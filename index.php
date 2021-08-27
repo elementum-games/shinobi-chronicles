@@ -199,7 +199,7 @@ if($LOGGED_IN) {
 		exit;
 	}	
 	if($player->ban_type == 'game') {
-		$ban_time = bcsub($player->ban_expire, time());
+		$ban_time = $player->ban_expire - time();
 		$ban_message = 'You are currently banned from the game. Time remaining: ';
 		$ban_message .= $system->time_remaining($ban_time);
 		if(!$ajax) {
@@ -640,7 +640,7 @@ if($LOGGED_IN) {
 		}
 		// Logout timer
 		require_once("functions.php");
-		$time_remaining = ($logout_limit * 60) - bcsub(time(), $player->last_login);
+		$time_remaining = ($logout_limit * 60) - (time() - $player->last_login);
 		$logout_time = timeRemaining($time_remaining, 'short', false, true) . " remaining";
 		$logout_display = ($logout_display) ? $logout_display : $logout_time;
 		echo str_replace("<!--LOGOUT_TIMER-->", $logout_display, $side_menu_end);

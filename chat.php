@@ -14,7 +14,7 @@ function chat() {
 	global $player;
 	global $self_link;
 	if($player->ban_type == 'tavern') {
-		$ban_time = bcsub($player->ban_expire, time());
+		$ban_time = $player->ban_expire - time();
 		$ban_message = 'You are currently banned from the chat. Time remaining: ';
 		$ban_message .= $system->time_remaining($ban_time);
 		echo "<table class='table'><tr><th>Chat</th></tr>
@@ -206,7 +206,7 @@ function chat() {
 				</td>
 				<td style='text-align:center;padding:4px;white-space:pre;'>" . 
 					wordwrap($system->html_parse(stripslashes($post['message']), false, true), 60, "\n", true) . "</td>";
-				$post_time = bcsub(time(), $post['time']);
+				$post_time = time() - $post['time'];
 				$post_minutes = ceil($post_time / 60);
 				$post_hours = floor($post_minutes / 60);
 				if($post_hours) {
