@@ -1,0 +1,68 @@
+
+-user archive
+
+-char counters
+
+-head_mod hiring/firing features
+
+-simple interface
+
+
+JONIN:
+
+[DONE] -add diffuse effect for weapons
+[DONE] -buff jutsu
+[DONE] -secondary element
+[DONE]-clan leader spots
+	[DONE] -claim
+	[DONE] -resign
+	[DONE]-controls
+		[DONE]-Edit motto
+		[DONE]-Edit avatar
+		[DONE]-Use points to change boost
+[DONE] -elemental tai weapons
+[DONE]-barrier jutsu
+[DONE]-layered genjutsu
+[DONE]-combat missions
+[DONE]-clan missions
+-jonin exam mission
+-content (Jutsu, AI, items, missions)
+
+
+-challenge for clan leader spot
+-Use points to dispurse rewards(money?) to clan members
+-Summoning
+-ANBU squads
+-students
+
+
+evaluate move level training
+
+
+::TEAM SYSTEM::
+
+Team points:
+Each month, teams that are above village average for points but below average for points that month will have the difference in their points -> monthly points subtracted from their total points.
+
+
+SENNIN:
+
+-Kage
+	Decided on a (monthly??) cycle, at the end of the cycle candidates are considered
+	Most points gained over last month
+	Top team over last month
+	Reputation? Kills over high ranking ninja, elo system basically????????????
+
+EVENTUALLY LIST
+
+-ichikawa ramen mission + coupon rewards
+-consider balance of multi-offense training
+-MPvP (any team members within 1 square of you at start of battle can join)
+-Add jutsu that use consumables
+-4th hokage's teleportation jutsu (limited # of items, drop on map, warp to any one)
+
+ELEMENTS ADD AN EFFECT THAT OTHER ELEMENTS TRIGGER
+frost = takes additional fire/shock damage????
+shocked = something something water?
+
+-AI that gets stronger when defeated by other players

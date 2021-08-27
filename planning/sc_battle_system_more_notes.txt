@@ -1,0 +1,66 @@
+Stats
+
+
+Jutsu with health cost in battle
+
+mangekyo style side effects
+
+Chakra - Having more of it could be a bloodline thing
+
+Absorbing chakra
+In-combat healing(Bl stat for non-medical ninj)
+
+Ninjutsu have two parts:
+-Chakra form
+-Chakra nature(element)
+
+
+elements have attributes (wind = slicing)
+
+Add these to elemental jutsu
+
+Combination of these results in unique synergy
+
+
+
+Chakra control stat????? 
+For nin/gen
+
+Jutsu types:
+
+Second-tier jutsu can be learned when first-tier is level 50+
+
+
+NINJUTSU
+
+elemental weaknesses factor during collission
+Fire > Wind > Lightning > Earth > Water
+
+Jutsu collission = 25% of damage slipthrough
+WInning jutsu gets remainder of damage clash added to slipthrough damage
+Defensive jutsu clash with offensive jutsu down to 10% slipthrough
+
+
+
+
+TAIJUTSU VS NINJUTSU
+speed vs cast speed
+whoever's speed is higher reduces the other's damage down to possible 25%
+equal speed = both people 50% damage
+damage reducd by tai skill
+taijutsu vs defensive jutsu?????
+
+TAIJUTSU VS TAIJUTSU
+equal speed = both people 100% damage
+
+
+GENJUTSU
+-Chuunin+ likely
+-Clone/kawarimi at genin?
+-Take effect the turn after they are cast
+-Anything done to the user in the turn they are done does not cancel
+-Will wear off after a certain number of turns, can be broken earlier with Genjutsu Release jutsu (Intelligence/GR jutsu level vs Intelligence / genjutsu level)
+-Each turn they are active they apply an effect (damage, debuff, etc)
+-Each turn they are active they become easier to break
+-Lv2 genjutsu can be activated X turns after Lv1 has been active, are stronger
+-True illusions? TRUE ILLUSIONS, LIE ABOUT HEALTH (prolly bad idea)

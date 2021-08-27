@@ -1,0 +1,341 @@
+<html>
+<head>
+<title>Data Structure</title>
+</head>
+<body>
+
+
+<!--USER-->
+<div style='width:225px;float:left;white-space:pre;'>
+<h3 style='margin-left:50px;margin-bottom:3px;'>::USER::</h3>
+-user_id
+-user_name
+-password
+-email
+-staff_level
+-last_ip
+-last_login
+-last_update
+-last_active
+-failed_logins
+-avatar_link
+
+-gender
+-village
+-level
+-rank
+-health
+-max_health
+-stamina
+-max_stamina
+-chakra
+-max_chakra
+-regen_rate
+-exp
+-bloodline_id
+-bloodline_name
+-awake
+-battle_id
+-location(x.y)
+-in_village (boolean, determined in class from location + village location comparison)
+
+-train_type
+-train_gain
+-train_time
+
+-money
+-premium_credits
+-premium_credits_purchased
+
+-pvp_wins
+-pvp_losses
+-ai_wins
+-ai_losses
+
+-monthly_pvp
+
+-ninjutsu skill
+-genjutsu skill
+-taijutsu skill
+
+-bloodline_skill
+
+-cast_speed
+
+-speed
+-strength
+-endurance
+-intelligence
+-willpower
+
+<b>Bloodline</b>
+-bloodline id
+-bloodline name
+
+-register_date
+
+</div>
+
+
+<!--USER INVENTORY-->
+<div style='width:225px;float:left;white-space:pre;'>
+<h3 style='margin-left:50px;margin-bottom:3px;'>::USER INVENTORY::</h3>
+
+-user_id
+
+<b>jutsu</b> (Below is JSON encoded into text column)
+--jutsu_id
+--level
+--exp
+
+<b>items</b> (Below is JSON encoded into text column)
+-item_id
+-quantity
+
+<b>bloodline_jutsu</b> (Below is JSON encoded into text column)
+--jutsu_id
+--level
+--exp
+
+<b>equipped_jutsu</b> (Below is JSON encoded into text column)
+-jutsu_id
+
+<b>equipped_items</b> (Below is JSON encoded into text column)
+-item_id
+
+</div>
+
+<!--JOURNAlS-->
+<div style='width:225px;float:left;white-space:pre;'>
+<h3 style='margin-left:50px;margin-bottom:3px;'>::JOURNALS::</h3>
+
+-user_id
+-journal
+
+</div>
+
+<!--AI OPPONENTS-->
+<div style='width:225px;float:left;white-space:pre;'>
+<h3 style='margin-left:50px;margin-bottom:3px;'>::AI OPPONENTS::</h3>
+
+-ai_id
+-rank
+-name
+-max_health
+
+-ninjutsu skill
+-genjutsu skill(offense + defense)
+-taijutsu skill(offense + defense)
+
+-speed(taijutsu accuracy)
+-strength(taijutsu damage)
+-cast_speed(ninjutsu defense vs taijutsu)
+-endurance(taijutsu defense)
+-intelligence(genjutsu offense + resistance)
+-willpower(all defense)
+
+
+-moves(json encoded text): [battle_text, power]
+
+</div>
+
+
+<!--JUTSU-->
+<div style='width:400px;float:left;white-space:pre;'>
+<h3 style='margin-left:50px;margin-bottom:3px;'>::JUTSU::</h3>
+-jutsu_id
+-name
+-jutsu_type (ninjutsu, genjutsu, taijutsu)
+-rank (student, genin, etc.)
+-level (0 for unlearned jutsu (SCROLL), 1-100 for other)
+-power
+-hand_seals (1-2-3-4-5-6)
+-element (melee, spirit, poison, fire, etc.)
+-parent_jutsu (for chained multi-stage moves)
+-purchase_type (1 = default, 2 = purchasable, 3 = non-purchasable)
+-purchase_cost
+-use_cost
+-use_type (projectile, physical, barrier)
+-description
+-battle_text
+-effect
+-effect_amount
+-effect_length
+</div>
+
+<!--ITEMS-->
+<div style='width:250px;float:left;white-space:pre;'>
+<h3 style='margin-left:50px;margin-bottom:3px;'>::ITEM::</h3>
+-item_id
+-name
+-rank
+-purchase_type(1 = purchasable, 2 = event)
+-purchase_cost
+-use_type (1 = weapon, 2 = armor, 3 = consumable)
+-effect
+-effect_amount
+</div>
+
+<!--BLOODLINE-->
+<div style='width:300px;float:left;white-space:pre;'>
+<h3 style='margin-left:50px;margin-bottom:3px;'>::BLOODLINE::</h3>
+-bloodline_id (int)
+-name (string - 100 chars)
+-clan_id (int)
+-rank (lesser, common, greater, elite, legendary)
+-passive_boosts (string - variable)
+	-json: 1-3x(effect, amount, power)
+-combat_boosts(string - variable)
+	-json: 1-3x(effect, amount, power)
+-moves(string - variable)
+	-json: [JUTSU data structure]
+
+Bloodlines will have set amount of power points (100 would be full for a legendary)
+These points can be set for each boost
+Effects will be static numbers (not %) which are increased by bloodline skill
+</div>
+
+
+<!--USER_BLOODLINE-->
+<div style='width:300px;float:left;white-space:pre;'>
+<h3 style='margin-left:50px;margin-bottom:3px;'>::BLOODLINE::</h3>
+-bloodline_id
+-passive_boosts(with actual %s)
+-combat_boosts(with actual %s)
+-moves (id, level, exp)
+</div>
+
+
+<!--TAVERN CHAT-->
+<div style='width:300px;float:left;white-space:pre;'>
+<h3 style='margin-left:50px;margin-bottom:3px;'>::TAVERN CHAT::</h3>
+-post_id
+-user_name
+-message
+-time
+-staff_level
+</div>
+
+<!--PRIVATE MESSAGES-->
+<div style='width:300px;float:left;white-space:pre;'>
+<h3 style='margin-left:50px;margin-bottom:3px;'>::PRIVATE MESSAGES::</h3>
+-message_id
+-sender
+-recipient
+-subject
+-message
+-time
+-read
+-staff_level
+</div>
+
+
+<!--NEWS POSTS-->
+<div style='width:300px;float:left;white-space:pre;'>
+<h3 style='margin-left:50px;margin-bottom:3px;'>::NEWS POSTS::</h3>
+-post_id
+-sender
+-title
+-message
+-time
+</div>
+
+<!--VILLAGES-->
+<div style='width:300px;float:left;white-space:pre;'>
+<h3 style='margin-left:50px;margin-bottom:3px;'>::VILLAGES::</h3>
+-village_id
+-name
+-location
+-points
+</div>
+
+<!--BANNED IPS-->
+<div style='width:300px;float:left;white-space:pre;'>
+<h3 style='margin-left:50px;margin-bottom:3px;'>::BANNED IPS::</h3>
+-id
+-ip_address
+-ban_level
+</div>
+
+<!--REPORTS-->
+<div style='width:300px;float:left;white-space:pre;'>
+<h3 style='margin-left:50px;margin-bottom:3px;'>::REPORTS::</h3>
+report_id
+report_type
+content_id
+user_id
+reporter_id
+staff_level
+reason
+notes
+status
+time
+</div>
+		
+<!--RANKS-->
+<div style='width:300px;float:left;white-space:pre;'>
+<h3 style='margin-left:50px;margin-bottom:3px;'>::RANKS::</h3>
+rank_id
+name
+base_level
+max_level
+base_stats
+stats_per_level
+health_gain
+pool_gain
+stat_cap
+</div>
+
+<!--CLAN-->
+<div style='width:300px;float:left;white-space:pre;'>
+<h3 style='margin-left:50px;margin-bottom:3px;'>::CLANS::</h3>
+clan_id
+village
+name
+bloodline_only
+boost
+boost_amount
+points
+leader
+elder_1
+elder_2
+logo
+</div>
+
+<!--MISSION-->
+<div style='width:300px;float:left;white-space:pre;'>
+<h3 style='margin-left:50px;margin-bottom:3px;'>::CLANS::</h3>
+mission_id
+name
+rank (1 = d-rank, 2 = c-rank, 3 = B-rank, 4 = A-rank, 5 = S-rank)
+mission_type  (1 = village, 2 = clan, 3 = special)
+stages(json encode)
+	-stage_id
+	-action_type (travel, search)
+	-action_data (location to travel to/search for)
+	-location_radius (radius to search/generate dynamic location in)
+	-description (text displayed to user)
+</div>
+
+<!--TEAM-->
+<div style='width:300px;float:left;white-space:pre;'>
+<h3 style='margin-left:50px;margin-bottom:3px;'>::TEAMS::</h3>
+team_id
+village
+name
+boost
+boost_amount
+points
+monthly_points
+leader
+members(JSON array of userids)
+mission_id
+mission_stage
+logo
+</div>
+
+		
+<br style='clear:both;' />
+
+</body>
+</html>

@@ -1,0 +1,9 @@
+Cast speed allows ninjutsu users to avoid damage from taijutsu.
+
+Speed allows taijutsu users to avoid damage from ninjutsu.
+
+Intelligence helps genjutsu users to keep people from breaking out of their genjutsu. It can also help other people to break out of genjutsu.
+
+Endurance provides defense against all types of damage.
+
+Willpower allows people to partially resist the effects of debuffs.

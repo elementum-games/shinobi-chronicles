@@ -1,0 +1,61 @@
+<p style='white-space:pre;'>
+DB naming convention:
+table_name
+column_name
+
+Script naming conventions
+variable_name
+ClassName
+functionName (applies to methods also)
+
+</p>
+
+<div style='white-space:pre;'>
+ShinobiChronicles
+INDEX ALGORITHM
+
+Start session
+
+If user isn't logged in, run login branch
+	-If login data submitted, validate
+		-Select info from DB by username
+		-If password matches, set userid in session
+		-Otherwise, invalid:
+			-Update failed logins to stop bruteforce attempts
+			-Set error message
+			
+	
+-Display header
+-Display any error messages	
+-If user is logged in, check page choice and display
+	-Set continue flag
+	-Check passive/asleep pages
+		If page choice is found, require script, call function, set continue to false
+	-If continue flag is true, check action/wake pages
+		If page choice is found, require script, call function, set continue to false
+	-If continue flag is true and player is staff, check staff pages
+		If choice is mod panel, require script, call function, set continue to false
+		If player is admin and choice is admin panel, require script, call function, set continue to false
+	
+	
+-Otherwise, display login form and news.
+-Display footer
+</div>
+
+<div style='white-space:pre;'>
+Files with server-specific variables:
+
+-variables.php
+</div>
+
+
+<div style='white-space:pre;'>
+Villages:
+	Stone
+	Cloud
+	Leaf
+	Sand
+	Mist
+
+<a href='./data_structure.html'>Data structure</a><br />
+<a href='./page_list.html'>Page list</a>
