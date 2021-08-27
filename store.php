@@ -36,14 +36,14 @@ function store() {
 	if($view == 'jutsu') {
 		$shop_jutsu = array();
 		$result = $system->query("SELECT * FROM `jutsu` WHERE `purchase_type` = '2' AND `rank` <= '$player->rank' ORDER BY `rank` ASC, `purchase_cost` ASC");
-		while($row = mysql_fetch_assoc($result)) {
+		while($row = $system->db_fetch($result)) {
 			$shop_jutsu[$row['jutsu_id']] = $row;
 		}
 	}
 	else {
 		$shop_items = array();
 		$result = $system->query("SELECT * FROM `items` WHERE `purchase_type` = '1' AND `rank` <= '$player->rank' ORDER BY `rank` ASC, `purchase_cost` ASC");
-		while($row = mysql_fetch_assoc($result)) {
+		while($row = $system->db_fetch($result)) {
 			$shop_items[$row['item_id']] = $row;
 		}
 	}

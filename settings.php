@@ -67,7 +67,7 @@ function userSettings() {
 		$confirm_password = trim($_POST['confirm_new_password']);
 		
 		$result = $system->query("SELECT `password` FROM `users` WHERE `user_id`='{$player->user_id}' LIMIT 1");
-		$result = mysql_fetch_assoc($result);
+		$result = $system->db_fetch($result);
 		
 		try {
 			if(sha1(str_rot13(sha1($password))) != $result['password']) {
@@ -104,7 +104,7 @@ function userSettings() {
 		
 			$password = sha1(str_rot13(sha1($password)));
 			$system->query("UPDATE `users` SET `password`='$password' WHERE `user_id`='{$player->user_id}' LIMIT 1");
-			if(mysql_affected_rows() >= 1) {
+			if($system->db_affected_rows >= 1) {
 				$system->message("Password updated!");
 			}
 		} catch (Exception $e) {
@@ -125,7 +125,7 @@ function userSettings() {
 				throw new Exception("Invaild song link!");
 			}
 			$system->query("UPDATE `users` SET `profile_song`='{$profile_song}' WHERE `user_id`='{$player->user_id}' LIMIT 1");
-			if(mysql_affected_rows() == 1) {
+			if($system->db_affected_rows == 1) {
 				$player->profile_song = $profile_song;
 				$system->message("Profile song updated!");
 			}
@@ -146,7 +146,7 @@ function userSettings() {
 			}
 			
 			$system->query("UPDATE `journals` SET `journal`='$journal' WHERE `user_id`='{$player->user_id}' LIMIT 1");
-			if(mysql_affected_rows() == 1) {
+			if($system->db_affected_rows == 1) {
 				$system->message("Journal updated!");
 			}
 		} catch (Exception $e) {
@@ -274,12 +274,12 @@ function userSettings() {
 	</td></tr>";
 	
 	$result = $system->query("SELECT `journal` FROM `journals` WHERE `user_id` = '{$player->user_id}' LIMIT 1");
-	if(mysql_num_rows($result) == 0) {
+	if($system->db_num_rows == 0) {
 		$journal = '';
 		$system->query("INSERT INTO `journals` (`user_id`, `journal`) VALUES('{$player->user_id}', '')");
 	}
 	else {
-		$result = mysql_fetch_assoc($result);
+		$result = $system->db_fetch($result);
 		$journal = $result['journal'];
 	}
 	

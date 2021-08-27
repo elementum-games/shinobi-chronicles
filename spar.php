@@ -19,13 +19,13 @@ function spar() {
 	if($player->battle_id) {
 		require("battleCore.php");
 		$result = $system->query("SELECT * FROM `battles` WHERE `battle_id`='$player->battle_id' LIMIT 1");
-		if(mysql_num_rows($result) == 0) {
+		if($system->db_num_rows == 0) {
 			$system->message("Invalid battle! - fetch");
 			$system->printMessage();
 			$player->battle_id = 0;
 			return false;
 		}
-		$battle = mysql_fetch_assoc($result);
+		$battle = $system->db_fetch($result);
 		
 		if($player->user_id == $battle['player1']) {
 			$opponent = new User($battle['player2']);
@@ -70,10 +70,10 @@ function spar() {
 			$challenge = (int)$system->clean($_GET['challenge']);
 			$result = $system->query("SELECT `user_id`, `user_name`, `village`, `location`, `challenge`, `battle_id`, `last_active`
 				FROM `users` WHERE `user_id`='$challenge' LIMIT 1");
-			if(mysql_num_rows($result) == 0) {
+			if($system->db_num_rows == 0) {
 				throw new Exception("Invalid user!");
 			}
-			$user = mysql_fetch_assoc($result);
+			$user = $system->db_fetch($result);
 			
 			/*
 			if($user['village'] != $player->village) {
@@ -117,10 +117,10 @@ function spar() {
 			
 			$result = $system->query("SELECT `user_id`, `user_name`, `village`, `location`, `battle_id`, `last_active` 
 				FROM `users` WHERE `user_id`='$challenge' LIMIT 1");
-			if(mysql_num_rows($result) == 0) {
+			if($system->db_num_rows == 0) {
 				throw new Exception("Invalid user!");
 			}
-			$user = mysql_fetch_assoc($result);
+			$user = $system->db_fetch($result);
 			
 			/*
 			if($user['village'] != $player->village) {

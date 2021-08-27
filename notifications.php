@@ -38,7 +38,7 @@ function displayNotifications() {
 
 	if($player->staff_level >= $SC_MODERATOR) {
 		$result = $system->query("SELECT `report_id` FROM `reports` WHERE `status` = 0 AND `staff_level` < $player->staff_level LIMIT 1");
-		if(mysql_num_rows($result) > 0) {
+		if($system->db_num_rows > 0) {
 			$notifications[] = "<a class='link' href='$report_link&page=view_all_reports'>New report(s)!</a>";
 		}
 	}

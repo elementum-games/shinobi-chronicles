@@ -26,7 +26,7 @@ function scoutArea() {
 	// Load rank data
 	$ranks = array();
 	$result = $system->query("SELECT `rank_id`, `name` FROM `ranks`");
-	while($rank = mysql_fetch_assoc($result)) {
+	while($rank = $system->db_fetch($result)) {
 		$ranks[$rank['rank_id']]['name'] = $rank['name'];
 	}
 	
@@ -34,7 +34,7 @@ function scoutArea() {
 	$result = $system->query("SELECT `user_id`, `user_name`, `rank`, `village`, `exp`, `location`, `battle_id`, `stealth` FROM `users` 
 		WHERE `last_active` > UNIX_TIMESTAMP() - 120 ORDER BY `exp` DESC LIMIT $min, $users_per_page");
 	$users = array();
-	while($row = mysql_fetch_assoc($result)) {
+	while($row = $system->db_fetch($result)) {
 		$location = explode('.', $row['location']);
 		$scout_range = $player->scout_range - $row['stealth'];
 		if($scout_range < 0) {

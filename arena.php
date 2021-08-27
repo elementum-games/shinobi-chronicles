@@ -190,13 +190,13 @@ function arena() {
 			WHERE `rank` ='$SC_MAX_RANK' ORDER BY `level` ASC");
 		}
 		//End
-		if(mysql_num_rows($result) == 0) {
+		if($system->db_num_rows == 0) {
 			$system->message("No AI opponents found!");
 			$system->printMessage();
 			return false;
 		}
 		$ai_opponents = array();
-		while($row = mysql_fetch_assoc($result)) {
+		while($row = $system->db_fetch($result)) {
 			$ai_opponents[$row['ai_id']] = $row;
 		}
 		$fight_start = false;

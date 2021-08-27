@@ -92,10 +92,10 @@ function battle() {
 			$attack_id = (int)$system->clean($_GET['attack']);
 			$result = $system->query("SELECT `user_id`, `user_name`, `rank`, `village`, `location`, `last_active`, `battle_id`, `last_death` 
 				FROM `users` WHERE `user_id`='$attack_id' LIMIT 1");
-			if(mysql_num_rows($result) == 0) {
+			if($system->db_num_rows == 0) {
 				throw new Exception("Invalid user!");
 			}
-			$user = mysql_fetch_assoc($result);
+			$user = $system->db_fetch($result);
 			if($user['village'] == $player->village) {
 				throw new Exception("You cannot attack people from your own village!");
 			}

@@ -63,7 +63,7 @@ function report() {
 					throw new Exception("Invalid user!");
 				}
 				
-				$content_data = mysql_fetch_assoc($result);
+				$content_data = $system->db_fetch($result);
 				$user_id = $content_id;
 				$staff_level = $content_data['staff_level'];
 				$time = time();
@@ -93,17 +93,17 @@ function report() {
 			// Chat post
 			else if($report_type == 3) {
 				$result = $system->query("SELECT `user_name`, `message`, `time` FROM `chat` WHERE `post_id`='$content_id' LIMIT 1");
-				if(mysql_num_rows($result) == 0) {
+				if($system->db_num_rows == 0) {
 					throw new Exception("Invalid user!");
 				}
 				
-				$content_data = mysql_fetch_assoc($result);
+				$content_data = $system->db_fetch($result);
 				
 				$result = $system->query("SELECT `user_id`, `staff_level` FROM `users` WHERE `user_name`='" . $content_data['user_name'] . "' LIMIT 1");
 				if(! $system->db_num_rows) {
 					throw new Exception("Invalid user!");
 				}
-				$result = mysql_fetch_assoc($result);
+				$result = $system->db_fetch($result);
 				$user_id = $result['user_id'];
 				$staff_level = $result['staff_level'];
 				$time = $content_data['time'];
@@ -124,7 +124,7 @@ function report() {
 			// Check for existing report
 			if($report_type != 1) {
 				$result = $system->query("SELECT `report_id` FROM `reports` WHERE `content_id`='$content_id' AND `report_type`='$report_type'");
-				if(mysql_num_rows($result) > 0) {
+				if($system->db_num_rows > 0) {
 					throw new Exception("This content has already been reported!");
 				}
 			}
@@ -143,7 +143,7 @@ function report() {
 			
 			$system->query($query);
 			
-			if(mysql_affected_rows() == 1) {
+			if($system->db_affected_rows == 1) {
 				$system->message("Report sent!");
 				$page = '';
 			}
@@ -162,11 +162,11 @@ function report() {
 		try {
 			$report_id = (int)$system->clean($_GET['report_id']);
 			$result = $system->query("SELECT `report_id`, `status`, `moderator_id` FROM `reports` WHERE `report_id`='$report_id' AND `staff_level` < $player->staff_level");
-			if(mysql_num_rows($result) == 0) {
+			if($system->db_num_rows == 0) {
 				throw new Exception("Invalid report!");
 			}
 			
-			$report = mysql_fetch_assoc($result);
+			$report = $system->db_fetch($result);
 			if($report['status'] != 0 && $player->staff_level < $SC_HEAD_MODERATOR) {
 				throw new Exception("Report has already been handled!");
 			}
@@ -182,7 +182,7 @@ function report() {
 			}
 			
 			$system->query("UPDATE `reports` SET `status` = $verdict, `moderator_id`='$player->user_id' WHERE `report_id` = $report_id LIMIT 1");
-			if(mysql_affected_rows() == 1) {
+			if($system->db_affected_rows == 1) {
 				$system->message("Report handled!");
 			}
 			else {
@@ -213,7 +213,7 @@ function report() {
 					throw new Exception("Invalid user!");
 				}
 				
-				$content_data = mysql_fetch_assoc($result);
+				$content_data = $system->db_fetch($result);
 				$user_id = $content_id;
 				$user_name = $content_data['user_name'];
 			}
@@ -238,17 +238,17 @@ function report() {
 			// Chat post
 			else if($report_type == 3) {
 				$result = $system->query("SELECT `user_name`, `message` FROM `chat` WHERE `post_id`='$content_id' LIMIT 1");
-				if(mysql_num_rows($result) == 0) {
+				if($system->db_num_rows == 0) {
 					throw new Exception("Invalid user!");
 				}
 				
-				$content_data = mysql_fetch_assoc($result);
+				$content_data = $system->db_fetch($result);
 				
 				$result = $system->query("SELECT `user_id` FROM `users` WHERE `user_name`='" . $content_data['user_name'] . "' LIMIT 1");
-				if(mysql_num_rows($result) == 0) {
+				if($system->db_num_rows == 0) {
 					throw new Exception("Invalid user!");
 				}
-				$result = mysql_fetch_assoc($result);
+				$result = $system->db_fetch($result);
 				$user_id = $result['user_id'];
 				$user_name = $content_data['user_name'];
 			}
@@ -259,7 +259,7 @@ function report() {
 			// Check for existing report
 			if($report_type != 1) {
 				$result = $system->query("SELECT `report_id` FROM `reports` WHERE `content_id`='$content_id' AND `report_type`='$report_type'");
-				if(mysql_num_rows($result) > 0) {
+				if($system->db_num_rows > 0) {
 					throw new Exception("This content has already been reported!");
 				}
 			}
@@ -313,7 +313,7 @@ function report() {
 		echo "<table class='table'><tr><th colspan='4'>Reports</th></tr>";
 		
 		$result = $system->query("SELECT * FROM `reports` WHERE `staff_level` < $player->staff_level AND `status` = 0");
-		if(mysql_num_rows($result) == 0) {
+		if($system->db_num_rows == 0) {
 			echo "<tr><td style='text-align:center;' colspan='4'>No reports!</td></tr>";
 		}
 		else {
@@ -326,7 +326,7 @@ function report() {
 			$user_ids = array();
 			$user_names = array();
 			$reports = array();
-			while($row = mysql_fetch_assoc($result)) {
+			while($row = $system->db_fetch($result)) {
 				$user_ids[] = $row['user_id'];
 				$user_ids[] = $row['reporter_id'];
 				$reports[] = $row;
@@ -336,7 +336,7 @@ function report() {
 			$user_ids = implode(',', $user_ids);
 			// Get user names
 			$result = $system->query("SELECT `user_id`, `user_name` FROM `users` WHERE `user_id` IN ($user_ids)");
-			while($row = mysql_fetch_assoc($result)) {
+			while($row = $system->db_fetch($result)) {
 				$user_names[$row['user_id']] = $row['user_name'];
 			}
 			
@@ -359,14 +359,14 @@ function report() {
 			}
 			
 			$result = $system->query("SELECT * FROM `reports` WHERE `report_id`='$report_id' AND `staff_level` < $player->staff_level");
-			if(mysql_num_rows($result) == 0) {
+			if($system->db_num_rows == 0) {
 				throw new Exception("Invalid report!");
 			}
-			$report = mysql_fetch_assoc($result);
+			$report = $system->db_fetch($result);
 			
 			$result = $system->query("SELECT `user_id`, `user_name` FROM `users` WHERE `user_id` IN (" . $report['user_id'] . ',' . $report['reporter_id'] . ")");
 			$user_names = array();
-			while($row = mysql_fetch_assoc($result)) {
+			while($row = $system->db_fetch($result)) {
 				$user_names[$row['user_id']] = $row['user_name'];
 			}
 			

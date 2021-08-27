@@ -48,7 +48,7 @@ function members() {
 		$result = $system->query("SELECT `user_id` FROM `users` WHERE `user_name`='{$user_name}' LIMIT 1");
 			
 		try {
-			if(mysql_num_rows($result) == 0) {
+			if($system->db_num_rows == 0) {
 				throw new Exception("User does not exist!");
 			}
 		

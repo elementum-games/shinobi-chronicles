@@ -41,7 +41,7 @@ function news() {
 				VALUES ('{$player->user_name}', '{$title}', '{$post}', '" . time() . "')";
 			$system->query($query);
 			
-			if(mysql_affected_rows() == 1) {
+			if($system->db_affected_rows == 1) {
 				$system->message("News posted!");
 				$page = false;
 			}

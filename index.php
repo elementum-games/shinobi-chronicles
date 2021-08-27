@@ -216,7 +216,7 @@ if($LOGGED_IN) {
 		exit;
 	}
 	$result = $system->query("SELECT `id` FROM `banned_ips` WHERE `ip_address`='" . $system->clean($_SERVER['REMOTE_ADDR']) . "' LIMIT 1");
-	if(mysql_num_rows($result) > 0) {		
+	if($system->db_num_rows > 0) {
 		if(!$ajax) {
 			echo str_replace("[HEADER_TITLE]", "Profile", $body_start);
 		}
@@ -275,14 +275,14 @@ if($LOGGED_IN) {
 	$result = $system->query("SELECT `name`, `location` FROM `villages`");
 	$villages = array();
 	$count = 0;
-	while($row = mysql_fetch_assoc($result)) {
+	while($row = $system->db_fetch($result)) {
 		$villages[$row['location']] = $row;
 		$villages[$row['location']]['count'] = $count++;
 	}
 	// Load rank data// Rank names
 	$RANK_NAMES = array();
 	$result = $system->query("SELECT `rank_id`, `name` FROM `ranks`");
-	while($rank = mysql_fetch_assoc($result)) {
+	while($rank = $system->db_fetch($result)) {
 		$RANK_NAMES[$rank['rank_id']] = $rank['name'];
 	}
 	// Page list 

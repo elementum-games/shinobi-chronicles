@@ -130,12 +130,12 @@ class User {
 		$result = $system->query("SELECT `user_id`, `user_name`, `ban_type`, `ban_expire`, `journal_ban`, `avatar_ban`, `song_ban`, `last_login`, 
 			`forbidden_seal`, `staff_level`, `username_changes` 
 			FROM `users` WHERE `user_id`='$this->user_id' LIMIT 1");
-		if(mysql_num_rows($result) == 0) {
+		if($system->db_num_rows == 0) {
 			$system->error("User does not exist!");
 			return false;
 		}
 		
-		$result = mysql_fetch_assoc($result);
+		$result = $system->db_fetch($result);
 		
 		$this->user_name = $result['user_name'];
 		$this->username_changes = $result['username_changes'];
@@ -763,8 +763,8 @@ class User {
 		$player_equipped_items = array();
 		
 		// Decode JSON of inventory into variables
-		if(mysql_num_rows($result) > 0) {
-			$user_inventory = mysql_fetch_assoc($result);
+		if($system->db_num_rows > 0) {
+			$user_inventory = $system->db_fetch($result);
 			$player_jutsu = json_decode($user_inventory['jutsu']);
 			$player_items = json_decode($user_inventory['items']);
 			$bloodline_jutsu = json_decode($user_inventory['bloodline_jutsu']);
@@ -795,8 +795,8 @@ class User {
 			$result = $this->system->query(
 				"SELECT * FROM `jutsu` WHERE `jutsu_id` IN ({$player_jutsu_string}) 
 				AND `purchase_type` != '1' AND `rank` <= '{$this->rank}'");
-			if(mysql_num_rows($result) > 0) {
-				while($jutsu = mysql_fetch_assoc($result)) {
+			if($system->db_num_rows > 0) {
+				while($jutsu = $system->db_fetch($result)) {
 					if($player_jutsu[$jutsu['jutsu_id']]->level == 0) {
 						$this->jutsu_scrolls[$jutsu['jutsu_id']] = $jutsu;
 						$this->jutsu_scrolls[$jutsu['jutsu_id']]['level'] = $player_jutsu[$jutsu['jutsu_id']]->level;
@@ -861,8 +861,8 @@ class User {
 			$this->items = array();
 			
 			$result = $this->system->query("SELECT * FROM `items` WHERE `item_id` IN ({$player_items_string})");
-			if(mysql_num_rows($result) > 0) {
-				while($item = mysql_fetch_assoc($result)) {
+			if($system->db_num_rows > 0) {
+				while($item = $system->db_fetch($result)) {
 					$this->items[$item['item_id']] = $item;
 					$this->items[$item['item_id']]['quantity'] = $player_items[$item['item_id']]->quantity;
 				}

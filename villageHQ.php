@@ -95,7 +95,7 @@ function villageHQ() {
 		// Load rank data
 		$ranks = array();
 		$result = $system->query("SELECT `rank_id`, `name` FROM `ranks`");
-		while($rank = mysql_fetch_assoc($result)) {
+		while($rank = $system->db_fetch($result)) {
 			$ranks[$rank['rank_id']]['name'] = $rank['name'];
 		}
 		
@@ -222,7 +222,7 @@ function villageHQ() {
 		// World info
 		$result = $system->query("SELECT * FROM `villages`");
 		$villages = array();
-		while($row = mysql_fetch_assoc($result)) {
+		while($row = $system->db_fetch($result)) {
 			$villages[] = $row;
 		}
 

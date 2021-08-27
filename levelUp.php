@@ -541,7 +541,7 @@ function rankUp() {
 					// Question 3 - Most villagers
 					$result = $system->query("SELECT `name` FROM `villages`");
 					$villages = array();
-					while($row = mysql_fetch_assoc($result)) {
+					while($row = $system->db_fetch($result)) {
 						$villages[] = $row;
 					}
 

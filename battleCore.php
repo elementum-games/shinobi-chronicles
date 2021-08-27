@@ -893,7 +893,7 @@ function battlePvP(&$player, &$opponent, &$battle) {
     $default_attacks = array();
     $query = "SELECT * FROM `jutsu` WHERE `purchase_type`='1'";
     $result = $system->query($query);
-    while($row = mysql_fetch_assoc($result)) {
+    while($row = $system->db_fetch($result)) {
         $default_attacks[$row['jutsu_id']] = $row;
     }
     $turn_length = 60;

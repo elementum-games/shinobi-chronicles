@@ -47,10 +47,10 @@ function modPanel() {
 				throw new Exception("Invalid ban type!");
 			}
 			$result = $system->query("SELECT `user_id`, `user_name`, `staff_level`, `ban_type`, `ban_expire` FROM `users` WHERE `user_name`='$user_name'");
-			if(mysql_num_rows($result) == 0) {
+			if($system->db_num_rows == 0) {
 				throw new Exception("Invalid username!");
 			}
-			$user_data = mysql_fetch_assoc($result);
+			$user_data = $system->db_fetch($result);
 			if($user_data['staff_level'] >= $player->staff_level and $player->staff_level != $SC_HEAD_ADMINISTRATOR) {
 				throw new Exception("You cannot ban fellow staff members!");
 			}
@@ -81,7 +81,7 @@ function modPanel() {
 				$ban_expire = time() + ($ban_length * 86400);
 				$system->query("UPDATE `users` SET `train_type`='', `train_time`=0, `ban_type`='$ban_type', `ban_expire`='$ban_expire' 
 					WHERE `user_id`='{$user_data['user_id']}' LIMIT 1");
-				if(mysql_affected_rows() == 1) {
+				if($system->db_affected_rows == 1) {
 					$system->message("User banned!");
 				}
 				else {
@@ -140,10 +140,10 @@ function modPanel() {
 			// Check username
 			$user_name = $system->clean($_POST['user_name']);		
 			$result = $system->query("SELECT `user_id`, `user_name`, `staff_level` FROM `users` WHERE `user_name`='$user_name'");
-			if(mysql_num_rows($result) == 0) {
+			if($system->db_num_rows == 0) {
 				throw new Exception("Invalid username!");
 			}
-			$user_data = mysql_fetch_assoc($result);
+			$user_data = $system->db_fetch($result);
 			if($user_data['staff_level'] >= $player->staff_level and $player->staff_level != $SC_HEAD_ADMINISTRATOR) {
 				throw new Exception("You cannot ban fellow staff members!");
 			}
@@ -192,7 +192,7 @@ function modPanel() {
 			}
 			// Set error flags
 			$error = false;
-			if(mysql_affected_rows() == 0) {
+			if($system->db_affected_rows == 0) {
 				$error = true;
 				if($ban_journal) {
 					$ban_journal = -1;
@@ -213,7 +213,7 @@ function modPanel() {
 			// Run remove journal query
 			if($remove_journal) {
 				$system->query("UPDATE `journals` SET `journal`='' WHERE `user_id` = '{$user_data['user_id']}' LIMIT 1");
-				if(mysql_affected_rows() == 0) {
+				if($system->db_affected_rows == 0) {
 					$error = true;
 					$remove_journal = -1;
 				}
@@ -366,11 +366,11 @@ function modPanel() {
 			try {
 				$ip_address = $system->clean($_POST['ip_address']);
 				$result = $system->query("SELECT `id` FROM `banned_ips` WHERE `ip_address`='$ip_address' LIMIT 1");
-				if(mysql_num_rows($result) > 0) {
+				if($system->db_num_rows > 0) {
 					throw new Exception("IP address has already been banned!");
 				}
 				$system->query("INSERT INTO `banned_ips` (`ip_address`, `ban_level`) VALUES ('$ip_address', 2)");
-				if(mysql_affected_rows() == 1) {
+				if($system->db_affected_rows == 1) {
 					$system->message("IP address '$ip_address' banned!");
 				}
 				else {
@@ -388,10 +388,10 @@ function modPanel() {
 				}
 				$user_name = $system->clean($_POST['user_name']);
 				$result = $system->query("SELECT `user_id`, `user_name`, `staff_level`, `ban_type`, `ban_expire` FROM `users` WHERE `user_name`='$user_name'");
-				if(mysql_num_rows($result) == 0) {
+				if($system->db_num_rows == 0) {
 					throw new Exception("Invalid username!");
 				}
-				$user_data = mysql_fetch_assoc($result);
+				$user_data = $system->db_fetch($result);
 				if($user_data['staff_level'] >= $player->staff_level and $player->staff_level != $SC_HEAD_ADMINISTRATOR) {
 					throw new Exception("You cannot unban fellow staff members!");
 				}
@@ -413,7 +413,7 @@ function modPanel() {
 				else {
 					$system->query("UPDATE `users` SET `ban_type`='', `ban_expire`='0' 
 						WHERE `user_id`='{$user_data['user_id']}' LIMIT 1");
-					if(mysql_affected_rows() == 1) {
+					if($system->db_affected_rows == 1) {
 						$system->message("User unbanned!");
 					}
 					else {
@@ -429,11 +429,11 @@ function modPanel() {
 			try {
 				$ip_address = $system->clean($_POST['ip_address']);
 				$result = $system->query("SELECT `id` FROM `banned_ips` WHERE `ip_address`='$ip_address' LIMIT 1");
-				if(mysql_num_rows($result) == 0) {
+				if($system->db_num_rows == 0) {
 					throw new Exception("IP address is not banned!");
 				}
 				$system->query("DELETE FROM `banned_ips` WHERE `ip_address`='$ip_address' LIMIT 1");
-				if(mysql_affected_rows() == 1) {
+				if($system->db_affected_rows == 1) {
 					$system->message("IP address '$ip_address' unbanned!");
 				}
 				else {
@@ -473,10 +473,10 @@ function modPanel() {
 				// Check username
 				$user_name = $system->clean($_POST['user_name']);		
 				$result = $system->query("SELECT `user_id`, `user_name`, `staff_level` FROM `users` WHERE `user_name`='$user_name'");
-				if(mysql_num_rows($result) == 0) {
+				if($system->db_num_rows == 0) {
 					throw new Exception("Invalid username!");
 				}
-				$user_data = mysql_fetch_assoc($result);
+				$user_data = $system->db_fetch($result);
 				if($user_data['staff_level'] >= $player->staff_level and $player->staff_level != $SC_HEAD_ADMINISTRATOR) {
 					throw new Exception("You cannot unban fellow staff members!");
 				}
@@ -507,7 +507,7 @@ function modPanel() {
 				$system->query($query);
 				// Set error flags
 				$error = false;
-				if(mysql_affected_rows() == 0) {
+				if($system->db_affected_rows == 0) {
 					$error = true;
 					if($unban_journal) {
 						$ban_journal = -1;
@@ -636,7 +636,7 @@ function modPanel() {
 		try {
 			$result = $system->query("SELECT `user_id`, `user_name`, `failed_logins` FROM `users`
 				WHERE `failed_logins` > 2 ORDER BY `failed_logins` DESC");
-			if(mysql_num_rows($result) == 0) {
+			if($system->db_num_rows == 0) {
 				throw new Exception("No locked out users!");
 			}
 			echo "<table class='table'><tr><th colspan='3'>Locked Out Users</th></tr></table>

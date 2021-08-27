@@ -757,7 +757,7 @@ function adminPanel() {
 				}
 				$query = "INSERT INTO `ai_opponents` ($column_names) VALUES ($column_data)";
 				$system->query($query);
-				if(mysql_affected_rows() == 1) {
+				if($system->db_affected_rows == 1) {
 					$system->message("AI created!");
 				}
 				else {
@@ -834,7 +834,7 @@ function adminPanel() {
 				// Hand seals hack
 				$query = "INSERT INTO `jutsu` ($column_names) VALUES ($column_data)";
 				$system->query($query);
-				if(mysql_affected_rows() == 1) {
+				if($system->db_affected_rows == 1) {
 					$system->message("Jutsu created!");
 				}
 				else {
@@ -911,7 +911,7 @@ function adminPanel() {
 				}
 				$query = "INSERT INTO `$table_name` ($column_names) VALUES ($column_data)";
 				$system->query($query);
-				if(mysql_affected_rows() == 1) {
+				if($system->db_affected_rows == 1) {
 					$system->message("Item created!");
 				}
 				else {
@@ -980,7 +980,7 @@ function adminPanel() {
 				}
 				$query = "INSERT INTO `$table_name` ($column_names) VALUES ($column_data)";
 				$system->query($query);
-				if(mysql_affected_rows() == 1) {
+				if($system->db_affected_rows == 1) {
 					$system->message(ucwords($content_name) . " created!");
 				}
 				else {
@@ -1040,7 +1040,7 @@ function adminPanel() {
 				}
 				$query = "INSERT INTO `$table_name` ($column_names) VALUES ($column_data)";
 				$system->query($query);
-				if(mysql_affected_rows() == 1) {
+				if($system->db_affected_rows == 1) {
 					$system->message(ucwords($content_name) . " created!");
 				}
 				else {
@@ -1100,7 +1100,7 @@ function adminPanel() {
 				}
 				$query = "INSERT INTO `$table_name` ($column_names) VALUES ($column_data)";
 				$system->query($query);
-				if(mysql_affected_rows() == 1) {
+				if($system->db_affected_rows == 1) {
 					$system->message(ucwords($content_name) . " created!");
 				}
 				else {
@@ -1160,7 +1160,7 @@ function adminPanel() {
 				}
 				$query = "INSERT INTO `$table_name` ($column_names) VALUES ($column_data)";
 				$system->query($query);
-				if(mysql_affected_rows() == 1) {
+				if($system->db_affected_rows == 1) {
 					$system->message(ucwords($content_name) . " created!");
 				}
 				else {
@@ -1202,7 +1202,7 @@ function adminPanel() {
 		if($_POST['ai_id']) {
 			$ai_id = (int)$system->clean($_POST['ai_id']);
 			$result = $system->query("SELECT * FROM `ai_opponents` WHERE `ai_id`='$ai_id'");
-			if(mysql_num_rows($result) == 0) {
+			if($system->db_num_rows == 0) {
 				$system->message("Invalid AI!");
 				$system->printMessage();
 			}
@@ -1231,7 +1231,7 @@ function adminPanel() {
 				}
 				$query .= "WHERE `ai_id`='$ai_id'";
 				$system->query($query);
-				if(mysql_affected_rows() == 1) {
+				if($system->db_affected_rows == 1) {
 					$system->message("AI " . $data['name'] . " has been edited!");
 					$select_ai = true;
 				}
@@ -1288,7 +1288,7 @@ function adminPanel() {
 		if($_POST['jutsu_id']) {
 			$jutsu_id = (int)$system->clean($_POST['jutsu_id']);
 			$result = $system->query("SELECT * FROM `jutsu` WHERE `jutsu_id`='$jutsu_id'");
-			if(mysql_num_rows($result) == 0) {
+			if($system->db_num_rows == 0) {
 				$system->message("Invalid Jutsu!");
 				$system->printMessage();
 			}
@@ -1318,7 +1318,7 @@ function adminPanel() {
 				$query .= "WHERE `jutsu_id`='{$jutsu_data['jutsu_id']}'";
 				//echo $query;
 				$system->query($query);
-				if(mysql_affected_rows() == 1) {
+				if($system->db_affected_rows == 1) {
 					$system->message("Jutsu edited!");
 					$select_jutsu = true;
 				}
@@ -1472,7 +1472,7 @@ function adminPanel() {
 		if($_POST['item_id']) {
 			$item_id = (int)$system->clean($_POST['item_id']);
 			$result = $system->query("SELECT * FROM `$table_name` WHERE `item_id`='$item_id'");
-			if(mysql_num_rows($result) == 0) {
+			if($system->db_num_rows == 0) {
 				$system->message("Invalid item!");
 				$system->printMessage();
 			}
@@ -1501,7 +1501,7 @@ function adminPanel() {
 				$query .= "WHERE `item_id`='{$item_data['item_id']}'";
 				//echo $query;
 				$system->query($query);
-				if(mysql_affected_rows() == 1) {
+				if($system->db_affected_rows == 1) {
 					$system->message("Item edited!");
 					$select_item = true;
 				}
@@ -1635,7 +1635,7 @@ function adminPanel() {
 		if($_POST[$content_name . '_id']) {
 			$content_id = (int)$system->clean($_POST[$content_name . '_id']);
 			$result = $system->query("SELECT * FROM `{$table_name}` WHERE `{$content_name}_id`='$content_id'");
-			if(mysql_num_rows($result) == 0) {
+			if($system->db_num_rows == 0) {
 				$system->message("Invalid $content_name!");
 				$system->printMessage();
 			}
@@ -1721,7 +1721,7 @@ function adminPanel() {
 		if($_POST[$content_name . '_id']) {
 			$content_id = (int)$system->clean($_POST[$content_name . '_id']);
 			$result = $system->query("SELECT * FROM `{$table_name}` WHERE `{$content_name}_id`='$content_id'");
-			if(mysql_num_rows($result) == 0) {
+			if($system->db_num_rows == 0) {
 				$system->message("Invalid $content_name!");
 				$system->printMessage();
 			}
@@ -1750,7 +1750,7 @@ function adminPanel() {
 				}
 				$query .= "WHERE `{$content_name}_id`='$content_id'";
 				$system->query($query);
-				if(mysql_affected_rows() == 1) {
+				if($system->db_affected_rows == 1) {
 					$system->message(ucwords($content_name) . ' ' . $data['name'] . " has been edited!");
 					$select_content = true;
 				}
@@ -1808,7 +1808,7 @@ function adminPanel() {
 		if($_POST[$content_name . '_id']) {
 			$content_id = (int)$system->clean($_POST[$content_name . '_id']);
 			$result = $system->query("SELECT * FROM `{$table_name}` WHERE `{$content_name}_id`='$content_id'");
-			if(mysql_num_rows($result) == 0) {
+			if($system->db_num_rows == 0) {
 				$system->message("Invalid $content_name!");
 				$system->printMessage();
 			}
@@ -1837,7 +1837,7 @@ function adminPanel() {
 				}
 				$query .= "WHERE `{$content_name}_id`='$content_id'";
 				$system->query($query);
-				if(mysql_affected_rows() == 1) {
+				if($system->db_affected_rows == 1) {
 					$system->message(ucwords($content_name) . ' ' . $data['name'] . " has been edited!");
 					$select_content = true;
 				}
@@ -1896,7 +1896,7 @@ function adminPanel() {
 		if($_POST[$content_name . '_id']) {
 			$content_id = (int)$system->clean($_POST[$content_name . '_id']);
 			$result = $system->query("SELECT * FROM `{$table_name}` WHERE `{$content_name}_id`='$content_id'");
-			if(mysql_num_rows($result) == 0) {
+			if($system->db_num_rows == 0) {
 				$system->message("Invalid $content_name!");
 				$system->printMessage();
 			}
@@ -1925,7 +1925,7 @@ function adminPanel() {
 				}
 				$query .= "WHERE `{$content_name}_id`='$content_id'";
 				$system->query($query);
-				if(mysql_affected_rows() == 1) {
+				if($system->db_affected_rows == 1) {
 					$system->message(ucwords($content_name) . ' ' . $data['name'] . " has been edited!");
 					$select_content = true;
 				}
@@ -1984,7 +1984,7 @@ function adminPanel() {
 		if($_POST[$content_name . '_id']) {
 			$content_id = (int)$system->clean($_POST[$content_name . '_id']);
 			$result = $system->query("SELECT * FROM `{$table_name}` WHERE `{$content_name}_id`='$content_id'");
-			if(mysql_num_rows($result) == 0) {
+			if($system->db_num_rows == 0) {
 				$system->message("Invalid $content_name!");
 				$system->printMessage();
 			}
@@ -2013,7 +2013,7 @@ function adminPanel() {
 				}
 				$query .= "WHERE `{$content_name}_id`='$content_id'";
 				$system->query($query);
-				if(mysql_affected_rows() == 1) {
+				if($system->db_affected_rows == 1) {
 					$system->message(ucwords($content_name) . ' ' . $data['name'] . " has been edited!");
 					$select_content = true;
 				}
@@ -2113,7 +2113,7 @@ function adminPanel() {
 		if($_GET['user_name']) {
 			$user_name = $system->clean($_GET['user_name']);
 			$result = $system->query("SELECT * FROM `users` WHERE `user_name`='$user_name'");
-			if(mysql_num_rows($result) == 0) {
+			if($system->db_num_rows == 0) {
 				$system->message("Invalid user!");
 				$system->printMessage();
 			}
@@ -2143,7 +2143,7 @@ function adminPanel() {
 				$query .= "WHERE `user_id`='{$user_data['user_id']}'";
 				// echo $query;
 				$system->query($query);
-				if(mysql_affected_rows() == 1) {
+				if($system->db_affected_rows == 1) {
 					$system->message("User edited!");
 					$select_user = true;
 					if($user_data['user_id'] == $player->user_id) {
@@ -2459,7 +2459,7 @@ function validateVariable($var_name, $input, $variable, &$variables, &$data, $co
 				WHERE `{$variable['unique_column']}` = '" . $data[$var_name] . "' LIMIT 1";
 		}
 		$result = $system->query($query);
-		if(mysql_num_rows($result) > 0) {
+		if($system->db_num_rows > 0) {
 			throw new Exception("'" . ucwords(str_replace("_", " ", $var_name)) . "' needs to be unique, the value '" . $data[$var_name] . "' is already taken!");
 		}		
 	}
