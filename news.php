@@ -62,7 +62,7 @@ function news() {
 		
 		try {
 			$result = $system->query("SELECT `post_id` FROM `news_posts` WHERE `post_id`='$post_id'");
-			if(mysql_num_rows($result) == 0) {
+			if($system->db_num_rows == 0) {
 				throw new Exception("Invalid post!");
 			}
 		
@@ -86,7 +86,7 @@ function news() {
 				WHERE `post_id`='{$post_id}' LIMIT 1";
 			$system->query($query);
 			
-			if(mysql_affected_rows() == 1) {
+			if($system->db_affected_rows == 1) {
 				$system->message("News edited!");
 				$page = false;
 			}
@@ -119,13 +119,13 @@ function news() {
 	else if($page == "edit_post" && $player->staff_level >= $SC_ADMINISTRATOR) {
 		$post_id = (int)$system->clean($_GET['post']);
 		$result = $system->query("SELECT * FROM `news_posts` WHERE `post_id`='$post_id'");
-		if(mysql_num_rows($result) == 0) {
+		if($system->db_num_rows == 0) {
 			$system->message("Invalid post!");
 			$system->printMessage();
 			$page = false;
 		}
 		else {
-			$post = mysql_fetch_assoc($result);
+			$post = $system->db_fetch($result);
 			echo "<table class='table'><tr><th>New Post</th></tr>
 			<tr><td style='text-align:center;'>
 				<form action='$self_link' method='post'>
@@ -154,18 +154,20 @@ function news() {
 
 function newsPosts($ADMIN = false, $max_posts = 8) {
 	require("variables.php");
+
+	/** @var string $link */
+    $self_link = $link;
+
 	global $system;
 	
 	$result = $system->query("SELECT * FROM `news_posts` ORDER BY `post_id` DESC LIMIT $max_posts");
 
-	$self_link = $link;
-	
-	if(mysql_num_rows($result) == 0) {
+	if($system->db_fetch() == 0) {
 		$system->message("No news posts!");
 		$system->printMessage();
 	}
 	
-	while($post = mysql_fetch_assoc($result)) {	
+	while($post = $system->db_fetch($result)) {
 		echo "<table class='table'><tr><th>" . $post['title'];
 		if($ADMIN) {
 			echo " ( <a style='color:inherit;' href='$self_link?page=edit_post&post={$post['post_id']}'>Edit</a> )";
