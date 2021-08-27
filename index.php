@@ -257,7 +257,7 @@ if($LOGGED_IN) {
 		var notificationRefreshID = setInterval('javascript:$(\'#notifications\').load(\'./ajax_notifications.php\');', 5000);
 		</script>";
 		//Christmas Snowfall - Kengetsu
-		echo "<script type='text/javascript' src='scripts/snowstorm.js'></script>";
+		// echo "<script type='text/javascript' src='scripts/snowstorm.js'></script>";
 	}
 	// Global message
 	if(!$player->global_message_viewed && isset($_GET['clear_message'])) {
