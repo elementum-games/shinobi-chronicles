@@ -13,7 +13,7 @@ $heading = <<<HTML
 <head>
 	<title>Shinobi Chronicles</title>
 	<link rel='stylesheet' type='text/css' href='./style/classic_blue/style.css' />
-	<script type='text/javascript' src='http://code.jquery.com/jquery-2.1.0.min.js'></script>
+	<script type='text/javascript' src='./scripts/jquery-2.1.0.min.js'></script>
 	<script type='text/javascript' src="./scripts/functions.js"></script>
 	<script type='text/javascript' src="./scripts/timer.js"></script>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
