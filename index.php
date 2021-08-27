@@ -49,13 +49,14 @@ $player_display = '';
 
 $logout_limit = 60;
 if(!isset($_SESSION['user_id'])) {
-	require("./securimage/securimage.php");
+	// require("./securimage/securimage.php");
 	if($_POST['login']) {
 		try {
-			$image = new Securimage();
+/*			$image = new Securimage();
 			if(!$image->check($_POST['login_code']) && $ENVIRONMENT == 'prod') {
 				throw new Exception("Invalid login code!");
-			}
+			}*/
+
 			// Basic input check - user_name/password
 			$user_name = $system->clean($_POST['user_name']);
 			if(empty($user_name)) {
@@ -68,10 +69,10 @@ if(!isset($_SESSION['user_id'])) {
 			// Get result
 			$result = $system->query("SELECT `user_id`, `user_name`, `password`, `failed_logins`, `current_ip`, `last_ip`, `user_verified` 
 				FROM `users` WHERE `user_name`='$user_name' LIMIT 1");
-			if(mysql_num_rows($result) == 0) {
+			if($system->db_num_rows == 0) {
 				throw new Exception("User does not exist!");
 			}
-			$result = mysql_fetch_assoc($result);
+			$result = $system->db_fetch($result);
 			if(!$result['user_verified']) {
 				throw new Exception("Your account has not been verified. Please check your email for the activation code.
 				<a class='link' href='{$link}register.php?act=resend_verification&username=$user_name'>Resend Verification</a>");
