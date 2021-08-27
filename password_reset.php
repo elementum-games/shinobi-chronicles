@@ -18,6 +18,13 @@ echo $top_menu;
 echo $header;
 echo str_replace("[HEADER_TITLE]", "Reset your password", $body_start);
 
+echo "Sorry, not functional. Ask Lsm on discord and maybe he'll reset it for you";
+
+echo $login_menu;
+echo $footer;
+
+exit;
+
 // If user confirms password reset, check input and reset
 if($_POST) {
 	$con = $system->dbConnect();
