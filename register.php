@@ -206,7 +206,7 @@ if($_POST['register']) {
 		}
 		
 		// Encrypt password
-		$password = sha1(str_rot13(sha1($password)));
+		$password = $system->hash_password($password);
 		
 		$verification_code = md5(mt_rand(1, 1337000));
 		

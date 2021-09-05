@@ -70,7 +70,7 @@ function userSettings() {
 		$result = $system->db_fetch($result);
 		
 		try {
-			if(sha1(str_rot13(sha1($password))) != $result['password']) {
+			if($system->hash_password($password) != $result['password']) {
 				throw new Exception("Current password is incorrect!");
 			}
 			
@@ -102,7 +102,7 @@ function userSettings() {
 				throw new Exception("The passwords do not match!");
 			}
 		
-			$password = sha1(str_rot13(sha1($password)));
+			$password = $system->hash_password($password);
 			$system->query("UPDATE `users` SET `password`='$password' WHERE `user_id`='{$player->user_id}' LIMIT 1");
 			if($system->db_affected_rows >= 1) {
 				$system->message("Password updated!");
