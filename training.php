@@ -13,12 +13,16 @@ function training() {
 	global $player;
 	global $self_link;
 	// Vars
+
 	$stat_train_length = 300; // 300
-	$stat_train_gain = 5;
-	$stat_long_train_length = 2400; // 2400
-	$stat_long_train_gain = 20;
-	$stat_extended_train_length = 21600;
-	$stat_extended_train_gain = 120;
+	$stat_train_gain = 1 + $player->rank;
+
+	$stat_long_train_length = $stat_train_length * 8;
+	$stat_long_train_gain = $stat_train_gain * 4;
+
+	$stat_extended_train_length = $stat_train_length * 72;
+	$stat_extended_train_gain = $stat_train_gain * 24;
+
 	// Forbidden seal trainings boost
 	if($player->forbidden_seal && $player->forbidden_seal['level'] >= 2) {
 		$stat_long_train_length = 3600;
