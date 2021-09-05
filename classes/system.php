@@ -25,7 +25,7 @@ class SystemFunctions {
     public $db_num_rows;
     public $db_affected_rows;
 
-    public function construct() {
+    public function __construct() {
         require("./secure/vars.php");
         /** @var $host */
         /** @var $username */
