@@ -57,7 +57,7 @@ function members() {
 			$viewUser->loadData(false, true);
 			
 			$journal_result = $system->query("SELECT `journal` FROM `journals` WHERE `user_id`='{$viewUser->user_id}'");
-			if(mysql_num_rows($journal_result) == 0) {
+			if($system->db_num_rows == 0) {
 				$journal = '';
 			}
 			else {
