@@ -295,8 +295,9 @@ function userSettings() {
 	<input type='submit' name='change_layout' value='Change' />
 	</form>
 	</td></tr>";
-	
-	echo "<tr><th>Profile Song</th></tr>
+
+	// TODO: Somehow $system->audioType got lost
+	/*echo "<tr><th>Profile Song</th></tr>
 	<tr><td style='text-align: center;'>
 	<p>Player only supports links ending in: .mp3, .ogg, or .wav.</p>
 	<audio controls>";
@@ -315,7 +316,7 @@ function userSettings() {
 	else {
 		echo "</p>You are currenly banned from editing your profile song.</p>";
 	}
-	echo "</td></tr>";
+	echo "</td></tr>";*/
 	
 	
 	echo "<tr><th>Journal</th></tr>
@@ -366,4 +367,3 @@ function userSettings() {
 	
 }
 
-?>

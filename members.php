@@ -136,7 +136,9 @@ function members() {
 			<label style='width:6em;'>AI wins:</label>		$viewUser->ai_wins<br />
 			<label style='width:6em;'>AI losses:</label>	$viewUser->ai_losses<br />
 			</td></tr>";
-			if($viewUser->profile_song) {				
+
+			// $system->audioType got lost
+			/*if($viewUser->profile_song) {
 				$profile_song = $system->audioType($viewUser->profile_song);
 				echo "<br />
 				<tr><th colspan='2'>Profile Song</th></tr>
@@ -146,7 +148,8 @@ function members() {
 				echo "
 					Your browser does not support the audio element.
 				</audio>";
-			}
+			}*/
+
 			if($journal) {
 				if(strpos($journal, "\n") === false) {
 					$journal = wordwrap($journal, 100, "\r\n", true);
