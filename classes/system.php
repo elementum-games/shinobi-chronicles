@@ -11,6 +11,10 @@ class SystemFunctions {
     public $message_displayed;
 
     // Variable for DB connection resource
+    private $host;
+    private $username;
+    private $password;
+    private $database;
     public $con;
 
     public $register_open;
@@ -20,6 +24,22 @@ class SystemFunctions {
     public $db_query_type;
     public $db_num_rows;
     public $db_affected_rows;
+
+    public function construct() {
+        require("./secure/vars.php");
+        /** @var $host */
+        /** @var $username */
+        /** @var $password */
+        /** @var $database */
+        /** @var $register_open */
+        $this->host = $host;
+        $this->username = $username;
+        $this->password = $password;
+        $this->database = $database;
+
+        $this->register_open = isset($register_open) ? $register_open : false;
+    }
+
 
     /* function dbConnect()
         Connects to a MySQL database and selects a DB. Stores connection resource in $con and returns.
@@ -31,16 +51,8 @@ class SystemFunctions {
             return $this->con;
         }
 
-        require("./secure/vars.php");
-        /** @var $host */
-        /** @var $username */
-        /** @var $password */
-        /** @var $database */
-        /** @var $register_open */
-        $this->register_open = isset($register_open) ? $register_open : false;
-
-        $con = new mysqli($host, $username, $password) or $this->error(mysqli_error($this->con));
-        mysqli_select_db($con, $database) or $this->error(mysqli_error($this->con));
+        $con = new mysqli($this->host, $this->username, $this->password) or $this->error(mysqli_error($this->con));
+        mysqli_select_db($con, $this->database) or $this->error(mysqli_error($this->con));
 
         $this->con = $con;
         return $con;
