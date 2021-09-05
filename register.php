@@ -30,9 +30,6 @@ $min_user_name_length = 4;
 $max_user_name_length = 18;
 $min_password_length = 6;
 
-echo $login_menu;
-echo $footer;
-
 if(isset($_GET['act'])) {
 	if($_GET['act'] == 'verify') {
 		$key = $system->clean($_GET['verify_key']);
@@ -329,10 +326,5 @@ else {
 	$system->printMessage();
 }
 
-
 echo $login_menu;
 echo $footer;
-
-
-
-?>
