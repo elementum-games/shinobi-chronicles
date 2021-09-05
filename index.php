@@ -88,7 +88,7 @@ if(!isset($_SESSION['user_id'])) {
 				throw new Exception("Account has been locked out!");
 			}
 			// Check password (NOTE: Due to importance of login, it is inclusive instead of exclusive (if statement must be true for user to be logged in) )
-			if($system->hash_password($password) == $result['password']) {
+			if($system->verify_password($password, $result['password'])) {
 				$_SESSION['user_id'] = $result['user_id'];
 				$LOGGED_IN = true;
 				if($result['failed_logins'] > 0) {

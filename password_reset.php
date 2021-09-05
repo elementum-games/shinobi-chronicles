@@ -37,7 +37,7 @@ if($_POST) {
 		$hash = sha1(mt_rand(1, 1000000));
 		$new_password = substr($hash, 0, 16);
 		$hashed_password = $system->hash_password($new_password);
-		$system->query("UPDATE users SET password='$hashed_password' WHERE user_id=$userid");
+		$system->query("UPDATE users SET password='{$hashed_password}' WHERE user_id=$userid");
 		
 		$subject = "Shinobi Chronicles - Password Reset";
 		$headers = "From: Shinobi Chronicles<lsmjudoka@shinobi-chronicles.com>" . "\r\n";
