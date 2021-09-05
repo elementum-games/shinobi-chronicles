@@ -9,10 +9,12 @@ Algorithm:	See master_plan.html
 */
 function chat() {
 	require("variables.php");
+
 	global $system;
 	global $ajax;
 	global $player;
 	global $self_link;
+
 	if($player->ban_type == 'tavern') {
 		$ban_time = $player->ban_expire - time();
 		$ban_message = 'You are currently banned from the chat. Time remaining: ';
@@ -23,6 +25,7 @@ function chat() {
 		</td></tr></table>";
 		return true;
 	}
+
 	// Validate post and submit to DB
 	if($_POST['post']) {
 		//If user has seal or is of staff, give them their words
@@ -253,4 +256,3 @@ function chat() {
 		echo "</div>";
 	}
 }
-?>

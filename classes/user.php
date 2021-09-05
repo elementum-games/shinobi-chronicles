@@ -609,7 +609,7 @@ class User {
 
 		//In Village Regen
 		if($this->in_village){
-			$this->regen_boost += $this->rank * 50;
+			$this->regen_boost += $this->regen_rate;
 		}
 		
 		// Elements
