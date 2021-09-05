@@ -422,7 +422,7 @@ CREATE TABLE `username_log` (
 CREATE TABLE `users` (
   `user_id` int(11) NOT NULL,
   `user_name` varchar(40) NOT NULL,
-  `password` varchar(40) NOT NULL,
+  `password` varchar(256) NOT NULL,
   `email` varchar(100) NOT NULL,
   `staff_level` smallint(6) NOT NULL DEFAULT '0',
   `health` double(12,2) NOT NULL,
