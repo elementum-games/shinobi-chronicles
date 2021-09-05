@@ -838,6 +838,14 @@ ALTER TABLE `villages`
   MODIFY `village_id` int(11) NOT NULL AUTO_INCREMENT;
 COMMIT;
 
+-- Add villages
+INSERT INTO `villages` (`village_id`, `name`, `location`, `points`, `leader`) VALUES
+(1, 'Stone', '5.3', 0, 0),
+(2, 'Cloud', '17.2', 0, 0),
+(3, 'Leaf', '9.6', 0, 0),
+(4, 'Sand', '3.8', 0, 0),
+(5, 'Mist', '16.10', 0, 0);
+
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
