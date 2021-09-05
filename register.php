@@ -17,17 +17,21 @@ echo $top_menu;
 echo $header;
 echo str_replace("[HEADER_TITLE]", "Create an Account", $body_start);
 
+if(!$system->register_open) {
+    echo "Sorry, not currently functional. Check back later.";
+
+    echo $login_menu;
+    echo $footer;
+
+    exit;
+}
+
 $min_user_name_length = 4;
 $max_user_name_length = 18;
 $min_password_length = 6;
 
-
-echo "Sorry, not currently functional. Check back later.";
-
 echo $login_menu;
 echo $footer;
-
-exit;
 
 if(isset($_GET['act'])) {
 	if($_GET['act'] == 'verify') {
@@ -59,13 +63,13 @@ if(isset($_GET['act'])) {
 			"{$link}register.php?act=verify&username={$user_name}&verify_key={$result['verify_key']}";
 			$headers = "From: Shinobi-Chronicles<admin@shinobi-chronicles.com>" . "\r\n";   
 			$headers .= "Reply-To: no-reply@shinobi-chronicles.com" . "\r\n";
-			/*if(mail($result['email'], $subject, $message, $headers)) {;
+			if(mail($result['email'], $subject, $message, $headers)) {;
 				$system->message("Email sent! Please check your email (including spam folder)");
 			}
 			else {
 				$system->message("There was a problem sending the email to the address provided: $email 
 				Please contact a staff member on the forums for manual activation.");
-			}*/
+			}
 			$system->printMessage();
 		}
 	}
@@ -232,12 +236,12 @@ if($_POST['register']) {
 		{$link}register.php?act=verify&username={$user_name}&verify_key=$verification_code";
 		$headers = "From: Shinobi-Chronicles<admin@shinobi-chronicles.com>" . "\r\n";   
 		$headers .= "Reply-To: no-reply@shinobi-chronicles.com" . "\r\n";
-		/*if(mail($email, $subject, $message, $headers)) {;
+		if(mail($email, $subject, $message, $headers)) {;
 			$system->message("Account created!<br />Please check the email that you registered with for the verification  link (Be sure to check your spam folder as well)!");
 		}
 		else {
 			$system->message("There was a problem sending the email to the address provided: $email Please contact a staff member on the forums for manual activation.");
-		}*/
+		}
 		
 		$register_ok = true;
 	} catch (Exception $e) {
