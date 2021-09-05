@@ -745,7 +745,8 @@ function premium() {
 		$view = $_GET['view'];
 	}
 	
-	
+	$kunai_per_dollar = SystemFunctions::KUNAI_PER_DOLLAR;
+
 	if($view == 'character_changes') {
 		// Character reset
 		echo "<table class='table'><tr><th>Character Reset</th></tr>
@@ -1128,12 +1129,12 @@ function premium() {
 			<p style='width:80%;margin:auto;'>All payments are securely processed through Paypal. You do not need a Paypal account to 
 			pay with a credit card.</p>
 			<br />
-			1 Ancient Kunai = $1 USD<br />
+			{$kunai_per_dollar} Ancient Kunai = $1 USD<br />
 			<br />
 			<b>-Ancient Kunai Specials-</b><br />
-			Buy 30+, get 5 free<br />
-			Buy 50+, get 10 free<br />
-			Buy 100+, get 25 free<br />
+			Buy 30+, get 10 free<br />
+			Buy 50+, get 20 free<br />
+			Buy 100+, get 50 free<br />
 			<br />
 			
 			<form action="https://www.paypal.com/cgi-bin/webscr" method="post">

@@ -6,6 +6,8 @@
 
 */
 class SystemFunctions {
+    const KUNAI_PER_DOLLAR = 2;
+
     // Variable for error message
     public $message;
     public $message_displayed;

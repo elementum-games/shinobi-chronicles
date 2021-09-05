@@ -25,8 +25,8 @@ function training() {
 
 	// Forbidden seal trainings boost
 	if($player->forbidden_seal && $player->forbidden_seal['level'] >= 2) {
-		$stat_long_train_length = 3600;
-		$stat_long_train_gain = 45;
+		$stat_long_train_length *= 1.5;
+		$stat_long_train_gain *= 2;
 	}
 	// Dev server boost
 	if($ENVIRONMENT == 'dev') {

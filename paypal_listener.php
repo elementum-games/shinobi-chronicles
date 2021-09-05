@@ -99,6 +99,8 @@ else {
 				if($payment_amount < 1) {
 					throw new Exception("Invalid payment, < $1!");
 				}
+
+				$kunai_amount = $payment_amount * SystemFunctions::KUNAI_PER_DOLLAR;
 				
 				$query = "INSERT INTO `Payments` (`txn_id`, `payment_date`, `time`, `username`, `buyer_name`, `buyer_email`, `payment_amount`, `quantity`,
 				`payment_currency`, `address_city`, `address_country`, `address_state`, `address_street`, `address_zip`, `address_status`) VALUES
@@ -108,24 +110,24 @@ else {
 				
 				// Check shard amount
 				$bonus = 0;
-				if($payment_amount >= 30) {
-					$bonus += 5;
+				if($kunai_amount >= 30) {
+					$bonus += 10;
 				}
-				if($payment_amount >= 50) {
-					$bonus += 5;
+				if($kunai_amount >= 50) {
+					$bonus += 10;
 				}
-				if($payment_amount >= 100) {
-					$bonus += 15;
+				if($kunai_amount >= 100) {
+					$bonus += 30;
 				}
 				
 				$query = "UPDATE `users` SET 
-				`premium_credits` = `premium_credits` + '" . ($payment_amount + $bonus) . "', 
-				`premium_credits_purchased` = `premium_credits_purchased` + '" . ($payment_amount + $bonus) . "'
+				`premium_credits` = `premium_credits` + '" . ($kunai_amount + $bonus) . "', 
+				`premium_credits_purchased` = `premium_credits_purchased` + '" . ($kunai_amount + $bonus) . "'
 				WHERE `user_name`='$username' LIMIT 1";
 				$system->query($query);
 				
 				$system->send_pm("Lsmjudoka", "$username", "Shard purchase", 
-				"Your purchase of " . ($payment_amount + $bonus) . " Ancient Kunai" . ($bonus > 0 ? " ($payment_amount + $bonus bonus)" : "") . 
+				"Your purchase of " . ($kunai_amount + $bonus) . " Ancient Kunai" . ($bonus > 0 ? " ($kunai_amount + $bonus bonus)" : "") .
 				" has been processed and credited to your account. Thank you!");
 				
 				// process payment
@@ -144,4 +146,3 @@ else {
 	}
 	fclose ($fp);
 }
-?>
