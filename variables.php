@@ -11,8 +11,7 @@ $ENVIRONMENT = 'prod';
 
 // Update for different website
 $dev_link = "http://lsmjudoka.com/projects/shinobi_chronicles/";
-// $prod_link = "http://shinobi-chronicles.com/";
-$prod_link = "https://gracious-easley.162-243-171-116.plesk.page/";
+$prod_link = "http://shinobichronicles.com/";
 
 /** @var string $link root link to webpage */
 if($ENVIRONMENT == 'dev') {
