@@ -247,7 +247,7 @@ class SystemFunctions {
     }
 
     public function getMemes() {
-        $memes = require '../memes.php';
+        $memes = require 'memes.php';
 
         return [
             'codes' => array_map(function ($meme) {
