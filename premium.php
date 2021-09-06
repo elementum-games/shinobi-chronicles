@@ -1104,8 +1104,8 @@ function premium() {
 				+1 weapon equip slots<br />
 				+1 armor equip slots<br />
 				+1 scout range<br />
-				Enhanced long trainings (60 mins, 45 points)<br />
-				New extended trainings (6 hours, 120 points)<br />
+				Enhanced long trainings (1.5x length, 2x gains)<br />
+				Enhanced extended trainings (1.5x length, 2.25x gains)<br />
 				<form action='$self_link&view=forbidden_seal' method='post'>
 				<p style='width:100%;text-align:center;margin:0px;margin-top:2.2em;'>
 					<input type='hidden' name='seal_level' value='2' />
