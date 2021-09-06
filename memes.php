@@ -414,4 +414,10 @@ return [
         'text' => ':calling lsm:',
         'public' => true,
     ],
+    [
+        'code' => ':guessilldie:',
+        'image' => '<img src="./images/memes/feels_old_man.png" />',
+        'text' => ':guess I\'ll die:',
+        'public' => true,
+    ],
 ];
