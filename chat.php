@@ -158,7 +158,7 @@ function chat() {
 	// Table with chat posts
 	echo "<table class='table' style='width:98%;'>
 		<tr>
-			<th style='width:25%;'>Users</th>
+			<th style='width:30%;'>Users</th>
 			<th style='width:66%;'>Message</th>
 			<th style='width:9%;'>Time</th>
 		</tr>";
@@ -168,12 +168,24 @@ function chat() {
 		while($post = $system->db_fetch($result)) {
 			$purchasers = $system->query("SELECT `premium_credits_purchased` FROM `users` WHERE `user_name` = '$post[user_name]'");
 			$creditsPurchased = $system->db_fetch();
+
+			/*Cextra Zone*/
+			$avyQuery = $system->query("SELECT `avatar_link` FROM `users` WHERE `user_name` = '$post[user_name]'");
+			$avyLink = $system->db_fetch($avyQuery);
 			echo "
 				<tr>
 					<td style='text-align:center;'>
-					<div id=\"user_data_container\">
-						<div style=\"display: inline-block;\">
+					<div id=\"user_data_container style='display=block'\">
+						<div style=\"display:inline-block;\">
+							<div style=\"display:inline-block;\">
+						</div>
+						<img style='height: 20px; margin: 100% 0px;'src=\"".$avyLink['avatar_link']."\"/>"
+						.
+						"<br/>
+					</div>
+					<div style=\"display: inline-block; width: 80%;\">
 			";
+			//*Cextra Zone*//
 			$statusType = "userLink ";
 			$statusType .= ($creditsPurchased['premium_credits_purchased']) ? "premiumUser" : "";
 			$class = "chat ";
@@ -194,10 +206,6 @@ function chat() {
 					$class .= 'normalUser';
 					break;
 			}
-
-			/*Cextra Zone*/
-			$avyQuery = $system->query("SELECT `avatar_link` FROM `users` WHERE `user_name` = '$post[user_name]'");
-			$avyLink = $system->db_fetch($avyQuery);
 
 			// echo
 			// "<img
@@ -222,16 +230,9 @@ function chat() {
 				echo "<a class='imageLink' href='$report_link&report_type=3&content_id=" . $post['post_id'] . "'>
 					<img src='./images/report_icon.png' style='max-width:20px;max-height:20px;' /></a>
 					</div>
-					<div style=\"display:inline-block;float: right; margin: 10% 5px\">";
+					";
 
-				echo
-				"<img
-				style='height: 30px;'
-				src=\"".$avyLink['avatar_link']."\"
-				/>".
-				"<br/>";
-
-				echo "</div>
+				echo "
 				</div>
 				</td>
 				<td style='text-align:center;padding:4px;white-space:pre;'>" .
