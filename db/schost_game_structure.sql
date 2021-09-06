@@ -1055,6 +1055,45 @@ INSERT INTO `ai_opponents` (`ai_id`, `rank`, `money`, `name`, `max_health`, `lev
 (20, 4, 7800, 'Zeus', 81920, 99, 48000.00, 28000.00, 36000.00, 35000.00, 20000.00, 0.00, 0.00, 7500.00, 3000.00, '[{\"battle_text\":\"[opponent] smites [player].\",\"power\":\"13\",\"jutsu_type\":\"ninjutsu\"},{\"battle_text\":\"Something else about lightning.\",\"power\":\"11\",\"jutsu_type\":\"ninjutsu\"}]');
 
 
+-- Add clans
+INSERT INTO `clans` (`clan_id`, `village`, `name`, `bloodline_only`, `boost`, `boost_amount`, `points`, `leader`, `elder_1`, `elder_2`, `challenge_1`, `logo`, `motto`, `info`) VALUES
+(1, 'Leaf', 'Kobayashi', 1, '', 0.00, 0, 0, 0, 0, '0', './images/default_avatar.png', '', ''),
+(2, 'Sand', 'Tsukino', 1, '', 0.00, 0, 0, 0, 0, '0', './images/default_avatar.png', '', ''),
+(3, 'Leaf', 'Himura', 1, '', 0.00, 0, 0, 0, 0, '0', './images/default_avatar.png', '', ''),
+(4, 'Leaf', 'Sugi', 0, '', 0.00, 0, 0, 0, 0, '0', './images/default_avatar.png', '', ''),
+(8, 'Stone', 'Kiku', 0, '', 0.00, 0, 0, 0, 0, '0', './images/default_avatar.png', '', ''),
+(5, 'Cloud', 'Yokoyama', 0, '', 0.00, 0, 0, 0, 0, '0', './images/default_avatar.png', '', ''),
+(6, 'Stone', 'Haniwa', 1, '', 0.00, 0, 0, 0, 0, '0', './images/default_avatar.png', '', ''),
+(7, 'Cloud', 'Aozora', 1, '', 0.00, 0, 0, 0, 0, '0', './images/default_avatar.png', '', ''),
+(9, 'Mist', 'Hashi', 0, '', 0.00, 0, 0, 0, 0, '0', './images/default_avatar.png', '', ''),
+(10, 'Sand', 'Iijima', 0, '', 0.00, 0, 0, 0, 0, '0', './images/default_avatar.png', '', ''),
+(11, 'Mist', 'Mizumaki', 1, '', 0.00, 0, 0, 0, 0, '0', './images/default_avatar.png', '', ''),
+(12, 'Leaf', 'Tsuruya', 1, '', 0.00, 0, 0, 0, 0, '0', './images/default_avatar.png', '', ''),
+(13, 'Stone', 'Yoshitomi', 1, '', 0.00, 0, 0, 0, 0, '0', './images/default_avatar.png', '', ''),
+(14, 'Sand', 'Kurosawa', 1, '', 0.00, 0, 0, 0, 0, '0', './images/default_avatar.png', '', ''),
+(15, 'Cloud', 'Tomioka', 1, '', 0.00, 0, 0, 0, 0, '0', './images/default_avatar.png', '', ''),
+(16, 'Leaf', 'Joshuya', 1, '', 0.00, 0, 0, 0, 0, '0', './images/default_avatar.png', '', ''),
+(17, 'Mist', 'Koizumi', 0, '', 0.00, 0, 0, 0, 0, '0', './images/default_avatar.png', '', ''),
+(18, 'Sand', 'Kasuse', 0, '', 0.00, 0, 0, 0, 0, '0', './images/default_avatar.png', '', ''),
+(19, 'Stone', 'Momotami', 0, '', 0.00, 0, 0, 0, 0, '0', './images/default_avatar.png', '', ''),
+(20, 'Cloud', 'Uesugi', 0, '', 0.00, 0, 0, 0, 0, '0', './images/default_avatar.png', '', ''),
+(21, 'Leaf', 'Nakano', 0, '', 0.00, 0, 0, 0, 0, '0', './images/default_avatar.png', '', ''),
+(22, 'Mist', 'Kurushimi', 1, '', 0.00, 0, 0, 0, 0, '0', './images/default_avatar.png', '', ''),
+(23, 'Leaf', 'Shukumei', 1, '', 0.00, 0, 0, 0, 0, '0', './images/default_avatar.png', '', ''),
+(24, 'Cloud', 'Kibou', 1, '', 0.00, 0, 0, 0, 0, '0', './images/default_avatar.png', '', ''),
+(25, 'Stone', 'Hosoku', 1, '', 0.00, 0, 0, 0, 0, '0', './images/default_avatar.png', '', ''),
+(26, 'Sand', 'Zetsubou', 1, '', 0.00, 0, 0, 0, 0, '0', './images/default_avatar.png', '', ''),
+(27, 'Mist', 'Haninozuka', 1, '', 0.00, 0, 0, 0, 0, '0', './images/default_avatar.png', '', ''),
+(28, 'Mist', 'Maigo', 1, '', 0.00, 0, 0, 0, 0, '0', './images/default_avatar.png', '', ''),
+(29, 'Leaf', 'Baransu', 1, '', 0.00, 0, 0, 0, 0, '0', './images/default_avatar.png', '', ''),
+(30, 'Stone', 'Hagane', 1, '', 0.00, 0, 0, 0, 0, '0', './images/default_avatar.png', '', ''),
+(31, 'Mist', 'Koori', 1, '', 0.00, 0, 0, 0, 0, '0', './images/default_avatar.png', '', ''),
+(32, 'Sand', 'Chikara', 1, '', 0.00, 0, 0, 0, 0, '0', './images/default_avatar.png', '', ''),
+(33, 'Cloud', 'Fumetsu', 1, '', 0.00, 0, 0, 0, 0, '0', './images/default_avatar.png', '', ''),
+(34, 'Sand', 'Kokomotsu', 1, '', 0.00, 0, 0, 0, 0, '0', './images/default_avatar.png', '', ''),
+(35, 'Cloud', 'Misaki', 1, '', 0.00, 0, 0, 0, 0, '0', './images/default_avatar.png', '', ''),
+(36, 'Mist', 'Mitzuku', 0, '', 0.00, 0, 0, 0, 0, '0', './images/default_avatar.png', '', '');
+
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
