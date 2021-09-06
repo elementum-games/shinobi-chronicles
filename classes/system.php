@@ -28,6 +28,12 @@ class SystemFunctions {
     public $db_num_rows;
     public $db_affected_rows;
 
+    public $debug = [
+        'battle' => false,
+        'damage' => false,
+        'bloodline' => false,
+    ];
+
     public function __construct() {
         require("./secure/vars.php");
         /** @var $host */
