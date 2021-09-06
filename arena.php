@@ -6,7 +6,9 @@ function arena() {
 	global $system;
 	global $player;
 	global $self_link;
+
 	$stat_gain_chance = 26;
+
 	if(isset($_SESSION['exam_stage'])) {
 		$system->message("You cannot access this page during the exam!");
 		$system->printMessage();
@@ -64,11 +66,12 @@ function arena() {
 					}
 				}
 				if($opponent->level >= $player->level) {
-					$stat_gain_chance += 5;
+					$stat_gain_chance += 10;
 				}
 				if($total_count > 4) {
 					$stat_gain_chance += 15;
-				}				
+				}
+
 				if($player->total_stats < $player->stat_cap && $stat_gain_chance >= mt_rand(1, 100)) {
 					$stat = '';
 					$highest_count = 0;
