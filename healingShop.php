@@ -25,7 +25,7 @@ function healingShop() {
 	$healing['pork']['cost'] = $player->rank * 20;
 	$healing['pork']['amount'] = $health[$player->rank] * 0.4;
 
-	$healing['deluxe']['cost'] = $player->rank * 45;
+	$healing['deluxe']['cost'] = $player->rank * 40;
 	$healing['deluxe']['amount'] = $health[$player->rank] * 0.8;
 
 	if($_GET['heal']) {
