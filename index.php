@@ -271,6 +271,7 @@ if($LOGGED_IN) {
 	else {
 		$global_message = false;
 	}
+
 	// Load village list
 	$result = $system->query("SELECT `name`, `location` FROM `villages`");
 	$villages = array();

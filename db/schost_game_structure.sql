@@ -1094,6 +1094,13 @@ INSERT INTO `clans` (`clan_id`, `village`, `name`, `bloodline_only`, `boost`, `b
 (35, 'Cloud', 'Misaki', 1, '', 0.00, 0, 0, 0, 0, '0', './images/default_avatar.png', '', ''),
 (36, 'Mist', 'Mitzuku', 0, '', 0.00, 0, 0, 0, 0, '0', './images/default_avatar.png', '', '');
 
+-- Add system storage
+CREATE TABLE `system_storage` (
+    `id` INT NOT NULL  AUTO_INCREMENT PRIMARY KEY,
+    `global_message` TEXT
+);
+INSERT INTO `system_storage` (`id`, `global_message`) VALUES (NULL, NULL);
+
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
