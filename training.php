@@ -15,7 +15,7 @@ function training() {
 	// Vars
 
 	$stat_train_length = 300; // 300
-	$stat_train_gain = 1 + $player->rank;
+	$stat_train_gain = 2 + ($player->rank * 2);
 
 	$stat_long_train_length = $stat_train_length * 8;
 	$stat_long_train_gain = $stat_train_gain * 4;
@@ -28,13 +28,7 @@ function training() {
 		$stat_long_train_length *= 1.5;
 		$stat_long_train_gain *= 2;
 	}
-	// Dev server boost
-	if($ENVIRONMENT == 'dev') {
-		$stat_train_length = 60;
-		$stat_train_gain = 10;
-		$stat_long_train_length = 120;
-		$stat_long_train_gain = 100;
-	}
+
 	$stat_train_gain += $TRAIN_BOOST;
 	$stat_long_train_gain += $LONG_TRAIN_BOOST;
 	$stat_extended_train_gain += ($LONG_TRAIN_BOOST * 5);
