@@ -47,7 +47,7 @@ if(isset($_GET['request_type']) && $_GET['request_type'] == 'ajax') {
 // Run login, load player data
 $player_display = '';
 
-$logout_limit = 120;
+$logout_limit = SystemFunctions::LOGOUT_LIMIT;
 if(!isset($_SESSION['user_id'])) {
 	// require("./securimage/securimage.php");
 	if($_POST['login']) {

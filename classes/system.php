@@ -7,6 +7,7 @@
 */
 class SystemFunctions {
     const KUNAI_PER_DOLLAR = 2;
+    const LOGOUT_LIMIT = 120;
 
     // Variable for error message
     public $message;
