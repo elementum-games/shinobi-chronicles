@@ -1,5 +1,5 @@
 <?php
-/* 
+/*
 File: 		variables.php
 Coder:		Levi Meahan
 Created:	02/21/2012
@@ -10,8 +10,8 @@ Purpose:	Store global variables such as master link, settings for script to use
 $ENVIRONMENT = 'prod';
 
 // Update for different website
-$dev_link = "http://lsmjudoka.com/projects/shinobi_chronicles/";
-$prod_link = "https://shinobichronicles.com/";
+$dev_link = "http://localhost/phplearning/shinobi-chronicles/";
+$prod_link = "http://localhost/phplearning/shinobi-chronicles/";
 
 /** @var string $link root link to webpage */
 if($ENVIRONMENT == 'dev') {
