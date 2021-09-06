@@ -137,11 +137,11 @@ function training() {
 		<br />
 		<span style='font-weight:bold;'>Skill/Attribute training:</span><br />
 			<p style='margin-left:20px;margin-top:5px;margin-bottom:8px;'>
-			<label style='font-weight:bold;width:45px;'>Short:</label>
+			<label style='font-weight:bold;width:70px;'>Short:</label>
 				Takes " . ($stat_train_length / 60) . " minutes, gives $stat_train_gain point" . ($stat_train_gain > 1 ? 's' : '') . "<br />
-			<label style='font-weight:bold;width:45px;'>Long:</label>
+			<label style='font-weight:bold;width:70px;'>Long:</label>
 				Takes " . ($stat_long_train_length / 60) . " minutes, gives $stat_long_train_gain point" . ($stat_long_train_gain > 1 ? 's' : '') . "<br />
-            <label style='font-weight:bold;width:45px;'>Extended:</label>
+            <label style='font-weight:bold;width:70px;'>Extended:</label>
 				Takes " . ($stat_extended_train_length / 60) . " minutes, gives $stat_extended_train_gain point" . ($stat_extended_train_gain > 1 ? 's' : '') . "<br />
 			</p>
 		<span style='font-weight:bold;'>Jutsu training:</span><br /> 
