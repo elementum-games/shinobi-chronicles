@@ -171,6 +171,8 @@ function chat() {
 			echo "
 				<tr>
 					<td style='text-align:center;'>
+					<div id=\"user_data_container\">
+						<div style=\"display: inline-block;\">
 			";
 			$statusType = "userLink ";
 			$statusType .= ($creditsPurchased['premium_credits_purchased']) ? "premiumUser" : "";
@@ -197,12 +199,12 @@ function chat() {
 			$avyQuery = $system->query("SELECT `avatar_link` FROM `users` WHERE `user_name` = '$post[user_name]'");
 			$avyLink = $system->db_fetch($avyQuery);
 
-			echo
-			"<img
-			style='height: 50px;'
-			src=\"".$avyLink['avatar_link']."\"
-			/>".
-			"<br/>";
+			// echo
+			// "<img
+			// style='height: 50px;'
+			// src=\"".$avyLink['avatar_link']."\"
+			// />".
+			// "<br/>";
 			/*Cextra Zone*/
 
 				echo "<a href='$members_link&user={$post['user_name']}' class='$class $statusType'>" . $post['user_name'] . "</a><br />" .
@@ -219,6 +221,18 @@ function chat() {
 				}
 				echo "<a class='imageLink' href='$report_link&report_type=3&content_id=" . $post['post_id'] . "'>
 					<img src='./images/report_icon.png' style='max-width:20px;max-height:20px;' /></a>
+					</div>
+					<div style=\"display:inline-block;float: right; margin: 10% 5px\">";
+
+				echo
+				"<img
+				style='height: 30px;'
+				src=\"".$avyLink['avatar_link']."\"
+				/>".
+				"<br/>";
+
+				echo "</div>
+				</div>
 				</td>
 				<td style='text-align:center;padding:4px;white-space:pre;'>" .
 					wordwrap($system->html_parse(stripslashes($post['message']), false, true), 60, "\n", true) . "</td>";
