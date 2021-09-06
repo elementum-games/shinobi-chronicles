@@ -12,17 +12,22 @@ function healingShop() {
 	global $system;
 	global $player;
 	global $self_link;
+
 	$health[1] = 200;
 	$health[2] = 1500;
 	$health[3] = 10000;
 	$health[4] = 40000;
 	$health[6] = 40000;
+
 	$healing['vegetable']['cost'] = $player->rank * 5;
 	$healing['vegetable']['amount'] = $health[$player->rank] * 0.1;
+
 	$healing['pork']['cost'] = $player->rank * 20;
 	$healing['pork']['amount'] = $health[$player->rank] * 0.4;
-	$healing['deluxe']['cost'] = $player->rank * 50;
-	$healing['deluxe']['amount'] = $health[$player->rank] * 0.75;
+
+	$healing['deluxe']['cost'] = $player->rank * 45;
+	$healing['deluxe']['amount'] = $health[$player->rank] * 0.8;
+
 	if($_GET['heal']) {
 		try {
 			$heal = $system->clean($_GET['heal']);
