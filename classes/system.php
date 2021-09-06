@@ -274,7 +274,8 @@ class SystemFunctions {
 
         $text = str_replace($search_array, $replace_array, $text);
 
-        $text = str_replace($this->memes['codes'], ($faces ? $this->memes['images'] : $this->memes['texts']), $text);
+        $memes = $this->getMemes();
+        $text = str_replace($memes['codes'], ($faces ? $memes['images'] : $memes['texts']), $text);
 
         if($img) {
             $search_array[count($search_array)] = "[img]";
