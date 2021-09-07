@@ -241,6 +241,7 @@ function userProfile() {
 		<label style='width:$label_width;'>Location:</label> $player->location<br />
 		<label style='width:$label_width;'>Money:</label> &yen;" . $player->money . "<br />
 		<label style='width:$label_width;'>Ancient Kunai:</label> " . $player->premium_credits . "<br />
+		<label style='width:$label_width;'>Ancient Kunai purchased:</label> " . $player->premium_credits_purchased . "<br />
 		
 		<br />
 		<label style='width:$label_width;'>PvP wins:</label>		$player->pvp_wins<br />
