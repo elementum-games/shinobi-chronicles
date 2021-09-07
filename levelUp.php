@@ -72,9 +72,9 @@ function rankUp() {
 		}
 		
 		// 2, 6, 12
-        $replacement_jutsu_id = 4;
-		$clone_jutsu_id = 87;
-		$transform_jutsu_id = 12;
+        $replacement_jutsu_id = '4';
+		$clone_jutsu_id = '87';
+		$transform_jutsu_id = '12';
 		$jutsu_ids = implode(",", [$replacement_jutsu_id, $clone_jutsu_id, $transform_jutsu_id]);
 
 		if($player->user_id == 1) {
