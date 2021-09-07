@@ -175,7 +175,7 @@ function chat() {
 			echo "
 				<tr>
 					<td style='text-align:center;'>
-					<div id=\"user_data_container style='display=block'\">
+					<div id='user_data_container' style='display=block'>
 						<div style=\"display:inline-block;\">
 							<div style=\"display:inline-block;\">
 						</div>
