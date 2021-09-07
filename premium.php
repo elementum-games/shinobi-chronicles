@@ -141,7 +141,7 @@ function premium() {
 			if(!$player->username_changes and $player->premium_credits < $akCost) {
 				throw new Exception("You do not have enough Ancient Kunai!");
 			}
-			if(strlen($new_name) < 4 || strlen($new_name) >= 18) {
+			if(strlen($new_name) < User::MIN_NAME_LENGTH || strlen($new_name) >= 18) {
 				throw new Exception("New user name is to short/long! Please enter a name between 4 and 18 characters long.");
 			}
 			if($player->user_name == $new_name) {

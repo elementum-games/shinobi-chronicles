@@ -26,7 +26,7 @@ if(!$system->register_open) {
     exit;
 }
 
-$min_user_name_length = 2;
+$min_user_name_length = User::MIN_NAME_LENGTH;
 $max_user_name_length = 18;
 $min_password_length = 6;
 

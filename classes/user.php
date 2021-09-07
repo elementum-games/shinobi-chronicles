@@ -4,6 +4,8 @@
 	Purpose:	Fetch user data and load into class variables.
 */
 class User {
+    const MIN_NAME_LENGTH = 2;
+
 	public $system;
 	
 	// Loaded in construct
