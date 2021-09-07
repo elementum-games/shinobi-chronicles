@@ -99,6 +99,7 @@ body {
 	min-height:500px;
 
 	float: left;
+    margin-left: 10px;
 }
 h2#title {
 	margin-left:30px;
