@@ -189,7 +189,7 @@ class AI {
 		$offense_skill = $attack['jutsu_type'] . '_skill';
 		$offense_boost = 0;
 		if(isset($this->{$attack['jutsu_type'] . '_nerf'})) {
-			echo "Nerf: " . $this->{$attack['jutsu_type'] . '_nerf'} . "<br />";
+			// echo "Nerf: " . $this->{$attack['jutsu_type'] . '_nerf'} . "<br />";
 			$offense_boost -= $this->{$attack['jutsu_type'] . '_nerf'};
 		}
 		

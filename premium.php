@@ -15,7 +15,6 @@ function premium() {
 	
 	global $self_link;
 
-	
 	$costs['user_reset'] = 0;
 	$costs['name_change'] = 15;
 	$costs['bloodline'][1] = 80;
@@ -289,6 +288,7 @@ function premium() {
 			}
 			
 			$cost = 5 + floor($transfer_amount / 200);
+			$cost = 0;
 			
 			if($player->premium_credits < $cost) {
 				throw new Exception("You do not have enough Ancient Kunai!");
@@ -822,6 +822,7 @@ function premium() {
 		function statAllocateCostDisplay() {
 			var transferAmount = parseInt($('#transferAmount').val());
 			var cost = 5 + Math.floor(transferAmount / 200);
+			cost = 0;
 			var time = transferAmount * 0.2;
 			
 			var display = cost + ' AK / ' + time + ' minutes';
@@ -855,7 +856,9 @@ function premium() {
 				echo "stats.$stat = " . ($player->{$stat} - 5) . ";\r\n";
 			}	
 		}
-		
+
+		//  (5 + floor(($player->ninjutsu_skill - 10) / 200))
+
 		echo "
 		</script>
 		<br />

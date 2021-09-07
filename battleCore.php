@@ -2208,6 +2208,7 @@ function jutsuCollision(&$player, &$opponent, &$player_damage, &$opponent_damage
 	if($player_cast_speed <= 0) {
 		$player_cast_speed = 1;
 	}
+
 	$opponent_speed = $opponent->speed + $opponent->speed_boost - $opponent->speed_nerf;
 	$opponent_speed = 50 + ($opponent_speed * 0.5);
 	if($opponent_speed <= 0) {
