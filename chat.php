@@ -229,7 +229,7 @@ function chat() {
 				}
 
 				echo "<td style='text-align:center;font-style:italic;'>
-                    <div>{$posted}</div>";
+                    <div style='margin-bottom: 2px;'>{$posted}</div>";
 
                     if(isset($SC_MODERATOR) && $player->staff_level >= $SC_MODERATOR) {
                         echo sprintf("<a class='imageLink' href='$self_link&delete=%d'><img src='./images/delete_icon.png' style='max-width:20px;max-height:20px;' /></a>", $post['post_id']);
