@@ -1,5 +1,5 @@
 <?php
-/* 
+/*
 File: 		chat.php
 Coder:		Levi Meahan
 Created:	02/26/2013
@@ -155,23 +155,37 @@ function chat() {
 		}
 		echo "<div id='socialPosts'>";
 	}
-	// Table with chat posts	
+	// Table with chat posts
 	echo "<table class='table' style='width:98%;'>
 		<tr>
-			<th style='width:25%;'>Users</th>
-			<th style='width:66%;'>Message</th>
+			<th style='width:30%;'>Users</th>
+			<th style='width:60%;'>Message</th>
 			<th style='width:9%;'>Time</th>
 		</tr>";
 		if(! $system->db_num_rows) {
 			echo "<tr><td colspan='2' style='text-align:center;'>No posts!</td></tr>";
-		}	
+		}
 		while($post = $system->db_fetch($result)) {
 			$purchasers = $system->query("SELECT `premium_credits_purchased` FROM `users` WHERE `user_name` = '$post[user_name]'");
 			$creditsPurchased = $system->db_fetch();
+
+			/*Cextra Zone*/
+			$avyQuery = $system->query("SELECT `avatar_link` FROM `users` WHERE `user_name` = '$post[user_name]'");
+			$avyLink = $system->db_fetch($avyQuery);
 			echo "
 				<tr>
 					<td style='text-align:center;'>
+					<div id='user_data_container' style='display=block'>
+						<div style=\"display:inline-block;\">
+							<div style=\"display:inline-block;\">
+						</div>
+						<img style='height: 20px; margin: 100% 0px;'src=\"".$avyLink['avatar_link']."\"/>"
+						.
+						"<br/>
+					</div>
+					<div style=\"display: inline-block; width: 80%;\">
 			";
+			//*Cextra Zone*//
 			$statusType = "userLink ";
 			$statusType .= ($creditsPurchased['premium_credits_purchased']) ? "premiumUser" : "";
 			$class = "chat ";
@@ -192,10 +206,19 @@ function chat() {
 					$class .= 'normalUser';
 					break;
 			}
+
+			// echo
+			// "<img
+			// style='height: 50px;'
+			// src=\"".$avyLink['avatar_link']."\"
+			// />".
+			// "<br/>";
+			/*Cextra Zone*/
+
 				echo "<a href='$members_link&user={$post['user_name']}' class='$class $statusType'>" . $post['user_name'] . "</a><br />" .
 					"<p style='margin:0px;margin-top:1px;margin-bottom:3px;'>
 					<img src='./images/village_icons/" . strtolower($post['village']) . ".png' alt='{$post['village']} Village'
-						style='max-width:20px;max-height:20px;vertical-align:text-bottom;'  title='{$post['village']} Village' /> " . 
+						style='max-width:20px;max-height:20px;vertical-align:text-bottom;'  title='{$post['village']} Village' /> " .
 						stripslashes($post['title']) . "</p>";
 				if($post['staff_level']) {
 					$Color = $SC_STAFF_COLORS[$post['staff_level']];
@@ -206,8 +229,13 @@ function chat() {
 				}
 				echo "<a class='imageLink' href='$report_link&report_type=3&content_id=" . $post['post_id'] . "'>
 					<img src='./images/report_icon.png' style='max-width:20px;max-height:20px;' /></a>
+					</div>
+					";
+
+				echo "
+				</div>
 				</td>
-				<td style='text-align:center;padding:4px;white-space:pre;'>" . 
+				<td style='text-align:center;padding:4px;white-space:pre;'>" .
 					wordwrap($system->html_parse(stripslashes($post['message']), false, true), 60, "\n", true) . "</td>";
 				$post_time = time() - $post['time'];
 				$post_minutes = ceil($post_time / 60);
