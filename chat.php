@@ -159,7 +159,7 @@ function chat() {
 	echo "<table class='table' style='width:98%;'>
 		<tr>
 			<th style='width:30%;'>Users</th>
-			<th style='width:66%;'>Message</th>
+			<th style='width:60%;'>Message</th>
 			<th style='width:9%;'>Time</th>
 		</tr>";
 		if(! $system->db_num_rows) {
