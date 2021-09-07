@@ -942,7 +942,7 @@ function premium() {
 			you in exchange for Ancient Kunai, allowing you to use a new bloodline" . 
 				($player->bloodline_id ? ' instead of your own' : '') . ".<br /><br />";
 			$result = $system->query("SELECT `bloodline_id`, `name`, `rank`
-				FROM `bloodlines` WHERE `village`='$player->village' AND `rank` < 5 ORDER BY `rank` ASC");
+				FROM `bloodlines` WHERE `rank` < 5 ORDER BY `rank` ASC");
 			if($system->db_num_rows == 0) {
 				echo "No bloodlines available!";
 			}
