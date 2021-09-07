@@ -294,9 +294,10 @@ function members() {
 		}
 		
 		// Pagination
-		$users_per_page = 10;
+		$users_per_page = 15;
 		$min = 0;
 		if($_GET['min'] && $view != 'highest_exp') {
+            $users_per_page = 10;
 			$min = (int)$system->clean($_GET['min']);
 		}
 		
@@ -434,4 +435,3 @@ function members() {
 	}
 }
 
-?>

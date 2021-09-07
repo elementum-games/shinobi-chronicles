@@ -158,68 +158,60 @@ function chat() {
 	// Table with chat posts
 	echo "<table class='table' style='width:98%;'>
 		<tr>
-			<th style='width:25%;'>Users</th>
-			<th style='width:66%;'>Message</th>
-			<th style='width:9%;'>Time</th>
+			<th style='width:28%;'>Users</th>
+			<th style='width:61%;'>Message</th>
+			<th style='width:10%;'>Time</th>
 		</tr>";
 		if(! $system->db_num_rows) {
 			echo "<tr><td colspan='2' style='text-align:center;'>No posts!</td></tr>";
 		}
 		while($post = $system->db_fetch($result)) {
-			$purchasers = $system->query("SELECT `premium_credits_purchased` FROM `users` WHERE `user_name` = '$post[user_name]'");
-			$creditsPurchased = $system->db_fetch();
+			$user_result = $system->query("SELECT `premium_credits_purchased`, `avatar_link` FROM `users` 
+                WHERE `user_name` = '{$system->clean($post['user_name'])}'");
+			$userData = $system->db_fetch($user_result);
+
+            $statusType = "userLink ";
+            $statusType .= ($userData['premium_credits_purchased']) ? "premiumUser" : "";
+            $class = "chat ";
+            switch($post['user_color']) {
+                case -1:
+                    $class .= 'blue';
+                    break;
+                case -2:
+                    $class .= 'pink';
+                    break;
+                case -3:
+                    $class .= 'gold';
+                    break;
+                case -4:
+                    $class .= 'administrator';
+                    break;
+                default:
+                    $class .= 'normalUser';
+                    break;
+            }
+
 			echo "
 				<tr>
 					<td style='text-align:center;'>
-			";
-			$statusType = "userLink ";
-			$statusType .= ($creditsPurchased['premium_credits_purchased']) ? "premiumUser" : "";
-			$class = "chat ";
-			switch($post['user_color']) {
-				case -1:
-					$class .= 'blue';
-					break;
-				case -2:
-					$class .= 'pink';
-					break;
-				case -3:
-					$class .= 'gold';
-					break;
-				case -4:
-					$class .= 'administrator';
-					break;
-				default:
-					$class .= 'normalUser';
-					break;
-			}
+					<div id='user_data_container' style='display: flex;flex-direction:row'>
+					    <div style='flex-shrink:0;'>
+					        <img style='max-height: 40px;max-width:40px;' src='{$userData['avatar_link']}' />
+                        </div>
+						<div style='display:block;flex-grow:1;'>
+							<a href='{$members_link}&user={$post['user_name']}' class='$class $statusType'>{$post['user_name']}</a><br />
+							<p style='margin: 1px 0 3px;'>
+                                <img src='./images/village_icons/" . strtolower($post['village']) . ".png' alt='{$post['village']} Village'
+                                    style='max-width:20px;max-height:20px;vertical-align:text-bottom;'  title='{$post['village']} Village' /> " .
+                            stripslashes($post['title']) . "</p>                              
+						</div>
+					</div>";
 
-			/*Cextra Zone*/
-			$avyQuery = $system->query("SELECT `avatar_link` FROM `users` WHERE `user_name` = '$post[user_name]'");
-			$avyLink = $system->db_fetch($avyQuery);
-
-			echo
-			"<img
-			style='height: 50px;'
-			src=\"".$avyLink['avatar_link']."\"
-			/>".
-			"<br/>";
-			/*Cextra Zone*/
-
-				echo "<a href='$members_link&user={$post['user_name']}' class='$class $statusType'>" . $post['user_name'] . "</a><br />" .
-					"<p style='margin:0px;margin-top:1px;margin-bottom:3px;'>
-					<img src='./images/village_icons/" . strtolower($post['village']) . ".png' alt='{$post['village']} Village'
-						style='max-width:20px;max-height:20px;vertical-align:text-bottom;'  title='{$post['village']} Village' /> " .
-						stripslashes($post['title']) . "</p>";
-				if($post['staff_level']) {
-					$Color = $SC_STAFF_COLORS[$post['staff_level']];
-					echo sprintf("<p class='staffMember' style='background-color: %s'>%s</p>", $Color['staffColor'], $Color['staffBanner']);
-				}
-				if(isset($SC_MODERATOR) && $player->staff_level >= $SC_MODERATOR) {
-					echo sprintf("<a class='imageLink' href='$self_link&delete=%d'><img src='./images/delete_icon.png' style='max-width:20px;max-height:20px;' /></a>", $post['post_id']);
-				}
-				echo "<a class='imageLink' href='$report_link&report_type=3&content_id=" . $post['post_id'] . "'>
-					<img src='./images/report_icon.png' style='max-width:20px;max-height:20px;' /></a>
-				</td>
+                    if($post['staff_level']) {
+                        $color = $SC_STAFF_COLORS[$post['staff_level']];
+                        echo "<p class='staffMember' style='background-color: {$color['staffColor']}'>{$color['staffBanner']}</p>";
+                    }
+                echo "</td>
 				<td style='text-align:center;padding:4px;white-space:pre;'>" .
 					wordwrap($system->html_parse(stripslashes($post['message']), false, true), 60, "\n", true) . "</td>";
 				$post_time = time() - $post['time'];
@@ -235,7 +227,16 @@ function chat() {
 				else {
 					$posted = $post_minutes . " min(s) ago";
 				}
-				echo "<td style='width:10%;text-align:center;font-style:italic;'>" . $posted . "</td>";
+
+				echo "<td style='text-align:center;font-style:italic;'>
+                    <div style='margin-bottom: 2px;'>{$posted}</div>";
+
+                    if(isset($SC_MODERATOR) && $player->staff_level >= $SC_MODERATOR) {
+                        echo sprintf("<a class='imageLink' href='$self_link&delete=%d'><img src='./images/delete_icon.png' style='max-width:20px;max-height:20px;' /></a>", $post['post_id']);
+                    }
+                    echo "<a class='imageLink' href='$report_link&report_type=3&content_id=" . $post['post_id'] . "'>
+					    <img src='./images/report_icon.png' style='max-width:20px;max-height:20px;' /></a>
+                    </td>";
 				echo "</tr>";
 		}
 	echo "</table>";

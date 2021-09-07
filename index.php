@@ -47,7 +47,7 @@ if(isset($_GET['request_type']) && $_GET['request_type'] == 'ajax') {
 // Run login, load player data
 $player_display = '';
 
-$logout_limit = 60;
+$logout_limit = SystemFunctions::LOGOUT_LIMIT;
 if(!isset($_SESSION['user_id'])) {
 	// require("./securimage/securimage.php");
 	if($_POST['login']) {
@@ -118,7 +118,7 @@ else {
 		$logout_display = "Disabled";
 	}
 	else if($player->forbidden_seal) {
-		$logout_limit = 90;
+		$logout_limit *= 2;
 	}
 	// Check logout timer
 	if($player->last_login < time() - ($logout_limit * 60)) {
@@ -271,6 +271,7 @@ if($LOGGED_IN) {
 	else {
 		$global_message = false;
 	}
+
 	// Load village list
 	$result = $system->query("SELECT `name`, `location` FROM `villages`");
 	$villages = array();

@@ -7,6 +7,8 @@
 */
 class SystemFunctions {
     const KUNAI_PER_DOLLAR = 2;
+    const LOGOUT_LIMIT = 120;
+    const BLOODLINE_ROLL_CHANCE = 50;
 
     // Variable for error message
     public $message;
@@ -26,6 +28,13 @@ class SystemFunctions {
     public $db_query_type;
     public $db_num_rows;
     public $db_affected_rows;
+    public $db_insert_id;
+
+    public $debug = [
+        'battle' => false,
+        'damage' => false,
+        'bloodline' => false,
+    ];
 
     public function __construct() {
         require("./secure/vars.php");
@@ -244,150 +253,37 @@ class SystemFunctions {
         return false;
 
     }
+
+    public function getMemes() {
+        $memes = require 'memes.php';
+
+        return [
+            'codes' => array_map(function ($meme) {
+                return $meme['code'];
+            }, $memes),
+            'images' => array_map(function ($meme) {
+                return $meme['image'];
+            }, $memes),
+            'texts' => array_map(function ($meme) {
+                return $meme['text'];
+            }, $memes),
+        ];
+    }
+
     public function html_parse($text, $img = false, $faces = false) {
         $search_array = array(
             "[b]","[/b]","[u]","[/u]","[i]","[/i]",
             "&lt;3","[strike]","[/strike]","[super]","[/super]","[sub]","[/sub]", "[center]", "[/center]", "[right]", "[/right]",
-            ":lesiregusta:", ":lemadamgusta:",
-            ":lol:", ":yuno:", ":challengeaccepted:", ":foreveralone:", ":rageface:", ":megusta:", ":heckyeah:", ":okay:", ":screwthis:",
-            ":skyrimstan:", ":asianfather:", ":iknowthatfeel:", ":skeptical:", ":truestory:", ":pokerface:", ":awwyeah:",
-            ":ohgodwhy:", ":wut:", ":areyouserious:", ":lololort:", ":likeasir:", ":likealady:", ":allofthe:", ":grumpycat:", ":notbad:",
-            ":whathasbeenseen:", ":no:", ":motherofgod:", ":ifyouknow:",":creepygusta:",":whatthe:",
-            ":insanitywolf:", ":why:", ":yoda:", ":wrongfail:", ":alot:", ":herpderp:", ":doge:", ":confessionbear:", ":kappa:",
-            ":howaboutno:", ':awkwardseal:', ':wegotabadass:', ':facepalm:',
-            ':opieop:', ':oskomodo:', ':babyrage:', ':pogchamp:', ':smileyderp:', 'BibleThump', 'HeyGuys', ':aliensguy:', 'lilyDango', ':likeaboss:',
-            ':vaultboy:');
-
-
-        if($faces) {
-            $replace_array = array("<b>","</b>","<u>","</u>","<i>","</i>","&hearts;",
-                "<del>","</del>","<sup>","</sup>","<sub>","</sub>", "<p style='text-align:center;'>", "</p>",
-                "<p style='text-align:right;'>", "</p>",
-                "<img src=\"http://lsmjudoka.com/images/memes/like_a_sir_gusta.png\" />",
-                "<img src=\"http://lsmjudoka.com/images/memes/like_a_lady_gusta.png\" />",
-                "<img src=\"http://lsmjudoka.com/images/memes/small_lol.png\" alt=':lol:' title=':lol:' />",
-                "<img src=\"http://lsmjudoka.com/images/memes/yuno.png\" alt=':yuno:' title=':yuno:' />",
-                "<img src=\"http://lsmjudoka.com/images/memes/challenge_accepted.png\" alt=':challengeaccepted:' title=':challengeaccepted:' />",
-                "<img src=\"http://lsmjudoka.com/images/memes/forever_alone.png\" alt=':foreveralone:' title=':foreveralone:' />",
-                "<img src=\"http://lsmjudoka.com/images/memes/rage_face.png\" alt=':rageface:' title=':rageface:'  />",
-                "<img src=\"http://lsmjudoka.com/images/memes/me_gusta.png\" alt=':megusta:' title=':megusta:' />",
-                "<img src=\"http://lsmjudoka.com/images/memes/f_yeah.png\" alt=':heckyeah:' title=':heckyeah:' />",
-                "<img src=\"http://lsmjudoka.com/images/memes/okay.png\" alt=':okay:' title=':okay:' />",
-                "<img src=\"http://lsmjudoka.com/images/memes/fts.png\" alt=':screwthis:' title=':screwthis:' />",
-                "<img src=\"http://lsmjudoka.com/images/memes/skyrim_stan.png\" alt=':skyrimstan:' title=':skyrimstan:' />",
-                "<img src=\"http://lsmjudoka.com/images/memes/asian_father.png\" alt=':asianfather:' title=':asianfather:' />",
-                "<img src=\"http://lsmjudoka.com/images/memes/i_know_that_feel_bro.png\" alt=':iknowthatfeel:' title=':iknowthatfeel:' />",
-                "<img src=\"http://lsmjudoka.com/images/memes/skeptical.png\" alt=':skeptical:' title=':skeptical:' />",
-                "<img src=\"http://lsmjudoka.com/images/memes/true_story.png\" alt=':truestory:' title=':truestory:' />",
-                "<img src=\"http://lsmjudoka.com/images/memes/poker_face.png\" alt=':pokerface:' title=':pokerface:' />",
-                "<img src=\"http://lsmjudoka.com/images/memes/aww_yeah.png\" alt=':awwyeah:' title=':awwyeah:' />",
-                "<img src=\"http://lsmjudoka.com/images/memes/oh_god_why.png\" alt=':ohgodwhy:' title=':ohgodwhy:'  />",
-                "<img src=\"http://lsmjudoka.com/images/memes/wut.gif\" alt=':wut:' title=':wut:' />",
-                "<img src=\"http://lsmjudoka.com/images/memes/are_you_serious.png\" alt=':areyouserious:' title=':areyouserious:' />",
-                "<img src=\"http://lsmjudoka.com/images/memes/reverse_lol.png\" />",
-                "<img src=\"http://lsmjudoka.com/images/memes/like_a_sir.png\" alt=':likeasir:' title=':likeasir:' />",
-                "<img src=\"http://lsmjudoka.com/images/memes/like_a_lady.png\" alt=':likealady:' title=':likealady:' />",
-                "<img src=\"http://lsmjudoka.com/images/memes/all_of_the.png\" alt=':allofthe:' title=':allofthe:' />",
-                "<img src=\"http://lsmjudoka.com/images/memes/grumpy_cat.png\" alt=':grumpycat:' title=':grumpycat:' />",
-                "<img src=\"http://lsmjudoka.com/images/memes/not_bad.png\" alt=':notbad:' title=':notbad:' />",
-                "<img src=\"http://lsmjudoka.com/images/memes/what_has_been_seen.png\" alt=':whathasbeenseen:' title=':whathasbeenseen:' />",
-                "<img src=\"http://lsmjudoka.com/images/memes/no.png\" alt=':no:' title=':no:' />",
-                "<img src=\"http://lsmjudoka.com/images/memes/mother_of_god.png\" alt=':motherofgod:' title=':motherofgod:' />",
-                "<img src=\"http://lsmjudoka.com/images/memes/if_you_know.png\" alt=':ifyouknow:' title=':ifyouknow:' />",
-                "<img src=\"http://lsmjudoka.com/images/memes/creepy_gusta.png\" alt=':creepygusta:' title=':creepygusta:' />",
-                "<img src=\"http://lsmjudoka.com/images/memes/what_the.png\" alt=':whatthe:' title=':whatthe:' />",
-                "<img src=\"http://lsmjudoka.com/images/memes/insanity_wolf.png\" alt=':insanitywolf:' title=':insanitywolf:' />",
-                "<img src=\"http://lsmjudoka.com/images/memes/why.png\" alt=':why:' title=':why:' />",
-                "<img src=\"http://lsmjudoka.com/images/memes/yoda_meme.png\" alt=':yoda:' title=':yoda:' />",
-                "<img src=\"http://lsmjudoka.com/images/memes/staff_fail.png\" />",
-                "<img src=\"http://lsmjudoka.com/images/memes/alot.png\" alt=':alot:' title=':alot:' />",
-                "<img src=\"http://lsmjudoka.com/images/memes/herp_derp.png\" alt=':herpderp:' title=':herpderp:' />",
-                "<img src=\"http://lsmjudoka.com/images/memes/doge.png\" alt=':doge:' title=':doge:' />",
-                "<img src=\"http://lsmjudoka.com/images/memes/confession_bear.png\" alt=':confessionbear:' title=':confessionbear:' />",
-                "<img src=\"http://lsmjudoka.com/images/memes/kappa.png\" alt=':kappa:' title=':kappa:' />",
-                "<img src=\"http://lsmjudoka.com/images/memes/how_about_no.png\" alt=':howaboutno:' title=':howaboutno:' />",
-                "<img src=\"http://worldofbleach-rpg.com/images/memes/awkward_seal.png\" title=':awkwardseal:' alt=':awkwardseal:' />",
-                "<img src=\"http://worldofbleach-rpg.com/images/memes/watch_out_we_got_a_badass.png\" title=':wegotabadass:' alt=':wegotabadass:' />",
-                "<img src=\"http://worldofbleach-rpg.com/images/memes/facepalm.png\" title=':facepalm:' alt=':facepalm:' />",
-                "<img src=\"http://worldofbleach-rpg.com/images/memes/opieop.png\" title=':opieop:' alt=':opieop:' />",
-                "<img src=\"http://worldofbleach-rpg.com/images/memes/oskomodo.png\" title=':oskomodo:' alt=':oskomodo:' />",
-                "<img src=\"http://worldofbleach-rpg.com/images/memes/babyrage.png\" title=':babyrage:' alt=':babyrage:' />",
-                "<img src=\"http://worldofbleach-rpg.com/images/memes/pogchamp.png\" title=':pogchamp:' alt=':pogchamp:' />",
-                "<img src=\"http://worldofbleach-rpg.com/images/memes/smiley_derp.png\" title=':smileyderp:' alt=':smileyderp:' />",
-                "<img src=\"https://static-cdn.jtvnw.net/emoticons/v1/86/1.0\" title='BibleThump' alt='BibleThump' />",
-                "<img src=\"https://static-cdn.jtvnw.net/emoticons/v1/30259/1.0\" title='HeyGuys' alt='HeyGuys' />",
-                "<img src=\"http://worldofbleach-rpg.com/images/memes/aliens_guy.png\" title=':aliensguy:' alt=':aliensguy:' />",
-                "<img src=\"https://static-cdn.jtvnw.net/emoticons/v1/14856/1.0\" />",
-                "<img src=\"./images/memes/likeaboss.png\" title=':likeaboss:' alt=':likeaboss:'>",
-                "<img src=\"http://worldofbleach-rpg.com/images/memes/vault_boy.png\" title=':vaultboy:' alt=':vaultboy:' />",
             );
-        }
+        $replace_array = array("<b>","</b>","<u>","</u>","<i>","</i>","&hearts;",
+            "<del>","</del>","<sup>","</sup>","<sub>","</sub>", "<p style='text-align:center;'>", "</p>",
+            "<p style='text-align:right;'>", "</p>",
+        );
 
-        else {
+        $text = str_replace($search_array, $replace_array, $text);
 
-            $replace_array = array("<b>","</b>","<u>","</u>","<i>","</i>","&hearts;",
-                "<del>","</del>","<sup>","</sup>","<sub>","</sub>", "<p style='text-align:center;'>", "</p>",
-                "<p style='text-align:right;'>", "</p>",
-                ":like a sir gusta:",
-                ":like a lady gusta:",
-                ":lol:",
-                ":Y u no?:",
-                ":challenge accepted:",
-                ":forever alone:",
-                ":rage face:",
-                ":me gusta:",
-                ":heck yeah:",
-                ":okay:",
-                ":screw this:",
-                ":skyrim stan:",
-                ":asian father:",
-                ":i know that feel:",
-                ":skeptical:",
-                ":true story:",
-                ":poker face:",
-                ":aww yeah:",
-                ":oh god why:",
-                ":wut:",
-                ":are you serious:",
-                ":lol:",
-                ":like a sir:",
-                ":like a lady:",
-                ":all of the:",
-                ":grumpy cat:",
-                ":not bad:",
-                ":what has been seen:",
-                ":no:",
-                ":mother of god:",
-                ":if you know what I mean:",
-                ":creepy gusta:",
-                ":what the:",
-                ":insanity wolf:",
-                ":why:",
-                ":yoda:",
-                ":staff-only fail:",
-                ":alot:",
-                ":herp derp:",
-                ":doge:",
-                ":confession bear:",
-                ":kappa:",
-                ":how about no:",
-                ":awkward seal:",
-                ":watch out we got a badass here:",
-                ":facepalm:",
-                ":opieop:",
-                ":oskomodo:",
-                ":babyrage:",
-                ":pogchamp:",
-                ":smileyderp:",
-                "BibleThump",
-                "HeyGuys",
-                ":aliensguy:",
-                "Dango",
-                ":likeaboss:",
-                ":vaultboy:",
-            );
-
-        }
+        $memes = $this->getMemes();
+        $text = str_replace($memes['codes'], ($faces ? $memes['images'] : $memes['texts']), $text);
 
         if($img) {
             $search_array[count($search_array)] = "[img]";
@@ -403,9 +299,7 @@ class SystemFunctions {
             $replace_array[count($replace_array)] = "<a href='http://www.";
             $replace_array[count($replace_array)] = "'>[Link]</a>";
         }
-
         else {
-
             $reg_exUrl = "/(?:http|https)\:\/\/([a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,5})(?:\/[^\:\s\\\\]*)?/i";
 
             preg_match_all($reg_exUrl, $text, $matches);
@@ -422,11 +316,7 @@ class SystemFunctions {
                 }
 
             }
-
-
-
         }
-
 
         array_push($search_array, '\r\n');
         array_push($replace_array, '<br />');
@@ -438,7 +328,6 @@ class SystemFunctions {
         array_push($replace_array, "&lt;");
         array_push($search_array, '&amp;gt;');
         array_push($replace_array, "&gt;");
-
 
         $text = str_ireplace($search_array,$replace_array,$text);
 

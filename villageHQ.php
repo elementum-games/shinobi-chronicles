@@ -78,7 +78,7 @@ function villageHQ() {
 		<p style='margin:2px;margin-left:auto;margin-right:auto;margin-bottom:4px;padding:2px 5px;
 			border:1px solid #000000;border-radius:15px;color:#000000;font-weight:bold;width:100px;
 			background:linear-gradient(to bottom, #DCCA12, #FAF000, #DCCA12);'>Kage</p>
-		<span style='font-size:1.2em;font-family:\"tempus sans itc\";font-weight:bold;'>$leader_name</span><br /><a href='{$self_link}&view=claim'>[- Claim -]</a><br />
+		<span style='font-size:1.2em;font-family:\"tempus sans itc\";font-weight:bold;'>$leader_name</span><br />
 		<img src='$leader_avatar' style='max-width:125px;max-height:125px;' />
 		</div>
 		
@@ -256,17 +256,6 @@ function villageHQ() {
 			}
 		}
 		echo "</table>";
-	}
-
-	else if($view == 'claim') {
-		echo "<table class='table'>
-			<tr>
-				<th>Hahaha</th>
-			</tr>
-			<tr>
-				<td style='text-align:center;'><img src='http://lsmjudoka.com/images/memes/trollface.png' width='200px'></td>
-			</tr>
-		</table>";
 	}
 	
 	

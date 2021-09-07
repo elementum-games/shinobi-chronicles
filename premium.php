@@ -15,7 +15,6 @@ function premium() {
 	
 	global $self_link;
 
-	
 	$costs['user_reset'] = 0;
 	$costs['name_change'] = 15;
 	$costs['bloodline'][1] = 80;
@@ -142,7 +141,7 @@ function premium() {
 			if(!$player->username_changes and $player->premium_credits < $akCost) {
 				throw new Exception("You do not have enough Ancient Kunai!");
 			}
-			if(strlen($new_name) < 4 || strlen($new_name) >= 18) {
+			if(strlen($new_name) < User::MIN_NAME_LENGTH || strlen($new_name) >= 18) {
 				throw new Exception("New user name is to short/long! Please enter a name between 4 and 18 characters long.");
 			}
 			if($player->user_name == $new_name) {
@@ -289,6 +288,7 @@ function premium() {
 			}
 			
 			$cost = 5 + floor($transfer_amount / 200);
+			$cost = 0;
 			
 			if($player->premium_credits < $cost) {
 				throw new Exception("You do not have enough Ancient Kunai!");
@@ -364,7 +364,7 @@ function premium() {
 		$bloodline_id = $system->clean($_POST['bloodline_id']);
 		try {
 			$result = $system->query("SELECT `bloodline_id`, `name`, `clan_id`, `rank` FROM `bloodlines` 
-				WHERE `bloodline_id`='$bloodline_id' AND `village`='$player->village' AND `rank` < 5 ORDER BY `rank` ASC");
+				WHERE `bloodline_id`='$bloodline_id' AND `rank` < 5 ORDER BY `rank` ASC");
 			if($system->db_num_rows == 0) {
 				throw new Exception("Invalid bloodline!");
 			}
@@ -822,6 +822,7 @@ function premium() {
 		function statAllocateCostDisplay() {
 			var transferAmount = parseInt($('#transferAmount').val());
 			var cost = 5 + Math.floor(transferAmount / 200);
+			cost = 0;
 			var time = transferAmount * 0.2;
 			
 			var display = cost + ' AK / ' + time + ' minutes';
@@ -855,7 +856,9 @@ function premium() {
 				echo "stats.$stat = " . ($player->{$stat} - 5) . ";\r\n";
 			}	
 		}
-		
+
+		//  (5 + floor(($player->ninjutsu_skill - 10) / 200))
+
 		echo "
 		</script>
 		<br />
@@ -863,7 +866,7 @@ function premium() {
 		Transfer amount:<br />
 		<input type='text' id='transferAmount' name='transfer_amount' value='" . ($player->ninjutsu_skill - 10) . "' 
 			onkeyup='statAllocateCostDisplay()' /><br />
-		<span id='statAllocateCost'>" . (5 + floor(($player->ninjutsu_skill - 10) / 200)) . " AK / " . (($player->ninjutsu_skill - 10) * 0.25) . " minutes</span><br />
+		<span id='statAllocateCost'>" . 0 . " AK / " . (($player->ninjutsu_skill - 10) * 0.25) . " minutes</span><br />
 		<input type='submit' name='stat_allocate' value='Transfer Stat Points' />
 		</form>
 		</td></tr></table>";
@@ -939,7 +942,7 @@ function premium() {
 			you in exchange for Ancient Kunai, allowing you to use a new bloodline" . 
 				($player->bloodline_id ? ' instead of your own' : '') . ".<br /><br />";
 			$result = $system->query("SELECT `bloodline_id`, `name`, `rank`
-				FROM `bloodlines` WHERE `village`='$player->village' AND `rank` < 5 ORDER BY `rank` ASC");
+				FROM `bloodlines` WHERE `rank` < 5 ORDER BY `rank` ASC");
 			if($system->db_num_rows == 0) {
 				echo "No bloodlines available!";
 			}
@@ -1104,8 +1107,8 @@ function premium() {
 				+1 weapon equip slots<br />
 				+1 armor equip slots<br />
 				+1 scout range<br />
-				Enhanced long trainings (60 mins, 45 points)<br />
-				New extended trainings (6 hours, 120 points)<br />
+				Enhanced long trainings (1.5x length, 2x gains)<br />
+				Enhanced extended trainings (1.5x length, 2.25x gains)<br />
 				<form action='$self_link&view=forbidden_seal' method='post'>
 				<p style='width:100%;text-align:center;margin:0px;margin-top:2.2em;'>
 					<input type='hidden' name='seal_level' value='2' />
@@ -1132,9 +1135,9 @@ function premium() {
 			{$kunai_per_dollar} Ancient Kunai = $1 USD<br />
 			<br />
 			<b>-Ancient Kunai Specials-</b><br />
-			Buy 30+, get 10 free<br />
-			Buy 50+, get 20 free<br />
-			Buy 100+, get 50 free<br />
+			$15 = 30 Kunai + 10 bonus<br />
+			$25 = 50 Kunai + 20 bonus<br />
+			$50 = 100 Kunai + 50 bonus<br />
 			<br />
 			
 			<form action="https://www.paypal.com/cgi-bin/webscr" method="post">

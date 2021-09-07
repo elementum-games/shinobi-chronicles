@@ -15,29 +15,27 @@ function training() {
 	// Vars
 
 	$stat_train_length = 300; // 300
-	$stat_train_gain = 1 + $player->rank;
+	$stat_train_gain = 2 + ($player->rank * 2);
 
 	$stat_long_train_length = $stat_train_length * 8;
 	$stat_long_train_gain = $stat_train_gain * 4;
 
-	$stat_extended_train_length = $stat_train_length * 72;
-	$stat_extended_train_gain = $stat_train_gain * 24;
+    $stat_extended_train_length = $stat_long_train_length * 6;
+	$stat_extended_train_gain = $stat_long_train_gain * 3;
 
 	// Forbidden seal trainings boost
 	if($player->forbidden_seal && $player->forbidden_seal['level'] >= 2) {
 		$stat_long_train_length *= 1.5;
 		$stat_long_train_gain *= 2;
+
+        $stat_extended_train_length = $stat_long_train_length * 6;
+        $stat_extended_train_gain = $stat_long_train_gain * 3.375;
 	}
-	// Dev server boost
-	if($ENVIRONMENT == 'dev') {
-		$stat_train_length = 60;
-		$stat_train_gain = 10;
-		$stat_long_train_length = 120;
-		$stat_long_train_gain = 100;
-	}
+
 	$stat_train_gain += $TRAIN_BOOST;
 	$stat_long_train_gain += $LONG_TRAIN_BOOST;
 	$stat_extended_train_gain += ($LONG_TRAIN_BOOST * 5);
+
 	$HOLIDAY_TRAINING = false;
 	$player->getInventory();
 	if($_POST['train_type'] && !$player->train_time) {
@@ -49,7 +47,7 @@ function training() {
 				$train_length = $stat_long_train_length;
 				$train_gain = $stat_long_train_gain;
 			}
-			else if($_POST['train_type'] == 'Extended' && $player->forbidden_seal && $player->forbidden_seal['level'] >= 2) {
+			else if($_POST['train_type'] == 'Extended') {
 				$train_length = $stat_extended_train_length;
 				$train_gain = $stat_extended_train_gain;
 			}
@@ -139,10 +137,12 @@ function training() {
 		<br />
 		<span style='font-weight:bold;'>Skill/Attribute training:</span><br />
 			<p style='margin-left:20px;margin-top:5px;margin-bottom:8px;'>
-			<label style='font-weight:bold;width:45px;'>Short:</label>
+			<label style='font-weight:bold;width:70px;'>Short:</label>
 				Takes " . ($stat_train_length / 60) . " minutes, gives $stat_train_gain point" . ($stat_train_gain > 1 ? 's' : '') . "<br />
-			<label style='font-weight:bold;width:45px;'>Long:</label>
+			<label style='font-weight:bold;width:70px;'>Long:</label>
 				Takes " . ($stat_long_train_length / 60) . " minutes, gives $stat_long_train_gain point" . ($stat_long_train_gain > 1 ? 's' : '') . "<br />
+            <label style='font-weight:bold;width:70px;'>Extended:</label>
+				Takes " . ($stat_extended_train_length / 60) . " minutes, gives $stat_extended_train_gain point" . ($stat_extended_train_gain > 1 ? 's' : '') . "<br />
 			</p>
 		<span style='font-weight:bold;'>Jutsu training:</span><br /> 
 			<p style='margin-left:20px;margin-top:5px;margin-bottom:8px;'>
@@ -188,11 +188,9 @@ function training() {
 							}
 						echo "</select><br />
 						<input type='submit' name='train_type' value='Short' />
-						<input type='submit' name='train_type' value='Long' />";
-						if(($player->forbidden_seal && $player->forbidden_seal['level'] >= 2) or $HOLIDAY_TRAINING) {
-							echo "<br /><input type='submit' name='train_type' value='Extended' />";
-						}
-					echo "</form>
+						<input type='submit' name='train_type' value='Long' />
+						<input type='submit' name='train_type' value='Extended' />
+                </form>
 				</td>
 				<td style='text-align:center;'>
 					<form action='$self_link' method='post'>
@@ -207,11 +205,9 @@ function training() {
 								">Willpower</option>
 						</select><br />
 						<input type='submit' name='train_type' value='Short' />
-						<input type='submit' name='train_type' value='Long' />";
-						if(($player->forbidden_seal && $player->forbidden_seal['level'] >= 2) or $HOLIDAY_TRAINING) {
-							echo "<br /><input type='submit' name='train_type' value='Extended' />";
-						}
-					echo "</form>
+						<input type='submit' name='train_type' value='Long' />
+						<input type='submit' name='train_type' value='Extended' />
+                    </form>
 				</td>
 				<td style='text-align:center;'>
 					<form action='$self_link' method='post'>

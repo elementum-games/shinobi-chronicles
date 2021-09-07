@@ -4,6 +4,8 @@
 	Purpose:	Fetch user data and load into class variables.
 */
 class User {
+    const MIN_NAME_LENGTH = 2;
+
 	public $system;
 	
 	// Loaded in construct
@@ -489,7 +491,7 @@ class User {
 						if($skill_ratio > 1.0) {
 							$skill_ratio = 1.0;
 						}
-						else if($ratio < 0.55) {
+						else if($skill_ratio < 0.55) {
 							$skill_ratio = 0.55;
 						}
 					
@@ -556,12 +558,12 @@ class User {
 			}
 			
 			// Debug info
-			if($this->user_id == 1) {
+			if($this->system->debug['bloodline']) {
 				foreach($this->bloodline->passive_boosts as $id=>$boost) {
-					//echo "Boost: " . $boost['effect'] . " : " . $boost['power'] . "<br />";
+					echo "Boost: " . $boost['effect'] . " : " . $boost['power'] . "<br />";
 				}
 				foreach($this->bloodline->combat_boosts as $id=>$boost) {
-					//echo "Boost: " . $boost['effect'] . " : " . $boost['power'] . "<br />";
+					echo "Boost: " . $boost['effect'] . " : " . $boost['power'] . "<br />";
 				}
 			}
 					
@@ -1092,7 +1094,7 @@ class User {
 			}
 		}
 			
-		if($this->user_id == 1)  {
+		if($this->system->debug['damage'])  {
 			echo "Off: $offense +($offense_boost) -> " . ($offense + $offense_boost) . "<br />";
 		}
 		
@@ -1118,7 +1120,7 @@ class User {
 		
 		// Add non-BL damage boosts
 		$damage_boost = $this->{$attack['jutsu_type'] . '_boost'} - $this->{$attack['jutsu_type'] . '_nerf'};		
-		if($this->user_id == 1) {
+		if($this->system->debug['damage']) {
 			echo 'Damage/boost: ' . $damage . ' / ' . $damage_boost . '<br />';
 		}
 		$damage = round($damage + $damage_boost, 2);

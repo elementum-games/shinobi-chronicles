@@ -124,7 +124,7 @@ function battle() {
 			}
 			$system->query("INSERT INTO `battles` (`player1`, `player2`, `turn_time`) 
 				VALUES ($player->user_id, $attack_id, " . (time() + 30) . ")");
-			$battle_id = mysql_insert_id();	
+			$battle_id = $system->db_insert_id;
 			$player->battle_id = $battle_id;
 			$system->query("UPDATE `users` SET `battle_id`='$battle_id' WHERE `user_id`= $player->user_id OR `user_id` = $attack_id LIMIT 2");
 			$system->message("You have attacked!<br />

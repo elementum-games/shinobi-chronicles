@@ -162,7 +162,7 @@ function newsPosts($ADMIN = false, $max_posts = 8) {
 	
 	$result = $system->query("SELECT * FROM `news_posts` ORDER BY `post_id` DESC LIMIT $max_posts");
 
-	if($system->db_fetch() == 0) {
+	if($system->db_num_rows == 0) {
 		$system->message("No news posts!");
 		$system->printMessage();
 	}

@@ -26,7 +26,7 @@ if(!$system->register_open) {
     exit;
 }
 
-$min_user_name_length = 4;
+$min_user_name_length = User::MIN_NAME_LENGTH;
 $max_user_name_length = 18;
 $min_password_length = 6;
 
@@ -166,7 +166,7 @@ if($_POST['register']) {
 			throw new Exception("Please enter a valid email address!");
 		}
 		
-		$email_pattern = '/^[\w\-\.]+@[\w\-\.]+\.[a-zA-Z]{2,4}$/';
+		$email_pattern = '/^[\w\-\.\+]+@[\w\-\.]+\.[a-zA-Z]{2,4}$/';
 		if(!preg_match($email_pattern, $email)) {
 			throw new Exception("Please enter a valid email address!");
 		}

@@ -10,21 +10,19 @@ body {
 
 #header {
 	/* Structure */
-	width: 680px;
+	width: 700px;
 	padding: 0px;
-	margin: auto;
-	margin-top: 0px;
-	margin-left: 90px;
+	margin: 0 auto auto 90px;
 	
 	position: absolute;
-	top: 0px;
+	top: 0;
 	
 	/* Style */
 	/* border-bottom:1px solid #000; */
 }
 
 #topMenu {
-	width: 680px;
+	width: 700px;
 	height: 30px;
 	padding: 3px 0px;
 	
@@ -86,7 +84,7 @@ body {
 }
 
 #content {
-	width: 670px;
+	width: 700px;
 	min-height: 500px;
 	background-color: #1f1c1d;
 	

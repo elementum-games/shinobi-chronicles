@@ -80,7 +80,7 @@ body {
 /* Content */
 #container {
 	/* Structure */
-	width: 960px;
+	width: 1000px;
 	position:relative;
 	
 	margin-left: auto;
@@ -95,10 +95,11 @@ body {
 }
 
 #content {
-	width:680px;
+	width: 700px;
 	min-height:500px;
 
 	float: left;
+    margin-left: 10px;
 }
 h2#title {
 	margin-left:30px;
