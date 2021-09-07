@@ -41,7 +41,7 @@ function spar() {
 			$system->message("Invalid battle! - p1/p2 check");
 			$system->printMessage();
 			$player->battle_id = 0;
-			break;
+			return false;
 		}
 		
 		$opponent->loadData(1);
