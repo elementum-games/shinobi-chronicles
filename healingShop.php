@@ -43,7 +43,7 @@ function healingShop() {
 				$player->health = $player->max_health;
 			}
 		} catch (Exception $e) {
-			$system->messsage($e->getMessage());
+			$system->message($e->getMessage());
 			$system->printMessage();
 		}
 	}
@@ -64,4 +64,3 @@ function healingShop() {
 	}
 	echo "</td></tr></table>";
 }
-?>
