@@ -1095,4 +1095,3 @@ function rankUp() {
 	return true;
 }
 
-?>
