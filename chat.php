@@ -166,28 +166,25 @@ function chat() {
 			echo "<tr><td colspan='2' style='text-align:center;'>No posts!</td></tr>";
 		}
 		while($post = $system->db_fetch($result)) {
-			$purchasers = $system->query("SELECT `premium_credits_purchased` FROM `users` WHERE `user_name` = '$post[user_name]'");
-			$creditsPurchased = $system->db_fetch();
+			$user_result = $system->query("SELECT `premium_credits_purchased`, `avatar_link` FROM `users` 
+                WHERE `user_name` = '{$system->clean($post['user_name'])}'");
+			$userData = $system->db_fetch($user_result);
 
-			/*Cextra Zone*/
-			$avyQuery = $system->query("SELECT `avatar_link` FROM `users` WHERE `user_name` = '$post[user_name]'");
-			$avyLink = $system->db_fetch($avyQuery);
 			echo "
 				<tr>
 					<td style='text-align:center;'>
-					<div id='user_data_container' style='display=block'>
-						<div style=\"display:inline-block;\">
-							<div style=\"display:inline-block;\">
+					<div id='user_data_container' style='display: block'>
+						<div style='display:inline-block;'>
+							<div style='display:inline-block;'>
 						</div>
-						<img style='height: 20px; margin: 100% 0px;'src=\"".$avyLink['avatar_link']."\"/>"
-						.
-						"<br/>
+						<img style='height: 20px; margin: 100% 0;' src='{$userData['avatar_link']}' />
+						<br />
 					</div>
 					<div style=\"display: inline-block; width: 80%;\">
 			";
-			//*Cextra Zone*//
+
 			$statusType = "userLink ";
-			$statusType .= ($creditsPurchased['premium_credits_purchased']) ? "premiumUser" : "";
+			$statusType .= ($userData['premium_credits_purchased']) ? "premiumUser" : "";
 			$class = "chat ";
 			switch($post['user_color']) {
 				case -1:
@@ -206,14 +203,6 @@ function chat() {
 					$class .= 'normalUser';
 					break;
 			}
-
-			// echo
-			// "<img
-			// style='height: 50px;'
-			// src=\"".$avyLink['avatar_link']."\"
-			// />".
-			// "<br/>";
-			/*Cextra Zone*/
 
 				echo "<a href='$members_link&user={$post['user_name']}' class='$class $statusType'>" . $post['user_name'] . "</a><br />" .
 					"<p style='margin:0px;margin-top:1px;margin-bottom:3px;'>
