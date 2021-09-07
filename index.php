@@ -685,7 +685,7 @@ else {
 			x.play();
 		}
 		</script>
-		<img id='captchaImage' style='width:150px;height:40px;' src='./securimage/securimage_show.php' /><br />	
+		<!-- <img id='captchaImage' style='width:150px;height:40px;' src='./securimage/securimage_show.php' /><br />	
 		<img id='captchaPlayButton' src='./images/sound_icon.png' style='height:24px;width:24px;' 
 			onclick='captchaPlay();' />
 		<img src='./images/reload_icon.png' style='height:24px;width:24px;'
@@ -694,7 +694,7 @@ else {
 			<source src='./securimage/securimage_play.php' type='audio/wav'>
 		</audio>
 		<br />
-		<input type='text' name='login_code' /><br />";
+		<input type='text' name='login_code' /><br />-->";
 	}
 	else {
 		$captcha = '';

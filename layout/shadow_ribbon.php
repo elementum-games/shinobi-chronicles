@@ -112,8 +112,6 @@ $login_menu = <<<HTML
 			<input type='text' name='user_name' /><br />
 			<span>Password</span><br />
 			<input type='password' name='password' /><br />
-			<span>Login Code</span><br />
-			<!--CAPTCHA-->
 			<input type='submit' name='login' value='Login' />
 			</form>
 			<p>
