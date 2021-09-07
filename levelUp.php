@@ -48,7 +48,7 @@ function rankUp() {
 	
 	// Akademi-sei -> Genin
 	if($player->rank == 1) {
-		$bloodline_roll_chance = 35;
+		$bloodline_roll_chance = SystemFunctions::BLOODLINE_ROLL_CHANCE;
 		
 		$player->getInventory();
 	
@@ -896,8 +896,7 @@ function rankUp() {
 			} catch(Exception $e) {
 				echo "<tr><td style='text-align:center;'>" . $e->getMessage() . "</td></tr>";
 			}
-			echo "</table>";
-		}
+			echo "</table>";		}
 		
 	}
 	// Chuunin -> Jonin

@@ -8,6 +8,7 @@
 class SystemFunctions {
     const KUNAI_PER_DOLLAR = 2;
     const LOGOUT_LIMIT = 120;
+    const BLOODLINE_ROLL_CHANCE = 50;
 
     // Variable for error message
     public $message;
