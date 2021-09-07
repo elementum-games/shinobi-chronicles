@@ -166,7 +166,7 @@ if($_POST['register']) {
 			throw new Exception("Please enter a valid email address!");
 		}
 		
-		$email_pattern = '/^[\w\-\.]+@[\w\-\.]+\.[a-zA-Z]{2,4}$/';
+		$email_pattern = '/^[\w\-\.\+]+@[\w\-\.]+\.[a-zA-Z]{2,4}$/';
 		if(!preg_match($email_pattern, $email)) {
 			throw new Exception("Please enter a valid email address!");
 		}
