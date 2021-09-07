@@ -53,14 +53,6 @@ function battleAI(&$player, &$opponent) {
 	global $system;
 	global $self_link;
 
-	//DEBUG PURPOSES
-		$allowed_debug = array(
-				1, //Lsmjudoka
-				190, //Sunny / Shade
-				193, //Kengetsu
-			);
-		$debug_allowed = in_array($player->user_id, $allowed_debug);
-
 	$player->getInventory();
 	$opponent->loadData();
 	
@@ -83,7 +75,7 @@ function battleAI(&$player, &$opponent) {
 		$active_effects = $_SESSION['active_effects'];
 
 		foreach($active_effects as $id => $effect) {
-			if($debug_allowed) {
+			if($system->debug['battle']) {
 				echo "[$id]: " . $effect['effect'] . "(". $effect['effect_amount'] . ") -> " . $effect['target'] . "<br />";
 			}
 			if($effect['target'] == $player->id) {
@@ -112,7 +104,7 @@ function battleAI(&$player, &$opponent) {
 	if(isset($_SESSION['active_genjutsu'])) {
 		$active_genjutsu = $_SESSION['active_genjutsu'];
 		foreach($active_genjutsu as $id => $genjutsu) {
-			if($debug_allowed) {
+			if($system->debug['battle']) {
 				echo '[' . $id . '] = ' . $genjutsu['effect'] . '(' . $genjutsu['effect_amount'] . ') -> ' . $genjutsu['target'] . '<br />';
 			}
 			if($genjutsu['target'] == 'P' . $player->user_id) {
@@ -433,7 +425,7 @@ function battleAI(&$player, &$opponent) {
 				}
 				
 				// add opponent jutsu cooldown
-				if($debug_allowed) {
+				if($system->debug['battle']) {
 					echo "PD: $player_damage<br />";
 				}
 				
@@ -459,7 +451,7 @@ function battleAI(&$player, &$opponent) {
 					$barrier_jutsu['effect_length'] = 1;
 					setEffect($player, $player->id, $barrier_jutsu, $player->barrier, $effect_id, $active_effects);
 				}
-				if($debug_allowed) {
+				if($system->debug['battle']) {
 					echo "PD: $player_damage<br />";
 				}
 				
@@ -1258,7 +1250,7 @@ function battlePvP(&$player, &$opponent, &$battle) {
 				$battle['player2_action'] == -1;
 				$player2_jutsu['effect_only'] = true;
 			}
-			if($debug_allowed) {
+			if($system->debug['battle']) {
 				echo 'P1: ' . $player1_damage . ' / P2: ' . $player2_damage . '<br />';
 			}
 
@@ -1516,7 +1508,7 @@ function battlePvP(&$player, &$opponent, &$battle) {
 				`jutsu_cooldowns` = '" . json_encode($battle['jutsu_cooldowns']) . "',
 				`turn_time`='{$battle['turn_time']}'
 				WHERE `battle_id`='{$battle['battle_id']}' LIMIT 1";
-			if($debug_allowed && false) {
+			if($system->debug['battle'] && false) {
 				echo $query . "<br /><br />";
 			}
 			$system->query($query);
