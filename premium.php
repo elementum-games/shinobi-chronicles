@@ -364,7 +364,7 @@ function premium() {
 		$bloodline_id = $system->clean($_POST['bloodline_id']);
 		try {
 			$result = $system->query("SELECT `bloodline_id`, `name`, `clan_id`, `rank` FROM `bloodlines` 
-				WHERE `bloodline_id`='$bloodline_id' AND `village`='$player->village' AND `rank` < 5 ORDER BY `rank` ASC");
+				WHERE `bloodline_id`='$bloodline_id' AND `rank` < 5 ORDER BY `rank` ASC");
 			if($system->db_num_rows == 0) {
 				throw new Exception("Invalid bloodline!");
 			}
