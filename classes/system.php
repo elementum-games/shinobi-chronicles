@@ -28,6 +28,7 @@ class SystemFunctions {
     public $db_query_type;
     public $db_num_rows;
     public $db_affected_rows;
+    public $db_insert_id;
 
     public $debug = [
         'battle' => false,

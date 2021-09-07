@@ -142,7 +142,7 @@ function spar() {
 			
 			$system->query("INSERT INTO `battles` (`battle_type`, `player1`, `player2`, `turn_time`) 
 				VALUES (2, $player->user_id, $challenge, " . (time() + 30) . ")");
-			$battle_id = mysql_insert_id();	
+			$battle_id = $system->db_insert_id;
 			
 			$player->battle_id = $battle_id;
 			$player->challenge = 0;
