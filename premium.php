@@ -866,7 +866,7 @@ function premium() {
 		Transfer amount:<br />
 		<input type='text' id='transferAmount' name='transfer_amount' value='" . ($player->ninjutsu_skill - 10) . "' 
 			onkeyup='statAllocateCostDisplay()' /><br />
-		<span id='statAllocateCost'>" . (5 + floor(($player->ninjutsu_skill - 10) / 200)) . " AK / " . (($player->ninjutsu_skill - 10) * 0.25) . " minutes</span><br />
+		<span id='statAllocateCost'>" . 0 . " AK / " . (($player->ninjutsu_skill - 10) * 0.25) . " minutes</span><br />
 		<input type='submit' name='stat_allocate' value='Transfer Stat Points' />
 		</form>
 		</td></tr></table>";
@@ -1135,9 +1135,9 @@ function premium() {
 			{$kunai_per_dollar} Ancient Kunai = $1 USD<br />
 			<br />
 			<b>-Ancient Kunai Specials-</b><br />
-			Buy 30+, get 10 free<br />
-			Buy 50+, get 20 free<br />
-			Buy 100+, get 50 free<br />
+			$15 = 30 Kunai + 10 bonus<br />
+			$25 = 50 Kunai + 20 bonus<br />
+			$50 = 100 Kunai + 50 bonus<br />
 			<br />
 			
 			<form action="https://www.paypal.com/cgi-bin/webscr" method="post">
