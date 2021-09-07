@@ -375,7 +375,7 @@ function jutsu() {
 						ucwords(str_replace('_', ' ', $jutsu['effect'])) . " - " . $jutsu['effect_length'] . " turns<br />";
 				}
 				echo "<label style='width:6.5em;'>Jutsu type:</label>" . ucwords($jutsu['jutsu_type']) . "<br />
-				<label style='width:6.5em;'>Power:</label>" . ucwords($jutsu['power']) . "<br />
+				<label style='width:6.5em;'>Power:</label>" . round($jutsu['power'], 1) . "<br />
 				<label style='width:6.5em;'>Level:</label>" . $jutsu['level'] . "<br />
 				<label style='width:6.5em;'>Exp:</label>" . $jutsu['exp'] . "<br />";
 			
