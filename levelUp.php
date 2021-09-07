@@ -70,11 +70,10 @@ function rankUp() {
 			$_SESSION['exam_stage'] = 1;
 			$exam_stage = 1;
 		}
-		
-		// 2, 6, 12
-        $replacement_jutsu_id = '4';
-		$clone_jutsu_id = '87';
-		$transform_jutsu_id = '12';
+
+        $replacement_jutsu_id = 4;
+		$clone_jutsu_id = 87;
+		$transform_jutsu_id = 12;
 		$jutsu_ids = implode(",", [$replacement_jutsu_id, $clone_jutsu_id, $transform_jutsu_id]);
 
 		$result = $system->query("SELECT `jutsu_id`, `name`, `hand_seals` FROM `jutsu` WHERE `jutsu_id` IN({$jutsu_ids})");
