@@ -47,7 +47,7 @@ $top_menu = <<<HTML
 <ul>
 	<li><a href='$link'>News</a></li>
 	<li><a href='http://shinobi-chronicles.com/forum/' target='_blank'>Forum</a></li>
-	<li><a href='http://shinobi-chronicles.com/forum/viewtopic.php?f=4&t=360' target='_blank'>Manual</a></li>
+	<li><a href='{$link}manual.php'>Manual</a></li>
 	<li><a href='{$link}rules.php'>Rules</a></li>
 	<li><a href='{$link}terms.php'>Terms of Service</a></li>
 </ul>
