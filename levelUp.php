@@ -75,7 +75,11 @@ function rankUp() {
         $replacement_jutsu_id = 4;
 		$clone_jutsu_id = 87;
 		$transform_jutsu_id = 12;
-		$jutsu_ids = "{$replacement_jutsu_id},{$clone_jutsu_id},{$transform_jutsu_id}";
+		$jutsu_ids = implode(",", [$replacement_jutsu_id, $clone_jutsu_id, $transform_jutsu_id]);
+
+		if($player->user_id == 1) {
+            echo "SELECT `jutsu_id`, `name`, `hand_seals` FROM `jutsu` WHERE `jutsu_id` IN(${$jutsu_ids})";
+        }
 
 		$result = $system->query("SELECT `jutsu_id`, `name`, `hand_seals` FROM `jutsu` WHERE `jutsu_id` IN(${$jutsu_ids})");
 		$jutsu_data = array();
