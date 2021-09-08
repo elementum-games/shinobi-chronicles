@@ -23,7 +23,7 @@ require_once("classes.php");
 $system = new SystemFunctions();
 
 // Check for logout
-if($_GET['logout'] == 1) {
+if(isset($_GET['logout']) && $_GET['logout'] == 1) {
 	$_SESSION = array();
 	if(ini_get("session.use_cookies")) {
 		$params = session_get_cookie_params();

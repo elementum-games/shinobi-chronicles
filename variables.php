@@ -10,7 +10,7 @@ Purpose:	Store global variables such as master link, settings for script to use
 $ENVIRONMENT = 'prod';
 
 // Update for different website
-$dev_link = "http://lsmjudoka.com/projects/shinobi_chronicles/";
+$dev_link = "http://localhost/";
 $prod_link = "https://shinobichronicles.com/";
 
 /** @var string $link root link to webpage */

@@ -56,7 +56,7 @@ function userProfile() {
 		}
 	}
 	// Rank up
-	else if($player->level >= $max_level && $player->exp >= $exp_needed && $player->rank < $SC_MAX_RANK) {
+	else if($player->level >= $player->max_level && $player->exp >= $exp_needed && $player->rank < $SC_MAX_RANK) {
 		if($player->battle_id > 0 or !$player->in_village) {
 			echo "<p style='text-align:center;font-style:italic;$extra_style'>
 				You must be out of battle and in your village to rank up.</p>";
@@ -194,12 +194,11 @@ function userProfile() {
 			"<div style='height:6px;width:250px;border-style:solid;border-width:1px;'>" .
 			"<div style='background-color:#00B000;height:6px;width:" . $stamina_percent . "%;' /></div>" . "</div>" .
 		"<br />
-		Regeneration rate: " . $player->regen_rate;
+		Regeneration rate: " . $player->regen_rate .
 		$regen_cut = 0;
 		if($player->battle_id or isset($_SESSION['ai_id'])) {
 			$regen_cut = round(($player->regen_rate + $player->regen_boost) * 0.7, 1);
 		}
-		
 		if($player->regen_boost) {
 			echo " (+" . $player->regen_boost . ") " . ($regen_cut ? "<span style='color:#8A0000;'>(-{$regen_cut})</span> " : "") .
 			"-> <span style='color:#00C000;'>" . ($player->regen_rate + $player->regen_boost - $regen_cut) . "</span>";
@@ -207,9 +206,14 @@ function userProfile() {
 		else if(isset($regen_cut)) {
 		
 		}
-		
-		echo "<br />
-		</td></tr>";
+		echo "<br />";
+
+        // First attempt:
+        // echo "<label style='width:9.2em;'>Regen Timer:</label>" . (time() - $player->last_update - 60) * -1;
+
+        $time_since_last_regen = time() - $player->last_update;
+        echo "<label style='width:9.2em;'>Regen Timer:</label>" . (60 - $time_since_last_regen) .
+		"</td></tr>";
 		
 		$exp_remaining = $exp_needed - $player->exp;
 		if($exp_remaining < 0) {
