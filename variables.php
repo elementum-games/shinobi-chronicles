@@ -77,4 +77,4 @@ $MAP_SIZE_X = 18;
 $MAP_SIZE_Y = 12;
 
 // Misc stuff
-$SC_MAX_RANK = 4;
+$SC_MAX_RANK = 3;
