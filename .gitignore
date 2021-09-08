@@ -2,3 +2,4 @@
 /planning/server_info.txt
 /secure
 !/secure/vars.sample.php
+.htaccess
