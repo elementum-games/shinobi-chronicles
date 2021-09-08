@@ -420,4 +420,16 @@ return [
         'text' => ':guess I\'ll die:',
         'public' => true,
     ],
+    [
+        'code' => ':surprisedpikachu:',
+        'image' => '<img src="./images/memes/surprised_pikachu.png" />',
+        'text' => ':surprised pikachu:',
+        'public' => true,
+    ],
+    [
+        'code' => ':whitelotus:',
+        'image' => '<img src="./images/memes/iroh.png" />',
+        'text' => ':guess I\'ll die:',
+        'public' => true,
+    ],
 ];
