@@ -194,7 +194,8 @@ function userProfile() {
 			"<div style='height:6px;width:250px;border-style:solid;border-width:1px;'>" .
 			"<div style='background-color:#00B000;height:6px;width:" . $stamina_percent . "%;' /></div>" . "</div>" .
 		"<br />
-		Regeneration rate: " . $player->regen_rate .
+		Regeneration rate: " . $player->regen_rate;
+
 		$regen_cut = 0;
 		if($player->battle_id or isset($_SESSION['ai_id'])) {
 			$regen_cut = round(($player->regen_rate + $player->regen_boost) * 0.7, 1);
