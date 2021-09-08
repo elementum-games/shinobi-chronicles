@@ -2,6 +2,8 @@ HTML{
 	width: 100%;
 	display: block;
 
+	font-family: arial;
+
 	text-align: center;
 }
 img{
@@ -50,23 +52,25 @@ a:hover{
 #header{
 }
 .topMenu{
-	display: inline-block;
+	display: block;
 	width: 100%;
 	height: auto;
+	font-size: 0.7em;
 }
 
 .topMenu li{
-	display: inline;
-	width: 20%;
-	styling: none;
-
-	background-color: rgba(40, 40, 40, 1);
-
-	border-radius: 5px;
+	display: inline-block;
 }
 
-.topMenu li:hover{
-	background-color: rgba(70,70,70, 1);
+.topMenu li a{
+	display: inline-block;
+	background: linear-gradient(0deg, rgba(40,40,40,1) 0%, rgba(62,62,62,1) 38%, rgba(40,40,40,1) 100%);
+	padding: 0.5em 0.7em;
+	margin: 0.4em 0.2em;
+}
+
+.topMenu li a:hover{
+	background: linear-gradient(0deg, rgba(40,40,40,1) 0%, rgba(82,82,82,1) 38%, rgba(40,40,40,1) 100%);
 }
 
 .submenu{
@@ -91,12 +95,30 @@ a:hover{
 }
 
 .table{
+	display: block;
+	width: 80%;
 	margin: 1em auto 6em auto;
 	border: solid 3px white;
 	padding: 2em;
+
+
 }
 .table tbody{
+	display: block;
+	width: 100%;
+	min-width: 200px;
 	font-size: 1.6em;
+}
+.table tr td{
+	display: block;
+	margin: 2em 0em;
+}
+.table a{
+	display: block;
+	text-decoration: none;
+	padding: 0.8em 0.5em;
+	margin: 0px auto;
+	background: linear-gradient(0deg, rgba(40,40,40,1) 0%, rgba(62,62,62,1) 38%, rgba(40,40,40,1) 100%);
 }
 
 .profile_table{
@@ -129,6 +151,7 @@ a:hover{
 	margin: 0.5em 0em;
 	border-top: solid 1px white;
 	border-bottom: solid 1px white;
+	border-radius: 0.2em;
 	background: linear-gradient(0deg, rgba(40,40,40,1) 0%, rgba(62,62,62,1) 38%, rgba(40,40,40,1) 100%);
 }
 .menu li:hover{
@@ -137,7 +160,23 @@ a:hover{
 .menu li a{
 	display: block;
 	text-decoration: none;
-	padding: 1em 0em;
+	padding: 0.8em 0em;
+}
+
+#socialPosts tbody{
+	display: inline;
+}
+#socialPosts tr a{
+	width: 10%;
+}
+#socialPosts div{
+	display: inline-block;
+}
+#socialPosts tr td{
+	display: inline-block;
+}
+#socialPosts tr{
+	display: block;
 }
 
 /*Separates menu items*/
@@ -146,6 +185,11 @@ hr{
 }
 
 /*UNIVERSAL*/
+
+tr{
+	display: block;
+	text-align: center;
+}
 
 input{
 	padding: 0.5em 1em;

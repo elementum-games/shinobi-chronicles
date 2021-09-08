@@ -14,7 +14,7 @@ session_start();
 if(!isset($_SESSION['user_id']) || $_SESSION['user_id'] != 1 || $_SESSION['user_id'] != 190) {
 	// ini_set('display_errors', 'Off');
 }
-ini_set('display_errors', 'On');
+ini_set('display_errors', 'Off'); //errors off
 
 $PAGE_LOAD_START = microtime(true);
 require("variables.php");
