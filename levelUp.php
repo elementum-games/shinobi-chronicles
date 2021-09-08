@@ -70,21 +70,22 @@ function rankUp() {
 			$_SESSION['exam_stage'] = 1;
 			$exam_stage = 1;
 		}
-		
-		// 2, 6, 12
-		$result = $system->query("SELECT `jutsu_id`, `name`, `hand_seals` FROM `jutsu` WHERE `jutsu_id` IN(2,6,12)");
+
+        $replacement_jutsu_id = 4;
+		$clone_jutsu_id = 87;
+		$transform_jutsu_id = 12;
+		$jutsu_ids = implode(",", [$replacement_jutsu_id, $clone_jutsu_id, $transform_jutsu_id]);
+
+		$result = $system->query("SELECT `jutsu_id`, `name`, `hand_seals` FROM `jutsu` WHERE `jutsu_id` IN({$jutsu_ids})");
 		$jutsu_data = array();
 		$count = 1;
 		while($row = $system->db_fetch($result)) {
 			$jutsu_data[$count++] = $row;
 		}
-		
 
 		// Input	
-		if(!empty($_POST)) {
-			if($_POST['hand_seals']) {
-				$hand_seals = $_POST['hand_seals'];
-			}
+		if(!empty($_POST['hand_seals'])) {
+			$hand_seals = $_POST['hand_seals'];
 		
 			switch($exam_stage) {
 				case 1:
