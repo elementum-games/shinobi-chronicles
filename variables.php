@@ -7,7 +7,7 @@ Revised:	04/15/2014
 Purpose:	Store global variables such as master link, settings for script to use
 */
 
-$ENVIRONMENT = 'dev';
+$ENVIRONMENT = 'prod';
 
 // Update for different website
 $dev_link = "http://localhost/";
