@@ -23,3 +23,16 @@ Recommended workflow
 
 
 
+### Local Setup
+
+WIP rough version of one way:
+- Fork repo
+- Download PhpStorm (https://www.jetbrains.com/phpstorm/)
+- Open from VCS -> GitHub -> login to your account -> choose shinobi-chronicles repository from the list
+- Download XAMPP (https://www.apachefriends.org/index.html)
+- Go to apache > config > httpd.conf
+- Find DocumentRoot > change the path "C:\xampp\htdocs" to your shinobi-chronicles directory (you can right-click the top folder in PhpStorm after opening it > copy path > absolute path)
+- change the default path below in <Directory "C:\xampp\htdocs"> to your shinobi-chronicles directory
+- Go to MySQL > Admin/PhpMyAdmin > user accounts > add user "shinobi_chronicles" > give it a password (doesn't matter what it is, can just be "password") > check "create database with same name and grant all permissions"
+- Go to PhpStorm, find secure/vars.sample.php and change the values to the ones from your database: user = shinobi_chronicles, database = shinobi_chronicles, password = (whatever you set)
+
