@@ -1,0 +1,95 @@
+HTML{
+	width: 100%;
+	display: block;
+
+	text-align: center;
+}
+img{
+	width: 100%;
+}
+Body{
+	color: white;
+	margin: 0px;
+	padding: 0px;
+	background-color: rgba(0,0,0,1);
+	font-size: 1.8em;
+}
+ul{
+	padding-left: 0px;
+	padding: 0px;
+	margin: 0px;
+}
+b{
+	width: 100%;
+	display: none; /*Hides warning messages*/
+}
+a{
+	color: rgba(220,220,220,1);
+}
+a:hover{
+	color: white);
+}
+
+#container{
+	width: 100%;
+}
+#menu{
+	display: inline-block;
+	width: 100%;
+	text-align: center;
+	padding-left: 0px;
+
+	/* display: none; /*Hides Menu*/ */
+
+}
+#notifications{
+	diplay: block;
+	text-align: center;
+	margin: 0.5em;
+}
+#header{
+}
+.topMenu{
+	display: inline-block;
+	width: 100%;
+	height: auto;
+}
+
+.topMenu li{
+	display: inline;
+	width: 20%;
+	styling: none;
+
+	background-color: rgba(40, 40, 40, 1);
+
+	border-radius: 5px;
+}
+
+.topMenu li:hover{
+	background-color: rgba(70,70,70, 1);
+}
+
+.submenu{
+	display: inline-block;
+	text-align: center;
+	font-size: 1.2em;
+	width: 100%;
+}
+.submenu li{
+	text-align: center;
+	width: 90% !important;
+	margin: 0px auto;
+	list-style: none;
+}
+
+.header.contentheader{
+	font-size: 1.6em;
+	padding: 0.5em 0em;
+	background: linear-gradient(0deg, rgba(40,40,40,1) 0%, rgba(20,20,20,1) 23%, rgba(49,62,56,1) 38%, rgba(40,40,40,1) 100%);
+	border-radius: 20px 20px 0px 0px;
+	margin-bottom: 0.8em;
+}
+
+.systemMessage{
+	color: rgba(240,240,20, 1);
+}
