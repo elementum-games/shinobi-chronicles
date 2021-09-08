@@ -10,9 +10,6 @@ Algorithm:	See master_plan.html
 
 //Start the session
 session_start();
-
-error_reporting (E_ALL ^ E_WARNING); //removes warnings
-
 // Turn errors off unless Lsm
 if(!isset($_SESSION['user_id']) || $_SESSION['user_id'] != 1 || $_SESSION['user_id'] != 190) {
 	// ini_set('display_errors', 'Off');
