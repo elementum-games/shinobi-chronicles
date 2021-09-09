@@ -207,8 +207,6 @@ function userProfile() {
 
 		}
 
-		echo "<br />
-		</td></tr>";
 		echo "<br />";
 
         // First attempt:
