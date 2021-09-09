@@ -1,5 +1,5 @@
 <?php
-/* 
+/*
 File: 		settings.php
 Coder:		Levi Meahan
 Created:	08/24/2013
@@ -11,42 +11,45 @@ Algorithm:	See master_plan.html
 function userSettings() {
 	require("variables.php");
 	global $system;
-	
+
 	global $player;
-	
+
 	global $self_link;
 	$max_journal_length = 1000;
 	// Forbidden seal increase
 	if($player->forbidden_seal or $player->staff_level >= $SC_HEAD_MODERATOR) {
 		$max_journal_length = 2000;
 	}
-	
+
 	$layouts = array('shadow_ribbon', 'geisha', 'classic_blue');
-	
+	if($ENVIRONMENT == 'dev') {
+	  $layouts[] = 'cextralite';
+	}
+
 	if($_POST['change_avatar']) {
 		$avatar_link = trim($_POST['avatar_link']);
 		try {
 			if($player->avatar_ban) {
 				throw new Exception("You are currently banned from changing your avatar.");
 			}
-		
+
 			if(strlen($avatar_link) < 5) {
 				throw new Exception("Please enter an avatar link!");
 			}
 			$avatar_link = $system->clean($avatar_link);
-			
+
 			if(!getimagesize($avatar_link)) {
 				throw new Exception("Image does not exist!");
 			}
-			
+
 			$suffix_array = explode(".", $avatar_link);
 			$suffix = $suffix_array[count($suffix_array) - 1];
 			unset($suffix_array);
-			$content = file_get_contents($avatar_link); 
+			$content = file_get_contents($avatar_link);
 			$temp_filename = "./images/avatars/{$player->user_name}.$suffix";
-			$handle = fopen($temp_filename, "w+"); 
-			fwrite($handle, $content); 
-			fclose($handle); 
+			$handle = fopen($temp_filename, "w+");
+			fwrite($handle, $content);
+			fclose($handle);
 			if(filesize($temp_filename) > 512000) {
 				$filesize = round(filesize($temp_filename) / 1024);
 				throw new Exception("Image is too large! Size {$filesize}kb, maximum is 500kb");
@@ -54,8 +57,8 @@ function userSettings() {
 
 			$player->avatar_link = $avatar_link;
 			$system->message("Avatar updated!");
-			
-			unlink($temp_filename); 		
+
+			unlink($temp_filename);
 		} catch (Exception $e) {
 			$system->message($e->getMessage());
 		}
@@ -65,21 +68,21 @@ function userSettings() {
 		$password = trim($_POST['current_password']);
 		$new_password = trim($_POST['new_password']);
 		$confirm_password = trim($_POST['confirm_new_password']);
-		
+
 		$result = $system->query("SELECT `password` FROM `users` WHERE `user_id`='{$player->user_id}' LIMIT 1");
 		$result = $system->db_fetch($result);
-		
+
 		try {
 			if($system->verify_password($password, $result['password'])) {
 				throw new Exception("Current password is incorrect!");
 			}
-			
+
 			$password = $new_password;
-			
+
 			if(strlen($password) < $min_password_length) {
 				throw new Exception("Please enter a password longer than 3 characters!");
 			}
-			
+
 			if(preg_match('/[0-9]/', $password) == false) {
 				throw new Exception("Password must include at least one number!");
 			}
@@ -97,11 +100,11 @@ function userSettings() {
 					throw new Exception("This password is too common, please choose a more unique password!");
 				}
 			}
-			
+
 			if($password != $confirm_password) {
 				throw new Exception("The passwords do not match!");
 			}
-		
+
 			$password = $system->hash_password($password);
 			$system->query("UPDATE `users` SET `password`='$password' WHERE `user_id`='{$player->user_id}' LIMIT 1");
 			if($system->db_affected_rows >= 1) {
@@ -140,11 +143,11 @@ function userSettings() {
 			if($player->journal_ban) {
 				throw new Exception("You are currently banned from changing your avatar.");
 			}
-			
+
 			if(strlen($journal) > $max_journal_length) {
 				throw new Exception("Journal is too long! " . strlen($journal) . "/{$max_journal_length} characters");
 			}
-			
+
 			$system->query("UPDATE `journals` SET `journal`='$journal' WHERE `user_id`='{$player->user_id}' LIMIT 1");
 			if($system->db_affected_rows == 1) {
 				$system->message("Journal updated!");
@@ -186,7 +189,7 @@ function userSettings() {
 					$system->message("{$blacklist_user['user_name']} is not on your blacklist");
 				}
 			}
-			
+
 		} catch (Exception $e) {
 			$system->message($e->getMessage());
 		}
@@ -203,7 +206,7 @@ function userSettings() {
 			if($user_exists) {
 				unset($player->blacklist[$user_remove]);
 			}
-			
+
 			$system->message($message);
 
 		}
@@ -218,7 +221,7 @@ function userSettings() {
 		if(array_search($layout, $layouts) === false) {
 			$layout = null;
 		}
-		
+
 		if(!$layout) {
 			$system->message("Invalid layout choice!");
 			$system->printMessage();
@@ -230,7 +233,7 @@ function userSettings() {
 			$system->printMessage();
 		}
 	}
-	
+
 	echo "<table class='table'>
 	<tr><th>Avatar</th></tr>
 	<tr><td style='text-align:center;'>
@@ -243,7 +246,7 @@ function userSettings() {
 				Default limit: " . ($player->forbidden_seal ? '175x175' : '125x125') . " pixels<br />
 				Avatar can be larger than the limit, but it will be resized<br />
 				Max filesize: 500kb<br />
-				
+
 		</div>
 		<br style='clear:both;' />
 		<br />";
@@ -256,7 +259,7 @@ function userSettings() {
 		else {
 			echo "<p>You are currently banned from changing your avatar.</p>";
 		}
-		
+
 	echo "</td></tr>
 	<tr><th>Password</th></tr>
 	<tr><td>
@@ -272,7 +275,7 @@ function userSettings() {
 		</p>
 		</form>
 	</td></tr>";
-	
+
 	$result = $system->query("SELECT `journal` FROM `journals` WHERE `user_id` = '{$player->user_id}' LIMIT 1");
 	if($system->db_num_rows == 0) {
 		$journal = '';
@@ -282,13 +285,13 @@ function userSettings() {
 		$result = $system->db_fetch($result);
 		$journal = $result['journal'];
 	}
-	
+
 	echo "<tr><th>Layout</th></tr>
 	<tr><td>
 	<form action='$self_link' method='post'>
 	<select name='layout'>";
 	foreach($layouts as $layout) {
-		echo "<option value='$layout' " . ($player->layout == $layout ? "selected='selected'" : "") . 
+		echo "<option value='$layout' " . ($player->layout == $layout ? "selected='selected'" : "") .
 			" >" . ucwords(str_replace("_", " ", $layout)) . "</option>";
 	}
 	echo "</select>
@@ -302,9 +305,9 @@ function userSettings() {
 	<p>Player only supports links ending in: .mp3, .ogg, or .wav.</p>
 	<audio controls>";
 	echo "{$system->audioType($player->profile_song)}";
-	echo 
+	echo
 		"Your browser does not support the audio element.
-	</audio> 
+	</audio>
 	<br />";
 	if(!$player->song_ban) {
 	echo "<br />
@@ -317,8 +320,8 @@ function userSettings() {
 		echo "</p>You are currenly banned from editing your profile song.</p>";
 	}
 	echo "</td></tr>";*/
-	
-	
+
+
 	echo "<tr><th>Journal</th></tr>
 	<tr><td style='text-align:center;'>
 	<i>(Images will be resized down to a max of " . ($player->forbidden_seal ? '500x500' : '300x200') . ")</i>";
@@ -362,8 +365,7 @@ function userSettings() {
 	</form>
 	</td></tr>
 	";
-	
-	echo "</tr></table>";
-	
-}
 
+	echo "</tr></table>";
+
+}

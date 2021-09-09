@@ -1,5 +1,5 @@
 <?php
-/* 
+/*
 File: 		profile.php
 Coder:		Levi Meahan
 Created:	02/26/2013
@@ -14,9 +14,9 @@ function userProfile() {
 
 	global $player;
 	global $self_link;
-	
+
 	// Submenu
-	if($player->rank > 1) {				
+	if($player->rank > 1) {
 		echo "<div class='submenu'>
 		<ul class='submenu'>
 			<li style='width:25.5%;'><a href='{$self_link}'>Character</a></li>
@@ -33,16 +33,16 @@ function userProfile() {
 			<div class='submenuMargin'></div>
 		";
 	}
-	
-	
+
+
 	// Level up/rank up checks
 	$exp_needed = $player->exp_per_level * (($player->level + 1) - $player->base_level) + ($player->base_stats * 10);
-	
+
 	// Admin override
 	if($player->staff_level >= $SC_ADMINISTRATOR) {
 		$SC_MAX_RANK = 4;
 	}
-	
+
 	// Level up
 	if($player->level < $player->max_level && $player->exp >= $exp_needed) {
 		if($player->battle_id) {
@@ -71,8 +71,8 @@ function userProfile() {
 				<a style='text-decoration:none;' href='$self_link&rankup=1'>Take exam for the next rank</a>
 			</p>";
 		}
-	}	
-	
+	}
+
 	$page = 'profile';
 	if(isset($_GET['page'])) {
 		switch($_GET['page']) {
@@ -88,12 +88,12 @@ function userProfile() {
 				break;
 		}
 	}
-	
+
 	// Process input
 	if(isset($_POST['send_currency'])) {
 		$recipient = $system->clean($_POST['recipient']);
 		$amount = (int)$system->clean($_POST['amount']);
-		
+
 		try {
 			if(strtolower($recipient) == strtolower($player->user_name)) {
 				throw new Exception("You cannot send money/AK to yourself!");
@@ -159,37 +159,35 @@ function userProfile() {
 		if($player->forbidden_seal) {
 			$avatar_size = '175px';
 		}
-		echo "<table class='table'>
+		echo "<table class='profile_table table'>
 		<tr><td style='width:50%;text-align:center;'>
 		<span style='font-size:1.3em;font-family:\"tempus sans itc\";font-weight:bold;'>" . $player->user_name . "</span><br />
 		<img src='{$player->avatar_link}' style='margin-top:5px;max-width:$avatar_size;max-height:$avatar_size;' /><br />
 		</td>";
-		
+
 		$exp_percent = ($player->exp_per_level - ($exp_needed - $player->exp)) / $player->exp_per_level * 100;
 		if($exp_percent < 0) {
 			$exp_percent = 0;
 		}
 		else if($exp_percent > 100) {
 			$exp_percent = 100;
-		}	
+		}
 		$exp_width = round($exp_percent * 2);
-		
-		
-		
+
 		$health_percent = round(($player->health / $player->max_health) * 100);
 		$chakra_percent = round(($player->chakra / $player->max_chakra) * 100);
 		$stamina_percent = round(($player->stamina / $player->max_stamina) * 100);
 
 		echo "<td style='width:50%;'>
-		<label style='width:6.7em;'>Health:</label>" . 
+		<label style='width:6.7em;'>Health:</label>" .
 			sprintf("%.2f", $player->health) . '/' . sprintf("%.2f", $player->max_health) . "<br />" .
 			"<div style='height:6px;width:250px;border-style:solid;border-width:1px;'>" .
 			"<div style='background-color:#C00000;height:6px;width:" . $health_percent . "%;' /></div>" . "</div>" .
-		"<label style='width:6.7em;'>Chakra:</label>" . 
+		"<label style='width:6.7em;'>Chakra:</label>" .
 			sprintf("%.2f", $player->chakra) . '/' . sprintf("%.2f", $player->max_chakra) . "<br />" .
 			"<div style='height:6px;width:250px;border-style:solid;border-width:1px;'>" .
 			"<div style='background-color:#0000B0;height:6px;width:" . $chakra_percent . "%;' /></div>" . "</div>" .
-		"<label style='width:6.7em;'>Stamina:</label>" . 
+		"<label style='width:6.7em;'>Stamina:</label>" .
 			sprintf("%.2f", $player->stamina) . '/' . sprintf("%.2f", $player->max_stamina) . "<br />" .
 			"<div style='height:6px;width:250px;border-style:solid;border-width:1px;'>" .
 			"<div style='background-color:#00B000;height:6px;width:" . $stamina_percent . "%;' /></div>" . "</div>" .
@@ -200,13 +198,15 @@ function userProfile() {
 		if($player->battle_id or isset($_SESSION['ai_id'])) {
 			$regen_cut = round(($player->regen_rate + $player->regen_boost) * 0.7, 1);
 		}
+
 		if($player->regen_boost) {
 			echo " (+" . $player->regen_boost . ") " . ($regen_cut ? "<span style='color:#8A0000;'>(-{$regen_cut})</span> " : "") .
 			"-> <span style='color:#00C000;'>" . ($player->regen_rate + $player->regen_boost - $regen_cut) . "</span>";
 		}
 		else if(isset($regen_cut)) {
-		
+
 		}
+
 		echo "<br />";
 
         // First attempt:
@@ -219,7 +219,7 @@ function userProfile() {
 		$exp_remaining = $exp_needed - $player->exp;
 		if($exp_remaining < 0) {
 			$exp_remaining = 0;
-		}	
+		}
 		$label_width = '7.1em';
 		$clan_positions = array(
 					1 => 'Leader',
@@ -246,27 +246,27 @@ function userProfile() {
 		<label style='width:$label_width;'>Location:</label> $player->location<br />
 		<label style='width:$label_width;'>Money:</label> &yen;" . $player->money . "<br />
 		<label style='width:$label_width;'>Ancient Kunai:</label> " . $player->premium_credits . "<br />
-		
+
 		<br />
 		<label style='width:$label_width;'>PvP wins:</label>		$player->pvp_wins<br />
 		<label style='width:$label_width;'>PvP losses:</label> 	$player->pvp_losses<br />
 		<label style='width:$label_width;'>AI wins:</label>		$player->ai_wins<br />
 		<label style='width:$label_width;'>AI losses:</label>		$player->ai_losses<br />
 		</td>
-		
+
 		<td style='width:50%;'>
-		<label style='width:9.2em;'>Total stats:</label>" . 
+		<label style='width:9.2em;'>Total stats:</label>" .
 			sprintf("%.2f", $player->total_stats) . '/' . sprintf("%.2f", $player->stat_cap) . "<br />
 		<br />
 		<label style='width:9.2em;'>Bloodline:</label>" . ($player->bloodline_id ? $player->bloodline_name : 'None') . "</br />";
 		if($player->bloodline_id) {
 			echo "<label style='width:9.2em;'>Bloodline skill:</label>$player->bloodline_skill</label><br />";
 		}
-		
+
 		if($player->elements) {
 			echo "<br /><label style='width:9.2em;'>Element" . (count($player->elements) > 1 ? 's' : '') . ":</label>" . implode(', ', $player->elements) . "</label><br />";
 		}
-		
+
 		echo "<br />
 		<label style='width:9.2em;'>Ninjutsu skill:</label>" . $player->ninjutsu_skill . "<br />
 		<label style='width:9.2em;'>Genjutsu skill:</label>" . $player->genjutsu_skill . "<br />

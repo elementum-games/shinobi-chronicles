@@ -1,5 +1,5 @@
-<?php 
-/* 
+<?php
+/*
 File: 		index.php
 Coder:		Levi Meahan
 Created:	02/21/2012
@@ -10,12 +10,10 @@ Algorithm:	See master_plan.html
 
 //Start the session
 session_start();
-
 // Turn errors off unless Lsm
 if(!isset($_SESSION['user_id']) || $_SESSION['user_id'] != 1 || $_SESSION['user_id'] != 190) {
 	// ini_set('display_errors', 'Off');
 }
-ini_set('display_errors', 'On');
 
 $PAGE_LOAD_START = microtime(true);
 require("variables.php");
@@ -67,7 +65,7 @@ if(!isset($_SESSION['user_id'])) {
 				throw new Exception("Please enter password!");
 			}
 			// Get result
-			$result = $system->query("SELECT `user_id`, `user_name`, `password`, `failed_logins`, `current_ip`, `last_ip`, `user_verified` 
+			$result = $system->query("SELECT `user_id`, `user_name`, `password`, `failed_logins`, `current_ip`, `last_ip`, `user_verified`
 				FROM `users` WHERE `user_name`='$user_name' LIMIT 1");
 			if($system->db_num_rows == 0) {
 				throw new Exception("User does not exist!");
@@ -122,7 +120,7 @@ else {
 	}
 	// Check logout timer
 	if($player->last_login < time() - ($logout_limit * 60)) {
-		if($ajax) {	
+		if($ajax) {
 			echo "<script type='text/javascript'>
 			clearInterval(refreshID);
 			clearInterval(notificationRefreshID);
@@ -159,6 +157,9 @@ else {
 	$layout = $player->layout;
 }
 switch($layout) {
+  case 'cextralite':
+		require("layout/cextralite.php");
+		break;
 	case 'classic_blue':
 		require("layout/classic_blue.php");
 		break;
@@ -197,7 +198,7 @@ if($LOGGED_IN) {
 			echo str_replace('<!--[VERSION_NUMBER]-->', $VERSION_NUMBER, $footer);
 		}
 		exit;
-	}	
+	}
 	if($player->ban_type == 'game') {
 		$ban_time = $player->ban_expire - time();
 		$ban_message = 'You are currently banned from the game. Time remaining: ';
@@ -286,7 +287,7 @@ if($LOGGED_IN) {
 	while($rank = $system->db_fetch($result)) {
 		$RANK_NAMES[$rank['rank_id']] = $rank['name'];
 	}
-	// Page list 
+	// Page list
 	{
 		$pages = array(
 			1 => array(
@@ -315,7 +316,7 @@ if($LOGGED_IN) {
 				'title' => 'Gear',
 				'function_name' => 'gear',
 				'battle_ok' => false
-			),	
+			),
 			6 => array(
 				'file_name' => 'members.php',
 				'title' => 'Members',
@@ -457,7 +458,7 @@ if($LOGGED_IN) {
 			}
 			if(strlen($val) > 32) {
 				$val = substr($val, 0, 32) . '...';
-			}		
+			}
 			$log_contents .= $key . ': ' . $val . '[br]';
 		}
 		foreach($_POST as $key => $value) {
@@ -467,7 +468,7 @@ if($LOGGED_IN) {
 			}
 			if(strlen($val) > 32) {
 				$val = substr($val, 0, 32) . '...';
-			}			
+			}
 			$log_contents .= $key . ': ' . $val . '[br]';
 		}
 		$system->log('player_action', $player->user_name, $log_contents);
@@ -667,7 +668,7 @@ else {
 		<tr><td style='text-align:center;'>
 		Shinobi-Chronicles is currently closed for maintenace. Please check back in a few minutes!
 		</td></tr></table>";
-	}	
+	}
 	require("news.php");
 	newsPosts();
 	if($ENVIRONMENT == 'prod') {
@@ -685,8 +686,8 @@ else {
 			x.play();
 		}
 		</script>
-		<!-- <img id='captchaImage' style='width:150px;height:40px;' src='./securimage/securimage_show.php' /><br />	
-		<img id='captchaPlayButton' src='./images/sound_icon.png' style='height:24px;width:24px;' 
+		<!-- <img id='captchaImage' style='width:150px;height:40px;' src='./securimage/securimage_show.php' /><br />
+		<img id='captchaPlayButton' src='./images/sound_icon.png' style='height:24px;width:24px;'
 			onclick='captchaPlay();' />
 		<img src='./images/reload_icon.png' style='height:24px;width:24px;'
 			onclick='captchaReload();' />
