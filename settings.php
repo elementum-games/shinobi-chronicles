@@ -21,7 +21,10 @@ function userSettings() {
 		$max_journal_length = 2000;
 	}
 
-	$layouts = array('cextralite', 'shadow_ribbon', 'geisha', 'classic_blue');
+	$layouts = array('shadow_ribbon', 'geisha', 'classic_blue');
+	if($ENVIRONMENT == 'dev') {
+	  $layouts[] = 'cextralite';
+	}
 
 	if($_POST['change_avatar']) {
 		$avatar_link = trim($_POST['avatar_link']);
