@@ -206,6 +206,10 @@ a:hover{
 #socialPosts tr td{
 	display: inline-block;
 }
+.chatmsg{
+	font-size: 1.2em;
+	padding: 2em 0em !important;
+}
 #user_data_container{
 	flex-direction: column !important;
 }
