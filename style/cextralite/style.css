@@ -129,6 +129,7 @@ a:hover{
 }
 .table tr td{
 	display: inline-block;
+	width: 100%;
 }
 .table tr{
 	margin: 0.5em auto;
@@ -200,6 +201,7 @@ a:hover{
 }
 #socialPosts div{
 	display: inline-block;
+	width: 100%;
 }
 #socialPosts tr td{
 	display: inline-block;
