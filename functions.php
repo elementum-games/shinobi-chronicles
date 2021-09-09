@@ -11,6 +11,9 @@ function timeRemaining($time_remaining, $format = 'short', $include_days = true,
 		$days = floor($time_remaining / 86400);
 		$time_remaining -= $days * 86400;
 	}
+    else {
+        $days = null;
+    }
 	
 	$hours = floor($time_remaining / 3600);
 	$time_remaining -= $hours * 3600;

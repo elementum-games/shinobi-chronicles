@@ -658,9 +658,8 @@ p {
 
 #content ul.submenu {
 	width: 90%;
-	margin: auto;
-	margin-top: 25px;
-	padding:0px;
+    margin: 20px auto auto;
+    padding:0px;
 	
 	border: 1px solid #000000;
 	border-radius: 30px;

@@ -703,6 +703,14 @@ function battleAI(&$player, &$opponent) {
 		"<div style='height:6px;width:250px;border-style:solid;border-width:1px;'>" .
 		"<div style='background-color:#C00000;height:6px;width:" . $opponent_health_percent . "%;' /></div>" . "</div>";
 	echo "</td></tr>";
+
+	// Move prompt
+    // Move prompt if no winner
+    if(!$winner) {
+        movePrompt($player, $default_attacks);
+    }
+
+	// Battle text
 	$search_array = array("[player]", "[opponent]", 
 		"[gender]", "[gender2]");
 	$replace_array = array($player->user_name, $opponent->name, 
@@ -712,11 +720,7 @@ function battleAI(&$player, &$opponent) {
 		stripslashes(str_replace($search_array, $replace_array, $battle_text)) .
 		"</td></tr>";
 	}
-	// Moves used if any
-	// Move prompt if no winner
-	if(!$winner) {
-		movePrompt($player, $default_attacks);
-	}
+
 	echo "</table>";
 	if($winner) {
 		unset($_SESSION['active_effects']);
