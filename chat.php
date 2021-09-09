@@ -212,7 +212,7 @@ function chat() {
                         echo "<p class='staffMember' style='background-color: {$color['staffColor']}'>{$color['staffBanner']}</p>";
                     }
                 echo "</td>
-				<td style='text-align:center;padding:4px;white-space:pre;'>" .
+				<td style='text-align:center;padding:4px;white-space:pre-wrap;'>" .
 					wordwrap($system->html_parse(stripslashes($post['message']), false, true), 60, "\n", true) . "</td>";
 				$post_time = time() - $post['time'];
 				$post_minutes = ceil($post_time / 60);

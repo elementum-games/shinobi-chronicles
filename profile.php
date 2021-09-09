@@ -56,7 +56,7 @@ function userProfile() {
 		}
 	}
 	// Rank up
-	else if($player->level >= $max_level && $player->exp >= $exp_needed && $player->rank < $SC_MAX_RANK) {
+	else if($player->level >= $player->max_level && $player->exp >= $exp_needed && $player->rank < $SC_MAX_RANK) {
 		if($player->battle_id > 0 or !$player->in_village) {
 			echo "<p style='text-align:center;font-style:italic;$extra_style'>
 				You must be out of battle and in your village to rank up.</p>";
@@ -174,8 +174,6 @@ function userProfile() {
 		}
 		$exp_width = round($exp_percent * 2);
 
-
-
 		$health_percent = round(($player->health / $player->max_health) * 100);
 		$chakra_percent = round(($player->chakra / $player->max_chakra) * 100);
 		$stamina_percent = round(($player->stamina / $player->max_stamina) * 100);
@@ -195,6 +193,7 @@ function userProfile() {
 			"<div style='background-color:#00B000;height:6px;width:" . $stamina_percent . "%;' /></div>" . "</div>" .
 		"<br />
 		Regeneration rate: " . $player->regen_rate;
+
 		$regen_cut = 0;
 		if($player->battle_id or isset($_SESSION['ai_id'])) {
 			$regen_cut = round(($player->regen_rate + $player->regen_boost) * 0.7, 1);
@@ -210,7 +209,15 @@ function userProfile() {
 
 		echo "<br />
 		</td></tr>";
+		echo "<br />";
 
+        // First attempt:
+        // echo "<label style='width:9.2em;'>Regen Timer:</label>" . (time() - $player->last_update - 60) * -1;
+
+        $time_since_last_regen = time() - $player->last_update;
+        echo "<label style='width:9.2em;'>Regen Timer:</label>" . (60 - $time_since_last_regen) .
+		"</td></tr>";
+		
 		$exp_remaining = $exp_needed - $player->exp;
 		if($exp_remaining < 0) {
 			$exp_remaining = 0;

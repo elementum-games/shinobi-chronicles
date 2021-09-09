@@ -84,6 +84,8 @@ class User {
 	public $song_ban;
 	
 	public $layout;
+
+
 	
 	// Combat boosts
 	public $ninjutsu_boost;
@@ -110,7 +112,10 @@ class User {
 	public $speed_nerf;
 	public $intelligence_nerf;
 	public $willpower_nerf;
-	
+
+    // Team
+    public $team_invite;
+
 	// Internal class variables
 	public $inventory_loaded;
 	
@@ -119,7 +124,7 @@ class User {
 		-Paramaters-
 		@user_id:	Id of the user, used to select and update data from database
 	*/
-	public function __construct($user_id) {
+    public function __construct($user_id) {
 		global $system;
 		$this->system =& $system;
 		if(!$user_id) {
@@ -378,6 +383,7 @@ class User {
 		
 		// Team
 		$this->team = $user_data['team_id'];
+        $this->team_invite = null;
 		if($this->team) {
 			// Invite stuff
 			if(substr($this->team, 0, 7) == 'invite:') {
@@ -653,6 +659,7 @@ class User {
 		}
 		
 		// Check training
+        $display = '';
 		if($this->train_time && $UPDATE >= 2) {
 			if($this->train_time < time()) {
 				// Jutsu training
@@ -728,14 +735,14 @@ class User {
 				require_once("functions.php");
 				if(strpos($this->train_type, 'jutsu:') !== false) {
 					$train_type = str_replace('jutsu:', '', $this->train_type);
-					$display = "<p class='trainingNotification'>Training: " . ucwords(str_replace('_', ' ', $train_type)) . "<br />" .
+					$display .= "<p class='trainingNotification'>Training: " . ucwords(str_replace('_', ' ', $train_type)) . "<br />" .
 					"<span id='trainingTimer'>" . timeRemaining($this->train_time - time(), 'short', false, true) . " remaining</span></p>";
 					$display .= "<script type='text/javascript'>
 					var train_time = " . ($this->train_time - time()) . ";
 					</script>";
 				}
 				else  {
-					$display = "<p class='trainingNotification'>Training: " . ucwords(str_replace('_', ' ', $this->train_type)) . "<br />" .
+					$display .= "<p class='trainingNotification'>Training: " . ucwords(str_replace('_', ' ', $this->train_type)) . "<br />" .
 						"<span id='trainingTimer'>" . timeRemaining($this->train_time - time(), 'short', false, true) . " remaining</span></p>";
 					$display .= "<script type='text/javascript'>
 					var train_time = " . ($this->train_time - time()) . ";
