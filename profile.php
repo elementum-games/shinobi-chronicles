@@ -256,7 +256,7 @@ function userProfile() {
 		<br />
 		<label style='width:9.2em;'>Bloodline:</label>" . ($player->bloodline_id ? $player->bloodline_name : 'None') . "</br />";
 		if($player->bloodline_id) {
-			echo "<img src='./images/stat_icons/bloodline.png' style='max-width:30px;max-height:30px;' /> <label style='width:9.2em;'>Bloodline skill:</label>$player->bloodline_skill</label><br />";
+			echo "<label style='width:9.2em;'>Bloodline skill:</label>$player->bloodline_skill</label><br />";
 		}
 		
 		if($player->elements) {
@@ -264,14 +264,14 @@ function userProfile() {
 		}
 		
 		echo "<br />
-		<img src='./images/stat_icons/ninjutsu.png' style='max-width:30px;max-height:30px;' /> <label style='width:9.2em;'>Ninjutsu skill:</label>" . $player->ninjutsu_skill . "<br />
-		<img src='./images/stat_icons/genjutsu.png' style='max-width:30px;max-height:30px;' /> <label style='width:9.2em;'>Genjutsu skill:</label>" . $player->genjutsu_skill . "<br />
-		<img src='./images/stat_icons/taijutsu.png' style='max-width:30px;max-height:30px;' /> <label style='width:9.2em;'>Taijutsu skill:</label>" . $player->taijutsu_skill . "<br />
+		 <label style='width:9.2em;'>Ninjutsu skill:</label>" . $player->ninjutsu_skill . "<br />
+		<label style='width:9.2em;'>Genjutsu skill:</label>" . $player->genjutsu_skill . "<br />
+		<label style='width:9.2em;'>Taijutsu skill:</label>" . $player->taijutsu_skill . "<br />
 		<br />
-		<img src='./images/stat_icons/cast_speed.png' style='max-width:30px;max-height:30px;' /> <label style='width:9.2em;'>Cast speed:</label>" . sprintf("%.2f", $player->cast_speed) . "<br />
-		<img src='./images/stat_icons/speed.png' style='max-width:30px;max-height:30px;' /> <label style='width:9.2em;'>Speed:</label>" . sprintf("%.2f", $player->speed) . "<br />
-		<img src='./images/stat_icons/intelligence.png' style='max-width:30px;max-height:30px;' /> <label style='width:9.2em;'>Intelligence:</label>" . sprintf("%.2f", $player->intelligence) . "<br />
-		<img src='./images/stat_icons/willpower.png' style='max-width:30px;max-height:30px;' /> <label style='width:9.2em;'>Willpower:</label>" . sprintf("%.2f", $player->willpower) . "<br />
+		<label style='width:9.2em;'>Cast speed:</label>" . sprintf("%.2f", $player->cast_speed) . "<br />
+		<label style='width:9.2em;'>Speed:</label>" . sprintf("%.2f", $player->speed) . "<br />
+		<label style='width:9.2em;'>Intelligence:</label>" . sprintf("%.2f", $player->intelligence) . "<br />
+		<label style='width:9.2em;'>Willpower:</label>" . sprintf("%.2f", $player->willpower) . "<br />
 		</td></tr></table>";
 	}
 }
