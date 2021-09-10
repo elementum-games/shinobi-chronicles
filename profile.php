@@ -209,9 +209,14 @@ function userProfile() {
 		else if(isset($regen_cut)) {
 		
 		}
-		
-		echo "<br />
-		</td></tr>";
+              echo "<br />";
+
+              // First attempt:
+              // echo "<label style='width:9.2em;'>Regen Timer:</label>" . (time() - $player->last_update - 60) * -1;
+
+              $time_since_last_regen = time() - $player->last_update;
+              echo "<label style='width:9.2em;'>Regen Timer:</label>" . (60 - $time_since_last_regen) .
+              "</td></tr>";
 		
 		$exp_remaining = $exp_needed - $player->exp;
 		if($exp_remaining < 0) {
