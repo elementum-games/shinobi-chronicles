@@ -56,7 +56,8 @@ function userProfile() {
 		}
 	}
 	// Rank up
-	else if($player->level >= $max_level && $player->exp >= $exp_needed && $player->rank < $SC_MAX_RANK) {
+	else if($player->level >= $player->max_level && $player->exp >= $exp_needed && $player->rank < $SC_MAX_RANK) {
+
 		if($player->battle_id > 0 or !$player->in_village) {
 			echo "<p style='text-align:center;font-style:italic;$extra_style'>
 				You must be out of battle and in your village to rank up.</p>";
