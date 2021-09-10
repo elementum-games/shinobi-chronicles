@@ -160,7 +160,8 @@ function userProfile() {
 		if($player->forbidden_seal) {
 			$avatar_size = '175px';
 		}
-		echo "<table class='table'>
+		echo "<table class='profile_table table'>
+
 		<tr><td style='width:50%;text-align:center;'>
 		<span style='font-size:1.3em;font-family:\"tempus sans itc\";font-weight:bold;'>" . $player->user_name . "</span><br />
 		<img src='{$player->avatar_link}' style='margin-top:5px;max-width:$avatar_size;max-height:$avatar_size;' /><br />
