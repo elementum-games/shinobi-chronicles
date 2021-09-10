@@ -282,5 +282,3 @@ function userProfile() {
 		</td></tr></table>";
 	}
 }
-
-?>
