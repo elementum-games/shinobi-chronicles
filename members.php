@@ -111,8 +111,8 @@ function members() {
 			
 			echo "<td style='width:50%;'>
 			<label style='width:6em;'>Level:</label> 	$viewUser->level<br />
+			<label style='width:6em;'>Exp:</label> 	$viewUser->exp<br />
 			<label style='width:6em;'>Rank:</label> 	" . $ranks[$viewUser->rank] . "<br />" .
-			($player->village == $viewUser->village ? "<label style='width:6em;'>Exp:</label> $viewUser->exp<br />" : '') .
 			"<br />
 			<label style='width:6em;'>Gender:</label> 	$viewUser->gender<br />
 			<label style='width:6em;'>Village:</label> $viewUser->village<br />
