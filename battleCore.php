@@ -1,5 +1,5 @@
 <?php
-/* 
+/*
 File: 		battleCore.php
 Coder:		Levi Meahan
 Created:	09/07/2013
@@ -42,7 +42,7 @@ ALGORITHM
 	-Move prompt if no winner
 */
 
-/* TO-DO LIST 
+/* TO-DO LIST
 	1) Damage Formula / Put functions for calculating raw damage dealt and taken in classes
 	3) Make player items from inventory usable
 	4) Make player and AI attacks chosen/validated through functions
@@ -54,11 +54,11 @@ function battleAI(&$player, &$opponent) {
 
 	$player->getInventory();
 	$opponent->loadData();
-	
+
 	// Load battle data
 	$winner = false;
 	$battle_text = '';
-	
+
 	// Load default attacks
 	$default_attacks = array();
 	$query = "SELECT * FROM `jutsu` WHERE `purchase_type`='1'";
@@ -66,7 +66,7 @@ function battleAI(&$player, &$opponent) {
 	while($row = $system->db_fetch($result)) {
 		$default_attacks[$row['jutsu_id']] = $row;
 	}
-	
+
 	// Apply passive effects
 	$effect_target = null;
 	$effect_user = null;
@@ -98,7 +98,7 @@ function battleAI(&$player, &$opponent) {
 		$active_effects = array();
 		$_SESSION['active_effects'] = array();
 	}
-	
+
 	// Apply genjutsu passive effects
 	if(isset($_SESSION['active_genjutsu'])) {
 		$active_genjutsu = $_SESSION['active_genjutsu'];
@@ -125,7 +125,7 @@ function battleAI(&$player, &$opponent) {
 		$active_genjutsu = array();
 		$_SESSION['active_genjutsu'] = array();
 	}
-	
+
 	// Load cooldowns
 	if(isset($_SESSION['jutsu_cooldowns'])) {
 		$jutsu_cooldowns = $_SESSION['jutsu_cooldowns'];
@@ -134,7 +134,7 @@ function battleAI(&$player, &$opponent) {
 		$jutsu_cooldowns = array();
 		$_SESSION['jutsu_cooldowns'] = array();
 	}
-	
+
 	// Apply item passive effects
 	if(!empty($player->equipped_armor)) {
 		foreach($player->equipped_armor as $item_id) {
@@ -147,7 +147,7 @@ function battleAI(&$player, &$opponent) {
 			}
 		}
 	}
-	
+
 	// Apply bloodline passive effects (REMOVED - Moved to classes.php)
 	// Load jutsu used logs
 	if(!empty($_SESSION['player_jutsu_used'])) {
@@ -155,18 +155,18 @@ function battleAI(&$player, &$opponent) {
 	}
 	else {
 		$player_jutsu_used = array();
-	}	
-	
+	}
+
 	// Check for move choice
 	if($_POST['attack']) {
-		// Validate, calculate and apply damage	
+		// Validate, calculate and apply damage
 		// $player_attack = $system->clean($_POST['attack_choice']);
 		// $player_attack = explode('-', $player_attack);
 		// $attack_type = $player_attack[0];
 		// $attack_id = $player_attack[1];
-		
+
 		// Run player attack
-		try {		
+		try {
 			$jutsu_type = $_POST['jutsu_type'];
 			// Check for handseals if ninjutsu/genjutsu (+Layered genjutsu check)
 			if($jutsu_type == 'ninjutsu' or $jutsu_type == 'genjutsu') {
@@ -219,9 +219,9 @@ function battleAI(&$player, &$opponent) {
 				if($jutsu_ok && $jutsu_type == 'genjutsu' && !empty($player_jutsu['parent_jutsu'])) {
 					$parent_genjutsu_id = $player->id . ':J' . $player_jutsu['parent_jutsu'];
 					$parent_jutsu = $player->jutsu[$player_jutsu['parent_jutsu']];
-					if(!isset($active_genjutsu[$parent_genjutsu_id]) or 
+					if(!isset($active_genjutsu[$parent_genjutsu_id]) or
 					$active_genjutsu[$parent_genjutsu_id]['turns'] == $parent_jutsu['effect_length']) {
-						throw new Exception($parent_jutsu['name'] . 
+						throw new Exception($parent_jutsu['name'] .
 							' must be active for 1 turn before using this jutsu!'
 						);
 					}
@@ -349,9 +349,9 @@ function battleAI(&$player, &$opponent) {
 				$_SESSION['player_jutsu_used'] = $player_jutsu_used;
 			}
 			// Run jutsu
-			if($jutsu_ok) {	
+			if($jutsu_ok) {
 				// Calc player jutsu
-				if($purchase_type == 'default') {		
+				if($purchase_type == 'default') {
 					$jutsu = $default_attacks[$attack_id];
 					$player_attack_type = $default_attacks[$attack_id]['jutsu_type'];
 					$player_damage = $player->calcDamage($jutsu, 'default_jutsu');
@@ -373,7 +373,7 @@ function battleAI(&$player, &$opponent) {
 				if($jutsu['jutsu_type'] == 'taijutsu' && $purchase_type != 'bloodline') {
 					$weapon_id = (int)$_POST['weapon_id'];
 					if($weapon_id && $player->checkInventory($weapon_id, 'item')) {
-						if(array_search($weapon_id, $player->equipped_weapons) !== false) {					
+						if(array_search($weapon_id, $player->equipped_weapons) !== false) {
 							// Apply element to jutsu
 							if($player->items[$weapon_id]['effect'] == 'element') {
 								$jutsu['element'] = $player->elements['first'];
@@ -393,47 +393,47 @@ function battleAI(&$player, &$opponent) {
 						}
 					}
 				}
-				
+
 				// Buff jutsu (-1 = self effect move)
 				if($jutsu['use_type'] == 'buff') {
 					$jutsu['weapon_id'] = 0;
 					$battle['player1_action'] == -1;
 					$jutsu['effect_only'] = true;
 				}
-				
+
 				// Barrier jutsu
 				if($jutsu['use_type'] == 'barrier') {
 					$jutsu['weapon_id'] = 0;
 					$battle['player1_action'] == -1;
 					$jutsu['effect_only'] = true;
 				}
-				
+
 				// Weapon effect
 				if(!empty($jutsu['weapon_id'])) {
 					$effect_id = $player->id . ':W' . $jutsu['weapon_id'];
 					setEffect($player, $opponent->id, $jutsu['weapon_effect'], $player_damage, $effect_id, $active_effects);
 				}
-				
+
 				// Calc opponent jutsu
 				$opponent_jutsu = $opponent->chooseMove();
 				$opponent_damage = $opponent->calcDamage($opponent->current_move, 'equipped_jutsu');
-				
+
 				// Set cooldowns
 				if($jutsu['cooldown'] > 0) {
 					$jutsu_cooldowns[$jutsu_unique_id] = $jutsu['cooldown'];
 				}
-				
+
 				// add opponent jutsu cooldown
 				if($system->debug['battle']) {
 					echo "PD: $player_damage<br />";
 				}
-				
-				// Jutsu collision			
-				$collision_text = '';				
+
+				// Jutsu collision
+				$collision_text = '';
 				if(empty($jutsu['effect_only']) or $jutsu['use_type'] == 'barrier') {
 					$collision_text = jutsuCollision($player, $opponent, $player_damage, $opponent_damage, $jutsu, $opponent->current_move);
 				}
-				
+
 				// Set remaining barrier amounts
 				if(isset($active_effects[$player->id . ':BARRIER'])) {
 					if($player->barrier) {
@@ -453,15 +453,15 @@ function battleAI(&$player, &$opponent) {
 				if($system->debug['battle']) {
 					echo "PD: $player_damage<br />";
 				}
-				
-				// Set player jutsu effects 
+
+				// Set player jutsu effects
 				if($jutsu['jutsu_type'] == 'genjutsu' && empty($jutsu['effect_only'])) {
 					$genjutsu_id = $player->id . ':J' . $jutsu['jutsu_id'];
 					// Bloodline jutsu ID override
 					if($purchase_type == 'bloodline') {
 						$genjutsu_id = $player->id . ':BL_J' . $jutsu['jutsu_id'];
 					}
-					
+
 					if($jutsu['effect'] == 'release_genjutsu') {
 						$intelligence = ($player->intelligence + $player->intelligence_boost - $player->intelligence_nerf);
 						if($intelligence <= 0) {
@@ -497,14 +497,14 @@ function battleAI(&$player, &$opponent) {
 
 					setEffect($player, $target_id, $jutsu, $player_damage, $effect_id, $active_effects);
 				}
-				
+
 				// Set opponent jutsu effects
 				if($opponent_jutsu['jutsu_type'] == 'genjutsu') {
 					$genjutsu_id = $opponent->id . ':J' . $opponent_jutsu['jutsu_id'];
 					if($purchase_type == 'bloodline') {
 						$genjutsu_id = $opponent->id . ':BL_J' . $opponent_jutsu['jutsu_id'];
 					}
-						
+
 					if($jutsu['effect'] == 'release_genjutsu') {
 						$intelligence = ($opponent->intelligence + $opponent->intelligence_boost - $opponent->intelligence_nerf);
 						if($intelligence <= 0) {
@@ -525,7 +525,7 @@ function battleAI(&$player, &$opponent) {
 					else {
 						setEffect($opponent, $player->id, $opponent_jutsu, $opponent_damage, $genjutsu_id, $active_genjutsu);
 					}
-				
+
 				}
 				else if($opponent_jutsu['effect'] && $opponent_jutsu['effect'] != 'none') {
 					$effect_id = $opponent->id . ':J' . $opponent_jutsu['jutsu_id'];
@@ -535,14 +535,14 @@ function battleAI(&$player, &$opponent) {
 					}
 					$target_id = $player->id;
 
-					if($opponent_jutsu['use_type'] == 'buff' or $opponent_jutsu['use_type'] == 'barrier' or 
+					if($opponent_jutsu['use_type'] == 'buff' or $opponent_jutsu['use_type'] == 'barrier' or
 					($opponent_jutsu['use_type'] == 'projectile' && strpos($opponent_jutsu['effect'], '_boost')) ) {
 						$target_id = $opponent->id;
 					}
 
 					setEffect($opponent, $target_id, $opponent_jutsu, $opponent_damage, $effect_id, $active_effects);
 				}
-				
+
 				// Apply player damage to opponent
 				if($jutsu['jutsu_type'] != 'genjutsu' && !$jutsu['effect_only']) {
 					$player_damage = $opponent->calcDamageTaken($player_damage, $attack_type);
@@ -551,7 +551,7 @@ function battleAI(&$player, &$opponent) {
 						$opponent->health = 0;
 					}
 				}
-				
+
 				// Apply opponent damage to player
 				if($opponent_jutsu['jutsu_type'] != 'genjutsu') {
 					$opponent_damage = $player->calcDamageTaken($opponent_damage, $opponent_jutsu['jutsu_type']);
@@ -560,10 +560,45 @@ function battleAI(&$player, &$opponent) {
 						$player->health = 0;
 					}
 				}
+
+				/******BATTLE TEXT******/
+				//set player jutsu text color
+				$jutsu_color = "black";
+				switch ($jutsu['jutsu_type']) {
+					case 'ninjutsu':
+						$jutsu_color = "blue";
+						break;
+					case 'taijutsu':
+						$jutsu_color = "red";
+						break;
+					case 'genjutsu':
+						$jutsu_color = "purple";
+						break;
+					case 'none':
+						break;
+				}
+				//set opponent jutsu text color
+				$opponent_jutsu_color = "black";
+				switch ($opponent_jutsu['jutsu_type']) {
+					case 'ninjutsu':
+						$opponent_jutsu_color = "blue";
+						break;
+					case 'taijutsu':
+						$opponent_jutsu_color = "red";
+						break;
+					case 'genjutsu':
+						$opponent_jutsu_color = "purple";
+						break;
+					case 'none':
+						break;
+				}
+
 				// Set display text
 				$battle_text .= $jutsu['battle_text'];
 				if($jutsu['jutsu_type'] != 'genjutsu' && !$jutsu['effect_only']) {
-					$battle_text .= " {$player->user_name} does {$player_damage} damage to {$opponent->name}.<br />";
+					$battle_text .= " {$player->user_name} does
+					<p style='display:inline;color:{$jutsu_color}'>{$player_damage} damage</p>
+					to {$opponent->name}.<br />";
 				}
 				if($player_effect_display) {
 					$battle_text .= $player_effect_display;
@@ -573,7 +608,9 @@ function battleAI(&$player, &$opponent) {
 				}
 				$battle_text .= "<hr />" . $opponent->name . ' ' . $opponent_jutsu['battle_text'];
 				if($opponent_jutsu['jutsu_type'] != 'genjutsu') {
-					$battle_text .= " {$opponent->name} does {$opponent_damage} damage to {$player->user_name}.<br />";
+					$battle_text .= " {$opponent->name} does
+					<p style=' display:inline; color:{$opponent_jutsu_color}'>{$opponent_damage} damage</p>
+					to {$player->user_name}.<br />";
 				}
 				if($opponent_effect_display) {
 					$battle_text .= $opponent_effect_display;
@@ -619,7 +656,9 @@ function battleAI(&$player, &$opponent) {
 				}
 				$battle_text .= "<hr />" . $opponent->name . ' ' . $opponent_jutsu['battle_text'];
 				if($opponent_jutsu['jutsu_type'] != 'genjutsu') {
-					$battle_text .= " {$opponent->name} does {$opponent_damage} damage to {$player->user_name}.<br />";
+					$battle_text .= " {$opponent->name} does
+					<p style='display: inline;color: {$opponent_jutsu_color}'>{$opponent_damage} damage</p>
+					to {$player->user_name}.<br />";
 				}
 				if($opponent_effect_display) {
 					$battle_text .= $opponent_effect_display;
@@ -633,30 +672,30 @@ function battleAI(&$player, &$opponent) {
 		} catch (Exception $e) {
 			$system->message($e->getMessage());
 		}
-		
+
 		$system->printMessage();
 		// Check for and set winner if either health below 0 (-1 signifies a tie)
-		
+
 		// Player lost
 		if($player->health <= 0 && $opponent->health > 0) {
 			$winner = 2;
-		}	
-		
+		}
+
 		// Player won
 		else if($player->health > 0 && $opponent->health <= 0) {
 			$winner = 1;
 		}
-		
+
 		// Tie
 		else if($player->health <= 0 && $opponent->health <= 0) {
 			$winner = -1;
-		}		
+		}
 	}
-	
+
 	// Update player's inventory
 	$player->updateInventory();
 	$opponent->updateData();
-	
+
 	// Sub-menu
 	echo "<div class='submenu'>
 	<ul class='submenu'>
@@ -680,15 +719,15 @@ function battleAI(&$player, &$opponent) {
 	}
 	echo "<td>
 	<img src='{$player->avatar_link}' style='display:block;max-width:$avatar_size;max-height:$avatar_size;margin:auto;' />
-	<label style='width:7em;'>Health:</label>" . 
+	<label style='width:7em;'>Health:</label>" .
 		sprintf("%.2f", $player->health) . '/' . sprintf("%.2f", $player->max_health) . "<br />" .
 		"<div style='height:6px;width:250px;border-style:solid;border-width:1px;'>" .
 		"<div style='background-color:#C00000;height:6px;width:" . $health_percent. "%;' /></div>" . "</div>" .
-	"<label style='width:7em;'>Chakra:</label>" . 
+	"<label style='width:7em;'>Chakra:</label>" .
 		sprintf("%.2f", $player->chakra) . '/' . sprintf("%.2f", $player->max_chakra) . "<br />" .
 		"<div style='height:6px;width:250px;border-style:solid;border-width:1px;'>" .
 		"<div style='background-color:#0000B0;height:6px;width:" . $chakra_percent . "%;' /></div>" . "</div>" .
-	"<label style='width:7em;'>Stamina:</label>" . 
+	"<label style='width:7em;'>Stamina:</label>" .
 		sprintf("%.2f", $player->stamina) . '/' . sprintf("%.2f", $player->max_stamina) . "<br />" .
 		"<div style='height:6px;width:250px;border-style:solid;border-width:1px;'>" .
 		"<div style='background-color:#00B000;height:6px;width:" . $stamina_percent . "%;' /></div>" . "</div>" .
@@ -697,7 +736,7 @@ function battleAI(&$player, &$opponent) {
 	$opponent_health_percent = round(($opponent->health / $opponent->max_health) * 100);
 	echo "
 	<div style='width:140px;height:150px;margin:auto:'></div>
-	<label style='width:6em;'>Health:</label>" . 
+	<label style='width:6em;'>Health:</label>" .
 		sprintf("%.2f", $opponent->health) . '/' . sprintf("%.2f", $opponent->max_health) . "<br />" .
 		"<div style='height:6px;width:250px;border-style:solid;border-width:1px;'>" .
 		"<div style='background-color:#C00000;height:6px;width:" . $opponent_health_percent . "%;' /></div>" . "</div>";
@@ -710,9 +749,9 @@ function battleAI(&$player, &$opponent) {
     }
 
 	// Battle text
-	$search_array = array("[player]", "[opponent]", 
+	$search_array = array("[player]", "[opponent]",
 		"[gender]", "[gender2]");
-	$replace_array = array($player->user_name, $opponent->name, 
+	$replace_array = array($player->user_name, $opponent->name,
 		($player->gender == 'Male' ? 'he' : 'she'), ($player->gender == 'Male' ? 'his' : 'her'));
 	if($battle_text) {
 		echo "<tr><td colspan='2'>" .
@@ -737,7 +776,7 @@ function battlePvP(&$player, &$opponent, &$battle) {
 	/*
 	five chakra natures
 	Jutsu clash – elemental factors
-	DATA STRUCTURE	
+	DATA STRUCTURE
 		player1
 		player2
 		player1_action (bool)
@@ -790,7 +829,7 @@ function battlePvP(&$player, &$opponent, &$battle) {
 	if(is_array($battle['active_effects'])) {
 		foreach($battle['active_effects'] as $id => $effect) {
 			if($player->staff_level >= SystemFunctions::SC_ADMINISTRATOR) {
-				echo "[$id] " . $effect['effect'] . '(' . $effect['effect_amount'] . ') ->' . 
+				echo "[$id] " . $effect['effect'] . '(' . $effect['effect_amount'] . ') ->' .
 					$effect['target'] . '(' . $effect['turns'] . ' turns left)<br />';
 			}
 			if($effect['target'] == $player1->id) {
@@ -897,7 +936,7 @@ function battlePvP(&$player, &$opponent, &$battle) {
 		if($_POST['attack']) {
 			// Run player attack
 			/* notes: Handseal-based jutsu can uniquely fail, triggering a failed_jutsu attack type */
-			try {		
+			try {
 				$jutsu_type = $_POST['jutsu_type'];
 
 				// Check for handseals if ninjutsu/genjutsu
@@ -951,13 +990,13 @@ function battlePvP(&$player, &$opponent, &$battle) {
 					if($jutsu_ok && $jutsu_type == 'genjutsu' && !empty($player_jutsu['parent_jutsu'])) {
 						$parent_genjutsu_id = $player->id . ':J' . $player_jutsu['parent_jutsu'];
 						$parent_jutsu = $player->jutsu[$player_jutsu['parent_jutsu']];
-						if(!isset($battle['active_genjutsu'][$parent_genjutsu_id]) or 
+						if(!isset($battle['active_genjutsu'][$parent_genjutsu_id]) or
 						$battle['active_genjutsu'][$parent_genjutsu_id]['turns'] == $parent_jutsu['effect_length']) {
-							throw new Exception($parent_jutsu['name'] . 
+							throw new Exception($parent_jutsu['name'] .
 								' must be active for 1 turn before using this jutsu!'
 							);
 						}
-					}		
+					}
 				}
 
 				// Check jutsu ID if taijutsu
@@ -976,7 +1015,7 @@ function battlePvP(&$player, &$opponent, &$battle) {
 						$purchase_type = 'equipped';
 						$player_jutsu = $player->jutsu[$jutsu_id];
 					}
-					$jutsu_unique_id = 'J:' . $attack_id . ':' . $player->id;		
+					$jutsu_unique_id = 'J:' . $attack_id . ':' . $player->id;
 				}
 
 				// Check BL jutsu ID if bloodline jutsu
@@ -1004,7 +1043,7 @@ function battlePvP(&$player, &$opponent, &$battle) {
 				}
 				if(!$player->useJutsu($player_jutsu, $purchase_type . '_jutsu')) {
 					throw new Exception($system->message);
-				}	
+				}
 
 				// Check for weapon if non-BL taijutsu
 				$weapon_id = 0;
@@ -1061,7 +1100,7 @@ function battlePvP(&$player, &$opponent, &$battle) {
 
 	// If time is up or both people have submitted moves, RUN TURN
 	if((time() - $battle['turn_time'] > $turn_length) || ($battle['player1_action'] && $battle['player2_action'])) {
-		if($battle['player1_action'] or $battle['player2_action']) {	
+		if($battle['player1_action'] or $battle['player2_action']) {
 			$effect_win = false;
 
 			// Run turn effects
@@ -1149,7 +1188,7 @@ function battlePvP(&$player, &$opponent, &$battle) {
 			$player1_battle_text = '';
 			$player2_battle_text = '';
 			if($battle['player1_action']) {
-				if($battle['player1_attack_type'] == 'default_jutsu') {		
+				if($battle['player1_attack_type'] == 'default_jutsu') {
 					$player1_jutsu = $default_attacks[$battle['player1_jutsu_id']];
 					$player1_damage = $player1->calcDamage($player1_jutsu, 'default_jutsu');
 					$player1_jutsu['unique_id'] = 'J:' . $player1_jutsu['jutsu_id'] . ':' . $player1->id;
@@ -1160,7 +1199,7 @@ function battlePvP(&$player, &$opponent, &$battle) {
 					$player1_jutsu['unique_id'] = 'J:' . $player1_jutsu['jutsu_id'] . ':' . $player1->id;
 				}
 				else if($battle['player1_attack_type'] == 'bloodline_jutsu') {
-					$player1_jutsu = $player1->bloodline->jutsu[$battle['player1_jutsu_id']];		
+					$player1_jutsu = $player1->bloodline->jutsu[$battle['player1_jutsu_id']];
 					$player1_damage = $player1->calcDamage($player1->bloodline->jutsu[$battle['player1_jutsu_id']], 'bloodline_jutsu');
 					$player1_jutsu['unique_id'] = 'BL_J:' . $player1_jutsu['jutsu_id'] . ':' . $player1->id;
 				}
@@ -1189,7 +1228,7 @@ function battlePvP(&$player, &$opponent, &$battle) {
 				}
 			}
 			if($battle['player2_action']) {
-				if($battle['player2_attack_type'] == 'default_jutsu') {		
+				if($battle['player2_attack_type'] == 'default_jutsu') {
 					$player2_jutsu = $default_attacks[$battle['player2_jutsu_id']];
 					$player2_damage = $player2->calcDamage($player2_jutsu, 'default_jutsu');
 					$player2_jutsu['unique_id'] = 'J:' . $player2_jutsu['jutsu_id'] . ':' . $player2->id;
@@ -1200,7 +1239,7 @@ function battlePvP(&$player, &$opponent, &$battle) {
 					$player2_jutsu['unique_id'] = 'J:' . $player2_jutsu['jutsu_id'] . ':' . $player2->id;
 				}
 				else if($battle['player2_attack_type'] == 'bloodline_jutsu') {
-					$player2_jutsu = $player2->bloodline->jutsu[$battle['player2_jutsu_id']];		
+					$player2_jutsu = $player2->bloodline->jutsu[$battle['player2_jutsu_id']];
 					$player2_damage = $player2->calcDamage($player2->bloodline->jutsu[$battle['player2_jutsu_id']], 'bloodline_jutsu');
 					$player2_jutsu['unique_id'] = 'BL_J:' . $player2_jutsu['jutsu_id'] . ':' . $player2->id;
 				}
@@ -1308,7 +1347,7 @@ function battlePvP(&$player, &$opponent, &$battle) {
 				if($player1_jutsu['weapon_id']) {
 					$effect_id = $player1->id . ':W' . $player1_jutsu['weapon_id'];
 					if($player1->items[$battle['player1_weapon_id']]['effect'] != 'diffuse') {
-						setEffect($player1, $player2->id, $player1_jutsu['weapon_effect'], 
+						setEffect($player1, $player2->id, $player1_jutsu['weapon_effect'],
 							$player1_raw_damage, $effect_id, $battle['active_effects']);
 					}
 				}
@@ -1346,7 +1385,7 @@ function battlePvP(&$player, &$opponent, &$battle) {
 					else  {
 						setEffect($player1, $player2->id, $player1_jutsu, $player1_raw_damage, $genjutsu_id, $battle['active_genjutsu']);
 					}
-				}			
+				}
 				else if($player1_jutsu['effect'] != 'none') {
 					$effect_id = $player1->id . ':J' . $player1_jutsu['jutsu_id'];
 					// Bloodline jutsu ID override
@@ -1358,7 +1397,7 @@ function battlePvP(&$player, &$opponent, &$battle) {
 						$target_id = $player1->id;
 					}
 					setEffect($player1, $target_id, $player1_jutsu, $player1_raw_damage, $effect_id, $battle['active_effects']);
-				}			
+				}
 				$text = $player1_jutsu['battle_text'];
 
                 if($player1_jutsu['jutsu_type'] != 'genjutsu' && empty($player1_jutsu['effect_only'])) {
@@ -1368,7 +1407,7 @@ function battlePvP(&$player, &$opponent, &$battle) {
 					$text .= $system->clean($player1_effect_display);
 				}
 				$battle['battle_text'] .= str_replace(
-					array('[player]', '[opponent]', 
+					array('[player]', '[opponent]',
 						'[gender]', '[gender2]'),
 					array($player1->user_name, $player2->user_name,
 						($player1->gender == 'Male' ? 'he' : 'she'), ($player1->gender == 'Male' ? 'his' : 'her')),
@@ -1391,11 +1430,11 @@ function battlePvP(&$player, &$opponent, &$battle) {
 			}
 			if($collision_text) {
 				$collision_text = str_replace(
-					array('[player]', '[opponent]'), 
-					array($player1->user_name, $player2->user_name), 
+					array('[player]', '[opponent]'),
+					array($player1->user_name, $player2->user_name),
 					$collision_text);
 				$battle['battle_text'] .= '[br][hr]' . $system->clean($collision_text);
-			}			
+			}
 			$battle['battle_text'] .= '[br][hr]';
 
 			// Apply damage/effects and set display
@@ -1451,7 +1490,7 @@ function battlePvP(&$player, &$opponent, &$battle) {
 					else  {
 						setEffect($player2, $player1->id, $player2_jutsu, $player2_raw_damage, $genjutsu_id, $battle['active_genjutsu']);
 					}
-				}			
+				}
 				else if($player2_jutsu['effect'] != 'none') {
 					$effect_id = $player2->id . ':J' . $player2_jutsu['jutsu_id'];
 					// Bloodline jutsu ID override
@@ -1463,7 +1502,7 @@ function battlePvP(&$player, &$opponent, &$battle) {
 						$target_id = $player2->id;
 					}
 					setEffect($player2, $target_id, $player2_jutsu, $player2_raw_damage, $effect_id, $battle['active_effects']);
-				}			
+				}
 
                 $text = $player2_jutsu['battle_text'];
 				if($player2_jutsu['jutsu_type'] != 'genjutsu' && empty($player2_jutsu['effect_only'])) {
@@ -1473,7 +1512,7 @@ function battlePvP(&$player, &$opponent, &$battle) {
 					$text .= $system->clean($player2_effect_display);
 				}
 				$battle['battle_text'] .= str_replace(
-					array('[player]', '[opponent]', 
+					array('[player]', '[opponent]',
 						'[gender]', '[gender2]'),
 					array($player2->user_name, $player1->user_name,
 						($player2->gender == 'Male' ? 'he' : 'she'), ($player2->gender == 'Male' ? 'his' : 'her')),
@@ -1569,15 +1608,15 @@ function battlePvP(&$player, &$opponent, &$battle) {
 	}
 	echo "<td>
 	<img src='{$player->avatar_link}' style='display:block;max-width:$avatar_size;max-height:$avatar_size;margin:auto;' />
-	<label style='width:80px;'>Health:</label>" . 
+	<label style='width:80px;'>Health:</label>" .
 		sprintf("%.2f", $player->health) . '/' . sprintf("%.2f", $player->max_health) . "<br />" .
 		"<div style='height:6px;width:250px;border-style:solid;border-width:1px;'>" .
 		"<div style='background-color:#C00000;height:6px;width:" . $health_percent . "%;' /></div>" . "</div>" .
-	"<label style='width:80px;'>Chakra:</label>" . 
+	"<label style='width:80px;'>Chakra:</label>" .
 		sprintf("%.2f", $player->chakra) . '/' . sprintf("%.2f", $player->max_chakra) . "<br />" .
 		"<div style='height:6px;width:250px;border-style:solid;border-width:1px;'>" .
 		"<div style='background-color:#0000B0;height:6px;width:" . $chakra_percent . "%;' /></div>" . "</div>" .
-	"<label style='width:80px;'>Stamina:</label>" . 
+	"<label style='width:80px;'>Stamina:</label>" .
 		sprintf("%.2f", $player->stamina) . '/' . sprintf("%.2f", $player->max_stamina) . "<br />" .
 		"<div style='height:6px;width:250px;border-style:solid;border-width:1px;'>" .
 		"<div style='background-color:#00B000;height:6px;width:" . $stamina_percent . "%;' /></div>" . "</div>" .
@@ -1590,7 +1629,7 @@ function battlePvP(&$player, &$opponent, &$battle) {
 	}
 	echo "
 	<img src='{$opponent->avatar_link}' style='display:block;max-width:$avatar_size;max-height:$avatar_size;margin:auto;' />
-	<label style='width:80px;'>Health:</label>" . 
+	<label style='width:80px;'>Health:</label>" .
 		sprintf("%.2f", $opponent->health) . '/' . sprintf("%.2f", $opponent->max_health) . "<br />" .
 		"<div style='height:6px;width:250px;border-style:solid;border-width:1px;'>" .
 		"<div style='background-color:#C00000;height:6px;width:" . $opponent_health_percent . "%;' /></div>" . "</div>";
@@ -1617,12 +1656,12 @@ function battlePvP(&$player, &$opponent, &$battle) {
 	else {
 		// Prompt for move or display wait message
 		echo "<tr><th colspan='2'>Select Action</th></tr>";
-		if(!$battle[$battle['player_side'] . '_action']) {		
+		if(!$battle[$battle['player_side'] . '_action']) {
 			movePrompt($player, $default_attacks);
 		}
 		else if(!$battle[$battle['opponent_side'] . '_action']) {
 			echo "<tr><td colspan='2'>Please wait for $opponent->user_name to select an action.</td></tr>";
-		}	
+		}
 
 		// Turn timer
 		echo "<tr><td style='text-align:center;' colspan='2'>
@@ -1636,7 +1675,7 @@ function battlePvP(&$player, &$opponent, &$battle) {
 
 function movePrompt($player, $default_attacks) {
 	global $self_link;
-	// New interface	
+	// New interface
 	if(true) {
 		$gold_color = '#FDD017';
 		echo "<tr><td colspan='2'>
@@ -1799,7 +1838,7 @@ function movePrompt($player, $default_attacks) {
 							$('#' + id + ' img').trigger('click');
 						}
 					}
-				
+
 				}
 
 				if(! firstJutsu) {
@@ -1860,7 +1899,7 @@ function movePrompt($player, $default_attacks) {
 				$('#jutsuType').val('genjutsu');
 			});
 			$('#jutsu span.taijutsu').click(function(){
-				if(display_state != 'taijutsu') {	
+				if(display_state != 'taijutsu') {
 					$('#textPrompt').text(weapons_prompt);
 					$('#handSeals').hide();
 					$('#weapons').show();
@@ -1904,10 +1943,10 @@ function movePrompt($player, $default_attacks) {
 		";
 		if(is_array($player->equipped_weapons)) {
 			foreach($player->equipped_weapons as $item_id) {
-				echo "<p class='weapon' data-id='$item_id'>" . 
-					"<b>" . $player->items[$item_id]['name'] . "</b><br />" . 
-					ucwords(str_replace('_', ' ', $player->items[$item_id]['effect'])) . 
-					" (" . $player->items[$item_id]['effect_amount'] . "%)" . 
+				echo "<p class='weapon' data-id='$item_id'>" .
+					"<b>" . $player->items[$item_id]['name'] . "</b><br />" .
+					ucwords(str_replace('_', ' ', $player->items[$item_id]['effect'])) .
+					" (" . $player->items[$item_id]['effect_amount'] . "%)" .
 				"</p>";
 			}
 		}
@@ -1937,8 +1976,8 @@ function movePrompt($player, $default_attacks) {
 				if($attack['jutsu_type'] != $jutsu_types[$i]) {
 					continue;
 				}
-				echo "<span class='jutsuName {$jutsu_types[$i]}' data-handseals='" . 
-					($attack['jutsu_type'] != 'taijutsu' ? $attack['hand_seals'] : '') . "' 
+				echo "<span class='jutsuName {$jutsu_types[$i]}' data-handseals='" .
+					($attack['jutsu_type'] != 'taijutsu' ? $attack['hand_seals'] : '') . "'
 					data-id='{$attack['jutsu_id']}'>" . $attack['name'] . '</span><br />';
 			}
 			if(is_array($player->equipped_jutsu)) {
@@ -1946,7 +1985,7 @@ function movePrompt($player, $default_attacks) {
 					if($player->jutsu[$jutsu['id']]['jutsu_type'] != $jutsu_types[$i]) {
 						continue;
 					}
-					echo "<span class='jutsuName {$jutsu_types[$i]}' data-handseals='{$player->jutsu[$jutsu['id']]['hand_seals']}' 
+					echo "<span class='jutsuName {$jutsu_types[$i]}' data-handseals='{$player->jutsu[$jutsu['id']]['hand_seals']}'
 						data-id='{$jutsu['id']}'>" . $player->jutsu[$jutsu['id']]['name'] . '</span><br />';
 				}
 			}
@@ -1978,7 +2017,7 @@ function movePrompt($player, $default_attacks) {
 		</td></tr>";
 	}
 	// No script
-	else {			
+	else {
 		$seal_form = "<option value='none'>-</option>";
 		for($i = 1; $i <= 12; $i++) {
 			$seal_form .= "<option value='$i'>$i</option>";
@@ -1993,7 +2032,7 @@ function movePrompt($player, $default_attacks) {
 				echo "Seal $x: <option value='$y'";
 				if($seals && $seals[$x - 1] == $y) {
 					echo " selected='selected'";
-				}	
+				}
 				echo ">$y</option>";
 			}
 			echo "</select>";
@@ -2017,7 +2056,7 @@ function movePrompt($player, $default_attacks) {
 		echo "<input type='submit' name='attack' value='Submit' />
 		</form>
 		</td></tr>";
-	}	
+	}
 }
 
 function jutsuCollision(&$player, &$opponent, &$player_damage, &$opponent_damage, $player_jutsu, $opponent_jutsu) {
@@ -2030,7 +2069,7 @@ function jutsuCollision(&$player, &$opponent, &$player_damage, &$opponent_damage
 						'effect_amount' => $player1->items[$battle['player1_weapon_id']]['effect_amount'],
 						'jutsu_type' => 'taijutsu'
 					);
-	*/	
+	*/
 
 	// Elemental interactions
 	if($player_jutsu['element'] && $opponent_jutsu['element']) {
@@ -2077,7 +2116,7 @@ function jutsuCollision(&$player, &$opponent, &$player_damage, &$opponent_damage
 				$player_damage *= 0.8;
 			}
 		}
-	}	
+	}
 
 	// Barriers
 	if($player_jutsu['use_type'] == 'barrier') {
@@ -2102,14 +2141,14 @@ function jutsuCollision(&$player, &$opponent, &$player_damage, &$opponent_damage
 		$player->barrier -= $block_amount;
 		$opponent_damage -= $block_amount;
 		if($player->barrier < 0) {
-			$player->barrier = 0; 
+			$player->barrier = 0;
 		}
 		if($opponent_damage < 0) {
 			$opponent_damage = 0;
 		}
 		// Set display
 		$block_percent = round($block_percent, 1);
-		$collision_text .= "[player]'s barrier blocked $block_percent% of [opponent]'s damage![br]";		
+		$collision_text .= "[player]'s barrier blocked $block_percent% of [opponent]'s damage![br]";
 	}
 	if($opponent->barrier && $player_jutsu['jutsu_type'] != 'genjutsu') {
 		// Block damage from opponent's attack
@@ -2130,7 +2169,7 @@ function jutsuCollision(&$player, &$opponent, &$player_damage, &$opponent_damage
 		}
 		// Set display
 		$block_percent = round($block_percent, 1);
-		$collision_text .= "[opponent]'s barrier blocked $block_percent% of [player]'s damage![br]";	
+		$collision_text .= "[opponent]'s barrier blocked $block_percent% of [player]'s damage![br]";
 	}
 
 	// Quit if barrier was used by one person (no collision remaining)
@@ -2148,7 +2187,7 @@ function jutsuCollision(&$player, &$opponent, &$player_damage, &$opponent_damage
 			$opponent_name = $opponent->name;
 		}
 		$collision_text = str_replace(
-			array('[player]', '[opponent]', 
+			array('[player]', '[opponent]',
 				'[gender]', '[gender2]'),
 			array($player_name, $opponent_name,
 				($player->gender == 'Male' ? 'he' : 'she'), ($player->gender == 'Male' ? 'his' : 'her')),
@@ -2165,7 +2204,7 @@ function jutsuCollision(&$player, &$opponent, &$player_damage, &$opponent_damage
 			$player_diffuse_amount = round(
 				$player_damage / $opponent_damage * ($player_jutsu['weapon_effect']['effect_amount'] / 100),
 				1
-			);	
+			);
 		}
 	}
 	if($opponent_jutsu['weapon_id'] && $opponent_jutsu['weapon_effect']['effect'] == 'diffuse') {
@@ -2230,7 +2269,7 @@ function jutsuCollision(&$player, &$opponent, &$player_damage, &$opponent_damage
 	$max_damage_reduction = 0.5;
 	if($player_jutsu['jutsu_type'] == 'ninjutsu') {
 		// Nin vs Nin
-		if($opponent_jutsu['jutsu_type'] == 'ninjutsu') {			
+		if($opponent_jutsu['jutsu_type'] == 'ninjutsu') {
 			if($player_cast_speed >= $opponent_cast_speed) {
 				$damage_reduction = ($player_cast_speed / $opponent_cast_speed) - 1.0;
 				$damage_reduction = round($damage_reduction * $cast_speed_ratio, 2);
@@ -2239,8 +2278,8 @@ function jutsuCollision(&$player, &$opponent, &$player_damage, &$opponent_damage
 				}
 				if($damage_reduction >= 0.01) {
 					$opponent_damage *= 1 - $damage_reduction;
-					$collision_text .= "[player] cast [gender2] jutsu before [opponent] cast, negating " . 
-					($damage_reduction * 100) . "% of [opponent]'s damage!";	
+					$collision_text .= "[player] cast [gender2] jutsu before [opponent] cast, negating " .
+					($damage_reduction * 100) . "% of [opponent]'s damage!";
 				}
 			}
 			else {
@@ -2251,7 +2290,7 @@ function jutsuCollision(&$player, &$opponent, &$player_damage, &$opponent_damage
 				}
 				if($damage_reduction >= 0.01) {
 					$player_damage *= 1 - $damage_reduction;
-					$collision_text .= "[opponent] cast their jutsu before [player] cast, negating " . 
+					$collision_text .= "[opponent] cast their jutsu before [player] cast, negating " .
 						($damage_reduction * 100) . "% of [player]'s damage!";
 				}
 			}
@@ -2266,8 +2305,8 @@ function jutsuCollision(&$player, &$opponent, &$player_damage, &$opponent_damage
 				}
 				if($damage_reduction >= 0.01) {
 					$opponent_damage *= 1 - $damage_reduction;
-					$collision_text .= "[player] cast [gender2] jutsu before [opponent] attacked, negating " . ($damage_reduction * 100) . 
-					"% of [opponent]'s damage!";	
+					$collision_text .= "[player] cast [gender2] jutsu before [opponent] attacked, negating " . ($damage_reduction * 100) .
+					"% of [opponent]'s damage!";
 				}
 			}
 			else {
@@ -2280,7 +2319,7 @@ function jutsuCollision(&$player, &$opponent, &$player_damage, &$opponent_damage
 					$player_damage *= 1 - $damage_reduction;
 					$collision_text .= "[opponent] swiftly evaded " . ($damage_reduction * 100) . "% of [player]'s damage!";
 				}
-			}		
+			}
 		}
 	}
 
@@ -2296,18 +2335,18 @@ function jutsuCollision(&$player, &$opponent, &$player_damage, &$opponent_damage
 				}
 				if($damage_reduction >= 0.01) {
 					$opponent_damage *= 1 - $damage_reduction;
-					$collision_text .= "[player] swiftly evaded " . ($damage_reduction * 100) . "% of [opponent]'s damage!";	
+					$collision_text .= "[player] swiftly evaded " . ($damage_reduction * 100) . "% of [opponent]'s damage!";
 				}
 			}
 			else {
 				$damage_reduction = ($opponent_speed / $player_speed) - 1.0;
-				$damage_reduction = round($damage_reduction * $speed_ratio, 2);	
+				$damage_reduction = round($damage_reduction * $speed_ratio, 2);
 				if($damage_reduction > $max_damage_reduction) {
 					$damage_reduction = $max_damage_reduction;
 				}
 				if($damage_reduction >= 0.01) {
 					$player_damage *= 1 - $damage_reduction;
-					$collision_text .= "[opponent] swiftly evaded " . ($damage_reduction * 100) . "% of [player]'s damage!";	
+					$collision_text .= "[opponent] swiftly evaded " . ($damage_reduction * 100) . "% of [player]'s damage!";
 				}
 			}
 		}
@@ -2320,7 +2359,7 @@ function jutsuCollision(&$player, &$opponent, &$player_damage, &$opponent_damage
 				}
 				if($damage_reduction >= 0.01) {
 					$opponent_damage *= 1 - $damage_reduction;
-					$collision_text .= "[player] swiftly evaded " . ($damage_reduction * 100) . "% of [opponent]'s damage!";	
+					$collision_text .= "[player] swiftly evaded " . ($damage_reduction * 100) . "% of [opponent]'s damage!";
 				}
 			}
 			else {
@@ -2331,8 +2370,8 @@ function jutsuCollision(&$player, &$opponent, &$player_damage, &$opponent_damage
 				}
 				if($damage_reduction >= 0.01) {
 					$player_damage *= 1 - $damage_reduction;
-					$collision_text .= "[opponent] cast their jutsu before [player] attacked, negating " . ($damage_reduction * 100) . 
-						"% of [player]'s damage!";		
+					$collision_text .= "[opponent] cast their jutsu before [player] attacked, negating " . ($damage_reduction * 100) .
+						"% of [player]'s damage!";
 				}
 			}
 		}
@@ -2353,7 +2392,7 @@ function jutsuCollision(&$player, &$opponent, &$player_damage, &$opponent_damage
 	}
 
     $collision_text = str_replace(
-		array('[player]', '[opponent]', 
+		array('[player]', '[opponent]',
 			'[gender]', '[gender2]'),
 		array($player_name, $opponent_name,
 			($player->gender == 'Male' ? 'he' : 'she'), ($player->gender == 'Male' ? 'his' : 'her')),
@@ -2364,7 +2403,7 @@ function jutsuCollision(&$player, &$opponent, &$player_damage, &$opponent_damage
 function setEffect(&$user, $target_id, $jutsu, $damage, $effect_id, &$active_effects) {
 	$apply_effect = true;
 	$debug = false;
-	
+
 	$debuff_power = ($jutsu['power'] <= 0) ? 0 : $damage / $jutsu['power'] / 15;
 
 	if($debug) {
@@ -2376,14 +2415,14 @@ function setEffect(&$user, $target_id, $jutsu, $damage, $effect_id, &$active_eff
 		$parent_genjutsu_id = $user->id . ':J' . $jutsu['parent_jutsu'];
 		if(!empty($active_effects[$parent_genjutsu_id]['layer_active'])) {
 			$active_effects[$parent_genjutsu_id]['layer_active'] = true;
-			$active_effects[$parent_genjutsu_id]['power'] *= 1.1;	
+			$active_effects[$parent_genjutsu_id]['power'] *= 1.1;
 		}
 		$jutsu['power'] *= 1.1;
 		$jutsu['effect_amount'] *= 1.1;
 	}
 
     switch($jutsu['effect']) {
-		case 'residual_damage':	
+		case 'residual_damage':
 		case 'ninjutsu_boost':
 		case 'taijutsu_boost':
 		case 'genjutsu_boost':
@@ -2514,7 +2553,7 @@ function applyActiveEffects(&$target, &$attacker, &$effect, &$effect_display, &$
 	}
 	if($effect['effect'] == 'residual_damage' || $effect['effect'] == 'bleed') {
 		$damage = $target->calcDamageTaken($effect['effect_amount'], $effect['effect_type']);
-		$effect_display .= '[br]-'. (isset($target->user_name) ? $target->user_name : $target->name) . 
+		$effect_display .= '[br]-'. (isset($target->user_name) ? $target->user_name : $target->name) .
 			" takes $damage residual damage-";
 		$target->health -= $damage;
 		if($target->health < 0) {
@@ -2523,7 +2562,7 @@ function applyActiveEffects(&$target, &$attacker, &$effect, &$effect_display, &$
 	}
 	else if($effect['effect'] == 'heal') {
 		$heal = $effect['effect_amount'];
-		$effect_display .= '[br]-'. (isset($target->user_name) ? $target->user_name : $target->name) . 
+		$effect_display .= '[br]-'. (isset($target->user_name) ? $target->user_name : $target->name) .
 			" heals $heal health-";
 		$target->health += $heal;
 		if($target->health > $target->max_health) {
@@ -2532,7 +2571,7 @@ function applyActiveEffects(&$target, &$attacker, &$effect, &$effect_display, &$
 	}
 	else if($effect['effect'] == 'drain_chakra') {
 		$drain = $target->calcDamageTaken($effect['effect_amount'], $effect['effect_type']);
-		$effect_display .= '[br]-'. $attacker->user_name . " drains $drain of " . 
+		$effect_display .= '[br]-'. $attacker->user_name . " drains $drain of " .
 			(isset($target->user_name) ? $target->user_name : $target->name) . "'s chakra-";
 		$target->chakra -= $drain;
 		if($target->chakra < 0) {
@@ -2541,7 +2580,7 @@ function applyActiveEffects(&$target, &$attacker, &$effect, &$effect_display, &$
 	}
 	else if($effect['effect'] == 'drain_stamina') {
 		$drain = $target->calcDamageTaken($effect['effect_amount'], $effect['effect_type']);
-		$effect_display .= '[br]-'. $attacker->user_name . " drains $drain of " . 
+		$effect_display .= '[br]-'. $attacker->user_name . " drains $drain of " .
 			(isset($target->user_name) ? $target->user_name : $target->name) . "'s stamina-";
 		$target->stamina -= $drain;
 		if($target->stamina < 0) {
@@ -2550,7 +2589,7 @@ function applyActiveEffects(&$target, &$attacker, &$effect, &$effect_display, &$
 	}
 	else if($effect['effect'] == 'absorb_chakra') {
 		$drain = $target->calcDamageTaken($effect['effect_amount'], $effect['effect_type']);
-		$effect_display .= '[br]-'. $attacker->user_name . " absorbs $drain of " . 
+		$effect_display .= '[br]-'. $attacker->user_name . " absorbs $drain of " .
 			(isset($target->user_name) ? $target->user_name : $target->name) . "'s chakra-";
 		$target->chakra -= $drain;
 		if($target->chakra < 0) {
@@ -2563,7 +2602,7 @@ function applyActiveEffects(&$target, &$attacker, &$effect, &$effect_display, &$
 	}
 	else if($effect['effect'] == 'absorb_stamina') {
 		$drain = $target->calcDamageTaken($effect['effect_amount'], $effect['effect_type']);
-		$effect_display .= '[br]-'. $attacker->user_name . " absorbs $drain of " . 
+		$effect_display .= '[br]-'. $attacker->user_name . " absorbs $drain of " .
 			(isset($target->user_name) ? $target->user_name : $target->name) . "'s stamina-";
 		$target->stamina -= $drain;
 		if($target->stamina < 0) {
