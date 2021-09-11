@@ -104,7 +104,7 @@ class SystemFunctions {
         $this->password = $password;
         $this->database = $database;
 
-        $this->environment = isset($environment) ? $environment : 'dev';
+        $this->environment = isset($ENVIRONMENT) ? $ENVIRONMENT : 'dev';
         $this->link = isset($web_url) ? $web_url : 'http://localhost/';
 
         $this->register_open = isset($register_open) ? $register_open : false;
