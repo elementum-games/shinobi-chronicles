@@ -215,13 +215,16 @@ function bloodline() {
 				echo "<label style='width:6.5em;'>Effect:</label>" . 
 					ucwords(str_replace('_', ' ', $jutsu['effect'])) . ' - ' . $jutsu['effect_length'] . " turns<br />";
 			}
-			echo "<label style='width:6.5em;float:left;'>Description:</label>
-				<p style='display:inline-block;width:37.1em;margin:0px;'>" . $jutsu['description'] . "</p>
-			<br style='margin:0px;clear:both;' />
-			<label style='width:6.5em;'>Jutsu type:</label>" . ucwords($jutsu['jutsu_type']) . "<br />
+			echo "<label style='width:6.5em;'>Jutsu type:</label>" . ucwords($jutsu['jutsu_type']) . "<br />
+			<label style='width:6.5em;'>Power:</label>" . round($jutsu['power'], 1) . "<br />
+
 			<label style='width:6.5em;'>Level:</label>" . $jutsu['level'] . "<br />
 			<label style='width:6.5em;'>Exp:</label>" . $jutsu['exp'] . "<br />";
 			echo "<br /><br />";
+			echo "<label style='width:6.5em;float:left;'>Description:</label>
+			<p style='display:inline-block;width:37.1em;margin:0px;'>" . $jutsu['description'] . "</p>
+			<br style='margin:0px;clear:both;' />";
+			
 		}
 		echo "</div>";
 	}

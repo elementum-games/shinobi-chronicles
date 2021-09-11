@@ -117,7 +117,6 @@ $login_menu = <<<HTML
 			<input type='text' name='user_name' /><br />
 			<span>Password</span><br />
 			<input type='password' name='password' /><br />
-			<img src='./securimage/securimage_show.php' /><br />
 			<input type='submit' name='login' value='Login' />
 			</form>
 			<p>
@@ -137,4 +136,3 @@ $footer = <<<HTML
 HTML;
 
 
-?>
