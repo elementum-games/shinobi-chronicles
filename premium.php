@@ -851,7 +851,7 @@ function premium() {
 			}	
 		}
 
-		//  (5 + floor(($player->ninjutsu_skill - 10) / 200))
+		$init_cost = (1 + floor(($player->ninjutsu_skill - 10) / 300))
 
 		echo "
 		</script>
@@ -860,7 +860,7 @@ function premium() {
 		Transfer amount:<br />
 		<input type='text' id='transferAmount' name='transfer_amount' value='" . ($player->ninjutsu_skill - 10) . "' 
 			onkeyup='statAllocateCostDisplay()' /><br />
-		<span id='statAllocateCost'>" . 0 . " AK / " . (($player->ninjutsu_skill - 10) * 0.25) . " minutes</span><br />
+		<span id='statAllocateCost'>" . $init_cost . " AK / " . (($player->ninjutsu_skill - 10) * 0.25) . " minutes</span><br />
 		<input type='submit' name='stat_allocate' value='Transfer Stat Points' />
 		</form>
 		</td></tr></table>";
