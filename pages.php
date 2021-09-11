@@ -10,7 +10,7 @@ $pages = [
     ],
     2 => [
         'file_name' => 'privateMessages.php',
-        'title' => 'Private Messages',
+        'title' => 'Inbox',
         'function_name' => 'privateMessages',
         'menu' => SystemFunctions::MENU_USER,
     ],
