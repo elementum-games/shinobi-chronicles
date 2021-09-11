@@ -851,7 +851,7 @@ function premium() {
 			}	
 		}
 
-		$init_cost = (1 + floor(($player->ninjutsu_skill - 10) / 300))
+		$init_cost = (1 + floor(($player->ninjutsu_skill - 10) / 300));
 
 		echo "
 		</script>
