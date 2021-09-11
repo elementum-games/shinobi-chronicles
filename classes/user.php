@@ -1503,8 +1503,10 @@ class User {
 	}
 
     private function bloodlineSkillRatio($boost) {
+        $bloodline_skill = $this->bloodline_skill + 10;
+
         $boost_type = explode('_', $boost['effect'])[0];
-        $skill_ratio = round($this->{$boost_type . '_skill'} / $this->bloodline_skill, 3);
+        $skill_ratio = round($this->{$boost_type . '_skill'} / $bloodline_skill, 3);
         if($skill_ratio > 1.0) {
             $skill_ratio = 1.0;
         }
