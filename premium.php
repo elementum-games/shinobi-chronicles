@@ -816,8 +816,7 @@ function premium() {
 		}
 		function statAllocateCostDisplay() {
 			var transferAmount = parseInt($('#transferAmount').val());
-			var cost = 5 + Math.floor(transferAmount / 200);
-			cost = 0;
+			var cost = 1 + Math.floor(transferAmount / 300);
 			var time = transferAmount * 0.2;
 			
 			var display = cost + ' AK / ' + time + ' minutes';
