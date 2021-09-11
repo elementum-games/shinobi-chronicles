@@ -8,7 +8,6 @@ Purpose:	Functions for initiating combat and distributing post-combat rewards
 Algorithm:	See master_plan.html
 */
 function battle() {
-	require("variables.php");
 	global $system;
 	global $player;
 	global $self_link;

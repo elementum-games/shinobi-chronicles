@@ -5,13 +5,12 @@ if(!isset($_SESSION['user_id'])) {
 }
 
 require("classes.php");
-require("variables.php");
 $system = new SystemFunctions();
 $system->dbConnect();
 $user = new User($_SESSION['user_id']);
 $user->loadData();
 
-if($user->staff_level < $SC_ADMINISTRATOR) {
+if($user->staff_level < SystemFunctions::SC_ADMINISTRATOR) {
 	exit;
 }
 

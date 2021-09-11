@@ -9,7 +9,6 @@ Algorithm:	See master_plan.html
 */
 
 function scoutArea() {
-	require("variables.php");
 	global $system;
 
 	global $player;
@@ -65,7 +64,7 @@ function scoutArea() {
 	if(is_array($users)) {
 		foreach($users as $user) {
 			echo "<tr>
-				<td style='width:28%;'><a href='$members_link&user={$user['user_name']}'>" . $user['user_name'] . "</a></td>
+				<td style='width:28%;'><a href='{$system->links['members']}&user={$user['user_name']}'>" . $user['user_name'] . "</a></td>
 				<td style='width:20%;text-align:center;'>" . $ranks[$user['rank']]['name'] . "</td>
 				<td style='width:17%;text-align:center;'>
 					<img src='./images/village_icons/" . strtolower($user['village']) . ".png' style='max-height:18px;max-width:18px;' />
@@ -80,9 +79,9 @@ function scoutArea() {
 				}
 				else if($user['location'] == $player->location && $user['user_id'] != $player->user_id) {
 					// Attack
-					echo "<a href='$spar_link&challenge={$user['user_id']}'>Spar</a>";
+					echo "<a href='{$system->links['spar']}}&challenge={$user['user_id']}'>Spar</a>";
 					if($user['village'] != $player->village && $user['rank'] > 2 && $player->rank > 2) {
-						echo " | <a href='$battle_link&attack={$user['user_id']}'>Attack</a>";
+						echo " | <a href='{$system->links['battle']}&attack={$user['user_id']}'>Attack</a>";
 					}
 				}
 				echo "&nbsp;</td>

@@ -1,7 +1,6 @@
 <?php
 session_start();
 
-require("variables.php");
 require("classes.php");
 
 $user = new TestUser(1);

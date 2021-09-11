@@ -9,7 +9,6 @@ Algorithm:	See master_plan.html
 */
 
 function gear() {
-	require("variables.php");
 	global $system;
 
 	global $player;
@@ -243,7 +242,6 @@ function gear() {
 }
 
 function jutsu() {
-	require("variables.php");
 	global $system;
 
 	global $player;

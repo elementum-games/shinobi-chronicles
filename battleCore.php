@@ -49,7 +49,6 @@ ALGORITHM
 */
 
 function battleAI(&$player, &$opponent) {
-	require("variables.php");
 	global $system;
 	global $self_link;
 
@@ -734,7 +733,6 @@ function battleAI(&$player, &$opponent) {
 }
 
 function battlePvP(&$player, &$opponent, &$battle) {
-	require("variables.php");
 	global $system;
 	/*
 	five chakra natures
@@ -791,7 +789,7 @@ function battlePvP(&$player, &$opponent, &$battle) {
 	// Jutsu passive effects
 	if(is_array($battle['active_effects'])) {
 		foreach($battle['active_effects'] as $id => $effect) {
-			if($player->staff_level >= $SC_ADMINISTRATOR) {
+			if($player->staff_level >= SystemFunctions::SC_ADMINISTRATOR) {
 				echo "[$id] " . $effect['effect'] . '(' . $effect['effect_amount'] . ') ->' . 
 					$effect['target'] . '(' . $effect['turns'] . ' turns left)<br />';
 			}
@@ -1415,7 +1413,7 @@ function battlePvP(&$player, &$opponent, &$battle) {
 				if($player2_jutsu['weapon_id']) {
 					$effect_id = $player2->id . ':W' . $player2_jutsu['weapon_id'];
 					if($player1->items[$battle['player2_weapon_id']]['effect'] != 'diffuse') {
-						setEffect($player2, $player1->id, $player2_jutus['weapon_effect'], 
+						setEffect($player2, $player1->id, $player2_jutsu['weapon_effect'],
 							$player2_raw_damage, $effect_id, $battle['active_effects']);
 					}
 				}
@@ -1546,6 +1544,8 @@ function battlePvP(&$player, &$opponent, &$battle) {
 			$winner = -1;
 		}
 	}
+
+	global $self_link;
 
 	// Start display
 	echo "<div class='submenu'>

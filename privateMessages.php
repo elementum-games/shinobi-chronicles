@@ -33,13 +33,12 @@ class Messaging {
 		];
 
 	function __construct() {
-
-		global $system, $player, $self_link, $SC_STAFF_COLORS;
+		global $system, $player, $self_link;
 
 		$this->system = $system;
 		$this->player = $player;
 		$this->self_link = $self_link;
-		$this->colors = $SC_STAFF_COLORS;
+		$this->colors = $system->SC_STAFF_COLORS;
 
 		$this->constraints['message_limit'] = ($player->staff_level || $player->forbidden_seal) ? self::SEAL_MAX_MESSAGE_LENGTH : self::MAX_MESSAGE_LENGTH;
 		$this->constraints['inbox_limit'] = ($player->staff_level || $player->forbidden_seal) ? (($player->staff_level) ? self::STAFF_INBOX_LIMIT : self::SEAL_INBOX_LIMIT) : self::INBOX_LIMIT;
@@ -47,7 +46,6 @@ class Messaging {
 	}
 
 	function validateForm() {
-		global $SC_MODERATOR, $SC_ADMINISTRATOR;
 		$inbox_limit = $this->constraints['inbox_limit'];
 		$subject = $this->system->clean(trim($_POST['subject']));
 		$recipient = $this->system->clean(trim($_POST['recipient']));
@@ -94,12 +92,12 @@ class Messaging {
 				}
 			}
 
-			if($this->player->staff_level < $SC_MODERATOR) {
+			if($this->player->staff_level < SystemFunctions::SC_MODERATOR) {
 				$mc_result = $this->system->query("SELECT COUNT(`message_id`) as `message_count` FROM `private_messages` WHERE `recipient`='{$result['user_id']}' AND `message_read` < 2");
 				$mc_result = $this->system->db_fetch($mc_result);
 				$message_count = $mc_result['message_count'];
 				$ErrorMsg = "User's inbox is full";
-				if($message_count >= $inbox_limit && $result['staff_level'] < $SC_MODERATOR) {
+				if($message_count >= $inbox_limit && $result['staff_level'] < SystemFunctions::SC_MODERATOR) {
 					if($result['forbidden_seal']) {
 						if($message_count >= self::SEAL_INBOX_LIMIT) {
 							throw new Exception($ErrorMsg);
@@ -140,7 +138,7 @@ class Messaging {
 
 		else {
 
-			if(! $this->message_id) {
+			if(!$this->message_id) {
 				if( is_array($_POST['message_id']) ) {
 					$this->message_id = implode(",", $_POST['message_id']);
 					$this->message_id = $this->system->clean($this->message_id);
@@ -161,16 +159,14 @@ class Messaging {
 
 	/**
 	 * @param $type
-	 * @param bool|false $members_link
 	 * @param bool|false $report_link
      */
-	function display($type, $members_link = false, $report_link = false) {
+	function display($type, $report_link = false) {
+        global $system;
 
 		switch($type) {
-
 			//Show up always
 			case 'options':
-
 				echo "
 					<form action='$this->self_link&page=delete_message' method='post'>
 						<div class='submenu'>
@@ -182,7 +178,6 @@ class Messaging {
 						</div>
 					<div class='submenuMargin'></div>
 				";
-
 			break;
 
 			//Show the form for sending a new message
@@ -245,7 +240,7 @@ class Messaging {
 						<tr>
 							<td>
 								<label>Sender:</label>
-									<a href='{$members_link}&user={$this->sender}' class='userLink $this->staff'>{$this->sender}</a><br />
+									<a href='{$system->links['members']}&user={$this->sender}' class='userLink $this->staff'>{$this->sender}</a><br />
 								<label>Subject:</label>
 									{$this->subject['display']}<br />
 								<label>Sent:</label>{$this->time}<br />
@@ -315,15 +310,12 @@ class Messaging {
 
 						$sender = $users[$message['sender']];
 
-						//User profile link fix. - Kengetsu
-						$members_link = $link . '?id=6';
-
 						if(! ctype_digit($persons_name)) {
 
 							echo "
 								<tr>
 									<td style='text-align:center;width:20%;' class='$class'>
-										<a href='{$members_link}&user={$persons_name}' class='userLink $staff'>" . $persons_name . "</a>
+										<a href='{$system->links['members']}&user={$persons_name}' class='userLink $staff'>" . $persons_name . "</a>
 									</td>
 									<td style='text-align:center;width:30%;' class='$class'>" . stripslashes($message['subject']) . "</td>
 									<td style='text-align:center;width:20%;' class='$class'>
@@ -472,7 +464,6 @@ function privateMessages() {
 	-message_read
 	*/
 
-	require("variables.php");
 	global $system;
 	global $player;
 	global $self_link;
@@ -494,7 +485,7 @@ function privateMessages() {
 
 		//For viewing private messages	
 		case 'view_message':
-			($Messaging->displayPrivateMessage()) ? $Messaging->display('privateMessage', $members_link, $report_link) : $Messaging->display('privateMessage:Error');
+			($Messaging->displayPrivateMessage()) ? $Messaging->display('privateMessage', $system->links['members'], $system->links['report']) : $Messaging->display('privateMessage:Error');
 		break;
 		
 		//For deleting messages

@@ -10,7 +10,6 @@ Algorithm:	See master_plan.html
 */
 
 function levelUp() {
-	require("variables.php");
 	global $system;
 
 	global $player;
@@ -38,7 +37,6 @@ function levelUp() {
 }
 
 function rankUp() {
-	require("variables.php");
 	global $system;
 
 	global $player;
@@ -572,7 +570,7 @@ function rankUp() {
 					$system->message("You have passed stage 1!");
 				} catch (Exception $e) {
 					$system->message("Your answers were incorrect. You have failed the Chuunin exam. " . $e->getMessage() . 
-						"<a href='$link?id=1'>Continue</a>");
+						"<a href='{$system->link}?id=1'>Continue</a>");
 					$system->printMessage();
 					unset($_SESSION['exam_stage']);
 					return false;
@@ -662,7 +660,7 @@ function rankUp() {
 						echo "You defeated your opponent, who had the scroll you needed, and have advanced to the 
 							next stage of the exam. You can take a short break and heal up if you want, or continue to the 
 							final battle.<br />
-							<a href='$link?id=1'>Take a break</a>
+							<a href='{$system->link}?id=1'>Take a break</a>
 							<a href='$self_link'>Continue</a>";
 							unset($_SESSION['ai_id']);
 							unset($_SESSION['battle_page']);
@@ -681,7 +679,7 @@ function rankUp() {
 				else if($winner == 2) {		// AI win
 					echo "<table class='table'><tr><th>Battle Results</th></tr>
 					<tr><td>You have been defeated. You have failed the chuunin exam.<br />
-					<a href='$link?id=1'>Continue</a>
+					<a href='{$system->link}?id=1'>Continue</a>
 					</td></tr></table>";
 					unset($_SESSION['exam_stage']);
 					unset($_SESSION['ai_id']);
@@ -693,7 +691,7 @@ function rankUp() {
 				else if($winner == -1) {
 					echo "<table class='table'><tr><th>Battle Results</th></tr>
 					<tr><td>The battle ended in a draw. You were unable to continue the exam and failed.<br />
-					<a href='$link?id=1'>Continue</a>
+					<a href='{$system->link}?id=1'>Continue</a>
 					</td></tr></table>";
 					unset($_SESSION['exam_stage']);
 					unset($_SESSION['ai_id']);
@@ -741,7 +739,7 @@ function rankUp() {
 				else if($winner == 2) {		// AI win
 					echo "<table class='table'><tr><th>Battle Results</th></tr>
 					<tr><td>You have been defeated. You have failed the chuunin exam.<br />
-					<a href='$link?id=1'>Continue</a>
+					<a href='{$system->link}?id=1'>Continue</a>
 					</td></tr></table>";
 					unset($_SESSION['exam_stage']);
 					unset($_SESSION['ai_id']);
@@ -751,7 +749,7 @@ function rankUp() {
 				else if($winner == -1) {
 					echo "<table class='table'><tr><th>Battle Results</th></tr>
 					<tr><td>The battle ended in a draw. You were unable to continue the exam and failed.<br />
-					<a href='$link?id=1'>Continue</a>
+					<a href='{$system->link}?id=1'>Continue</a>
 					</td></tr></table>";
 					unset($_SESSION['exam_stage']);
 					unset($_SESSION['ai_id']);
@@ -826,7 +824,7 @@ function rankUp() {
 							consuming destruction, that devours anything in its path. Your Fire jutsu will be strong against Wind jutsu, as
 							they will only fan the flames and strengthen your jutsu. However, you must be careful against Water jutsu, as they 
 							can extinguish your fires.\"<br />
-							<a href='$link?id=1'>Continue</a>";
+							<a href='{$system->link}?id=1'>Continue</a>";
 							break;
 						case 'Wind':
 							echo "Picturing a tempestuous tornado, you focus on the paper and flow chakra from your stomach,
@@ -836,7 +834,7 @@ function rankUp() {
 							will be strong against Lightning jutsu, as you can cut and dissipate it, but you will be weak against Fire jutsu,
 							because your wind only serves to fan their flames and make them stronger.\"
 							<br />
-							<a href='$link?id=1'>Continue</a>";
+							<a href='{$system->link}?id=1'>Continue</a>";
 							break;
 						case 'Lightning':
 							echo "Imagining the feel of electricity coursing through your veins, you focus on the paper and flow chakra 
@@ -847,7 +845,7 @@ function rankUp() {
 							jutsu will be strong against Earth as your speed can slice straight through the slower techniques of Earth,
 							but you must be careful against Wind jutsu as they will dissipate your Lightning.\"
 							<br />
-							<a href='$link?id=1'>Continue</a>";
+							<a href='{$system->link}?id=1'>Continue</a>";
 							break;
 						case 'Earth':
 							echo "Firmly planting your feet in the dirt and embracing the feel of it, you focus on the paper and flow 
@@ -857,7 +855,7 @@ function rankUp() {
 							strong against Water jutsu, as you can turn the water to mud and render it useless, but you will be weak to 
 							Lightning jutsu, as they are one of the few types that can swiftly evade and strike through your techniques.\"
 							<br />
-							<a href='$link?id=1'>Continue</a>";
+							<a href='{$system->link}?id=1'>Continue</a>";
 							break;
 						case 'Water':
 							echo "With thoughts of splashing rivers flowing through your mind, you focus on the paper and flow chakra 
@@ -867,7 +865,7 @@ function rankUp() {
 							of the battle, trapping enemies or launching large-scale attacks at them. Your Water jutsu will be strong against
 							Fire jutsu because you can extinguish them, but Earth jutsu can turn your water into mud and render it useless.\"
 							<br />
-							<a href='$link?id=1'>Continue</a>";
+							<a href='{$system->link}?id=1'>Continue</a>";
 							break;
 					}
 					
@@ -1015,7 +1013,7 @@ function rankUp() {
 							consuming destruction, that devours anything in its path. Your Fire jutsu will be strong against Wind jutsu, as
 							they will only fan the flames and strengthen your jutsu. However, you must be careful against Water jutsu, as they 
 							can extinguish your fires.\"<br />
-							<a href='$link?id=1'>Continue</a>";
+							<a href='{$system->link}?id=1'>Continue</a>";
 							break;
 						case 'Wind':
 							echo "Picturing a tempestuous tornado, you flow chakra from your stomach,
@@ -1026,7 +1024,7 @@ function rankUp() {
 							Lightning jutsu, as you can cut and dissipate it, but you will be weak against Fire jutsu,
 							because your wind only serves to fan their flames and make them stronger.\"
 							<br />
-							<a href='$link?id=1'>Continue</a>";
+							<a href='{$system->link}?id=1'>Continue</a>";
 							break;
 						case 'Lightning':
 							echo "Imagining the feel of electricity coursing through your veins, you flow chakra from your stomach,
@@ -1037,7 +1035,7 @@ function rankUp() {
 							jutsu will be strong against Earth as your speed can slice straight through the slower techniques of Earth,
 							but you must be careful against Wind jutsu as they will dissipate your Lightning.\"
 							<br />
-							<a href='$link?id=1'>Continue</a>";
+							<a href='{$system->link}?id=1'>Continue</a>";
 							break;
 						case 'Earth':
 							echo "Envisioning stone as hard as the temple you are sitting in, you flow chakra from your stomach,
@@ -1047,7 +1045,7 @@ function rankUp() {
 							strong against Water jutsu, as you can turn the water to mud and render it useless, but you will be weak to 
 							Lightning jutsu, as they are one of the few types that can swiftly evade and strike through your techniques.\"
 							<br />
-							<a href='$link?id=1'>Continue</a>";
+							<a href='{$system->link}?id=1'>Continue</a>";
 							break;
 						case 'Water':
 							echo "With thoughts of splashing rivers flowing through your mind, you flow chakra from your stomach,
@@ -1057,7 +1055,7 @@ function rankUp() {
 							of the battle, trapping enemies or launching large-scale attacks at them. Your Water jutsu will be strong against
 							Fire jutsu because you can extinguish them, but Earth jutsu can turn your water into mud and render it useless.\"
 							<br />
-							<a href='$link?id=1'>Continue</a>";
+							<a href='{$system->link}?id=1'>Continue</a>";
 							break;
 					}
 							

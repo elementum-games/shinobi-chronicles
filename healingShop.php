@@ -8,7 +8,6 @@ Purpose:	Functions for healing (ramen shop)
 Algorithm:	See master_plan.html
 */
 function healingShop() {
-	require("variables.php");
 	global $system;
 	global $player;
 	global $self_link;

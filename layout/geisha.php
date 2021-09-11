@@ -1,4 +1,8 @@
 <?php
+
+/** @var SystemFunctions $system */
+
+/** @noinspection HtmlUnknownTarget */
 $heading = <<<HTML
 <!doctype HTML public>
 <html>
@@ -45,11 +49,11 @@ HTML;
 
 $top_menu = <<<HTML
 <ul>
-	<li><a href='$link'>News</a></li>
+	<li><a href='{$system->link}'>News</a></li>
 	<li><a href='http://shinobi-chronicles.com/forum/' target='_blank'>Forum</a></li>
-	<li><a href='{$link}manual.php'>Manual</a></li>
-	<li><a href='{$link}rules.php'>Rules</a></li>
-	<li><a href='{$link}terms.php'>Terms of Service</a></li>
+	<li><a href='{$system->link}manual.php'>Manual</a></li>
+	<li><a href='{$system->link}rules.php'>Rules</a></li>
+	<li><a href='{$system->link}terms.php'>Terms of Service</a></li>
 </ul>
 HTML;
 
@@ -59,22 +63,10 @@ $side_menu_start = <<<HTML
 	
 	<ul class='menu'>
 	<h2><p>User Menu</p></h2>
-	
-	<li><a href='$link?id=1'>Profile</a></li>
-	<li><a href='$link?id=2'>Inbox</a></li>
-	<li><a href='$link?id=3'>Settings</a></li>
-	<li><a href='$link?id=4'>Jutsu</a></li>
-	<li><a href='$link?id=5'>Gear</a></li>
-	<li><a href='$link?id=6'>Members</a></li>
-	<li><a href='$link?id=7'>Chat</a></li>
 HTML;
 
-$village_menu = <<<HTML
+$village_menu_start = <<<HTML
 	<h2><p>Village Menu</p></h2>
-	<li><a href='$link?id=8'>Shop</a></li>
-	<li><a href='$link?id=9'>Village HQ</a></li>
-	<li><a href='$link?id=22'>Spar</a></li>
-	<li><a href='$link?id=21'>Ancient Market</a></li>
 HTML;
 
 $action_menu_header = <<<HTML
@@ -106,7 +98,7 @@ $login_menu = <<<HTML
 	<ul class='menu'>
 	<h2><p>Login</p></h2>
 		<div id='login'>
-			<form action='$link' method='post'>
+			<form action='{$system->link}' method='post'>
 			<span>Username</span><br />
 			<input type='text' name='user_name' /><br />
 			<span>Password</span><br />
@@ -116,7 +108,7 @@ $login_menu = <<<HTML
 			<input type='submit' name='login' value='Login' />
 			</form>
 			<p>
-				<a class='link' style='font-size:16px;padding-right:18px;' href='{$link}register.php'>Create an account</a>
+				<a class='link' style='font-size:16px;padding-right:18px;' href='{$system->link}register.php'>Create an account</a>
 			</p>
 		</div>
 	</div>

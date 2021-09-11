@@ -9,7 +9,6 @@ Algorithm:	See master_plan.html
 */
 
 function team() {
-	require("variables.php");
 	global $system;
 
 	global $player;
@@ -404,7 +403,7 @@ function team() {
 		}
 		
 		echo "<tr>
-			<td style='width:29%;' class='$class'><a href='$members_link&user={$row['user_name']}'>" . $row['user_name'] . "</a></td>
+			<td style='width:29%;' class='$class'><a href='{$system->links['members']}&user={$row['user_name']}'>" . $row['user_name'] . "</a></td>
 			<td style='width:20%;text-align:center;' class='$class'>" . $RANK_NAMES[$row['rank']] . "</td>
 			<td style='width:20%;text-align:center;' class='$class'>" . $row['level'] . "</td>
 			<td style='width:30%;text-align:center;' class='$class'>" . $row['monthly_pvp'] . "</td>
@@ -505,7 +504,6 @@ function team() {
 }
 
 function createTeam() {
-	require("variables.php");
 	global $system;
 
 	global $player;

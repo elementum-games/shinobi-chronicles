@@ -3,12 +3,11 @@ session_start();
 if(!isset($_SESSION['user_id'])) {
 	exit;
 }
-require("variables.php");
 require("classes.php");
 $system = new SystemFunctions();
 $system->dbConnect();
 $player = new User($_SESSION['user_id']);
-if($player->staff_level < $SC_HEAD_ADMINISTRATOR) {
+if($player->staff_level < SystemFunctions::SC_HEAD_ADMINISTRATOR) {
 	exit;
 }
 $result = $system->query("SELECT `rank_id`, `health_gain`, `pool_gain`, `base_level`, `max_level` FROM `ranks`");

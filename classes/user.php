@@ -1,12 +1,13 @@
-<?php
+<?php /** @noinspection PhpRedundantOptionalArgumentInspection */
 
 /*	Class:		User
 	Purpose:	Fetch user data and load into class variables.
 */
 class User {
     const MIN_NAME_LENGTH = 2;
+    const MIN_PASSWORD_LENGTH = 6;
 
-	public $system;
+    public $system;
 	
 	// Loaded in construct
 	public $id; // 'P' + user_id
@@ -66,9 +67,6 @@ class User {
 	public $intelligence;
 	public $willpower;
 	
-	public $max_skill;
-	public $max_gens;
-	
 	public $jutsu;
 	public $ninjutsu_ids;
 	public $genjutsu_ids;
@@ -76,8 +74,10 @@ class User {
 	
 	public $equipped_jutsu;
 	public $equipped_items;
-	
-	public $ban_type;
+
+    public $bloodline = null;
+
+    public $ban_type;
 	public $ban_expire;
 	public $journal_ban;
 	public $avatar_ban;
@@ -118,12 +118,148 @@ class User {
 
 	// Internal class variables
 	public $inventory_loaded;
-	
-	/* function __construct(user_id, system)
-		Creates instance of the User class. Sanitizes and checks user id to ensure user exists.
-		-Paramaters-
-		@user_id:	Id of the user, used to select and update data from database
-	*/
+
+    public $rank_name;
+
+    public $last_update;
+    public $last_active;
+    public $forbidden_seal;
+    public $last_login;
+
+    public $jutsu_scrolls;
+    public $avatar_link;
+    public $profile_song;
+    public $log_actions;
+    /**
+     * @var mixed
+     */
+    public $base_level;
+    /**
+     * @var mixed
+     */
+    public $max_level;
+    /**
+     * @var mixed
+     */
+    public $base_stats;
+    /**
+     * @var mixed
+     */
+    public $stats_per_level;
+    /**
+     * @var mixed
+     */
+    public $health_gain;
+    /**
+     * @var mixed
+     */
+    public $pool_gain;
+    /**
+     * @var mixed
+     */
+    public $stat_cap;
+    /**
+     * @var float|int
+     */
+    public $exp_per_level;
+    /**
+     * @var float|int|mixed
+     */
+    public $stats_max_level;
+    /**
+     * @var mixed
+     */
+    public $regen_rate;
+    public $bloodline_skill;
+
+    public $elements;
+
+    public $items;
+    /**
+     * @var array
+     */
+    public $equipped_weapons;
+    /**
+     * @var int
+     */
+    public $regen_boost;
+    /**
+     * @var mixed
+     */
+    public $battle_id;
+    /**
+     * @var mixed
+     */
+    public $challenge;
+    /**
+     * @var mixed
+     */
+    public $mission_id;
+    /**
+     * @var mixed
+     */
+    public $mission_stage;
+    /**
+     * @var mixed
+     */
+    public $last_ai;
+    /**
+     * @var mixed
+     */
+    public $last_pvp;
+    /**
+     * @var mixed
+     */
+    public $last_death;
+    /**
+     * @var mixed
+     */
+    public $premium_credits;
+    /**
+     * @var mixed
+     */
+    public $premium_credits_purchased;
+    /**
+     * @var mixed
+     */
+    public $total_stats;
+    /**
+     * @var int|mixed
+     */
+    public $scout_range;
+    /**
+     * @var int
+     */
+    public $stealth;
+    /**
+     * @var mixed
+     */
+    public $village_changes;
+    /**
+     * @var mixed
+     */
+    public $clan_changes;
+    /**
+     * @var mixed
+     */
+    public $team;
+    /**
+     * @var mixed
+     */
+    public $clan_office;
+    /**
+     * @var array
+     */
+    public $equipped_armor;
+    /**
+     * @var array
+     */
+    public $bloodline_offense_boosts;
+    /**
+     * @var array
+     */
+    public $bloodline_defense_boosts;
+
     public function __construct($user_id) {
 		global $system;
 		$this->system =& $system;
@@ -167,11 +303,13 @@ class User {
 		}
 	
 		$this->inventory_loaded = false;
+
+		return true;
 	}
 	
 	/* function loadData()
 		Loads user data from the database into class members
-		-Paramaters-
+		-Parameters-
 		Update (1 = regen, 2 = training)
 	*/
 	public function loadData($UPDATE = 2, $remote_view = false) {
@@ -481,7 +619,7 @@ class User {
 			$ratios = array(
 				'offense_boost'=> 0.04, 'defense_boost'=> 0.04, 
 				'speed_boost' => 0.08, 'mental_boost' => 0.1, 'heal' => 0.04);
-			// (boosts are 50% at 1:2 offense:blskill)
+			// (boosts are 50% at 1:2 offense:bl_skill)
 			
 			foreach($this->bloodline->combat_boosts as $id=>$boost) {
 				$boost['power'] = floor($boost['power'] / 5);
@@ -492,14 +630,7 @@ class User {
 					case 'ninjutsu_boost':
 					case 'genjutsu_boost':
 					case 'taijutsu_boost':
-						$boost_type = explode('_', $boost['effect'])[0];
-						$skill_ratio = round($this->{$boost_type . '_skill'} / $bloodline_skill, 3);
-						if($skill_ratio > 1.0) {
-							$skill_ratio = 1.0;
-						}
-						else if($skill_ratio < 0.55) {
-							$skill_ratio = 0.55;
-						}
+					    $skill_ratio = $this->bloodlineSkillRatio($boost);
 					
 						$this->bloodline->combat_boosts[$id]['power'] = 
 							round($boost['power'] * $skill_ratio * $ratios['offense_boost'], 3);
@@ -508,15 +639,9 @@ class User {
 					case 'ninjutsu_resist':
 					case 'genjutsu_resist':
 					case 'taijutsu_resist':
-						$boost_type = explode('_', $boost['effect'])[0];
-						$skill_ratio = round($this->{$boost_type . '_skill'} / $bloodline_skill, 3);
-						if($skill_ratio > 1.0) {
-							$skill_ratio = 1.0;
-						}
-						else if($skill_ratio < 0.55) {
-							$skill_ratio = 0.55;
-						}
-					
+                        $boost_type = explode('_', $boost['effect'])[0];
+                        $skill_ratio = $this->bloodlineSkillRatio($boost);
+
 						// Est. jutsu power
 						$skill = $bloodline_skill + $this->{$boost_type . '_skill'};
 						$jutsu_power = $this->rank;
@@ -664,21 +789,19 @@ class User {
 			if($this->train_time < time()) {
 				// Jutsu training
 				if(strpos($this->train_type, 'jutsu:') !== false) {
-					require("variables.php");
-					
+                    $jutsu_id = $this->train_gain;
+
 					$gain = 5;
-					if($TRAIN_BOOST) {
-						$gain += $TRAIN_BOOST;
+					if($this->system->TRAIN_BOOST) {
+						$gain += $this->system->TRAIN_BOOST;
 					}
 					if($this->jutsu[$jutsu_id]['level'] + $gain > 100) {
 						$gain = 100 - $this->jutsu[$jutsu_id]['level'];
 					}
 					
 					$this->getInventory();
-					$jutsu_id = $this->train_gain;
 					if($this->checkInventory($jutsu_id, 'jutsu')) {
 						if($this->jutsu[$jutsu_id]['level'] < 100) {
-
 							$new_level = $this->jutsu[$jutsu_id]['level'] + $gain;
 
 							if($new_level > 100) {
@@ -700,7 +823,7 @@ class User {
 								
 							$this->system->message($message);
 
-							if(! $this->ban_type) {
+							if(!$this->ban_type) {
 								$this->updateInventory();
 							}
 						}
@@ -738,14 +861,14 @@ class User {
 					$display .= "<p class='trainingNotification'>Training: " . ucwords(str_replace('_', ' ', $train_type)) . "<br />" .
 					"<span id='trainingTimer'>" . timeRemaining($this->train_time - time(), 'short', false, true) . " remaining</span></p>";
 					$display .= "<script type='text/javascript'>
-					var train_time = " . ($this->train_time - time()) . ";
+					let train_time = " . ($this->train_time - time()) . ";
 					</script>";
 				}
 				else  {
 					$display .= "<p class='trainingNotification'>Training: " . ucwords(str_replace('_', ' ', $this->train_type)) . "<br />" .
 						"<span id='trainingTimer'>" . timeRemaining($this->train_time - time(), 'short', false, true) . " remaining</span></p>";
 					$display .= "<script type='text/javascript'>
-					var train_time = " . ($this->train_time - time()) . ";
+					let train_time = " . ($this->train_time - time()) . ";
 					</script>";
 				}
 			}
@@ -756,32 +879,28 @@ class User {
 
 	/* function getInventory()
 	* Loads user jutsu, items, and equipped jutsu/bl jutsu/items
-	*	-Paramaters-
+	*	-Parameters-
 	*/
 	public function getInventory() {
-		// Vars
-		$max_equipped_jutsu = 3;	
-		
 		// Query user owned inventory
 		$result = $this->system->query("SELECT * FROM `user_inventory` WHERE `user_id` = '{$this->user_id}'");
 		
-		$player_jutsu = array();
-		$player_items = array();
-		$player_bloodline_jutsu = array();
-		$player_equipped_jutsu = array();
-		$player_equipped_items = array();
+		$player_jutsu = [];
+		$player_items = [];
+		$equipped_jutsu = [];
+		$equipped_items = [];
 		
 		// Decode JSON of inventory into variables
 		if($this->system->db_num_rows > 0) {
 			$user_inventory = $this->system->db_fetch($result);
 			$player_jutsu = json_decode($user_inventory['jutsu']);
 			$player_items = json_decode($user_inventory['items']);
-			$bloodline_jutsu = json_decode($user_inventory['bloodline_jutsu']);
 			$equipped_jutsu = json_decode($user_inventory['equipped_jutsu']);
 			$equipped_items = json_decode($user_inventory['equipped_items']);
 		}
 		else {
-			$this->system->query("INSERT INTO `user_inventory` (`user_id`) VALUES ('{$this->user_id}')");
+			$this->system->query("INSERT INTO `user_inventory` (`user_id`, `items`, `bloodline_jutsu`, `jutsu`) 
+                VALUES ('{$this->user_id}', '', '', '')");
 		}
 		
 		// Assemble query strings and fetch data of jutsu/items user owns from jutsu/item tables
@@ -789,7 +908,7 @@ class User {
 		
 		if($player_jutsu) {
 			$player_jutsu_array = $player_jutsu;
-			$player_jutsu = array();
+			$player_jutsu = [];
 			foreach($player_jutsu_array as $jutsu) {
 				if(!is_numeric($jutsu->jutsu_id)) {
 					continue;
@@ -799,7 +918,7 @@ class User {
 			}
 			$player_jutsu_string = substr($player_jutsu_string, 0, strlen($player_jutsu_string) - 1);
 			
-			$this->jutsu = array();
+			$this->jutsu = [];
 			
 			$result = $this->system->query(
 				"SELECT * FROM `jutsu` WHERE `jutsu_id` IN ({$player_jutsu_string}) 
@@ -841,7 +960,7 @@ class User {
 		}
 		
 		$this->equipped_jutsu = array();
-		if($equipped_jutsu) {
+		if(!empty($equipped_jutsu)) {
 			$count = 0;
 			foreach($equipped_jutsu as $jutsu) {
 				if($this->checkInventory($jutsu->id, 'jutsu')) {
@@ -858,6 +977,8 @@ class User {
 		if($player_items) {
 			$player_items_array = $player_items;
 			$player_items = array();
+			$player_items_string = '';
+
 			foreach($player_items_array as $item) {
 				if(!is_numeric($item->item_id)) {
 					continue;
@@ -948,13 +1069,6 @@ class User {
 						break;
 				}
 			}
-			
-			/* <b>bloodline_jutsu</b> (Below is JSON encoded into text column)
-			--jutsu_id
-			--level
-			--exp
-			*/	
-		
 		}
 		
 		$this->inventory_loaded = true;
@@ -962,7 +1076,7 @@ class User {
 	
 	/* function checkInventory()
 	*	Checks user inventory, returns true if the item/jutsu is owned, false if it isn't.
-		-Paramaters-
+		-Parameters-
 		@item_id: Id of the item/jutsu to be checked for
 		@inventory_type (jutsu, item): Type of thing to check for, either item or jutsu
 	*/
@@ -998,7 +1112,6 @@ class User {
 				break;
 			default:
 				return false;
-				break;
 		}
 		
 		if($this->{$energy_type} < $jutsu['use_cost']) {
@@ -1054,19 +1167,20 @@ class User {
 			default:
 				$this->system->message("Invalid jutsu type!");
 				return false;
-				break;
 		}
 		
 		return true;
 	}
-	
-	/* function calcDamage() CONTAINS TEMP NUMBER FIX
-	*	Calculates raw damage based on player stats and jutsu or item strength
-		-Paramaters-
-		@attack: Copy of the attack data.
-		@attack_type (default_jutsu, equipped_jutsu, item, bloodline_jutsu,): 
-			Type of thing to check for, either item or jutsu
-	*/
+
+    /**
+     * function calcDamage() CONTAINS TEMP NUMBER FIX
+     *	Calculates raw damage based on player stats and jutsu or item strength
+     *
+     * @param array  $attack  Copy of the attack data.
+     * @param string $attack_type (default_jutsu, equipped_jutsu, item, bloodline_jutsu)
+     * @return float|int
+     * @throws Exception
+     */
 	public function calcDamage($attack, $attack_type = 'default_jutsu') {
 		switch($attack_type) {
 			case 'default_jutsu':
@@ -1078,7 +1192,6 @@ class User {
 				break;
 			default:
 				throw new Exception("Invalid jutsu type!");
-				break;
 		}
 		$offense_boost = 0;		
 		
@@ -1140,7 +1253,7 @@ class User {
 	
 	/* function calcDamageTaken()
 	*	Calculates final damage taken based on player stats and attack type
-		-Paramaters-
+		-Parameters-
 		@raw_damage: Raw damage dealt before defense
 		@defense_type (ninjutsu, taijutsu, genjutsu, weapon): 
 			Type of thing to check for, either item or jutsu
@@ -1153,7 +1266,6 @@ class User {
 		}
 		
 		if(!empty($this->bloodline_defense_boosts)) {
-			$boost_amount = 0;
 			foreach($this->bloodline_defense_boosts as $id => $boost) {
 				$boost_type = explode('_', $boost['effect'])[0];
 				if($boost_type != $defense_type) {
@@ -1196,7 +1308,7 @@ class User {
 	
 	/* function updateData()
 		Updates user data from class members into database
-		-Paramaters-
+		-Parameters-
 	*/
 	public function updateData() {
 		$this->location = $this->x . '.' . $this->y;
@@ -1237,8 +1349,8 @@ class User {
 		if($this->team) {
 			$query .= "`team_id` = '{$this->team['id']}',";
 		}
-		if($this->team_invite) {
-			"`team_id` = 'invite:{$this->team_invite}',";
+		else if($this->team_invite) {
+			$query .= "`team_id` = 'invite:{$this->team_invite}',";
 		}
 		
 		
@@ -1312,7 +1424,7 @@ class User {
 
 	/* function updateInventory()
 		Updates user inventory from class members into database
-		-Paramaters-
+		-Parameters-
 	*/
 	public function updateInventory() {
 		if(!$this->inventory_loaded) {
@@ -1322,9 +1434,6 @@ class User {
 		
 		$player_jutsu = array();
 		$player_items = array();
-		$player_bloodline_jutsu = array();
-		$player_equipped_jutsu = array();
-		$player_equipped_items = array();
 		
 		$jutsu_count = 0;
 		$item_count = 0;
@@ -1367,7 +1476,8 @@ class User {
 			`equipped_items` = '{$player_equipped_items_json}'
 			WHERE `user_id` = '{$this->user_id}' LIMIT 1");
 		
-		
+
+		$bloodline_jutsu = [];
 		if($this->bloodline_id && !empty($this->bloodline->jutsu)) {
 			$jutsu_count = 0;
 			foreach($this->bloodline->jutsu as $jutsu) {
@@ -1389,7 +1499,20 @@ class User {
 		// strip down to id, level, exp
 		// Json encode
 		// run query
+        return true;
 	}
-	
+
+    private function bloodlineSkillRatio($boost) {
+        $boost_type = explode('_', $boost['effect'])[0];
+        $skill_ratio = round($this->{$boost_type . '_skill'} / $this->bloodline_skill, 3);
+        if($skill_ratio > 1.0) {
+            $skill_ratio = 1.0;
+        }
+        else if($skill_ratio < 0.55) {
+            $skill_ratio = 0.55;
+        }
+        return $skill_ratio;
+    }
+
 }
 

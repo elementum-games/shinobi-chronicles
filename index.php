@@ -18,7 +18,6 @@ if(!isset($_SESSION['user_id']) || $_SESSION['user_id'] != 1 || $_SESSION['user_
 ini_set('display_errors', 'On');
 
 $PAGE_LOAD_START = microtime(true);
-require("variables.php");
 require_once("classes.php");
 $system = new SystemFunctions();
 
@@ -33,7 +32,7 @@ if(isset($_GET['logout']) && $_GET['logout'] == 1) {
 		);
 	}
 	session_destroy();
-	header("Location: $link");
+	header("Location: {$system->link}");
 	exit;
 }
 $LOGGED_IN = false;
@@ -50,10 +49,10 @@ $player_display = '';
 $logout_limit = SystemFunctions::LOGOUT_LIMIT;
 if(!isset($_SESSION['user_id'])) {
 	// require("./securimage/securimage.php");
-	if($_POST['login']) {
+	if(!empty($_POST['login'])) {
 		try {
 /*			$image = new Securimage();
-			if(!$image->check($_POST['login_code']) && $ENVIRONMENT == 'prod') {
+			if(!$image->check($_POST['login_code']) && $system->environment == 'prod') {
 				throw new Exception("Invalid login code!");
 			}*/
 
@@ -75,7 +74,7 @@ if(!isset($_SESSION['user_id'])) {
 			$result = $system->db_fetch($result);
 			if(!$result['user_verified']) {
 				throw new Exception("Your account has not been verified. Please check your email for the activation code.
-				<a class='link' href='{$link}register.php?act=resend_verification&username=$user_name'>Resend Verification</a>");
+				<a class='link' href='{$system->link}register.php?act=resend_verification&username=$user_name'>Resend Verification</a>");
 			}
 			// Check failed logins
 			if($result['failed_logins'] >= 3 && $_SERVER['REMOTE_ADDR'] != $result['current_ip'] && $_SERVER['REMOTE_ADDR'] != $result['last_ip']) {
@@ -87,6 +86,7 @@ if(!isset($_SESSION['user_id'])) {
 			else if($result['failed_logins'] >= 5) {
 				throw new Exception("Account has been locked out!");
 			}
+
 			// Check password (NOTE: Due to importance of login, it is inclusive instead of exclusive (if statement must be true for user to be logged in) )
 			if($system->verify_password($password, $result['password'])) {
 				$_SESSION['user_id'] = $result['user_id'];
@@ -97,6 +97,7 @@ if(!isset($_SESSION['user_id'])) {
 				$player = new User($_SESSION['user_id']);
 				$player_display = $player->loadData();
 				$player->last_login = time();
+				$player->updateData();
 			}
 			// If wrong, increment failed logins
 			else {
@@ -113,7 +114,7 @@ else {
 	$player = new User($_SESSION['user_id']);
 	//This is in minutes.
 	$logout_display = false;
-	if($player->staff_level == $SC_ADMINISTRATOR) {
+	if($player->staff_level == SystemFunctions::SC_ADMINISTRATOR) {
 		$logout_limit = 1440;
 		$logout_display = "Disabled";
 	}
@@ -127,7 +128,7 @@ else {
 			clearInterval(refreshID);
 			clearInterval(notificationRefreshID);
 			</script>
-			<p style='text-align:center;'>Logout timer finished. <a href='$link'>Continue</a></p>";
+			<p style='text-align:center;'>Logout timer finished. <a href='{$system->link}'>Continue</a></p>";
 			exit;
 		}
 		else {
@@ -140,7 +141,7 @@ else {
 				);
 			}
 			session_destroy();
-			header("Location: $link");
+			header("Location: {$system->link}");
 			exit;
 		}
 	}
@@ -151,9 +152,10 @@ else {
 		$player_display = $player->loadData();
 	}
 }
+
 // Start display
 if(!$LOGGED_IN) {
-	$layout = $DEFAULT_LAYOUT;
+	$layout = SystemFunctions::DEFAULT_LAYOUT;
 }
 else {
 	$layout = $player->layout;
@@ -184,7 +186,7 @@ $allowed_coders = array(
 // Load page or news
 if($LOGGED_IN) {
 	// Master close
-	if(!$SC_OPEN && $player->staff_level < $SC_ADMINISTRATOR) {
+	if(!$system->SC_OPEN && $player->staff_level < SystemFunctions::SC_ADMINISTRATOR) {
 		if(!$ajax) {
 			echo str_replace("[HEADER_TITLE]", "Profile", $body_start);
 		}
@@ -194,7 +196,7 @@ if($LOGGED_IN) {
 		</td></tr></table>";
 		if(!$ajax) {
 			echo $side_menu_start . $side_menu_end;
-			echo str_replace('<!--[VERSION_NUMBER]-->', $VERSION_NUMBER, $footer);
+			echo str_replace('<!--[VERSION_NUMBER]-->', SystemFunctions::VERSION_NUMBER, $footer);
 		}
 		exit;
 	}	
@@ -211,7 +213,7 @@ if($LOGGED_IN) {
 		</td></tr></table>";
 		if(!$ajax) {
 			echo $side_menu_start . $side_menu_end;
-			echo str_replace('<!--[VERSION_NUMBER]-->', $VERSION_NUMBER, $footer);
+			echo str_replace('<!--[VERSION_NUMBER]-->', SystemFunctions::VERSION_NUMBER, $footer);
 		}
 		exit;
 	}
@@ -256,8 +258,6 @@ if($LOGGED_IN) {
 		echo "<script type='text/javascript'>
 		var notificationRefreshID = setInterval('javascript:$(\'#notifications\').load(\'./ajax_notifications.php\');', 5000);
 		</script>";
-		//Christmas Snowfall - Kengetsu
-		// echo "<script type='text/javascript' src='scripts/snowstorm.js'></script>";
 	}
 	// Global message
 	if(!$player->global_message_viewed && isset($_GET['clear_message'])) {
@@ -287,163 +287,8 @@ if($LOGGED_IN) {
 		$RANK_NAMES[$rank['rank_id']] = $rank['name'];
 	}
 	// Page list 
-	{
-		$pages = array(
-			1 => array(
-				'file_name' => 'profile.php',
-				'title' => 'Profile',
-				'function_name' => 'userProfile'
-			),
-			2 => array(
-				'file_name' => 'privateMessages.php',
-				'title' => 'Private Messages',
-				'function_name' => 'privateMessages'
-			),
-			3 => array(
-				'file_name' => 'settings.php',
-				'title' => 'Settings',
-				'function_name' => 'userSettings'
-			),
-			4 => array(
-				'file_name' => 'equip.php',
-				'title' => 'Jutsu',
-				'function_name' => 'jutsu',
-				'battle_ok' => false
-			),
-			5 => array(
-				'file_name' => 'equip.php',
-				'title' => 'Gear',
-				'function_name' => 'gear',
-				'battle_ok' => false
-			),	
-			6 => array(
-				'file_name' => 'members.php',
-				'title' => 'Members',
-				'function_name' => 'members'
-			),
-			7 => array(
-				'file_name' => 'chat.php',
-				'title' => 'Chat',
-				'function_name' => 'chat',
-				'ajax_ok' => true
-			),
-			8 => array(
-				'file_name' => 'store.php',
-				'title' => 'Academy',
-				'function_name' => 'store',
-				'village_ok' => 2
-			),
-			9 => array(
-				'file_name' => 'villageHQ.php',
-				'title' => 'Village HQ',
-				'function_name' => 'villageHQ',
-				'village_ok' => 2
-			),
-			10 => array(
-				'file_name' => 'bloodline.php',
-				'title' => 'Bloodline',
-				'function_name' => 'bloodline',
-				'battle_ok' => false,
-				'village_ok' => 1
-			),
-			11 => array(
-				'file_name' => 'training.php',
-				'title' => 'Training',
-				'function_name' => 'training',
-				'menu' => 'activity',
-				'battle_ok' => false,
-				'village_ok' => 0
-			),
-			12 => array(
-				'file_name' => 'arena.php',
-				'title' => 'Arena',
-				'function_name' => 'arena',
-				'menu' => 'activity',
-				'pvp_ok' => false,
-				'village_ok' => 0
-			),
-			13 => array(
-				'file_name' => 'healingShop.php',
-				'title' => 'Ramen Shop',
-				'function_name' => 'healingShop',
-				'menu' => 'activity',
-				'battle_ok' => false,
-				'village_ok' => 2
-			),
-			14 => array(
-				'file_name' => 'travel.php',
-				'title' => 'Travel',
-				'function_name' => 'travel',
-				'menu' => 'activity',
-				'battle_ok' => false,
-				'survival_ok' => false,
-				'village_ok' => 1,
-				'min_rank' => 2
-			),
-			15 => array(
-				'file_name' => 'scoutArea.php',
-				'title' => 'Scout Area',
-				'function_name' => 'scoutArea',
-				'menu' => 'activity',
-				'battle_ok' => false,
-				'village_ok' => 1
-			),
-			16 => array(
-				'file_name' => 'modPanel.php',
-				'title' => 'Moderator Control Panel',
-				'function_name' => 'modPanel',
-				'staff_level_required' => $SC_MODERATOR
-			),
-			17 => array(
-				'file_name' => 'adminPanel.php',
-				'title' => 'Administrator Control Panel',
-				'function_name' => 'adminPanel',
-				'staff_level_required' => $SC_ADMINISTRATOR
-			),
-			18 => array(
-				'file_name' => 'report.php',
-				'title' => 'Report',
-				'function_name' => 'report'
-			),
-			19 => array(
-				'file_name' => 'battle.php',
-				'title' => 'Battle',
-				'function_name' => 'battle',
-				'battle_type' => 1
-			),
-			20 => array(
-				'file_name' => 'clan.php',
-				'title' => 'Clan',
-				'function_name' => 'clan'
-			),
-			21 => array(
-				'file_name' => 'premium.php',
-				'title' => 'Ancient Market',
-				'function_name' => 'premium'
-			),
-			22 => array(
-				'file_name' => 'spar.php',
-				'title' => 'Spar',
-				'function_name' => 'spar',
-				'battle_type' => 2
-			),
-			23 => array(
-				'file_name' => 'missions.php',
-				'title' => 'Missions',
-				'function_name' => 'missions',
-				'menu' => 'activity',
-				'pvp_ok' => false,
-				'village_ok' => 1,
-				'min_rank' => 2
-			),
-			24 => array(
-				'file_name' => 'team.php',
-				'title' => 'Team',
-				'function_name' => 'team',
-				'min_rank' => 3
-			)
-		);
-	}
+	$pages = require 'pages.php';
+
 	// Action log
 	if($player->log_actions) {
 		$log_contents = '';
@@ -549,7 +394,7 @@ if($LOGGED_IN) {
 			if(!$ajax || !isset($pages[$id]['ajax_ok']) ) {
 				echo str_replace("[HEADER_TITLE]", $pages[$id]['title'], $body_start);
 			}
-			$self_link = $link . '?id=' . $id;
+			$self_link = $system->link . '?id=' . $id;
 			$system->printMessage();
 			if($global_message) {
 				echo "<table class='table globalMessage'><tr><th>Global message</th></tr>
@@ -580,7 +425,7 @@ if($LOGGED_IN) {
 			echo "<table class='table globalMessage'><tr><th>Global message</th></tr>
 			<tr><td style='text-align:center;'>" . $system->html_parse($global_message) . "
 			<br />
-			<a class='link' href='$link?clear_message=1'>Dismiss</a>
+			<a class='link' href='{$system->link}?clear_message=1'>Dismiss</a>
 			</td></tr></table>";
 		}
 		require("news.php");
@@ -589,20 +434,26 @@ if($LOGGED_IN) {
 	$player->updateData();
 	// Display side menu and footer
 	if(!$ajax) {
-		echo $side_menu_start;
 		if($player->bloodline_id) {
-			echo "<li><a href='$link?id=10'>Bloodline</a></li>";
+		    $pages[10]['menu'] = 'user';
 		}
 		if($player->clan) {
-			echo "<li><a href='$link?id=20'>Clan</a></li>";
+		    $pages[20]['menu'] = 'user';
 		}
 		if($player->rank >= 3) {
-			echo "<li><a href='$link?id=24'>Team</a></li>";
+		    $pages[24]['menu'] = 'user';
 		}
-		// In village or not
-		if($player->in_village) {
-			echo $village_menu;
-		}
+
+
+        echo $side_menu_start;
+		foreach($pages as $id => $page) {
+            if(!isset($page['menu']) || $page['menu'] != SystemFunctions::MENU_USER) {
+                continue;
+            }
+
+            echo "<li><a href='{$system->link}?id=$id'>" . $page['title'] . "</a></li>";
+        }
+
 		echo $action_menu_header;
 		if($player->in_village) {
 			foreach($pages as $id => $page) {
@@ -611,7 +462,7 @@ if($LOGGED_IN) {
 				}
 				// Page ok if an in-village page or player rank is below chuunin
 				if($page['village_ok'] > 0 || $player->rank < 3) {
-					echo "<li><a href='$link?id=$id'>" . $page['title'] . "</a></li>";
+					echo "<li><a href='{$system->link}?id=$id'>" . $page['title'] . "</a></li>";
 				}
 			}
 		}
@@ -622,22 +473,29 @@ if($LOGGED_IN) {
 				}
 				// Page ok if a non-village page or player rank is below chuunin
 				if($page['village_ok'] < 2) {
-					echo "<li><a href='$link?id=$id'>" . $page['title'] . "</a></li>";
+					echo "<li><a href='{$system->link}?id=$id'>" . $page['title'] . "</a></li>";
 				}
 			}
 		}
-		/*
-		<li><a href='$link?id=11'>Training</a></li>
-	<li><a href='$link?id=12'>Arena</a></li>
-	<li><a href='$link?id=13'>Ramen Shop</a></li>
-	<li><a href='$link?id=14'>Travel</a></li>
-	<li><a href='$link?id=15'>Scout Area</a></li>*/
-		if($player->staff_level >= $SC_MODERATOR) {
+
+        // In village or not
+        if($player->in_village) {
+            echo $village_menu_start;
+            foreach($pages as $id => $page) {
+                if(!isset($page['menu']) || $page['menu'] != SystemFunctions::MENU_VILLAGE) {
+                    continue;
+                }
+
+                echo "<li><a href='{$system->link}?id=$id'>" . $page['title'] . "</a></li>";
+            }
+        }
+
+		if($player->staff_level >= SystemFunctions::SC_MODERATOR) {
 			echo $staff_menu_header;
-			echo "<li><a href='$link?id=16'>Mod Panel</a></li>";
+			echo "<li><a href='{$system->link}?id=16'>Mod Panel</a></li>";
 		}
-		if($player->staff_level >= $SC_ADMINISTRATOR) {
-			echo "<li><a href='$link?id=17'>Admin Panel</a></li>";
+		if($player->staff_level >= SystemFunctions::SC_ADMINISTRATOR) {
+			echo "<li><a href='{$system->link}?id=17'>Admin Panel</a></li>";
 		}
 		// Logout timer
 		require_once("functions.php");
@@ -656,13 +514,13 @@ else if($ajax) {
 			clearInterval(refreshID);
 			clearInterval(notificationRefreshID);
 			</script>
-	<p style='text-align:center;'>Logout timer finished. <a href='$link'>Continue</a></p>";
+	<p style='text-align:center;'>Logout timer finished. <a href='{$system->link}'>Continue</a></p>";
 }
 else {
 	echo str_replace("[HEADER_TITLE]", "News", $body_start);
 	// Display error messages
 	$system->printMessage();
-	if(!$SC_OPEN && $player->staff_level < $SC_ADMINISTRATOR) {
+	if(!$system->SC_OPEN && $player->staff_level < SystemFunctions::SC_ADMINISTRATOR) {
 		echo "<table class='table'><tr><th>Game Maintenance</th></tr>
 		<tr><td style='text-align:center;'>
 		Shinobi-Chronicles is currently closed for maintenace. Please check back in a few minutes!
@@ -670,7 +528,7 @@ else {
 	}	
 	require("news.php");
 	newsPosts();
-	if($ENVIRONMENT == 'prod') {
+	if($system->environment == 'prod') {
 		$captcha = "
 		<script type='text/javascript'>
 		function captchaReload() {
@@ -705,7 +563,7 @@ if(!$ajax) {
 	$page_load_time = round(microtime(true) - $PAGE_LOAD_START, 3);
 	echo str_replace(
 		array('<!--[VERSION_NUMBER]-->', '<!--[PAGE_LOAD_TIME]-->'),
-		array($VERSION_NUMBER, $page_load_time),
+		array(SystemFunctions::VERSION_NUMBER, $page_load_time),
 	$footer);
 }
 ?>

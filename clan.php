@@ -8,7 +8,6 @@ Purpose:	Functions for clan management and activties
 Algorithm:	See master_plan.html
 */
 function clan() {
-	require("variables.php");
 	global $system;
 	global $player;
 	global $self_link;
@@ -58,17 +57,10 @@ function clan() {
 			if(!isset($missions[$mission_id])) {
 				throw new Exception("Invalid mission!");
 			}
-			if($player->mission_id) {
-				throw new Exception("You are already on a mission!");
-			}
-			$fight_timer = 20;
-			if($player->last_ai > time() - $fight_timer) {
-				throw new Exception("Please wait " . ($player->last_ai - (time() - $fight_timer)) . " more seconds!");
-			}
-			$mission = new Mission($mission_id, $player);
-			$player->mission_id = $mission_id;
+			Mission::start($player, $mission_id);
+
 			require("missions.php");
-			missions();
+			runActiveMission();
 			return true;
 		} catch (Exception $e) {
 			$system->message($e->getMessage());
@@ -78,7 +70,6 @@ function clan() {
 	if($player->rank >= 3 && $page == 'challenge') {
 		if($_GET['challenge']) {
 			$challenge_position = $_GET['challenge'];
-			echo $positions[$challenge_position];
 			$positions = array (
 				1 => 'leader',
 				2 => 'elder_1',
@@ -284,7 +275,7 @@ function clan() {
 				$class = 'row2';
 			}
 			echo "<tr>
-				<td style='width:29%;' class='$class'><a href='$members_link&user={$row['user_name']}'>" . $row['user_name'] . "</a></td>
+				<td style='width:29%;' class='$class'><a href='{$system->links['members']}&user={$row['user_name']}'>" . $row['user_name'] . "</a></td>
 				<td style='width:20%;text-align:center;' class='$class'>" . $RANK_NAMES[$row['rank']] . "</td>
 				<td style='width:20%;text-align:center;' class='$class'>" . $row['level'] . "</td>
 				<td style='width:30%;text-align:center;' class='$class'>" . $row['exp'] . "</td>
@@ -440,7 +431,7 @@ function clan() {
 			if(isset($officers[$position])) {
 				echo "<img src='" . $officers[$position]['avatar_link'] . "' /><br />
 				<span style='font-weight:bold;'>
-					<a href='$members_link&user={$officers[$position]['user_name']}'>" . $officers[$position]['user_name'] . "</a></span><br />";
+					<a href='{$system->links['members']}&user={$officers[$position]['user_name']}'>" . $officers[$position]['user_name'] . "</a></span><br />";
 				if($player->rank >= 4 && $player->clan_office != $position) {
 					// echo "<a href='$self_link&page=challenge&challenge=$position'>(Challenge)</a>";
 				}

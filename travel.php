@@ -9,7 +9,6 @@ Algorithm:	See master_plan.html
 */
 
 function travel() {
-	require("variables.php");
 	global $system;
 
 	global $player;
@@ -17,10 +16,7 @@ function travel() {
 	global $villages;
 
 	global $self_link;
-	
-	$map_size = 12;
-	$map_size_x = 18;
-	$map_size_y = 12;
+
 	if($_GET['travel']) {
 		$travel = $system->clean($_GET['travel']);
 		$target_x = $player->x;
@@ -35,7 +31,7 @@ function travel() {
 				$target_y--;
 				break;
 			case 'south':
-				if($player->y >= $map_size_y) {
+				if($player->y >= SystemFunctions::MAP_SIZE_Y) {
 					$system->message("You cannot travel farther this way!");
 					break;
 				}
@@ -43,7 +39,7 @@ function travel() {
 				$target_y++;
 				break;
 			case 'east':
-				if($player->x >= $map_size_x) {
+				if($player->x >= SystemFunctions::MAP_SIZE_X) {
 					$system->message("You cannot travel farther this way!");
 					break;
 				}
@@ -164,16 +160,16 @@ function travel() {
 	if($player->mission_id) {
 		if($player->mission_stage['action_type'] == 'travel' or $player->mission_stage['action_type'] == 'search') {
 			if($player->location == $player->mission_stage['action_data']) {
-				echo "<a href='$mission_link'><p class='button' style='margin-top:5px;'>Go to Mission Location</p></a><br />";
+				echo "<a href='{$system->links['mission']}'><p class='button' style='margin-top:5px;'>Go to Mission Location</p></a><br />";
 			}
 		}
 	}
 	
-	echo "<span style='font-style:italic;margin-bottom:3px;display:inline-block;font-style:0.9em;'>(Use WASD, arrow keys, or the arrows below)</span>
-	<table class='map' cellspacing='0' style='padding:0px;border:1px solid #000;'>";
-	for($y = 1; $y <= $map_size_y; $y++) {
+	echo "<span style='font-style:italic;margin-bottom:3px;display:inline-block;font-size:0.9em;'>(Use WASD, arrow keys, or the arrows below)</span>
+	<table class='map' style='padding:0;border:1px solid #000;border-collapse:collapse;border-spacing:0;'>";
+	for($y = 1; $y <= SystemFunctions::MAP_SIZE_Y; $y++) {
 		echo "<tr>";
-		for($x = 1; $x <= $map_size_x; $x++) {
+		for($x = 1; $x <= SystemFunctions::MAP_SIZE_X; $x++) {
 			$key = $x . '.' . $y;
 			if(isset($villages[$key])) {
 				echo "<td class='village' style='background-image: url(./images/village_icons/" . $icons[$villages[$key]['count']] . ');';

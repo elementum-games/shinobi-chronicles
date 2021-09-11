@@ -9,7 +9,6 @@ Algorithm:	See master_plan.html
 */
 
 function userProfile() {
-	require("variables.php");
 	global $system;
 
 	global $player;
@@ -38,15 +37,10 @@ function userProfile() {
 	// Level up/rank up checks
 	$exp_needed = $player->exp_per_level * (($player->level + 1) - $player->base_level) + ($player->base_stats * 10);
 	
-	// Admin override
-	if($player->staff_level >= $SC_ADMINISTRATOR) {
-		$SC_MAX_RANK = 4;
-	}
-	
 	// Level up
 	if($player->level < $player->max_level && $player->exp >= $exp_needed) {
 		if($player->battle_id) {
-			echo "<p style='text-align:center;font-style:italic;$extra_style'>
+			echo "<p style='text-align:center;font-style:italic;'>
 				You must be out of battle to level up.</p>";
 		}
 		else {
@@ -56,9 +50,9 @@ function userProfile() {
 		}
 	}
 	// Rank up
-	else if($player->level >= $player->max_level && $player->exp >= $exp_needed && $player->rank < $SC_MAX_RANK) {
+	else if($player->level >= $player->max_level && $player->exp >= $exp_needed && $player->rank < SystemFunctions::SC_MAX_RANK) {
 		if($player->battle_id > 0 or !$player->in_village) {
-			echo "<p style='text-align:center;font-style:italic;$extra_style'>
+			echo "<p style='text-align:center;font-style:italic;'>
 				You must be out of battle and in your village to rank up.</p>";
 		}
 		else if($_GET['rankup']) {
@@ -67,7 +61,7 @@ function userProfile() {
 			return true;
 		}
 		else {
-			echo "<p style='text-align:center;font-size:1.1em;$extra_style'>
+			echo "<p style='text-align:center;font-size:1.1em;'>
 				<a style='text-decoration:none;' href='$self_link&rankup=1'>Take exam for the next rank</a>
 			</p>";
 		}

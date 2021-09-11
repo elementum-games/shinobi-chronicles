@@ -1,9 +1,7 @@
 <?php
 session_start();
 
-require("variables.php");
-
-switch($DEFAULT_LAYOUT) {
+switch(SystemFunctions::DEFAULT_LAYOUT) {
     case 'classic_blue':
         require("layout/classic_blue.php");
         break;
@@ -50,4 +48,4 @@ else {
     echo $login_menu;
 }
 
-echo str_replace('<!--[VERSION_NUMBER]-->', $VERSION_NUMBER, $footer);
+echo str_replace('<!--[VERSION_NUMBER]-->', SystemFunctions::VERSION_NUMBER, $footer);

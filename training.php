@@ -8,7 +8,6 @@ Purpose:	Function for allowing user to train their stats and jutsu
 Algorithm:	See master_plan.html
 */
 function training() {
-	require("variables.php");
 	global $system;
 	global $player;
 	global $self_link;
@@ -32,9 +31,9 @@ function training() {
         $stat_extended_train_gain = $stat_long_train_gain * 3.375;
 	}
 
-	$stat_train_gain += $TRAIN_BOOST;
-	$stat_long_train_gain += $LONG_TRAIN_BOOST;
-	$stat_extended_train_gain += ($LONG_TRAIN_BOOST * 5);
+	$stat_train_gain += $system->TRAIN_BOOST;
+	$stat_long_train_gain += $system->LONG_TRAIN_BOOST;
+	$stat_extended_train_gain += ($system->LONG_TRAIN_BOOST * 5);
 
 	$HOLIDAY_TRAINING = false;
 	$player->getInventory();

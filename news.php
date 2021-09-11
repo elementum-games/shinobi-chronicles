@@ -9,16 +9,15 @@ Algorithm:	See master_plan.html
 */
 
 function news() {
-	require("variables.php");
 	global $system;
 
 	global $player;
 
-	$self_link = $link;
+	$self_link = $system->link;
 	
-	$page = $_GET['page'];
+	$page = isset($_GET['page']) ? $_GET['page'] : false;
 	
-	if($_POST['create_post'] && $player->staff_level >= $SC_ADMINISTRATOR) {
+	if(!empty($_POST['create_post']) && $player->staff_level >= SystemFunctions::SC_ADMINISTRATOR) {
 		$post = $system->clean($_POST['news_post']);
 		$title = $system->clean($_POST['title']);
 		
@@ -55,7 +54,7 @@ function news() {
 		}
 		$system->printMessage();
 	}
-	else if($_POST['edit_post'] && $player->staff_level >= $SC_ADMINISTRATOR) {
+	else if(!empty($_POST['edit_post']) && $player->staff_level >= SystemFunctions::SC_ADMINISTRATOR) {
 		$post_id = (int)$system->clean($_POST['post_id']);
 		$message = $system->clean($_POST['news_post']);
 		$title = $system->clean($_POST['title']);
@@ -102,7 +101,7 @@ function news() {
 	}
 	
 	// Show create, edit pages, or display news posts
-	if($page == "create_post" && $player->staff_level >= $SC_ADMINISTRATOR) {
+	if($page == "create_post" && $player->staff_level >= SystemFunctions::SC_ADMINISTRATOR) {
 		echo "<table class='table'><tr><th>New Post</th></tr>
 		<tr><td style='text-align:center;'>
 			<form action='$self_link' method='post'>
@@ -116,7 +115,7 @@ function news() {
 			</form>
 		</td></tr></table>";
 	}
-	else if($page == "edit_post" && $player->staff_level >= $SC_ADMINISTRATOR) {
+	else if($page == "edit_post" && $player->staff_level >= SystemFunctions::SC_ADMINISTRATOR) {
 		$post_id = (int)$system->clean($_GET['post']);
 		$result = $system->query("SELECT * FROM `news_posts` WHERE `post_id`='$post_id'");
 		if($system->db_num_rows == 0) {
@@ -142,7 +141,7 @@ function news() {
 	}
 	
 	if(!$page) {
-		if($player->staff_level >= $SC_ADMINISTRATOR) {
+		if($player->staff_level >= SystemFunctions::SC_ADMINISTRATOR) {
 			echo "<p style='text-align:center;'><a href='$self_link?page=create_post'>New post</a></p>";
 			newsPosts(true);
 		}
@@ -153,12 +152,8 @@ function news() {
 }
 
 function newsPosts($ADMIN = false, $max_posts = 8) {
-	require("variables.php");
-
-	/** @var string $link */
-    $self_link = $link;
-
 	global $system;
+	$self_link = $system->link;
 	
 	$result = $system->query("SELECT * FROM `news_posts` ORDER BY `post_id` DESC LIMIT $max_posts");
 
@@ -170,7 +165,7 @@ function newsPosts($ADMIN = false, $max_posts = 8) {
 	while($post = $system->db_fetch($result)) {
 		echo "<table class='table'><tr><th>" . $post['title'];
 		if($ADMIN) {
-			echo " ( <a style='color:inherit;' href='$self_link?page=edit_post&post={$post['post_id']}'>Edit</a> )";
+			echo " ( <a style='color:inherit;' href='{$self_link}?page=edit_post&post={$post['post_id']}'>Edit</a> )";
 		}
 		echo "</th></tr>
 			<tr><td>";
@@ -180,7 +175,6 @@ function newsPosts($ADMIN = false, $max_posts = 8) {
 		$message = str_replace("\n", "<br />", $message);
 		
 		echo wordwrap($system->html_parse(stripslashes($message), true), 90, "\n", true);
-		
 
 		
 		echo "</td></tr><tr><td class='newsFooter'>" . 
@@ -189,4 +183,3 @@ function newsPosts($ADMIN = false, $max_posts = 8) {
 	}
 }
 
-?>	

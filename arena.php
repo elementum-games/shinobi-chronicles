@@ -2,7 +2,6 @@
 /* arena.php
 */
 function arena() {
-	require("variables.php");
 	global $system;
 	global $player;
 	global $self_link;
@@ -187,10 +186,11 @@ function arena() {
 	else {
 		$result = $system->query("SELECT `ai_id`, `name`, `level` FROM `ai_opponents` 
 			WHERE `rank` ='$player->rank' ORDER BY `level` ASC");
+
 		// Addition by Kengetsu - Get access to AI if rank is higher than public max.
-		if($player->rank > $SC_MAX_RANK) {
+		if($player->rank > SystemFunctions::SC_MAX_RANK) {
 			$result = $system->query("SELECT `ai_id`, `name`, `level` FROM `ai_opponents` 
-			WHERE `rank` ='$SC_MAX_RANK' ORDER BY `level` ASC");
+			WHERE `rank` ='" . SystemFunctions::SC_MAX_RANK . "' ORDER BY `level` ASC");
 		}
 		//End
 		if($system->db_num_rows == 0) {

@@ -8,14 +8,13 @@ Purpose:	Function for admin panel where user and content data can be submitted a
 Algorithm:	See master_plan.html
 */
 function adminPanel() {
-	require("variables.php");
 	global $system;
 	global $player;
 	global $self_link;
 	global $id;
 	global $RANK_NAMES;
 	// Staff level check
-	if(!isset($SC_ADMINISTRATOR) or $player->staff_level < $SC_ADMINISTRATOR) {
+	if($player->staff_level < SystemFunctions::SC_ADMINISTRATOR) {
 		return false;
 	}
 	/* $pattern = '/[0-9]+\.[0-9]+/';
@@ -1221,7 +1220,7 @@ function adminPanel() {
 				$column_names = '';
 				$column_data = '';
 				$count = 1;
-				$query = "UPDATE `ai_opponents` SET ";
+                $query = "UPDATE `ai_opponents` SET ";
 				foreach($data as $name=>$var) {
 					$query .= "`$name` = '$var'";
 					if($count < count($data)) {
@@ -2101,12 +2100,12 @@ function adminPanel() {
 			*/
 		/* Variables */ 
 		$variables =& $edit_user_variables;
-		if($player->staff_level >= $SC_HEAD_ADMINISTRATOR) {
+		if($player->staff_level >= SystemFunctions::SC_HEAD_ADMINISTRATOR) {
 			$variables['staff_level'] = array(
 				'data_type' => 'int',
 				'input_type' => 'radio',
-				'options' => array(0 => 'normal_user', $SC_MODERATOR => 'moderator', $SC_HEAD_MODERATOR => 'head moderator', 
-					$SC_ADMINISTRATOR => 'administrator', $SC_HEAD_ADMINISTRATOR => 'head administrator')
+				'options' => array(0 => 'normal_user', SystemFunctions::SC_MODERATOR => 'moderator', SystemFunctions::SC_HEAD_MODERATOR => 'head moderator',
+					SystemFunctions::SC_ADMINISTRATOR => 'administrator', SystemFunctions::SC_HEAD_ADMINISTRATOR => 'head administrator')
 			);
 		}
 		// Validate user name
@@ -2226,7 +2225,7 @@ function adminPanel() {
 				$result = $system->db_fetch($result);
 				$user_id = $result['user_id'];
 				$user_name = $result['user_name'];
-				if($result['staff_level'] >= $SC_ADMINISTRATOR && $player->staff_level < $SC_HEAD_ADMINISTRATOR) {
+				if($result['staff_level'] >= SystemFunctions::SC_ADMINISTRATOR && $player->staff_level < SystemFunctions::SC_HEAD_ADMINISTRATOR) {
 					throw new Exception("You cannot delete other admins!");
 				}
 				if(!isset($_POST['confirm'])) {

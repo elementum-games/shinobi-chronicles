@@ -9,7 +9,6 @@ Algorithm:	See master_plan.html
 */
 
 function userSettings() {
-	require("variables.php");
 	global $system;
 	
 	global $player;
@@ -17,7 +16,7 @@ function userSettings() {
 	global $self_link;
 	$max_journal_length = 1000;
 	// Forbidden seal increase
-	if($player->forbidden_seal or $player->staff_level >= $SC_HEAD_MODERATOR) {
+	if($player->forbidden_seal or $player->staff_level >= SystemFunctions::SC_HEAD_MODERATOR) {
 		$max_journal_length = 2000;
 	}
 	
@@ -76,7 +75,7 @@ function userSettings() {
 			
 			$password = $new_password;
 			
-			if(strlen($password) < $min_password_length) {
+			if(strlen($password) < User::MIN_PASSWORD_LENGTH) {
 				throw new Exception("Please enter a password longer than 3 characters!");
 			}
 			
@@ -164,7 +163,7 @@ function userSettings() {
 			else {
 				$blacklist_user = $system->db_fetch($result);
 			}
-			if($blacklist_user['staff_level'] >= $SC_MODERATOR) {
+			if($blacklist_user['staff_level'] >= SystemFunctions::SC_MODERATOR) {
 				throw new Exception("You are unable to blacklist staff members!");
 			}
 			if($player->user_id == $blacklist_user['user_id']) {
@@ -343,7 +342,7 @@ function userSettings() {
 		$i = 0;
 		foreach ($player->blacklist as $id => $name) {
 			$i++;
-			$list .= "<a href='$members_link&user={$name['user_name']}'>{$name['user_name']}</a><sup>(<a href='$self_link&blacklist_remove=$id'>x</a>)</sup>";
+			$list .= "<a href='{$system->links['members']}&user={$name['user_name']}'>{$name['user_name']}</a><sup>(<a href='$self_link&blacklist_remove=$id'>x</a>)</sup>";
 			if(count($player->blacklist) > $i) {
 				$list .= ", ";
 			}

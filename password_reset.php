@@ -1,18 +1,17 @@
 <?php
 session_start();
 
-require("variables.php");
-if(isset($_SESSION['user_id'])) {
-	header("Location: $link");
-	exit;
-}
-
 require_once("classes.php");
 $system = new SystemFunctions();
+if(isset($_SESSION['user_id'])) {
+    header("Location: {$system->link}");
+    exit;
+}
+
 $system->dbConnect();
 
 // Start display
-require("layout/" . $DEFAULT_LAYOUT . ".php");
+require("layout/" . SystemFunctions::DEFAULT_LAYOUT . ".php");
 echo $heading;
 echo $top_menu;
 echo $header;

@@ -4,7 +4,6 @@ if(!isset($_SESSION['user_id'])) {
 	echo "<!--LOGOUT-->";
 	exit;
 }
-require("variables.php");
 require_once("classes.php");
 $system = new SystemFunctions();
 $player = new User($_SESSION['user_id']);
