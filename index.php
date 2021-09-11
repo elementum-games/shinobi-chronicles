@@ -161,6 +161,9 @@ else {
 	$layout = $player->layout;
 }
 switch($layout) {
+  case 'cextralite':
+		require("layout/cextralite.php");
+		break;
 	case 'classic_blue':
 		require("layout/classic_blue.php");
 		break;

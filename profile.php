@@ -153,7 +153,8 @@ function userProfile() {
 		if($player->forbidden_seal) {
 			$avatar_size = '175px';
 		}
-		echo "<table class='table'>
+		echo "<table class='profile_table table'>
+
 		<tr><td style='width:50%;text-align:center;'>
 		<span style='font-size:1.3em;font-family:\"tempus sans itc\";font-weight:bold;'>" . $player->user_name . "</span><br />
 		<img src='{$player->avatar_link}' style='margin-top:5px;max-width:$avatar_size;max-height:$avatar_size;' /><br />
@@ -194,6 +195,7 @@ function userProfile() {
 		if($player->battle_id or isset($_SESSION['ai_id'])) {
 			$regen_cut = round(($player->regen_rate + $player->regen_boost) * 0.7, 1);
 		}
+
 		if($player->regen_boost) {
 			echo " (+" . $player->regen_boost . ") " . ($regen_cut ? "<span style='color:#8A0000;'>(-{$regen_cut})</span> " : "") .
 			"-> <span style='color:#00C000;'>" . ($player->regen_rate + $player->regen_boost - $regen_cut) . "</span>";
@@ -240,6 +242,7 @@ function userProfile() {
 		<label style='width:$label_width;'>Location:</label> $player->location<br />
 		<label style='width:$label_width;'>Money:</label> &yen;" . $player->money . "<br />
 		<label style='width:$label_width;'>Ancient Kunai:</label> " . $player->premium_credits . "<br />
+		<label style='width:$label_width;'>Ancient Kunai purchased:</label> " . $player->premium_credits_purchased . "<br /> 
 		
 		<br />
 		<label style='width:$label_width;'>PvP wins:</label>		$player->pvp_wins<br />
@@ -273,5 +276,3 @@ function userProfile() {
 		</td></tr></table>";
 	}
 }
-
-?>

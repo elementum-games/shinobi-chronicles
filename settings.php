@@ -21,7 +21,10 @@ function userSettings() {
 	}
 	
 	$layouts = array('shadow_ribbon', 'geisha', 'classic_blue');
-	
+	if($system->environment == 'dev') {
+	  $layouts[] = 'cextralite';
+	}
+
 	if($_POST['change_avatar']) {
 		$avatar_link = trim($_POST['avatar_link']);
 		try {
@@ -365,4 +368,3 @@ function userSettings() {
 	echo "</tr></table>";
 	
 }
-
