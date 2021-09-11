@@ -166,7 +166,7 @@ function chat() {
 			echo "<tr><td colspan='2' style='text-align:center;'>No posts!</td></tr>";
 		}
 		while($post = $system->db_fetch($result)) {
-			$user_result = $system->query("SELECT `premium_credits_purchased`, `avatar_link` FROM `users` 
+			$user_result = $system->query("SELECT `premium_credits_purchased`, `avatar_link` FROM `users`
                 WHERE `user_name` = '{$system->clean($post['user_name'])}'");
 			$userData = $system->db_fetch($user_result);
 
@@ -203,7 +203,7 @@ function chat() {
 							<p style='margin: 1px 0 3px;'>
                                 <img src='./images/village_icons/" . strtolower($post['village']) . ".png' alt='{$post['village']} Village'
                                     style='max-width:20px;max-height:20px;vertical-align:text-bottom;'  title='{$post['village']} Village' /> " .
-                            stripslashes($post['title']) . "</p>                              
+                            stripslashes($post['title']) . "</p>
 						</div>
 					</div>";
 
@@ -212,7 +212,7 @@ function chat() {
                         echo "<p class='staffMember' style='background-color: {$color['staffColor']}'>{$color['staffBanner']}</p>";
                     }
                 echo "</td>
-				<td style='text-align:center;padding:4px;white-space:pre-wrap;'>" .
+				<td class='chatmsg'style='text-align:center;padding:4px;white-space:pre-wrap;'>" .
 					wordwrap($system->html_parse(stripslashes($post['message']), false, true), 60, "\n", true) . "</td>";
 				$post_time = time() - $post['time'];
 				$post_minutes = ceil($post_time / 60);
