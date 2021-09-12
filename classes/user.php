@@ -872,7 +872,7 @@ class User {
 						"<span id='trainingTimer'>" . timeRemaining($this->train_time - time(), 'short', false, true) . " remaining</span></p>";
 					$display .= "<script type='text/javascript'>
 					let train_time = " . ($this->train_time - time()) . ";
-          setTimeout(()=>{titleBarFlash();}, train_time * 995);
+          setTimeout(()=>{titleBarFlash();}, train_time * 1000);
 					</script>";
 				}
 			}
