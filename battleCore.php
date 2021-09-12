@@ -563,41 +563,16 @@ function battleAI(&$player, &$opponent) {
 
 				/******BATTLE TEXT******/
 				//set player jutsu text color
-				$jutsu_color = "black";
-				switch ($jutsu['jutsu_type']) {
-					case 'ninjutsu':
-						$jutsu_color = "blue";
-						break;
-					case 'taijutsu':
-						$jutsu_color = "red";
-						break;
-					case 'genjutsu':
-						$jutsu_color = "purple";
-						break;
-					case 'none':
-						break;
-				}
+				$jutsu_color = getJutsuTextColor($jutsu['jutsu_type']);
+
 				//set opponent jutsu text color
-				$opponent_jutsu_color = "black";
-				switch ($opponent_jutsu['jutsu_type']) {
-					case 'ninjutsu':
-						$opponent_jutsu_color = "blue";
-						break;
-					case 'taijutsu':
-						$opponent_jutsu_color = "red";
-						break;
-					case 'genjutsu':
-						$opponent_jutsu_color = "purple";
-						break;
-					case 'none':
-						break;
-				}
+				$opponent_jutsu_color = getJutsuTextColor($opponent_jutsu['jutsu_type']);
 
 				// Set display text
 				$battle_text .= $jutsu['battle_text'];
 				if($jutsu['jutsu_type'] != 'genjutsu' && !$jutsu['effect_only']) {
-					$battle_text .= "<p style='font-weight:bold;'>$player->user_name} does
-					<p style='display:inline;color:{$jutsu_color}'>{$player_damage} damage</p>
+					$battle_text .= "<p style='font-weight:bold;'>
+                        {$player->user_name} does <span style='color:{$jutsu_color}'>{$player_damage} damage</span>
 					to {$opponent->name}.</p>";
 
 				}
@@ -610,7 +585,7 @@ function battleAI(&$player, &$opponent) {
 				$battle_text .= "<hr />" . $opponent->name . ' ' . $opponent_jutsu['battle_text'];
 				if($opponent_jutsu['jutsu_type'] != 'genjutsu') {
 					$battle_text .= "<p style='font-weight:bold;'>{$opponent->name} does
-					<p style=' display:inline; color:{$opponent_jutsu_color}'>{$opponent_damage} damage</p>
+					    <span style='color:{$opponent_jutsu_color}'>{$opponent_damage} damage</span>
 					to {$player->user_name}.</p>";
 
 				}
@@ -657,9 +632,11 @@ function battleAI(&$player, &$opponent) {
 					$battle_text .= $player_effect_display;
 				}
 				$battle_text .= "<hr />" . $opponent->name . ' ' . $opponent_jutsu['battle_text'];
+
+				$opponent_jutsu_color = getJutsuTextColor($opponent_jutsu['jutsu_type']);
 				if($opponent_jutsu['jutsu_type'] != 'genjutsu') {
 					$battle_text .= "<p style='font-weight:bold;'>{$opponent->name} does
-					<p style='display: inline;color: {$opponent_jutsu_color}'>{$opponent_damage} damage</p>
+					    <span style='color: {$opponent_jutsu_color}'>{$opponent_damage} damage</span>
 					to {$player->user_name}.</p>";
 
 				}
@@ -2620,6 +2597,20 @@ function applyActiveEffects(&$target, &$attacker, &$effect, &$effect_display, &$
 		$winner = $attacker->id;
 	}
 	return false;
+}
+
+function getJutsuTextColor($jutsu_type) {
+    switch ($jutsu_type) {
+        case 'ninjutsu':
+            return "blue";
+        case 'taijutsu':
+            return "red";
+        case 'genjutsu':
+            return "purple";
+        case 'none':
+        default:
+            return "black";
+    }
 }
 
 function runTurnEffects() {
