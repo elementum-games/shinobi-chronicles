@@ -172,7 +172,7 @@ function travel() {
 
 
     echo "<div class='travelContainer'>
-        <div class='mapContainer'>" . renderMap($player, $icons) . "</div>
+        <div class='mapContainer'>" . renderMap($player, $villages, $icons) . "</div>
         <a class='travelButton north' href='$self_link&travel=north'><span class='upArrow'></span></a>
         <a class='travelButton west' href='$self_link&travel=west'><span class='leftArrow'></span></a>
         <a class='travelButton east' href='$self_link&travel=east'><span class='rightArrow'></span></a>
@@ -188,7 +188,7 @@ function travel() {
 }
 
 
-function renderMap($player, $icons) {
+function renderMap($player, $villages, $icons) {
     $output = "";
     $output .= "<table class='map' 
             style='padding:0;border:1px solid #000;border-collapse:collapse;border-spacing:0;border-radius:0;'>";
