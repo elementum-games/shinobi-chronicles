@@ -8,7 +8,7 @@ Purpose:	Functions for scouting and links to initiating combat
 Algorithm:	See master_plan.html
 */
 
-function scoutArea() {
+function scoutArea($in_existing_table = false) {
 	global $system;
 
 	global $player;
@@ -49,11 +49,24 @@ function scoutArea() {
 	
 	// Search box for individual users
 	// List top 10 users by experience
-	echo "<table class='table'><tr><th>Scout Area (Scout Range: $player->scout_range squares)</th></tr>
-	<tr><td style='text-align:center;'>
-	You can view other ninja within your scout range here. You can also attack or issue spar challenges if allowed.
-	</td></tr></table>
-	<table class='table'><tr>
+    $colspan_attr = '';
+    if(!$in_existing_table) {
+        echo "<table class='table'>";
+    }
+    else {
+        $colspan_attr = " colspan='5'";
+    }
+
+	echo "<tr><th {$colspan_attr}>Scout Area (Scout Range: $player->scout_range squares)</th></tr>";
+
+    if(!$in_existing_table) {
+        echo "<tr><td style='text-align:center;'>
+        You can view other ninja within your scout range here. You can also attack or issue spar challenges if allowed.
+        </td></tr></table>
+        <table class='table'>";
+    }
+
+    echo "<tr>
 		<th style='width:28%;'>Username</th>
 		<th style='width:20%;'>Rank</th>
 		<th style='width:17%;'>Village</th>
@@ -87,27 +100,29 @@ function scoutArea() {
 				echo "&nbsp;</td>
 			</tr>";
 		}
-		echo "</table>";	
-		
-		// Pagination
-		echo "<p style='text-align:center;'>";
-		if($min > 0) {
-			$prev = $min - $users_per_page;
-			if($prev < 0) {
-				$prev = 0;
-			}
-			echo "<a href='$self_link&min=$prev'>Previous</a>";
-		}
-		
-		if($min + $users_per_page < count($users)) {
-			if($min > 0) {
-				echo "&nbsp;&nbsp;|&nbsp;&nbsp;";
-			}
-			$next = $min + $users_per_page;
-			echo "<a href='$self_link&min=$next'>Next</a>";
-		}
-		echo "</p>";
+
+		if(!$in_existing_table) {
+            echo "</table>";
+
+            // Pagination
+            echo "<p style='text-align:center;'>";
+            if($min > 0) {
+                $prev = $min - $users_per_page;
+                if($prev < 0) {
+                    $prev = 0;
+                }
+                echo "<a href='$self_link&min=$prev'>Previous</a>";
+            }
+
+            if($min + $users_per_page < count($users)) {
+                if($min > 0) {
+                    echo "&nbsp;&nbsp;|&nbsp;&nbsp;";
+                }
+                $next = $min + $users_per_page;
+                echo "<a href='$self_link&min=$next'>Next</a>";
+            }
+            echo "</p>";
+        }
 	}
 	
 }
-?>

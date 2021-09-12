@@ -153,10 +153,11 @@ function travel() {
 	
 	</script>";
 	
-	echo "<table class='table' style='width:98%;'><tr><th>Your location: {$player->location}" .
+	echo "<table class='table' style='width:98%;'>
+    <tr><th colspan='5'>Your location: {$player->location}" .
 	(isset($villages[$player->location]) ? " (" . $villages[$player->location]['name'] . " Village)" : "") .
 	"</th></tr>
-	<tr><td style='text-align:center;'>";
+	<tr><td colspan='5' style='text-align:center;'>";
 	if($player->mission_id) {
 		if($player->mission_stage['action_type'] == 'travel' or $player->mission_stage['action_type'] == 'search') {
 			if($player->location == $player->mission_stage['action_data']) {
@@ -178,12 +179,11 @@ function travel() {
         <a class='travelButton south' href='$self_link&travel=south'><span class='downArrow'></span></a>
     </div>";
 	echo "</td></tr>";
-	
-	echo "<tr><td style='text-align:center;'>
-	
-	
-	</td></tr>
-	</table>";
+
+	require("scoutArea.php");
+	scoutArea(true);
+
+	echo "</table>";
 
 }
 
