@@ -529,4 +529,68 @@ class SystemFunctions {
         return password_verify($password, $hash);
     }
 
+    public function renderStaticPageHeader() {
+        switch(SystemFunctions::DEFAULT_LAYOUT) {
+            case 'cextralite':
+                require("layout/cextralite.php");
+                break;
+            case 'classic_blue':
+                require("layout/classic_blue.php");
+                break;
+            case 'geisha':
+                require("layout/geisha.php");
+                break;
+            case 'shadow_ribbon':
+            default:
+                require("layout/shadow_ribbon.php");
+                break;
+        }
+
+        /**
+         * @var $heading
+         * @var $top_menu
+         * @var $header
+         * @var $body_start
+         */
+
+        echo $heading;
+        echo $top_menu;
+        echo $header;
+        echo str_replace("[HEADER_TITLE]", "Rules", $body_start);
+    }
+
+    public function renderStaticPageFooter() {
+        switch(SystemFunctions::DEFAULT_LAYOUT) {
+            case 'cextralite':
+                require("layout/cextralite.php");
+                break;
+            case 'classic_blue':
+                require("layout/classic_blue.php");
+                break;
+            case 'geisha':
+                require("layout/geisha.php");
+                break;
+            case 'shadow_ribbon':
+            default:
+                require("layout/shadow_ribbon.php");
+                break;
+        }
+
+        /**
+         * @var $side_menu_start
+         * @var $side_menu_end
+         *
+         * @var $login_menu
+         * @var $footer
+         */
+        if(isset($_SESSION['user_id'])) {
+            echo $side_menu_start;
+            echo $side_menu_end;
+        }
+        else {
+            echo $login_menu;
+        }
+
+        echo str_replace('<!--[VERSION_NUMBER]-->', SystemFunctions::VERSION_NUMBER, $footer);
+    }
 }

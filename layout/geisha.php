@@ -5,7 +5,7 @@
 /** @noinspection HtmlUnknownTarget */
 $heading = <<<HTML
 <!doctype HTML public>
-<html>
+<html lang="en">
 <head>
 	<title>Shinobi Chronicles RPG</title>
 	<link rel='stylesheet' type='text/css' href='./style/geisha/geisha.css' />

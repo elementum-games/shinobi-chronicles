@@ -12,7 +12,7 @@ Purpose:	Contains variables for layout HTML sections: Header, menus, footer
 /** @noinspection HtmlUnknownTarget */
 $heading = <<<HTML
 <!doctype HTML public>
-<html>
+<html lang="en">
 <head>
 	<title>Shinobi Chronicles</title>
 	<link rel='stylesheet' type='text/css' href='./style/classic_blue/style.css' />
