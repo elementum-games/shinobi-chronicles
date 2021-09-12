@@ -909,7 +909,7 @@ function battlePvP(&$player, &$opponent, &$battle) {
     while($row = $system->db_fetch($result)) {
         $default_attacks[$row['jutsu_id']] = $row;
     }
-    $turn_length = 60;
+    $turn_length = 40;
 
 	// If turn is still active and user hasn't submitted their move, check for action
 	if((time() - $battle['turn_time'] < $turn_length) && (!$battle[$battle['player_side'] . '_action'])) {
