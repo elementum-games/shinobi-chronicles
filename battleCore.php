@@ -596,9 +596,10 @@ function battleAI(&$player, &$opponent) {
 				// Set display text
 				$battle_text .= $jutsu['battle_text'];
 				if($jutsu['jutsu_type'] != 'genjutsu' && !$jutsu['effect_only']) {
-					$battle_text .= " {$player->user_name} does
+					$battle_text .= "<p style='font-weight:bold;'>$player->user_name} does
 					<p style='display:inline;color:{$jutsu_color}'>{$player_damage} damage</p>
-					to {$opponent->name}.<br />";
+					to {$opponent->name}.</p>";
+
 				}
 				if($player_effect_display) {
 					$battle_text .= $player_effect_display;
