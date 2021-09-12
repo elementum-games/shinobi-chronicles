@@ -706,3 +706,106 @@ br.clear {
 	clear:both;
 	margin:0px;
 }
+
+/* Travel */
+.upArrow, .leftArrow, .rightArrow, .downArrow {
+    display: inline-block;
+    height:32px;
+    width:32px;
+    margin:0px;
+    background-size: 100%;
+    background-repeat: no-repeat;
+}
+
+.upArrow {
+    background-image: url(../../images/icons/up.png);
+}
+.upArrow:hover {
+    background-image: url(../../images/icons/up_hover.png);
+}
+
+.leftArrow {
+    background-image: url(../../images/icons/left.png);
+}
+.leftArrow:hover {
+    background-image: url(../../images/icons/left_hover.png);
+}
+
+.downArrow {
+    background-image: url(../../images/icons/down.png);
+}
+.downArrow:hover {
+    background-image: url(../../images/icons/down_hover.png);
+}
+
+.rightArrow {
+    background-image: url(../../images/icons/right.png);
+}
+.rightArrow:hover {
+    background-image: url(../../images/icons/right_hover.png);
+}
+
+:root {
+    --travel-button-size: 40px;
+}
+
+.travelContainer {
+    width: 600px;
+    height: 385px;
+    position: relative;
+
+    /* Match content size to mapContainer, but pad */
+    padding: var(--travel-button-size);
+}
+.mapContainer {
+    width: 600px;
+    height: 385px;
+}
+
+.travelButton {
+    position: absolute;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0,0,0,0.1);
+}
+.travelButton:hover {
+    background: rgba(0,0,0,0.2);
+}
+.north {
+    left: var(--travel-button-size);
+    right: var(--travel-button-size);
+    top: 0;
+    height: var(--travel-button-size);
+
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+}
+.east {
+    width: var(--travel-button-size);
+    right: 0;
+    top: var(--travel-button-size);
+    bottom: var(--travel-button-size);
+
+    border-top-right-radius: 10px;
+    border-bottom-right-radius: 10px;
+}
+.west {
+    left: 0;
+    width: var(--travel-button-size);
+    top: var(--travel-button-size);
+    bottom: var(--travel-button-size);
+
+    border-top-left-radius: 10px;
+    border-bottom-left-radius: 10px;
+}
+.south {
+    left: var(--travel-button-size);
+    right: var(--travel-button-size);
+    height: var(--travel-button-size);
+    bottom: 0;
+
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
+}
