@@ -1,6 +1,8 @@
 <?php
 session_start();
 
+require "classes/system.php";
+
 switch(SystemFunctions::DEFAULT_LAYOUT) {
     case 'classic_blue':
         require("layout/classic_blue.php");
@@ -16,7 +18,7 @@ switch(SystemFunctions::DEFAULT_LAYOUT) {
 echo $heading;
 echo $top_menu;
 echo $header;
-echo str_replace("[HEADER_TITLE]", "Rules", $body_start);
+echo str_replace("[HEADER_TITLE]", "Manual", $body_start);
 
 ?>
 
