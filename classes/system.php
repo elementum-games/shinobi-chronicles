@@ -530,6 +530,8 @@ class SystemFunctions {
     }
 
     public function renderStaticPageHeader() {
+        $system = $this;
+
         switch(SystemFunctions::DEFAULT_LAYOUT) {
             case 'cextralite':
                 require("layout/cextralite.php");
@@ -560,6 +562,8 @@ class SystemFunctions {
     }
 
     public function renderStaticPageFooter() {
+        $system = $this;
+
         switch(SystemFunctions::DEFAULT_LAYOUT) {
             case 'cextralite':
                 require("layout/cextralite.php");
