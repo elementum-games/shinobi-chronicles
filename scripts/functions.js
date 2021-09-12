@@ -8,7 +8,8 @@ var totalNotifications = 0;
 function titleBarFlash() {
 	setInterval(()=>
 	{
-		document.title = document.title == "Training Done!" ? "" : "Training Done!";
+		document.title = document.title == "Training Done!" ? "Shinobi Chronicles RPG" : "Training Done!";
+
 	}, 2000);
 }
 
