@@ -5,12 +5,19 @@ function selectAllMessages() {
 var currentNotification = 0;
 var totalNotifications = 0;
 
+function titleBarFlash() {
+	setInterval(()=>
+	{
+		document.title = document.title == "Training Done!" ? "" : "Training Done!";
+	}, 2000);
+}
+
 function slideNotificationRight() {
 	totalNotifications = $('#notificationSlider p.notification').length;
 	if(currentNotification >= totalNotifications - 1) {
 		return false;
 	}
-	
+
 	$('p.notification[data-notification-id=\"' + currentNotification + '\"]').hide({
 		'effect': 'slide',
 		'direction': 'left',
@@ -29,7 +36,7 @@ function slideNotificationLeft() {
 	if(currentNotification == 0) {
 		return false;
 	}
-	
+
 	$('p.notification[data-notification-id=\"' + currentNotification + '\"]').hide({
 		'effect': 'slide',
 		'direction': 'right',
@@ -42,5 +49,5 @@ function slideNotificationLeft() {
 				'duration': 200
 			});
 		}
-	});	
+	});
 }
