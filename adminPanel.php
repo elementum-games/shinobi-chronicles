@@ -2667,19 +2667,28 @@ function giveBloodline($bloodline_id, $user_id, $display = true) {
 		}
 		$result = $system->query("SELECT `exp`, `bloodline_skill` FROM `users` WHERE `user_id`='$user_id' LIMIT 1");
 		$result = $system->db_fetch($result);
+		$new_exp = $result['exp'];
+		$new_bloodline_skill = $result['bloodline_skill'];
 		if($result['bloodline_skill'] > 10) {
-			$result['exp'] -= ($result['bloodline_skill'] - 10) * 10;
-			$result['bloodline_skill'] = 10;
-		}		
-		$query = "UPDATE `users` SET `bloodline_id`='$bloodline_id', `bloodline_name`='{$bloodline['name']}', `bloodline_skill`=10 
+		    $bloodline_skill_reduction = ($result['bloodline_skill'] - 10) * Bloodline::SKILL_REDUCTION_ON_CHANGE;
+			$new_exp -= $bloodline_skill_reduction * 10;
+			$new_bloodline_skill -= $bloodline_skill_reduction;
+		}
+
+		$query = "UPDATE `users` SET 
+            `bloodline_id`='$bloodline_id', 
+            `bloodline_name`='{$bloodline['name']}', 
+            `bloodline_skill`='{$new_bloodline_skill}',
+            `exp`='{$new_exp}'
 			WHERE `user_id`='$user_id' LIMIT 1";
+
 		$system->query($query);
 		if($user_id == $_SESSION['user_id']) {
 			global $player;
 			$player->bloodline_id = $bloodline_id;
 			$player->bloodline_name = $bloodline['name'];
-			$player->exp = $result['exp'];
-			$player->bloodline_skill = $result['bloodline_skill'];
+			$player->exp = $new_exp;
+			$player->bloodline_skill = $new_bloodline_skill;
 		}
 	}
 	else {
@@ -2690,4 +2699,3 @@ function giveBloodline($bloodline_id, $user_id, $display = true) {
 	}
 	return true;
 }
-?>

@@ -17,6 +17,8 @@ function levelUp() {
 	
 	if($player->level < $player->max_level) {
 		$player->level++;
+		$player->exp = $player->total_stats * 10;
+
 		$player->max_health += $player->health_gain;
 		$player->max_chakra += $player->pool_gain;
 		$player->max_stamina += $player->pool_gain;

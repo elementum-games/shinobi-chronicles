@@ -244,6 +244,8 @@ class AI {
 /* Class:		Bloodline
 */
 class Bloodline {
+    const SKILL_REDUCTION_ON_CHANGE = 0.5;
+
 	public $bloodline_id;
 	public $id;
 	public $name;
