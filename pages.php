@@ -126,7 +126,7 @@ $pages = [
     // Village Menu
     8 => [
         'file_name' => 'store.php',
-        'title' => 'Academy',
+        'title' => 'Shop',
         'function_name' => 'store',
         'village_ok' => 2,
         'menu' => SystemFunctions::MENU_VILLAGE,
