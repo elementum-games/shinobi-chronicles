@@ -27,7 +27,7 @@ function healingShop() {
 	$healing['deluxe']['cost'] = $player->rank * 40;
 	$healing['deluxe']['amount'] = $health[$player->rank] * 0.8;
 
-	if($_GET['heal']) {
+	if(isset($_GET['heal'])) {
 		try {
 			$heal = $system->clean($_GET['heal']);
 			if(!isset($healing[$heal])) {
@@ -35,6 +35,9 @@ function healingShop() {
 			}
 			if($player->money < $healing[$heal]['cost']) {
 				throw new Exception("You do not have enough money!");
+			}
+          	if($player->health >= $player->max_health) {
+				throw new Exception("Your health is already maxed out!");
 			}
 			$player->money -= $healing[$heal]['cost'];
 			$player->health += $healing[$heal]['amount'];
