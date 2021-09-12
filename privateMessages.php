@@ -22,7 +22,9 @@ class Messaging {
 		SEAL_INBOX_LIMIT = 75,
 		STAFF_INBOX_LIMIT = 100;
 
-	private
+	public $message_id;
+
+    private
 		$Messages,
 		$Users,
 		$constraints = [],
@@ -130,19 +132,19 @@ class Messaging {
 	function deleteMessage($msg_id = false) {
 
 		if($msg_id) {
-
 			$this->system->query(sprintf("UPDATE `private_messages` SET `message_read` = 2 WHERE `message_id` IN(%s) AND `recipient`='%d'", $msg_id, $this->player->user_id));
 			$this->inbox();
-
 		}
-
 		else {
-
 			if(!$this->message_id) {
-				if( is_array($_POST['message_id']) ) {
+				if( !empty($_POST['message_id']) && is_array($_POST['message_id']) ) {
 					$this->message_id = implode(",", $_POST['message_id']);
 					$this->message_id = $this->system->clean($this->message_id);
 				}
+				else {
+				    $this->system->error("You have no messages selected!");
+				    return;
+                }
 			}
 
 			$this->system->query(sprintf("UPDATE `private_messages` SET `message_read` = 2 WHERE `message_id` IN(%s) AND `recipient`='%d'", $this->message_id, $this->player->user_id));
@@ -151,9 +153,7 @@ class Messaging {
 			$this->inbox();
 			$this->system->message($message);
 			$this->system->printMessage();
-
 		}
-
 
 	}
 
@@ -442,11 +442,6 @@ class Messaging {
 
 }
 
-
-
-
-
-
 function privateMessages() {
 	/*
 	-send messages
@@ -504,4 +499,3 @@ function privateMessages() {
 
 }
 
-?>

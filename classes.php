@@ -262,7 +262,7 @@ class Bloodline {
 			return false;
 		}
 		$this->bloodline_id = $system->clean($bloodline_id);
-		$this->id = 'BL' . $this->user_id;
+		// $this->id = 'BL' . $this->user_id;
 			
 		$result = $system->query("SELECT * FROM `bloodlines` WHERE `bloodline_id`='$this->bloodline_id' LIMIT 1");
 		if(mysqli_num_rows($result) == 0) {

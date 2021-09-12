@@ -289,11 +289,22 @@ class SystemFunctions {
 
         $this->message($message);
         $this->printMessage();
+
         global $side_menu_start;
         global $side_menu_end;
         global $footer;
 
-        echo $side_menu_start . $side_menu_end . $footer;
+        $pages = require 'pages.php';
+
+        echo $side_menu_start;
+        foreach($pages as $id => $page) {
+            if(!isset($page['menu']) || $page['menu'] != SystemFunctions::MENU_USER) {
+                continue;
+            }
+
+            echo "<li><a href='{$this->link}?id=$id'>" . $page['title'] . "</a></li>";
+        }
+        echo $side_menu_end . $footer;
         exit;
     }
 

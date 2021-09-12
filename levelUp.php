@@ -372,6 +372,7 @@ function rankUp() {
 							$clan_name = $result['name'];
 							$player->clan = array();
 							$player->clan['id'] = $bloodlines[$bloodline_id]['clan_id'];
+							$player->clan_office = 0;
 						}
 						
 						// Give bloodline

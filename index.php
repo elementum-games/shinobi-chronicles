@@ -234,26 +234,7 @@ if($LOGGED_IN) {
 		}
 		exit;
 	}
-	/*
-	1: Profile
-	2: Inbox
-	3: Settings
-	4: Equip
-	6: Home
-	7: Members
-	8: Tavern
-	9: Shop
-	5: Village HQ
-	10: Training
-	11: Arena
-	12: Ramen Shop
-	13: Travel
-	14: Scout Area
-	15: Mod panel
-	16: Admin panel
-	17: Report
-	18: Combat
-	*/
+
 	// Notifications
 	if(!$ajax) {
 		require("notifications.php");
@@ -531,35 +512,8 @@ else {
 	}	
 	require("news.php");
 	newsPosts();
-	if($system->environment == 'prod') {
-		$captcha = "
-		<script type='text/javascript'>
-		function captchaReload() {
-			$('#captchaImage').fadeOut(function(){
-				$('#captchaImage').attr('src', './securimage/securimage_show.php?' + Math.random());
-				$('#captchaImage').fadeIn();
-				$('#captchaPlayButton').hide();
-			});
-		}
-		function captchaPlay() {
-			var x=document.getElementById(\"captchaAudio\");
-			x.play();
-		}
-		</script>
-		<!-- <img id='captchaImage' style='width:150px;height:40px;' src='./securimage/securimage_show.php' /><br />	
-		<img id='captchaPlayButton' src='./images/sound_icon.png' style='height:24px;width:24px;' 
-			onclick='captchaPlay();' />
-		<img src='./images/reload_icon.png' style='height:24px;width:24px;'
-			onclick='captchaReload();' />
-		<audio id='captchaAudio'>
-			<source src='./securimage/securimage_play.php' type='audio/wav'>
-		</audio>
-		<br />
-		<input type='text' name='login_code' /><br />-->";
-	}
-	else {
-		$captcha = '';
-	}
+
+    $captcha = '';
 	echo str_replace('<!--CAPTCHA-->', $captcha, $login_menu);
 }
 if(!$ajax) {
@@ -569,4 +523,4 @@ if(!$ajax) {
 		array(SystemFunctions::VERSION_NUMBER, $page_load_time),
 	$footer);
 }
-?>
+

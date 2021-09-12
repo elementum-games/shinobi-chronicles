@@ -55,7 +55,7 @@ function userProfile() {
 			echo "<p style='text-align:center;font-style:italic;'>
 				You must be out of battle and in your village to rank up.</p>";
 		}
-		else if($_GET['rankup']) {
+		else if(!empty($_GET['rankup'])) {
 			require("levelUp.php");
 			rankUp();
 			return true;
