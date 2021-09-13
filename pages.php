@@ -128,7 +128,7 @@ $pages = [
         'function_name' => 'villageHQ',
         'village_ok' => 2,
         'menu' => SystemFunctions::MENU_VILLAGE,
-    ],
+    ], 
     21 => [
         'file_name' => 'premium.php',
         'title' => 'Ancient Market',
