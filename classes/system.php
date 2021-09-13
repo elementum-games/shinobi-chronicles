@@ -226,7 +226,13 @@ class SystemFunctions {
     */
     public function printMessage($force_display = false) {
         if(strlen($this->message) && (!$this->message_displayed || $force_display)) {
-            echo "<p class='systemMessage'>$this->message</p>";
+
+            $temp_msg = <<<HTML
+            <p class='systemMessage'> {$this->message} </p>
+            HTML;
+
+            echo $temp_msg;
+
             $this->message = '';
             $this->message_displayed = true;
             return true;
