@@ -27,7 +27,7 @@ function chat() {
 
 	// Validate post and submit to DB
     $chat_max_post_length = SystemFunctions::CHAT_MAX_POST_LENGTH;
-	if($_POST['post']) {
+	if(isset($_POST['post'])) {
 		//If user has seal or is of staff, give them their words
 		$chat_max_post_length += ($player->forbidden_seal || $player->staff_level >= SystemFunctions::SC_MODERATOR) ? 100 : 0;
 		$message = $system->clean(stripslashes(trim($_POST['post'])));
@@ -74,7 +74,7 @@ function chat() {
 		}
 		$system->printMessage();
 	}
-	else if($_GET['delete'] && $player->staff_level >= SystemFunctions::SC_MODERATOR) {
+	else if(isset($_GET['delete']) && $player->staff_level >= SystemFunctions::SC_MODERATOR) {
 		$delete = (int) $system->clean($_GET['delete']);
 		$result = $system->query("DELETE FROM `chat` WHERE `post_id` = $delete LIMIT 1");
 		$return_message = ($system->db_affected_rows) ? "Post deleted!" : "Error deleting post!";
@@ -83,7 +83,7 @@ function chat() {
 	}
 	$min = 0;
 	$max_posts = 15;
-	if($_GET['min']) {
+	if(isset($_GET['min'])) {
 		$min = $system->clean($_GET['min']);
 		if(!is_numeric($min)) {
 			$min = 0;

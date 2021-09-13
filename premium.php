@@ -935,6 +935,12 @@ function premium() {
 			<tr><td style='text-align:center;'>A researcher from the village will implant another clan's DNA into 
 			you in exchange for Ancient Kunai, allowing you to use a new bloodline" . 
 				($player->bloodline_id ? ' instead of your own' : '') . ".<br /><br />";
+			if($player->bloodline_skill > 10) {
+			    echo "<b>Warning: Your bloodline skill will be reduced by " . (Bloodline::SKILL_REDUCTION_ON_CHANGE * 100) . "% as you must 
+                   re-adjust to your new bloodline!</b><br />";
+            }
+			echo "<br />";
+
 			$result = $system->query("SELECT `bloodline_id`, `name`, `rank`
 				FROM `bloodlines` WHERE `rank` < 5 ORDER BY `rank` ASC");
 			if($system->db_num_rows == 0) {

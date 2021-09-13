@@ -19,8 +19,9 @@ Recommended workflow
      - Then when you want to update your local, run
        - `git pull upstream main`
    - For GUI
-     - You should see a prompt on the main page of your fork repository when it's behind, with a button to click (Image TBD)
-
+     - Click the "Fetch upstream" prompt on the GitHub page for your fork
+       - ![image](https://i.imgur.com/cQJ0zGc.png) 
+     - Pull the changes from your GitHub fork to your local
 
 
 ### Local Setup
