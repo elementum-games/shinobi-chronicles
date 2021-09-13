@@ -1948,6 +1948,89 @@ function movePrompt($player, $default_attacks) {
 		echo "</th></tr>
 		<tr><td colspan='2'>
 		<div id='jutsu'>";
+
+		// Keyboard hotkeys
+		echo "<script type='text/javascript'>
+		var nin = 78;
+		var gen = 71;
+		var tai = 84;
+		var bl = 66;
+		var def_ault = 68;
+		var arr = [];
+
+		$(document).keyup(function(event){
+
+			//if the first array item is not a letter
+
+			if(event.which == nin) {
+				arr[0] = 'ninjutsu';
+			}
+			else if(event.which == gen) {
+				arr[0] = 'genjutsu';
+			}
+			else if(event.which == tai) {
+				arr[0] = 'taijutsu';
+			}
+			else if(event.which == bl) {
+				arr[0] = 'bloodline';
+			}
+			else if(event.which == def_ault) {
+				arr[0] = 'taijutsu'; /*default*/
+			}
+
+
+			//if first array empty
+			if(typeof(arr[0]) == null){
+				arr = [];
+			}
+
+			var key = -1;
+			switch (event.which){
+				case 48: key = 0;
+				break;
+				case 49: key = 1;
+				break;
+				case 50: key = 2;
+				break;
+				case 51: key = 3;
+				break;
+				case 52: key = 4;
+				break;
+				case 53: key = 5;
+				break;
+				case 54: key = 6;
+				break;
+				case 55: key = 7;
+				break;
+				case 56: key = 8;
+				break;
+				case 57: key = 9;
+				break;
+			}
+
+			arr[1] = key;
+
+			//create
+			var classname = arr[0] + arr[1];
+			console.log(classname + ' test input');
+
+			if(typeof(arr[0]) == 'string' && arr[1] != -1){
+
+				var classname = arr[0] + arr[1];
+				console.log(classname);
+				// console.log('key has been focused');
+
+				document.getElementById(classname).click();
+
+				// document.getElementById(classname).addClass('focused') should add this
+				// document.getElementById(enterButton).click(); input will be made after selection
+
+				console.log('selection successful');
+			}
+		});
+
+		</script>";
+
 		// Attack list
 		$jutsu_types = array('ninjutsu', 'taijutsu', 'genjutsu');
 		for($i = 0; $i < 3; $i++) {
@@ -1956,7 +2039,7 @@ function movePrompt($player, $default_attacks) {
 				if($attack['jutsu_type'] != $jutsu_types[$i]) {
 					continue;
 				}
-				echo "<span class='jutsuName {$jutsu_types[$i]}' data-handseals='" .
+				echo "<span id='{$jutsu_types[$i]}{$i}' class='jutsuName {$jutsu_types[$i]}' data-handseals='" .
 					($attack['jutsu_type'] != 'taijutsu' ? $attack['hand_seals'] : '') . "'
 					data-id='{$attack['jutsu_id']}'>" . $attack['name'] . '</span><br />';
 			}
@@ -1965,7 +2048,7 @@ function movePrompt($player, $default_attacks) {
 					if($player->jutsu[$jutsu['id']]['jutsu_type'] != $jutsu_types[$i]) {
 						continue;
 					}
-					echo "<span class='jutsuName {$jutsu_types[$i]}' data-handseals='{$player->jutsu[$jutsu['id']]['hand_seals']}'
+					echo "<span id='{$jutsu_types[$i]}{$i}'class='jutsuName {$jutsu_types[$i]}' data-handseals='{$player->jutsu[$jutsu['id']]['hand_seals']}'
 						data-id='{$jutsu['id']}'>" . $player->jutsu[$jutsu['id']]['name'] . '</span><br />';
 				}
 			}
@@ -1976,7 +2059,7 @@ function movePrompt($player, $default_attacks) {
 			echo "<p style='width:$width;margin-right:0px;'>";
 			if(!empty($player->bloodline->jutsu)) {
 				foreach($player->bloodline->jutsu as $id => $jutsu) {
-					echo "<span class='jutsuName bloodline_jutsu' data-handseals='" . $jutsu['hand_seals'] . "'" .
+					echo "<span id='bloodline{$i}' class='jutsuName bloodline_jutsu' data-handseals='" . $jutsu['hand_seals'] . "'" .
 						"data-id='$id'>" . $jutsu['name'] . '</span><br />';
 				}
 			}
@@ -2031,7 +2114,7 @@ function movePrompt($player, $default_attacks) {
 			}
 		}
 		else {
-			echo "lolwaT";
+			echo "lolwaT";//lol
 		}
 		echo "<input type='submit' name='attack' value='Submit' />
 		</form>
