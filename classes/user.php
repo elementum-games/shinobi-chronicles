@@ -470,8 +470,12 @@ class User {
 		$this->intelligence_nerf = 0;
 		$this->willpower_nerf = 0;
 
-		$this->scout_range = $this->rank - 1;
+		$this->scout_range = 1;
 		$this->stealth = 0;
+
+        if($this->rank > 3) {
+            $this->scout_range++;
+        }
 
 		$this->village_changes = $user_data['village_changes'];
 		$this->clan_changes = $user_data['clan_changes'];
@@ -734,7 +738,6 @@ class User {
 				}
 				else if($this->forbidden_seal['level'] == 2) {
 					$this->regen_boost += $this->regen_rate * 0.2;
-					$this->scout_range++;
 				}
 
 			}
