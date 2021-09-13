@@ -20,7 +20,8 @@ Recommended workflow
        - `git pull upstream main`
    - For GUI
      - Click the "Fetch upstream" prompt on the GitHub page for your fork
-     - ![image](https://i.imgur.com/cQJ0zGc.png) 
+       - ![image](https://i.imgur.com/cQJ0zGc.png) 
+     - Pull the changes from your GitHub fork to your local
 
 
 ### Local Setup
