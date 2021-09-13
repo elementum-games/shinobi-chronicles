@@ -7,6 +7,8 @@ class User {
     const MIN_NAME_LENGTH = 2;
     const MIN_PASSWORD_LENGTH = 6;
 
+    public static $jutsu_train_gain = 5;
+
     public $system;
 
 	// Loaded in construct
@@ -259,6 +261,7 @@ class User {
      * @var array
      */
     public $bloodline_defense_boosts;
+
 
     public function __construct($user_id) {
 		global $system;
@@ -794,7 +797,7 @@ class User {
 				if(strpos($this->train_type, 'jutsu:') !== false) {
                     $jutsu_id = $this->train_gain;
 
-					$gain = 5;
+					$gain = User::$jutsu_train_gain;
 					if($this->system->TRAIN_BOOST) {
 						$gain += $this->system->TRAIN_BOOST;
 					}

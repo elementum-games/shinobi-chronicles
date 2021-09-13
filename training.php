@@ -16,6 +16,8 @@ function training() {
 	$stat_train_length = 300; // 300
 	$stat_train_gain = 2 + ($player->rank * 2);
 
+	$jutsu_train_gain = User::$jutsu_train_gain;
+
 	$stat_long_train_length = $stat_train_length * 8;
 	$stat_long_train_gain = $stat_train_gain * 4;
 
@@ -145,7 +147,7 @@ function training() {
 			</p>
 		<span style='font-weight:bold;'>Jutsu training:</span><br /> 
 			<p style='margin-left:20px;margin-top:5px;margin-bottom:8px;'>
-			Takes 10 minutes or more depending on the jutsu level, gives $stat_train_gain level" . ($stat_train_gain > 1 ? 's' : '') . ".</p>
+			Takes 10 minutes or more depending on the jutsu level, gives {$jutsu_train_gain} level" . ($jutsu_train_gain > 1 ? 's' : '') . ".</p>
 		</td></tr>";
 	if($player->train_time) {
 		require_once("functions.php");
