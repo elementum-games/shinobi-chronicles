@@ -1106,7 +1106,6 @@ function premium() {
 				+1 jutsu equip slots<br />
 				+1 weapon equip slots<br />
 				+1 armor equip slots<br />
-				+1 scout range<br />
 				Enhanced long trainings (1.5x length, 2x gains)<br />
 				Enhanced extended trainings (1.5x length, 2.25x gains)<br />
 				<form action='$self_link&view=forbidden_seal' method='post'>

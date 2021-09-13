@@ -111,6 +111,7 @@ class SystemFunctions {
         $this->SC_OPEN = isset($SC_OPEN) ? $SC_OPEN : false;
         
         $this->links = [
+            'profile' => $this->link . '?id=1',
             'members' => $this->link . '?id=6',
             'mod' => $this->link . '?id=16',
             'admin' => $this->link . '?id=17',

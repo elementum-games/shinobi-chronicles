@@ -199,7 +199,7 @@ function chat() {
 					<td style='text-align:center;'>
 					<div id='user_data_container'>
 					    <div style='flex-shrink:0;'>
-					        <img style='max-height: 40px;max-width:40px;' src='{$userData['avatar_link']}' />
+					        <img style='max-height:45px;max-width:45px;' src='{$userData['avatar_link']}' />
                         </div>
 						<div style='display:inline-block;flex-grow:1;'>
 							<a style='display:inline-block;' href='{$system->links['members']}&user={$post['user_name']}' class='$class $statusType'>{$post['user_name']}</a><br />
@@ -215,7 +215,7 @@ function chat() {
                         echo "<p class='staffMember' style='background-color: {$color['staffColor']}'>{$color['staffBanner']}</p>";
                     }
                 echo "</td>
-				<td class='chatmsg'style='text-align:center;padding:4px;white-space:pre-wrap;'>" .
+				<td class='chatmsg' style='text-align:center;padding:4px;white-space:pre-wrap;'>" .
 					wordwrap($system->html_parse(stripslashes($post['message']), false, true), 60, "\n", true) . "</td>";
 				$post_time = time() - $post['time'];
 				$post_minutes = ceil($post_time / 60);

@@ -7,6 +7,8 @@ class User {
     const MIN_NAME_LENGTH = 2;
     const MIN_PASSWORD_LENGTH = 6;
 
+    public static $jutsu_train_gain = 5;
+
     public $system;
 
 	// Loaded in construct
@@ -260,6 +262,7 @@ class User {
      */
     public $bloodline_defense_boosts;
 
+
     public function __construct($user_id) {
 		global $system;
 		$this->system =& $system;
@@ -470,8 +473,12 @@ class User {
 		$this->intelligence_nerf = 0;
 		$this->willpower_nerf = 0;
 
-		$this->scout_range = $this->rank - 1;
+		$this->scout_range = 1;
 		$this->stealth = 0;
+
+        if($this->rank > 3) {
+            $this->scout_range++;
+        }
 
 		$this->village_changes = $user_data['village_changes'];
 		$this->clan_changes = $user_data['clan_changes'];
@@ -734,7 +741,6 @@ class User {
 				}
 				else if($this->forbidden_seal['level'] == 2) {
 					$this->regen_boost += $this->regen_rate * 0.2;
-					$this->scout_range++;
 				}
 
 			}
@@ -791,7 +797,7 @@ class User {
 				if(strpos($this->train_type, 'jutsu:') !== false) {
                     $jutsu_id = $this->train_gain;
 
-					$gain = 5;
+					$gain = User::$jutsu_train_gain;
 					if($this->system->TRAIN_BOOST) {
 						$gain += $this->system->TRAIN_BOOST;
 					}

@@ -167,6 +167,13 @@ function members() {
 			<a href='{$system->link}?id=2&page=new_message&sender={$viewUser->user_name}'>Send Message</a>
 			&nbsp;&nbsp; |  &nbsp;&nbsp; 
 			<a href='{$system->links['report']}&report_type=1&content_id=$viewUser->user_id'>Report Profile/Journal</a>";
+
+			if($player->rank > 1) {
+                echo "&nbsp;&nbsp;|&nbsp;&nbsp;<a href='{$system->links['profile']}&page=send_money&recipient={$viewUser->user_name}'>Send Money</a>";
+            }
+			if($player->rank > 2) {
+                echo "&nbsp;&nbsp;|&nbsp;&nbsp;<a href='{$system->links['profile']}&page=send_ak&recipient={$viewUser->user_name}'>Send AK</a>";
+            }
 			if($viewUser->rank >= 3 && $player->team) {
 				if($player->user_id == $player->team['leader'] && !$viewUser->team && !$viewUser->team_invite && 
 				$player->village == $viewUser->village) {

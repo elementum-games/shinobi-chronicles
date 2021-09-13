@@ -22,9 +22,7 @@ function userProfile() {
 			<li style='width:25.5%;'><a href='{$self_link}&page=send_money'>Send Money</a></li>
 		";
 		if ($player->rank > 2) {
-			echo "
-				<li style='width:25.5%;'><a href='{$self_link}&page=send_ak'>Send AK</a></li>
-			";
+			echo "<li style='width:25.5%;'><a href='{$self_link}&page=send_ak'>Send AK</a></li>";
 		}
 		echo"
 				</ul>
@@ -134,6 +132,8 @@ function userProfile() {
 		$currency = ($type == 'Money') ? "money" : "premium_credits";
 		$hidden = ($type == 'Money') ? "yen" : "kunai";
 
+		$recipient = !empty($_GET['recipient']) ? $_GET['recipient'] : '';
+
 		echo "<table class='table'><tr><th>Send {$type}</th></tr>
 		<tr><td style='text-align:center;'>
 		<form action='{$self_link}&page={$page}' method='post'>
@@ -141,7 +141,7 @@ function userProfile() {
 		<br />
 		Send {$type} to:<br />
 		<input type='hidden' name='{$hidden}' value='1'/>
-		<input type='text' name='recipient' /><br />
+		<input type='text' name='recipient' value='{$recipient}' /><br />
 		Amount:<br />
 		<input type='text' name='amount' /><br />
 		<input type='submit' name='send_currency' value='Send {$type}' />
