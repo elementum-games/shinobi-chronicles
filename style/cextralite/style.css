@@ -22,12 +22,16 @@ ul{
 	padding: 0px;
 	margin: 0px;
 }
+p{
+	font-size: 1em;
+}
 b{
 	width: 100%;
 	display: none; /*Hides warning messages*/
 }
 a{
 	color: rgba(220,220,220,1);
+
 }
 a:hover{
 	color: white);
@@ -161,19 +165,19 @@ a:hover{
 .submenu{
 	display: inline-block;
 	text-align: center;
-	font-size: 1.2em;
+	font-size: 1em;
 	width: 100%;
 }
 .submenu li{
 	text-align: center;
 	width: 90% !important;
-	margin: 0.5em auto;
+	margin: 1em auto;
 	list-style: none;
 	padding: 0.2em 0em;
 }
 .submenu li a{
 	display: inline-block;
-	padding: 0.2em 0.2em;
+	padding: 0.4em 0.4em;
 	text-decoration: none;
 	background: linear-gradient(0deg, rgba(40,40,40,1) 0%, rgba(62,62,62,1) 38%, rgba(40,40,40,1) 100%);
 }
@@ -182,22 +186,23 @@ a:hover{
 }
 }
 
-.header .contentheader{
+.header.contentheader{
 	font-size: 1.2em;
 	padding: 0.5em 0em;
-	background: linear-gradient(0deg, rgba(40,40,40,1) 0%, rgba(20,20,20,1) 23%, rgba(49,62,56,1) 38%, rgba(40,40,40,1) 100%);
+	/* background: linear-gradient(0deg, rgba(40,40,40,1) 0%, rgba(20,20,20,1) 23%, rgba(49,62,56,1) 38%, rgba(40,40,40,1) 100%); */
 	border-radius: 20px 20px 0px 0px;
 	margin-bottom: 0.8em;
 }
 
+
 .table{
 	display: block;
-	width: 80%;
+	width: 90%;
 	margin: 1em auto 6em auto;
-	border: solid 3px white;
-	padding: 0em 0.2em;
+	background-color: rgba(27, 56, 31, 1);
 
-
+	/*xpos ypos spread color*/
+	box-shadow: 0em 0em 2em rgba(27, 56, 31, 0.9);
 }
 .table tbody{
 	display: inline-block;
@@ -209,7 +214,8 @@ a:hover{
 .table tr td{
 	display: inline-block;
 	width: 100%;
-	margin: 0.3em 0;
+	margin: 0.6em 0;
+	padding: 0.3em 0;
 }
 .table tr{
 	margin: 0.5em auto;
@@ -223,7 +229,7 @@ a:hover{
 	text-decoration: none;
 	padding: 0.8em 0.5em;
 	margin: 0px auto;
-	background: linear-gradient(0deg, rgba(40,40,40,1) 0%, rgba(62,62,62,1) 38%, rgba(40,40,40,1) 100%);
+	background: rgba(17, 25, 18, 0.3);
 }
 
 .profile_table{
@@ -244,6 +250,13 @@ a:hover{
 	font-size: 1em;
 	padding: 0.5em;
 	background-color: rgba(40,40,40,1);
+}
+
+.button{
+	margin: 0;
+	padding: 0;
+	display: inline-block;
+	width: 80%;
 }
 
 .menu div{
@@ -316,6 +329,19 @@ a:hover{
 	display: block;
 }
 
+#handseals{
+	display: inline-block;
+	width: 90%;
+}
+#handseals p{
+	display: inline;
+	height: 0px;
+}
+
+.jutsuName{
+	color: black;
+}
+
 /*Separates menu items*/
 hr{
 	margin: 2em 0em;
@@ -347,25 +373,26 @@ tr{
 input{
 	display: inline;
 	padding: 0.8em 1em;
-	font-size: 0.6em;
+	font-size: 0.8em;
 	margin: 0.8em 0em;
 }
 
 form{
-	margin: 2.5em auto;
-	text-align: center;
+	margin: 1em 1.5em;
+	text-align: left;
 	font-size: 1.2em;
 }
 
 th{
 	padding: 1em;
-	font-size: 1em;
+	font-size: 1.2em;
 }
 
 select{
 	display: inline;
 	padding: 1em 0.4em;
 	width: 70%;
+	font-size: 1em;
 }
 
 .systemMessage{
