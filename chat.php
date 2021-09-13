@@ -199,7 +199,7 @@ function chat() {
 					<td style='text-align:center;'>
 					<div id='user_data_container' style='display: flex;flex-direction:row'>
 					    <div style='flex-shrink:0;'>
-					        <img style='max-height: 40px;max-width:40px;' src='{$userData['avatar_link']}' />
+					        <img style='max-height: 50px;max-width:50px;' src='{$userData['avatar_link']}' />
                         </div>
 						<div style='display:block;flex-grow:1;'>
 							<a href='{$system->links['members']}&user={$post['user_name']}' class='$class $statusType'>{$post['user_name']}</a><br />
