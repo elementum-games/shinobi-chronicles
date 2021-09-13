@@ -3,7 +3,6 @@ if(!$_POST) {
 	exit;
 }
 
-require("variables.php");
 require("classes.php");
 $system = new SystemFunctions();
 $system->dbConnect();

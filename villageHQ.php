@@ -9,7 +9,6 @@ Algorithm:	See master_plan.html
 */
 
 function villageHQ() {
-	require("variables.php");
 	global $system;
 
 	global $player;
@@ -128,7 +127,7 @@ function villageHQ() {
 			}
 			
 			echo "<tr>
-				<td style='width:29%;' class='$class'><a href='$members_link&user={$row['user_name']}'>" . $row['user_name'] . "</a></td>
+				<td style='width:29%;' class='$class'><a href='{$system->links['members']}&user={$row['user_name']}'>" . $row['user_name'] . "</a></td>
 				<td style='width:20%;text-align:center;' class='$class'>" . $ranks[$row['rank']]['name'] . "</td>
 				<td style='width:20%;text-align:center;' class='$class'>" . $row['level'] . "</td>
 				<td style='width:30%;text-align:center;' class='$class'>" . $row['exp'] . "</td>

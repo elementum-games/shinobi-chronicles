@@ -49,7 +49,7 @@ class AI {
 	
 	/* function __construct(ai_id)
 	Creates instance of the AI class. Sanitizes and checks AI id to ensure AI exists.
-	-Paramaters-
+	-Parameters-
 	@ai_id:	Id of the AI, used to select and update data from database
 	*/
 	public function __construct($ai_id) {
@@ -81,7 +81,7 @@ class AI {
 	
 	/* function loadData()
 		Loads AI data from the database into class members
-		-Paramaters-
+		-Parameters-
 	*/
 	public function loadData() {
 		$result = $this->system->query("SELECT * FROM `ai_opponents` WHERE `ai_id`='$this->ai_id' LIMIT 1");
@@ -171,7 +171,7 @@ class AI {
 	
 	/* function calcDamage() CONTAINS TEMP FIX
 	*	Calculates raw damage based on AI stats and jutsu or item strength
-		-Paramaters-
+		-Parameters-
 		@attack: Copy of the attack data.
 		@attack_type (default_jutsu, equipped_jutsu, item, bloodline_jutsu,): 
 			Type of thing to check for, either item or jutsu
@@ -209,7 +209,7 @@ class AI {
 	
 	/* function calcDamageTaken()
 	*	Calculates final damage taken based on AI stats and attack type
-		-Paramaters-
+		-Parameters-
 		@raw_damage: Raw damage dealt before defense
 		@defense_type (ninjutsu, taijutsu, genjutsu, weapon): 
 			Type of thing to check for, either item or jutsu
@@ -244,6 +244,8 @@ class AI {
 /* Class:		Bloodline
 */
 class Bloodline {
+    const SKILL_REDUCTION_ON_CHANGE = 0.5;
+
 	public $bloodline_id;
 	public $id;
 	public $name;
@@ -262,7 +264,7 @@ class Bloodline {
 			return false;
 		}
 		$this->bloodline_id = $system->clean($bloodline_id);
-		$this->id = 'BL' . $this->user_id;
+		// $this->id = 'BL' . $this->user_id;
 			
 		$result = $system->query("SELECT * FROM `bloodlines` WHERE `bloodline_id`='$this->bloodline_id' LIMIT 1");
 		if(mysqli_num_rows($result) == 0) {
@@ -538,8 +540,6 @@ class Mission {
 	
 	public function rollLocation($starting_location) {
 		global $villages;
-		global $MAP_SIZE_X;
-		global $MAP_SIZE_Y;
 		
 		$starting_location = explode('.', $starting_location);
 			
@@ -560,15 +560,38 @@ class Mission {
 			$y = 1;
 		}
 		
-		if($x > $MAP_SIZE_X) {
-			$x = $MAP_SIZE_X;
+		if($x > SystemFunctions::MAP_SIZE_X) {
+			$x = SystemFunctions::MAP_SIZE_X;
 		}
-		if($y > $MAP_SIZE_Y) {
-			$y = $MAP_SIZE_Y;
+		if($y > SystemFunctions::MAP_SIZE_Y) {
+			$y = SystemFunctions::MAP_SIZE_Y;
 		}
 		
 		return $x . '.' . $y;
 	}
+
+    /**
+     * @param $player
+     * @param $mission_id
+     * @return Mission
+     * @throws Exception
+     */
+	public static function start($player, $mission_id) {
+        if($player->mission_id) {
+            throw new Exception("You are already on a mission!");
+        }
+
+        $fight_timer = 20;
+        if($player->last_ai > time() - $fight_timer) {
+            throw new Exception("Please wait " . ($player->last_ai - (time() - $fight_timer)) . " more seconds!");
+        }
+
+        $mission = new Mission($mission_id, $player);
+
+        $player->mission_id = $mission_id;
+
+        return $mission;
+    }
 }
 
 function diminishing_returns($val, $scale) {

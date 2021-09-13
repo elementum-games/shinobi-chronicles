@@ -5,7 +5,6 @@ if(!isset($_SESSION['user_id'])) {
 	exit;
 }
 
-require("variables.php");
 require("classes.php");
 
 $system = new SystemFunctions();
@@ -13,7 +12,7 @@ $system->dbConnect();
 
 $player = new User($_SESSION['user_id']);
 
-if($player->staff_level < $SC_HEAD_ADMINISTRATOR) {
+if($player->staff_level < SystemFunctions::SC_HEAD_ADMINISTRATOR) {
 	exit;
 }
 

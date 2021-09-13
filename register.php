@@ -1,17 +1,16 @@
 <?php
 session_start();
 
-require("variables.php");
-if(isset($_SESSION['user_id'])) {
-	header("Location: $link");
-	exit;
-}
-
 require_once("classes.php");
 $system = new SystemFunctions();
 
+if(isset($_SESSION['user_id'])) {
+    header("Location: {$system->link}}");
+    exit;
+}
+
 // Start display
-require("layout/" . $DEFAULT_LAYOUT . ".php");
+require("layout/" . SystemFunctions::DEFAULT_LAYOUT . ".php");
 echo $heading;
 echo $top_menu;
 echo $header;
@@ -28,7 +27,7 @@ if(!$system->register_open) {
 
 $min_user_name_length = User::MIN_NAME_LENGTH;
 $max_user_name_length = 18;
-$min_password_length = 6;
+$min_password_length = User::MIN_PASSWORD_LENGTH;
 
 if(isset($_GET['act'])) {
 	if($_GET['act'] == 'verify') {
@@ -37,7 +36,7 @@ if(isset($_GET['act'])) {
 		
 		$result = $system->query("UPDATE `users` SET `user_verified`=1 WHERE `user_name`='$user_name' AND `verify_key`='$key' LIMIT 1");
 		if($system->db_affected_rows > 0) {
-			$system->message("Account activated! You may log in and start playing. <a href='$link'>Continue</a>");
+			$system->message("Account activated! You may log in and start playing. <a href='{$system->link}'>Continue</a>");
 			$system->printMessage();
 		}
 		else {
@@ -57,7 +56,7 @@ if(isset($_GET['act'])) {
 			
 			$subject = "Shinobi-Chronicles account verification";
 			$message = "Welcome to Shinobi-Chronicles RPG. Please visit the link below to verify your account: \r\n" .
-			"{$link}register.php?act=verify&username={$user_name}&verify_key={$result['verify_key']}";
+			"{$system->link}register.php?act=verify&username={$user_name}&verify_key={$result['verify_key']}";
 			$headers = "From: Shinobi-Chronicles<admin@shinobi-chronicles.com>" . "\r\n";   
 			$headers .= "Reply-To: no-reply@shinobi-chronicles.com" . "\r\n";
 			if(mail($result['email'], $subject, $message, $headers)) {;
@@ -215,14 +214,20 @@ if($_POST['register']) {
 		`exp`, `bloodline_id`, `bloodline_name`, `clan_id`, `location`, `money`, `pvp_wins`, `pvp_losses`, `ai_wins`, `ai_losses`,
 		`ninjutsu_skill`, `genjutsu_skill`, `taijutsu_skill`, `bloodline_skill`, 
 		`cast_speed`, `speed`, `intelligence`, `willpower`, 
-		`register_date`, `verify_key`, `layout`, `avatar_link`)
+		`register_date`, `verify_key`, `layout`, `avatar_link`,
+                     `forbidden_seal`, `current_ip`, `profile_song`, `last_ai`, `last_pvp`, `last_death`,
+                     `mission_stage`, `ban_type`
+                     
+                     )
 		VALUES 
 		('$user_name', '$password', '$email', '0', '{$_SERVER['REMOTE_ADDR']}', '0',
 		'$gender', '$village', '1', '1', '100.00', '100.00', '100.00', '100.00', '100.00', '100.00', '10.00', 
 		'0', '0', '', '0', '" . $villages[$village]['location'] . "', '100', '0', '0', '0', '0',
 		'10', '10', '10', '0',
 		'5.00', '5.00', '5.00', '5.00', 
-		'" . time() . "', '" . $verification_code . "', 'shadow_ribbon', './images/default_avatar.png')";
+		'" . time() . "', '" . $verification_code . "', 'shadow_ribbon', './images/default_avatar.png',
+		'', '', '', 0, 0, 0,
+		'', '')";
 
 		
 		
@@ -230,7 +235,7 @@ if($_POST['register']) {
 		
 		$subject = 'Shinobi-Chronicles account verification';
 		$message = "Welcome to Shinobi-Chronicles RPG. Please visit the link below to verify your account: \r\n 
-		{$link}register.php?act=verify&username={$user_name}&verify_key=$verification_code";
+		{$system->link}register.php?act=verify&username={$user_name}&verify_key=$verification_code";
 		$headers = "From: Shinobi-Chronicles<admin@shinobi-chronicles.com>" . "\r\n";   
 		$headers .= "Reply-To: no-reply@shinobi-chronicles.com" . "\r\n";
 		if(mail($email, $subject, $message, $headers)) {;
@@ -285,7 +290,7 @@ if(!$register_ok) {
 	
 	<table class='table'><tr><th>Create an account</th></tr>
 	<tr><td>
-		<form action='{$link}register.php' method='post'>
+		<form action='{$system->link}register.php' method='post'>
 		<label for='user_name'>Username</label>
 			<input type='text' name='user_name' value='$user_name' /><br />
 			<br />

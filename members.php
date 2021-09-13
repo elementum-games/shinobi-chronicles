@@ -9,7 +9,6 @@ Algorithm:	See master_plan.html
 */
 
 function members() {
-	require("variables.php");
 	global $system;
 
 	global $player;
@@ -85,7 +84,7 @@ function members() {
 				}
 				echo "<br />";
 				$last_active = time() - $viewUser->last_active;
-				if($player->staff_level >= $SC_MODERATOR) {
+				if($player->staff_level >= SystemFunctions::SC_MODERATOR) {
 					require_once("functions.php");
 					echo "(Last active " . timeRemaining($last_active, 'long') . " ago)";
 				}
@@ -165,20 +164,20 @@ function members() {
 				<tr><td colspan='2' style='white-space:pre-wrap;'>" . $journal . "</td></tr>";
 			}
 			echo "<tr><td style='text-align:center;' colspan='2'>
-			<a href='$link?id=2&page=new_message&sender={$viewUser->user_name}'>Send Message</a>
+			<a href='{$system->link}?id=2&page=new_message&sender={$viewUser->user_name}'>Send Message</a>
 			&nbsp;&nbsp; |  &nbsp;&nbsp; 
-			<a href='$report_link&report_type=1&content_id=$viewUser->user_id'>Report Profile/Journal</a>";
+			<a href='{$system->links['report']}&report_type=1&content_id=$viewUser->user_id'>Report Profile/Journal</a>";
 			if($viewUser->rank >= 3 && $player->team) {
 				if($player->user_id == $player->team['leader'] && !$viewUser->team && !$viewUser->team_invite && 
 				$player->village == $viewUser->village) {
 					echo "&nbsp;&nbsp; |  &nbsp;&nbsp; 
-					<a href='$link?id=24&invite=1&user_name=$viewUser->user_name'>Invite to Team</a>";
+					<a href='{$system->link}?id=24&invite=1&user_name=$viewUser->user_name'>Invite to Team</a>";
 				}
 			}
 			
 			echo "</td></tr></table>";
 
-			if($player->staff_level >= $SC_MODERATOR) {
+			if($player->staff_level >= SystemFunctions::SC_MODERATOR) {
 				echo "<table class='table'><tr><th colspan='2'>Staff Info</th></tr>
 				<tr><td colspan='2'>
 					IP address: $viewUser->current_ip<br />
@@ -208,7 +207,7 @@ function members() {
 					}
 					
 					// Bot info
-					if($player->staff_level >= $SC_HEAD_ADMINISTRATOR) {
+					if($player->staff_level >= SystemFunctions::SC_HEAD_ADMINISTRATOR) {
 						echo "</td></tr>
 						<tr><td colspan='2' style='text-align:center;'>";
 						
@@ -238,17 +237,17 @@ function members() {
 					
 					echo "</td></tr>
 					<tr><td colspan='2' style='text-align:center;'>
-					<a href='$mod_link&view_record={$viewUser->user_name}'>View Record</a>&nbsp;&nbsp;|&nbsp;&nbsp;
-					<a href='$mod_link&ban_user_name={$viewUser->user_name}'>Ban user</a>";
+					<a href='{$system->links['mod']}&view_record={$viewUser->user_name}'>View Record</a>&nbsp;&nbsp;|&nbsp;&nbsp;
+					<a href='{$system->links['mod']}&ban_user_name={$viewUser->user_name}'>Ban user</a>";
 				
 				
-				if($player->staff_level >= $SC_HEAD_MODERATOR) {
-					echo "&nbsp;&nbsp;|&nbsp;&nbsp;<a href='$mod_link&unban_user_name={$viewUser->user_name}'>Unban user</a>";
-					echo "&nbsp;&nbsp;|&nbsp;&nbsp;<a href='$mod_link&ban_ip_address={$viewUser->last_ip}'>Ban IP</a>";
-					echo "&nbsp;&nbsp;|&nbsp;&nbsp;<a href='$mod_link&unban_ip_address={$viewUser->last_ip}'>Unban IP</a>";
+				if($player->staff_level >= SystemFunctions::SC_HEAD_MODERATOR) {
+					echo "&nbsp;&nbsp;|&nbsp;&nbsp;<a href='{$system->links['mod']}&unban_user_name={$viewUser->user_name}'>Unban user</a>";
+					echo "&nbsp;&nbsp;|&nbsp;&nbsp;<a href='{$system->links['mod']}&ban_ip_address={$viewUser->last_ip}'>Ban IP</a>";
+					echo "&nbsp;&nbsp;|&nbsp;&nbsp;<a href='{$system->links['mod']}&unban_ip_address={$viewUser->last_ip}'>Unban IP</a>";
 				}
-				if($player->staff_level >= $SC_ADMINISTRATOR) {
-					echo "&nbsp;&nbsp;|&nbsp;&nbsp;<a href='$admin_link&page=edit_user&user_name={$viewUser->user_name}'>Edit user</a>";
+				if($player->staff_level >= SystemFunctions::SC_ADMINISTRATOR) {
+					echo "&nbsp;&nbsp;|&nbsp;&nbsp;<a href='{$system->links['admin']}&page=edit_user&user_name={$viewUser->user_name}'>Edit user</a>";
 				}
 			
 				echo "</td></tr>";
@@ -269,12 +268,11 @@ function members() {
 	
 	if($display_list == 'standard') {
 		$online_seconds = 120;
-		
-		
+
 		$query_custom = '';
 		$view = 'highest_exp';
 		if($_GET['view'] == 'highest_exp') {
-			$query_custom = " WHERE `staff_level` < $SC_ADMINISTRATOR ORDER BY `exp` DESC";
+			$query_custom = " WHERE `staff_level` < " . SystemFunctions::SC_ADMINISTRATOR . " ORDER BY `exp` DESC";
 			$list_name = 'Top 10 Users - Highest Exp';
 			$view = 'highest_exp';
 		}
@@ -287,7 +285,7 @@ function members() {
 			$view = 'online_users';		
 		}
 		else {
-			$query_custom = " WHERE `staff_level` < $SC_ADMINISTRATOR ORDER BY `exp` DESC";
+			$query_custom = " WHERE `staff_level` < " . SystemFunctions::SC_ADMINISTRATOR . " ORDER BY `exp` DESC";
 			$list_name = 'Top 10 Users - Highest Exp';
 			$view = 'highest_exp';
 		
@@ -382,7 +380,7 @@ function members() {
 			</table>";
 		}
 		else {		
-			$last_staff_level = $SC_ADMINISTRATOR;
+			$last_staff_level = SystemFunctions::SC_ADMINISTRATOR;
 			while($row = $system->db_fetch($result)) {
 				$class = '';
 				if(is_int($count++ / 2)) {
@@ -393,16 +391,16 @@ function members() {
 				}
 				
 				switch($row['staff_level']) {
-					case $SC_MODERATOR:
+					case SystemFunctions::SC_MODERATOR:
 						$link_class = 'moderator';
 						break;
-					case $SC_HEAD_MODERATOR:
+					case SystemFunctions::SC_HEAD_MODERATOR:
 						$link_class = 'headModerator';
 						break;
-					case $SC_ADMINISTRATOR:
+					case SystemFunctions::SC_ADMINISTRATOR:
 						$link_class = 'administrator';
 						break;
-					case $SC_HEAD_ADMINISTRATOR:
+					case SystemFunctions::SC_HEAD_ADMINISTRATOR:
 						$link_class = 'administrator';
 						break;
 				}
@@ -411,10 +409,10 @@ function members() {
 				if($row['staff_level'] < $last_staff_level) {
 					$last_staff_level = $row['staff_level'];
 					switch($row['staff_level']) {
-						case $SC_HEAD_MODERATOR:
+						case SystemFunctions::SC_HEAD_MODERATOR:
 							echo "<tr><th colspan='3'>Head Moderators</th></tr>";
 							break;
-						case $SC_MODERATOR:
+						case SystemFunctions::SC_MODERATOR:
 							echo "<tr><th colspan='3'>Moderators</th></tr>";
 							break;
 					}

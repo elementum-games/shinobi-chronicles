@@ -14,7 +14,7 @@ Body{
 	margin: 0px;
 	padding: 0px;
 	background-color: rgba(0,0,0,1);
-	font-size: 1.8em;
+	font-size: 1.5em;
 }
 ul{
 	padding-left: 0px;
@@ -34,6 +34,12 @@ a:hover{
 
 #container{
 	width: 100%;
+}
+#chatMessage{
+	width: 100% !important;
+	height: 30% !important;
+
+	font-size: 1.2em !important;
 }
 #menu{
 	display: inline-block;
@@ -82,12 +88,23 @@ a:hover{
 .submenu li{
 	text-align: center;
 	width: 90% !important;
-	margin: 0px auto;
+	margin: 0.5em auto;
 	list-style: none;
+	padding: 0.2em 0em;
+}
+.submenu li a{
+	display: inline-block;
+	padding: 0.4em 0.2em;
+	text-decoration: none;
+	background: linear-gradient(0deg, rgba(40,40,40,1) 0%, rgba(62,62,62,1) 38%, rgba(40,40,40,1) 100%);
+}
+.submenu li a:hover{
+	background: linear-gradient(0deg, rgba(40,40,40,1) 0%, rgba(82,82,82,1) 38%, rgba(40,40,40,1) 100%);
+}
 }
 
 .header.contentheader{
-	font-size: 1.6em;
+	font-size: 1.2em;
 	padding: 0.5em 0em;
 	background: linear-gradient(0deg, rgba(40,40,40,1) 0%, rgba(20,20,20,1) 23%, rgba(49,62,56,1) 38%, rgba(40,40,40,1) 100%);
 	border-radius: 20px 20px 0px 0px;
@@ -99,19 +116,27 @@ a:hover{
 	width: 80%;
 	margin: 1em auto 6em auto;
 	border: solid 3px white;
-	padding: 2em;
+	padding: 0em 0.2em;
 
 
 }
 .table tbody{
-	display: block;
+	display: inline-block;
+	margin: 0px auto;
 	width: 100%;
 	min-width: 200px;
-	font-size: 1.6em;
+	font-size: 1.4em;
 }
 .table tr td{
-	display: block;
-	margin: 2em 0em;
+	display: inline-block;
+	width: 100%;
+}
+.table tr{
+	margin: 0.5em auto;
+}
+.table th a{
+	display: inline-block;
+	padding: 0.5em;
 }
 .table a{
 	display: block;
@@ -129,7 +154,7 @@ a:hover{
 	display: block;
 	width: 100% !important;
 	margin: 0px auto;
-	font-size: 1.5em;
+	font-size: 1.2em;
 }
 .profile_table tbody{
 }
@@ -163,20 +188,38 @@ a:hover{
 	padding: 0.8em 0em;
 }
 
+#socialPost table{
+	padding: 0.1em;
+}
 #socialPosts tbody{
 	display: inline;
+	font-size: 1em;
+	width: 100%;
 }
 #socialPosts tr a{
-	width: 10%;
+
 }
 #socialPosts div{
 	display: inline-block;
+	width: 100%;
 }
 #socialPosts tr td{
 	display: inline-block;
 }
+.chatmsg{
+	font-size: 1.2em;
+	padding: 2em 0em !important;
+}
+#user_data_container{
+	flex-direction: column !important;
+}
 #socialPosts tr{
-	display: block;
+	width: 95%;
+	background-color: rgba(50,50,50,1);
+}
+
+.submenumargin{
+	display: inline-block;
 }
 
 /*Separates menu items*/
@@ -186,14 +229,32 @@ hr{
 
 /*UNIVERSAL*/
 
+label{
+	text-align: left;
+}
+
+/*health bars*/
+td div{
+	margin: 0.5em auto;
+	display: block;
+}
+td div div{
+	margin: 0px;
+	padding: 0.2em 0.1em;
+	width:70%;
+}
+/*health bars*/
+
 tr{
 	display: block;
 	text-align: center;
 }
 
 input{
-	padding: 0.5em 1em;
-
+	display: inline;
+	padding: 0.8em 1em;
+	font-size: 0.6em;
+	margin: 0.8em 0em;
 }
 
 form{
@@ -203,12 +264,14 @@ form{
 }
 
 th{
-	font-size: 1.4em;
+	padding: 1em;
+	font-size: 1em;
 }
 
 select{
 	display: inline;
 	padding: 1em 0.4em;
+	width: 70%;
 }
 
 .systemMessage{

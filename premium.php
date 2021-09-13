@@ -8,7 +8,6 @@ Purpose:	Function for premium credit shop. Resets, name changes, bloodline re-ro
 */
 
 function premium() {
-	require("variables.php");
 	global $system;
 
 	global $player;
@@ -125,7 +124,7 @@ function premium() {
 			echo "<table class='table'><tr><th>Character Reset</th></tr>
 			<tr><td style='text-align:center;'>
 			You have reset your character.<br />
-			<a href='$link?id=1'>Continue</a>
+			<a href='{$system->link}?id=1'>Continue</a>
 			</td></tr>
 			</table>";
 			return true;
@@ -197,7 +196,7 @@ function premium() {
 			echo "<table class='table'><tr><th>Username Change</th></tr>
 			<tr><td style='text-align:center;'>
 			You have changed your username to {$new_name}.<br />
-			<a href='$link?id=1'>Continue</a>
+			<a href='{$system->link}?id=1'>Continue</a>
 			</td></tr>
 			</table>";
 		} catch (Exception $e) {
@@ -270,6 +269,17 @@ function premium() {
 			if(array_search($target_stat, $stats) === false) {
 				throw new Exception("Invalid target stat!");
 			}
+
+            // Check for same stat
+            if($original_stat == $target_stat) {
+                throw new Exception("You cannot transfer points to the same stat!");
+            }
+
+            // Amount to reset to
+            $reset_amount = 5;
+            if(strpos($original_stat, 'skill') !== false) {
+                $reset_amount = 10;
+            }
 			
 			// Transfer amount
 			$transfer_amount = (int)$system->clean($_POST['transfer_amount']);
@@ -281,26 +291,11 @@ function premium() {
 				throw new Exception("Invalid transfer amount!");
 			}
 			
-			
-			// Check for same stat
-			if($original_stat == $target_stat) {
-				throw new Exception("You cannot transfer points to the same stat!");
-			}
-			
-			$cost = 5 + floor($transfer_amount / 200);
-			$cost = 0;
+			$cost = 1 + floor($transfer_amount / 300);
 			
 			if($player->premium_credits < $cost) {
 				throw new Exception("You do not have enough Ancient Kunai!");
 			}
-			
-			// Amount to reset to
-			$reset_amount = 5;
-			if(strpos($original_stat, 'skill') !== false) {
-				$reset_amount = 10;
-			}
-			
-			
 			
 			$time = $transfer_amount * 0.2;
 			
@@ -494,7 +489,7 @@ function premium() {
 				break;
 			/* Shadekun edit for returning administrator color */
 			case 'red':
-				if($player->staff_level < $SC_ADMINISTRATOR) {
+				if($player->staff_level < SystemFunctions::SC_ADMINISTRATOR) {
 					$system->message("Invalid color!");
 					break;
 				}
@@ -821,8 +816,7 @@ function premium() {
 		}
 		function statAllocateCostDisplay() {
 			var transferAmount = parseInt($('#transferAmount').val());
-			var cost = 5 + Math.floor(transferAmount / 200);
-			cost = 0;
+			var cost = 1 + Math.floor(transferAmount / 300);
 			var time = transferAmount * 0.2;
 			
 			var display = cost + ' AK / ' + time + ' minutes';
@@ -857,7 +851,7 @@ function premium() {
 			}	
 		}
 
-		//  (5 + floor(($player->ninjutsu_skill - 10) / 200))
+		$init_cost = (1 + floor(($player->ninjutsu_skill - 10) / 300));
 
 		echo "
 		</script>
@@ -866,7 +860,7 @@ function premium() {
 		Transfer amount:<br />
 		<input type='text' id='transferAmount' name='transfer_amount' value='" . ($player->ninjutsu_skill - 10) . "' 
 			onkeyup='statAllocateCostDisplay()' /><br />
-		<span id='statAllocateCost'>" . 0 . " AK / " . (($player->ninjutsu_skill - 10) * 0.25) . " minutes</span><br />
+		<span id='statAllocateCost'>" . $init_cost . " AK / " . (($player->ninjutsu_skill - 10) * 0.25) . " minutes</span><br />
 		<input type='submit' name='stat_allocate' value='Transfer Stat Points' />
 		</form>
 		</td></tr></table>";
@@ -941,6 +935,12 @@ function premium() {
 			<tr><td style='text-align:center;'>A researcher from the village will implant another clan's DNA into 
 			you in exchange for Ancient Kunai, allowing you to use a new bloodline" . 
 				($player->bloodline_id ? ' instead of your own' : '') . ".<br /><br />";
+			if($player->bloodline_skill > 10) {
+			    echo "<b>Warning: Your bloodline skill will be reduced by " . (Bloodline::SKILL_REDUCTION_ON_CHANGE * 100) . "% as you must 
+                   re-adjust to your new bloodline!</b><br />";
+            }
+			echo "<br />";
+
 			$result = $system->query("SELECT `bloodline_id`, `name`, `rank`
 				FROM `bloodlines` WHERE `rank` < 5 ORDER BY `rank` ASC");
 			if($system->db_num_rows == 0) {
@@ -1029,7 +1029,7 @@ function premium() {
 				($player->forbidden_seal['color'] == 'gold' ? "checked='checked'" : '') . "/> 					
 				<span class='gold' style='font-weight:bold;'>Gold</span>";
 			}
-			if($player->staff_level >= $SC_ADMINISTRATOR) {
+			if($player->staff_level >= SystemFunctions::SC_ADMINISTRATOR) {
 				echo "
 				<input type='radio' name='name_color' value='red' " . 						
 				($player->forbidden_seal['color'] == 'red' ? "checked='checked'" : '') . "/> 					
@@ -1050,7 +1050,7 @@ function premium() {
 			($player->forbidden_seal['color'] == 'gold' ? "checked='checked'" : '') . "/> 	
 			<span class='gold' style='font-weight:bold;'>Gold</span>
 			";
-			if($player->staff_level >= $SC_ADMINISTRATOR) {
+			if($player->staff_level >= SystemFunctions::SC_ADMINISTRATOR) {
 				echo "
 				<input type='radio' name='name_color' value='red' " . 						
 				($player->forbidden_seal['color'] == 'red' ? "checked='checked'" : '') . "/> 					
@@ -1143,8 +1143,8 @@ function premium() {
 			<form action="https://www.paypal.com/cgi-bin/webscr" method="post">
 			<input type="hidden" name="cmd" value="_xclick">
 			<input type="hidden" name="business" value="lsmjudoka05@yahoo.com">
-			<input type="hidden" name="cancel_return" value="$link">
-			<input type="hidden" name="return" value="$link">
+			<input type="hidden" name="cancel_return" value="{$system->link}">
+			<input type="hidden" name="return" value="{$system->link}">
 			<input type="hidden" name="amount" value="1.00">
 			<input type="hidden" name="undefined_quantity" value="1">
 			<input type="hidden" name="cn" value="Ancient Kunai">
@@ -1153,18 +1153,12 @@ function premium() {
 			<input type="hidden" name="currency_code" value="USD">
 			<input type="hidden" name="item_name" value="Ancient Kunai - $player->user_name">
 			<input type="hidden" name="custom" value="$player->user_name">
-			<input type="hidden" name="notify_url" value="{$link}paypal_listener.php">
+			<input type="hidden" name="notify_url" value="{$system->link}paypal_listener.php">
+            <input type='submit' style='background:url(https://www.paypal.com/en_US/i/btn/btn_buynowCC_LG.gif);
+					border:0;width:171px;height:47px;cursor:pointer;' value='' name='submit' alt='Buy kunai'>
+			</form>
+		</td></tr></table>
 HTML;
-			if(true) {
-				echo "<input type='submit' style='background:url(https://www.paypal.com/en_US/i/btn/btn_buynowCC_LG.gif);
-					border:0px;width:171px;height:47px;cursor:pointer;' value='' name='submit' alt='Buy kunai'>";
-			}
-			else {
-				echo '<input type="image" src="https://www.paypal.com/en_US/i/btn/btn_buynowCC_LG.gif" 
-					border="0" name="submit" alt="Buy kunai">';
-			}
-			echo '</form>
-		</td></tr></table>';
 		
 		
 		// Exchange
@@ -1174,7 +1168,6 @@ HTML;
 }
 
 function premiumCreditExchange() {
-	require("variables.php");
 	global $system;
 
 	global $player;
@@ -1357,7 +1350,7 @@ function premiumCreditExchange() {
 			$sellerName = $credit_users[$row['seller']];
 			
 			echo "<tr> 
-				<td style='text-align:center;'><a href='$members_link&user={$sellerName}'>{$sellerName}</a></td>
+				<td style='text-align:center;'><a href='{$system->links['members']}&user={$sellerName}'>{$sellerName}</a></td>
 				<td style='text-align:center;'>{$row['premium_credits']} AK</td>
 				<td style='text-align:center;'>&yen;{$row['money']}</td>";
 			if($player->user_id == $row['seller']) {

@@ -3,10 +3,6 @@ Shinobi Chronicles
 
 Core is: index.php, classes.php
 
-Resources: variables.php
-
--variables.php
-
 $link // Link of main site, your page's link can be appended e.g. <a href='$link?id=7'>Travel</a>
 
 

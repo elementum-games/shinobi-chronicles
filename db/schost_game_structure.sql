@@ -474,7 +474,6 @@ CREATE TABLE `users` (
   `bloodline_skill` int(11) NOT NULL,
   `cast_speed` double(12,2) NOT NULL,
   `speed` double(12,2) NOT NULL,
-  `endurance` double(12,2) NOT NULL,
   `intelligence` double(12,2) NOT NULL,
   `willpower` double(12,2) NOT NULL,
   `mission_id` int(11) NOT NULL DEFAULT '0',

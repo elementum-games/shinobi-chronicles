@@ -10,6 +10,15 @@ class SystemFunctions {
     const LOGOUT_LIMIT = 120;
     const BLOODLINE_ROLL_CHANCE = 50;
 
+    const MENU_USER = 'user';
+    const MENU_ACTIVITY = 'activity';
+    const MENU_VILLAGE = 'village';
+
+    const SC_MODERATOR = 1;
+    const SC_HEAD_MODERATOR = 2;
+    const SC_ADMINISTRATOR = 3;
+    const SC_HEAD_ADMINISTRATOR = 4;
+
     // Variable for error message
     public $message;
     public $message_displayed;
@@ -21,7 +30,16 @@ class SystemFunctions {
     private $database;
     public $con;
 
+    public $environment;
+
+    public $SC_OPEN;
     public $register_open;
+
+    public $link;
+
+    // Training boost switches
+    public $TRAIN_BOOST = 0; // Extra points per training, 0 for none
+    public $LONG_TRAIN_BOOST = 0; // Extra points per long training, 0 for none
 
     // Variables for query() function to track things
     public $db_result;
@@ -29,6 +47,45 @@ class SystemFunctions {
     public $db_num_rows;
     public $db_affected_rows;
     public $db_insert_id;
+
+    public $SC_STAFF_COLORS = array(
+        SystemFunctions::SC_MODERATOR => array(
+            'staffBanner' => "moderator",
+            'staffColor' => "009020",
+            'pm_class' => 'moderator'
+        ),
+        SystemFunctions::SC_HEAD_MODERATOR => array(
+            'staffBanner' => "head moderator",
+            'staffColor' => "0090A0",
+            'pm_class' => 'headModerator'
+        ),
+        SystemFunctions::SC_ADMINISTRATOR => array(
+            'staffBanner' => "administrator",
+            'staffColor' => "A00000",
+            'pm_class' => 'administrator'
+        ),
+        SystemFunctions::SC_HEAD_ADMINISTRATOR => array(
+            'staffBanner' => "head administrator",
+            'staffColor' => "A00000",
+            'pm_class' => 'administrator'
+        )
+    );
+
+    public $links = [];
+
+    //Chat variables
+    const CHAT_MAX_POST_LENGTH = 350;
+
+    // Default layout
+    const DEFAULT_LAYOUT = 'shadow_ribbon';
+    const VERSION_NUMBER = '0.8.0';
+
+    // Map size
+    const MAP_SIZE_X = 18;
+    const MAP_SIZE_Y = 12;
+
+    // Misc stuff
+    const SC_MAX_RANK = 3;
 
     public $debug = [
         'battle' => false,
@@ -42,19 +99,31 @@ class SystemFunctions {
         /** @var $username */
         /** @var $password */
         /** @var $database */
-        /** @var $register_open */
         $this->host = $host;
         $this->username = $username;
         $this->password = $password;
         $this->database = $database;
 
-        $this->register_open = isset($register_open) ? $register_open : false;
-    }
+        $this->environment = isset($ENVIRONMENT) ? $ENVIRONMENT : 'dev';
+        $this->link = isset($web_url) ? $web_url : 'http://localhost/';
 
+        $this->register_open = isset($register_open) ? $register_open : false;
+        $this->SC_OPEN = isset($SC_OPEN) ? $SC_OPEN : false;
+        
+        $this->links = [
+            'members' => $this->link . '?id=6',
+            'mod' => $this->link . '?id=16',
+            'admin' => $this->link . '?id=17',
+            'report' => $this->link . '?id=18',
+            'battle' => $this->link . '?id=19',
+            'spar' => $this->link . '?id=22',
+            'mission' => $this->link . '?id=23',
+        ];
+    }
 
     /* function dbConnect()
         Connects to a MySQL database and selects a DB. Stores connection resource in $con and returns.
-        -Paramaters-
+        -Parameters-
         None; Uses @host, @user_name, @password, @database from /secure/vars.php for DB credentials.
     */
     public function dbConnect() {
@@ -71,7 +140,7 @@ class SystemFunctions {
 
     /* function clean(raw_input)
         Cleans raw input to be safe for use in queries. Requires $this->con to have a connection for using mysqli_real_escape_string
-        -Paramaters-
+        -Parameters-
         @raw_input: Input to be sanitized
     */
     public function clean($raw_input) {
@@ -136,7 +205,7 @@ class SystemFunctions {
 
         Stores a message for display later.
 
-        -Paramaters-
+        -Parameters-
 
         @message: 		Message to be stored for display
 
@@ -151,7 +220,7 @@ class SystemFunctions {
 
     /* function printMessage()
         Displays message, if one is stored.
-        -Paramaters-
+        -Parameters-
         None
     */
     public function printMessage($force_display = false) {
@@ -211,15 +280,31 @@ class SystemFunctions {
 
         $admins = array(1, 190, 193);
 
-        $message = (in_array($_SESSION['user_id'], $admins)) ? $error_message : "An error has occured. Please make a report to the administrators if the problem persists.";
+        if($this->environment == 'dev' || in_array($_SESSION['user_id'], $admins)) {
+            $message = $error_message;
+        }
+        else {
+            $message = "An error has occured. Please make a report to the administrators if the problem persists.";
+        }
 
         $this->message($message);
         $this->printMessage();
+
         global $side_menu_start;
         global $side_menu_end;
         global $footer;
 
-        echo $side_menu_start . $side_menu_end . $footer;
+        $pages = require 'pages.php';
+
+        echo $side_menu_start;
+        foreach($pages as $id => $page) {
+            if(!isset($page['menu']) || $page['menu'] != SystemFunctions::MENU_USER) {
+                continue;
+            }
+
+            echo "<li><a href='{$this->link}?id=$id'>" . $page['title'] . "</a></li>";
+        }
+        echo $side_menu_end . $footer;
         exit;
     }
 
@@ -455,4 +540,72 @@ class SystemFunctions {
         return password_verify($password, $hash);
     }
 
+    public function renderStaticPageHeader() {
+        $system = $this;
+
+        switch(SystemFunctions::DEFAULT_LAYOUT) {
+            case 'cextralite':
+                require("layout/cextralite.php");
+                break;
+            case 'classic_blue':
+                require("layout/classic_blue.php");
+                break;
+            case 'geisha':
+                require("layout/geisha.php");
+                break;
+            case 'shadow_ribbon':
+            default:
+                require("layout/shadow_ribbon.php");
+                break;
+        }
+
+        /**
+         * @var $heading
+         * @var $top_menu
+         * @var $header
+         * @var $body_start
+         */
+
+        echo $heading;
+        echo $top_menu;
+        echo $header;
+        echo str_replace("[HEADER_TITLE]", "Rules", $body_start);
+    }
+
+    public function renderStaticPageFooter() {
+        $system = $this;
+
+        switch(SystemFunctions::DEFAULT_LAYOUT) {
+            case 'cextralite':
+                require("layout/cextralite.php");
+                break;
+            case 'classic_blue':
+                require("layout/classic_blue.php");
+                break;
+            case 'geisha':
+                require("layout/geisha.php");
+                break;
+            case 'shadow_ribbon':
+            default:
+                require("layout/shadow_ribbon.php");
+                break;
+        }
+
+        /**
+         * @var $side_menu_start
+         * @var $side_menu_end
+         *
+         * @var $login_menu
+         * @var $footer
+         */
+        if(isset($_SESSION['user_id'])) {
+            echo $side_menu_start;
+            echo $side_menu_end;
+        }
+        else {
+            echo $login_menu;
+        }
+
+        echo str_replace('<!--[VERSION_NUMBER]-->', SystemFunctions::VERSION_NUMBER, $footer);
+    }
 }

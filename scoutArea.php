@@ -8,8 +8,7 @@ Purpose:	Functions for scouting and links to initiating combat
 Algorithm:	See master_plan.html
 */
 
-function scoutArea() {
-	require("variables.php");
+function scoutArea($in_existing_table = false) {
 	global $system;
 
 	global $player;
@@ -50,11 +49,24 @@ function scoutArea() {
 	
 	// Search box for individual users
 	// List top 10 users by experience
-	echo "<table class='table'><tr><th>Scout Area (Scout Range: $player->scout_range squares)</th></tr>
-	<tr><td style='text-align:center;'>
-	You can view other ninja within your scout range here. You can also attack or issue spar challenges if allowed.
-	</td></tr></table>
-	<table class='table'><tr>
+    $colspan_attr = '';
+    if(!$in_existing_table) {
+        echo "<table class='table'>";
+    }
+    else {
+        $colspan_attr = " colspan='5'";
+    }
+
+	echo "<tr><th {$colspan_attr}>Scout Area (Scout Range: $player->scout_range squares)</th></tr>";
+
+    if(!$in_existing_table) {
+        echo "<tr><td style='text-align:center;'>
+        You can view other ninja within your scout range here. You can also attack or issue spar challenges if allowed.
+        </td></tr></table>
+        <table class='table'>";
+    }
+
+    echo "<tr>
 		<th style='width:28%;'>Username</th>
 		<th style='width:20%;'>Rank</th>
 		<th style='width:17%;'>Village</th>
@@ -65,7 +77,7 @@ function scoutArea() {
 	if(is_array($users)) {
 		foreach($users as $user) {
 			echo "<tr>
-				<td style='width:28%;'><a href='$members_link&user={$user['user_name']}'>" . $user['user_name'] . "</a></td>
+				<td style='width:28%;'><a href='{$system->links['members']}&user={$user['user_name']}'>" . $user['user_name'] . "</a></td>
 				<td style='width:20%;text-align:center;'>" . $ranks[$user['rank']]['name'] . "</td>
 				<td style='width:17%;text-align:center;'>
 					<img src='./images/village_icons/" . strtolower($user['village']) . ".png' style='max-height:18px;max-width:18px;' />
@@ -80,35 +92,37 @@ function scoutArea() {
 				}
 				else if($user['location'] == $player->location && $user['user_id'] != $player->user_id) {
 					// Attack
-					echo "<a href='$spar_link&challenge={$user['user_id']}'>Spar</a>";
+					echo "<a href='{$system->links['spar']}}&challenge={$user['user_id']}'>Spar</a>";
 					if($user['village'] != $player->village && $user['rank'] > 2 && $player->rank > 2) {
-						echo " | <a href='$battle_link&attack={$user['user_id']}'>Attack</a>";
+						echo " | <a href='{$system->links['battle']}&attack={$user['user_id']}'>Attack</a>";
 					}
 				}
 				echo "&nbsp;</td>
 			</tr>";
 		}
-		echo "</table>";	
-		
-		// Pagination
-		echo "<p style='text-align:center;'>";
-		if($min > 0) {
-			$prev = $min - $users_per_page;
-			if($prev < 0) {
-				$prev = 0;
-			}
-			echo "<a href='$self_link&min=$prev'>Previous</a>";
-		}
-		
-		if($min + $users_per_page < count($users)) {
-			if($min > 0) {
-				echo "&nbsp;&nbsp;|&nbsp;&nbsp;";
-			}
-			$next = $min + $users_per_page;
-			echo "<a href='$self_link&min=$next'>Next</a>";
-		}
-		echo "</p>";
+
+		if(!$in_existing_table) {
+            echo "</table>";
+
+            // Pagination
+            echo "<p style='text-align:center;'>";
+            if($min > 0) {
+                $prev = $min - $users_per_page;
+                if($prev < 0) {
+                    $prev = 0;
+                }
+                echo "<a href='$self_link&min=$prev'>Previous</a>";
+            }
+
+            if($min + $users_per_page < count($users)) {
+                if($min > 0) {
+                    echo "&nbsp;&nbsp;|&nbsp;&nbsp;";
+                }
+                $next = $min + $users_per_page;
+                echo "<a href='$self_link&min=$next'>Next</a>";
+            }
+            echo "</p>";
+        }
 	}
 	
 }
-?>

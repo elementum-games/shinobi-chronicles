@@ -1,8 +1,6 @@
 <?php
 
 function displayNotifications() {
-	require("variables.php");
-	
 	global $system;
 	global $player;
 	
@@ -18,37 +16,37 @@ function displayNotifications() {
 			$result = $system->db_fetch($result);
 			switch($result['battle_type']) {
 				case 1:
-					$notifications[] = "<a class='link red' href='$battle_link'>In battle!</a>";
+					$notifications[] = "<a class='link red' href='{$system->links['battle']}'>In battle!</a>";
 					break;
 				case 2:
-					$notifications[] = "<a class='link red' href='$spar_link'>In battle!</a>";
+					$notifications[] = "<a class='link red' href='{$system->links['spar']}'>In battle!</a>";
 					break;
 			}
 		}
 	}
 	else if($player->battle_id == -1) {
-		$notifications[] = "<a class='link red' href='" . ($link . '?id=' . $_SESSION['battle_page']) . "'>In battle!</a>";
+		$notifications[] = "<a class='link red' href='" . ($system->link . '?id=' . $_SESSION['battle_page']) . "'>In battle!</a>";
 	}
 	
 	$result = $system->query("SELECT `message_id` FROM `private_messages` 
 		WHERE `recipient`='{$player->user_id}' AND `message_read`=0 LIMIT 1");
 	if($system->db_num_rows) {
-		$notifications[] = "<a class='link' href='$link?id=2'>You have unread PM(s)</a>";
+		$notifications[] = "<a class='link' href='{$system->link}?id=2'>You have unread PM(s)</a>";
 	}
 
-	if($player->staff_level >= $SC_MODERATOR) {
+	if($player->staff_level >= SystemFunctions::SC_MODERATOR) {
 		$result = $system->query("SELECT `report_id` FROM `reports` WHERE `status` = 0 AND `staff_level` < $player->staff_level LIMIT 1");
 		if($system->db_num_rows > 0) {
-			$notifications[] = "<a class='link' href='$report_link&page=view_all_reports'>New report(s)!</a>";
+			$notifications[] = "<a class='link' href='{$system->links['report']}&page=view_all_reports'>New report(s)!</a>";
 		}
 	}
 
 	if($player->challenge) {
-		$notifications[] = "<a class='link' href='$spar_link'>Challenged!</a>";
+		$notifications[] = "<a class='link' href='{$system->links['spar']}}'>Challenged!</a>";
 	}
 	
 	if($player->team_invite) {
-		$notifications[] = "<a class='link' href='$link?id=24'>Invited to team!</a>";
+		$notifications[] = "<a class='link' href='{$system->link}?id=24'>Invited to team!</a>";
 	}
 	
 	

@@ -8,7 +8,6 @@ Purpose:	Function for displaying and allowing users to post messages to tavern c
 Algorithm:	See master_plan.html
 */
 function chat() {
-	require("variables.php");
 
 	global $system;
 	global $ajax;
@@ -27,9 +26,10 @@ function chat() {
 	}
 
 	// Validate post and submit to DB
-	if($_POST['post']) {
+    $chat_max_post_length = SystemFunctions::CHAT_MAX_POST_LENGTH;
+	if(isset($_POST['post'])) {
 		//If user has seal or is of staff, give them their words
-		$CHAT_MAX_POST_LENGTH += ($player->forbidden_seal || $player->staff_level >= $SC_MODERATOR) ? 100 : 0;
+		$chat_max_post_length += ($player->forbidden_seal || $player->staff_level >= SystemFunctions::SC_MODERATOR) ? 100 : 0;
 		$message = $system->clean(stripslashes(trim($_POST['post'])));
 		try {
 			$result = $system->query("SELECT `message` FROM `chat` WHERE `user_name` = '$player->user_name' ORDER BY  `post_id` DESC LIMIT 1");
@@ -42,15 +42,14 @@ function chat() {
 			if(strlen($message) < 3) {
 				throw new Exception("Message is too short!");
 			}
-			if(strlen($message) > $CHAT_MAX_POST_LENGTH) {
+			if(strlen($message) > $chat_max_post_length) {
 				throw new Exception("Message is too long!");
 			}
 			// Banned words
 			if($system->censor_check($message)) {
 				throw new Exception("Inappropriate language is not allowed in chat!");
 			}
-			//Look into what this does later -- Shadekun
-			$time_diff = round(microtime(true) - $start_time, 4);
+
 			$title = $player->rank_name;
 			$staff_level = $player->staff_level;
 			$supported_colors = array(
@@ -61,8 +60,12 @@ function chat() {
 			);
 			$user_color = (!$player->forbidden_seal) ? 0 : ($supported_colors[$player->forbidden_seal['color']]);
 
-			$sql = "INSERT INTO `chat` (`user_name`, `message`, `title`, `village`, `staff_level`, `user_color`, `time`) VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s')";
-			$system->query(sprintf($sql, $player->user_name, $message, $title, $player->village, $staff_level, $user_color, time()));
+			$sql = "INSERT INTO `chat` 
+                    (`user_name`, `message`, `title`, `village`, `staff_level`, `user_color`, `time`, `edited`) VALUES 
+                           ('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s')";
+			$system->query(sprintf(
+			    $sql, $player->user_name, $message, $title, $player->village, $staff_level, $user_color, time(), 0
+            ));
 			if($system->db_affected_rows) {
 				$system->message("Message posted!");
 			}
@@ -71,7 +74,7 @@ function chat() {
 		}
 		$system->printMessage();
 	}
-	else if($_GET['delete'] && isset($SC_MODERATOR) && $player->staff_level >= $SC_MODERATOR) {
+	else if(isset($_GET['delete']) && $player->staff_level >= SystemFunctions::SC_MODERATOR) {
 		$delete = (int) $system->clean($_GET['delete']);
 		$result = $system->query("DELETE FROM `chat` WHERE `post_id` = $delete LIMIT 1");
 		$return_message = ($system->db_affected_rows) ? "Post deleted!" : "Error deleting post!";
@@ -80,7 +83,7 @@ function chat() {
 	}
 	$min = 0;
 	$max_posts = 15;
-	if($_GET['min']) {
+	if(isset($_GET['min'])) {
 		$min = $system->clean($_GET['min']);
 		if(!is_numeric($min)) {
 			$min = 0;
@@ -166,7 +169,7 @@ function chat() {
 			echo "<tr><td colspan='2' style='text-align:center;'>No posts!</td></tr>";
 		}
 		while($post = $system->db_fetch($result)) {
-			$user_result = $system->query("SELECT `premium_credits_purchased`, `avatar_link` FROM `users` 
+			$user_result = $system->query("SELECT `premium_credits_purchased`, `avatar_link` FROM `users`
                 WHERE `user_name` = '{$system->clean($post['user_name'])}'");
 			$userData = $system->db_fetch($user_result);
 
@@ -199,20 +202,20 @@ function chat() {
 					        <img style='max-height: 40px;max-width:40px;' src='{$userData['avatar_link']}' />
                         </div>
 						<div style='display:block;flex-grow:1;'>
-							<a href='{$members_link}&user={$post['user_name']}' class='$class $statusType'>{$post['user_name']}</a><br />
+							<a href='{$system->links['members']}&user={$post['user_name']}' class='$class $statusType'>{$post['user_name']}</a><br />
 							<p style='margin: 1px 0 3px;'>
                                 <img src='./images/village_icons/" . strtolower($post['village']) . ".png' alt='{$post['village']} Village'
                                     style='max-width:20px;max-height:20px;vertical-align:text-bottom;'  title='{$post['village']} Village' /> " .
-                            stripslashes($post['title']) . "</p>                              
+                            stripslashes($post['title']) . "</p>
 						</div>
 					</div>";
 
                     if($post['staff_level']) {
-                        $color = $SC_STAFF_COLORS[$post['staff_level']];
+                        $color = $system->SC_STAFF_COLORS[$post['staff_level']];
                         echo "<p class='staffMember' style='background-color: {$color['staffColor']}'>{$color['staffBanner']}</p>";
                     }
                 echo "</td>
-				<td style='text-align:center;padding:4px;white-space:pre-wrap;'>" .
+				<td class='chatmsg'style='text-align:center;padding:4px;white-space:pre-wrap;'>" .
 					wordwrap($system->html_parse(stripslashes($post['message']), false, true), 60, "\n", true) . "</td>";
 				$post_time = time() - $post['time'];
 				$post_minutes = ceil($post_time / 60);
@@ -231,10 +234,10 @@ function chat() {
 				echo "<td style='text-align:center;font-style:italic;'>
                     <div style='margin-bottom: 2px;'>{$posted}</div>";
 
-                    if(isset($SC_MODERATOR) && $player->staff_level >= $SC_MODERATOR) {
+                    if($player->staff_level >= SystemFunctions::SC_MODERATOR) {
                         echo sprintf("<a class='imageLink' href='$self_link&delete=%d'><img src='./images/delete_icon.png' style='max-width:20px;max-height:20px;' /></a>", $post['post_id']);
                     }
-                    echo "<a class='imageLink' href='$report_link&report_type=3&content_id=" . $post['post_id'] . "'>
+                    echo "<a class='imageLink' href='{$system->links['report']}&report_type=3&content_id=" . $post['post_id'] . "'>
 					    <img src='./images/report_icon.png' style='max-width:20px;max-height:20px;' /></a>
                     </td>";
 				echo "</tr>";
@@ -253,12 +256,15 @@ function chat() {
 		}
 		echo "<a href='$self_link&min=$prev{$refresh}'>Previous</a>";
 	}
+
+	$posts_per_page = 10;
+
 	$result = $system->query("SELECT COUNT(`post_id`) as `count` FROM `chat`");
 	$result = $system->db_fetch();
 	if($result['count'] >= 200) {
 		$result['count'] = 200;
 	}
-	if($min + $users_per_page < $result['count']) {
+	if($min + $posts_per_page < $result['count']) {
 		if($min > 0) {
 			echo "&nbsp;&nbsp;|&nbsp;&nbsp;";
 		}

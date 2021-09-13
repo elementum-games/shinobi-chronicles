@@ -9,7 +9,6 @@ Algorithm:	See master_plan.html
 */
 
 function store() {
-	require("variables.php");
 	global $system;
 
 	global $player;

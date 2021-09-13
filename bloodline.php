@@ -4,7 +4,6 @@
 	Created:	04/10/2014
 */
 function bloodline() {
-	require("variables.php");
 	global $system;
 	global $player;
 	global $self_link;

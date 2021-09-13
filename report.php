@@ -9,13 +9,7 @@ Algorithm:	See master_plan.html
 */
 
 function report() {
-	require("variables.php");
 	global $system;
-	if(!isset($SC_MODERATOR)) {
-		$system->message("Error loading config!");
-		$system->printMessage();
-		return true;
-	}
 	
 	global $player;
 	
@@ -27,7 +21,7 @@ function report() {
 	}
 	
 	// Submenu
-	if($player->staff_level >= $SC_MODERATOR) {
+	if($player->staff_level >= SystemFunctions::SC_MODERATOR) {
 		echo "<div class='submenu'>
 		<ul class='submenu'>
 			<li style='width:99.5%;'><a href='{$self_link}&page=view_all_reports'>View New Reports</a></li>
@@ -113,11 +107,11 @@ function report() {
 				throw new Exception("Invalid report type!");
 			}
 		
-			if($staff_level == $SC_HEAD_ADMINISTRATOR) {
+			if($staff_level == SystemFunctions::SC_HEAD_ADMINISTRATOR) {
 				$staff_level--;
 			}
 		
-			if($user_id == $player->user_id && $player->staff_level < $SC_MODERATOR) {
+			if($user_id == $player->user_id && $player->staff_level < SystemFunctions::SC_MODERATOR) {
 				throw new Exception("You cannot report yourself!");
 			}
 
@@ -156,7 +150,7 @@ function report() {
 		$system->printMessage();
 	}
 	// Handle report
-	if($_POST['handle_report'] && $player->staff_level >= $SC_MODERATOR) {
+	if($_POST['handle_report'] && $player->staff_level >= SystemFunctions::SC_MODERATOR) {
 		$page = 'view_report';
 		
 		try {
@@ -167,7 +161,7 @@ function report() {
 			}
 			
 			$report = $system->db_fetch($result);
-			if($report['status'] != 0 && $player->staff_level < $SC_HEAD_MODERATOR) {
+			if($report['status'] != 0 && $player->staff_level < SystemFunctions::SC_HEAD_MODERATOR) {
 				throw new Exception("Report has already been handled!");
 			}
 			
@@ -194,7 +188,7 @@ function report() {
 		$system->printMessage();
 	}
 	
-	if(isset($SC_MODERATOR) && $player->staff_level < $SC_MODERATOR) {
+	if($player->staff_level < SystemFunctions::SC_MODERATOR) {
 		// [MOD] View report
 		// [MOD] View all reports
 	}
@@ -264,7 +258,7 @@ function report() {
 				}
 			}
 		
-			if($user_name == $player->user_name && $player->staff_level < $SC_MODERATOR) {
+			if($user_name == $player->user_name && $player->staff_level < SystemFunctions::SC_MODERATOR) {
 				throw new Exception("You cannot report yourself!");
 			}
 						
@@ -309,7 +303,7 @@ function report() {
 		}
 		$system->printMessage();
 	}
-	else if($page == 'view_all_reports' && $player->staff_level >= $SC_MODERATOR) {
+	else if($page == 'view_all_reports' && $player->staff_level >= SystemFunctions::SC_MODERATOR) {
 		echo "<table class='table'><tr><th colspan='4'>Reports</th></tr>";
 		
 		$result = $system->query("SELECT * FROM `reports` WHERE `staff_level` < $player->staff_level AND `status` = 0");
@@ -345,13 +339,13 @@ function report() {
 					<td>" . $user_names[$report['user_id']] . "</td>
 					<td>" . $user_names[$report['reporter_id']] . "</td>
 					<td>" . $report['reason'] . "</th>
-					<td><a href='$report_link&page=view_report&report_id=" . $report['report_id'] . "'>View</a></td>
+					<td><a href='{$system->links['report']}&page=view_report&report_id=" . $report['report_id'] . "'>View</a></td>
 				</tr>";
 			}
 		}
 		echo "</table>";
 	}
-	else if($page == 'view_report' && $player->staff_level >= $SC_MODERATOR) {
+	else if($page == 'view_report' && $player->staff_level >= SystemFunctions::SC_MODERATOR) {
 		try {
 			$report_id = (int)$system->clean($_GET['report_id']);
 			if(!$report_id) {
@@ -420,7 +414,7 @@ function report() {
 	
 	
 	// Staff level check
-	if($player->staff_level < $SC_MODERATOR) {
+	if($player->staff_level < SystemFunctions::SC_MODERATOR) {
 		// [MOD] View report
 		// [MOD] View all reports
 	}

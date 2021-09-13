@@ -14,7 +14,7 @@ body {
 }
 
 #container {
-	width:871px;
+	width:951px;
 	min-height:100%;
 	
 	background-color:#BBDDEE;
@@ -40,23 +40,26 @@ body {
 	height:179px;
 	margin-bottom:40px;
 	
-	background-color: #90BACC;
+	/*background-color: #90BACC;*/
+    background-color: #071d28;
 }
 #header img {
 	display:block;
 	margin-left:auto;
 	margin-right:auto;
 	border: 0px;
+
+    width: 100%;
 }
 
 #menu {
 	position:absolute;
-	width:918px;
+	width:998px;
 	margin-left:-23px;
 	top:143px;
 	
 	
-	background-image:url(./images/menuBG.png);
+	background-image:url(./images/menuBG_998.png);
 	background-repeat:no-repeat;
 	
 	height:44px;
@@ -342,7 +345,7 @@ div.logout a:hover {
 }
 
 #footer {
-	width:871px;
+	width:951px;
 	
 	height:25px;
 	position:relative;
@@ -586,4 +589,109 @@ p.trainingNotification {
 br.clear {
 	clear:both;
 	margin:0px;
+}
+
+/* Travel */
+.upArrow, .leftArrow, .rightArrow, .downArrow {
+    display: inline-block;
+    height:32px;
+    width:32px;
+    margin:0px;
+    background-size: 100%;
+    background-repeat: no-repeat;
+}
+
+.upArrow {
+    background-image: url(../../images/icons/up.png);
+}
+.upArrow:hover {
+    background-image: url(../../images/icons/up_hover.png);
+}
+
+.leftArrow {
+    background-image: url(../../images/icons/left.png);
+}
+.leftArrow:hover {
+    background-image: url(../../images/icons/left_hover.png);
+}
+
+.downArrow {
+    background-image: url(../../images/icons/down.png);
+}
+.downArrow:hover {
+    background-image: url(../../images/icons/down_hover.png);
+}
+
+.rightArrow {
+    background-image: url(../../images/icons/right.png);
+}
+.rightArrow:hover {
+    background-image: url(../../images/icons/right_hover.png);
+}
+
+:root {
+    --travel-button-size: 32px;
+}
+
+.travelContainer {
+    width: 560px;
+    height: 338px;
+    position: relative;
+    margin-left: auto;
+    margin-right: auto;
+
+    /* Match content size to mapContainer, but pad */
+    padding: var(--travel-button-size);
+}
+.mapContainer {
+    width: 560px;
+    height: 338px;
+}
+
+.travelButton {
+    position: absolute;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0,0,0,0.1);
+}
+.travelButton:hover {
+    background: rgba(0,0,0,0.2);
+}
+.north {
+    left: var(--travel-button-size);
+    right: var(--travel-button-size);
+    top: 0;
+    height: var(--travel-button-size);
+
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+}
+.east {
+    width: var(--travel-button-size);
+    right: 0;
+    top: var(--travel-button-size);
+    bottom: var(--travel-button-size);
+
+    border-top-right-radius: 10px;
+    border-bottom-right-radius: 10px;
+}
+.west {
+    left: 0;
+    width: var(--travel-button-size);
+    top: var(--travel-button-size);
+    bottom: var(--travel-button-size);
+
+    border-top-left-radius: 10px;
+    border-bottom-left-radius: 10px;
+}
+.south {
+    left: var(--travel-button-size);
+    right: var(--travel-button-size);
+    height: var(--travel-button-size);
+    bottom: 0;
+
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
 }
