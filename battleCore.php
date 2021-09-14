@@ -2067,6 +2067,7 @@ function movePrompt($player, $default_attacks) {
 						data-id='{$jutsu['id']}'>" . $player->jutsu[$jutsu['id']]['name'] . '<br /><strong>'.strtoupper($jutsu_types[$i][0]).$c2.'</strong></span><br />';
 						$c2++;
 				}
+				$c2 = 0;
 			}
 			echo "</p>";
 		}
