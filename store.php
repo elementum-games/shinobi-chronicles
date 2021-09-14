@@ -228,41 +228,42 @@ function store() {
 					break;
 			}
 		}
-		
+
 		$style = "style='text-decoration:none;'";
-	
+
 		echo "<table class='table'><tr><th>Jutsu Scrolls</th></tr>
 		<tr><td style='text-align:center;'>You can buy Jutsu Scrolls in this section for any jutsu of your rank or below.
 		Once you have purchased a scroll, go to the Jutsu page to learn the jutsu.<br />
 		<br />
 		<b>Your money:</b> &yen;$player->money</td></tr></table>
-		
+
 		<p style='text-align:center;margin-bottom:0px;'>
-			<a href='$self_link&view=jutsu&jutsu_type=ninjutsu' " . ($jutsu_type == 'ninjutsu' ? $style : "") . ">Ninjutsu</a> | 
-			<a href='$self_link&view=jutsu&jutsu_type=taijutsu' " . ($jutsu_type == 'taijutsu' ? $style : "") . ">Taijutsu</a> | 
+			<a href='$self_link&view=jutsu&jutsu_type=ninjutsu' " . ($jutsu_type == 'ninjutsu' ? $style : "") . ">Ninjutsu</a> |
+			<a href='$self_link&view=jutsu&jutsu_type=taijutsu' " . ($jutsu_type == 'taijutsu' ? $style : "") . ">Taijutsu</a> |
 			<a href='$self_link&view=jutsu&jutsu_type=genjutsu' " . ($jutsu_type == 'genjutsu' ? $style : "") . ">Genjutsu</a>
 		</p>
-		
+
 		<table class='table' style='margin-top:15px;'><tr>
-			<th style='width:30%;'>Name</th>
-			<th style='width:25%;'>Effect</th>
-			<th style='width:26%;'>Cost</th>
-			<th style='width:18%;'></th>
+			<th style='width:15%;'>Name</th>
+			<th style='width:15%;'>Effect</th>
+			<th style='width:10%;'>Type</th>
+			<th style='width:10%;'>Cost</th>
+			<th style='width:10%;'></th>
 		</tr>";
-		
+
 		if(!$shop_jutsu) {
-			echo "<tr><td colspan='4'>No jutsu found!</td></tr>";
+			echo "<tr><td colspan='5'>No jutsu found!</td></tr>";
 		}
 		else {
 			$count = 0;
-			
+
 			$rank = current($shop_jutsu)['rank'];
-			
+
 			foreach($shop_jutsu as $id => $jutsu) {
 				if($jutsu_type && $jutsu['jutsu_type'] != $jutsu_type) {
 					continue;
 				}
-				
+
 				if($player->checkInventory($jutsu['jutsu_id'], 'jutsu')) {
 					continue;
 				}
@@ -270,16 +271,17 @@ function store() {
 					continue;
 				}
 				$count++;
-				
-				echo "<tr>					
+
+				echo "<tr>
 					<td style='width:30%;'><a href='$self_link&view=jutsu&view_jutsu=$id'>{$jutsu['name']}</a></td>
 					<td style='width:25%;text-align:center;'>" . ucwords(str_replace('_', ' ', $jutsu['effect'])) . "</td>
+					<td style='width:25%;text-align:center;'>" . ucwords(str_replace('_', ' ', $jutsu['jutsu_type'])) . "</td>
 					<td style='width:26%;text-align:center;'>&yen;{$jutsu['purchase_cost']}</td>
 					<td style='width:28%;text-align:center;'>
 						<a href='$self_link&view=jutsu&purchase_jutsu={$jutsu['jutsu_id']}&jutsu_type={$jutsu['jutsu_type']}'>Purchase</a></td>
 				</tr>";
 			}
-			
+
 			if($count == 0) {
 				echo "<tr><td colspan='4'>No jutsu available!</td></tr>";
 			}
@@ -317,40 +319,40 @@ function store() {
 				}
 				else if(($item['use_type'] == 1 || $item['use_type'] == 2) && $category != 'gear') {
 					continue;
-				}				
-				
+				}
+
 				if($category != 'consumables' && $player->checkInventory($item['item_id'], 'item')) {
 					continue;
 				}
-				
+
 				$count++;
-				
+
 				if($category == 'consumables' && $player->checkInventory($item['item_id'], 'item')) {
 					$owned = $player->items[$item['item_id']]['quantity'];
 				}
 				else {
 					$owned = 0;
 				}
-				
-				echo "<tr>					
+
+				echo "<tr style='text-align:center;'>
 					<td style='width:35%;'>{$item['name']}" .
-					($owned ? "<br />(Owned: $owned/$max_consumables)" : "") . 
+					($owned ? "<br />(Owned: $owned/$max_consumables)" : "") .
 					"</td>
 					<td style='width:25%;'>" . ucwords(str_replace('_', ' ', $item['effect'])) . "</td>
 					<td style='width:20%;'>&yen;{$item['purchase_cost']}</td>
 					<td style='width:20%;'><a href='$self_link&view=$category&purchase_item={$item['item_id']}'>Purchase</a></td>
 				</tr>";
-				
+
 			}
-			
+
 			if($count == 0) {
 				echo "<tr><td colspan='4'>No items available!</td></tr>";
 			}
 		}
 		echo "</table>";
 	}
-	
-	
+
+
 }
 
 ?>
