@@ -1960,8 +1960,14 @@ function movePrompt($player, $default_attacks) {
 
 		$(document).keyup(function(event){
 
-			//if the first array item is not a letter
+			//arr->array will hold 2 elements [JutsuName, Number];
 
+			//enter key
+			if(event.which == 13){
+				document.getElementById('submitbtn').click();
+			}
+
+			//(If Key is a Letter, Letter will be turned into string for Arr)
 			if(event.which == nin) {
 				arr[0] = 'ninjutsu';
 			}
@@ -1975,15 +1981,17 @@ function movePrompt($player, $default_attacks) {
 				arr[0] = 'bloodline';
 			}
 			else if(event.which == def_ault) {
-				arr[0] = 'taijutsu'; /*default*/
+				arr[0] = 'default'; /*default*/
 			}
 
 
-			//if first array empty
+			//if arr[0] is not a valid string, arr will clear
 			if(typeof(arr[0]) == null){
 				arr = [];
 			}
 
+
+			//if user presses correct number (between 0-9) store in Arr[1];
 			var key = -1;
 			switch (event.which){
 				case 48: key = 0;
@@ -2007,29 +2015,33 @@ function movePrompt($player, $default_attacks) {
 				case 57: key = 9;
 				break;
 			}
-
 			arr[1] = key;
 
-			//create
+			//create the array example: array[ninjutsu, 0];
 			var classname = arr[0] + arr[1];
-			console.log(classname + ' test input');
+			// console.log(classname + ' test input');
 
+			//if arr[0] not a string, and arr[1] is not the default -1, continue;
 			if(typeof(arr[0]) == 'string' && arr[1] != -1){
 
+				//creating the ID name to get the Element to add the click() function to
 				var classname = arr[0] + arr[1];
 				console.log(classname);
-				// console.log('key has been focused');
-
+				console.log('selection successful');
 				document.getElementById(classname).click();
 
-				// document.getElementById(classname).addClass('focused') should add this
-				// document.getElementById(enterButton).click(); input will be made after selection
+				// document.getElementById(classname).addClass('focused') should add something like this
+				//for visual so user knows selection is made
 
-				console.log('selection successful');
 			}
+
+			//for this script to work had to add ID's to each jutsu during their button creation
+			//needs refactoring for the future but this kinda works for now.
 		});
 
 		</script>";
+
+		$n = 0; $t =0; $g =0;
 
 		// Attack list
 		$jutsu_types = array('ninjutsu', 'taijutsu', 'genjutsu');
@@ -2039,9 +2051,9 @@ function movePrompt($player, $default_attacks) {
 				if($attack['jutsu_type'] != $jutsu_types[$i]) {
 					continue;
 				}
-				echo "<span id='{$jutsu_types[$i]}{$i}' class='jutsuName {$jutsu_types[$i]}' data-handseals='" .
+				echo "<span id='default{$i}' class='jutsuName {$jutsu_types[$i]}' data-handseals='" .
 					($attack['jutsu_type'] != 'taijutsu' ? $attack['hand_seals'] : '') . "'
-					data-id='{$attack['jutsu_id']}'>" . $attack['name'] . '</span><br />';
+					data-id='{$attack['jutsu_id']}'>" . $attack['name'] . '<br /><strong>'.'D'.$i.'</strong></span><br />';
 			}
 			if(is_array($player->equipped_jutsu)) {
 				foreach($player->equipped_jutsu as $jutsu) {
@@ -2049,7 +2061,7 @@ function movePrompt($player, $default_attacks) {
 						continue;
 					}
 					echo "<span id='{$jutsu_types[$i]}{$i}'class='jutsuName {$jutsu_types[$i]}' data-handseals='{$player->jutsu[$jutsu['id']]['hand_seals']}'
-						data-id='{$jutsu['id']}'>" . $player->jutsu[$jutsu['id']]['name'] . '</span><br />';
+						data-id='{$jutsu['id']}'>" . $player->jutsu[$jutsu['id']]['name'] . '<br /><strong>'.strtoupper($jutsu_types[$i][0].$i).'</strong></span><br />';
 				}
 			}
 			echo "</p>";
@@ -2060,7 +2072,7 @@ function movePrompt($player, $default_attacks) {
 			if(!empty($player->bloodline->jutsu)) {
 				foreach($player->bloodline->jutsu as $id => $jutsu) {
 					echo "<span id='bloodline{$i}' class='jutsuName bloodline_jutsu' data-handseals='" . $jutsu['hand_seals'] . "'" .
-						"data-id='$id'>" . $jutsu['name'] . '</span><br />';
+						"data-id='$id'>" . $jutsu['name'] . '<br /><strong>B' . $i . '</strong></span><br />';
 				}
 			}
 			echo "</p>";
@@ -2072,7 +2084,7 @@ function movePrompt($player, $default_attacks) {
 		<input type='hidden' id='weaponID' name='weapon_id' value='0' />
 		<input type='hidden' id='jutsuID' name='jutsu_id' value='' />
 		<p style='display:block;text-align:center;margin:auto;'>
-			<input type='submit' name='attack' value='Submit' />
+			<input id='submitbtn' type='submit' name='attack' value='Submit' />
 		</p>
 		</form>
 		</div>";
