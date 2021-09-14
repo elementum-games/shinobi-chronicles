@@ -2041,8 +2041,10 @@ function movePrompt($player, $default_attacks) {
 
 		</script>";
 
-		$n = 0; $t =0; $g =0;
-
+		//Used to change ID #
+		$c1 = 0;
+		$c2 = 0;
+		$c3 = 0;
 		// Attack list
 		$jutsu_types = array('ninjutsu', 'taijutsu', 'genjutsu');
 		for($i = 0; $i < 3; $i++) {
@@ -2051,17 +2053,19 @@ function movePrompt($player, $default_attacks) {
 				if($attack['jutsu_type'] != $jutsu_types[$i]) {
 					continue;
 				}
-				echo "<span id='default{$i}' class='jutsuName {$jutsu_types[$i]}' data-handseals='" .
+				echo "<span id='default$c1' class='jutsuName {$jutsu_types[$i]}' data-handseals='" .
 					($attack['jutsu_type'] != 'taijutsu' ? $attack['hand_seals'] : '') . "'
-					data-id='{$attack['jutsu_id']}'>" . $attack['name'] . '<br /><strong>'.'D'.$i.'</strong></span><br />';
+					data-id='{$attack['jutsu_id']}'>" . $attack['name'] . '<br /><strong>'.'D'.$c1.'</strong></span><br />';
+					$c1++;
 			}
 			if(is_array($player->equipped_jutsu)) {
 				foreach($player->equipped_jutsu as $jutsu) {
 					if($player->jutsu[$jutsu['id']]['jutsu_type'] != $jutsu_types[$i]) {
 						continue;
 					}
-					echo "<span id='{$jutsu_types[$i]}{$i}'class='jutsuName {$jutsu_types[$i]}' data-handseals='{$player->jutsu[$jutsu['id']]['hand_seals']}'
-						data-id='{$jutsu['id']}'>" . $player->jutsu[$jutsu['id']]['name'] . '<br /><strong>'.strtoupper($jutsu_types[$i][0].$i).'</strong></span><br />';
+					echo "<span id='{$jutsu_types[$i]}$c2'class='jutsuName {$jutsu_types[$i]}' data-handseals='{$player->jutsu[$jutsu['id']]['hand_seals']}'
+						data-id='{$jutsu['id']}'>" . $player->jutsu[$jutsu['id']]['name'] . '<br /><strong>'.strtoupper($jutsu_types[$i][0]).$c2.'</strong></span><br />';
+						$c2++;
 				}
 			}
 			echo "</p>";
@@ -2071,8 +2075,9 @@ function movePrompt($player, $default_attacks) {
 			echo "<p style='width:$width;margin-right:0px;'>";
 			if(!empty($player->bloodline->jutsu)) {
 				foreach($player->bloodline->jutsu as $id => $jutsu) {
-					echo "<span id='bloodline{$i}' class='jutsuName bloodline_jutsu' data-handseals='" . $jutsu['hand_seals'] . "'" .
-						"data-id='$id'>" . $jutsu['name'] . '<br /><strong>B' . $i . '</strong></span><br />';
+					echo "<span id='bloodline$c3' class='jutsuName bloodline_jutsu' data-handseals='" . $jutsu['hand_seals'] . "'" .
+						"data-id='$id'>" . $jutsu['name'] . '<br /><strong>B' . $c3 . '</strong></span><br />';
+						$c3++;
 				}
 			}
 			echo "</p>";
