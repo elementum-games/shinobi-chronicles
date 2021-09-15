@@ -31,7 +31,7 @@ Recommended workflow
 
 ## Local Setup
 
-You need an environment with three things:
+You need an environment with four things:
 - A remote fork of the SC repository (e.g. `your-username/shinobi-chronicles`), on your GitHub account
 - A local clone of your fork 
 - A PHP local web server
