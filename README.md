@@ -26,14 +26,44 @@ Recommended workflow
 
 ### Local Setup
 
-WIP rough version of one way:
-- Fork repo
-- Download PhpStorm (https://www.jetbrains.com/phpstorm/)
-- Open from VCS -> GitHub -> login to your account -> choose shinobi-chronicles repository from the list
-- Download XAMPP (https://www.apachefriends.org/index.html)
-- Go to apache > config > httpd.conf
-- Find DocumentRoot > change the path "C:\xampp\htdocs" to your shinobi-chronicles directory (you can right-click the top folder in PhpStorm after opening it > copy path > absolute path)
-- change the default path below in <Directory "C:\xampp\htdocs"> to your shinobi-chronicles directory
-- Go to MySQL > Admin/PhpMyAdmin > user accounts > add user "shinobi_chronicles" > give it a password (doesn't matter what it is, can just be "password") > check "create database with same name and grant all permissions"
-- Go to PhpStorm, find secure/vars.sample.php and change the values to the ones from your database: user = shinobi_chronicles, database = shinobi_chronicles, password = (whatever you set)
+You need an environment with three things:
+- A remote fork of the SC repository (e.g. `your-username/shinobi-chronicles`), on your GitHub account
+- A local clone of your fork 
+- A PHP local web server
+- A MySQL database 
+
+You can use any IDE and setup you want if you have the know-how, but this guide lays out one way to get 
+started quickly with minimal PHP environment/Git knowledge.
+
+1. Fork repo
+2. Download PhpStorm (https://www.jetbrains.com/phpstorm/)
+3. Setup PhpStorm 
+   - Open from VCS -> GitHub
+   - login to your account
+   - choose shinobi-chronicles repository from the list
+4. Download XAMPP (https://www.apachefriends.org/index.html)
+5. Setup Apache in XAMPP
+   - Go to apache > config > httpd.conf
+   - Find DocumentRoot and change the path "C:\xampp\htdocs" to your shinobi-chronicles directory
+     - (You can right-click the top folder in PhpStorm after opening it > copy path > absolute path)
+   - Change the default path below in <Directory "C:\xampp\htdocs"> to your shinobi-chronicles directory
+6. Setup MySQL in XAMPP
+   - Go to MySQL > Admin/PhpMyAdmin > user accounts 
+   - Go to add user
+   - Enter the name "shinobi_chronicles" and give it a password (doesn't matter what it is, can just be "password") > check "create database with same name and grant all permissions"
+7. Import the DB in XAMPP > MySQL
+   - Select the database `shinobi_chornicles` in PhpMyAdmin
+   - Click "Import" at the top menu
+   - Click "Choose file" and navigate to your SC directory
+     - Select `shinobi-chronicles/db/schost_game_structure.sql` and proceed with the import
+8. Setup game config in PhpStorm
+   - Find `secure/vars.sample.php`
+   - Make a copy of it as `secure/vars.php` 
+   - Change the values to the ones from your database:
+     - user = shinobi_chronicles 
+     - database = shinobi_chronicles 
+     - password = (whatever you set as your password)
+9. Run it
+    - First, make sure Apache and MySQL are both started in XAMPP
+    - Then navigate to http://localhost/ and you should see the game come up
 
