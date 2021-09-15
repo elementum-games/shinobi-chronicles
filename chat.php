@@ -161,12 +161,13 @@ function chat() {
 	// Table with chat posts
 	echo "<table class='table' style='width:98%;'>
 		<tr>
-			<th style='width:28%;'>Users</th>
-			<th style='width:61%;'>Message</th>
+			<th style='width:8%;'>Avy</th>
+			<th style='width:12%;'>User</th>
+			<th style='width:40%;'>Message</th>
 			<th style='width:10%;'>Time</th>
 		</tr>";
 		if(! $system->db_num_rows) {
-			echo "<tr><td colspan='2' style='text-align:center;'>No posts!</td></tr>";
+			echo "<tr><td colspan='3' style='text-align:center;'>No posts!</td></tr>";
 		}
 		while($post = $system->db_fetch($result)) {
 			$user_result = $system->query("SELECT `premium_credits_purchased`, `avatar_link` FROM `users`
@@ -196,11 +197,14 @@ function chat() {
 
 			echo "
 				<tr>
+
+					<!--Profile Img-->
+				  <td>
+						<img style='object-fit: fill;' src='{$userData['avatar_link']}' />
+					</td>
+
 					<td style='text-align:center;'>
 					<div id='user_data_container' style='display: flex;flex-direction:row'>
-					    <div style='flex-shrink:0;'>
-					        <img style='max-height:45px;max-width:45px;' src='{$userData['avatar_link']}' />
-                        </div>
 						<div style='display:block;flex-grow:1;'>
 							<a href='{$system->links['members']}&user={$post['user_name']}' class='$class $statusType'>{$post['user_name']}</a><br />
 							<p style='margin: 1px 0 3px;'>
@@ -209,12 +213,11 @@ function chat() {
                             stripslashes($post['title']) . "</p>
 						</div>
 					</div>";
-
-                    if($post['staff_level']) {
-                        $color = $system->SC_STAFF_COLORS[$post['staff_level']];
-                        echo "<p class='staffMember' style='background-color: {$color['staffColor']}'>{$color['staffBanner']}</p>";
-                    }
-                echo "</td>
+            if($post['staff_level']) {
+                $color = $system->SC_STAFF_COLORS[$post['staff_level']];
+                echo "<p class='staffMember' style='background-color: {$color['staffColor']}'>{$color['staffBanner']}</p>";
+            }
+      echo "</td>
 				<td class='chatmsg' style='text-align:center;padding:4px;white-space:pre-wrap;'>" .
 					wordwrap($system->html_parse(stripslashes($post['message']), false, true), 60, "\n", true) . "</td>";
 				$post_time = time() - $post['time'];
