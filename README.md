@@ -21,7 +21,7 @@ maintainer on it to avoid building something that's not going to get approved.
 3. Create a new branch for your changes
 4. Make the changes and test them on your local environment, then commit them to the branch
 5. Push the branch to your forked repo on GH
-4. Open a pull request from `your-name/shinobi-chronicles:branch-name` => `levimeahan/shinobi-chronicles:main`
+4. Open a pull request from your fork/branch to the primary repo (`levimeahan/shinobi-chronicles`) and `main` branch
    - There's a "Contribute" button on the main page of your fork you can use to compare and open a pull request
     ![image](https://i.imgur.com/z5SCPuQ.png)
 
