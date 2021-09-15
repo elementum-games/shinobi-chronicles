@@ -5,14 +5,23 @@
 
 ## Contributing
 
-Recommended workflow
+Feel free to tackle any of the issues at https://github.com/levimeahan/shinobi-chronicles/issues - Assign yourself 
+or drop a comment mentioning you're working on it so others know. You can also drop any questions on the issue to 
+clarify exactly what needs to be done.
+
+You can also create a new issue if there's something you want to add that's not on the list and get the yay/nay from a 
+maintainer on it to avoid building something that's not going to get approved.
+
+### Recommended workflow
 
 1. Fork repo on GitHub (top right)  
   ![image](https://i.imgur.com/0tiyX6N.png) 
 2. Clone your fork to your local machine (you can find the URL to clone under "Code")  
   ![image](https://i.imgur.com/VCUgDnG.png)
-3. Make changes to your local and test, push to your forked repo on GH
-4. Open a pull request from fork => original repo
+3. Create a new branch for your changes
+4. Make the changes and test them on your local environment, then commit them to the branch
+5. Push the branch to your forked repo on GH
+4. Open a pull request from `your-name/shinobi-chronicles:branch-name` => `levimeahan/shinobi-chronicles:main`
    - There's a "Contribute" button on the main page of your fork you can use to compare and open a pull request
     ![image](https://i.imgur.com/z5SCPuQ.png)
 
@@ -55,9 +64,9 @@ started quickly with minimal PHP environment/Git knowledge.
 6. Setup MySQL in XAMPP
    - Go to MySQL > Admin/PhpMyAdmin > user accounts 
    - Go to add user
-   - Enter the name "shinobi_chronicles" and give it a password (doesn't matter what it is, can just be "password") > check "create database with same name and grant all permissions"
+   - Enter the name `shinobi_chronicles` and give it a password (doesn't matter what it is, can just be "password") > check "create database with same name and grant all permissions"
 7. Import the DB in XAMPP > MySQL
-   - Select the database `shinobi_chornicles` in PhpMyAdmin
+   - Select the database `shinobi_chronicles` in PhpMyAdmin
    - Click "Import" at the top menu
    - Click "Choose file" and navigate to your SC directory
      - Select `shinobi-chronicles/db/schost_game_structure.sql` and proceed with the import
