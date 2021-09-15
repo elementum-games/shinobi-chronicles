@@ -66,6 +66,7 @@ function travel() {
 			$player->location = $location;
 			$player->y = $target_y;
 			$player->x = $target_x;
+			$player->updateData();
 		}
 		
 		// Village check
