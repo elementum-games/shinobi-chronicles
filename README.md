@@ -1,3 +1,8 @@
+# Overview
+
+[Contributing](#contributing)  
+[Local Setup](#local-setup)
+
 ## Contributing
 
 Recommended workflow
@@ -24,7 +29,7 @@ Recommended workflow
      - Pull the changes from your GitHub fork to your local
 
 
-### Local Setup
+## Local Setup
 
 You need an environment with three things:
 - A remote fork of the SC repository (e.g. `your-username/shinobi-chronicles`), on your GitHub account
