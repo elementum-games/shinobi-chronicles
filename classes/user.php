@@ -1369,10 +1369,13 @@ class User {
 		`location` = '$this->location',";
 		if($this->mission_id) {
 			if(is_array($this->mission_stage)) {
-				$this->mission_stage = json_encode($this->mission_stage);
+				$mission_stage = json_encode($this->mission_stage);
 			}
+			else {
+			    $mission_stage = $this->mission_stage;
+            }
 			$query .= "`mission_id`='$this->mission_id',
-			`mission_stage`='$this->mission_stage',";
+			`mission_stage`='$mission_stage',";
 		}
 		else {
 			$query .= "`mission_id`=0,";
