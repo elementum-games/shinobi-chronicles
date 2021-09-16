@@ -168,6 +168,8 @@ function battleAI(User &$player, AI &$opponent) {
 		// Run player attack
 		try {
 			$jutsu_type = $_POST['jutsu_type'];
+			$player_jutsu = null;
+
 			// Check for handseals if ninjutsu/genjutsu (+Layered genjutsu check)
 			if($jutsu_type == 'ninjutsu' or $jutsu_type == 'genjutsu') {
 				if(!$_POST['hand_seals']) {
@@ -214,6 +216,7 @@ function battleAI(User &$player, AI &$opponent) {
 						break;
 					}
 				}
+
 				$jutsu_unique_id = 'J:' . $attack_id . ':' . $player->id;
 				// Layered genjutsu check
 				if($jutsu_ok && $jutsu_type == 'genjutsu' && !empty($player_jutsu->parent_jutsu)) {
@@ -265,6 +268,10 @@ function battleAI(User &$player, AI &$opponent) {
 			if($jutsu_ok && isset($jutsu_cooldowns[$jutsu_unique_id])) {
 				throw new Exception("Cannot use that jutsu, it is on cooldown for " . $jutsu_cooldowns[$jutsu_unique_id] . " more turns!");
 			}
+
+			if(!$jutsu_ok) {
+			    throw new Exception("Invalid jutsu!");
+            }
 
 			// Run usage check
 			if(!$player->useJutsu($player_jutsu, $purchase_type . '_jutsu')) {
