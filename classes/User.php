@@ -802,6 +802,7 @@ class User {
 				// Jutsu training
 				if(strpos($this->train_type, 'jutsu:') !== false) {
                     $jutsu_id = $this->train_gain;
+                    $this->getInventory();
 
 					$gain = User::$jutsu_train_gain;
 					if($this->system->TRAIN_BOOST) {
@@ -811,7 +812,6 @@ class User {
 						$gain = 100 - $this->jutsu[$jutsu_id]->level;
 					}
 
-					$this->getInventory();
 					if($this->checkInventory($jutsu_id, 'jutsu')) {
 						if($this->jutsu[$jutsu_id]->level < 100) {
 							$new_level = $this->jutsu[$jutsu_id]->level + $gain;
