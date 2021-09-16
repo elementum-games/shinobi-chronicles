@@ -1,5 +1,5 @@
-<?php 
-/* 
+<?php
+/*
 File: 		premium.php
 Coder:		Levi Meahan
 Created:	04/30/2014
@@ -11,7 +11,7 @@ function premium() {
 	global $system;
 
 	global $player;
-	
+
 	global $self_link;
 
 	$costs['user_reset'] = 0;
@@ -46,16 +46,16 @@ function premium() {
 	if($player->bloodline->bloodline_id && $player->clan['id'] != $player->bloodline->clan_id) {
 		$system->query(sprintf("SELECT `clan_id`, `name` FROM `clans` WHERE `clan_id` = '%d'", $player->bloodline->clan_id));
 		$result = $system->db_fetch();
-		$available_clans[$result['clan_id']] = stripslashes($result['name']); 
+		$available_clans[$result['clan_id']] = stripslashes($result['name']);
 	}
 
 
-	if($_POST['user_reset']) {		
-		try {			
+	if($_POST['user_reset']) {
+		try {
 			if($player->premium_credits < $costs['user_reset']) {
 				throw new Exception("You do not have enough Ancient Kunai!");
 			}
-			
+
 			if(!isset($_POST['confirm_reset'])) {
 				echo "<table class='table'><tr><th>Confirm Reset</th></tr>
 				<tr><td style='text-align:center;'>Are you sure you want to reset your character? You will lose all your stats,
@@ -68,11 +68,11 @@ function premium() {
 				return true;
 				throw new Exception('');
 			}
-			
+
 			if($player->team) {
 				throw new Exception("You must leave your team before resetting!");
 			}
-			
+
 			$player->level = 1;
 			$player->level = 1;
 			$player->rank = 1;
@@ -106,21 +106,21 @@ function premium() {
 
 			//Bug fix: Elements previously was not cleared. -- Shadekun
 			$player->elements = NULL;
-			
+
 			$player->premium_credits -= $costs['user_reset'];
-			
+
 			$player->updateData(1);
-			
+
 			$system->query("DELETE FROM `user_bloodlines` WHERE `user_id`='$player->user_id'");
-			$system->query("UPDATE `user_inventory` SET 
+			$system->query("UPDATE `user_inventory` SET
 				`jutsu` = '',
 				`items` = '',
 				`bloodline_jutsu` = '',
 				`equipped_jutsu` = '',
 				`equipped_items` = ''
 				WHERE `user_id`='$player->user_id'");
-				
-				
+
+
 			echo "<table class='table'><tr><th>Character Reset</th></tr>
 			<tr><td style='text-align:center;'>
 			You have reset your character.<br />
@@ -149,11 +149,11 @@ function premium() {
 			if(!preg_match('/^[a-zA-Z0-9_-]+$/', $new_name)) {
 				throw new Exception("Only alphanumeric characters, dashes, and underscores are allowed in usernames!");
 			}
-	
+
 			if($system->censor_check($new_name)) {
 				throw new Exception("Inappropriate language is not allowed in usernames!");
 			}
-			
+
 			if($player->username_changes > 0){
 				$akCost = 0;
 			}
@@ -172,7 +172,7 @@ function premium() {
 					throw new Exception("Username already in use!");
 				}
 			}
-			
+
 			if(!isset($_POST['confirm_nameChange'])) {
 				echo "<table class='table'><tr><th>Confirm Change</th></tr>
 				<tr><td style='text-align:center;'>Are you sure you want to change your username?
@@ -192,7 +192,7 @@ function premium() {
 
 			$system->query(sprintf($sql, $new_name, $akCost, $nameCost, $player->user_id));
 			$player->premium_credits -= $akCost;
-			
+
 			echo "<table class='table'><tr><th>Username Change</th></tr>
 			<tr><td style='text-align:center;'>
 			You have changed your username to {$new_name}.<br />
@@ -208,23 +208,23 @@ function premium() {
 		if($player->bloodline_id) {
 			array_unshift($stats, 'bloodline_skill');
 		}
-		try {	
+		try {
 			$stat = $system->clean($_POST['stat']);
 			if(array_search($stat, $stats) === false) {
 				throw new Exception("Invalid stat!");
 			}
-			
+
 			$cost = floor($player->{$stat} / 200);
 			if($player->premium_credits < $cost) {
 				throw new Exception("You do not have enough Ancient Kunai!");
 			}
-			
+
 			// Amount to reset to
 			$reset_amount = 5;
 			if(strpos($stat, 'skill')) {
 				$reset_amount = 10;
 			}
-			
+
 			if(!isset($_POST['confirm'])) {
 				echo "<table class='table'><tr><th>Confirm stat reset</th></tr>
 				<tr><td style='text-align:center;'>
@@ -235,19 +235,19 @@ function premium() {
 				<input type='submit' name='stat_reset' value='Confirm reset' />
 				</form>
 				</td></tr></table>";
-				
+
 				throw new Exception('');
 			}
-			
+
 			$player->premium_credits -= $cost;
-			
-			
-			
+
+
+
 			$exp = ($player->{$stat} - $reset_amount) * 10;
-			
+
 			$player->{$stat} = $reset_amount;
 			$player->exp -= $exp;
-			
+
 			$system->message("You have reset your " . ucwords(str_replace('_', ' ', $stat)) . " to $reset_amount.");
 		} catch (Exception $e) {
 			$system->message($e->getMessage());
@@ -259,8 +259,8 @@ function premium() {
 		if($player->bloodline_id) {
 			array_unshift($stats, 'bloodline_skill');
 		}
-		
-		try {	
+
+		try {
 			$original_stat = $system->clean($_POST['original_stat']);
 			$target_stat = $system->clean($_POST['target_stat']);
 			if(array_search($original_stat, $stats) === false) {
@@ -280,39 +280,43 @@ function premium() {
             if(strpos($original_stat, 'skill') !== false) {
                 $reset_amount = 10;
             }
-			
+
 			// Transfer amount
 			$transfer_amount = (int)$system->clean($_POST['transfer_amount']);
-			
+
 			if($transfer_amount < 1) {
 				throw new Exception("Invalid transfer amount!");
 			}
 			if($transfer_amount > $player->{$original_stat} - $reset_amount) {
 				throw new Exception("Invalid transfer amount!");
 			}
-			
-			$cost = 1 + floor($transfer_amount / 300);
-			
+
+			if($transfer_amount <= 25) {
+				$cost = 0;
+			} else if($transfer_amount >= 26) {
+				$cost = 1 + floor($transfer_amount / 300);
+			}
+
 			if($player->premium_credits < $cost) {
 				throw new Exception("You do not have enough Ancient Kunai!");
 			}
-			
+
 			$time = $transfer_amount * 0.2;
-			
+
 			// Check for minimum stat amount
 			if($player->{$original_stat} <= $reset_amount) {
 				throw new Exception("Stat is already at the minimum!");
 			}
-			
+
 			// Check for player training
 			if($player->train_time) {
 				throw new Exception("Please finish or cancel your training!");
 			}
-			
+
 			if(!isset($_POST['confirm'])) {
 				echo "<table class='table'><tr><th>Confirm stat reset</th></tr>
 				<tr><td style='text-align:center;'>
-				Are you sure you want to transfer $transfer_amount " . ucwords(str_replace('_', ' ', $original_stat)) . " to " . 
+				Are you sure you want to transfer $transfer_amount " . ucwords(str_replace('_', ' ', $original_stat)) . " to " .
 					ucwords(str_replace('_', ' ', $target_stat)) . "?<br />" .
 				ucwords(str_replace('_', ' ', $original_stat)) . ": " . $player->{$original_stat} . " -> " . ($player->{$original_stat} - $transfer_amount) . "<br />" .
 				ucwords(str_replace('_', ' ', $target_stat)) . ": " . $player->{$target_stat} . " -> " . ($player->{$target_stat} + $transfer_amount) .
@@ -327,27 +331,27 @@ function premium() {
 				<input type='submit' name='stat_allocate' value='Confirm transfer' />
 				</form>
 				</td></tr></table>";
-				
+
 				throw new Exception('');
 			}
-			
+
 			$player->premium_credits -= $cost;
-			
+
 			$exp = $transfer_amount * 10;
 			$player->exp -= $exp;
 			$player->{$original_stat} -= $transfer_amount;
-			
+
 			$player->train_type = $target_stat;
 			$player->train_gain = $transfer_amount;
 			$player->train_time = time() + ($time * 60);
-			
+
 			$player->updateData();
-			
+
 			echo "<table class='table'><tr><th>Stat Transfer Started</th></tr>
-			<tr><td style='text-align:center;'>You have started the transfer of your " . ucwords(str_replace('_', ' ', $original_stat)) . " to " . 
+			<tr><td style='text-align:center;'>You have started the transfer of your " . ucwords(str_replace('_', ' ', $original_stat)) . " to " .
 				ucwords(str_replace('_', ' ', $target_stat)) . ".<br />
 				<b><u>IMPORTANT</u></b>:<br />
-				Do not cancel the training that was just started or you will not receive the transferred stats, and staff will not refund you for the 
+				Do not cancel the training that was just started or you will not receive the transferred stats, and staff will not refund you for the
 				transfer cost!
 				</td></tr></table>";
 		} catch (Exception $e) {
@@ -358,17 +362,17 @@ function premium() {
 	else if($_POST['purchase_bloodline']) {
 		$bloodline_id = $system->clean($_POST['bloodline_id']);
 		try {
-			$result = $system->query("SELECT `bloodline_id`, `name`, `clan_id`, `rank` FROM `bloodlines` 
+			$result = $system->query("SELECT `bloodline_id`, `name`, `clan_id`, `rank` FROM `bloodlines`
 				WHERE `bloodline_id`='$bloodline_id' AND `rank` < 5 ORDER BY `rank` ASC");
 			if($system->db_num_rows == 0) {
 				throw new Exception("Invalid bloodline!");
 			}
 			$result = $system->db_fetch($result);
-			
+
 			if($player->bloodline_id == $bloodline_id) {
 				throw new Exception("You already have this bloodline!");
 			}
-			
+
 			if($player->premium_credits < $costs['bloodline'][$result['rank']]) {
 				throw new Exception("You do not have enough Ancient Kunai!");
 			}
@@ -387,30 +391,30 @@ function premium() {
 				$player->clan_office = 0;
 			}
 
-		
+
 			$player->premium_credits -= $costs['bloodline'][$result['rank']];
-			
+
 			// Give bloodline
 			$clan_id = $result['clan_id'];
 			$bloodline_name = $result['name'];
-			
+
 			require("adminPanel.php");
 			$status = giveBloodline($bloodline_id, $player->user_id, false);
-			
+
 			$message = "You now have the bloodline <b>$bloodline_name</b>.";
-			
+
 			// Set clan
 			$result = $system->query("SELECT `name` FROM `clans` WHERE `clan_id` = '$clan_id' LIMIT 1");
 			if($system->db_num_rows > 0) {
 				$clan_result = $system->db_fetch($result);
-				
-				
+
+
 				$player->clan = array();
 				$player->clan['id'] = $clan_id;
 				$message .= " With your new bloodline you have been kicked out of your previous clan, and have been accepted by
 				the " . $clan_result['name'] . " Clan.";
 			}
-			
+
 			echo "<table class='table'><tr><th>New Bloodline!</th></tr>
 			<tr><td style='text-align:center;'>$message</td></tr></table>";
 		} catch (Exception $e) {
@@ -430,7 +434,7 @@ function premium() {
 					throw new Exception("Invalid seal!");
 					break;
 			}
-			
+
 			// Check seal length
 			switch($seal_length) {
 				case 30:
@@ -441,14 +445,14 @@ function premium() {
 					throw new Exception("Invalid length!");
 					break;
 			}
-			
+
 			// Check cost
 			$cost = $costs['forbidden_seal'][$seal_level] * ($seal_length / 30);
 			if($player->premium_credits < $cost) {
 				throw new Exception("You do not have enough Ancient Kunai! ($cost needed)");
 			}
 			$player->premium_credits -= $cost;
-			
+
 			// Extend
 			if($player->forbidden_seal && $player->forbidden_seal['level'] == $seal_level) {
 				$player->forbidden_seal['time'] += $seal_length * 86400;
@@ -508,7 +512,7 @@ function premium() {
 			if($village == $player->village) {
 				throw new Exception("Invalid village!");
 			}
-			
+
 			switch($village) {
 				case 'Stone':
 				case 'Cloud':
@@ -520,16 +524,16 @@ function premium() {
 					throw new Exception("Invalid village!");
 					break;
 			}
-		
+
 			if($player->team) {
 				$debug = ($player->layout == 'classic_blue') ? "<br /><br />" : "";
 				throw new Exception($debug . "You must leave your team first!");
 			}
-			
+
 			if($player->premium_credits < $costs['village_change']) {
 				throw new Exception("You do not have enough Ancient Kunai!");
 			}
-			
+
 			if(!isset($_POST['confirm'])) {
 				echo "<table class='table'><tr><th>Confirm Village Change</th></tr>
 				<tr><td style='text-align:center;'>
@@ -538,7 +542,7 @@ function premium() {
 				<br />
 				<b>(IMPORTANT: This is non-reversable once completed, if you want to return to your original village you will have to pay
 				a higher transfer fee)</b><br />
-				<form action='$self_link' method='post'>				
+				<form action='$self_link' method='post'>
 				<input type='hidden' name='new_village' value='$village' />
 				<input type='hidden' name='confirm' value='1' />
 				<input type='submit' name='change_village' value='Change Village' />
@@ -560,38 +564,38 @@ function premium() {
 			if($player->clan_office) {
 				$player->clan_office = 0;
 			}
-			
+
 			// Cost
 			$player->premium_credits -= ($costs['village_change']);
 			$player->village_changes++;
-			
+
 			// Village
 			$player->village = $village;
-			
+
 			// Location
 			$result = $system->query("SELECT `location` FROM `villages` WHERE `name`='$player->village' LIMIT 1");
 			$location = $system->db_fetch($result)['location'];
 			$player->location = $location;
-			
+
 			// Clan
-			$result = $system->query("SELECT `clan_id`, `name` FROM `clans` 
+			$result = $system->query("SELECT `clan_id`, `name` FROM `clans`
 					WHERE `village`='$player->village' AND `bloodline_only`='0'");
 			if($system->db_num_rows == 0) {
-				$result = $system->query("SELECT `clan_id`, `name` FROM `clans` 
+				$result = $system->query("SELECT `clan_id`, `name` FROM `clans`
 				WHERE `bloodline_only`='0'");
 			}
-			
+
 			if(! $system->db_num_rows) {
 				throw new Exception("No clans available!");
 			}
-			
+
 			$clans = array();
 			$count = 0;
 			while($row = $system->db_fetch($result)) {
 				$clans[$row['clan_id']] = $row;
 				$count++;
 			}
-			
+
 			$query = "SELECT ";
 			$x = 0;
 			foreach($clans as $id => $clan) {
@@ -602,7 +606,7 @@ function premium() {
 				}
 			}
 			$query .= " FROM `users`";
-			
+
 			$clan_counts = array();
 			$result = $system->query($query);
 			$row = $system->db_fetch($result);
@@ -611,9 +615,9 @@ function premium() {
 				$clan_counts[$id] = $user_count;
 				$total_users += $user_count;
 			}
-			
+
 			$average_users = round($total_users / $count);
-			
+
 			$clan_rolls = array();
 			foreach($clans as $id => $clan) {
 				$entries = 4;
@@ -622,26 +626,26 @@ function premium() {
 					if($clan_counts[$id] / 3 > $average_users) {
 						$entries--;
 					}
-					
-					
+
+
 				}
 				for($i = 0; $i < $entries; $i++) {
 					$clan_rolls[] = $id;
 				}
-				
+
 				$clan_id = $clan_rolls[mt_rand(0, count($clan_rolls) - 1)];
-				
-				
+
+
 				$player->clan = array();
 				$player->clan['id'] = $clan_id;
 				$clan_name = $clans[$clan_id]['name'];
 			}
-			
+
 			$system->message("You have moved to the $village village, and been placed in the $clan_name clan.");
 			$location = explode('.', $player->location);
 			$player->x = $location[0];
 			$player->y = $location[1];
-			
+
 		} catch (Exception $e) {
 			$system->message($e->getMessage());
 		}
@@ -663,7 +667,7 @@ function premium() {
 			}
 
 			$clan_name = $available_clans[$new_clan_id];
-			
+
 			if(!isset($_POST['confirm'])) {
 				echo "
 					<table class='table'><tr><th>Confirm Clan Change</th></tr>
@@ -672,8 +676,8 @@ function premium() {
 								Are you sure you want to move from the {$player->clan['name']} clan to the $clan_name clan?<br />
 								<br />
 								<b>(IMPORTANT: This is non-reversable once completed, if you want to return to your original clan you will have to pay a higher transfer fee)</b><br />
-								
-								<form action='$self_link' method='post'>				
+
+								<form action='$self_link' method='post'>
 									<input type='hidden' name='clan_change_id' value='$new_clan_id' />
 									<input type='hidden' name='confirm' value='1' />
 									<input type='submit' name='change_clan' value='Change Clan' />
@@ -683,11 +687,11 @@ function premium() {
 					</table>";
 				return true;
 			}
-			
+
 			// Cost
 			$player->premium_credits -= ($costs['clan_change']);
 			$player->clan_changes++;
-			
+
 			// Village
 			if($player->clan['leader'] == $player->user_id) {
 				$system->query("UPDATE `clans` SET `leader` = '0' WHERE `clan_id` = '{$player->clan['id']}'");
@@ -701,17 +705,17 @@ function premium() {
 
 			$player->clan['id'] = $new_clan_id;
 			$player->clan_office = 0;
-			
+
 			$system->message("You have moved to the $clan_name clan.");
-			
+
 		} catch (Exception $e) {
 			$system->message($e->getMessage());
 		}
 		$system->printMessage();
 	}
 	// End Clan Change
-	
-	
+
+
 	// Sub-menu
 	echo "<div class='submenu'>
 	<ul class='submenu'>
@@ -722,7 +726,7 @@ function premium() {
 	</ul>
 	</div>
 	<div class='submenuMargin'></div>";
-	
+
 	$system->printMessage();
 	// Summary
 	echo "<table class='table'><tr><th>Premium</th></tr>
@@ -731,7 +735,7 @@ function premium() {
 	<br />
 	<b>Your Ancient Kunai:</b> $player->premium_credits
 	</td></tr></table>";
-	
+
 	$view = 'character_changes';
 	if($player->premium_credits == 0) {
 		$view = 'buy_kunai';
@@ -739,7 +743,7 @@ function premium() {
 	if(isset($_GET['view'])) {
 		$view = $_GET['view'];
 	}
-	
+
 	$kunai_per_dollar = SystemFunctions::KUNAI_PER_DOLLAR;
 
 	if($view == 'character_changes') {
@@ -751,9 +755,9 @@ function premium() {
 		<input type='submit' name='user_reset' value='Reset' />
 		</form>
 		</td></tr>";
-		
+
 		echo "<tr><th>Username Change</th></tr>
-		<tr><td style='text-align:center;'>You can change your username free once per account or for ". $costs['name_change'] . "AK afterward. 
+		<tr><td style='text-align:center;'>You can change your username free once per account or for ". $costs['name_change'] . "AK afterward.
 		Any changes to the case of your name do not cost.<br />
 		<p>Free Changes left: {$player->username_changes}</p>
 		<form action='$self_link' method='post'>
@@ -771,7 +775,7 @@ function premium() {
 		$clan_change_cost = $costs['clan_change'];
 
 		$costs = array();
-		
+
 		echo "<tr><th>Individual Stat Resets</th></tr>
 		<tr><td style='text-align:center;'>
 		<script type='text/javascript'>
@@ -789,25 +793,27 @@ function premium() {
 			$costs[$stat] = floor($player->{$stat} / 200);
 			echo "<option value='$stat'>" . ucwords(str_replace('_', ' ', $stat)) . '</option>';
 		}
-		
+
 		echo "</select>
 		<script type='text/javascript'>";
 		foreach($costs as $id => $cost) {
 			echo "costs.{$id} = $cost;\r\n";
 		}
-		
+
 		echo "</script>
 		<br />
 		<span id='statResetCost'>Cost: " . $costs[$stats[0]] . " AK</span><br />
 		<input type='submit' name='stat_reset' value='Reset stat' />
 		</form>
-		</td></tr>";	
-		
+		</td></tr>";
+
 		echo "</table>";
-		
+
 		// Stat rellocation
 		echo "<table class='table'><tr><th>Stat Transfers</th></tr>
 		<tr><td style='text-align:center;'>
+
+
 		<script type='text/javascript'>
 		var stats = new Object;
 		function statSelectChange() {
@@ -816,16 +822,21 @@ function premium() {
 		}
 		function statAllocateCostDisplay() {
 			var transferAmount = parseInt($('#transferAmount').val());
-			var cost = 1 + Math.floor(transferAmount / 300);
+			if (transferAmount <= 25) {
+				var cost = 0;
+			} else if(transferAmount >= 26) {
+					var cost = 1 + Math.floor(transferAmount / 300);
+				}
 			var time = transferAmount * 0.2;
-			
+
 			var display = cost + ' AK / ' + time + ' minutes';
-					
+
 			$('#statAllocateCost').html(display);
 		}
 		</script>
 		You can transfer points from one stat to another. This costs Ancient Kunai and takes time to complete, both cost and time increase
 		the higher your stat amount is.<br />
+		Stat changes under 25 are free.<br />
 		<form action='$self_link&view=character_changes' method='post'>
 		<br />
 		Transfer<br />
@@ -833,7 +844,7 @@ function premium() {
 		foreach($stats as $stat) {
 			echo "<option value='$stat'>" . ucwords(str_replace('_', ' ', $stat)) . '</option>';
 		}
-		
+
 		echo "</select><br />
 		to<br />
 		<select name='target_stat'>";
@@ -848,23 +859,23 @@ function premium() {
 			}
 			else {
 				echo "stats.$stat = " . ($player->{$stat} - 5) . ";\r\n";
-			}	
+			}
 		}
 
-		$init_cost = (1 + floor(($player->ninjutsu_skill - 10) / 300));
+		$init_cost = (1 + floor(($player->bloodline_skill  - 10) / 300));
 
 		echo "
 		</script>
 		<br />
 		<br />
 		Transfer amount:<br />
-		<input type='text' id='transferAmount' name='transfer_amount' value='" . ($player->ninjutsu_skill - 10) . "' 
+		<input type='text' id='transferAmount' name='transfer_amount' value='" . ($player->bloodline_skill - 10) . "'
 			onkeyup='statAllocateCostDisplay()' /><br />
-		<span id='statAllocateCost'>" . $init_cost . " AK / " . (($player->ninjutsu_skill - 10) * 0.25) . " minutes</span><br />
+		<span id='statAllocateCost'>" . $init_cost . " AK / " . (($player->bloodline_skill  - 10) * 0.25) . " minutes</span><br />
 		<input type='submit' name='stat_allocate' value='Transfer Stat Points' />
 		</form>
 		</td></tr></table>";
-		
+
 		// Village change
 
 		if($player->rank >= 2) {
@@ -921,7 +932,7 @@ function premium() {
 				}
 				echo "<option value='$village'>$village</option>";
 			}
-			
+
 			echo "</select><br />
 			<input type='submit' name='change_village' value='Change Village' />
 			</form>
@@ -932,11 +943,11 @@ function premium() {
 		// Bloodline
 		if($player->rank >= 2) {
 			echo "<table class='table'><tr><th>Purchase New Bloodline</th></tr>
-			<tr><td style='text-align:center;'>A researcher from the village will implant another clan's DNA into 
-			you in exchange for Ancient Kunai, allowing you to use a new bloodline" . 
+			<tr><td style='text-align:center;'>A researcher from the village will implant another clan's DNA into
+			you in exchange for Ancient Kunai, allowing you to use a new bloodline" .
 				($player->bloodline_id ? ' instead of your own' : '') . ".<br /><br />";
 			if($player->bloodline_skill > 10) {
-			    echo "<b>Warning: Your bloodline skill will be reduced by " . (Bloodline::SKILL_REDUCTION_ON_CHANGE * 100) . "% as you must 
+			    echo "<b>Warning: Your bloodline skill will be reduced by " . (Bloodline::SKILL_REDUCTION_ON_CHANGE * 100) . "% as you must
                    re-adjust to your new bloodline!</b><br />";
             }
 			echo "<br />";
@@ -954,7 +965,7 @@ function premium() {
 					}
 					$bloodlines[$row['rank']][$row['bloodline_id']] = $row;
 				}
-				
+
 				$ranks = array(1 => 'Legendary', 2 => 'Elite', 3 => 'Common', 4 => 'Lesser');
 				foreach($ranks as $id => $rank) {
 					if(empty($bloodlines[$id])) {
@@ -972,7 +983,7 @@ function premium() {
 				}
 
 			}
-			
+
 
 			echo "</td></tr></table>";
 		}
@@ -985,22 +996,22 @@ function premium() {
 		echo "<table class='table'><tr><th colspan='2'>Forbidden Seals</th></tr>
 		<tr><td style='text-align:center;' colspan='2'>
 		Shinobi researchers can imbue you with a forbidden seal, providing you with various benefits, in exchange for Ancient Kunai. The
-		specific benefits and their strengths depend on which seal the researchers give you. The seals will recede after 30 days 
+		specific benefits and their strengths depend on which seal the researchers give you. The seals will recede after 30 days
 		naturally, although with extra chakra imbued they can last longer.<br />
 		<br />
 		<b>Your Forbidden Seal</b><br />";
 		if(isset($player->forbidden_seal['level'])) {
 			$seals = array(1 => 'Twin Sparrow Seal', 2 => 'Four Dragon Seal');
 			$time_remaining = $player->forbidden_seal['time'] - time();
-			
+
 			$days = floor($time_remaining / 86400);
 			$time_remaining -= $days * 86400;
-			
+
 			$hours = floor($time_remaining / 3600);
 			$time_remaining -= $hours * 3600;
-			
+
 			$minutes = ceil($time_remaining / 60);
-			
+
 			echo $seals[$player->forbidden_seal['level']] . "<br />";
 			if($days) {
 				echo "$days day(s), $hours hour(s), $minutes minute(s) remaining<br />";
@@ -1011,54 +1022,54 @@ function premium() {
 			else {
 				echo "$minutes minute(s) remaining<br />";
 			}
-			//Addition - Kengetsu - Paying Player Chat Color		
-			echo "<br />				
-			<form action='$self_link&view=forbidden_seal' method='post'>				
-			<input type='radio' name='name_color' value='blue' " . 					
-			($player->forbidden_seal['color'] == 'blue' ? "checked='checked'" : '') . "/> 					
-			<span class='blue' style='font-weight:bold;'>Blue</span>				
-			<input type='radio' name='name_color' value='pink' " . 					
-			($player->forbidden_seal['color'] == 'pink' ? "checked='checked'" : '') . "/> 					
-			<span class='pink' style='font-weight:bold;'>Pink</span>				
-			<input type='radio' name='name_color' value='black' " . 					
-			($player->forbidden_seal['color'] == 'black' ? "checked='checked'" : '') . "/> 					
+			//Addition - Kengetsu - Paying Player Chat Color
+			echo "<br />
+			<form action='$self_link&view=forbidden_seal' method='post'>
+			<input type='radio' name='name_color' value='blue' " .
+			($player->forbidden_seal['color'] == 'blue' ? "checked='checked'" : '') . "/>
+			<span class='blue' style='font-weight:bold;'>Blue</span>
+			<input type='radio' name='name_color' value='pink' " .
+			($player->forbidden_seal['color'] == 'pink' ? "checked='checked'" : '') . "/>
+			<span class='pink' style='font-weight:bold;'>Pink</span>
+			<input type='radio' name='name_color' value='black' " .
+			($player->forbidden_seal['color'] == 'black' ? "checked='checked'" : '') . "/>
 			<span style='font-weight:bold;'>Black</span>";
-			if ($player->premium_credits_purchased) { 
+			if ($player->premium_credits_purchased) {
 				echo "
-				<input type='radio' name='name_color' value='gold' " . 						
-				($player->forbidden_seal['color'] == 'gold' ? "checked='checked'" : '') . "/> 					
+				<input type='radio' name='name_color' value='gold' " .
+				($player->forbidden_seal['color'] == 'gold' ? "checked='checked'" : '') . "/>
 				<span class='gold' style='font-weight:bold;'>Gold</span>";
 			}
 			if($player->staff_level >= SystemFunctions::SC_ADMINISTRATOR) {
 				echo "
-				<input type='radio' name='name_color' value='red' " . 						
-				($player->forbidden_seal['color'] == 'red' ? "checked='checked'" : '') . "/> 					
+				<input type='radio' name='name_color' value='red' " .
+				($player->forbidden_seal['color'] == 'red' ? "checked='checked'" : '') . "/>
 				<span class='administrator' style='font-weight:bold;'>Red</span>";
 			}
 			echo "
-			<br />				
-			<input type='submit' name='change_color' value='Change Name Color' />				
+			<br />
+			<input type='submit' name='change_color' value='Change Name Color' />
 			</form>";
 		}
-		else if ($player->premium_credits_purchased) { 
+		else if ($player->premium_credits_purchased) {
 			echo "
 			<form action='$self_link&view=forbidden_seal' method='post'>
-			<input type='radio' name='name_color' value='black' " . 					
-			($player->forbidden_seal['color'] == 'black' ? "checked='checked'" : '') . "/> 					
+			<input type='radio' name='name_color' value='black' " .
+			($player->forbidden_seal['color'] == 'black' ? "checked='checked'" : '') . "/>
 			<span style='font-weight:bold;'>Black</span>
-			<input type='radio' name='name_color' value='gold' " . 						
-			($player->forbidden_seal['color'] == 'gold' ? "checked='checked'" : '') . "/> 	
+			<input type='radio' name='name_color' value='gold' " .
+			($player->forbidden_seal['color'] == 'gold' ? "checked='checked'" : '') . "/>
 			<span class='gold' style='font-weight:bold;'>Gold</span>
 			";
 			if($player->staff_level >= SystemFunctions::SC_ADMINISTRATOR) {
 				echo "
-				<input type='radio' name='name_color' value='red' " . 						
-				($player->forbidden_seal['color'] == 'red' ? "checked='checked'" : '') . "/> 					
+				<input type='radio' name='name_color' value='red' " .
+				($player->forbidden_seal['color'] == 'red' ? "checked='checked'" : '') . "/>
 				<span class='administrator' style='font-weight:bold;'>Red</span>";
 			}
 			echo "
-			<br />				
-			<input type='submit' name='change_color' value='Change Name Color' />				
+			<br />
+			<input type='submit' name='change_color' value='Change Name Color' />
 			</form>";
 		}
 		// End
@@ -1092,7 +1103,7 @@ function premium() {
 					<option value='60'>60 days (" . ($costs['forbidden_seal'][1] * 2) . " AK)</option>
 					<option value='90'>90 days (" . ($costs['forbidden_seal'][1] * 3) . " AK)</option>
 					</select><br />
-					<input type='submit' name='forbidden_seal' value='" . 
+					<input type='submit' name='forbidden_seal' value='" .
 						($player->forbidden_seal && $player->forbidden_seal['level'] == 1 ? 'Extend' : 'Purchase') . "' />
 				</p>
 				</form>
@@ -1116,7 +1127,7 @@ function premium() {
 					<option value='60'>60 days (" . ($costs['forbidden_seal'][2] * 2) . " AK)</option>
 					<option value='90'>90 days (" . ($costs['forbidden_seal'][2] * 3) . " AK)</option>
 					</select><br />
-					<input type='submit' name='forbidden_seal' value='" . 
+					<input type='submit' name='forbidden_seal' value='" .
 						($player->forbidden_seal && $player->forbidden_seal['level'] == 2 ? 'Extend' : 'Purchase') . "' />
 				</p>
 				</form>
@@ -1128,7 +1139,7 @@ function premium() {
 		echo <<<HTML
 		<table class='table'><tr><th>Buy Ancient Kunai</th></tr>
 		<tr><td style='text-align:center;'>
-			<p style='width:80%;margin:auto;'>All payments are securely processed through Paypal. You do not need a Paypal account to 
+			<p style='width:80%;margin:auto;'>All payments are securely processed through Paypal. You do not need a Paypal account to
 			pay with a credit card.</p>
 			<br />
 			{$kunai_per_dollar} Ancient Kunai = $1 USD<br />
@@ -1138,7 +1149,7 @@ function premium() {
 			$25 = 50 Kunai + 20 bonus<br />
 			$50 = 100 Kunai + 50 bonus<br />
 			<br />
-			
+
 			<form action="https://www.paypal.com/cgi-bin/webscr" method="post">
 			<input type="hidden" name="cmd" value="_xclick">
 			<input type="hidden" name="business" value="lsmjudoka05@yahoo.com">
@@ -1158,25 +1169,25 @@ function premium() {
 			</form>
 		</td></tr></table>
 HTML;
-		
-		
+
+
 		// Exchange
 		premiumCreditExchange();
 	}
-	
+
 }
 
 function premiumCreditExchange() {
 	global $system;
 
 	global $player;
-	
+
 	global $self_link;
 	$self_link .= '&view=buy_kunai';
-	
+
 	$price_min = 1.0;
 	$price_max = 10.0;
-	
+
 	// Create offer
 	if(isset($_POST['new_offer'])) {
 		try {
@@ -1191,7 +1202,7 @@ function premiumCreditExchange() {
 			else {
 				throw new Exception("Invalid kunai amount!");
 			}
-			
+
 			if(isset($_POST['money'])) {
 				$money = $system->clean($_POST['money']);
 				if(!is_numeric($money)) {
@@ -1205,24 +1216,24 @@ function premiumCreditExchange() {
 			else {
 				throw new Exception("Invalid money amount!");
 			}
-			
+
 			// Check offer is greater than 0
 			if($premium_credits <= 0) {
 				throw new Exception("Offer must be at least 1 kunai!");
 			}
-			
+
 			// Check user has premium_credits
 			if($player->premium_credits < $premium_credits) {
 				throw new Exception("You do not have enough Ancient Kunai!");
 			}
-			
-			
+
+
 			// Subtract premium_credits from user count and submit offer.
 			$player->premium_credits -= $premium_credits;
 			$player->updateData();
-			
+
 			$money = $money * $premium_credits * 1000;
-			
+
 			$system->query("INSERT INTO `premium_credit_exchange` (`seller`, `premium_credits`, `money`)
 			VALUES ('$player->user_id', '$premium_credits', '$money')");
 			if($system->db_affected_rows > 0) {
@@ -1247,22 +1258,22 @@ function premiumCreditExchange() {
 			if($system->db_num_rows == 0) {
 				 throw new Exception("Invalid offer!");
 			}
-			
+
 			$offer = $system->db_fetch($result);
-			
+
 			// Check user has enough money
 			if($player->money < $offer['money']) {
 				throw new Exception("You do not have enough money!");
 			}
-			
+
 			// Run purchase and log [NOTE: Updating first is to avoid as much server lag and possibility for glitching]
 			$system->query("UPDATE `premium_credit_exchange` SET `completed`='1' WHERE `id`='$id' LIMIT 1");
-			
+
 			$player->money -= $offer['money'];
 			$player->premium_credits += $offer['premium_credits'];
 			$player->updateData();
-			
-			$system->query("UPDATE `users` SET `money`=`money` + {$offer['money']} 
+
+			$system->query("UPDATE `users` SET `money`=`money` + {$offer['money']}
 				WHERE `user_id`='{$offer['seller']}'");
 			$system->log("Kunai Exchange", "Completed Sale", "ID# {$offer['id']}; {$offer['seller']} -> $player->user_name :: {$offer['premium_credits']} for &yen;{$offer['money']}");
 			$system->send_pm('Ancient Kunai Exchange', $offer['seller'], 'Transaction Complete', $player->user_name . " has purchased {$offer['premium_credits']} Ancient Kunai for &yen;{$offer['money']}.");
@@ -1283,22 +1294,22 @@ function premiumCreditExchange() {
 			if($system->db_num_rows == 0) {
 				 throw new Exception("Invalid offer!");
 			}
-			
+
 			$offer = $system->db_fetch($result);
-			
+
 			// Check offer belongs to user
 			if($player->user_id != $offer['seller']) {
 				throw new Exception("Offer is not yours!");
 			}
-			
+
 			// Cancel log [NOTE: Updating first is to avoid as much server lag and possibility for glitching]
 			$system->query("UPDATE `premium_credit_exchange` SET `completed`='1' WHERE `id`='$id' LIMIT 1");
-			
+
 			$player->premium_credits += $offer['premium_credits'];
 			$player->updateData();
-			
+
 			$system->log("Kunai Exchange", "Cancelled Offer", "ID# {$offer['id']}; {$offer['seller']} - Cancelled :: {$offer['premium_credits']} for &yen;{$offer['money']}=");
-			
+
 			$system->message("Offer cancelled!");
 			$system->printMessage();
 		} catch(Exception $e) {
@@ -1345,10 +1356,10 @@ function premiumCreditExchange() {
 				$user_info = $system->db_fetch();
 				$credit_users[$row['seller']] = $user_info['user_name'];
 			}
-			
+
 			$sellerName = $credit_users[$row['seller']];
-			
-			echo "<tr> 
+
+			echo "<tr>
 				<td style='text-align:center;'><a href='{$system->links['members']}&user={$sellerName}'>{$sellerName}</a></td>
 				<td style='text-align:center;'>{$row['premium_credits']} AK</td>
 				<td style='text-align:center;'>&yen;{$row['money']}</td>";
@@ -1359,7 +1370,7 @@ function premiumCreditExchange() {
 				echo "<td style='text-align:center;'><a href='$self_link&purchase={$row['id']}'>Purchase</a></td>";
 			}
 			echo "</tr>";
-		}	
+		}
 	}
 	else {	// Display no offers message
 		echo "<tr><td colspan='4' style='text-align:center;'>No offers!</td></tr>";
@@ -1389,7 +1400,7 @@ function premiumCreditExchange() {
 		</script>
 		<form action='$self_link' method='post'>
 		<div style='width:350px;margin-left:auto;margin-right:auto;text-align:left;'>
-		<span style='display:inline-block;width:120px;'>Ancient Kunai to sell:</span> 
+		<span style='display:inline-block;width:120px;'>Ancient Kunai to sell:</span>
 			<input type='text' name='premium_credits' id='premium_credits' style='width:80px;margin-left:2px;' onKeyUp='calcPreview();' /><br />
 		<span style='display:inline-block;width:120px;'>Money per kunai: </span>
 		<select onchange='calcPreview();' name='money' id='money'>&yen;";
@@ -1397,7 +1408,7 @@ function premiumCreditExchange() {
 		for($i = $price_min; $i < $price_max; $i += 0.1) {
 			echo "<option value='" . sprintf("%.1f", $i) . "'>" . sprintf("%.1f", $i) . "</option>";
 		}
-		
+
 	echo "</select> x 1000 per kunai
 		</div>
 		<span id='offerPreview'>&nbsp;</span><br />
