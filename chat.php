@@ -189,6 +189,7 @@ function chat() {
                     break;
                 case -4:
                     $class .= 'moderator';
+                    break;
                 case -5:
                     $class .= 'administrator';
                     break;
