@@ -203,7 +203,7 @@ function chat() {
                         </div>
 						<div style='display:block;flex-grow:1;'>
 							<a style='display:inline-block;' href='{$system->links['members']}&user={$post['user_name']}' class='$class $statusType'>{$post['user_name']}</a><br />
-							<p style='display:block; margin: 1px 0 3px;'>
+							<p style='margin: 1px 0 3px;'>
                                 <img src='./images/village_icons/" . strtolower($post['village']) . ".png' alt='{$post['village']} Village'
                                     style='max-width:20px;max-height:20px;vertical-align:text-bottom;'  title='{$post['village']} Village' /> " .
                             stripslashes($post['title']) . "</p>
