@@ -2086,12 +2086,15 @@ function movePrompt(User $player, $default_attacks) {
     }
 
     $prefill_hand_seals = $_POST['hand_seals'] ?? '';
+    $prefill_jutsu_type = $_POST['jutsu_type'] ?? 'ninjutsu';
+    $prefill_weapon_id = $_POST['weapon_id'] ?? '0';
+    $prefill_jutsu_id = $_POST['jutsu_id'] ?? '';
     echo "
     <form action='$self_link' method='post'>
     <input type='hidden' id='hand_seal_input' name='hand_seals' value='{$prefill_hand_seals}' />
-    <input type='hidden' id='jutsuType' name='jutsu_type' value='ninjutsu' />
-    <input type='hidden' id='weaponID' name='weapon_id' value='0' />
-    <input type='hidden' id='jutsuID' name='jutsu_id' value='' />
+    <input type='hidden' id='jutsuType' name='jutsu_type' value='{$prefill_jutsu_type}' />
+    <input type='hidden' id='weaponID' name='weapon_id' value='{$prefill_weapon_id}' />
+    <input type='hidden' id='jutsuID' name='jutsu_id' value='{$prefill_jutsu_id}' />
     <p style='display:block;text-align:center;margin:auto;'>
         <input id='submitbtn' type='submit' name='attack' value='Submit' />
     </p>
