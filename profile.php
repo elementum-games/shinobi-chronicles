@@ -201,21 +201,43 @@ function userProfile() {
 			"-> <span style='color:#00C000;'>" . ($player->regen_rate + $player->regen_boost - $regen_cut) . "</span>";
 		}
 		else if(isset($regen_cut)) {
-		
+
 		}
 		echo "<br />";
+    // First attempt:
+    // echo "<label style='width:9.2em;'>Regen Timer:</label>" . (time() - $player->last_update - 60) * -1;
+    $time_since_last_regen = time() - $player->last_update;
 
-        // First attempt:
-        // echo "<label style='width:9.2em;'>Regen Timer:</label>" . (time() - $player->last_update - 60) * -1;
+		//regen timer script - can be moved to its own script.js file
+		echo "
+		<script>
+		var remainingtime = ". 60 - $time_since_last_regen .";
 
-        $time_since_last_regen = time() - $player->last_update;
-        echo "<label style='width:9.2em;'>Regen Timer:</label>" . (60 - $time_since_last_regen) .
-		"</td></tr>";
-		
+		setInterval(() => {
+
+			document.getElementById('regentimer').innerHTML = remainingtime - 1; //minus 1 to compensate for lag
+
+			remainingtime--;
+
+			if(remainingtime == -1){
+				remainingtime = 60;
+			}
+
+		}, 1000);
+
+		</script>
+		";
+
+    echo "<label style='width:9.2em;'>Regen Timer:</label>
+		<p id='regentimer' style='display:inline'>" . (60 - $time_since_last_regen) . "</p>
+
+		</td>
+		</tr>";
+
 		$exp_remaining = $exp_needed - $player->exp;
 		if($exp_remaining < 0) {
 			$exp_remaining = 0;
-		}	
+		}
 		$label_width = '7.1em';
 		$clan_positions = array(
 					1 => 'Leader',
