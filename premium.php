@@ -836,7 +836,7 @@ function premium() {
 		</script>
 		You can transfer points from one stat to another. This costs Ancient Kunai and takes time to complete, both cost and time increase
 		the higher your stat amount is.<br />
-		Stat changes under 25 are free.<br />
+		Stat transfers under 25 are free.<br />
 		<form action='$self_link&view=character_changes' method='post'>
 		<br />
 		Transfer<br />
