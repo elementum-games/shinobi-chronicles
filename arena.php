@@ -206,18 +206,7 @@ function arena() {
 		$fight_timer = 20;
 		if($_GET['fight']) {
 			if($player->last_ai > time() - $fight_timer) {
-
-				$temp_time = $player->last_ai - (time() - $fight_timer);
-
-				//can't seem to squeeze a <div> around $temp_time
-				//for some reason if there's a tag at the end
-				//it creates another empty <p> tag after the notification message
-				//confused at how and why this happens
-				$temp_msg = <<<HTML
-					<p>Please wait {$temp_time} more seconds!
-				HTML;
-
-				$system->message($temp_msg);
+				$system->message("Please wait " . ($player->last_ai - (time() - $fight_timer)) . " more seconds!");
 			}
 			else if(isset($ai_opponents[$_GET['fight']])) {
 				$_SESSION['ai_id'] = $_GET['fight'];
