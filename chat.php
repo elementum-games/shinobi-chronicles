@@ -56,7 +56,8 @@ function chat() {
 				'blue' => -1,
 				'pink' => -2,
 				'gold' => -3,
-				'red' => -4
+				'green' => -4,
+				'red' => -5
 			);
 			$user_color = (!$player->forbidden_seal) ? 0 : ($supported_colors[$player->forbidden_seal['color']]);
 
@@ -187,6 +188,8 @@ function chat() {
                     $class .= 'gold';
                     break;
                 case -4:
+                    $class .= 'moderator';
+                case -5:
                     $class .= 'administrator';
                     break;
                 default:
