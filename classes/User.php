@@ -1308,6 +1308,8 @@ class User {
 				$defense += SystemFunctions::diminishing_returns($this->taijutsu_skill * 0.03, 50);
 				$raw_damage -= $this->taijutsu_resist;
 				break;
+            default:
+                error_log("Invalid defense type! {$defense_type}");
 		}
 
 		$damage = round($raw_damage / $defense, 2);

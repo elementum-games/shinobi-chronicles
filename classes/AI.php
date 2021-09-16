@@ -288,6 +288,8 @@ class AI {
             case 'taijutsu':
                 $defense += SystemFunctions::diminishing_returns($this->taijutsu_skill * 0.03, 40);
                 break;
+            default:
+                error_log("Invalid defense type! {$defense_type}");
         }
 
         $damage = round($raw_damage / $defense, 2);
