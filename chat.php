@@ -197,7 +197,7 @@ function chat() {
 			echo "
 				<tr>
 					<td style='text-align:center;'>
-					<div id='user_data_container'>
+					<div id='user_data_container' style='display: flex;flex-direction:row'>
 					    <div style='flex-shrink:0;'>
 					        <img style='max-height:45px;max-width:45px;' src='{$userData['avatar_link']}' />
                         </div>
