@@ -339,7 +339,7 @@ function jutsu() {
 			$system->message($e->getMessage());
 		}
 	}
-	else if($_GET['forget_jutsu']){
+	else if(!empty($_GET['forget_jutsu'])) {
 		$jutsu_id = (int)$_GET['forget_jutsu'];
 		try{
 			//Checking if player knows the jutsu he's trying to forget.
@@ -354,7 +354,7 @@ function jutsu() {
 			}
 
 			//Forgetting jutsu.
-			$jutsu_name = $player->jutsu[$jutsu_id]['name'];
+			$jutsu_name = $player->jutsu[$jutsu_id]->name;
 			unset($player->jutsu[$jutsu_id]);
 			$system->message("You have forgot $jutsu_name!");
 		}
@@ -415,7 +415,7 @@ function jutsu() {
 					echo "</p>";
 				}
 
-				echo "<p style='text-align:center'><a href='$self_link&forget_jutsu={$jutsu['jutsu_id']}'>Forget Jutsu!</a></p>";
+				echo "<p style='text-align:center'><a href='$self_link&forget_jutsu={$jutsu->id}'>Forget Jutsu!</a></p>";
 			echo "</td></tr>";
 		}
 	}
@@ -528,3 +528,12 @@ function jutsu() {
 	$player->updateInventory();
 }
 
+function userHasChildrenJutsu($id, $player){
+    foreach($player->jutsu as $element){
+        if($id == $element->parent_jutsu){
+            return false;
+        }
+    }
+
+    return true;
+}
