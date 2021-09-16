@@ -293,7 +293,7 @@ function premium() {
 
 			if($transfer_amount <= 25) {
 				$cost = 0;
-			} else if($transfer_amount >= 26) {
+			} else {
 				$cost = 1 + floor($transfer_amount / 300);
 			}
 
@@ -824,7 +824,7 @@ function premium() {
 			var transferAmount = parseInt($('#transferAmount').val());
 			if (transferAmount <= 25) {
 				var cost = 0;
-			} else if(transferAmount >= 26) {
+			} else {
 					var cost = 1 + Math.floor(transferAmount / 300);
 				}
 			var time = transferAmount * 0.2;
@@ -862,19 +862,37 @@ function premium() {
 			}
 		}
 
-		$init_cost = (1 + floor(($player->bloodline_skill  - 10) / 300));
+		if($player->rank >= 2) {
+			$init_cost = (1 + floor(($player->bloodline_skill  - 10) / 300));
+		} else {
+			$init_cost = (1 + floor(($player->ninjutsu_skill  - 10) / 300));
+		 }
 
-		echo "
-		</script>
-		<br />
-		<br />
-		Transfer amount:<br />
-		<input type='text' id='transferAmount' name='transfer_amount' value='" . ($player->bloodline_skill - 10) . "'
-			onkeyup='statAllocateCostDisplay()' /><br />
-		<span id='statAllocateCost'>" . $init_cost . " AK / " . (($player->bloodline_skill  - 10) * 0.25) . " minutes</span><br />
-		<input type='submit' name='stat_allocate' value='Transfer Stat Points' />
-		</form>
-		</td></tr></table>";
+		if($player->rank >= 2){
+				echo "
+			</script>
+			<br />
+			<br />
+			Transfer amount:<br />
+			<input type='text' id='transferAmount' name='transfer_amount' value='" . ($player->bloodline_skill - 10) . "'
+				onkeyup='statAllocateCostDisplay()' /><br />
+			<span id='statAllocateCost'>" . $init_cost . " AK / " . (($player->bloodline_skill  - 10) * 0.25) . " minutes</span><br />
+			<input type='submit' name='stat_allocate' value='Transfer Stat Points' />
+			</form>
+			</td></tr></table>";
+		} else {
+				echo "
+			</script>
+			<br />
+			<br />
+			Transfer amount:<br />
+			<input type='text' id='transferAmount' name='transfer_amount' value='" . ($player->ninjutsu_skill - 10) . "'
+				onkeyup='statAllocateCostDisplay()' /><br />
+			<span id='statAllocateCost'>" . $init_cost . " AK / " . (($player->ninjutsu_skill  - 10) * 0.25) . " minutes</span><br />
+			<input type='submit' name='stat_allocate' value='Transfer Stat Points' />
+			</form>
+			</td></tr></table>";
+		}
 
 		// Village change
 
