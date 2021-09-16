@@ -553,8 +553,8 @@ function calcDamage($player1, $player2) {
 	$player2_defense = 50;
 	
 	
-	$player1_defense += diminishing_returns($player1[$player2_jutsu['jutsu_type'] . '_skill'] * 0.01, 50);
-	$player2_defense += diminishing_returns($player2[$player1_jutsu['jutsu_type'] . '_skill'] * 0.01, 50);
+	$player1_defense += SystemFunctions::diminishing_returns($player1[$player2_jutsu['jutsu_type'] . '_skill'] * 0.01, 50);
+	$player2_defense += SystemFunctions::diminishing_returns($player2[$player1_jutsu['jutsu_type'] . '_skill'] * 0.01, 50);
 	
 	// Offense
 	$player1_damage = round($player1_damage / $player2_defense, 1);
@@ -576,12 +576,4 @@ function calcDamage($player1, $player2) {
 		'collision_text' => $collision_text
 	);
 	return $damages;
-}
-
-function diminishing_returns($val, $scale) {
-    if($val < 0)
-        return -diminishing_returns(-$val, $scale);
-    $mult = $val / $scale;
-    $trinum = (sqrt(8.0 * $mult + 1.0) - 1.0) / 2.0;
-    return $trinum * $scale;
 }

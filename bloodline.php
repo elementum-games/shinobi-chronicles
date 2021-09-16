@@ -5,6 +5,7 @@
 */
 function bloodline() {
 	global $system;
+	/** @var User */
 	global $player;
 	global $self_link;
 	global $RANK_NAMES;
@@ -16,7 +17,7 @@ function bloodline() {
 	$base_bloodline = new Bloodline($player->bloodline_id);
 	$player->getInventory();
 	// Learn jutsu
-	if(strlen($_GET['learn_jutsu'])) {
+	if(isset($_GET['learn_jutsu'])) {
 		$jutsu_id = (int)$_GET['learn_jutsu'];
 		try {
 			if(!isset($base_bloodline->jutsu[$jutsu_id])) {
@@ -25,26 +26,26 @@ function bloodline() {
 			if(isset($player->bloodline->jutsu[$jutsu_id])) {
 				throw new Exception("You already know this jutsu!");
 			}
-			if($base_bloodline->jutsu[$jutsu_id]['rank'] > $player->rank) {
+			if($base_bloodline->jutsu[$jutsu_id]->rank > $player->rank) {
 				throw new Exception("You are not high enough rank to learn this jutsu!");
 			}
 			// Parent jutsu check
-			if($base_bloodline->jutsu[$jutsu_id]['parent_jutsu']) {
-				$id = $base_bloodline->jutsu[$jutsu_id]['parent_jutsu'] - 1;
+			if($base_bloodline->jutsu[$jutsu_id]->parent_jutsu) {
+				$id = $base_bloodline->jutsu[$jutsu_id]->parent_jutsu - 1;
 				if(!isset($player->bloodline->jutsu[$id])) {
-					throw new Exception("You need to learn " . $base_bloodline->jutsu[$id]['name'] . " first!");
+					throw new Exception("You need to learn " . $base_bloodline->jutsu[$id]->name . " first!");
 				}
-				if($player->bloodline->jutsu[$id]['level'] < 50) {
-					throw new Exception("You are not skilled enough with " . $player->bloodline->jutsu[$id]['name'] . 
-						"! (Level " . $player->bloodline->jutsu[$id]['level'] . "/50)");
+				if($player->bloodline->jutsu[$id]->level < 50) {
+					throw new Exception("You are not skilled enough with " . $player->bloodline->jutsu[$id]->name .
+						"! (Level " . $player->bloodline->jutsu[$id]->level . "/50)");
 				}
 			}
 			$player->bloodline->jutsu[$jutsu_id] = $base_bloodline->jutsu[$jutsu_id];
-			$player->bloodline->jutsu[$jutsu_id]['jutsu_id'] = $jutsu_id;
-			$player->bloodline->jutsu[$jutsu_id]['level'] = 1;
-			$player->bloodline->jutsu[$jutsu_id]['exp'] = 0;
+			$player->bloodline->jutsu[$jutsu_id]->id = $jutsu_id;
+			$player->bloodline->jutsu[$jutsu_id]->level = 1;
+			$player->bloodline->jutsu[$jutsu_id]->exp = 0;
 			$player->updateInventory();
-			$system->message("Learned " . $base_bloodline->jutsu[$jutsu_id]['name'] . "!");
+			$system->message("Learned " . $base_bloodline->jutsu[$jutsu_id]->name . "!");
 		} catch (Exception $e) {
 			$system->message($e->getMessage());
 		}
@@ -62,13 +63,16 @@ function bloodline() {
 		<label style='width: 8.8em;font-weight:bold;'>Rank:</label>" . $bloodline_ranks[$player->bloodline->rank] . "<br />
 		<label style='width: 8.8em;font-weight:bold;'>Bloodline skill:</label>" . $player->bloodline_skill . "<br />";
 	echo "<br />";
+
+
 	$estimated_jutsu_power = $player->rank;
-	$jutsu_power += round($player->total_stats / $player->stats_max_level, 3);
-	if($jutsu_power > $player->rank + 1) {
-		$jutsu_power = $player->rank + 1;
+	$estimated_jutsu_power += round($player->total_stats / $player->stats_max_level, 3);
+	if($estimated_jutsu_power > $player->rank + 1) {
+		$estimated_jutsu_power = $player->rank + 1;
 	}
-	$estimated_offense = 35 * $jutsu_power;
+	$estimated_offense = 35 * $estimated_jutsu_power;
 	$estimated_defense = 50 + ($player->total_stats * 0.01);
+
 	$boosts = array(
 		'scout_range' => array(
 			'text' => "<span class='amount'>[AMOUNT] extra square(s)</span>"
@@ -118,6 +122,7 @@ function bloodline() {
 		)
 	);
 	$bloodline_skill = 100 + $player->bloodline_skill;
+
 	echo "
 	<style type='text/css'>
 	span.amount {
@@ -201,33 +206,34 @@ function bloodline() {
 		<br />
 		<div style='margin-left:2em;margin-top:7px;'>";
 		foreach($player->bloodline->jutsu as $jutsu) {
-			echo "<label style='font-weight:bold;'>" . $jutsu['name'] . "</label><br />
-			<label style='width:6.5em;'>Rank:</label>" . $RANK_NAMES[$jutsu['rank']] . "<br />";
-			if($jutsu['element'] != 'none') {
-				echo "<label style='width:6.5em;'>Element:</label>" . $jutsu['element'] . "<br />";
+			echo "<label style='font-weight:bold;'>" . $jutsu->name . "</label><br />
+			<label style='width:6.5em;'>Rank:</label>" . $RANK_NAMES[$jutsu->rank] . "<br />";
+			if($jutsu->element != 'none') {
+				echo "<label style='width:6.5em;'>Element:</label>" . $jutsu->element . "<br />";
 			}
-			echo "<label style='width:6.5em;'>Use cost:</label>" . $jutsu['use_cost'] . "<br />";
-			if($jutsu['cooldown']) {
-				echo "<label style='width:6.5em;'>Cooldown:</label>" . $jutsu['cooldown'] . " turn(s)<br />";
+			echo "<label style='width:6.5em;'>Use cost:</label>" . $jutsu->use_cost . "<br />";
+			if($jutsu->cooldown) {
+				echo "<label style='width:6.5em;'>Cooldown:</label>" . $jutsu->cooldown . " turn(s)<br />";
 			}
-			if($jutsu['effect']) {
+			if($jutsu->effect) {
 				echo "<label style='width:6.5em;'>Effect:</label>" . 
-					ucwords(str_replace('_', ' ', $jutsu['effect'])) . ' - ' . $jutsu['effect_length'] . " turns<br />";
+					ucwords(str_replace('_', ' ', $jutsu->effect)) . ' - ' . $jutsu->effect_length . " turns<br />";
 			}
-			echo "<label style='width:6.5em;'>Jutsu type:</label>" . ucwords($jutsu['jutsu_type']) . "<br />
-			<label style='width:6.5em;'>Power:</label>" . round($jutsu['power'], 1) . "<br />
+			echo "<label style='width:6.5em;'>Jutsu type:</label>" . ucwords($jutsu->jutsu_type) . "<br />
+			<label style='width:6.5em;'>Power:</label>" . round($jutsu->power, 1) . "<br />
 
-			<label style='width:6.5em;'>Level:</label>" . $jutsu['level'] . "<br />
-			<label style='width:6.5em;'>Exp:</label>" . $jutsu['exp'] . "<br />";
+			<label style='width:6.5em;'>Level:</label>" . $jutsu->level . "<br />
+			<label style='width:6.5em;'>Exp:</label>" . $jutsu->exp . "<br />";
 			echo "<br /><br />";
 			echo "<label style='width:6.5em;float:left;'>Description:</label>
-			<p style='display:inline-block;width:37.1em;margin:0px;'>" . $jutsu['description'] . "</p>
+			<p style='display:inline-block;width:37.1em;margin:0px;'>" . $jutsu->description . "</p>
 			<br style='margin:0px;clear:both;' />";
 			
 		}
 		echo "</div>";
 	}
 	echo "</td></tr>";
+
 	if(!$player->bloodline->jutsu or count($player->bloodline->jutsu) < count($base_bloodline->jutsu)) {
 		echo "<tr><th>Learn Jutsu</th></tr>";
 		foreach($base_bloodline->jutsu as $id=>$jutsu) {
@@ -235,21 +241,21 @@ function bloodline() {
 				continue;
 			}
 			echo "<tr><td>
-				<span style='font-weight:bold;'>" . $jutsu['name'] . "</span><br />
+				<span style='font-weight:bold;'>" . $jutsu->name . "</span><br />
 				<div style='margin-left:2em;'>
-					<label style='width:6.5em;'>Rank:</label>" . $RANK_NAMES[$jutsu['rank']] . "<br />";
-					if($jutsu['parent_jutsu']) {
+					<label style='width:6.5em;'>Rank:</label>" . $RANK_NAMES[$jutsu->rank] . "<br />";
+					if($jutsu->parent_jutsu) {
 						echo "<label style='width:6.5em;'>Parent Jutsu:</label>" . 
-							$base_bloodline->jutsu[($jutsu['parent_jutsu'] - 1)]['name'] . "<br />";
+							$base_bloodline->jutsu[($jutsu->parent_jutsu - 1)]->name . "<br />";
 					}
-					if($jutsu['element'] != 'none') {
-						echo "<label style='width:6.5em;'>Element:</label>" . $jutsu['element'] . "<br />";
+					if($jutsu->element != 'none') {
+						echo "<label style='width:6.5em;'>Element:</label>" . $jutsu->element . "<br />";
 					}
-					echo "<label style='width:6.5em;'>Use cost:</label>" . $jutsu['use_cost'] . "<br />
+					echo "<label style='width:6.5em;'>Use cost:</label>" . $jutsu->use_cost . "<br />
 					<label style='width:6.5em;float:left;'>Description:</label> 
-						<p style='display:inline-block;margin:0px;width:37.1em;'>" . $jutsu['description'] . "</p>
+						<p style='display:inline-block;margin:0px;width:37.1em;'>" . $jutsu->description . "</p>
 					<br style='clear:both;' />
-				<label style='width:6.5em;'>Jutsu type:</label>" . ucwords($jutsu['jutsu_type']) . "<br />
+				<label style='width:6.5em;'>Jutsu type:</label>" . ucwords($jutsu->jutsu_type) . "<br />
 				</div>
 				<p style='text-align:right;margin:0px;'><a href='$self_link&learn_jutsu=$id'>Learn</a></p>
 			</td></tr>";

@@ -24,7 +24,7 @@ function store() {
 	
 	$max_consumables = 5;
 	
-	if($_GET['view']) {
+	if(!empty($_GET['view'])) {
 		$view = $_GET['view'];
 	}
 	else {
@@ -127,15 +127,8 @@ function store() {
 			
 			// Add to inventory
 			$player->money -= $shop_jutsu[$jutsu_id]['purchase_cost'];
-			
-			$jutsu = array(
-				'jutsu_id' => $jutsu_id,
-				'level' => 0,
-				'exp' => 0
-			);
-			
-			
-			$player->jutsu_scrolls[$jutsu_id] = $jutsu;
+
+			$player->jutsu_scrolls[$jutsu_id] = Jutsu::fromArray($jutsu_id, $shop_jutsu[$jutsu_id]);
 			
 			$system->message("Jutsu purchased!");
 		} catch (Exception $e) {
@@ -158,7 +151,7 @@ function store() {
 	$system->printMessage();	
 	
 	// View single jutsu
-	if($_GET['view_jutsu']) {
+	if(!empty($_GET['view_jutsu'])) {
 		$jutsu_list = false;
 		$jutsu_id = (int)$system->clean($_GET['view_jutsu']);
 		if(!isset($shop_jutsu[$jutsu_id])) {
@@ -216,7 +209,7 @@ function store() {
 	
 	if($view == 'jutsu') {
 		$jutsu_type = '';
-		if($_GET['jutsu_type']) {
+		if(!empty($_GET['jutsu_type'])) {
 			$jutsu_type = $_GET['jutsu_type'];
 			switch($jutsu_type) {
 				case 'ninjutsu':
@@ -228,6 +221,17 @@ function store() {
 					break;
 			}
 		}
+		else {
+		    if($player->ninjutsu_skill > $player->taijutsu_skill && $player->ninjutsu_skill > $player->genjutsu_skill) {
+		        $jutsu_type = 'ninjutsu';
+            }
+		    else if($player->taijutsu_skill > $player->genjutsu_skill && $player->taijutsu_skill > $player->ninjutsu_skill) {
+		        $jutsu_type = 'taijutsu';
+            }
+		    else if($player->genjutsu_skill > $player->taijutsu_skill && $player->genjutsu_skill > $player->ninjutsu_skill) {
+		        $jutsu_type = 'genjutsu';
+            }
+        }
 
 		$style = "style='text-decoration:none;'";
 

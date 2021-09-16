@@ -1,5 +1,7 @@
 <?php /** @noinspection PhpRedundantOptionalArgumentInspection */
 
+require_once "classes/Jutsu.php";
+
 /*	Class:		User
 	Purpose:	Fetch user data and load into class variables.
 */
@@ -69,7 +71,9 @@ class User {
 	public $intelligence;
 	public $willpower;
 
-	public $jutsu;
+	/** @var Jutsu[] */
+	public array $jutsu;
+
 	public $ninjutsu_ids;
 	public $genjutsu_ids;
 	public $taijutsu_ids;
@@ -104,6 +108,8 @@ class User {
 	public $genjutsu_resist;
 
 	public $defense_boost;
+
+	public $barrier;
 
 	// Combat nerfs
 	public $ninjutsu_nerf;
@@ -315,7 +321,7 @@ class User {
 		-Parameters-
 		Update (1 = regen, 2 = training)
 	*/
-	public function loadData($UPDATE = 2, $remote_view = false) {
+	public function loadData($UPDATE = 2, $remote_view = false): string {
 		$result = $this->system->query("SELECT * FROM `users` WHERE `user_id`='$this->user_id' LIMIT 1");
 		$user_data = $this->system->db_fetch($result);
 
@@ -801,25 +807,25 @@ class User {
 					if($this->system->TRAIN_BOOST) {
 						$gain += $this->system->TRAIN_BOOST;
 					}
-					if($this->jutsu[$jutsu_id]['level'] + $gain > 100) {
-						$gain = 100 - $this->jutsu[$jutsu_id]['level'];
+					if($this->jutsu[$jutsu_id]->level + $gain > 100) {
+						$gain = 100 - $this->jutsu[$jutsu_id]->level;
 					}
 
 					$this->getInventory();
 					if($this->checkInventory($jutsu_id, 'jutsu')) {
-						if($this->jutsu[$jutsu_id]['level'] < 100) {
-							$new_level = $this->jutsu[$jutsu_id]['level'] + $gain;
+						if($this->jutsu[$jutsu_id]->level < 100) {
+							$new_level = $this->jutsu[$jutsu_id]->level + $gain;
 
 							if($new_level > 100) {
-								$this->jutsu[$jutsu_id]['level'] = 100;
+								$this->jutsu[$jutsu_id]->level = 100;
 							}
 							else {
-								$this->jutsu[$jutsu_id]['level'] += $gain;
+								$this->jutsu[$jutsu_id]->level += $gain;
 							}
-							$message = $this->jutsu[$jutsu_id]['name'] . " has increased to level " .
-								$this->jutsu[$jutsu_id]['level'] . '.';
+							$message = $this->jutsu[$jutsu_id]->name . " has increased to level " .
+								$this->jutsu[$jutsu_id]->level . '.';
 
-							$jutsu_skill_type = $this->jutsu[$jutsu_id]['jutsu_type'] . '_skill';
+							$jutsu_skill_type = $this->jutsu[$jutsu_id]->jutsu_type . '_skill';
 							if($this->total_stats < $this->stat_cap) {
 								$this->{$jutsu_skill_type}++;
 								$this->exp += 10;
@@ -903,7 +909,7 @@ class User {
 		// Decode JSON of inventory into variables
 		if($this->system->db_num_rows > 0) {
 			$user_inventory = $this->system->db_fetch($result);
-			$player_jutsu = json_decode($user_inventory['jutsu']);
+			$player_jutsu = json_decode($user_inventory['jutsu'], true);
 			$player_items = json_decode($user_inventory['items']);
 			$equipped_jutsu = json_decode($user_inventory['equipped_jutsu']);
 			$equipped_items = json_decode($user_inventory['equipped_items']);
@@ -919,12 +925,12 @@ class User {
 		if($player_jutsu) {
 			$player_jutsu_array = $player_jutsu;
 			$player_jutsu = [];
-			foreach($player_jutsu_array as $jutsu) {
-				if(!is_numeric($jutsu->jutsu_id)) {
+			foreach($player_jutsu_array as $jutsu_data) {
+				if(!is_numeric($jutsu_data['jutsu_id'])) {
 					continue;
 				}
-				$player_jutsu[$jutsu->jutsu_id] = $jutsu;
-				$player_jutsu_string .= $jutsu->jutsu_id . ',';
+				$player_jutsu[$jutsu_data['jutsu_id']] = $jutsu_data;
+				$player_jutsu_string .= $jutsu_data['jutsu_id'] . ',';
 			}
 			$player_jutsu_string = substr($player_jutsu_string, 0, strlen($player_jutsu_string) - 1);
 
@@ -934,32 +940,27 @@ class User {
 				"SELECT * FROM `jutsu` WHERE `jutsu_id` IN ({$player_jutsu_string})
 				AND `purchase_type` != '1' AND `rank` <= '{$this->rank}'");
 			if($this->system->db_num_rows > 0) {
-				while($jutsu = $this->system->db_fetch($result)) {
-					if($player_jutsu[$jutsu['jutsu_id']]->level == 0) {
-						$this->jutsu_scrolls[$jutsu['jutsu_id']] = $jutsu;
-						$this->jutsu_scrolls[$jutsu['jutsu_id']]['level'] = $player_jutsu[$jutsu['jutsu_id']]->level;
-						$this->jutsu_scrolls[$jutsu['jutsu_id']]['exp'] = $player_jutsu[$jutsu['jutsu_id']]->exp;
+				while($jutsu_data = $this->system->db_fetch($result)) {
+                    $jutsu_id = $jutsu_data['jutsu_id'];
+                    $jutsu = Jutsu::fromArray($jutsu_id, $jutsu_data);
+
+					if($player_jutsu[$jutsu_id]['level'] == 0) {
+						$this->jutsu_scrolls[$jutsu_id] = $jutsu;
 						continue;
 					}
-					$this->jutsu[$jutsu['jutsu_id']] = $jutsu;
-					$this->jutsu[$jutsu['jutsu_id']]['level'] = $player_jutsu[$jutsu['jutsu_id']]->level;
-					$this->jutsu[$jutsu['jutsu_id']]['exp'] = $player_jutsu[$jutsu['jutsu_id']]->exp;
 
-					$this->jutsu[$jutsu['jutsu_id']]['power'] *= 1 + round($this->jutsu[$jutsu['jutsu_id']]['level'] * 0.003, 2);
-					if($this->jutsu[$jutsu['jutsu_id']]['effect'] && $this->jutsu[$jutsu['jutsu_id']]['effect'] != 'none') {
-						$this->jutsu[$jutsu['jutsu_id']]['effect_amount'] *= 1 + round($this->jutsu[$jutsu['jutsu_id']]['level'] * 0.002, 3);
-					}
+					$this->jutsu[$jutsu_id] = $jutsu;
+					$this->jutsu[$jutsu_id]->setLevel($player_jutsu[$jutsu_id]['level'], $player_jutsu[$jutsu_id]['exp']);
 
-
-					switch($jutsu['jutsu_type']) {
+					switch($jutsu_data['jutsu_type']) {
 						case 'ninjutsu':
-							$this->ninjutsu_ids[] = $jutsu['jutsu_id'];
+							$this->ninjutsu_ids[] = $jutsu_id;
 							break;
 						case 'genjutsu':
-							$this->genjutsu_ids[] = $jutsu['jutsu_id'];
+							$this->genjutsu_ids[] = $jutsu_id;
 							break;
 						case 'taijutsu':
-							$this->taijutsu_ids[] = $jutsu['jutsu_id'];
+							$this->taijutsu_ids[] = $jutsu_id;
 							break;
 					}
 				}
@@ -972,10 +973,10 @@ class User {
 		$this->equipped_jutsu = array();
 		if(!empty($equipped_jutsu)) {
 			$count = 0;
-			foreach($equipped_jutsu as $jutsu) {
-				if($this->checkInventory($jutsu->id, 'jutsu')) {
-					$this->equipped_jutsu[$count]['id'] = $jutsu->id;
-					$this->equipped_jutsu[$count]['type'] = $jutsu->type;
+			foreach($equipped_jutsu as $jutsu_data) {
+				if($this->checkInventory($jutsu_data->id, 'jutsu')) {
+					$this->equipped_jutsu[$count]['id'] = $jutsu_data->id;
+					$this->equipped_jutsu[$count]['type'] = $jutsu_data->type;
 					$count++;
 				}
 			}
@@ -1038,15 +1039,15 @@ class User {
 			if(!empty($this->bloodline->combat_boosts)) {
 				$bloodline_skill = 100 + $this->bloodline_skill;
 
-				foreach($this->bloodline->combat_boosts as $id => $effect) {
-					$this->bloodline->combat_boosts[$id]['effect_amount'] = round($effect['power'] * $bloodline_skill, 3);
+				foreach($this->bloodline->combat_boosts as $jutsu_id => $effect) {
+					$this->bloodline->combat_boosts[$jutsu_id]['effect_amount'] = round($effect['power'] * $bloodline_skill, 3);
 				}
 			}
 
 			// Apply bloodline passive combat boosts
 			$this->bloodline_offense_boosts = array();
 			$this->bloodline_defense_boosts = array();
-			foreach($this->bloodline->combat_boosts as $id => $effect) {
+			foreach($this->bloodline->combat_boosts as $jutsu_id => $effect) {
 				switch($effect['effect']) {
 					// Nin/Tai/Gen boost applied in User::calcDamage()
 					case 'ninjutsu_boost':
@@ -1090,7 +1091,7 @@ class User {
 		@item_id: Id of the item/jutsu to be checked for
 		@inventory_type (jutsu, item): Type of thing to check for, either item or jutsu
 	*/
-	public function checkInventory($item_id, $inventory_type = 'jutsu') {
+	public function checkInventory($item_id, $inventory_type = 'jutsu'): bool {
 		if(!$item_id) {
 			return false;
 		}
@@ -1111,8 +1112,8 @@ class User {
 
 	/* function useJutsu
 		pool check, calc exp, etc */
-	public function useJutsu($jutsu, $jutsu_type = 'equipped_jutsu') {
-		switch($jutsu['jutsu_type']) {
+	public function useJutsu(Jutsu $jutsu, $jutsu_type = 'equipped_jutsu'): bool {
+		switch($jutsu->jutsu_type) {
 			case 'ninjutsu':
 			case 'genjutsu':
 				$energy_type = 'chakra';
@@ -1124,7 +1125,7 @@ class User {
 				return false;
 		}
 
-		if($this->{$energy_type} < $jutsu['use_cost']) {
+		if($this->{$energy_type} < $jutsu->use_cost) {
 			$this->system->message("You do not have enough $energy_type!");
 			return false;
 		}
@@ -1132,9 +1133,9 @@ class User {
 		switch($jutsu_type) {
 			case 'equipped_jutsu':
 				// Element check
-				if($jutsu['element'] && $jutsu['element'] != 'None') {
+				if($jutsu->element && $jutsu->element != 'None') {
 					if($this->elements) {
-						if(array_search($jutsu['element'], $this->elements) === false) {
+						if(array_search($jutsu->element, $this->elements) === false) {
 							$this->system->message("You do not possess the elemental chakra for this jutsu!");
 							return false;
 						}
@@ -1145,33 +1146,33 @@ class User {
 					}
 				}
 
-				if($this->jutsu[$jutsu['jutsu_id']]['level'] < 100) {
-					$this->jutsu[$jutsu['jutsu_id']]['exp'] += round(1000 / ($this->jutsu[$jutsu['jutsu_id']]['level'] * 0.9));
+				if($this->jutsu[$jutsu->id]->level < 100) {
+					$this->jutsu[$jutsu->id]->exp += round(1000 / ($this->jutsu[$jutsu->id]->level * 0.9));
 
-					if($this->jutsu[$jutsu['jutsu_id']]['exp'] >= 1000) {
-						$this->jutsu[$jutsu['jutsu_id']]['exp'] = 0;
-						$this->jutsu[$jutsu['jutsu_id']]['level']++;
-						$this->system->message($jutsu['name'] . " has increased to level " . $this->jutsu[$jutsu['jutsu_id']]['level'] . ".");
+					if($this->jutsu[$jutsu->id]->exp >= 1000) {
+						$this->jutsu[$jutsu->id]->exp = 0;
+						$this->jutsu[$jutsu->id]->level++;
+						$this->system->message($jutsu->name . " has increased to level " . $this->jutsu[$jutsu->id]->level . ".");
 					}
 				}
 
-				$this->{$energy_type} -= $jutsu['use_cost'];
+				$this->{$energy_type} -= $jutsu->use_cost;
 				break;
 			case 'bloodline_jutsu':
-				if($this->bloodline->jutsu[$jutsu['jutsu_id']]['level'] < 100) {
-					$this->bloodline->jutsu[$jutsu['jutsu_id']]['exp'] += round(500 / ($this->bloodline->jutsu[$jutsu['jutsu_id']]['level'] * 0.9));
+				if($this->bloodline->jutsu[$jutsu->id]->level < 100) {
+					$this->bloodline->jutsu[$jutsu->id]->exp += round(500 / ($this->bloodline->jutsu[$jutsu->id]->level * 0.9));
 
-					if($this->bloodline->jutsu[$jutsu['jutsu_id']]['exp'] >= 1000) {
-						$this->bloodline->jutsu[$jutsu['jutsu_id']]['exp'] = 0;
-						$this->bloodline->jutsu[$jutsu['jutsu_id']]['level']++;
-						$this->system->message($jutsu['name'] . " has increased to level " . $this->bloodline->jutsu[$jutsu['jutsu_id']]['level'] . ".");
+					if($this->bloodline->jutsu[$jutsu->id]->exp >= 1000) {
+						$this->bloodline->jutsu[$jutsu->id]->exp = 0;
+						$this->bloodline->jutsu[$jutsu->id]->level++;
+						$this->system->message($jutsu->name . " has increased to level " . $this->bloodline->jutsu[$jutsu->id]->level . ".");
 					}
 				}
 
-				$this->{$energy_type} -= $jutsu['use_cost'];
+				$this->{$energy_type} -= $jutsu->use_cost;
 				break;
 			case 'default_jutsu':
-				$this->{$energy_type} -= $jutsu['use_cost'];
+				$this->{$energy_type} -= $jutsu->use_cost;
 				break;
 
 			default:
@@ -1186,19 +1187,19 @@ class User {
      * function calcDamage() CONTAINS TEMP NUMBER FIX
      *	Calculates raw damage based on player stats and jutsu or item strength
      *
-     * @param array  $attack  Copy of the attack data.
+     * @param Jutsu  $attack  Copy of the attack data.
      * @param string $attack_type (default_jutsu, equipped_jutsu, item, bloodline_jutsu)
      * @return float|int
      * @throws Exception
      */
-	public function calcDamage($attack, $attack_type = 'default_jutsu') {
+	public function calcDamage(Jutsu $attack, $attack_type = 'default_jutsu') {
 		switch($attack_type) {
 			case 'default_jutsu':
 			case 'equipped_jutsu':
-				$offense = 35 + ($this->{$attack['jutsu_type'] . '_skill'} * 0.10);
+				$offense = 35 + ($this->{$attack->jutsu_type . '_skill'} * 0.10);
 				break;
 			case 'bloodline_jutsu':
-				$offense = 35 + ($this->{$attack['jutsu_type'] . '_skill'} * 0.08) + ($this->bloodline_skill * 0.08);
+				$offense = 35 + ($this->{$attack->jutsu_type . '_skill'} * 0.08) + ($this->bloodline_skill * 0.08);
 				break;
 			default:
 				throw new Exception("Invalid jutsu type!");
@@ -1208,7 +1209,7 @@ class User {
 		if(!empty($this->bloodline_offense_boosts)) {
 			foreach($this->bloodline_offense_boosts as $id => $boost) {
 				$boost_type = explode('_', $boost['effect'])[0];
-				if($boost_type != $attack['jutsu_type']) {
+				if($boost_type != $attack->jutsu_type) {
 					continue;
 				}
 
@@ -1246,10 +1247,10 @@ class User {
 		$rand = (int)(($min + $max) / 2);
 		// $rand = mt_rand($min, $max);
 
-		$damage = $offense * $attack['power'] * $rand;
+		$damage = $offense * $attack->power * $rand;
 
 		// Add non-BL damage boosts
-		$damage_boost = $this->{$attack['jutsu_type'] . '_boost'} - $this->{$attack['jutsu_type'] . '_nerf'};
+		$damage_boost = $this->{$attack->jutsu_type . '_boost'} - $this->{$attack->jutsu_type . '_nerf'};
 		if($this->system->debug['damage']) {
 			echo 'Damage/boost: ' . $damage . ' / ' . $damage_boost . '<br />';
 		}
@@ -1296,15 +1297,15 @@ class User {
 
 		switch($defense_type) {
 			case 'ninjutsu':
-				$defense += diminishing_returns($this->ninjutsu_skill * 0.03, 50);
+				$defense += SystemFunctions::diminishing_returns($this->ninjutsu_skill * 0.03, 50);
 				$raw_damage -= $this->ninjutsu_resist;
 				break;
 			case 'genjutsu':
-				$defense += diminishing_returns($this->genjutsu_skill * 0.03, 50);
+				$defense += SystemFunctions::diminishing_returns($this->genjutsu_skill * 0.03, 50);
 				$raw_damage -= $this->genjutsu_resist;
 				break;
 			case 'taijutsu':
-				$defense += diminishing_returns($this->taijutsu_skill * 0.03, 50);
+				$defense += SystemFunctions::diminishing_returns($this->taijutsu_skill * 0.03, 50);
 				$raw_damage -= $this->taijutsu_resist;
 				break;
 		}
@@ -1439,7 +1440,7 @@ class User {
 		Updates user inventory from class members into database
 		-Parameters-
 	*/
-	public function updateInventory() {
+	public function updateInventory(): bool {
 		if(!$this->inventory_loaded) {
 			$this->system->error("Called update without fetching inventory!");
 			return false;
@@ -1451,28 +1452,34 @@ class User {
 		$jutsu_count = 0;
 		$item_count = 0;
 
-		if($this->jutsu && !empty($this->jutsu)) {
+		if(!empty($this->jutsu)) {
 			foreach($this->jutsu as $jutsu) {
-				$player_jutsu[$jutsu_count]['jutsu_id'] = $jutsu['jutsu_id'];
-				$player_jutsu[$jutsu_count]['level'] = $jutsu['level'];
-				$player_jutsu[$jutsu_count]['exp'] = $jutsu['exp'];
+			    $player_jutsu[$jutsu_count] = [
+                    'jutsu_id' => $jutsu->id,
+                    'level' => $jutsu->level,
+                    'exp' => $jutsu->exp,
+                ];
 				$jutsu_count++;
 			}
 		}
 
 		if($this->jutsu_scrolls && !empty($this->jutsu_scrolls)) {
-			foreach($this->jutsu_scrolls as $jutsu) {
-				$player_jutsu[$jutsu_count]['jutsu_id'] = $jutsu['jutsu_id'];
-				$player_jutsu[$jutsu_count]['level'] = $jutsu['level'];
-				$player_jutsu[$jutsu_count]['exp'] = $jutsu['exp'];
+			foreach($this->jutsu_scrolls as $jutsu_scroll) {
+                $player_jutsu[$jutsu_count] = [
+                    'jutsu_id' => $jutsu_scroll->id,
+                    'level' => $jutsu_scroll->level,
+                    'exp' => $jutsu_scroll->exp,
+                ];
 				$jutsu_count++;
 			}
 		}
 
 		if($this->items && !empty($this->items)) {
 			foreach($this->items as $item) {
-				$player_items[$item_count]['item_id'] = $item['item_id'];
-				$player_items[$item_count]['quantity'] = $item['quantity'];
+                $player_items[$item_count] = [
+                    'item_id' => $item['item_id'],
+                    'quantity' => $item['quantity'],
+                ];
 				$item_count++;
 			}
 		}
@@ -1494,12 +1501,12 @@ class User {
 		if($this->bloodline_id && !empty($this->bloodline->jutsu)) {
 			$jutsu_count = 0;
 			foreach($this->bloodline->jutsu as $jutsu) {
-				if($jutsu['rank'] > $this->rank) {
+				if($jutsu->rank > $this->rank) {
 					continue;
 				}
-				$bloodline_jutsu[$jutsu_count]['jutsu_id'] = $jutsu['jutsu_id'];
-				$bloodline_jutsu[$jutsu_count]['level'] = $jutsu['level'];
-				$bloodline_jutsu[$jutsu_count]['exp'] = $jutsu['exp'];
+				$bloodline_jutsu[$jutsu_count]['jutsu_id'] = $jutsu->id;
+				$bloodline_jutsu[$jutsu_count]['level'] = $jutsu->level;
+				$bloodline_jutsu[$jutsu_count]['exp'] = $jutsu->exp;
 				$jutsu_count++;
 			}
 
@@ -1509,13 +1516,10 @@ class User {
 				WHERE `user_id` = '{$this->user_id}' LIMIT 1");
 		}
 
-		// strip down to id, level, exp
-		// Json encode
-		// run query
         return true;
 	}
 
-    private function bloodlineSkillRatio($boost) {
+    private function bloodlineSkillRatio($boost): float {
         $bloodline_skill = $this->bloodline_skill + 10;
 
         $boost_type = explode('_', $boost['effect'])[0];
