@@ -343,12 +343,19 @@ function jutsu() {
 	else if($_GET['forget_jutsu']){
 		$jutsu_id = (int)$_GET['forget_jutsu'];
 		try{
+			//Checking if player knows the jutsu he's trying to forget.
 			if(!$player->checkInventory($jutsu_id, 'jutsu')) {
 				throw new Exception("Invalid Jutsu!");
 			}
 
-			$jutsu_name = $player->jutsu[$jutsu_id]['name'];
+			//Checking if player has jutsu that depend on the jutsu he's trying to forget.
+			$can_forget = userHasChildrenJutsu($jutsu_id, $player);
+			if($can_forget == false){
+				throw new Exception("You cannot forget the parent of a jutsu you know!");
+			}
 
+			//Forgetting jutsu.
+			$jutsu_name = $player->jutsu[$jutsu_id]['name'];
 			unset($player->jutsu[$jutsu_id]);
 			$system->message("You have forgot $jutsu_name!");
 		}
@@ -519,6 +526,16 @@ function jutsu() {
 	echo "</table>";
 	
 	$player->updateInventory();
+}
+
+function userHasChildrenJutsu($id, $player){
+	foreach($player->jutsu as $element){
+		if($id == $element['parent_jutsu']){
+			return false;
+		}
+	}
+
+	return true;
 }
 
 ?>
