@@ -278,15 +278,17 @@ class AI {
     public function calcDamageTaken($raw_damage, $defense_type) {
         $defense = 50;
 
+        $def_multiplier = 0.01;
+
         switch($defense_type) {
             case 'ninjutsu':
-                $defense += SystemFunctions::diminishing_returns($this->ninjutsu_skill * 0.03, 40);
+                $defense += SystemFunctions::diminishing_returns($this->ninjutsu_skill * $def_multiplier, 40);
                 break;
             case 'genjutsu':
-                $defense += SystemFunctions::diminishing_returns($this->genjutsu_skill * 0.03, 40);
+                $defense += SystemFunctions::diminishing_returns($this->genjutsu_skill * $def_multiplier * 0.9, 40);
                 break;
             case 'taijutsu':
-                $defense += SystemFunctions::diminishing_returns($this->taijutsu_skill * 0.03, 40);
+                $defense += SystemFunctions::diminishing_returns($this->taijutsu_skill * $def_multiplier, 40);
                 break;
             default:
                 error_log("Invalid defense type! {$defense_type}");
