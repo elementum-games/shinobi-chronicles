@@ -469,8 +469,7 @@ function premium() {
 		}
 		$system->printMessage();
 	}
-	// Edited by Kengetsu - Line 371
-	else if($_POST['change_color'] && $player->forbidden_seal || $_POST['change_color'] && $player->premium_credits_purchased) {
+	else if($_POST['change_color'] && ($player->forbidden_seal || $player->premium_credits_purchased)) {
 		$color = $system->clean($_POST['name_color']);
 		switch($color) {
 			case 'blue':
@@ -487,7 +486,14 @@ function premium() {
 				$player->forbidden_seal['color'] = $color;
 				$system->message("Color changed!");
 				break;
-			/* Shadekun edit for returning administrator color */
+            case 'green':
+                if($player->staff_level < SystemFunctions::SC_MODERATOR) {
+                    $system->message("Invalid color!");
+                    break;
+                }
+                $player->forbidden_seal['color'] = $color;
+                $system->message("Color changed");
+                break;
 			case 'red':
 				if($player->staff_level < SystemFunctions::SC_ADMINISTRATOR) {
 					$system->message("Invalid color!");
@@ -495,8 +501,7 @@ function premium() {
 				}
 				$player->forbidden_seal['color'] = $color;
 				$system->message("Color changed");
-			break;
-			/* End Shadekun edit */
+			    break;
 			default:
 				$system->message("Invalid color!");
 		}
@@ -1029,6 +1034,12 @@ function premium() {
 				($player->forbidden_seal['color'] == 'gold' ? "checked='checked'" : '') . "/> 					
 				<span class='gold' style='font-weight:bold;'>Gold</span>";
 			}
+            if($player->staff_level >= SystemFunctions::SC_MODERATOR) {
+                echo "
+				<input type='radio' name='name_color' value='green' " .
+                    ($player->forbidden_seal['color'] == 'green' ? "checked='checked'" : '') . "/> 					
+				<span class='moderator' style='font-weight:bold;'>Green</span>";
+            }
 			if($player->staff_level >= SystemFunctions::SC_ADMINISTRATOR) {
 				echo "
 				<input type='radio' name='name_color' value='red' " . 						
