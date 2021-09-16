@@ -94,6 +94,7 @@ function gear() {
 			$system->message($e->getMessage());
 		}
 	}
+
 	
 	
 	$system->printMessage();
@@ -339,6 +340,22 @@ function jutsu() {
 			$system->message($e->getMessage());
 		}
 	}
+	else if($_GET['forget_jutsu']){
+		$jutsu_id = (int)$_GET['forget_jutsu'];
+		try{
+			if(!$player->checkInventory($jutsu_id, 'jutsu')) {
+				throw new Exception("Invalid Jutsu!");
+			}
+
+			$jutsu_name = $player->jutsu[$jutsu_id]['name'];
+
+			unset($player->jutsu[$jutsu_id]);
+			$system->message("You have forgot $jutsu_name!");
+		}
+		catch (Exception $e) {
+			$system->message($e->getMessage());
+		}
+	}
 	
 	$system->printMessage();
 	echo "<table class='table'>";
@@ -391,6 +408,8 @@ function jutsu() {
 					}
 					echo "</p>";
 				}
+
+				echo "<p style='text-align:center'><a href='$self_link&forget_jutsu={$jutsu['jutsu_id']}'>Forget Jutsu!</a></p>";
 			echo "</td></tr>";
 		}
 	}
