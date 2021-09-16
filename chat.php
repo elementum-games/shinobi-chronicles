@@ -61,8 +61,8 @@ function chat() {
 			);
 			$user_color = (!$player->forbidden_seal) ? 0 : ($supported_colors[$player->forbidden_seal['color']]);
 
-			$sql = "INSERT INTO `chat` 
-                    (`user_name`, `message`, `title`, `village`, `staff_level`, `user_color`, `time`, `edited`) VALUES 
+			$sql = "INSERT INTO `chat`
+                    (`user_name`, `message`, `title`, `village`, `staff_level`, `user_color`, `time`, `edited`) VALUES
                            ('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s')";
 			$system->query(sprintf(
 			    $sql, $player->user_name, $message, $title, $player->village, $staff_level, $user_color, time(), 0
@@ -206,7 +206,7 @@ function chat() {
 					        <img style='max-height:45px;max-width:45px;' src='{$userData['avatar_link']}' />
                         </div>
 						<div style='display:block;flex-grow:1;'>
-							<a href='{$system->links['members']}&user={$post['user_name']}' class='$class $statusType'>{$post['user_name']}</a><br />
+							<a style='display:inline-block;' href='{$system->links['members']}&user={$post['user_name']}' class='$class $statusType'>{$post['user_name']}</a><br />
 							<p style='margin: 1px 0 3px;'>
                                 <img src='./images/village_icons/" . strtolower($post['village']) . ".png' alt='{$post['village']} Village'
                                     style='max-width:20px;max-height:20px;vertical-align:text-bottom;'  title='{$post['village']} Village' /> " .

@@ -58,6 +58,11 @@ $body_start = <<<HTML
 HTML;
 
 $top_menu = <<<HTML
+
+	<div style="height: 70px; width: 70px; margin: auto; padding: 0;" class="menuTouchItem">
+		<img style='width: 100%;' src="" />
+	</div>
+
 	<ul class='topMenu'>
 		<li><a href='{$system->link}'>News</a></li>
 		<li><a href='#' target='_blank'>Forum</a></li>
@@ -66,32 +71,55 @@ $top_menu = <<<HTML
 		<li><a href='{$system->link}terms.php'>Terms of Service</a></li>
 	</ul>
 
+
+			</div>
+		</div>
+
 HTML;
 
 $side_menu_start = <<<HTML
-		</div>
-	</div>
+
 	<div id='sidebar'>
-		<div class='header'>
-		Menu
-		</div>
 
 		<ul class='menu'>
+				<div id="character_header" class='header'>
+				Character Menu
+				</div>
+			<div id="player_menu">
 HTML;
 
 	$village_menu_start = <<<HTML
-		<hr />
+
+	<hr />
+			</div>
+			<div id="travel_header" class='header'>
+			Travel Menu
+			</div>
+		<div id="travel_menu">
 HTML;
 
 	$action_menu_header = <<<HTML
-		<hr />
+		</div>
+			<div id="action_header" class='header'>
+				Action Menu
+			</div>
+		<div id="action_menu">
 HTML;
 
 	$staff_menu_header = <<<HTML
-	<hr />
+		<hr />
+		</div>
+			<div id="staff_header" class='header'>
+				Staff Menu
+			</div>
+		<div id="staff_menu">
 HTML;
 
 	$side_menu_end = <<<HTML
+
+	<hr />
+</div>
+</div>
 		<br style='margin:0px;' />
 		</ul>
 		<br style='margin:0px;' />
@@ -124,6 +152,8 @@ $login_menu = <<<HTML
 </div>
 HTML;$footer = <<<HTML
 </div>
+
+<script type='text/javascript' src="./style/cextralite/responsive_script.js"></script>
 
 <div id='footer'>
 	Developed by LM Visions - Layout design by Cextra

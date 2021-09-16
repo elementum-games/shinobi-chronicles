@@ -7,19 +7,23 @@ HTML{
 	text-align: center;
 }
 img{
-	width: 100%;
+	display: inline-block;
+	/* width: 100%; */
 }
 Body{
 	color: white;
 	margin: 0px;
 	padding: 0px;
 	background-color: rgba(0,0,0,1);
-	font-size: 1.5em;
+	font-size: 1em;
 }
 ul{
 	padding-left: 0px;
 	padding: 0px;
 	margin: 0px;
+}
+p{
+	font-size: 1em;
 }
 b{
 	width: 100%;
@@ -27,6 +31,7 @@ b{
 }
 a{
 	color: rgba(220,220,220,1);
+
 }
 a:hover{
 	color: white);
@@ -43,11 +48,11 @@ a:hover{
 }
 #menu{
 	display: inline-block;
-	width: 100%;
 	text-align: center;
-	padding-left: 0px;
+	padding: 0;
+	width: 100%;
 
-	/* display: none; /*Hides Menu*/ */
+	/* display: none; /*Hides Menu*/
 
 }
 #notifications{
@@ -55,46 +60,124 @@ a:hover{
 	text-align: center;
 	margin: 0.5em;
 }
+
 #header{
 }
+#header img{
+	width: 100%;
+}
+
 .topMenu{
 	display: block;
 	width: 100%;
-	height: auto;
 	font-size: 0.7em;
-}
 
+	overflow: hidden;
+	height: 0px;
+
+	cursor: pointer;
+}
 .topMenu li{
-	display: inline-block;
+	display: block;
+	float: none;
+	text-align: left;
+	width: 100%;
+	margin: 0px;
 }
 
 .topMenu li a{
-	display: inline-block;
-	background: linear-gradient(0deg, rgba(40,40,40,1) 0%, rgba(62,62,62,1) 38%, rgba(40,40,40,1) 100%);
-	padding: 0.5em 0.7em;
-	margin: 0.4em 0.2em;
-}
+	display: block;
+	background-color: rgba(40,40,40,1);
 
+	border-style: solid;
+	border-color: white;
+	border-bottom: none;
+	border-width: 1px;
+
+
+	padding: 0.5em 0em;
+	/* margin: 0em 0.5em; */
+}
 .topMenu li a:hover{
 	background: linear-gradient(0deg, rgba(40,40,40,1) 0%, rgba(82,82,82,1) 38%, rgba(40,40,40,1) 100%);
+}
+/*when topMenu gets the class {.open} applied*/
+.topMenu.open{
+	height: auto;
+}
+
+.menuTouchItem{
+	/* display: inline-block; */
+}
+
+#player_menu{
+	height: 0;
+	overflow: hidden;
+}
+#player_menu.open{
+	height: auto;
+}
+
+#character_menu.open{
+	height: 0;
+	overflow: hidden;
+}
+#character_menu.open{
+	height: auto;
+}
+
+#travel_menu{
+	height: 0;
+	overflow: hidden;
+}
+
+#travel_menu.open{
+	height: auto;
+}
+
+#staff_menu{
+	height: 0;
+	overflow: hidden;
+}
+
+#staff_menu.open{
+	height: auto;
+}
+
+#travel_menu{
+	height: 0;
+	overflow: hidden;
+}
+
+#travel_menu.open{
+	height: auto;
+}
+
+#action_menu{
+	height: 0;
+	overflow: hidden;
+}
+
+#action_menu.open{
+	height: auto;
 }
 
 .submenu{
 	display: inline-block;
 	text-align: center;
-	font-size: 1.2em;
+	font-size: 1em;
 	width: 100%;
 }
 .submenu li{
 	text-align: center;
 	width: 90% !important;
-	margin: 0.5em auto;
+	margin: 1em auto;
 	list-style: none;
 	padding: 0.2em 0em;
 }
 .submenu li a{
 	display: inline-block;
-	padding: 0.4em 0.2em;
+	padding: 0.4em 0.4em;
 	text-decoration: none;
 	background: linear-gradient(0deg, rgba(40,40,40,1) 0%, rgba(62,62,62,1) 38%, rgba(40,40,40,1) 100%);
 }
@@ -106,30 +189,33 @@ a:hover{
 .header.contentheader{
 	font-size: 1.2em;
 	padding: 0.5em 0em;
-	background: linear-gradient(0deg, rgba(40,40,40,1) 0%, rgba(20,20,20,1) 23%, rgba(49,62,56,1) 38%, rgba(40,40,40,1) 100%);
+	/* background: linear-gradient(0deg, rgba(40,40,40,1) 0%, rgba(20,20,20,1) 23%, rgba(49,62,56,1) 38%, rgba(40,40,40,1) 100%); */
 	border-radius: 20px 20px 0px 0px;
 	margin-bottom: 0.8em;
 }
 
+
 .table{
 	display: block;
-	width: 80%;
+	width: 90%;
 	margin: 1em auto 6em auto;
-	border: solid 3px white;
-	padding: 0em 0.2em;
+	background-color: rgba(27, 56, 31, 1);
 
-
+	/*xpos ypos spread color*/
+	box-shadow: 0em 0em 2em rgba(27, 56, 31, 0.9);
 }
 .table tbody{
 	display: inline-block;
 	margin: 0px auto;
 	width: 100%;
 	min-width: 200px;
-	font-size: 1.4em;
+	font-size: 1em;
 }
 .table tr td{
 	display: inline-block;
 	width: 100%;
+	margin: 0.6em 0;
+	padding: 0.3em 0;
 }
 .table tr{
 	margin: 0.5em auto;
@@ -143,7 +229,7 @@ a:hover{
 	text-decoration: none;
 	padding: 0.8em 0.5em;
 	margin: 0px auto;
-	background: linear-gradient(0deg, rgba(40,40,40,1) 0%, rgba(62,62,62,1) 38%, rgba(40,40,40,1) 100%);
+	background: rgba(17, 25, 18, 0.3);
 }
 
 .profile_table{
@@ -154,26 +240,36 @@ a:hover{
 	display: block;
 	width: 100% !important;
 	margin: 0px auto;
-	font-size: 1.2em;
+	font-size: 1em;
 }
 .profile_table tbody{
 }
 
 .header{
-	font-size: 1.6em;
-	padding: 0.5em 0em;
-	background: linear-gradient(0deg, rgba(40,40,40,1) 0%, rgba(20,20,20,1) 23%, rgba(49,62,56,1) 38%, rgba(40,40,40,1) 100%);
-	border-radius: 20px 20px 0px 0px;
-	margin-bottom: 0.8em;
+	display: block;
+	font-size: 1em;
+	padding: 0.5em;
+	background-color: rgba(40,40,40,1);
+}
+
+.button{
+	margin: 0;
+	padding: 0;
+	display: inline-block;
+	width: 80%;
+}
+
+.menu div{
+	margin: 0.1em 0.1em;
 }
 
 .menu li{
 	display: block;
-	font-size: 1.2em;
+	font-size: 1em;
 	text-decoration: none;
 	padding: 0em 0em;
 	font-family: Arial;
-	margin: 0.5em 0em;
+	margin: 0.2em 0em;
 	border-top: solid 1px white;
 	border-bottom: solid 1px white;
 	border-radius: 0.2em;
@@ -185,9 +281,12 @@ a:hover{
 .menu li a{
 	display: block;
 	text-decoration: none;
-	padding: 0.8em 0em;
+	padding: 0.5em 0em;
 }
 
+#socialPost{
+	display: inline-block;
+}
 #socialPost table{
 	padding: 0.1em;
 }
@@ -211,7 +310,8 @@ a:hover{
 	padding: 2em 0em !important;
 }
 #user_data_container{
-	flex-direction: column !important;
+	display: flex;
+	flex-direction: row;
 }
 #socialPosts tr{
 	width: 95%;
@@ -220,6 +320,26 @@ a:hover{
 
 .submenumargin{
 	display: inline-block;
+}
+
+.logout{
+	margin: 0.2em 0em;
+}
+.logout a{
+	display: block;
+}
+
+#handseals{
+	display: inline-block;
+	width: 90%;
+}
+#handseals p{
+	display: inline;
+	height: 0px;
+}
+
+.jutsuName{
+	color: black;
 }
 
 /*Separates menu items*/
@@ -253,25 +373,26 @@ tr{
 input{
 	display: inline;
 	padding: 0.8em 1em;
-	font-size: 0.6em;
+	font-size: 0.8em;
 	margin: 0.8em 0em;
 }
 
 form{
-	margin: 2.5em auto;
-	text-align: center;
+	margin: 1em 1.5em;
+	text-align: left;
 	font-size: 1.2em;
 }
 
 th{
 	padding: 1em;
-	font-size: 1em;
+	font-size: 1.2em;
 }
 
 select{
 	display: inline;
 	padding: 1em 0.4em;
 	width: 70%;
+	font-size: 1em;
 }
 
 .systemMessage{
