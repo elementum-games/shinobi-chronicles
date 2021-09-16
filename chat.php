@@ -201,9 +201,9 @@ function chat() {
 					    <div style='flex-shrink:0;'>
 					        <img style='max-height:45px;max-width:45px;' src='{$userData['avatar_link']}' />
                         </div>
-						<div style='display:inline-block;flex-grow:1;'>
+						<div style='display:block;flex-grow:1;'>
 							<a style='display:inline-block;' href='{$system->links['members']}&user={$post['user_name']}' class='$class $statusType'>{$post['user_name']}</a><br />
-							<p style='display:inline-block; margin: 1px 0 3px;'>
+							<p style='display:block; margin: 1px 0 3px;'>
                                 <img src='./images/village_icons/" . strtolower($post['village']) . ".png' alt='{$post['village']} Village'
                                     style='max-width:20px;max-height:20px;vertical-align:text-bottom;'  title='{$post['village']} Village' /> " .
                             stripslashes($post['title']) . "</p>
