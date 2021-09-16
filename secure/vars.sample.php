@@ -6,7 +6,7 @@ manually upload to your server, outside of git.
  */
 
 $ENVIRONMENT = 'dev';
-$web_url = 'localhost/';
+$web_url = 'http://localhost/';
 
 $SC_OPEN = true;
 $register_open = true;

@@ -95,13 +95,13 @@ function training() {
 				if(!$player->checkInventory($jutsu_id, 'jutsu')) {
 					throw new Exception("Invalid jutsu!");
 				}
-				if($player->jutsu[$jutsu_id]['level'] >= 100) {
+				if($player->jutsu[$jutsu_id]->level >= 100) {
 					throw new Exception("You cannot train this jutsu any further!");
 				}
-				$train_type = 'jutsu:' . strtolower(str_replace(' ', '_', $player->jutsu[$jutsu_id]['name']));
+				$train_type = 'jutsu:' . strtolower(str_replace(' ', '_', $player->jutsu[$jutsu_id]->name));
 				$train_type = $system->clean($train_type);
 				$train_gain = $jutsu_id;
-				$train_length = 600 + (60 * round(pow($player->jutsu[$jutsu_id]['level'], 1.1)));
+				$train_length = 600 + (60 * round(pow($player->jutsu[$jutsu_id]->level, 1.1)));
 				if($player->user_id == 190) {
 					$train_length = 5;	
 				}
@@ -214,10 +214,10 @@ function training() {
 					<form action='$self_link' method='post'>
 						<select name='jutsu'>";
 						foreach($player->jutsu as $id => $jutsu) {
-							if($jutsu['level'] >= 100) {
+							if($jutsu->level >= 100) {
 								continue;
 							}
-							echo "<option value='$id' title='{$jutsu['jutsu_type']}'>" . $jutsu['name'] . "</option>";
+							echo "<option value='$id' title='{$jutsu->jutsu_type}'>" . $jutsu->name . "</option>";
 						}
 						echo "</select><br />
 						<input type='submit' name='train_type' value='Train' />

@@ -89,6 +89,7 @@ class SystemFunctions {
 
     public $debug = [
         'battle' => false,
+        'battle_effects' => false,
         'damage' => false,
         'bloodline' => false,
     ];
@@ -127,7 +128,7 @@ class SystemFunctions {
         -Parameters-
         None; Uses @host, @user_name, @password, @database from /secure/vars.php for DB credentials.
     */
-    public function dbConnect() {
+    public function dbConnect(): mysqli {
         if($this->con) {
             return $this->con;
         }
@@ -144,7 +145,7 @@ class SystemFunctions {
         -Parameters-
         @raw_input: Input to be sanitized
     */
-    public function clean($raw_input) {
+    public function clean($raw_input): string {
         if(!$this->con) {
             $this->dbConnect();
         }
@@ -189,7 +190,7 @@ class SystemFunctions {
     /* function db_fetch(result set, return_type)
 
     */
-    public function db_fetch($result = false, $return_type = 'assoc') {
+    public function db_fetch($result = false, $return_type = 'assoc'): ?array {
         if(!$result) {
             $result = $this->db_result;
         }
@@ -224,9 +225,9 @@ class SystemFunctions {
         -Parameters-
         None
     */
-    public function printMessage($force_display = false) {
+    public function printMessage($force_display = false): bool {
         if(strlen($this->message) && (!$this->message_displayed || $force_display)) {
-            echo "<p class='systemMessage'>$this->message</p>";
+            echo "<p class='systemMessage'>{$this->message}</p>";
             $this->message = '';
             $this->message_displayed = true;
             return true;
@@ -244,7 +245,7 @@ class SystemFunctions {
      * @param int $staff_level
      * @return bool
      */
-    public function send_pm($sender, $recipient, $subject, $message, $staff_level = 0) {
+    public function send_pm($sender, $recipient, $subject, $message, $staff_level = 0): bool {
         if(!$this->con) {
             $this->dbConnect();
         }
@@ -314,7 +315,7 @@ class SystemFunctions {
         -Parameters-
         @string
     */
-    public function censor_check($string) {
+    public function censor_check($string): bool {
         $banned_words = [
             'fuck',
             'shit',
@@ -340,7 +341,7 @@ class SystemFunctions {
 
     }
 
-    public function getMemes() {
+    public function getMemes(): array {
         $memes = require 'memes.php';
 
         return [
@@ -421,7 +422,7 @@ class SystemFunctions {
 
     }
 
-    public function imageCheck($image, $size) {
+    public function imageCheck($image, $size): string {
 
         $avatar_limit = $size;
 
@@ -436,7 +437,7 @@ class SystemFunctions {
         return "<img src='$image' style='max-width:{$width}px;max-height:{$height}px;' />";
 
     }
-    public function timeAgo($timestamp) {
+    public function timeAgo($timestamp): string {
 
         $time = time() - $timestamp;
 
@@ -484,7 +485,7 @@ class SystemFunctions {
 
     }
 
-    public function time_remaining($timestamp) {
+    public function time_remaining($timestamp): string {
         $days = floor($timestamp / 86400);
         $hours = floor($timestamp / 3600);
         $minutes = ceil($timestamp / 60);
@@ -516,28 +517,12 @@ class SystemFunctions {
         $this->query("INSERT INTO `logs` (`log_type`, `log_title`, `log_time`, `log_contents`)
 			VALUES ('$type', '$title', " . time() . ", '$contents')");
     }
-    public function convertUser() {
-        if(func_num_args() != 1){
-            return false;
-        }
-        $identity = func_get_arg(0);
-        if(filter_var($identity, FILTER_VALIDATE_INT)){
-            $result = $this->db_fetch($this->query("SELECT `user_name` FROM `users` WHERE `user_id` = '{$identity}'"));
-            return $result['user_name'];
-        }
-        else if(is_string($identity)){
-            $identity = $this->clean($identity);
-            $result = $this->db_fetch($this->query("SELECT `user_id` FROM `users` WHERE `user_name` = '{$identity}'"));
-            return $result['user_id'];
-        }
-
-    }
 
     public function hash_password($password) {
         return password_hash($password, PASSWORD_DEFAULT);
     }
 
-    public function verify_password($password, $hash) {
+    public function verify_password($password, $hash): bool {
         return password_verify($password, $hash);
     }
 
@@ -608,5 +593,14 @@ class SystemFunctions {
         }
 
         echo str_replace('<!--[VERSION_NUMBER]-->', SystemFunctions::VERSION_NUMBER, $footer);
+    }
+
+    public static function diminishing_returns($val, $scale) {
+        if($val < 0) {
+            return -self::diminishing_returns(-$val, $scale);
+        }
+        $mult = $val / $scale;
+        $trinum = (sqrt(8.0 * $mult + 1.0) - 1.0) / 2.0;
+        return $trinum * $scale;
     }
 }
