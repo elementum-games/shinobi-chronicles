@@ -106,7 +106,7 @@ function userProfile() {
 			else {
 				throw new Exception("Invalid Currency Type!");
 			}
-			if($amount <= 0) {
+			if($amount <= 0 && $player->staff_level < SystemFunctions::SC_HEAD_ADMINISTRATOR) {
 				throw new Exception("Invalid amount!");
 			}
 			if($amount > $player->$type) {

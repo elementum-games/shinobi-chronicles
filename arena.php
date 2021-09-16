@@ -204,7 +204,7 @@ function arena() {
 		}
 		$fight_start = false;
 		$fight_timer = 20;
-		if($_GET['fight']) {
+		if(!empty($_GET['fight'])) {
 			if($player->last_ai > time() - $fight_timer) {
 				$system->message("Please wait " . ($player->last_ai - (time() - $fight_timer)) . " more seconds!");
 			}
