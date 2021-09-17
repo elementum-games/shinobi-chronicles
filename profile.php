@@ -80,12 +80,12 @@ function userProfile() {
 				break;
 		}
 	}
-	
+
 	// Process input
 	if(isset($_POST['send_currency'])) {
 		$recipient = $system->clean($_POST['recipient']);
 		$amount = (int)$system->clean($_POST['amount']);
-		
+
 		try {
 			if(strtolower($recipient) == strtolower($player->user_name)) {
 				throw new Exception("You cannot send money/AK to yourself!");
@@ -187,7 +187,7 @@ function userProfile() {
 			"<div style='height:6px;width:250px;border-style:solid;border-width:1px;'>" .
 			"<div id='staminabar' style='background-color:#00B000;height:6px;width:" . $stamina_percent . "%;' /></div>" . "</div>" .
 		"<br />
-		Regeneration rate: " . $player->regen_rate;
+		Regeneration Rate: " . $player->regen_rate;
 
 		$regen_cut = 0;
 		if($player->battle_id or isset($_SESSION['ai_id'])) {
@@ -209,23 +209,18 @@ function userProfile() {
 		//regen timer script - can be moved to its own script.js file
 		echo "
 		<script>
-		var remainingtime = ". 60 - $time_since_last_regen .";
+		var remainingtime = ". 59 - $time_since_last_regen .";
 
-		// var health = {$player->health};
-		var health = 20;
+		var health = {$player->health};
 		var max_health = {$player->max_health};
 
-		// var chakra = {$player->chakra};
-			var chakra = 20;
+		var chakra = {$player->chakra};
 		var max_chakra = {$player->max_chakra};
 
-		// var stamina = {$player->stamina};
-			var stamina = 20;
+		var stamina = {$player->stamina};
 		var max_stamina = {$player->max_stamina};
 
 		var regen = {$player->regen_rate} + {$player->regen_boost}; //no regen cut
-
-		console.log(regen);
 
 		setInterval(() => {
 
@@ -235,47 +230,43 @@ function userProfile() {
 			if(remainingtime <= 0){
 				remainingtime = 60;
 
-			if(health <= max_health){
-				health += regen;
-				if(health > max_health){
+				if((health + regen) >= max_health){
 					health = max_health;
+				} else {
+					health += regen; //health ignores regen boost
 				}
-			} else if (health > max_health){
-				health = max_health;
-			}
 
-			if(chakra <= max_chakra){
-				chakra += regen;
-				if(chakra > max_chakra){
+				if((chakra + regen) >= max_chakra){
 					chakra = max_chakra;
+				} else {
+					chakra += regen;
 				}
-			} else if (chakra > max_chakra){
-				chakra = max_chakra;
-			}
 
-			if(stamina <= max_stamina){
-				stamina += regen;
-				if(stamina > max_stamina){
+				if((stamina + regen) >= max_stamina){
 					stamina = max_stamina;
+				} else {
+					stamina += regen;
 				}
-			} else if (stamina > max_stamina){
-				stamina = max_stamina;
-			}
 
-				//update health amounts / bars
-				document.getElementById('health').innerHTML = health.toFixed(2) + '/' + max_health.toFixed(2);
-				document.getElementById('healthbar').style.width = ( health / max_health )*100 + '%';
+			//update health amounts / bars
+			document.getElementById('health').innerHTML = health.toFixed(2) + '/' + max_health.toFixed(2);
+			document.getElementById('healthbar').style.width = ( health / max_health )*100 + '%';
 
-				document.getElementById('chakra').innerHTML = chakra.toFixed(2) + '/' + max_chakra.toFixed(2);
-				document.getElementById('chakrabar').style.width = ( chakra / max_chakra )*100 + '%';
+			document.getElementById('chakra').innerHTML = chakra.toFixed(2) + '/' + max_chakra.toFixed(2);
+			document.getElementById('chakrabar').style.width = ( chakra / max_chakra )*100 + '%';
 
-				document.getElementById('stamina').innerHTML = stamina.toFixed(2) + '/' + max_stamina.toFixed(2);
-				document.getElementById('staminabar').style.width = ( stamina / max_stamina )*100 + '%';
+			document.getElementById('stamina').innerHTML = stamina.toFixed(2) + '/' + max_stamina.toFixed(2);
+			document.getElementById('staminabar').style.width = ( stamina / max_stamina )*100 + '%';
 			}
 
 			remainingtime--;
 
-		}, 1000); //for some reason the regen timer is updating faster than the interval function...
+		}, 1000);
+
+		//for some reason every other tick the javascript regen is ahead of the actual regen?
+		//can't figure out why? its like the Regen changes every other minute in intervals or it doubles
+		//can't find the error with my script
+		//can't seem to find out where the error is, need help.
 
 		</script>
 		";
