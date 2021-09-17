@@ -72,24 +72,6 @@ function members() {
 			echo "<table class='table'>
 			<tr><th colspan='2'>View Profile</th>";
 
-			//send message/money/ak
-			echo "<tr><td style='text-align:center;' colspan='2'>
-			<a href='{$system->link}?id=2&page=new_message&sender={$viewUser->user_name}'>Send Message</a>";
-
-			if($player->rank > 1) {
-								echo "&nbsp;&nbsp;|&nbsp;&nbsp;<a href='{$system->links['profile']}&page=send_money&recipient={$viewUser->user_name}'>Send Money</a>";
-						}
-			if($player->rank > 2) {
-								echo "&nbsp;&nbsp;|&nbsp;&nbsp;<a href='{$system->links['profile']}&page=send_ak&recipient={$viewUser->user_name}'>Send AK</a>";
-						}
-			if($viewUser->rank >= 3 && $player->team) {
-				if($player->user_id == $player->team['leader'] && !$viewUser->team && !$viewUser->team_invite &&
-				$player->village == $viewUser->village) {
-					echo "&nbsp;&nbsp; |  &nbsp;&nbsp;
-					<a href='{$system->link}?id=24&invite=1&user_name=$viewUser->user_name'>Invite to Team</a>";
-				}
-			}
-
 			echo "<tr><td colspan='2' style='text-align:center;'>";
 				// Online/activity display
 				if($viewUser->last_active > time() - 120) {
@@ -167,6 +149,24 @@ function members() {
 					Your browser does not support the audio element.
 				</audio>";
 			}*/
+
+			//send message/money/ak
+			echo "<tr style='text-align:center;'><td style='text-align:center;' colspan='2'>
+			<a href='{$system->link}?id=2&page=new_message&sender={$viewUser->user_name}'>Send Message</a>";
+
+			if($player->rank > 1) {
+								echo "&nbsp;&nbsp;|&nbsp;&nbsp;<a href='{$system->links['profile']}&page=send_money&recipient={$viewUser->user_name}'>Send Money</a>";
+						}
+			if($player->rank > 2) {
+								echo "&nbsp;&nbsp;|&nbsp;&nbsp;<a href='{$system->links['profile']}&page=send_ak&recipient={$viewUser->user_name}'>Send AK</a>";
+						}
+			if($viewUser->rank >= 3 && $player->team) {
+				if($player->user_id == $player->team['leader'] && !$viewUser->team && !$viewUser->team_invite &&
+				$player->village == $viewUser->village) {
+					echo "&nbsp;&nbsp; |  &nbsp;&nbsp;
+					<a href='{$system->link}?id=24&invite=1&user_name=$viewUser->user_name'>Invite to Team</a>";
+				}
+			}
 
 			if($journal) {
 				if(strpos($journal, "\n") === false) {
