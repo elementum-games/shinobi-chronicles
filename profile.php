@@ -272,7 +272,8 @@ function userProfile() {
 		";
 
     echo "<label style='width:9.2em;'>Regen Timer:</label>
-		<p id='regentimer' style='display:inline'>" . (60 - $time_since_last_regen) . "</p>
+		<span id='regentimer'>" . (60 - $time_since_last_regen) . "</span>
+
 
 		</td>
 		</tr>";
