@@ -175,15 +175,18 @@ function userProfile() {
 
 		echo "<td style='width:50%;'>
 		<label style='width:6.7em;'>Health:</label>" .
-			"<p id='health' style='display: inline'>". sprintf("%.2f", $player->health) . '/' . sprintf("%.2f", $player->max_health) . "</p><br />" .
+			"<span id='health'>". sprintf("%.2f", $player->health) . '/' . sprintf("%.2f", $player->max_health) . "</span><br />" .
+
 			"<div style='height:6px;width:250px;border-style:solid;border-width:1px;'>" .
 			"<div id='healthbar' style='background-color:#C00000;height:6px;width:" . $health_percent . "%;' /></div>" . "</div>" .
 		"<label style='width:6.7em;'>Chakra:</label>" .
-			"<p id='chakra' style='display: inline'>". sprintf("%.2f", $player->chakra) . '/' . sprintf("%.2f", $player->max_chakra) . "</p><br />" .
+			"<span id='chakra'>". sprintf("%.2f", $player->chakra) . '/' . sprintf("%.2f", $player->max_chakra) . "</span><br />" .
+
 			"<div style='height:6px;width:250px;border-style:solid;border-width:1px;'>" .
 			"<div id='chakrabar' style='background-color:#0000B0;height:6px;width:" . $chakra_percent . "%;' /></div>" . "</div>" .
 		"<label style='width:6.7em;'>Stamina:</label>" .
-			"<p id='stamina' style='display: inline'>". sprintf("%.2f", $player->stamina) . '/' . sprintf("%.2f", $player->max_stamina) . "</p><br />" .
+			"<span id='stamina'>". sprintf("%.2f", $player->stamina) . '/' . sprintf("%.2f", $player->max_stamina) . "</span><br />" .
+
 			"<div style='height:6px;width:250px;border-style:solid;border-width:1px;'>" .
 			"<div id='staminabar' style='background-color:#00B000;height:6px;width:" . $stamina_percent . "%;' /></div>" . "</div>" .
 		"<br />
