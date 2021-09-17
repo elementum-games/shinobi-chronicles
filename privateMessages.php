@@ -55,7 +55,8 @@ class Messaging {
 		try {
 			// Check minimum length 
 			if(strlen($subject) < self::MIN_SUBJECT_LENGTH) {
-				throw new Exception("Please enter a subject!");
+				// throw new Exception("Please enter a subject!");
+				$subject = "No Subject";
 			}
 			if(strlen($recipient) < User::MIN_NAME_LENGTH) {
 				throw new Exception("Please enter a recipient!");
