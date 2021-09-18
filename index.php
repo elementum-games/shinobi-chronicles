@@ -419,7 +419,7 @@ if($LOGGED_IN) {
 	// Display side menu and footer
 	if(!$ajax) {
 		if($player->clan) {
-		    $pages[20]['menu'] = SystemFunctions::MENU_USER;
+		    $pages[20]['menu'] = SystemFunctions::MENU_VILLAGE;
 		}
 		if($player->rank >= 3) {
 		    $pages[24]['menu'] = SystemFunctions::MENU_USER;

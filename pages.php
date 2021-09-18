@@ -49,12 +49,6 @@ $pages = [
         'function_name' => 'members',
         'menu' => SystemFunctions::MENU_USER,
     ],
-    20 => [
-        'file_name' => 'clan.php',
-        'title' => 'Clan',
-        'function_name' => 'clan',
-        'menu' => 'conditional',
-    ],
     24 => [
         'file_name' => 'team.php',
         'title' => 'Team',
@@ -131,6 +125,12 @@ $pages = [
         'function_name' => 'villageHQ',
         'village_ok' => SystemFunctions::ONLY_IN_VILLAGE,
         'menu' => SystemFunctions::MENU_VILLAGE,
+    ],
+    20 => [
+        'file_name' => 'clan.php',
+        'title' => 'Clan',
+        'function_name' => 'clan',
+        'menu' => 'conditional',
     ],
     21 => [
         'file_name' => 'premium.php',
