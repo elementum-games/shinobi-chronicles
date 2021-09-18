@@ -507,7 +507,15 @@ function premium() {
 				$player->forbidden_seal['color'] = $color;
 				$system->message("Color changed!");
 				break;
+			 case 'green':
 			/* Shadekun edit for returning administrator color */
+                if($player->staff_level < SystemFunctions::SC_MODERATOR) {
+                    $system->message("Invalid color!");
+                    break;
+                }
+                $player->forbidden_seal['color'] = $color;
+                $system->message("Color changed");
+                break;
 			case 'red':
 				if($player->staff_level < SystemFunctions::SC_ADMINISTRATOR) {
 					$system->message("Invalid color!");
