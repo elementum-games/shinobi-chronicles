@@ -418,9 +418,6 @@ if($LOGGED_IN) {
 	$player->updateData();
 	// Display side menu and footer
 	if(!$ajax) {
-		if($player->bloodline_id) {
-		    $pages[10]['menu'] = SystemFunctions::MENU_USER;
-		}
 		if($player->clan) {
 		    $pages[20]['menu'] = SystemFunctions::MENU_USER;
 		}

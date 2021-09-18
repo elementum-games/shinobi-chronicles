@@ -15,19 +15,8 @@ function userProfile() {
 	global $self_link;
 	
 	// Submenu
-	if($player->rank > 1) {				
-		echo "<div class='submenu'>
-		<ul class='submenu'>
-			<li style='width:25.5%;'><a href='{$self_link}'>Character</a></li>
-			<li style='width:25.5%;'><a href='{$self_link}&page=send_money'>Send Money</a></li>
-			<li style='width:25.5%;'><a href='{$self_link}&page=send_ak'>Send AK</a></li>
-        </ul>
-        </div>
-        <div class='submenuMargin'></div>
-		";
-	}
-	
-	
+    renderProfileSubmenu();
+
 	// Level up/rank up checks
 	$exp_needed = $player->exp_per_level * (($player->level + 1) - $player->base_level) + ($player->base_stats * 10);
 	
@@ -350,4 +339,50 @@ function userProfile() {
 		<label style='width:9.2em;'>Willpower:</label>" . sprintf("%.2f", $player->willpower) . "<br />
 		</td></tr></table>";
 	}
+}
+
+function renderProfileSubmenu() {
+    global $system;
+    global $player;
+    global $self_link;
+
+    $submenu_links = [
+        [
+            'link' => $system->links['profile'],
+            'title' => 'Character'
+        ],
+        [
+            'link' => $system->links['settings'],
+            'title' => 'Settings'
+        ],
+    ];
+    if($player->rank > 1) {
+        $submenu_links[] =  [
+            'link' => $system->links['profile'] . "&page=send_money",
+            'title' => 'Send Money'
+        ];
+        $submenu_links[] = [
+            'link' => $system->links['profile'] . "&page=send_ak",
+            'title' => 'Send AK'
+        ];
+    }
+    if($player->bloodline_id) {
+        $submenu_links[] = [
+            'link' => $system->links['bloodline'],
+            'title' => 'Bloodline'
+        ];
+    }
+
+    if($player->rank > 1) {
+        echo "<div class='submenu'>
+		<ul class='submenu'>";
+        $submenu_link_width = round(99 / count($submenu_links), 1);
+        foreach($submenu_links as $link) {
+            echo "<li style='width:{$submenu_link_width}%;'><a href='{$link['link']}'>{$link['title']}</a></li>";
+        }
+        echo "</ul>
+        </div>
+        <div class='submenuMargin'></div>
+		";
+    }
 }

@@ -14,10 +14,11 @@ $pages = [
         'function_name' => 'privateMessages',
         'menu' => SystemFunctions::MENU_USER,
     ],
-    3 => [
-        'file_name' => 'settings.php',
-        'title' => 'Settings',
-        'function_name' => 'userSettings',
+    7 => [
+        'file_name' => 'chat.php',
+        'title' => 'Chat',
+        'function_name' => 'chat',
+        'ajax_ok' => true,
         'menu' => SystemFunctions::MENU_USER,
     ],
     4 => [
@@ -34,19 +35,6 @@ $pages = [
         'battle_ok' => false,
         'menu' => SystemFunctions::MENU_USER,
     ],
-    6 => [
-        'file_name' => 'members.php',
-        'title' => 'Members',
-        'function_name' => 'members',
-        'menu' => SystemFunctions::MENU_USER,
-    ],
-    7 => [
-        'file_name' => 'chat.php',
-        'title' => 'Chat',
-        'function_name' => 'chat',
-        'ajax_ok' => true,
-        'menu' => SystemFunctions::MENU_USER,
-    ],
     10 => [
         'file_name' => 'bloodline.php',
         'title' => 'Bloodline',
@@ -54,6 +42,12 @@ $pages = [
         'battle_ok' => false,
         'village_ok' => SystemFunctions::IN_VILLAGE_OKAY,
         'menu' => 'conditional',
+    ],
+    6 => [
+        'file_name' => 'members.php',
+        'title' => 'Members',
+        'function_name' => 'members',
+        'menu' => SystemFunctions::MENU_USER,
     ],
     20 => [
         'file_name' => 'clan.php',
@@ -160,6 +154,12 @@ $pages = [
     ],
 
     // Misc
+    3 => [
+        'file_name' => 'settings.php',
+        'title' => 'Settings',
+        'function_name' => 'userSettings',
+        'menu' => 'none',
+    ],
     18 => [
         'file_name' => 'report.php',
         'title' => 'Report',

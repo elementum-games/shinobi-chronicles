@@ -117,7 +117,9 @@ class SystemFunctions {
         
         $this->links = [
             'profile' => $this->link . '?id=1',
+            'settings' => $this->link . '?id=3',
             'members' => $this->link . '?id=6',
+            'bloodline' => $this->link . '?id=10',
             'mod' => $this->link . '?id=16',
             'admin' => $this->link . '?id=17',
             'report' => $this->link . '?id=18',
