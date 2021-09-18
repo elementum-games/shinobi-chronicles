@@ -1391,7 +1391,7 @@ class User {
 		$forbidden_seal = $this->forbidden_seal;
 		if(is_array($forbidden_seal)) {
 			$forbidden_seal = json_encode($forbidden_seal);
-		}
+		} 
 
 		$elements = $this->elements;
 		if(is_array($elements)) {
