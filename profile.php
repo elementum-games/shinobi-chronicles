@@ -118,7 +118,7 @@ function userProfile() {
                 $system->log(
                     'money_transfer',
                     'Money Sent',
-                    "{$amount} yen - {$player->user_id} ($player->user_name) => {$recipient['user_id']}"
+                    "{$amount} yen - #{$player->user_id} ($player->user_name) to #{$recipient['user_id']}"
                 );
 				$system->send_pm('Currency Transfer System', $recipient['user_id'], 'Money Received', $player->user_name . " has sent you &yen;$amount.");
 			}
@@ -126,7 +126,7 @@ function userProfile() {
                 $system->log(
                     'premium_credit_transfer',
                     'Premium Credits Sent',
-                    "{$amount} AK - {$player->user_id} ($player->user_name) => {$recipient['user_id']}"
+                    "{$amount} AK - #{$player->user_id} ($player->user_name) to #{$recipient['user_id']}"
                 );
 				$system->send_pm('Currency Transfer System', $recipient['user_id'], 'AK Received', $player->user_name . " has sent you $amount Ancient Kunai.");
 			}
