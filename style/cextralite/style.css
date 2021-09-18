@@ -38,7 +38,12 @@ a:hover{
 }
 
 #container{
-	width: 100%;
+	display: grid;
+	grid-template-columns: 0.10fr 1fr;
+}
+
+#sidebar {
+	position: static;
 }
 #chatMessage{
 	width: 100% !important;
@@ -46,25 +51,31 @@ a:hover{
 
 	font-size: 1.2em !important;
 }
-#menu{
-	display: inline-block;
-	text-align: center;
-	padding: 0;
-	width: 100%;
 
-	/* display: none; /*Hides Menu*/
-
-}
 #notifications{
 	diplay: block;
 	text-align: center;
 	margin: 0.5em;
 }
 
-#header{
-}
 #header img{
 	width: 100%;
+}
+
+#menu{
+	display: grid;
+	grid-template-columns: 1fr 1fr 1fr;
+}
+
+.buttonList a{
+	display: block;
+	padding: 1em 0em;
+
+	text-decoration: none;
+	border: 1px solid white;
+	font-weight: bold;
+
+	background-color: rgba(75,75,75, 1);
 }
 
 .topMenu{
@@ -184,15 +195,6 @@ a:hover{
 .submenu li a:hover{
 	background: linear-gradient(0deg, rgba(40,40,40,1) 0%, rgba(82,82,82,1) 38%, rgba(40,40,40,1) 100%);
 }
-}
-
-.header.contentheader{
-	font-size: 1.2em;
-	padding: 0.5em 0em;
-	/* background: linear-gradient(0deg, rgba(40,40,40,1) 0%, rgba(20,20,20,1) 23%, rgba(49,62,56,1) 38%, rgba(40,40,40,1) 100%); */
-	border-radius: 20px 20px 0px 0px;
-	margin-bottom: 0.8em;
-}
 
 
 .table{
@@ -248,8 +250,18 @@ a:hover{
 .header{
 	display: block;
 	font-size: 1em;
-	padding: 0.5em;
+	padding: 1em 0em;
 	background-color: rgba(40,40,40,1);
+}
+
+.contentHeader{
+	font-size: 1.2em;
+	font-weight: bold;
+
+	padding: 0.5em 0em;
+	background: linear-gradient(0deg, rgba(40,40,40,1) 0%, rgba(20,20,20,1) 23%, rgba(49,62,56,0.7) 38%, rgba(40,40,40,1) 100%);
+	border-radius: 20px 20px 0px 0px;
+	margin-bottom: 0.8em;
 }
 
 .button{
@@ -257,31 +269,6 @@ a:hover{
 	padding: 0;
 	display: inline-block;
 	width: 80%;
-}
-
-.menu div{
-	margin: 0.1em 0.1em;
-}
-
-.menu li{
-	display: block;
-	font-size: 1em;
-	text-decoration: none;
-	padding: 0em 0em;
-	font-family: Arial;
-	margin: 0.2em 0em;
-	border-top: solid 1px white;
-	border-bottom: solid 1px white;
-	border-radius: 0.2em;
-	background: linear-gradient(0deg, rgba(40,40,40,1) 0%, rgba(62,62,62,1) 38%, rgba(40,40,40,1) 100%);
-}
-.menu li:hover{
-	background: linear-gradient(0deg, rgba(40,40,40,1) 0%, rgba(92,92,92,1) 38%, rgba(40,40,40,1) 100%);
-}
-.menu li a{
-	display: block;
-	text-decoration: none;
-	padding: 0.5em 0em;
 }
 
 #socialPost{
