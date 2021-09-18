@@ -1142,9 +1142,10 @@ function premium() {
 			<p style='width:80%;margin:auto;'>All payments are securely processed through Paypal. You do not need a Paypal account to 
 			pay with a credit card.</p>
 			<br />
-			{$kunai_per_dollar} Ancient Kunai = $1 USD<br />
+			<b>$1 USD = {$kunai_per_dollar} Ancient Kunai</b><br />
+			<i>(ignore price per unit on Paypal confirmation screen, the bonus is applied after)</i><br />
 			<br />
-			<b>-Ancient Kunai Specials-</b><br />
+			<b>Ancient Kunai Specials</b><br />
 			$15 = 30 Kunai + 10 bonus<br />
 			$25 = 50 Kunai + 20 bonus<br />
 			$50 = 100 Kunai + 50 bonus<br />
@@ -1275,7 +1276,7 @@ function premiumCreditExchange() {
 			
 			$system->query("UPDATE `users` SET `money`=`money` + {$offer['money']} 
 				WHERE `user_id`='{$offer['seller']}'");
-			$system->log("Kunai Exchange", "Completed Sale", "ID# {$offer['id']}; {$offer['seller']} -> $player->user_name :: {$offer['premium_credits']} for &yen;{$offer['money']}");
+			$system->log("Kunai Exchange", "Completed Sale", "ID# {$offer['id']}; #{$offer['seller']} to #{$player->user_id} ($player->user_name) :: {$offer['premium_credits']} for &yen;{$offer['money']}");
 			$system->send_pm('Ancient Kunai Exchange', $offer['seller'], 'Transaction Complete', $player->user_name . " has purchased {$offer['premium_credits']} Ancient Kunai for &yen;{$offer['money']}.");
 			$system->message("Ancient Kunai purchased!");
 			$system->printMessage();

@@ -20,14 +20,10 @@ function userProfile() {
 		<ul class='submenu'>
 			<li style='width:25.5%;'><a href='{$self_link}'>Character</a></li>
 			<li style='width:25.5%;'><a href='{$self_link}&page=send_money'>Send Money</a></li>
-		";
-		if ($player->rank > 2) {
-			echo "<li style='width:25.5%;'><a href='{$self_link}&page=send_ak'>Send AK</a></li>";
-		}
-		echo"
-				</ul>
-			</div>
-			<div class='submenuMargin'></div>
+			<li style='width:25.5%;'><a href='{$self_link}&page=send_ak'>Send AK</a></li>
+        </ul>
+        </div>
+        <div class='submenuMargin'></div>
 		";
 	}
 	
@@ -74,7 +70,7 @@ function userProfile() {
 				}
 				break;
 			case 'send_ak':
-				if($player->rank > 2) {
+				if($player->rank > 1) {
 					$page = 'send_ak';
 				}
 				break;
@@ -115,11 +111,22 @@ function userProfile() {
 			$player->$type -= $amount;
 			$system->query("UPDATE `users` SET `{$type}`=`{$type}` + $amount WHERE `user_id`='{$recipient['user_id']}' LIMIT 1");
 			if($type == 'money') {
+                $system->log(
+                    'money_transfer',
+                    'Money Sent',
+                    "{$amount} yen - #{$player->user_id} ($player->user_name) to #{$recipient['user_id']}"
+                );
 				$system->send_pm('Currency Transfer System', $recipient['user_id'], 'Money Received', $player->user_name . " has sent you &yen;$amount.");
 			}
 			else {
+                $system->log(
+                    'premium_credit_transfer',
+                    'Premium Credits Sent',
+                    "{$amount} AK - #{$player->user_id} ($player->user_name) to #{$recipient['user_id']}"
+                );
 				$system->send_pm('Currency Transfer System', $recipient['user_id'], 'AK Received', $player->user_name . " has sent you $amount Ancient Kunai.");
 			}
+
 			$system->message("Currency sent!");
 		} catch (Exception $e) {
 			$system->message($e->getMessage());
@@ -127,7 +134,6 @@ function userProfile() {
 		$system->printMessage();
 	}
 	if($page == 'send_money' || $page == 'send_ak') {
-
 		$type = ($page == 'send_money') ? "Money" : "AK";
 		$currency = ($type == 'Money') ? "money" : "premium_credits";
 		$hidden = ($type == 'Money') ? "yen" : "kunai";
@@ -212,7 +218,7 @@ function userProfile() {
 		//regen timer script - can be moved to its own script.js file
 		echo "
 		<script>
-		var remainingtime = ". 59 - $time_since_last_regen .";
+		var remainingtime = ". (59 - $time_since_last_regen) .";
 
 		var health = {$player->health};
 		var max_health = {$player->max_health};
