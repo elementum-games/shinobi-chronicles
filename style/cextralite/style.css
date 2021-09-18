@@ -180,6 +180,7 @@ a:hover{
 	width: 100%;
 }
 .submenu li{
+	display: block;
 	text-align: center;
 	width: 90% !important;
 	margin: 1em auto;
@@ -187,8 +188,10 @@ a:hover{
 	padding: 0.2em 0em;
 }
 .submenu li a{
-	display: inline-block;
-	padding: 0.4em 0.4em;
+	display: block;
+	width: 50%;
+	padding: 1em 0.5em;
+	margin: 0em auto;
 	text-decoration: none;
 	background: linear-gradient(0deg, rgba(40,40,40,1) 0%, rgba(62,62,62,1) 38%, rgba(40,40,40,1) 100%);
 }
@@ -199,9 +202,10 @@ a:hover{
 
 .table{
 	display: block;
-	width: 90%;
+	width: 95%;
 	margin: 1em auto 6em auto;
 	background-color: rgba(27, 56, 31, 1);
+	border-radius: 20px 20px 10px 10px;
 
 	/*xpos ypos spread color*/
 	box-shadow: 0em 0em 2em rgba(27, 56, 31, 0.9);
@@ -213,14 +217,19 @@ a:hover{
 	min-width: 200px;
 	font-size: 1em;
 }
+.table tr{
+	margin: 0.2em 0.3em;
+}
 .table tr td{
 	display: inline-block;
-	width: 100%;
-	margin: 0.6em 0;
-	padding: 0.3em 0;
-}
-.table tr{
-	margin: 0.5em auto;
+	width: 90%;
+	margin: .5em 0;
+	padding: 1em 0;
+	border-radius: 10px 10px 10px 10px;
+
+	font-size: 1.3em;
+
+	background-color: rgba(20,20,20, 0.7);
 }
 .table th a{
 	display: inline-block;
