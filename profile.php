@@ -222,7 +222,7 @@ function userProfile() {
 		//regen timer script - can be moved to its own script.js file
 		echo "
 		<script>
-		var remainingtime = ". 59 - $time_since_last_regen .";
+		var remainingtime = ". (59 - $time_since_last_regen) .";
 
 		var health = {$player->health};
 		var max_health = {$player->max_health};
