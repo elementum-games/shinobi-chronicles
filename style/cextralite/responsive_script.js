@@ -33,5 +33,20 @@ $(document).ready(function(){
   })
 
 
+ //Travel Buttons
+ //insert div after travelcontainer
+ $("<div id='buttonContainer'> </div>").insertAfter(".travelContainer");
+ //move the buttons into the div created after travel container
+ $(".travelButton").appendTo("#buttonContainer");
+
+
+//add text to the buttons
+ $("<span>North</span>").appendTo(".north");
+ $("<span>East</span>").appendTo(".east");
+ $("<span>West</span>").appendTo(".west");
+ $("<span>South</span>").appendTo(".south");
+
+
+
 
 })
