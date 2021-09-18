@@ -20,14 +20,10 @@ function userProfile() {
 		<ul class='submenu'>
 			<li style='width:25.5%;'><a href='{$self_link}'>Character</a></li>
 			<li style='width:25.5%;'><a href='{$self_link}&page=send_money'>Send Money</a></li>
-		";
-		if ($player->rank > 2) {
-			echo "<li style='width:25.5%;'><a href='{$self_link}&page=send_ak'>Send AK</a></li>";
-		}
-		echo"
-				</ul>
-			</div>
-			<div class='submenuMargin'></div>
+			<li style='width:25.5%;'><a href='{$self_link}&page=send_ak'>Send AK</a></li>
+        </ul>
+        </div>
+        <div class='submenuMargin'></div>
 		";
 	}
 	
@@ -74,18 +70,18 @@ function userProfile() {
 				}
 				break;
 			case 'send_ak':
-				if($player->rank > 2) {
+				if($player->rank > 1) {
 					$page = 'send_ak';
 				}
 				break;
 		}
 	}
-	
+
 	// Process input
 	if(isset($_POST['send_currency'])) {
 		$recipient = $system->clean($_POST['recipient']);
 		$amount = (int)$system->clean($_POST['amount']);
-		
+
 		try {
 			if(strtolower($recipient) == strtolower($player->user_name)) {
 				throw new Exception("You cannot send money/AK to yourself!");
@@ -115,11 +111,22 @@ function userProfile() {
 			$player->$type -= $amount;
 			$system->query("UPDATE `users` SET `{$type}`=`{$type}` + $amount WHERE `user_id`='{$recipient['user_id']}' LIMIT 1");
 			if($type == 'money') {
+                $system->log(
+                    'money_transfer',
+                    'Money Sent',
+                    "{$amount} yen - #{$player->user_id} ($player->user_name) to #{$recipient['user_id']}"
+                );
 				$system->send_pm('Currency Transfer System', $recipient['user_id'], 'Money Received', $player->user_name . " has sent you &yen;$amount.");
 			}
 			else {
+                $system->log(
+                    'premium_credit_transfer',
+                    'Premium Credits Sent',
+                    "{$amount} AK - #{$player->user_id} ($player->user_name) to #{$recipient['user_id']}"
+                );
 				$system->send_pm('Currency Transfer System', $recipient['user_id'], 'AK Received', $player->user_name . " has sent you $amount Ancient Kunai.");
 			}
+
 			$system->message("Currency sent!");
 		} catch (Exception $e) {
 			$system->message($e->getMessage());
@@ -127,7 +134,6 @@ function userProfile() {
 		$system->printMessage();
 	}
 	if($page == 'send_money' || $page == 'send_ak') {
-
 		$type = ($page == 'send_money') ? "Money" : "AK";
 		$currency = ($type == 'Money') ? "money" : "premium_credits";
 		$hidden = ($type == 'Money') ? "yen" : "kunai";
@@ -159,37 +165,38 @@ function userProfile() {
 		<span style='font-size:1.3em;font-family:\"tempus sans itc\";font-weight:bold;'>" . $player->user_name . "</span><br />
 		<img src='{$player->avatar_link}' style='margin-top:5px;max-width:$avatar_size;max-height:$avatar_size;' /><br />
 		</td>";
-		
+
 		$exp_percent = ($player->exp_per_level - ($exp_needed - $player->exp)) / $player->exp_per_level * 100;
 		if($exp_percent < 0) {
 			$exp_percent = 0;
 		}
 		else if($exp_percent > 100) {
 			$exp_percent = 100;
-		}	
+		}
 		$exp_width = round($exp_percent * 2);
-		
-		
-		
+
 		$health_percent = round(($player->health / $player->max_health) * 100);
 		$chakra_percent = round(($player->chakra / $player->max_chakra) * 100);
 		$stamina_percent = round(($player->stamina / $player->max_stamina) * 100);
 
 		echo "<td style='width:50%;'>
-		<label style='width:6.7em;'>Health:</label>" . 
-			sprintf("%.2f", $player->health) . '/' . sprintf("%.2f", $player->max_health) . "<br />" .
+		<label style='width:6.7em;'>Health:</label>" .
+			"<span id='health'>". sprintf("%.2f", $player->health) . '/' . sprintf("%.2f", $player->max_health) . "</span><br />" .
+
 			"<div style='height:6px;width:250px;border-style:solid;border-width:1px;'>" .
-			"<div style='background-color:#C00000;height:6px;width:" . $health_percent . "%;' /></div>" . "</div>" .
-		"<label style='width:6.7em;'>Chakra:</label>" . 
-			sprintf("%.2f", $player->chakra) . '/' . sprintf("%.2f", $player->max_chakra) . "<br />" .
+			"<div id='healthbar' style='background-color:#C00000;height:6px;width:" . $health_percent . "%;' /></div>" . "</div>" .
+		"<label style='width:6.7em;'>Chakra:</label>" .
+			"<span id='chakra'>". sprintf("%.2f", $player->chakra) . '/' . sprintf("%.2f", $player->max_chakra) . "</span><br />" .
+
 			"<div style='height:6px;width:250px;border-style:solid;border-width:1px;'>" .
-			"<div style='background-color:#0000B0;height:6px;width:" . $chakra_percent . "%;' /></div>" . "</div>" .
-		"<label style='width:6.7em;'>Stamina:</label>" . 
-			sprintf("%.2f", $player->stamina) . '/' . sprintf("%.2f", $player->max_stamina) . "<br />" .
+			"<div id='chakrabar' style='background-color:#0000B0;height:6px;width:" . $chakra_percent . "%;' /></div>" . "</div>" .
+		"<label style='width:6.7em;'>Stamina:</label>" .
+			"<span id='stamina'>". sprintf("%.2f", $player->stamina) . '/' . sprintf("%.2f", $player->max_stamina) . "</span><br />" .
+
 			"<div style='height:6px;width:250px;border-style:solid;border-width:1px;'>" .
-			"<div style='background-color:#00B000;height:6px;width:" . $stamina_percent . "%;' /></div>" . "</div>" .
+			"<div id='staminabar' style='background-color:#00B000;height:6px;width:" . $stamina_percent . "%;' /></div>" . "</div>" .
 		"<br />
-		Regeneration rate: " . $player->regen_rate;
+		Regeneration Rate: " . $player->regen_rate;
 
 		$regen_cut = 0;
 		if($player->battle_id or isset($_SESSION['ai_id'])) {
@@ -201,21 +208,89 @@ function userProfile() {
 			"-> <span style='color:#00C000;'>" . ($player->regen_rate + $player->regen_boost - $regen_cut) . "</span>";
 		}
 		else if(isset($regen_cut)) {
-		
+
 		}
 		echo "<br />";
+    // First attempt:
+    // echo "<label style='width:9.2em;'>Regen Timer:</label>" . (time() - $player->last_update - 60) * -1;
+    $time_since_last_regen = time() - $player->last_update;
 
-        // First attempt:
-        // echo "<label style='width:9.2em;'>Regen Timer:</label>" . (time() - $player->last_update - 60) * -1;
+		//regen timer script - can be moved to its own script.js file
+		echo "
+		<script>
+		var remainingtime = ". (59 - $time_since_last_regen) .";
 
-        $time_since_last_regen = time() - $player->last_update;
-        echo "<label style='width:9.2em;'>Regen Timer:</label>" . (60 - $time_since_last_regen) .
-		"</td></tr>";
-		
+		var health = {$player->health};
+		var max_health = {$player->max_health};
+
+		var chakra = {$player->chakra};
+		var max_chakra = {$player->max_chakra};
+
+		var stamina = {$player->stamina};
+		var max_stamina = {$player->max_stamina};
+
+		var regen = {$player->regen_rate} + {$player->regen_boost}; //no regen cut
+
+		setInterval(() => {
+
+			document.getElementById('regentimer').innerHTML = remainingtime; //minus 1 to compensate for lag
+
+
+			if(remainingtime <= 0){
+				remainingtime = 60;
+
+				if((health + regen) >= max_health){
+					health = max_health;
+				} else {
+					health += regen; //health ignores regen boost
+				}
+
+				if((chakra + regen) >= max_chakra){
+					chakra = max_chakra;
+				} else {
+					chakra += regen;
+				}
+
+				if((stamina + regen) >= max_stamina){
+					stamina = max_stamina;
+				} else {
+					stamina += regen;
+				}
+
+			//update health amounts / bars
+			document.getElementById('health').innerHTML = health.toFixed(2) + '/' + max_health.toFixed(2);
+			document.getElementById('healthbar').style.width = ( health / max_health )*100 + '%';
+
+			document.getElementById('chakra').innerHTML = chakra.toFixed(2) + '/' + max_chakra.toFixed(2);
+			document.getElementById('chakrabar').style.width = ( chakra / max_chakra )*100 + '%';
+
+			document.getElementById('stamina').innerHTML = stamina.toFixed(2) + '/' + max_stamina.toFixed(2);
+			document.getElementById('staminabar').style.width = ( stamina / max_stamina )*100 + '%';
+			}
+
+			remainingtime--;
+
+		}, 1000);
+
+		//for some reason every other tick the javascript regen is ahead of the actual regen?
+		//can't figure out why? its like the Regen changes every other minute in intervals or it doubles
+		//can't find the error with my script
+		//can't seem to find out where the error is, need help.
+
+		</script>
+		";
+
+    echo "<label style='width:9.2em;'>Regen Timer:</label>
+		<span id='regentimer'>" . (60 - $time_since_last_regen) . "</span>
+
+
+		</td>
+		</tr>";
+
 		$exp_remaining = $exp_needed - $player->exp;
 		if($exp_remaining < 0) {
 			$exp_remaining = 0;
-		}	
+		}
 		$label_width = '7.1em';
 		$clan_positions = array(
 					1 => 'Leader',
