@@ -52,7 +52,7 @@ $pages = [
         'title' => 'Bloodline',
         'function_name' => 'bloodline',
         'battle_ok' => false,
-        'village_ok' => 1,
+        'village_ok' => SystemFunctions::IN_VILLAGE_OKAY,
         'menu' => 'conditional',
     ],
     20 => [
@@ -71,12 +71,14 @@ $pages = [
 
     // Activity Menu
     11 => [
-        'file_name' => 'training.php',
-        'title' => 'Training',
-        'function_name' => 'training',
+        'file_name' => 'travel.php',
+        'title' => 'Travel',
+        'function_name' => 'travel',
         'menu' => SystemFunctions::MENU_ACTIVITY,
         'battle_ok' => false,
-        'village_ok' => 0
+        'survival_ok' => false,
+        'village_ok' => SystemFunctions::IN_VILLAGE_OKAY,
+        'min_rank' => 2
     ],
     12 => [
         'file_name' => 'arena.php',
@@ -84,43 +86,41 @@ $pages = [
         'function_name' => 'arena',
         'menu' => SystemFunctions::MENU_ACTIVITY,
         'pvp_ok' => false,
-        'village_ok' => 0
+        'village_ok' => SystemFunctions::NOT_IN_VILLAGE,
     ],
     13 => [
-        'file_name' => 'healingShop.php',
-        'title' => 'Ramen Shop',
-        'function_name' => 'healingShop',
+        'file_name' => 'training.php',
+        'title' => 'Training',
+        'function_name' => 'training',
         'menu' => SystemFunctions::MENU_ACTIVITY,
         'battle_ok' => false,
-        'village_ok' => 2
-    ],
-    14 => [
-        'file_name' => 'travel.php',
-        'title' => 'Travel',
-        'function_name' => 'travel',
-        'menu' => SystemFunctions::MENU_ACTIVITY,
-        'battle_ok' => false,
-        'survival_ok' => false,
-        'village_ok' => 1,
-        'min_rank' => 2
-    ],
-    15 => [
-        'file_name' => 'scoutArea.php',
-        'title' => 'Scout Area',
-        'function_name' => 'scoutArea',
-        'menu' => SystemFunctions::MENU_ACTIVITY,
-        'battle_ok' => false,
-        'village_ok' => 1
+        'village_ok' => SystemFunctions::NOT_IN_VILLAGE,
     ],
 
-    23 => [
+    14 => [
         'file_name' => 'missions.php',
         'title' => 'Missions',
         'function_name' => 'missions',
         'menu' => SystemFunctions::MENU_ACTIVITY,
         'pvp_ok' => false,
-        'village_ok' => 1,
+        'village_ok' => SystemFunctions::IN_VILLAGE_OKAY,
         'min_rank' => 2
+    ],
+    22 => [
+        'file_name' => 'spar.php',
+        'title' => 'Spar',
+        'function_name' => 'spar',
+        'battle_type' => 2,
+        'village_ok' => SystemFunctions::IN_VILLAGE_OKAY,
+        'menu' => SystemFunctions::MENU_ACTIVITY,
+    ],
+    23 => [
+        'file_name' => 'healingShop.php',
+        'title' => 'Ramen Shop',
+        'function_name' => 'healingShop',
+        'menu' => SystemFunctions::MENU_ACTIVITY,
+        'battle_ok' => false,
+        'village_ok' => SystemFunctions::ONLY_IN_VILLAGE,
     ],
 
     // Village Menu
@@ -128,21 +128,14 @@ $pages = [
         'file_name' => 'store.php',
         'title' => 'Shop',
         'function_name' => 'store',
-        'village_ok' => 2,
+        'village_ok' => SystemFunctions::ONLY_IN_VILLAGE,
         'menu' => SystemFunctions::MENU_VILLAGE,
     ],
     9 => [
         'file_name' => 'villageHQ.php',
         'title' => 'Village HQ',
         'function_name' => 'villageHQ',
-        'village_ok' => 2,
-        'menu' => SystemFunctions::MENU_VILLAGE,
-    ],
-    22 => [
-        'file_name' => 'spar.php',
-        'title' => 'Spar',
-        'function_name' => 'spar',
-        'battle_type' => 2,
+        'village_ok' => SystemFunctions::ONLY_IN_VILLAGE,
         'menu' => SystemFunctions::MENU_VILLAGE,
     ],
     21 => [

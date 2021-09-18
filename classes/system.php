@@ -14,6 +14,10 @@ class SystemFunctions {
     const MENU_ACTIVITY = 'activity';
     const MENU_VILLAGE = 'village';
 
+    const NOT_IN_VILLAGE = 0;
+    const IN_VILLAGE_OKAY = 1;
+    const ONLY_IN_VILLAGE = 2;
+
     const SC_MODERATOR = 1;
     const SC_HEAD_MODERATOR = 2;
     const SC_ADMINISTRATOR = 3;

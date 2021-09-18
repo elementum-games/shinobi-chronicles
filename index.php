@@ -362,10 +362,10 @@ if($LOGGED_IN) {
 			// Check for being in village is not okay/okay/required (0 / 1 / 2)
 			if(isset($pages[$id]['village_ok'])) {
 				// Player is alllowed in up to rank 3, then must go outside village
-				if($player->rank > 2 && $pages[$id]['village_ok'] == 0 && isset($villages[$player->location])) {
+				if($player->rank > 2 && $pages[$id]['village_ok'] == SystemFunctions::NOT_IN_VILLAGE && isset($villages[$player->location])) {
 					throw new Exception("You cannot access this page while in a village!");
 				}
-				if($pages[$id]['village_ok'] == 2 && $player->location != $player->village_location) {
+				if($pages[$id]['village_ok'] == SystemFunctions::ONLY_IN_VILLAGE && $player->location != $player->village_location) {
 					throw new Exception("You must be in your village to access this page!");
 				}
 			}
@@ -419,13 +419,13 @@ if($LOGGED_IN) {
 	// Display side menu and footer
 	if(!$ajax) {
 		if($player->bloodline_id) {
-		    $pages[10]['menu'] = 'user';
+		    $pages[10]['menu'] = SystemFunctions::MENU_USER;
 		}
 		if($player->clan) {
-		    $pages[20]['menu'] = 'user';
+		    $pages[20]['menu'] = SystemFunctions::MENU_USER;
 		}
 		if($player->rank >= 3) {
-		    $pages[24]['menu'] = 'user';
+		    $pages[24]['menu'] = SystemFunctions::MENU_USER;
 		}
 
 
@@ -445,7 +445,7 @@ if($LOGGED_IN) {
 					continue;
 				}
 				// Page ok if an in-village page or player rank is below chuunin
-				if($page['village_ok'] > 0 || $player->rank < 3) {
+				if($page['village_ok'] != SystemFunctions::NOT_IN_VILLAGE || $player->rank < 3) {
 					echo "<li><a href='{$system->link}?id=$id'>" . $page['title'] . "</a></li>";
 				}
 			}
@@ -455,8 +455,7 @@ if($LOGGED_IN) {
 				if(!isset($page['menu']) || $page['menu'] != 'activity') {
 					continue;
 				}
-				// Page ok if a non-village page or player rank is below chuunin
-				if($page['village_ok'] < 2) {
+				if($page['village_ok'] != SystemFunctions::ONLY_IN_VILLAGE) {
 					echo "<li><a href='{$system->link}?id=$id'>" . $page['title'] . "</a></li>";
 				}
 			}
