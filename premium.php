@@ -1275,7 +1275,7 @@ function premiumCreditExchange() {
 			
 			$system->query("UPDATE `users` SET `money`=`money` + {$offer['money']} 
 				WHERE `user_id`='{$offer['seller']}'");
-			$system->log("Kunai Exchange", "Completed Sale", "ID# {$offer['id']}; {$offer['seller']} -> $player->user_name :: {$offer['premium_credits']} for &yen;{$offer['money']}");
+			$system->log("Kunai Exchange", "Completed Sale", "ID# {$offer['id']}; #{$offer['seller']} to #{$player->user_id} ($player->user_name) :: {$offer['premium_credits']} for &yen;{$offer['money']}");
 			$system->send_pm('Ancient Kunai Exchange', $offer['seller'], 'Transaction Complete', $player->user_name . " has purchased {$offer['premium_credits']} Ancient Kunai for &yen;{$offer['money']}.");
 			$system->message("Ancient Kunai purchased!");
 			$system->printMessage();
