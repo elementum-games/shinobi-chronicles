@@ -1142,10 +1142,10 @@ function premium() {
 			<p style='width:80%;margin:auto;'>All payments are securely processed through Paypal. You do not need a Paypal account to 
 			pay with a credit card.</p>
 			<br />
-			$1 USD = {$kunai_per_dollar} Ancient Kunai<br />
+			<b>$1 USD = {$kunai_per_dollar} Ancient Kunai</b><br />
 			<i>(ignore price per unit on Paypal confirmation screen, the bonus is applied after)</i><br />
 			<br />
-			<b>-Ancient Kunai Specials-</b><br />
+			<b>Ancient Kunai Specials</b><br />
 			$15 = 30 Kunai + 10 bonus<br />
 			$25 = 50 Kunai + 20 bonus<br />
 			$50 = 100 Kunai + 50 bonus<br />
