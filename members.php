@@ -170,8 +170,6 @@ function members() {
 
 			if($player->rank > 1) {
                 echo "&nbsp;&nbsp;|&nbsp;&nbsp;<a href='{$system->links['profile']}&page=send_money&recipient={$viewUser->user_name}'>Send Money</a>";
-            }
-			if($player->rank > 2) {
                 echo "&nbsp;&nbsp;|&nbsp;&nbsp;<a href='{$system->links['profile']}&page=send_ak&recipient={$viewUser->user_name}'>Send AK</a>";
             }
 			if($viewUser->rank >= 3 && $player->team) {

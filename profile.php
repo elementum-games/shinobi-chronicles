@@ -20,14 +20,10 @@ function userProfile() {
 		<ul class='submenu'>
 			<li style='width:25.5%;'><a href='{$self_link}'>Character</a></li>
 			<li style='width:25.5%;'><a href='{$self_link}&page=send_money'>Send Money</a></li>
-		";
-		if ($player->rank > 2) {
-			echo "<li style='width:25.5%;'><a href='{$self_link}&page=send_ak'>Send AK</a></li>";
-		}
-		echo"
-				</ul>
-			</div>
-			<div class='submenuMargin'></div>
+			<li style='width:25.5%;'><a href='{$self_link}&page=send_ak'>Send AK</a></li>
+        </ul>
+        </div>
+        <div class='submenuMargin'></div>
 		";
 	}
 	
@@ -74,7 +70,7 @@ function userProfile() {
 				}
 				break;
 			case 'send_ak':
-				if($player->rank > 2) {
+				if($player->rank > 1) {
 					$page = 'send_ak';
 				}
 				break;
