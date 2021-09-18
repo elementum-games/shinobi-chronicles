@@ -86,8 +86,7 @@ function members() {
 				echo "<br />";
 				$last_active = time() - $viewUser->last_active;
 				if($player->staff_level >= SystemFunctions::SC_MODERATOR) {
-					require_once("functions.php");
-					echo "(Last active " . timeRemaining($last_active, 'long') . " ago)";
+					echo "(Last active " . SystemFunctions::timeRemaining($last_active, 'long') . " ago)";
 				}
 				else {
 					$days = floor($last_active / 86400);
@@ -183,7 +182,6 @@ function members() {
 				<tr><td colspan='2' style='white-space:pre-wrap;'>" . $journal . "</td></tr>";
 			}
 
-
 			//report player
 			echo
 			"
@@ -193,7 +191,6 @@ function members() {
 				</td>
 			</tr>
 			";
-
 			echo "</td></tr></table>";
 
 			if($player->staff_level >= SystemFunctions::SC_MODERATOR) {
@@ -234,22 +231,22 @@ function members() {
 						$result = $system->query("SELECT `time` FROM `chat` WHERE `user_name`='{$viewUser->user_name}' ORDER BY `post_id` DESC LIMIT 1");
 						if($system->db_num_rows > 0) {
 							$last_post = $system->db_fetch($result)['time'];
-							echo "Last chat post: " . timeRemaining(time() - $last_post, 'long') . " ago<br />";
+							echo "Last chat post: " . SystemFunctions::timeRemaining(time() - $last_post, 'long') . " ago<br />";
 						}
 						
 						// Last AI
-						echo "Last AI battle started: " . timeRemaining(time() - $viewUser->last_ai, 'short') . " ago<br />";
+						echo "Last AI battle started: " . SystemFunctions::timeRemaining(time() - $viewUser->last_ai, 'short') . " ago<br />";
 						
 						// Current training
 						$display = '';
 						if(strpos($viewUser->train_type, 'jutsu:') !== false) {
 							$train_type = str_replace('jutsu:', '', $viewUser->train_type);
 							$display = "<br />Training: " . ucwords(str_replace('_', ' ', $train_type)) . "<br />" .
-								timeRemaining($viewUser->train_time - time(), 'short', false, true) . " remaining";
+								SystemFunctions::timeRemaining($viewUser->train_time - time(), 'short', false, true) . " remaining";
 						}
 						else  {
 							$display = "<br />Training: " . ucwords(str_replace('_', ' ', $viewUser->train_type)) . "<br />" .
-								timeRemaining($viewUser->train_time - time(), 'short', false, true) . " remaining";
+								SystemFunctions::timeRemaining($viewUser->train_time - time(), 'short', false, true) . " remaining";
 						}
 						echo $display;
 					}
