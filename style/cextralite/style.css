@@ -31,7 +31,6 @@ b{
 }
 a{
 	color: rgba(220,220,220,1);
-
 }
 a:hover{
 	color: white);
@@ -207,6 +206,8 @@ a:hover{
 	background-color: rgba(27, 56, 31, 1);
 	border-radius: 20px 20px 10px 10px;
 
+	overflow: scroll;
+
 	/*xpos ypos spread color*/
 	box-shadow: 0em 0em 2em rgba(27, 56, 31, 0.9);
 }
@@ -278,7 +279,8 @@ a:hover{
 .table tbody{
 	display: inline-block;
 	margin: 0px auto;
-	width: 100%;
+	/* width: 100%; */
+	width: auto;
 	font-size: 1em;
 }
 .table tr{
@@ -303,8 +305,11 @@ a:hover{
 	display: block;
 	text-decoration: none;
 	padding: 0.8em 0.5em;
-	margin: 0px auto;
-	background: rgba(17, 25, 18, 0.3);
+	background: linear-gradient(0deg, rgba(15,15,15,1) 0%, rgba(20,20,20,1) 23%, rgba(49,62,56,0.7) 38%, rgba(25,25,25,1) 100%);
+	border: 1px solid rgba(255,255,255,0.5);
+	border-radius: 4px;
+	box-shadow: 0px 3px 15px rgba(0,0,0,0.6);
+
 }
 
 .profile_table{
@@ -371,13 +376,42 @@ a:hover{
 	padding: 2em 0em !important;
 }
 #user_data_container{
-	display: flex;
-	flex-direction: row;
+	display: grid !important;
+	grid-template-columns: 0.3fr 0.7fr;
+
+}
+#user_data_container a{
+	background: none;
+	border: none;
+	box-shadow: none;
+	padding: 0.1em 0em;
+}
+
+#user_data_container div{
+	display: grid;
+	align-content: space-evenly;
+	justify-content: center;
+}
+.chatmsg{
+	background-color: rgba(255,255,255,0.06) !important;
+}
+#socialPosts a{
+	background: none;
+	border: none;
+	box-shadow: none;
 }
 #socialPosts tr{
 	width: 95%;
+	/* width: auto; */
 	background-color: rgba(50,50,50,1);
+	padding: 1em 0em;
 }
+
+#socialPosts td{
+	padding: 0.1em 0em;
+	margin: 0.1em 0em;
+}
+
 
 .submenumargin{
 	display: inline-block;
@@ -395,14 +429,38 @@ a:hover{
 	width: 90%;
 }
 #handseals p{
-	display: inline;
-	height: 0px;
+	display: inline-block;
+}
+
+#jutsu p{
+	overflow: hidden;
 }
 
 .jutsuName{
 	color: black;
+	font-size: 0.65em;
+	padding: 0.15em 0em !important;
 }
 
+#jutsu input{
+	padding: 0.8em 0.3em;
+	border-radius: 10px 10px 10px 10px;
+}
+
+/* #jutsu{
+	display: grid;
+	grid-template-columns: repeat(4, 1fr);
+}
+#jutsu p{
+	display: inline-block;
+	width: 25%!important;
+} */
+
+
+tbody{
+	display: block;
+	margin: 0em auto;
+}
 /*Separates menu items*/
 hr{
 	margin: 2em 0em;
@@ -433,9 +491,12 @@ tr{
 
 input{
 	display: inline;
-	padding: 0.8em 1em;
+	padding: 0.2em 0.2em;
 	font-size: 0.8em;
-	margin: 0.8em 0em;
+	margin: 0.2em 0em;
+	border-radius: 10px 10px 10px 10px;
+
+	width: 100% !important;
 }
 
 form{
@@ -444,15 +505,25 @@ form{
 	font-size: 1.2em;
 }
 
+textarea{
+	width: 100% !important;
+}
+
 th{
 	padding: 1em;
 	font-size: 1.2em;
 }
 
+td label{
+	display: inline-block;
+	/* padding: 0em 0.3em; */
+	width: auto !important;
+}
+
 select{
 	display: inline;
-	padding: 1em 0.4em;
-	width: 70%;
+	padding: 0.2em 0.2em;
+	width: 80%;
 	font-size: 1em;
 }
 
