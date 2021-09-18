@@ -210,6 +210,35 @@ a:hover{
 	/*xpos ypos spread color*/
 	box-shadow: 0em 0em 2em rgba(27, 56, 31, 0.9);
 }
+
+.travelContainer{
+	overflow: scroll;
+	height: 80%;
+}
+.mapContainer{
+width: auto;
+}
+
+.map{
+	background-size: auto;
+}
+.map tbody{
+	display: grid !important;
+	grid-template-rows: repeat(24, 1fr);
+	width: 100%;
+}
+
+.map tbody tr{
+	display: block;
+	width: auto;
+}
+
+.map tbody tr td{
+	display: inline-block;
+	height: 30px;
+	width: 30px;
+}
+
 .table tbody{
 	display: inline-block;
 	margin: 0px auto;
@@ -279,6 +308,7 @@ a:hover{
 	display: inline-block;
 	width: 80%;
 }
+
 
 #socialPost{
 	display: inline-block;
