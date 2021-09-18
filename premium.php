@@ -490,8 +490,7 @@ function premium() {
 		}
 		$system->printMessage();
 	}
-	// Edited by Kengetsu - Line 371
-	else if($_POST['change_color'] && $player->forbidden_seal || $_POST['change_color'] && $player->premium_credits_purchased) {
+	else if($_POST['change_color'] && ($player->forbidden_seal || $player->premium_credits_purchased)) {
 		$color = $system->clean($_POST['name_color']);
 		switch($color) {
 			case 'blue':
