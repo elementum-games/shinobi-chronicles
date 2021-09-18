@@ -125,7 +125,7 @@ class SystemFunctions {
             'report' => $this->link . '?id=18',
             'battle' => $this->link . '?id=19',
             'spar' => $this->link . '?id=22',
-            'mission' => $this->link . '?id=23',
+            'mission' => $this->link . '?id=14',
         ];
     }
 
