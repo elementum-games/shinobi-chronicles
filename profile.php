@@ -115,11 +115,22 @@ function userProfile() {
 			$player->$type -= $amount;
 			$system->query("UPDATE `users` SET `{$type}`=`{$type}` + $amount WHERE `user_id`='{$recipient['user_id']}' LIMIT 1");
 			if($type == 'money') {
+                $system->log(
+                    'money_transfer',
+                    'Money Sent',
+                    "{$amount} yen - {$player->user_id} ($player->user_name) => {$recipient['user_id']}"
+                );
 				$system->send_pm('Currency Transfer System', $recipient['user_id'], 'Money Received', $player->user_name . " has sent you &yen;$amount.");
 			}
 			else {
+                $system->log(
+                    'premium_credit_transfer',
+                    'Premium Credits Sent',
+                    "{$amount} AK - {$player->user_id} ($player->user_name) => {$recipient['user_id']}"
+                );
 				$system->send_pm('Currency Transfer System', $recipient['user_id'], 'AK Received', $player->user_name . " has sent you $amount Ancient Kunai.");
 			}
+
 			$system->message("Currency sent!");
 		} catch (Exception $e) {
 			$system->message($e->getMessage());
@@ -127,7 +138,6 @@ function userProfile() {
 		$system->printMessage();
 	}
 	if($page == 'send_money' || $page == 'send_ak') {
-
 		$type = ($page == 'send_money') ? "Money" : "AK";
 		$currency = ($type == 'Money') ? "money" : "premium_credits";
 		$hidden = ($type == 'Money') ? "yen" : "kunai";
