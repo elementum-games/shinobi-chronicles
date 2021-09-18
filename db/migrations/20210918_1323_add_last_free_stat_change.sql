@@ -1,6 +1,6 @@
 START TRANSACTION;
 
-    alter table `users` add column `last_free_stat_change` int after `last_ai`;
+    alter table `users` add column `last_free_stat_change` int default 0 after `last_ai`;
 
     alter table `system_storage` add column `database_version` varchar(128);
 
