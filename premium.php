@@ -906,7 +906,6 @@ function premium() {
 			<input type='submit' name='stat_allocate' value='Transfer Stat Points' />
 			</form>
 			</td></tr></table>";
-		}
 
 		// Village change
 
