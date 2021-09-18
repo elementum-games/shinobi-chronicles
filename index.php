@@ -482,9 +482,8 @@ if($LOGGED_IN) {
 			echo "<li><a href='{$system->link}?id=17'>Admin Panel</a></li>";
 		}
 		// Logout timer
-		require_once("functions.php");
 		$time_remaining = ($logout_limit * 60) - (time() - $player->last_login);
-		$logout_time = timeRemaining($time_remaining, 'short', false, true) . " remaining";
+		$logout_time = SystemFunctions::timeRemaining($time_remaining, 'short', false, true) . " remaining";
 		$logout_display = ($logout_display) ? $logout_display : $logout_time;
 		echo str_replace("<!--LOGOUT_TIMER-->", $logout_display, $side_menu_end);
 

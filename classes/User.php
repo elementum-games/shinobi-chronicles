@@ -871,12 +871,11 @@ class User {
 				}
 			}
 			else {
-				require_once("functions.php");
         //*setTimeout is used to notify training finished*//
 				if(strpos($this->train_type, 'jutsu:') !== false) {
 					$train_type = str_replace('jutsu:', '', $this->train_type);
 					$display .= "<p class='trainingNotification'>Training: " . ucwords(str_replace('_', ' ', $train_type)) . "<br />" .
-					"<span id='trainingTimer'>" . timeRemaining($this->train_time - time(), 'short', false, true) . " remaining</span></p>";
+					"<span id='trainingTimer'>" . SystemFunctions::timeRemaining($this->train_time - time(), 'short', false, true) . " remaining</span></p>";
 					$display .= "<script type='text/javascript'>
 					let train_time = " . ($this->train_time - time()) . ";
           setTimeout(()=>{titleBarFlash();}, train_time * 1000);
@@ -885,7 +884,7 @@ class User {
 				else  {
           //*setTimeout is used to notify training finished*//
 					$display .= "<p class='trainingNotification'>Training: " . ucwords(str_replace('_', ' ', $this->train_type)) . "<br />" .
-						"<span id='trainingTimer'>" . timeRemaining($this->train_time - time(), 'short', false, true) . " remaining</span></p>";
+						"<span id='trainingTimer'>" . SystemFunctions::timeRemaining($this->train_time - time(), 'short', false, true) . " remaining</span></p>";
 					$display .= "<script type='text/javascript'>
 					let train_time = " . ($this->train_time - time()) . ";
           setTimeout(()=>{titleBarFlash();}, train_time * 1000);

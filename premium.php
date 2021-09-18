@@ -31,6 +31,8 @@ function premium() {
 		$costs['clan_change'] = 40;
 	}
 
+    $free_stat_change_timer = 86400;
+
 	$available_clans = array();
 
 	if($player->clan) {
@@ -291,17 +293,23 @@ function premium() {
 				throw new Exception("Invalid transfer amount!");
 			}
 
+            $is_free_stat_change = $transfer_amount <= 10;
 
 
-
-			if($transfer_amount <= 10) {
+			if($is_free_stat_change) {
 				$cost = 0;
 
 				// Check for last free stat change
-				$free_stat_change_timer = 86400;
-	            require_once("functions.php");
 	            if($player->last_free_stat_change > time() - $free_stat_change_timer) {
-	                throw new Exception ("You cannot stat transfer for free currently." . "<br />" . "Time remaining: " . timeRemaining($player->last_free_stat_change - (time() - $free_stat_change_timer), 'long', false, true));
+	                throw new Exception (
+	                    "You cannot stat transfer for free currently." . "<br />" .
+                        "Time remaining: " . SystemFunctions::timeRemaining(
+                            $player->last_free_stat_change - (time() - $free_stat_change_timer),
+                            'long',
+                            false,
+                            true
+                        )
+                    );
 	            }
 			} else {
 				$cost = 1 + floor($transfer_amount / 300);
@@ -356,11 +364,9 @@ function premium() {
 			$player->train_gain = $transfer_amount;
 			$player->train_time = time() + ($time * 60);
 
-			if($transfer_amount <= 10) {
+			if($is_free_stat_change) {
 				$player->last_free_stat_change = time();
-				$player->updateData();
 			}
-
 
 			$player->updateData();
 
@@ -407,7 +413,6 @@ function premium() {
 			if($player->clan_office) {
 				$player->clan_office = 0;
 			}
-
 
 			$player->premium_credits -= $costs['bloodline'][$result['rank']];
 
