@@ -4,85 +4,60 @@
 	Purpose:	Contains all information for a specific AI, functions for selecting move, calculated damage dealt and
 				received, etc
 */
-class AI {
+class AI extends Fighter {
+    const ID_PREFIX = 'AI';
+
     public SystemFunctions $system;
 
-    public $id;
-    public $ai_id;
+    public string $id;
+    public int $ai_id;
     public $name;
-    public $max_health;
+    public float $max_health;
     public $level;
     public $gender;
 
     public $rank;
 
-    public $health;
-    public $chakra;
+    public float $health;
+    public float $chakra = 0;
+    public float $stamina = 0;
 
-    public $ninjutsu_skill;
+    public float $ninjutsu_skill;
 
-    public $genjutsu_skill;
-    public $taijutsu_skill;
-    public $cast_speed;
+    public float $genjutsu_skill;
+    public float $taijutsu_skill;
+    public float $cast_speed;
 
-    public $ninjutsu_offense;
-    public $genjutsu_offense;
-    public $taijutsu_offense;
-    public $ninjutsu_defense;
-    public $genjutsu_defense;
-    public $taijutsu_defense;
-
-    public $speed;
+    public float $speed;
     public $strength;
-    public $intelligence;
-    public $willpower;
+    public float $intelligence;
+    public float $willpower;
 
     public $money;
 
     /** @var Jutsu[] */
-    public array $moves;
+    public array $jutsu;
 
     public $current_move;
 
-
-    // Combat vars
-    public $taijutsu_nerf;
-
-    public $speed_boost = 0;
-    public $speed_nerf = 0;
-
-    public $cast_speed_boost = 0;
-    public $cast_speed_nerf = 0;
-
-    public $intelligence_boost = 0;
-    public $intelligence_nerf = 0;
-
-    public $willpower_boost = 0;
-    public $willpower_nerf = 0;
-
-
-    public $barrier;
-
-
     /**
      * AI constructor.
-     * @param int $ai_id Id of the AI, used to select and update data from database
+     * @param SystemFunctions $system
+     * @param int             $ai_id Id of the AI, used to select and update data from database
+     * @throws Exception
      */
-    public function __construct(int $ai_id) {
-        global $system;
+    public function __construct(SystemFunctions $system, int $ai_id) {
         $this->system =& $system;
         if(!$ai_id) {
             $system->error("Invalid AI opponent!");
             return false;
         }
         $this->ai_id = $system->clean($ai_id);
-        $this->id = 'A' . $this->ai_id;
-
+        $this->id = self::ID_PREFIX . ':' . $this->ai_id;
 
         $result = $system->query("SELECT `ai_id`, `name` FROM `ai_opponents` WHERE `ai_id`='$this->ai_id' LIMIT 1");
         if($system->db_num_rows == 0) {
-            $system->error("AI does not exist!");
-            return false;
+            throw new Exception("AI does not exist!");
         }
 
         $result = $this->system->db_fetch($result);
@@ -107,13 +82,7 @@ class AI {
 
         $this->rank = $ai_data['rank'];
         $this->max_health = $ai_data['max_health'];
-        if(isset($_SESSION['ai_health'])) {
-            $this->health = $_SESSION['ai_health'];
-        }
-        else {
-            $this->health = $this->max_health;
-            $_SESSION['ai_health'] = $this->health;
-        }
+        $this->health = $this->max_health;
 
         $this->gender = "Male";
 
@@ -161,7 +130,7 @@ class AI {
                     throw new Exception("Invalid jutsu type!");
             }
 
-            $this->moves[$count] = $jutsu;
+            $this->jutsu[$count] = $jutsu;
 
             $count++;
         }
@@ -183,8 +152,8 @@ class AI {
                 }
                 $moveArr[$type] = $data;
             }
-            $this->moves[] = $this->initJutsu(
-                count($this->moves),
+            $this->jutsu[] = $this->initJutsu(
+                count($this->jutsu),
                 $moveArr['jutsu_type'],
                 $moveArr['power'],
                 $moveArr['battle_text']
@@ -195,19 +164,31 @@ class AI {
     /* function chooseMove()
     */
     public function chooseMove(): Jutsu {
-        if(!$_SESSION['ai_logic']['special_move_used'] && $this->moves[1]) {
-            $this->current_move =& $this->moves[1];
+        if(!$_SESSION['ai_logic']['special_move_used'] && $this->jutsu[1]) {
+            $this->current_move =& $this->jutsu[1];
             $_SESSION['ai_logic']['special_move_used'] = true;
         }
         else {
-            $randMove = rand(1, (count($this->moves) - 1));
-            $this->current_move =& $this->moves[$randMove];
+            $randMove = rand(1, (count($this->jutsu) - 1));
+            $this->current_move =& $this->jutsu[$randMove];
         }
 
         return $this->current_move;
     }
 
     public function initJutsu(int $id, $jutsu_type, float $power, string $battle_text): Jutsu {
+        $battle_text_alt = str_replace(
+            ['[player]', '[opponent]'],
+            ['[playerX]', '[opponentX]'],
+            $battle_text
+        );
+
+        $battle_text_swapped = str_replace(
+            ['[playerX]', '[opponentX]'],
+            ['[opponent]', '[player]'],
+            $battle_text_alt
+        );
+
         return new Jutsu(
             $id,
             'Move ' . $id,
@@ -218,7 +199,7 @@ class AI {
             0,
             0,
             "N/A",
-            $battle_text,
+            $battle_text_swapped,
             0,
             Jutsu::USE_TYPE_PHYSICAL,
             $this->rank * 5,
@@ -230,78 +211,46 @@ class AI {
         );
     }
 
-    /* function calcDamage() CONTAINS TEMP FIX
-    *	Calculates raw damage based on AI stats and jutsu or item strength
-        -Parameters-
-        @attack: Copy of the attack data.
-        @attack_type (default_jutsu, equipped_jutsu, item, bloodline_jutsu,):
-            Type of thing to check for, either item or jutsu
-    */
-    public function calcDamage(Jutsu $attack, $attack_type = 'default_jutsu'): float {
-        switch($attack_type) {
-            case 'default_jutsu':
-                break;
-            case 'equipped_jutsu':
-                break;
-            default:
-                throw new Exception("Invalid jutsu type!");
-                break;
-        }
-        $offense_skill = $attack->jutsu_type . '_skill';
-        $offense_boost = 0;
-        if(isset($this->{$attack->jutsu_type . '_nerf'})) {
-            // echo "Nerf: " . $this->{$attack->jutsu_type . '_nerf'} . "<br />";
-            $offense_boost -= $this->{$attack->jutsu_type . '_nerf'};
-        }
-
-        // TEMP FIX (should be 0.10)
-        $offense = (35 + $this->{$offense_skill} * 0.09);
-        $offense += $offense_boost;
-
-        $min = 20;
-        $max = 35;
-        $rand = (int)(($min + $max) / 2);
-        // $rand = mt_rand($min, $max);
-
-        $damage = round($offense * $attack->power * $rand, 2);
-
-        return $damage;
-    }
-
-    /* function calcDamageTaken()
-    *	Calculates final damage taken based on AI stats and attack type
-        -Parameters-
-        @raw_damage: Raw damage dealt before defense
-        @defense_type (ninjutsu, taijutsu, genjutsu, weapon):
-            Type of thing to check for, either item or jutsu
-    */
-    public function calcDamageTaken($raw_damage, $defense_type) {
-        $defense = 50;
-
-        $def_multiplier = 0.01;
-
-        switch($defense_type) {
-            case 'ninjutsu':
-                $defense += SystemFunctions::diminishing_returns($this->ninjutsu_skill * $def_multiplier, 40);
-                break;
-            case 'genjutsu':
-                $defense += SystemFunctions::diminishing_returns($this->genjutsu_skill * $def_multiplier * 0.9, 40);
-                break;
-            case 'taijutsu':
-                $defense += SystemFunctions::diminishing_returns($this->taijutsu_skill * $def_multiplier, 40);
-                break;
-            default:
-                error_log("Invalid defense type! {$defense_type}");
-        }
-
-        $damage = round($raw_damage / $defense, 2);
-        if($damage < 0) {
-            $damage = 0;
-        }
-        return $damage;
-    }
-
     public function updateData() {
         $_SESSION['ai_health'] = $this->health;
+    }
+
+    public function getName(): string {
+        return $this->name;
+    }
+
+    public function getAvatarSize(): int {
+        return 125;
+    }
+
+    public function getInventory() {
+    }
+
+    public function hasItem(int $item_id): bool {
+        return false;
+    }
+
+    public function useJutsu(Jutsu $jutsu, $purchase_type) {
+
+    }
+
+    public function updateInventory() {
+
+    }
+
+    /**
+     * @param SystemFunctions $system
+     * @param string          $entity_id_str
+     * @return AI
+     * @throws Exception
+     */
+    public static function fromEntityId(SystemFunctions $system, string $entity_id_str): AI {
+        $entityId = SystemFunctions::parseEntityId($entity_id_str);
+
+        if($entityId->entity_type != self::ID_PREFIX) {
+            throw new Exception("Invalid entity type for AI class!");
+        }
+
+        return new AI($system, $entityId->id);
     }
 }

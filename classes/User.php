@@ -5,23 +5,31 @@ require_once "classes/Jutsu.php";
 /*	Class:		User
 	Purpose:	Fetch user data and load into class variables.
 */
-class User {
+class User extends Fighter {
+    const ID_PREFIX = 'U';
+
     const MIN_NAME_LENGTH = 2;
     const MIN_PASSWORD_LENGTH = 6;
 
-    public static $jutsu_train_gain = 5;
+    public static int $jutsu_train_gain = 5;
 
-    public $system;
+    public SystemFunctions $system;
 
-	// Loaded in construct
-	public $id; // 'P' + user_id
-	public $user_id;
-	public $user_name;
+	public string $id;
+	public int $user_id;
+	public string $user_name;
 	public $username_changes;
 	public $blacklist;
 	public $original_blacklist;
 
 	// Loaded in loadData
+    public float $health;
+    public float $max_health;
+    public float $stamina;
+    public float $max_stamina;
+    public float $chakra;
+    public float $max_chakra;
+
 	public $current_ip;
 	public $last_ip;
 	public $email;
@@ -32,15 +40,10 @@ class User {
 	public $village;
 	public $level;
 	public $rank;
-	public $health;
-	public $max_health;
-	public $stamina;
-	public $max_stamina;
-	public $chakra;
-	public $max_chakra;
+
 	public $exp;
 	public $staff_level;
-	public $bloodline_id;
+	public int $bloodline_id;
 	public $bloodline_name;
 	public $clan;
 	public $village_location;
@@ -62,15 +65,6 @@ class User {
 
 	public $monthly_pvp;
 
-	public $ninjutsu_skill;
-	public $genjutsu_skill;
-	public $taijutsu_skill;
-
-	public $cast_speed;
-	public $speed;
-	public $intelligence;
-	public $willpower;
-
 	/** @var Jutsu[] */
 	public array $jutsu;
 
@@ -78,10 +72,14 @@ class User {
 	public $genjutsu_ids;
 	public $taijutsu_ids;
 
-	public $equipped_jutsu;
+	public array $equipped_jutsu;
 	public $equipped_items;
 
-    public $bloodline = null;
+    public array $items;
+    public array $equipped_weapons;
+
+    public ?Bloodline $bloodline = null;
+    public float $bloodline_skill;
 
     public $ban_type;
 	public $ban_expire;
@@ -90,36 +88,6 @@ class User {
 	public $song_ban;
 
 	public $layout;
-
-
-
-	// Combat boosts
-	public $ninjutsu_boost;
-	public $taijutsu_boost;
-	public $genjutsu_boost;
-
-	public $cast_speed_boost;
-	public $speed_boost;
-	public $intelligence_boost;
-	public $willpower_boost;
-
-	public $ninjutsu_resist;
-	public $taijutsu_resist;
-	public $genjutsu_resist;
-
-	public $defense_boost;
-
-	public $barrier;
-
-	// Combat nerfs
-	public $ninjutsu_nerf;
-	public $taijutsu_nerf;
-	public $genjutsu_nerf;
-
-	public $cast_speed_nerf;
-	public $speed_nerf;
-	public $intelligence_nerf;
-	public $willpower_nerf;
 
     // Team
     public $team_invite;
@@ -135,159 +103,83 @@ class User {
     public $last_login;
 
     public $jutsu_scrolls;
-    public $avatar_link;
+    public string $avatar_link;
     public $profile_song;
     public $log_actions;
-    /**
-     * @var mixed
-     */
-    public $base_level;
-    /**
-     * @var mixed
-     */
-    public $max_level;
-    /**
-     * @var mixed
-     */
-    public $base_stats;
-    /**
-     * @var mixed
-     */
-    public $stats_per_level;
-    /**
-     * @var mixed
-     */
-    public $health_gain;
-    /**
-     * @var mixed
-     */
-    public $pool_gain;
-    /**
-     * @var mixed
-     */
-    public $stat_cap;
-    /**
-     * @var float|int
-     */
-    public $exp_per_level;
-    /**
-     * @var float|int|mixed
-     */
-    public $stats_max_level;
-    /**
-     * @var mixed
-     */
-    public $regen_rate;
-    public $bloodline_skill;
 
-    public $elements;
+    public int $base_level;
+    public int $max_level;
+    public int $base_stats;
+    public int $stats_per_level;
+    public int $health_gain;
+    public int $pool_gain;
+    public int $stat_cap;
+    public int $exp_per_level;
+    public int $stats_max_level;
+    public int $regen_rate;
 
-    public $items;
-    /**
-     * @var array
-     */
-    public $equipped_weapons;
-    /**
-     * @var int
-     */
-    public $regen_boost;
-    /**
-     * @var mixed
-     */
-    public $battle_id;
+    public array $elements;
+
+    public int $regen_boost;
+
+    public int $battle_id;
+
     /**
      * @var mixed
      */
     public $challenge;
-    /**
-     * @var mixed
-     */
-    public $mission_id;
+
+    public int $mission_id;
     /**
      * @var mixed
      */
     public $mission_stage;
-    /**
-     * @var mixed
-     */
-    public $last_ai;
+
+    public int $exam_stage;
+
+    public int $last_ai;
 	
-    public $last_free_stat_change;
+    public int $last_free_stat_change;
 
-    /**
-     * @var mixed
-     */
-    public $last_pvp;
-    /**
-     * @var mixed
-     */
-    public $last_death;
-    /**
-     * @var mixed
-     */
-    public $premium_credits;
-    /**
-     * @var mixed
-     */
-    public $premium_credits_purchased;
-    /**
-     * @var mixed
-     */
-    public $total_stats;
-    /**
-     * @var int|mixed
-     */
-    public $scout_range;
-    /**
-     * @var int
-     */
-    public $stealth;
-    /**
-     * @var mixed
-     */
+    public int $last_pvp;
+    public int $last_death;
+    public int $premium_credits;
+    public int $premium_credits_purchased;
+
+    public int $total_stats;
+
+    public int $scout_range;
+
+    public int $stealth;
     public $village_changes;
-    /**
-     * @var mixed
-     */
     public $clan_changes;
-    /**
-     * @var mixed
-     */
     public $team;
-    /**
-     * @var mixed
-     */
     public $clan_office;
-    /**
-     * @var array
-     */
-    public $equipped_armor;
-    /**
-     * @var array
-     */
-    public $bloodline_offense_boosts;
-    /**
-     * @var array
-     */
-    public $bloodline_defense_boosts;
 
+    public array $equipped_armor;
+    public array $bloodline_offense_boosts;
+    public array $bloodline_defense_boosts;
 
+    /**
+     * User constructor.
+     * @param $user_id
+     * @throws Exception
+     */
     public function __construct($user_id) {
 		global $system;
 		$this->system =& $system;
+
 		if(!$user_id) {
-			$this->system->error("Invalid user id!");
-			return false;
+			throw new Exception("Invalid user id!");
 		}
 		$this->user_id = $this->system->clean($user_id);
-		$this->id = 'P' . $this->user_id;
+		$this->id = self::ID_PREFIX . ':' . $this->user_id;
 
 		$result = $this->system->query("SELECT `user_id`, `user_name`, `ban_type`, `ban_expire`, `journal_ban`, `avatar_ban`, `song_ban`, `last_login`,
 			`forbidden_seal`, `staff_level`, `username_changes`
 			FROM `users` WHERE `user_id`='$this->user_id' LIMIT 1");
 		if($this->system->db_num_rows == 0) {
-			$this->system->error("User does not exist!");
-			return false;
+			throw new Exception("User does not exist!");
 		}
 
 		$result = $this->system->db_fetch($result);
@@ -324,7 +216,8 @@ class User {
 		-Parameters-
 		Update (1 = regen, 2 = training)
 	*/
-	public function loadData($UPDATE = 2, $remote_view = false): string {
+
+    public function loadData($UPDATE = 2, $remote_view = false): string {
 		$result = $this->system->query("SELECT * FROM `users` WHERE `user_id`='$this->user_id' LIMIT 1");
 		$user_data = $this->system->db_fetch($result);
 
@@ -414,6 +307,8 @@ class User {
 		if($this->mission_id) {
 			$this->mission_stage = json_decode($user_data['mission_stage'], true);
 		}
+
+		$this->exam_stage = $user_data['exam_stage'];
 
 		$this->last_ai = $user_data['last_ai'];
 		$this->last_free_stat_change = $user_data['last_free_stat_change'];
@@ -762,10 +657,17 @@ class User {
 		}
 
 		// Elements
-		$this->elements = $user_data['elements'];
-		if($this->elements) {
-			$this->elements = json_decode($this->elements, true);
-		}
+        $elements = $user_data['elements'];
+		if($elements) {
+            $this->elements = json_decode(
+                $user_data['elements'] ?? "[]",
+                true
+            );
+        }
+		else {
+		    $this->elements = [];
+        }
+
 
 		// Regen/time-based events
 		$time_difference = time() - $this->last_update;
@@ -1113,9 +1015,17 @@ class User {
 		return false;
 	}
 
+	public function hasJutsu(int $jutsu_id): bool {
+	    return isset($this->jutsu[$jutsu_id]);
+    }
+
+    public function hasItem(int $item_id): bool {
+        return isset($this->items[$item_id]);
+    }
+
 	/* function useJutsu
 		pool check, calc exp, etc */
-	public function useJutsu(Jutsu $jutsu, $jutsu_type = 'equipped_jutsu'): bool {
+	public function useJutsu(Jutsu $jutsu, $purchase_type = 'equipped_jutsu'): bool {
 		switch($jutsu->jutsu_type) {
 			case 'ninjutsu':
 			case 'genjutsu':
@@ -1133,7 +1043,7 @@ class User {
 			return false;
 		}
 
-		switch($jutsu_type) {
+		switch($purchase_type) {
 			case 'equipped_jutsu':
 				// Element check
 				if($jutsu->element && $jutsu->element != 'None') {
@@ -1184,142 +1094,6 @@ class User {
 		}
 
 		return true;
-	}
-
-    /**
-     * function calcDamage() CONTAINS TEMP NUMBER FIX
-     *	Calculates raw damage based on player stats and jutsu or item strength
-     *
-     * @param Jutsu  $attack  Copy of the attack data.
-     * @param string $attack_type (default_jutsu, equipped_jutsu, item, bloodline_jutsu)
-     * @return float|int
-     * @throws Exception
-     */
-	public function calcDamage(Jutsu $attack, $attack_type = 'default_jutsu') {
-		switch($attack_type) {
-			case 'default_jutsu':
-			case 'equipped_jutsu':
-				$offense = 35 + ($this->{$attack->jutsu_type . '_skill'} * 0.10);
-				break;
-			case 'bloodline_jutsu':
-				$offense = 35 + ($this->{$attack->jutsu_type . '_skill'} * 0.08) + ($this->bloodline_skill * 0.08);
-				break;
-			default:
-				throw new Exception("Invalid jutsu type!");
-		}
-		$offense_boost = 0;
-
-		if(!empty($this->bloodline_offense_boosts)) {
-			foreach($this->bloodline_offense_boosts as $id => $boost) {
-				$boost_type = explode('_', $boost['effect'])[0];
-				if($boost_type != $attack->jutsu_type) {
-					continue;
-				}
-
-				if($attack_type == 'bloodline_jutsu') {
-					$multiplier = 0.5;
-				}
-				else {
-					$multiplier = 1.0;
-				}
-
-				$effect_amount = round($boost['effect_amount'] * $multiplier, 2);
-				$offense_boost += $effect_amount;
-			}
-		}
-
-		if($this->system->debug['damage'])  {
-			echo "Off: $offense +($offense_boost) -> " . ($offense + $offense_boost) . "<br />";
-		}
-
-		$offense += $offense_boost;
-		$offense = round($offense, 2);
-		if($offense < 0) {
-			$offense = 0;
-		}
-
-		// TEMP FIX
-		if($offense > 900) {
-			$extra_offense = $offense - 900;
-			$extra_offense *= 0.6;
-			$offense = $extra_offense + 900;
-		}
-
-		$min = 25;
-		$max = 45;
-		$rand = (int)(($min + $max) / 2);
-		// $rand = mt_rand($min, $max);
-
-		$damage = $offense * $attack->power * $rand;
-
-		// Add non-BL damage boosts
-		$damage_boost = $this->{$attack->jutsu_type . '_boost'} - $this->{$attack->jutsu_type . '_nerf'};
-		if($this->system->debug['damage']) {
-			echo 'Damage/boost: ' . $damage . ' / ' . $damage_boost . '<br />';
-		}
-		$damage = round($damage + $damage_boost, 2);
-		if($damage < 0) {
-			$damage = 0;
-		}
-
-		return $damage;
-	}
-
-	/* function calcDamageTaken()
-	*	Calculates final damage taken based on player stats and attack type
-		-Parameters-
-		@raw_damage: Raw damage dealt before defense
-		@defense_type (ninjutsu, taijutsu, genjutsu, weapon):
-			Type of thing to check for, either item or jutsu
-	*/
-	public function calcDamageTaken($raw_damage, $defense_type) {
-		$defense = 50 * (1 + $this->defense_boost);
-
-		if($defense <= 0) {
-			$defense = 1;
-		}
-
-		if(!empty($this->bloodline_defense_boosts)) {
-			foreach($this->bloodline_defense_boosts as $id => $boost) {
-				$boost_type = explode('_', $boost['effect'])[0];
-				if($boost_type != $defense_type) {
-					continue;
-				}
-
-				$boost_amount = $boost['effect_amount'] * 35;
-				if($raw_damage < $boost_amount) {
-					$this->bloodline_defense_boosts[$id]['effect_amount'] -= ($raw_damage / 35);
-					$raw_damage = 0;
-				}
-				else {
-					$raw_damage -= $boost_amount;
-					unset($this->bloodline_defense_boosts[$id]);
-				}
-			}
-		}
-
-		switch($defense_type) {
-			case 'ninjutsu':
-				$defense += SystemFunctions::diminishing_returns($this->ninjutsu_skill * 0.03, 50);
-				$raw_damage -= $this->ninjutsu_resist;
-				break;
-			case 'genjutsu':
-				$defense += SystemFunctions::diminishing_returns($this->genjutsu_skill * 0.03, 50);
-				$raw_damage -= $this->genjutsu_resist;
-				break;
-			case 'taijutsu':
-				$defense += SystemFunctions::diminishing_returns($this->taijutsu_skill * 0.03, 50);
-				$raw_damage -= $this->taijutsu_resist;
-				break;
-            default:
-                error_log("Invalid defense type! {$defense_type}");
-		}
-
-		$damage = round($raw_damage / $defense, 2);
-		if($damage < 0.0) {
-			$damage = 0;
-		}
-		return $damage;
 	}
 
 	/* function updateData()
@@ -1384,7 +1158,8 @@ class User {
 			$query .= "`mission_id`=0,";
 		}
 
-		$query .= "`last_ai` = '$this->last_ai',
+		$query .= "`exam_stage` = '{$this->exam_stage}',
+		`last_ai` = '$this->last_ai',
 		`last_free_stat_change` = '{$this->last_free_stat_change}',
 		`last_pvp` = '$this->last_pvp',
 		`last_death` = '$this->last_death',";
@@ -1516,6 +1291,18 @@ class User {
         return true;
 	}
 
+	public function getName(): string {
+	    return $this->user_name;
+    }
+
+	public function getAvatarSize(): int {
+	    return $this->forbidden_seal ? 175 : 125;
+    }
+
+    public function expForNextLevel() {
+        return $this->exp_per_level * (($this->level + 1) - $this->base_level) + ($this->base_stats * 10);
+    }
+
     private function bloodlineSkillRatio($boost): float {
         $bloodline_skill = $this->bloodline_skill + 10;
 
@@ -1530,4 +1317,18 @@ class User {
         return $skill_ratio;
     }
 
+    /**
+     * @param string $entity_id
+     * @return User
+     * @throws Exception
+     */
+    public static function fromEntityId(string $entity_id): User {
+        $entity_id = SystemFunctions::parseEntityId($entity_id);
+
+        if($entity_id->entity_type != self::ID_PREFIX) {
+            throw new Exception("Entity ID is not a User!");
+        }
+
+        return new User($entity_id->id);
+    }
 }

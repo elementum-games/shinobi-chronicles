@@ -107,7 +107,7 @@ function premium() {
 			$player->willpower = 5;
 
 			//Bug fix: Elements previously was not cleared. -- Shadekun
-			$player->elements = NULL;
+			$player->elements = [];
 
 			$player->premium_credits -= $costs['user_reset'];
 

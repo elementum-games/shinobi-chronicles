@@ -1,5 +1,7 @@
 <?php
 
+// KEEP IDS IN SYNC WITH SystemFunctions::PAGE_IDS
+
 $pages = [
     // User Menu
     1 => [
@@ -73,8 +75,8 @@ $pages = [
         'title' => 'Arena',
         'function_name' => 'arena',
         'menu' => SystemFunctions::MENU_ACTIVITY,
-        'pvp_ok' => false,
         'village_ok' => SystemFunctions::NOT_IN_VILLAGE,
+        'battle_type' => Battle::TYPE_AI_ARENA,
     ],
     13 => [
         'file_name' => 'training.php',
@@ -90,7 +92,7 @@ $pages = [
         'title' => 'Missions',
         'function_name' => 'missions',
         'menu' => SystemFunctions::MENU_ACTIVITY,
-        'pvp_ok' => false,
+        'battle_type' => Battle::TYPE_AI_ARENA,
         'village_ok' => SystemFunctions::IN_VILLAGE_OKAY,
         'min_rank' => 2
     ],
@@ -98,7 +100,7 @@ $pages = [
         'file_name' => 'spar.php',
         'title' => 'Spar',
         'function_name' => 'spar',
-        'battle_type' => 2,
+        'battle_type' => Battle::TYPE_SPAR,
         'village_ok' => SystemFunctions::IN_VILLAGE_OKAY,
         'menu' => SystemFunctions::MENU_ACTIVITY,
     ],
@@ -169,7 +171,13 @@ $pages = [
         'file_name' => 'battle.php',
         'title' => 'Battle',
         'function_name' => 'battle',
-        'battle_type' => 1
+        'battle_type' => Battle::TYPE_FIGHT,
+    ],
+    25 => [
+        'file_name' => 'levelUp.php',
+        'title' => 'Rank Exam',
+        'function_name' => 'rankUp',
+        'battle_type' => Battle::TYPE_AI_RANKUP,
     ],
 ];
 

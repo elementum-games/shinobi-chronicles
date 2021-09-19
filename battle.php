@@ -12,12 +12,7 @@ function battle() {
 	global $player;
 	global $self_link;
 
-	$extra_first_turn_time = 20;
-
 	if($player->battle_id) {
-		if(isset($_SESSION['ai_id'])) {
-			unset($_SESSION['ai_id']);
-		}
 		require("battleCore.php");
 		$result = $system->query("SELECT * FROM `battles` WHERE `battle_id`='$player->battle_id' LIMIT 1");
 		if($system->db_num_rows == 0) {
@@ -26,23 +21,29 @@ function battle() {
 			$player->battle_id = 0;
 			return false;
 		}
-		$battle = $system->db_fetch($result);
-		if($player->user_id == $battle['player1']) {
-			$opponent = new User($battle['player2']);
-			$battle['player_side'] = 'player1';
-			$battle['opponent_side'] = 'player2';
-		}
-		else if($player->user_id == $battle['player2']) {
-			$opponent = new User($battle['player1']);
-			$battle['player_side'] = 'player2';
-			$battle['opponent_side'] = 'player1';
-		}
-		else {
-			$system->message("Invalid battle! - p1/p2 check");
-			$system->printMessage();
-			$player->battle_id = 0;
-			return false;
-		}
+
+		try {
+            $battle = $system->db_fetch($result);
+            if($player->id == $battle['player1']) {
+                $opponent = User::fromEntityId($battle['player2']);
+                $battle['player_side'] = 'player1';
+                $battle['opponent_side'] = 'player2';
+            }
+            else if($player->id == $battle['player2']) {
+                $opponent = User::fromEntityId($battle['player1']);
+                $battle['player_side'] = 'player2';
+                $battle['opponent_side'] = 'player1';
+            }
+            else {
+               throw new Exception("Invalid battle! - p1/p2 check");
+            }
+        } catch(Exception $e) {
+            $system->message($e->getMessage());
+            $system->printMessage();
+            $player->battle_id = 0;
+            return false;
+        }
+
 		$opponent->loadData(1);
 		$winner = battlePvP($player, $opponent, $battle);
 		if($winner !== false) {
@@ -92,43 +93,42 @@ function battle() {
 	else if($_GET['attack']) {
 		try {
 			$attack_id = (int)$system->clean($_GET['attack']);
-			$result = $system->query("SELECT `user_id`, `user_name`, `rank`, `village`, `location`, `last_active`, `battle_id`, `last_death` 
-				FROM `users` WHERE `user_id`='$attack_id' LIMIT 1");
-			if($system->db_num_rows == 0) {
-				throw new Exception("Invalid user!");
-			}
-			$user = $system->db_fetch($result);
-			if($user['village'] == $player->village) {
+
+			try {
+			    $user = new User($attack_id);
+			    $user->loadData(1, true);
+            } catch(Exception $e) {
+                throw new Exception("Invalid user! " . $e->getMessage());
+            }
+
+			if($user->village == $player->village) {
 				throw new Exception("You cannot attack people from your own village!");
 			}
-			if($user['rank'] < 3) {
+			if($user->rank < 3) {
 				throw new Exception("You cannot attack people below Chuunin rank!");
 			}
 			if($player->rank < 3) {
 				throw new Exception("You cannot attack people Chuunin rank and higher!");
 			}
-			if($user['location'] != $player->location) {
+			if($user->location != $player->location) {
 				throw new Exception("Target is not at your location!");
 			}
-			if($user['battle_id']) {
+			if($user->battle_id) {
 				throw new Exception("Target is in battle!");
 			}
-			if($user['last_active'] < time() - 120) {
+			if($user->last_active < time() - 120) {
 				throw new Exception("Target is inactive/offline!");
 			}
 			if($player->last_death > time() - 60) {
 				throw new Exception("You died within the last minute, please wait " . 
 					(($player->last_death + 60) - time()) . " more seconds.");
 			}
-			if($user['last_death'] > time() - 60) {
+			if($user->last_death > time() - 60) {
 				throw new Exception("Target has died within the last minute, please wait " . 
-					(($user['last_death'] + 60) - time()) . " more seconds.");
+					(($user->last_death + 60) - time()) . " more seconds.");
 			}
-			$system->query("INSERT INTO `battles` (`player1`, `player2`, `turn_time`) 
-				VALUES ($player->user_id, $attack_id, " . (time() + 20) . ")");
-			$battle_id = $system->db_insert_id;
-			$player->battle_id = $battle_id;
-			$system->query("UPDATE `users` SET `battle_id`='$battle_id' WHERE `user_id`= $player->user_id OR `user_id` = $attack_id LIMIT 2");
+
+			Battle::start($system, $player, $user, Battle::TYPE_FIGHT);
 			$system->message("You have attacked!<br />
 				<a class='link' href='$self_link'>To Battle</a>");
 			$system->printMessage();

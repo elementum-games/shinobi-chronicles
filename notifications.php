@@ -14,18 +14,31 @@ function displayNotifications() {
 		}
 		else {
 			$result = $system->db_fetch($result);
+			$link = null;
 			switch($result['battle_type']) {
-				case 1:
-					$notifications[] = "<a class='link red' href='{$system->links['battle']}'>In battle!</a>";
+                case Battle::TYPE_AI_ARENA:
+                    $link = $system->links['arena'];
 					break;
-				case 2:
-					$notifications[] = "<a class='link red' href='{$system->links['spar']}'>In battle!</a>";
+                case Battle::TYPE_AI_MISSION:
+                    $link = $system->links['mission'];
+                    break;
+                case Battle::TYPE_AI_RANKUP:
+                    $link = $system->links['rankup'];
+                    break;
+				case Battle::TYPE_SPAR:
+				    $link = $system->links['spar'];
 					break;
+                case Battle::TYPE_FIGHT:
+                    $link = $system->links['battle'];
+                    break;
+               /* case Battle::TYPE_CHALLENGE:
+                    $link = $system->links['spar'];
+                    break;*/
 			}
+			if($link) {
+                $notifications[] = "<a class='link red' href='{$link}'>In battle!</a>";
+            }
 		}
-	}
-	else if($player->battle_id == -1) {
-		$notifications[] = "<a class='link red' href='" . ($system->link . '?id=' . $_SESSION['battle_page']) . "'>In battle!</a>";
 	}
 	
 	$result = $system->query("SELECT `message_id` FROM `private_messages` 
