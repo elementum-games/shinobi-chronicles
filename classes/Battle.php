@@ -96,14 +96,33 @@ class Battle {
     // Transient vars
     public array $default_attacks;
 
+    /**
+     * @param SystemFunctions $system
+     * @param Fighter         $player1
+     * @param Fighter         $player2
+     * @param int             $battle_type
+     * @throws Exception
+     */
     public static function start(
-        SystemFunctions $system, Fighter $player1, Fighter $player2
+        SystemFunctions $system, Fighter $player1, Fighter $player2, int $battle_type
     ) {
         $json_empty_array = '"[]"';
+
+        switch($battle_type) {
+            case self::TYPE_AI_ARENA:
+            case self::TYPE_SPAR:
+            case self::TYPE_FIGHT:
+            case self::TYPE_CHALLENGE:
+            case self::TYPE_AI_MISSION:
+                break;
+            default:
+                throw new Exception("Invalid battle type!");
+        }
 
         $system->query(
             "INSERT INTO `battles` 
                 (
+                 `battle_type`,
                  `player1`, 
                  `player2`, 
                  `turn_time`,
@@ -122,6 +141,7 @@ class Battle {
                  winner
                ) VALUES 
                (
+                {$battle_type},
                 '$player1->id', 
                 '$player2->id', 
                 " . (time() + 20) . ",
@@ -151,7 +171,6 @@ class Battle {
             $player2->updateData();
         }
     }
-
 
     /**
      * Battle constructor.

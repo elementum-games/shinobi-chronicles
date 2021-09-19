@@ -158,13 +158,17 @@ class User extends Fighter {
     public array $bloodline_offense_boosts;
     public array $bloodline_defense_boosts;
 
+    /**
+     * User constructor.
+     * @param $user_id
+     * @throws Exception
+     */
     public function __construct($user_id) {
 		global $system;
 		$this->system =& $system;
 
 		if(!$user_id) {
-			$this->system->error("Invalid user id!");
-			return false;
+			throw new Exception("Invalid user id!");
 		}
 		$this->user_id = $this->system->clean($user_id);
 		$this->id = self::ID_PREFIX . ':' . $this->user_id;
@@ -173,8 +177,7 @@ class User extends Fighter {
 			`forbidden_seal`, `staff_level`, `username_changes`
 			FROM `users` WHERE `user_id`='$this->user_id' LIMIT 1");
 		if($this->system->db_num_rows == 0) {
-			$this->system->error("User does not exist!");
-			return false;
+			throw new Exception("User does not exist!");
 		}
 
 		$result = $this->system->db_fetch($result);
