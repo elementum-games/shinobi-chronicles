@@ -1,7 +1,7 @@
 <?php
 session_start();
 
-require "classes/system.php";
+require "classes/System.php";
 $system = new System();
 $system->renderStaticPageHeader();
 

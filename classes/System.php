@@ -1,9 +1,9 @@
 <?php
 
+require_once "classes/EntityId.php";
+
 /*	Class:		System
-
 	Purpose: 	Handle database connection and queries. Handle storing and printing of error messages.
-
 */
 class System {
     const KUNAI_PER_DOLLAR = 2;
@@ -698,17 +698,3 @@ class System {
     }
 }
 
-class EntityId {
-    public string $entity_type;
-    public int $id;
-
-    /**
-     * EntityId constructor.
-     * @param string $entity_type
-     * @param int    $id
-     */
-    public function __construct(string $entity_type, int $id) {
-        $this->entity_type = $entity_type;
-        $this->id = $id;
-    }
-}
