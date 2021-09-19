@@ -246,20 +246,6 @@ class Battle {
             $this->player_jutsu_used = $this->player2_jutsu_used;
         }
 
-        // Load jutsu used logs
-        if(!empty($this->player1_jutsu_used)) {
-            $this->player1_jutsu_used = json_decode($this->player1_jutsu_used, true);
-        }
-        else {
-            $this->player1_jutsu_used = array();
-        }
-        if(!empty($this->player2_jutsu_used)) {
-            $this->player2_jutsu_used = json_decode($this->player2_jutsu_used, true);
-        }
-        else {
-            $this->player2_jutsu_used = array();
-        }
-
         $this->default_attacks = $this->getDefaultAttacks();
     }
 
@@ -420,18 +406,7 @@ class Battle {
                     }
 
                     // Log jutsu used
-                    if($jutsu_ok) {
-                        if(isset($player_jutsu_used[$jutsu_unique_id])) {
-                            $player_jutsu_used[$jutsu_unique_id]['count']++;
-                        }
-                        else {
-                            $player_jutsu_used[$jutsu_unique_id] = array();
-                            $player_jutsu_used[$jutsu_unique_id]['jutsu_type'] = $player_jutsu->jutsu_type;
-                            $player_jutsu_used[$jutsu_unique_id]['count'] = 1;
-                        }
-                    }
-
-                    $this->setPlayerAction($attack_id, $weapon_id, $attack_type);
+                    $this->setPlayerAction($attack_id, $weapon_id, $attack_type, $jutsu_unique_id, $player_jutsu->jutsu_type);
 
                     if($this->opponent instanceof AI) {
                         $this->chooseAndSetAIAction($this->opponent);
@@ -2168,18 +2143,40 @@ class Battle {
         return false;
     }
 
-    public function setPlayerAction($attack_id, $weapon_id, $attack_type) {
+    public function setPlayerAction($attack_id, $weapon_id, $attack_type, string $jutsu_unique_id, string $jutsu_type) {
         if($this->player_side == Battle::TEAM1) {
             $this->player1_action = 1;
             $this->player1_jutsu_id = $attack_id;
             $this->player1_weapon_id = $weapon_id;
             $this->player1_attack_type = $attack_type;
+
+            if($attack_type != 'failed_jutsu') {
+                if(isset($this->player1_jutsu_used[$jutsu_unique_id])) {
+                    $this->player1_jutsu_used[$jutsu_unique_id]['count']++;
+                }
+                else {
+                    $this->player1_jutsu_used[$jutsu_unique_id] = array();
+                    $this->player1_jutsu_used[$jutsu_unique_id]['jutsu_type'] = $jutsu_type;
+                    $this->player1_jutsu_used[$jutsu_unique_id]['count'] = 1;
+                }
+            }
         }
         else {
             $this->player2_action = 1;
             $this->player2_jutsu_id = $attack_id;
             $this->player2_weapon_id = $weapon_id;
             $this->player2_attack_type = $attack_type;
+
+            if($attack_type != 'failed_jutsu') {
+                if(isset($this->player2_jutsu_used[$jutsu_unique_id])) {
+                    $this->player2_jutsu_used[$jutsu_unique_id]['count']++;
+                }
+                else {
+                    $this->player2_jutsu_used[$jutsu_unique_id] = array();
+                    $this->player2_jutsu_used[$jutsu_unique_id]['jutsu_type'] = $jutsu_type;
+                    $this->player2_jutsu_used[$jutsu_unique_id]['count'] = 1;
+                }
+            }
         }
     }
 
