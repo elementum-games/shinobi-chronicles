@@ -27,7 +27,7 @@ function modPanel() {
 	</div>
 	<div class='submenuMargin'></div>";
 	// Social/game ban
-	if($_POST['ban']) {
+	if(!empty($_POST['ban'])) {
 		try {
 			if(!isset($_POST['user_name'])) {
 				throw new Exception("Invalid username!");
@@ -92,7 +92,7 @@ function modPanel() {
 		}
 	}
 	// Journal/avatar/profile song ban + remove
-	else if($_POST['profile_ban']) {
+	else if(!empty($_POST['profile_ban'])) {
 		try {
 			if(!empty($_POST['journal'])) {
 				$journal = $_POST['journal'];
@@ -288,7 +288,7 @@ function modPanel() {
 		}
 	}
 	// View record
-	else if($_GET['view_record']) {
+	else if(!empty($_GET['view_record'])) {
 		try {
 			$user_name = $system->clean($_GET['view_record']);
 			$result = $system->query("SELECT `user_id`, `user_name`, `staff_level` FROM `users` WHERE `user_name`='$user_name' LIMIT 1");
@@ -305,6 +305,7 @@ function modPanel() {
 			$result = $system->query("SELECT * FROM `reports` WHERE `user_id`='$user_id'");
 			$reports = array();
 			$user_ids = array();
+			$users = [];
 			while($row = $system->db_fetch($result)) {
 				$reports[$row['report_id']] = $row;
 				if($row['moderator_id']) {
@@ -347,7 +348,7 @@ function modPanel() {
 	}
 	// Banned user list
 	// Locked out users
-	if($_GET['unlock_account'] && $player->staff_level >= SystemFunctions::SC_HEAD_MODERATOR) {
+	if(!empty($_GET['unlock_account']) && $player->staff_level >= SystemFunctions::SC_HEAD_MODERATOR) {
 		$user_id = (int)$system->clean($_GET['unlock_account']);
 		$result = $system->query("UPDATE `users` SET `failed_logins`=0 WHERE `user_id`='$user_id' LIMIT 1");
 		if($system->db_affected_rows > 0) {
@@ -361,7 +362,7 @@ function modPanel() {
 	// HM actions
 	if($player->staff_level >= SystemFunctions::SC_HEAD_MODERATOR) {
 		// Ban IP
-		if($_POST['ban_ip']) {
+		if(!empty($_POST['ban_ip'])) {
 			try {
 				$ip_address = $system->clean($_POST['ip_address']);
 				$result = $system->query("SELECT `id` FROM `banned_ips` WHERE `ip_address`='$ip_address' LIMIT 1");
@@ -380,7 +381,7 @@ function modPanel() {
 			}
 		}
 		// Social/game unban
-		if($_POST['unban']) {
+		if(!empty($_POST['unban'])) {
 			try {
 				if(!isset($_POST['user_name'])) {
 					throw new Exception("Invalid username!");
@@ -424,7 +425,7 @@ function modPanel() {
 			}
 		}
 		// Unban IP
-		if($_POST['unban_ip']) {
+		if(!empty($_POST['unban_ip'])) {
 			try {
 				$ip_address = $system->clean($_POST['ip_address']);
 				$result = $system->query("SELECT `id` FROM `banned_ips` WHERE `ip_address`='$ip_address' LIMIT 1");
@@ -443,7 +444,7 @@ function modPanel() {
 			}
 		}
 		// Journal/avatar/profile song unban
-		else if($_POST['profile_unban']) {
+		else if(!empty($_POST['profile_unban'])) {
 			try {
 				if(!empty($_POST['journal'])) {
 					$journal = $_POST['journal'];
@@ -555,10 +556,10 @@ function modPanel() {
 			}
 		}
 		// Unlock account
-		else if($_GET['locked_out_users']) {
+		else if(!empty($_GET['locked_out_users'])) {
 		}
 		// Global message
-		else if($_POST['global_message']) {
+		else if(!empty($_POST['global_message'])) {
 			$message = $system->clean($_POST['global_message']);
 			try {
 				if(strlen($message) < 5) {
@@ -577,10 +578,14 @@ function modPanel() {
 			$system->printMessage();
 		}
 	}
+
 	// Logged message
 	$system->printMessage();
+
 	// Display forms
-	if($_GET['view'] == 'banned_users') {
+    $view = $_GET['view'] ?? '';
+
+	if($view == 'banned_users') {
 		try {
 			$result = $system->query("SELECT `user_id`, `user_name`, `ban_type`, `ban_expire`, `journal_ban`, `avatar_ban`, `song_ban` FROM `users`
 				WHERE `ban_type` != '' OR `journal_ban` = 1 OR `avatar_ban` = 1 OR `song_ban` = 1");
@@ -631,7 +636,7 @@ function modPanel() {
 			$system->message($e->getMessage());
 		}
 	}	
-	else if($_GET['view'] == 'locked_out_users') {
+	else if($view == 'locked_out_users') {
 		try {
 			$result = $system->query("SELECT `user_id`, `user_name`, `failed_logins` FROM `users`
 				WHERE `failed_logins` > 2 ORDER BY `failed_logins` DESC");
@@ -681,7 +686,7 @@ function modPanel() {
 			</style>
 			<div style='width:210px;margin-left:auto;margin-right:auto;text-align:center;'>
 				<p>Username</p>
-				<input type='text' name='user_name' " . ($_GET['ban_user_name'] ? "value='{$_GET['ban_user_name']}'" : "") . "/><br />
+				<input type='text' name='user_name' value='" . ($_GET['ban_user_name'] ?? "") . "' /><br />
 				<div style='height:56px;text-align:left;padding-top:13px;'>
 				<label for='ban_type'>Ban type:</label>
 					<select name='ban_type' style='width:100px;'>
@@ -708,7 +713,7 @@ function modPanel() {
 			<form action='$self_link' method='post'>
 			<div style='width:210px;margin-left:auto;margin-right:auto;'>
 				<p>Username</p>
-				<input type='text' name='user_name' " . ($_GET['ban_user_name'] ? "value='{$_GET['ban_user_name']}'" : "") . "/><br />
+				<input type='text' name='user_name' value='" . ($_GET['ban_user_name'] ?? "") . "' /><br />
 				<div style='width:50%;float:left;text-align:left;margin-left:9%;'>
 					<p>Journal</p>
 					<input type='checkbox' name='journal[]' value='ban' /> Ban<br />
@@ -759,7 +764,7 @@ function modPanel() {
 				</style>
 				<div style='width:210px;margin-left:auto;margin-right:auto;text-align:center;'>
 					<p>Username</p>
-					<input type='text' name='user_name' " . ($_GET['unban_user_name'] ? "value='{$_GET['unban_user_name']}'" : "") . "/><br />
+					<input type='text' name='user_name' value='" . ($_GET['unban_user_name'] ?? "") . "' /><br />
 				</div>
 				<p style='margin-top:3px;text-align:center;'>	
 					<input type='submit' name='unban' value='Unban'  />
@@ -770,7 +775,7 @@ function modPanel() {
 				<form action='$self_link' method='post'>
 				<div style='width:210px;margin-left:auto;margin-right:auto;'>
 					<p>Username</p>
-					<input type='text' name='user_name' " . ($_GET['unban_user_name'] ? "value='{$_GET['unban_user_name']}'" : "") . "/><br />
+					<input type='text' name='user_name' value='" . ($_GET['unban_user_name'] ?? "") . "' /><br />
 					<div style='width:50%;float:left;text-align:left;margin-left:9%;'>
 						<p>Journal</p>
 						<input type='checkbox' name='journal' value='unban' /> Unban<br />
@@ -799,14 +804,14 @@ function modPanel() {
 				<td style='text-align:center;'>
 					<form action='$self_link' method='post'>
 						<label for='ip_address'>IP address</label><br />
-						<input type='text' name='ip_address' " . ($_GET['ban_ip_address'] ? "value='{$_GET['ban_ip_address']}'" : "") . "/><br />
+						<input type='text' name='ip_address' value='" . ($_GET['ban_ip_address'] ?? "") . "' /><br />
 						<input type='submit' name='ban_ip' value='Ban' />
 					</form>
 				</td>
 				<td style='text-align:center;'>
 					<form action='$self_link' method='post'>
 						<label for='ip_address'>IP address</label><br />
-						<input type='text' name='ip_address' " . ($_GET['unban_ip_address'] ? "value='{$_GET['unban_ip_address']}'" : "") . "/><br />
+						<input type='text' name='ip_address' value='" . ($_GET['unban_ip_address'] ?? "") . "' /><br />
 						<input type='submit' name='unban_ip' value='Unban' />
 					</form>
 				</td>
