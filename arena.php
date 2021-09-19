@@ -50,7 +50,7 @@ function arena() {
                     $ai->health = $ai->max_health;
 
                     $player->last_ai = time();
-                    Battle::start($system, $player, $ai);
+                    Battle::start($system, $player, $ai, Battle::TYPE_AI_ARENA);
 
                     arena();
                     return true;
