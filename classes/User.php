@@ -653,10 +653,17 @@ class User extends Fighter {
 		}
 
 		// Elements
-		$this->elements = json_decode(
-            $user_data['elements'] ?? "[]",
-            true
-        );
+        $elements = $user_data['elements'];
+		if($elements) {
+            $this->elements = json_decode(
+                $user_data['elements'] ?? "[]",
+                true
+            );
+        }
+		else {
+		    $this->elements = [];
+        }
+
 
 		// Regen/time-based events
 		$time_difference = time() - $this->last_update;
