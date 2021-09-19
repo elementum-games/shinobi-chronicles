@@ -22,6 +22,9 @@ function displayNotifications() {
                 case Battle::TYPE_AI_MISSION:
                     $link = $system->links['mission'];
                     break;
+                case Battle::TYPE_AI_RANKUP:
+                    $link = $system->links['rankup'];
+                    break;
 				case Battle::TYPE_SPAR:
 				    $link = $system->links['spar'];
 					break;

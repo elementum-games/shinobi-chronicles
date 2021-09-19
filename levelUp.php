@@ -55,6 +55,13 @@ function rankUp(): bool {
         return true;
     }
 
+	// Can't even access this page if in a different type of battle
+	if($player->battle_id && $player->exam_stage == 0) {
+	    $player->battle_id = 0;
+        $system->message("Your exam battle has concluded. <a href='{$system->links['profile']}'>Continue</a>");
+        return true;
+    }
+
     if($player->level < $player->max_level || $player->exp < $player->expForNextLevel() || $player->rank >= SystemFunctions::SC_MAX_RANK) {
         $player->exam_stage = 0;
         $system->message("You are not eligible for a rankup exam. <a href='{$system->links['profile']}'>Continue</a>");
