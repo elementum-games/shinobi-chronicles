@@ -2300,7 +2300,7 @@ class Battle {
         if($this->player1->health > 0 && $this->player2->health <= 0) {
             $this->winner = Battle::TEAM1;
         }
-        else if($this->player2->health <= 0 && $this->player1->health > 0) {
+        else if($this->player2->health > 0 && $this->player1->health <= 0) {
             $this->winner = Battle::TEAM2;
         }
         else if($this->player1->health <= 0 && $this->player2->health <= 0) {
