@@ -356,7 +356,8 @@ function jutsu() {
             if(!empty($_POST['confirm_forget'])) {
                 //Forgetting jutsu.
                 $jutsu_name = $player->jutsu[$jutsu_id]->name;
-                unset($player->jutsu[$jutsu_id]);
+                $player->removeJutsu($jutsu_id);
+
                 $system->message("You have forgotten $jutsu_name!");
                 $system->printMessage();
                 $page = '';

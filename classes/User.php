@@ -859,13 +859,13 @@ class User extends Fighter {
 
 					switch($jutsu_data['jutsu_type']) {
 						case 'ninjutsu':
-							$this->ninjutsu_ids[] = $jutsu_id;
+							$this->ninjutsu_ids[$jutsu_id] = $jutsu_id;
 							break;
 						case 'genjutsu':
-							$this->genjutsu_ids[] = $jutsu_id;
+							$this->genjutsu_ids[$jutsu_id] = $jutsu_id;
 							break;
 						case 'taijutsu':
-							$this->taijutsu_ids[] = $jutsu_id;
+							$this->taijutsu_ids[$jutsu_id] = $jutsu_id;
 							break;
 					}
 				}
@@ -1330,5 +1330,22 @@ class User extends Fighter {
         }
 
         return new User($entity_id->id);
+    }
+
+    public function removeJutsu(int $jutsu_id) {
+        $jutsu = $this->jutsu[$jutsu_id];
+        unset($this->jutsu[$jutsu_id]);
+
+        switch($jutsu->jutsu_type) {
+            case Jutsu::TYPE_NINJUTSU:
+                unset($this->ninjutsu_ids[$jutsu_id]);
+                break;
+            case Jutsu::TYPE_TAIJUTSU:
+                unset($this->taijutsu_ids[$jutsu_id]);
+                break;
+            case Jutsu::TYPE_GENJUTSU:
+                unset($this->genjutsu_ids[$jutsu_id]);
+                break;
+        }
     }
 }
