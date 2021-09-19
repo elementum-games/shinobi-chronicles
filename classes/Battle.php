@@ -37,6 +37,7 @@ class Battle {
     const TYPE_FIGHT = 3;
     const TYPE_CHALLENGE = 4;
     const TYPE_AI_MISSION = 5;
+    const TYPE_AI_RANKUP = 6;
 
     const TURN_LENGTH = 10;
 
@@ -114,6 +115,7 @@ class Battle {
             case self::TYPE_FIGHT:
             case self::TYPE_CHALLENGE:
             case self::TYPE_AI_MISSION:
+            case self::TYPE_AI_RANKUP:
                 break;
             default:
                 throw new Exception("Invalid battle type!");
@@ -885,9 +887,6 @@ class Battle {
                 $this->player1_health = $this->player1->health;
                 $this->player2_health = $this->player2->health;
 
-                $this->checkForWinner();
-                $this->updateData();
-
                 $this->player1->updateData();
                 $this->player1->updateInventory();
 
@@ -897,17 +896,17 @@ class Battle {
             // If neither player moved, update turn timer only
             else {
                 $this->turn_time = time();
-                $this->system->query("UPDATE `battles` SET `turn_time`='{$this->turn_time}'
-				WHERE `battle_id`='{$this->battle_id}' LIMIT 1");
             }
         }
-
         // Time is up - Player moved, opponent didn't
         // Time is up - Opponent moved, player didnt
         // Time is up - nobody moved
         else {
 
         }
+
+        $this->checkForWinner();
+        $this->updateData();
 
 
         return $this->winner;
