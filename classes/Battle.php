@@ -889,7 +889,10 @@ class Battle {
                 $this->updateData();
 
                 $this->player1->updateData();
+                $this->player1->updateInventory();
+
                 $this->player2->updateData();
+                $this->player2->updateInventory();
             }
             // If neither player moved, update turn timer only
             else {
