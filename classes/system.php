@@ -75,7 +75,21 @@ class SystemFunctions {
         )
     );
 
-    public $links = [];
+    // Keep in sync with pages.php
+    const PAGE_IDS = [
+        'profile' => 1,
+        'settings' => 3,
+        'members' => 6,
+        'bloodline' => 10,
+        'arena' => 12,
+        'mod' => 16,
+        'admin' => 17,
+        'report' => 18,
+        'battle' => 19,
+        'spar' => 22,
+        'mission' => 14,
+    ];
+    public array $links = [];
 
     //Chat variables
     const CHAT_MAX_POST_LENGTH = 350;
@@ -114,19 +128,11 @@ class SystemFunctions {
 
         $this->register_open = isset($register_open) ? $register_open : false;
         $this->SC_OPEN = isset($SC_OPEN) ? $SC_OPEN : false;
-        
-        $this->links = [
-            'profile' => $this->link . '?id=1',
-            'settings' => $this->link . '?id=3',
-            'members' => $this->link . '?id=6',
-            'bloodline' => $this->link . '?id=10',
-            'mod' => $this->link . '?id=16',
-            'admin' => $this->link . '?id=17',
-            'report' => $this->link . '?id=18',
-            'battle' => $this->link . '?id=19',
-            'spar' => $this->link . '?id=22',
-            'mission' => $this->link . '?id=14',
-        ];
+
+        $this->links = [];
+        foreach(self::PAGE_IDS as $slug => $id) {
+            $this->links[$id] = $this->link . '?id=' . $id;
+        }
     }
 
     /* function dbConnect()
