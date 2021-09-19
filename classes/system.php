@@ -131,7 +131,7 @@ class SystemFunctions {
 
         $this->links = [];
         foreach(self::PAGE_IDS as $slug => $id) {
-            $this->links[$id] = $this->link . '?id=' . $id;
+            $this->links[$slug] = $this->link . '?id=' . $id;
         }
     }
 
@@ -607,6 +607,20 @@ class SystemFunctions {
         echo str_replace('<!--[VERSION_NUMBER]-->', SystemFunctions::VERSION_NUMBER, $footer);
     }
 
+    /**
+     * @param string $entity_id
+     * @return EntityId
+     * @throws Exception
+     */
+    public static function parseEntityId(string $entity_id): EntityId {
+        $arr = explode(':', $entity_id);
+        if(count($arr) != 2) {
+            throw new Exception("Invalid entity id {$entity_id}!");
+        }
+
+        return new EntityId($arr[0], (int)$arr[1]);
+    }
+
     public static function diminishing_returns($val, $scale) {
         if($val < 0) {
             return -self::diminishing_returns(-$val, $scale);
@@ -616,7 +630,7 @@ class SystemFunctions {
         return $trinum * $scale;
     }
 
-    public static function timeRemaining($time_remaining, $format = 'short', $include_days = true, $include_seconds = true) {
+    public static function timeRemaining($time_remaining, $format = 'short', $include_days = true, $include_seconds = true): string {
         if($include_days) {
             $days = floor($time_remaining / 86400);
             $time_remaining -= $days * 86400;
@@ -680,5 +694,20 @@ class SystemFunctions {
             }
         }
         return $string;
+    }
+}
+
+class EntityId {
+    public string $entity_type;
+    public int $id;
+
+    /**
+     * EntityId constructor.
+     * @param string $entity_type
+     * @param int    $id
+     */
+    public function __construct(string $entity_type, int $id) {
+        $this->entity_type = $entity_type;
+        $this->id = $id;
     }
 }

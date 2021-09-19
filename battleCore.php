@@ -346,6 +346,7 @@ function battleAI(User &$player, AI &$opponent) {
 					}
 				}
 			}
+
 			// Log jutsu
 			if($jutsu_ok) {
 				if(isset($player_jutsu_used[$jutsu_unique_id])) {
@@ -589,6 +590,7 @@ function battleAI(User &$player, AI &$opponent) {
 				if($collision_text) {
 					$battle_text .= '<hr />' . $collision_text;
 				}
+
 				$battle_text .= "<hr />" . $opponent->name . ' ' . $opponent_jutsu->battle_text;
 				if($opponent_jutsu->jutsu_type != 'genjutsu') {
 					$battle_text .= "<p style='font-weight:bold;'>{$opponent->name} does
@@ -602,9 +604,9 @@ function battleAI(User &$player, AI &$opponent) {
 			}
 			else {
 				// Calc opponent jutsu
-				$opponent_damage = $opponent->calcDamage($opponent->moves[0], 'equipped_jutsu');
+				$opponent_damage = $opponent->calcDamage($opponent->jutsu[0], 'equipped_jutsu');
 				// Set opponent jutsu effects
-				$opponent_jutsu =& $opponent->moves[0];
+				$opponent_jutsu =& $opponent->jutsu[0];
 				if($opponent_jutsu->jutsu_type == 'genjutsu') {
 					$genjutsu_id = 'AI_J' . $opponent_jutsu->id;
 					$genjutsu_user = 'A' . $opponent->ai_id;
@@ -1541,7 +1543,6 @@ function battlePvP(&$player, &$opponent, &$battle) {
 				WHERE `battle_id`='{$battle['battle_id']}' LIMIT 1");
 		}
 	}
-
 	// Time is up - Player moved, opponent didn't
 	// Time is up - Opponent moved, player didnt
 	// Time is up - nobody moved
@@ -2104,6 +2105,74 @@ function movePrompt(User $player, $default_attacks) {
     </td></tr>";
 }
 
+function applyPassiveEffects(&$target, &$attacker, &$effect, &$effect_display = '') {
+    // Buffs
+    if($effect['effect'] == 'ninjutsu_boost') {
+        $target->ninjutsu_boost += $effect['effect_amount'];
+    }
+    else if($effect['effect'] == 'taijutsu_boost') {
+        $target->taijutsu_boost += $effect['effect_amount'];
+    }
+    else if($effect['effect'] == 'genjutsu_boost') {
+        $target->genjutsu_boost += $effect['effect_amount'];
+    }
+    else if($effect['effect'] == 'cast_speed_boost') {
+        $target->cast_speed_boost += $effect['effect_amount'];
+    }
+    else if($effect['effect'] == 'speed_boost' or $effect['effect'] == 'lighten') {
+        $target->speed_boost += $effect['effect_amount'];
+    }
+    else if($effect['effect'] == 'intelligence_boost') {
+        $target->intelligence_boost += $effect['effect_amount'];
+    }
+    else if($effect['effect'] == 'endurance_boost') {
+        $target->endurance_boost += $effect['effect_amount'];
+    }
+    else if($effect['effect'] == 'willpower_boost') {
+        $target->willpower_boost += $effect['effect_amount'];
+    }
+    else if($effect['effect'] == 'ninjutsu_resist') {
+        $target->ninjutsu_resist += $effect['effect_amount'];
+    }
+    else if($effect['effect'] == 'genjutsu_resist') {
+        $target->genjutsu_resist += $effect['effect_amount'];
+    }
+    else if($effect['effect'] == 'taijutsu_resist' or $effect['effect'] == 'harden') {
+        $target->taijutsu_resist += $effect['effect_amount'];
+    }
+    else if($effect['effect'] == 'barrier') {
+        $target->barrier += $effect['effect_amount'];
+    }
+    // Debuffs
+    $target_debuff_resist = 50 + ($target->willpower + $target->willpower_boost - $target->willpower_nerf) * 0.5;
+    if($effect['effect'] == 'ninjutsu_nerf') {
+        $target->ninjutsu_nerf += $effect['effect_amount'] / $target_debuff_resist;
+    }
+    else if($effect['effect'] == 'taijutsu_nerf') {
+        $target->taijutsu_nerf += $effect['effect_amount'] / $target_debuff_resist;
+    }
+    else if($effect['effect'] == 'genjutsu_nerf') {
+        $target->genjutsu_nerf += $effect['effect_amount'] / $target_debuff_resist;
+    }
+    else if($effect['effect'] == 'cast_speed_nerf') {
+        $target->cast_speed_nerf += $effect['effect_amount'] / $target_debuff_resist;
+    }
+    else if($effect['effect'] == 'speed_nerf' or $effect['effect'] == 'cripple') {
+        $target->speed_nerf += $effect['effect_amount'] / $target_debuff_resist;
+    }
+    else if($effect['effect'] == 'intelligence_nerf' or $effect['effect'] == 'daze') {
+        $target->intelligence_nerf += $effect['effect_amount'] / $target_debuff_resist;
+    }
+    else if($effect['effect'] == 'endurance_nerf') {
+        $target->endurance_nerf += $effect['effect_amount'] / $target_debuff_resist;
+    }
+    else if($effect['effect'] == 'willpower_nerf') {
+        $target->willpower_nerf += $effect['effect_amount'] / $target_debuff_resist;
+    }
+    return false;
+}
+
+
 function jutsuCollision(&$player, &$opponent, &$player_damage, &$opponent_damage, $player_jutsu, $opponent_jutsu) {
 	$collision_text = '';
 	/*
@@ -2527,72 +2596,6 @@ function setEffect(&$user, $target_id, Jutsu $jutsu, $damage, $effect_id, &$acti
 	}
 }
 
-function applyPassiveEffects(&$target, &$attacker, &$effect, &$effect_display = '') {
-	// Buffs
-	if($effect['effect'] == 'ninjutsu_boost') {
-		$target->ninjutsu_boost += $effect['effect_amount'];
-	}
-	else if($effect['effect'] == 'taijutsu_boost') {
-		$target->taijutsu_boost += $effect['effect_amount'];
-	}
-	else if($effect['effect'] == 'genjutsu_boost') {
-		$target->genjutsu_boost += $effect['effect_amount'];
-	}
-	else if($effect['effect'] == 'cast_speed_boost') {
-		$target->cast_speed_boost += $effect['effect_amount'];
-	}
-	else if($effect['effect'] == 'speed_boost' or $effect['effect'] == 'lighten') {
-		$target->speed_boost += $effect['effect_amount'];
-	}
-	else if($effect['effect'] == 'intelligence_boost') {
-		$target->intelligence_boost += $effect['effect_amount'];
-	}
-	else if($effect['effect'] == 'endurance_boost') {
-		$target->endurance_boost += $effect['effect_amount'];
-	}
-	else if($effect['effect'] == 'willpower_boost') {
-		$target->willpower_boost += $effect['effect_amount'];
-	}
-	else if($effect['effect'] == 'ninjutsu_resist') {
-		$target->ninjutsu_resist += $effect['effect_amount'];
-	}
-	else if($effect['effect'] == 'genjutsu_resist') {
-		$target->genjutsu_resist += $effect['effect_amount'];
-	}
-	else if($effect['effect'] == 'taijutsu_resist' or $effect['effect'] == 'harden') {
-		$target->taijutsu_resist += $effect['effect_amount'];
-	}
-	else if($effect['effect'] == 'barrier') {
-		$target->barrier += $effect['effect_amount'];
-	}
-	// Debuffs
-	$target_debuff_resist = 50 + ($target->willpower + $target->willpower_boost - $target->willpower_nerf) * 0.5;
-	if($effect['effect'] == 'ninjutsu_nerf') {
-		$target->ninjutsu_nerf += $effect['effect_amount'] / $target_debuff_resist;
-	}
-	else if($effect['effect'] == 'taijutsu_nerf') {
-		$target->taijutsu_nerf += $effect['effect_amount'] / $target_debuff_resist;
-	}
-	else if($effect['effect'] == 'genjutsu_nerf') {
-		$target->genjutsu_nerf += $effect['effect_amount'] / $target_debuff_resist;
-	}
-	else if($effect['effect'] == 'cast_speed_nerf') {
-		$target->cast_speed_nerf += $effect['effect_amount'] / $target_debuff_resist;
-	}
-	else if($effect['effect'] == 'speed_nerf' or $effect['effect'] == 'cripple') {
-		$target->speed_nerf += $effect['effect_amount'] / $target_debuff_resist;
-	}
-	else if($effect['effect'] == 'intelligence_nerf' or $effect['effect'] == 'daze') {
-		$target->intelligence_nerf += $effect['effect_amount'] / $target_debuff_resist;
-	}
-	else if($effect['effect'] == 'endurance_nerf') {
-		$target->endurance_nerf += $effect['effect_amount'] / $target_debuff_resist;
-	}
-	else if($effect['effect'] == 'willpower_nerf') {
-		$target->willpower_nerf += $effect['effect_amount'] / $target_debuff_resist;
-	}
-	return false;
-}
 
 function applyActiveEffects(&$target, &$attacker, &$effect, &$effect_display, &$winner) {
 	if($winner && $winner != $target->id) {
