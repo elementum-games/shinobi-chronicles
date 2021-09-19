@@ -1,11 +1,11 @@
 <?php
 
-/*	Class:		SystemFunctions
+/*	Class:		System
 
 	Purpose: 	Handle database connection and queries. Handle storing and printing of error messages.
 
 */
-class SystemFunctions {
+class System {
     const KUNAI_PER_DOLLAR = 2;
     const LOGOUT_LIMIT = 120;
     const BLOODLINE_ROLL_CHANCE = 50;
@@ -53,22 +53,22 @@ class SystemFunctions {
     public $db_insert_id;
 
     public $SC_STAFF_COLORS = array(
-        SystemFunctions::SC_MODERATOR => array(
+        System::SC_MODERATOR => array(
             'staffBanner' => "moderator",
             'staffColor' => "009020",
             'pm_class' => 'moderator'
         ),
-        SystemFunctions::SC_HEAD_MODERATOR => array(
+        System::SC_HEAD_MODERATOR => array(
             'staffBanner' => "head moderator",
             'staffColor' => "0090A0",
             'pm_class' => 'headModerator'
         ),
-        SystemFunctions::SC_ADMINISTRATOR => array(
+        System::SC_ADMINISTRATOR => array(
             'staffBanner' => "administrator",
             'staffColor' => "A00000",
             'pm_class' => 'administrator'
         ),
-        SystemFunctions::SC_HEAD_ADMINISTRATOR => array(
+        System::SC_HEAD_ADMINISTRATOR => array(
             'staffBanner' => "head administrator",
             'staffColor' => "A00000",
             'pm_class' => 'administrator'
@@ -313,7 +313,7 @@ class SystemFunctions {
 
         echo $side_menu_start;
         foreach($pages as $id => $page) {
-            if(!isset($page['menu']) || $page['menu'] != SystemFunctions::MENU_USER) {
+            if(!isset($page['menu']) || $page['menu'] != System::MENU_USER) {
                 continue;
             }
 
@@ -542,7 +542,7 @@ class SystemFunctions {
     public function renderStaticPageHeader() {
         $system = $this;
 
-        switch(SystemFunctions::DEFAULT_LAYOUT) {
+        switch(System::DEFAULT_LAYOUT) {
             case 'cextralite':
                 require("layout/cextralite.php");
                 break;
@@ -574,7 +574,7 @@ class SystemFunctions {
     public function renderStaticPageFooter() {
         $system = $this;
 
-        switch(SystemFunctions::DEFAULT_LAYOUT) {
+        switch(System::DEFAULT_LAYOUT) {
             case 'cextralite':
                 require("layout/cextralite.php");
                 break;
@@ -605,7 +605,7 @@ class SystemFunctions {
             echo $login_menu;
         }
 
-        echo str_replace('<!--[VERSION_NUMBER]-->', SystemFunctions::VERSION_NUMBER, $footer);
+        echo str_replace('<!--[VERSION_NUMBER]-->', System::VERSION_NUMBER, $footer);
     }
 
     /**

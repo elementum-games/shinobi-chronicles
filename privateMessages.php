@@ -95,12 +95,12 @@ class Messaging {
 				}
 			}
 
-			if($this->player->staff_level < SystemFunctions::SC_MODERATOR) {
+			if($this->player->staff_level < System::SC_MODERATOR) {
 				$mc_result = $this->system->query("SELECT COUNT(`message_id`) as `message_count` FROM `private_messages` WHERE `recipient`='{$result['user_id']}' AND `message_read` < 2");
 				$mc_result = $this->system->db_fetch($mc_result);
 				$message_count = $mc_result['message_count'];
 				$ErrorMsg = "User's inbox is full";
-				if($message_count >= $inbox_limit && $result['staff_level'] < SystemFunctions::SC_MODERATOR) {
+				if($message_count >= $inbox_limit && $result['staff_level'] < System::SC_MODERATOR) {
 					if($result['forbidden_seal']) {
 						if($message_count >= self::SEAL_INBOX_LIMIT) {
 							throw new Exception($ErrorMsg);

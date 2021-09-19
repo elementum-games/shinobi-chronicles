@@ -45,7 +45,7 @@ class Battle {
     const TEAM2 = 'T2';
     const DRAW = 'DRAW';
 
-    private SystemFunctions $system;
+    private System $system;
 
     public int $battle_id;
     public int $battle_type;
@@ -98,14 +98,14 @@ class Battle {
     public array $default_attacks;
 
     /**
-     * @param SystemFunctions $system
-     * @param Fighter         $player1
-     * @param Fighter         $player2
-     * @param int             $battle_type
+     * @param System  $system
+     * @param Fighter $player1
+     * @param Fighter $player2
+     * @param int     $battle_type
      * @throws Exception
      */
     public static function start(
-        SystemFunctions $system, Fighter $player1, Fighter $player2, int $battle_type
+        System $system, Fighter $player1, Fighter $player2, int $battle_type
     ) {
         $json_empty_array = '[]';
 
@@ -176,12 +176,12 @@ class Battle {
 
     /**
      * Battle constructor.
-     * @param SystemFunctions $system
-     * @param User            $player
-     * @param int             $battle_id
+     * @param System $system
+     * @param User   $player
+     * @param int    $battle_id
      * @throws Exception
      */
-    public function __construct(SystemFunctions $system, User $player, int $battle_id) {
+    public function __construct(System $system, User $player, int $battle_id) {
         $this->system = $system;
 
         $this->battle_id = $battle_id;
@@ -1049,7 +1049,7 @@ class Battle {
      * @throws Exception
      */
     public static function getFighterEntityType(string $entity_id): string {
-        $entity_id = SystemFunctions::parseEntityId($entity_id);
+        $entity_id = System::parseEntityId($entity_id);
         return $entity_id->entity_type;
     }
 

@@ -5,12 +5,12 @@ if(!isset($_SESSION['user_id'])) {
 }
 
 require("classes.php");
-$system = new SystemFunctions();
+$system = new System();
 $system->dbConnect();
 $user = new User($_SESSION['user_id']);
 $user->loadData();
 
-if($user->staff_level < SystemFunctions::SC_ADMINISTRATOR) {
+if($user->staff_level < System::SC_ADMINISTRATOR) {
 	exit;
 }
 
@@ -553,8 +553,8 @@ function calcDamage($player1, $player2) {
 	$player2_defense = 50;
 	
 	
-	$player1_defense += SystemFunctions::diminishing_returns($player1[$player2_jutsu['jutsu_type'] . '_skill'] * 0.01, 50);
-	$player2_defense += SystemFunctions::diminishing_returns($player2[$player1_jutsu['jutsu_type'] . '_skill'] * 0.01, 50);
+	$player1_defense += System::diminishing_returns($player1[$player2_jutsu['jutsu_type'] . '_skill'] * 0.01, 50);
+	$player2_defense += System::diminishing_returns($player2[$player1_jutsu['jutsu_type'] . '_skill'] * 0.01, 50);
 	
 	// Offense
 	$player1_damage = round($player1_damage / $player2_defense, 1);

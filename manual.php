@@ -2,7 +2,7 @@
 session_start();
 
 require "classes/system.php";
-$system = new SystemFunctions();
+$system = new System();
 $system->renderStaticPageHeader();
 
 ?>

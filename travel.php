@@ -31,7 +31,7 @@ function travel() {
 				$target_y--;
 				break;
 			case 'south':
-				if($player->y >= SystemFunctions::MAP_SIZE_Y) {
+				if($player->y >= System::MAP_SIZE_Y) {
 					$system->message("You cannot travel farther this way!");
 					break;
 				}
@@ -39,7 +39,7 @@ function travel() {
 				$target_y++;
 				break;
 			case 'east':
-				if($player->x >= SystemFunctions::MAP_SIZE_X) {
+				if($player->x >= System::MAP_SIZE_X) {
 					$system->message("You cannot travel farther this way!");
 					break;
 				}
@@ -193,9 +193,9 @@ function renderMap($player, $villages, $icons) {
     $output = "";
     $output .= "<table class='map' 
             style='padding:0;border:1px solid #000;border-collapse:collapse;border-spacing:0;border-radius:0;'>";
-    for($y = 1; $y <= SystemFunctions::MAP_SIZE_Y; $y++) {
+    for($y = 1; $y <= System::MAP_SIZE_Y; $y++) {
         $output .= "<tr>";
-        for($x = 1; $x <= SystemFunctions::MAP_SIZE_X; $x++) {
+        for($x = 1; $x <= System::MAP_SIZE_X; $x++) {
             $key = $x . '.' . $y;
             if(isset($villages[$key])) {
                 $output .= "<td class='village' style='background-image: url(./images/village_icons/" . $icons[$villages[$key]['count']] . ');';

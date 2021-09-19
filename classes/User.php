@@ -13,7 +13,7 @@ class User extends Fighter {
 
     public static int $jutsu_train_gain = 5;
 
-    public SystemFunctions $system;
+    public System $system;
 
 	public string $id;
 	public int $user_id;
@@ -777,7 +777,7 @@ class User extends Fighter {
 				if(strpos($this->train_type, 'jutsu:') !== false) {
 					$train_type = str_replace('jutsu:', '', $this->train_type);
 					$display .= "<p class='trainingNotification'>Training: " . ucwords(str_replace('_', ' ', $train_type)) . "<br />" .
-					"<span id='trainingTimer'>" . SystemFunctions::timeRemaining($this->train_time - time(), 'short', false, true) . " remaining</span></p>";
+					"<span id='trainingTimer'>" . System::timeRemaining($this->train_time - time(), 'short', false, true) . " remaining</span></p>";
 					$display .= "<script type='text/javascript'>
 					let train_time = " . ($this->train_time - time()) . ";
           setTimeout(()=>{titleBarFlash();}, train_time * 1000);
@@ -786,7 +786,7 @@ class User extends Fighter {
 				else  {
           //*setTimeout is used to notify training finished*//
 					$display .= "<p class='trainingNotification'>Training: " . ucwords(str_replace('_', ' ', $this->train_type)) . "<br />" .
-						"<span id='trainingTimer'>" . SystemFunctions::timeRemaining($this->train_time - time(), 'short', false, true) . " remaining</span></p>";
+						"<span id='trainingTimer'>" . System::timeRemaining($this->train_time - time(), 'short', false, true) . " remaining</span></p>";
 					$display .= "<script type='text/javascript'>
 					let train_time = " . ($this->train_time - time()) . ";
           setTimeout(()=>{titleBarFlash();}, train_time * 1000);
@@ -1323,7 +1323,7 @@ class User extends Fighter {
      * @throws Exception
      */
     public static function fromEntityId(string $entity_id): User {
-        $entity_id = SystemFunctions::parseEntityId($entity_id);
+        $entity_id = System::parseEntityId($entity_id);
 
         if($entity_id->entity_type != self::ID_PREFIX) {
             throw new Exception("Entity ID is not a User!");

@@ -226,11 +226,11 @@ class Mission {
             $y = 1;
         }
 
-        if($x > SystemFunctions::MAP_SIZE_X) {
-            $x = SystemFunctions::MAP_SIZE_X;
+        if($x > System::MAP_SIZE_X) {
+            $x = System::MAP_SIZE_X;
         }
-        if($y > SystemFunctions::MAP_SIZE_Y) {
-            $y = SystemFunctions::MAP_SIZE_Y;
+        if($y > System::MAP_SIZE_Y) {
+            $y = System::MAP_SIZE_Y;
         }
 
         return $x . '.' . $y;

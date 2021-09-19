@@ -2,7 +2,7 @@
 session_start();
 
 require_once("classes.php");
-$system = new SystemFunctions();
+$system = new System();
 
 if(isset($_SESSION['user_id'])) {
     header("Location: {$system->link}}");
@@ -10,7 +10,7 @@ if(isset($_SESSION['user_id'])) {
 }
 
 // Start display
-require("layout/" . SystemFunctions::DEFAULT_LAYOUT . ".php");
+require("layout/" . System::DEFAULT_LAYOUT . ".php");
 echo $heading;
 echo $top_menu;
 echo $header;

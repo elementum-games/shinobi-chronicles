@@ -5,7 +5,7 @@ if(!isset($_SESSION['user_id'])) {
 	exit;
 }
 require_once("classes.php");
-$system = new SystemFunctions();
+$system = new System();
 $player = new User($_SESSION['user_id']);
 $player->loadData(0); // Load data without calling regen/training updates
 $ajax = true;

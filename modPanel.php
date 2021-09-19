@@ -12,7 +12,7 @@ function modPanel() {
 	global $player;
 	global $self_link;
 	// Staff level check
-	if($player->staff_level < SystemFunctions::SC_MODERATOR) {
+	if($player->staff_level < System::SC_MODERATOR) {
 		return false;
 	}
 	// $page = $_GET['page'];
@@ -50,10 +50,10 @@ function modPanel() {
 				throw new Exception("Invalid username!");
 			}
 			$user_data = $system->db_fetch($result);
-			if($user_data['staff_level'] >= $player->staff_level and $player->staff_level != SystemFunctions::SC_HEAD_ADMINISTRATOR) {
+			if($user_data['staff_level'] >= $player->staff_level and $player->staff_level != System::SC_HEAD_ADMINISTRATOR) {
 				throw new Exception("You cannot ban fellow staff members!");
 			}
-			if(!empty($user_data['ban_type']) && $player->staff_level == SystemFunctions::SC_MODERATOR) {
+			if(!empty($user_data['ban_type']) && $player->staff_level == System::SC_MODERATOR) {
 				if($ban_type == 'social' && $user_data['ban_type'] == 'game') {
 					throw new Exception("You cannot reduce a ban!");
 				}
@@ -143,7 +143,7 @@ function modPanel() {
 				throw new Exception("Invalid username!");
 			}
 			$user_data = $system->db_fetch($result);
-			if($user_data['staff_level'] >= $player->staff_level and $player->staff_level != SystemFunctions::SC_HEAD_ADMINISTRATOR) {
+			if($user_data['staff_level'] >= $player->staff_level and $player->staff_level != System::SC_HEAD_ADMINISTRATOR) {
 				throw new Exception("You cannot ban fellow staff members!");
 			}
 			// Build query
@@ -299,7 +299,7 @@ function modPanel() {
 			$user_id = $result['user_id'];
 			$user_name = $result['user_name'];
 			$staff_level = $result['staff_level'];
-			if($staff_level >= $player->staff_level && $player->staff_level < SystemFunctions::SC_HEAD_ADMINISTRATOR) {
+			if($staff_level >= $player->staff_level && $player->staff_level < System::SC_HEAD_ADMINISTRATOR) {
 				throw new Exception("You do not have authorization to view this record!");
 			}
 			$result = $system->query("SELECT * FROM `reports` WHERE `user_id`='$user_id'");
@@ -348,7 +348,7 @@ function modPanel() {
 	}
 	// Banned user list
 	// Locked out users
-	if(!empty($_GET['unlock_account']) && $player->staff_level >= SystemFunctions::SC_HEAD_MODERATOR) {
+	if(!empty($_GET['unlock_account']) && $player->staff_level >= System::SC_HEAD_MODERATOR) {
 		$user_id = (int)$system->clean($_GET['unlock_account']);
 		$result = $system->query("UPDATE `users` SET `failed_logins`=0 WHERE `user_id`='$user_id' LIMIT 1");
 		if($system->db_affected_rows > 0) {
@@ -360,7 +360,7 @@ function modPanel() {
 		$system->printMessage();
 	}
 	// HM actions
-	if($player->staff_level >= SystemFunctions::SC_HEAD_MODERATOR) {
+	if($player->staff_level >= System::SC_HEAD_MODERATOR) {
 		// Ban IP
 		if(!empty($_POST['ban_ip'])) {
 			try {
@@ -392,7 +392,7 @@ function modPanel() {
 					throw new Exception("Invalid username!");
 				}
 				$user_data = $system->db_fetch($result);
-				if($user_data['staff_level'] >= $player->staff_level and $player->staff_level != SystemFunctions::SC_HEAD_ADMINISTRATOR) {
+				if($user_data['staff_level'] >= $player->staff_level and $player->staff_level != System::SC_HEAD_ADMINISTRATOR) {
 					throw new Exception("You cannot unban fellow staff members!");
 				}
 				if(!$user_data['ban_type']) {
@@ -477,7 +477,7 @@ function modPanel() {
 					throw new Exception("Invalid username!");
 				}
 				$user_data = $system->db_fetch($result);
-				if($user_data['staff_level'] >= $player->staff_level and $player->staff_level != SystemFunctions::SC_HEAD_ADMINISTRATOR) {
+				if($user_data['staff_level'] >= $player->staff_level and $player->staff_level != System::SC_HEAD_ADMINISTRATOR) {
 					throw new Exception("You cannot unban fellow staff members!");
 				}
 				// Build query
@@ -654,7 +654,7 @@ function modPanel() {
 					<td><a href='{$system->links['members']}&user={$user['user_name']}'>" . $user['user_name'] . "</a></td>
 					<td>" . ($user['failed_logins'] >= 5 ? 'Full' : 'Partial') . "</td>
 					<td>";
-					if($player->staff_level >= SystemFunctions::SC_HEAD_MODERATOR) {
+					if($player->staff_level >= System::SC_HEAD_MODERATOR) {
 						echo "<a href='$self_link&view=locked_out_users&unlock_account={$user['user_id']}'>Unlock</a>";
 					}
 					else {
@@ -748,7 +748,7 @@ function modPanel() {
 		</td></tr>";
 		echo "</table>";	
 		// HM actions
-		if($player->staff_level >= SystemFunctions::SC_HEAD_MODERATOR) {
+		if($player->staff_level >= System::SC_HEAD_MODERATOR) {
 			echo "<br />
 			<table class='table'><tr><th colspan='2'>Head Moderator actions</th></tr>
 			<tr><th style='width:50%;'>Unban user</th>

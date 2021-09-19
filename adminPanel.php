@@ -14,7 +14,7 @@ function adminPanel() {
     global $id;
     global $RANK_NAMES;
     // Staff level check
-    if($player->staff_level < SystemFunctions::SC_ADMINISTRATOR) {
+    if($player->staff_level < System::SC_ADMINISTRATOR) {
         return false;
     }
     /* $pattern = '/[0-9]+\.[0-9]+/';
@@ -2113,12 +2113,12 @@ function adminPanel() {
             */
         /* Variables */
         $variables =& $edit_user_variables;
-        if($player->staff_level >= SystemFunctions::SC_HEAD_ADMINISTRATOR) {
+        if($player->staff_level >= System::SC_HEAD_ADMINISTRATOR) {
             $variables['staff_level'] = [
                 'data_type' => 'int',
                 'input_type' => 'radio',
-                'options' => [0 => 'normal_user', SystemFunctions::SC_MODERATOR => 'moderator', SystemFunctions::SC_HEAD_MODERATOR => 'head moderator',
-                    SystemFunctions::SC_ADMINISTRATOR => 'administrator', SystemFunctions::SC_HEAD_ADMINISTRATOR => 'head administrator'],
+                'options' => [0 => 'normal_user', System::SC_MODERATOR => 'moderator', System::SC_HEAD_MODERATOR => 'head moderator',
+                    System::SC_ADMINISTRATOR => 'administrator', System::SC_HEAD_ADMINISTRATOR => 'head administrator'],
             ];
         }
         // Validate user name
@@ -2238,7 +2238,7 @@ function adminPanel() {
                 $result = $system->db_fetch($result);
                 $user_id = $result['user_id'];
                 $user_name = $result['user_name'];
-                if($result['staff_level'] >= SystemFunctions::SC_ADMINISTRATOR && $player->staff_level < SystemFunctions::SC_HEAD_ADMINISTRATOR) {
+                if($result['staff_level'] >= System::SC_ADMINISTRATOR && $player->staff_level < System::SC_HEAD_ADMINISTRATOR) {
                     throw new Exception("You cannot delete other admins!");
                 }
                 if(!isset($_POST['confirm'])) {
