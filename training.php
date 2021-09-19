@@ -150,17 +150,16 @@ function training() {
 			Takes 10 minutes or more depending on the jutsu level, gives {$jutsu_train_gain} level" . ($jutsu_train_gain > 1 ? 's' : '') . ".</p>
 		</td></tr>";
 	if($player->train_time) {
-		require_once("functions.php");
 		echo "<tr><th colspan='3'>Currently Training</th></tr>
 		<tr><td colspan='3' style='text-align:center'>";
 		if(strpos($player->train_type, 'jutsu:') !== false) {
 			$train_type = str_replace('jutsu:', '', $player->train_type);
 			echo "Currently training: " . ucwords(str_replace('_', ' ', $train_type)) . "<br />" .
-			timeRemaining($player->train_time - time(), 'short', false, true) . " remaining";
+			SystemFunctions::timeRemaining($player->train_time - time(), 'short', false, true) . " remaining";
 		}
 		else  {
 			echo "Currently training: " . ucwords(str_replace('_', ' ', $player->train_type)) . "<br />" .
-			timeRemaining($player->train_time - time(), 'short', false, true) . " remaining";
+			SystemFunctions::timeRemaining($player->train_time - time(), 'short', false, true) . " remaining";
 		}
 		echo "<br />
 		<br /><a href='$self_link&cancel_training=1'>Cancel Training</a>";

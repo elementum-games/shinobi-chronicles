@@ -25,7 +25,10 @@ function userSettings() {
 	  $layouts[] = 'cextralite';
 	}
 
-	if($_POST['change_avatar']) {
+	require_once "profile.php";
+	renderProfileSubmenu();
+
+	if(!empty($_POST['change_avatar'])) {
 		$avatar_link = trim($_POST['avatar_link']);
 		try {
 			if($player->avatar_ban) {
@@ -63,7 +66,7 @@ function userSettings() {
 		}
 		$system->printMessage();
 	}
-	else if($_POST['change_password']) {
+	else if(!empty($_POST['change_password'])) {
 		$password = trim($_POST['current_password']);
 		$new_password = trim($_POST['new_password']);
 		$confirm_password = trim($_POST['confirm_new_password']);
@@ -114,7 +117,7 @@ function userSettings() {
 		}
 		$system->printMessage();
 	}
-	else if($_POST['change_song']) {
+	else if(!empty($_POST['change_song'])) {
 		$profile_song = trim($_POST['profile_song']);
 		try {
 			if($player->song_ban) {
@@ -136,7 +139,7 @@ function userSettings() {
 		}
 		$system->printMessage();
 	}
-	else if($_POST['change_journal']) {
+	else if(!empty($_POST['change_journal'])) {
 		$journal = $system->clean(trim($_POST['journal']));
 		try {
 			if($player->journal_ban) {
@@ -156,7 +159,7 @@ function userSettings() {
 		}
 		$system->printMessage();
 	}
-	else if($_POST['blacklist_add'] or $_POST['blacklist_remove']) {
+	else if(!empty($_POST['blacklist_add']) or !empty($_POST['blacklist_remove'])) {
 		$blacklist_username = $system->clean(trim($_POST['blacklist_name']));
 		$result = $system->query("SELECT `user_id`, `user_name`, `staff_level` FROM `users` WHERE `user_name`='{$blacklist_username}'");
 		try {
@@ -194,7 +197,7 @@ function userSettings() {
 		}
 		$system->printMessage();
 	}
-	else if($user_remove = $_GET['blacklist_remove']) {
+	else if($user_remove = $_GET['blacklist_remove'] ?? null) {
 		$user_remove = abs((int) $user_remove);
 
 		try {
@@ -214,8 +217,7 @@ function userSettings() {
 		}
 		$system->printMessage();
 	}
-
-	else if($_POST['change_layout']) {
+	else if(!empty($_POST['change_layout'])) {
 		$layout = $system->clean($_POST['layout']);
 		if(array_search($layout, $layouts) === false) {
 			$layout = null;

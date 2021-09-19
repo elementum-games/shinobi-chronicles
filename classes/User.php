@@ -211,6 +211,9 @@ class User {
      * @var mixed
      */
     public $last_ai;
+	
+    public $last_free_stat_change;
+
     /**
      * @var mixed
      */
@@ -413,6 +416,7 @@ class User {
 		}
 
 		$this->last_ai = $user_data['last_ai'];
+		$this->last_free_stat_change = $user_data['last_free_stat_change'];
 		$this->last_pvp = $user_data['last_pvp'];
 		$this->last_death = $user_data['last_death'];
 
@@ -867,12 +871,11 @@ class User {
 				}
 			}
 			else {
-				require_once("functions.php");
         //*setTimeout is used to notify training finished*//
 				if(strpos($this->train_type, 'jutsu:') !== false) {
 					$train_type = str_replace('jutsu:', '', $this->train_type);
 					$display .= "<p class='trainingNotification'>Training: " . ucwords(str_replace('_', ' ', $train_type)) . "<br />" .
-					"<span id='trainingTimer'>" . timeRemaining($this->train_time - time(), 'short', false, true) . " remaining</span></p>";
+					"<span id='trainingTimer'>" . SystemFunctions::timeRemaining($this->train_time - time(), 'short', false, true) . " remaining</span></p>";
 					$display .= "<script type='text/javascript'>
 					let train_time = " . ($this->train_time - time()) . ";
           setTimeout(()=>{titleBarFlash();}, train_time * 1000);
@@ -881,7 +884,7 @@ class User {
 				else  {
           //*setTimeout is used to notify training finished*//
 					$display .= "<p class='trainingNotification'>Training: " . ucwords(str_replace('_', ' ', $this->train_type)) . "<br />" .
-						"<span id='trainingTimer'>" . timeRemaining($this->train_time - time(), 'short', false, true) . " remaining</span></p>";
+						"<span id='trainingTimer'>" . SystemFunctions::timeRemaining($this->train_time - time(), 'short', false, true) . " remaining</span></p>";
 					$display .= "<script type='text/javascript'>
 					let train_time = " . ($this->train_time - time()) . ";
           setTimeout(()=>{titleBarFlash();}, train_time * 1000);
@@ -1336,7 +1339,6 @@ class User {
 		`avatar_link` = '$this->avatar_link',
 		`profile_song` = '$this->profile_song',
 		`global_message_viewed` = '$this->global_message_viewed',
-
 		`gender` = '$this->gender',
 		`village` = '$this->village',
 		`level` = '$this->level',
@@ -1348,9 +1350,7 @@ class User {
 		`chakra` = '$this->chakra',
 		`max_chakra` = '$this->max_chakra',
 		`regen_rate` = '$this->regen_rate',
-
 		`stealth` = '$this->stealth',
-
 		`exp` = '$this->exp',
 		`bloodline_id` = '$this->bloodline_id',
 		`bloodline_name` = '$this->bloodline_name',";
@@ -1385,6 +1385,7 @@ class User {
 		}
 
 		$query .= "`last_ai` = '$this->last_ai',
+		`last_free_stat_change` = '{$this->last_free_stat_change}',
 		`last_pvp` = '$this->last_pvp',
 		`last_death` = '$this->last_death',";
 
@@ -1403,28 +1404,22 @@ class User {
 		`train_type` = '$this->train_type',
 		`train_gain` = '$this->train_gain',
 		`train_time` = '$this->train_time',
-
 		`money` = '$this->money',
 		`premium_credits` = '$this->premium_credits',
-
 		`pvp_wins` = '$this->pvp_wins',
 		`pvp_losses` = '$this->pvp_losses',
 		`ai_wins` = '$this->ai_wins',
 		`ai_losses` = '$this->ai_losses',
 		`monthly_pvp` = '$this->monthly_pvp',
-
 		`elements` = '$elements',
-
 		`ninjutsu_skill` = '$this->ninjutsu_skill',
 		`genjutsu_skill` = '$this->genjutsu_skill',
 		`taijutsu_skill` = '$this->taijutsu_skill',
 		`bloodline_skill` = '$this->bloodline_skill',
-
 		`cast_speed` = '$this->cast_speed',
 		`speed` = '$this->speed',
 		`intelligence` = '$this->intelligence',
 		`willpower` = '$this->willpower',
-
 		`village_changes` = '$this->village_changes',
 		`clan_changes` = '$this->clan_changes'
 		WHERE `user_id` = '{$this->user_id}' LIMIT 1";
