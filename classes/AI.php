@@ -82,7 +82,7 @@ class AI extends Fighter {
 
         $this->rank = $ai_data['rank'];
         $this->max_health = $ai_data['max_health'];
-        $this->health = 69;
+        $this->health = $this->max_health;
 
         $this->gender = "Male";
 
