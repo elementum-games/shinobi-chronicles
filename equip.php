@@ -353,10 +353,33 @@ function jutsu() {
 				throw new Exception("You cannot forget the parent of a jutsu you know!");
 			}
 
-			//Forgetting jutsu.
-			$jutsu_name = $player->jutsu[$jutsu_id]->name;
-			unset($player->jutsu[$jutsu_id]);
-			$system->message("You have forgot $jutsu_name!");
+            if($_POST['confirm_forget']) {
+                //Forgetting jutsu.
+                $jutsu_name = $player->jutsu[$jutsu_id]->name;
+                unset($player->jutsu[$jutsu_id]);
+                $system->message("You have forgotten $jutsu_name!");
+                $system->printMessage();
+                $page = '';
+            }
+            else {
+                echo "<table class='table'>
+					    <tr>
+					        <th>Forget Jutsu</th>
+                        </tr>
+					    <tr>
+					        <td style='text-align:center;'>
+						        Are you sure you want to forget {$player->jutsu[$jutsu_id]->name}?
+						        <br />
+                                <form action='$self_link&forget_jutsu={$jutsu_id}' method='post'>
+                                    <input type='hidden' name='confirm_forget' value='1' />
+                                    <button style='text-align:center' type='submit'>Forget</button>
+                                </form>
+					        </td>
+					    </tr>
+				    </table>";
+            }
+
+
 		}
 		catch (Exception $e) {
 			$system->message($e->getMessage());
@@ -415,7 +438,7 @@ function jutsu() {
 					echo "</p>";
 				}
 
-				echo "<p style='text-align:center'><a href='$self_link&forget_jutsu={$jutsu->id}'>Forget Jutsu!</a></p>";
+				echo "<p style='text-align:center'><a href='$self_link&view_jutsu={$jutsu->id}&forget_jutsu={$jutsu->id}'>Forget Jutsu!</a></p>";
 			echo "</td></tr>";
 		}
 	}
