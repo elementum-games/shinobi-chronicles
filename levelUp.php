@@ -643,7 +643,7 @@ function rankUp() {
 				$_SESSION['battle_page'] = $id;
 				$player->battle_id = -1;
 				
-				$opponent = new AI($opponents[$exam_stage]);
+				$opponent = new AI($system, $opponents[$exam_stage]);
 				if($opponent) {
 					require("battleCore.php");
 					$winner = battleAI($player, $opponent);
@@ -714,7 +714,7 @@ function rankUp() {
 				
 				
 				$_SESSION['ai_id'] = $opponent_id;
-				$opponent = new AI($opponent_id);
+				$opponent = new AI($system, $opponent_id);
 				if($opponent) {
 					require("battleCore.php");
 					$winner = battleAI($player, $opponent);
