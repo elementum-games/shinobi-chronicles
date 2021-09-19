@@ -155,8 +155,8 @@ class Battle {
                 '{$json_empty_array}',
                 '{$json_empty_array}',
                 '',
-                {$json_empty_array},
-                {$json_empty_array},
+                '{$json_empty_array}',
+                '{$json_empty_array}',
                 ''
                 )"
         );
