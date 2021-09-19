@@ -106,7 +106,7 @@ class Battle {
     public static function start(
         SystemFunctions $system, Fighter $player1, Fighter $player2, int $battle_type
     ) {
-        $json_empty_array = '"[]"';
+        $json_empty_array = '[]';
 
         switch($battle_type) {
             case self::TYPE_AI_ARENA:

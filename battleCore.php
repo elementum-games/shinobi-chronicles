@@ -795,11 +795,11 @@ function battlePvP(&$player, &$opponent, &$battle) {
 	$battle_text = '';
 
 	// Create p1 and p2 references
-	if($player->user_id == $battle['player1']) {
+	if($player->id == $battle['player1']) {
 		$player1 =& $player;
 		$player2 =& $opponent;
 	}
-	else if($player->user_id == $battle['player2']) {
+	else if($player->id == $battle['player2']) {
 		$player2 =& $player;
 		$player1 =& $opponent;
 	}

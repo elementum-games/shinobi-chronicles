@@ -21,23 +21,29 @@ function battle() {
 			$player->battle_id = 0;
 			return false;
 		}
-		$battle = $system->db_fetch($result);
-		if($player->user_id == $battle['player1']) {
-			$opponent = new User($battle['player2']);
-			$battle['player_side'] = 'player1';
-			$battle['opponent_side'] = 'player2';
-		}
-		else if($player->user_id == $battle['player2']) {
-			$opponent = new User($battle['player1']);
-			$battle['player_side'] = 'player2';
-			$battle['opponent_side'] = 'player1';
-		}
-		else {
-			$system->message("Invalid battle! - p1/p2 check");
-			$system->printMessage();
-			$player->battle_id = 0;
-			return false;
-		}
+
+		try {
+            $battle = $system->db_fetch($result);
+            if($player->id == $battle['player1']) {
+                $opponent = User::fromEntityId($battle['player2']);
+                $battle['player_side'] = 'player1';
+                $battle['opponent_side'] = 'player2';
+            }
+            else if($player->id == $battle['player2']) {
+                $opponent = User::fromEntityId($battle['player1']);
+                $battle['player_side'] = 'player2';
+                $battle['opponent_side'] = 'player1';
+            }
+            else {
+               throw new Exception("Invalid battle! - p1/p2 check");
+            }
+        } catch(Exception $e) {
+            $system->message($e->getMessage());
+            $system->printMessage();
+            $player->battle_id = 0;
+            return false;
+        }
+
 		$opponent->loadData(1);
 		$winner = battlePvP($player, $opponent, $battle);
 		if($winner !== false) {
