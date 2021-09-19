@@ -64,6 +64,7 @@ a:hover{
 #menu{
 	display: grid;
 	grid-template-columns: 1fr 1fr 1fr;
+	height: auto;
 }
 
 .buttonList a{
@@ -172,6 +173,12 @@ a:hover{
 	height: auto;
 }
 
+ul.submenu{
+	display: grid;
+	grid-template-columns: repeat(3, 1fr);
+	/* grid-column-gap: 0.25fr; */
+}
+
 .submenu{
 	display: inline-block;
 	text-align: center;
@@ -182,14 +189,14 @@ a:hover{
 	display: block;
 	text-align: center;
 	width: 90% !important;
-	margin: 1em auto;
+	margin: 0.5em auto;
 	list-style: none;
-	padding: 0.2em 0em;
+	/* padding: 0.2em 0em; */
 }
 .submenu li a{
 	display: block;
-	width: 50%;
-	padding: 1em 0.5em;
+	width: 100%;
+	padding: 0.5em 0.3em;
 	margin: 0em auto;
 	text-decoration: none;
 	background: linear-gradient(0deg, rgba(40,40,40,1) 0%, rgba(62,62,62,1) 38%, rgba(40,40,40,1) 100%);
@@ -203,7 +210,8 @@ a:hover{
 	display: block;
 	width: 95%;
 	margin: 1em auto 6em auto;
-	background-color: rgba(27, 56, 31, 1);
+	/* background-color: rgba(27, 56, 31, 1);*/ /*green*/
+	background-color: rgba(79, 33, 29, 1); /*red*/
 	border-radius: 20px 20px 10px 10px;
 
 	overflow: scroll;
@@ -456,13 +464,19 @@ a:hover{
 /*Equipment*/
 #jutsu_scrolls div{
 	display: grid;
-	width: 100%;
+	/* width: 100%; */
 	overflow: scroll;
 
-	grid-template-columns: 1fr 1fr;
-	grid-template-rows: repeat(5, 1fr);
-	justify-items: start;
+	margin-left: 0.2em !important; /*override default div styling*/
+	margin: 1em 0em;
+
+	grid-template-columns: auto auto;
+	grid-template-rows: repeat(auto-fill, auto);
+
 	grid-column-gap: 0.5em;
+	grid-row-gap: 0.3em;
+	justify-items: start;
+	text-align: left !important;
 }
 
 #jutsu_scrolls br{
@@ -471,8 +485,12 @@ a:hover{
 
 #jutsu_scrolls p{
 	display: block;
-	width: auto;
-	text-align: center !important;
+	width: auto !important; /*//overwrites the inline for jutsu descriptions */
+	/* text-align: center !important; */
+}
+
+#jutsu_scrolls a{
+	text-align: center;
 }
 
 /*Travel Page*/
