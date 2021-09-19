@@ -279,9 +279,8 @@ a:hover{
 .table tbody{
 	display: inline-block;
 	margin: 0px auto;
-	/* width: 100%; */
-	width: auto;
-	font-size: 1em;
+	width: 100%;
+	font-size: 0.90em;
 }
 .table tr{
 	margin: 0.2em 0.3em;
@@ -440,11 +439,67 @@ a:hover{
 	color: black;
 	font-size: 0.65em;
 	padding: 0.15em 0em !important;
+	border-radius: 0px !important;
 }
 
 #jutsu input{
-	padding: 0.8em 0.3em;
-	border-radius: 10px 10px 10px 10px;
+	padding: 0.3em 0.1em;
+	/* border-radius: 5px; */
+}
+
+#jutsu span{
+	/* border-radius: 5px; */
+	margin: 0.1em 0.5em;
+	/* padding: 0.5em 0.2em; */
+}
+
+/*Equipment*/
+#jutsu_scrolls div{
+	display: grid;
+	width: 100%;
+	overflow: scroll;
+
+	grid-template-columns: 1fr 1fr;
+	grid-template-rows: repeat(5, 1fr);
+	justify-items: start;
+	grid-column-gap: 0.5em;
+}
+
+#jutsu_scrolls br{
+	display: none;
+}
+
+#jutsu_scrolls p{
+	display: block;
+	width: auto;
+	text-align: center !important;
+}
+
+/*Travel Page*/
+#scoutTable .scrollable{
+	overflow: scroll;
+}
+
+
+/*Table Custom CSS*/
+/* //multiple columns of about 5 item */
+.table_multicolumns{
+	display: grid;
+	grid-template-columns: 1fr 0.75fr 0.5fr 0.5fr 0.3fr;
+	grid-template-rows: 1fr;
+
+	align-items: center;
+
+	font-size: 0.75em;
+}
+
+.table_multicolumns td{
+	width: 100% !important;
+	height: auto;
+	margin: auto 0em;
+	padding: 0em;
+	justify-content: center;
+	background-color: transparent !important;
 }
 
 /* #jutsu{
@@ -455,7 +510,6 @@ a:hover{
 	display: inline-block;
 	width: 25%!important;
 } */
-
 
 tbody{
 	display: block;
@@ -496,6 +550,8 @@ input{
 	margin: 0.2em 0em;
 	border-radius: 10px 10px 10px 10px;
 
+	background-color: white;
+
 	width: 100% !important;
 }
 
@@ -507,6 +563,8 @@ form{
 
 textarea{
 	width: 100% !important;
+
+	background-color: white;
 }
 
 th{
@@ -525,6 +583,8 @@ select{
 	padding: 0.2em 0.2em;
 	width: 80%;
 	font-size: 1em;
+
+	background-color: white;
 }
 
 .systemMessage{

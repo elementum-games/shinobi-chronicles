@@ -276,7 +276,7 @@ function store() {
 				}
 				$count++;
 
-				echo "<tr>
+				echo "<tr class='table_multicolumns'>
 					<td style='width:30%;'><a href='$self_link&view=jutsu&view_jutsu=$id'>{$jutsu['name']}</a></td>
 					<td style='width:25%;text-align:center;'>" . ucwords(str_replace('_', ' ', $jutsu['effect'])) . "</td>
 					<td style='width:25%;text-align:center;'>" . ucwords(str_replace('_', ' ', $jutsu['jutsu_type'])) . "</td>
@@ -338,7 +338,7 @@ function store() {
 					$owned = 0;
 				}
 
-				echo "<tr style='text-align:center;'>
+				echo "<tr class='table_multicolumns' style='text-align:center;'>
 					<td style='width:35%;'>{$item['name']}" .
 					($owned ? "<br />(Owned: $owned/$max_consumables)" : "") .
 					"</td>
