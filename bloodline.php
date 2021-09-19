@@ -16,6 +16,10 @@ function bloodline() {
 	}
 	$base_bloodline = new Bloodline($player->bloodline_id);
 	$player->getInventory();
+
+    require_once "profile.php";
+    renderProfileSubmenu();
+
 	// Learn jutsu
 	if(isset($_GET['learn_jutsu'])) {
 		$jutsu_id = (int)$_GET['learn_jutsu'];

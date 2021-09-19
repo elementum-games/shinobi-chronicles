@@ -14,6 +14,10 @@ class SystemFunctions {
     const MENU_ACTIVITY = 'activity';
     const MENU_VILLAGE = 'village';
 
+    const NOT_IN_VILLAGE = 0;
+    const IN_VILLAGE_OKAY = 1;
+    const ONLY_IN_VILLAGE = 2;
+
     const SC_MODERATOR = 1;
     const SC_HEAD_MODERATOR = 2;
     const SC_ADMINISTRATOR = 3;
@@ -71,7 +75,22 @@ class SystemFunctions {
         )
     );
 
-    public $links = [];
+    // Keep in sync with pages.php
+    const PAGE_IDS = [
+        'profile' => 1,
+        'settings' => 3,
+        'members' => 6,
+        'bloodline' => 10,
+        'arena' => 12,
+        'mod' => 16,
+        'admin' => 17,
+        'report' => 18,
+        'battle' => 19,
+        'spar' => 22,
+        'mission' => 14,
+        'rankup' => 25,
+    ];
+    public array $links = [];
 
     //Chat variables
     const CHAT_MAX_POST_LENGTH = 350;
@@ -110,17 +129,11 @@ class SystemFunctions {
 
         $this->register_open = isset($register_open) ? $register_open : false;
         $this->SC_OPEN = isset($SC_OPEN) ? $SC_OPEN : false;
-        
-        $this->links = [
-            'profile' => $this->link . '?id=1',
-            'members' => $this->link . '?id=6',
-            'mod' => $this->link . '?id=16',
-            'admin' => $this->link . '?id=17',
-            'report' => $this->link . '?id=18',
-            'battle' => $this->link . '?id=19',
-            'spar' => $this->link . '?id=22',
-            'mission' => $this->link . '?id=23',
-        ];
+
+        $this->links = [];
+        foreach(self::PAGE_IDS as $slug => $id) {
+            $this->links[$slug] = $this->link . '?id=' . $id;
+        }
     }
 
     /* function dbConnect()
@@ -595,6 +608,20 @@ class SystemFunctions {
         echo str_replace('<!--[VERSION_NUMBER]-->', SystemFunctions::VERSION_NUMBER, $footer);
     }
 
+    /**
+     * @param string $entity_id
+     * @return EntityId
+     * @throws Exception
+     */
+    public static function parseEntityId(string $entity_id): EntityId {
+        $arr = explode(':', $entity_id);
+        if(count($arr) != 2) {
+            throw new Exception("Invalid entity id {$entity_id}!");
+        }
+
+        return new EntityId($arr[0], (int)$arr[1]);
+    }
+
     public static function diminishing_returns($val, $scale) {
         if($val < 0) {
             return -self::diminishing_returns(-$val, $scale);
@@ -602,5 +629,86 @@ class SystemFunctions {
         $mult = $val / $scale;
         $trinum = (sqrt(8.0 * $mult + 1.0) - 1.0) / 2.0;
         return $trinum * $scale;
+    }
+
+    public static function timeRemaining($time_remaining, $format = 'short', $include_days = true, $include_seconds = true): string {
+        if($include_days) {
+            $days = floor($time_remaining / 86400);
+            $time_remaining -= $days * 86400;
+        }
+        else {
+            $days = null;
+        }
+
+        $hours = floor($time_remaining / 3600);
+        $time_remaining -= $hours * 3600;
+
+        if($include_seconds) {
+            $minutes = floor($time_remaining / 60);
+            $time_remaining -= $minutes * 60;
+
+            $seconds = $time_remaining;
+        }
+        else {
+            $minutes = ceil($time_remaining / 60);
+        }
+
+        if($hours < 10 && $format == 'short') {
+            $hours = '0' . $hours;
+        }
+        if($minutes < 10 && $format == 'short') {
+            $minutes = '0' . $minutes;
+        }
+        if($include_seconds && $seconds < 10 && $format == 'short') {
+            $seconds = '0' . $seconds;
+        }
+
+        $string = '';
+        if($format == 'long') {
+            if($days && $include_days) {
+                $string = "$days day(s), $hours hour(s), $minutes minute(s)";
+            }
+            else if($hours && $hours != '00') {
+                $string = "$hours hour(s), $minutes minute(s)";
+            }
+            else {
+                $string = "$minutes minute(s)";
+            }
+
+            if($include_seconds) {
+                $string .= ", $seconds seconds";
+            }
+        }
+        else if($format == 'short') {
+            if($days) {
+                $string = "$days day(s), $hours:$minutes";
+            }
+            else if($hours && $hours != '00') {
+                $string = "$hours:$minutes";
+            }
+            else {
+                $string = "$minutes";
+            }
+
+            if($include_seconds) {
+                $string .= ":$seconds";
+            }
+        }
+        return $string;
+    }
+}
+
+class EntityId {
+    public string $entity_type;
+    public int $id;
+
+    /**
+     * EntityId constructor.
+     * @param string $entity_type
+     * @param int    $id
+     */
+    public function __construct(string $entity_type, int $id) {
+        $this->entity_type = $entity_type;
+        $this->id = $id;
     }
 }

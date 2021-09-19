@@ -70,8 +70,9 @@ function members() {
 				$avatar_size = '175px';
 			}
 			echo "<table class='table'>
-			<tr><th colspan='2'>View Profile</th>
-			<tr><td colspan='2' style='text-align:center;'>";
+			<tr><th colspan='2'>View Profile</th>";
+
+			echo "<tr><td colspan='2' style='text-align:center;'>";
 				// Online/activity display
 				if($viewUser->last_active > time() - 120) {
 					echo "<span style='font-weight:bold;color:#00C000;'>Online</span>";
@@ -85,8 +86,7 @@ function members() {
 				echo "<br />";
 				$last_active = time() - $viewUser->last_active;
 				if($player->staff_level >= SystemFunctions::SC_MODERATOR) {
-					require_once("functions.php");
-					echo "(Last active " . timeRemaining($last_active, 'long') . " ago)";
+					echo "(Last active " . SystemFunctions::timeRemaining($last_active, 'long') . " ago)";
 				}
 				else {
 					$days = floor($last_active / 86400);
@@ -149,6 +149,22 @@ function members() {
 				</audio>";
 			}*/
 
+			//send message/money/ak
+			echo "<tr style='text-align:center;'><td style='text-align:center;' colspan='2'>
+			<a href='{$system->link}?id=2&page=new_message&sender={$viewUser->user_name}'>Send Message</a>";
+
+			if($player->rank > 1) {
+                echo "&nbsp;&nbsp;|&nbsp;&nbsp;<a href='{$system->links['profile']}&page=send_money&recipient={$viewUser->user_name}'>Send Money</a>";
+                echo "&nbsp;&nbsp;|&nbsp;&nbsp;<a href='{$system->links['profile']}&page=send_ak&recipient={$viewUser->user_name}'>Send AK</a>";
+            }
+			if($viewUser->rank >= 3 && $player->team) {
+				if($player->user_id == $player->team['leader'] && !$viewUser->team && !$viewUser->team_invite &&
+				$player->village == $viewUser->village) {
+					echo "&nbsp;&nbsp; |  &nbsp;&nbsp;
+					<a href='{$system->link}?id=24&invite=1&user_name=$viewUser->user_name'>Invite to Team</a>";
+				}
+			}
+
 			if($journal) {
 				if(strpos($journal, "\n") === false) {
 					$journal = wordwrap($journal, 100, "\r\n", true);
@@ -163,23 +179,16 @@ function members() {
 				echo "<tr><th colspan='2'>Journal</th></tr>
 				<tr><td colspan='2' style='white-space:pre-wrap;'>" . $journal . "</td></tr>";
 			}
-			echo "<tr><td style='text-align:center;' colspan='2'>
-			<a href='{$system->link}?id=2&page=new_message&sender={$viewUser->user_name}'>Send Message</a>
-			&nbsp;&nbsp; |  &nbsp;&nbsp; 
-			<a href='{$system->links['report']}&report_type=1&content_id=$viewUser->user_id'>Report Profile/Journal</a>";
 
-			if($player->rank > 1) {
-                echo "&nbsp;&nbsp;|&nbsp;&nbsp;<a href='{$system->links['profile']}&page=send_money&recipient={$viewUser->user_name}'>Send Money</a>";
-                echo "&nbsp;&nbsp;|&nbsp;&nbsp;<a href='{$system->links['profile']}&page=send_ak&recipient={$viewUser->user_name}'>Send AK</a>";
-            }
-			if($viewUser->rank >= 3 && $player->team) {
-				if($player->user_id == $player->team['leader'] && !$viewUser->team && !$viewUser->team_invite && 
-				$player->village == $viewUser->village) {
-					echo "&nbsp;&nbsp; |  &nbsp;&nbsp; 
-					<a href='{$system->link}?id=24&invite=1&user_name=$viewUser->user_name'>Invite to Team</a>";
-				}
-			}
-			
+			//report player
+			echo
+			"
+			<tr>
+				<td style='text-align: center;'colspan='2'>
+					<a href='{$system->links['report']}&report_type=1&content_id=$viewUser->user_id'>Report Profile/Journal</a>
+				</td>
+			</tr>
+			";
 			echo "</td></tr></table>";
 
 			if($player->staff_level >= SystemFunctions::SC_MODERATOR) {
@@ -220,22 +229,22 @@ function members() {
 						$result = $system->query("SELECT `time` FROM `chat` WHERE `user_name`='{$viewUser->user_name}' ORDER BY `post_id` DESC LIMIT 1");
 						if($system->db_num_rows > 0) {
 							$last_post = $system->db_fetch($result)['time'];
-							echo "Last chat post: " . timeRemaining(time() - $last_post, 'long') . " ago<br />";
+							echo "Last chat post: " . SystemFunctions::timeRemaining(time() - $last_post, 'long') . " ago<br />";
 						}
 						
 						// Last AI
-						echo "Last AI battle started: " . timeRemaining(time() - $viewUser->last_ai, 'short') . " ago<br />";
+						echo "Last AI battle started: " . SystemFunctions::timeRemaining(time() - $viewUser->last_ai, 'short') . " ago<br />";
 						
 						// Current training
 						$display = '';
 						if(strpos($viewUser->train_type, 'jutsu:') !== false) {
 							$train_type = str_replace('jutsu:', '', $viewUser->train_type);
 							$display = "<br />Training: " . ucwords(str_replace('_', ' ', $train_type)) . "<br />" .
-								timeRemaining($viewUser->train_time - time(), 'short', false, true) . " remaining";
+								SystemFunctions::timeRemaining($viewUser->train_time - time(), 'short', false, true) . " remaining";
 						}
 						else  {
 							$display = "<br />Training: " . ucwords(str_replace('_', ' ', $viewUser->train_type)) . "<br />" .
-								timeRemaining($viewUser->train_time - time(), 'short', false, true) . " remaining";
+								SystemFunctions::timeRemaining($viewUser->train_time - time(), 'short', false, true) . " remaining";
 						}
 						echo $display;
 					}

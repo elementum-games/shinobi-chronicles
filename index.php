@@ -301,48 +301,36 @@ if($LOGGED_IN) {
 		}
 		$system->log('player_action', $player->user_name, $log_contents);
 	}
+
 	// Pre-content display
 	if($player_display) {
 		echo $player_display;
 	}
 	$page_loaded = false;
+
 	if(isset($_GET['id'])) {
 		$id = (int)$_GET['id'];
 		try {
 			if(!isset($pages[$id])) {
 				throw new Exception("");
 			}
-			// Unset battle ID if AI battle is not in session
-			if($player->battle_id == -1 && !isset($_SESSION['ai_id'])) {
-				$player->battle_id = 0;
-			}
+
 			// Check for battle if page is restricted
 			if(isset($pages[$id]['battle_ok']) && $pages[$id]['battle_ok'] == false) {
-				if(isset($_SESSION['ai_id']) || $player->battle_id) {
+				if($player->battle_id) {
 					throw new Exception("You cannot visit this page while in battle!");
 				}
 			}
+
 			//Check for survival mission restricted
 			if(isset($pages[$id]['survival_ok']) && $pages[$id]['survival_ok'] == false) {
 				if(isset($_SESSION['ai_defeated']) && $player->mission_stage['action_type'] == 'combat') {
 					throw new Exception("You cannot move while under attack!");
 				}
 			}
-			// Check for PvP battle/AI type if page is restricted
-			if(isset($pages[$id]['pvp_ok']) && $pages[$id]['pvp_ok'] == false) {
-				// PvP
-				if($player->battle_id > 0) {
-					throw new Exception("You cannot visit this page while in a PvP battle!");
-				}
-				else if($player->battle_id == -1 && $_SESSION['battle_page'] != $id) {
-					throw new Exception("You cannot visit this page while in combat!");
-				}
-			}
+
 			// Check for spar/fight PvP type, stop page if trying to load spar/battle while in AI battle
 			if(isset($pages[$id]['battle_type'])) {
-				if($player->battle_id == -1) {
-					throw new Exception("You cannot access this page while in an AI battle!");
-				}
 				$result = $system->query("SELECT `battle_type` FROM `battles` WHERE `battle_id`='$player->battle_id' LIMIT 1");
 				if($system->db_num_rows > 0) {
 					$battle_type = $system->db_fetch($result)['battle_type'];
@@ -359,13 +347,14 @@ if($LOGGED_IN) {
 					throw new Exception("");
 				}
 			}
-			// Check for being in village is not okay/okay/required (0 / 1 / 2)
+
+			// Check for being in village is not okay/okay/required
 			if(isset($pages[$id]['village_ok'])) {
 				// Player is alllowed in up to rank 3, then must go outside village
-				if($player->rank > 2 && $pages[$id]['village_ok'] == 0 && isset($villages[$player->location])) {
+				if($player->rank > 2 && $pages[$id]['village_ok'] == SystemFunctions::NOT_IN_VILLAGE && isset($villages[$player->location])) {
 					throw new Exception("You cannot access this page while in a village!");
 				}
-				if($pages[$id]['village_ok'] == 2 && $player->location != $player->village_location) {
+				if($pages[$id]['village_ok'] == SystemFunctions::ONLY_IN_VILLAGE && $player->location != $player->village_location) {
 					throw new Exception("You must be in your village to access this page!");
 				}
 			}
@@ -374,11 +363,14 @@ if($LOGGED_IN) {
 					throw new Exception("You are not a high enough rank to access this page!");
 				}
 			}
+
 			// Page is okay
 			if(!$ajax || !isset($pages[$id]['ajax_ok']) ) {
 				echo str_replace("[HEADER_TITLE]", $pages[$id]['title'], $body_start);
 			}
+
 			$self_link = $system->link . '?id=' . $id;
+
 			$system->printMessage();
 			if($global_message) {
 				echo "<table class='table globalMessage'><tr><th>Global message</th></tr>
@@ -387,7 +379,10 @@ if($LOGGED_IN) {
 				<a class='link' href='{$self_link}&clear_message=1'>Dismiss</a>
 				</td></tr></table>";
 			}
-			require($pages[$id]['file_name']);
+
+            /** @noinspection PhpIncludeInspection */
+            require($pages[$id]['file_name']);
+
 			$pages[$id]['function_name']();
 			$page_loaded = true;
 		} catch (Exception $e) {
@@ -402,6 +397,7 @@ if($LOGGED_IN) {
 			}
 		}
 	}
+
 	if(!$page_loaded) {
 		echo str_replace("[HEADER_TITLE]", "News", $body_start);
 		$system->printMessage();
@@ -416,16 +412,14 @@ if($LOGGED_IN) {
 		news();
 	}
 	$player->updateData();
+
 	// Display side menu and footer
 	if(!$ajax) {
-		if($player->bloodline_id) {
-		    $pages[10]['menu'] = 'user';
-		}
 		if($player->clan) {
-		    $pages[20]['menu'] = 'user';
+		    $pages[20]['menu'] = SystemFunctions::MENU_VILLAGE;
 		}
 		if($player->rank >= 3) {
-		    $pages[24]['menu'] = 'user';
+		    $pages[24]['menu'] = SystemFunctions::MENU_USER;
 		}
 
 
@@ -445,7 +439,7 @@ if($LOGGED_IN) {
 					continue;
 				}
 				// Page ok if an in-village page or player rank is below chuunin
-				if($page['village_ok'] > 0 || $player->rank < 3) {
+				if($page['village_ok'] != SystemFunctions::NOT_IN_VILLAGE || $player->rank < 3) {
 					echo "<li><a href='{$system->link}?id=$id'>" . $page['title'] . "</a></li>";
 				}
 			}
@@ -455,8 +449,7 @@ if($LOGGED_IN) {
 				if(!isset($page['menu']) || $page['menu'] != 'activity') {
 					continue;
 				}
-				// Page ok if a non-village page or player rank is below chuunin
-				if($page['village_ok'] < 2) {
+				if($page['village_ok'] != SystemFunctions::ONLY_IN_VILLAGE) {
 					echo "<li><a href='{$system->link}?id=$id'>" . $page['title'] . "</a></li>";
 				}
 			}
@@ -482,9 +475,8 @@ if($LOGGED_IN) {
 			echo "<li><a href='{$system->link}?id=17'>Admin Panel</a></li>";
 		}
 		// Logout timer
-		require_once("functions.php");
 		$time_remaining = ($logout_limit * 60) - (time() - $player->last_login);
-		$logout_time = timeRemaining($time_remaining, 'short', false, true) . " remaining";
+		$logout_time = SystemFunctions::timeRemaining($time_remaining, 'short', false, true) . " remaining";
 		$logout_display = ($logout_display) ? $logout_display : $logout_time;
 		echo str_replace("<!--LOGOUT_TIMER-->", $logout_display, $side_menu_end);
 

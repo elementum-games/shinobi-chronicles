@@ -18,7 +18,7 @@ function scoutArea($in_existing_table = false) {
 	// Pagination
 	$users_per_page = 30;
 	$min = 0;
-	if($_GET['min']) {
+	if(!empty($_GET['min'])) {
 		$min = (int)$system->clean($_GET['min']);
 	}
 	

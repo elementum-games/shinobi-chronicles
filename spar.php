@@ -25,23 +25,28 @@ function spar() {
 			return false;
 		}
 		$battle = $system->db_fetch($result);
-		
-		if($player->user_id == $battle['player1']) {
-			$opponent = new User($battle['player2']);
-			$battle['player_side'] = 'player1';
-			$battle['opponent_side'] = 'player2';
-		}
-		else if($player->user_id == $battle['player2']) {
-			$opponent = new User($battle['player1']);
-			$battle['player_side'] = 'player2';
-			$battle['opponent_side'] = 'player1';
-		}
-		else {
-			$system->message("Invalid battle! - p1/p2 check");
-			$system->printMessage();
-			$player->battle_id = 0;
-			return false;
-		}
+
+		try {
+            if($player->id == $battle['player1']) {
+                $opponent = User::fromEntityId($battle['player2']);
+                $battle['player_side'] = 'player1';
+                $battle['opponent_side'] = 'player2';
+            }
+            else if($player->id == $battle['player2']) {
+                $opponent = User::fromEntityId($battle['player1']);
+                $battle['player_side'] = 'player2';
+                $battle['opponent_side'] = 'player1';
+            }
+            else {
+                throw new Exception("Invalid battle! - p1/p2 check");
+            }
+        }
+        catch (Exception $e) {
+            $system->printMessage($e->getMessage());
+            $player->battle_id = 0;
+            return false;
+        }
+
 		
 		$opponent->loadData(1);
 		$winner = battlePvP($player, $opponent, $battle);
@@ -113,39 +118,29 @@ function spar() {
 			if($challenge != $player->challenge) {
 				throw new Exception("Invalid challenge!");
 			}
+
+            try {
+                $user = new User($challenge);
+                $user->loadData(1, true);
+            } catch(Exception $e) {
+                throw new Exception("Invalid user! " . $e->getMessage());
+            }
 			
-			$result = $system->query("SELECT `user_id`, `user_name`, `village`, `location`, `battle_id`, `last_active` 
-				FROM `users` WHERE `user_id`='$challenge' LIMIT 1");
-			if($system->db_num_rows == 0) {
-				throw new Exception("Invalid user!");
-			}
-			$user = $system->db_fetch($result);
-			
-			/*
-			if($user['village'] != $player->village) {
-				throw new Exception("You cannot spar ninja from enemy villages!");
-			}
-			*/
-			
-			if($user['location'] != $player->location) {
+			if($user->location != $player->location) {
 				throw new Exception("Target is not at your location!");
 			}
 			
-			if($user['battle_id']) {
+			if($user->battle_id) {
 				throw new Exception("User is in battle!");
 			}
 			
-			if($user['last_active'] < time() - 120) {
+			if($user->last_active < time() - 120) {
 				throw new Exception("Target is inactive/offline!");
 			}
-			
-			$system->query("INSERT INTO `battles` (`battle_type`, `player1`, `player2`, `turn_time`) 
-				VALUES (2, $player->user_id, $challenge, " . (time() + 30) . ")");
-			$battle_id = $system->db_insert_id;
-			
-			$player->battle_id = $battle_id;
-			$player->challenge = 0;
-			$system->query("UPDATE `users` SET `battle_id`='$battle_id', `challenge`=0 WHERE `user_id`= $player->user_id OR `user_id` = $challenge LIMIT 2");
+
+            $player->challenge = 0;
+            Battle::start($system, $player, $user, Battle::TYPE_SPAR);
+
 			$system->message("You have accepted the challenge!<br />
 				<a class='link' href='$self_link'>To Battle</a>");
 			$system->printMessage();

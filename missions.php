@@ -261,7 +261,7 @@ function runActiveMission() {
 
             // Jonin exam
             if($mission->mission_id == 10) {
-                $_SESSION['exam_stage'] = 2;
+                $player->exam_stage = 2;
                 $self_link = $system->link . '?id=1';
 
                 require_once("levelUp.php");

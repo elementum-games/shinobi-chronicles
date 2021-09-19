@@ -13,23 +13,12 @@ function userProfile() {
 
 	global $player;
 	global $self_link;
-	
-	// Submenu
-	if($player->rank > 1) {				
-		echo "<div class='submenu'>
-		<ul class='submenu'>
-			<li style='width:25.5%;'><a href='{$self_link}'>Character</a></li>
-			<li style='width:25.5%;'><a href='{$self_link}&page=send_money'>Send Money</a></li>
-			<li style='width:25.5%;'><a href='{$self_link}&page=send_ak'>Send AK</a></li>
-        </ul>
-        </div>
-        <div class='submenuMargin'></div>
-		";
-	}
-	
-	
-	// Level up/rank up checks
-	$exp_needed = $player->exp_per_level * (($player->level + 1) - $player->base_level) + ($player->base_stats * 10);
+
+    // Submenu
+    renderProfileSubmenu();
+
+    // Level up/rank up checks
+	$exp_needed = $player->expForNextLevel();
 	
 	// Level up
 	if($player->level < $player->max_level && $player->exp >= $exp_needed) {
@@ -40,7 +29,7 @@ function userProfile() {
 		else {
 			require("levelUp.php");
 			levelUp();
-			$exp_needed = $player->exp_per_level * (($player->level + 1) - $player->base_level) + $player->base_exp;
+			$exp_needed = $player->expForNextLevel();
 		}
 	}
 	// Rank up
@@ -49,18 +38,20 @@ function userProfile() {
 			echo "<p style='text-align:center;font-style:italic;'>
 				You must be out of battle and in your village to rank up.</p>";
 		}
-		else if(!empty($_GET['rankup'])) {
-			require("levelUp.php");
-			rankUp();
-			return true;
-		}
 		else {
-			echo "<p style='text-align:center;font-size:1.1em;'>
-				<a style='text-decoration:none;' href='$self_link&rankup=1'>Take exam for the next rank</a>
+		    if($player->exam_stage) {
+		        $prompt = "Resume exam for the next rank";
+            }
+		    else {
+		        $prompt = "Take exam for the next rank";
+            }
+
+            echo "<p style='text-align:center;font-size:1.1em;'>
+				<a class='button' style='padding:5px 10px 4px;margin-bottom:0;text-decoration:none;' href='{$system->links['rankup']}'>{$prompt}</a>
 			</p>";
-		}
-	}	
-	
+        }
+	}
+
 	$page = 'profile';
 	if(isset($_GET['page'])) {
 		switch($_GET['page']) {
@@ -350,4 +341,48 @@ function userProfile() {
 		<label style='width:9.2em;'>Willpower:</label>" . sprintf("%.2f", $player->willpower) . "<br />
 		</td></tr></table>";
 	}
+}
+
+function renderProfileSubmenu() {
+    global $system;
+    global $player;
+    global $self_link;
+
+    $submenu_links = [
+        [
+            'link' => $system->links['profile'],
+            'title' => 'Character'
+        ],
+        [
+            'link' => $system->links['settings'],
+            'title' => 'Settings'
+        ],
+    ];
+    if($player->rank > 1) {
+        $submenu_links[] =  [
+            'link' => $system->links['profile'] . "&page=send_money",
+            'title' => 'Send Money'
+        ];
+        $submenu_links[] = [
+            'link' => $system->links['profile'] . "&page=send_ak",
+            'title' => 'Send AK'
+        ];
+    }
+    if($player->bloodline_id) {
+        $submenu_links[] = [
+            'link' => $system->links['bloodline'],
+            'title' => 'Bloodline'
+        ];
+    }
+
+    echo "<div class='submenu'>
+    <ul class='submenu'>";
+    $submenu_link_width = round(99.7 / count($submenu_links), 1);
+    foreach($submenu_links as $link) {
+        echo "<li style='width:{$submenu_link_width}%;'><a href='{$link['link']}'>{$link['title']}</a></li>";
+    }
+    echo "</ul>
+    </div>
+    <div class='submenuMargin'></div>
+    ";
 }
