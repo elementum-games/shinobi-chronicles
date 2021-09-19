@@ -353,7 +353,7 @@ function jutsu() {
 				throw new Exception("You cannot forget the parent of a jutsu you know!");
 			}
 
-            if($_POST['confirm_forget']) {
+            if(!empty($_POST['confirm_forget'])) {
                 //Forgetting jutsu.
                 $jutsu_name = $player->jutsu[$jutsu_id]->name;
                 unset($player->jutsu[$jutsu_id]);
