@@ -243,6 +243,10 @@ abstract class Fighter {
                 error_log("Invalid defense type! {$defense_type}");
         }
 
+        if($this instanceof AI && $defense_type == 'genjutsu') {
+            $defense *= 0.8;
+        }
+
         $damage = round($raw_damage / $defense, 2);
         if($damage < 0.0) {
             $damage = 0;
