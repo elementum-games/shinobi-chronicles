@@ -6,7 +6,7 @@ function arena() {
 	global $player;
 	global $self_link;
 
-	if(isset($_SESSION['exam_stage'])) {
+	if($player->exam_stage > 0) {
 		$system->message("You cannot access this page during the exam!");
 		$system->printMessage();
 		return false;

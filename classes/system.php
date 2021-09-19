@@ -88,6 +88,7 @@ class SystemFunctions {
         'battle' => 19,
         'spar' => 22,
         'mission' => 14,
+        'rankup' => 25,
     ];
     public array $links = [];
 

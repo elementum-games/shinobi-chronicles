@@ -13,12 +13,12 @@ function userProfile() {
 
 	global $player;
 	global $self_link;
-	
-	// Submenu
+
+    // Submenu
     renderProfileSubmenu();
 
-	// Level up/rank up checks
-	$exp_needed = $player->exp_per_level * (($player->level + 1) - $player->base_level) + ($player->base_stats * 10);
+    // Level up/rank up checks
+	$exp_needed = $player->expForNextLevel();
 	
 	// Level up
 	if($player->level < $player->max_level && $player->exp >= $exp_needed) {
@@ -29,7 +29,7 @@ function userProfile() {
 		else {
 			require("levelUp.php");
 			levelUp();
-			$exp_needed = $player->exp_per_level * (($player->level + 1) - $player->base_level) + $player->base_exp;
+			$exp_needed = $player->expForNextLevel();
 		}
 	}
 	// Rank up
@@ -38,18 +38,20 @@ function userProfile() {
 			echo "<p style='text-align:center;font-style:italic;'>
 				You must be out of battle and in your village to rank up.</p>";
 		}
-		else if(!empty($_GET['rankup'])) {
-			require("levelUp.php");
-			rankUp();
-			return true;
-		}
 		else {
-			echo "<p style='text-align:center;font-size:1.1em;'>
-				<a style='text-decoration:none;' href='$self_link&rankup=1'>Take exam for the next rank</a>
+		    if($player->exam_stage) {
+		        $prompt = "Resume exam for the next rank";
+            }
+		    else {
+		        $prompt = "Take exam for the next rank";
+            }
+
+            echo "<p style='text-align:center;font-size:1.1em;'>
+				<a class='button' style='padding:5px 10px 4px;margin-bottom:0;text-decoration:none;' href='{$system->links['rankup']}'>{$prompt}</a>
 			</p>";
-		}
-	}	
-	
+        }
+	}
+
 	$page = 'profile';
 	if(isset($_GET['page'])) {
 		switch($_GET['page']) {

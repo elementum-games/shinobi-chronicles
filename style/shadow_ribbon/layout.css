@@ -420,11 +420,11 @@ p {
 .systemMessage {
 	position: absolute;
 	margin: 0px;
-	width: 630px;
+	width: 95%;
 	padding-left: 10px;
 	
 	left: 0px;
-	top: 60px;
+	top: 62px;
 	
 	z-index: 50;
 	

@@ -135,6 +135,8 @@ class User extends Fighter {
      */
     public $mission_stage;
 
+    public int $exam_stage;
+
     public int $last_ai;
 	
     public int $last_free_stat_change;
@@ -305,6 +307,8 @@ class User extends Fighter {
 		if($this->mission_id) {
 			$this->mission_stage = json_decode($user_data['mission_stage'], true);
 		}
+
+		$this->exam_stage = $user_data['exam_stage'];
 
 		$this->last_ai = $user_data['last_ai'];
 		$this->last_free_stat_change = $user_data['last_free_stat_change'];
@@ -1154,7 +1158,8 @@ class User extends Fighter {
 			$query .= "`mission_id`=0,";
 		}
 
-		$query .= "`last_ai` = '$this->last_ai',
+		$query .= "`exam_stage` = '{$this->exam_stage}',
+		`last_ai` = '$this->last_ai',
 		`last_free_stat_change` = '{$this->last_free_stat_change}',
 		`last_pvp` = '$this->last_pvp',
 		`last_death` = '$this->last_death',";
@@ -1292,6 +1297,10 @@ class User extends Fighter {
 
 	public function getAvatarSize(): int {
 	    return $this->forbidden_seal ? 175 : 125;
+    }
+
+    public function expForNextLevel() {
+        return $this->exp_per_level * (($this->level + 1) - $this->base_level) + ($this->base_stats * 10);
     }
 
     private function bloodlineSkillRatio($boost): float {

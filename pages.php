@@ -173,6 +173,12 @@ $pages = [
         'function_name' => 'battle',
         'battle_type' => Battle::TYPE_FIGHT,
     ],
+    25 => [
+        'file_name' => 'levelUp.php',
+        'title' => 'Rank Exam',
+        'function_name' => 'rankUp',
+        'battle_type' => Battle::TYPE_AI_RANKUP,
+    ],
 ];
 
 return $pages;

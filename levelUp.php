@@ -38,13 +38,35 @@ function levelUp() {
 	return true;
 }
 
-function rankUp() {
+function rankUp(): bool {
 	global $system;
 
 	global $player;
-	global $self_link;
 	
-	$self_link .= '&rankup=1';
+	$self_link = $system->links['rankup'];
+
+	if($player->exam_stage > 0 && !empty($_GET['abandon_exam'])) {
+	    $player->exam_stage = 0;
+
+        $system->message("Understanding that this is not your time, you bow out of the exam. Maybe next time
+            will be your chance!<br />
+            <a href='{$system->links['profile']}'>Continue</a>");
+        $system->printMessage();
+        return true;
+    }
+
+    if($player->level < $player->max_level || $player->exp < $player->expForNextLevel() || $player->rank >= SystemFunctions::SC_MAX_RANK) {
+        $player->exam_stage = 0;
+        $system->message("You are not eligible for a rankup exam. <a href='{$system->links['profile']}'>Continue</a>");
+        return true;
+    }
+
+    echo "<div class='submenu'>
+        <ul class='submenu'>
+            <li style='width:100%;'><a href='{$self_link}&abandon_exam=1'>Abandon Exam</a></li>
+        </ul>
+    </div>
+    <div class='submenuMargin'></div>";
 	
 	// Akademi-sei -> Genin
 	if($player->rank == 1) {
@@ -63,13 +85,9 @@ function rankUp() {
 		$row = $system->db_fetch($result);
 		$ranks[$row['rank_id']] = $row;
 				
-		if(isset($_SESSION['exam_stage'])) {
-			$exam_stage = $_SESSION['exam_stage'];
-		}
-		else {
-			$_SESSION['exam_stage'] = 1;
-			$exam_stage = 1;
-		}
+		if(!$player->exam_stage) {
+		    $player->exam_stage = 1;
+        }
 
         $replacement_jutsu_id = 4;
 		$clone_jutsu_id = 87;
@@ -87,11 +105,10 @@ function rankUp() {
 		if(!empty($_POST['hand_seals'])) {
 			$hand_seals = $_POST['hand_seals'];
 		
-			switch($exam_stage) {
+			switch($player->exam_stage) {
 				case 1:
 					if($hand_seals == $jutsu_data[1]['hand_seals'] && $player->checkInventory($jutsu_data[1]['jutsu_id'], 'jutsu')) {
-						$exam_stage = 2;
-						$_SESSION['exam_stage'] = 2;
+						$player->exam_stage = 2;
 					}
 					else {
 						/*echo 'hand seals: ' . $hand_seals . ' / ' . $jutsu_data[1]['hand_seals'] . '<br />' .
@@ -101,8 +118,7 @@ function rankUp() {
 					break;
 				case 2:
 					if($hand_seals == $jutsu_data[2]['hand_seals'] && $player->checkInventory($jutsu_data[2]['jutsu_id'], 'jutsu')) {
-						$exam_stage = 3;
-						$_SESSION['exam_stage'] = 3;
+						$player->exam_stage = 3;
 					}
 					else {
 						$system->message("You attempted to perform " . $jutsu_data[2]['name'] . " but failed.");
@@ -110,8 +126,7 @@ function rankUp() {
 					break;
 				case 3:
 					if($hand_seals == $jutsu_data[3]['hand_seals'] && $player->checkInventory($jutsu_data[3]['jutsu_id'], 'jutsu')) {
-						$exam_stage = 4;
-						$_SESSION['exam_stage'] = 4;
+						$player->exam_stage = 4;
 					}
 					else {
 						$system->message("You attempted to perform " . $jutsu_data[3]['name'] . " but failed.");
@@ -126,7 +141,7 @@ function rankUp() {
 		$exam_instructions = '<tr><td>Welcome to the Genin Exam. In order to pass, you must demonstrate three jutsu: ' . 
 			$jutsu_data[1]['name'] . ', ' . $jutsu_data[2]['name'] . ', and ' . $jutsu_data[3]['name'] . 
 			'. See below for instructions on your current task.</td></tr>';
-		switch($exam_stage) {
+		switch($player->exam_stage) {
 			case 1:
 				echo $exam_instructions;
 				$prompt = 'Please demonstrate ' . $jutsu_data[1]['name'] . ':';
@@ -147,7 +162,7 @@ function rankUp() {
 		}
 		
 		
-		if($exam_stage >= 1 && $exam_stage <= 3) {
+		if($player->exam_stage >= 1 && $player->exam_stage <= 3) {
 			$gold_color = '#FDD017';
 			echo "<tr><td>
 			<div style='margin:0px;position:relative;'>
@@ -275,9 +290,9 @@ function rankUp() {
 			</div>
 			</td></tr>";
 		}
-		else if($exam_stage == 4) { // Pass
+		else if($player->exam_stage == 4) { // Pass
 			try {
-				unset($_SESSION['exam_stage']);
+			    $player->exam_stage = 0;
 				$gender = ($player->gender == 'Male' ? 'his' : 'her');
 				
 				$bloodline_rolled = false;
@@ -485,14 +500,14 @@ function rankUp() {
 					and smiles, saying calmly 'You have the <b>$bloodline_name</b>. This is the 
 					bloodline of the <b>$clan_name</b> clan. From this day forward you shall join them, and study with them to train
 					your bloodline to its fullest potential.'<br />
-					<p style='text-align:center;'><a href='$self_link'>Continue</a></p>
+					<p style='text-align:center;'><a href='{$system->links['profile']}'>Continue</a></p>
 					</td></tr>";
 				}
 				else {
 					echo "After focusing deeply for several minutes, the elder withdraws $gender hand and says 'It appears you do not
 					have a bloodline. You are free to train as you wish, we will place you in the <b>$clan_name</b> clan. Train 
 					hard with them and become a strong ninja for your clan and village.'<br />
-					<p style='text-align:center;'><a href='$self_link'>Continue</a></p>
+					<p style='text-align:center;'><a href='{$system->links['profile']}'>Continue</a></p>
 					</td></tr>";
 				}			
 			} catch(Exception $e) {
@@ -514,17 +529,13 @@ function rankUp() {
 		$row = $system->db_fetch($result);
 		$ranks[$row['rank_id']] = $row;
 				
-		if(isset($_SESSION['exam_stage'])) {
-			$exam_stage = $_SESSION['exam_stage'];
-		}
-		else {
-			$_SESSION['exam_stage'] = 1;
-			$exam_stage = 1;
-		}
+		if(!$player->exam_stage) {
+		    $player->exam_stage = 1;
+        }
 				
 		// Input	
 		if(!empty($_POST)) {
-			if($exam_stage == 1) {
+			if($player->exam_stage == 1) {
 				$answer1 = $_POST['question1'];
 				$answer2 = $_POST['question2'];
 				$answer3 = $_POST['question3'];
@@ -568,14 +579,13 @@ function rankUp() {
 						throw new Exception('');
 					}
 					
-					$exam_stage = 2;
-					$_SESSION['exam_stage'] = 2;
+					$player->exam_stage = 2;
 					$system->message("You have passed stage 1!");
 				} catch (Exception $e) {
 					$system->message("Your answers were incorrect. You have failed the Chuunin exam. " . $e->getMessage() . 
-						"<a href='{$system->link}?id=1'>Continue</a>");
+						"<a href='{$system->links['profile']}'>Continue</a>");
 					$system->printMessage();
-					unset($_SESSION['exam_stage']);
+					$player->exam_stage = 0;
 					return false;
 				}
 				$system->printMessage();
@@ -588,9 +598,9 @@ function rankUp() {
 		$exam_instructions = '<tr><td>Welcome to the Chuunin Exam. In order to pass, you must complete all three stages: The written
 		exam, survival exam, and combat exam. See below for instructions on the current stage.</td></tr>';
 		
-		if($exam_stage >= 1 && $exam_stage <= 5) {
+		if($player->exam_stage >= 1 && $player->exam_stage <= 5) {
 			// Written exam
-			if($exam_stage == 1) {
+			if($player->exam_stage == 1) {
 				echo "<tr><th><b>Stage 1 - Written Exam</th></tr>
 				<tr><td>
 				<p style='text-align:center;'>Answer the following questions correctly to proceed:</p>
@@ -626,48 +636,52 @@ function rankUp() {
 				</td></tr></table>";
 				
 			}
-			else if($exam_stage >= 2 && $exam_stage <= 4) {
+			else if($player->exam_stage >= 2 && $player->exam_stage <= 4) {
 				$opponents[2] = 6;
 				$opponents[3] = 5;
 				$opponents[4] = 10;
-				
-				$gender = ($player->gender == 'Male' ? 'him' : 'her');
+
 				echo "<tr><th><b>Stage 2 - Survival Exam</th></tr>
 				<tr><td style='text-align:center;'>
 				You must fight your way through the forest of death, defeating other ninjas to acquire the exam scroll. Being defeated
 				will result in failing the exam.
 				</td></tr></table>";
-				
-				$_SESSION['ai_id'] = $opponents[$exam_stage];
-				global $id;
-				$_SESSION['battle_page'] = $id;
-				$player->battle_id = -1;
-				
-				$opponent = new AI($system, $opponents[$exam_stage]);
-				if($opponent) {
-					require("battleCore.php");
-					$winner = battleAI($player, $opponent);
-				}
-				else {
-					$system->printMessage();
-					return false;
-				}
-				
-				if(!$winner) {
-					return true;
-				}
-				else if($winner == 1) {		// Player win				
+
+				if(!$player->battle_id) {
+				    try {
+                        $opponent = new AI($system, $opponents[$player->exam_stage]);
+                        $opponent->loadData();
+                        Battle::start($system, $player, $opponent, Battle::TYPE_AI_RANKUP);
+                    } catch(Exception $e) {
+                        $system->message($e->getMessage());
+                        $system->printMessage();
+                        return false;
+                    }
+                }
+
+                $battle = new Battle($system, $player, $player->battle_id);
+                $battle->loadFighters();
+
+                $battle->checkTurn();
+
+                $battle->renderBattle();
+
+                if(!$battle->isComplete()) {
+                    return true;
+                }
+
+                $player->battle_id = 0;
+                if($battle->winner == $battle->player_side) {
+                    $player->exam_stage++;
+
 					echo "<table class='table'><tr><th>Battle Results</th></tr>
 					<tr><td style='text-align:center;'>";
-					if($exam_stage == 4) {
+					if($player->exam_stage == 5) {
 						echo "You defeated your opponent, who had the scroll you needed, and have advanced to the 
 							next stage of the exam. You can take a short break and heal up if you want, or continue to the 
 							final battle.<br />
-							<a href='{$system->link}?id=1'>Take a break</a>
+							<a href='{$system->links['profile']}'>Take a break</a>
 							<a href='$self_link'>Continue</a>";
-							unset($_SESSION['ai_id']);
-							unset($_SESSION['battle_page']);
-							$player->battle_id = 0;
 					}
 					else {
 						echo "You defeated your opponent, but they did not have the scroll you needed. You must keep going and fight 
@@ -675,93 +689,85 @@ function rankUp() {
 					}
 					
 					echo "</td></tr></table>";
-					unset($_SESSION['ai_health']);
-					$exam_stage++;
-					$_SESSION['exam_stage']++;
 				}
-				else if($winner == 2) {		// AI win
+				else if($battle->winner == $battle->opponent_side) {
+                    $player->exam_stage = 0;
+
 					echo "<table class='table'><tr><th>Battle Results</th></tr>
 					<tr><td>You have been defeated. You have failed the chuunin exam.<br />
-					<a href='{$system->link}?id=1'>Continue</a>
+					<a href='{$system->links['profile']}'>Continue</a>
 					</td></tr></table>";
-					unset($_SESSION['exam_stage']);
-					unset($_SESSION['ai_id']);
-					unset($_SESSION['ai_health']);
-					unset($_SESSION['battle_page']);
-					$player->battle_id = 0;
 					return false;
 				}
-				else if($winner == -1) {
+				else if($battle->winner == Battle::DRAW) {
+                    $player->exam_stage = 0;
+
 					echo "<table class='table'><tr><th>Battle Results</th></tr>
 					<tr><td>The battle ended in a draw. You were unable to continue the exam and failed.<br />
-					<a href='{$system->link}?id=1'>Continue</a>
+					<a href='{$system->links['profile']}'>Continue</a>
 					</td></tr></table>";
-					unset($_SESSION['exam_stage']);
-					unset($_SESSION['ai_id']);
-					unset($_SESSION['ai_health']);
-					unset($_SESSION['battle_page']);
-					$player->battle_id = 0;
 					return false;
 				}
 			}
-			else if($exam_stage == 5) {
+			else if($player->exam_stage == 5) {
 				$opponent_id = 11;
 				echo "<tr><th><b>Stage 3 - Combat Exam</th></tr>
 				<tr><td style='text-align:center;'>
 				For your final exam, you must fight against one of the strongest exam participants in a duel.
 				</td></tr></table>";
-				
-				
-				
-				$_SESSION['ai_id'] = $opponent_id;
-				$opponent = new AI($system, $opponent_id);
-				if($opponent) {
-					require("battleCore.php");
-					$winner = battleAI($player, $opponent);
-				}
-				else {
-					$system->printMessage();
-					return false;
-				}
-				
-				if(!$winner) {
-					return true;
-				}
-				else if($winner == 1) {		// Player win				
+
+                if(!$player->battle_id) {
+                    try {
+                        $opponent = new AI($system, $opponent_id);
+                        $opponent->loadData();
+                        Battle::start($system, $player, $opponent, Battle::TYPE_AI_RANKUP);
+                    } catch(Exception $e) {
+                        $system->message($e->getMessage());
+                        $system->printMessage();
+                        return false;
+                    }
+                }
+
+                $battle = new Battle($system, $player, $player->battle_id);
+                $battle->loadFighters();
+
+                $battle->checkTurn();
+
+                $battle->renderBattle();
+
+                if(!$battle->isComplete()) {
+                    return true;
+                }
+
+                $player->battle_id = 0;
+                if($battle->winner == $battle->player_side) {
+                    $player->exam_stage++;
 					echo "<table class='table'><tr><th>Battle Results</th></tr>
 					<tr><td style='text-align:center;'>
 					You defeated your opponent, and have passed the final test!<br />
 					<a href='$self_link'>Continue</a>
 					</td></tr></table>";		
-					
-					unset($_SESSION['ai_id']);
-					unset($_SESSION['ai_health']);
-					$exam_stage++;
-					$_SESSION['exam_stage']++;
+
 				}
-				else if($winner == 2) {		// AI win
+				else if($battle->winner == $battle->opponent_side) {
+                    $player->exam_stage = 0;
 					echo "<table class='table'><tr><th>Battle Results</th></tr>
 					<tr><td>You have been defeated. You have failed the chuunin exam.<br />
-					<a href='{$system->link}?id=1'>Continue</a>
+					<a href='{$system->links['profile']}'>Continue</a>
 					</td></tr></table>";
-					unset($_SESSION['exam_stage']);
-					unset($_SESSION['ai_id']);
-					unset($_SESSION['ai_health']);
 					return false;
 				}
-				else if($winner == -1) {
+				else if($battle->winner == Battle::DRAW) {
+                    $player->exam_stage = 0;
 					echo "<table class='table'><tr><th>Battle Results</th></tr>
 					<tr><td>The battle ended in a draw. You were unable to continue the exam and failed.<br />
-					<a href='{$system->link}?id=1'>Continue</a>
+					<a href='{$system->links['profile']}'>Continue</a>
 					</td></tr></table>";
-					unset($_SESSION['exam_stage']);
-					unset($_SESSION['ai_id']);
-					unset($_SESSION['ai_health']);
 					return false;
 				}
 			}
 		}
-		else if($exam_stage == 6) { // Pass
+		else if($player->exam_stage == 6) { // Pass
 			try {
 				$element = $_POST['element'];
 				
@@ -780,7 +786,6 @@ function rankUp() {
 						$system->message("Invalid element!");
 						break;
 				}
-				
 				
 				// Display		
 				if(!$element) {
@@ -827,7 +832,7 @@ function rankUp() {
 							consuming destruction, that devours anything in its path. Your Fire jutsu will be strong against Wind jutsu, as
 							they will only fan the flames and strengthen your jutsu. However, you must be careful against Water jutsu, as they 
 							can extinguish your fires.\"<br />
-							<a href='{$system->link}?id=1'>Continue</a>";
+							<a href='{$system->links['profile']}'>Continue</a>";
 							break;
 						case 'Wind':
 							echo "Picturing a tempestuous tornado, you focus on the paper and flow chakra from your stomach,
@@ -837,7 +842,7 @@ function rankUp() {
 							will be strong against Lightning jutsu, as you can cut and dissipate it, but you will be weak against Fire jutsu,
 							because your wind only serves to fan their flames and make them stronger.\"
 							<br />
-							<a href='{$system->link}?id=1'>Continue</a>";
+							<a href='{$system->links['profile']}'>Continue</a>";
 							break;
 						case 'Lightning':
 							echo "Imagining the feel of electricity coursing through your veins, you focus on the paper and flow chakra 
@@ -848,7 +853,7 @@ function rankUp() {
 							jutsu will be strong against Earth as your speed can slice straight through the slower techniques of Earth,
 							but you must be careful against Wind jutsu as they will dissipate your Lightning.\"
 							<br />
-							<a href='{$system->link}?id=1'>Continue</a>";
+							<a href='{$system->links['profile']}'>Continue</a>";
 							break;
 						case 'Earth':
 							echo "Firmly planting your feet in the dirt and embracing the feel of it, you focus on the paper and flow 
@@ -858,7 +863,7 @@ function rankUp() {
 							strong against Water jutsu, as you can turn the water to mud and render it useless, but you will be weak to 
 							Lightning jutsu, as they are one of the few types that can swiftly evade and strike through your techniques.\"
 							<br />
-							<a href='{$system->link}?id=1'>Continue</a>";
+							<a href='{$system->links['profile']}'>Continue</a>";
 							break;
 						case 'Water':
 							echo "With thoughts of splashing rivers flowing through your mind, you focus on the paper and flow chakra 
@@ -868,7 +873,7 @@ function rankUp() {
 							of the battle, trapping enemies or launching large-scale attacks at them. Your Water jutsu will be strong against
 							Fire jutsu because you can extinguish them, but Earth jutsu can turn your water into mud and render it useless.\"
 							<br />
-							<a href='{$system->link}?id=1'>Continue</a>";
+							<a href='{$system->links['profile']}'>Continue</a>";
 							break;
 					}
 					
@@ -878,9 +883,8 @@ function rankUp() {
 				}
 				
 				$player->elements = array('first' => $element);
-				
-				unset($_SESSION['exam_stage']);
-				$gender = ($player->gender == 'Male' ? 'his' : 'her');
+
+				$player->exam_stage = 0;
 				
 				$player->rank++;
 				$player->level++;
@@ -913,18 +917,14 @@ function rankUp() {
 		$ranks[$row['rank_id']] = $row;
 		$row = $system->db_fetch($result);
 		$ranks[$row['rank_id']] = $row;
-		
-		if(isset($_SESSION['exam_stage'])) {
-			$exam_stage = $_SESSION['exam_stage'];
-		}
-		else {
-			$_SESSION['exam_stage'] = 1;
-			$exam_stage = 1;
-		}
+
+        if(!$player->exam_stage) {
+            $player->exam_stage = 1;
+        }
 		
 		// Input	
 		if(!empty($_POST)) {
-			if($exam_stage == 1) {
+			if($player->exam_stage == 1) {
 				if(isset($_POST['start_exam'])) {
 					$mission_id = 10;
 				
@@ -934,9 +934,6 @@ function rankUp() {
 					require("missions.php");
 					missions();
 					return true;
-				}
-				else if($player->mission_id == 10) {
-					$_SESSION['battle_page'] = 23;
 				}
 			}
 		}
@@ -948,7 +945,7 @@ function rankUp() {
 		$exam_instructions = '<tr><td>Welcome to the Jonin Exam. In order to pass, you must complete a special mission
 			assigned by the Kage.</td></tr>';
 		
-		if($exam_stage == 1) {
+		if($player->exam_stage == 1) {
 			echo $exam_instructions . 
 				"<tr><td style='text-align:center;'>
 				<form action='$self_link' method='post'>
@@ -956,7 +953,7 @@ function rankUp() {
 				</form>
 				</td></tr>";
 		}
-		else if($exam_stage == 2) { // Pass
+		else if($player->exam_stage == 2) { // Pass
 			try {
 				$elements = array('Fire', 'Wind', 'Lightning', 'Earth', 'Water');
 				unset($elements[array_search($player->elements['first'], $elements)]);
@@ -1016,7 +1013,7 @@ function rankUp() {
 							consuming destruction, that devours anything in its path. Your Fire jutsu will be strong against Wind jutsu, as
 							they will only fan the flames and strengthen your jutsu. However, you must be careful against Water jutsu, as they 
 							can extinguish your fires.\"<br />
-							<a href='{$system->link}?id=1'>Continue</a>";
+							<a href='{$system->links['profile']}'>Continue</a>";
 							break;
 						case 'Wind':
 							echo "Picturing a tempestuous tornado, you flow chakra from your stomach,
@@ -1027,7 +1024,7 @@ function rankUp() {
 							Lightning jutsu, as you can cut and dissipate it, but you will be weak against Fire jutsu,
 							because your wind only serves to fan their flames and make them stronger.\"
 							<br />
-							<a href='{$system->link}?id=1'>Continue</a>";
+							<a href='{$system->links['profile']}'>Continue</a>";
 							break;
 						case 'Lightning':
 							echo "Imagining the feel of electricity coursing through your veins, you flow chakra from your stomach,
@@ -1038,7 +1035,7 @@ function rankUp() {
 							jutsu will be strong against Earth as your speed can slice straight through the slower techniques of Earth,
 							but you must be careful against Wind jutsu as they will dissipate your Lightning.\"
 							<br />
-							<a href='{$system->link}?id=1'>Continue</a>";
+							<a href='{$system->links['profile']}'>Continue</a>";
 							break;
 						case 'Earth':
 							echo "Envisioning stone as hard as the temple you are sitting in, you flow chakra from your stomach,
@@ -1048,7 +1045,7 @@ function rankUp() {
 							strong against Water jutsu, as you can turn the water to mud and render it useless, but you will be weak to 
 							Lightning jutsu, as they are one of the few types that can swiftly evade and strike through your techniques.\"
 							<br />
-							<a href='{$system->link}?id=1'>Continue</a>";
+							<a href='{$system->links['profile']}'>Continue</a>";
 							break;
 						case 'Water':
 							echo "With thoughts of splashing rivers flowing through your mind, you flow chakra from your stomach,
@@ -1058,7 +1055,7 @@ function rankUp() {
 							of the battle, trapping enemies or launching large-scale attacks at them. Your Water jutsu will be strong against
 							Fire jutsu because you can extinguish them, but Earth jutsu can turn your water into mud and render it useless.\"
 							<br />
-							<a href='{$system->link}?id=1'>Continue</a>";
+							<a href='{$system->links['profile']}'>Continue</a>";
 							break;
 					}
 							
@@ -1067,8 +1064,7 @@ function rankUp() {
 				
 				$player->elements['second'] = $element;
 				
-				unset($_SESSION['exam_stage']);
-				$gender = ($player->gender == 'Male' ? 'his' : 'her');
+				$player->exam_stage = 0;
 				
 				$player->rank++;
 				$player->level++;
