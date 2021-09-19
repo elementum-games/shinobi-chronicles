@@ -1485,45 +1485,45 @@ class Battle {
                 //if user presses correct number (between 0-9) store in Arr[1];
                 var key = -1;
                 switch (event.which){
-                    case 48: key = 0;
+                    case 48: 
+                    case 96: 
+                        key = 0;
                     break;
-                    case 96: key = 0;
+                    case 49:
+                    case 97:
+                        key = 1;
                     break;
-                    case 49: key = 1;
+                    case 50:
+                    case 98:
+                        key = 2;
                     break;
-                    case 97: key = 1;
+                    case 51:
+                    case 99:
+                        key = 3;
                     break;
-                    case 50: key = 2;
+                    case 52:
+                    case 100:
+                        key = 4;
                     break;
-                    case 98: key = 2;
+                    case 53:
+                    case 101:
+                        key = 5;
                     break;
-                    case 51: key = 3;
+                    case 54:
+                    case 102:
+                        key = 6;
                     break;
-                    case 99: key = 3;
+                    case 55:
+                    case 103:
+                        key = 7;
                     break;
-                    case 52: key = 4;
+                    case 56:
+                    case 104:
+                        key = 8;
                     break;
-                    case 100: key = 4;
-                    break;
-                    case 53: key = 5;
-                    break;
-                    case 101: key = 5;
-                    break;
-                    case 54: key = 6;
-                    break;
-                    case 102: key = 6;
-                    break;
-                    case 55: key = 7;
-                    break;
-                    case 103: key = 7;
-                    break;
-                    case 56: key = 8;
-                    break;
-                    case 104: key = 8;
-                    break;
-                    case 57: key = 9;
-                    break;
-                    case 105: key = 9;
+                    case 57:
+                    case 105:
+                        key = 9;
                     break;
                 }
                 arr[1] = key;
