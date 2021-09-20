@@ -356,9 +356,18 @@ function jutsu() {
             if(!empty($_POST['confirm_forget'])) {
                 //Forgetting jutsu.
                 $jutsu_name = $player->jutsu[$jutsu_id]->name;
+
+								//refund input verification
+								$refund = ($player->jutsu[$jutsu_id]->purchase_cost * 0.1); //10% Refund
+								$refund = intval(round($refund)); //round and then convert Float=>Int
+								if($refund > 0 && gettype($refund) == "integer"){
+									$player->money += $refund; //need an addMoney() function for $Player
+								};
+
                 $player->removeJutsu($jutsu_id);
 
-                $system->message("You have forgotten $jutsu_name!");
+								//css: Overlap caused by css Position property
+                $system->message("You have forgotten $jutsu_name!<br>You were refunded ¥{$refund}");
                 $system->printMessage();
                 $page = '';
             }
