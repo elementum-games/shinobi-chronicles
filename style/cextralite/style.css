@@ -44,9 +44,19 @@ a:hover{
 #sidebar {
 	position: static;
 }
+
+#chat_table{
+	margin: 1em auto;
+}
+#chat_table textarea{
+	height: 20%;
+}
+#chatSubmit{
+	padding: 0.5em 0em;
+}
 #chatMessage{
 	width: 100% !important;
-	height: 30% !important;
+	height: 30%;
 
 	font-size: 1.2em !important;
 }
@@ -291,7 +301,7 @@ ul.submenu{
 	font-size: 0.90em;
 }
 .table tr{
-	margin: 0.2em 0.3em;
+	margin: 0.5em auto;
 }
 .table tr td{
 	display: inline-block;
@@ -368,6 +378,30 @@ ul.submenu{
 	font-size: 1em;
 	width: 100%;
 }
+
+#chat_input_table{
+	margin: 1em auto;
+}
+.chat_msg{
+	display: grid !important;
+	grid-template-columns: 1fr 3fr 1fr;
+	/* grid-template-rows: 0.3fr 0.7fr; */
+	align-items: center;
+	grid-row-gap: 1em;
+	/* margin: 0em; */
+}
+.chat_msg td:nth-child(1){
+	grid-column: 1 / 4;
+	width: 100%;
+}
+.chat_msg td:nth-child(3){
+	/* grid-column: 1 / 4; */
+	/* width: 100%; */
+	font-size: 0.9em;
+}
+.chat_msg td{
+	height: 100%;
+}
 #socialPosts tr a{
 
 }
@@ -375,17 +409,17 @@ ul.submenu{
 	display: inline-block;
 	width: 100%;
 }
-#socialPosts tr td{
-	display: inline-block;
-}
+
 .chatmsg{
 	font-size: 1.2em;
-	padding: 2em 0em !important;
+	align-items: center;
+	grid-column: 1 / span 2;
 }
 #user_data_container{
 	display: grid !important;
 	grid-template-columns: 0.3fr 0.7fr;
-
+	grid-template-rows: 1.5fr;
+	margin: 0.1em 0em;
 }
 #user_data_container a{
 	background: none;
@@ -399,9 +433,17 @@ ul.submenu{
 	align-content: space-evenly;
 	justify-content: center;
 }
+.staffMember{
+	margin: 0.1em 0em;
+}
 .chatmsg{
 	background-color: rgba(255,255,255,0.06) !important;
+	text-align: left !important;
+	height: auto;
+	max-height: 400px;
+	overflow: scroll;
 }
+
 #socialPosts a{
 	background: none;
 	border: none;
@@ -574,9 +616,9 @@ input{
 }
 
 form{
-	margin: 1em 1.5em;
+	margin: 1em 1.2em;
 	text-align: left;
-	font-size: 1.2em;
+	font-size: 1em;
 }
 
 textarea{
