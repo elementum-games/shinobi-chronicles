@@ -255,46 +255,49 @@ class Battle {
         $this->default_attacks = $this->getDefaultAttacks();
     }
 
-    public function determineEffectAnnouncementText(string  $attackingPlayer, string $defendingPlayer, string $announcement_text, string $effect) : string{
+    public function determineEffectAnnouncementText(string  $attackingPlayer, string $defendingPlayer, string $effect) : string{
+        $announcement_text = "";
         switch($effect){
             case 'taijutsu_nerf':
-                $announcement_text .= "<br/> <p style=\"font-weight:bold;\"> {$defendingPlayer}'s Taijutsu is being lowered.</p>";
+                $announcement_text = "{$defendingPlayer}'s Taijutsu is being lowered.";
                 break;
             case 'ninjutsu_nerf':
-                $announcement_text .= "<br/> <p style=\"font-weight:bold;\"> {$defendingPlayer}'s Ninjutsu is being lowered.</p>";
+                $announcement_text = "{$defendingPlayer}'s Ninjutsu is being lowered.";
                 break;
             case 'genjutsu_nerf':
-                $announcement_text .= "<br/> <p style=\"font-weight:bold;\"> {$defendingPlayer}'s Genjutsu is being lowered.</p>";
+                $announcement_text = "{$defendingPlayer}'s Genjutsu is being lowered.";
                 break;
             case 'intelligence_nerf':
-                $announcement_text .= "<br/> <p style=\"font-weight:bold;\"> {$defendingPlayer}'s Intelligence is being lowered.</p>";
+            case 'daze':
+                $announcement_text = "{$defendingPlayer}'s Intelligence is being lowered.";
                 break;
             case 'willpower_nerf':
-                $announcement_text .= "<br/> <p style=\"font-weight:bold;\"> {$defendingPlayer}'s Willpower is being lowered.</p>";
+                $announcement_text = "{$defendingPlayer}'s Willpower is being lowered.";
                 break;
             case 'cast_speed_nerf':
-                $announcement_text .= "<br/> <p style=\"font-weight:bold;\"> {$defendingPlayer}'s Cast Speed is being lowered.</p>";
+                $announcement_text = "{$defendingPlayer}'s Cast Speed is being lowered.";
                 break;
             case 'speed_nerf':
-                $announcement_text .= "<br/> <p style=\"font-weight:bold;\"> {$defendingPlayer}'s Speed is being lowered.</p>";
+            case 'cripple':
+                $announcement_text = "{$defendingPlayer}'s Speed is being lowered.";
                 break;
             case 'residual_damage':
-                $announcement_text .= "<br/> <p style=\"font-weight:bold;\"> {$defendingPlayer} is taking Residual Damage.</p>";
+                $announcement_text = "{$defendingPlayer} is taking Residual Damage.";
                 break;
             case 'drain_chakra':
-                $announcement_text .= "<br/> <p style=\"font-weight:bold;\"> {$defendingPlayer}'s Chakra is being drained.</p>";
+                $announcement_text = "{$defendingPlayer}'s Chakra is being drained.";
                 break;
             case 'drain_stamina':
-                $announcement_text .= "<br/> <p style=\"font-weight:bold;\"> {$defendingPlayer}'s Stamina is being drained.</p>";
+                $announcement_text = "{$defendingPlayer}'s Stamina is being drained.";
                 break;
-            case 'taijutsu_boost ':
-                $announcement_text .= "<br/> <p style=\"font-weight:bold;\"> {$attackingPlayer}'s Taijutsu is being increased.</p>";
+            case 'taijutsu_boost':
+                $announcement_text = "{$attackingPlayer}'s Taijutsu is being increased.";
                 break;
-            case 'ninjutsu_boost  ':
-                $announcement_text .= "<br/> <p style=\"font-weight:bold;\"> {$attackingPlayer}'s Ninjutsu is being increased.</p>";
+            case 'ninjutsu_boost':
+                $announcement_text = "{$attackingPlayer}'s Ninjutsu is being increased.";
                 break;
-            case 'genjutsu_boost  ':
-                $announcement_text .= "<br/> <p style=\"font-weight:bold;\"> {$attackingPlayer}'s Genjutsu is being increased.</p>";
+            case 'genjutsu_boost':
+                $announcement_text = "{$attackingPlayer}'s Genjutsu is being increased.";
                 break;
             default:
                 break;
@@ -805,10 +808,12 @@ class Battle {
                     }
 
                     if($player1_jutsu->effect != 'none'){
-                        $text = $this->determineEffectAnnouncementText($this->player1->getName(), $this->player2->getName(), $text, $player1_jutsu->effect);
+                        $text .= "<br/> <p style=\"font-weight:bold;\">" . "{$this->system->clean($this->determineEffectAnnouncementText($this->player1->getName(), $this->player2->getName(), $player1_jutsu->effect))}" . "</p>";
                     }
 
-                    //$this->system->message($text);
+                    if($player1_jutsu->weapon_id) {
+                        $text .= "<br/> <p style=\"font-weight:bold;\">" . "{$this->system->clean($this->determineEffectAnnouncementText($this->player1->getName(), $this->player2->getName(), $player1_jutsu->weapon_effect->effect))}" . "</p>";
+                    }
 
                     $this->battle_text .= $this->parseCombatText($text, $this->player1, $this->player2);
                 }
@@ -916,6 +921,14 @@ class Battle {
 					}
                     if($player2_effect_display) {
                         $text .= $this->system->clean($player2_effect_display);
+                    }
+
+                    if($player2_jutsu->effect != 'none'){
+                        $text .= "<br/> <p style=\"font-weight:bold;\">" . "{$this->system->clean($this->determineEffectAnnouncementText($this->player2->getName(), $this->player1->getName(), $player2_jutsu->effect))}" . "</p>";
+                    }
+
+                    if($player2_jutsu->weapon_id) {
+                        $text .= "<br/> <p style=\"font-weight:bold;\">" . "{$this->system->clean($this->determineEffectAnnouncementText($this->player2->getName(), $this->player1->getName(), $player1_jutsu->weapon_effect->effect))}" . "</p>";
                     }
 
                     $this->battle_text .= $this->parseCombatText($text, $this->player2, $this->player1);
