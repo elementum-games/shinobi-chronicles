@@ -198,6 +198,21 @@ function chat() {
                     break;
             }
 
+			/*If User is Blocked, Skip their Echo'd Post!*/
+			$isBlocked = false;
+			foreach($player->blacklist as $id => $blacklist){
+				//if post has same username as someone in their blacklist
+				if($post['user_name'] == $blacklist[$id]['user_name']){
+					// echo "".$post['user_name']." <- Fuck this guy!";
+					$isBlocked = true;
+				}
+			}
+			//skip post
+			if($isBlocked){
+				$isBlocked = false; //just in case?
+				continue;
+			}
+
 			echo "
 				<tr>
 					<td style='text-align:center;'>
