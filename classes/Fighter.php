@@ -1,7 +1,7 @@
 <?php
 
 abstract class Fighter {
-    public SystemFunctions $system;
+    public System $system;
 
     public string $combat_id;
 
@@ -228,15 +228,15 @@ abstract class Fighter {
 
         switch($defense_type) {
             case 'ninjutsu':
-                $defense += SystemFunctions::diminishing_returns($this->ninjutsu_skill * $def_multiplier, 50);
+                $defense += System::diminishing_returns($this->ninjutsu_skill * $def_multiplier, 50);
                 $raw_damage -= $this->ninjutsu_resist;
                 break;
             case 'genjutsu':
-                $defense += SystemFunctions::diminishing_returns($this->genjutsu_skill * $def_multiplier, 50);
+                $defense += System::diminishing_returns($this->genjutsu_skill * $def_multiplier, 50);
                 $raw_damage -= $this->genjutsu_resist;
                 break;
             case 'taijutsu':
-                $defense += SystemFunctions::diminishing_returns($this->taijutsu_skill * $def_multiplier, 50);
+                $defense += System::diminishing_returns($this->taijutsu_skill * $def_multiplier, 50);
                 $raw_damage -= $this->taijutsu_resist;
                 break;
             default:

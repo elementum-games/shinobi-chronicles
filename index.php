@@ -19,7 +19,7 @@ ini_set('display_errors', 'On');
 
 $PAGE_LOAD_START = microtime(true);
 require_once("classes.php");
-$system = new SystemFunctions();
+$system = new System();
 
 // Check for logout
 if(isset($_GET['logout']) && $_GET['logout'] == 1) {
@@ -46,7 +46,7 @@ if(isset($_GET['request_type']) && $_GET['request_type'] == 'ajax') {
 // Run login, load player data
 $player_display = '';
 
-$logout_limit = SystemFunctions::LOGOUT_LIMIT;
+$logout_limit = System::LOGOUT_LIMIT;
 if(!isset($_SESSION['user_id'])) {
 	// require("./securimage/securimage.php");
 	if(!empty($_POST['login'])) {
@@ -114,7 +114,7 @@ else {
 	$player = new User($_SESSION['user_id']);
 	//This is in minutes.
 	$logout_display = false;
-	if($player->staff_level == SystemFunctions::SC_ADMINISTRATOR) {
+	if($player->staff_level == System::SC_ADMINISTRATOR) {
 		$logout_limit = 1440;
 		$logout_display = "Disabled";
 	}
@@ -155,7 +155,7 @@ else {
 
 // Start display
 if(!$LOGGED_IN) {
-	$layout = SystemFunctions::DEFAULT_LAYOUT;
+	$layout = System::DEFAULT_LAYOUT;
 }
 else {
 	$layout = $player->layout;
@@ -189,7 +189,7 @@ $allowed_coders = array(
 // Load page or news
 if($LOGGED_IN) {
 	// Master close
-	if(!$system->SC_OPEN && $player->staff_level < SystemFunctions::SC_ADMINISTRATOR) {
+	if(!$system->SC_OPEN && $player->staff_level < System::SC_ADMINISTRATOR) {
 		if(!$ajax) {
 			echo str_replace("[HEADER_TITLE]", "Profile", $body_start);
 		}
@@ -199,7 +199,7 @@ if($LOGGED_IN) {
 		</td></tr></table>";
 		if(!$ajax) {
 			echo $side_menu_start . $side_menu_end;
-			echo str_replace('<!--[VERSION_NUMBER]-->', SystemFunctions::VERSION_NUMBER, $footer);
+			echo str_replace('<!--[VERSION_NUMBER]-->', System::VERSION_NUMBER, $footer);
 		}
 		exit;
 	}	
@@ -216,7 +216,7 @@ if($LOGGED_IN) {
 		</td></tr></table>";
 		if(!$ajax) {
 			echo $side_menu_start . $side_menu_end;
-			echo str_replace('<!--[VERSION_NUMBER]-->', SystemFunctions::VERSION_NUMBER, $footer);
+			echo str_replace('<!--[VERSION_NUMBER]-->', System::VERSION_NUMBER, $footer);
 		}
 		exit;
 	}
@@ -351,10 +351,10 @@ if($LOGGED_IN) {
 			// Check for being in village is not okay/okay/required
 			if(isset($pages[$id]['village_ok'])) {
 				// Player is alllowed in up to rank 3, then must go outside village
-				if($player->rank > 2 && $pages[$id]['village_ok'] == SystemFunctions::NOT_IN_VILLAGE && isset($villages[$player->location])) {
+				if($player->rank > 2 && $pages[$id]['village_ok'] == System::NOT_IN_VILLAGE && isset($villages[$player->location])) {
 					throw new Exception("You cannot access this page while in a village!");
 				}
-				if($pages[$id]['village_ok'] == SystemFunctions::ONLY_IN_VILLAGE && $player->location != $player->village_location) {
+				if($pages[$id]['village_ok'] == System::ONLY_IN_VILLAGE && $player->location != $player->village_location) {
 					throw new Exception("You must be in your village to access this page!");
 				}
 			}
@@ -416,16 +416,16 @@ if($LOGGED_IN) {
 	// Display side menu and footer
 	if(!$ajax) {
 		if($player->clan) {
-		    $pages[20]['menu'] = SystemFunctions::MENU_VILLAGE;
+		    $pages[20]['menu'] = System::MENU_VILLAGE;
 		}
 		if($player->rank >= 3) {
-		    $pages[24]['menu'] = SystemFunctions::MENU_USER;
+		    $pages[24]['menu'] = System::MENU_USER;
 		}
 
 
         echo $side_menu_start;
 		foreach($pages as $id => $page) {
-            if(!isset($page['menu']) || $page['menu'] != SystemFunctions::MENU_USER) {
+            if(!isset($page['menu']) || $page['menu'] != System::MENU_USER) {
                 continue;
             }
 
@@ -439,7 +439,7 @@ if($LOGGED_IN) {
 					continue;
 				}
 				// Page ok if an in-village page or player rank is below chuunin
-				if($page['village_ok'] != SystemFunctions::NOT_IN_VILLAGE || $player->rank < 3) {
+				if($page['village_ok'] != System::NOT_IN_VILLAGE || $player->rank < 3) {
 					echo "<li><a href='{$system->link}?id=$id'>" . $page['title'] . "</a></li>";
 				}
 			}
@@ -449,7 +449,7 @@ if($LOGGED_IN) {
 				if(!isset($page['menu']) || $page['menu'] != 'activity') {
 					continue;
 				}
-				if($page['village_ok'] != SystemFunctions::ONLY_IN_VILLAGE) {
+				if($page['village_ok'] != System::ONLY_IN_VILLAGE) {
 					echo "<li><a href='{$system->link}?id=$id'>" . $page['title'] . "</a></li>";
 				}
 			}
@@ -459,7 +459,7 @@ if($LOGGED_IN) {
         if($player->in_village) {
             echo $village_menu_start;
             foreach($pages as $id => $page) {
-                if(!isset($page['menu']) || $page['menu'] != SystemFunctions::MENU_VILLAGE) {
+                if(!isset($page['menu']) || $page['menu'] != System::MENU_VILLAGE) {
                     continue;
                 }
 
@@ -467,16 +467,16 @@ if($LOGGED_IN) {
             }
         }
 
-		if($player->staff_level >= SystemFunctions::SC_MODERATOR) {
+		if($player->staff_level >= System::SC_MODERATOR) {
 			echo $staff_menu_header;
 			echo "<li><a href='{$system->link}?id=16'>Mod Panel</a></li>";
 		}
-		if($player->staff_level >= SystemFunctions::SC_ADMINISTRATOR) {
+		if($player->staff_level >= System::SC_ADMINISTRATOR) {
 			echo "<li><a href='{$system->link}?id=17'>Admin Panel</a></li>";
 		}
 		// Logout timer
 		$time_remaining = ($logout_limit * 60) - (time() - $player->last_login);
-		$logout_time = SystemFunctions::timeRemaining($time_remaining, 'short', false, true) . " remaining";
+		$logout_time = System::timeRemaining($time_remaining, 'short', false, true) . " remaining";
 		$logout_display = ($logout_display) ? $logout_display : $logout_time;
 		echo str_replace("<!--LOGOUT_TIMER-->", $logout_display, $side_menu_end);
 
@@ -496,7 +496,7 @@ else {
 	echo str_replace("[HEADER_TITLE]", "News", $body_start);
 	// Display error messages
 	$system->printMessage();
-	if(!$system->SC_OPEN && $player->staff_level < SystemFunctions::SC_ADMINISTRATOR) {
+	if(!$system->SC_OPEN && $player->staff_level < System::SC_ADMINISTRATOR) {
 		echo "<table class='table'><tr><th>Game Maintenance</th></tr>
 		<tr><td style='text-align:center;'>
 		Shinobi-Chronicles is currently closed for maintenace. Please check back in a few minutes!
@@ -512,7 +512,7 @@ if(!$ajax) {
 	$page_load_time = round(microtime(true) - $PAGE_LOAD_START, 3);
 	echo str_replace(
 		array('<!--[VERSION_NUMBER]-->', '<!--[PAGE_LOAD_TIME]-->'),
-		array(SystemFunctions::VERSION_NUMBER, $page_load_time),
+		array(System::VERSION_NUMBER, $page_load_time),
 	$footer);
 }
 

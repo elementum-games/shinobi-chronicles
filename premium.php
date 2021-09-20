@@ -303,7 +303,7 @@ function premium() {
 	            if($player->last_free_stat_change > time() - $free_stat_change_timer) {
 	                throw new Exception (
 	                    "You cannot stat transfer for free currently." . "<br />" .
-                        "Time remaining: " . SystemFunctions::timeRemaining(
+                        "Time remaining: " . System::timeRemaining(
                             $player->last_free_stat_change - (time() - $free_stat_change_timer),
                             'long',
                             false,
@@ -514,7 +514,7 @@ function premium() {
 				break;
 			 case 'green':
 			/* Shadekun edit for returning administrator color */
-                if($player->staff_level < SystemFunctions::SC_MODERATOR) {
+                if($player->staff_level < System::SC_MODERATOR) {
                     $system->message("Invalid color!");
                     break;
                 }
@@ -522,7 +522,7 @@ function premium() {
                 $system->message("Color changed");
                 break;
 			case 'red':
-				if($player->staff_level < SystemFunctions::SC_ADMINISTRATOR) {
+				if($player->staff_level < System::SC_ADMINISTRATOR) {
 					$system->message("Invalid color!");
 					break;
 				}
@@ -772,7 +772,7 @@ function premium() {
 		$view = $_GET['view'];
 	}
 
-	$kunai_per_dollar = SystemFunctions::KUNAI_PER_DOLLAR;
+	$kunai_per_dollar = System::KUNAI_PER_DOLLAR;
 
 	if($view == 'character_changes') {
 		// Character reset
@@ -1071,7 +1071,7 @@ function premium() {
 				($player->forbidden_seal['color'] == 'gold' ? "checked='checked'" : '') . "/>
 				<span class='gold' style='font-weight:bold;'>Gold</span>";
 			}
-			if($player->staff_level >= SystemFunctions::SC_ADMINISTRATOR) {
+			if($player->staff_level >= System::SC_ADMINISTRATOR) {
 				echo "
 				<input type='radio' name='name_color' value='red' " .
 				($player->forbidden_seal['color'] == 'red' ? "checked='checked'" : '') . "/>
@@ -1092,7 +1092,7 @@ function premium() {
 			($player->forbidden_seal['color'] == 'gold' ? "checked='checked'" : '') . "/>
 			<span class='gold' style='font-weight:bold;'>Gold</span>
 			";
-			if($player->staff_level >= SystemFunctions::SC_ADMINISTRATOR) {
+			if($player->staff_level >= System::SC_ADMINISTRATOR) {
 				echo "
 				<input type='radio' name='name_color' value='red' " .
 				($player->forbidden_seal['color'] == 'red' ? "checked='checked'" : '') . "/>

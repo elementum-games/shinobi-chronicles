@@ -26,10 +26,10 @@ function chat() {
 	}
 
 	// Validate post and submit to DB
-    $chat_max_post_length = SystemFunctions::CHAT_MAX_POST_LENGTH;
+    $chat_max_post_length = System::CHAT_MAX_POST_LENGTH;
 	if(isset($_POST['post'])) {
 		//If user has seal or is of staff, give them their words
-		$chat_max_post_length += ($player->forbidden_seal || $player->staff_level >= SystemFunctions::SC_MODERATOR) ? 100 : 0;
+		$chat_max_post_length += ($player->forbidden_seal || $player->staff_level >= System::SC_MODERATOR) ? 100 : 0;
 		$message = $system->clean(stripslashes(trim($_POST['post'])));
 		try {
 			$result = $system->query("SELECT `message` FROM `chat` WHERE `user_name` = '$player->user_name' ORDER BY  `post_id` DESC LIMIT 1");
@@ -75,7 +75,7 @@ function chat() {
 		}
 		$system->printMessage();
 	}
-	else if(isset($_GET['delete']) && $player->staff_level >= SystemFunctions::SC_MODERATOR) {
+	else if(isset($_GET['delete']) && $player->staff_level >= System::SC_MODERATOR) {
 		$delete = (int) $system->clean($_GET['delete']);
 		$result = $system->query("DELETE FROM `chat` WHERE `post_id` = $delete LIMIT 1");
 		$return_message = ($system->db_affected_rows) ? "Post deleted!" : "Error deleting post!";
@@ -238,7 +238,7 @@ function chat() {
 				echo "<td style='text-align:center;font-style:italic;'>
                     <div style='margin-bottom: 2px;'>{$posted}</div>";
 
-                    if($player->staff_level >= SystemFunctions::SC_MODERATOR) {
+                    if($player->staff_level >= System::SC_MODERATOR) {
                         echo sprintf("<a class='imageLink' href='$self_link&delete=%d'><img src='./images/delete_icon.png' style='max-width:20px;max-height:20px;' /></a>", $post['post_id']);
                     }
                     echo "<a class='imageLink' href='{$system->links['report']}&report_type=3&content_id=" . $post['post_id'] . "'>

@@ -7,7 +7,7 @@
 class AI extends Fighter {
     const ID_PREFIX = 'AI';
 
-    public SystemFunctions $system;
+    public System $system;
 
     public string $id;
     public int $ai_id;
@@ -42,11 +42,11 @@ class AI extends Fighter {
 
     /**
      * AI constructor.
-     * @param SystemFunctions $system
-     * @param int             $ai_id Id of the AI, used to select and update data from database
+     * @param System $system
+     * @param int    $ai_id Id of the AI, used to select and update data from database
      * @throws Exception
      */
-    public function __construct(SystemFunctions $system, int $ai_id) {
+    public function __construct(System $system, int $ai_id) {
         $this->system =& $system;
         if(!$ai_id) {
             $system->error("Invalid AI opponent!");
@@ -239,13 +239,13 @@ class AI extends Fighter {
     }
 
     /**
-     * @param SystemFunctions $system
-     * @param string          $entity_id_str
+     * @param System $system
+     * @param string $entity_id_str
      * @return AI
      * @throws Exception
      */
-    public static function fromEntityId(SystemFunctions $system, string $entity_id_str): AI {
-        $entityId = SystemFunctions::parseEntityId($entity_id_str);
+    public static function fromEntityId(System $system, string $entity_id_str): AI {
+        $entityId = System::parseEntityId($entity_id_str);
 
         if($entityId->entity_type != self::ID_PREFIX) {
             throw new Exception("Invalid entity type for AI class!");

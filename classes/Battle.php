@@ -45,7 +45,7 @@ class Battle {
     const TEAM2 = 'T2';
     const DRAW = 'DRAW';
 
-    private SystemFunctions $system;
+    private System $system;
 
     public int $battle_id;
     public int $battle_type;
@@ -98,14 +98,14 @@ class Battle {
     public array $default_attacks;
 
     /**
-     * @param SystemFunctions $system
-     * @param Fighter         $player1
-     * @param Fighter         $player2
-     * @param int             $battle_type
+     * @param System  $system
+     * @param Fighter $player1
+     * @param Fighter $player2
+     * @param int     $battle_type
      * @throws Exception
      */
     public static function start(
-        SystemFunctions $system, Fighter $player1, Fighter $player2, int $battle_type
+        System $system, Fighter $player1, Fighter $player2, int $battle_type
     ) {
         $json_empty_array = '[]';
 
@@ -176,12 +176,12 @@ class Battle {
 
     /**
      * Battle constructor.
-     * @param SystemFunctions $system
-     * @param User            $player
-     * @param int             $battle_id
+     * @param System $system
+     * @param User   $player
+     * @param int    $battle_id
      * @throws Exception
      */
-    public function __construct(SystemFunctions $system, User $player, int $battle_id) {
+    public function __construct(System $system, User $player, int $battle_id) {
         $this->system = $system;
 
         $this->battle_id = $battle_id;
@@ -1049,7 +1049,7 @@ class Battle {
      * @throws Exception
      */
     public static function getFighterEntityType(string $entity_id): string {
-        $entity_id = SystemFunctions::parseEntityId($entity_id);
+        $entity_id = System::parseEntityId($entity_id);
         return $entity_id->entity_type;
     }
 
@@ -1485,25 +1485,45 @@ class Battle {
                 //if user presses correct number (between 0-9) store in Arr[1];
                 var key = -1;
                 switch (event.which){
-                    case 48: key = 0;
+                    case 48: 
+                    case 96: 
+                        key = 0;
                     break;
-                    case 49: key = 1;
+                    case 49:
+                    case 97:
+                        key = 1;
                     break;
-                    case 50: key = 2;
+                    case 50:
+                    case 98:
+                        key = 2;
                     break;
-                    case 51: key = 3;
+                    case 51:
+                    case 99:
+                        key = 3;
                     break;
-                    case 52: key = 4;
+                    case 52:
+                    case 100:
+                        key = 4;
                     break;
-                    case 53: key = 5;
+                    case 53:
+                    case 101:
+                        key = 5;
                     break;
-                    case 54: key = 6;
+                    case 54:
+                    case 102:
+                        key = 6;
                     break;
-                    case 55: key = 7;
+                    case 55:
+                    case 103:
+                        key = 7;
                     break;
-                    case 56: key = 8;
+                    case 56:
+                    case 104:
+                        key = 8;
                     break;
-                    case 57: key = 9;
+                    case 57:
+                    case 105:
+                        key = 9;
                     break;
                 }
                 arr[1] = key;

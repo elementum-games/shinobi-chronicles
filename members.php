@@ -85,8 +85,8 @@ function members() {
 				}
 				echo "<br />";
 				$last_active = time() - $viewUser->last_active;
-				if($player->staff_level >= SystemFunctions::SC_MODERATOR) {
-					echo "(Last active " . SystemFunctions::timeRemaining($last_active, 'long') . " ago)";
+				if($player->staff_level >= System::SC_MODERATOR) {
+					echo "(Last active " . System::timeRemaining($last_active, 'long') . " ago)";
 				}
 				else {
 					$days = floor($last_active / 86400);
@@ -191,7 +191,7 @@ function members() {
 			";
 			echo "</td></tr></table>";
 
-			if($player->staff_level >= SystemFunctions::SC_MODERATOR) {
+			if($player->staff_level >= System::SC_MODERATOR) {
 				echo "<table class='table'><tr><th colspan='2'>Staff Info</th></tr>
 				<tr><td colspan='2'>
 					IP address: $viewUser->current_ip<br />
@@ -221,7 +221,7 @@ function members() {
 					}
 					
 					// Bot info
-					if($player->staff_level >= SystemFunctions::SC_HEAD_ADMINISTRATOR) {
+					if($player->staff_level >= System::SC_HEAD_ADMINISTRATOR) {
 						echo "</td></tr>
 						<tr><td colspan='2' style='text-align:center;'>";
 						
@@ -229,22 +229,22 @@ function members() {
 						$result = $system->query("SELECT `time` FROM `chat` WHERE `user_name`='{$viewUser->user_name}' ORDER BY `post_id` DESC LIMIT 1");
 						if($system->db_num_rows > 0) {
 							$last_post = $system->db_fetch($result)['time'];
-							echo "Last chat post: " . SystemFunctions::timeRemaining(time() - $last_post, 'long') . " ago<br />";
+							echo "Last chat post: " . System::timeRemaining(time() - $last_post, 'long') . " ago<br />";
 						}
 						
 						// Last AI
-						echo "Last AI battle started: " . SystemFunctions::timeRemaining(time() - $viewUser->last_ai, 'short') . " ago<br />";
+						echo "Last AI battle started: " . System::timeRemaining(time() - $viewUser->last_ai, 'short') . " ago<br />";
 						
 						// Current training
 						$display = '';
 						if(strpos($viewUser->train_type, 'jutsu:') !== false) {
 							$train_type = str_replace('jutsu:', '', $viewUser->train_type);
 							$display = "<br />Training: " . ucwords(str_replace('_', ' ', $train_type)) . "<br />" .
-								SystemFunctions::timeRemaining($viewUser->train_time - time(), 'short', false, true) . " remaining";
+								System::timeRemaining($viewUser->train_time - time(), 'short', false, true) . " remaining";
 						}
 						else  {
 							$display = "<br />Training: " . ucwords(str_replace('_', ' ', $viewUser->train_type)) . "<br />" .
-								SystemFunctions::timeRemaining($viewUser->train_time - time(), 'short', false, true) . " remaining";
+								System::timeRemaining($viewUser->train_time - time(), 'short', false, true) . " remaining";
 						}
 						echo $display;
 					}
@@ -255,12 +255,12 @@ function members() {
 					<a href='{$system->links['mod']}&ban_user_name={$viewUser->user_name}'>Ban user</a>";
 				
 				
-				if($player->staff_level >= SystemFunctions::SC_HEAD_MODERATOR) {
+				if($player->staff_level >= System::SC_HEAD_MODERATOR) {
 					echo "&nbsp;&nbsp;|&nbsp;&nbsp;<a href='{$system->links['mod']}&unban_user_name={$viewUser->user_name}'>Unban user</a>";
 					echo "&nbsp;&nbsp;|&nbsp;&nbsp;<a href='{$system->links['mod']}&ban_ip_address={$viewUser->last_ip}'>Ban IP</a>";
 					echo "&nbsp;&nbsp;|&nbsp;&nbsp;<a href='{$system->links['mod']}&unban_ip_address={$viewUser->last_ip}'>Unban IP</a>";
 				}
-				if($player->staff_level >= SystemFunctions::SC_ADMINISTRATOR) {
+				if($player->staff_level >= System::SC_ADMINISTRATOR) {
 					echo "&nbsp;&nbsp;|&nbsp;&nbsp;<a href='{$system->links['admin']}&page=edit_user&user_name={$viewUser->user_name}'>Edit user</a>";
 				}
 			
@@ -286,7 +286,7 @@ function members() {
 		$query_custom = '';
 		$view = 'highest_exp';
 		if($_GET['view'] == 'highest_exp') {
-			$query_custom = " WHERE `staff_level` < " . SystemFunctions::SC_ADMINISTRATOR . " ORDER BY `exp` DESC";
+			$query_custom = " WHERE `staff_level` < " . System::SC_ADMINISTRATOR . " ORDER BY `exp` DESC";
 			$list_name = 'Top 10 Users - Highest Exp';
 			$view = 'highest_exp';
 		}
@@ -299,7 +299,7 @@ function members() {
 			$view = 'online_users';		
 		}
 		else {
-			$query_custom = " WHERE `staff_level` < " . SystemFunctions::SC_ADMINISTRATOR . " ORDER BY `exp` DESC";
+			$query_custom = " WHERE `staff_level` < " . System::SC_ADMINISTRATOR . " ORDER BY `exp` DESC";
 			$list_name = 'Top 10 Users - Highest Exp';
 			$view = 'highest_exp';
 		
@@ -394,7 +394,7 @@ function members() {
 			</table>";
 		}
 		else {		
-			$last_staff_level = SystemFunctions::SC_ADMINISTRATOR;
+			$last_staff_level = System::SC_ADMINISTRATOR;
 			while($row = $system->db_fetch($result)) {
 				$class = '';
 				if(is_int($count++ / 2)) {
@@ -405,16 +405,16 @@ function members() {
 				}
 				
 				switch($row['staff_level']) {
-					case SystemFunctions::SC_MODERATOR:
+					case System::SC_MODERATOR:
 						$link_class = 'moderator';
 						break;
-					case SystemFunctions::SC_HEAD_MODERATOR:
+					case System::SC_HEAD_MODERATOR:
 						$link_class = 'headModerator';
 						break;
-					case SystemFunctions::SC_ADMINISTRATOR:
+					case System::SC_ADMINISTRATOR:
 						$link_class = 'administrator';
 						break;
-					case SystemFunctions::SC_HEAD_ADMINISTRATOR:
+					case System::SC_HEAD_ADMINISTRATOR:
 						$link_class = 'administrator';
 						break;
 				}
@@ -423,10 +423,10 @@ function members() {
 				if($row['staff_level'] < $last_staff_level) {
 					$last_staff_level = $row['staff_level'];
 					switch($row['staff_level']) {
-						case SystemFunctions::SC_HEAD_MODERATOR:
+						case System::SC_HEAD_MODERATOR:
 							echo "<tr><th colspan='3'>Head Moderators</th></tr>";
 							break;
-						case SystemFunctions::SC_MODERATOR:
+						case System::SC_MODERATOR:
 							echo "<tr><th colspan='3'>Moderators</th></tr>";
 							break;
 					}

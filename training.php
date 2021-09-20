@@ -155,11 +155,11 @@ function training() {
 		if(strpos($player->train_type, 'jutsu:') !== false) {
 			$train_type = str_replace('jutsu:', '', $player->train_type);
 			echo "Currently training: " . ucwords(str_replace('_', ' ', $train_type)) . "<br />" .
-			SystemFunctions::timeRemaining($player->train_time - time(), 'short', false, true) . " remaining";
+			System::timeRemaining($player->train_time - time(), 'short', false, true) . " remaining";
 		}
 		else  {
 			echo "Currently training: " . ucwords(str_replace('_', ' ', $player->train_type)) . "<br />" .
-			SystemFunctions::timeRemaining($player->train_time - time(), 'short', false, true) . " remaining";
+			System::timeRemaining($player->train_time - time(), 'short', false, true) . " remaining";
 		}
 		echo "<br />
 		<br /><a href='$self_link&cancel_training=1'>Cancel Training</a>";

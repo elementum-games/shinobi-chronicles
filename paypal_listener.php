@@ -4,7 +4,7 @@ if(!$_POST) {
 }
 
 require("classes.php");
-$system = new SystemFunctions();
+$system = new System();
 $system->dbConnect();
 
 
@@ -99,7 +99,7 @@ else {
 					throw new Exception("Invalid payment, < $1!");
 				}
 
-				$kunai_amount = $payment_amount * SystemFunctions::KUNAI_PER_DOLLAR;
+				$kunai_amount = $payment_amount * System::KUNAI_PER_DOLLAR;
 				
 				$query = "INSERT INTO `Payments` (`txn_id`, `payment_date`, `time`, `username`, `buyer_name`, `buyer_email`, `payment_amount`, `quantity`,
 				`payment_currency`, `address_city`, `address_country`, `address_state`, `address_street`, `address_zip`, `address_status`) VALUES
