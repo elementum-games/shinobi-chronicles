@@ -45,6 +45,10 @@ class Battle {
     const TEAM2 = 'T2';
     const DRAW = 'DRAW';
 
+    // Minimum % (of itself) a debuff can be reduced to with debuff resist
+    const MIN_DEBUFF_RATIO = 0.1;
+    const MAX_DIFFUSE_PERCENT = 0.75;
+
     private System $system;
 
     public int $battle_id;
@@ -983,6 +987,11 @@ class Battle {
         // Apply genjutsu passive effects
         if(is_array($this->active_genjutsu)) {
             foreach($this->active_genjutsu as $id => $genjutsu) {
+                if($this->system->debug['battle']) {
+                    echo "[$id] " . $genjutsu['effect'] . '(' . $genjutsu['effect_amount'] . ') ->' .
+                        $genjutsu['target'] . '(' . $genjutsu['turns'] . ' turns left)<br />';
+                }
+
                 if($genjutsu['target'] == $this->player1->combat_id) {
                     $effect_target =& $this->player1;
                 }
@@ -995,7 +1004,7 @@ class Battle {
                 else {
                     $effect_user =& $this->player2;
                 }
-                $this->applyPassiveEffects($effect_target, $effect_user, $effect);
+                $this->applyPassiveEffects($effect_target, $effect_user, $genjutsu);
             }
         }
         else {
@@ -1645,28 +1654,33 @@ class Battle {
         else if($effect['effect'] == 'barrier') {
             $target->barrier += $effect['effect_amount'];
         }
+
         // Debuffs
-        $target_debuff_resist = 50 + ($target->willpower + $target->willpower_boost - $target->willpower_nerf) * 0.5;
+        $effect_amount = $effect['effect_amount'] - $target->getDebuffResist();
+        if($effect_amount < $effect['effect_amount'] * Battle::MIN_DEBUFF_RATIO) {
+            $effect_amount = $effect['effect_amount'] * Battle::MIN_DEBUFF_RATIO;
+        }
+
         if($effect['effect'] == 'ninjutsu_nerf') {
-            $target->ninjutsu_nerf += $effect['effect_amount'] / $target_debuff_resist;
+            $target->ninjutsu_nerf += $effect_amount;
         }
         else if($effect['effect'] == 'taijutsu_nerf') {
-            $target->taijutsu_nerf += $effect['effect_amount'] / $target_debuff_resist;
+            $target->taijutsu_nerf += $effect_amount;
         }
         else if($effect['effect'] == 'genjutsu_nerf') {
-            $target->genjutsu_nerf += $effect['effect_amount'] / $target_debuff_resist;
+            $target->genjutsu_nerf += $effect_amount;
         }
         else if($effect['effect'] == 'cast_speed_nerf') {
-            $target->cast_speed_nerf += $effect['effect_amount'] / $target_debuff_resist;
+            $target->cast_speed_nerf += $effect_amount;
         }
         else if($effect['effect'] == 'speed_nerf' or $effect['effect'] == 'cripple') {
-            $target->speed_nerf += $effect['effect_amount'] / $target_debuff_resist;
+            $target->speed_nerf += $effect_amount;
         }
         else if($effect['effect'] == 'intelligence_nerf' or $effect['effect'] == 'daze') {
-            $target->intelligence_nerf += $effect['effect_amount'] / $target_debuff_resist;
+            $target->intelligence_nerf += $effect_amount;
         }
         else if($effect['effect'] == 'willpower_nerf') {
-            $target->willpower_nerf += $effect['effect_amount'] / $target_debuff_resist;
+            $target->willpower_nerf += $effect_amount;
         }
         return false;
     }
@@ -1812,33 +1826,41 @@ class Battle {
         // Weapon diffuse (tai diffuse nin)
         if($player_jutsu->weapon_id && $player_jutsu->weapon_effect->effect == 'diffuse') {
             if($opponent_damage <= 0){
-                $player_diffuse_amount = 0;
+                $player_diffuse_percent = 0;
             }
             else {
-                $player_diffuse_amount = round(
+                $player_diffuse_percent = round(
                     $player_damage / $opponent_damage * ($player_jutsu->weapon_effect->effect_amount / 100),
                     1
                 );
+
+                if($player_diffuse_percent > Battle::MAX_DIFFUSE_PERCENT) {
+                    $player_diffuse_percent = Battle::MAX_DIFFUSE_PERCENT;
+                }
             }
         }
         if($opponent_jutsu->weapon_id && $opponent_jutsu->weapon_effect->effect == 'diffuse') {
             if($player_damage <= 0){
-                $opponent_diffuse_amount = 0;
+                $opponent_diffuse_percent = 0;
             }
             else {
-                $opponent_diffuse_amount = round(
+                $opponent_diffuse_percent = round(
                     $opponent_damage / $player_damage * ($opponent_jutsu->weapon_effect->effect_amount / 100),
                     1
                 );
             }
+
+            if($opponent_diffuse_percent > Battle::MAX_DIFFUSE_PERCENT) {
+                $opponent_diffuse_percent = Battle::MAX_DIFFUSE_PERCENT;
+            }
         }
-        if(!empty($player_diffuse_amount)) {
-            $opponent_damage *= 1 - $player_diffuse_amount;
-            $collision_text .= "[player] diffused " . ($player_diffuse_amount * 100) . "% of [opponent]'s damage![br]";
+        if(!empty($player_diffuse_percent)) {
+            $opponent_damage *= 1 - $player_diffuse_percent;
+            $collision_text .= "[player] diffused " . ($player_diffuse_percent * 100) . "% of [opponent]'s damage![br]";
         }
-        if(!empty($opponent_diffuse_amount)) {
-            $player_damage *= 1 - $opponent_diffuse_amount;
-            $collision_text .= "[opponent] diffused " . ($opponent_diffuse_amount * 100) . "% of [player]'s damage![br]";
+        if(!empty($opponent_diffuse_percent)) {
+            $player_damage *= 1 - $opponent_diffuse_percent;
+            $collision_text .= "[opponent] diffused " . ($opponent_diffuse_percent * 100) . "% of [player]'s damage![br]";
         }
 
         if($player_jutsu->jutsu_type == 'genjutsu' or $opponent_jutsu->jutsu_type == 'genjutsu') {
@@ -2014,14 +2036,14 @@ class Battle {
         return $collision_text;
     }
 
-    function setEffect(Fighter &$user, $target_id, Jutsu $jutsu, $damage, $effect_id, &$active_effects) {
+    function setEffect(Fighter &$user, $target_id, Jutsu $jutsu, $raw_damage, $effect_id, &$active_effects) {
         $apply_effect = true;
 
-        $debuff_power = ($jutsu->power <= 0) ? 0 : $damage / $jutsu->power / 15;
+        $debuff_power = ($jutsu->power <= 0) ? 0 : $raw_damage / $jutsu->power / 15;
 
         if($this->system->debug['battle_effects']) {
             echo sprintf("JP: %s (%s)<br />", $jutsu->power, $jutsu->effect);
-            echo sprintf("%s / %s<br />", $damage, $debuff_power);
+            echo sprintf("%s / %s<br />", $raw_damage, $debuff_power);
         }
 
         if($jutsu->jutsu_type == 'genjutsu' && !empty($jutsu->parent_jutsu)) {
@@ -2045,15 +2067,15 @@ class Battle {
             case 'ninjutsu_resist':
             case 'taijutsu_resist':
             case 'genjutsu_resist':
-                $jutsu->effect_amount = round($damage * ($jutsu->effect_amount / 100), 2);
+                $jutsu->effect_amount = round($raw_damage * ($jutsu->effect_amount / 100), 2);
                 break;
             case 'absorb_chakra':
             case 'absorb_stamina':
-                $jutsu->effect_amount = round($damage * ($jutsu->effect_amount / 600), 2);
+                $jutsu->effect_amount = round($raw_damage * ($jutsu->effect_amount / 600), 2);
                 break;
             case 'drain_chakra':
             case 'drain_stamina':
-                $jutsu->effect_amount = round($damage * ($jutsu->effect_amount / 300), 2);
+                $jutsu->effect_amount = round($raw_damage * ($jutsu->effect_amount / 300), 2);
                 break;
             case 'speed_boost':
             case 'cast_speed_boost':
@@ -2066,7 +2088,7 @@ class Battle {
                 $jutsu->effect_amount = round($debuff_power * ($jutsu->effect_amount / 100), 2);
                 break;
             case 'barrier':
-                $jutsu->effect_amount = $damage;
+                $jutsu->effect_amount = $raw_damage;
                 break;
             default:
                 $apply_effect = false;
