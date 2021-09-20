@@ -1,7 +1,15 @@
 <?php
 
 abstract class Fighter {
-    public SystemFunctions $system;
+    const BASE_OFFENSE = 35;
+
+    const SKILL_OFFENSE_RATIO = 0.10;
+    CONST BLOODLINE_OFFENSE_RATIO = self::SKILL_OFFENSE_RATIO * 0.8;
+
+    const MIN_RAND = 33;
+    const MAX_RAND = 37;
+
+    public System $system;
 
     public string $combat_id;
 
@@ -50,32 +58,32 @@ abstract class Fighter {
     public $gender;
 
     // In-combat vars
-    public $ninjutsu_boost;
-    public $taijutsu_boost;
-    public $genjutsu_boost;
+    public $ninjutsu_boost = 0;
+    public $taijutsu_boost = 0;
+    public $genjutsu_boost = 0;
 
-    public $cast_speed_boost;
-    public $speed_boost;
-    public $intelligence_boost;
-    public $willpower_boost;
+    public $cast_speed_boost = 0;
+    public $speed_boost = 0;
+    public $intelligence_boost = 0;
+    public $willpower_boost = 0;
 
-    public $ninjutsu_resist;
-    public $taijutsu_resist;
-    public $genjutsu_resist;
+    public $ninjutsu_resist = 0;
+    public $taijutsu_resist = 0;
+    public $genjutsu_resist = 0;
 
-    public $defense_boost;
+    public $defense_boost = 0;
 
     public $barrier;
 
     // Combat nerfs
-    public $ninjutsu_nerf;
-    public $taijutsu_nerf;
-    public $genjutsu_nerf;
+    public $ninjutsu_nerf = 0;
+    public $taijutsu_nerf = 0;
+    public $genjutsu_nerf = 0;
 
-    public $cast_speed_nerf;
-    public $speed_nerf;
-    public $intelligence_nerf;
-    public $willpower_nerf;
+    public $cast_speed_nerf = 0;
+    public $speed_nerf = 0;
+    public $intelligence_nerf = 0;
+    public $willpower_nerf = 0;
 
     // Getters
     abstract public function getName(): string;
@@ -110,6 +118,24 @@ abstract class Fighter {
             return 'their';
         }
     }
+    
+    public function getDebuffResist(): float {
+        $willpower = ($this->willpower + $this->willpower_boost - $this->willpower_nerf);
+
+        $initial_willpower = $willpower;
+        $extra_willpower = 0;
+        if($willpower > 1000) {
+            $initial_willpower = 1000;
+            $extra_willpower = $willpower - 1000;
+        }
+
+        // Make first 1000 count extra to offset base offense
+        $final_amount = ($initial_willpower * 1.35) + $extra_willpower;
+
+        $avg_rand = floor((self::MIN_RAND + self::MAX_RAND) / 2);
+
+        return $final_amount * (self::SKILL_OFFENSE_RATIO * 2) * $avg_rand;
+    }
 
     /**
      * function calcDamage() CONTAINS TEMP NUMBER FIX
@@ -121,13 +147,38 @@ abstract class Fighter {
      * @throws Exception
      */
     public function calcDamage(Jutsu $attack, $attack_type = 'default_jutsu') {
+        if($this->system->debug['damage'])  {
+            echo "Debugging damage for {$this->getName()}<br />";
+        }
+
+        switch($attack->jutsu_type) {
+            case Jutsu::TYPE_TAIJUTSU:
+                $off_skill = $this->taijutsu_skill;
+                $off_boost = $this->taijutsu_boost;
+                $off_nerf = $this->taijutsu_nerf;
+                break;
+            case Jutsu::TYPE_GENJUTSU:
+                $off_skill = $this->genjutsu_skill;
+                $off_boost = $this->genjutsu_boost;
+                $off_nerf = $this->genjutsu_nerf;
+                break;
+            case Jutsu::TYPE_NINJUTSU:
+                $off_skill = $this->ninjutsu_skill;
+                $off_boost = $this->ninjutsu_boost;
+                $off_nerf = $this->ninjutsu_nerf;
+                break;
+            default:
+                throw new Exception("Invalid jutsu type!");
+        }
+
         switch($attack_type) {
             case 'default_jutsu':
             case 'equipped_jutsu':
-                $offense = 35 + ($this->{$attack->jutsu_type . '_skill'} * 0.10);
+                $offense = self::BASE_OFFENSE + ($off_skill * self::SKILL_OFFENSE_RATIO);
                 break;
             case 'bloodline_jutsu':
-                $offense = 35 + ($this->{$attack->jutsu_type . '_skill'} * 0.08) + ($this->bloodline_skill * 0.08);
+                $offense = self::BASE_OFFENSE +
+                    ($off_skill * self::BLOODLINE_OFFENSE_RATIO) + ($this->bloodline_skill * self::BLOODLINE_OFFENSE_RATIO);
                 break;
             default:
                 throw new Exception("Invalid jutsu type!");
@@ -170,18 +221,16 @@ abstract class Fighter {
             $offense = $extra_offense + 900;
         }
 
-        $min = 25;
-        $max = 45;
-        $rand = (int)(($min + $max) / 2);
-        // $rand = mt_rand($min, $max);
+        $rand = mt_rand(self::MIN_RAND, self::MAX_RAND);
 
         $damage = $offense * $attack->power * $rand;
 
         // Add non-BL damage boosts
-        $damage_boost = $this->{$attack->jutsu_type . '_boost'} - $this->{$attack->jutsu_type . '_nerf'};
+        $damage_boost = $off_boost - $off_nerf;
         if($this->system->debug['damage']) {
-            echo 'Damage/boost: ' . $damage . ' / ' . $damage_boost . '<br />';
+            echo "Damage/boost/nerf/final boost: $damage / {$off_boost} / {$off_nerf} / {$damage_boost} <br />";
         }
+
         $damage = round($damage + $damage_boost, 2);
         if($damage < 0) {
             $damage = 0;
@@ -228,15 +277,15 @@ abstract class Fighter {
 
         switch($defense_type) {
             case 'ninjutsu':
-                $defense += SystemFunctions::diminishing_returns($this->ninjutsu_skill * $def_multiplier, 50);
+                $defense += System::diminishing_returns($this->ninjutsu_skill * $def_multiplier, 50);
                 $raw_damage -= $this->ninjutsu_resist;
                 break;
             case 'genjutsu':
-                $defense += SystemFunctions::diminishing_returns($this->genjutsu_skill * $def_multiplier, 50);
+                $defense += System::diminishing_returns($this->genjutsu_skill * $def_multiplier, 50);
                 $raw_damage -= $this->genjutsu_resist;
                 break;
             case 'taijutsu':
-                $defense += SystemFunctions::diminishing_returns($this->taijutsu_skill * $def_multiplier, 50);
+                $defense += System::diminishing_returns($this->taijutsu_skill * $def_multiplier, 50);
                 $raw_damage -= $this->taijutsu_resist;
                 break;
             default:

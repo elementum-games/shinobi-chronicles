@@ -27,8 +27,8 @@ function missions() {
 	else if($player->rank == 4) {
 		$max_mission_rank = 4;
 	}
-	else if($player->rank > SystemFunctions::SC_MAX_RANK) {
-		$max_mission_rank = SystemFunctions::SC_MAX_RANK;
+	else if($player->rank > System::SC_MAX_RANK) {
+		$max_mission_rank = System::SC_MAX_RANK;
 	}
 	//End
 	$mission_rank_names = array(1 => 'D-Rank', 2 => 'C-Rank', 3 => 'B-Rank', 4 => 'A-Rank', 5 => 'S-Rank');

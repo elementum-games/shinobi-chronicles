@@ -7,7 +7,7 @@ Revised:	08/24/2013 by Levi Meahan
 Purpose:	Contains variables for layout HTML sections: Header, menus, footer
 */
 
-/** @var SystemFunctions $system */
+/** @var System $system */
 
 /** @noinspection HtmlUnknownTarget */
 $heading = <<<HTML

@@ -94,7 +94,8 @@ function gear() {
 			$system->message($e->getMessage());
 		}
 	}
-	
+
+
 	
 	$system->printMessage();
 	
@@ -302,7 +303,7 @@ function jutsu() {
 			if($player->checkInventory($jutsu_id, 'jutsu')) {
 				throw new Exception("You already know that jutsu!");
 			}
-		
+
 			// Parent jutsu check
 			if($player->jutsu_scrolls[$jutsu_id]->parent_jutsu) {
 				$id = $player->jutsu_scrolls[$jutsu_id]->parent_jutsu;
@@ -338,7 +339,54 @@ function jutsu() {
 			$system->message($e->getMessage());
 		}
 	}
-	
+	else if(!empty($_GET['forget_jutsu'])) {
+		$jutsu_id = (int)$_GET['forget_jutsu'];
+		try{
+			//Checking if player knows the jutsu he's trying to forget.
+			if(!$player->checkInventory($jutsu_id, 'jutsu')) {
+				throw new Exception("Invalid Jutsu!");
+			}
+
+			//Checking if player has jutsu that depend on the jutsu he's trying to forget.
+			$can_forget = userHasChildrenJutsu($jutsu_id, $player);
+			if($can_forget == false){
+				throw new Exception("You cannot forget the parent of a jutsu you know!");
+			}
+
+            if(!empty($_POST['confirm_forget'])) {
+                //Forgetting jutsu.
+                $jutsu_name = $player->jutsu[$jutsu_id]->name;
+                $player->removeJutsu($jutsu_id);
+
+                $system->message("You have forgotten $jutsu_name!");
+                $system->printMessage();
+                $page = '';
+            }
+            else {
+                echo "<table class='table'>
+					    <tr>
+					        <th>Forget Jutsu</th>
+                        </tr>
+					    <tr>
+					        <td style='text-align:center;'>
+						        Are you sure you want to forget {$player->jutsu[$jutsu_id]->name}?
+						        <br />
+                                <form action='$self_link&forget_jutsu={$jutsu_id}' method='post'>
+                                    <input type='hidden' name='confirm_forget' value='1' />
+                                    <button style='text-align:center' type='submit'>Forget</button>
+                                </form>
+					        </td>
+					    </tr>
+				    </table>";
+            }
+
+
+		}
+		catch (Exception $e) {
+			$system->message($e->getMessage());
+		}
+	}
+
 	$system->printMessage();
 	echo "<table class='table'>";
 	
@@ -390,6 +438,8 @@ function jutsu() {
 					}
 					echo "</p>";
 				}
+
+				echo "<p style='text-align:center'><a href='$self_link&view_jutsu={$jutsu->id}&forget_jutsu={$jutsu->id}'>Forget Jutsu!</a></p>";
 			echo "</td></tr>";
 		}
 	}
@@ -502,4 +552,12 @@ function jutsu() {
 	$player->updateInventory();
 }
 
+function userHasChildrenJutsu($id, $player){
+    foreach($player->jutsu as $element){
+        if($id == $element->parent_jutsu){
+            return false;
+        }
+    }
 
+    return true;
+}

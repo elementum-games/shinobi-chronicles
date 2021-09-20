@@ -7,7 +7,7 @@
 class AI extends Fighter {
     const ID_PREFIX = 'AI';
 
-    public SystemFunctions $system;
+    public System $system;
 
     public string $id;
     public int $ai_id;
@@ -36,17 +36,17 @@ class AI extends Fighter {
     public $money;
 
     /** @var Jutsu[] */
-    public array $jutsu;
+    public array $jutsu = [];
 
     public $current_move;
 
     /**
      * AI constructor.
-     * @param SystemFunctions $system
-     * @param int             $ai_id Id of the AI, used to select and update data from database
+     * @param System $system
+     * @param int    $ai_id Id of the AI, used to select and update data from database
      * @throws Exception
      */
-    public function __construct(SystemFunctions $system, int $ai_id) {
+    public function __construct(System $system, int $ai_id) {
         $this->system =& $system;
         if(!$ai_id) {
             $system->error("Invalid AI opponent!");
@@ -110,9 +110,8 @@ class AI extends Fighter {
 
         $moves = json_decode($ai_data['moves'], true);
 
-        $count = 0;
         foreach($moves as $move) {
-            $jutsu = $this->initJutsu($count, $move['jutsu_type'], $move['power'], $move['battle_text']);
+            $jutsu = $this->initJutsu(count($this->jutsu), $move['jutsu_type'], $move['power'], $move['battle_text']);
 
             switch($jutsu->jutsu_type) {
                 case Jutsu::TYPE_NINJUTSU:
@@ -130,17 +129,19 @@ class AI extends Fighter {
                     throw new Exception("Invalid jutsu type!");
             }
 
-            $this->jutsu[$count] = $jutsu;
-
-            $count++;
+            $this->jutsu[] = $jutsu;
         }
 
+        $this->loadRandomShopJutsu();
+    }
+
+    private function loadRandomShopJutsu() {
         $jutsuTypes = ['ninjutsu', 'taijutsu'];
         $aiType = rand(0, 1);
         $result = $this->system->query(
             "SELECT `battle_text`, `power`, `jutsu_type` FROM `jutsu` 
                     WHERE `rank` = '{$this->rank}' AND `jutsu_type` = '{$jutsuTypes[$aiType]}' 
-                    AND `purchase_type` != '1' AND `purchase_type` != '3' LIMIT 5");
+                    AND `purchase_type` != '1' AND `purchase_type` != '3' LIMIT 1");
         while ($row = $this->system->db_fetch($result)) {
             $moveArr = [];
             foreach($row as $type => $data) {
@@ -239,13 +240,13 @@ class AI extends Fighter {
     }
 
     /**
-     * @param SystemFunctions $system
-     * @param string          $entity_id_str
+     * @param System $system
+     * @param string $entity_id_str
      * @return AI
      * @throws Exception
      */
-    public static function fromEntityId(SystemFunctions $system, string $entity_id_str): AI {
-        $entityId = SystemFunctions::parseEntityId($entity_id_str);
+    public static function fromEntityId(System $system, string $entity_id_str): AI {
+        $entityId = System::parseEntityId($entity_id_str);
 
         if($entityId->entity_type != self::ID_PREFIX) {
             throw new Exception("Invalid entity type for AI class!");

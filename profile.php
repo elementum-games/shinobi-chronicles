@@ -33,7 +33,7 @@ function userProfile() {
 		}
 	}
 	// Rank up
-	else if($player->level >= $player->max_level && $player->exp >= $exp_needed && $player->rank < SystemFunctions::SC_MAX_RANK) {
+	else if($player->level >= $player->max_level && $player->exp >= $exp_needed && $player->rank < System::SC_MAX_RANK) {
 		if($player->battle_id > 0 or !$player->in_village) {
 			echo "<p style='text-align:center;font-style:italic;'>
 				You must be out of battle and in your village to rank up.</p>";
@@ -93,7 +93,7 @@ function userProfile() {
 			else {
 				throw new Exception("Invalid Currency Type!");
 			}
-			if($amount <= 0 && $player->staff_level < SystemFunctions::SC_HEAD_ADMINISTRATOR) {
+			if($amount <= 0 && $player->staff_level < System::SC_HEAD_ADMINISTRATOR) {
 				throw new Exception("Invalid amount!");
 			}
 			if($amount > $player->$type) {

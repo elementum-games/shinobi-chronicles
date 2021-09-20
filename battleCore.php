@@ -817,7 +817,7 @@ function battlePvP(&$player, &$opponent, &$battle) {
 	// Jutsu passive effects
 	if(is_array($battle['active_effects'])) {
 		foreach($battle['active_effects'] as $id => $effect) {
-			if($player->staff_level >= SystemFunctions::SC_ADMINISTRATOR) {
+			if($player->staff_level >= System::SC_ADMINISTRATOR) {
 				echo "[$id] " . $effect['effect'] . '(' . $effect['effect_amount'] . ') ->' .
 					$effect['target'] . '(' . $effect['turns'] . ' turns left)<br />';
 			}

@@ -1,7 +1,7 @@
 <?php
 
 
-/** @var SystemFunctions $system */
+/** @var System $system */
 
 /** @noinspection HtmlUnknownTarget */
 $heading = <<<HTML

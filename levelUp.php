@@ -62,7 +62,7 @@ function rankUp(): bool {
         return true;
     }
 
-    if($player->level < $player->max_level || $player->exp < $player->expForNextLevel() || $player->rank >= SystemFunctions::SC_MAX_RANK) {
+    if($player->level < $player->max_level || $player->exp < $player->expForNextLevel() || $player->rank >= System::SC_MAX_RANK) {
         $player->exam_stage = 0;
         $system->message("You are not eligible for a rankup exam. <a href='{$system->links['profile']}'>Continue</a>");
         return true;
@@ -77,7 +77,7 @@ function rankUp(): bool {
 	
 	// Akademi-sei -> Genin
 	if($player->rank == 1) {
-		$bloodline_roll_chance = SystemFunctions::BLOODLINE_ROLL_CHANCE;
+		$bloodline_roll_chance = System::BLOODLINE_ROLL_CHANCE;
 		
 		$player->getInventory();
 	

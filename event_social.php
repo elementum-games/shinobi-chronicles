@@ -4,7 +4,7 @@ if(!isset($_SESSION['user_id']) or $_SESSION['user_id'] != 1) {
 	exit;
 }
 require("classes.php");
-$system = new SystemFunctions();
+$system = new System();
 $system->dbConnect();
 $village = 'Leaf';
 if($_POST['message']) {

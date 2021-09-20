@@ -1,6 +1,7 @@
 <?php
 
-require_once "classes/system.php";
+require_once "classes/EntityId.php";
+require_once "classes/System.php";
 
 require_once "classes/Jutsu.php";
 require_once "classes/Bloodline.php";

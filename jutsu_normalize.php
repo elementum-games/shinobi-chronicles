@@ -7,12 +7,12 @@ if(!isset($_SESSION['user_id'])) {
 
 require("classes.php");
 
-$system = new SystemFunctions();
+$system = new System();
 $system->dbConnect();
 
 $player = new User($_SESSION['user_id']);
 
-if($player->staff_level < SystemFunctions::SC_HEAD_ADMINISTRATOR) {
+if($player->staff_level < System::SC_HEAD_ADMINISTRATOR) {
 	exit;
 }
 
