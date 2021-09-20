@@ -251,6 +251,54 @@ class Battle {
         $this->default_attacks = $this->getDefaultAttacks();
     }
 
+    public function determineEffectAnnouncementText(string  $attackingPlayer, string $defendingPlayer, string $announcement_text, string $effect) : string{
+        switch($effect){
+            case 'taijutsu_nerf':
+                $announcement_text .= "<br/> <p style=\"font-weight:bold;\"> {$defendingPlayer}'s Taijutsu is being lowered.</p>";
+                break;
+            case 'ninjutsu_nerf':
+                $announcement_text .= "<br/> <p style=\"font-weight:bold;\"> {$defendingPlayer}'s Ninjutsu is being lowered.</p>";
+                break;
+            case 'genjutsu_nerf':
+                $announcement_text .= "<br/> <p style=\"font-weight:bold;\"> {$defendingPlayer}'s Genjutsu is being lowered.</p>";
+                break;
+            case 'intelligence_nerf':
+                $announcement_text .= "<br/> <p style=\"font-weight:bold;\"> {$defendingPlayer}'s Intelligence is being lowered.</p>";
+                break;
+            case 'willpower_nerf':
+                $announcement_text .= "<br/> <p style=\"font-weight:bold;\"> {$defendingPlayer}'s Willpower is being lowered.</p>";
+                break;
+            case 'cast_speed_nerf':
+                $announcement_text .= "<br/> <p style=\"font-weight:bold;\"> {$defendingPlayer}'s Cast Speed is being lowered.</p>";
+                break;
+            case 'speed_nerf':
+                $announcement_text .= "<br/> <p style=\"font-weight:bold;\"> {$defendingPlayer}'s Speed is being lowered.</p>";
+                break;
+            case 'residual_damage':
+                $announcement_text .= "<br/> <p style=\"font-weight:bold;\"> {$defendingPlayer} is taking Residual Damage.</p>";
+                break;
+            case 'drain_chakra':
+                $announcement_text .= "<br/> <p style=\"font-weight:bold;\"> {$defendingPlayer}'s Chakra is being drained.</p>";
+                break;
+            case 'drain_stamina':
+                $announcement_text .= "<br/> <p style=\"font-weight:bold;\"> {$defendingPlayer}'s Stamina is being drained.</p>";
+                break;
+            case 'taijutsu_boost ':
+                $announcement_text .= "<br/> <p style=\"font-weight:bold;\"> {$attackingPlayer}'s Taijutsu is being increased.</p>";
+                break;
+            case 'ninjutsu_boost  ':
+                $announcement_text .= "<br/> <p style=\"font-weight:bold;\"> {$attackingPlayer}'s Ninjutsu is being increased.</p>";
+                break;
+            case 'genjutsu_boost  ':
+                $announcement_text .= "<br/> <p style=\"font-weight:bold;\"> {$attackingPlayer}'s Genjutsu is being increased.</p>";
+                break;
+            default:
+                break;
+        }
+
+        return $announcement_text;
+    }
+
     /**
      * @return string|null
      * @throws Exception
@@ -751,6 +799,13 @@ class Battle {
                     if($player1_effect_display) {
                         $text .= $this->system->clean($player1_effect_display);
                     }
+
+                    if($player1_jutsu->effect != 'none'){
+                        $text = $this->determineEffectAnnouncementText($this->player1->getName(), $this->player2->getName(), $text, $player1_jutsu->effect);
+                    }
+
+                    //$this->system->message($text);
+
                     $this->battle_text .= $this->parseCombatText($text, $this->player1, $this->player2);
                 }
                 else {
