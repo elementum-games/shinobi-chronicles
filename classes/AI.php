@@ -36,7 +36,7 @@ class AI extends Fighter {
     public $money;
 
     /** @var Jutsu[] */
-    public array $jutsu;
+    public array $jutsu = [];
 
     public $current_move;
 
@@ -110,9 +110,8 @@ class AI extends Fighter {
 
         $moves = json_decode($ai_data['moves'], true);
 
-        $count = 0;
         foreach($moves as $move) {
-            $jutsu = $this->initJutsu($count, $move['jutsu_type'], $move['power'], $move['battle_text']);
+            $jutsu = $this->initJutsu(count($this->jutsu), $move['jutsu_type'], $move['power'], $move['battle_text']);
 
             switch($jutsu->jutsu_type) {
                 case Jutsu::TYPE_NINJUTSU:
@@ -130,17 +129,19 @@ class AI extends Fighter {
                     throw new Exception("Invalid jutsu type!");
             }
 
-            $this->jutsu[$count] = $jutsu;
-
-            $count++;
+            $this->jutsu[] = $jutsu;
         }
 
+        $this->loadRandomShopJutsu();
+    }
+
+    private function loadRandomShopJutsu() {
         $jutsuTypes = ['ninjutsu', 'taijutsu'];
         $aiType = rand(0, 1);
         $result = $this->system->query(
             "SELECT `battle_text`, `power`, `jutsu_type` FROM `jutsu` 
                     WHERE `rank` = '{$this->rank}' AND `jutsu_type` = '{$jutsuTypes[$aiType]}' 
-                    AND `purchase_type` != '1' AND `purchase_type` != '3' LIMIT 5");
+                    AND `purchase_type` != '1' AND `purchase_type` != '3' LIMIT 1");
         while ($row = $this->system->db_fetch($result)) {
             $moveArr = [];
             foreach($row as $type => $data) {
