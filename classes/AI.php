@@ -132,7 +132,7 @@ class AI extends Fighter {
             $this->jutsu[] = $jutsu;
         }
 
-        // $this->loadRandomShopJutsu();
+        $this->loadRandomShopJutsu();
     }
 
     private function loadRandomShopJutsu() {
@@ -141,7 +141,7 @@ class AI extends Fighter {
         $result = $this->system->query(
             "SELECT `battle_text`, `power`, `jutsu_type` FROM `jutsu` 
                     WHERE `rank` = '{$this->rank}' AND `jutsu_type` = '{$jutsuTypes[$aiType]}' 
-                    AND `purchase_type` != '1' AND `purchase_type` != '3' LIMIT 5");
+                    AND `purchase_type` != '1' AND `purchase_type` != '3' LIMIT 1");
         while ($row = $this->system->db_fetch($result)) {
             $moveArr = [];
             foreach($row as $type => $data) {
