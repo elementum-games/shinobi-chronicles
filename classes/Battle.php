@@ -242,14 +242,14 @@ class Battle {
             $this->opponent_side = Battle::TEAM2;
 
             $this->player1 = $player;
-            $this->player_jutsu_used = $this->player1_jutsu_used;
+            $this->player_jutsu_used =& $this->player1_jutsu_used;
         }
         else if($player->id == $this->player2_id) {
             $this->player_side = Battle::TEAM2;
             $this->opponent_side = Battle::TEAM1;
 
             $this->player2 = $player;
-            $this->player_jutsu_used = $this->player2_jutsu_used;
+            $this->player_jutsu_used =& $this->player2_jutsu_used;
         }
 
         $this->default_attacks = $this->getDefaultAttacks();
@@ -1187,11 +1187,11 @@ class Battle {
         return $entity_id->entity_type;
     }
 
-        /**
+    /**
      * @param Fighter $player
-     * @param Jutsu[]  $default_attacks
+     * @param Jutsu[] $default_attacks
      */
-    protected function renderActionPrompt(Fighter $player, $default_attacks) {
+    protected function renderActionPrompt(Fighter $player, array $default_attacks) {
         global $self_link;
 
         $gold_color = '#FDD017';
@@ -2393,7 +2393,7 @@ class Battle {
         return $this->winner;
     }
 
-    private static function getJutsuTextColor($jutsu_type) {
+    private static function getJutsuTextColor($jutsu_type): string {
         switch ($jutsu_type) {
             case 'ninjutsu':
                 return "blue";
