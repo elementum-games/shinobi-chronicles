@@ -1348,4 +1348,9 @@ class User extends Fighter {
                 break;
         }
     }
+
+    public function clearMission() {
+        $this->mission_id = 0;
+        $this->mission_stage = [];
+    }
 }

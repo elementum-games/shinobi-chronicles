@@ -92,7 +92,7 @@ $pages = [
         'title' => 'Missions',
         'function_name' => 'missions',
         'menu' => System::MENU_ACTIVITY,
-        'battle_type' => Battle::TYPE_AI_ARENA,
+        'battle_type' => Battle::TYPE_AI_MISSION,
         'village_ok' => System::IN_VILLAGE_OKAY,
         'min_rank' => 2
     ],

@@ -61,7 +61,7 @@ class Mission {
 
         // Check for multi-count, stop stage ID
         $new_stage = true;
-        if($this->current_stage['count_needed']) {
+        if(!empty($this->current_stage['count_needed'])) {
             $this->current_stage['count']++;
             if($this->current_stage['count'] < $this->current_stage['count_needed']) {
                 $stage_id--;
@@ -82,6 +82,10 @@ class Mission {
                 'action_data' => $this->player->village_location,
                 'description' => 'Report back to the village to complete the mission.'
             );
+            if($this->mission_type == 5) {
+                $this->current_stage['ai_defeated'] = $this->player->mission_stage['ai_defeated'] ?? 0;
+                $this->current_stage['mission_money'] = $this->player->mission_stage['mission_money'] ?? 0;
+            }
             $this->player->mission_stage = $this->current_stage;
             return 1;
         }
@@ -115,6 +119,10 @@ class Mission {
 
         $this->current_stage['description'] = str_replace($search_array, $replace_array, $this->current_stage['description']);
 
+        if($this->mission_type == 5) {
+            $this->current_stage['ai_defeated'] = $this->player->mission_stage['ai_defeated'] ?? 0;
+            $this->current_stage['mission_money'] = $this->player->mission_stage['mission_money'] ?? 0;
+        }
         $this->player->mission_stage = $this->current_stage;
         return 1;
     }
@@ -159,8 +167,7 @@ class Mission {
 
         // Clear mission if it was cancelled
         if($new_stage && !$this->team['mission_id']) {
-            echo 'cancelled';
-            $this->player->mission_id = 0;
+            $this->player->clearMission();
             return 1;
         }
 
@@ -242,7 +249,7 @@ class Mission {
      * @return Mission
      * @throws Exception
      */
-    public static function start($player, $mission_id) {
+    public static function start($player, $mission_id): Mission {
         if($player->mission_id) {
             throw new Exception("You are already on a mission!");
         }
@@ -255,6 +262,7 @@ class Mission {
         $mission = new Mission($mission_id, $player);
 
         $player->mission_id = $mission_id;
+
 
         return $mission;
     }
