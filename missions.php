@@ -80,7 +80,7 @@ function missions() {
 	// Display missions
 	$system->printMessage();
 	$view = $max_mission_rank;
-	if($_GET['view_rank']) {
+	if(isset($_GET['view_rank'])) {
 		$view = (int)$_GET['view_rank'];
 		if($view < 1 or $view > $max_mission_rank) {
 			$view = $max_mission_rank;

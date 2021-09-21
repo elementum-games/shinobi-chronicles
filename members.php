@@ -42,7 +42,7 @@ function members() {
 	</div>";
 	
 	// Display user's profile
-	if($_GET['user']) {
+	if(isset($_GET['user'])) {
 		$user_name = $system->clean($_GET['user']);
 		$result = $system->query("SELECT `user_id` FROM `users` WHERE `user_name`='{$user_name}' LIMIT 1");
 			
@@ -273,24 +273,25 @@ function members() {
 		}
 		$system->printMessage();
 	}
-	else if($_GET['view']) {
+	else if(isset($_GET['view'])) {
 		if($_GET['view'] == 'staff') {
 			$display_list = 'staff';
 		}
 	}
 	
-	
+	$count = 0;
+
 	if($display_list == 'standard') {
 		$online_seconds = 120;
 
 		$query_custom = '';
 		$view = 'highest_exp';
-		if($_GET['view'] == 'highest_exp') {
+		if(isset($_GET['view']) && $_GET['view'] == 'highest_exp') {
 			$query_custom = " WHERE `staff_level` < " . System::SC_ADMINISTRATOR . " ORDER BY `exp` DESC";
 			$list_name = 'Top 10 Users - Highest Exp';
 			$view = 'highest_exp';
 		}
-		else if($_GET['view'] == 'online_users') {
+		else if(isset($_GET['view']) && $_GET['view'] == 'online_users') {
 			$query_custom = "WHERE `last_active` > UNIX_TIMESTAMP() - $online_seconds ORDER BY `level` DESC";
 			
 			$result = $system->query("SELECT COUNT(`user_id`) as `online_users` FROM `users` WHERE `last_active` > UNIX_TIMESTAMP() - $online_seconds");
@@ -308,8 +309,8 @@ function members() {
 		// Pagination
 		$users_per_page = 15;
 		$min = 0;
-		if($_GET['min'] && $view != 'highest_exp') {
-            $users_per_page = 10;
+		if(isset($_GET['min']) && $view != 'highest_exp') {
+      $users_per_page = 10;
 			$min = (int)$system->clean($_GET['min']);
 		}
 		

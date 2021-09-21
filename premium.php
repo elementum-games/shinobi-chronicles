@@ -45,14 +45,13 @@ function premium() {
 
 	}
 
-	if($player->bloodline->bloodline_id && $player->clan['id'] != $player->bloodline->clan_id) {
+	if($player->bloodline_id && $player->clan['id'] != $player->bloodline->clan_id) {
 		$system->query(sprintf("SELECT `clan_id`, `name` FROM `clans` WHERE `clan_id` = '%d'", $player->bloodline->clan_id));
 		$result = $system->db_fetch();
 		$available_clans[$result['clan_id']] = stripslashes($result['name']);
 	}
 
-
-	if($_POST['user_reset']) {
+	if(isset($_POST['user_reset'])) {
 		try {
 			if($player->premium_credits < $costs['user_reset']) {
 				throw new Exception("You do not have enough Ancient Kunai!");
@@ -134,7 +133,7 @@ function premium() {
 			$system->message($e->getMessage());
 		}
 	}
-	else if($_POST['name_change']) {
+	else if(isset($_POST['name_change'])) {
 		$new_name = $system->clean($_POST['new_name']);
 		$nameCost = 1;
 		$akCost = $costs['name_change'];
@@ -205,7 +204,7 @@ function premium() {
 			$system->message($e->getMessage());
 		}
 	}
-	else if($_POST['stat_reset']) {
+	else if(isset($_POST['stat_reset'])) {
 		$stats = array('ninjutsu_skill', 'taijutsu_skill', 'genjutsu_skill', 'cast_speed', 'speed', 'intelligence', 'willpower');
 		if($player->bloodline_id) {
 			array_unshift($stats, 'bloodline_skill');
@@ -256,7 +255,7 @@ function premium() {
 		}
 		$system->printMessage();
 	}
-	else if($_POST['stat_allocate']) {
+	else if(isset($_POST['stat_allocate'])) {
 		$stats = array('ninjutsu_skill', 'taijutsu_skill', 'genjutsu_skill', 'cast_speed', 'speed', 'intelligence', 'willpower');
 		if($player->bloodline_id) {
 			array_unshift($stats, 'bloodline_skill');
@@ -382,7 +381,7 @@ function premium() {
 		}
 		$system->printMessage();
 	}
-	else if($_POST['purchase_bloodline']) {
+	else if(isset($_POST['purchase_bloodline'])) {
 		$bloodline_id = $system->clean($_POST['bloodline_id']);
 		try {
 			$result = $system->query("SELECT `bloodline_id`, `name`, `clan_id`, `rank` FROM `bloodlines`
@@ -443,7 +442,7 @@ function premium() {
 			$system->message($e->getMessage());
 		}
 	}
-	else if($_POST['forbidden_seal']) {
+	else if(isset($_POST['forbidden_seal'])) {
 		$seal_level = (int)$system->clean($_POST['seal_level']);
 		$seal_length = (int)$system->clean($_POST['seal_length']);
 		try {
@@ -495,7 +494,7 @@ function premium() {
 		}
 		$system->printMessage();
 	}
-	else if($_POST['change_color'] && ($player->forbidden_seal || $player->premium_credits_purchased)) {
+	else if(isset($_POST['change_color']) && ($player->forbidden_seal || $player->premium_credits_purchased)) {
 		$color = $system->clean($_POST['name_color']);
 		switch($color) {
 			case 'blue':
@@ -535,7 +534,7 @@ function premium() {
 		}
 		$system->printMessage();
 	}
-	else if($_POST['change_village'] && $player->rank >= 3) {
+	else if(isset($_POST['change_village']) && $player->rank >= 3) {
 		$village = $_POST['new_village'];
 		try {
 			if($village == $player->village) {
@@ -681,7 +680,7 @@ function premium() {
 		$system->printMessage();
 	}
 	//Clan Change
-	else if($_POST['change_clan'] && $player->rank >= 2) {
+	else if(isset($_POST['change_clan']) && $player->rank >= 2) {
 		$new_clan_id = abs((int) $_POST['clan_change_id']);
 		try {
 
