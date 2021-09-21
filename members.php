@@ -169,7 +169,7 @@ function members() {
 				if(strpos($journal, "\n") === false) {
 					$journal = wordwrap($journal, 100, "\r\n", true);
 				}
-				$journal = $system->html_parse(stripslashes($journal), true, false);
+				$journal = $system->html_parse(stripslashes($journal), true, true);
 				
 				$img_size = 'max-width:300px;max-height:200px;';
 				if($player->forbidden_seal) {
