@@ -94,6 +94,9 @@ function modPanel() {
 	// Journal/avatar/profile song ban + remove
 	else if(!empty($_POST['profile_ban'])) {
 		try {
+			$journal = false;
+			$song = false;
+			$avatar = false;
 			if(!empty($_POST['journal'])) {
 				$journal = $_POST['journal'];
 			}
