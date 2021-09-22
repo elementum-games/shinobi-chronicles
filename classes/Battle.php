@@ -39,7 +39,7 @@ class Battle {
     const TYPE_AI_MISSION = 5;
     const TYPE_AI_RANKUP = 6;
 
-    const TURN_LENGTH = 10;
+    const TURN_LENGTH = 40;
 
     const TEAM1 = 'T1';
     const TEAM2 = 'T2';
