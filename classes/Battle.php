@@ -874,7 +874,7 @@ class Battle {
                         $this->battle_text .= $this->player2->getName() . ' stood still and did nothing.';
                     }
                     if($player2_effect_display) {
-                        $this->battle_text .= str_replace(
+                        $this->battle_text .= $this->parseCombatText(
                             $this->system->clean($player2_effect_display),
                             $this->player2,
                             $this->player1
