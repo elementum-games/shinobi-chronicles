@@ -226,18 +226,6 @@ function modPanel() {
 					$system->message("Error removing journal! (or it is already blank)");
 				}
 			}
-			// Player class
-			if($user_data['user_id']) {
-				if($remove_journal) {
-					$player->journal = '';
-				}
-				if($remove_avatar) {
-					$player->avatar_link = '';
-				}
-				if($remove_song) {
-					$player->profile_song = '';
-				}
-			}
 			// Success message	
 			if(!$error) {
 				$add_comma = false;
