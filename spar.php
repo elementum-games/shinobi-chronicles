@@ -16,29 +16,31 @@ function spar() {
 	global $self_link;
 
 	if($player->battle_id) {
-		require("battleCore.php");
-		$result = $system->query("SELECT * FROM `battles` WHERE `battle_id`='$player->battle_id' LIMIT 1");
-		if($system->db_num_rows == 0) {
-			$system->message("Invalid battle! - fetch");
-			$system->printMessage();
-			$player->battle_id = 0;
-			return false;
-		}
-		$battle = $system->db_fetch($result);
-
 		try {
-            if($player->id == $battle['player1']) {
-                $opponent = User::fromEntityId($battle['player2']);
-                $battle['player_side'] = 'player1';
-                $battle['opponent_side'] = 'player2';
-            }
-            else if($player->id == $battle['player2']) {
-                $opponent = User::fromEntityId($battle['player1']);
-                $battle['player_side'] = 'player2';
-                $battle['opponent_side'] = 'player1';
-            }
-            else {
-                throw new Exception("Invalid battle! - p1/p2 check");
+            $battle = new Battle($system, $player, $player->battle_id);
+            $battle->loadFighters();
+
+            $battle->checkTurn();
+
+            $battle->renderBattle();
+
+            if($battle->isComplete()) {
+                echo "<table class='table'><tr><th>Battle complete</th></tr>
+			    <tr><td style='text-align:center;'>";
+                if($battle->isPlayerWinner()) {
+                    echo "You win!<br />";
+                }
+                else if($battle->isOpponentWinner()) {
+                    echo "You lose.<br />";
+                    $player->health = 5;
+                }
+                else if($battle->isDraw()) {
+                    echo "You both knocked each other out.<br />";
+                    $player->health = 5;
+                }
+                echo "</td></tr></table>";
+
+                $player->battle_id = 0;
             }
         }
         catch (Exception $e) {
@@ -46,28 +48,6 @@ function spar() {
             $player->battle_id = 0;
             return false;
         }
-
-		
-		$opponent->loadData(1);
-		$winner = battlePvP($player, $opponent, $battle);
-		if($winner !== false) {
-			echo "<table class='table'><tr><th>Battle complete</th></tr>
-			<tr><td style='text-align:center;'>";
-			if($winner == $player->user_id) {
-				echo "You win!<br />";
-			}
-			else if($winner == $opponent->user_id) {
-				echo "You lose.<br />";
-				$player->health = 5;
-			}
-			else {
-				echo "You both knocked each other out.<br />";
-				$player->health = 5;
-			}
-			echo "</td></tr></table>";
-			
-			$player->battle_id = 0;
-		}
 	}
 	else if($_GET['challenge']) {
 		try {

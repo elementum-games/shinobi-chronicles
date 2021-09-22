@@ -928,10 +928,10 @@ class Battle {
         }
 
         if($this->player_side == Battle::TEAM1) {
-            $this->opponent = $this->player2;
+            $this->opponent =& $this->player2;
         }
         else {
-            $this->opponent = $this->player1;
+            $this->opponent =& $this->player1;
         }
 
         $this->player1->combat_id = Battle::TEAM1 . ':' . $this->player1->id;
@@ -944,6 +944,10 @@ class Battle {
         if($this->player2 instanceof AI) {
             $this->player2->loadData();
             $this->player2->health = $this->player2_health;
+        }
+
+        if($this->opponent instanceof User) {
+            $this->opponent->loadData(1, true);
         }
 
         $this->player1->getInventory();
