@@ -81,6 +81,11 @@ class User extends Fighter {
     public ?Bloodline $bloodline = null;
     public float $bloodline_skill;
 
+    //marriage
+    public bool $isMarried = false;
+    public int $marriageId = 0;
+    public ?array $marriageData;
+
     public $ban_type;
 	public $ban_expire;
 	public $journal_ban;
@@ -176,8 +181,8 @@ class User extends Fighter {
 		$this->id = self::ID_PREFIX . ':' . $this->user_id;
 
 		$result = $this->system->query("SELECT `user_id`, `user_name`, `ban_type`, `ban_expire`, `journal_ban`, `avatar_ban`, `song_ban`, `last_login`,
-			`forbidden_seal`, `staff_level`, `username_changes`
-			FROM `users` WHERE `user_id`='$this->user_id' LIMIT 1");
+			`forbidden_seal`, `staff_level`, `username_changes`, `isMarried`, `marriage_id`
+      FROM `users` WHERE `user_id`='$this->user_id' LIMIT 1");
 		if($this->system->db_num_rows == 0) {
 			throw new Exception("User does not exist!");
 		}
@@ -207,6 +212,9 @@ class User extends Fighter {
 		}
 
 		$this->inventory_loaded = false;
+
+    $this->isMarried = $result['isMarried'];
+    $this->marriageId = $result['marriage_id'];
 
 		return true;
 	}
@@ -400,6 +408,34 @@ class User extends Fighter {
 		else {
 			$this->in_village = false;
 		}
+
+    //Marriage
+    if($this->isMarried){
+      $marriageData = $this->system->query("SELECT * FROM `marriage` WHERE `marriage_id`='$this->marriageId' LIMIT 1");
+      $user_marriage_data = $this->system->db_fetch($marriageData);
+
+      try{
+        if(mysqli_num_rows($marriageData) > 0){
+
+          /*might have to rename this*/
+          foreach($marriageData as $item){
+            $this->marriageData = $item;
+          }
+
+          // print_r($this->marriageData);
+          // echo "<br>" . $this->marriageData['congrats_text'];
+        } else if($marriageData == Null) {
+          throw new Exception("You're missing Marriage information...");
+        } else {
+          $this->system->message("No Marriage data found");
+          $this->isMarried = false;
+          throw new Exception("No Marriage data found");
+        }
+      } catch(Exception $e) {
+        $this->system->message("Marriage Error");
+      }
+
+    }
 
 		// Clan
 		$this->clan = $user_data['clan_id'];

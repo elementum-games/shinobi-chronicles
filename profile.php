@@ -339,7 +339,13 @@ function userProfile() {
 		<label style='width:9.2em;'>Speed:</label>" . sprintf("%.2f", $player->speed) . "<br />
 		<label style='width:9.2em;'>Intelligence:</label>" . sprintf("%.2f", $player->intelligence) . "<br />
 		<label style='width:9.2em;'>Willpower:</label>" . sprintf("%.2f", $player->willpower) . "<br />
-		</td></tr></table>";
+		";
+
+		if($player->isMarried){
+			echo "<br><label style='width: 100%; align-text: center;'>Congrats, You're Married!</label><br>";
+		}
+
+		echo "</td></tr></table>";
 	}
 }
 
