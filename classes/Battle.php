@@ -39,7 +39,7 @@ class Battle {
     const TYPE_AI_MISSION = 5;
     const TYPE_AI_RANKUP = 6;
 
-    const TURN_LENGTH = 10;
+    const TURN_LENGTH = 40;
 
     const TEAM1 = 'T1';
     const TEAM2 = 'T2';
@@ -242,14 +242,14 @@ class Battle {
             $this->opponent_side = Battle::TEAM2;
 
             $this->player1 = $player;
-            $this->player_jutsu_used = $this->player1_jutsu_used;
+            $this->player_jutsu_used =& $this->player1_jutsu_used;
         }
         else if($player->id == $this->player2_id) {
             $this->player_side = Battle::TEAM2;
             $this->opponent_side = Battle::TEAM1;
 
             $this->player2 = $player;
-            $this->player_jutsu_used = $this->player2_jutsu_used;
+            $this->player_jutsu_used =& $this->player2_jutsu_used;
         }
 
         $this->default_attacks = $this->getDefaultAttacks();
@@ -942,7 +942,7 @@ class Battle {
                         $this->battle_text .= $this->player2->getName() . ' stood still and did nothing.';
                     }
                     if($player2_effect_display) {
-                        $this->battle_text .= str_replace(
+                        $this->battle_text .= $this->parseCombatText(
                             $this->system->clean($player2_effect_display),
                             $this->player2,
                             $this->player1
@@ -996,10 +996,10 @@ class Battle {
         }
 
         if($this->player_side == Battle::TEAM1) {
-            $this->opponent = $this->player2;
+            $this->opponent =& $this->player2;
         }
         else {
-            $this->opponent = $this->player1;
+            $this->opponent =& $this->player1;
         }
 
         $this->player1->combat_id = Battle::TEAM1 . ':' . $this->player1->id;
@@ -1012,6 +1012,10 @@ class Battle {
         if($this->player2 instanceof AI) {
             $this->player2->loadData();
             $this->player2->health = $this->player2_health;
+        }
+
+        if($this->opponent instanceof User) {
+            $this->opponent->loadData(1, true);
         }
 
         $this->player1->getInventory();
@@ -1104,32 +1108,6 @@ class Battle {
         }
     }
 
-    /**
-     * @param string $entity_id
-     * @return
-     * @throws Exception
-     */
-    public function loadFighterFromEntityId(string $entity_id): Fighter {
-        switch(Battle::getFighterEntityType($entity_id)) {
-            case User::ID_PREFIX:
-                return User::fromEntityId($entity_id);
-            case AI::ID_PREFIX:
-               return AI::fromEntityId($this->system, $entity_id);
-            default:
-                throw new Exception("Invalid entity type! " . Battle::getFighterEntityType($entity_id));
-        }
-    }
-
-    /**
-     * @param string $entity_id
-     * @return string
-     * @throws Exception
-     */
-    public static function getFighterEntityType(string $entity_id): string {
-        $entity_id = System::parseEntityId($entity_id);
-        return $entity_id->entity_type;
-    }
-
     public function renderBattle() {
         global $self_link;
 
@@ -1218,11 +1196,74 @@ class Battle {
         echo "</table>";
     }
 
+    public function isComplete(): bool {
+        return $this->winner;
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function isPlayerWinner(): bool {
+        if(!$this->isComplete()) {
+            throw new Exception("Cannot call isPlayerWinner() check before battle is complete!");
+        }
+
+        return $this->winner === $this->player_side;
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function isOpponentWinner(): bool {
+        if(!$this->isComplete()) {
+            throw new Exception("Cannot call isPlayerWinner() check before battle is complete!");
+        }
+
+        return $this->winner === $this->opponent_side;
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function isDraw(): bool {
+        if(!$this->isComplete()) {
+            throw new Exception("Cannot call isPlayerWinner() check before battle is complete!");
+        }
+
+        return $this->winner === Battle::DRAW;
+    }
+
+    /**
+         * @param string $entity_id
+         * @return
+         * @throws Exception
+         */
+    protected function loadFighterFromEntityId(string $entity_id): Fighter {
+    switch(Battle::getFighterEntityType($entity_id)) {
+        case User::ID_PREFIX:
+            return User::fromEntityId($entity_id);
+        case AI::ID_PREFIX:
+            return AI::fromEntityId($this->system, $entity_id);
+        default:
+            throw new Exception("Invalid entity type! " . Battle::getFighterEntityType($entity_id));
+    }
+}
+
+    /**
+     * @param string $entity_id
+     * @return string
+     * @throws Exception
+     */
+    protected static function getFighterEntityType(string $entity_id): string {
+        $entity_id = System::parseEntityId($entity_id);
+        return $entity_id->entity_type;
+    }
+
     /**
      * @param Fighter $player
-     * @param Jutsu[]  $default_attacks
+     * @param Jutsu[] $default_attacks
      */
-    public function renderActionPrompt(Fighter $player, $default_attacks) {
+    protected function renderActionPrompt(Fighter $player, array $default_attacks) {
         global $self_link;
 
         $gold_color = '#FDD017';
@@ -1687,7 +1728,7 @@ class Battle {
     </td></tr>";
     }
 
-    public function applyPassiveEffects(Fighter &$target, Fighter &$attacker, &$effect, &$effect_display = ''): bool {
+    protected function applyPassiveEffects(Fighter &$target, Fighter &$attacker, &$effect, &$effect_display = ''): bool {
         // Buffs
         if($effect['effect'] == 'ninjutsu_boost') {
             $target->ninjutsu_boost += $effect['effect_amount'];
@@ -2104,7 +2145,7 @@ class Battle {
         return $collision_text;
     }
 
-    function setEffect(Fighter &$user, $target_id, Jutsu $jutsu, $raw_damage, $effect_id, &$active_effects) {
+    protected function setEffect(Fighter &$user, $target_id, Jutsu $jutsu, $raw_damage, $effect_id, &$active_effects) {
         $apply_effect = true;
 
         $debuff_power = ($jutsu->power <= 0) ? 0 : $raw_damage / $jutsu->power / 15;
@@ -2183,7 +2224,7 @@ class Battle {
         }
     }
 
-    function applyActiveEffects(Fighter &$target, Fighter &$attacker, &$effect, &$effect_display, &$winner): bool {
+    protected function applyActiveEffects(Fighter &$target, Fighter &$attacker, &$effect, &$effect_display, &$winner): bool {
         if($winner && $winner != $target->combat_id) {
             return false;
         }
@@ -2255,7 +2296,7 @@ class Battle {
         return false;
     }
 
-    public function setPlayerAction($attack_id, $weapon_id, $attack_type, string $jutsu_unique_id, string $jutsu_type) {
+    protected function setPlayerAction($attack_id, $weapon_id, $attack_type, string $jutsu_unique_id, string $jutsu_type) {
         if($this->player_side == Battle::TEAM1) {
             $this->player1_action = 1;
             $this->player1_jutsu_id = $attack_id;
@@ -2292,7 +2333,7 @@ class Battle {
         }
     }
 
-    public function chooseAndSetAIAction(AI $ai) {
+    protected function chooseAndSetAIAction(AI $ai) {
         $jutsu = $ai->chooseMove();
 
         $attack_id = $jutsu->id;
@@ -2349,7 +2390,7 @@ class Battle {
         WHERE `battle_id` = '{$this->battle_id}' LIMIT 1");
     }
 
-    public function getDefaultAttacks(): array {
+    protected function getDefaultAttacks(): array {
         $default_attacks = [];
 
         $query = "SELECT * FROM `jutsu` WHERE `purchase_type`='1'";
@@ -2360,7 +2401,7 @@ class Battle {
         return $default_attacks;
     }
 
-    public function timeRemaining(): int {
+    protected function timeRemaining(): int {
         return Battle::TURN_LENGTH - (time() - $this->turn_time);
     }
 
@@ -2424,11 +2465,7 @@ class Battle {
         return $this->winner;
     }
 
-    public function isComplete(): bool {
-        return $this->winner;
-    }
-
-    private static function getJutsuTextColor($jutsu_type) {
+    private static function getJutsuTextColor($jutsu_type): string {
         switch ($jutsu_type) {
             case 'ninjutsu':
                 return "blue";
