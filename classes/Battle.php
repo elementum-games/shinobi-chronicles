@@ -39,7 +39,7 @@ class Battle {
     const TYPE_AI_MISSION = 5;
     const TYPE_AI_RANKUP = 6;
 
-    const TURN_LENGTH = 10;
+    const TURN_LENGTH = 40;
 
     const TEAM1 = 'T1';
     const TEAM2 = 'T2';
@@ -874,7 +874,7 @@ class Battle {
                         $this->battle_text .= $this->player2->getName() . ' stood still and did nothing.';
                     }
                     if($player2_effect_display) {
-                        $this->battle_text .= str_replace(
+                        $this->battle_text .= $this->parseCombatText(
                             $this->system->clean($player2_effect_display),
                             $this->player2,
                             $this->player1
@@ -928,10 +928,10 @@ class Battle {
         }
 
         if($this->player_side == Battle::TEAM1) {
-            $this->opponent = $this->player2;
+            $this->opponent =& $this->player2;
         }
         else {
-            $this->opponent = $this->player1;
+            $this->opponent =& $this->player1;
         }
 
         $this->player1->combat_id = Battle::TEAM1 . ':' . $this->player1->id;
@@ -944,6 +944,10 @@ class Battle {
         if($this->player2 instanceof AI) {
             $this->player2->loadData();
             $this->player2->health = $this->player2_health;
+        }
+
+        if($this->opponent instanceof User) {
+            $this->opponent->loadData(1, true);
         }
 
         $this->player1->getInventory();
