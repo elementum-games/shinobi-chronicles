@@ -89,6 +89,7 @@ class System {
         'spar' => 22,
         'mission' => 14,
         'rankup' => 25,
+        'marriage' => 110,
     ];
     public array $links = [];
 

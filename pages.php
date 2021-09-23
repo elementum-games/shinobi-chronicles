@@ -112,6 +112,14 @@ $pages = [
         'battle_ok' => false,
         'village_ok' => System::ONLY_IN_VILLAGE,
     ],
+    101 => [
+        'file_name' => 'marriage_view.php',
+        'title' => 'Marriage',
+        'function_name' => 'marriage_controller',
+        'menu' => System::MENU_ACTIVITY,
+        'battle_ok' => false,
+        'village_ok' => System::ONLY_IN_VILLAGE
+    ],
 
     // Village Menu
     8 => [
