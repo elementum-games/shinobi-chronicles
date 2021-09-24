@@ -98,6 +98,8 @@ class Battle {
     public int $turn_time;
     public $winner;
 
+    public bool $spectate = false;
+
     // Transient vars
     public array $default_attacks;
 
@@ -253,6 +255,8 @@ class Battle {
         }
 
         $this->default_attacks = $this->getDefaultAttacks();
+
+        $this->loadFighters();
     }
 
     /**
@@ -260,8 +264,6 @@ class Battle {
      * @throws Exception
      */
     public function checkTurn(): ?string {
-        $this->loadFighters();
-
         // If someone is not in battle, this will be set
         if($this->winner) {
             return $this->winner;
@@ -956,7 +958,7 @@ class Battle {
         }
 
         if($this->opponent instanceof User) {
-            $this->opponent->loadData(1, true);
+            $this->opponent->loadData($this->spectate ? 0 : 1, true);
             if(!$this->isComplete() && $this->opponent->battle_id != $this->battle_id) {
                 $this->stopBattle();
                 return;
@@ -1188,7 +1190,7 @@ class Battle {
          */
     protected function loadFighterFromEntityId(string $entity_id): Fighter {
     switch(Battle::getFighterEntityType($entity_id)) {
-        case User::ID_PREFIX:
+        case User::ENTITY_TYPE:
             return User::fromEntityId($entity_id);
         case AI::ID_PREFIX:
             return AI::fromEntityId($this->system, $entity_id);
@@ -2290,6 +2292,10 @@ class Battle {
     }
 
     private function updateData() {
+        if($this->spectate) {
+            return;
+        }
+
         $this->system->query("UPDATE `battles` SET
             `player1_action` = '{$this->player1_action}',
             `player2_action` = '{$this->player2_action}',

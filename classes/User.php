@@ -6,7 +6,7 @@ require_once "classes/Jutsu.php";
 	Purpose:	Fetch user data and load into class variables.
 */
 class User extends Fighter {
-    const ID_PREFIX = 'U';
+    const ENTITY_TYPE = 'U';
 
     const MIN_NAME_LENGTH = 2;
     const MIN_PASSWORD_LENGTH = 6;
@@ -173,7 +173,7 @@ class User extends Fighter {
 			throw new Exception("Invalid user id!");
 		}
 		$this->user_id = $this->system->clean($user_id);
-		$this->id = self::ID_PREFIX . ':' . $this->user_id;
+		$this->id = self::ENTITY_TYPE . ':' . $this->user_id;
 
 		$result = $this->system->query("SELECT `user_id`, `user_name`, `ban_type`, `ban_expire`, `journal_ban`, `avatar_ban`, `song_ban`, `last_login`,
 			`forbidden_seal`, `staff_level`, `username_changes`
@@ -1286,7 +1286,7 @@ class User extends Fighter {
     public static function fromEntityId(string $entity_id): User {
         $entity_id = System::parseEntityId($entity_id);
 
-        if($entity_id->entity_type != self::ID_PREFIX) {
+        if($entity_id->entity_type != self::ENTITY_TYPE) {
             throw new Exception("Entity ID is not a User!");
         }
 
