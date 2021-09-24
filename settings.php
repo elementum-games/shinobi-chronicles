@@ -321,14 +321,34 @@ function userSettings() {
 		echo "</p>You are currenly banned from editing your profile song.</p>";
 	}
 	echo "</td></tr>";*/
-	
+
+    //Blacklist
+    echo "<tr><th>Blocklist</th></tr>
+		<tr><td style='text-align:center;'>
+	";
+    if(!empty($player->blacklist)) {
+        $list = "";
+        $i = 0;
+        foreach ($player->blacklist as $id => $name) {
+            $i++;
+            // var_dump($name);
+            $list .= "<a href='{$system->links['members']}&user={$name[$id]['user_name']}'>{$name[$id]['user_name']}</a><sup>(<a href='$self_link&blacklist_remove=$id'>x</a>)</sup>";
+            if(count($player->blacklist) > $i) {
+                $list .= ", ";
+            }
+        }
+        echo "$list";
+    }
+    else {
+        echo "<p style='text-align:center;'>No blocked users!</p>";
+    }
 	
 	echo "<tr><th>Journal</th></tr>
 	<tr><td style='text-align:center;'>
 	<i>(Images will be resized down to a max of " . ($player->forbidden_seal ? '500x500' : '300x200') . ")</i>";
 	if(!$player->journal_ban) {
 		echo "<form action='$self_link' method='post'>
-		<textarea style='height:200px;width:500px;' name='journal'>" . stripslashes($journal) . "</textarea>
+		<textarea style='height:350px;width:95%;' name='journal'>" . stripslashes($journal) . "</textarea>
 		<br />
 		<input type='submit' name='change_journal' value='Update' />
 		</form>";
@@ -338,26 +358,6 @@ function userSettings() {
 	}
 	echo "</td></tr>";
 
-	//Blacklist
-	echo "<tr><th>Blacklist</th></tr>
-		<tr><td style='text-align:center;'>
-	";
-	if(!empty($player->blacklist)) {
-		$list = "";
-		$i = 0;
-		foreach ($player->blacklist as $id => $name) {
-			$i++;
-			// var_dump($name);
-			$list .= "<a href='{$system->links['members']}&user={$name[$id]['user_name']}'>{$name[$id]['user_name']}</a><sup>(<a href='$self_link&blacklist_remove=$id'>x</a>)</sup>";
-			if(count($player->blacklist) > $i) {
-				$list .= ", ";
-			}
-		}
-		echo "$list";
-	}
-	else {
-		echo "<p style='text-align:center;'>No blocked users!</p>";
-	}
 	echo "
 	<br />
 	<form action='$self_link' method='post'>
