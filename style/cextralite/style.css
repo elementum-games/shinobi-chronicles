@@ -38,7 +38,7 @@ a:hover{
 
 #container{
 	display: grid;
-	grid-template-columns: 0.10fr 1fr;
+	/* grid-template-columns: 0.10fr 1fr; */
 }
 
 #sidebar {
@@ -68,6 +68,7 @@ a:hover{
 }
 
 #header img{
+	display: none;
 	width: 100%;
 }
 
@@ -75,6 +76,11 @@ a:hover{
 	display: grid;
 	grid-template-columns: 1fr 1fr 1fr;
 	height: auto;
+}
+
+.buttonList{
+	position: absolute;
+	width: 33%;
 }
 
 .buttonList a{
@@ -91,12 +97,14 @@ a:hover{
 .topMenu{
 	display: block;
 	width: 100%;
-	font-size: 0.7em;
+	font-size: 0.9em;
 
 	overflow: hidden;
 	height: 0px;
 
 	cursor: pointer;
+
+	/* margin: 0em 0em 1em 0em; */
 }
 .topMenu li{
 	display: block;
@@ -112,11 +120,12 @@ a:hover{
 
 	border-style: solid;
 	border-color: white;
-	border-bottom: none;
+	/* border-bottom: none; */
 	border-width: 1px;
 
+	text-align: center;
 
-	padding: 0.5em 0em;
+	padding: 0.8em 0em;
 	/* margin: 0em 0.5em; */
 }
 .topMenu li a:hover{
@@ -129,6 +138,23 @@ a:hover{
 
 .menuTouchItem{
 	/* display: inline-block; */
+}
+
+#newsfooter{
+	margin: 1em 0em 0em 0em;
+}
+
+.newsfooter{
+	width: 100% !important;
+	border-radius: 0px !important;
+	padding: 0.6em 0em !important;
+
+	color: rgba(255,255,255,0.75);
+
+	text-align: right;
+
+	height: 15px;
+	margin: 0em 0em !important;
 }
 
 #player_menu{
