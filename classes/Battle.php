@@ -966,8 +966,8 @@ class Battle {
         $this->player1->getInventory();
         $this->player2->getInventory();
 
-        $this->applyBloodlineBoosts($this->player1);
-        $this->applyBloodlineBoosts($this->player2);
+        $this->player1->applyBloodlineBoosts();
+        $this->player2->applyBloodlineBoosts();
 
         // Apply passive effects
         $effect_target = null;
@@ -2418,68 +2418,4 @@ class Battle {
                 return "black";
         }
     }
-
-    private function applyBloodlineBoosts(Fighter $fighter) {
-        // Temp number fix inside
-        if($fighter->bloodline_id) {
-            if(!empty($fighter->bloodline->combat_boosts)) {
-                $bloodline_skill = 100 + $fighter->bloodline_skill;
-
-                foreach($fighter->bloodline->combat_boosts as $jutsu_id => $effect) {
-                    $fighter->bloodline->combat_boosts[$jutsu_id]['effect_amount'] = round($effect['power'] * $bloodline_skill, 3);
-                }
-            }
-
-            if($fighter->system->debug['bloodline']) {
-                echo "Setting passive combat boosts for {$fighter->getName()}<br />";
-                echo "<br />";
-            }
-
-            // Apply bloodline passive combat boosts
-            $fighter->bloodline_offense_boosts = array();
-            $fighter->bloodline_defense_boosts = array();
-            foreach($fighter->bloodline->combat_boosts as $jutsu_id => $effect) {
-                if($fighter->system->debug['bloodline']) {
-                    echo "[{$effect['effect']}] = {$effect['effect_amount']}<br />";
-                }
-
-                switch($effect['effect']) {
-                    // Nin/Tai/Gen boost applied in User::calcDamage()
-                    case 'ninjutsu_boost':
-                    case 'taijutsu_boost':
-                    case 'genjutsu_boost':
-                        $x = count($fighter->bloodline_offense_boosts);
-                        $fighter->bloodline_offense_boosts[$x]['effect'] = $effect['effect'];
-                        $fighter->bloodline_offense_boosts[$x]['effect_amount'] = $effect['effect_amount'];
-                        break;
-
-                    case 'ninjutsu_resist':
-                    case 'genjutsu_resist':
-                    case 'taijutsu_resist':
-                        $x = count($fighter->bloodline_defense_boosts);
-                        $fighter->bloodline_defense_boosts[$x]['effect'] = $effect['effect'];
-                        $fighter->bloodline_defense_boosts[$x]['effect_amount'] = $effect['effect_amount'];
-                        break;
-
-                    case 'cast_speed_boost':
-                        $fighter->cast_speed_boost += $effect['effect_amount'];
-                        break;
-                    case 'speed_boost':
-                        $fighter->speed_boost += $effect['effect_amount'];
-                        break;
-                    case 'intelligence_boost':
-                        $fighter->intelligence_boost += $effect['effect_amount'];
-                        break;
-                    case 'willpower_boost':
-                        $fighter->willpower_boost += $effect['effect_amount'];
-                        break;
-                }
-            }
-
-            if($fighter->system->debug['bloodline']) {
-                echo "<br />";
-            }
-        }
-    }
-
 }
