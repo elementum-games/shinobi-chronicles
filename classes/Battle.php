@@ -271,10 +271,10 @@ class Battle {
         $announcement_text = "";
         switch($effect){
             case 'taijutsu_nerf':
-                $announcement_text = "[opponent]'s Taijutsu is being lowered.";
+                $announcement_text = "[opponent]'s Taijutsu offense is being lowered.";
                 break;
             case 'ninjutsu_nerf':
-                $announcement_text = "[opponent]'s Ninjutsu is being lowered.";
+                $announcement_text = "[opponent]'s Ninjutsu offense is being lowered.";
                 break;
             case 'genjutsu_nerf':
                 $announcement_text = "[opponent]'s Genjutsu is being lowered.";
@@ -303,13 +303,13 @@ class Battle {
                 $announcement_text = "[opponent]'s Stamina is being drained.";
                 break;
             case 'taijutsu_boost':
-                $announcement_text = "[player]'s Taijutsu is being increased.";
+                $announcement_text = "[player]'s Taijutsu offense is being increased.";
                 break;
             case 'ninjutsu_boost':
-                $announcement_text = "[player]'s Ninjutsu is being increased.";
+                $announcement_text = "[player]'s Ninjutsu offense is being increased.";
                 break;
             case 'genjutsu_boost':
-                $announcement_text = "[player]'s Genjutsu is being increased.";
+                $announcement_text = "[player]'s Genjutsu offense is being increased.";
                 break;
             default:
                 break;
@@ -823,11 +823,15 @@ class Battle {
                     }
 
                     if($player1_jutsu->effect != 'none'){
-                        $text .= "<br/> <p style=\"font-weight:bold;\">" . "{$this->system->clean($this->determineEffectAnnouncementText($player1_jutsu->effect, $player1_jutsu_color))}" . "</p>";
+                        $text .= "<p style=\"font-style:italic;margin-top:3px;\">" .
+                            $this->system->clean($this->determineEffectAnnouncementText($player1_jutsu->effect)) .
+                            "</p>";
                     }
 
                     if($player1_jutsu->weapon_id) {
-                        $text .= "<br/> <p style=\"font-weight:bold;\">" . "{$this->system->clean($this->determineEffectAnnouncementText($player1_jutsu->weapon_effect->effect, $player1_jutsu_color))}" . "</p>";
+                        $text .= "<p style=\"font-style:italic;margin-top:3px;\">" .
+                            $this->system->clean($this->determineEffectAnnouncementText($player1_jutsu->weapon_effect->effect)) .
+                        "</p>";
                     }
 
                     $this->battle_text .= $this->parseCombatText($text, $this->player1, $this->player2);
@@ -939,11 +943,15 @@ class Battle {
                     }
 
                     if($player2_jutsu->effect != 'none'){
-                        $text .= "<br/> <p style=\"font-weight:bold;\">" . "{$this->system->clean($this->determineEffectAnnouncementText($player2_jutsu->effect))}" . "</p>";
+                        $text .= "<p style=\"font-style:italic;margin-top:3px;\">" .
+                            $this->system->clean($this->determineEffectAnnouncementText($player2_jutsu->effect)) .
+                        "</p>";
                     }
 
                     if($player2_jutsu->weapon_id) {
-                        $text .= "<br/> <p style=\"font-weight:bold;\">" . "{$this->system->clean($this->determineEffectAnnouncementText($player1_jutsu->weapon_effect->effect))}" . "</p>";
+                        $text .= "<p style=\"font-style:italic;margin-top:3px;\">" .
+                            $this->system->clean($this->determineEffectAnnouncementText($player1_jutsu->weapon_effect->effect)) .
+                        "</p>";
                     }
 
                     $this->battle_text .= $this->parseCombatText($text, $this->player2, $this->player1);
