@@ -342,13 +342,24 @@ function userSettings() {
     else {
         echo "<p style='text-align:center;'>No blocked users!</p>";
     }
+    echo "
+	<br />
+	<form action='$self_link' method='post'>
+		<input type='text' name='blacklist_name' style='width:250px;' /> <br />
+		<input type='submit' name='blacklist_add' value='Add' />
+		<input type='submit' name='blacklist_remove' value='Remove' />
+	</form>
+	</td></tr>";
 	
 	echo "<tr><th>Journal</th></tr>
-	<tr><td style='text-align:center;'>
-	<i>(Images will be resized down to a max of " . ($player->forbidden_seal ? '500x500' : '300x200') . ")</i>";
+	<tr><td style='text-align:center;'>";
+    if(!$player->forbidden_seal) {
+        echo "<i>(Images will be resized down to a max of 300x200</i>";
+    }
+
 	if(!$player->journal_ban) {
 		echo "<form action='$self_link' method='post'>
-		<textarea style='height:350px;width:95%;' name='journal'>" . stripslashes($journal) . "</textarea>
+		<textarea style='height:350px;width:95%;margin:10px 0;' name='journal'>" . stripslashes($journal) . "</textarea>
 		<br />
 		<input type='submit' name='change_journal' value='Update' />
 		</form>";
@@ -357,16 +368,6 @@ function userSettings() {
 		echo "<p>You are currently banned from editing your journal.</p>";
 	}
 	echo "</td></tr>";
-
-	echo "
-	<br />
-	<form action='$self_link' method='post'>
-		<input type='text' name='blacklist_name' style='width:250px;' /> <br />
-		<input type='submit' name='blacklist_add' value='Add' />
-		<input type='submit' name='blacklist_remove' value='Remove' />
-	</form>
-	</td></tr>
-	";
 	
 	echo "</tr></table>";
 	

@@ -170,20 +170,25 @@ function members() {
 					$journal = wordwrap($journal, 100, "\r\n", true);
 				}
 				$journal = $system->html_parse(stripslashes($journal), true, true);
-				
-				$img_size = 'max-width:300px;max-height:200px;';
-				if($player->forbidden_seal) {
-					$img_size = 'max-width:500px;max-height:500px;';
-				}
-				$journal = str_replace("/*IMG_SIZE*/", $img_size, $journal);
-				echo "<tr><th colspan='2'>Journal</th></tr>
-				<tr><td colspan='2' style='white-space:pre-wrap;'>" . $journal . "</td></tr>";
+
+				$class_name = $player->forbidden_seal ? 'forbidden_seal' : 'normal';
+				echo "<style type='text/css'>
+                    #journal.normal img {
+                        max-width: 400px;
+                        max-height: 300px;
+                    }
+                </style>
+                <tr><th colspan='2'>Journal</th></tr>
+				<tr><td colspan='2' style='white-space:pre-wrap;'>
+                    <div id='journal' class='{$class_name}'>
+                        {$journal}
+                    </div>
+                </td></tr>";
 			}
 
 			//report player
 			echo
-			"
-			<tr>
+			"<tr>
 				<td style='text-align: center;'colspan='2'>
 					<a href='{$system->links['report']}&report_type=1&content_id=$viewUser->user_id'>Report Profile/Journal</a>
 				</td>
