@@ -92,6 +92,61 @@ abstract class Fighter {
 
     abstract public function getInventory();
 
+    public function applyBloodlineBoosts() {
+        // Temp number fix inside
+        if($this->bloodline_id) {
+            if($this->system->debug['bloodline']) {
+                echo "Setting passive combat boosts for {$this->getName()}<br />";
+                echo "<br />";
+            }
+
+            // Apply bloodline passive combat boosts
+            $this->bloodline_offense_boosts = array();
+            $this->bloodline_defense_boosts = array();
+            foreach($this->bloodline->combat_boosts as $jutsu_id => $effect) {
+                if($this->system->debug['bloodline']) {
+                    echo "[{$effect['effect']}] = {$effect['effect_amount']}<br />";
+                }
+
+                switch($effect['effect']) {
+                    // Nin/Tai/Gen boost applied in User::calcDamage()
+                    case 'ninjutsu_boost':
+                    case 'taijutsu_boost':
+                    case 'genjutsu_boost':
+                        $x = count($this->bloodline_offense_boosts);
+                        $this->bloodline_offense_boosts[$x]['effect'] = $effect['effect'];
+                        $this->bloodline_offense_boosts[$x]['effect_amount'] = $effect['effect_amount'];
+                        break;
+
+                    case 'ninjutsu_resist':
+                    case 'genjutsu_resist':
+                    case 'taijutsu_resist':
+                        $x = count($this->bloodline_defense_boosts);
+                        $this->bloodline_defense_boosts[$x]['effect'] = $effect['effect'];
+                        $this->bloodline_defense_boosts[$x]['effect_amount'] = $effect['effect_amount'];
+                        break;
+
+                    case 'cast_speed_boost':
+                        $this->cast_speed_boost += $effect['effect_amount'];
+                        break;
+                    case 'speed_boost':
+                        $this->speed_boost += $effect['effect_amount'];
+                        break;
+                    case 'intelligence_boost':
+                        $this->intelligence_boost += $effect['effect_amount'];
+                        break;
+                    case 'willpower_boost':
+                        $this->willpower_boost += $effect['effect_amount'];
+                        break;
+                }
+            }
+
+            if($this->system->debug['bloodline']) {
+                echo "<br />";
+            }
+        }
+    }
+
     // abstract public function hasJutsu(int $jutsu_id): bool;
     abstract public function hasItem(int $item_id): bool;
 

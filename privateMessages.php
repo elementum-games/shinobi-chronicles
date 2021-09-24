@@ -286,7 +286,7 @@ class Messaging {
 				}
 				else {
 					echo "
-						<tr>
+						<tr class='table_multicolumns'>
 							<th class='rowHeader' style='width:20%;'>Sender</th>
 							<th class='rowHeader' style='width:40%;'>Subject</th>
 							<th class='rowHeader' style='width:15%;'></th>
@@ -314,7 +314,7 @@ class Messaging {
 						if(! ctype_digit($persons_name)) {
 
 							echo "
-								<tr>
+								<tr class='table_multicolumns'>
 									<td style='text-align:center;width:20%;' class='$class'>
 										<a href='{$system->links['members']}&user={$persons_name}' class='userLink $staff'>" . $persons_name . "</a>
 									</td>

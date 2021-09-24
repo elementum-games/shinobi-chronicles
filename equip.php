@@ -98,9 +98,9 @@ function gear() {
 
 	
 	$system->printMessage();
-	
-	echo "<table class='table'>";
-	
+
+	echo "<table id='equipment gear' class='table'>";
+
 	echo "<tr>
 		<th style='width:33%;'>Weapons</th>
 		<th style='width:33%;'>Armor</th>
@@ -356,9 +356,18 @@ function jutsu() {
             if(!empty($_POST['confirm_forget'])) {
                 //Forgetting jutsu.
                 $jutsu_name = $player->jutsu[$jutsu_id]->name;
+
+								//refund input verification
+								$refund = ($player->jutsu[$jutsu_id]->purchase_cost * 0.1); //10% Refund
+								$refund = intval(round($refund)); //round and then convert Float=>Int
+								if($refund > 0 && gettype($refund) == "integer"){
+									$player->money += $refund; //need an addMoney() function for $Player
+								};
+
                 $player->removeJutsu($jutsu_id);
 
-                $system->message("You have forgotten $jutsu_name!");
+								//css: Overlap caused by css Position property
+                $system->message("You have forgotten $jutsu_name!<br>You were refunded ¥{$refund}");
                 $system->printMessage();
                 $page = '';
             }
@@ -529,7 +538,7 @@ function jutsu() {
 			echo "<tr><th colspan='3'>Jutsu scrolls</th></tr>";
 			
 			foreach($player->jutsu_scrolls as $id => $jutsu_scroll) {
-				echo "<tr><td colspan='3'>
+				echo "<tr id='jutsu_scrolls' ><td colspan='3'>
 					<span style='font-weight:bold;'>" . $jutsu_scroll->name . "</span><br />
 					<div style='margin-left:2em;'>
 						<label style='width:6.5em;'>Rank:</label>" . $jutsu_scroll->rank . "<br />

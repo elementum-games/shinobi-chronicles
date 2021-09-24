@@ -169,7 +169,7 @@ function members() {
 				if(strpos($journal, "\n") === false) {
 					$journal = wordwrap($journal, 100, "\r\n", true);
 				}
-				$journal = $system->html_parse(stripslashes($journal), true, false);
+				$journal = $system->html_parse(stripslashes($journal), true, true);
 				
 				$img_size = 'max-width:300px;max-height:200px;';
 				if($player->forbidden_seal) {
@@ -340,8 +340,8 @@ function members() {
 				else {
 					$class = 'row2';
 				}
-				
-				echo "<tr>
+
+				echo "<tr class='table_multicolumns'>
 					<td class='$class' style='width:30%;'>
 						<a href='$self_link&user={$row['user_name']}' class='userLink'>" . $row['user_name'] . "</a></td>
 					<td class='$class' style='width:20%;text-align:center;'>" . $ranks[$row['rank']] . "</td>

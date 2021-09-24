@@ -29,16 +29,20 @@ class AI extends Fighter {
     public float $cast_speed;
 
     public float $speed;
-    public $strength;
+    public float $strength;
     public float $intelligence;
     public float $willpower;
 
-    public $money;
+    public int $money;
 
     /** @var Jutsu[] */
     public array $jutsu = [];
 
+    public int $bloodline_id = 0;
+
     public $current_move;
+
+    public int $staff_level = 0;
 
     /**
      * AI constructor.
@@ -132,7 +136,34 @@ class AI extends Fighter {
             $this->jutsu[] = $jutsu;
         }
 
-        $this->loadRandomShopJutsu();
+        $this->loadDefaultJutsu();
+        // $this->loadRandomShopJutsu();
+    }
+
+    private function loadDefaultJutsu() {
+        $result = $this->system->query(
+            "SELECT `battle_text`, `power`, `jutsu_type` FROM `jutsu` 
+                    WHERE `rank` <= '{$this->rank}'
+                    AND `purchase_type`='" . Jutsu::PURCHASE_TYPE_DEFAULT . "'
+                    ORDER BY `rank` DESC LIMIT 1");
+        while ($row = $this->system->db_fetch($result)) {
+            $moveArr = [];
+            foreach($row as $type => $data) {
+                if($type == 'battle_text') {
+                    $search = ['[player]', '[opponent]', '[gender]', '[gender2]'];
+                    $replace = ['opponent1', 'player1', 'he', 'his'];
+                    $data = str_replace($search, $replace, $data);
+                    $data = str_replace(['player1', 'opponent1'], ['[player]', '[opponent]'], $data);
+                }
+                $moveArr[$type] = $data;
+            }
+            $this->jutsu[] = $this->initJutsu(
+                count($this->jutsu),
+                $moveArr['jutsu_type'],
+                $moveArr['power'],
+                $moveArr['battle_text']
+            );
+        }
     }
 
     private function loadRandomShopJutsu() {

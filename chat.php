@@ -45,10 +45,6 @@ function chat() {
 			if(strlen($message) > $chat_max_post_length) {
 				throw new Exception("Message is too long!");
 			}
-			// Banned words
-			if($system->censor_check($message)) {
-				throw new Exception("Inappropriate language is not allowed in chat!");
-			}
 
 			$title = $player->rank_name;
 			$staff_level = $player->staff_level;
@@ -137,7 +133,7 @@ function chat() {
 				$_SESSION['quick_reply'] = 1;
 			}
 		}
-		echo "<table class='table'>
+		echo "<table id='chat_input_table' class='table'>
 			<tr><th>Post Message</th></tr>
 			<tr><td style='text-align:center;'>
 			<form action='$self_link' method='post'>
@@ -198,8 +194,27 @@ function chat() {
                     break;
             }
 
+
+			/*If User is Blocked, Skip their Echo'd Post!*/
+			$isBlocked = false;
+			foreach($player->blacklist as $id => $blacklist){
+				//if post has same username as someone in their blacklist
+				if($post['user_name'] == $blacklist[$id]['user_name']){
+					// echo "".$post['user_name']." <- Fuck this guy!";
+					$isBlocked = true;
+				}
+			}
+			//skip post
+			if($isBlocked){
+				$isBlocked = false; //just in case?
+				continue;
+			}
+
+      $message = $system->explicitLanguageReplace($post['message']);
+      $message = $system->html_parse(stripslashes($message), false, true);
+
 			echo "
-				<tr>
+				<tr class='chat_msg' >
 					<td style='text-align:center;'>
 					<div id='user_data_container' style='display: flex;flex-direction:row'>
 					    <div style='flex-shrink:0;'>
@@ -219,8 +234,7 @@ function chat() {
                         echo "<p class='staffMember' style='background-color: {$color['staffColor']}'>{$color['staffBanner']}</p>";
                     }
                 echo "</td>
-				<td class='chatmsg' style='text-align:center;padding:4px;white-space:pre-wrap;'>" .
-					wordwrap($system->html_parse(stripslashes($post['message']), false, true), 60, "\n", true) . "</td>";
+				<td class='chatmsg' style='text-align:center;padding:4px;white-space:pre-wrap;'>" . $message . "</td>";
 				$post_time = time() - $post['time'];
 				$post_minutes = ceil($post_time / 60);
 				$post_hours = floor($post_minutes / 60);
