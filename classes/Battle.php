@@ -262,11 +262,6 @@ class Battle {
     public function checkTurn(): ?string {
         $this->loadFighters();
 
-        if($this->player1->staff_level >= System::SC_ADMINISTRATOR || $this->player2->staff_level >= System::SC_ADMINISTRATOR) {
-            $this->system->debug['jutsu_collision'] = true;
-            $this->system->debug['bloodline'] = true;
-        }
-
         // If someone is not in battle, this will be set
         if($this->winner) {
             return $this->winner;
@@ -934,6 +929,11 @@ class Battle {
         }
         if($this->player2_id != $this->player->id) {
             $this->player2 = $this->loadFighterFromEntityId($this->player2_id);
+        }
+
+        if($this->player1->staff_level >= System::SC_ADMINISTRATOR || $this->player2->staff_level >= System::SC_ADMINISTRATOR) {
+            $this->system->debug['jutsu_collision'] = true;
+            $this->system->debug['bloodline'] = true;
         }
 
         if($this->player_side == Battle::TEAM1) {
