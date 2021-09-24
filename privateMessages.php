@@ -472,7 +472,7 @@ function privateMessages() {
 
 	$Messaging->display('options');
 
-	switch((isset($_GET['page']) ? $_GET['page'] : '')) {
+	switch($_GET['page'] ?? '') {
 		
 		//For creating and sending new messages
 		case 'new_message':
