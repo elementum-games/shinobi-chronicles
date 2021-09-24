@@ -1087,9 +1087,11 @@ class Battle {
             $opponent = $this->player2;
         }
 
+        $refresh_link = $this->spectate ? "{$self_link}&battle_id={$this->battle_id}" : $self_link;
+
         echo "<div class='submenu'>
             <ul class='submenu'>
-                <li style='width:100%;'><a href='{$self_link}'>Refresh Battle</a></li>
+                <li style='width:100%;'><a href='{$refresh_link}'>Refresh Battle</a></li>
             </ul>
         </div>
         <div class='submenuMargin'></div>";
