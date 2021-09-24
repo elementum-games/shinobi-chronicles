@@ -952,7 +952,7 @@ class Battle {
 
         if($this->opponent instanceof User) {
             $this->opponent->loadData(1, true);
-            if(!$this->opponent->battle_id != $this->battle_id) {
+            if($this->opponent->battle_id != $this->battle_id) {
                 $this->stopBattle();
                 return;
             }
