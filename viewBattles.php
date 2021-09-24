@@ -27,7 +27,7 @@ function viewBattles() {
     $battles_result = $system->query(
         "SELECT `battle_id`, `player1`, `player2`, `winner` FROM `battles` 
             WHERE `battle_type` IN (" . implode(",", $battle_types) . ")
-            ORDER BY `battle_id` DESC");
+            ORDER BY `battle_id` DESC LIMIT 20");
 
     $user_ids = [];
     $raw_battles = [];
