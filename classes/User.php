@@ -384,6 +384,9 @@ class User extends Fighter {
         if($this->rank > 3) {
             $this->scout_range++;
         }
+        if($this->staff_level >= System::SC_HEAD_ADMINISTRATOR) {
+            $this->scout_range += 2;
+        }
 
 		$this->village_changes = $user_data['village_changes'];
 		$this->clan_changes = $user_data['clan_changes'];
