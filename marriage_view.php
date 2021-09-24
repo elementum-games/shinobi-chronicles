@@ -25,11 +25,11 @@ function marriage_controller(){
 			$temp_proposal_name = Null;
 		}
 
-		if(!($temp_proposal_name == $player->user_name)){
+		if(!(strtolower($temp_proposal_name) == strtolower($player->user_name))){
 			//check if name can be proposed to
 			$marriageDepartment = new MarriageDepartment($temp_proposal_name);
 		} else {
-			echo "You cant marry yourself...";
+			$system->message("You can't marry yourself...");
 			$marriageDepartment = new MarriageDepartment(Null);
 		}
 
@@ -39,6 +39,7 @@ function marriage_controller(){
 		$marriageDepartment->areTheyMarried();
 
 		//display proposal portion of page
+		$system->printMessage();
 		$marriageDepartment->display();
 	}
 
@@ -129,28 +130,29 @@ class MarriageDepartment{
 
 	function areTheyMarried(){
 
+		global $system;
+
 		if($this->proposed_name == Null){
 			return true;
 		}
 
 		if($this->proposed_name !== Null){
-			echo "<h1>This mf you want to marry: {$this->proposed_name}</h1>";
 
 			if($this->checkDB($this->proposed_name)) return true;
 
 			if($this->user2_isMarried == false){
-				echo "They're available! Send a Proposal!";
+				$system->message("They're available!");
 				$this->displayProposalOptions_Yes_No();
 				return true;
 			}
 		}
 
 		if($this->user2_isMarried == true){
-			echo "They're married :^(";
+		  $system->message("{$this->proposed_name} is already married or doesn't exist!");
 			return true;
 		}
 
-		echo "Name doesn't exist";
+	  $system->message("{$this->proposed_name} does not exist...");
 		return true;
 	}
 
@@ -165,12 +167,10 @@ class MarriageDepartment{
 		$proposal_to_username_result = $system->db_fetch($proposal_to_username_query);
 
 		if(isset($proposal_to_username_result)){
-			echo "<h1>Wow they actually exist, lets check the results</h1>";
-			echo "<h1>".print_r($proposal_to_username_result['isMarried'])."</h1>";
-
+			// $system->message("Checking the files");
 			$this->user2_isMarried = $proposal_to_username_result['isMarried'];
 		} else {
-			echo "<h1>They Don't Exist!</h1>";
+			// $system->message("They don't exist...");
 		}
 	}
 
