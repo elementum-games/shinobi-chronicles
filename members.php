@@ -180,9 +180,7 @@ function members() {
                 </style>
                 <tr><th colspan='2'>Journal</th></tr>
 				<tr><td colspan='2' style='white-space:pre-wrap;'>
-                    <div id='journal' class='{$class_name}'>
-                        {$journal}
-                    </div>
+                    <div id='journal' class='{$class_name}'>" . $journal . "</div>
                 </td></tr>";
 			}
 
