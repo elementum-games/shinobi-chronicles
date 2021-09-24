@@ -950,10 +950,18 @@ class User extends Fighter {
 				}
 			}
 
+            if($this->system->debug['bloodline']) {
+                echo "Setting passive combat boosts for {$this->getName()}<br />";
+            }
+
 			// Apply bloodline passive combat boosts
 			$this->bloodline_offense_boosts = array();
 			$this->bloodline_defense_boosts = array();
 			foreach($this->bloodline->combat_boosts as $jutsu_id => $effect) {
+			    if($this->system->debug['bloodline']) {
+			        echo "[{$effect['effect']}] = {$effect['effect_amount']}<br />";
+                }
+
 				switch($effect['effect']) {
 					// Nin/Tai/Gen boost applied in User::calcDamage()
 					case 'ninjutsu_boost':
