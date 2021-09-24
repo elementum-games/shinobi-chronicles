@@ -94,6 +94,9 @@ function modPanel() {
 	// Journal/avatar/profile song ban + remove
 	else if(!empty($_POST['profile_ban'])) {
 		try {
+			$journal = false;
+			$song = false;
+			$avatar = false;
 			if(!empty($_POST['journal'])) {
 				$journal = $_POST['journal'];
 			}
@@ -224,18 +227,6 @@ function modPanel() {
 				}
 				if($remove_journal == -1) {
 					$system->message("Error removing journal! (or it is already blank)");
-				}
-			}
-			// Player class
-			if($user_data['user_id']) {
-				if($remove_journal) {
-					$player->journal = '';
-				}
-				if($remove_avatar) {
-					$player->avatar_link = '';
-				}
-				if($remove_song) {
-					$player->profile_song = '';
 				}
 			}
 			// Success message	
