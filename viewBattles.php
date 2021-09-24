@@ -5,7 +5,10 @@ function viewBattles() {
     global $player;
     global $self_link;
 
-    $battle_types = [Battle::TYPE_SPAR, Battle::TYPE_FIGHT, Battle::TYPE_CHALLENGE, Battle::TYPE_AI_ARENA];
+    $battle_types = [Battle::TYPE_SPAR, Battle::TYPE_FIGHT, Battle::TYPE_CHALLENGE];
+    if($player->staff_level >= System::SC_HEAD_ADMINISTRATOR) {
+        $battle_types[] = Battle::TYPE_AI_ARENA;
+    }
 
     if(!empty($_GET['battle_id'])) {
         $battle_id = (int)$_GET['battle_id'];
@@ -51,18 +54,12 @@ function viewBattles() {
 
     $user_names = [];
     if(count($user_ids) > 0) {
-        $query = "SELECT `user_id`, `user_name` FROM `users` 
-            WHERE `user_id` IN(" .  implode(',', $user_ids). ")";
-        $user_names_result = $system->query($query);
-
-        echo $query;
-
+        $user_names_result = $system->query("SELECT `user_id`, `user_name` FROM `users` 
+            WHERE `user_id` IN(" .  implode(',', $user_ids). ")");
 
         while($row = $system->db_fetch($user_names_result)) {
             $user_names[$row['user_id']] = $row['user_name'];
         }
-
-        var_dump($user_names);
     }
 
     $battles = [];
