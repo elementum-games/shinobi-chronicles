@@ -51,11 +51,18 @@ function viewBattles() {
 
     $user_names = [];
     if(count($user_ids) > 0) {
-        $user_names_result = $system->query("SELECT `user_id`, `user_name` FROM `users` 
-            WHERE `user_id` IN(" .  implode(',', $user_ids). ")");
+        $query = "SELECT `user_id`, `user_name` FROM `users` 
+            WHERE `user_id` IN(" .  implode(',', $user_ids). ")";
+        $user_names_result = $system->query($query);
+
+        echo $query;
+
+
         while($row = $system->db_fetch($user_names_result)) {
             $user_names[$row['user_id']] = $row['user_name'];
         }
+
+        var_dump($user_names);
     }
 
     $battles = [];
