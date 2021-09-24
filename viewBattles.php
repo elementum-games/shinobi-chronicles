@@ -9,8 +9,8 @@ function viewBattles() {
     $limit = 20;
 
     if($player->staff_level >= System::SC_HEAD_ADMINISTRATOR) {
-        $battle_types[] = Battle::TYPE_AI_ARENA;
-        $limit = 30;
+        // $battle_types[] = Battle::TYPE_AI_ARENA;
+        $limit = 25;
     }
 
     if(!empty($_GET['battle_id'])) {
