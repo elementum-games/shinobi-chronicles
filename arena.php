@@ -88,7 +88,6 @@ function arenaFight(): bool {
 
     try {
         $battle = new Battle($system, $player, $player->battle_id);
-        $battle->loadFighters();
 
         $winner = $battle->checkTurn();
 

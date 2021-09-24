@@ -154,7 +154,6 @@ function runActiveMission() {
                 }
 
                 $battle = new Battle($system, $player, $player->battle_id);
-                $battle->loadFighters();
                 $battle->checkTurn();
 
                 $battle->renderBattle();

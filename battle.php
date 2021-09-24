@@ -19,7 +19,6 @@ function battle(): bool {
 
 	if($player->battle_id) {
         $battle = new Battle($system, $player, $player->battle_id);
-        $battle->loadFighters();
 
         $battle->checkTurn();
 
