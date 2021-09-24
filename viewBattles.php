@@ -6,8 +6,11 @@ function viewBattles() {
     global $self_link;
 
     $battle_types = [Battle::TYPE_SPAR, Battle::TYPE_FIGHT, Battle::TYPE_CHALLENGE];
+    $limit = 20;
+
     if($player->staff_level >= System::SC_HEAD_ADMINISTRATOR) {
         $battle_types[] = Battle::TYPE_AI_ARENA;
+        $limit = 30;
     }
 
     if(!empty($_GET['battle_id'])) {
@@ -30,7 +33,7 @@ function viewBattles() {
     $battles_result = $system->query(
         "SELECT `battle_id`, `player1`, `player2`, `winner` FROM `battles` 
             WHERE `battle_type` IN (" . implode(",", $battle_types) . ")
-            ORDER BY `battle_id` DESC LIMIT 20");
+            ORDER BY `battle_id` DESC LIMIT {$limit}");
 
     $user_ids = [];
     $raw_battles = [];
