@@ -267,6 +267,57 @@ class Battle {
         $this->loadFighters();
     }
 
+    public function determineEffectAnnouncementText(string $effect) : string{
+        $announcement_text = "";
+        switch($effect){
+            case 'taijutsu_nerf':
+                $announcement_text = "[opponent]'s Taijutsu is being lowered.";
+                break;
+            case 'ninjutsu_nerf':
+                $announcement_text = "[opponent]'s Ninjutsu is being lowered.";
+                break;
+            case 'genjutsu_nerf':
+                $announcement_text = "[opponent]'s Genjutsu is being lowered.";
+                break;
+            case 'intelligence_nerf':
+            case 'daze':
+                $announcement_text = "[opponent]'s Intelligence is being lowered.";
+                break;
+            case 'willpower_nerf':
+                $announcement_text = "[opponent]'s Willpower is being lowered.";
+                break;
+            case 'cast_speed_nerf':
+                $announcement_text = "[opponent]'s Cast Speed is being lowered.";
+                break;
+            case 'speed_nerf':
+            case 'cripple':
+                $announcement_text = "[opponent]'s Speed is being lowered.";
+                break;
+            case 'residual_damage':
+                $announcement_text = "[opponent] is taking Residual Damage.";
+                break;
+            case 'drain_chakra':
+                $announcement_text = "[opponent]'s Chakra is being drained.";
+                break;
+            case 'drain_stamina':
+                $announcement_text = "[opponent]'s Stamina is being drained.";
+                break;
+            case 'taijutsu_boost':
+                $announcement_text = "[player]'s Taijutsu is being increased.";
+                break;
+            case 'ninjutsu_boost':
+                $announcement_text = "[player]'s Ninjutsu is being increased.";
+                break;
+            case 'genjutsu_boost':
+                $announcement_text = "[player]'s Genjutsu is being increased.";
+                break;
+            default:
+                break;
+        }
+
+        return $announcement_text;
+    }
+
     /**
      * @return string|null
      * @throws Exception
@@ -770,6 +821,15 @@ class Battle {
                     if($player1_effect_display) {
                         $text .= $this->system->clean($player1_effect_display);
                     }
+
+                    if($player1_jutsu->effect != 'none'){
+                        $text .= "<br/> <p style=\"font-weight:bold;\">" . "{$this->system->clean($this->determineEffectAnnouncementText($player1_jutsu->effect, $player1_jutsu_color))}" . "</p>";
+                    }
+
+                    if($player1_jutsu->weapon_id) {
+                        $text .= "<br/> <p style=\"font-weight:bold;\">" . "{$this->system->clean($this->determineEffectAnnouncementText($player1_jutsu->weapon_effect->effect, $player1_jutsu_color))}" . "</p>";
+                    }
+
                     $this->battle_text .= $this->parseCombatText($text, $this->player1, $this->player2);
                 }
                 else {
@@ -876,6 +936,14 @@ class Battle {
 					}
                     if($player2_effect_display) {
                         $text .= $this->system->clean($player2_effect_display);
+                    }
+
+                    if($player2_jutsu->effect != 'none'){
+                        $text .= "<br/> <p style=\"font-weight:bold;\">" . "{$this->system->clean($this->determineEffectAnnouncementText($player2_jutsu->effect))}" . "</p>";
+                    }
+
+                    if($player2_jutsu->weapon_id) {
+                        $text .= "<br/> <p style=\"font-weight:bold;\">" . "{$this->system->clean($this->determineEffectAnnouncementText($player1_jutsu->weapon_effect->effect))}" . "</p>";
                     }
 
                     $this->battle_text .= $this->parseCombatText($text, $this->player2, $this->player1);
