@@ -253,6 +253,11 @@ class Battle {
         }
 
         $this->default_attacks = $this->getDefaultAttacks();
+
+        if($this->player1->staff_level >= System::SC_ADMINISTRATOR || $this->player2->staff_level >= System::SC_ADMINISTRATOR) {
+            $this->system->debug['jutsu_collision'] = true;
+            $this->system->debug['bloodline'] = true;
+        }
     }
 
     /**
@@ -1948,6 +1953,11 @@ class Battle {
             $opponent_cast_speed = 1;
         }
 
+        if($this->system->debug['jutsu_collision']) {
+            echo "Player: {$player->speed} ({$player->speed_boost} - {$player->speed_nerf})<br />";
+            echo "Opponent: {$opponent->speed} ({$opponent->speed_boost} - {$opponent->speed_nerf})<br />";
+        }
+
         // Ratios for damage reduction
         $speed_ratio = 0.8;
         $cast_speed_ratio = 0.8;
@@ -2063,19 +2073,6 @@ class Battle {
         }
 
         // Parse text
-        if(isset($player->user_name)) {
-            $player_name = $player->user_name;
-        }
-        else {
-            $player_name = $player->name;
-        }
-        if(isset($opponent->user_name)) {
-            $opponent_name = $opponent->user_name;
-        }
-        else {
-            $opponent_name = $opponent->name;
-        }
-
         $collision_text = $this->parseCombatText($collision_text, $player, $opponent);
         return $collision_text;
     }

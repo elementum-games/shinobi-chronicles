@@ -40,6 +40,8 @@ class AI extends Fighter {
 
     public $current_move;
 
+    public $staff_level = 0;
+
     /**
      * AI constructor.
      * @param System $system
@@ -143,11 +145,21 @@ class AI extends Fighter {
                     AND `purchase_type`='" . Jutsu::PURCHASE_TYPE_DEFAULT . "'
                     ORDER BY `rank` DESC LIMIT 1");
         while ($row = $this->system->db_fetch($result)) {
+            $moveArr = [];
+            foreach($row as $type => $data) {
+                if($type == 'battle_text') {
+                    $search = ['[player]', '[opponent]', '[gender]', '[gender2]'];
+                    $replace = ['opponent1', 'player1', 'he', 'his'];
+                    $data = str_replace($search, $replace, $data);
+                    $data = str_replace(['player1', 'opponent1'], ['[player]', '[opponent]'], $data);
+                }
+                $moveArr[$type] = $data;
+            }
             $this->jutsu[] = $this->initJutsu(
                 count($this->jutsu),
-                $row['jutsu_type'],
-                $row['power'],
-                $row['battle_text']
+                $moveArr['jutsu_type'],
+                $moveArr['power'],
+                $moveArr['battle_text']
             );
         }
     }

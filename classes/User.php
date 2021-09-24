@@ -602,6 +602,7 @@ class User extends Fighter {
 
 			// Debug info
 			if($this->system->debug['bloodline']) {
+			    echo "Debugging {$this->getName()}";
 				foreach($this->bloodline->passive_boosts as $id=>$boost) {
 					echo "Boost: " . $boost['effect'] . " : " . $boost['power'] . "<br />";
 				}
