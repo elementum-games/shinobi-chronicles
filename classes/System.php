@@ -449,7 +449,7 @@ class System {
             $search_array[count($search_array)] = "[/img]";
             $replace_array[count($replace_array)] = "<img src='[image_prefix]";
             $replace_array[count($replace_array)] = "<img src='[image_prefix]";
-            $replace_array[count($replace_array)] = "' style='/*IMG_SIZE*/' />";
+            $replace_array[count($replace_array)] = "' />";
         }
 
         $text = str_ireplace($search_array,$replace_array,$text);
@@ -457,14 +457,9 @@ class System {
         $search_array = [];
         $replace_array = [];
 
-        $reg_exUrl = "/(?:http|https)\:\/\/([a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,5})(?:\/[^\:\s\\\\]*)?/i";
-        preg_match_all($reg_exUrl, $text, $matches);
-
-        foreach($matches[0] as $pattern){
-            preg_match($reg_exUrl, $pattern, $url);
-
-            $text = str_replace($pattern, sprintf("<a href='%s' target='_blank'>%s</a>", $pattern, $pattern), $text);
-        }
+        $reg_exUrl = '/((?:http|https)\:\/\/(?:[a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,5})(?:\/[^\:\s\\\\]*)?)/i';
+        $replacement = '<a href="$1" target="_blank">$1</a>';
+        $text = preg_replace($reg_exUrl, $replacement, $text);
 
         array_push($search_array, '[image_prefix]');
         array_push($replace_array, 'https://');
