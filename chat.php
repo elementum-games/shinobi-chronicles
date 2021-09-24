@@ -194,8 +194,24 @@ function chat() {
                     break;
             }
 
-            $message = $system->explicitLanguageReplace($post['message']);
-            $message = $system->html_parse(stripslashes($message), false, true);
+
+			/*If User is Blocked, Skip their Echo'd Post!*/
+			$isBlocked = false;
+			foreach($player->blacklist as $id => $blacklist){
+				//if post has same username as someone in their blacklist
+				if($post['user_name'] == $blacklist[$id]['user_name']){
+					// echo "".$post['user_name']." <- Fuck this guy!";
+					$isBlocked = true;
+				}
+			}
+			//skip post
+			if($isBlocked){
+				$isBlocked = false; //just in case?
+				continue;
+			}
+
+      $message = $system->explicitLanguageReplace($post['message']);
+      $message = $system->html_parse(stripslashes($message), false, true);
 
 			echo "
 				<tr>

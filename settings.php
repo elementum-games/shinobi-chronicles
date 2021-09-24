@@ -347,7 +347,8 @@ function userSettings() {
 		$i = 0;
 		foreach ($player->blacklist as $id => $name) {
 			$i++;
-			$list .= "<a href='{$system->links['members']}&user={$name['user_name']}'>{$name['user_name']}</a><sup>(<a href='$self_link&blacklist_remove=$id'>x</a>)</sup>";
+			// var_dump($name);
+			$list .= "<a href='{$system->links['members']}&user={$name[$id]['user_name']}'>{$name[$id]['user_name']}</a><sup>(<a href='$self_link&blacklist_remove=$id'>x</a>)</sup>";
 			if(count($player->blacklist) > $i) {
 				$list .= ", ";
 			}
