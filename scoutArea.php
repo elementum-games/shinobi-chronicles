@@ -8,7 +8,7 @@ Purpose:	Functions for scouting and links to initiating combat
 Algorithm:	See master_plan.html
 */
 
-function scoutArea($in_existing_table = false) {
+function scoutArea($in_existing_table = false, $show_spar_link = true) {
 	global $system;
 
 	global $player;
@@ -91,11 +91,17 @@ function scoutArea($in_existing_table = false) {
 					echo "In battle";
 				}
 				else if($user['location'] == $player->location && $user['user_id'] != $player->user_id) {
-					// Attack
-					echo "<a href='{$system->links['spar']}}&challenge={$user['user_id']}'>Spar</a>";
+					$links = [];
+
+				    // Attack
+					if($show_spar_link) {
+					    $links[] = "<a href='{$system->links['spar']}}&challenge={$user['user_id']}'>Spar</a>";
+                    }
 					if($user['village'] != $player->village && $user['rank'] > 2 && $player->rank > 2) {
-						echo " | <a href='{$system->links['battle']}&attack={$user['user_id']}'>Attack</a>";
-					}
+					    $links[] = "<a href='{$system->links['battle']}&attack={$user['user_id']}'>Attack</a>";
+                    }
+
+					echo implode(" | ", $links);
 				}
 				echo "&nbsp;</td>
 			</tr>";

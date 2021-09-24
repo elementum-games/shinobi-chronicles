@@ -58,16 +58,25 @@ function travel() {
 				break;
 		}
 		$location = $target_x . "." . $target_y;
-		
-		if(isset($villages[$location]) && $location != $player->village_location) {
-			$system->message("You cannot travel into another village!");
-		}
-		else {
-			$player->location = $location;
-			$player->y = $target_y;
-			$player->x = $target_x;
-			$player->updateData();
-		}
+
+		try {
+            if(isset($villages[$location]) && $location != $player->village_location) {
+                throw new Exception("You cannot travel into another village!");
+            }
+
+            if($player->last_death > time() - 15) {
+                throw new Exception("You died within the last 15 seconds, please wait " .
+                    (($player->last_death + 15) - time()) . " more seconds before moving.");
+            }
+
+            $player->location = $location;
+            $player->y = $target_y;
+            $player->x = $target_x;
+            $player->updateData();
+        } catch(Exception $e) {
+            $system->message("You cannot travel into another village!");
+            $system->message($e->getMessage());
+        }
 		
 		// Village check
 		if($player->location == $player->village_location) {
@@ -182,7 +191,7 @@ function travel() {
 	echo "</td></tr>";
 
 	require("scoutArea.php");
-	scoutArea(true);
+	scoutArea(true, false);
 
 	echo "</table>";
 
