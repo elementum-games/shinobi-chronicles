@@ -268,6 +268,22 @@ label {
 	display: inline-block;
 }
 
+/* #c6bca1; */
+:root {
+    --travel-button-size: 40px;
+
+    /* old colors */
+    /* --theme-content-bg-color: #efe9da;
+    --theme-content-darker-bg-color: #e7e1d1;
+    --theme-content-lighter-bg-color: #f2eee4;*/
+
+    /*--theme-content-bg-color: #c6bca1;*/
+    --theme-content-bg-color: #cfc3a8;
+    --theme-content-darker-bg-color: #c8bca2;
+    --theme-content-darker2-bg-color: #bfb49b;
+    --theme-content-lighter-bg-color: #d6caad;
+}
+
 #content table.table {
 	margin: auto;
 	margin-top:30px;
@@ -279,9 +295,8 @@ label {
 	/* Style */
 	color: inherit;
 	font-size: inherit;
-	
-	/*background-color: #faf7f0;*/
-	background-color: #efe9da;
+
+	background-color: var(--theme-content-bg-color);
 	
 	border: 1px solid #000000;
 	border-radius:10px;
@@ -289,7 +304,7 @@ label {
 }
 #content table.table td {
 	padding: 5px;
-	border: 1px solid #D0D0D0;
+	border: 1px solid var(--theme-content-darker2-bg-color);
 	max-width: 100%;
 }
 #content table.table th {
@@ -606,14 +621,14 @@ p {
 #content table.table td.row1 {
 	padding:1px 0px;
 	border:0px;
-	background-color:#efe9da;
+    background-color: var(--theme-content-bg-color);
 	
 	
 }
 #content table.table td.row2 {
 	padding:1px 0px;
 	border:0px;
-	background-color:#f2eee4;
+	background-color: var(--theme-content-lighter-bg-color);
 }
 
 
@@ -645,16 +660,16 @@ p {
 	
 	border: 1px solid #131313;
 	border-radius: 30px;
-	background-color: #efe9da;
+	background-color: var(--theme-content-bg-color);
 	text-align: center;
 }
 #content ul.submenu li {
 	list-style: none;
 	display: inline-block;
 	text-align: center;
-	
-	background-color: #efe9da;
-	background: linear-gradient(to bottom, #e7e1d1, #efe9da);
+
+    background: var(--theme-content-bg-color)
+        linear-gradient(to bottom, var(--theme-content-darker-bg-color), var(--theme-content-bg-color));
 }
 #content ul.submenu li:first-child {
 	border-top-left-radius: 20px;
@@ -750,10 +765,6 @@ br.clear {
 }
 .rightArrow:hover {
     background-image: url(../../images/icons/right_hover.png);
-}
-
-:root {
-    --travel-button-size: 40px;
 }
 
 .travelContainer {
