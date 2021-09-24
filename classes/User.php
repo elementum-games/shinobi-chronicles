@@ -1090,7 +1090,6 @@ class User extends Fighter {
 			$query .= "`team_id` = 'invite:{$this->team_invite}',";
 		}
 
-
 		$query .= "`battle_id` = '$this->battle_id',
 		`challenge` = '$this->challenge',
 		`location` = '$this->location',";

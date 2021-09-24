@@ -29,11 +29,11 @@ class AI extends Fighter {
     public float $cast_speed;
 
     public float $speed;
-    public $strength;
+    public float $strength;
     public float $intelligence;
     public float $willpower;
 
-    public $money;
+    public int $money;
 
     /** @var Jutsu[] */
     public array $jutsu = [];
@@ -42,7 +42,7 @@ class AI extends Fighter {
 
     public $current_move;
 
-    public $staff_level = 0;
+    public int $staff_level = 0;
 
     /**
      * AI constructor.

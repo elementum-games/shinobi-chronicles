@@ -444,27 +444,30 @@ class System {
         $text = str_replace($memes['codes'], ($faces ? $memes['images'] : $memes['texts']), $text);
 
         if($img) {
-            $search_array[count($search_array)] = "[img]";
+            $search_array[count($search_array)] = "[img]https://";
+            $search_array[count($search_array)] = "[img]http://";
             $search_array[count($search_array)] = "[/img]";
-            $replace_array[count($replace_array)] = "<img src='";
+            $replace_array[count($replace_array)] = "<img src='[image_prefix]";
+            $replace_array[count($replace_array)] = "<img src='[image_prefix]";
             $replace_array[count($replace_array)] = "' style='/*IMG_SIZE*/' />";
         }
-        else {
-            $reg_exUrl = "/(?:http|https)\:\/\/([a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,5})(?:\/[^\:\s\\\\]*)?/i";
 
-            preg_match_all($reg_exUrl, $text, $matches);
+        $text = str_ireplace($search_array,$replace_array,$text);
 
-            $websites = array();
+        $search_array = [];
+        $replace_array = [];
 
-            foreach($matches[0] as $pattern){
-                preg_match($reg_exUrl, $pattern, $url);
+        $reg_exUrl = "/(?:http|https)\:\/\/([a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,5})(?:\/[^\:\s\\\\]*)?/i";
+        preg_match_all($reg_exUrl, $text, $matches);
 
-                if(!$websites[$pattern]) {
-                    $websites[$pattern] = trim($url[1]);
-                    $text = str_replace($pattern, sprintf("<a href='%s' target='_blank'>%s</a>", $pattern, $websites[$pattern]), $text);
-                }
-            }
+        foreach($matches[0] as $pattern){
+            preg_match($reg_exUrl, $pattern, $url);
+
+            $text = str_replace($pattern, sprintf("<a href='%s' target='_blank'>%s</a>", $pattern, $pattern), $text);
         }
+
+        array_push($search_array, '[image_prefix]');
+        array_push($replace_array, 'https://');
 
         array_push($search_array, '\r\n');
         array_push($replace_array, '<br />');
