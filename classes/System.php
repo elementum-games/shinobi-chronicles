@@ -448,14 +448,6 @@ class System {
             $search_array[count($search_array)] = "[/img]";
             $replace_array[count($replace_array)] = "<img src='";
             $replace_array[count($replace_array)] = "' style='/*IMG_SIZE*/' />";
-
-            $search_array[count($search_array)] = "[url]http:";
-            $search_array[count($search_array)] = "[url]www.";
-            $search_array[count($search_array)] = "[/url]";
-
-            $replace_array[count($replace_array)] = "<a href='http:";
-            $replace_array[count($replace_array)] = "<a href='http://www.";
-            $replace_array[count($replace_array)] = "'>[Link]</a>";
         }
         else {
             $reg_exUrl = "/(?:http|https)\:\/\/([a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,5})(?:\/[^\:\s\\\\]*)?/i";
@@ -465,14 +457,12 @@ class System {
             $websites = array();
 
             foreach($matches[0] as $pattern){
-
                 preg_match($reg_exUrl, $pattern, $url);
 
                 if(!$websites[$pattern]) {
                     $websites[$pattern] = trim($url[1]);
                     $text = str_replace($pattern, sprintf("<a href='%s' target='_blank'>%s</a>", $pattern, $websites[$pattern]), $text);
                 }
-
             }
         }
 

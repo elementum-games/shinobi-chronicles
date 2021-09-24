@@ -38,6 +38,8 @@ class AI extends Fighter {
     /** @var Jutsu[] */
     public array $jutsu = [];
 
+    public int $bloodline_id = 0;
+
     public $current_move;
 
     public $staff_level = 0;
