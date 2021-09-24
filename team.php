@@ -289,7 +289,7 @@ function team() {
 			$player->team['mission_id'] = 0;
 			
 			if($player->mission_id == $mission_id) {
-				$player->mission_id = 0;
+				$player->clearMission();
 			}
 			
 			$system->message("Mission cancelled.");

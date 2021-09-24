@@ -39,7 +39,7 @@ class Battle {
     const TYPE_AI_MISSION = 5;
     const TYPE_AI_RANKUP = 6;
 
-    const TURN_LENGTH = 10;
+    const TURN_LENGTH = 40;
 
     const TEAM1 = 'T1';
     const TEAM2 = 'T2';
@@ -97,6 +97,8 @@ class Battle {
 
     public int $turn_time;
     public $winner;
+
+    public bool $spectate = false;
 
     // Transient vars
     public array $default_attacks;
@@ -183,13 +185,15 @@ class Battle {
      * @param System $system
      * @param User   $player
      * @param int    $battle_id
+     * @param bool   $spectate
      * @throws Exception
      */
-    public function __construct(System $system, User $player, int $battle_id) {
+    public function __construct(System $system, User $player, int $battle_id, bool $spectate = false) {
         $this->system = $system;
 
         $this->battle_id = $battle_id;
         $this->player = $player;
+        $this->spectate = $spectate;
 
         $result = $this->system->query(
             "SELECT * FROM `battles` WHERE `battle_id`='{$battle_id}' LIMIT 1"
@@ -202,6 +206,8 @@ class Battle {
         }
 
         $battle = $this->system->db_fetch($result);
+
+        $this->battle_type = $battle['battle_type'];
 
         $this->player1_id = $battle['player1'];
         $this->player2_id = $battle['player2'];
@@ -242,17 +248,23 @@ class Battle {
             $this->opponent_side = Battle::TEAM2;
 
             $this->player1 = $player;
-            $this->player_jutsu_used = $this->player1_jutsu_used;
+            $this->player_jutsu_used =& $this->player1_jutsu_used;
         }
         else if($player->id == $this->player2_id) {
             $this->player_side = Battle::TEAM2;
             $this->opponent_side = Battle::TEAM1;
 
             $this->player2 = $player;
-            $this->player_jutsu_used = $this->player2_jutsu_used;
+            $this->player_jutsu_used =& $this->player2_jutsu_used;
+        }
+        else {
+            $this->player_side = Battle::TEAM1;
+            $this->opponent_side = Battle::TEAM2;
         }
 
         $this->default_attacks = $this->getDefaultAttacks();
+
+        $this->loadFighters();
     }
 
     /**
@@ -260,7 +272,10 @@ class Battle {
      * @throws Exception
      */
     public function checkTurn(): ?string {
-        $this->loadFighters();
+        // If someone is not in battle, this will be set
+        if($this->winner) {
+            return $this->winner;
+        }
 
         // If turn is still active and user hasn't submitted their move, check for action
         if($this->timeRemaining() > 0 && !$this->playerActionSubmitted()) {
@@ -874,7 +889,7 @@ class Battle {
                         $this->battle_text .= $this->player2->getName() . ' stood still and did nothing.';
                     }
                     if($player2_effect_display) {
-                        $this->battle_text .= str_replace(
+                        $this->battle_text .= $this->parseCombatText(
                             $this->system->clean($player2_effect_display),
                             $this->player2,
                             $this->player1
@@ -912,7 +927,6 @@ class Battle {
         $this->checkForWinner();
         $this->updateData();
 
-
         return $this->winner;
     }
 
@@ -928,10 +942,10 @@ class Battle {
         }
 
         if($this->player_side == Battle::TEAM1) {
-            $this->opponent = $this->player2;
+            $this->opponent =& $this->player2;
         }
         else {
-            $this->opponent = $this->player1;
+            $this->opponent =& $this->player1;
         }
 
         $this->player1->combat_id = Battle::TEAM1 . ':' . $this->player1->id;
@@ -946,8 +960,26 @@ class Battle {
             $this->player2->health = $this->player2_health;
         }
 
+        if($this->player1 instanceof User && $this->player1->id != $this->player->id) {
+            $this->player1->loadData($this->spectate ? 0 : 1, true);
+            if(!$this->isComplete() && $this->player1->battle_id != $this->battle_id) {
+                $this->stopBattle();
+                return;
+            }
+        }
+        if($this->player2 instanceof User && $this->player2->id != $this->player->id) {
+            $this->player2->loadData($this->spectate ? 0 : 1, true);
+            if(!$this->isComplete() && $this->player2->battle_id != $this->battle_id) {
+                $this->stopBattle();
+                return;
+            }
+        }
+
         $this->player1->getInventory();
         $this->player2->getInventory();
+
+        $this->player1->applyBloodlineBoosts();
+        $this->player2->applyBloodlineBoosts();
 
         // Apply passive effects
         $effect_target = null;
@@ -1037,31 +1069,8 @@ class Battle {
     }
 
     /**
-     * @param string $entity_id
-     * @return
      * @throws Exception
      */
-    public function loadFighterFromEntityId(string $entity_id): Fighter {
-        switch(Battle::getFighterEntityType($entity_id)) {
-            case User::ID_PREFIX:
-                return User::fromEntityId($entity_id);
-            case AI::ID_PREFIX:
-               return AI::fromEntityId($this->system, $entity_id);
-            default:
-                throw new Exception("Invalid entity type! " . Battle::getFighterEntityType($entity_id));
-        }
-    }
-
-    /**
-     * @param string $entity_id
-     * @return string
-     * @throws Exception
-     */
-    public static function getFighterEntityType(string $entity_id): string {
-        $entity_id = System::parseEntityId($entity_id);
-        return $entity_id->entity_type;
-    }
-
     public function renderBattle() {
         global $self_link;
 
@@ -1078,9 +1087,11 @@ class Battle {
             $opponent = $this->player2;
         }
 
+        $refresh_link = $this->spectate ? "{$self_link}&battle_id={$this->battle_id}" : $self_link;
+
         echo "<div class='submenu'>
             <ul class='submenu'>
-                <li style='width:100%;'><a href='{$self_link}'>Refresh Battle</a></li>
+                <li style='width:100%;'><a href='{$refresh_link}'>Refresh Battle</a></li>
             </ul>
         </div>
         <div class='submenuMargin'></div>";
@@ -1131,7 +1142,7 @@ class Battle {
         }
 
         // Trigger win action or display action prompt
-        if(!$this->winner) {
+        if(!$this->isComplete() && !$this->spectate) {
             // Prompt for move or display wait message
             echo "<tr><th colspan='2'>Select Action</th></tr>";
 
@@ -1147,14 +1158,96 @@ class Battle {
 			Time remaining: " . $this->timeRemaining() . " seconds</td></tr>";
         }
 
+        if($this->spectate) {
+            echo "<tr><td style='text-align:center;' colspan='2'>";
+
+            if($this->winner == self::TEAM1) {
+                echo $this->player1->getName() . ' won!';
+            }
+            else if($this->winner == self::TEAM2) {
+                echo $this->player2->getName() . ' won!';
+            }
+			else if($this->winner == self::DRAW) {
+                echo "Fight ended in a draw.";
+            }
+			else {
+                echo "Time remaining: " . $this->timeRemaining() . " seconds";
+            }
+
+            echo "</td></tr>";
+        }
+
         echo "</table>";
+    }
+
+    public function isComplete(): bool {
+        return $this->winner;
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function isPlayerWinner(): bool {
+        if(!$this->isComplete()) {
+            throw new Exception("Cannot call isPlayerWinner() check before battle is complete!");
+        }
+
+        return $this->winner === $this->player_side;
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function isOpponentWinner(): bool {
+        if(!$this->isComplete()) {
+            throw new Exception("Cannot call isPlayerWinner() check before battle is complete!");
+        }
+
+        return $this->winner === $this->opponent_side;
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function isDraw(): bool {
+        if(!$this->isComplete()) {
+            throw new Exception("Cannot call isPlayerWinner() check before battle is complete!");
+        }
+
+        return $this->winner === Battle::DRAW;
+    }
+
+    /**
+         * @param string $entity_id
+         * @return
+         * @throws Exception
+         */
+    protected function loadFighterFromEntityId(string $entity_id): Fighter {
+    switch(Battle::getFighterEntityType($entity_id)) {
+        case User::ENTITY_TYPE:
+            return User::fromEntityId($entity_id);
+        case AI::ID_PREFIX:
+            return AI::fromEntityId($this->system, $entity_id);
+        default:
+            throw new Exception("Invalid entity type! " . Battle::getFighterEntityType($entity_id));
+    }
+}
+
+    /**
+     * @param string $entity_id
+     * @return string
+     * @throws Exception
+     */
+    protected static function getFighterEntityType(string $entity_id): string {
+        $entity_id = System::parseEntityId($entity_id);
+        return $entity_id->entity_type;
     }
 
     /**
      * @param Fighter $player
-     * @param Jutsu[]  $default_attacks
+     * @param Jutsu[] $default_attacks
      */
-    public function renderActionPrompt(Fighter $player, $default_attacks) {
+    protected function renderActionPrompt(Fighter $player, array $default_attacks) {
         global $self_link;
 
         $gold_color = '#FDD017';
@@ -1619,7 +1712,7 @@ class Battle {
     </td></tr>";
     }
 
-    public function applyPassiveEffects(Fighter &$target, Fighter &$attacker, &$effect, &$effect_display = ''): bool {
+    protected function applyPassiveEffects(Fighter &$target, Fighter &$attacker, &$effect, &$effect_display = ''): bool {
         // Buffs
         if($effect['effect'] == 'ninjutsu_boost') {
             $target->ninjutsu_boost += $effect['effect_amount'];
@@ -1685,8 +1778,8 @@ class Battle {
         return false;
     }
 
-    function jutsuCollision(
-        Fighter &$player, Fighter &$opponent, &$player_damage, &$opponent_damage, $player_jutsu, $opponent_jutsu
+    protected function jutsuCollision(
+        Fighter &$player1, Fighter &$player2, &$player_damage, &$opponent_damage, $player_jutsu, $opponent_jutsu
     ) {
         $collision_text = '';
         /*
@@ -1749,27 +1842,27 @@ class Battle {
         // Barriers
         if($player_jutsu->use_type == 'barrier') {
             $player_jutsu->effect_amount = $player_damage;
-            $player->barrier += $player_damage;
+            $player1->barrier += $player_damage;
             $player_damage = 0;
         }
         if($opponent_jutsu->use_type == 'barrier') {
             $opponent_jutsu->effect_amount = $opponent_damage;
-            $opponent->barrier += $opponent_damage;
+            $player2->barrier += $opponent_damage;
             $opponent_damage = 0;
         }
-        if($player->barrier && $opponent_jutsu->jutsu_type != 'genjutsu') {
+        if($player1->barrier && $opponent_jutsu->jutsu_type != 'genjutsu') {
             // Block damage from opponent's attack
-            if($player->barrier >= $opponent_damage) {
+            if($player1->barrier >= $opponent_damage) {
                 $block_amount = $opponent_damage;
             }
             else {
-                $block_amount = $player->barrier;
+                $block_amount = $player1->barrier;
             }
             $block_percent = ($opponent_damage >= 1) ? ($block_amount / $opponent_damage) * 100 : 100;
-            $player->barrier -= $block_amount;
+            $player1->barrier -= $block_amount;
             $opponent_damage -= $block_amount;
-            if($player->barrier < 0) {
-                $player->barrier = 0;
+            if($player1->barrier < 0) {
+                $player1->barrier = 0;
             }
             if($opponent_damage < 0) {
                 $opponent_damage = 0;
@@ -1778,19 +1871,19 @@ class Battle {
             $block_percent = round($block_percent, 1);
             $collision_text .= "[player]'s barrier blocked $block_percent% of [opponent]'s damage![br]";
         }
-        if($opponent->barrier && $player_jutsu->jutsu_type != 'genjutsu') {
+        if($player2->barrier && $player_jutsu->jutsu_type != 'genjutsu') {
             // Block damage from opponent's attack
-            if($opponent->barrier >= $player_damage) {
+            if($player2->barrier >= $player_damage) {
                 $block_amount = $player_damage;
             }
             else {
-                $block_amount = $opponent->barrier;
+                $block_amount = $player2->barrier;
             }
             $block_percent = ($player_damage >= 1) ? ($block_amount / $player_damage) * 100 : 100;
-            $opponent->barrier -= $block_amount;
+            $player2->barrier -= $block_amount;
             $player_damage -= $block_amount;
-            if($opponent->barrier < 0) {
-                $opponent->barrier = 0;
+            if($player2->barrier < 0) {
+                $player2->barrier = 0;
             }
             if($player_damage < 0) {
                 $player_damage = 0;
@@ -1802,23 +1895,23 @@ class Battle {
 
         // Quit if barrier was used by one person (no collision remaining)
         if($player_jutsu->use_type == 'barrier' or $opponent_jutsu->use_type == 'barrier') {
-            if(isset($player->user_name)) {
-                $player_name = $player->user_name;
+            if(isset($player1->user_name)) {
+                $player_name = $player1->user_name;
             }
             else {
-                $player_name = $player->name;
+                $player_name = $player1->name;
             }
-            if(isset($opponent->user_name)) {
-                $opponent_name = $opponent->user_name;
+            if(isset($player2->user_name)) {
+                $opponent_name = $player2->user_name;
             }
             else {
-                $opponent_name = $opponent->name;
+                $opponent_name = $player2->name;
             }
             $collision_text = str_replace(
                 array('[player]', '[opponent]',
                     '[gender]', '[gender2]'),
                 array($player_name, $opponent_name,
-                    ($player->gender == 'Male' ? 'he' : 'she'), ($player->gender == 'Male' ? 'his' : 'her')),
+                    ($player1->gender == 'Male' ? 'he' : 'she'), ($player1->gender == 'Male' ? 'his' : 'her')),
                 $collision_text);
             return $collision_text;
         }
@@ -1877,26 +1970,31 @@ class Battle {
         }
 
         // Apply buffs/nerfs
-        $player_speed = $player->speed + $player->speed_boost - $player->speed_nerf;
+        $player_speed = $player1->speed + $player1->speed_boost - $player1->speed_nerf;
         $player_speed = 50 + ($player_speed * 0.5);
         if($player_speed <= 0) {
             $player_speed = 1;
         }
-        $player_cast_speed = $player->cast_speed + $player->cast_speed_boost - $player->cast_speed_nerf;
+        $player_cast_speed = $player1->cast_speed + $player1->cast_speed_boost - $player1->cast_speed_nerf;
         $player_cast_speed = 50 + ($player_cast_speed * 0.5);
         if($player_cast_speed <= 0) {
             $player_cast_speed = 1;
         }
 
-        $opponent_speed = $opponent->speed + $opponent->speed_boost - $opponent->speed_nerf;
+        $opponent_speed = $player2->speed + $player2->speed_boost - $player2->speed_nerf;
         $opponent_speed = 50 + ($opponent_speed * 0.5);
         if($opponent_speed <= 0) {
             $opponent_speed = 1;
         }
-        $opponent_cast_speed = $opponent->cast_speed + $opponent->cast_speed_boost - $opponent->cast_speed_nerf;
+        $opponent_cast_speed = $player2->cast_speed + $player2->cast_speed_boost - $player2->cast_speed_nerf;
         $opponent_cast_speed = 50 + ($opponent_cast_speed * 0.5);
         if($opponent_cast_speed <= 0) {
             $opponent_cast_speed = 1;
+        }
+
+        if($this->system->debug['jutsu_collision']) {
+            echo "Player1({$player1->getName()}): {$player1->speed} ({$player1->speed_boost} - {$player1->speed_nerf})<br />";
+            echo "Player2({$player2->getName()}): {$player2->speed} ({$player2->speed_boost} - {$player2->speed_nerf})<br />";
         }
 
         // Ratios for damage reduction
@@ -2014,29 +2112,11 @@ class Battle {
         }
 
         // Parse text
-        if(isset($player->user_name)) {
-            $player_name = $player->user_name;
-        }
-        else {
-            $player_name = $player->name;
-        }
-        if(isset($opponent->user_name)) {
-            $opponent_name = $opponent->user_name;
-        }
-        else {
-            $opponent_name = $opponent->name;
-        }
-
-        $collision_text = str_replace(
-            array('[player]', '[opponent]',
-                '[gender]', '[gender2]'),
-            array($player_name, $opponent_name,
-                ($player->gender == 'Male' ? 'he' : 'she'), ($player->gender == 'Male' ? 'his' : 'her')),
-            $collision_text);
+        $collision_text = $this->parseCombatText($collision_text, $player1, $player2);
         return $collision_text;
     }
 
-    function setEffect(Fighter &$user, $target_id, Jutsu $jutsu, $raw_damage, $effect_id, &$active_effects) {
+    protected function setEffect(Fighter &$user, $target_id, Jutsu $jutsu, $raw_damage, $effect_id, &$active_effects) {
         $apply_effect = true;
 
         $debuff_power = ($jutsu->power <= 0) ? 0 : $raw_damage / $jutsu->power / 15;
@@ -2115,7 +2195,7 @@ class Battle {
         }
     }
 
-    function applyActiveEffects(Fighter &$target, Fighter &$attacker, &$effect, &$effect_display, &$winner): bool {
+    protected function applyActiveEffects(Fighter &$target, Fighter &$attacker, &$effect, &$effect_display, &$winner): bool {
         if($winner && $winner != $target->combat_id) {
             return false;
         }
@@ -2187,7 +2267,7 @@ class Battle {
         return false;
     }
 
-    public function setPlayerAction($attack_id, $weapon_id, $attack_type, string $jutsu_unique_id, string $jutsu_type) {
+    protected function setPlayerAction($attack_id, $weapon_id, $attack_type, string $jutsu_unique_id, string $jutsu_type) {
         if($this->player_side == Battle::TEAM1) {
             $this->player1_action = 1;
             $this->player1_jutsu_id = $attack_id;
@@ -2224,7 +2304,7 @@ class Battle {
         }
     }
 
-    public function chooseAndSetAIAction(AI $ai) {
+    protected function chooseAndSetAIAction(AI $ai) {
         $jutsu = $ai->chooseMove();
 
         $attack_id = $jutsu->id;
@@ -2246,6 +2326,10 @@ class Battle {
     }
 
     private function updateData() {
+        if($this->spectate) {
+            return;
+        }
+
         $this->system->query("UPDATE `battles` SET
             `player1_action` = '{$this->player1_action}',
             `player2_action` = '{$this->player2_action}',
@@ -2281,7 +2365,12 @@ class Battle {
         WHERE `battle_id` = '{$this->battle_id}' LIMIT 1");
     }
 
-    public function getDefaultAttacks(): array {
+    protected function stopBattle() {
+        $this->winner = Battle::DRAW;
+        $this->updateData();
+    }
+
+    protected function getDefaultAttacks(): array {
         $default_attacks = [];
 
         $query = "SELECT * FROM `jutsu` WHERE `purchase_type`='1'";
@@ -2292,7 +2381,7 @@ class Battle {
         return $default_attacks;
     }
 
-    public function timeRemaining(): int {
+    protected function timeRemaining(): int {
         return Battle::TURN_LENGTH - (time() - $this->turn_time);
     }
 
@@ -2349,18 +2438,14 @@ class Battle {
             $this->winner = Battle::DRAW;
         }
 
-        if($this->winner) {
+        if($this->winner && !$this->spectate) {
             $this->player->updateInventory();
         }
 
         return $this->winner;
     }
 
-    public function isComplete(): bool {
-        return $this->winner;
-    }
-
-    private static function getJutsuTextColor($jutsu_type) {
+    private static function getJutsuTextColor($jutsu_type): string {
         switch ($jutsu_type) {
             case 'ninjutsu':
                 return "blue";
@@ -2373,5 +2458,4 @@ class Battle {
                 return "black";
         }
     }
-
 }

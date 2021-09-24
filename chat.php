@@ -45,10 +45,6 @@ function chat() {
 			if(strlen($message) > $chat_max_post_length) {
 				throw new Exception("Message is too long!");
 			}
-			// Banned words
-			if($system->censor_check($message)) {
-				throw new Exception("Inappropriate language is not allowed in chat!");
-			}
 
 			$title = $player->rank_name;
 			$staff_level = $player->staff_level;
@@ -198,6 +194,7 @@ function chat() {
                     break;
             }
 
+
 			/*If User is Blocked, Skip their Echo'd Post!*/
 			$isBlocked = false;
 			foreach($player->blacklist as $id => $blacklist){
@@ -212,6 +209,9 @@ function chat() {
 				$isBlocked = false; //just in case?
 				continue;
 			}
+
+      $message = $system->explicitLanguageReplace($post['message']);
+      $message = $system->html_parse(stripslashes($message), false, true);
 
 			echo "
 				<tr>
@@ -234,8 +234,7 @@ function chat() {
                         echo "<p class='staffMember' style='background-color: {$color['staffColor']}'>{$color['staffBanner']}</p>";
                     }
                 echo "</td>
-				<td class='chatmsg' style='text-align:center;padding:4px;white-space:pre-wrap;'>" .
-					wordwrap($system->html_parse(stripslashes($post['message']), false, true), 60, "\n", true) . "</td>";
+				<td class='chatmsg' style='text-align:center;padding:4px;white-space:pre-wrap;'>" . $message . "</td>";
 				$post_time = time() - $post['time'];
 				$post_minutes = ceil($post_time / 60);
 				$post_hours = floor($post_minutes / 60);

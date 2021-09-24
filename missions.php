@@ -18,6 +18,7 @@ function missions() {
 	
 	if($player->mission_id) {
         runActiveMission();
+        return true;
 	}
 	
 	$max_mission_rank = 1;
@@ -30,7 +31,7 @@ function missions() {
 	else if($player->rank > System::SC_MAX_RANK) {
 		$max_mission_rank = System::SC_MAX_RANK;
 	}
-	//End
+
 	$mission_rank_names = array(1 => 'D-Rank', 2 => 'C-Rank', 3 => 'B-Rank', 4 => 'A-Rank', 5 => 'S-Rank');
 	
 	$result = $system->query("SELECT `mission_id`, `name`, `rank` FROM `missions` WHERE `mission_type`=1 OR `mission_type`=5 AND `rank` <= $max_mission_rank");
@@ -59,7 +60,7 @@ function missions() {
 	<div class='submenuMargin'></div>";
 	
 	// Start mission
-	if($_GET['start_mission']) {
+	if(!empty($_GET['start_mission'])) {
 		$mission_id = $_GET['start_mission'];
 		try {
             if(!isset($missions[$mission_id])) {
@@ -69,7 +70,6 @@ function missions() {
 
             missions();
 			return true;
-			
 		} catch (Exception $e) {
 			$system->message($e->getMessage());
 		}
@@ -105,8 +105,8 @@ function runActiveMission() {
     global $player;
     global $self_link;
 
-    if($_GET['cancel_mission']) {
-        $player->mission_id = 0;
+    if(!empty($_GET['cancel_mission'])) {
+        $player->clearMission();
         $system->message("You have abandoned your mission. <a href='$self_link'>Continue</a>");
         $system->printMessage();
         return true;
@@ -122,12 +122,12 @@ function runActiveMission() {
     // Check status/stage
     $mission_status = 1;
 
-    if($_GET['retreat']) {
+    if(!empty($_GET['retreat'])) {
         $player->battle_id = 0;
         $mission->nextStage($player->mission_stage['stage_id'] = 4);
     }
 
-    if($mission_status < 2 ) {
+    if($mission_status < 2) {
         if($player->mission_stage['action_type'] == 'travel' or $player->mission_stage['action_type'] == 'search') {
             if($player->location == $player->mission_stage['action_data']) {
                 // Team or solo
@@ -140,29 +140,29 @@ function runActiveMission() {
             }
         }
         else if($player->mission_stage['action_type'] == 'combat') {
-
-            // monster id
-            $opponent = new AI($player->mission_stage['action_data']);
-            if($opponent) {
-                // Initialize start of battle stuff
-                if(!isset($_SESSION['ai_id'])) {
-                    global $id;
-                    $_SESSION['player_jutsu_used'] = array();
-                    $_SESSION['battle_page'] = $id;
-                    $_SESSION['ai_id'] = $opponent->id;
-                    $player->last_ai = time();
-                    $player->battle_id = -1;
+            try {
+                // monster id
+                $opponent = new AI($system, $player->mission_stage['action_data']);
+                if(!$opponent) {
+                    throw new Exception("Couldn't load opponent for mission!");
                 }
 
-                require("battleCore.php");
-                $winner = battleAI($player, $opponent);
+                // Initialize start of battle stuff
+                if(!$player->battle_id) {
+                    $opponent->loadData();
+                    Battle::start($system, $player, $opponent, Battle::TYPE_AI_MISSION);
+                }
 
-                if(!$winner) {
+                $battle = new Battle($system, $player, $player->battle_id);
+                $battle->checkTurn();
+
+                $battle->renderBattle();
+
+                if(!$battle->isComplete()) {
                     return true;
                 }
                 else if($mission->mission_type == 5) {		//Survival Mission Combat
-
-                    if($winner == 1) { //Player victory
+                    if($battle->isPlayerWinner()) {
                         $money_gain = $mission->money;
                         $level_difference = $player->level - $opponent->level;
                         if($level_difference > 9) {
@@ -173,38 +173,35 @@ function runActiveMission() {
                             $money_gain = 5;
                         }
 
-                        if($_SESSION['ai_defeated'] > 1 && $_SESSION['ai_defeated'] % 5 == 0){
+                        if($player->mission_stage['ai_defeated'] > 1 && $player->mission_stage['ai_defeated'] % 5 == 0){
                             $player->mission_stage['stage_id'] += 1;
                         }
                         else if($player->mission_stage['stage_id'] > 2){
                             $player->mission_stage['stage_id'] -= 1;
                         }
                         $mission_status = $mission->nextStage($player->mission_stage['stage_id']);
-                        $_SESSION['ai_defeated']++;
-                        $_SESSION['mission_money'] += $money_gain;
-                    }
-                    else if($winner == 2 || $winner == -1) { //Player Defeat
-                        echo "<table class='table'><tr><th>Battle Results</th></tr>
-							<tr><td>You have been defeated.
-							</td></tr></table>";
+
+                        $player->mission_stage['ai_defeated']++;
+                        $player->mission_stage['mission_money'] += $money_gain;
                         $player->battle_id = 0;
-                        $_SESSION['mission_money'] /= 2;
+                    }
+                    else if($battle->isOpponentWinner() || $battle->isDraw()) { //Player Defeat
+                        $player->battle_id = 0;
+                        $player->mission_stage['mission_money'] /= 2;
                         $mission->nextStage($player->mission_stage['stage_id'] = 4);
+
+                        echo "<table class='table'><tr><th>Battle Results</th></tr>
+                        <tr><td>You have been defeated.
+                        </td></tr></table>";
                     }
                     else {
-                        $player->mission_id = 0;
-                        $player->mission_stage = '';
+                        $player->clearMission();
 
                         $system->printMessage();
                         return false;
                     }
-                    unset($_SESSION['ai_id']);
-                    unset($_SESSION['ai_health']);
-                    unset($_SESSION['player_jutsu_used']);
-                    unset($_SESSION['battle_page']);
-
                 }
-                else if($winner == 1) {		// Player win
+                else if($battle->isPlayerWinner()) {		// Player win
                     $player->battle_id = 0;
 
                     // Team or solo
@@ -215,40 +212,33 @@ function runActiveMission() {
                         $mission_status = $mission->nextStage($player->mission_stage['stage_id'] + 1);
                     }
                 }
-                else if($winner == 2) {		// AI win
+                else if($battle->isOpponentWinner()) {		// AI win
                     echo "<table class='table'><tr><th>Battle Results</th></tr>
-						<tr><td>You have been defeated. You have failed your mission.
-						</td></tr></table>";
+                    <tr><td>You have been defeated. You have failed your mission.
+                    </td></tr></table>";
 
-                    $player->mission_id = 0;
-                    $player->mission_stage = '';
+                    $player->clearMission();
 
                     $player->ai_losses++;
                     $player->battle_id = 0;
                 }
-                else if($winner == -1) {
+                else if($battle->isDraw()) {
                     echo "<table class='table'><tr><th>Battle Results</th></tr>
-						<tr><td>The battle ended in a draw. You have failed your mission.
-						</td></tr></table>";
+                    <tr><td>The battle ended in a draw. You have failed your mission.
+                    </td></tr></table>";
 
-                    $player->mission_id = 0;
-                    $player->mission_stage = '';
+                    $player->clearMission();
                     $player->battle_id = 0;
                 }
+            } catch(Exception $e) {
+                error_log($e->getMessage());
 
-                unset($_SESSION['ai_id']);
-                unset($_SESSION['ai_health']);
-                unset($_SESSION['player_jutsu_used']);
-                unset($_SESSION['battle_page']);
-            }
-            else {
-                $player->mission_id = 0;
-                $player->mission_stage = '';
+                $player->clearMission();
 
+                $system->message("There was an error with the mission - Your mission has been cancelled. <a href='$self_link'>Continue</a>");
                 $system->printMessage();
-                return false;
+                return true;
             }
-
         }
     }
 
@@ -256,8 +246,7 @@ function runActiveMission() {
     if($mission_status == 2) {
         // Special mission
         if($mission->mission_type == 4) {
-            $player->mission_id = 0;
-            $player->mission_stage = '';
+            $player->clearMission();
 
             // Jonin exam
             if($mission->mission_id == 10) {
@@ -272,8 +261,7 @@ function runActiveMission() {
         // Team mission
         else if($mission->mission_type == 3) {
             $player->money += $mission->money;
-            $player->mission_id = 0;
-            $player->mission_stage = '';
+            $player->clearMission();
 
             $team_points = 2;
             // Process team rewards if this is the first completing player, then unset the mission ID
@@ -294,8 +282,7 @@ function runActiveMission() {
         // Clan mission
         else if($mission->mission_type == 2) {
             $player->money += $mission->money;
-            $player->mission_id = 0;
-            $player->mission_stage = '';
+            $player->clearMission();
             $player->last_ai = time();
 
             $point_gain = 1;
@@ -311,28 +298,22 @@ function runActiveMission() {
         }
         // Village/Survival mission
         else {
-
-            if($mission->mission_type == 5){
-                $mission->money = $_SESSION['mission_money'];
-                unset($_SESSION['mission_money']);
-            }
-
-            $player->money += $mission->money;
-            $player->mission_id = 0;
-            $player->mission_stage = '';
-            $player->last_ai = time();
-
             echo "<table class='table'><tr><th>Current Mission</th></tr>
 				<tr><td style='text-align:center;'><span style='font-weight:bold;'>$mission->name Complete</span><br />
 				You have completed your mission.<br />";
             if($mission->mission_type == 5) {
+                $mission->money = $player->mission_stage['mission_money'];
                 echo sprintf("For your effort in defeating %d enemies, you have received &yen;%d.<br />",
-                    $_SESSION['ai_defeated'], $mission->money);
-                unset($_SESSION['ai_defeated']);
+                    $player->mission_stage['ai_defeated'], $mission->money);
             }
             else{
                 echo "You have been paid &yen;$mission->money.<br />";
             }
+
+            $player->money += $mission->money;
+            $player->clearMission();
+            $player->last_ai = time();
+
             echo "<a href='$self_link'>Continue</a>
 					</td></tr></table>";
         }
@@ -349,7 +330,7 @@ function runActiveMission() {
         if($mission->mission_type == 3 && $mission->team['mission_stage']['count_needed']) {
             echo ' (' . $mission->team['mission_stage']['count'] . '/' . $mission->team['mission_stage']['count_needed'] . ' complete)';
         }
-        else if($player->mission_stage['count_needed']) {
+        else if(!empty($player->mission_stage['count_needed'])) {
             echo ' (' . $player->mission_stage['count'] . '/' . $player->mission_stage['count_needed'] . ' complete)';
         }
 

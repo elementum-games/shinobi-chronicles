@@ -421,7 +421,9 @@ if($LOGGED_IN) {
 		if($player->rank >= 3) {
 		    $pages[24]['menu'] = System::MENU_USER;
 		}
-
+		if($player->staff_level >= System::SC_HEAD_ADMINISTRATOR) {
+		    $pages[26]['menu'] = System::MENU_ACTIVITY;
+        }
 
         echo $side_menu_start;
 		foreach($pages as $id => $page) {

@@ -667,7 +667,6 @@ function rankUp(): bool {
                 }
 
                 $battle = new Battle($system, $player, $player->battle_id);
-                $battle->loadFighters();
 
                 $battle->checkTurn();
 
@@ -736,7 +735,6 @@ function rankUp(): bool {
                 }
 
                 $battle = new Battle($system, $player, $player->battle_id);
-                $battle->loadFighters();
 
                 $battle->checkTurn();
 

@@ -106,6 +106,66 @@ class System {
     // Misc stuff
     const SC_MAX_RANK = 3;
 
+    public static $banned_words = [
+        'fuck',
+        'fuk',
+        'fck',
+        'fuq',
+        'fook',
+
+        'asshole',
+        'anus',
+
+        'shit',
+        'sht',
+        'shiee',
+        'shiet',
+
+        'fag ',
+        'faggot',
+        'fgt',
+
+        'cunt',
+
+        'bitch',
+        'bich',
+        'bish',
+
+        'retard',
+
+        'cock ',
+        'cocksu',
+        'dick',
+        'tits',
+        'titt',
+        'nigga',
+        ' niga',
+        'niga ',
+        'nigger',
+        'pussy',
+        'pussies',
+        'douche',
+        'slut',
+        'thot',
+
+        'cum ',
+        'cummi',
+        'cumming',
+        'jizz',
+
+        // Sex terms
+        'anal ',
+        'blowjob',
+        'creampie',
+        'handjob',
+        'rimjob',
+
+        ' rape',
+        'rape ',
+
+        'dildo',
+    ];
+
     public $debug = [
         'battle' => false,
         'battle_effects' => false,
@@ -329,29 +389,27 @@ class System {
         @string
     */
     public function censor_check($string): bool {
-        $banned_words = [
-            'fuck',
-            'shit',
-            'asshole',
-            'bitch',
-            'cunt',
-            'fag',
-            'asshat',
-            'pussy',
-            ' dick',
-            'whore'
-        ];
-        foreach($banned_words as $word) {
-
+        foreach(self::$banned_words as $word) {
             if(strpos(strtolower($string), $word) !== false) {
-
                 return true;
-
             }
-
         }
         return false;
 
+    }
+
+    /**
+     * @param      $text
+     * @return string
+     */
+    public function explicitLanguageReplace($text): string {
+        //String censorship
+        $word_replace = [];
+        foreach(self::$banned_words as $key => $word) {
+            $word_replace[] = str_repeat('*', strlen($word));
+        }
+
+        return str_ireplace(self::$banned_words, $word_replace, $text);
     }
 
     public function getMemes(): array {
@@ -386,37 +444,30 @@ class System {
         $text = str_replace($memes['codes'], ($faces ? $memes['images'] : $memes['texts']), $text);
 
         if($img) {
-            $search_array[count($search_array)] = "[img]";
+            $search_array[count($search_array)] = "[img]https://";
+            $search_array[count($search_array)] = "[img]http://";
             $search_array[count($search_array)] = "[/img]";
-            $replace_array[count($replace_array)] = "<img src='";
+            $replace_array[count($replace_array)] = "<img src='[image_prefix]";
+            $replace_array[count($replace_array)] = "<img src='[image_prefix]";
             $replace_array[count($replace_array)] = "' style='/*IMG_SIZE*/' />";
-
-            $search_array[count($search_array)] = "[url]http:";
-            $search_array[count($search_array)] = "[url]www.";
-            $search_array[count($search_array)] = "[/url]";
-
-            $replace_array[count($replace_array)] = "<a href='http:";
-            $replace_array[count($replace_array)] = "<a href='http://www.";
-            $replace_array[count($replace_array)] = "'>[Link]</a>";
         }
-        else {
-            $reg_exUrl = "/(?:http|https)\:\/\/([a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,5})(?:\/[^\:\s\\\\]*)?/i";
 
-            preg_match_all($reg_exUrl, $text, $matches);
+        $text = str_ireplace($search_array,$replace_array,$text);
 
-            $websites = array();
+        $search_array = [];
+        $replace_array = [];
 
-            foreach($matches[0] as $pattern){
+        $reg_exUrl = "/(?:http|https)\:\/\/([a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,5})(?:\/[^\:\s\\\\]*)?/i";
+        preg_match_all($reg_exUrl, $text, $matches);
 
-                preg_match($reg_exUrl, $pattern, $url);
+        foreach($matches[0] as $pattern){
+            preg_match($reg_exUrl, $pattern, $url);
 
-                if(!$websites[$pattern]) {
-                    $websites[$pattern] = trim($url[1]);
-                    $text = str_replace($pattern, sprintf("<a href='%s' target='_blank'>%s</a>", $pattern, $websites[$pattern]), $text);
-                }
-
-            }
+            $text = str_replace($pattern, sprintf("<a href='%s' target='_blank'>%s</a>", $pattern, $pattern), $text);
         }
+
+        array_push($search_array, '[image_prefix]');
+        array_push($replace_array, 'https://');
 
         array_push($search_array, '\r\n');
         array_push($replace_array, '<br />');

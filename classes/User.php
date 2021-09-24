@@ -6,7 +6,7 @@ require_once "classes/Jutsu.php";
 	Purpose:	Fetch user data and load into class variables.
 */
 class User extends Fighter {
-    const ID_PREFIX = 'U';
+    const ENTITY_TYPE = 'U';
 
     const MIN_NAME_LENGTH = 2;
     const MIN_PASSWORD_LENGTH = 6;
@@ -173,7 +173,7 @@ class User extends Fighter {
 			throw new Exception("Invalid user id!");
 		}
 		$this->user_id = $this->system->clean($user_id);
-		$this->id = self::ID_PREFIX . ':' . $this->user_id;
+		$this->id = self::ENTITY_TYPE . ':' . $this->user_id;
 
 		$result = $this->system->query("SELECT `user_id`, `user_name`, `ban_type`, `ban_expire`, `journal_ban`, `avatar_ban`, `song_ban`, `last_login`,
 			`forbidden_seal`, `staff_level`, `username_changes`
@@ -383,6 +383,9 @@ class User extends Fighter {
 
         if($this->rank > 3) {
             $this->scout_range++;
+        }
+        if($this->staff_level >= System::SC_HEAD_ADMINISTRATOR) {
+            $this->scout_range += 2;
         }
 
 		$this->village_changes = $user_data['village_changes'];
@@ -602,12 +605,14 @@ class User extends Fighter {
 
 			// Debug info
 			if($this->system->debug['bloodline']) {
+			    echo "Debugging {$this->getName()}<br />";
 				foreach($this->bloodline->passive_boosts as $id=>$boost) {
 					echo "Boost: " . $boost['effect'] . " : " . $boost['power'] . "<br />";
 				}
 				foreach($this->bloodline->combat_boosts as $id=>$boost) {
 					echo "Boost: " . $boost['effect'] . " : " . $boost['power'] . "<br />";
 				}
+				echo "<br />";
 			}
 
 			// Regen/scan range effects
@@ -798,10 +803,6 @@ class User extends Fighter {
 		return $display;
 	}
 
-	/* function getInventory()
-	* Loads user jutsu, items, and equipped jutsu/bl jutsu/items
-	*	-Parameters-
-	*/
 	public function getInventory() {
 		// Query user owned inventory
 		$result = $this->system->query("SELECT * FROM `user_inventory` WHERE `user_id` = '{$this->user_id}'");
@@ -939,53 +940,15 @@ class User extends Fighter {
 			}
 		}
 
-		// Temp number fix inside
-		if($this->bloodline_id) {
-			if(!empty($this->bloodline->combat_boosts)) {
-				$bloodline_skill = 100 + $this->bloodline_skill;
+        if($this->bloodline_id) {
+            if(!empty($this->bloodline->combat_boosts)) {
+                $bloodline_skill = 100 + $this->bloodline_skill;
 
-				foreach($this->bloodline->combat_boosts as $jutsu_id => $effect) {
-					$this->bloodline->combat_boosts[$jutsu_id]['effect_amount'] = round($effect['power'] * $bloodline_skill, 3);
-				}
-			}
-
-			// Apply bloodline passive combat boosts
-			$this->bloodline_offense_boosts = array();
-			$this->bloodline_defense_boosts = array();
-			foreach($this->bloodline->combat_boosts as $jutsu_id => $effect) {
-				switch($effect['effect']) {
-					// Nin/Tai/Gen boost applied in User::calcDamage()
-					case 'ninjutsu_boost':
-					case 'taijutsu_boost':
-					case 'genjutsu_boost':
-						$x = count($this->bloodline_offense_boosts);
-						$this->bloodline_offense_boosts[$x]['effect'] = $effect['effect'];
-						$this->bloodline_offense_boosts[$x]['effect_amount'] = $effect['effect_amount'];
-						break;
-
-					case 'ninjutsu_resist':
-					case 'genjutsu_resist':
-					case 'taijutsu_resist':
-						$x = count($this->bloodline_defense_boosts);
-						$this->bloodline_defense_boosts[$x]['effect'] = $effect['effect'];
-						$this->bloodline_defense_boosts[$x]['effect_amount'] = $effect['effect_amount'];
-						break;
-
-					case 'cast_speed_boost':
-						$this->cast_speed_boost += $effect['effect_amount'];
-						break;
-					case 'speed_boost':
-						$this->speed_boost += $effect['effect_amount'];
-						break;
-					case 'intelligence_boost':
-						$this->intelligence_boost += $effect['effect_amount'];
-						break;
-					case 'willpower_boost':
-						$this->willpower_boost += $effect['effect_amount'];
-						break;
-				}
-			}
-		}
+                foreach($this->bloodline->combat_boosts as $jutsu_id => $effect) {
+                    $this->bloodline->combat_boosts[$jutsu_id]['effect_amount'] = round($effect['power'] * $bloodline_skill, 3);
+                }
+            }
+        }
 
 		$this->inventory_loaded = true;
 	}
@@ -1140,7 +1103,6 @@ class User extends Fighter {
 			$query .= "`team_id` = 'invite:{$this->team_invite}',";
 		}
 
-
 		$query .= "`battle_id` = '$this->battle_id',
 		`challenge` = '$this->challenge',
 		`location` = '$this->location',";
@@ -1205,7 +1167,6 @@ class User extends Fighter {
 			$blacklist_json = json_encode($this->blacklist);
 			$this->system->query("UPDATE `blacklist` SET `blocked_ids`='{$blacklist_json}' WHERE `user_id`='{$this->user_id}' LIMIT 1");
 		}
-
 	}
 
 	/* function updateInventory()
@@ -1325,7 +1286,7 @@ class User extends Fighter {
     public static function fromEntityId(string $entity_id): User {
         $entity_id = System::parseEntityId($entity_id);
 
-        if($entity_id->entity_type != self::ID_PREFIX) {
+        if($entity_id->entity_type != self::ENTITY_TYPE) {
             throw new Exception("Entity ID is not a User!");
         }
 
@@ -1347,5 +1308,10 @@ class User extends Fighter {
                 unset($this->genjutsu_ids[$jutsu_id]);
                 break;
         }
+    }
+
+    public function clearMission() {
+        $this->mission_id = 0;
+        $this->mission_stage = [];
     }
 }

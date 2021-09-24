@@ -92,7 +92,7 @@ $pages = [
         'title' => 'Missions',
         'function_name' => 'missions',
         'menu' => System::MENU_ACTIVITY,
-        'battle_type' => Battle::TYPE_AI_ARENA,
+        'battle_type' => Battle::TYPE_AI_MISSION,
         'village_ok' => System::IN_VILLAGE_OKAY,
         'min_rank' => 2
     ],
@@ -111,6 +111,14 @@ $pages = [
         'menu' => System::MENU_ACTIVITY,
         'battle_ok' => false,
         'village_ok' => System::ONLY_IN_VILLAGE,
+    ],
+    26 => [
+        'file_name' => 'viewBattles.php',
+        'title' => 'View Battles',
+        'function_name' => 'viewBattles',
+        'menu' => System::MENU_ACTIVITY,
+        'battle_ok' => false,
+        'village_ok' => System::IN_VILLAGE_OKAY,
     ],
 
     // Village Menu
