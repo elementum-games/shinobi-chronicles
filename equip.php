@@ -30,8 +30,7 @@ function gear() {
 	}
 	
 	
-		
-	if($_POST['equip_item']) {
+	if(isset($_POST['equip_item'])) {
 		$view = 'items';
 		$items = $_POST['items'];
 		$equipped_items = array();
@@ -64,7 +63,7 @@ function gear() {
 			$system->message("Items equipped!");
 		}
 	}
-	else if($_GET['use_item']) {
+	else if(isset($_GET['use_item'])) {
 		$item_id = (int)$system->clean($_GET['use_item']);
 		try {
 			if(!$player->checkInventory($item_id, 'item') or $player->items[$item_id]['use_type'] != 3) {

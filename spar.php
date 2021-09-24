@@ -48,7 +48,7 @@ function spar() {
             return false;
         }
 	}
-	else if($_GET['challenge']) {
+	else if(isset($_GET['challenge'])) {
 		try {
 			$challenge = (int)$system->clean($_GET['challenge']);
 			$result = $system->query("SELECT `user_id`, `user_name`, `village`, `location`, `challenge`, `battle_id`, `last_active`
@@ -90,7 +90,7 @@ function spar() {
 			scoutArea();
 		}
 	}
-	else if($_GET['accept_challenge']) {
+	else if(isset($_GET['accept_challenge'])) {
 		try {
 			$challenge = (int)$system->clean($_GET['accept_challenge']);
 			
@@ -132,7 +132,7 @@ function spar() {
 			scoutArea();
 		}
 	}
-	else if($_GET['decline_challenge']) {
+	else if(isset($_GET['decline_challenge'])) {
 		$player->challenge = 0;
 		$system->message("Challenge declined.");
 		$system->printMessage();
@@ -140,7 +140,7 @@ function spar() {
 		require("scoutArea.php");
 		scoutArea();
 	}
-	else if($_GET['cancel_challenge']) {
+	else if(isset($_GET['cancel_challenge'])) {
 		$challenge = $system->clean($_GET['cancel_challenge']);
 		// Load user challenges sent
 		$result = $system->query("UPDATE `users` SET `challenge`=0 WHERE `user_id`='$challenge' AND `challenge`='$player->user_id' LIMIT 1");
