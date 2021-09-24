@@ -1,5 +1,5 @@
 <?php
-/* 
+/*
 File: 		equip.php
 Coder:		Levi Meahan
 Created:	09/04/2013
@@ -12,14 +12,14 @@ function gear() {
 	global $system;
 
 	global $player;
-	
+
 	global $self_link;
-	
+
 	$player->getInventory();
-	
+
 	$max_equipped_armor = 2;
 	$max_equipped_weapons = 1;
-	
+
 	if($player->rank >= 3) {
 		$max_equipped_armor++;
 		$max_equipped_weapons++;
@@ -28,13 +28,13 @@ function gear() {
 		$max_equipped_armor++;
 		$max_equipped_weapons++;
 	}
-	
-	
+
+
 	if(isset($_POST['equip_item'])) {
 		$view = 'items';
 		$items = $_POST['items'];
 		$equipped_items = array();
-		
+
 		$equip_ok = true;
 		$equipped_armor = 0;
 		$equipped_weapons = 0;
@@ -57,7 +57,7 @@ function gear() {
 				}
 			}
 		}
-		
+
 		if($equip_ok) {
 			$player->equipped_items = $equipped_items;
 			$system->message("Items equipped!");
@@ -69,11 +69,11 @@ function gear() {
 			if(!$player->checkInventory($item_id, 'item') or $player->items[$item_id]['use_type'] != 3) {
 				throw new Exception("Invalid item!");
 			}
-			
+
 			if($player->items[$item_id]['quantity'] <= 0) {
 				throw new Exception("You do not have any more of this item!");
 			}
-			
+
 			$player->items[$item_id]['quantity']--;
 			switch($player->items[$item_id]['effect']) {
 				case 'heal':
@@ -87,7 +87,7 @@ function gear() {
 					$player->items[$item_id]['quantity']++;
 					break;
 			}
-			
+
 			$player->updateInventory();
 		} catch (Exception $e) {
 			$system->message($e->getMessage());
@@ -95,74 +95,74 @@ function gear() {
 	}
 
 
-	
+
 	$system->printMessage();
 
 	echo "<table id='equipment gear' class='table'>";
 
-	echo "<tr>
+	echo "<tr class='threeColumns'>
 		<th style='width:33%;'>Weapons</th>
 		<th style='width:33%;'>Armor</th>
 		<th style='width:33%;'>Consumables</th>
 	</tr>";
-	
-	
+
+
 	// Use type: 1 = weapon, 2 = armor, 3 = consumable
-	echo "<tr><td>";
+	echo "<tr class='threeColumns'><td>";
 	if($player->items) {
 		foreach($player->items as $item) {
 			if($item['use_type'] != 1) {
 				continue;
 			}
-			
+
 			$item['effect'] = str_replace("_", " ", $item['effect']);
 
 			echo sprintf("%s <sup style='font-size:9px;'>(%s %s)</sup> <br />", $item['name'], $item['effect_amount'], $item['effect']);
 		}
 	}
 	echo "</td>";
-	
+
 	echo "<td>";
 	if($player->items) {
 		foreach($player->items as $item) {
 			if($item['use_type'] != 2) {
 				continue;
 			}
-			
+
 
 			echo sprintf("%s <sup style='font-size:9px;'>(%s %s)</sup> <br />", $item['name'], $item['effect_amount'], $item['effect']);
 
 		}
 	}
 	echo "</td>";
-	
+
 	echo "<td>";
 	if($player->items) {
 		foreach($player->items as $item) {
 			if($item['use_type'] != 3) {
 				continue;
 			}
-			
+
 			echo sprintf("%s <sup style='font-size:9px;'>(%s %s)</sup> <br />", $item['name'], $item['effect_amount'], $item['effect']);
 		}
 	}
 	echo "</td>";
-	
+
 	echo "</td></tr>";
-	
-	
+
+
 	echo "
 	<form action='$self_link' method='post' style='margin:0px;'>
-	<tr>
+	<tr class='twoHeaders'>
 		<th colspan='2'>Equipped Gear</th>
 		<th>Use Items</th>
-	</tr>";		
-			
-	echo "<tr>";
-	
-	
+	</tr>";
+
+	echo "<tr class='threeColumns'>";
+
+
 	$item_count = 1;
-	echo "<td style='width:33%;'>";
+	echo "<td class='fullwidth' style='width:33%;'>";
 	$equipped_weapons = array();
 	for($i = 0; $i < $max_equipped_weapons; $i++) {
 		$selected_displayed = false;
@@ -184,8 +184,8 @@ function gear() {
 		echo "</select><br />";
 	}
 	echo "</td>";
-	
-	echo "<td style='width:33%;'>";
+
+	echo "<td class='fullwidth' style='width:33%;'>";
 	$equipped_armor = array();
 	for($i = 0; $i < $max_equipped_armor; $i++) {
 		$selected_displayed = false;
@@ -202,24 +202,24 @@ function gear() {
 				echo " selected='selected' ";
 				$equipped_armor[$item['item_id']] = $item['item_id'];
 			}
-			
-			
+
+
 			echo ">{$item['name']}</option>";
 		}
 		echo "</select><br />";
 	}
 	echo "</td>";
-	
-	echo "<td style='text-align:center;'>";
+
+	echo "<td class='fullwidth' style='text-align:center;'>";
 	foreach($player->items as $id => $item) {
 		if($item['use_type'] != 3) {
 			continue;
 		}
-		
+
 		if($item['quantity'] <= 0) {
 			continue;
 		}
-		
+
 		echo "<a href='$self_link&use_item=$id'><span class='button' style='min-width:8em;'>" . $item['name'] . '<br />';
 		if($item['effect'] == 'heal') {
 			echo "<span style='font-weight:normal;'>(Heal " . $item['effect_amount'] . " HP)</span></span></a><br />";
@@ -228,16 +228,16 @@ function gear() {
 	}
 	echo "</select>
 	</td>
-	
-	
+
+
 	<br />
 	<tr><td colspan='3' style='text-align:center;'>";
-		
+
 	echo "<input type='submit' name='equip_item' value='Equip' />
 	</td></tr>
 	</form>
-	</table>";	
-		
+	</table>";
+
 	$player->updateInventory();
 }
 
@@ -245,11 +245,11 @@ function jutsu() {
 	global $system;
 
 	global $player;
-	
+
 	global $self_link;
-	
+
 	$player->getInventory();
-	
+
 	$max_equipped_jutsu = 3;
 	if($player->rank >= 3) {
 		$max_equipped_jutsu++;
@@ -257,11 +257,11 @@ function jutsu() {
 	if($player->forbidden_seal && $player->forbidden_seal['level'] >= 2) {
 		$max_equipped_jutsu++;
 	}
-	
+
 	if(!empty($_POST['equip_jutsu'])) {
 		$jutsu = $_POST['jutsu'];
 		$equipped_jutsu = array();
-		
+
 		try {
 			$count = 0;
 			$jutsu_types = array('ninjutsu', 'taijutsu', 'genjutsu');
@@ -269,30 +269,30 @@ function jutsu() {
 				if($count >= $max_equipped_jutsu) {
 					break;
 				}
-				
+
 				$jutsu_array = explode('-', $jutsu_data);
 				if($jutsu_array[0] == 'none') {
 					continue;
 				}
-				
+
 				if(array_search($jutsu_array[0], $jutsu_types) === false) {
 					throw new Exception("Invalid jutsu type!");
 					break;
 				}
-				if($player->checkInventory($jutsu_array[1], 'jutsu')) {		
-					$equipped_jutsu[$count]['id'] = $system->clean($jutsu_array[1]);				
+				if($player->checkInventory($jutsu_array[1], 'jutsu')) {
+					$equipped_jutsu[$count]['id'] = $system->clean($jutsu_array[1]);
 					$equipped_jutsu[$count]['type'] = $system->clean($jutsu_array[0]);
 					$count++;
 				}
 			}
-			
+
 			$player->equipped_jutsu = $equipped_jutsu;
 			$system->message("Jutsu equipped!");
 		} catch (Exception $e) {
 			$system->message($e->getMessage());
 		}
 	}
-	
+
 	if(!empty($_GET['learn_jutsu'])) {
 		$jutsu_id = (int)$_GET['learn_jutsu'];
 		try {
@@ -309,17 +309,17 @@ function jutsu() {
 				if(!isset($player->jutsu[$id])) {
 					throw new Exception("You need to learn " . $player->jutsu[$id]->name . " first!");
 				}
-				
+
 				if($player->jutsu[$id]->level < 50) {
 					throw new Exception("You are not skilled enough with " . $player->jutsu[$id]->name .
 						"! (Level " . $player->jutsu[$id]->level . "/50)");
 				}
 			}
-		
+
 			$player->jutsu[$jutsu_id] = $player->jutsu_scrolls[$jutsu_id];
 			$player->jutsu[$jutsu_id]->setLevel(1, 0);
 			$jutsu_name = $player->jutsu_scrolls[$jutsu_id]->name;
-			
+
 			switch($player->jutsu[$jutsu_id]->jutsu_type) {
 				case 'ninjutsu':
 					$player->ninjutsu_ids[] = $jutsu_id;
@@ -331,7 +331,7 @@ function jutsu() {
 					$player->genjutsu_ids[] = $jutsu_id;
 					break;
 			}
-			
+
 			unset($player->jutsu_scrolls[$jutsu_id]);
 			$system->message("You have learned $jutsu_name!");
 		} catch (Exception $e) {
@@ -397,10 +397,10 @@ function jutsu() {
 
 	$system->printMessage();
 	echo "<table class='table'>";
-	
+
 	// View single jutsu details
 	$jutsu_list = true;
-	
+
 	if(!empty($_GET['view_jutsu'])) {
 		$jutsu_list = false;
 		$jutsu_id = (int)$system->clean($_GET['view_jutsu']);
@@ -424,18 +424,18 @@ function jutsu() {
 					echo "<label style='width:6.5em;'>Cooldown:</label>" . $jutsu->cooldown . " turn(s)<br />";
 				}
 				if($jutsu->effect) {
-					echo "<label style='width:6.5em;'>Effect:</label>" . 
+					echo "<label style='width:6.5em;'>Effect:</label>" .
 						ucwords(str_replace('_', ' ', $jutsu->effect)) . " - " . $jutsu->effect_length . " turns<br />";
 				}
 				echo "<label style='width:6.5em;'>Jutsu type:</label>" . ucwords($jutsu->jutsu_type) . "<br />
 				<label style='width:6.5em;'>Power:</label>" . round($jutsu->power, 1) . "<br />
 				<label style='width:6.5em;'>Level:</label>" . $jutsu->level . "<br />
 				<label style='width:6.5em;'>Exp:</label>" . $jutsu->exp . "<br />";
-			
-				echo "<label style='width:6.5em;float:left;'>Description:</label> 
+
+				echo "<label style='width:6.5em;float:left;'>Description:</label>
 					<p style='display:inline-block;margin:0px;width:37.1em;'>" . $jutsu->description . "</p>
 					<br style='clear:both;' />";
-				
+
 				$result = $system->query("SELECT `name` FROM `jutsu` WHERE `parent_jutsu`='$jutsu_id'");
 				if($system->db_num_rows > 0) {
 					echo "<br />
@@ -451,16 +451,16 @@ function jutsu() {
 			echo "</td></tr>";
 		}
 	}
-	
+
 	if($jutsu_list) {
 		echo "<tr>
 			<th style='width:33%;'>Ninjutsu</th>
 			<th style='width:33%;'>Taijutsu</th>
 			<th style='width:33%;'>Genjutsu</th>
 		</tr>";
-		
+
 		$jutsu_array = array();
-		
+
 		echo "<tr><td>";
 		if($player->ninjutsu_ids) {
 			$sortedJutsu = array();
@@ -473,7 +473,7 @@ function jutsu() {
 			}
 		}
 		echo "</td>";
-		
+
 		echo "<td>";
 		if($player->taijutsu_ids) {
 			$sortedJutsu = array();
@@ -486,7 +486,7 @@ function jutsu() {
 			}
 		}
 		echo "</td>";
-		
+
 		echo "<td>";
 		if($player->genjutsu_ids) {
 			$sortedJutsu = array();
@@ -499,8 +499,8 @@ function jutsu() {
 			}
 		}
 		echo "</td></tr>";
-		echo "<tr><th colspan='3'>Equipped Jutsu</th></tr>";	
-				
+		echo "<tr><th colspan='3'>Equipped Jutsu</th></tr>";
+
 		echo "<tr><td colspan='3'>
 		<form action='$self_link' method='post'>
 		<div style='text-align:center;'>";
@@ -517,7 +517,7 @@ function jutsu() {
 				">{$jutsu->name}</option>";
 			}
 			echo "</select><br />";
-			
+
 			// Start second row
 			if($row_start++ > 2) {
 				echo "</div><div style='display:inline-block;'>";
@@ -525,17 +525,17 @@ function jutsu() {
 			}
 		}
 		echo "</div><br />";
-		
+
 		echo "<input type='submit' name='equip_jutsu' value='Equip' />
 		</div>
 		</form>
-		</tr>";	
-		
-		
+		</tr>";
+
+
 		// Purchase jutsu
 		if(!empty($player->jutsu_scrolls)) {
 			echo "<tr><th colspan='3'>Jutsu scrolls</th></tr>";
-			
+
 			foreach($player->jutsu_scrolls as $id => $jutsu_scroll) {
 				echo "<tr id='jutsu_scrolls' ><td colspan='3'>
 					<span style='font-weight:bold;'>" . $jutsu_scroll->name . "</span><br />
@@ -544,7 +544,7 @@ function jutsu() {
 						<label style='width:6.5em;'>Element:</label>" . $jutsu_scroll->element . "<br />
 						<label style='width:6.5em;'>Use cost:</label>" . $jutsu_scroll->use_cost . "<br />" .
 						($jutsu_scroll->cooldown ? "<label style='width:6.5em;'>Cooldown:</label>" . $jutsu_scroll->cooldown . " turn(s)<br />" : "") .
-                    "<label style='width:6.5em;float:left;'>Description:</label> 
+                    "<label style='width:6.5em;float:left;'>Description:</label>
 						<p style='display:inline-block;margin:0;width:37.1em;'>" . $jutsu_scroll->description . "</p>
 						<br style='clear:both;' />
 						<label style='width:6.5em;'>Jutsu type:</label>" . ucwords($jutsu_scroll->jutsu_type) . "<br />
@@ -554,9 +554,9 @@ function jutsu() {
 			}
 		}
 	}
-		
+
 	echo "</table>";
-	
+
 	$player->updateInventory();
 }
 

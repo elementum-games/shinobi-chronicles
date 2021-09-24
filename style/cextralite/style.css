@@ -76,6 +76,7 @@ a:hover{
 	display: grid;
 	grid-template-columns: 1fr 1fr 1fr;
 	height: auto;
+	margin: 0em 0em 1em 0em;
 }
 
 .buttonList{
@@ -561,6 +562,9 @@ ul.submenu{
 	text-align: center;
 }
 
+/*gear equipment*/
+
+
 /*Travel Page*/
 #scoutTable .scrollable{
 	overflow: scroll;
@@ -588,6 +592,27 @@ ul.submenu{
 	background-color: transparent !important;
 }
 
+/*Table Data TD of 3 columns*/
+.threeColumns{
+	display: grid;
+	grid-template-columns: repeat(3, 1fr);
+	justify-items: center;
+}
+.threeColumns th{
+	width: 100% !important;
+	padding: 1em 0em;
+}
+
+/*Use this for headers of 2 columns*/
+.twoHeaders{
+	display: grid;
+	grid-template-columns: repeat(2, 1fr);
+}
+
+/*In Gear - TD's that need to fill more space*/
+.fullWidth{
+	width: 95% !important;
+}
 /* #jutsu{
 	display: grid;
 	grid-template-columns: repeat(4, 1fr);
