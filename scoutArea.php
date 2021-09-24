@@ -76,7 +76,7 @@ function scoutArea($in_existing_table = false, $show_spar_link = true) {
 	
 	if(is_array($users)) {
 		foreach($users as $user) {
-			echo "<tr>
+			echo "<tr class='table_multicolumns'>
 				<td style='width:28%;'><a href='{$system->links['members']}&user={$user['user_name']}'>" . $user['user_name'] . "</a></td>
 				<td style='width:20%;text-align:center;'>" . $ranks[$user['rank']]['name'] . "</td>
 				<td style='width:17%;text-align:center;'>

@@ -98,9 +98,9 @@ function gear() {
 
 	
 	$system->printMessage();
-	
-	echo "<table class='table'>";
-	
+
+	echo "<table id='equipment gear' class='table'>";
+
 	echo "<tr>
 		<th style='width:33%;'>Weapons</th>
 		<th style='width:33%;'>Armor</th>
@@ -538,7 +538,7 @@ function jutsu() {
 			echo "<tr><th colspan='3'>Jutsu scrolls</th></tr>";
 			
 			foreach($player->jutsu_scrolls as $id => $jutsu_scroll) {
-				echo "<tr><td colspan='3'>
+				echo "<tr id='jutsu_scrolls' ><td colspan='3'>
 					<span style='font-weight:bold;'>" . $jutsu_scroll->name . "</span><br />
 					<div style='margin-left:2em;'>
 						<label style='width:6.5em;'>Rank:</label>" . $jutsu_scroll->rank . "<br />

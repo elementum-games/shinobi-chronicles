@@ -340,8 +340,8 @@ function members() {
 				else {
 					$class = 'row2';
 				}
-				
-				echo "<tr>
+
+				echo "<tr class='table_multicolumns'>
 					<td class='$class' style='width:30%;'>
 						<a href='$self_link&user={$row['user_name']}' class='userLink'>" . $row['user_name'] . "</a></td>
 					<td class='$class' style='width:20%;text-align:center;'>" . $ranks[$row['rank']] . "</td>

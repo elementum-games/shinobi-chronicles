@@ -133,7 +133,7 @@ function chat() {
 				$_SESSION['quick_reply'] = 1;
 			}
 		}
-		echo "<table class='table'>
+		echo "<table id='chat_input_table' class='table'>
 			<tr><th>Post Message</th></tr>
 			<tr><td style='text-align:center;'>
 			<form action='$self_link' method='post'>
@@ -214,7 +214,7 @@ function chat() {
       $message = $system->html_parse(stripslashes($message), false, true);
 
 			echo "
-				<tr>
+				<tr class='chat_msg' >
 					<td style='text-align:center;'>
 					<div id='user_data_container' style='display: flex;flex-direction:row'>
 					    <div style='flex-shrink:0;'>

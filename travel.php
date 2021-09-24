@@ -160,8 +160,8 @@ function travel() {
 	});
 	
 	</script>";
-	
-	echo "<table class='table' style='width:98%;'>
+
+	echo "<table id='scoutTable' class='table' style='width:98%;'>
     <tr><th colspan='5'>Your location: {$player->location}" .
 	(isset($villages[$player->location]) ? " (" . $villages[$player->location]['name'] . " Village)" : "") .
 	"</th></tr>

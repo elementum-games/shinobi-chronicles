@@ -662,7 +662,7 @@ function modPanel() {
 	}
 	else if($display_menu) {
 		// Social/game ban
-		echo "<table class='table'>
+		echo "<table id='mod_panel' class='table'>
 		<tr>
 			<th style='width:50%;'>Ban user</th>
 			<th style='width:50%;'>Ban journal/avatar/profile song</th>
