@@ -1205,7 +1205,6 @@ class User extends Fighter {
 			$blacklist_json = json_encode($this->blacklist);
 			$this->system->query("UPDATE `blacklist` SET `blocked_ids`='{$blacklist_json}' WHERE `user_id`='{$this->user_id}' LIMIT 1");
 		}
-
 	}
 
 	/* function updateInventory()

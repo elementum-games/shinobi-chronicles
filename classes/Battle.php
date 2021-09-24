@@ -2068,12 +2068,7 @@ class Battle {
             $opponent_name = $opponent->name;
         }
 
-        $collision_text = str_replace(
-            array('[player]', '[opponent]',
-                '[gender]', '[gender2]'),
-            array($player_name, $opponent_name,
-                ($player->gender == 'Male' ? 'he' : 'she'), ($player->gender == 'Male' ? 'his' : 'her')),
-            $collision_text);
+        $collision_text = $this->parseCombatText($collision_text, $player, $opponent);
         return $collision_text;
     }
 

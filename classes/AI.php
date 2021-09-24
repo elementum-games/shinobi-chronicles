@@ -132,7 +132,24 @@ class AI extends Fighter {
             $this->jutsu[] = $jutsu;
         }
 
-        $this->loadRandomShopJutsu();
+        $this->loadDefaultJutsu();
+        // $this->loadRandomShopJutsu();
+    }
+
+    private function loadDefaultJutsu() {
+        $result = $this->system->query(
+            "SELECT `battle_text`, `power`, `jutsu_type` FROM `jutsu` 
+                    WHERE `rank` <= '{$this->rank}'
+                    AND `purchase_type`='" . Jutsu::PURCHASE_TYPE_DEFAULT . "'
+                    ORDER BY `rank` DESC LIMIT 1");
+        while ($row = $this->system->db_fetch($result)) {
+            $this->jutsu[] = $this->initJutsu(
+                count($this->jutsu),
+                $row['jutsu_type'],
+                $row['power'],
+                $row['battle_text']
+            );
+        }
     }
 
     private function loadRandomShopJutsu() {
