@@ -253,11 +253,6 @@ class Battle {
         }
 
         $this->default_attacks = $this->getDefaultAttacks();
-
-        if($this->player1->staff_level >= System::SC_ADMINISTRATOR || $this->player2->staff_level >= System::SC_ADMINISTRATOR) {
-            $this->system->debug['jutsu_collision'] = true;
-            $this->system->debug['bloodline'] = true;
-        }
     }
 
     /**
@@ -266,6 +261,11 @@ class Battle {
      */
     public function checkTurn(): ?string {
         $this->loadFighters();
+
+        if($this->player1->staff_level >= System::SC_ADMINISTRATOR || $this->player2->staff_level >= System::SC_ADMINISTRATOR) {
+            $this->system->debug['jutsu_collision'] = true;
+            $this->system->debug['bloodline'] = true;
+        }
 
         // If someone is not in battle, this will be set
         if($this->winner) {
