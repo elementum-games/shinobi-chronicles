@@ -800,10 +800,6 @@ class User extends Fighter {
 		return $display;
 	}
 
-	/* function getInventory()
-	* Loads user jutsu, items, and equipped jutsu/bl jutsu/items
-	*	-Parameters-
-	*/
 	public function getInventory() {
 		// Query user owned inventory
 		$result = $this->system->query("SELECT * FROM `user_inventory` WHERE `user_id` = '{$this->user_id}'");
@@ -953,6 +949,8 @@ class User extends Fighter {
 
             if($this->system->debug['bloodline']) {
                 echo "Setting passive combat boosts for {$this->getName()}<br />";
+                debug_print_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
+                echo "<br />";
             }
 
 			// Apply bloodline passive combat boosts
