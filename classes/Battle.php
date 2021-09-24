@@ -262,6 +262,11 @@ class Battle {
     public function checkTurn(): ?string {
         $this->loadFighters();
 
+        // If someone is not in battle, this will be set
+        if($this->winner) {
+            return $this->winner;
+        }
+
         // If turn is still active and user hasn't submitted their move, check for action
         if($this->timeRemaining() > 0 && !$this->playerActionSubmitted()) {
             if(!empty($_POST['attack'])) {
@@ -912,7 +917,6 @@ class Battle {
         $this->checkForWinner();
         $this->updateData();
 
-
         return $this->winner;
     }
 
@@ -948,6 +952,10 @@ class Battle {
 
         if($this->opponent instanceof User) {
             $this->opponent->loadData(1, true);
+            if(!$this->opponent->battle_id != $this->battle_id) {
+                $this->stopBattle();
+                return;
+            }
         }
 
         $this->player1->getInventory();
@@ -1726,7 +1734,7 @@ class Battle {
         return false;
     }
 
-    function jutsuCollision(
+    protected function jutsuCollision(
         Fighter &$player, Fighter &$opponent, &$player_damage, &$opponent_damage, $player_jutsu, $opponent_jutsu
     ) {
         $collision_text = '';
@@ -2315,6 +2323,11 @@ class Battle {
             `winner` = '{$this->winner}'
 
         WHERE `battle_id` = '{$this->battle_id}' LIMIT 1");
+    }
+
+    protected function stopBattle() {
+        $this->winner = Battle::DRAW;
+        $this->updateData();
     }
 
     protected function getDefaultAttacks(): array {
