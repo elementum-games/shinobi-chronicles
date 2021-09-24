@@ -268,6 +268,10 @@ class Battle {
     }
 
     public function determineEffectAnnouncementText(string $effect) : string{
+        if($effect == null) {
+            return "";
+        }
+
         $announcement_text = "";
         switch($effect){
             case 'taijutsu_nerf':
