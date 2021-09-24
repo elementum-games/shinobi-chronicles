@@ -932,8 +932,8 @@ class Battle {
         }
 
         if($this->player1->staff_level >= System::SC_ADMINISTRATOR || $this->player2->staff_level >= System::SC_ADMINISTRATOR) {
-            $this->system->debug['jutsu_collision'] = true;
-            $this->system->debug['bloodline'] = true;
+            // $this->system->debug['jutsu_collision'] = true;
+            // $this->system->debug['bloodline'] = true;
         }
 
         if($this->player_side == Battle::TEAM1) {
