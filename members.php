@@ -173,14 +173,17 @@ function members() {
 
 				$class_name = $player->forbidden_seal ? 'forbidden_seal' : 'normal';
 				echo "<style type='text/css'>
+                    #journal {
+                        white-space: pre-wrap;
+                    }
                     #journal.normal img {
                         max-width: 400px;
                         max-height: 300px;
                     }
                 </style>
                 <tr><th colspan='2'>Journal</th></tr>
-				<tr><td colspan='2' style='white-space:pre-wrap;'>
-                    <div id='journal' class='{$class_name}'>" . $journal . "</div>
+				<tr><td colspan='2' >
+				    <div id='journal' class='{$class_name}'>" . $journal . "</div>
                 </td></tr>";
 			}
 
