@@ -185,13 +185,15 @@ class Battle {
      * @param System $system
      * @param User   $player
      * @param int    $battle_id
+     * @param bool   $spectate
      * @throws Exception
      */
-    public function __construct(System $system, User $player, int $battle_id) {
+    public function __construct(System $system, User $player, int $battle_id, bool $spectate = false) {
         $this->system = $system;
 
         $this->battle_id = $battle_id;
         $this->player = $player;
+        $this->spectate = $spectate;
 
         $result = $this->system->query(
             "SELECT * FROM `battles` WHERE `battle_id`='{$battle_id}' LIMIT 1"
@@ -252,6 +254,10 @@ class Battle {
 
             $this->player2 = $player;
             $this->player_jutsu_used =& $this->player2_jutsu_used;
+        }
+        else {
+            $this->player_side = Battle::TEAM1;
+            $this->opponent_side = Battle::TEAM2;
         }
 
         $this->default_attacks = $this->getDefaultAttacks();
@@ -933,11 +939,6 @@ class Battle {
             $this->player2 = $this->loadFighterFromEntityId($this->player2_id);
         }
 
-        if($this->player1->staff_level >= System::SC_ADMINISTRATOR || $this->player2->staff_level >= System::SC_ADMINISTRATOR) {
-            // $this->system->debug['jutsu_collision'] = true;
-            // $this->system->debug['bloodline'] = true;
-        }
-
         if($this->player_side == Battle::TEAM1) {
             $this->opponent =& $this->player2;
         }
@@ -957,9 +958,16 @@ class Battle {
             $this->player2->health = $this->player2_health;
         }
 
-        if($this->opponent instanceof User) {
-            $this->opponent->loadData($this->spectate ? 0 : 1, true);
-            if(!$this->isComplete() && $this->opponent->battle_id != $this->battle_id) {
+        if($this->player1 instanceof User && $this->player1->id != $this->player->id) {
+            $this->player1->loadData($this->spectate ? 0 : 1, true);
+            if(!$this->isComplete() && $this->player1->battle_id != $this->battle_id) {
+                $this->stopBattle();
+                return;
+            }
+        }
+        if($this->player2 instanceof User && $this->player2->id != $this->player->id) {
+            $this->player2->loadData($this->spectate ? 0 : 1, true);
+            if(!$this->isComplete() && $this->player2->battle_id != $this->battle_id) {
                 $this->stopBattle();
                 return;
             }
@@ -1058,6 +1066,9 @@ class Battle {
         }
     }
 
+    /**
+     * @throws Exception
+     */
     public function renderBattle() {
         global $self_link;
 
@@ -1127,7 +1138,7 @@ class Battle {
         }
 
         // Trigger win action or display action prompt
-        if(!$this->winner) {
+        if(!$this->isComplete() && !$this->spectate) {
             // Prompt for move or display wait message
             echo "<tr><th colspan='2'>Select Action</th></tr>";
 
@@ -1141,6 +1152,25 @@ class Battle {
             // Turn timer
             echo "<tr><td style='text-align:center;' colspan='2'>
 			Time remaining: " . $this->timeRemaining() . " seconds</td></tr>";
+        }
+
+        if($this->spectate) {
+            echo "<tr><td style='text-align:center;' colspan='2'>";
+
+            if($this->winner == self::TEAM1) {
+                echo $this->player1->getName() . ' won!';
+            }
+            else if($this->winner == self::TEAM2) {
+                echo $this->player2->getName() . ' won!';
+            }
+			else if($this->winner == self::DRAW) {
+                echo "Fight ended in a draw.";
+            }
+			else {
+                echo "Time remaining: " . $this->timeRemaining() . " seconds";
+            }
+
+            echo "</td></tr>";
         }
 
         echo "</table>";
@@ -2404,7 +2434,7 @@ class Battle {
             $this->winner = Battle::DRAW;
         }
 
-        if($this->winner) {
+        if($this->winner && !$this->spectate) {
             $this->player->updateInventory();
         }
 

@@ -5,13 +5,25 @@ function viewBattles() {
     global $player;
     global $self_link;
 
+    $battle_types = [Battle::TYPE_SPAR, Battle::TYPE_FIGHT, Battle::TYPE_CHALLENGE, Battle::TYPE_AI_ARENA];
+
     if(!empty($_GET['battle_id'])) {
-        echo "<a href='{$self_link}' class='button'>Back</a>";
-        return true;
+        $battle_id = (int)$_GET['battle_id'];
+        try {
+            $battle = new Battle($system, $player, $battle_id, true);
+            if(!in_array($battle->battle_type, $battle_types)) {
+                throw new Exception("Invalid battle type!");
+            }
+
+            $battle->renderBattle();
+
+            return true;
+        } catch(Exception $e) {
+            $system->message($e->getMessage());
+            $system->printMessage();
+        }
     }
 
-
-    $battle_types = [Battle::TYPE_SPAR, Battle::TYPE_FIGHT, Battle::TYPE_CHALLENGE];
     $battles_result = $system->query(
         "SELECT `battle_id`, `player1`, `player2`, `winner` FROM `battles` 
             WHERE `battle_type` IN (" . implode(",", $battle_types) . ")
