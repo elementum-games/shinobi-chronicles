@@ -937,6 +937,16 @@ class User extends Fighter {
 			}
 		}
 
+        if($this->bloodline_id) {
+            if(!empty($this->bloodline->combat_boosts)) {
+                $bloodline_skill = 100 + $this->bloodline_skill;
+
+                foreach($this->bloodline->combat_boosts as $jutsu_id => $effect) {
+                    $this->bloodline->combat_boosts[$jutsu_id]['effect_amount'] = round($effect['power'] * $bloodline_skill, 3);
+                }
+            }
+        }
+
 		$this->inventory_loaded = true;
 	}
 

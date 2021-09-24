@@ -95,14 +95,6 @@ abstract class Fighter {
     public function applyBloodlineBoosts() {
         // Temp number fix inside
         if($this->bloodline_id) {
-            if(!empty($this->bloodline->combat_boosts)) {
-                $bloodline_skill = 100 + $this->bloodline_skill;
-
-                foreach($this->bloodline->combat_boosts as $jutsu_id => $effect) {
-                    $this->bloodline->combat_boosts[$jutsu_id]['effect_amount'] = round($effect['power'] * $bloodline_skill, 3);
-                }
-            }
-
             if($this->system->debug['bloodline']) {
                 echo "Setting passive combat boosts for {$this->getName()}<br />";
                 echo "<br />";

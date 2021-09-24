@@ -16,7 +16,6 @@ function bloodline() {
 	}
 	$base_bloodline = new Bloodline($player->bloodline_id);
 	$player->getInventory();
-	$player->applyBloodlineBoosts();
 
     require_once "profile.php";
     renderProfileSubmenu();
