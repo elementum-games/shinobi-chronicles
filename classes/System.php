@@ -106,6 +106,66 @@ class System {
     // Misc stuff
     const SC_MAX_RANK = 3;
 
+    public static $banned_words = [
+        'fuck',
+        'fuk',
+        'fck',
+        'fuq',
+        'fook',
+
+        'asshole',
+        'anus',
+
+        'shit',
+        'sht',
+        'shiee',
+        'shiet',
+
+        'fag ',
+        'faggot',
+        'fgt',
+
+        'cunt',
+
+        'bitch',
+        'bich',
+        'bish',
+
+        'retard',
+
+        'cock ',
+        'cocksu',
+        'dick',
+        'tits',
+        'titt',
+        'nigga',
+        ' niga',
+        'niga ',
+        'nigger',
+        'pussy',
+        'pussies',
+        'douche',
+        'slut',
+        'thot',
+
+        'cum ',
+        'cummi',
+        'cumming',
+        'jizz',
+
+        // Sex terms
+        'anal ',
+        'blowjob',
+        'creampie',
+        'handjob',
+        'rimjob',
+
+        ' rape',
+        'rape ',
+
+        'dildo',
+    ];
+
     public $debug = [
         'battle' => false,
         'battle_effects' => false,
@@ -329,29 +389,27 @@ class System {
         @string
     */
     public function censor_check($string): bool {
-        $banned_words = [
-            'fuck',
-            'shit',
-            'asshole',
-            'bitch',
-            'cunt',
-            'fag',
-            'asshat',
-            'pussy',
-            ' dick',
-            'whore'
-        ];
-        foreach($banned_words as $word) {
-
+        foreach(self::$banned_words as $word) {
             if(strpos(strtolower($string), $word) !== false) {
-
                 return true;
-
             }
-
         }
         return false;
 
+    }
+
+    /**
+     * @param      $text
+     * @return string
+     */
+    public function explicitLanguageReplace($text): string {
+        //String censorship
+        $word_replace = [];
+        foreach(self::$banned_words as $key => $word) {
+            $word_replace[] = str_repeat('*', strlen($word));
+        }
+
+        return str_ireplace(self::$banned_words, $word_replace, $text);
     }
 
     public function getMemes(): array {
