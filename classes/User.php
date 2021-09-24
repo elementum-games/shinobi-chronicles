@@ -602,13 +602,14 @@ class User extends Fighter {
 
 			// Debug info
 			if($this->system->debug['bloodline']) {
-			    echo "Debugging {$this->getName()}";
+			    echo "Debugging {$this->getName()}<br />";
 				foreach($this->bloodline->passive_boosts as $id=>$boost) {
 					echo "Boost: " . $boost['effect'] . " : " . $boost['power'] . "<br />";
 				}
 				foreach($this->bloodline->combat_boosts as $id=>$boost) {
 					echo "Boost: " . $boost['effect'] . " : " . $boost['power'] . "<br />";
 				}
+				echo "<br />";
 			}
 
 			// Regen/scan range effects
@@ -994,6 +995,10 @@ class User extends Fighter {
 						break;
 				}
 			}
+
+			if($this->system->debug['bloodline']) {
+				echo "<br />";
+            }
 		}
 
 		$this->inventory_loaded = true;
