@@ -1740,7 +1740,7 @@ class Battle {
     }
 
     protected function jutsuCollision(
-        Fighter &$player, Fighter &$opponent, &$player_damage, &$opponent_damage, $player_jutsu, $opponent_jutsu
+        Fighter &$player1, Fighter &$player2, &$player_damage, &$opponent_damage, $player_jutsu, $opponent_jutsu
     ) {
         $collision_text = '';
         /*
@@ -1803,27 +1803,27 @@ class Battle {
         // Barriers
         if($player_jutsu->use_type == 'barrier') {
             $player_jutsu->effect_amount = $player_damage;
-            $player->barrier += $player_damage;
+            $player1->barrier += $player_damage;
             $player_damage = 0;
         }
         if($opponent_jutsu->use_type == 'barrier') {
             $opponent_jutsu->effect_amount = $opponent_damage;
-            $opponent->barrier += $opponent_damage;
+            $player2->barrier += $opponent_damage;
             $opponent_damage = 0;
         }
-        if($player->barrier && $opponent_jutsu->jutsu_type != 'genjutsu') {
+        if($player1->barrier && $opponent_jutsu->jutsu_type != 'genjutsu') {
             // Block damage from opponent's attack
-            if($player->barrier >= $opponent_damage) {
+            if($player1->barrier >= $opponent_damage) {
                 $block_amount = $opponent_damage;
             }
             else {
-                $block_amount = $player->barrier;
+                $block_amount = $player1->barrier;
             }
             $block_percent = ($opponent_damage >= 1) ? ($block_amount / $opponent_damage) * 100 : 100;
-            $player->barrier -= $block_amount;
+            $player1->barrier -= $block_amount;
             $opponent_damage -= $block_amount;
-            if($player->barrier < 0) {
-                $player->barrier = 0;
+            if($player1->barrier < 0) {
+                $player1->barrier = 0;
             }
             if($opponent_damage < 0) {
                 $opponent_damage = 0;
@@ -1832,19 +1832,19 @@ class Battle {
             $block_percent = round($block_percent, 1);
             $collision_text .= "[player]'s barrier blocked $block_percent% of [opponent]'s damage![br]";
         }
-        if($opponent->barrier && $player_jutsu->jutsu_type != 'genjutsu') {
+        if($player2->barrier && $player_jutsu->jutsu_type != 'genjutsu') {
             // Block damage from opponent's attack
-            if($opponent->barrier >= $player_damage) {
+            if($player2->barrier >= $player_damage) {
                 $block_amount = $player_damage;
             }
             else {
-                $block_amount = $opponent->barrier;
+                $block_amount = $player2->barrier;
             }
             $block_percent = ($player_damage >= 1) ? ($block_amount / $player_damage) * 100 : 100;
-            $opponent->barrier -= $block_amount;
+            $player2->barrier -= $block_amount;
             $player_damage -= $block_amount;
-            if($opponent->barrier < 0) {
-                $opponent->barrier = 0;
+            if($player2->barrier < 0) {
+                $player2->barrier = 0;
             }
             if($player_damage < 0) {
                 $player_damage = 0;
@@ -1856,23 +1856,23 @@ class Battle {
 
         // Quit if barrier was used by one person (no collision remaining)
         if($player_jutsu->use_type == 'barrier' or $opponent_jutsu->use_type == 'barrier') {
-            if(isset($player->user_name)) {
-                $player_name = $player->user_name;
+            if(isset($player1->user_name)) {
+                $player_name = $player1->user_name;
             }
             else {
-                $player_name = $player->name;
+                $player_name = $player1->name;
             }
-            if(isset($opponent->user_name)) {
-                $opponent_name = $opponent->user_name;
+            if(isset($player2->user_name)) {
+                $opponent_name = $player2->user_name;
             }
             else {
-                $opponent_name = $opponent->name;
+                $opponent_name = $player2->name;
             }
             $collision_text = str_replace(
                 array('[player]', '[opponent]',
                     '[gender]', '[gender2]'),
                 array($player_name, $opponent_name,
-                    ($player->gender == 'Male' ? 'he' : 'she'), ($player->gender == 'Male' ? 'his' : 'her')),
+                    ($player1->gender == 'Male' ? 'he' : 'she'), ($player1->gender == 'Male' ? 'his' : 'her')),
                 $collision_text);
             return $collision_text;
         }
@@ -1931,31 +1931,31 @@ class Battle {
         }
 
         // Apply buffs/nerfs
-        $player_speed = $player->speed + $player->speed_boost - $player->speed_nerf;
+        $player_speed = $player1->speed + $player1->speed_boost - $player1->speed_nerf;
         $player_speed = 50 + ($player_speed * 0.5);
         if($player_speed <= 0) {
             $player_speed = 1;
         }
-        $player_cast_speed = $player->cast_speed + $player->cast_speed_boost - $player->cast_speed_nerf;
+        $player_cast_speed = $player1->cast_speed + $player1->cast_speed_boost - $player1->cast_speed_nerf;
         $player_cast_speed = 50 + ($player_cast_speed * 0.5);
         if($player_cast_speed <= 0) {
             $player_cast_speed = 1;
         }
 
-        $opponent_speed = $opponent->speed + $opponent->speed_boost - $opponent->speed_nerf;
+        $opponent_speed = $player2->speed + $player2->speed_boost - $player2->speed_nerf;
         $opponent_speed = 50 + ($opponent_speed * 0.5);
         if($opponent_speed <= 0) {
             $opponent_speed = 1;
         }
-        $opponent_cast_speed = $opponent->cast_speed + $opponent->cast_speed_boost - $opponent->cast_speed_nerf;
+        $opponent_cast_speed = $player2->cast_speed + $player2->cast_speed_boost - $player2->cast_speed_nerf;
         $opponent_cast_speed = 50 + ($opponent_cast_speed * 0.5);
         if($opponent_cast_speed <= 0) {
             $opponent_cast_speed = 1;
         }
 
         if($this->system->debug['jutsu_collision']) {
-            echo "Player: {$player->speed} ({$player->speed_boost} - {$player->speed_nerf})<br />";
-            echo "Opponent: {$opponent->speed} ({$opponent->speed_boost} - {$opponent->speed_nerf})<br />";
+            echo "Player1({$player1->getName()}): {$player1->speed} ({$player1->speed_boost} - {$player1->speed_nerf})<br />";
+            echo "Player2({$player2->getName()}): {$player2->speed} ({$player2->speed_boost} - {$player2->speed_nerf})<br />";
         }
 
         // Ratios for damage reduction
@@ -2073,7 +2073,7 @@ class Battle {
         }
 
         // Parse text
-        $collision_text = $this->parseCombatText($collision_text, $player, $opponent);
+        $collision_text = $this->parseCombatText($collision_text, $player1, $player2);
         return $collision_text;
     }
 
