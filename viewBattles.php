@@ -73,7 +73,7 @@ function viewBattles() {
         $p2 = $battle['player2'];
 
         $p1_name = $user_names[$p1->id] ?? $p1->toString();
-        $p2_name = $user_names[$p2->id] ?? $p1->toString();
+        $p2_name = $user_names[$p2->id] ?? $p2->toString();
 
         $winner = '';
         switch($battle['winner']) {

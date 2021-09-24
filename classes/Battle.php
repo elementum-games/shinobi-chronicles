@@ -207,6 +207,8 @@ class Battle {
 
         $battle = $this->system->db_fetch($result);
 
+        $this->battle_type = $battle['battle_type'];
+
         $this->player1_id = $battle['player1'];
         $this->player2_id = $battle['player2'];
 
