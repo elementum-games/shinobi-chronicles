@@ -3,18 +3,46 @@ if(!isset($_SESSION['user_id'])) {
 	exit;
 }
 
+
 //fires when user first enters page
 function marriage_controller(){
 
-  global $player;
+	global $player;
+	global $system;
 
-  if(!$player->isMarred){
-    header("Location: http://localhost/shinobi-chronicles/?id=1"); //change ethis before push
-    die();
-  }
 
-  $view = new MarriageView();
-  $view->display();
+	if($player->isMarried){
+		//find marriage ID
+		//if ID invalid -> break
+		$view = new MarriageView(/*id in here or something*/);
+		$view->display();
+	} else {
+
+		//if page reloaded with name
+		if(isset($_POST['proposal_name'])){
+			$temp_proposal_name = $system->clean($_POST['proposal_name']);
+	  } else {
+			$temp_proposal_name = Null;
+		}
+
+		if(!($temp_proposal_name == $player->user_name)){
+			//check if name can be proposed to
+			$marriageDepartment = new MarriageDepartment($temp_proposal_name);
+		} else {
+			echo "You cant marry yourself...";
+			$marriageDepartment = new MarriageDepartment(Null);
+		}
+
+		// echo "<h1 style='color: white;'>{$proposed_name}</h1>"; //testing
+
+		//display if they're married
+		$marriageDepartment->areTheyMarried();
+
+		//display proposal portion of page
+		$marriageDepartment->display();
+	}
+
+	// echo "What";
 }
 
 class MarriageView{
@@ -88,6 +116,108 @@ class MarriageView{
     ;
 }
 
+class MarriageDepartment{
 
+	private bool $user1CurrentMarriageStatus = false; //main user
+	private ?string $proposed_name = Null;
+	private ?bool $user2_isMarried = True; //Want to Marry (lets just assume they are)
+
+	//constructors
+	public function __construct($proposed_name){
+		$this->proposed_name = $proposed_name;
+	}
+
+	function areTheyMarried(){
+
+		if($this->proposed_name == Null){
+			return true;
+		}
+
+		if($this->proposed_name !== Null){
+			echo "<h1>This mf you want to marry: {$this->proposed_name}</h1>";
+
+			if($this->checkDB($this->proposed_name)) return true;
+
+			if($this->user2_isMarried == false){
+				echo "They're available! Send a Proposal!";
+				$this->displayProposalOptions_Yes_No();
+				return true;
+			}
+		}
+
+		if($this->user2_isMarried == true){
+			echo "They're married :^(";
+			return true;
+		}
+
+		echo "Name doesn't exist";
+		return true;
+	}
+
+	/*
+	* return array || false
+	*/
+	function checkDB($proposal_to_username){
+		global $system;
+		$proposal_to_username_query = $system->query("SELECT `isMarried` FROM `users`
+							WHERE `user_name` = '{$proposal_to_username}'");
+
+		$proposal_to_username_result = $system->db_fetch($proposal_to_username_query);
+
+		if(isset($proposal_to_username_result)){
+			echo "<h1>Wow they actually exist, lets check the results</h1>";
+			echo "<h1>".print_r($proposal_to_username_result['isMarried'])."</h1>";
+
+			$this->user2_isMarried = $proposal_to_username_result['isMarried'];
+		} else {
+			echo "<h1>They Don't Exist!</h1>";
+		}
+	}
+
+	//default display
+	function display(){
+		$headerName = "Marriage Department";
+		echo "
+		<table class='table'>
+			<th colspan='1'>{$headerName}</th>
+			<tr><!--Display Area-->
+				<td style='display: grid; justify-content: center; align-items: center;'><!--Marriage Forms-->
+					<form method='POST' action='' style='padding: 2em 0em;'>
+						<label for='m_name'>Propose: </label>
+						<input id='m_name' type='text' name='proposal_name' minlength='2' maxlength='16' autofocus autocomplete='off' required>
+						<input type='submit' name='submit'>
+					</form>
+				</td>
+			</tr>
+		</table>
+
+
+		";
+	}
+
+
+	//if the proposal can be sent (option to send a proposal)
+	function displayProposalOptions_Yes_No(){
+		$headerName = "Proposal!";
+
+		echo "
+		<table class='table'>
+			<th colspan='1'>{$headerName}</th>
+			<tr><!--Display Area-->
+				<td style='display: grid; justify-items: center;'><!--Marriage Forms-->
+					<label for='proposal_option'>Would you like to propose to {$this->proposed_name}?</label>
+					<form id='proposal_option' method='POST' action='' style='padding: 2em 0em;'>
+						<label for='prop_yes'>Yes</label>
+						<input id='prop_yes' type='radio' name='marriage_radio_btn' value='{$this->proposed_name}' checked>
+						<label for='prop_no'>No</label>
+						<input id='prop_no' type='radio' name='marriage_radio_btn'>
+						<input style='' type='submit' name='submit' autofocus>
+					</form>
+				</td>
+			</tr>
+		</table>
+		";
+	}
+}
 
 ?>
