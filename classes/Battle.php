@@ -950,7 +950,7 @@ class Battle {
 
                     if($player2_jutsu->weapon_id) {
                         $text .= "<p style=\"font-style:italic;margin-top:3px;\">" .
-                            $this->system->clean($this->determineEffectAnnouncementText($player1_jutsu->weapon_effect->effect)) .
+                            $this->system->clean($this->determineEffectAnnouncementText($player2_jutsu->weapon_effect->effect)) .
                         "</p>";
                     }
 
