@@ -80,7 +80,7 @@ body {
 /* Content */
 #container {
 	/* Structure */
-	width: 1000px;
+	width: 1030px;
 	position:relative;
 	
 	margin-left: auto;
@@ -95,11 +95,11 @@ body {
 }
 
 #content {
-	width: 710px;
+	width: 750px;
 	min-height:500px;
 
 	float: left;
-    margin-left: 10px;
+    margin-left: 8px;
 }
 h2#title {
 	margin-left:30px;
@@ -267,8 +267,7 @@ label {
 }
 
 #content table.table {
-	margin: auto;
-	margin-top:25px;
+	margin: 15px auto;
 	padding:0px;
 	width: 95%;
 	
@@ -277,11 +276,10 @@ label {
 	/* Style */
 	color: inherit;
 	font-size: inherit;
-	
-	background-color: #FAFAFA;
-	background: linear-gradient(to bottom right, #FAFAFA, #F0F0F0);
-	
-	border: 1px solid #D0D0D0;
+
+    background: #FAFAFA linear-gradient(to bottom right, #FAFAFA, #F0F0F0);
+
+    border: 1px solid #D0D0D0;
 	border-radius:16px;
 	border-spacing: 0px;
 }
@@ -367,11 +365,12 @@ table.globalMessage tr:last-child td:last-child  {
 
 #content .contentHeader {
 	/* Structure */
-	margin-top: 25px;
-	margin-left: 25px;
+	margin-top: 20px;
+	margin-left: 20px;
+    margin-bottom: -5px;
 	
 	/* Style */
-	font-size: 30px;
+	font-size: 24px;
 	font-weight: bold;
 	font-family: "Lucida Sans Unicode", "Lucida Grande", sans-serif;
 	color: #A02000;
@@ -424,7 +423,7 @@ p {
 	padding-left: 10px;
 	
 	left: 0px;
-	top: 62px;
+	top: 30px;
 	
 	z-index: 50;
 	
@@ -665,7 +664,7 @@ p {
 
 #content ul.submenu {
 	width: 90%;
-    margin: 20px auto auto;
+    margin: 15px auto;
     padding:0px;
 	
 	border: 1px solid #000000;

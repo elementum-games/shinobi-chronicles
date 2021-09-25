@@ -377,7 +377,7 @@ function renderProfileSubmenu() {
 
     echo "<div class='submenu'>
     <ul class='submenu'>";
-    $submenu_link_width = round(99.7 / count($submenu_links), 1);
+    $submenu_link_width = round(100 / count($submenu_links), 1);
     foreach($submenu_links as $link) {
         echo "<li style='width:{$submenu_link_width}%;'><a href='{$link['link']}'>{$link['title']}</a></li>";
     }
