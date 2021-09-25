@@ -580,6 +580,42 @@ ul.submenu{
 	overflow: scroll;
 }
 
+.row1{
+
+}
+.row2{
+
+}
+
+/*Do not use this for 3 grid rows I messed up rename this fr*/
+.villageView{
+	display: grid !important;
+	grid-template-columns: repeat(3, 1fr);
+	width: auto !important;
+	/* grid-column-gap: 4em; */
+	text-align: left;
+	font-size: 0.8em !important;
+	align-items: center;
+	justify-content: center;
+	justify-items: center;
+	margin: 0em 4em;
+}
+.villageView div{
+	width: auto !important;
+}
+.fourColGrid{
+	 display: grid;
+	 grid-template-columns: repeat(4, 1fr);
+	 align-items: center;
+}
+
+#villagemembertd td{
+	width: 100% !important;
+}
+
+#villages td{
+	width: 100% !important;
+}
 
 /*Table Custom CSS*/
 /* //multiple columns of about 5 item */
