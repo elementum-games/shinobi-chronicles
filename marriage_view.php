@@ -18,29 +18,32 @@ function marriage_controller(){
 		$view->display();
 	} else {
 
-		//if page reloaded with name
+		//if page reloaded with Option 'yes' to propose
+		if(isset($_POST['marriage_radio_btn'])){
+			$m_temp = $system->clean($_POST['marriage_radio_btn']);
+			$system->message($m_temp);
+			$system->printMessage();
+		}
+
+		//if page reloaded with proposal name
+		$temp_proposal_name = Null;
 		if(isset($_POST['proposal_name'])){
 			$temp_proposal_name = $system->clean($_POST['proposal_name']);
-	  } else {
-			$temp_proposal_name = Null;
+
+			if(strtolower($temp_proposal_name) == strtolower($player->user_name)) {
+				$system->message("You can't marry yourself...");
+				$temp_proposal_name = Null;
+			}
 		}
 
-		if(!(strtolower($temp_proposal_name) == strtolower($player->user_name))){
-			//check if name can be proposed to
-			$marriageDepartment = new MarriageDepartment($temp_proposal_name);
-		} else {
-			$system->message("You can't marry yourself...");
-			$marriageDepartment = new MarriageDepartment(Null);
-		}
+		$marriageDepartment = new MarriageDepartment($temp_proposal_name);
+		$temp_proposal_name = $marriageDepartment->runCheck($temp_proposal_name);
 
-		// echo "<h1 style='color: white;'>{$proposed_name}</h1>"; //testing
-
-		//display if they're married
-		$marriageDepartment->areTheyMarried();
+		if($temp_proposal_name == Null) $marriageDepartment->displaySearchBox();
+		//display stuff if married or not
 
 		//display proposal portion of page
 		$system->printMessage();
-		$marriageDepartment->display();
 	}
 
 	// echo "What";
@@ -128,12 +131,12 @@ class MarriageDepartment{
 		$this->proposed_name = $proposed_name;
 	}
 
-	function areTheyMarried(){
+	function runCheck($temp_name){
 
 		global $system;
 
 		if($this->proposed_name == Null){
-			return true;
+			return Null;
 		}
 
 		if($this->proposed_name !== Null){
@@ -143,17 +146,17 @@ class MarriageDepartment{
 			if($this->user2_isMarried == false){
 				$system->message("They're available!");
 				$this->displayProposalOptions_Yes_No();
-				return true;
+				return $temp_name;
 			}
 		}
 
 		if($this->user2_isMarried == true){
 		  $system->message("{$this->proposed_name} is already married or doesn't exist!");
-			return true;
+			return Null;
 		}
 
 	  $system->message("{$this->proposed_name} does not exist...");
-		return true;
+		return Null;
 	}
 
 	/*
@@ -175,7 +178,7 @@ class MarriageDepartment{
 	}
 
 	//default display
-	function display(){
+	function displaySearchBox(){
 		$headerName = "Marriage Department";
 		echo "
 		<table class='table'>
