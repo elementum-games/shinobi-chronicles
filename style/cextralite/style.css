@@ -37,7 +37,7 @@ a:hover{
 }
 
 table{
-	color: rgba(255,255,255,0.86) !important;
+	color: rgba(255,255,255,0.76) !important;
 }
 
 #container{
@@ -258,7 +258,7 @@ ul.submenu{
 	margin: 1em auto 3em auto;
 	/* background-color: rgba(27, 56, 31, 1);*/ /*green*/
 	background-color: rgba(79, 33, 29, 1); /*red*/
-	border-radius: 20px 20px 10px 10px;
+	border-radius: 10px 10px 0px 0px;
 
 	color: rgba(255,255,255, 0.86);
 
@@ -348,7 +348,7 @@ ul.submenu{
 	padding: 1em 0;
 	border-radius: 10px 10px 10px 10px;
 
-	font-size: 1.3em;
+	font-size: 1.2em;
 
 	background-color: rgba(20,20,20, 0.7);
 }
@@ -421,21 +421,26 @@ ul.submenu{
 #chat_input_table{
 	margin: 1em auto;
 }
+/*Sorry there's 2 of these*/
 .chat_msg{
 	display: grid !important;
 	grid-template-columns: 1fr 3fr 1fr;
 	/* grid-template-rows: 0.3fr 0.7fr; */
 	align-items: center;
-	grid-row-gap: 1em;
-	/* margin: 0em; */
+	/* grid-row-gap: 0.5em; */
+	width: 98% !important;
+	margin: 1.5em auto !important;
 }
+
+/*chat profile data bar*/
 .chat_msg td:nth-child(1){
 	grid-column: 1 / 4;
 	width: 100%;
 }
+/*chat Report Bar*/
 .chat_msg td:nth-child(3){
 	/* grid-column: 1 / 4; */
-	/* width: 100%; */
+	width: 100%;
 	font-size: 0.9em;
 }
 .chat_msg td{
@@ -449,10 +454,14 @@ ul.submenu{
 	width: 100%;
 }
 
+/*TextArea in Chat*/
 .chatmsg{
 	font-size: 1.2em;
 	align-items: center;
 	grid-column: 1 / span 2;
+	width: auto !important;
+	padding: 0.5em 0em 0em 0.5em !important;
+	overflow: scroll !important;
 }
 #user_data_container{
 	display: grid !important;
@@ -478,6 +487,7 @@ ul.submenu{
 .chatmsg{
 	background-color: rgba(255,255,255,0.06) !important;
 	text-align: left !important;
+	padding-left: 10px;
 	height: auto;
 	max-height: 400px;
 	overflow: scroll;
@@ -492,7 +502,7 @@ ul.submenu{
 	width: 95%;
 	/* width: auto; */
 	background-color: rgba(50,50,50,1);
-	padding: 1em 0em;
+	padding: 0.3em 0em;
 }
 
 #socialPosts td{
@@ -582,12 +592,6 @@ ul.submenu{
 	overflow: scroll;
 }
 
-.row1{
-
-}
-.row2{
-
-}
 
 /*Do not use this for 3 grid rows I messed up rename this fr*/
 .villageView{
@@ -644,7 +648,7 @@ ul.submenu{
 	background-color: transparent !important;
 }
 
-/*Table Data TD of 3 columns*/
+/*Table Data TR of 3 columns*/
 .threeColumns{
 	display: grid;
 	grid-template-columns: repeat(3, 1fr);
@@ -654,6 +658,9 @@ ul.submenu{
 .threeColumns th{
 	width: 100% !important;
 	padding: 1em 0em;
+}
+.threeColumns td{
+	width: 100% !important;
 }
 
 /*Use this for headers of 2 columns*/
@@ -756,11 +763,11 @@ select{
 	color: rgba(240,240,20, 1);
 }
 .systemMessage {
-  animation: blinker 1.5s step-start infinite;
+  animation: blinker 0.9s step-start infinite;
 }
 
 @keyframes blinker {
   50% {
-    opacity: 0.25;
+    opacity: 0.75;
   }
 }

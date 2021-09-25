@@ -438,8 +438,8 @@ function members() {
 							break;
 					}
 				}
-				
-				echo "<tr>
+
+				echo "<tr class='threeColumns' >
 					<td class='$class' style='width:45%;'>
 						<a class='$link_class userLink' href='$self_link&user={$row['user_name']}'>" . $row['user_name'] . "</a></td>
 					<td class='$class' style='width:20%;text-align:center;'>" . $ranks[$row['rank']] . "</td>
