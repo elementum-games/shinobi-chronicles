@@ -69,7 +69,7 @@ function members() {
 			if($viewUser->forbidden_seal) {
 				$avatar_size = '175px';
 			}
-			echo "<table class='table'>
+			echo "<table id='viewprofile' class='table'>
 			<tr><th colspan='2'>View Profile</th>";
 
 			echo "<tr><td colspan='2' style='text-align:center;'>";
