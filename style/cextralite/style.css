@@ -26,8 +26,8 @@ p{
 	font-size: 1em;
 }
 b{
-	width: 100%;
-	display: none; /*Hides warning messages*/
+	/* width: 100%; */
+	/* display: none; /*Hides warning messages*/ */
 }
 a{
 	color: rgba(220,220,220,1);
@@ -255,10 +255,12 @@ ul.submenu{
 .table{
 	display: block;
 	width: 95%;
-	margin: 1em auto 6em auto;
+	margin: 1em auto 3em auto;
 	/* background-color: rgba(27, 56, 31, 1);*/ /*green*/
 	background-color: rgba(79, 33, 29, 1); /*red*/
 	border-radius: 20px 20px 10px 10px;
+
+	color: rgba(255,255,255, 0.86);
 
 	overflow: scroll;
 
@@ -617,6 +619,10 @@ ul.submenu{
 	width: 100% !important;
 }
 
+#kunaiExchange{
+
+}
+
 /*Table Custom CSS*/
 /* //multiple columns of about 5 item */
 .table_multicolumns{
@@ -717,6 +723,7 @@ form{
 	margin: 1em 1.2em;
 	text-align: left;
 	font-size: 1em;
+	overflow: scroll;
 }
 
 textarea{
