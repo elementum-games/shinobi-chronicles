@@ -36,8 +36,6 @@ body {
     left: 200px;
 	
 	margin-top: 0;
-    z-index: 11;
-	
 }
 #topMenu ul {
 	list-style: none;
@@ -69,6 +67,9 @@ body {
 }
 
 /* Content */
+:root {
+    --content-top-margin: 175px;
+}
 #container {
 	/* Structure */
 	width: 1145px;
@@ -99,7 +100,7 @@ body {
 	
 	float: left;
 	margin-left: 60px;
-	margin-top: 175px;
+	margin-top: var(--content-top-margin);
 }
 h2#title {
 	margin-left: 30px;
@@ -124,15 +125,12 @@ h2#title {
 }
 #sideMenu ul {
 	list-style: none;
-	margin: 0;
-	padding: 0;
 	
-	margin-top: 220px;
+	margin: var(--content-top-margin) 0 8px;
+    padding: 0;
 }
 #sideMenu li {
-	margin-top: 1px;
-	margin-bottom: 1px;
-	margin-left: 8px;
+    margin: 3px 0;
 }
 #sideMenu h2 {
 	width: 215px;
@@ -190,9 +188,8 @@ h2#title {
 	right: 100px;
 	z-index: 1;
 	
-	margin-top: 230px;
-	
 	background-color: #1f1c1d;
+    border-left: 1px solid #282425;
 }
 
 #logout {
@@ -428,7 +425,7 @@ p {
 	width: 670px;
 	
 	left: 0;
-	top: 52px;
+	top: 24px;
 	
 	z-index: 50;
 	
@@ -442,7 +439,7 @@ p {
 	width: 215px;
 	position: absolute;
 	right: 100px;
-	top: 160px;
+	top: 120px;
 	
 	z-index: 20;
 	
@@ -465,7 +462,7 @@ p {
 	right: 100px;
 	z-index: 20;
 
-	padding-top: 10px;
+	padding-top: 5px;
 	
 	/* Style */
 	text-align:center;
