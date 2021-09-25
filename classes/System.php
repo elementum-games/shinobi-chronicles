@@ -106,6 +106,8 @@ class System {
     // Misc stuff
     const SC_MAX_RANK = 3;
 
+    const MAX_LINK_DISPLAY_LENGTH = 60;
+
     public static $banned_words = [
         'fuck',
         'fuk',
@@ -458,8 +460,17 @@ class System {
         $replace_array = [];
 
         $reg_exUrl = '/((?:http|https)\:\/\/(?:[a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,5})(?:\/[^\:\s\\\\]*)?)/i';
-        $replacement = '<a href="$1" target="_blank">$1</a>';
-        $text = preg_replace($reg_exUrl, $replacement, $text);
+        $text = preg_replace_callback(
+            $reg_exUrl,
+            function($matches) {
+                $display = $matches[1];
+                if(strlen($display) > System::MAX_LINK_DISPLAY_LENGTH) {
+                    $display = substr($display, 0, System::MAX_LINK_DISPLAY_LENGTH - 3) . '...';
+                }
+                return "<a href='{$matches[1]}' target='_blank'>{$display}</a>";
+            },
+            $text
+        );
 
         array_push($search_array, '[image_prefix]');
         array_push($replace_array, 'https://');
