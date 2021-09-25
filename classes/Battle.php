@@ -1330,16 +1330,19 @@ class Battle {
         echo "<tr><td colspan='2'>
             <div style='margin:0px;position:relative;'>
             <style type='text/css'>
+            #handSeals {
+                padding-top: 4px;
+            }
             #handSeals p {
                 display: inline-block;
                 width: 80px;
-                height: 110px;
+                height: 90px;
                 margin: 4px;
                 position:relative;
             }
             #handSeals img {
-                height: 74px;
-                width: 74px;
+                height: 62px;
+                width: 62px;
                 position: relative;
                 z-index: 1;
                 border: 3px solid rgba(0,0,0,0);
@@ -1353,7 +1356,7 @@ class Battle {
                 text-align: center;
                 left: 31px;
                 right: 31px;
-                bottom: 35px;
+                bottom: 30px;
                 /* Style */
                 font-size: 14px;
                 font-weight: bold;
@@ -1377,7 +1380,7 @@ class Battle {
             }
             /* WEAPONS */
             #weapons {
-                height: 236px;
+                height: 200px;
                 padding-left: 20px;
                 padding-right: 20px;
             }
@@ -1571,7 +1574,6 @@ class Battle {
             });
             </script>
             <!--DIV START-->
-            <p id='textPrompt' style='text-align:center;'>Please enter handseals (click jutsu name for hint):</p>
             <div id='handSeals'>
             ";
                 for($i = 1; $i <= 12; $i++) {
