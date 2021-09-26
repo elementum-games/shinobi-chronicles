@@ -14,24 +14,55 @@ function marriage_controller(){
 	if($player->isMarried){
 		//find marriage ID
 		//if ID invalid -> break
-		$view = new MarriageView(/*id in here or something*/);
+		$view = new MarriageView($player->marriedId);
 		$view->display();
 	} else {
 
+		//Answer to Proposal
 		if(isset($_POST['accept_proposal'])){
-			$yes_no_answer = $system->clean($_POST['accept_proposal']);
+			$proposal_answer = $system->clean($_POST['accept_proposal']);
 
-			//erase proposalInbox from current user and other users
-			//create marriage ID assign to both parties and then reload page
-			if($yes_no_answer == 'yes'){
+
+			if($proposal_answer != 'no'){
+				//erase proposalInbox from current user and other users
+				//create marriage ID assign to both parties and then reload page
+
+				//set users to married
+				$system->query("UPDATE `users` SET
+					`isMarried` = '1'
+				WHERE `user_name` = '{$proposal_answer}' LIMIT 1");
+				$system->query("UPDATE `users` SET
+					`isMarried` = '1'
+				WHERE `user_id` = '{$player->user_id}' LIMIT 1");
+
+				//erase proposal proposalInbox
+				$system->query("UPDATE `users` SET
+					`marriage_id` = '0'
+				WHERE `user_name` = '{$proposal_answer}' LIMIT 1");
+
+				$system->query("UPDATE `users` SET
+					`proposalInbox` = ''
+				WHERE `user_name` = '{$player->getName()}' LIMIT 1");
+
+				//create new MarriageId Row in MarriageData database and set the VALUES
+
 
 				$system->message("Woah you're married now!");
 				$system->printMessage();
-				return;
+
+				header("Refresh:0"); //don't know if this is okay...
+				return; //reload page
 			} else {
 				//erase proposal inbox from current user and then reset other user marriageId to 0 so they can propose again
+				$system->query("UPDATE `users` SET
+					`marriage_id` = '0'
+				WHERE `user_name` = '{$proposal_answer}' LIMIT 1");
 
-				$system->message("You rejected");
+				$system->query("UPDATE `users` SET
+					`proposalInbox` = ''
+				WHERE `user_name` = '{$player->getName()}' LIMIT 1");
+
+				$system->message("You rejected them");
 				$system->printMessage();
 			}
 		}
@@ -98,8 +129,8 @@ function marriage_controller(){
 		if($temp_proposal_name == Null) $marriageDepartment->displaySearchBox();
 		//display stuff if married or not
 
-		//display proposal portion of page
-		$system->printMessage();
+		// //display proposal portion of page
+		// $system->printMessage();
 	}
 
 	// echo "What";
@@ -122,6 +153,10 @@ class MarriageView{
 		'marriage date' => '9/23/2021',
 		'weeks married' => '2'
 	);
+
+	function __construct($marriageId){
+
+	}
 
   function display(){
     echo "
@@ -296,7 +331,7 @@ class MarriageDepartment{
 						<label for='prop_yes'>Yes</label>
 						<input id='prop_yes' type='radio' name='marriage_radio_btn' value='{$this->proposed_name}' checked>
 						<label for='prop_no'>No</label>
-						<input id='prop_no' type='radio' name='marriage_radio_btn'>
+						<input id='prop_no' type='radio' name='marriage_radio_btn' value=''>
 						<input style='' type='submit' name='submit' autofocus>
 					</form>
 				</td>
@@ -316,9 +351,9 @@ class MarriageDepartment{
 					<label for='proposal_option'>Would you like to accept a proposal from {$proposalFrom}?</label>
 					<form id='proposal_option' method='POST' action='' style='padding: 2em 0em;'>
 						<label for='prop_yes'>Yes</label>
-						<input id='prop_yes' type='radio' name='accept_proposal' value='yes' checked>
+						<input id='prop_yes' type='radio' name='accept_proposal' value='{$proposalFrom}' checked>
 						<label for='prop_no'>No</label>
-						<input id='prop_no' type='radio' name='accept_proposal'>
+						<input id='prop_no' type='radio' name='accept_proposal' value='no'>
 						<input style='' type='submit' name='submit' autofocus>
 					</form>
 				</td>
