@@ -18,11 +18,30 @@ function marriage_controller(){
 		$view->display();
 	} else {
 
+		//if proposal in inbox display [accept yes/no]
+
 		//if page reloaded with Option 'yes' to propose
 		if(isset($_POST['marriage_radio_btn'])){
 			$m_temp = $system->clean($_POST['marriage_radio_btn']);
-			$system->message($m_temp);
-			$system->printMessage();
+
+			//get user id of user they want to propose to
+			$proposee_userId = $system->query("SELECT `user_id`, `proposalInbox` FROM `users`
+								WHERE `user_name` = '{$m_temp}'");
+			$proposee_name = $system->db_fetch($proposee_userId);
+
+			//update proposal inbox with username of person who wants to propose
+			 //if proposal already in inbox don't send proposal
+			if($proposee_name['proposalInbox'] == ''){
+				$system->query("UPDATE `users` SET
+					`proposalInbox` = '{$player->getName()}'
+				WHERE `user_id` = '{$proposee_name['user_id']}' LIMIT 1");
+
+				$system->message("Proposal Sent!");
+				$system->printMessage();
+			} else {
+				$system->message("{$m_temp} already has a proposal :(!");
+				$system->printMessage();
+			}
 		}
 
 		//if page reloaded with proposal name
@@ -30,7 +49,7 @@ function marriage_controller(){
 		if(isset($_POST['proposal_name'])){
 			$temp_proposal_name = $system->clean($_POST['proposal_name']);
 
-			if(strtolower($temp_proposal_name) == strtolower($player->user_name)) {
+			if(strtolower($temp_proposal_name) == strtolower($player->getName())) {
 				$system->message("You can't marry yourself...");
 				$temp_proposal_name = Null;
 			}
