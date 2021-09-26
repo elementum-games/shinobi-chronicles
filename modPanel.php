@@ -678,7 +678,7 @@ function modPanel() {
 			<div style='width:210px;margin-left:auto;margin-right:auto;text-align:center;'>
 				<p>Username</p>
 				<input type='text' name='user_name' value='" . ($_GET['ban_user_name'] ?? "") . "' /><br />
-				<div style='height:56px;text-align:left;padding-top:13px;'>
+				<div style='text-align:left;padding-top:13px;'>
 				<label for='ban_type'>Ban type:</label>
 					<select name='ban_type' style='width:100px;'>
 						<option value='tavern' /> Tavern ban</option>

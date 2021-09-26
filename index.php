@@ -173,6 +173,9 @@ switch($layout) {
 	case 'geisha':
 		require("layout/geisha.php");
 		break;
+	case 'blue_scroll':
+		require("layout/blue_scroll.php");
+		break;
 	default:
 		require("layout/classic_blue.php");
 		break;
@@ -431,7 +434,7 @@ if($LOGGED_IN) {
                 continue;
             }
 
-            echo "<li><a href='{$system->link}?id=$id'>" . $page['title'] . "</a></li>";
+            echo "<li><a id='sideMenuOption-".str_replace(' ', '', $page['title'])."' href='{$system->link}?id=$id'>" . $page['title'] . "</a></li>";
         }
 
 		echo $action_menu_header;
@@ -442,7 +445,7 @@ if($LOGGED_IN) {
 				}
 				// Page ok if an in-village page or player rank is below chuunin
 				if($page['village_ok'] != System::NOT_IN_VILLAGE || $player->rank < 3) {
-					echo "<li><a href='{$system->link}?id=$id'>" . $page['title'] . "</a></li>";
+					echo "<li><a id='sideMenuOption-".str_replace(' ', '', $page['title'])."' href='{$system->link}?id=$id'>" . $page['title'] . "</a></li>";
 				}
 			}
 		}
@@ -452,7 +455,7 @@ if($LOGGED_IN) {
 					continue;
 				}
 				if($page['village_ok'] != System::ONLY_IN_VILLAGE) {
-					echo "<li><a href='{$system->link}?id=$id'>" . $page['title'] . "</a></li>";
+					echo "<li><a id='sideMenuOption-".str_replace(' ', '', $page['title'])."' href='{$system->link}?id=$id'>" . $page['title'] . "</a></li>";
 				}
 			}
 		}
@@ -465,16 +468,16 @@ if($LOGGED_IN) {
                     continue;
                 }
 
-                echo "<li><a href='{$system->link}?id=$id'>" . $page['title'] . "</a></li>";
+                echo "<li><a id='sideMenuOption-".str_replace(' ', '', $page['title'])."' href='{$system->link}?id=$id'>" . $page['title'] . "</a></li>";
             }
         }
 
 		if($player->staff_level >= System::SC_MODERATOR) {
 			echo $staff_menu_header;
-			echo "<li><a href='{$system->link}?id=16'>Mod Panel</a></li>";
+			echo "<li><a id='sideMenuOption-ModPanel' href='{$system->link}?id=16'>Mod Panel</a></li>";
 		}
 		if($player->staff_level >= System::SC_ADMINISTRATOR) {
-			echo "<li><a href='{$system->link}?id=17'>Admin Panel</a></li>";
+			echo "<li><a id='sideMenuOption-AdminPanel' href='{$system->link}?id=17'>Admin Panel</a></li>";
 		}
 		// Logout timer
 		$time_remaining = ($logout_limit * 60) - (time() - $player->last_login);
