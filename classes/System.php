@@ -431,64 +431,76 @@ class System {
     }
 
     public function html_parse($text, $img = false, $faces = false) {
-        $search_array = array(
-            "[b]","[/b]","[u]","[/u]","[i]","[/i]",
-            "&lt;3","[strike]","[/strike]","[super]","[/super]","[sub]","[/sub]", "[center]", "[/center]", "[right]", "[/right]",
-            );
-        $replace_array = array("<b>","</b>","<u>","</u>","<i>","</i>","&hearts;",
-            "<del>","</del>","<sup>","</sup>","<sub>","</sub>", "<p style='text-align:center;'>", "</p>",
-            "<p style='text-align:right;'>", "</p>",
-        );
 
-        $text = str_replace($search_array, $replace_array, $text);
+      require_once "./libraries/JBBCode-1.3.0/JBBcode/Parser.php";
 
-        $memes = $this->getMemes();
-        $text = str_replace($memes['codes'], ($faces ? $memes['images'] : $memes['texts']), $text);
+      $parser = new JBBCode\Parser();
+      $parser->addCodeDefinitionSet(new JBBCode\DefaultCodeDefinitionSet());
 
-        if($img) {
-            $search_array[count($search_array)] = "[img]https://";
-            $search_array[count($search_array)] = "[img]http://";
-            $search_array[count($search_array)] = "[/img]";
-            $replace_array[count($replace_array)] = "<img src='[image_prefix]";
-            $replace_array[count($replace_array)] = "<img src='[image_prefix]";
-            $replace_array[count($replace_array)] = "' />";
-        }
+      $journal = $text;
+      $parser->parse($journal);
 
-        $text = str_ireplace($search_array,$replace_array,$text);
+      return $parser->getAsHtml();
 
-        $search_array = [];
-        $replace_array = [];
 
-        $reg_exUrl = '/((?:http|https)\:\/\/(?:[a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,5})(?:\/[^\:\s\\\\]*)?)/i';
-        $text = preg_replace_callback(
-            $reg_exUrl,
-            function($matches) {
-                $display = $matches[1];
-                if(strlen($display) > System::MAX_LINK_DISPLAY_LENGTH) {
-                    $display = substr($display, 0, System::MAX_LINK_DISPLAY_LENGTH - 3) . '...';
-                }
-                return "<a href='{$matches[1]}' target='_blank'>{$display}</a>";
-            },
-            $text
-        );
-
-        array_push($search_array, '[image_prefix]');
-        array_push($replace_array, 'https://');
-
-        array_push($search_array, '\r\n');
-        array_push($replace_array, '<br />');
-
-        array_push($search_array, '&amp;#039;');
-        array_push($replace_array, "&#039;");
-
-        array_push($search_array, '&amp;lt;');
-        array_push($replace_array, "&lt;");
-        array_push($search_array, '&amp;gt;');
-        array_push($replace_array, "&gt;");
-
-        $text = str_ireplace($search_array,$replace_array,$text);
-
-        return $text;
+        // $search_array = array(
+        //     "[b]","[/b]","[u]","[/u]","[i]","[/i]",
+        //     "&lt;3","[strike]","[/strike]","[super]","[/super]","[sub]","[/sub]", "[center]", "[/center]", "[right]", "[/right]",
+        //     );
+        // $replace_array = array("<b>","</b>","<u>","</u>","<i>","</i>","&hearts;",
+        //     "<del>","</del>","<sup>","</sup>","<sub>","</sub>", "<p style='text-align:center;'>", "</p>",
+        //     "<p style='text-align:right;'>", "</p>",
+        // );
+        //
+        // $text = str_replace($search_array, $replace_array, $text);
+        //
+        // $memes = $this->getMemes();
+        // $text = str_replace($memes['codes'], ($faces ? $memes['images'] : $memes['texts']), $text);
+        //
+        // if($img) {
+        //     $search_array[count($search_array)] = "[img]https://";
+        //     $search_array[count($search_array)] = "[img]http://";
+        //     $search_array[count($search_array)] = "[/img]";
+        //     $replace_array[count($replace_array)] = "<img src='[image_prefix]";
+        //     $replace_array[count($replace_array)] = "<img src='[image_prefix]";
+        //     $replace_array[count($replace_array)] = "' />";
+        // }
+        //
+        // $text = str_ireplace($search_array,$replace_array,$text);
+        //
+        // $search_array = [];
+        // $replace_array = [];
+        //
+        // $reg_exUrl = '/((?:http|https)\:\/\/(?:[a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,5})(?:\/[^\:\s\\\\]*)?)/i';
+        // $text = preg_replace_callback(
+        //     $reg_exUrl,
+        //     function($matches) {
+        //         $display = $matches[1];
+        //         if(strlen($display) > System::MAX_LINK_DISPLAY_LENGTH) {
+        //             $display = substr($display, 0, System::MAX_LINK_DISPLAY_LENGTH - 3) . '...';
+        //         }
+        //         return "<a href='{$matches[1]}' target='_blank'>{$display}</a>";
+        //     },
+        //     $text
+        // );
+        //
+        // array_push($search_array, '[image_prefix]');
+        // array_push($replace_array, 'https://');
+        //
+        // array_push($search_array, '\r\n');
+        // array_push($replace_array, '<br />');
+        //
+        // array_push($search_array, '&amp;#039;');
+        // array_push($replace_array, "&#039;");
+        //
+        // array_push($search_array, '&amp;lt;');
+        // array_push($replace_array, "&lt;");
+        // array_push($search_array, '&amp;gt;');
+        // array_push($replace_array, "&gt;");
+        //
+        // $text = str_ireplace($search_array,$replace_array,$text);
+        //
+        // return $text;
 
     }
 
@@ -754,4 +766,3 @@ class System {
         return $string;
     }
 }
-
