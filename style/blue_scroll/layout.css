@@ -159,15 +159,18 @@ body {
 
 #mainBanner {
     max-width: 100%;
-    height: 120px;
+    height: 100px;
     margin: 0 auto;
     text-align: center;
+
+    overflow: hidden;
 }
 
 #mainBanner img {
     width: 100%;
     max-width: 100%;
-    height: auto;
+    height: 149px;
+    margin-top: -25px;
 }
 
 #topMenu {
@@ -1038,17 +1041,16 @@ p {
 .trainingNotification {
     width: auto;
     position: absolute;
-    top: 0;
-    right: 20px;
-    width: 200px;
-    padding: 10px;
-
+    top: 60px;
+    right: 5px;
+    width: 225px;
+    padding: 5px 2px;
     z-index: 20;
 
     /* Style */
     text-align: center;
     font-family: 'Roboto', sans-serif;
-    color: #beb28a;
+    color: #b99e47;
     font-size: 0.7rem;
 }
 
@@ -1056,26 +1058,60 @@ p {
     width: auto;
     height: auto;
     position: absolute;
-    right: 20px;
-    top: 60px;
-    width: 200px;
+    right: 5px;
+    top: 20px;
+    width: 225px;
     z-index: 20;
 
     /* Style */
     text-align: center;
 }
 
+#notifications > div[style='margin:0px;border:1px solid #AAAAAA;border-radius:inherit;'] {
+    visibility: hidden;
+}
+#container #notifications > div > p {
+    padding: 0;
+    margin: 0;
+}
+
+#container #notifications > div > p > a {
+    visibility: visible;
+    display: block;
+    width: 100%;
+    height: 100%;
+    line-height: 25px;
+
+    border-radius: 2px;
+
+    color: #413510;
+    text-decoration: none;
+    font-size: 0.7rem;
+}
+
+#container #notifications > div > p > a:hover {
+    background: #d1a71c;
+}
+
 #notificationSlider {
     width: 200px;
     display: inline-block;
     margin: 0px;
-    height: 20px;
+    padding: 0;
+    height: 26px;
+    line-height: 26px;
+    overflow: hidden;
+
+    
+    background: #b99e47;
+    border-bottom: 1px solid #6d5c26;
+    border-radius: 2px;
+    box-shadow: 0 0 2px #000000;
 }
 
 #notificationSlider p.notification {
     width: 200px;
     display: none;
-    margin: 0px 1px;
 
     text-align: center;
 }
@@ -1085,13 +1121,13 @@ p {
 }
 
 #notifications a.link {
-    font-family: 'Roboto', sans-serif;
+    color: #413510;
+    text-decoration: none;
     font-size: 0.7rem;
-    color: #beb28a;
 }
 
 #notifications p.notification a.link:hover {
-    color: #FFFFFF;
+    color: #413510;
 }
 
 #notifications .header {
@@ -1102,32 +1138,36 @@ p {
     display: block;
     position: absolute;
     z-index: 25;
-    left: 2px;
-    top: 10px;
+    left: -2px;
+    top: 50%;
+    transform: translateY(-50%);
 
     height: 12px;
     width: 12px;
 
     padding: 3px;
 
-    background-color: rgba(0, 0, 0, 0);
+    background-color: #b99e47;
     border-radius: 15px;
+    box-shadow: 0 0 3px #000000;
 }
 
 #notifications .slideButtonRight {
     display: block;
     position: absolute;
     z-index: 25;
-    right: 2px;
-    top: 10px;
+    right: -2px;
+    top: 50%;
+    transform: translateY(-50%);
 
     height: 12px;
     width: 12px;
 
     padding: 3px;
 
-    background-color: rgba(0, 0, 0, 0);
+    background-color: #b99e47;
     border-radius: 15px;
+    box-shadow: 0 0 3px #000000;
 }
 
 #notifications .slideButtonLeft:hover,
