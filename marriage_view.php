@@ -18,7 +18,35 @@ function marriage_controller(){
 		$view->display();
 	} else {
 
-		//if proposal in inbox display [accept yes/no]
+		if(isset($_POST['accept_proposal'])){
+			$yes_no_answer = $system->clean($_POST['accept_proposal']);
+
+			//erase proposalInbox from current user and other users
+			//create marriage ID assign to both parties and then reload page
+			if($yes_no_answer == 'yes'){
+
+				$system->message("Woah you're married now!");
+				$system->printMessage();
+				return;
+			} else {
+				//erase proposal inbox from current user and then reset other user marriageId to 0 so they can propose again
+
+				$system->message("You rejected");
+				$system->printMessage();
+			}
+		}
+
+		//query
+		//if username exists in the proposalinbox -> display [accept yes/no]
+		$proposalInbox = $system->query("SELECT `proposalInbox` FROM `users`
+							WHERE `user_id` = '{$player->user_id}'");
+		$proposalInbox = $system->db_fetch($proposalInbox);
+		if($proposalInbox['proposalInbox'] != ''){
+
+			$marriageDepartment = new MarriageDepartment(Null);
+			$marriageDepartment->displayAcceptProposalBox_yes_no($proposalInbox['proposalInbox']);
+		}
+
 
 		//if page reloaded with Option 'yes' to propose
 		if(isset($_POST['marriage_radio_btn'])){
@@ -32,9 +60,17 @@ function marriage_controller(){
 			//update proposal inbox with username of person who wants to propose
 			 //if proposal already in inbox don't send proposal
 			if($proposee_name['proposalInbox'] == ''){
+
+				//proposal inbox
 				$system->query("UPDATE `users` SET
 					`proposalInbox` = '{$player->getName()}'
 				WHERE `user_id` = '{$proposee_name['user_id']}' LIMIT 1");
+
+
+				//set current user marriageId to -1 to signify they've placed a proposal
+				$system->query("UPDATE `users` SET
+					`marriage_id` = '-1'
+				WHERE `user_id` = '{$player->user_id}' LIMIT 1");
 
 				$system->message("Proposal Sent!");
 				$system->printMessage();
@@ -55,6 +91,7 @@ function marriage_controller(){
 			}
 		}
 
+
 		$marriageDepartment = new MarriageDepartment($temp_proposal_name);
 		$temp_proposal_name = $marriageDepartment->runCheck($temp_proposal_name);
 
@@ -68,6 +105,11 @@ function marriage_controller(){
 	// echo "What";
 }
 
+/**
+* @param String $tablename displays title of the html table
+* @param Array $m_stats holds marriage stats i.e boosts
+* @param Array $m_data holds marriage 'info' i.e dates/number
+*/
 class MarriageView{
 
   public $tablename = 'Marriage Panel';
@@ -139,20 +181,42 @@ class MarriageView{
     ;
 }
 
+/**
+* Class is used to display a username search box, or the yes/no box for sending proposalInbox
+* the class also handles db check for a username returns Null or
+* @param Bool $user1CurrentMarriageStatus  | If User is Married themself T/F
+* @param String|Null $proposed_name | User input, proposal name
+* @param Bool|Null $user2_isMarried | Proposal person is married T/F
+*
+* @return String|Null if username of proposee exists function will return a string
+*/
 class MarriageDepartment{
 
 	private bool $user1CurrentMarriageStatus = false; //main user
 	private ?string $proposed_name = Null;
 	private ?bool $user2_isMarried = True; //Want to Marry (lets just assume they are)
 
+	private string $proposedfrom = '';
+
 	//constructors
 	public function __construct($proposed_name){
 		$this->proposed_name = $proposed_name;
+	}
+	public function __createProposalFromInbox($proposedFrom){
+		$this->displayAcceptProposalBox_yes_no($proposedFrom);
 	}
 
 	function runCheck($temp_name){
 
 		global $system;
+		global $player;
+
+		//makes sure current user hasn't already sent a proposalInbox
+		//might cause issue if they've sent a proposal to an inactive player
+		//set up a way for users to send another proposal after 24 hours lol
+		if($player->marriageId == -1){
+			$system->message("You've made a proposal already, please wait for a response or 24 hours.");
+		}
 
 		if($this->proposed_name == Null){
 			return Null;
@@ -233,6 +297,28 @@ class MarriageDepartment{
 						<input id='prop_yes' type='radio' name='marriage_radio_btn' value='{$this->proposed_name}' checked>
 						<label for='prop_no'>No</label>
 						<input id='prop_no' type='radio' name='marriage_radio_btn'>
+						<input style='' type='submit' name='submit' autofocus>
+					</form>
+				</td>
+			</tr>
+		</table>
+		";
+	}
+
+	function displayAcceptProposalBox_yes_no($proposalFrom){
+		$headerName = "Do you Accept?";
+
+		echo "
+		<table class='table'>
+			<th colspan='1'>{$headerName}</th>
+			<tr><!--Display Area-->
+				<td style='display: grid; justify-items: center;'><!--Marriage Forms-->
+					<label for='proposal_option'>Would you like to accept a proposal from {$proposalFrom}?</label>
+					<form id='proposal_option' method='POST' action='' style='padding: 2em 0em;'>
+						<label for='prop_yes'>Yes</label>
+						<input id='prop_yes' type='radio' name='accept_proposal' value='yes' checked>
+						<label for='prop_no'>No</label>
+						<input id='prop_no' type='radio' name='accept_proposal'>
 						<input style='' type='submit' name='submit' autofocus>
 					</form>
 				</td>

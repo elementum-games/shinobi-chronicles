@@ -83,7 +83,7 @@ class User extends Fighter {
 
     //marriage
     public bool $isMarried = false;
-    public int $marriageId = 0;
+    public int $marriageId = 0; //if -1 proposal was made
     public ?array $marriageData;
 
     public $ban_type;
