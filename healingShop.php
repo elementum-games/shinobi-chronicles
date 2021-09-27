@@ -20,7 +20,7 @@ function healingShop() {
 	$health[2] = $rankManager->healthForRankAndLevel(2, $rankManager->ranks[2]->max_level);
 	$health[3] = $rankManager->healthForRankAndLevel(3, $rankManager->ranks[3]->max_level);
 	$health[4] = $rankManager->healthForRankAndLevel(4, $rankManager->ranks[4]->max_level);
-	$health[5] = $rankManager->healthForRankAndLevel(5, $rankManager->ranks[5]->max_level);
+	// $health[5] = $rankManager->healthForRankAndLevel(5, $rankManager->ranks[5]->max_level);
 
 	$healing['vegetable']['cost'] = $player->rank * 5;
 	$healing['vegetable']['amount'] = $health[$player->rank] * 0.1;
