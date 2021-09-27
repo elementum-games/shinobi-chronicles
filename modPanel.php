@@ -559,7 +559,7 @@ function modPanel() {
 				if(strlen($message) > 1000) {
 					throw new Exception("Message is too long! (" . strlen($message) . "/1000 chars)");
 				}
-				$system->query("UPDATE `system_storage` SET `global_message`='$message', `time`='".time()."'");
+				$system->query("UPDATE `system_storage` SET `global_message`='$message'");
 				$system->query("UPDATE `users` SET `global_message_viewed`=0");
 				$player->global_message_viewed = 0;
 				$system->message("Message posted!");
