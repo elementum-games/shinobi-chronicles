@@ -13,6 +13,8 @@ class User extends Fighter {
 
     const BASE_EXP = 500;
 
+    const MAX_CONSUMABLES = 10;
+
     public static int $jutsu_train_gain = 5;
 
     public System $system;
