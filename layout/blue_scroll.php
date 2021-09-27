@@ -55,7 +55,7 @@ HTML;
 $top_menu = <<<HTML
 <ul>
 	<li><a id='topMenuOption-News' href='{$system->link}'>News</a></li>
-	<li><a id='topMenuOption-Discord' href='http://shinobi-chronicles.com/forum/' target='_blank'>Discord</a></li>
+	<li><a id='topMenuOption-Discord' href='https://discord.gg/Kx52dbXEf3' target='_blank'>Discord</a></li>
 	<li><a id='topMenuOption-Manual' href='{$system->link}manual.php'>Manual</a></li>
 	<li><a id='topMenuOption-Rules' href='{$system->link}rules.php'>Rules</a></li>
 	<li><a id='topMenuOption-Terms' href='{$system->link}terms.php'>Terms of Service</a></li>
