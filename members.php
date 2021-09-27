@@ -307,7 +307,8 @@ function members() {
 			$view = 'online_users';		
 		}
 		else {
-			$query_custom = " WHERE `staff_level` < " . System::SC_ADMINISTRATOR . " ORDER BY `exp` DESC";
+            $query_custom = " WHERE `staff_level` < " . System::SC_ADMINISTRATOR .
+                " ORDER BY `exp` DESC, `pvp_wins` DESC";
 			$list_name = 'Top 10 Users - Highest Exp';
 			$view = 'highest_exp';
 		

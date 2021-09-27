@@ -84,7 +84,7 @@ function premium() {
 			$player->chakra = 100;
 			$player->max_chakra = 100;
 			$player->regen_rate = 10;
-			$player->exp = 0;
+			$player->exp = User::BASE_EXP;
 			$player->bloodline_id = 0;
 			$player->bloodline_name = '';
 			$player->clan = array();
