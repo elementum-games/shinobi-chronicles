@@ -1,6 +1,6 @@
 <?php /** @noinspection PhpRedundantOptionalArgumentInspection */
 
-require_once "classes/Jutsu.php";
+require_once __DIR__ . "/Jutsu.php";
 
 /*	Class:		User
 	Purpose:	Fetch user data and load into class variables.

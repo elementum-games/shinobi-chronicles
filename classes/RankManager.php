@@ -1,6 +1,6 @@
 <?php
 
-require_once "classes/Rank.php";
+require_once __DIR__ . "/Rank.php";
 
 class RankManager {
     public System $system;
@@ -44,6 +44,27 @@ class RankManager {
         return $health;
     }
 
+    public function chakraForRankAndLevel(int $rank_id, int $level): int {
+        if(!$this->ranks_loaded) {
+            $this->loadRanks();
+        }
+
+        $chakra = 100 - $this->ranks[1]->chakra_gain;
+        foreach($this->ranks as $id => $rank) {
+            if($id > $rank_id) {
+                continue;
+            }
+
+            $max_level = $id === $rank_id ? $level : $rank->max_level;
+
+            for($i = $rank->base_level; $i <= $max_level; $i++) {
+                $chakra += $rank->pool_gain;
+            }
+        }
+
+        return $chakra;
+    }
+
     public function statsForRankAndLevel(int $rank_id, int $level): int {
         if(!$this->ranks_loaded) {
             $this->loadRanks();
@@ -51,7 +72,8 @@ class RankManager {
 
         $rank = $this->ranks[$rank_id];
         $stats = $rank->base_stats;
-        for($i = $rank->base_level; $i <= $level; $i++) {
+
+        for($i = $rank->base_level + 1; $i <= $level; $i++) {
             $stats += $rank->stats_per_level;
         }
 

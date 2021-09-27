@@ -1,6 +1,6 @@
 <?php
 
-require_once "classes/EntityId.php";
+require_once __DIR__ . '/EntityId.php';
 
 /*	Class:		System
 	Purpose: 	Handle database connection and queries. Handle storing and printing of error messages.
@@ -176,7 +176,7 @@ class System {
     ];
 
     public function __construct() {
-        require("./secure/vars.php");
+        require __DIR__ . "/../secure/vars.php";
         /** @var $host */
         /** @var $username */
         /** @var $password */
