@@ -278,6 +278,30 @@ class System {
         }
     }
 
+    /**
+     * @param false  $result
+     * @param string $return_type
+     * @return array|null
+     */
+    public function db_fetch_all($result = false, ?string $id_column = null): array {
+        if(!$result) {
+            $result = $this->db_result;
+        }
+
+        $entities = [];
+        while($row = $this->db_fetch($result)) {
+            if($id_column) {
+                $entities[$row[$id_column]] = $row;
+            }
+            else {
+                $entities[] = $row;
+            }
+        }
+        return $entities;
+    }
+
+
+
     /* function message(message, force_message)
 
         Stores a message for display later.

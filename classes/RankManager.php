@@ -1,0 +1,62 @@
+<?php
+
+require_once "classes/Rank.php";
+
+class RankManager {
+    public System $system;
+
+    /** @var Rank[] */
+    public array $ranks = [];
+    private bool $ranks_loaded = false;
+
+    public function __construct(System $system) {
+        $this->system = $system;
+    }
+
+    public function loadRanks() {
+        $ranks_result = $this->system->query("SELECT * FROM ranks ORDER BY rank_id");
+        $ranks = $this->system->db_fetch_all($ranks_result, 'rank_id');
+        foreach($ranks as $rank) {
+            $this->ranks[$rank['rank_id']] = Rank::fromDb($rank);
+        }
+
+        $this->ranks_loaded = true;
+    }
+
+    public function healthForRankAndLevel(int $rank_id, int $level): int {
+        if(!$this->ranks_loaded) {
+            $this->loadRanks();
+        }
+
+        $health = 100 - $this->ranks[1]->health_gain;
+        foreach($this->ranks as $id => $rank) {
+            if($id > $rank_id) {
+                continue;
+            }
+
+            $max_level = $id === $rank_id ? $level : $rank->max_level;
+
+            for($i = $rank->base_level; $i <= $max_level; $i++) {
+                $health += $rank->health_gain;
+            }
+        }
+
+        return $health;
+    }
+
+    public function statsForRankAndLevel(int $rank_id, int $level): int {
+        if(!$this->ranks_loaded) {
+            $this->loadRanks();
+        }
+
+        $rank = $this->ranks[$rank_id];
+        $stats = $rank->base_stats;
+        for($i = $rank->base_level; $i <= $level; $i++) {
+            $stats += $rank->stats_per_level;
+        }
+
+        return $stats;
+    }
+
+    // public static
+}
