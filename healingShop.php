@@ -12,11 +12,15 @@ function healingShop() {
 	global $player;
 	global $self_link;
 
-	$health[1] = 200;
-	$health[2] = 1500;
-	$health[3] = 10000;
-	$health[4] = 40000;
-	$health[6] = 40000;
+
+	$rankManager = new RankManager($system);
+	$rankManager->loadRanks();
+
+	$health[1] = $rankManager->healthForRankAndLevel(1, $rankManager->ranks[1]->max_level);
+	$health[2] = $rankManager->healthForRankAndLevel(2, $rankManager->ranks[2]->max_level);
+	$health[3] = $rankManager->healthForRankAndLevel(3, $rankManager->ranks[3]->max_level);
+	$health[4] = $rankManager->healthForRankAndLevel(4, $rankManager->ranks[4]->max_level);
+	$health[5] = $rankManager->healthForRankAndLevel(5, $rankManager->ranks[5]->max_level);
 
 	$healing['vegetable']['cost'] = $player->rank * 5;
 	$healing['vegetable']['amount'] = $health[$player->rank] * 0.1;
