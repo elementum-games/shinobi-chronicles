@@ -37,7 +37,6 @@ if(isset($_GET['logout']) && $_GET['logout'] == 1) {
 }
 $LOGGED_IN = false;
 
-
 // Ajax
 $ajax = false;
 if(isset($_GET['request_type']) && $_GET['request_type'] == 'ajax') {
@@ -251,9 +250,11 @@ if($LOGGED_IN) {
 		$player->global_message_viewed = 1;
 	}
 	if(!$player->global_message_viewed && !$ajax) {
-		$result = $system->query("SELECT `global_message` FROM `system_storage` LIMIT 1");
-		$message = $system->db_fetch($result)['global_message'];
+		$result = $system->query("SELECT `global_message`, `time` FROM `system_storage` LIMIT 1");
+		$results = $system->db_fetch($result, 'assoc');
+		$message = $results['global_message'];
 		$global_message = str_replace("\r\n", "<br />", $message);
+		$global_message_time = date("l, M j, Y - g:i A", $results['time']);
 	}
 	else {
 		$global_message = false;
@@ -376,11 +377,10 @@ if($LOGGED_IN) {
 
 			$system->printMessage();
 			if($global_message) {
-				echo "<table class='table globalMessage'><tr><th>Global message</th></tr>
-				<tr><td style='text-align:center;'>" . $system->html_parse($global_message) . "
-				<br />
-				<a class='link' href='{$self_link}&clear_message=1'>Dismiss</a>
-				</td></tr></table>";
+				echo "<table class='table globalMessage'><tr><th colspan='2'>Global message</th></tr>
+				<tr><td style='text-align:center;' colspan='2'>" . $system->html_parse($global_message) . "</td></tr>
+				<tr><td style='width: 50px;' class='newsFooter'><a class='link' href='{$self_link}&clear_message=1'>Dismiss</a></td>
+				<td class='newsFooter'>".$global_message_time."</td></tr></table>";
 			}
 
             /** @noinspection PhpIncludeInspection */
@@ -405,11 +405,11 @@ if($LOGGED_IN) {
 		echo str_replace("[HEADER_TITLE]", "News", $body_start);
 		$system->printMessage();
 		if($global_message) {
-			echo "<table class='table globalMessage'><tr><th>Global message</th></tr>
-			<tr><td style='text-align:center;'>" . $system->html_parse($global_message) . "
-			<br />
-			<a class='link' href='{$system->link}?clear_message=1'>Dismiss</a>
-			</td></tr></table>";
+			echo "<table class='table globalMessage'><tr><th colspan='2'>Global message</th></tr>
+			<tr><td style='text-align:center;' colspan='2'>" . $system->html_parse($global_message) . "
+			</td></tr>
+			<tr><td style='width: 50px;' class='newsFooter'><a class='link' href='{$system->link}&clear_message=1'>Dismiss</a></td>
+				<td class='newsFooter'>".$global_message_time."</td></tr></table>";
 		}
 		require("news.php");
 		news();
