@@ -146,10 +146,10 @@ function runActiveMission() {
                 if(!$opponent) {
                     throw new Exception("Couldn't load opponent for mission!");
                 }
+                $opponent->loadData();
 
                 // Initialize start of battle stuff
                 if(!$player->battle_id) {
-                    $opponent->loadData();
                     Battle::start($system, $player, $opponent, Battle::TYPE_AI_MISSION);
                 }
 
