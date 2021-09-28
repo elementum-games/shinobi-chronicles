@@ -1282,21 +1282,6 @@ class User extends Fighter {
         return $skill_ratio;
     }
 
-    /**
-     * @param string $entity_id
-     * @return User
-     * @throws Exception
-     */
-    public static function fromEntityId(string $entity_id): User {
-        $entity_id = System::parseEntityId($entity_id);
-
-        if($entity_id->entity_type != self::ENTITY_TYPE) {
-            throw new Exception("Entity ID is not a User!");
-        }
-
-        return new User($entity_id->id);
-    }
-
     public function removeJutsu(int $jutsu_id) {
         $jutsu = $this->jutsu[$jutsu_id];
         unset($this->jutsu[$jutsu_id]);
@@ -1317,5 +1302,49 @@ class User extends Fighter {
     public function clearMission() {
         $this->mission_id = 0;
         $this->mission_stage = [];
+    }
+
+    const LOG_TRAINING = 'training';
+    const LOG_ARENA = 'arena';
+    const LOG_LOGIN = 'login';
+
+    public function log(string $log_type, string $log_contents): bool {
+        $valid_log_types = [self::LOG_TRAINING, self::LOG_ARENA, self::LOG_LOGIN];
+        if(!in_array($log_type, $valid_log_types)) {
+            error_log("Invalid player log type {$log_type}");
+            return false;
+        }
+
+        $dateTime = DateTime::createFromFormat(
+            'U.u',
+            number_format(microtime(true), 2, '.', '')
+        );
+
+        $dateTimeFormat = 'Y-m-d H:i:s.u';
+        $this->system->query("INSERT INTO `player_logs`
+            (`user_id`, `user_name`, `log_type`, `log_time`, 
+             `log_contents`)
+            VALUES 
+            ({$this->user_id}, '{$this->user_name}', '{$log_type}', '{$dateTime->format($dateTimeFormat)}',
+             '{$this->system->clean($log_contents)}'
+            )
+        ");
+
+        return true;
+    }
+
+    /**
+     * @param string $entity_id
+     * @return User
+     * @throws Exception
+     */
+    public static function fromEntityId(string $entity_id): User {
+        $entity_id = System::parseEntityId($entity_id);
+
+        if($entity_id->entity_type != self::ENTITY_TYPE) {
+            throw new Exception("Entity ID is not a User!");
+        }
+
+        return new User($entity_id->id);
     }
 }

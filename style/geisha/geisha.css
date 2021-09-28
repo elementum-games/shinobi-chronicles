@@ -548,15 +548,19 @@ p {
 	font-weight: bold;
 }
 
+#content table.globalMessage {
+    table-layout: initial;
+}
 #content table.table td.newsFooter {
 	text-align:right;
 	background-color:#afa490;
-	padding:2px;
-	padding-right:5px;
+    padding: 4px 7px;
 	
 	font-size:14px;
 	font-family:"comic sans ms";
-	
+
+    border: none;
+
 	/* text-shadow:1px 1px #CCCCCC; */
 }
 

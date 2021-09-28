@@ -429,7 +429,7 @@ p {
 
 
 #content {
-	font-size: 12px;
+	font-size: 13px;
 }
 #content table.table {
 	width:95%;
@@ -462,7 +462,9 @@ p {
 #content table.table td.newsFooter {
 	text-align:right;
 	background-color:#2080CA;
-	padding:2px;
+
+    padding: 4px 5px 5px;
+    border: none;
 	
 	font-size:13px;
 	font-family:"comic sans ms";

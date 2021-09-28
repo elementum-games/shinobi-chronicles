@@ -63,6 +63,8 @@ function calcDamage(Fighter $player1, Fighter $player2, Jutsu $player1_jutsu, Ju
         $player1_jutsu, $player2_jutsu
     );
 
+    $system->query("DELETE FROM battles WHERE `battle_id`={$battle_id}");
+
     $player1_collision_damage = $player1_raw_damage;
     $player2_collision_damage = $player2_raw_damage;
 
@@ -208,7 +210,7 @@ else if($_POST['run_simulation'] && $mode == 'scenarios') {
         2,
         'p2j',
         $player2->rank,
-        Jutsu::TYPE_NINJUTSU,
+        Jutsu::TYPE_TAIJUTSU,
         $base_jutsu_power,
         'none',
         0,

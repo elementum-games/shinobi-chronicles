@@ -299,6 +299,9 @@ label {
 	border-bottom:1px solid #202020;
 	text-shadow: 0px 1px 0px #606060;
 }
+#content table.globalMessage {
+    table-layout: initial;
+}
 
 #content .button {
 	display: inline-block;
@@ -547,8 +550,8 @@ p {
 #content table.table td.newsFooter {
 	text-align:right;
 	background-color:#EAEAEA;
-	padding:2px;
-	padding-right:5px;
+	padding: 4px 8px;
+    border: none;
 	
 	font-size:14px;
 	font-family:"comic sans ms";

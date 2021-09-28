@@ -37,7 +37,6 @@ if(isset($_GET['logout']) && $_GET['logout'] == 1) {
 }
 $LOGGED_IN = false;
 
-
 // Ajax
 $ajax = false;
 if(isset($_GET['request_type']) && $_GET['request_type'] == 'ajax') {
@@ -65,6 +64,7 @@ if(!isset($_SESSION['user_id'])) {
 			if(empty($password)) {
 				throw new Exception("Please enter password!");
 			}
+
 			// Get result
 			$result = $system->query("SELECT `user_id`, `user_name`, `password`, `failed_logins`, `current_ip`, `last_ip`, `user_verified` 
 				FROM `users` WHERE `user_name`='$user_name' LIMIT 1");
@@ -76,6 +76,7 @@ if(!isset($_SESSION['user_id'])) {
 				throw new Exception("Your account has not been verified. Please check your email for the activation code.
 				<a class='link' href='{$system->link}register.php?act=resend_verification&username=$user_name'>Resend Verification</a>");
 			}
+
 			// Check failed logins
 			if($result['failed_logins'] >= 3 && $_SERVER['REMOTE_ADDR'] != $result['current_ip'] && $_SERVER['REMOTE_ADDR'] != $result['last_ip']) {
 				throw new Exception("Account has been locked out!");
@@ -94,9 +95,11 @@ if(!isset($_SESSION['user_id'])) {
 				if($result['failed_logins'] > 0) {
 					$system->query("UPDATE `users` SET `failed_logins`= 0 WHERE `user_id`='{$result['user_id']}' LIMIT 1");
 				}
+
 				$player = new User($_SESSION['user_id']);
 				$player_display = $player->loadData();
 				$player->last_login = time();
+				$player->log(User::LOG_LOGIN, $_SERVER['REMOTE_ADDR']);
 				$player->updateData();
 			}
 			// If wrong, increment failed logins
@@ -251,9 +254,11 @@ if($LOGGED_IN) {
 		$player->global_message_viewed = 1;
 	}
 	if(!$player->global_message_viewed && !$ajax) {
-		$result = $system->query("SELECT `global_message` FROM `system_storage` LIMIT 1");
-		$message = $system->db_fetch($result)['global_message'];
+		$result = $system->query("SELECT `global_message`, `time` FROM `system_storage` LIMIT 1");
+		$results = $system->db_fetch($result);
+		$message = $results['global_message'];
 		$global_message = str_replace("\r\n", "<br />", $message);
+		$global_message_time = date("l, M j, Y - g:i A", $results['time']);
 	}
 	else {
 		$global_message = false;
@@ -376,11 +381,10 @@ if($LOGGED_IN) {
 
 			$system->printMessage();
 			if($global_message) {
-				echo "<table class='table globalMessage'><tr><th>Global message</th></tr>
-				<tr><td style='text-align:center;'>" . $system->html_parse($global_message) . "
-				<br />
-				<a class='link' href='{$self_link}&clear_message=1'>Dismiss</a>
-				</td></tr></table>";
+				echo "<table class='table globalMessage'><tr><th colspan='2'>Global message</th></tr>
+				<tr><td style='text-align:center;' colspan='2'>" . $system->html_parse($global_message) . "</td></tr>
+				<tr><td style='width: 50px;' class='newsFooter'><a class='link' href='{$self_link}&clear_message=1'>Dismiss</a></td>
+				<td class='newsFooter'>".$global_message_time."</td></tr></table>";
 			}
 
             /** @noinspection PhpIncludeInspection */
@@ -405,11 +409,11 @@ if($LOGGED_IN) {
 		echo str_replace("[HEADER_TITLE]", "News", $body_start);
 		$system->printMessage();
 		if($global_message) {
-			echo "<table class='table globalMessage'><tr><th>Global message</th></tr>
-			<tr><td style='text-align:center;'>" . $system->html_parse($global_message) . "
-			<br />
-			<a class='link' href='{$system->link}?clear_message=1'>Dismiss</a>
-			</td></tr></table>";
+			echo "<table class='table globalMessage'><tr><th colspan='2'>Global message</th></tr>
+			<tr><td style='text-align:center;' colspan='2'>" . $system->html_parse($global_message) . "
+			</td></tr>
+			<tr><td style='width: 50px;' class='newsFooter'><a class='link' href='{$system->link}&clear_message=1'>Dismiss</a></td>
+				<td class='newsFooter'>".$global_message_time."</td></tr></table>";
 		}
 		require("news.php");
 		news();
