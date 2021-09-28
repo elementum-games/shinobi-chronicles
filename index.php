@@ -251,7 +251,7 @@ if($LOGGED_IN) {
 	}
 	if(!$player->global_message_viewed && !$ajax) {
 		$result = $system->query("SELECT `global_message`, `time` FROM `system_storage` LIMIT 1");
-		$results = $system->db_fetch($result, 'assoc');
+		$results = $system->db_fetch($result);
 		$message = $results['global_message'];
 		$global_message = str_replace("\r\n", "<br />", $message);
 		$global_message_time = date("l, M j, Y - g:i A", $results['time']);
