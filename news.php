@@ -107,7 +107,7 @@ function news() {
 			<form action='$self_link' method='post'>
 				<span style='font-weight:bold;'>Title</span><br />
 				<input type='text' name='title' value='" . ($_POST['title'] ? $_POST['title'] : '') . "' /><br />
-				<textarea name='news_post' style='height:125px;width:450px;'>" .
+				<textarea name='news_post' style='height:200px;width:550px;'>" .
 				($_POST['news_post'] ? $_POST['news_post'] : '') .
 				"</textarea>
 				<br />
@@ -130,7 +130,7 @@ function news() {
 				<form action='$self_link' method='post'>
 					<span style='font-weight:bold;'>Title</span><br />
 					<input type='text' name='title' value='" . stripslashes($post['title']) . "' /><br />
-					<textarea name='news_post' style='height:125px;width:450px;'>" .
+					<textarea name='news_post' style='height:200px;width:550px;'>" .
 					stripslashes($post['message']) .
 					"</textarea><br />
 					<input type='hidden' name='post_id' value='{$post_id}' />

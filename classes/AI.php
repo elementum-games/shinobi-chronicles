@@ -8,15 +8,17 @@ class AI extends Fighter {
     const ID_PREFIX = 'AI';
 
     public System $system;
+    public RankManager $rankManager;
 
     public string $id;
     public int $ai_id;
     public $name;
     public float $max_health;
-    public $level;
+    public int $level;
     public $gender;
 
-    public $rank;
+    public int $rank;
+    public float $rank_progress;
 
     public float $health;
     public float $chakra = 0;
@@ -84,24 +86,32 @@ class AI extends Fighter {
         $result = $this->system->query("SELECT * FROM `ai_opponents` WHERE `ai_id`='$this->ai_id' LIMIT 1");
         $ai_data = $this->system->db_fetch($result);
 
+        $this->rankManager = new RankManager($this->system);
+        $this->rankManager->loadRanks();
+
         $this->rank = $ai_data['rank'];
-        $this->max_health = $ai_data['max_health'];
+        $this->level = $ai_data['level'];
+
+        $base_level = $this->rankManager->ranks[$this->rank]->base_level;
+        $max_level = $this->rankManager->ranks[$this->rank]->max_level;
+        $this->rank_progress = round(($this->level - $base_level) / ($max_level - $base_level), 2);
+
+        $this->max_health = $this->rankManager->healthForRankAndLevel($this->rank, $this->level) * $ai_data['max_health'];
         $this->health = $this->max_health;
 
         $this->gender = "Male";
 
-        $this->level = $ai_data['level'];
+        $stats_for_level = $this->rankManager->statsForRankAndLevel($this->rank, $this->level);
+        $this->ninjutsu_skill = $stats_for_level * $ai_data['ninjutsu_skill'];
+        $this->genjutsu_skill = $stats_for_level * $ai_data['genjutsu_skill'];
+        $this->taijutsu_skill = $stats_for_level * $ai_data['taijutsu_skill'];
 
-        $this->ninjutsu_skill = $ai_data['ninjutsu_skill'];
-        $this->genjutsu_skill = $ai_data['genjutsu_skill'];
-        $this->taijutsu_skill = $ai_data['taijutsu_skill'];
+        $this->cast_speed = $stats_for_level * $ai_data['cast_speed'];
 
-        $this->cast_speed = $ai_data['cast_speed'];
-
-        $this->speed = $ai_data['speed'];
-        $this->strength = $ai_data['strength'];
-        $this->intelligence = $ai_data['intelligence'];
-        $this->willpower = $ai_data['willpower'];
+        $this->speed = $stats_for_level * $ai_data['speed'];
+        $this->strength = $stats_for_level * $ai_data['strength'];
+        $this->intelligence = $stats_for_level * $ai_data['intelligence'];
+        $this->willpower = $stats_for_level * $ai_data['willpower'];
 
         $attributes = array('cast_speed', 'speed', 'strength', 'intelligence', 'willpower');
         foreach($attributes as $attribute) {
@@ -221,7 +231,7 @@ class AI extends Fighter {
             $battle_text_alt
         );
 
-        return new Jutsu(
+        $jutsu = new Jutsu(
             $id,
             'Move ' . $id,
             $this->rank,
@@ -241,6 +251,11 @@ class AI extends Fighter {
             Jutsu::ELEMENT_NONE,
             ''
         );
+
+        $jutsu_level = 5 + ($this->rank_progress * 50);
+        $jutsu->setLevel($jutsu_level, 0);
+
+        return $jutsu;
     }
 
     public function updateData() {

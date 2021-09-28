@@ -1,6 +1,6 @@
 <?php
 
-require_once "classes/EntityId.php";
+require_once __DIR__ . '/EntityId.php';
 
 /*	Class:		System
 	Purpose: 	Handle database connection and queries. Handle storing and printing of error messages.
@@ -178,7 +178,7 @@ class System {
     ];
 
     public function __construct() {
-        require("./secure/vars.php");
+        require __DIR__ . "/../secure/vars.php";
         /** @var $host */
         /** @var $username */
         /** @var $password */
@@ -281,6 +281,30 @@ class System {
             return mysqli_fetch_array($result);
         }
     }
+
+    /**
+     * @param false  $result
+     * @param string $return_type
+     * @return array|null
+     */
+    public function db_fetch_all($result = false, ?string $id_column = null): array {
+        if(!$result) {
+            $result = $this->db_result;
+        }
+
+        $entities = [];
+        while($row = $this->db_fetch($result)) {
+            if($id_column) {
+                $entities[$row[$id_column]] = $row;
+            }
+            else {
+                $entities[] = $row;
+            }
+        }
+        return $entities;
+    }
+
+
 
     /* function message(message, force_message)
 

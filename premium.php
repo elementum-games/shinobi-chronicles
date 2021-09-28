@@ -84,7 +84,7 @@ function premium() {
 			$player->chakra = 100;
 			$player->max_chakra = 100;
 			$player->regen_rate = 10;
-			$player->exp = 0;
+			$player->exp = User::BASE_EXP;
 			$player->bloodline_id = 0;
 			$player->bloodline_name = '';
 			$player->clan = array();
@@ -542,7 +542,7 @@ function premium() {
 		}
 		$system->printMessage();
 	}
-	else if(isset($_POST['change_village']) && $player->rank >= 3) {
+	else if(isset($_POST['change_village']) && $player->rank >= 2) {
 		$village = $_POST['new_village'];
 		try {
 			if($village == $player->village) {
@@ -952,7 +952,7 @@ function premium() {
 
 		}
 
-		if($player->rank >= 3) {
+		if($player->rank >= 2) {
 			$villages = array('Stone', 'Cloud', 'Leaf', 'Sand', 'Mist');
 			echo "<table class='table'><tr><th>Change Village</th></tr>
 			<tr><td style='text-align:center;'>
@@ -1166,7 +1166,7 @@ function premium() {
 				+1 weapon equip slots<br />
 				+1 armor equip slots<br />
 				Enhanced long trainings (1.5x length, 2x gains)<br />
-				Enhanced extended trainings (1.5x length, 2.25x gains)<br />
+				Enhanced extended trainings (1.5x length, 2x gains)<br />
 				<form action='$self_link&view=forbidden_seal' method='post'>
 				<p style='width:100%;text-align:center;margin:0px;margin-top:2.2em;'>
 					<input type='hidden' name='seal_level' value='2' />
