@@ -76,7 +76,7 @@ function userSettings() {
 		$result = $system->db_fetch($result);
 		
 		try {
-			if($system->verify_password($password, $result['password'])) {
+			if(!$system->verify_password($password, $result['password'])) {
 				throw new Exception("Current password is incorrect!");
 			}
 			
