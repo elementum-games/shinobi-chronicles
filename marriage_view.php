@@ -14,38 +14,62 @@ function marriage_controller(){
 	if($player->isMarried){
 		//find marriage ID
 		//if ID invalid -> break
-		$view = new MarriageView($player->marriedId);
+		$view = new MarriageView($player->marriageId);
 		$view->display();
 	} else {
 
 		//Answer to Proposal
 		if(isset($_POST['accept_proposal'])){
-			$proposal_answer = $system->clean($_POST['accept_proposal']);
+			$proposal_user = $system->clean($_POST['accept_proposal']); //holds name of user 2(proposing)
 
+			if($proposal_user !== 'no'){
 
-			if($proposal_answer != 'no'){
-				//erase proposalInbox from current user and other users
-				//create marriage ID assign to both parties and then reload page
+				//get user id of proposal answer
+				$user2_id_query = $system->query("SELECT `user_id` FROM `users`
+									WHERE `user_name` = '{$proposal_user}'");
+				$user2_id = $system->db_fetch($user2_id_query);
+				$user2_id = $user2_id['user_id'];
 
-				//set users to married
+				//create marriage ID assigns ID to both parties
+				// TODO: Users2 is not being set correctly, check it out later
+				$system->query(
+						"INSERT INTO `marriage`
+								(
+								 `user1_id`,
+								 `user2_id`
+							 ) VALUES
+							 (
+								'$player->user_id',
+								'$user2_id'
+								)"
+				);
+			  $system->message($system->db_insert_id);
+				$system->printMessage();
+				$marriageId = $system->db_insert_id;
+
+				//User1 set isMarried and marriage_id
 				$system->query("UPDATE `users` SET
 					`isMarried` = '1'
-				WHERE `user_name` = '{$proposal_answer}' LIMIT 1");
+				WHERE `user_name` = '{$proposal_user}' LIMIT 1");
+				$system->query("UPDATE `users` SET
+					`marriage_id` = '{$marriageId}'
+				WHERE `user_name` = '{$proposal_user}' LIMIT 1");
+
+				//User2 set isMarried and marriage_id
 				$system->query("UPDATE `users` SET
 					`isMarried` = '1'
 				WHERE `user_id` = '{$player->user_id}' LIMIT 1");
-
-				//erase proposal proposalInbox
 				$system->query("UPDATE `users` SET
-					`marriage_id` = '0'
-				WHERE `user_name` = '{$proposal_answer}' LIMIT 1");
+					`marriage_id` = '{$marriageId}'
+				WHERE `user_id` = '{$player->user_id}' LIMIT 1");
 
+				//clear inbox
 				$system->query("UPDATE `users` SET
 					`proposalInbox` = ''
 				WHERE `user_name` = '{$player->getName()}' LIMIT 1");
-
-				//create new MarriageId Row in MarriageData database and set the VALUES
-
+				$system->query("UPDATE `users` SET
+					`proposalInbox` = ''
+				WHERE `user_name` = '{$proposal_user}' LIMIT 1");
 
 				$system->message("Woah you're married now!");
 				$system->printMessage();
@@ -53,11 +77,19 @@ function marriage_controller(){
 				header("Refresh:0"); //don't know if this is okay...
 				return; //reload page
 			} else {
+				//answer was 'no'
+				//grab user2 name
+				$proposal_from_name = $system->query("SELECT `proposalInbox` FROM `users`
+									WHERE `user_id` = '{$player->user_id}'");
+				$proposal_from_name = $system->db_fetch($proposal_user); //holds username of proposal person
+
 				//erase proposal inbox from current user and then reset other user marriageId to 0 so they can propose again
 				$system->query("UPDATE `users` SET
 					`marriage_id` = '0'
-				WHERE `user_name` = '{$proposal_answer}' LIMIT 1");
+				WHERE `user_name` = '{$proposal_from_name}' LIMIT 1");
+				echo "<h1>{$proposal_from_name}</h1>";
 
+				//clear current users proposal inbox allowing them to have proposals again!
 				$system->query("UPDATE `users` SET
 					`proposalInbox` = ''
 				WHERE `user_name` = '{$player->getName()}' LIMIT 1");
@@ -80,7 +112,7 @@ function marriage_controller(){
 
 
 		//if page reloaded with Option 'yes' to propose
-		if(isset($_POST['marriage_radio_btn'])){
+		if(isset($_POST['marriage_radio_btn']) && $_POST['marriage_radio_btn'] !== 'no'){
 			$m_temp = $system->clean($_POST['marriage_radio_btn']);
 
 			//get user id of user they want to propose to
@@ -89,7 +121,7 @@ function marriage_controller(){
 			$proposee_name = $system->db_fetch($proposee_userId);
 
 			//update proposal inbox with username of person who wants to propose
-			 //if proposal already in inbox don't send proposal
+			//if proposal already in inbox don't send proposal
 			if($proposee_name['proposalInbox'] == ''){
 
 				//proposal inbox
@@ -106,7 +138,7 @@ function marriage_controller(){
 				$system->message("Proposal Sent!");
 				$system->printMessage();
 			} else {
-				$system->message("{$m_temp} already has a proposal :(!");
+				$system->message("{$m_temp} already has a proposal in their inbox :(!");
 				$system->printMessage();
 			}
 		}
@@ -118,6 +150,7 @@ function marriage_controller(){
 
 			if(strtolower($temp_proposal_name) == strtolower($player->getName())) {
 				$system->message("You can't marry yourself...");
+				$system->printMessage();
 				$temp_proposal_name = Null;
 			}
 		}
@@ -246,11 +279,11 @@ class MarriageDepartment{
 		global $system;
 		global $player;
 
-		//makes sure current user hasn't already sent a proposalInbox
 		//might cause issue if they've sent a proposal to an inactive player
-		//set up a way for users to send another proposal after 24 hours lol
+		// TODO: set up a way for users to send another proposal after 24 hours lol
 		if($player->marriageId == -1){
 			$system->message("You've made a proposal already, please wait for a response or 24 hours.");
+			$system->printMessage();
 		}
 
 		if($this->proposed_name == Null){
@@ -331,7 +364,7 @@ class MarriageDepartment{
 						<label for='prop_yes'>Yes</label>
 						<input id='prop_yes' type='radio' name='marriage_radio_btn' value='{$this->proposed_name}' checked>
 						<label for='prop_no'>No</label>
-						<input id='prop_no' type='radio' name='marriage_radio_btn' value=''>
+						<input id='prop_no' type='radio' name='marriage_radio_btn' value='no'>
 						<input style='' type='submit' name='submit' autofocus>
 					</form>
 				</td>
