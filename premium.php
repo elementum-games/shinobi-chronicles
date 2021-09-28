@@ -534,7 +534,7 @@ function premium() {
 		}
 		$system->printMessage();
 	}
-	else if(isset($_POST['change_village']) && $player->rank >= 3) {
+	else if(isset($_POST['change_village']) && $player->rank >= 2) {
 		$village = $_POST['new_village'];
 		try {
 			if($village == $player->village) {
@@ -944,7 +944,7 @@ function premium() {
 
 		}
 
-		if($player->rank >= 3) {
+		if($player->rank >= 2) {
 			$villages = array('Stone', 'Cloud', 'Leaf', 'Sand', 'Mist');
 			echo "<table class='table'><tr><th>Change Village</th></tr>
 			<tr><td style='text-align:center;'>
