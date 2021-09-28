@@ -22,7 +22,6 @@ function userSettings() {
 	
 	$layouts = array('shadow_ribbon', 'geisha', 'classic_blue', 'blue_scroll');
 	if($system->environment == 'dev') {
-	    $layouts[] = 'blue_scroll';
 	    $layouts[] = 'cextralite';
 	}
 
