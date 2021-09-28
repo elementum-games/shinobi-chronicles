@@ -75,7 +75,7 @@ function userSettings() {
 		$result = $system->db_fetch($result);
 		
 		try {
-			if($system->verify_password($password, $result['password'])) {
+			if(!$system->verify_password($password, $result['password'])) {
 				throw new Exception("Current password is incorrect!");
 			}
 			
@@ -230,7 +230,8 @@ function userSettings() {
 		else {
 			$query = "UPDATE `users` SET `layout`='$layout' WHERE `user_id`='$player->user_id' LIMIT 1";
 			$system->query($query);
-			$system->message("Layout updated!<script type='text/javascript'>setTimeout('window.location.reload();', 2000);</script>");
+			$system->message("Layout updated!
+                <script type='text/javascript'>setTimeout('window.location.assign(window.location.href)', 2000);</script>");
 			$system->printMessage();
 		}
 	}
