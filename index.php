@@ -64,6 +64,7 @@ if(!isset($_SESSION['user_id'])) {
 			if(empty($password)) {
 				throw new Exception("Please enter password!");
 			}
+
 			// Get result
 			$result = $system->query("SELECT `user_id`, `user_name`, `password`, `failed_logins`, `current_ip`, `last_ip`, `user_verified` 
 				FROM `users` WHERE `user_name`='$user_name' LIMIT 1");
@@ -75,6 +76,7 @@ if(!isset($_SESSION['user_id'])) {
 				throw new Exception("Your account has not been verified. Please check your email for the activation code.
 				<a class='link' href='{$system->link}register.php?act=resend_verification&username=$user_name'>Resend Verification</a>");
 			}
+
 			// Check failed logins
 			if($result['failed_logins'] >= 3 && $_SERVER['REMOTE_ADDR'] != $result['current_ip'] && $_SERVER['REMOTE_ADDR'] != $result['last_ip']) {
 				throw new Exception("Account has been locked out!");
@@ -93,9 +95,11 @@ if(!isset($_SESSION['user_id'])) {
 				if($result['failed_logins'] > 0) {
 					$system->query("UPDATE `users` SET `failed_logins`= 0 WHERE `user_id`='{$result['user_id']}' LIMIT 1");
 				}
+
 				$player = new User($_SESSION['user_id']);
 				$player_display = $player->loadData();
 				$player->last_login = time();
+				$player->log(User::LOG_LOGIN, $_SERVER['REMOTE_ADDR']);
 				$player->updateData();
 			}
 			// If wrong, increment failed logins

@@ -120,6 +120,9 @@ function training() {
 					$train_length *= 1 - ($player->clan['boost_amount'] / 100);
 				}
 			}
+
+			$player->log(User::LOG_TRAINING, "Type: {$train_type} / Length: {$train_length}");
+
 			$player->train_type = $train_type;
 			$player->train_gain = $train_gain;
 			$player->train_time = time() + $train_length;
@@ -133,6 +136,7 @@ function training() {
 		$system->message("Training cancelled.");
 		$system->printMessage();
 	}
+
 	// Add rank stuff
 	echo "<table class='table'><tr><th colspan='3'>Academy</th></tr>
 		<tr><td colspan='3'>

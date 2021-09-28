@@ -188,6 +188,7 @@ class Battle {
      * @param User   $player
      * @param int    $battle_id
      * @param bool   $spectate
+     * @param bool   $load_fighters
      * @throws Exception
      */
     public function __construct(System $system, User $player, int $battle_id, bool $spectate = false, bool $load_fighters = true) {
