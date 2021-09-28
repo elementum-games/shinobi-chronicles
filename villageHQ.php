@@ -101,7 +101,7 @@ function villageHQ() {
 		// Pagination
 		$users_per_page = 10;
 		$min = 0;
-		if($_GET['min']) {
+		if(isset($_GET['min'])) {
 			$min = (int)$system->clean($_GET['min']);
 		}
 		
@@ -116,7 +116,7 @@ function villageHQ() {
 			<th style='width:30%;'>Experience</th>
 		</tr>";
 		
-		
+		$count = 0;
 		while($row = $system->db_fetch($result)) {
 			$class = '';
 			if(is_int($count++ / 2)) {

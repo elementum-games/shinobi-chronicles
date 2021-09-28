@@ -53,6 +53,7 @@ function arena() {
                     Battle::start($system, $player, $ai, Battle::TYPE_AI_ARENA);
 
                     arena();
+                    $player->log(User::LOG_ARENA, "Opponent {$ai->id} ({$ai->getName()})");
                     return true;
                 } catch(Exception $e) {
                     $system->message("Invalid opponent!");

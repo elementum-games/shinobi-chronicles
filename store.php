@@ -22,7 +22,7 @@ function store() {
 	
 	$player->getInventory();
 	
-	$max_consumables = 5;
+	$max_consumables = User::MAX_CONSUMABLES;
 	
 	if(!empty($_GET['view'])) {
 		$view = $_GET['view'];

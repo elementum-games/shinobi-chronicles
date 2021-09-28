@@ -80,7 +80,7 @@ function missions() {
 	// Display missions
 	$system->printMessage();
 	$view = $max_mission_rank;
-	if($_GET['view_rank']) {
+	if(isset($_GET['view_rank'])) {
 		$view = (int)$_GET['view_rank'];
 		if($view < 1 or $view > $max_mission_rank) {
 			$view = $max_mission_rank;
@@ -146,10 +146,10 @@ function runActiveMission() {
                 if(!$opponent) {
                     throw new Exception("Couldn't load opponent for mission!");
                 }
+                $opponent->loadData();
 
                 // Initialize start of battle stuff
                 if(!$player->battle_id) {
-                    $opponent->loadData();
                     Battle::start($system, $player, $opponent, Battle::TYPE_AI_MISSION);
                 }
 

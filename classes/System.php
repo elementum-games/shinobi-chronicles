@@ -1,6 +1,6 @@
 <?php
 
-require_once "classes/EntityId.php";
+require_once __DIR__ . '/EntityId.php';
 
 /*	Class:		System
 	Purpose: 	Handle database connection and queries. Handle storing and printing of error messages.
@@ -107,6 +107,8 @@ class System {
     // Misc stuff
     const SC_MAX_RANK = 3;
 
+    const MAX_LINK_DISPLAY_LENGTH = 60;
+
     public static $banned_words = [
         'fuck',
         'fuk',
@@ -175,7 +177,7 @@ class System {
     ];
 
     public function __construct() {
-        require("./secure/vars.php");
+        require __DIR__ . "/../secure/vars.php";
         /** @var $host */
         /** @var $username */
         /** @var $password */
@@ -276,6 +278,30 @@ class System {
             return mysqli_fetch_array($result);
         }
     }
+
+    /**
+     * @param false  $result
+     * @param string $return_type
+     * @return array|null
+     */
+    public function db_fetch_all($result = false, ?string $id_column = null): array {
+        if(!$result) {
+            $result = $this->db_result;
+        }
+
+        $entities = [];
+        while($row = $this->db_fetch($result)) {
+            if($id_column) {
+                $entities[$row[$id_column]] = $row;
+            }
+            else {
+                $entities[] = $row;
+            }
+        }
+        return $entities;
+    }
+
+
 
     /* function message(message, force_message)
 
@@ -450,7 +476,7 @@ class System {
             $search_array[count($search_array)] = "[/img]";
             $replace_array[count($replace_array)] = "<img src='[image_prefix]";
             $replace_array[count($replace_array)] = "<img src='[image_prefix]";
-            $replace_array[count($replace_array)] = "' style='/*IMG_SIZE*/' />";
+            $replace_array[count($replace_array)] = "' />";
         }
 
         $text = str_ireplace($search_array,$replace_array,$text);
@@ -458,14 +484,18 @@ class System {
         $search_array = [];
         $replace_array = [];
 
-        $reg_exUrl = "/(?:http|https)\:\/\/([a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,5})(?:\/[^\:\s\\\\]*)?/i";
-        preg_match_all($reg_exUrl, $text, $matches);
-
-        foreach($matches[0] as $pattern){
-            preg_match($reg_exUrl, $pattern, $url);
-
-            $text = str_replace($pattern, sprintf("<a href='%s' target='_blank'>%s</a>", $pattern, $pattern), $text);
-        }
+        $reg_exUrl = '/((?:http|https)\:\/\/(?:[a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,5})(?:\/[^\:\s\\\\]*)?)/i';
+        $text = preg_replace_callback(
+            $reg_exUrl,
+            function($matches) {
+                $display = $matches[1];
+                if(strlen($display) > System::MAX_LINK_DISPLAY_LENGTH) {
+                    $display = substr($display, 0, System::MAX_LINK_DISPLAY_LENGTH - 3) . '...';
+                }
+                return "<a href='{$matches[1]}' target='_blank'>{$display}</a>";
+            },
+            $text
+        );
 
         array_push($search_array, '[image_prefix]');
         array_push($replace_array, 'https://');

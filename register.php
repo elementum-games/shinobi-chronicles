@@ -222,7 +222,7 @@ if($_POST['register']) {
 		VALUES
 		('$user_name', '$password', '$email', '0', '{$_SERVER['REMOTE_ADDR']}', '0',
 		'$gender', '$village', '1', '1', '100.00', '100.00', '100.00', '100.00', '100.00', '100.00', '10.00',
-		'0', '0', '', '0', '" . $villages[$village]['location'] . "', '100', '0', '0', '0', '0',
+		'" . User::BASE_EXP . "', '0', '', '0', '" . $villages[$village]['location'] . "', '100', '0', '0', '0', '0',
 		'10', '10', '10', '0',
 		'5.00', '5.00', '5.00', '5.00',
 		'" . time() . "', '" . $verification_code . "', 'shadow_ribbon', './images/default_avatar.png',

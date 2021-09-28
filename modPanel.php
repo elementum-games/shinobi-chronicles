@@ -559,7 +559,7 @@ function modPanel() {
 				if(strlen($message) > 1000) {
 					throw new Exception("Message is too long! (" . strlen($message) . "/1000 chars)");
 				}
-				$system->query("UPDATE `system_storage` SET `global_message`='$message'");
+				$system->query("UPDATE `system_storage` SET `global_message`='$message', `time`='".time()."'");
 				$system->query("UPDATE `users` SET `global_message_viewed`=0");
 				$player->global_message_viewed = 0;
 				$system->message("Message posted!");
@@ -678,7 +678,7 @@ function modPanel() {
 			<div style='width:210px;margin-left:auto;margin-right:auto;text-align:center;'>
 				<p>Username</p>
 				<input type='text' name='user_name' value='" . ($_GET['ban_user_name'] ?? "") . "' /><br />
-				<div style='height:56px;text-align:left;padding-top:13px;'>
+				<div style='text-align:left;padding-top:13px;'>
 				<label for='ban_type'>Ban type:</label>
 					<select name='ban_type' style='width:100px;'>
 						<option value='tavern' /> Tavern ban</option>

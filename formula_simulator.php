@@ -1,194 +1,388 @@
 <?php
 session_start();
 if(!isset($_SESSION['user_id'])) {
-	exit;
+    exit;
 }
 
 require("classes.php");
 $system = new System();
 $system->dbConnect();
+
 $user = new User($_SESSION['user_id']);
 $user->loadData();
 
 if($user->staff_level < System::SC_ADMINISTRATOR) {
-	exit;
+    exit;
 }
 
-$stats = array('ninjutsu_skill', 'taijutsu_skill', 'genjutsu_skill', 'speed', 'cast_speed', 'intelligence', 'willpower');
-$scenario_stats = array('offense', 'speed', 'intelligence', 'willpower');
+class TestFighter extends Fighter {
+    public string $name = 'test';
+    public int $rank = 1;
+
+    public function getAvatarSize(): int {
+        return 125;
+    }
+
+    public function getName(): string {
+        return $this->name;
+    }
+
+    public function getInventory() {
+    }
+
+    public function hasItem(int $item_id): bool {
+        return true;
+    }
+
+    public function useJutsu(Jutsu $jutsu, $purchase_type) {
+
+    }
+
+    public function updateInventory() {
+
+    }
+
+    public function updateData() {
+
+    }
+}
+
+function calcDamage(Fighter $player1, Fighter $player2, Jutsu $player1_jutsu, Jutsu $player2_jutsu) {
+    global $system;
+    global $user;
+
+    $player1_raw_damage = $player1->calcDamage($player1_jutsu,'equipped_jutsu', true);
+    $player2_raw_damage = $player2->calcDamage($player2_jutsu,'equipped_jutsu', true);
+
+    // Collision
+    $battle_id = Battle::start($system, $player1, $player2, Battle::TYPE_SPAR);
+    $battle = new Battle($system, $user, $battle_id, true, false);
+    $collision_text = $battle->jutsuCollision(
+        $player1, $player2,
+        $player1_raw_damage, $player2_raw_damage,
+        $player1_jutsu, $player2_jutsu
+    );
+
+    $system->query("DELETE FROM battles WHERE `battle_id`={$battle_id}");
+
+    $player1_collision_damage = $player1_raw_damage;
+    $player2_collision_damage = $player2_raw_damage;
+
+    $player1_damage = $player2->calcDamageTaken($player1_collision_damage, $player1_jutsu->jutsu_type);
+    $player2_damage = $player1->calcDamageTaken($player2_collision_damage, $player2_jutsu->jutsu_type);
+
+    // Display
+    $damages = [
+        'player1' => [
+            'raw_damage' => $player1_raw_damage,
+            'collision_damage' => $player1_collision_damage,
+            'damage' => $player1_damage,
+        ],
+        'player2' => [
+            'raw_damage' => $player2_raw_damage,
+            'collision_damage' => $player2_collision_damage,
+            'damage' => $player2_damage,
+        ],
+        'collision_text' => $collision_text,
+    ];
+    return $damages;
+}
+
+$stats = [
+    'ninjutsu_skill',
+    'taijutsu_skill',
+    'genjutsu_skill',
+    'speed',
+    'cast_speed',
+    'intelligence',
+    'willpower'
+];
+$scenario_stats = ['offense', 'speed', 'intelligence', 'willpower'];
 
 $jutsu_power = 5;
 $jutsu_type = 'ninjutsu';
 
-$player1_jutsu['jutsu_type'] = $jutsu_type;
-$player2_jutsu['jutsu_type'] = $jutsu_type;
+$player1_jutsu_type = $jutsu_type;
+$player2_jutsu_type = $jutsu_type;
 
-if($_POST['run_simulation'] && $_POST['mode'] == 'vs') {
-	$player1 = $_POST['stats1'];
-	$player2 = $_POST['stats2'];
-	
-	$player2['jutsu_power'] = $player1['jutsu_power'];
-	
-	$damages = calcDamage($player1, $player2);
-	
-	echo "<div style='width:500px;background-color:#EAEAEA;text-align:center;margin-left:auto;margin-right:auto;
+$mode = 'scenarios';
+if(($_POST['mode'] ?? '') == 'scenarios' || ($_GET['mode'] ?? '') == 'scenarios') {
+    $mode = 'scenarios';
+}
+if(($_POST['mode'] ?? '') == 'vs' || ($_GET['mode'] ?? '') == 'vs') {
+    $mode = 'vs';
+}
+
+if($_POST['run_simulation'] && $mode == 'vs') {
+    $player1_data = $_POST['stats1'];
+    $player2_data = $_POST['stats2'];
+
+    $player2_jutsu->power = $player1_jutsu->power;
+
+    $damages = calcDamage($player1, $player2);
+
+    echo "<div style='width:500px;background-color:#EAEAEA;text-align:center;margin-left:auto;margin-right:auto;
 		padding:8px;border:1px solid #000000;border-radius:10px;'>
 	Player 1:<br />
 	{$damages['player1']['raw_damage']} raw damage<br />
 	{$damages['player1']['collision_damage']} post-collision damage<br />
 	{$damages['player1']['damage']} final damage<br />";
-	
-	if($damages['collision_text']) {
-		echo "<hr />" . $damages['collision_text'] . "<hr />";
-	}
-	else {
-		echo "<hr />";
-	}
-	
-	echo "Player 2:<br />
+
+    if($damages['collision_text']) {
+        echo "<hr />" . $damages['collision_text'] . "<hr />";
+    }
+    else {
+        echo "<hr />";
+    }
+
+    echo "Player 2:<br />
 	{$damages['player2']['raw_damage']} raw damage<br />
 	{$damages['player2']['collision_damage']} post-collision damage<br />
 	{$damages['player2']['damage']} final damage<br />
 	</div>";
 }
-else if($_POST['run_simulation'] && $_POST['mode'] == 'scenarios') {
-	$base_level = $_POST['base_level'];
-	$max_level = $_POST['max_level'];
-	$base_skill = $_POST['base_skill'];
-	$base_stats = $_POST['base_stats'];
-	$base_health = $_POST['base_health'];
-	$base_jutsu_power = $_POST['base_jutsu_power'];
-	$health_gain = $_POST['health_gain'];
-	$skill_gain = $_POST['skill_gain'];
-	$stat_gain = $_POST['stat_gain'];
-	$jutsu_power_gain = $_POST['jutsu_power_gain'];	
-	
-	$player1 = array(
-		'ninjutsu_skill' => 10,
-		'taijutsu_skill' => 10,
-		'genjutsu_skill' => 10,
-		'speed' => 5,
-		'cast_speed' => 5,
-		'intelligence' => 5,
-		'willpower' => 5,
-		'jutsu_power' => $base_jutsu_power
-	);
-	$player2 = array(
-		'ninjutsu_skill' => 10,
-		'taijutsu_skill' => 10,
-		'genjutsu_skill' => 10,
-		'speed' => 5,
-		'cast_speed' => 5,
-		'intelligence' => 5,
-		'willpower' => 5,
-		'jutsu_power' => $base_jutsu_power
-	);
-	
-	$player1['jutsu_type'] = 'ninjutsu';
-	$player2['jutsu_type'] = 'taijutsu';
-	
-	// Set jutsu type specific stats to base for rank
-	switch($player1['jutsu_type']) {
-		case 'ninjutsu':
-			$player1['ninjutsu_skill'] = $base_skill;
-			$player1['cast_speed'] = $base_stats;
-			break;
-		case 'taijutsu':
-			$player1['taijutsu_skill'] = $base_skill;
-			$player1['speed'] = $base_stats;
-			break;
-		case 'genjutsu':
-			$player1['genjutsu_skill'] = $base_skill;
-			break;
-	}
-	switch($player2['jutsu_type']) {
-		case 'ninjutsu':
-			$player2['ninjutsu_skill'] = $base_skill;
-			$player2['cast_speed'] = $base_stats;
-			break;
-		case 'taijutsu':
-			$player2['taijutsu_skill'] = $base_skill;
-			$player2['speed'] = $base_stats;
-			break;
-		case 'genjutsu':
-			$player2['genjutsu_skill'] = $base_skill;
-			break;
-	}
-		
-	$player1['jutsu_power'] = $base_jutsu_power;
-	$player2['jutsu_power'] = $base_jutsu_power;
-	
-	$damages = array();
-	$level = $base_level;
-	$health = $base_health;
-	
-	// Calc damage ranges
-	$damage = calcDamage($player1, $player2);
-	$damages[$level]['player1'] = $damage['player1']['damage'];
-	$damages[$level]['player2'] = $damage['player2']['damage'];
-	$damages[$level]['health'] = $health;
-	
-	for($level = $base_level + 1; $level <= $max_level; $level++) {
-		switch($player1['jutsu_type']) {
-			case 'ninjutsu':
-				$player1['ninjutsu_skill'] += $skill_gain;
-				$player1['cast_speed'] += $stat_gain;
-				break;
-			case 'taijutsu':
-				$player1['taijutsu_skill'] += $skill_gain;
-				$player1['speed'] += $stat_gain;
-				break;
-			case 'genjutsu':
-				$player1['genjutsu_skill'] += $skill_gain;
-				break;
-		}
-		switch($player2['jutsu_type']) {
-			case 'ninjutsu':
-				$player2['ninjutsu_skill'] += $skill_gain;
-				$player2['cast_speed'] += $stat_gain;
-				break;
-			case 'taijutsu':
-				$player2['taijutsu_skill'] += $skill_gain;
-				$player2['speed'] += $stat_gain;
-				break;
-			case 'genjutsu':
-				$player2['genjutsu_skill'] += $skill_gain;
-				break;
-		}
-		
-		$health += $health_gain;
-		$player1['jutsu_power'] += $jutsu_power_gain;
-		$player2['jutsu_power'] += $jutsu_power_gain;
-		
-		$damage = calcDamage($player1, $player2);
-		$damages[$level]['player1'] = $damage['player1']['damage'];
-		$damages[$level]['player2'] = $damage['player2']['damage'];
-		$damages[$level]['health'] = $health;
-		
-	}
-	
-	
-	echo "<div style='width:500px;background-color:#EAEAEA;text-align:center;margin-left:auto;margin-right:auto;
-		padding:8px;border:1px solid #000000;border-radius:10px;'>";
-		foreach($damages as $level => $damage) {
-			echo "<span style='display:inline-block;width:" . (70 + (strlen($max_level) * 10)) . "px;'>Level $level:</span>" . 
-				$damage['health'] . " HP / " . sprintf("%.1f", $damage['player1']) . " damage (" . round($damage['health'] / $damage['player1'], 1) .
-				" turns)<br />";
-		}
-		echo "Final stats: <br />" .
-		$player1['ninjutsu_skill'] . ' nin skill, ' . $player1['taijutsu_skill'] . ' tai skill<br />' .
-		$player1['cast_speed'] . ' cast speed, ' . $player1['speed'] . ' speed<br />' .
-		$player1['jutsu_power'] . ' jutsu power.';
-		
-	echo "<br />
+else if($_POST['run_simulation'] && $mode == 'scenarios') {
+    $base_level = $_POST['base_level'];
+    $max_level = $_POST['max_level'];
+    
+    $base_stats = $_POST['base_stats'];
+    $original_attribute_ratio = round($_POST['attribute_ratio'] / 100, 2);
+    $base_health = $_POST['base_health'];
+    $base_jutsu_power = $_POST['base_jutsu_power'];
+    
+    $max_level_health = $_POST['max_level_health'];
+    $max_level_stats = $_POST['max_level_stats'];
+    $max_level_jutsu_power = $_POST['max_level_jutsu_power'];
+    $max_level_jutsu_level = $_POST['max_level_jutsu_level'];
+
+    $num_levels = $max_level - $base_level;
+
+    $health_gain = ($max_level_health - $base_health) / $num_levels;
+    $stat_gain = ($max_level_stats - $base_stats) / $num_levels;
+    $jutsu_power_gain = round(($max_level_jutsu_power - $base_jutsu_power) / $num_levels, 3);
+
+    $base_jutsu_level = 20;
+    $jutsu_level_gain = ($max_level_jutsu_level - $base_jutsu_level) / $num_levels;
+
+    $player1 = new TestFighter();
+    $player1->name = "Player 1";
+    $player1->system = $system;
+    $player1->ninjutsu_skill = 10;
+    $player1->taijutsu_skill = 10;
+    $player1->genjutsu_skill = 10;
+    $player1->speed = 10;
+    $player1->cast_speed = 10;
+    $player1->intelligence = 10;
+    $player1->willpower = 10;
+    $player1_jutsu = new Jutsu(
+        1,
+        'p1j',
+        $player1->rank,
+        Jutsu::TYPE_NINJUTSU,
+        $base_jutsu_power,
+        'none',
+        0,
+        0,
+        'no',
+        'nope',
+        0,
+        Jutsu::USE_TYPE_PROJECTILE,
+        0,
+        0,
+        Jutsu::PURCHASE_TYPE_PURCHASEABLE,
+        0,
+        Jutsu::ELEMENT_NONE,
+        1
+    );
+    $player1_jutsu->setLevel($base_jutsu_level, 0);
+
+    $player2 = new TestFighter();
+    $player2->system = $system;
+    $player2->name = "Player 2";
+    $player2->ninjutsu_skill = 10;
+    $player2->taijutsu_skill = 10;
+    $player2->genjutsu_skill = 10;
+    $player2->speed = 10;
+    $player2->cast_speed = 10;
+    $player2->intelligence = 10;
+    $player2->willpower = 10;
+    $player2_jutsu = new Jutsu(
+        2,
+        'p2j',
+        $player2->rank,
+        Jutsu::TYPE_TAIJUTSU,
+        $base_jutsu_power,
+        'none',
+        0,
+        0,
+        'no',
+        'nope',
+        0,
+        Jutsu::USE_TYPE_PHYSICAL,
+        0,
+        0,
+        Jutsu::PURCHASE_TYPE_PURCHASEABLE,
+        0,
+        Jutsu::ELEMENT_NONE,
+        2
+    );
+    $player2_jutsu->setLevel($base_jutsu_level, 0);
+
+    $total_ratio = 1 + $original_attribute_ratio;
+
+    $skill_ratio = 1 / $total_ratio;
+    $attribute_ratio = $original_attribute_ratio / $total_ratio;
+
+    // Set jutsu type specific stats to base for rank
+    switch($player1_jutsu->jutsu_type) {
+        case Jutsu::TYPE_NINJUTSU:
+            $player1->ninjutsu_skill = $base_stats * $skill_ratio;
+            $player1->cast_speed = $base_stats * $attribute_ratio;
+            break;
+        case Jutsu::TYPE_TAIJUTSU:
+            $player1->taijutsu_skill = $base_stats * $skill_ratio;
+            $player1->speed = $base_stats * $attribute_ratio;
+            break;
+        case Jutsu::TYPE_GENJUTSU:
+            $player1->genjutsu_skill = $base_stats;
+            break;
+    }
+    switch($player2_jutsu->jutsu_type) {
+        case Jutsu::TYPE_NINJUTSU:
+            $player2->ninjutsu_skill = $base_stats * $skill_ratio;
+            $player2->cast_speed = $base_stats * $attribute_ratio;
+            break;
+        case Jutsu::TYPE_TAIJUTSU:
+            $player2->taijutsu_skill = $base_stats * $skill_ratio;
+            $player2->speed = $base_stats * $attribute_ratio;
+            break;
+        case Jutsu::TYPE_GENJUTSU:
+            $player2->genjutsu_skill = $base_stats;
+            break;
+    }
+
+    $damages = [];
+    $level = $base_level;
+    $health = $base_health;
+
+    $player1->max_health = $health;
+    $player1->health = $player1->max_health;
+
+    $player2->max_health = $health;
+    $player2->health = $player2->max_health;
+
+    // Calc damage ranges
+    $damage = calcDamage($player1, $player2, $player1_jutsu, $player2_jutsu);
+    $damages[$level]['player1'] = $damage['player1']['damage'];
+    $damages[$level]['player2'] = $damage['player2']['damage'];
+    $damages[$level]['health'] = $health;
+
+    for($level = $base_level + 1; $level <= $max_level; $level++) {
+        switch($player1_jutsu->jutsu_type) {
+            case Jutsu::TYPE_NINJUTSU:
+                $player1->ninjutsu_skill += round($stat_gain * $skill_ratio, 1);
+                $player1->cast_speed += round($stat_gain * $attribute_ratio, 1);
+                break;
+            case Jutsu::TYPE_TAIJUTSU:
+                $player1->taijutsu_skill += round($stat_gain * $skill_ratio, 1);
+                $player1->speed += round($stat_gain * $attribute_ratio, 1);
+                break;
+            case Jutsu::TYPE_GENJUTSU:
+                $player1->genjutsu_skill += round($stat_gain, 1);
+                break;
+        }
+        switch($player2_jutsu->jutsu_type) {
+            case Jutsu::TYPE_NINJUTSU:
+                $player2->ninjutsu_skill += round($stat_gain * $skill_ratio, 1);
+                $player2->cast_speed += round($stat_gain * $attribute_ratio, 1);
+                break;
+            case Jutsu::TYPE_TAIJUTSU:
+                $player2->taijutsu_skill += round($stat_gain * $skill_ratio, 1);
+                $player2->speed += round($stat_gain * $attribute_ratio, 1);
+                break;
+            case Jutsu::TYPE_GENJUTSU:
+                $player2->genjutsu_skill += round($stat_gain, 1);
+                break;
+        }
+
+        $health += $health_gain;
+
+        $player1->max_health = $health;
+        $player1->health = $player1->max_health;
+
+        $player2->max_health = $health;
+        $player2->health = $player2->max_health;
+
+        $player1_jutsu->base_power += $jutsu_power_gain;
+        $player2_jutsu->base_power += $jutsu_power_gain;
+
+        $player1_jutsu->setLevel($player1_jutsu->level + $jutsu_level_gain, 0);
+        $player2_jutsu->setLevel($player2_jutsu->level + $jutsu_level_gain, 0);
+
+        $damage = calcDamage($player1, $player2, $player1_jutsu, $player2_jutsu);
+        $damages[$level]['player1'] = $damage['player1']['damage'];
+        $damages[$level]['player2'] = $damage['player2']['damage'];
+        $damages[$level]['health'] = $health;
+
+    }
+
+    $label_width = 120;
+    echo "<style type='text/css'>
+        label {
+            display: inline-block;
+            text-align: left;
+        }
+    </style>";
+    echo "<div style='width:500px;background-color:#EAEAEA;text-align:center;margin-left:auto;margin-right:auto;
+		padding:8px;border:1px solid #000000;border-radius:10px;'>
+		<label style='width:{$label_width}px;'>Health gain:</label>
+        <label style='width:80px;'>" . round($health_gain, 2) . "</label><br />
+        
+        <label style='width:{$label_width}px;'>Stats gain:</label>
+        <label style='width:80px;'>" . round($stat_gain, 2) . "</label><br />
+        
+        <label style='width:{$label_width}px;'>Jutsu power gain:</label>
+        <label style='width:80px;'>" . round($jutsu_power_gain, 2) . "</label><br />
+        <br />";
+
+    $label_width = (70 + (strlen($max_level) * 10));
+    foreach($damages as $level => $damage) {
+        echo "<label style='width:{$label_width}px;'>Level $level:</label>" .
+            "<label style='width:" . round($label_width * 2.4) . "px;'>" .
+            round($damage['health'], 1) . " HP / " .
+            sprintf("%.1f", $damage['player1']) . " damage" .
+            "</label>" .
+            "<label style='width:{$label_width}px'>(" . round($damage['health'] / $damage['player1'], 1) .
+            " turns)</label><br />";
+    }
+    echo "<br />Final stats: <br />" .
+        round($player1->ninjutsu_skill, 1) . ' nin skill, ' . round($player1->taijutsu_skill, 1) . ' tai skill<br />' .
+        round($player1->cast_speed, 1) . ' cast speed, ' . round($player1->speed, 1) . ' speed<br />' .
+        round($player1_jutsu->power, 1) . ' jutsu power.';
+
+    echo "<br />
 	</div>";
 }
-	
+
+
+$rankManager = new RankManager($system);
+$rankManager->loadRanks();
+$ranks_prefill_data = array_map(function($rank) use ($rankManager) {
+    return [
+        'id' => $rank->id,
+        'name' => $rank->name,
+        'base_level' => $rank->base_level,
+        'max_level' => $rank->max_level,
+        'base_stats' => $rank->base_stats,
+        'base_health' => $rankManager->healthForRankAndLevel($rank->id, $rank->base_level),
+        'base_jutsu_power' => (float)$rank->id,
+        'max_level_health' => $rankManager->healthForRankAndLevel($rank->id, $rank->max_level),
+        'max_level_stats' => $rankManager->statsForRankAndLevel($rank->id, $rank->max_level),
+        'max_level_jutsu_power' => $rank->id + 0.9,
+    ];
+}, $rankManager->ranks);
+
 // Display form
-$display = 'vs';
-if($_POST['mode'] == 'scenarios') {
-	$display = 'scenarios';
-}
 echo "<style type='text/css'>
 label {
 	display: inline-block;
@@ -197,21 +391,27 @@ label {
 
 <br />
 <div style='text-align:center;'>
-<script type='text/javascript' src='http://code.jquery.com/jquery-2.1.0.min.js'></script>
+<script type='text/javascript' src='./scripts/jquery-2.1.0.min.js'></script>
 <script type='text/javascript'>
-function changeDisplay(display_id) {
-	$('.displayDiv').hide();
-	$('#' + display_id).show();
-}
-
+    function changeDisplay(display_id) {
+        $('.displayDiv').hide();
+        $('#' + display_id).show();
+    }
 </script>
+
+<a href='formula_simulator.php?mode=vs'>VS</a>
+&nbsp;&nbsp;|&nbsp;&nbsp;
+<a href='formula_simulator.php?mode=scenarios'>Damage/Level Curve</a>
+<br />
+<br />
+
 <!--VS DISPLAY-->
-<div id='vs' class='displayDiv' " . ($display == 'scenarios' ? "style='display:none;'" : '') . ">
+<div id='vs' class='displayDiv' " . ($mode == 'scenarios' ? "style='display:none;'" : '') . ">
 	<form action='./formula_simulator.php' method='post'>
 	<div style='width:300px;display:inline-block;border:1px solid #000000;border-radius:10px;'>
 		Player 1<br />";
-		foreach($stats as $stat) {
-			echo "<label style='width:110px;'>$stat:</label>
+foreach($stats as $stat) {
+    echo "<label style='width:110px;'>$stat:</label>
 				<input type='text' name='stats1[$stat]' value='{$_POST['stats1'][$stat]}' /><br />";
 		}
 		echo "<label style='width:110px;'>Jutsu power:</label>
@@ -227,10 +427,12 @@ function changeDisplay(display_id) {
 	<div style='width:300px;display:inline-block;border:1px solid #000000;border-radius:10px;margin-left:20px;'>
 		Player 2<br />";
 		foreach($stats as $stat) {
-			echo "<label style='width:110px;'>$stat:</label>
+            echo "<label style='width:110px;'>$stat:</label>
 				<input type='text' name='stats2[$stat]' value='{$_POST['stats2'][$stat]}' /><br />";
-		}
-		echo "<label style='width:110px;'>Jutsu power:</label>
+        }
+/** @noinspection JSCheckFunctionSignatures */
+/** @noinspection JSUnnecessarySemicolon */
+echo "<label style='width:110px;'>Jutsu power:</label>
 			<input type='text' name='stats2[jutsu_power]' value='{$_POST['stats2']['jutsu_power']}' /><br /> 
 		<input type='radio' name='stats2[jutsu_type]' value='ninjutsu' " . 
 			($_POST['stats2']['jutsu_type'] == 'ninjutsu' ? "checked='checked'" : '') . "/> Ninjutsu<br />
@@ -249,331 +451,75 @@ function changeDisplay(display_id) {
 </div>
 
 <!--SCENARIO DISPLAY-->
-<div id='scenario' class='displayDiv'" . ($display == 'vs' ? "style='display:none;'" : '') . ">
+<style type='text/css'>
+    .scenario_input {
+        width:500px;
+        display:inline-block;
+        border:1px solid #000000;
+        background: rgba(0,0,0,0.4);
+        border-radius:10px;
+        padding:5px;
+    }
+</style>
+<script type='text/javascript'>
+    let ranks = " . json_encode($ranks_prefill_data) . ";
+    function prefillRank(id) {
+        if(typeof ranks[id] === 'undefined') {
+            return;
+        }
+        
+        rank = ranks[id];
+        
+        let fields = [
+            'base_level',
+            'max_level',
+            'base_stats',
+            'base_health',
+            'base_jutsu_power',
+            'max_level_health',
+            'max_level_stats',
+            'max_level_jutsu_power',
+        ]
+        fields.forEach(field => {  
+            document.getElementById(field).value = rank[field];
+        })
+    }
+</script>
+<div id='scenario' class='displayDiv' " . ($mode == 'vs' ? "style='display:none;'" : '') . ">
+    <div id='rank_select'>";
+        foreach($ranks_prefill_data as $id => $rank) {
+            echo "<button onClick='prefillRank({$rank['id']})'>{$rank['id']}: {$rank['name']}</button>";
+        }
+    echo "</div>
 	<form action='./formula_simulator.php' method='post'>
-	<div style='width:300px;display:inline-block;border:1px solid #000000;border-radius:10px;'>
-		Sim details<br />
-		Base level: <input type='text' name='base_level' value='{$_POST['base_level']}' /><br />
-		Max level: <input type='text' name='max_level' value='{$_POST['max_level']}' /><br />
-		Base skill: <input type='text' name='base_skill' value='{$_POST['base_skill']}' /><br />
-		Base stats: <input type='text' name='base_stats' value='{$_POST['base_stats']}' /><br />
-		Base health: <input type='text' name='base_health' value='{$_POST['base_health']}' /><br />
-		Base jutsu power: <input type='text' name='base_jutsu_power' value='{$_POST['base_jutsu_power']}' /><br />
-		<br />
-		Health gain: <input type='text' name='health_gain' value='{$_POST['health_gain']}' /><br />
-		Skill gain: <input type='text' name='skill_gain' value='{$_POST['skill_gain']}' /><br />
-		Stat gain: <input type='text' name='stat_gain' value='{$_POST['stat_gain']}' /><br />
-		Jutsu power gain: <input type='text' name='jutsu_power_gain' value='{$_POST['jutsu_power_gain']}' /><br />
-	</div>
-	<br />
-	<br />
-	<input type='radio' name='mode' value='vs' onclick='changeDisplay(\"vs\")' /> Versus<br />
-	<input type='radio' name='mode' value='scenarios' onclick='changeDisplay(\"scenario\")' checked='checked' /> Scenarios<br />
-	<input type='submit' name='run_simulation' value='Run Simulation' />
+        <div class='scenario_input'>
+            Sim details<br />
+            Base level: <input type='text' id='base_level' name='base_level' value='{$_POST['base_level']}' /><br />
+            Max level: <input type='text' id='max_level' name='max_level' value='{$_POST['max_level']}' /><br />
+            Base stats: <input type='text' id='base_stats' name='base_stats' value='{$_POST['base_stats']}' /><br />
+            Attribute ratio: 
+                <select name='attribute_ratio''>";
+                    for($i = 10; $i < 60; $i += 10) {
+                        echo "<option value='{$i}' " . (($_POST['attribute_ratio'] ?? 40) == $i ? "selected='selected'" : "") . ">{$i}%</option>";
+                    }
+                echo "</select><br />
+            Base health: <input type='text' id='base_health' name='base_health' value='{$_POST['base_health']}' /><br />
+            Base jutsu power: <input type='text' id='base_jutsu_power' name='base_jutsu_power' value='{$_POST['base_jutsu_power']}' /><br />
+            <br />
+            Max level health: <input type='text' id='max_level_health' name='max_level_health' value='{$_POST['max_level_health']}' /><br />
+            Max level stats: <input type='text' id='max_level_stats' name='max_level_stats' value='{$_POST['max_level_stats']}' /><br />
+            Max level jutsu power: <input type='text' id='max_level_jutsu_power' name='max_level_jutsu_power' value='{$_POST['max_level_jutsu_power']}' /><br />
+            Max level jutsu level: <input type='text' id='max_level_jutsu_level' name='max_level_jutsu_level' 
+                value='" . ($_POST['max_level_jutsu_level'] ?? 50) . "' /><br />
+        </div>
+        <br />
+        <br />
+        <input type='radio' name='mode' value='vs' onclick='changeDisplay(\"vs\")' /> Versus<br />
+        <input type='radio' name='mode' value='scenarios' onclick='changeDisplay(\"scenario\")' checked='checked' /> Damage/Level Curve<br />
+        <input type='submit' name='run_simulation' value='Run Simulation' />
 	</form>
 </div>
 </div>";
 
-function jutsuCollision(&$player, &$opponent, &$player_damage, &$opponent_damage, $player_jutsu, $opponent_jutsu) {
-	$collision_text = '';
-		
-	if($player_jutsu['element'] && $opponent_jutsu['element']) {
-		// Fire > Wind > Lightning > Earth > Water > Fire
-		if($player_jutsu['element'] == 'fire') {
-			if($opponent_jutsu['element'] == 'wind') {
-				$opponent_damage *= 0.8;
-			}
-			else if($opponent_jutsu['element'] == 'water') {
-				$player_damage *= 0.8;
-			}
-		}
-		else if($player_jutsu['element'] == 'wind') {
-			if($opponent_jutsu['element'] == 'lightning') {
-				$opponent_damage *= 0.8;
-			}
-			else if($opponent_jutsu['element'] == 'fire') {
-				$player_damage *= 0.8;
-			}
-		}
-		else if($player_jutsu['element'] == 'lightning') {
-			if($opponent_jutsu['element'] == 'earth') {
-				$opponent_damage *= 0.8;
-			}
-			else if($opponent_jutsu['element'] == 'wind') {
-				$player_damage *= 0.8;
-			}
-		}
-		else if($player_jutsu['element'] == 'earth') {
-			if($opponent_jutsu['element'] == 'water') {
-				$opponent_damage *= 0.8;
-			}
-			else if($opponent_jutsu['element'] == 'lightning') {
-				$player_damage *= 0.8;
-			}
-		}
-		else if($player_jutsu['element'] == 'water') {
-			if($opponent_jutsu['element'] == 'fire') {
-				$opponent_damage *= 0.8;
-			}
-			else if($opponent_jutsu['element'] == 'earth') {
-				$player_damage *= 0.8;
-			}
-		}
-		
-	}	
-	
-	if($player_jutsu['jutsu_type'] == 'genjutsu' or $opponent_jutsu['jutsu_type'] == 'genjutsu') {
-		return false;
-	}
-	
-	$player_min_damage = $player_damage * 0.5;
-	if($player_min_damage < 1) {
-		$player_min_damage = 1;
-	}
-	
-	$opponent_min_damage = $opponent_damage * 0.5;
-	if($opponent_min_damage < 1) {
-		$opponent_min_damage = 1;
-	}
-	
-	// Apply buffs/nerfs
-	$player_speed = 50 + ($player['speed'] * 0.5);
-	if($player_speed <= 0) {
-		$player_speed = 1;
-	}
-	$player_cast_speed = 50 + ($player['cast_speed'] * 0.6);
-	if($player_cast_speed <= 0) {
-		$player_cast_speed = 1;
-	}
-	
-	$opponent_speed = 50 + ($opponent['speed'] * 0.5);
-	if($opponent_speed <= 0) {
-		$opponent_speed = 1;
-	}
-	$opponent_cast_speed = 50 + ($opponent['cast_speed'] * 0.6);
-	if($opponent_cast_speed <= 0) {
-		$opponent_cast_speed = 1;
-	}	
-	
-	
-	// Ratios for damage reduction
-	$speed_ratio = 0.8;
-	$cast_speed_ratio = 0.8;
-	$max_damage_reduction = 0.5;
-	
-	if($player_jutsu['jutsu_type'] == 'ninjutsu') {
-		// Nin vs Nin
-		if($opponent_jutsu['jutsu_type'] == 'ninjutsu') {			
-			$player_damage -= $player_min_damage;
-			$opponent_damage -= $opponent_min_damage;
-			
-			$collision_result = $player_damage - $opponent_damage;
-			if($collision_result >= 0) {
-				$damage_reduction = round(1 - ($player_min_damage + $collision_result) / ($player_damage + $player_min_damage), 2);
-				
-				$player_damage = $player_min_damage + $collision_result;
-				$opponent_damage = $opponent_min_damage;
-				
-				$collision_text .= "[player]'s jutsu clashed with [opponent]'s jutsu";
-				if($damage_reduction >= 1) {
-					$collision_text .= ", losing " . ($damage_reduction * 100) . "% damage before breaking through!";
-				}
-				else {
-					$collision_text .= " and broke through!";
-				}
-			}
-			else {
-				$damage_reduction = round(1 - ($opponent_min_damage + abs($collision_result)) / ($opponent_damage + $opponent_min_damage), 2);
-				
-				$opponent_damage = $opponent_min_damage + abs($collision_result);
-				$player_damage = $player_min_damage;
-				
-				$collision_text .= "[opponent]'s jutsu clashed with [player]'s jutsu";
-				if($damage_reduction >= 1) {
-					$collision_text .= ", losing " . ($damage_reduction * 100) . "% damage before breaking through!";
-				}
-				else {
-					$collision_text .= " and broke through!";
-				}
-			}				
-		}
-		// Nin vs Tai
-		else if($opponent_jutsu['jutsu_type'] == 'taijutsu') {
-			if($player_cast_speed >= $opponent_speed) {
-				$damage_reduction = ($player_cast_speed / $opponent_speed) - 1.0;
-				$damage_reduction = round($damage_reduction * $cast_speed_ratio, 2);
-				if($damage_reduction > $max_damage_reduction) {
-					$damage_reduction = $max_damage_reduction;
-				}
-				
-				if($damage_reduction >= 0.01) {
-					$opponent_damage *= 1 - $damage_reduction;
-					$collision_text .= "[player] cast [gender2] jutsu before [opponent] attacked, negating " . ($damage_reduction * 100) . 
-					"% of [opponent]'s damage!";	
-				}
-			}
-			else {
-				$damage_reduction = ($opponent_speed / $player_cast_speed) - 1.0;
-				$damage_reduction = round($damage_reduction * $speed_ratio, 2);
-				if($damage_reduction > $max_damage_reduction) {
-					$damage_reduction = $max_damage_reduction;
-				}
-				
-				if($damage_reduction >= 0.01) {
-					$player_damage *= 1 - $damage_reduction;
-					$collision_text .= "[opponent] swiftly evaded " . ($damage_reduction * 100) . "% of [player]'s damage!";
-				}
-			}
-			
-		}
-	}
-	// Taijutsu clash
-	else if($player_jutsu['jutsu_type'] == 'taijutsu') {
-		// Tai vs Tai
-		if($opponent_jutsu['jutsu_type'] == 'taijutsu') {
-			if($player_speed >= $opponent_speed) {
-				$damage_reduction = ($player_speed / $opponent_speed) - 1.0;
-				$damage_reduction = round($damage_reduction * $speed_ratio, 2);
-				if($damage_reduction > $max_damage_reduction) {
-					$damage_reduction = $max_damage_reduction;
-				}
-				
-				if($damage_reduction >= 0.01) {
-					$opponent_damage *= 1 - $damage_reduction;
-					$collision_text .= "[player] swiftly evaded " . ($damage_reduction * 100) . "% of [opponent]'s damage!";	
-				}
-			}
-			else {
-				$damage_reduction = ($opponent_speed / $player_speed) - 1.0;
-				$damage_reduction = round($damage_reduction * $speed_ratio, 2);	
-				
-				if($damage_reduction > $max_damage_reduction) {
-					$damage_reduction = $max_damage_reduction;
-				}
-				
-				if($damage_reduction >= 0.01) {
-					$player_damage *= 1 - $damage_reduction;
-					$collision_text .= "[opponent] swiftly evaded " . ($damage_reduction * 100) . "% of [player]'s damage!";	
-				}
-			}
-		}
-		else if($opponent_jutsu['jutsu_type'] == 'ninjutsu') {
-			if($player_speed >= $opponent_cast_speed) {
-				$damage_reduction = ($player_speed / $opponent_cast_speed) - 1.0;
-				$damage_reduction = round($damage_reduction * $speed_ratio, 2);
-				if($damage_reduction > $max_damage_reduction) {
-					$damage_reduction = $max_damage_reduction;
-				}
-				
-				if($damage_reduction >= 0.01) {
-					$opponent_damage *= 1 - $damage_reduction;
-					$collision_text .= "[player] swiftly evaded " . ($damage_reduction * 100) . "% of [opponent]'s damage!";	
-				}
-			}
-			else {
-				$damage_reduction = ($opponent_cast_speed / $player_speed) - 1.0;
-				$damage_reduction = round($damage_reduction * $cast_speed_ratio, 2);
-				if($damage_reduction > $max_damage_reduction) {
-					$damage_reduction = $max_damage_reduction;
-				}
-				
-				if($damage_reduction >= 0.01) {
-					$player_damage *= 1 - $damage_reduction;
-					$collision_text .= "[opponent] cast their jutsu before [player] attacked, negating " . ($damage_reduction * 100) . 
-						"% of [player]'s damage!";		
-				}
-			}
-		}
-	}
 
-	// Parse text
-	$player_name = 'Player 1';
-	$opponent_name = 'Player 2';
-		
-	$collision_text = str_replace(
-		array('[player]', '[opponent]'),
-		array($player_name, $opponent_name),
-		$collision_text);
-	
-	return $collision_text;
-}
 
-function calcDamage($player1, $player2) {
-	switch($player1['jutsu_type']) {
-		case 'ninjutsu':
-		case 'taijutsu':
-		case 'genjutsu':
-			break;
-		default:
-			$player1['jutsu_type'] = 'ninjutsu';
-			break;
-	}
-	switch($player2['jutsu_type']) {
-		case 'ninjutsu':
-		case 'taijutsu':
-		case 'genjutsu':
-			break;
-		default:
-			$player2['jutsu_type'] = 'ninjutsu';
-			break;
-	}
-	
-	
-	$player1_jutsu = array(
-		'jutsu_type' => $player1['jutsu_type'],
-		'power' => $player1['jutsu_power']
-	);
-	$player2_jutsu = array(
-		'jutsu_type' => $player2['jutsu_type'],
-		'power' => $player2['jutsu_power']
-	);
-	
-	$player1_offense = 35 + ($player1[$player1_jutsu['jutsu_type'] . '_skill'] * 0.10);
-	$player2_offense = 35 + ($player2[$player2_jutsu['jutsu_type'] . '_skill'] * 0.10);
-	
-	$min = 25;
-	$max = 45;
-	
-	$rand = (int)(($min + $max) / 2);
-	
-	$player1_raw_damage = round($player1_offense * $player1_jutsu['power'] * $rand, 2);
-	$player2_raw_damage = round($player2_offense * $player2_jutsu['power'] * $rand, 2);
-	
-	$player1_damage = $player1_raw_damage;
-	$player2_damage = $player2_raw_damage;
-	
-	// Collision
-	$collision_text = '';
-	$collision_text = jutsuCollision($player1, $player2, $player1_damage, $player2_damage, $player1_jutsu, $player2_jutsu);
-
-	$player1_collision_damage = $player1_damage;
-	$player2_collision_damage = $player2_damage;
-	
-	$player1_defense = 50;
-	$player2_defense = 50;
-	
-	
-	$player1_defense += System::diminishing_returns($player1[$player2_jutsu['jutsu_type'] . '_skill'] * 0.01, 50);
-	$player2_defense += System::diminishing_returns($player2[$player1_jutsu['jutsu_type'] . '_skill'] * 0.01, 50);
-	
-	// Offense
-	$player1_damage = round($player1_damage / $player2_defense, 1);
-	$player2_damage = round($player2_damage / $player1_defense, 1);
-	
-	
-	// Display
-	$damages = array(
-		'player1' => array(
-			'raw_damage' => $player1_raw_damage,
-			'collision_damage' => $player1_collision_damage,
-			'damage' => $player1_damage
-		),
-		'player2' => array(
-			'raw_damage' => $player2_raw_damage,
-			'collision_damage' => $player2_collision_damage,
-			'damage' => $player2_damage
-		),
-		'collision_text' => $collision_text
-	);
-	return $damages;
-}

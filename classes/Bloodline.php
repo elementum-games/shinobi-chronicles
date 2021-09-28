@@ -3,7 +3,7 @@
 /* Class:		Bloodline
 */
 class Bloodline {
-    const SKILL_REDUCTION_ON_CHANGE = 0.5;
+    const SKILL_REDUCTION_ON_CHANGE = 0.1;
 
     public System $system;
 
@@ -59,8 +59,8 @@ class Bloodline {
                     $j['jutsu_type'], 
                     $j['power'],
                     $j['effect'], 
-                    $j['effect_amount'],
-                    $j['effect_length'], 
+                    $j['effect_amount'] ?? 0,
+                    $j['effect_length'] ?? 0,
                     $j['description'], 
                     $j['battle_text'], 
                     $j['cooldown'] ?? 0,

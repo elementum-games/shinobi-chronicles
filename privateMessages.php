@@ -309,7 +309,7 @@ class Messaging {
 						$staff = $this->staffColor($message['staff_level']);
 						$persons_name = ($this->Users[$message['sender']]) ? $this->Users[$message['sender']] : $message['sender'];
 
-						$sender = $users[$message['sender']];
+						$sender = $this->Users[$message['sender']];
 
 						if(! ctype_digit($persons_name)) {
 
@@ -472,7 +472,7 @@ function privateMessages() {
 
 	$Messaging->display('options');
 
-	switch($_GET['page']) {
+	switch($_GET['page'] ?? '') {
 		
 		//For creating and sending new messages
 		case 'new_message':

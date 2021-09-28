@@ -69,7 +69,7 @@ function displayNotifications() {
 	}
 	
 	if(!empty($notifications)) {
-		if($player->layout == 'shadow_ribbon') {
+		if($player->layout == 'shadow_ribbon' || $player->layout === 'blue_scroll') {
 			
 			if(count($notifications) > 1) {	
 				echo "<img class='slideButtonLeft' onclick='slideNotificationLeft()' src='./images/left_arrow.png' />";

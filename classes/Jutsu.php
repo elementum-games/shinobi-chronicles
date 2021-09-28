@@ -20,13 +20,16 @@ class Jutsu {
     const USE_TYPE_PROJECTILE = 'projectile';
     const USE_TYPE_BUFF = 'buff';
     const USE_TYPE_BARRIER = 'barrier';
+
+    const POWER_PER_LEVEL_PERCENT = 0.3;
+    const BL_POWER_PER_LEVEL_PERCENT = 0.5;
     
     public int $id;
     public string $name;
     public int $rank;
     public string $jutsu_type;
 
-    private float $base_power;
+    public float $base_power;
     public float $power;
 
     public ?string $effect;
@@ -146,7 +149,8 @@ class Jutsu {
         $this->level = $level;
         $this->exp = $exp;
 
-        $level_multiplier = $this->is_bloodline ? 0.005 : 0.003;
+        $level_multiplier = $this->is_bloodline ?
+            self::BL_POWER_PER_LEVEL_PERCENT / 100 : self::POWER_PER_LEVEL_PERCENT / 100;
 
         $this->power = $this->base_power * (1 + round($this->level * $level_multiplier, 2));
         if($this->effect && $this->effect != 'none') {

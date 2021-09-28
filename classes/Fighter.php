@@ -194,14 +194,15 @@ abstract class Fighter {
 
     /**
      * function calcDamage() CONTAINS TEMP NUMBER FIX
-     *	Calculates raw damage based on player stats and jutsu or item strength
+     *    Calculates raw damage based on player stats and jutsu or item strength
      *
-     * @param Jutsu  $attack  Copy of the attack data.
+     * @param Jutsu  $attack      Copy of the attack data.
      * @param string $attack_type (default_jutsu, equipped_jutsu, item, bloodline_jutsu)
+     * @param bool   $disable_randomness
      * @return float|int
      * @throws Exception
      */
-    public function calcDamage(Jutsu $attack, $attack_type = 'default_jutsu') {
+    public function calcDamage(Jutsu $attack, $attack_type = 'default_jutsu', bool $disable_randomness = false) {
         if($this->system->debug['damage'])  {
             echo "Debugging damage for {$this->getName()}<br />";
         }
@@ -277,6 +278,9 @@ abstract class Fighter {
         }
 
         $rand = mt_rand(self::MIN_RAND, self::MAX_RAND);
+        if($disable_randomness) {
+            $rand = (self::MIN_RAND + self::MAX_RAND) / 2;
+        }
 
         $damage = $offense * $attack->power * $rand;
 
@@ -325,9 +329,9 @@ abstract class Fighter {
             }
         }
 
-        $def_multiplier = 0.03;
+        $def_multiplier = 0.003;
         if($this instanceof AI) {
-            $def_multiplier = 0.01;
+            $def_multiplier = 0.001;
         }
 
         switch($defense_type) {

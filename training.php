@@ -18,19 +18,22 @@ function training() {
 
 	$jutsu_train_gain = User::$jutsu_train_gain;
 
+	// 56.25% of standard
 	$stat_long_train_length = $stat_train_length * 8;
-	$stat_long_train_gain = $stat_train_gain * 4;
+	$stat_long_train_gain = $stat_train_gain * 4.5;
 
-    $stat_extended_train_length = $stat_long_train_length * 6;
-	$stat_extended_train_gain = $stat_long_train_gain * 3;
+    // 48x length, 16x gains: 33% of standard
+    $stat_extended_train_length = $stat_train_length * 48;
+	$stat_extended_train_gain = $stat_train_gain * 16;
 
 	// Forbidden seal trainings boost
 	if($player->forbidden_seal && $player->forbidden_seal['level'] >= 2) {
-		$stat_long_train_length *= 1.5;
+		// 12x length, 9x gain = 75% of regular long
+	    $stat_long_train_length *= 1.5;
 		$stat_long_train_gain *= 2;
 
-        $stat_extended_train_length = $stat_long_train_length * 6;
-        $stat_extended_train_gain = $stat_long_train_gain * 3.375;
+        $stat_extended_train_length = round($stat_extended_train_length * 1.5);
+        $stat_extended_train_gain = round($stat_extended_train_gain * 2);
 	}
 
 	$stat_train_gain += $system->TRAIN_BOOST;
@@ -117,6 +120,9 @@ function training() {
 					$train_length *= 1 - ($player->clan['boost_amount'] / 100);
 				}
 			}
+
+			$player->log(User::LOG_TRAINING, "Type: {$train_type} / Length: {$train_length}");
+
 			$player->train_type = $train_type;
 			$player->train_gain = $train_gain;
 			$player->train_time = time() + $train_length;
@@ -130,6 +136,7 @@ function training() {
 		$system->message("Training cancelled.");
 		$system->printMessage();
 	}
+
 	// Add rank stuff
 	echo "<table class='table'><tr><th colspan='3'>Academy</th></tr>
 		<tr><td colspan='3'>

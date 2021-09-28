@@ -514,7 +514,7 @@ function createTeam() {
 	$min_name_length = 5;
 	$max_name_length = 35;
 	
-	if($_POST['create_team']) {
+	if(isset($_GET['create_team'])) {
 		$name = $system->clean($_POST['name']);
 		try {
 			// Name
@@ -588,7 +588,7 @@ function createTeam() {
 			$system->message($e->getMessage());
 		}
 	}
-	else if($_GET['accept_invite'] && $player->team_invite) {
+	else if(isset($_GET['accept_invite']) && $player->team_invite) {
 		try {
 			$team_id = $player->team_invite;
 			$result = $system->query("SELECT * FROM `teams` WHERE `team_id`='$team_id' LIMIT 1");
@@ -630,7 +630,7 @@ function createTeam() {
 			$system->message($e->getMessage());
 		}
 	}
-	else if($_GET['decline_invite'] && $player->team_invite) {
+	else if(isset($_GET['decline_invite']) && $player->team_invite) {
 		$player->team_invite = 0;
 		$system->query("UPDATE `users` SET `team_id`=0 WHERE `user_id`='$player->user_id' LIMIT 1");
 		$system->message("Invite declined.");
