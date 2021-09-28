@@ -231,8 +231,13 @@ function userSettings() {
 		else {
 			$query = "UPDATE `users` SET `layout`='$layout' WHERE `user_id`='$player->user_id' LIMIT 1";
 			$system->query($query);
-			$system->message("Layout updated!<script type='text/javascript'>setTimeout('window.location.reload();', 2000);</script>");
-			$system->printMessage();
+			$system->message("Layout updated!");
+            $system->printMessage();
+            
+            // Only reload page if a layout change was made
+            if($layout != $player->layout) {
+                header("Refresh:2; url=$self_link");
+            }
 		}
 	}
 	
