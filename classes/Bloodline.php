@@ -3,7 +3,7 @@
 /* Class:		Bloodline
 */
 class Bloodline {
-    const SKILL_REDUCTION_ON_CHANGE = 0.5;
+    const SKILL_REDUCTION_ON_CHANGE = 0.25;
 
     public System $system;
 
