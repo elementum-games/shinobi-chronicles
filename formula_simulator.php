@@ -208,7 +208,7 @@ else if($_POST['run_simulation'] && $mode == 'scenarios') {
         2,
         'p2j',
         $player2->rank,
-        Jutsu::TYPE_NINJUTSU,
+        Jutsu::TYPE_TAIJUTSU,
         $base_jutsu_power,
         'none',
         0,
