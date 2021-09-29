@@ -514,7 +514,7 @@ function createTeam() {
 	$min_name_length = 5;
 	$max_name_length = 35;
 	
-	if(isset($_GET['create_team'])) {
+	if(isset($_POST['create_team'])) {
 		$name = $system->clean($_POST['name']);
 		try {
 			// Name
@@ -682,21 +682,17 @@ function createTeam() {
 	}
 	
 	
-	echo "<table class='table'><tr><th>Create Team</th></tr>
-	<tr><td style='text-align:center;'>
-	<form action='$self_link' method='post'>
-	<b>Name</b><br />
-	<i>($min_name_length-$max_name_length characters, only letters, numbers, spaces, dashes, and underscores allowed)</i><br />
-	<input type='text' name='name' value='" . (isset($name) ? $name : '') . "' /><br />
-	<!--TYPE-->
-	<input type='submit' name='create_team' value='Create' />
-	</form>
-	
-	
-	</td></tr></table>";
-	
-	
-	
-	
-	
+	echo "<table class='table'>
+        <tr><th>Create Team</th></tr>
+        <tr><td style='text-align:center;'>
+        <form action='$self_link' method='post'>
+            <b>Name</b><br />
+            <i>($min_name_length-$max_name_length characters, only letters, numbers, spaces, dashes, and underscores allowed)</i><br />
+            <input type='text' name='name' value='" . (isset($name) ? $name : '') . "' /><br />
+            <!--TYPE-->
+            <input type='submit' name='create_team' value='Create' />
+        </form>
+        </td></tr>
+	</table>";
+
 }
