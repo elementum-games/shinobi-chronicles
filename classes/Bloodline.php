@@ -67,7 +67,7 @@ class Bloodline {
                     $j['use_type'], 
                     $j['use_cost'], 
                     $j['purchase_cost'], 
-                    $j['purchase_type'], 
+                    Jutsu::PURCHASE_TYPE_BLOODLINE,
                     $j['parent_jutsu'] ?? 0,
                     $j['element'], 
                     $j['hand_seals']

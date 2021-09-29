@@ -171,6 +171,7 @@ class System {
     public $debug = [
         'battle' => false,
         'battle_effects' => false,
+        'jutsu_collision' => false,
         'damage' => false,
         'bloodline' => false,
     ];

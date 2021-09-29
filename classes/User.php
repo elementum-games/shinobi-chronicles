@@ -992,7 +992,7 @@ class User extends Fighter {
 
 	/* function useJutsu
 		pool check, calc exp, etc */
-	public function useJutsu(Jutsu $jutsu, $purchase_type = 'equipped_jutsu'): bool {
+	public function useJutsu(Jutsu $jutsu): bool {
 		switch($jutsu->jutsu_type) {
 			case 'ninjutsu':
 			case 'genjutsu':
@@ -1010,10 +1010,10 @@ class User extends Fighter {
 			return false;
 		}
 
-		switch($purchase_type) {
-			case 'equipped_jutsu':
+		switch($jutsu->purchase_type) {
+            case Jutsu::PURCHASE_TYPE_PURCHASEABLE:
 				// Element check
-				if($jutsu->element && $jutsu->element != 'None') {
+				if($jutsu->element && $jutsu->element != Jutsu::ELEMENT_NONE) {
 					if($this->elements) {
 						if(array_search($jutsu->element, $this->elements) === false) {
 							$this->system->message("You do not possess the elemental chakra for this jutsu!");
@@ -1038,20 +1038,20 @@ class User extends Fighter {
 
 				$this->{$energy_type} -= $jutsu->use_cost;
 				break;
-			case 'bloodline_jutsu':
-				if($this->bloodline->jutsu[$jutsu->id]->level < 100) {
-					$this->bloodline->jutsu[$jutsu->id]->exp += round(500 / ($this->bloodline->jutsu[$jutsu->id]->level * 0.9));
+            case Jutsu::PURCHASE_TYPE_BLOODLINE:
+                if($this->bloodline->jutsu[$jutsu->id]->level < 100) {
+                    $this->bloodline->jutsu[$jutsu->id]->exp += round(500 / ($this->bloodline->jutsu[$jutsu->id]->level * 0.9));
 
-					if($this->bloodline->jutsu[$jutsu->id]->exp >= 1000) {
-						$this->bloodline->jutsu[$jutsu->id]->exp = 0;
-						$this->bloodline->jutsu[$jutsu->id]->level++;
-						$this->system->message($jutsu->name . " has increased to level " . $this->bloodline->jutsu[$jutsu->id]->level . ".");
-					}
-				}
+                    if($this->bloodline->jutsu[$jutsu->id]->exp >= 1000) {
+                        $this->bloodline->jutsu[$jutsu->id]->exp = 0;
+                        $this->bloodline->jutsu[$jutsu->id]->level++;
+                        $this->system->message($jutsu->name . " has increased to level " . $this->bloodline->jutsu[$jutsu->id]->level . ".");
+                    }
+                }
 
-				$this->{$energy_type} -= $jutsu->use_cost;
-				break;
-			case 'default_jutsu':
+                $this->{$energy_type} -= $jutsu->use_cost;
+                break;
+			case Jutsu::PURCHASE_TYPE_DEFAULT:
 				$this->{$energy_type} -= $jutsu->use_cost;
 				break;
 

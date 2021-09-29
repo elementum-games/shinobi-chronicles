@@ -11,6 +11,7 @@ class Jutsu {
     const PURCHASE_TYPE_DEFAULT = 1;
     const PURCHASE_TYPE_PURCHASEABLE = 2;
     const PURCHASE_TYPE_NON_PURCHASEABLE = 3;
+    const PURCHASE_TYPE_BLOODLINE = 4;
 
     const TYPE_NINJUTSU = 'ninjutsu';
     const TYPE_TAIJUTSU = 'taijutsu';
@@ -58,6 +59,7 @@ class Jutsu {
 
     // Dynamic vars
     public bool $is_bloodline = false;
+    public bool $is_weapon = false;
 
     public int $level = 0;
     public int $exp = 0;
@@ -65,6 +67,8 @@ class Jutsu {
     public ?int $weapon_id = null;
     public ?Jutsu $weapon_effect = null;
     public bool $effect_only = false;
+
+    public ?string $combat_id;
 
     /**
      * Jutsu constructor.
@@ -180,8 +184,14 @@ class Jutsu {
              $this->element,
              $this->hand_seals
         );
+        $this->weapon_effect->is_weapon = true;
 
         return $this->weapon_effect;
+    }
+
+    public function setCombatId(string $fighter_combat_id) {
+        $prefix = $this->is_bloodline ? 'BL_J' : 'J';
+        $this->combat_id = $prefix . $this->id . ':' . $fighter_combat_id;
     }
 
 
