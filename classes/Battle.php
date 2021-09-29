@@ -408,16 +408,6 @@ class Battle {
                         }
                     }
 
-                    if($player_jutsu->purchase_type == 'default') {
-                        $attack_type = Jutsu::PURCHASE_TYPE_DEFAULT;
-                    }
-                    else if($player_jutsu->purchase_type == 'bloodline') {
-                        $attack_type = Jutsu::PURCHASE_TYPE_BLOODLINE
-                    }
-                    else {
-                        $attack_type = Jutsu::PURCHASE_TYPE_PURCHASEABLE;
-                    }
-
                     // Log jutsu used
                     $this->setPlayerAction($player_jutsu, $weapon_id);
 
