@@ -375,6 +375,7 @@ class Battle {
                         $player_jutsu = null;
                         if(isset($this->player->bloodline->jutsu[$jutsu_id])) {
                             $player_jutsu = $this->player->bloodline->jutsu[$jutsu_id];
+                            $player_jutsu->setCombatId($this->player->combat_id);
                         }
                     }
                     else {
@@ -1559,7 +1560,7 @@ class Battle {
                     $('#jutsuType').val('taijutsu');
                     $('#jutsuID').val($(this).attr('data-id'));
                 });
-                $('#jutsu span.bloodline_jutsu').click(function(){
+                $('#jutsu .bloodline_jutsu').click(function(){
                     if(display_state != 'bloodline_jutsu') {
                         $('#handsealOverlay').fadeIn();
                     }
@@ -1778,15 +1779,30 @@ class Battle {
         }
         // Display bloodline jutsu
         if($player->bloodline_id) {
-            echo "<p style='width:$width;margin-right:0;'>";
+            echo "<div class='jutsuCategory' style='width:$width;margin-right:0;'>";
             if(!empty($player->bloodline->jutsu)) {
                 foreach($player->bloodline->jutsu as $id => $jutsu) {
-                    echo "<span id='bloodline$c3' class='jutsuName bloodline_jutsu' data-handseals='" . $jutsu->hand_seals . "'" .
-                        " data-id='$id'>" . $jutsu->name . '<br /><strong>B' . $c3 . '</strong></span><br />';
+                    $jutsu->setCombatId($player->combat_id);
+                    $cd_left = $this->jutsu_cooldowns[$jutsu->combat_id] ?? 0;
+
+                    echo "<div 
+                        id='bloodline{$c3}' 
+                        class='jutsuName bloodline_jutsu' 
+                        data-handseals='{$jutsu->hand_seals}'
+                        data-id='$id'
+                        aria-disabled='" . ($cd_left > 0 ? "true" : "false") . "'
+                        >{$jutsu->name}<br />";
+                            if($cd_left > 0) {
+                                echo "(CD: {$cd_left} turns)";
+                            }
+                            else {
+                                echo "<strong>B{$c3}</strong>";
+                            }
+                    echo "</div><br />";
                     $c3++;
                 }
             }
-            echo "</p>";
+            echo "</div>";
         }
 
         $prefill_hand_seals = $_POST['hand_seals'] ?? '';
