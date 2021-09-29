@@ -68,7 +68,7 @@ class Jutsu {
     public ?Jutsu $weapon_effect = null;
     public bool $effect_only = false;
 
-    public ?string $combat_id;
+    public ?string $combat_id = null;
 
     /**
      * Jutsu constructor.
