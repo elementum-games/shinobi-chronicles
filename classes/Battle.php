@@ -782,6 +782,9 @@ class Battle {
                 $player1_damage = $this->player1->calcDamage($this->player1->bloodline->jutsu[$this->player1_jutsu_id]);
                 $player1_jutsu->setCombatId($this->player1->combat_id);
             }
+            else {
+                throw new \Exception("Invalid p1 attack type! {$this->player1_attack_type}");
+            }
 
             // Set weapon data into jutsu
             if(($this->player1_attack_type == Jutsu::PURCHASE_TYPE_DEFAULT or $this->player1_attack_type == Jutsu::PURCHASE_TYPE_PURCHASEABLE)
@@ -2214,6 +2217,10 @@ class Battle {
     }
 
     protected function setEffect(Fighter &$user, $target_id, Jutsu $jutsu, $raw_damage, &$active_effects) {
+        if(!$jutsu->combat_id) {
+            $jutsu->setCombatId($user->combat_id);
+        }
+
         $apply_effect = true;
 
         $debuff_power = ($jutsu->power <= 0) ? 0 : $raw_damage / $jutsu->power / 15;
