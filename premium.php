@@ -110,7 +110,9 @@ function premium() {
 
 			$player->premium_credits -= $costs['user_reset'];
 
-			$player->updateData(1);
+			$player->exam_stage = 0;
+
+			$player->updateData();
 
 			$system->query("DELETE FROM `user_bloodlines` WHERE `user_id`='$player->user_id'");
 			$system->query("UPDATE `user_inventory` SET
