@@ -409,13 +409,13 @@ class Battle {
                     }
 
                     if($player_jutsu->purchase_type == 'default') {
-                        $attack_type = 'default_jutsu';
+                        $attack_type = Jutsu::PURCHASE_TYPE_DEFAULT;
                     }
                     else if($player_jutsu->purchase_type == 'bloodline') {
-                        $attack_type = 'bloodline_jutsu';
+                        $attack_type = Jutsu::PURCHASE_TYPE_BLOODLINE
                     }
                     else {
-                        $attack_type = 'equipped_jutsu';
+                        $attack_type = Jutsu::PURCHASE_TYPE_PURCHASEABLE;
                     }
 
                     // Log jutsu used
@@ -805,24 +805,27 @@ class Battle {
             }
         }
         if($this->player2_action) {
-            if($this->player2_attack_type == 'default_jutsu') {
+            if($this->player2_attack_type == Jutsu::PURCHASE_TYPE_DEFAULT) {
                 $player2_jutsu = $this->default_attacks[$this->player2_jutsu_id];
                 $player2_damage = $this->player2->calcDamage($player2_jutsu);
                 $player2_jutsu->setCombatId($this->player2->combat_id);
             }
-            else if($this->player2_attack_type == 'equipped_jutsu') {
+            else if($this->player2_attack_type == Jutsu::PURCHASE_TYPE_PURCHASEABLE) {
                 $player2_jutsu = $this->player2->jutsu[$this->player2_jutsu_id];
                 $player2_damage = $this->player2->calcDamage($player2_jutsu);
                 $player2_jutsu->setCombatId($this->player2->combat_id);
             }
-            else if($this->player2_attack_type == 'bloodline_jutsu') {
+            else if($this->player2_attack_type == Jutsu::PURCHASE_TYPE_BLOODLINE) {
                 $player2_jutsu = $this->player2->bloodline->jutsu[$this->player2_jutsu_id];
                 $player2_damage = $this->player2->calcDamage($this->player2->bloodline->jutsu[$this->player2_jutsu_id]);
                 $player2_jutsu->setCombatId($this->player2->combat_id);
             }
+            else {
+                throw new Exception("Invalid player 2 attack type {$this->player2_attack_type}");
+            }
 
             // Set weapon data into jutsu
-            if(($this->player2_attack_type == 'default_jutsu' or $this->player2_attack_type == 'equipped_jutsu')
+            if(($this->player2_attack_type == Jutsu::PURCHASE_TYPE_DEFAULT or $this->player2_attack_type == Jutsu::PURCHASE_TYPE_PURCHASEABLE)
                 && $player2_jutsu->jutsu_type == Jutsu::TYPE_TAIJUTSU && $this->player2_weapon_id) {
                 // Apply element to jutsu
                 if($this->player2->items[$this->player2_weapon_id]['effect'] == 'element') {
@@ -929,7 +932,7 @@ class Battle {
             if($player1_jutsu->jutsu_type == Jutsu::TYPE_GENJUTSU && $player1_jutsu->use_type != Jutsu::USE_TYPE_BUFF) {
                 $genjutsu_id = $this->player1->combat_id . ':J' . $player1_jutsu->id;
                 // Bloodline jutsu ID override
-                if($this->player1_attack_type == 'bloodline_jutsu') {
+                if($this->player1_attack_type == Jutsu::PURCHASE_TYPE_BLOODLINE) {
                     $genjutsu_id = $this->player1->combat_id . ':BL_J' . $player1_jutsu->id;
                 }
 
@@ -1039,7 +1042,7 @@ class Battle {
             if($player2_jutsu->jutsu_type == Jutsu::TYPE_GENJUTSU && $player2_jutsu->use_type != Jutsu::USE_TYPE_BUFF) {
                 $genjutsu_id = $this->player2->combat_id . ':J' . $player2_jutsu->id;
                 // Bloodline jutsu ID override
-                if($this->player2_attack_type == 'bloodline_jutsu') {
+                if($this->player2_attack_type == Jutsu::PURCHASE_TYPE_BLOODLINE) {
                     $genjutsu_id = $this->player2->combat_id . ':BL_J' . $player2_jutsu->id;
                 }
 
@@ -2417,7 +2420,7 @@ class Battle {
 
         $attack_id = $jutsu->id;
         $weapon_id = 0;
-        $attack_type = 'equipped_jutsu';
+        $attack_type = Jutsu::PURCHASE_TYPE_PURCHASEABLE;
 
         if($this->opponent_side == Battle::TEAM1) {
             $this->player1_action = 1;
