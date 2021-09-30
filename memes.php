@@ -432,4 +432,22 @@ return [
         'text' => ':guess I\'ll die:',
         'public' => true,
     ],
+    [
+        'code' => ':chad:',
+        'image' => '<img src="./images/memes/chad.png" />',
+        'text' => ':chad:',
+        'public' => true,
+    ],
+    [
+        'code' => ':will:',
+        'image' => '<img src="./images/memes/will.png" />',
+        'text' => ':chad:',
+        'public' => true,
+    ],
+    [
+        'code' => ':bonk:',
+        'image' => '<img src="./images/memes/bonk.png" />',
+        'text' => ':chad:',
+        'public' => true,
+    ],
 ];
