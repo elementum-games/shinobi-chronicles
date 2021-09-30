@@ -1315,12 +1315,9 @@ class User extends Fighter {
             return false;
         }
 
-        $dateTime = DateTime::createFromFormat(
-            'U.u',
-            number_format(microtime(true), 2, '.', '')
-        );
+        $dateTime = System::dateTimeFromMicrotime(microtime(true));
 
-        $dateTimeFormat = 'Y-m-d H:i:s.u';
+        $dateTimeFormat = System::DB_DATETIME_MS_FORMAT;
         $this->system->query("INSERT INTO `player_logs`
             (`user_id`, `user_name`, `log_type`, `log_time`, 
              `log_contents`)

@@ -4,7 +4,7 @@ if(!isset($_SESSION['user_id'])) {
     exit;
 }
 
-require __DIR__ . "/../classes.php";
+require __DIR__ . "/classes.php";
 
 $system = new System();
 $system->dbConnect();

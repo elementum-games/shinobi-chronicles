@@ -23,6 +23,8 @@ class System {
     const SC_ADMINISTRATOR = 3;
     const SC_HEAD_ADMINISTRATOR = 4;
 
+    const DB_DATETIME_MS_FORMAT = 'Y-m-d H:i:s.u';
+
     // Variable for error message
     public $message;
     public $message_displayed;
@@ -777,6 +779,13 @@ class System {
             }
         }
         return $string;
+    }
+
+    public static function dateTimeFromMicrotime(float $microtime) {
+        return DateTime::createFromFormat(
+            'U.u',
+            number_format($microtime, 2, '.', '')
+        );
     }
 }
 
