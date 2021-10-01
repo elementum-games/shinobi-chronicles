@@ -89,6 +89,10 @@ video {
     box-sizing: border-box;
 }
 
+b {
+    font-weight: bold;
+}
+
 /* END RESET **/
 
 /* FONTS */
