@@ -1080,12 +1080,12 @@ function premium() {
 				($player->forbidden_seal['color'] == 'gold' ? "checked='checked'" : '') . "/>
 				<span class='gold' style='font-weight:bold;'>Gold</span>";
 			}
-			if ($player->staff_level == System::SC_MODERATOR) {
+			if ($player->staff_level >= System::SC_MODERATOR) {
 				echo "
 				<input type='radio' name='name_color' value='green' " .
 				($player->forbidden_seal['color'] == 'green' ? "checked='checked'" : '') . "/>
 				<span class='moderator' style='font-weight:bold;'>Green</span>";
-			} else if ($player->staff_level == System::SC_HEAD_MODERATOR) {
+			} else if ($player->staff_level >= System::SC_HEAD_MODERATOR) {
 				echo "
 				<input type='radio' name='name_color' value='teal' " .
 				($player->forbidden_seal['color'] == 'teal' ? "checked='checked'" : '') . "/>
