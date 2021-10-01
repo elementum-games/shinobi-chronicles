@@ -255,6 +255,7 @@ class User extends Fighter {
 		else {
 			$blacklist_json = json_encode($this->blacklist);
 			$this->system->query("INSERT INTO `blacklist` (`user_id`, `blocked_ids`) VALUES ('{$this->user_id}', '{$blacklist_json}')");
+			$this->original_blacklist = array(); // Default an empty array, user did not have an original.
 		}
 
 		// Rank stuff
