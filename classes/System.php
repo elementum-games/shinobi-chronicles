@@ -43,6 +43,8 @@ class System {
 
     public $link;
 
+    public $timezoneOffset;
+
     // Training boost switches
     public $TRAIN_BOOST = 0; // Extra points per training, 0 for none
     public $LONG_TRAIN_BOOST = 0; // Extra points per long training, 0 for none
@@ -199,6 +201,8 @@ class System {
         foreach(self::PAGE_IDS as $slug => $id) {
             $this->links[$slug] = $this->link . '?id=' . $id;
         }
+
+        $this->timezoneOffset = date('Z');
     }
 
     /* function dbConnect()
