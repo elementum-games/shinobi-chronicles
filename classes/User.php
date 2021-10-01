@@ -255,6 +255,7 @@ class User extends Fighter {
 		else {
 			$blacklist_json = json_encode($this->blacklist);
 			$this->system->query("INSERT INTO `blacklist` (`user_id`, `blocked_ids`) VALUES ('{$this->user_id}', '{$blacklist_json}')");
+			$this->original_blacklist = array(); // User did not have a blacklist, create empty array for original
 		}
 
 		// Rank stuff
@@ -1167,6 +1168,8 @@ class User extends Fighter {
 		$this->system->query($query);
 
 		// Update Blacklist
+        echo "BL: " . is_array($this->blacklist) . "<br />" .
+             "OBL:" . is_array($this->original_blacklist) . "<br />";
 		if(count($this->blacklist) != count($this->original_blacklist)) {
 			$blacklist_json = json_encode($this->blacklist);
 			$this->system->query("UPDATE `blacklist` SET `blocked_ids`='{$blacklist_json}' WHERE `user_id`='{$this->user_id}' LIMIT 1");
