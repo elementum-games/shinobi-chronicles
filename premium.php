@@ -1353,8 +1353,8 @@ function premiumCreditExchange() {
 	/* [DISPLAY] */
 
 	// View offers
-	echo "<table class='table' cellspacing='0' style='width:95%;'>
-	<tr><th colspan='4'><a href='$self_link'>Ancient Kunai Exchange</a></th></tr>
+	echo "<table id='kunaiExchange' class='table' cellspacing='0' style='width:95%;'>
+	<tr'><th colspan='4'><a href='$self_link'>Ancient Kunai Exchange</a></th></tr>
 	<tr>
 		<td colspan='4' style='text-align:center;'>
 			<div style='width:200px;margin-left:auto;margin-right:auto;text-align:left;'>
@@ -1391,7 +1391,7 @@ function premiumCreditExchange() {
 
 			$sellerName = $credit_users[$row['seller']];
 
-			echo "<tr>
+			echo "<tr  class='fourColGrid' >
 				<td style='text-align:center;'><a href='{$system->links['members']}&user={$sellerName}'>{$sellerName}</a></td>
 				<td style='text-align:center;'>{$row['premium_credits']} AK</td>
 				<td style='text-align:center;'>&yen;{$row['money']}</td>";

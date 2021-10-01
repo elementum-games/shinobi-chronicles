@@ -26,8 +26,8 @@ p{
 	font-size: 1em;
 }
 b{
-	width: 100%;
-	display: none; /*Hides warning messages*/
+	/* width: 100%; */
+	/* display: none; /*Hides warning messages*/ */
 }
 a{
 	color: rgba(220,220,220,1);
@@ -36,9 +36,13 @@ a:hover{
 	color: white);
 }
 
+table{
+	color: rgba(255,255,255,0.76) !important;
+}
+
 #container{
 	display: grid;
-	grid-template-columns: 0.10fr 1fr;
+	/* grid-template-columns: 0.10fr 1fr; */
 }
 
 #sidebar {
@@ -68,6 +72,7 @@ a:hover{
 }
 
 #header img{
+	display: none;
 	width: 100%;
 }
 
@@ -75,6 +80,12 @@ a:hover{
 	display: grid;
 	grid-template-columns: 1fr 1fr 1fr;
 	height: auto;
+	margin: 0em 0em 1em 0em;
+}
+
+.buttonList{
+	position: absolute;
+	width: 33%;
 }
 
 .buttonList a{
@@ -91,12 +102,14 @@ a:hover{
 .topMenu{
 	display: block;
 	width: 100%;
-	font-size: 0.7em;
+	font-size: 0.9em;
 
 	overflow: hidden;
 	height: 0px;
 
 	cursor: pointer;
+
+	/* margin: 0em 0em 1em 0em; */
 }
 .topMenu li{
 	display: block;
@@ -112,11 +125,12 @@ a:hover{
 
 	border-style: solid;
 	border-color: white;
-	border-bottom: none;
+	/* border-bottom: none; */
 	border-width: 1px;
 
+	text-align: center;
 
-	padding: 0.5em 0em;
+	padding: 0.8em 0em;
 	/* margin: 0em 0.5em; */
 }
 .topMenu li a:hover{
@@ -129,6 +143,28 @@ a:hover{
 
 .menuTouchItem{
 	/* display: inline-block; */
+}
+
+#newstable td{
+	text-align: left;
+	padding: 1em 0.7em;
+}
+
+#newsfooter{
+	margin: 1em 0em 0em 0em;
+}
+
+.newsfooter{
+	width: 100% !important;
+	border-radius: 0px !important;
+	padding: 0.6em 0em !important;
+
+	color: rgba(255,255,255,0.75);
+
+	text-align: right;
+
+	height: 15px;
+	margin: 0em 0em !important;
 }
 
 #player_menu{
@@ -219,10 +255,12 @@ ul.submenu{
 .table{
 	display: block;
 	width: 95%;
-	margin: 1em auto 6em auto;
+	margin: 1em auto 3em auto;
 	/* background-color: rgba(27, 56, 31, 1);*/ /*green*/
 	background-color: rgba(79, 33, 29, 1); /*red*/
-	border-radius: 20px 20px 10px 10px;
+	border-radius: 10px 10px 0px 0px;
+
+	color: rgba(255,255,255, 0.86);
 
 	overflow: scroll;
 
@@ -310,7 +348,7 @@ ul.submenu{
 	padding: 1em 0;
 	border-radius: 10px 10px 10px 10px;
 
-	font-size: 1.3em;
+	font-size: 1.2em;
 
 	background-color: rgba(20,20,20, 0.7);
 }
@@ -321,7 +359,8 @@ ul.submenu{
 .table a{
 	display: block;
 	text-decoration: none;
-	padding: 0.8em 0.5em;
+	font-size: 0.8em;
+	padding: 0.4em 0.2em;
 	background: linear-gradient(0deg, rgba(15,15,15,1) 0%, rgba(20,20,20,1) 23%, rgba(49,62,56,0.7) 38%, rgba(25,25,25,1) 100%);
 	border: 1px solid rgba(255,255,255,0.5);
 	border-radius: 4px;
@@ -382,21 +421,26 @@ ul.submenu{
 #chat_input_table{
 	margin: 1em auto;
 }
+/*Sorry there's 2 of these*/
 .chat_msg{
 	display: grid !important;
 	grid-template-columns: 1fr 3fr 1fr;
 	/* grid-template-rows: 0.3fr 0.7fr; */
 	align-items: center;
-	grid-row-gap: 1em;
-	/* margin: 0em; */
+	/* grid-row-gap: 0.5em; */
+	width: 98% !important;
+	margin: 1.5em auto !important;
 }
+
+/*chat profile data bar*/
 .chat_msg td:nth-child(1){
 	grid-column: 1 / 4;
 	width: 100%;
 }
+/*chat Report Bar*/
 .chat_msg td:nth-child(3){
 	/* grid-column: 1 / 4; */
-	/* width: 100%; */
+	width: 100%;
 	font-size: 0.9em;
 }
 .chat_msg td{
@@ -410,10 +454,14 @@ ul.submenu{
 	width: 100%;
 }
 
+/*TextArea in Chat*/
 .chatmsg{
 	font-size: 1.2em;
 	align-items: center;
 	grid-column: 1 / span 2;
+	width: auto !important;
+	padding: 0.5em 0em 0em 0.5em !important;
+	overflow: scroll !important;
 }
 #user_data_container{
 	display: grid !important;
@@ -433,12 +481,32 @@ ul.submenu{
 	align-content: space-evenly;
 	justify-content: center;
 }
+
+/*Journal*/
+#journal{
+	overflow: scroll;
+}
+#journal img{
+	width: 100%;
+}
+
+/*Profile Page user sees when visiting another profile*/
+#viewprofile tbody tr:nth-child(3){
+	display: grid;
+	justify-items: center;
+}
+
+#viewprofile tbody tr td{
+	width: 100% !important;
+}
+
 .staffMember{
 	margin: 0.1em 0em;
 }
 .chatmsg{
 	background-color: rgba(255,255,255,0.06) !important;
 	text-align: left !important;
+	padding-left: 10px;
 	height: auto;
 	max-height: 400px;
 	overflow: scroll;
@@ -453,7 +521,7 @@ ul.submenu{
 	width: 95%;
 	/* width: auto; */
 	background-color: rgba(50,50,50,1);
-	padding: 1em 0em;
+	padding: 0.3em 0em;
 }
 
 #socialPosts td{
@@ -535,11 +603,48 @@ ul.submenu{
 	text-align: center;
 }
 
+/*gear equipment*/
+
+
 /*Travel Page*/
 #scoutTable .scrollable{
 	overflow: scroll;
 }
 
+
+/*Do not use this for 3 grid rows I messed up rename this fr*/
+.villageView{
+	display: grid !important;
+	grid-template-columns: repeat(3, 1fr);
+	width: auto !important;
+	/* grid-column-gap: 4em; */
+	text-align: left;
+	font-size: 0.8em !important;
+	align-items: center;
+	justify-content: center;
+	justify-items: center;
+	margin: 0em 4em;
+}
+.villageView div{
+	width: auto !important;
+}
+.fourColGrid{
+	 display: grid;
+	 grid-template-columns: repeat(4, 1fr);
+	 align-items: center;
+}
+
+#villagemembertd td{
+	width: 100% !important;
+}
+
+#villages td{
+	width: 100% !important;
+}
+
+#kunaiExchange{
+
+}
 
 /*Table Custom CSS*/
 /* //multiple columns of about 5 item */
@@ -562,6 +667,31 @@ ul.submenu{
 	background-color: transparent !important;
 }
 
+/*Table Data TR of 3 columns*/
+.threeColumns{
+	display: grid;
+	grid-template-columns: repeat(3, 1fr);
+	justify-items: center;
+	font-size: 90%; /*too small = eyestrain :^(*/
+}
+.threeColumns th{
+	width: 100% !important;
+	padding: 1em 0em;
+}
+.threeColumns td{
+	width: 100% !important;
+}
+
+/*Use this for headers of 2 columns*/
+.twoHeaders{
+	display: grid;
+	grid-template-columns: repeat(2, 1fr);
+}
+
+/*In Gear - TD's that need to fill more space*/
+.fullWidth{
+	width: 95% !important;
+}
 /* #jutsu{
 	display: grid;
 	grid-template-columns: repeat(4, 1fr);
@@ -605,7 +735,7 @@ tr{
 
 input{
 	display: inline;
-	padding: 0.2em 0.2em;
+	padding: 0.4em 0.2em;
 	font-size: 0.8em;
 	margin: 0.2em 0em;
 	border-radius: 10px 10px 10px 10px;
@@ -619,6 +749,7 @@ form{
 	margin: 1em 1.2em;
 	text-align: left;
 	font-size: 1em;
+	overflow: scroll;
 }
 
 textarea{
@@ -651,11 +782,11 @@ select{
 	color: rgba(240,240,20, 1);
 }
 .systemMessage {
-  animation: blinker 1.5s step-start infinite;
+  animation: blinker 0.9s step-start infinite;
 }
 
 @keyframes blinker {
   50% {
-    opacity: 0.25;
+    opacity: 0.75;
   }
 }

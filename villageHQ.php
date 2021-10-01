@@ -1,5 +1,5 @@
 <?php
-/* 
+/*
 File: 		villageHQ.php
 Coder:		Levi Meahan
 Created:	12/07/2013
@@ -15,7 +15,7 @@ function villageHQ() {
 
 	global $self_link;
 	global $RANK_NAMES;
-	
+
 	// Sub-menu
 	echo "<div class='submenu'>
 	<ul class='submenu'>
@@ -26,25 +26,25 @@ function villageHQ() {
 	</ul>
 	</div>
 	<div class='submenuMargin'></div>";
-	
+
 	$view = 'village_info';
 	if(isset($_GET['view'])) {
 		$view = $_GET['view'];
 	}
-	
+
 	if($view == 'village_info') {
 		$result = $system->query("SELECT * FROM `villages` WHERE `name`='$player->village'");
 		$village_data = $system->db_fetch($result);
-		
-		$result = $system->query("SELECT 
+
+		$result = $system->query("SELECT
 			COUNT(IF(`rank`=1,1,NULL)) as `count_1`,
 			COUNT(IF(`rank`=2,1,NULL)) as `count_2`,
 			COUNT(IF(`rank`=3,1,NULL)) as `count_3`,
 			COUNT(IF(`rank`=4,1,NULL)) as `count_4`
 			FROM `users` WHERE `village`='$player->village'");
 		$villager_counts = $system->db_fetch($result);
-		
-		
+
+
 		$leader_name = 'None';
 		$leader_avatar = './images/default_avatar.png';
 		if($village_data['leader']) {
@@ -55,12 +55,12 @@ function villageHQ() {
 				$leader_avatar = $result['avatar_link'];
 			}
 		}
-		
+
 		echo "<table class='table'><tr><th>$player->village Village</th></tr>
-		<tr><td>
-		
+		<tr><td class='villageView'>
+
 		<!--Info-->
-		<div style='display:inline-block;padding-top:10px;margin:0px;vertical-align:top;width:25%;'>	
+		<div style='display:inline-block;padding-top:10px;margin:0px;vertical-align:top;width:25%;'>
 			<label style='width:8.7em;font-weight:bold;'>Village Points:</label>" . $village_data['points'] . "<br />
 			<br />
 			<label style='width:8.7em;font-weight:bold;'>Village Ninja</label><br />
@@ -71,7 +71,7 @@ function villageHQ() {
 				" . $villager_counts['count_4'] . ' ' . $RANK_NAMES[4] . "<br />
 			</p>
 		</div>
-		
+
 		<!--Leader -->
 		<div style='display:inline-block;width:25%;margin:1%;margin-left:11%;text-align:center;'>
 		<p style='margin:2px;margin-left:auto;margin-right:auto;margin-bottom:4px;padding:2px 5px;
@@ -80,7 +80,7 @@ function villageHQ() {
 		<span style='font-size:1.2em;font-family:\"tempus sans itc\";font-weight:bold;'>$leader_name</span><br />
 		<img src='$leader_avatar' style='max-width:125px;max-height:125px;' />
 		</div>
-		
+
 		<!--Village Symbol-->
 		<div style='float:right;display:inline-block;width:84px;height:74px;margin:10px;margin-top:46px;margin-right:35px;
 			border-radius:75px;padding-top:10px;
@@ -97,17 +97,17 @@ function villageHQ() {
 		while($rank = $system->db_fetch($result)) {
 			$ranks[$rank['rank_id']]['name'] = $rank['name'];
 		}
-		
+
 		// Pagination
 		$users_per_page = 10;
 		$min = 0;
 		if(isset($_GET['min'])) {
 			$min = (int)$system->clean($_GET['min']);
 		}
-		
-		$result = $system->query("SELECT `user_name`, `rank`, `level`, `exp` FROM `users` 
+
+		$result = $system->query("SELECT `user_name`, `rank`, `level`, `exp` FROM `users`
 			WHERE `village`='$player->village' ORDER BY `rank` DESC, `exp` DESC LIMIT $min, $users_per_page");
-		
+
 		echo "<table class='table'><tr><th colspan='4'>Village Members</th></tr>
 		<tr>
 			<th style='width:30%;'>Username</th>
@@ -115,7 +115,7 @@ function villageHQ() {
 			<th style='width:20%;'>Level</th>
 			<th style='width:30%;'>Experience</th>
 		</tr>";
-		
+
 		$count = 0;
 		while($row = $system->db_fetch($result)) {
 			$class = '';
@@ -125,16 +125,16 @@ function villageHQ() {
 			else {
 				$class = 'row2';
 			}
-			
-			echo "<tr>
+
+			echo "<tr id='villagemembertd' class='fourColGrid'>
 				<td style='width:29%;' class='$class'><a href='{$system->links['members']}&user={$row['user_name']}'>" . $row['user_name'] . "</a></td>
 				<td style='width:20%;text-align:center;' class='$class'>" . $ranks[$row['rank']]['name'] . "</td>
 				<td style='width:20%;text-align:center;' class='$class'>" . $row['level'] . "</td>
 				<td style='width:30%;text-align:center;' class='$class'>" . $row['exp'] . "</td>
 			</tr>";
 		}
-		echo "</table>";	
-		
+		echo "</table>";
+
 		// Pagination
 		echo "<p style='text-align:center;'>";
 		if($min > 0) {
@@ -157,7 +157,7 @@ function villageHQ() {
 	}
 	else if($view == 'clans_teams') {
 		$user_id_array = array();
-		
+
 		// Clans
 		$result = $system->query("SELECT * FROM `clans` WHERE `village`='$player->village' ORDER BY `points` DESC LIMIT 5");
 		$clans = array();
@@ -167,7 +167,7 @@ function villageHQ() {
 				$user_id_array[] = $row['leader'];
 			}
 		}
-		
+
 		// Teams
 		$result = $system->query("SELECT * FROM `teams` WHERE `village`='$player->village' ORDER BY `points` DESC LIMIT 5");
 		$teams = array();
@@ -177,7 +177,7 @@ function villageHQ() {
 				$user_id_array[] = $row['leader'];
 			}
 		}
-		
+
 		// Fetch leader names
 		$user_id_string = implode(',', $user_id_array);
 		$result = $system->query("SELECT `user_id`, `user_name` FROM `users` WHERE `user_id` IN ($user_id_string)");
@@ -185,7 +185,7 @@ function villageHQ() {
 		while($row = $system->db_fetch($result)) {
 			$user_names[$row['user_id']] = $row['user_name'];
 		}
-		
+
 		// Clan display
 		echo "<table class='table'><tr><th colspan='3'>Top 5 Clans</th></tr>
 		<tr>
@@ -201,7 +201,7 @@ function villageHQ() {
 			</tr>";
 		}
 		echo "</table>";
-		
+
 		// Team display
 		echo "<table class='table'><tr><th colspan='3'>Top 5 Teams</th></tr><tr>
 			<th>Name</th>
@@ -235,7 +235,7 @@ function villageHQ() {
 		$count_query .= " FROM `users`";
 		$result = $system->query($count_query);
 		$village_counts = $system->db_fetch($result);
-		
+
 		echo "<table class='table'><tr><th colspan='4'>Villages</th></tr>
 		<tr>
 			<th style='width:25%;'>Village</th>
@@ -245,7 +245,7 @@ function villageHQ() {
 		</tr>";
 		if(is_array($villages)) {
 			foreach($villages as $village) {
-				echo "<tr>
+				echo "<tr id='villages' class='fourColGrid'>
 					<td style='width:25%;'>" . $village['name'] . "</td>
 					<td style='width:25%;'>" . $village['points'] . "</td>
 					<td style='width:25%;'>" . $village_counts[($village['name'] . '_members')] . "</td>
@@ -256,7 +256,7 @@ function villageHQ() {
 		}
 		echo "</table>";
 	}
-	
-	
+
+
 }
 ?>
