@@ -9,7 +9,7 @@ $system->renderStaticPageHeader();
 
 <table class='table'><tr><th>Manual</th></tr>
     <tr><td>
-        <!-- <b>Contributing</b>
+        <b>Contributing</b>
         To submit changes to this manual (you may need a GitHub account):
         <ol>
             <li>Go to <a href='https://github.com/levimeahan/shinobi-chronicles/blob/main/manual.php'>manual.php on GitHub</a></li>
@@ -17,7 +17,7 @@ $system->renderStaticPageHeader();
             <li>Make your changes</li>
             <li>Scroll down and click "Propose Changes"</li>
             <li>Click "Create Pull Request"</li>
-        </ol> -->
+        </ol>
 
         <div id='manual_container'>
 
@@ -128,10 +128,9 @@ $system->renderStaticPageHeader();
               <h3>Navigating the Profile Page</h3>
             </div>
 
-            <div>
-              <p>The profile summary is divided up into 4 sections.</p>
-            </div>
-          </div>
+          <p>
+            Add profile info here
+          </p>
           <!--End User Profile-->
 
         </div>
