@@ -1168,9 +1168,7 @@ class User extends Fighter {
 		$this->system->query($query);
 
 		// Update Blacklist
-        echo "BL: " . is_array($this->blacklist) . "<br />" .
-             "OBL:" . is_array($this->original_blacklist) . "<br />";
-		if(count($this->blacklist) != count($this->original_blacklist)) {
+        if(count($this->blacklist) != count($this->original_blacklist)) {
 			$blacklist_json = json_encode($this->blacklist);
 			$this->system->query("UPDATE `blacklist` SET `blocked_ids`='{$blacklist_json}' WHERE `user_id`='{$this->user_id}' LIMIT 1");
 		}
