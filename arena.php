@@ -193,6 +193,16 @@ function arenaFight(): bool {
             $player->ai_wins++;
             $player->battle_id = 0;
             $player->last_pvp = time();
+
+            // Daily Tasks
+            $dt = [];
+            foreach ($player->daily_tasks as $task) {
+                if ($task['Task'] == 'AI Battles' && $task['Complete'] != 1) {
+                    $task['Progress']++;
+                }
+                array_push($dt, $task);
+            }
+            $player->daily_tasks = $dt;
         }
         else if($winner == $battle->opponent_side) {
             echo "<table class='table'><tr><th>Battle Results</th></tr>
@@ -201,6 +211,16 @@ function arenaFight(): bool {
             $player->ai_losses++;
             $player->battle_id = 0;
             $player->last_pvp = time();
+
+            // Daily Tasks
+            $dt = [];
+            foreach ($player->daily_tasks as $task) {
+                if ($task['Task'] == 'AI Battles' && $tast['SubTask'] == 'Complete' && $task['Complete'] != 1) {
+                    $task['Progress']++;
+                }
+                array_push($dt, $task);
+            }
+            $player->daily_tasks = $dt;
         }
         else if($winner == Battle::DRAW) {
             echo "<table class='table'><tr><th>Battle Results</th></tr>
@@ -208,6 +228,16 @@ function arenaFight(): bool {
 			</td></tr></table>";
             $player->battle_id = 0;
             $player->last_pvp = time();
+            
+            // Daily Tasks
+            $dt = [];
+            foreach ($player->daily_tasks as $task) {
+                if ($task['Task'] == 'AI Battles' && $tast['SubTask'] == 'Complete' && $task['Complete'] != 1) {
+                    $task['Progress']++;
+                }
+                array_push($dt, $task);
+            }
+            $player->daily_tasks = $dt;
         }
     } catch(Exception $e) {
         $system->message($e->getMessage());

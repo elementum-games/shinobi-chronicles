@@ -340,6 +340,90 @@ function userProfile() {
 		<label style='width:9.2em;'>Intelligence:</label>" . sprintf("%.2f", $player->intelligence) . "<br />
 		<label style='width:9.2em;'>Willpower:</label>" . sprintf("%.2f", $player->willpower) . "<br />
 		</td></tr></table>";
+
+		echo "
+		<div class='contentDiv'>
+			<h2 class='contentDivHeader'>Daily Tasks</h2>
+
+			<div id='dailyTaskWrapper'>";
+			
+		foreach($player->daily_tasks as $daily_task) {
+
+			$dt_progress = 0;
+			if ($daily_task['Progress'] != 0) {
+				$dt_progress = $daily_task['Progress'] / $daily_task['Amount'] * 100;
+			}
+			$dt_complete = ($daily_task['Complete'] ? 'Complete' : 'NotComplete');
+
+			if ($daily_task['Task'] === 'Missions') {
+				switch($daily_task['MissionRank']) {
+					case '1':
+						$dt_rank = 'D';
+						break;
+					case '2':
+						$dt_rank = 'C';
+						break;
+					case '3':
+						$dt_rank = 'B';
+						break;
+					case '4':
+						$dt_rank = 'A';
+						break;
+					default:
+						$dt_rank = 'SSS';
+						break;
+				}
+				$daily_task['Task'] = $dt_rank . ' ' . $daily_task['Task'];
+			}
+
+			echo "
+				<div class='dailyTask'>
+					<div class='dailyTaskTitle'>
+						".$daily_task['TaskName']."
+					</div>
+					<div class='dailyTaskGoal'>
+						<span>Task:</span>
+						<span>".$daily_task['SubTask']." ". $daily_task['Amount'] ." ".$daily_task['Task']."</span>
+					</div>
+					<div class='dailyTaskDifficulty'>
+						<span>Difficulty:</span>
+						<span class='dailyTask".$daily_task['Difficulty']."'>".$daily_task['Difficulty']."</span>
+					</div>
+					<div class='dailyTaskReward'>
+						<span>Reward:</span>
+						<span>¥".$daily_task['Reward']."</span>
+					</div>
+					<div class='dailyTaskProgress'>
+						<div class='dailyTaskProgressBar dailyTask".$dt_complete."'>
+							<div style='width: ".$dt_progress."%;'></div>
+						</div>
+					</div>
+					<div class='dailyTaskProgressCaption'>
+						<span>".$daily_task['Progress']."</span> / <span>".$daily_task['Amount']."</span>
+					</div>
+				</div>";
+		}
+
+		$dt_time_remaining = System::timeRemaining($player->daily_tasks_reset + (60*60*24) - time(), 'short', false, true);
+
+		echo "</div>
+			
+			<div class='contentDivCaption'>
+				<span>Time Remaining:</span>
+				<span id='dailyTaskTimer'>".$dt_time_remaining." left
+				</span>
+			</div>
+
+			<script type='text/javascript'>
+				let stringValue = ".($player->daily_tasks_reset + (60*60*24) - time()).";
+				let targetSpan = document.getElementById('dailyTaskTimer');
+				setInterval(() => {
+					stringValue--;
+					let stringTime = timeRemaining(stringValue, 'short', false, true);
+					targetSpan.innerHTML = stringTime + ' left';
+				}, 1000);
+			</script>
+		</div>";
 	}
 }
 

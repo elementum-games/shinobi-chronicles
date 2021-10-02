@@ -310,6 +310,18 @@ function runActiveMission() {
                 echo "You have been paid &yen;$mission->money.<br />";
             }
 
+            // check what mission rank for daily Task
+            $all_mission_ranks = [0, 1, 2, 3, 4];
+            $mission_rank = $all_mission_ranks[$mission->rank];
+            $dt = [];
+            foreach ($player->daily_tasks as $task) {
+                if ($task['Task'] == 'Missions' && $task['MissionRank'] == $mission_rank && !$task['Complete']) {
+                    $task['Progress']++;
+                }
+                array_push($dt, $task);
+            }
+            $player->daily_tasks = $dt;
+
             $player->money += $mission->money;
             $player->clearMission();
             $player->last_ai = time();
