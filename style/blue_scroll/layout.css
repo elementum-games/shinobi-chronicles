@@ -137,20 +137,24 @@ body {
     background-size: 400px 400px;
 }
 
+:root {
+    --total-width: 1400px;
+}
+
 #mainBanner {
     width: 1000px;
 }
 
 #topMenu {
-    width: 1400px;
+    width: var(--total-width);
 }
 
 #footer {
-    width: 1400px;
+    width: var(--total-width);
 }
 
 #container {
-    width: 1350px;
+    width: calc(var(--total-width) - 50px);
 }
 
 #header {
