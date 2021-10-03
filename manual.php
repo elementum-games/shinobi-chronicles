@@ -82,14 +82,14 @@ $system->renderStaticPageHeader();
           <br></br>
 
           <h2>Character Rank, Stat caps and Requirements</h2>
-          <p><b>Academy student</b>- Starting rank up to level 10. Stat cap of 500</p>
-          <p><b>Genin</b> - Must be a lvl 10 AS plus required exp to take the exam. Stat cap of 3000</p>
+          <p><b>Academy student</b>- Starting rank up to level 10. Stat cap of 1000</p>
+          <p><b>Genin</b> - Must be a lvl 10 AS plus required exp to take the exam. Stat cap of 5000</p>
 
           <p>
             In order to pass the exam, you must buy and learn <b>Basic Replacement</b>, <b>Clone Combo</b>, and <b>Transformation Trickery</b> from the shop and perform the hand signs.<br>
           </p>
           <p>
-            <b>Chuunin</b> - Must be a lvl 20 Genin plus required exp to take the exam. Stat cap of 15000
+            <b>Chuunin</b> - Must be a lvl 20 Genin plus required exp to take the exam. Stat cap of 25000
             In order to pass the exam, the user must pass a basic test along with undergoing a series of battles.
           </p>
 
@@ -124,7 +124,7 @@ $system->renderStaticPageHeader();
           <p><b>Elite</b> - 10% chance</p>
           <p><b>Legendary</b> - 5% chance</p>
 
-          <p>Use Ancient Kunai to purchase or reroll to a new bloodline of your choosing. Note, 50% of bloodline skill will be lost when acquiring a new bloodline.</p>
+          <p>Use Ancient Kunai to purchase or reroll to a new bloodline of your choosing. Note, 10% of bloodline skill will be lost when acquiring a new bloodline.</p>
           <p><b>Legendary</b> - 80 AK</p>
           <p><b>Elite</b> - 60 AK</p>
           <p><b>Common</b> - 40 AK</p>
