@@ -541,7 +541,7 @@ function premium() {
 
 	// Change elements
 
-	else if($_POST['change_element'] && $player->rank >= 3) {
+	else if(isset($_POST['change_element']) && $player->rank >= 3) {
 
         try {
 			$current_element = $_POST['current_element'];
