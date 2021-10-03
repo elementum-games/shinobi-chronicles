@@ -1090,8 +1090,8 @@ function premium() {
 						<br />
 						<form action='$self_link' method='post'>
 							<select name='current_element'>";
-								foreach ($player->elements as $player_elements) {
-									echo "<option value='$player_elements'>$player_elements</option>";
+								foreach ($player->elements as $slot => $element) {
+									echo "<option value='{$slot}'>{$element}</option>";
 								}
 						echo "
 						</select>
