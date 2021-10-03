@@ -610,7 +610,8 @@ class User extends Fighter {
 						'members' => json_decode($data['members'], true),
 						'mission_id' => $data['mission_id'],
 						'mission_stage' => json_decode($data['mission_stage'], true),
-						'logo' => $data['logo']
+						'logo' => $data['logo'],
+						'boost_time' => $data['boost_time']
 					);
 
 					// Same square boost
@@ -619,6 +620,13 @@ class User extends Fighter {
 					$location_count = $this->system->db_fetch($result)['count'];
 
 					$this->defense_boost += (($location_count - 1) * 0.1);
+
+					// check if boosts have expired.
+					$seven_days = 60*60*24*7;
+					if ($this->team['boost_time'] * $seven_days <= time()) {
+						$this->team['boost'] = 'none';
+						$this->team['boost_amount'] = 0.00;
+					}
 				}
 			}
 		}

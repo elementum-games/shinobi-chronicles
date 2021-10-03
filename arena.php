@@ -182,6 +182,13 @@ function arenaFight(): bool {
 						<br />You have gained 1 ' . ucwords(str_replace('_', ' ', $stat)) . '.';
                 }
             }
+            
+            // TEAM BOOST AI GAINS
+            if ($player->team['boost'] == 'AI') {
+                $percent_increase = ceil($money_gain * $player->team['boost_amount'] / 100);
+                $money_gain += $percent_increase;
+            }
+
             $player->money += $money_gain;
             echo "<table class='table'><tr><th>Battle Results</th></tr>
 			<tr><td>You have defeated your arena opponent.<br />

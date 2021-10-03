@@ -59,6 +59,11 @@ function training() {
 				$train_length = $stat_extended_train_length;
 				$train_gain = $stat_extended_train_gain - 20;
 			}
+			// TEAM BOOST TRAINING GAINS
+			if ($player->team['boost'] == 'Training') {
+                $percent_increase = ceil($train_gain * $player->team['boost_amount'] / 100);
+                $train_gain += $percent_increase;
+			}
 			if($_POST['skill']) {
 				if($player->total_stats >= $player->stat_cap) {
 					throw new Exception("You cannot train any more at this rank!");
@@ -113,13 +118,13 @@ function training() {
 				throw new Exception("Invalid training type!");
 			}
 			// Check for clan training boost
-			if($player->clan && substr($player->clan['boost'], 0, 9) == 'training:') {
-				if($train_type == substr($player->clan['boost'], 9) || strpos($train_type, 'jutsu') !== false && substr($player->clan['boost'], 9) == 'jutsu') {
-					$system->message("Your training was reduced by " . ($train_length * ($player->clan['boost_amount'] / 100)) . " seconds
-					due to your clan boost.");
-					$train_length *= 1 - ($player->clan['boost_amount'] / 100);
-				}
-			}
+			// if($player->clan && substr($player->clan['boost'], 0, 9) == 'training:') {
+			// 	if($train_type == substr($player->clan['boost'], 9) || strpos($train_type, 'jutsu') !== false && substr($player->clan['boost'], 9) == 'jutsu') {
+			// 		$system->message("Your training was reduced by " . ($train_length * ($player->clan['boost_amount'] / 100)) . " seconds
+			// 		due to your clan boost.");
+			// 		$train_length *= 1 - ($player->clan['boost_amount'] / 100);
+			// 	}
+			// }
 
 			$player->log(User::LOG_TRAINING, "Type: {$train_type} / Length: {$train_length}");
 
