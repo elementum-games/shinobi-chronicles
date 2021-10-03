@@ -597,7 +597,7 @@ function premium() {
 								</tr>
 							</table>";
 							return true;
-						} else if(isset($_POST['confirm'])) {
+						} else {
 								echo "<table class='table'><tr><th>Chakra Element Change</th></tr>
 										<td style='text-align:center;'>";
 											switch($new_element) {
