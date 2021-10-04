@@ -59,11 +59,6 @@ function training() {
 				$train_length = $stat_extended_train_length;
 				$train_gain = $stat_extended_train_gain - 20;
 			}
-			// TEAM BOOST TRAINING GAINS
-			if ($player->team['boost'] == 'Training') {
-                $percent_increase = ceil($train_gain * $player->team['boost_amount'] / 100);
-                $train_gain += $percent_increase;
-			}
 			if($_POST['skill']) {
 				if($player->total_stats >= $player->stat_cap) {
 					throw new Exception("You cannot train any more at this rank!");

@@ -909,6 +909,20 @@ class User extends Fighter {
 				}
 				// Skill/attribute training
 				else {
+					// TEAM BOOST TRAINING GAINS
+					$team_boost = false;
+					if ($this->team['boost'] == 'Training') {
+						$random_number = rand(1, 100);
+						if ($random_number <= $this->team['boost_amount']) {
+							// boost success
+							// a "flat" 20% increase in stat gain
+							$boost_amount = ceil(20 / 100 * $this->train_gain);
+							$team_boost = '<br>LUCKY! Your team bond triggered a breakthrough and resulted in increased progress!
+							<br>
+							You gained an additional <b>[ ' . $boost_amount . ' ]</b> point(s)';
+							$this->train_gain += $boost_amount;
+						}				
+					}
 					// Check caps
 					$gain = $this->train_gain;
 
@@ -927,7 +941,7 @@ class User extends Fighter {
 
 					$this->train_time = 0;
 					$this->system->message("You have gained " . $gain . " " . ucwords(str_replace('_', ' ', $this->train_type)) .
-						" and " . ($gain * 10) . " experience.");
+						" and " . ($gain * 10) . " experience.".$team_boost);
 				}
 			}
 			else {

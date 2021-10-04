@@ -127,36 +127,31 @@ function team() {
 		$allowed_boosts = [
 			'Training' => [
 				'Amount' => [
-					'2.5' => [
-						'Cost' => 5
-					],
-					'5.0' => [
+					10 => [
 						'Cost' => 10
 					],
-					'10.0' => [
-						'Cost' => 25
+					20 => [
+						'Cost' => 10
 					],
-					'15.0' => [
-						'Cost' => 30
+					30 => [
+						'Cost' => 20
 					]
 				]
 			],
 			'AI' => [
 				'Amount' => [
-					'2.5' => [
-						'Cost' => 5
-					],
-					'5.0' => [
+					10 => [
 						'Cost' => 10
 					],
-					'10.0' => [
-						'Cost' => 25
+					20 => [
+						'Cost' => 20
 					],
-					'15.0' => [
+					30 => [
 						'Cost' => 30
 					]
 				]
-			]];
+			]
+		];
 		
 		if ($player->user_id != $player->team['leader']) {
 			$system->message('You are not the leader of this team!');
@@ -363,13 +358,6 @@ function team() {
 			<br>
 			<a href='$self_link&leave_team=1'><p class='button'>Leave Team</p></a>
 		</td>";
-			// <label style='width:7.2em;'>Boost:</label>";
-			// $boost = explode(':', $player->team['boost']);
-			// if($boost[0] == 'training') {
-			// 	echo (int)$player->team['boost_amount'] . "% faster " . ucwords(str_replace('_', ' ', $boost[1])) . " training<br />";
-			// }
-			// else {
-			// 	echo "None<br />";
 	
 	$result = $system->query("SELECT `user_name`, `avatar_link`, `forbidden_seal` FROM `users` WHERE `user_id`='" . $player->team['leader'] . "' LIMIT 1");
 	if($system->db_num_rows > 0) {
@@ -561,13 +549,17 @@ function team() {
 				<option value='Training'>Training</option>
 				<option value='AI'>AI Gains</option>
 			</select><br>
-			<select name='set_amount'>
-				<option value='2.5'>2.5% - 5 Points</option>
-				<option value='5.0'>5% - 10 Points</option>
-				<option value='10.0'>10% - 20 Points</option>
-				<option value='15.0'>15% - 30 Points</option>
+			<select name='set_amount' id='set_amount' onchange='displayCost()'>
+				<option disabled selected>Percent</option>
+				<option value='10'>10%</option>
+				<option value='20'>20%</option>
+				<option value='30'>30%</option>
 			</select><br>
-			<button type='submit'>Set Boost</button>
+			Cost: <span id='display_cost'>N/A</span>
+			<br>
+			<button type='submit'>Set Boost</button><br>
+			<br>
+			<label style='font-size: 0.8rem; font-style: italic;'>Boosts increase the occurrences of breakthroughs in training or battles. Chance of extra rewards based on boost percentage</label>
 		</form>
 		<br />
 	

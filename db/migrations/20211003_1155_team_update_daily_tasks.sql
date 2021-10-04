@@ -50,7 +50,8 @@ ALTER TABLE `daily_tasks`
 /* ADDING BOOST_TIME TO TEAM */
 
 ALTER TABLE `teams` 
-  ADD `boost_time` INT(11) DEFAULT 0;
+  ADD `boost_time` INT(11) NOT NULL DEFAULT 0,
+  MODIFY `boost_amount` INT(11) NOT NULL DEFAULT 0;
 
   
 COMMIT;
