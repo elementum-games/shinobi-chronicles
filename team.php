@@ -121,8 +121,8 @@ function team() {
 	else if (isset($_POST['set_boost'], $_POST['set_amount'])) {
 
 		$boost_valid = true;
-		$Boost = $system->clean($_POST['set_boost']);
-		$Amount = $system->clean($_POST['set_amount']);
+		$boost = $system->clean($_POST['set_boost']);
+		$amount = $system->clean($_POST['set_amount']);
 
 		$allowed_boosts = [
 			'Training' => [
@@ -163,26 +163,26 @@ function team() {
 			$boost_valid = false;
 		}
 
-		if (!array_key_exists($Boost, $allowed_boosts)) {
+		if (!array_key_exists($boost, $allowed_boosts)) {
 			$system->message('This boost does not exist!');
 			$boost_valid = false;
 		}
 
-		if (!array_key_exists($Amount, $allowed_boosts[$Boost]['Amount'])) {
+		if (!array_key_exists($amount, $allowed_boosts[$boost]['Amount'])) {
 			$system->message('You cannot boost by this amount!');
 			$boost_valid = false;
 		}
 
-		if ($allowed_boosts[$Boost]['Amount'][$Amount]['Cost'] > $player->team['points']) {
+		if ($allowed_boosts[$boost]['Amount'][$amount]['Cost'] > $player->team['points']) {
 			$system->message('Your team does not have enough points for this boost!');
 			$boost_valid = false;
 		}
 		
 		if ($boost_valid) {
-			$new_points = $player->team['points'] - $allowed_boosts[$Boost]['Amount'][$Amount]['Cost'];
+			$new_points = $player->team['points'] - $allowed_boosts[$boost]['Amount'][$amount]['Cost'];
 			$boost_time = time();
 			try {
-				$result = $system->query("UPDATE `teams` SET `boost`='{$Boost}', `boost_amount`='{$Amount}', `points`='{$new_points}', `boost_time`='{$boost_time}' WHERE `team_id`='{$player->team['id']}' ");
+				$result = $system->query("UPDATE `teams` SET `boost`='{$boost}', `boost_amount`='{$amount}', `points`='{$new_points}', `boost_time`='{$boost_time}' WHERE `team_id`='{$player->team['id']}' ");
 				$system->message('Boost set!');
 			}
 			catch (Exception $e) {
