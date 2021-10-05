@@ -552,7 +552,7 @@ function premium() {
 	            }
 
 				switch($current_element) {
-						case 'Fire':
+						case Jutsu::ELEMENT_FIRE:
 						case 'Wind':
 						case 'Lightning':
 						case 'Earth':
