@@ -9,14 +9,20 @@ services:
     volumes:
       - ./:/var/www/html
     depends_on:
-      - "db"
-  db:
+      - "sc_db"
+  sc_db:
     image: mysql:5.7
     environment:
-      MYSQL_ROOT_PASSWORD: database_password
-      MYSQL_DATABASE: database_name
-      MYSQL_USER: database_username
-      MYSQL_PASSWORD: database_password
+      MYSQL_ROOT_PASSWORD: root_db_pass
+      MYSQL_DATABASE: shinobi_chronicles_db
+      MYSQL_USER: sc_db_usr
+      MYSQL_PASSWORD: sc_db_pass
     ports:
       - "3306:3306"
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8080:8080
 
