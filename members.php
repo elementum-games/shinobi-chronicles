@@ -40,9 +40,108 @@ function members() {
 		<input type='submit' value='Search' />
 		</form>
 	</div>";
-	
+
+	// Display Team profile
+	if (isset($_GET['view_team'])) {
+		$team_id = $system->clean($_GET['view_team']);
+		try {
+			$result = $system->query("SELECT `name`, `type`, `points`, `monthly_points`, `village`, `members`, `logo`, `leader` FROM `teams` WHERE `team_id`='{$team_id}'");
+			
+			if ($system->db_num_rows == 0) {
+				throw new Exception ('Team does not exist');
+			}
+
+			$team_info = $system->db_fetch($result);
+			$team_member_ids = json_decode($team_info['members'], true);
+
+			$result = $system->query("SELECT `user_name`, `avatar_link`, `forbidden_seal` FROM `users` WHERE `user_id`='{$team_info['leader']}'");
+			$leader_info = $system->db_fetch($result);
+			$forbidden_seal = ($leader_info['forbidden_seal'] != '' ? '175px' : '125px');
+
+			echo "
+			<table class='table'>
+				<tr>
+					<th colspan='3'>
+						{$team_info['name']}
+					</th>
+				</tr>
+				<tr>
+					<th style='width: 33%;'>
+						Info
+					</th>
+					<th style='width: 33%;'>
+
+					</th>
+					<th style='width: 33%;'>
+						Leader
+					</th>
+				</tr>
+				<tr>
+					<td style='vertical-align: middle;'>
+						<b>Village</b>: {$team_info['village']} <br>
+						<b>Type</b>: Shinobi<br>
+					</td>
+					<td style='vertical-align: middle;'>
+						<b>Points</b>: {$team_info['points']} <br>
+						<b>Monthly Points</b>: {$team_info['monthly_points']}
+					</td>
+					<td style='vertical-align: middle;text-align: center;' rowspan='2'>
+						<a href='{$self_link}&user={$leader_info['user_name']}'>{$leader_info['user_name']}</a> <br>
+						<img src='{$leader_info['avatar_link']}' style='margin-top:5px;max-width:{$forbidden_seal};max-height:{$forbidden_seal};'>
+					</td>
+				</tr>
+				<tr>
+					<td colspan='2' style='text-align: center;'>
+						<img src='{$team_info['logo']}' style='width: 450px; height: 100px;'>
+					</td>
+				</tr>
+			</table>
+
+			<table class='table'>
+				<tr>
+					<th colspan='3'>
+						Members
+					</th>
+				</tr>
+				<tr>
+					<th tyle='width: 33%;'>
+						Name
+					</th>
+					<th tyle='width: 33%;'>
+						Rank
+					</th>
+					<th tyle='width: 33%;'>
+						Level
+					</th>
+				</tr>";
+			
+			$user_ids = implode(',', $team_member_ids);
+			$result = $system->query("SELECT `user_name`, `rank`, `level` FROM `users` WHERE `user_id` IN ($user_ids) ORDER BY `rank` DESC, `level` DESC");
+			
+			while ($team_member = $system->db_fetch($result)) {
+				echo "
+				<tr class='table_multicolumns'>
+					<td>
+						<a href='{$self_link}&user={$team_member['user_name']}'>{$team_member['user_name']}</a>
+					</td>
+					<td style='text-align: center;'>
+						{$ranks[$team_member['rank']]}
+					</td>
+					<td style='text-align: center;'>
+						{$team_member['level']}
+					</td>
+				</tr>";
+			}
+			echo "</table>";
+		}
+		catch (Exception $e) {
+			$system->message($e->getMessage());
+		}
+		$system->printMessage();
+		$display_list = false;
+	}
+	else if(isset($_GET['user'])) {
 	// Display user's profile
-	if(isset($_GET['user'])) {
 		$user_name = $system->clean($_GET['user']);
 		$result = $system->query("SELECT `user_id` FROM `users` WHERE `user_name`='{$user_name}' LIMIT 1");
 			
@@ -127,7 +226,7 @@ function members() {
 				echo $viewUser->clan_office ? "<label style='width:6em;'>Clan Rank:</label> " . $clan_positions[$viewUser->clan_office] . "<br />" : "";
 			}
 			if($viewUser->team) {
-				echo "<label style='width:6em;'>Team:</label> " . $viewUser->team['name'] . "<br />";
+				echo "<label style='width:6em;'>Team:</label> <a href='{$self_link}&view_team={$viewUser->team['id']}'>" . $viewUser->team['name'] . "</a><br />";
 			}
 			echo "<br />
 			<label style='width:6em;'>PvP wins:</label>	$viewUser->pvp_wins<br />

@@ -113,13 +113,13 @@ function training() {
 				throw new Exception("Invalid training type!");
 			}
 			// Check for clan training boost
-			if($player->clan && substr($player->clan['boost'], 0, 9) == 'training:') {
-				if($train_type == substr($player->clan['boost'], 9) || strpos($train_type, 'jutsu') !== false && substr($player->clan['boost'], 9) == 'jutsu') {
-					$system->message("Your training was reduced by " . ($train_length * ($player->clan['boost_amount'] / 100)) . " seconds
-					due to your clan boost.");
-					$train_length *= 1 - ($player->clan['boost_amount'] / 100);
-				}
-			}
+			// if($player->clan && substr($player->clan['boost'], 0, 9) == 'training:') {
+			// 	if($train_type == substr($player->clan['boost'], 9) || strpos($train_type, 'jutsu') !== false && substr($player->clan['boost'], 9) == 'jutsu') {
+			// 		$system->message("Your training was reduced by " . ($train_length * ($player->clan['boost_amount'] / 100)) . " seconds
+			// 		due to your clan boost.");
+			// 		$train_length *= 1 - ($player->clan['boost_amount'] / 100);
+			// 	}
+			// }
 
 			$player->log(User::LOG_TRAINING, "Type: {$train_type} / Length: {$train_length}");
 

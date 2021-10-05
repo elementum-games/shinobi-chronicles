@@ -21,8 +21,8 @@ function team() {
 		createTeam();
 		return false;
 	}
-	
-	if($_GET['leave_team']) {
+
+	if(isset($_GET['leave_team'])) {
 		$members = $player->team['members'];
 		$self = false;
 		$count = 0;
@@ -118,7 +118,78 @@ function team() {
 		}
 		$system->printMessage();
 	}
-	else if($_GET['join_mission'] && $player->team['mission_id']) {
+	else if (isset($_POST['set_boost'], $_POST['set_amount'])) {
+
+		$boost_valid = true;
+		$boost = $system->clean($_POST['set_boost']);
+		$amount = $system->clean($_POST['set_amount']);
+
+		$allowed_boosts = [
+			'Training' => [
+				'Amount' => [
+					10 => [
+						'Cost' => 10
+					],
+					20 => [
+						'Cost' => 10
+					],
+					30 => [
+						'Cost' => 20
+					]
+				]
+			],
+			'AI' => [
+				'Amount' => [
+					10 => [
+						'Cost' => 10
+					],
+					20 => [
+						'Cost' => 20
+					],
+					30 => [
+						'Cost' => 30
+					]
+				]
+			]
+		];
+		
+		if ($player->user_id != $player->team['leader']) {
+			$system->message('You are not the leader of this team!');
+			$boost_valid = false;
+		}
+
+		if (!array_key_exists($boost, $allowed_boosts)) {
+			$system->message('This boost does not exist!');
+			$boost_valid = false;
+		}
+
+		if (!array_key_exists($amount, $allowed_boosts[$boost]['Amount'])) {
+			$system->message('You cannot boost by this amount!');
+			$boost_valid = false;
+		}
+
+		if ($allowed_boosts[$boost]['Amount'][$amount]['Cost'] > $player->team['points']) {
+			$system->message('Your team does not have enough points for this boost!');
+			$boost_valid = false;
+		}
+		
+		if ($boost_valid) {
+			$new_points = $player->team['points'] - $allowed_boosts[$boost]['Amount'][$amount]['Cost'];
+			$boost_time = time();
+			try {
+				$result = $system->query("UPDATE `teams` SET `boost`='{$boost}', `boost_amount`='{$amount}', `points`='{$new_points}', `boost_time`='{$boost_time}' WHERE `team_id`='{$player->team['id']}' ");
+				$system->message('Boost set!');
+			}
+			catch (Exception $e) {
+				$system->message($e->getMessage());
+			}
+		}
+		
+		
+		$system->printMessage();
+
+	}
+	else if(isset($_GET['join_mission']) && $player->team['mission_id']) {
 		$mission_id = $player->team['mission_id'];
 		$mission = new Mission($mission_id, $player, $player->team);
 	
@@ -129,7 +200,7 @@ function team() {
 	}
 	// Controls
 	else if($player->user_id == $player->team['leader']) {
-		if($_GET['invite']) {
+		if(isset($_GET['invite'])) {
 			$user_name = $system->clean($_GET['user_name']);
 			try {
 				$result = $system->query("SELECT `user_id`, `rank`, `team_id`, `village` FROM `users` WHERE `user_name`='$user_name'");
@@ -159,7 +230,7 @@ function team() {
 			}
 			$system->printMessage();
 		}
-		else if($_POST['kick']) {
+		else if(isset($_POST['kick'])) {
 			$kick = (int)$system->clean($_POST['user_id']);
 			
 			$members = $player->team['members'];
@@ -222,43 +293,18 @@ function team() {
 			$system->printMessage();
 						
 		}
-		else if($_POST['change_logo']) {
+		else if(isset($_POST['logo_link'])) {
 			$avatar_link = $system->clean($_POST['logo_link']);
 			try {
-				if(strlen($avatar_link) < 5) {
-					throw new Exception("Please enter a logo link!");
-				}
-				$avatar_link = $system->clean($avatar_link);
-				
-				if(!getimagesize($avatar_link)) {
-					throw new Exception("Image does not exist!");
-				}
-				
-				$suffix_array = explode(".", $avatar_link);
-				$suffix = $suffix_array[count($suffix_array) - 1];
-				$suffix = preg_replace("/\/[^\/]*/", "", $suffix);
-				unset($suffix_array);
-				$content = file_get_contents($avatar_link); 
-				$temp_filename = "./images/avatars/team_{$player->team['id']}.$suffix";
-				$handle = fopen($temp_filename, "w+"); 
-				fwrite($handle, $content); 
-				fclose($handle); 
-				if(filesize($temp_filename) > 256000) {
-					$filesize = round(filesize($temp_filename) / 1024);
-					throw new Exception("Image is too large! Size {$filesize}kb, maximum is 250kb");
-				}
-
-				
-				$system->query("UPDATE `teams` SET `logo`='$avatar_link' WHERE `team_id`={$player->team['id']} LIMIT 1");
+				$system->query("UPDATE `teams` SET `logo`='{$avatar_link}' WHERE `team_id`={$player->team['id']} LIMIT 1");
 				$player->team['logo'] = $avatar_link;
 				$system->message("Logo updated!");
-				
-				unlink($temp_filename); 	
 			} catch (Exception $e) {
 				$system->message($e->getMessage());
 			}
+			$system->printMessage();
 		}
-		else if($_POST['start_mission']) {
+		else if(isset($_POST['start_mission'])) {
 			$mission_id = (int)$system->clean($_POST['mission_id']);
 			$result = $system->query("SELECT `mission_id` FROM `missions` WHERE `mission_id`=$mission_id AND `mission_type`=3");
 			if($system->db_num_rows == 0) {
@@ -281,7 +327,7 @@ function team() {
 			}
 			$system->printMessage();
 		}
-		else if($_GET['cancel_mission']) {
+		else if(isset($_GET['cancel_mission'])) {
 			$mission_id = $player->team['mission_id'];
 			$result = $system->query("UPDATE `teams` SET `mission_id`=0, `mission_stage`='' WHERE `team_id`={$player->team['id']} LIMIT 1");
 			$result = $system->query("UPDATE `users` SET `mission_id`=0 WHERE `team_id`={$player->team['id']} AND `mission_id`=$mission_id");
@@ -297,26 +343,21 @@ function team() {
 		}
 	}
 	
-	echo "<table class='table'><tr><th>" . $player->team['name'] . "</th></tr>
-	<tr><td>
-	<style type='text/css'>
-	label {
-		display: inline-block;
-	}
-	</style>
-	
-	<div style='float:left;margin-top:8px;width:24%;'>
-	<label style='width:7.2em;'>Team Type:</label>Shinobi<br />
-	<label style='width:7.2em;'>Points:</label>" . $player->team['points'] . "<br />
-	<label style='width:7.2em;'>Boost:</label>";
-	$boost = explode(':', $player->team['boost']);
-	if($boost[0] == 'training') {
-		echo (int)$player->team['boost_amount'] . "% faster " . ucwords(str_replace('_', ' ', $boost[1])) . " training<br />";
-	}
-	else {
-		echo "None<br />";
-	}
-	
+	echo "<table class='table'>
+	<tr><th colspan='3'>" . $player->team['name'] . "</th></tr>
+	<tr>
+		<th style='width: 33%;'>Information</th>
+		<th style='width: 33%;'>Boost</th>
+		<th style='width: 33%;'>Leader</th>
+	</tr>
+	<tr>
+		<td style='vertical-align: top;'>
+			<b>Team Type:</b> Shinobi<br />
+			<br>
+			<b>Points:</b> " . $player->team['points'] . "<br />
+			<br>
+			<a href='$self_link&leave_team=1'><p class='button'>Leave Team</p></a>
+		</td>";
 	
 	$result = $system->query("SELECT `user_name`, `avatar_link`, `forbidden_seal` FROM `users` WHERE `user_id`='" . $player->team['leader'] . "' LIMIT 1");
 	if($system->db_num_rows > 0) {
@@ -332,16 +373,61 @@ function team() {
 		$leader = 'None';
 		$leader_avatar = './images/default_avatar.png';
 	}
+
+	if ($player->team['boost'] != 'none') {
+		$boost_text = $player->team['boost'] . ' -- ' . $player->team['boost_amount'] . '%';
+		$time_left = $player->team['boost_time'] + (60*60*24*7) - time();
+		$boost_time = $system->timeRemaining($time_left, 'long');
+	} else {
+		$boost_text = 'none';
+		$boost_time = 'n/a';
+	}
 	
-	echo "<br />
-	<!--Team Symbol-->
-	<p style='text-align:center;'>
-		<img src='{$player->team['logo']}' style='max-width:64px;max-height:64px;' />
-	</p>
-	</div>";
+	echo "
+	<td style='text-align: center;vertical-align: middle;'>
+		<b>Current Boosts:</b> {$boost_text}<br>
+		<b>Time Remaining:</b><br>
+		{$boost_time}
+	</td>";
 	
+		
+	echo "
+	<td rowspan='2' style='text-align: center;vertical-align: middle;'>
+			<img src='$leader_avatar' style='max-width:125px;max-height:125px;' />
+	</td>
+	</tr>
+	<tr>
+		<td colspan='2' style='text-align: center;'>
+			<img src='{$player->team['logo']}' style='width: 450px; height: 100px;'>
+		</td>
+	</tr>
+	</table>";
+	
+	// Start mission
+	echo "<table class='table'>
+	<tr><th colspan='2'>Missions</th></tr>
+	<tr><td style='text-align:center; width: 50%;'>";
+
+	if($player->team['mission_id']) {
+		echo "<p style='margin:0px;margin-top:5px;'>
+			<a href='$self_link&cancel_mission=1'><span class='button'>Cancel Mission</span></a></p>";
+	}
+	else {
+		$result = $system->query("SELECT `mission_id`, `name`, `rank` FROM `missions` WHERE `mission_type`=3");
+		
+		echo "<form action='$self_link' method='post'>
+		<select name='mission_id'>";
+		while($mission = $system->db_fetch($result)) {
+			echo "<option value='{$mission['mission_id']}'>{$mission['name']}</option>";
+		}
+		echo "</select><br />
+		<input type='submit' name='start_mission' value='Start Mission' />
+		</form>";
+	}
+
+	echo "</td>";
 	// Mission display
-	echo "<div style='display:inline-block;width:44%;margin-left:4%;margin-top:30px;text-align:center;'>
+	echo "<td style='text-align: center;'><div>
 	<p style='font-size:1.1em;font-weight:bold;text-decoration:underline;margin-top:0px;margin-bottom:5px;'>Current Mission</p>";
 	if($player->team['mission_id']) {
 		$result = $system->query("SELECT `name` FROM `missions` WHERE `mission_id`={$player->team['mission_id']} LIMIT 1");
@@ -349,7 +435,7 @@ function team() {
 		if($player->mission_id == $player->team['mission_id']) {
 			echo "<b>$name</b><br />" .
 			$player->mission_stage['description'];
-			if($player->team['mission_stage']['count_needed']) {
+			if(is_array($player->team['mission_stage']) && $player->team['mission_stage']['count_needed']) {
 				echo ' (' . $player->team['mission_stage']['count'] . '/' . $player->team['mission_stage']['count_needed'] . ' remaining)';
 			}
 		}
@@ -364,27 +450,20 @@ function team() {
 	else {
 		echo "None";
 	}
-	echo "</div>";
-		
-	echo "<!--Leader -->
-	<div style='float:right;width:25%;height:145px;margin:1%;margin-top:5px;text-align:center;'>
-		<p style='margin:2px;margin-bottom:4px;padding:3px 5px;border:1px solid #000000;border-radius:15px;color:#000000;font-weight:bold;
-			background:linear-gradient(to bottom, #DCCA12, #FAF000, #DCCA12);'>Team Leader</p>
-		<span style='font-size:1.2em;font-family:\"tempus sans itc\";font-weight:bold;'>$leader</span><br />
-		<img src='$leader_avatar' style='max-width:125px;max-height:125px;' />
-		</div>
-	
-	
-	<br style='clear:both;margin:0px;' />
-	<p style='width:44%;margin-left:28%;text-align:center;'><a href='$self_link&leave_team=1'>Leave Team</a></p>
-	</td></tr></table>";
-	
+	echo "</div>
+	</table>";
+
 	// Members
 	$user_ids = implode(',', $player->team['members']);
 	$result = $system->query("SELECT `user_name`, `rank`, `level`, `monthly_pvp` FROM `users` 
 		WHERE `user_id` IN ($user_ids) ORDER BY `rank` DESC, `level` DESC");
 	
 	echo "<table class='table'>
+	<tr>
+		<th colspan='4'>
+			Team Members
+		</th>
+	</tr>
 	<tr>
 		<th style='width:30%;'>Username</th>
 		<th style='width:20%;'>Rank</th>
@@ -394,19 +473,11 @@ function team() {
 	
 	
 	while($row = $system->db_fetch($result)) {
-		$class = '';
-		if(is_int($count++ / 2)) {
-			$class = 'row1';
-		}
-		else {
-			$class = 'row2';
-		}
-		
-		echo "<tr>
-			<td style='width:29%;' class='$class'><a href='{$system->links['members']}&user={$row['user_name']}'>" . $row['user_name'] . "</a></td>
-			<td style='width:20%;text-align:center;' class='$class'>" . $RANK_NAMES[$row['rank']] . "</td>
-			<td style='width:20%;text-align:center;' class='$class'>" . $row['level'] . "</td>
-			<td style='width:30%;text-align:center;' class='$class'>" . $row['monthly_pvp'] . "</td>
+		echo "<tr class='table_multicolumns'>
+			<td style='width:29%;'><a href='{$system->links['members']}&user={$row['user_name']}'>" . $row['user_name'] . "</a></td>
+			<td style='width:20%;text-align:center;'>" . $RANK_NAMES[$row['rank']] . "</td>
+			<td style='width:20%;text-align:center;'>" . $row['level'] . "</td>
+			<td style='width:30%;text-align:center;'>" . $row['monthly_pvp'] . "</td>
 		</tr>";
 	}
 	echo "</table>";
@@ -429,14 +500,15 @@ function team() {
 			unset($members[$self]);
 		}
 			
-		echo "<table class='table'><tr><th colspan='2'>Team Controls</th></tr>";
+		echo "<table class='table'><tr><th colspan='3'>Team Controls</th></tr>";
 		
 		// Team members (invite/kick)
 		echo "<tr>
-			<th>Members</th>
-			<th>Settings/Actions</th>
+			<th style='width: 33%;'>Invite</th>
+			<th style='width: 33%;'>Logo</th>
+			<th style='width: 33%;'>Boost</th>
 		</tr>
-		<tr><td style='text-align:center;width:50%;'>
+		<tr><td style='text-align:center;'>
 		<br />
 		<form action='$self_link' method='get'>
 		<input type='hidden' name='id' value='$self_id'>
@@ -461,45 +533,37 @@ function team() {
 			</form><br />";	
 		}
 		
-		echo "</td>";
-		
-		
-		echo "<td style='width:50%;text-align:center;'>
-		<!--LOGO-->
+		echo "</td>
+		<td style='text-align: center;'>
+		<br>
+			<form action='$self_link' method='post'>
+				<input type='text' name='logo_link' value='{$player->team['logo']}'><br>
+				<button type='submit'>Change Logo</button><br>
+				Dimensions: 450x100<br>
+			</form>
+		</td>
+		<td style='text-align:center;'>
+		<br>
 		<form action='$self_link' method='post'>
-		<input type='text' name='logo_link' value='{$player->team['logo']}' style='width:250px;' /><br />
-		<input type='submit' name='change_logo' value='Change Logo' />
+			<select name='set_boost'>
+				<option value='Training'>Training</option>
+				<option value='AI'>AI Gains</option>
+			</select><br>
+			<select name='set_amount' id='set_amount' onchange='displayCost()'>
+				<option disabled selected>Percent</option>
+				<option value='10'>10%</option>
+				<option value='20'>20%</option>
+				<option value='30'>30%</option>
+			</select><br>
+			Cost: <span id='display_cost'>N/A</span>
+			<br>
+			<button type='submit'>Set Boost</button><br>
+			<br>
+			<label style='font-size: 0.8rem; font-style: italic;'>Boosts increase the occurrences of breakthroughs in training or battles. Chance of extra rewards based on boost percentage</label>
 		</form>
 		<br />
-		
-		<!--Set boost-->
-		</td></tr>";
-		
-		// Start mission
-		echo "<tr><th colspan='2'>Missions</th></tr>
-		<tr><td colspan='2' style='text-align:center;'>";
-		
-		if($player->team['mission_id']) {
-			echo "<p style='margin:0px;margin-top:5px;'>
-				<a href='$self_link&cancel_mission=1'><span class='button'>Cancel Mission</span></a></p>";
-		}
-		else {
-			$result = $system->query("SELECT `mission_id`, `name`, `rank` FROM `missions` WHERE `mission_type`=3");
-			
-			echo "<form action='$self_link' method='post'>
-			<select name='mission_id'>";
-			while($mission = $system->db_fetch($result)) {
-				echo "<option value='{$mission['mission_id']}'>{$mission['name']}</option>";
-			}
-			echo "</select><br />
-			<input type='submit' name='start_mission' value='Start Mission' />
-			</form>";
-		}
-		
-		echo "</td></tr>";
-		
-		
-		echo "</table>";
+	
+		</td></tr></table>";
 	}
 }
 
@@ -671,7 +735,7 @@ function createTeam() {
 			<div style='display:inline-block;width:150px;height:145px;'>
 				<p style='margin:2px;margin-bottom:4px;padding:3px 5px;border:1px solid #000000;border-radius:15px;color:#000000;font-weight:bold;
 					background:linear-gradient(to bottom, #DCCA12, #EFDA17, #DCCA12);'>Team Leader</p>
-				<span style='font-size:1.2em;font-family:\"tempus sans itc\";font-weight:bold;'>{$leader_data['user_name']}</span>
+				<span style='font-size:1.2em;font-family:\"tempus sans itc\";font-weight:bold;'>{$leader_data['user_name']}</span><br>
 				<img src='{$leader_data['avatar_link']}' style='max-width:100px;max-height:100px;' /><br />
 				" . $RANK_NAMES[$leader_data['rank']] . "
 			</div>

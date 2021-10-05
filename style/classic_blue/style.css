@@ -704,3 +704,165 @@ br.clear {
     border-bottom-left-radius: 10px;
     border-bottom-right-radius: 10px;
 }
+
+.contentDiv,
+.contentDivMed {
+    width: 95%;
+    margin: 15px auto 15px auto;
+
+    background: #D0DAE0;
+    border-radius: 10px;
+	border: 1px solid #2020209d;
+
+	font-family: sans-serif;
+}
+
+.contentDivMed {
+    width: 70%;
+}
+
+.contentDivHeader {
+    padding: 5px 0;
+	margin: 0 auto;
+    text-align: center;
+
+    background: linear-gradient(#0C283C, #318FD3);
+	border-bottom: 1x solid #AAAAAA;
+	border-top-left-radius: 8px;
+	border-top-right-radius: 8px;
+
+    color: #FFFFFF;
+	text-shadow: 0 1px 0 #000000;
+    font-size: 0.9rem;
+}
+
+.contentDivCaption {
+    width: 90%;
+    padding: 15px 0;
+    text-align: center;
+    margin: 0 auto;
+
+    color: rgb(48, 48, 48);
+    font-size: 1.3rem;
+    font-family: 'BebasNeue', sans-serif;
+}
+
+.contentDivCaption span:first-of-type {
+    padding-right: 10px;
+
+    color: rgb(48, 48, 48);
+	font-weight: bold;
+}
+
+#dailyTaskWrapper {
+    width: 95%;
+    margin: 0 auto;
+    display: flex;
+    flex-flow: column wrap;
+    padding: 10px 0 0 0;
+}
+
+.dailyTask {
+    display: flex;
+    flex-flow: row wrap;
+}
+
+.dailyTaskTitle {
+    flex-grow: 4;
+    width: 100%;
+    padding: 5px 0 10px 0;
+
+    font-size: 1rem;
+    color: rgb(48, 48, 48);
+    text-transform: uppercase;
+}
+
+.dailyTaskGoal span:first-of-type,
+.dailyTaskReward span:first-of-type,
+.dailyTaskDifficulty span:first-of-type {
+    padding-right: 10px;
+
+    color: rgb(48, 48, 48);
+    text-transform: uppercase;
+	font-weight: bold;
+}
+
+.dailyTaskGoal,
+.dailyTaskReward,
+.dailyTaskDifficulty {
+    text-align: left;
+
+    color: rgb(48, 48, 48);
+    font-size: 0.7rem;
+}
+
+.dailyTaskReward {
+    text-align: left;
+}
+
+.dailyTaskDifficulty {
+    text-align: left;
+}
+
+.dailyTaskGoal, 
+.dailyTaskReward,
+.dailyTaskDifficulty {
+    flex-grow: 1;
+    width: 33%;
+}
+
+.dailyTaskDifficulty span:last-of-type {
+    font-weight: bold;
+}
+
+.dailyTaskProgress {
+    display: flex;
+    flex-grow: 3;
+    width: 90%;
+    height: 30px;
+}
+
+.dailyTaskProgressCaption {
+    flex-grow: 1;
+    width: 10%;
+    text-align: center;
+    line-height: 30px;
+
+    color: rgb(48, 48, 48);
+    font-size: 0.8rem;
+    font-weight: bold;
+}
+
+.dailyTaskProgressBar {
+    height: 10px;
+    width: 100%;
+    align-self: center;
+
+    background: #575656;
+    box-shadow: 0 0 1px #000000 inset, 0 0 0 1px rgba(255,255,255,0.02);
+    border: 1px solid #000000;
+}
+
+.dailyTaskProgressBar div {
+    height: 100%;
+    margin-left: 0;
+
+    background:  linear-gradient(#0C283C, #318FD3);
+    border-right: 1px solid #000000;
+}
+
+.dailyTaskComplete div {
+    background: #218821;
+}
+
+.dailyTaskEasy {
+    color: #3bac4e;
+}
+
+.dailyTaskMedium {
+    color: #b1a00b;
+}
+
+.dailyTaskHard {
+    color: #d13535;
+}

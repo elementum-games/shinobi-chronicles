@@ -43,6 +43,15 @@ function battle(): bool {
 						WHERE `team_id`={$player->team['id']} LIMIT 1");
 					echo "You have earned $team_point_gain point for your team.<br />";
 				}
+				// Daily Tasks
+				$dt = [];
+				foreach ($player->daily_tasks as $task) {
+					if ($task['Task'] == 'PVP Battles' && $task['Complete'] != 1) {
+						$task['Progress']++;
+					}
+					array_push($dt, $task);
+				}
+				$player->daily_tasks = $dt;
 			}
 			else if($battle->isOpponentWinner()) {
 				echo "You lose. You were taken back to your village by some allied ninja.<br />";
@@ -54,6 +63,15 @@ function battle(): bool {
 				$location = explode('.', $player->location);
 				$player->x = $location[0];
 				$player->y = $location[1];
+				// Daily Tasks
+				$dt = [];
+				foreach ($player->daily_tasks as $task) {
+					if ($task['Task'] == 'PVP Battles' && $task['SubTask'] == 'Complete' && $task['Complete'] != 1) {
+						$task['Progress']++;
+					}
+					array_push($dt, $task);
+				}
+				$player->daily_tasks = $dt;
 			}
 			else {
 				echo "You both knocked each other out. You were taken back to your village by some allied ninja.<br />";
@@ -63,6 +81,15 @@ function battle(): bool {
 				$player->x = $location[0];
 				$player->y = $location[1];
 				$player->last_pvp = time();
+				// Daily Tasks
+				$dt = [];
+				foreach ($player->daily_tasks as $task) {
+					if ($task['Task'] == 'PVP Battles' && $task['SubTask'] == 'Complete' && $task['Complete'] != 1) {
+						$task['Progress']++;
+					}
+					array_push($dt, $task);
+				}
+				$player->daily_tasks = $dt;
 			}
 			echo "</td></tr></table>";
 			$player->battle_id = 0;

@@ -126,7 +126,7 @@ function villageHQ() {
 				$class = 'row2';
 			}
 
-			echo "<tr id='villagemembertd' class='fourColGrid'>
+			echo "<tr id='villagemembertd' class='fourColGrid table_multicolumns'>
 				<td style='width:29%;' class='$class'><a href='{$system->links['members']}&user={$row['user_name']}'>" . $row['user_name'] . "</a></td>
 				<td style='width:20%;text-align:center;' class='$class'>" . $ranks[$row['rank']]['name'] . "</td>
 				<td style='width:20%;text-align:center;' class='$class'>" . $row['level'] . "</td>
@@ -194,7 +194,7 @@ function villageHQ() {
 			<th>Points</th>
 		</tr>";
 		foreach($clans as $row) {
-			echo "<tr>
+			echo "<tr class='table_multicolumns'>
 				<td>" . $row['name'] . "</td>
 				<td>" . ($row['leader'] ? $user_names[$row['leader']] : 'None') . "</td>
 				<td>" . $row['points']  . "</td>
@@ -209,9 +209,9 @@ function villageHQ() {
 			<th>Points</th>
 		</tr>";
 		foreach($teams as $row) {
-			echo "<tr>
-				<td>" . $row['name'] . "</td>
-				<td>" . $user_names[$row['leader']] . "</td>
+			echo "<tr class='table_multicolumns'>
+				<td><a href='{$system->links['members']}&view_team={$row['team_id']}'>" . $row['name'] . "</td>
+				<td style='text-align: center;'>" . $user_names[$row['leader']] . "</td>
 				<td style='text-align:center;'>" . $row['points']  . "</td>
 			</tr>";
 		}
@@ -245,7 +245,7 @@ function villageHQ() {
 		</tr>";
 		if(is_array($villages)) {
 			foreach($villages as $village) {
-				echo "<tr id='villages' class='fourColGrid'>
+				echo "<tr id='villages' class='fourColGrid table_multicolumns'>
 					<td style='width:25%;'>" . $village['name'] . "</td>
 					<td style='width:25%;'>" . $village['points'] . "</td>
 					<td style='width:25%;'>" . $village_counts[($village['name'] . '_members')] . "</td>
