@@ -412,7 +412,7 @@ if($LOGGED_IN) {
 			echo "<table class='table globalMessage'><tr><th colspan='2'>Global message</th></tr>
 			<tr><td style='text-align:center;' colspan='2'>" . $system->html_parse($global_message) . "
 			</td></tr>
-			<tr><td style='width: 50px;' class='newsFooter'><a class='link' href='{$system->link}&clear_message=1'>Dismiss</a></td>
+			<tr><td style='width: 50px;' class='newsFooter'><a class='link' href='{$system->link}?clear_message=1'>Dismiss</a></td>
 				<td class='newsFooter'>".$global_message_time."</td></tr></table>";
 		}
 		require("news.php");

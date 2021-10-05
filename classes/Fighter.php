@@ -197,12 +197,11 @@ abstract class Fighter {
      *    Calculates raw damage based on player stats and jutsu or item strength
      *
      * @param Jutsu  $attack      Copy of the attack data.
-     * @param string $attack_type (default_jutsu, equipped_jutsu, item, bloodline_jutsu)
      * @param bool   $disable_randomness
      * @return float|int
      * @throws Exception
      */
-    public function calcDamage(Jutsu $attack, $attack_type = 'default_jutsu', bool $disable_randomness = false) {
+    public function calcDamage(Jutsu $attack, bool $disable_randomness = false) {
         if($this->system->debug['damage'])  {
             echo "Debugging damage for {$this->getName()}<br />";
         }
@@ -227,12 +226,12 @@ abstract class Fighter {
                 throw new Exception("Invalid jutsu type!");
         }
 
-        switch($attack_type) {
-            case 'default_jutsu':
-            case 'equipped_jutsu':
+        switch($attack->purchase_type) {
+            case Jutsu::PURCHASE_TYPE_DEFAULT:
+            case Jutsu::PURCHASE_TYPE_PURCHASEABLE:
                 $offense = self::BASE_OFFENSE + ($off_skill * self::SKILL_OFFENSE_RATIO);
                 break;
-            case 'bloodline_jutsu':
+            case Jutsu::PURCHASE_TYPE_BLOODLINE:
                 $offense = self::BASE_OFFENSE +
                     ($off_skill * self::BLOODLINE_OFFENSE_RATIO) + ($this->bloodline_skill * self::BLOODLINE_OFFENSE_RATIO);
                 break;
@@ -248,7 +247,7 @@ abstract class Fighter {
                     continue;
                 }
 
-                if($attack_type == 'bloodline_jutsu') {
+                if($attack->purchase_type == Jutsu::PURCHASE_TYPE_BLOODLINE) {
                     $multiplier = 0.5;
                 }
                 else {
@@ -364,7 +363,7 @@ abstract class Fighter {
 
 
     // Actions
-    abstract public function useJutsu(Jutsu $jutsu, $purchase_type);
+    abstract public function useJutsu(Jutsu $jutsu);
 
     abstract public function updateInventory();
 

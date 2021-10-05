@@ -89,6 +89,10 @@ video {
     box-sizing: border-box;
 }
 
+b {
+    font-weight: bold;
+}
+
 /* END RESET **/
 
 /* FONTS */
@@ -133,20 +137,24 @@ body {
     background-size: 400px 400px;
 }
 
+:root {
+    --total-width: 1300px;
+}
+
 #mainBanner {
     width: 1000px;
 }
 
 #topMenu {
-    width: 1400px;
+    width: var(--total-width);
 }
 
 #footer {
-    width: 1400px;
+    width: var(--total-width);
 }
 
 #container {
-    width: 1350px;
+    width: calc(var(--total-width) - 50px);
 }
 
 #header {
@@ -1644,4 +1652,159 @@ br.clear {
     right: var(--travel-button-size);
     height: var(--travel-button-size);
     bottom: 0;
+}
+
+.contentDiv,
+.contentDivMed {
+    width: 95%;
+    margin: 15px auto 15px auto;
+
+    background: #0d111f;
+    box-shadow: 0 0 2px #000000;
+    border: 1px solid #b99e471f;
+}
+
+.contentDivMed {
+    width: 70%;
+}
+
+.contentDivHeader {
+    padding: 5px 0;
+    text-align: center;
+
+    background: #b99e47;
+
+    font-family: 'BebasNeue', sans-serif;
+    color: #413510;
+    font-size: 1.2rem;
+}
+
+.contentDivCaption {
+    width: 90%;
+    padding: 15px 0;
+    text-align: center;
+    margin: 0 auto;
+
+    color: #beb28a;
+    font-size: 1.3rem;
+    font-family: 'BebasNeue', sans-serif;
+}
+
+.contentDivCaption span:first-of-type {
+    padding-right: 10px;
+
+    color: #b99e47;
+}
+
+#dailyTaskWrapper {
+    width: 95%;
+    margin: 0 auto;
+    display: flex;
+    flex-flow: column wrap;
+    padding: 10px 0 0 0;
+}
+
+.dailyTask {
+    display: flex;
+    flex-flow: row wrap;
+}
+
+.dailyTaskTitle {
+    flex-grow: 4;
+    width: 100%;
+    padding: 5px 0 10px 0;
+
+    font-family: 'Teko', sans-serif;
+    font-size: 1.2rem;
+    color: #b99e47;
+    text-transform: uppercase;
+}
+
+.dailyTaskGoal span:first-of-type,
+.dailyTaskReward span:first-of-type,
+.dailyTaskDifficulty span:first-of-type {
+    padding-right: 10px;
+
+    color: #b99e47;
+    text-transform: uppercase;
+}
+
+.dailyTaskGoal,
+.dailyTaskReward,
+.dailyTaskDifficulty {
+    text-align: left;
+
+    color: #beb28a;
+    font-size: 0.7rem;
+}
+
+.dailyTaskReward {
+    text-align: left;
+}
+
+.dailyTaskDifficulty {
+    text-align: left;
+}
+
+.dailyTaskGoal, 
+.dailyTaskReward,
+.dailyTaskDifficulty {
+    flex-grow: 1;
+    width: 33%;
+}
+
+.dailyTaskDifficulty span:last-of-type {
+    font-weight: bold;
+}
+
+.dailyTaskProgress {
+    display: flex;
+    flex-grow: 3;
+    width: 90%;
+    height: 30px;
+}
+
+.dailyTaskProgressCaption {
+    flex-grow: 1;
+    width: 10%;
+    text-align: center;
+    line-height: 30px;
+
+    color: #beb28a;
+    font-size: 0.8rem;
+    font-weight: bold;
+}
+
+.dailyTaskProgressBar {
+    height: 10px;
+    width: 100%;
+    align-self: center;
+
+    background: #202231;
+    box-shadow: 0 0 1px #000000 inset, 0 0 0 1px rgba(255,255,255,0.02);
+    border: 1px solid #000000;
+}
+
+.dailyTaskProgressBar div {
+    height: 100%;
+    margin-left: 0;
+
+    background: #beb28a;
+    border-right: 1px solid #000000;
+}
+
+.dailyTaskComplete div {
+    background: #218821;
+}
+
+.dailyTaskEasy {
+    color: #3bac4e;
+}
+
+.dailyTaskMedium {
+    color: #e5ff00;
+}
+
+.dailyTaskHard {
+    color: #d13535;
 }

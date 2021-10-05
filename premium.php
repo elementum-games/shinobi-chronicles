@@ -110,7 +110,9 @@ function premium() {
 
 			$player->premium_credits -= $costs['user_reset'];
 
-			$player->updateData(1);
+			$player->exam_stage = 0;
+
+			$player->updateData();
 
 			$system->query("DELETE FROM `user_bloodlines` WHERE `user_id`='$player->user_id'");
 			$system->query("UPDATE `user_inventory` SET
@@ -520,6 +522,14 @@ function premium() {
                 $player->forbidden_seal['color'] = $color;
                 $system->message("Color changed");
                 break;
+			case 'teal':
+				if ($player->staff_level < System::SC_HEAD_MODERATOR) {
+					$system->message("Invalid color!");
+					break;
+				}
+				$player->forbidden_seal['color'] = $color;
+				$system->message("Color changed");
+				break;
 			case 'red':
 				if($player->staff_level < System::SC_ADMINISTRATOR) {
 					$system->message("Invalid color!");
@@ -1070,7 +1080,17 @@ function premium() {
 				($player->forbidden_seal['color'] == 'gold' ? "checked='checked'" : '') . "/>
 				<span class='gold' style='font-weight:bold;'>Gold</span>";
 			}
-			if($player->staff_level >= System::SC_ADMINISTRATOR) {
+			if ($player->staff_level >= System::SC_MODERATOR) {
+				echo "
+				<input type='radio' name='name_color' value='green' " .
+				($player->forbidden_seal['color'] == 'green' ? "checked='checked'" : '') . "/>
+				<span class='moderator' style='font-weight:bold;'>Green</span>";
+			} else if ($player->staff_level >= System::SC_HEAD_MODERATOR) {
+				echo "
+				<input type='radio' name='name_color' value='teal' " .
+				($player->forbidden_seal['color'] == 'teal' ? "checked='checked'" : '') . "/>
+				<span class='headModerator' style='font-weight:bold;'>Teal</span>";
+			} else if ($player->staff_level >= System::SC_ADMINISTRATOR) {
 				echo "
 				<input type='radio' name='name_color' value='red' " .
 				($player->forbidden_seal['color'] == 'red' ? "checked='checked'" : '') . "/>
@@ -1351,8 +1371,8 @@ function premiumCreditExchange() {
 	/* [DISPLAY] */
 
 	// View offers
-	echo "<table class='table' cellspacing='0' style='width:95%;'>
-	<tr><th colspan='4'><a href='$self_link'>Ancient Kunai Exchange</a></th></tr>
+	echo "<table id='kunaiExchange' class='table' cellspacing='0' style='width:95%;'>
+	<tr'><th colspan='4'><a href='$self_link'>Ancient Kunai Exchange</a></th></tr>
 	<tr>
 		<td colspan='4' style='text-align:center;'>
 			<div style='width:200px;margin-left:auto;margin-right:auto;text-align:left;'>
@@ -1389,7 +1409,7 @@ function premiumCreditExchange() {
 
 			$sellerName = $credit_users[$row['seller']];
 
-			echo "<tr>
+			echo "<tr  class='fourColGrid' >
 				<td style='text-align:center;'><a href='{$system->links['members']}&user={$sellerName}'>{$sellerName}</a></td>
 				<td style='text-align:center;'>{$row['premium_credits']} AK</td>
 				<td style='text-align:center;'>&yen;{$row['money']}</td>";

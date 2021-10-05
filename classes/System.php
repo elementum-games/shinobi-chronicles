@@ -23,6 +23,8 @@ class System {
     const SC_ADMINISTRATOR = 3;
     const SC_HEAD_ADMINISTRATOR = 4;
 
+    const DB_DATETIME_MS_FORMAT = 'Y-m-d H:i:s.u';
+
     // Variable for error message
     public $message;
     public $message_displayed;
@@ -40,6 +42,8 @@ class System {
     public $register_open;
 
     public $link;
+
+    public $timezoneOffset;
 
     // Training boost switches
     public $TRAIN_BOOST = 0; // Extra points per training, 0 for none
@@ -172,6 +176,7 @@ class System {
     public $debug = [
         'battle' => false,
         'battle_effects' => false,
+        'jutsu_collision' => false,
         'damage' => false,
         'bloodline' => false,
     ];
@@ -197,6 +202,8 @@ class System {
         foreach(self::PAGE_IDS as $slug => $id) {
             $this->links[$slug] = $this->link . '?id=' . $id;
         }
+
+        $this->timezoneOffset = date('Z');
     }
 
     /* function dbConnect()
@@ -777,6 +784,13 @@ class System {
             }
         }
         return $string;
+    }
+
+    public static function dateTimeFromMicrotime(float $microtime) {
+        return DateTime::createFromFormat(
+            'U.u',
+            number_format($microtime, 2, '.', '')
+        );
     }
 }
 

@@ -337,62 +337,20 @@ class Battle {
         if($this->timeRemaining() > 0 && !$this->playerActionSubmitted()) {
             if(!empty($_POST['attack'])) {
                 // Run player attack
-                /* notes: Handseal-based jutsu can uniquely fail, triggering a failed_jutsu attack type */
                 try {
                     $jutsu_type = $_POST['jutsu_type'];
 
                     // Check for handseals if ninjutsu/genjutsu
-                    if($jutsu_type == 'ninjutsu' or $jutsu_type == 'genjutsu') {
+                    if($jutsu_type == Jutsu::TYPE_NINJUTSU or $jutsu_type == Jutsu::TYPE_GENJUTSU) {
                         if(!$_POST['hand_seals']) {
                             throw new Exception("Please enter hand seals!");
                         }
-                        if(is_array($_POST['hand_seals'])) {
-                            $seals = array();
-                            foreach($_POST['seals'] as $seal) {
-                                if(!is_numeric($seal)) {
-                                    break;
-                                }
-                                $seals[] = $seal;
-                            }
-                            $seal_string = implode('-', $seals);
-                        }
-                        else {
-                            $raw_seals = explode('-', $_POST['hand_seals']);
-                            $seals = array();
-                            foreach($raw_seals as $seal) {
-                                if(!is_numeric($seal)) {
-                                    break;
-                                }
-                                $seals[] = $seal;
-                            }
-                            $seal_string = implode('-', $seals);
-                        }
 
-                        $jutsu_ok = false;
-
-                        $attack_id = 0;
-                        foreach($this->default_attacks as $id => $attack) {
-                            if($attack->hand_seals == $seal_string) {
-                                $jutsu_ok = true;
-                                $attack_id = $id;
-                                $purchase_type = 'default';
-                                $player_jutsu = $attack;
-                                break;
-                            }
-                        }
-                        foreach($this->player->jutsu as $id => $jutsu) {
-                            if($jutsu->hand_seals == $seal_string) {
-                                $jutsu_ok = true;
-                                $attack_id = $id;
-                                $purchase_type = 'equipped';
-                                $player_jutsu = $jutsu;
-                                break;
-                            }
-                        }
-                        $jutsu_unique_id = 'J:' . $attack_id . ':' . $this->player->combat_id;
+                        $player_jutsu = $this->getJutsuFromHandSeals($this->player, $_POST['hand_seals']);
+                        $jutsu_unique_id = $player_jutsu->combat_id;
 
                         // Layered genjutsu check
-                        if($jutsu_ok && $jutsu_type == 'genjutsu' && !empty($player_jutsu->parent_jutsu)) {
+                        if($player_jutsu && $player_jutsu->jutsu_type == Jutsu::TYPE_GENJUTSU && !empty($player_jutsu->parent_jutsu)) {
                             $parent_genjutsu_id = $this->player->combat_id . ':J' . $player_jutsu->parent_jutsu;
                             $parent_jutsu = $this->player->jutsu[$player_jutsu->parent_jutsu];
                             if(!isset($this->active_genjutsu[$parent_genjutsu_id]) or
@@ -405,56 +363,40 @@ class Battle {
                     }
 
                     // Check jutsu ID if taijutsu
-                    else if($jutsu_type == 'taijutsu') {
-                        $jutsu_ok = false;
+                    else if($jutsu_type == Jutsu::TYPE_TAIJUTSU) {
                         $jutsu_id = (int)$_POST['jutsu_id'];
-                        $attack_id = null;
-                        if(isset($this->default_attacks[$jutsu_id]) && $this->default_attacks[$jutsu_id]->jutsu_type == 'taijutsu') {
-                            $jutsu_ok = true;
-                            $attack_id = $jutsu_id;
-                            $purchase_type = 'default';
-                            $player_jutsu = $this->default_attacks[$jutsu_id];
-                        }
-                        if(isset($this->player->jutsu[$jutsu_id]) && $this->player->jutsu[$jutsu_id]->jutsu_type == 'taijutsu') {
-                            $jutsu_ok = true;
-                            $attack_id = $jutsu_id;
-                            $purchase_type = 'equipped';
-                            $player_jutsu = $this->player->jutsu[$jutsu_id];
-                        }
-                        $jutsu_unique_id = 'J:' . $attack_id . ':' . $this->player->combat_id;
-                    }
 
+                        $player_jutsu = $this->getJutsuFromId($this->player, $jutsu_id);
+                    }
                     // Check BL jutsu ID if bloodline jutsu
                     else if($jutsu_type == 'bloodline_jutsu' && $this->player->bloodline_id) {
-                        $jutsu_ok = false;
                         $jutsu_id = (int)$_POST['jutsu_id'];
-                        $attack_id = null;
+
+                        $player_jutsu = null;
                         if(isset($this->player->bloodline->jutsu[$jutsu_id])) {
-                            $jutsu_ok = true;
-                            $attack_id = $jutsu_id;
-                            $purchase_type = 'bloodline';
                             $player_jutsu = $this->player->bloodline->jutsu[$jutsu_id];
+                            $player_jutsu->setCombatId($this->player->combat_id);
                         }
-                        $jutsu_unique_id = 'BL_J:' . $attack_id . ':' . $this->player->combat_id;
                     }
                     else {
                         throw new Exception("Invalid jutsu selection!");
                     }
 
                     // Check jutsu cooldown
-                    if($jutsu_ok && isset($this->jutsu_cooldowns[$jutsu_unique_id])) {
-                        throw new Exception("Cannot use that jutsu, it is on cooldown for " . $this->jutsu_cooldowns[$jutsu_unique_id] . " more turns!");
-                    }
-                    if(!$jutsu_ok) {
+                    if(!$player_jutsu) {
                         throw new Exception("Invalid jutsu!");
                     }
-                    if(!$this->player->useJutsu($player_jutsu, $purchase_type . '_jutsu')) {
+                    if(isset($this->jutsu_cooldowns[$player_jutsu->combat_id])) {
+                        throw new Exception("Cannot use that jutsu, it is on cooldown for " . $this->jutsu_cooldowns[$player_jutsu->combat_id] . " more turns!");
+                    }
+
+                    if(!$this->player->useJutsu($player_jutsu)) {
                         throw new Exception($this->system->message);
                     }
 
                     // Check for weapon if non-BL taijutsu
                     $weapon_id = 0;
-                    if($jutsu_type == 'taijutsu' && $purchase_type != 'bloodline' && $_POST['weapon_id']) {
+                    if($jutsu_type == Jutsu::TYPE_TAIJUTSU && !empty($_POST['weapon_id'])) {
                         $weapon_id = (int)$this->system->clean($_POST['weapon_id']);
                         if($weapon_id && $this->player->hasItem($weapon_id)) {
                             if(array_search($weapon_id, $this->player->equipped_weapons) === false) {
@@ -465,25 +407,9 @@ class Battle {
                             $weapon_id = 0;
                         }
                     }
-                    if($purchase_type == 'default') {
-                        if(!isset($this->default_attacks[$attack_id])) {
-                            throw new Exception("Invalid attack!");
-                        }
-                        $attack_type = 'default_jutsu';
-                    }
-                    else if($purchase_type == 'bloodline') {
-                        $attack_type = 'bloodline_jutsu';
-                    }
-                    else if(!$jutsu_ok) {
-                        $attack_id = 0;
-                        $attack_type = 'failed_jutsu';
-                    }
-                    else {
-                        $attack_type = 'equipped_jutsu';
-                    }
 
                     // Log jutsu used
-                    $this->setPlayerAction($attack_id, $weapon_id, $attack_type, $jutsu_unique_id, $player_jutsu->jutsu_type);
+                    $this->setPlayerAction($player_jutsu, $weapon_id);
 
                     if($this->opponent instanceof AI) {
                         $this->chooseAndSetAIAction($this->opponent);
@@ -515,6 +441,64 @@ class Battle {
         $this->updateData();
 
         return $this->winner;
+    }
+
+    private function getJutsuFromHandSeals(Fighter $fighter, string $hand_seals): ?Jutsu {
+        /*if(is_array($_POST['hand_seals'])) {
+            $seals = array();
+            foreach($_POST['hand_seals'] as $seal) {
+                if(!is_numeric($seal)) {
+                    break;
+                }
+                $seals[] = $seal;
+            }
+            $seal_string = implode('-', $seals);
+        }*/
+
+        $raw_seals = explode('-', $hand_seals);
+        $seals = array();
+        foreach($raw_seals as $seal) {
+            if(!is_numeric($seal)) {
+                break;
+            }
+            $seals[] = $seal;
+        }
+        $seal_string = implode('-', $seals);
+
+        $fighter_jutsu = null;
+        foreach($this->default_attacks as $id => $attack) {
+            if($attack->hand_seals == $seal_string) {
+                $fighter_jutsu = $attack;
+                break;
+            }
+        }
+        foreach($fighter->jutsu as $id => $jutsu) {
+            if($jutsu->hand_seals == $seal_string) {
+                $fighter_jutsu = $jutsu;
+                break;
+            }
+        }
+        if($fighter_jutsu) {
+            $fighter_jutsu->setCombatId($fighter->combat_id);
+        }
+
+        return $fighter_jutsu;
+    }
+
+    private function getJutsuFromId(Fighter $fighter, int $jutsu_id): ?Jutsu {
+        $fighter_jutsu = null;
+        if(isset($this->default_attacks[$jutsu_id]) && $this->default_attacks[$jutsu_id]->jutsu_type == Jutsu::TYPE_TAIJUTSU) {
+            $fighter_jutsu = $this->default_attacks[$jutsu_id];
+        }
+        if(isset($this->player->jutsu[$jutsu_id]) && $this->player->jutsu[$jutsu_id]->jutsu_type == Jutsu::TYPE_TAIJUTSU) {
+            $fighter_jutsu = $this->player->jutsu[$jutsu_id];
+        }
+
+        if($fighter_jutsu) {
+            $fighter_jutsu->setCombatId($fighter->combat_id);
+        }
+
+        return $fighter_jutsu;
     }
 
     /**
@@ -549,14 +533,14 @@ class Battle {
 
         if($this->player1 instanceof User && $this->player1->id != $this->player->id) {
             $this->player1->loadData($this->spectate ? 0 : 1, true);
-            if(!$this->isComplete() && $this->player1->battle_id != $this->battle_id) {
+            if(!$this->spectate && !$this->isComplete() && $this->player1->battle_id != $this->battle_id) {
                 $this->stopBattle();
                 return;
             }
         }
         if($this->player2 instanceof User && $this->player2->id != $this->player->id) {
             $this->player2->loadData($this->spectate ? 0 : 1, true);
-            if(!$this->isComplete() && $this->player2->battle_id != $this->battle_id) {
+            if(!$this->spectate && !$this->isComplete() && $this->player2->battle_id != $this->battle_id) {
                 $this->stopBattle();
                 return;
             }
@@ -766,29 +750,35 @@ class Battle {
         $player2_damage = 0;
         $player1_battle_text = '';
         $player2_battle_text = '';
+
+        /** @var ?Jutsu $player1_jutsu */
+        $player1_jutsu = null;
+        /** @var ?Jutsu $player2_jutsu */
+        $player2_jutsu = null;
+
         if($this->player1_action) {
-            /** @var Jutsu $player1_jutsu */
-            if($this->player1_attack_type == 'default_jutsu') {
+            if($this->player1_attack_type == Jutsu::PURCHASE_TYPE_DEFAULT) {
                 $player1_jutsu = $this->default_attacks[$this->player1_jutsu_id];
-                $player1_damage = $this->player1->calcDamage($player1_jutsu, 'default_jutsu');
-                $player1_jutsu->unique_id = 'J:' . $player1_jutsu->id . ':' . $this->player1->combat_id;
+                $player1_damage = $this->player1->calcDamage($player1_jutsu);
+                $player1_jutsu->setCombatId($this->player1->combat_id);
             }
-            else if($this->player1_attack_type == 'equipped_jutsu') {
+            else if($this->player1_attack_type == Jutsu::PURCHASE_TYPE_PURCHASEABLE) {
                 $player1_jutsu = $this->player1->jutsu[$this->player1_jutsu_id];
-                $player1_damage = $this->player1->calcDamage($player1_jutsu, 'equipped_jutsu');
-                $player1_jutsu->unique_id = 'J:' . $player1_jutsu->id . ':' . $this->player1->combat_id;
+                $player1_damage = $this->player1->calcDamage($player1_jutsu);
+                $player1_jutsu->setCombatId($this->player1->combat_id);
             }
-            else if($this->player1_attack_type == 'bloodline_jutsu') {
+            else if($this->player1_attack_type == Jutsu::PURCHASE_TYPE_BLOODLINE) {
                 $player1_jutsu = $this->player1->bloodline->jutsu[$this->player1_jutsu_id];
-                $player1_damage = $this->player1->calcDamage($this->player1->bloodline->jutsu[$this->player1_jutsu_id], 'bloodline_jutsu');
-                $player1_jutsu->unique_id = 'BL_J:' . $player1_jutsu->id . ':' . $this->player1->combat_id;
+                $player1_damage = $this->player1->calcDamage($this->player1->bloodline->jutsu[$this->player1_jutsu_id]);
+                $player1_jutsu->setCombatId($this->player1->combat_id);
             }
-            else if($this->player1_attack_type == 'failed_jutsu') {
-                $this->player1_action = false;
+            else {
+                throw new \Exception("Invalid p1 attack type! {$this->player1_attack_type}");
             }
+
             // Set weapon data into jutsu
-            if(($this->player1_attack_type == 'default_jutsu' or $this->player1_attack_type == 'equipped_jutsu')
-                && $player1_jutsu->jutsu_type == 'taijutsu' && $this->player1_weapon_id) {
+            if(($this->player1_attack_type == Jutsu::PURCHASE_TYPE_DEFAULT or $this->player1_attack_type == Jutsu::PURCHASE_TYPE_PURCHASEABLE)
+                && $player1_jutsu->jutsu_type == Jutsu::TYPE_TAIJUTSU && $this->player1_weapon_id) {
                 // Apply element to jutsu
                 if($this->player1->items[$this->player1_weapon_id]['effect'] == 'element') {
                     $player1_jutsu->element = $this->player1->elements['first'];
@@ -805,27 +795,28 @@ class Battle {
             }
         }
         if($this->player2_action) {
-            if($this->player2_attack_type == 'default_jutsu') {
+            if($this->player2_attack_type == Jutsu::PURCHASE_TYPE_DEFAULT) {
                 $player2_jutsu = $this->default_attacks[$this->player2_jutsu_id];
-                $player2_damage = $this->player2->calcDamage($player2_jutsu, 'default_jutsu');
-                $player2_jutsu->unique_id = 'J:' . $player2_jutsu->id . ':' . $this->player2->combat_id;
+                $player2_damage = $this->player2->calcDamage($player2_jutsu);
+                $player2_jutsu->setCombatId($this->player2->combat_id);
             }
-            else if($this->player2_attack_type == 'equipped_jutsu') {
+            else if($this->player2_attack_type == Jutsu::PURCHASE_TYPE_PURCHASEABLE) {
                 $player2_jutsu = $this->player2->jutsu[$this->player2_jutsu_id];
-                $player2_damage = $this->player2->calcDamage($player2_jutsu, 'equipped_jutsu');
-                $player2_jutsu->unique_id = 'J:' . $player2_jutsu->id . ':' . $this->player2->combat_id;
+                $player2_damage = $this->player2->calcDamage($player2_jutsu);
+                $player2_jutsu->setCombatId($this->player2->combat_id);
             }
-            else if($this->player2_attack_type == 'bloodline_jutsu') {
+            else if($this->player2_attack_type == Jutsu::PURCHASE_TYPE_BLOODLINE) {
                 $player2_jutsu = $this->player2->bloodline->jutsu[$this->player2_jutsu_id];
-                $player2_damage = $this->player2->calcDamage($this->player2->bloodline->jutsu[$this->player2_jutsu_id], 'bloodline_jutsu');
-                $player2_jutsu->unique_id = 'BL_J:' . $player2_jutsu->id . ':' . $this->player2->combat_id;
+                $player2_damage = $this->player2->calcDamage($this->player2->bloodline->jutsu[$this->player2_jutsu_id]);
+                $player2_jutsu->setCombatId($this->player2->combat_id);
             }
-            else if($this->player2_attack_type == 'failed_jutsu') {
-                $this->player2_action = false;
+            else {
+                throw new Exception("Invalid player 2 attack type {$this->player2_attack_type}");
             }
+
             // Set weapon data into jutsu
-            if(($this->player2_attack_type == 'default_jutsu' or $this->player2_attack_type == 'equipped_jutsu')
-                && $player2_jutsu->jutsu_type == 'taijutsu' && $this->player2_weapon_id) {
+            if(($this->player2_attack_type == Jutsu::PURCHASE_TYPE_DEFAULT or $this->player2_attack_type == Jutsu::PURCHASE_TYPE_PURCHASEABLE)
+                && $player2_jutsu->jutsu_type == Jutsu::TYPE_TAIJUTSU && $this->player2_weapon_id) {
                 // Apply element to jutsu
                 if($this->player2->items[$this->player2_weapon_id]['effect'] == 'element') {
                     $player2_jutsu->element = $this->player2->elements['first'];
@@ -843,21 +834,21 @@ class Battle {
         }
 
         // Buff jutsu (-1 = self effect move)
-        if($player1_jutsu->use_type == 'buff') {
+        if($player1_jutsu->use_type == Jutsu::USE_TYPE_BUFF) {
             $player1_jutsu->weapon_id = 0;
             $player1_jutsu->effect_only = true;
         }
-        if($player2_jutsu->use_type == 'buff') {
+        if($player2_jutsu->use_type == Jutsu::USE_TYPE_BUFF) {
             $player2_jutsu->weapon_id = 0;
             $player2_jutsu->effect_only = true;
         }
 
         // Barrier jutsu
-        if($player1_jutsu->use_type == 'barrier') {
+        if($player1_jutsu->use_type == Jutsu::USE_TYPE_BARRIER) {
             $player1_jutsu->weapon_id = 0;
             $player1_jutsu->effect_only = true;
         }
-        if($player2_jutsu->use_type == 'barrier') {
+        if($player2_jutsu->use_type == Jutsu::USE_TYPE_BARRIER) {
             $player2_jutsu->weapon_id = 0;
             $player2_jutsu->effect_only = true;
         }
@@ -871,41 +862,40 @@ class Battle {
         }
 
         // Apply remaining barrier
-        if(isset($this->active_effects[$this->player1->combat_id . ':BARRIER'])) {
+        if(isset($this->active_effects[Battle::barrierId($this->player1)])) {
             if($this->player1->barrier) {
-                $this->active_effects[$this->player1->combat_id . ':BARRIER']['effect_amount'] = $this->player1->barrier;
+                $this->active_effects[Battle::barrierId($this->player1)]['effect_amount'] = $this->player1->barrier;
             }
             else {
-                unset($this->active_effects[$this->player1->combat_id . ':BARRIER']);
+                unset($this->active_effects[Battle::barrierId($this->player1)]);
             }
         }
-        else if($player1_jutsu->use_type == 'barrier' && $this->player1->barrier) {
-            $effect_id = $this->player1->combat_id . ':BARRIER';
+        else if($player1_jutsu->use_type == Jutsu::USE_TYPE_BARRIER && $this->player1->barrier) {
             $barrier_jutsu = $player1_jutsu;
-            $barrier_jutsu->effect = 'barrier';
+            $barrier_jutsu->effect = Jutsu::USE_TYPE_BARRIER;
             $barrier_jutsu->effect_length = 1;
-            $this->setEffect($this->player1, $this->player1->combat_id, $barrier_jutsu, $this->player1->barrier, $effect_id, $this->active_effects);
+            $this->setEffect($this->player1, $this->player1->combat_id, $barrier_jutsu, $this->player1->barrier, $this->active_effects);
         }
-        if(isset($this->active_effects[$this->player2->combat_id . ':BARRIER'])) {
+
+        if(isset($this->active_effects[$this->barrierId($this->player2)])) {
             if($this->player2->barrier) {
-                $this->active_effects[$this->player2->combat_id . ':BARRIER']['effect_amount'] = $this->player2->barrier;
+                $this->active_effects[Battle::barrierId($this->player2)]['effect_amount'] = $this->player2->barrier;
             }
             else {
-                unset($this->active_effects[$this->player2->combat_id . ':BARRIER']);
+                unset($this->active_effects[Battle::barrierId($this->player2)]);
             }
         }
-        else if($player2_jutsu->use_type == 'barrier' && $this->player2->barrier) {
-            $effect_id = $this->player2->combat_id . ':BARRIER';
+        else if($player2_jutsu->use_type == Jutsu::USE_TYPE_BARRIER && $this->player2->barrier) {
             $barrier_jutsu = $player2_jutsu;
-            $barrier_jutsu->effect = 'barrier';
+            $barrier_jutsu->effect = Jutsu::USE_TYPE_BARRIER;
             $barrier_jutsu->effect_length = 1;
-            $this->setEffect($this->player2, $this->player2->combat_id, $barrier_jutsu, $this->player2->barrier, $effect_id, $this->active_effects);
+            $this->setEffect($this->player2, $this->player2->combat_id, $barrier_jutsu, $this->player2->barrier, $this->active_effects);
         }
 
         // Apply damage/effects and set display
         if($this->player1_action) {
             $player1_raw_damage = $player1_damage;
-            if($player1_jutsu->jutsu_type != 'genjutsu' && empty($player1_jutsu->effect_only)) {
+            if($player1_jutsu->jutsu_type != Jutsu::TYPE_GENJUTSU && empty($player1_jutsu->effect_only)) {
                 $player1_damage = $this->player2->calcDamageTaken($player1_damage, $player1_jutsu->jutsu_type);
                 $this->player2->health -= $player1_damage;
                 if($this->player2->health < 0) {
@@ -918,20 +908,21 @@ class Battle {
                 $effect_id = $this->player1->combat_id . ':W' . $player1_jutsu->weapon_id;
                 if($this->player1->items[$this->player1_weapon_id]['effect'] != 'diffuse') {
                     $this->setEffect($this->player1, $this->player2->combat_id, $player1_jutsu->weapon_effect,
-                        $player1_raw_damage, $effect_id, $this->active_effects);
+                        $player1_raw_damage, $this->active_effects
+                    );
                 }
             }
 
             // Set cooldowns
             if($player1_jutsu->cooldown > 0) {
-                $this->jutsu_cooldowns[$player1_jutsu->unique_id] = $player1_jutsu->cooldown;
+                $this->jutsu_cooldowns[$player1_jutsu->combat_id] = $player1_jutsu->cooldown;
             }
 
             // Genjutsu/effects
-            if($player1_jutsu->jutsu_type == 'genjutsu' && $player1_jutsu->use_type != 'buff') {
+            if($player1_jutsu->jutsu_type == Jutsu::TYPE_GENJUTSU && $player1_jutsu->use_type != Jutsu::USE_TYPE_BUFF) {
                 $genjutsu_id = $this->player1->combat_id . ':J' . $player1_jutsu->id;
                 // Bloodline jutsu ID override
-                if($this->player1_attack_type == 'bloodline_jutsu') {
+                if($this->player1_attack_type == Jutsu::PURCHASE_TYPE_BLOODLINE) {
                     $genjutsu_id = $this->player1->combat_id . ':BL_J' . $player1_jutsu->id;
                 }
 
@@ -953,27 +944,22 @@ class Battle {
                     }
                 }
                 else  {
-                    $this->setEffect($this->player1, $this->player2->combat_id, $player1_jutsu, $player1_raw_damage, $genjutsu_id, $this->active_genjutsu);
+                    $this->setEffect($this->player1, $this->player2->combat_id, $player1_jutsu, $player1_raw_damage, $this->active_genjutsu);
                 }
             }
             else if($player1_jutsu->effect != 'none') {
-                $effect_id = $this->player1->combat_id . ':J' . $player1_jutsu->id;
-                // Bloodline jutsu ID override
-                if($this->player1_attack_type == 'bloodline_jutsu') {
-                    $effect_id = $this->player1->combat_id . ':BL_J' . $player1_jutsu->id;
-                }
                 $target_id = $this->player2->combat_id;
-                if($player1_jutsu->use_type == 'buff' || ($player1_jutsu->use_type == 'projectile' && strpos($player1_jutsu->effect, '_boost'))) {
+                if($player1_jutsu->use_type == Jutsu::USE_TYPE_BUFF || ($player1_jutsu->use_type == 'projectile' && strpos($player1_jutsu->effect, '_boost'))) {
                     $target_id = $this->player1->combat_id;
                 }
-                $this->setEffect($this->player1, $target_id, $player1_jutsu, $player1_raw_damage, $effect_id, $this->active_effects);
+                $this->setEffect($this->player1, $target_id, $player1_jutsu, $player1_raw_damage, $this->active_effects);
             }
             $text = $player1_jutsu->battle_text;
 
             //set player jutsu text color
             $player1_jutsu_color = Battle::getJutsuTextColor($player1_jutsu->jutsu_type);
 
-            if($player1_jutsu->jutsu_type != 'genjutsu' && empty($player1_jutsu->effect_only)) {
+            if($player1_jutsu->jutsu_type != Jutsu::TYPE_GENJUTSU && empty($player1_jutsu->effect_only)) {
                 $text .= "<p style=\"font-weight:bold;\">
                             {$this->player1->getName()} deals 
                                 <span style=\"color:{$player1_jutsu_color}\">
@@ -1001,13 +987,7 @@ class Battle {
             $this->battle_text .= $this->parseCombatText($text, $this->player1, $this->player2);
         }
         else {
-            // Failed jutsu or did nothing (display)
-            if($this->player1_attack_type == 'failed_jutsu') {
-                $this->battle_text .= $this->player1->getName() . ' attempted to perform a jutsu, but failed.';
-            }
-            else {
-                $this->battle_text .= $this->player1->getName() . ' stood still and did nothing.';
-            }
+            $this->battle_text .= $this->player1->getName() . ' stood still and did nothing.';
             if($player1_effect_display) {
                 $this->battle_text .= $this->parseCombatText(
                     $this->system->clean($player1_effect_display),
@@ -1016,6 +996,7 @@ class Battle {
                 );
             }
         }
+
         if($collision_text) {
             $collision_text = $this->parseCombatText($collision_text, $this->player1, $this->player2);
             $this->battle_text .= '[br][hr]' . $this->system->clean($collision_text);
@@ -1025,7 +1006,7 @@ class Battle {
         // Apply damage/effects and set display
         if($this->player2_action) {
             $player2_raw_damage = $player2_damage;
-            if($player2_jutsu->jutsu_type != 'genjutsu' && empty($player2_jutsu->effect_only)) {
+            if($player2_jutsu->jutsu_type != Jutsu::TYPE_GENJUTSU && empty($player2_jutsu->effect_only)) {
                 $player2_damage = $this->player1->calcDamageTaken($player2_damage, $player2_jutsu->jutsu_type);
                 $this->player1->health -= $player2_damage;
                 if($this->player1->health < 0) {
@@ -1035,23 +1016,23 @@ class Battle {
 
             // Weapon effect for taijutsu (IN PROGRESS)
             if($player2_jutsu->weapon_id) {
-                $effect_id = $this->player2->combat_id . ':W' . $player2_jutsu->weapon_id;
                 if($this->player1->items[$this->player2_weapon_id]['effect'] != 'diffuse') {
                     $this->setEffect($this->player2, $this->player1->combat_id, $player2_jutsu->weapon_effect,
-                        $player2_raw_damage, $effect_id, $this->active_effects);
+                        $player2_raw_damage, $this->active_effects
+                    );
                 }
             }
 
             // Set cooldowns
             if($player2_jutsu->cooldown > 0) {
-                $this->jutsu_cooldowns[$player2_jutsu->unique_id] = $player2_jutsu->cooldown;
+                $this->jutsu_cooldowns[$player2_jutsu->combat_id] = $player2_jutsu->cooldown;
             }
 
             // Genjutsu/effects
-            if($player2_jutsu->jutsu_type == 'genjutsu' && $player2_jutsu->use_type != 'buff') {
+            if($player2_jutsu->jutsu_type == Jutsu::TYPE_GENJUTSU && $player2_jutsu->use_type != Jutsu::USE_TYPE_BUFF) {
                 $genjutsu_id = $this->player2->combat_id . ':J' . $player2_jutsu->id;
                 // Bloodline jutsu ID override
-                if($this->player2_attack_type == 'bloodline_jutsu') {
+                if($this->player2_attack_type == Jutsu::PURCHASE_TYPE_BLOODLINE) {
                     $genjutsu_id = $this->player2->combat_id . ':BL_J' . $player2_jutsu->id;
                 }
 
@@ -1073,27 +1054,22 @@ class Battle {
                     }
                 }
                 else  {
-                    $this->setEffect($this->player2, $this->player1->combat_id, $player2_jutsu, $player2_raw_damage, $genjutsu_id, $this->active_genjutsu);
+                    $this->setEffect($this->player2, $this->player1->combat_id, $player2_jutsu, $player2_raw_damage, $this->active_genjutsu);
                 }
             }
             else if($player2_jutsu->effect != 'none') {
-                $effect_id = $this->player2->combat_id . ':J' . $player2_jutsu->id;
-                // Bloodline jutsu ID override
-                if($this->player2_attack_type == 'bloodline_jutsu') {
-                    $effect_id = $this->player2->combat_id . ':BL_J' . $player2_jutsu->id;
-                }
                 $target_id = $this->player1->combat_id;
-                if($player2_jutsu->use_type == 'buff' || ($player2_jutsu->use_type == 'projectile' && strpos($player2_jutsu->effect, '_boost'))) {
+                if($player2_jutsu->use_type == Jutsu::USE_TYPE_BUFF || ($player2_jutsu->use_type == 'projectile' && strpos($player2_jutsu->effect, '_boost'))) {
                     $target_id = $this->player2->combat_id;
                 }
-                $this->setEffect($this->player2, $target_id, $player2_jutsu, $player2_raw_damage, $effect_id, $this->active_effects);
+                $this->setEffect($this->player2, $target_id, $player2_jutsu, $player2_raw_damage, $this->active_effects);
             }
 
             //set opponent jutsu text color
             $player2_jutsu_color = Battle::getJutsuTextColor($player2_jutsu->jutsu_type);
 
             $text = $player2_jutsu->battle_text;
-            if($player2_jutsu->jutsu_type != 'genjutsu' && empty($player2_jutsu->effect_only)) {
+            if($player2_jutsu->jutsu_type != Jutsu::TYPE_GENJUTSU && empty($player2_jutsu->effect_only)) {
                 $text .= "<p style=\"font-weight:bold;\">
                             {$this->player2->getName()} deals 
                                 <span style=\"color:{$player2_jutsu_color}\">
@@ -1121,13 +1097,7 @@ class Battle {
             $this->battle_text .= $this->parseCombatText($text, $this->player2, $this->player1);
         }
         else {
-            // Failed jutsu or did nothing (display)
-            if($this->player2_attack_type == 'failed_jutsu') {
-                $this->battle_text .= $this->player2->getName() . ' attempted to perform a jutsu, but failed.';
-            }
-            else {
-                $this->battle_text .= $this->player2->getName() . ' stood still and did nothing.';
-            }
+            $this->battle_text .= $this->player2->getName() . ' stood still and did nothing.';
             if($player2_effect_display) {
                 $this->battle_text .= $this->parseCombatText(
                     $this->system->clean($player2_effect_display),
@@ -1393,16 +1363,19 @@ class Battle {
                 padding-left: 20px;
                 padding-right: 20px;
             }
+            
+            
             #jutsu {
                 padding-left: 5px;
             }
-            #jutsu p {
+            #jutsu .jutsuCategory {
                 display:inline-block;
                 margin:0px;
                 vertical-align:top;
                 margin-right:1%;
                 text-align:center;
             }
+            
             #jutsu .jutsuName {
                 display: inline-block;
                 padding: 5px 7px;
@@ -1421,6 +1394,14 @@ class Battle {
                 background: linear-gradient(#E4E4E4, #EFEFEF);
                 cursor: pointer;
             }
+            #jutsu .jutsuName[aria-disabled='true'] {
+                opacity: 0.75;
+            }
+            #jutsu .jutsuName[aria-disabled='true']:hover {
+                background: linear-gradient(#EFEFEF, #E4E4E4);
+                cursor: default;
+            }
+            
             #weapons p.weapon {
                 display: inline-block;
                 padding: 8px 10px;
@@ -1440,6 +1421,8 @@ class Battle {
                 background: rgba(0, 0, 0, 0.1);
                 cursor: pointer;
             }
+            
+            
             </style>
             <script type='text/javascript'>
             $(document).ready(function(){
@@ -1470,6 +1453,7 @@ class Battle {
                     }
                     // Update display
                     $('#hand_seal_input').val(hand_seals.join('-'));
+                    $('#jutsuID').val('0');
                     var id = '';
                     for(var x in hand_seals) {
                         id = 'handseal_' + hand_seals[x];
@@ -1539,7 +1523,7 @@ class Battle {
                     $('#weaponID').val( $(this).attr('data-id') );
                 });
                 var display_state = 'ninjutsu';
-                $('#jutsu span.ninjutsu').click(function(){
+                $('#jutsu .ninjutsu').click(function(){
                     if(display_state != 'ninjutsu' && display_state != 'genjutsu') {
                         $('#textPrompt').text(hand_seal_prompt);
                         $('#weapons').hide();
@@ -1549,7 +1533,7 @@ class Battle {
                     display_state = 'ninjutsu';
                     $('#jutsuType').val('ninjutsu');
                 });
-                $('#jutsu span.genjutsu').click(function(){
+                $('#jutsu .genjutsu').click(function(){
                     if(display_state != 'genjutsu' && display_state != 'ninjutsu') {
                         $('#textPrompt').text(hand_seal_prompt);
                         $('#weapons').hide();
@@ -1559,7 +1543,7 @@ class Battle {
                     display_state = 'genjutsu';
                     $('#jutsuType').val('genjutsu');
                 });
-                $('#jutsu span.taijutsu').click(function(){
+                $('#jutsu .taijutsu').click(function(){
                     if(display_state != 'taijutsu') {
                         $('#textPrompt').text(weapons_prompt);
                         $('#handSeals').hide();
@@ -1572,7 +1556,7 @@ class Battle {
                     $('#jutsuType').val('taijutsu');
                     $('#jutsuID').val($(this).attr('data-id'));
                 });
-                $('#jutsu span.bloodline_jutsu').click(function(){
+                $('#jutsu .bloodline_jutsu').click(function(){
                     if(display_state != 'bloodline_jutsu') {
                         $('#handsealOverlay').fadeIn();
                     }
@@ -1742,47 +1726,83 @@ class Battle {
         $c1 = 0;
         $c2 = 0;
         $c3 = 0;
+
         // Attack list
-        $jutsu_types = array('ninjutsu', 'taijutsu', 'genjutsu');
+        $jutsu_types = array(Jutsu::TYPE_NINJUTSU, Jutsu::TYPE_TAIJUTSU, Jutsu::TYPE_GENJUTSU);
         for($i = 0; $i < 3; $i++) {
-            echo "<p style='width:$width;'>";
+            echo "<div class='jutsuCategory' style='width:$width;'>";
             foreach($default_attacks as $attack) {
                 if($attack->jutsu_type != $jutsu_types[$i]) {
                     continue;
                 }
                 echo "<span id='default$c1' class='jutsuName {$jutsu_types[$i]}' data-handseals='" .
-                    ($attack->jutsu_type != 'taijutsu' ? $attack->hand_seals : '') . "'
+                    ($attack->jutsu_type != Jutsu::TYPE_TAIJUTSU ? $attack->hand_seals : '') . "'
                 data-id='{$attack->id}'>" . $attack->name . '<br /><strong>'.'D'.$c1.'</strong></span><br />';
                 $c1++;
             }
             if(is_array($player->equipped_jutsu)) {
                 foreach($player->equipped_jutsu as $jutsu) {
+                    /** @var Jutsu $jutsu */
                     if($player->jutsu[$jutsu['id']]->jutsu_type != $jutsu_types[$i]) {
                         continue;
                     }
-                    echo "<span id='{$jutsu_types[$i]}$c2' class='jutsuName {$jutsu_types[$i]}' data-handseals='{$player->jutsu[$jutsu['id']]->hand_seals}'
-                    data-id='{$jutsu['id']}'>" . $player->jutsu[$jutsu['id']]->name . '<br /><strong>'.strtoupper($jutsu_types[$i][0]).$c2.'</strong></span><br />';
+
+                    $player_jutsu = $player->jutsu[$jutsu['id']];
+                    $player_jutsu->setCombatId($player->combat_id);
+
+                    $cd_left = $this->jutsu_cooldowns[$player_jutsu->combat_id] ?? 0;
+
+                    echo "<div 
+                            id='{$jutsu_types[$i]}$c2' 
+                            class='jutsuName {$jutsu_types[$i]}' 
+                            data-handseals='{$player_jutsu->hand_seals}'
+                            data-id='{$jutsu['id']}'
+                            aria-disabled='" . ($cd_left > 0 ? "true" : "false") . "'
+                        >" . $player_jutsu->name . '<br />';
+                            if($cd_left > 0) {
+                                echo "(CD: {$cd_left} turns)";
+                            }
+                            else {
+                                echo "<strong>" .strtoupper($jutsu_types[$i][0]).$c2. "</strong>";
+                            }
+
+                        echo "</div><br />";
                     $c2++;
                 }
                 $c2 = 0;
             }
-            echo "</p>";
+            echo "</div>";
         }
         // Display bloodline jutsu
         if($player->bloodline_id) {
-            echo "<p style='width:$width;margin-right:0;'>";
+            echo "<div class='jutsuCategory' style='width:$width;margin-right:0;'>";
             if(!empty($player->bloodline->jutsu)) {
                 foreach($player->bloodline->jutsu as $id => $jutsu) {
-                    echo "<span id='bloodline$c3' class='jutsuName bloodline_jutsu' data-handseals='" . $jutsu->hand_seals . "'" .
-                        " data-id='$id'>" . $jutsu->name . '<br /><strong>B' . $c3 . '</strong></span><br />';
+                    $jutsu->setCombatId($player->combat_id);
+                    $cd_left = $this->jutsu_cooldowns[$jutsu->combat_id] ?? 0;
+
+                    echo "<div 
+                        id='bloodline{$c3}' 
+                        class='jutsuName bloodline_jutsu' 
+                        data-handseals='{$jutsu->hand_seals}'
+                        data-id='$id'
+                        aria-disabled='" . ($cd_left > 0 ? "true" : "false") . "'
+                        >{$jutsu->name}<br />";
+                            if($cd_left > 0) {
+                                echo "(CD: {$cd_left} turns)";
+                            }
+                            else {
+                                echo "<strong>B{$c3}</strong>";
+                            }
+                    echo "</div><br />";
                     $c3++;
                 }
             }
-            echo "</p>";
+            echo "</div>";
         }
 
         $prefill_hand_seals = $_POST['hand_seals'] ?? '';
-        $prefill_jutsu_type = $_POST['jutsu_type'] ?? 'ninjutsu';
+        $prefill_jutsu_type = $_POST['jutsu_type'] ?? Jutsu::TYPE_NINJUTSU;
         $prefill_weapon_id = $_POST['weapon_id'] ?? '0';
         $prefill_jutsu_id = $_POST['jutsu_id'] ?? '';
         echo "<form action='$self_link' method='post'>
@@ -1831,7 +1851,7 @@ class Battle {
         else if($effect['effect'] == 'taijutsu_resist' or $effect['effect'] == 'harden') {
             $target->taijutsu_resist += $effect['effect_amount'];
         }
-        else if($effect['effect'] == 'barrier') {
+        else if($effect['effect'] == Jutsu::USE_TYPE_BARRIER) {
             $target->barrier += $effect['effect_amount'];
         }
 
@@ -1927,17 +1947,17 @@ class Battle {
         }
 
         // Barriers
-        if($player_jutsu->use_type == 'barrier') {
+        if($player_jutsu->use_type == Jutsu::USE_TYPE_BARRIER) {
             $player_jutsu->effect_amount = $player_damage;
             $player1->barrier += $player_damage;
             $player_damage = 0;
         }
-        if($opponent_jutsu->use_type == 'barrier') {
+        if($opponent_jutsu->use_type == Jutsu::USE_TYPE_BARRIER) {
             $opponent_jutsu->effect_amount = $opponent_damage;
             $player2->barrier += $opponent_damage;
             $opponent_damage = 0;
         }
-        if($player1->barrier && $opponent_jutsu->jutsu_type != 'genjutsu') {
+        if($player1->barrier && $opponent_jutsu->jutsu_type != Jutsu::TYPE_GENJUTSU) {
             // Block damage from opponent's attack
             if($player1->barrier >= $opponent_damage) {
                 $block_amount = $opponent_damage;
@@ -1958,7 +1978,7 @@ class Battle {
             $block_percent = round($block_percent, 1);
             $collision_text .= "[player]'s barrier blocked $block_percent% of [opponent]'s damage![br]";
         }
-        if($player2->barrier && $player_jutsu->jutsu_type != 'genjutsu') {
+        if($player2->barrier && $player_jutsu->jutsu_type != Jutsu::TYPE_GENJUTSU) {
             // Block damage from opponent's attack
             if($player2->barrier >= $player_damage) {
                 $block_amount = $player_damage;
@@ -1981,7 +2001,7 @@ class Battle {
         }
 
         // Quit if barrier was used by one person (no collision remaining)
-        if($player_jutsu->use_type == 'barrier' or $opponent_jutsu->use_type == 'barrier') {
+        if($player_jutsu->use_type == Jutsu::USE_TYPE_BARRIER or $opponent_jutsu->use_type == Jutsu::USE_TYPE_BARRIER) {
             return $this->parseCombatText(
                 $collision_text,
                 $player1,
@@ -2029,7 +2049,7 @@ class Battle {
             $collision_text .= "[opponent] diffused " . ($opponent_diffuse_percent * 100) . "% of [player]'s damage![br]";
         }
 
-        if($player_jutsu->jutsu_type == 'genjutsu' or $opponent_jutsu->jutsu_type == 'genjutsu') {
+        if($player_jutsu->jutsu_type == Jutsu::TYPE_GENJUTSU or $opponent_jutsu->jutsu_type == Jutsu::TYPE_GENJUTSU) {
             return false;
         }
 
@@ -2074,9 +2094,9 @@ class Battle {
         $speed_ratio = 0.8;
         $cast_speed_ratio = 0.8;
         $max_damage_reduction = 0.5;
-        if($player_jutsu->jutsu_type == 'ninjutsu') {
+        if($player_jutsu->jutsu_type == Jutsu::TYPE_NINJUTSU) {
             // Nin vs Nin
-            if($opponent_jutsu->jutsu_type == 'ninjutsu') {
+            if($opponent_jutsu->jutsu_type == Jutsu::TYPE_NINJUTSU) {
                 if($player_cast_speed >= $opponent_cast_speed) {
                     $damage_reduction = ($player_cast_speed / $opponent_cast_speed) - 1.0;
                     $damage_reduction = round($damage_reduction * $cast_speed_ratio, 2);
@@ -2103,7 +2123,7 @@ class Battle {
                 }
             }
             // Nin vs Tai
-            else if($opponent_jutsu->jutsu_type == 'taijutsu') {
+            else if($opponent_jutsu->jutsu_type == Jutsu::TYPE_TAIJUTSU) {
                 if($player_cast_speed >= $opponent_speed) {
                     $damage_reduction = ($player_cast_speed / $opponent_speed) - 1.0;
                     $damage_reduction = round($damage_reduction * $cast_speed_ratio, 2);
@@ -2131,9 +2151,9 @@ class Battle {
         }
 
         // Taijutsu clash
-        else if($player_jutsu->jutsu_type == 'taijutsu') {
+        else if($player_jutsu->jutsu_type == Jutsu::TYPE_TAIJUTSU) {
             // Tai vs Tai
-            if($opponent_jutsu->jutsu_type == 'taijutsu') {
+            if($opponent_jutsu->jutsu_type == Jutsu::TYPE_TAIJUTSU) {
                 if($player_speed >= $opponent_speed) {
                     $damage_reduction = ($player_speed / $opponent_speed) - 1.0;
                     $damage_reduction = round($damage_reduction * $speed_ratio, 2);
@@ -2157,7 +2177,7 @@ class Battle {
                     }
                 }
             }
-            else if($opponent_jutsu->jutsu_type == 'ninjutsu') {
+            else if($opponent_jutsu->jutsu_type == Jutsu::TYPE_NINJUTSU) {
                 if($player_speed >= $opponent_cast_speed) {
                     $damage_reduction = ($player_speed / $opponent_cast_speed) - 1.0;
                     $damage_reduction = round($damage_reduction * $speed_ratio, 2);
@@ -2189,7 +2209,11 @@ class Battle {
         return $collision_text;
     }
 
-    protected function setEffect(Fighter &$user, $target_id, Jutsu $jutsu, $raw_damage, $effect_id, &$active_effects) {
+    protected function setEffect(Fighter &$user, $target_id, Jutsu $jutsu, $raw_damage, &$active_effects) {
+        if(!$jutsu->combat_id) {
+            $jutsu->setCombatId($user->combat_id);
+        }
+
         $apply_effect = true;
 
         $debuff_power = ($jutsu->power <= 0) ? 0 : $raw_damage / $jutsu->power / 15;
@@ -2199,7 +2223,7 @@ class Battle {
             echo sprintf("%s / %s<br />", $raw_damage, $debuff_power);
         }
 
-        if($jutsu->jutsu_type == 'genjutsu' && !empty($jutsu->parent_jutsu)) {
+        if($jutsu->jutsu_type == Jutsu::TYPE_GENJUTSU && !empty($jutsu->parent_jutsu)) {
             $parent_genjutsu_id = $user->combat_id . ':J' . $jutsu->parent_jutsu;
             if(!empty($active_effects[$parent_genjutsu_id]['layer_active'])) {
                 $active_effects[$parent_genjutsu_id]['layer_active'] = true;
@@ -2240,7 +2264,7 @@ class Battle {
             case 'willpower_nerf':
                 $jutsu->effect_amount = round($debuff_power * ($jutsu->effect_amount / 100), 2);
                 break;
-            case 'barrier':
+            case Jutsu::USE_TYPE_BARRIER:
                 $jutsu->effect_amount = $raw_damage;
                 break;
             default:
@@ -2249,6 +2273,14 @@ class Battle {
         }
 
         if($apply_effect) {
+            $effect_id = $jutsu->combat_id;
+            if($jutsu->use_type == Jutsu::USE_TYPE_BARRIER) {
+                $effect_id = Battle::barrierId($this->player1);
+            }
+            else if($jutsu->is_weapon) {
+                $effect_id = $user->combat_id . ':WE:' . $jutsu->effect;
+            }
+
             $active_effects[$effect_id] = array(
                 'user' => $user->combat_id,
                 'target' => $target_id,
@@ -2257,7 +2289,7 @@ class Battle {
                 'effect_amount' => $jutsu->effect_amount,
                 'effect_type' => $jutsu->jutsu_type
             );
-            if($jutsu->jutsu_type == 'genjutsu') {
+            if($jutsu->jutsu_type == Jutsu::TYPE_GENJUTSU) {
                 $intelligence = ($user->intelligence + $user->intelligence_boost - $user->intelligence_nerf);
                 if($intelligence <= 0) {
                     $intelligence = 1;
@@ -2340,39 +2372,35 @@ class Battle {
         return false;
     }
 
-    protected function setPlayerAction($attack_id, $weapon_id, $attack_type, string $jutsu_unique_id, string $jutsu_type) {
+    protected function setPlayerAction(Jutsu $jutsu, $weapon_id) {
         if($this->player_side == Battle::TEAM1) {
             $this->player1_action = 1;
-            $this->player1_jutsu_id = $attack_id;
+            $this->player1_jutsu_id = $jutsu->id;
             $this->player1_weapon_id = $weapon_id;
-            $this->player1_attack_type = $attack_type;
+            $this->player1_attack_type = $jutsu->purchase_type;
 
-            if($attack_type != 'failed_jutsu') {
-                if(isset($this->player1_jutsu_used[$jutsu_unique_id])) {
-                    $this->player1_jutsu_used[$jutsu_unique_id]['count']++;
-                }
-                else {
-                    $this->player1_jutsu_used[$jutsu_unique_id] = array();
-                    $this->player1_jutsu_used[$jutsu_unique_id]['jutsu_type'] = $jutsu_type;
-                    $this->player1_jutsu_used[$jutsu_unique_id]['count'] = 1;
-                }
+            if(isset($this->player1_jutsu_used[$jutsu->combat_id])) {
+                $this->player1_jutsu_used[$jutsu->combat_id]['count']++;
+            }
+            else {
+                $this->player1_jutsu_used[$jutsu->combat_id] = array();
+                $this->player1_jutsu_used[$jutsu->combat_id]['jutsu_type'] = $jutsu->jutsu_type;
+                $this->player1_jutsu_used[$jutsu->combat_id]['count'] = 1;
             }
         }
         else {
             $this->player2_action = 1;
-            $this->player2_jutsu_id = $attack_id;
+            $this->player2_jutsu_id = $jutsu->id;
             $this->player2_weapon_id = $weapon_id;
-            $this->player2_attack_type = $attack_type;
+            $this->player2_attack_type = $jutsu->purchase_type;
 
-            if($attack_type != 'failed_jutsu') {
-                if(isset($this->player2_jutsu_used[$jutsu_unique_id])) {
-                    $this->player2_jutsu_used[$jutsu_unique_id]['count']++;
-                }
-                else {
-                    $this->player2_jutsu_used[$jutsu_unique_id] = array();
-                    $this->player2_jutsu_used[$jutsu_unique_id]['jutsu_type'] = $jutsu_type;
-                    $this->player2_jutsu_used[$jutsu_unique_id]['count'] = 1;
-                }
+            if(isset($this->player2_jutsu_used[$jutsu->combat_id])) {
+                $this->player2_jutsu_used[$jutsu->combat_id]['count']++;
+            }
+            else {
+                $this->player2_jutsu_used[$jutsu->combat_id] = array();
+                $this->player2_jutsu_used[$jutsu->combat_id]['jutsu_type'] = $jutsu->jutsu_type;
+                $this->player2_jutsu_used[$jutsu->combat_id]['count'] = 1;
             }
         }
     }
@@ -2382,7 +2410,7 @@ class Battle {
 
         $attack_id = $jutsu->id;
         $weapon_id = 0;
-        $attack_type = 'equipped_jutsu';
+        $attack_type = Jutsu::PURCHASE_TYPE_PURCHASEABLE;
 
         if($this->opponent_side == Battle::TEAM1) {
             $this->player1_action = 1;
@@ -2520,15 +2548,20 @@ class Battle {
 
     private static function getJutsuTextColor($jutsu_type): string {
         switch ($jutsu_type) {
-            case 'ninjutsu':
+            case Jutsu::TYPE_NINJUTSU:
                 return "blue";
-            case 'taijutsu':
+            case Jutsu::TYPE_TAIJUTSU:
                 return "red";
-            case 'genjutsu':
+            case Jutsu::TYPE_GENJUTSU:
                 return "purple";
             case 'none':
             default:
                 return "black";
         }
     }
+
+    private static function barrierId(Fighter $fighter): string {
+        return $fighter->combat_id . ':BARRIER';
+    }
+
 }

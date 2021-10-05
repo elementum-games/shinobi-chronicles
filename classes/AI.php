@@ -277,7 +277,7 @@ class AI extends Fighter {
         return false;
     }
 
-    public function useJutsu(Jutsu $jutsu, $purchase_type) {
+    public function useJutsu(Jutsu $jutsu) {
 
     }
 

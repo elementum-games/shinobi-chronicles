@@ -25,6 +25,8 @@ class User extends Fighter {
 	public $username_changes;
 	public $blacklist;
 	public $original_blacklist;
+	public $daily_tasks;
+	public $daily_tasks_reset;
 
 	// Loaded in loadData
     public float $health;
@@ -265,6 +267,21 @@ class User extends Fighter {
 		else {
 			$blacklist_json = json_encode($this->blacklist);
 			$this->system->query("INSERT INTO `blacklist` (`user_id`, `blocked_ids`) VALUES ('{$this->user_id}', '{$blacklist_json}')");
+			$this->original_blacklist = array(); // Default an empty array, user did not have an original.
+		}
+
+		// Daily Tasks
+		$this->daily_tasks = array();
+		$this->daily_tasks_reset = 0;
+		$result = $this->system->query("SELECT `tasks`, `last_reset` FROM `daily_tasks` WHERE `user_id`='$this->user_id' LIMIT 1");
+		if ($this->system->db_num_rows !== 0) {
+			$dt = $this->system->db_fetch($result);
+			$this->daily_tasks = json_decode($dt['tasks'], true);
+			$this->daily_tasks_reset = $dt['last_reset'];
+		}
+		else {
+			$this->system->query("INSERT INTO `daily_tasks` (`user_id`, `tasks`, `last_reset`)
+			VALUES ('{$this->user_id}', '".json_encode(array())."', '".time()."')");
 		}
 
 		// Rank stuff
@@ -468,6 +485,132 @@ class User extends Fighter {
       $this->isMarried = 0;
       //no id is set :^(
     }
+      
+		// Daily Tasks
+		if (empty($this->daily_tasks) || (time() - $this->daily_tasks_reset) > (60 * 60 * 24)) {
+			// Generate new Daily Tasks if there's never been a new task or if 24hrs have ellapsed since last reset
+			$possible_task_types = [
+				'PVP Battles' => [
+					'Type' => 'PVP',
+					'SubTask' => ['Win', 'Complete'],
+					'Amount' => [1, 3, 5, 10, 15]
+				],
+				'AI Battles' => [
+					'Type' => 'AI',
+					'SubTask' => ['Win', 'Complete'],
+					'Amount' => [5, 10, 15, 30, 50, 75, 100]
+				],
+				'Missions' => [
+					'Type' => 'Mission',
+					'SubTask' => ['Complete'],
+					'Amount' => [5, 10, 15, 30, 50, 75, 100],
+					'MissionType' => [0, 1]
+				]
+			];
+			
+			if ($this->rank > 1) {
+				array_push($possible_task_types['Missions']['MissionType'], 2);
+			}
+			if ($this->rank > 2) {
+				array_push($possible_task_types['Missions']['MissionType'], 3);
+			}
+			if ($this->rank > 3) {
+				array_push($possible_task_types['Missions']['MissionType'], 4);
+			}
+			
+			$possible_task_names = ['Zodiac of Solaris', 'Defend the Past',
+			'Call of Grace', 'The Shattered Corpse', 'Trap the Fury', 'The Obsidian Orb', 
+			'Zodia Clock', 'Rats of the Frontline', 'The Grey Quarry', 'Something Immortal',
+			'The Beast in the West', 'Made for Error', 'Spare Parts', 'The Fall of the Orb',
+			'Cry of Menace', 'Breaking Rites', 'Conjured Moon'];
+
+			$num_of_tasks = 3;
+			$daily_tasks = [];
+
+			for ($i = 0; $i < $num_of_tasks; $i++) {
+				// Randomly choose a mission type and amount
+				$task_type = array_rand($possible_task_types, 1);
+				$sub_task_type = array_rand($possible_task_types[$task_type]['SubTask'], 1);
+				$task_amount = array_rand($possible_task_types[$task_type]['Amount'], 1);
+				// Don't have duplicate task names
+				$task_name_key = array_rand($possible_task_names, 1);
+				$task_name = $possible_task_names[$task_name_key];
+				unset($possible_task_names[$task_name_key]);
+
+				$mission_letter = 0;
+				if ($task_type == 'Missions') {
+					$valid = false;
+					while($valid === false) {
+						$mission_letter = array_rand($possible_task_types['Missions']['MissionType'], 1);
+						if ($possible_task_types['Missions']['MissionType'][$mission_letter] != 0) {
+							$valid = true;
+						}
+					}
+				}
+				// Decide the Task difficulty for rewards
+				$task_difficulty = 'Easy';
+				$difficulty_multiplier = 1.5;
+				$task_reward = 1000;
+				$task_win_multiplier = ($sub_task_type == 'Win' ? 2 : 1);
+				switch($task_type) {
+					case 'PVP Battles':
+						$mediumTarget = 3;
+						$hardTarget = 10;
+						$type_multiplier = 4;
+						break;
+					case 'AI Battles':
+						$mediumTarget = 30;
+						$hardTarget = 75;
+						$type_multiplier = 2.5;
+						break;
+					case 'Missions':
+					default:
+						$mediumTarget = 30;
+						$hardTarget = 75;
+						$type_multiplier = 2;
+						break;
+				}
+				if ($possible_task_types[$task_type]['Amount'][$task_amount] * $task_win_multiplier > $hardTarget) {
+					$task_difficulty = 'Hard';
+					$difficulty_multiplier = 5;
+				} else if ($possible_task_types[$task_type]['Amount'][$task_amount] * $task_win_multiplier > $mediumTarget) {
+					$task_difficulty = 'Medium';
+					$difficulty_multiplier = 3;
+				}
+
+				$money_reward = $task_reward * $type_multiplier * $difficulty_multiplier;
+
+
+
+				$arr_target = [
+					'TaskName' => $task_name,
+					'Task' => $task_type,
+					'MissionRank' => $possible_task_types['Missions']['MissionType'][$mission_letter],
+					'SubTask' => $possible_task_types[$task_type]['SubTask'][$sub_task_type],
+					'Amount' => $possible_task_types[$task_type]['Amount'][$task_amount],
+					'Difficulty' => $task_difficulty,
+					'Reward' => $money_reward,
+					'Progress' => 0,
+					'Complete' => 0
+				];
+				array_push($daily_tasks, $arr_target);
+			}
+			$this->system->query("UPDATE `daily_tasks` SET `tasks`='".json_encode($daily_tasks)."', `last_reset`='".time()."' WHERE `user_id`='{$this->user_id}'");
+		} else {
+		// check if the user has completed stuff and reward them if so
+			$dt = [];
+			foreach($this->daily_tasks as $task) {
+				if ($task['Complete'] == 0 && $task['Progress'] >= $task['Amount']) {
+					$task['Progress'] = $task['Amount'];
+					$task['Complete'] = 1;
+					$this->money += $task['Reward'];
+					$this->system->message('You have completed ' . $task['TaskName'] .' and earned ¥'. $task['Reward']);
+				}
+				array_push($dt, $task);
+			}
+			$this->daily_tasks = $dt;
+		}
+      
 		// Clan
 		$this->clan = $user_data['clan_id'];
 		if($this->clan) {
@@ -529,7 +672,8 @@ class User extends Fighter {
 						'members' => json_decode($data['members'], true),
 						'mission_id' => $data['mission_id'],
 						'mission_stage' => json_decode($data['mission_stage'], true),
-						'logo' => $data['logo']
+						'logo' => $data['logo'],
+						'boost_time' => $data['boost_time']
 					);
 
 					// Same square boost
@@ -538,6 +682,13 @@ class User extends Fighter {
 					$location_count = $this->system->db_fetch($result)['count'];
 
 					$this->defense_boost += (($location_count - 1) * 0.1);
+
+					// check if boosts have expired.
+					$seven_days = 60*60*24*7;
+					if ($this->team['boost_time'] * $seven_days <= time()) {
+						$this->team['boost'] = 'none';
+						$this->team['boost_amount'] = 0.00;
+					}
 				}
 			}
 		}
@@ -820,6 +971,20 @@ class User extends Fighter {
 				}
 				// Skill/attribute training
 				else {
+					// TEAM BOOST TRAINING GAINS
+					$team_boost = false;
+					if ($this->team['boost'] == 'Training') {
+						$random_number = rand(1, 100);
+						if ($random_number <= $this->team['boost_amount']) {
+							// boost success
+							// a "flat" 20% increase in stat gain
+							$boost_amount = ceil(20 / 100 * $this->train_gain);
+							$team_boost = '<br>LUCKY! Your team bond triggered a breakthrough and resulted in increased progress!
+							<br>
+							You gained an additional <b>[ ' . $boost_amount . ' ]</b> point(s)';
+							$this->train_gain += $boost_amount;
+						}				
+					}
 					// Check caps
 					$gain = $this->train_gain;
 
@@ -838,7 +1003,7 @@ class User extends Fighter {
 
 					$this->train_time = 0;
 					$this->system->message("You have gained " . $gain . " " . ucwords(str_replace('_', ' ', $this->train_type)) .
-						" and " . ($gain * 10) . " experience.");
+						" and " . ($gain * 10) . " experience.".$team_boost);
 				}
 			}
 			else {
@@ -1052,7 +1217,7 @@ class User extends Fighter {
 
 	/* function useJutsu
 		pool check, calc exp, etc */
-	public function useJutsu(Jutsu $jutsu, $purchase_type = 'equipped_jutsu'): bool {
+	public function useJutsu(Jutsu $jutsu): bool {
 		switch($jutsu->jutsu_type) {
 			case 'ninjutsu':
 			case 'genjutsu':
@@ -1070,10 +1235,10 @@ class User extends Fighter {
 			return false;
 		}
 
-		switch($purchase_type) {
-			case 'equipped_jutsu':
+		switch($jutsu->purchase_type) {
+            case Jutsu::PURCHASE_TYPE_PURCHASEABLE:
 				// Element check
-				if($jutsu->element && $jutsu->element != 'None') {
+				if($jutsu->element && $jutsu->element != Jutsu::ELEMENT_NONE) {
 					if($this->elements) {
 						if(array_search($jutsu->element, $this->elements) === false) {
 							$this->system->message("You do not possess the elemental chakra for this jutsu!");
@@ -1098,20 +1263,20 @@ class User extends Fighter {
 
 				$this->{$energy_type} -= $jutsu->use_cost;
 				break;
-			case 'bloodline_jutsu':
-				if($this->bloodline->jutsu[$jutsu->id]->level < 100) {
-					$this->bloodline->jutsu[$jutsu->id]->exp += round(500 / ($this->bloodline->jutsu[$jutsu->id]->level * 0.9));
+            case Jutsu::PURCHASE_TYPE_BLOODLINE:
+                if($this->bloodline->jutsu[$jutsu->id]->level < 100) {
+                    $this->bloodline->jutsu[$jutsu->id]->exp += round(500 / ($this->bloodline->jutsu[$jutsu->id]->level * 0.9));
 
-					if($this->bloodline->jutsu[$jutsu->id]->exp >= 1000) {
-						$this->bloodline->jutsu[$jutsu->id]->exp = 0;
-						$this->bloodline->jutsu[$jutsu->id]->level++;
-						$this->system->message($jutsu->name . " has increased to level " . $this->bloodline->jutsu[$jutsu->id]->level . ".");
-					}
-				}
+                    if($this->bloodline->jutsu[$jutsu->id]->exp >= 1000) {
+                        $this->bloodline->jutsu[$jutsu->id]->exp = 0;
+                        $this->bloodline->jutsu[$jutsu->id]->level++;
+                        $this->system->message($jutsu->name . " has increased to level " . $this->bloodline->jutsu[$jutsu->id]->level . ".");
+                    }
+                }
 
-				$this->{$energy_type} -= $jutsu->use_cost;
-				break;
-			case 'default_jutsu':
+                $this->{$energy_type} -= $jutsu->use_cost;
+                break;
+			case Jutsu::PURCHASE_TYPE_DEFAULT:
 				$this->{$energy_type} -= $jutsu->use_cost;
 				break;
 
@@ -1227,9 +1392,15 @@ class User extends Fighter {
 		$this->system->query($query);
 
 		// Update Blacklist
-		if(count($this->blacklist) != count($this->original_blacklist)) {
+        if(count($this->blacklist) != count($this->original_blacklist)) {
 			$blacklist_json = json_encode($this->blacklist);
 			$this->system->query("UPDATE `blacklist` SET `blocked_ids`='{$blacklist_json}' WHERE `user_id`='{$this->user_id}' LIMIT 1");
+		}
+
+		//Update Daily Tasks
+		if ($this->daily_tasks) {
+			$dt = json_encode($this->daily_tasks);
+			$this->system->query("UPDATE `daily_tasks` SET `tasks`='{$dt}' WHERE `user_id`='{$this->user_id}'");
 		}
 	}
 
@@ -1375,12 +1546,9 @@ class User extends Fighter {
             return false;
         }
 
-        $dateTime = DateTime::createFromFormat(
-            'U.u',
-            number_format(microtime(true), 2, '.', '')
-        );
+        $dateTime = System::dateTimeFromMicrotime(microtime(true));
 
-        $dateTimeFormat = 'Y-m-d H:i:s.u';
+        $dateTimeFormat = System::DB_DATETIME_MS_FORMAT;
         $this->system->query("INSERT INTO `player_logs`
             (`user_id`, `user_name`, `log_type`, `log_time`, 
              `log_contents`)
