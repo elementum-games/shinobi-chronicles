@@ -600,7 +600,7 @@ function premium() {
 								echo "<table class='table'><tr><th>Chakra Element Change</th></tr>
 										<td style='text-align:center;'>";
 											switch($new_element) {
-												case 'Fire':
+												case Jutsu::ELEMENT_FIRE:
 													echo "With the image of blazing fires in your mind, you flow chakra from your stomach,
 													down through your legs and into the seal on the floor. Suddenly one of the pedestals bursts into
 													fire, breaking your focus, and the elders smile and say
@@ -610,7 +610,7 @@ function premium() {
 													can extinguish your fires.\"
 													<br />";
 													break;
-												case 'Wind':
+												case Jutsu::ELEMENT_WIND:
 													echo "Picturing a tempestuous tornado, you flow chakra from your stomach,
 													down through your legs and into the seal on the floor. You feel a disturbance in the room and
 													suddenly realize that a small whirlwind has formed around one of the pedestals, and the elders smile and say
@@ -620,7 +620,7 @@ function premium() {
 													because your wind only serves to fan their flames and make them stronger.\"
 													<br />";
 													break;
-												case 'Lightning':
+												case Jutsu::ELEMENT_LIGHTNING:
 													echo "Imagining the feel of electricity coursing through your veins, you flow chakra from your stomach,
 													down through your legs and into the seal on the floor. Suddenly you feel a charge in the air and
 													one of the pedestals begins to spark with crackling electricity, and the elders smile and say
@@ -630,7 +630,7 @@ function premium() {
 													but you must be careful against Wind jutsu as they will dissipate your Lightning.\"
 													<br />";
 													break;
-												case 'Earth':
+												case Jutsu::ELEMENT_EARTH:
 													echo "Envisioning stone as hard as the temple you are sitting in, you flow chakra from your stomach,
 													down through your legs and into the seal on the floor. Suddenly dirt from nowhere begins to fall off one of the
 													pedstals and the elders smile and say
@@ -640,7 +640,7 @@ function premium() {
 													Lightning jutsu, as they are one of the few types that can swiftly evade and strike through your techniques.\"
 													<br />";
 													break;
-												case 'Water':
+												case Jutsu::ELEMENT_WATER:
 													echo "With thoughts of splashing rivers flowing through your mind, you flow chakra from your stomach,
 													down through your legs and into the seal on the floor. Suddenly a small geyser erupts from one of
 													the pedestals, and the elders smile and say
