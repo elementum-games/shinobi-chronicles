@@ -72,7 +72,7 @@ class Messaging {
 				throw new Exception(sprintf("Message is too long! (%d/%d chars)", strlen($message), self::MAX_MESSAGE_LENGTH));
 			}
 			$result = $this->system->query("SELECT `user_id`, `user_name`, `staff_level`, `forbidden_seal` FROM `users` WHERE `user_name`='{$recipient}'");
-			if(! $this->system->db_num_rows) {
+			if(! $this->system->db_last_num_rows) {
 				throw new Exception("User does not exist!");
 			}
 			$result = $this->system->db_fetch($result);
@@ -82,7 +82,7 @@ class Messaging {
 			/* Place Blacklist Here */
 			if($recipient != $this->player->user_name){
 				$blacklist = $this->system->query("SELECT `blocked_ids` FROM `blacklist` WHERE `user_id`='{$result['user_id']}' LIMIT 1");
-				if($this->system->db_num_rows != 0){
+				if($this->system->db_last_num_rows != 0){
 					$blacklist = $this->system->db_fetch($blacklist);
 					$blacklist = json_decode($blacklist['blocked_ids'], true);
 
@@ -149,7 +149,7 @@ class Messaging {
 			}
 
 			$this->system->query(sprintf("UPDATE `private_messages` SET `message_read` = 2 WHERE `message_id` IN(%s) AND `recipient`='%d'", $this->message_id, $this->player->user_id));
-			$message = ($this->system->db_affected_rows) ? "Message deleted" : "Invalid message!";
+			$message = ($this->system->db_last_affected_rows) ? "Message deleted" : "Invalid message!";
 			
 			$this->inbox();
 			$this->system->message($message);
@@ -362,12 +362,12 @@ class Messaging {
 			$messages[] = $message;
 		}
 
-		if(! $this->system->db_num_rows) {
+		if(! $this->system->db_last_num_rows) {
 			$this->Messages = NULL;
 		}
 		else {
 
-			$this->msg_count = $this->system->db_num_rows;
+			$this->msg_count = $this->system->db_last_num_rows;
 
 			$user_string = implode(",", $users);
 

@@ -68,7 +68,7 @@ if(!isset($_SESSION['user_id'])) {
 			// Get result
 			$result = $system->query("SELECT `user_id`, `user_name`, `password`, `failed_logins`, `current_ip`, `last_ip`, `user_verified` 
 				FROM `users` WHERE `user_name`='$user_name' LIMIT 1");
-			if($system->db_num_rows == 0) {
+			if($system->db_last_num_rows == 0) {
 				throw new Exception("User does not exist!");
 			}
 			$result = $system->db_fetch($result);
@@ -227,7 +227,7 @@ if($LOGGED_IN) {
 		exit;
 	}
 	$result = $system->query("SELECT `id` FROM `banned_ips` WHERE `ip_address`='" . $system->clean($_SERVER['REMOTE_ADDR']) . "' LIMIT 1");
-	if($system->db_num_rows > 0) {
+	if($system->db_last_num_rows > 0) {
 		if(!$ajax) {
 			echo str_replace("[HEADER_TITLE]", "Profile", $body_start);
 		}
@@ -340,7 +340,7 @@ if($LOGGED_IN) {
 			// Check for spar/fight PvP type, stop page if trying to load spar/battle while in AI battle
 			if(isset($pages[$id]['battle_type'])) {
 				$result = $system->query("SELECT `battle_type` FROM `battles` WHERE `battle_id`='$player->battle_id' LIMIT 1");
-				if($system->db_num_rows > 0) {
+				if($system->db_last_num_rows > 0) {
 					$battle_type = $system->db_fetch($result)['battle_type'];
 					if($battle_type != $pages[$id]['battle_type']) {
 						throw new Exception("You cannot visit this page while in combat!");

@@ -153,7 +153,7 @@ function premium() {
 				throw new Exception("Only alphanumeric characters, dashes, and underscores are allowed in usernames!");
 			}
 
-			if($system->censor_check($new_name)) {
+			if($system->explicitLanguageCheck($new_name)) {
 				throw new Exception("Inappropriate language is not allowed in usernames!");
 			}
 
@@ -165,7 +165,7 @@ function premium() {
 			}
 
 			$result = $system->query("SELECT `user_name` FROM `users` WHERE `user_name`='$new_name' LIMIT 1");
-			if($system->db_num_rows) {
+			if($system->db_last_num_rows) {
 				$result = $system->db_fetch();
 				if(strtolower($player->user_name) == strtolower($new_name)) {
 					$nameCost = 0;
@@ -388,7 +388,7 @@ function premium() {
 		try {
 			$result = $system->query("SELECT `bloodline_id`, `name`, `clan_id`, `rank` FROM `bloodlines`
 				WHERE `bloodline_id`='$bloodline_id' AND `rank` < 5 ORDER BY `rank` ASC");
-			if($system->db_num_rows == 0) {
+			if($system->db_last_num_rows == 0) {
 				throw new Exception("Invalid bloodline!");
 			}
 			$result = $system->db_fetch($result);
@@ -428,7 +428,7 @@ function premium() {
 
 			// Set clan
 			$result = $system->query("SELECT `name` FROM `clans` WHERE `clan_id` = '$clan_id' LIMIT 1");
-			if($system->db_num_rows > 0) {
+			if($system->db_last_num_rows > 0) {
 				$clan_result = $system->db_fetch($result);
 
 
@@ -618,12 +618,12 @@ function premium() {
 			// Clan
 			$result = $system->query("SELECT `clan_id`, `name` FROM `clans`
 					WHERE `village`='$player->village' AND `bloodline_only`='0'");
-			if($system->db_num_rows == 0) {
+			if($system->db_last_num_rows == 0) {
 				$result = $system->query("SELECT `clan_id`, `name` FROM `clans`
 				WHERE `bloodline_only`='0'");
 			}
 
-			if(! $system->db_num_rows) {
+			if(! $system->db_last_num_rows) {
 				throw new Exception("No clans available!");
 			}
 
@@ -994,7 +994,7 @@ function premium() {
 
 			$result = $system->query("SELECT `bloodline_id`, `name`, `rank`
 				FROM `bloodlines` WHERE `rank` < 5 ORDER BY `rank` ASC");
-			if($system->db_num_rows == 0) {
+			if($system->db_last_num_rows == 0) {
 				echo "No bloodlines available!";
 			}
 			else {
@@ -1286,7 +1286,7 @@ function premiumCreditExchange() {
 
 			$system->query("INSERT INTO `premium_credit_exchange` (`seller`, `premium_credits`, `money`)
 			VALUES ('$player->user_id', '$premium_credits', '$money')");
-			if($system->db_affected_rows > 0) {
+			if($system->db_last_affected_rows > 0) {
 				$system->message("Offer placed!");
 			}
 			else {
@@ -1305,7 +1305,7 @@ function premiumCreditExchange() {
 			// Validate input for offer id
 			$id = (int)$system->clean($_GET['purchase']);
 			$result = $system->query("SELECT * FROM `premium_credit_exchange` WHERE `id`='$id' AND `completed`='0' LIMIT 1");
-			if($system->db_num_rows == 0) {
+			if($system->db_last_num_rows == 0) {
 				 throw new Exception("Invalid offer!");
 			}
 
@@ -1341,7 +1341,7 @@ function premiumCreditExchange() {
 			// Validate input for offer id
 			$id = (int)$system->clean($_GET['cancel']);
 			$result = $system->query("SELECT * FROM `premium_credit_exchange` WHERE `id`='$id' AND `completed`='0' LIMIT 1");
-			if($system->db_num_rows == 0) {
+			if($system->db_last_num_rows == 0) {
 				 throw new Exception("Invalid offer!");
 			}
 
@@ -1396,7 +1396,7 @@ function premiumCreditExchange() {
 	$credit_users = array();
 
 	//If there are offers in the database
-	if($system->db_num_rows) {
+	if($system->db_last_num_rows) {
 
 		while($row = $system->db_fetch($result)) {
 

@@ -1,6 +1,7 @@
 <?php /** @noinspection PhpRedundantOptionalArgumentInspection */
 
 require_once __DIR__ . "/Jutsu.php";
+require_once __DIR__ . "/Team.php";
 
 /*	Class:		User
 	Purpose:	Fetch user data and load into class variables.
@@ -96,7 +97,9 @@ class User extends Fighter {
 	public $layout;
 
     // Team
-    public $team_invite;
+    public ?Team $team = null;
+    public array $fake_team = [];
+    public ?int $team_invite;
 
 	// Internal class variables
 	public $inventory_loaded;
@@ -159,7 +162,7 @@ class User extends Fighter {
     public int $stealth;
     public $village_changes;
     public $clan_changes;
-    public $team;
+
     public $clan_office;
 
     public array $equipped_armor;
@@ -184,7 +187,7 @@ class User extends Fighter {
 		$result = $this->system->query("SELECT `user_id`, `user_name`, `ban_type`, `ban_expire`, `journal_ban`, `avatar_ban`, `song_ban`, `last_login`,
 			`forbidden_seal`, `staff_level`, `username_changes`
 			FROM `users` WHERE `user_id`='$this->user_id' LIMIT 1");
-		if($this->system->db_num_rows == 0) {
+		if($this->system->db_last_num_rows == 0) {
 			throw new Exception("User does not exist!");
 		}
 
@@ -249,7 +252,7 @@ class User extends Fighter {
 		// Message blacklist
 		$this->blacklist = array();
 		$result = $this->system->query("SELECT `blocked_ids` FROM `blacklist` WHERE `user_id`='$this->user_id' LIMIT 1");
-		if($this->system->db_num_rows != 0) {
+		if($this->system->db_last_num_rows != 0) {
 			$blacklist = $this->system->db_fetch($result);
 			$this->blacklist = json_decode($blacklist['blocked_ids'], true);
 			$this->original_blacklist = $this->blacklist;
@@ -264,7 +267,7 @@ class User extends Fighter {
 		$this->daily_tasks = array();
 		$this->daily_tasks_reset = 0;
 		$result = $this->system->query("SELECT `tasks`, `last_reset` FROM `daily_tasks` WHERE `user_id`='$this->user_id' LIMIT 1");
-		if ($this->system->db_num_rows !== 0) {
+		if ($this->system->db_last_num_rows !== 0) {
 			$dt = $this->system->db_fetch($result);
 			$this->daily_tasks = json_decode($dt['tasks'], true);
 			$this->daily_tasks_reset = $dt['last_reset'];
@@ -277,7 +280,7 @@ class User extends Fighter {
 		// Rank stuff
 		$this->rank = $user_data['rank'];
 		$rank_data = $this->system->query("SELECT * FROM `ranks` WHERE `rank_id`='$this->rank'");
-		if($this->system->db_num_rows == 0) {
+		if($this->system->db_last_num_rows == 0) {
 			$this->system->message("Invalid rank!");
 			$this->system->printMessage("Invalid rank!");
 		}
@@ -414,7 +417,7 @@ class User extends Fighter {
 
 		// Village
 		$result = $this->system->query("SELECT `location` FROM `villages` WHERE `name`='{$this->village}' LIMIT 1");
-		if($this->system->db_num_rows != 0) {
+		if($this->system->db_last_num_rows != 0) {
 			$result = $this->system->db_fetch($result);
 			$this->village_location = $result['location'];
 			if($this->location == $this->village_location) {
@@ -554,7 +557,7 @@ class User extends Fighter {
 		$this->clan = $user_data['clan_id'];
 		if($this->clan) {
 			$result = $this->system->query("SELECT * FROM `clans` WHERE `clan_id`='$this->clan' LIMIT 1");
-			if($this->system->db_num_rows == 0) {
+			if($this->system->db_last_num_rows == 0) {
 				$this->clan = false;
 			}
 			else {
@@ -581,54 +584,23 @@ class User extends Fighter {
 		}
 
 		// Team
-		$this->team = $user_data['team_id'];
+        $this->team = null;
         $this->team_invite = null;
-		if($this->team) {
+        $this->fake_team = [
+            'name' => 'Something',
+            'avatar' => 'Something Else'
+        ];
+
+        $team_id = $user_data['team_id'];
+		if($team_id) {
 			// Invite stuff
-			if(substr($this->team, 0, 7) == 'invite:') {
+			if(substr($team_id, 0, 7) == 'invite:') {
 				$this->team_invite = (int)substr($this->team, 7);
-				$this->team = false;
 			}
 			// Player team stuff
 			else {
-				$result = $this->system->query("SELECT * FROM `teams` WHERE `team_id`='$this->team' LIMIT 1");
-				if($this->system->db_num_rows == 0) {
-					$this->team = array();
-					$this->team['id'] = 0;
-				}
-				else {
-					$data = $this->system->db_fetch($result);
-					$this->team = array(
-						'id' => $data['team_id'],
-						'name' => $data['name'],
-						'village' => $data['village'],
-						'type' => $data['type'],
-						'boost' => $data['boost'],
-						'boost_amount' => $data['boost_amount'],
-						'points' => $data['points'],
-						'monthly_points' => $data['monthly_points'],
-						'leader' => $data['leader'],
-						'members' => json_decode($data['members'], true),
-						'mission_id' => $data['mission_id'],
-						'mission_stage' => json_decode($data['mission_stage'], true),
-						'logo' => $data['logo'],
-						'boost_time' => $data['boost_time']
-					);
-
-					// Same square boost
-					$result = $this->system->query("SELECT COUNT(`user_id`) as `count` FROM `users`
-						WHERE `team_id`='{$this->team['id']}' AND `location`='$this->location' AND `last_active` > UNIX_TIMESTAMP() - 120");
-					$location_count = $this->system->db_fetch($result)['count'];
-
-					$this->defense_boost += (($location_count - 1) * 0.1);
-
-					// check if boosts have expired.
-					$seven_days = 60*60*24*7;
-					if ($this->team['boost_time'] * $seven_days <= time()) {
-						$this->team['boost'] = 'none';
-						$this->team['boost_amount'] = 0.00;
-					}
-				}
+			     $this->team = Team::findById($this->system, $team_id);
+			     $this->defense_boost += $this->team->getDefenseBoost($this);
 			}
 		}
 
@@ -911,19 +883,18 @@ class User extends Fighter {
 				// Skill/attribute training
 				else {
 					// TEAM BOOST TRAINING GAINS
-					$team_boost = false;
-					if ($this->team['boost'] == 'Training') {
-						$random_number = rand(1, 100);
-						if ($random_number <= $this->team['boost_amount']) {
-							// boost success
-							// a "flat" 20% increase in stat gain
-							$boost_amount = ceil(20 / 100 * $this->train_gain);
-							$team_boost = '<br>LUCKY! Your team bond triggered a breakthrough and resulted in increased progress!
-							<br>
+                    if($this->team != null) {
+                        $boost_percent = $this->team->checkForTrainingBoostTrigger();
+                        if($boost_percent != null) {
+                            $boost_amount = round($this->train_gain * $boost_percent, PHP_ROUND_HALF_DOWN);
+                            $this->train_gain += $boost_amount;
+
+                            $team_boost = '<br />LUCKY! Your team bond triggered a breakthrough and resulted in increased progress!
+							<br />
 							You gained an additional <b>[ ' . $boost_amount . ' ]</b> point(s)';
-							$this->train_gain += $boost_amount;
-						}				
-					}
+                        }
+                    }
+
 					// Check caps
 					$gain = $this->train_gain;
 
@@ -935,7 +906,6 @@ class User extends Fighter {
 							$gain = 0;
 						}
 					}
-
 
 					$this->{$this->train_type} += $gain;
 					$this->exp += $gain * 10;
@@ -981,7 +951,7 @@ class User extends Fighter {
 		$equipped_items = [];
 
 		// Decode JSON of inventory into variables
-		if($this->system->db_num_rows > 0) {
+		if($this->system->db_last_num_rows > 0) {
 			$user_inventory = $this->system->db_fetch($result);
 			$player_jutsu = json_decode($user_inventory['jutsu'], true);
 			$player_items = json_decode($user_inventory['items']);
@@ -1013,7 +983,7 @@ class User extends Fighter {
 			$result = $this->system->query(
 				"SELECT * FROM `jutsu` WHERE `jutsu_id` IN ({$player_jutsu_string})
 				AND `purchase_type` != '1' AND `rank` <= '{$this->rank}'");
-			if($this->system->db_num_rows > 0) {
+			if($this->system->db_last_num_rows > 0) {
 				while($jutsu_data = $this->system->db_fetch($result)) {
                     $jutsu_id = $jutsu_data['jutsu_id'];
                     $jutsu = Jutsu::fromArray($jutsu_id, $jutsu_data);
@@ -1076,7 +1046,7 @@ class User extends Fighter {
 			$this->items = array();
 
 			$result = $this->system->query("SELECT * FROM `items` WHERE `item_id` IN ({$player_items_string})");
-			if($this->system->db_num_rows > 0) {
+			if($this->system->db_last_num_rows > 0) {
 				while($item = $this->system->db_fetch($result)) {
 					$this->items[$item['item_id']] = $item;
 					$this->items[$item['item_id']]['quantity'] = $player_items[$item['item_id']]->quantity;
@@ -1265,7 +1235,7 @@ class User extends Fighter {
 		}
 
 		if($this->team) {
-			$query .= "`team_id` = '{$this->team['id']}',";
+			$query .= "`team_id` = '{$this->team->id}',";
 		}
 		else if($this->team_invite) {
 			$query .= "`team_id` = 'invite:{$this->team_invite}',";

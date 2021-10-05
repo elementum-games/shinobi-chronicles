@@ -40,7 +40,7 @@ function news() {
 				VALUES ('{$player->user_name}', '{$title}', '{$post}', '" . time() . "')";
 			$system->query($query);
 
-			if($system->db_affected_rows == 1) {
+			if($system->db_last_affected_rows == 1) {
 				$system->message("News posted!");
 				$page = false;
 			}
@@ -61,7 +61,7 @@ function news() {
 
 		try {
 			$result = $system->query("SELECT `post_id` FROM `news_posts` WHERE `post_id`='$post_id'");
-			if($system->db_num_rows == 0) {
+			if($system->db_last_num_rows == 0) {
 				throw new Exception("Invalid post!");
 			}
 
@@ -85,7 +85,7 @@ function news() {
 				WHERE `post_id`='{$post_id}' LIMIT 1";
 			$system->query($query);
 
-			if($system->db_affected_rows == 1) {
+			if($system->db_last_affected_rows == 1) {
 				$system->message("News edited!");
 				$page = false;
 			}
@@ -118,7 +118,7 @@ function news() {
 	else if($page == "edit_post" && $player->staff_level >= System::SC_ADMINISTRATOR) {
 		$post_id = (int)$system->clean($_GET['post']);
 		$result = $system->query("SELECT * FROM `news_posts` WHERE `post_id`='$post_id'");
-		if($system->db_num_rows == 0) {
+		if($system->db_last_num_rows == 0) {
 			$system->message("Invalid post!");
 			$system->printMessage();
 			$page = false;
@@ -157,7 +157,7 @@ function newsPosts($ADMIN = false, $max_posts = 8) {
 
 	$result = $system->query("SELECT * FROM `news_posts` ORDER BY `post_id` DESC LIMIT $max_posts");
 
-	if($system->db_num_rows == 0) {
+	if($system->db_last_num_rows == 0) {
 		$system->message("No news posts!");
 		$system->printMessage();
 	}

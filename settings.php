@@ -109,7 +109,7 @@ function userSettings() {
 		
 			$password = $system->hash_password($password);
 			$system->query("UPDATE `users` SET `password`='$password' WHERE `user_id`='{$player->user_id}' LIMIT 1");
-			if($system->db_affected_rows >= 1) {
+			if($system->db_last_affected_rows >= 1) {
 				$system->message("Password updated!");
 			}
 		} catch (Exception $e) {
@@ -130,7 +130,7 @@ function userSettings() {
 				throw new Exception("Invaild song link!");
 			}
 			$system->query("UPDATE `users` SET `profile_song`='{$profile_song}' WHERE `user_id`='{$player->user_id}' LIMIT 1");
-			if($system->db_affected_rows == 1) {
+			if($system->db_last_affected_rows == 1) {
 				$player->profile_song = $profile_song;
 				$system->message("Profile song updated!");
 			}
@@ -151,7 +151,7 @@ function userSettings() {
 			}
 			
 			$system->query("UPDATE `journals` SET `journal`='$journal' WHERE `user_id`='{$player->user_id}' LIMIT 1");
-			if($system->db_affected_rows == 1) {
+			if($system->db_last_affected_rows == 1) {
 				$system->message("Journal updated!");
 			}
 		} catch (Exception $e) {
@@ -163,7 +163,7 @@ function userSettings() {
 		$blacklist_username = $system->clean(trim($_POST['blacklist_name']));
 		$result = $system->query("SELECT `user_id`, `user_name`, `staff_level` FROM `users` WHERE `user_name`='{$blacklist_username}'");
 		try {
-			if($system->db_num_rows == 0) {
+			if($system->db_last_num_rows == 0) {
 				throw new Exception("User doesn't exist or check your spelling!");
 			}
 			else {
@@ -279,7 +279,7 @@ function userSettings() {
 	</td></tr>";
 	
 	$result = $system->query("SELECT `journal` FROM `journals` WHERE `user_id` = '{$player->user_id}' LIMIT 1");
-	if($system->db_num_rows == 0) {
+	if($system->db_last_num_rows == 0) {
 		$journal = '';
 		$system->query("INSERT INTO `journals` (`user_id`, `journal`) VALUES('{$player->user_id}', '')");
 	}

@@ -51,10 +51,10 @@ class System {
 
     // Variables for query() function to track things
     public $db_result;
-    public $db_query_type;
-    public $db_num_rows;
-    public $db_affected_rows;
-    public $db_insert_id;
+    public string $db_query_type;
+    public int $db_last_num_rows;
+    public int $db_last_affected_rows;
+    public $db_last_insert_id;
 
     public $SC_STAFF_COLORS = array(
         System::SC_MODERATOR => array(
@@ -256,15 +256,15 @@ class System {
         $result = mysqli_query($this->con, $query) or $this->error(mysqli_error($this->con));
 
         if($this->db_query_type == 'select') {
-            $this->db_num_rows = mysqli_num_rows($result);
+            $this->db_last_num_rows = mysqli_num_rows($result);
             $this->db_result = $result;
         }
         else {
-            $this->db_affected_rows = mysqli_affected_rows($this->con);
+            $this->db_last_affected_rows = mysqli_affected_rows($this->con);
         }
 
         if($this->db_query_type == 'insert') {
-            $this->db_insert_id = mysqli_insert_id($this->con);
+            $this->db_last_insert_id = mysqli_insert_id($this->con);
         }
         return $result;
     }
@@ -367,7 +367,7 @@ class System {
         $query = "INSERT INTO `private_messages` (`sender`, `recipient`, `subject`, `message`, `time`, `message_read`, `staff_level`)
 				VALUES ('$sender', '$recipient', '$subject', '$message', " . time() . ", 0, '$staff_level')";
         $this->query($query);
-        if($this->db_affected_rows) {
+        if($this->db_last_affected_rows) {
             return true;
         }
         else {
@@ -416,12 +416,12 @@ class System {
         exit;
     }
 
-    /* function censor_check(word)
+    /* function explicitLanguageCheck(word)
         Checks our list of banned words, returns true or false if censored words are detected.
         -Parameters-
         @string
     */
-    public function censor_check($string): bool {
+    public function explicitLanguageCheck($string): bool {
         foreach(self::$banned_words as $word) {
             if(strpos(strtolower($string), $word) !== false) {
                 return true;

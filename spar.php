@@ -53,7 +53,7 @@ function spar() {
 			$challenge = (int)$system->clean($_GET['challenge']);
 			$result = $system->query("SELECT `user_id`, `user_name`, `village`, `location`, `challenge`, `battle_id`, `last_active`
 				FROM `users` WHERE `user_id`='$challenge' LIMIT 1");
-			if($system->db_num_rows == 0) {
+			if($system->db_last_num_rows == 0) {
 				throw new Exception("Invalid user!");
 			}
 			$user = $system->db_fetch($result);
@@ -153,7 +153,7 @@ function spar() {
 	else {
 		// Load user challenges sent
 		$result = $system->query("SELECT `user_id`, `user_name` FROM `users` WHERE `challenge`='$player->user_id'");
-		if($system->db_num_rows > 0) {
+		if($system->db_last_num_rows > 0) {
 			$user_challenges = array();
 			while($row = $system->db_fetch($result)) {
 				$user_challenges[$row['user_id']] = $row['user_name'];
@@ -166,7 +166,7 @@ function spar() {
 			// Challenge received
 			if($player->challenge) {
 				$result = $system->query("SELECT `user_name` FROM `users` WHERE `user_id`='$player->challenge' LIMIT 1");
-				if($system->db_num_rows == 0) {
+				if($system->db_last_num_rows == 0) {
 					$player->challenge = 0;
 				}
 				else {

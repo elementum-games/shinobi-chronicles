@@ -38,9 +38,9 @@ function battle(): bool {
 				$system->query("UPDATE `villages` SET `points`=`points`+'$village_point_gain' WHERE `name`='$player->village' LIMIT 1");
 				echo "You have earned $village_point_gain point for your village.<br />";
 				// Team points
-				if($player->team) {
-					$system->query("UPDATE `teams` SET `points`=`points`+'$team_point_gain', `monthly_points`=`monthly_points`+'$team_point_gain'  
-						WHERE `team_id`={$player->team['id']} LIMIT 1");
+				if($player->team != null) {
+				    $player->team->addPoints($team_point_gain);
+
 					echo "You have earned $team_point_gain point for your team.<br />";
 				}
 				// Daily Tasks

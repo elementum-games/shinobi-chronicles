@@ -47,7 +47,7 @@ function members() {
 		try {
 			$result = $system->query("SELECT `name`, `type`, `points`, `monthly_points`, `village`, `members`, `logo`, `leader` FROM `teams` WHERE `team_id`='{$team_id}'");
 			
-			if ($system->db_num_rows == 0) {
+			if ($system->db_last_num_rows == 0) {
 				throw new Exception ('Team does not exist');
 			}
 
@@ -146,7 +146,7 @@ function members() {
 		$result = $system->query("SELECT `user_id` FROM `users` WHERE `user_name`='{$user_name}' LIMIT 1");
 			
 		try {
-			if($system->db_num_rows == 0) {
+			if($system->db_last_num_rows == 0) {
 				throw new Exception("User does not exist!");
 			}
 		
@@ -155,7 +155,7 @@ function members() {
 			$viewUser->loadData(false, true);
 			
 			$journal_result = $system->query("SELECT `journal` FROM `journals` WHERE `user_id`='{$viewUser->user_id}'");
-			if($system->db_num_rows == 0) {
+			if($system->db_last_num_rows == 0) {
 				$journal = '';
 			}
 			else {
@@ -226,7 +226,7 @@ function members() {
 				echo $viewUser->clan_office ? "<label style='width:6em;'>Clan Rank:</label> " . $clan_positions[$viewUser->clan_office] . "<br />" : "";
 			}
 			if($viewUser->team) {
-				echo "<label style='width:6em;'>Team:</label> <a href='{$self_link}&view_team={$viewUser->team['id']}'>" . $viewUser->team['name'] . "</a><br />";
+				echo "<label style='width:6em;'>Team:</label> <a href='{$self_link}&view_team={$viewUser->team->id}'>" . $viewUser->team->name . "</a><br />";
 			}
 			echo "<br />
 			<label style='width:6em;'>PvP wins:</label>	$viewUser->pvp_wins<br />
@@ -257,7 +257,7 @@ function members() {
                 echo "&nbsp;&nbsp;|&nbsp;&nbsp;<a href='{$system->links['profile']}&page=send_ak&recipient={$viewUser->user_name}'>Send AK</a>";
             }
 			if($viewUser->rank >= 3 && $player->team) {
-				if($player->user_id == $player->team['leader'] && !$viewUser->team && !$viewUser->team_invite &&
+				if($player->user_id == $player->team->leader && !$viewUser->team && !$viewUser->team_invite &&
 				$player->village == $viewUser->village) {
 					echo "&nbsp;&nbsp; |  &nbsp;&nbsp;
 					<a href='{$system->link}?id=24&invite=1&user_name=$viewUser->user_name'>Invite to Team</a>";
@@ -332,7 +332,7 @@ function members() {
 						
 						// Last chat post
 						$result = $system->query("SELECT `time` FROM `chat` WHERE `user_name`='{$viewUser->user_name}' ORDER BY `post_id` DESC LIMIT 1");
-						if($system->db_num_rows > 0) {
+						if($system->db_last_num_rows > 0) {
 							$last_post = $system->db_fetch($result)['time'];
 							echo "Last chat post: " . System::timeRemaining(time() - $last_post, 'long') . " ago<br />";
 						}
@@ -435,7 +435,7 @@ function members() {
 		</tr>";
 		
 		
-		if($system->db_num_rows == 0) {
+		if($system->db_last_num_rows == 0) {
 			echo "<tr><td colspan='4'>No users found!</td></tr>
 			</table>";
 		}
@@ -497,7 +497,7 @@ function members() {
 		
 		echo "<table class='table'><tr><th colspan='3'>Administrators</th></tr>";
 			
-		if($system->db_num_rows == 0) {
+		if($system->db_last_num_rows == 0) {
 			echo "<tr><td colspan='3'>No users found!</td></tr>
 			</table>";
 		}

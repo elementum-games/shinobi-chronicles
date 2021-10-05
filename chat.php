@@ -33,7 +33,7 @@ function chat() {
 		$message = $system->clean(stripslashes(trim($_POST['post'])));
 		try {
 			$result = $system->query("SELECT `message` FROM `chat` WHERE `user_name` = '$player->user_name' ORDER BY  `post_id` DESC LIMIT 1");
-			if($system->db_num_rows) {
+			if($system->db_last_num_rows) {
 				$post = $system->db_fetch($result);
 				if($post['message'] == $message) {
 					throw new Exception("You cannot post the same message twice in a row!");
@@ -64,7 +64,7 @@ function chat() {
 			$system->query(sprintf(
 			    $sql, $player->user_name, $message, $title, $player->village, $staff_level, $user_color, time(), 0
             ));
-			if($system->db_affected_rows) {
+			if($system->db_last_affected_rows) {
 				$system->message("Message posted!");
 			}
 		} catch(Exception $e) {
@@ -75,7 +75,7 @@ function chat() {
 	else if(isset($_GET['delete']) && $player->staff_level >= System::SC_MODERATOR) {
 		$delete = (int) $system->clean($_GET['delete']);
 		$result = $system->query("DELETE FROM `chat` WHERE `post_id` = $delete LIMIT 1");
-		$return_message = ($system->db_affected_rows) ? "Post deleted!" : "Error deleting post!";
+		$return_message = ($system->db_last_affected_rows) ? "Post deleted!" : "Error deleting post!";
 		$system->message($return_message);
 		$system->printMessage();
 	}
@@ -163,7 +163,7 @@ function chat() {
 			<th style='width:61%;'>Message</th>
 			<th style='width:10%;'>Time</th>
 		</tr>";
-		if(! $system->db_num_rows) {
+		if(! $system->db_last_num_rows) {
 			echo "<tr><td colspan='2' style='text-align:center;'>No posts!</td></tr>";
 		}
 		while($post = $system->db_fetch($result)) {

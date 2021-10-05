@@ -46,7 +46,7 @@ function modPanel() {
 				throw new Exception("Invalid ban type!");
 			}
 			$result = $system->query("SELECT `user_id`, `user_name`, `staff_level`, `ban_type`, `ban_expire` FROM `users` WHERE `user_name`='$user_name'");
-			if($system->db_num_rows == 0) {
+			if($system->db_last_num_rows == 0) {
 				throw new Exception("Invalid username!");
 			}
 			$user_data = $system->db_fetch($result);
@@ -80,7 +80,7 @@ function modPanel() {
 				$ban_expire = time() + ($ban_length * 86400);
 				$system->query("UPDATE `users` SET `train_type`='', `train_time`=0, `ban_type`='$ban_type', `ban_expire`='$ban_expire' 
 					WHERE `user_id`='{$user_data['user_id']}' LIMIT 1");
-				if($system->db_affected_rows == 1) {
+				if($system->db_last_affected_rows == 1) {
 					$system->message("User banned!");
 				}
 				else {
@@ -142,7 +142,7 @@ function modPanel() {
 			// Check username
 			$user_name = $system->clean($_POST['user_name']);		
 			$result = $system->query("SELECT `user_id`, `user_name`, `staff_level` FROM `users` WHERE `user_name`='$user_name'");
-			if($system->db_num_rows == 0) {
+			if($system->db_last_num_rows == 0) {
 				throw new Exception("Invalid username!");
 			}
 			$user_data = $system->db_fetch($result);
@@ -194,7 +194,7 @@ function modPanel() {
 			}
 			// Set error flags
 			$error = false;
-			if($system->db_affected_rows == 0) {
+			if($system->db_last_affected_rows == 0) {
 				$error = true;
 				if($ban_journal) {
 					$ban_journal = -1;
@@ -215,7 +215,7 @@ function modPanel() {
 			// Run remove journal query
 			if($remove_journal) {
 				$system->query("UPDATE `journals` SET `journal`='' WHERE `user_id` = '{$user_data['user_id']}' LIMIT 1");
-				if($system->db_affected_rows == 0) {
+				if($system->db_last_affected_rows == 0) {
 					$error = true;
 					$remove_journal = -1;
 				}
@@ -283,7 +283,7 @@ function modPanel() {
 		try {
 			$user_name = $system->clean($_GET['view_record']);
 			$result = $system->query("SELECT `user_id`, `user_name`, `staff_level` FROM `users` WHERE `user_name`='$user_name' LIMIT 1");
-			if($system->db_num_rows == 0) {
+			if($system->db_last_num_rows == 0) {
 				throw new Exception("Invalid user!");
 			}
 			$result = $system->db_fetch($result);
@@ -342,7 +342,7 @@ function modPanel() {
 	if(!empty($_GET['unlock_account']) && $player->staff_level >= System::SC_HEAD_MODERATOR) {
 		$user_id = (int)$system->clean($_GET['unlock_account']);
 		$result = $system->query("UPDATE `users` SET `failed_logins`=0 WHERE `user_id`='$user_id' LIMIT 1");
-		if($system->db_affected_rows > 0) {
+		if($system->db_last_affected_rows > 0) {
 			$system->message("Account unlocked!");
 		}
 		else {
@@ -357,11 +357,11 @@ function modPanel() {
 			try {
 				$ip_address = $system->clean($_POST['ip_address']);
 				$result = $system->query("SELECT `id` FROM `banned_ips` WHERE `ip_address`='$ip_address' LIMIT 1");
-				if($system->db_num_rows > 0) {
+				if($system->db_last_num_rows > 0) {
 					throw new Exception("IP address has already been banned!");
 				}
 				$system->query("INSERT INTO `banned_ips` (`ip_address`, `ban_level`) VALUES ('$ip_address', 2)");
-				if($system->db_affected_rows == 1) {
+				if($system->db_last_affected_rows == 1) {
 					$system->message("IP address '$ip_address' banned!");
 				}
 				else {
@@ -379,7 +379,7 @@ function modPanel() {
 				}
 				$user_name = $system->clean($_POST['user_name']);
 				$result = $system->query("SELECT `user_id`, `user_name`, `staff_level`, `ban_type`, `ban_expire` FROM `users` WHERE `user_name`='$user_name'");
-				if($system->db_num_rows == 0) {
+				if($system->db_last_num_rows == 0) {
 					throw new Exception("Invalid username!");
 				}
 				$user_data = $system->db_fetch($result);
@@ -404,7 +404,7 @@ function modPanel() {
 				else {
 					$system->query("UPDATE `users` SET `ban_type`='', `ban_expire`='0' 
 						WHERE `user_id`='{$user_data['user_id']}' LIMIT 1");
-					if($system->db_affected_rows == 1) {
+					if($system->db_last_affected_rows == 1) {
 						$system->message("User unbanned!");
 					}
 					else {
@@ -420,11 +420,11 @@ function modPanel() {
 			try {
 				$ip_address = $system->clean($_POST['ip_address']);
 				$result = $system->query("SELECT `id` FROM `banned_ips` WHERE `ip_address`='$ip_address' LIMIT 1");
-				if($system->db_num_rows == 0) {
+				if($system->db_last_num_rows == 0) {
 					throw new Exception("IP address is not banned!");
 				}
 				$system->query("DELETE FROM `banned_ips` WHERE `ip_address`='$ip_address' LIMIT 1");
-				if($system->db_affected_rows == 1) {
+				if($system->db_last_affected_rows == 1) {
 					$system->message("IP address '$ip_address' unbanned!");
 				}
 				else {
@@ -464,7 +464,7 @@ function modPanel() {
 				// Check username
 				$user_name = $system->clean($_POST['user_name']);		
 				$result = $system->query("SELECT `user_id`, `user_name`, `staff_level` FROM `users` WHERE `user_name`='$user_name'");
-				if($system->db_num_rows == 0) {
+				if($system->db_last_num_rows == 0) {
 					throw new Exception("Invalid username!");
 				}
 				$user_data = $system->db_fetch($result);
@@ -498,7 +498,7 @@ function modPanel() {
 				$system->query($query);
 				// Set error flags
 				$error = false;
-				if($system->db_affected_rows == 0) {
+				if($system->db_last_affected_rows == 0) {
 					$error = true;
 					if($unban_journal) {
 						$ban_journal = -1;
@@ -580,7 +580,7 @@ function modPanel() {
 		try {
 			$result = $system->query("SELECT `user_id`, `user_name`, `ban_type`, `ban_expire`, `journal_ban`, `avatar_ban`, `song_ban` FROM `users`
 				WHERE `ban_type` != '' OR `journal_ban` = 1 OR `avatar_ban` = 1 OR `song_ban` = 1");
-			if($system->db_num_rows == 0) {
+			if($system->db_last_num_rows == 0) {
 				throw new Exception("No banned users!");
 			}
 			echo "<table class='table'><tr><th colspan='2'>Banned Users</th></tr>
@@ -631,7 +631,7 @@ function modPanel() {
 		try {
 			$result = $system->query("SELECT `user_id`, `user_name`, `failed_logins` FROM `users`
 				WHERE `failed_logins` > 2 ORDER BY `failed_logins` DESC");
-			if($system->db_num_rows == 0) {
+			if($system->db_last_num_rows == 0) {
 				throw new Exception("No locked out users!");
 			}
 			echo "<table class='table'><tr><th colspan='3'>Locked Out Users</th></tr></table>

@@ -49,7 +49,7 @@ function villageHQ() {
 		$leader_avatar = './images/default_avatar.png';
 		if($village_data['leader']) {
 			$result = $system->query("SELECT `user_name`, `avatar_link` FROM `users` WHERE `user_id`={$village_data['leader']} LIMIT 1");
-			if($system->db_num_rows > 0) {
+			if($system->db_last_num_rows > 0) {
 				$result = $system->db_fetch($result);
 				$leader_name = $result['user_name'];
 				$leader_avatar = $result['avatar_link'];

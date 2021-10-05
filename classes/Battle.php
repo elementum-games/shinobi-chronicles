@@ -168,7 +168,7 @@ class Battle {
                 ''
                 )"
         );
-        $battle_id = $system->db_insert_id;
+        $battle_id = $system->db_last_insert_id;
 
         if($player1 instanceof User) {
             $player1->battle_id = $battle_id;
@@ -201,7 +201,7 @@ class Battle {
         $result = $this->system->query(
             "SELECT * FROM `battles` WHERE `battle_id`='{$battle_id}' LIMIT 1"
         );
-        if($this->system->db_num_rows == 0) {
+        if($this->system->db_last_num_rows == 0) {
             if($player->battle_id = $battle_id) {
                 $player->battle_id = 0;
             }

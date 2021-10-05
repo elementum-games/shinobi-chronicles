@@ -78,7 +78,7 @@ function userProfile() {
 				throw new Exception("You cannot send money/AK to yourself!");
 			}
 			$result = $system->query("SELECT `user_id`, `user_name` FROM `users` WHERE `user_name`='$recipient' LIMIT 1");
-			if(! $system->db_num_rows) {
+			if(! $system->db_last_num_rows) {
 				throw new Exception("Invalid user!");
 			}
 			else {

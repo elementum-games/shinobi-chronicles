@@ -80,7 +80,7 @@ else {
 				}
 				// check that txn_id has not been previously processed
 				$result = $system->query("SELECT `id` FROM `Payments` WHERE `txn_id`='$txn_id' LIMIT 1");
-				if($system->db_num_rows > 0 ) {
+				if($system->db_last_num_rows > 0 ) {
 					throw new Exception("Payment has already been processed!");
 				}
 				

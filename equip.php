@@ -437,7 +437,7 @@ function jutsu() {
 					<br style='clear:both;' />";
 
 				$result = $system->query("SELECT `name` FROM `jutsu` WHERE `parent_jutsu`='$jutsu_id'");
-				if($system->db_num_rows > 0) {
+				if($system->db_last_num_rows > 0) {
 					echo "<br />
 					<br /><label>Learn <b>" . $jutsu->name . "</b> to level 50 to unlock:</label>
 						<p style='margin-left:10px;margin-top:5px;'>";
