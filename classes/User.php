@@ -441,7 +441,7 @@ class User extends Fighter {
       $user_marriage_data = $this->system->db_fetch($marriageData);
 
       try{
-        if(mysqli_num_rows($marriageData) > 0){
+        if($this->system->db_num_rows > 0){
 
         /*might have to rename this*/
         foreach($marriageData as $item){
