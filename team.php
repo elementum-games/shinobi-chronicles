@@ -122,34 +122,7 @@ function team() {
 		$boost = $system->clean($_POST['set_boost']);
 		$amount = $system->clean($_POST['set_amount']);
 
-		$allowed_boosts = [
-			'Training' => [
-				'Amount' => [
-					10 => [
-						'Cost' => 10
-					],
-					20 => [
-						'Cost' => 10
-					],
-					30 => [
-						'Cost' => 20
-					]
-				]
-			],
-			'AI' => [
-				'Amount' => [
-					10 => [
-						'Cost' => 10
-					],
-					20 => [
-						'Cost' => 20
-					],
-					30 => [
-						'Cost' => 30
-					]
-				]
-			]
-		];
+		$allowed_boosts = Team::$allowed_boosts;
 		
 		if ($player->user_id != $player->team->leader) {
 			$system->message('You are not the leader of this team!');
@@ -175,7 +148,12 @@ function team() {
 			$new_points = $player->team->points - $allowed_boosts[$boost]['Amount'][$amount]['Cost'];
 			$boost_time = time();
 			try {
-				$result = $system->query("UPDATE `teams` SET `boost`='{$boost}', `boost_amount`='{$amount}', `points`='{$new_points}', `boost_time`='{$boost_time}' WHERE `team_id`='{$player->team->id}' ");
+				$result = $system->query("UPDATE `teams` SET 
+                    `boost`='{$boost}', 
+                    `boost_amount`='{$amount}', 
+                    `points`='{$new_points}', 
+                    `boost_time`='{$boost_time}' 
+                    WHERE `team_id`='{$player->team->id}' ");
 				$system->message('Boost set!');
 			}
 			catch (Exception $e) {

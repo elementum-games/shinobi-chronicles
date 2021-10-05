@@ -7,6 +7,35 @@ class Team {
     const MIN_NAME_LENGTH = 5;
     const MAX_NAME_LENGTH = 35;
 
+    public static array $allowed_boosts = [
+        'Training' => [
+            'Amount' => [
+                10 => [
+                    'Cost' => 25
+                ],
+                20 => [
+                    'Cost' => 60
+                ],
+                30 => [
+                    'Cost' => 100
+                ]
+            ]
+        ],
+        'AI' => [
+            'Amount' => [
+                10 => [
+                    'Cost' => 25
+                ],
+                15 => [
+                    'Cost' => 50
+                ],
+                20 => [
+                    'Cost' => 100
+                ]
+            ]
+        ]
+    ];
+
     public System $system;
     public int $id;
 
