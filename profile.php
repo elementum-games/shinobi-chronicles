@@ -342,7 +342,8 @@ function userProfile() {
 		";
 
 		if($player->isMarried){
-			echo "<br><label style='width: 100%; align-text: center;'>Congrats, You're Married!</label><br>";
+			echo "<br><p style='font-size: 1.05em; width: 100%; text-align: center; <!-- text-shadow: 0px 1px 2px rgba(200, 50, 50, 0.25); --> margin: 0em auto;'>
+			Married: <a style='display:inline-block;' href='{$system->links['members']}&user={$player->spouseName}'>{$player->spouseName}</a></p><br>";
 		}
 
 		echo "</td></tr></table>";

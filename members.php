@@ -69,7 +69,7 @@ function members() {
 			if($viewUser->forbidden_seal) {
 				$avatar_size = '175px';
 			}
-			echo "<table class='table'>
+			echo "<table id='viewprofile' class='table'>
 			<tr><th colspan='2'>View Profile</th>";
 
 			echo "<tr><td colspan='2' style='text-align:center;'>";
@@ -133,8 +133,14 @@ function members() {
 			<label style='width:6em;'>PvP wins:</label>	$viewUser->pvp_wins<br />
 			<label style='width:6em;'>PvP losses:</label> 	$viewUser->pvp_losses<br />
 			<label style='width:6em;'>AI wins:</label>		$viewUser->ai_wins<br />
-			<label style='width:6em;'>AI losses:</label>	$viewUser->ai_losses<br />
-			</td></tr>";
+			<label style='width:6em;'>AI losses:</label>	$viewUser->ai_losses<br /><br />";
+
+			//*I think '' is the default value*//
+			if($viewUser->spouseName !== ''){
+			echo "<label style='width:6em;'>Spouse:</label>	<a style='display:inline-block;' href='{$system->links['members']}&user={$viewUser->spouseName}'>{$viewUser->spouseName}</a><br />";
+			};
+
+			echo "</td></tr>";
 
 			// $system->audioType got lost
 			/*if($viewUser->profile_song) {
@@ -440,8 +446,8 @@ function members() {
 							break;
 					}
 				}
-				
-				echo "<tr>
+
+				echo "<tr class='threeColumns' >
 					<td class='$class' style='width:45%;'>
 						<a class='$link_class userLink' href='$self_link&user={$row['user_name']}'>" . $row['user_name'] . "</a></td>
 					<td class='$class' style='width:20%;text-align:center;'>" . $ranks[$row['rank']] . "</td>

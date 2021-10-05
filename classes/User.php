@@ -89,6 +89,7 @@ class User extends Fighter {
     public bool $isMarried = false;
     public int $marriageId = 0; //if -1 proposal was made
     public ?array $marriageData;
+    public string $spouseName = 'none';
 
     public $ban_type;
 	public $ban_expire;
@@ -248,6 +249,7 @@ class User extends Fighter {
 		$this->last_active = $user_data['last_active'];
 		$this->failed_logins = $user_data['failed_logins'];
 		$this->avatar_link = $user_data['avatar_link'];
+    $this->spouseName = $user_data['spouse_username'];
 		$this->profile_song = $user_data['profile_song'];
 
 		$this->log_actions = $user_data['log_actions'];
@@ -417,17 +419,36 @@ class User extends Fighter {
 		}
 
     //Marriage
-    if($this->isMarried){
+    if($this->isMarried && ($this->marriageId !== 0)){
       $marriageData = $this->system->query("SELECT * FROM `marriage` WHERE `marriage_id`='$this->marriageId' LIMIT 1");
       $user_marriage_data = $this->system->db_fetch($marriageData);
 
       try{
         if(mysqli_num_rows($marriageData) > 0){
 
-          /*might have to rename this*/
-          foreach($marriageData as $item){
-            $this->marriageData = $item;
-          }
+        /*might have to rename this*/
+        foreach($marriageData as $item){
+          $this->marriageData = $item;
+        }
+
+        //get spouse name (unsure which name is spouse so get by ID)
+        $user2id = $this->marriageData['user2_id'];
+        $user1id = $this->marriageData['user1_id'];
+        if($this->marriageData['user1_id'] == $this->user_id){
+          $spouseNameQuery = $this->system->query("SELECT `user_name` FROM `users` WHERE `user_id`='{$user2id}' LIMIT 1");
+          $spouseNameQuery = $this->system->db_fetch($spouseNameQuery);
+        } else {
+          $spouseNameQuery = $this->system->query("SELECT `user_name` FROM `users` WHERE `user_id`='{$user1id}' LIMIT 1");
+          $spouseNameQuery = $this->system->db_fetch($spouseNameQuery);
+        }
+
+        //setting spouse name in DB
+        $this->spouseName = $spouseNameQuery['user_name'];
+        $temp_spouseName = $this->system->clean($this->spouseName); //just in case
+        $this->system->query("UPDATE `users` SET
+					`spouse_username` = '{$this->spouseName}'
+				WHERE `user_id` = '{$this->user_id}' LIMIT 1");
+
 
           // print_r($this->marriageData);
           // echo "<br>" . $this->marriageData['congrats_text'];
@@ -435,7 +456,7 @@ class User extends Fighter {
           throw new Exception("You're missing Marriage information...");
         } else {
           $this->system->message("No Marriage data found");
-          $this->isMarried = false;
+          $this->isMarried = 0;
           throw new Exception("No Marriage data found");
         }
       } catch(Exception $e) {
@@ -443,7 +464,10 @@ class User extends Fighter {
       }
 
     }
-
+    else {
+      $this->isMarried = 0;
+      //no id is set :^(
+    }
 		// Clan
 		$this->clan = $user_data['clan_id'];
 		if($this->clan) {
