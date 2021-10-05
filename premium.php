@@ -667,18 +667,18 @@ function premium() {
 						$player->getInventory();
 
 						// Chuunin element change
-						if($player->rank >= 3 && $player->elements['first'] == $current_element) {
+						if($player->rank >= 3 && $player->elements['first'] == $player->elements[$current_element]) {
 							foreach($player->jutsu as $jutsu) {
-								if($jutsu->element == $current_element) {
+								if($jutsu->element == $player->elements[$current_element]) {
                         				$player->removeJutsu($jutsu->id);
                     				}
                 			}
                 			$player->elements['first'] = $new_element;
             			}
 						// Jonin+ element change
-						else if($player->rank >= 4 && $player->elements['second'] == $current_element) {
+						else if($player->rank >= 4 && $player->elements['second'] == $player->elements[$current_element]) {
 							foreach($player->jutsu as $jutsu) {
-								if($jutsu->element == $current_element) {
+								if($jutsu->element == $player->elements[$current_element]) {
                         				$player->removeJutsu($jutsu->id);
                     				}
                 			}
