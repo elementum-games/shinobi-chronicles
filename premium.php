@@ -542,7 +542,6 @@ function premium() {
 	// Change elements
 
 	else if(isset($_POST['change_element']) && $player->rank >= 3) {
-
         try {
 			$current_element = $_POST['current_element'];
 			$new_element = $_POST['new_element'];
@@ -551,27 +550,27 @@ function premium() {
 	                throw new Exception("Invalid element selected!");
 	            }
 
-				switch($current_element) {
+				switch($player->elements[$current_element]) {
 						case Jutsu::ELEMENT_FIRE:
-						case 'Wind':
-						case 'Lightning':
-						case 'Earth':
-						case 'Water':
+						case Jutsu::ELEMENT_WIND:
+						case Jutsu::ELEMENT_LIGHTNING:
+						case Jutsu::ELEMENT_EARTH:
+						case Jutsu::ELEMENT_WATER:
 							break;
 						default:
-							throw new Exception("Invalid element!");
+							throw new Exception("Invalid element! {$current_element}");
 							break;
 					}
 
 				switch($new_element) {
-						case 'Fire':
-						case 'Wind':
-						case 'Lightning':
-						case 'Earth':
-						case 'Water':
+					case Jutsu::ELEMENT_FIRE:
+					case Jutsu::ELEMENT_WIND:
+					case Jutsu::ELEMENT_LIGHTNING:
+					case Jutsu::ELEMENT_EARTH:
+					case Jutsu::ELEMENT_WATER:
 							break;
 						default:
-							throw new Exception("Invalid element!");
+							throw new Exception("Invalid element! new element");
 							break;
 					}
 
@@ -584,7 +583,7 @@ function premium() {
 							<table class='table'><tr><th>Confirm Chakra Element Change</th></tr>
 								<tr>
 									<td style='text-align:center;'>
-										Are you sure you want to <b>forget the $current_element nature</b> and any jutsus you have to <b>attune to the $new_element nature</b>?<br />
+										Are you sure you want to <b>forget the " . $player->elements[$current_element] . " nature</b> and any jutsus you have to <b>attune to the $new_element nature</b>?<br />
 										<br />
 										<b>(IMPORTANT: This is non-reversable once completed, if you want to return to your original element you will have to pay another fee. You will forget any elemental jutsu you currently have of this nature.)</b><br />
 										<form action='$self_link' method='post'>
@@ -653,7 +652,7 @@ function premium() {
 												}
 								echo "
 								<br/>
-								<b style='color:green'>You have forgotten the $current_element nature and all its jutsu and are now attuned to the $new_element nature.</b>
+								<b style='color:green'>You have forgotten the " . $player->elements[$current_element] ." nature and all its jutsu and are now attuned to the $new_element nature.</b>
 								<br />
 								<br />
 								<a href='{$system->links['premium']}'>Continue</a>
@@ -1112,7 +1111,6 @@ function premium() {
 								</td>
 								</tr>";
 						echo "</table>";
-
 			}
 
 		// Village change
