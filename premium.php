@@ -16,6 +16,7 @@ function premium() {
 
 	$costs['user_reset'] = 0;
 	$costs['name_change'] = 15;
+	$costs['gender_change'] = 10;
 	$costs['bloodline'][1] = 80;
 	$costs['bloodline'][2] = 60;
 	$costs['bloodline'][3] = 40;
@@ -207,6 +208,59 @@ function premium() {
 			$system->message($e->getMessage());
 		}
 	}
+
+	// Gender change
+
+	else if(isset($_POST['change_gender'])) {
+		try {
+			$new_gender = $_POST['new_gender'];
+			$gender_change_cost = $costs['gender_change'];
+			if($player->premium_credits < $gender_change_cost) {
+				throw new Exception("You do not have enough Ancient Kunai!");
+			}
+			if(!in_array($new_gender,array('Male','Female'), true)) {
+				throw new Exception("Invalid gender! {$new_gender}");
+			}
+
+	 if(!isset($_POST['confirm'])) {
+		echo "
+			<table class='table'><tr><th>Confirm Gender Change</th></tr>
+				<tr>
+					<td style='text-align:center;'>Are you sure you want to change your gender to $new_gender?<br />
+					<br />
+					<b>(IMPORTANT: This is non-reversable once completed, if you want to return to your original gender you will have to pay another fee.)</b>
+					<br />
+						<form action='$self_link' method='post'>
+							<input type='hidden' name='confirm' value='1' />
+							<input type='hidden' name='new_gender' value='$new_gender' />
+							<input type='submit' name='change_gender' value='Change Gender' />
+						</form>
+					</td>
+				</tr>
+			</table>";
+			return true;
+		} else {
+				echo "<table class='table'><tr><th>Gender Change</th></tr>
+					<tr><td style='text-align:center;'>
+					You have changed your gender to {$new_gender}.<br />
+					<a href='{$system->link}?id=1'>Continue</a>
+					</td></tr>
+					</table>";
+
+					$player->premium_credits -= $gender_change_cost;
+					$player->gender = $new_gender;
+					$player->updateData();
+
+					return false;
+				}
+
+		} catch (Exception $e) {
+		$system->message($e->getMessage());
+		}
+	}
+
+
+
 	else if(isset($_POST['stat_reset'])) {
 		$stats = array('ninjutsu_skill', 'taijutsu_skill', 'genjutsu_skill', 'cast_speed', 'speed', 'intelligence', 'willpower');
 		if($player->bloodline_id) {
@@ -965,6 +1019,26 @@ function premium() {
 		<input type='text' name='new_name'/>
 		<input type='submit' name='name_change' value='Change' />
 		</form>
+		</td></tr>";
+
+		$genders = array('Male', 'Female');
+		echo "<tr><th>Gender Change</th></tr>
+		<tr><td style='text-align:center;'>You can change your gender to:
+		<form action='$self_link' method='post'>
+			<select name='new_gender'>";
+				foreach($genders as $new_gender) {
+					if($player->gender == $new_gender) {
+						continue;
+					} else {
+					echo "<option value='$new_gender'>$new_gender</option>";
+					}
+				}
+				echo "
+				</select><br />
+				for {$costs['gender_change']} Ancient Kunai.
+				<br />
+ 				<input type='submit' name='change_gender' value='Change Gender' />
+			</form>
 		</td></tr>";
 
 		$stats = array('ninjutsu_skill', 'taijutsu_skill', 'genjutsu_skill', 'cast_speed', 'speed', 'intelligence', 'willpower');
