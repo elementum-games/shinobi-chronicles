@@ -218,6 +218,9 @@ function premium() {
 			if($player->premium_credits < $gender_change_cost) {
 				throw new Exception("You do not have enough Ancient Kunai!");
 			}
+			if($player->gender == $new_gender) {
+				throw new Exception("You are already a {$new_gender}!");
+			}
 			if(!in_array($new_gender,array('Male','Female'), true)) {
 				throw new Exception("Invalid gender! {$new_gender}");
 			}
