@@ -25,9 +25,10 @@ function members() {
 	// Sub-menu
 	echo "<div class='submenu'>
 	<ul class='submenu'>
-		<li style='width:33%;'><a href='{$self_link}&view=highest_exp'>Highest Exp</a></li>
-		<li style='width:33%;'><a href='{$self_link}&view=online_users'>Online Users</a></li>
-		<li style='width:32.5%;'><a href='{$self_link}&view=staff'>Game Staff</a></li>
+		<li style='width:24.5%;'><a href='{$self_link}&view=highest_pvp'>Highest Pvp</a></li>
+		<li style='width:24.5%;'><a href='{$self_link}&view=highest_exp'>Highest Exp</a></li>
+		<li style='width:24.5%;'><a href='{$self_link}&view=online_users'>Online Users</a></li>
+		<li style='width:24.5%;'><a href='{$self_link}&view=staff'>Game Staff</a></li>
 	</ul>
 	</div>
 	<div class='submenuMargin'></div>";
@@ -397,6 +398,12 @@ function members() {
 			$list_name = 'Top 10 Users - Highest Exp';
 			$view = 'highest_exp';
 		}
+		else if(isset($_GET['view']) && $_GET['view'] == 'highest_pvp') {
+			$query_custom = " WHERE `staff_level` < " . System::SC_ADMINISTRATOR .
+                " ORDER BY `pvp_wins` DESC";
+			$list_name = 'Top 10 Users - Highest Pvp';
+			$view = 'highest_pvp';
+		}
 		else if(isset($_GET['view']) && $_GET['view'] == 'online_users') {
 			$query_custom = "WHERE `last_active` > UNIX_TIMESTAMP() - $online_seconds ORDER BY `level` DESC";
 			
@@ -416,13 +423,26 @@ function members() {
 		// Pagination
 		$users_per_page = 15;
 		$min = 0;
-		if(isset($_GET['min']) && $view != 'highest_exp') {
+		if(isset($_GET['min']) && $view != 'highest_exp' && $view != 'highest_pvp') {
 			$users_per_page = 10;
 			$min = (int)$system->clean($_GET['min']);
 		}
 		
-		$result = $system->query("SELECT `user_name`, `rank`, `village`, `exp`, `level` FROM `users` 
+		$result = $system->query("SELECT `user_name`, `rank`, `village`, `exp`, `level` , `pvp_wins` FROM `users` 
 			$query_custom LIMIT $min, $users_per_page");
+
+		$table_header = 'Level';
+		switch($view) {
+			case "highest_exp":
+				$table_header = 'Experience';
+				break;
+			case "highest_pvp":
+				$table_header = 'Pvp Kills';
+				break;
+			case "online_users":
+				$table_header = 'Level';
+				break;
+		}
 		
 		// Search box for individual users
 		// List top 10 users by experience
@@ -431,7 +451,7 @@ function members() {
 			<th style='width:30%;'>Username</th>
 			<th style='width:20%;'>Rank</th>
 			<th style='width:20%;'>Village</th>
-			<th style='width:30%;'>" . ($view == 'highest_exp' ? 'Experience' : 'Level') . "</th>
+			<th style='width:30%;'>" . ($table_header) . "</th>
 		</tr>";
 		
 		
@@ -459,6 +479,9 @@ function members() {
 					<td class='$class' style='width:30%;text-align:center;'>";
 					if($view == 'highest_exp') {
 						echo $row['exp'];
+					}
+					else if($view == 'highest_pvp') {
+						echo $row['pvp_wins'];
 					}
 					else {
 						echo $row['level'];
