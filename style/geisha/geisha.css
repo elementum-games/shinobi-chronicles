@@ -1,8 +1,13 @@
+:root {
+    --content-top-margin: 175px;
+}
+
 html, body {
 	height: 100%;
 	width: 100%;
 	margin: 0;
 	padding: 0;
+    font-size: 14px;
 }
 body {
 	background-color: #111111;
@@ -67,9 +72,6 @@ body {
 }
 
 /* Content */
-:root {
-    --content-top-margin: 175px;
-}
 #container {
 	/* Structure */
 	width: 1145px;
@@ -877,7 +879,7 @@ br.clear {
     margin: 0 auto;
 
     color: rgb(48, 48, 48);
-    font-size: 1.3rem;
+    font-size: 1.1rem;
     font-family: 'BebasNeue', sans-serif;
 }
 
