@@ -1077,7 +1077,7 @@ function premium() {
 		// Change Element
 		if($player->elements) {
 
-		$elements = array('Fire', 'Wind', 'Lightning', 'Earth', 'Water');
+		$elements = array(Jutsu::ELEMENT_FIRE, Jutsu::ELEMENT_WIND, Jutsu::ELEMENT_LIGHTNING, Jutsu::ELEMENT_EARTH, Jutsu::ELEMENT_WATER);
 		echo "<table class='table'>
 		<tr><th> Chakra Element Change</th></tr>
 				<tr>
