@@ -17,7 +17,7 @@ function news() {
 
 	$page = isset($_GET['page']) ? $_GET['page'] : false;
 
-	if(!empty($_POST['create_post']) && $player->staff_level >= System::SC_ADMINISTRATOR) {
+	if(!empty($_POST['create_post']) && $player->hasAdminPanel()) {
 		$post = $system->clean($_POST['news_post']);
 		$title = $system->clean($_POST['title']);
 
@@ -54,7 +54,7 @@ function news() {
 		}
 		$system->printMessage();
 	}
-	else if(!empty($_POST['edit_post']) && $player->staff_level >= System::SC_ADMINISTRATOR) {
+	else if(!empty($_POST['edit_post']) && $player->isUserAdmin()) {
 		$post_id = (int)$system->clean($_POST['post_id']);
 		$message = $system->clean($_POST['news_post']);
 		$title = $system->clean($_POST['title']);
@@ -101,7 +101,7 @@ function news() {
 	}
 
 	// Show create, edit pages, or display news posts
-	if($page == "create_post" && $player->staff_level >= System::SC_ADMINISTRATOR) {
+	if($page == "create_post" && $player->isUserAdmin()) {
 		echo "<table class='table'><tr><th>New Post</th></tr>
 		<tr><td style='text-align:center;'>
 			<form action='$self_link' method='post'>
@@ -115,7 +115,7 @@ function news() {
 			</form>
 		</td></tr></table>";
 	}
-	else if($page == "edit_post" && $player->staff_level >= System::SC_ADMINISTRATOR) {
+	else if($page == "edit_post" && $player->isUserAdmin()) {
 		$post_id = (int)$system->clean($_GET['post']);
 		$result = $system->query("SELECT * FROM `news_posts` WHERE `post_id`='$post_id'");
 		if($system->db_last_num_rows == 0) {
@@ -141,7 +141,7 @@ function news() {
 	}
 
 	if(!$page) {
-		if($player->staff_level >= System::SC_ADMINISTRATOR) {
+		if($player->isUserAdmin()) {
 			echo "<p style='text-align:center;'><a href='$self_link?page=create_post'>New post</a></p>";
 			newsPosts(true);
 		}

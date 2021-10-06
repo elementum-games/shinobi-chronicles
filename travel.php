@@ -21,7 +21,7 @@ function travel() {
 		$target_x = $player->x;
 		$target_y = $player->y;
 
-		$ignore_travel_restrictions = $player->staff_level >= System::SC_HEAD_ADMINISTRATOR;
+		$ignore_travel_restrictions = $player->isHeadAdmin();
 
 		try {
             switch($_GET['travel']) {

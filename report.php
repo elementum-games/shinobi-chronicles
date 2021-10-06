@@ -21,7 +21,7 @@ function report() {
 	}
 	
 	// Submenu
-	if($player->staff_level >= System::SC_MODERATOR) {
+	if($player->isModerator()) {
 		echo "<div class='submenu'>
 		<ul class='submenu'>
 			<li style='width:99.5%;'><a href='{$self_link}&page=view_all_reports'>View New Reports</a></li>
@@ -107,11 +107,11 @@ function report() {
 				throw new Exception("Invalid report type!");
 			}
 		
-			if($staff_level == System::SC_HEAD_ADMINISTRATOR) {
+			if($staff_level == User::STAFF_HEAD_ADMINISTRATOR) {
 				$staff_level--;
 			}
 		
-			if($user_id == $player->user_id && $player->staff_level < System::SC_MODERATOR) {
+			if($user_id == $player->user_id && !$player->isModerator()) {
 				throw new Exception("You cannot report yourself!");
 			}
 
@@ -150,7 +150,7 @@ function report() {
 		$system->printMessage();
 	}
 	// Handle report
-	if($_POST['handle_report'] && $player->staff_level >= System::SC_MODERATOR) {
+	if(!empty($_POST['handle_report']) && $player->isModerator()) {
 		$page = 'view_report';
 		
 		try {
@@ -161,7 +161,7 @@ function report() {
 			}
 			
 			$report = $system->db_fetch($result);
-			if($report['status'] != 0 && $player->staff_level < System::SC_HEAD_MODERATOR) {
+			if($report['status'] != 0 && !$player->isHeadModerator()) {
 				throw new Exception("Report has already been handled!");
 			}
 			
@@ -188,7 +188,7 @@ function report() {
 		$system->printMessage();
 	}
 	
-	if($player->staff_level < System::SC_MODERATOR) {
+	if(!$player->isModerator()) {
 		// [MOD] View report
 		// [MOD] View all reports
 	}
@@ -258,7 +258,7 @@ function report() {
 				}
 			}
 		
-			if($user_name == $player->user_name && $player->staff_level < System::SC_MODERATOR) {
+			if($user_name == $player->user_name && !$player->isModerator()) {
 				throw new Exception("You cannot report yourself!");
 			}
 						
@@ -303,7 +303,7 @@ function report() {
 		}
 		$system->printMessage();
 	}
-	else if($page == 'view_all_reports' && $player->staff_level >= System::SC_MODERATOR) {
+	else if($page == 'view_all_reports' && $player->isModerator()) {
 		echo "<table class='table'><tr><th colspan='4'>Reports</th></tr>";
 		
 		$result = $system->query("SELECT * FROM `reports` WHERE `staff_level` < $player->staff_level AND `status` = 0");
@@ -345,7 +345,7 @@ function report() {
 		}
 		echo "</table>";
 	}
-	else if($page == 'view_report' && $player->staff_level >= System::SC_MODERATOR) {
+	else if($page == 'view_report' && $player->isModerator()) {
 		try {
 			$report_id = (int)$system->clean($_GET['report_id']);
 			if(!$report_id) {
@@ -412,12 +412,4 @@ function report() {
 		}
 	}
 	
-	
-	// Staff level check
-	if($player->staff_level < System::SC_MODERATOR) {
-		// [MOD] View report
-		// [MOD] View all reports
-	}
-	
 }
-?>

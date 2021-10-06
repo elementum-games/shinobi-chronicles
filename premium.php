@@ -515,8 +515,7 @@ function premium() {
 				$system->message("Color changed!");
 				break;
 			 case 'green':
-			/* Shadekun edit for returning administrator color */
-                if($player->staff_level < System::SC_MODERATOR) {
+                if(!$player->isModerator()) {
                     $system->message("Invalid color!");
                     break;
                 }
@@ -524,15 +523,23 @@ function premium() {
                 $system->message("Color changed");
                 break;
 			case 'teal':
-				if ($player->staff_level < System::SC_HEAD_MODERATOR) {
+				if (!$player->isHeadModerator()) {
 					$system->message("Invalid color!");
 					break;
 				}
 				$player->forbidden_seal['color'] = $color;
 				$system->message("Color changed");
 				break;
+            case 'purple':
+                if (!$player->isContentAdmin()) {
+                    $system->message("Invalid color!");
+                    break;
+                }
+                $player->forbidden_seal['color'] = $color;
+                $system->message("Color changed");
+                break;
 			case 'red':
-				if($player->staff_level < System::SC_ADMINISTRATOR) {
+				if(!$player->isUserAdmin()) {
 					$system->message("Invalid color!");
 					break;
 				}
@@ -1281,17 +1288,25 @@ function premium() {
 				($player->forbidden_seal['color'] == 'gold' ? "checked='checked'" : '') . "/>
 				<span class='gold' style='font-weight:bold;'>Gold</span>";
 			}
-			if ($player->staff_level >= System::SC_MODERATOR) {
+			if ($player->isModerator()) {
 				echo "
 				<input type='radio' name='name_color' value='green' " .
 				($player->forbidden_seal['color'] == 'green' ? "checked='checked'" : '') . "/>
 				<span class='moderator' style='font-weight:bold;'>Green</span>";
-			} else if ($player->staff_level >= System::SC_HEAD_MODERATOR) {
+			}
+			if ($player->isHeadModerator()) {
 				echo "
 				<input type='radio' name='name_color' value='teal' " .
 				($player->forbidden_seal['color'] == 'teal' ? "checked='checked'" : '') . "/>
 				<span class='headModerator' style='font-weight:bold;'>Teal</span>";
-			} else if ($player->staff_level >= System::SC_ADMINISTRATOR) {
+			}
+			if($player->isContentAdmin()) {
+                echo "
+				<input type='radio' name='name_color' value='purple' " .
+                    ($player->forbidden_seal['color'] == 'purple' ? "checked='checked'" : '') . "/>
+				<span class='administrator' style='font-weight:bold;'>Purple</span>";
+            }
+			if ($player->isUserAdmin()) {
 				echo "
 				<input type='radio' name='name_color' value='red' " .
 				($player->forbidden_seal['color'] == 'red' ? "checked='checked'" : '') . "/>
@@ -1312,7 +1327,7 @@ function premium() {
 			($player->forbidden_seal['color'] == 'gold' ? "checked='checked'" : '') . "/>
 			<span class='gold' style='font-weight:bold;'>Gold</span>
 			";
-			if($player->staff_level >= System::SC_ADMINISTRATOR) {
+			if($player->isUserAdmin()) {
 				echo "
 				<input type='radio' name='name_color' value='red' " .
 				($player->forbidden_seal['color'] == 'red' ? "checked='checked'" : '') . "/>

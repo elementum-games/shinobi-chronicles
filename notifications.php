@@ -47,7 +47,7 @@ function displayNotifications() {
 		$notifications[] = "<a class='link' href='{$system->link}?id=2'>You have unread PM(s)</a>";
 	}
 
-	if($player->staff_level >= System::SC_MODERATOR) {
+	if($player->isModerator()) {
 		$result = $system->query("SELECT `report_id` FROM `reports` WHERE `status` = 0 AND `staff_level` < $player->staff_level LIMIT 1");
 		if($system->db_last_num_rows > 0) {
 			$notifications[] = "<a class='link' href='{$system->links['report']}&page=view_all_reports'>New report(s)!</a>";

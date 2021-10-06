@@ -16,7 +16,7 @@ function userSettings() {
 	global $self_link;
 	$max_journal_length = 1000;
 	// Forbidden seal increase
-	if($player->forbidden_seal or $player->staff_level >= System::SC_HEAD_MODERATOR) {
+	if($player->forbidden_seal or $player->isHeadModerator()) {
 		$max_journal_length = 2000;
 	}
 	
@@ -169,7 +169,7 @@ function userSettings() {
 			else {
 				$blacklist_user = $system->db_fetch($result);
 			}
-			if($blacklist_user['staff_level'] >= System::SC_MODERATOR) {
+			if($blacklist_user['staff_level'] >= User::STAFF_MODERATOR) {
 				throw new Exception("You are unable to blacklist staff members!");
 			}
 			if($player->user_id == $blacklist_user['user_id']) {

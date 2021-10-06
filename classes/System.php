@@ -57,22 +57,27 @@ class System {
     public $db_last_insert_id;
 
     public $SC_STAFF_COLORS = array(
-        System::SC_MODERATOR => array(
+        User::STAFF_MODERATOR => array(
             'staffBanner' => "moderator",
             'staffColor' => "009020",
             'pm_class' => 'moderator'
         ),
-        System::SC_HEAD_MODERATOR => array(
+        User::STAFF_HEAD_MODERATOR => array(
             'staffBanner' => "head moderator",
             'staffColor' => "0090A0",
             'pm_class' => 'headModerator'
         ),
-        System::SC_ADMINISTRATOR => array(
+        User::STAFF_CONTENT_ADMIN => array(
+            'staffBanner' => "contentAdmin",
+            'staffColor' => "A000A0",
+            'pm_class' => 'contentAdmin'
+        ),
+        User::STAFF_ADMINISTRATOR => array(
             'staffBanner' => "administrator",
             'staffColor' => "A00000",
             'pm_class' => 'administrator'
         ),
-        System::SC_HEAD_ADMINISTRATOR => array(
+        User::STAFF_HEAD_ADMINISTRATOR => array(
             'staffBanner' => "head administrator",
             'staffColor' => "A00000",
             'pm_class' => 'administrator'

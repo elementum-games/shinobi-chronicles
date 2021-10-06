@@ -93,7 +93,7 @@ function userProfile() {
 			else {
 				throw new Exception("Invalid Currency Type!");
 			}
-			if($amount <= 0 && $player->staff_level < System::SC_HEAD_ADMINISTRATOR) {
+			if($amount <= 0 && !$player->isHeadAdmin()) {
 				throw new Exception("Invalid amount!");
 			}
 			if($amount > $player->$type) {

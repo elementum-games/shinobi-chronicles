@@ -154,13 +154,17 @@ $pages = [
         'file_name' => 'modPanel.php',
         'title' => 'Mod Panel',
         'function_name' => 'modPanel',
-        'staff_level_required' => System::SC_MODERATOR
+        'user_check' => function(User $u) {
+            return $u->isModerator();
+        }
     ],
     17 => [
         'file_name' => 'adminPanel.php',
         'title' => 'Admin Panel',
         'function_name' => 'adminPanel',
-        'staff_level_required' => System::SC_ADMINISTRATOR
+        'user_check' => function(User $u) {
+            return $u->hasAdminPanel();
+        }
     ],
 
     // Misc
