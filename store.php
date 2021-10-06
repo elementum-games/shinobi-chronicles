@@ -22,7 +22,7 @@ function store() {
 	
 	$player->getInventory();
 	
-	$max_consumables = 5;
+	$max_consumables = User::MAX_CONSUMABLES;
 	
 	if(!empty($_GET['view'])) {
 		$view = $_GET['view'];
@@ -191,7 +191,7 @@ function store() {
 				<br style='clear:both;' />
 				<label style='width:6.5em;'>Jutsu type:</label>" . ucwords($jutsu['jutsu_type']);
 				$result = $system->query("SELECT `name` FROM `jutsu` WHERE `parent_jutsu`='$jutsu_id'");
-				if($system->db_num_rows > 0) {
+				if($system->db_last_num_rows > 0) {
 					echo "<br />
 					<br /><label>Learn <b>" . $jutsu['name'] . "</b> to level 50 to unlock:</label>
 						<p style='margin-left:10px;margin-top:5px;'>";
@@ -276,7 +276,7 @@ function store() {
 				}
 				$count++;
 
-				echo "<tr>
+				echo "<tr class='table_multicolumns'>
 					<td style='width:30%;'><a href='$self_link&view=jutsu&view_jutsu=$id'>{$jutsu['name']}</a></td>
 					<td style='width:25%;text-align:center;'>" . ucwords(str_replace('_', ' ', $jutsu['effect'])) . "</td>
 					<td style='width:25%;text-align:center;'>" . ucwords(str_replace('_', ' ', $jutsu['jutsu_type'])) . "</td>
@@ -338,7 +338,7 @@ function store() {
 					$owned = 0;
 				}
 
-				echo "<tr style='text-align:center;'>
+				echo "<tr class='table_multicolumns' style='text-align:center;'>
 					<td style='width:35%;'>{$item['name']}" .
 					($owned ? "<br />(Owned: $owned/$max_consumables)" : "") .
 					"</td>

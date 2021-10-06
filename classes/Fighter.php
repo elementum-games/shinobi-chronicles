@@ -92,6 +92,61 @@ abstract class Fighter {
 
     abstract public function getInventory();
 
+    public function applyBloodlineBoosts() {
+        // Temp number fix inside
+        if($this->bloodline_id) {
+            if($this->system->debug['bloodline']) {
+                echo "Setting passive combat boosts for {$this->getName()}<br />";
+                echo "<br />";
+            }
+
+            // Apply bloodline passive combat boosts
+            $this->bloodline_offense_boosts = array();
+            $this->bloodline_defense_boosts = array();
+            foreach($this->bloodline->combat_boosts as $jutsu_id => $effect) {
+                if($this->system->debug['bloodline']) {
+                    echo "[{$effect['effect']}] = {$effect['effect_amount']}<br />";
+                }
+
+                switch($effect['effect']) {
+                    // Nin/Tai/Gen boost applied in User::calcDamage()
+                    case 'ninjutsu_boost':
+                    case 'taijutsu_boost':
+                    case 'genjutsu_boost':
+                        $x = count($this->bloodline_offense_boosts);
+                        $this->bloodline_offense_boosts[$x]['effect'] = $effect['effect'];
+                        $this->bloodline_offense_boosts[$x]['effect_amount'] = $effect['effect_amount'];
+                        break;
+
+                    case 'ninjutsu_resist':
+                    case 'genjutsu_resist':
+                    case 'taijutsu_resist':
+                        $x = count($this->bloodline_defense_boosts);
+                        $this->bloodline_defense_boosts[$x]['effect'] = $effect['effect'];
+                        $this->bloodline_defense_boosts[$x]['effect_amount'] = $effect['effect_amount'];
+                        break;
+
+                    case 'cast_speed_boost':
+                        $this->cast_speed_boost += $effect['effect_amount'];
+                        break;
+                    case 'speed_boost':
+                        $this->speed_boost += $effect['effect_amount'];
+                        break;
+                    case 'intelligence_boost':
+                        $this->intelligence_boost += $effect['effect_amount'];
+                        break;
+                    case 'willpower_boost':
+                        $this->willpower_boost += $effect['effect_amount'];
+                        break;
+                }
+            }
+
+            if($this->system->debug['bloodline']) {
+                echo "<br />";
+            }
+        }
+    }
+
     // abstract public function hasJutsu(int $jutsu_id): bool;
     abstract public function hasItem(int $item_id): bool;
 
@@ -139,14 +194,14 @@ abstract class Fighter {
 
     /**
      * function calcDamage() CONTAINS TEMP NUMBER FIX
-     *	Calculates raw damage based on player stats and jutsu or item strength
+     *    Calculates raw damage based on player stats and jutsu or item strength
      *
-     * @param Jutsu  $attack  Copy of the attack data.
-     * @param string $attack_type (default_jutsu, equipped_jutsu, item, bloodline_jutsu)
+     * @param Jutsu  $attack      Copy of the attack data.
+     * @param bool   $disable_randomness
      * @return float|int
      * @throws Exception
      */
-    public function calcDamage(Jutsu $attack, $attack_type = 'default_jutsu') {
+    public function calcDamage(Jutsu $attack, bool $disable_randomness = false) {
         if($this->system->debug['damage'])  {
             echo "Debugging damage for {$this->getName()}<br />";
         }
@@ -171,12 +226,12 @@ abstract class Fighter {
                 throw new Exception("Invalid jutsu type!");
         }
 
-        switch($attack_type) {
-            case 'default_jutsu':
-            case 'equipped_jutsu':
+        switch($attack->purchase_type) {
+            case Jutsu::PURCHASE_TYPE_DEFAULT:
+            case Jutsu::PURCHASE_TYPE_PURCHASEABLE:
                 $offense = self::BASE_OFFENSE + ($off_skill * self::SKILL_OFFENSE_RATIO);
                 break;
-            case 'bloodline_jutsu':
+            case Jutsu::PURCHASE_TYPE_BLOODLINE:
                 $offense = self::BASE_OFFENSE +
                     ($off_skill * self::BLOODLINE_OFFENSE_RATIO) + ($this->bloodline_skill * self::BLOODLINE_OFFENSE_RATIO);
                 break;
@@ -192,7 +247,7 @@ abstract class Fighter {
                     continue;
                 }
 
-                if($attack_type == 'bloodline_jutsu') {
+                if($attack->purchase_type == Jutsu::PURCHASE_TYPE_BLOODLINE) {
                     $multiplier = 0.5;
                 }
                 else {
@@ -222,6 +277,9 @@ abstract class Fighter {
         }
 
         $rand = mt_rand(self::MIN_RAND, self::MAX_RAND);
+        if($disable_randomness) {
+            $rand = (self::MIN_RAND + self::MAX_RAND) / 2;
+        }
 
         $damage = $offense * $attack->power * $rand;
 
@@ -270,9 +328,9 @@ abstract class Fighter {
             }
         }
 
-        $def_multiplier = 0.03;
+        $def_multiplier = 0.003;
         if($this instanceof AI) {
-            $def_multiplier = 0.01;
+            $def_multiplier = 0.001;
         }
 
         switch($defense_type) {
@@ -305,7 +363,7 @@ abstract class Fighter {
 
 
     // Actions
-    abstract public function useJutsu(Jutsu $jutsu, $purchase_type);
+    abstract public function useJutsu(Jutsu $jutsu);
 
     abstract public function updateInventory();
 

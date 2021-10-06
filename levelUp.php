@@ -83,7 +83,7 @@ function rankUp(): bool {
 	
 		$new_rank = $player->rank + 1;
 		$result = $system->query("SELECT * FROM `ranks` WHERE `rank_id`=$player->rank OR `rank_id`=$new_rank");
-		if($system->db_num_rows == 0) {
+		if($system->db_last_num_rows == 0) {
 			$system->message("Invalid rank data!");
 			return false;
 		}
@@ -331,12 +331,12 @@ function rankUp(): bool {
 					// Pull bloodlines
 					$result = $system->query("SELECT `bloodline_id`, `clan_id`, `name` FROM `bloodlines` 
 						WHERE `village`='$player->village' AND `rank`='$bloodline_rank'");
-					if($system->db_num_rows == 0) {
+					if($system->db_last_num_rows == 0) {
 						$result = $system->query("SELECT `bloodline_id`, `clan_id`, `name` FROM `bloodlines` 
 						WHERE `village`='$player->village' AND `rank` < 5");
 					}
 					
-					if($system->db_num_rows == 0) {
+					if($system->db_last_num_rows == 0) {
 						$bloodline_rolled = false;
 					}
 					
@@ -391,7 +391,7 @@ function rankUp(): bool {
 						$bloodline_name = $bloodlines[$bloodline_id]['name'];
 						
 						$result = $system->query("SELECT `name` FROM `clans` WHERE `clan_id`='" . $bloodlines[$bloodline_id]['clan_id'] . "'");
-						if($system->db_num_rows > 0) {
+						if($system->db_last_num_rows > 0) {
 							$result = $system->db_fetch($result);
 							$clan_name = $result['name'];
 							$player->clan = array();
@@ -409,12 +409,12 @@ function rankUp(): bool {
 				if(!$bloodline_rolled) {
 					$result = $system->query("SELECT `clan_id`, `name` FROM `clans` 
 						WHERE `village`='$player->village' AND `bloodline_only`='0'");
-					if($system->db_num_rows == 0) {
+					if($system->db_last_num_rows == 0) {
 						$result = $system->query("SELECT `clan_id`, `name` FROM `clans` 
 						WHERE `bloodline_only`='0'");
 					}
 					
-					if($system->db_num_rows == 0) {
+					if($system->db_last_num_rows == 0) {
 						throw new Exception("No clans available!");
 					}
 					
@@ -527,7 +527,7 @@ function rankUp(): bool {
 	else if($player->rank == 2) {
 		$new_rank = $player->rank + 1;
 		$result = $system->query("SELECT * FROM `ranks` WHERE `rank_id`=$player->rank OR `rank_id`=$new_rank");
-		if($system->db_num_rows == 0) {
+		if($system->db_last_num_rows == 0) {
 			$system->message("Invalid rank data!");
 			return false;
 		}
@@ -667,7 +667,6 @@ function rankUp(): bool {
                 }
 
                 $battle = new Battle($system, $player, $player->battle_id);
-                $battle->loadFighters();
 
                 $battle->checkTurn();
 
@@ -736,7 +735,6 @@ function rankUp(): bool {
                 }
 
                 $battle = new Battle($system, $player, $player->battle_id);
-                $battle->loadFighters();
 
                 $battle->checkTurn();
 
@@ -916,7 +914,7 @@ function rankUp(): bool {
 	else if($player->rank == 3) {
 		$new_rank = $player->rank + 1;
 		$result = $system->query("SELECT * FROM `ranks` WHERE `rank_id`=$player->rank OR `rank_id`=$new_rank");
-		if($system->db_num_rows == 0) {
+		if($system->db_last_num_rows == 0) {
 			$system->message("Invalid rank data!");
 			return false;
 		}

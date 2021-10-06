@@ -16,29 +16,30 @@ function spar() {
 	global $self_link;
 
 	if($player->battle_id) {
-		require("battleCore.php");
-		$result = $system->query("SELECT * FROM `battles` WHERE `battle_id`='$player->battle_id' LIMIT 1");
-		if($system->db_num_rows == 0) {
-			$system->message("Invalid battle! - fetch");
-			$system->printMessage();
-			$player->battle_id = 0;
-			return false;
-		}
-		$battle = $system->db_fetch($result);
-
 		try {
-            if($player->id == $battle['player1']) {
-                $opponent = User::fromEntityId($battle['player2']);
-                $battle['player_side'] = 'player1';
-                $battle['opponent_side'] = 'player2';
-            }
-            else if($player->id == $battle['player2']) {
-                $opponent = User::fromEntityId($battle['player1']);
-                $battle['player_side'] = 'player2';
-                $battle['opponent_side'] = 'player1';
-            }
-            else {
-                throw new Exception("Invalid battle! - p1/p2 check");
+            $battle = new Battle($system, $player, $player->battle_id);
+
+            $battle->checkTurn();
+
+            $battle->renderBattle();
+
+            if($battle->isComplete()) {
+                echo "<table class='table'><tr><th>Battle complete</th></tr>
+			    <tr><td style='text-align:center;'>";
+                if($battle->isPlayerWinner()) {
+                    echo "You win!<br />";
+                }
+                else if($battle->isOpponentWinner()) {
+                    echo "You lose.<br />";
+                    $player->health = 5;
+                }
+                else if($battle->isDraw()) {
+                    echo "You both knocked each other out.<br />";
+                    $player->health = 5;
+                }
+                echo "</td></tr></table>";
+
+                $player->battle_id = 0;
             }
         }
         catch (Exception $e) {
@@ -46,35 +47,13 @@ function spar() {
             $player->battle_id = 0;
             return false;
         }
-
-		
-		$opponent->loadData(1);
-		$winner = battlePvP($player, $opponent, $battle);
-		if($winner !== false) {
-			echo "<table class='table'><tr><th>Battle complete</th></tr>
-			<tr><td style='text-align:center;'>";
-			if($winner == $player->user_id) {
-				echo "You win!<br />";
-			}
-			else if($winner == $opponent->user_id) {
-				echo "You lose.<br />";
-				$player->health = 5;
-			}
-			else {
-				echo "You both knocked each other out.<br />";
-				$player->health = 5;
-			}
-			echo "</td></tr></table>";
-			
-			$player->battle_id = 0;
-		}
 	}
-	else if($_GET['challenge']) {
+	else if(isset($_GET['challenge'])) {
 		try {
 			$challenge = (int)$system->clean($_GET['challenge']);
 			$result = $system->query("SELECT `user_id`, `user_name`, `village`, `location`, `challenge`, `battle_id`, `last_active`
 				FROM `users` WHERE `user_id`='$challenge' LIMIT 1");
-			if($system->db_num_rows == 0) {
+			if($system->db_last_num_rows == 0) {
 				throw new Exception("Invalid user!");
 			}
 			$user = $system->db_fetch($result);
@@ -111,7 +90,7 @@ function spar() {
 			scoutArea();
 		}
 	}
-	else if($_GET['accept_challenge']) {
+	else if(isset($_GET['accept_challenge'])) {
 		try {
 			$challenge = (int)$system->clean($_GET['accept_challenge']);
 			
@@ -153,7 +132,7 @@ function spar() {
 			scoutArea();
 		}
 	}
-	else if($_GET['decline_challenge']) {
+	else if(isset($_GET['decline_challenge'])) {
 		$player->challenge = 0;
 		$system->message("Challenge declined.");
 		$system->printMessage();
@@ -161,7 +140,7 @@ function spar() {
 		require("scoutArea.php");
 		scoutArea();
 	}
-	else if($_GET['cancel_challenge']) {
+	else if(isset($_GET['cancel_challenge'])) {
 		$challenge = $system->clean($_GET['cancel_challenge']);
 		// Load user challenges sent
 		$result = $system->query("UPDATE `users` SET `challenge`=0 WHERE `user_id`='$challenge' AND `challenge`='$player->user_id' LIMIT 1");
@@ -174,7 +153,7 @@ function spar() {
 	else {
 		// Load user challenges sent
 		$result = $system->query("SELECT `user_id`, `user_name` FROM `users` WHERE `challenge`='$player->user_id'");
-		if($system->db_num_rows > 0) {
+		if($system->db_last_num_rows > 0) {
 			$user_challenges = array();
 			while($row = $system->db_fetch($result)) {
 				$user_challenges[$row['user_id']] = $row['user_name'];
@@ -187,7 +166,7 @@ function spar() {
 			// Challenge received
 			if($player->challenge) {
 				$result = $system->query("SELECT `user_name` FROM `users` WHERE `user_id`='$player->challenge' LIMIT 1");
-				if($system->db_num_rows == 0) {
+				if($system->db_last_num_rows == 0) {
 					$player->challenge = 0;
 				}
 				else {

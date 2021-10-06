@@ -25,7 +25,7 @@ if($_POST) {
 	$email = $system->clean($_POST['email']);
 	$query = "SELECT `user_id` FROM users WHERE user_name='$user_name' AND email='$email' LIMIT 1";
 	$result = $system->query($query);
-	if($system->db_num_rows == 0) {
+	if($system->db_last_num_rows == 0) {
 		$system->message("Invalid username or email address! Please contact Lsmjudoka on the Forums.");
 		$system->printMessage();
 	}

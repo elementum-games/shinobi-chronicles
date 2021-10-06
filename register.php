@@ -35,7 +35,7 @@ if(isset($_GET['act'])) {
 		$user_name = $system->clean($_GET['username']);
 
 		$result = $system->query("UPDATE `users` SET `user_verified`=1 WHERE `user_name`='$user_name' AND `verify_key`='$key' LIMIT 1");
-		if($system->db_affected_rows > 0) {
+		if($system->db_last_affected_rows > 0) {
 			$system->message("Account activated! You may log in and start playing. <a href='{$system->link}'>Continue</a>");
 			$system->printMessage();
 		}
@@ -47,7 +47,7 @@ if(isset($_GET['act'])) {
 	else if($_GET['act'] == 'resend_verification') {
 		$user_name = $system->clean($_GET['username']);
 		$result = $system->query("SELECT `email`, `verify_key`, `user_verified` FROM `users` WHERE `user_name`='$user_name' LIMIT 1");
-		if($system->db_num_rows == 0) {
+		if($system->db_last_num_rows == 0) {
 			$system->message("Invalid user!");
 			$system->printMessage();
 		}
@@ -222,7 +222,7 @@ if($_POST['register']) {
 		VALUES
 		('$user_name', '$password', '$email', '0', '{$_SERVER['REMOTE_ADDR']}', '0',
 		'$gender', '$village', '1', '1', '100.00', '100.00', '100.00', '100.00', '100.00', '100.00', '10.00',
-		'0', '0', '', '0', '" . $villages[$village]['location'] . "', '100', '0', '0', '0', '0',
+		'" . User::BASE_EXP . "', '0', '', '0', '" . $villages[$village]['location'] . "', '100', '0', '0', '0', '0',
 		'10', '10', '10', '0',
 		'5.00', '5.00', '5.00', '5.00',
 		'" . time() . "', '" . $verification_code . "', 'shadow_ribbon', './images/default_avatar.png',

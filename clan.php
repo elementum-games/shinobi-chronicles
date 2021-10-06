@@ -77,7 +77,7 @@ function clan() {
 			);
 			$position_holders = array();
 			$result = $system->query("SELECT `leader`, `elder_1`, `elder_2` FROM `clans` WHERE `clan_id` = '{$player->clan['id']}'");
-			if($system->db_num_rows > 0) {
+			if($system->db_last_num_rows > 0) {
 					while($row = $system->db_fetch($result)) {
 						foreach ($row as $position => $id) {
 							$position_holders[] = $id;
@@ -392,7 +392,7 @@ function clan() {
 		$officers = array();
 		$query = "SELECT `leader`, `elder_1`, `elder_2` FROM `clans` WHERE `clan_id` ='{$player->clan['id']}'";
 		$result = $system->query($query);
-		if($system->db_num_rows > 0) {
+		if($system->db_last_num_rows > 0) {
 			while ($row = $system->db_fetch($result)) {
 				foreach ($row as $position => $id) {
 					$officers[] = $id;
@@ -409,7 +409,7 @@ function clan() {
 				"Leader" => 1,
 				"Elder 2" => 3,
 			);
-			if($system->db_num_rows > 0) {
+			if($system->db_last_num_rows > 0) {
 				while($row = $system->db_fetch($result)) {
 					$officers[$row['clan_office']] = $row;
 				}

@@ -18,56 +18,63 @@ function travel() {
 	global $self_link;
 
 	if(!empty($_GET['travel'])) {
-		$travel = $system->clean($_GET['travel']);
 		$target_x = $player->x;
 		$target_y = $player->y;
-		switch($_GET['travel']) {
-			case 'north':
-				if($player->y <= 1) {
-					$system->message("You cannot travel farther this way!");
-					break;
-				}
-				
-				$target_y--;
-				break;
-			case 'south':
-				if($player->y >= System::MAP_SIZE_Y) {
-					$system->message("You cannot travel farther this way!");
-					break;
-				}
-				
-				$target_y++;
-				break;
-			case 'east':
-				if($player->x >= System::MAP_SIZE_X) {
-					$system->message("You cannot travel farther this way!");
-					break;
-				}
-				
-				$target_x++;
-				break;
-			case 'west':
-				if($player->x <= 1) {
-					$system->message("You cannot travel farther this way!");
-					break;
-				}
-				
-				$target_x--;
-				break;
-			default:
-				break;
-		}
-		$location = $target_x . "." . $target_y;
-		
-		if(isset($villages[$location]) && $location != $player->village_location) {
-			$system->message("You cannot travel into another village!");
-		}
-		else {
-			$player->location = $location;
-			$player->y = $target_y;
-			$player->x = $target_x;
-			$player->updateData();
-		}
+
+		$ignore_travel_restrictions = $player->staff_level >= System::SC_HEAD_ADMINISTRATOR;
+
+		try {
+            switch($_GET['travel']) {
+                case 'north':
+                    if($player->y <= 1 && !$ignore_travel_restrictions) {
+                        throw new Exception("You cannot travel farther this way!");
+                    }
+
+                    $target_y--;
+                    break;
+                case 'south':
+                    if($player->y >= System::MAP_SIZE_Y && !$ignore_travel_restrictions) {
+                        throw new Exception("You cannot travel farther this way!");
+                    }
+
+                    $target_y++;
+                    break;
+                case 'east':
+                    if($player->x >= System::MAP_SIZE_X && !$ignore_travel_restrictions) {
+                        throw new Exception("You cannot travel farther this way!");
+                    }
+
+                    $target_x++;
+                    break;
+                case 'west':
+                    if($player->x <= 1 && !$ignore_travel_restrictions) {
+                        throw new Exception("You cannot travel farther this way!");
+                    }
+
+                    $target_x--;
+                    break;
+                default:
+                    break;
+            }
+            $location = $target_x . "." . $target_y;
+            
+            if(isset($villages[$location]) && $location != $player->village_location && !$ignore_travel_restrictions) {
+                throw new Exception("You cannot travel into another village!");
+            }
+
+            if($player->last_death > time() - 15 && !$ignore_travel_restrictions) {
+                throw new Exception("You died within the last 15 seconds, please wait " .
+                    (($player->last_death + 15) - time()) . " more seconds before moving.");
+            }
+
+            $player->location = $location;
+            $player->y = $target_y;
+            $player->x = $target_x;
+            $player->updateData();
+        } catch(Exception $e) {
+            $system->message("You cannot travel into another village!");
+            $system->message($e->getMessage());
+        }
 		
 		// Village check
 		if($player->location == $player->village_location) {
@@ -153,8 +160,8 @@ function travel() {
 	});
 	
 	</script>";
-	
-	echo "<table class='table' style='width:98%;'>
+
+	echo "<table id='scoutTable' class='table' style='width:98%;'>
     <tr><th colspan='5'>Your location: {$player->location}" .
 	(isset($villages[$player->location]) ? " (" . $villages[$player->location]['name'] . " Village)" : "") .
 	"</th></tr>
@@ -182,7 +189,7 @@ function travel() {
 	echo "</td></tr>";
 
 	require("scoutArea.php");
-	scoutArea(true);
+	scoutArea(true, false);
 
 	echo "</table>";
 

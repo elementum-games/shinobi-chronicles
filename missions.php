@@ -35,7 +35,7 @@ function missions() {
 	$mission_rank_names = array(1 => 'D-Rank', 2 => 'C-Rank', 3 => 'B-Rank', 4 => 'A-Rank', 5 => 'S-Rank');
 	
 	$result = $system->query("SELECT `mission_id`, `name`, `rank` FROM `missions` WHERE `mission_type`=1 OR `mission_type`=5 AND `rank` <= $max_mission_rank");
-	if($system->db_num_rows == 0) {
+	if($system->db_last_num_rows == 0) {
 		$system->message("No missions available!");
 		$system->printMessage();
 		return false;
@@ -80,7 +80,7 @@ function missions() {
 	// Display missions
 	$system->printMessage();
 	$view = $max_mission_rank;
-	if($_GET['view_rank']) {
+	if(isset($_GET['view_rank'])) {
 		$view = (int)$_GET['view_rank'];
 		if($view < 1 or $view > $max_mission_rank) {
 			$view = $max_mission_rank;
@@ -146,15 +146,14 @@ function runActiveMission() {
                 if(!$opponent) {
                     throw new Exception("Couldn't load opponent for mission!");
                 }
+                $opponent->loadData();
 
                 // Initialize start of battle stuff
                 if(!$player->battle_id) {
-                    $opponent->loadData();
                     Battle::start($system, $player, $opponent, Battle::TYPE_AI_MISSION);
                 }
 
                 $battle = new Battle($system, $player, $player->battle_id);
-                $battle->loadFighters();
                 $battle->checkTurn();
 
                 $battle->renderBattle();
@@ -266,10 +265,10 @@ function runActiveMission() {
 
             $team_points = 2;
             // Process team rewards if this is the first completing player, then unset the mission ID
-            if($player->team['mission_id']) {
+            if($player->team->mission_id) {
                 $system->query("UPDATE `teams` SET 
 						`points`=`points` + $team_points, `monthly_points`=`monthly_points` + $team_points,`mission_id`=0 
-						WHERE `team_id`={$player->team['id']}");
+						WHERE `team_id`={$player->team->id}");
             }
 
             echo "<table class='table'><tr><th>Current Mission</th></tr>
@@ -311,6 +310,18 @@ function runActiveMission() {
                 echo "You have been paid &yen;$mission->money.<br />";
             }
 
+            // check what mission rank for daily Task
+            $all_mission_ranks = [0, 1, 2, 3, 4];
+            $mission_rank = $all_mission_ranks[$mission->rank];
+            $dt = [];
+            foreach ($player->daily_tasks as $task) {
+                if ($task['Task'] == 'Missions' && $task['MissionRank'] == $mission_rank && !$task['Complete']) {
+                    $task['Progress']++;
+                }
+                array_push($dt, $task);
+            }
+            $player->daily_tasks = $dt;
+
             $player->money += $mission->money;
             $player->clearMission();
             $player->last_ai = time();
@@ -324,12 +335,12 @@ function runActiveMission() {
     else if($player->mission_id){
         echo "<table class='table'><tr><th>Current Mission (<a href='$self_link&cancel_mission=1'>Abandon Mission</a>)</th></tr>
 			<tr><td style='text-align:center;'><span style='font-weight:bold;'>" .
-            ($mission->mission_type == 3 ? '[' . $player->team['name'] . '] ' : '') . "$mission->name</span><br />" .
+            ($mission->mission_type == 3 ? '[' . $player->team->name . '] ' : '') . "$mission->name</span><br />" .
             $player->mission_stage['description'];
 
         // Display counts of team/solo mission
-        if($mission->mission_type == 3 && $mission->team['mission_stage']['count_needed']) {
-            echo ' (' . $mission->team['mission_stage']['count'] . '/' . $mission->team['mission_stage']['count_needed'] . ' complete)';
+        if($mission->mission_type == 3 && $mission->team->mission_stage['count_needed']) {
+            echo ' (' . $mission->team->mission_stage['count'] . '/' . $mission->team->mission_stage['count_needed'] . ' complete)';
         }
         else if(!empty($player->mission_stage['count_needed'])) {
             echo ' (' . $player->mission_stage['count'] . '/' . $player->mission_stage['count_needed'] . ' complete)';

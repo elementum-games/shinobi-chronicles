@@ -25,9 +25,10 @@ function members() {
 	// Sub-menu
 	echo "<div class='submenu'>
 	<ul class='submenu'>
-		<li style='width:33%;'><a href='{$self_link}&view=highest_exp'>Highest Exp</a></li>
-		<li style='width:33%;'><a href='{$self_link}&view=online_users'>Online Users</a></li>
-		<li style='width:32.5%;'><a href='{$self_link}&view=staff'>Game Staff</a></li>
+		<li style='width:24.5%;'><a href='{$self_link}&view=highest_pvp'>Highest Pvp</a></li>
+		<li style='width:24.5%;'><a href='{$self_link}&view=highest_exp'>Highest Exp</a></li>
+		<li style='width:24.5%;'><a href='{$self_link}&view=online_users'>Online Users</a></li>
+		<li style='width:24.5%;'><a href='{$self_link}&view=staff'>Game Staff</a></li>
 	</ul>
 	</div>
 	<div class='submenuMargin'></div>";
@@ -40,14 +41,113 @@ function members() {
 		<input type='submit' value='Search' />
 		</form>
 	</div>";
-	
+
+	// Display Team profile
+	if (isset($_GET['view_team'])) {
+		$team_id = $system->clean($_GET['view_team']);
+		try {
+			$result = $system->query("SELECT `name`, `type`, `points`, `monthly_points`, `village`, `members`, `logo`, `leader` FROM `teams` WHERE `team_id`='{$team_id}'");
+			
+			if ($system->db_last_num_rows == 0) {
+				throw new Exception ('Team does not exist');
+			}
+
+			$team_info = $system->db_fetch($result);
+			$team_member_ids = json_decode($team_info['members'], true);
+
+			$result = $system->query("SELECT `user_name`, `avatar_link`, `forbidden_seal` FROM `users` WHERE `user_id`='{$team_info['leader']}'");
+			$leader_info = $system->db_fetch($result);
+			$forbidden_seal = ($leader_info['forbidden_seal'] != '' ? '175px' : '125px');
+
+			echo "
+			<table class='table'>
+				<tr>
+					<th colspan='3'>
+						{$team_info['name']}
+					</th>
+				</tr>
+				<tr>
+					<th style='width: 33%;'>
+						Info
+					</th>
+					<th style='width: 33%;'>
+
+					</th>
+					<th style='width: 33%;'>
+						Leader
+					</th>
+				</tr>
+				<tr>
+					<td style='vertical-align: middle;'>
+						<b>Village</b>: {$team_info['village']} <br>
+						<b>Type</b>: Shinobi<br>
+					</td>
+					<td style='vertical-align: middle;'>
+						<b>Points</b>: {$team_info['points']} <br>
+						<b>Monthly Points</b>: {$team_info['monthly_points']}
+					</td>
+					<td style='vertical-align: middle;text-align: center;' rowspan='2'>
+						<a href='{$self_link}&user={$leader_info['user_name']}'>{$leader_info['user_name']}</a> <br>
+						<img src='{$leader_info['avatar_link']}' style='margin-top:5px;max-width:{$forbidden_seal};max-height:{$forbidden_seal};'>
+					</td>
+				</tr>
+				<tr>
+					<td colspan='2' style='text-align: center;'>
+						<img src='{$team_info['logo']}' style='width: 450px; height: 100px;'>
+					</td>
+				</tr>
+			</table>
+
+			<table class='table'>
+				<tr>
+					<th colspan='3'>
+						Members
+					</th>
+				</tr>
+				<tr>
+					<th tyle='width: 33%;'>
+						Name
+					</th>
+					<th tyle='width: 33%;'>
+						Rank
+					</th>
+					<th tyle='width: 33%;'>
+						Level
+					</th>
+				</tr>";
+			
+			$user_ids = implode(',', $team_member_ids);
+			$result = $system->query("SELECT `user_name`, `rank`, `level` FROM `users` WHERE `user_id` IN ($user_ids) ORDER BY `rank` DESC, `level` DESC");
+			
+			while ($team_member = $system->db_fetch($result)) {
+				echo "
+				<tr class='table_multicolumns'>
+					<td>
+						<a href='{$self_link}&user={$team_member['user_name']}'>{$team_member['user_name']}</a>
+					</td>
+					<td style='text-align: center;'>
+						{$ranks[$team_member['rank']]}
+					</td>
+					<td style='text-align: center;'>
+						{$team_member['level']}
+					</td>
+				</tr>";
+			}
+			echo "</table>";
+		}
+		catch (Exception $e) {
+			$system->message($e->getMessage());
+		}
+		$system->printMessage();
+		$display_list = false;
+	}
+	else if(isset($_GET['user'])) {
 	// Display user's profile
-	if($_GET['user']) {
 		$user_name = $system->clean($_GET['user']);
 		$result = $system->query("SELECT `user_id` FROM `users` WHERE `user_name`='{$user_name}' LIMIT 1");
 			
 		try {
-			if($system->db_num_rows == 0) {
+			if($system->db_last_num_rows == 0) {
 				throw new Exception("User does not exist!");
 			}
 		
@@ -56,7 +156,7 @@ function members() {
 			$viewUser->loadData(false, true);
 			
 			$journal_result = $system->query("SELECT `journal` FROM `journals` WHERE `user_id`='{$viewUser->user_id}'");
-			if($system->db_num_rows == 0) {
+			if($system->db_last_num_rows == 0) {
 				$journal = '';
 			}
 			else {
@@ -69,7 +169,7 @@ function members() {
 			if($viewUser->forbidden_seal) {
 				$avatar_size = '175px';
 			}
-			echo "<table class='table'>
+			echo "<table id='viewprofile' class='table'>
 			<tr><th colspan='2'>View Profile</th>";
 
 			echo "<tr><td colspan='2' style='text-align:center;'>";
@@ -127,7 +227,7 @@ function members() {
 				echo $viewUser->clan_office ? "<label style='width:6em;'>Clan Rank:</label> " . $clan_positions[$viewUser->clan_office] . "<br />" : "";
 			}
 			if($viewUser->team) {
-				echo "<label style='width:6em;'>Team:</label> " . $viewUser->team['name'] . "<br />";
+				echo "<label style='width:6em;'>Team:</label> <a href='{$self_link}&view_team={$viewUser->team->id}'>" . $viewUser->team->name . "</a><br />";
 			}
 			echo "<br />
 			<label style='width:6em;'>PvP wins:</label>	$viewUser->pvp_wins<br />
@@ -158,7 +258,7 @@ function members() {
                 echo "&nbsp;&nbsp;|&nbsp;&nbsp;<a href='{$system->links['profile']}&page=send_ak&recipient={$viewUser->user_name}'>Send AK</a>";
             }
 			if($viewUser->rank >= 3 && $player->team) {
-				if($player->user_id == $player->team['leader'] && !$viewUser->team && !$viewUser->team_invite &&
+				if($player->user_id == $player->team->leader && !$viewUser->team && !$viewUser->team_invite &&
 				$player->village == $viewUser->village) {
 					echo "&nbsp;&nbsp; |  &nbsp;&nbsp;
 					<a href='{$system->link}?id=24&invite=1&user_name=$viewUser->user_name'>Invite to Team</a>";
@@ -169,21 +269,27 @@ function members() {
 				if(strpos($journal, "\n") === false) {
 					$journal = wordwrap($journal, 100, "\r\n", true);
 				}
-				$journal = $system->html_parse(stripslashes($journal), true, false);
-				
-				$img_size = 'max-width:300px;max-height:200px;';
-				if($player->forbidden_seal) {
-					$img_size = 'max-width:500px;max-height:500px;';
-				}
-				$journal = str_replace("/*IMG_SIZE*/", $img_size, $journal);
-				echo "<tr><th colspan='2'>Journal</th></tr>
-				<tr><td colspan='2' style='white-space:pre-wrap;'>" . $journal . "</td></tr>";
+				$journal = $system->html_parse(stripslashes($journal), true, true);
+
+				$class_name = $player->forbidden_seal ? 'forbidden_seal' : 'normal';
+				echo "<style type='text/css'>
+                    #journal {
+                        white-space: pre-wrap;
+                    }
+                    #journal.normal img {
+                        max-width: 400px;
+                        max-height: 300px;
+                    }
+                </style>
+                <tr><th colspan='2'>Journal</th></tr>
+				<tr><td colspan='2' >
+				    <div id='journal' class='{$class_name}'>" . $journal . "</div>
+                </td></tr>";
 			}
 
 			//report player
 			echo
-			"
-			<tr>
+			"<tr>
 				<td style='text-align: center;'colspan='2'>
 					<a href='{$system->links['report']}&report_type=1&content_id=$viewUser->user_id'>Report Profile/Journal</a>
 				</td>
@@ -227,7 +333,7 @@ function members() {
 						
 						// Last chat post
 						$result = $system->query("SELECT `time` FROM `chat` WHERE `user_name`='{$viewUser->user_name}' ORDER BY `post_id` DESC LIMIT 1");
-						if($system->db_num_rows > 0) {
+						if($system->db_last_num_rows > 0) {
 							$last_post = $system->db_fetch($result)['time'];
 							echo "Last chat post: " . System::timeRemaining(time() - $last_post, 'long') . " ago<br />";
 						}
@@ -273,24 +379,32 @@ function members() {
 		}
 		$system->printMessage();
 	}
-	else if($_GET['view']) {
+	else if(isset($_GET['view'])) {
 		if($_GET['view'] == 'staff') {
 			$display_list = 'staff';
 		}
 	}
 	
-	
+	$count = 0;
+
 	if($display_list == 'standard') {
 		$online_seconds = 120;
 
 		$query_custom = '';
 		$view = 'highest_exp';
-		if($_GET['view'] == 'highest_exp') {
-			$query_custom = " WHERE `staff_level` < " . System::SC_ADMINISTRATOR . " ORDER BY `exp` DESC";
+		if(isset($_GET['view']) && $_GET['view'] == 'highest_exp') {
+			$query_custom = " WHERE `staff_level` < " . System::SC_ADMINISTRATOR .
+                " ORDER BY `exp` DESC, `pvp_wins` DESC";
 			$list_name = 'Top 10 Users - Highest Exp';
 			$view = 'highest_exp';
 		}
-		else if($_GET['view'] == 'online_users') {
+		else if(isset($_GET['view']) && $_GET['view'] == 'highest_pvp') {
+			$query_custom = " WHERE `staff_level` < " . System::SC_ADMINISTRATOR .
+                " ORDER BY `pvp_wins` DESC";
+			$list_name = 'Top 10 Users - Highest Pvp';
+			$view = 'highest_pvp';
+		}
+		else if(isset($_GET['view']) && $_GET['view'] == 'online_users') {
 			$query_custom = "WHERE `last_active` > UNIX_TIMESTAMP() - $online_seconds ORDER BY `level` DESC";
 			
 			$result = $system->query("SELECT COUNT(`user_id`) as `online_users` FROM `users` WHERE `last_active` > UNIX_TIMESTAMP() - $online_seconds");
@@ -299,7 +413,8 @@ function members() {
 			$view = 'online_users';		
 		}
 		else {
-			$query_custom = " WHERE `staff_level` < " . System::SC_ADMINISTRATOR . " ORDER BY `exp` DESC";
+            $query_custom = " WHERE `staff_level` < " . System::SC_ADMINISTRATOR .
+                " ORDER BY `exp` DESC, `pvp_wins` DESC";
 			$list_name = 'Top 10 Users - Highest Exp';
 			$view = 'highest_exp';
 		
@@ -308,13 +423,26 @@ function members() {
 		// Pagination
 		$users_per_page = 15;
 		$min = 0;
-		if($_GET['min'] && $view != 'highest_exp') {
-            $users_per_page = 10;
+		if(isset($_GET['min']) && $view != 'highest_exp' && $view != 'highest_pvp') {
+			$users_per_page = 10;
 			$min = (int)$system->clean($_GET['min']);
 		}
 		
-		$result = $system->query("SELECT `user_name`, `rank`, `village`, `exp`, `level` FROM `users` 
+		$result = $system->query("SELECT `user_name`, `rank`, `village`, `exp`, `level` , `pvp_wins` FROM `users` 
 			$query_custom LIMIT $min, $users_per_page");
+
+		$table_header = 'Level';
+		switch($view) {
+			case "highest_exp":
+				$table_header = 'Experience';
+				break;
+			case "highest_pvp":
+				$table_header = 'Pvp Kills';
+				break;
+			case "online_users":
+				$table_header = 'Level';
+				break;
+		}
 		
 		// Search box for individual users
 		// List top 10 users by experience
@@ -323,11 +451,11 @@ function members() {
 			<th style='width:30%;'>Username</th>
 			<th style='width:20%;'>Rank</th>
 			<th style='width:20%;'>Village</th>
-			<th style='width:30%;'>" . ($view == 'highest_exp' ? 'Experience' : 'Level') . "</th>
+			<th style='width:30%;'>" . ($table_header) . "</th>
 		</tr>";
 		
 		
-		if($system->db_num_rows == 0) {
+		if($system->db_last_num_rows == 0) {
 			echo "<tr><td colspan='4'>No users found!</td></tr>
 			</table>";
 		}
@@ -340,8 +468,8 @@ function members() {
 				else {
 					$class = 'row2';
 				}
-				
-				echo "<tr>
+
+				echo "<tr class='table_multicolumns'>
 					<td class='$class' style='width:30%;'>
 						<a href='$self_link&user={$row['user_name']}' class='userLink'>" . $row['user_name'] . "</a></td>
 					<td class='$class' style='width:20%;text-align:center;'>" . $ranks[$row['rank']] . "</td>
@@ -351,6 +479,9 @@ function members() {
 					<td class='$class' style='width:30%;text-align:center;'>";
 					if($view == 'highest_exp') {
 						echo $row['exp'];
+					}
+					else if($view == 'highest_pvp') {
+						echo $row['pvp_wins'];
 					}
 					else {
 						echo $row['level'];
@@ -389,7 +520,7 @@ function members() {
 		
 		echo "<table class='table'><tr><th colspan='3'>Administrators</th></tr>";
 			
-		if($system->db_num_rows == 0) {
+		if($system->db_last_num_rows == 0) {
 			echo "<tr><td colspan='3'>No users found!</td></tr>
 			</table>";
 		}
@@ -431,8 +562,8 @@ function members() {
 							break;
 					}
 				}
-				
-				echo "<tr>
+
+				echo "<tr class='threeColumns' >
 					<td class='$class' style='width:45%;'>
 						<a class='$link_class userLink' href='$self_link&user={$row['user_name']}'>" . $row['user_name'] . "</a></td>
 					<td class='$class' style='width:20%;text-align:center;'>" . $ranks[$row['rank']] . "</td>

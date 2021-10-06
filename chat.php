@@ -33,7 +33,7 @@ function chat() {
 		$message = $system->clean(stripslashes(trim($_POST['post'])));
 		try {
 			$result = $system->query("SELECT `message` FROM `chat` WHERE `user_name` = '$player->user_name' ORDER BY  `post_id` DESC LIMIT 1");
-			if($system->db_num_rows) {
+			if($system->db_last_num_rows) {
 				$post = $system->db_fetch($result);
 				if($post['message'] == $message) {
 					throw new Exception("You cannot post the same message twice in a row!");
@@ -45,10 +45,6 @@ function chat() {
 			if(strlen($message) > $chat_max_post_length) {
 				throw new Exception("Message is too long!");
 			}
-			// Banned words
-			if($system->censor_check($message)) {
-				throw new Exception("Inappropriate language is not allowed in chat!");
-			}
 
 			$title = $player->rank_name;
 			$staff_level = $player->staff_level;
@@ -57,7 +53,8 @@ function chat() {
 				'pink' => -2,
 				'gold' => -3,
 				'green' => -4,
-				'red' => -5
+				'teal' => -5,
+				'red' => -6
 			);
 			$user_color = (!$player->forbidden_seal) ? 0 : ($supported_colors[$player->forbidden_seal['color']]);
 
@@ -67,7 +64,7 @@ function chat() {
 			$system->query(sprintf(
 			    $sql, $player->user_name, $message, $title, $player->village, $staff_level, $user_color, time(), 0
             ));
-			if($system->db_affected_rows) {
+			if($system->db_last_affected_rows) {
 				$system->message("Message posted!");
 			}
 		} catch(Exception $e) {
@@ -78,7 +75,7 @@ function chat() {
 	else if(isset($_GET['delete']) && $player->staff_level >= System::SC_MODERATOR) {
 		$delete = (int) $system->clean($_GET['delete']);
 		$result = $system->query("DELETE FROM `chat` WHERE `post_id` = $delete LIMIT 1");
-		$return_message = ($system->db_affected_rows) ? "Post deleted!" : "Error deleting post!";
+		$return_message = ($system->db_last_affected_rows) ? "Post deleted!" : "Error deleting post!";
 		$system->message($return_message);
 		$system->printMessage();
 	}
@@ -137,7 +134,7 @@ function chat() {
 				$_SESSION['quick_reply'] = 1;
 			}
 		}
-		echo "<table class='table'>
+		echo "<table id='chat_input_table' class='table'>
 			<tr><th>Post Message</th></tr>
 			<tr><td style='text-align:center;'>
 			<form action='$self_link' method='post'>
@@ -166,7 +163,7 @@ function chat() {
 			<th style='width:61%;'>Message</th>
 			<th style='width:10%;'>Time</th>
 		</tr>";
-		if(! $system->db_num_rows) {
+		if(! $system->db_last_num_rows) {
 			echo "<tr><td colspan='2' style='text-align:center;'>No posts!</td></tr>";
 		}
 		while($post = $system->db_fetch($result)) {
@@ -191,6 +188,9 @@ function chat() {
                     $class .= 'moderator';
                     break;
                 case -5:
+                    $class .= 'headModerator';
+                    break;
+                case -6:
                     $class .= 'administrator';
                     break;
                 default:
@@ -198,8 +198,27 @@ function chat() {
                     break;
             }
 
+
+			/*If User is Blocked, Skip their Echo'd Post!*/
+			$isBlocked = false;
+			foreach($player->blacklist as $id => $blacklist){
+				//if post has same username as someone in their blacklist
+				if($post['user_name'] == $blacklist[$id]['user_name']){
+					// echo "".$post['user_name']." <- Fuck this guy!";
+					$isBlocked = true;
+				}
+			}
+			//skip post
+			if($isBlocked){
+				$isBlocked = false; //just in case?
+				continue;
+			}
+
+      $message = $system->explicitLanguageReplace($post['message']);
+      $message = $system->html_parse(stripslashes($message), false, true);
+
 			echo "
-				<tr>
+				<tr class='chat_msg' >
 					<td style='text-align:center;'>
 					<div id='user_data_container' style='display: flex;flex-direction:row'>
 					    <div style='flex-shrink:0;'>
@@ -219,8 +238,7 @@ function chat() {
                         echo "<p class='staffMember' style='background-color: {$color['staffColor']}'>{$color['staffBanner']}</p>";
                     }
                 echo "</td>
-				<td class='chatmsg' style='text-align:center;padding:4px;white-space:pre-wrap;'>" .
-					wordwrap($system->html_parse(stripslashes($post['message']), false, true), 60, "\n", true) . "</td>";
+				<td class='chatmsg' style='text-align:center;padding:4px;white-space:pre-wrap;'>" . $message . "</td>";
 				$post_time = time() - $post['time'];
 				$post_minutes = ceil($post_time / 60);
 				$post_hours = floor($post_minutes / 60);

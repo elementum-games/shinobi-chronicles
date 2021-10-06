@@ -112,6 +112,14 @@ $pages = [
         'battle_ok' => false,
         'village_ok' => System::ONLY_IN_VILLAGE,
     ],
+    26 => [
+        'file_name' => 'viewBattles.php',
+        'title' => 'View Battles',
+        'function_name' => 'viewBattles',
+        'menu' => System::MENU_ACTIVITY,
+        'battle_ok' => false,
+        'village_ok' => System::IN_VILLAGE_OKAY,
+    ],
 
     // Village Menu
     8 => [
@@ -144,13 +152,13 @@ $pages = [
     // Staff menu
     16 => [
         'file_name' => 'modPanel.php',
-        'title' => 'Moderator Control Panel',
+        'title' => 'Mod Panel',
         'function_name' => 'modPanel',
         'staff_level_required' => System::SC_MODERATOR
     ],
     17 => [
         'file_name' => 'adminPanel.php',
-        'title' => 'Administrator Control Panel',
+        'title' => 'Admin Panel',
         'function_name' => 'adminPanel',
         'staff_level_required' => System::SC_ADMINISTRATOR
     ],

@@ -34,24 +34,24 @@ $heading = <<<HTML
 <body>
 
 	<div id='container'>
-		<div id='menu'>
+		<div>
 HTML;
 
 $header = <<<HTML
-</div>
-
-	<div id='header'>
-		<img src='./style/classic_blue/images/banner.png' />
 	</div>
 
-	<div id='contentContainer'>
+		<div id='header'>
+			<img src='./style/classic_blue/images/banner.png' />
+		</div>
+
+		<div id='contentContainer'>
 
 HTML;
 
 $body_start = <<<HTML
 
-	<div id='content'>
-		<div class='header contentHeader'>
+	  <div id='content'>
+		<div class='contentHeader'>
 		[HEADER_TITLE]
 		</div>
 
@@ -65,7 +65,7 @@ $top_menu = <<<HTML
 
 	<ul class='topMenu'>
 		<li><a href='{$system->link}'>News</a></li>
-		<li><a href='#' target='_blank'>Forum</a></li>
+		<li><a href='https://discord.gg/Kx52dbXEf3' target='_blank'>Discord</a></li>
 		<li><a href='{$system->link}manual.php'>Manual</a></li>
 		<li><a href='{$system->link}rules.php'>Rules</a></li>
 		<li><a href='{$system->link}terms.php'>Terms of Service</a></li>
@@ -80,45 +80,48 @@ HTML;
 $side_menu_start = <<<HTML
 
 	<div id='sidebar'>
+  <ul  id='menu'>
 
-		<ul class='menu'>
-				<div id="character_header" class='header'>
-				Character Menu
+						<div>
+						<div id="character_header" class='header'>
+						Character Menu
+						</div>
+				  	<div id="player_menu" class='buttonList'>
+HTML;
+$village_menu_start = <<<HTML
+			      </div>
+						</div>
+
+				<div>
+				<div id="travel_header" class='header'>
+				Travel Menu
 				</div>
-			<div id="player_menu">
+		  	<div id="travel_menu" class='buttonList'>
 HTML;
+$action_menu_header = <<<HTML
+	  		</div>
+				</div>
 
-	$village_menu_start = <<<HTML
-
-	<hr />
-			</div>
-			<div id="travel_header" class='header'>
-			Travel Menu
-			</div>
-		<div id="travel_menu">
-HTML;
-
-	$action_menu_header = <<<HTML
-		</div>
-			<div id="action_header" class='header'>
+		<div>
+		<div id="action_header" class='header'>
 				Action Menu
-			</div>
-		<div id="action_menu">
-HTML;
-
-	$staff_menu_header = <<<HTML
-		<hr />
 		</div>
-			<div id="staff_header" class='header'>
-				Staff Menu
-			</div>
-		<div id="staff_menu">
+		<div id="action_menu" class='buttonList'>
 HTML;
+$staff_menu_header = <<<HTML
+		</div>
+		</div>
 
-	$side_menu_end = <<<HTML
+				<div>
+				<div id="staff_header" class='header'>
+					Staff Menu
+				</div>
+				<div id="staff_menu" class='buttonList'>
+HTML;
+$side_menu_end = <<<HTML
+				</div>
+				</div>
 
-	<hr />
-</div>
 </div>
 		<br style='margin:0px;' />
 		</ul>

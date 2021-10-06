@@ -37,7 +37,6 @@ if(isset($_GET['logout']) && $_GET['logout'] == 1) {
 }
 $LOGGED_IN = false;
 
-
 // Ajax
 $ajax = false;
 if(isset($_GET['request_type']) && $_GET['request_type'] == 'ajax') {
@@ -65,10 +64,11 @@ if(!isset($_SESSION['user_id'])) {
 			if(empty($password)) {
 				throw new Exception("Please enter password!");
 			}
+
 			// Get result
 			$result = $system->query("SELECT `user_id`, `user_name`, `password`, `failed_logins`, `current_ip`, `last_ip`, `user_verified` 
 				FROM `users` WHERE `user_name`='$user_name' LIMIT 1");
-			if($system->db_num_rows == 0) {
+			if($system->db_last_num_rows == 0) {
 				throw new Exception("User does not exist!");
 			}
 			$result = $system->db_fetch($result);
@@ -76,6 +76,7 @@ if(!isset($_SESSION['user_id'])) {
 				throw new Exception("Your account has not been verified. Please check your email for the activation code.
 				<a class='link' href='{$system->link}register.php?act=resend_verification&username=$user_name'>Resend Verification</a>");
 			}
+
 			// Check failed logins
 			if($result['failed_logins'] >= 3 && $_SERVER['REMOTE_ADDR'] != $result['current_ip'] && $_SERVER['REMOTE_ADDR'] != $result['last_ip']) {
 				throw new Exception("Account has been locked out!");
@@ -94,9 +95,11 @@ if(!isset($_SESSION['user_id'])) {
 				if($result['failed_logins'] > 0) {
 					$system->query("UPDATE `users` SET `failed_logins`= 0 WHERE `user_id`='{$result['user_id']}' LIMIT 1");
 				}
+
 				$player = new User($_SESSION['user_id']);
 				$player_display = $player->loadData();
 				$player->last_login = time();
+				$player->log(User::LOG_LOGIN, $_SERVER['REMOTE_ADDR']);
 				$player->updateData();
 			}
 			// If wrong, increment failed logins
@@ -173,6 +176,9 @@ switch($layout) {
 	case 'geisha':
 		require("layout/geisha.php");
 		break;
+	case 'blue_scroll':
+		require("layout/blue_scroll.php");
+		break;
 	default:
 		require("layout/classic_blue.php");
 		break;
@@ -221,7 +227,7 @@ if($LOGGED_IN) {
 		exit;
 	}
 	$result = $system->query("SELECT `id` FROM `banned_ips` WHERE `ip_address`='" . $system->clean($_SERVER['REMOTE_ADDR']) . "' LIMIT 1");
-	if($system->db_num_rows > 0) {
+	if($system->db_last_num_rows > 0) {
 		if(!$ajax) {
 			echo str_replace("[HEADER_TITLE]", "Profile", $body_start);
 		}
@@ -248,9 +254,11 @@ if($LOGGED_IN) {
 		$player->global_message_viewed = 1;
 	}
 	if(!$player->global_message_viewed && !$ajax) {
-		$result = $system->query("SELECT `global_message` FROM `system_storage` LIMIT 1");
-		$message = $system->db_fetch($result)['global_message'];
+		$result = $system->query("SELECT `global_message`, `time` FROM `system_storage` LIMIT 1");
+		$results = $system->db_fetch($result);
+		$message = $results['global_message'];
 		$global_message = str_replace("\r\n", "<br />", $message);
+		$global_message_time = date("l, M j, Y - g:i A", $results['time']);
 	}
 	else {
 		$global_message = false;
@@ -332,7 +340,7 @@ if($LOGGED_IN) {
 			// Check for spar/fight PvP type, stop page if trying to load spar/battle while in AI battle
 			if(isset($pages[$id]['battle_type'])) {
 				$result = $system->query("SELECT `battle_type` FROM `battles` WHERE `battle_id`='$player->battle_id' LIMIT 1");
-				if($system->db_num_rows > 0) {
+				if($system->db_last_num_rows > 0) {
 					$battle_type = $system->db_fetch($result)['battle_type'];
 					if($battle_type != $pages[$id]['battle_type']) {
 						throw new Exception("You cannot visit this page while in combat!");
@@ -373,11 +381,10 @@ if($LOGGED_IN) {
 
 			$system->printMessage();
 			if($global_message) {
-				echo "<table class='table globalMessage'><tr><th>Global message</th></tr>
-				<tr><td style='text-align:center;'>" . $system->html_parse($global_message) . "
-				<br />
-				<a class='link' href='{$self_link}&clear_message=1'>Dismiss</a>
-				</td></tr></table>";
+				echo "<table class='table globalMessage'><tr><th colspan='2'>Global message</th></tr>
+				<tr><td style='text-align:center;' colspan='2'>" . $system->html_parse($global_message) . "</td></tr>
+				<tr><td style='width: 50px;' class='newsFooter'><a class='link' href='{$self_link}&clear_message=1'>Dismiss</a></td>
+				<td class='newsFooter'>".$global_message_time."</td></tr></table>";
 			}
 
             /** @noinspection PhpIncludeInspection */
@@ -402,11 +409,11 @@ if($LOGGED_IN) {
 		echo str_replace("[HEADER_TITLE]", "News", $body_start);
 		$system->printMessage();
 		if($global_message) {
-			echo "<table class='table globalMessage'><tr><th>Global message</th></tr>
-			<tr><td style='text-align:center;'>" . $system->html_parse($global_message) . "
-			<br />
-			<a class='link' href='{$system->link}?clear_message=1'>Dismiss</a>
-			</td></tr></table>";
+			echo "<table class='table globalMessage'><tr><th colspan='2'>Global message</th></tr>
+			<tr><td style='text-align:center;' colspan='2'>" . $system->html_parse($global_message) . "
+			</td></tr>
+			<tr><td style='width: 50px;' class='newsFooter'><a class='link' href='{$system->link}?clear_message=1'>Dismiss</a></td>
+				<td class='newsFooter'>".$global_message_time."</td></tr></table>";
 		}
 		require("news.php");
 		news();
@@ -421,7 +428,9 @@ if($LOGGED_IN) {
 		if($player->rank >= 3) {
 		    $pages[24]['menu'] = System::MENU_USER;
 		}
-
+		if($player->staff_level >= System::SC_HEAD_ADMINISTRATOR) {
+		    $pages[26]['menu'] = System::MENU_ACTIVITY;
+        }
 
         echo $side_menu_start;
 		foreach($pages as $id => $page) {
@@ -429,7 +438,7 @@ if($LOGGED_IN) {
                 continue;
             }
 
-            echo "<li><a href='{$system->link}?id=$id'>" . $page['title'] . "</a></li>";
+            echo "<li><a id='sideMenuOption-".str_replace(' ', '', $page['title'])."' href='{$system->link}?id=$id'>" . $page['title'] . "</a></li>";
         }
 
 		echo $action_menu_header;
@@ -440,7 +449,7 @@ if($LOGGED_IN) {
 				}
 				// Page ok if an in-village page or player rank is below chuunin
 				if($page['village_ok'] != System::NOT_IN_VILLAGE || $player->rank < 3) {
-					echo "<li><a href='{$system->link}?id=$id'>" . $page['title'] . "</a></li>";
+					echo "<li><a id='sideMenuOption-".str_replace(' ', '', $page['title'])."' href='{$system->link}?id=$id'>" . $page['title'] . "</a></li>";
 				}
 			}
 		}
@@ -450,7 +459,7 @@ if($LOGGED_IN) {
 					continue;
 				}
 				if($page['village_ok'] != System::ONLY_IN_VILLAGE) {
-					echo "<li><a href='{$system->link}?id=$id'>" . $page['title'] . "</a></li>";
+					echo "<li><a id='sideMenuOption-".str_replace(' ', '', $page['title'])."' href='{$system->link}?id=$id'>" . $page['title'] . "</a></li>";
 				}
 			}
 		}
@@ -463,16 +472,16 @@ if($LOGGED_IN) {
                     continue;
                 }
 
-                echo "<li><a href='{$system->link}?id=$id'>" . $page['title'] . "</a></li>";
+                echo "<li><a id='sideMenuOption-".str_replace(' ', '', $page['title'])."' href='{$system->link}?id=$id'>" . $page['title'] . "</a></li>";
             }
         }
 
 		if($player->staff_level >= System::SC_MODERATOR) {
 			echo $staff_menu_header;
-			echo "<li><a href='{$system->link}?id=16'>Mod Panel</a></li>";
+			echo "<li><a id='sideMenuOption-ModPanel' href='{$system->link}?id=16'>Mod Panel</a></li>";
 		}
 		if($player->staff_level >= System::SC_ADMINISTRATOR) {
-			echo "<li><a href='{$system->link}?id=17'>Admin Panel</a></li>";
+			echo "<li><a id='sideMenuOption-AdminPanel' href='{$system->link}?id=17'>Admin Panel</a></li>";
 		}
 		// Logout timer
 		$time_remaining = ($logout_limit * 60) - (time() - $player->last_login);

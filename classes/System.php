@@ -1,6 +1,6 @@
 <?php
 
-require_once "classes/EntityId.php";
+require_once __DIR__ . '/EntityId.php';
 
 /*	Class:		System
 	Purpose: 	Handle database connection and queries. Handle storing and printing of error messages.
@@ -23,6 +23,8 @@ class System {
     const SC_ADMINISTRATOR = 3;
     const SC_HEAD_ADMINISTRATOR = 4;
 
+    const DB_DATETIME_MS_FORMAT = 'Y-m-d H:i:s.u';
+
     // Variable for error message
     public $message;
     public $message_displayed;
@@ -41,16 +43,18 @@ class System {
 
     public $link;
 
+    public $timezoneOffset;
+
     // Training boost switches
     public $TRAIN_BOOST = 0; // Extra points per training, 0 for none
     public $LONG_TRAIN_BOOST = 0; // Extra points per long training, 0 for none
 
     // Variables for query() function to track things
     public $db_result;
-    public $db_query_type;
-    public $db_num_rows;
-    public $db_affected_rows;
-    public $db_insert_id;
+    public string $db_query_type;
+    public int $db_last_num_rows;
+    public int $db_last_affected_rows;
+    public $db_last_insert_id;
 
     public $SC_STAFF_COLORS = array(
         System::SC_MODERATOR => array(
@@ -106,15 +110,78 @@ class System {
     // Misc stuff
     const SC_MAX_RANK = 3;
 
+    const MAX_LINK_DISPLAY_LENGTH = 60;
+
+    public static $banned_words = [
+        'fuck',
+        'fuk',
+        'fck',
+        'fuq',
+        'fook',
+
+        'asshole',
+        'anus',
+
+        'shit',
+        'sht',
+        'shiee',
+        'shiet',
+
+        'fag ',
+        'faggot',
+        'fgt',
+
+        'cunt',
+
+        'bitch',
+        'bich',
+        'bish',
+
+        'retard',
+
+        'cock ',
+        'cocksu',
+        'dick',
+        'tits',
+        'titt',
+        'nigga',
+        ' niga',
+        'niga ',
+        'nigger',
+        'pussy',
+        'pussies',
+        'douche',
+        'slut',
+        'thot',
+
+        'cum ',
+        'cummi',
+        'cumming',
+        'jizz',
+
+        // Sex terms
+        'anal ',
+        'blowjob',
+        'creampie',
+        'handjob',
+        'rimjob',
+
+        ' rape',
+        'rape ',
+
+        'dildo',
+    ];
+
     public $debug = [
         'battle' => false,
         'battle_effects' => false,
+        'jutsu_collision' => false,
         'damage' => false,
         'bloodline' => false,
     ];
 
     public function __construct() {
-        require("./secure/vars.php");
+        require __DIR__ . "/../secure/vars.php";
         /** @var $host */
         /** @var $username */
         /** @var $password */
@@ -134,6 +201,8 @@ class System {
         foreach(self::PAGE_IDS as $slug => $id) {
             $this->links[$slug] = $this->link . '?id=' . $id;
         }
+
+        $this->timezoneOffset = date('Z');
     }
 
     /* function dbConnect()
@@ -187,15 +256,15 @@ class System {
         $result = mysqli_query($this->con, $query) or $this->error(mysqli_error($this->con));
 
         if($this->db_query_type == 'select') {
-            $this->db_num_rows = mysqli_num_rows($result);
+            $this->db_last_num_rows = mysqli_num_rows($result);
             $this->db_result = $result;
         }
         else {
-            $this->db_affected_rows = mysqli_affected_rows($this->con);
+            $this->db_last_affected_rows = mysqli_affected_rows($this->con);
         }
 
         if($this->db_query_type == 'insert') {
-            $this->db_insert_id = mysqli_insert_id($this->con);
+            $this->db_last_insert_id = mysqli_insert_id($this->con);
         }
         return $result;
     }
@@ -215,6 +284,30 @@ class System {
             return mysqli_fetch_array($result);
         }
     }
+
+    /**
+     * @param false  $result
+     * @param string $return_type
+     * @return array|null
+     */
+    public function db_fetch_all($result = false, ?string $id_column = null): array {
+        if(!$result) {
+            $result = $this->db_result;
+        }
+
+        $entities = [];
+        while($row = $this->db_fetch($result)) {
+            if($id_column) {
+                $entities[$row[$id_column]] = $row;
+            }
+            else {
+                $entities[] = $row;
+            }
+        }
+        return $entities;
+    }
+
+
 
     /* function message(message, force_message)
 
@@ -274,7 +367,7 @@ class System {
         $query = "INSERT INTO `private_messages` (`sender`, `recipient`, `subject`, `message`, `time`, `message_read`, `staff_level`)
 				VALUES ('$sender', '$recipient', '$subject', '$message', " . time() . ", 0, '$staff_level')";
         $this->query($query);
-        if($this->db_affected_rows) {
+        if($this->db_last_affected_rows) {
             return true;
         }
         else {
@@ -323,35 +416,33 @@ class System {
         exit;
     }
 
-    /* function censor_check(word)
+    /* function explicitLanguageCheck(word)
         Checks our list of banned words, returns true or false if censored words are detected.
         -Parameters-
         @string
     */
-    public function censor_check($string): bool {
-        $banned_words = [
-            'fuck',
-            'shit',
-            'asshole',
-            'bitch',
-            'cunt',
-            'fag',
-            'asshat',
-            'pussy',
-            ' dick',
-            'whore'
-        ];
-        foreach($banned_words as $word) {
-
+    public function explicitLanguageCheck($string): bool {
+        foreach(self::$banned_words as $word) {
             if(strpos(strtolower($string), $word) !== false) {
-
                 return true;
-
             }
-
         }
         return false;
 
+    }
+
+    /**
+     * @param      $text
+     * @return string
+     */
+    public function explicitLanguageReplace($text): string {
+        //String censorship
+        $word_replace = [];
+        foreach(self::$banned_words as $key => $word) {
+            $word_replace[] = str_repeat('*', strlen($word));
+        }
+
+        return str_ireplace(self::$banned_words, $word_replace, $text);
     }
 
     public function getMemes(): array {
@@ -386,37 +477,34 @@ class System {
         $text = str_replace($memes['codes'], ($faces ? $memes['images'] : $memes['texts']), $text);
 
         if($img) {
-            $search_array[count($search_array)] = "[img]";
+            $search_array[count($search_array)] = "[img]https://";
+            $search_array[count($search_array)] = "[img]http://";
             $search_array[count($search_array)] = "[/img]";
-            $replace_array[count($replace_array)] = "<img src='";
-            $replace_array[count($replace_array)] = "' style='/*IMG_SIZE*/' />";
-
-            $search_array[count($search_array)] = "[url]http:";
-            $search_array[count($search_array)] = "[url]www.";
-            $search_array[count($search_array)] = "[/url]";
-
-            $replace_array[count($replace_array)] = "<a href='http:";
-            $replace_array[count($replace_array)] = "<a href='http://www.";
-            $replace_array[count($replace_array)] = "'>[Link]</a>";
+            $replace_array[count($replace_array)] = "<img src='[image_prefix]";
+            $replace_array[count($replace_array)] = "<img src='[image_prefix]";
+            $replace_array[count($replace_array)] = "' />";
         }
-        else {
-            $reg_exUrl = "/(?:http|https)\:\/\/([a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,5})(?:\/[^\:\s\\\\]*)?/i";
 
-            preg_match_all($reg_exUrl, $text, $matches);
+        $text = str_ireplace($search_array,$replace_array,$text);
 
-            $websites = array();
+        $search_array = [];
+        $replace_array = [];
 
-            foreach($matches[0] as $pattern){
-
-                preg_match($reg_exUrl, $pattern, $url);
-
-                if(!$websites[$pattern]) {
-                    $websites[$pattern] = trim($url[1]);
-                    $text = str_replace($pattern, sprintf("<a href='%s' target='_blank'>%s</a>", $pattern, $websites[$pattern]), $text);
+        $reg_exUrl = '/((?:http|https)\:\/\/(?:[a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,5})(?:\/[^\:\s\\\\]*)?)/i';
+        $text = preg_replace_callback(
+            $reg_exUrl,
+            function($matches) {
+                $display = $matches[1];
+                if(strlen($display) > System::MAX_LINK_DISPLAY_LENGTH) {
+                    $display = substr($display, 0, System::MAX_LINK_DISPLAY_LENGTH - 3) . '...';
                 }
+                return "<a href='{$matches[1]}' target='_blank'>{$display}</a>";
+            },
+            $text
+        );
 
-            }
-        }
+        array_push($search_array, '[image_prefix]');
+        array_push($replace_array, 'https://');
 
         array_push($search_array, '\r\n');
         array_push($replace_array, '<br />');
@@ -695,6 +783,13 @@ class System {
             }
         }
         return $string;
+    }
+
+    public static function dateTimeFromMicrotime(float $microtime) {
+        return DateTime::createFromFormat(
+            'U.u',
+            number_format($microtime, 2, '.', '')
+        );
     }
 }
 

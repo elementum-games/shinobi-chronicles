@@ -7,49 +7,27 @@ Revised:	05/02/2014 by Levi Meahan
 Purpose:	Functions for initiating combat and distributing post-combat rewards
 Algorithm:	See master_plan.html
 */
-function battle() {
+
+/**
+ * @return bool
+ * @throws Exception
+ */
+function battle(): bool {
 	global $system;
 	global $player;
 	global $self_link;
 
 	if($player->battle_id) {
-		require("battleCore.php");
-		$result = $system->query("SELECT * FROM `battles` WHERE `battle_id`='$player->battle_id' LIMIT 1");
-		if($system->db_num_rows == 0) {
-			$system->message("Invalid battle! - fetch");
-			$system->printMessage();
-			$player->battle_id = 0;
-			return false;
-		}
+        $battle = new Battle($system, $player, $player->battle_id);
 
-		try {
-            $battle = $system->db_fetch($result);
-            if($player->id == $battle['player1']) {
-                $opponent = User::fromEntityId($battle['player2']);
-                $battle['player_side'] = 'player1';
-                $battle['opponent_side'] = 'player2';
-            }
-            else if($player->id == $battle['player2']) {
-                $opponent = User::fromEntityId($battle['player1']);
-                $battle['player_side'] = 'player2';
-                $battle['opponent_side'] = 'player1';
-            }
-            else {
-               throw new Exception("Invalid battle! - p1/p2 check");
-            }
-        } catch(Exception $e) {
-            $system->message($e->getMessage());
-            $system->printMessage();
-            $player->battle_id = 0;
-            return false;
-        }
+        $battle->checkTurn();
 
-		$opponent->loadData(1);
-		$winner = battlePvP($player, $opponent, $battle);
-		if($winner !== false) {
+        $battle->renderBattle();
+
+        if($battle->isComplete()) {
 			echo "<table class='table'><tr><th>Battle complete</th></tr>
 			<tr><td style='text-align:center;'>";
-			if($winner == $player->user_id) {
+			if($battle->isPlayerWinner()) {
 				$player->pvp_wins++;
 				$player->monthly_pvp++;
 				$player->last_pvp = time();
@@ -60,13 +38,22 @@ function battle() {
 				$system->query("UPDATE `villages` SET `points`=`points`+'$village_point_gain' WHERE `name`='$player->village' LIMIT 1");
 				echo "You have earned $village_point_gain point for your village.<br />";
 				// Team points
-				if($player->team) {
-					$system->query("UPDATE `teams` SET `points`=`points`+'$team_point_gain', `monthly_points`=`monthly_points`+'$team_point_gain'  
-						WHERE `team_id`={$player->team['id']} LIMIT 1");
+				if($player->team != null) {
+				    $player->team->addPoints($team_point_gain);
+
 					echo "You have earned $team_point_gain point for your team.<br />";
 				}
+				// Daily Tasks
+				$dt = [];
+				foreach ($player->daily_tasks as $task) {
+					if ($task['Task'] == 'PVP Battles' && $task['Complete'] != 1) {
+						$task['Progress']++;
+					}
+					array_push($dt, $task);
+				}
+				$player->daily_tasks = $dt;
 			}
-			else if($winner == $opponent->user_id) {
+			else if($battle->isOpponentWinner()) {
 				echo "You lose. You were taken back to your village by some allied ninja.<br />";
 				$player->health = 5;
 				$player->pvp_losses++;
@@ -76,6 +63,15 @@ function battle() {
 				$location = explode('.', $player->location);
 				$player->x = $location[0];
 				$player->y = $location[1];
+				// Daily Tasks
+				$dt = [];
+				foreach ($player->daily_tasks as $task) {
+					if ($task['Task'] == 'PVP Battles' && $task['SubTask'] == 'Complete' && $task['Complete'] != 1) {
+						$task['Progress']++;
+					}
+					array_push($dt, $task);
+				}
+				$player->daily_tasks = $dt;
 			}
 			else {
 				echo "You both knocked each other out. You were taken back to your village by some allied ninja.<br />";
@@ -85,6 +81,15 @@ function battle() {
 				$player->x = $location[0];
 				$player->y = $location[1];
 				$player->last_pvp = time();
+				// Daily Tasks
+				$dt = [];
+				foreach ($player->daily_tasks as $task) {
+					if ($task['Task'] == 'PVP Battles' && $task['SubTask'] == 'Complete' && $task['Complete'] != 1) {
+						$task['Progress']++;
+					}
+					array_push($dt, $task);
+				}
+				$player->daily_tasks = $dt;
 			}
 			echo "</td></tr></table>";
 			$player->battle_id = 0;

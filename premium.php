@@ -46,14 +46,13 @@ function premium() {
 
 	}
 
-	if($player->bloodline->bloodline_id && $player->clan['id'] != $player->bloodline->clan_id) {
+	if($player->bloodline_id && $player->clan['id'] != $player->bloodline->clan_id) {
 		$system->query(sprintf("SELECT `clan_id`, `name` FROM `clans` WHERE `clan_id` = '%d'", $player->bloodline->clan_id));
 		$result = $system->db_fetch();
 		$available_clans[$result['clan_id']] = stripslashes($result['name']);
 	}
 
-
-	if($_POST['user_reset']) {
+	if(isset($_POST['user_reset'])) {
 		try {
 			if($player->premium_credits < $costs['user_reset']) {
 				throw new Exception("You do not have enough Ancient Kunai!");
@@ -86,7 +85,7 @@ function premium() {
 			$player->chakra = 100;
 			$player->max_chakra = 100;
 			$player->regen_rate = 10;
-			$player->exp = 0;
+			$player->exp = User::BASE_EXP;
 			$player->bloodline_id = 0;
 			$player->bloodline_name = '';
 			$player->clan = array();
@@ -112,7 +111,9 @@ function premium() {
 
 			$player->premium_credits -= $costs['user_reset'];
 
-			$player->updateData(1);
+			$player->exam_stage = 0;
+
+			$player->updateData();
 
 			$system->query("DELETE FROM `user_bloodlines` WHERE `user_id`='$player->user_id'");
 			$system->query("UPDATE `user_inventory` SET
@@ -135,7 +136,7 @@ function premium() {
 			$system->message($e->getMessage());
 		}
 	}
-	else if($_POST['name_change']) {
+	else if(isset($_POST['name_change'])) {
 		$new_name = $system->clean($_POST['new_name']);
 		$nameCost = 1;
 		$akCost = $costs['name_change'];
@@ -153,7 +154,7 @@ function premium() {
 				throw new Exception("Only alphanumeric characters, dashes, and underscores are allowed in usernames!");
 			}
 
-			if($system->censor_check($new_name)) {
+			if($system->explicitLanguageCheck($new_name)) {
 				throw new Exception("Inappropriate language is not allowed in usernames!");
 			}
 
@@ -165,7 +166,7 @@ function premium() {
 			}
 
 			$result = $system->query("SELECT `user_name` FROM `users` WHERE `user_name`='$new_name' LIMIT 1");
-			if($system->db_num_rows) {
+			if($system->db_last_num_rows) {
 				$result = $system->db_fetch();
 				if(strtolower($player->user_name) == strtolower($new_name)) {
 					$nameCost = 0;
@@ -206,7 +207,7 @@ function premium() {
 			$system->message($e->getMessage());
 		}
 	}
-	else if($_POST['stat_reset']) {
+	else if(isset($_POST['stat_reset'])) {
 		$stats = array('ninjutsu_skill', 'taijutsu_skill', 'genjutsu_skill', 'cast_speed', 'speed', 'intelligence', 'willpower');
 		if($player->bloodline_id) {
 			array_unshift($stats, 'bloodline_skill');
@@ -257,7 +258,7 @@ function premium() {
 		}
 		$system->printMessage();
 	}
-	else if($_POST['stat_allocate']) {
+	else if(isset($_POST['stat_allocate'])) {
 		$stats = array('ninjutsu_skill', 'taijutsu_skill', 'genjutsu_skill', 'cast_speed', 'speed', 'intelligence', 'willpower');
 		if($player->bloodline_id) {
 			array_unshift($stats, 'bloodline_skill');
@@ -383,14 +384,12 @@ function premium() {
 		}
 		$system->printMessage();
 	}
-
-
-	else if($_POST['purchase_bloodline']) {
+	else if(isset($_POST['purchase_bloodline'])) {
 		$bloodline_id = $system->clean($_POST['bloodline_id']);
 		try {
 			$result = $system->query("SELECT `bloodline_id`, `name`, `clan_id`, `rank` FROM `bloodlines`
 				WHERE `bloodline_id`='$bloodline_id' AND `rank` < 5 ORDER BY `rank` ASC");
-			if($system->db_num_rows == 0) {
+			if($system->db_last_num_rows == 0) {
 				throw new Exception("Invalid bloodline!");
 			}
 			$result = $system->db_fetch($result);
@@ -430,7 +429,7 @@ function premium() {
 
 			// Set clan
 			$result = $system->query("SELECT `name` FROM `clans` WHERE `clan_id` = '$clan_id' LIMIT 1");
-			if($system->db_num_rows > 0) {
+			if($system->db_last_num_rows > 0) {
 				$clan_result = $system->db_fetch($result);
 
 
@@ -446,7 +445,7 @@ function premium() {
 			$system->message($e->getMessage());
 		}
 	}
-	else if($_POST['forbidden_seal']) {
+	else if(isset($_POST['forbidden_seal'])) {
 		$seal_level = (int)$system->clean($_POST['seal_level']);
 		$seal_length = (int)$system->clean($_POST['seal_length']);
 		try {
@@ -498,7 +497,7 @@ function premium() {
 		}
 		$system->printMessage();
 	}
-	else if($_POST['change_color'] && ($player->forbidden_seal || $player->premium_credits_purchased)) {
+	else if(isset($_POST['change_color']) && ($player->forbidden_seal || $player->premium_credits_purchased)) {
 		$color = $system->clean($_POST['name_color']);
 		switch($color) {
 			case 'blue':
@@ -524,6 +523,14 @@ function premium() {
                 $player->forbidden_seal['color'] = $color;
                 $system->message("Color changed");
                 break;
+			case 'teal':
+				if ($player->staff_level < System::SC_HEAD_MODERATOR) {
+					$system->message("Invalid color!");
+					break;
+				}
+				$player->forbidden_seal['color'] = $color;
+				$system->message("Color changed");
+				break;
 			case 'red':
 				if($player->staff_level < System::SC_ADMINISTRATOR) {
 					$system->message("Invalid color!");
@@ -538,9 +545,7 @@ function premium() {
 		}
 		$system->printMessage();
 	}
-
 	// Change elements
-
 	else if(isset($_POST['change_element']) && $player->rank >= 3) {
         try {
 			$current_element = $_POST['current_element'];
@@ -694,8 +699,7 @@ function premium() {
 					$system->printMessage();
 					return false;
 			}
-
-	else if($_POST['change_village'] && $player->rank >= 3) {
+	else if(isset($_POST['change_village']) && $player->rank >= 2) {
 		$village = $_POST['new_village'];
 		try {
 			if($village == $player->village) {
@@ -769,12 +773,12 @@ function premium() {
 			// Clan
 			$result = $system->query("SELECT `clan_id`, `name` FROM `clans`
 					WHERE `village`='$player->village' AND `bloodline_only`='0'");
-			if($system->db_num_rows == 0) {
+			if($system->db_last_num_rows == 0) {
 				$result = $system->query("SELECT `clan_id`, `name` FROM `clans`
 				WHERE `bloodline_only`='0'");
 			}
 
-			if(! $system->db_num_rows) {
+			if(! $system->db_last_num_rows) {
 				throw new Exception("No clans available!");
 			}
 
@@ -843,7 +847,7 @@ function premium() {
 
 
 	//Clan Change
-	else if($_POST['change_clan'] && $player->rank >= 2) {
+	else if(isset($_POST['change_clan']) && $player->rank >= 2) {
 		$new_clan_id = abs((int) $_POST['clan_change_id']);
 		try {
 
@@ -1151,7 +1155,7 @@ function premium() {
 
 		}
 
-		if($player->rank >= 3) {
+		if($player->rank >= 2) {
 			$villages = array('Stone', 'Cloud', 'Leaf', 'Sand', 'Mist');
 			echo "<table class='table'><tr><th>Change Village</th></tr>
 			<tr><td style='text-align:center;'>
@@ -1191,7 +1195,7 @@ function premium() {
 
 			$result = $system->query("SELECT `bloodline_id`, `name`, `rank`
 				FROM `bloodlines` WHERE `rank` < 5 ORDER BY `rank` ASC");
-			if($system->db_num_rows == 0) {
+			if($system->db_last_num_rows == 0) {
 				echo "No bloodlines available!";
 			}
 			else {
@@ -1277,7 +1281,17 @@ function premium() {
 				($player->forbidden_seal['color'] == 'gold' ? "checked='checked'" : '') . "/>
 				<span class='gold' style='font-weight:bold;'>Gold</span>";
 			}
-			if($player->staff_level >= System::SC_ADMINISTRATOR) {
+			if ($player->staff_level >= System::SC_MODERATOR) {
+				echo "
+				<input type='radio' name='name_color' value='green' " .
+				($player->forbidden_seal['color'] == 'green' ? "checked='checked'" : '') . "/>
+				<span class='moderator' style='font-weight:bold;'>Green</span>";
+			} else if ($player->staff_level >= System::SC_HEAD_MODERATOR) {
+				echo "
+				<input type='radio' name='name_color' value='teal' " .
+				($player->forbidden_seal['color'] == 'teal' ? "checked='checked'" : '') . "/>
+				<span class='headModerator' style='font-weight:bold;'>Teal</span>";
+			} else if ($player->staff_level >= System::SC_ADMINISTRATOR) {
 				echo "
 				<input type='radio' name='name_color' value='red' " .
 				($player->forbidden_seal['color'] == 'red' ? "checked='checked'" : '') . "/>
@@ -1355,7 +1369,7 @@ function premium() {
 				+1 weapon equip slots<br />
 				+1 armor equip slots<br />
 				Enhanced long trainings (1.5x length, 2x gains)<br />
-				Enhanced extended trainings (1.5x length, 2.25x gains)<br />
+				Enhanced extended trainings (1.5x length, 2x gains)<br />
 				<form action='$self_link&view=forbidden_seal' method='post'>
 				<p style='width:100%;text-align:center;margin:0px;margin-top:2.2em;'>
 					<input type='hidden' name='seal_level' value='2' />
@@ -1473,7 +1487,7 @@ function premiumCreditExchange() {
 
 			$system->query("INSERT INTO `premium_credit_exchange` (`seller`, `premium_credits`, `money`)
 			VALUES ('$player->user_id', '$premium_credits', '$money')");
-			if($system->db_affected_rows > 0) {
+			if($system->db_last_affected_rows > 0) {
 				$system->message("Offer placed!");
 			}
 			else {
@@ -1492,7 +1506,7 @@ function premiumCreditExchange() {
 			// Validate input for offer id
 			$id = (int)$system->clean($_GET['purchase']);
 			$result = $system->query("SELECT * FROM `premium_credit_exchange` WHERE `id`='$id' AND `completed`='0' LIMIT 1");
-			if($system->db_num_rows == 0) {
+			if($system->db_last_num_rows == 0) {
 				 throw new Exception("Invalid offer!");
 			}
 
@@ -1528,7 +1542,7 @@ function premiumCreditExchange() {
 			// Validate input for offer id
 			$id = (int)$system->clean($_GET['cancel']);
 			$result = $system->query("SELECT * FROM `premium_credit_exchange` WHERE `id`='$id' AND `completed`='0' LIMIT 1");
-			if($system->db_num_rows == 0) {
+			if($system->db_last_num_rows == 0) {
 				 throw new Exception("Invalid offer!");
 			}
 
@@ -1558,8 +1572,8 @@ function premiumCreditExchange() {
 	/* [DISPLAY] */
 
 	// View offers
-	echo "<table class='table' cellspacing='0' style='width:95%;'>
-	<tr><th colspan='4'><a href='$self_link'>Ancient Kunai Exchange</a></th></tr>
+	echo "<table id='kunaiExchange' class='table' cellspacing='0' style='width:95%;'>
+	<tr'><th colspan='4'><a href='$self_link'>Ancient Kunai Exchange</a></th></tr>
 	<tr>
 		<td colspan='4' style='text-align:center;'>
 			<div style='width:200px;margin-left:auto;margin-right:auto;text-align:left;'>
@@ -1583,7 +1597,7 @@ function premiumCreditExchange() {
 	$credit_users = array();
 
 	//If there are offers in the database
-	if($system->db_num_rows) {
+	if($system->db_last_num_rows) {
 
 		while($row = $system->db_fetch($result)) {
 
@@ -1596,7 +1610,7 @@ function premiumCreditExchange() {
 
 			$sellerName = $credit_users[$row['seller']];
 
-			echo "<tr>
+			echo "<tr  class='fourColGrid' >
 				<td style='text-align:center;'><a href='{$system->links['members']}&user={$sellerName}'>{$sellerName}</a></td>
 				<td style='text-align:center;'>{$row['premium_credits']} AK</td>
 				<td style='text-align:center;'>&yen;{$row['money']}</td>";

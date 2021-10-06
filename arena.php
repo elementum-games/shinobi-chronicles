@@ -25,7 +25,7 @@ function arena() {
 			WHERE `rank` ='" . System::SC_MAX_RANK . "' ORDER BY `level` ASC");
 		}
 		//End
-		if($system->db_num_rows == 0) {
+		if($system->db_last_num_rows == 0) {
 			$system->message("No AI opponents found!");
 			$system->printMessage();
 			return false;
@@ -53,6 +53,7 @@ function arena() {
                     Battle::start($system, $player, $ai, Battle::TYPE_AI_ARENA);
 
                     arena();
+                    $player->log(User::LOG_ARENA, "Opponent {$ai->id} ({$ai->getName()})");
                     return true;
                 } catch(Exception $e) {
                     $system->message("Invalid opponent!");
@@ -88,7 +89,6 @@ function arenaFight(): bool {
 
     try {
         $battle = new Battle($system, $player, $player->battle_id);
-        $battle->loadFighters();
 
         $winner = $battle->checkTurn();
 
@@ -98,6 +98,7 @@ function arenaFight(): bool {
             return true;
         }
         else if($winner == $battle->player_side) {
+            $stat_gain_display = false;
             $opponent = $battle->opponent;
             $money_gain = $battle->opponent->money;
 
@@ -144,7 +145,6 @@ function arenaFight(): bool {
                 if($total_count > 4) {
                     $stat_gain_chance += 15;
                 }
-
                 if($player->total_stats < $player->stat_cap && $stat_gain_chance >= mt_rand(1, 100)) {
                     $stat = '';
                     $highest_count = 0;
@@ -182,7 +182,18 @@ function arenaFight(): bool {
 						<br />You have gained 1 ' . ucwords(str_replace('_', ' ', $stat)) . '.';
                 }
             }
+
+            // TEAM BOOST AI GAINS
+            if($player->team != null) {
+                $boost_percent = $player->team->getAIMoneyBoostAmount();
+                if($boost_percent != null) {
+                    $boost_amount = ceil($boost_percent * $money_gain);
+                    $money_gain += $boost_amount;
+                }
+            }
+
             $player->money += $money_gain;
+
             echo "<table class='table'><tr><th>Battle Results</th></tr>
 			<tr><td>You have defeated your arena opponent.<br />
 			You have claimed your prize of &yen;$money_gain.";
@@ -193,6 +204,16 @@ function arenaFight(): bool {
             $player->ai_wins++;
             $player->battle_id = 0;
             $player->last_pvp = time();
+
+            // Daily Tasks
+            $dt = [];
+            foreach ($player->daily_tasks as $task) {
+                if ($task['Task'] == 'AI Battles' && $task['Complete'] != 1) {
+                    $task['Progress']++;
+                }
+                array_push($dt, $task);
+            }
+            $player->daily_tasks = $dt;
         }
         else if($winner == $battle->opponent_side) {
             echo "<table class='table'><tr><th>Battle Results</th></tr>
@@ -201,6 +222,16 @@ function arenaFight(): bool {
             $player->ai_losses++;
             $player->battle_id = 0;
             $player->last_pvp = time();
+
+            // Daily Tasks
+            $dt = [];
+            foreach ($player->daily_tasks as $task) {
+                if ($task['Task'] == 'AI Battles' && $tast['SubTask'] == 'Complete' && $task['Complete'] != 1) {
+                    $task['Progress']++;
+                }
+                array_push($dt, $task);
+            }
+            $player->daily_tasks = $dt;
         }
         else if($winner == Battle::DRAW) {
             echo "<table class='table'><tr><th>Battle Results</th></tr>
@@ -208,6 +239,16 @@ function arenaFight(): bool {
 			</td></tr></table>";
             $player->battle_id = 0;
             $player->last_pvp = time();
+            
+            // Daily Tasks
+            $dt = [];
+            foreach ($player->daily_tasks as $task) {
+                if ($task['Task'] == 'AI Battles' && $tast['SubTask'] == 'Complete' && $task['Complete'] != 1) {
+                    $task['Progress']++;
+                }
+                array_push($dt, $task);
+            }
+            $player->daily_tasks = $dt;
         }
     } catch(Exception $e) {
         $system->message($e->getMessage());

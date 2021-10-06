@@ -20,9 +20,9 @@ function userSettings() {
 		$max_journal_length = 2000;
 	}
 	
-	$layouts = array('shadow_ribbon', 'geisha', 'classic_blue');
+	$layouts = array('shadow_ribbon', 'geisha', 'classic_blue', 'blue_scroll');
 	if($system->environment == 'dev') {
-	  $layouts[] = 'cextralite';
+	    $layouts[] = 'cextralite';
 	}
 
 	require_once "profile.php";
@@ -75,7 +75,7 @@ function userSettings() {
 		$result = $system->db_fetch($result);
 		
 		try {
-			if($system->verify_password($password, $result['password'])) {
+			if(!$system->verify_password($password, $result['password'])) {
 				throw new Exception("Current password is incorrect!");
 			}
 			
@@ -109,7 +109,7 @@ function userSettings() {
 		
 			$password = $system->hash_password($password);
 			$system->query("UPDATE `users` SET `password`='$password' WHERE `user_id`='{$player->user_id}' LIMIT 1");
-			if($system->db_affected_rows >= 1) {
+			if($system->db_last_affected_rows >= 1) {
 				$system->message("Password updated!");
 			}
 		} catch (Exception $e) {
@@ -130,7 +130,7 @@ function userSettings() {
 				throw new Exception("Invaild song link!");
 			}
 			$system->query("UPDATE `users` SET `profile_song`='{$profile_song}' WHERE `user_id`='{$player->user_id}' LIMIT 1");
-			if($system->db_affected_rows == 1) {
+			if($system->db_last_affected_rows == 1) {
 				$player->profile_song = $profile_song;
 				$system->message("Profile song updated!");
 			}
@@ -151,7 +151,7 @@ function userSettings() {
 			}
 			
 			$system->query("UPDATE `journals` SET `journal`='$journal' WHERE `user_id`='{$player->user_id}' LIMIT 1");
-			if($system->db_affected_rows == 1) {
+			if($system->db_last_affected_rows == 1) {
 				$system->message("Journal updated!");
 			}
 		} catch (Exception $e) {
@@ -163,7 +163,7 @@ function userSettings() {
 		$blacklist_username = $system->clean(trim($_POST['blacklist_name']));
 		$result = $system->query("SELECT `user_id`, `user_name`, `staff_level` FROM `users` WHERE `user_name`='{$blacklist_username}'");
 		try {
-			if($system->db_num_rows == 0) {
+			if($system->db_last_num_rows == 0) {
 				throw new Exception("User doesn't exist or check your spelling!");
 			}
 			else {
@@ -230,7 +230,8 @@ function userSettings() {
 		else {
 			$query = "UPDATE `users` SET `layout`='$layout' WHERE `user_id`='$player->user_id' LIMIT 1";
 			$system->query($query);
-			$system->message("Layout updated!<script type='text/javascript'>setTimeout('window.location.reload();', 2000);</script>");
+			$system->message("Layout updated!
+                <script type='text/javascript'>setTimeout('window.location.assign(window.location.href)', 2000);</script>");
 			$system->printMessage();
 		}
 	}
@@ -278,7 +279,7 @@ function userSettings() {
 	</td></tr>";
 	
 	$result = $system->query("SELECT `journal` FROM `journals` WHERE `user_id` = '{$player->user_id}' LIMIT 1");
-	if($system->db_num_rows == 0) {
+	if($system->db_last_num_rows == 0) {
 		$journal = '';
 		$system->query("INSERT INTO `journals` (`user_id`, `journal`) VALUES('{$player->user_id}', '')");
 	}
@@ -321,14 +322,45 @@ function userSettings() {
 		echo "</p>You are currenly banned from editing your profile song.</p>";
 	}
 	echo "</td></tr>";*/
-	
+
+    //Blacklist
+    echo "<tr><th>Blocklist</th></tr>
+		<tr><td style='text-align:center;'>
+	";
+    if(!empty($player->blacklist)) {
+        $list = "";
+        $i = 0;
+        foreach ($player->blacklist as $id => $name) {
+            $i++;
+            // var_dump($name);
+            $list .= "<a href='{$system->links['members']}&user={$name[$id]['user_name']}'>{$name[$id]['user_name']}</a><sup>(<a href='$self_link&blacklist_remove=$id'>x</a>)</sup>";
+            if(count($player->blacklist) > $i) {
+                $list .= ", ";
+            }
+        }
+        echo "$list";
+    }
+    else {
+        echo "<p style='text-align:center;'>No blocked users!</p>";
+    }
+    echo "
+	<br />
+	<form action='$self_link' method='post'>
+		<input type='text' name='blacklist_name' style='width:250px;' /> <br />
+		<input type='submit' name='blacklist_add' value='Add' />
+		<input type='submit' name='blacklist_remove' value='Remove' />
+	</form>
+	</td></tr>";
 	
 	echo "<tr><th>Journal</th></tr>
-	<tr><td style='text-align:center;'>
-	<i>(Images will be resized down to a max of " . ($player->forbidden_seal ? '500x500' : '300x200') . ")</i>";
+	<tr><td style='text-align:center;'>";
+    if(!$player->forbidden_seal) {
+        echo "<i>(Images will be resized down to a max of 300x200</i>";
+    }
+
 	if(!$player->journal_ban) {
 		echo "<form action='$self_link' method='post'>
-		<textarea style='height:200px;width:500px;' name='journal'>" . stripslashes($journal) . "</textarea>
+		<textarea style='height:350px;width:95%;margin:10px 0;' name='journal'>" . stripslashes($journal) . "</textarea>
 		<br />
 		<input type='submit' name='change_journal' value='Update' />
 		</form>";
@@ -337,35 +369,6 @@ function userSettings() {
 		echo "<p>You are currently banned from editing your journal.</p>";
 	}
 	echo "</td></tr>";
-
-	//Blacklist
-	echo "<tr><th>Blacklist</th></tr>
-		<tr><td style='text-align:center;'>
-	";
-	if(!empty($player->blacklist)) {
-		$list = "";
-		$i = 0;
-		foreach ($player->blacklist as $id => $name) {
-			$i++;
-			$list .= "<a href='{$system->links['members']}&user={$name['user_name']}'>{$name['user_name']}</a><sup>(<a href='$self_link&blacklist_remove=$id'>x</a>)</sup>";
-			if(count($player->blacklist) > $i) {
-				$list .= ", ";
-			}
-		}
-		echo "$list";
-	}
-	else {
-		echo "<p style='text-align:center;'>No blocked users!</p>";
-	}
-	echo "
-	<br />
-	<form action='$self_link' method='post'>
-		<input type='text' name='blacklist_name' style='width:250px;' /> <br />
-		<input type='submit' name='blacklist_add' value='Add' />
-		<input type='submit' name='blacklist_remove' value='Remove' />
-	</form>
-	</td></tr>
-	";
 	
 	echo "</tr></table>";
 	

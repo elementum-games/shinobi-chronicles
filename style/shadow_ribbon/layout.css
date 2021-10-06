@@ -80,7 +80,7 @@ body {
 /* Content */
 #container {
 	/* Structure */
-	width: 1000px;
+	width: 1030px;
 	position:relative;
 	
 	margin-left: auto;
@@ -95,11 +95,11 @@ body {
 }
 
 #content {
-	width: 710px;
+	width: 750px;
 	min-height:500px;
 
 	float: left;
-    margin-left: 10px;
+    margin-left: 8px;
 }
 h2#title {
 	margin-left:30px;
@@ -267,8 +267,7 @@ label {
 }
 
 #content table.table {
-	margin: auto;
-	margin-top:25px;
+	margin: 15px auto;
 	padding:0px;
 	width: 95%;
 	
@@ -277,11 +276,10 @@ label {
 	/* Style */
 	color: inherit;
 	font-size: inherit;
-	
-	background-color: #FAFAFA;
-	background: linear-gradient(to bottom right, #FAFAFA, #F0F0F0);
-	
-	border: 1px solid #D0D0D0;
+
+    background: #FAFAFA linear-gradient(to bottom right, #FAFAFA, #F0F0F0);
+
+    border: 1px solid #D0D0D0;
 	border-radius:16px;
 	border-spacing: 0px;
 }
@@ -300,6 +298,9 @@ label {
 	color: #202020;
 	border-bottom:1px solid #202020;
 	text-shadow: 0px 1px 0px #606060;
+}
+#content table.globalMessage {
+    table-layout: initial;
 }
 
 #content .button {
@@ -367,11 +368,12 @@ table.globalMessage tr:last-child td:last-child  {
 
 #content .contentHeader {
 	/* Structure */
-	margin-top: 25px;
-	margin-left: 25px;
+	margin-top: 20px;
+	margin-left: 20px;
+    margin-bottom: -5px;
 	
 	/* Style */
-	font-size: 30px;
+	font-size: 24px;
 	font-weight: bold;
 	font-family: "Lucida Sans Unicode", "Lucida Grande", sans-serif;
 	color: #A02000;
@@ -424,7 +426,7 @@ p {
 	padding-left: 10px;
 	
 	left: 0px;
-	top: 62px;
+	top: 30px;
 	
 	z-index: 50;
 	
@@ -548,8 +550,8 @@ p {
 #content table.table td.newsFooter {
 	text-align:right;
 	background-color:#EAEAEA;
-	padding:2px;
-	padding-right:5px;
+	padding: 4px 8px;
+    border: none;
 	
 	font-size:14px;
 	font-family:"comic sans ms";
@@ -665,7 +667,7 @@ p {
 
 #content ul.submenu {
 	width: 90%;
-    margin: 20px auto auto;
+    margin: 15px auto;
     padding:0px;
 	
 	border: 1px solid #000000;
@@ -847,4 +849,164 @@ br.clear {
 
     border-bottom-left-radius: 10px;
     border-bottom-right-radius: 10px;
+}
+
+.contentDiv,
+.contentDivMed {
+    width: 95%;
+    margin: 15px auto 15px auto;
+
+    background: #FAFAFA linear-gradient(to bottom right, #FAFAFA, #F0F0F0);
+    border-radius: 10px;
+	border: 1px solid #2020209d;
+}
+
+.contentDivMed {
+    width: 70%;
+}
+
+.contentDivHeader {
+    padding: 5px 0;
+	margin: 0 auto;
+    text-align: center;
+
+    background: linear-gradient(#E7584A, #B84433);
+	border-bottom: 1px solid #202020;
+	border-top-left-radius: 8px;
+	border-top-right-radius: 8px;
+
+    color: #202020;
+	text-shadow: 0 1px 0 #000000;
+    font-size: 1rem;
+}
+
+.contentDivCaption {
+    width: 90%;
+    padding: 15px 0;
+    text-align: center;
+    margin: 0 auto;
+
+    color: rgb(48, 48, 48);
+    font-size: 1.3rem;
+    font-family: 'BebasNeue', sans-serif;
+}
+
+.contentDivCaption span:first-of-type {
+    padding-right: 10px;
+
+    color: rgb(48, 48, 48);
+	font-weight: bold;
+}
+
+#dailyTaskWrapper {
+    width: 95%;
+    margin: 0 auto;
+    display: flex;
+    flex-flow: column wrap;
+    padding: 10px 0 0 0;
+}
+
+.dailyTask {
+    display: flex;
+    flex-flow: row wrap;
+}
+
+.dailyTaskTitle {
+    flex-grow: 4;
+    width: 100%;
+    padding: 5px 0 10px 0;
+
+    font-size: 1rem;
+    color: rgb(48, 48, 48);
+    text-transform: uppercase;
+}
+
+.dailyTaskGoal span:first-of-type,
+.dailyTaskReward span:first-of-type,
+.dailyTaskDifficulty span:first-of-type {
+    padding-right: 10px;
+
+    color: rgb(48, 48, 48);
+    text-transform: uppercase;
+	font-weight: bold;
+}
+
+.dailyTaskGoal,
+.dailyTaskReward,
+.dailyTaskDifficulty {
+    text-align: left;
+
+    color: rgb(48, 48, 48);
+    font-size: 0.7rem;
+}
+
+.dailyTaskReward {
+    text-align: left;
+}
+
+.dailyTaskDifficulty {
+    text-align: left;
+}
+
+.dailyTaskGoal, 
+.dailyTaskReward,
+.dailyTaskDifficulty {
+    flex-grow: 1;
+    width: 33%;
+}
+
+.dailyTaskDifficulty span:last-of-type {
+    font-weight: bold;
+}
+
+.dailyTaskProgress {
+    display: flex;
+    flex-grow: 3;
+    width: 90%;
+    height: 30px;
+}
+
+.dailyTaskProgressCaption {
+    flex-grow: 1;
+    width: 10%;
+    text-align: center;
+    line-height: 30px;
+
+    color: rgb(48, 48, 48);
+    font-size: 0.8rem;
+    font-weight: bold;
+}
+
+.dailyTaskProgressBar {
+    height: 10px;
+    width: 100%;
+    align-self: center;
+
+    background: #575656;
+    box-shadow: 0 0 1px #000000 inset, 0 0 0 1px rgba(255,255,255,0.02);
+    border: 1px solid #000000;
+}
+
+.dailyTaskProgressBar div {
+    height: 100%;
+    margin-left: 0;
+
+    background: linear-gradient(#E7584A, #B84433);
+    border-right: 1px solid #000000;
+}
+
+.dailyTaskComplete div {
+    background: #218821;
+}
+
+.dailyTaskEasy {
+    color: #3bac4e;
+}
+
+.dailyTaskMedium {
+    color: #b1a00b;
+}
+
+.dailyTaskHard {
+    color: #d13535;
 }

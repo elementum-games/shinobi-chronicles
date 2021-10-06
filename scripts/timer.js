@@ -94,3 +94,34 @@ function timeRemaining(time_remaining, format, include_days, include_seconds) {
 	}
 	return string;
 }
+
+
+function currentTimeStringUTC(offset, target) {
+	let months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+	let days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+
+	let d = new Date();
+	
+	d.setTime(d.getTime() + (offset * 1000));
+
+	let day = days[d.getUTCDay()];
+	let hour = d.getUTCHours();
+	let mins = d.getUTCMinutes();
+	let secs = d.getUTCSeconds();
+	if (mins < 10) {
+		mins = "0" + mins;
+	}
+	if (secs < 10) {
+		secs = "0" + secs;
+	}
+	let ampm = "am";
+	if (hour > 12) {
+		hour -= 12;
+		ampm = "pm";
+	}
+	let currDate = d.getUTCDate();
+	let month = months[d.getUTCMonth()];
+	let year = d.getUTCFullYear();
+	let div = document.getElementById(target);
+	div.innerHTML = day + ", " + month + " " + currDate + ", " + year + " - " + hour + ":" + mins + ":" + secs + " " + ampm;
+	}
