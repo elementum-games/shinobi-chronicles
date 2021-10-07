@@ -717,15 +717,14 @@ class User extends Fighter {
         if($time_difference > 60 && $UPDATE >= 1) {
             $minutes = floor($time_difference / 60);
 
-            $regen_amount = $minutes * $this->regen_rate;
-            $regen_amount += $this->regen_boost;
+            $regen_amount = $minutes * ($this->regen_rate + $this->regen_boost);
 
             // In-battle decrease
-            if($this->battle_id or isset($_SESSION['ai_id'])) {
+            if($this->battle_id) {
                 $regen_amount -= round($regen_amount * 0.7, 1);
             }
 
-            $this->health += $regen_amount;
+            $this->health += $regen_amount * 2;
             $this->chakra += $regen_amount;
             $this->stamina += $regen_amount;
 
