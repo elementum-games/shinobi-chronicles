@@ -138,7 +138,7 @@ function chat() {
 			<tr><th>Post Message</th></tr>
 			<tr><td style='text-align:center;'>
 			<form action='$self_link' method='post'>
-				<textarea id='chatMessage' name='post' style='width:350px;height:100px;'></textarea><br />
+				<textarea id='chatMessage' name='post' style='width:375px;height:100px;'></textarea><br />
 				<input type='checkbox' id='quickReply' name='quick_reply' value='1' " .
 				($_SESSION['quick_reply'] ? "checked='checked'" : '') .
 				"/> Quick reply<br />
