@@ -3,8 +3,21 @@
 /* Class:		Mission
 */
 class Mission {
+    const RANK_D = 1;
+    const RANK_C = 2;
+    const RANK_B = 3;
+    const RANK_A = 4;
+    const RANK_S = 5;
 
     const TYPE_TEAM = 3;
+
+    public static array $rank_names = [
+        Mission::RANK_D => 'D-Rank',
+        Mission::RANK_C => 'C-Rank',
+        Mission::RANK_B => 'B-Rank',
+        Mission::RANK_A => 'A-Rank',
+        Mission::RANK_S => 'S-Rank'
+    ];
 
     public int $mission_id;
     public string $name;
@@ -275,5 +288,16 @@ class Mission {
 
 
         return $mission;
+    }
+
+    public static function maxMissionRank(int $player_rank): int {
+        $max_mission_rank = Mission::RANK_D;
+        if($player_rank == 3) {
+            $max_mission_rank = Mission::RANK_B;
+        }
+        else if($player_rank >= 4) {
+            $max_mission_rank = Mission::RANK_A;
+        }
+        return $max_mission_rank;
     }
 }

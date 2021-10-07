@@ -20,19 +20,8 @@ function missions() {
         runActiveMission();
         return true;
 	}
-	
-	$max_mission_rank = 1;
-	if($player->rank == 3) {
-		$max_mission_rank = 3;
-	}
-	else if($player->rank == 4) {
-		$max_mission_rank = 4;
-	}
-	else if($player->rank > System::SC_MAX_RANK) {
-		$max_mission_rank = System::SC_MAX_RANK;
-	}
 
-	$mission_rank_names = array(1 => 'D-Rank', 2 => 'C-Rank', 3 => 'B-Rank', 4 => 'A-Rank', 5 => 'S-Rank');
+	$max_mission_rank = Mission::maxMissionRank($player->rank);
 	
 	$result = $system->query("SELECT `mission_id`, `name`, `rank` FROM `missions` WHERE `mission_type`=1 OR `mission_type`=5 AND `rank` <= $max_mission_rank");
 	if($system->db_last_num_rows == 0) {
@@ -53,7 +42,7 @@ function missions() {
 	$width = 100 / $max_mission_rank;
 	$width = round($width - 0.6, 2);
 	for($i = 1; $i <= $max_mission_rank; $i++) {
-		echo "<li style='width:$width%;'><a href='{$self_link}&view_rank=$i'>" . $mission_rank_names[$i] . "</a></li> ";
+		echo "<li style='width:$width%;'><a href='{$self_link}&view_rank=$i'>" . Mission::$rank_names[$i] . "</a></li> ";
 	}
 	echo "</ul>
 	</div>
@@ -86,9 +75,9 @@ function missions() {
 			$view = $max_mission_rank;
 		}
 	}
-	echo "<table class='table'><tr><th>" . $mission_rank_names[$view] . " Missions</th></tr>
+	echo "<table class='table'><tr><th>" . Mission::$rank_names[$view] . " Missions</th></tr>
 	<tr><td style='text-align:center;'>You can go on village missions here. As a " . $RANK_NAMES[$player->rank] . " you
-	can take on up to " . $mission_rank_names[$max_mission_rank] . " missions.</td></tr>
+	can take on up to " . Mission::$rank_names[$max_mission_rank] . " missions.</td></tr>
 	<tr><td style='text-align:center;'>";
 	foreach($missions as $id => $mission) {
 		if($mission['rank'] != $view) {
@@ -313,14 +302,11 @@ function runActiveMission() {
             // check what mission rank for daily Task
             $all_mission_ranks = [0, 1, 2, 3, 4];
             $mission_rank = $all_mission_ranks[$mission->rank];
-            $dt = [];
             foreach ($player->daily_tasks as $task) {
-                if ($task['Task'] == 'Missions' && $task['MissionRank'] == $mission_rank && !$task['Complete']) {
-                    $task['Progress']++;
+                if ($task->activity == DailyTask::ACTIVITY_MISSIONS && $task->mission_rank == $mission_rank && !$task->complete) {
+                    $task->progress++;
                 }
-                array_push($dt, $task);
             }
-            $player->daily_tasks = $dt;
 
             $player->money += $mission->money;
             $player->clearMission();
