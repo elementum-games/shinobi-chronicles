@@ -29,11 +29,11 @@ function chat() {
     $chat_max_post_length = System::CHAT_MAX_POST_LENGTH;
 	if(isset($_POST['post'])) {
 		//If user has seal or is of staff, give them their words
-		$chat_max_post_length += ($player->forbidden_seal || $player->staff_level >= System::SC_MODERATOR) ? 100 : 0;
+		$chat_max_post_length += $player->forbidden_seal ? 100 : 0;
 		$message = $system->clean(stripslashes(trim($_POST['post'])));
 		try {
 			$result = $system->query("SELECT `message` FROM `chat` WHERE `user_name` = '$player->user_name' ORDER BY  `post_id` DESC LIMIT 1");
-			if($system->db_num_rows) {
+			if($system->db_last_num_rows) {
 				$post = $system->db_fetch($result);
 				if($post['message'] == $message) {
 					throw new Exception("You cannot post the same message twice in a row!");
@@ -54,7 +54,8 @@ function chat() {
 				'gold' => -3,
 				'green' => -4,
 				'teal' => -5,
-				'red' => -6
+				'purple' => -6,
+				'red' => -7,
 			);
 			$user_color = (!$player->forbidden_seal) ? 0 : ($supported_colors[$player->forbidden_seal['color']]);
 
@@ -64,7 +65,7 @@ function chat() {
 			$system->query(sprintf(
 			    $sql, $player->user_name, $message, $title, $player->village, $staff_level, $user_color, time(), 0
             ));
-			if($system->db_affected_rows) {
+			if($system->db_last_affected_rows) {
 				$system->message("Message posted!");
 			}
 		} catch(Exception $e) {
@@ -72,10 +73,10 @@ function chat() {
 		}
 		$system->printMessage();
 	}
-	else if(isset($_GET['delete']) && $player->staff_level >= System::SC_MODERATOR) {
+	else if(isset($_GET['delete']) && $player->isModerator()) {
 		$delete = (int) $system->clean($_GET['delete']);
 		$result = $system->query("DELETE FROM `chat` WHERE `post_id` = $delete LIMIT 1");
-		$return_message = ($system->db_affected_rows) ? "Post deleted!" : "Error deleting post!";
+		$return_message = ($system->db_last_affected_rows) ? "Post deleted!" : "Error deleting post!";
 		$system->message($return_message);
 		$system->printMessage();
 	}
@@ -138,7 +139,7 @@ function chat() {
 			<tr><th>Post Message</th></tr>
 			<tr><td style='text-align:center;'>
 			<form action='$self_link' method='post'>
-				<textarea id='chatMessage' name='post' style='width:350px;height:100px;'></textarea><br />
+				<textarea id='chatMessage' name='post' style='width:375px;height:100px;'></textarea><br />
 				<input type='checkbox' id='quickReply' name='quick_reply' value='1' " .
 				($_SESSION['quick_reply'] ? "checked='checked'" : '') .
 				"/> Quick reply<br />
@@ -163,7 +164,7 @@ function chat() {
 			<th style='width:61%;'>Message</th>
 			<th style='width:10%;'>Time</th>
 		</tr>";
-		if(! $system->db_num_rows) {
+		if(! $system->db_last_num_rows) {
 			echo "<tr><td colspan='2' style='text-align:center;'>No posts!</td></tr>";
 		}
 		while($post = $system->db_fetch($result)) {
@@ -191,6 +192,9 @@ function chat() {
                     $class .= 'headModerator';
                     break;
                 case -6:
+                    $class .= 'contentAdmin';
+                    break;
+                case -7:
                     $class .= 'administrator';
                     break;
                 default:
@@ -256,7 +260,7 @@ function chat() {
 				echo "<td style='text-align:center;font-style:italic;'>
                     <div style='margin-bottom: 2px;'>{$posted}</div>";
 
-                    if($player->staff_level >= System::SC_MODERATOR) {
+                    if($player->isModerator()) {
                         echo sprintf("<a class='imageLink' href='$self_link&delete=%d'><img src='./images/delete_icon.png' style='max-width:20px;max-height:20px;' /></a>", $post['post_id']);
                     }
                     echo "<a class='imageLink' href='{$system->links['report']}&report_type=3&content_id=" . $post['post_id'] . "'>

@@ -3,20 +3,44 @@
 /* Class:		Mission
 */
 class Mission {
-    public $mission_id;
-    public $name;
+    const RANK_D = 1;
+    const RANK_C = 2;
+    const RANK_B = 3;
+    const RANK_A = 4;
+    const RANK_S = 5;
+
+    const TYPE_TEAM = 3;
+
+    public static array $rank_names = [
+        Mission::RANK_D => 'D-Rank',
+        Mission::RANK_C => 'C-Rank',
+        Mission::RANK_B => 'B-Rank',
+        Mission::RANK_A => 'A-Rank',
+        Mission::RANK_S => 'S-Rank'
+    ];
+
+    public int $mission_id;
+    public string $name;
     public $rank;
     public $mission_type;
     public $stages;
     public $money;
 
+    public User $player;
+    public ?Team $team;
+
+    /**
+     * @var false|mixed
+     */
+    public $current_stage;
+
     private $system;
 
-    public function __construct($mission_id, &$player = false, &$team = false) {
+    public function __construct($mission_id, User $player, ?Team $team = null) {
         global $system;
         $this->system = $system;
         $result = $this->system->query("SELECT * FROM `missions` WHERE `mission_id`='$mission_id' LIMIT 1");
-        if($this->system->db_num_rows == 0) {
+        if($this->system->db_last_num_rows == 0) {
             return false;
         }
 
@@ -32,9 +56,8 @@ class Mission {
         $this->money = $mission_data['money'];
 
         // Unset team if normal mission
-        if($this->mission_type != 3) {
-            unset($this->team);
-            $this->team = false;
+        if($this->mission_type != Mission::TYPE_TEAM) {
+            $this->team = null;
         }
 
         $stages = json_decode($mission_data['stages'], true);
@@ -47,7 +70,7 @@ class Mission {
             $this->current_stage = $this->player->mission_stage;
         }
         else {
-            if($this->team) {
+            if($this->team != null) {
                 $this->nextTeamStage(1);
             }
             else {
@@ -127,7 +150,7 @@ class Mission {
         return 1;
     }
 
-    public function nextTeamStage($stage_id) {
+    public function nextTeamStage($stage_id): int {
         global $villages;
 
         // Return signal for mission complete
@@ -137,19 +160,19 @@ class Mission {
 
         // Check for old stage
         $old_stage = false;
-        if($this->player->mission_stage['stage_id'] < $this->team['mission_stage']['stage_id']) {
+        if($this->player->mission_stage['stage_id'] < $this->team->mission_stage['stage_id']) {
             $old_stage = true;
         }
 
         // Check multi counts, block stage id
         $new_stage = true;
-        if($this->team['mission_stage']['count_needed'] && !$old_stage) {
-            $this->team['mission_stage']['count']++;
-            if($this->team['mission_stage']['count'] < $this->team['mission_stage']['count_needed']) {
+        if($this->team->mission_stage['count_needed'] && !$old_stage) {
+            $this->team->mission_stage['count']++;
+            if($this->team->mission_stage['count'] < $this->team->mission_stage['count_needed']) {
                 $stage_id--;
                 $new_stage = false;
-                $mission_stage = json_encode($this->team['mission_stage']);
-                $this->system->query("UPDATE `teams` SET `mission_stage`='$mission_stage' WHERE `team_id`={$this->team['id']} LIMIT 1");
+                $mission_stage = json_encode($this->team->mission_stage);
+                $this->system->query("UPDATE `teams` SET `mission_stage`='$mission_stage' WHERE `team_id`={$this->team->id} LIMIT 1");
             }
         }
 
@@ -166,7 +189,7 @@ class Mission {
         }
 
         // Clear mission if it was cancelled
-        if($new_stage && !$this->team['mission_id']) {
+        if($new_stage && !$this->team->mission_id) {
             $this->player->clearMission();
             return 1;
         }
@@ -183,13 +206,13 @@ class Mission {
                 $this->current_stage['count_needed'] = 0;
             }
 
-            $this->team['mission_stage']['stage_id'] = $stage_id;
-            $this->team['mission_stage']['count'] = $this->current_stage['count'];
-            $this->team['mission_stage']['count_needed'] = $this->current_stage['count_needed'];
+            $this->team->mission_stage['stage_id'] = $stage_id;
+            $this->team->mission_stage['count'] = $this->current_stage['count'];
+            $this->team->mission_stage['count_needed'] = $this->current_stage['count_needed'];
 
-            $mission_stage = json_encode($this->team['mission_stage']);
+            $mission_stage = json_encode($this->team->mission_stage);
 
-            $this->system->query("UPDATE `teams` SET `mission_stage`='$mission_stage' WHERE `team_id`='{$this->team['id']}' LIMIT 1");
+            $this->system->query("UPDATE `teams` SET `mission_stage`='$mission_stage' WHERE `team_id`='{$this->team->id}' LIMIT 1");
         }
 
         if($this->current_stage['action_type'] == 'travel' || $this->current_stage['action_type'] == 'search') {
@@ -265,5 +288,16 @@ class Mission {
 
 
         return $mission;
+    }
+
+    public static function maxMissionRank(int $player_rank): int {
+        $max_mission_rank = Mission::RANK_D;
+        if($player_rank == 3) {
+            $max_mission_rank = Mission::RANK_B;
+        }
+        else if($player_rank >= 4) {
+            $max_mission_rank = Mission::RANK_A;
+        }
+        return $max_mission_rank;
     }
 }

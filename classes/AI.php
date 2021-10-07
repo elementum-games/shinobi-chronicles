@@ -62,7 +62,7 @@ class AI extends Fighter {
         $this->id = self::ID_PREFIX . ':' . $this->ai_id;
 
         $result = $system->query("SELECT `ai_id`, `name` FROM `ai_opponents` WHERE `ai_id`='$this->ai_id' LIMIT 1");
-        if($system->db_num_rows == 0) {
+        if($system->db_last_num_rows == 0) {
             throw new Exception("AI does not exist!");
         }
 

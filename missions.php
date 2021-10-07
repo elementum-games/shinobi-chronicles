@@ -20,22 +20,11 @@ function missions() {
         runActiveMission();
         return true;
 	}
-	
-	$max_mission_rank = 1;
-	if($player->rank == 3) {
-		$max_mission_rank = 3;
-	}
-	else if($player->rank == 4) {
-		$max_mission_rank = 4;
-	}
-	else if($player->rank > System::SC_MAX_RANK) {
-		$max_mission_rank = System::SC_MAX_RANK;
-	}
 
-	$mission_rank_names = array(1 => 'D-Rank', 2 => 'C-Rank', 3 => 'B-Rank', 4 => 'A-Rank', 5 => 'S-Rank');
+	$max_mission_rank = Mission::maxMissionRank($player->rank);
 	
 	$result = $system->query("SELECT `mission_id`, `name`, `rank` FROM `missions` WHERE `mission_type`=1 OR `mission_type`=5 AND `rank` <= $max_mission_rank");
-	if($system->db_num_rows == 0) {
+	if($system->db_last_num_rows == 0) {
 		$system->message("No missions available!");
 		$system->printMessage();
 		return false;
@@ -53,7 +42,7 @@ function missions() {
 	$width = 100 / $max_mission_rank;
 	$width = round($width - 0.6, 2);
 	for($i = 1; $i <= $max_mission_rank; $i++) {
-		echo "<li style='width:$width%;'><a href='{$self_link}&view_rank=$i'>" . $mission_rank_names[$i] . "</a></li> ";
+		echo "<li style='width:$width%;'><a href='{$self_link}&view_rank=$i'>" . Mission::$rank_names[$i] . "</a></li> ";
 	}
 	echo "</ul>
 	</div>
@@ -86,9 +75,9 @@ function missions() {
 			$view = $max_mission_rank;
 		}
 	}
-	echo "<table class='table'><tr><th>" . $mission_rank_names[$view] . " Missions</th></tr>
+	echo "<table class='table'><tr><th>" . Mission::$rank_names[$view] . " Missions</th></tr>
 	<tr><td style='text-align:center;'>You can go on village missions here. As a " . $RANK_NAMES[$player->rank] . " you
-	can take on up to " . $mission_rank_names[$max_mission_rank] . " missions.</td></tr>
+	can take on up to " . Mission::$rank_names[$max_mission_rank] . " missions.</td></tr>
 	<tr><td style='text-align:center;'>";
 	foreach($missions as $id => $mission) {
 		if($mission['rank'] != $view) {
@@ -265,10 +254,10 @@ function runActiveMission() {
 
             $team_points = 2;
             // Process team rewards if this is the first completing player, then unset the mission ID
-            if($player->team['mission_id']) {
+            if($player->team->mission_id) {
                 $system->query("UPDATE `teams` SET 
 						`points`=`points` + $team_points, `monthly_points`=`monthly_points` + $team_points,`mission_id`=0 
-						WHERE `team_id`={$player->team['id']}");
+						WHERE `team_id`={$player->team->id}");
             }
 
             echo "<table class='table'><tr><th>Current Mission</th></tr>
@@ -313,14 +302,11 @@ function runActiveMission() {
             // check what mission rank for daily Task
             $all_mission_ranks = [0, 1, 2, 3, 4];
             $mission_rank = $all_mission_ranks[$mission->rank];
-            $dt = [];
             foreach ($player->daily_tasks as $task) {
-                if ($task['Task'] == 'Missions' && $task['MissionRank'] == $mission_rank && !$task['Complete']) {
-                    $task['Progress']++;
+                if ($task->activity == DailyTask::ACTIVITY_MISSIONS && $task->mission_rank == $mission_rank && !$task->complete) {
+                    $task->progress++;
                 }
-                array_push($dt, $task);
             }
-            $player->daily_tasks = $dt;
 
             $player->money += $mission->money;
             $player->clearMission();
@@ -335,12 +321,12 @@ function runActiveMission() {
     else if($player->mission_id){
         echo "<table class='table'><tr><th>Current Mission (<a href='$self_link&cancel_mission=1'>Abandon Mission</a>)</th></tr>
 			<tr><td style='text-align:center;'><span style='font-weight:bold;'>" .
-            ($mission->mission_type == 3 ? '[' . $player->team['name'] . '] ' : '') . "$mission->name</span><br />" .
+            ($mission->mission_type == 3 ? '[' . $player->team->name . '] ' : '') . "$mission->name</span><br />" .
             $player->mission_stage['description'];
 
         // Display counts of team/solo mission
-        if($mission->mission_type == 3 && $mission->team['mission_stage']['count_needed']) {
-            echo ' (' . $mission->team['mission_stage']['count'] . '/' . $mission->team['mission_stage']['count_needed'] . ' complete)';
+        if($mission->mission_type == 3 && $mission->team->mission_stage['count_needed']) {
+            echo ' (' . $mission->team->mission_stage['count'] . '/' . $mission->team->mission_stage['count_needed'] . ' complete)';
         }
         else if(!empty($player->mission_stage['count_needed'])) {
             echo ' (' . $player->mission_stage['count'] . '/' . $player->mission_stage['count_needed'] . ' complete)';

@@ -8,7 +8,7 @@ function viewBattles() {
     $battle_types = [Battle::TYPE_SPAR, Battle::TYPE_FIGHT, Battle::TYPE_CHALLENGE];
     $limit = 20;
 
-    if($player->staff_level >= System::SC_HEAD_ADMINISTRATOR) {
+    if($player->isHeadAdmin()) {
         // $battle_types[] = Battle::TYPE_AI_ARENA;
         $limit = 25;
     }

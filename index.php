@@ -68,7 +68,7 @@ if(!isset($_SESSION['user_id'])) {
 			// Get result
 			$result = $system->query("SELECT `user_id`, `user_name`, `password`, `failed_logins`, `current_ip`, `last_ip`, `user_verified` 
 				FROM `users` WHERE `user_name`='$user_name' LIMIT 1");
-			if($system->db_num_rows == 0) {
+			if($system->db_last_num_rows == 0) {
 				throw new Exception("User does not exist!");
 			}
 			$result = $system->db_fetch($result);
@@ -116,10 +116,8 @@ else {
 	$LOGGED_IN = true;
 	$player = new User($_SESSION['user_id']);
 	//This is in minutes.
-	$logout_display = false;
-	if($player->staff_level == System::SC_ADMINISTRATOR) {
+	if($player->hasAdminPanel()) {
 		$logout_limit = 1440;
-		$logout_display = "Disabled";
 	}
 	else if($player->forbidden_seal) {
 		$logout_limit *= 2;
@@ -192,10 +190,11 @@ if(!$ajax) {
 $allowed_coders = array(
 	'lsmjudoka'
 );
+
 // Load page or news
 if($LOGGED_IN) {
 	// Master close
-	if(!$system->SC_OPEN && $player->staff_level < System::SC_ADMINISTRATOR) {
+	if(!$system->SC_OPEN && !$player->isUserAdmin()) {
 		if(!$ajax) {
 			echo str_replace("[HEADER_TITLE]", "Profile", $body_start);
 		}
@@ -227,7 +226,7 @@ if($LOGGED_IN) {
 		exit;
 	}
 	$result = $system->query("SELECT `id` FROM `banned_ips` WHERE `ip_address`='" . $system->clean($_SERVER['REMOTE_ADDR']) . "' LIMIT 1");
-	if($system->db_num_rows > 0) {
+	if($system->db_last_num_rows > 0) {
 		if(!$ajax) {
 			echo str_replace("[HEADER_TITLE]", "Profile", $body_start);
 		}
@@ -340,18 +339,22 @@ if($LOGGED_IN) {
 			// Check for spar/fight PvP type, stop page if trying to load spar/battle while in AI battle
 			if(isset($pages[$id]['battle_type'])) {
 				$result = $system->query("SELECT `battle_type` FROM `battles` WHERE `battle_id`='$player->battle_id' LIMIT 1");
-				if($system->db_num_rows > 0) {
+				if($system->db_last_num_rows > 0) {
 					$battle_type = $system->db_fetch($result)['battle_type'];
 					if($battle_type != $pages[$id]['battle_type']) {
 						throw new Exception("You cannot visit this page while in combat!");
 					}
 				}
 			}
-			if(isset($pages[$id]['staff_level_required'])) {
-				if($pages[$id]['staff_level_required'] == 0) {
-					throw new Exception("A permissions error has occurred. Please contact an administrator.");
-				}
-				if($player->staff_level < $pages[$id]['staff_level_required']) {
+
+			if(isset($pages[$id]['user_check'])) {
+			    if(!($pages[$id]['user_check'] instanceof Closure)) {
+			        throw new Exception("Invalid user check!");
+                }
+
+			    $page_ok = $pages[$id]['user_check']($player);
+
+				if(!$page_ok) {
 					throw new Exception("");
 				}
 			}
@@ -428,9 +431,6 @@ if($LOGGED_IN) {
 		if($player->rank >= 3) {
 		    $pages[24]['menu'] = System::MENU_USER;
 		}
-		if($player->staff_level >= System::SC_HEAD_ADMINISTRATOR) {
-		    $pages[26]['menu'] = System::MENU_ACTIVITY;
-        }
 
         echo $side_menu_start;
 		foreach($pages as $id => $page) {
@@ -476,17 +476,21 @@ if($LOGGED_IN) {
             }
         }
 
-		if($player->staff_level >= System::SC_MODERATOR) {
-			echo $staff_menu_header;
-			echo "<li><a id='sideMenuOption-ModPanel' href='{$system->link}?id=16'>Mod Panel</a></li>";
-		}
-		if($player->staff_level >= System::SC_ADMINISTRATOR) {
-			echo "<li><a id='sideMenuOption-AdminPanel' href='{$system->link}?id=17'>Admin Panel</a></li>";
-		}
+        if($player->isModerator() || $player->hasAdminPanel()) {
+            echo $staff_menu_header;
+            if($player->isModerator()) {
+                echo "<li><a id='sideMenuOption-ModPanel' href='{$system->link}?id=16'>Mod Panel</a></li>";
+            }
+            if($player->hasAdminPanel()) {
+                echo "<li><a id='sideMenuOption-AdminPanel' href='{$system->link}?id=17'>Admin Panel</a></li>";
+            }
+        }
+
 		// Logout timer
 		$time_remaining = ($logout_limit * 60) - (time() - $player->last_login);
 		$logout_time = System::timeRemaining($time_remaining, 'short', false, true) . " remaining";
-		$logout_display = ($logout_display) ? $logout_display : $logout_time;
+
+		$logout_display = $player->isUserAdmin() ? "Disabled" : $logout_time;
 		echo str_replace("<!--LOGOUT_TIMER-->", $logout_display, $side_menu_end);
 
 		if($logout_display != "Disabled") {
@@ -505,7 +509,7 @@ else {
 	echo str_replace("[HEADER_TITLE]", "News", $body_start);
 	// Display error messages
 	$system->printMessage();
-	if(!$system->SC_OPEN && $player->staff_level < System::SC_ADMINISTRATOR) {
+	if(!$system->SC_OPEN) {
 		echo "<table class='table'><tr><th>Game Maintenance</th></tr>
 		<tr><td style='text-align:center;'>
 		Shinobi-Chronicles is currently closed for maintenace. Please check back in a few minutes!

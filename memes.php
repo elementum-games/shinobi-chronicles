@@ -432,4 +432,10 @@ return [
         'text' => ':guess I\'ll die:',
         'public' => true,
     ],
+    [
+        'code' => ':dogekek:',
+        'image' => "<img src='./images/memes/doge_kek.png' style='width:64px;height:64px;' />",
+        'text' => ':guess I\'ll die:',
+        'public' => true,
+    ],
 ];

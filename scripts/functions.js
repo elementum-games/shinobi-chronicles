@@ -52,23 +52,3 @@ function slideNotificationLeft() {
 		}
 	});
 }
-
-function displayCost() {
-	let display_value;
-	let value = document.getElementById('set_amount').value;
-	switch(value) {
-		case '10':
-			display_value = 10;
-			break;
-		case '20':
-			display_value = 20;
-			break;
-		case '30':
-			display_value = 30;
-			break;
-		default:
-			display_value = 'N/A';
-			break;
-	}
-	let display = document.getElementById('display_cost').innerHTML = display_value + ' points';
-}

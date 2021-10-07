@@ -38,20 +38,17 @@ function battle(): bool {
 				$system->query("UPDATE `villages` SET `points`=`points`+'$village_point_gain' WHERE `name`='$player->village' LIMIT 1");
 				echo "You have earned $village_point_gain point for your village.<br />";
 				// Team points
-				if($player->team) {
-					$system->query("UPDATE `teams` SET `points`=`points`+'$team_point_gain', `monthly_points`=`monthly_points`+'$team_point_gain'  
-						WHERE `team_id`={$player->team['id']} LIMIT 1");
+				if($player->team != null) {
+				    $player->team->addPoints($team_point_gain);
+
 					echo "You have earned $team_point_gain point for your team.<br />";
 				}
 				// Daily Tasks
-				$dt = [];
 				foreach ($player->daily_tasks as $task) {
-					if ($task['Task'] == 'PVP Battles' && $task['Complete'] != 1) {
-						$task['Progress']++;
+					if ($task->activity == DailyTask::ACTIVITY_PVP && !$task->complete) {
+						$task->progress++;
 					}
-					array_push($dt, $task);
 				}
-				$player->daily_tasks = $dt;
 			}
 			else if($battle->isOpponentWinner()) {
 				echo "You lose. You were taken back to your village by some allied ninja.<br />";
@@ -64,14 +61,11 @@ function battle(): bool {
 				$player->x = $location[0];
 				$player->y = $location[1];
 				// Daily Tasks
-				$dt = [];
 				foreach ($player->daily_tasks as $task) {
-					if ($task['Task'] == 'PVP Battles' && $task['SubTask'] == 'Complete' && $task['Complete'] != 1) {
-						$task['Progress']++;
+					if ($task->activity == DailyTask::ACTIVITY_PVP && $task->sub_task == DailyTask::SUB_TASK_COMPLETE && !$task->complete) {
+						$task->progress++;
 					}
-					array_push($dt, $task);
 				}
-				$player->daily_tasks = $dt;
 			}
 			else {
 				echo "You both knocked each other out. You were taken back to your village by some allied ninja.<br />";
@@ -81,15 +75,13 @@ function battle(): bool {
 				$player->x = $location[0];
 				$player->y = $location[1];
 				$player->last_pvp = time();
+
 				// Daily Tasks
-				$dt = [];
 				foreach ($player->daily_tasks as $task) {
-					if ($task['Task'] == 'PVP Battles' && $task['SubTask'] == 'Complete' && $task['Complete'] != 1) {
-						$task['Progress']++;
+					if ($task->activity == DailyTask::ACTIVITY_PVP && $task->sub_task == DailyTask::SUB_TASK_COMPLETE && !$task->complete) {
+						$task->progress++;
 					}
-					array_push($dt, $task);
 				}
-				$player->daily_tasks = $dt;
 			}
 			echo "</td></tr></table>";
 			$player->battle_id = 0;

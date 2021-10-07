@@ -22,6 +22,7 @@ function premium() {
 	$costs['bloodline'][4] = 20;
 	$costs['forbidden_seal'][1] = 5;
 	$costs['forbidden_seal'][2] = 15;
+	$costs['element_change'] = 10;
 	$costs['village_change'] = 5 * $player->village_changes;
 	$costs['clan_change'] = 5 * $player->clan_changes;
 	if($costs['village_change'] > 40) {
@@ -153,7 +154,7 @@ function premium() {
 				throw new Exception("Only alphanumeric characters, dashes, and underscores are allowed in usernames!");
 			}
 
-			if($system->censor_check($new_name)) {
+			if($system->explicitLanguageCheck($new_name)) {
 				throw new Exception("Inappropriate language is not allowed in usernames!");
 			}
 
@@ -165,7 +166,7 @@ function premium() {
 			}
 
 			$result = $system->query("SELECT `user_name` FROM `users` WHERE `user_name`='$new_name' LIMIT 1");
-			if($system->db_num_rows) {
+			if($system->db_last_num_rows) {
 				$result = $system->db_fetch();
 				if(strtolower($player->user_name) == strtolower($new_name)) {
 					$nameCost = 0;
@@ -388,7 +389,7 @@ function premium() {
 		try {
 			$result = $system->query("SELECT `bloodline_id`, `name`, `clan_id`, `rank` FROM `bloodlines`
 				WHERE `bloodline_id`='$bloodline_id' AND `rank` < 5 ORDER BY `rank` ASC");
-			if($system->db_num_rows == 0) {
+			if($system->db_last_num_rows == 0) {
 				throw new Exception("Invalid bloodline!");
 			}
 			$result = $system->db_fetch($result);
@@ -428,7 +429,7 @@ function premium() {
 
 			// Set clan
 			$result = $system->query("SELECT `name` FROM `clans` WHERE `clan_id` = '$clan_id' LIMIT 1");
-			if($system->db_num_rows > 0) {
+			if($system->db_last_num_rows > 0) {
 				$clan_result = $system->db_fetch($result);
 
 
@@ -514,8 +515,7 @@ function premium() {
 				$system->message("Color changed!");
 				break;
 			 case 'green':
-			/* Shadekun edit for returning administrator color */
-                if($player->staff_level < System::SC_MODERATOR) {
+                if(!$player->isModerator()) {
                     $system->message("Invalid color!");
                     break;
                 }
@@ -523,15 +523,23 @@ function premium() {
                 $system->message("Color changed");
                 break;
 			case 'teal':
-				if ($player->staff_level < System::SC_HEAD_MODERATOR) {
+				if (!$player->isHeadModerator()) {
 					$system->message("Invalid color!");
 					break;
 				}
 				$player->forbidden_seal['color'] = $color;
 				$system->message("Color changed");
 				break;
+            case 'purple':
+                if (!$player->isContentAdmin()) {
+                    $system->message("Invalid color!");
+                    break;
+                }
+                $player->forbidden_seal['color'] = $color;
+                $system->message("Color changed");
+                break;
 			case 'red':
-				if($player->staff_level < System::SC_ADMINISTRATOR) {
+				if(!$player->isUserAdmin()) {
 					$system->message("Invalid color!");
 					break;
 				}
@@ -544,6 +552,160 @@ function premium() {
 		}
 		$system->printMessage();
 	}
+	// Change elements
+	else if(isset($_POST['change_element']) && $player->rank >= 3) {
+        try {
+			$current_element = $_POST['current_element'];
+			$new_element = $_POST['new_element'];
+
+	            if($new_element == $player->elements) {
+	                throw new Exception("Invalid element selected!");
+	            }
+
+				switch($player->elements[$current_element]) {
+						case Jutsu::ELEMENT_FIRE:
+						case Jutsu::ELEMENT_WIND:
+						case Jutsu::ELEMENT_LIGHTNING:
+						case Jutsu::ELEMENT_EARTH:
+						case Jutsu::ELEMENT_WATER:
+							break;
+						default:
+							throw new Exception("Invalid element! {$current_element}");
+							break;
+					}
+
+				switch($new_element) {
+					case Jutsu::ELEMENT_FIRE:
+					case Jutsu::ELEMENT_WIND:
+					case Jutsu::ELEMENT_LIGHTNING:
+					case Jutsu::ELEMENT_EARTH:
+					case Jutsu::ELEMENT_WATER:
+							break;
+						default:
+							throw new Exception("Invalid element! new element");
+							break;
+					}
+
+					if($player->premium_credits < $costs['element_change']) {
+						throw new Exception("You do not have enough Ancient Kunai!");
+					}
+
+					 if(!isset($_POST['confirm'])) {
+						echo "
+							<table class='table'><tr><th>Confirm Chakra Element Change</th></tr>
+								<tr>
+									<td style='text-align:center;'>
+										Are you sure you want to <b>forget the " . $player->elements[$current_element] . " nature</b> and any jutsus you have to <b>attune to the $new_element nature</b>?<br />
+										<br />
+										<b>(IMPORTANT: This is non-reversable once completed, if you want to return to your original element you will have to pay another fee. You will forget any elemental jutsu you currently have of this nature.)</b><br />
+										<form action='$self_link' method='post'>
+											<input type='hidden' name='confirm' value='1' />
+											<input type='hidden' name='current_element' value='$current_element' />
+											<input type='hidden' name='new_element' value='$new_element' />
+											<input type='submit' name='change_element' value='Change Element' />
+										</form>
+									</td>
+								</tr>
+							</table>";
+							return true;
+						} else {
+								echo "<table class='table'><tr><th>Chakra Element Change</th></tr>
+										<td style='text-align:center;'>";
+											switch($new_element) {
+												case Jutsu::ELEMENT_FIRE:
+													echo "With the image of blazing fires in your mind, you flow chakra from your stomach,
+													down through your legs and into the seal on the floor. Suddenly one of the pedestals bursts into
+													fire, breaking your focus, and the elders smile and say
+													<br />\"Congratulations, you now have the Fire element. Fire is the embodiment of
+													consuming destruction, that devours anything in its path. Your Fire jutsu will be strong against Wind jutsu, as
+													they will only fan the flames and strengthen your jutsu. However, you must be careful against Water jutsu, as they
+													can extinguish your fires.\"
+													<br />";
+													break;
+												case Jutsu::ELEMENT_WIND:
+													echo "Picturing a tempestuous tornado, you flow chakra from your stomach,
+													down through your legs and into the seal on the floor. You feel a disturbance in the room and
+													suddenly realize that a small whirlwind has formed around one of the pedestals, and the elders smile and say
+													<br />\"Congratulations, you have the Wind element. Wind is the sharpest out of all chakra natures,
+													and can slice through anything when used properly. Your Wind chakra will be strong against
+													Lightning jutsu, as you can cut and dissipate it, but you will be weak against Fire jutsu,
+													because your wind only serves to fan their flames and make them stronger.\"
+													<br />";
+													break;
+												case Jutsu::ELEMENT_LIGHTNING:
+													echo "Imagining the feel of electricity coursing through your veins, you flow chakra from your stomach,
+													down through your legs and into the seal on the floor. Suddenly you feel a charge in the air and
+													one of the pedestals begins to spark with crackling electricity, and the elders smile and say
+													<br />\"Congratulations, you have the Lightning element. Lightning embodies pure speed, and skilled users of
+													this element physically augment themselves to swiftly strike through almost anything. Your Lightning
+													jutsu will be strong against Earth as your speed can slice straight through the slower techniques of Earth,
+													but you must be careful against Wind jutsu as they will dissipate your Lightning.\"
+													<br />";
+													break;
+												case Jutsu::ELEMENT_EARTH:
+													echo "Envisioning stone as hard as the temple you are sitting in, you flow chakra from your stomach,
+													down through your legs and into the seal on the floor. Suddenly dirt from nowhere begins to fall off one of the
+													pedstals and the elders smile and say
+													<br />\"Congratulations, you have the Earth element. Earth
+													is the hardiest of elements and can protect you or your teammates from enemy attacks. Your Earth jutsu will be
+													strong against Water jutsu, as you can turn the water to mud and render it useless, but you will be weak to
+													Lightning jutsu, as they are one of the few types that can swiftly evade and strike through your techniques.\"
+													<br />";
+													break;
+												case Jutsu::ELEMENT_WATER:
+													echo "With thoughts of splashing rivers flowing through your mind, you flow chakra from your stomach,
+													down through your legs and into the seal on the floor. Suddenly a small geyser erupts from one of
+													the pedestals, and the elders smile and say
+													<br />\"Congratulations, you have the Water element. Water is a versatile element that can control the flow
+													of the battle, trapping enemies or launching large-scale attacks at them. Your Water jutsu will be strong against
+													Fire jutsu because you can extinguish them, but Earth jutsu can turn your water into mud and render it useless.\"
+													<br />";
+													break;
+												}
+								echo "
+								<br/>
+								<b style='color:green'>You have forgotten the " . $player->elements[$current_element] ." nature and all its jutsu and are now attuned to the $new_element nature.</b>
+								<br />
+								<br />
+								<a href='{$system->links['premium']}'>Continue</a>
+								<br />
+								<tr><td style='text-align:center;'></table>";
+								}
+
+
+						// Cost
+						$player->premium_credits -= $costs['element_change'];
+
+						$player->getInventory();
+
+						// Chuunin element change
+						if($player->rank >= 3 && $current_element === 'first') {
+							foreach($player->jutsu as $jutsu) {
+								if($jutsu->element == $player->elements[$current_element]) {
+                        				$player->removeJutsu($jutsu->id);
+                    				}
+                			}
+                			$player->elements['first'] = $new_element;
+            			}
+						// Jonin+ element change
+						else if($player->rank >= 4 && $current_element === 'second') {
+							foreach($player->jutsu as $jutsu) {
+								if($jutsu->element == $player->elements[$current_element]) {
+                        				$player->removeJutsu($jutsu->id);
+                    				}
+                			}
+                		$player->elements['second'] = $new_element;
+            		}
+
+						$player->updateData();
+						$player->updateInventory();
+
+					} catch (Exception $e) {
+						$system->message($e->getMessage());
+					}
+					$system->printMessage();
+					return false;
+			}
 	else if(isset($_POST['change_village']) && $player->rank >= 2) {
 		$village = $_POST['new_village'];
 		try {
@@ -618,12 +780,12 @@ function premium() {
 			// Clan
 			$result = $system->query("SELECT `clan_id`, `name` FROM `clans`
 					WHERE `village`='$player->village' AND `bloodline_only`='0'");
-			if($system->db_num_rows == 0) {
+			if($system->db_last_num_rows == 0) {
 				$result = $system->query("SELECT `clan_id`, `name` FROM `clans`
 				WHERE `bloodline_only`='0'");
 			}
 
-			if(! $system->db_num_rows) {
+			if(! $system->db_last_num_rows) {
 				throw new Exception("No clans available!");
 			}
 
@@ -689,6 +851,8 @@ function premium() {
 		}
 		$system->printMessage();
 	}
+
+
 	//Clan Change
 	else if(isset($_POST['change_clan']) && $player->rank >= 2) {
 		$new_clan_id = abs((int) $_POST['clan_change_id']);
@@ -808,6 +972,7 @@ function premium() {
 			array_unshift($stats, 'bloodline_skill');
 		}
 
+		$element_change_cost = $costs['element_change'];
 		$village_change_cost = $costs['village_change'];
 		$clan_change_cost = $costs['clan_change'];
 
@@ -916,6 +1081,49 @@ function premium() {
 			</form>
 			</td></tr></table>";
 
+		// Change Element
+		if($player->elements) {
+
+		$elements = array(Jutsu::ELEMENT_FIRE, Jutsu::ELEMENT_WIND, Jutsu::ELEMENT_LIGHTNING, Jutsu::ELEMENT_EARTH, Jutsu::ELEMENT_WATER);
+		echo "<table class='table'>
+		<tr><th> Chakra Element Change</th></tr>
+				<tr>
+					<td style='text-align:center;'>
+						You can undergo harsh training by the village elders to reattune your chakra nature.
+						<br />
+						A gift offering of $element_change_cost Ancient Kunai is required.
+						<br />
+						<br />
+						<b>(IMPORTANT: This is non-reversable once completed, if you want to return to your original element you will have to pay another fee. You will forget any elemental jutsu you currently have of this nature.)</b>
+
+		 			<br />Choose your element to reattune:
+						<br />
+						<form action='$self_link' method='post'>
+							<select name='current_element'>";
+								foreach ($player->elements as $slot => $element) {
+									echo "<option value='{$slot}'>{$element}</option>";
+								}
+						echo "
+						</select>
+						<br />Choose your element to attune to:
+								<br />
+							   <select name='new_element'>";
+							   	foreach($elements as $new_element) {
+									if($player->elements['first'] == $new_element) {
+                    					continue;
+                				} else if($player->elements['second'] == $new_element) {
+									continue;
+								}
+							        echo "<option value='$new_element'>$new_element</option>";
+								 }
+							  echo "</select><br />
+									<input type='submit' name='change_element' value='Change Element' />
+								</form>
+								</td>
+								</tr>";
+						echo "</table>";
+			}
+
 		// Village change
 
 		if($player->rank >= 2) {
@@ -994,7 +1202,7 @@ function premium() {
 
 			$result = $system->query("SELECT `bloodline_id`, `name`, `rank`
 				FROM `bloodlines` WHERE `rank` < 5 ORDER BY `rank` ASC");
-			if($system->db_num_rows == 0) {
+			if($system->db_last_num_rows == 0) {
 				echo "No bloodlines available!";
 			}
 			else {
@@ -1080,17 +1288,25 @@ function premium() {
 				($player->forbidden_seal['color'] == 'gold' ? "checked='checked'" : '') . "/>
 				<span class='gold' style='font-weight:bold;'>Gold</span>";
 			}
-			if ($player->staff_level >= System::SC_MODERATOR) {
+			if ($player->isModerator()) {
 				echo "
 				<input type='radio' name='name_color' value='green' " .
 				($player->forbidden_seal['color'] == 'green' ? "checked='checked'" : '') . "/>
 				<span class='moderator' style='font-weight:bold;'>Green</span>";
-			} else if ($player->staff_level >= System::SC_HEAD_MODERATOR) {
+			}
+			if ($player->isHeadModerator()) {
 				echo "
 				<input type='radio' name='name_color' value='teal' " .
 				($player->forbidden_seal['color'] == 'teal' ? "checked='checked'" : '') . "/>
 				<span class='headModerator' style='font-weight:bold;'>Teal</span>";
-			} else if ($player->staff_level >= System::SC_ADMINISTRATOR) {
+			}
+			if($player->isContentAdmin()) {
+                echo "
+				<input type='radio' name='name_color' value='purple' " .
+                    ($player->forbidden_seal['color'] == 'purple' ? "checked='checked'" : '') . "/>
+				<span class='contentAdmin' style='font-weight:bold;'>Purple</span>";
+            }
+			if ($player->isUserAdmin()) {
 				echo "
 				<input type='radio' name='name_color' value='red' " .
 				($player->forbidden_seal['color'] == 'red' ? "checked='checked'" : '') . "/>
@@ -1111,7 +1327,7 @@ function premium() {
 			($player->forbidden_seal['color'] == 'gold' ? "checked='checked'" : '') . "/>
 			<span class='gold' style='font-weight:bold;'>Gold</span>
 			";
-			if($player->staff_level >= System::SC_ADMINISTRATOR) {
+			if($player->isUserAdmin()) {
 				echo "
 				<input type='radio' name='name_color' value='red' " .
 				($player->forbidden_seal['color'] == 'red' ? "checked='checked'" : '') . "/>
@@ -1286,7 +1502,7 @@ function premiumCreditExchange() {
 
 			$system->query("INSERT INTO `premium_credit_exchange` (`seller`, `premium_credits`, `money`)
 			VALUES ('$player->user_id', '$premium_credits', '$money')");
-			if($system->db_affected_rows > 0) {
+			if($system->db_last_affected_rows > 0) {
 				$system->message("Offer placed!");
 			}
 			else {
@@ -1305,7 +1521,7 @@ function premiumCreditExchange() {
 			// Validate input for offer id
 			$id = (int)$system->clean($_GET['purchase']);
 			$result = $system->query("SELECT * FROM `premium_credit_exchange` WHERE `id`='$id' AND `completed`='0' LIMIT 1");
-			if($system->db_num_rows == 0) {
+			if($system->db_last_num_rows == 0) {
 				 throw new Exception("Invalid offer!");
 			}
 
@@ -1341,7 +1557,7 @@ function premiumCreditExchange() {
 			// Validate input for offer id
 			$id = (int)$system->clean($_GET['cancel']);
 			$result = $system->query("SELECT * FROM `premium_credit_exchange` WHERE `id`='$id' AND `completed`='0' LIMIT 1");
-			if($system->db_num_rows == 0) {
+			if($system->db_last_num_rows == 0) {
 				 throw new Exception("Invalid offer!");
 			}
 
@@ -1396,7 +1612,7 @@ function premiumCreditExchange() {
 	$credit_users = array();
 
 	//If there are offers in the database
-	if($system->db_num_rows) {
+	if($system->db_last_num_rows) {
 
 		while($row = $system->db_fetch($result)) {
 

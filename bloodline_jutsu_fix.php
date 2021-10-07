@@ -5,16 +5,10 @@ if(!isset($_SESSION['user_id'])) {
 	exit;
 }
 
-require("classes.php");
-
-$system = new System();
-$system->dbConnect();
-
-$player = new User($_SESSION['user_id']);
-
-if($player->staff_level < System::SC_HEAD_ADMINISTRATOR) {
-	exit;
-}
+/**
+ * @var System $system;
+ */
+require "authenticate_admin.php";
 
 $result = $system->query("SELECT `bloodline_id`, `jutsu` FROM `bloodlines`");
 $bloodlines = array();
@@ -35,9 +29,3 @@ foreach($bloodlines as $bloodline_id => $bloodline_jutsu) {
 	$system->query($query);
 }
 
-
-
-
-
-
-?>

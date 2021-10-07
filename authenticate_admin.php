@@ -12,6 +12,6 @@ $system->dbConnect();
 $user = new User($_SESSION['user_id']);
 $user->loadData();
 
-if($user->staff_level < System::SC_ADMINISTRATOR) {
+if(!$user->isHeadAdmin()) {
     exit;
 }

@@ -25,7 +25,7 @@ function arena() {
 			WHERE `rank` ='" . System::SC_MAX_RANK . "' ORDER BY `level` ASC");
 		}
 		//End
-		if($system->db_num_rows == 0) {
+		if($system->db_last_num_rows == 0) {
 			$system->message("No AI opponents found!");
 			$system->printMessage();
 			return false;
@@ -184,24 +184,19 @@ function arenaFight(): bool {
             }
 
             // TEAM BOOST AI GAINS
-            $team_boost = false;
-            if ($player->team['boost'] == 'AI') {
-                $random_number = rand(1, 100);
-                if ($random_number <= $player->team['boost_amount']) {
-                    // boost success
-                    // a "flat" 20% increase in stat gain
-                    $boost_amount = ceil(20 / 100 * $money_gain);
-                    $team_boost = '<br>LUCKY! Your team bond triggered a breakthrough and resulted in increased rewards!
-                    <br>
-                    You gained an additional <b>[ ¥' . $boost_amount . ' ]</b>.';
+            if($player->team != null) {
+                $boost_percent = $player->team->getAIMoneyBoostAmount();
+                if($boost_percent != null) {
+                    $boost_amount = ceil($boost_percent * $money_gain);
                     $money_gain += $boost_amount;
-                }				
+                }
             }
 
             $player->money += $money_gain;
+
             echo "<table class='table'><tr><th>Battle Results</th></tr>
 			<tr><td>You have defeated your arena opponent.<br />
-			You have claimed your prize of &yen;$money_gain.".$team_boost;
+			You have claimed your prize of &yen;$money_gain.";
             if($stat_gain_display) {
                 echo $stat_gain_display;
             }
@@ -211,14 +206,11 @@ function arenaFight(): bool {
             $player->last_pvp = time();
 
             // Daily Tasks
-            $dt = [];
             foreach ($player->daily_tasks as $task) {
-                if ($task['Task'] == 'AI Battles' && $task['Complete'] != 1) {
-                    $task['Progress']++;
+                if (!$task->complete && $task->activity == DailyTask::ACTIVITY_ARENA && $task->sub_task == DailyTask::SUB_TASK_WIN_FIGHT) {
+                    $task->progress++;
                 }
-                array_push($dt, $task);
             }
-            $player->daily_tasks = $dt;
         }
         else if($winner == $battle->opponent_side) {
             echo "<table class='table'><tr><th>Battle Results</th></tr>
@@ -229,14 +221,11 @@ function arenaFight(): bool {
             $player->last_pvp = time();
 
             // Daily Tasks
-            $dt = [];
-            foreach ($player->daily_tasks as $task) {
-                if ($task['Task'] == 'AI Battles' && $tast['SubTask'] == 'Complete' && $task['Complete'] != 1) {
-                    $task['Progress']++;
+            foreach ($player->daily_tasks as &$task) {
+                if (!$task->complete && $task->activity == DailyTask::ACTIVITY_ARENA && $task->sub_task == DailyTask::SUB_TASK_COMPLETE) {
+                    $task->progress++;
                 }
-                array_push($dt, $task);
             }
-            $player->daily_tasks = $dt;
         }
         else if($winner == Battle::DRAW) {
             echo "<table class='table'><tr><th>Battle Results</th></tr>
@@ -246,14 +235,11 @@ function arenaFight(): bool {
             $player->last_pvp = time();
             
             // Daily Tasks
-            $dt = [];
             foreach ($player->daily_tasks as $task) {
-                if ($task['Task'] == 'AI Battles' && $tast['SubTask'] == 'Complete' && $task['Complete'] != 1) {
-                    $task['Progress']++;
+                if (!$task->complete && $task->activity == DailyTask::ACTIVITY_ARENA && $task->sub_task == DailyTask::SUB_TASK_COMPLETE) {
+                    $task->progress++;
                 }
-                array_push($dt, $task);
             }
-            $player->daily_tasks = $dt;
         }
     } catch(Exception $e) {
         $system->message($e->getMessage());

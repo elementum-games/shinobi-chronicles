@@ -13,722 +13,92 @@ function adminPanel() {
     global $self_link;
     global $id;
     global $RANK_NAMES;
+
     // Staff level check
-    if($player->staff_level < System::SC_ADMINISTRATOR) {
+    if(!$player->hasAdminPanel()) {
         return false;
     }
-    /* $pattern = '/[0-9]+\.[0-9]+/';
-                    if(!preg_match($pattern, $location)) {
-                        throw new Exception("Invalid location!");
-                    }
-        */
+
+    $content_create_pages = [
+        'create_ai',
+        'create_jutsu',
+        'create_item',
+        'create_bloodline',
+        'create_mission',
+        'create_clan',
+    ];
+    $content_edit_pages = [
+        'edit_ai',
+        'edit_jutsu',
+        'edit_item',
+        'edit_bloodline',
+        'edit_mission',
+        'edit_clan',
+    ];
+
+    $user_admin_pages = [
+        'create_rank',
+        'edit_rank',
+        'edit_team',
+        'edit_user',
+        'activate_user',
+        'delete_user',
+        'give_bloodline',
+    ];
+
+
     // Menu
-    echo "<table class='table'><tr><th>Menu</th></tr>
-	<tr><td style='text-align:center;'>
-		<a href='$self_link&page=create_ai'>Create AI</a> &nbsp;&nbsp;|&nbsp;&nbsp;
-		<a href='$self_link&page=create_jutsu'>Create Jutsu</a> &nbsp;&nbsp;|&nbsp;&nbsp;
-		<a href='$self_link&page=create_item'>Create Item</a> &nbsp;&nbsp;|&nbsp;&nbsp;
-		<a href='$self_link&page=create_rank'>Create Rank</a> &nbsp;&nbsp;|&nbsp;&nbsp;
-		<a href='$self_link&page=create_bloodline'>Create Bloodline</a>
-	</td></tr>
-	<tr><td style='text-align:center;'>
-		<a href='$self_link&page=create_clan'>Create Clan</a> &nbsp;&nbsp;|&nbsp;&nbsp;
-		<a href='$self_link&page=create_mission'>Create Mission</a>
-	</td></tr>
-	<tr><td style='text-align:center;'>
-		<a href='$self_link&page=edit_ai'>Edit AI</a> &nbsp;&nbsp;|&nbsp;&nbsp;
-		<a href='$self_link&page=edit_jutsu'>Edit Jutsu</a> &nbsp;&nbsp;|&nbsp;&nbsp;
-		<a href='$self_link&page=edit_item'>Edit Item</a> &nbsp;&nbsp;|&nbsp;&nbsp;
-		<a href='$self_link&page=edit_rank'>Edit Rank</a> &nbsp;&nbsp;|&nbsp;&nbsp;
-		<a href='$self_link&page=edit_bloodline'>Edit Bloodline</a>	
-	</td></tr>
-	<tr><td style='text-align:center;'>
-		<a href='$self_link&page=edit_clan'>Edit Clan</a> &nbsp;&nbsp;|&nbsp;&nbsp;
-		<a href='$self_link&page=edit_team'>Edit Team</a> &nbsp;&nbsp;|&nbsp;&nbsp;
-		<a href='$self_link&page=edit_mission'>Edit Mission</a>
-	</td></tr>	
-	<tr><td style='text-align:center;'>
-		<a href='$self_link&page=edit_user'>Edit user</a> &nbsp;&nbsp;|&nbsp;&nbsp;
-		<a href='$self_link&page=activate_user'>Activate user</a> &nbsp;&nbsp;|&nbsp;&nbsp;
-		<a href='$self_link&page=delete_user'>Delete user</a> &nbsp;&nbsp;|&nbsp;&nbsp;
-		<a href='$self_link&page=give_bloodline'>Give Bloodline</a>
-	</tr></td>";
+    echo "<table class='table'>
+        <tr><th>Admin Panel Menu</th></tr>";
+	if($player->isContentAdmin()) {
+	    echo "<tr><td style='text-align:center'>";
+	    echo implode(
+	        "&nbsp;&nbsp;|&nbsp;&nbsp;",
+            array_map(function($page_slug) use ($self_link) {
+                return "<a href='{$self_link}&page={$page_slug}'>" . System::unSlug($page_slug) . "</a>";
+            }, $content_create_pages)
+        );
+	    echo "</td></tr>";
+    }
+    if($player->isContentAdmin()) {
+        echo "<tr><td style='text-align:center'>";
+        echo implode(
+            "&nbsp;&nbsp;|&nbsp;&nbsp;",
+            array_map(function($page_slug) use ($self_link) {
+                return "<a href='{$self_link}&page={$page_slug}'>" . System::unSlug($page_slug) . "</a>";
+            }, $content_edit_pages)
+        );
+        echo "</td></tr>";
+    }
+    if($player->isUserAdmin()) {
+        echo "<tr><td style='text-align:center'>";
+        echo implode(
+            "&nbsp;&nbsp;|&nbsp;&nbsp;",
+            array_map(function($page_slug) use ($self_link) {
+                return "<a href='{$self_link}&page={$page_slug}'>" . System::unSlug($page_slug) . "</a>";
+            }, $user_admin_pages)
+        );
+        echo "</td></tr>";
+    }
     echo "</table>";
+
     // Variable sets
-    {    /* Edit User*/
-        $edit_user_variables = [
-            'email' => [
-                'data_type' => 'string',
-                'input_type' => 'text',
-                'max_length' => 64,
-            ],
-            'avatar_link' => [
-                'data_type' => 'string',
-                'input_type' => 'text',
-                'max_length' => 120,
-            ],
-            'gender' => [
-                'data_type' => 'string',
-                'input_type' => 'text',
-                'max_length' => 32,
-            ],
-            'level' => [
-                'data_type' => 'int',
-                'input_type' => 'text',
-            ],
-            'rank' => [
-                'data_type' => 'int',
-                'input_type' => 'text',
-            ],
-            'health' => [
-                'data_type' => 'float',
-                'input_type' => 'text',
-            ],
-            'max_health' => [
-                'data_type' => 'float',
-                'input_type' => 'text',
-            ],
-            'stamina' => [
-                'data_type' => 'float',
-                'input_type' => 'text',
-            ],
-            'max_stamina' => [
-                'data_type' => 'float',
-                'input_type' => 'text',
-            ],
-            'chakra' => [
-                'data_type' => 'float',
-                'input_type' => 'text',
-            ],
-            'max_chakra' => [
-                'data_type' => 'float',
-                'input_type' => 'text',
-            ],
-            'regen_rate' => [
-                'data_type' => 'float',
-                'input_type' => 'text',
-            ],
-            'exp' => [
-                'data_type' => 'int',
-                'input_type' => 'text',
-            ],
-            'money' => [
-                'data_type' => 'int',
-                'input_type' => 'text',
-            ],
-            'premium_credits' => [
-                'data_type' => 'int',
-                'input_type' => 'text',
-            ],
-            'premium_credits_purchased' => [
-                'data_type' => 'int',
-                'input_type' => 'text',
-            ],
-            'pvp_wins' => [
-                'data_type' => 'int',
-                'input_type' => 'text',
-            ],
-            'pvp_losses' => [
-                'data_type' => 'int',
-                'input_type' => 'text',
-            ],
-            'ai_wins' => [
-                'data_type' => 'int',
-                'input_type' => 'text',
-            ],
-            'ai_losses' => [
-                'data_type' => 'int',
-                'input_type' => 'text',
-            ],
-            'ninjutsu_skill' => [
-                'data_type' => 'float',
-                'input_type' => 'text',
-            ],
-            'taijutsu_skill' => [
-                'data_type' => 'float',
-                'input_type' => 'text',
-            ],
-            'genjutsu_skill' => [
-                'data_type' => 'float',
-                'input_type' => 'text',
-            ],
-            'bloodline_skill' => [
-                'data_type' => 'float',
-                'input_type' => 'text',
-            ],
-            'cast_speed' => [
-                'data_type' => 'float',
-                'input_type' => 'text',
-            ],
-            'speed' => [
-                'data_type' => 'float',
-                'input_type' => 'text',
-            ],
-            'intelligence' => [
-                'data_type' => 'float',
-                'input_type' => 'text',
-            ],
-            'willpower' => [
-                'data_type' => 'float',
-                'input_type' => 'text',
-            ],
-            'battle_id' => [
-                'data_type' => 'int',
-                'input_type' => 'text',
-            ],
-            'mission_id' => [
-                'data_type' => 'int',
-                'input_type' => 'text',
-            ],
-            'location' => [
-                'data_type' => 'float',
-                'input_type' => 'text',
-                'pattern' => '/[0-9]+\.[0-9]+/',
-            ],
-            'clan_id' => [
-                'data_type' => 'int',
-                'input_type' => 'text',
-            ],
-            'clan_office' => [
-                'data_type' => 'int',
-                'input_type' => 'text',
-            ],
-            'team_id' => [
-                'data_type' => 'string',
-                'input_type' => 'text',
-            ],
-            'village' => [
-                'data_type' => 'string',
-                'input_type' => 'radio',
-                'options' => ['Stone', 'Cloud', 'Leaf', 'Sand', 'Mist'],
-            ],
-        ];
+    $constraints = require 'admin/entity_constraints.php';
+
+    $page = $_GET['page'] ?? '';
+
+    if(array_search($page, $user_admin_pages) !== false && !$player->isUserAdmin()) {
+        $page = '';
     }
-    {    /* AI */
-        $ai_variables = [
-            'rank' => [
-                'data_type' => 'int',
-                'input_type' => 'text',
-            ],
-            'name' => [
-                'data_type' => 'string',
-                'input_type' => 'text',
-            ],
-            'max_health' => [
-                'data_type' => 'float',
-                'input_type' => 'text',
-            ],
-            'level' => [
-                'data_type' => 'int',
-                'input_type' => 'text',
-            ],
-            'ninjutsu_skill' => [
-                'data_type' => 'float',
-                'input_type' => 'text',
-            ],
-            'genjutsu_skill' => [
-                'data_type' => 'float',
-                'input_type' => 'text',
-            ],
-            'taijutsu_skill' => [
-                'data_type' => 'float',
-                'input_type' => 'text',
-            ],
-            'cast_speed' => [
-                'data_type' => 'float',
-                'input_type' => 'text',
-            ],
-            'speed' => [
-                'data_type' => 'float',
-                'input_type' => 'text',
-            ],
-            'intelligence' => [
-                'data_type' => 'float',
-                'input_type' => 'text',
-            ],
-            'willpower' => [
-                'data_type' => 'float',
-                'input_type' => 'text',
-            ],
-            'money' => [
-                'data_type' => 'int',
-                'input_type' => 'text',
-            ],
-            'moves' => [
-                'count' => 2,
-                'num_required' => 1,
-                'variables' => [
-                    'battle_text' => [
-                        'data_type' => 'string',
-                        'input_type' => 'text',
-                        'max_length' => 300,
-                    ],
-                    'power' => [
-                        'data_type' => 'float',
-                        'input_type' => 'text',
-                    ],
-                    'jutsu_type' => [
-                        'data_type' => 'string',
-                        'input_type' => 'text',
-                        'options' => ['ninjutsu', 'taijutsu', 'genjutsu'],
-                    ],
-                ],
-            ],
-        ];
+    else if(array_search($page, $content_create_pages) !== false && !$player->isContentAdmin()) {
+        $page = '';
     }
-    {    /* Jutsu */
-        $jutsu_effects = [
-            'none',
-            'release_genjutsu',
-            'residual_damage',
-            'ninjutsu_boost',
-            'taijutsu_boost',
-            'genjutsu_boost',
-            'ninjutsu_resist',
-            'taijutsu_resist',
-            'genjutsu_resist',
-            'speed_boost',
-            'cast_speed_boost',
-            'intelligence_boost',
-            'willpower_boost',
-            'absorb_chakra',
-            'absorb_stamina',
-            'drain_chakra',
-            'drain_stamina',
-            'ninjutsu_nerf',
-            'taijutsu_nerf',
-            'genjutsu_nerf',
-            'cast_speed_nerf',
-            'speed_nerf',
-            'endurance_nerf',
-            'intelligence_nerf',
-            'willpower_nerf',
-        ];
-        $jutsu_variables = [
-            'name' => [
-                'data_type' => 'string',
-                'input_type' => 'text',
-                'max_length' => 25,
-            ],
-            'rank' => [
-                'data_type' => 'int',
-                'input_type' => 'text',
-            ],
-            'power' => [
-                'data_type' => 'float',
-                'input_type' => 'text',
-            ],
-            'hand_seals' => [
-                'data_type' => 'string',
-                'input_type' => 'text',
-                'unique_required' => true,
-                'unique_table' => 'jutsu',
-                'unique_column' => 'hand_seals',
-                'id_column' => 'jutsu_id',
-            ],
-            'element' => [
-                'data_type' => 'string',
-                'input_type' => 'text',
-                'options' => [
-                    Jutsu::ELEMENT_NONE,
-                    Jutsu::ELEMENT_FIRE,
-                    Jutsu::ELEMENT_EARTH,
-                    Jutsu::ELEMENT_WIND,
-                    Jutsu::ELEMENT_WATER,
-                    Jutsu::ELEMENT_LIGHTNING,
-                ],
-            ],
-            'cooldown' => [
-                'data_type' => 'int',
-                'input_type' => 'text',
-            ],
-            'parent_jutsu' => [
-                'data_type' => 'int',
-                'input_type' => 'text',
-            ],
-            'purchase_cost' => [
-                'data_type' => 'int',
-                'input_type' => 'text',
-            ],
-            'use_cost' => [
-                'data_type' => 'int',
-                'input_type' => 'text',
-            ],
-            'description' => [
-                'data_type' => 'string',
-                'input_type' => 'text',
-                'max_length' => 200,
-            ],
-            'battle_text' => [
-                'data_type' => 'string',
-                'input_type' => 'text',
-                'max_length' => 450,
-            ],
-            'use_type' => [
-                'data_type' => 'string',
-                'input_type' => 'radio',
-                'options' => [Jutsu::USE_TYPE_PHYSICAL, Jutsu::USE_TYPE_PROJECTILE, Jutsu::USE_TYPE_BUFF, Jutsu::USE_TYPE_BARRIER],
-            ],
-            'jutsu_type' => [
-                'data_type' => 'string',
-                'input_type' => 'radio',
-                'options' => [Jutsu::TYPE_NINJUTSU, Jutsu::TYPE_TAIJUTSU, Jutsu::TYPE_GENJUTSU],
-            ],
-            'purchase_type' => [
-                'data_type' => 'int',
-                'input_type' => 'radio',
-                'options' => [
-                    Jutsu::PURCHASE_TYPE_DEFAULT => 'default',
-                    Jutsu::PURCHASE_TYPE_PURCHASEABLE => 'purchasable',
-                    Jutsu::PURCHASE_TYPE_NON_PURCHASEABLE => 'non-purchasable',
-                ],
-            ],
-            'effect' => [
-                'data_type' => 'string',
-                'input_type' => 'radio',
-                'options' => $jutsu_effects,
-                'not_required_value' => 'none',
-            ],
-            'effect_amount' => [
-                'data_type' => 'float',
-                'input_type' => 'text',
-                'required_if' => 'effect',
-            ],
-            'effect_length' => [
-                'data_type' => 'int',
-                'input_type' => 'text',
-                'required_if' => 'effect',
-            ],
-        ];
+    else if(array_search($page, $content_edit_pages) !== false && !$player->isContentAdmin()) {
+        $page = '';
     }
-    {    /* Item  */
-        $item_effects = [
-            'residual_damage',
-            'cripple',
-            'daze',
-            'harden',
-            'lighten',
-            'heal',
-            'diffuse',
-            'element',
-        ];
-        $item_variables = [
-            'name' => [
-                'data_type' => 'string',
-                'input_type' => 'text',
-                'max_length' => 45,
-            ],
-            'rank' => [
-                'data_type' => 'int',
-                'input_type' => 'text',
-            ],
-            'purchase_cost' => [
-                'data_type' => 'int',
-                'input_type' => 'text',
-            ],
-            'purchase_type' => [
-                'data_type' => 'int',
-                'input_type' => 'radio',
-                'options' => [1 => 'purchasable', 2 => 'event'],
-            ],
-            'use_type' => [
-                'data_type' => 'int',
-                'input_type' => 'radio',
-                'options' => [1 => 'weapon', 2 => 'armor', 3 => 'consumable'],
-            ],
-            'effect' => [
-                'data_type' => 'string',
-                'input_type' => 'radio',
-                'options' => $item_effects,
-            ],
-            'effect_amount' => [
-                'data_type' => 'float',
-                'input_type' => 'text',
-            ],
-        ];
-    }
-    {    /* Bloodline */
-        $combat_boosts = [
-            'ninjutsu_boost',
-            'genjutsu_boost',
-            'taijutsu_boost',
-            'ninjutsu_resist',
-            'genjutsu_resist',
-            'taijutsu_resist',
-            'speed_boost',
-            'cast_speed_boost',
-            'endurance_boost',
-            'intelligence_boost',
-            'willpower_boost',
-            'heal',
-        ];
-        $passive_boosts = [
-            'scout_range',
-            'stealth',
-            'regen',
-        ];
-        $bloodline_variables = [
-            'name' => [
-                'data_type' => 'string',
-                'input_type' => 'text',
-                'max_length' => 100,
-            ],
-            'clan_id' => [
-                'data_type' => 'int',
-                'input_type' => 'text',
-            ],
-            'rank' => [
-                'data_type' => 'int',
-                'input_type' => 'radio',
-                'options' => [5 => 'Admin', 4 => 'Lesser', 3 => 'Common', 2 => 'Elite', 1 => 'Legendary'],
-            ],
-            'village' => [
-                'data_type' => 'string',
-                'input_type' => 'radio',
-                'options' => ['Stone', 'Cloud', 'Leaf', 'Sand', 'Mist'],
-            ],
-            'passive_boosts' => [
-                'count' => 3,
-                'num_required' => 0,
-                'variables' => [
-                    'power' => [
-                        'data_type' => 'int',
-                        'input_type' => 'text',
-                    ],
-                    'effect' => [
-                        'data_type' => 'string',
-                        'input_type' => 'radio',
-                        'options' => $passive_boosts,
-                    ],
-                    'remove' => [
-                        'special' => 'remove',
-                    ],
-                ],
-            ],
-            'combat_boosts' => [
-                'count' => 3,
-                'num_required' => 0,
-                'variables' => [
-                    'power' => [
-                        'data_type' => 'int',
-                        'input_type' => 'text',
-                    ],
-                    'effect' => [
-                        'data_type' => 'string',
-                        'input_type' => 'radio',
-                        'options' => $combat_boosts,
-                    ],
-                    'remove' => [
-                        'special' => 'remove',
-                    ],
-                ],
-            ],
-            'jutsu' => [
-                'count' => 3,
-                'num_required' => 1,
-                'variables' => $jutsu_variables,
-            ],
-        ];
-        $bloodline_variables['jutsu']['variables']['hand_seals']['unique_required'] = false;
-    }
-    {    /* Rank  */
-        $rank_variables = [
-            'name' => [
-                'data_type' => 'string',
-                'input_type' => 'text',
-                'max_length' => 64,
-            ],
-            'base_level' => [
-                'data_type' => 'int',
-                'input_type' => 'text',
-            ],
-            'max_level' => [
-                'data_type' => 'int',
-                'input_type' => 'text',
-            ],
-            'base_stats' => [
-                'data_type' => 'int',
-                'input_type' => 'text',
-            ],
-            'stats_per_level' => [
-                'data_type' => 'int',
-                'input_type' => 'text',
-            ],
-            'health_gain' => [
-                'data_type' => 'int',
-                'input_type' => 'text',
-            ],
-            'pool_gain' => [
-                'data_type' => 'int',
-                'input_type' => 'text',
-            ],
-            'stat_cap' => [
-                'data_type' => 'int',
-                'input_type' => 'text',
-            ],
-        ];
-    }
-    {    /* Clan */
-        $create_clan_variables = [
-            'name' => [
-                'data_type' => 'string',
-                'input_type' => 'text',
-                'max_length' => 50,
-            ],
-            'boost' => [
-                'data_type' => 'string',
-                'input_type' => 'text',
-                'max_length' => 40,
-            ],
-            'boost_amount' => [
-                'data_type' => 'float',
-                'input_type' => 'text',
-            ],
-            'village' => [
-                'data_type' => 'string',
-                'input_type' => 'radio',
-                'options' => ['Stone', 'Cloud', 'Leaf', 'Sand', 'Mist'],
-            ],
-            'bloodline_only' => [
-                'data_type' => 'int',
-                'input_type' => 'radio',
-                'options' => [0 => 'No', 1 => 'Yes'],
-            ],
-        ];
-        $edit_clan_variables = $create_clan_variables;
-        $edit_clan_variables['points'] = [
-            'data_type' => 'int',
-            'input_type' => 'text',
-        ];
-        $edit_clan_variables['leader'] = [
-            'data_type' => 'int',
-            'input_type' => 'text',
-        ];
-        $edit_clan_variables['elder_1'] = [
-            'data_type' => 'int',
-            'input_type' => 'text',
-        ];
-        $edit_clan_variables['elder_2'] = [
-            'data_type' => 'int',
-            'input_type' => 'text',
-        ];
-        $edit_clan_variables['challenge_1'] = [
-            'data_type' => 'string',
-            'input_type' => 'text',
-        ];
-        $edit_clan_variables['motto'] = [
-            'data_type' => 'string',
-            'input_type' => 'text',
-            'max_length' => 175,
-        ];
-        $edit_clan_variables['info'] = [
-            'data_type' => 'string',
-            'input_type' => 'text',
-            'max_length' => 750,
-        ];
-    }
-    {    /* Team */
-        $team_variables = [
-            'name' => [
-                'data_type' => 'string',
-                'input_type' => 'text',
-                'max_length' => 50,
-            ],
-            'village' => [
-                'data_type' => 'string',
-                'input_type' => 'radio',
-                'options' => ['Stone', 'Cloud', 'Leaf', 'Sand', 'Mist'],
-            ],
-            'type' => [
-                'data_type' => 'int',
-                'input_type' => 'radio',
-                'options' => [1 => 'Shinobi', 2 => 'ANBU'],
-            ],
-            'boost' => [
-                'data_type' => 'string',
-                'input_type' => 'text',
-                'max_length' => 40,
-            ],
-            'boost_amount' => [
-                'data_type' => 'float',
-                'input_type' => 'text',
-            ],
-            'points' => [
-                'data_type' => 'int',
-                'input_type' => 'text',
-            ],
-            'monthly_points' => [
-                'data_type' => 'int',
-                'input_type' => 'text',
-            ],
-            'leader' => [
-                'data_type' => 'string',
-                'input_type' => 'text',
-            ],
-            'mission_id' => [
-                'data_type' => 'int',
-                'input_type' => 'text',
-            ],
-            'logo' => [
-                'data_type' => 'string',
-                'input_type' => 'text',
-            ],
-        ];
-    }
-    {    /* Mission */
-        $mission_stage_variables = [
-            'action_type' => [
-                'data_type' => 'string',
-                'input_type' => 'radio',
-                'options' => ['travel', 'search', 'combat'],
-            ],
-            'action_data' => [
-                'data_type' => 'string',
-                'input_type' => 'text',
-            ],
-            'location_radius' => [
-                'data_type' => 'int',
-                'input_type' => 'text',
-            ],
-            'count' => [
-                'data_type' => 'int',
-                'input_type' => 'text',
-            ],
-            'description' => [
-                'data_type' => 'string',
-                'input_type' => 'text',
-                'max_length' => 300,
-            ],
-        ];
-        $mission_variables = [
-            'name' => [
-                'data_type' => 'string',
-                'input_type' => 'text',
-                'max_length' => 50,
-            ],
-            'rank' => [
-                'data_type' => 'int',
-                'input_type' => 'radio',
-                'options' => [1 => 'D-Rank', 2 => 'C-Rank', 3 => 'B-Rank', 4 => 'A-Rank', 5 => 'S-Rank'],
-            ],
-            'mission_type' => [
-                'data_type' => 'int',
-                'input_type' => 'radio',
-                'options' => [1 => 'Village', 2 => 'Clan', 3 => 'Team', 4 => 'Special', 5 => 'Survival'],
-            ],
-            'money' => [
-                'data_type' => 'int',
-                'input_type' => 'text',
-            ],
-            'stages' => [
-                'count' => 4,
-                'num_required' => 1,
-                'variables' => $mission_stage_variables,
-            ],
-        ];
-    }
+
     // Create AI
-    if($_GET['page'] == 'create_ai') {
+    if($page == 'create_ai') {
         /* Variables
         -ai_id
         -rank
@@ -745,7 +115,7 @@ function adminPanel() {
         -willpower
         -moves(json encoded text): [battle_text, power, jutsu_type] */
         /* Variables */
-        $variables =& $ai_variables;
+        $variables =& $constraints['ai'];
         $error = false;
         $data = [];
         if($_POST['ai_data']) {
@@ -767,7 +137,7 @@ function adminPanel() {
                 }
                 $query = "INSERT INTO `ai_opponents` ($column_names) VALUES ($column_data)";
                 $system->query($query);
-                if($system->db_affected_rows == 1) {
+                if($system->db_last_affected_rows == 1) {
                     $system->message("AI created!");
                 }
                 else {
@@ -801,7 +171,7 @@ function adminPanel() {
 		</td></tr></table>";
     }
     // Create jutsu
-    else if($_GET['page'] == 'create_jutsu') {
+    else if($page == 'create_jutsu') {
         /* Variables
         -jutsu_id
         -name
@@ -821,7 +191,7 @@ function adminPanel() {
         -effect_amount
         -effect_length */
         /* Variables */
-        $variables =& $jutsu_variables;
+        $variables =& $constraints['jutsu'];
         $error = false;
         $data = [];
         if($_POST['jutsu_data']) {
@@ -844,7 +214,7 @@ function adminPanel() {
                 // Hand seals hack
                 $query = "INSERT INTO `jutsu` ($column_names) VALUES ($column_data)";
                 $system->query($query);
-                if($system->db_affected_rows == 1) {
+                if($system->db_last_affected_rows == 1) {
                     $system->message("Jutsu created!");
                 }
                 else {
@@ -887,7 +257,7 @@ function adminPanel() {
 		</td></tr></table>";
     }
     // Create item
-    else if($_GET['page'] == 'create_item') {
+    else if($page == 'create_item') {
         /* Variables
             -item_id
             -name
@@ -899,7 +269,7 @@ function adminPanel() {
             -effect_amount */
         $table_name = 'items';
         /* Variables */
-        $variables =& $item_variables;
+        $variables =& $constraints['item'];
         $error = false;
         $data = [];
         if($_POST['item_data']) {
@@ -921,7 +291,7 @@ function adminPanel() {
                 }
                 $query = "INSERT INTO `$table_name` ($column_names) VALUES ($column_data)";
                 $system->query($query);
-                if($system->db_affected_rows == 1) {
+                if($system->db_last_affected_rows == 1) {
                     $system->message("Item created!");
                 }
                 else {
@@ -964,11 +334,11 @@ function adminPanel() {
 		</td></tr></table>";
     }
     // Create Bloodline
-    else if($_GET['page'] == 'create_bloodline') {
+    else if($page == 'create_bloodline') {
         $table_name = 'bloodlines';
         $content_name = 'bloodline';
         /* Variables */
-        $variables =& $bloodline_variables;
+        $variables =& $constraints['bloodline'];
         $error = false;
         $data = [];
         if($_POST[$content_name . '_data']) {
@@ -990,7 +360,7 @@ function adminPanel() {
                 }
                 $query = "INSERT INTO `$table_name` ($column_names) VALUES ($column_data)";
                 $system->query($query);
-                if($system->db_affected_rows == 1) {
+                if($system->db_last_affected_rows == 1) {
                     $system->message(ucwords($content_name) . " created!");
                 }
                 else {
@@ -1024,11 +394,11 @@ function adminPanel() {
 		</td></tr></table>";
     }
     // Create rank
-    else if($_GET['page'] == 'create_rank') {
+    else if($page == 'create_rank') {
         $table_name = 'ranks';
         $content_name = 'rank';
         /* Variables */
-        $variables =& $rank_variables;
+        $variables =& $constraints['rank'];
         $error = false;
         $data = [];
         if($_POST[$content_name . '_data']) {
@@ -1050,7 +420,7 @@ function adminPanel() {
                 }
                 $query = "INSERT INTO `$table_name` ($column_names) VALUES ($column_data)";
                 $system->query($query);
-                if($system->db_affected_rows == 1) {
+                if($system->db_last_affected_rows == 1) {
                     $system->message(ucwords($content_name) . " created!");
                 }
                 else {
@@ -1084,11 +454,11 @@ function adminPanel() {
 		</td></tr></table>";
     }
     // Create Clan
-    else if($_GET['page'] == 'create_clan') {
+    else if($page == 'create_clan') {
         $table_name = 'clans';
         $content_name = 'clan';
         /* Variables */
-        $variables =& $create_clan_variables;
+        $variables =& $constraints['create_clan'];
         $error = false;
         $data = [];
         if($_POST[$content_name . '_data']) {
@@ -1110,7 +480,7 @@ function adminPanel() {
                 }
                 $query = "INSERT INTO `$table_name` ($column_names) VALUES ($column_data)";
                 $system->query($query);
-                if($system->db_affected_rows == 1) {
+                if($system->db_last_affected_rows == 1) {
                     $system->message(ucwords($content_name) . " created!");
                 }
                 else {
@@ -1144,11 +514,11 @@ function adminPanel() {
 		</td></tr></table>";
     }
     // Create Clan
-    else if($_GET['page'] == 'create_mission') {
+    else if($page == 'create_mission') {
         $table_name = 'missions';
         $content_name = 'mission';
         /* Variables */
-        $variables =& $mission_variables;
+        $variables =& $constraints['mission'];
         $error = false;
         $data = [];
         if($_POST[$content_name . '_data']) {
@@ -1170,7 +540,7 @@ function adminPanel() {
                 }
                 $query = "INSERT INTO `$table_name` ($column_names) VALUES ($column_data)";
                 $system->query($query);
-                if($system->db_affected_rows == 1) {
+                if($system->db_last_affected_rows == 1) {
                     $system->message(ucwords($content_name) . " created!");
                 }
                 else {
@@ -1204,15 +574,15 @@ function adminPanel() {
 		</td></tr></table>";
     }
     // Edit AI
-    else if($_GET['page'] == 'edit_ai') {
+    else if($page == 'edit_ai') {
         /* Variables */
-        $variables =& $ai_variables;
+        $variables =& $constraints['ai'];
         $select_ai = true;
         // Validate AI id
         if($_POST['ai_id']) {
             $ai_id = (int)$system->clean($_POST['ai_id']);
             $result = $system->query("SELECT * FROM `ai_opponents` WHERE `ai_id`='$ai_id'");
-            if($system->db_num_rows == 0) {
+            if($system->db_last_num_rows == 0) {
                 $system->message("Invalid AI!");
                 $system->printMessage();
             }
@@ -1241,7 +611,7 @@ function adminPanel() {
                 }
                 $query .= "WHERE `ai_id`='$ai_id'";
                 $system->query($query);
-                if($system->db_affected_rows == 1) {
+                if($system->db_last_affected_rows == 1) {
                     $system->message("AI " . $data['name'] . " has been edited!");
                     $select_ai = true;
                 }
@@ -1290,15 +660,15 @@ function adminPanel() {
         }
     }
     // Edit jutsu
-    else if($_GET['page'] == 'edit_jutsu') {
+    else if($page == 'edit_jutsu') {
         $select_jutsu = true;
         /* Variables */
-        $variables =& $jutsu_variables;
+        $variables =& $constraints['jutsu'];
         // Validate jutsu id
         if($_POST['jutsu_id']) {
             $jutsu_id = (int)$system->clean($_POST['jutsu_id']);
             $result = $system->query("SELECT * FROM `jutsu` WHERE `jutsu_id`='$jutsu_id'");
-            if($system->db_num_rows == 0) {
+            if($system->db_last_num_rows == 0) {
                 $system->message("Invalid Jutsu!");
                 $system->printMessage();
             }
@@ -1328,7 +698,7 @@ function adminPanel() {
                 $query .= "WHERE `jutsu_id`='{$jutsu_data['jutsu_id']}'";
                 //echo $query;
                 $system->query($query);
-                if($system->db_affected_rows == 1) {
+                if($system->db_last_affected_rows == 1) {
                     $system->message("Jutsu edited!");
                     $select_jutsu = true;
                 }
@@ -1474,16 +844,16 @@ function adminPanel() {
         }
     }
     // Edit item
-    else if($_GET['page'] == 'edit_item') {
+    else if($page == 'edit_item') {
         $select_item = true;
         $table_name = 'items';
         /* Variables */
-        $variables =& $item_variables;
+        $variables =& $constraints['item'];
         // Validate item id
         if($_POST['item_id']) {
             $item_id = (int)$system->clean($_POST['item_id']);
             $result = $system->query("SELECT * FROM `$table_name` WHERE `item_id`='$item_id'");
-            if($system->db_num_rows == 0) {
+            if($system->db_last_num_rows == 0) {
                 $system->message("Invalid item!");
                 $system->printMessage();
             }
@@ -1512,7 +882,7 @@ function adminPanel() {
                 $query .= "WHERE `item_id`='{$item_data['item_id']}'";
                 //echo $query;
                 $system->query($query);
-                if($system->db_affected_rows == 1) {
+                if($system->db_last_affected_rows == 1) {
                     $system->message("Item edited!");
                     $select_item = true;
                 }
@@ -1637,17 +1007,17 @@ function adminPanel() {
         }
     }
     // Edit Bloodline
-    else if($_GET['page'] == 'edit_bloodline') {
+    else if($page == 'edit_bloodline') {
         $table_name = 'bloodlines';
         $content_name = 'bloodline';
         /* Variables */
-        $variables =& $bloodline_variables;
+        $variables =& $constraints['bloodline'];
         $select_content = true;
         // Validate AI id
         if($_POST[$content_name . '_id']) {
             $content_id = (int)$system->clean($_POST[$content_name . '_id']);
             $result = $system->query("SELECT * FROM `{$table_name}` WHERE `{$content_name}_id`='$content_id'");
-            if($system->db_num_rows == 0) {
+            if($system->db_last_num_rows == 0) {
                 $system->message("Invalid $content_name!");
                 $system->printMessage();
             }
@@ -1675,7 +1045,7 @@ function adminPanel() {
                 }
                 $query .= "WHERE `{$content_name}_id`='$content_id'";
                 $system->query($query);
-                if($system->db_affected_rows == 1) {
+                if($system->db_last_affected_rows == 1) {
                     $system->message(ucwords($content_name) . ' ' . $data['name'] . " has been edited!");
                     $select_content = true;
                 }
@@ -1723,17 +1093,17 @@ function adminPanel() {
         }
     }
     // Edit AI
-    else if($_GET['page'] == 'edit_rank') {
+    else if($page == 'edit_rank') {
         $table_name = 'ranks';
         $content_name = 'rank';
         /* Variables */
-        $variables =& $rank_variables;
+        $variables =& $constraints['rank'];
         $select_content = true;
         // Validate content id
         if($_POST[$content_name . '_id']) {
             $content_id = (int)$system->clean($_POST[$content_name . '_id']);
             $result = $system->query("SELECT * FROM `{$table_name}` WHERE `{$content_name}_id`='$content_id'");
-            if($system->db_num_rows == 0) {
+            if($system->db_last_num_rows == 0) {
                 $system->message("Invalid $content_name!");
                 $system->printMessage();
             }
@@ -1762,7 +1132,7 @@ function adminPanel() {
                 }
                 $query .= "WHERE `{$content_name}_id`='$content_id'";
                 $system->query($query);
-                if($system->db_affected_rows == 1) {
+                if($system->db_last_affected_rows == 1) {
                     $system->message(ucwords($content_name) . ' ' . $data['name'] . " has been edited!");
                     $select_content = true;
                 }
@@ -1810,17 +1180,18 @@ function adminPanel() {
         }
     }
     // Edit Clan
-    else if($_GET['page'] == 'edit_clan') {
+    else if($page == 'edit_clan') {
         $table_name = 'clans';
         $content_name = 'clan';
         /* Variables */
-        $variables =& $edit_clan_variables;
+        $variables =& $constraints['edit_clan'];
+
         $select_content = true;
         // Validate AI id
         if($_POST[$content_name . '_id']) {
             $content_id = (int)$system->clean($_POST[$content_name . '_id']);
             $result = $system->query("SELECT * FROM `{$table_name}` WHERE `{$content_name}_id`='$content_id'");
-            if($system->db_num_rows == 0) {
+            if($system->db_last_num_rows == 0) {
                 $system->message("Invalid $content_name!");
                 $system->printMessage();
             }
@@ -1849,7 +1220,7 @@ function adminPanel() {
                 }
                 $query .= "WHERE `{$content_name}_id`='$content_id'";
                 $system->query($query);
-                if($system->db_affected_rows == 1) {
+                if($system->db_last_affected_rows == 1) {
                     $system->message(ucwords($content_name) . ' ' . $data['name'] . " has been edited!");
                     $select_content = true;
                 }
@@ -1898,17 +1269,18 @@ function adminPanel() {
         }
     }
     // Edit Team
-    else if($_GET['page'] == 'edit_team') {
+    else if($page == 'edit_team') {
         $table_name = 'teams';
         $content_name = 'team';
         /* Variables */
-        $variables =& $team_variables;
+        $variables =& $constraints['team'];
+
         $select_content = true;
         // Validate AI id
         if($_POST[$content_name . '_id']) {
             $content_id = (int)$system->clean($_POST[$content_name . '_id']);
             $result = $system->query("SELECT * FROM `{$table_name}` WHERE `{$content_name}_id`='$content_id'");
-            if($system->db_num_rows == 0) {
+            if($system->db_last_num_rows == 0) {
                 $system->message("Invalid $content_name!");
                 $system->printMessage();
             }
@@ -1937,7 +1309,7 @@ function adminPanel() {
                 }
                 $query .= "WHERE `{$content_name}_id`='$content_id'";
                 $system->query($query);
-                if($system->db_affected_rows == 1) {
+                if($system->db_last_affected_rows == 1) {
                     $system->message(ucwords($content_name) . ' ' . $data['name'] . " has been edited!");
                     $select_content = true;
                 }
@@ -1986,17 +1358,18 @@ function adminPanel() {
         }
     }
     // Edit Mission
-    else if($_GET['page'] == 'edit_mission') {
+    else if($page == 'edit_mission') {
         $table_name = 'missions';
         $content_name = 'mission';
         /* Variables */
-        $variables =& $mission_variables;
+        $variables =& $constraints['mission'];
+
         $select_content = true;
         // Validate content id
         if($_POST[$content_name . '_id']) {
             $content_id = (int)$system->clean($_POST[$content_name . '_id']);
             $result = $system->query("SELECT * FROM `{$table_name}` WHERE `{$content_name}_id`='$content_id'");
-            if($system->db_num_rows == 0) {
+            if($system->db_last_num_rows == 0) {
                 $system->message("Invalid $content_name!");
                 $system->printMessage();
             }
@@ -2025,7 +1398,7 @@ function adminPanel() {
                 }
                 $query .= "WHERE `{$content_name}_id`='$content_id'";
                 $system->query($query);
-                if($system->db_affected_rows == 1) {
+                if($system->db_last_affected_rows == 1) {
                     $system->message(ucwords($content_name) . ' ' . $data['name'] . " has been edited!");
                     $select_content = true;
                 }
@@ -2074,58 +1447,31 @@ function adminPanel() {
         }
     }
     /* USER ADMINISTRATION PAGES */
-    else if($_GET['page'] == 'edit_user') {
+    else if($page == 'edit_user') {
         $select_user = true;
-        /* Variables
-            -email
-            -avatar_link
-            -gender
-            -level
-            -rank
-            -health
-            -max_health
-            -stamina
-            -max_stamina
-            -chakra
-            -max_chakra
-            -regen_rate
-            -exp
-            -money
-            -pvp_wins
-            -pvp_losses
-            -ai_wins
-            -ai_losses
-            -ninjutsu_skill
-            -genjutsu_skill
-            -taijutsu_skill
-            -bloodline_skill
-            -cast_speed
-            -speed
-            -strength
-            -endurance
-            -intelligence
-            -willpower
-            -battle_id
-            -location(x.y)
-            -awake
-            -village
-            -staff_level
-            */
         /* Variables */
-        $variables =& $edit_user_variables;
-        if($player->staff_level >= System::SC_HEAD_ADMINISTRATOR) {
+        $variables =& $constraints['edit_user'];
+
+        if($player->isHeadAdmin()) {
             $variables['staff_level'] = [
                 'data_type' => 'int',
                 'input_type' => 'radio',
-                'options' => [0 => 'normal_user', System::SC_MODERATOR => 'moderator', System::SC_HEAD_MODERATOR => 'head moderator',
-                    System::SC_ADMINISTRATOR => 'administrator', System::SC_HEAD_ADMINISTRATOR => 'head administrator'],
+                'options' => [
+                    User::STAFF_NONE => 'normal_user',
+                    User::STAFF_MODERATOR => 'moderator',
+                    User::STAFF_HEAD_MODERATOR => 'head moderator',
+                    User::STAFF_CONTENT_ADMIN => 'content admin',
+                    User::STAFF_ADMINISTRATOR => 'administrator',
+                    User::STAFF_HEAD_ADMINISTRATOR => 'head administrator'
+                ],
             ];
         }
+
         // Validate user name
         if($_GET['user_name']) {
             $user_name = $system->clean($_GET['user_name']);
             $result = $system->query("SELECT * FROM `users` WHERE `user_name`='$user_name'");
-            if($system->db_num_rows == 0) {
+            if($system->db_last_num_rows == 0) {
                 $system->message("Invalid user!");
                 $system->printMessage();
             }
@@ -2140,6 +1486,7 @@ function adminPanel() {
                 // Load form data
                 $data = [];
                 validateFormData($variables, $data);
+
                 // Insert into database
                 $column_names = '';
                 $column_data = '';
@@ -2155,7 +1502,8 @@ function adminPanel() {
                 $query .= "WHERE `user_id`='{$user_data['user_id']}'";
                 // echo $query;
                 $system->query($query);
-                if($system->db_affected_rows == 1) {
+
+                if($system->db_last_affected_rows == 1) {
                     $system->message("User edited!");
                     $select_user = true;
                     if($user_data['user_id'] == $player->user_id) {
@@ -2204,11 +1552,11 @@ function adminPanel() {
         }
     }
     // Activate user
-    else if($_GET['page'] == 'activate_user') {
+    else if($page == 'activate_user') {
         if($_POST['activate']) {
             $activate = $system->clean($_POST['activate']);
             $system->query("UPDATE `users` SET `user_verified`='1' WHERE `user_name`='$activate' LIMIT 1");
-            if($system->db_affected_rows == 1) {
+            if($system->db_last_affected_rows == 1) {
                 $system->message("User activated!");
             }
             else {
@@ -2226,19 +1574,19 @@ function adminPanel() {
 		</td></tr></table>";
     }
     // Delete user
-    else if($_GET['page'] == 'delete_user') {
+    else if($page == 'delete_user') {
         $select_user = true;
         if($_POST['user_name']) {
             $user_name = $system->clean($_POST['user_name']);
             try {
                 $result = $system->query("SELECT `user_id`, `user_name`, `staff_level` FROM `users` WHERE `user_name`='$user_name' LIMIT 1");
-                if($system->db_num_rows == 0) {
+                if($system->db_last_num_rows == 0) {
                     throw new Exception("Invalid user!");
                 }
                 $result = $system->db_fetch($result);
                 $user_id = $result['user_id'];
                 $user_name = $result['user_name'];
-                if($result['staff_level'] >= System::SC_ADMINISTRATOR && $player->staff_level < System::SC_HEAD_ADMINISTRATOR) {
+                if($result['staff_level'] >= $player->staff_level && !$player->isHeadAdmin()) {
                     throw new Exception("You cannot delete other admins!");
                 }
                 if(!isset($_POST['confirm'])) {
@@ -2277,10 +1625,10 @@ function adminPanel() {
         }
     }
     // Give bloodline
-    else if($_GET['page'] == 'give_bloodline') {
+    else if($page == 'give_bloodline') {
         // Fetch BL list
         $result = $system->query("SELECT `bloodline_id`, `name` FROM `bloodlines`");
-        if($system->db_num_rows == 0) {
+        if($system->db_last_num_rows == 0) {
             $system->message("No bloodlines in database!");
             $system->printMessage();
             return false;
@@ -2297,7 +1645,7 @@ function adminPanel() {
                     throw new Exception("Invalid bloodline!");
                 }
                 $result = $system->query("SELECT `user_id` FROM `users` WHERE `user_name`='$user_name' LIMIT 1");
-                if($system->db_num_rows == 0) {
+                if($system->db_last_num_rows == 0) {
                     throw new Exception("User does not exist!");
                 }
                 $result = $system->db_fetch($result);
@@ -2475,7 +1823,7 @@ function validateVariable($var_name, $input, $variable, &$variables, &$data, $co
 				WHERE `{$variable['unique_column']}` = '" . $data[$var_name] . "' LIMIT 1";
         }
         $result = $system->query($query);
-        if($system->db_num_rows > 0) {
+        if($system->db_last_num_rows > 0) {
             throw new Exception("'" . ucwords(str_replace("_", " ", $var_name)) . "' needs to be unique, the value '" . $data[$var_name] . "' is already taken!");
         }
     }
@@ -2579,10 +1927,11 @@ function displayVariable($var_name, $variable, $current_value, $input_name_prefi
 function giveBloodline($bloodline_id, $user_id, $display = true) {
     global $system;
     $result = $system->query("SELECT * FROM `bloodlines` WHERE `bloodline_id` = '$bloodline_id' LIMIT 1");
-    if($system->db_num_rows == 0) {
+    if($system->db_last_num_rows == 0) {
         throw new Exception("Invalid bloodline!");
     }
     $bloodline = $system->db_fetch($result);
+
     $user_bloodline['bloodline_id'] = $bloodline['bloodline_id'];
     $user_bloodline['name'] = $bloodline['name'];
     $user_bloodline['passive_boosts'] = $bloodline['passive_boosts'];
@@ -2590,6 +1939,7 @@ function giveBloodline($bloodline_id, $user_id, $display = true) {
     $user_bloodline['jutsu'] = $bloodline['jutsu'];
     // 5000 bl skill -> 20 power = 1 increment of BL effect
     // Heal: 1 increment = 100 heal
+
     $effects = [
         // Passive boosts
         'scout_range' => [
@@ -2661,15 +2011,18 @@ function giveBloodline($bloodline_id, $user_id, $display = true) {
         }
         $user_bloodline['combat_boosts'] = json_encode($user_bloodline['combat_boosts']);
     }
+
     // move ids (level & exp -> 0)
     $user_bloodline['jutsu'] = false;
     $result = $system->query("SELECT `bloodline_id` FROM `user_bloodlines` WHERE `user_id`='$user_id' LIMIT 1");
+
     // Insert new row
-    if($system->db_num_rows == 0) {
+    if($system->db_last_num_rows == 0) {
         $query = "INSERT INTO `user_bloodlines` (`user_id`, `bloodline_id`, `name`, `passive_boosts`, `combat_boosts`, `jutsu`)
 			VALUES ('$user_id', '$bloodline_id', '{$user_bloodline['name']}', '{$user_bloodline['passive_boosts']}', 
 			'{$user_bloodline['combat_boosts']}', '{$user_bloodline['jutsu']}')";
     }
+
     // Update existing row
     else {
         $query = "UPDATE `user_bloodlines` SET
@@ -2681,7 +2034,8 @@ function giveBloodline($bloodline_id, $user_id, $display = true) {
 			WHERE `user_id`='$user_id' LIMIT 1";
     }
     $system->query($query);
-    if($system->db_affected_rows == 1) {
+
+    if($system->db_last_affected_rows == 1) {
         if($display) {
             $system->message("Bloodline given!");
         }
@@ -2714,6 +2068,7 @@ function giveBloodline($bloodline_id, $user_id, $display = true) {
     else {
         throw new Exception("Error giving bloodline! (Or user already has this BL)");
     }
+
     if($display) {
         $system->printMessage();
     }
