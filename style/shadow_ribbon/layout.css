@@ -937,7 +937,7 @@ br.clear {
     text-align: left;
 
     color: rgb(48, 48, 48);
-    font-size: 0.7rem;
+    font-size: 0.8rem;
 }
 
 .dailyTaskReward {
@@ -1004,7 +1004,8 @@ br.clear {
 }
 
 .dailyTaskMedium {
-    color: #b1a00b;
+    color: #ffea24;
+    text-shadow: 0 0 2px black;
 }
 
 .dailyTaskHard {

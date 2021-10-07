@@ -116,54 +116,33 @@ function team() {
 		}
 		$system->printMessage();
 	}
-	else if (isset($_POST['set_boost'], $_POST['set_amount'])) {
-
-		$boost_valid = true;
-		$boost = $system->clean($_POST['set_boost']);
-		$amount = $system->clean($_POST['set_amount']);
+	else if (isset($_POST['boost_type'], $_POST['boost_size'])) {
+		$boost_type = $system->clean($_POST['boost_type']);
+		$boost_size = $system->clean($_POST['boost_size']);
 
 		$allowed_boosts = Team::$allowed_boosts;
 		
-		if ($player->user_id != $player->team->leader) {
-			$system->message('You are not the leader of this team!');
-			$boost_valid = false;
-		}
+        try {
+            if ($player->user_id != $player->team->leader) {
+                throw new Exception('You are not the leader of this team!');
+            }
 
-		if (!array_key_exists($boost, $allowed_boosts)) {
-			$system->message('This boost does not exist!');
-			$boost_valid = false;
-		}
+            if(!isset($allowed_boosts[$boost_type])) {
+                throw new Exception('This boost does not exist!');
+            }
 
-		if (!array_key_exists($amount, $allowed_boosts[$boost]['Amount'])) {
-			$system->message('You cannot boost by this amount!');
-			$boost_valid = false;
-		}
-
-		if ($allowed_boosts[$boost]['Amount'][$amount]['Cost'] > $player->team->points) {
-			$system->message('Your team does not have enough points for this boost!');
-			$boost_valid = false;
-		}
-		
-		if ($boost_valid) {
-			$new_points = $player->team->points - $allowed_boosts[$boost]['Amount'][$amount]['Cost'];
-			$boost_time = time();
-			try {
-				$result = $system->query("UPDATE `teams` SET 
-                    `boost`='{$boost}', 
-                    `boost_amount`='{$amount}', 
-                    `points`='{$new_points}', 
-                    `boost_time`='{$boost_time}' 
-                    WHERE `team_id`='{$player->team->id}' ");
-				$system->message('Boost set!');
-			}
-			catch (Exception $e) {
-				$system->message($e->getMessage());
-			}
-		}
-		
+            if(!isset($boost_size, $allowed_boosts[$boost_type])) {
+                throw new Exception('You cannot boost by this amount!');
+            }
+            
+            $player->team->setBoost($boost_type, $boost_size);
+            $system->message('Boost set!');
+        }
+        catch (Exception $e) {
+            $system->message($e->getMessage());
+        }
 		
 		$system->printMessage();
-
 	}
 	else if(isset($_GET['join_mission']) && $player->team->mission_id) {
 		$mission_id = $player->team->mission_id;
@@ -322,7 +301,7 @@ function team() {
 	$result = $system->query("SELECT `user_name`, `avatar_link`, `forbidden_seal` FROM `users` WHERE `user_id`='" . $player->team->leader . "' LIMIT 1");
 	if($system->db_last_num_rows > 0) {
 		$result = $system->db_fetch($result);
-		$leader = $result['user_name'];
+		$leader_name = $result['user_name'];
 		$leader_avatar = $result['avatar_link'];
 		$leader_avatar_size = '125px';
 		if($result['forbidden_seal']) {
@@ -330,19 +309,9 @@ function team() {
 		}
 	}
 	else {
-		$leader = 'None';
+		$leader_name = 'None';
 		$leader_avatar = './images/default_avatar.png';
 	}
-
-	if ($player->team->boost != 'none') {
-		$boost_text = $player->team->boost . ' -- ' . $player->team->boost_amount . '%';
-		$time_left = $player->team->boost_time + (60*60*24*7) - time();
-		$boost_time = $system->timeRemaining($time_left, 'long');
-	} else {
-		$boost_text = 'none';
-		$boost_time = 'n/a';
-	}
-
 
     $result = $system->query("SELECT `mission_id`, `name`, `rank` FROM `missions` WHERE `mission_type`=3");
 	$available_missions = [];
