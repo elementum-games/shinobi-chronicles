@@ -610,6 +610,9 @@ p {
 #content .headModerator, #content a.headModerator:hover {
 	color: #0090A0;
 }
+#content .contentAdmin, #content a.contentAdmin:hover {
+    color: #A000B0;
+}
 #content .administrator, #content a.administrator:hover {
 	color: #A00000;
 }

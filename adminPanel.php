@@ -19,43 +19,84 @@ function adminPanel() {
         return false;
     }
 
+    $content_create_pages = [
+        'create_ai',
+        'create_jutsu',
+        'create_item',
+        'create_bloodline',
+        'create_mission',
+        'create_clan',
+    ];
+    $content_edit_pages = [
+        'edit_ai',
+        'edit_jutsu',
+        'edit_item',
+        'edit_bloodline',
+        'edit_mission',
+        'edit_clan',
+    ];
+
+    $user_admin_pages = [
+        'create_rank',
+        'edit_rank',
+        'edit_team',
+        'edit_user',
+        'activate_user',
+        'delete_user',
+        'give_bloodline',
+    ];
+
+
     // Menu
-    echo "<table class='table'><tr><th>Menu</th></tr>
-	<tr><td style='text-align:center;'>
-		<a href='$self_link&page=create_ai'>Create AI</a> &nbsp;&nbsp;|&nbsp;&nbsp;
-		<a href='$self_link&page=create_jutsu'>Create Jutsu</a> &nbsp;&nbsp;|&nbsp;&nbsp;
-		<a href='$self_link&page=create_item'>Create Item</a> &nbsp;&nbsp;|&nbsp;&nbsp;
-		<a href='$self_link&page=create_rank'>Create Rank</a> &nbsp;&nbsp;|&nbsp;&nbsp;
-		<a href='$self_link&page=create_bloodline'>Create Bloodline</a>
-	</td></tr>
-	<tr><td style='text-align:center;'>
-		<a href='$self_link&page=create_clan'>Create Clan</a> &nbsp;&nbsp;|&nbsp;&nbsp;
-		<a href='$self_link&page=create_mission'>Create Mission</a>
-	</td></tr>
-	<tr><td style='text-align:center;'>
-		<a href='$self_link&page=edit_ai'>Edit AI</a> &nbsp;&nbsp;|&nbsp;&nbsp;
-		<a href='$self_link&page=edit_jutsu'>Edit Jutsu</a> &nbsp;&nbsp;|&nbsp;&nbsp;
-		<a href='$self_link&page=edit_item'>Edit Item</a> &nbsp;&nbsp;|&nbsp;&nbsp;
-		<a href='$self_link&page=edit_rank'>Edit Rank</a> &nbsp;&nbsp;|&nbsp;&nbsp;
-		<a href='$self_link&page=edit_bloodline'>Edit Bloodline</a>	
-	</td></tr>
-	<tr><td style='text-align:center;'>
-		<a href='$self_link&page=edit_clan'>Edit Clan</a> &nbsp;&nbsp;|&nbsp;&nbsp;
-		<a href='$self_link&page=edit_team'>Edit Team</a> &nbsp;&nbsp;|&nbsp;&nbsp;
-		<a href='$self_link&page=edit_mission'>Edit Mission</a>
-	</td></tr>	
-	<tr><td style='text-align:center;'>
-		<a href='$self_link&page=edit_user'>Edit user</a> &nbsp;&nbsp;|&nbsp;&nbsp;
-		<a href='$self_link&page=activate_user'>Activate user</a> &nbsp;&nbsp;|&nbsp;&nbsp;
-		<a href='$self_link&page=delete_user'>Delete user</a> &nbsp;&nbsp;|&nbsp;&nbsp;
-		<a href='$self_link&page=give_bloodline'>Give Bloodline</a>
-	</tr></td>";
+    echo "<table class='table'>
+        <tr><th>Admin Panel Menu</th></tr>";
+	if($player->isContentAdmin()) {
+	    echo "<tr><td style='text-align:center'>";
+	    echo implode(
+	        "&nbsp;&nbsp;|&nbsp;&nbsp;",
+            array_map(function($page_slug) use ($self_link) {
+                return "<a href='{$self_link}&page={$page_slug}'>" . System::unSlug($page_slug) . "</a>";
+            }, $content_create_pages)
+        );
+	    echo "</td></tr>";
+    }
+    if($player->isContentAdmin()) {
+        echo "<tr><td style='text-align:center'>";
+        echo implode(
+            "&nbsp;&nbsp;|&nbsp;&nbsp;",
+            array_map(function($page_slug) use ($self_link) {
+                return "<a href='{$self_link}&page={$page_slug}'>" . System::unSlug($page_slug) . "</a>";
+            }, $content_edit_pages)
+        );
+        echo "</td></tr>";
+    }
+    if($player->isUserAdmin()) {
+        echo "<tr><td style='text-align:center'>";
+        echo implode(
+            "&nbsp;&nbsp;|&nbsp;&nbsp;",
+            array_map(function($page_slug) use ($self_link) {
+                return "<a href='{$self_link}&page={$page_slug}'>" . System::unSlug($page_slug) . "</a>";
+            }, $user_admin_pages)
+        );
+        echo "</td></tr>";
+    }
     echo "</table>";
 
     // Variable sets
     $constraints = require 'admin/entity_constraints.php';
 
     $page = $_GET['page'] ?? '';
+
+    if(array_search($page, $user_admin_pages) !== false && !$player->isUserAdmin()) {
+        $page = '';
+    }
+    else if(array_search($page, $content_create_pages) !== false && !$player->isContentAdmin()) {
+        $page = '';
+    }
+    else if(array_search($page, $content_edit_pages) !== false && !$player->isContentAdmin()) {
+        $page = '';
+    }
+
     // Create AI
     if($page == 'create_ai') {
         /* Variables

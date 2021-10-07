@@ -1304,7 +1304,7 @@ function premium() {
                 echo "
 				<input type='radio' name='name_color' value='purple' " .
                     ($player->forbidden_seal['color'] == 'purple' ? "checked='checked'" : '') . "/>
-				<span class='administrator' style='font-weight:bold;'>Purple</span>";
+				<span class='contentAdmin' style='font-weight:bold;'>Purple</span>";
             }
 			if ($player->isUserAdmin()) {
 				echo "

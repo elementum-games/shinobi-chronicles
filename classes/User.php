@@ -1383,6 +1383,7 @@ class User extends Fighter {
     public function isContentAdmin(): bool {
         switch($this->staff_level) {
             case User::STAFF_CONTENT_ADMIN:
+            case User::STAFF_ADMINISTRATOR:
             case User::STAFF_HEAD_ADMINISTRATOR:
                 return true;
             default:

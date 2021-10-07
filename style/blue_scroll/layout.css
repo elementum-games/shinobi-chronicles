@@ -1373,6 +1373,16 @@ p {
                 -1px -1px 1px #14626b;
 }
 
+#content .contentAdmin,
+#content .table .contentAdmin,
+#content .table a.contentAdmin,
+#content a.contentAdmin:hover,
+#content .chat_msg .contentAdmin,
+#content .chat_msg a.contentAdmin:hover {
+    color: #a000b0;
+}
+
+
 #content .administrator,
 #content .table .administrator,
 #content .table a.administrator,

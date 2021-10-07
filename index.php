@@ -476,13 +476,16 @@ if($LOGGED_IN) {
             }
         }
 
-		if($player->isModerator()) {
-			echo $staff_menu_header;
-			echo "<li><a id='sideMenuOption-ModPanel' href='{$system->link}?id=16'>Mod Panel</a></li>";
-		}
-		if($player->isUserAdmin()) {
-			echo "<li><a id='sideMenuOption-AdminPanel' href='{$system->link}?id=17'>Admin Panel</a></li>";
-		}
+        if($player->isModerator() || $player->hasAdminPanel()) {
+            echo $staff_menu_header;
+            if($player->isModerator()) {
+                echo "<li><a id='sideMenuOption-ModPanel' href='{$system->link}?id=16'>Mod Panel</a></li>";
+            }
+            if($player->hasAdminPanel()) {
+                echo "<li><a id='sideMenuOption-AdminPanel' href='{$system->link}?id=17'>Admin Panel</a></li>";
+            }
+        }
+
 		// Logout timer
 		$time_remaining = ($logout_limit * 60) - (time() - $player->last_login);
 		$logout_time = System::timeRemaining($time_remaining, 'short', false, true) . " remaining";
