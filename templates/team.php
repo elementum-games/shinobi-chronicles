@@ -202,7 +202,7 @@
                         <label for='boost_type'>Boost Type</label><br />
                         <select id='boost_type' name='boost_type' style='width:110px;' onchange='updateType()'>
                             <option value='<?= Team::BOOST_TRAINING ?>'>Training</option>
-                            <option value='<?= Team::BOOST_AI_MONEY ?>'>AI Gains</option>
+                            <option value='<?= Team::BOOST_AI_MONEY ?>'>AI Money</option>
                         </select>
                         <br />
 
