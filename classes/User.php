@@ -515,7 +515,9 @@ class User extends Fighter {
             // Player team stuff
             else {
                 $this->team = Team::findById($this->system, $team_id);
-                $this->defense_boost += $this->team->getDefenseBoost($this);
+                if($this->team != null) {
+                    $this->defense_boost += $this->team->getDefenseBoost($this);
+                }
             }
         }
 
