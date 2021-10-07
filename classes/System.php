@@ -1,6 +1,7 @@
 <?php
 
 require_once __DIR__ . '/EntityId.php';
+require_once __DIR__ . '/User.php';
 
 /*	Class:		System
 	Purpose: 	Handle database connection and queries. Handle storing and printing of error messages.
@@ -68,8 +69,8 @@ class System {
             'pm_class' => 'headModerator'
         ),
         User::STAFF_CONTENT_ADMIN => array(
-            'staffBanner' => "contentAdmin",
-            'staffColor' => "A000A0",
+            'staffBanner' => "content admin",
+            'staffColor' => "#A000B0",
             'pm_class' => 'contentAdmin'
         ),
         User::STAFF_ADMINISTRATOR => array(
@@ -795,6 +796,10 @@ class System {
             'U.u',
             number_format($microtime, 2, '.', '')
         );
+    }
+
+    public static function unSlug(string $slug) {
+        return ucwords(str_replace('_', ' ', $slug));
     }
 }
 

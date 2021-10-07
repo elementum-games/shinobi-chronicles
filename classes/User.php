@@ -3,6 +3,7 @@
 require_once __DIR__ . "/Jutsu.php";
 require_once __DIR__ . "/Team.php";
 require_once __DIR__ . "/DailyTask.php";
+require_once __DIR__ . "/Fighter.php";
 
 /*	Class:		User
 	Purpose:	Fetch user data and load into class variables.
