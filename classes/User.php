@@ -455,7 +455,7 @@ class User extends Fighter {
                 `last_reset`='" . time() . "' 
                 WHERE `user_id`='{$this->user_id}'");
         }
-        else {
+        else if(!$remote_view) {
             // check if the user has completed stuff and reward them if so
             foreach($this->daily_tasks as $task) {
                 if(!$task->complete && $task->progress >= $task->amount) {
