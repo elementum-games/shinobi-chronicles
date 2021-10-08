@@ -429,9 +429,9 @@ p {
 	margin: 0;
 	padding-left: 10px;
 	
-	left: 150px;
-	top: 27px;
-    right: 10px;
+	left: 200px;
+	top: 28px;
+    right: 25px;
 	
 	z-index: 50;
 	
@@ -440,6 +440,7 @@ p {
 	text-align: center;
 	color: #00A000;
 }
+
 .trainingNotification {
 	width: var(--side-menu-width);
 	position: absolute;

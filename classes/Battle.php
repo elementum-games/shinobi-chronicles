@@ -490,8 +490,11 @@ class Battle {
         if(isset($this->default_attacks[$jutsu_id]) && $this->default_attacks[$jutsu_id]->jutsu_type == Jutsu::TYPE_TAIJUTSU) {
             $fighter_jutsu = $this->default_attacks[$jutsu_id];
         }
-        if(isset($this->player->jutsu[$jutsu_id]) && $this->player->jutsu[$jutsu_id]->jutsu_type == Jutsu::TYPE_TAIJUTSU) {
-            $fighter_jutsu = $this->player->jutsu[$jutsu_id];
+        if(isset($fighter->jutsu[$jutsu_id]) &&
+            $fighter->jutsu[$jutsu_id]->jutsu_type == Jutsu::TYPE_TAIJUTSU &&
+            $fighter->hasEquippedJutsu($jutsu_id)
+        ) {
+            $fighter_jutsu = $fighter->jutsu[$jutsu_id];
         }
 
         if($fighter_jutsu) {

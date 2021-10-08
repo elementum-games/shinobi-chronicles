@@ -150,6 +150,8 @@ abstract class Fighter {
     // abstract public function hasJutsu(int $jutsu_id): bool;
     abstract public function hasItem(int $item_id): bool;
 
+    abstract public function hasEquippedJutsu(int $jutsu_id): bool;
+
     public function getSingularPronoun(): string {
         if($this->gender == 'Male') {
             return 'he';

@@ -1337,6 +1337,15 @@ class User extends Fighter {
         return $skill_ratio;
     }
 
+    public function hasEquippedJutsu(int $jutsu_id): bool {
+        foreach($this->equipped_jutsu as $jutsu) {
+            if($jutsu['id'] == $jutsu_id) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public function removeJutsu(int $jutsu_id) {
         $jutsu = $this->jutsu[$jutsu_id];
         unset($this->jutsu[$jutsu_id]);
