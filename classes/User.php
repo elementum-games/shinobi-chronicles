@@ -1338,6 +1338,10 @@ class User extends Fighter {
     }
 
     public function hasEquippedJutsu(int $jutsu_id): bool {
+        if(!isset($this->jutsu[$jutsu_id])) {
+            return false;
+        }
+
         foreach($this->equipped_jutsu as $jutsu) {
             if($jutsu['id'] == $jutsu_id) {
                 return true;

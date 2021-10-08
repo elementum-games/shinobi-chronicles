@@ -490,10 +490,7 @@ class Battle {
         if(isset($this->default_attacks[$jutsu_id]) && $this->default_attacks[$jutsu_id]->jutsu_type == Jutsu::TYPE_TAIJUTSU) {
             $fighter_jutsu = $this->default_attacks[$jutsu_id];
         }
-        if(isset($fighter->jutsu[$jutsu_id]) &&
-            $fighter->jutsu[$jutsu_id]->jutsu_type == Jutsu::TYPE_TAIJUTSU &&
-            $fighter->hasEquippedJutsu($jutsu_id)
-        ) {
+        if($fighter->hasEquippedJutsu($jutsu_id) && $fighter->jutsu[$jutsu_id]->jutsu_type == Jutsu::TYPE_TAIJUTSU) {
             $fighter_jutsu = $fighter->jutsu[$jutsu_id];
         }
 
