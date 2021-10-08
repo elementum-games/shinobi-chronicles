@@ -510,7 +510,7 @@ class User extends Fighter {
         if($team_id) {
             // Invite stuff
             if(substr($team_id, 0, 7) == 'invite:') {
-                $this->team_invite = (int)substr($this->team, 7);
+                $this->team_invite = (int)explode(':', $team_id)[1];
             }
             // Player team stuff
             else {
