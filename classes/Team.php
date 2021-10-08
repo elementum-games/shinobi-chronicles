@@ -255,6 +255,8 @@ class Team {
      * @throws Exception
      */
     public function fetchLeader(): User {
-        return new User($this->leader);
+        $leader = new User($this->leader);
+        $leader->loadData(0, true);
+        return $leader;
     }
 }
