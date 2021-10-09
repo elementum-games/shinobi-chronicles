@@ -1026,7 +1026,7 @@ function premium() {
 
 		$genders = array('Male', 'Female','Non-binary','None');
 		echo "<tr><th>Gender Change</th></tr>
-		<tr><td style='text-align:center;'>You can change your gender to:
+		<tr><td style='text-align:center;'>You can change your gender  for {$costs['gender_change']} Ancient Kunai.
 		<form action='$self_link' method='post'>
 			<select name='new_gender'>";
 				foreach($genders as $new_gender) {
@@ -1038,7 +1038,6 @@ function premium() {
 				}
 				echo "
 				</select><br />
-				for {$costs['gender_change']} Ancient Kunai.
 				<br />
  				<input type='submit' name='change_gender' value='Change Gender' />
 			</form>
