@@ -200,13 +200,10 @@ function premium() {
 		}
 	}
 	else if(isset($_POST['stat_reset'])) {
-		$stats = array('ninjutsu_skill', 'taijutsu_skill', 'genjutsu_skill', 'cast_speed', 'speed', 'intelligence', 'willpower');
-		if($player->bloodline_id) {
-			array_unshift($stats, 'bloodline_skill');
-		}
+
 		try {
 			$stat = $system->clean($_POST['stat']);
-			if(array_search($stat, $stats) === false) {
+			if(array_search($stat, $player->stats) === false) {
 				throw new Exception("Invalid stat!");
 			}
 
@@ -242,18 +239,13 @@ function premium() {
 		$system->printMessage();
 	}
 	else if(isset($_POST['stat_allocate'])) {
-		$stats = array('ninjutsu_skill', 'taijutsu_skill', 'genjutsu_skill', 'cast_speed', 'speed', 'intelligence', 'willpower');
-		if($player->bloodline_id) {
-			array_unshift($stats, 'bloodline_skill');
-		}
-
 		try {
 			$original_stat = $system->clean($_POST['original_stat']);
 			$target_stat = $system->clean($_POST['target_stat']);
-			if(array_search($original_stat, $stats) === false) {
+			if(array_search($original_stat, $player->stats) === false) {
 				throw new Exception("Invalid original stat!");
 			}
-			if(array_search($target_stat, $stats) === false) {
+			if(array_search($target_stat, $player->stats) === false) {
 				throw new Exception("Invalid target stat!");
 			}
 
@@ -1004,19 +996,19 @@ function premium() {
 		<br />
 		Transfer<br />
 		<select id='statAllocateSelect' name='original_stat' onchange='statSelectChange();'>";
-		foreach($stats as $stat) {
+		foreach($player->stats as $stat) {
 			echo "<option value='$stat'>" . ucwords(str_replace('_', ' ', $stat)) . '</option>';
 		}
 
 		echo "</select><br />
 		to<br />
 		<select name='target_stat'>";
-		foreach($stats as $stat) {
+		foreach($player->stats as $stat) {
 			echo "<option value='$stat'>" . ucwords(str_replace('_', ' ', $stat)) . '</option>';
 		}
 		echo "</select>
 		<script type='text/javascript'>";
-		foreach($stats as $stat) {
+		foreach($player->stats as $stat) {
 			if(strpos($stat, 'skill') !== false) {
 				echo "stats.$stat = " . ($player->{$stat} - 10) . ";\r\n";
 			}
