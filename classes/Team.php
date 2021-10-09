@@ -256,7 +256,7 @@ class Team {
      */
     public function fetchLeader(): User {
         $leader = new User($this->leader);
-        $leader->loadData(0, true);
+        $leader->loadData(User::UPDATE_NOTHING, true);
         return $leader;
     }
 }

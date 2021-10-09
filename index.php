@@ -147,7 +147,7 @@ else {
 		}
 	}
 	if($ajax) {
-		$player_display = $player->loadData(1);
+		$player_display = $player->loadData(User::UPDATE_REGEN);
 	}
 	else {
 		$player_display = $player->loadData();

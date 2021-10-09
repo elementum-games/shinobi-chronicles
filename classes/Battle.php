@@ -532,14 +532,14 @@ class Battle {
         }
 
         if($this->player1 instanceof User && $this->player1->id != $this->player->id) {
-            $this->player1->loadData($this->spectate ? 0 : 1, true);
+            $this->player1->loadData(User::UPDATE_NOTHING, true);
             if(!$this->spectate && !$this->isComplete() && $this->player1->battle_id != $this->battle_id) {
                 $this->stopBattle();
                 return;
             }
         }
         if($this->player2 instanceof User && $this->player2->id != $this->player->id) {
-            $this->player2->loadData($this->spectate ? 0 : 1, true);
+            $this->player2->loadData(User::UPDATE_NOTHING, true);
             if(!$this->spectate && !$this->isComplete() && $this->player2->battle_id != $this->battle_id) {
                 $this->stopBattle();
                 return;

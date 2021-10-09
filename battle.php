@@ -93,7 +93,7 @@ function battle(): bool {
 
 			try {
 			    $user = new User($attack_id);
-			    $user->loadData(1, true);
+			    $user->loadData(User::UPDATE_NOTHING, true);
             } catch(Exception $e) {
                 throw new Exception("Invalid user! " . $e->getMessage());
             }

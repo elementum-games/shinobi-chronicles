@@ -26,6 +26,10 @@ class User extends Fighter {
     const STAFF_ADMINISTRATOR = 4;
     const STAFF_HEAD_ADMINISTRATOR = 5;
 
+    const UPDATE_NOTHING = 0;
+    const UPDATE_REGEN = 1;
+    const UPDATE_FULL = 2;
+
     public static int $jutsu_train_gain = 5;
 
     public System $system;
@@ -239,7 +243,7 @@ class User extends Fighter {
         Update (1 = regen, 2 = training)
     */
 
-    public function loadData($UPDATE = 2, $remote_view = false): string {
+    public function loadData($UPDATE = User::UPDATE_FULL, $remote_view = false): string {
         $result = $this->system->query("SELECT * FROM `users` WHERE `user_id`='$this->user_id' LIMIT 1");
         $user_data = $this->system->db_fetch($result);
 
@@ -274,26 +278,6 @@ class User extends Fighter {
             $blacklist_json = json_encode($this->blacklist);
             $this->system->query("INSERT INTO `blacklist` (`user_id`, `blocked_ids`) VALUES ('{$this->user_id}', '{$blacklist_json}')");
             $this->original_blacklist = []; // Default an empty array, user did not have an original.
-        }
-
-        // Daily Tasks
-        $this->daily_tasks = [];
-        $this->daily_tasks_reset = 0;
-        $result = $this->system->query("SELECT `tasks`, `last_reset` FROM `daily_tasks` WHERE `user_id`='$this->user_id' LIMIT 1");
-        if($this->system->db_last_num_rows !== 0) {
-            $dt = $this->system->db_fetch($result);
-
-            $dt_arr = json_decode($dt['tasks'], true);
-            $this->daily_tasks = array_map(function($dt_data) {
-                return new DailyTask($dt_data);
-            }, $dt_arr);
-
-            $this->daily_tasks_reset = $dt['last_reset'];
-        }
-        else {
-            $this->system->query("INSERT INTO `daily_tasks` (`user_id`, `tasks`, `last_reset`)
-			    VALUES ('{$this->user_id}', '" . json_encode([]) . "', '" . time() . "')"
-            );
         }
 
         // Rank stuff
@@ -447,6 +431,26 @@ class User extends Fighter {
         }
 
         // Daily Tasks
+        // Daily Tasks
+        $this->daily_tasks = [];
+        $this->daily_tasks_reset = 0;
+        $result = $this->system->query("SELECT `tasks`, `last_reset` FROM `daily_tasks` WHERE `user_id`='$this->user_id' LIMIT 1");
+        if($this->system->db_last_num_rows !== 0) {
+            $dt = $this->system->db_fetch($result);
+
+            $dt_arr = json_decode($dt['tasks'], true);
+            $this->daily_tasks = array_map(function($dt_data) {
+                return new DailyTask($dt_data);
+            }, $dt_arr);
+
+            $this->daily_tasks_reset = $dt['last_reset'];
+        }
+        else {
+            $this->system->query("INSERT INTO `daily_tasks` (`user_id`, `tasks`, `last_reset`)
+			    VALUES ('{$this->user_id}', '" . json_encode([]) . "', '" . time() . "')"
+            );
+        }
+
         if(empty($this->daily_tasks) || (time() - $this->daily_tasks_reset) > (60 * 60 * 24)) {
             $daily_tasks = DailyTask::generateNewTasks($this);
 
@@ -455,7 +459,7 @@ class User extends Fighter {
                 `last_reset`='" . time() . "' 
                 WHERE `user_id`='{$this->user_id}'");
         }
-        else if(!$remote_view) {
+        else if($UPDATE == User::UPDATE_FULL && !$remote_view) {
             // check if the user has completed stuff and reward them if so
             foreach($this->daily_tasks as $task) {
                 if(!$task->complete && $task->progress >= $task->amount) {
@@ -682,7 +686,7 @@ class User extends Fighter {
         if($this->forbidden_seal) {
             $this->forbidden_seal = json_decode($user_data['forbidden_seal'], true);
 
-            if($this->forbidden_seal['time'] < time() && $UPDATE >= 2 && !(!$this->forbidden_seal['level'] && $this->forbidden_seal['color'])) {
+            if($this->forbidden_seal['time'] < time() && $UPDATE >= User::UPDATE_FULL && !(!$this->forbidden_seal['level'] && $this->forbidden_seal['color'])) {
                 $this->system->message("Your Forbidden Seal has receded.");
                 $this->forbidden_seal = false;
             }
@@ -717,7 +721,7 @@ class User extends Fighter {
 
         // Regen/time-based events
         $time_difference = time() - $this->last_update;
-        if($time_difference > 60 && $UPDATE >= 1) {
+        if($time_difference > 60 && $UPDATE >= User::UPDATE_REGEN) {
             $minutes = floor($time_difference / 60);
 
             $regen_amount = $minutes * ($this->regen_rate + $this->regen_boost);
@@ -746,7 +750,7 @@ class User extends Fighter {
 
         // Check training
         $display = '';
-        if($this->train_time && $UPDATE >= 2) {
+        if($this->train_time && $UPDATE >= User::UPDATE_FULL) {
             if($this->train_time < time()) {
                 // Jutsu training
                 if(strpos($this->train_type, 'jutsu:') !== false) {
