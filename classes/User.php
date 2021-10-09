@@ -185,6 +185,16 @@ class User extends Fighter {
     public array $bloodline_offense_boosts;
     public array $bloodline_defense_boosts;
 
+    public array $stats = [
+        'ninjutsu_skill',
+        'taijutsu_skill',
+        'genjutsu_skill',
+        'cast_speed',
+        'speed',
+        'intelligence',
+        'willpower'
+    ];
+
     /**
      * User constructor.
      * @param $user_id
@@ -346,6 +356,11 @@ class User extends Fighter {
         $this->exp = $user_data['exp'];
         $this->bloodline_id = $user_data['bloodline_id'];
         $this->bloodline_name = $user_data['bloodline_name'];
+
+        if($this->bloodline_id) {
+            array_unshift($this->stats, 'bloodline_skill');
+        }
+
         $this->location = $user_data['location']; // x.y
         $location = explode(".", $this->location);
         $this->x = $location[0];
