@@ -452,10 +452,10 @@ class User extends Fighter {
         }
 
         if(empty($this->daily_tasks) || (time() - $this->daily_tasks_reset) > (60 * 60 * 24)) {
-            $daily_tasks = DailyTask::generateNewTasks($this);
+            $this->daily_tasks = DailyTask::generateNewTasks($this);
 
             $this->system->query("UPDATE `daily_tasks` SET 
-                `tasks`='" . json_encode($daily_tasks) . "', 
+                `tasks`='" . json_encode($this->daily_tasks) . "', 
                 `last_reset`='" . time() . "' 
                 WHERE `user_id`='{$this->user_id}'");
         }
