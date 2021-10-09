@@ -197,7 +197,7 @@ if($_POST['register']) {
         }
 
         // Gender
-        if(!($gender == "Male" || $gender == "Female")) {
+        if(!($gender == "Male" || $gender == "Female" || $gender == "Non-binary" || $gender == "None")) {
             throw new Exception("Please enter a valid gender!");
         }
 
@@ -252,6 +252,8 @@ if(!$register_ok) {
 
     $male = 0;
     $female = 0;
+    $non_binary = 0;
+    $none = 0;
 
     $stone = 0;
     $cloud = 0;
@@ -265,6 +267,12 @@ if(!$register_ok) {
             break;
         case 'Female':
             $female = 1;
+            break;
+        case 'Non-binary':
+            $non_binary = 1;
+            break;
+        case 'None':
+            $none = 1;
             break;
         default:
             break;
@@ -298,6 +306,8 @@ if(!$register_ok) {
 		<label for='gender'>Gender</label><br />
 			<input type='radio' name='gender' value='Male' " . ($male ? "checked='checked'" : "") . " /> Male<br />
 			<input type='radio' name='gender' value='Female' " . ($female ? "checked='checked'" : "") . " /> Female<br />
+            <input type='radio' name='gender' value='Non-binary' " . ($non_binary ? "checked='checked'" : "") . " /> Non-binary<br />
+            <input type='radio' name='gender' value='None' " . ($none ? "checked='checked'" : "") . " /> None<br />
 			<br />";
 
     echo "<label for='village'>Village</label><br />

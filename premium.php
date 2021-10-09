@@ -221,7 +221,7 @@ function premium() {
 			if($player->gender == $new_gender) {
 				throw new Exception("You are already a {$new_gender}!");
 			}
-			if(!in_array($new_gender,array('Male','Female'), true)) {
+			if(!in_array($new_gender,array('Male','Female','Non-binary','None'), true)) {
 				throw new Exception("Invalid gender! {$new_gender}");
 			}
 
@@ -1024,7 +1024,7 @@ function premium() {
 		</form>
 		</td></tr>";
 
-		$genders = array('Male', 'Female');
+		$genders = array('Male', 'Female','Non-binary','None');
 		echo "<tr><th>Gender Change</th></tr>
 		<tr><td style='text-align:center;'>You can change your gender to:
 		<form action='$self_link' method='post'>

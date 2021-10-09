@@ -1,5 +1,5 @@
 <?php
-/* 
+/*
 File: 		profile.php
 Coder:		Levi Meahan
 Created:	02/26/2013
@@ -19,7 +19,7 @@ function userProfile() {
 
     // Level up/rank up checks
 	$exp_needed = $player->expForNextLevel();
-	
+
 	// Level up
 	if($player->level < $player->max_level && $player->exp >= $exp_needed) {
 		if($player->battle_id) {
@@ -302,34 +302,41 @@ function userProfile() {
 		<label style='width:$label_width;'>Next level in:</label> " . $exp_remaining . " exp<br />
 		<div style='height:6px;width:200px;border-style:solid;border-width:1px;'>" .
 			"<div style='background-color:#FFD700;height:6px;width:" . $exp_width . "px;' /></div>" . "</div>" .
-		"<br />
-		<label style='width:$label_width;'>Gender:</label> $player->gender<br />
+		"<br />";
+		if($player->gender == "None") {
+			echo "<label style='width:$label_width;'>Gender:</label> $player->gender
+			(Won't display)
+			<br />";
+		} else {
+			echo "<label style='width:$label_width;'>Gender:</label> $player->gender<br />";
+		}
+		echo "
 		<label style='width:$label_width;'>Village:</label> $player->village<br />
 		<label style='width:$label_width;'>Location:</label> $player->location<br />
 		<label style='width:$label_width;'>Money:</label> &yen;" . $player->money . "<br />
 		<label style='width:$label_width;'>Ancient Kunai:</label> " . $player->premium_credits . "<br />
-		<label style='width:$label_width;'>Ancient Kunai purchased:</label> " . $player->premium_credits_purchased . "<br /> 
-		
+		<label style='width:$label_width;'>Ancient Kunai purchased:</label> " . $player->premium_credits_purchased . "<br />
+
 		<br />
 		<label style='width:$label_width;'>PvP wins:</label>		$player->pvp_wins<br />
 		<label style='width:$label_width;'>PvP losses:</label> 	$player->pvp_losses<br />
 		<label style='width:$label_width;'>AI wins:</label>		$player->ai_wins<br />
 		<label style='width:$label_width;'>AI losses:</label>		$player->ai_losses<br />
 		</td>
-		
+
 		<td style='width:50%;'>
-		<label style='width:9.2em;'>Total stats:</label>" . 
+		<label style='width:9.2em;'>Total stats:</label>" .
 			sprintf("%.2f", $player->total_stats) . '/' . sprintf("%.2f", $player->stat_cap) . "<br />
 		<br />
 		<label style='width:9.2em;'>Bloodline:</label>" . ($player->bloodline_id ? $player->bloodline_name : 'None') . "</br />";
 		if($player->bloodline_id) {
 			echo "<label style='width:9.2em;'>Bloodline skill:</label>$player->bloodline_skill</label><br />";
 		}
-		
+
 		if($player->elements) {
 			echo "<br /><label style='width:9.2em;'>Element" . (count($player->elements) > 1 ? 's' : '') . ":</label>" . implode(', ', $player->elements) . "</label><br />";
 		}
-		
+
 		echo "<br />
 		<label style='width:9.2em;'>Ninjutsu skill:</label>" . $player->ninjutsu_skill . "<br />
 		<label style='width:9.2em;'>Genjutsu skill:</label>" . $player->genjutsu_skill . "<br />
@@ -346,7 +353,7 @@ function userProfile() {
 			<h2 class='contentDivHeader'>Daily Tasks</h2>
 
 			<div id='dailyTaskWrapper'>";
-			
+
 		foreach($player->daily_tasks as $daily_task) {
 
 			$dt_progress = 0;
@@ -407,7 +414,7 @@ function userProfile() {
 		$dt_time_remaining = System::timeRemaining($player->daily_tasks_reset + (60*60*24) - time(), 'short', false, true);
 
 		echo "</div>
-			
+
 			<div class='contentDivCaption'>
 				<span>Time Remaining:</span>
 				<span id='dailyTaskTimer'>".$dt_time_remaining." left
