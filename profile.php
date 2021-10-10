@@ -302,14 +302,8 @@ function userProfile() {
 		<label style='width:$label_width;'>Next level in:</label> " . $exp_remaining . " exp<br />
 		<div style='height:6px;width:200px;border-style:solid;border-width:1px;'>" .
 			"<div style='background-color:#FFD700;height:6px;width:" . $exp_width . "px;' /></div>" . "</div>" .
-		"<br />";
-		if($player->gender == "None") {
-			echo "<label style='width:$label_width;'>Gender:</label> $player->gender
-			(Won't display)
-			<br />";
-		} else {
-			echo "<label style='width:$label_width;'>Gender:</label> $player->gender<br />";
-		}
+		"<br />
+		<label style='width:$label_width;'>Gender:</label> $player->gender<br />";
 		echo "
 		<label style='width:$label_width;'>Village:</label> $player->village<br />
 		<label style='width:$label_width;'>Location:</label> $player->location<br />
