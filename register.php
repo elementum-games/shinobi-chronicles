@@ -304,10 +304,9 @@ if(!$register_ok) {
 			<br />
 			<br />
 		<label for='gender'>Gender</label><br />
-			<input type='radio' name='gender' value='Male' " . ($male ? "checked='checked'" : "") . " /> Male<br />
-			<input type='radio' name='gender' value='Female' " . ($female ? "checked='checked'" : "") . " /> Female<br />
-            <input type='radio' name='gender' value='Non-binary' " . ($non_binary ? "checked='checked'" : "") . " /> Non-binary<br />
-            <input type='radio' name='gender' value='None' " . ($none ? "checked='checked'" : "") . " /> None<br />
+foreach(User::$genders as $gender_opt) {
+    echo "<input type='radio' name='gender' value='$gender_opt' " . ($gender == $gender_opt ? "checked='checked'" : "") . " /> $gender_opt<br />";
+}
 			<br />";
 
     echo "<label for='village'>Village</label><br />
