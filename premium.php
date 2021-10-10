@@ -231,7 +231,6 @@ function premium() {
 				<tr>
 					<td style='text-align:center;'>Are you sure you want to change your gender to $new_gender?<br />
 					<br />
-					<b>(IMPORTANT: This is non-reversable once completed, if you want to return to your original gender you will have to pay another fee.)</b>
 					<br />
 						<form action='$self_link' method='post'>
 							<input type='hidden' name='confirm' value='1' />
