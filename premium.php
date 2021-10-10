@@ -221,8 +221,8 @@ function premium() {
 			if($player->gender == $new_gender) {
 				throw new Exception("You are already a {$new_gender}!");
 			}
-			if(!in_array($new_gender,array('Male','Female','Non-binary','None'), true)) {
-				throw new Exception("Invalid gender! {$new_gender}");
+			if(!in_array($new_gender, User::$genders, true)) {
+				throw new Exception("Invalid gender!");
 			}
 
 	 if(!isset($_POST['confirm'])) {
@@ -230,6 +230,9 @@ function premium() {
 			<table class='table'><tr><th>Confirm Gender Change</th></tr>
 				<tr>
 					<td style='text-align:center;'>Are you sure you want to change your gender to $new_gender?<br />
+					(" . User::GENDER_NONE ." will not be displayed on view profile)<br />
+					<br />
+					<b>(IMPORTANT: This is non-reversable once completed, if you want to return to your original gender you will have to pay another fee.)</b>
 					<br />
 					<br />
 						<form action='$self_link' method='post'>
@@ -1023,12 +1026,12 @@ function premium() {
 		</form>
 		</td></tr>";
 
-		$genders = array('Male', 'Female','Non-binary','None');
 		echo "<tr><th>Gender Change</th></tr>
 		<tr><td style='text-align:center;'>You can change your gender  for {$costs['gender_change']} Ancient Kunai.
+		<br />(" . User::GENDER_NONE ." will not be displayed on view profile)
 		<form action='$self_link' method='post'>
 			<select name='new_gender'>";
-				foreach($genders as $new_gender) {
+				foreach(User::$genders as $new_gender) {
 					if($player->gender == $new_gender) {
 						continue;
 					} else {
@@ -1037,7 +1040,6 @@ function premium() {
 				}
 				echo "
 				</select><br />
-				<br />
  				<input type='submit' name='change_gender' value='Change Gender' />
 			</form>
 		</td></tr>";

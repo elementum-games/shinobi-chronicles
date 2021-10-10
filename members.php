@@ -213,7 +213,7 @@ function members() {
 			<label style='width:6em;'>Exp:</label> 	$viewUser->exp<br />
 			<label style='width:6em;'>Rank:</label> 	" . $ranks[$viewUser->rank] . "<br />" .
 			"<br />";
-			if($viewUser->gender == "None") {
+			if($viewUser->gender == User::GENDER_NONE) {
 				echo "";
 			} else {
 				echo "<label style='width:6em;'>Gender:</label> $viewUser->gender<br />";

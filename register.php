@@ -197,8 +197,8 @@ if($_POST['register']) {
         }
 
         // Gender
-        if(!($gender == "Male" || $gender == "Female" || $gender == "Non-binary" || $gender == "None")) {
-            throw new Exception("Please enter a valid gender!");
+        if(!in_array($gender, User::$genders, true)) {
+            throw new Exception("Invalid gender!");
         }
 
         // Village
@@ -250,10 +250,6 @@ if(!$register_ok) {
     $gender = $_POST['gender'];
     $village = $_POST['village'];
 
-    $male = 0;
-    $female = 0;
-    $non_binary = 0;
-    $none = 0;
 
     $stone = 0;
     $cloud = 0;
@@ -261,22 +257,7 @@ if(!$register_ok) {
     $sand = 0;
     $mist = 0;
 
-    switch($gender) {
-        case 'Male':
-            $male = 1;
-            break;
-        case 'Female':
-            $female = 1;
-            break;
-        case 'Non-binary':
-            $non_binary = 1;
-            break;
-        case 'None':
-            $none = 1;
-            break;
-        default:
-            break;
-    }
+
 
     echo "
 	<style type='text/css'>
@@ -303,13 +284,13 @@ if(!$register_ok) {
 			<span style='font-style:italic;font-size:0.9em;'>(Note: Currently we cannot send emails to addresses from: " . implode(', ', $bad_domains) . ")</span>
 			<br />
 			<br />
-		<label for='gender'>Gender</label><br />
-foreach(User::$genders as $gender_opt) {
-    echo "<input type='radio' name='gender' value='$gender_opt' " . ($gender == $gender_opt ? "checked='checked'" : "") . " /> $gender_opt<br />";
-}
-			<br />";
+		<label for='gender'>Gender</label><br />";
+        foreach(User::$genders as $gender_opt) {
+                echo "<input type='radio' name='gender' value='$gender_opt' " . ($gender == $gender_opt ? "checked='checked'" : "") . " /> $gender_opt<br />";
+            }
+			echo"<br />
 
-    echo "<label for='village'>Village</label><br />
+    <label for='village'>Village</label><br />
 			<select name='village'>";
     foreach($villages as $name => $loop_village) {
         echo "<option value='$name' " . ($village == $name ? "selected='selected'" : "") . ">$name</option>";
