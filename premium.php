@@ -222,7 +222,6 @@ function premium() {
 			<table class='table'><tr><th>Confirm Gender Change</th></tr>
 				<tr>
 					<td style='text-align:center;'>Are you sure you want to change your gender to $new_gender?<br />
-					<br />
 						<form action='$self_link' method='post'>
 							<input type='hidden' name='confirm' value='1' />
 							<input type='hidden' name='new_gender' value='$new_gender' />
@@ -1018,7 +1017,7 @@ function premium() {
 
 		echo "<tr><th colspan='2'>Gender Change</th></tr>
 		<tr><td style='text-align:center;' colspan='2'>You can change your gender  for {$costs['gender_change']} Ancient Kunai.
-		<br />(" . User::GENDER_NONE ." will not be displayed on view profile)
+		<br />('" . User::GENDER_NONE ."' gender will not be displayed on view profile)
 		<form action='$self_link' method='post'>
 			<select name='new_gender'>";
 				foreach(User::$genders as $new_gender) {
