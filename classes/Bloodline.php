@@ -5,6 +5,12 @@
 class Bloodline {
     const SKILL_REDUCTION_ON_CHANGE = 0.1;
 
+    const RANK_ADMIN = 5;
+    const RANK_LESSER = 4;
+    const RANK_COMMON = 3;
+    const RANK_ELITE = 2;
+    const RANK_LEGENDARY = 1;
+
     public System $system;
 
     public $bloodline_id;

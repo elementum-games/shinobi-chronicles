@@ -222,10 +222,6 @@ function premium() {
 			<table class='table'><tr><th>Confirm Gender Change</th></tr>
 				<tr>
 					<td style='text-align:center;'>Are you sure you want to change your gender to $new_gender?<br />
-					(" . User::GENDER_NONE ." will not be displayed on view profile)<br />
-					<br />
-					<b>(IMPORTANT: This is non-reversable once completed, if you want to return to your original gender you will have to pay another fee.)</b>
-					<br />
 					<br />
 						<form action='$self_link' method='post'>
 							<input type='hidden' name='confirm' value='1' />
@@ -1020,8 +1016,8 @@ function premium() {
             </form>
 		</td></tr>";
 
-		echo "<tr><th>Gender Change</th></tr>
-		<tr><td style='text-align:center;'>You can change your gender  for {$costs['gender_change']} Ancient Kunai.
+		echo "<tr><th colspan='2'>Gender Change</th></tr>
+		<tr><td style='text-align:center;' colspan='2'>You can change your gender  for {$costs['gender_change']} Ancient Kunai.
 		<br />(" . User::GENDER_NONE ." will not be displayed on view profile)
 		<form action='$self_link' method='post'>
 			<select name='new_gender'>";
