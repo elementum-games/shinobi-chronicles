@@ -388,7 +388,7 @@ return [
     ],
     [
         'code' => ':thisisfine:',
-        'image' => '<img src="./images/memes/this_is_fine.png" 
+        'image' => '<img src="./images/memes/this_is_fine.png"
                 title=\':thisisfine:\' alt=\':thisisfine:\' />',
         'text' => ':this is fine:',
         'public' => true,
@@ -396,14 +396,14 @@ return [
 
     [
         'code' => ':notmybusiness:',
-        'image' => '<img src="./images/memes/none_of_my_business.png" 
+        'image' => '<img src="./images/memes/none_of_my_business.png"
                 title=\':notmybusiness:\' alt=\':notmybusiness:\' />',
         'text' => ':none of my business:',
         'public' => true,
     ],
     [
         'code' => ':youdontsay:',
-        'image' => '<img src="./images/memes/you_dont_say.png" 
+        'image' => '<img src="./images/memes/you_dont_say.png"
                 title=\':youdontsay:\' alt=\':youdontsay:\' />',
         'text' => ':you don\'t say:',
         'public' => true,
@@ -436,6 +436,12 @@ return [
         'code' => ':dogekek:',
         'image' => "<img src='./images/memes/doge_kek.png' style='width:64px;height:64px;' />",
         'text' => ':guess I\'ll die:',
+        'public' => true,
+    ],
+    [
+        'code' => ':feelschatman:',
+        'image' => "<img src='./images/memes/feelschatman.png' style='width:64px;height:64px;' />",
+        'text' => ':feelschatman:',
         'public' => true,
     ],
 ];
