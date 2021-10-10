@@ -2305,7 +2305,7 @@ class Battle {
             return false;
         }
         if($effect['effect'] == 'residual_damage' || $effect['effect'] == 'bleed') {
-            $damage = $target->calcDamageTaken($effect['effect_amount'], $effect['effect_type']);
+            $damage = $target->calcDamageTaken($effect['effect_amount'], $effect['effect_type'], true);
             $effect_display .= '[br]-'. (isset($target->user_name) ? $target->user_name : $target->name) .
                 " takes $damage residual damage-";
             $target->health -= $damage;

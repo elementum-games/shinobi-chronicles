@@ -300,11 +300,12 @@ abstract class Fighter {
     }
 
     /**
-     * @param $raw_damage
+     * @param        $raw_damage
      * @param string $defense_type ninjutsu, genjutsu, taijutsu
+     * @param bool   $residual_damage
      * @return float|int
      */
-    public function calcDamageTaken($raw_damage, string $defense_type) {
+    public function calcDamageTaken($raw_damage, string $defense_type, bool $residual_damage = false) {
         $defense = 50 * (1 + $this->defense_boost);
 
         if($defense <= 0) {
@@ -338,15 +339,15 @@ abstract class Fighter {
         switch($defense_type) {
             case 'ninjutsu':
                 $defense += System::diminishing_returns($this->ninjutsu_skill * $def_multiplier, 50);
-                $raw_damage -= $this->ninjutsu_resist;
+                $raw_damage -= $residual_damage ? $this->ninjutsu_resist : $this->ninjutsu_resist * 0.65;
                 break;
             case 'genjutsu':
                 $defense += System::diminishing_returns($this->genjutsu_skill * $def_multiplier, 50);
-                $raw_damage -= $this->genjutsu_resist;
+                $raw_damage -= $residual_damage ? $this->genjutsu_resist : $this->genjutsu_resist * 0.65;
                 break;
             case 'taijutsu':
                 $defense += System::diminishing_returns($this->taijutsu_skill * $def_multiplier, 50);
-                $raw_damage -= $this->taijutsu_resist;
+                $raw_damage -= $residual_damage ? $this->taijutsu_resist : $this->taijutsu_resist * 0.65;
                 break;
             default:
                 error_log("Invalid defense type! {$defense_type}");
