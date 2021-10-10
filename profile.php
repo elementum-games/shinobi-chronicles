@@ -1,5 +1,5 @@
 <?php
-/* 
+/*
 File: 		profile.php
 Coder:		Levi Meahan
 Created:	02/26/2013
@@ -308,15 +308,15 @@ function userProfile() {
 		<label style='width:$label_width;'>Location:</label> $player->location<br />
 		<label style='width:$label_width;'>Money:</label> &yen;" . $player->money . "<br />
 		<label style='width:$label_width;'>Ancient Kunai:</label> " . $player->premium_credits . "<br />
-		<label style='width:$label_width;'>Ancient Kunai purchased:</label> " . $player->premium_credits_purchased . "<br /> 
-		
+		<label style='width:$label_width;'>Ancient Kunai purchased:</label> " . $player->premium_credits_purchased . "<br />
+
 		<br />
 		<label style='width:$label_width;'>PvP wins:</label>		$player->pvp_wins<br />
 		<label style='width:$label_width;'>PvP losses:</label> 	$player->pvp_losses<br />
 		<label style='width:$label_width;'>AI wins:</label>		$player->ai_wins<br />
 		<label style='width:$label_width;'>AI losses:</label>		$player->ai_losses<br />
 		</td>
-		
+
 		<td style='width:50%;'>
 		<label style='width:9.2em;'>Total stats:</label>" .
             sprintf("%.2f", $player->total_stats) . '/' . sprintf("%.2f", $player->stat_cap) . "<br />

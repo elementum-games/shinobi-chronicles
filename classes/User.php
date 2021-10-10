@@ -12,6 +12,18 @@ require_once __DIR__ . "/Fighter.php";
 class User extends Fighter {
     const ENTITY_TYPE = 'U';
 
+    const GENDER_MALE = 'Male';
+    const GENDER_FEMALE = 'Female';
+    const GENDER_NON_BINARY = 'Non-binary';
+    const GENDER_NONE = 'None';
+
+    public static array $genders = [
+            User::GENDER_MALE,
+            User::GENDER_FEMALE,
+            User::GENDER_NON_BINARY,
+            User::GENDER_NONE
+        ];
+
     const MIN_NAME_LENGTH = 2;
     const MIN_PASSWORD_LENGTH = 6;
 
@@ -1458,9 +1470,9 @@ class User extends Fighter {
 
         $dateTimeFormat = System::DB_DATETIME_MS_FORMAT;
         $this->system->query("INSERT INTO `player_logs`
-            (`user_id`, `user_name`, `log_type`, `log_time`, 
+            (`user_id`, `user_name`, `log_type`, `log_time`,
              `log_contents`)
-            VALUES 
+            VALUES
             ({$this->user_id}, '{$this->user_name}', '{$log_type}', '{$dateTime->format($dateTimeFormat)}',
              '{$this->system->clean($log_contents)}'
             )
