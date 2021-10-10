@@ -7,33 +7,38 @@ class Team {
     const MIN_NAME_LENGTH = 5;
     const MAX_NAME_LENGTH = 35;
 
+    const BOOST_TRAINING = 'training';
+    const BOOST_AI_MONEY = 'ai_money';
+
     public static array $allowed_boosts = [
-        'Training' => [
-            'Amount' => [
-                10 => [
-                    'Cost' => 25
-                ],
-                20 => [
-                    'Cost' => 60
-                ],
-                30 => [
-                    'Cost' => 100
-                ]
-            ]
+        Team::BOOST_TRAINING => [
+            'small' => [
+                'amount' => 10,
+                'points_cost' => 25,
+            ],
+            'medium' => [
+                'amount' => 20,
+                'points_cost' => 50,
+            ],
+            'large' => [
+                'amount' => 30,
+                'points_cost' => 100,
+            ],
         ],
-        'AI' => [
-            'Amount' => [
-                10 => [
-                    'Cost' => 25
-                ],
-                15 => [
-                    'Cost' => 50
-                ],
-                20 => [
-                    'Cost' => 100
-                ]
-            ]
-        ]
+        Team::BOOST_AI_MONEY => [
+            'small' => [
+                'amount' => 10,
+                'points_cost' => 25,
+            ],
+            'medium' => [
+                'amount' => 15,
+                'points_cost' => 50,
+            ],
+            'large' => [
+                'amount' => 20,
+                'points_cost' => 100,
+            ],
+        ],
     ];
 
     public System $system;
@@ -127,7 +132,7 @@ class Team {
 
     public function checkForTrainingBoostTrigger(): ?float {
         $boost_amount = null;
-        if($this->boost == 'Training') {
+        if($this->boost == Team::BOOST_TRAINING) {
             $random_number = mt_rand(1, 100);
             if ($random_number <= $this->boost_amount) {
                 // boost success
@@ -139,12 +144,16 @@ class Team {
     }
 
     public function getAIMoneyBoostAmount(): ?float {
-        if($this->boost == 'AI') {
+        if($this->boost == Team::BOOST_AI_MONEY) {
             return $this->boost_amount / 100;
         }
         else {
             return null;
         }
+    }
+
+    public function getBoostLabel(): string {
+        return ucwords(str_replace('_', ' ', $this->boost));
     }
 
     public function addPoints($point_gain) {
@@ -181,6 +190,31 @@ class Team {
         else {
             throw new Exception("Error adding you to the team!");
         }
+    }
+
+    /**
+     * @param string $boost_type
+     * @param string $boost_size
+     * @throws Exception
+     */
+    public function setBoost(string $boost_type, string $boost_size) {
+        $boost = self::$allowed_boosts[$boost_type][$boost_size] ?? null;
+        if($boost == null) {
+            throw new Exception("Invalid boost!");
+        }
+
+        if ($boost['points_cost'] > $this->points) {
+            throw new Exception('Your team does not have enough points for this boost!');
+        }
+
+        $this->points -= $boost['points_cost'];
+
+        $this->system->query("UPDATE `teams` SET 
+                    `boost`='{$boost_type}', 
+                    `boost_amount`='{$boost['amount']}', 
+                    `points`='{$this->points}', 
+                    `boost_time`='" . time() . "' 
+                    WHERE `team_id`='{$this->id}'");
     }
 
     /**** STATIC UTILS ****/
@@ -221,6 +255,8 @@ class Team {
      * @throws Exception
      */
     public function fetchLeader(): User {
-        return new User($this->leader);
+        $leader = new User($this->leader);
+        $leader->loadData(User::UPDATE_NOTHING, true);
+        return $leader;
     }
 }

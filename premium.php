@@ -14,7 +14,6 @@ function premium() {
 
 	global $self_link;
 
-	$costs['user_reset'] = 0;
 	$costs['name_change'] = 15;
 	$costs['gender_change'] = 10;
 	$costs['bloodline'][1] = 80;
@@ -55,10 +54,6 @@ function premium() {
 
 	if(isset($_POST['user_reset'])) {
 		try {
-			if($player->premium_credits < $costs['user_reset']) {
-				throw new Exception("You do not have enough Ancient Kunai!");
-			}
-
 			if(!isset($_POST['confirm_reset'])) {
 				echo "<table class='table'><tr><th>Confirm Reset</th></tr>
 				<tr><td style='text-align:center;'>Are you sure you want to reset your character? You will lose all your stats,
@@ -69,7 +64,6 @@ function premium() {
 				</form>
 				</td></tr></table>";
 				return true;
-				throw new Exception('');
 			}
 
 			if($player->team) {
@@ -109,8 +103,6 @@ function premium() {
 
 			//Bug fix: Elements previously was not cleared. -- Shadekun
 			$player->elements = [];
-
-			$player->premium_credits -= $costs['user_reset'];
 
 			$player->exam_stage = 0;
 
@@ -267,19 +259,11 @@ function premium() {
 
 
 	else if(isset($_POST['stat_reset'])) {
-		$stats = array('ninjutsu_skill', 'taijutsu_skill', 'genjutsu_skill', 'cast_speed', 'speed', 'intelligence', 'willpower');
-		if($player->bloodline_id) {
-			array_unshift($stats, 'bloodline_skill');
-		}
+
 		try {
 			$stat = $system->clean($_POST['stat']);
-			if(array_search($stat, $stats) === false) {
+			if(array_search($stat, $player->stats) === false) {
 				throw new Exception("Invalid stat!");
-			}
-
-			$cost = floor($player->{$stat} / 200);
-			if($player->premium_credits < $cost) {
-				throw new Exception("You do not have enough Ancient Kunai!");
 			}
 
 			// Amount to reset to
@@ -302,10 +286,6 @@ function premium() {
 				throw new Exception('');
 			}
 
-			$player->premium_credits -= $cost;
-
-
-
 			$exp = ($player->{$stat} - $reset_amount) * 10;
 
 			$player->{$stat} = $reset_amount;
@@ -318,18 +298,13 @@ function premium() {
 		$system->printMessage();
 	}
 	else if(isset($_POST['stat_allocate'])) {
-		$stats = array('ninjutsu_skill', 'taijutsu_skill', 'genjutsu_skill', 'cast_speed', 'speed', 'intelligence', 'willpower');
-		if($player->bloodline_id) {
-			array_unshift($stats, 'bloodline_skill');
-		}
-
 		try {
 			$original_stat = $system->clean($_POST['original_stat']);
 			$target_stat = $system->clean($_POST['target_stat']);
-			if(array_search($original_stat, $stats) === false) {
+			if(array_search($original_stat, $player->stats) === false) {
 				throw new Exception("Invalid original stat!");
 			}
-			if(array_search($target_stat, $stats) === false) {
+			if(array_search($target_stat, $player->stats) === false) {
 				throw new Exception("Invalid target stat!");
 			}
 
@@ -1008,22 +983,41 @@ function premium() {
 
 	if($view == 'character_changes') {
 		// Character reset
-		echo "<table class='table'><tr><th>Character Reset</th></tr>
-		<tr><td style='text-align:center;'>You can reset your character and start over as a level 1 Akademi-sei. This costs
-		" . $costs['user_reset'] . " Ancient Kunai.<br />
-		<form action='$self_link' method='post'>
-		<input type='submit' name='user_reset' value='Reset' />
-		</form>
-		</td></tr>";
+		echo "<table class='table'>
+        <tr>
+            <th>Character Reset</th>
+            <th>Individual Stat Resets</th>
+        </tr>
+		<tr>
+            <td style='text-align:center;'>You can reset your character and start over as a level 1 Akademi-sei. This is <b>free.</b><br />
+                <form action='$self_link' method='post'>
+                <input type='submit' name='user_reset' value='Reset Character' style='margin-top:8px;' />
+                </form>
+            </td>
+            <td style='text-align:center;'>
+                You can reset an individual stat, freeing up space in your total stat cap to train something else higher.
+                This is <b>free.</b><br />
+                <form action='$self_link&view=character_changes' method='post'>
+                <select id='statResetSelect' name='stat' style='margin:6px 0 8px;'>";
+                foreach($player->stats as $stat) {
+                    echo "<option value='$stat'>" . ucwords(str_replace('_', ' ', $stat)) . '</option>';
+                }
 
-		echo "<tr><th>Username Change</th></tr>
-		<tr><td style='text-align:center;'>You can change your username free once per account or for ". $costs['name_change'] . "AK afterward.
-		Any changes to the case of your name do not cost.<br />
-		<p>Free Changes left: {$player->username_changes}</p>
-		<form action='$self_link' method='post'>
-		<input type='text' name='new_name'/>
-		<input type='submit' name='name_change' value='Change' />
-		</form>
+            echo "</select>
+            <br />
+            <input type='submit' name='stat_reset' value='Reset stat' />
+            </form>
+		</td></tr>
+		</tr>";
+
+		echo "<tr><th colspan='2'>Username Change</th></tr>
+		<tr><td colspan='2'style='text-align:center;'>You can change your username free once per account or for ". $costs['name_change'] . "AK afterward.
+            Any changes to the case of your name do not cost.<br />
+            <p>Free Changes left: {$player->username_changes}</p>
+            <form action='$self_link' method='post'>
+            <input type='text' name='new_name'/>
+            <input type='submit' name='name_change' value='Change' />
+            </form>
 		</td></tr>";
 
 		echo "<tr><th>Gender Change</th></tr>
@@ -1053,43 +1047,11 @@ function premium() {
 		$village_change_cost = $costs['village_change'];
 		$clan_change_cost = $costs['clan_change'];
 
-		$costs = array();
-
-		echo "<tr><th>Individual Stat Resets</th></tr>
-		<tr><td style='text-align:center;'>
-		<script type='text/javascript'>
-		var costs = new Object;
-		function statResetCostDisplay(costs) {
-			var display = '';
-			display = 'Cost: ' + costs[$('#statResetSelect').val()] + ' AK';
-			$('#statResetCost').text(display);
-		}
-		</script>
-		You can reset an individual stat, freeing up space in your total stat cap to train something else higher.<br />
-		<form action='$self_link&view=character_changes' method='post'>
-		<select id='statResetSelect' name='stat' onchange='statResetCostDisplay(costs);'>";
-		foreach($stats as $stat) {
-			$costs[$stat] = floor($player->{$stat} / 200);
-			echo "<option value='$stat'>" . ucwords(str_replace('_', ' ', $stat)) . '</option>';
-		}
-
-		echo "</select>
-		<script type='text/javascript'>";
-		foreach($costs as $id => $cost) {
-			echo "costs.{$id} = $cost;\r\n";
-		}
-
-		echo "</script>
-		<br />
-		<span id='statResetCost'>Cost: " . $costs[$stats[0]] . " AK</span><br />
-		<input type='submit' name='stat_reset' value='Reset stat' />
-		</form>
-		</td></tr>";
-
 		echo "</table>";
 
-		// Stat rellocation
-		echo "<table class='table'><tr><th>Stat Transfers</th></tr>
+		// Stat reallocation
+		echo "<table class='table'>
+        <tr><th>Stat Transfers</th></tr>
 		<tr><td style='text-align:center;'>
 		<script type='text/javascript'>
 		var stats = new Object;
@@ -1116,19 +1078,19 @@ function premium() {
 		<br />
 		Transfer<br />
 		<select id='statAllocateSelect' name='original_stat' onchange='statSelectChange();'>";
-		foreach($stats as $stat) {
+		foreach($player->stats as $stat) {
 			echo "<option value='$stat'>" . ucwords(str_replace('_', ' ', $stat)) . '</option>';
 		}
 
 		echo "</select><br />
 		to<br />
 		<select name='target_stat'>";
-		foreach($stats as $stat) {
+		foreach($player->stats as $stat) {
 			echo "<option value='$stat'>" . ucwords(str_replace('_', ' ', $stat)) . '</option>';
 		}
 		echo "</select>
 		<script type='text/javascript'>";
-		foreach($stats as $stat) {
+		foreach($player->stats as $stat) {
 			if(strpos($stat, 'skill') !== false) {
 				echo "stats.$stat = " . ($player->{$stat} - 10) . ";\r\n";
 			}
@@ -1202,9 +1164,7 @@ function premium() {
 			}
 
 		// Village change
-
 		if($player->rank >= 2) {
-
 			echo "
 				<form method='POST'>
 					<table class='table'>
@@ -1381,7 +1341,7 @@ function premium() {
                 echo "
 				<input type='radio' name='name_color' value='purple' " .
                     ($player->forbidden_seal['color'] == 'purple' ? "checked='checked'" : '') . "/>
-				<span class='administrator' style='font-weight:bold;'>Purple</span>";
+				<span class='contentAdmin' style='font-weight:bold;'>Purple</span>";
             }
 			if ($player->isUserAdmin()) {
 				echo "

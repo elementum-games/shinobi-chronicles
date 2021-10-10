@@ -490,8 +490,8 @@ class Battle {
         if(isset($this->default_attacks[$jutsu_id]) && $this->default_attacks[$jutsu_id]->jutsu_type == Jutsu::TYPE_TAIJUTSU) {
             $fighter_jutsu = $this->default_attacks[$jutsu_id];
         }
-        if(isset($this->player->jutsu[$jutsu_id]) && $this->player->jutsu[$jutsu_id]->jutsu_type == Jutsu::TYPE_TAIJUTSU) {
-            $fighter_jutsu = $this->player->jutsu[$jutsu_id];
+        if($fighter->hasEquippedJutsu($jutsu_id) && $fighter->jutsu[$jutsu_id]->jutsu_type == Jutsu::TYPE_TAIJUTSU) {
+            $fighter_jutsu = $fighter->jutsu[$jutsu_id];
         }
 
         if($fighter_jutsu) {
@@ -532,14 +532,14 @@ class Battle {
         }
 
         if($this->player1 instanceof User && $this->player1->id != $this->player->id) {
-            $this->player1->loadData($this->spectate ? 0 : 1, true);
+            $this->player1->loadData(User::UPDATE_NOTHING, true);
             if(!$this->spectate && !$this->isComplete() && $this->player1->battle_id != $this->battle_id) {
                 $this->stopBattle();
                 return;
             }
         }
         if($this->player2 instanceof User && $this->player2->id != $this->player->id) {
-            $this->player2->loadData($this->spectate ? 0 : 1, true);
+            $this->player2->loadData(User::UPDATE_NOTHING, true);
             if(!$this->spectate && !$this->isComplete() && $this->player2->battle_id != $this->battle_id) {
                 $this->stopBattle();
                 return;

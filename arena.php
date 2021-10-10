@@ -206,14 +206,11 @@ function arenaFight(): bool {
             $player->last_pvp = time();
 
             // Daily Tasks
-            $dt = [];
             foreach ($player->daily_tasks as $task) {
-                if ($task['Task'] == 'AI Battles' && $task['Complete'] != 1) {
-                    $task['Progress']++;
+                if (!$task->complete && $task->activity == DailyTask::ACTIVITY_ARENA && $task->sub_task == DailyTask::SUB_TASK_WIN_FIGHT) {
+                    $task->progress++;
                 }
-                array_push($dt, $task);
             }
-            $player->daily_tasks = $dt;
         }
         else if($winner == $battle->opponent_side) {
             echo "<table class='table'><tr><th>Battle Results</th></tr>
@@ -224,14 +221,11 @@ function arenaFight(): bool {
             $player->last_pvp = time();
 
             // Daily Tasks
-            $dt = [];
-            foreach ($player->daily_tasks as $task) {
-                if ($task['Task'] == 'AI Battles' && $tast['SubTask'] == 'Complete' && $task['Complete'] != 1) {
-                    $task['Progress']++;
+            foreach ($player->daily_tasks as &$task) {
+                if (!$task->complete && $task->activity == DailyTask::ACTIVITY_ARENA && $task->sub_task == DailyTask::SUB_TASK_COMPLETE) {
+                    $task->progress++;
                 }
-                array_push($dt, $task);
             }
-            $player->daily_tasks = $dt;
         }
         else if($winner == Battle::DRAW) {
             echo "<table class='table'><tr><th>Battle Results</th></tr>
@@ -241,14 +235,11 @@ function arenaFight(): bool {
             $player->last_pvp = time();
             
             // Daily Tasks
-            $dt = [];
             foreach ($player->daily_tasks as $task) {
-                if ($task['Task'] == 'AI Battles' && $tast['SubTask'] == 'Complete' && $task['Complete'] != 1) {
-                    $task['Progress']++;
+                if (!$task->complete && $task->activity == DailyTask::ACTIVITY_ARENA && $task->sub_task == DailyTask::SUB_TASK_COMPLETE) {
+                    $task->progress++;
                 }
-                array_push($dt, $task);
             }
-            $player->daily_tasks = $dt;
         }
     } catch(Exception $e) {
         $system->message($e->getMessage());

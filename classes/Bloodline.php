@@ -8,10 +8,11 @@ class Bloodline {
     public System $system;
 
     public $bloodline_id;
-    public $id;
-    public $name;
-    public $clan_id;
-    public $rank;
+    public int $id;
+    public string $name;
+    public int $clan_id;
+    public int $rank;
+    public string $description;
 
     public $passive_boosts;
     public $combat_boosts;
@@ -21,23 +22,23 @@ class Bloodline {
     /** @var Jutsu[] */
     public array $jutsu;
 
-    public function __construct($bloodline_id, $user_id = false) {
+    public function __construct(int $bloodline_id, ?int $user_id = null) {
         global $system;
         $this->system =& $system;
         if(!$bloodline_id) {
             $system->error("Invalid bloodline id!");
             return false;
         }
-        $this->bloodline_id = $system->clean($bloodline_id);
+        $this->bloodline_id = (int)$bloodline_id;
         // $this->id = 'BL' . $this->user_id;
 
         $result = $system->query("SELECT * FROM `bloodlines` WHERE `bloodline_id`='$this->bloodline_id' LIMIT 1");
-        if(mysqli_num_rows($result) == 0) {
+        if($system->db_last_num_rows == 0) {
             $system->error("Bloodline does not exist!");
             return false;
         }
 
-        $bloodline_data = mysqli_fetch_assoc($result);
+        $bloodline_data = $system->db_fetch($result);
 
         $this->name = $bloodline_data['name'];
         $this->clan_id = $bloodline_data['clan_id'];
@@ -80,7 +81,6 @@ class Bloodline {
 
         // Load user-related BL data if relevant
         if($user_id) {
-            $user_id = (int)$user_id;
             $result = $system->query("SELECT * FROM `user_bloodlines` WHERE `user_id`=$user_id LIMIT 1");
             if(mysqli_num_rows($result) == 0) {
                 $this->system->message("Invalid user bloodline data!");

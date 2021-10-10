@@ -44,14 +44,11 @@ function battle(): bool {
 					echo "You have earned $team_point_gain point for your team.<br />";
 				}
 				// Daily Tasks
-				$dt = [];
 				foreach ($player->daily_tasks as $task) {
-					if ($task['Task'] == 'PVP Battles' && $task['Complete'] != 1) {
-						$task['Progress']++;
+					if ($task->activity == DailyTask::ACTIVITY_PVP && !$task->complete) {
+						$task->progress++;
 					}
-					array_push($dt, $task);
 				}
-				$player->daily_tasks = $dt;
 			}
 			else if($battle->isOpponentWinner()) {
 				echo "You lose. You were taken back to your village by some allied ninja.<br />";
@@ -64,14 +61,11 @@ function battle(): bool {
 				$player->x = $location[0];
 				$player->y = $location[1];
 				// Daily Tasks
-				$dt = [];
 				foreach ($player->daily_tasks as $task) {
-					if ($task['Task'] == 'PVP Battles' && $task['SubTask'] == 'Complete' && $task['Complete'] != 1) {
-						$task['Progress']++;
+					if ($task->activity == DailyTask::ACTIVITY_PVP && $task->sub_task == DailyTask::SUB_TASK_COMPLETE && !$task->complete) {
+						$task->progress++;
 					}
-					array_push($dt, $task);
 				}
-				$player->daily_tasks = $dt;
 			}
 			else {
 				echo "You both knocked each other out. You were taken back to your village by some allied ninja.<br />";
@@ -81,15 +75,13 @@ function battle(): bool {
 				$player->x = $location[0];
 				$player->y = $location[1];
 				$player->last_pvp = time();
+
 				// Daily Tasks
-				$dt = [];
 				foreach ($player->daily_tasks as $task) {
-					if ($task['Task'] == 'PVP Battles' && $task['SubTask'] == 'Complete' && $task['Complete'] != 1) {
-						$task['Progress']++;
+					if ($task->activity == DailyTask::ACTIVITY_PVP && $task->sub_task == DailyTask::SUB_TASK_COMPLETE && !$task->complete) {
+						$task->progress++;
 					}
-					array_push($dt, $task);
 				}
-				$player->daily_tasks = $dt;
 			}
 			echo "</td></tr></table>";
 			$player->battle_id = 0;
@@ -101,7 +93,7 @@ function battle(): bool {
 
 			try {
 			    $user = new User($attack_id);
-			    $user->loadData(1, true);
+			    $user->loadData(User::UPDATE_NOTHING, true);
             } catch(Exception $e) {
                 throw new Exception("Invalid user! " . $e->getMessage());
             }

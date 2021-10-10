@@ -54,7 +54,8 @@ function chat() {
 				'gold' => -3,
 				'green' => -4,
 				'teal' => -5,
-				'red' => -6
+				'purple' => -6,
+				'red' => -7,
 			);
 			$user_color = (!$player->forbidden_seal) ? 0 : ($supported_colors[$player->forbidden_seal['color']]);
 
@@ -138,7 +139,7 @@ function chat() {
 			<tr><th>Post Message</th></tr>
 			<tr><td style='text-align:center;'>
 			<form action='$self_link' method='post'>
-				<textarea id='chatMessage' name='post' style='width:350px;height:100px;'></textarea><br />
+				<textarea id='chatMessage' name='post' style='width:375px;height:100px;'></textarea><br />
 				<input type='checkbox' id='quickReply' name='quick_reply' value='1' " .
 				($_SESSION['quick_reply'] ? "checked='checked'" : '') .
 				"/> Quick reply<br />
@@ -191,6 +192,9 @@ function chat() {
                     $class .= 'headModerator';
                     break;
                 case -6:
+                    $class .= 'contentAdmin';
+                    break;
+                case -7:
                     $class .= 'administrator';
                     break;
                 default:

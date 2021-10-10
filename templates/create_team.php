@@ -42,7 +42,8 @@
         max-height:100px;
     }
 </style>
-<table class='table'><tr><th>Invited to Team</th></tr>
+<table class='table'>
+    <tr><th>Invited to Team</th></tr>
     <tr><td style='text-align:center;'>
         <div class='teamInvite'>
             You have been invited to join the team <b><?= $team_invited_to->name ?></b><br />

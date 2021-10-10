@@ -1,8 +1,13 @@
+:root {
+    --content-top-margin: 175px;
+}
+
 html, body {
 	height: 100%;
 	width: 100%;
 	margin: 0;
 	padding: 0;
+    font-size: 14px;
 }
 body {
 	background-color: #111111;
@@ -67,9 +72,6 @@ body {
 }
 
 /* Content */
-:root {
-    --content-top-margin: 175px;
-}
 #container {
 	/* Structure */
 	width: 1145px;
@@ -607,6 +609,9 @@ p {
 #content .headModerator, #content a.headModerator:hover {
 	color: #0090A0;
 }
+#content .contentAdmin, #content a.contentAdmin:hover {
+    color: #A000B0;
+}
 #content .administrator, #content a.administrator:hover {
 	color: #A00000;
 }
@@ -877,7 +882,7 @@ br.clear {
     margin: 0 auto;
 
     color: rgb(48, 48, 48);
-    font-size: 1.3rem;
+    font-size: 1.1rem;
     font-family: 'BebasNeue', sans-serif;
 }
 
@@ -927,7 +932,7 @@ br.clear {
     text-align: left;
 
     color: rgb(48, 48, 48);
-    font-size: 0.7rem;
+    font-size: 0.8rem;
 }
 
 .dailyTaskReward {
@@ -995,6 +1000,7 @@ br.clear {
 
 .dailyTaskMedium {
     color: #e5ff00;
+    text-shadow: 0 0 2px black;
 }
 
 .dailyTaskHard {
