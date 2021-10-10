@@ -235,8 +235,11 @@ function members() {
 				echo "<label style='width:6em;'>Team:</label> <a href='{$self_link}&view_team={$viewUser->team->id}'>" . $viewUser->team->name . "</a><br />";
 			}
 			echo "<br />
-			<label style='width:6em;'>PvP wins:</label>	$viewUser->pvp_wins<br />
-			<label style='width:6em;'>AI wins:</label>		$viewUser->ai_wins<br />
+			<label style='width:6em;'>PvP wins:</label>	$viewUser->pvp_wins<br />";
+            if($player->isHeadAdmin()) {
+                echo "<label style='width:6em;'>PvP losses:</label>	$viewUser->pvp_losses<br />";
+            }
+			echo "<label style='width:6em;'>AI wins:</label> $viewUser->ai_wins<br />
 			</td></tr>";
 
 			// $system->audioType got lost
