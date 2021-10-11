@@ -57,10 +57,10 @@ class Battle {
     public Fighter $player;
     public Fighter $opponent;
 
-    public string $player_side;
+    	public string $player_side;
     public string $opponent_side;
 
-    public string $player1_id;
+    		public string $player1_id;
     public string $player2_id;
 
     public Fighter $player1;
