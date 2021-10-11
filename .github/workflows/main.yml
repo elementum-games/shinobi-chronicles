@@ -20,5 +20,5 @@ jobs:
     - name: Prettify code
       uses: creyD/prettier_action@v4.0
       with:
-        prettier_plugins: plugin-php
+        prettier_plugins: php
         only_changed: True
