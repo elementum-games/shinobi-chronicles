@@ -3,10 +3,10 @@
 $constraints = [];
 
 /* Edit User*/
-$constraints['edit_user'] = [
+    $constraints['edit_user'] = [
     'email' => [
         'data_type' => 'string',
-        'input_type' => 'text',
+            'input_type' => 'text',
         'max_length' => 64,
     ],
     'avatar_link' => [
