@@ -1186,6 +1186,9 @@ class User extends Fighter {
         else if($this->team_invite) {
             $query .= "`team_id` = 'invite:{$this->team_invite}',";
         }
+        else {
+            $query .= "`team_id`=0,";
+        }
 
         $query .= "`battle_id` = '$this->battle_id',
 		`challenge` = '$this->challenge',
