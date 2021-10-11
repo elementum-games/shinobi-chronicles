@@ -7,16 +7,16 @@ class Bloodline {
 
     const RANK_ADMIN = 5;
     const RANK_LESSER = 4;
-    const RANK_COMMON = 3;
+        const RANK_COMMON = 3;
     const RANK_ELITE = 2;
     const RANK_LEGENDARY = 1;
 
     public System $system;
 
     public $bloodline_id;
-    public int $id;
+        public int $id;
     public string $name;
-    public int $clan_id;
+        public int $clan_id;
     public int $rank;
     public string $description;
 
