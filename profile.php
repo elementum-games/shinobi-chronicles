@@ -160,9 +160,9 @@ function userProfile() {
         $exp_percent = ($player->exp_per_level - ($exp_needed - $player->exp)) / $player->exp_per_level * 100;
         if($exp_percent < 0) {
             $exp_percent = 0;
-        }
-        else if($exp_percent > 100) {
-            $exp_percent = 100;
+        		}
+        		else if($exp_percent > 100) {
+           			 $exp_percent = 100;
         }
         $exp_width = round($exp_percent * 2);
 
@@ -182,9 +182,9 @@ function userProfile() {
             "<div style='height:6px;width:250px;border-style:solid;border-width:1px;'>" .
             "<div id='chakrabar' style='background-color:#0000B0;height:6px;width:" . $chakra_percent . "%;' /></div>" . "</div>" .
             "<label style='width:6.7em;'>Stamina:</label>" .
-            "<span id='stamina'>" . sprintf("%.2f", $player->stamina) . '/' . sprintf("%.2f", $player->max_stamina) . "</span><br />" .
+            	"<span id='stamina'>" . sprintf("%.2f", $player->stamina) . '/' . sprintf("%.2f", $player->max_stamina) . "</span><br />" .
 
-            "<div style='height:6px;width:250px;border-style:solid;border-width:1px;'>" .
+          		  "<div style='height:6px;width:250px;border-style:solid;border-width:1px;'>" .
             "<div id='staminabar' style='background-color:#00B000;height:6px;width:" . $stamina_percent . "%;' /></div>" . "</div>" .
             "<br />
 		Regeneration Rate: " . $player->regen_rate;
