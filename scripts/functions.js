@@ -52,3 +52,21 @@ function slideNotificationLeft() {
 		}
 	});
 }
+
+function toggleBloodlineDetails(name, byID = false) {
+    if(byID) {
+        name = '#'+name;
+    } else {
+        name = '.'+name;
+    }
+
+    if(name.indexOf("_rank") >= 0) {
+        if($(name+'_box').is(':checked')) {
+            $(name).show();
+        }else {
+            $(name).hide();
+        }
+    } else {
+        $(name).toggle();
+    }
+}

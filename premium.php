@@ -14,6 +14,8 @@ function premium() {
 
 	global $self_link;
 
+	global $RANK_NAMES;
+
 	$costs['name_change'] = 15;
 	$costs['gender_change'] = 10;
 	$costs['bloodline'][1] = 80;
@@ -1232,23 +1234,23 @@ function premium() {
             }
 			echo "<br />";
 
-			$result = $system->query("SELECT `bloodline_id`, `name`, `rank`
-				FROM `bloodlines` WHERE `rank` < 5 ORDER BY `rank` ASC");
+			// Select all for bloodline list
+			$result = $system->query("SELECT * FROM `bloodlines` WHERE `rank` < 5 ORDER BY `rank` ASC");
 			if($system->db_last_num_rows == 0) {
 				echo "No bloodlines available!";
 			}
 			else {
 				$bloodlines = array();
 				while($row = $system->db_fetch($result)) {
-					if($player->bloodline_id && $player->bloodline_id == $row['bloodline_id']) {
-						continue;
-					}
-					$bloodlines[$row['rank']][$row['bloodline_id']] = $row;
+				    $bloodlines[$row['rank']][$row['bloodline_id']] = $row;
 				}
 
 				$ranks = array(1 => 'Legendary', 2 => 'Elite', 3 => 'Common', 4 => 'Lesser');
 				foreach($ranks as $id => $rank) {
-					if(empty($bloodlines[$id])) {
+				    // Skip if rank is empty or user currently possess bloodline
+                    // Need to actually keep bloodline in the bloodlines array for bloodline list
+					if(empty($bloodlines[$id])
+                        || ($player->bloodline_id && $player->bloodline_id == $row['bloodline_id'])) {
 						continue;
 					}
 					echo "$rank Bloodlines (" . $costs['bloodline'][$id] . " Ancient Kunai)<br />
@@ -1261,6 +1263,77 @@ function premium() {
 					<input type='submit' name='purchase_bloodline' value='Implant' />
 					</form>";
 				}
+
+				// Bloodline list
+                echo "<table class='table'>
+                        <tr><th>Bloodline List</th></tr>
+                        <tr><td>
+                            <p>Using the form below, you can search for bloodlines based on rank.</p>
+                            <form style='text-align:center;'>";
+                                foreach($ranks as $id=>$name) {
+                                    echo "<input type='checkbox' onclick=\"toggleBloodlineDetails('{$id}_rank')\"
+                                    class='{$id}_rank_box' checked='checked' />$name";
+                                }
+                            echo "</form>
+                        </td></tr>";
+
+                foreach($ranks as $id => $rank) {
+				    if(empty($bloodlines[$id])) {
+				        continue;
+                    }
+                    echo "<tr class='{$id}_rank'><th>$rank</th></tr>";
+                    foreach($bloodlines[$id] as $bloodline_id => $bloodline) {
+                        echo "<tr class='{$id}_rank'><td>
+                            <a onclick=\"toggleBloodlineDetails('{$bloodline_id}_details');\" style='cursor:pointer;'>
+                                {$bloodline['name']}</a><br />
+                            <div class='{$bloodline_id}_details' style='display:none; margin-left:1.5em'>
+                                <label style='width:4.25em; font-weight:bold;'>Village:</label>{$bloodline['village']}<br />";
+                        // Passive Boost List
+                                if(isset($bloodline['passive_boosts']) && !empty($bloodline['passive_boosts'])) {
+                                    echo "<label style='width:9.5em; font-weight:bold;'>Passive Boosts:</label>
+                                    <div style='margin-left:1.5em'>";
+                                        foreach(json_decode($bloodline['passive_boosts']) as $passive) {
+                                            echo ucwords(str_replace('_', ' ', $passive->effect)) .
+                                                " => " .  $passive->power . "<br />";
+                                        }
+                                    echo "</div>";
+                                }
+                        // Combat Boost List
+                                if(isset($bloodline['combat_boosts']) && !empty($bloodline['combat_boosts'])) {
+                                    echo "<label style='width:9.5em; font-weight:bold;'>Combat Boosts:</label>
+                                    <div style='margin-left:1.5em'>";
+                                    foreach(json_decode($bloodline['combat_boosts']) as $combat_boost) {
+                                        echo ucwords(str_replace('_', ' ', $combat_boost->effect)) .
+                                            " => " .  $combat_boost->power . "<br />";
+                                    }
+                                    echo "</div>";
+                                }
+                        // Jutsu List
+                        echo "<label style='width:4em; font-weight:bold;'>Jutsu:</label><br />
+                                <div style='margin-left:1.5em;'>";
+                                foreach(json_decode($bloodline['jutsu']) as $jutsu) {
+                                    echo "<em>{$jutsu->name}</em><br />
+                                    <div style='margin-left:1.5em;'>
+                                        Rank: " . $RANK_NAMES[$jutsu->rank] . "<br />
+                                        Element: {$jutsu->element}<br />
+                                        Use cost: {$jutsu->use_cost}<br />
+                                        Effect: " . ucwords(str_replace('_', ' ', $jutsu->effect));
+                                            if($jutsu->effect != 'none') {
+                                                echo " - {$jutsu->effect_length} turn(s)";
+                                            }
+                                    echo "<br />
+                                        Jutsu Type: " . ucwords($jutsu->jutsu_type) . "<br />
+                                        Description: {$jutsu->description}<br />
+                                        <br />
+                                    </div>";
+                                }
+                        // End table
+                            echo "</div>
+                        </td></tr>";
+                    }
+                }
+
+                echo "</table>";
 
 			}
 
