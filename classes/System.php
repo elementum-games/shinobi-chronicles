@@ -100,7 +100,9 @@ class System {
         'mission' => 14,
         'rankup' => 25,
     ];
-    public array $links = [];
+    public array $links = [
+        'github' => 'https://github.com/elementum-games/shinobi-chronicles'
+    ];
 
     //Chat variables
     const CHAT_MAX_POST_LENGTH = 350;
@@ -203,7 +205,6 @@ class System {
         $this->register_open = isset($register_open) ? $register_open : false;
         $this->SC_OPEN = isset($SC_OPEN) ? $SC_OPEN : false;
 
-        $this->links = [];
         foreach(self::PAGE_IDS as $slug => $id) {
             $this->links[$slug] = $this->link . '?id=' . $id;
         }
