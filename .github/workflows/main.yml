@@ -20,6 +20,6 @@ jobs:
     - name: Prettify code
       uses: creyD/prettier_action@v4.0
       with:
-        write: --write **/*.{js,php}
+        prettier_options: --write **/*.{js,php}
         prettier_plugins: "@prettier/plugin-php"
         only_changed: true
