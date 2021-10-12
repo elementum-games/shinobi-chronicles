@@ -829,7 +829,7 @@ class User extends Fighter {
                     if($this->team != null) {
                         $boost_percent = $this->team->checkForTrainingBoostTrigger();
                         if($boost_percent != null) {
-                            $boost_amount = round($this->train_gain * $boost_percent, PHP_ROUND_HALF_DOWN);
+                            $boost_amount = round($this->train_gain * $boost_percent, 0, PHP_ROUND_HALF_DOWN);
                             $this->train_gain += $boost_amount;
 
                             $team_boost = '<br />LUCKY! Your team bond triggered a breakthrough and resulted in increased progress!
