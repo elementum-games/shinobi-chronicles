@@ -493,7 +493,7 @@ function members() {
 					   foreach($teams as $row) {
 						   echo "<tr class='table_multicolumns'>
 							   <td><a href='{$system->links['members']}&view_team={$row['team_id']}'>" . $row['name'] . "</td>
-							   <td style='text-align: center;'><a href='{$system->links['members']}&userm={$user_names[$row['leader']]}'>" . $user_names[$row['leader']] . "</td>
+							   <td style='text-align: center;'><a href='{$system->links['members']}&user={$user_names[$row['leader']]}'>" . $user_names[$row['leader']] . "</td>
 							   <td style='text-align: center;'><img src='./images/village_icons/" . strtolower($row['village']) . ".png' style='max-height:18px;max-width:18px;' /> " . $row['village'] . "</td>
 							   <td style='text-align:center;'>" . $row['points']  . "</td>
 						   </tr>";
