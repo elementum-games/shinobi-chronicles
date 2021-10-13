@@ -401,13 +401,13 @@ function members() {
 		if(isset($_GET['view']) && $_GET['view'] == 'highest_exp') {
 			$query_custom = " WHERE `staff_level` <= " . User::STAFF_HEAD_MODERATOR .
                 " ORDER BY `exp` DESC, `pvp_wins` DESC";
-			$list_name = 'Top 10 Users - Highest Exp';
+			$list_name = 'Top 15 Users - Highest Exp';
 			$view = 'highest_exp';
 		}
 		else if(isset($_GET['view']) && $_GET['view'] == 'highest_pvp') {
 			$query_custom = " WHERE `staff_level` < " . System::SC_ADMINISTRATOR .
                 " ORDER BY `pvp_wins` DESC";
-			$list_name = 'Top 10 Users - Highest Pvp';
+			$list_name = 'Top 15 Users - Highest Pvp';
 			$view = 'highest_pvp';
 		}
 		else if(isset($_GET['view']) && $_GET['view'] == 'online_users') {
@@ -421,7 +421,7 @@ function members() {
 		else {
             $query_custom = " WHERE `staff_level` <= " . User::STAFF_HEAD_MODERATOR .
                 " ORDER BY `exp` DESC, `pvp_wins` DESC";
-			$list_name = 'Top 10 Users - Highest Exp';
+			$list_name = 'Top 15 Users - Highest Exp';
 			$view = 'highest_exp';
 
 		}
@@ -451,7 +451,7 @@ function members() {
 		}
 
 		// Search box for individual users
-		// List top 10 users by experience
+		// List top 15 users by experience
 		echo "<table class='table'><tr><th colspan='4'>$list_name</th></tr>
 		<tr>
 			<th style='width:30%;'>Username</th>
