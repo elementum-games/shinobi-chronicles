@@ -60,6 +60,7 @@ $top_menu = <<<HTML
 	<li><a href='{$system->links['github']}'>GitHub</a></li>
 	<li><a href='{$system->link}rules.php'>Rules</a></li>
 	<li><a href='{$system->link}terms.php'>Terms of Service</a></li>
+	<li><a href='{$system->link}support.php'>Support</a></li>
 </ul>
 HTML;
 

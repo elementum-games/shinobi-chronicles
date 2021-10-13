@@ -70,6 +70,7 @@ $top_menu = <<<HTML
 	<li><a id='topMenuOption-Github' href='https://github.com/elementum-games/shinobi-chronicles' target='_blank'>Github</a></li>
 	<li><a id='topMenuOption-Rules' href='{$system->link}rules.php'>Rules</a></li>
 	<li><a id='topMenuOption-Terms' href='{$system->link}terms.php'>Terms of Service</a></li>
+	<li><a id='topMenuOption-Manual' href='{$system->link}support.php'>Support</a></li>
 </ul>
 HTML;
 
