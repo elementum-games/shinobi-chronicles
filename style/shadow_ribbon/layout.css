@@ -41,12 +41,12 @@ body {
 	border: 0;
 }
 #topMenu {
-	width: 750px;
+	width: 800px;
 	
 	position: relative;
 	top: -61px;
 	
-	margin-left: 100px;
+	margin-left: -25px;
 	margin-top: 15px;
 	/* Temp */
 

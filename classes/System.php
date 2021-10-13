@@ -634,24 +634,10 @@ class System {
         return password_verify($password, $hash);
     }
 
-    public function renderStaticPageHeader() {
+    public function renderStaticPageHeader($layout = System::DEFAULT_LAYOUT) {
         $system = $this;
 
-        switch(System::DEFAULT_LAYOUT) {
-            case 'cextralite':
-                require("layout/cextralite.php");
-                break;
-            case 'classic_blue':
-                require("layout/classic_blue.php");
-                break;
-            case 'geisha':
-                require("layout/geisha.php");
-                break;
-            case 'shadow_ribbon':
-            default:
-                require("layout/shadow_ribbon.php");
-                break;
-        }
+        require($this->fetchLayoutByName($layout));
 
         /**
          * @var $heading
@@ -666,24 +652,10 @@ class System {
         echo str_replace("[HEADER_TITLE]", "Rules", $body_start);
     }
 
-    public function renderStaticPageFooter() {
+    public function renderStaticPageFooter($layout = System::DEFAULT_LAYOUT) {
         $system = $this;
 
-        switch(System::DEFAULT_LAYOUT) {
-            case 'cextralite':
-                require("layout/cextralite.php");
-                break;
-            case 'classic_blue':
-                require("layout/classic_blue.php");
-                break;
-            case 'geisha':
-                require("layout/geisha.php");
-                break;
-            case 'shadow_ribbon':
-            default:
-                require("layout/shadow_ribbon.php");
-                break;
-        }
+        require($this->fetchLayoutByName($layout));
 
         /**
          * @var $side_menu_start
@@ -701,6 +673,29 @@ class System {
         }
 
         echo str_replace('<!--[VERSION_NUMBER]-->', System::VERSION_NUMBER, $footer);
+    }
+
+    public function fetchLayoutByName($layout) {
+        switch($layout) {
+            case 'cextralite':
+                return "layout/cextralite.php";
+                break;
+            case 'classic_blue':
+                return "layout/classic_blue.php";
+                break;
+            case 'shadow_ribbon':
+                return "layout/shadow_ribbon.php";
+                break;
+            case 'geisha':
+                return "layout/geisha.php";
+                break;
+            case 'blue_scroll':
+                return "layout/blue_scroll.php";
+                break;
+            default:
+                return "layout/" . self::DEFAULT_LAYOUT . ".php";
+                break;
+        }
     }
 
     /**

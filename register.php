@@ -10,7 +10,7 @@ if(isset($_SESSION['user_id'])) {
 }
 
 // Start display
-require("layout/" . System::DEFAULT_LAYOUT . ".php");
+require($system->fetchLayoutByName(System::DEFAULT_LAYOUT));
 echo $heading;
 echo $top_menu;
 echo $header;
