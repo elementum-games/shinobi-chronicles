@@ -25,9 +25,10 @@ function members() {
 	// Sub-menu
 	echo "<div class='submenu'>
 	<ul class='submenu'>
-		<li style='width:24.5%;'><a href='{$self_link}&view=highest_exp'>Highest Exp</a></li>		
+		<li style='width:24.5%;'><a href='{$self_link}&view=highest_exp'>Highest Exp</a></li>
 		<li style='width:24.5%;'><a href='{$self_link}&view=online_users'>Online Users</a></li>
 		<li style='width:24.5%;'><a href='{$self_link}&view=highest_pvp'>Highest Pvp</a></li>
+		<li style='width:24.5%;'><a href='{$self_link}&view=highest_teams'>Highest Teams</a></li>
 		<li style='width:24.5%;'><a href='{$self_link}&view=staff'>Game Staff</a></li>
 	</ul>
 	</div>
@@ -410,6 +411,13 @@ function members() {
 			$list_name = 'Top 15 Users - Highest Pvp';
 			$view = 'highest_pvp';
 		}
+		//Teams
+		else if(isset($_GET['view']) && $_GET['view'] == 'highest_teams') {
+			$query_custom = " WHERE `staff_level` < " . System::SC_ADMINISTRATOR .
+                " ORDER BY `pvp_wins` DESC";
+			$list_name = 'Top 15 Teams - Highest Team Points';
+			$view = 'highest_teams';
+		}
 		else if(isset($_GET['view']) && $_GET['view'] == 'online_users') {
 			$query_custom = "WHERE `last_active` > UNIX_TIMESTAMP() - $online_seconds ORDER BY `level` DESC";
 
@@ -429,7 +437,7 @@ function members() {
 		// Pagination
 		$users_per_page = 15;
 		$min = 0;
-		if(isset($_GET['min']) && $view != 'highest_exp' && $view != 'highest_pvp') {
+		if(isset($_GET['min']) && $view != 'highest_exp' && $view != 'highest_teams' && $view != 'highest_pvp') {
 			$users_per_page = 10;
 			$min = (int)$system->clean($_GET['min']);
 		}
@@ -442,23 +450,66 @@ function members() {
 			case "highest_exp":
 				$table_header = 'Experience';
 				break;
-			case "highest_pvp":
-				$table_header = 'Pvp Kills';
-				break;
 			case "online_users":
 				$table_header = 'Level';
 				break;
+				case "highest_pvp":
+					$table_header = 'Pvp Kills';
+					break;
+				case "highest_teams":
+					$table_header = 'Highest Teams';
+					break;
 		}
 
 		// Search box for individual users
+		// list top 15 Teams
+		if($view == 'highest_teams') {
+			// Teams
+				$user_id_array = array();
+				$result = $system->query("SELECT * FROM `teams` ORDER BY `points` DESC LIMIT 15");
+				$teams = array();
+				while($row = $system->db_fetch($result)) {
+					$teams[] = $row;
+					if(array_search($row['leader'], $user_id_array) === false) {
+							$user_id_array[] = $row['leader'];
+						}
+					}
+				// Fetch leader names
+				$user_id_string = implode(',', $user_id_array);
+				$result = $system->query("SELECT `user_id`, `user_name`, `village` FROM `users` WHERE `user_id` IN ($user_id_string)");
+				$user_names = array();
+				$village = array();
+				while($row = $system->db_fetch($result)) {
+						$user_names[$row['user_id']] = $row['user_name'];
+						$village[$row['village']] = $row['village'];
+					}
+					// Team display
+				   echo "<table class='table'><tr><th colspan='4'>Top 15 Teams - Highest Team Points</th></tr><tr>
+						   <th>Name</th>
+						   <th>Leader</th>
+						   <th>Village</th>
+						   <th>Points</th>
+					   </tr>";
+					   foreach($teams as $row) {
+						   echo "<tr class='table_multicolumns'>
+							   <td><a href='{$system->links['members']}&view_team={$row['team_id']}'>" . $row['name'] . "</td>
+							   <td style='text-align: center;'><a href='{$system->links['members']}&userm={$user_names[$row['leader']]}'>" . $user_names[$row['leader']] . "</td>
+							   <td style='text-align: center;'><img src='./images/village_icons/" . strtolower($row['village']) . ".png' style='max-height:18px;max-width:18px;' /> " . $row['village'] . "</td>
+							   <td style='text-align:center;'>" . $row['points']  . "</td>
+						   </tr>";
+					   }
+		}
 		// List top 15 users by experience
-		echo "<table class='table'><tr><th colspan='4'>$list_name</th></tr>
-		<tr>
-			<th style='width:30%;'>Username</th>
-			<th style='width:20%;'>Rank</th>
-			<th style='width:20%;'>Village</th>
-			<th style='width:30%;'>" . ($table_header) . "</th>
-		</tr>";
+		else {
+			echo "<table class='table'><tr><th colspan='4'>$list_name</th></tr>
+				<tr>
+					<th style='width:30%;'>Username</th>
+					<th style='width:20%;'>Rank</th>
+					<th style='width:20%;'>Village</th>
+					<th style='width:30%;'>" . ($table_header) . "</th>
+				</tr>";
+	}
+
 
 
 		if($system->db_last_num_rows == 0) {
@@ -474,7 +525,6 @@ function members() {
 				else {
 					$class = 'row2';
 				}
-
 				echo "<tr class='table_multicolumns'>
 					<td class='$class' style='width:30%;'>
 						<a href='$self_link&user={$row['user_name']}' class='userLink'>" . $row['user_name'] . "</a></td>
