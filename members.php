@@ -25,9 +25,9 @@ function members() {
 	// Sub-menu
 	echo "<div class='submenu'>
 	<ul class='submenu'>
-		<li style='width:24.5%;'><a href='{$self_link}&view=highest_pvp'>Highest Pvp</a></li>
-		<li style='width:24.5%;'><a href='{$self_link}&view=highest_exp'>Highest Exp</a></li>
+		<li style='width:24.5%;'><a href='{$self_link}&view=highest_exp'>Highest Exp</a></li>		
 		<li style='width:24.5%;'><a href='{$self_link}&view=online_users'>Online Users</a></li>
+		<li style='width:24.5%;'><a href='{$self_link}&view=highest_pvp'>Highest Pvp</a></li>
 		<li style='width:24.5%;'><a href='{$self_link}&view=staff'>Game Staff</a></li>
 	</ul>
 	</div>
