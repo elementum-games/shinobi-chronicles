@@ -381,7 +381,7 @@ if($LOGGED_IN) {
 			// Page is okay
 
             // Force view battle page if waiting too long
-            if(!$ajax && $player->battle_id && empty($pages[$id]['battle_type'])) {
+            if($player->battle_id && empty($pages[$id]['battle_type'])) {
                 $battle_result = $system->query(
                     "SELECT winner, turn_time, battle_type FROM battles WHERE `battle_id`='{$player->battle_id}' LIMIT 1"
                 );
