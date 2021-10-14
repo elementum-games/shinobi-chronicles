@@ -2,6 +2,11 @@
 
 /** @var System $system */
 
+$extra_meta_tags = '';
+if($system->environment == System::ENVIRONMENT_DEV) {
+    $extra_meta_tags = '<meta name="robots" content="noindex" />';
+}
+
 /** @noinspection HtmlUnknownTarget */
 $heading = <<<HTML
 <!doctype HTML public>
@@ -17,6 +22,7 @@ $heading = <<<HTML
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 	<meta name="keywords" content="naruto, rpg, online, game, anime, manga, mmorpg" />
 	<meta name="description" content="Shinobi Chronicles: An online browser-based RPG inspired by the anime/manga Naruto." />
+	$extra_meta_tags
 	<script type='text/javascript'>
 	$(document).ready(function(){
 		if(typeof train_time !== 'undefined') {

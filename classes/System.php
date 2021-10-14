@@ -7,6 +7,8 @@ require_once __DIR__ . '/User.php';
 	Purpose: 	Handle database connection and queries. Handle storing and printing of error messages.
 */
 class System {
+    const ENVIRONMENT_DEV = 'dev';
+
     const KUNAI_PER_DOLLAR = 2;
     const LOGOUT_LIMIT = 120;
     const BLOODLINE_ROLL_CHANCE = 50;
@@ -199,7 +201,7 @@ class System {
         $this->password = $password;
         $this->database = $database;
 
-        $this->environment = isset($ENVIRONMENT) ? $ENVIRONMENT : 'dev';
+        $this->environment = isset($ENVIRONMENT) ? $ENVIRONMENT : self::ENVIRONMENT_DEV;
         $this->link = isset($web_url) ? $web_url : 'http://localhost/';
 
         $this->register_open = isset($register_open) ? $register_open : false;
