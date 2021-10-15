@@ -29,7 +29,7 @@
 
 <table class="table">
     <tr><th>Bloodline List</th></tr>
-    <tr><td>
+    <tr><td style='text-align:center;'>
         <p>Using the form below, you can search for bloodlines based on rank.</p>
         <div style="text-align:center;">
             <?php foreach(Bloodline::$public_ranks as $id=> $name): ?>
@@ -38,9 +38,6 @@
             <?php endforeach ?>
         </div>
     </td></tr>
-</table>
-
-<table class="table">
     <?php foreach(Bloodline::$public_ranks as $id=> $rank): ?>
         <?php if(empty($bloodlines[$id])): ?>
             <?php continue; ?>
@@ -57,8 +54,8 @@
                             <label style="width:9.5em; font-weight:bold;">Passive Boosts:</label><br />
                             <div style="margin-left:1.5em;">
                             <?php foreach($bloodline['passive_boosts'] as $passive_boost): ?>
-                                <?=ucwords(str_replace('_', ' ', $passive_boost->effect))?> =>
-                                <?= $passive_boost->power ?><br />
+                                <?=ucwords(str_replace('_', ' ', $passive_boost->effect))?>:
+                                <?= $passive_boost->power ?> boost power<br />
                             <?php endforeach ?>
                             </div>
                         <?php endif ?>
@@ -68,7 +65,7 @@
                             <div style="margin-left:1.5em;">
                                 <?php foreach($bloodline['combat_boosts'] as $combat_boost): ?>
                                     <?=ucwords(str_replace('_', ' ', $combat_boost->effect))?> =>
-                                    <?= $combat_boost->power ?><br />
+                                    <?= $combat_boost->power ?> boost power<br />
                                 <?php endforeach ?>
                             </div>
                         <?php ENDIF ?>
@@ -80,7 +77,8 @@
                                 <div style="margin-left:1.5em;">
                                     <label style="width:7.5em; font-weight:bold;">Rank:</label> <?=$RANK_NAMES[$ability->rank]?><br />
                                     <label style="width:7.5em; font-weight:bold;">Element:</label> <?=ucwords($ability->element)?><br />
-                                    <label style="width:7.5em; font-weight:bold;">Use Cost:</label> <?=$ability->use_cost?><br />
+                                    <label style="width:7.5em; font-weight:bold;">Use Cost:</label>
+                                        <?=$ability->use_cost?> <?= $ability->jutsu_type == 'Taijutsu' ? 'Stamina' : 'Chakra' ?><br />
                                     <label style="width:7.5em; font-weight:bold;">Effect:</label> <?=ucwords(str_replace('_', ' ', $ability->effect))?>
                                         <?php if($ability->effect != 'none'): ?>
                                             - <?=$ability->effect_length?> turn(s)<br />

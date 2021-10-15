@@ -328,13 +328,12 @@
                             </select>
                             <input type='submit' name='purchase_bloodline' value='Implant'/>
                         </form>
-                        }
-
-                        <?php include('templates/bloodlineList.php') ?>
                     <?php endforeach; ?>
                 </td>
             </tr>
+
         </table>
+        <?php include('templates/bloodlineList.php') ?>
     <?php else: ?>
         <table class='table'><tr><td>
             You cannot access this section until you are a Genin!
