@@ -426,9 +426,10 @@ function members() {
 		}
 
 		// Pagination
-		$users_per_page = 15;
+		$users_per_page = 20;
+		$results_per_page = 15;
 		$min = 0;
-		if(isset($_GET['min']) && $view != 'highest_exp' && $view != 'highest_teams' && $view != 'highest_pvp') {
+		if(isset($_GET['min']) && $view == 'online_users') {
 			$users_per_page = 10;
 			$min = (int)$system->clean($_GET['min']);
 		}
@@ -457,7 +458,7 @@ function members() {
 		if($view == 'highest_teams') {
 			// Teams
 				$user_id_array = array();
-				$result = $system->query("SELECT * FROM `teams` ORDER BY `monthly_points` DESC LIMIT 15");
+				$result = $system->query("SELECT * FROM `teams` ORDER BY `monthly_points` DESC LIMIT $results_per_page");
 				$teams = array();
 				while($row = $system->db_fetch($result)) {
 					$teams[] = $row;
@@ -465,7 +466,13 @@ function members() {
 							$user_id_array[] = $row['leader'];
 						}
 					}
+
 				// Fetch leader names
+				try {
+				if(empty($user_id_array)) {
+					throw new Exception("Leader does not exist!");
+				}
+				else {
 				$user_id_string = implode(',', $user_id_array);
 				$result = $system->query("SELECT `user_id`, `user_name`, `village` FROM `users` WHERE `user_id` IN ($user_id_string)");
 				$user_names = array();
@@ -474,6 +481,7 @@ function members() {
 						$user_names[$row['user_id']] = $row['user_name'];
 						$village[$row['village']] = $row['village'];
 					}
+				}
 					// Team display
 				   echo "<table class='table'><tr><th colspan='4'>Top 15 Teams - Points This Month</th></tr><tr>
 						   <th>Name</th>
@@ -489,7 +497,12 @@ function members() {
 							   <td style='text-align:center;'>" . $row['monthly_points']  . "</td>
 						   </tr>";
 					   }
-		}
+				   }
+				   catch (Exception $e) {
+		   			$system->message($e->getMessage());
+		   		}
+		   		$system->printMessage();
+			 }
 		// List top 15 users by experience
 		else {
 			echo "<table class='table'><tr><th colspan='4'>$list_name</th></tr>
