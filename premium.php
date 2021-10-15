@@ -982,37 +982,52 @@ function premium() {
             'label' => 'Pink',
             'value' => 'pink'
         ],
-        [
+    ];
+
+    if($player->premium_credits_purchased > 0) {
+        $name_colors[] = [
             'class' => '',
             'label' => 'Black',
             'value' => 'black'
-        ],
-        [
+        ];
+        $name_colors[] = [
             'class'=>'gold',
             'label' => 'Gold',
             'value' => 'gold'
-        ],
-        [
+        ];
+    }
+
+    if($player->isModerator()) {
+        $name_colors[] = [
             'class'=>'moderator',
             'label' => 'Green',
             'value' => 'green'
-        ],
-        [
+        ];
+
+    }
+    if($player->isHeadModerator()) {
+        $name_colors[] = [
             'class'=>'headModerator',
             'label' => 'Teal',
             'value' => 'teal'
-        ],
-        [
+        ];
+
+    }
+    if($player->isContentAdmin()) {
+        $name_colors[] = [
             'class'=>'contentAdmin',
             'label' => 'Purple',
             'value' => 'purple'
-        ],
-        [
+        ];
+    }
+    if($player->isHeadAdmin()) {
+        $name_colors[] = [
             'class'=>'administrator',
             'label' => 'Red',
             'value' => 'red'
-        ],
-    ];
+        ];
+    }
+
 
     require "templates/premium.php";
     return true;
