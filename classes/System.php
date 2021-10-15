@@ -28,6 +28,9 @@ class System {
 
     const DB_DATETIME_MS_FORMAT = 'Y-m-d H:i:s.u';
 
+    public static array $villages = ['Stone', 'Cloud', 'Leaf', 'Sand', 'Mist'];
+    public static array $forbidden_seals = array(1 => 'Twin Sparrow Seal', 2 => 'Four Dragon Seal');
+
     // Variable for error message
     public $message;
     public $message_displayed;

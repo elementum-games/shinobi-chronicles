@@ -11,6 +11,13 @@ class Bloodline {
     const RANK_ELITE = 2;
     const RANK_LEGENDARY = 1;
 
+    public static array $public_ranks = [
+        self::RANK_LEGENDARY => 'Legendary',
+        self::RANK_ELITE  => 'Elite',
+        self::RANK_COMMON  => 'Common',
+        self::RANK_LESSER  => 'Lesser'
+    ];
+
     public System $system;
 
     public $bloodline_id;

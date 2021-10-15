@@ -947,541 +947,75 @@ function premium() {
 	}
 	// End Clan Change
 
+    $view = 'character_changes';
+    if($player->premium_credits == 0) {
+        $view = 'buy_kunai';
+    }
+    if(isset($_GET['view'])) {
+        $view = $_GET['view'];
+    }
 
-	// Sub-menu
-	echo "<div class='submenu'>
-	<ul class='submenu'>
-		<li style='width:30.5%;'><a href='{$self_link}&view=character_changes'>Character Changes</a></li>
-		<li style='width:23%;'><a href='{$self_link}&view=bloodlines'>Bloodlines</a></li>
-		<li style='width:25.5%;'><a href='{$self_link}&view=forbidden_seal'>Forbidden Seal</a></li>
-		<li style='width:18.5%;'><a href='{$self_link}&view=buy_kunai'>Buy AK</a></li>
-	</ul>
-	</div>
-	<div class='submenuMargin'></div>";
+    $kunai_per_dollar = System::KUNAI_PER_DOLLAR;
 
-	$system->printMessage();
-	// Summary
-	echo "<table class='table'><tr><th>Premium</th></tr>
-	<tr><td style='text-align:center;'>
-	Here you can purchase and spend Ancient Kunai on a variety of boosts and in-game items.<br />
-	<br />
-	<b>Your Ancient Kunai:</b> $player->premium_credits
-	</td></tr></table>";
+    // Select all for bloodline list
+    $bloodlines = array();
+    $result = $system->query("SELECT * FROM `bloodlines` WHERE `rank` < 5 ORDER BY `rank` ASC");
+    if($system->db_last_num_rows > 0) {
+        while($row = $system->db_fetch($result)) {
+            // Prep json encoded members for use in BL list
+            $row['passive_boosts'] = json_decode($row['passive_boosts']);
+            $row['combat_boosts'] = json_decode($row['combat_boosts']);
+            $row['jutsu'] = json_decode($row['jutsu']);
+            // Add BL to list
+            $bloodlines[$row['rank']][$row['bloodline_id']] = $row;
+        }
+    }
 
-	$view = 'character_changes';
-	if($player->premium_credits == 0) {
-		$view = 'buy_kunai';
-	}
-	if(isset($_GET['view'])) {
-		$view = $_GET['view'];
-	}
+    $name_colors = [
+        [
+            'class'=>'blue',
+            'label' => 'Blue',
+            'value' => 'blue'
+        ],
+        [
+            'class'=>'pink',
+            'label' => 'Pink',
+            'value' => 'pink'
+        ],
+        [
+            'class' => '',
+            'label' => 'Black',
+            'value' => 'black'
+        ],
+        [
+            'class'=>'gold',
+            'label' => 'Gold',
+            'value' => 'gold'
+        ],
+        [
+            'class'=>'moderator',
+            'label' => 'Green',
+            'value' => 'green'
+        ],
+        [
+            'class'=>'headModerator',
+            'label' => 'Teal',
+            'value' => 'teal'
+        ],
+        [
+            'class'=>'contentAdmin',
+            'label' => 'Purple',
+            'value' => 'purple'
+        ],
+        [
+            'class'=>'administrator',
+            'label' => 'Red',
+            'value' => 'red'
+        ],
+    ];
 
-	$kunai_per_dollar = System::KUNAI_PER_DOLLAR;
-
-	if($view == 'character_changes') {
-		// Character reset
-		echo "<table class='table'>
-        <tr>
-            <th>Character Reset</th>
-            <th>Individual Stat Resets</th>
-        </tr>
-		<tr>
-            <td style='text-align:center;'>You can reset your character and start over as a level 1 Akademi-sei. This is <b>free.</b><br />
-                <form action='$self_link' method='post'>
-                <input type='submit' name='user_reset' value='Reset Character' style='margin-top:8px;' />
-                </form>
-            </td>
-            <td style='text-align:center;'>
-                You can reset an individual stat, freeing up space in your total stat cap to train something else higher.
-                This is <b>free.</b><br />
-                <form action='$self_link&view=character_changes' method='post'>
-                <select id='statResetSelect' name='stat' style='margin:6px 0 8px;'>";
-                foreach($player->stats as $stat) {
-                    echo "<option value='$stat'>" . ucwords(str_replace('_', ' ', $stat)) . '</option>';
-                }
-
-            echo "</select>
-            <br />
-            <input type='submit' name='stat_reset' value='Reset stat' />
-            </form>
-		</td></tr>
-		</tr>";
-
-		echo "<tr><th colspan='2'>Username Change</th></tr>
-		<tr><td colspan='2'style='text-align:center;'>You can change your username free once per account or for ". $costs['name_change'] . "AK afterward.
-            Any changes to the case of your name do not cost.<br />
-            <p>Free Changes left: {$player->username_changes}</p>
-            <form action='$self_link' method='post'>
-            <input type='text' name='new_name'/>
-            <input type='submit' name='name_change' value='Change' />
-            </form>
-		</td></tr>";
-
-		echo "<tr><th colspan='2'>Gender Change</th></tr>
-		<tr><td style='text-align:center;' colspan='2'>You can change your gender  for {$costs['gender_change']} Ancient Kunai.
-		<br />('" . User::GENDER_NONE ."' gender will not be displayed on view profile)
-		<form action='$self_link' method='post'>
-			<select name='new_gender'>";
-				foreach(User::$genders as $new_gender) {
-					if($player->gender == $new_gender) {
-						continue;
-					} else {
-					echo "<option value='$new_gender'>$new_gender</option>";
-					}
-				}
-				echo "
-				</select><br />
- 				<input type='submit' name='change_gender' value='Change Gender' />
-			</form>
-		</td></tr>";
-
-		$stats = array('ninjutsu_skill', 'taijutsu_skill', 'genjutsu_skill', 'cast_speed', 'speed', 'intelligence', 'willpower');
-		if($player->bloodline_id) {
-			array_unshift($stats, 'bloodline_skill');
-		}
-
-		$element_change_cost = $costs['element_change'];
-		$village_change_cost = $costs['village_change'];
-		$clan_change_cost = $costs['clan_change'];
-
-		echo "</table>";
-
-		// Stat reallocation
-		echo "<table class='table'>
-        <tr><th>Stat Transfers</th></tr>
-		<tr><td style='text-align:center;'>
-		<script type='text/javascript'>
-		var stats = new Object;
-		function statSelectChange() {
-			$('#transferAmount').val(stats[$('#statAllocateSelect').val()]);
-			statAllocateCostDisplay();
-		}
-		function statAllocateCostDisplay() {
-			var transferAmount = parseInt($('#transferAmount').val());
-			if (transferAmount <= 10) {
-				var cost = 0;
-			} else {
-					var cost = 1 + Math.floor(transferAmount / 300);
-				}
-			var time = transferAmount * 0.2;
-			var display = cost + ' AK / ' + time + ' minutes';
-			$('#statAllocateCost').html(display);
-		}
-		</script>
-		You can transfer points from one stat to another. This costs Ancient Kunai and takes time to complete, both cost and time increase
-		the higher your stat amount is.<br />
-		Stat transfers under 10 are free but have a <b>24 hour cool down</b>.<br />
-		<form action='$self_link&view=character_changes' method='post'>
-		<br />
-		Transfer<br />
-		<select id='statAllocateSelect' name='original_stat' onchange='statSelectChange();'>";
-		foreach($player->stats as $stat) {
-			echo "<option value='$stat'>" . ucwords(str_replace('_', ' ', $stat)) . '</option>';
-		}
-
-		echo "</select><br />
-		to<br />
-		<select name='target_stat'>";
-		foreach($player->stats as $stat) {
-			echo "<option value='$stat'>" . ucwords(str_replace('_', ' ', $stat)) . '</option>';
-		}
-		echo "</select>
-		<script type='text/javascript'>";
-		foreach($player->stats as $stat) {
-			if(strpos($stat, 'skill') !== false) {
-				echo "stats.$stat = " . ($player->{$stat} - 10) . ";\r\n";
-			}
-			else {
-				echo "stats.$stat = " . ($player->{$stat} - 5) . ";\r\n";
-			}
-		}
-
-		if($player->bloodline_id) {
-			$init_cost = (1 + floor(($player->bloodline_skill - 10) / 300));
-			$init_transfer_amount = $player->bloodline_skill - 10;
-			$init_length = ($player->bloodline_skill - 10) * 0.25;
-		} else {
-			$init_cost = (1 + floor(($player->ninjutsu_skill  - 10) / 300));
-			$init_transfer_amount = $player->ninjutsu_skill - 10;
-			$init_length = ($player->ninjutsu_skill - 10) * 0.25;
-		 }
-
-		echo "</script>
-			<br />
-			<br />
-			Transfer amount:<br />
-			<input type='text' id='transferAmount' name='transfer_amount' value='{$init_transfer_amount}'
-				onkeyup='statAllocateCostDisplay()' /><br />
-			<span id='statAllocateCost'>" . $init_cost . " AK / {$init_length} minutes</span><br />
-			<input type='submit' name='stat_allocate' value='Transfer Stat Points' />
-			</form>
-			</td></tr></table>";
-
-		// Change Element
-		if($player->elements) {
-
-		$elements = array(Jutsu::ELEMENT_FIRE, Jutsu::ELEMENT_WIND, Jutsu::ELEMENT_LIGHTNING, Jutsu::ELEMENT_EARTH, Jutsu::ELEMENT_WATER);
-		echo "<table class='table'>
-		<tr><th> Chakra Element Change</th></tr>
-				<tr>
-					<td style='text-align:center;'>
-						You can undergo harsh training by the village elders to reattune your chakra nature.
-						<br />
-						A gift offering of $element_change_cost Ancient Kunai is required.
-						<br />
-						<br />
-						<b>(IMPORTANT: This is non-reversable once completed, if you want to return to your original element you will have to pay another fee. You will forget any elemental jutsu you currently have of this nature.)</b>
-
-		 			<br />Choose your element to reattune:
-						<br />
-						<form action='$self_link' method='post'>
-							<select name='current_element'>";
-								foreach ($player->elements as $slot => $element) {
-									echo "<option value='{$slot}'>{$element}</option>";
-								}
-						echo "
-						</select>
-						<br />Choose your element to attune to:
-								<br />
-							   <select name='new_element'>";
-							   	foreach($elements as $new_element) {
-									if($player->elements['first'] == $new_element) {
-                    					continue;
-                				} else if($player->elements['second'] == $new_element) {
-									continue;
-								}
-							        echo "<option value='$new_element'>$new_element</option>";
-								 }
-							  echo "</select><br />
-									<input type='submit' name='change_element' value='Change Element' />
-								</form>
-								</td>
-								</tr>";
-						echo "</table>";
-			}
-
-		// Village change
-		if($player->rank >= 2) {
-			echo "
-				<form method='POST'>
-					<table class='table'>
-						<tr>
-							<th>Change Clan</th>
-						</tr>
-						<tr>
-							<td style='text-align:center;'>If you choose to abandon your clan now, you must gain the respect of other leaders in order to be accepted into their family. A gift offering of {$clan_change_cost} Ancient Kunai is required.
-							<br />
-							<br />
-							<b>(IMPORTANT: This is non-reversable once completed, if you want to return to your original village you will have to pay a higher transfer fee. Furthermore, you'll be removed from any clan office.)</b>
-							<br />Select the clan below:</td>
-						</tr>
-						<tr>
-							<td style='text-align:center;'>
-								<select name='clan_change_id'>
-			";
-								foreach($available_clans as $clan_id => $clan_name) {
-									echo sprintf("<option value='%d'>%s</option>", $clan_id, $clan_name);
-								}
-			echo "
-								</select>
-							</td>
-						</tr>
-						<tr>
-							<td style='text-align:center;'><input type='submit' name='change_clan' value='Change'></td>
-						</tr>
-					</table>
-				</form>
-			";
-
-
-		}
-
-		if($player->rank >= 2) {
-			$villages = array('Stone', 'Cloud', 'Leaf', 'Sand', 'Mist');
-			echo "<table class='table'><tr><th>Change Village</th></tr>
-			<tr><td style='text-align:center;'>
-			You can betray your own village and go to another village if you no longer wish to be a ninja in your own village.
-			However to get the other village to accept you, you must offer them " . ($village_change_cost) .
-			" Ancient Kunai.<br />
-			<br />
-			<b>(IMPORTANT: This is non-reversable once completed, if you want to return to your original village you will have to pay
-			a higher transfer fee)</b><br />
-			<form action='$self_link' method='post'>
-			<select name='new_village'>";
-			foreach($villages as $village) {
-				if($player->village == $village) {
-					continue;
-				}
-				echo "<option value='$village'>$village</option>";
-			}
-
-			echo "</select><br />
-			<input type='submit' name='change_village' value='Change Village' />
-			</form>
-			</td></tr></table>";
-		}
-	}
-	else if($view == 'bloodlines') {
-		// Bloodline
-		if($player->rank >= 2) {
-			echo "<table class='table'><tr><th>Purchase New Bloodline</th></tr>
-			<tr><td style='text-align:center;'>A researcher from the village will implant another clan's DNA into
-			you in exchange for Ancient Kunai, allowing you to use a new bloodline" .
-				($player->bloodline_id ? ' instead of your own' : '') . ".<br /><br />";
-			if($player->bloodline_skill > 10) {
-			    echo "<b>Warning: Your bloodline skill will be reduced by " . (Bloodline::SKILL_REDUCTION_ON_CHANGE * 100) . "% as you must
-                   re-adjust to your new bloodline!</b><br />";
-            }
-			echo "<br />";
-
-			// Select all for bloodline list
-			$result = $system->query("SELECT * FROM `bloodlines` WHERE `rank` < 5 ORDER BY `rank` ASC");
-			if($system->db_last_num_rows == 0) {
-				echo "No bloodlines available!";
-			}
-			else {
-				$bloodlines = array();
-				while($row = $system->db_fetch($result)) {
-				    // Prep json encoded members for use in BL list
-				    $row['passive_boosts'] = json_decode($row['passive_boosts']);
-				    $row['combat_boosts'] = json_decode($row['combat_boosts']);
-				    $row['jutsu'] = json_decode($row['jutsu']);
-				    // Add BL to list
-				    $bloodlines[$row['rank']][$row['bloodline_id']] = $row;
-				}
-
-				$ranks = array(1 => 'Legendary', 2 => 'Elite', 3 => 'Common', 4 => 'Lesser');
-				foreach($ranks as $id => $rank) {
-				    // Skip if rank is empty or user currently possess bloodline
-                    // Need to actually keep bloodline in the bloodlines array for bloodline list
-					if(empty($bloodlines[$id])
-                        || ($player->bloodline_id && $player->bloodline_id == $row['bloodline_id'])) {
-						continue;
-					}
-					echo "$rank Bloodlines (" . $costs['bloodline'][$id] . " Ancient Kunai)<br />
-					<form action='$self_link' method='post'>
-					<select name='bloodline_id'>";
-					foreach($bloodlines[$id] as $bloodline_id => $bloodline) {
-						echo "<option value='$bloodline_id'>" . $bloodline['name'] . "</option>";
-					}
-					echo "</select>
-					<input type='submit' name='purchase_bloodline' value='Implant' />
-					</form>";
-				}
-
-				// Bloodline list
-                include('templates/bloodlineList.php');
-			}
-
-
-			echo "</td></tr></table>";
-		}
-		else {
-			$system->message("You cannot access the Bloodline section until you are a Genin!");
-			$system->printMessage();
-		}
-	}
-	else if($view == 'forbidden_seal') {
-		echo "<table class='table'><tr><th colspan='2'>Forbidden Seals</th></tr>
-		<tr><td style='text-align:center;' colspan='2'>
-		Shinobi researchers can imbue you with a forbidden seal, providing you with various benefits, in exchange for Ancient Kunai. The
-		specific benefits and their strengths depend on which seal the researchers give you. The seals will recede after 30 days
-		naturally, although with extra chakra imbued they can last longer.<br />
-		<br />
-		<b>Your Forbidden Seal</b><br />";
-		if(isset($player->forbidden_seal['level'])) {
-			$seals = array(1 => 'Twin Sparrow Seal', 2 => 'Four Dragon Seal');
-			$time_remaining = $player->forbidden_seal['time'] - time();
-
-			$days = floor($time_remaining / 86400);
-			$time_remaining -= $days * 86400;
-
-			$hours = floor($time_remaining / 3600);
-			$time_remaining -= $hours * 3600;
-
-			$minutes = ceil($time_remaining / 60);
-
-			echo $seals[$player->forbidden_seal['level']] . "<br />";
-			if($days) {
-				echo "$days day(s), $hours hour(s), $minutes minute(s) remaining<br />";
-			}
-			else if($hours) {
-				echo "$hours hour(s), $minutes minute(s) remaining<br />";
-			}
-			else {
-				echo "$minutes minute(s) remaining<br />";
-			}
-			//Addition - Kengetsu - Paying Player Chat Color
-			echo "<br />
-			<form action='$self_link&view=forbidden_seal' method='post'>
-			<input type='radio' name='name_color' value='blue' " .
-			($player->forbidden_seal['color'] == 'blue' ? "checked='checked'" : '') . "/>
-			<span class='blue' style='font-weight:bold;'>Blue</span>
-			<input type='radio' name='name_color' value='pink' " .
-			($player->forbidden_seal['color'] == 'pink' ? "checked='checked'" : '') . "/>
-			<span class='pink' style='font-weight:bold;'>Pink</span>
-			<input type='radio' name='name_color' value='black' " .
-			($player->forbidden_seal['color'] == 'black' ? "checked='checked'" : '') . "/>
-			<span style='font-weight:bold;'>Black</span>";
-			if ($player->premium_credits_purchased) {
-				echo "
-				<input type='radio' name='name_color' value='gold' " .
-				($player->forbidden_seal['color'] == 'gold' ? "checked='checked'" : '') . "/>
-				<span class='gold' style='font-weight:bold;'>Gold</span>";
-			}
-			if ($player->isModerator()) {
-				echo "
-				<input type='radio' name='name_color' value='green' " .
-				($player->forbidden_seal['color'] == 'green' ? "checked='checked'" : '') . "/>
-				<span class='moderator' style='font-weight:bold;'>Green</span>";
-			}
-			if ($player->isHeadModerator()) {
-				echo "
-				<input type='radio' name='name_color' value='teal' " .
-				($player->forbidden_seal['color'] == 'teal' ? "checked='checked'" : '') . "/>
-				<span class='headModerator' style='font-weight:bold;'>Teal</span>";
-			}
-			if($player->isContentAdmin()) {
-                echo "
-				<input type='radio' name='name_color' value='purple' " .
-                    ($player->forbidden_seal['color'] == 'purple' ? "checked='checked'" : '') . "/>
-				<span class='contentAdmin' style='font-weight:bold;'>Purple</span>";
-            }
-			if ($player->isUserAdmin()) {
-				echo "
-				<input type='radio' name='name_color' value='red' " .
-				($player->forbidden_seal['color'] == 'red' ? "checked='checked'" : '') . "/>
-				<span class='administrator' style='font-weight:bold;'>Red</span>";
-			}
-			echo "
-			<br />
-			<input type='submit' name='change_color' value='Change Name Color' />
-			</form>";
-		}
-		else if ($player->premium_credits_purchased) {
-			echo "
-			<form action='$self_link&view=forbidden_seal' method='post'>
-			<input type='radio' name='name_color' value='black' " .
-			($player->forbidden_seal['color'] == 'black' ? "checked='checked'" : '') . "/>
-			<span style='font-weight:bold;'>Black</span>
-			<input type='radio' name='name_color' value='gold' " .
-			($player->forbidden_seal['color'] == 'gold' ? "checked='checked'" : '') . "/>
-			<span class='gold' style='font-weight:bold;'>Gold</span>
-			";
-			if($player->isUserAdmin()) {
-				echo "
-				<input type='radio' name='name_color' value='red' " .
-				($player->forbidden_seal['color'] == 'red' ? "checked='checked'" : '') . "/>
-				<span class='administrator' style='font-weight:bold;'>Red</span>";
-			}
-			echo "
-			<br />
-			<input type='submit' name='change_color' value='Change Name Color' />
-			</form>";
-		}
-		// End
-		else {
-			echo "None";
-		}
-		echo "</td></tr>
-		<tr>
-			<th>Twin Sparrow Seal</th>
-			<th>Four Dragon Seal</th>
-		</tr>
-		<tr>
-			<td style='width:50%;vertical-align:top;'>
-				<p style='font-weight:bold;text-align:center;'>
-					{$costs['forbidden_seal'][1]} Ancient Kunai / 30 days</p>
-				<br />
-				+10% regen rate<br />
-				Blue/Pink username color in chat<br />
-				Larger avatar (125x125 -> 175x175)<br />
-				Longer logout timer (60 -> 90 minutes)<br />
-				Larger inbox (50 -> 75 messages)<br />
-				Longer journal (1000 -> 2000 characters)<br />
-				Larger journal images (300x200 -> 500x500)<br />
-				Longer chat posts (350 -> 450 characters)<br />
-				Longer PMs (1000 -> 1500 characters)<br />
-				<form action='$self_link&view=forbidden_seal' method='post'>
-				<p style='width:100%;text-align:center;margin:0px;margin-top:1em;'>
-					<input type='hidden' name='seal_level' value='1' />
-					<select name='seal_length'>
-					<option value='30'>30 days (" . ($costs['forbidden_seal'][1] * 1) . " AK)</option>
-					<option value='60'>60 days (" . ($costs['forbidden_seal'][1] * 2) . " AK)</option>
-					<option value='90'>90 days (" . ($costs['forbidden_seal'][1] * 3) . " AK)</option>
-					</select><br />
-					<input type='submit' name='forbidden_seal' value='" .
-						($player->forbidden_seal && $player->forbidden_seal['level'] == 1 ? 'Extend' : 'Purchase') . "' />
-				</p>
-				</form>
-			</td>
-			<td style='width:50%;vertical-align:top;'>
-				<p style='font-weight:bold;text-align:center;'>
-					{$costs['forbidden_seal'][2]} Ancient Kunai / 30 days</p>
-				<br />
-				All benefits of Twin Sparrow Seal<br />
-				+20% regen rate<br />
-				+1 jutsu equip slots<br />
-				+1 weapon equip slots<br />
-				+1 armor equip slots<br />
-				Enhanced long trainings (1.5x length, 2x gains)<br />
-				Enhanced extended trainings (1.5x length, 2x gains)<br />
-				<form action='$self_link&view=forbidden_seal' method='post'>
-				<p style='width:100%;text-align:center;margin:0px;margin-top:2.2em;'>
-					<input type='hidden' name='seal_level' value='2' />
-					<select name='seal_length'>
-					<option value='30'>30 days (" . ($costs['forbidden_seal'][2] * 1) . " AK)</option>
-					<option value='60'>60 days (" . ($costs['forbidden_seal'][2] * 2) . " AK)</option>
-					<option value='90'>90 days (" . ($costs['forbidden_seal'][2] * 3) . " AK)</option>
-					</select><br />
-					<input type='submit' name='forbidden_seal' value='" .
-						($player->forbidden_seal && $player->forbidden_seal['level'] == 2 ? 'Extend' : 'Purchase') . "' />
-				</p>
-				</form>
-			</td>
-		</tr></table>";
-	}
-	else if($view == 'buy_kunai') {
-		// Buy kunai
-		echo <<<HTML
-		<table class='table'><tr><th>Buy Ancient Kunai</th></tr>
-		<tr><td style='text-align:center;'>
-			<p style='width:80%;margin:auto;'>All payments are securely processed through Paypal. You do not need a Paypal account to
-			pay with a credit card.</p>
-			<br />
-			<b>$1 USD = {$kunai_per_dollar} Ancient Kunai</b><br />
-			<i>(ignore price per unit on Paypal confirmation screen, the bonus is applied after)</i><br />
-			<br />
-			<b>Ancient Kunai Specials</b><br />
-			$15 = 30 Kunai + 10 bonus<br />
-			$25 = 50 Kunai + 20 bonus<br />
-			$50 = 100 Kunai + 50 bonus<br />
-			<br />
-			<form action="https://www.paypal.com/cgi-bin/webscr" method="post">
-			<input type="hidden" name="cmd" value="_xclick">
-			<input type="hidden" name="business" value="lsmjudoka05@yahoo.com">
-			<input type="hidden" name="cancel_return" value="{$system->link}">
-			<input type="hidden" name="return" value="{$system->link}">
-			<input type="hidden" name="amount" value="1.00">
-			<input type="hidden" name="undefined_quantity" value="1">
-			<input type="hidden" name="cn" value="Ancient Kunai">
-			<input type="hidden" name="no_note" value="1">
-			<input type="hidden" name="no_shipping" value="1">
-			<input type="hidden" name="currency_code" value="USD">
-			<input type="hidden" name="item_name" value="Ancient Kunai - $player->user_name">
-			<input type="hidden" name="custom" value="$player->user_name">
-			<input type="hidden" name="notify_url" value="{$system->link}paypal_listener.php">
-            <input type='submit' style='background:url(https://www.paypal.com/en_US/i/btn/btn_buynowCC_LG.gif);
-					border:0;width:171px;height:47px;cursor:pointer;' value='' name='submit' alt='Buy kunai'>
-			</form>
-		</td></tr></table>
-HTML;
-
-
-		// Exchange
-		premiumCreditExchange();
-	}
-
+    require "templates/premium.php";
+    return true;
 }
 
 function premiumCreditExchange() {

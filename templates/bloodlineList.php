@@ -32,7 +32,7 @@
     <tr><td>
         <p>Using the form below, you can search for bloodlines based on rank.</p>
         <div style="text-align:center;">
-            <?php foreach($ranks as $id=>$name): ?>
+            <?php foreach(Bloodline::$public_ranks as $id=> $name): ?>
                 <input type="checkbox" onclick="toggleBloodlineDetails('<?=$id?>_rank')"
                        class="<?=$id?>_rank_box" checked="checked" /><?=$name?>
             <?php endforeach ?>
@@ -41,7 +41,7 @@
 </table>
 
 <table class="table">
-    <?php foreach($ranks as $id=>$rank): ?>
+    <?php foreach(Bloodline::$public_ranks as $id=> $rank): ?>
         <?php if(empty($bloodlines[$id])): ?>
             <?php continue; ?>
         <?php else: ?>
