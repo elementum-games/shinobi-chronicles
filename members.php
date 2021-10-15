@@ -23,16 +23,7 @@ function members() {
 
 
 	// Sub-menu
-	echo "<div class='submenu'>
-	<ul class='submenu'>
-		<li style='width:24.5%;'><a href='{$self_link}&view=highest_exp'>Highest Exp</a></li>
-		<li style='width:24.5%;'><a href='{$self_link}&view=online_users'>Online Users</a></li>
-		<li style='width:24.5%;'><a href='{$self_link}&view=highest_pvp'>Highest Pvp</a></li>
-		<li style='width:24.5%;'><a href='{$self_link}&view=highest_teams'>Highest Teams</a></li>
-		<li style='width:24.5%;'><a href='{$self_link}&view=staff'>Game Staff</a></li>
-	</ul>
-	</div>
-	<div class='submenuMargin'></div>";
+	renderMemberSubmenu();
 
 	// Search box
 	echo "<div style='text-align:center;'>
@@ -415,7 +406,7 @@ function members() {
 		else if(isset($_GET['view']) && $_GET['view'] == 'highest_teams') {
 			$query_custom = " WHERE `staff_level` < " . System::SC_ADMINISTRATOR .
                 " ORDER BY `pvp_wins` DESC";
-			$list_name = 'Top 15 Teams - Highest Team Points';
+			$list_name = 'Top 15 Teams - Points This Month';
 			$view = 'highest_teams';
 		}
 		else if(isset($_GET['view']) && $_GET['view'] == 'online_users') {
@@ -466,7 +457,7 @@ function members() {
 		if($view == 'highest_teams') {
 			// Teams
 				$user_id_array = array();
-				$result = $system->query("SELECT * FROM `teams` ORDER BY `points` DESC LIMIT 15");
+				$result = $system->query("SELECT * FROM `teams` ORDER BY `monthly_points` DESC LIMIT 15");
 				$teams = array();
 				while($row = $system->db_fetch($result)) {
 					$teams[] = $row;
@@ -484,18 +475,18 @@ function members() {
 						$village[$row['village']] = $row['village'];
 					}
 					// Team display
-				   echo "<table class='table'><tr><th colspan='4'>Top 15 Teams - Highest Team Points</th></tr><tr>
+				   echo "<table class='table'><tr><th colspan='4'>Top 15 Teams - Points This Month</th></tr><tr>
 						   <th>Name</th>
 						   <th>Leader</th>
 						   <th>Village</th>
-						   <th>Points</th>
+						   <th>Points This Month</th>
 					   </tr>";
 					   foreach($teams as $row) {
 						   echo "<tr class='table_multicolumns'>
 							   <td><a href='{$system->links['members']}&view_team={$row['team_id']}' class='userLink'>" . $row['name'] . "</td>
 							   <td style='text-align: center;'><a href='{$system->links['members']}&user={$user_names[$row['leader']]}' class='userLink'>" . $user_names[$row['leader']] . "</td>
 							   <td style='text-align: center;'><img src='./images/village_icons/" . strtolower($row['village']) . ".png' style='max-height:18px;max-width:18px;' /> " . $row['village'] . "</td>
-							   <td style='text-align:center;'>" . $row['points']  . "</td>
+							   <td style='text-align:center;'>" . $row['monthly_points']  . "</td>
 						   </tr>";
 					   }
 		}
@@ -635,4 +626,47 @@ function members() {
 		}
 
 	}
+}
+
+
+
+function renderMemberSubmenu() {
+    global $system;
+    global $player;
+    global $self_link;
+
+    $submenu_links = [
+        [
+            'link' => $system->links['members'] . "&view=highest_exp",
+            'title' => 'Highest Exp',
+        ],
+        [
+            'link' => $system->links['members'] . "&view=online_users",
+            'title' => 'Online Users',
+        ],
+        $submenu_links[] = [
+            'link' => $system->links['members'] . "&view=highest_pvp",
+            'title' => 'Highest Pvps',
+        ],
+        $submenu_links[] = [
+            'link' => $system->links['members'] . "&view=highest_teams",
+            'title' => 'Highest Teams',
+        ],
+		$submenu_links[] = [
+            'link' => $system->links['members'] . "&view=staff",
+            'title' => 'Game Staff',
+        ],
+	];
+
+	    echo "
+			<div class='submenu'>
+	    		<ul class='submenu'>";
+	    			$submenu_link_width = round(100 / count($submenu_links), 1);
+	    				foreach($submenu_links as $link) {
+	        				echo "<li style='width:{$submenu_link_width}%;'><a href='{$link['link']}'>{$link['title']}</a></li>";
+	    				}
+	    		echo "</ul>
+	    	</div>
+	    	<div class='submenuMargin'></div>
+	    ";
 }
