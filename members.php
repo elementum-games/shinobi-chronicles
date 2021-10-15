@@ -468,11 +468,7 @@ function members() {
 					}
 
 				// Fetch leader names
-				try {
-				if(empty($user_id_array)) {
-					throw new Exception("Leader does not exist!");
-				}
-				else {
+				if(!empty($user_id_array)) {
 				$user_id_string = implode(',', $user_id_array);
 				$result = $system->query("SELECT `user_id`, `user_name`, `village` FROM `users` WHERE `user_id` IN ($user_id_string)");
 				$user_names = array();
@@ -498,11 +494,7 @@ function members() {
 						   </tr>";
 					   }
 				   }
-				   catch (Exception $e) {
-		   			$system->message($e->getMessage());
-		   		}
-		   		$system->printMessage();
-			 }
+
 		// List top 15 users by experience
 		else {
 			echo "<table class='table'><tr><th colspan='4'>$list_name</th></tr>
@@ -514,12 +506,15 @@ function members() {
 				</tr>";
 	}
 
-
-
-		if($system->db_last_num_rows == 0) {
-			echo "<tr><td colspan='4'>No users found!</td></tr>
+	 if($view == 'highest_teams' && $system->db_last_num_rows == 0) {
+			echo "<tr><td colspan='4'>No teams found!</td></tr>
+		</table>";
+		}
+		else if($view !== 'highest_teams' && $system->db_last_num_rows == 0) {
+				echo "<tr><td colspan='4'>No users found!</td></tr>
 			</table>";
 		}
+
 		else {
 			while($row = $system->db_fetch($result)) {
 				$class = '';
