@@ -14,6 +14,8 @@ function premium() {
 
 	global $self_link;
 
+	global $RANK_NAMES;
+
 	$costs['name_change'] = 15;
 	$costs['gender_change'] = 10;
 	$costs['bloodline'][1] = 80;
@@ -1232,23 +1234,28 @@ function premium() {
             }
 			echo "<br />";
 
-			$result = $system->query("SELECT `bloodline_id`, `name`, `rank`
-				FROM `bloodlines` WHERE `rank` < 5 ORDER BY `rank` ASC");
+			// Select all for bloodline list
+			$result = $system->query("SELECT * FROM `bloodlines` WHERE `rank` < 5 ORDER BY `rank` ASC");
 			if($system->db_last_num_rows == 0) {
 				echo "No bloodlines available!";
 			}
 			else {
 				$bloodlines = array();
 				while($row = $system->db_fetch($result)) {
-					if($player->bloodline_id && $player->bloodline_id == $row['bloodline_id']) {
-						continue;
-					}
-					$bloodlines[$row['rank']][$row['bloodline_id']] = $row;
+				    // Prep json encoded members for use in BL list
+				    $row['passive_boosts'] = json_decode($row['passive_boosts']);
+				    $row['combat_boosts'] = json_decode($row['combat_boosts']);
+				    $row['jutsu'] = json_decode($row['jutsu']);
+				    // Add BL to list
+				    $bloodlines[$row['rank']][$row['bloodline_id']] = $row;
 				}
 
 				$ranks = array(1 => 'Legendary', 2 => 'Elite', 3 => 'Common', 4 => 'Lesser');
 				foreach($ranks as $id => $rank) {
-					if(empty($bloodlines[$id])) {
+				    // Skip if rank is empty or user currently possess bloodline
+                    // Need to actually keep bloodline in the bloodlines array for bloodline list
+					if(empty($bloodlines[$id])
+                        || ($player->bloodline_id && $player->bloodline_id == $row['bloodline_id'])) {
 						continue;
 					}
 					echo "$rank Bloodlines (" . $costs['bloodline'][$id] . " Ancient Kunai)<br />
@@ -1262,6 +1269,8 @@ function premium() {
 					</form>";
 				}
 
+				// Bloodline list
+                include('templates/bloodlineList.php');
 			}
 
 

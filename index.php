@@ -510,7 +510,7 @@ if($LOGGED_IN) {
             }
         }
 
-		// Logout timer
+		//  timer
 		$time_remaining = ($logout_limit * 60) - (time() - $player->last_login);
 		$logout_time = System::timeRemaining($time_remaining, 'short', false, true) . " remaining";
 
