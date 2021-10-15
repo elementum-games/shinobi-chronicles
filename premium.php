@@ -982,14 +982,14 @@ function premium() {
             'label' => 'Pink',
             'value' => 'pink'
         ],
-    ];
-
-    if($player->premium_credits_purchased > 0) {
-        $name_colors[] = [
+        [
             'class' => '',
             'label' => 'Black',
             'value' => 'black'
-        ];
+        ],
+    ];
+
+    if($player->premium_credits_purchased > 0) {
         $name_colors[] = [
             'class'=>'gold',
             'label' => 'Gold',
