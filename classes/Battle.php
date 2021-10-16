@@ -2019,7 +2019,7 @@ class Battle {
         }
 
         // Weapon diffuse (tai diffuse nin)
-        if($player_jutsu->weapon_id && $player_jutsu->weapon_effect->effect == 'diffuse') {
+        if($player_jutsu->weapon_id && $player_jutsu->weapon_effect->effect == 'diffuse' && $opponent_jutsu->jutsu_type == Jutsu::TYPE_NINJUTSU) {
             if($opponent_damage <= 0){
                 $player_diffuse_percent = 0;
             }
