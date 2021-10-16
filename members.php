@@ -510,7 +510,8 @@ function members() {
 			echo "<tr><td colspan='4'>No teams found!</td></tr>
 		</table>";
 		}
-		else if($view !== 'highest_teams' && $system->db_last_num_rows == 0) {
+		else if($system->db_last_num_rows == 0) {
+
 				echo "<tr><td colspan='4'>No users found!</td></tr>
 			</table>";
 		}
