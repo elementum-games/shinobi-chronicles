@@ -2,17 +2,25 @@
 session_start();
 
 require_once("classes.php");
+
 $system = new System();
 $guest_support = true;
 $layout = 'layout/' . System::DEFAULT_LAYOUT . '.php';
 $self_link = $system->link . 'support.php';
+$staff_level = 0;
+$user_id = 0;
 
 if(isset($_SESSION['user_id'])) {
     $guest_support = false;
     $player = new User($_SESSION['user_id']);
     $player->loadData();
     $layout = $system->fetchLayoutByName($player->layout);
+    $staff_level = $player->staff_level;
+    $user_id = $player->user_id;
 }
+
+$supportSystem = new SupportManager($system, $user_id);
+$request_types = $supportSystem->getSupportTypes($staff_level);
 
 require($layout);
 
@@ -22,9 +30,98 @@ echo $header;
 echo str_replace("[HEADER_TITLE]", "Support", $body_start);
 
 if(!$guest_support) {
+    //Form submitted
+    if(isset($_POST['add_support'])) {
+        try {
+            $request_type = $system->clean($_POST['support_type']);
+            $subject = $system->clean($_POST['subject']);
+            $subjectLength = strlen($subject);
+            $message = $system->clean($_POST['message']);
+            $messageLength = strlen($message);
 
-    // New Ticket form
-    require('templates/supportTicketForm.php');
+            // Validate support
+            if (!in_array($request_type, $request_types)) {
+                throw new Exception("Invalid support type!");
+            }
+            if ($subjectLength < SupportManager::$validationConstraints['subject']['min']) {
+                throw new Exception("Subject must be at least " .
+                    SupportManager::$validationConstraints['subject']['min'] . " characters!");
+            }
+            if ($subjectLength > SupportManager::$validationConstraints['subject']['max']) {
+                throw new Exception("Subject must not exceed " .
+                    SupportManager::$validationConstraints['subject']['max'] . " characters!");
+            }
+            if ($messageLength < SupportManager::$validationConstraints['message']['min']) {
+                throw new Exception("Content must be at least " .
+                    SupportManager::$validationConstraints['message']['min'] . " characters!");
+            }
+            if ($messageLength > SupportManager::$validationConstraints['message']['max']) {
+                throw new Exception("Content must not exceed " .
+                    SupportManager::$validationConstraints['message']['max'] . " characters!");
+            }
+
+            if($supportSystem->createSupport($player->current_ip, '', $request_type, $subject, $message,
+                    $user_id, $player->user_name)) {
+                $system->message("Support Submitted!");
+            }
+        }catch (Exception $e) {
+            $system->message($e->getMessage());
+        }
+    }
+
+    if($system->message && !$system->message_displayed) {
+        $system->printMessage();
+    }
+    if(!isset($_GET['support_id'])) {
+        // New Ticket form
+        require('templates/supportTicketForm.php');
+
+        // Load user tickets
+        $supports = $supportSystem->fetchUserSupports($user_id);
+        if (!empty($supports)) {
+            require('templates/userTickets.php');
+        }
+    } else {
+        $support_id = $system->clean($_GET['support_id']);
+        $support = $supportSystem->fetchSupportByID($support_id, $user_id);
+
+        if(!$support) {
+            $system->message("Support not found!");
+            $system->printMessage();
+        } else {
+            if(isset($_POST['add_response'])) {
+                try {
+                    $message = $system->clean($_POST['message']);
+                    $messageLength = strlen($message);
+
+                    // Validate
+                    if ($messageLength < SupportManager::$validationConstraints['message']['min']) {
+                        throw new Exception("Content must be at least " .
+                            SupportManager::$validationConstraints['message']['min'] . " characters!");
+                    }
+                    if ($messageLength > SupportManager::$validationConstraints['message']['max']) {
+                        throw new Exception("Content must not exceed " .
+                            SupportManager::$validationConstraints['message']['max'] . " characters!");
+                    }
+
+                    if ($supportSystem->addSupportResponses($support_id, $user_id, $player->user_name, $message, $player->current_ip,)) {
+                        $system->message("Response added!");
+                    } else {
+                        throw new Exception("Error adding response!");
+                    }
+                } catch (Exception $e) {
+                    $system->message($e->getMessage());
+                }
+            }
+
+            $responses = $supportSystem->fetchSupportResponses($support_id);
+            $self_link .= "?support_id=" . $support_id;
+            if($system->message && !$system->message_displayed) {
+                $system->printMessage();
+            }
+            require('templates/displayTicket.php');
+        }
+    }
 
     // Load side menu
     $pages = require_once('pages.php');
