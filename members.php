@@ -387,26 +387,24 @@ function members() {
 
 	if($display_list == 'standard') {
 		$online_seconds = 120;
+        $results_per_page = 15;
 
 		$query_custom = '';
 		$view = 'highest_exp';
 		if(isset($_GET['view']) && $_GET['view'] == 'highest_exp') {
 			$query_custom = " WHERE `staff_level` <= " . User::STAFF_HEAD_MODERATOR .
                 " ORDER BY `exp` DESC, `pvp_wins` DESC";
-			$list_name = 'Top 15 Users - Highest Exp';
 			$view = 'highest_exp';
 		}
 		else if(isset($_GET['view']) && $_GET['view'] == 'highest_pvp') {
 			$query_custom = " WHERE `staff_level` < " . System::SC_ADMINISTRATOR .
                 " ORDER BY `pvp_wins` DESC";
-			$list_name = 'Top 15 Users - Highest PvP';
 			$view = 'highest_pvp';
 		}
 		//Teams
 		else if(isset($_GET['view']) && $_GET['view'] == 'highest_teams') {
 			$query_custom = " WHERE `staff_level` < " . System::SC_ADMINISTRATOR .
                 " ORDER BY `pvp_wins` DESC";
-			$list_name = 'Top 15 Teams - Points This Month';
 			$view = 'highest_teams';
 		}
 		else if(isset($_GET['view']) && $_GET['view'] == 'online_users') {
@@ -414,43 +412,43 @@ function members() {
 
 			$result = $system->query("SELECT COUNT(`user_id`) as `online_users` FROM `users` WHERE `last_active` > UNIX_TIMESTAMP() - $online_seconds");
 			$result = $system->db_fetch($result);
-			$list_name = 'Online Users (' . $result['online_users'] . ' currently online)';
 			$view = 'online_users';
 		}
 		else {
             $query_custom = " WHERE `staff_level` <= " . User::STAFF_HEAD_MODERATOR .
                 " ORDER BY `exp` DESC, `pvp_wins` DESC";
-			$list_name = 'Top 15 Users - Highest Exp';
 			$view = 'highest_exp';
 
 		}
 
 		// Pagination
-		$users_per_page = 20;
-		$results_per_page = 15;
 		$min = 0;
 		if(isset($_GET['min']) && $view == 'online_users') {
-			$users_per_page = 10;
+			$results_per_page = 20;
 			$min = (int)$system->clean($_GET['min']);
 		}
 
 		$result = $system->query("SELECT `user_name`, `rank`, `village`, `exp`, `level` , `pvp_wins` FROM `users`
-			$query_custom LIMIT $min, $users_per_page");
+			$query_custom LIMIT $min, $results_per_page");
 
 		$table_header = 'Level';
 		switch($view) {
 			case "highest_exp":
 				$table_header = 'Experience';
+                $list_name = "Top {$results_per_page} Users - Highest Exp";
 				break;
 			case "online_users":
 				$table_header = 'Level';
+                $list_name = 'Online Users (' . $result['online_users'] . ' currently online)';
 				break;
-				case "highest_pvp":
-					$table_header = 'Pvp Kills';
-					break;
-				case "highest_teams":
-					$table_header = 'Highest Teams';
-					break;
+            case "highest_pvp":
+                $table_header = 'Pvp Kills';
+                $list_name = "Top {$results_per_page} Users - Highest PvP";
+                break;
+            case "highest_teams":
+                $table_header = 'Highest Teams';
+                $list_name = "Top {$results_per_page} Teams - Points This Month";
+                break;
 		}
 
 		// Search box for individual users
@@ -479,7 +477,7 @@ function members() {
 					}
 				}
 					// Team display
-				   echo "<table class='table'><tr><th colspan='4'>Top 15 Teams - Points This Month</th></tr><tr>
+				   echo "<table class='table'><tr><th colspan='4'>Top {$results_per_page} Teams - Points This Month</th></tr><tr>
 						   <th>Name</th>
 						   <th>Leader</th>
 						   <th>Village</th>
@@ -551,7 +549,7 @@ function members() {
 			// Pagination
 			echo "<p style='text-align:center;'>";
 			if($min > 0 && $view != 'highest_exp') {
-				$prev = $min - $users_per_page;
+				$prev = $min - $results_per_page;
 				if($prev < 0) {
 					$prev = 0;
 				}
@@ -559,11 +557,11 @@ function members() {
 			}
 			$result = $system->query("SELECT COUNT(`user_id`) as `count` FROM `users` $query_custom");
 			$result = $system->db_fetch($result);
-			if($min + $users_per_page < $result['count'] && $view != 'highest_exp') {
+			if($min + $results_per_page < $result['count'] && $view != 'highest_exp') {
 				if($min > 0) {
 					echo "&nbsp;&nbsp;|&nbsp;&nbsp;";
 				}
-				$next = $min + $users_per_page;
+				$next = $min + $results_per_page;
 				echo "<a href='$self_link&view=$view&min=$next'>Next</a>";
 			}
 			echo "</p>";
