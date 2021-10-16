@@ -279,6 +279,7 @@ abstract class Fighter {
         }
 
         $rand = mt_rand(self::MIN_RAND, self::MAX_RAND);
+        $disable_randomness = true;
         if($disable_randomness) {
             $rand = (self::MIN_RAND + self::MAX_RAND) / 2;
         }
@@ -339,15 +340,15 @@ abstract class Fighter {
         switch($defense_type) {
             case 'ninjutsu':
                 $defense += System::diminishing_returns($this->ninjutsu_skill * $def_multiplier, 50);
-                $raw_damage -= $residual_damage ? $this->ninjutsu_resist : $this->ninjutsu_resist * 0.65;
+                $raw_damage -= $residual_damage ? $this->ninjutsu_resist * 0.5 : $this->ninjutsu_resist;
                 break;
             case 'genjutsu':
                 $defense += System::diminishing_returns($this->genjutsu_skill * $def_multiplier, 50);
-                $raw_damage -= $residual_damage ? $this->genjutsu_resist : $this->genjutsu_resist * 0.65;
+                $raw_damage -= $residual_damage ? $this->genjutsu_resist * 1 : $this->genjutsu_resist;
                 break;
             case 'taijutsu':
                 $defense += System::diminishing_returns($this->taijutsu_skill * $def_multiplier, 50);
-                $raw_damage -= $residual_damage ? $this->taijutsu_resist : $this->taijutsu_resist * 0.65;
+                $raw_damage -= $residual_damage ? $this->taijutsu_resist * 0.5 : $this->taijutsu_resist;
                 break;
             default:
                 error_log("Invalid defense type! {$defense_type}");

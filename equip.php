@@ -70,9 +70,14 @@ function gear() {
 				throw new Exception("Invalid item!");
 			}
 
+			if($player->health >= $player->max_health) {
+				throw new Exception("Your health is already maxed out!");
+			}
+
 			if($player->items[$item_id]['quantity'] <= 0) {
 				throw new Exception("You do not have any more of this item!");
 			}
+		
 
 			$player->items[$item_id]['quantity']--;
 			switch($player->items[$item_id]['effect']) {

@@ -944,7 +944,13 @@ class Battle {
                     }
                 }
                 else  {
-                    $this->setEffect($this->player1, $this->player2->combat_id, $player1_jutsu, $player1_raw_damage, $this->active_genjutsu);
+                    $this->setEffect(
+                        $this->player1,
+                        $this->player2->combat_id,
+                        $player1_jutsu,
+                        $player1_raw_damage,
+                        $this->active_genjutsu
+                    );
                 }
             }
             else if($player1_jutsu->effect != 'none') {
@@ -952,7 +958,13 @@ class Battle {
                 if($player1_jutsu->use_type == Jutsu::USE_TYPE_BUFF || ($player1_jutsu->use_type == 'projectile' && strpos($player1_jutsu->effect, '_boost'))) {
                     $target_id = $this->player1->combat_id;
                 }
-                $this->setEffect($this->player1, $target_id, $player1_jutsu, $player1_raw_damage, $this->active_effects);
+                $this->setEffect(
+                    $this->player1,
+                    $target_id,
+                    $player1_jutsu,
+                    $player1_raw_damage,
+                    $this->active_effects
+                );
             }
             $text = $player1_jutsu->battle_text;
 
@@ -1016,7 +1028,7 @@ class Battle {
 
             // Weapon effect for taijutsu (IN PROGRESS)
             if($player2_jutsu->weapon_id) {
-                if($this->player1->items[$this->player2_weapon_id]['effect'] != 'diffuse') {
+                if($this->player2->items[$this->player2_weapon_id]['effect'] != 'diffuse') {
                     $this->setEffect($this->player2, $this->player1->combat_id, $player2_jutsu->weapon_effect,
                         $player2_raw_damage, $this->active_effects
                     );
@@ -2019,7 +2031,7 @@ class Battle {
         }
 
         // Weapon diffuse (tai diffuse nin)
-        if($player_jutsu->weapon_id && $player_jutsu->weapon_effect->effect == 'diffuse') {
+        if($player_jutsu->weapon_id && $player_jutsu->weapon_effect->effect == 'diffuse' && $opponent_jutsu->jutsu_type == Jutsu::TYPE_NINJUTSU) {
             if($opponent_damage <= 0){
                 $player_diffuse_percent = 0;
             }
@@ -2034,7 +2046,7 @@ class Battle {
                 }
             }
         }
-        if($opponent_jutsu->weapon_id && $opponent_jutsu->weapon_effect->effect == 'diffuse') {
+        if($opponent_jutsu->weapon_id && $opponent_jutsu->weapon_effect->effect == 'diffuse' &&  $player_jutsu->jutsu_type == Jutsu::TYPE_NINJUTSU) {
             if($player_damage <= 0){
                 $opponent_diffuse_percent = 0;
             }

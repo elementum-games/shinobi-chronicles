@@ -96,7 +96,7 @@ class Team {
         
         // check if boosts have expired.
         $seven_days = 60*60*24*7;
-        if($this->boost_time * $seven_days <= time()) {
+        if($this->boost_time + $seven_days <= time()) {
             $this->boost = 'none';
             $this->boost_amount = 0;
         }
