@@ -399,7 +399,7 @@ function members() {
 		else if(isset($_GET['view']) && $_GET['view'] == 'highest_pvp') {
 			$query_custom = " WHERE `staff_level` < " . System::SC_ADMINISTRATOR .
                 " ORDER BY `pvp_wins` DESC";
-			$list_name = 'Top 15 Users - Highest Pvp';
+			$list_name = 'Top 15 Users - Highest PvP';
 			$view = 'highest_pvp';
 		}
 		//Teams
