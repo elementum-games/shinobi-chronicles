@@ -426,11 +426,11 @@ function members() {
 		}
 
 		// Pagination
-		$users_per_page = 20;
+		$users_per_page = 15;
 		$results_per_page = 15;
 		$min = 0;
 		if(isset($_GET['min']) && $view == 'online_users') {
-			$users_per_page = 10;
+			$users_per_page = 15;
 			$min = (int)$system->clean($_GET['min']);
 		}
 
