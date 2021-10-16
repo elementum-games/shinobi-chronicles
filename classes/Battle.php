@@ -944,7 +944,13 @@ class Battle {
                     }
                 }
                 else  {
-                    $this->setEffect($this->player1, $this->player2->combat_id, $player1_jutsu, $player1_raw_damage, $this->active_genjutsu);
+                    $this->setEffect(
+                        $this->player1,
+                        $this->player2->combat_id,
+                        $player1_jutsu,
+                        $player1_raw_damage,
+                        $this->active_genjutsu
+                    );
                 }
             }
             else if($player1_jutsu->effect != 'none') {
@@ -952,7 +958,13 @@ class Battle {
                 if($player1_jutsu->use_type == Jutsu::USE_TYPE_BUFF || ($player1_jutsu->use_type == 'projectile' && strpos($player1_jutsu->effect, '_boost'))) {
                     $target_id = $this->player1->combat_id;
                 }
-                $this->setEffect($this->player1, $target_id, $player1_jutsu, $player1_raw_damage, $this->active_effects);
+                $this->setEffect(
+                    $this->player1,
+                    $target_id,
+                    $player1_jutsu,
+                    $player1_raw_damage,
+                    $this->active_effects
+                );
             }
             $text = $player1_jutsu->battle_text;
 
@@ -1016,7 +1028,7 @@ class Battle {
 
             // Weapon effect for taijutsu (IN PROGRESS)
             if($player2_jutsu->weapon_id) {
-                if($this->player1->items[$this->player2_weapon_id]['effect'] != 'diffuse') {
+                if($this->player2->items[$this->player2_weapon_id]['effect'] != 'diffuse') {
                     $this->setEffect($this->player2, $this->player1->combat_id, $player2_jutsu->weapon_effect,
                         $player2_raw_damage, $this->active_effects
                     );

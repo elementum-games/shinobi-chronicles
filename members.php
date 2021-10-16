@@ -560,7 +560,7 @@ function members() {
 			}
 			$result = $system->query("SELECT COUNT(`user_id`) as `count` FROM `users` $query_custom");
 			$result = $system->db_fetch($result);
-			if($min + $results_per_page < $result['count'] && $view != 'highest_exp') {
+			if($min + $results_per_page < $result['count'] && $view == 'online_users') {
 				if($min > 0) {
 					echo "&nbsp;&nbsp;|&nbsp;&nbsp;";
 				}
