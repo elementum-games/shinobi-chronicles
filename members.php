@@ -411,6 +411,7 @@ function members() {
 			$query_custom = "WHERE `last_active` > UNIX_TIMESTAMP() - $online_seconds ORDER BY `level` DESC";
 
 			$view = 'online_users';
+            $results_per_page = 20;
 		}
 		else {
             $query_custom = " WHERE `staff_level` <= " . User::STAFF_HEAD_MODERATOR .
@@ -422,7 +423,6 @@ function members() {
 		// Pagination
 		$min = 0;
 		if(isset($_GET['min']) && $view == 'online_users') {
-			$results_per_page = 20;
 			$min = (int)$system->clean($_GET['min']);
 		}
 
