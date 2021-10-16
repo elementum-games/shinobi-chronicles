@@ -89,8 +89,9 @@ if(!$guest_support) {
             $system->message("Support not found!");
             $system->printMessage();
         } else {
-            if(isset($_POST['add_response'])) {
+            if(isset($_POST['add_response']) || isset($_POST['close_ticket'])) {
                 try {
+                    $responseType = (isset($_POST['add_response'])) ? 'response' : 'close';
                     $message = $system->clean($_POST['message']);
                     $messageLength = strlen($message);
 
@@ -105,7 +106,13 @@ if(!$guest_support) {
                     }
 
                     if ($supportSystem->addSupportResponses($support_id, $user_id, $player->user_name, $message, $player->current_ip,)) {
-                        $system->message("Response added!");
+                        if($responseType == 'response') {
+                            $system->message("Response added!");
+                        } else {
+                            if($supportSystem->closeSupport($support_id)) {
+                                $system->message("Support closed.");
+                            }
+                        }
                     } else {
                         throw new Exception("Error adding response!");
                     }
@@ -179,7 +186,8 @@ if(!$guest_support) {
     if ($player->isModerator() || $player->hasAdminPanel()) {
         echo $staff_menu_header;
         if ($player->isModerator()) {
-            echo "<li><a id='sideMenuOption-ModPanel' href='{$system->link}?id=16'>Mod Panel</a></li>";
+            echo "<li><a id='sideMenuOption-ModPanel' href='{$system->link}?id=16'>Mod Panel</a></li>
+            <li><a id='sideMenuOption-ModPanel' href='{$system->link}?id=30'>Support Panel</a></li>";
         }
         if ($player->hasAdminPanel()) {
             echo "<li><a id='sideMenuOption-AdminPanel' href='{$system->link}?id=17'>Admin Panel</a></li>";

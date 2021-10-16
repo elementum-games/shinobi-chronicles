@@ -158,6 +158,14 @@ $pages = [
             return $u->isModerator();
         }
     ],
+    30 => [
+        'file_name' => 'modPanel.php',
+        'title' => 'Support Reuqests',
+        'function_name' => 'supportRequests',
+        'user_check' => function(User $u) {
+            return $u->isModerator();
+        }
+    ],
     17 => [
         'file_name' => 'adminPanel.php',
         'title' => 'Admin Panel',

@@ -462,8 +462,8 @@ class SupportManager {
             throw new Exception("Support is already closed!");
         }
 
-        $this->system->query("UPDATE `Supports` SET `open`=0 WHERE `id`={$support_id}");
-        if($this->system->db_affected_rows) {
+        $this->system->query("UPDATE `support_request` SET `open`=0 WHERE `support_id`={$support_id}");
+        if($this->system->db_last_affected_rows) {
             if($inactive) {
                 $this->addSupportResponses($support_id,
                     System::$SYSTEM_USERID, 'System', "[Closed for inactivity]"

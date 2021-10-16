@@ -93,6 +93,7 @@ class System {
         'bloodline' => 10,
         'arena' => 12,
         'mod' => 16,
+        'support' => 30,
         'admin' => 17,
         'report' => 18,
         'battle' => 19,

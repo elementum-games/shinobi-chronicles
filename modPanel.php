@@ -829,3 +829,7 @@ function modPanel() {
 		// View locked out accounts / links to unlock
 	}
 }
+
+function supportRequests() {
+
+}

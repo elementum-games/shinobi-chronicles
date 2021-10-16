@@ -46,6 +46,7 @@
     <tr><td>
         <label>Support Type:</label><?=$support['support_type']?><br />
         <label>Submitted:</label><?= strftime("%m/%d/%y @ %I:%M", $support['time']) ?><br />
+        <label>Status:</label><?= ($support['open'] ? 'Open' : 'Closed') ?><br />
         <?php if($support['time'] != $support['updated']): ?>
             <label>Last Updated:</label><?= strftime("%m/%d/%y @ %I:%M", $support['updated']) ?><br />
         <?php endif ?>
@@ -67,12 +68,15 @@
     <?php endif ?>
 </table>
 
+<?php if($support['open']): ?>
 <table class="table">
     <tr><th>Add Response</th></tr>
     <tr><td style="text-align: center;">
         <form action="<?=$self_link?>" method="post">
             <textarea name="message"></textarea><br />
             <input type="submit" name="add_response" value="Add Response" />
+            <input type="submit" name="close_ticket" value="Cancel Request" />
         </form>
     </td></tr>
 </table>
+<?php endif ?>
