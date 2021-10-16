@@ -655,7 +655,7 @@ function renderMemberSubmenu() {
         ],
         $submenu_links[] = [
             'link' => $system->links['members'] . "&view=highest_pvp",
-            'title' => 'Highest Pvps',
+            'title' => 'Highest PvP',
         ],
         $submenu_links[] = [
             'link' => $system->links['members'] . "&view=highest_teams",
