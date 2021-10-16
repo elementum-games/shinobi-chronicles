@@ -2034,7 +2034,7 @@ class Battle {
                 }
             }
         }
-        if($opponent_jutsu->weapon_id && $opponent_jutsu->weapon_effect->effect == 'diffuse') {
+        if($opponent_jutsu->weapon_id && $opponent_jutsu->weapon_effect->effect == 'diffuse' &&  $player_jutsu->jutsu_type == Jutsu::TYPE_NINJUTSU) {
             if($player_damage <= 0){
                 $opponent_diffuse_percent = 0;
             }
