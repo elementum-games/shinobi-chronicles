@@ -659,7 +659,7 @@ function renderMemberSubmenu() {
         ],
         $submenu_links[] = [
             'link' => $system->links['members'] . "&view=highest_teams",
-            'title' => 'Highest Teams',
+            'title' => 'Top Teams',
         ],
 		$submenu_links[] = [
             'link' => $system->links['members'] . "&view=staff",
