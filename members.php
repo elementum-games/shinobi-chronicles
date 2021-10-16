@@ -411,7 +411,7 @@ function members() {
 			$query_custom = "WHERE `last_active` > UNIX_TIMESTAMP() - $online_seconds ORDER BY `level` DESC";
 
 			$result = $system->query("SELECT COUNT(`user_id`) as `online_users` FROM `users` WHERE `last_active` > UNIX_TIMESTAMP() - $online_seconds");
-			$result = $system->db_fetch($result);
+			$online_users = $system->db_fetch($result)['online_users'];
 			$view = 'online_users';
 		}
 		else {
@@ -439,7 +439,7 @@ function members() {
 				break;
 			case "online_users":
 				$table_header = 'Level';
-                $list_name = 'Online Users (' . $result['online_users'] . ' currently online)';
+                $list_name = 'Online Users (' . $online_users . ' currently online)';
 				break;
             case "highest_pvp":
                 $table_header = 'Pvp Kills';
