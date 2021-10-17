@@ -67,12 +67,16 @@ function travel() {
                     (($player->last_death + 15) - time()) . " more seconds before moving.");
             }
 
+			if ($player->special_mission) {
+				throw new Exception("You are currently in a Special Mission and cannot travel!");
+			}
+
             $player->location = $location;
             $player->y = $target_y;
             $player->x = $target_x;
             $player->updateData();
         } catch(Exception $e) {
-            $system->message("You cannot travel into another village!");
+            // $system->message("You cannot travel into another village!");
             $system->message($e->getMessage());
         }
 		

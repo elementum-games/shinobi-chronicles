@@ -98,6 +98,7 @@ class System {
         'battle' => 19,
         'spar' => 22,
         'mission' => 14,
+        'specialmissions' => 15,
         'rankup' => 25,
     ];
     public array $links = [];

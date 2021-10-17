@@ -86,13 +86,21 @@ $pages = [
         'battle_ok' => false,
         'village_ok' => System::NOT_IN_VILLAGE,
     ],
-
     14 => [
         'file_name' => 'missions.php',
         'title' => 'Missions',
         'function_name' => 'missions',
         'menu' => System::MENU_ACTIVITY,
         'battle_type' => Battle::TYPE_AI_MISSION,
+        'village_ok' => System::IN_VILLAGE_OKAY,
+        'min_rank' => 2
+    ],
+    15 => [
+        'file_name' => 'specialmissions.php',
+        'title' => 'Special Missions',
+        'function_name' => 'specialMissions',
+        'battle_ok' => false,
+        'menu' => System::MENU_ACTIVITY,
         'village_ok' => System::IN_VILLAGE_OKAY,
         'min_rank' => 2
     ],
