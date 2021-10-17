@@ -25,6 +25,14 @@ class Jutsu {
     const POWER_PER_LEVEL_PERCENT = 0.3;
     const BL_POWER_PER_LEVEL_PERCENT = 0.5;
     
+    public static array $elements = [    
+        self::ELEMENT_FIRE,
+        self::ELEMENT_EARTH,
+        self::ELEMENT_WIND,
+        self::ELEMENT_WATER,
+        self::ELEMENT_LIGHTNING,
+    ];
+    
     public int $id;
     public string $name;
     public int $rank;

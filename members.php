@@ -1,5 +1,5 @@
-<?php 
-/* 
+<?php
+/*
 File: 		members.php
 Coder:		Levi Meahan
 Created:	08/24/2013
@@ -12,27 +12,19 @@ function members() {
 	global $system;
 
 	global $player;
-	
+
 	global $self_link;
-	
+
 	$display_list = 'standard';
-	
+
 	// Load rank data
 	global $RANK_NAMES;
 	$ranks = $RANK_NAMES;
-	
-	
+
+
 	// Sub-menu
-	echo "<div class='submenu'>
-	<ul class='submenu'>
-		<li style='width:24.5%;'><a href='{$self_link}&view=highest_pvp'>Highest Pvp</a></li>
-		<li style='width:24.5%;'><a href='{$self_link}&view=highest_exp'>Highest Exp</a></li>
-		<li style='width:24.5%;'><a href='{$self_link}&view=online_users'>Online Users</a></li>
-		<li style='width:24.5%;'><a href='{$self_link}&view=staff'>Game Staff</a></li>
-	</ul>
-	</div>
-	<div class='submenuMargin'></div>";
-	
+	renderMemberSubmenu();
+
 	// Search box
 	echo "<div style='text-align:center;'>
 		<form action='$self_link' method='get'>
@@ -47,7 +39,7 @@ function members() {
 		$team_id = $system->clean($_GET['view_team']);
 		try {
 			$result = $system->query("SELECT `name`, `type`, `points`, `monthly_points`, `village`, `members`, `logo`, `leader` FROM `teams` WHERE `team_id`='{$team_id}'");
-			
+
 			if ($system->db_last_num_rows == 0) {
 				throw new Exception ('Team does not exist');
 			}
@@ -115,10 +107,10 @@ function members() {
 						Level
 					</th>
 				</tr>";
-			
+
 			$user_ids = implode(',', $team_member_ids);
 			$result = $system->query("SELECT `user_name`, `rank`, `level` FROM `users` WHERE `user_id` IN ($user_ids) ORDER BY `rank` DESC, `level` DESC");
-			
+
 			while ($team_member = $system->db_fetch($result)) {
 				echo "
 				<tr class='table_multicolumns'>
@@ -145,16 +137,16 @@ function members() {
 	// Display user's profile
 		$user_name = $system->clean($_GET['user']);
 		$result = $system->query("SELECT `user_id` FROM `users` WHERE `user_name`='{$user_name}' LIMIT 1");
-			
+
 		try {
 			if($system->db_last_num_rows == 0) {
 				throw new Exception("User does not exist!");
 			}
-		
+
 			$result = $system->db_fetch($result);
 			$viewUser = new User($result['user_id']);
 			$viewUser->loadData(false, true);
-			
+
 			$journal_result = $system->query("SELECT `journal` FROM `journals` WHERE `user_id`='{$viewUser->user_id}'");
 			if($system->db_last_num_rows == 0) {
 				$journal = '';
@@ -163,8 +155,8 @@ function members() {
 				$journal_result = $system->db_fetch($journal_result);
 				$journal = $journal_result['journal'];
 			}
-			
-			
+
+
 			$avatar_size = '125px';
 			if($viewUser->forbidden_seal) {
 				$avatar_size = '175px';
@@ -200,22 +192,27 @@ function members() {
 						echo "(Last active $days days ago)";
 					}
 				}
-				
+
 			echo "</td></tr>
 			<tr><td style='width:50%;text-align:center;'>
 			<span style='font-size:1.3em;font-family:\"tempus sans itc\";font-weight:bold;'>" . $viewUser->user_name . "</span><br />
 			<img src='{$viewUser->avatar_link}' style='margin-top:5px;max-width:$avatar_size;max-height:$avatar_size;' /><br />
 			</td>";
-			
-			
+
+
 			echo "<td style='width:50%;'>
 			<label style='width:6em;'>Level:</label> 	$viewUser->level<br />
 			<label style='width:6em;'>Exp:</label> 	$viewUser->exp<br />
 			<label style='width:6em;'>Rank:</label> 	" . $ranks[$viewUser->rank] . "<br />" .
-			"<br />
-			<label style='width:6em;'>Gender:</label> 	$viewUser->gender<br />
+			"<br />";
+			if($viewUser->gender == User::GENDER_NONE) {
+				echo "";
+			} else {
+				echo "<label style='width:6em;'>Gender:</label> $viewUser->gender<br />";
+			}
+			echo "
 			<label style='width:6em;'>Village:</label> $viewUser->village<br />
-			<label style='width:6em;'>Bloodline:</label> " . ($viewUser->bloodline_id ? $viewUser->bloodline_name : "None") . 
+			<label style='width:6em;'>Bloodline:</label> " . ($viewUser->bloodline_id ? $viewUser->bloodline_name : "None") .
 				"<br />";
 			if($viewUser->clan) {
 				$clan_positions = array(
@@ -230,10 +227,11 @@ function members() {
 				echo "<label style='width:6em;'>Team:</label> <a href='{$self_link}&view_team={$viewUser->team->id}'>" . $viewUser->team->name . "</a><br />";
 			}
 			echo "<br />
-			<label style='width:6em;'>PvP wins:</label>	$viewUser->pvp_wins<br />
-			<label style='width:6em;'>PvP losses:</label> 	$viewUser->pvp_losses<br />
-			<label style='width:6em;'>AI wins:</label>		$viewUser->ai_wins<br />
-			<label style='width:6em;'>AI losses:</label>	$viewUser->ai_losses<br />
+			<label style='width:6em;'>PvP wins:</label>	$viewUser->pvp_wins<br />";
+            if($player->isHeadAdmin()) {
+                echo "<label style='width:6em;'>PvP losses:</label>	$viewUser->pvp_losses<br />";
+            }
+			echo "<label style='width:6em;'>AI wins:</label> $viewUser->ai_wins<br />
 			</td></tr>";
 
 			// $system->audioType got lost
@@ -308,7 +306,7 @@ function members() {
 						echo ucwords($viewUser->ban_type) . " banned: " . $system->time_remaining($viewUser->ban_expire - time()) . " remaining<br />";
 						$banned = true;
 					}
-					
+
 					if($viewUser->journal_ban) {
 						echo "Journal banned<br />";
 						$banned = true;
@@ -321,26 +319,26 @@ function members() {
 						echo "Profile song banned<br />";
 						$banned = true;
 					}
-					
+
 					if(!$banned) {
 						echo "No bans!<br />";
 					}
-					
+
 					// Bot info
 					if($player->isHeadAdmin()) {
 						echo "</td></tr>
 						<tr><td colspan='2' style='text-align:center;'>";
-						
+
 						// Last chat post
 						$result = $system->query("SELECT `time` FROM `chat` WHERE `user_name`='{$viewUser->user_name}' ORDER BY `post_id` DESC LIMIT 1");
 						if($system->db_last_num_rows > 0) {
 							$last_post = $system->db_fetch($result)['time'];
 							echo "Last chat post: " . System::timeRemaining(time() - $last_post, 'long') . " ago<br />";
 						}
-						
+
 						// Last AI
 						echo "Last AI battle started: " . System::timeRemaining(time() - $viewUser->last_ai, 'short') . " ago<br />";
-						
+
 						// Current training
 						$display = '';
 						if(strpos($viewUser->train_type, 'jutsu:') !== false) {
@@ -354,13 +352,13 @@ function members() {
 						}
 						echo $display;
 					}
-					
+
 					echo "</td></tr>
 					<tr><td colspan='2' style='text-align:center;'>
 					<a href='{$system->links['mod']}&view_record={$viewUser->user_name}'>View Record</a>&nbsp;&nbsp;|&nbsp;&nbsp;
 					<a href='{$system->links['mod']}&ban_user_name={$viewUser->user_name}'>Ban user</a>";
-				
-				
+
+
 				if($player->isHeadModerator()) {
 					echo "&nbsp;&nbsp;|&nbsp;&nbsp;<a href='{$system->links['mod']}&unban_user_name={$viewUser->user_name}'>Unban user</a>";
 					echo "&nbsp;&nbsp;|&nbsp;&nbsp;<a href='{$system->links['mod']}&ban_ip_address={$viewUser->last_ip}'>Ban IP</a>";
@@ -369,7 +367,7 @@ function members() {
 				if($player->isUserAdmin()) {
 					echo "&nbsp;&nbsp;|&nbsp;&nbsp;<a href='{$system->links['admin']}&page=edit_user&user_name={$viewUser->user_name}'>Edit user</a>";
 				}
-			
+
 				echo "</td></tr>";
 			}
 			echo "</table>";
@@ -384,82 +382,142 @@ function members() {
 			$display_list = 'staff';
 		}
 	}
-	
+
 	$count = 0;
 
 	if($display_list == 'standard') {
 		$online_seconds = 120;
+        $results_per_page = 15;
 
 		$query_custom = '';
 		$view = 'highest_exp';
 		if(isset($_GET['view']) && $_GET['view'] == 'highest_exp') {
 			$query_custom = " WHERE `staff_level` <= " . User::STAFF_HEAD_MODERATOR .
                 " ORDER BY `exp` DESC, `pvp_wins` DESC";
-			$list_name = 'Top 10 Users - Highest Exp';
 			$view = 'highest_exp';
 		}
 		else if(isset($_GET['view']) && $_GET['view'] == 'highest_pvp') {
 			$query_custom = " WHERE `staff_level` < " . System::SC_ADMINISTRATOR .
                 " ORDER BY `pvp_wins` DESC";
-			$list_name = 'Top 10 Users - Highest Pvp';
 			$view = 'highest_pvp';
+		}
+		//Teams
+		else if(isset($_GET['view']) && $_GET['view'] == 'highest_teams') {
+			$query_custom = " WHERE `staff_level` < " . System::SC_ADMINISTRATOR .
+                " ORDER BY `pvp_wins` DESC";
+			$view = 'highest_teams';
 		}
 		else if(isset($_GET['view']) && $_GET['view'] == 'online_users') {
 			$query_custom = "WHERE `last_active` > UNIX_TIMESTAMP() - $online_seconds ORDER BY `level` DESC";
-			
-			$result = $system->query("SELECT COUNT(`user_id`) as `online_users` FROM `users` WHERE `last_active` > UNIX_TIMESTAMP() - $online_seconds");
-			$result = $system->db_fetch($result);
-			$list_name = 'Online Users (' . $result['online_users'] . ' currently online)';
-			$view = 'online_users';		
+
+			$view = 'online_users';
+            $results_per_page = 20;
 		}
 		else {
             $query_custom = " WHERE `staff_level` <= " . User::STAFF_HEAD_MODERATOR .
                 " ORDER BY `exp` DESC, `pvp_wins` DESC";
-			$list_name = 'Top 10 Users - Highest Exp';
 			$view = 'highest_exp';
-		
+
 		}
-		
+
 		// Pagination
-		$users_per_page = 15;
 		$min = 0;
-		if(isset($_GET['min']) && $view != 'highest_exp' && $view != 'highest_pvp') {
-			$users_per_page = 10;
+		if(isset($_GET['min']) && $view == 'online_users') {
 			$min = (int)$system->clean($_GET['min']);
 		}
-		
-		$result = $system->query("SELECT `user_name`, `rank`, `village`, `exp`, `level` , `pvp_wins` FROM `users` 
-			$query_custom LIMIT $min, $users_per_page");
+
+		$result = $system->query("SELECT `user_name`, `rank`, `village`, `exp`, `level` , `pvp_wins` FROM `users`
+			$query_custom LIMIT $min, $results_per_page");
 
 		$table_header = 'Level';
 		switch($view) {
 			case "highest_exp":
 				$table_header = 'Experience';
-				break;
-			case "highest_pvp":
-				$table_header = 'Pvp Kills';
+                $list_name = "Top {$results_per_page} Users - Highest Exp";
 				break;
 			case "online_users":
 				$table_header = 'Level';
+
+				$online_users_result = $system->query(
+				    "SELECT COUNT(`user_id`) as `online_users` FROM `users` WHERE `last_active` > UNIX_TIMESTAMP() - $online_seconds"
+                );
+                $online_users = $system->db_fetch($online_users_result)['online_users'];
+                $list_name = 'Online Users (' . $online_users . ' currently online)';
 				break;
+            case "highest_pvp":
+                $table_header = 'Pvp Kills';
+                $list_name = "Top {$results_per_page} Users - Highest PvP";
+                break;
+            case "highest_teams":
+                $table_header = 'Highest Teams';
+                $list_name = "Top {$results_per_page} Teams - Points This Month";
+                break;
 		}
-		
+
 		// Search box for individual users
-		// List top 10 users by experience
-		echo "<table class='table'><tr><th colspan='4'>$list_name</th></tr>
-		<tr>
-			<th style='width:30%;'>Username</th>
-			<th style='width:20%;'>Rank</th>
-			<th style='width:20%;'>Village</th>
-			<th style='width:30%;'>" . ($table_header) . "</th>
-		</tr>";
-		
-		
-		if($system->db_last_num_rows == 0) {
-			echo "<tr><td colspan='4'>No users found!</td></tr>
+		// list top 15 Teams
+		if($view == 'highest_teams') {
+			// Teams
+				$user_id_array = array();
+				$result = $system->query("SELECT * FROM `teams` ORDER BY `monthly_points` DESC LIMIT $results_per_page");
+				$teams = array();
+				while($row = $system->db_fetch($result)) {
+					$teams[] = $row;
+					if(array_search($row['leader'], $user_id_array) === false) {
+							$user_id_array[] = $row['leader'];
+						}
+					}
+
+				// Fetch leader names
+				if(!empty($user_id_array)) {
+				$user_id_string = implode(',', $user_id_array);
+				$result = $system->query("SELECT `user_id`, `user_name`, `village` FROM `users` WHERE `user_id` IN ($user_id_string)");
+				$user_names = array();
+				$village = array();
+				while($row = $system->db_fetch($result)) {
+						$user_names[$row['user_id']] = $row['user_name'];
+						$village[$row['village']] = $row['village'];
+					}
+				}
+					// Team display
+				   echo "<table class='table'><tr><th colspan='4'>Top {$results_per_page} Teams - Points This Month</th></tr><tr>
+						   <th>Name</th>
+						   <th>Leader</th>
+						   <th>Village</th>
+						   <th>Points This Month</th>
+					   </tr>";
+					   foreach($teams as $row) {
+						   echo "<tr class='table_multicolumns'>
+							   <td><a href='{$system->links['members']}&view_team={$row['team_id']}' class='userLink'>" . $row['name'] . "</td>
+							   <td style='text-align: center;'><a href='{$system->links['members']}&user={$user_names[$row['leader']]}' class='userLink'>" . $user_names[$row['leader']] . "</td>
+							   <td style='text-align: center;'><img src='./images/village_icons/" . strtolower($row['village']) . ".png' style='max-height:18px;max-width:18px;' /> " . $row['village'] . "</td>
+							   <td style='text-align:center;'>" . $row['monthly_points']  . "</td>
+						   </tr>";
+					   }
+				   }
+
+		// List top 15 users by experience
+		else {
+			echo "<table class='table'><tr><th colspan='4'>$list_name</th></tr>
+				<tr>
+					<th style='width:30%;'>Username</th>
+					<th style='width:20%;'>Rank</th>
+					<th style='width:20%;'>Village</th>
+					<th style='width:30%;'>" . ($table_header) . "</th>
+				</tr>";
+	}
+
+	 if($view == 'highest_teams' && $system->db_last_num_rows == 0) {
+			echo "<tr><td colspan='4'>No teams found!</td></tr>
+		</table>";
+		}
+		else if($system->db_last_num_rows == 0) {
+
+				echo "<tr><td colspan='4'>No users found!</td></tr>
 			</table>";
 		}
-		else {		
+
+		else {
 			while($row = $system->db_fetch($result)) {
 				$class = '';
 				if(is_int($count++ / 2)) {
@@ -468,13 +526,12 @@ function members() {
 				else {
 					$class = 'row2';
 				}
-
 				echo "<tr class='table_multicolumns'>
 					<td class='$class' style='width:30%;'>
 						<a href='$self_link&user={$row['user_name']}' class='userLink'>" . $row['user_name'] . "</a></td>
 					<td class='$class' style='width:20%;text-align:center;'>" . $ranks[$row['rank']] . "</td>
 					<td class='$class' style='width:20%;text-align:center;'>
-						<img src='./images/village_icons/" . strtolower($row['village']) . ".png' style='max-height:18px;max-width:18px;' /> " . 
+						<img src='./images/village_icons/" . strtolower($row['village']) . ".png' style='max-height:18px;max-width:18px;' /> " .
 						$row['village'] . "</td>
 					<td class='$class' style='width:30%;text-align:center;'>";
 					if($view == 'highest_exp') {
@@ -486,16 +543,16 @@ function members() {
 					else {
 						echo $row['level'];
 					}
-					
+
 					echo "</td>
 				</tr>";
 			}
-			echo "</table>";	
-			
+			echo "</table>";
+
 			// Pagination
 			echo "<p style='text-align:center;'>";
 			if($min > 0 && $view != 'highest_exp') {
-				$prev = $min - $users_per_page;
+				$prev = $min - $results_per_page;
 				if($prev < 0) {
 					$prev = 0;
 				}
@@ -503,28 +560,28 @@ function members() {
 			}
 			$result = $system->query("SELECT COUNT(`user_id`) as `count` FROM `users` $query_custom");
 			$result = $system->db_fetch($result);
-			if($min + $users_per_page < $result['count'] && $view != 'highest_exp') {
+			if($min + $results_per_page < $result['count'] && $view == 'online_users') {
 				if($min > 0) {
 					echo "&nbsp;&nbsp;|&nbsp;&nbsp;";
 				}
-				$next = $min + $users_per_page;
+				$next = $min + $results_per_page;
 				echo "<a href='$self_link&view=$view&min=$next'>Next</a>";
 			}
 			echo "</p>";
 		}
-	
+
 	}
-	else if($display_list == 'staff') {	
+	else if($display_list == 'staff') {
 		$result = $system->query("SELECT `user_name`, `rank`, `staff_level`, `village` FROM `users` WHERE `staff_level` > 0
 			ORDER BY `staff_level` DESC");
-		
+
 		echo "<table class='table'><tr><th colspan='3'>Administrators</th></tr>";
-			
+
 		if($system->db_last_num_rows == 0) {
 			echo "<tr><td colspan='3'>No users found!</td></tr>
 			</table>";
 		}
-		else {		
+		else {
 			$last_staff_level = User::STAFF_ADMINISTRATOR;
 			while($row = $system->db_fetch($result)) {
 				$class = '';
@@ -534,7 +591,7 @@ function members() {
 				else {
 					$class = 'row2';
 				}
-				
+
 				switch($row['staff_level']) {
 					case User::STAFF_MODERATOR:
 						$link_class = 'moderator';
@@ -552,7 +609,7 @@ function members() {
 						$link_class = 'administrator';
 						break;
 				}
-				
+
 				// Headers
 				if($row['staff_level'] < $last_staff_level) {
 					$last_staff_level = $row['staff_level'];
@@ -571,13 +628,55 @@ function members() {
 						<a class='$link_class userLink' href='$self_link&user={$row['user_name']}'>" . $row['user_name'] . "</a></td>
 					<td class='$class' style='width:20%;text-align:center;'>" . $ranks[$row['rank']] . "</td>
 					<td class='$class' style='width:35%;text-align:center;'>
-						<img src='./images/village_icons/" . strtolower($row['village']) . ".png' style='max-height:18px;max-width:18px;' /> " . 
+						<img src='./images/village_icons/" . strtolower($row['village']) . ".png' style='max-height:18px;max-width:18px;' /> " .
 						$row['village'] . "</td>
 				</tr>";
 			}
-			echo "</table>";	
+			echo "</table>";
 		}
-	
+
 	}
 }
 
+
+
+function renderMemberSubmenu() {
+    global $system;
+    global $player;
+    global $self_link;
+
+    $submenu_links = [
+        [
+            'link' => $system->links['members'] . "&view=highest_exp",
+            'title' => 'Highest Exp',
+        ],
+        [
+            'link' => $system->links['members'] . "&view=online_users",
+            'title' => 'Online Users',
+        ],
+        $submenu_links[] = [
+            'link' => $system->links['members'] . "&view=highest_pvp",
+            'title' => 'Highest PvP',
+        ],
+        $submenu_links[] = [
+            'link' => $system->links['members'] . "&view=highest_teams",
+            'title' => 'Top Teams',
+        ],
+		$submenu_links[] = [
+            'link' => $system->links['members'] . "&view=staff",
+            'title' => 'Game Staff',
+        ],
+	];
+
+	    echo "
+			<div class='submenu'>
+	    		<ul class='submenu'>";
+	    			$submenu_link_width = round(100 / count($submenu_links), 1);
+	    				foreach($submenu_links as $link) {
+	        				echo "<li style='width:{$submenu_link_width}%;'><a href='{$link['link']}'>{$link['title']}</a></li>";
+	    				}
+	    		echo "</ul>
+	    	</div>
+	    	<div class='submenuMargin'></div>
+	    ";
+}

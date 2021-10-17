@@ -30,15 +30,15 @@ $heading = <<<HTML
 	<div id='header'>
         <div id="mainBanner">
             <img src="./style/blue_scroll/images/banner.png">
-        </div>	
+        </div>
 		<div id='topMenu'>
             <div id='topMenuWrapper'>
 HTML;
-            
-            
+
+
 $header = <<<HTML
 		    </div>
-			
+
 			<div id="systemTimeWrapper">
 				<div id="systemTime"></div>
 				<script type="text/javascript">
@@ -50,7 +50,7 @@ $header = <<<HTML
 			</div>
         </div>
 	</div>
-	
+
 	<div id='container'>
 HTML;
 
@@ -67,6 +67,7 @@ $top_menu = <<<HTML
 	<li><a id='topMenuOption-News' href='{$system->link}'>News</a></li>
 	<li><a id='topMenuOption-Discord' href='https://discord.gg/Kx52dbXEf3' target='_blank'>Discord</a></li>
 	<li><a id='topMenuOption-Manual' href='{$system->link}manual.php'>Manual</a></li>
+	<li><a id='topMenuOption-Github' href='https://github.com/elementum-games/shinobi-chronicles' target='_blank'>Github</a></li>
 	<li><a id='topMenuOption-Rules' href='{$system->link}rules.php'>Rules</a></li>
 	<li><a id='topMenuOption-Terms' href='{$system->link}terms.php'>Terms of Service</a></li>
 </ul>
@@ -76,7 +77,7 @@ $side_menu_start = <<<HTML
 	</div>
 	<div id='sideMenu'>
 		<div id='notifications'><!--[NOTIFICATIONS]--></div>
-	
+
 	<ul class='menu'>
 	<h2>User Menu</h2>
 HTML;
@@ -100,15 +101,15 @@ $side_menu_end = <<<HTML
 			<p id='logoutTimer' style='margin-top:5px;'><!--LOGOUT_TIMER--></p>
 		</div>
 	</div>
-		
+
 		<br style='clear:both;margin:0px;padding:0px;' />
 HTML;
-    
+
 $login_menu = <<<HTML
 		</div>
 	<div id='sideMenu'>
 		<div id='notifications'><!--[NOTIFICATIONS]--></div>
-	
+
 	<ul class='menu'>
 	<h2><p>Login</p></h2>
 		<div id='login'>
@@ -125,10 +126,10 @@ $login_menu = <<<HTML
 		</div>
 	</div>
 	<div id='sideMenuBg'></div>
-		
+
 		<br style='clear:both;margin:0px;padding:0px;' />
 HTML;
-    
+
 $footer = <<<HTML
 	</div>
 	<div id='footer'>

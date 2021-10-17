@@ -1,5 +1,5 @@
 <?php
-/* 
+/*
 File: 		battle.php
 Coder:		Levi Meahan
 Created:	12/18/2013
@@ -20,6 +20,8 @@ function battle(): bool {
 	if($player->battle_id) {
         $battle = new Battle($system, $player, $player->battle_id);
 
+		$pvp_yen = $player->rank * 50;
+
         $battle->checkTurn();
 
         $battle->renderBattle();
@@ -33,7 +35,8 @@ function battle(): bool {
 				$player->last_pvp = time();
 				$village_point_gain = 1;
 				$team_point_gain = 1;
-				echo "You win!<br />";
+				$player->money += $pvp_yen;
+				echo "You win the fight and earn ¥$pvp_yen!<br />";
 				// Village points
 				$system->query("UPDATE `villages` SET `points`=`points`+'$village_point_gain' WHERE `name`='$player->village' LIMIT 1");
 				echo "You have earned $village_point_gain point for your village.<br />";
@@ -93,7 +96,7 @@ function battle(): bool {
 
 			try {
 			    $user = new User($attack_id);
-			    $user->loadData(1, true);
+			    $user->loadData(User::UPDATE_NOTHING, true);
             } catch(Exception $e) {
                 throw new Exception("Invalid user! " . $e->getMessage());
             }
@@ -117,11 +120,11 @@ function battle(): bool {
 				throw new Exception("Target is inactive/offline!");
 			}
 			if($player->last_death > time() - 60) {
-				throw new Exception("You died within the last minute, please wait " . 
+				throw new Exception("You died within the last minute, please wait " .
 					(($player->last_death + 60) - time()) . " more seconds.");
 			}
 			if($user->last_death > time() - 60) {
-				throw new Exception("Target has died within the last minute, please wait " . 
+				throw new Exception("Target has died within the last minute, please wait " .
 					(($user->last_death + 60) - time()) . " more seconds.");
 			}
 

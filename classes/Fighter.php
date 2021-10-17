@@ -150,6 +150,8 @@ abstract class Fighter {
     // abstract public function hasJutsu(int $jutsu_id): bool;
     abstract public function hasItem(int $item_id): bool;
 
+    abstract public function hasEquippedJutsu(int $jutsu_id): bool;
+
     public function getSingularPronoun(): string {
         if($this->gender == 'Male') {
             return 'he';
@@ -277,6 +279,7 @@ abstract class Fighter {
         }
 
         $rand = mt_rand(self::MIN_RAND, self::MAX_RAND);
+        $disable_randomness = true;
         if($disable_randomness) {
             $rand = (self::MIN_RAND + self::MAX_RAND) / 2;
         }
@@ -298,11 +301,12 @@ abstract class Fighter {
     }
 
     /**
-     * @param $raw_damage
+     * @param        $raw_damage
      * @param string $defense_type ninjutsu, genjutsu, taijutsu
+     * @param bool   $residual_damage
      * @return float|int
      */
-    public function calcDamageTaken($raw_damage, string $defense_type) {
+    public function calcDamageTaken($raw_damage, string $defense_type, bool $residual_damage = false) {
         $defense = 50 * (1 + $this->defense_boost);
 
         if($defense <= 0) {
@@ -336,15 +340,15 @@ abstract class Fighter {
         switch($defense_type) {
             case 'ninjutsu':
                 $defense += System::diminishing_returns($this->ninjutsu_skill * $def_multiplier, 50);
-                $raw_damage -= $this->ninjutsu_resist;
+                $raw_damage -= $residual_damage ? $this->ninjutsu_resist * 0.5 : $this->ninjutsu_resist;
                 break;
             case 'genjutsu':
                 $defense += System::diminishing_returns($this->genjutsu_skill * $def_multiplier, 50);
-                $raw_damage -= $this->genjutsu_resist;
+                $raw_damage -= $residual_damage ? $this->genjutsu_resist * 1 : $this->genjutsu_resist;
                 break;
             case 'taijutsu':
                 $defense += System::diminishing_returns($this->taijutsu_skill * $def_multiplier, 50);
-                $raw_damage -= $this->taijutsu_resist;
+                $raw_damage -= $residual_damage ? $this->taijutsu_resist * 0.5 : $this->taijutsu_resist;
                 break;
             default:
                 error_log("Invalid defense type! {$defense_type}");

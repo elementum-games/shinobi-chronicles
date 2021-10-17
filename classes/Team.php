@@ -96,7 +96,7 @@ class Team {
         
         // check if boosts have expired.
         $seven_days = 60*60*24*7;
-        if($this->boost_time * $seven_days <= time()) {
+        if($this->boost_time + $seven_days <= time()) {
             $this->boost = 'none';
             $this->boost_amount = 0;
         }
@@ -255,6 +255,8 @@ class Team {
      * @throws Exception
      */
     public function fetchLeader(): User {
-        return new User($this->leader);
+        $leader = new User($this->leader);
+        $leader->loadData(User::UPDATE_NOTHING, true);
+        return $leader;
     }
 }

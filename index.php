@@ -147,7 +147,7 @@ else {
 		}
 	}
 	if($ajax) {
-		$player_display = $player->loadData(1);
+		$player_display = $player->loadData(User::UPDATE_REGEN);
 	}
 	else {
 		$player_display = $player->loadData();
@@ -248,6 +248,7 @@ if($LOGGED_IN) {
 		var notificationRefreshID = setInterval('javascript:$(\'#notifications\').load(\'./ajax_notifications.php\');', 5000);
 		</script>";
 	}
+
 	// Global message
 	if(!$player->global_message_viewed && isset($_GET['clear_message'])) {
 		$player->global_message_viewed = 1;
@@ -271,12 +272,14 @@ if($LOGGED_IN) {
 		$villages[$row['location']] = $row;
 		$villages[$row['location']]['count'] = $count++;
 	}
+
 	// Load rank data// Rank names
 	$RANK_NAMES = array();
 	$result = $system->query("SELECT `rank_id`, `name` FROM `ranks`");
 	while($rank = $system->db_fetch($result)) {
 		$RANK_NAMES[$rank['rank_id']] = $rank['name'];
 	}
+
 	// Page list 
 	$pages = require 'pages.php';
 
@@ -376,7 +379,28 @@ if($LOGGED_IN) {
 			}
 
 			// Page is okay
-			if(!$ajax || !isset($pages[$id]['ajax_ok']) ) {
+
+            // Force view battle page if waiting too long
+            if($player->battle_id && empty($pages[$id]['battle_type'])) {
+                $battle_result = $system->query(
+                    "SELECT winner, turn_time, battle_type FROM battles WHERE `battle_id`='{$player->battle_id}' LIMIT 1"
+                );
+                if($system->db_last_num_rows) {
+                    $battle_data = $system->db_fetch($battle_result);
+                    $time_since_turn = time() - $battle_data['turn_time'];
+
+                    if($battle_data['winner'] && $time_since_turn >= 60) {
+                        foreach($pages as $page_id => $page) {
+                            $type = $page['battle_type'] ?? null;
+                            if($type == $battle_data['battle_type']) {
+                                $id = $page_id;
+                            }
+                        }
+                    }
+                }
+            }
+
+            if(!$ajax || !isset($pages[$id]['ajax_ok']) ) {
 				echo str_replace("[HEADER_TITLE]", $pages[$id]['title'], $body_start);
 			}
 
@@ -486,7 +510,7 @@ if($LOGGED_IN) {
             }
         }
 
-		// Logout timer
+		//  timer
 		$time_remaining = ($logout_limit * 60) - (time() - $player->last_login);
 		$logout_time = System::timeRemaining($time_remaining, 'short', false, true) . " remaining";
 

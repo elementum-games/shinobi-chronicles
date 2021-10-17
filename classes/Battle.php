@@ -128,30 +128,30 @@ class Battle {
         }
 
         $system->query(
-            "INSERT INTO `battles` 
+            "INSERT INTO `battles`
                 (
                  `battle_type`,
-                 `player1`, 
-                 `player2`, 
+                 `player1`,
+                 `player2`,
                  `turn_time`,
                  player1_health,
                  player2_health,
-                 player1_weapon_id, 
-                 player2_weapon_id, 
-                 player1_attack_type, 
+                 player1_weapon_id,
+                 player2_weapon_id,
+                 player1_attack_type,
                  player2_attack_type,
-                 player1_jutsu_used, 
+                 player1_jutsu_used,
                  player2_jutsu_used,
-                 active_effects, 
-                 battle_text, 
-                 active_genjutsu, 
+                 active_effects,
+                 battle_text,
+                 active_genjutsu,
                  jutsu_cooldowns,
                  winner
-               ) VALUES 
+               ) VALUES
                (
                 {$battle_type},
-                '$player1->id', 
-                '$player2->id', 
+                '$player1->id',
+                '$player2->id',
                 " . (time() + 20) . ",
                 {$player1->health},
                 {$player2->health},
@@ -220,32 +220,32 @@ class Battle {
 
         $this->player1_action = $battle['player1_action'];
         $this->player2_action = $battle['player2_action'];
-    
+
         $this->player1_attack_type = $battle['player1_attack_type'];
         $this->player2_attack_type = $battle['player2_attack_type'];
-    
+
         $this->player1_jutsu_id = (int)$battle['player1_jutsu_id'];
         $this->player2_jutsu_id = (int)$battle['player2_jutsu_id'];
-    
+
         $this->player1_weapon_id = $battle['player1_weapon_id'];
         $this->player2_weapon_id = $battle['player2_weapon_id'];
-    
+
         $this->player1_battle_text = $battle['player1_battle_text'];
         $this->player2_battle_text = $battle['player2_battle_text'];
-    
+
         $this->battle_text = $battle['battle_text'];
-    
+
         $this->active_effects = json_decode($battle['active_effects'], true);
         $this->active_genjutsu = json_decode($battle['active_genjutsu'], true);
 
         $this->jutsu_cooldowns = json_decode($battle['jutsu_cooldowns'] ?? "[]", true);
-    
+
         $this->player1_jutsu_used = json_decode($battle['player1_jutsu_used'], true);
         $this->player2_jutsu_used = json_decode($battle['player2_jutsu_used'], true);
-    
+
         $this->turn_time = $battle['turn_time'];
         $this->winner = $battle['winner'];
-        
+
         if($player->id == $this->player1_id) {
             $this->player_side = Battle::TEAM1;
             $this->opponent_side = Battle::TEAM2;
@@ -490,8 +490,8 @@ class Battle {
         if(isset($this->default_attacks[$jutsu_id]) && $this->default_attacks[$jutsu_id]->jutsu_type == Jutsu::TYPE_TAIJUTSU) {
             $fighter_jutsu = $this->default_attacks[$jutsu_id];
         }
-        if(isset($this->player->jutsu[$jutsu_id]) && $this->player->jutsu[$jutsu_id]->jutsu_type == Jutsu::TYPE_TAIJUTSU) {
-            $fighter_jutsu = $this->player->jutsu[$jutsu_id];
+        if($fighter->hasEquippedJutsu($jutsu_id) && $fighter->jutsu[$jutsu_id]->jutsu_type == Jutsu::TYPE_TAIJUTSU) {
+            $fighter_jutsu = $fighter->jutsu[$jutsu_id];
         }
 
         if($fighter_jutsu) {
@@ -532,14 +532,14 @@ class Battle {
         }
 
         if($this->player1 instanceof User && $this->player1->id != $this->player->id) {
-            $this->player1->loadData($this->spectate ? 0 : 1, true);
+            $this->player1->loadData(User::UPDATE_NOTHING, true);
             if(!$this->spectate && !$this->isComplete() && $this->player1->battle_id != $this->battle_id) {
                 $this->stopBattle();
                 return;
             }
         }
         if($this->player2 instanceof User && $this->player2->id != $this->player->id) {
-            $this->player2->loadData($this->spectate ? 0 : 1, true);
+            $this->player2->loadData(User::UPDATE_NOTHING, true);
             if(!$this->spectate && !$this->isComplete() && $this->player2->battle_id != $this->battle_id) {
                 $this->stopBattle();
                 return;
@@ -944,7 +944,13 @@ class Battle {
                     }
                 }
                 else  {
-                    $this->setEffect($this->player1, $this->player2->combat_id, $player1_jutsu, $player1_raw_damage, $this->active_genjutsu);
+                    $this->setEffect(
+                        $this->player1,
+                        $this->player2->combat_id,
+                        $player1_jutsu,
+                        $player1_raw_damage,
+                        $this->active_genjutsu
+                    );
                 }
             }
             else if($player1_jutsu->effect != 'none') {
@@ -952,7 +958,13 @@ class Battle {
                 if($player1_jutsu->use_type == Jutsu::USE_TYPE_BUFF || ($player1_jutsu->use_type == 'projectile' && strpos($player1_jutsu->effect, '_boost'))) {
                     $target_id = $this->player1->combat_id;
                 }
-                $this->setEffect($this->player1, $target_id, $player1_jutsu, $player1_raw_damage, $this->active_effects);
+                $this->setEffect(
+                    $this->player1,
+                    $target_id,
+                    $player1_jutsu,
+                    $player1_raw_damage,
+                    $this->active_effects
+                );
             }
             $text = $player1_jutsu->battle_text;
 
@@ -961,7 +973,7 @@ class Battle {
 
             if($player1_jutsu->jutsu_type != Jutsu::TYPE_GENJUTSU && empty($player1_jutsu->effect_only)) {
                 $text .= "<p style=\"font-weight:bold;\">
-                            {$this->player1->getName()} deals 
+                            {$this->player1->getName()} deals
                                 <span style=\"color:{$player1_jutsu_color}\">
                                     " . sprintf('%.2f', $player1_damage) . " damage
                                 </span>
@@ -1016,7 +1028,7 @@ class Battle {
 
             // Weapon effect for taijutsu (IN PROGRESS)
             if($player2_jutsu->weapon_id) {
-                if($this->player1->items[$this->player2_weapon_id]['effect'] != 'diffuse') {
+                if($this->player2->items[$this->player2_weapon_id]['effect'] != 'diffuse') {
                     $this->setEffect($this->player2, $this->player1->combat_id, $player2_jutsu->weapon_effect,
                         $player2_raw_damage, $this->active_effects
                     );
@@ -1071,7 +1083,7 @@ class Battle {
             $text = $player2_jutsu->battle_text;
             if($player2_jutsu->jutsu_type != Jutsu::TYPE_GENJUTSU && empty($player2_jutsu->effect_only)) {
                 $text .= "<p style=\"font-weight:bold;\">
-                            {$this->player2->getName()} deals 
+                            {$this->player2->getName()} deals
                                 <span style=\"color:{$player2_jutsu_color}\">
                                     " . sprintf('%.2f', $player2_damage) . " damage
                                 </span>
@@ -1153,9 +1165,15 @@ class Battle {
             $this->system->printMessage();
             echo "<table class='table'>
             <tr>
-                <th style='width:50%;'>{$player->getName()}</th>
-                <th style='width:50%;'>{$opponent->getName()}</th>
-            </tr>";
+                <th style='width:50%;'><a href='{$this->system->links['members']}&user={$player->getName()}' style='text-decoration:none'>{$player->getName()}</a></th>";
+                //if arena fight, no URL display
+                if($this->battle_type == Battle::TYPE_AI_ARENA) {
+                    echo "<th style='width:50%;'>{$opponent->getName()}</th>";
+                }
+                else {
+                    echo "<th style='width:50%;'><a href='{$this->system->links['members']}&user={$opponent->getName()}' style='text-decoration:none'>{$opponent->getName()}</a></th>";
+                }
+            echo "</tr>";
             $health_percent = round(($player->health / $player->max_health) * 100);
             $chakra_percent = round(($player->chakra / $player->max_chakra) * 100);
             $stamina_percent = round(($player->stamina / $player->max_stamina) * 100);
@@ -1165,8 +1183,9 @@ class Battle {
         <label style='width:80px;'>Health:</label>" .
                 sprintf("%.2f", $player->health) . '/' . sprintf("%.2f", $player->max_health) . "<br />" .
                 "<div style='height:6px;width:250px;border-style:solid;border-width:1px;'>" .
-                "<div style='background-color:#C00000;height:6px;width:" . $health_percent . "%;' /></div>" . "</div>" .
-                "<label style='width:80px;'>Chakra:</label>" .
+                "<div style='background-color:#C00000;height:6px;width:" . $health_percent . "%;' /></div>" . "</div>";
+        if(!$this->spectate) {
+                echo "<label style='width:80px;'>Chakra:</label>" .
                 sprintf("%.2f", $player->chakra) . '/' . sprintf("%.2f", $player->max_chakra) . "<br />" .
                 "<div style='height:6px;width:250px;border-style:solid;border-width:1px;'>" .
                 "<div style='background-color:#0000B0;height:6px;width:" . $chakra_percent . "%;' /></div>" . "</div>" .
@@ -1174,8 +1193,10 @@ class Battle {
                 sprintf("%.2f", $player->stamina) . '/' . sprintf("%.2f", $player->max_stamina) . "<br />" .
                 "<div style='height:6px;width:250px;border-style:solid;border-width:1px;'>" .
                 "<div style='background-color:#00B000;height:6px;width:" . $stamina_percent . "%;' /></div>" . "</div>" .
-                "</td>
-	<td>";
+                "</td>";
+            }
+	             echo "<td>";
+
         $opponent_health_percent = round(($opponent->health / $opponent->max_health) * 100);
         $avatar_size = $opponent->getAvatarSize() . 'px';
 
@@ -1363,8 +1384,8 @@ class Battle {
                 padding-left: 20px;
                 padding-right: 20px;
             }
-            
-            
+
+
             #jutsu {
                 padding-left: 5px;
             }
@@ -1375,7 +1396,7 @@ class Battle {
                 margin-right:1%;
                 text-align:center;
             }
-            
+
             #jutsu .jutsuName {
                 display: inline-block;
                 padding: 5px 7px;
@@ -1401,7 +1422,7 @@ class Battle {
                 background: linear-gradient(#EFEFEF, #E4E4E4);
                 cursor: default;
             }
-            
+
             #weapons p.weapon {
                 display: inline-block;
                 padding: 8px 10px;
@@ -1421,8 +1442,8 @@ class Battle {
                 background: rgba(0, 0, 0, 0.1);
                 cursor: pointer;
             }
-            
-            
+
+
             </style>
             <script type='text/javascript'>
             $(document).ready(function(){
@@ -1463,9 +1484,9 @@ class Battle {
                 var currentlySelectedJutsu = false;
                 var lastJutsu, firstJutsu = false;
                 $('.jutsuName').click(function(){
-        
+
                     if(lastJutsu != this && firstJutsu) {
-        
+
                         var seals = $(lastJutsu).attr('data-handseals').split('-');
                         for(var ay in seals) {
                             if(!isNaN(parseInt(seals[ay]))) {
@@ -1473,9 +1494,9 @@ class Battle {
                                 $('#' + id + ' img').trigger('click');
                             }
                         }
-        
+
                         lastJutsu = this;
-        
+
                         var new_seals = $(lastJutsu).attr('data-handseals').split('-');
                         for(var ayy in new_seals) {
                             if(!isNaN(parseInt(new_seals[ayy]))) {
@@ -1483,9 +1504,9 @@ class Battle {
                                 $('#' + id + ' img').trigger('click');
                             }
                         }
-        
+
                     }
-        
+
                     if(! firstJutsu) {
                         lastJutsu = this;
                         firstJutsu = true;
@@ -1497,7 +1518,7 @@ class Battle {
                             }
                         }
                     }
-        
+
                     if(currentlySelectedJutsu != false) {
                         $(currentlySelectedJutsu).css('box-shadow', '0px');
                     }
@@ -1621,16 +1642,16 @@ class Battle {
             var bl = 66;
             var def_ault = 68;
             var arr = [];
-    
+
             $(document).keyup(function(event){
-        
+
                 //arr->array will hold 2 elements [JutsuName, Number];
-        
+
                 //enter key
                 if(event.which === 13){
                     document.getElementById('submitbtn').click();
                 }
-        
+
                 //(If Key is a Letter, Letter will be turned into string for Arr)
                 if(event.which === nin) {
                     arr[0] = 'ninjutsu';
@@ -1647,19 +1668,19 @@ class Battle {
                 else if(event.which === def_ault) {
                     arr[0] = 'default'; /*default*/
                 }
-        
-        
+
+
                 //if arr[0] is not a valid string, arr will clear
                 if(typeof(arr[0]) == null){
                     arr = [];
                 }
-        
-        
+
+
                 //if user presses correct number (between 0-9) store in Arr[1];
                 var key = -1;
                 switch (event.which){
-                    case 48: 
-                    case 96: 
+                    case 48:
+                    case 96:
                         key = 0;
                     break;
                     case 49:
@@ -1700,11 +1721,11 @@ class Battle {
                     break;
                 }
                 arr[1] = key;
-        
+
                 //create the array example: array[ninjutsu, 0];
                 var classname = arr[0] + arr[1];
                 // console.log(classname + ' test input');
-        
+
                 //if arr[0] not a string, and arr[1] is not the default -1, continue;
                 if(typeof(arr[0]) == 'string' && arr[1] !== -1){
                     //creating the ID name to get the Element to add the click() function to
@@ -1712,11 +1733,11 @@ class Battle {
                     console.log(classname);
                     console.log('selection successful');
                     document.getElementById(classname).click();
-        
+
                     // document.getElementById(classname).addClass('focused') should add something like this
                     //for visual so user knows selection is made
                 }
-        
+
                 //for this script to work had to add ID's to each jutsu during their button creation
                 //needs refactoring for the future but this kinda works for now.
             });
@@ -1752,9 +1773,9 @@ class Battle {
 
                     $cd_left = $this->jutsu_cooldowns[$player_jutsu->combat_id] ?? 0;
 
-                    echo "<div 
-                            id='{$jutsu_types[$i]}$c2' 
-                            class='jutsuName {$jutsu_types[$i]}' 
+                    echo "<div
+                            id='{$jutsu_types[$i]}$c2'
+                            class='jutsuName {$jutsu_types[$i]}'
                             data-handseals='{$player_jutsu->hand_seals}'
                             data-id='{$jutsu['id']}'
                             aria-disabled='" . ($cd_left > 0 ? "true" : "false") . "'
@@ -1781,9 +1802,9 @@ class Battle {
                     $jutsu->setCombatId($player->combat_id);
                     $cd_left = $this->jutsu_cooldowns[$jutsu->combat_id] ?? 0;
 
-                    echo "<div 
-                        id='bloodline{$c3}' 
-                        class='jutsuName bloodline_jutsu' 
+                    echo "<div
+                        id='bloodline{$c3}'
+                        class='jutsuName bloodline_jutsu'
                         data-handseals='{$jutsu->hand_seals}'
                         data-id='$id'
                         aria-disabled='" . ($cd_left > 0 ? "true" : "false") . "'
@@ -2010,7 +2031,7 @@ class Battle {
         }
 
         // Weapon diffuse (tai diffuse nin)
-        if($player_jutsu->weapon_id && $player_jutsu->weapon_effect->effect == 'diffuse') {
+        if($player_jutsu->weapon_id && $player_jutsu->weapon_effect->effect == 'diffuse' && $opponent_jutsu->jutsu_type == Jutsu::TYPE_NINJUTSU) {
             if($opponent_damage <= 0){
                 $player_diffuse_percent = 0;
             }
@@ -2025,7 +2046,7 @@ class Battle {
                 }
             }
         }
-        if($opponent_jutsu->weapon_id && $opponent_jutsu->weapon_effect->effect == 'diffuse') {
+        if($opponent_jutsu->weapon_id && $opponent_jutsu->weapon_effect->effect == 'diffuse' &&  $player_jutsu->jutsu_type == Jutsu::TYPE_NINJUTSU) {
             if($player_damage <= 0){
                 $opponent_diffuse_percent = 0;
             }
@@ -2305,7 +2326,7 @@ class Battle {
             return false;
         }
         if($effect['effect'] == 'residual_damage' || $effect['effect'] == 'bleed') {
-            $damage = $target->calcDamageTaken($effect['effect_amount'], $effect['effect_type']);
+            $damage = $target->calcDamageTaken($effect['effect_amount'], $effect['effect_type'], true);
             $effect_display .= '[br]-'. (isset($target->user_name) ? $target->user_name : $target->name) .
                 " takes $damage residual damage-";
             $target->health -= $damage;
@@ -2434,32 +2455,32 @@ class Battle {
         $this->system->query("UPDATE `battles` SET
             `player1_action` = '{$this->player1_action}',
             `player2_action` = '{$this->player2_action}',
-    
+
             `player1_health` = {$this->player1_health},
             `player2_health` = {$this->player2_health},
-        
+
             `player1_attack_type` = '{$this->player1_attack_type}',
             `player2_attack_type` = '{$this->player2_attack_type}',
-        
+
             `player1_jutsu_id` = {$this->player1_jutsu_id},
             `player2_jutsu_id` = {$this->player2_jutsu_id},
-        
+
             `player1_weapon_id` = {$this->player1_weapon_id},
             `player2_weapon_id` = {$this->player2_weapon_id},
-        
+
             `player1_battle_text` = '{$this->player1_battle_text}',
             `player2_battle_text` = '{$this->player2_battle_text}',
-        
+
             `battle_text` = '{$this->battle_text}',
-        
+
             `active_effects` = '" . json_encode($this->active_effects) . "',
             `active_genjutsu` = '" . json_encode($this->active_genjutsu) . "',
-        
+
             `jutsu_cooldowns` = '" . json_encode($this->jutsu_cooldowns) . "',
-        
+
             `player1_jutsu_used` = '" . json_encode($this->player1_jutsu_used) . "',
             `player2_jutsu_used` = '" . json_encode($this->player2_jutsu_used) . "',
-        
+
             `turn_time` = {$this->turn_time},
             `winner` = '{$this->winner}'
 

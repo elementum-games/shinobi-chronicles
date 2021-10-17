@@ -316,6 +316,16 @@ body {
     background-size: 100% 100%;
 }
 
+#topMenuOption-Github::before {
+    background: url('./images/github-off.png');
+    background-size: 80% 80%;
+}
+
+#topMenuOption-Github:hover::before {
+    background: url('./images/github-on.png');
+    background-size: 80% 80%;
+}
+
 #topMenuOption-Rules::before {
     background: url('./images/rules-off.png');
     background-size: 100% 100%;
@@ -1138,7 +1148,7 @@ p {
     line-height: 26px;
     overflow: hidden;
 
-    
+
     background: #b99e47;
     border-bottom: 1px solid #6d5c26;
     border-radius: 2px;
@@ -1791,7 +1801,7 @@ br.clear {
     text-align: left;
 }
 
-.dailyTaskGoal, 
+.dailyTaskGoal,
 .dailyTaskReward,
 .dailyTaskDifficulty {
     flex-grow: 1;
@@ -1853,6 +1863,7 @@ br.clear {
 .dailyTaskHard {
     color: #d13535;
 }
+
 
 /* SPECIAL MISSIONS HI LSM */
 

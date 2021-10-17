@@ -7,6 +7,8 @@ require_once __DIR__ . '/User.php';
 	Purpose: 	Handle database connection and queries. Handle storing and printing of error messages.
 */
 class System {
+    const ENVIRONMENT_DEV = 'dev';
+
     const KUNAI_PER_DOLLAR = 2;
     const LOGOUT_LIMIT = 120;
     const BLOODLINE_ROLL_CHANCE = 50;
@@ -25,6 +27,9 @@ class System {
     const SC_HEAD_ADMINISTRATOR = 4;
 
     const DB_DATETIME_MS_FORMAT = 'Y-m-d H:i:s.u';
+
+    public static array $villages = ['Stone', 'Cloud', 'Leaf', 'Sand', 'Mist'];
+    public static array $forbidden_seals = array(1 => 'Twin Sparrow Seal', 2 => 'Four Dragon Seal');
 
     // Variable for error message
     public $message;
@@ -101,7 +106,9 @@ class System {
         'specialmissions' => 15,
         'rankup' => 25,
     ];
-    public array $links = [];
+    public array $links = [
+        'github' => 'https://github.com/elementum-games/shinobi-chronicles'
+    ];
 
     //Chat variables
     const CHAT_MAX_POST_LENGTH = 350;
@@ -198,13 +205,12 @@ class System {
         $this->password = $password;
         $this->database = $database;
 
-        $this->environment = isset($ENVIRONMENT) ? $ENVIRONMENT : 'dev';
+        $this->environment = isset($ENVIRONMENT) ? $ENVIRONMENT : self::ENVIRONMENT_DEV;
         $this->link = isset($web_url) ? $web_url : 'http://localhost/';
 
         $this->register_open = isset($register_open) ? $register_open : false;
         $this->SC_OPEN = isset($SC_OPEN) ? $SC_OPEN : false;
 
-        $this->links = [];
         foreach(self::PAGE_IDS as $slug => $id) {
             $this->links[$slug] = $this->link . '?id=' . $id;
         }

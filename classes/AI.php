@@ -277,6 +277,10 @@ class AI extends Fighter {
         return false;
     }
 
+    public function hasEquippedJutsu(int $jutsu_id): bool {
+        return true;
+    }
+
     public function useJutsu(Jutsu $jutsu) {
 
     }
