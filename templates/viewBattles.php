@@ -15,10 +15,12 @@
             <td><a href="<?= $system->links['members']?>&user=<?= $battle['player1'] ?>" style='text-decoration:none'><?= $battle['player1'] ?></a></td>
             <td><a href="<?= $system->links['members']?>&user=<?= $battle['player2'] ?>" style='text-decoration:none'><?= $battle['player2'] ?></a></td>
             <td>
-                <?php if($battle['winner']): ?>
+            <?php if($battle['winner'] == Battle::DRAW): ?>
+                <?= ucfirst(strtolower($battle['winner'])) ?>
+            <?php elseif($battle['winner']): ?>
                     <a href="<?= $system->links['members']?>&user=<?= $battle['winner'] ?>" style='text-decoration:none'><?= $battle['winner'] ?></a>
                 <?php else: ?>
-                    <a href="<?= $self_link ?>&battle_id=<?= $battle['id'] ?>">Watch</a>
+                    <a href="<?= $self_link ?>&battle_id=<?= $battle['id'] ?>" style='text-decoration:none'>Watch</a>
                 <?php endif; ?>
             </td>
         </tr>

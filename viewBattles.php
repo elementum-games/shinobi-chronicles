@@ -31,7 +31,7 @@ function viewBattles() {
     }
 
     $battles_result = $system->query(
-        "SELECT `battle_id`, `player1`, `player2`, `winner` FROM `battles` 
+        "SELECT `battle_id`, `player1`, `player2`, `winner` FROM `battles`
             WHERE `battle_type` IN (" . implode(",", $battle_types) . ")
             ORDER BY `battle_id` DESC LIMIT {$limit}");
 
@@ -57,7 +57,7 @@ function viewBattles() {
 
     $user_names = [];
     if(count($user_ids) > 0) {
-        $user_names_result = $system->query("SELECT `user_id`, `user_name` FROM `users` 
+        $user_names_result = $system->query("SELECT `user_id`, `user_name` FROM `users`
             WHERE `user_id` IN(" .  implode(',', $user_ids). ")");
 
         while($row = $system->db_fetch($user_names_result)) {
@@ -78,7 +78,7 @@ function viewBattles() {
         $winner = '';
         switch($battle['winner']) {
             case Battle::DRAW:
-                $winner = 'Draw';
+                $winner = 'DRAW';
                 break;
             case Battle::TEAM1:
                 $winner = $p1_name;
