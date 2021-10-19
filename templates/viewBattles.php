@@ -16,7 +16,7 @@
             <td><a href="<?= $system->links['members']?>&user=<?= $battle['player2'] ?>" style='text-decoration:none'><?= $battle['player2'] ?></a></td>
             <td>
             <?php if($battle['winner'] == Battle::DRAW): ?>
-                <?= ucfirst(strtolower($battle['winner'])) ?>
+                Draw
             <?php elseif($battle['winner']): ?>
                     <a href="<?= $system->links['members']?>&user=<?= $battle['winner'] ?>" style='text-decoration:none'><?= $battle['winner'] ?></a>
                 <?php else: ?>
