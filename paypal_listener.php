@@ -103,7 +103,7 @@ else {
 
 				$query = "INSERT INTO `Payments` (`txn_id`, `payment_date`, `time`, `username`, `buyer_name`, `buyer_email`, `payment_amount`, `quantity`,
 				`payment_currency`, `address_city`, `address_country`, `address_state`, `address_street`, `address_zip`, `address_status`) VALUES
-				('$txn_id', '$payment_date', '$time', '$user_id', '$buyer_name', '$buyer_email', '$payment_amount', '$quantity', 
+				('$txn_id', '$payment_date', '$time', 'user:$user_id', '$buyer_name', '$buyer_email', '$payment_amount', '$quantity', 
 				'$payment_currency', '$address_city', '$address_country', '$address_state', '$address_street', '$address_zip', '$address_status')";
 				$system->query($query);
 				
