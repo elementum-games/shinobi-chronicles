@@ -38,7 +38,7 @@ $fp = fsockopen ('ssl://www.paypal.com', 443, $errno, $errstr, 30);
 $txn_id =	 		$system->clean($_POST['txn_id']);
 $payment_date = 	$system->clean($_POST['payment_date']);
 $time = 			time();
-$username =			$system->clean($_POST['custom']);
+$user_id =			$system->clean($_POST['custom']);
 $buyer_name = 		$system->clean($_POST['first_name'] . ' ' . $_POST['last_name']);
 $buyer_email = 		$system->clean($_POST['payer_email']);
 $payment_amount = 	$system->clean($_POST['mc_gross']);
@@ -65,7 +65,7 @@ else {
 		$res = trim($res);
 		if (strcmp($res, "VERIFIED") == 0) {
 			$message = "
-			Username: $username
+			User ID: $user_id
 			Status: $payment_status 
 			Amount: $payment_amount
 			Currency: $payment_currency
@@ -100,10 +100,10 @@ else {
 				}
 
 				$kunai_amount = $payment_amount * System::KUNAI_PER_DOLLAR;
-				
+
 				$query = "INSERT INTO `Payments` (`txn_id`, `payment_date`, `time`, `username`, `buyer_name`, `buyer_email`, `payment_amount`, `quantity`,
 				`payment_currency`, `address_city`, `address_country`, `address_state`, `address_street`, `address_zip`, `address_status`) VALUES
-				('$txn_id', '$payment_date', '$time', '$username', '$buyer_name', '$buyer_email', '$payment_amount', '$quantity', 
+				('$txn_id', '$payment_date', '$time', '$user_id', '$buyer_name', '$buyer_email', '$payment_amount', '$quantity', 
 				'$payment_currency', '$address_city', '$address_country', '$address_state', '$address_street', '$address_zip', '$address_status')";
 				$system->query($query);
 				
@@ -124,10 +124,10 @@ else {
 				$query = "UPDATE `users` SET 
 				`premium_credits` = `premium_credits` + '" . ($kunai_amount + $bonus) . "', 
 				`premium_credits_purchased` = `premium_credits_purchased` + '" . ($kunai_amount + $bonus) . "'
-				WHERE `user_name`='$username' LIMIT 1";
+				WHERE `user_id`='$user_id' LIMIT 1";
 				$system->query($query);
 				
-				$system->send_pm("Lsmjudoka", "$username", "Shard purchase", 
+				$system->send_pm("Lsmjudoka", "$user_id", "Shard purchase",
 				"Your purchase of " . ($kunai_amount + $bonus) . " Ancient Kunai" . ($bonus > 0 ? " ($kunai_amount + $bonus bonus)" : "") .
 				" has been processed and credited to your account. Thank you!");
 				
