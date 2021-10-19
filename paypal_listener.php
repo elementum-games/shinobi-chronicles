@@ -109,15 +109,17 @@ else {
 				
 				// Check shard amount
 				$bonus = 0;
-				if($kunai_amount >= 30) {
-					$bonus += 10;
-				}
-				if($kunai_amount >= 50) {
-					$bonus += 10;
-				}
-				if($kunai_amount >= 100) {
-					$bonus += 30;
-				}
+				$kunai_packs = $system->getKunaiPacks();
+				$selected_pack = null;
+				foreach($kunai_packs as $pack) {
+				    if($payment_amount < $pack['cost']) {
+                        break;
+                    }
+
+				    $selected_pack = $pack;
+                }
+
+				$bonus = $selected_pack['bonus'] ?? 0;
 				
 				$query = "UPDATE `users` SET 
 				`premium_credits` = `premium_credits` + '" . ($kunai_amount + $bonus) . "', 

@@ -4,6 +4,11 @@
     --content-header-font-size: 14px;
 
     --side-menu-width: 215px;
+
+    --theme-content-bg-color: #F5F5F5;
+    --theme-content-darker-bg-color: #EAEAEA;
+    --theme-content-darker2-bg-color: #E5E5E5;
+    --theme-content-lighter-bg-color: #FFFFFF;
 }
 
 html, body {

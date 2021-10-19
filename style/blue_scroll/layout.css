@@ -1,3 +1,13 @@
+:root {
+    --total-width: 1300px;
+    --travel-button-size: 40px;
+
+    --theme-content-bg-color: #0d111f;
+    --theme-content-darker-bg-color: #0a0d18;
+    --theme-content-darker2-bg-color: #070811;
+    --theme-content-lighter-bg-color: #0f1324;
+}
+
 /* RESET CSS **/
 html,
 body,
@@ -135,10 +145,6 @@ body {
 
     background: url('./images/background.png');
     background-size: 400px 400px;
-}
-
-:root {
-    --total-width: 1300px;
 }
 
 #mainBanner {
@@ -1600,9 +1606,7 @@ br.clear {
 }
 
 
-:root {
-    --travel-button-size: 40px;
-}
+
 
 .travelContainer {
     width: 681px;
