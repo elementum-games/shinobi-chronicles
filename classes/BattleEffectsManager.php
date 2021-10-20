@@ -30,7 +30,7 @@ class BattleEffectsManager {
         }, $raw_active_genjutsu);
     }
 
-    public function setEffect(Fighter &$effect_user, $target_id, Jutsu $jutsu, $raw_damage) {
+    public function setEffect(Fighter $effect_user, $target_id, Jutsu $jutsu, $raw_damage) {
         if(!$jutsu->combat_id) {
             $jutsu->setCombatId($effect_user->combat_id);
         }
@@ -195,7 +195,7 @@ class BattleEffectsManager {
         }
     }
 
-    public function applyPassiveEffect(Fighter &$target, BattleEffect &$effect): bool {
+    public function applyPassiveEffect(Fighter $target, BattleEffect $effect): bool {
         // Buffs
         if($effect->effect == 'ninjutsu_boost') {
             $target->ninjutsu_boost += $effect->effect_amount;
@@ -357,7 +357,7 @@ class BattleEffectsManager {
         }
     }
     
-    public function applyActiveEffect(Fighter &$target, Fighter &$attacker, BattleEffect $effect, &$winner): bool {
+    public function applyActiveEffect(Fighter $target, Fighter $attacker, BattleEffect $effect, &$winner): bool {
         if($winner && $winner != $target->combat_id) {
             return false;
         }

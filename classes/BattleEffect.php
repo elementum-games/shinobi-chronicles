@@ -62,11 +62,4 @@ class BattleEffect {
             $raw_data['layer_active'] ?? false,
         );    
     }
-
-    public static function fromItem($item) {
-        array(
-            'effect' => $item['effect'],
-            'effect_amount' => $item['effect_amount']
-        );
-    }
 }

@@ -157,6 +157,7 @@ class Battle {
      * @param Fighter $player1
      * @param Fighter $player2
      * @param int     $battle_type
+     * @return mixed
      * @throws Exception
      */
     public static function start(
@@ -350,7 +351,6 @@ class Battle {
                         }
 
                         $player_jutsu = $this->getJutsuFromHandSeals($this->player, $_POST['hand_seals']);
-                        $jutsu_unique_id = $player_jutsu->combat_id;
 
                         // Layered genjutsu check
                         if($player_jutsu && $player_jutsu->jutsu_type == Jutsu::TYPE_GENJUTSU && !empty($player_jutsu->parent_jutsu)) {
@@ -425,12 +425,6 @@ class Battle {
             else {
                 $this->turn_time = time();
             }
-        }
-        // Time is up - Player moved, opponent didn't
-        // Time is up - Opponent moved, player didnt
-        // Time is up - nobody moved
-        else {
-
         }
 
         $this->checkForWinner();
@@ -602,7 +596,7 @@ class Battle {
                 $player1_jutsu->setCombatId($this->player1->combat_id);
             }
             else {
-                throw new \Exception("Invalid p1 attack type! {$this->player1_attack_type}");
+                throw new Exception("Invalid p1 attack type! {$this->player1_attack_type}");
             }
 
             // Set weapon data into jutsu
@@ -686,6 +680,7 @@ class Battle {
         }
 
         // Collision
+        $collision_text = null;
         if($this->player1_action > 0 && $this->player2_action > 0) {
             $collision_text = $this->jutsuCollision($this->player1, $this->player2, $player1_damage, $player2_damage, $player1_jutsu, $player2_jutsu);
         }
@@ -1035,10 +1030,10 @@ class Battle {
     }
 
     /**
-         * @param string $entity_id
-         * @return
-         * @throws Exception
-         */
+     * @param string $entity_id
+     * @return Fighter
+     * @throws Exception
+     */
     protected function loadFighterFromEntityId(string $entity_id): Fighter {
     switch(Battle::getFighterEntityType($entity_id)) {
         case User::ENTITY_TYPE:
@@ -1377,12 +1372,12 @@ class Battle {
 
         // Keyboard hotkeys
         echo "<script type='text/javascript'>
-            var nin = 78;
-            var gen = 71;
-            var tai = 84;
-            var bl = 66;
-            var def_ault = 68;
-            var arr = [];
+            const nin = 78;
+            const gen = 71;
+            const tai = 84;
+            const bl = 66;
+            const def_ault = 68;
+            let arr = [];
 
             $(document).keyup(function(event){
 
@@ -1418,7 +1413,7 @@ class Battle {
 
 
                 //if user presses correct number (between 0-9) store in Arr[1];
-                var key = -1;
+                let key = -1;
                 switch (event.which){
                     case 48:
                     case 96:
@@ -1463,14 +1458,10 @@ class Battle {
                 }
                 arr[1] = key;
 
-                //create the array example: array[ninjutsu, 0];
-                var classname = arr[0] + arr[1];
-                // console.log(classname + ' test input');
-
                 //if arr[0] not a string, and arr[1] is not the default -1, continue;
                 if(typeof(arr[0]) == 'string' && arr[1] !== -1){
                     //creating the ID name to get the Element to add the click() function to
-                    var classname = arr[0] + arr[1];
+                    const classname = arr[0] + arr[1];
                     console.log(classname);
                     console.log('selection successful');
                     document.getElementById(classname).click();
@@ -1478,9 +1469,6 @@ class Battle {
                     // document.getElementById(classname).addClass('focused') should add something like this
                     //for visual so user knows selection is made
                 }
-
-                //for this script to work had to add ID's to each jutsu during their button creation
-                //needs refactoring for the future but this kinda works for now.
             });
         </script>";
 
@@ -1582,7 +1570,7 @@ class Battle {
     }
 
     public function jutsuCollision(
-        Fighter &$player1, Fighter &$player2, &$player_damage, &$opponent_damage, $player_jutsu, $opponent_jutsu
+        Fighter $player1, Fighter $player2, &$player_damage, &$opponent_damage, $player_jutsu, $opponent_jutsu
     ) {
         $collision_text = '';
         /*
@@ -1747,15 +1735,6 @@ class Battle {
 
         if($player_jutsu->jutsu_type == Jutsu::TYPE_GENJUTSU or $opponent_jutsu->jutsu_type == Jutsu::TYPE_GENJUTSU) {
             return false;
-        }
-
-        $player_min_damage = $player_damage * 0.5;
-        if($player_min_damage < 1) {
-            $player_min_damage = 1;
-        }
-        $opponent_min_damage = $opponent_damage * 0.5;
-        if($opponent_min_damage < 1) {
-            $opponent_min_damage = 1;
         }
 
         // Apply buffs/nerfs
