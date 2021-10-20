@@ -1295,7 +1295,7 @@ class Battle {
     }
 
     public function isPreparationPhase(): bool {
-        return $this->prepTimeRemaining() > 0;
+        return $this->prepTimeRemaining() > 0 && !($this->opponent instanceof AI);
     }
 
     /**
