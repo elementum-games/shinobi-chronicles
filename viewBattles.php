@@ -78,7 +78,7 @@ function viewBattles() {
         $winner = '';
         switch($battle['winner']) {
             case Battle::DRAW:
-                $winner = 'DRAW';
+                $winner = 'Draw';
                 break;
             case Battle::TEAM1:
                 $winner = $p1_name;
