@@ -1896,14 +1896,25 @@ class Battle {
             }
         }
         else {
-            echo "<div id='items'>";
-            if(is_array($player->items)) {
-                foreach($player->items as $item) {
+            $heal_items = [];
+            foreach($player->items as $item) {
+                if ($item['effect'] === 'heal')
+                    $heal_items[] = $item;
+            }
+
+            if(count($heal_items) > 0) {
+                echo "<div id='items'>";
+                foreach($heal_items as $item) {
                     echo sprintf("<p class='item' data-id='%d'><b>%s</b> (%s %.2f)<br />(Owned %d)", $item['item_id'], $item['name'], $item['effect'], $item['effect_amount'], $item['quantity']);
                 }
+                echo "</div>";
+                $showSubmitBtn = true;
             }
-            echo "</div>";
+            else {
+                echo "<p style='text-align:center;'>You do not have any healing items.</p>";
+            }
         }
+        if(!$this->isPreparationPhase() || ($showSubmitBtn ?? false)) {
             $prefill_hand_seals = $_POST['hand_seals'] ?? '';
             $prefill_jutsu_type = $_POST['jutsu_type'] ?? Jutsu::TYPE_NINJUTSU;
             $prefill_weapon_id = $_POST['weapon_id'] ?? '0';
@@ -1922,6 +1933,7 @@ class Battle {
         </div>";
         echo "</div>
     </td></tr>";
+        }
     }
 
     protected function applyPassiveEffects(Fighter &$target, Fighter &$attacker, &$effect, &$effect_display = ''): bool {
