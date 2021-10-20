@@ -1264,8 +1264,7 @@ class Battle {
             }
 
             // Turn timer
-            $prepTime = $this->prepTimeRemaining();
-            echo sprintf("<tr><td style='text-align:center;' colspan='2'>%sTime remaining: %d seconds</td></tr>", $prepTime  ? "Prep-" : "", $this->isPreparationPhase() ? $prepTime : $this->timeRemaining());
+            echo sprintf("<tr><td style='text-align:center;' colspan='2'>%sTime remaining: %d seconds</td></tr>", $this->isPreparationPhase()  ? "Prep-" : "", $this->isPreparationPhase() ? $this->prepTimeRemaining() : $this->timeRemaining());
         }
 
         if($this->spectate) {
