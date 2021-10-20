@@ -202,6 +202,9 @@ class Jutsu {
         $this->combat_id = $prefix . $this->id . ':' . $fighter_combat_id;
     }
 
+    public function hasEffect(): bool {
+        return $this->effect && $this->effect != 'none';
+    }
 
     // TODO: Replace public usages of level with this, privatize level
     /*public function getLevel() {
