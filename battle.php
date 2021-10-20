@@ -59,10 +59,7 @@ function battle(): bool {
 				$player->pvp_losses++;
 				$player->last_pvp = time();
 				$player->last_death = time();
-				$player->location = $player->village_location;
-				$location = explode('.', $player->location);
-				$player->x = $location[0];
-				$player->y = $location[1];
+				$player->moveToVillage();
 				// Daily Tasks
 				foreach ($player->daily_tasks as $task) {
 					if ($task->activity == DailyTask::ACTIVITY_PVP && $task->sub_task == DailyTask::SUB_TASK_COMPLETE && !$task->complete) {
@@ -73,10 +70,7 @@ function battle(): bool {
 			else {
 				echo "You both knocked each other out. You were taken back to your village by some allied ninja.<br />";
 				$player->health = 5;
-				$player->location = $player->village_location;
-				$location = explode('.', $player->location);
-				$player->x = $location[0];
-				$player->y = $location[1];
+				$player->moveToVillage();
 				$player->last_pvp = time();
 
 				// Daily Tasks

@@ -218,10 +218,7 @@ function arenaFight(): bool {
 			</td></tr></table>";
 			$player->health = 5;
             $player->ai_losses++;
-			$player->location = $player->village_location;
-			$location = explode('.', $player->location);
-			$player->x = $location[0];
-			$player->y = $location[1];
+			$player->moveToVillage();
             $player->battle_id = 0;
             $player->last_pvp = time();
 
@@ -237,10 +234,7 @@ function arenaFight(): bool {
 			<tr><td>The battle ended in a draw. You receive no reward.
 			</td></tr></table>";
 			$player->health = 5;
-			$player->location = $player->village_location;
-			$location = explode('.', $player->location);
-			$player->x = $location[0];
-			$player->y = $location[1];
+			$player->moveToVillage();
             $player->battle_id = 0;
             $player->last_pvp = time();
             $player->battle_id = 0;

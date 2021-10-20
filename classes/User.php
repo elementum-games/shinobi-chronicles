@@ -481,9 +481,9 @@ class User extends Fighter {
         if(empty($this->daily_tasks) || (time() - $this->daily_tasks_reset) > (60 * 60 * 24)) {
             $this->daily_tasks = DailyTask::generateNewTasks($this);
 
-            $this->system->query("UPDATE `daily_tasks` SET 
-                `tasks`='" . json_encode($this->daily_tasks) . "', 
-                `last_reset`='" . time() . "' 
+            $this->system->query("UPDATE `daily_tasks` SET
+                `tasks`='" . json_encode($this->daily_tasks) . "',
+                `last_reset`='" . time() . "'
                 WHERE `user_id`='{$this->user_id}'");
         }
         else if($UPDATE == User::UPDATE_FULL && !$remote_view) {
@@ -1141,6 +1141,15 @@ class User extends Fighter {
         }
 
         return true;
+    }
+
+    /* function moteToVillage()
+        moves user to village */
+    public function moveToVillage() {
+        $this->location = $this->village_location;
+        $location = explode('.', $this->location);
+        $this->x = $location[0];
+        $this->y = $location[1];
     }
 
     /* function updateData()
