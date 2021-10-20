@@ -808,5 +808,31 @@ class System {
     public static function unSlug(string $slug) {
         return ucwords(str_replace('_', ' ', $slug));
     }
+
+    public function getKunaiPacks(): array {
+        $kunai_packs = [
+            [
+                'cost' => 10,
+                'bonus' => 0
+            ],
+            [
+                'cost' => 25,
+                'bonus' => 15
+            ],
+            [
+                'cost' => 50,
+                'bonus' => 40
+            ],
+            [
+                'cost' => 100,
+                'bonus' => 100
+            ],
+        ];
+        foreach($kunai_packs as &$pack) {
+            $pack['kunai'] = $pack['cost'] * System::KUNAI_PER_DOLLAR;
+        }
+
+        return $kunai_packs;
+    }
 }
 

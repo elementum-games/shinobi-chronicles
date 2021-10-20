@@ -1,5 +1,12 @@
 :root {
     --content-top-margin: 175px;
+    --travel-button-size: 40px;
+
+    /* v3 */
+    --theme-content-bg-color: #d2c9b3;
+    --theme-content-darker-bg-color: #c8bfab;
+    --theme-content-darker2-bg-color: #bfb6a3;
+    --theme-content-lighter-bg-color: #d9d0ba;
 }
 
 html, body {
@@ -270,28 +277,6 @@ h2#title {
 
 label {
 	display: inline-block;
-}
-
-/* #c6bca1; */
-:root {
-    --travel-button-size: 40px;
-
-    /* v1 */
-    /* --theme-content-bg-color: #efe9da;
-    --theme-content-darker-bg-color: #e7e1d1;
-    --theme-content-lighter-bg-color: #f2eee4;*/
-
-    /* v2 */
-    /* --theme-content-bg-color: #cfc3a8;
-    --theme-content-darker-bg-color: #c8bca2;
-    --theme-content-darker2-bg-color: #bfb49b;
-    --theme-content-lighter-bg-color: #d6caad; */
-
-    /* v3 */
-    --theme-content-bg-color: #d2c9b3;
-    --theme-content-darker-bg-color: #c8bfab;
-    --theme-content-darker2-bg-color: #bfb6a3;
-    --theme-content-lighter-bg-color: #d9d0ba;
 }
 
 #content table.table {

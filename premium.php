@@ -1028,6 +1028,16 @@ function premium() {
         ];
     }
 
+    // Buying shards
+    if($system->environment == System::ENVIRONMENT_DEV) {
+        $paypal_url = "https://www.sandbox.paypal.com/cgi-bin/webscr";
+        $paypal_business_id = 'lsmjudoka@lmvisions.com';
+    }
+    else {
+        $paypal_url = 'https://www.paypal.com/cgi-bin/webscr';
+        $paypal_business_id = 'lsmjudoka05@yahoo.com';
+    }
+    $paypal_listener_url = $system->link . 'paypal_listener.php';
 
     require "templates/premium.php";
     return true;

@@ -643,6 +643,12 @@ br.clear {
 
 :root {
     --travel-button-size: 32px;
+
+    /* #D0DAE0 */
+    --theme-content-bg-color: #D0DAE0;
+    --theme-content-darker-bg-color: #c8d2d7;
+    --theme-content-darker2-bg-color: #bfc9cd;
+    --theme-content-lighter-bg-color: #dae3e9;
 }
 
 .travelContainer {
