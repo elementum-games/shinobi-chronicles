@@ -206,6 +206,10 @@ class Jutsu {
         return $this->effect && $this->effect != 'none';
     }
 
+    public function isAllyTargetType(): bool {
+        return in_array($this->use_type, [Jutsu::USE_TYPE_BUFF, Jutsu::USE_TYPE_BARRIER]);
+    }
+
     // TODO: Replace public usages of level with this, privatize level
     /*public function getLevel() {
         return $this->level;

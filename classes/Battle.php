@@ -656,25 +656,15 @@ class Battle {
             }
         }
 
-        // Buff jutsu (-1 = self effect move)
-        if($player1_jutsu->use_type == Jutsu::USE_TYPE_BUFF) {
+        if($player1_jutsu->isAllyTargetType()) {
             $player1_jutsu->weapon_id = 0;
             $player1_jutsu->effect_only = true;
         }
-        if($player2_jutsu->use_type == Jutsu::USE_TYPE_BUFF) {
+        if($player2_jutsu->isAllyTargetType()) {
             $player2_jutsu->weapon_id = 0;
             $player2_jutsu->effect_only = true;
         }
 
-        // Barrier jutsu
-        if($player1_jutsu->use_type == Jutsu::USE_TYPE_BARRIER) {
-            $player1_jutsu->weapon_id = 0;
-            $player1_jutsu->effect_only = true;
-        }
-        if($player2_jutsu->use_type == Jutsu::USE_TYPE_BARRIER) {
-            $player2_jutsu->weapon_id = 0;
-            $player2_jutsu->effect_only = true;
-        }
         if($this->system->debug['battle']) {
             echo 'P1: ' . $player1_damage . ' / P2: ' . $player2_damage . '<br />';
         }
