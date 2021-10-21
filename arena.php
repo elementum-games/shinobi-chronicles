@@ -237,8 +237,6 @@ function arenaFight(): bool {
 			$player->moveToVillage();
             $player->battle_id = 0;
             $player->last_pvp = time();
-            $player->battle_id = 0;
-            $player->last_pvp = time();
 
             // Daily Tasks
             foreach ($player->daily_tasks as $task) {
