@@ -787,7 +787,7 @@ class Battle {
                         </p>";
             }
             if($this->effects->hasDisplays($this->player1)) {
-                $text .= '[br]' . $this->effects->getDisplayText($this->player1);
+                $text .= '<p>' . $this->effects->getDisplayText($this->player1) . '</p>';
             }
 
             if($player1_jutsu->hasEffect()){
@@ -807,11 +807,13 @@ class Battle {
         else {
             $this->battle_text .= $this->player1->getName() . ' stood still and did nothing.';
             if($this->effects->hasDisplays($this->player1)) {
-                $this->battle_text .= '[br]' . $this->parseCombatText(
-                    $this->effects->getDisplayText($this->player1),
-                    $this->player1,
-                    $this->player2
-                );
+                $this->battle_text .= '<p>' .
+                    $this->parseCombatText(
+                        $this->effects->getDisplayText($this->player1),
+                        $this->player1,
+                        $this->player2
+                    ) .
+                '</p>';
             }
         }
 
@@ -871,7 +873,7 @@ class Battle {
                         </p>";
             }
             if($this->effects->hasDisplays($this->player2)) {
-                $text .= '[br]' . $this->effects->getDisplayText($this->player2);
+                $text .= "<p>" . $this->effects->getDisplayText($this->player2) . "</p>";
             }
 
             if($player2_jutsu->hasEffect()){
@@ -891,11 +893,11 @@ class Battle {
         else {
             $this->battle_text .= $this->player2->getName() . ' stood still and did nothing.';
             if($this->effects->hasDisplays($this->player2)) {
-                $this->battle_text .= '[br]' . $this->parseCombatText(
+                $this->battle_text .= "<p>" . $this->parseCombatText(
                     $this->effects->getDisplayText($this->player2),
                     $this->player2,
                     $this->player1
-                );
+                ) . "</p>";
             }
         }
 
