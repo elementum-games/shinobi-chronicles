@@ -88,6 +88,7 @@ class Battle {
     const TYPE_AI_RANKUP = 6;
 
     const TURN_LENGTH = 40;
+    const PREP_LENGTH = 25;
 
     const TEAM1 = 'T1';
     const TEAM2 = 'T2';
@@ -145,6 +146,7 @@ class Battle {
     public array $player2_jutsu_used;
 
     public int $turn_time;
+    public int $start_time;
     public $winner;
 
     public bool $spectate = false;
@@ -184,6 +186,7 @@ class Battle {
                  `player1`,
                  `player2`,
                  `turn_time`,
+                 `start_time`,
                  player1_health,
                  player2_health,
                  player1_weapon_id,
@@ -202,7 +205,8 @@ class Battle {
                 {$battle_type},
                 '$player1->id',
                 '$player2->id',
-                " . (time() + 20) . ",
+                " . (time() + self::TURN_LENGTH) . ",
+                " . time() . ",
                 {$player1->health},
                 {$player2->health},
                 0,
@@ -299,6 +303,8 @@ class Battle {
         $this->player2_jutsu_used = json_decode($battle['player2_jutsu_used'], true);
 
         $this->turn_time = $battle['turn_time'];
+        $this->start_time = $battle['start_time'];
+
         $this->winner = $battle['winner'];
 
         if($player->id == $this->player1_id) {
@@ -337,6 +343,34 @@ class Battle {
             return $this->winner;
         }
 
+        if($this->isPreparationPhase()) {
+            try {
+                if (isset($_POST['attack'])) {
+                    $item_id = $_POST['item_id'] ?? null;
+                    if ($item_id && $this->player->hasItem($item_id)) {
+                        $item = $this->player->items[$item_id];
+                        if ($this->player->health == $this->player->max_health) {
+                            throw new Exception("You are already at max health");
+                        }
+                        if ($item['effect'] === 'heal') {
+                            if (--$this->player->items[$item_id]['quantity'] === 0)
+                                unset($this->player->items[$item_id]);
+                            $this->player->health += $item['effect_amount'];
+                            if ($this->player->health >= $this->player->max_health)
+                                $this->player->health = $this->player->max_health;
+                            $this->player->updateData();
+                            $this->player->updateInventory();
+                            $this->battle_text .= sprintf("%s used a %s and healed for %.2f[br]", $this->player->user_name, $item['name'], $item['effect_amount']);
+                            $this->updateData();
+                        }
+                    }
+                }
+            }
+            catch(Exception $e) {
+                $this->system->message($e->getMessage());
+            }
+            return false;
+        }
         // If turn is still active and user hasn't submitted their move, check for action
         if($this->timeRemaining() > 0 && !$this->playerActionSubmitted()) {
             if(!empty($_POST['attack'])) {
@@ -956,8 +990,7 @@ class Battle {
             }
 
             // Turn timer
-            echo "<tr><td style='text-align:center;' colspan='2'>
-			Time remaining: " . $this->timeRemaining() . " seconds</td></tr>";
+            echo sprintf("<tr><td style='text-align:center;' colspan='2'>%sTime remaining: %d seconds</td></tr>", $this->isPreparationPhase()  ? "Prep-" : "", $this->isPreparationPhase() ? $this->prepTimeRemaining() : $this->timeRemaining());
         }
 
         if($this->spectate) {
@@ -984,6 +1017,10 @@ class Battle {
 
     public function isComplete(): bool {
         return $this->winner;
+    }
+
+    public function isPreparationPhase(): bool {
+        return $this->prepTimeRemaining() > 0 && !($this->opponent instanceof AI);
     }
 
     /**
@@ -1053,6 +1090,9 @@ class Battle {
         global $self_link;
 
         $gold_color = '#FDD017';
+        if($this->isPreparationPhase() && ! $player->items)
+            return;
+
         echo "<tr><td colspan='2'>
             <div style='margin:0px;position:relative;'>
             <style type='text/css'>
@@ -1168,6 +1208,26 @@ class Battle {
                 background: rgba(0, 0, 0, 0.1);
                 cursor: pointer;
             }
+            
+            #items p.item {
+                display: inline-block;
+                padding: 8px 10px;
+                margin-right: 15px;
+                vertical-align:top;
+                /* Style */
+                background-color: rgba(255, 255, 255, 0.1);
+                border: 1px solid #C0C0C0;
+                border-radius: 10px;
+                text-align:center;
+                box-shadow: 0 0 4px 0 rgba(0,0,0,0);
+            }
+            #items p.item:last-child {
+                margin-right: 1px;
+            }
+            #items p.item:hover {
+                background: rgba(0, 0, 0, 0.1);
+                cursor: pointer;
+            }
 
 
             </style>
@@ -1269,6 +1329,15 @@ class Battle {
                     $(currentlySelectedWeapon).css('box-shadow', '0px 0px 4px 0px #000000');
                     $('#weaponID').val( $(this).attr('data-id') );
                 });
+                var currentlySelectedItem = false;
+                $('.item').click(function(){
+                    if(currentlySelectedItem != false) {
+                        $(currentlySelectedItem).css('box-shadow', '0px');
+                    }
+                    currentlySelectedItem = this;
+                    $(currentlySelectedItem).css('box-shadow', '0px 0px 4px 0px #000000');
+                    $('#itemID').val( $(this).attr('data-id') );
+                });
                 var display_state = 'ninjutsu';
                 $('#jutsu .ninjutsu').click(function(){
                     if(display_state != 'ninjutsu' && display_state != 'genjutsu') {
@@ -1312,12 +1381,15 @@ class Battle {
                     $('#jutsuID').val($(this).attr('data-id'));
                 });
             });
-            </script>
-            <!--DIV START-->
-            <div id='handSeals'>
-            ";
-                for($i = 1; $i <= 12; $i++) {
-                    echo "<p id='handseal_$i' data-selected='no' data-handseal='$i'>
+            </script>";
+
+        if(! $this->isPreparationPhase()) {
+            echo "
+                <!--DIV START-->
+                <div id='handSeals'>
+                ";
+            for ($i = 1; $i <= 12; $i++) {
+                echo "<p id='handseal_$i' data-selected='no' data-handseal='$i'>
                     <img src='./images/handseal_$i.png' draggable='false' />
                     <span class='handsealNumber'>1</span>
                     <span class='handsealTooltip'>&nbsp;</span>
@@ -1528,28 +1600,50 @@ class Battle {
                         data-id='$id'
                         aria-disabled='" . ($cd_left > 0 ? "true" : "false") . "'
                         >{$jutsu->name}<br />";
-                            if($cd_left > 0) {
-                                echo "(CD: {$cd_left} turns)";
-                            }
-                            else {
-                                echo "<strong>B{$c3}</strong>";
-                            }
-                    echo "</div><br />";
-                    $c3++;
+                        if($cd_left > 0) {
+                            echo "(CD: {$cd_left} turns)";
+                        }
+                        else {
+                            echo "<strong>B{$c3}</strong>";
+                        }
+                        echo "</div><br />";
+                        $c3++;
+                    }
                 }
+                echo "</div>";
             }
-            echo "</div>";
         }
+        else {
+            $heal_items = [];
+            foreach($player->items as $item) {
+                if ($item['effect'] === 'heal')
+                    $heal_items[] = $item;
+            }
 
-        $prefill_hand_seals = $_POST['hand_seals'] ?? '';
-        $prefill_jutsu_type = $_POST['jutsu_type'] ?? Jutsu::TYPE_NINJUTSU;
-        $prefill_weapon_id = $_POST['weapon_id'] ?? '0';
-        $prefill_jutsu_id = $_POST['jutsu_id'] ?? '';
-        echo "<form action='$self_link' method='post'>
+            if(count($heal_items) > 0) {
+                echo "<div id='items'>";
+                foreach($heal_items as $item) {
+                    echo sprintf("<p class='item' data-id='%d'><b>%s</b> (%s %.2f)<br />(Owned %d)", $item['item_id'], $item['name'], $item['effect'], $item['effect_amount'], $item['quantity']);
+                }
+                echo "</div>";
+                $showSubmitBtn = true;
+            }
+            else {
+                echo "<p style='text-align:center;'>You do not have any healing items.</p>";
+            }
+        }
+        if(!$this->isPreparationPhase() || ($showSubmitBtn ?? false)) {
+            $prefill_hand_seals = $_POST['hand_seals'] ?? '';
+            $prefill_jutsu_type = $_POST['jutsu_type'] ?? Jutsu::TYPE_NINJUTSU;
+            $prefill_weapon_id = $_POST['weapon_id'] ?? '0';
+            $prefill_jutsu_id = $_POST['jutsu_id'] ?? '';
+            $prefill_item_id = $_POST['item_id'] ?? '';
+            echo "<form action='$self_link' method='post'>
             <input type='hidden' id='hand_seal_input' name='hand_seals' value='{$prefill_hand_seals}' />
             <input type='hidden' id='jutsuType' name='jutsu_type' value='{$prefill_jutsu_type}' />
             <input type='hidden' id='weaponID' name='weapon_id' value='{$prefill_weapon_id}' />
             <input type='hidden' id='jutsuID' name='jutsu_id' value='{$prefill_jutsu_id}' />
+            <input type='hidden' id='itemID' name='item_id' value='{$prefill_item_id}' />
             <p style='display:block;text-align:center;margin:auto;'>
                 <input id='submitbtn' type='submit' name='attack' value='Submit' />
             </p>
@@ -1557,6 +1651,7 @@ class Battle {
         </div>";
         echo "</div>
     </td></tr>";
+        }
     }
 
     public function jutsuCollision(
@@ -1986,6 +2081,10 @@ class Battle {
 
     protected function timeRemaining(): int {
         return Battle::TURN_LENGTH - (time() - $this->turn_time);
+    }
+
+    protected function prepTimeRemaining(): int {
+        return Battle::PREP_LENGTH - (time() - $this->start_time);
     }
 
     private function playerActionSubmitted(): bool {
