@@ -725,8 +725,12 @@ class Battle {
         }
 
         // Apply remaining barrier
-        $this->effects->setBarrier($this->player1, $player1_jutsu);
-        $this->effects->setBarrier($this->player2, $player2_jutsu);
+        if($player1_jutsu) {
+            $this->effects->setBarrier($this->player1, $player1_jutsu);
+        }
+        if($player2_jutsu) {
+            $this->effects->setBarrier($this->player2, $player2_jutsu);
+        }
 
         // Apply damage/effects and set display
         if($this->player1_action) {
