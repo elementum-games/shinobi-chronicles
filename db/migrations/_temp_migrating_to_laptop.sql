@@ -17,6 +17,8 @@ CREATE TABLE `support_request` (
   `time` INT,
   `updated` INT,
   `assigned_to` INT,
+  `admin_name` VARCHAR(75),
+  `admin_respond_by` INT,
   `open` INT(1),
   `admin_response` INT(1)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

@@ -45,10 +45,13 @@
     <tr><th><?=$support['subject']?></th></tr>
     <tr><td>
         <label>Support Type:</label><?=$support['support_type']?><br />
-        <label>Submitted:</label><?= strftime("%m/%d/%y @ %I:%M", $support['time']) ?><br />
+        <label>Submitted:</label><?= strftime(SupportManager::$strfString, $support['time']) ?><br />
         <label>Status:</label><?= ($support['open'] ? 'Open' : 'Closed') ?><br />
+        <?php if($support['assigned_to'] != ''): ?>
+            <label>Assigned To:</label><?=$support['admin_name']?><br />
+        <?php endif ?>
         <?php if($support['time'] != $support['updated']): ?>
-            <label>Last Updated:</label><?= strftime("%m/%d/%y @ %I:%M", $support['updated']) ?><br />
+            <label>Last Updated:</label><?= strftime(SupportManager::$strfString, $support['updated']) ?><br />
         <?php endif ?>
         <label>Details:</label><br />
         <div class="support_detail"><p><?=$support['message']?></p></div>
@@ -59,7 +62,7 @@
     <?php else: ?>
         <?php foreach($responses as $response): ?>
             <tr onclick="toggleDetails(<?=$response['response_id']?>)" style="cursor: pointer;">
-                <th><?=$response['user_name']?> - <?=strftime("%m/%d/%y @ %I:%M", $response['time'])?></th>
+                <th><?=$response['user_name']?> - <?=strftime(SupportManager::$strfString, $response['time'])?></th>
             </tr>
             <tr id="<?=$response['response_id']?>" class="response" style="display:none;"><td>
                 <div class="support_detail"><p><?=$response['message']?></p></div>

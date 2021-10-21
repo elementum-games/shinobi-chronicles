@@ -24,9 +24,10 @@ function modPanel() {
 	// Submenu
 	echo "<div class='submenu'>
 	<ul class='submenu'>
-		<li style='width:22.6%;'><a href='{$self_link}'>Menu</a></li>
-		<li style='width:37.6%;'><a href='{$self_link}&view=banned_users'>Banned Users</a></li>
-		<li style='width:37.6%;'><a href='{$self_link}&view=locked_out_users'>Locked Out Users</a></li>
+		<li style='width:20%;'><a href='{$self_link}'>Menu</a></li>
+		<li style='width:26%;'><a href='{$self_link}&view=banned_users'>Banned Users</a></li>
+		<li style='width:26%;'><a href='{$self_link}&view=locked_out_users'>Locked Out Users</a></li>
+		<li style='width:26%;'><a href='{$self_link}&view=support_requests'>Support Requests</a></li>
 	</ul>
 	</div>
 	<div class='submenuMargin'></div>";
@@ -667,6 +668,104 @@ function modPanel() {
 			$system->message($e->getMessage());
 		}
 	}
+    else if ($view == 'support_requests') {
+        require_once('classes/SupportManager.php');
+        $supportManager = new SupportManager($system, $player->user_id, true);
+
+        // Display variables
+        $self_link .= '&view=support_requests';
+        $supports = [];
+        $support_id = 0;
+        if(isset($_GET['support_id'])) {
+            $support_id = $system->clean($_GET['support_id']);
+        }
+        $category = 'awaiting_admin';
+        if(isset($_GET['category'])) {
+            $category = $system->clean($_GET['category']);
+        }
+
+        if(isset($_POST)) {
+            try {
+                if(isset($_POST['add_response'])) {
+                    $supportData = $supportManager->fetchSupportByID($support_id);
+                    $message = $system->clean($_POST['message']);
+
+                    // Support not found
+                    if(!$supportData) {
+                        throw new Exception("Support not found!");
+                    }
+                    // Support closed
+                    if(!$supportData['open']) {
+                        throw new Exception("Support is closed!");
+                    }
+                    // Message validation
+                    if($message == '') {
+                        throw new Exception("You must enter a reply!");
+                    }
+                    if(strlen($message) < SupportManager::$validationConstraints['message']['min']) {
+                        throw new Exception("Response must be at least "
+                            . SupportManager::$validationConstraints['message']['min'] . " characters long.");
+                    }
+                    if(strlen($message) > SupportManager::$validationConstraints['message']['max']) {
+                        throw new Exception("Response cannot exceed "
+                            . SupportManager::$validationConstraints['message']['max'] . " characters long.");
+                    }
+                    // Assignment validation
+                    if($supportData['assigned_to'] != 0 && $supportData['admin_name'] != '') {
+                        if($player->user_id != $supportData['assigned_to'] && $player->staff_level < System::SC_HEAD_ADMINISTRATOR) {
+                            throw new Exception("Support is currently assigned to {$supportData['admin_name']}!");
+                        }
+                    }
+
+                    $supportManager->addSupportResponses($support_id, $player->user_id, $player->user_name,
+                        $message, $player->current_ip, $player->staff_level);
+                }
+
+                if(isset($_POST['close_ticket'])) {
+                    $message = '';
+                    if(isset($_POST['message'])) {
+                        $message = $system->clean($message);
+                    }
+
+                    if($message != '') {
+                        $supportManager->addSupportResponses($support_id, $player->user_id, $player->user_name,
+                            $message, $player->current_ip, $player->staff_level);
+                    }
+
+                    if($supportManager->closeSupport($support_id, $player->staff_level, false, $player->user_name)) {
+                        $system->message("Support closed!");
+                    }else {
+                        throw new Exception("Error closing support!d");
+                    }
+                }
+            }catch(Exception $e) {
+                $system->message($e->getMessage());
+            }
+        }
+
+        //Fetch support data and responses
+        if($support_id != 0) {
+            $supportData = $supportManager->fetchSupportByID($support_id);
+            $supportResponses = $supportManager->fetchSupportResponses($support_id);
+
+            if($supportData['admin_response'] == 0 && $supportData['assigned_to'] && $supportData['admin_respond_by'] < time()) {
+                if($supportManager->removeStaffMember($support_id)) {
+                    $system->message("{$supportData['admin_name']} has been removed!");
+                    $supportData['admin_name'] = ''; // Fix display
+                    $supportData['assigned_to'] = 0; // Fix display
+                }
+            }
+        }
+        //Only fetch all supports if a specific isn't selected
+        else {
+            $supports = $supportManager->fetchAllSupports($category, $player->user_id);
+        }
+
+        if(!$system->message_displayed) {
+            $system->printMessage();
+        }
+        require('templates/staff/supportRequests.php');
+    }
 	else if($display_menu) {
 		// Social/game ban
 		echo "<table id='mod_panel' class='table'>
@@ -828,8 +927,4 @@ function modPanel() {
 		// Rules/manual edit
 		// View locked out accounts / links to unlock
 	}
-}
-
-function supportRequests() {
-
 }

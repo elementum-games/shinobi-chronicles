@@ -8,6 +8,7 @@ require_once __DIR__ . '/User.php';
 */
 class System {
     const ENVIRONMENT_DEV = 'dev';
+    const LOCAL_HOST = true;
 
     const KUNAI_PER_DOLLAR = 2;
     const LOGOUT_LIMIT = 120;
@@ -23,8 +24,9 @@ class System {
 
     const SC_MODERATOR = 1;
     const SC_HEAD_MODERATOR = 2;
-    const SC_ADMINISTRATOR = 3;
-    const SC_HEAD_ADMINISTRATOR = 4;
+    const SC_CONTENT_ADMINISTRATOR = 3;
+    const SC_ADMINISTRATOR = 4;
+    const SC_HEAD_ADMINISTRATOR = 5;
 
     const DB_DATETIME_MS_FORMAT = 'Y-m-d H:i:s.u';
 
@@ -98,7 +100,6 @@ class System {
         'bloodline' => 10,
         'arena' => 12,
         'mod' => 16,
-        'support' => 30,
         'admin' => 17,
         'report' => 18,
         'battle' => 19,
@@ -504,6 +505,10 @@ class System {
         $replace_array = [];
 
         $reg_exUrl = '/((?:http|https)\:\/\/(?:[a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,5})(?:\/[^\:\s\\\\]*)?)/i';
+        if(self::LOCAL_HOST) {
+            //Allow regex to work with local links if system is set to local host
+            $reg_exUrl = '/((?:http|https)\:\/\/(?:[a-zA-Z0-9\-\.]+[a-zA-Z]{2,5})(?:\/[^\:\s\\\\]*)?)/i';
+        }
         $text = preg_replace_callback(
             $reg_exUrl,
             function($matches) {

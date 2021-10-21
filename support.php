@@ -186,8 +186,7 @@ if(!$guest_support) {
     if ($player->isModerator() || $player->hasAdminPanel()) {
         echo $staff_menu_header;
         if ($player->isModerator()) {
-            echo "<li><a id='sideMenuOption-ModPanel' href='{$system->link}?id=16'>Mod Panel</a></li>
-            <li><a id='sideMenuOption-ModPanel' href='{$system->link}?id=30'>Support Panel</a></li>";
+            echo "<li><a id='sideMenuOption-ModPanel' href='{$system->link}?id=16'>Mod Panel</a></li>";
         }
         if ($player->hasAdminPanel()) {
             echo "<li><a id='sideMenuOption-AdminPanel' href='{$system->link}?id=17'>Admin Panel</a></li>";

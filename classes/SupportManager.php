@@ -20,22 +20,21 @@ class SupportManager {
     ];
 
     public static $requestTypeUserlevels = [
-        'Game Question' => 'head_mod',
-        'Account Problem' => 'head_mod',
-
-        'Sword Feedback' => 'admin',
-        'Content Text Issue' => 'admin',
-
-        'Balance Feedback' => 'head_admin',
-
-        'Appeal Ban' => 'head_admin',
-        'Suggestion' => 'head_admin',
-        'Report Bug' => 'head_admin',
-        'Race Change' => 'head_admin',
-        'Report Staff Member' => 'head_admin',
-        'Misc. Request' => 'head_admin',
-        'Mod Request' => 'head_admin',
+        'Game Question' => 'SC_MODERATOR',
+        'Misc. Request' => 'SC_MODERATOR',
+        'Appeal Ban' => 'SC_HEAD_MODERATOR',
+        'Account Problem' => 'SC_HEAD_MODERATOR',
+        'Report Staff Member' => 'SC_HEAD_MODERATOR',
+        'Content Text Issue' => 'SC_CONTENT_ADMINISTRATOR',
+        'Balance Feedback' => 'SC_CONTENT_ADMINISTRATOR',
+        'Suggestion' => 'SC_CONTENT_ADMINISTRATOR',
+        'Report Bug' => 'SC_ADMINISTRATOR',
+        'Mod Request' => 'SC_ADMINISTRATOR',
     ];
+
+    public static $strfString = '%m/%d/%y @ %I:%M';
+
+    public static $changeStaffTime = 86400 * 3;
 
     /** @var System $system */
     protected $system;
@@ -107,7 +106,35 @@ class SupportManager {
         if(!isset(self::$requestTypeUserlevels[$type])) {
             return true;
         }
-        return $userlevel >= $this->system->STAFF_LEVELS[self::$requestTypeUserlevels[$type]];
+        switch(self::$requestTypeUserlevels[$type]) {
+            case 'SC_MODERATOR':
+                if($userlevel >= System::SC_MODERATOR)
+                    return true;
+                else
+                    return false;
+            case 'SC_HEAD_MODERATOR':
+                if($userlevel >= System::SC_HEAD_MODERATOR)
+                    return true;
+                else
+                    return false;
+            case 'SC_CONTENT_ADMINISTRATOR':
+                if($userlevel >= System::SC_CONTENT_ADMINISTRATOR)
+                    return true;
+                else
+                    return false;
+            case 'SC_ADMINISTRATOR':
+                if($userlevel >= System::SC_ADMINISTRATOR)
+                    return true;
+                else
+                    return false;
+            case 'SC_HEAD_ADMINISTRATOR':
+                if($userlevel >= System::SC_HEAD_ADMINISTRATOR)
+                    return true;
+                else
+                    return false;
+            default:
+                return false;
+        }
     }
 
 
@@ -137,6 +164,8 @@ class SupportManager {
               `message`,
               `open`, 
               `admin_response`,
+              `assigned_to`,
+              `admin_respond_by`,
               `user_name`
             )
         VALUES
@@ -150,6 +179,8 @@ class SupportManager {
               '{$subject}',
               '{$details}',
               '1', 
+              '0',
+              '0',
               '0',
               '{$name}'
             )
@@ -207,7 +238,7 @@ class SupportManager {
         }
 
         $result = $this->system->query("SELECT * FROM `support_request` 
-            WHERE `user_id`={$user_id} AND `open`=1 ORDER BY `open` DESC, `updated` DESC");
+            WHERE `user_id`={$user_id} ORDER BY `open` DESC, `updated` DESC LIMIT 50");
         $supports = [];
         while($row = $this->system->db_fetch($result)) {
             $supports[] = $row;
@@ -222,26 +253,37 @@ class SupportManager {
      * @param int    $offset
      * @return array
      */
-    public function fetchAllSupports($category = '', $limit = 100, $offset = 0) {
+    public function fetchAllSupports($category = '', $user_id = 0, $limit = 100, $offset = 0) {
         $orderDirection = 'ASC';
-        $query = "SELECT * FROM `Supports` ";
+        $query = "SELECT * FROM `support_request` ";
         switch($category) {
-            case 'awaiting_admin':
+            case 'awaiting_staff':
                 $query .= "WHERE `open`=1 AND `admin_response`=0";
                 break;
             case 'awaiting_user':
                 $query .= "WHERE `open`=1 AND `admin_response`=1";
                 break;
+            case 'my_supports':
+                $query .= "WHERE `open`=1 AND `assigned_to`={$user_id}";
+                break;
+            case 'my_supports_user':
+                $query .= "WHERE `open`=1 AND `assigned_to`={$user_id} AND `admin_response`=1";
+                break;
+            case 'my_supports_admin':
+                $query .= "WHERE `open`=1 AND `assigned_to`={$user_id} AND `admin_response`=0";
+                break;
             case 'closed':
                 $query .= "WHERE `open`=0";
                 $orderDirection = 'DESC';
                 break;
+            default:
+                $query .= "WHERE `open`=1 AND `admin_response`=0";
         }
         $query .= " ORDER BY `updated` {$orderDirection} LIMIT {$offset},{$limit}";
 
         $supports = [];
         $result = $this->system->query($query);
-        while($row = $this->system->dbFetch($result)) {
+        while($row = $this->system->db_fetch($result)) {
             $supports[] = $row;
         }
 
@@ -320,7 +362,7 @@ class SupportManager {
                     'low' => [],
                 ];
                 while($row = $this->system->db_fetch($result)) {
-                    switch($row['type']) {
+                    switch($row['support_type']) {
                         case 'Account Problem':
                         case 'Report Staff Member':
                         case 'Appeal Ban':
@@ -352,7 +394,7 @@ class SupportManager {
      * @param bool $update
      * @return bool
      */
-    public function addSupportResponses($support_id, $userid, $username, $response, $ip_address, $update = true) {
+    public function addSupportResponses($support_id, $userid, $username, $response, $ip_address, $staff_level = 0, $update = true) {
         $this->system->query("INSERT INTO `support_request_responses`
             (
               `support_id`,
@@ -374,7 +416,9 @@ class SupportManager {
         ");
 
         if($this->system->db_last_insert_id) {
-            if($update) {
+            if($update && $this->admin) {
+                $this->updateSupport($support_id, $userid, $username, $staff_level);
+            } else {
                 $this->updateSupport($support_id);
             }
             return true;
@@ -392,7 +436,7 @@ class SupportManager {
      * @return bool
      * @throws Exception
      */
-    public function updateSupport($support_id) {
+    public function updateSupport($support_id, $admin_id = 0, $admin_name = '', $staff_level=0) {
         // Validate support exists and belongs to user
         if($this->admin) {
             $support_data = $this->fetchSupportByID($support_id);
@@ -405,27 +449,31 @@ class SupportManager {
         }
 
         // Notify user of update
-        if($this->admin && false) {
-            if($support_data['character_id']) {
-                $this->system->sendPM(System::$SYSTEM_USERID, $support_data['character_id'], 'Request Update',
-                    "Your support request {$support_data['subject']} has been updated by an administrator. "
-                    . "You can view it here:\r\n"
-                    . $this->system->route('support', ['view_request' => $support_data['id']]));
-            }
-            else {
-                $this->system->sendAccountMessage('System', $support_data['user_id'], 'support_updated',
-                    'Support Updated',
-                    "Your support request {$support_data['subject']} has been updated by an administrator. "
-                    . "You can view it here:\r\n"
-                    . $this->system->route('support', ['view_request' => $support_data['id']]));
+        if($this->admin) {
+            if($support_data['user_id']) {
+                $this->system->send_pm($admin_id, $support_data['user_id'], 'Support Updated',
+                    "Your support {$support_data['subject']} has been updated and can be viewed here "
+                . $this->system->link . "support.php?support_id=" . $support_id, $staff_level);
             }
         }
 
-        $this->system->query("UPDATE `support_request` SET
-            `updated`='" . time() . "',
-            `admin_response`='{$this->admin}'
-        WHERE `support_id`='{$support_id}' LIMIT 1");
-        if($this->system->db_last_affected_rows) {
+        $query = "UPDATE `support_request` SET `updated`='" . time() . "',
+            `admin_response`='{$this->admin}'";
+
+        // Assign staff member
+        if($this->admin && $admin_id != 0) {
+            $query .= ", `assigned_to`='{$admin_id}', 
+                `admin_name`='{$admin_name}'";
+        }
+        // Assign staff deadline
+        if($support_data['admin_response'] == 1 && $support_data['assigned_to'] != 0) {
+            $query .= ", `admin_respond_by`='" . (time() + self::$changeStaffTime) . "'";
+        }
+
+        $query .= " WHERE `support_id`='{$support_id}' LIMIT 1";
+
+        $this->system->query($query);
+        if ($this->system->db_last_affected_rows) {
             return true;
         }
         return false;
@@ -438,7 +486,7 @@ class SupportManager {
      * @return bool
      * @throws Exception
      */
-    public function closeSupport($support_id, $inactive = false, $admin_name = false) {
+    public function closeSupport($support_id, $staff_level = 0, $inactive = false, $admin_name = false) {
         if($this->admin) {
             $support = $this->fetchSupportByID($support_id);
         }
@@ -464,18 +512,35 @@ class SupportManager {
 
         $this->system->query("UPDATE `support_request` SET `open`=0 WHERE `support_id`={$support_id}");
         if($this->system->db_last_affected_rows) {
-            if($inactive) {
-                $this->addSupportResponses($support_id,
+            if($inactive && false) {
+                /*$this->addSupportResponses($support_id,
                     System::$SYSTEM_USERID, 'System', "[Closed for inactivity]"
-                );
+                );*/
             }
             else {
                 $this->addSupportResponses($support_id,
                     $this->user_id,
                     ($admin_name ? $admin_name : $support['username']),
-                    "[Request Closed]"
+                    "[Request Closed]",
+                    -1,
+                    $staff_level
                 );
             }
+            return true;
+        }
+        return false;
+    }
+
+    public function removeStaffMember($support_id) {
+        //Must be an admin connection
+        if(!$this->admin) {
+            return false;
+        }
+
+        $this->system->query("UPDATE `support_request` SET `assigned_to`=0, `admin_name`='' 
+            WHERE `support_id`={$support_id} LIMIT 1");
+
+        if($this->system->db_last_affected_rows) {
             return true;
         }
         return false;
