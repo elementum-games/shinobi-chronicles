@@ -90,6 +90,8 @@ class Battle {
     const TURN_LENGTH = 40;
     const PREP_LENGTH = 25;
 
+    const MAX_PRE_FIGHT_HEAL_PERCENT = 85;
+
     const TEAM1 = 'T1';
     const TEAM2 = 'T2';
     const DRAW = 'DRAW';
@@ -97,6 +99,12 @@ class Battle {
     // Minimum % (of itself) a debuff can be reduced to with debuff resist
     const MIN_DEBUFF_RATIO = 0.1;
     const MAX_DIFFUSE_PERCENT = 0.75;
+
+    public static $pve_battle_types = [
+        self::TYPE_AI_ARENA,
+        self::TYPE_AI_MISSION,
+        self::TYPE_AI_RANKUP,
+    ];
 
     private System $system;
 
@@ -349,15 +357,22 @@ class Battle {
                     $item_id = $_POST['item_id'] ?? null;
                     if ($item_id && $this->player->hasItem($item_id)) {
                         $item = $this->player->items[$item_id];
-                        if ($this->player->health == $this->player->max_health) {
-                            throw new Exception("You are already at max health");
+
+                        $max_health = $this->player->max_health * (Battle::MAX_PRE_FIGHT_HEAL_PERCENT / 100);
+
+                        if ($this->player->health >= $max_health) {
+                            throw new Exception("You can't heal any further!");
                         }
                         if ($item['effect'] === 'heal') {
-                            if (--$this->player->items[$item_id]['quantity'] === 0)
+                            if (--$this->player->items[$item_id]['quantity'] === 0) {
                                 unset($this->player->items[$item_id]);
+                            }
+
                             $this->player->health += $item['effect_amount'];
-                            if ($this->player->health >= $this->player->max_health)
-                                $this->player->health = $this->player->max_health;
+                            if ($this->player->health >= $max_health) {
+                                $this->player->health = $max_health;
+                            }
+
                             $this->player->updateData();
                             $this->player->updateInventory();
                             $this->battle_text .= sprintf("%s used a %s and healed for %.2f[br]", $this->player->user_name, $item['name'], $item['effect_amount']);
@@ -1020,7 +1035,7 @@ class Battle {
     }
 
     public function isPreparationPhase(): bool {
-        return $this->prepTimeRemaining() > 0 && !($this->opponent instanceof AI);
+        return $this->prepTimeRemaining() > 0 && in_array($this->battle_type, self::$pve_battle_types);
     }
 
     /**
@@ -1090,8 +1105,6 @@ class Battle {
         global $self_link;
 
         $gold_color = '#FDD017';
-        if($this->isPreparationPhase() && ! $player->items)
-            return;
 
         echo "<tr><td colspan='2'>
             <div style='margin:0px;position:relative;'>
@@ -1383,7 +1396,35 @@ class Battle {
             });
             </script>";
 
-        if(! $this->isPreparationPhase()) {
+        if($this->isPreparationPhase()) {
+            echo "<p style='text-align:center;font-style:italic;'>
+                (You can use healing items during prep phase, but cannot heal past " . Battle::MAX_PRE_FIGHT_HEAL_PERCENT  . "% of your max health)
+             </p>";
+            if(empty($player->items)) {
+                echo "<p style='text-align:center;'>You do not have any healing items.</p>";
+                return;
+            }
+
+            $heal_items = [];
+            foreach($player->items as $item) {
+                if ($item['effect'] === 'heal') {
+                    $heal_items[] = $item;
+                }
+            }
+
+            if(count($heal_items) > 0) {
+                echo "<div id='items'>";
+                foreach($heal_items as $item) {
+                    echo sprintf("<p class='item' data-id='%d'><b>%s</b> (%s %.2f)<br />(Owned %d)", $item['item_id'], $item['name'], $item['effect'], $item['effect_amount'], $item['quantity']);
+                }
+                echo "</div>";
+                $showSubmitBtn = true;
+            }
+            else {
+                echo "<p style='text-align:center;'>You do not have any healing items.</p>";
+            }
+        }
+        else {
             echo "
                 <!--DIV START-->
                 <div id='handSeals'>
@@ -1394,26 +1435,26 @@ class Battle {
                     <span class='handsealNumber'>1</span>
                     <span class='handsealTooltip'>&nbsp;</span>
                 </p>";
-                    if($i == 6) {
-                        echo "<br />";
-                    }
+                if($i == 6) {
+                    echo "<br />";
                 }
-                echo "</div>
+            }
+            echo "</div>
             <div id='weapons' style='display:none;'>
             <p class='weapon' data-id='0' style='box-shadow: 0 0 4px 0 #000000;margin-top:14px;'>
             <b>None</b>
             </p>
             ";
-                if(is_array($player->equipped_weapons)) {
-                    foreach($player->equipped_weapons as $item_id) {
-                        echo "<p class='weapon' data-id='$item_id'>" .
-                            "<b>" . $player->items[$item_id]['name'] . "</b><br />" .
-                            ucwords(str_replace('_', ' ', $player->items[$item_id]['effect'])) .
-                            " (" . $player->items[$item_id]['effect_amount'] . "%)" .
-                            "</p>";
-                    }
+            if(is_array($player->equipped_weapons)) {
+                foreach($player->equipped_weapons as $item_id) {
+                    echo "<p class='weapon' data-id='$item_id'>" .
+                        "<b>" . $player->items[$item_id]['name'] . "</b><br />" .
+                        ucwords(str_replace('_', ' ', $player->items[$item_id]['effect'])) .
+                        " (" . $player->items[$item_id]['effect_amount'] . "%)" .
+                        "</p>";
                 }
-                echo "</div>
+            }
+            echo "</div>
             <div id='handsealOverlay'>
             </div>
         </td></tr>
@@ -1428,12 +1469,12 @@ class Battle {
             <span style='display:inline-block;width:$width;'>Taijutsu</span>
             <span style='display:inline-block;width:$width;'>Genjutsu</span>" .
                 ($player->bloodline_id ? "<span style='display:inline-block;width:$width;'>Bloodline</span>" : '');
-        echo "</th></tr>
+            echo "</th></tr>
         <tr><td colspan='2'>
         <div id='jutsu'>";
 
-        // Keyboard hotkeys
-        echo "<script type='text/javascript'>
+            // Keyboard hotkeys
+            echo "<script type='text/javascript'>
             const nin = 78;
             const gen = 71;
             const tai = 84;
@@ -1534,66 +1575,66 @@ class Battle {
             });
         </script>";
 
-        //Used to change ID #
-        $c1 = 0;
-        $c2 = 0;
-        $c3 = 0;
+            //Used to change ID #
+            $c1 = 0;
+            $c2 = 0;
+            $c3 = 0;
 
-        // Attack list
-        $jutsu_types = array(Jutsu::TYPE_NINJUTSU, Jutsu::TYPE_TAIJUTSU, Jutsu::TYPE_GENJUTSU);
-        for($i = 0; $i < 3; $i++) {
-            echo "<div class='jutsuCategory' style='width:$width;'>";
-            foreach($default_attacks as $attack) {
-                if($attack->jutsu_type != $jutsu_types[$i]) {
-                    continue;
-                }
-                echo "<span id='default$c1' class='jutsuName {$jutsu_types[$i]}' data-handseals='" .
-                    ($attack->jutsu_type != Jutsu::TYPE_TAIJUTSU ? $attack->hand_seals : '') . "'
-                data-id='{$attack->id}'>" . $attack->name . '<br /><strong>'.'D'.$c1.'</strong></span><br />';
-                $c1++;
-            }
-            if(is_array($player->equipped_jutsu)) {
-                foreach($player->equipped_jutsu as $jutsu) {
-                    /** @var Jutsu $jutsu */
-                    if($player->jutsu[$jutsu['id']]->jutsu_type != $jutsu_types[$i]) {
+            // Attack list
+            $jutsu_types = array(Jutsu::TYPE_NINJUTSU, Jutsu::TYPE_TAIJUTSU, Jutsu::TYPE_GENJUTSU);
+            for($i = 0; $i < 3; $i++) {
+                echo "<div class='jutsuCategory' style='width:$width;'>";
+                foreach($default_attacks as $attack) {
+                    if($attack->jutsu_type != $jutsu_types[$i]) {
                         continue;
                     }
+                    echo "<span id='default$c1' class='jutsuName {$jutsu_types[$i]}' data-handseals='" .
+                        ($attack->jutsu_type != Jutsu::TYPE_TAIJUTSU ? $attack->hand_seals : '') . "'
+                data-id='{$attack->id}'>" . $attack->name . '<br /><strong>'.'D'.$c1.'</strong></span><br />';
+                    $c1++;
+                }
+                if(is_array($player->equipped_jutsu)) {
+                    foreach($player->equipped_jutsu as $jutsu) {
+                        /** @var Jutsu $jutsu */
+                        if($player->jutsu[$jutsu['id']]->jutsu_type != $jutsu_types[$i]) {
+                            continue;
+                        }
 
-                    $player_jutsu = $player->jutsu[$jutsu['id']];
-                    $player_jutsu->setCombatId($player->combat_id);
+                        $player_jutsu = $player->jutsu[$jutsu['id']];
+                        $player_jutsu->setCombatId($player->combat_id);
 
-                    $cd_left = $this->jutsu_cooldowns[$player_jutsu->combat_id] ?? 0;
+                        $cd_left = $this->jutsu_cooldowns[$player_jutsu->combat_id] ?? 0;
 
-                    echo "<div
+                        echo "<div
                             id='{$jutsu_types[$i]}$c2'
                             class='jutsuName {$jutsu_types[$i]}'
                             data-handseals='{$player_jutsu->hand_seals}'
                             data-id='{$jutsu['id']}'
                             aria-disabled='" . ($cd_left > 0 ? "true" : "false") . "'
                         >" . $player_jutsu->name . '<br />';
-                            if($cd_left > 0) {
-                                echo "(CD: {$cd_left} turns)";
-                            }
-                            else {
-                                echo "<strong>" .strtoupper($jutsu_types[$i][0]).$c2. "</strong>";
-                            }
+                        if($cd_left > 0) {
+                            echo "(CD: {$cd_left} turns)";
+                        }
+                        else {
+                            echo "<strong>" .strtoupper($jutsu_types[$i][0]).$c2. "</strong>";
+                        }
 
                         echo "</div><br />";
-                    $c2++;
+                        $c2++;
+                    }
+                    $c2 = 0;
                 }
-                $c2 = 0;
+                echo "</div>";
             }
-            echo "</div>";
-        }
-        // Display bloodline jutsu
-        if($player->bloodline_id) {
-            echo "<div class='jutsuCategory' style='width:$width;margin-right:0;'>";
-            if(!empty($player->bloodline->jutsu)) {
-                foreach($player->bloodline->jutsu as $id => $jutsu) {
-                    $jutsu->setCombatId($player->combat_id);
-                    $cd_left = $this->jutsu_cooldowns[$jutsu->combat_id] ?? 0;
+            // Display bloodline jutsu
+            if($player->bloodline_id) {
+                echo "<div class='jutsuCategory' style='width:$width;margin-right:0;'>";
+                if(!empty($player->bloodline->jutsu)) {
+                    foreach($player->bloodline->jutsu as $id => $jutsu) {
+                        $jutsu->setCombatId($player->combat_id);
+                        $cd_left = $this->jutsu_cooldowns[$jutsu->combat_id] ?? 0;
 
-                    echo "<div
+                        echo "<div
                         id='bloodline{$c3}'
                         class='jutsuName bloodline_jutsu'
                         data-handseals='{$jutsu->hand_seals}'
@@ -1613,25 +1654,7 @@ class Battle {
                 echo "</div>";
             }
         }
-        else {
-            $heal_items = [];
-            foreach($player->items as $item) {
-                if ($item['effect'] === 'heal')
-                    $heal_items[] = $item;
-            }
 
-            if(count($heal_items) > 0) {
-                echo "<div id='items'>";
-                foreach($heal_items as $item) {
-                    echo sprintf("<p class='item' data-id='%d'><b>%s</b> (%s %.2f)<br />(Owned %d)", $item['item_id'], $item['name'], $item['effect'], $item['effect_amount'], $item['quantity']);
-                }
-                echo "</div>";
-                $showSubmitBtn = true;
-            }
-            else {
-                echo "<p style='text-align:center;'>You do not have any healing items.</p>";
-            }
-        }
         if(!$this->isPreparationPhase() || ($showSubmitBtn ?? false)) {
             $prefill_hand_seals = $_POST['hand_seals'] ?? '';
             $prefill_jutsu_type = $_POST['jutsu_type'] ?? Jutsu::TYPE_NINJUTSU;
