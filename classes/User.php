@@ -555,8 +555,24 @@ class User extends Fighter {
         // Bloodline
         if($this->bloodline_id) {
             $this->bloodline = new Bloodline($this->bloodline_id, $this->user_id);
+
+            // Debug info
+            if($this->system->debug['bloodline']) {
+                echo "Debugging {$this->getName()}<br />";
+                foreach($this->bloodline->passive_boosts as $id => $boost) {
+                    echo "Boost: " . $boost['effect'] . " : " . $boost['power'] . "<br />";
+                }
+                foreach($this->bloodline->combat_boosts as $id => $boost) {
+                    echo "Boost: " . $boost['effect'] . " : " . $boost['power'] . "<br />";
+                }
+                echo "<br />";
+            }
+
             $this->bloodline->setBoostAmounts(
-                $this->bloodline_skill, $this->base_stats, $this->total_stats, $this->stats_max_level, $this->regen_rate
+                $this->rank,
+                $this->ninjutsu_skill, $this->taijutsu_skill, $this->genjutsu_skill, $this->bloodline_skill,
+                $this->base_stats, $this->total_stats, $this->stats_max_level,
+                $this->regen_rate
             );
 
             // Debug info

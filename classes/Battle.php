@@ -662,6 +662,11 @@ class Battle {
                     );
                 }
             }
+
+            if($player1_jutsu->isAllyTargetType()) {
+                $player1_jutsu->weapon_id = 0;
+                $player1_jutsu->effect_only = true;
+            }
         }
         if($this->player2_action) {
             if($this->player2_attack_type == Jutsu::PURCHASE_TYPE_DEFAULT) {
@@ -700,15 +705,11 @@ class Battle {
                     );
                 }
             }
-        }
 
-        if($player1_jutsu && $player1_jutsu->isAllyTargetType()) {
-            $player1_jutsu->weapon_id = 0;
-            $player1_jutsu->effect_only = true;
-        }
-        if($player2_jutsu && $player2_jutsu->isAllyTargetType()) {
-            $player2_jutsu->weapon_id = 0;
-            $player2_jutsu->effect_only = true;
+            if($player2_jutsu->isAllyTargetType()) {
+                $player2_jutsu->weapon_id = 0;
+                $player2_jutsu->effect_only = true;
+            }
         }
 
         if($this->system->debug['battle']) {
