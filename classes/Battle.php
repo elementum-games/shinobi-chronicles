@@ -1041,7 +1041,7 @@ class Battle {
     }
 
     public function isPreparationPhase(): bool {
-        return $this->prepTimeRemaining() > 0 && !in_array($this->battle_type, self::$pve_battle_types);
+        return $this->prepTimeRemaining() > 0 && in_array($this->battle_type, [self::TYPE_FIGHT, self::TYPE_CHALLENGE]);
     }
 
     /**
