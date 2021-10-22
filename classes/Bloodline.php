@@ -138,7 +138,7 @@ class Bloodline {
     
     public function setBoostAmounts(
         int $user_rank,
-        int $ninjutsu_skill, int $taijutsu_skill, int $genjutsu_skill, int $user_bloodline_skill,
+        int $ninjutsu_skill, int $taijutsu_skill, int $genjutsu_skill, int $bloodline_skill,
         int $base_stats, int $total_stats, int $stats_max_level,
         int $regen_rate
     ) {
@@ -150,6 +150,7 @@ class Bloodline {
             'heal' => 0.04,
             'regen' => 0.15,
         ];
+        $bloodline_skill += self::BASE_BLOODLINE_SKILL;
 
         if($this->raw_passive_boosts) {
             $this->passive_boosts = json_decode($this->raw_passive_boosts, true);
@@ -157,15 +158,14 @@ class Bloodline {
         if($this->raw_combat_boosts) {
             $this->combat_boosts = json_decode($this->raw_combat_boosts, true);
         }
+
         // Each ratio operates on assumption of 5 BLP
         foreach($this->passive_boosts as $id => $boost) {
             $boost_power = floor($boost['power'] / 5);
 
-            $bloodline_skill = $user_bloodline_skill + self::BASE_BLOODLINE_SKILL;
-
             switch($boost['effect']) {
                 case 'regen':
-                    $regen_multiplier = ($user_bloodline_skill / $stats_max_level);
+                    $regen_multiplier = ($bloodline_skill / $stats_max_level);
                     if($regen_multiplier > 1) {
                         $regen_multiplier = 1;
                     }
@@ -202,11 +202,10 @@ class Bloodline {
             }
         }
 
-        // (boosts are 50% at 1:2 offense:bl_skill)
+        // (boosts are 50% at 1:2 offense:bl_skill) - but why tho?
         foreach($this->combat_boosts as $id => $boost) {
             $boost_power = floor($boost['power'] / 5);
 
-            $bloodline_skill = $user_bloodline_skill + self::BASE_BLOODLINE_SKILL;
             $jutsu_type_skill = 10;
 
             switch($boost['effect']) {
