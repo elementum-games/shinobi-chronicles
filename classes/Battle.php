@@ -88,7 +88,7 @@ class Battle {
     const TYPE_AI_RANKUP = 6;
 
     const TURN_LENGTH = 40;
-    const PREP_LENGTH = 20;
+    const PREP_LENGTH = 15;
 
     const MAX_PRE_FIGHT_HEAL_PERCENT = 85;
 
