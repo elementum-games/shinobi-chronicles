@@ -27,9 +27,6 @@ class Bloodline {
     public int $rank;
     public string $description;
 
-    protected ?string $raw_passive_boosts;
-    protected ?string $raw_combat_boosts;
-
     public $passive_boosts;
     public $combat_boosts;
 
@@ -60,8 +57,8 @@ class Bloodline {
         $this->clan_id = $bloodline_data['clan_id'];
         $this->rank = $bloodline_data['rank'];
 
-        $this->raw_passive_boosts = $bloodline_data['passive_boosts'];
-        $this->raw_combat_boosts = $bloodline_data['combat_boosts'];
+        $this->passive_boosts = $bloodline_data['passive_boosts'];
+        $this->combat_boosts = $bloodline_data['combat_boosts'];
         
         $this->base_jutsu = [];
         $this->jutsu = [];
@@ -126,164 +123,14 @@ class Bloodline {
             }
         }
 
-        if($this->raw_passive_boosts) {
-            $this->passive_boosts = json_decode($this->raw_passive_boosts, true);
+
+        if($this->passive_boosts) {
+            $this->passive_boosts = json_decode($this->passive_boosts, true);
+            //var_dump($this->passive_boosts);
         }
-        if($this->raw_combat_boosts) {
-            $this->combat_boosts = json_decode($this->raw_combat_boosts, true);
-        }
-    }
-    
-    public function setBoostAmounts(
-        int $user_bloodline_skill, int $base_stats, int $total_stats, int $stats_max_level, int $regen_rate
-    ) {
-        $ratios = [
-            'offense_boost' => 0.04,
-            'defense_boost' => 0.04,
-            'speed_boost' => 0.08,
-            'mental_boost' => 0.1,
-            'heal' => 0.04,
-            'regen' => 0.15,
-        ];
-
-        if($this->raw_passive_boosts) {
-            $this->passive_boosts = json_decode($this->raw_passive_boosts, true);
-        }
-        if($this->raw_combat_boosts) {
-            $this->combat_boosts = json_decode($this->raw_combat_boosts, true);
-        }
-        // Each ratio operates on assumption of 5 BLP
-
-        // Set ratios
-        foreach($this->passive_boosts as $id => $boost) {
-            $boost_power = floor($boost['power'] / 5);
-
-            $bloodline_skill = $user_bloodline_skill + 100;
-
-            switch($boost['effect']) {
-                case 'regen':
-                    $regen_multiplier = ($user_bloodline_skill / $stats_max_level);
-                    if($regen_multiplier > 1) {
-                        $regen_multiplier = 1;
-                    }
-                    $regen_multiplier *= $ratios['regen'];
-
-                    $this->passive_boosts[$id]['power'] = round($boost_power * $regen_multiplier, 2);
-                    $this->passive_boosts[$id]['effect_amount'] = floor($this->passive_boosts[$id]['power'] * $regen_rate);
-                    break;
-
-                case 'scout_range':
-                case 'stealth':
-                    $boost_amount = 0;
-                    if($bloodline_skill < ($base_stats * 0.4) && $this->rank > 2) {
-                        if($this->rank > 3 && $bloodline_skill > 750) {
-                            $boost_amount = 1;
-                        }
-                        $this->passive_boosts[$id]['progress'] = round($bloodline_skill / ($base_stats * 0.4), 2) * 100;
-                    }
-                    else {
-                        $boost_amount = $this->rank - 2;
-
-                        $extra_boost = $bloodline_skill / ($stats_max_level * 0.5);
-                        if($extra_boost > 0.99) {
-                            $boost_amount += 1;
-                        }
-                        else {
-                            $this->passive_boosts[$id]['progress'] = round($extra_boost, 2) * 100;
-                        }
-
-                    }
-                    $this->passive_boosts[$id]['effect_amount'] = $boost_amount;
-
-                    break;
-            }
+        if($this->combat_boosts) {
+            $this->combat_boosts = json_decode($this->combat_boosts, true);
         }
 
-
-        // (boosts are 50% at 1:2 offense:bl_skill)
-
-        foreach($this->combat_boosts as $id => $boost) {
-            $boost_power = floor($boost['power'] / 5);
-
-            $bloodline_skill = $user_bloodline_skill + 10;
-
-            switch($boost['effect']) {
-                case 'ninjutsu_boost':
-                case 'genjutsu_boost':
-                case 'taijutsu_boost':
-                    $skill_ratio = $this->skillRatio($boost, $user_bloodline_skill);
-
-                    $this->combat_boosts[$id]['power'] =
-                        round($boost_power * $skill_ratio * $ratios['offense_boost'], 3);
-                    break;
-
-                case 'ninjutsu_resist':
-                case 'genjutsu_resist':
-                case 'taijutsu_resist':
-                    $boost_type = explode('_', $boost['effect'])[0];
-                    $skill_ratio = $this->skillRatio($boost, $user_bloodline_skill);
-
-                    // Est. jutsu power
-                    $skill = $bloodline_skill + $this->{$boost_type . '_skill'};
-                    $jutsu_power = $this->rank;
-                    $jutsu_power += round($skill / $stats_max_level, 3);
-                    if($jutsu_power > $this->rank + 1) {
-                        $jutsu_power = $this->rank + 1;
-                    }
-
-                    $multiplier = $jutsu_power;
-
-                    $this->combat_boosts[$id]['power'] =
-                        round($boost_power * $multiplier * $skill_ratio * $ratios['defense_boost'], 3);
-                    break;
-
-                case 'speed_boost':
-                case 'cast_speed_boost':
-                    $this->combat_boosts[$id]['power'] = round($boost_power * $ratios['speed_boost'], 3);
-                    break;
-
-                case 'intelligence_boost':
-                case 'willpower_boost':
-                    $this->combat_boosts[$id]['power'] = round($boost_power * $ratios['mental_boost'], 3);
-                    break;
-
-                // (NEEDS TESTING/ADJUSTMENT)
-                case 'heal':
-                    // Est. jutsu power
-                    $skill = $bloodline_skill;
-                    $jutsu_power = $this->rank;
-                    $jutsu_power += round($skill / $stats_max_level, 3);
-                    if($jutsu_power > $this->rank + 1) {
-                        $jutsu_power = $this->rank + 1;
-                    }
-                    $stat_multiplier = 35 * $jutsu_power; /* est jutsu power */
-
-                    // Defensive power
-                    $defense = 50 + ($total_stats * 0.01);
-
-                    $this->combat_boosts[$id]['power'] =
-                        round($boost_power * $stat_multiplier * $ratios['heal'] / $defense, 3);
-                    $this->combat_boosts[$id]['divider'] = $defense;
-
-                    break;
-            }
-
-            $this->combat_boosts[$id]['effect_amount'] = round($this->combat_boosts[$id]['power'] * $bloodline_skill, 3);
-        }
-
-    }
-
-    private function skillRatio($boost, int $bloodline_skill): float {
-        $bloodline_skill += 10;
-
-        $boost_type = explode('_', $boost['effect'])[0];
-        $skill_ratio = round($this->{$boost_type . '_skill'} / $bloodline_skill, 3);
-        if($skill_ratio > 1.0) {
-            $skill_ratio = 1.0;
-        }
-        else if($skill_ratio < 0.55) {
-            $skill_ratio = 0.55;
-        }
-        return $skill_ratio;
     }
 }
