@@ -88,7 +88,7 @@ class Battle {
     const TYPE_AI_RANKUP = 6;
 
     const TURN_LENGTH = 40;
-    const PREP_LENGTH = 25;
+    const PREP_LENGTH = 20;
 
     const MAX_PRE_FIGHT_HEAL_PERCENT = 85;
 
@@ -213,7 +213,7 @@ class Battle {
                 {$battle_type},
                 '$player1->id',
                 '$player2->id',
-                " . (time() + self::TURN_LENGTH) . ",
+                " . (time() + self::PREP_LENGTH) . ",
                 " . time() . ",
                 {$player1->health},
                 {$player2->health},
