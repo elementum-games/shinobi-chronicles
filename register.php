@@ -28,7 +28,6 @@ if(!$system->register_open) {
 $min_user_name_length = User::MIN_NAME_LENGTH;
 $max_user_name_length = 18;
 $min_password_length = User::MIN_PASSWORD_LENGTH;
-$bad_domains = ['hotmail.com', 'live.com', 'msn.com', 'outlook.com'];
 
 if(isset($_GET['act'])) {
     if($_GET['act'] == 'verify') {
@@ -178,8 +177,8 @@ if($_POST['register']) {
         $email_arr = explode('@', $email);
         $email_arr[1] = strtolower($email_arr[1]);
 
-        if(array_search($email_arr[1], $bad_domains) !== false) {
-            throw new Exception(implode(' / ', $bad_domains) . " emails are currently not supported!");
+        if(array_search($email_arr[1], System::UNSERVICALBE_EMAIL_DOMAINS) !== false) {
+            throw new Exception(implode(' / ', System::UNSERVICALBE_EMAIL_DOMAINS) . " emails are currently not supported!");
         }
 
         // Check for username/email existing
@@ -281,7 +280,7 @@ if(!$register_ok) {
 			<br />
 		<label for='email'>Email</label>
 			<input type='text' name='email' value='$email' /><br />
-			<span style='font-style:italic;font-size:0.9em;'>(Note: Currently we cannot send emails to addresses from: " . implode(', ', $bad_domains) . ")</span>
+			<span style='font-style:italic;font-size:0.9em;'>(Note: Currently we cannot send emails to addresses from: " . implode(', ', System::UNSERVICALBE_EMAIL_DOMAINS) . ")</span>
 			<br />
 			<br />
 		<label for='gender'>Gender</label><br />";
