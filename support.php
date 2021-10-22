@@ -21,6 +21,7 @@ if(isset($_SESSION['user_id'])) {
 
 $supportSystem = new SupportManager($system, $user_id);
 $request_types = $supportSystem->getSupportTypes($staff_level);
+$supportCreated = false;
 
 require($layout);
 
@@ -63,6 +64,25 @@ if(!$guest_support) {
             if($supportSystem->createSupport($player->current_ip, '', $request_type, $subject, $message,
                     $user_id, $player->user_name)) {
                 $system->message("Support Submitted!");
+            }
+        }catch (Exception $e) {
+            $system->message($e->getMessage());
+        }
+    }
+    if(isset($_POST['add_guest_support'])){
+        try {
+            $support_key = $system->clean($_POST['support_key']);
+
+            $support_id = $supportSystem->getSupportIdByKey($support_key);
+
+            if(!$support_id) {
+                throw new Exception("Support not found!");
+            }
+
+            if($supportSystem->assignGuestSupportToUser($support_id)) {
+                $system->message("Support assigned to account!");
+            } else {
+                $system->message("Error adding support to account or support already assigned!");
             }
         }catch (Exception $e) {
             $system->message($e->getMessage());
@@ -205,6 +225,110 @@ if(!$guest_support) {
         echo "<script type='text/javascript'>countdownTimer($time_remaining, 'logoutTimer');</script>";
     }
 } else {
+    // Get support data
+    if(isset($_GET['support_key'])) {
+        $support_key = $system->clean($_GET['support_key']);
+        $supportData = $supportSystem->fetchSupportByKey($support_key);
+
+        if(!$supportData) {
+            $system->message("Support not found!");
+        }else {
+            $responses = $supportSystem->fetchSupportResponses($supportData['support_id']);
+        }
+    }
+
+    // Add guest support
+    if(isset($_POST['add_support'])) {
+        try {
+            $subject = $system->clean($_POST['subject']);
+            $subjectLength = strlen($subject);
+            $email = $system->clean($_POST['email']);
+            $support_type = $system->clean($_POST['support_type']);
+            $name = $system->clean($_POST['name']);
+            $message = $system->clean($_POST['message']);
+            $messageLength = strlen($message);
+            $support_key = sha1(mt_rand(0, 255384));
+
+            // Name validation
+            if($name == '') {
+                throw new Exception("You must enter your name or display name.");
+            }
+            if(strlen($name) < 3) {
+                throw new Exception("Your name must be at least 3 characters long.");
+            }
+            if(strlen($name) > 75) {
+                throw new Exception("Your name may not exceed 75 characters. Please shorten or use a nick name.");
+            }
+            // Email validation
+            if(!filter_var($_POST['email'], FILTER_VALIDATE_EMAIL)) {
+                throw new Exception("You must provide a valid email!");
+            }
+            if(in_array(strtolower(explode('@', $email)[1]), System::UNSERVICALBE_EMAIL_DOMAINS)) {
+                throw new Exception("We are currently unable to support " .
+                    implode(' / ', System::UNSERVICALBE_EMAIL_DOMAINS) . " email types.");
+            }
+            // Subject validation
+            if($subjectLength < SupportManager::$validationConstraints['subject']['min']) {
+                throw new Exception("Subject must be at least " . SupportManager::$validationConstraints['subject']['min']
+                 . " characters long.");
+            }
+            if($subjectLength > SupportManager::$validationConstraints['subject']['max']) {
+                throw new Exception("Subject may not exceed " . SupportManager::$validationConstraints['subject']['max']
+                . " characters.");
+            }
+            // Message validation
+            if($messageLength < SupportManager::$validationConstraints['message']['min']) {
+                throw new Exception("Details must be at least " . SupportManager::$validationConstraints['message']['min']
+                    . " characters long.");
+            }
+            if($messageLength > SupportManager::$validationConstraints['message']['max']) {
+                throw new Exception("Details may not exceed " . SupportManager::$validationConstraints['message']['max']
+                    . " characters.");
+            }
+
+            // Create support
+            if($supportSystem->createSupport($_SERVER['REMOTE_ADDR'], $email, $support_type, $subject, $message, 0, $name, $support_key)) {
+                $supportCreated = true;
+            } else {
+                $system->message("Error creating support.");
+            }
+        }catch(Exception $e) {
+            $system->message($e->getMessage());
+        }
+    }
+    // Add guest response
+    if(isset($_POST['add_response'])) {
+        try {
+            $message = $system->clean($_POST['message']);
+
+            // Message validation
+            if(strlen($message) < SupportManager::$validationConstraints['message']['min']) {
+                throw new Exception("Response must be at least " . SupportManager::$validationConstraints['message']['min'] . " characters.");
+            }
+            if(strlen($message) > SupportManager::$validationConstraints['message']['max']) {
+                throw new Exception("Response may not exceed " . SupportManager::$validationConstraints['message']['max'] . " characters.");
+            }
+
+            if(!isset($supportData) || !$supportData) {
+                throw new Exception("Support not found!");
+            }
+
+            if($supportSystem->addSupportResponses($supportData['support_id'], 0, $supportData['user_name'], $message, $_SERVER['REMOTE_ADDR'])) {
+                $system->message("Response added!");
+                $responses = $supportSystem->fetchSupportResponses($supportData['support_id']);
+            } else {
+                throw new Exception("Error adding response!");
+            }
+        }catch (Exception $e) {
+            $system->message($e->getMessage());
+        }
+    }
+
+    // Print system message
+    if($system->message != '' && !$system->message_displayed) {
+        $system->printMessage();
+    }
+    require('templates/guestSupport.php');
 
     echo $login_menu;
 }

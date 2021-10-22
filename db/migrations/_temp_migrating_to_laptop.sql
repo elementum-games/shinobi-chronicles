@@ -7,7 +7,7 @@ START TRANSACTION;
 CREATE TABLE `support_request` (
   `support_id` INT PRIMARY KEY AUTO_INCREMENT,
   `support_type` VARCHAR(75),
-  `guest_ticket` INT(1) NULL,
+  `support_key` VARCHAR(75),
   `user_id` INT,
   `user_name` VARCHAR(40),
   `email` VARCHAR(100),

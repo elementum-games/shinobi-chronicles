@@ -66,6 +66,9 @@
         <tr>
             <td>
                 <label style="width:8em; font-weight:bold;">Submitted By:</label><?=$supportData['user_name']?><br />
+                <?=($supportData['user_id'] == 0 && isset($supportData['support_key']))
+                    ? "<label style='width:8em; font-weight:bold;'>Support Key:</label>{$supportData['support_key']}<br />"
+                    : "" ?>
                 <label style="width:8em; font-weight:bold;">Type:</label><?=$supportData['support_type']?><br />
                 <label style="width:8em; font-weight:bold;">Assigned To:</label>
                     <?=($supportData['admin_name'] == '') ? 'Not Assigned' : $supportData['admin_name']?><br />

@@ -60,11 +60,11 @@
     <?php if(!$responses): ?>
         <tr style="text-align:center;"><td>No responses!</td></tr>
     <?php else: ?>
-        <?php foreach($responses as $response): ?>
+        <?php foreach($responses as $pos=>$response): ?>
             <tr onclick="toggleDetails(<?=$response['response_id']?>)" style="cursor: pointer;">
                 <th><?=$response['user_name']?> - <?=strftime(SupportManager::$strfString, $response['time'])?></th>
             </tr>
-            <tr id="<?=$response['response_id']?>" class="response" style="display:none;"><td>
+            <tr id="<?=$response['response_id']?>" class="response" style="display:<?=($pos == 0 ? 'table-row' : 'none')?>"><td>
                 <div class="support_detail"><p><?=$response['message']?></p></div>
             </td></tr>
         <?php endforeach ?>

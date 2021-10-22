@@ -150,7 +150,7 @@ class SupportManager {
      * @param null   $supportkey
      * @return bool
      */
-    public function createSupport($ip_address, $email, $type, $subject, $details, $user_id, $name, $supportkey = null
+    public function createSupport($ip_address, $email, $type, $subject, $details, $user_id, $name, $support_key = null
     ) {
         $this->system->query("INSERT INTO `support_request`
             (
@@ -166,7 +166,8 @@ class SupportManager {
               `admin_response`,
               `assigned_to`,
               `admin_respond_by`,
-              `user_name`
+              `user_name`,
+              `support_key`
             )
         VALUES
             (
@@ -182,7 +183,8 @@ class SupportManager {
               '0',
               '0',
               '0',
-              '{$name}'
+              '{$name}',
+              '{$support_key}'
             )
         ");
 
@@ -218,7 +220,7 @@ class SupportManager {
      * @return bool|mixed
      */
     public function fetchSupportByKey($key) {
-        $result = $this->supportSearch(['supportkey' => $key], 1, ['created' => 'DESC']);
+        $result = $this->supportSearch(['support_key' => $key], 1, ['time' => 'DESC']);
         return ($result ? $result[0] : false);
     }
 
@@ -428,6 +430,23 @@ class SupportManager {
         }
     }
 
+    public function assignGuestSupportToUser($support_id) {
+        $data = $this->supportSearch(['support_id'=>$support_id], 1, ['time'=>'DESC'])[0];
+
+        if(!$data) {
+            return false;
+        }
+        if($data['user_id'] != 0) {
+            //return false;
+        }
+
+        if($this->system->query("UPDATE `support_request` SET `user_id`='{$this->user_id}' WHERE `support_id`='{$support_id}' LIMIT 1")) {
+            $this->addSupportResponses($support_id, $this->user_id, $data['user_name'], "Added to my account.", $_SERVER['REMOTE_ADDR']);
+            return true;
+        }
+        return false;
+    }
+
     /**
      *
      *
@@ -553,7 +572,7 @@ class SupportManager {
      */
     public function fetchSupportResponses($support_id) {
         $result = $this->system->query("SELECT * FROM `support_request_responses` 
-            WHERE `support_id`='{$support_id}' ORDER BY `time` ASC");
+            WHERE `support_id`='{$support_id}' ORDER BY `time` DESC");
         if($this->system->db_last_num_rows) {
             $responses = [];
             while($row = $this->system->db_fetch($result)) {
@@ -570,9 +589,9 @@ class SupportManager {
      * @return bool|mixed
      */
     public function getSupportIdByKey($support_key) {
-        $result = $this->system->query("SELECT `id` FROM `Supports` WHERE `supportkey`='{$support_key}' ORDER BY `created` DESC LIMIT 1");
-        if($this->system->db_num_rows) {
-            return ($this->system->dbFetch($result)['id']);
+        $result = $this->system->query("SELECT `support_id` FROM `support_request` WHERE `support_key`='{$support_key}' ORDER BY `time` DESC LIMIT 1");
+        if($this->system->db_last_num_rows) {
+            return ($this->system->db_fetch($result)['support_id']);
         }
         return false;
     }

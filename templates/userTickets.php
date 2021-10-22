@@ -7,6 +7,13 @@
 
 <table class="table" style="table-layout:auto;">
     <tr><th colspan="5">My Support Requests</th></tr>
+    <tr style="text-align:center;"><td colspan="5">
+        <form action="<?=$self_link?>" method="post">
+            Add Guest Support to my account<br />
+            Support Key:<input type="text" name="support_key" />
+            <input type="submit" name="add_guest_support" value="Add" />
+        </form>
+    </td></tr>
     <tr>
         <th style="width:45%;">Subject</th>
         <th style="width:20%;">Date</th>
