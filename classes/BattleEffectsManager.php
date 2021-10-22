@@ -352,7 +352,7 @@ class BattleEffectsManager {
     }
     
     public function applyActiveEffect(Fighter $target, Fighter $attacker, BattleEffect $effect): bool {
-        if($target->health <= 0 || $attacker->health <= 0) {
+        if($target->health <= 0) {
             return false;
         }
 
