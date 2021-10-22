@@ -11,6 +11,8 @@ class Bloodline {
     const RANK_ELITE = 2;
     const RANK_LEGENDARY = 1;
 
+    const BASE_BLOODLINE_SKILL = 100;
+
     public static array $public_ranks = [
         self::RANK_LEGENDARY => 'Legendary',
         self::RANK_ELITE  => 'Elite',
@@ -159,7 +161,7 @@ class Bloodline {
         foreach($this->passive_boosts as $id => $boost) {
             $boost_power = floor($boost['power'] / 5);
 
-            $bloodline_skill = $user_bloodline_skill + 100;
+            $bloodline_skill = $user_bloodline_skill + self::BASE_BLOODLINE_SKILL;
 
             switch($boost['effect']) {
                 case 'regen':
@@ -204,7 +206,7 @@ class Bloodline {
         foreach($this->combat_boosts as $id => $boost) {
             $boost_power = floor($boost['power'] / 5);
 
-            $bloodline_skill = $user_bloodline_skill + 10;
+            $bloodline_skill = $user_bloodline_skill + self::BASE_BLOODLINE_SKILL;
             $jutsu_type_skill = 10;
 
             switch($boost['effect']) {
