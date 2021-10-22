@@ -264,13 +264,9 @@ class BattleEffectsManager {
     /**
      * @param Fighter $player1
      * @param Fighter $player2
-     * @param bool    $effect_win
      * @throws Exception
      */
-    public function applyActiveEffects(
-        Fighter $player1, Fighter $player2,
-        bool &$effect_win
-    ) {
+    public function applyActiveEffects(Fighter $player1, Fighter $player2) {
         if(!empty($this->active_effects)) {
             foreach($this->active_effects as $id => $effect) {
                 if($effect->target == $player1->combat_id) {
@@ -296,8 +292,7 @@ class BattleEffectsManager {
                 $this->applyActiveEffect(
                     $effect_target,
                     $effect_user,
-                    $effect,
-                    $effect_win
+                    $effect
                 );
 
                 $this->active_effects[$id]->turns--;
@@ -320,7 +315,7 @@ class BattleEffectsManager {
                 else {
                     $effect_user =& $player2;
                 }
-                $this->applyActiveEffect($effect_target, $effect_user, $genjutsu, $effect_win);
+                $this->applyActiveEffect($effect_target, $effect_user, $genjutsu);
                 $this->active_genjutsu[$id]->turns--;
                 $this->active_genjutsu[$id]->power *= 0.9;
                 if($this->active_genjutsu[$id]->turns <= 0) {
@@ -350,17 +345,17 @@ class BattleEffectsManager {
                         $effect['effect'],
                         $effect['effect_amount'],
                         Jutsu::TYPE_TAIJUTSU
-                    ),
-                    $effect_win
+                    )
                 );
             }
         }
     }
     
-    public function applyActiveEffect(Fighter $target, Fighter $attacker, BattleEffect $effect, &$winner): bool {
-        if($winner && $winner != $target->combat_id) {
+    public function applyActiveEffect(Fighter $target, Fighter $attacker, BattleEffect $effect): bool {
+        if($target->health <= 0 || $attacker->health <= 0) {
             return false;
         }
+
         if($effect->effect == 'residual_damage' || $effect->effect == 'bleed') {
             $damage = $target->calcDamageTaken($effect->effect_amount, $effect->effect_type, true);
             $this->addDisplay($target, $target->getName() . " takes $damage residual damage");
@@ -431,10 +426,8 @@ class BattleEffectsManager {
                 $attacker->stamina = $attacker->max_stamina;
             }
         }
-        if($target->health <= 0) {
-            $winner = $attacker->combat_id;
-        }
-        return false;
+
+        return true;
     }
 
     public function setBarrier(Fighter $fighter, Jutsu $fighter_jutsu) {

@@ -600,13 +600,8 @@ class Battle {
      * @throws Exception
      */
     public function runActions() {
-        $effect_win = false;
-
         // Run turn effects
-        $this->effects->applyActiveEffects(
-            $this->player1, $this->player2,
-            $effect_win
-        );
+        $this->effects->applyActiveEffects($this->player1, $this->player2);
 
         // Decrement cooldowns
         if(!empty($this->jutsu_cooldowns)) {
