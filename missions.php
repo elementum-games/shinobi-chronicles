@@ -211,6 +211,7 @@ function runActiveMission() {
 
                     $player->ai_losses++;
                     $player->battle_id = 0;
+					$player->moveToVillage();
                 }
                 else if($battle->isDraw()) {
                     echo "<table class='table'><tr><th>Battle Results</th></tr>
