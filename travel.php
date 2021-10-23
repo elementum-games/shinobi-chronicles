@@ -168,7 +168,11 @@ function travel() {
 	<tr><td colspan='5' style='text-align:center;'>";
 	if($player->mission_id) {
 		if($player->mission_stage['action_type'] == 'travel' or $player->mission_stage['action_type'] == 'search') {
-			if($player->location == $player->mission_stage['action_data']) {
+            $missionLocation = explode('.', $player->mission_stage['action_data']);
+            $missionX = $missionLocation[0];
+            $missionY = $missionLocation[1];
+
+			if($player->x == $missionX && $player->y == $missionY) {
 				echo "<a href='{$system->links['mission']}'><p class='button' style='margin-top:5px;'>Go to Mission Location</p></a><br />";
 			}
 		}
