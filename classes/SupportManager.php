@@ -48,6 +48,7 @@ class SupportManager {
     public static $strfString = '%m/%d/%y @ %I:%M';
 
     public static $changeStaffTime = 86400 * 3;
+    public static $autoClose = 86400 * 5;
 
     /** @var System $system */
     protected $system;
@@ -562,19 +563,17 @@ class SupportManager {
             throw new Exception("No authorization level!");
         }
 
-        if(!$support) {
+        if(!$support && !$inactive) {
             throw new Exception("Invalid support data!");
         }
-        if(!$support['open']) {
+        if(!$support['open'] && !$inactive) {
             throw new Exception("Support is already closed!");
         }
 
         $this->system->query("UPDATE `support_request` SET `open`=0 WHERE `support_id`={$support_id}");
         if($this->system->db_last_affected_rows) {
-            if($inactive && false) {
-                /*$this->addSupportResponses($support_id,
-                    System::$SYSTEM_USERID, 'System', "[Closed for inactivity]"
-                );*/
+            if($inactive) {
+                $this->addSupportResponses($support_id, 0, 'System', '[Closed for inactivity]', 0);
             }
             else {
                 $this->addSupportResponses($support_id,
@@ -642,18 +641,18 @@ class SupportManager {
     }
 
     public function autocloseSupports() {
-        $timeRequired = time() - (self::$autoCloseDays * 86400);
-        $result = $this->system->query("SELECT * FROM `Supports` 
-            WHERE `admin_response`='1' AND `updated`<'{$timeRequired}'");
+        $timeRequired = time() - (self::$autoClose);
+        $result = $this->system->query("SELECT * FROM `support_request` 
+            WHERE `admin_response`='1' AND `open`='1' AND `updated`<'{$timeRequired}'");
         $toClose = [];
-        if($this->system->db_num_rows) {
-            while($row = $this->system->dbFetch($result)) {
-                $toClose[] = $row['id'];
+        if($this->system->db_last_num_rows) {
+            while($row = $this->system->db_fetch($result)) {
+                $toClose[] = $row['support_id'];
             }
         }
 
         foreach($toClose as $key => $id) {
-            $this->closeSupport($id, true);
+            $this->closeSupport($id, 0, true);
         }
     }
 

@@ -676,6 +676,9 @@ function modPanel() {
         $next = 100;
         $previous = null;
 
+        // Auto close supports for user inactivity
+        $supportManager->autocloseSupports();
+
         $maxOffset = $supportManager->supportSearch(['open'=>'1'], false, ['updated'=>'DESC'], false, true);
         if($next > $maxOffset) {
             $next = $maxOffset - $limit;
