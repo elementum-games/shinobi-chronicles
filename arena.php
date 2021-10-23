@@ -16,12 +16,12 @@ function arena() {
         arenaFight();
 	}
 	else {
-		$result = $system->query("SELECT `ai_id`, `name`, `level` FROM `ai_opponents` 
+		$result = $system->query("SELECT `ai_id`, `name`, `level` FROM `ai_opponents`
 			WHERE `rank` ='$player->rank' ORDER BY `level` ASC");
 
 		// Addition by Kengetsu - Get access to AI if rank is higher than public max.
 		if($player->rank > System::SC_MAX_RANK) {
-			$result = $system->query("SELECT `ai_id`, `name`, `level` FROM `ai_opponents` 
+			$result = $system->query("SELECT `ai_id`, `name`, `level` FROM `ai_opponents`
 			WHERE `rank` ='" . System::SC_MAX_RANK . "' ORDER BY `level` ASC");
 		}
 		//End
@@ -178,7 +178,7 @@ function arenaFight(): bool {
                     $player->{$stat} += 1;
                     $player->exp += 10;
                     $stat_gain_display = '<br />During the fight you realized a way to use your ' . ucwords(explode('_', $stat)[0]) . ' a little
-						more effectively. 
+						more effectively.
 						<br />You have gained 1 ' . ucwords(str_replace('_', ' ', $stat)) . '.';
                 }
             }
@@ -216,7 +216,9 @@ function arenaFight(): bool {
             echo "<table class='table'><tr><th>Battle Results</th></tr>
 			<tr><td>You have been defeated.
 			</td></tr></table>";
+			$player->health = 5;
             $player->ai_losses++;
+			$player->moveToVillage();
             $player->battle_id = 0;
             $player->last_pvp = time();
 
@@ -231,9 +233,11 @@ function arenaFight(): bool {
             echo "<table class='table'><tr><th>Battle Results</th></tr>
 			<tr><td>The battle ended in a draw. You receive no reward.
 			</td></tr></table>";
+			$player->health = 5;
+			$player->moveToVillage();
             $player->battle_id = 0;
             $player->last_pvp = time();
-            
+
             // Daily Tasks
             foreach ($player->daily_tasks as $task) {
                 if (!$task->complete && $task->activity == DailyTask::ACTIVITY_ARENA && $task->sub_task == DailyTask::SUB_TASK_COMPLETE) {

@@ -9,6 +9,8 @@ class TestFighter extends Fighter {
     public string $name = 'test';
     public int $rank = 1;
 
+    public $id;
+
     public function getAvatarSize(): int {
         return 125;
     }
@@ -24,7 +26,11 @@ class TestFighter extends Fighter {
         return true;
     }
 
-    public function useJutsu(Jutsu $jutsu, $purchase_type) {
+    public function hasEquippedJutsu(int $jutsu_id): bool {
+        return true;
+    }
+
+    public function useJutsu(Jutsu $jutsu) {
 
     }
 
@@ -35,6 +41,8 @@ class TestFighter extends Fighter {
     public function updateData() {
 
     }
+
+
 }
 
 function calcDamage(Fighter $player1, Fighter $player2, Jutsu $player1_jutsu, Jutsu $player2_jutsu) {
