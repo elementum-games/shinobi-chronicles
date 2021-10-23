@@ -671,6 +671,15 @@ function modPanel() {
     else if ($view == 'support_requests') {
         require_once('classes/SupportManager.php');
         $supportManager = new SupportManager($system, $player->user_id, true);
+        $offset = 0;
+        $limit = 100;
+        $next = 100;
+        $previous = null;
+
+        $maxOffset = $supportManager->supportSearch(['open'=>'1'], false, ['updated'=>'DESC'], false, true);
+        if($next > $maxOffset) {
+            $next = $maxOffset - $limit;
+        }
 
         // Display variables
         $self_link .= '&view=support_requests';
@@ -682,6 +691,24 @@ function modPanel() {
         $category = 'awaiting_admin';
         if(isset($_GET['category'])) {
             $category = $system->clean($_GET['category']);
+            $self_link .= "&category={$category}";
+        }
+
+        // Pagination
+        if(isset($_GET['offset'])) {
+            $offset = $_GET['offset'];
+            if($offset > $maxOffset) {
+                $offset -= $limit;
+            }
+
+            $previous = $offset - 100;
+            if($previous < 0) {
+                $previous = 0;
+            }
+            $next = $offset + $limit;
+            if($next > $maxOffset) {
+                $next = $maxOffset - $limit;
+            }
         }
 
         if(isset($_POST)) {
@@ -758,7 +785,7 @@ function modPanel() {
         }
         //Only fetch all supports if a specific isn't selected
         else {
-            $supports = $supportManager->fetchAllSupports($category, $player->user_id);
+            $supports = $supportManager->fetchAllSupports($category, $player->user_id, $limit, $offset);
         }
 
         if(!$system->message_displayed) {

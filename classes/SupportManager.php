@@ -32,6 +32,19 @@ class SupportManager {
         'Mod Request' => 'SC_ADMINISTRATOR',
     ];
 
+    public static $requestPremiumCosts = [
+        'Game Question' => 1,
+        'Misc. Request' => 1,
+        'Appeal Ban' => 10,
+        'Account Problem' => 10,
+        'Report Staff Member' => 0,
+        'Content Text Issue' => 0,
+        'Balance Feedback' => 1,
+        'Suggestion' => 1,
+        'Report Bug' => 0,
+        'Mod Request' => 1,
+    ];
+
     public static $strfString = '%m/%d/%y @ %I:%M';
 
     public static $changeStaffTime = 86400 * 3;
@@ -150,7 +163,7 @@ class SupportManager {
      * @param null   $supportkey
      * @return bool
      */
-    public function createSupport($ip_address, $email, $type, $subject, $details, $user_id, $name, $support_key = null
+    public function createSupport($ip_address, $email, $type, $subject, $details, $user_id, $name, $premium = false, $support_key = null
     ) {
         $this->system->query("INSERT INTO `support_request`
             (
@@ -167,7 +180,8 @@ class SupportManager {
               `assigned_to`,
               `admin_respond_by`,
               `user_name`,
-              `support_key`
+              `support_key`,
+              `premium`
             )
         VALUES
             (
@@ -184,7 +198,8 @@ class SupportManager {
               '0',
               '0',
               '{$name}',
-              '{$support_key}'
+              '{$support_key}',
+              '{$premium}'
             )
         ");
 
@@ -283,13 +298,19 @@ class SupportManager {
         }
         $query .= " ORDER BY `updated` {$orderDirection} LIMIT {$offset},{$limit}";
 
-        $supports = [];
+        $supports = [
+            'prem_high' => [],
+            'high' => [],
+            'prem' => [],
+            'reg' => [],
+            'low' => []
+        ];
         $result = $this->system->query($query);
         while($row = $this->system->db_fetch($result)) {
-            $supports[] = $row;
+            $supports[self::getTypePriority($row['support_type'], $row['premium'])][] = $row;
         }
 
-        return $supports;
+        return array_merge($supports['prem_high'], $supports['high'], $supports['prem'], $supports['reg'], $supports['low']);
     }
 
     /**
@@ -430,6 +451,12 @@ class SupportManager {
         }
     }
 
+    /**
+     * @param $support_id
+     * @return bool
+     * Allows a user to assign their guest support to their account, should they want to follow up further
+     * through their account.
+     */
     public function assignGuestSupportToUser($support_id) {
         $data = $this->supportSearch(['support_id'=>$support_id], 1, ['time'=>'DESC'])[0];
 
@@ -563,6 +590,11 @@ class SupportManager {
         return false;
     }
 
+    /**
+     * @param $support_id
+     * @return bool
+     * Used to remove a staff member for inactivity to allow assignment of a new staff member
+     */
     public function removeStaffMember($support_id) {
         //Must be an admin connection
         if(!$this->admin) {
@@ -629,7 +661,7 @@ class SupportManager {
      * @param $type
      * @return string
      */
-    public static function getTypePriority($type) {
+    public static function getTypePriority($type, $premium = false) {
         switch($type) {
             case 'Account Problem':
             case 'Report Staff Member':
@@ -643,6 +675,12 @@ class SupportManager {
             default:
                 $priority = 'reg';
                 break;
+        }
+
+        if($priority == 'high' && $premium) {
+            $priority = 'prem_high';
+        } elseif($premium) {
+            $priority = 'prem';
         }
 
         return $priority;

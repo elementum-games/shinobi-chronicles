@@ -59,6 +59,13 @@
             <?php endif?>
         <?php endforeach ?>
     </table>
+    <div style="width:50%; margin:auto; text-align: center;">
+        <?php if(!is_null($previous) && $previous >= 0): ?>
+        <a href="<?=$self_link?>&offset=<?=$previous?>">Previous</a> |
+        <?php endif ?>
+        <?php if(!is_null($next) && $next != $maxOffset): ?>
+        <a href="<?=$self_link?>&offset=<?=$next?>">Next</a></div>
+        <?php endif ?>
 <?php else: ?>
     <script type="text/javascript" src="/scripts/supportScripts.js"></script>
     <table class="table">
@@ -67,6 +74,7 @@
         <tr>
             <td>
                 <label style="width:8em; font-weight:bold;">Submitted By:</label><?=$supportData['user_name']?><br />
+                <label style="width:8em; font-weight:bold;">Premium:</label><?=($supportData['premium'] ? 'Yes' : 'No')?><br />
                 <?=($supportData['user_id'] == 0 && isset($supportData['support_key']))
                     ? "<label style='width:8em; font-weight:bold;'>Support Key:</label>{$supportData['support_key']}<br />"
                     : "" ?>

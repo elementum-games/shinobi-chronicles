@@ -6,39 +6,26 @@
  * @var array $request_types
  */
 ?>
-<style type="text/css">
-    form label {
-        display: inline-block;
-        width: 8em;
-
-        font-weight: bold;
-    }
-    form input[type=text], select{
-        width: 250px;
-    }
-    form textarea {
-        margin-left: 8em;
-        width: 500px;
-        height: 350px;
-    }
-    form input[type=submit] {
-        margin: 3px;
-    }
-</style>
 
 <table class='table'>
     <tr><th>New Support Request</th></tr>
     <tr><td>
         <form action="<?=$self_link?>" method="post">
-            <label>Subject:</label><input type="text" name="subject" /><br />
-            <label>Request Type:</label><select name="support_type">
+            <label style="width:8em; font-weight:bold;">Subject:</label><input type="text" name="subject" /><br />
+            <label style="width:8em; font-weight:bold;">Request Type:</label><select name="support_type">
                 <?php foreach($request_types as $type): ?>
                     <option value="<?=$type?>"><?=$type?></option>
                 <?php endforeach ?>
             </select><br />
-            <label>Content:</label><br />
-            <textarea name="message"></textarea><br />
+            <label style="width:8em; font-weight:bold;">Content:</label><br />
+            <textarea name="message" style="display:inline-block; width:500px;height:200px;margin-left:8em;"></textarea><br />
+            <br />
             <input type="submit" name="add_support" value="Submit Ticket" />
+            <input type="submit" name="add_support_prem" value="Submit Premium Ticket*" /><br />
+            <br />
+            *You may submit a premium ticket at the cost AK to give your support higher priority. Account related issues
+            cost 10AK each, all other supports are 1AK each. Bug reports, reporting staff members, etc., are not available
+            for premium supports, they will be submitted at normal priority at no cost.
         </form>
     </td></tr>
 </table>

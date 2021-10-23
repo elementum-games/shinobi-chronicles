@@ -32,13 +32,16 @@ echo str_replace("[HEADER_TITLE]", "Support", $body_start);
 
 if(!$guest_support) {
     //Form submitted
-    if(isset($_POST['add_support'])) {
+    if(isset($_POST['add_support']) || isset($_POST['add_support_prem']) || isset($_POST['confirm_prem_support'])) {
         try {
+            $addSupport = true;
             $request_type = $system->clean($_POST['support_type']);
             $subject = $system->clean($_POST['subject']);
             $subjectLength = strlen($subject);
             $message = $system->clean($_POST['message']);
             $messageLength = strlen($message);
+            $cost = (isset(SupportManager::$requestPremiumCosts[$request_type]) ? SupportManager::$requestPremiumCosts[$request_type] : 0);
+            $premium = ($cost > 0) ? 1 : 0;
 
             // Validate support
             if (!in_array($request_type, $request_types)) {
@@ -61,9 +64,26 @@ if(!$guest_support) {
                     SupportManager::$validationConstraints['message']['max'] . " characters!");
             }
 
-            if($supportSystem->createSupport($player->current_ip, '', $request_type, $subject, $message,
-                    $user_id, $player->user_name)) {
-                $system->message("Support Submitted!");
+            // Premium cost
+            if ($_POST['confirm_prem_support'] && $player->premium_credits < $cost) {
+                throw new Exception("You need {$cost}AK for this request.");
+            } else {
+                $player->premium_credits -= $cost;
+                $player->updateData();
+            }
+
+            if(isset($_POST['add_support_prem']) && $cost != 0) {
+                require('templates/premiumSupportConfirmation.php');
+                $addSupport = false; //Confirmation required
+            }
+
+            // Add support
+            if($addSupport) {
+                if ($supportSystem->createSupport($player->current_ip, '', $request_type, $subject, $message,
+                    $user_id, $player->user_name, $premium)
+                ) {
+                    $system->message("Support Submitted!");
+                }
             }
         }catch (Exception $e) {
             $system->message($e->getMessage());
