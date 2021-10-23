@@ -289,6 +289,16 @@ if(!$guest_support) {
             // Create support
             if($supportSystem->createSupport($_SERVER['REMOTE_ADDR'], $email, $support_type, $subject, $message, 0, $name, $support_key)) {
                 $supportCreated = true;
+                // Send email to user
+                $subject = "Shinobi-Chronicles support request";
+                $message = "Thank you for submitting your support. Click the link below to access your support: \r\n" .
+                    "{$system->link}support.php?support_key={$support_key} \r\n" .
+                    "If the link does not work, your support key is: {$support_key}";
+                $headers = "From: Shinobi-Chronicles<admin@shinobi-chronicles.com>" . "\r\n";
+                $headers .= "Reply-To: no-reply@shinobi-chronicles.com" . "\r\n";
+                if(!mail($email, $subject, $message, $headers)) {
+                    $system->message("Email failed to send! Make sure you save your support key somewhere!");
+                }
             } else {
                 $system->message("Error creating support.");
             }

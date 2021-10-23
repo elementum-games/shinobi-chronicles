@@ -60,6 +60,7 @@
         <?php endforeach ?>
     </table>
 <?php else: ?>
+    <script type="text/javascript" src="/scripts/supportScripts.js"></script>
     <table class="table">
         <?php if($supportData !== false && $supportManager->hasPermission($player->staff_level, $supportData['support_type'])): ?>
         <tr><th><?=$supportData['subject']?></th></tr>
@@ -91,9 +92,10 @@
             </td>
         </tr>
         <?php if(!empty($supportResponses)): ?>
-            <?php foreach($supportResponses as $response): ?>
-                <tr><th><?=$response['user_name']?> - <?=strftime(SupportManager::$strfString, $response['time'])?></th></tr>
-                <tr><td><div style="margin-left:8em; white-space:pre-wrap"><?=$response['message']?></div></td></tr>
+            <tr><th>Responses - <a onclick="showAll()" style="cursor: pointer;"><em>Show All</em></a></th></tr>
+            <?php foreach($supportResponses as $pos=>$response): ?>
+                <tr onclick="toggleDetails(<?=$response['response_id']?>)" style="cursor: pointer;"><th><?=$response['user_name']?> - <?=strftime(SupportManager::$strfString, $response['time'])?></th></tr>
+                <tr id="<?=$response['response_id']?>" class="response" style="display:<?=($pos==0 ? 'table-row' : 'none')?>;"><td><div style="margin-left:8em; white-space:pre-wrap"><?=$response['message']?></div></td></tr>
             <?php endforeach ?>
         <?php endif ?>
         </table>

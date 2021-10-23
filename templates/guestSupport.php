@@ -3,6 +3,7 @@
  * @var System $system
  * @var SupportManager $supportManager
  * @var array $request_types
+ * @var array $responses
  * @var bool $supportCreated
  * @var string $support_key
  */
@@ -18,22 +19,29 @@
         </td></tr>
     </table>
 <?php endif ?>
-<?php if(!isset($_GET['support_key'])): ?>
+<?php if(!isset($_GET['support_key']) && !$supportCreated): ?>
 <table class="table">
-    <tr><th>Submit a Support</th></tr>
+    <tr><th>Shinobi Chronicles Support System</th></tr>
     <tr><td>
         Welcome to Shinobi Chronicles Support. We are happy to help you, whether you are looking to have your questions
             answered before joining or are having issues accessing the site after signing up. Please note that you must
             provide a valid email to submit a support as a guest. We will notify you of updates to your support through
             email.<br />
         <br />
-        We are currently unable to service the following email domains: <?= implode(', ', System::UNSERVICALBE_EMAIL_DOMAINS) ?><br />
+        We are currently unable to service the following email domains: <?= implode(', ', System::UNSERVICALBE_EMAIL_DOMAINS) ?>
+        </td></tr>
+        <tr><th>Access an Ongoing Support</th></tr>
+        <tr><td>
+        If you already have submitted a support, you may enter the support key below to respond to staff replies or provide
+            updated information if a staff member has yet to respond.<br />
             <br />
         <form action="<?=$system->link?>support.php" method="get">
             Support Key: <input type="text" name="support_key" />
             <input type="submit" value="Search"/>
         </form>
-        <hr />
+        </td></tr>
+        <tr><th>Submit a new Support</th></tr>
+        <tr><td>
         <form action="<?=$system->link?>support.php" method="post">
             <label style="width:8em; font-weight:bold;">Name:</label><input type="text" name="name" /><br />
             <label style="width:8em; font-weight:bold;">Subject:</label><input type="text" name="subject" /><br />
@@ -49,7 +57,8 @@
         </form>
     </td></tr>
 </table>
-<?php else: ?>
+<?php elseif(isset($_GET['support_key'])): ?>
+<script type="text/javascript" src="/scripts/supportScripts.js"></script>
 <table class="table">
     <?php if(!$supportData): ?>
         <tr><td>Support not found!</td></tr>
@@ -65,9 +74,10 @@
         </td></tr>
     <?php endif ?>
     <?php if($responses && !empty($responses)): ?>
-        <?php foreach($responses as $response): ?>
-            <tr><th><?=$response['user_name']?> - <?= strftime(SupportManager::$strfString, $response['time'])?></th></tr>
-            <tr><td><?=$response['message']?></td></tr>
+        <tr><th>Responses - <a onclick="showAll()" style="cursor: pointer;"><em>Show All</em></a></th></tr>
+        <?php foreach($responses as $pos=>$response): ?>
+            <tr onclick="toggleDetails(<?=$response['response_id']?>)" style="cursor: pointer;"><th><?=$response['user_name']?> - <?= strftime(SupportManager::$strfString, $response['time'])?></th></tr>
+            <tr id="<?=$response['response_id']?>" class="response" style="display:<?=($pos==0 ? 'table-row' : 'none')?>;"><td><?=$response['message']?></td></tr>
         <?php endforeach ?>
     <?php endif ?>
 </table>

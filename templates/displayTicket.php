@@ -4,57 +4,20 @@
  * @var array $responses
  */
 ?>
-
-<script type="text/javascript">
-    function toggleDetails(id) {
-        var rowID='#'+id;
-        $(rowID).toggle();
-    }
-    function showAll() {
-        $('.response').show();
-    }
-</script>
-
-<style type="text/css">
-    table label {
-        widtH: 8em;
-        font-weight:bold;
-    }
-
-    table .support_detail {
-        width: 75%;
-        margin: 0 auto 0 auto;
-        padding: 3px;
-        white-space:pre-wrap;
-    }
-    table .support_detail p {
-        margin: 2px 0 2px 5px;
-    }
-
-    form textarea {
-        width: 475px;
-        height: 200px;
-    }
-    form input {
-        margin-top: 3px;
-        margin-bottom: 3px;
-    }
-</style>
-
+<script type="text/javascript" src="/scripts/supportScripts.js"></script>
 <table class="table">
     <tr><th><?=$support['subject']?></th></tr>
     <tr><td>
-        <label>Support Type:</label><?=$support['support_type']?><br />
-        <label>Submitted:</label><?= strftime(SupportManager::$strfString, $support['time']) ?><br />
-        <label>Status:</label><?= ($support['open'] ? 'Open' : 'Closed') ?><br />
+        <label style="width:8em; font-weight:bold;">Support Type:</label><?=$support['support_type']?><br />
+        <label style="width:8em; font-weight:bold;">Submitted:</label><?= strftime(SupportManager::$strfString, $support['time']) ?><br />
+        <label style="width:8em; font-weight:bold;">Status:</label><?= ($support['open'] ? 'Open' : 'Closed') ?><br />
         <?php if($support['assigned_to'] != ''): ?>
-            <label>Assigned To:</label><?=$support['admin_name']?><br />
+            <label style="width:8em; font-weight:bold;">Assigned To:</label><?=$support['admin_name']?><br />
         <?php endif ?>
         <?php if($support['time'] != $support['updated']): ?>
-            <label>Last Updated:</label><?= strftime(SupportManager::$strfString, $support['updated']) ?><br />
+            <label style="width:8em; font-weight:bold;">Last Updated:</label><?= strftime(SupportManager::$strfString, $support['updated']) ?><br />
         <?php endif ?>
-        <label>Details:</label><br />
-        <div class="support_detail"><p><?=$support['message']?></p></div>
+        <label style="width:8em; font-weight:bold;">Details:</label><div style="white-space:pre-wrap; display:inline-block;"><?=$support['message']?></div>
     </td></tr>
     <tr><th>Responses - <em><a onclick="showAll()" style="cursor: pointer;">Show All</a></em></th></tr>
     <?php if(!$responses): ?>

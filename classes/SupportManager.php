@@ -475,6 +475,19 @@ class SupportManager {
                 . $this->system->link . "support.php?support_id=" . $support_id, $staff_level);
             }
         }
+        // Email if ticket submitted by guest
+        if($support_data['user_id'] == 0) {
+            // Make sure a name/administrator is placed in email
+            $admin_name = ($admin_name == '') ? 'Administrator' : $admin_name;
+
+            $subject = "Shinobi-Chronicles support request updated";
+            $message = "Your support was updated by {$admin_name}. Click the link below to access your support: \r\n" .
+                "{$this->system->link}support.php?support_key={$support_data['support_key']} \r\n" .
+                "If the link does not work, your support key is: {$support_data['support_key']}";
+            $headers = "From: Shinobi-Chronicles<admin@shinobi-chronicles.com>" . "\r\n";
+            $headers .= "Reply-To: no-reply@shinobi-chronicles.com" . "\r\n";
+            mail($support_data['email'], $subject, $message, $headers);
+        }
 
         $query = "UPDATE `support_request` SET `updated`='" . time() . "',
             `admin_response`='{$this->admin}'";
