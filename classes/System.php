@@ -811,6 +811,10 @@ class System {
     public function getKunaiPacks(): array {
         $kunai_packs = [
             [
+                'cost' => 5,
+                'bonus' => 0
+            ],
+            [
                 'cost' => 10,
                 'bonus' => 0
             ],

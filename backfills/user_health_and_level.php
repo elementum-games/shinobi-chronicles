@@ -8,6 +8,8 @@ require __DIR__ . '/../authenticate_admin.php';
  *
  */
 
+$system->log('backfill', 'user_health_and_level', "ran by {$user->user_name} ({$user->user_id})");
+
 $rankManager = new RankManager($system);
 $rankManager->loadRanks();
 

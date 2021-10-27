@@ -226,6 +226,7 @@ function gear() {
 		}
 
 		echo "<a href='$self_link&use_item=$id'><span class='button' style='min-width:8em;'>" . $item['name'] . '<br />';
+		echo "<span style='font-weight:normal;'>Amount: {$item['quantity']}</span><br/>";
 		if($item['effect'] == 'heal') {
 			echo "<span style='font-weight:normal;'>(Heal " . $item['effect_amount'] . " HP)</span></span></a><br />";
 		}

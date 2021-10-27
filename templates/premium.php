@@ -444,7 +444,7 @@
             display: inline-block;
             box-sizing: border-box;
 
-            margin: 20px 25px;
+            margin: 20px;
             padding: 5px 5px 10px;
             width: 185px;
             min-height: 60px;
