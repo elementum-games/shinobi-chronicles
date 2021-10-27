@@ -958,9 +958,7 @@ class Battle {
             $health_percent = round(($player->health / $player->max_health) * 100);
             $chakra_percent = round(($player->chakra / $player->max_chakra) * 100);
             $stamina_percent = round(($player->stamina / $player->max_stamina) * 100);
-            $avatar_size = $player->getAvatarSize() . 'px';
-        echo "<td>
-        <img src='{$player->avatar_link}' style='display:block;max-width:$avatar_size;max-height:$avatar_size;margin:auto;' />
+        echo "<td valign='top'>" . $this->system->imageCheck($player->avatar_link, $player->getAvatarSize()) . "<br />
         <label style='width:80px;'>Health:</label>" .
                 sprintf("%.2f", $player->health) . '/' . sprintf("%.2f", $player->max_health) . "<br />" .
                 "<div style='height:6px;width:250px;border-style:solid;border-width:1px;'>" .
@@ -976,14 +974,11 @@ class Battle {
                 "<div style='background-color:#00B000;height:6px;width:" . $stamina_percent . "%;' /></div>" . "</div>" .
                 "</td>";
             }
-	             echo "<td>";
+	             echo "<td valign='top'>" . $this->system->imageCheck($opponent->avatar_link, $opponent->getAvatarSize()) . "<br />";
 
         $opponent_health_percent = round(($opponent->health / $opponent->max_health) * 100);
-        $avatar_size = $opponent->getAvatarSize() . 'px';
 
-        echo "
-	<img src='{$opponent->avatar_link}' style='display:block;max-width:$avatar_size;max-height:$avatar_size;margin:auto;' />
-	<label style='width:80px;'>Health:</label>" .
+        echo "<label style='width:80px;'>Health:</label>" .
             sprintf("%.2f", $opponent->health) . '/' . sprintf("%.2f", $opponent->max_health) . "<br />" .
             "<div style='height:6px;width:250px;border-style:solid;border-width:1px;'>" .
             "<div style='background-color:#C00000;height:6px;width:" . $opponent_health_percent . "%;' /></div>" . "</div>";
