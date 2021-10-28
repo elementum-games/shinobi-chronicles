@@ -70,9 +70,18 @@ function travel() {
             $player->location = $location;
             $player->y = $target_y;
             $player->x = $target_x;
+
+            if($player->mission_id && $player->mission_stage['action_type'] == 'combat') {
+                $mission = new Mission($player->mission_id, $player);
+                if($mission->mission_type == 5) {
+                    $mission->nextStage($player->mission_stage['stage_id'] = 4);
+                    $player->mission_stage['mission_money'] /= 2;
+                    throw new Exception("Mission failed! Return to village.");
+                }
+            }
+
             $player->updateData();
         } catch(Exception $e) {
-            $system->message("You cannot travel into another village!");
             $system->message($e->getMessage());
         }
 		
