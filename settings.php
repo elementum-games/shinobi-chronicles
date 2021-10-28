@@ -51,10 +51,10 @@ function userSettings() {
 			$temp_filename = "./images/avatars/{$player->user_name}.$suffix";
 			$handle = fopen($temp_filename, "w+"); 
 			fwrite($handle, $content); 
-			fclose($handle); 
-			if(filesize($temp_filename) > 512000) {
+			fclose($handle);
+            if(filesize($temp_filename) > User::AVATAR_MAX_FILE_SIZE) {
 				$filesize = round(filesize($temp_filename) / 1024);
-				throw new Exception("Image is too large! Size {$filesize}kb, maximum is 500kb");
+				throw new Exception("Image is too large! Size {$filesize}kb, maximum is " . $player->getAvatarFileSize());
 			}
 
 			$player->avatar_link = $avatar_link;
@@ -240,14 +240,14 @@ function userSettings() {
 	<tr><th>Avatar</th></tr>
 	<tr><td style='text-align:center;'>
 		<div style='float:left;width:200px;'>
-			<img src='{$player->avatar_link}' style='max-width:150px;max-height:150px;' />
+			" . $system->imageCheck($player->avatar_link, $player->getAvatarSize()).  "
 		</div>
 		<div>
 			<b>Avatar info:</b><br />
 				Avatar must be hosted on another website<br />
-				Default limit: " . ($player->forbidden_seal ? '175x175' : '125x125') . " pixels<br />
+				Default limit: " . ($player->getAvatarSize() . "x" . $player->getAvatarSize()) . " pixels<br />
 				Avatar can be larger than the limit, but it will be resized<br />
-				Max filesize: 500kb<br />
+				Max filesize: " . $player->getAvatarFileSize() . "<br />
 				
 		</div>
 		<br style='clear:both;' />

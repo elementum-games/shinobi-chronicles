@@ -12,6 +12,10 @@ require_once __DIR__ . "/Fighter.php";
 class User extends Fighter {
     const ENTITY_TYPE = 'U';
 
+    const AVATAR_MAX_SIZE = 150;
+    const AVATAR_MAX_SEAL_SIZE = 200;
+    const AVATAR_MAX_FILE_SIZE = 1024 ** 2; // 1024 kb
+
     const GENDER_MALE = 'Male';
     const GENDER_FEMALE = 'Female';
     const GENDER_NON_BINARY = 'Non-binary';
@@ -1247,7 +1251,22 @@ class User extends Fighter {
     }
 
     public function getAvatarSize(): int {
-        return $this->forbidden_seal ? 175 : 125;
+        return $this->forbidden_seal ? self::AVATAR_MAX_SEAL_SIZE : self::AVATAR_MAX_SIZE;
+    }
+
+    public function getAvatarFileSize($format='MB'): string {
+        $max_size = self::AVATAR_MAX_FILE_SIZE;
+        switch($format) {
+            default:
+                $divisor = 1024 * 1024;
+                $suffix = "MB";
+                break;
+            case 'kb':
+                $divisor = 1024;
+                $suffix = "KB";
+            break;
+        }
+        return floor($max_size / $divisor) . $suffix;
     }
 
     public function expForNextLevel() {
