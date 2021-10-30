@@ -6,19 +6,18 @@ function supportPanel() {
     global $self_link;
 
     require_once('classes/SupportManager.php');
-    $supportManager = new SupportManager($system, $player->user_id, true);
+    $supportManager = new SupportManager($system, $player->user_id, $player->support_level, true);
     $offset = 0;
     $limit = 100;
-    $next = 100;
+    $next = null;
     $previous = null;
 
     // Auto close supports for user inactivity
     $supportManager->autocloseSupports();
 
-    $maxOffset = $supportManager->supportSearch(['open' => '1'], false, ['updated' => 'DESC'], false, true);
-    if ($next > $maxOffset) {
-        $next = $maxOffset - $limit;
-    }
+    $processTypes = 'IN_' . $supportManager->processTypes(true);
+    $maxOffset = $supportManager->supportSearch(['open' => '1', 'support_type' => $processTypes], false,
+            ['updated' => 'DESC', 'premium'=>'DESC'], false, true) - $limit;
 
     // Display variables
     $self_link .= '&view=support_requests';
@@ -33,21 +32,47 @@ function supportPanel() {
         $self_link .= "&category={$category}";
     }
 
-    // Pagination
-    if (isset($_GET['offset'])) {
-        $offset = $_GET['offset'];
-        if ($offset > $maxOffset) {
-            $offset -= $limit;
+    if(isset($_GET['support_search']) && $_GET['support_search'] == 'true') {
+        $self_link .= "&support_search=true";
+        $searchData['support_type'] = $processTypes;
+
+        if(isset($_GET['user_name'])) {
+            $self_link .= "&user_name=" . $_GET['user_name'];
+            $searchData['user_name'] = $system->clean($_GET['user_name']);
+        }
+        if(isset($_GET['support_type'])) {
+            $self_link .= "&support_type=" . $_GET['support_type'];
+            $searchData['support_type'] = $system->clean($_GET['support_type']);
+        }
+        if(isset($_GET['support_key'])) {
+            $self_link .= "&support_key=" . $_GET['support_key'];
+            $searchData['support_key'] = $system->clean($_GET['support_key']);
+        }
+        if(isset($_GET['ip_address'])) {
+            $self_link .= "&ip_address=" . $_GET['ip_address'];
+            $searchData['ip_address'] = $system->clean($_GET['ip_address']);
         }
 
-        $previous = $offset - 100;
-        if ($previous < 0) {
-            $previous = 0;
-        }
-        $next = $offset + $limit;
-        if ($next > $maxOffset) {
-            $next = $maxOffset - $limit;
-        }
+        $supports = $supportManager->supportSearch($searchData, false, ['updated' => 'DESC', 'open'=>'DESC', 'premium'=>'DESC']);
+        $maxOffset = $supportManager->supportSearch($searchData, false, ['updated' => 'DESC', 'open'=>'DESC', 'premium'=>'DESC'], false, true) - $limit;
+    }
+
+    // Pagination
+    if($maxOffset < 0) {
+        $maxOffset = 0;
+    }
+    if(isset($_GET['offset'])) {
+        $offset = (int) $_GET['offset'];
+    }
+    // Previous button
+    $previous -= $limit;
+    if($previous < 0) {
+        $previous = 0;
+    }
+    // Next button
+    $next = $offset + $limit;
+    if($next > $maxOffset) {
+        $next = $maxOffset;
     }
 
     if (isset($_POST)) {
@@ -76,15 +101,29 @@ function supportPanel() {
                     throw new Exception("Response cannot exceed "
                         . SupportManager::$validationConstraints['message']['max'] . " characters long.");
                 }
+                // No valid permission
+                if(!$supportManager->canProcess($supportData['support_type'])) {
+                    throw new Exception("You do not have permission to process this support type!");
+                }
 
                 $supportManager->addSupportResponses($support_id, $player->user_id, $player->user_name,
                     $message, $player->current_ip, $player->staff_level);
             }
 
             if (isset($_POST['close_ticket'])) {
+                $supportData = $supportManager->fetchSupportByID($support_id);
                 $message = '';
                 if (isset($_POST['message'])) {
                     $message = $system->clean($message);
+                }
+
+                // Not found
+                if(!$supportData) {
+                    throw new Exception("Support not found!");
+                }
+                // No valid permission
+                if(!$supportManager->canProcess($supportData['support_type'])) {
+                    throw new Exception("You do not have permission to process this support type!");
                 }
 
                 if ($message != '') {
@@ -107,8 +146,9 @@ function supportPanel() {
     if ($support_id != 0) {
         $supportData = $supportManager->fetchSupportByID($support_id);
         $supportResponses = $supportManager->fetchSupportResponses($support_id);
-    } //Only fetch all supports if a specific isn't selected
-    else {
+    }
+    //Only fetch all supports if a specific isn't selected
+    else if (!isset($_GET['support_search'])){
         $supports = $supportManager->fetchAllSupports($category, $player->user_id, $limit, $offset);
     }
 

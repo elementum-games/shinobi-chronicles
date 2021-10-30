@@ -51,7 +51,7 @@ body {
 	position: relative;
 	top: -61px;
 	
-	margin-left: 100px;
+	margin-left: 97px;
 	margin-top: 15px;
 	/* Temp */
 
@@ -374,7 +374,6 @@ table.globalMessage tr:last-child td:first-child  {
 table.globalMessage tr:last-child td:last-child  {
 	border-bottom-right-radius: 15px;
 }
-
 
 #content .contentHeader {
 	/* Structure */

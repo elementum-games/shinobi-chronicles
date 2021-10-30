@@ -40,7 +40,7 @@ if(!$guest_support) {
             $subjectLength = strlen($subject);
             $message = $system->clean($_POST['message']);
             $messageLength = strlen($message);
-            $cost = (isset(SupportManager::$requestPremiumCosts[$request_type]) ? SupportManager::$requestPremiumCosts[$request_type] : 0);
+            $cost = ($supportSystem->requestPremiumCosts[$request_type] ?? 0);
             $premium = ($cost > 0) ? 1 : 0;
 
             // Validate support
@@ -65,7 +65,7 @@ if(!$guest_support) {
             }
 
             // Premium cost
-            if ($_POST['confirm_prem_support'] && $player->premium_credits < $cost) {
+            if (isset($_POST['confirm_prem_support']) && $player->premium_credits < $cost) {
                 throw new Exception("You need {$cost}AK for this request.");
             } else {
                 $player->premium_credits -= $cost;
@@ -129,9 +129,8 @@ if(!$guest_support) {
             $system->message("Support not found!");
             $system->printMessage();
         } else {
-            if(isset($_POST['add_response']) || isset($_POST['close_ticket'])) {
+            if(isset($_POST['add_response'])) {
                 try {
-                    $responseType = (isset($_POST['add_response'])) ? 'response' : 'close';
                     $message = $system->clean($_POST['message']);
                     $messageLength = strlen($message);
 
@@ -146,17 +145,45 @@ if(!$guest_support) {
                     }
 
                     if ($supportSystem->addSupportResponses($support_id, $user_id, $player->user_name, $message, $player->current_ip,)) {
-                        if($responseType == 'response') {
                             $system->message("Response added!");
-                        } else {
-                            if($supportSystem->closeSupport($support_id)) {
-                                $system->message("Support closed.");
-                            }
-                        }
-                    } else {
+                    }
+                    else {
                         throw new Exception("Error adding response!");
                     }
                 } catch (Exception $e) {
+                    $system->message($e->getMessage());
+                }
+            }
+            if(isset($_POST['close_ticket'])) {
+                try {
+                    $message = $system->clean($_POST['message']);
+                    $messageLength = strlen($message);
+
+                    // Validate user owns support
+                    if($support['user_id'] != $player->user_id) {
+                        throw new Exception("You can only close your supports!");
+                    }
+
+                    // Add resopnse
+                    if($message != '') {
+                        // Validate
+                        if ($messageLength < SupportManager::$validationConstraints['message']['min']) {
+                            throw new Exception("Content must be at least " .
+                                SupportManager::$validationConstraints['message']['min'] . " characters!");
+                        }
+                        if ($messageLength > SupportManager::$validationConstraints['message']['max']) {
+                            throw new Exception("Content must not exceed " .
+                                SupportManager::$validationConstraints['message']['max'] . " characters!");
+                        }
+
+                        $supportSystem->addSupportResponses($support_id, $user_id, $player->user_name, $message, $player->current_ip, $player->staff_level);
+                        if(!$system->db_last_insert_id) {
+                            throw new Exception("Error adding response.");
+                        }
+                    }
+
+                    $supportSystem->closeSupport($support_id);
+                }catch (Exception $e) {
                     $system->message($e->getMessage());
                 }
             }
@@ -310,7 +337,8 @@ if(!$guest_support) {
             }
 
             // Create support
-            if($supportSystem->createSupport($_SERVER['REMOTE_ADDR'], $email, $support_type, $subject, $message, 0, $name, $support_key)) {
+            if($supportSystem->createSupport($_SERVER['REMOTE_ADDR'], $email, $support_type, $subject, $message,
+                0, $name, false, $support_key)) {
                 $supportCreated = true;
                 // Send email to user
                 $subject = "Shinobi-Chronicles support request";

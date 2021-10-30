@@ -19,33 +19,24 @@ class SupportManager {
         ],
     ];
 
-    public static $requestTypeUserlevels = [
-        'Game Question' => System::SC_MODERATOR,
-        'Misc. Request' => System::SC_MODERATOR,
-        'Appeal Ban' => System::SC_HEAD_MODERATOR,
-        'Account Problem' => System::SC_HEAD_MODERATOR,
-        'Report Staff Member' => System::SC_HEAD_MODERATOR,
-        'Content Text Issue' => System::SC_CONTENT_ADMINISTRATOR,
-        'Balance Feedback' => System::SC_CONTENT_ADMINISTRATOR,
-        'Suggestion' => System::SC_CONTENT_ADMINISTRATOR,
-        'Report Bug' => System::SC_ADMINISTRATOR,
-        'Mod Request' => System::SC_ADMINISTRATOR,
-    ];
+    public static $TYPE_ACCOUNT_PROBLEM = 'Account Problem';
+    public static $TYPE_GAME_QUESTION = 'Game Question';
+    public static $TYPE_MISC = 'Misc. Request';
+    public static $TYPE_APPEAL_BAN = 'Appeal Ban';
+    public static $TYPE_REPORT_STAFF = 'Report Staff Member';
+    public static $TYPE_CONTENT_TEXT = 'Content Text Issue';
+    public static $TYPE_BALANCE = 'Balance Feedback';
+    public static $TYPE_SUGGESTION = 'Suggestion';
+    public static $TYPE_BUG = 'Report Bug';
+    public static $TYPE_MOD_REQUEST = 'Mod Request';
 
-    public static $requestPremiumCosts = [
-        'Game Question' => 1,
-        'Misc. Request' => 1,
-        'Appeal Ban' => 10,
-        'Account Problem' => 10,
-        'Report Staff Member' => 0,
-        'Content Text Issue' => 0,
-        'Balance Feedback' => 1,
-        'Suggestion' => 1,
-        'Report Bug' => 0,
-        'Mod Request' => 1,
-    ];
+    public static $PRIORITY_LOW = 'low';
+    public static $PRIORITY_REG = 'reg';
+    public static $PRIORITY_PREM = 'premium';
+    public static $PRIORITY_HIGH = 'high';
+    public static $PRIOIRTY_PREM_HIGH = 'premium_high';
 
-    public static $strfString = '%m/%d/%y @ %I:%M';
+    public static $strfString = '%m/%d/%y @ %I:%M:%S';
 
     public static $staffNotify = 86400 * 3;
     public static $autoClose = 86400 * 5;
@@ -54,8 +45,11 @@ class SupportManager {
     protected $system;
 
     public $user_id;
+    public $support_level;
     public $admin;
     public $key = '';
+    public $requestTypeUserlevels;
+    public $requestPremiumCosts;
 
     /**
      * SupportManager constructor
@@ -69,10 +63,37 @@ class SupportManager {
      * @param int  $user_id
      * @param bool $admin
      */
-    public function __construct($system, $user_id = 0, $admin = false) {
+    public function __construct($system, $user_id = 0, $support_level = false, $admin = false) {
         $this->system = $system;
         $this->user_id = $user_id;
+        $this->support_level = $support_level;
         $this->admin = $admin;
+
+        $this->requestTypeUserlevels = [
+            self::$TYPE_GAME_QUESTION => User::SUPPORT_BASIC,
+            self::$TYPE_MISC => User::SUPPORT_INTERMEDIATE,
+            self::$TYPE_APPEAL_BAN => User::SUPPORT_SUPERVISOR,
+            self::$TYPE_ACCOUNT_PROBLEM => User::SUPPORT_SUPERVISOR,
+            self::$TYPE_REPORT_STAFF => User::SUPPORT_SUPERVISOR,
+            self::$TYPE_CONTENT_TEXT => User::SUPPORT_CONTENT_ONLY,
+            self::$TYPE_BALANCE => User::SUPPORT_CONTENT_ONLY,
+            self::$TYPE_SUGGESTION => User::SUPPORT_CONTENT_ONLY,
+            self::$TYPE_BUG => User::SUPPORT_ADMIN,
+            self::$TYPE_MOD_REQUEST => User::SUPPORT_ADMIN,
+        ];
+
+        $this->requestPremiumCosts = [
+            self::$TYPE_GAME_QUESTION => 10,
+            self::$TYPE_MISC => 10,
+            self::$TYPE_APPEAL_BAN => 5,
+            self::$TYPE_ACCOUNT_PROBLEM => 5,
+            self::$TYPE_REPORT_STAFF => 0,
+            self::$TYPE_CONTENT_TEXT => 5,
+            self::$TYPE_BALANCE => 5,
+            self::$TYPE_SUGGESTION => 5,
+            self::$TYPE_BUG => 0,
+            self::$TYPE_MOD_REQUEST => 10,
+        ];
     }
 
     /**** SUPPORT FUNCTIONS ****/
@@ -112,45 +133,60 @@ class SupportManager {
     /**
      * Returns true/false based on if userlevel has permission to access request type
      *
-     * @param $userlevel
      * @param $type
      * @return bool
      */
-    public function hasPermission($userlevel, $type) {
-        if(!isset(self::$requestTypeUserlevels[$type])) {
+    public function canProcess($type): bool
+    {
+        // Not set error, allow anybody to attempt to process
+        if(!isset($this->requestTypeUserlevels[$type])) {
             return true;
         }
-        switch(self::$requestTypeUserlevels[$type]) {
-            case 'SC_MODERATOR':
-                if($userlevel >= System::SC_MODERATOR)
-                    return true;
-                else
-                    return false;
-            case 'SC_HEAD_MODERATOR':
-                if($userlevel >= System::SC_HEAD_MODERATOR)
-                    return true;
-                else
-                    return false;
-            case 'SC_CONTENT_ADMINISTRATOR':
-                if($userlevel >= System::SC_CONTENT_ADMINISTRATOR)
-                    return true;
-                else
-                    return false;
-            case 'SC_ADMINISTRATOR':
-                if($userlevel >= System::SC_ADMINISTRATOR)
-                    return true;
-                else
-                    return false;
-            case 'SC_HEAD_ADMINISTRATOR':
-                if($userlevel >= System::SC_HEAD_ADMINISTRATOR)
-                    return true;
-                else
-                    return false;
-            default:
-                return false;
+
+        if($this->support_level == User::SUPPORT_CONTENT_ONLY && $this->requestTypeUserlevels[$type] == User::SUPPORT_CONTENT_ONLY) {
+            return true;
         }
+        else if($this->support_level >= $this->requestTypeUserlevels[$type]) {
+            return true;
+        }
+
+        return false;
     }
 
+    /**
+     * @param false $returnSqlString
+     * @return array|string
+     *
+     * Returns array or sql string of supports that user can process
+     * String returned must be used with an IN type mysql clause
+     * String e.g.: ('Game Question', 'Misc. Request)
+     * Parentheses and single quotes are included in the return
+     */
+    public function processTypes($returnSqlString = false) {
+        $typeRestrictions = [
+            self::$TYPE_GAME_QUESTION => User::SUPPORT_BASIC
+        ];
+
+        $canProcess = [];
+        foreach($this->requestTypeUserlevels as $type=>$userlevel) {
+            if($this->support_level == User::SUPPORT_CONTENT_ONLY && User::SUPPORT_CONTENT_ONLY == $userlevel) {
+                $canProcess[] = $type;
+            }
+            else if($this->support_level != User::SUPPORT_CONTENT_ONLY && $this->support_level >= $userlevel) {
+                $canProcess[] = $type;
+            }
+        }
+
+        if(!$returnSqlString) {
+            return $canProcess;
+        }
+
+        $string = "(";
+        foreach($canProcess as $type) {
+            $string .= "'{$type}', ";
+        }
+        return substr($string, 0, strlen($string)-2) . ")";
+    }
 
     /**
      * @param string $ip_address
@@ -266,38 +302,45 @@ class SupportManager {
      * @param int    $offset
      * @return array
      */
-    public function fetchAllSupports($category = '', $user_id = 0, $limit = 100, $offset = 0) {
+    public function fetchAllSupports($category = '', $user_id = 0, $limit = 100, $offset = 0, $debug = false) {
+        $canProcess = $this->processTypes(true);
+
         $orderDirection = 'ASC';
         $query = "SELECT * FROM `support_request` ";
         switch($category) {
             case 'awaiting_staff':
-                $query .= "WHERE `open`=1 AND `admin_response`=0";
+                $query .= "WHERE `open`=1 AND `admin_response`=0 AND `support_type` IN {$canProcess}";
                 break;
             case 'awaiting_user':
-                $query .= "WHERE `open`=1 AND `admin_response`=1";
+                $query .= "WHERE `open`=1 AND `admin_response`=1 AND `support_type` IN {$canProcess}";
                 break;
             case 'closed':
-                $query .= "WHERE `open`=0";
+                $query .= "WHERE `open`=0 AND `support_type` IN {$canProcess}";
                 $orderDirection = 'DESC';
                 break;
             default:
-                $query .= "WHERE `open`=1 AND `admin_response`=0";
+                $query .= "WHERE `open`=1 AND `admin_response`=0 AND `support_type` IN {$canProcess}";
         }
-        $query .= " ORDER BY `updated` {$orderDirection} LIMIT {$offset},{$limit}";
+        $query .= " ORDER BY `updated` {$orderDirection}, `premium` DESC LIMIT {$offset},{$limit}";
+
+        if($debug) {
+            echo $query;
+        }
 
         $supports = [
-            'prem_high' => [],
-            'high' => [],
-            'prem' => [],
-            'reg' => [],
-            'low' => []
+            self::$PRIOIRTY_PREM_HIGH => [],
+            self::$PRIORITY_HIGH => [],
+            self::$PRIORITY_PREM => [],
+            self::$PRIORITY_REG => [],
+            self::$PRIORITY_LOW => []
         ];
         $result = $this->system->query($query);
         while($row = $this->system->db_fetch($result)) {
             $supports[self::getTypePriority($row['support_type'], $row['premium'])][] = $row;
         }
 
-        return array_merge($supports['prem_high'], $supports['high'], $supports['prem'], $supports['reg'], $supports['low']);
+        return array_merge($supports[self::$PRIOIRTY_PREM_HIGH], $supports[self::$PRIORITY_HIGH],
+            $supports[self::$PRIORITY_PREM], $supports[self::$PRIORITY_REG], $supports[self::$PRIORITY_LOW]);
     }
 
     /**
@@ -335,6 +378,11 @@ class SupportManager {
                     $comparison = $keys[0];
                     $value = $keys[1];
                     $query .= "`$col` {$comparison} '{$value}' AND ";
+                }
+                elseif(substr($val, 0, 2) == 'IN') {
+                    $keys = explode('_', $val);
+                    $value = $keys[1];
+                    $query .= "`$col` IN {$value} AND ";
                 }
                 else {
                     $query .= "`$col`='{$val}' AND ";
@@ -552,7 +600,7 @@ class SupportManager {
             else {
                 $this->addSupportResponses($support_id,
                     $this->user_id,
-                    ($admin_name ? $admin_name : $support['username']),
+                    ($admin_name  ? $admin_name : $support['user_name']),
                     "[Request Closed]",
                     -1,
                     $staff_level
@@ -570,7 +618,7 @@ class SupportManager {
      */
     public function fetchSupportResponses($support_id) {
         $result = $this->system->query("SELECT * FROM `support_request_responses` 
-            WHERE `support_id`='{$support_id}' ORDER BY `time` DESC");
+            WHERE `support_id`='{$support_id}' ORDER BY `time` DESC, `response_id` DESC");
         if($this->system->db_last_num_rows) {
             $responses = [];
             while($row = $this->system->db_fetch($result)) {
@@ -620,20 +668,20 @@ class SupportManager {
             case 'Report Staff Member':
             case 'Appeal Ban':
             case 'Report Bug':
-                $priority = 'high';
+                $priority = self::$PRIORITY_HIGH;
                 break;
             case 'Misc. Request':
-                $priority = 'low';
+                $priority = self::$PRIORITY_LOW;
                 break;
             default:
-                $priority = 'reg';
+                $priority = self::$PRIORITY_REG;
                 break;
         }
 
         if($priority == 'high' && $premium) {
-            $priority = 'prem_high';
+            $priority = self::$PRIOIRTY_PREM_HIGH;
         } elseif($premium) {
-            $priority = 'prem';
+            $priority = self::$PRIORITY_PREM;
         }
 
         return $priority;
