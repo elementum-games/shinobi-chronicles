@@ -53,10 +53,10 @@ function displayNotifications() {
 			$notifications[] = "<a class='link' href='{$system->links['report']}&page=view_all_reports'>New report(s)!</a>";
 		}
 
-		$result = $system->query("SELECT `support_id` FROM `support_request` WHERE `open`=1 AND `assigned_to`=$player->user_id
-		  AND `admin_response`=0");
+        $result = $system->query("SELECT `support_id` FROM `support_request` WHERE `open`=1 AND `admin_response`=0
+            AND `updated` < '" . time() - SupportManager::$staffNotify . "'");
 		if($system->db_last_num_rows > 0) {
-            $notifications[] = "<a class='link' href='{$system->links['mod']}&view=support_requests&category=my_supports_admin'>Support(s) Updated!</a>";
+            $notifications[] = "<a class='link' href='{$system->links['mod']}&view=support_requests'>Support(s) Updated!</a>";
         }
 	}
 

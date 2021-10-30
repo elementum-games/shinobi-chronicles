@@ -30,7 +30,7 @@ class System {
 
     const DB_DATETIME_MS_FORMAT = 'Y-m-d H:i:s.u';
 
-    const UNSERVICALBE_EMAIL_DOMAINS = ['hotmail.com', 'live.com', 'msn.com', 'outlook.com'];
+    const UNSERVICEABLE_EMAIL_DOMAINS = ['hotmail.com', 'live.com', 'msn.com', 'outlook.com'];
 
     public static array $villages = ['Stone', 'Cloud', 'Leaf', 'Sand', 'Mist'];
     public static array $forbidden_seals = array(1 => 'Twin Sparrow Seal', 2 => 'Four Dragon Seal');
@@ -108,6 +108,7 @@ class System {
         'spar' => 22,
         'mission' => 14,
         'rankup' => 25,
+        'support' => 30,
     ];
     public array $links = [
         'github' => 'https://github.com/elementum-games/shinobi-chronicles'

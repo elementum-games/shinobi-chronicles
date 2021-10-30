@@ -5,15 +5,23 @@
  */
 ?>
 <script type="text/javascript" src="/scripts/supportScripts.js"></script>
+<script type='text/javascript'>
+    var shiftPressed = false;
+    $(document).ready(function(){
+        $('#responseMessage').keypress(function( event ) {
+            if (event.which == 13 && !event.shiftKey && $('#quickReply').prop('checked')) {
+                $('#responseSubmit').trigger('click');
+            }
+        });
+    });
+</script>
+
 <table class="table">
     <tr><th><?=$support['subject']?></th></tr>
     <tr><td>
         <label style="width:8em; font-weight:bold;">Support Type:</label><?=$support['support_type']?><br />
         <label style="width:8em; font-weight:bold;">Submitted:</label><?= strftime(SupportManager::$strfString, $support['time']) ?><br />
         <label style="width:8em; font-weight:bold;">Status:</label><?= ($support['open'] ? 'Open' : 'Closed') ?><br />
-        <?php if($support['assigned_to'] != ''): ?>
-            <label style="width:8em; font-weight:bold;">Assigned To:</label><?=$support['admin_name']?><br />
-        <?php endif ?>
         <?php if($support['time'] != $support['updated']): ?>
             <label style="width:8em; font-weight:bold;">Last Updated:</label><?= strftime(SupportManager::$strfString, $support['updated']) ?><br />
         <?php endif ?>
@@ -28,7 +36,7 @@
                 <th><?=$response['user_name']?> - <?=strftime(SupportManager::$strfString, $response['time'])?></th>
             </tr>
             <tr id="<?=$response['response_id']?>" class="response" style="display:<?=($pos == 0 ? 'table-row' : 'none')?>"><td>
-                <div class="support_detail"><p><?=$response['message']?></p></div>
+                <div style="white-space: pre-wrap; margin-left: 5px;"><p><?=$response['message']?></p></div>
             </td></tr>
         <?php endforeach ?>
     <?php endif ?>
@@ -39,8 +47,9 @@
     <tr><th>Add Response</th></tr>
     <tr><td style="text-align: center;">
         <form action="<?=$self_link?>" method="post">
-            <textarea name="message"></textarea><br />
-            <input type="submit" name="add_response" value="Add Response" />
+            <textarea id="responseMessage" name="message" style="display:block; width:500px;height:200px; margin:auto;"></textarea><br />
+            <input type="checkbox" id="quickReply" checked="checked" />Quick Reply<br />
+            <input type="submit" id="responseSubmit" name="add_response" value="Add Response" />
             <input type="submit" name="close_ticket" value="Cancel Request" />
         </form>
     </td></tr>

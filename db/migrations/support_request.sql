@@ -16,9 +16,6 @@ CREATE TABLE `support_request` (
   `message` TEXT,
   `time` INT,
   `updated` INT,
-  `assigned_to` INT DEFAULT 0,
-  `admin_name` VARCHAR(75) DEFAULT NULL,
-  `admin_respond_by` INT DEFAULT 0,
   `open` INT(1) DEFAULT 1,
   `admin_response` INT(1) DEFAULT 0,
   `premium` INT(1) DEFAULT 0
@@ -38,5 +35,15 @@ CREATE TABLE `support_request_responses` (
   `message` TEXT,
   `time` INT
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- ADD SUPPORT LEVELS TO USERS
+--
+ALTER TABLE `users` ADD `support_level` INT(1) DEFAULT 0 AFTER `staff_level`;
+
+--
+-- ADD HITORI & LSM AS SUPPORT ADMINS
+--
+ALTER TABLE `user` SET `support_level`='5' WHERE `user_id` IN(1, 254) LIMIT 2;
 
 COMMIT;

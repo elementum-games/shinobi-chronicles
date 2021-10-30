@@ -28,7 +28,7 @@
             provide a valid email to submit a support as a guest. We will notify you of updates to your support through
             email.<br />
         <br />
-        We are currently unable to service the following email domains: <?= implode(', ', System::UNSERVICALBE_EMAIL_DOMAINS) ?>
+        We are currently unable to service the following email domains: <?= implode(', ', System::UNSERVICEABLE_EMAIL_DOMAINS) ?>
         </td></tr>
         <tr><th>Access an Ongoing Support</th></tr>
         <tr><td>

@@ -482,8 +482,11 @@ if($LOGGED_IN) {
             }
         }
 
-        if($player->isModerator() || $player->hasAdminPanel()) {
+        if($player->isModerator() || $player->hasAdminPanel() || $player->isSupportStaff()) {
             echo $staff_menu_header;
+            if($player->isSupportStaff()) {
+                echo "<li><a id='sideMenuOption-SupportPanel' href='{$system->link}?id=30'>Support Panel</a></li>";
+            }
             if($player->isModerator()) {
                 echo "<li><a id='sideMenuOption-ModPanel' href='{$system->link}?id=16'>Mod Panel</a></li>";
             }

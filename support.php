@@ -122,7 +122,7 @@ if(!$guest_support) {
             require('templates/userTickets.php');
         }
     } else {
-        $support_id = $system->clean($_GET['support_id']);
+        $support_id = (int) $_GET['support_id'];
         $support = $supportSystem->fetchSupportByID($support_id, $user_id);
 
         if(!$support) {
@@ -223,8 +223,11 @@ if(!$guest_support) {
         }
     }
 
-    if ($player->isModerator() || $player->hasAdminPanel()) {
+    if ($player->isModerator() || $player->hasAdminPanel() || $player->isSupportStaff()) {
         echo $staff_menu_header;
+        if ($player->isSupportStaff()) {
+            echo "<li><a id='sideMenuOption-SupportPanel' href='{$system->link}?id=30'>Support Panel</a></li>";
+        }
         if ($player->isModerator()) {
             echo "<li><a id='sideMenuOption-ModPanel' href='{$system->link}?id=16'>Mod Panel</a></li>";
         }
@@ -283,9 +286,9 @@ if(!$guest_support) {
             if(!filter_var($_POST['email'], FILTER_VALIDATE_EMAIL)) {
                 throw new Exception("You must provide a valid email!");
             }
-            if(in_array(strtolower(explode('@', $email)[1]), System::UNSERVICALBE_EMAIL_DOMAINS)) {
+            if(in_array(strtolower(explode('@', $email)[1]), System::UNSERVICEABLE_EMAIL_DOMAINS)) {
                 throw new Exception("We are currently unable to support " .
-                    implode(' / ', System::UNSERVICALBE_EMAIL_DOMAINS) . " email types.");
+                    implode(' / ', System::UNSERVICEABLE_EMAIL_DOMAINS) . " email types.");
             }
             // Subject validation
             if($subjectLength < SupportManager::$validationConstraints['subject']['min']) {

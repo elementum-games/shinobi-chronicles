@@ -177,8 +177,8 @@ if($_POST['register']) {
         $email_arr = explode('@', $email);
         $email_arr[1] = strtolower($email_arr[1]);
 
-        if(array_search($email_arr[1], System::UNSERVICALBE_EMAIL_DOMAINS) !== false) {
-            throw new Exception(implode(' / ', System::UNSERVICALBE_EMAIL_DOMAINS) . " emails are currently not supported!");
+        if(array_search($email_arr[1], System::UNSERVICEABLE_EMAIL_DOMAINS) !== false) {
+            throw new Exception(implode(' / ', System::UNSERVICEABLE_EMAIL_DOMAINS) . " emails are currently not supported!");
         }
 
         // Check for username/email existing
@@ -280,7 +280,7 @@ if(!$register_ok) {
 			<br />
 		<label for='email'>Email</label>
 			<input type='text' name='email' value='$email' /><br />
-			<span style='font-style:italic;font-size:0.9em;'>(Note: Currently we cannot send emails to addresses from: " . implode(', ', System::UNSERVICALBE_EMAIL_DOMAINS) . ")</span>
+			<span style='font-style:italic;font-size:0.9em;'>(Note: Currently we cannot send emails to addresses from: " . implode(', ', System::UNSERVICEABLE_EMAIL_DOMAINS) . ")</span>
 			<br />
 			<br />
 		<label for='gender'>Gender</label><br />";

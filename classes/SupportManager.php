@@ -20,16 +20,16 @@ class SupportManager {
     ];
 
     public static $requestTypeUserlevels = [
-        'Game Question' => 'SC_MODERATOR',
-        'Misc. Request' => 'SC_MODERATOR',
-        'Appeal Ban' => 'SC_HEAD_MODERATOR',
-        'Account Problem' => 'SC_HEAD_MODERATOR',
-        'Report Staff Member' => 'SC_HEAD_MODERATOR',
-        'Content Text Issue' => 'SC_CONTENT_ADMINISTRATOR',
-        'Balance Feedback' => 'SC_CONTENT_ADMINISTRATOR',
-        'Suggestion' => 'SC_CONTENT_ADMINISTRATOR',
-        'Report Bug' => 'SC_ADMINISTRATOR',
-        'Mod Request' => 'SC_ADMINISTRATOR',
+        'Game Question' => System::SC_MODERATOR,
+        'Misc. Request' => System::SC_MODERATOR,
+        'Appeal Ban' => System::SC_HEAD_MODERATOR,
+        'Account Problem' => System::SC_HEAD_MODERATOR,
+        'Report Staff Member' => System::SC_HEAD_MODERATOR,
+        'Content Text Issue' => System::SC_CONTENT_ADMINISTRATOR,
+        'Balance Feedback' => System::SC_CONTENT_ADMINISTRATOR,
+        'Suggestion' => System::SC_CONTENT_ADMINISTRATOR,
+        'Report Bug' => System::SC_ADMINISTRATOR,
+        'Mod Request' => System::SC_ADMINISTRATOR,
     ];
 
     public static $requestPremiumCosts = [
@@ -47,7 +47,7 @@ class SupportManager {
 
     public static $strfString = '%m/%d/%y @ %I:%M';
 
-    public static $changeStaffTime = 86400 * 3;
+    public static $staffNotify = 86400 * 3;
     public static $autoClose = 86400 * 5;
 
     /** @var System $system */
@@ -178,8 +178,6 @@ class SupportManager {
               `message`,
               `open`, 
               `admin_response`,
-              `assigned_to`,
-              `admin_respond_by`,
               `user_name`,
               `support_key`,
               `premium`
@@ -196,8 +194,6 @@ class SupportManager {
               '{$details}',
               '1', 
               '0',
-              '0',
-              '0',
               '{$name}',
               '{$support_key}',
               '{$premium}'
@@ -205,7 +201,6 @@ class SupportManager {
         ");
 
         if($this->system->db_last_insert_id) {
-            //$this->addSupportResponses($this->system->db_insert_id, $user_id, $name, $details, false);
             return $this->system->db_last_insert_id;
         }
         return false;
@@ -280,15 +275,6 @@ class SupportManager {
                 break;
             case 'awaiting_user':
                 $query .= "WHERE `open`=1 AND `admin_response`=1";
-                break;
-            case 'my_supports':
-                $query .= "WHERE `open`=1 AND `assigned_to`={$user_id}";
-                break;
-            case 'my_supports_user':
-                $query .= "WHERE `open`=1 AND `assigned_to`={$user_id} AND `admin_response`=1";
-                break;
-            case 'my_supports_admin':
-                $query .= "WHERE `open`=1 AND `assigned_to`={$user_id} AND `admin_response`=0";
                 break;
             case 'closed':
                 $query .= "WHERE `open`=0";
@@ -518,19 +504,7 @@ class SupportManager {
         }
 
         $query = "UPDATE `support_request` SET `updated`='" . time() . "',
-            `admin_response`='{$this->admin}'";
-
-        // Assign staff member
-        if($this->admin && $admin_id != 0) {
-            $query .= ", `assigned_to`='{$admin_id}', 
-                `admin_name`='{$admin_name}'";
-        }
-        // Assign staff deadline
-        if($support_data['admin_response'] == 1 && $support_data['assigned_to'] != 0) {
-            $query .= ", `admin_respond_by`='" . (time() + self::$changeStaffTime) . "'";
-        }
-
-        $query .= " WHERE `support_id`='{$support_id}' LIMIT 1";
+            `admin_response`='{$this->admin}' WHERE `support_id`='{$support_id}' LIMIT 1";
 
         $this->system->query($query);
         if ($this->system->db_last_affected_rows) {
@@ -584,26 +558,6 @@ class SupportManager {
                     $staff_level
                 );
             }
-            return true;
-        }
-        return false;
-    }
-
-    /**
-     * @param $support_id
-     * @return bool
-     * Used to remove a staff member for inactivity to allow assignment of a new staff member
-     */
-    public function removeStaffMember($support_id) {
-        //Must be an admin connection
-        if(!$this->admin) {
-            return false;
-        }
-
-        $this->system->query("UPDATE `support_request` SET `assigned_to`=0, `admin_name`='' 
-            WHERE `support_id`={$support_id} LIMIT 1");
-
-        if($this->system->db_last_affected_rows) {
             return true;
         }
         return false;
