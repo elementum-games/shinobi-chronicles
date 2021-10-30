@@ -57,8 +57,8 @@ if(isset($_GET['act'])) {
             $subject = "Shinobi-Chronicles account verification";
             $message = "Welcome to Shinobi-Chronicles RPG. Please visit the link below to verify your account: \r\n" .
                 "{$system->link}register.php?act=verify&username={$user_name}&verify_key={$result['verify_key']}";
-            $headers = "From: Shinobi-Chronicles<admin@shinobi-chronicles.com>" . "\r\n";
-            $headers .= "Reply-To: no-reply@shinobi-chronicles.com" . "\r\n";
+            $headers = "From: Shinobi-Chronicles<" . System::SC_ADMIN_EMAIL . ">" . "\r\n";
+            $headers .= "Reply-To: " . System::SC_NO_REPLY_EMAIL . "\r\n";
             if(mail($result['email'], $subject, $message, $headers)) {
                 ;
                 $system->message("Email sent! Please check your email (including spam folder)");
@@ -224,8 +224,8 @@ if($_POST['register']) {
         $subject = 'Shinobi-Chronicles account verification';
         $message = "Welcome to Shinobi-Chronicles RPG. Please visit the link below to verify your account: \r\n
 		{$system->link}register.php?act=verify&username={$user_name}&verify_key=$verification_code";
-        $headers = "From: Shinobi-Chronicles<admin@shinobi-chronicles.com>" . "\r\n";
-        $headers .= "Reply-To: no-reply@shinobi-chronicles.com" . "\r\n";
+        $headers = "From: Shinobi-Chronicles<" . System::SC_ADMIN_EMAIL . ">" . "\r\n";
+        $headers .= "Reply-To: " . System::SC_NO_REPLY_EMAIL . "\r\n";
         if(mail($email, $subject, $message, $headers)) {
             ;
             $system->message("Account created!<br />Please check the email that you registered with for the verification  link (Be sure to check your spam folder as well)!");

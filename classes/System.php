@@ -30,6 +30,8 @@ class System {
 
     const DB_DATETIME_MS_FORMAT = 'Y-m-d H:i:s.u';
 
+    const SC_ADMIN_EMAIL = "admin@shinobichronicles.com";
+    const SC_NO_REPLY_EMAIL = "no-reply@shinobichronicles.com";
     const UNSERVICEABLE_EMAIL_DOMAINS = ['hotmail.com', 'live.com', 'msn.com', 'outlook.com'];
 
     public static array $villages = ['Stone', 'Cloud', 'Leaf', 'Sand', 'Mist'];

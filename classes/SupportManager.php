@@ -546,8 +546,8 @@ class SupportManager {
             $message = "Your support was updated by {$admin_name}. Click the link below to access your support: \r\n" .
                 "{$this->system->link}support.php?support_key={$support_data['support_key']} \r\n" .
                 "If the link does not work, your support key is: {$support_data['support_key']}";
-            $headers = "From: Shinobi-Chronicles<admin@shinobi-chronicles.com>" . "\r\n";
-            $headers .= "Reply-To: no-reply@shinobi-chronicles.com" . "\r\n";
+            $headers = "From: Shinobi-Chronicles<" . System::SC_ADMIN_EMAIL . ">" . "\r\n";
+            $headers .= "Reply-To: " . System::SC_NO_REPLY_EMAIL . "\r\n";
             mail($support_data['email'], $subject, $message, $headers);
         }
 
