@@ -58,7 +58,7 @@ function travel() {
             }
             $location = $target_x . "." . $target_y;
             
-            if(isset($villages[$location]) && $location != $player->village_location && !$ignore_travel_restrictions) {
+            if(isset($villages[$location]) && $location !== $player->village_location && !$ignore_travel_restrictions) {
                 throw new Exception("You cannot travel into another village!");
             }
 

@@ -104,7 +104,7 @@ function battle(): bool {
 			if($player->rank < 3) {
 				throw new Exception("You cannot attack people Chuunin rank and higher!");
 			}
-			if($user->location != $player->location) {
+			if($user->location !== $player->location) {
 				throw new Exception("Target is not at your location!");
 			}
 			if($user->battle_id) {
