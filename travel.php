@@ -181,6 +181,9 @@ function travel() {
 				echo "<a href='{$system->links['mission']}'><p class='button' style='margin-top:5px;'>Go to Mission Location</p></a><br />";
 			}
 		}
+        else if($player->mission_stage['action_type'] == 'combat') {
+            echo "<h3>Warning: Attempting to travel will cancel your mission!</h3>";
+        }
 	}
 
 	echo "<span style='font-style:italic;margin-bottom:3px;display:inline-block;font-size:0.9em;'>
