@@ -41,9 +41,4 @@ CREATE TABLE `support_request_responses` (
 --
 ALTER TABLE `users` ADD `support_level` INT(1) DEFAULT 0 AFTER `staff_level`;
 
---
--- ADD HITORI & LSM AS SUPPORT ADMINS
---
-ALTER TABLE `user` SET `support_level`='5' WHERE `user_id` IN(1, 254) LIMIT 2;
-
 COMMIT;
