@@ -146,15 +146,12 @@ function userProfile() {
 		</td></tr></table>";
     }
     else if($page == 'profile') {
-        $avatar_size = '125px';
-        if($player->forbidden_seal) {
-            $avatar_size = '175px';
-        }
         echo "<table class='profile_table table'>
 
 		<tr><td style='width:50%;text-align:center;'>
 		<span style='font-size:1.3em;font-family:\"tempus sans itc\";font-weight:bold;'>" . $player->user_name . "</span><br />
-		<img src='{$player->avatar_link}' style='margin-top:5px;max-width:$avatar_size;max-height:$avatar_size;' /><br />
+		" . $system->imageCheck($player->avatar_link, $player->getAvatarSize()) . "
+		<br />
 		</td>";
 
         $exp_percent = ($player->exp_per_level - ($exp_needed - $player->exp)) / $player->exp_per_level * 100;

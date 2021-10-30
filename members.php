@@ -157,10 +157,6 @@ function members() {
 			}
 
 
-			$avatar_size = '125px';
-			if($viewUser->forbidden_seal) {
-				$avatar_size = '175px';
-			}
 			echo "<table id='viewprofile' class='table'>
 			<tr><th colspan='2'>View Profile</th>";
 
@@ -196,7 +192,7 @@ function members() {
 			echo "</td></tr>
 			<tr><td style='width:50%;text-align:center;'>
 			<span style='font-size:1.3em;font-family:\"tempus sans itc\";font-weight:bold;'>" . $viewUser->user_name . "</span><br />
-			<img src='{$viewUser->avatar_link}' style='margin-top:5px;max-width:$avatar_size;max-height:$avatar_size;' /><br />
+			" . $system->imageCheck($viewUser->avatar_link, $viewUser->getAvatarSize()). "<br />
 			</td>";
 
 

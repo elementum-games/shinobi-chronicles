@@ -58,7 +58,7 @@ function travel() {
             }
             $location = $target_x . "." . $target_y;
             
-            if(isset($villages[$location]) && $location != $player->village_location && !$ignore_travel_restrictions) {
+            if(isset($villages[$location]) && $location !== $player->village_location && !$ignore_travel_restrictions) {
                 throw new Exception("You cannot travel into another village!");
             }
 
@@ -70,9 +70,18 @@ function travel() {
             $player->location = $location;
             $player->y = $target_y;
             $player->x = $target_x;
+
+            if($player->mission_id && $player->mission_stage['action_type'] == 'combat') {
+                $mission = new Mission($player->mission_id, $player);
+                if($mission->mission_type == 5) {
+                    $mission->nextStage($player->mission_stage['stage_id'] = 4);
+                    $player->mission_stage['mission_money'] /= 2;
+                    throw new Exception("Mission failed! Return to village.");
+                }
+            }
+
             $player->updateData();
         } catch(Exception $e) {
-            $system->message("You cannot travel into another village!");
             $system->message($e->getMessage());
         }
 		
@@ -168,10 +177,13 @@ function travel() {
 	<tr><td colspan='5' style='text-align:center;'>";
 	if($player->mission_id) {
 		if($player->mission_stage['action_type'] == 'travel' or $player->mission_stage['action_type'] == 'search') {
-			if($player->location == $player->mission_stage['action_data']) {
+            if($player->location === $player->mission_stage['action_data']) {
 				echo "<a href='{$system->links['mission']}'><p class='button' style='margin-top:5px;'>Go to Mission Location</p></a><br />";
 			}
 		}
+        else if($player->mission_stage['action_type'] == 'combat') {
+            echo "<h3>Warning: Attempting to travel will cancel your mission!</h3>";
+        }
 	}
 
 	echo "<span style='font-style:italic;margin-bottom:3px;display:inline-block;font-size:0.9em;'>

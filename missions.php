@@ -1,5 +1,5 @@
 <?php
-/* 
+/*
 File: 		missions.php
 Coder:		Levi Meahan
 Created:	05/04/2014
@@ -15,27 +15,27 @@ function missions() {
 
 	global $self_link;
 	global $RANK_NAMES;
-	
+
 	if($player->mission_id) {
         runActiveMission();
         return true;
 	}
 
 	$max_mission_rank = Mission::maxMissionRank($player->rank);
-	
+
 	$result = $system->query("SELECT `mission_id`, `name`, `rank` FROM `missions` WHERE `mission_type`=1 OR `mission_type`=5 AND `rank` <= $max_mission_rank");
 	if($system->db_last_num_rows == 0) {
 		$system->message("No missions available!");
 		$system->printMessage();
 		return false;
 	}
-	
+
 	$missions = array();
 	while($row = $system->db_fetch($result)) {
 		$missions[$row['mission_id']] = $row;
 	}
-	
-	
+
+
 	// Sub-menu
 	echo "<div class='submenu'>
 	<ul class='submenu'>";
@@ -47,7 +47,7 @@ function missions() {
 	echo "</ul>
 	</div>
 	<div class='submenuMargin'></div>";
-	
+
 	// Start mission
 	if(!empty($_GET['start_mission'])) {
 		$mission_id = $_GET['start_mission'];
@@ -62,10 +62,10 @@ function missions() {
 		} catch (Exception $e) {
 			$system->message($e->getMessage());
 		}
-		
+
 	}
-	
-	
+
+
 	// Display missions
 	$system->printMessage();
 	$view = $max_mission_rank;
@@ -178,6 +178,7 @@ function runActiveMission() {
                         $player->battle_id = 0;
                         $player->mission_stage['mission_money'] /= 2;
                         $mission->nextStage($player->mission_stage['stage_id'] = 4);
+						$player->moveToVillage();
 
                         echo "<table class='table'><tr><th>Battle Results</th></tr>
                         <tr><td>You have been defeated.
@@ -210,6 +211,7 @@ function runActiveMission() {
 
                     $player->ai_losses++;
                     $player->battle_id = 0;
+					$player->moveToVillage();
                 }
                 else if($battle->isDraw()) {
                     echo "<table class='table'><tr><th>Battle Results</th></tr>
@@ -218,6 +220,7 @@ function runActiveMission() {
 
                     $player->clearMission();
                     $player->battle_id = 0;
+					$player->moveToVillage();
                 }
             } catch(Exception $e) {
                 error_log($e->getMessage());
@@ -255,8 +258,8 @@ function runActiveMission() {
             $team_points = 2;
             // Process team rewards if this is the first completing player, then unset the mission ID
             if($player->team->mission_id) {
-                $system->query("UPDATE `teams` SET 
-						`points`=`points` + $team_points, `monthly_points`=`monthly_points` + $team_points,`mission_id`=0 
+                $system->query("UPDATE `teams` SET
+						`points`=`points` + $team_points, `monthly_points`=`monthly_points` + $team_points,`mission_id`=0
 						WHERE `team_id`={$player->team->id}");
             }
 
