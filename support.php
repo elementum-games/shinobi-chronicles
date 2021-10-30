@@ -41,7 +41,7 @@ if(!$guest_support) {
             $message = $system->clean($_POST['message']);
             $messageLength = strlen($message);
             $cost = ($supportSystem->requestPremiumCosts[$request_type] ?? 0);
-            $premium = ($cost > 0) ? 1 : 0;
+            $premium = ($cost > 0 && isset($_POST['confirm_prem_support'])) ? 1 : 0;
 
             // Validate support
             if (!in_array($request_type, $request_types)) {
