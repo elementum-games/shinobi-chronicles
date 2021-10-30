@@ -368,7 +368,7 @@ if($LOGGED_IN) {
 				if($player->rank > 2 && $pages[$id]['village_ok'] == System::NOT_IN_VILLAGE && isset($villages[$player->location])) {
 					throw new Exception("You cannot access this page while in a village!");
 				}
-				if($pages[$id]['village_ok'] == System::ONLY_IN_VILLAGE && $player->location != $player->village_location) {
+				if($pages[$id]['village_ok'] == System::ONLY_IN_VILLAGE && $player->location !== $player->village_location) {
 					throw new Exception("You must be in your village to access this page!");
 				}
 			}
