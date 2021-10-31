@@ -40,7 +40,21 @@ if(isset($_GET['act'])) {
             $system->printMessage();
         }
         else {
-            $system->message("There was an error activating your account. Please contact an administrator.");
+            $accountData = $system->query("SELECT `user_verified` FROM `users` WHERE `user_name`='$user_name' AND `verify_key`='$key' LIMIT 1");
+            if(!$system->db_last_num_rows) {
+                $system->message("User not found!. Please contact an administrator. Staff can be found on
+                        <a href='{$system->links['discord']}' target='_blank'>Discord.</a>");
+            }
+            else {
+                $accountData = $system->db_fetch($accountData);
+                if($accountData['user_verified']) {
+                    $system->message("Your account is already activated and you may login!");
+                }
+                else {
+                    $system->message("Account activation error! Please contact an administrator. Staff can be found on
+                        <a href='{$system->links['discord']}' target='_blank'>Discord.</a>");
+                }
+            }
             $system->printMessage();
         }
     }

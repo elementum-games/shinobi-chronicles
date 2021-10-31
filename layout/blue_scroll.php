@@ -65,7 +65,7 @@ HTML;
 $top_menu = <<<HTML
 <ul>
 	<li><a id='topMenuOption-News' href='{$system->link}'>News</a></li>
-	<li><a id='topMenuOption-Discord' href='https://discord.gg/Kx52dbXEf3' target='_blank'>Discord</a></li>
+	<li><a id='topMenuOption-Discord' href='{$system->links['discord']}' target='_blank'>Discord</a></li>
 	<li><a id='topMenuOption-Manual' href='{$system->link}manual.php'>Manual</a></li>
 	<li><a id='topMenuOption-Github' href='https://github.com/elementum-games/shinobi-chronicles' target='_blank'>Github</a></li>
 	<li><a id='topMenuOption-Rules' href='{$system->link}rules.php'>Rules</a></li>

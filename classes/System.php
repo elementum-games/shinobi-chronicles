@@ -113,7 +113,8 @@ class System {
         'support' => 30,
     ];
     public array $links = [
-        'github' => 'https://github.com/elementum-games/shinobi-chronicles'
+        'github' => 'https://github.com/elementum-games/shinobi-chronicles',
+        'discord' => 'https://discord.gg/Kx52dbXEf3',
     ];
 
     //Chat variables
