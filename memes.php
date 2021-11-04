@@ -231,6 +231,12 @@ return [
         'public' => true,
     ],
     [
+        'code' => ':catte:',
+        'image' => '<img src="./images/memes/catte.png" title=\':catte:\' alt=\':catte:\' />',
+        'text' => ':catte:',
+        'public' => true,
+    ],
+    [
         'code' => ':confessionbear:',
         'image' => '<img src="./images/memes/confession_bear.png" title=\':confessionbear:\' alt=\':confessionbear:\' />',
         'text' => ':confession bear:',
