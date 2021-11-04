@@ -298,13 +298,6 @@ class Battle {
     /**
      * @throws Exception
      */
-    public function isDraw(): bool {
-        if(!$this->isComplete()) {
-            throw new Exception("Cannot call isPlayerWinner() check before battle is complete!");
-        }
-
-        return $this->winner === Battle::DRAW;
-    }
 
     public function timeRemaining(): int {
         return Battle::TURN_LENGTH - (time() - $this->turn_time);

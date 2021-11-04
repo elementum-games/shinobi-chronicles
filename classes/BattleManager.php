@@ -1181,6 +1181,18 @@ class BattleManager {
         return $this->battle->winner === $this->opponent_side;
     }
 
+    /**
+     * @return bool
+     * @throws Exception
+     */
+    public function isDraw(): bool {
+        if(!$this->isComplete()) {
+            throw new Exception("Cannot call isDraw() check before battle is complete!");
+        }
+
+        return $this->battle->winner === Battle::DRAW;
+    }
+
     public function updateData() {
         if($this->spectate) {
             return;
