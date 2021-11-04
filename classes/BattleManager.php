@@ -1235,4 +1235,8 @@ class BattleManager {
                 return "black";
         }
     }
+
+    public function getBattleType(): int {
+        return $this->battle->battle_type;
+    }
 }
