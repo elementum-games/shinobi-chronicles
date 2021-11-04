@@ -3,6 +3,7 @@
 
 /**
  * @var System $system;
+ * @var BattleManager $battleManager
  * @var Battle $battle
  * @var Fighter $player
  * @var Fighter $opponent
@@ -87,7 +88,7 @@
             <?= sprintf("%.2f", $player->health) ?> / <?= sprintf("%.2f", $player->max_health) ?><br />
         <div class='resourceBarOuter'><div class='healthFill' style='width:<?= $health_percent ?>%;'></div></div>
 
-        <?php if(!$battle->spectate): ?>
+        <?php if(!$battleManager->spectate): ?>
             <label style='width:80px;'>Chakra:</label>
             <?= sprintf("%.2f", $player->chakra) ?> / <?= sprintf("%.2f", $player->max_chakra) ?><br />
             <div class='resourceBarOuter'><div class='chakraFill' style='width:<?= $chakra_percent ?>%;'></div></div>
@@ -112,12 +113,12 @@
     <?php endif; ?>
 
     <!--// Trigger win action or display action prompt-->
-    <?php if(!$battle->isComplete() && !$battle->spectate): ?>
+    <?php if(!$battle->isComplete() && !$battleManager->spectate): ?>
         <tr><th colspan='2'>Select Action</th></tr>
 
-        <?php if(!$battle->playerActionSubmitted()): ?>
+        <?php if(!$battleManager->playerActionSubmitted()): ?>
             <?php require 'templates/battle/action_prompt.php'; ?>
-        <?php elseif(!$battle->opponentActionSubmitted()): ?>
+        <?php elseif(!$battleManager->opponentActionSubmitted()): ?>
             <tr><td colspan='2'>Please wait for <?= $opponent->getName() ?> to select an action.</td></tr>
         <?php endif; ?>
 
@@ -128,7 +129,7 @@
         </td></tr>
     <?php endif; ?>
 
-    <?php if($battle->spectate): ?>
+    <?php if($battleManager->spectate): ?>
         <tr><td style='text-align:center;' colspan='2'>
             <?php if($battle->winner == Battle::TEAM1): ?>
                <?=  $battle->player1->getName() ?> won!

@@ -16,7 +16,7 @@ function viewBattles() {
     if(!empty($_GET['battle_id'])) {
         $battle_id = (int)$_GET['battle_id'];
         try {
-            $battle = new Battle($system, $player, $battle_id, true);
+            $battle = new BattleManager($system, $player, $battle_id);
             if(!in_array($battle->battle_type, $battle_types)) {
                 throw new Exception("Invalid battle type!");
             }

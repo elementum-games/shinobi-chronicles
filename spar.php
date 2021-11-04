@@ -17,7 +17,7 @@ function spar() {
 
 	if($player->battle_id) {
 		try {
-            $battle = new Battle($system, $player, $player->battle_id);
+            $battle = new BattleManager($system, $player, $player->battle_id);
 
             $battle->checkTurn();
 

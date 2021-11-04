@@ -88,7 +88,7 @@ function arenaFight(): bool {
     $stat_gain_chance = 26;
 
     try {
-        $battle = new Battle($system, $player, $player->battle_id);
+        $battle = new BattleManager($system, $player, $player->battle_id);
 
         $winner = $battle->checkTurn();
 

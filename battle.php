@@ -18,7 +18,7 @@ function battle(): bool {
 	global $self_link;
 
 	if($player->battle_id) {
-        $battle = new Battle($system, $player, $player->battle_id);
+        $battle = new BattleManager($system, $player, $player->battle_id);
 
 		$pvp_yen = $player->rank * 50;
 

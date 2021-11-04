@@ -142,7 +142,7 @@ function runActiveMission() {
                     Battle::start($system, $player, $opponent, Battle::TYPE_AI_MISSION);
                 }
 
-                $battle = new Battle($system, $player, $player->battle_id);
+                $battle = new BattleManager($system, $player, $player->battle_id);
                 $battle->checkTurn();
 
                 $battle->renderBattle();
