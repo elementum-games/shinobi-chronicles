@@ -141,6 +141,7 @@ class User extends Fighter {
     public $last_update;
     public $last_active;
     public $forbidden_seal;
+    public $chat_color;
     public $last_login;
 
     public $jutsu_scrolls;
@@ -227,7 +228,7 @@ class User extends Fighter {
         $this->id = self::ENTITY_TYPE . ':' . $this->user_id;
 
         $result = $this->system->query("SELECT `user_id`, `user_name`, `ban_type`, `ban_expire`, `journal_ban`, `avatar_ban`, `song_ban`, `last_login`,
-			`forbidden_seal`, `staff_level`, `username_changes`
+			`forbidden_seal`, `chat_color`, `staff_level`, `username_changes`
 			FROM `users` WHERE `user_id`='$this->user_id' LIMIT 1"
         );
         if($this->system->db_last_num_rows == 0) {
@@ -250,6 +251,7 @@ class User extends Fighter {
         $this->last_login = $result['last_login'];
 
         $this->forbidden_seal = $result['forbidden_seal'];
+        $this->chat_color = $result['chat_color'];
 
         if($this->ban_type && $this->ban_expire <= time()) {
             $this->system->message("Your " . $this->ban_type . " ban has ended.");
@@ -611,6 +613,10 @@ class User extends Fighter {
             }
         }
 
+        // Chat color
+        if($this->chat_color == '') {
+            $this->chat_color = 'black';
+        }
         // Forbidden seal
         if($this->forbidden_seal) {
             $this->forbidden_seal = json_decode($user_data['forbidden_seal'], true);
@@ -619,6 +625,15 @@ class User extends Fighter {
                 $this->system->message("Your Forbidden Seal has receded.");
                 $this->forbidden_seal = false;
             }
+
+            // Patch infinite premium from user name color
+            if(isset($this->forbidden_seal['color']) && $UPDATE >= User::UPDATE_FULL) {
+                if(!isset($this->forbidden_seal['level'])) {
+                    $this->chat_color = $this->forbidden_seal['color'];
+                    $this->forbidden_seal = false;
+                }
+            }
+
             // Regen boost
             else {
                 if($this->forbidden_seal['level'] == 1) {
@@ -1125,6 +1140,7 @@ class User extends Fighter {
         }
 
         $query .= "`forbidden_seal`='$forbidden_seal',
+        `chat_color` = '$this->chat_color',
 		`train_type` = '$this->train_type',
 		`train_gain` = '$this->train_gain',
 		`train_time` = '$this->train_time',
@@ -1252,6 +1268,25 @@ class User extends Fighter {
 
     public function getAvatarSize(): int {
         return $this->forbidden_seal ? self::AVATAR_MAX_SEAL_SIZE : self::AVATAR_MAX_SIZE;
+    }
+
+    public function canChangeChatColor(): bool {
+        // Premium purchased
+        if($this->premium_credits_purchased) {
+            return true;
+        }
+
+        // Forbidden seal
+        if($this->forbidden_seal && $this->forbidden_seal['time'] > time()) {
+            return true;
+        }
+
+        // Staff level
+        if($this->isModerator() || $this->isHeadModerator() || $this->isContentAdmin() || $this->isUserAdmin() || $this->isHeadAdmin()) {
+            return true;
+        }
+
+        return false;
     }
 
     public function getAvatarFileSize($format='MB'): string {

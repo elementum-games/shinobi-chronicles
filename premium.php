@@ -528,13 +528,13 @@ function premium() {
 		}
 		$system->printMessage();
 	}
-	else if(isset($_POST['change_color']) && ($player->forbidden_seal || $player->premium_credits_purchased)) {
+	else if(isset($_POST['change_color']) && $player->canChangeChatColor()) {
 		$color = $system->clean($_POST['name_color']);
 		switch($color) {
 			case 'blue':
 			case 'pink':
 			case 'black':
-				$player->forbidden_seal['color'] = $color;
+				$player->chat_color = $color;
 				$system->message("Color changed!");
 				break;
 			case 'gold':
@@ -542,7 +542,7 @@ function premium() {
 					$system->message("Invalid color!");
 					break;
 				}
-				$player->forbidden_seal['color'] = $color;
+				$player->chat_color = $color;
 				$system->message("Color changed!");
 				break;
 			 case 'green':
@@ -550,7 +550,7 @@ function premium() {
                     $system->message("Invalid color!");
                     break;
                 }
-                $player->forbidden_seal['color'] = $color;
+                $player->chat_color = $color;
                 $system->message("Color changed");
                 break;
 			case 'teal':
@@ -558,7 +558,7 @@ function premium() {
 					$system->message("Invalid color!");
 					break;
 				}
-				$player->forbidden_seal['color'] = $color;
+				$player->chat_color = $color;
 				$system->message("Color changed");
 				break;
             case 'purple':
@@ -566,7 +566,7 @@ function premium() {
                     $system->message("Invalid color!");
                     break;
                 }
-                $player->forbidden_seal['color'] = $color;
+                $player->chat_color = $color;
                 $system->message("Color changed");
                 break;
 			case 'red':
@@ -574,7 +574,7 @@ function premium() {
 					$system->message("Invalid color!");
 					break;
 				}
-				$player->forbidden_seal['color'] = $color;
+				$player->chat_color = $color;
 				$system->message("Color changed");
 			break;
 			/* End Shadekun edit */
@@ -973,21 +973,26 @@ function premium() {
 
     $name_colors = [
         [
-            'class'=>'blue',
-            'label' => 'Blue',
-            'value' => 'blue'
-        ],
-        [
-            'class'=>'pink',
-            'label' => 'Pink',
-            'value' => 'pink'
-        ],
-        [
             'class' => '',
             'label' => 'Black',
             'value' => 'black'
         ],
     ];
+
+    if($player->forbidden_seal) {
+        $name_colors = array_merge($name_colors, [
+            [
+                'class'=>'blue',
+                'label' => 'Blue',
+                'value' => 'blue'
+            ],
+            [
+                'class'=>'pink',
+                'label' => 'Pink',
+                'value' => 'pink'
+            ],
+        ]);
+    }
 
     if($player->premium_credits_purchased > 0) {
         $name_colors[] = [
@@ -1020,7 +1025,7 @@ function premium() {
             'value' => 'purple'
         ];
     }
-    if($player->isHeadAdmin()) {
+    if($player->isUserAdmin() || $player->isHeadAdmin()) {
         $name_colors[] = [
             'class'=>'administrator',
             'label' => 'Red',
