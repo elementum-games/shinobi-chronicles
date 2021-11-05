@@ -45,7 +45,7 @@ class SupportManager {
     protected $system;
 
     public $user_id;
-    public $support_level;
+    public $user_support_level;
     public $admin;
     public $key = '';
     public $requestTypeUserlevels;
@@ -63,10 +63,10 @@ class SupportManager {
      * @param int  $user_id
      * @param bool $admin
      */
-    public function __construct($system, $user_id = 0, $support_level = false, $admin = false) {
+    public function __construct($system, $user_id = 0, $user_support_level = false, $admin = false) {
         $this->system = $system;
         $this->user_id = $user_id;
-        $this->support_level = $support_level;
+        $this->user_support_level = $user_support_level;
         $this->admin = $admin;
 
         $this->requestTypeUserlevels = [
@@ -123,7 +123,7 @@ class SupportManager {
                 'Misc. Request',
                 'Suggestion',
             ];
-            if($staffLevel >= System::SC_MODERATOR) {
+            if($staffLevel == System::SC_MODERATOR) {
                 $types[] = 'Mod Request';
             }
         }
@@ -143,10 +143,10 @@ class SupportManager {
             return true;
         }
 
-        if($this->support_level == User::SUPPORT_CONTENT_ONLY && $this->requestTypeUserlevels[$type] == User::SUPPORT_CONTENT_ONLY) {
+        if($this->user_support_level == User::SUPPORT_CONTENT_ONLY && $this->requestTypeUserlevels[$type] == User::SUPPORT_CONTENT_ONLY) {
             return true;
         }
-        else if($this->support_level >= $this->requestTypeUserlevels[$type]) {
+        else if($this->user_support_level >= $this->requestTypeUserlevels[$type]) {
             return true;
         }
 
@@ -169,10 +169,10 @@ class SupportManager {
 
         $canProcess = [];
         foreach($this->requestTypeUserlevels as $type=>$userlevel) {
-            if($this->support_level == User::SUPPORT_CONTENT_ONLY && User::SUPPORT_CONTENT_ONLY == $userlevel) {
+            if($this->user_support_level == User::SUPPORT_CONTENT_ONLY && User::SUPPORT_CONTENT_ONLY == $userlevel) {
                 $canProcess[] = $type;
             }
-            else if($this->support_level != User::SUPPORT_CONTENT_ONLY && $this->support_level >= $userlevel) {
+            else if($this->user_support_level != User::SUPPORT_CONTENT_ONLY && $this->user_support_level >= $userlevel) {
                 $canProcess[] = $type;
             }
         }
@@ -414,6 +414,7 @@ class SupportManager {
                 return $supports;
             }
             else {
+                // This is currently not used
                 $supports = [
                     'high' => [],
                     'reg' => [],
