@@ -156,31 +156,13 @@ else {
 
 // Start display
 if(!$LOGGED_IN) {
-	$layout = System::DEFAULT_LAYOUT;
+	$layout = $system->fetchLayoutByName(System::DEFAULT_LAYOUT);
 }
 else {
-	$layout = $player->layout;
+	$layout = $system->fetchLayoutByName($player->layout);
 }
-switch($layout) {
-  case 'cextralite':
-		require("layout/cextralite.php");
-		break;
-	case 'classic_blue':
-		require("layout/classic_blue.php");
-		break;
-	case 'shadow_ribbon':
-		require("layout/shadow_ribbon.php");
-		break;
-	case 'geisha':
-		require("layout/geisha.php");
-		break;
-	case 'blue_scroll':
-		require("layout/blue_scroll.php");
-		break;
-	default:
-		require("layout/classic_blue.php");
-		break;
-}
+require($layout);
+
 if(!$ajax) {
 	echo $heading;
 	echo $top_menu;
@@ -500,8 +482,11 @@ if($LOGGED_IN) {
             }
         }
 
-        if($player->isModerator() || $player->hasAdminPanel()) {
+        if($player->isModerator() || $player->hasAdminPanel() || $player->isSupportStaff()) {
             echo $staff_menu_header;
+            if($player->isSupportStaff()) {
+                echo "<li><a id='sideMenuOption-SupportPanel' href='{$system->link}?id=30'>Support Panel</a></li>";
+            }
             if($player->isModerator()) {
                 echo "<li><a id='sideMenuOption-ModPanel' href='{$system->link}?id=16'>Mod Panel</a></li>";
             }

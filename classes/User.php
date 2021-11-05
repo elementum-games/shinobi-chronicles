@@ -42,6 +42,13 @@ class User extends Fighter {
     const STAFF_ADMINISTRATOR = 4;
     const STAFF_HEAD_ADMINISTRATOR = 5;
 
+    const SUPPORT_NONE = 0;
+    const SUPPORT_BASIC = 1;
+    const SUPPORT_INTERMEDIATE = 2;
+    const SUPPORT_CONTENT_ONLY = 3;
+    const SUPPORT_SUPERVISOR = 4;
+    const SUPPORT_ADMIN = 5;
+
     const UPDATE_NOTHING = 0;
     const UPDATE_REGEN = 1;
     const UPDATE_FULL = 2;
@@ -82,6 +89,7 @@ class User extends Fighter {
 
     public $exp;
     public $staff_level;
+    public $support_level;
     public int $bloodline_id;
     public $bloodline_name;
     public $clan;
@@ -227,7 +235,7 @@ class User extends Fighter {
         $this->id = self::ENTITY_TYPE . ':' . $this->user_id;
 
         $result = $this->system->query("SELECT `user_id`, `user_name`, `ban_type`, `ban_expire`, `journal_ban`, `avatar_ban`, `song_ban`, `last_login`,
-			`forbidden_seal`, `staff_level`, `username_changes`
+			`forbidden_seal`, `staff_level`, `support_level`, `username_changes`
 			FROM `users` WHERE `user_id`='$this->user_id' LIMIT 1"
         );
         if($this->system->db_last_num_rows == 0) {
@@ -240,6 +248,7 @@ class User extends Fighter {
         $this->username_changes = $result['username_changes'];
 
         $this->staff_level = $result['staff_level'];
+        $this->support_level = $result['support_level'];
 
         $this->ban_type = $result['ban_type'];
         $this->ban_expire = $result['ban_expire'];
@@ -1306,6 +1315,38 @@ class User extends Fighter {
     public function clearMission() {
         $this->mission_id = 0;
         $this->mission_stage = [];
+    }
+
+    public function isSupportStaff(): bool {
+        switch($this->support_level) {
+            case User::SUPPORT_BASIC:
+            case User::SUPPORT_INTERMEDIATE:
+            case User::SUPPORT_CONTENT_ONLY:
+            case User::SUPPORT_SUPERVISOR:
+            case User::SUPPORT_ADMIN:
+                return true;
+            default:
+                return false;
+        }
+    }
+
+    public function isSupportSupervisor(): bool {
+        switch($this->support_level) {
+            case User::SUPPORT_SUPERVISOR:
+            case User::SUPPORT_ADMIN:
+                return true;
+            default:
+                return false;
+        }
+    }
+
+    public function isSupportAdmin(): bool {
+        switch($this->support_level) {
+            case User::SUPPORT_ADMIN:
+                return true;
+            default:
+                return false;
+        }
     }
 
     public function isModerator(): bool {

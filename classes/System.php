@@ -8,6 +8,7 @@ require_once __DIR__ . '/User.php';
 */
 class System {
     const ENVIRONMENT_DEV = 'dev';
+    const LOCAL_HOST = true;
 
     const KUNAI_PER_DOLLAR = 2;
     const LOGOUT_LIMIT = 120;
@@ -23,10 +24,15 @@ class System {
 
     const SC_MODERATOR = 1;
     const SC_HEAD_MODERATOR = 2;
-    const SC_ADMINISTRATOR = 3;
-    const SC_HEAD_ADMINISTRATOR = 4;
+    const SC_CONTENT_ADMINISTRATOR = 3;
+    const SC_ADMINISTRATOR = 4;
+    const SC_HEAD_ADMINISTRATOR = 5;
 
     const DB_DATETIME_MS_FORMAT = 'Y-m-d H:i:s.u';
+
+    const SC_ADMIN_EMAIL = "admin@shinobichronicles.com";
+    const SC_NO_REPLY_EMAIL = "no-reply@shinobichronicles.com";
+    const UNSERVICEABLE_EMAIL_DOMAINS = ['hotmail.com', 'live.com', 'msn.com', 'outlook.com'];
 
     public static array $villages = ['Stone', 'Cloud', 'Leaf', 'Sand', 'Mist'];
     public static array $forbidden_seals = array(1 => 'Twin Sparrow Seal', 2 => 'Four Dragon Seal');
@@ -104,9 +110,11 @@ class System {
         'spar' => 22,
         'mission' => 14,
         'rankup' => 25,
+        'support' => 30,
     ];
     public array $links = [
-        'github' => 'https://github.com/elementum-games/shinobi-chronicles'
+        'github' => 'https://github.com/elementum-games/shinobi-chronicles',
+        'discord' => 'https://discord.gg/Kx52dbXEf3',
     ];
 
     //Chat variables
@@ -503,6 +511,10 @@ class System {
         $replace_array = [];
 
         $reg_exUrl = '/((?:http|https)\:\/\/(?:[a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,5})(?:\/[^\:\s\\\\]*)?)/i';
+        if(self::LOCAL_HOST) {
+            //Allow regex to work with local links if system is set to local host
+            $reg_exUrl = '/((?:http|https)\:\/\/(?:[a-zA-Z0-9\-\.]+[a-zA-Z]{2,5})(?:\/[^\:\s\\\\]*)?)/i';
+        }
         $text = preg_replace_callback(
             $reg_exUrl,
             function($matches) {
@@ -639,24 +651,10 @@ class System {
         return password_verify($password, $hash);
     }
 
-    public function renderStaticPageHeader() {
+    public function renderStaticPageHeader($layout = System::DEFAULT_LAYOUT) {
         $system = $this;
 
-        switch(System::DEFAULT_LAYOUT) {
-            case 'cextralite':
-                require("layout/cextralite.php");
-                break;
-            case 'classic_blue':
-                require("layout/classic_blue.php");
-                break;
-            case 'geisha':
-                require("layout/geisha.php");
-                break;
-            case 'shadow_ribbon':
-            default:
-                require("layout/shadow_ribbon.php");
-                break;
-        }
+        require($this->fetchLayoutByName($layout));
 
         /**
          * @var $heading
@@ -671,24 +669,10 @@ class System {
         echo str_replace("[HEADER_TITLE]", "Rules", $body_start);
     }
 
-    public function renderStaticPageFooter() {
+    public function renderStaticPageFooter($layout = System::DEFAULT_LAYOUT) {
         $system = $this;
 
-        switch(System::DEFAULT_LAYOUT) {
-            case 'cextralite':
-                require("layout/cextralite.php");
-                break;
-            case 'classic_blue':
-                require("layout/classic_blue.php");
-                break;
-            case 'geisha':
-                require("layout/geisha.php");
-                break;
-            case 'shadow_ribbon':
-            default:
-                require("layout/shadow_ribbon.php");
-                break;
-        }
+        require($this->fetchLayoutByName($layout));
 
         /**
          * @var $side_menu_start
@@ -706,6 +690,29 @@ class System {
         }
 
         echo str_replace('<!--[VERSION_NUMBER]-->', System::VERSION_NUMBER, $footer);
+    }
+
+    public function fetchLayoutByName($layout) {
+        switch($layout) {
+            case 'cextralite':
+                return "layout/cextralite.php";
+                break;
+            case 'classic_blue':
+                return "layout/classic_blue.php";
+                break;
+            case 'shadow_ribbon':
+                return "layout/shadow_ribbon.php";
+                break;
+            case 'geisha':
+                return "layout/geisha.php";
+                break;
+            case 'blue_scroll':
+                return "layout/blue_scroll.php";
+                break;
+            default:
+                return "layout/" . self::DEFAULT_LAYOUT . ".php";
+                break;
+        }
     }
 
     /**

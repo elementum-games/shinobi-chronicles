@@ -1467,6 +1467,21 @@ function adminPanel() {
             ];
         }
 
+        if($player->isSupportAdmin() || $player->isHeadAdmin()) {
+            $variables['support_level'] = [
+                'data_type' => 'int',
+                'input_type' => 'radio',
+                'options' => [
+                    User::SUPPORT_NONE => 'normal_user',
+                    User::SUPPORT_BASIC => 'basic_support',
+                    User::SUPPORT_INTERMEDIATE => 'intermediate_support',
+                    User::SUPPORT_CONTENT_ONLY => 'content_only_support',
+                    User::SUPPORT_SUPERVISOR => 'support_supervisor',
+                    User::SUPPORT_ADMIN => 'support_admin',
+                ]
+            ];
+        }
+
         // Validate user name
         if($_GET['user_name']) {
             $user_name = $system->clean($_GET['user_name']);

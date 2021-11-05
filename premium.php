@@ -1020,7 +1020,7 @@ function premium() {
             'value' => 'purple'
         ];
     }
-    if($player->isHeadAdmin()) {
+    if($player->isUserAdmin()) {
         $name_colors[] = [
             'class'=>'administrator',
             'label' => 'Red',

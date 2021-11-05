@@ -56,11 +56,11 @@ HTML;
 $top_menu = <<<HTML
 <ul>
 	<li><a href='{$system->link}'>News</a></li>
-	<li><a href='https://discord.gg/Kx52dbXEf3' target='_blank'>Discord</a></li>
+	<li><a href='{$system->links['discord']}' target='_blank'>Discord</a></li>
 	<li><a href='{$system->link}manual.php'>Manual</a></li>
 	<li><a href='{$system->links['github']}'>GitHub</a></li>
 	<li><a href='{$system->link}rules.php'>Rules</a></li>
-	<li><a href='{$system->link}terms.php'>Terms</a></li>
+	<li><a href='{$system->link}support.php'>Support</a></li>
 </ul>
 HTML;
 
@@ -127,8 +127,9 @@ HTML;
 $footer = <<<HTML
 	</div>
 	<div id='footer'>
-		<p>Shinobi Chronicles v<!--[VERSION_NUMBER]--> &bull; Copyright &copy; LM Visions</p>
-	</div>
+		<p>Shinobi Chronicles v<!--[VERSION_NUMBER]--> &bull; Copyright &copy; LM Visions</p>	
+	    <p><a href="{$system->link}terms.php">Terms of Service</a></p>	
+    </div>
 </body>
 </html>
 HTML;
