@@ -645,6 +645,9 @@ class User extends Fighter {
                 if(!isset($this->forbidden_seal['level'])) {
                     $this->chat_color = $this->forbidden_seal['color'];
                     $this->forbidden_seal = false;
+                } else {
+                    $this->chat_color = $this->forbidden_seal['color'];
+                    unset($this->forbidden_seal['color']);
                 }
             }
 
