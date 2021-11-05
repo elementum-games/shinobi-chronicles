@@ -51,7 +51,7 @@ function chat() {
 			$supported_colors = $player->getNameColors();
 
 			$user_color = '';
-            if($player->canChangeChatColor() && isset($supported_colors[$player->chat_color])) {
+            if(isset($supported_colors[$player->chat_color])) {
                 $user_color = $supported_colors[$player->chat_color];
             }
 
