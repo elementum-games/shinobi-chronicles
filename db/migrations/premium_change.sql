@@ -1,0 +1,1 @@
+ALTER TABLE `users` ADD `chat_color` VARCHAR(100) NOT NULL AFTER `forbidden_seal`;

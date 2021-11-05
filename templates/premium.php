@@ -363,13 +363,16 @@
                     <?= System::$forbidden_seals[$player->forbidden_seal['level']] ?><br/>
                     <?= $system->time_remaining($player->forbidden_seal['time'] - time()) ?>
                     <br />
+                <?php else: ?>
+                    None<br />
                 <?php endif; ?>
 
-                <?php if(isset($player->forbidden_seal['level']) || $player->premium_credits_purchased): ?>
+                <?php if($player->canChangeChatColor()): ?>
+                    <br /><b>Change Name Color:</b><br />
                     <form action='<?= $self_link ?>&view=forbidden_seal' method='post'>
                         <?php foreach($name_colors as $name_color): ?>
                             <input type='radio' name='name_color' value='<?= $name_color['value'] ?>'
-                                <?= ($player->forbidden_seal['color'] == $name_color['value'] ? "checked='checked'" : '') ?> />
+                                <?= ($player->chat_color == $name_color['value'] ? "checked='checked'" : '') ?> />
                             <span class='<?= $name_color['class'] ?>' style='font-weight:bold;'><?= $name_color['label'] ?></span>
                         <?php endforeach; ?>
                         <br />
