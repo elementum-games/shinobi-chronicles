@@ -112,7 +112,7 @@ class SupportManager {
                 self::$TYPE_MISC,
             ];
 
-            if($this->user->staff_level == System::SC_MODERATOR) {
+            if($this->user->isModerator()) {
                 $types[] = [
                     self::$TYPE_MOD_REQUEST,
                 ];
@@ -321,7 +321,7 @@ class SupportManager {
         return false;
     }
 
-    public function fetchAllSupports($category = '', $limit = 100, $offset = 0, $order = 'DESC') {
+    public function fetchAllSupports($category = '', $limit = 100, $offset = 0, $order = 'ASC') {
         if(!$this->staff) {
             return false;
         }
@@ -395,7 +395,7 @@ class SupportManager {
         return false;
     }
 
-    public function updateSupport($support_id, $support_staff = false) {
+    public function updateSupport($support_id) {
         $support_data = $this->fetchSupportByID($support_id);
 
         if(!$support_data) {
@@ -403,7 +403,7 @@ class SupportManager {
         }
 
         // Notify user of update
-        if($support_staff) {
+        if($this->staff) {
             if($support_data['user_id']) {
                 $this->system->send_pm($this->user_id, $support_data['user_id'], "Support Updated!",
                     "Your support {$support_data['subject']} has been updated and can be viewed here "
@@ -411,7 +411,7 @@ class SupportManager {
             }
         }
         // Email if ticket submitted by guest
-        if($support_data['user_id'] == 0 && $support_staff) {
+        if($support_data['user_id'] == 0 && $this->staff) {
             // Make sure a name/administrator is placed in email
             $admin_name = ($this->user) ? $this->user->user_name : 'Administrator';
 
@@ -425,7 +425,7 @@ class SupportManager {
         }
 
         $query = "UPDATE `support_request` SET `updated`='" . time() . "',
-            `admin_response`='{$support_staff}' WHERE `support_id`='{$support_id}' LIMIT 1";
+            `admin_response`='{$this->staff}' WHERE `support_id`='{$support_id}' LIMIT 1";
 
         if($this->system->query($query)) {
             return true;
@@ -456,7 +456,7 @@ class SupportManager {
 
         if($this->system->db_last_insert_id) {
             if($this->staff && $update) {
-                $this->updateSupport($support_id, $this->staff);
+                $this->updateSupport($support_id);
             }
             else {
                 $this->updateSupport($support_id);

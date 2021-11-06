@@ -134,7 +134,15 @@
             <tr><th><?=$supportData['subject']?></th></tr>
             <tr>
                 <td>
-                    <label style="width:8em; font-weight:bold;">Submitted By:</label><?=$supportData['user_name']?><br />
+                    <label style="width:8em; font-weight:bold;">Submitted By:</label>
+                    <?php if($supportData['user_id']): ?>
+                        <a href="<?=$system->link?>?id=<?=System::PAGE_IDS['members']?>&user=<?=$supportData['user_name']?>"
+                        target="_blank">
+                            <?=$supportData['user_name']?>
+                        </a><br />
+                    <?php else: ?>
+                        <?=$supportData['user_name']?><br />
+                    <?php endif ?>
                     <label style="width:8em; font-weight:bold;">Status:</label><?=($supportData['open']) ? 'Open' : 'Closed'?><br />
                     <label style="width:8em; font-weight:bold;">Premium:</label><?=($supportData['premium'] ? 'Yes' : 'No')?><br />
                     <?=($supportData['user_id'] == 0 && isset($supportData['support_key']))
