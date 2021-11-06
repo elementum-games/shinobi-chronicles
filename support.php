@@ -17,9 +17,13 @@ if(isset($_SESSION['user_id'])) {
     $layout = $system->fetchLayoutByName($player->layout);
     $staff_level = $player->staff_level;
     $user_id = $player->user_id;
+
+    $supportSystem = new SupportManager($system, $player);
+}
+else {
+    $supportSystem = new SupportManager($system);
 }
 
-$supportSystem = new SupportManager($system, $user_id);
 $request_types = $supportSystem->getSupportTypes($staff_level);
 $supportCreated = false;
 
@@ -31,7 +35,7 @@ echo $header;
 echo str_replace("[HEADER_TITLE]", "Support", $body_start);
 
 if(!$guest_support) {
-    //Form submitted
+    //Form submitted // 11/6/21 SM{V2} supported
     if(isset($_POST['add_support']) || isset($_POST['add_support_prem']) || isset($_POST['confirm_prem_support'])) {
         try {
             $addSupport = true;
@@ -79,10 +83,11 @@ if(!$guest_support) {
 
             // Add support
             if($addSupport) {
-                if ($supportSystem->createSupport($player->current_ip, '', $request_type, $subject, $message,
-                    $user_id, $player->user_name, $premium)
-                ) {
+                if ($supportSystem->createSupport($player->user_name, $request_type, $subject, $message, $premium)) {
                     $system->message("Support Submitted!");
+                }
+                else {
+                    $system->message("Error submitting support.");
                 }
             }
         }catch (Exception $e) {
@@ -117,13 +122,13 @@ if(!$guest_support) {
         require('templates/supportTicketForm.php');
 
         // Load user tickets
-        $supports = $supportSystem->fetchUserSupports($user_id);
+        $supports = $supportSystem->fetchUserSupports();
         if (!empty($supports)) {
             require('templates/userTickets.php');
         }
     } else {
         $support_id = (int) $_GET['support_id'];
-        $support = $supportSystem->fetchSupportByID($support_id, $user_id);
+        $support = $supportSystem->fetchSupportByID($support_id);
 
         if(!$support) {
             $system->message("Support not found!");
@@ -144,7 +149,7 @@ if(!$guest_support) {
                             SupportManager::$validationConstraints['message']['max'] . " characters!");
                     }
 
-                    if ($supportSystem->addSupportResponses($support_id, $user_id, $player->user_name, $message, $player->current_ip,)) {
+                    if ($supportSystem->addSupportResponse($support_id, $player->user_name, $message)) {
                             $system->message("Response added!");
                     }
                     else {
@@ -176,13 +181,16 @@ if(!$guest_support) {
                                 SupportManager::$validationConstraints['message']['max'] . " characters!");
                         }
 
-                        $supportSystem->addSupportResponses($support_id, $user_id, $player->user_name, $message, $player->current_ip, $player->staff_level);
+                        $supportSystem->addSupportResponse($support_id, $player->user_name, $message);
                         if(!$system->db_last_insert_id) {
                             throw new Exception("Error adding response.");
                         }
                     }
 
-                    $supportSystem->closeSupport($support_id);
+                    if($supportSystem->closeSupport($support_id)) {
+                        $support['open'] = 0;
+                        $system->message("Support closed.");
+                    }
                 }catch (Exception $e) {
                     $system->message($e->getMessage());
                 }
@@ -278,7 +286,8 @@ if(!$guest_support) {
     // Get support data
     if(isset($_GET['support_key'])) {
         $support_key = $system->clean($_GET['support_key']);
-        $supportData = $supportSystem->fetchSupportByKey($support_key);
+        $email = $system->clean($_GET['email']);
+        $supportData = $supportSystem->fetchSupportByKey($support_key, $email);
 
         if(!$supportData) {
             $system->message("Support not found!");
@@ -337,8 +346,7 @@ if(!$guest_support) {
             }
 
             // Create support
-            if($supportSystem->createSupport($_SERVER['REMOTE_ADDR'], $email, $support_type, $subject, $message,
-                0, $name, false, $support_key)) {
+            if($supportSystem->createSupport($name, $support_type, $subject, $message, 0, $email, $support_key)) {
                 $supportCreated = true;
                 // Send email to user
                 $subject = "Shinobi-Chronicles support request";
@@ -374,7 +382,7 @@ if(!$guest_support) {
                 throw new Exception("Support not found!");
             }
 
-            if($supportSystem->addSupportResponses($supportData['support_id'], 0, $supportData['user_name'], $message, $_SERVER['REMOTE_ADDR'])) {
+            if($supportSystem->addSupportResponse($supportData['support_id'], $supportData['user_name'], $message)) {
                 $system->message("Response added!");
                 $responses = $supportSystem->fetchSupportResponses($supportData['support_id']);
             } else {

@@ -52,7 +52,12 @@
             <form action="<?=$self_link?>" method="get">
                 <input type="hidden" name="id" value="30" />
                 <input type="hidden" name="support_search" value="true" />
-                <label style="width:6.5em; font-weight:bold;">Supp. Type:</label><input type="text" name="support_type" />
+                <label style="width:6.5em; font-weight:bold;">Supp. Type:</label>
+                <select name="support_type">
+                    <?php foreach($supportTypes as $type): ?>
+                        <option value="<?=$type?>"><?=$type?></option>
+                    <?php endforeach ?>
+                </select>
                 <input type="submit" value="Search" />
             </form>
         </td>
@@ -152,7 +157,7 @@
                 <?php endforeach ?>
             <?php endif ?>
             </table>
-            <?php if($supportData['open']): ?>
+            <!-- Response Table -->
             <table class="table">
                 <tr><th>Add Response</th></tr>
                 <tr style="text-align:center;"><td>
@@ -160,11 +165,14 @@
                         <textarea id="responseMessage" name="message" style="width:500px;height:200px;"></textarea><br />
                         <br />
                         <input type="checkbox" id="quickReply" checked="checked" />Quick Reply<br />
-                        <input type="submit" id="responseSubmit" name="add_response" value="Reply" />
-                        <input type="submit" name="close_ticket" value="Close" />
+                        <?php if ($supportData['open']): ?>
+                            <input type="submit" id="responseSubmit" name="add_response" value="Reply" />
+                            <input type="submit" name="close_ticket" value="Close" />
+                        <?php else: ?>
+                            <input type="submit" id="responseSubmit" name="open_ticket" value="Re-open" />
+                        <?php endif ?>
                     </form>
                 </td></tr>
             </table>
-            <?php endif ?>
     <?php endif ?>
 <?php endif ?>
