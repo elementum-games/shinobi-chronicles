@@ -113,9 +113,7 @@ class SupportManager {
             ];
 
             if($this->user->isModerator()) {
-                $types[] = [
-                    self::$TYPE_MOD_REQUEST,
-                ];
+                $types[] = self::$TYPE_MOD_REQUEST;
             }
         }
         return $types;
