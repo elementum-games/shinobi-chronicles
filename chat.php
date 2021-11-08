@@ -48,54 +48,9 @@ function chat() {
 
 			$title = $player->rank_name;
 			$staff_level = $player->staff_level;
-			$supported_colors = array(
-				'black' => 0,'blue' => -1,
-				'pink' => -2,
-				'gold' => -3,
-				'green' => -4,
-				'teal' => -5,
-				'purple' => -6,
-				'red' => -7,
-			);
+			$supported_colors = $player->getNameColors();
 
-            // Restrict color if user is no longer able to use it
-            switch($player->chat_color) {
-                case 'blue':
-                case 'pink':
-                    if(!$player->forbidden_seal) {
-                        $player->chat_color = 'black';
-                    }
-                    break;
-                case 'gold':
-                    if(!$player->premium_credits_purchased) {
-                        $player->chat_color = 'black';
-                    }
-                    break;
-                case 'green':
-                    if(!$player->isModerator()) {
-                        $player->chat_color = 'black';
-                    }
-                    break;
-                case 'teal':
-                    if(!$player->isHeadAdmin()) {
-                        $player->chat_color = 'black';
-                    }
-                    break;
-                case 'purple':
-                    if(!$player->isContentAdmin() || !$player->isUserAdmin() || !$player->isHeadAdmin()) {
-                        $player->chat_color = 'black';
-                    }
-                    break;
-                case 'red':
-                    if(!$player->isUserAdmin() || !$player->isHeadAdmin()) {
-                        $player->chat_color = 'black';
-                    }
-                    break;
-                default:
-                    break;
-            }
-
-			$user_color = (!$player->canChangeChatColor()) ? 0 : ($supported_colors[$player->chat_color]);
+			$user_color = (!$player->canChangeChatColor()) ? '' : ($supported_colors[$player->chat_color]);
 
 			$sql = "INSERT INTO `chat`
                     (`user_name`, `message`, `title`, `village`, `staff_level`, `user_color`, `time`, `edited`) VALUES
@@ -213,33 +168,9 @@ function chat() {
             $statusType = "userLink ";
             $statusType .= ($userData['premium_credits_purchased']) ? "premiumUser" : "";
             $class = "chat ";
-            switch($post['user_color']) {
-                case -1:
-                    $class .= 'blue';
-                    break;
-                case -2:
-                    $class .= 'pink';
-                    break;
-                case -3:
-                    $class .= 'gold';
-                    break;
-                case -4:
-                    $class .= 'moderator';
-                    break;
-                case -5:
-                    $class .= 'headModerator';
-                    break;
-                case -6:
-                    $class .= 'contentAdmin';
-                    break;
-                case -7:
-                    $class .= 'administrator';
-                    break;
-                default:
-                    $class .= 'normalUser';
-                    break;
+            if(isset($post['user_color'])) {
+                $class .= $post['user_color'];
             }
-
 
 			/*If User is Blocked, Skip their Echo'd Post!*/
 			$isBlocked = false;
