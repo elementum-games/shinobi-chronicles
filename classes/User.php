@@ -651,18 +651,6 @@ class User extends Fighter {
                 }
             }
 
-
-            // Patch infinite premium from user name color
-            if(isset($this->forbidden_seal['color']) && $UPDATE >= User::UPDATE_FULL) {
-                if(!isset($this->forbidden_seal['level'])) {
-                    $this->chat_color = $this->forbidden_seal['color'];
-                    $this->forbidden_seal = false;
-                } else {
-                    $this->chat_color = $this->forbidden_seal['color'];
-                    unset($this->forbidden_seal['color']);
-                }
-            }
-
             // Regen boost
             else {
                 if($this->forbidden_seal['level'] == 1) {
@@ -1308,25 +1296,6 @@ class User extends Fighter {
 
     public function getAvatarSize(): int {
         return $this->forbidden_seal ? self::AVATAR_MAX_SEAL_SIZE : self::AVATAR_MAX_SIZE;
-    }
-
-    public function canChangeChatColor(): bool {
-        // Premium purchased
-        if($this->premium_credits_purchased) {
-            return true;
-        }
-
-        // Forbidden seal
-        if($this->forbidden_seal && $this->forbidden_seal['time'] > time()) {
-            return true;
-        }
-
-        // Staff level
-        if($this->isModerator() || $this->isHeadModerator() || $this->isContentAdmin() || $this->isUserAdmin() || $this->isHeadAdmin()) {
-            return true;
-        }
-
-        return false;
     }
 
     public function canChangeChatColor(): bool {
