@@ -971,67 +971,7 @@ function premium() {
         }
     }
 
-    $name_colors = [
-        [
-            'class' => '',
-            'label' => 'Black',
-            'value' => 'black'
-        ],
-    ];
-
-    if($player->forbidden_seal) {
-        $name_colors = array_merge($name_colors, [
-            [
-                'class'=>'blue',
-                'label' => 'Blue',
-                'value' => 'blue'
-            ],
-            [
-                'class'=>'pink',
-                'label' => 'Pink',
-                'value' => 'pink'
-            ],
-        ]);
-    }
-
-    if($player->premium_credits_purchased > 0) {
-        $name_colors[] = [
-            'class'=>'gold',
-            'label' => 'Gold',
-            'value' => 'gold'
-        ];
-    }
-
-    if($player->isModerator()) {
-        $name_colors[] = [
-            'class'=>'moderator',
-            'label' => 'Green',
-            'value' => 'green'
-        ];
-
-    }
-    if($player->isHeadModerator()) {
-        $name_colors[] = [
-            'class'=>'headModerator',
-            'label' => 'Teal',
-            'value' => 'teal'
-        ];
-
-    }
-    if($player->isContentAdmin()) {
-        $name_colors[] = [
-            'class'=>'contentAdmin',
-            'label' => 'Purple',
-            'value' => 'purple'
-        ];
-    }
-    if($player->isUserAdmin() || $player->isHeadAdmin()) {
-        $name_colors[] = [
-            'class'=>'administrator',
-            'label' => 'Red',
-            'value' => 'red'
-        ];
-    }
+    $name_colors = $player->getNameColors();
 
     // Buying shards
     if($system->environment == System::ENVIRONMENT_DEV) {

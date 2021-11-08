@@ -1292,6 +1292,47 @@ class User extends Fighter {
         return false;
     }
 
+    /**
+     * @param false $forceAll // should only be used for debugging
+     * @return string[]
+     */
+    public function getNameColors($forceAll = false) {
+        $return = [
+            'black' => 'normalUser'
+        ];
+
+        if($this->forbidden_seal || $forceAll) {
+            $return = array_merge($return, [
+                'blue' => 'blue',
+                'pink' => 'pink',
+            ]);
+        }
+
+        if($this->premium_credits_purchased > 0 || $forceAll) {
+            $return = array_merge($return, [
+                'gold' => 'gold'
+            ]);
+        }
+
+        if($this->isModerator() || $forceAll) {
+            $return['green'] = 'moderator';
+        }
+
+        if($this->isHeadModerator() || $forceAll) {
+            $return['teal'] = 'headModerator';
+        }
+
+        if($this->isContentAdmin() || $forceAll) {
+            $return['purple'] = 'contentAdmin';
+        }
+
+        if($this->isUserAdmin() || $this->isHeadAdmin() || $forceAll) {
+            $return['red'] = 'administrator';
+        }
+
+        return $return;
+    }
+
     public function getAvatarFileSize($format='MB'): string {
         $max_size = self::AVATAR_MAX_FILE_SIZE;
         switch($format) {
