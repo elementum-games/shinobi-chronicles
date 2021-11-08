@@ -370,10 +370,10 @@
                 <?php if($player->canChangeChatColor()): ?>
                     <br /><b>Change Name Color:</b><br />
                     <form action='<?= $self_link ?>&view=forbidden_seal' method='post'>
-                        <?php foreach($name_colors as $name_color): ?>
-                            <input type='radio' name='name_color' value='<?= $name_color['value'] ?>'
-                                <?= ($player->chat_color == $name_color['value'] ? "checked='checked'" : '') ?> />
-                            <span class='<?= $name_color['class'] ?>' style='font-weight:bold;'><?= $name_color['label'] ?></span>
+                        <?php foreach($name_colors as $name_color=>$class): ?>
+                            <input type='radio' name='name_color' value='<?= $name_color ?>'
+                                <?= ($player->chat_color == $name_color ? "checked='checked'" : '') ?> />
+                            <span class='<?= $class ?>' style='font-weight:bold;'><?= ucwords($name_color) ?></span>
                         <?php endforeach; ?>
                         <br />
                         <input type='submit' name='change_color' value='Change Name Color'/>
