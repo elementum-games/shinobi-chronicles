@@ -50,7 +50,10 @@ function chat() {
 			$staff_level = $player->staff_level;
 			$supported_colors = $player->getNameColors();
 
-			$user_color = (!$player->canChangeChatColor()) ? '' : ($supported_colors[$player->chat_color]);
+			$user_color = '';
+            if($player->canChangeChatColor() && isset($supported_colors[$player->chat_color])) {
+                $user_color = $supported_colors[$player->chat_color];
+            }
 
 			$sql = "INSERT INTO `chat`
                     (`user_name`, `message`, `title`, `village`, `staff_level`, `user_color`, `time`, `edited`) VALUES
