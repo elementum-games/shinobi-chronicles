@@ -453,7 +453,7 @@ class SpecialMission {
     }
 
     // Returns the last time an event was triggered
-    public function returnLastUpdate(): int {
+    public function returnLastUpdateMs(): int {
         $last_entry = $this->returnLatestLog();
         return $last_entry['timestamp_ms'];
     }

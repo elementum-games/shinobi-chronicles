@@ -39,7 +39,7 @@ if ($status) {
     // The longer this is set then the easier it is for users to get sniped
     // and the longer the mission takes to complete
     $time_gap_ms = 3000;
-    $target_update = $special_mission->returnLastUpdate() + $time_gap;
+    $target_update = $special_mission->returnLastUpdateMs() + $time_gap;
     if (floor(microtime(true) * 1000) >= $target_update) {
         $special_mission->nextEvent();
         echo json_encode($special_mission);
