@@ -69,9 +69,11 @@ if(!$guest_support) {
             }
 
             // Premium cost
-            if (isset($_POST['confirm_prem_support']) && $player->premium_credits < $cost) {
-                throw new Exception("You need {$cost}AK for this request.");
-            } else {
+            if (isset($_POST['confirm_prem_support'])) {
+                if($player->premium_credits < $cost) {
+                    throw new Exception("You need {$cost}AK for this request.");
+                }
+
                 $player->premium_credits -= $cost;
                 $player->updateData();
             }
