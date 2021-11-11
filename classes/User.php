@@ -12,6 +12,10 @@ require_once __DIR__ . "/Fighter.php";
 class User extends Fighter {
     const ENTITY_TYPE = 'U';
 
+    const AVATAR_MAX_SIZE = 150;
+    const AVATAR_MAX_SEAL_SIZE = 200;
+    const AVATAR_MAX_FILE_SIZE = 1024 ** 2; // 1024 kb
+
     const GENDER_MALE = 'Male';
     const GENDER_FEMALE = 'Female';
     const GENDER_NON_BINARY = 'Non-binary';
@@ -37,6 +41,13 @@ class User extends Fighter {
     const STAFF_CONTENT_ADMIN = 3;
     const STAFF_ADMINISTRATOR = 4;
     const STAFF_HEAD_ADMINISTRATOR = 5;
+
+    const SUPPORT_NONE = 0;
+    const SUPPORT_BASIC = 1;
+    const SUPPORT_INTERMEDIATE = 2;
+    const SUPPORT_CONTENT_ONLY = 3;
+    const SUPPORT_SUPERVISOR = 4;
+    const SUPPORT_ADMIN = 5;
 
     const UPDATE_NOTHING = 0;
     const UPDATE_REGEN = 1;
@@ -78,6 +89,7 @@ class User extends Fighter {
 
     public $exp;
     public $staff_level;
+    public $support_level;
     public int $bloodline_id;
     public $bloodline_name;
     public $clan;
@@ -225,7 +237,7 @@ class User extends Fighter {
         $this->id = self::ENTITY_TYPE . ':' . $this->user_id;
 
         $result = $this->system->query("SELECT `user_id`, `user_name`, `ban_type`, `ban_expire`, `journal_ban`, `avatar_ban`, `song_ban`, `last_login`,
-			`forbidden_seal`, `staff_level`, `username_changes`
+			`forbidden_seal`, `staff_level`, `support_level`, `username_changes`
 			FROM `users` WHERE `user_id`='$this->user_id' LIMIT 1"
         );
         if($this->system->db_last_num_rows == 0) {
@@ -238,6 +250,7 @@ class User extends Fighter {
         $this->username_changes = $result['username_changes'];
 
         $this->staff_level = $result['staff_level'];
+        $this->support_level = $result['support_level'];
 
         $this->ban_type = $result['ban_type'];
         $this->ban_expire = $result['ban_expire'];
@@ -485,9 +498,9 @@ class User extends Fighter {
         if(empty($this->daily_tasks) || (time() - $this->daily_tasks_reset) > (60 * 60 * 24)) {
             $this->daily_tasks = DailyTask::generateNewTasks($this);
 
-            $this->system->query("UPDATE `daily_tasks` SET 
-                `tasks`='" . json_encode($this->daily_tasks) . "', 
-                `last_reset`='" . time() . "' 
+            $this->system->query("UPDATE `daily_tasks` SET
+                `tasks`='" . json_encode($this->daily_tasks) . "',
+                `last_reset`='" . time() . "'
                 WHERE `user_id`='{$this->user_id}'");
         }
         else if($UPDATE == User::UPDATE_FULL && !$remote_view) {
@@ -560,125 +573,24 @@ class User extends Fighter {
         if($this->bloodline_id) {
             $this->bloodline = new Bloodline($this->bloodline_id, $this->user_id);
 
-            // Each ratio operates on assumption of 5 BLP
-
-            // Set ratios
-            foreach($this->bloodline->passive_boosts as $id => $boost) {
-                $boost['power'] = floor($boost['power'] / 5);
-
-                $bloodline_skill = $this->bloodline_skill + 100;
-
-                switch($boost['effect']) {
-                    case 'regen':
-                        $regen_ratio = ($this->bloodline_skill / $this->stats_max_level);
-                        if($regen_ratio > 1) {
-                            $regen_ratio = 1;
-                        }
-                        $regen_ratio *= 0.075;
-                        $this->bloodline->passive_boosts[$id]['power'] =
-                            round($boost['power'] * $regen_ratio, 2);
-                        break;
-
-                    case 'scout_range':
-                    case 'stealth':
-                        $boost_amount = 0;
-                        if($bloodline_skill < ($this->base_stats * 0.4) && $this->rank > 2) {
-                            if($this->rank > 3 && $bloodline_skill > 750) {
-                                $boost_amount = 1;
-                            }
-                            $this->bloodline->passive_boosts[$id]['progress'] = round($bloodline_skill / ($this->base_stats * 0.4), 2) * 100;
-                        }
-                        else {
-                            $boost_amount = $this->rank - 2;
-
-                            $extra_boost = $bloodline_skill / ($this->stats_max_level * 0.5);
-                            if($extra_boost > 0.99) {
-                                $boost_amount += 1;
-                            }
-                            else {
-                                $this->bloodline->passive_boosts[$id]['progress'] = round($extra_boost, 2) * 100;
-                            }
-
-                        }
-                        $this->bloodline->passive_boosts[$id]['effect_amount'] = $boost_amount;
-
-                        break;
-
+            // Debug info
+            if($this->system->debug['bloodline']) {
+                echo "Debugging {$this->getName()}<br />";
+                foreach($this->bloodline->passive_boosts as $id => $boost) {
+                    echo "Boost: " . $boost['effect'] . " : " . $boost['power'] . "<br />";
                 }
-
+                foreach($this->bloodline->combat_boosts as $id => $boost) {
+                    echo "Boost: " . $boost['effect'] . " : " . $boost['power'] . "<br />";
+                }
+                echo "<br />";
             }
 
-            $ratios = [
-                'offense_boost' => 0.04, 'defense_boost' => 0.04,
-                'speed_boost' => 0.08, 'mental_boost' => 0.1, 'heal' => 0.04];
-            // (boosts are 50% at 1:2 offense:bl_skill)
-
-            foreach($this->bloodline->combat_boosts as $id => $boost) {
-                $boost['power'] = floor($boost['power'] / 5);
-
-                $bloodline_skill = $this->bloodline_skill + 10;
-
-                switch($boost['effect']) {
-                    case 'ninjutsu_boost':
-                    case 'genjutsu_boost':
-                    case 'taijutsu_boost':
-                        $skill_ratio = $this->bloodlineSkillRatio($boost);
-
-                        $this->bloodline->combat_boosts[$id]['power'] =
-                            round($boost['power'] * $skill_ratio * $ratios['offense_boost'], 3);
-                        break;
-
-                    case 'ninjutsu_resist':
-                    case 'genjutsu_resist':
-                    case 'taijutsu_resist':
-                        $boost_type = explode('_', $boost['effect'])[0];
-                        $skill_ratio = $this->bloodlineSkillRatio($boost);
-
-                        // Est. jutsu power
-                        $skill = $bloodline_skill + $this->{$boost_type . '_skill'};
-                        $jutsu_power = $this->rank;
-                        $jutsu_power += round($skill / $this->stats_max_level, 3);
-                        if($jutsu_power > $this->rank + 1) {
-                            $jutsu_power = $this->rank + 1;
-                        }
-
-                        $multiplier = $jutsu_power;
-
-                        $this->bloodline->combat_boosts[$id]['power'] =
-                            round($boost['power'] * $multiplier * $skill_ratio * $ratios['defense_boost'], 3);
-                        break;
-
-                    case 'speed_boost':
-                    case 'cast_speed_boost':
-                        $this->bloodline->combat_boosts[$id]['power'] = round($boost['power'] * $ratios['speed_boost'], 3);
-                        break;
-
-                    case 'intelligence_boost':
-                    case 'willpower_boost':
-                        $this->bloodline->combat_boosts[$id]['power'] = round($boost['power'] * $ratios['mental_boost'], 3);
-                        break;
-
-                    // (NEEDS TESTING/ADJUSTMENT)
-                    case 'heal':
-                        // Est. jutsu power
-                        $skill = $bloodline_skill;
-                        $jutsu_power = $this->rank;
-                        $jutsu_power += round($skill / $this->stats_max_level, 3);
-                        if($jutsu_power > $this->rank + 1) {
-                            $jutsu_power = $this->rank + 1;
-                        }
-                        $stat_multiplier = 35 * $jutsu_power; /* est jutsu power */
-
-                        // Defensive power
-                        $defense = 50 + ($this->total_stats * 0.01);
-
-                        $this->bloodline->combat_boosts[$id]['power'] =
-                            round($boost['power'] * $stat_multiplier * $ratios['heal'] / $defense, 3);
-                        $this->bloodline->combat_boosts[$id]['divider'] = $defense;
-
-                        break;
-                }
-            }
+            $this->bloodline->setBoostAmounts(
+                $this->rank,
+                $this->ninjutsu_skill, $this->taijutsu_skill, $this->genjutsu_skill, $this->bloodline_skill,
+                $this->base_stats, $this->total_stats, $this->stats_max_level,
+                $this->regen_rate
+            );
 
             // Debug info
             if($this->system->debug['bloodline']) {
@@ -692,7 +604,7 @@ class User extends Fighter {
                 echo "<br />";
             }
 
-            // Regen/scan range effects
+            // Apply out-of-combat effects
             if(!empty($this->bloodline->passive_boosts)) {
                 foreach($this->bloodline->passive_boosts as $id => $effect) {
                     switch($effect['effect']) {
@@ -703,8 +615,7 @@ class User extends Fighter {
                             $this->stealth += $effect['effect_amount'];
                             break;
                         case 'regen':
-                            $this->bloodline->passive_boosts[$id]['effect_amount'] = floor($this->regen_rate * $effect['power']);
-                            $this->regen_boost += $this->bloodline->passive_boosts[$id]['effect_amount'];
+                            $this->regen_boost += $effect['effect_amount'];
                             break;
                         default:
                             break;
@@ -1033,16 +944,6 @@ class User extends Fighter {
             }
         }
 
-        if($this->bloodline_id) {
-            if(!empty($this->bloodline->combat_boosts)) {
-                $bloodline_skill = 100 + $this->bloodline_skill;
-
-                foreach($this->bloodline->combat_boosts as $jutsu_id => $effect) {
-                    $this->bloodline->combat_boosts[$jutsu_id]['effect_amount'] = round($effect['power'] * $bloodline_skill, 3);
-                }
-            }
-        }
-
         $this->inventory_loaded = true;
     }
 
@@ -1150,6 +1051,15 @@ class User extends Fighter {
         }
 
         return true;
+    }
+
+    /* function moteToVillage()
+        moves user to village */
+    public function moveToVillage() {
+        $this->location = $this->village_location;
+        $location = explode('.', $this->location);
+        $this->x = $location[0];
+        $this->y = $location[1];
     }
 
     /* function updateData()
@@ -1365,25 +1275,26 @@ class User extends Fighter {
     }
 
     public function getAvatarSize(): int {
-        return $this->forbidden_seal ? 175 : 125;
+        return $this->forbidden_seal ? self::AVATAR_MAX_SEAL_SIZE : self::AVATAR_MAX_SIZE;
+    }
+
+    public function getAvatarFileSize($format='MB'): string {
+        $max_size = self::AVATAR_MAX_FILE_SIZE;
+        switch($format) {
+            default:
+                $divisor = 1024 * 1024;
+                $suffix = "MB";
+                break;
+            case 'kb':
+                $divisor = 1024;
+                $suffix = "KB";
+            break;
+        }
+        return floor($max_size / $divisor) . $suffix;
     }
 
     public function expForNextLevel() {
         return $this->exp_per_level * (($this->level + 1) - $this->base_level) + ($this->base_stats * 10);
-    }
-
-    private function bloodlineSkillRatio($boost): float {
-        $bloodline_skill = $this->bloodline_skill + 10;
-
-        $boost_type = explode('_', $boost['effect'])[0];
-        $skill_ratio = round($this->{$boost_type . '_skill'} / $bloodline_skill, 3);
-        if($skill_ratio > 1.0) {
-            $skill_ratio = 1.0;
-        }
-        else if($skill_ratio < 0.55) {
-            $skill_ratio = 0.55;
-        }
-        return $skill_ratio;
     }
 
     public function hasEquippedJutsu(int $jutsu_id): bool {
@@ -1419,6 +1330,38 @@ class User extends Fighter {
     public function clearMission() {
         $this->mission_id = 0;
         $this->mission_stage = [];
+    }
+
+    public function isSupportStaff(): bool {
+        switch($this->support_level) {
+            case User::SUPPORT_BASIC:
+            case User::SUPPORT_INTERMEDIATE:
+            case User::SUPPORT_CONTENT_ONLY:
+            case User::SUPPORT_SUPERVISOR:
+            case User::SUPPORT_ADMIN:
+                return true;
+            default:
+                return false;
+        }
+    }
+
+    public function isSupportSupervisor(): bool {
+        switch($this->support_level) {
+            case User::SUPPORT_SUPERVISOR:
+            case User::SUPPORT_ADMIN:
+                return true;
+            default:
+                return false;
+        }
+    }
+
+    public function isSupportAdmin(): bool {
+        switch($this->support_level) {
+            case User::SUPPORT_ADMIN:
+                return true;
+            default:
+                return false;
+        }
     }
 
     public function isModerator(): bool {

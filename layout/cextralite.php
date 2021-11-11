@@ -65,7 +65,7 @@ $top_menu = <<<HTML
 
 	<ul class='topMenu'>
 		<li><a href='{$system->link}'>News</a></li>
-		<li><a href='https://discord.gg/Kx52dbXEf3' target='_blank'>Discord</a></li>
+		<li><a href='{$system->link['discord']}' target='_blank'>Discord</a></li>
 		<li><a href='{$system->link}manual.php'>Manual</a></li>
 		<li><a href='{$system->link}rules.php'>Rules</a></li>
 		<li><a href='{$system->link}terms.php'>Terms of Service</a></li>

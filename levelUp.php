@@ -38,6 +38,10 @@ function levelUp() {
 	return true;
 }
 
+/**
+ * @return bool
+ * @throws Exception
+ */
 function rankUp(): bool {
 	global $system;
 
@@ -666,7 +670,7 @@ function rankUp(): bool {
                     }
                 }
 
-                $battle = new Battle($system, $player, $player->battle_id);
+                $battle = new BattleManager($system, $player, $player->battle_id);
 
                 $battle->checkTurn();
 
@@ -677,7 +681,7 @@ function rankUp(): bool {
                 }
 
                 $player->battle_id = 0;
-                if($battle->winner == $battle->player_side) {
+                if($battle->isPlayerWinner()) {
                     $player->exam_stage++;
 
 					echo "<table class='table'><tr><th>Battle Results</th></tr>
@@ -696,7 +700,7 @@ function rankUp(): bool {
 					
 					echo "</td></tr></table>";
 				}
-				else if($battle->winner == $battle->opponent_side) {
+				else if($battle->isOpponentWinner()) {
                     $player->exam_stage = 0;
 
 					echo "<table class='table'><tr><th>Battle Results</th></tr>
@@ -705,7 +709,7 @@ function rankUp(): bool {
 					</td></tr></table>";
 					return false;
 				}
-				else if($battle->winner == Battle::DRAW) {
+				else if($battle->isDraw()) {
                     $player->exam_stage = 0;
 
 					echo "<table class='table'><tr><th>Battle Results</th></tr>
@@ -734,7 +738,7 @@ function rankUp(): bool {
                     }
                 }
 
-                $battle = new Battle($system, $player, $player->battle_id);
+                $battle = new BattleManager($system, $player, $player->battle_id);
 
                 $battle->checkTurn();
 
@@ -745,7 +749,7 @@ function rankUp(): bool {
                 }
 
                 $player->battle_id = 0;
-                if($battle->winner == $battle->player_side) {
+                if($battle->isPlayerWinner()) {
                     $player->exam_stage++;
 					echo "<table class='table'><tr><th>Battle Results</th></tr>
 					<tr><td style='text-align:center;'>
@@ -754,7 +758,7 @@ function rankUp(): bool {
 					</td></tr></table>";		
 
 				}
-				else if($battle->winner == $battle->opponent_side) {
+				else if($battle->isOpponentWinner()) {
                     $player->exam_stage = 0;
 					echo "<table class='table'><tr><th>Battle Results</th></tr>
 					<tr><td>You have been defeated. You have failed the chuunin exam.<br />
@@ -762,7 +766,7 @@ function rankUp(): bool {
 					</td></tr></table>";
 					return false;
 				}
-				else if($battle->winner == Battle::DRAW) {
+				else if($battle->isDraw()) {
                     $player->exam_stage = 0;
 					echo "<table class='table'><tr><th>Battle Results</th></tr>
 					<tr><td>The battle ended in a draw. You were unable to continue the exam and failed.<br />

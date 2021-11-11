@@ -106,7 +106,7 @@ class DailyTask {
                 'type' => DailyTask::ACTIVITY_MISSIONS,
                 'sub_task' => [DailyTask::SUB_TASK_COMPLETE],
                 'min_amount' => 5,
-                'max_amount' => 40,
+                'max_amount' => 35,
                 'mission_rank' => [],
             ],
         ];

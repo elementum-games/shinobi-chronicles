@@ -158,6 +158,14 @@ $pages = [
     ],
 
     // Staff menu
+    30 => [
+        'file_name' => 'supportPanel.php',
+        'title' => 'Support Panel',
+        'function_name' => 'supportPanel',
+        'user_check' => function(User $u) {
+            return $u->isSupportStaff();
+        }
+    ],
     16 => [
         'file_name' => 'modPanel.php',
         'title' => 'Mod Panel',

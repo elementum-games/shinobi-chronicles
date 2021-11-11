@@ -46,12 +46,12 @@ body {
 	border: 0;
 }
 #topMenu {
-	width: 750px;
+	width: 800px;
 	
 	position: relative;
 	top: -61px;
 	
-	margin-left: 100px;
+	margin-left: 97px;
 	margin-top: 15px;
 	/* Temp */
 
@@ -76,10 +76,10 @@ body {
 	text-decoration: none;
 	text-transform: uppercase;
 	color: #1C1C1C;
-	font-size: 20px;
+	font-size: 16px;
 	font-family: Verdana, Geneva, sans-serif;
 	font-weight: bold;
-	
+
 	text-shadow: 0 1px 0 #505050;
 }
 #topMenu a:hover {
@@ -94,14 +94,14 @@ body {
 	/* Structure */
 	width: var(--container-width);
 	position:relative;
-	
+
 	margin-left: auto;
 	margin-right: auto;
 	padding-bottom:37px;
 	margin-bottom:0;
-	
+
 	/* Temp */
-	
+
 	/* Style */
 	background-color: #FFFFFF;
 }
@@ -375,7 +375,6 @@ table.globalMessage tr:last-child td:first-child  {
 table.globalMessage tr:last-child td:last-child  {
 	border-bottom-right-radius: 15px;
 }
-
 
 #content .contentHeader {
 	/* Structure */

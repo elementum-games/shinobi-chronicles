@@ -3,7 +3,17 @@ session_start();
 
 require "classes/System.php";
 $system = new System();
-$system->renderStaticPageHeader();
+$layout = System::DEFAULT_LAYOUT;
+
+if(isset($_SESSION['user_id'])) {
+    require_once "classes/User.php";
+    require_once "classes/Bloodline.php";
+    $player = new User($_SESSION['user_id']);
+    $player->loadData();
+    $layout = $player->layout;
+}
+
+$system->renderStaticPageHeader($layout);
 
 ?>
 
@@ -184,4 +194,4 @@ $system->renderStaticPageHeader();
 </table>
 
 <?php
-$system->renderStaticPageFooter();
+$system->renderStaticPageFooter($layout);

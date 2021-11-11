@@ -10,7 +10,7 @@ if(isset($_SESSION['user_id'])) {
 }
 
 // Start display
-require("layout/" . System::DEFAULT_LAYOUT . ".php");
+require($system->fetchLayoutByName(System::DEFAULT_LAYOUT));
 echo $heading;
 echo $top_menu;
 echo $header;
@@ -28,7 +28,6 @@ if(!$system->register_open) {
 $min_user_name_length = User::MIN_NAME_LENGTH;
 $max_user_name_length = 18;
 $min_password_length = User::MIN_PASSWORD_LENGTH;
-$bad_domains = ['hotmail.com', 'live.com', 'msn.com', 'outlook.com'];
 
 if(isset($_GET['act'])) {
     if($_GET['act'] == 'verify') {
@@ -41,7 +40,21 @@ if(isset($_GET['act'])) {
             $system->printMessage();
         }
         else {
-            $system->message("There was an error activating your account. Please contact an administrator.");
+            $accountData = $system->query("SELECT `user_verified` FROM `users` WHERE `user_name`='$user_name' AND `verify_key`='$key' LIMIT 1");
+            if(!$system->db_last_num_rows) {
+                $system->message("User not found!. Please contact an administrator. Staff can be found on
+                        <a href='{$system->links['discord']}' target='_blank'>Discord.</a>");
+            }
+            else {
+                $accountData = $system->db_fetch($accountData);
+                if($accountData['user_verified']) {
+                    $system->message("Your account is already activated and you may login!");
+                }
+                else {
+                    $system->message("Account activation error! Please contact an administrator. Staff can be found on
+                        <a href='{$system->links['discord']}' target='_blank'>Discord.</a>");
+                }
+            }
             $system->printMessage();
         }
     }
@@ -58,8 +71,8 @@ if(isset($_GET['act'])) {
             $subject = "Shinobi-Chronicles account verification";
             $message = "Welcome to Shinobi-Chronicles RPG. Please visit the link below to verify your account: \r\n" .
                 "{$system->link}register.php?act=verify&username={$user_name}&verify_key={$result['verify_key']}";
-            $headers = "From: Shinobi-Chronicles<admin@shinobi-chronicles.com>" . "\r\n";
-            $headers .= "Reply-To: no-reply@shinobi-chronicles.com" . "\r\n";
+            $headers = "From: Shinobi-Chronicles<" . System::SC_ADMIN_EMAIL . ">" . "\r\n";
+            $headers .= "Reply-To: " . System::SC_NO_REPLY_EMAIL . "\r\n";
             if(mail($result['email'], $subject, $message, $headers)) {
                 ;
                 $system->message("Email sent! Please check your email (including spam folder)");
@@ -178,8 +191,8 @@ if($_POST['register']) {
         $email_arr = explode('@', $email);
         $email_arr[1] = strtolower($email_arr[1]);
 
-        if(array_search($email_arr[1], $bad_domains) !== false) {
-            throw new Exception(implode(' / ', $bad_domains) . " emails are currently not supported!");
+        if(array_search($email_arr[1], System::UNSERVICEABLE_EMAIL_DOMAINS) !== false) {
+            throw new Exception(implode(' / ', System::UNSERVICEABLE_EMAIL_DOMAINS) . " emails are currently not supported!");
         }
 
         // Check for username/email existing
@@ -225,8 +238,8 @@ if($_POST['register']) {
         $subject = 'Shinobi-Chronicles account verification';
         $message = "Welcome to Shinobi-Chronicles RPG. Please visit the link below to verify your account: \r\n
 		{$system->link}register.php?act=verify&username={$user_name}&verify_key=$verification_code";
-        $headers = "From: Shinobi-Chronicles<admin@shinobi-chronicles.com>" . "\r\n";
-        $headers .= "Reply-To: no-reply@shinobi-chronicles.com" . "\r\n";
+        $headers = "From: Shinobi-Chronicles<" . System::SC_ADMIN_EMAIL . ">" . "\r\n";
+        $headers .= "Reply-To: " . System::SC_NO_REPLY_EMAIL . "\r\n";
         if(mail($email, $subject, $message, $headers)) {
             ;
             $system->message("Account created!<br />Please check the email that you registered with for the verification  link (Be sure to check your spam folder as well)!");
@@ -281,7 +294,7 @@ if(!$register_ok) {
 			<br />
 		<label for='email'>Email</label>
 			<input type='text' name='email' value='$email' /><br />
-			<span style='font-style:italic;font-size:0.9em;'>(Note: Currently we cannot send emails to addresses from: " . implode(', ', $bad_domains) . ")</span>
+			<span style='font-style:italic;font-size:0.9em;'>(Note: Currently we cannot send emails to addresses from: " . implode(', ', System::UNSERVICEABLE_EMAIL_DOMAINS) . ")</span>
 			<br />
 			<br />
 		<label for='gender'>Gender</label><br />";

@@ -16,12 +16,12 @@ function viewBattles() {
     if(!empty($_GET['battle_id'])) {
         $battle_id = (int)$_GET['battle_id'];
         try {
-            $battle = new Battle($system, $player, $battle_id, true);
-            if(!in_array($battle->battle_type, $battle_types)) {
+            $battleManager = new BattleManager($system, $player, $battle_id, true);
+            if(!in_array($battleManager->getBattleType(), $battle_types)) {
                 throw new Exception("Invalid battle type!");
             }
 
-            $battle->renderBattle();
+            $battleManager->renderBattle();
 
             return true;
         } catch(Exception $e) {
@@ -66,17 +66,17 @@ function viewBattles() {
     }
 
     $battles = [];
-    foreach($raw_battles as $battle) {
+    foreach($raw_battles as $battleManager) {
         /** @var EntityId $p1 */
-        $p1 = $battle['player1'];
+        $p1 = $battleManager['player1'];
         /** @var EntityId $p2 */
-        $p2 = $battle['player2'];
+        $p2 = $battleManager['player2'];
 
         $p1_name = $user_names[$p1->id] ?? $p1->toString();
         $p2_name = $user_names[$p2->id] ?? $p2->toString();
 
         $winner = '';
-        switch($battle['winner']) {
+        switch($battleManager['winner']) {
             case Battle::DRAW:
                 $winner = 'Draw';
                 break;
@@ -89,7 +89,7 @@ function viewBattles() {
         }
 
         $battles[] = [
-            'id' => $battle['id'],
+            'id' => $battleManager['id'],
             'player1' => $p1_name,
             'player2' => $p2_name,
             'winner' => $winner
