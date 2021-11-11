@@ -26,7 +26,8 @@ if($_POST) {
 	$query = "SELECT `user_id` FROM users WHERE user_name='$user_name' AND email='$email' LIMIT 1";
 	$result = $system->query($query);
 	if($system->db_last_num_rows == 0) {
-		$system->message("Invalid username or email address! Please contact Lsmjudoka on the Forums.");
+		$system->message("Invalid username or email address! Please submit a 
+		    <a href='{$system->link}support.php'>support request</a>");
 		$system->printMessage();
 	}
 	else {
@@ -39,18 +40,18 @@ if($_POST) {
 		$system->query("UPDATE users SET password='{$hashed_password}' WHERE user_id=$userid");
 		
 		$subject = "Shinobi Chronicles - Password Reset";
-		$headers = "From: Shinobi Chronicles<lsmjudoka@shinobi-chronicles.com>" . "\r\n";
-$message = "A password reset was requested for your account $username. Your temporary password is:
+		$headers = "From: Shinobi Chronicles<" . System::SC_ADMIN_EMAIL . ">" . "\r\n";
+$message = "A password reset was requested for your account $user_name. Your temporary password is:
 $new_password
-You can login at http://shinobi-chronicles.com with 
+You can login at {$system->link} with 
 your temporary password. We strongly suggest you change it to something easier to remember;
 It can be changed in the settings page, found on your profile.
 
-If this is your account but you did not request a password reset, please contact Lsmjudoka.
+If this is your account but you did not request a password reset, please submit a support request: <a href='{$system->link}support.php'>here</a>.
 
-This message was sent because someone signed up at shinobi-chronicles.com with this email 
-address and requested a password reset. If this is not your account, please disregard this email or email 
-lsmjudoka@shinobi-chronicles.com to have your address removed from our records.";
+This message was sent because someone signed up at {$system->link} with this email 
+address and requested a password reset. If this is not your account, please disregard this email or submit a 
+ <a href='{$system->link}support.php'>support.php</a> to have your address removed from our records.";
 		mail($email, $subject, $message, $headers);
 		$system->message("Password sent!");
 		$system->printMessage();

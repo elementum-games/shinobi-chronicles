@@ -71,6 +71,9 @@ function premium() {
 			if($player->team) {
 				throw new Exception("You must leave your team before resetting!");
 			}
+            if($player->clan_office) {
+                throw new Exception("You must resign from your clan office first!");
+            }
 
 			$player->level = 1;
 			$player->level = 1;
@@ -99,7 +102,6 @@ function premium() {
 			$player->bloodline_skill = 0;
 			$player->cast_speed = 5;
 			$player->speed = 5;
-			$player->strength = 5;
 			$player->intelligence = 5;
 			$player->willpower = 5;
 

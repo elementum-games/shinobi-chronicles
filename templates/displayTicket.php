@@ -33,7 +33,7 @@
     <?php else: ?>
         <?php foreach($responses as $pos=>$response): ?>
             <tr onclick="toggleDetails(<?=$response['response_id']?>)" style="cursor: pointer;">
-                <th><?=$response['user_name']?> (<?=$response['response_id']?>) - <?=strftime(SupportManager::$strfString, $response['time'])?></th>
+                <th><?=$response['user_name']?> - <?=strftime(SupportManager::$strfString, $response['time'])?></th>
             </tr>
             <tr id="<?=$response['response_id']?>" class="response" style="display:<?=($pos == 0 ? 'table-row' : 'none')?>"><td>
                 <div style="white-space: pre-wrap; margin-left: 5px;"><p><?=$response['message']?></p></div>

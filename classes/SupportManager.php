@@ -1,14 +1,19 @@
 <?php
 
-/**
- * Class SupportManager
- *
- * Note: Set admin to true to fetch/update supports without restriction. Leave it false and set user ID/key
- * to automatically restrict search/update of functions that care
- * to only supports matching that ID/key
- */
 class SupportManager {
-    public static $validationConstraints = [
+    public int $user_id;
+    public string $user_name;
+    public int $user_support_level;
+    public string $ip_address;
+    public bool $staff;
+
+    public array $requestTypeUserlevels;
+    public array $requestPremiumCosts;
+
+    public static bool $debug = false; //  Warning this flag will display A LOT of debugging data as many functions ise it
+    // and they are not limited by post-cursory flags.
+
+    public static array $validationConstraints = [
         'subject' => [
             'min' => 5,
             'max' => 75,
@@ -19,55 +24,45 @@ class SupportManager {
         ],
     ];
 
-    public static $TYPE_ACCOUNT_PROBLEM = 'Account Problem';
-    public static $TYPE_GAME_QUESTION = 'Game Question';
-    public static $TYPE_MISC = 'Misc. Request';
-    public static $TYPE_APPEAL_BAN = 'Appeal Ban';
-    public static $TYPE_REPORT_STAFF = 'Report Staff Member';
-    public static $TYPE_CONTENT_TEXT = 'Content Text Issue';
-    public static $TYPE_BALANCE = 'Balance Feedback';
-    public static $TYPE_SUGGESTION = 'Suggestion';
-    public static $TYPE_BUG = 'Report Bug';
-    public static $TYPE_MOD_REQUEST = 'Mod Request';
+    public static string $TYPE_ACCOUNT_PROBLEM = 'Account Problem';
+    public static string $TYPE_GAME_QUESTION = 'Game Question';
+    public static string $TYPE_MISC = 'Misc. Request';
+    public static string $TYPE_APPEAL_BAN = 'Appeal Ban';
+    public static string $TYPE_REPORT_STAFF = 'Report Staff Member';
+    public static string $TYPE_CONTENT_TEXT = 'Content Text Issue';
+    public static string $TYPE_BALANCE = 'Balance Feedback';
+    public static string $TYPE_SUGGESTION = 'Suggestion';
+    public static string $TYPE_BUG = 'Report Bug';
+    public static string $TYPE_MOD_REQUEST = 'Mod Request';
 
-    public static $PRIORITY_LOW = 'low';
-    public static $PRIORITY_REG = 'reg';
-    public static $PRIORITY_PREM = 'premium';
-    public static $PRIORITY_HIGH = 'high';
-    public static $PRIOIRTY_PREM_HIGH = 'premium_high';
+    public static string $PRIORITY_LOW = 'low';
+    public static string $PRIORITY_REG = 'reg';
+    public static string $PRIORITY_PREM = 'premium';
+    public static string $PRIORITY_HIGH = 'high';
+    public static string $PRIORITY_PREM_HIGH = 'premium_high';
 
-    public static $strfString = '%m/%d/%y @ %I:%M:%S';
+    public static string $strfString = '%m/%d/%y @ %I:%M:%S';
 
-    public static $staffNotify = 86400 * 3;
     public static $autoClose = 86400 * 5;
 
-    /** @var System $system */
-    protected $system;
-
-    public $user_id;
-    public $user_support_level;
-    public $admin;
-    public $key = '';
-    public $requestTypeUserlevels;
-    public $requestPremiumCosts;
+    private $user;
+    private System $system;
 
     /**
-     * SupportManager constructor
-     *
-     * Set admin to true to fetch/update supports without restriction.
-     *
-     * Leave admin false and set user ID to automatically restrict every search/update to only supports
-     * matching that ID unless fetched by key
-     *
-     * @param      $system
-     * @param int  $user_id
-     * @param bool $admin
+     * @param $system
+     * @param false|User $user
+     * @param bool $staff
      */
-    public function __construct($system, $user_id = 0, $user_support_level = false, $admin = false) {
+    public function __construct($system, $user = false, $staff = false) {
         $this->system = $system;
-        $this->user_id = $user_id;
-        $this->user_support_level = $user_support_level;
-        $this->admin = $admin;
+        $this->user = $user;
+
+        $this->user_support_level = ($this->user) ? $this->user->support_level : false;
+        $this->user_id = ($this->user) ? $this->user->user_id : 0;
+        $this->ip_address = ($this->user) ? $this->user->user_id : $_SERVER['REMOTE_ADDR'];
+
+        // Only allow a staff connection if a user is defined
+        $this->staff = ($this->user) ? $staff : false;
 
         $this->requestTypeUserlevels = [
             self::$TYPE_GAME_QUESTION => User::SUPPORT_BASIC,
@@ -96,115 +91,89 @@ class SupportManager {
         ];
     }
 
-    /**** SUPPORT FUNCTIONS ****/
-
-    /**
-     * Returns support request types based on user level
-     * @param int $userlevel
-     * @return array
-     */
-    public function getSupportTypes($staffLevel) {
-        if(!$staffLevel) {
+    public function getSupportTypes() {
+        if($this->user == false) {
             $types = [
-                'Account Problem',
-                'Report Bug',
-                'Appeal Ban',
+                self::$TYPE_ACCOUNT_PROBLEM,
+                self::$TYPE_BUG,
+                self::$TYPE_APPEAL_BAN,
             ];
         }
         else {
             $types = [
-                'Account Problem',
-                'Report Bug',
-                'Game Question',
-                'Content Text Issue',
-                'Balance Feedback',
-                'Report Staff Member',
-                'Appeal Ban',
-                'Misc. Request',
-                'Suggestion',
+                self::$TYPE_ACCOUNT_PROBLEM,
+                self::$TYPE_BUG,
+                self::$TYPE_GAME_QUESTION,
+                self::$TYPE_CONTENT_TEXT,
+                self::$TYPE_BALANCE,
+                self::$TYPE_REPORT_STAFF,
+                self::$TYPE_APPEAL_BAN,
+                self::$TYPE_SUGGESTION,
+                self::$TYPE_MISC,
             ];
-            if($staffLevel == System::SC_MODERATOR) {
-                $types[] = 'Mod Request';
+
+            if($this->user->isModerator()) {
+                $types[] = self::$TYPE_MOD_REQUEST;
             }
         }
         return $types;
     }
 
-    /**
-     * Returns true/false based on if userlevel has permission to access request type
-     *
-     * @param $type
-     * @return bool
-     */
-    public function canProcess($type): bool
-    {
-        // Not set error, allow anybody to attempt to process
+    public function canProcess($type) {
+        // Support type not set, allow anyone to process
         if(!isset($this->requestTypeUserlevels[$type])) {
             return true;
         }
 
-        if($this->user_support_level == User::SUPPORT_CONTENT_ONLY && $this->requestTypeUserlevels[$type] == User::SUPPORT_CONTENT_ONLY) {
-            return true;
+        if($this->user_support_level == User::SUPPORT_CONTENT_ONLY) {
+            if($this->requestTypeUserlevels[$type] == User::SUPPORT_CONTENT_ONLY) {
+                return true;
+            }
         }
-        else if($this->user_support_level >= $this->requestTypeUserlevels[$type]) {
-            return true;
+        else {
+            if($this->user_support_level >= $this->requestTypeUserlevels[$type]) {
+                return true;
+            }
         }
 
         return false;
     }
 
-    /**
-     * @param false $returnSqlString
-     * @return array|string
-     *
-     * Returns array or sql string of supports that user can process
-     * String returned must be used with an IN type mysql clause
-     * String e.g.: ('Game Question', 'Misc. Request)
-     * Parentheses and single quotes are included in the return
-     */
     public function processTypes($returnSqlString = false) {
-        $typeRestrictions = [
-            self::$TYPE_GAME_QUESTION => User::SUPPORT_BASIC
-        ];
+        $processArr = [];
+        $processStr = "(";
 
-        $canProcess = [];
-        foreach($this->requestTypeUserlevels as $type=>$userlevel) {
-            if($this->user_support_level == User::SUPPORT_CONTENT_ONLY && User::SUPPORT_CONTENT_ONLY == $userlevel) {
-                $canProcess[] = $type;
+        foreach($this->requestTypeUserlevels as $type=>$support_level_req) {
+            if($this->canProcess($type)) {
+                /**** DEBUG ****/
+                if(self::$debug) {
+                    echo "S_SL: {$this->user_support_level} can process $type | $support_level_req<br />";
+                }
+                $processArr[] = $type;
+                $processStr .= "'{$type}', ";
             }
-            else if($this->user_support_level != User::SUPPORT_CONTENT_ONLY && $this->user_support_level >= $userlevel) {
-                $canProcess[] = $type;
+            else {
+                /**** DEBUG ****/
+                if(self::$debug) {
+                    echo "S_SL: {$this->user_support_level} can not process $type | $support_level_req<br />";
+                }
             }
         }
 
-        if(!$returnSqlString) {
-            return $canProcess;
-        }
+        // Complete string
+        $processStr = substr($processStr, 0, strlen($processStr)-2) . ")";
 
-        $string = "(";
-        foreach($canProcess as $type) {
-            $string .= "'{$type}', ";
+        if($returnSqlString) {
+            return $processStr;
         }
-        return substr($string, 0, strlen($string)-2) . ")";
+        return $processArr;
     }
 
-    /**
-     * @param string $ip_address
-     * @param string $email
-     * @param string $type
-     * @param string $subject
-     * @param string $details
-     * @param int    $user_id
-     * @param int    $character_id
-     * @param        $name
-     * @param null   $supportkey
-     * @return bool
-     */
-    public function createSupport($ip_address, $email, $type, $subject, $details, $user_id, $name, $premium = false, $support_key = null
-    ) {
+    public function createSupport($user_name, $support_type, $subject, $message, $premium = false, $email = '', $support_key = '') {
+
         $this->system->query("INSERT INTO `support_request`
             (
-              `time`, 
+                `time`, 
               `updated`, 
               `user_id`, 
               `ip_address`, 
@@ -220,19 +189,19 @@ class SupportManager {
             )
         VALUES
             (
-              '" . time() . "', 
-              '" . time() . "', 
-              '{$user_id}',
-              '{$ip_address}', 
-              '{$email}', 
-              '{$type}', 
-              '{$subject}',
-              '{$details}',
-              '1', 
-              '0',
-              '{$name}',
-              '{$support_key}',
-              '{$premium}'
+                '" . time() . "',
+                '" . time() . "',
+                '{$this->user_id}',
+                '{$this->ip_address}',
+                '{$email}',
+                '{$support_type}',
+                '{$subject}',
+                '{$message}',
+                '1',
+                '0',
+                '{$user_name}',
+                '{$support_key}',
+                '{$premium}'
             )
         ");
 
@@ -242,126 +211,31 @@ class SupportManager {
         return false;
     }
 
-    /**
-     * @param           $support_id
-     * @param bool|int  $user_id Optional
-     * @return bool|mixed
-     */
-    public function fetchSupportByID($support_id, $user_id = false) {
-        // If not admin, restrict to user ID
-        if($this->user_id && !$this->admin) {
-            $user_id = $this->user_id;
-        }
-
-        $criteria = ['support_id' => $support_id];
-        if($user_id !== false) {
-            $criteria['user_id'] = $user_id;
-        }
-
-        $result = $this->supportSearch($criteria, 1);
-        return ($result ? $result[0] : false);
-    }
-
-    /**
-     * @param $key
-     * @return bool|mixed
-     */
-    public function fetchSupportByKey($key) {
-        $result = $this->supportSearch(['support_key' => $key], 1, ['time' => 'DESC']);
-        return ($result ? $result[0] : false);
-    }
-
-    /**
-     * @param int $user_id optional, uses $this->user_id if not provided
-     * @return array|bool
-     */
-    public function fetchUserSupports($user_id = 0) {
-        // Quit if user is not admin and requesting a different user's supports
-        if($user_id && $user_id != $this->user_id && !$this->admin) {
-            return [];
-        }
-
-        // Use user's ID if this is not an admin load
-        if(!$user_id && !$this->admin) {
-            $user_id = $this->user_id;
-        }
-
-        $result = $this->system->query("SELECT * FROM `support_request` 
-            WHERE `user_id`={$user_id} ORDER BY `open` DESC, `updated` DESC LIMIT 50");
-        $supports = [];
-        while($row = $this->system->db_fetch($result)) {
-            $supports[] = $row;
-        }
-
-        return $supports;
-    }
-
-    /**
-     * @param string $category
-     * @param int    $limit
-     * @param int    $offset
-     * @return array
-     */
-    public function fetchAllSupports($category = '', $user_id = 0, $limit = 100, $offset = 0, $debug = false) {
-        $canProcess = $this->processTypes(true);
-
-        $orderDirection = 'ASC';
-        $query = "SELECT * FROM `support_request` ";
-        switch($category) {
-            case 'awaiting_staff':
-                $query .= "WHERE `open`=1 AND `admin_response`=0 AND `support_type` IN {$canProcess}";
+    public function getTypePriority($type, $premium = false) {
+        switch($type) {
+            case self::$TYPE_ACCOUNT_PROBLEM:
+            case self::$TYPE_REPORT_STAFF:
+            case self::$TYPE_APPEAL_BAN:
+            case self::$TYPE_BUG:
+                $priority = self::$PRIORITY_HIGH;
                 break;
-            case 'awaiting_user':
-                $query .= "WHERE `open`=1 AND `admin_response`=1 AND `support_type` IN {$canProcess}";
-                break;
-            case 'closed':
-                $query .= "WHERE `open`=0 AND `support_type` IN {$canProcess}";
-                $orderDirection = 'DESC';
+            case self::$TYPE_MISC:
+                $priority = self::$PRIORITY_LOW;
                 break;
             default:
-                $query .= "WHERE `open`=1 AND `admin_response`=0 AND `support_type` IN {$canProcess}";
-        }
-        $query .= " ORDER BY `updated` {$orderDirection}, `premium` DESC LIMIT {$offset},{$limit}";
-
-        if($debug) {
-            echo $query;
+                $priority = self::$PRIORITY_REG;
         }
 
-        $supports = [
-            self::$PRIOIRTY_PREM_HIGH => [],
-            self::$PRIORITY_HIGH => [],
-            self::$PRIORITY_PREM => [],
-            self::$PRIORITY_REG => [],
-            self::$PRIORITY_LOW => []
-        ];
-        $result = $this->system->query($query);
-        while($row = $this->system->db_fetch($result)) {
-            $supports[self::getTypePriority($row['support_type'], $row['premium'])][] = $row;
+        if($premium) {
+            $priority = ($priority == self::$PRIORITY_HIGH) ? self::$PRIORITY_PREM_HIGH : self::$PRIORITY_PREM;
         }
 
-        return array_merge($supports[self::$PRIOIRTY_PREM_HIGH], $supports[self::$PRIORITY_HIGH],
-            $supports[self::$PRIORITY_PREM], $supports[self::$PRIORITY_REG], $supports[self::$PRIORITY_LOW]);
+        return $priority;
     }
 
-    /**
-     * Runs a query based on variables, order and limit data provided.
-     * !IMPORTANT! This will return an array of rows or false even if only one row is requested!
-     *
-     * !IMPORTANT! Normally this function will use column and value as equal
-     * (e.g. 'open'=>1 ==> `$col`='$val'. If you would like a different comparison for any given column,
-     * prepend the value with which comparison you would like to use and an underscore -
-     * (e.g. ['open'=>'>_1'] ==> `$col` > '1').
-     *
-     * @param array    $variables
-     * @param bool|int $limit
-     * @param array    $order
-     * @param bool|int $offset
-     * @param bool     $count
-     * @return array|bool
-     */
     public function supportSearch($variables = [], $limit = false, $order = [], $offset = 0, $count = false) {
         if($count) {
-            $query = "SELECT COUNT(*)";
+            $query = "SELECT COUNT(*) ";
         }
         else {
             $query = "SELECT * ";
@@ -369,14 +243,15 @@ class SupportManager {
 
         $query .= "FROM `support_request`";
 
+        // Restrict search
         if(!empty($variables)) {
             $query .= " WHERE ";
             foreach($variables as $col => $val) {
-                $definedVals = ['>', '<', '='];
+                $definedVals = ['<', '>', '='];
                 if(in_array(substr($val, 0, 1), $definedVals)) {
                     $keys = explode('_', $val);
-                    $comparison = $keys[0];
-                    $value = $keys[1];
+                    $comparison = $this->system->clean($keys[0]);
+                    $value = $this->system->clean($keys[1]);
                     $query .= "`$col` {$comparison} '{$value}' AND ";
                 }
                 elseif(substr($val, 0, 2) == 'IN') {
@@ -385,20 +260,29 @@ class SupportManager {
                     $query .= "`$col` IN {$value} AND ";
                 }
                 else {
-                    $query .= "`$col`='{$val}' AND ";
+                    $query .= "`$col` = '{$val}' AND ";
                 }
             }
-            $query = substr($query, 0, strlen($query) - 4);
+            $query = substr($query, 0, strlen($query) - 4) . " ";
         }
+
+        // Order search
         if(!empty($order)) {
-            $query .= "ORDER BY ";
-            foreach($order as $col => $val) {
-                $query .= "`$col` $val, ";
+            $query .= " ORDER BY ";
+            foreach($order as $col => $dir) {
+                $query .= "`$col` $dir, ";
             }
             $query = substr($query, 0, strlen($query) - 2) . " ";
         }
+
+        // Limit search
         if($limit) {
-            $query .= ' LIMIT ' . $offset . ', ' . $limit;
+            $query .= " LIMIT " . $offset . ', ' . $limit;
+        }
+
+        /*** DEBUG ***/
+        if(self::$debug) {
+            echo $query;
         }
 
         $result = $this->system->query($query);
@@ -406,7 +290,8 @@ class SupportManager {
             if($count) {
                 return $this->system->db_fetch($result)["COUNT(*)"];
             }
-            if(!$this->admin) {
+
+            if(!$this->staff) {
                 $supports = [];
                 while($row = $this->system->db_fetch($result)) {
                     $supports[] = $row;
@@ -414,209 +299,87 @@ class SupportManager {
                 return $supports;
             }
             else {
-                // This is currently not used
                 $supports = [
-                    'high' => [],
-                    'reg' => [],
-                    'low' => [],
+                    self::$PRIORITY_PREM_HIGH => [],
+                    self::$PRIORITY_HIGH => [],
+                    self::$PRIORITY_PREM => [],
+                    self::$PRIORITY_REG => [],
+                    self::$PRIORITY_LOW => [],
                 ];
+
+                // Prioritize supports
                 while($row = $this->system->db_fetch($result)) {
-                    switch($row['support_type']) {
-                        case 'Account Problem':
-                        case 'Report Staff Member':
-                        case 'Appeal Ban':
-                            $priority = 'high';
-                            break;
-                        case 'Misc. Reqeust':
-                            $priority = 'low';
-                            break;
-                        default:
-                            $priority = 'reg';
-                            break;
-                    }
-
-                    $supports[$priority][] = $row;
+                    $supports[$this->getTypePriority($row['support_type'], $row['premium'])][] = $row;
                 }
-                return array_merge($supports['high'], $supports['reg'], $supports['low']);
+
+                return array_merge($supports[self::$PRIORITY_PREM_HIGH], $supports[self::$PRIORITY_HIGH],
+                    $supports[self::$PRIORITY_PREM], $supports[self::$PRIORITY_REG], $supports[self::$PRIORITY_LOW]);
             }
         }
         return false;
     }
 
-    /**
-     * By default calls updateSupport which will handle notifying user if this was an admin update
-     *
-     * @param      $support_id
-     * @param      $userid
-     * @param      $username
-     * @param      $response
-     * @param bool $update
-     * @return bool
-     */
-    public function addSupportResponses($support_id, $userid, $username, $response, $ip_address, $staff_level = 0, $update = true) {
-        $this->system->query("INSERT INTO `support_request_responses`
-            (
-              `support_id`,
-              `time`,
-              `user_id`,
-              `user_name`,
-              `message`,
-              `ip_address`
-            )
-          VALUES
-            (
-              '{$support_id}',
-              '" . time() . "',
-              '{$userid}',
-              '{$username}',
-              '{$response}',
-              '{$ip_address}'
-            )
-        ");
-
-        if($this->system->db_last_insert_id) {
-            if($update && $this->admin) {
-                $this->updateSupport($support_id, $userid, $username, $staff_level);
-            } else {
-                $this->updateSupport($support_id);
-            }
-            return true;
-        }
-        else {
+    public function fetchAllSupports($category = '', $limit = 100, $offset = 0, $order = 'ASC') {
+        if(!$this->staff) {
             return false;
         }
+
+        switch($category) {
+            case 'awaiting_staff':
+                $criteria = [
+                    'open' => 1,
+                    'admin_response' => 0,
+                    'support_type' => 'IN_' . $this->processTypes(true),
+                ];
+                break;
+            case 'awaiting_user':
+                $criteria = [
+                    'open' => 1,
+                    'admin_response' => 1,
+                    'support_type' => 'IN_' . $this->processTypes(true),
+                ];
+                break;
+            case 'closed':
+                $criteria = [
+                    'open' => 0,
+                    'support_type' => 'IN_' . $this->processTypes(true),
+                ];
+                break;
+            default:
+                $criteria = [
+                    'open' => 1,
+                    'admin_response' => 0,
+                    'support_type' => 'IN_' . $this->processTypes(true)
+                ];
+        }
+
+        return $this->supportSearch($criteria, $limit, ['updated' => $order], $offset);
     }
 
-    /**
-     * @param $support_id
-     * @return bool
-     * Allows a user to assign their guest support to their account, should they want to follow up further
-     * through their account.
-     */
-    public function assignGuestSupportToUser($support_id) {
-        $data = $this->supportSearch(['support_id'=>$support_id], 1, ['time'=>'DESC'])[0];
-
-        if(!$data) {
-            return false;
-        }
-        if($data['user_id'] != 0) {
-            //return false;
+    public function fetchUserSupports() {
+        if(!$this->user) {
+            return [];
         }
 
-        if($this->system->query("UPDATE `support_request` SET `user_id`='{$this->user_id}' WHERE `support_id`='{$support_id}' LIMIT 1")) {
-            $this->addSupportResponses($support_id, $this->user_id, $data['user_name'], "Added to my account.", $_SERVER['REMOTE_ADDR']);
-            return true;
-        }
-        return false;
+        $supports = $this->supportSearch(['user_id'=>$this->user_id], 50, ['open'=>'DESC', 'updated'=>'DESC']);
+
+        return ($supports ?? []);
     }
 
-    /**
-     *
-     *
-     *
-     * @param  int        $support_id
-     * @return bool
-     * @throws Exception
-     */
-    public function updateSupport($support_id, $admin_id = 0, $admin_name = '', $staff_level=0) {
-        // Validate support exists and belongs to user
-        if($this->admin) {
-            $support_data = $this->fetchSupportByID($support_id);
-        }
-        else {
-            $support_data = $this->fetchSupportByID($support_id, $this->user_id);
-        }
-        if(!$support_data) {
-            throw new Exception("Invalid support!");
+    public function fetchSupportByID($support_id, $forceGuest = false) {
+        $support_id = (int) $support_id;
+
+        $criteria = ['support_id' => $support_id];
+
+        //If not staff, restrict to user id
+        if(!$this->staff && !$forceGuest) {
+            $criteria['user_id'] = $this->user_id;
         }
 
-        // Notify user of update
-        if($this->admin) {
-            if($support_data['user_id']) {
-                $this->system->send_pm($admin_id, $support_data['user_id'], 'Support Updated',
-                    "Your support {$support_data['subject']} has been updated and can be viewed here "
-                . $this->system->link . "support.php?support_id=" . $support_id, $staff_level);
-            }
-        }
-        // Email if ticket submitted by guest
-        if($support_data['user_id'] == 0) {
-            // Make sure a name/administrator is placed in email
-            $admin_name = ($admin_name == '') ? 'Administrator' : $admin_name;
-
-            $subject = "Shinobi-Chronicles support request updated";
-            $message = "Your support was updated by {$admin_name}. Click the link below to access your support: \r\n" .
-                "{$this->system->link}support.php?support_key={$support_data['support_key']} \r\n" .
-                "If the link does not work, your support key is: {$support_data['support_key']}";
-            $headers = "From: Shinobi-Chronicles<" . System::SC_ADMIN_EMAIL . ">" . "\r\n";
-            $headers .= "Reply-To: " . System::SC_NO_REPLY_EMAIL . "\r\n";
-            mail($support_data['email'], $subject, $message, $headers);
-        }
-
-        $query = "UPDATE `support_request` SET `updated`='" . time() . "',
-            `admin_response`='{$this->admin}' WHERE `support_id`='{$support_id}' LIMIT 1";
-
-        $this->system->query($query);
-        if ($this->system->db_last_affected_rows) {
-            return true;
-        }
-        return false;
+        $result = $this->supportSearch($criteria, 1);
+        return($result ? $result[0] : false);
     }
 
-    /**
-     * @param      $support_id
-     * @param bool $inactive
-     * @param bool $admin_name
-     * @return bool
-     * @throws Exception
-     */
-    public function closeSupport($support_id, $staff_level = 0, $inactive = false, $admin_name = false) {
-        if($this->admin) {
-            $support = $this->fetchSupportByID($support_id);
-        }
-        else if($this->user_id) {
-            $support = $this->fetchSupportByID($support_id);
-        }
-        else if($this->key) {
-            $support = $this->fetchSupportByID($support_id);
-            if($support['supportkey'] != $this->key) {
-                throw new Exception("Invalid support!");
-            }
-        }
-        else {
-            throw new Exception("No authorization level!");
-        }
-
-        if(!$support && !$inactive) {
-            throw new Exception("Invalid support data!");
-        }
-        if(!$support['open'] && !$inactive) {
-            throw new Exception("Support is already closed!");
-        }
-
-        $this->system->query("UPDATE `support_request` SET `open`=0 WHERE `support_id`={$support_id}");
-        if($this->system->db_last_affected_rows) {
-            if($inactive) {
-                $this->addSupportResponses($support_id, 0, 'System', '[Closed for inactivity]', 0);
-            }
-            else {
-                $this->addSupportResponses($support_id,
-                    $this->user_id,
-                    ($admin_name  ? $admin_name : $support['user_name']),
-                    "[Request Closed]",
-                    -1,
-                    $staff_level
-                );
-            }
-            return true;
-        }
-        return false;
-    }
-
-    /**
-     * Fetches all responses associated with given support
-     * @param $support_id
-     * @return array|bool
-     */
     public function fetchSupportResponses($support_id) {
         $result = $this->system->query("SELECT * FROM `support_request_responses` 
             WHERE `support_id`='{$support_id}' ORDER BY `time` DESC, `response_id` DESC");
@@ -630,11 +393,125 @@ class SupportManager {
         return false;
     }
 
-    /**
-     * Returns support id via matched support key
-     * @param string $support_key
-     * @return bool|mixed
-     */
+    public function updateSupport($support_id) {
+        $support_data = $this->fetchSupportByID($support_id);
+
+        if(!$support_data) {
+            throw new Exception("Invalid support!");
+        }
+
+        // Notify user of update
+        if($this->staff) {
+            if($support_data['user_id']) {
+                $this->system->send_pm($this->user_id, $support_data['user_id'], "Support Updated!",
+                    "Your support {$support_data['subject']} has been updated and can be viewed here "
+                    . $this->system->link . "support.php?support_id=" . $support_id, $this->user->staff_level);
+            }
+        }
+        // Email if ticket submitted by guest
+        if($support_data['user_id'] == 0 && $this->staff) {
+            // Make sure a name/administrator is placed in email
+            $admin_name = ($this->user) ? $this->user->user_name : 'Administrator';
+
+            $subject = "Shinobi-Chronicles support request updated";
+            $message = "Your support was updated by {$admin_name}. Click the link below to access your support: \r\n" .
+                "{$this->system->link}support.php?support_key={$support_data['support_key']} \r\n" .
+                "If the link does not work, your support key is: {$support_data['support_key']}";
+            $headers = "From: Shinobi-Chronicles<" . System::SC_ADMIN_EMAIL . ">" . "\r\n";
+            $headers .= "Reply-To: " . System::SC_NO_REPLY_EMAIL . "\r\n";
+            mail($support_data['email'], $subject, $message, $headers);
+        }
+
+        $query = "UPDATE `support_request` SET `updated`='" . time() . "',
+            `admin_response`='{$this->staff}' WHERE `support_id`='{$support_id}' LIMIT 1";
+
+        if($this->system->query($query)) {
+            return true;
+        }
+        return false;
+    }
+
+    public function addSupportResponse($support_id, $user_name, $response, $update = true) {
+        $this->system->query("INSERT INTO `support_request_responses`
+            (
+                `support_id`,
+                `time`,
+                `user_id`,
+                `user_name`,
+                `message`,
+                `ip_address`
+            )
+        VALUES
+            (
+                '{$support_id}',
+                '" . time() . "',
+                '{$this->user_id}',
+                '{$user_name}',
+                '{$response}',
+                '{$this->ip_address}'
+            )
+        ");
+
+        if($this->system->db_last_insert_id) {
+            if($this->staff && $update) {
+                $this->updateSupport($support_id);
+            }
+            else {
+                $this->updateSupport($support_id);
+            }
+            return true;
+        }
+        return false;
+    }
+
+    public function closeSupport($support_id, $inactive = false) {
+        $support = $this->fetchSupportByID($support_id);
+
+        // Support not found
+        if(!$support) {
+            throw new Exception("Invalid support data!");
+        }
+        // Support does not belong to user and user is not staff
+        if($support['user_id'] != $this->user_id && !$this->staff) {
+            throw new Exception("Not authorized to view this support!");
+        }
+        if(!$support['open'] && !$inactive) {
+            throw new Exception("Support already closed!");
+        }
+
+        $this->system->query("UPDATE `support_request` SET `open`=0 WHERE `support_id`={$support_id} LIMIT 1");
+        if($this->system->db_last_affected_rows) {
+            if($inactive) {
+                $this->addSupportResponse($support_id, 'System', '[Closed fo inactivity]', false);
+            }
+            else {
+                $this->addSupportResponse($support_id, $this->user->user_name, '[Request Closed]');
+            }
+            return true;
+        }
+        return false;
+    }
+
+    public function openSupport($support_id) {
+        $support = $this->fetchSupportByID($support_id);
+
+        // Support not found
+        if(!$support) {
+            throw new Exception("Invalid support data!");
+        }
+        // Support does not belong to user and user is not staff
+        if($support['user_id'] != $this->user_id && !$this->staff) {
+            throw new Exception("Not authorized to view this support!");
+        }
+
+        $this->system->query("UPDATE `support_request` SET `open`=1 WHERE `support_id`={$support_id} LIMIT 1");
+        if($this->system->db_last_affected_rows) {
+                $this->addSupportResponse($support_id, $this->user->user_name, '[Request Re-opened]');
+            return true;
+        }
+        return false;
+    }
+
     public function getSupportIdByKey($support_key) {
         $result = $this->system->query("SELECT `support_id` FROM `support_request` WHERE `support_key`='{$support_key}' ORDER BY `time` DESC LIMIT 1");
         if($this->system->db_last_num_rows) {
@@ -655,36 +532,36 @@ class SupportManager {
         }
 
         foreach($toClose as $key => $id) {
-            $this->closeSupport($id, 0, true);
+            $this->closeSupport($id, true);
         }
     }
 
-    /**
-     * @param $type
-     * @return string
-     */
-    public static function getTypePriority($type, $premium = false) {
-        switch($type) {
-            case 'Account Problem':
-            case 'Report Staff Member':
-            case 'Appeal Ban':
-            case 'Report Bug':
-                $priority = self::$PRIORITY_HIGH;
-                break;
-            case 'Misc. Request':
-                $priority = self::$PRIORITY_LOW;
-                break;
-            default:
-                $priority = self::$PRIORITY_REG;
-                break;
+    /**** GUEST SUPPORT FUNCTIONS ****/
+
+    public function fetchSupportByKey($key, $email) {
+        $result = $this->supportSearch(['support_key'=>$key, 'email'=>$email], 1, ['time'=>'DESC']);
+        return ($result ? $result[0] : false);
+    }
+
+    public function assignGuestSupportToUser($support_id) {
+        $data = $this->fetchSupportByID($support_id, true);
+
+        // User must be set
+        if(!$this->user) {
+            throw new Exception("No user to assign to!");
+        }
+        // Request not found or already assigned
+        if(!$data || $data['user_id'] != 0) {
+            var_dump($data);
+            throw new Exception("User already assigned!");
         }
 
-        if($priority == 'high' && $premium) {
-            $priority = self::$PRIOIRTY_PREM_HIGH;
-        } elseif($premium) {
-            $priority = self::$PRIORITY_PREM;
-        }
+        $this->system->query("UPDATE `support_request` SET `user_id`='{$this->user_id}', `user_name`='{$this->user->user_name}' WHERE `support_id`='{$support_id}' LIMIT 1");
 
-        return $priority;
+        if($this->system->db_last_affected_rows) {
+            $this->addSupportResponse($support_id, $this->user->user_name, "I have added this guest support to my Account.");
+            return true;
+        }
+        return false;
     }
 }
