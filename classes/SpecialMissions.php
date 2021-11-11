@@ -198,14 +198,14 @@ class SpecialMission {
 
     // update the mission with current set values
     public function updateMission() {
-        $this->target = json_encode($this->target);
-        $this->log = json_encode($this->log);
+        $target = json_encode($this->target);
+        $log = json_encode($this->log);
         $sql = "UPDATE `special_missions`
                 SET `status`={$this->status}, 
                 `end_time`={$this->end_time},
                 `progress`={$this->progress},
-                `target`='{$this->target}',
-                `log`='{$this->log}',
+                `target`='{$target}',
+                `log`='{$log}',
                 `reward`={$this->reward}
                 WHERE `mission_id`={$this->mission_id}";
         $result = $this->system->query($sql);
@@ -396,7 +396,7 @@ class SpecialMission {
     public function logNewEvent($new_event, $event_text): bool {
         $log_entry = [
             'event' => $new_event,
-            'timestamp' => time(),
+            'timestamp_ms' => floor(microtime(true) * 1000),
             'description' => $event_text
         ];
         array_unshift($this->log, $log_entry);
@@ -455,7 +455,7 @@ class SpecialMission {
     // Returns the last time an event was triggered
     public function returnLastUpdate(): int {
         $last_entry = $this->returnLatestLog();
-        return $last_entry['timestamp'];
+        return $last_entry['timestamp_ms'];
     }
     
     // Cancel the mission
@@ -482,7 +482,7 @@ class SpecialMission {
         $log = [
             0 => [
             'event' => self::$event_names['start']['event'],
-            'timestamp' => $timestamp,
+            'timestamp_ms' => floor(microtime(true) * 1000),
             'description' => self::$event_names['start']['text']
             ]
         ];
