@@ -238,7 +238,7 @@ class User extends Fighter {
         $this->id = self::ENTITY_TYPE . ':' . $this->user_id;
 
         $result = $this->system->query("SELECT `user_id`, `user_name`, `ban_type`, `ban_expire`, `journal_ban`, `avatar_ban`, `song_ban`, `last_login`,
-			`forbidden_seal`, `chat_color`, `staff_level`, `username_changes`
+			`forbidden_seal`, `chat_color`, `staff_level`, `username_changes`, `support_level`, `special_mission`
 			FROM `users` WHERE `user_id`='$this->user_id' LIMIT 1"
         );
         if($this->system->db_last_num_rows == 0) {
@@ -1317,40 +1317,39 @@ class User extends Fighter {
     }
 
     /**
-     * @param false $forceAll // should only be used for debugging
      * @return string[]
      */
-    public function getNameColors($forceAll = false) {
+    public function getNameColors() {
         $return = [
             'black' => 'normalUser'
         ];
 
-        if($this->forbidden_seal || $forceAll) {
+        if($this->forbidden_seal || $this->isHeadAdmin()) {
             $return = array_merge($return, [
                 'blue' => 'blue',
                 'pink' => 'pink',
             ]);
         }
 
-        if($this->premium_credits_purchased > 0 || $forceAll) {
+        if($this->premium_credits_purchased > 0 || $this->isHeadAdmin()) {
             $return = array_merge($return, [
                 'gold' => 'gold'
             ]);
         }
 
-        if($this->isModerator() || $forceAll) {
+        if($this->isModerator()) {
             $return['green'] = 'moderator';
         }
 
-        if($this->isHeadModerator() || $forceAll) {
+        if($this->isHeadModerator()) {
             $return['teal'] = 'headModerator';
         }
 
-        if($this->isContentAdmin() || $forceAll) {
+        if($this->isContentAdmin()) {
             $return['purple'] = 'contentAdmin';
         }
 
-        if($this->isUserAdmin() || $this->isHeadAdmin() || $forceAll) {
+        if($this->isUserAdmin()) {
             $return['red'] = 'administrator';
         }
 
