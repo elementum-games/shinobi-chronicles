@@ -430,7 +430,7 @@ class BattleEffectsManager {
         return true;
     }
 
-    public function setBarrier(Fighter $fighter, Jutsu $fighter_jutsu) {
+    public function updateBarrier(Fighter $fighter, Jutsu $fighter_jutsu) {
         if(isset($this->active_effects[self::barrierId($fighter)])) {
             if($fighter->barrier) {
                 $this->active_effects[self::barrierId($fighter)]->effect_amount = $fighter->barrier;

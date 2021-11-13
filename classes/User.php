@@ -3,7 +3,7 @@
 require_once __DIR__ . "/Jutsu.php";
 require_once __DIR__ . "/Team.php";
 require_once __DIR__ . "/DailyTask.php";
-require_once __DIR__ . "/Fighter.php";
+require_once __DIR__ . "/battle/Fighter.php";
 
 /*	Class:		User
 	Purpose:	Fetch user data and load into class variables.
@@ -82,7 +82,7 @@ class User extends Fighter {
     public $failed_logins;
     public $global_message_viewed;
 
-    public $gender;
+    public string $gender;
     public $village;
     public $level;
     public $rank;

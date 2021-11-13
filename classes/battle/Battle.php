@@ -1,6 +1,7 @@
-<?php /** @noinspection DuplicatedCode */
+<?php
 
 require_once __DIR__ . '/BattleEffectsManager.php';
+require_once __DIR__ . '/BattleLog.php';
 
 class Battle {
     const TYPE_AI_ARENA = 1;
@@ -23,23 +24,23 @@ class Battle {
     const MIN_DEBUFF_RATIO = 0.1;
     const MAX_DIFFUSE_PERCENT = 0.75;
 
-    public static $pve_battle_types = [
-        self::TYPE_AI_ARENA,
-        self::TYPE_AI_MISSION,
-        self::TYPE_AI_RANKUP,
-    ];
-
     private System $system;
 
     public string $raw_active_effects;
     public string $raw_active_genjutsu;
+    public string $raw_field;
 
     // Properties
     public int $battle_id;
     public int $battle_type;
 
+    public int $start_time;
+    public int $turn_time;
+    public int $turn_count;
+
+    public string $winner;
+
     public Fighter $player;
-    public Fighter $opponent;
 
     public string $player1_id;
     public string $player2_id;
@@ -47,34 +48,21 @@ class Battle {
     public Fighter $player1;
     public Fighter $player2;
 
-    public float $player1_health;
-    public float $player2_health;
+    public array $fighter_health;
 
-    public $player1_action;
-    public $player2_action;
+    /** @var FighterAction[] */
+    public array $fighter_actions;
 
-    public $player1_attack_type;
-    public $player2_attack_type;
+    /** @var BattleLog[] */
+    public array $log;
 
-    public int $player1_jutsu_id;
-    public int $player2_jutsu_id;
+    public array $jutsu_cooldowns;
 
-    public $player1_weapon_id;
-    public $player2_weapon_id;
+    /** @var array [user_combat_id][jutsu_combat_id] => [count, jutsu_type] */
+    public array $fighter_jutsu_used;
 
-    public ?string $player1_battle_text;
-    public ?string $player2_battle_text;
-
+    // transient instance var - more convenient to interface with log this way for the moment
     public string $battle_text;
-
-    public $jutsu_cooldowns;
-
-    public array $player1_jutsu_used;
-    public array $player2_jutsu_used;
-
-    public int $turn_time;
-    public int $start_time;
-    public $winner;
 
     /**
      * @param System  $system
@@ -101,48 +89,31 @@ class Battle {
                 throw new Exception("Invalid battle type!");
         }
 
+        $player1->combat_id = Battle::combatId(Battle::TEAM1, $player1);
+        $player2->combat_id = Battle::combatId(Battle::TEAM2, $player2);
+
+        $fighter_health = [
+            $player1->combat_id => $player1->health,
+            $player2->combat_id => $player2->health
+        ];
+        
         $system->query(
-            "INSERT INTO `battles`
-                (
-                 `battle_type`,
-                 `player1`,
-                 `player2`,
-                 `turn_time`,
-                 `start_time`,
-                 player1_health,
-                 player2_health,
-                 player1_weapon_id,
-                 player2_weapon_id,
-                 player1_attack_type,
-                 player2_attack_type,
-                 player1_jutsu_used,
-                 player2_jutsu_used,
-                 active_effects,
-                 battle_text,
-                 active_genjutsu,
-                 jutsu_cooldowns,
-                 winner
-               ) VALUES
-               (
-                {$battle_type},
-                '$player1->id',
-                '$player2->id',
-                " . (time() + self::PREP_LENGTH) . ",
-                " . time() . ",
-                {$player1->health},
-                {$player2->health},
-                0,
-                0,
-                '',
-                '',
-                '{$json_empty_array}',
-                '{$json_empty_array}',
-                '{$json_empty_array}',
-                '',
-                '{$json_empty_array}',
-                '{$json_empty_array}',
-                ''
-                )"
+            "INSERT INTO `battles` SET 
+                `battle_type` = '" . $battle_type . "',
+                `start_time` = '" . (time() + self::PREP_LENGTH) . "',
+                `turn_time` = '" . time() . "',
+                `turn_count` = '" . 0 . "',
+                `winner` = '',
+                `player1` = '" . $player1->id . "',
+                `player2` = '" . $player2->id . "',
+                `fighter_health` = '" . json_encode($fighter_health) . "',
+                `fighter_actions` = '" . $json_empty_array . "',
+                `field` = '" . $json_empty_array . "',
+                `active_effects` = '" . $json_empty_array . "',
+                `active_genjutsu` = '" . $json_empty_array . "',
+                `jutsu_cooldowns` = '" . $json_empty_array . "',
+                `fighter_jutsu_used` = '" . $json_empty_array . "'
+                "
         );
         $battle_id = $system->db_last_insert_id;
 
@@ -187,41 +158,35 @@ class Battle {
 
         $this->raw_active_effects = $battle['active_effects'];
         $this->raw_active_genjutsu = $battle['active_genjutsu'];
+        $this->raw_field = $battle['field'];
 
         $this->battle_type = $battle['battle_type'];
+
+        $this->start_time = $battle['start_time'];
+        $this->turn_time = $battle['turn_time'];
+        $this->turn_count = $battle['turn_count'];
+
+        $this->winner = $battle['winner'];
 
         $this->player1_id = $battle['player1'];
         $this->player2_id = $battle['player2'];
 
-        $this->player1_health = $battle['player1_health'];
-        $this->player2_health = $battle['player2_health'];
-
-        $this->player1_action = $battle['player1_action'];
-        $this->player2_action = $battle['player2_action'];
-
-        $this->player1_attack_type = $battle['player1_attack_type'];
-        $this->player2_attack_type = $battle['player2_attack_type'];
-
-        $this->player1_jutsu_id = (int)$battle['player1_jutsu_id'];
-        $this->player2_jutsu_id = (int)$battle['player2_jutsu_id'];
-
-        $this->player1_weapon_id = $battle['player1_weapon_id'];
-        $this->player2_weapon_id = $battle['player2_weapon_id'];
-
-        $this->player1_battle_text = $battle['player1_battle_text'];
-        $this->player2_battle_text = $battle['player2_battle_text'];
-
-        $this->battle_text = $battle['battle_text'];
+        $this->fighter_health = json_decode($battle['fighter_health'], true);
+        $this->fighter_actions = json_decode($battle['fighter_actions'], true);
 
         $this->jutsu_cooldowns = json_decode($battle['jutsu_cooldowns'] ?? "[]", true);
 
-        $this->player1_jutsu_used = json_decode($battle['player1_jutsu_used'], true);
-        $this->player2_jutsu_used = json_decode($battle['player2_jutsu_used'], true);
+        $this->fighter_jutsu_used = json_decode($battle['fighter_jutsu_used'], true);
 
-        $this->turn_time = $battle['turn_time'];
-        $this->start_time = $battle['start_time'];
-
-        $this->winner = $battle['winner'];
+        // lo9g
+        $last_turn_log = BattleLog::getLastTurn($this->system, $this->battle_id);
+        if($last_turn_log != null) {
+            $this->log[$last_turn_log->turn_number] = $last_turn_log;
+            $this->battle_text = $last_turn_log->content;
+        }
+        else {
+            $this->battle_text = '';
+        }
     }
 
     /**
@@ -235,16 +200,16 @@ class Battle {
             $this->player2 = $this->loadFighterFromEntityId($this->player2_id);
         }
 
-        $this->player1->combat_id = Battle::TEAM1 . ':' . $this->player1->id;
-        $this->player2->combat_id = Battle::TEAM2 . ':' . $this->player2->id;
+        $this->player1->combat_id = Battle::combatId(Battle::TEAM1, $this->player1);
+        $this->player2->combat_id = Battle::combatId(Battle::TEAM2, $this->player2);
 
         if($this->player1 instanceof AI) {
             $this->player1->loadData();
-            $this->player1->health = $this->player1_health;
+            $this->player1->health = $this->fighter_health[$this->player1->combat_id];
         }
         if($this->player2 instanceof AI) {
             $this->player2->loadData();
-            $this->player2->health = $this->player2_health;
+            $this->player2->health = $this->fighter_health[$this->player2->combat_id];
         }
 
         if($this->player1 instanceof User && $this->player1->id != $this->player->id) {
@@ -308,39 +273,31 @@ class Battle {
     }
 
     public function updateData() {
+        $this->system->query("START TRANSACTION;");
+
         $this->system->query("UPDATE `battles` SET
-            `player1_action` = '{$this->player1_action}',
-            `player2_action` = '{$this->player2_action}',
-
-            `player1_health` = {$this->player1_health},
-            `player2_health` = {$this->player2_health},
-
-            `player1_attack_type` = '{$this->player1_attack_type}',
-            `player2_attack_type` = '{$this->player2_attack_type}',
-
-            `player1_jutsu_id` = {$this->player1_jutsu_id},
-            `player2_jutsu_id` = {$this->player2_jutsu_id},
-
-            `player1_weapon_id` = {$this->player1_weapon_id},
-            `player2_weapon_id` = {$this->player2_weapon_id},
-
-            `player1_battle_text` = '{$this->player1_battle_text}',
-            `player2_battle_text` = '{$this->player2_battle_text}',
-
-            `battle_text` = '{$this->battle_text}',
+            `turn_time` = {$this->turn_time},
+            `turn_count` = {$this->turn_count},
+            `winner` = '{$this->winner}',
+    
+            `fighter_health` = '" . json_encode($this->fighter_health) . "',
+            `fighter_actions` = '" . json_encode($this->fighter_actions) . "',
+            
+            `field` = '" . $this->raw_field . "',
 
             `active_effects` = '" . $this->raw_active_effects . "',
             `active_genjutsu` = '" . $this->raw_active_genjutsu . "',
 
             `jutsu_cooldowns` = '" . json_encode($this->jutsu_cooldowns) . "',
-
-            `player1_jutsu_used` = '" . json_encode($this->player1_jutsu_used) . "',
-            `player2_jutsu_used` = '" . json_encode($this->player2_jutsu_used) . "',
-
-            `turn_time` = {$this->turn_time},
-            `winner` = '{$this->winner}'
-
+            `fighter_jutsu_used` = '" . json_encode($this->fighter_jutsu_used) . "'
         WHERE `battle_id` = '{$this->battle_id}' LIMIT 1");
+        
+        BattleLog::addOrUpdateTurnLog($this->system, $this->battle_id, $this->turn_count, $this->battle_text);
+
+        $this->system->query("COMMIT;");
     }
 
+    public static function combatId(string $team, Fighter $fighter): string {
+        return $team . ':' . $fighter->id;
+    }
 }

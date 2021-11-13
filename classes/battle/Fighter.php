@@ -55,7 +55,7 @@ abstract class Fighter {
     public array $bloodline_offense_boosts;
     public array $bloodline_defense_boosts;
 
-    public $gender;
+    public string $gender;
 
     // In-combat vars
     public $ninjutsu_boost = 0;

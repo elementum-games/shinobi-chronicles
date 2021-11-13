@@ -12,10 +12,10 @@ class AI extends Fighter {
 
     public string $id;
     public int $ai_id;
-    public $name;
+    public string $name;
     public float $max_health;
     public int $level;
-    public $gender;
+    public string $gender;
 
     public int $rank;
     public float $rank_progress;
