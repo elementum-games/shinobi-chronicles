@@ -6,5 +6,4 @@
 class BattleAttack {
     public Jutsu $jutsu;
     public float $raw_damage;
-
 }
