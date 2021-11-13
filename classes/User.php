@@ -1317,9 +1317,10 @@ class User extends Fighter {
     }
 
     /**
-     * @return string[]
+     * @return array
      */
-    public function getNameColors() {
+    public function getNameColors(): array
+    {
         $return = [
             'black' => 'normalUser'
         ];
