@@ -45,12 +45,20 @@ class TestFighter extends Fighter {
 
 }
 
-function calcDamage(Fighter $player1, Fighter $player2, Jutsu $player1_jutsu, Jutsu $player2_jutsu) {
+/**
+ * @param Fighter $player1
+ * @param Fighter $player2
+ * @param Jutsu   $player1_jutsu
+ * @param Jutsu   $player2_jutsu
+ * @return array
+ * @throws Exception
+ */
+function calcDamage(Fighter $player1, Fighter $player2, Jutsu $player1_jutsu, Jutsu $player2_jutsu): array {
     global $system;
     global $user;
 
-    $player1_raw_damage = $player1->calcDamage($player1_jutsu,'equipped_jutsu', true);
-    $player2_raw_damage = $player2->calcDamage($player2_jutsu,'equipped_jutsu', true);
+    $player1_raw_damage = $player1->calcDamage($player1_jutsu, true);
+    $player2_raw_damage = $player2->calcDamage($player2_jutsu, true);
 
     // Collision
     $battle_id = Battle::start($system, $player1, $player2, Battle::TYPE_SPAR);
@@ -111,8 +119,8 @@ if(($_POST['mode'] ?? '') == 'vs' || ($_GET['mode'] ?? '') == 'vs') {
     $mode = 'vs';
 }
 
-if($_POST['run_simulation'] && $mode == 'vs') {
-    $player1_data = $_POST['stats1'];
+/* if($_POST['run_simulation'] && $mode == 'vs') {
+   $player1_data = $_POST['stats1'];
     $player2_data = $_POST['stats2'];
 
     $player2_jutsu->power = $player1_jutsu->power;
@@ -139,7 +147,8 @@ if($_POST['run_simulation'] && $mode == 'vs') {
 	{$damages['player2']['damage']} final damage<br />
 	</div>";
 }
-else if($_POST['run_simulation'] && $mode == 'scenarios') {
+else */
+if($_POST['run_simulation'] && $mode == 'scenarios') {
     $base_level = $_POST['base_level'];
     $max_level = $_POST['max_level'];
     
