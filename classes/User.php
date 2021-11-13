@@ -184,6 +184,8 @@ class User extends Fighter {
      */
     public $mission_stage;
 
+    public int $special_mission;
+
     public int $exam_stage;
 
     public int $last_ai;
@@ -368,6 +370,8 @@ class User extends Fighter {
         if($this->mission_id) {
             $this->mission_stage = json_decode($user_data['mission_stage'], true);
         }
+
+        $this->special_mission = $user_data['special_mission'];
 
         $this->exam_stage = $user_data['exam_stage'];
 
@@ -655,6 +659,11 @@ class User extends Fighter {
         }
         else {
             $this->elements = [];
+        }
+
+        // Special Mission - Kick user out if battle is started
+        if ($this->battle_id && $this->special_mission) {
+            $cancel_mission = SpecialMission::cancelMission($this->system, $this, $this->special_mission);
         }
 
         // Regen/time-based events
@@ -1115,6 +1124,12 @@ class User extends Fighter {
         }
         else {
             $query .= "`mission_id`=0,";
+        }
+
+        if ($this->special_mission) {
+            $query .= "`special_mission`='$this->special_mission',";
+        } else {
+            $query .= "`special_mission`='0',";
         }
 
         $query .= "`exam_stage` = '{$this->exam_stage}',

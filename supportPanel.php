@@ -5,8 +5,7 @@ function supportPanel() {
     global $player;
     global $self_link;
 
-    require_once('classes/SupportManager.php');
-    $supportManager = new SupportManager($system, $player->user_id, $player->support_level, true);
+    $supportManager = new SupportManager($system, $player, true);
     $offset = 0;
     $limit = 100;
     $next = null;
@@ -23,6 +22,7 @@ function supportPanel() {
     $self_link .= '&view=support_requests';
     $supports = [];
     $support_id = 0;
+    $supportTypes = $supportManager->processTypes();
     if (isset($_GET['support_id'])) {
         $support_id = (int)$_GET['support_id'];
     }
@@ -106,15 +106,16 @@ function supportPanel() {
                     throw new Exception("You do not have permission to process this support type!");
                 }
 
-                $supportManager->addSupportResponses($support_id, $player->user_id, $player->user_name,
-                    $message, $player->current_ip, $player->staff_level);
+                if($supportManager->addSupportResponse($support_id, $player->user_name, $message)) {
+                    $system->message("Response added!");
+                }
             }
 
             if (isset($_POST['close_ticket'])) {
                 $supportData = $supportManager->fetchSupportByID($support_id);
                 $message = '';
                 if (isset($_POST['message'])) {
-                    $message = $system->clean($message);
+                    $message = $system->clean($_POST['message']);
                 }
 
                 // Not found
@@ -126,15 +127,44 @@ function supportPanel() {
                     throw new Exception("You do not have permission to process this support type!");
                 }
 
-                if ($message != '') {
-                    $supportManager->addSupportResponses($support_id, $player->user_id, $player->user_name,
-                        $message, $player->current_ip, $player->staff_level);
-                }
-
-                if ($supportManager->closeSupport($support_id, $player->staff_level, false, $player->user_name)) {
+                if ($supportManager->closeSupport($support_id)) {
                     $system->message("Support closed!");
                 } else {
-                    throw new Exception("Error closing support!d");
+                    throw new Exception("Error closing support!");
+                }
+
+                if ($message != '') {
+                    $supportManager->addSupportResponse($support_id, $player->user_name, $message);
+                }
+            }
+
+            if(isset($_POST['open_ticket'])) {
+                $supportData = $supportManager->fetchSupportByID($support_id);
+                $message = '';
+                if (isset($_POST['message'])) {
+                    $message = $system->clean($_POST['message']);
+                }
+
+                // Not found
+                if(!$supportData) {
+                    throw new Exception("Support not found!");
+                }
+                // No valid permission
+                if(!$supportManager->canProcess($supportData['support_type'])) {
+                    throw new Exception("You do not have permission to process this support type!");
+                }
+
+                // Open support
+                if ($supportManager->openSupport($support_id)) {
+                    $system->message("Support opened!");
+                } else {
+                    throw new Exception("Error opening support!");
+                }
+
+                // Add message if supplied
+                if ($message != '') {
+                    echo "Adding support message...";
+                    $supportManager->addSupportResponse($support_id, $player->user_name, $message);
                 }
             }
         } catch (Exception $e) {
@@ -149,7 +179,7 @@ function supportPanel() {
     }
     //Only fetch all supports if a specific isn't selected
     else if (!isset($_GET['support_search'])){
-        $supports = $supportManager->fetchAllSupports($category, $player->user_id, $limit, $offset);
+        $supports = $supportManager->fetchAllSupports($category, $limit, $offset);
     }
 
     if (!$system->message_displayed) {

@@ -36,7 +36,8 @@
             updated information if a staff member has yet to respond.<br />
             <br />
         <form action="<?=$system->link?>support.php" method="get">
-            Support Key: <input type="text" name="support_key" />
+            <label style="width:8em; font-weight:bold;">Support Key:</label><input type="text" name="support_key" /><br />
+            <label style="width:8em; font-weight:bold;">Email:</label><input type="text" name="email" /><br />
             <input type="submit" value="Search"/>
         </form>
         </td></tr>
@@ -57,7 +58,7 @@
         </form>
     </td></tr>
 </table>
-<?php elseif(isset($_GET['support_key'])): ?>
+<?php elseif(isset($_GET['support_key']) && (isset($_GET['email']) && $_GET['email'] != '')): ?>
 <script type="text/javascript" src="/scripts/supportScripts.js"></script>
 <table class="table">
     <?php if(!$supportData): ?>
@@ -85,7 +86,7 @@
     <table class="table">
         <tr><th>Add Response</th></tr>
         <tr><td>
-            <form action="<?=$system->link?>support.php?support_key=<?=$supportData['support_key']?>" method="post">
+            <form action="<?=$system->link?>support.php?support_key=<?=$supportData['support_key']?>&email=<?=$supportData['email']?>" method="post">
                 <textarea name="message" style="display:block;width:500px;height:200px;margin:5px auto 5px auto;"></textarea><br />
                 <input type="submit" name="add_response" value="Add Response" />
             </form>
