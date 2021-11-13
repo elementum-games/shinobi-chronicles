@@ -356,28 +356,6 @@ class BattleManager {
         return $this->battle->isComplete();
     }
 
-    private function checkForWinner(): string {
-        if($this->battle->isComplete()) {
-            return $this->battle->winner;
-        }
-
-        if($this->battle->player1->health > 0 && $this->battle->player2->health <= 0) {
-            $this->battle->winner = Battle::TEAM1;
-        }
-        else if($this->battle->player2->health > 0 && $this->battle->player1->health <= 0) {
-            $this->battle->winner = Battle::TEAM2;
-        }
-        else if($this->battle->player1->health <= 0 && $this->battle->player2->health <= 0) {
-            $this->battle->winner = Battle::DRAW;
-        }
-
-        if($this->battle->winner && !$this->spectate) {
-            $this->player->updateInventory();
-        }
-
-        return $this->battle->winner;
-    }
-
     public function playerActionSubmitted(): bool {
         return $this->fighterActionSubmitted($this->player);
     }
@@ -575,6 +553,28 @@ class BattleManager {
 
         $this->battle->player2->updateData();
         $this->battle->player2->updateInventory();
+    }
+
+    private function checkForWinner(): string {
+        if($this->battle->isComplete()) {
+            return $this->battle->winner;
+        }
+
+        if($this->battle->player1->health > 0 && $this->battle->player2->health <= 0) {
+            $this->battle->winner = Battle::TEAM1;
+        }
+        else if($this->battle->player2->health > 0 && $this->battle->player1->health <= 0) {
+            $this->battle->winner = Battle::TEAM2;
+        }
+        else if($this->battle->player1->health <= 0 && $this->battle->player2->health <= 0) {
+            $this->battle->winner = Battle::DRAW;
+        }
+
+        if($this->battle->winner && !$this->spectate) {
+            $this->player->updateInventory();
+        }
+
+        return $this->battle->winner;
     }
 
     /**
