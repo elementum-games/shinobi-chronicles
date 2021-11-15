@@ -102,7 +102,10 @@ $pages = [
         'battle_ok' => false,
         'menu' => System::MENU_ACTIVITY,
         'village_ok' => System::IN_VILLAGE_OKAY,
-        'min_rank' => 2
+        'min_rank' => 2,
+        'user_check' => function(User $u) {
+            return $u->isHeadAdmin();
+        }
     ],
     22 => [
         'file_name' => 'spar.php',
