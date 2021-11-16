@@ -248,7 +248,7 @@ class Messaging {
 							</td>
 						</tr>
 						<tr>
-							<td style='white-space:pre;'>" . wordwrap($this->message, 65) . "</td>
+							<td style='white-space:pre-wrap;'>" . $this->message . "</td>
 						</tr>
 						<tr>
 							<td style='text-align:center;'>
