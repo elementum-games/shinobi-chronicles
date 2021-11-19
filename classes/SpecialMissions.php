@@ -207,8 +207,7 @@ class SpecialMission {
         $this->player_max_health = $this->player->max_health;
 
         // Village info
-        $result = $this->system->query("SELECT `location`, `name` FROM villages");
-        $villages = $this->system->db_fetch_all($result);
+        $villages = $this->system->getVillageLocations();
         foreach ($villages as $village) {
             $location = explode('.', $village['location']);
             self::$target_villages[$village['name']]['x'] = $location[0];
@@ -452,7 +451,7 @@ class SpecialMission {
             $target_y = $new_coord;
         }
 
-        global $villages;
+        $villages = $this->system->getVillageLocations();
         $target_location = $target_x . "." . $target_y;
 
         if(isset($villages[$target_location]) && $target_location !== $this->player->village_location) {

@@ -57,6 +57,8 @@ class System {
 
     public $timezoneOffset;
 
+    public array $villageLocations = [];
+
     // Training boost switches
     public $TRAIN_BOOST = 0; // Extra points per training, 0 for none
     public $LONG_TRAIN_BOOST = 0; // Extra points per long training, 0 for none
@@ -714,6 +716,19 @@ class System {
                 return "layout/" . self::DEFAULT_LAYOUT . ".php";
                 break;
         }
+    }
+
+    public function getVillageLocations(): array {
+        if(count($this->villageLocations) < 1) {
+            $result = $this->query("SELECT `name`, `location` FROM `villages`");
+            $count = 0;
+            while($row = $this->db_fetch($result)) {
+                $this->villageLocations[$row['location']] = $row;
+                $this->villageLocations[$row['location']]['count'] = $count++;
+            }
+        }
+
+        return $this->villageLocations;
     }
 
     /**

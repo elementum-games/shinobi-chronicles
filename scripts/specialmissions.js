@@ -1,4 +1,11 @@
 /**
+ * @typedef {Object} Response
+ *
+ * @property {?Mission} mission
+ * @property {?String} systemMessage
+ */
+
+/**
  * @typedef {Object} Mission
  *
  * @property {Number} mission_id
@@ -55,24 +62,27 @@ function getMissionData() {
                 inBattle();
                 return;
             }
+            if(data.systemMessage != null) {
+                console.log(data.systemMessage);
+            }
 
             // check the mission status
-            missionStatus(data);
+            missionStatus(data.mission);
 
             // check the mission timer
-            missionTimer(data);
+            missionTimer(data.mission);
 
             // check the mission progress
-            missionProgress(data);
+            missionProgress(data.mission);
 
             // check player health
-            playerHealth(data);
+            playerHealth(data.mission);
 
             // check reward
-            reward(data);
+            reward(data.mission);
 
             // check mission logs
-            missionLogs(data);
+            missionLogs(data.mission);
         })
         .catch(err => {
             console.error(err);

@@ -820,6 +820,15 @@ class User extends Fighter {
             }
         }
 
+        // Correction location
+        $villages = $this->system->getVillageLocations();
+        if(isset($villages[$this->location]) &&
+            $this->location !== $this->village_location &&
+            !$this->isHeadAdmin()
+        ) {
+            $this->x--;
+        }
+
         return $display;
     }
 

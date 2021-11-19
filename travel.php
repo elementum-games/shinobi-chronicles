@@ -13,9 +13,9 @@ function travel() {
 
 	global $player;
 
-	global $villages;
-
 	global $self_link;
+
+    $villages = $system->getVillageLocations();
 
 	if(!empty($_GET['travel'])) {
 		$target_x = $player->x;

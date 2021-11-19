@@ -80,7 +80,7 @@ class Mission {
     }
 
     public function nextStage($stage_id) {
-        global $villages;
+        $villages = $this->system->getVillageLocations();
 
         // Check for multi-count, stop stage ID
         $new_stage = true;
@@ -151,7 +151,7 @@ class Mission {
     }
 
     public function nextTeamStage($stage_id): int {
-        global $villages;
+        $villages = $this->system->getVillageLocations();
 
         // Return signal for mission complete
         if($stage_id > count($this->stages) + 1) {
@@ -234,9 +234,7 @@ class Mission {
         return 1;
     }
 
-    public function rollLocation($starting_location) {
-        global $villages;
-
+    public function rollLocation($starting_location): string {
         $starting_location = explode('.', $starting_location);
 
         $max = $this->current_stage['location_radius'] * 2;

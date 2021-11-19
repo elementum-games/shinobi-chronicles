@@ -247,13 +247,7 @@ if($LOGGED_IN) {
 	}
 
 	// Load village list
-	$result = $system->query("SELECT `name`, `location` FROM `villages`");
-	$villages = array();
-	$count = 0;
-	while($row = $system->db_fetch($result)) {
-		$villages[$row['location']] = $row;
-		$villages[$row['location']]['count'] = $count++;
-	}
+	$villages = $system->getVillageLocations();
 
 	// Load rank data// Rank names
 	$RANK_NAMES = array();

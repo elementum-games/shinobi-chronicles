@@ -39,5 +39,8 @@ if ($status) {
         $special_mission->nextEvent();
     }
 
-    echo json_encode($special_mission);
+    echo json_encode([
+        'mission' => $special_mission,
+        'systemMessage' => $system->message,
+    ]);
 }
