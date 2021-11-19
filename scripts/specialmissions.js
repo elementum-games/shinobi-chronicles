@@ -1,145 +1,176 @@
+/**
+ * @typedef {Object} Mission
+ *
+ * @property {Number} mission_id
+ * @property {Number} status
+ * @property {Number} start_time
+ * @property {Number} end_time
+ * @property {Number} progress
+ * @property {LogEntry[]} log
+ * @property {Number} player_health
+ * @property {Number} player_max_health
+ * @property {Number} reward
+ * @property {String} difficulty
+ * @property {MissionTarget} target
+ *
+ *
+ * @property {?Boolean} inBattle
+ */
+
+/**
+ * @typedef {Object} LogEntry
+ * @property {String} event
+ * @property {Number} timestamp_ms
+ * @property {String} description
+ */
+
+/**
+ * @typedef {Object} MissionTarget
+ * @property {String} target
+ * @property {Number} x
+ * @property {Number} y
+ */
+
 let startTime = 0;
-let userBattle = false;
+const specialMissionsUrl = 'ajax_specialmissions.php';
 
+// Mission event cooldown + 50ms to help prevent network variance causing premature refreshes
+const serverRefreshIntervalMs = (missionEventDurationMs || 3000) + 50;
 
-// check the state of the mission every 2 seconds
-let queryInterval = setInterval(() => {
-    getMissionData();
-}, 1000);
+// Ping server to progress mission on cooldown
+let queryInterval = setInterval(() => getMissionData(), serverRefreshIntervalMs);
 
-// Update the timer if it's set every second
-let displayInterval = setInterval(() => {
-    updateTimer();
-}, 1000);
+// Update the timer every second
+let displayInterval = setInterval(() => updateTimer(), 1000);
 
 getMissionData();
 updateTimer();
 
 function getMissionData() {
-    // CREATE XHR OBJECT
-    let xhr = new XMLHttpRequest();
-    const ajaxTarget = 'ajax_specialmissions.php';
-    xhr.open('GET', ajaxTarget, true);
-    xhr.onreadystatechange = function() {
-        // If the response is OK
-        if (this.readyState == 4 && this.status === 200) {
-            if (!this.responseText) {
-                return false;
-            }
-            let res = JSON.parse(this.responseText);
-
-            
-            if (res.log) {
-                res.log = JSON.parse(res.log);
-            }
-            // check if the user is in battle
-            let battleStatus = inBattle(res);
-
+    fetch(specialMissionsUrl)
+        .then(response => response.json())
+        .then(data => {
             // stop everything if user is in battle
-            if (battleStatus) {
+            if (data.inBattle === true) {
+                inBattle();
                 return;
             }
 
             // check the mission status
-            missionStatus(res);
+            missionStatus(data);
 
             // check the mission timer
-            missionTimer(res);
+            missionTimer(data);
 
             // check the mission progress
-            missionProgress(res);
+            missionProgress(data);
 
             // check player health
-            playerHealth(res);
+            playerHealth(data);
 
             // check reward
-            reward(res);
+            reward(data);
 
             // check mission logs
-            missionLogs(res);
-        }
-    }
-    // Send Request
-    xhr.send();
+            missionLogs(data);
+        })
+        .catch(err => {
+            console.error(err);
+        });
 }
 
-// Update the Reward Display
-function reward(res) {
-    if (!res.reward) {
+/**
+ * Update the Reward Display
+ *
+ * @param {Mission} mission
+ * @return {boolean}
+ */
+function reward(mission) {
+    if (!mission.reward) {
         return false;
     }
 
     let target = document.getElementById('spec_miss_reward');
-    target.innerHTML = res.reward;
+    target.innerHTML = mission.reward.toString();
 }
 
-// Update the Health Display
-function playerHealth(res) {
-    let percent = res.player_health / res.player_max_health * 100;
+/**
+ * Update the Health Display
+ *
+ * @param {Mission} mission
+ */
+function playerHealth(mission) {
+    let percent = mission.player_health / mission.player_max_health * 100;
     let target = document.getElementById('spec_miss_health_bar');
     target.style.width = percent + '%';
 }
 
-// Update the mission status
-function missionStatus(res) {
-    if (res.status == undefined) {
+/**
+ * Update the mission status
+ *
+ * @param {Mission} mission
+ * @return {boolean}
+ */
+function missionStatus(mission) {
+    if (mission.status == null) {
         console.log('Mission Status not set');
         return false;
     }
 
     // Latest log entry
-    let lastEntry = res.log[0];
+    let lastEntry = mission.log[0];
 
     // mission success
-    if (lastEntry.event == 'mission_reward') {
+    if (lastEntry.event === 'mission_reward') {
         updateMissionStatus('Success');
-
-        // clear intervals
-        clearInterval(displayInterval); // Frontend query
-        clearInterval(queryInterval); // Backend query
+        stopRefresh();
         return true;
     }
 
     // mission failed
-    if (lastEntry.event == 'mission_failed') {
+    if (lastEntry.event === 'mission_failed') {
         updateMissionStatus('Failed');
-
-        // clear intervals
-        clearInterval(displayInterval); // Frontend query
-        clearInterval(queryInterval); // Backend query
+        stopRefresh();
         return true;
     }
 
     updateMissionStatus('In Progress');
 }
 
-// Update the mission timer global
-function missionTimer(res) {
-    if (res.start_time == 0) {
+
+/**
+ * Update the mission timer global
+ *
+ * @param {Mission} mission
+ * @return {boolean}
+ */
+function missionTimer(mission) {
+    if (mission.start_time === 0) {
         console.log('Mission Timer not set');
         return false;
     }
 
-    startTime = res.start_time;
+    startTime = mission.start_time;
 }
 
-// check if the user in battle
-function inBattle(res) {
-    if (res == 'battle') {
-        // update the UI with the status
-        updateMissionStatus('Failed');
-
-        // clear intervals
-        clearInterval(displayInterval); // Frontend query
-        clearInterval(queryInterval); // Backend query
-        return true;
-    }
-    return false;
+/**
+ * Run cleanup tasks when mission failed due to being attacked
+ *
+ * @return {boolean}
+ */
+function inBattle() {
+    updateMissionStatus('Failed');
+    stopRefresh();
 }
 
-// Update the Mission Status display
+/**
+ * Update the Mission Status display
+ *
+ * @param {String} missionStatus
+ * @return {boolean}
+ */
 function updateMissionStatus(missionStatus) {
-    if (missionStatus == 'In Progress') {
+    if (missionStatus === 'In Progress') {
         console.log('Mission In Progress');
         return false;
     }
@@ -150,28 +181,38 @@ function updateMissionStatus(missionStatus) {
     target.classList.add(className);
 }
 
-// Updates the Mission Progress display
-function missionProgress(res) {
-    if (res.progress == undefined) {
+/**
+ * Updates the Mission Progress display
+ *
+ * @param {Mission} mission
+ * @return {boolean}
+ */
+function missionProgress(mission) {
+    if (mission.progress == null) {
         console.log('Mission Progress not set');
         return false;
     }
 
-    // Update the Progress trackeer display
-    let progress = (res.progress > 100 ? 100 : res.progress);
+    // Update the Progress tracker display
+    let progress = (mission.progress > 100 ? 100 : mission.progress);
     let target = document.getElementById('spec_miss_progress').innerHTML = progress;
 
     // highlight the display if the progress goal has been reached
-    if (progress == 100) {
+    if (progress === 100) {
         let className = 'spec_miss_status_Success';
         let classTarget = document.getElementById('spec_miss_progress_div');
         classTarget.classList.add(className);
     }
 }
 
-// Update the Mission Log display
-function missionLogs(res) {
-    if (res.log == undefined) {
+/**
+ * Update the Mission Log display
+ *
+ * @param {Mission} mission
+ * @return {boolean}
+ */
+function missionLogs(mission) {
+    if (mission.log == null) {
         return false;
     }
 
@@ -182,16 +223,16 @@ function missionLogs(res) {
     // clear the container
     container.innerHTML = '';
 
-    // generate entries
-    for (const entry of res.log) {
+    for (const entry of mission.log) {
         // copy of the entry template
         let copy = document.importNode(template, true);
         // Add the icon for the event
         copy.querySelector('.spec_miss_log_entry_icon').classList.add('spec_miss_event_' + entry.event);
         // add the text of the event
-        copy.querySelector('.spec_miss_log_entry_text').innerHTML = entry.description;
+        copy.querySelector('.spec_miss_log_entry_text').innerHTML = entry.description.replace(/\[br]/g, "<br />");
         // add the timestamp
-        copy.querySelector('#spec_miss_log_entry_timestamp').innerHTML = timeDifference(entry.timestamp, startTime);
+        copy.querySelector('#spec_miss_log_entry_timestamp')
+            .innerHTML = timeDifference(Math.floor(entry.timestamp_ms / 1000), startTime);
         // add the entry to the container
         container.appendChild(copy);
     }
@@ -199,22 +240,28 @@ function missionLogs(res) {
 
 // update the timer
 function updateTimer() {
-    if (startTime == 0) {
+    if (startTime === 0) {
         return false;
     }
-    let timeEllapsed = timeDifference(startTime);
-    let timer = document.getElementById('spec_miss_timer').innerHTML = timeEllapsed;
+    document.getElementById('spec_miss_timer').innerHTML = timeDifference(startTime);
+}
+
+function stopRefresh() {
+    clearInterval(displayInterval); // Frontend query
+    clearInterval(queryInterval); // Backend query
 }
 
 // Get the time difference between two times
 function timeDifference(timestamp, target = false) {
-    // get the current time in seconds, UTC
+    // get the current time in milliseconds, UTC
     let currentTime = Math.floor(Date.now() / 1000);
+
     // the newest timestamp to subtract
     let timeTarget = ( target ? timestamp : currentTime );
+
     // the older timestamp
     let timeMinus = ( target ? target : timestamp );
     let timeDifference = timeTarget - timeMinus;
-    let timeEllapsed = timeRemaining(timeDifference, 'short', false, true);
-    return timeEllapsed;
+
+    return timeRemaining(timeDifference, 'short', false, true);
 }

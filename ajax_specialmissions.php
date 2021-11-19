@@ -7,7 +7,7 @@ session_start();
 $status = true;
 // Make sure the user is logged in.
 if(!isset($_SESSION['user_id'])) {
-	echo "<!--LOGOUT-->";
+	echo json_encode(['logout' => true]);
 	$status = false;
 }
 
@@ -20,7 +20,7 @@ $player->loadData(0);
 
 // Check if the user is in battle
 if ($player->battle_id) {
-    echo json_encode('battle');
+    echo json_encode(['inBattle' => true]);
     $status = false;
 }
 
@@ -30,18 +30,14 @@ if (!$player->special_mission) {
     $status = false;
 }
 
-if ($status) { 
-
+if ($status) {
     $special_mission = new SpecialMission($system, $player, $player->special_mission);
 
-    /* ******** LSM ADJUSTMENT ****** */
-    // if the last step was more than X seconds ago 
-    // The longer this is set then the easier it is for users to get sniped
-    // and the longer the mission takes to complete
-    $time_gap_ms = 3000;
-    $target_update = $special_mission->returnLastUpdateMs() + $time_gap;
+    $time_gap_ms = SpecialMission::EVENT_DURATION_MS;
+    $target_update = $special_mission->returnLastUpdateMs() + $time_gap_ms;
     if (floor(microtime(true) * 1000) >= $target_update) {
         $special_mission->nextEvent();
-        echo json_encode($special_mission);
     }
+
+    echo json_encode($special_mission);
 }

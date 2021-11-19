@@ -2087,6 +2087,13 @@ br.clear {
     font-size: 0.9rem;
 }
 
+.spec_miss_page_warning {
+    font-size: 0.8em;
+    font-style: italic;
+    margin-right: 65px;
+    color: #beb28a;
+    opacity: 0.8;
+}
 #spec_miss_cancel_wrapper {
     min-width: 100%;
     text-align: right;

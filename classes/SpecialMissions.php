@@ -1,52 +1,64 @@
 <?php
 
 class SpecialMission {
-    
-    private User $player;
-    private ?Team $team;
-    private System $system;
-
-    public int $mission_id;
-    public int $status;
-    public int $start_time;
-    public int $end_time;
-    public int $progress;
-    public $log;
-    public int $player_health;
-    public int $player_max_health;
-    public int $reward;
-
     const DIFFICULTY_EASY = 'easy';
     const DIFFICULTY_NORMAL = 'normal';
     const DIFFICULTY_HARD = 'hard';
     const DIFFICULTY_NIGHTMARE = 'nightmare';
 
+    // Scale damage multiplier from this point in the rank to cap
+    const BASE_STAT_CAP_PERCENT = 20;
+    // Damage multiplier starts here at the base number, then scales down to 1x at cap
+    const MAX_DAMAGE_MULTIPLIER = 3;
+
+    // Number of jutsu to use per fight, picked at random from equipped and bloodline jutsu
+    const JUTSU_USES_PER_FIGHT = 3;
+
+    /*
+     * DIFFICULTY
+     * When setting difficulty, consider the max dmg multiplier above as well as that # of fights is
+     * roughly equal to 100 / intel gain, then calculate the range of damage lost (shown in comments below)
+     *
+     * Pricing context:
+     *  - Yen gains here will be multiplied by player's rank
+     *  - healing shop cost is rank * 5 / rank * 20 / rank * 40
+    */
     public static array $difficulties = [
         SpecialMission::DIFFICULTY_EASY => [
-            'yen_per_battle' => 10,
-            'yen_per_mission' => 100,
-            'hp_lost' => 10,
-            'intel_gain' => 10
+            'yen_per_battle' => 4,
+            'yen_per_mission' => 25,
+            'hp_lost_percent' => 4, // 20% => 60% lost
+            'intel_gain' => 20, // est. 5 fights
         ],
         SpecialMission::DIFFICULTY_NORMAL => [
-            'yen_per_battle' => 20,
-            'yen_per_mission' => 200,
-            'hp_lost' => 15,
-            'intel_gain' => 10
+            'yen_per_battle' => 6,
+            'yen_per_mission' => 30,
+            'hp_lost_percent' => 6, // 33% => 100% lost
+            'intel_gain' => 18 // 5.5 fights
         ],
         SpecialMission::DIFFICULTY_HARD => [
-            'yen_per_battle' => 30,
-            'yen_per_mission' => 300,
-            'hp_lost' => 20,
-            'intel_gain' => 10
+            'yen_per_battle' => 8,
+            'yen_per_mission' => 35,
+            'hp_lost_percent' => 8, // 50% => 150% lost
+            'intel_gain' => 16 // 6.25 fights
         ],
         SpecialMission::DIFFICULTY_NIGHTMARE => [
-            'yen_per_battle' => 50,
-            'yen_per_mission' => 500,
-            'hp_lost' => 30,
-            'intel_gain' => 10
+            'yen_per_battle' => 10,
+            'yen_per_mission' => 40,
+            'hp_lost_percent' => 11, // 78.5% => 235.5% lost
+            'intel_gain' => 14 // 7.14 fights
         ]
     ];
+
+    /* The longer this is set then the easier it is for users to get sniped and the longer the mission
+    takes to complete.
+
+    Baseline testing at 1200ms shows completion ranges of
+    Easy (20% intel gain, ~5 encounters): 1:09 - 2:01
+
+    Nightmare (14% intel gain, ~7 encounters): 1:27 -> 2:47
+    */
+    const EVENT_DURATION_MS = 1200;
 
     const EVENT_START = 'start';
     const EVENT_MOVE_X = 'move_x';
@@ -78,7 +90,7 @@ class SpecialMission {
         ],
         SpecialMission::EVENT_BATTLE_WIN => [
             'event' => SpecialMission::EVENT_BATTLE_WIN,
-            'text' => 'You defeated an enemy patrol and found documents related to your assignment! You collected &#165;'
+            'text' => 'You defeated an enemy patrol and found documents related to your assignment!'
         ],
         SpecialMission::EVENT_BATTLE_LOSE => [
             'event' => SpecialMission::EVENT_BATTLE_LOSE,
@@ -150,6 +162,20 @@ class SpecialMission {
             'positive_y' => 2
         ]
     ];
+
+    private User $player;
+    private ?Team $team;
+    private System $system;
+
+    public int $mission_id;
+    public int $status;
+    public int $start_time;
+    public int $end_time;
+    public int $progress;
+    public $log;
+    public int $player_health;
+    public int $player_max_health;
+    public int $reward;
 
     // 
     public function __construct(System $system, User $player, $mission_id) {
@@ -274,7 +300,7 @@ class SpecialMission {
         // Play Events
         switch($new_event) {
             case self::EVENT_BATTLE:
-                $result = $this->newBattle();
+                $result = $this->simulateBattle();
                 // log the results
                 $this->logNewEvent($result[0], $result[1]);
                 break;
@@ -301,12 +327,8 @@ class SpecialMission {
 
     // Complete the mission
     public function completeMission() {
-        
-        
-        // *************** LSM ADJUSTMENTS ****************************************************************
         // Yen gain for completing the mission
         $yen_gain = self::$difficulties[$this->difficulty]['yen_per_mission'] + (random_int(0, 100));
-        // ************************************************************************************************
 
         $this->status = 1;
         $this->end_time = time();
@@ -320,29 +342,31 @@ class SpecialMission {
     }
 
     // Simulates a battle with an ai
-    public function newBattle(): array {
+    public function simulateBattle(): array {
 
         $battle_result = self::EVENT_BATTLE_WIN; // Winning by default, suffering from success
         $battle_text = self::$event_names[self::EVENT_BATTLE_WIN]['text'];
 
-        // *************** LSM ADJUSTMENTS ****************************************************************
-        // Gains for mission progress, basic stuff at the moment
-        $intel_gained = self::$difficulties[$this->difficulty]['intel_gain'] + (random_int(0,5)); // Random increase on intel gain
-        $yen_gain = self::$difficulties[$this->difficulty]['yen_per_battle'] + (random_int(0,5));
+       // Gains for mission progress, basic stuff at the moment.
+        // 20% variance up/down from base on intel gains. Averages to 105% base
+
+        $intel_gained = self::$difficulties[$this->difficulty]['intel_gain'];
+        $intel_gained *= 0.8 + (mt_rand(1, 4) / 10);
+        $intel_gained = floor($intel_gained);
+
+        $yen_gain = self::$difficulties[$this->difficulty]['yen_per_battle'] * $this->player->rank;
+        $yen_gain *= 0.8 + (mt_rand(1, 4) / 10);
+        $yen_gain = floor($yen_gain);
 
         // Percentage to decrease the HP loss, based on stat cap
-        // We Decrease the lost hp per turn by % of user stats compared to cap
-        // Maybe add ranks to this? IDK
-        $hp_lost_base = self::$difficulties[$this->difficulty]['hp_lost']; // Based on difficulty
-        $stat_cap_percent = floor($this->player->total_stats / $this->player->stat_cap * 100); // e.g. 90%
-        $subtract_from_base_hp_lost = floor($stat_cap_percent / 100 * $hp_lost_base); // e.g. 18 hp per
-        $hp_lost_percent = $hp_lost_base - $subtract_from_base_hp_lost; // e.g 2 hp per
-        $hp_lost = floor($hp_lost_percent / 100 * $this->player->max_health); // e.g flat amount = 2% of hp -- 2 out of 100 hp
+        $health_lost = $this->calcHealthLost(
+            self::$difficulties[$this->difficulty]['hp_lost_percent']
+        );
 
         // ***********************************************************************************************
 
         // If the user loses all HP
-        if ($this->player->health - $hp_lost <= 0) {
+        if ($this->player->health - $health_lost <= 0) {
             $battle_result = self::EVENT_BATTLE_LOSE;
             $battle_text = self::$event_names[self::EVENT_BATTLE_LOSE]['text'];
             $this->player->health = 0;
@@ -354,18 +378,51 @@ class SpecialMission {
             $this->progress += $intel_gained;
 
             // Damage HP
-            $this->player->health -= $hp_lost;
-            $this->player_health -= $hp_lost;
+            $this->player->health -= $health_lost;
+            $this->player_health -= $health_lost;
 
             // Yen Gain
             $this->player->money += $yen_gain;
             $this->reward += $yen_gain;
 
+            $this->player->getInventory();
+
+            // Jutsu exp
+            for($i = 0; $i < self::JUTSU_USES_PER_FIGHT; $i++) {
+                // 33% chance of using bloodline jutsu, if there are any
+                if($this->player->bloodline
+                    && count($this->player->bloodline->jutsu) > 0
+                    && mt_rand(1, 100) < 33
+                ) {
+                    $jutsu_key = array_rand($this->player->bloodline->jutsu);
+                    $jutsu = $this->player->bloodline->jutsu[$jutsu_key];
+                }
+                else {
+                    $jutsu_key = array_rand($this->player->equipped_jutsu);
+                    $jutsu_id = $this->player->equipped_jutsu[$jutsu_key]['id'];
+                    $jutsu = $this->player->jutsu[$jutsu_id] ?? null;
+                }
+
+                if($jutsu == null) {
+                    continue;
+                }
+
+                $original_level = $jutsu->level;
+
+                $this->player->useJutsu($jutsu);
+
+                if($jutsu->level > $original_level) {
+                    $battle_text .= "[br]" . stripslashes($jutsu->name) . " has increased to level {$jutsu->level}! ";
+                }
+            }
+
+            $this->player->updateInventory();
+
             // generate a new target
             $this->generateTarget();
 
             // Modify the event text
-            $battle_text .= $yen_gain."!";
+            $battle_text .= "[br]You collected &#165;{$yen_gain}!";
         }
 
         return ([$battle_result, $battle_text]);
@@ -415,14 +472,14 @@ class SpecialMission {
         }
 
         // Set the coords
-        $is_x_negative = (bool)random_int(0,1);
+        $is_x_negative = (bool)mt_rand(0,1);
         $max_x = ($is_x_negative ? self::$target_villages[$random_village_key]['negative_x'] : self::$target_villages[$random_village_key]['positive_x']);
-        $random_x = random_int(1, $max_x);
+        $random_x = mt_rand(1, $max_x);
         $target_x = ($is_x_negative ? (self::$target_villages[$random_village_key]['x'] - $random_x) : (self::$target_villages[$random_village_key]['x'] + $random_x));
 
-        $is_y_negative = (bool)random_int(0,1);
+        $is_y_negative = (bool)mt_rand(0,1);
         $max_y = ($is_y_negative ? self::$target_villages[$random_village_key]['negative_y'] : self::$target_villages[$random_village_key]['positive_y']);
-        $random_y = random_int(1, $max_y);
+        $random_y = mt_rand(1, $max_y);
         $target_y = ($is_x_negative ? (self::$target_villages[$random_village_key]['y'] - $random_y) : (self::$target_villages[$random_village_key]['y'] + $random_y));
 
         $new_target = [
@@ -457,11 +514,46 @@ class SpecialMission {
         $last_entry = $this->returnLatestLog();
         return $last_entry['timestamp_ms'];
     }
-    
+
+    private function calcHealthLost(int $base_hp_lost_percent): int {
+        // We Decrease the lost hp per turn by % of user stats compared to cap
+        $stats_percent = floor(($this->player->total_stats / $this->player->stat_cap) * 100);
+        if($stats_percent > 100) {
+            $stats_percent = 100;
+        }
+
+        /* We expect people to enter most ranks at about 20-25% of the stat cap. So we adjust the stat
+        percentage to reflect the realistic start => end points players will experience in a rank. With base
+        set to 20%, we consider the 20% -> 100% range of stats to be 0% -> 100% for the purpose of calculating
+        HP loss.
+        */
+        if($stats_percent < self::BASE_STAT_CAP_PERCENT) {
+            $stats_percent = self::BASE_STAT_CAP_PERCENT;
+        }
+        $adjusted_stats_percent = (
+            ($stats_percent - self::BASE_STAT_CAP_PERCENT - 1) /
+            (100 - self::BASE_STAT_CAP_PERCENT)
+        ) * 100;
+        $inverse_stats_percent = 100 - $adjusted_stats_percent;
+
+        /* What is this? Let's say our max damage multiplier is 3x, so we want damage to scale from 1x -> 3x.
+            To accomplish that, we
+            - set our base multiplier to be 1x
+            then
+            - add anywhere from 0x -> 2x based on lack of stats, aka inverse stats percent.
+        */
+        $damage_multiplier = 1;
+        $damage_multiplier += (self::MAX_DAMAGE_MULTIPLIER - 1) * ($inverse_stats_percent / 100);
+
+        $hp_lost_percent = $base_hp_lost_percent * $damage_multiplier;
+        return floor(($hp_lost_percent / 100) * $this->player->max_health);
+    }
+
     // Cancel the mission
     public static function cancelMission($system, $player, $mission_id) {
         $timestamp = time();
-        $result = $system->query("UPDATE `special_missions` SET `status`=2, `end_time`={$timestamp} WHERE `mission_id`={$mission_id}");
+        $result = $system->query("UPDATE `special_missions`
+SET `status`=2, `end_time`={$timestamp} WHERE `mission_id`={$mission_id}");
         $player->special_mission = 0;
         $player->updateData();
         return true;

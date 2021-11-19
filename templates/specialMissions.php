@@ -27,7 +27,7 @@
             a series of carefully coordinated efforts that will bring power and glory to your homeland?
         </p>
         <p>
-            Special missions take place over a short period of time (a couple to a few minutes). Your character will automatically perform
+            Special missions take about 1-5 minutes to complete. Your character will automatically perform
             the steps without you having to manually move, scout, etc. You can be attacked by other players while your
             character is moving around the map.
 
@@ -43,6 +43,7 @@
 <?php if ($player->special_mission): ?>
     <div id="spec_miss_wrapper">
         <div id="spec_miss_cancel_wrapper">
+            <span class="spec_miss_page_warning">Stay on this page to keep your mission progressing!</span>
             <a id="spec_miss_cancel" href="<?= $self_link ?>&cancelmission=true">Cancel Mission</a>
         </div>
         <div id="spec_miss_header">
@@ -109,5 +110,8 @@
         </div>
     </template>
     <!-- TEMPLATE END -->
+    <script type="text/javascript">
+        const missionEventDurationMs = <?= SpecialMission::EVENT_DURATION_MS ?>;
+    </script>
     <script type="text/javascript" src="<?= $system->link ?>/scripts/specialmissions.js"></script>
 <?php endif; ?>
