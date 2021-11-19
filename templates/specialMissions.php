@@ -26,6 +26,13 @@
             efforts have been noticed. Are you willing to put everything on the line, leave your home behind, and undertake
             a series of carefully coordinated efforts that will bring power and glory to your homeland?
         </p>
+        <p>
+            Special missions take place over a short period of time (a couple to a few minutes). Your character will automatically perform
+            the steps without you having to manually move, scout, etc. You can be attacked by other players while your
+            character is moving around the map.
+
+            Special missions reward money and jutsu exp/levels at random for your equipped and Bloodline jutsu.
+        </p>
         <a href="<?= $self_link ?>&start=easy"><button>Start Easy Mission!</button></a>
         <a href="<?= $self_link ?>&start=normal"><button>Start Normal Mission!</button></a>
         <a href="<?= $self_link ?>&start=hard"><button>Start Hard Mission!</button></a>
