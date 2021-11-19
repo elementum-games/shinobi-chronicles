@@ -328,7 +328,9 @@ class SpecialMission {
     // Complete the mission
     public function completeMission() {
         // Yen gain for completing the mission
-        $yen_gain = self::$difficulties[$this->difficulty]['yen_per_mission'] + (random_int(0, 100));
+        $yen_gain = self::$difficulties[$this->difficulty]['yen_per_mission'] * $this->player->rank;
+        $yen_gain *= 0.8 + (mt_rand(1, 4) / 10);
+        $yen_gain = floor($yen_gain);
 
         $this->status = 1;
         $this->end_time = time();
