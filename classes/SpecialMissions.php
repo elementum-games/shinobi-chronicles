@@ -443,11 +443,29 @@ class SpecialMission {
 
     // Move the user to the new coordinate
     public function movePlayer($event, $new_coord) {
+        $target_x = $this->player->x;
+        $target_y = $this->player->y;
+
         if ($event == self::EVENT_MOVE_X) {
-            $this->player->x = $new_coord;
+            $target_x = $new_coord;
         } else if ($event == self::EVENT_MOVE_Y) {
-            $this->player->y = $new_coord;
+            $target_y = $new_coord;
         }
+
+        global $villages;
+        $target_location = $target_x . "." . $target_y;
+
+        if(isset($villages[$target_location]) && $target_location !== $this->player->village_location) {
+            if ($event == self::EVENT_MOVE_X) {
+                $target_x += $target_x - $this->player->x;
+            } else if ($event == self::EVENT_MOVE_Y) {
+                $target_y += $target_y - $this->player->y;
+            }
+        }
+
+        $this->player->x = $target_x;
+        $this->player->y = $target_y;
+
         return $event;
     }
 
