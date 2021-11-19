@@ -110,7 +110,7 @@ class SpecialMission {
         ],
         SpecialMission::EVENT_COMPLETE_REWARD => [
             'event' => SpecialMission::EVENT_COMPLETE_REWARD,
-            'text' => 'You completed the mission successfully and earned &#165;'
+            'text' => 'You completed the mission successfully and earned a bonus of &#165;'
         ]
     ];
 
