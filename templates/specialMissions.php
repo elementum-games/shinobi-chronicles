@@ -1,30 +1,25 @@
 <?php
 /**
  * @var System $system
- * @var User $player
+ * @var User   $player
  * @var string $self_link
  */
 ?>
 
-<?php if (!$player->special_mission): ?>
+<?php if(!$player->special_mission): ?>
     <div class="contentDiv">
         <h2 class="contentDivHeader">
             Special Missions
         </h2>
 
         <p>
-            As each nation vies for control of the world around them, strategic use of the ninja in their control is key to
-            any gains made or losses prevented. Most missions undertaken serve as a means to generate income from loyal
-            clients, who fund the shinobi way of life in exchange for valuable services few others can provide. But
-            occasionally, a task of such great importance arises to a village that it warrants special designation. These
-            missions serve the nation as a whole by providing valuable intelligence, resources and staging points for future
-            military efforts.
-        </p>
-        <p>
-            Undertaking such integral efforts requires a ninja of unparalleled dedication to the village, for enemies abound
-            and not just any warrior would risk their lives for the betterment of all. But if you are here, then your
-            efforts have been noticed. Are you willing to put everything on the line, leave your home behind, and undertake
-            a series of carefully coordinated efforts that will bring power and glory to your homeland?
+            As nations struggle for control of the world around them, it falls upon ninja to undertake the missions that
+            see these goals realised. Most missions serve as a means to generate income from loyal clients and fund the
+            shinobi way of life. Occasionally, however, a task of such great importance arises to a village that it
+            warrants special designation. These missions challenge even the strongest shinobi, but the potential rewards
+            are endless. Enemies abound, but those dedicated few who take these missions secure valuable information for
+            their village. This information in turn supports the greater war, helping the nation grow stronger than
+            those around it.
         </p>
         <p>
             Special missions take about 1-5 minutes to complete. Your character will automatically perform
@@ -33,14 +28,22 @@
 
             Special missions reward money and jutsu exp/levels at random for your equipped and Bloodline jutsu.
         </p>
-        <a href="<?= $self_link ?>&start=easy"><button>Start Easy Mission!</button></a>
-        <a href="<?= $self_link ?>&start=normal"><button>Start Normal Mission!</button></a>
-        <a href="<?= $self_link ?>&start=hard"><button>Start Hard Mission!</button></a>
-        <a href="<?= $self_link ?>&start=nightmare"><button>Start Nightmare Mission!</button></a>
+        <a href="<?= $self_link ?>&start=easy">
+            <button>Start Easy Mission!</button>
+        </a>
+        <a href="<?= $self_link ?>&start=normal">
+            <button>Start Normal Mission!</button>
+        </a>
+        <a href="<?= $self_link ?>&start=hard">
+            <button>Start Hard Mission!</button>
+        </a>
+        <a href="<?= $self_link ?>&start=nightmare">
+            <button>Start Nightmare Mission!</button>
+        </a>
     </div>
 <?php endif; ?>
 
-<?php if ($player->special_mission): ?>
+<?php if($player->special_mission): ?>
     <div id="spec_miss_wrapper">
         <div id="spec_miss_cancel_wrapper">
             <span class="spec_miss_page_warning">Stay on this page to keep your mission progressing!</span>
@@ -49,7 +52,7 @@
         <div id="spec_miss_header">
             <div id="spec_miss_timer_wrapper">
                 <div id="spec_miss_timer_title">
-                     Duration
+                    Duration
                 </div>
                 <div id="spec_miss_timer">
                     0:00<!-- Timer -->
@@ -58,7 +61,7 @@
             <div id="spec_miss_character_wrapper">
                 <div id="spec_miss_status_wrapper">
                     <div id="spec_miss_status_title">
-                         Status
+                        Status
                     </div>
                     <div id="spec_miss_status_text">
                         In Progress
