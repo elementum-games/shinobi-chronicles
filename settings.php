@@ -117,28 +117,6 @@ function userSettings() {
 		}
 		$system->printMessage();
 	}
-	else if(!empty($_POST['change_song'])) {
-		$profile_song = $system->clean($_POST['profile_song']);
-		try {
-			if($player->song_ban) {
-				throw new Exception("You are currently banned from changing your profile song.");
-			}
-			if(strlen($profile_song) < 1) {
-				throw new Exception("Please enter a song link!");
-			}
-			if(preg_match_all('/\.(mp3|wav|ogg)/i', $profile_song) == false) {
-				throw new Exception("Invaild song link!");
-			}
-			$system->query("UPDATE `users` SET `profile_song`='{$profile_song}' WHERE `user_id`='{$player->user_id}' LIMIT 1");
-			if($system->db_last_affected_rows == 1) {
-				$player->profile_song = $profile_song;
-				$system->message("Profile song updated!");
-			}
-		} catch (Exception $e) {
-			$system->message($e->getMessage());
-		}
-		$system->printMessage();
-	}
 	else if(!empty($_POST['change_journal'])) {
 		$journal = $system->clean(trim($_POST['journal']));
 		try {
@@ -300,28 +278,6 @@ function userSettings() {
 	<input type='submit' name='change_layout' value='Change' />
 	</form>
 	</td></tr>";
-
-	// TODO: Somehow $system->audioType got lost
-	/*echo "<tr><th>Profile Song</th></tr>
-	<tr><td style='text-align: center;'>
-	<p>Player only supports links ending in: .mp3, .ogg, or .wav.</p>
-	<audio controls>";
-	echo "{$system->audioType($player->profile_song)}";
-	echo 
-		"Your browser does not support the audio element.
-	</audio> 
-	<br />";
-	if(!$player->song_ban) {
-	echo "<br />
-	<form action='$self_link' method='post'>
-		<input type='text' name='profile_song' value='{$player->profile_song}' style='width:250px;' /><br />
-		<input type='submit' name='change_song' value='Change' />
-	</form>";
-	}
-	else {
-		echo "</p>You are currenly banned from editing your profile song.</p>";
-	}
-	echo "</td></tr>";*/
 
     //Blacklist
     echo "<tr><th>Blocklist</th></tr>

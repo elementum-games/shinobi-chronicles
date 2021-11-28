@@ -133,8 +133,8 @@ function members() {
 		$system->printMessage();
 		$display_list = false;
 	}
-	else if(isset($_GET['user'])) {
-	// Display user's profile
+    // Display user's profile
+    else if(isset($_GET['user'])) {
 		$user_name = $system->clean($_GET['user']);
 		$result = $system->query("SELECT `user_id` FROM `users` WHERE `user_name`='{$user_name}' LIMIT 1");
 
@@ -230,19 +230,6 @@ function members() {
 			echo "<label style='width:6em;'>AI wins:</label> $viewUser->ai_wins<br />
 			</td></tr>";
 
-			// $system->audioType got lost
-			/*if($viewUser->profile_song) {
-				$profile_song = $system->audioType($viewUser->profile_song);
-				echo "<br />
-				<tr><th colspan='2'>Profile Song</th></tr>
-				<tr><td colspan='2' style='text-align: center;'>
-				<audio controls>";
-				echo "$profile_song";
-				echo "
-					Your browser does not support the audio element.
-				</audio>";
-			}*/
-
 			//send message/money/ak
 			echo "<tr style='text-align:center;'><td style='text-align:center;' colspan='2'>
 			<a href='{$system->link}?id=2&page=new_message&sender={$viewUser->user_name}'>Send Message</a>";
@@ -284,7 +271,7 @@ function members() {
 			//report player
 			echo
 			"<tr>
-				<td style='text-align: center;'colspan='2'>
+				<td style='text-align: center;' colspan='2'>
 					<a href='{$system->links['report']}&report_type=1&content_id=$viewUser->user_id'>Report Profile/Journal</a>
 				</td>
 			</tr>
@@ -309,10 +296,6 @@ function members() {
 					}
 					if($viewUser->avatar_ban) {
 						echo "Avatar banned<br />";
-						$banned = true;
-					}
-					if($viewUser->song_ban) {
-						echo "Profile song banned<br />";
 						$banned = true;
 					}
 
@@ -633,8 +616,6 @@ function members() {
 
 	}
 }
-
-
 
 function renderMemberSubmenu() {
     global $system;
