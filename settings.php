@@ -118,7 +118,7 @@ function userSettings() {
 		$system->printMessage();
 	}
 	else if(!empty($_POST['change_song'])) {
-		$profile_song = trim($_POST['profile_song']);
+		$profile_song = $system->clean($_POST['profile_song']);
 		try {
 			if($player->song_ban) {
 				throw new Exception("You are currently banned from changing your profile song.");
