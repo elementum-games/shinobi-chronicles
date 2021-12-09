@@ -4,3 +4,5 @@
 !/secure/vars.sample.php
 /tools
 .htaccess
+
+/vendor/

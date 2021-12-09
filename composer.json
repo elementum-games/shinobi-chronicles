@@ -1,0 +1,14 @@
+{
+    "name": "elementum-games/shinobi-chronicles",
+    "type": "project",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Levi Meahan",
+            "email": "lsmjudoka@gmail.com"
+        }
+    ],
+    "require": {
+      "php": ">=7.4"
+    }
+}

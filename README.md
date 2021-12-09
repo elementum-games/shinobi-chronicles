@@ -80,4 +80,20 @@ started quickly with minimal PHP environment/Git knowledge.
 9. Run it
     - First, make sure Apache and MySQL are both started in XAMPP
     - Then navigate to http://localhost/ and you should see the game come up
+    
 
+### Installing PHP Manually
+
+**Ubuntu**
+https://www.linode.com/docs/guides/install-php-8-for-apache-and-nginx-on-ubuntu/
+
+**Windows**
+https://www.php.net/downloads.php  
+Then go to "Windows downloads"
+
+### Composer
+
+We use composer for managing some dependencies and info about PHP version. Download
+at 
+https://getcomposer.org/download/
+and run `composer install` 
