@@ -28,6 +28,7 @@ class Battle {
 
     public string $raw_active_effects;
     public string $raw_active_genjutsu;
+
     public string $raw_field;
 
     // Properties
@@ -96,6 +97,8 @@ class Battle {
             $player1->combat_id => $player1->health,
             $player2->combat_id => $player2->health
         ];
+
+        $initial_field = BattleField::getInitialFieldExport($player1, $player2, $battle_type);
         
         $system->query(
             "INSERT INTO `battles` SET 
@@ -108,7 +111,7 @@ class Battle {
                 `player2` = '" . $player2->id . "',
                 `fighter_health` = '" . json_encode($fighter_health) . "',
                 `fighter_actions` = '" . $json_empty_array . "',
-                `field` = '" . $json_empty_array . "',
+                `field` = '" . json_encode($initial_field) . "',
                 `active_effects` = '" . $json_empty_array . "',
                 `active_genjutsu` = '" . $json_empty_array . "',
                 `jutsu_cooldowns` = '" . $json_empty_array . "',
@@ -243,6 +246,17 @@ class Battle {
             throw new Exception("Invalid entity type! " . Battle::getFighterEntityType($entity_id));
     }
 }
+
+    public function getFighter(string $combat_id): ?Fighter {
+        if($this->player1->combat_id === $combat_id) {
+            return $this->player1;
+        }
+        if($this->player2->combat_id === $combat_id) {
+            return $this->player2;
+        }
+
+        return null;
+    }
 
     /**
      * @param string $entity_id

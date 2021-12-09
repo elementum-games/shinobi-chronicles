@@ -1,7 +1,7 @@
 <?php
 
 require_once __DIR__ . '/Battle.php';
-// require_once __DIR__ . '/BattleField.php';
+require_once __DIR__ . '/BattleField.php';
 require_once __DIR__ . '/BattleEffectsManager.php';
 require_once __DIR__ . '/BattleAttack.php';
 require_once __DIR__ . '/FighterAction.php';
@@ -71,7 +71,7 @@ class BattleManager {
     public array $player_jutsu_used = [];
 
     // Components
-    // private BattleField $field;
+    public BattleField $field;
     private BattleEffectsManager $effects;
 
     /** @var Jutsu[] */
@@ -99,7 +99,10 @@ class BattleManager {
 
         $this->default_attacks = $this->getDefaultAttacks();
 
-        // $this->field = new BattleField($system, json_decode($this->battle->raw_field, true));
+        $this->field = new BattleField(
+             $system,
+             $this->battle,
+        );
 
         $this->effects = new BattleEffectsManager(
             $system,
@@ -630,7 +633,7 @@ class BattleManager {
 
         $this->battle->raw_active_effects = json_encode($this->effects->active_effects);
         $this->battle->raw_active_genjutsu = json_encode($this->effects->active_genjutsu);
-        // $this->battle->raw_field = json_encode($this->field->exportToDb())
+        $this->battle->raw_field = json_encode($this->field->exportToDb());
 
         $this->battle->updateData();
     }

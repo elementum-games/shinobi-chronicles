@@ -116,16 +116,26 @@ if($battle->battle_text) {
 <div class='submenuMargin'></div>
 
 <?php $system->printMessage(); ?>
+
+<!-- PLAYER DISPLAYS -->
 <table class='table'>
     <tr>
         <th id='bi_th_user' style='width:50%;'>
-            <a href='<?= $system->links['members'] ?>&user=<?= $player->getName() ?>' style='text-decoration:none'><?= $player->getName() ?></a>
+            <a href='<?= $system->links['members'] ?>&user=<?= $player->getName() ?>'
+               style='text-decoration:none'
+            >
+                <?= $player->getName() ?>
+            </a>
         </th>
         <th id='bi_th_opponent' style='width:50%;'>
             <?php if($opponent instanceof AI): ?>
                 <?= $opponent->getName() ?>
             <?php else: ?>
-                <a href='<?= $system->links['members'] ?>&user=<?= $opponent->getName() ?>' style='text-decoration:none'><?= $opponent->getName() ?></a>
+                <a href='<?= $system->links['members'] ?>&user=<?= $opponent->getName() ?>'
+                   style='text-decoration:none'
+                >
+                    <?= $opponent->getName() ?>
+                </a>
             <?php endif; ?>
         </th>
     </tr>
@@ -167,6 +177,14 @@ if($battle->battle_text) {
             </div>
         </td>
     </tr>
+</table>
+
+<!-- Battle field -->
+<table class='table'>
+    <tr><th>Field</th></tr>
+    <tr><td>
+        <?php require 'templates/battle/battle_field.php'; ?>
+    </td></tr>
 </table>
 
 <table class='table'>
