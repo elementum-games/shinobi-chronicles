@@ -24,6 +24,9 @@ class Battle {
     const MIN_DEBUFF_RATIO = 0.1;
     const MAX_DIFFUSE_PERCENT = 0.75;
 
+    const TURN_TYPE_MOVE = 'move';
+    const TURN_TYPE_ATTACK = 'attack';
+
     private System $system;
 
     public string $raw_active_effects;
@@ -38,6 +41,7 @@ class Battle {
     public int $start_time;
     public int $turn_time;
     public int $turn_count;
+    public string $turn_type;
 
     public string $winner;
 
@@ -70,12 +74,12 @@ class Battle {
      * @param Fighter $player1
      * @param Fighter $player2
      * @param int     $battle_type
-     * @return mixed
+     * @return int
      * @throws Exception
      */
     public static function start(
         System $system, Fighter $player1, Fighter $player2, int $battle_type
-    ) {
+    ): int {
         $json_empty_array = '[]';
 
         switch($battle_type) {
@@ -168,6 +172,7 @@ class Battle {
         $this->start_time = $battle['start_time'];
         $this->turn_time = $battle['turn_time'];
         $this->turn_count = $battle['turn_count'];
+        $this->turn_type = $battle['turn_type'];
 
         $this->winner = $battle['winner'];
 
@@ -294,6 +299,7 @@ class Battle {
         $this->system->query("UPDATE `battles` SET
             `turn_time` = {$this->turn_time},
             `turn_count` = {$this->turn_count},
+            `turn_type` = '{$this->turn_type}',
             `winner` = '{$this->winner}',
     
             `fighter_health` = '" . json_encode($this->fighter_health) . "',
