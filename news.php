@@ -101,7 +101,7 @@ function news() {
 	}
 
 	// Show create, edit pages, or display news posts
-	if($page == "create_post" && $player->isUserAdmin()) {
+	if($page == "create_post" && $player->hasAdminPanel()) {
 		echo "<table class='table'><tr><th>New Post</th></tr>
 		<tr><td style='text-align:center;'>
 			<form action='$self_link' method='post'>
@@ -141,9 +141,9 @@ function news() {
 	}
 
 	if(!$page) {
-		if($player->isUserAdmin()) {
+		if($player->hasAdminPanel()) {
 			echo "<p style='text-align:center;'><a href='$self_link?page=create_post'>New post</a></p>";
-			newsPosts(true);
+			newsPosts($player->isUserAdmin());
 		}
 		else {
 			newsPosts();
