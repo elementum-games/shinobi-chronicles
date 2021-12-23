@@ -24,7 +24,7 @@ class Battle {
     const MIN_DEBUFF_RATIO = 0.1;
     const MAX_DIFFUSE_PERCENT = 0.75;
 
-    const TURN_TYPE_MOVE = 'move';
+    const TURN_TYPE_MOVEMENT = 'movement';
     const TURN_TYPE_ATTACK = 'attack';
 
     private System $system;
@@ -110,6 +110,7 @@ class Battle {
                 `start_time` = '" . time() . "',
                 `turn_time` = '" . (time() + self::PREP_LENGTH - 5) . "',
                 `turn_count` = '" . 0 . "',
+                `turn_type` = '" . Battle::TURN_TYPE_MOVEMENT . "',
                 `winner` = '',
                 `player1` = '" . $player1->id . "',
                 `player2` = '" . $player2->id . "',
@@ -213,11 +214,11 @@ class Battle {
         $this->player1->combat_id = Battle::combatId(Battle::TEAM1, $this->player1);
         $this->player2->combat_id = Battle::combatId(Battle::TEAM2, $this->player2);
 
-        if($this->player1 instanceof AI) {
+        if($this->player1 instanceof NPC) {
             $this->player1->loadData();
             $this->player1->health = $this->fighter_health[$this->player1->combat_id];
         }
-        if($this->player2 instanceof AI) {
+        if($this->player2 instanceof NPC) {
             $this->player2->loadData();
             $this->player2->health = $this->fighter_health[$this->player2->combat_id];
         }
@@ -245,8 +246,8 @@ class Battle {
     switch(Battle::getFighterEntityType($entity_id)) {
         case User::ENTITY_TYPE:
             return User::fromEntityId($entity_id);
-        case AI::ID_PREFIX:
-            return AI::fromEntityId($this->system, $entity_id);
+        case NPC::ID_PREFIX:
+            return NPC::fromEntityId($this->system, $entity_id);
         default:
             throw new Exception("Invalid entity type! " . Battle::getFighterEntityType($entity_id));
     }
@@ -321,5 +322,15 @@ class Battle {
 
     public static function combatId(string $team, Fighter $fighter): string {
         return $team . ':' . $fighter->id;
+    }
+
+    public function isAttackPhase(): bool {
+        return true;
+        // return $this->turn_type === Battle::TURN_TYPE_ATTACK;
+    }
+
+    public function isMovementPhase(): bool {
+        return false;
+        // return $this->turn_type === Battle::TURN_TYPE_MOVEMENT;
     }
 }

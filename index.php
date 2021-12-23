@@ -344,7 +344,7 @@ if($LOGGED_IN) {
 				}
 			}
 
-			// Check for spar/fight PvP type, stop page if trying to load spar/battle while in AI battle
+			// Check for spar/fight PvP type, stop page if trying to load spar/battle while in NPC battle
 			if(isset($routes[$id]['battle_type'])) {
 				$result = $system->query("SELECT `battle_type` FROM `battles` WHERE `battle_id`='$player->battle_id' LIMIT 1");
 				if($system->db_last_num_rows > 0) {

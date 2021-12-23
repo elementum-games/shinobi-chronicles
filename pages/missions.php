@@ -148,7 +148,7 @@ function runActiveMission() {
         else if($player->mission_stage['action_type'] == 'combat') {
             try {
                 // monster id
-                $opponent = new AI($system, $player->mission_stage['action_data']);
+                $opponent = new NPC($system, $player->mission_stage['action_data']);
                 if(!$opponent) {
                     throw new Exception("Couldn't load opponent for mission!");
                 }
@@ -227,7 +227,7 @@ function runActiveMission() {
                         $mission_status = $mission->nextStage($player->mission_stage['stage_id'] + 1);
                     }
                 }
-                else if($battle->isOpponentWinner()) {		// AI win
+                else if($battle->isOpponentWinner()) {		// NPC win
                     echo "<table class='table'><tr><th>Battle Results</th></tr>
                     <tr><td>You have been defeated. You have failed your mission.
                     </td></tr></table>";

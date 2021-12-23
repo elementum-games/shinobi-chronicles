@@ -1,5 +1,7 @@
 <?php
 
+use JetBrains\PhpStorm\Pure;
+
 require_once __DIR__ . '/Battle.php';
 require_once __DIR__ . '/BattleField.php';
 require_once __DIR__ . '/BattleEffectsManager.php';
@@ -213,115 +215,19 @@ class BattleManager {
         }
 
         if($this->battle->isPreparationPhase()) {
-            try {
-                if (isset($_POST['attack'])) {
-                    $item_id = $_POST['item_id'] ?? null;
-                    if ($item_id && $this->player->hasItem($item_id)) {
-                        $item = $this->player->items[$item_id];
-
-                        $max_health = $this->player->max_health * (Battle::MAX_PRE_FIGHT_HEAL_PERCENT / 100);
-
-                        if ($this->player->health >= $max_health) {
-                            throw new Exception("You can't heal any further!");
-                        }
-                        if ($item['effect'] === 'heal') {
-                            if (--$this->player->items[$item_id]['quantity'] === 0) {
-                                unset($this->player->items[$item_id]);
-                            }
-
-                            $this->player->health += $item['effect_amount'];
-                            if ($this->player->health >= $max_health) {
-                                $this->player->health = $max_health;
-                            }
-
-                            $this->player->updateData();
-                            $this->player->updateInventory();
-                            $this->battle->battle_text .= sprintf("%s used a %s and healed for %.2f[br]", $this->player->user_name, $item['name'], $item['effect_amount']);
-                            $this->updateData();
-                        }
-                    }
-                }
-            }
-            catch(Exception $e) {
-                $this->system->message($e->getMessage());
-            }
+            $this->runPlayerHealItemAction($_POST);
             return false;
         }
         // If turn is still active and user hasn't submitted their move, check for action
         if($this->battle->timeRemaining() > 0 && !$this->playerActionSubmitted()) {
-            if(!empty($_POST['attack'])) {
-                // Run player attack
-                try {
-                    $jutsu_type = $_POST['jutsu_type'];
+            $player_action = $this->collectPlayerAction($_POST);
+            var_dump($player_action);
+            if($player_action != null) {
+                echo "player action not null";
+                $this->setPlayerAction($this->player, $player_action);
 
-                    // Check for handseals if ninjutsu/genjutsu
-                    if($jutsu_type == Jutsu::TYPE_NINJUTSU or $jutsu_type == Jutsu::TYPE_GENJUTSU) {
-                        if(!$_POST['hand_seals']) {
-                            throw new Exception("Please enter hand seals!");
-                        }
-
-                        $player_jutsu = $this->getJutsuFromHandSeals($this->player, $_POST['hand_seals']);
-
-                        // Layered genjutsu check
-                        /*if($player_jutsu && $player_jutsu->jutsu_type == Jutsu::TYPE_GENJUTSU && !empty($player_jutsu->parent_jutsu)) {
-                            $this->effects->assertParentGenjutsuActive($this->player, $player_jutsu);
-                        }*/
-                    }
-
-                    // Check jutsu ID if taijutsu
-                    else if($jutsu_type == Jutsu::TYPE_TAIJUTSU) {
-                        $jutsu_id = (int)$_POST['jutsu_id'];
-
-                        $player_jutsu = $this->getJutsuFromId($this->player, $jutsu_id);
-                    }
-                    // Check BL jutsu ID if bloodline jutsu
-                    else if($jutsu_type == 'bloodline_jutsu' && $this->player->bloodline_id) {
-                        $jutsu_id = (int)$_POST['jutsu_id'];
-
-                        $player_jutsu = null;
-                        if(isset($this->player->bloodline->jutsu[$jutsu_id])) {
-                            $player_jutsu = $this->player->bloodline->jutsu[$jutsu_id];
-                            $player_jutsu->setCombatId($this->player->combat_id);
-                        }
-                    }
-                    else {
-                        throw new Exception("Invalid jutsu selection!");
-                    }
-
-                    // Check jutsu cooldown
-                    if(!$player_jutsu) {
-                        throw new Exception("Invalid jutsu!");
-                    }
-                    if(isset($this->battle->jutsu_cooldowns[$player_jutsu->combat_id])) {
-                        throw new Exception("Cannot use that jutsu, it is on cooldown for " . $this->battle->jutsu_cooldowns[$player_jutsu->combat_id] . " more turns!");
-                    }
-
-                    if(!$this->player->useJutsu($player_jutsu)) {
-                        throw new Exception($this->system->message);
-                    }
-
-                    // Check for weapon if non-BL taijutsu
-                    $weapon_id = 0;
-                    if($jutsu_type == Jutsu::TYPE_TAIJUTSU && !empty($_POST['weapon_id'])) {
-                        $weapon_id = (int)$this->system->clean($_POST['weapon_id']);
-                        if($weapon_id && $this->player->hasItem($weapon_id)) {
-                            if(array_search($weapon_id, $this->player->equipped_weapons) === false) {
-                                $weapon_id = 0;
-                            }
-                        }
-                        else {
-                            $weapon_id = 0;
-                        }
-                    }
-
-                    // Log jutsu used
-                    $this->setPlayerAction($this->player, $player_jutsu, $weapon_id);
-
-                    if($this->opponent instanceof AI) {
-                        $this->chooseAndSetAIAction($this->opponent);
-                    }
-                } catch (Exception $e) {
-                    $this->system->message($e->getMessage());
+                if($this->opponent instanceof NPC) {
+                    $this->chooseAndSetNPCAttackAction($this->opponent);
                 }
             }
             else if(!empty($_POST['forfeit'])) {
@@ -378,6 +284,7 @@ class BattleManager {
         require 'templates/battle/battle_interface.php';
     }
 
+    #[Pure]
     public function isComplete(): bool {
         return $this->battle->isComplete();
     }
@@ -485,19 +392,23 @@ class BattleManager {
 
         /** @var ?BattleAttack $player1_attack */
         $player1_attack = null;
-        /** @var ?BattleAttack $player2_attack */
-        $player2_attack = null;
+        $player1_action = $this->battle->fighter_actions[$this->battle->player1->combat_id] ?? null;
 
-        if(isset($this->battle->fighter_actions[$this->battle->player1->combat_id])) {
+        if($player1_action != null && ($player1_action instanceof FighterAttackAction)) {
             $player1_attack = $this->setupFighterAttack(
                 $this->battle->player1,
-                $this->battle->fighter_actions[$this->battle->player1->combat_id]
+                $player1_action
             );
         }
-        if(isset($this->battle->fighter_actions[$this->battle->player2->combat_id])) {
+
+        /** @var ?BattleAttack $player2_attack */
+        $player2_attack = null;
+        $player2_action = $this->battle->fighter_actions[$this->battle->player2->combat_id] ?? null;
+
+        if($player2_action != null && ($player2_action instanceof FighterAttackAction)) {
             $player2_attack = $this->setupFighterAttack(
                 $this->battle->player2,
-                $this->battle->fighter_actions[$this->battle->player2->combat_id]
+                $player2_action
             );
         }
 
@@ -647,21 +558,10 @@ class BattleManager {
      * @return BattleAttack
      * @throws Exception
      */
-    protected function setupFighterAttack(Fighter $fighter, FighterAction $action): BattleAttack {
+    protected function setupFighterAttack(Fighter $fighter, FighterAttackAction $action): BattleAttack {
         $attack = new BattleAttack();
-        if($action->jutsu_purchase_type == Jutsu::PURCHASE_TYPE_DEFAULT) {
-            $attack->jutsu = $this->default_attacks[$action->jutsu_id];
-        }
-        else if($action->jutsu_purchase_type == Jutsu::PURCHASE_TYPE_PURCHASEABLE) {
-            $attack->jutsu = $fighter->jutsu[$action->jutsu_id];
-        }
-        else if($action->jutsu_purchase_type == Jutsu::PURCHASE_TYPE_BLOODLINE) {
-            $attack->jutsu = $fighter->bloodline->jutsu[$action->jutsu_id];
-        }
-        else {
-            throw new Exception("Invalid jutsu purchase type {$action->jutsu_purchase_type} for fighter {$fighter->combat_id}");
-        }
 
+        $attack->jutsu = $this->getJutsuFromAttackAction($fighter, $action);
         $attack->jutsu->setCombatId($fighter->combat_id);
 
         $disable_randomness = false;
@@ -1016,6 +916,184 @@ class BattleManager {
 
     // PRIVATE API - PLAYER ACTIONS
 
+    /**
+     * @param Fighter       $player
+     * @param FighterAction $action
+     * @throws Exception
+     */
+    protected function setPlayerAction(Fighter $player, FighterAction $action) {
+        if($this->battle->isAttackPhase() && $action instanceof FighterAttackAction) {
+            $this->battle->fighter_actions[$player->combat_id] = $action;
+            $jutsu = $this->getJutsuFromAttackAction($player, $action);
+
+            if(isset($this->player_jutsu_used[$jutsu->combat_id])) {
+                $this->battle->fighter_jutsu_used[$player->combat_id][$jutsu->combat_id]['count']++;
+            }
+            else {
+                $this->player_jutsu_used[$jutsu->combat_id] = array();
+                $this->player_jutsu_used[$jutsu->combat_id]['jutsu_type'] = $jutsu->jutsu_type;
+                $this->player_jutsu_used[$jutsu->combat_id]['count'] = 1;
+            }
+        }
+        else if($this->battle->isMovementPhase() && $action instanceof FighterMovementAction) {
+            $this->battle->fighter_actions[$player->combat_id] = $action;
+        }
+        else {
+            throw new Exception(
+                "Invalid attack type for current turn phase! " .
+                "{$this->battle->turn_type} / {$action->type}"
+            );
+        }
+    }
+
+    protected function runPlayerHealItemAction(array $FORM_DATA) {
+        try {
+            if (isset($FORM_DATA['attack'])) {
+                $item_id = $FORM_DATA['item_id'] ?? null;
+                if ($item_id && $this->player->hasItem($item_id)) {
+                    $item = $this->player->items[$item_id];
+
+                    $max_health = $this->player->max_health * (Battle::MAX_PRE_FIGHT_HEAL_PERCENT / 100);
+
+                    if ($this->player->health >= $max_health) {
+                        throw new Exception("You can't heal any further!");
+                    }
+                    if ($item['effect'] === 'heal') {
+                        if (--$this->player->items[$item_id]['quantity'] === 0) {
+                            unset($this->player->items[$item_id]);
+                        }
+
+                        $this->player->health += $item['effect_amount'];
+                        if ($this->player->health >= $max_health) {
+                            $this->player->health = $max_health;
+                        }
+
+                        $this->player->updateData();
+                        $this->player->updateInventory();
+                        $this->battle->battle_text .= sprintf("%s used a %s and healed for %.2f[br]", $this->player->user_name, $item['name'], $item['effect_amount']);
+                        $this->updateData();
+                    }
+                }
+            }
+        }
+        catch(Exception $e) {
+            $this->system->message($e->getMessage());
+        }
+    }
+
+    /**
+     * @param Fighter $npc
+     * @throws Exception
+     */
+    protected function chooseAndSetNPCAttackAction(Fighter $npc) {
+        if(!($npc instanceof NPC)) {
+            throw new Exception("Calling chooseAndSetNPCAttackAction on non-NPC!");
+        }
+
+        $jutsu = $npc->chooseAttack();
+        $jutsu->setCombatId($npc->combat_id);
+
+        $this->battle->fighter_actions[$npc->combat_id] = new FighterAttackAction(
+            fighter_id: $npc->combat_id,
+            jutsu_id: $jutsu->id,
+            jutsu_purchase_type: Jutsu::PURCHASE_TYPE_PURCHASEABLE,
+            weapon_id: null,
+        );
+    }
+
+    // PRIVATE UTILS - PLAYER ACTIONS
+
+    protected function collectPlayerAction(array $FORM_DATA): ?FighterAction {
+        if($this->battle->isAttackPhase() && !empty($FORM_DATA['attack'])) {
+            try {
+                $jutsu_type = $FORM_DATA['jutsu_type'];
+
+                // Check for handseals if ninjutsu/genjutsu
+                if($jutsu_type == Jutsu::TYPE_NINJUTSU or $jutsu_type == Jutsu::TYPE_GENJUTSU) {
+                    if(!$FORM_DATA['hand_seals']) {
+                        throw new Exception("Please enter hand seals!");
+                    }
+
+                    $player_jutsu = $this->getJutsuFromHandSeals($this->player, $FORM_DATA['hand_seals']);
+
+                    // Layered genjutsu check
+                    if($player_jutsu && $player_jutsu->jutsu_type == Jutsu::TYPE_GENJUTSU && !empty($player_jutsu->parent_jutsu)) {
+                        $this->effects->assertParentGenjutsuActive($this->player, $player_jutsu);
+                    }
+                }
+
+                // Check jutsu ID if taijutsu
+                else if($jutsu_type == Jutsu::TYPE_TAIJUTSU) {
+                    $jutsu_id = (int)$FORM_DATA['jutsu_id'];
+
+                    $player_jutsu = $this->getJutsuFromId($this->player, $jutsu_id);
+                }
+                // Check BL jutsu ID if bloodline jutsu
+                else if($jutsu_type == 'bloodline_jutsu' && $this->player->bloodline_id) {
+                    $jutsu_id = (int)$FORM_DATA['jutsu_id'];
+
+                    $player_jutsu = null;
+                    if(isset($this->player->bloodline->jutsu[$jutsu_id])) {
+                        $player_jutsu = $this->player->bloodline->jutsu[$jutsu_id];
+                        $player_jutsu->setCombatId($this->player->combat_id);
+                    }
+                }
+                else {
+                    throw new Exception("Invalid jutsu selection!");
+                }
+
+                // Check jutsu cooldown
+                if(!$player_jutsu) {
+                    throw new Exception("Invalid jutsu!");
+                }
+                if(isset($this->battle->jutsu_cooldowns[$player_jutsu->combat_id])) {
+                    throw new Exception("Cannot use that jutsu, it is on cooldown for " . $this->battle->jutsu_cooldowns[$player_jutsu->combat_id] . " more turns!");
+                }
+
+                if(!$this->player->useJutsu($player_jutsu)) {
+                    throw new Exception($this->system->message);
+                }
+
+                // Check for weapon if non-BL taijutsu
+                $weapon_id = 0;
+                if($jutsu_type == Jutsu::TYPE_TAIJUTSU && !empty($FORM_DATA['weapon_id'])) {
+                    $weapon_id = (int)$this->system->clean($FORM_DATA['weapon_id']);
+                    if($weapon_id && $this->player->hasItem($weapon_id)) {
+                        if(array_search($weapon_id, $this->player->equipped_weapons) === false) {
+                            $weapon_id = 0;
+                        }
+                    }
+                    else {
+                        $weapon_id = 0;
+                    }
+                }
+
+                // Log jutsu used
+                return new FighterAttackAction(
+                    $this->player->combat_id,
+                    $player_jutsu->id,
+                    $player_jutsu->purchase_type,
+                    $weapon_id
+                );
+
+            } catch (Exception $e) {
+                $this->system->message($e->getMessage());
+                return null;
+            }
+        }
+        else if($this->battle->isMovementPhase() && !empty($FORM_DATA['movement'])) {
+            // Run player attack
+            try {
+                return new FighterMovementAction();
+            } catch (Exception $e) {
+                $this->system->message($e->getMessage());
+                return null;
+            }
+        }
+
+        return null;
+    }
+
     private function getJutsuFromHandSeals(Fighter $fighter, string $hand_seals): ?Jutsu {
         /*if(is_array($_POST['hand_seals'])) {
             $seals = array();
@@ -1074,38 +1152,25 @@ class BattleManager {
         return $fighter_jutsu;
     }
 
-    protected function setPlayerAction(Fighter $player, Jutsu $jutsu, $weapon_id) {
-        $this->battle->fighter_actions[$player->combat_id] = new FighterAction(
-            $jutsu->id,
-            $jutsu->purchase_type,
-            $weapon_id
-        );
-
-        if(isset($this->player_jutsu_used[$jutsu->combat_id])) {
-            $this->battle->fighter_jutsu_used[$player->combat_id][$jutsu->combat_id]['count']++;
-        }
-        else {
-            $this->player_jutsu_used[$jutsu->combat_id] = array();
-            $this->player_jutsu_used[$jutsu->combat_id]['jutsu_type'] = $jutsu->jutsu_type;
-            $this->player_jutsu_used[$jutsu->combat_id]['count'] = 1;
-        }
-    }
-
     /**
-     * @param Fighter $ai
+     * @param Fighter             $fighter
+     * @param FighterAttackAction $action
+     * @return Jutsu
      * @throws Exception
      */
-    protected function chooseAndSetAIAction(Fighter $ai) {
-        if(!($ai instanceof AI)) {
-            throw new Exception("Calling chooseAndSetAIAction on non-AI!");
+    private function getJutsuFromAttackAction(Fighter $fighter, FighterAttackAction $action): Jutsu {
+        if($action->jutsu_purchase_type == Jutsu::PURCHASE_TYPE_DEFAULT) {
+            return $this->default_attacks[$action->jutsu_id];
         }
-
-        $jutsu = $ai->chooseMove();
-
-        $this->battle->fighter_actions[$ai->combat_id] = new FighterAction(
-            $jutsu->id,
-            Jutsu::PURCHASE_TYPE_PURCHASEABLE,
-            0,
-        );
+        else if($action->jutsu_purchase_type == Jutsu::PURCHASE_TYPE_PURCHASEABLE) {
+            return $fighter->jutsu[$action->jutsu_id];
+        }
+        else if($action->jutsu_purchase_type == Jutsu::PURCHASE_TYPE_BLOODLINE) {
+            return $fighter->bloodline->jutsu[$action->jutsu_id];
+        }
+        else {
+            throw new Exception("Invalid jutsu purchase type {$action->jutsu_purchase_type} for fighter {$fighter->combat_id}");
+        }
     }
+
 }

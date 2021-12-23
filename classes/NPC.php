@@ -1,11 +1,11 @@
 <?php
 
-/* 	Class:		AI
-	Purpose:	Contains all information for a specific AI, functions for selecting move, calculated damage dealt and
+/* 	Class:		NPC
+	Purpose:	Contains all information for a specific NPC, functions for selecting move, calculated damage dealt and
 				received, etc
 */
-class AI extends Fighter {
-    const ID_PREFIX = 'AI';
+class NPC extends Fighter {
+    const ID_PREFIX = 'NPC';
 
     public System $system;
     public RankManager $rankManager;
@@ -47,15 +47,15 @@ class AI extends Fighter {
     public int $staff_level = 0;
 
     /**
-     * AI constructor.
+     * NPC constructor.
      * @param System $system
-     * @param int    $ai_id Id of the AI, used to select and update data from database
+     * @param int    $ai_id Id of the NPC, used to select and update data from database
      * @throws Exception
      */
     public function __construct(System $system, int $ai_id) {
         $this->system =& $system;
         if(!$ai_id) {
-            $system->error("Invalid AI opponent!");
+            $system->error("Invalid NPC opponent!");
             return false;
         }
         $this->ai_id = $system->clean($ai_id);
@@ -63,7 +63,7 @@ class AI extends Fighter {
 
         $result = $system->query("SELECT `ai_id`, `name` FROM `ai_opponents` WHERE `ai_id`='$this->ai_id' LIMIT 1");
         if($system->db_last_num_rows == 0) {
-            throw new Exception("AI does not exist!");
+            throw new Exception("NPC does not exist!");
         }
 
         $result = $this->system->db_fetch($result);
@@ -79,7 +79,7 @@ class AI extends Fighter {
     }
 
     /**
-     * Loads AI data from the database into class members
+     * Loads NPC data from the database into class members
      * @throws Exception
      */
     public function loadData() {
@@ -203,9 +203,7 @@ class AI extends Fighter {
         }
     }
 
-    /* function chooseMove()
-    */
-    public function chooseMove(): Jutsu {
+    public function chooseAttack(): Jutsu {
         if(!$_SESSION['ai_logic']['special_move_used'] && $this->jutsu[1]) {
             $this->current_move =& $this->jutsu[1];
             $_SESSION['ai_logic']['special_move_used'] = true;
@@ -292,16 +290,16 @@ class AI extends Fighter {
     /**
      * @param System $system
      * @param string $entity_id_str
-     * @return AI
+     * @return NPC
      * @throws Exception
      */
-    public static function fromEntityId(System $system, string $entity_id_str): AI {
+    public static function fromEntityId(System $system, string $entity_id_str): NPC {
         $entityId = System::parseEntityId($entity_id_str);
 
         if($entityId->entity_type != self::ID_PREFIX) {
-            throw new Exception("Invalid entity type for AI class!");
+            throw new Exception("Invalid entity type for NPC class!");
         }
 
-        return new AI($system, $entityId->id);
+        return new NPC($system, $entityId->id);
     }
 }

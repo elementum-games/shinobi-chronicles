@@ -344,7 +344,6 @@ abstract class Fighter {
                 }
             }
         }
-
         switch($defense_type) {
             case 'ninjutsu':
                 // Resist unfairly applies to nin/tai residuals which only have a 25% or so effect amount, so we lower its effectiveness compared to a regular hit
@@ -361,7 +360,7 @@ abstract class Fighter {
                 error_log("Invalid defense type! {$defense_type}");
         }
 
-        if($this instanceof AI && $defense_type == 'genjutsu') {
+        if($this instanceof NPC && $defense_type == 'genjutsu') {
             $defense *= 0.8;
         }
 

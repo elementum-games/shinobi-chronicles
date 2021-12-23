@@ -12,7 +12,7 @@ require_once __DIR__ . "/classes/Item.php";
 
 require_once __DIR__ . "/classes/battle/Fighter.php";
 require_once __DIR__ . "/classes/User.php";
-require_once __DIR__ . "/classes/AI.php";
+require_once __DIR__ . "/classes/NPC.php";
 
 require_once __DIR__ . "/classes/SupportManager.php";
 

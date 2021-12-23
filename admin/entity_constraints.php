@@ -155,7 +155,7 @@ $constraints['edit_user'] = [
     ],
 ];
 
-/* AI */
+/* NPC */
 $constraints['ai'] = [
     'rank' => [
         'data_type' => 'int',

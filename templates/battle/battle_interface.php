@@ -25,9 +25,33 @@ if($battle->battle_text) {
     $battle_text = $system->html_parse(stripslashes($battle->battle_text));
     $battle_text = str_replace(array('[br]', '[hr]'), array('<br />', '<hr />'), $battle_text);
 }
+    $battle_text = null;
+    if($battle->battle_text) {
+        $battle_text = $system->html_parse(stripslashes($battle->battle_text));
+        $battle_text = str_replace(array('[br]', '[hr]'), array('<br />', '<hr />'), $battle_text);
+    }
+
+    require 'templates/battle/resource_bar.php';
 ?>
 
 <style type='text/css'>
+    .fighterDisplay {
+        display: flex;
+        flex-direction: row;
+        gap: 8px;
+    }
+    .fighterDisplay.opponent {
+        flex-direction: row-reverse;
+    }
+    .avatarContainer {
+        width: 100px;
+        height: 100px;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(0,0,0,0.1);
+    }
     .playerAvatar {
         display:block;
         margin: auto;
@@ -47,7 +71,7 @@ if($battle->battle_text) {
         width: 240px;
         border: 1px solid black;
         border-radius: 17px;
-        
+
         background-color: rgba(0, 0, 0, 0.6);
     }
 
@@ -64,7 +88,7 @@ if($battle->battle_text) {
         line-height:15px;
 
         color: #ffffff;
-        text-shadow: 
+        text-shadow:
             -1px 0 0 rgba(0,0,0,0.7),
             -1px -1px 0 rgba(0,0,0,0.7),
             0 -1px 0 rgba(0,0,0,0.7),
@@ -128,7 +152,7 @@ if($battle->battle_text) {
             </a>
         </th>
         <th id='bi_th_opponent' style='width:50%;'>
-            <?php if($opponent instanceof AI): ?>
+            <?php if($opponent instanceof NPC): ?>
                 <?= $opponent->getName() ?>
             <?php else: ?>
                 <a href='<?= $system->links['members'] ?>&user=<?= $opponent->getName() ?>'
@@ -139,50 +163,31 @@ if($battle->battle_text) {
             <?php endif; ?>
         </th>
     </tr>
-    <tr>
-        <td style='text-align: center;' id='bi_td_player'>
-            <img src='<?= $player->avatar_link ?>' class='playerAvatar' alt='player_profile_img' />
-            <div id='player_battle_stats_container' style='display: inline-block; text-align: center; margin-top: 10px;'>
-
-                <!-- Health -->
-                <div class='resourceBarOuter'>
-                    <label class='innerResourceBarLabel' ><?= sprintf("%.2f", $player->health) ?> / <?= sprintf("%.2f", $player->max_health) ?></label>
-                    <div class='healthFill' style='width:<?= $health_percent ?>%;'></div>
-                </div>
-
+    <tr><td id='bi_td_player'>
+        <div class='fighterDisplay'>
+            <div class='avatarContainer'>
+                <img src='<?= $player->avatar_link ?>' class='playerAvatar' />
+            </div>
+            <div class='resourceBars'>
+                <?php resourceBar($player->health, $player->max_health, 'health') ?>
                 <?php if(!$battleManager->spectate): ?>
-
-                    <!-- Chakra -->
-                    <div class='resourceBarOuter' style='margin-top:6px;'>
-                        <label class='innerResourceBarLabel'><?= sprintf("%.2f", $player->chakra) ?> / <?= sprintf("%.2f", $player->max_chakra) ?></label>
-                        <div class='chakraFill' style='width:<?= $chakra_percent ?>%;'></div>
-                    </div>
-
-                    <!-- Stamina -->
-                    <div class='resourceBarOuter' style='margin-top:6px;'>
-                        <label class='innerResourceBarLabel'><?= sprintf("%.2f", $player->stamina) ?> / <?= sprintf("%.2f", $player->max_stamina) ?></label>
-                        <div class='staminaFill' style='width:<?= $stamina_percent ?>%;'></div>
-                    </div>
-
+                    <?php resourceBar($player->chakra, $player->max_chakra, 'chakra') ?>
                 <?php endif; ?>
             </div>
-        </td>
-        <td style='text-align: center;' id='bi_td_opponent'>
-            <img src='<?= $opponent->avatar_link ?>' class='opponentAvatar' />
-            <div id='ai_battle_stats_container' style='display: inline-block; text-align: center; margin-top: 10px;'>
-                <div class='resourceBarOuter' style='margin-top:8px;'><div class='healthFill' style='width:<?= $opponent_health_percent ?>%;'>
-                        <label  class='innerResourceBarLabel'><?= sprintf("%.2f", $opponent->health) ?> / <?= sprintf("%.2f", $opponent->max_health) ?></label>
-                    </div>
-                </div>
+        </div>
+    </td>
+    <td id='bi_td_opponent'>
+        <div class='fighterDisplay opponent'>
+            <div class='avatarContainer'>
+                <img src='<?= $opponent->avatar_link ?>' class='opponentAvatar' />
             </div>
-        </td>
-    </tr>
-</table>
-
-<!-- Battle field -->
-<table class='table'>
-    <tr><th>Field</th></tr>
-    <tr><td>
+            <div class='resourceBars'>
+                <?php resourceBar($opponent->health, $opponent->max_health,'health') ?>
+            </div>
+        </div>
+    </td></tr>
+    <!-- Battle field -->
+    <tr><td colspan='2'>
         <?php require 'templates/battle/battle_field.php'; ?>
     </td></tr>
 </table>

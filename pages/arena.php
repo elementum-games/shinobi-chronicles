@@ -21,14 +21,14 @@ function arena() {
 		$result = $system->query("SELECT `ai_id`, `name`, `level` FROM `ai_opponents`
 			WHERE `rank` ='$player->rank_num' ORDER BY `level` ASC");
 
-		// Addition by Kengetsu - Get access to AI if rank is higher than public max.
+		// Addition by Kengetsu - Get access to NPC if rank is higher than public max.
 		if($player->rank_num > System::SC_MAX_RANK) {
 			$result = $system->query("SELECT `ai_id`, `name`, `level` FROM `ai_opponents`
 			WHERE `rank` ='" . System::SC_MAX_RANK . "' ORDER BY `level` ASC");
 		}
 		//End
 		if($system->db_last_num_rows == 0) {
-			$system->message("No AI opponents found!");
+			$system->message("No NPC opponents found!");
 			$system->printMessage();
 			return false;
 		}
@@ -50,7 +50,7 @@ function arena() {
 
                 try {
                     $ai_id = $_GET['fight'];
-                    $ai = new AI($system, $ai_id);
+                    $ai = new NPC($system, $ai_id);
                     $ai->loadData();
                     $ai->health = $ai->max_health;
 
@@ -163,7 +163,7 @@ function arenaFight(): bool {
                 <br />You have gained 1 ' . System::unSlug($stat_to_gain) . '.';
             }
 
-            // TEAM BOOST AI GAINS
+            // TEAM BOOST NPC GAINS
             if($player->team != null) {
                 $boost_percent = $player->team->getAIMoneyBoostAmount();
                 if($boost_percent != null) {
