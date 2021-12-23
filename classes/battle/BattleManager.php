@@ -1084,6 +1084,7 @@ class BattleManager {
         else if($this->battle->isMovementPhase() && !empty($FORM_DATA['movement'])) {
             // Run player attack
             try {
+                // TODO: Add a way to actually submit movement
                 return new FighterMovementAction();
             } catch (Exception $e) {
                 $this->system->message($e->getMessage());
