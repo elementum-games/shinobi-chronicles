@@ -1446,10 +1446,6 @@ class User extends Fighter {
         return $this->isContentAdmin() || $this->isUserAdmin() || $this->isHeadAdmin();
     }
 
-    public function hasEventPanel(): bool {
-        return $this->isUserAdmin() || $this->isHeadAdmin() || $this->isContentAdmin();
-    }
-
     const LOG_TRAINING = 'training';
     const LOG_ARENA = 'arena';
     const LOG_LOGIN = 'login';
