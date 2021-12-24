@@ -197,18 +197,19 @@ function members() {
 
 
 			echo "<td style='width:50%;'>
-			<label style='width:6em;'>Level:</label> 	$viewUser->level<br />
-			<label style='width:6em;'>Exp:</label> 	$viewUser->exp<br />
-			<label style='width:6em;'>Rank:</label> 	" . $ranks[$viewUser->rank] . "<br />" .
+			<label style='width:6.5em;'>Level:</label> 	$viewUser->level<br />
+			<label style='width:6.5em;'>Exp:</label> 	$viewUser->exp<br />
+			<label style='width:6.5em;'>Rank:</label> 	" . $ranks[$viewUser->rank] . "<br />" .
 			"<br />";
 			if($viewUser->gender == User::GENDER_NONE) {
 				echo "";
 			} else {
-				echo "<label style='width:6em;'>Gender:</label> $viewUser->gender<br />";
+				echo "<label style='width:6.5em;'>Gender:</label> $viewUser->gender<br />";
 			}
+
 			echo "
-			<label style='width:6em;'>Village:</label> $viewUser->village<br />
-			<label style='width:6em;'>Bloodline:</label> " . ($viewUser->bloodline_id ? $viewUser->bloodline_name : "None") .
+			<label style='width:6.5em;'>Village:</label> $viewUser->village<br />
+			<label style='width:6.5em;'>Bloodline:</label> " . ($viewUser->bloodline_id ? $viewUser->bloodline_name : "None") .
 				"<br />";
 			if($viewUser->clan) {
 				$clan_positions = array(
@@ -216,18 +217,34 @@ function members() {
 					2 => 'Elder 1',
 					3 => 'Elder 2',
 				);
-				echo "<label style='width:6em;'>Clan:</label> " . $viewUser->clan['name'] . "<br />";
+				echo "<label style='width:6.5em;'>Clan:</label> " . $viewUser->clan['name'] . "<br />";
 				echo $viewUser->clan_office ? "<label style='width:6em;'>Clan Rank:</label> " . $clan_positions[$viewUser->clan_office] . "<br />" : "";
 			}
 			if($viewUser->team) {
-				echo "<label style='width:6em;'>Team:</label> <a href='{$self_link}&view_team={$viewUser->team->id}'>" . $viewUser->team->name . "</a><br />";
+				echo "<label style='width:6.5em;'>Team:</label> <a href='{$self_link}&view_team={$viewUser->team->id}'>" . $viewUser->team->name . "</a><br />";
 			}
-			echo "<br />
-			<label style='width:6em;'>PvP wins:</label>	$viewUser->pvp_wins<br />";
-            if($player->isHeadAdmin()) {
-                echo "<label style='width:6em;'>PvP losses:</label>	$viewUser->pvp_losses<br />";
+
+            echo "<br /><label style='width:6.5em;'>Spouse:</label> ";
+            if($player->spouse > 0) {
+                echo "<a href='{$self_link}&user={$player->spouse_name}'>" . $player->spouse_name . "</a><br />
+                <label style='width:6.5em;'>Anniversary:</label> " . Date('F j, Y', $viewUser->marriage_time) . "<br />";
             }
-			echo "<label style='width:6em;'>AI wins:</label> $viewUser->ai_wins<br />
+            else {
+                echo "None<br />";
+            }
+
+            // Spouse location
+            if($player->user_id == $viewUser->user_id) {
+                echo "<label style='width:6.5em;'>Location:</label> {$viewUser->location}<br />";
+            }
+
+
+			echo "<br />
+			<label style='width:6.5em;'>PvP wins:</label>	$viewUser->pvp_wins<br />";
+            if($player->isHeadAdmin()) {
+                echo "<label style='width:6.5em;'>PvP losses:</label>	$viewUser->pvp_losses<br />";
+            }
+			echo "<label style='width:6.5em;'>AI wins:</label> $viewUser->ai_wins<br />
 			</td></tr>";
 
 			// $system->audioType got lost

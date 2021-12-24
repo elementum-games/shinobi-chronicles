@@ -300,7 +300,18 @@ function userProfile() {
 		<div style='height:6px;width:200px;border-style:solid;border-width:1px;'>" .
             "<div style='background-color:#FFD700;height:6px;width:" . $exp_width . "px;' /></div>" . "</div>" .
             "<br />
-		<label style='width:$label_width;'>Gender:</label> $player->gender<br />
+		
+		<label style='width:$label_width;'>Spouse:</label> ";
+        if($player->spouse > 0) {
+            echo "<a href='{$system->links['members']}&user={$player->spouse_name}'>" . $player->spouse_name . "</a><br />
+            <label style='width:$label_width;'>Anniversary:</label> " . Date('F j, Y', $player->marriage_time) . "<br />";
+        }
+        else {
+            echo "None<br />";
+        }
+
+		echo "<br />
+        <label style='width:$label_width;'>Gender:</label> $player->gender<br />
 		<label style='width:$label_width;'>Village:</label> $player->village<br />
 		<label style='width:$label_width;'>Location:</label> $player->location<br />
 		<label style='width:$label_width;'>Money:</label> &yen;" . $player->money . "<br />
@@ -336,6 +347,23 @@ function userProfile() {
 		<label style='width:9.2em;'>Speed:</label>" . sprintf("%.2f", $player->speed) . "<br />
 		<label style='width:9.2em;'>Intelligence:</label>" . sprintf("%.2f", $player->intelligence) . "<br />
 		<label style='width:9.2em;'>Willpower:</label>" . sprintf("%.2f", $player->willpower) . "<br />
+		<br />
+		<b>Missions Completed:</b><br />
+		&nbsp;&nbsp;<label style='width:5em;'>" . Mission::$rank_names[Mission::RANK_D] . ":</label>
+		    " . (isset($player->missions_completed[Mission::RANK_D]) ? $player->missions_completed[MIssion::RANK_D] : '0') . "
+		    <br />
+		&nbsp;&nbsp;<label style='width:5em;'>" . Mission::$rank_names[Mission::RANK_C] . ":</label>
+		    " . (isset($player->missions_completed[Mission::RANK_C]) ? $player->missions_completed[MIssion::RANK_C] : '0') . "
+		    <br />
+		&nbsp;&nbsp;<label style='width:5em;'>" . Mission::$rank_names[Mission::RANK_B] . ":</label>
+		    " . (isset($player->missions_completed[Mission::RANK_B]) ? $player->missions_completed[MIssion::RANK_B] : '0') . "
+		    <br />
+		&nbsp;&nbsp;<label style='width:5em;'>" . Mission::$rank_names[Mission::RANK_A] . ":</label>
+		    " . (isset($player->missions_completed[Mission::RANK_A]) ? $player->missions_completed[MIssion::RANK_A] : '0') . "
+		    <br />
+		&nbsp;&nbsp;<label style='width:5em;'>" . Mission::$rank_names[Mission::RANK_S] . ":</label>
+		    " . (isset($player->missions_completed[Mission::RANK_S]) ? $player->missions_completed[MIssion::RANK_S] : '0') . "
+		    <br />
 		</td></tr></table>";
 
         echo "

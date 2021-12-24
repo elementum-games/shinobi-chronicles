@@ -1,6 +1,7 @@
 <?php
 
 // KEEP IDS IN SYNC WITH System::PAGE_IDS
+// NEXT ID: 29 (i.e. if you add 28, update this to 29 to help other contributors)
 
 $pages = [
     // User Menu
@@ -57,6 +58,12 @@ $pages = [
         'function_name' => 'team',
         'min_rank' => 3,
         'menu' => 'conditional',
+    ],
+    29 => [
+        'file_name' => 'marriage.php',
+        'title' => 'Marriage',
+        'function_name' => 'marriage',
+        'menu' => System::MENU_USER,
     ],
 
     // Activity Menu
@@ -180,6 +187,14 @@ $pages = [
         'function_name' => 'adminPanel',
         'user_check' => function(User $u) {
             return $u->hasAdminPanel();
+        }
+    ],
+    27 => [
+        'file_name' => 'event.php',
+        'title' => 'Event',
+        'function_name' => 'eventPanel',
+        'user_check' => function(User $u) {
+            return $u->hasEventPanel();
         }
     ],
 

@@ -112,6 +112,7 @@ class System {
         'specialmissions' => 15,
         'rankup' => 25,
         'support' => 30,
+        'marriage' => 29,
     ];
     public array $links = [
         'github' => 'https://github.com/elementum-games/shinobi-chronicles',

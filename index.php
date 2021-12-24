@@ -493,6 +493,9 @@ if($LOGGED_IN) {
             if($player->hasAdminPanel()) {
                 echo "<li><a id='sideMenuOption-AdminPanel' href='{$system->link}?id=17'>Admin Panel</a></li>";
             }
+            if($player->hasEventPanel()) {
+                echo "<li><a id='sideMenuOption-AdminPanel' href='{$system->link}?id=27'>Event Panel</a></li>";
+            }
         }
 
 		//  timer

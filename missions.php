@@ -311,6 +311,14 @@ function runActiveMission() {
                 }
             }
 
+
+            if(isset($player->missions_completed[$mission->rank])) {
+                $player->missions_completed[$mission->rank] += 1;
+            }
+            else {
+                $player->missions_completed[$mission->rank] = 1;
+            }
+
             $player->money += $mission->money;
             $player->clearMission();
             $player->last_ai = time();

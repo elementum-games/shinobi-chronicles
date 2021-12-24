@@ -61,6 +61,10 @@ function displayNotifications() {
 	if($player->team_invite) {
 		$notifications[] = "<a class='link' href='{$system->link}?id=24'>Invited to team!</a>";
 	}
+
+    if($player->spouse < 0) {
+        $notifications[] = "<a class='link' href='{$system->links['marriage']}'>Proposal received!</a>";
+    }
 	
 	
 	global $ajax;
