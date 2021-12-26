@@ -911,6 +911,10 @@ function adminPanel() {
                     echo "<label for='$var_name'>" . ucwords(str_replace("_", " ", $var_name)) . ":</label>
 					<input type='text' name='$var_name' value='" . stripslashes($data[$var_name]) . "' /><br />";
                 }
+                else if($variable['input_type'] == 'text_area') {
+                    echo "<label for='$var_name'>" . ucwords(str_replace("_", " ", $var_name)) . ":</label><br />
+		                <label></label>&nbsp;<textarea name='$var_name'>" . stripslashes($data[$var_name]) . "</textarea><br />";
+                }
                 else if($variable['input_type'] == 'radio' && !empty($variable['options'])) {
                     echo "<label for='$var_name' style='margin-top:5px;'>" . ucwords(str_replace("_", " ", $var_name)) . ":</label>
 					<p style='padding-left:10px;margin-top:5px;'>";
@@ -962,7 +966,7 @@ function adminPanel() {
 			</form>
 			</td></tr></table>";
             $item_type = 1;
-            if($_GET['item_type']) {
+            if(isset($_GET['item_type'])) {
                 switch($_GET['item_type']) {
                     case 'weapon':
                         $item_type = 1;
@@ -1771,7 +1775,7 @@ function validateFormData($variables, &$data, $content_id = null) {
 function validateVariable($var_name, $input, $variable, &$variables, &$data, $content_id = null) {
     global $system;
     // Skip variable if it is not required
-    if($variable['required_if']) {
+    if(isset($variable['required_if'])) {
         $req_var = $variable['required_if'];
         // If variable false/not set, continue
         if(empty($data[$req_var]) && empty($_POST[$req_var])) {
@@ -1786,7 +1790,7 @@ function validateVariable($var_name, $input, $variable, &$variables, &$data, $co
         }
     }
     // Check for special remove variable
-    if($variable['special'] == 'remove') {
+    if(isset($variable['special']) && $variable['special'] == 'remove') {
         return true;
     }
     $data[$var_name] = $system->clean($input);
@@ -1907,6 +1911,10 @@ function displayVariable($var_name, $variable, $current_value, $input_name_prefi
     if($variable['input_type'] == 'text') {
         echo "<label for='$name'>" . ucwords(str_replace("_", " ", $var_name)) . ":</label>
 		<input type='text' name='$name' value='" . stripslashes($current_value) . "' /><br />";
+    }
+    else if($variable['input_type'] == 'text_area') {
+        echo "<label for='$var_name'>" . ucwords(str_replace("_", " ", $var_name)) . ":</label><br />
+        <label></label>&nbsp;<textarea name='$var_name'>" . stripslashes($data[$var_name]) . "</textarea><br />";
     }
     else if($variable['input_type'] == 'radio' && !empty($variable['options'])) {
         echo "<label for='$name' style='margin-top:5px;'>" . ucwords(str_replace("_", " ", $var_name)) . ":</label>

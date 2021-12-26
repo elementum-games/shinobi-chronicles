@@ -37,6 +37,12 @@ class System {
     public static array $villages = ['Stone', 'Cloud', 'Leaf', 'Sand', 'Mist'];
     public static array $forbidden_seals = array(1 => 'Twin Sparrow Seal', 2 => 'Four Dragon Seal');
 
+    // TODO: Remove! This is a temporary way to do events
+    const SC_EVENT_START = 0;
+    const SC_EVENT_END = 1641769200;
+    const SC_EVENT_NAME = 'Holiday 2021';
+    public static bool $SC_EVENT_ACTIVE = true;
+
     // Variable for error message
     public $message;
     public $message_displayed;
@@ -113,6 +119,7 @@ class System {
         'rankup' => 25,
         'support' => 30,
         'marriage' => 29,
+        'event' => 27,
     ];
     public array $links = [
         'github' => 'https://github.com/elementum-games/shinobi-chronicles',
@@ -225,6 +232,11 @@ class System {
         }
 
         $this->timezoneOffset = date('Z');
+
+        // TODO: REMOVE TEMPORARY EVENT STUFF
+        if(time() > self::SC_EVENT_END) {
+            self::$SC_EVENT_ACTIVE = false;
+        }
     }
 
     /* function dbConnect()

@@ -114,6 +114,7 @@ class User extends Fighter {
     public $ai_losses;
 
     public $missions_completed;
+    public $presents_claimed;
 
     public $monthly_pvp;
 
@@ -417,6 +418,11 @@ class User extends Fighter {
         $this->missions_completed = json_decode($user_data['missions_completed'], true);
         if(!is_array($this->missions_completed)) {
             $this->missions_completed = [];
+        }
+
+        $this->presents_claimed = json_decode($user_data['presents_claimed'], true);
+        if(!is_array($this->presents_claimed)) {
+            $this->presents_claimed = [];
         }
 
         $this->ninjutsu_skill = $user_data['ninjutsu_skill'];
@@ -1177,6 +1183,11 @@ class User extends Fighter {
             $missions_completed = json_encode($missions_completed);
         }
 
+        $presents_claimed = $this->presents_claimed;
+        if(is_array($presents_claimed)) {
+            $presents_claimed = json_encode($this->presents_claimed);
+        }
+
         $query .= "`forbidden_seal`='$forbidden_seal',
 		`train_type` = '$this->train_type',
 		`train_gain` = '$this->train_gain',
@@ -1188,6 +1199,7 @@ class User extends Fighter {
 		`ai_wins` = '$this->ai_wins',
 		`ai_losses` = '$this->ai_losses',
 		`missions_completed` = '$missions_completed',
+		`presents_claimed` = '$presents_claimed',
 		`monthly_pvp` = '$this->monthly_pvp',
 		`elements` = '$elements',
 		`ninjutsu_skill` = '$this->ninjutsu_skill',

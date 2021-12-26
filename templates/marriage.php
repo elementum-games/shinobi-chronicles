@@ -72,7 +72,7 @@
                 <label>Ancient Kunai:</label><?=number_format($spouse['premium_credits'])?><br />
                 <label>Perks:</label><br />
                     <div id="perk_details">
-                        <em>Remain faithful, perks will be coming in Q1 of 2022!</em>
+                        <em>Remain faithful, perks tbd!</em>
                     </div>
             </td>
         </tr>

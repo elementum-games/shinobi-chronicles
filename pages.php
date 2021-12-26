@@ -189,14 +189,6 @@ $pages = [
             return $u->hasAdminPanel();
         }
     ],
-    27 => [
-        'file_name' => 'event.php',
-        'title' => 'Event',
-        'function_name' => 'eventPanel',
-        'user_check' => function(User $u) {
-            return $u->hasEventPanel();
-        }
-    ],
 
     // Misc
     3 => [
@@ -221,6 +213,11 @@ $pages = [
         'title' => 'Rank Exam',
         'function_name' => 'rankUp',
         'battle_type' => Battle::TYPE_AI_RANKUP,
+    ],
+    27 => [
+        'file_name' => 'event.php',
+        'title' => 'Event',
+        'function_name' => 'event',
     ],
 ];
 

@@ -396,6 +396,11 @@ if($LOGGED_IN) {
 				<td class='newsFooter'>".$global_message_time."</td></tr></table>";
 			}
 
+            // EVENT
+            if($system::$SC_EVENT_ACTIVE) {
+                require 'templates/temp_event_header.php';
+            }
+
             /** @noinspection PhpIncludeInspection */
             require($pages[$id]['file_name']);
 
