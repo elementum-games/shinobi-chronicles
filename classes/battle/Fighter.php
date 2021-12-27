@@ -1,5 +1,7 @@
 <?php
 
+use JetBrains\PhpStorm\Pure;
+
 abstract class Fighter {
     const BASE_OFFENSE = 35;
     const BASE_DEFENSE = 50;
@@ -180,6 +182,7 @@ abstract class Fighter {
         }
     }
     
+    #[Pure]
     public function getDebuffResist(): float {
         $willpower = ($this->willpower + $this->willpower_boost - $this->willpower_nerf);
 

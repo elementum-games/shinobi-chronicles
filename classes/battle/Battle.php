@@ -283,10 +283,14 @@ class Battle {
     }
 
     public function timeRemaining(): int {
+        if($this->isPreparationPhase()) {
+            return $this->prepTimeRemaining();
+        }
+
         return Battle::TURN_LENGTH - (time() - $this->turn_time);
     }
 
-    public function prepTimeRemaining(): int {
+    protected function prepTimeRemaining(): int {
         return Battle::PREP_LENGTH - (time() - $this->start_time);
     }
 
@@ -321,13 +325,11 @@ class Battle {
     }
 
     public function isAttackPhase(): bool {
-        // TODO: fix this
         return true;
         // return $this->turn_type === Battle::TURN_TYPE_ATTACK;
     }
 
     public function isMovementPhase(): bool {
-        // TODO: fix this
         return false;
         // return $this->turn_type === Battle::TURN_TYPE_MOVEMENT;
     }

@@ -83,24 +83,12 @@
     </td></tr>
 </table>
 
-<table class='table'>
-    <!--// Trigger win action or display action prompt-->
-    <?php if(!$battle->isComplete() && !$battleManager->spectate): ?>
-        <tr><th colspan='2'>Select Action</th></tr>
-
-        <?php if(!$battleManager->playerActionSubmitted()): ?>
-            <?php require 'templates/battle/action_prompt.php'; ?>
-        <?php elseif(!$battleManager->opponentActionSubmitted()): ?>
-            <tr><td colspan='2'>Please wait for <?= $opponent->getName() ?> to select an action.</td></tr>
-        <?php endif; ?>
-
-        <!--// Turn timer-->
-        <tr><td style='text-align:center;' colspan='2'>
-                <b><?= $battle->isPreparationPhase() ? $battle->prepTimeRemaining() : $battle->timeRemaining() ?></b> seconds remaining
-            <br /><a href='<?= $refresh_link ?>'>Refresh</a>
-        </td></tr>
-    <?php elseif($battleManager->spectate): ?>
-        <tr><td style='text-align:center;' colspan='2'>
+<!-- Trigger win action or display action prompt-->
+<?php if(!$battle->isComplete() && !$battleManager->spectate): ?>
+    <?php require 'templates/battle/action_prompt.php'; ?>
+<?php elseif($battleManager->spectate): ?>
+    <table class='table'>
+        <tr><td style='text-align:center;'>
             <?php if($battle->winner == Battle::TEAM1): ?>
                <?=  $battle->player1->getName() ?> won!
             <?php elseif($battle->winner == Battle::TEAM2): ?>
@@ -112,8 +100,8 @@
                 <a href='<?= $refresh_link ?>'>Refresh</a>
             <?php endif; ?>
         </td></tr>
-    <?php endif; ?>
-</table>
+    </table>
+<?php endif; ?>
 
 <!--// Battle text display-->
 <?php if($battle_text): ?>

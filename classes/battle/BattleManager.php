@@ -221,17 +221,16 @@ class BattleManager {
         // If turn is still active and user hasn't submitted their move, check for action
         if($this->battle->timeRemaining() > 0 && !$this->playerActionSubmitted()) {
             $player_action = $this->collectPlayerAction($_POST);
-            var_dump($player_action);
             if($player_action != null) {
-                echo "player action not null";
+                var_dump($player_action);
                 $this->setPlayerAction($this->player, $player_action);
 
                 if($this->opponent instanceof NPC) {
                     $this->chooseAndSetNPCAttackAction($this->opponent);
                 }
             }
-            else if(!empty($_POST['forfeit'])) {
-                $this->player->health = 0;
+            else {
+                echo "Player action NULL";
             }
         }
 
@@ -344,6 +343,18 @@ class BattleManager {
         return $this->battle->battle_type;
     }
 
+    #[Pure]
+    public function getPhaseLabel(): string {
+        if($this->battle->isMovementPhase()) {
+            return "Movement";
+        }
+        else if($this->battle->isAttackPhase()) {
+            return "Attack";
+        }
+        else {
+            return "[Invalid]";
+        }
+    }
 
     // PRIVATE API - VIEW HELPERS
 
@@ -948,7 +959,7 @@ class BattleManager {
 
     protected function runPlayerHealItemAction(array $FORM_DATA) {
         try {
-            if (isset($FORM_DATA['attack'])) {
+            if (isset($FORM_DATA['submit_prep_action'])) {
                 $item_id = $FORM_DATA['item_id'] ?? null;
                 if ($item_id && $this->player->hasItem($item_id)) {
                     $item = $this->player->items[$item_id];
