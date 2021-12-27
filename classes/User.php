@@ -83,6 +83,9 @@ class User extends Fighter {
     public $global_message_viewed;
 
     public string $gender;
+    public int $spouse;
+    public string $spouse_name;
+    public int $marriage_time;
     public $village;
     public $level;
     public $rank;
@@ -109,6 +112,9 @@ class User extends Fighter {
     public $pvp_losses;
     public $ai_wins;
     public $ai_losses;
+
+    public $missions_completed;
+    public $presents_claimed;
 
     public $monthly_pvp;
 
@@ -411,6 +417,16 @@ class User extends Fighter {
         $this->ai_losses = $user_data['ai_losses'];
         $this->monthly_pvp = $user_data['monthly_pvp'];
 
+        $this->missions_completed = json_decode($user_data['missions_completed'], true);
+        if(!is_array($this->missions_completed)) {
+            $this->missions_completed = [];
+        }
+
+        $this->presents_claimed = json_decode($user_data['presents_claimed'], true);
+        if(!is_array($this->presents_claimed)) {
+            $this->presents_claimed = [];
+        }
+
         $this->ninjutsu_skill = $user_data['ninjutsu_skill'];
         $this->genjutsu_skill = $user_data['genjutsu_skill'];
         $this->taijutsu_skill = $user_data['taijutsu_skill'];
@@ -569,6 +585,18 @@ class User extends Fighter {
                     $this->defense_boost += $this->team->getDefenseBoost($this);
                 }
             }
+        }
+
+        // Spouse
+        $this->spouse = $user_data['spouse'];
+        $this->marriage_time = $user_data['marriage_time'];
+        $result = $this->system->query("SELECT `user_name` FROM `users` WHERE `user_id`='$this->spouse' LIMIT 1");
+        if($this->system->db_last_num_rows) {
+            $this->spouse_name = $this->system->db_fetch($result)['user_name'];
+        }
+        else {
+            //TODO: Make a log if this becomes an issue
+            $this->spouse_name = '???';
         }
 
         // Bloodline
@@ -1107,6 +1135,8 @@ class User extends Fighter {
 		`profile_song` = '$this->profile_song',
 		`global_message_viewed` = '$this->global_message_viewed',
 		`gender` = '$this->gender',
+		`spouse`  = '$this->spouse',
+		`marriage_time` = '$this->marriage_time',
 		`village` = '$this->village',
 		`level` = '$this->level',
 		`rank` = '$this->rank',
@@ -1175,6 +1205,16 @@ class User extends Fighter {
             $elements = json_encode($this->elements);
         }
 
+        $missions_completed = $this->missions_completed;
+        if(is_array($missions_completed)) {
+            $missions_completed = json_encode($missions_completed);
+        }
+
+        $presents_claimed = $this->presents_claimed;
+        if(is_array($presents_claimed)) {
+            $presents_claimed = json_encode($this->presents_claimed);
+        }
+
         $query .= "`forbidden_seal`='$forbidden_seal',
         `chat_color` = '$this->chat_color',
 		`train_type` = '$this->train_type',
@@ -1186,6 +1226,8 @@ class User extends Fighter {
 		`pvp_losses` = '$this->pvp_losses',
 		`ai_wins` = '$this->ai_wins',
 		`ai_losses` = '$this->ai_losses',
+		`missions_completed` = '$missions_completed',
+		`presents_claimed` = '$presents_claimed',
 		`monthly_pvp` = '$this->monthly_pvp',
 		`elements` = '$elements',
 		`ninjutsu_skill` = '$this->ninjutsu_skill',
@@ -1566,6 +1608,7 @@ class User extends Fighter {
             'failed_logins' => 0,
 
             'gender' => $gender,
+            'spouse' => 0,
             'village' => $village,
             'level' => 1,
             'rank' => 1,

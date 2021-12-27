@@ -358,6 +358,7 @@ $item_effects = [
     'heal',
     'diffuse',
     'element',
+    'unknown',
 ];
 $constraints['item'] = [
     'name' => [
@@ -381,7 +382,7 @@ $constraints['item'] = [
     'use_type' => [
         'data_type' => 'int',
         'input_type' => 'radio',
-        'options' => [1 => 'weapon', 2 => 'armor', 3 => 'consumable'],
+        'options' => [1 => 'weapon', 2 => 'armor', 3 => 'consumable', 4 => 'Special'],
     ],
     'effect' => [
         'data_type' => 'string',
@@ -391,6 +392,11 @@ $constraints['item'] = [
     'effect_amount' => [
         'data_type' => 'float',
         'input_type' => 'text',
+    ],
+    'description' => [
+        'data_type' => 'string',
+        'input_type' => 'text_area',
+        'max_length' => 300,
     ],
 ];
 

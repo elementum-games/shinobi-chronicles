@@ -155,6 +155,22 @@ function gear() {
 
 	echo "</td></tr>";
 
+    if($player->items) {
+        $header_displayed = false;
+        foreach($player->items as $item) {
+            if($item['use_type'] == 4) {
+                if(!$header_displayed) {
+                    echo "<tr><th colspan='3'>Special</th></tr>";
+                    $header_displayed = true;
+                }
+                echo "<td colspan='3'>";
+                echo sprintf("%s <sup style='font-size:9px;'>(%s %s)</sup> <br />", $item['name'], $item['effect_amount'], $item['effect']);
+                echo "</td>";
+            }
+        }
+    }
+
+
 
 	echo "
 	<form action='$self_link' method='post' style='margin:0px;'>
