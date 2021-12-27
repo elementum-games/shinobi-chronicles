@@ -40,7 +40,7 @@ function event() {
                 $system->message("You received " . str_replace('_yen_', $amount, $gifts[$claim]));
                 break;
             case 1228:
-                if($day < 28 && $month != 'Jan' && !$player->isUserAdmin()) {
+                if($day < 28 && $month != 'Jan') {
                     $system->message("You cannot claim that yet!");
                     break;
                 }
