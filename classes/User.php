@@ -689,9 +689,6 @@ class User extends Fighter {
 
             }
         }
-        else {
-            $this->forbidden_seal = [];
-        }
 
         //In Village Regen
         if($this->in_village) {
