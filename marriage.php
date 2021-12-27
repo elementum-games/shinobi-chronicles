@@ -19,7 +19,7 @@ function marriage() {
             $user_to_marry = $system->db_fetch($result);
 
             // Cannot self marry
-            if($user_to_marry['user_id'] == $player->user_id && !$player->isUserAdmin() || !$player->isHeadAdmin()) {
+            if($user_to_marry['user_id'] == $player->user_id && !$player->isUserAdmin()) {
                 throw new Exception("You cannot marry yourself!");
             }
             // Existing proposal/marriage
