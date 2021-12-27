@@ -1471,7 +1471,7 @@ function adminPanel() {
             ];
         }
 
-        if($player->isSupportAdmin() || $player->isHeadAdmin()) {
+        if($player->isSupportAdmin() || $player->isUserAdmin()) {
             $variables['support_level'] = [
                 'data_type' => 'int',
                 'input_type' => 'radio',

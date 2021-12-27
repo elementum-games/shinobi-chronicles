@@ -5,6 +5,7 @@
  * @var string $self_link
  * @var false|array $proposal_user
  * @var array $spouse
+ * @var bool $proposal_sent
  */
 ?>
 
@@ -28,7 +29,17 @@
 </style>
 
 <table class="table">
-    <?php if($player->spouse <= 0): ?>
+    <?php if($proposal_sent): ?>
+        <tr><th>Proposal to <?=$proposal_user['user_name']?></th></tr>
+        <tr>
+            <td style="text-align: center;">
+                <form action="<?=$self_link?>" method="post">
+                    Would you like to cancel your proposal?<br />
+                    <input type="submit" name="cancel_proposal" value="Cancel" />
+                </form>
+            </td>
+        </tr>
+    <?php elseif($player->spouse <= 0): ?>
         <?php if($player->spouse < 0): ?>
             <?php if($proposal_user == false): ?>
                 <tr><th>Cold Feet!</th></tr>

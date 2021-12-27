@@ -6,6 +6,14 @@ function marriage() {
     global $player;
     global $self_link;
 
+    // Check for user proposal
+    $proposal_sent = false;
+    $result = $system->query("SELECT `user_name`, `user_id` FROM `users` WHERE `spouse`='-{$player->user_id}' LIMIT 1");
+    if($system->db_last_num_rows) {
+        $proposal_sent = true;
+        $proposal_user = $system->db_fetch($result);
+    }
+
     if(isset($_POST['propose'])) {
         try {
             $to_marry = $system->clean($_POST['user_name']);
@@ -18,8 +26,12 @@ function marriage() {
 
             $user_to_marry = $system->db_fetch($result);
 
+            // Only one proposal allowed
+            if($proposal_sent) {
+                throw new Exception("You must cancel your current proposal!");
+            }
             // Cannot self marry
-            if($user_to_marry['user_id'] == $player->user_id && !$player->isUserAdmin() || !$player->isHeadAdmin()) {
+            if($user_to_marry['user_id'] == $player->user_id && !$player->isUserAdmin()) {
                 throw new Exception("You cannot marry yourself!");
             }
             // Existing proposal/marriage
@@ -40,11 +52,18 @@ function marriage() {
                 }
             }
 
+            if(array_key_exists($user_to_marry['user_id'], $player->blacklist)) {
+                throw new Exception("You cannot send proposals to users on your blacklist!");
+            }
+
             // Send proposal
             $system->query("UPDATE `users` SET `spouse`='-$player->user_id' WHERE `user_id`='{$user_to_marry['user_id']}' LIMIT 1");
             if($system->db_last_affected_rows) {
-                $player->spouse = -$user_to_marry['user_id'];
-
+                $proposal_sent = true;
+                $proposal_user = [
+                    'user_id' => $user_to_marry['user_id'],
+                    'user_name' => $user_to_marry['user_name'],
+                ];
                 $system->message("You have proposed to {$user_to_marry['user_name']}!");
             }
             else {
@@ -52,6 +71,17 @@ function marriage() {
             }
         }catch (Exception $e) {
             $system->message($e->getMessage());
+        }
+    }
+    if(isset($_POST['cancel_proposal']) && $proposal_sent) {
+        //Cancel request use from above result
+        $system->query("UPDATE `users` SET `spouse`='0' WHERE `user_id`='{$proposal_user['user_id']}' LIMIT 1");
+        if($system->db_last_affected_rows) {
+            $proposal_sent = false;
+            $system->message("You have cancelled you proposal!");
+        }
+        else {
+            $system->message("Error cancelling proposal!");
         }
     }
 
