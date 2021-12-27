@@ -9,6 +9,8 @@
  * @var string $self_link
  * @var string $refresh_link
  */
+
+    require_once 'templates/battle/fighter_avatar.php';
 ?>
 
 <style type='text/css'>
@@ -50,15 +52,11 @@
         background: rgba(255,255,255,0.5);
         border-radius: 15px;
     }
-
-    .avatar {
-        max-height: 20px;
-        max-width: 20px;
-    }
 </style>
 
 <?php $tiles = $battleManager->field->getDisplayTiles(); ?>
 
+<form action=""
 <div class='tilesContainer'>
     <?php foreach($tiles as $index => $tile): ?>
         <div class='tile'>
@@ -66,7 +64,7 @@
             <?php foreach($tile->fighters as $fighter): ?>
                 <?php /** @var Fighter $fighter */ ?>
                 <div class='tileFighter'>
-                    <img class='avatar' src='<?= $fighter->avatar_link ?>' />
+                    <?php renderAvatarImage($fighter, 20) ?>
                 </div>
             <?php endforeach; ?>
         </div>

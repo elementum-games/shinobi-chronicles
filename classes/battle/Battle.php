@@ -282,10 +282,6 @@ class Battle {
         return $this->prepTimeRemaining() > 0 && in_array($this->battle_type, [Battle::TYPE_FIGHT, Battle::TYPE_CHALLENGE]);
     }
 
-    /**
-     * @throws Exception
-     */
-
     public function timeRemaining(): int {
         return Battle::TURN_LENGTH - (time() - $this->turn_time);
     }
