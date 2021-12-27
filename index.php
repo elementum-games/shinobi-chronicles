@@ -397,7 +397,7 @@ if($LOGGED_IN) {
 			}
 
             // EVENT
-            if($system::$SC_EVENT_ACTIVE) {
+            if($system::$SC_EVENT_ACTIVE && !$ajax) {
                 require 'templates/temp_event_header.php';
             }
 
