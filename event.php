@@ -71,6 +71,7 @@ function event() {
                 if(!is_array($player->forbidden_seal)) {
                     $player->forbidden_seal = [];
                 }
+
                 $player->forbidden_seal['level'] = $seal_level;
                 $player->forbidden_seal['time'] = $seal_time;
                 $player->presents_claimed[] = $claim;
