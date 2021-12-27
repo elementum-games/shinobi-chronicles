@@ -36,7 +36,7 @@ function marriage() {
                 $blacklist = json_decode($blacklist['blocked_ids'], true);
 
                 if(array_key_exists($player->user_id, $blacklist)) {
-                    throw new Exception("{$user_to_marry['user_name']} has you blacklisted!");
+                    throw new Exception("{$user_to_marry['user_name']} has chosen not to receive marriage proposals!");
                 }
             }
 
