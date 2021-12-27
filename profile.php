@@ -350,19 +350,19 @@ function userProfile() {
 		<br />
 		<b>Missions Completed:</b><br />
 		&nbsp;&nbsp;<label style='width:5em;'>" . Mission::$rank_names[Mission::RANK_D] . ":</label>
-		    " . (isset($player->missions_completed[Mission::RANK_D]) ? $player->missions_completed[MIssion::RANK_D] : '0') . "
+		    " . (($player->missions_completed[Mission::RANK_D]) ??'0') . "
 		    <br />
 		&nbsp;&nbsp;<label style='width:5em;'>" . Mission::$rank_names[Mission::RANK_C] . ":</label>
-		    " . (isset($player->missions_completed[Mission::RANK_C]) ? $player->missions_completed[MIssion::RANK_C] : '0') . "
+		    " . (($player->missions_completed[Mission::RANK_C]) ?? '0') . "
 		    <br />
 		&nbsp;&nbsp;<label style='width:5em;'>" . Mission::$rank_names[Mission::RANK_B] . ":</label>
-		    " . (isset($player->missions_completed[Mission::RANK_B]) ? $player->missions_completed[MIssion::RANK_B] : '0') . "
+		    " . (($player->missions_completed[Mission::RANK_B]) ?? '0') . "
 		    <br />
 		&nbsp;&nbsp;<label style='width:5em;'>" . Mission::$rank_names[Mission::RANK_A] . ":</label>
-		    " . (isset($player->missions_completed[Mission::RANK_A]) ? $player->missions_completed[MIssion::RANK_A] : '0') . "
+		    " . (($player->missions_completed[Mission::RANK_A]) ?? '0') . "
 		    <br />
 		&nbsp;&nbsp;<label style='width:5em;'>" . Mission::$rank_names[Mission::RANK_S] . ":</label>
-		    " . (isset($player->missions_completed[Mission::RANK_S]) ? $player->missions_completed[MIssion::RANK_S] : '0') . "
+		    " . (($player->missions_completed[Mission::RANK_S]) ?? '0') . "
 		    <br />
 		</td></tr></table>";
 

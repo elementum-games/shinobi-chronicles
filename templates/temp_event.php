@@ -12,7 +12,7 @@
         <td>
             The staff at Shinobi Chronicles knows you have all been patiently waiting for an update to drop. We understand
             that you may feel like we haven't been up to much, if anything at all. We wanted to make sure everyone knew
-            that we are still dedicated to our community and wanted to give the community a sense that we are still here
+            that we are still dedicated to our community and wanted to make you all know that we are still here
             and working on things.<br />
             <br />
             We know this event isn't a huge addition, but we thought you'd like to celebrate with us as we bring in the

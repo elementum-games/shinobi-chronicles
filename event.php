@@ -7,10 +7,10 @@ function event() {
     global $self_link;
 
     $gifts = [
-        1227 => '1000 Yen!',
+        1227 => '_yen_ Yen!',
         1228 => '_days_ days of _seal_!',
         1229 => '1 Ancient Kunai!',
-        1230 => '1,500 Yen!',
+        1230 => '_yen_ Yen!',
         1231 => '1 Ancient Kunai!',
         101 => 'Crystal Pendant!',
     ];
@@ -31,11 +31,13 @@ function event() {
                     break;
                 }
 
-                $player->money += 1000;
+                $amount = $player->rank * 1000;
+
+                $player->money += $amount;
                 $player->presents_claimed[] = 1227;
                 $player->updateData();
 
-                $system->message("You received " . $gifts[$claim] . "!");
+                $system->message("You received " . str_replace('_yen_', $amount, $gifts[$claim]));
                 break;
             case 1228:
                 if($day < 28 && $month != 'Jan' && !$player->isUserAdmin()) {
@@ -101,11 +103,13 @@ function event() {
                 }
 
 
-                $player->money += 1500;
+                $amount = $player->rank * 1500;
+
+                $player->money += $amount;
                 $player->presents_claimed[] = 1230;
                 $player->updateData();
 
-                $system->message("You received " . $gifts[$claim] . "!");
+                $system->message("You received " . str_replace('_yen_', $amount, $gifts[$claim]));
 
                 break;
             case 1231:
@@ -122,7 +126,7 @@ function event() {
                 $player->presents_claimed[] = 1231;
                 $player->updateData();
 
-                $system->message("You received " . $gifts[$claim] . "!");
+                $system->message("You received " . $gifts[$claim]);
 
                 break;
             case 101:
@@ -147,7 +151,7 @@ function event() {
 
                 break;
             default:
-                $system->message("Invalid present ($claim)!");
+                $system->message("Invalid present!");
         }
     }
 

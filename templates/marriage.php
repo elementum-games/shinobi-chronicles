@@ -68,8 +68,6 @@
                 <label>Spouse: </label><a href="<?=$system->links['members']?>&user=<?=$player->spouse_name?>"><?=$player->spouse_name?></a><br />
                 <label>Anniversary:</label><?=Date('F j, Y', $player->marriage_time)?><br />
                 <label>Location:</label><?=$spouse['location']?><br />
-                <label>Yen:</label><?=number_format($spouse['money'])?><br />
-                <label>Ancient Kunai:</label><?=number_format($spouse['premium_credits'])?><br />
                 <label>Perks:</label><br />
                     <div id="perk_details">
                         <em>Remain faithful, perks tbd!</em>

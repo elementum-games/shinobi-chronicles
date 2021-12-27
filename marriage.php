@@ -29,6 +29,17 @@ function marriage() {
                 throw new Exception("{$user_to_marry['user_name']} already has a " . $to_pend);
             }
 
+            // Blacklist check
+            $blacklist = $system->query("SELECT `blocked_ids` FROM `blacklist` WHERE `user_id`='{$user_to_marry['user_id']}' LIMIT 1");
+            if($system->db_last_num_rows != 0){
+                $blacklist = $system->db_fetch($blacklist);
+                $blacklist = json_decode($blacklist['blocked_ids'], true);
+
+                if(array_key_exists($player->user_id, $blacklist)) {
+                    throw new Exception("{$user_to_marry['user_name']} has you blacklisted!");
+                }
+            }
+
             // Send proposal
             $system->query("UPDATE `users` SET `spouse`='-$player->user_id' WHERE `user_id`='{$user_to_marry['user_id']}' LIMIT 1");
             if($system->db_last_affected_rows) {
@@ -108,8 +119,6 @@ function marriage() {
             }
 
             $system->message("You have divorced $player->spouse_name!");
-            $system->send_pm($player->user_id, $player->spouse, "Divorce",
-                "It's not you, it's me.", $player->staff_level);
 
             $player->spouse = 0;
             $player->spouse_name = '';
