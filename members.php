@@ -225,8 +225,8 @@ function members() {
 			}
 
             echo "<br /><label style='width:6.5em;'>Spouse:</label> ";
-            if($player->spouse > 0) {
-                echo "<a href='{$self_link}&user={$player->spouse_name}'>" . $player->spouse_name . "</a><br />
+            if($viewUser->spouse > 0) {
+                echo "<a href='{$self_link}&user={$viewUser->spouse_name}'>" . $viewUser->spouse_name . "</a><br />
                 <label style='width:6.5em;'>Anniversary:</label> " . Date('F j, Y', $viewUser->marriage_time) . "<br />";
             }
             else {
@@ -234,7 +234,7 @@ function members() {
             }
 
             // Spouse location
-            if($player->user_id == $viewUser->user_id) {
+            if($player->user_id == $viewUser->spouse) {
                 echo "<label style='width:6.5em;'>Location:</label> {$viewUser->location}<br />";
             }
 
