@@ -121,7 +121,8 @@
         id="submit"
         name="submit_movement_action"
         value="Submit"
-        style='display:none;margin: 2px auto;'
+        style='margin: 2px auto;<?= $battle->isMovementPhase() ? 'display:block;' : 'display:none;' ?>'
+        disabled="disabled"
     />
 </form>
 
@@ -130,6 +131,8 @@
     const selectedTileInput = document.getElementById('selected_tile_input');
     const submitButton = document.getElementById('submit');
     const tiles = document.querySelectorAll('.tile');
+
+    const isMovementPhase = <?= $battle->isMovementPhase() ? 'true' : 'false' ?>;
 
     /** @var {?Element} selectedTile */
     let selectedTile = null;
@@ -148,7 +151,7 @@
 
             selectedTile = tile;
             selectedTileInput.value = tile.getAttribute('data-tile-index');
-            submitButton.style.display = 'block';
+            submitButton.removeAttribute('disabled');
         })
     )
 </script>
