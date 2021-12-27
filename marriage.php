@@ -41,6 +41,11 @@ function marriage() {
                 throw new Exception("{$user_to_marry['user_name']} already has a " . $to_pend);
             }
 
+            $result = $system->query("SELECT `user_name` FROM `users` WHERE `spouse`='-{$user_to_marry['user_id']}'");
+            if($system->db_last_num_rows) {
+                throw new Exception("{$user_to_marry['user_name']} has a pending marriage!");
+            }
+
             // Blacklist check
             $blacklist = $system->query("SELECT `blocked_ids` FROM `blacklist` WHERE `user_id`='{$user_to_marry['user_id']}' LIMIT 1");
             if($system->db_last_num_rows != 0){
