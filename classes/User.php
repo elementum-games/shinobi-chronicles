@@ -658,6 +658,7 @@ class User extends Fighter {
         if($this->chat_color == '') {
             $this->chat_color = 'black';
         }
+
         // Forbidden seal
         if($this->forbidden_seal) {
             $this->forbidden_seal = json_decode($user_data['forbidden_seal'], true);

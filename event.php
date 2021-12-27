@@ -67,6 +67,11 @@ function event() {
 
                 $display = str_replace(["_days_", "_seal_"], [$days, $seal], $gifts[$claim]);
 
+                // Prevent string => array error
+                if(!is_array($player->forbidden_seal)) {
+                    $player->forbidden_seal = [];
+                }
+
                 $player->forbidden_seal['level'] = $seal_level;
                 $player->forbidden_seal['time'] = $seal_time;
                 $player->presents_claimed[] = $claim;
