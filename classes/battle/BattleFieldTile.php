@@ -1,10 +1,9 @@
 <?php
 
 class BattleFieldTile {
-    /** @var Fighter[] */
-    public array $fighters;
+    public array $fighter_ids;
 
-    public function __construct(array $fighters) {
-        $this->fighters = $fighters;
+    public function __construct(array $fighter_ids) {
+        $this->fighter_ids = $fighter_ids;
     }
 }

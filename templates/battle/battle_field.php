@@ -62,10 +62,25 @@
     .tileFighter.enemy {
         background: rgba(255,0,0,0.4);
     }
+
+    .tilesContainer.movementActive .tile[data-player-tile="0"] {
+        cursor: pointer;
+    }
+    .tilesContainer.movementActive .tile:hover[data-player-tile="0"] {
+        background: #b1a990;
+    }
+    .tilesContainer.movementActive .tile.selected[data-player-tile="0"] {
+        background: #b1a990;
+        border-color: #5d594c;
+        box-shadow: 0 0 3px 0 black;
+    }
 </style>
 
 <?php
-    function renderTileFighter(Fighter $fighter, bool $is_ally) {
+    function renderTileFighter(?Fighter $fighter, bool $is_ally) {
+        if($fighter == null) {
+            return;
+        }
         ?>
         <div class='tileFighter <?= $is_ally ? 'ally' : 'enemy' ?>'>
             <?php renderAvatarImage($fighter, 20) ?>
@@ -76,24 +91,64 @@
     $tiles = $battleManager->field->getDisplayTiles();
 ?>
 
-<div class='tilesContainer'>
+<div class='tilesContainer <?= $battle->isMovementPhase() ? 'movementActive' : '' ?>'>
     <?php foreach($tiles as $index => $tile): ?>
-        <div class='tile' id='tile<?= $index ?>'>
+        <div
+            class='tile'
+            id='tile<?= $index ?>'
+            data-tile-index='<?= $index ?>'
+            data-player-tile='<?=
+                0 // default to 0, okay to let players select their own tile
+                /* $battleManager->field->getFighterLocation($player->combat_id) == $index ? 1 : 0 */
+            ?>'
+        >
             <span class='tileIndex'><?= $index ?></span>
             <?php
-                foreach($tile->fighters as $fighter) {
-                    /** @var Fighter $fighter */
-                    renderTileFighter($fighter, $fighter->combat_id == $player->combat_id);
+                foreach($tile->fighter_ids as $fighter_id) {
+                    renderTileFighter(
+                            $battle->getFighter($fighter_id),
+                            $fighter_id == $player->combat_id
+                    );
                 }
             ?>
         </div>
     <?php endforeach; ?>
 </div>
 <form action="<?= $self_link ?>" method="POST" id="battle_field_form">
-    <input type="hidden" name="foo" value="bar" />
+    <input type="hidden" id="selected_tile_input" name="selected_tile" value="" />
+    <input
+        type="submit"
+        id="submit"
+        name="submit_movement_action"
+        value="Submit"
+        style='display:none;margin: 2px auto;'
+    />
 </form>
 
 <script type='text/javascript'>
     const form = document.getElementById('battle_field_form');
+    const selectedTileInput = document.getElementById('selected_tile_input');
+    const submitButton = document.getElementById('submit');
     const tiles = document.querySelectorAll('.tile');
+
+    /** @var {?Element} selectedTile */
+    let selectedTile = null;
+
+    tiles.forEach(tile =>
+        tile.addEventListener('click', e => {
+            console.log('clicked', tile.id, tile.getAttribute('data-tile-index'));
+            if(parseInt(tile.getAttribute('data-player-tile')) === 1) {
+                return;
+            }
+
+            if(selectedTile != null) {
+                selectedTile.classList.remove('selected');
+            }
+            tile.classList.add('selected');
+
+            selectedTile = tile;
+            selectedTileInput.value = tile.getAttribute('data-tile-index');
+            submitButton.style.display = 'block';
+        })
+    )
 </script>

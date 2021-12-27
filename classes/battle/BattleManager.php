@@ -92,7 +92,13 @@ class BattleManager {
      * @param bool   $load_fighters
      * @throws Exception
      */
-    public function __construct(System $system, User $player, int $battle_id, bool $spectate = false, bool $load_fighters = true) {
+    public function __construct(
+        System $system,
+        User $player,
+        int $battle_id,
+        bool $spectate = false,
+        bool $load_fighters = true
+    ) {
         $this->system = $system;
         $this->battle_id = $battle_id;
         $this->player = $player;
@@ -401,85 +407,113 @@ class BattleManager {
 
         $this->battle->battle_text = '';
 
-        /** @var ?BattleAttack $player1_attack */
-        $player1_attack = null;
-        $player1_action = $this->battle->fighter_actions[$this->battle->player1->combat_id] ?? null;
+        if($this->battle->isMovementPhase()) {
+            $player1_action = $this->battle->fighter_actions[$this->battle->player1->combat_id] ?? null;
+            $player2_action = $this->battle->fighter_actions[$this->battle->player2->combat_id] ?? null;
 
-        if($player1_action != null && ($player1_action instanceof FighterAttackAction)) {
-            $player1_attack = $this->setupFighterAttack(
-                $this->battle->player1,
-                $player1_action
-            );
-        }
+            if($player1_action != null && ($player1_action instanceof FighterMovementAction)) {
+                $this->field->moveFighterTo(
+                    fighter_id: $this->battle->player1->combat_id,
+                    target_tile: $player1_action->target_tile
+                );
+                $this->battle->battle_text .= $this->battle->player1->getName() .
+                    ' moved to tile ' . $player1_action->target_tile . '.';
+            }
 
-        /** @var ?BattleAttack $player2_attack */
-        $player2_attack = null;
-        $player2_action = $this->battle->fighter_actions[$this->battle->player2->combat_id] ?? null;
+            if($player1_action != null && $player2_action != null) {
+                $this->battle->battle_text .= '[br][hr]';
+            }
 
-        if($player2_action != null && ($player2_action instanceof FighterAttackAction)) {
-            $player2_attack = $this->setupFighterAttack(
-                $this->battle->player2,
-                $player2_action
-            );
-        }
-
-        if($this->system->debug['battle']) {
-            echo 'P1: ' . $player1_attack->raw_damage . ' / P2: ' . $player2_attack->raw_damage . '<br />';
-        }
-
-        // Collision
-        $collision_text = null;
-        if($player1_attack != null && $player2_attack != null) {
-            $collision_text = $this->jutsuCollision(
-                $this->battle->player1, $this->battle->player2,
-                $player1_attack->raw_damage, $player2_attack->raw_damage,
-                $player1_attack->jutsu, $player2_attack->jutsu
-            );
-        }
-
-        // Apply remaining barrier
-        if($player1_attack) {
-            $this->effects->updateBarrier($this->battle->player1, $player1_attack->jutsu);
-        }
-        if($player2_attack) {
-            $this->effects->updateBarrier($this->battle->player2, $player2_attack->jutsu);
-        }
-
-        // Apply damage/effects and set display
-        if($player1_attack) {
-            $this->applyAttack($player1_attack, $this->battle->player1, $this->battle->player2);
-        }
-        else {
-            $this->battle->battle_text .= $this->battle->player1->getName() . ' stood still and did nothing.';
-            if($this->effects->hasDisplays($this->battle->player1)) {
-                $this->battle->battle_text .= '<p>' .
-                    $this->parseCombatText(
-                        $this->effects->getDisplayText($this->battle->player1),
-                        $this->battle->player1,
-                        $this->battle->player2
-                    ) .
-                    '</p>';
+            if($player2_action != null && ($player2_action instanceof FighterMovementAction)) {
+                $this->field->moveFighterTo(
+                    fighter_id: $this->battle->player1->combat_id,
+                    target_tile: $player2_action->target_tile
+                );
+                $this->battle->battle_text .= $this->battle->player1->getName() .
+                    ' moved to tile ' . $player2_action->target_tile . '.';
             }
         }
+        else if($this->battle->isAttackPhase()) {
+            /** @var ?BattleAttack $player1_attack */
+            $player1_attack = null;
+            $player1_action = $this->battle->fighter_actions[$this->battle->player1->combat_id] ?? null;
 
-        if($collision_text) {
-            $collision_text = $this->parseCombatText($collision_text, $this->battle->player1, $this->battle->player2);
-            $this->battle->battle_text .= '[br][hr]' . $this->system->clean($collision_text);
-        }
-        $this->battle->battle_text .= '[br][hr]';
+            if($player1_action != null && ($player1_action instanceof FighterAttackAction)) {
+                $player1_attack = $this->setupFighterAttack(
+                    $this->battle->player1,
+                    $player1_action
+                );
+            }
 
-        // Apply damage/effects and set display
-        if($player2_attack) {
-            $this->applyAttack($player2_attack, $this->battle->player2, $this->battle->player1);
-        }
-        else {
-            $this->battle->battle_text .= $this->battle->player2->getName() . ' stood still and did nothing.';
-            if($this->effects->hasDisplays($this->battle->player2)) {
-                $this->battle->battle_text .= "<p>" . $this->parseCombatText(
-                        $this->effects->getDisplayText($this->battle->player2),
-                        $this->battle->player2,
-                        $this->battle->player1
-                    ) . "</p>";
+            /** @var ?BattleAttack $player2_attack */
+            $player2_attack = null;
+            $player2_action = $this->battle->fighter_actions[$this->battle->player2->combat_id] ?? null;
+
+            if($player2_action != null && ($player2_action instanceof FighterAttackAction)) {
+                $player2_attack = $this->setupFighterAttack(
+                    $this->battle->player2,
+                    $player2_action
+                );
+            }
+
+            if($this->system->debug['battle']) {
+                echo 'P1: ' . $player1_attack->raw_damage . ' / P2: ' . $player2_attack->raw_damage . '<br />';
+            }
+
+            // Collision
+            $collision_text = null;
+            if($player1_attack != null && $player2_attack != null) {
+                $collision_text = $this->jutsuCollision(
+                    $this->battle->player1, $this->battle->player2,
+                    $player1_attack->raw_damage, $player2_attack->raw_damage,
+                    $player1_attack->jutsu, $player2_attack->jutsu
+                );
+            }
+
+            // Apply remaining barrier
+            if($player1_attack) {
+                $this->effects->updateBarrier($this->battle->player1, $player1_attack->jutsu);
+            }
+            if($player2_attack) {
+                $this->effects->updateBarrier($this->battle->player2, $player2_attack->jutsu);
+            }
+
+            // Apply damage/effects and set display
+            if($player1_attack) {
+                $this->applyAttack($player1_attack, $this->battle->player1, $this->battle->player2);
+            }
+            else {
+                $this->battle->battle_text .= $this->battle->player1->getName() . ' stood still and did nothing.';
+                if($this->effects->hasDisplays($this->battle->player1)) {
+                    $this->battle->battle_text .= '<p>' .
+                        $this->parseCombatText(
+                            $this->effects->getDisplayText($this->battle->player1),
+                            $this->battle->player1,
+                            $this->battle->player2
+                        ) .
+                        '</p>';
+                }
+            }
+
+            if($collision_text) {
+                $collision_text = $this->parseCombatText($collision_text, $this->battle->player1, $this->battle->player2);
+                $this->battle->battle_text .= '[br][hr]' . $this->system->clean($collision_text);
+            }
+            $this->battle->battle_text .= '[br][hr]';
+
+            // Apply damage/effects and set display
+            if($player2_attack) {
+                $this->applyAttack($player2_attack, $this->battle->player2, $this->battle->player1);
+            }
+            else {
+                $this->battle->battle_text .= $this->battle->player2->getName() . ' stood still and did nothing.';
+                if($this->effects->hasDisplays($this->battle->player2)) {
+                    $this->battle->battle_text .= "<p>" . $this->parseCombatText(
+                            $this->effects->getDisplayText($this->battle->player2),
+                            $this->battle->player2,
+                            $this->battle->player1
+                        ) . "</p>";
+                }
             }
         }
 
@@ -490,6 +524,7 @@ class BattleManager {
     private function finishTurn() {
         $this->battle->turn_time = time();
         $this->battle->turn_count++;
+        $this->battle->turn_type = $this->nextTurnPhase();
 
         $this->battle->fighter_actions = [];
 
@@ -501,6 +536,16 @@ class BattleManager {
 
         $this->battle->player2->updateData();
         $this->battle->player2->updateInventory();
+    }
+
+    #[Pure]
+    private function nextTurnPhase(): string {
+       if($this->battle->isMovementPhase()) {
+            return Battle::TURN_TYPE_ATTACK;
+        }
+        else {
+            return Battle::TURN_TYPE_MOVEMENT;
+        }
     }
 
     private function checkForWinner(): string {
@@ -1092,11 +1137,21 @@ class BattleManager {
                 return null;
             }
         }
-        else if($this->battle->isMovementPhase() && !empty($FORM_DATA['movement'])) {
+        else if($this->battle->isMovementPhase() && !empty($FORM_DATA['submit_movement_action'])) {
             // Run player attack
             try {
-                // TODO: Add a way to actually submit movement
-                return new FighterMovementAction();
+                $target_tile = isset($FORM_DATA['selected_tile']) ? $FORM_DATA['selected_tile'] : null;
+                if($target_tile == null) {
+                    throw new Exception("Invalid tile!");
+                }
+                if(!$this->field->tileIsInBounds($target_tile)) {
+                    throw new Exception("Invalid tile - out of bounds!");
+                }
+
+                return new FighterMovementAction(
+                    fighter_id: $this->player->combat_id,
+                    target_tile: $target_tile
+                );
             } catch (Exception $e) {
                 $this->system->message($e->getMessage());
                 return null;
