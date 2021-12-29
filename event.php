@@ -11,7 +11,7 @@ function event() {
         1228 => '_days_ days of _seal_!',
         1229 => '1 Ancient Kunai!',
         1230 => '_yen_ Yen!',
-        1231 => '1 Ancient Kunai!',
+        1231 => '_ak_ Ancient Kunai!',
         101 => 'Crystal Pendant!',
     ];
 
@@ -127,11 +127,13 @@ function event() {
                     break;
                 }
 
-                $player->money += 3000;
+                $amount = 10;
+
+                $player->premium_credits += $amount;
                 $player->presents_claimed[] = 1231;
                 $player->updateData();
 
-                $system->message("You received " . $gifts[$claim]);
+                $system->message("You received " . str_replace('_ak_', $amount, $gifts[$claim]));
 
                 break;
             case 101:
