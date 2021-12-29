@@ -108,7 +108,7 @@ function event() {
                 }
 
 
-                $amount = $player->rank * 1500;
+                $amount = $player->rank * 2000;
 
                 $player->money += $amount;
                 $player->presents_claimed[] = 1230;
