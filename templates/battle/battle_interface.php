@@ -87,7 +87,7 @@
 <?php if(!$battle->isComplete() && !$battleManager->spectate): ?>
     <?php require 'templates/battle/action_prompt.php'; ?>
 <?php elseif($battleManager->spectate): ?>
-    <table class='table'>
+    <table class='table' style='margin-top:2px;'>
         <tr><td style='text-align:center;'>
             <?php if($battle->winner == Battle::TEAM1): ?>
                <?=  $battle->player1->getName() ?> won!

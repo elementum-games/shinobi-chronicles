@@ -10,7 +10,7 @@
 
 ?>
 
-<table class='table'>
+<table class='table' style='margin-top:0;'>
     <tr><th>
         Select <?= $battleManager->getPhaseLabel() ?> Action
     </th></tr>

@@ -547,24 +547,25 @@ else if(isset($_POST['run_simulation']) && $mode == 'scenarios') {
     $player1->intelligence = 10;
     $player1->willpower = 10;
     $player1_jutsu = new Jutsu(
-        1,
-        'p1j',
-        $player1->rank,
-        Jutsu::TYPE_NINJUTSU,
-        $base_jutsu_power,
-        'none',
-        0,
-        0,
-        'no',
-        'nope',
-        0,
-        Jutsu::USE_TYPE_PROJECTILE,
-        0,
-        0,
-        Jutsu::PURCHASE_TYPE_PURCHASEABLE,
-        0,
-        Jutsu::ELEMENT_NONE,
-        1
+        id: 1,
+        name: 'p1j',
+        rank: $player1->rank,
+        jutsu_type: Jutsu::TYPE_NINJUTSU,
+        base_power: $base_jutsu_power,
+        effect: 'none',
+        base_effect_amount: 0,
+        effect_length: 0,
+        description: 'no',
+        battle_text: 'nope',
+        cooldown: 0,
+        use_type: Jutsu::USE_TYPE_PROJECTILE,
+        target_type: Jutsu::TARGET_TYPE_DIRECTION,
+        use_cost: 0,
+        purchase_cost: 0,
+        purchase_type: Jutsu::PURCHASE_TYPE_PURCHASEABLE,
+        parent_jutsu: 0,
+        element: Jutsu::ELEMENT_NONE,
+        hand_seals: 1
     );
     $player1_jutsu->setLevel($base_jutsu_level, 0);
 
@@ -579,24 +580,25 @@ else if(isset($_POST['run_simulation']) && $mode == 'scenarios') {
     $player2->intelligence = 10;
     $player2->willpower = 10;
     $player2_jutsu = new Jutsu(
-        2,
-        'p2j',
-        $player2->rank,
-        Jutsu::TYPE_TAIJUTSU,
-        $base_jutsu_power,
-        'none',
-        0,
-        0,
-        'no',
-        'nope',
-        0,
-        Jutsu::USE_TYPE_PHYSICAL,
-        0,
-        0,
-        Jutsu::PURCHASE_TYPE_PURCHASEABLE,
-        0,
-        Jutsu::ELEMENT_NONE,
-        2
+        id: 2,
+        name: 'p2j',
+        rank: $player2->rank,
+        jutsu_type: Jutsu::TYPE_TAIJUTSU,
+        base_power: $base_jutsu_power,
+        effect: 'none',
+        base_effect_amount: 0,
+        effect_length: 0,
+        description: 'no',
+        battle_text: 'nope',
+        cooldown: 0,
+        use_type: Jutsu::USE_TYPE_MELEE,
+        target_type: Jutsu::TARGET_TYPE_FIGHTER_ID,
+        use_cost: 0,
+        purchase_cost: 0,
+        purchase_type: Jutsu::PURCHASE_TYPE_PURCHASEABLE,
+        parent_jutsu: 0,
+        element: Jutsu::ELEMENT_NONE,
+        hand_seals: 2
     );
     $player2_jutsu->setLevel($base_jutsu_level, 0);
 

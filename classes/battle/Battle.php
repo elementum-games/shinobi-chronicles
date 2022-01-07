@@ -287,7 +287,8 @@ class Battle {
             return $this->prepTimeRemaining();
         }
 
-        return Battle::TURN_LENGTH - (time() - $this->turn_time);
+        $time_remaining = Battle::TURN_LENGTH - (time() - $this->turn_time);
+        return $time_remaining >= 0 ? $time_remaining : 0;
     }
 
     protected function prepTimeRemaining(): int {

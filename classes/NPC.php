@@ -132,7 +132,7 @@ class NPC extends Fighter {
                     $jutsu->use_type = Jutsu::USE_TYPE_PROJECTILE;
                     break;
                 case Jutsu::TYPE_TAIJUTSU:
-                    $jutsu->use_type = Jutsu::USE_TYPE_PHYSICAL;
+                    $jutsu->use_type = Jutsu::USE_TYPE_MELEE;
                     break;
                 case Jutsu::TYPE_GENJUTSU:
                     $jutsu->effect = 'residual_damage';
@@ -230,24 +230,25 @@ class NPC extends Fighter {
         );
 
         $jutsu = new Jutsu(
-            $id,
-            'Move ' . $id,
-            $this->rank,
-            $jutsu_type,
-            $power,
-            'none',
-            0,
-            0,
-            "N/A",
-            $battle_text_swapped,
-            0,
-            Jutsu::USE_TYPE_PHYSICAL,
-            $this->rank * 5,
-            $this->rank * 1000,
-            Jutsu::PURCHASE_TYPE_PURCHASEABLE,
-            0,
-            Jutsu::ELEMENT_NONE,
-            ''
+            id: $id,
+            name: 'Move ' . $id,
+            rank: $this->rank,
+            jutsu_type: $jutsu_type,
+            base_power: $power,
+            effect: 'none',
+            base_effect_amount: 0,
+            effect_length: 0,
+            description: "N/A",
+            battle_text: $battle_text_swapped,
+            cooldown: 0,
+            use_type: Jutsu::USE_TYPE_MELEE,
+            target_type: Jutsu::TARGET_TYPE_FIGHTER_ID,
+            use_cost: $this->rank * 5,
+            purchase_cost: $this->rank * 1000,
+            purchase_type: Jutsu::PURCHASE_TYPE_PURCHASEABLE,
+            parent_jutsu: 0,
+            element: Jutsu::ELEMENT_NONE,
+            hand_seals: ''
         );
 
         $jutsu_level = 5 + ($this->rank_progress * 50);

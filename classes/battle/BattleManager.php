@@ -6,6 +6,7 @@ require_once __DIR__ . '/Battle.php';
 require_once __DIR__ . '/BattleField.php';
 require_once __DIR__ . '/BattleEffectsManager.php';
 require_once __DIR__ . '/BattleAttack.php';
+require_once __DIR__ . '/AttackTarget.php';
 require_once __DIR__ . '/FighterAction.php';
 
 /*
@@ -18,9 +19,6 @@ require_once __DIR__ . '/FighterAction.php';
  *
  *
  * BATTLEFIELD
- * - what tiles are shown based on position
- * - at least 6 tiles
- * - show at least 2 tiles behind each user, to a max of 5(6?) tiles from the opponent
  * - handle:
  *   - movement
  *     - does the movement trigger an effect (tile status effect, or backstab bonus?)
@@ -34,16 +32,14 @@ require_once __DIR__ . '/FighterAction.php';
  * - max 2 people from team per tile
  * - opportunity attacks to disincentivize running through opponent
  *
- *
  * ATTACK PHASE
  * - activate conditions (genjutsu)
  * - cast time (nin/gen)
  *   - is interrupted?
  *
- *
- *
- *
  */
+
+// Attack not casting is due to casting it after turn time passes limit, then turn needs to reset
 
 /* Types of ninjutsu
 - melee
@@ -224,8 +220,11 @@ class BattleManager {
             $this->runPlayerHealItemAction($_POST);
             return false;
         }
+
         // If turn is still active and user hasn't submitted their move, check for action
-        if($this->battle->timeRemaining() > 0 && !$this->playerActionSubmitted()) {
+        if(!$this->playerActionSubmitted() &&
+            ($this->battle->timeRemaining() > 0 || !$this->opponentActionSubmitted())
+        ) {
             $player_action = $this->collectPlayerAction($_POST);
             if($player_action != null) {
                 var_dump($player_action);
@@ -235,19 +234,12 @@ class BattleManager {
                     $this->chooseAndSetNPCAttackAction($this->opponent);
                 }
             }
-            else {
-                echo "Player action NULL";
-            }
         }
 
         // If time is up or both people have submitted moves, RUN TURN
         if($this->battle->timeRemaining() <= 0 || $this->allActionsSubmitted()) {
             if(!empty($this->battle->fighter_actions)) {
                 $this->runActions();
-            }
-            // If neither player moved, update turn timer only
-            else {
-                $this->battle->turn_time = time();
             }
         }
 
@@ -406,6 +398,7 @@ class BattleManager {
         $this->processTurnEffects();
 
         $this->battle->battle_text = '';
+
 
         if($this->battle->isMovementPhase()) {
             $player1_action = $this->battle->fighter_actions[$this->battle->player1->combat_id] ?? null;
@@ -1054,6 +1047,8 @@ class BattleManager {
             jutsu_id: $jutsu->id,
             jutsu_purchase_type: Jutsu::PURCHASE_TYPE_PURCHASEABLE,
             weapon_id: null,
+            // TODO: real AI targeting
+            target: new AttackFighterIdTarget($this->player->combat_id)
         );
     }
 
@@ -1126,10 +1121,12 @@ class BattleManager {
 
                 // Log jutsu used
                 return new FighterAttackAction(
-                    $this->player->combat_id,
-                    $player_jutsu->id,
-                    $player_jutsu->purchase_type,
-                    $weapon_id
+                    fighter_id: $this->player->combat_id,
+                    jutsu_id: $player_jutsu->id,
+                    jutsu_purchase_type: $player_jutsu->purchase_type,
+                    weapon_id: $weapon_id,
+                    // TODO: real targeting
+                    target: new AttackFighterIdTarget($this->opponent->combat_id)
                 );
 
             } catch (Exception $e) {

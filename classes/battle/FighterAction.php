@@ -25,11 +25,15 @@ abstract class FighterAction {
                 fighter_id: $action_data['fighter_id'],
                 jutsu_id: $action_data['jutsu_id'],
                 jutsu_purchase_type: $action_data['jutsu_purchase_type'],
-                weapon_id: $action_data['weapon_id']
+                weapon_id: $action_data['weapon_id'],
+                target: AttackTarget::fromDb($action_data['target'])
             );
         }
         else if($action_data['type'] === self::TYPE_MOVEMENT) {
-            return new FighterMovementAction();
+            return new FighterMovementAction(
+                fighter_id: $action_data['fighter_id'],
+                target_tile: $action_data['target_tile']
+            );
         }
         else {
             throw new Exception("Invalid FighterAction db data!");
