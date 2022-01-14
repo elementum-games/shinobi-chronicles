@@ -292,7 +292,7 @@ function team() {
                         }
                     }
 
-                    if(!$kick_key) {
+                    if($kick_key === false) {
                         throw new Exception("Invalid user key!");
                     }
 
