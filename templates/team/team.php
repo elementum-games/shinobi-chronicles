@@ -31,7 +31,7 @@
         <td style='vertical-align: top;'>
             <b>Team Type:</b> Shinobi<br />
             <br>
-            <b>Points:</b> <?= $player->team->points ?><br />
+            <b>Points:</b> <?= number_format($player->team->points) ?><br />
             <br>
             <a href='<?= $self_link ?>&leave_team=1'><p class='button'>Leave Team</p></a>
         </td>
@@ -65,11 +65,11 @@
 <table class='table'>
     <tr><th colspan='2'>Missions</th></tr>
     <tr><td style='text-align:center; width: 50%;'>
-            <?php if($player->team->mission_id): ?>
+            <?php if($player->team->mission_id && $player->user_id == $player->team->leader): ?>
                 <p style='margin: 5px 0 0;'>
                     <a href='<?= $self_link ?>&cancel_mission=1'><span class='button'>Cancel Mission</span></a>
                 </p>
-            <?php else: ?>
+            <?php elseif($player->user_id == $player->team->leader): ?>
 
             <form action='<?= $self_link ?>' method='post'>
                 <label>
@@ -139,21 +139,23 @@
         <!--// Team members (invite/kick)-->
         <tr><th colspan='3'>Team Controls</th></tr>
         <tr>
-            <th style='width: 33%;'>Invite</th>
+            <th style='width: 33%;'>Member Actions</th>
             <th style='width: 33%;'>Logo</th>
             <th style='width: 33%;'>Boost</th>
         </tr>
         <tr><td style='text-align:center;'>
                 <br />
+                <b>Invite Player</b><br />
                 <form action='<?= $self_link ?>' method='get'>
-                    <input type='hidden' name='id' value='<?= $self_id ?>'>
+                    <input type='hidden' name='id' value='<?= System::PAGE_IDS['team'] ?>'>
                     <input type='text' name='user_name' /><br />
-                    <input type='submit' name='invite' value='Invite Player' />
+                    <input type='submit' name='invite' value='Send' />
                 </form>
                 <br />
 
-                <!--// Kick-->
                 <?php if(count($team_members) > 1): ?>
+                    <b>Kick Member</b><br />
+                    <!--// Kick-->
                     <form action='<?= $self_link ?>' method='post'>
                         <select name='user_id'>
                             <?php foreach($team_members as $user_id => $member): ?>
@@ -161,7 +163,19 @@
                                 <option value='<?= $member['user_id'] ?>'><?= $member['user_name'] ?></option>
                             <?php endforeach; ?>
                         </select><br />
-                        <input type='submit' name='kick' value='Kick Member' />
+                        <input type='submit' name='kick' value='Remove' />
+                    </form><br />
+
+                    <b>Transfer Leadership</b><br />
+                    <!--// Transfer Leadership-->
+                    <form action='<?= $self_link ?>' method='post'>
+                        <select name='user_id'>
+                            <?php foreach($team_members as $user_id => $member): ?>
+                                <?php if($member['user_id'] == $player->user_id) continue; ?>
+                                <option value='<?= $member['user_id'] ?>'><?= $member['user_name'] ?></option>
+                            <?php endforeach; ?>
+                        </select><br />
+                        <input type='submit' name='transfer_leader' value='Transfer' />
                     </form><br />
                 <?php endif; ?>
                 </td>
@@ -216,7 +230,7 @@
                             Cost: <span id='display_cost'>N/A</span>
                         </p>
                     </div>
-                    <button type='submit'>Set Boost</button><br>
+                    <input type='submit' name="set_boost" value="Set Boost" /><br>
                     <label style='font-size: 0.8rem; font-style: italic;margin:5px 0;'>
                         Training boost is a chance to get extra gains, not a boost to all gains.
                     </label>

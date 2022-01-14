@@ -122,6 +122,7 @@ class System {
         'support' => 30,
         'marriage' => 29,
         'event' => 27,
+        'team' => 24,
     ];
     public array $links = [
         'github' => 'https://github.com/elementum-games/shinobi-chronicles',
@@ -280,8 +281,14 @@ class System {
     }
 
     /* function query(query) */
-    public function query($query) {
+    public function query($query, $debug = false) {
         $query = trim($query);
+
+        //Debugging
+        if($debug == true) {
+            echo $query;
+            return false;
+        }
 
         $this->db_query_type = strtolower(substr($query, 0, strpos($query, ' ')));
 

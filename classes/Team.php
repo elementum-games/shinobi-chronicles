@@ -3,6 +3,7 @@
 class Team {
     const TYPE_SHINOBI = 1;
     const MAX_MEMBERS = 4;
+    const MIN_RANK = 3;
 
     const MIN_NAME_LENGTH = 5;
     const MAX_NAME_LENGTH = 35;
@@ -207,7 +208,11 @@ class Team {
             throw new Exception('Your team does not have enough points for this boost!');
         }
 
+        //Set values for display
         $this->points -= $boost['points_cost'];
+        $this->boost = $boost_type;
+        $this->boost_amount = $boost['amount'];
+        $this->boost_time = time();
 
         $this->system->query("UPDATE `teams` SET 
                     `boost`='{$boost_type}', 
