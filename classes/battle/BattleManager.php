@@ -77,6 +77,10 @@ class BattleManager {
 
     public bool $spectate = false;
 
+    public array $debug = [
+        'player_action' => false
+    ];
+
     // INITIALIZATION
 
     /**
@@ -226,8 +230,9 @@ class BattleManager {
             ($this->battle->timeRemaining() > 0 || !$this->opponentActionSubmitted())
         ) {
             $player_action = $this->collectPlayerAction($_POST);
+            $this->renderDebug('player_action', 'playerActionSubmitted', print_r($player_action, true));
+
             if($player_action != null) {
-                var_dump($player_action);
                 $this->setPlayerAction($this->player, $player_action);
 
                 if($this->opponent instanceof NPC) {
@@ -399,7 +404,6 @@ class BattleManager {
 
         $this->battle->battle_text = '';
 
-
         if($this->battle->isMovementPhase()) {
             $player1_action = $this->battle->fighter_actions[$this->battle->player1->combat_id] ?? null;
             $player2_action = $this->battle->fighter_actions[$this->battle->player2->combat_id] ?? null;
@@ -427,31 +431,17 @@ class BattleManager {
             }
         }
         else if($this->battle->isAttackPhase()) {
-            /** @var ?BattleAttack $player1_attack */
-            $player1_attack = null;
-            $player1_action = $this->battle->fighter_actions[$this->battle->player1->combat_id] ?? null;
-
-            if($player1_action != null && ($player1_action instanceof FighterAttackAction)) {
-                $player1_attack = $this->setupFighterAttack(
-                    $this->battle->player1,
-                    $player1_action
-                );
-            }
-
-            /** @var ?BattleAttack $player2_attack */
-            $player2_attack = null;
-            $player2_action = $this->battle->fighter_actions[$this->battle->player2->combat_id] ?? null;
-
-            if($player2_action != null && ($player2_action instanceof FighterAttackAction)) {
-                $player2_attack = $this->setupFighterAttack(
-                    $this->battle->player2,
-                    $player2_action
-                );
-            }
+            $player1_attack = $this->getFighterAttackFromActions($this->battle->player1->combat_id);
+            $player2_attack = $this->getFighterAttackFromActions($this->battle->player2->combat_id);
 
             if($this->system->debug['battle']) {
                 echo 'P1: ' . $player1_attack->raw_damage . ' / P2: ' . $player2_attack->raw_damage . '<br />';
             }
+
+            // Actions cast
+            // Actions have multiple collisions now
+            // Cast time
+            // travel time
 
             // Collision
             $collision_text = null;
@@ -600,6 +590,29 @@ class BattleManager {
 
 
     // PRIVATE API - ATTACK PROCESSING
+
+    /**
+     * @param string $combat_id
+     * @return BattleAttack|null
+     * @throws Exception
+     */
+    protected function getFighterAttackFromActions(string $combat_id): ?BattleAttack {
+        $fighter = $this->battle->getFighter($combat_id);
+        if($fighter == null) {
+            return null;
+        }
+
+        $fighter_action = $this->battle->fighter_actions[$combat_id] ?? null;
+
+        if($fighter_action != null && ($fighter_action instanceof FighterAttackAction)) {
+            return $this->setupFighterAttack(
+                $fighter,
+                $fighter_action
+            );
+        }
+
+        return null;
+    }
 
     /**
      * @param Fighter       $fighter
@@ -1223,18 +1236,48 @@ class BattleManager {
      * @throws Exception
      */
     private function getJutsuFromAttackAction(Fighter $fighter, FighterAttackAction $action): Jutsu {
+        $jutsu = null;
+
         if($action->jutsu_purchase_type == Jutsu::PURCHASE_TYPE_DEFAULT) {
-            return $this->default_attacks[$action->jutsu_id];
+            $jutsu = $this->default_attacks[$action->jutsu_id] ?? null;
         }
         else if($action->jutsu_purchase_type == Jutsu::PURCHASE_TYPE_PURCHASEABLE) {
-            return $fighter->jutsu[$action->jutsu_id];
+            $jutsu = $fighter->jutsu[$action->jutsu_id] ?? null;
         }
         else if($action->jutsu_purchase_type == Jutsu::PURCHASE_TYPE_BLOODLINE) {
-            return $fighter->bloodline->jutsu[$action->jutsu_id];
+            $jutsu = $fighter->bloodline->jutsu[$action->jutsu_id] ?? null;
         }
         else {
             throw new Exception("Invalid jutsu purchase type {$action->jutsu_purchase_type} for fighter {$fighter->combat_id}");
         }
+
+        if($jutsu == null) {
+            $this->renderDebug('player_action', "getJutsuFromAttackAction", print_r($action, true));
+            throw new Exception("Invalid type {$action->jutsu_purchase_type} jutsu {$action->jutsu_id} for fighter {$fighter->getName()}");
+        }
+
+        return $jutsu;
+    }
+
+    private function renderDebug(string $category, string $label, string $content) {
+        if(($this->debug[$category] ?? false) !== true) {
+            return;
+        }
+
+        if($content == "") {
+            $content = "[empty]";
+        }
+        echo "<div style='background:#222;
+                color:#e0e0e0;
+                white-space:pre-wrap;
+                padding: 5px 5px 5px 10px;
+                margin: 10px;
+                border: 1px solid #333;
+                '
+        >" .
+            "<p style='font-weight:bold;margin-top:0;'>{$label}</p>" .
+            $content .
+        "</div>";
     }
 
 }
