@@ -89,7 +89,7 @@ $system->renderStaticPageHeader($layout);
           <p>Increased by 15% if you are under or same level as AI</p>
           <p>ncreased by 10% if the fight lasts longer than 4 turns</p>
 
-          <br></br>
+              <br/>
 
           <h2>Character Rank, Stat caps and Requirements</h2>
           <p><b>Academy student</b>- Starting rank up to level 10. Stat cap of 1000</p>
@@ -103,7 +103,7 @@ $system->renderStaticPageHeader($layout);
             In order to pass the exam, the user must pass a basic test along with undergoing a series of battles.
           </p>
 
-          <br></br>
+              <br/>
 
           <h2>Shinobi Chronicle Currencies</h2>
           <p>Yen is the primary currency for Shinobi Chronicles, use Yen to purchase the jutsus of your offense type in the shop, gear to help you in battle, and healing items for after combat</p>
@@ -124,7 +124,7 @@ $system->renderStaticPageHeader($layout);
           <h2>Character changes</h2>
           <p>Use Ancient Kunai to reset your character, change your username, transfer skill points into other stats, reset an individual stat, or to change your current clan</p>
 
-          <br></br>
+              <br/>
 
           <h2>Bloodline</h2>
           <p>Bloodline rates for your first roll upon reaching Genin are as followed</p>
@@ -140,11 +140,11 @@ $system->renderStaticPageHeader($layout);
           <p><b>Common</b> - 40 AK</p>
           <p><b>Lesser</b> - 20 AK</p>
 
-          <br></br>
+              <br/>
 
           Bloodline section with info TBA
 
-          <br></br>
+              <br/>
 
           <h2>Auras</h2>
           <p>With the use of Ancient Kunai, you can imbue your character with a forbidden seal for enhanced benefits toward your character.</p>
@@ -155,7 +155,7 @@ $system->renderStaticPageHeader($layout);
             </h3>
             <h4>
               5 Ancient Kunai / 30 days
-            </h2>
+            </h4>
             <div>+10% regen rate</div>
             <div>Blue/Pink username color in chat</div>
             <div>Larger avatar (125x125 -> 175x175)</div>
