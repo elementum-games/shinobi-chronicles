@@ -256,14 +256,14 @@ if($LOGGED_IN) {
 		$RANK_NAMES[$rank['rank_id']] = $rank['name'];
 	}
 
-	// Page list 
-	$pages = require 'pages.php';
+	// Route list
+	$routes = require 'routes.php';
 
 	// Action log
 	if($player->log_actions) {
 		$log_contents = '';
-		if($_GET['id'] && isset($pages[$_GET['id']])) {
-			$log_contents .= 'Page: ' . $pages[$_GET['id']]['title'] . ' - Time: ' . round(microtime(true), 1) . '[br]';
+		if($_GET['id'] && isset($routes[$_GET['id']])) {
+			$log_contents .= 'Page: ' . $routes[$_GET['id']]['title'] . ' - Time: ' . round(microtime(true), 1) . '[br]';
 		}
 		foreach($_GET as $key => $value) {
 			$val = $value;
@@ -297,41 +297,41 @@ if($LOGGED_IN) {
 	if(isset($_GET['id'])) {
 		$id = (int)$_GET['id'];
 		try {
-			if(!isset($pages[$id])) {
+			if(!isset($routes[$id])) {
 				throw new Exception("");
 			}
 
 			// Check for battle if page is restricted
-			if(isset($pages[$id]['battle_ok']) && $pages[$id]['battle_ok'] == false) {
+			if(isset($routes[$id]['battle_ok']) && $routes[$id]['battle_ok'] == false) {
 				if($player->battle_id) {
 					throw new Exception("You cannot visit this page while in battle!");
 				}
 			}
 
 			//Check for survival mission restricted
-			if(isset($pages[$id]['survival_ok']) && $pages[$id]['survival_ok'] == false) {
+			if(isset($routes[$id]['survival_ok']) && $routes[$id]['survival_ok'] == false) {
 				if(isset($_SESSION['ai_defeated']) && $player->mission_stage['action_type'] == 'combat') {
 					throw new Exception("You cannot move while under attack!");
 				}
 			}
 
 			// Check for spar/fight PvP type, stop page if trying to load spar/battle while in AI battle
-			if(isset($pages[$id]['battle_type'])) {
+			if(isset($routes[$id]['battle_type'])) {
 				$result = $system->query("SELECT `battle_type` FROM `battles` WHERE `battle_id`='$player->battle_id' LIMIT 1");
 				if($system->db_last_num_rows > 0) {
 					$battle_type = $system->db_fetch($result)['battle_type'];
-					if($battle_type != $pages[$id]['battle_type']) {
+					if($battle_type != $routes[$id]['battle_type']) {
 						throw new Exception("You cannot visit this page while in combat!");
 					}
 				}
 			}
 
-			if(isset($pages[$id]['user_check'])) {
-			    if(!($pages[$id]['user_check'] instanceof Closure)) {
+			if(isset($routes[$id]['user_check'])) {
+			    if(!($routes[$id]['user_check'] instanceof Closure)) {
 			        throw new Exception("Invalid user check!");
                 }
 
-			    $page_ok = $pages[$id]['user_check']($player);
+			    $page_ok = $routes[$id]['user_check']($player);
 
 				if(!$page_ok) {
 					throw new Exception("");
@@ -339,17 +339,17 @@ if($LOGGED_IN) {
 			}
 
 			// Check for being in village is not okay/okay/required
-			if(isset($pages[$id]['village_ok'])) {
+			if(isset($routes[$id]['village_ok'])) {
 				// Player is alllowed in up to rank 3, then must go outside village
-				if($player->rank > 2 && $pages[$id]['village_ok'] == System::NOT_IN_VILLAGE && isset($villages[$player->location])) {
+				if($player->rank > 2 && $routes[$id]['village_ok'] == System::NOT_IN_VILLAGE && isset($villages[$player->location])) {
 					throw new Exception("You cannot access this page while in a village!");
 				}
-				if($pages[$id]['village_ok'] == System::ONLY_IN_VILLAGE && $player->location !== $player->village_location) {
+				if($routes[$id]['village_ok'] == System::ONLY_IN_VILLAGE && $player->location !== $player->village_location) {
 					throw new Exception("You must be in your village to access this page!");
 				}
 			}
-			if(isset($pages[$id]['min_rank'])) {
-				if($player->rank < $pages[$id]['min_rank']) {
+			if(isset($routes[$id]['min_rank'])) {
+				if($player->rank < $routes[$id]['min_rank']) {
 					throw new Exception("You are not a high enough rank to access this page!");
 				}
 			}
@@ -357,7 +357,7 @@ if($LOGGED_IN) {
 			// Page is okay
 
             // Force view battle page if waiting too long
-            if($player->battle_id && empty($pages[$id]['battle_type'])) {
+            if($player->battle_id && empty($routes[$id]['battle_type'])) {
                 $battle_result = $system->query(
                     "SELECT winner, turn_time, battle_type FROM battles WHERE `battle_id`='{$player->battle_id}' LIMIT 1"
                 );
@@ -366,7 +366,7 @@ if($LOGGED_IN) {
                     $time_since_turn = time() - $battle_data['turn_time'];
 
                     if($battle_data['winner'] && $time_since_turn >= 60) {
-                        foreach($pages as $page_id => $page) {
+                        foreach($routes as $page_id => $page) {
                             $type = $page['battle_type'] ?? null;
                             if($type == $battle_data['battle_type']) {
                                 $id = $page_id;
@@ -376,8 +376,8 @@ if($LOGGED_IN) {
                 }
             }
 
-            if(!$ajax || !isset($pages[$id]['ajax_ok']) ) {
-				echo str_replace("[HEADER_TITLE]", $pages[$id]['title'], $body_start);
+            if(!$ajax || !isset($routes[$id]['ajax_ok']) ) {
+				echo str_replace("[HEADER_TITLE]", $routes[$id]['title'], $body_start);
 			}
 
 			$self_link = $system->link . '?id=' . $id;
@@ -396,15 +396,15 @@ if($LOGGED_IN) {
             }
 
             /** @noinspection PhpIncludeInspection */
-            require($pages[$id]['file_name']);
+            require('pages/' . $routes[$id]['file_name']);
 
-			$pages[$id]['function_name']();
+			$routes[$id]['function_name']();
 			$page_loaded = true;
 		} catch (Exception $e) {
 			if(strlen($e->getMessage()) > 1) {
 				// Display page title if page is set
-				if(isset($pages[$id])) {
-					echo str_replace("[HEADER_TITLE]", $pages[$id]['title'], $body_start);
+				if(isset($routes[$id])) {
+					echo str_replace("[HEADER_TITLE]", $routes[$id]['title'], $body_start);
 					$page_loaded = true;
 				}
 				$system->message($e->getMessage());
@@ -431,14 +431,14 @@ if($LOGGED_IN) {
 	// Display side menu and footer
 	if(!$ajax) {
 		if($player->clan) {
-		    $pages[20]['menu'] = System::MENU_VILLAGE;
+		    $routes[20]['menu'] = System::MENU_VILLAGE;
 		}
 		if($player->rank >= 3) {
-		    $pages[24]['menu'] = System::MENU_USER;
+		    $routes[24]['menu'] = System::MENU_USER;
 		}
 
         echo $side_menu_start;
-		foreach($pages as $id => $page) {
+		foreach($routes as $id => $page) {
             if(!isset($page['menu']) || $page['menu'] != System::MENU_USER) {
                 continue;
             }
@@ -448,7 +448,7 @@ if($LOGGED_IN) {
 
 		echo $action_menu_header;
 		if($player->in_village) {
-			foreach($pages as $id => $page) {
+			foreach($routes as $id => $page) {
 				if(!isset($page['menu']) || $page['menu'] != 'activity') {
 					continue;
 				}
@@ -459,7 +459,7 @@ if($LOGGED_IN) {
 			}
 		}
 		else {
-			foreach($pages as $id => $page) {
+			foreach($routes as $id => $page) {
 				if(!isset($page['menu']) || $page['menu'] != 'activity') {
 					continue;
 				}
@@ -472,7 +472,7 @@ if($LOGGED_IN) {
         // In village or not
         if($player->in_village) {
             echo $village_menu_start;
-            foreach($pages as $id => $page) {
+            foreach($routes as $id => $page) {
                 if(!isset($page['menu']) || $page['menu'] != System::MENU_VILLAGE) {
                     continue;
                 }

@@ -1,6 +1,6 @@
 <?php
 
-require __DIR__ . '/../authenticate_admin.php';
+require 'authenticate_admin.php';
 
 /**
  * @var System $system

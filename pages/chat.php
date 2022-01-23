@@ -233,10 +233,10 @@ function chat() {
                     <div style='margin-bottom: 2px;'>{$posted}</div>";
 
                     if($player->isModerator()) {
-                        echo sprintf("<a class='imageLink' href='$self_link&delete=%d'><img src='./images/delete_icon.png' style='max-width:20px;max-height:20px;' /></a>", $post['post_id']);
+                        echo sprintf("<a class='imageLink' href='$self_link&delete=%d'><img src='../images/delete_icon.png' style='max-width:20px;max-height:20px;' /></a>", $post['post_id']);
                     }
                     echo "<a class='imageLink' href='{$system->links['report']}&report_type=3&content_id=" . $post['post_id'] . "'>
-					    <img src='./images/report_icon.png' style='max-width:20px;max-height:20px;' /></a>
+					    <img src='../images/report_icon.png' style='max-width:20px;max-height:20px;' /></a>
                     </td>";
 				echo "</tr>";
 		}

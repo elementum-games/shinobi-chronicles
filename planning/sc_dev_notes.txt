@@ -11,9 +11,9 @@ CORE
 
 -index.php
 
-Handles login, top-level access control, and routing. Your pages wil be called from this script.
+Handles login, top-level access control, and routing. Your routes wil be called from this script.
 
-Once pages are finished they will be assigned a numeric id. Pages in development can be accessed through
+Once routes are finished they will be assigned a numeric id. Pages in development can be accessed through
 $link?developer={your developer name}&page={your file name}
 
 Note that code in the files needs to contain a single function named the same as the file. For instance:

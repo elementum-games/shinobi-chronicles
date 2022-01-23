@@ -445,7 +445,7 @@ class System {
         global $side_menu_end;
         global $footer;
 
-        $pages = require 'pages.php';
+        $pages = require 'routes.php';
 
         echo $side_menu_start;
         foreach($pages as $id => $page) {

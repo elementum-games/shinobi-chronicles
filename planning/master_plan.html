@@ -29,11 +29,11 @@ If user isn't logged in, run login branch
 -Display any error messages	
 -If user is logged in, check page choice and display
 	-Set continue flag
-	-Check passive/asleep pages
+	-Check passive/asleep routes
 		If page choice is found, require script, call function, set continue to false
-	-If continue flag is true, check action/wake pages
+	-If continue flag is true, check action/wake routes
 		If page choice is found, require script, call function, set continue to false
-	-If continue flag is true and player is staff, check staff pages
+	-If continue flag is true and player is staff, check staff routes
 		If choice is mod panel, require script, call function, set continue to false
 		If player is admin and choice is admin panel, require script, call function, set continue to false
 	
