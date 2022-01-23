@@ -283,7 +283,8 @@ class BattleManager {
         $battle = $this->battle;
         $system = $this->system;
 
-        require 'templates/battle/battle_interface.php';
+        // require 'templates/battle/battle_interface.php';
+        require 'templates/battle/battle_interface_v2.php';
     }
 
     #[Pure]

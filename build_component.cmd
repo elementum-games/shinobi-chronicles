@@ -1,0 +1,1 @@
+npx babel $1 --out-dir ui_components/build
