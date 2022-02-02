@@ -103,7 +103,7 @@ function travel() {
 		margin-left:auto;
 		margin-right:auto;
 		/* width: 590px; */
-		background: url(../images/travel_map.png);
+		background: url(./images/travel_map.png);
 		background-size: 100%;
 		background-repeat: no-repeat;
 	}
@@ -230,7 +230,7 @@ function renderMap($player, $villages, $icons) {
             else {
                 $output .= "<td>";
             }
-            $output .= ($y == $player->y && $x == $player->x ? "<img src='../images/ninja_head.png' />" : "&nbsp;") . "</td>";
+            $output .= ($y == $player->y && $x == $player->x ? "<img src='./images/ninja_head.png' />" : "&nbsp;") . "</td>";
         }
         $output .= "</tr>";
     }
