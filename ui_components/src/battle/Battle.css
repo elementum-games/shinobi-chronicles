@@ -1,0 +1,66 @@
+
+
+
+
+
+/* BATTLE FIELD */
+.tilesContainer {
+    display: flex;
+    justify-content: space-evenly;
+    padding: 10px 0;
+}
+.tile {
+    height: 70px;
+    width: 70px;
+
+    display: inline-flex;
+    position: relative;
+    align-items: center;
+    justify-content: center;
+
+    background: #948d78;
+    border-radius: 35px;
+    border: 1px solid #807a68;
+}
+.tileIndex {
+    position: absolute;
+    bottom: 1px;
+    left: 0;
+    right: 0;
+    text-align: center;
+
+    color: white;
+    font-size: 8px;
+    opacity: 0.7;
+}
+.tileFighter {
+    height: 30px;
+    width: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: rgba(255,255,255,0.5);
+    border-radius: 15px;
+    border: 1px solid rgba(0,0,0,0.4);
+    color: black;
+}
+
+.tileFighter.ally {
+    background: rgba(0,0,255,0.4);
+}
+.tileFighter.enemy {
+    background: rgba(255,0,0,0.4);
+}
+
+.tilesContainer.movementActive .tile[data-player-tile="0"] {
+    cursor: pointer;
+}
+.tilesContainer.movementActive .tile:hover[data-player-tile="0"] {
+    background: #b1a990;
+}
+.tilesContainer.movementActive .tile.selected[data-player-tile="0"] {
+    background: #b1a990;
+    border-color: #5d594c;
+    box-shadow: 0 0 3px 0 black;
+}

@@ -1,27 +1,47 @@
-import { FighterDisplay } from "./FighterDisplay.js";
-import { BattleField } from "./BattleField.js";
-
-function Battle({
-  battle,
-  membersLink
+import { FighterAvatar } from "./FighterAvatar.js";
+import { ResourceBar } from "./ResourceBar.js";
+const styles = {
+  fighterDisplay: {
+    display: "flex",
+    flexDirection: "row",
+    gap: "8px"
+  },
+  opponent: {
+    flexDirection: "row-reverse"
+  }
+};
+export function FighterDisplay({
+  fighter,
+  showChakra,
+  isOpponent
 }) {
-  return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement(FightersAndField, {
-    player: battle.fighters[battle.playerId],
-    opponent: battle.fighters[battle.opponentId],
-    isSpectating: false,
-    fighters: battle.fighters,
-    field: battle.field,
-    membersLink: membersLink
-  }));
+  const containerStyles = { ...styles.fighterDisplay,
+    ...(isOpponent && styles.opponent)
+  };
+  return /*#__PURE__*/React.createElement("div", {
+    className: "fighterDisplay",
+    style: containerStyles
+  }, /*#__PURE__*/React.createElement(FighterAvatar, {
+    fighterName: fighter.name,
+    avatarLink: fighter.avatarLink,
+    maxAvatarSize: 125
+  }), /*#__PURE__*/React.createElement("div", {
+    className: "resourceBars"
+  }, /*#__PURE__*/React.createElement(ResourceBar, {
+    currentAmount: fighter.health,
+    maxAmount: fighter.maxHealth,
+    resourceType: "health"
+  }), !showChakra && /*#__PURE__*/React.createElement(ResourceBar, {
+    currentAmount: 40,
+    maxAmount: 100,
+    resourceType: "chakra"
+  })));
 }
-
-function FightersAndField({
+export function FighterDisplays({
+  membersLink,
   player,
   opponent,
-  membersLink,
-  isSpectating,
-  fighters,
-  field
+  isSpectating
 }) {
   return /*#__PURE__*/React.createElement("table", {
     className: "table"
@@ -52,10 +72,5 @@ function FightersAndField({
     showChakra: false
   }))), /*#__PURE__*/React.createElement("tr", null, /*#__PURE__*/React.createElement("td", {
     colSpan: "2"
-  }, /*#__PURE__*/React.createElement(BattleField, {
-    fighters: fighters,
-    tiles: field.tiles
-  })))));
+  }))));
 }
-
-window.Battle = Battle;

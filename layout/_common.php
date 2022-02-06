@@ -23,7 +23,7 @@ HTML;
     }
 
     return <<<HTML
-<!doctype HTML public>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 	<title>Shinobi Chronicles RPG</title>

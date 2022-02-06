@@ -1,17 +1,28 @@
 <?php
   /**
    * @var System $system
+   * @var BattleManager $battleManager
    * @var Battle $battle
+   *
  */
 ?>
+<link rel="stylesheet" type="text/css" href="ui_components/src/battle/Battle.css" />
 <div id="battleReactContainer"></div>
-<script type="text/javascript" src="<?= $system->getReactFile("battle/Battle") ?>"></script>
+<script type="module" src="<?= $system->getReactFile("battle/Battle") ?>"></script>
 <!--suppress JSUnresolvedVariable, JSUnresolvedFunction -->
 <script type="text/javascript">
-    const battleId = <?= $battle->battle_id ?>;
     const battleContainer = document.querySelector("#battleReactContainer");
-    ReactDOM.render(
-        React.createElement(Battle, { battleId: battleId }),
-        battleContainer
-    );
+
+    const battle = <?= json_encode($battleManager->getApiResponse()) ?>;
+    const membersLink = "<?= $system->links['members'] ?>";
+
+    window.addEventListener('load', () => {
+        ReactDOM.render(
+            React.createElement(Battle, {
+                battle: battle,
+                membersLink: membersLink
+            }),
+            battleContainer
+        );
+    })
 </script>
