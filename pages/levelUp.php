@@ -118,7 +118,7 @@ function rankUp(): bool {
 		
 			switch($player->exam_stage) {
 				case 1:
-					if($hand_seals == $jutsu_data[1]['hand_seals'] && $player->checkInventory($jutsu_data[1]['jutsu_id'], 'jutsu')) {
+					if($hand_seals == $jutsu_data[1]['hand_seals'] && $player->hasJutsu($jutsu_data[1]['jutsu_id'])) {
 						$player->exam_stage = 2;
 					}
 					else {
@@ -128,7 +128,7 @@ function rankUp(): bool {
 					}
 					break;
 				case 2:
-					if($hand_seals == $jutsu_data[2]['hand_seals'] && $player->checkInventory($jutsu_data[2]['jutsu_id'], 'jutsu')) {
+					if($hand_seals == $jutsu_data[2]['hand_seals'] && $player->hasJutsu($jutsu_data[2]['jutsu_id'])) {
 						$player->exam_stage = 3;
 					}
 					else {
@@ -136,7 +136,7 @@ function rankUp(): bool {
 					}
 					break;
 				case 3:
-					if($hand_seals == $jutsu_data[3]['hand_seals'] && $player->checkInventory($jutsu_data[3]['jutsu_id'], 'jutsu')) {
+					if($hand_seals == $jutsu_data[3]['hand_seals'] && $player->hasJutsu($jutsu_data[3]['jutsu_id'])) {
 						$player->exam_stage = 4;
 					}
 					else {
@@ -177,7 +177,7 @@ function rankUp(): bool {
 			$gold_color = '#FDD017';
 			echo "<tr><td>
 			<div style='margin:0px;position:relative;'>
-			<style type='text/css'>
+			<style>
 			#handSeals p {
 				display: inline-block;
 				width: 80px;

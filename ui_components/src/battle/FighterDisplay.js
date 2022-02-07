@@ -12,7 +12,7 @@ const styles = {
     }
 };
 
-export function FighterDisplay({ fighter, showChakra, isOpponent }) {
+export default function FighterDisplay({ fighter, showChakra, isOpponent }) {
     const containerStyles = {
         ...styles.fighterDisplay,
         ...(isOpponent && styles.opponent)

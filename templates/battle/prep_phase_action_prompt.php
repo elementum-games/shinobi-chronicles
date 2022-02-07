@@ -4,7 +4,7 @@
  */
 
 ?>
-<style type='text/css'>
+<style>
     #items p.item {
         display: inline-block;
         padding: 8px 10px;
@@ -38,7 +38,7 @@
 $heal_items = [];
 if(!empty($player->items)) {
     foreach($player->items as $item) {
-        if ($item['effect'] === 'heal') {
+        if ($item->effect === 'heal') {
             $heal_items[] = $item;
         }
     }
@@ -53,9 +53,9 @@ if(!empty($player->items)) {
     <?php if(count($heal_items) > 0): ?>
         <div id='items'>
             <?php foreach($heal_items as $item): ?>
-            <p class='item' data-id='<?= $item['item_id'] ?>'>
-                <b><?= $item['name'] ?></b> (<?= $item['effect'] ?> <?= $item['effect_amount'] ?>)<br />
-                (Owned <?= $item['quantity'] ?>)
+            <p class='item' data-id='<?= $item->id ?>'>
+                <b><?= $item->name ?></b> (<?= $item->effect ?> <?= $item->effect_amount ?>)<br />
+                (Owned <?= $item->quantity ?>)
                 <?php endforeach; ?>
         </div>
         <form action='<?= $self_link ?>' method='post'>

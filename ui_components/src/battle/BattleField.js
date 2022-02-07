@@ -9,7 +9,7 @@ type Props = {|
     +isMovementPhase: boolean,
 |};
 
-export function BattleField({ fighters, tiles, isMovementPhase }: Props) {
+export default function BattleField({ fighters, tiles, isMovementPhase }: Props) {
     const fightersForIds = (ids: string[]) => {
         return ids.map(id => fighters[id]).filter(Boolean)
     };

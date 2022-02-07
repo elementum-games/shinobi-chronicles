@@ -1,4 +1,4 @@
-<style type='text/css'>
+<style>
     .resourceBarOuter {
         height: 16px;
         width: 225px;

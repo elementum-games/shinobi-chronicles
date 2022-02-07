@@ -97,13 +97,13 @@ function members() {
 					</th>
 				</tr>
 				<tr>
-					<th tyle='width: 33%;'>
+					<th style='width: 33%;'>
 						Name
 					</th>
-					<th tyle='width: 33%;'>
+					<th style='width: 33%;'>
 						Rank
 					</th>
-					<th tyle='width: 33%;'>
+					<th style='width: 33%;'>
 						Level
 					</th>
 				</tr>";

@@ -1,4 +1,4 @@
-<style type='text/css'>
+<style>
     .avatarContainer {
         width: 100px;
         height: 100px;

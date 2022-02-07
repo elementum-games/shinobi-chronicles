@@ -1,4 +1,4 @@
-
+// @flow strict-local
 
 const styles = {
     avatarContainer: {

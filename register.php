@@ -259,7 +259,7 @@ if(!$register_ok) {
 
 
     echo "
-	<style type='text/css'>
+	<style>
 	label {
 		width:125px;
 		display:inline-block;

@@ -10,7 +10,7 @@ const styles = {
     flexDirection: "row-reverse"
   }
 };
-export function FighterDisplay({
+export default function FighterDisplay({
   fighter,
   showChakra,
   isOpponent

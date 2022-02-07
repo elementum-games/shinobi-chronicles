@@ -6,12 +6,22 @@ export type BattleType = {|
     +fighters: $ReadOnlyArray<FighterType>,
     +playerId: string,
     +opponentId: string,
+    +playerDefaultAttacks: $ReadOnlyArray<JutsuType>,
     +field: BattleFieldType,
     +isSpectating: boolean,
     +isMovementPhase: boolean,
     +isAttackPhase: boolean,
     +isPreparationPhase: boolean,
     +isComplete: boolean,
+    +playerActionSubmitted: boolean,
+    +turnSecondsRemaining: number,
+    +lastTurnText: string,
+    +currentPhaseLabel: string,
+    +jutsuTypes: {|
+        +ninjutsu: string,
+        +taijutsu: string,
+        +genjutsu: string,
+    |}
 |};
 
 // BattleApiPresenter::fighterResponse
@@ -23,6 +33,8 @@ export type FighterType = {|
     +maxAvatarSize: number,
     +health: number,
     +maxHealth: number,
+    +hasBloodline: boolean,
+    +equippedWeapons: $ReadOnlyArray<WeaponType>
 |};
 
 // BattleApiPresenter::fieldResponse
@@ -34,3 +46,14 @@ export type BattleFieldType = {|
 export type BattleFieldTileType = {|
     +fighterIds: $ReadOnlyArray<String>
 |};
+
+// BattleApiPresenter::jutsuResponse
+export type JutsuType = {|
+    +id: number,
+    +combatId: string,
+|};
+
+// BattleApiPresenter::weaponResponse
+export type WeaponType = {|
+|};
+

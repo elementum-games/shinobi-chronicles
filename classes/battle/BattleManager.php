@@ -274,7 +274,7 @@ class BattleManager {
         $player = $this->player;
         $opponent = $this->opponent;
 
-        //require 'templates/battle/battle_interface.php';
+        // require 'templates/battle/battle_interface.php';
         require 'templates/battle/battle_interface_v2.php';
     }
 
@@ -298,6 +298,8 @@ class BattleManager {
             player: $player,
             opponent: $opponent,
             is_spectating: $this->spectate,
+            player_action_submitted: $this->playerActionSubmitted(),
+            player_default_attacks: $this->getDefaultAttacks()
         );
     }
 
@@ -654,16 +656,16 @@ class BattleManager {
         // Set weapon data into jutsu
         if($attack->jutsu->jutsu_type == Jutsu::TYPE_TAIJUTSU && $action->weapon_id) {
             // Apply element to jutsu
-            if($fighter->items[$action->weapon_id]['effect'] == 'element') {
+            if($fighter->items[$action->weapon_id]->effect == 'element') {
                 $attack->jutsu->element = $fighter->elements['first'];
-                $attack->raw_damage *= 1 + ($fighter->items[$action->weapon_id]['effect_amount'] / 100);
+                $attack->raw_damage *= 1 + ($fighter->items[$action->weapon_id]->effect_amount / 100);
             }
             // Set effect in jutsu
             else {
                 $attack->jutsu->setWeapon(
                     $action->weapon_id,
-                    $fighter->items[$action->weapon_id]['effect'],
-                    $fighter->items[$action->weapon_id]['effect_amount'],
+                    $fighter->items[$action->weapon_id]->effect,
+                    $fighter->items[$action->weapon_id]->effect_amount,
                 );
             }
         }
@@ -694,7 +696,7 @@ class BattleManager {
 
         // Weapon effect for taijutsu (IN PROGRESS)
         if($attack->jutsu->weapon_id) {
-            if($user->items[$attack->jutsu->weapon_id]['effect'] != 'diffuse') {
+            if($user->items[$attack->jutsu->weapon_id]->effect != 'diffuse') {
                 $this->effects->setEffect(
                     $user,
                     $target->combat_id,
@@ -1035,19 +1037,19 @@ class BattleManager {
                     if ($this->player->health >= $max_health) {
                         throw new Exception("You can't heal any further!");
                     }
-                    if ($item['effect'] === 'heal') {
-                        if (--$this->player->items[$item_id]['quantity'] === 0) {
+                    if ($item->effect === 'heal') {
+                        if (--$this->player->items[$item_id]->quantity === 0) {
                             unset($this->player->items[$item_id]);
                         }
 
-                        $this->player->health += $item['effect_amount'];
+                        $this->player->health += $item->effect_amount;
                         if ($this->player->health >= $max_health) {
                             $this->player->health = $max_health;
                         }
 
                         $this->player->updateData();
                         $this->player->updateInventory();
-                        $this->battle->battle_text .= sprintf("%s used a %s and healed for %.2f[br]", $this->player->user_name, $item['name'], $item['effect_amount']);
+                        $this->battle->battle_text .= sprintf("%s used a %s and healed for %.2f[br]", $this->player->user_name, $item->name, $item->effect_amount);
                         $this->updateData();
                     }
                 }
@@ -1073,7 +1075,7 @@ class BattleManager {
         $this->battle->fighter_actions[$npc->combat_id] = new FighterAttackAction(
             fighter_id: $npc->combat_id,
             jutsu_id: $jutsu->id,
-            jutsu_purchase_type: Jutsu::PURCHASE_TYPE_PURCHASEABLE,
+            jutsu_purchase_type: Jutsu::PURCHASE_TYPE_PURCHASABLE,
             weapon_id: null,
             // TODO: real AI targeting
             target: new AttackFighterIdTarget($this->player->combat_id)
@@ -1138,7 +1140,7 @@ class BattleManager {
                 if($jutsu_type == Jutsu::TYPE_TAIJUTSU && !empty($FORM_DATA['weapon_id'])) {
                     $weapon_id = (int)$this->system->clean($FORM_DATA['weapon_id']);
                     if($weapon_id && $this->player->hasItem($weapon_id)) {
-                        if(array_search($weapon_id, $this->player->equipped_weapons) === false) {
+                        if(array_search($weapon_id, $this->player->equipped_weapon_ids) === false) {
                             $weapon_id = 0;
                         }
                     }
@@ -1256,7 +1258,7 @@ class BattleManager {
         if($action->jutsu_purchase_type == Jutsu::PURCHASE_TYPE_DEFAULT) {
             $jutsu = $this->default_attacks[$action->jutsu_id] ?? null;
         }
-        else if($action->jutsu_purchase_type == Jutsu::PURCHASE_TYPE_PURCHASEABLE) {
+        else if($action->jutsu_purchase_type == Jutsu::PURCHASE_TYPE_PURCHASABLE) {
             $jutsu = $fighter->jutsu[$action->jutsu_id] ?? null;
         }
         else if($action->jutsu_purchase_type == Jutsu::PURCHASE_TYPE_BLOODLINE) {

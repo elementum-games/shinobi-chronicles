@@ -13,7 +13,7 @@
     require_once 'templates/battle/fighter_avatar.php';
 ?>
 
-<style type='text/css'>
+<style>
     .tilesContainer {
         display: flex;
         justify-content: space-evenly;

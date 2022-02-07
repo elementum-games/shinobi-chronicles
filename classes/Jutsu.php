@@ -11,8 +11,8 @@ class Jutsu {
     const ELEMENT_LIGHTNING = 'Lightning';
 
     const PURCHASE_TYPE_DEFAULT = 1;
-    const PURCHASE_TYPE_PURCHASEABLE = 2;
-    const PURCHASE_TYPE_NON_PURCHASEABLE = 3;
+    const PURCHASE_TYPE_PURCHASABLE = 2;
+    const PURCHASE_TYPE_NON_PURCHASABLE = 3;
     const PURCHASE_TYPE_BLOODLINE = 4;
 
     const TYPE_NINJUTSU = 'ninjutsu';

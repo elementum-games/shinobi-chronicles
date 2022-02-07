@@ -22,7 +22,7 @@
     require 'templates/battle/fighter_avatar.php';
 ?>
 
-<style type='text/css'>
+<style>
     .fighterDisplay {
         display: flex;
         flex-direction: row;

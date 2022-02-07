@@ -335,8 +335,8 @@ $constraints['jutsu'] = [
         'input_type' => 'select',
         'options' => [
             Jutsu::PURCHASE_TYPE_DEFAULT => 'default',
-            Jutsu::PURCHASE_TYPE_PURCHASEABLE => 'purchasable',
-            Jutsu::PURCHASE_TYPE_NON_PURCHASEABLE => 'non-purchasable',
+            Jutsu::PURCHASE_TYPE_PURCHASABLE => 'purchasable',
+            Jutsu::PURCHASE_TYPE_NON_PURCHASABLE => 'non-purchasable',
         ],
     ],
     'effect' => [
@@ -387,12 +387,20 @@ $constraints['item'] = [
     'purchase_type' => [
         'data_type' => 'int',
         'input_type' => 'radio',
-        'options' => [1 => 'purchasable', 2 => 'event'],
+        'options' => [
+            Item::PURCHASE_TYPE_PURCHASABLE => 'purchasable',
+            Item::PURCHASE_TYPE_EVENT => 'event'
+        ],
     ],
     'use_type' => [
         'data_type' => 'int',
         'input_type' => 'radio',
-        'options' => [1 => 'weapon', 2 => 'armor', 3 => 'consumable', 4 => 'Special'],
+        'options' => [
+            Item::USE_TYPE_WEAPON => 'weapon',
+            Item::USE_TYPE_ARMOR => 'armor',
+            Item::USE_TYPE_CONSUMABLE => 'consumable',
+            Item::USE_TYPE_SPECIAL => 'Special'
+        ],
     ],
     'effect' => [
         'data_type' => 'string',

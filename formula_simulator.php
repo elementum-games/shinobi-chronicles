@@ -562,7 +562,7 @@ else if(isset($_POST['run_simulation']) && $mode == 'scenarios') {
         target_type: Jutsu::TARGET_TYPE_DIRECTION,
         use_cost: 0,
         purchase_cost: 0,
-        purchase_type: Jutsu::PURCHASE_TYPE_PURCHASEABLE,
+        purchase_type: Jutsu::PURCHASE_TYPE_PURCHASABLE,
         parent_jutsu: 0,
         element: Jutsu::ELEMENT_NONE,
         hand_seals: 1
@@ -595,7 +595,7 @@ else if(isset($_POST['run_simulation']) && $mode == 'scenarios') {
         target_type: Jutsu::TARGET_TYPE_FIGHTER_ID,
         use_cost: 0,
         purchase_cost: 0,
-        purchase_type: Jutsu::PURCHASE_TYPE_PURCHASEABLE,
+        purchase_type: Jutsu::PURCHASE_TYPE_PURCHASABLE,
         parent_jutsu: 0,
         element: Jutsu::ELEMENT_NONE,
         hand_seals: 2
@@ -701,7 +701,7 @@ else if(isset($_POST['run_simulation']) && $mode == 'scenarios') {
     }
 
     $label_width = 120;
-    echo "<style type='text/css'>
+    echo "<style>
         label {
             display: inline-block;
             text-align: left;

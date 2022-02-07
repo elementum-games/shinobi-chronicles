@@ -1,5 +1,5 @@
 import { FighterAvatar } from "./FighterAvatar.js";
-export function BattleField({
+export default function BattleField({
   fighters,
   tiles,
   isMovementPhase

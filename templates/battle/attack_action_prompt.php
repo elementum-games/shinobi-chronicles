@@ -257,7 +257,7 @@ $prefill_item_id = $_POST['item_id'] ?? '';
         }
     }
 </script>
-<style type='text/css'>
+<style>
     #handSeals {
         padding-top: 4px;
         position: relative;
@@ -407,12 +407,12 @@ $prefill_item_id = $_POST['item_id'] ?? '';
     <p class='weapon' data-id='0' style='box-shadow: 0 0 4px 0 #000000;margin-top:14px;'>
         <b>None</b>
     </p>
-    <?php if(is_array($player->equipped_weapons)): ?>
-        <?php foreach($player->equipped_weapons as $item_id): ?>
+    <?php if(is_array($player->equipped_weapon_ids)): ?>
+        <?php foreach($player->equipped_weapon_ids as $item_id): ?>
             <p class='weapon' data-id='<?= $item_id ?>'>
-                <b><?= $player->items[$item_id]['name'] ?></b><br />
-                <?= ucwords(str_replace('_', ' ', $player->items[$item_id]['effect'])) ?>
-                (<?= $player->items[$item_id]['effect_amount'] ?>%)
+                <b><?= $player->items[$item_id]->name ?></b><br />
+                <?= ucwords(str_replace('_', ' ', $player->items[$item_id]->effect)) ?>
+                (<?= $player->items[$item_id]->effect_amount ?>%)
             </p>
         <?php endforeach; ?>
     <?php endif; ?>

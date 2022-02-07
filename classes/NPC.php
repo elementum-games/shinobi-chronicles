@@ -245,7 +245,7 @@ class NPC extends Fighter {
             target_type: Jutsu::TARGET_TYPE_FIGHTER_ID,
             use_cost: $this->rank * 5,
             purchase_cost: $this->rank * 1000,
-            purchase_type: Jutsu::PURCHASE_TYPE_PURCHASEABLE,
+            purchase_type: Jutsu::PURCHASE_TYPE_PURCHASABLE,
             parent_jutsu: 0,
             element: Jutsu::ELEMENT_NONE,
             hand_seals: ''

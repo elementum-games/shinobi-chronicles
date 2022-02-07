@@ -7,6 +7,7 @@ require_once __DIR__ . "/classes/Auth.php";
 require_once __DIR__ . "/classes/RankManager.php";
 
 require_once __DIR__ . "/classes/Jutsu.php";
+require_once __DIR__ . "/classes/Item.php";
 require_once __DIR__ . "/classes/Bloodline.php";
 require_once __DIR__ . "/classes/Item.php";
 

@@ -1,5 +1,7 @@
 <?php
 
+use JetBrains\PhpStorm\Pure;
+
 require_once __DIR__ . '/BattleEffectsManager.php';
 require_once __DIR__ . '/BattleLog.php';
 
@@ -331,5 +333,18 @@ class Battle {
 
     public function isMovementPhase(): bool {
         return $this->turn_type === Battle::TURN_TYPE_MOVEMENT;
+    }
+
+    #[Pure]
+    public function getCurrentPhaseLabel(): string {
+        if($this->isMovementPhase()) {
+            return "Movement";
+        }
+        else if($this->isAttackPhase()) {
+            return "Attack";
+        }
+        else {
+            return "[Invalid]";
+        }
     }
 }

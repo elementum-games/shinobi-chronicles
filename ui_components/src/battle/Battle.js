@@ -1,7 +1,9 @@
 // @flow strict-local
 
-import { FighterDisplay } from "./FighterDisplay.js";
-import { BattleField } from "./BattleField.js";
+import FighterDisplay from "./FighterDisplay.js";
+import BattleField from "./BattleField.js";
+import BattleLog from "./BattleLog.js";
+import BattleActionPrompt from "./BattleActionPrompt.js";
 
 import type { BattleType as BattleData } from "./battleSchema.js";
 
@@ -16,24 +18,30 @@ function Battle({
 }: Props) {
     return <div>
         <FightersAndField
-            player={battle.fighters[battle.playerId]}
-            opponent={battle.fighters[battle.opponentId]}
-            isSpectating={false}
-            fighters={battle.fighters}
-            field={battle.field}
+            battle={battle}
             membersLink={membersLink}
         />
+        {battle.isSpectating && <SpectateStatus />}
+        {!battle.isSpectating && !battle.isComplete && <BattleActionPrompt battle={battle} />}
+        {battle.lastTurnText != null && <BattleLog lastTurnText={battle.lastTurnText} />}
     </div>;
 }
 
+// Fighters and Field
+type FightersAndFieldProps = {|
+    +battle: BattleData,
+    +membersLink: String,
+|};
+
 function FightersAndField({
-    player,
-    opponent,
+    battle,
     membersLink,
-    isSpectating,
-    fighters,
-    field
-}) {
+}: FightersAndFieldProps) {
+    const player = battle.fighters[battle.playerId];
+    const opponent = battle.fighters[battle.opponentId];
+
+    const { fighters, field, isSpectating, isMovementPhase } = battle;
+
     return (
         <table className='table'>
             <tbody>
@@ -73,6 +81,7 @@ function FightersAndField({
                     <BattleField
                         fighters={fighters}
                         tiles={field.tiles}
+                        isMovementPhase={isMovementPhase}
                     />
                 </td>
             </tr>
@@ -80,5 +89,31 @@ function FightersAndField({
         </table>
     );
 }
+
+
+function SpectateStatus() {
+    return <div>
+        Spectate Status
+    </div>;
+
+    /*
+        <table class='table' style='margin-top:2px;'>
+        <tr><td style='text-align:center;'>
+            <?php if($battle->winner == Battle::TEAM1): ?>
+               <?=  $battle->player1->getName() ?> won!
+            <?php elseif($battle->winner == Battle::TEAM2): ?>
+                <?= $battle->player2->getName() ?> won!
+            <?php elseif($battle->winner == Battle::DRAW): ?>
+                Fight ended in a draw.
+            <?php else: ?>
+                <b><?= $battle->timeRemaining() ?></b> seconds remaining<br />
+                <a href='<?= $refresh_link ?>'>Refresh</a>
+            <?php endif; ?>
+        </td></tr>
+    </table>
+
+     */
+}
+
 
 window.Battle = Battle;
