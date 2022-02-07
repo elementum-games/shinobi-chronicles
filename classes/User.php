@@ -999,7 +999,7 @@ class User extends Fighter {
         $result = $this->system->query("SELECT * FROM `user_inventory` WHERE `user_id` = '{$this->user_id}'");
 
         $player_jutsu = [];
-        $player_items = [];
+        $player_item_inventory = [];
         $equipped_jutsu = [];
         $equipped_items = [];
 
@@ -1007,7 +1007,7 @@ class User extends Fighter {
         if($this->system->db_last_num_rows > 0) {
             $user_inventory = $this->system->db_fetch($result);
             $player_jutsu = json_decode($user_inventory['jutsu'], true);
-            $player_items = json_decode($user_inventory['items']);
+            $player_item_inventory = json_decode($user_inventory['items'], true);
             $equipped_jutsu = json_decode($user_inventory['equipped_jutsu']);
             $equipped_items = json_decode($user_inventory['equipped_items']);
         }
@@ -1084,17 +1084,17 @@ class User extends Fighter {
             $this->equipped_jutsu = [];
         }
 
-        if($player_items) {
-            $player_items_array = $player_items;
-            $player_items = [];
+        if($player_item_inventory) {
+            $player_items_array = $player_item_inventory;
+            $player_item_inventory = [];
             $player_items_string = '';
 
             foreach($player_items_array as $item) {
-                if(!is_numeric($item->id)) {
+                if(!is_numeric($item['item_id'])) {
                     continue;
                 }
-                $player_items[$item->id] = $item;
-                $player_items_string .= $item->id . ',';
+                $player_item_inventory[$item['item_id']] = $item;
+                $player_items_string .= $item['item_id'] . ',';
             }
             $player_items_string = substr($player_items_string, 0, strlen($player_items_string) - 1);
 
@@ -1104,9 +1104,8 @@ class User extends Fighter {
             if($this->system->db_last_num_rows > 0) {
                 while($item_data = $this->system->db_fetch($result)) {
                     $item_id = $item_data['item_id'];
-                    $this->items[$item_id] = Item::fromDb($item_data, $player_items[$item_id]->quantity);
+                    $this->items[$item_id] = Item::fromDb($item_data, $player_item_inventory[$item_id]['quantity']);
                 }
-
             }
             else {
                 $this->items = [];
