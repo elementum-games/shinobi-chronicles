@@ -35,6 +35,8 @@ export type FighterType = {|
     +maxAvatarSize: number,
     +health: number,
     +maxHealth: number,
+    +chakra: number,
+    +maxChakra: number,
     +hasBloodline: boolean,
     +equippedWeapons: $ReadOnlyArray<WeaponType>
 |};

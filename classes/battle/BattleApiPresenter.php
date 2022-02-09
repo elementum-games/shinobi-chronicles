@@ -102,6 +102,8 @@ class BattleApiPresenter {
             'maxAvatarSize' => $fighter->getAvatarSize(),
             'health' => $fighter->health,
             'maxHealth' => $fighter->max_health,
+            'chakra' => $fighter->chakra,
+            'maxChakra' => $fighter->max_chakra,
             'hasBloodline' => (bool)$fighter->bloodline_id,
         ];
     }

@@ -31,9 +31,9 @@ export default function FighterDisplay({
     currentAmount: fighter.health,
     maxAmount: fighter.maxHealth,
     resourceType: "health"
-  }), !showChakra && /*#__PURE__*/React.createElement(ResourceBar, {
-    currentAmount: 40,
-    maxAmount: 100,
+  }), showChakra && /*#__PURE__*/React.createElement(ResourceBar, {
+    currentAmount: fighter.chakra,
+    maxAmount: fighter.maxChakra,
     resourceType: "chakra"
   })));
 }

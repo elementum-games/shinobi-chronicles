@@ -13,7 +13,6 @@ class NPC extends Fighter {
     public string $id;
     public int $ai_id;
     public string $name;
-    public float $max_health;
     public int $level;
     public string $gender;
 
@@ -21,7 +20,9 @@ class NPC extends Fighter {
     public float $rank_progress;
 
     public float $health;
-    public float $chakra = 0;
+    public float $max_health;
+    public float $chakra = 100;
+    public float $max_chakra = 100;
     public float $stamina = 0;
 
     public float $ninjutsu_skill;

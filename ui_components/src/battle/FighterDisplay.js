@@ -31,10 +31,10 @@ export default function FighterDisplay({ fighter, showChakra, isOpponent }) {
                     maxAmount={fighter.maxHealth}
                     resourceType="health"
                 />
-                {!showChakra &&
+                {showChakra &&
                     <ResourceBar
-                        currentAmount={40}
-                        maxAmount={100}
+                        currentAmount={fighter.chakra}
+                        maxAmount={fighter.maxChakra}
                         resourceType="chakra"
                     />
                 }

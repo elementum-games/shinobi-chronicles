@@ -65,14 +65,14 @@ function FightersAndField({
                 <td>
                     <FighterDisplay
                         fighter={player}
-                        showChakra={isSpectating}
+                        showChakra={!isSpectating}
                     />
                 </td>
                 <td>
                     <FighterDisplay
                         fighter={opponent}
                         isOpponent={true}
-                        showChakra={false}
+                        showChakra={!isSpectating}
                     />
                 </td>
             </tr>

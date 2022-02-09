@@ -52,11 +52,11 @@ function FightersAndField({
     }
   }, opponent.name))), /*#__PURE__*/React.createElement("tr", null, /*#__PURE__*/React.createElement("td", null, /*#__PURE__*/React.createElement(FighterDisplay, {
     fighter: player,
-    showChakra: isSpectating
+    showChakra: !isSpectating
   })), /*#__PURE__*/React.createElement("td", null, /*#__PURE__*/React.createElement(FighterDisplay, {
     fighter: opponent,
     isOpponent: true,
-    showChakra: false
+    showChakra: !isSpectating
   }))), /*#__PURE__*/React.createElement("tr", null, /*#__PURE__*/React.createElement("td", {
     colSpan: "2"
   }, /*#__PURE__*/React.createElement(BattleField, {
