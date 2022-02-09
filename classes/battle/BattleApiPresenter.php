@@ -11,7 +11,8 @@ class BattleApiPresenter {
         Fighter $opponent,
         bool $is_spectating,
         bool $player_action_submitted,
-        array $player_default_attacks
+        array $player_default_attacks,
+        array $player_equipped_jutsu
     ): array {
         return [
             'id' => $battle->battle_id,
@@ -21,7 +22,22 @@ class BattleApiPresenter {
             ],
             'playerId' => $player->combat_id,
             'opponentId' => $opponent->combat_id,
-            'playerDefaultAttacks' => $player_default_attacks,
+            'playerDefaultAttacks' => array_map(
+                function($jutsu) use($battle) {
+                    return BattleApiPresenter::jutsuResponse($jutsu, $battle);
+                },
+                array_values($player_default_attacks)
+            ),
+            'playerEquippedJutsu' => array_map(
+                function(array $id_and_type) use ($player, $battle) {
+                    if(!$player->hasJutsu($id_and_type['id'])) {
+                        return null;
+                    }
+
+                    return BattleApiPresenter::jutsuResponse($player->jutsu[$id_and_type['id']], $battle);
+                },
+                $player_equipped_jutsu
+            ),
             'playerEquippedWeapons' => array_map(
                 function($weapon_id) use ($player) {
                     if(!$player->hasItem($weapon_id)) {
@@ -31,6 +47,12 @@ class BattleApiPresenter {
                     return BattleApiPresenter::weaponResponse($player->items[$weapon_id]);
                 },
                 $player->equipped_weapon_ids
+            ),
+            'playerBloodlineJutsu' => array_map(
+                function(Jutsu $jutsu) use ($player, $battle) {
+                    return BattleApiPresenter::jutsuResponse($jutsu, $battle);
+                },
+                $player->bloodline != null ? array_values($player->bloodline->jutsu) : []
             ),
             'field' => BattleApiPresenter::fieldResponse($battle_field),
             'isSpectating' => $is_spectating,
@@ -84,10 +106,13 @@ class BattleApiPresenter {
         ];
     }
 
-    private static function jutsuReponse(Jutsu $jutsu): array {
+    private static function jutsuResponse(Jutsu $jutsu, Battle $battle): array {
         return [
             'id' => $jutsu->id,
             'combatId' => $jutsu->combat_id,
+            'name' => $jutsu->name,
+            'activeCooldownTurnsLeft' => $battle->jutsu_cooldowns[$jutsu->combat_id] ?? 0,
+            'jutsuType' => $jutsu->jutsu_type,
         ];
     }
 

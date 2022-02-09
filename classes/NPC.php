@@ -272,6 +272,9 @@ class NPC extends Fighter {
     public function getInventory() {
     }
 
+    public function hasJutsu(int $jutsu_id): bool {
+        return false;
+    }
     public function hasItem(int $item_id): bool {
         return false;
     }

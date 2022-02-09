@@ -1,17 +1,14 @@
 // @flow
-import * as React from "react";
+import type React from "react";
 
-export default function AttackActionPrompt({ battle }) {
+export default function AttackActionPrompt({ battle }): React$Node {
     const player = battle.fighters[battle.playerId];
     const opponent = battle.fighters[battle.opponentId];
 
-    /*
-    <input type='hidden' id='hand_seal_input' name='hand_seals' value='<?= $prefill_hand_seals ?>' />
-<input type='hidden' id='jutsuType' name='jutsu_type' value='<?= $prefill_jutsu_type ?>' />
-<input type='hidden' id='weaponID' name='weapon_id' value='<?= $prefill_weapon_id ?>' />
-<input type='hidden' id='jutsuID' name='jutsu_id' value='<?= $prefill_jutsu_id ?>' />
-<input type='hidden' id='itemID' name='item_id' value='<?= $prefill_item_id ?>' />
-     */
+    const [handSeals, setHandSeals] = React.useState([]);
+    const [jutsuType, setJutsuType] = React.useState([]);
+    const [weaponId, setWeaponId] = React.useState([]);
+    const [jutsuId, setJutsuId] = React.useState([]);
 
     const isSelectingHandSeals = true;
     const isSelectingWeapon = false;
@@ -26,15 +23,28 @@ export default function AttackActionPrompt({ battle }) {
             </tr>
             <tr>
                 <th className='jutsuCategoryHeader'>
-                    <span>Ninjutsu</span>
-                    <span>Taijutsu</span>
-                    <span>Genjutsu</span>
-                    {player.hasBloodline && <span>Bloodline</span>}
+                    <div>
+                        <span>Ninjutsu</span>
+                        <span>Taijutsu</span>
+                        <span>Genjutsu</span>
+                        {player.hasBloodline && <span>Bloodline</span>}
+                    </div>
                 </th>
             </tr>
             <tr>
                 <td>
-                    <JutsuInput />
+                    <JutsuInput
+                        battle={battle}
+                        player={player}
+                    />
+                    <input type='hidden' id='hand_seal_input' name='hand_seals' value='<?= $prefill_hand_seals ?>' />
+                    <input type='hidden' id='jutsuType' name='jutsu_type' value='<?= $prefill_jutsu_type ?>' />
+                    <input type='hidden' id='weaponID' name='weapon_id' value='<?= $prefill_weapon_id ?>' />
+                    <input type='hidden' id='jutsuID' name='jutsu_id' value='<?= $prefill_jutsu_id ?>' />
+                    <input type='hidden' id='itemID' name='item_id' value='<?= $prefill_item_id ?>' />
+                    <p style={{ display: "block", textAlign: "center", margin: "auto" }}>
+                        <input id='submitbtn' type='submit' name='attack' value='Submit' />
+                    </p>
                 </td></tr>
         </React.Fragment>
     );
@@ -78,120 +88,104 @@ function WeaponInput({ fighter }) {
     );
 }
 
-const NINJUTSU = 'ninjutsu', TAIJUTSU = 'taijutsu', GENJUTSU = 'genjutsu';
-
-function JutsuInput() {
-    let  c1_count = 0, c2_count = 0, c3_count = 0;
-
-    const categories = [
-        battle.jutsuTypes.ninjutsu,
-        battle.jutsuTypes.taijutsu,
-        battle.jutsuTypes.genjutsu,
+function JutsuInput({ battle, player }) {
+    const standardCategories = [
+        {
+            key: 'ninjutsu',
+            jutsuType: battle.jutsuTypes.ninjutsu,
+            initial: 'N',
+        },
+        {
+            key: 'taijutsu',
+            jutsuType: battle.jutsuTypes.taijutsu,
+            initial: 'T',
+        },
+        {
+            key: 'genjutsu',
+            jutsuType: battle.jutsuTypes.genjutsu,
+            initial: 'G',
+        },
     ]
 
     return (
-        <div id='jutsu'>
-            {categories.map((category) => (
+        <div id='jutsuContainer'>
+            {standardCategories.map((category, x) => {
+                let categoryJutsuCount = 1;
+
+                return (
+                    <div className='jutsuCategory' key={x}>
+                        {battle.playerDefaultAttacks
+                            .filter(jutsu => jutsu.jutsuType === category.jutsuType)
+                            .map((jutsu, i) => (
+                                <Jutsu
+                                    key={i}
+                                    jutsu={jutsu}
+                                    hotkeyDisplay={`${category.initial}${categoryJutsuCount}`}
+                                />
+                            ))}
+
+                        {battle.playerEquippedJutsu
+                            .filter(jutsu => jutsu.jutsuType === category.jutsuType)
+                            .map((jutsu, i) => {
+                                return (
+                                    <Jutsu
+                                        key={i}
+                                        jutsu={jutsu}
+                                        hotkeyDisplay={`${category.initial}${categoryJutsuCount}`}
+                                    />
+                                )
+                            })}
+                    </div>
+                );
+            })}
+
+            {player.hasBloodline && battle.playerBloodlineJutsu.length > 0 && (
                 <div className='jutsuCategory'>
-                    {battle.playerDefaultAttacks.filter(jutsu => jutsu.type === battles.jutsuTypes)}
-                    <?php foreach($battleManager->default_attacks as $attack): ?>
-                    <?php if($attack->jutsu_type != $jutsu_types[$i]) continue; ?>
-                    <span id='default<?= $c1_count ?>'
-                          className='jutsuName <?= $jutsu_types[$i] ?>'
-                          data-handseals='<?= ($attack->jutsu_type != Jutsu::TYPE_TAIJUTSU ? $attack->hand_seals : '') ?>'
-                          data-id='<?= $attack->id ?>'
-                    >
-        <?= $attack->name ?><br/>
-        <strong>D<?= $c1_count ?></strong>
-        </span><br/>
-                    <?php $c1_count++; ?>
-                    <?php endforeach; ?>
-
-                    <?php if(is_array($player->equipped_jutsu)): ?>
-                    <?php foreach($player->equipped_jutsu as $jutsu): ?>
-                    <?php
-                    /!** @var Jutsu jutsu *!/
-                    if($player->jutsu[$jutsu['id']]->jutsu_type != $jutsu_types[$i]) {
-                    continue;
-                    }
-
-                    $player_jutsu = $player->jutsu[$jutsu['id']];
-                    $player_jutsu->setCombatId($player->combat_id);
-
-                    $cd_left = $battle->jutsu_cooldowns[$player_jutsu->combat_id] ?? 0;
-                    ?>
-
-                    <div
-                        id='<?= $jutsu_types[$i] ?><?= $c2_count ?>'
-                        className='jutsuName <?= $jutsu_types[$i] ?>'
-                        data-handseals='<?= $player_jutsu->hand_seals ?>'
-                        data-id='<?= $jutsu[' id'] ?>'
-                        aria-disabled='<?= ($cd_left > 0 ? "true" : "false") ?>'
-                    >
-                        <?= $player_jutsu->name ?><br/>
-                        <?php if($cd_left > 0): ?>
-                        (CD: <?= $cd_left ?> turns)
-                        <?php else: ?>
-                        <strong><?= strtoupper($jutsu_types[$i][0]) ?><?= $c2_count ?></strong>
-                        <?php endif; ?>
-                    </div><br/>
-                    <?php $c2_count++; ?>
-                    <?php endforeach; ?>
-                    <?php $c2_count = 0; ?>
-                    <?php endif; ?>
+                    {battle.playerBloodlineJutsu.map((jutsu, i) => (
+                        <Jutsu
+                            key={i}
+                            jutsu={jutsu}
+                            hotkeyDisplay={`B${i}`}
+                            isBloodline={true}
+                        />
+                    ))}
                 </div>
-            ))}
-
-            <!-- Display bloodline jutsu-->
-            {player.hasBloodline && <JutsuCategoryList />}
-
-
-            <form action='<?= $self_link ?>' method='post'>
-                <input type='hidden' id='hand_seal_input' name='hand_seals' value='<?= $prefill_hand_seals ?>' />
-                <input type='hidden' id='jutsuType' name='jutsu_type' value='<?= $prefill_jutsu_type ?>' />
-                <input type='hidden' id='weaponID' name='weapon_id' value='<?= $prefill_weapon_id ?>' />
-                <input type='hidden' id='jutsuID' name='jutsu_id' value='<?= $prefill_jutsu_id ?>' />
-                <input type='hidden' id='itemID' name='item_id' value='<?= $prefill_item_id ?>' />
-                <p style='display:block;text-align:center;margin:auto;'>
-                    <input id='submitbtn' type='submit' name='attack' value='Submit' />
-                </p>
-            </form>
+            )}
         </div>
     );
 }
 
-function JutsuCategoryList({defaultJutsu, equippedJutsu, bloodlineJutsu}) {
+function Jutsu({
+    jutsu,
+    hotkeyDisplay,
+    isBloodline = false
+}: {
+    +jutsu: JutsuType,
+    +hotkeyDisplay: string,
+    +isBloodline?: boolean
+}) {
     return (
-        <div className='jutsuCategory'>
-            <?php if(!empty($player->bloodline->jutsu)): ?>
-            <?php foreach($player->bloodline->jutsu as $id => $jutsu): ?>
-            <?php
-            $jutsu->setCombatId($player->combat_id);
-            $cd_left = $battle->jutsu_cooldowns[$jutsu->combat_id] ?? 0;
-            ?>
-
-            <div
-                id='bloodline<?= $c3_count ?>'
-                className='jutsuName bloodline_jutsu'
-                data-handseals='<?= $jutsu->hand_seals ?>'
-                data-id='<?= $id ?>'
-                aria-disabled='<?= ($cd_left > 0 ? "true" : "false") ?>'
-            >
-                <?= $jutsu->name ?><br/>
-                <?php if($cd_left > 0): ?>
-                (CD: <?= $cd_left ?> turns)
-                <?php else: ?>
-                <strong>B<?= $c3_count ?></strong>
-                <?php endif; ?>
-            </div><br/>
-            <?php $c3_count++; ?>
-            <?php endforeach; ?>
-            <?php endif; ?>
+        <div
+            className={`jutsuName ${isBloodline ? 'bloodline_jutsu' : jutsu.jutsuType}`}
+            /*data-handseals='<?= $player_jutsu->hand_seals ?>'
+            data-id='<?= $jutsu[' id'] ?>'*/
+            aria-disabled={jutsu.activeCooldownTurnsLeft > 0}
+        >
+            {jutsu.name}
+            <br />
+            {jutsu.activeCooldownTurnsLeft > 0 ?
+                <span>{`(CD: ${jutsu.activeCooldownTurnsLeft} turns)`}</span>
+                :
+                <strong>{hotkeyDisplay}</strong>
+            }
         </div>
-    )
+    );
 }
 
+// gold color when selected
+//
 
+/*
 function setAbilityClickHandlers() {
     let hand_seals = [];
     let hand_seal_prompt = 'Please enter handseals (click jutsu name for hint):';
@@ -217,8 +211,8 @@ function setAbilityClickHandlers() {
             if(hand_seals[x] === seal) {
                 hand_seals.splice(x,1);
                 break;
-            }
-        }*!/
+            }*!/
+        }
     }
     // Update display
     $('#hand_seal_input').val(hand_seals.join('-'));
@@ -433,6 +427,7 @@ function handleKeyUp(event) {
         //for visual so user knows selection is made
     }
 }
+*/
 
 /*
 

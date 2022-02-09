@@ -299,7 +299,8 @@ class BattleManager {
             opponent: $opponent,
             is_spectating: $this->spectate,
             player_action_submitted: $this->playerActionSubmitted(),
-            player_default_attacks: $this->getDefaultAttacks()
+            player_default_attacks: $this->getDefaultAttacks(),
+            player_equipped_jutsu: $player->equipped_jutsu
         );
     }
 

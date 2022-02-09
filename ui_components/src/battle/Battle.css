@@ -75,14 +75,26 @@
 #handSeals {
     padding-top: 4px;
     position: relative;
+
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+
+    align-content: center;
+    align-items: center;
+    justify-content: center;
 }
 
 #handSeals p {
-    display: inline-block;
-    width: 80px;
+    width: 15%; /* 6 per row */
     height: 90px;
-    margin: 4px;
+    margin: 0;
+    padding: 0;
     position: relative;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 #handSeals img {
@@ -138,19 +150,30 @@
     padding-right: 20px;
 }
 
-#jutsu {
+#jutsuContainer {
     padding-left: 5px;
+
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
 }
 
-#jutsu .jutsuCategory {
-    display: inline-block;
+#jutsuContainer .jutsuCategory {
     margin: 0;
-    vertical-align: top;
-    margin-right: 1%;
     text-align: center;
+
+    flex-basis: 25%;
+}
+.jutsuCategoryHeader div {
+    display: flex;
+    justify-content: space-evenly;
+}
+.jutsuCategoryHeader span {
+    flex-basis: 25%;
 }
 
-#jutsu .jutsuName {
+
+#jutsuContainer .jutsuName {
     display: inline-block;
     padding: 5px 7px;
     margin-bottom: 10px;
@@ -163,20 +186,20 @@
     box-shadow: 0 0 4px 0 rgba(0, 0, 0, 0);
 }
 
-#jutsu .jutsuName:last-child {
+#jutsuContainer .jutsuName:last-child {
     margin-bottom: 1px;
 }
 
-#jutsu .jutsuName:hover {
+#jutsuContainer .jutsuName:hover {
     background: linear-gradient(#E4E4E4, #EFEFEF);
     cursor: pointer;
 }
 
-#jutsu .jutsuName[aria-disabled='true'] {
+#jutsuContainer .jutsuName[aria-disabled='true'] {
     opacity: 0.75;
 }
 
-#jutsu .jutsuName[aria-disabled='true']:hover {
+#jutsuContainer .jutsuName[aria-disabled='true']:hover {
     background: linear-gradient(#EFEFEF, #E4E4E4);
     cursor: default;
 }

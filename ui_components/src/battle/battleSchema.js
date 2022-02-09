@@ -3,10 +3,12 @@
 // Match this type to BattleApiPresenter::buildResponse
 export type BattleType = {|
     +id: number,
-    +fighters: $ReadOnlyArray<FighterType>,
+    +fighters: { [key: string]: FighterType },
     +playerId: string,
     +opponentId: string,
     +playerDefaultAttacks: $ReadOnlyArray<JutsuType>,
+    +playerEquippedJutsu: $ReadOnlyArray<JutsuType>,
+    +playerBloodlineJutsu: $ReadOnlyArray<JutsuType>,
     +field: BattleFieldType,
     +isSpectating: boolean,
     +isMovementPhase: boolean,
@@ -51,6 +53,9 @@ export type BattleFieldTileType = {|
 export type JutsuType = {|
     +id: number,
     +combatId: string,
+    +name: string,
+    +activeCooldownTurnsLeft: number,
+    +jutsuType: string,
 |};
 
 // BattleApiPresenter::weaponResponse
