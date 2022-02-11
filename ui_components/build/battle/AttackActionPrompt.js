@@ -9,7 +9,9 @@ export default function AttackActionPrompt({
   const [jutsuId, setJutsuId] = React.useState([]);
   const isSelectingHandSeals = true;
   const isSelectingWeapon = false;
-  return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("tr", null, /*#__PURE__*/React.createElement("td", null, isSelectingHandSeals && /*#__PURE__*/React.createElement(HandSealsInput, null), isSelectingWeapon && /*#__PURE__*/React.createElement(WeaponInput, {
+  return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("tr", null, /*#__PURE__*/React.createElement("td", null, isSelectingHandSeals && /*#__PURE__*/React.createElement(HandSealsInput, {
+    onChange: setHandSeals
+  }), isSelectingWeapon && /*#__PURE__*/React.createElement(WeaponInput, {
     fighter: player
   }))), /*#__PURE__*/React.createElement("tr", null, /*#__PURE__*/React.createElement("th", {
     className: "jutsuCategoryHeader"
@@ -55,24 +57,88 @@ export default function AttackActionPrompt({
   })))));
 }
 
-function HandSealsInput() {
-  // 1-12
-  const handSealNumbers = Array(12).fill().map((_, i) => i + 1);
+function HandSealsInput({
+  onChange,
+  tooltips = {}
+}) {
+  const [selectedHandSeals, setSelectedHandSeals] = React.useState([]);
+  let handSeals = {
+    "1": {
+      selectedIndex: -1
+    },
+    "2": {
+      selectedIndex: -1
+    },
+    "3": {
+      selectedIndex: -1
+    },
+    "4": {
+      selectedIndex: -1
+    },
+    "5": {
+      selectedIndex: -1
+    },
+    "6": {
+      selectedIndex: -1
+    },
+    "7": {
+      selectedIndex: -1
+    },
+    "8": {
+      selectedIndex: -1
+    },
+    "9": {
+      selectedIndex: -1
+    },
+    "10": {
+      selectedIndex: -1
+    },
+    "11": {
+      selectedIndex: -1
+    },
+    "12": {
+      selectedIndex: -1
+    }
+  };
+  selectedHandSeals.forEach((hs, i) => {
+    handSeals[hs].selectedIndex = i;
+  });
+  const setHandSealSelected = React.useCallback((num, selected) => {
+    if (handSeals[num].selectedIndex !== -1 && !selected) {
+      // Deselect
+      const index = handSeals[num].selectedIndex;
+      let newHandSeals = [...selectedHandSeals.slice(0, index), ...selectedHandSeals.slice(index + 1)];
+      setSelectedHandSeals(newHandSeals);
+      onChange(newHandSeals);
+    } else if (handSeals[num].selectedIndex === -1 && selected) {
+      let newHandSeals = [...selectedHandSeals, num];
+      setSelectedHandSeals(newHandSeals);
+      onChange(newHandSeals);
+    } else {
+      console.log(`tried to set ${num} to ${selected} but `, handSeals, selectedHandSeals);
+    }
+  }, [handSeals, selectedHandSeals]);
   return /*#__PURE__*/React.createElement("div", {
     id: "handSeals"
-  }, handSealNumbers.map(num => {
-    return /*#__PURE__*/React.createElement("p", {
+  }, Object.keys(handSeals).map(num => {
+    const selected = handSeals[num].selectedIndex !== -1;
+    return /*#__PURE__*/React.createElement("div", {
       key: `handseal:${num}`,
-      "data-selected": "no",
-      "data-handseal": "<?= $i ?>"
+      className: "handSealContainer"
+    }, /*#__PURE__*/React.createElement("div", {
+      className: `handSeal ${selected ? "selected" : ""}`,
+      onClick: () => setHandSealSelected(num, !selected)
     }, /*#__PURE__*/React.createElement("img", {
       src: `./images/handseal_${num}.png`,
       draggable: "false"
     }), /*#__PURE__*/React.createElement("span", {
-      className: "handsealNumber"
-    }, "1"), /*#__PURE__*/React.createElement("span", {
+      className: "handSealNumber",
+      style: {
+        display: selected ? "initial" : "none"
+      }
+    }, handSeals[num].selectedIndex + 1), /*#__PURE__*/React.createElement("span", {
       className: "handsealTooltip"
-    }, "\xA0"));
+    }, tooltips[num] ?? "")));
   }), /*#__PURE__*/React.createElement("div", {
     id: "handsealOverlay"
   }));

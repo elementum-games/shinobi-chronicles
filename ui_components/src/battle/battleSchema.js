@@ -62,5 +62,8 @@ export type JutsuType = {|
 
 // BattleApiPresenter::weaponResponse
 export type WeaponType = {|
+    +name: string,
+    +effect: string,
+    +effectAmount: number,
 |};
 

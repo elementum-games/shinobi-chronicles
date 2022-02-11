@@ -85,7 +85,7 @@
     justify-content: center;
 }
 
-#handSeals p {
+.handSealContainer {
     width: 15%; /* 6 per row */
     height: 90px;
     margin: 0;
@@ -97,24 +97,36 @@
     justify-content: center;
 }
 
-#handSeals img {
+:root {
+    --handseal-width: 62px;
+    --handseal-number-width: 20px;
+
+    --handseal-number-margin: calc((var(--handseal-width) - var(--handseal-number-width)) / 2);
+}
+.handSeal {
     height: 62px;
-    width: 62px;
+    width: var(--handseal-width);
     position: relative;
     z-index: 1;
     border: 3px solid rgba(0, 0, 0, 0);
     border-radius: 5px;
 }
+.handSeal img {
+    height: 100%;
+    width: 100%;
+}
+.handSeal.selected {
+    border-color: var(--gold-color);
+}
 
-#handSeals .handsealNumber {
-    display: none;
-    width: 18px;
+.handSealNumber {
+    width: var(--handseal-number-width);
     position: absolute;
     z-index: 20;
     text-align: center;
-    left: 31px;
-    right: 31px;
-    bottom: 30px;
+    left: var(--handseal-number-margin);
+    right: var(--handseal-number-margin);
+    bottom: 6px;
 
     /* Style */
     font-size: 14px;

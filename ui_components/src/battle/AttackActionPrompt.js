@@ -1,7 +1,7 @@
 // @flow
-import type React from "react";
+import type { BattleType, JutsuType } from "./battleSchema.js";
 
-export default function AttackActionPrompt({ battle }): React$Node {
+export default function AttackActionPrompt({ battle }: { +battle: BattleType }): React$Node {
     const player = battle.fighters[battle.playerId];
     const opponent = battle.fighters[battle.opponentId];
 
@@ -17,7 +17,7 @@ export default function AttackActionPrompt({ battle }): React$Node {
         <React.Fragment>
             <tr>
                 <td>
-                    {isSelectingHandSeals && <HandSealsInput />}
+                    {isSelectingHandSeals && <HandSealsInput onChange={setHandSeals} />}
                     {isSelectingWeapon && <WeaponInput fighter={player} />}
                 </td>
             </tr>
@@ -50,19 +50,74 @@ export default function AttackActionPrompt({ battle }): React$Node {
     );
 }
 
-function HandSealsInput() {
-    // 1-12
-    const handSealNumbers = Array(12).fill().map((_, i) => i + 1);
+function HandSealsInput({ onChange, tooltips = {} }: {
+    +onChange: ($ReadOnlyArray<number>) => void,
+    +tooltips?: {
+        [string]: number
+    }
+}) {
+    const [selectedHandSeals, setSelectedHandSeals] = React.useState([]);
+    let handSeals = {
+        "1": { selectedIndex: -1 },
+        "2": { selectedIndex: -1 },
+        "3": { selectedIndex: -1 },
+        "4": { selectedIndex: -1 },
+        "5": { selectedIndex: -1 },
+        "6": { selectedIndex: -1 },
+        "7": { selectedIndex: -1 },
+        "8": { selectedIndex: -1 },
+        "9": { selectedIndex: -1 },
+        "10": { selectedIndex: -1 },
+        "11": { selectedIndex: -1 },
+        "12": { selectedIndex: -1 }
+    };
+    selectedHandSeals.forEach((hs, i) => {
+        handSeals[hs].selectedIndex = i;
+    })
+
+    const setHandSealSelected = React.useCallback((num: number, selected: boolean) => {
+        if(handSeals[num].selectedIndex !== -1 && !selected) {
+            // Deselect
+            const index = handSeals[num].selectedIndex;
+
+            let newHandSeals = [
+                ...selectedHandSeals.slice(0, index),
+                ...selectedHandSeals.slice(index + 1)
+            ];
+            setSelectedHandSeals(newHandSeals);
+            onChange(newHandSeals);
+        }
+        else if(handSeals[num].selectedIndex === -1 && selected) {
+            let newHandSeals = [
+                ...selectedHandSeals,
+                num
+            ];
+            setSelectedHandSeals(newHandSeals);
+            onChange(newHandSeals);
+        }
+        else {
+            console.log(`tried to set ${num} to ${selected} but `, handSeals, selectedHandSeals)
+        }
+    }, [handSeals, selectedHandSeals]);
 
     return (
         <div id='handSeals'>
-            {handSealNumbers.map((num) => {
+            {Object.keys(handSeals).map((num) => {
+                const selected = handSeals[num].selectedIndex !== -1;
+
                 return (
-                    <p key={`handseal:${num}`} data-selected='no' data-handseal='<?= $i ?>'>
-                        <img src={`./images/handseal_${num}.png`} draggable='false'/>
-                        <span className='handsealNumber'>1</span>
-                        <span className='handsealTooltip'>&nbsp;</span>
-                    </p>
+                    <div key={`handseal:${num}`} className="handSealContainer">
+                        <div
+                            className={`handSeal ${selected ? "selected" : ""}`}
+                            onClick={() => setHandSealSelected(num, !selected)}
+                        >
+                            <img src={`./images/handseal_${num}.png`} draggable='false'/>
+                            <span className='handSealNumber' style={{ display: (selected ? "initial" : "none")}}>
+                                {(handSeals[num].selectedIndex + 1)}
+                            </span>
+                            <span className='handsealTooltip'>{tooltips[num] ?? ""}</span>
+                        </div>
+                    </div>
                 );
             })}
             <div id='handsealOverlay'>
