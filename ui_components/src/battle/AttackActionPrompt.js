@@ -1,17 +1,24 @@
 // @flow
-import type { BattleType, JutsuType } from "./battleSchema.js";
+import type { BattleType, FighterType, JutsuType } from "./battleSchema.js";
+
+type JutsuCategory = 'ninjutsu' | 'genjutsu' | 'taijutsu' | "bloodline";
 
 export default function AttackActionPrompt({ battle }: { +battle: BattleType }): React$Node {
     const player = battle.fighters[battle.playerId];
     const opponent = battle.fighters[battle.opponentId];
 
     const [handSeals, setHandSeals] = React.useState([]);
-    const [jutsuType, setJutsuType] = React.useState([]);
-    const [weaponId, setWeaponId] = React.useState([]);
     const [jutsuId, setJutsuId] = React.useState([]);
+    const [jutsuCategory, setJutsuCategory] = React.useState([]);
+    const [weaponId, setWeaponId] = React.useState([]);
 
     const isSelectingHandSeals = true;
     const isSelectingWeapon = false;
+
+    const handleJutsuChange = (jutsuId: number, jutsuCategory: JutsuCategory) => {
+        setJutsuCategory(jutsuCategory);
+        setJutsuId(jutsuId);
+    };
 
     return (
         <React.Fragment>
@@ -36,12 +43,12 @@ export default function AttackActionPrompt({ battle }: { +battle: BattleType }):
                     <JutsuInput
                         battle={battle}
                         player={player}
+                        onChange={handleJutsuChange}
                     />
                     <input type='hidden' id='hand_seal_input' name='hand_seals' value='<?= $prefill_hand_seals ?>' />
                     <input type='hidden' id='jutsuType' name='jutsu_type' value='<?= $prefill_jutsu_type ?>' />
                     <input type='hidden' id='weaponID' name='weapon_id' value='<?= $prefill_weapon_id ?>' />
                     <input type='hidden' id='jutsuID' name='jutsu_id' value='<?= $prefill_jutsu_id ?>' />
-                    <input type='hidden' id='itemID' name='item_id' value='<?= $prefill_item_id ?>' />
                     <p style={{ display: "block", textAlign: "center", margin: "auto" }}>
                         <input id='submitbtn' type='submit' name='attack' value='Submit' />
                     </p>
@@ -51,7 +58,7 @@ export default function AttackActionPrompt({ battle }: { +battle: BattleType }):
 }
 
 function HandSealsInput({ onChange, tooltips = {} }: {
-    +onChange: ($ReadOnlyArray<number>) => void,
+    +onChange: ($ReadOnlyArray<string>) => void,
     +tooltips?: {
         [string]: number
     }
@@ -75,7 +82,7 @@ function HandSealsInput({ onChange, tooltips = {} }: {
         handSeals[hs].selectedIndex = i;
     })
 
-    const setHandSealSelected = React.useCallback((num: number, selected: boolean) => {
+    const setHandSealSelected = React.useCallback((num: string, selected: boolean) => {
         if(handSeals[num].selectedIndex !== -1 && !selected) {
             // Deselect
             const index = handSeals[num].selectedIndex;
@@ -96,7 +103,7 @@ function HandSealsInput({ onChange, tooltips = {} }: {
             onChange(newHandSeals);
         }
         else {
-            console.log(`tried to set ${num} to ${selected} but `, handSeals, selectedHandSeals)
+            console.log(`tried to set ${num} to ${selected ? 'selected' : 'unselected'} but `, handSeals, selectedHandSeals)
         }
     }, [handSeals, selectedHandSeals]);
 
@@ -143,7 +150,12 @@ function WeaponInput({ fighter }) {
     );
 }
 
-function JutsuInput({ battle, player }) {
+type JutsuInputProps = {|
+    +battle: BattleType,
+    +player: FighterType,
+    +onChange: (id: number, category: JutsuCategory) => void,
+|};
+function JutsuInput({ battle, player, onChange }: JutsuInputProps) {
     const standardCategories = [
         {
             key: 'ninjutsu',
@@ -160,7 +172,21 @@ function JutsuInput({ battle, player }) {
             jutsuType: battle.jutsuTypes.genjutsu,
             initial: 'G',
         },
-    ]
+    ];
+
+    const [selectedJutsu, setSelectedJutsu] = React.useState({
+        id: 0,
+        categoryKey: '',
+    });
+
+    const handleJutsuSelect = (categoryKey: JutsuCategory, jutsu: JutsuType) => {
+        setSelectedJutsu({
+            categoryKey: categoryKey,
+            id: jutsu.id,
+            jutsuType: jutsu.jutsuType
+        });
+        onChange(jutsu.id, categoryKey);
+    };
 
     return (
         <div id='jutsuContainer'>
@@ -175,6 +201,8 @@ function JutsuInput({ battle, player }) {
                                 <Jutsu
                                     key={i}
                                     jutsu={jutsu}
+                                    selected={category.key === selectedJutsu.categoryKey && jutsu.id === selectedJutsu.id}
+                                    onClick={() => handleJutsuSelect(category.key, jutsu)}
                                     hotkeyDisplay={`${category.initial}${categoryJutsuCount}`}
                                 />
                             ))}
@@ -186,6 +214,8 @@ function JutsuInput({ battle, player }) {
                                     <Jutsu
                                         key={i}
                                         jutsu={jutsu}
+                                        selected={category.key === selectedJutsu.categoryKey && jutsu.id === selectedJutsu.id}
+                                        onClick={() => handleJutsuSelect(category.key, jutsu)}
                                         hotkeyDisplay={`${category.initial}${categoryJutsuCount}`}
                                     />
                                 )
@@ -200,6 +230,8 @@ function JutsuInput({ battle, player }) {
                         <Jutsu
                             key={i}
                             jutsu={jutsu}
+                            selected={'bloodline' === selectedJutsu.categoryKey && jutsu.id === selectedJutsu.id}
+                            onClick={() => handleJutsuSelect('bloodline', jutsu)}
                             hotkeyDisplay={`B${i}`}
                             isBloodline={true}
                         />
@@ -212,18 +244,26 @@ function JutsuInput({ battle, player }) {
 
 function Jutsu({
     jutsu,
+    selected,
+    onClick,
     hotkeyDisplay,
     isBloodline = false
 }: {
     +jutsu: JutsuType,
+    +selected: boolean,
+    +onClick: () => void,
     +hotkeyDisplay: string,
     +isBloodline?: boolean
 }) {
+    const classes = [
+        'jutsuButton',
+        isBloodline ? 'bloodline_jutsu' : jutsu.jutsuType,
+        selected ? 'selected' : '',
+    ];
     return (
         <div
-            className={`jutsuName ${isBloodline ? 'bloodline_jutsu' : jutsu.jutsuType}`}
-            /*data-handseals='<?= $player_jutsu->hand_seals ?>'
-            data-id='<?= $jutsu[' id'] ?>'*/
+            className={classes.join(' ')}
+            onClick={onClick}
             aria-disabled={jutsu.activeCooldownTurnsLeft > 0}
         >
             {jutsu.name}

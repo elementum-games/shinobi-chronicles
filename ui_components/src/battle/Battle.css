@@ -185,7 +185,7 @@
 }
 
 
-#jutsuContainer .jutsuName {
+.jutsuButton {
     display: inline-block;
     padding: 5px 7px;
     margin-bottom: 10px;
@@ -197,21 +197,24 @@
     text-align: center;
     box-shadow: 0 0 4px 0 rgba(0, 0, 0, 0);
 }
+.jutsuButton.selected {
+    box-shadow: 0 0 4px 0 #000000;
+}
 
-#jutsuContainer .jutsuName:last-child {
+.jutsuButton:last-child {
     margin-bottom: 1px;
 }
 
-#jutsuContainer .jutsuName:hover {
+.jutsuButton:hover {
     background: linear-gradient(#E4E4E4, #EFEFEF);
     cursor: pointer;
 }
 
-#jutsuContainer .jutsuName[aria-disabled='true'] {
+.jutsuButton[aria-disabled='true'] {
     opacity: 0.75;
 }
 
-#jutsuContainer .jutsuName[aria-disabled='true']:hover {
+.jutsuButton[aria-disabled='true']:hover {
     background: linear-gradient(#EFEFEF, #E4E4E4);
     cursor: default;
 }
