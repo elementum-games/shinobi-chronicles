@@ -8,12 +8,13 @@ export default function AttackActionPrompt({ battle }: { +battle: BattleType }):
     const opponent = battle.fighters[battle.opponentId];
 
     const [handSeals, setHandSeals] = React.useState([]);
-    const [jutsuId, setJutsuId] = React.useState([]);
-    const [jutsuCategory, setJutsuCategory] = React.useState([]);
-    const [weaponId, setWeaponId] = React.useState([]);
+    const [jutsuId, setJutsuId] = React.useState(-1);
+    const [jutsuCategory, setJutsuCategory] = React.useState('ninjutsu');
+    const [jutsuType, setJutsuType] = React.useState('ninjutsu');
+    const [weaponId, setWeaponId] = React.useState(0);
 
-    const isSelectingHandSeals = true;
-    const isSelectingWeapon = false;
+    const isSelectingHandSeals = ['ninjutsu', 'genjutsu'].includes(jutsuCategory);
+    const isSelectingWeapon = jutsuCategory === 'taijutsu';
 
     const handleJutsuChange = (jutsuId: number, jutsuCategory: JutsuCategory) => {
         setJutsuCategory(jutsuCategory);

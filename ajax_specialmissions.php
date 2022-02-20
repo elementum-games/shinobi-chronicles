@@ -11,7 +11,7 @@ if(!isset($_SESSION['user_id'])) {
 	$status = false;
 }
 
-require_once("classes.php");
+require_once("classes/_autoload.php");
 $system = new System();
 $player = new User($_SESSION['user_id']);
 

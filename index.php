@@ -17,7 +17,8 @@ if(!isset($_SESSION['user_id']) || $_SESSION['user_id'] != 1 || $_SESSION['user_
 }
 
 $PAGE_LOAD_START = microtime(true);
-require_once("classes.php");
+
+require_once("classes/_autoload.php");
 $system = new System();
 
 if($system->environment == System::ENVIRONMENT_DEV) {

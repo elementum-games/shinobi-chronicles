@@ -1,7 +1,7 @@
 <?php
 session_start();
 
-require_once("classes.php");
+require_once("classes/_autoload.php");
 $system = new System();
 
 if(isset($_SESSION['user_id'])) {

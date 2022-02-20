@@ -3,7 +3,7 @@
 /**
  * @var System $system
  */
-require "authenticate_admin.php";
+require "admin/_authenticate_admin.php";
 
 class TestFighter extends Fighter {
     public string $name = 'test';
@@ -782,7 +782,7 @@ $ranks_prefill_data = array_map(function($rank) use ($rankManager) {
 
 <br />
 <div style='text-align:center;'>
-<script type='text/javascript' src='./scripts/jquery-2.1.0.min.js'></script>
+<script type='text/javascript' src='../scripts/jquery-2.1.0.min.js'></script>
 <script type='text/javascript'>
     function changeDisplay(display_id) {
         $('.displayDiv').hide();

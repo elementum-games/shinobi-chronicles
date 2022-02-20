@@ -4,7 +4,7 @@ Generally speaking these files are responsible for their own auth with the stand
 
 ```php
 # Begin standard auth
-require "../classes.php";
+require "../classes/_autoload.php";
 
 $system = new System();
 
