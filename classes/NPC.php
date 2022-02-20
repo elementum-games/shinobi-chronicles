@@ -56,8 +56,7 @@ class NPC extends Fighter {
     public function __construct(System $system, int $ai_id) {
         $this->system =& $system;
         if(!$ai_id) {
-            $system->error("Invalid NPC opponent!");
-            return false;
+            throw new Exception("Invalid NPC opponent!");
         }
         $this->ai_id = $system->clean($ai_id);
         $this->id = self::ID_PREFIX . ':' . $this->ai_id;

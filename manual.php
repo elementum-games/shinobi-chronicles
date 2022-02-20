@@ -13,12 +13,11 @@ if (isset($_SESSION['user_id'])) {
   $layout = $player->layout;
 }
 
-$system->renderStaticPageHeader($layout);
-?>
+$system->renderStaticPageHeader('Manual', $layout);
 
-<!-- 
-  Probably move the styles somewhere, but since all the 
-  themes has their own style IDK where to keep this, 
+<!--
+  Probably move the styles somewhere, but since all the
+  themes has their own style IDK where to keep this,
   maybe manual should have its own styles?
   But for now I'm keeping styles here
 -->

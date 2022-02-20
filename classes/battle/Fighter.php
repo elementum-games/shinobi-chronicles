@@ -27,6 +27,9 @@ abstract class Fighter {
     public float $chakra;
     public float $max_chakra;
 
+    public int $level = 1;
+    public int $money = 0;
+
     public string $avatar_link = '';
 
     // Stats

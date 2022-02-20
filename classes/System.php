@@ -4,6 +4,7 @@ use JetBrains\PhpStorm\Pure;
 
 require_once __DIR__ . '/EntityId.php';
 require_once __DIR__ . '/User.php';
+require_once __DIR__ . '/MarkdownParser.php';
 require_once __DIR__ . '/API.php';
 
 /*	Class:		System
@@ -604,6 +605,19 @@ class System {
 
     }
 
+    public function parseMarkdown($text, $allow_images = false, $strip_breaks = true, $faces = false): string {
+        if($strip_breaks) {
+            $text = str_replace("\n", "", $text);
+        }
+
+        $text = str_replace("[br]", "\n", $text);
+
+        return MarkdownParser::instance()
+            ->setImagesDisabled(!$allow_images)
+            ->setBreaksEnabled(true)
+            ->text($text);
+    }
+
     public function imageCheck($image, $size): string {
 
         $avatar_limit = $size;
@@ -754,7 +768,7 @@ class System {
         return password_verify($password, $hash);
     }
 
-    public function renderStaticPageHeader($layout = System::DEFAULT_LAYOUT): void {
+    public function renderStaticPageHeader(string $page_title, $layout = System::DEFAULT_LAYOUT): void {
         $system = $this;
 
         require($this->fetchLayoutByName($layout));
@@ -769,7 +783,7 @@ class System {
         echo $heading;
         echo $top_menu;
         echo $header;
-        echo str_replace("[HEADER_TITLE]", "Rules", $body_start);
+        echo str_replace("[HEADER_TITLE]", $page_title, $body_start);
     }
 
     public function renderStaticPageFooter($layout = System::DEFAULT_LAYOUT): void {

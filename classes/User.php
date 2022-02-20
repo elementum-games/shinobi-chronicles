@@ -99,7 +99,8 @@ class User extends Fighter {
     public string $spouse_name;
     public int $marriage_time;
     public $village;
-    public $level;
+    public int $level;
+    public $rank;
 
     public int $rank_num;
     public Rank $rank;
@@ -121,14 +122,14 @@ class User extends Fighter {
     public array $filters;
     public $train_type;
     public $train_gain;
-    public $train_time;
+    public int $train_time;
 
     private int $money;
 
-    public $pvp_wins;
-    public $pvp_losses;
-    public $ai_wins;
-    public $ai_losses;
+    public int $pvp_wins;
+    public int $pvp_losses;
+    public int $ai_wins;
+    public int $ai_losses;
 
     public $missions_completed;
     public $presents_claimed;

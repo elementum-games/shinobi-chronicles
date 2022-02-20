@@ -1,8 +1,10 @@
 <?php
 
+
 require_once __DIR__ . "/classes/EntityId.php";
 require_once __DIR__ . "/classes/System.php";
 require_once __DIR__ . "/classes/Auth.php";
+require_once __DIR__ . "/classes/API.php";
 
 require_once __DIR__ . "/classes/RankManager.php";
 
@@ -22,6 +24,7 @@ require_once __DIR__ . "/classes/SpecialMissions.php";
 
 require_once __DIR__ . "/classes/battle/Battle.php";
 require_once __DIR__ . "/classes/battle/BattleManager.php";
+require_once __DIR__ . "/classes/battle/BattlePageAPIResponse.php";
 
 require_once __DIR__ . "/classes/Inbox.php";
 require_once __DIR__ . "/classes/InboxUser.php";

@@ -24,22 +24,12 @@ function spar() {
             $battle->renderBattle();
 
             if($battle->isComplete()) {
-                echo "<table class='table'><tr><th>Battle complete</th></tr>
-			    <tr><td style='text-align:center;'>";
-                if($battle->isPlayerWinner()) {
-                    echo "You win!<br />";
-                }
-                else if($battle->isOpponentWinner()) {
-                    echo "You lose.<br />";
-                    $player->health = 5;
-                }
-                else if($battle->isDraw()) {
-                    echo "You both knocked each other out.<br />";
-                    $player->health = 5;
-                }
-                echo "</td></tr></table>";
+                $result = processSparFightEnd($battle, $player);
 
-                $player->battle_id = 0;
+                echo "<table class='table'>
+                    <tr><th>Battle complete</th></tr>
+			        <tr><td style='text-align:center;'>{$result}</td></tr>
+                </table>";
             }
         }
         catch (Exception $e) {
@@ -201,4 +191,50 @@ function spar() {
 	}
 	
 	return true;
+}
+
+/**
+ * @throws Exception
+ */
+function processSparFightEnd(BattleManager $battle, User $player): string {
+    $player->battle_id = 0;
+
+    if($battle->isPlayerWinner()) {
+        return "You win!";
+    }
+    else if($battle->isOpponentWinner()) {
+        $player->health = 5;
+        return "You lose.";
+    }
+    else if($battle->isDraw()) {
+        $player->health = 5;
+        return "You both knocked each other out.";
+    }
+    else {
+        throw new Exception("Invalid battle completion!");
+    }
+}
+
+function sparFightAPI(System $system, User $player): BattlePageAPIResponse {
+    if(!$player->battle_id) {
+        return new BattlePageAPIResponse(errors: ["Player is not in battle!"]);
+    }
+
+    $response = new BattlePageAPIResponse();
+
+    try {
+        $battle = new BattleManager($system, $player, $player->battle_id);
+        $battle->checkTurn();
+
+        $response->battle_data = $battle->getApiResponse();
+
+        if($battle->isComplete()) {
+           $response->battle_result = processSparFightEnd($battle, $player);
+        }
+    }
+    catch (Exception $e) {
+        $response->errors[] = $e->getMessage();
+    }
+
+    return $response;
 }

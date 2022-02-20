@@ -50,7 +50,10 @@ class TestFighter extends Fighter {
 
     }
 
-
+    public function hasJutsu(int $jutsu_id): bool {
+        // TODO: Implement hasJutsu() method.
+        return true;
+    }
 }
 
 function fighterFromData(array $fighter_data, string $name): TestFighter {

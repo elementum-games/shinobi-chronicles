@@ -1,7 +1,10 @@
 <?php
 /* arena.php
 */
-function arena() {
+
+use JetBrains\PhpStorm\ArrayShape;
+
+function arena(): bool {
 	global $system;
 	global $player;
 	global $self_link;
@@ -84,6 +87,8 @@ function arena() {
         }
         echo "</td></tr></table>";
 	}
+
+    return true;
 }
 
 function arenaFight(): bool {
@@ -95,18 +100,58 @@ function arenaFight(): bool {
 
     try {
         $battle = new BattleManager($system, $player, $player->battle_id);
-
-        $winner = $battle->checkTurn();
+        $battle->checkTurn();
 
         $battle->renderBattle();
 
-        if(!$battle->isComplete()) {
-            return true;
+        if($battle->isComplete()) {
+            $battle_result = processArenaBattleEnd($battle, $player);
+            echo "<table class='table'><tr><th>Battle Results</th></tr>
+            <tr><td>" . $battle_result . "</td></tr></table>";
         }
-        else if($winner == $battle->player_side) {
-            $stat_gain_display = false;
-            $opponent = $battle->opponent;
-            $money_gain = $battle->opponent->money;
+    } catch(Exception $e) {
+        $system->message($e->getMessage());
+        $system->printMessage();
+        return false;
+    }
+    return true;
+}
+
+#[ArrayShape(['errors' => "array", 'battle_result' => "string"])]
+function arenaFightAPI(System $system, User $player): BattlePageAPIResponse {
+    $response = new BattlePageAPIResponse();
+
+    try {
+        $battle = new BattleManager($system, $player, $player->battle_id);
+        $battle->checkTurn();
+
+        $response->battle_data = $battle->getApiResponse();
+
+        if($battle->isComplete()) {
+            $response->battle_result = processArenaBattleEnd($battle, $player);
+        }
+    } catch(Exception $e) {
+        $response->errors[] = $e->getMessage();
+    }
+
+    return $response;
+}
+
+/**
+ * @throws Exception
+ */
+function processArenaBattleEnd(BattleManager $battle, User $player): string {
+    $stat_gain_chance = 26;
+    $battle_result = "";
+
+    if(!$battle->isComplete()) {
+        return true;
+    }
+    else if($battle->isPlayerWinner()) {
+        $stat_gain_display = false;
+        $opponent = $battle->opponent;
+
+        $money_gain = $battle->opponent->money;
 
             if($player->level > $opponent->level) {
                 $level_difference = $player->level - $opponent->level;
@@ -163,72 +208,64 @@ function arenaFight(): bool {
                 <br />You have gained 1 ' . System::unSlug($stat_to_gain) . '.';
             }
 
-            // TEAM BOOST NPC GAINS
-            if($player->team != null) {
-                $boost_percent = $player->team->getAIMoneyBoostAmount();
-                if($boost_percent != null) {
-                    $boost_amount = ceil($boost_percent * $money_gain);
-                    $money_gain += $boost_amount;
-                }
+        // TEAM BOOST NPC GAINS
+        if($player->team != null) {
+            $boost_percent = $player->team->getAIMoneyBoostAmount();
+            if($boost_percent != null) {
+                $boost_amount = ceil($boost_percent * $money_gain);
+                $money_gain += $boost_amount;
             }
+        }
 
             $player->addMoney($money_gain, 'arena');
 
-            echo "<table class='table'><tr><th>Battle Results</th></tr>
-			<tr><td>You have defeated your arena opponent.<br />
+        $battle_result = "You have defeated your arena opponent.<br />
 			You have claimed your prize of &yen;$money_gain.";
-            if($stat_gain_display) {
-                echo $stat_gain_display;
-            }
-            echo "</td></tr></table>";
-            $player->ai_wins++;
-            $player->battle_id = 0;
-            $player->last_pvp_ms = System::currentTimeMs();
+        if($stat_gain_display) {
+            $battle_result .=  $stat_gain_display;
+        }
+        $player->ai_wins++;
+        $player->battle_id = 0;
+        $player->last_pvp = time();
 
-            // Daily Tasks
-            foreach ($player->daily_tasks as $task) {
-                if (!$task->complete && $task->activity == DailyTask::ACTIVITY_ARENA && $task->sub_task == DailyTask::SUB_TASK_WIN_FIGHT) {
-                    $task->progress++;
-                }
+        // Daily Tasks
+        foreach ($player->daily_tasks as $task) {
+            if (!$task->complete && $task->activity == DailyTask::ACTIVITY_ARENA && $task->sub_task == DailyTask::SUB_TASK_WIN_FIGHT) {
+                $task->progress++;
             }
         }
-        else if($winner == $battle->opponent_side) {
-            echo "<table class='table'><tr><th>Battle Results</th></tr>
-			<tr><td>You have been defeated.
-			</td></tr></table>";
-			$player->health = 5;
-            $player->ai_losses++;
-			$player->moveToVillage();
-            $player->battle_id = 0;
-            $player->last_pvp_ms = System::currentTimeMs();
-
-            // Daily Tasks
-            foreach ($player->daily_tasks as &$task) {
-                if (!$task->complete && $task->activity == DailyTask::ACTIVITY_ARENA && $task->sub_task == DailyTask::SUB_TASK_COMPLETE) {
-                    $task->progress++;
-                }
-            }
-        }
-        else if($winner == Battle::DRAW) {
-            echo "<table class='table'><tr><th>Battle Results</th></tr>
-			<tr><td>The battle ended in a draw. You receive no reward.
-			</td></tr></table>";
-			$player->health = 5;
-			$player->moveToVillage();
-            $player->battle_id = 0;
-            $player->last_pvp_ms = System::currentTimeMs();
-
-            // Daily Tasks
-            foreach ($player->daily_tasks as $task) {
-                if (!$task->complete && $task->activity == DailyTask::ACTIVITY_ARENA && $task->sub_task == DailyTask::SUB_TASK_COMPLETE) {
-                    $task->progress++;
-                }
-            }
-        }
-    } catch(Exception $e) {
-        $system->message($e->getMessage());
-        $system->printMessage();
-        return false;
     }
-    return true;
+    else if($battle->isOpponentWinner()) {
+        $battle_result .= "You have been defeated.";
+
+        $player->health = 5;
+        $player->ai_losses++;
+        $player->moveToVillage();
+        $player->battle_id = 0;
+        $player->last_pvp_ms = System::currentTimeMs();
+
+        // Daily Tasks
+        foreach ($player->daily_tasks as &$task) {
+            if (!$task->complete && $task->activity == DailyTask::ACTIVITY_ARENA && $task->sub_task == DailyTask::SUB_TASK_COMPLETE) {
+                $task->progress++;
+            }
+        }
+    }
+    else if($battle->isDraw()) {
+        $battle_result .= "The battle ended in a draw. You receive no reward.";
+
+        $player->health = 5;
+        $player->moveToVillage();
+        $player->battle_id = 0;
+        $player->last_pvp_ms = System::currentTimeMs();
+
+        // Daily Tasks
+        foreach ($player->daily_tasks as $task) {
+            if (!$task->complete && $task->activity == DailyTask::ACTIVITY_ARENA && $task->sub_task == DailyTask::SUB_TASK_COMPLETE) {
+                $task->progress++;
+            }
+        }
+    }
+
+    return $battle_result;
 }

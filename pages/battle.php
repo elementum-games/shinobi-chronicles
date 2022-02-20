@@ -20,75 +20,18 @@ function battle(): bool {
 	if($player->battle_id) {
         $battle = new BattleManager($system, $player, $player->battle_id);
 
-		$pvp_yen = $player->rank_num * 50;
-
         $battle->checkTurn();
 
         $battle->renderBattle();
 
         if($battle->isComplete()) {
-			echo "<table class='table'><tr><th>Battle complete</th></tr>
-			<tr><td style='text-align:center;'>";
-			if($battle->isPlayerWinner()) {
-				$player->pvp_wins++;
-				$player->monthly_pvp++;
-				$player->last_pvp_ms = System::currentTimeMs();
-				$village_point_gain = 1;
-				$team_point_gain = 1;
-				$player->addMoney($pvp_yen, "PVP win");
-				echo "You win the fight and earn ¥$pvp_yen!<br />";
-				// Village points
-				$system->query("UPDATE `villages` SET `points`=`points`+'$village_point_gain' WHERE `name`='$player->village' LIMIT 1");
-				echo "You have earned $village_point_gain point for your village.<br />";
-				// Team points
-				if($player->team != null) {
-				    $player->team->addPoints($team_point_gain);
+            $player->battle_id = 0;
+            $result = processBattleFightEnd($battle, $player);
 
-					echo "You have earned $team_point_gain point for your team.<br />";
-				}
-				// Daily Tasks
-				foreach ($player->daily_tasks as $task) {
-					if ($task->activity == DailyTask::ACTIVITY_PVP && !$task->complete) {
-						$task->progress++;
-					}
-				}
-			}
-			else if($battle->isOpponentWinner()) {
-				echo "You lose. You were taken back to your village by some allied ninja.<br />";
-				$player->health = 5;
-				$player->pvp_losses++;
-				$player->last_pvp_ms = System::currentTimeMs();
-				$player->last_death_ms = System::currentTimeMs();
-				$player->moveToVillage();
-
-                // If player is killed during a survival mission as a result of PVP, clear the survival mission
-                if($player->mission_id != null)
-                {
-                    check_survival_missions($player->mission_id);
-                }
-
-
-                // Daily Tasks
-				foreach ($player->daily_tasks as $task) {
-					if ($task->activity == DailyTask::ACTIVITY_PVP && $task->sub_task == DailyTask::SUB_TASK_COMPLETE && !$task->complete) {
-						$task->progress++;
-					}
-				}
-			}
-			else {
-				echo "You both knocked each other out. You were taken back to your village by some allied ninja.<br />";
-				$player->health = 5;
-				$player->moveToVillage();
-				$player->last_pvp_ms = System::currentTimeMs();
-
-                // If player is killed during a survival mission as a result of PVP, clear the survival mission
-                if($player->mission_id != null)
-                {
-                    check_survival_missions($player->mission_id);
-                }
-			}
-			echo "</td></tr></table>";
-			$player->battle_id = 0;
+			echo "<table class='table'>
+                <tr><th>Battle complete</th></tr>
+			    <tr><td style='text-align:center;'>" . str_replace("[br]", "<br />", $result) . "</td></tr>
+            </table>";
 		}
 	}
 	else if(isset($_GET['attack'])) {
@@ -164,6 +107,106 @@ function battle(): bool {
 		scoutArea();
 	}
 	return true;
+}
+
+/**
+ * @throws Exception
+ */
+function processBattleFightEnd(BattleManager $battle, User $player): string {
+    $pvp_yen = $player->rank * 50;
+
+    $result = "";
+
+    if($battle->isPlayerWinner()) {
+        $player->pvp_wins++;
+        $player->monthly_pvp++;
+        $player->last_pvp_ms = System::currentTimeMs();
+        $village_point_gain = 1;
+        $team_point_gain = 1;
+
+        $player->addMoney($pvp_yen, "PVP win");
+        $result .= "You win the fight and earn ¥$pvp_yen![br]";
+
+        $player->system->query("UPDATE `villages` SET `points`=`points`+'$village_point_gain' WHERE `name`='$player->village' LIMIT 1");
+        $result .= "You have earned $village_point_gain point for your village.[br]";
+
+        // Team points
+        if($player->team != null) {
+            $player->team->addPoints($team_point_gain);
+
+            $result .= "You have earned $team_point_gain point for your team.[br]";
+        }
+        // Daily Tasks
+        foreach ($player->daily_tasks as $task) {
+            if ($task->activity == DailyTask::ACTIVITY_PVP && !$task->complete) {
+                $task->progress++;
+            }
+        }
+    }
+    else if($battle->isOpponentWinner()) {
+        $result .= "You lose. You were taken back to your village by some allied ninja.[br]";
+        $player->health = 5;
+        $player->pvp_losses++;
+        $player->last_pvp_ms = System::currentTimeMs();
+        $player->last_death_ms = System::currentTimeMs();
+        $player->moveToVillage();
+
+        // If player is killed during a survival mission as a result of PVP, clear the survival mission
+        if($player->mission_id != null) {
+            check_survival_missions($player->mission_id);
+        }
+
+        // Daily Tasks
+        foreach ($player->daily_tasks as $task) {
+            if ($task->activity == DailyTask::ACTIVITY_PVP && $task->sub_task == DailyTask::SUB_TASK_COMPLETE && !$task->complete) {
+                $task->progress++;
+            }
+        }
+    }
+    else {
+        $result .= "You both knocked each other out. You were taken back to your village by some allied ninja.[br]";
+        $player->health = 5;
+        $player->moveToVillage();
+        $player->last_pvp_ms = System::currentTimeMs();
+
+        // If player is killed during a survival mission as a result of PVP, clear the survival mission
+        if($player->mission_id != null) {
+            check_survival_missions($player->mission_id);
+        }
+
+        // Daily Tasks
+        foreach ($player->daily_tasks as $task) {
+            if ($task->activity == DailyTask::ACTIVITY_PVP && $task->sub_task == DailyTask::SUB_TASK_COMPLETE && !$task->complete) {
+                $task->progress++;
+            }
+        }
+    }
+
+    return $result;
+}
+
+function battleFightAPI(System $system, User $player): BattlePageAPIResponse {
+    if(!$player->battle_id) {
+        return new BattlePageAPIResponse(errors: ["Player is not in battle!"]);
+    }
+
+    $response = new BattlePageAPIResponse();
+
+    try {
+        $battle = new BattleManager($system, $player, $player->battle_id);
+        $battle->checkTurn();
+
+        $response->battle_data = $battle->getApiResponse();
+
+        if($battle->isComplete()) {
+            $response->battle_result = processBattleFightEnd($battle, $player);
+        }
+    }
+    catch (Exception $e) {
+        $response->errors[] = $e->getMessage();
+    }
+
+    return $response;
 }
 
 /**
