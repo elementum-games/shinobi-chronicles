@@ -98,13 +98,12 @@ function battle(): bool {
 		} catch (Exception $e) {
 			$system->message($e->getMessage());
 			$system->printMessage();
-			require("scoutArea.php");
-			scoutArea();
+
+			NearbyPlayers::renderScoutAreaList($system, $player, $self_link);
 		}
 	}
 	else {
-		require("scoutArea.php");
-		scoutArea();
+        NearbyPlayers::renderScoutAreaList($system, $player, $self_link);
 	}
 	return true;
 }

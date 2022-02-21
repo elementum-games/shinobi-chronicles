@@ -208,7 +208,7 @@ if(!$guest_support) {
     }
 
     // Load side menu
-    $pages = require_once('routes.php');
+    $pages = require_once('config/routes.php');
 
     if ($player->clan) {
         $pages[20]['menu'] = System::MENU_VILLAGE;

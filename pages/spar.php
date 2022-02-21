@@ -76,8 +76,8 @@ function spar() {
 		} catch (Exception $e) {
 			$system->message($e->getMessage());
 			$system->printMessage();
-			require("scoutArea.php");
-			scoutArea();
+
+            NearbyPlayers::renderScoutAreaList($system, $player, $self_link);
 		}
 	}
 	else if(isset($_GET['accept_challenge'])) {
@@ -118,17 +118,16 @@ function spar() {
 			
 			$system->message($e->getMessage());
 			$system->printMessage();
-			require("scoutArea.php");
-			scoutArea();
+
+            NearbyPlayers::renderScoutAreaList($system, $player, $self_link);
 		}
 	}
 	else if(isset($_GET['decline_challenge'])) {
 		$player->challenge = 0;
 		$system->message("Challenge declined.");
 		$system->printMessage();
-		
-		require("scoutArea.php");
-		scoutArea();
+
+        NearbyPlayers::renderScoutAreaList($system, $player, $self_link);
 	}
 	else if(isset($_GET['cancel_challenge'])) {
 		$challenge = $system->clean($_GET['cancel_challenge']);
@@ -136,9 +135,8 @@ function spar() {
 		$result = $system->query("UPDATE `users` SET `challenge`=0 WHERE `user_id`='$challenge' AND `challenge`='$player->user_id' LIMIT 1");
 		$system->message("Challenge cancelled!");
 		$system->printMessage();
-			
-		require("scoutArea.php");
-		scoutArea();
+
+        NearbyPlayers::renderScoutAreaList($system, $player, $self_link);
 	}
 	else {
 		// Load user challenges sent
@@ -185,9 +183,8 @@ function spar() {
 			
 			echo "</table>";
 		}
-		
-		require("scoutArea.php");
-		scoutArea();
+
+        NearbyPlayers::renderScoutAreaList($system, $player, $self_link);
 	}
 	
 	return true;

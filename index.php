@@ -246,10 +246,14 @@ if($LOGGED_IN) {
 
 	// Notifications
 	if(!$ajax) {
-		require("notifications.php");
-		displayNotifications();
+		Notifications::displayNotifications($system, $player);
 		echo "<script type='text/javascript'>
-		var notificationRefreshID = setInterval('javascript:$(\'#notifications\').load(\'./ajax_notifications.php\');', 5000);
+		var notificationRefreshID = setInterval(
+            () => {
+                $('#notifications').load('./api/legacy_notifications.php');
+            },
+            5000
+        );
 		</script>";
 	}
 
@@ -279,7 +283,7 @@ if($LOGGED_IN) {
 	}
 
 	// Route list
-	$routes = require 'routes.php';
+	$routes = require 'config/routes.php';
 
 	// Action log
 	if($player->log_actions) {
@@ -465,7 +469,7 @@ if($LOGGED_IN) {
 			<tr><td style='width: 50px;' class='newsFooter'><a class='link' href='{$system->link}?clear_message=1'>Dismiss</a></td>
 				<td class='newsFooter'>".$global_message_time."</td></tr></table>";
 		}
-		require("news.php");
+		require("pages/news.php");
 		news();
 	}
 	$player->updateData();
@@ -567,7 +571,7 @@ else {
 		Shinobi-Chronicles is currently closed for maintenace. Please check back in a few minutes!
 		</td></tr></table>";
 	}	
-	require("news.php");
+	require("pages/news.php");
 	newsPosts();
 
     $captcha = '';
