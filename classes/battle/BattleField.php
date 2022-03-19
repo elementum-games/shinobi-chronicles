@@ -139,6 +139,7 @@ class BattleField {
         $tiles = [];
         for($i = $this->min_tile; $i <= $this->max_tile; $i++) {
             $tiles[$i] = new BattleFieldTile(
+                index: $i,
                 fighter_ids: $fighter_ids_by_tile[$i] ?? []
             );
         }

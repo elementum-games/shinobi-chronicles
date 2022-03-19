@@ -30,7 +30,7 @@ function Battle({
 // Fighters and Field
 type FightersAndFieldProps = {|
     +battle: BattleData,
-    +membersLink: String,
+    +membersLink: string,
 |};
 
 function FightersAndField({
@@ -41,6 +41,10 @@ function FightersAndField({
     const opponent = battle.fighters[battle.opponentId];
 
     const { fighters, field, isSpectating, isMovementPhase } = battle;
+
+    const handleTileSelect = (tileIndex) => {
+        console.log('selected tile', tileIndex);
+    };
 
     return (
         <table className='table'>
@@ -79,9 +83,11 @@ function FightersAndField({
             <tr>
                 <td colSpan='2'>
                     <BattleField
+                        player={player}
                         fighters={fighters}
                         tiles={field.tiles}
-                        isMovementPhase={isMovementPhase}
+                        isSelectingTile={isMovementPhase}
+                        onTileSelect={handleTileSelect}
                     />
                 </td>
             </tr>

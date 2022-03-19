@@ -652,7 +652,7 @@ function chuuninExam(System $system, User $player, RankManager $rankManager): bo
 
             $battle = new BattleManager($system, $player, $player->battle_id);
 
-            $battle->checkTurn();
+            $battle->checkInputAndRunTurn();
 
             $battle->renderBattle();
 
@@ -719,7 +719,7 @@ function chuuninExam(System $system, User $player, RankManager $rankManager): bo
             }
 
             $battle = new BattleManager($system, $player, $player->battle_id);
-            $battle->checkTurn();
+            $battle->checkInputAndRunTurn();
 
             $battle->renderBattle();
             if(!$battle->isComplete()) {
@@ -1113,7 +1113,7 @@ function rankupFightAPI(System $system, User $player): BattlePageAPIResponse {
 
     try {
         $battle = new BattleManager($system, $player, $player->battle_id);
-        $battle->checkTurn();
+        $battle->checkInputAndRunTurn();
 
         $response->battle_data = $battle->getApiResponse();
 

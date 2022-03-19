@@ -30,6 +30,11 @@ function FightersAndField({
     isSpectating,
     isMovementPhase
   } = battle;
+
+  const handleTileSelect = tileIndex => {
+    console.log('selected tile', tileIndex);
+  };
+
   return /*#__PURE__*/React.createElement("table", {
     className: "table"
   }, /*#__PURE__*/React.createElement("tbody", null, /*#__PURE__*/React.createElement("tr", null, /*#__PURE__*/React.createElement("th", {
@@ -60,9 +65,11 @@ function FightersAndField({
   }))), /*#__PURE__*/React.createElement("tr", null, /*#__PURE__*/React.createElement("td", {
     colSpan: "2"
   }, /*#__PURE__*/React.createElement(BattleField, {
+    player: player,
     fighters: fighters,
     tiles: field.tiles,
-    isMovementPhase: isMovementPhase
+    isSelectingTile: isMovementPhase,
+    onTileSelect: handleTileSelect
   })))));
 }
 

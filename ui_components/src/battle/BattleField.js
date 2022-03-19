@@ -4,34 +4,53 @@ import { FighterAvatar } from "./FighterAvatar.js";
 import type { FighterType, BattleFieldTileType } from "./battleSchema.js";
 
 type Props = {|
-    +fighters: $ReadOnlyArray<FighterType>,
+    +player: FighterType,
+    +fighters: { [key: string]: FighterType },
     +tiles: $ReadOnlyArray<BattleFieldTileType>,
-    +isMovementPhase: boolean,
+    +isSelectingTile: boolean,
+    +onTileSelect: (tileIndex: number) => void,
 |};
 
-export default function BattleField({ fighters, tiles, isMovementPhase }: Props) {
-    const fightersForIds = (ids: string[]) => {
+export default function BattleField({
+    player,
+    fighters,
+    tiles,
+    isSelectingTile,
+    onTileSelect
+}: Props): React$Node {
+    const fightersForIds = (ids: $ReadOnlyArray<string>) => {
         return ids.map(id => fighters[id]).filter(Boolean)
     };
 
     return (
         <div className={`tilesContainer`}>
-            {Object.keys(tiles).map((tileIndex) => (
+            {tiles.map((tile, tileIndex) => (
                 <BattleFieldTile
                     key={tileIndex}
                     index={tileIndex}
-                    isPlayerTile={true}
-                    fighters={fightersForIds(tiles[tileIndex].fighterIds)}
+                    fighters={fightersForIds(tile.fighterIds)}
+                    isPlayerTile={tile.fighterIds.includes(player.id)}
+                    isMovementPhase={isSelectingTile}
+                    onSelect={() => onTileSelect(tileIndex)}
                 />
             ))}
         </div>
     )
 }
 
-function BattleFieldTile({ tileIndex, isPlayerTile, fighters }) {
+function BattleFieldTile({
+    index,
+    fighters,
+    isPlayerTile,
+    isMovementPhase,
+    onSelect
+}) {
     return (
-        <div className='tile'>
-            <span className='tileIndex'>{tileIndex}</span>
+        <div
+            className={`tile ${(isMovementPhase && !isPlayerTile) ? 'movementActive' : ''}`}
+            onClick={onSelect}
+        >
+            <span className='tileIndex'>{index}</span>
             {fighters.map((fighter, i) => (
                 <div key={i} className={`tileFighter ${fighter.isAlly ? 'ally' : 'enemy'}`}>
                     <FighterAvatar

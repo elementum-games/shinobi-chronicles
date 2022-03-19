@@ -209,10 +209,13 @@ class BattleManager {
     // PUBLIC MUTATION API
 
     /**
+     * This is the primary method most usages of battle should call. This triggers progresses the battle if the required inputs
+     * have been gathered.
+     *
      * @return string|null
      * @throws Exception
      */
-    public function checkTurn(): ?string {
+    public function checkInputAndRunTurn(): ?string {
         // If someone is not in battle, this will be set
         if($this->battle->winner) {
             return $this->battle->winner;

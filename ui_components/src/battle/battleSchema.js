@@ -28,6 +28,7 @@ export type BattleType = {|
 
 // BattleApiPresenter::fighterResponse
 export type FighterType = {|
+    +id: string,
     +name: string,
     +isNpc: boolean,
     +isAlly: boolean,
@@ -48,7 +49,8 @@ export type BattleFieldType = {|
 
 // BattleApiPresenter::fieldTileResponse
 export type BattleFieldTileType = {|
-    +fighterIds: $ReadOnlyArray<String>
+    +index: number,
+    +fighterIds: $ReadOnlyArray<string>
 |};
 
 // BattleApiPresenter::jutsuResponse

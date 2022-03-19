@@ -56,15 +56,13 @@
     background: rgba(255, 0, 0, 0.4);
 }
 
-.tilesContainer.movementActive .tile[data-player-tile="0"] {
+.tile.movementActive {
     cursor: pointer;
 }
-
-.tilesContainer.movementActive .tile:hover[data-player-tile="0"] {
+.tile.movementActive:hover {
     background: #b1a990;
 }
-
-.tilesContainer.movementActive .tile.selected[data-player-tile="0"] {
+.tile.movementActive.selected {
     background: #b1a990;
     border-color: #5d594c;
     box-shadow: 0 0 3px 0 black;

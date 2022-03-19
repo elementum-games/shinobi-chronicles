@@ -1,8 +1,10 @@
 import { FighterAvatar } from "./FighterAvatar.js";
 export default function BattleField({
+  player,
   fighters,
   tiles,
-  isMovementPhase
+  isSelectingTile,
+  onTileSelect
 }) {
   const fightersForIds = ids => {
     return ids.map(id => fighters[id]).filter(Boolean);
@@ -10,24 +12,29 @@ export default function BattleField({
 
   return /*#__PURE__*/React.createElement("div", {
     className: `tilesContainer`
-  }, Object.keys(tiles).map(tileIndex => /*#__PURE__*/React.createElement(BattleFieldTile, {
+  }, tiles.map((tile, tileIndex) => /*#__PURE__*/React.createElement(BattleFieldTile, {
     key: tileIndex,
     index: tileIndex,
-    isPlayerTile: true,
-    fighters: fightersForIds(tiles[tileIndex].fighterIds)
+    fighters: fightersForIds(tile.fighterIds),
+    isPlayerTile: tile.fighterIds.includes(player.id),
+    isMovementPhase: isSelectingTile,
+    onSelect: () => onTileSelect(tileIndex)
   })));
 }
 
 function BattleFieldTile({
-  tileIndex,
+  index,
+  fighters,
   isPlayerTile,
-  fighters
+  isMovementPhase,
+  onSelect
 }) {
   return /*#__PURE__*/React.createElement("div", {
-    className: "tile"
+    className: `tile ${isMovementPhase && !isPlayerTile ? 'movementActive' : ''}`,
+    onClick: onSelect
   }, /*#__PURE__*/React.createElement("span", {
     className: "tileIndex"
-  }, tileIndex), fighters.map((fighter, i) => /*#__PURE__*/React.createElement("div", {
+  }, index), fighters.map((fighter, i) => /*#__PURE__*/React.createElement("div", {
     key: i,
     className: `tileFighter ${fighter.isAlly ? 'ally' : 'enemy'}`
   }, /*#__PURE__*/React.createElement(FighterAvatar, {

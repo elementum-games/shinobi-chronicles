@@ -89,12 +89,14 @@ class BattleApiPresenter {
 
     private static function fieldTileResponse(BattleFieldTile $tile): array {
         return [
+            'index' => $tile->index,
             'fighterIds' => $tile->fighter_ids,
         ];
     }
 
     private static function fighterResponse(Fighter $fighter, bool $is_player = false): array {
         return [
+            'id' => $fighter->combat_id,
             'name' => $fighter->getName(),
             'isNpc' => ($fighter instanceof NPC),
             'isAlly' => $is_player,
