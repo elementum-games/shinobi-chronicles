@@ -24,14 +24,14 @@ export default function BattleField({
 
     return (
         <div className={`tilesContainer`}>
-            {tiles.map((tile, tileIndex) => (
+            {tiles.map((tile) => (
                 <BattleFieldTile
-                    key={tileIndex}
-                    index={tileIndex}
+                    key={tile.index}
+                    index={tile.index}
                     fighters={fightersForIds(tile.fighterIds)}
                     isPlayerTile={tile.fighterIds.includes(player.id)}
                     isMovementPhase={isSelectingTile}
-                    onSelect={() => onTileSelect(tileIndex)}
+                    onSelect={() => onTileSelect(tile.index)}
                 />
             ))}
         </div>

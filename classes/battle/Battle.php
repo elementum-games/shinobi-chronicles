@@ -328,11 +328,13 @@ class Battle {
     }
 
     public function isAttackPhase(): bool {
-        return $this->turn_type === Battle::TURN_TYPE_ATTACK;
+        return false;
+        // return $this->turn_type === Battle::TURN_TYPE_ATTACK;
     }
 
     public function isMovementPhase(): bool {
-        return $this->turn_type === Battle::TURN_TYPE_MOVEMENT;
+        return true;
+        // return $this->turn_type === Battle::TURN_TYPE_MOVEMENT;
     }
 
     #[Pure]

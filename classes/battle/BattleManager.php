@@ -61,6 +61,8 @@ class BattleManager {
 
     private Battle $battle;
 
+    private bool $is_api_request;
+
     public User $player;
     public Fighter $opponent;
 
@@ -78,8 +80,10 @@ class BattleManager {
 
     public bool $spectate = false;
 
+    const DEBUG_PLAYER_ACTION = 'player_action';
+
     public array $debug = [
-        'player_action' => false
+        self::DEBUG_PLAYER_ACTION => false
     ];
 
     // INITIALIZATION
@@ -91,6 +95,7 @@ class BattleManager {
      * @param int    $battle_id
      * @param bool   $spectate
      * @param bool   $load_fighters
+     * @param bool   $is_api_request
      * @throws Exception
      */
     public function __construct(
@@ -98,13 +103,15 @@ class BattleManager {
         User $player,
         int $battle_id,
         bool $spectate = false,
-        bool $load_fighters = true
+        bool $load_fighters = true,
+        bool $is_api_request = false
     ) {
         $this->system = $system;
         $this->battle_id = $battle_id;
         $this->player = $player;
         $this->spectate = $spectate;
         $this->battle = new Battle($system, $player, $battle_id);
+        $this->is_api_request = $is_api_request;
 
         $this->default_attacks = $this->getDefaultAttacks();
 
@@ -234,7 +241,7 @@ class BattleManager {
             ($this->battle->timeRemaining() > 0 || !$this->opponentActionSubmitted())
         ) {
             $player_action = $this->collectPlayerAction($_POST);
-            $this->renderDebug('player_action', 'playerActionSubmitted', print_r($player_action, true));
+            $this->renderDebug(self::DEBUG_PLAYER_ACTION, 'playerActionSubmitted', print_r($player_action, true));
 
             if($player_action != null) {
                 $this->setPlayerAction($this->player, $player_action);
@@ -1169,9 +1176,11 @@ class BattleManager {
             }
         }
         else if($this->battle->isMovementPhase() && !empty($FORM_DATA['submit_movement_action'])) {
+            $this->renderDebug(self::DEBUG_PLAYER_ACTION, 'collecting movement action', $FORM_DATA['selected_tile'] ?? null);
+
             // Run player attack
             try {
-                $target_tile = isset($FORM_DATA['selected_tile']) ? $FORM_DATA['selected_tile'] : null;
+                $target_tile = $FORM_DATA['selected_tile'] ?? null;
                 if($target_tile == null) {
                     throw new Exception("Invalid tile!");
                 }
@@ -1273,7 +1282,7 @@ class BattleManager {
         }
 
         if($jutsu == null) {
-            $this->renderDebug('player_action', "getJutsuFromAttackAction", print_r($action, true));
+            $this->renderDebug(self::DEBUG_PLAYER_ACTION, "getJutsuFromAttackAction", print_r($action, true));
             throw new Exception("Invalid type {$action->jutsu_purchase_type} jutsu {$action->jutsu_id} for fighter {$fighter->getName()}");
         }
 
@@ -1288,6 +1297,12 @@ class BattleManager {
         if($content == "") {
             $content = "[empty]";
         }
+
+        if($this->is_api_request) {
+            $this->system->debugMessage($label . ': ' . $content);
+            return;
+        }
+
         echo "<div style='background:#222;
                 color:#e0e0e0;
                 white-space:pre-wrap;

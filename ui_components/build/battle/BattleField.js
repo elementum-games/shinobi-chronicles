@@ -12,13 +12,13 @@ export default function BattleField({
 
   return /*#__PURE__*/React.createElement("div", {
     className: `tilesContainer`
-  }, tiles.map((tile, tileIndex) => /*#__PURE__*/React.createElement(BattleFieldTile, {
-    key: tileIndex,
-    index: tileIndex,
+  }, tiles.map(tile => /*#__PURE__*/React.createElement(BattleFieldTile, {
+    key: tile.index,
+    index: tile.index,
     fighters: fightersForIds(tile.fighterIds),
     isPlayerTile: tile.fighterIds.includes(player.id),
     isMovementPhase: isSelectingTile,
-    onSelect: () => onTileSelect(tileIndex)
+    onSelect: () => onTileSelect(tile.index)
   })));
 }
 

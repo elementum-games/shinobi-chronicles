@@ -79,11 +79,13 @@ class BattleApiPresenter {
     }
 
     private static function fieldAllTilesResponse(BattleField $field): array {
-        return array_map(
-            function(BattleFieldTile $tile) {
-                return BattleApiPresenter::fieldTileResponse($tile);
-            },
-            $field->getDisplayTiles()
+        return array_values(
+            array_map(
+                function(BattleFieldTile $tile) {
+                    return BattleApiPresenter::fieldTileResponse($tile);
+                },
+                $field->getDisplayTiles()
+            )
         );
     }
 

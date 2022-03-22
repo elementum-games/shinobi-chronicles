@@ -6,24 +6,61 @@ import BattleLog from "./BattleLog.js";
 import BattleActionPrompt from "./BattleActionPrompt.js";
 
 import type { BattleType as BattleData } from "./battleSchema.js";
+import { buildFormData } from "../utils/formData.js";
 
 type Props = {|
     +battle: BattleData,
+    +battleApiLink: string,
     +membersLink: string,
 |};
 
+async function postData(url = '', data = {}) {
+    // Default options are marked with *
+    const response = await fetch(url, {
+        method: 'POST',
+        mode: 'cors', // no-cors, *cors, same-origin
+        cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
+        credentials: 'same-origin', // include, *same-origin, omit
+        redirect: 'follow', // manual, *follow, error
+        referrerPolicy: 'no-referrer',
+        body: buildFormData(data)
+    });
+    return response.json();
+}
+
 function Battle({
-    battle,
+    battle: initialBattle,
+    battleApiLink,
     membersLink
 }: Props) {
+    const [battle, setBattle] = React.useState(initialBattle);
+
+    const handleTileSelect = (tileIndex) => {
+        console.log('selected tile', tileIndex);
+
+        postData(
+            battleApiLink,
+            {
+                submit_movement_action: "yes",
+                selected_tile: tileIndex
+            }
+        )
+        .then(response => {
+            if (response.data.battle != null) {
+                setBattle(response.data.battle);
+            }
+        });
+    };
+
     return <div>
         <FightersAndField
             battle={battle}
             membersLink={membersLink}
+            onTileSelect={handleTileSelect}
         />
-        {battle.isSpectating && <SpectateStatus />}
-        {!battle.isSpectating && !battle.isComplete && <BattleActionPrompt battle={battle} />}
-        {battle.lastTurnText != null && <BattleLog lastTurnText={battle.lastTurnText} />}
+        {battle.isSpectating && <SpectateStatus/>}
+        {!battle.isSpectating && !battle.isComplete && <BattleActionPrompt battle={battle}/>}
+        {battle.lastTurnText != null && <BattleLog lastTurnText={battle.lastTurnText}/>}
     </div>;
 }
 
@@ -31,19 +68,21 @@ function Battle({
 type FightersAndFieldProps = {|
     +battle: BattleData,
     +membersLink: string,
+    +onTileSelect: (tileIndex: number) => void,
 |};
 
 function FightersAndField({
     battle,
     membersLink,
+    onTileSelect
 }: FightersAndFieldProps) {
-    const player = battle.fighters[battle.playerId];
-    const opponent = battle.fighters[battle.opponentId];
+    const player = battle.fighters[ battle.playerId ];
+    const opponent = battle.fighters[ battle.opponentId ];
 
     const { fighters, field, isSpectating, isMovementPhase } = battle;
 
     const handleTileSelect = (tileIndex) => {
-        console.log('selected tile', tileIndex);
+        onTileSelect(tileIndex);
     };
 
     return (

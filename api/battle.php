@@ -14,7 +14,7 @@ try {
 
 $player->loadData(User::UPDATE_NOTHING);
 
-$routes = require __DIR__ . '../config/routes.php';
+$routes = require __DIR__ . '/../config/routes.php';
 
 $battle_result = $system->query("SELECT battle_type FROM battles WHERE `battle_id`='{$player->battle_id}' LIMIT 1");
 if($system->db_last_num_rows) {

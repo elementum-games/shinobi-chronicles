@@ -15,11 +15,13 @@
 
     const battle = <?= json_encode($battleManager->getApiResponse()) ?>;
     const membersLink = "<?= $system->links['members'] ?>";
+    const battleApiLink = "<?= $system->api_links['battle'] ?>";
 
     window.addEventListener('load', () => {
         ReactDOM.render(
             React.createElement(Battle, {
                 battle: battle,
+                battleApiLink: battleApiLink,
                 membersLink: membersLink
             }),
             battleContainer

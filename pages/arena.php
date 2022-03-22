@@ -122,10 +122,11 @@ function arenaFightAPI(System $system, User $player): BattlePageAPIResponse {
     $response = new BattlePageAPIResponse();
 
     try {
-        $battle = new BattleManager($system, $player, $player->battle_id);
+        $battle = new BattleManager(system: $system, player: $player, battle_id: $player->battle_id, is_api_request: true);
         $battle->checkInputAndRunTurn();
 
         $response->battle_data = $battle->getApiResponse();
+        $response->errors[] = $system->debug_messages;
 
         if($battle->isComplete()) {
             $response->battle_result = processArenaBattleEnd($battle, $player);

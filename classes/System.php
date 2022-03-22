@@ -61,8 +61,8 @@ class System {
 
     public $environment;
 
-    public $SC_OPEN;
-    public $register_open;
+    public bool $SC_OPEN;
+    public bool $register_open;
 
     public string $link;
 
@@ -135,9 +135,13 @@ class System {
         'support' => 30,
         'chat_log' => 31,
     ];
+
     public array $links = [
         'github' => 'https://github.com/elementum-games/shinobi-chronicles',
         'discord' => 'https://discord.gg/Kx52dbXEf3',
+    ];
+    public array $api_links = [
+        'battle' => ''
     ];
 
     //Chat variables
@@ -246,6 +250,7 @@ class System {
             $this->links[$slug] = $this->link . '?id=' . $id;
         }
 
+        $this->api_links['battle'] = $this->link . 'api/battle.php';
         $this->api_links['inbox'] = $this->link . 'api/inbox.php';
         $this->api_links['travel'] = $this->link . 'api/travel.php';
 
@@ -382,6 +387,10 @@ class System {
         if(strlen($this->message) == 0 || $force_message) {
             $this->message = $message;
         }
+    }
+
+    public function debugMessage($message) {
+        $this->debug_messages[] = $message;
     }
 
     /* function printMessage()

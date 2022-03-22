@@ -2,14 +2,49 @@ import FighterDisplay from "./FighterDisplay.js";
 import BattleField from "./BattleField.js";
 import BattleLog from "./BattleLog.js";
 import BattleActionPrompt from "./BattleActionPrompt.js";
+import { buildFormData } from "../utils/formData.js";
+
+async function postData(url = '', data = {}) {
+  // Default options are marked with *
+  const response = await fetch(url, {
+    method: 'POST',
+    mode: 'cors',
+    // no-cors, *cors, same-origin
+    cache: 'no-cache',
+    // *default, no-cache, reload, force-cache, only-if-cached
+    credentials: 'same-origin',
+    // include, *same-origin, omit
+    redirect: 'follow',
+    // manual, *follow, error
+    referrerPolicy: 'no-referrer',
+    body: buildFormData(data)
+  });
+  return response.json();
+}
 
 function Battle({
-  battle,
+  battle: initialBattle,
+  battleApiLink,
   membersLink
 }) {
+  const [battle, setBattle] = React.useState(initialBattle);
+
+  const handleTileSelect = tileIndex => {
+    console.log('selected tile', tileIndex);
+    postData(battleApiLink, {
+      submit_movement_action: "yes",
+      selected_tile: tileIndex
+    }).then(response => {
+      if (response.data.battle != null) {
+        setBattle(response.data.battle);
+      }
+    });
+  };
+
   return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement(FightersAndField, {
     battle: battle,
-    membersLink: membersLink
+    membersLink: membersLink,
+    onTileSelect: handleTileSelect
   }), battle.isSpectating && /*#__PURE__*/React.createElement(SpectateStatus, null), !battle.isSpectating && !battle.isComplete && /*#__PURE__*/React.createElement(BattleActionPrompt, {
     battle: battle
   }), battle.lastTurnText != null && /*#__PURE__*/React.createElement(BattleLog, {
@@ -20,7 +55,8 @@ function Battle({
 
 function FightersAndField({
   battle,
-  membersLink
+  membersLink,
+  onTileSelect
 }) {
   const player = battle.fighters[battle.playerId];
   const opponent = battle.fighters[battle.opponentId];
@@ -32,7 +68,7 @@ function FightersAndField({
   } = battle;
 
   const handleTileSelect = tileIndex => {
-    console.log('selected tile', tileIndex);
+    onTileSelect(tileIndex);
   };
 
   return /*#__PURE__*/React.createElement("table", {
