@@ -1,6 +1,8 @@
 // @flow
 import type { BattleType, FighterType, JutsuType } from "./battleSchema.js";
 
+import { unSlug } from "../utils/string.js";
+
 type JutsuCategory = 'ninjutsu' | 'genjutsu' | 'taijutsu' | "bloodline";
 
 export default function AttackActionPrompt({ battle }: { +battle: BattleType }): React$Node {
@@ -21,12 +23,23 @@ export default function AttackActionPrompt({ battle }: { +battle: BattleType }):
         setJutsuId(jutsuId);
     };
 
+    const handleWeaponChange = (weaponId: number) => {
+        console.log("Weapon selected ", weaponId);
+        setWeaponId(weaponId);
+    };
+
     return (
         <React.Fragment>
             <tr>
                 <td>
                     {isSelectingHandSeals && <HandSealsInput onChange={setHandSeals} />}
-                    {isSelectingWeapon && <WeaponInput fighter={player} />}
+                    {isSelectingWeapon &&
+                        <WeaponInput
+                            weapons={battle.playerEquippedWeapons}
+                            selectedWeaponId={weaponId}
+                            onChange={handleWeaponChange}
+                        />
+                    }
                 </td>
             </tr>
             <tr>
@@ -134,17 +147,22 @@ function HandSealsInput({ onChange, tooltips = {} }: {
     );
 }
 
-function WeaponInput({ fighter }) {
+function WeaponInput({ weapons, selectedWeaponId, onChange }) {
     return (
         <div id='weapons'>
-            <p className='weapon' data-id='0'>
+            <p
+                className={`weapon ${selectedWeaponId === 0 ? 'selected' : ''}`}
+                data-id='0' onClick={() => onChange(0)}>
                 <b>None</b>
             </p>
-            {fighter.equippedWeapons.map(weapon => (
-                <p className='weapon'>
+            {weapons.map((weapon, i) => (
+                <p
+                    key={i}
+                    className={`weapon ${selectedWeaponId === weapon.id ? 'selected' : ''}`}
+                    onClick={() => onChange(weapon.id)}
+                >
                     <b>{weapon.name}</b><br/>
-                    {weapon.effect}
-                    {weapon.effectAmount}%
+                    {unSlug(weapon.effect)} ({weapon.effectAmount}%)
                 </p>
             ))}
         </div>

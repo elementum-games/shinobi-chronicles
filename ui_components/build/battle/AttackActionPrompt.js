@@ -1,3 +1,4 @@
+import { unSlug } from "../utils/string.js";
 export default function AttackActionPrompt({
   battle
 }) {
@@ -16,10 +17,17 @@ export default function AttackActionPrompt({
     setJutsuId(jutsuId);
   };
 
+  const handleWeaponChange = weaponId => {
+    console.log("Weapon selected ", weaponId);
+    setWeaponId(weaponId);
+  };
+
   return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("tr", null, /*#__PURE__*/React.createElement("td", null, isSelectingHandSeals && /*#__PURE__*/React.createElement(HandSealsInput, {
     onChange: setHandSeals
   }), isSelectingWeapon && /*#__PURE__*/React.createElement(WeaponInput, {
-    fighter: player
+    weapons: battle.playerEquippedWeapons,
+    selectedWeaponId: weaponId,
+    onChange: handleWeaponChange
   }))), /*#__PURE__*/React.createElement("tr", null, /*#__PURE__*/React.createElement("th", {
     className: "jutsuCategoryHeader"
   }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("span", null, "Ninjutsu"), /*#__PURE__*/React.createElement("span", null, "Taijutsu"), /*#__PURE__*/React.createElement("span", null, "Genjutsu"), player.hasBloodline && /*#__PURE__*/React.createElement("span", null, "Bloodline")))), /*#__PURE__*/React.createElement("tr", null, /*#__PURE__*/React.createElement("td", null, /*#__PURE__*/React.createElement(JutsuInput, {
@@ -148,16 +156,21 @@ function HandSealsInput({
 }
 
 function WeaponInput({
-  fighter
+  weapons,
+  selectedWeaponId,
+  onChange
 }) {
   return /*#__PURE__*/React.createElement("div", {
     id: "weapons"
   }, /*#__PURE__*/React.createElement("p", {
-    className: "weapon",
-    "data-id": "0"
-  }, /*#__PURE__*/React.createElement("b", null, "None")), fighter.equippedWeapons.map(weapon => /*#__PURE__*/React.createElement("p", {
-    className: "weapon"
-  }, /*#__PURE__*/React.createElement("b", null, weapon.name), /*#__PURE__*/React.createElement("br", null), weapon.effect, weapon.effectAmount, "%")));
+    className: `weapon ${selectedWeaponId === 0 ? 'selected' : ''}`,
+    "data-id": "0",
+    onClick: () => onChange(0)
+  }, /*#__PURE__*/React.createElement("b", null, "None")), weapons.map((weapon, i) => /*#__PURE__*/React.createElement("p", {
+    key: i,
+    className: `weapon ${selectedWeaponId === weapon.id ? 'selected' : ''}`,
+    onClick: () => onChange(weapon.id)
+  }, /*#__PURE__*/React.createElement("b", null, weapon.name), /*#__PURE__*/React.createElement("br", null), unSlug(weapon.effect), " (", weapon.effectAmount, "%)")));
 }
 
 function JutsuInput({

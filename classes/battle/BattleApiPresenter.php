@@ -124,7 +124,10 @@ class BattleApiPresenter {
 
     private static function weaponResponse(Item $weapon): array {
         return [
-            'effect' => $weapon->effect
+            'id' => $weapon->id,
+            'name' => $weapon->name,
+            'effect' => $weapon->effect,
+            'effectAmount' => $weapon->effect_amount,
         ];
     }
 }

@@ -9,6 +9,7 @@ export type BattleType = {|
     +playerDefaultAttacks: $ReadOnlyArray<JutsuType>,
     +playerEquippedJutsu: $ReadOnlyArray<JutsuType>,
     +playerBloodlineJutsu: $ReadOnlyArray<JutsuType>,
+    +playerEquippedWeapons: $ReadOnlyArray<WeaponType>,
     +field: BattleFieldType,
     +isSpectating: boolean,
     +isMovementPhase: boolean,
@@ -64,6 +65,7 @@ export type JutsuType = {|
 
 // BattleApiPresenter::weaponResponse
 export type WeaponType = {|
+    +id: number,
     +name: string,
     +effect: string,
     +effectAmount: number,
