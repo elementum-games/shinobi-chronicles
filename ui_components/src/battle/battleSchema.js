@@ -61,6 +61,7 @@ export type JutsuType = {|
     +name: string,
     +activeCooldownTurnsLeft: number,
     +jutsuType: string,
+    +handSeals: $ReadOnlyArray<string>,
 |};
 
 // BattleApiPresenter::weaponResponse
@@ -70,4 +71,6 @@ export type WeaponType = {|
     +effect: string,
     +effectAmount: number,
 |};
+
+export type JutsuCategory = 'ninjutsu' | 'genjutsu' | 'taijutsu' | "bloodline";
 
