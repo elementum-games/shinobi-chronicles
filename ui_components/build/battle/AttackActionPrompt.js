@@ -1,41 +1,64 @@
 import { JutsuInput } from "./JutsuInput.js";
 import { unSlug } from "../utils/string.js";
 export default function AttackActionPrompt({
-  battle
+  battle,
+  selectedAttack,
+  updateSelectedAttack
 }) {
   const player = battle.fighters[battle.playerId];
   const opponent = battle.fighters[battle.opponentId];
-  const [handSeals, setHandSeals] = React.useState([]);
-  const [jutsuId, setJutsuId] = React.useState(-1);
-  const [jutsuCategory, setJutsuCategory] = React.useState('ninjutsu');
-  const [jutsuType, setJutsuType] = React.useState('ninjutsu');
-  const [weaponId, setWeaponId] = React.useState(0);
+  const {
+    jutsuId,
+    jutsuCategory,
+    jutsuType,
+    handSeals,
+    weaponId
+  } = selectedAttack;
   const isSelectingHandSeals = ['ninjutsu', 'genjutsu'].includes(jutsuCategory);
   const isSelectingWeapon = jutsuCategory === 'taijutsu';
 
-  const handleJutsuChange = (jutsuId, jutsuCategory) => {
-    setJutsuCategory(jutsuCategory);
-    setJutsuId(jutsuId);
+  const handleHandSealsChange = handSeals => {
+    updateSelectedAttack({
+      handSeals
+    });
+  };
 
-    if (jutsuCategory === "ninjutsu" || jutsuCategory === "genjutsu") {
-      const jutsu = battle.playerEquippedJutsu.find(jutsu => jutsu.id === jutsuId);
+  const handleJutsuChange = (jutsuId, newJutsuCategory) => {
+    let newSelectedAttack = {
+      jutsuCategory: newJutsuCategory,
+      jutsuId
+    };
+    let jutsu;
 
-      if (jutsu != null) {
-        setHandSeals(jutsu.handSeals);
-      } else {
-        console.error("Invalid jutsu handseals!");
-      }
+    if (newJutsuCategory === 'bloodline') {
+      jutsu = battle.playerBloodlineJutsu.find(jutsu => jutsu.id === jutsuId);
+    } else {
+      jutsu = battle.playerEquippedJutsu.find(jutsu => jutsu.id === jutsuId) || battle.playerDefaultAttacks.find(jutsu => jutsu.id === jutsuId);
     }
+
+    if (jutsu != null) {
+      newSelectedAttack.jutsuType = jutsu.jutsuType;
+
+      if (newJutsuCategory === "ninjutsu" || newJutsuCategory === "genjutsu") {
+        newSelectedAttack.handSeals = jutsu.handSeals;
+      }
+    } else {
+      console.error("Invalid jutsu!");
+    }
+
+    updateSelectedAttack(newSelectedAttack);
   };
 
   const handleWeaponChange = weaponId => {
     console.log("Weapon selected ", weaponId);
-    setWeaponId(weaponId);
+    updateSelectedAttack({
+      weaponId
+    });
   };
 
   return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("tr", null, /*#__PURE__*/React.createElement("td", null, isSelectingHandSeals && /*#__PURE__*/React.createElement(HandSealsInput, {
     initialHandSeals: handSeals,
-    onChange: setHandSeals
+    onChange: handleHandSealsChange
   }), isSelectingWeapon && /*#__PURE__*/React.createElement(WeaponInput, {
     weapons: battle.playerEquippedWeapons,
     selectedWeaponId: weaponId,
@@ -46,38 +69,7 @@ export default function AttackActionPrompt({
     battle: battle,
     player: player,
     onChange: handleJutsuChange
-  }), /*#__PURE__*/React.createElement("input", {
-    type: "hidden",
-    id: "hand_seal_input",
-    name: "hand_seals",
-    value: "<?= $prefill_hand_seals ?>"
-  }), /*#__PURE__*/React.createElement("input", {
-    type: "hidden",
-    id: "jutsuType",
-    name: "jutsu_type",
-    value: "<?= $prefill_jutsu_type ?>"
-  }), /*#__PURE__*/React.createElement("input", {
-    type: "hidden",
-    id: "weaponID",
-    name: "weapon_id",
-    value: "<?= $prefill_weapon_id ?>"
-  }), /*#__PURE__*/React.createElement("input", {
-    type: "hidden",
-    id: "jutsuID",
-    name: "jutsu_id",
-    value: "<?= $prefill_jutsu_id ?>"
-  }), /*#__PURE__*/React.createElement("p", {
-    style: {
-      display: "block",
-      textAlign: "center",
-      margin: "auto"
-    }
-  }, /*#__PURE__*/React.createElement("input", {
-    id: "submitbtn",
-    type: "submit",
-    name: "attack",
-    value: "Submit"
-  })))));
+  }))));
 }
 
 function HandSealsInput({
@@ -179,8 +171,12 @@ function WeaponInput({
   return /*#__PURE__*/React.createElement("div", {
     id: "weapons"
   }, /*#__PURE__*/React.createElement("p", {
+    style: {
+      textAlign: "center",
+      fontStyle: "italic"
+    }
+  }, "Please select a weapon to augment your Taijutsu with:"), /*#__PURE__*/React.createElement("p", {
     className: `weapon ${selectedWeaponId === 0 ? 'selected' : ''}`,
-    "data-id": "0",
     onClick: () => onChange(0)
   }, /*#__PURE__*/React.createElement("b", null, "None")), weapons.map((weapon, i) => /*#__PURE__*/React.createElement("p", {
     key: i,

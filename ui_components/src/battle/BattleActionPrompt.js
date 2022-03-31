@@ -18,6 +18,13 @@ export default function BattleActionPrompt({ battle }: { +battle: BattleData }):
         weaponId: 0,
     });
 
+    const updateSelectedAttack = (newSelectedAttack: $Shape<AttackFormFields>) => {
+        setSelectedAttack(prevSelectedAttack => ({
+            ...prevSelectedAttack,
+            ...newSelectedAttack
+        }));
+    }
+
     const opponent = battle.fighters[battle.opponentId];
 
     const renderPhaseComponent = () => {
@@ -38,7 +45,7 @@ export default function BattleActionPrompt({ battle }: { +battle: BattleData }):
             return <AttackActionPrompt 
                 battle={battle}
                 selectedAttack={selectedAttack}
-                setSelectedAttack={setSelectedAttack}
+                updateSelectedAttack={updateSelectedAttack}
             />;
         }
         else {
@@ -60,7 +67,15 @@ export default function BattleActionPrompt({ battle }: { +battle: BattleData }):
         prompt = "Select Movement Action";
     }
     else if(battle.isAttackPhase) {
-
+        if((selectedAttack.jutsuCategory === 'ninjutsu' || selectedAttack.jutsuCategory === 'genjutsu') && selectedAttack.handSeals.length < 1) {
+            prompt = "Select Jutsu";
+        }
+        else if(selectedAttack.jutsuId === -1) {
+            prompt = "Select Jutsu";
+        }
+        else {
+            prompt = "Select a Target (above)"
+        }
     }
 
     const handleSubmit = () => {

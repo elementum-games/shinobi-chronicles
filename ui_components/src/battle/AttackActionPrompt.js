@@ -19,13 +19,13 @@ export type AttackFormFields = {|
 type Props = {|
     +battle: BattleType,
     +selectedAttack: AttackFormFields,
-    +setSelectedAttack: (AttackFormFields) => void,
+    +updateSelectedAttack: ($Shape<AttackFormFields>) => void,
 |};
 
 export default function AttackActionPrompt({
     battle,
     selectedAttack,
-    setSelectedAttack
+    updateSelectedAttack
 }: Props): React$Node {
     const player = battle.fighters[battle.playerId];
     const opponent = battle.fighters[battle.opponentId];
@@ -41,16 +41,12 @@ export default function AttackActionPrompt({
     const isSelectingHandSeals = ['ninjutsu', 'genjutsu'].includes(jutsuCategory);
     const isSelectingWeapon = jutsuCategory === 'taijutsu';
 
-    const handleHandSealsChange = React.useCallback((handSeals: $ReadOnlyArray<string>) => {
-        setSelectedAttack({
-            ...selectedAttack,
-            handSeals
-        });
-    }, [selectedAttack]);
+    const handleHandSealsChange = (handSeals: $ReadOnlyArray<string>) => {
+        updateSelectedAttack({ handSeals });
+    };
 
-    const handleJutsuChange = React.useCallback((jutsuId: number, newJutsuCategory: JutsuCategory) => {
-        let newSelectedAttack = {
-            ...selectedAttack,
+    const handleJutsuChange = (jutsuId: number, newJutsuCategory: JutsuCategory) => {
+        let newSelectedAttack: $Shape<AttackFormFields> = {
             jutsuCategory: newJutsuCategory,
             jutsuId
         };
@@ -74,16 +70,13 @@ export default function AttackActionPrompt({
             console.error("Invalid jutsu!");
         }
 
-        setSelectedAttack(newSelectedAttack);
-    }, [selectedAttack]);
+        updateSelectedAttack(newSelectedAttack);
+    };
 
-    const handleWeaponChange = React.useCallback((weaponId: number) => {
+    const handleWeaponChange = (weaponId: number) => {
         console.log("Weapon selected ", weaponId);
-        setSelectedAttack({
-            ...selectedAttack,
-            weaponId
-        });
-    }, [selectedAttack]);
+        updateSelectedAttack({ weaponId });
+    };
 
     return (
         <React.Fragment>
@@ -205,9 +198,11 @@ function HandSealsInput({ initialHandSeals, onChange, tooltips = {} }: {
 function WeaponInput({ weapons, selectedWeaponId, onChange }) {
     return (
         <div id='weapons'>
+            <p style={{textAlign: "center", fontStyle: "italic"}}>Please select a weapon to augment your Taijutsu with:</p>
             <p
                 className={`weapon ${selectedWeaponId === 0 ? 'selected' : ''}`}
-                data-id='0' onClick={() => onChange(0)}>
+                onClick={() => onChange(0)}
+            >
                 <b>None</b>
             </p>
             {weapons.map((weapon, i) => (
