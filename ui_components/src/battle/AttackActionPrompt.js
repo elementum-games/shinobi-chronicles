@@ -7,44 +7,89 @@ import { unSlug } from "../utils/string.js";
 
 import type { JutsuCategory } from "./battleSchema.js";
 
-export default function AttackActionPrompt({ battle }: { +battle: BattleType }): React$Node {
+export type AttackFormFields = {|
+    handSeals: $ReadOnlyArray<string>,
+    jutsuId: number,
+    jutsuCategory: JutsuCategory,
+    jutsuType: 'ninjutsu' | 'genjutsu' | 'taijutsu',
+    weaponId: number,
+|};
+
+
+type Props = {|
+    +battle: BattleType,
+    +selectedAttack: AttackFormFields,
+    +setSelectedAttack: (AttackFormFields) => void,
+|};
+
+export default function AttackActionPrompt({
+    battle,
+    selectedAttack,
+    setSelectedAttack
+}: Props): React$Node {
     const player = battle.fighters[battle.playerId];
     const opponent = battle.fighters[battle.opponentId];
 
-    const [handSeals, setHandSeals] = React.useState([]);
-    const [jutsuId, setJutsuId] = React.useState(-1);
-    const [jutsuCategory, setJutsuCategory] = React.useState('ninjutsu');
-    const [jutsuType, setJutsuType] = React.useState('ninjutsu');
-    const [weaponId, setWeaponId] = React.useState(0);
+    const {
+        jutsuId,
+        jutsuCategory,
+        jutsuType,
+        handSeals,
+        weaponId
+    } = selectedAttack;
 
     const isSelectingHandSeals = ['ninjutsu', 'genjutsu'].includes(jutsuCategory);
     const isSelectingWeapon = jutsuCategory === 'taijutsu';
 
-    const handleJutsuChange = (jutsuId: number, jutsuCategory: JutsuCategory) => {
-        setJutsuCategory(jutsuCategory);
-        setJutsuId(jutsuId);
+    const handleHandSealsChange = React.useCallback((handSeals: $ReadOnlyArray<string>) => {
+        setSelectedAttack({
+            ...selectedAttack,
+            handSeals
+        });
+    }, [selectedAttack]);
 
-        if(jutsuCategory === "ninjutsu" || jutsuCategory === "genjutsu") {
-            const jutsu = battle.playerEquippedJutsu.find(jutsu => jutsu.id === jutsuId);
-            if(jutsu != null) {
-                setHandSeals(jutsu.handSeals);
-            }
-            else {
-                console.error("Invalid jutsu handseals!");
+    const handleJutsuChange = React.useCallback((jutsuId: number, newJutsuCategory: JutsuCategory) => {
+        let newSelectedAttack = {
+            ...selectedAttack,
+            jutsuCategory: newJutsuCategory,
+            jutsuId
+        };
+
+        let jutsu;
+        if(newJutsuCategory === 'bloodline') {
+            jutsu = battle.playerBloodlineJutsu.find(jutsu => jutsu.id === jutsuId);
+        }
+        else {
+            jutsu = battle.playerEquippedJutsu.find(jutsu => jutsu.id === jutsuId) ||
+                battle.playerDefaultAttacks.find(jutsu => jutsu.id === jutsuId);
+        }
+
+        if (jutsu != null) {
+            newSelectedAttack.jutsuType = jutsu.jutsuType;
+            if (newJutsuCategory === "ninjutsu" || newJutsuCategory === "genjutsu") {
+                newSelectedAttack.handSeals = jutsu.handSeals;
             }
         }
-    };
+        else {
+            console.error("Invalid jutsu!");
+        }
 
-    const handleWeaponChange = (weaponId: number) => {
+        setSelectedAttack(newSelectedAttack);
+    }, [selectedAttack]);
+
+    const handleWeaponChange = React.useCallback((weaponId: number) => {
         console.log("Weapon selected ", weaponId);
-        setWeaponId(weaponId);
-    };
+        setSelectedAttack({
+            ...selectedAttack,
+            weaponId
+        });
+    }, [selectedAttack]);
 
     return (
         <React.Fragment>
             <tr>
                 <td>
-                    {isSelectingHandSeals && <HandSealsInput initialHandSeals={handSeals} onChange={setHandSeals} />}
+                    {isSelectingHandSeals && <HandSealsInput initialHandSeals={handSeals} onChange={handleHandSealsChange} />}
                     {isSelectingWeapon &&
                         <WeaponInput
                             weapons={battle.playerEquippedWeapons}
@@ -71,13 +116,6 @@ export default function AttackActionPrompt({ battle }: { +battle: BattleType }):
                         player={player}
                         onChange={handleJutsuChange}
                     />
-                    <input type='hidden' id='hand_seal_input' name='hand_seals' value='<?= $prefill_hand_seals ?>' />
-                    <input type='hidden' id='jutsuType' name='jutsu_type' value='<?= $prefill_jutsu_type ?>' />
-                    <input type='hidden' id='weaponID' name='weapon_id' value='<?= $prefill_weapon_id ?>' />
-                    <input type='hidden' id='jutsuID' name='jutsu_id' value='<?= $prefill_jutsu_id ?>' />
-                    <p style={{ display: "block", textAlign: "center", margin: "auto" }}>
-                        <input id='submitbtn' type='submit' name='attack' value='Submit' />
-                    </p>
                 </td></tr>
         </React.Fragment>
     );

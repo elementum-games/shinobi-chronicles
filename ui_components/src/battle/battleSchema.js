@@ -60,7 +60,7 @@ export type JutsuType = {|
     +combatId: string,
     +name: string,
     +activeCooldownTurnsLeft: number,
-    +jutsuType: string,
+    +jutsuType: 'ninjutsu' | 'genjutsu' | 'taijutsu',
     +handSeals: $ReadOnlyArray<string>,
 |};
 

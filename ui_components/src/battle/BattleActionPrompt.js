@@ -3,11 +3,20 @@
 import AttackActionPrompt from "./AttackActionPrompt.js";
 
 import type { BattleType as BattleData } from "./battleSchema.js";
+import type { AttackFormFields } from "./AttackActionPrompt.js";
 
-export default function BattleActionPrompt({ battle }: { +battle: BattleData }) {
+export default function BattleActionPrompt({ battle }: { +battle: BattleData }): React$Node {
     if(battle.isComplete) {
         return null;
     }
+
+    const [selectedAttack, setSelectedAttack] = React.useState<AttackFormFields>({
+        handSeals: [],
+        jutsuId: -1,
+        jutsuCategory: 'ninjutsu',
+        jutsuType: 'ninjutsu',
+        weaponId: 0,
+    });
 
     const opponent = battle.fighters[battle.opponentId];
 
@@ -26,7 +35,11 @@ export default function BattleActionPrompt({ battle }: { +battle: BattleData }) 
             );
         }
         else if(battle.isAttackPhase) {
-            return <AttackActionPrompt battle={battle} />;
+            return <AttackActionPrompt 
+                battle={battle}
+                selectedAttack={selectedAttack}
+                setSelectedAttack={setSelectedAttack}
+            />;
         }
         else {
             return (
@@ -39,11 +52,27 @@ export default function BattleActionPrompt({ battle }: { +battle: BattleData }) 
         }
     };
 
+    let prompt = '';
+    if(battle.isPreparationPhase) {
+        prompt = "Select pre-fight actions";
+    }
+    else if(battle.isMovementPhase) {
+        prompt = "Select Movement Action";
+    }
+    else if(battle.isAttackPhase) {
+
+    }
+
+    const handleSubmit = () => {
+        console.log("submit");
+    };
+
+
     return <table className='table' style={{ marginTop: 0 }}>
         <tbody>
         <tr>
             <th>
-                Select {battle.currentPhaseLabel} Action
+                {prompt}
             </th>
         </tr>
 
@@ -58,6 +87,9 @@ export default function BattleActionPrompt({ battle }: { +battle: BattleData }) 
 
         <tr>
             <td style={{ textAlign: "center" }}>
+                <p style={{ display: "block", textAlign: "center", margin: "auto auto 5px" }}>
+                    <input type='submit' value='Submit' onClick={handleSubmit} />
+                </p>
                 <b>{battle.turnSecondsRemaining}</b> seconds remaining
             </td>
         </tr>
