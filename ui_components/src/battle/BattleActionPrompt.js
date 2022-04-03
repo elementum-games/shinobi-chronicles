@@ -3,26 +3,23 @@
 import AttackActionPrompt from "./AttackActionPrompt.js";
 
 import type { BattleType as BattleData } from "./battleSchema.js";
-import type { AttackFormFields } from "./AttackActionPrompt.js";
+import type { AttackInputFields } from "./AttackActionPrompt.js";
 
-export default function BattleActionPrompt({ battle }: { +battle: BattleData }): React$Node {
+type Props = {
+    +battle: BattleData,
+    +isAttackSelected: boolean,
+    +attackInput: AttackInputFields,
+    +updateAttackInput: ($Shape<AttackInputFields>) => void,
+};
+
+export default function BattleActionPrompt({
+    battle,
+    isAttackSelected,
+    attackInput,
+    updateAttackInput,
+}: Props): React$Node {
     if(battle.isComplete) {
         return null;
-    }
-
-    const [selectedAttack, setSelectedAttack] = React.useState<AttackFormFields>({
-        handSeals: [],
-        jutsuId: -1,
-        jutsuCategory: 'ninjutsu',
-        jutsuType: 'ninjutsu',
-        weaponId: 0,
-    });
-
-    const updateSelectedAttack = (newSelectedAttack: $Shape<AttackFormFields>) => {
-        setSelectedAttack(prevSelectedAttack => ({
-            ...prevSelectedAttack,
-            ...newSelectedAttack
-        }));
     }
 
     const opponent = battle.fighters[battle.opponentId];
@@ -44,8 +41,8 @@ export default function BattleActionPrompt({ battle }: { +battle: BattleData }):
         else if(battle.isAttackPhase) {
             return <AttackActionPrompt 
                 battle={battle}
-                selectedAttack={selectedAttack}
-                updateSelectedAttack={updateSelectedAttack}
+                selectedAttack={attackInput}
+                updateSelectedAttack={updateAttackInput}
             />;
         }
         else {
@@ -67,14 +64,11 @@ export default function BattleActionPrompt({ battle }: { +battle: BattleData }):
         prompt = "Select Movement Action";
     }
     else if(battle.isAttackPhase) {
-        if((selectedAttack.jutsuCategory === 'ninjutsu' || selectedAttack.jutsuCategory === 'genjutsu') && selectedAttack.handSeals.length < 1) {
-            prompt = "Select Jutsu";
-        }
-        else if(selectedAttack.jutsuId === -1) {
-            prompt = "Select Jutsu";
+        if(isAttackSelected) {
+            prompt = "Select a Target (above)"
         }
         else {
-            prompt = "Select a Target (above)"
+            prompt = "Select Jutsu";
         }
     }
 
@@ -98,7 +92,6 @@ export default function BattleActionPrompt({ battle }: { +battle: BattleData }):
                 <td>Please wait for {opponent.name} to select an action.</td>
             </tr>
         }
-
 
         <tr>
             <td style={{ textAlign: "center" }}>

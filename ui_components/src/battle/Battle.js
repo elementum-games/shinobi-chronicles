@@ -6,7 +6,8 @@ import BattleLog from "./BattleLog.js";
 import BattleActionPrompt from "./BattleActionPrompt.js";
 
 import type { BattleType as BattleData } from "./battleSchema.js";
-import { buildFormData } from "../utils/formData.js";
+import { apiFetch } from "../utils/network.js";
+import type { AttackInputFields } from "./AttackActionPrompt.js";
 
 type Props = {|
     +battle: BattleData,
@@ -14,52 +15,88 @@ type Props = {|
     +membersLink: string,
 |};
 
-async function postData(url = '', data = {}) {
-    // Default options are marked with *
-    const response = await fetch(url, {
-        method: 'POST',
-        mode: 'cors', // no-cors, *cors, same-origin
-        cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
-        credentials: 'same-origin', // include, *same-origin, omit
-        redirect: 'follow', // manual, *follow, error
-        referrerPolicy: 'no-referrer',
-        body: buildFormData(data)
-    });
-    return response.json();
-}
-
 function Battle({
     battle: initialBattle,
     battleApiLink,
     membersLink
 }: Props) {
+    // STATE
     const [battle, setBattle] = React.useState(initialBattle);
+    const [attackInput, setAttackInput] = React.useState<AttackInputFields>({
+        handSeals: [],
+        jutsuId: -1,
+        jutsuCategory: 'ninjutsu',
+        jutsuType: 'ninjutsu',
+        weaponId: 0,
+        targetTileIndex: null
+    });
 
+    // DERIVED STATE
+    const isAttackSelected = battle.isAttackPhase && (attackInput.jutsuId !== -1 || attackInput.handSeals.length > 0);
+    const isSelectingTile = battle.isMovementPhase || isAttackSelected;
+
+    // STATE MUTATORS
+    const updateAttackInput = (newAttackInput: $Shape<AttackInputFields>) => {
+        setAttackInput(prevSelectedAttack => ({
+            ...prevSelectedAttack,
+            ...newAttackInput
+        }));
+    }
+
+    // ACTIONS
     const handleTileSelect = (tileIndex) => {
         console.log('selected tile', tileIndex);
 
-        postData(
-            battleApiLink,
-            {
-                submit_movement_action: "yes",
-                selected_tile: tileIndex
-            }
-        )
-        .then(response => {
-            if (response.data.battle != null) {
-                setBattle(response.data.battle);
-            }
-        });
+        if(battle.isMovementPhase) {
+            apiFetch(
+                battleApiLink,
+                {
+                    submit_movement_action: "yes",
+                    selected_tile: tileIndex
+                }
+            )
+                .then(response => {
+                    if (response.data.battle != null) {
+                        setBattle(response.data.battle);
+                    }
+                });
+        }
+        else if(isAttackSelected) {
+            apiFetch(
+                battleApiLink,
+                {
+                    submit_attack: "1",
+                    hand_seals: attackInput.handSeals,
+                    jutsu_id: attackInput.jutsuId,
+                    jutsu_category: attackInput.jutsuCategory,
+                    weapon_id: attackInput.weaponId,
+                    target_tile: tileIndex
+                }
+            )
+            .then(response => {
+                if (response.data.battle != null) {
+                    setBattle(response.data.battle);
+                }
+            });
+        }
     };
 
     return <div>
         <FightersAndField
             battle={battle}
             membersLink={membersLink}
+            isSelectingTile={isSelectingTile}
             onTileSelect={handleTileSelect}
         />
         {battle.isSpectating && <SpectateStatus/>}
-        {!battle.isSpectating && !battle.isComplete && <BattleActionPrompt battle={battle}/>}
+        {!battle.isSpectating && !battle.isComplete && (
+            <BattleActionPrompt
+                battle={battle}
+                attackInput={attackInput}
+                updateAttackInput={updateAttackInput}
+                isAttackSelected={isSelectingTile}
+            />
+        )}
         {battle.lastTurnText != null && <BattleLog lastTurnText={battle.lastTurnText}/>}
     </div>;
 }
@@ -68,12 +105,14 @@ function Battle({
 type FightersAndFieldProps = {|
     +battle: BattleData,
     +membersLink: string,
+    +isSelectingTile: boolean,
     +onTileSelect: (tileIndex: number) => void,
 |};
 
 function FightersAndField({
     battle,
     membersLink,
+    isSelectingTile,
     onTileSelect
 }: FightersAndFieldProps) {
     const player = battle.fighters[ battle.playerId ];
@@ -125,7 +164,7 @@ function FightersAndField({
                         player={player}
                         fighters={fighters}
                         tiles={field.tiles}
-                        isSelectingTile={isMovementPhase}
+                        isSelectingTile={isSelectingTile}
                         onTileSelect={handleTileSelect}
                     />
                 </td>

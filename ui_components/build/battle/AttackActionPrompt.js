@@ -41,6 +41,8 @@ export default function AttackActionPrompt({
 
       if (newJutsuCategory === "ninjutsu" || newJutsuCategory === "genjutsu") {
         newSelectedAttack.handSeals = jutsu.handSeals;
+      } else {
+        newSelectedAttack.handSeals = [];
       }
     } else {
       console.error("Invalid jutsu!");

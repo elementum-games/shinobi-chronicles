@@ -7,19 +7,20 @@ import { unSlug } from "../utils/string.js";
 
 import type { JutsuCategory } from "./battleSchema.js";
 
-export type AttackFormFields = {|
+export type AttackInputFields = {|
     handSeals: $ReadOnlyArray<string>,
     jutsuId: number,
     jutsuCategory: JutsuCategory,
     jutsuType: 'ninjutsu' | 'genjutsu' | 'taijutsu',
     weaponId: number,
+    targetTileIndex: ?number
 |};
 
 
 type Props = {|
     +battle: BattleType,
-    +selectedAttack: AttackFormFields,
-    +updateSelectedAttack: ($Shape<AttackFormFields>) => void,
+    +selectedAttack: AttackInputFields,
+    +updateSelectedAttack: ($Shape<AttackInputFields>) => void,
 |};
 
 export default function AttackActionPrompt({
@@ -46,7 +47,7 @@ export default function AttackActionPrompt({
     };
 
     const handleJutsuChange = (jutsuId: number, newJutsuCategory: JutsuCategory) => {
-        let newSelectedAttack: $Shape<AttackFormFields> = {
+        let newSelectedAttack: $Shape<AttackInputFields> = {
             jutsuCategory: newJutsuCategory,
             jutsuId
         };
@@ -64,6 +65,9 @@ export default function AttackActionPrompt({
             newSelectedAttack.jutsuType = jutsu.jutsuType;
             if (newJutsuCategory === "ninjutsu" || newJutsuCategory === "genjutsu") {
                 newSelectedAttack.handSeals = jutsu.handSeals;
+            }
+            else {
+                newSelectedAttack.handSeals = [];
             }
         }
         else {

@@ -1,24 +1,13 @@
 import AttackActionPrompt from "./AttackActionPrompt.js";
 export default function BattleActionPrompt({
-  battle
+  battle,
+  isAttackSelected,
+  attackInput,
+  updateAttackInput
 }) {
   if (battle.isComplete) {
     return null;
   }
-
-  const [selectedAttack, setSelectedAttack] = React.useState({
-    handSeals: [],
-    jutsuId: -1,
-    jutsuCategory: 'ninjutsu',
-    jutsuType: 'ninjutsu',
-    weaponId: 0
-  });
-
-  const updateSelectedAttack = newSelectedAttack => {
-    setSelectedAttack(prevSelectedAttack => ({ ...prevSelectedAttack,
-      ...newSelectedAttack
-    }));
-  };
 
   const opponent = battle.fighters[battle.opponentId];
 
@@ -35,8 +24,8 @@ export default function BattleActionPrompt({
     } else if (battle.isAttackPhase) {
       return /*#__PURE__*/React.createElement(AttackActionPrompt, {
         battle: battle,
-        selectedAttack: selectedAttack,
-        updateSelectedAttack: updateSelectedAttack
+        selectedAttack: attackInput,
+        updateSelectedAttack: updateAttackInput
       });
     } else {
       return /*#__PURE__*/React.createElement("tr", null, /*#__PURE__*/React.createElement("td", null, "invalid phase"));
@@ -50,12 +39,10 @@ export default function BattleActionPrompt({
   } else if (battle.isMovementPhase) {
     prompt = "Select Movement Action";
   } else if (battle.isAttackPhase) {
-    if ((selectedAttack.jutsuCategory === 'ninjutsu' || selectedAttack.jutsuCategory === 'genjutsu') && selectedAttack.handSeals.length < 1) {
-      prompt = "Select Jutsu";
-    } else if (selectedAttack.jutsuId === -1) {
-      prompt = "Select Jutsu";
-    } else {
+    if (isAttackSelected) {
       prompt = "Select a Target (above)";
+    } else {
+      prompt = "Select Jutsu";
     }
   }
 

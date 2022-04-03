@@ -83,7 +83,7 @@ class BattleManager {
     const DEBUG_PLAYER_ACTION = 'player_action';
 
     public array $debug = [
-        self::DEBUG_PLAYER_ACTION => false
+        self::DEBUG_PLAYER_ACTION => true
     ];
 
     // INITIALIZATION
@@ -1096,17 +1096,33 @@ class BattleManager {
     // PRIVATE UTILS - PLAYER ACTIONS
 
     protected function collectPlayerAction(array $FORM_DATA): ?FighterAction {
-        if($this->battle->isAttackPhase() && !empty($FORM_DATA['attack'])) {
+        if($this->battle->isAttackPhase() && !empty($FORM_DATA['submit_attack'])) {
             try {
-                $jutsu_type = $FORM_DATA['jutsu_type'];
+                $jutsu_category = $FORM_DATA['jutsu_category'];
+                $jutsu_id = (int)$FORM_DATA['jutsu_id'] ?? null;
+                $hand_seals = $FORM_DATA['hand_seals'] ?? null;
+                $weapon_id = (int)$FORM_DATA['weapon_id'] ?? 0;
+                $target_tile = (int)$FORM_DATA['target_tile'] ?? null;
+
+                $this->renderDebug(
+                    self::DEBUG_PLAYER_ACTION,
+                    'collecting attack action',
+                    json_encode([
+                        'jutsu_type' => $jutsu_category,
+                        'jutsu_id' => $jutsu_id,
+                        'hand_seals' => $hand_seals,
+                        'weapon_id' => $weapon_id,
+                    ])
+                );
+
 
                 // Check for handseals if ninjutsu/genjutsu
-                if($jutsu_type == Jutsu::TYPE_NINJUTSU or $jutsu_type == Jutsu::TYPE_GENJUTSU) {
-                    if(!$FORM_DATA['hand_seals']) {
+                if($jutsu_category == Jutsu::TYPE_NINJUTSU or $jutsu_category == Jutsu::TYPE_GENJUTSU) {
+                    if(!$hand_seals) {
                         throw new Exception("Please enter hand seals!");
                     }
 
-                    $player_jutsu = $this->getJutsuFromHandSeals($this->player, $FORM_DATA['hand_seals']);
+                    $player_jutsu = $this->getJutsuFromHandSeals($this->player, $hand_seals);
 
                     // Layered genjutsu check
                     if($player_jutsu && $player_jutsu->jutsu_type == Jutsu::TYPE_GENJUTSU && !empty($player_jutsu->parent_jutsu)) {
@@ -1115,15 +1131,11 @@ class BattleManager {
                 }
 
                 // Check jutsu ID if taijutsu
-                else if($jutsu_type == Jutsu::TYPE_TAIJUTSU) {
-                    $jutsu_id = (int)$FORM_DATA['jutsu_id'];
-
+                else if($jutsu_category == Jutsu::TYPE_TAIJUTSU) {
                     $player_jutsu = $this->getJutsuFromId($this->player, $jutsu_id);
                 }
                 // Check BL jutsu ID if bloodline jutsu
-                else if($jutsu_type == 'bloodline_jutsu' && $this->player->bloodline_id) {
-                    $jutsu_id = (int)$FORM_DATA['jutsu_id'];
-
+                else if($jutsu_category == 'bloodline_jutsu' && $this->player->bloodline_id) {
                     $player_jutsu = null;
                     if(isset($this->player->bloodline->jutsu[$jutsu_id])) {
                         $player_jutsu = $this->player->bloodline->jutsu[$jutsu_id];
@@ -1147,11 +1159,9 @@ class BattleManager {
                 }
 
                 // Check for weapon if non-BL taijutsu
-                $weapon_id = 0;
-                if($jutsu_type == Jutsu::TYPE_TAIJUTSU && !empty($FORM_DATA['weapon_id'])) {
-                    $weapon_id = (int)$this->system->clean($FORM_DATA['weapon_id']);
-                    if($weapon_id && $this->player->hasItem($weapon_id)) {
-                        if(array_search($weapon_id, $this->player->equipped_weapon_ids) === false) {
+                if($jutsu_category == Jutsu::TYPE_TAIJUTSU && !empty($weapon_id)) {
+                    if($this->player->hasItem($weapon_id)) {
+                        if(!in_array($weapon_id, $this->player->equipped_weapon_ids)) {
                             $weapon_id = 0;
                         }
                     }
@@ -1176,11 +1186,12 @@ class BattleManager {
             }
         }
         else if($this->battle->isMovementPhase() && !empty($FORM_DATA['submit_movement_action'])) {
-            $this->renderDebug(self::DEBUG_PLAYER_ACTION, 'collecting movement action', $FORM_DATA['selected_tile'] ?? null);
+            $target_tile = $FORM_DATA['selected_tile'] ?? null;
+
+            $this->renderDebug(self::DEBUG_PLAYER_ACTION, 'collecting movement action', $target_tile);
 
             // Run player attack
             try {
-                $target_tile = $FORM_DATA['selected_tile'] ?? null;
                 if($target_tile == null) {
                     throw new Exception("Invalid tile!");
                 }
@@ -1201,7 +1212,7 @@ class BattleManager {
         return null;
     }
 
-    private function getJutsuFromHandSeals(Fighter $fighter, string $hand_seals): ?Jutsu {
+    private function getJutsuFromHandSeals(Fighter $fighter, ?array $hand_seals): ?Jutsu {
         /*if(is_array($_POST['hand_seals'])) {
             $seals = array();
             foreach($_POST['hand_seals'] as $seal) {
@@ -1213,7 +1224,7 @@ class BattleManager {
             $seal_string = implode('-', $seals);
         }*/
 
-        $raw_seals = explode('-', $hand_seals);
+        $raw_seals = $hand_seals;
         $seals = array();
         foreach($raw_seals as $seal) {
             if(!is_numeric($seal)) {
@@ -1236,9 +1247,7 @@ class BattleManager {
                 break;
             }
         }
-        if($fighter_jutsu) {
-            $fighter_jutsu->setCombatId($fighter->combat_id);
-        }
+        $fighter_jutsu?->setCombatId($fighter->combat_id);
 
         return $fighter_jutsu;
     }

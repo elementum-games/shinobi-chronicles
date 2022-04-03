@@ -29,8 +29,7 @@ export default function BattleField({
                     key={tile.index}
                     index={tile.index}
                     fighters={fightersForIds(tile.fighterIds)}
-                    isPlayerTile={tile.fighterIds.includes(player.id)}
-                    isMovementPhase={isSelectingTile}
+                    isSelecting={isSelectingTile && !tile.fighterIds.includes(player.id)}
                     onSelect={() => onTileSelect(tile.index)}
                 />
             ))}
@@ -41,13 +40,12 @@ export default function BattleField({
 function BattleFieldTile({
     index,
     fighters,
-    isPlayerTile,
-    isMovementPhase,
+    isSelecting,
     onSelect
 }) {
     return (
         <div
-            className={`tile ${(isMovementPhase && !isPlayerTile) ? 'movementActive' : ''}`}
+            className={`tile ${(isSelecting) ? 'movementActive' : ''}`}
             onClick={onSelect}
         >
             <span className='tileIndex'>{index}</span>

@@ -2,51 +2,72 @@ import FighterDisplay from "./FighterDisplay.js";
 import BattleField from "./BattleField.js";
 import BattleLog from "./BattleLog.js";
 import BattleActionPrompt from "./BattleActionPrompt.js";
-import { buildFormData } from "../utils/formData.js";
-
-async function postData(url = '', data = {}) {
-  // Default options are marked with *
-  const response = await fetch(url, {
-    method: 'POST',
-    mode: 'cors',
-    // no-cors, *cors, same-origin
-    cache: 'no-cache',
-    // *default, no-cache, reload, force-cache, only-if-cached
-    credentials: 'same-origin',
-    // include, *same-origin, omit
-    redirect: 'follow',
-    // manual, *follow, error
-    referrerPolicy: 'no-referrer',
-    body: buildFormData(data)
-  });
-  return response.json();
-}
+import { apiFetch } from "../utils/network.js";
 
 function Battle({
   battle: initialBattle,
   battleApiLink,
   membersLink
 }) {
+  // STATE
   const [battle, setBattle] = React.useState(initialBattle);
+  const [attackInput, setAttackInput] = React.useState({
+    handSeals: [],
+    jutsuId: -1,
+    jutsuCategory: 'ninjutsu',
+    jutsuType: 'ninjutsu',
+    weaponId: 0,
+    targetTileIndex: null
+  }); // DERIVED STATE
+
+  const isAttackSelected = battle.isAttackPhase && (attackInput.jutsuId !== -1 || attackInput.handSeals.length > 0);
+  const isSelectingTile = battle.isMovementPhase || isAttackSelected; // STATE MUTATORS
+
+  const updateAttackInput = newAttackInput => {
+    setAttackInput(prevSelectedAttack => ({ ...prevSelectedAttack,
+      ...newAttackInput
+    }));
+  }; // ACTIONS
+
 
   const handleTileSelect = tileIndex => {
     console.log('selected tile', tileIndex);
-    postData(battleApiLink, {
-      submit_movement_action: "yes",
-      selected_tile: tileIndex
-    }).then(response => {
-      if (response.data.battle != null) {
-        setBattle(response.data.battle);
-      }
-    });
+
+    if (battle.isMovementPhase) {
+      apiFetch(battleApiLink, {
+        submit_movement_action: "yes",
+        selected_tile: tileIndex
+      }).then(response => {
+        if (response.data.battle != null) {
+          setBattle(response.data.battle);
+        }
+      });
+    } else if (isAttackSelected) {
+      apiFetch(battleApiLink, {
+        submit_attack: "1",
+        hand_seals: attackInput.handSeals,
+        jutsu_id: attackInput.jutsuId,
+        jutsu_category: attackInput.jutsuCategory,
+        weapon_id: attackInput.weaponId,
+        target_tile: tileIndex
+      }).then(response => {
+        if (response.data.battle != null) {
+          setBattle(response.data.battle);
+        }
+      });
+    }
   };
 
   return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement(FightersAndField, {
     battle: battle,
     membersLink: membersLink,
+    isSelectingTile: isSelectingTile,
     onTileSelect: handleTileSelect
   }), battle.isSpectating && /*#__PURE__*/React.createElement(SpectateStatus, null), !battle.isSpectating && !battle.isComplete && /*#__PURE__*/React.createElement(BattleActionPrompt, {
-    battle: battle
+    battle: battle,
+    attackInput: attackInput,
+    updateAttackInput: updateAttackInput,
+    isAttackSelected: isSelectingTile
   }), battle.lastTurnText != null && /*#__PURE__*/React.createElement(BattleLog, {
     lastTurnText: battle.lastTurnText
   }));
@@ -56,6 +77,7 @@ function Battle({
 function FightersAndField({
   battle,
   membersLink,
+  isSelectingTile,
   onTileSelect
 }) {
   const player = battle.fighters[battle.playerId];
@@ -104,7 +126,7 @@ function FightersAndField({
     player: player,
     fighters: fighters,
     tiles: field.tiles,
-    isSelectingTile: isMovementPhase,
+    isSelectingTile: isSelectingTile,
     onTileSelect: handleTileSelect
   })))));
 }

@@ -1,6 +1,6 @@
 import { buildFormData } from "./formData.js";
 
-export async function apiFetch(url = '', data = {}) {
+export async function apiFetch(url: string = '', data: {} = {}) {
     // Default options are marked with *
     const response = await fetch(url, {
         method: 'POST',
