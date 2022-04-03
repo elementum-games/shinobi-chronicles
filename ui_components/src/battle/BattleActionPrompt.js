@@ -30,13 +30,7 @@ export default function BattleActionPrompt({
             /*<?php require 'templates/battle/prep_phase_action_prompt.php'; ?>*/
         }
         else if(battle.isMovementPhase) {
-            return (
-                <tr>
-                    <td style={{ textAlign: "center" }}>
-                        <em>Select a tile above</em>
-                    </td>
-                </tr>
-            );
+            return null;
         }
         else if(battle.isAttackPhase) {
             return <AttackActionPrompt 
@@ -61,7 +55,7 @@ export default function BattleActionPrompt({
         prompt = "Select pre-fight actions";
     }
     else if(battle.isMovementPhase) {
-        prompt = "Select Movement Action";
+        prompt = "Select Movement Action (above)";
     }
     else if(battle.isAttackPhase) {
         if(isAttackSelected) {
@@ -71,11 +65,6 @@ export default function BattleActionPrompt({
             prompt = "Select Jutsu";
         }
     }
-
-    const handleSubmit = () => {
-        console.log("submit");
-    };
-
 
     return <table className='table' style={{ marginTop: 0 }}>
         <tbody>
@@ -95,9 +84,6 @@ export default function BattleActionPrompt({
 
         <tr>
             <td style={{ textAlign: "center" }}>
-                <p style={{ display: "block", textAlign: "center", margin: "auto auto 5px" }}>
-                    <input type='submit' value='Submit' onClick={handleSubmit} />
-                </p>
                 <b>{battle.turnSecondsRemaining}</b> seconds remaining
             </td>
         </tr>

@@ -16,11 +16,7 @@ export default function BattleActionPrompt({
       return null;
       /*<?php require 'templates/battle/prep_phase_action_prompt.php'; ?>*/
     } else if (battle.isMovementPhase) {
-      return /*#__PURE__*/React.createElement("tr", null, /*#__PURE__*/React.createElement("td", {
-        style: {
-          textAlign: "center"
-        }
-      }, /*#__PURE__*/React.createElement("em", null, "Select a tile above")));
+      return null;
     } else if (battle.isAttackPhase) {
       return /*#__PURE__*/React.createElement(AttackActionPrompt, {
         battle: battle,
@@ -37,7 +33,7 @@ export default function BattleActionPrompt({
   if (battle.isPreparationPhase) {
     prompt = "Select pre-fight actions";
   } else if (battle.isMovementPhase) {
-    prompt = "Select Movement Action";
+    prompt = "Select Movement Action (above)";
   } else if (battle.isAttackPhase) {
     if (isAttackSelected) {
       prompt = "Select a Target (above)";
@@ -45,10 +41,6 @@ export default function BattleActionPrompt({
       prompt = "Select Jutsu";
     }
   }
-
-  const handleSubmit = () => {
-    console.log("submit");
-  };
 
   return /*#__PURE__*/React.createElement("table", {
     className: "table",
@@ -59,15 +51,5 @@ export default function BattleActionPrompt({
     style: {
       textAlign: "center"
     }
-  }, /*#__PURE__*/React.createElement("p", {
-    style: {
-      display: "block",
-      textAlign: "center",
-      margin: "auto auto 5px"
-    }
-  }, /*#__PURE__*/React.createElement("input", {
-    type: "submit",
-    value: "Submit",
-    onClick: handleSubmit
-  })), /*#__PURE__*/React.createElement("b", null, battle.turnSecondsRemaining), " seconds remaining"))));
+  }, /*#__PURE__*/React.createElement("b", null, battle.turnSecondsRemaining), " seconds remaining"))));
 }
