@@ -40,12 +40,14 @@ export type FighterType = {|
     +chakra: number,
     +maxChakra: number,
     +hasBloodline: boolean,
-    +equippedWeapons: $ReadOnlyArray<WeaponType>
+    +equippedWeapons: $ReadOnlyArray<WeaponType>,
+    +movementRange: number,
 |};
 
 // BattleApiPresenter::fieldResponse
 export type BattleFieldType = {|
     +tiles: $ReadOnlyArray<BattleFieldTileType>,
+    +fighterLocations: { [key: string]: number },
 |};
 
 // BattleApiPresenter::fieldTileResponse
@@ -62,6 +64,7 @@ export type JutsuType = {|
     +activeCooldownTurnsLeft: number,
     +jutsuType: 'ninjutsu' | 'genjutsu' | 'taijutsu',
     +handSeals: $ReadOnlyArray<string>,
+    +range: number,
 |};
 
 // BattleApiPresenter::weaponResponse

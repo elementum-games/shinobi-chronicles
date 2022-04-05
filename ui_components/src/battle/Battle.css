@@ -18,6 +18,8 @@
     align-items: center;
     justify-content: center;
 
+    z-index: 2;
+
     background: #948d78;
     border-radius: 35px;
     border: 1px solid #807a68;
@@ -56,16 +58,25 @@
     background: rgba(255, 0, 0, 0.4);
 }
 
-.tile.movementActive {
+.tile.movementTarget {
     cursor: pointer;
 }
-.tile.movementActive:hover {
+.tile.movementTarget:hover {
     background: #b1a990;
 }
-.tile.movementActive.selected {
+.tile.movementTarget.selected {
     background: #b1a990;
     border-color: #5d594c;
     box-shadow: 0 0 3px 0 black;
+}
+
+.tile.attackTarget {
+    cursor: pointer;
+
+    box-shadow: 0 0 3px 1px #000091;
+}
+.tile.attackTarget:hover {
+    background: #b7af95;
 }
 
 

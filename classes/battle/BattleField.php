@@ -12,7 +12,7 @@ class BattleField {
     private Battle $battle;
 
     /** @var int[] */
-    private array $fighter_locations;
+    public array $fighter_locations;
 
     protected int $min_tile;
     protected int $max_tile;

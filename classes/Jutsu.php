@@ -64,6 +64,8 @@ class Jutsu {
     public float $base_power;
     public float $power;
 
+    public int $range;
+
     public ?string $effect;
 
     private float $base_effect_amount;
@@ -125,8 +127,8 @@ class Jutsu {
      * @param string      $element
      * @param string      $hand_seals
      */
-    public function __construct(int $id, string $name, int $rank, string $jutsu_type, float $base_power, ?string $effect,
-        ?float $base_effect_amount, ?int $effect_length, string $description, string $battle_text, int $cooldown,
+    public function __construct(int $id, string $name, int $rank, string $jutsu_type, float $base_power, int $range,
+        ?string $effect, ?float $base_effect_amount, ?int $effect_length, string $description, string $battle_text, int $cooldown,
         string $use_type, string $target_type, int $use_cost, int $purchase_cost, int $purchase_type, ?int $parent_jutsu, string $element,
         string $hand_seals
     ) {
@@ -137,6 +139,11 @@ class Jutsu {
 
         $this->base_power = $base_power;
         $this->power = $this->base_power;
+
+        $this->range = $range;
+        if($this->jutsu_type == Jutsu::TYPE_TAIJUTSU) {
+            $this->range = 1;
+        }
 
         $this->effect = $effect;
 
@@ -169,6 +176,7 @@ class Jutsu {
             rank: $jutsu_data['rank'],
             jutsu_type: $jutsu_data['jutsu_type'],
             base_power: $jutsu_data['power'],
+            range: 2,
             effect: $jutsu_data['effect'],
             base_effect_amount: $jutsu_data['effect_amount'],
             effect_length: $jutsu_data['effect_length'],
@@ -176,7 +184,7 @@ class Jutsu {
             battle_text: $jutsu_data['battle_text'],
             cooldown: $jutsu_data['cooldown'],
             use_type: $jutsu_data['use_type'],
-            target_type: $jutsu_data['target_type'] ?? Jutsu::TARGET_TYPE_FIGHTER_ID,
+            target_type: $jutsu_data['target_type'] ?? Jutsu::TARGET_TYPE_TILE,
             use_cost: $jutsu_data['use_cost'],
             purchase_cost: $jutsu_data['purchase_cost'],
             purchase_type: $jutsu_data['purchase_type'],
@@ -209,6 +217,7 @@ class Jutsu {
             rank: $this->rank,
             jutsu_type: Jutsu::TYPE_TAIJUTSU,
             base_power: $this->power,
+            range: 0,
             effect: $effect,
             base_effect_amount: $effect_amount,
             effect_length: 2,

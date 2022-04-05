@@ -235,6 +235,7 @@ class NPC extends Fighter {
             rank: $this->rank,
             jutsu_type: $jutsu_type,
             base_power: $power,
+            range: 2,
             effect: 'none',
             base_effect_amount: 0,
             effect_length: 0,

@@ -1,5 +1,6 @@
 import { JutsuInput } from "./JutsuInput.js";
 import { unSlug } from "../utils/string.js";
+import { findPlayerJutsu } from "./playerUtils.js";
 export default function AttackActionPrompt({
   battle,
   selectedAttack,
@@ -28,13 +29,7 @@ export default function AttackActionPrompt({
       jutsuCategory: newJutsuCategory,
       jutsuId
     };
-    let jutsu;
-
-    if (newJutsuCategory === 'bloodline') {
-      jutsu = battle.playerBloodlineJutsu.find(jutsu => jutsu.id === jutsuId);
-    } else {
-      jutsu = battle.playerEquippedJutsu.find(jutsu => jutsu.id === jutsuId) || battle.playerDefaultAttacks.find(jutsu => jutsu.id === jutsuId);
-    }
+    const jutsu = findPlayerJutsu(battle, jutsuId, newJutsuCategory === 'bloodline');
 
     if (jutsu != null) {
       newSelectedAttack.jutsuType = jutsu.jutsuType;

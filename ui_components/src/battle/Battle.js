@@ -8,6 +8,7 @@ import BattleActionPrompt from "./BattleActionPrompt.js";
 import type { BattleType as BattleData } from "./battleSchema.js";
 import { apiFetch } from "../utils/network.js";
 import type { AttackInputFields } from "./AttackActionPrompt.js";
+import { findPlayerJutsu } from "./playerUtils.js";
 
 type Props = {|
     +battle: BattleData,
@@ -84,6 +85,7 @@ function Battle({
     return <div>
         <FightersAndField
             battle={battle}
+            attackInput={attackInput}
             membersLink={membersLink}
             isSelectingTile={isSelectingTile}
             onTileSelect={handleTileSelect}
@@ -104,6 +106,7 @@ function Battle({
 // Fighters and Field
 type FightersAndFieldProps = {|
     +battle: BattleData,
+    +attackInput: AttackInputFields,
     +membersLink: string,
     +isSelectingTile: boolean,
     +onTileSelect: (tileIndex: number) => void,
@@ -111,6 +114,7 @@ type FightersAndFieldProps = {|
 
 function FightersAndField({
     battle,
+    attackInput,
     membersLink,
     isSelectingTile,
     onTileSelect
@@ -118,11 +122,13 @@ function FightersAndField({
     const player = battle.fighters[ battle.playerId ];
     const opponent = battle.fighters[ battle.opponentId ];
 
-    const { fighters, field, isSpectating, isMovementPhase } = battle;
+    const { fighters, field, isSpectating } = battle;
 
     const handleTileSelect = (tileIndex) => {
         onTileSelect(tileIndex);
     };
+
+    const selectedJutsu = battle.isAttackPhase
 
     return (
         <table className='table'>
@@ -164,7 +170,13 @@ function FightersAndField({
                         player={player}
                         fighters={fighters}
                         tiles={field.tiles}
-                        isSelectingTile={isSelectingTile}
+                        fighterLocations={field.fighterLocations}
+                        jutsuToSelectTarget={
+                            battle.isAttackPhase
+                                ? findPlayerJutsu(battle, attackInput.jutsuId, attackInput.jutsuCategory === 'bloodline')
+                                : null
+                        }
+                        isMovementPhase={battle.isMovementPhase}
                         onTileSelect={handleTileSelect}
                     />
                 </td>

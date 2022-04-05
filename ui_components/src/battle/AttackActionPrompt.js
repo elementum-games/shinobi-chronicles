@@ -6,6 +6,7 @@ import { JutsuInput } from "./JutsuInput.js";
 import { unSlug } from "../utils/string.js";
 
 import type { JutsuCategory } from "./battleSchema.js";
+import { findPlayerJutsu } from "./playerUtils.js";
 
 export type AttackInputFields = {|
     handSeals: $ReadOnlyArray<string>,
@@ -52,14 +53,7 @@ export default function AttackActionPrompt({
             jutsuId
         };
 
-        let jutsu;
-        if(newJutsuCategory === 'bloodline') {
-            jutsu = battle.playerBloodlineJutsu.find(jutsu => jutsu.id === jutsuId);
-        }
-        else {
-            jutsu = battle.playerEquippedJutsu.find(jutsu => jutsu.id === jutsuId) ||
-                battle.playerDefaultAttacks.find(jutsu => jutsu.id === jutsuId);
-        }
+        const jutsu = findPlayerJutsu(battle, jutsuId, newJutsuCategory === 'bloodline');
 
         if (jutsu != null) {
             newSelectedAttack.jutsuType = jutsu.jutsuType;

@@ -3,6 +3,7 @@ import BattleField from "./BattleField.js";
 import BattleLog from "./BattleLog.js";
 import BattleActionPrompt from "./BattleActionPrompt.js";
 import { apiFetch } from "../utils/network.js";
+import { findPlayerJutsu } from "./playerUtils.js";
 
 function Battle({
   battle: initialBattle,
@@ -60,6 +61,7 @@ function Battle({
 
   return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement(FightersAndField, {
     battle: battle,
+    attackInput: attackInput,
     membersLink: membersLink,
     isSelectingTile: isSelectingTile,
     onTileSelect: handleTileSelect
@@ -76,6 +78,7 @@ function Battle({
 
 function FightersAndField({
   battle,
+  attackInput,
   membersLink,
   isSelectingTile,
   onTileSelect
@@ -85,14 +88,14 @@ function FightersAndField({
   const {
     fighters,
     field,
-    isSpectating,
-    isMovementPhase
+    isSpectating
   } = battle;
 
   const handleTileSelect = tileIndex => {
     onTileSelect(tileIndex);
   };
 
+  const selectedJutsu = battle.isAttackPhase;
   return /*#__PURE__*/React.createElement("table", {
     className: "table"
   }, /*#__PURE__*/React.createElement("tbody", null, /*#__PURE__*/React.createElement("tr", null, /*#__PURE__*/React.createElement("th", {
@@ -126,7 +129,9 @@ function FightersAndField({
     player: player,
     fighters: fighters,
     tiles: field.tiles,
-    isSelectingTile: isSelectingTile,
+    fighterLocations: field.fighterLocations,
+    jutsuToSelectTarget: battle.isAttackPhase ? findPlayerJutsu(battle, attackInput.jutsuId, attackInput.jutsuCategory === 'bloodline') : null,
+    isMovementPhase: battle.isMovementPhase,
     onTileSelect: handleTileSelect
   })))));
 }

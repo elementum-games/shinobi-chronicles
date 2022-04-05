@@ -63,6 +63,7 @@ class Bloodline {
                     rank: $j['rank'],
                     jutsu_type: $j['jutsu_type'],
                     base_power: $j['power'],
+                    range: 2,
                     effect: $j['effect'],
                     base_effect_amount: $j['effect_amount'] ?? 0,
                     effect_length: $j['effect_length'] ?? 0,

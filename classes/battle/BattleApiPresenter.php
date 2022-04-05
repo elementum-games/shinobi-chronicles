@@ -75,6 +75,7 @@ class BattleApiPresenter {
     private static function fieldResponse(BattleField $field): array {
         return [
             'tiles' => BattleApiPresenter::fieldAllTilesResponse($field),
+            'fighterLocations' => $field->fighter_locations,
         ];
     }
 
@@ -109,6 +110,7 @@ class BattleApiPresenter {
             'chakra' => $fighter->chakra,
             'maxChakra' => $fighter->max_chakra,
             'hasBloodline' => (bool)$fighter->bloodline_id,
+            'movementRange' => 2,
         ];
     }
 
@@ -120,6 +122,7 @@ class BattleApiPresenter {
             'activeCooldownTurnsLeft' => $battle->jutsu_cooldowns[$jutsu->combat_id] ?? 0,
             'jutsuType' => $jutsu->jutsu_type,
             'handSeals' => explode('-', $jutsu->hand_seals),
+            'range' => $jutsu->range,
         ];
     }
 

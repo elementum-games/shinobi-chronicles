@@ -3,11 +3,23 @@ export default function BattleField({
   player,
   fighters,
   tiles,
-  isSelectingTile,
+  fighterLocations,
+  jutsuToSelectTarget,
+  isMovementPhase,
   onTileSelect
 }) {
   const fightersForIds = ids => {
     return ids.map(id => fighters[id]).filter(Boolean);
+  };
+
+  const playerLocation = fighterLocations[player.id];
+
+  if (playerLocation == null) {
+    throw new Error("Invalid player location!");
+  }
+
+  const distanceToPlayer = tileIndex => {
+    return Math.abs(tileIndex - playerLocation);
   };
 
   return /*#__PURE__*/React.createElement("div", {
@@ -16,7 +28,8 @@ export default function BattleField({
     key: tile.index,
     index: tile.index,
     fighters: fightersForIds(tile.fighterIds),
-    isSelecting: isSelectingTile && !tile.fighterIds.includes(player.id),
+    canMoveTo: isMovementPhase && !tile.fighterIds.includes(player.id),
+    canAttack: jutsuToSelectTarget ? distanceToPlayer(tile.index) <= jutsuToSelectTarget.range : false,
     onSelect: () => onTileSelect(tile.index)
   })));
 }
@@ -24,12 +37,23 @@ export default function BattleField({
 function BattleFieldTile({
   index,
   fighters,
-  isSelecting,
+  canMoveTo,
+  canAttack,
   onSelect
 }) {
+  const classes = ['tile'];
+
+  if (canMoveTo) {
+    classes.push('movementTarget');
+  }
+
+  if (canAttack) {
+    classes.push('attackTarget');
+  }
+
   return /*#__PURE__*/React.createElement("div", {
-    className: `tile ${isSelecting ? 'movementActive' : ''}`,
-    onClick: onSelect
+    className: classes.join(' '),
+    onClick: canMoveTo || canAttack ? onSelect : null
   }, /*#__PURE__*/React.createElement("span", {
     className: "tileIndex"
   }, index), fighters.map((fighter, i) => /*#__PURE__*/React.createElement("div", {
@@ -42,45 +66,3 @@ function BattleFieldTile({
     includeContainer: false
   }))));
 }
-/*<form action="<?= $self_link ?>" method="POST" id="battle_field_form">
-    <input type="hidden" id="selected_tile_input" name="selected_tile" value="" />
-    <input
-        type="submit"
-        id="submit"
-        name="submit_movement_action"
-        value="Submit"
-        style='margin: 2px auto;<?= $battle->isMovementPhase() ? 'display:block;' : 'display:none;' ?>'
-    disabled="disabled"
-/>
-</form>
-*/
-
-/*<script type='text/javascript'>
-    const form = document.getElementById('battle_field_form');
-    const selectedTileInput = document.getElementById('selected_tile_input');
-    const submitButton = document.getElementById('submit');
-    const tiles = document.querySelectorAll('.tile');
-
-    const isMovementPhase = <?= $battle->isMovementPhase() ? 'true' : 'false' ?>;
-
-    /!** @var {?Element} selectedTile *!/
-    let selectedTile = null;
-
-    tiles.forEach(tile =>
-    tile.addEventListener('click', e => {
-    console.log('clicked', tile.id, tile.getAttribute('data-tile-index'));
-    if(parseInt(tile.getAttribute('data-player-tile')) === 1) {
-    return;
-}
-
-    if(selectedTile != null) {
-    selectedTile.classList.remove('selected');
-}
-    tile.classList.add('selected');
-
-    selectedTile = tile;
-    selectedTileInput.value = tile.getAttribute('data-tile-index');
-    submitButton.removeAttribute('disabled');
-})
-    )
-</script>*/
