@@ -126,7 +126,9 @@ function arenaFightAPI(System $system, User $player): BattlePageAPIResponse {
         $battle->checkInputAndRunTurn();
 
         $response->battle_data = $battle->getApiResponse();
-        $response->errors[] = $system->debug_messages;
+        if($system->message) {
+            $response->errors[] = $system->message;
+        }
 
         if($battle->isComplete()) {
             $response->battle_result = processArenaBattleEnd($battle, $player);

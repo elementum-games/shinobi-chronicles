@@ -147,6 +147,20 @@ class BattleField {
         return $tiles;
     }
 
+    /**
+     * @param string $fighter_id
+     * @param int    $target_tile
+     * @return float|int
+     * @throws Exception
+     */
+    public function distanceFromFighter(string $fighter_id, int $target_tile): float|int {
+        if(!isset($this->fighter_locations[$fighter_id])) {
+            throw new Exception("Invalid fighter location!");
+        }
+
+        return abs($this->fighter_locations[$fighter_id] - $target_tile);
+    }
+
     // PUBLIC DATA IMPORT/EXPORT API
 
     #[ArrayShape(['fighter_locations' => "array"])]

@@ -1170,14 +1170,25 @@ class BattleManager {
                     }
                 }
 
+                // Check target
+                if($target_tile != null) {
+                    $target = new AttackTileTarget($target_tile);
+                    $distance_to_target = $this->field->distanceFromFighter($this->player->combat_id, $target_tile);
+                    if($distance_to_target > $player_jutsu->range) {
+                        throw new Exception("Target is not in range!");
+                    }
+                }
+                else {
+                    throw new Exception("Invalid target type!");
+                }
+
                 // Log jutsu used
                 return new FighterAttackAction(
                     fighter_id: $this->player->combat_id,
                     jutsu_id: $player_jutsu->id,
                     jutsu_purchase_type: $player_jutsu->purchase_type,
                     weapon_id: $weapon_id,
-                    // TODO: real targeting
-                    target: new AttackFighterIdTarget($this->opponent->combat_id)
+                    target: $target,
                 );
 
             } catch (Exception $e) {

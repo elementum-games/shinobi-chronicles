@@ -31,6 +31,7 @@ function Battle({
         weaponId: 0,
         targetTileIndex: null
     });
+    const [error, setError] = React.useState(null);
 
     // DERIVED STATE
     const isAttackSelected = battle.isAttackPhase && (attackInput.jutsuId !== -1 || attackInput.handSeals.length > 0);
@@ -44,6 +45,18 @@ function Battle({
         }));
     }
 
+    const handleApiResponse = (response) => {
+        if (response.data.battle != null) {
+            setBattle(response.data.battle);
+        }
+        if(response.errors.length > 0) {
+            setError(response.errors.join(' '));
+        }
+        else {
+            setError(null);
+        }
+    };
+
     // ACTIONS
     const handleTileSelect = (tileIndex) => {
         console.log('selected tile', tileIndex);
@@ -56,11 +69,7 @@ function Battle({
                     selected_tile: tileIndex
                 }
             )
-                .then(response => {
-                    if (response.data.battle != null) {
-                        setBattle(response.data.battle);
-                    }
-                });
+            .then(handleApiResponse);
         }
         else if(isAttackSelected) {
             apiFetch(
@@ -74,15 +83,12 @@ function Battle({
                     target_tile: tileIndex
                 }
             )
-            .then(response => {
-                if (response.data.battle != null) {
-                    setBattle(response.data.battle);
-                }
-            });
+            .then(handleApiResponse);
         }
     };
 
     return <div>
+        <p className='systemMessage'>{error}</p>
         <FightersAndField
             battle={battle}
             attackInput={attackInput}

@@ -122,7 +122,7 @@ class BattleApiPresenter {
             'activeCooldownTurnsLeft' => $battle->jutsu_cooldowns[$jutsu->combat_id] ?? 0,
             'jutsuType' => $jutsu->jutsu_type,
             'handSeals' => explode('-', $jutsu->hand_seals),
-            'range' => $jutsu->range,
+            'range' => $jutsu->range + 1,
         ];
     }
 
