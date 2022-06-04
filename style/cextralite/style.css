@@ -14,6 +14,7 @@ Body{
 	color: white;
 	margin: 0px;
 	padding: 0px;
+	padding-bottom: 50px; /*Due to Menu stuck at bottom*/
 	background-color: rgba(0,0,0,1);
 	font-size: 1em;
 }
@@ -46,7 +47,11 @@ table{
 }
 
 #sidebar {
-	position: static;
+	position: fixed;
+	bottom: 0;
+	right: 0;
+	left: 0;
+	min-width: 50px;
 }
 
 #chat_table{
@@ -80,7 +85,6 @@ table{
 	display: grid;
 	grid-template-columns: 1fr 1fr 1fr;
 	height: auto;
-	margin: 0em 0em 1em 0em;
 }
 
 .buttonList{
@@ -138,11 +142,19 @@ table{
 }
 /*when topMenu gets the class {.open} applied*/
 .topMenu.open{
-	height: auto;
+	height: 220px;
+	position: fixed;
+	top: 0;
+	bottom: 0;
 }
 
 .menuTouchItem{
-	/* display: inline-block; */
+	display: inline;
+	position: fixed;
+	bottom: 60;
+	right: 10;
+	height: 50px !important;
+	width: 50px !important;
 }
 
 #newstable td{
@@ -173,6 +185,7 @@ table{
 }
 #player_menu.open{
 	height: auto;
+	bottom: 100%; /* makes list appear above instead of below */
 }
 
 #character_menu.open{
@@ -181,6 +194,7 @@ table{
 }
 #character_menu.open{
 	height: auto;
+	bottom: 100%; /* makes list appear above instead of below */
 }
 
 #travel_menu{
@@ -190,6 +204,7 @@ table{
 
 #travel_menu.open{
 	height: auto;
+	bottom: 100%; /* makes list appear above instead of below */
 }
 
 #staff_menu{
@@ -217,6 +232,7 @@ table{
 
 #action_menu.open{
 	height: auto;
+	bottom: 100%; /* makes list appear above instead of below */
 }
 
 ul.submenu{
@@ -374,7 +390,7 @@ ul.submenu{
 }
 .profile_table td{
 	display: block;
-	width: 100% !important;
+	width: 90% !important;
 	margin: 0px auto;
 	font-size: 1em;
 }
@@ -704,6 +720,7 @@ ul.submenu{
 tbody{
 	display: block;
 	margin: 0em auto;
+	background-color: #06404C;
 }
 /*Separates menu items*/
 hr{

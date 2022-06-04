@@ -5,6 +5,7 @@
 $(document).ready(function(){
 
 
+  //Profile Page
   //style names are important
   //moves the sidebar menu (I'm lazy, hope this works)
   $('#container').append( $('#sidebar') );
@@ -33,6 +34,7 @@ $(document).ready(function(){
   })
 
 
+ //Travel Page
  //Travel Buttons
  //insert div after travelcontainer
  $("<div id='buttonContainer'> </div>").insertAfter(".travelContainer");
