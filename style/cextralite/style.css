@@ -15,6 +15,10 @@ Body{
 	margin: 0px;
 	padding: 0px;
 	padding-bottom: 50px; /*Due to Menu stuck at bottom*/
+	background-image: url("./images/temp-background-lowquality.jpg");
+	background-repeat: no-repeat;
+	background-position: center;
+	background-size: cover;
 	background-color: rgba(0,0,0,1);
 	font-size: 1em;
 }
@@ -371,14 +375,14 @@ ul.submenu{
 	margin: .5em 0;
 	padding: 0.5em 1em;
 	overflow: scroll;
-	border-radius: 10px 10px 10px 10px;
+	border-radius: 5px 5px 5px 5px;
 
 	width: 100%;
 
 	font-size: 1.1em;
 	text-align: left;
 
-	background-color: rgba(20,20,20, 0.7);
+	background-color: rgba(20,20,20, 0.1);
 }
 
 .table th a{
@@ -572,6 +576,10 @@ ul.submenu{
 }
 .logout a{
 	display: block;
+}
+
+#handSeal_td{
+	text-align: center; /*important*/
 }
 
 #handseals{
