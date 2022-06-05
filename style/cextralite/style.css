@@ -28,7 +28,7 @@ p{
 }
 b{
 	/* width: 100%; */
-	/* display: none; /*Hides warning messages*/ */
+	display: none; /*Hides warning messages*/
 }
 a{
 	color: rgba(220,220,220,1);
@@ -47,6 +47,7 @@ table{
 }
 
 #sidebar {
+	z-index: 99;
 	position: fixed;
 	bottom: 0;
 	right: 0;
@@ -237,7 +238,8 @@ table{
 
 ul.submenu{
 	display: grid;
-	grid-template-columns: repeat(3, 1fr);
+	/* grid-template-columns: repeat(3, 1fr); */
+	grid-auto-flow: row;
 	/* grid-column-gap: 0.25fr; */
 }
 
@@ -245,15 +247,16 @@ ul.submenu{
 	display: inline-block;
 	text-align: center;
 	font-size: 1em;
+	margin: 0em auto;
 	width: 100%;
 }
 .submenu li{
 	display: block;
 	text-align: center;
 	width: 90% !important;
-	margin: 0.5em auto;
 	list-style: none;
-	/* padding: 0.2em 0em; */
+	padding: 0.2em 0em;
+	margin: 0em auto;
 }
 .submenu li a{
 	display: block;
@@ -261,7 +264,9 @@ ul.submenu{
 	padding: 0.5em 0.3em;
 	margin: 0em auto;
 	text-decoration: none;
-	background: linear-gradient(0deg, rgba(40,40,40,1) 0%, rgba(62,62,62,1) 38%, rgba(40,40,40,1) 100%);
+	/* background: linear-gradient(0deg, rgba(40,40,40,1) 0%, rgba(62,62,62,1) 38%, rgba(40,40,40,1) 100%); */
+	background-color: rgba(40, 40, 40);
+	border-radius: 5px;
 }
 .submenu li a:hover{
 	background: linear-gradient(0deg, rgba(40,40,40,1) 0%, rgba(82,82,82,1) 38%, rgba(40,40,40,1) 100%);
@@ -356,18 +361,26 @@ ul.submenu{
 }
 .table tr{
 	margin: 0.5em auto;
+	display: grid;
+	/*change this to column vvv for larger screen sizes*/
+	grid-auto-flow: row;
+	justify-content: space-around;
 }
 .table tr td{
-	display: inline-block;
-	width: 90%;
+	display: block;
 	margin: .5em 0;
-	padding: 1em 0;
+	padding: 0.5em 1em;
+	overflow: scroll;
 	border-radius: 10px 10px 10px 10px;
 
-	font-size: 1.2em;
+	width: 100%;
+
+	font-size: 1.1em;
+	text-align: left;
 
 	background-color: rgba(20,20,20, 0.7);
 }
+
 .table th a{
 	display: inline-block;
 	padding: 0.5em;
@@ -402,15 +415,20 @@ ul.submenu{
 	font-size: 1em;
 	padding: 1em 0em;
 	background-color: rgba(40,40,40,1);
+	border: 1px solid white rgba(255,255,255, 0.4);
+	border-left: 1px solid rgba(80,80,80);
+	border-right: 1px solid rgba(80,80,80);
+	border-top: 1px solid rgba(40,40,40);
+	border-radius: 7px 7px 0px 0px;
 }
 
 .contentHeader{
-	font-size: 1.2em;
+	font-size: 1.5em;
 	font-weight: bold;
 
 	padding: 0.5em 0em;
-	background: linear-gradient(0deg, rgba(40,40,40,1) 0%, rgba(20,20,20,1) 23%, rgba(49,62,56,0.7) 38%, rgba(40,40,40,1) 100%);
-	border-radius: 20px 20px 0px 0px;
+	border: 1px solid rgba(255,255,255,0.5);
+	border-radius: 10px 10px 0px 0px;
 	margin-bottom: 0.8em;
 }
 
@@ -441,9 +459,6 @@ ul.submenu{
 .chat_msg{
 	display: grid !important;
 	grid-template-columns: 1fr 3fr 1fr;
-	/* grid-template-rows: 0.3fr 0.7fr; */
-	align-items: center;
-	/* grid-row-gap: 0.5em; */
 	width: 98% !important;
 	margin: 1.5em auto !important;
 }
@@ -475,7 +490,6 @@ ul.submenu{
 	font-size: 1.2em;
 	align-items: center;
 	grid-column: 1 / span 2;
-	width: auto !important;
 	padding: 0.5em 0em 0em 0.5em !important;
 	overflow: scroll !important;
 }
@@ -529,12 +543,15 @@ ul.submenu{
 }
 
 #socialPosts a{
-	background: none;
+	background: rgba(40, 40, 40);
+	border-radius: 5px 5px;
+	padding: 10px;
 	border: none;
 	box-shadow: none;
 }
 #socialPosts tr{
 	width: 95%;
+	grid-auto-flow: column;
 	/* width: auto; */
 	background-color: rgba(50,50,50,1);
 	padding: 0.3em 0em;
@@ -560,8 +577,21 @@ ul.submenu{
 #handseals{
 	display: inline-block;
 	width: 90%;
+	text-align: center !important; /*important*/
 }
 #handseals p{
+	display: inline-block;
+	text-align: center !important;
+}
+
+#weapons{
+	display: inline-block;
+	width: 90%;
+	margin: 0em auto;
+}
+#weapons p{
+	min-width: 15px;
+	font-size: 0.8em;
 	display: inline-block;
 }
 
@@ -573,12 +603,11 @@ ul.submenu{
 	color: black;
 	font-size: 0.65em;
 	padding: 0.15em 0em !important;
-	border-radius: 0px !important;
+	border-radius: 5px !important;
 }
 
 #jutsu input{
 	padding: 0.3em 0.1em;
-	/* border-radius: 5px; */
 }
 
 #jutsu span{
@@ -625,6 +654,22 @@ ul.submenu{
 /*Travel Page*/
 #scoutTable .scrollable{
 	overflow: scroll;
+}
+
+#scoutTable tbody tr:nth-child(4){
+	grid-auto-flow: column;
+}
+/*Travel Page*/
+
+.table_multicolumns{
+	grid-auto-flow: column;
+}
+.table_multicolumns a{
+	text-align: center;
+}
+
+#shop_table_header{
+	grid-auto-flow: column;
 }
 
 
@@ -731,6 +776,7 @@ hr{
 
 label{
 	text-align: left;
+	font-size: 17px;
 }
 
 /*health bars*/
@@ -746,8 +792,16 @@ td div div{
 /*health bars*/
 
 tr{
-	display: block;
+	display: grid;
 	text-align: center;
+	justify-content: space-around;
+	align-items: center;
+	justify-items: center;
+}
+
+#kunaiExchange tr{
+	justify-content: space-around;
+	grid-auto-flow: column;
 }
 
 input{
@@ -755,7 +809,7 @@ input{
 	padding: 0.4em 0.2em;
 	font-size: 0.8em;
 	margin: 0.2em 0em;
-	border-radius: 10px 10px 10px 10px;
+	/* border-radius: 10px 10px 10px 10px; */
 
 	background-color: white;
 
@@ -778,6 +832,12 @@ textarea{
 th{
 	padding: 1em;
 	font-size: 1.2em;
+	display: grid;
+	grid-auto-flow: column;
+	justify-content: space-around;
+}
+th span{
+	margin: 0em 1em;
 }
 
 td label{
@@ -795,6 +855,20 @@ select{
 	background-color: white;
 }
 
+/*Arena*/
+#jutsu{
+	overflow: scroll;
+	text-align: center;
+}
+.jutsuCategory{
+	width: 25% !important;
+}
+.jutsuCategory span{
+	width: 70% !important;
+}
+/*Arena*/
+
+/*Notification Blink*/
 .systemMessage{
 	color: rgba(240,240,20, 1);
 }
@@ -806,4 +880,24 @@ select{
   50% {
     opacity: 0.75;
   }
+}
+/*Notification Blink*/
+
+/*Battle Jutsu Signs Responsive Design*/
+@media (min-width: 470px) {
+
+	#handseals{
+		display: grid;
+		grid-template-columns: repeat(6, 1fr);
+		overflow: scroll;
+	}
+	#handseals p img{
+		border-radius: 20px;
+	}
+	#handseals br{
+		display: none; /*removes element*/
+	}
+	.handsealNumber{
+		background-color: #ab902e	!important; /*override default color*/
+	}
 }
