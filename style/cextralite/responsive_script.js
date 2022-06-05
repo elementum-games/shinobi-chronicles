@@ -48,7 +48,8 @@ $(document).ready(function(){
  $("<span>West</span>").appendTo(".west");
  $("<span>South</span>").appendTo(".south");
 
-
-
+//arena
+$("#bi_td_opponent").before($("#bi_th_opponent"));
+$("#bi_th_opponent").css("margin-top", "1.5rem");
 
 })
