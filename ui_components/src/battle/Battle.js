@@ -46,7 +46,7 @@ function Battle({
     }
 
     const handleApiResponse = (response) => {
-        if (response.data.battle != null) {
+        if (response.data.battle != null && Object.keys(response.data.battle).length > 0) {
             setBattle(response.data.battle);
         }
         if(response.errors.length > 0) {

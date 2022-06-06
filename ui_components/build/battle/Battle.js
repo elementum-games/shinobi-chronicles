@@ -19,7 +19,8 @@ function Battle({
     jutsuType: 'ninjutsu',
     weaponId: 0,
     targetTileIndex: null
-  }); // DERIVED STATE
+  });
+  const [error, setError] = React.useState(null); // DERIVED STATE
 
   const isAttackSelected = battle.isAttackPhase && (attackInput.jutsuId !== -1 || attackInput.handSeals.length > 0);
   const isSelectingTile = battle.isMovementPhase || isAttackSelected; // STATE MUTATORS
@@ -28,6 +29,18 @@ function Battle({
     setAttackInput(prevSelectedAttack => ({ ...prevSelectedAttack,
       ...newAttackInput
     }));
+  };
+
+  const handleApiResponse = response => {
+    if (response.data.battle != null && Object.keys(response.data.battle).length > 0) {
+      setBattle(response.data.battle);
+    }
+
+    if (response.errors.length > 0) {
+      setError(response.errors.join(' '));
+    } else {
+      setError(null);
+    }
   }; // ACTIONS
 
 
@@ -38,11 +51,7 @@ function Battle({
       apiFetch(battleApiLink, {
         submit_movement_action: "yes",
         selected_tile: tileIndex
-      }).then(response => {
-        if (response.data.battle != null) {
-          setBattle(response.data.battle);
-        }
-      });
+      }).then(handleApiResponse);
     } else if (isAttackSelected) {
       apiFetch(battleApiLink, {
         submit_attack: "1",
@@ -51,15 +60,13 @@ function Battle({
         jutsu_category: attackInput.jutsuCategory,
         weapon_id: attackInput.weaponId,
         target_tile: tileIndex
-      }).then(response => {
-        if (response.data.battle != null) {
-          setBattle(response.data.battle);
-        }
-      });
+      }).then(handleApiResponse);
     }
   };
 
-  return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement(FightersAndField, {
+  return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("p", {
+    className: "systemMessage"
+  }, error), /*#__PURE__*/React.createElement(FightersAndField, {
     battle: battle,
     attackInput: attackInput,
     membersLink: membersLink,

@@ -7,6 +7,7 @@ require_once __DIR__ . '/BattleApiPresenter.php';
 require_once __DIR__ . '/BattleField.php';
 require_once __DIR__ . '/BattleEffectsManager.php';
 require_once __DIR__ . '/BattleAttack.php';
+require_once __DIR__ . '/BattleAttackHit.php';
 require_once __DIR__ . '/AttackTarget.php';
 require_once __DIR__ . '/FighterAction.php';
 
@@ -81,9 +82,11 @@ class BattleManager {
     public bool $spectate = false;
 
     const DEBUG_PLAYER_ACTION = 'player_action';
+    const DEBUG_DAMAGE = 'damage';
 
     public array $debug = [
-        self::DEBUG_PLAYER_ACTION => true
+        self::DEBUG_PLAYER_ACTION => true,
+        self::DEBUG_DAMAGE => true,
     ];
 
     // INITIALIZATION
@@ -116,8 +119,8 @@ class BattleManager {
         $this->default_attacks = $this->getDefaultAttacks();
 
         $this->field = new BattleField(
-             $system,
-             $this->battle,
+            $system,
+            $this->battle,
         );
 
         $this->effects = new BattleEffectsManager(
@@ -216,8 +219,8 @@ class BattleManager {
     // PUBLIC MUTATION API
 
     /**
-     * This is the primary method most usages of battle should call. This triggers progresses the battle if the required inputs
-     * have been gathered.
+     * This is the primary method most usages of battle should call. This triggers progresses the battle if the
+     * required inputs have been gathered.
      *
      * @return string|null
      * @throws Exception
@@ -241,7 +244,7 @@ class BattleManager {
             ($this->battle->timeRemaining() > 0 || !$this->opponentActionSubmitted())
         ) {
             $player_action = $this->collectPlayerAction($_POST);
-            $this->renderDebug(self::DEBUG_PLAYER_ACTION, 'playerActionSubmitted', print_r($player_action, true));
+            $this->debug(self::DEBUG_PLAYER_ACTION, 'playerActionSubmitted', print_r($player_action, true));
 
             if($player_action != null) {
                 $this->setPlayerAction($this->player, $player_action);
@@ -395,7 +398,7 @@ class BattleManager {
                 '[player]',
                 '[opponent]',
                 '[gender]',
-                '[gender2]'
+                '[gender2]',
             ],
             [
                 $attacker->getName(),
@@ -408,7 +411,7 @@ class BattleManager {
     }
 
     private static function getJutsuTextColor($jutsu_type): string {
-        switch ($jutsu_type) {
+        switch($jutsu_type) {
             case Jutsu::TYPE_NINJUTSU:
                 return "blue";
             case Jutsu::TYPE_TAIJUTSU:
@@ -446,7 +449,7 @@ class BattleManager {
             }
 
             if($player1_action != null && $player2_action != null) {
-                $this->battle->battle_text .= '[br][hr]';
+                $this->battle->battle_text .= '[hr]';
             }
 
             if($player2_action != null && ($player2_action instanceof FighterMovementAction)) {
@@ -459,77 +462,142 @@ class BattleManager {
             }
         }
         else if($this->battle->isAttackPhase()) {
-            $player1_attack = $this->getFighterAttackFromActions($this->battle->player1->combat_id);
-            $player2_attack = $this->getFighterAttackFromActions($this->battle->player2->combat_id);
-
-            if($this->system->debug['battle']) {
-                echo 'P1: ' . $player1_attack->raw_damage . ' / P2: ' . $player2_attack->raw_damage . '<br />';
-            }
-
-            // Actions cast
-            // Actions have multiple collisions now
-            // Cast time
-            // travel time
-
-            // Collision
-            $collision_text = null;
-            if($player1_attack != null && $player2_attack != null) {
-                $collision_text = $this->jutsuCollision(
-                    $this->battle->player1, $this->battle->player2,
-                    $player1_attack->raw_damage, $player2_attack->raw_damage,
-                    $player1_attack->jutsu, $player2_attack->jutsu
-                );
-            }
-
-            // Apply remaining barrier
-            if($player1_attack) {
-                $this->effects->updateBarrier($this->battle->player1, $player1_attack->jutsu);
-            }
-            if($player2_attack) {
-                $this->effects->updateBarrier($this->battle->player2, $player2_attack->jutsu);
-            }
-
-            // Apply damage/effects and set display
-            if($player1_attack) {
-                $this->applyAttack($player1_attack, $this->battle->player1, $this->battle->player2);
-            }
-            else {
-                $this->battle->battle_text .= $this->battle->player1->getName() . ' stood still and did nothing.';
-                if($this->effects->hasDisplays($this->battle->player1)) {
-                    $this->battle->battle_text .= '<p>' .
-                        $this->parseCombatText(
-                            $this->effects->getDisplayText($this->battle->player1),
-                            $this->battle->player1,
-                            $this->battle->player2
-                        ) .
-                        '</p>';
-                }
-            }
-
-            if($collision_text) {
-                $collision_text = $this->parseCombatText($collision_text, $this->battle->player1, $this->battle->player2);
-                $this->battle->battle_text .= '[br][hr]' . $this->system->clean($collision_text);
-            }
-            $this->battle->battle_text .= '[br][hr]';
-
-            // Apply damage/effects and set display
-            if($player2_attack) {
-                $this->applyAttack($player2_attack, $this->battle->player2, $this->battle->player1);
-            }
-            else {
-                $this->battle->battle_text .= $this->battle->player2->getName() . ' stood still and did nothing.';
-                if($this->effects->hasDisplays($this->battle->player2)) {
-                    $this->battle->battle_text .= "<p>" . $this->parseCombatText(
-                            $this->effects->getDisplayText($this->battle->player2),
-                            $this->battle->player2,
-                            $this->battle->player1
-                        ) . "</p>";
-                }
-            }
+            $this->runAttackPhaseActions();
         }
 
         // Update battle
         $this->finishTurn();
+    }
+
+    /**
+     * @throws Exception
+     */
+    protected function runAttackPhaseActions() {
+        $player1_attack = $this->getFighterAttackFromActions($this->battle->player1->combat_id);
+        $player2_attack = $this->getFighterAttackFromActions($this->battle->player2->combat_id);
+
+        $this->debug(
+            self::DEBUG_DAMAGE,
+            'Raw damage',
+            'P1: ' . $player1_attack->starting_raw_damage . ' / P2: ' . $player2_attack->starting_raw_damage
+        );
+
+        // Casting puts the attack on the field
+        // Check for collissions
+
+        // DIRECTIONAL ATTACKS
+        // put attacks temporarily on all their squares
+        // walk through path of attack, find collisions
+        $this->setAttackPath($this->battle->player1, $player1_attack);
+
+        // $this->setAttackPath($this->battle->player2, $player2_attack);
+
+        $this->runAttackPath($this->battle->player1, $player1_attack);
+
+        // For all attacks, have a cast/travel time and do stat checks against it
+        // (e.g. attack vs replacement, raise/lower damage % taken)
+
+        // for each collision check
+        // - each attack square #
+        // - each attack travel speed
+        // and find a point of collision, weaken attack after that
+
+        $hits = $player1_attack->hits;
+
+        // squares hit
+        // direction
+
+        // Cast time
+        // travel time
+
+        // Collision
+        // This doesn't apply the same way any more, move logic to field processing
+        /*$collision_text = null;
+        if($player1_attack != null && $player2_attack != null) {
+            $collision_text = $this->jutsuCollision(
+                $this->battle->player1, $this->battle->player2,
+                $player1_attack->raw_damage, $player2_attack->raw_damage,
+                $player1_attack->jutsu, $player2_attack->jutsu
+            );
+        }*/
+
+        // Apply remaining barrier
+        if($player1_attack) {
+            $this->effects->updateBarrier($this->battle->player1, $player1_attack->jutsu);
+        }
+        if($player2_attack) {
+            $this->effects->updateBarrier($this->battle->player2, $player2_attack->jutsu);
+        }
+
+        // Apply damage/effects and set display
+        if($player1_attack) {
+            $text = $player1_attack->jutsu->battle_text;
+            if(count($player1_attack->hits) === 0) {
+                $text .= "[player]'s attack misses.";
+            }
+            $this->battle->battle_text .= $this->parseCombatText(
+                $text, $this->battle->player1, $this->battle->player2
+            );
+
+            foreach($player1_attack->hits as $hit) {
+                /** @var BattleAttackHit $hit */
+                $this->applyAttackHit(
+                    attack: $player1_attack,
+                    user: $hit->attacker,
+                    target: $hit->target,
+                    raw_damage: $hit->raw_damage
+                );
+            }
+        }
+        else {
+            $this->battle->battle_text .= $this->battle->player1->getName() . ' stood still and did nothing.';
+            if($this->effects->hasDisplays($this->battle->player1)) {
+                $this->battle->battle_text .= '<p>' .
+                    $this->parseCombatText(
+                        $this->effects->getDisplayText($this->battle->player1),
+                        $this->battle->player1,
+                        $this->battle->player2
+                    ) .
+                    '</p>';
+            }
+        }
+
+        /*if($collision_text) {
+            $collision_text = $this->parseCombatText($collision_text, $this->battle->player1, $this->battle->player2);
+            $this->battle->battle_text .= '[hr]' . $this->system->clean($collision_text);
+        }*/
+        $this->battle->battle_text .= '[hr]';
+
+        // Apply damage/effects and set display
+        if($player2_attack) {
+            $text = $player2_attack->jutsu->battle_text;
+            if(count($player2_attack->hits) === 0) {
+                $text .= "[player]'s attack misses.";
+            }
+            $this->battle->battle_text .= $this->parseCombatText(
+                $text, $this->battle->player2, $this->battle->player1
+            );
+
+            foreach($player2_attack->hits as $hit) {
+                /** @var BattleAttackHit $hit */
+                $this->applyAttackHit(
+                    attack: $player2_attack,
+                    user: $hit->attacker,
+                    target: $hit->target,
+                    raw_damage: $hit->raw_damage
+                );
+            }
+        }
+        else {
+            $this->battle->battle_text .= $this->battle->player2->getName() . ' stood still and did nothing.';
+            if($this->effects->hasDisplays($this->battle->player2)) {
+                $this->battle->battle_text .= "<p>" . $this->parseCombatText(
+                        $this->effects->getDisplayText($this->battle->player2),
+                        $this->battle->player2,
+                        $this->battle->player1
+                    ) . "</p>";
+            }
+        }
     }
 
     private function finishTurn() {
@@ -551,7 +619,7 @@ class BattleManager {
 
     #[Pure]
     private function nextTurnPhase(): string {
-       if($this->battle->isMovementPhase()) {
+        if($this->battle->isMovementPhase()) {
             return Battle::TURN_TYPE_ATTACK;
         }
         else {
@@ -590,7 +658,7 @@ class BattleManager {
 
         // Decrement cooldowns
         if(!empty($this->battle->jutsu_cooldowns)) {
-            foreach($this->battle->jutsu_cooldowns as $id=>$cooldown) {
+            foreach($this->battle->jutsu_cooldowns as $id => $cooldown) {
                 $this->battle->jutsu_cooldowns[$id]--;
                 if($this->battle->jutsu_cooldowns[$id] == 0) {
                     unset($this->battle->jutsu_cooldowns[$id]);
@@ -649,27 +717,22 @@ class BattleManager {
      * @throws Exception
      */
     protected function setupFighterAttack(Fighter $fighter, FighterAttackAction $action): BattleAttack {
-        $attack = new BattleAttack();
+        $jutsu = $this->getJutsuFromAttackAction($fighter, $action);
+        $jutsu->setCombatId($fighter->combat_id);
 
-        $attack->jutsu = $this->getJutsuFromAttackAction($fighter, $action);
-        $attack->jutsu->setCombatId($fighter->combat_id);
-
-        $disable_randomness = false;
-        switch($this->battle->battle_type) {
-            case Battle::TYPE_AI_ARENA:
-            case Battle::TYPE_AI_MISSION:
-                $disable_randomness = true;
-                break;
-        }
-
-        $attack->raw_damage = $fighter->calcDamage(attack: $attack->jutsu, disable_randomness: $disable_randomness);
+        $attack = new BattleAttack(
+            attacker_id: $action->fighter_id,
+            target: $action->target,
+            jutsu: $jutsu,
+            starting_raw_damage: $fighter->calcDamage($jutsu),
+        );
 
         // Set weapon data into jutsu
         if($attack->jutsu->jutsu_type == Jutsu::TYPE_TAIJUTSU && $action->weapon_id) {
             // Apply element to jutsu
             if($fighter->items[$action->weapon_id]->effect == 'element') {
                 $attack->jutsu->element = $fighter->elements['first'];
-                $attack->raw_damage *= 1 + ($fighter->items[$action->weapon_id]->effect_amount / 100);
+                $attack->starting_raw_damage *= 1 + ($fighter->items[$action->weapon_id]->effect_amount / 100);
             }
             // Set effect in jutsu
             else {
@@ -687,18 +750,94 @@ class BattleManager {
         }
 
         if($attack->jutsu->use_type == Jutsu::USE_TYPE_BARRIER) {
-            $attack->jutsu->effect_amount = $attack->raw_damage;
-            $fighter->barrier += $attack->raw_damage;
-            $attack->raw_damage = 0;
+            $attack->jutsu->effect_amount = $attack->starting_raw_damage;
+            $fighter->barrier += $attack->starting_raw_damage;
+            $attack->starting_raw_damage = 0;
         }
 
         return $attack;
     }
 
-    protected function applyAttack(BattleAttack $attack, Fighter $user, Fighter $target) {
-        $attack_damage = $attack->raw_damage;
+    /**
+     * @throws Exception
+     */
+    protected function setAttackPath(Fighter $attacker, BattleAttack $attack) {
+        /*const TARGET_TYPE_FIGHTER_ID = 'fighter_id'
+        const TARGET_TYPE_TILE = 'tile';
+        const TARGET_TYPE_DIRECTION = 'direction';*/
+
+        switch($attack->jutsu->use_type) {
+            case Jutsu::USE_TYPE_MELEE:
+            case Jutsu::USE_TYPE_PROJECTILE:
+                if($attack->target instanceof AttackTileTarget) {
+                    $this->field->setupTileAttack($attacker, $attack, $attack->target);
+                }
+                else if($attack->target instanceof AttackDirectionTarget) {
+                    $this->field->setupDirectionAttack($attacker, $attack, $attack->target);
+                }
+                else if($attack->target instanceof AttackFighterIdTarget) {
+                    throw new Exception("setAttackPath: Unsupported target type!");
+                }
+                else {
+                    throw new Exception("setAttackPath: Invalid target type!");
+                }
+                // TODO
+                break;
+            case Jutsu::USE_TYPE_PROJECTILE_AOE:
+            case Jutsu::USE_TYPE_REMOTE_SPAWN:
+            case Jutsu::USE_TYPE_BUFF:
+            case Jutsu::USE_TYPE_BARRIER:
+            default:
+                throw new Exception("setAttackPath: Invalid jutsu use type!");
+        }
+    }
+
+    /**
+     * @throws Exception
+     */
+    protected function runAttackPath(Fighter $attacker, BattleAttack $attack): BattleAttack {
+        if($attack->root_path_segment == null) {
+            throw new Exception("runAttackPath: No root path segment!");
+        }
+
+        $attacker_team = Battle::fighterTeam($attacker);
+
+        $path_segment = $attack->root_path_segment;
+
+        $count = 0;
+        while($path_segment != null) {
+            if($count++ > 100) {
+                throw new Exception("runAttackPath: Attack path tried over 100 segments, exiting!");
+            }
+
+            foreach($path_segment->tile->fighter_ids as $fighter_id) {
+                $fighter = $this->battle->getFighter($fighter_id);
+                if($fighter === null) {
+                    continue;
+                }
+
+                // TODO: Buff attacks
+                if(Battle::fighterTeam($fighter) === $attacker_team) {
+                    continue;
+                }
+
+                $attack->hits[] = new BattleAttackHit(
+                    attacker: $attacker,
+                    target: $fighter,
+                    raw_damage: $path_segment->raw_damage,
+                );
+            }
+
+            $path_segment = $path_segment->next_segment;
+        }
+
+        return $attack;
+    }
+
+    protected function applyAttackHit(BattleAttack $attack, Fighter $user, Fighter $target, float $raw_damage) {
+        $attack_damage = $raw_damage;
         if($attack->jutsu->jutsu_type != Jutsu::TYPE_GENJUTSU && empty($attack->jutsu->effect_only)) {
-            $attack_damage = $target->calcDamageTaken($attack->raw_damage, $attack->jutsu->jutsu_type);
+            $attack_damage = $target->calcDamageTaken($attack->starting_raw_damage, $attack->jutsu->jutsu_type);
             $target->health -= $attack_damage;
             if($target->health < 0) {
                 $target->health = 0;
@@ -712,7 +851,7 @@ class BattleManager {
                     $user,
                     $target->combat_id,
                     $attack->jutsu->weapon_effect,
-                    $attack->raw_damage
+                    $attack->starting_raw_damage
                 );
             }
         }
@@ -724,7 +863,9 @@ class BattleManager {
 
         // Effects
         if($attack->jutsu->hasEffect()) {
-            if($attack->jutsu->use_type == Jutsu::USE_TYPE_BUFF || in_array($attack->jutsu->effect, BattleEffect::$buff_effects)) {
+            if($attack->jutsu->use_type == Jutsu::USE_TYPE_BUFF || in_array(
+                    $attack->jutsu->effect, BattleEffect::$buff_effects
+                )) {
                 $target_id = $user->combat_id;
             }
             else {
@@ -735,11 +876,11 @@ class BattleManager {
                 $user,
                 $target_id,
                 $attack->jutsu,
-                $attack->raw_damage
+                $attack->starting_raw_damage
             );
         }
 
-        $text = $attack->jutsu->battle_text;
+        $text = "";
         $attack_jutsu_color = BattleManager::getJutsuTextColor($attack->jutsu->jutsu_type);
 
         if($attack->jutsu->jutsu_type != Jutsu::TYPE_GENJUTSU && empty($attack->jutsu->effect_only)) {
@@ -755,7 +896,7 @@ class BattleManager {
             $text .= '<p>' . $this->effects->getDisplayText($user) . '</p>';
         }
 
-        if($attack->jutsu->hasEffect()){
+        if($attack->jutsu->hasEffect()) {
             $text .= "<p style=\"font-style:italic;margin-top:3px;\">" .
                 $this->system->clean($this->effects->getAnnouncementText($attack->jutsu->effect)) .
                 "</p>";
@@ -1020,7 +1161,7 @@ class BattleManager {
                 $this->battle->fighter_jutsu_used[$player->combat_id][$jutsu->combat_id]['count']++;
             }
             else {
-                $this->player_jutsu_used[$jutsu->combat_id] = array();
+                $this->player_jutsu_used[$jutsu->combat_id] = [];
                 $this->player_jutsu_used[$jutsu->combat_id]['jutsu_type'] = $jutsu->jutsu_type;
                 $this->player_jutsu_used[$jutsu->combat_id]['count'] = 1;
             }
@@ -1038,35 +1179,37 @@ class BattleManager {
 
     protected function runPlayerHealItemAction(array $FORM_DATA) {
         try {
-            if (isset($FORM_DATA['submit_prep_action'])) {
+            if(isset($FORM_DATA['submit_prep_action'])) {
                 $item_id = $FORM_DATA['item_id'] ?? null;
-                if ($item_id && $this->player->hasItem($item_id)) {
+                if($item_id && $this->player->hasItem($item_id)) {
                     $item = $this->player->items[$item_id];
 
                     $max_health = $this->player->max_health * (Battle::MAX_PRE_FIGHT_HEAL_PERCENT / 100);
 
-                    if ($this->player->health >= $max_health) {
+                    if($this->player->health >= $max_health) {
                         throw new Exception("You can't heal any further!");
                     }
-                    if ($item->effect === 'heal') {
-                        if (--$this->player->items[$item_id]->quantity === 0) {
+                    if($item->effect === 'heal') {
+                        if(--$this->player->items[$item_id]->quantity === 0) {
                             unset($this->player->items[$item_id]);
                         }
 
                         $this->player->health += $item->effect_amount;
-                        if ($this->player->health >= $max_health) {
+                        if($this->player->health >= $max_health) {
                             $this->player->health = $max_health;
                         }
 
                         $this->player->updateData();
                         $this->player->updateInventory();
-                        $this->battle->battle_text .= sprintf("%s used a %s and healed for %.2f[br]", $this->player->user_name, $item->name, $item->effect_amount);
+                        $this->battle->battle_text .= sprintf(
+                            "%s used a %s and healed for %.2f[br]", $this->player->user_name, $item->name,
+                            $item->effect_amount
+                        );
                         $this->updateData();
                     }
                 }
             }
-        }
-        catch(Exception $e) {
+        } catch(Exception $e) {
             $this->system->message($e->getMessage());
         }
     }
@@ -1104,7 +1247,7 @@ class BattleManager {
                 $weapon_id = (int)$FORM_DATA['weapon_id'] ?? 0;
                 $target_tile = (int)$FORM_DATA['target_tile'] ?? null;
 
-                $this->renderDebug(
+                $this->debug(
                     self::DEBUG_PLAYER_ACTION,
                     'collecting attack action',
                     json_encode([
@@ -1114,7 +1257,6 @@ class BattleManager {
                         'weapon_id' => $weapon_id,
                     ])
                 );
-
 
                 // Check for handseals if ninjutsu/genjutsu
                 if($jutsu_category == Jutsu::TYPE_NINJUTSU or $jutsu_category == Jutsu::TYPE_GENJUTSU) {
@@ -1151,7 +1293,9 @@ class BattleManager {
                     throw new Exception("Invalid jutsu!");
                 }
                 if(isset($this->battle->jutsu_cooldowns[$player_jutsu->combat_id])) {
-                    throw new Exception("Cannot use that jutsu, it is on cooldown for " . $this->battle->jutsu_cooldowns[$player_jutsu->combat_id] . " more turns!");
+                    throw new Exception(
+                        "Cannot use that jutsu, it is on cooldown for " . $this->battle->jutsu_cooldowns[$player_jutsu->combat_id] . " more turns!"
+                    );
                 }
 
                 if(!$this->player->useJutsu($player_jutsu)) {
@@ -1171,16 +1315,7 @@ class BattleManager {
                 }
 
                 // Check target
-                if($target_tile != null) {
-                    $target = new AttackTileTarget($target_tile);
-                    $distance_to_target = $this->field->distanceFromFighter($this->player->combat_id, $target_tile);
-                    if($distance_to_target > $player_jutsu->range) {
-                        throw new Exception("Target is not in range!");
-                    }
-                }
-                else {
-                    throw new Exception("Invalid target type!");
-                }
+                $target = $this->getTarget($this->player, $player_jutsu, $target_tile);
 
                 // Log jutsu used
                 return new FighterAttackAction(
@@ -1191,7 +1326,7 @@ class BattleManager {
                     target: $target,
                 );
 
-            } catch (Exception $e) {
+            } catch(Exception $e) {
                 $this->system->message($e->getMessage());
                 return null;
             }
@@ -1199,7 +1334,7 @@ class BattleManager {
         else if($this->battle->isMovementPhase() && !empty($FORM_DATA['submit_movement_action'])) {
             $target_tile = $FORM_DATA['selected_tile'] ?? null;
 
-            $this->renderDebug(self::DEBUG_PLAYER_ACTION, 'collecting movement action', $target_tile);
+            $this->debug(self::DEBUG_PLAYER_ACTION, 'collecting movement action', $target_tile);
 
             // Run player attack
             try {
@@ -1214,13 +1349,46 @@ class BattleManager {
                     fighter_id: $this->player->combat_id,
                     target_tile: $target_tile
                 );
-            } catch (Exception $e) {
+            } catch(Exception $e) {
                 $this->system->message($e->getMessage());
                 return null;
             }
         }
 
         return null;
+    }
+
+    /**
+     * @param Fighter $fighter
+     * @param Jutsu $
+     * @param int     $target_tile
+     * @return AttackTarget
+     * @throws Exception
+     */
+    private function getTarget(Fighter $fighter, Jutsu $jutsu, ?int $target_tile): AttackTarget {
+        if($target_tile != null) {
+            $distance_to_target = $this->field->distanceFromFighter($fighter->combat_id, $target_tile);
+            if($distance_to_target > $jutsu->range) {
+                throw new Exception("getTarget: Target is not in range!");
+            }
+
+            if($jutsu->target_type === Jutsu::TARGET_TYPE_DIRECTION) {
+                $direction = $this->field->getTileDirectionFromFighter(
+                    fighter: $this->player, target_tile: $target_tile
+                );
+                return new AttackDirectionTarget($direction);
+            }
+            else if($jutsu->target_type === Jutsu::TARGET_TYPE_TILE) {
+                return new AttackTileTarget($target_tile);
+            }
+            else {
+                throw new Exception("getTarget: Unsupported target type!");
+            }
+        }
+        else {
+            // TODO: Attack a fighter directly
+            throw new Exception("getTarget: Invalid target type!");
+        }
     }
 
     private function getJutsuFromHandSeals(Fighter $fighter, ?array $hand_seals): ?Jutsu {
@@ -1236,7 +1404,7 @@ class BattleManager {
         }*/
 
         $raw_seals = $hand_seals;
-        $seals = array();
+        $seals = [];
         foreach($raw_seals as $seal) {
             if(!is_numeric($seal)) {
                 break;
@@ -1298,18 +1466,22 @@ class BattleManager {
             $jutsu = $fighter->bloodline->jutsu[$action->jutsu_id] ?? null;
         }
         else {
-            throw new Exception("Invalid jutsu purchase type {$action->jutsu_purchase_type} for fighter {$fighter->combat_id}");
+            throw new Exception(
+                "Invalid jutsu purchase type {$action->jutsu_purchase_type} for fighter {$fighter->combat_id}"
+            );
         }
 
         if($jutsu == null) {
-            $this->renderDebug(self::DEBUG_PLAYER_ACTION, "getJutsuFromAttackAction", print_r($action, true));
-            throw new Exception("Invalid type {$action->jutsu_purchase_type} jutsu {$action->jutsu_id} for fighter {$fighter->getName()}");
+            $this->debug(self::DEBUG_PLAYER_ACTION, "getJutsuFromAttackAction", print_r($action, true));
+            throw new Exception(
+                "Invalid type {$action->jutsu_purchase_type} jutsu {$action->jutsu_id} for fighter {$fighter->getName()}"
+            );
         }
 
         return $jutsu;
     }
 
-    private function renderDebug(string $category, string $label, string $content) {
+    private function debug(string $category, string $label, string $content) {
         if(($this->debug[$category] ?? false) !== true) {
             return;
         }
@@ -1333,7 +1505,7 @@ class BattleManager {
         >" .
             "<p style='font-weight:bold;margin-top:0;'>{$label}</p>" .
             $content .
-        "</div>";
+            "</div>";
     }
 
 }

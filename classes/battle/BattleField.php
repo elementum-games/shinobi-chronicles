@@ -6,6 +6,7 @@ require_once __DIR__ . '/../System.php';
 require_once __DIR__ . '/../Coords.php';
 require_once __DIR__ . '/Battle.php';
 require_once __DIR__ . '/BattleFieldTile.php';
+require_once __DIR__ . '/AttackTarget.php';
 
 class BattleField {
     private System $system;
@@ -113,12 +114,96 @@ class BattleField {
        return $target_tile >= $this->min_tile && $target_tile <= $this->max_tile;
     }
 
+    /**
+     * @param Fighter               $attacker
+     * @param BattleAttack          $attack
+     * @param AttackDirectionTarget $target
+     * @return BattleAttack
+     * @throws Exception
+     */
+    public function setupDirectionAttack(Fighter $attacker, BattleAttack $attack, AttackDirectionTarget $target): BattleAttack {
+        if(!isset($this->fighter_locations[$attacker->combat_id])) {
+            throw new Exception("Invalid attacker location!");
+        }
+
+        $starting_tile = $this->getFighterLocationTile($attacker->combat_id);
+        if($starting_tile == null) {
+            throw new Exception("Invalid starting tile!");
+        }
+
+        $attack->first_tile = $starting_tile;
+        $attack->root_path_segment = new AttackPathSegment(
+            tile: $starting_tile,
+            raw_damage: $attack->starting_raw_damage
+        );
+
+        // TODO: iterate to attack range, adding tiles to attack path
+
+        /*
+        const USE_TYPE_MELEE = 'physical';
+        const USE_TYPE_PROJECTILE = 'projectile';
+        const USE_TYPE_PROJECTILE_AOE = 'projectile_aoe';
+        const USE_TYPE_REMOTE_SPAWN = 'spawn';
+        const USE_TYPE_BUFF = 'buff';
+        const USE_TYPE_BARRIER = 'barrier';
+        */
+
+        return $attack;
+    }
+
+    /**
+     * @param Fighter          $attacker
+     * @param BattleAttack     $attack
+     * @param AttackTileTarget $target
+     * @return BattleAttack
+     * @throws Exception
+     */
+    public function setupTileAttack(Fighter $attacker, BattleAttack $attack, AttackTileTarget $target): BattleAttack {
+        if(!isset($this->fighter_locations[$attacker->combat_id])) {
+            throw new Exception("Invalid attacker location!");
+        }
+
+        $tile = $this->getTiles()[$target->tile_index] ?? null;
+        if($tile == null) {
+            throw new Exception("setupTileAttack: Invalid tile!");
+        }
+
+        $attack->first_tile = $tile;
+        $attack->root_path_segment = new AttackPathSegment(
+            tile: $tile,
+            raw_damage: $attack->starting_raw_damage
+        );
+
+        /*
+        const USE_TYPE_MELEE = 'physical';
+        const USE_TYPE_PROJECTILE = 'projectile';
+        const USE_TYPE_PROJECTILE_AOE = 'projectile_aoe';
+        const USE_TYPE_REMOTE_SPAWN = 'spawn';
+        const USE_TYPE_BUFF = 'buff';
+        const USE_TYPE_BARRIER = 'barrier';
+        */
+
+        return $attack;
+    }
+
     // PUBLIC VIEW API
     public function getFighterLocation(string $combat_id): ?int {
         return $this->fighter_locations[$combat_id] ?? null;
     }
 
-    public function getDisplayTiles(): array {
+    public function getFighterLocationTile(string $combat_id): ?BattleFieldTile {
+        $location = $this->fighter_locations[$combat_id] ?? null;
+        if($location == null) {
+            return null;
+        }
+
+        return $this->tiles[$location] ?? null;
+    }
+
+    /**
+     * @return BattleFieldTile[]
+     */
+    public function getTiles(): array {
         $fighter_ids_by_tile = [];
         foreach($this->fighter_locations as $combat_id => $tile_index) {
             if($tile_index < $this->min_tile) {
@@ -143,6 +228,7 @@ class BattleField {
                 fighter_ids: $fighter_ids_by_tile[$i] ?? []
             );
         }
+
 
         return $tiles;
     }
@@ -178,5 +264,11 @@ class BattleField {
         return [
             'fighter_locations' => $this->fighter_locations,
         ];
+    }
+
+    public function getTileDirectionFromFighter(Fighter $fighter, int $target_tile): string {
+        return $target_tile > $this->getFighterLocation($fighter->combat_id)
+            ? AttackDirectionTarget::DIRECTION_RIGHT
+            : AttackDirectionTarget::DIRECTION_LEFT;
     }
 }

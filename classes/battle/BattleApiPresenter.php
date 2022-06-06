@@ -62,7 +62,7 @@ class BattleApiPresenter {
             'isComplete' => $battle->isComplete(),
             'playerActionSubmitted' => $player_action_submitted,
             'turnSecondsRemaining' => $battle->timeRemaining(),
-            'lastTurnText' => $battle->battle_text,
+            'lastTurnText' => str_replace("&#039;", "'", $battle->battle_text),
             'currentPhaseLabel' => $battle->getCurrentPhaseLabel(),
             'jutsuTypes' => [
                 'taijutsu' => Jutsu::TYPE_TAIJUTSU,
@@ -85,7 +85,7 @@ class BattleApiPresenter {
                 function(BattleFieldTile $tile) {
                     return BattleApiPresenter::fieldTileResponse($tile);
                 },
-                $field->getDisplayTiles()
+                $field->getTiles()
             )
         );
     }
@@ -122,7 +122,7 @@ class BattleApiPresenter {
             'activeCooldownTurnsLeft' => $battle->jutsu_cooldowns[$jutsu->combat_id] ?? 0,
             'jutsuType' => $jutsu->jutsu_type,
             'handSeals' => explode('-', $jutsu->hand_seals),
-            'range' => $jutsu->range + 1,
+            'range' => $jutsu->range,
         ];
     }
 

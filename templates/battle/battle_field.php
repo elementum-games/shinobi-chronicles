@@ -88,7 +88,7 @@
         <?php
     }
 
-    $tiles = $battleManager->field->getDisplayTiles();
+    $tiles = $battleManager->field->getTiles();
 ?>
 
 <div class='tilesContainer <?= $battle->isMovementPhase() ? 'movementActive' : '' ?>'>

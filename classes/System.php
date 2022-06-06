@@ -71,6 +71,10 @@ class System {
 
     public $timezoneOffset;
 
+    // Request lifecycle
+    public bool $is_legacy_ajax_request = false;
+    public bool $is_api_request = false;
+
     public array $villageLocations = [];
 
     // Training boost switches
@@ -293,7 +297,11 @@ class System {
         $search_terms = array('&yen;');
         $replace_terms = array('[yen]');
         $input = str_replace($search_terms, $replace_terms, $input);
-        $input = htmlspecialchars($input, ENT_QUOTES);
+        $input = htmlspecialchars(
+            string: $input,
+            flags: ENT_QUOTES,
+            double_encode: false
+        );
 
         $input = str_replace($replace_terms, $search_terms, $input);
         $input = mysqli_real_escape_string($this->con, $input);
@@ -475,7 +483,7 @@ class System {
         global $side_menu_end;
         global $footer;
 
-        $pages = require __DIR__ . '../config/routes.php';
+        $pages = require __DIR__ . '/../config/routes.php';
 
         echo $side_menu_start;
         foreach($pages as $id => $page) {

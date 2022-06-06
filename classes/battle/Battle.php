@@ -327,6 +327,22 @@ class Battle {
         return $team . ':' . $fighter->id;
     }
 
+    /**
+     * @param Fighter $fighter
+     * @return string
+     * @throws Exception
+     */
+    public static function fighterTeam(Fighter $fighter): string {
+        $combat_id_parts = explode(':', $fighter->combat_id);
+        switch($combat_id_parts[0]) {
+            case self::TEAM1:
+            case self::TEAM2:
+                return $combat_id_parts[0];
+            default:
+                throw new Exception("Invalid team in combat id! ({$fighter->combat_id})");
+        }
+    }
+
     public function isAttackPhase(): bool {
         return $this->turn_type === Battle::TURN_TYPE_ATTACK;
     }

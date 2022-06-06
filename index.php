@@ -42,9 +42,9 @@ if(isset($_GET['logout']) && $_GET['logout'] == 1) {
 $LOGGED_IN = false;
 
 // Ajax
-$ajax = false;
+$system->is_legacy_ajax_request = false;
 if(isset($_GET['request_type']) && $_GET['request_type'] == 'ajax') {
-	$ajax = true;
+	$system->is_legacy_ajax_request = true;
 }
 // Run login, load player data
 $player_display = '';
@@ -133,7 +133,7 @@ else {
 	}
 	// Check logout timer
 	if($player->last_login < time() - ($logout_limit * 60)) {
-		if($ajax) {	
+		if($system->is_legacy_ajax_request) {
 			echo "<script type='text/javascript'>
 			clearInterval(refreshID);
 			clearInterval(notificationRefreshID);
@@ -155,7 +155,7 @@ else {
 			exit;
 		}
 	}
-	if($ajax) {
+	if($system->is_legacy_ajax_request) {
 		$player_display = $player->loadData(User::UPDATE_REGEN);
 	}
 	else {
@@ -174,7 +174,7 @@ else {
 }
 require($layout);
 
-if(!$ajax) {
+if(!$system->is_legacy_ajax_request) {
 	echo $heading;
 	echo $top_menu;
 	echo $header;
@@ -188,14 +188,14 @@ $allowed_coders = array(
 if($LOGGED_IN) {
 	// Master close
 	if(!$system->SC_OPEN && !$player->isUserAdmin()) {
-		if(!$ajax) {
+		if(!$system->is_legacy_ajax_request) {
 			echo str_replace("[HEADER_TITLE]", "Profile", $body_start);
 		}
 		echo "<table class='table'><tr><th>Game Maintenance</th></tr>
 		<tr><td style='text-align:center;'>
 		Shinobi-Chronicles is currently closed for maintenace. Please check back in a few minutes!
 		</td></tr></table>";
-		if(!$ajax) {
+		if(!$system->is_legacy_ajax_request) {
 			echo $side_menu_start . $side_menu_end;
 			echo str_replace('<!--[VERSION_NUMBER]-->', System::VERSION_NUMBER, $footer);
 		}
@@ -207,13 +207,13 @@ if($LOGGED_IN) {
         $ban_expire = ($expire_int == StaffManager::PERM_BAN_VALUE ? $expire_int : $system->time_remaining($player->ban_data[StaffManager::BAN_TYPE_GAME] - time()));
 
         //Display header
-        if(!$ajax) {
+        if(!$system->is_legacy_ajax_request) {
             echo str_replace("[HEADER_TITLE]", "Profile", $body_start);
         }
         //Ban info
         require 'templates/ban_info.php';
         // Footer
-        if(!$ajax) {
+        if(!$system->is_legacy_ajax_request) {
             echo $side_menu_start . $side_menu_end;
             echo str_replace('<!--[VERSION_NUMBER]-->', System::VERSION_NUMBER, $footer);
         }
@@ -226,26 +226,26 @@ if($LOGGED_IN) {
         $ban_expire = ($expire_int == StaffManager::PERM_BAN_VALUE ? $expire_int : $system->time_remaining($player->ban_data[StaffManager::BAN_TYPE_GAME] - time()));
 
         //Display header
-        if(!$ajax) {
+        if(!$system->is_legacy_ajax_request) {
             echo str_replace("[HEADER_TITLE]", "Profile", $body_start);
         }
         //Ban info
         require 'templates/ban_info.php';
         // Footer
-        if(!$ajax) {
+        if(!$system->is_legacy_ajax_request) {
             echo $side_menu_start . $side_menu_end;
             echo str_replace('<!--[VERSION_NUMBER]-->', System::VERSION_NUMBER, $footer);
         }
         exit;
 	}
-	
+
 	// NEW MESSAGE ALERT
 	$playerInbox = new InboxManager($system, $player);
 	$new_inbox_message = $playerInbox->checkIfUnreadMessages();
 	$new_inbox_alerts = $playerInbox->checkIfUnreadAlerts();
 
 	// Notifications
-	if(!$ajax) {
+	if(!$system->is_legacy_ajax_request) {
 		Notifications::displayNotifications($system, $player);
 		echo "<script type='text/javascript'>
 		var notificationRefreshID = setInterval(
@@ -261,7 +261,7 @@ if($LOGGED_IN) {
 	if(!$player->global_message_viewed && isset($_GET['clear_message'])) {
 		$player->global_message_viewed = 1;
 	}
-	if(!$player->global_message_viewed && !$ajax) {
+	if(!$player->global_message_viewed && !$system->is_legacy_ajax_request) {
 		$result = $system->query("SELECT `global_message`, `time` FROM `system_storage` LIMIT 1");
 		$results = $system->db_fetch($result);
 		$message = $results['global_message'];
@@ -420,7 +420,7 @@ if($LOGGED_IN) {
                 }
             }
 
-            if(!$ajax || !isset($routes[$id]['ajax_ok']) ) {
+            if(!$system->is_legacy_ajax_request || !isset($routes[$id]['ajax_ok']) ) {
                 $location_name = ($player->current_location->location_id) ? ' ' . ' <div id="contentHeaderLocation">'.$player->current_location->name.'</div>' : null;
 
 				echo str_replace("[HEADER_TITLE]", $routes[$id]['title'] . $location_name, $body_start);
@@ -437,7 +437,7 @@ if($LOGGED_IN) {
 			}
 
             // EVENT
-            if($system::$SC_EVENT_ACTIVE && !$ajax) {
+            if($system::$SC_EVENT_ACTIVE && !$system->is_legacy_ajax_request) {
                 require 'templates/temp_event_header.php';
             }
 
@@ -475,7 +475,7 @@ if($LOGGED_IN) {
 	$player->updateData();
 
 	// Display side menu and footer
-	if(!$ajax) {
+	if(!$system->is_legacy_ajax_request) {
 		if($player->clan) {
 		    $routes[20]['menu'] = System::MENU_VILLAGE;
 		}
@@ -554,7 +554,7 @@ if($LOGGED_IN) {
 		}
 	}
 }
-else if($ajax) {
+else if($system->is_legacy_ajax_request) {
 	echo "<script type='text/javascript'>
 			clearInterval(refreshID);
 			clearInterval(notificationRefreshID);
@@ -577,7 +577,7 @@ else {
     $captcha = '';
 	echo str_replace('<!--CAPTCHA-->', $captcha, $login_menu);
 }
-if(!$ajax) {
+if(!$system->is_legacy_ajax_request) {
 	$page_load_time = round(microtime(true) - $PAGE_LOAD_START, 3);
 	echo str_replace(
 		array('<!--[VERSION_NUMBER]-->', '<!--[PAGE_LOAD_TIME]-->'),

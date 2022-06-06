@@ -45,12 +45,14 @@ class BattleLog {
      * @param string $content
      */
     public static function addOrUpdateTurnLog(System $system, int $battle_id, int $turn_number, string $content) {
+        $clean_content = $system->clean($content);
+
         $system->query("INSERT INTO `battle_logs` 
             SET `battle_id`='{$battle_id}',
                 `turn_number`='{$turn_number}',
-                `content`='{$content}'
+                `content`='{$clean_content}'
             ON DUPLICATE KEY UPDATE
-                `content`='{$content}'
+                `content`='{$clean_content}'
         ");
     }
 }
