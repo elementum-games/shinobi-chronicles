@@ -52,4 +52,24 @@ $(document).ready(function(){
 $("#bi_td_opponent").before($("#bi_th_opponent"));
 $("#bi_th_opponent").css("margin-top", "1.5rem");
 
+//Team Page
+$("#team_information_data").before($("#team_information_header"));
+$("#team_boost_data").before($("#team_boost_header"));
+$("#team_leader_data").before($("#team_leader_header"));
+
+$("#team_actions_data").before($("#team_actions_header"));
+$("#team_logo_data").before($("#team_logo_header"));
+$("#team_boost2_data").before($("#team_boost2_header"));
+/*there's actually 2 boost ID's with the same name headers - might cause confusiong */
+
+//Jutsu page
+$("#ninjutsu_table_data").before($("#ninjutsu_title_header"));
+$("#taijutsu_table_data").before($("#taijutsu_title_header"));
+$("#genjutsu_table_data").before($("#genjutsu_title_header"));
+
+/*Premum Page*/
+$("#premium_individualStatReset_data").before($("#premium_individualStatReset_header"));
+$("#premium_fourDragonSeal_data").before($("#premium_fourDragonSeal_header"));
+
+console.log("Cextralite Script Working");
 })

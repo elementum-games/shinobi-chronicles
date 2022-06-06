@@ -20,15 +20,15 @@
  */
 ?>
 
-<table class='table'>
-    <tr><th colspan='3'><?= $player->team->name ?></th></tr>
+<table id='team_table' class='table'>
+    <tr><th id='team_team_title' colspan='3'><?= $player->team->name ?></th></tr>
     <tr>
-        <th style='width: 33%;'>Information</th>
-        <th style='width: 33%;'>Boost</th>
-        <th style='width: 33%;'>Leader</th>
+        <th id='team_information_header' style='width: 33%;'>Information</th>
+        <th id='team_boost_header' style='width: 33%;'>Boost</th>
+        <th id='team_leader_header' style='width: 33%;'>Leader</th>
     </tr>
     <tr>
-        <td style='vertical-align: top;'>
+        <td id='team_information_data' style='vertical-align: top;'>
             <b>Team Type:</b> Shinobi<br />
             <br>
             <b>Points:</b> <?= number_format($player->team->points) ?><br />
@@ -37,7 +37,7 @@
         </td>
 
 
-        <td style='text-align: center;vertical-align: middle;'>
+        <td id='team_boost_data' style='text-align: center;vertical-align: middle;'>
             <b>Current Boosts</b><br />
             <?php if ($player->team->boost != 'none'): ?>
                 <?= $player->team->getBoostLabel() ?> (<?= $player->team->boost_amount ?>%)<br />
@@ -49,7 +49,7 @@
             <?php endif; ?>
         </td>
 
-        <td rowspan='2' style='text-align: center;vertical-align: middle;'>
+        <td id='team_leader_data' rowspan='2' style='text-align: center;vertical-align: middle;'>
             <p style='font-size:1.1rem;font-weight:bold;margin-bottom:5px;'><?= $leader_name ?></p>
             <img src='<?= $leader_avatar ?>' style='max-width:125px;max-height:125px;' />
         </td>
@@ -114,7 +114,7 @@
             Team Members
         </th>
     </tr>
-    <tr>
+    <tr id='team_teamMembers_row'>
         <th style='width:30%;'>Username</th>
         <th style='width:20%;'>Rank</th>
         <th style='width:20%;'>Level</th>
@@ -139,11 +139,12 @@
         <!--// Team members (invite/kick)-->
         <tr><th colspan='3'>Team Controls</th></tr>
         <tr>
-            <th style='width: 33%;'>Member Actions</th>
-            <th style='width: 33%;'>Logo</th>
-            <th style='width: 33%;'>Boost</th>
+            <th id='team_actions_header' style='width: 33%;'>Member Actions</th>
+            <th id='team_logo_header' style='width: 33%;'>Logo</th>
+            <th id='team_boost2_header' style='width: 33%;'>Boost</th>
         </tr>
-        <tr><td style='text-align:center;'>
+        <tr>
+            <td id='team_actions_data' style='text-align:center;'>
                 <br />
                 <b>Invite Player</b><br />
                 <form action='<?= $self_link ?>' method='get'>
@@ -179,7 +180,7 @@
                     </form><br />
                 <?php endif; ?>
                 </td>
-            <td style='text-align: center;'>
+            <td id='team_logo_data' style='text-align: center;'>
                 <br>
                 <form action='<?= $self_link ?>' method='post'>
                     <input type='text' name='logo_link' value='<?= $player->team->logo ?>'><br>
@@ -187,7 +188,7 @@
                     <button type='submit'>Change Logo</button><br>
                 </form>
             </td>
-            <td style='text-align:center;'>
+            <td id='team_boost2_data' style='text-align:center;'>
                 <form action='<?= $self_link ?>' method='post'>
                     <div style='margin-top:2px;'>
                         <script type='text/javascript'>
@@ -240,6 +241,7 @@
                         displayCost();
                     </script>
                 </form>
-        </td></tr>
+          </td>
+        </tr>
     </table>
 <?php endif; ?>

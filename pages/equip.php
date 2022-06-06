@@ -476,14 +476,14 @@ function jutsu() {
 
 	if($jutsu_list) {
 		echo "<tr>
-			<th style='width:33%;'>Ninjutsu</th>
-			<th style='width:33%;'>Taijutsu</th>
-			<th style='width:33%;'>Genjutsu</th>
+			<th id='ninjutsu_title_header' style='width:33%;'>Ninjutsu</th>
+			<th id='taijutsu_title_header' style='width:33%;'>Taijutsu</th>
+			<th id='genjutsu_title_header' style='width:33%;'>Genjutsu</th>
 		</tr>";
 
 		$jutsu_array = array();
 
-		echo "<tr><td>";
+		echo "<tr><td id='ninjutsu_table_data'>";
 		if($player->ninjutsu_ids) {
 			$sortedJutsu = array();
 			foreach($player->ninjutsu_ids as $jutsu_id) {
@@ -496,7 +496,7 @@ function jutsu() {
 		}
 		echo "</td>";
 
-		echo "<td>";
+		echo "<td id='taijutsu_table_data'>";
 		if($player->taijutsu_ids) {
 			$sortedJutsu = array();
 			foreach($player->taijutsu_ids as $jutsu_id) {
@@ -509,7 +509,7 @@ function jutsu() {
 		}
 		echo "</td>";
 
-		echo "<td>";
+		echo "<td id='genjutsu_table_data'>";
 		if($player->genjutsu_ids) {
 			$sortedJutsu = array();
 			foreach($player->genjutsu_ids as $jutsu_id) {

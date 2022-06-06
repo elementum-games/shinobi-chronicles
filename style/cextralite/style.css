@@ -102,7 +102,8 @@ table{
 	padding: 1em 0em;
 
 	text-decoration: none;
-	border: 1px solid white;
+	border: 3px solid rgba(140, 140, 140);
+	border-bottom: 0px;
 	font-weight: bold;
 
 	background-color: rgba(75,75,75, 1);
@@ -215,6 +216,7 @@ table{
 #staff_menu{
 	height: 0;
 	overflow: hidden;
+	bottom: 100%; /* makes list appear above instead of below */
 }
 
 #staff_menu.open{
@@ -412,6 +414,120 @@ ul.submenu{
 	font-size: 1em;
 }
 .profile_table tbody{
+}
+
+/*Profile Daily Tasks*/
+.contentDiv{
+	background-color: #06404C;
+	padding: 1em 0.5em;
+	text-align: left;
+}
+.contentDiv h2{
+	text-align: center;
+}
+
+.dailyTask{
+	margin: 1.75em 0em;
+}
+
+.dailyTaskTitle{
+	font-size: 28px;
+}
+
+.dailyTaskGoal:nth-child(2){
+	font-weight: bold;
+}
+
+.dailyTaskProgress{
+	display: grid;
+	width: 100%;
+	height: 20px;
+	border: 2px solid #39545c;
+	border-radius: 50px;
+}
+
+.dailyTaskProgressBar div{
+	height: 20px;
+	background-color: #4fb052;
+	border: 0px solid white;
+	border-radius: 50px;
+}
+
+.dailyTaskProgressCaption{
+	text-align: center;
+}
+
+.contentDivCaption{
+	font-weight: bold;
+}
+
+/*Special Mission Page*/
+/*Hopefully class name is only on this page and no where else hehehehe*/
+/*i'm gonna leave it very bare bone just in case*/
+.contentDiv{
+	display: grid;
+	grid-auto-flow: row;
+}
+.contentDiv a button{
+	width: 100%;
+	padding: 1em 0em;
+	margin: 0.5em 0em;
+}
+/*Special Mission Page*/
+/*Special Missions - status page thing*/
+#spec_miss_wrapper{
+	background-color: #06404C;
+}
+#spec_miss_header{
+	padding: 1em 0em;
+	margin: 1.5em 0em;
+	display: grid;
+	grid-template-columns: 1fr 1fr 1fr;
+	background-color: #15242e;
+}
+#spec_miss_cancel_wrapper{
+	padding: 1em 0em;
+}
+#spec_miss_cancel{
+	font-weight: bold;
+}
+
+.spec_miss_log_entry{
+	padding: 0.5em 0em;
+	border-top: 1px;
+	border-bottom: 1px;
+	border-right: 0px;
+	border-left: 0px;
+	border-color: #6c7ba1;
+	border-style: solid;
+}
+/*Special Missions - status page thing*/
+
+/*Members Page*/
+#members_table tbody tr:nth-child(2){
+	grid-auto-flow: column;
+}
+
+#members_team_table  tbody tr:nth-child(2){
+	grid-auto-flow: column;
+}
+
+#team_team_title{
+	font-size: 1.5rem;
+}
+
+#team_teamMembers_row{
+	grid-auto-flow: column;
+}
+
+/*View Battles Page*/
+#viewBattles_headers{
+	grid-auto-flow: column;
+}
+
+/*Spar Page*/
+#scoutArea_headers{
+	grid-auto-flow: column;
 }
 
 .header{
