@@ -6,6 +6,7 @@ header('Content-Type: application/json');
 require "../classes/_autoload.php";
 
 $system = new System();
+$system->is_api_request = true;
 
 try {
     $player = Auth::getUserFromSession($system);
