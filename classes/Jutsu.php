@@ -92,6 +92,8 @@ class Jutsu {
 
     public string $hand_seals;
 
+    public float $travel_speed = 1.0;
+
     // Dynamic vars
     public bool $is_bloodline = false;
     public bool $is_weapon = false;

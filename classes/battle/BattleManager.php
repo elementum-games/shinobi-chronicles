@@ -482,20 +482,19 @@ class BattleManager {
             'P1: ' . $player1_attack->starting_raw_damage . ' / P2: ' . $player2_attack->starting_raw_damage
         );
 
-        // Casting puts the attack on the field
-        // Check for collissions
-
-        // DIRECTIONAL ATTACKS
-        // put attacks temporarily on all their squares
-        // walk through path of attack, find collisions
         $this->setAttackPath($this->battle->player1, $player1_attack);
-
         // $this->setAttackPath($this->battle->player2, $player2_attack);
+
+        $collisions = $this->findCollisions($player1_attack, $player2_attack);
 
         $this->runAttackPath($this->battle->player1, $player1_attack);
 
+
         // For all attacks, have a cast/travel time and do stat checks against it
         // (e.g. attack vs replacement, raise/lower damage % taken)
+
+        // put attacks temporarily on all their squares
+        // walk through path of attack, find collisions
 
         // for each collision check
         // - each attack square #
@@ -724,6 +723,7 @@ class BattleManager {
             attacker_id: $action->fighter_id,
             target: $action->target,
             jutsu: $jutsu,
+            turn: $this->battle->turn_count,
             starting_raw_damage: $fighter->calcDamage($jutsu),
         );
 
@@ -790,6 +790,91 @@ class BattleManager {
             default:
                 throw new Exception("setAttackPath: Invalid jutsu use type!");
         }
+    }
+
+    /**
+     * @param BattleAttack $fighter1Attack
+     * @param BattleAttack $fighter2Attack
+     * @return array
+     * @throws Exception
+     */
+    protected function findCollisions(BattleAttack $fighter1Attack, BattleAttack $fighter2Attack): array {
+        $tile_attack_map = [];
+        $collisions = [];
+
+        foreach([$fighter1Attack, $fighter2Attack] as &$attack) {
+            $attack->forEachSegment(function (AttackPathSegment $segment) use (&$tile_attack_map, &$attack) {
+                if(!isset($tile_attack_map[$segment->tile->index])) {
+                    $tile_attack_map[$segment->tile->index] = [
+                        'attack_segments' => []
+                    ];
+                }
+                $tile =& $tile_attack_map[$segment->tile->index];
+
+                // TODO: how to handle multi attacks from same team?
+                $tile['attack_segments'][] = [
+                    'attack' => $attack,
+                    'segment' => $segment
+                ];
+            });
+        }
+
+        $colliding_attack_pairs = [];
+
+        foreach($tile_attack_map as $tile) {
+            if(count($tile['attack_segments']) < 2) {
+                continue;
+            }
+            if(count($tile['attack_segments']) > 2) {
+                throw new Exception("3-way collisions are currently not supported!");
+            }
+
+            $colliding_attack_pairs[] = [
+                $tile['attack_segments'][0]['attack'],
+                $tile['attack_segments'][1]['attack'],
+            ];
+        }
+
+
+        /*
+         * Proposed method
+         * - find earliest point each attack enters the other's path
+         * - later of the two is the collision point
+         * won't work
+         *
+         * for each tile, see if attack on same tile is <= same time
+         *  - if attack on next tile is <= time + 1
+         *
+         *
+         *        X
+         *  1 2 3 4 5 6 >
+         *    < 6 5 4 3 2 1
+         *          X
+         *
+         *          X
+         *  1 1 2 2 3 3 >
+         *      < 5 4 3 2 1
+         *              X
+         *
+         *    X
+         *  1 2 3 4 5 6 >
+         *    < 3 3 2 2 1 1
+         *        X
+         *
+         *         X
+         * 1 1 2 2 3 3 4 4 >
+         *     < 4 4 3 3 2 2 1 1
+                       X
+            */
+        foreach($colliding_attack_pairs as $colliding_attack_pair) {
+            $attack1 = $colliding_attack_pair[0];
+            $attack2 = $colliding_attack_pair[1];
+
+
+        }
+
+
+        return [];
     }
 
     /**

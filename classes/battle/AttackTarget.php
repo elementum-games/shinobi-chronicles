@@ -82,4 +82,12 @@ class AttackDirectionTarget extends AttackTarget {
                 throw new Exception("Invalid direction!");
         }
     }
+
+    public function isDirectionLeft(): bool {
+        return $this->direction === self::DIRECTION_LEFT;
+    }
+
+    public function isDirectionRight(): bool {
+        return $this->direction === self::DIRECTION_RIGHT;
+    }
 }

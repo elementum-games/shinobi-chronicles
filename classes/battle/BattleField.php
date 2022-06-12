@@ -121,21 +121,65 @@ class BattleField {
      * @return BattleAttack
      * @throws Exception
      */
-    public function setupDirectionAttack(Fighter $attacker, BattleAttack $attack, AttackDirectionTarget $target): BattleAttack {
+    public function setupDirectionAttack(
+        Fighter $attacker, BattleAttack $attack, AttackDirectionTarget $target
+    ): BattleAttack {
         if(!isset($this->fighter_locations[$attacker->combat_id])) {
             throw new Exception("Invalid attacker location!");
         }
 
-        $starting_tile = $this->getFighterLocationTile($attacker->combat_id);
-        if($starting_tile == null) {
+        $tiles = $this->getTiles();
+
+        $starting_tile_index = $this->getFighterLocation($attacker->combat_id) +
+            $target->isDirectionLeft() ? -1 : 1;
+        $starting_tile = $tiles[$starting_tile_index] ?? null;
+        if(!$this->tileIsInBounds($starting_tile_index) || $tiles[$starting_tile_index] == null) {
             throw new Exception("Invalid starting tile!");
         }
+
 
         $attack->first_tile = $starting_tile;
         $attack->root_path_segment = new AttackPathSegment(
             tile: $starting_tile,
-            raw_damage: $attack->starting_raw_damage
+            raw_damage: $attack->starting_raw_damage,
+            time_arrived: $attack->jutsu->travel_speed,
         );
+
+        $index = $starting_tile->index;
+
+        $attack->forEachSegment(
+            function (AttackPathSegment $segment) use (&$index, $attack, $target, $starting_tile_index) {
+                $next_index = $target->isDirectionLeft() ? $index - 1 : $index + 1;
+                if(!$this->tileIsInBounds($next_index)) {
+                    return;
+                }
+
+                $index = $next_index;
+                $tile = $this->getTiles()[$index] ?? null;
+
+                $distance_from_start = abs($index - $starting_tile_index);
+
+                // +1 to include starting tile
+                $time_arrived = floor(
+                    ($distance_from_start + 1) / $attack->jutsu->travel_speed
+                );
+
+                $segment->next_segment = new AttackPathSegment(
+                    $tile,
+                    $segment->raw_damage,
+                    $time_arrived
+                );
+            }
+        );
+
+
+        // sort collisions by time occurrence, process
+        // if a collision takes place on a path segment that doesn't exist anymore, remove it
+
+        //       < - - - -
+        // - - - - - - >
+        //         < - - -
+
 
         // TODO: iterate to attack range, adding tiles to attack path
 
@@ -158,7 +202,9 @@ class BattleField {
      * @return BattleAttack
      * @throws Exception
      */
-    public function setupTileAttack(Fighter $attacker, BattleAttack $attack, AttackTileTarget $target): BattleAttack {
+    public function setupTileAttack(
+        Fighter $attacker, BattleAttack $attack, AttackTileTarget $target
+    ): BattleAttack {
         if(!isset($this->fighter_locations[$attacker->combat_id])) {
             throw new Exception("Invalid attacker location!");
         }
@@ -171,7 +217,8 @@ class BattleField {
         $attack->first_tile = $tile;
         $attack->root_path_segment = new AttackPathSegment(
             tile: $tile,
-            raw_damage: $attack->starting_raw_damage
+            raw_damage: $attack->starting_raw_damage,
+            time_arrived: (int)$attack->jutsu->travel_speed,
         );
 
         /*
