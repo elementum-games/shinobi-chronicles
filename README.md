@@ -150,6 +150,26 @@ docker compose up -d
 
 This will set up mysql and perform database migration in order to initialize database with needed data.
 
+### Installing Required PHP Extensions
+This varies by system, but generally:
+
+**Windows**  
+- Find your php.ini file (php --ini from command line may help)
+- search for the extension name without prefix (e.g. if composer tells you to install `ext-mbstring`)
+- You should see a line like `;extension=mbstring.dll` - Remove the semicolon and save the file
+
+**Linux**  
+These extensions are usually managed by your package manager, try 
+installing, prefixed with `php<version>-`. Examples
+
+Ubuntu: `sudo apt-get install php8.0-mbstring`
+
+CentOS / RedHat: `sudo yum install php8.0-mbstring`
+
+**Note about ext-dom**
+  - This extension is included in the `xml` extension, install that
+
+
 ### Node.js and NPM
 
 We use Node.js and NPM to install Javascript packages for some advanced 
@@ -172,6 +192,16 @@ so we have to compile the source code into plain JavaScript for it to run in bro
 - When developing advanced UI components, navigate to the root SC directory in a terminal window
 and run `npm run watch-ui` to automatically compile source files from the `src` directory to 
   compiled version in the `build` directory.
+
+
+## Testing
+You will need to install Composer and run `composer install` to install the PHPUnit
+testing framework. 
+
+Run `./vendor/bin/phpunit tests` to run all tests.
+
+For more on writing tests with PHPUnit, see the docs for PHPUnit here:
+https://phpunit.readthedocs.io/en/9.5/
   
 ## Remote Server Setup reference (CentOS 7)
 
