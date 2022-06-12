@@ -150,6 +150,11 @@ docker compose up -d
 
 This will set up mysql and perform database migration in order to initialize database with needed data.
 
+Note that if you have some code that relies on Composer's `vendor/autoload.php` and you're getting
+`Class or interface "MyNewClass" does not exist` errors, you may need to run 
+`composer dump-autoload`. If that does not resolve it, you may need to add its directory to
+the `classmap` in `composer.json`.
+
 ### Installing Required PHP Extensions
 This varies by system, but generally:
 
