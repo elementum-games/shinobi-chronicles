@@ -2,25 +2,105 @@
 
 use PHPUnit\Framework\TestCase;
 
+use SC\Factories\JutsuFactory;
+
 final class BattleFieldTest extends TestCase {
-    public function testCanInit() {
-        $system = $this->createStub(System::class);
+    private static int $next_int = 1;
+
+    private function initBattle(): Battle {
         $battle = $this->createStub(Battle::class);
+        $battle->player1 = $this->createStub(Fighter::class);
+        $battle->player1->combat_id = "P:1";
 
-        $fighter1 = $this->createStub(Fighter::class);
-        $fighter1->combat_id = "P:1";
-
-        $fighter2 = $this->createStub(Fighter::class);
-        $fighter2->combat_id = "P:2";
+        $battle->player2 = $this->createStub(Fighter::class);
+        $battle->player2->combat_id = "P:2";
 
         $battle->raw_field = json_encode([
             'fighter_locations' => [
-                $fighter1->combat_id => 2,
-                $fighter2->combat_id => 4
+                $battle->player1->combat_id => 2,
+                $battle->player2->combat_id => 4
             ]
         ]);
 
-        $this->assertInstanceOf(BattleField::class, new BattleField($system, $battle));
+        return $battle;
+    }
+
+    private function initAttack(Fighter $attacker, AttackTarget $target, Jutsu $jutsu = null): BattleAttack {
+        if($jutsu == null) {
+            $jutsu = JutsuFactory::create(
+                range: 3
+            );
+        }
+
+        return new BattleAttack(
+            attacker_id: $attacker->combat_id,
+            target: $target,
+            jutsu: $jutsu,
+            turn: self::$next_int++,
+            starting_raw_damage: 1000
+        );
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function testDirectionAttackPathMatchesRange() {
+        $battle = $this->initBattle();
+        $battleField = new BattleField(
+            system: $this->createStub(System::class),
+            battle: $battle,
+        );
+
+        $attacker = $battle->player1;
+        $target = new AttackDirectionTarget(AttackDirectionTarget::DIRECTION_RIGHT);
+        $attack = $this->initAttack(attacker: $attacker, target: $target);
+
+        $battleField->setupDirectionAttack(
+            attacker: $attacker,
+            attack: $attack,
+            target: $target
+        );
+
+        /* ASSERT */
+        $this->assertEquals(
+            expected: $attack->jutsu->range,
+            actual: $attack->countPathSegments(),
+            message: 'Segments must equal jutsu range!'
+        );
+    }
+
+    /**
+     * @return void
+     * @throws Exception
+     */
+    public function testDirectionAttackPathEndsAtEdge() {
+        $battle = $this->initBattle();
+        $battleField = new BattleField(
+            system: $this->createStub(System::class),
+            battle: $battle,
+        );
+
+        $attacker = $battle->player1;
+        $target = new AttackDirectionTarget(AttackDirectionTarget::DIRECTION_RIGHT);
+        $attack = $this->initAttack(attacker: $attacker, target: $target);
+
+        $distance_from_edge = $attack->jutsu->range - 1;
+        $battleField->fighter_locations[$attacker->combat_id] = $battleField->max_tile - $distance_from_edge;
+
+        // destroy path and rebuild
+        $attack->root_path_segment = null;
+        $battleField->setupDirectionAttack(
+            attacker: $attacker,
+            attack: $attack,
+            target: $target
+        );
+
+        /* ASSERT */
+        $this->assertEquals(
+            expected: $distance_from_edge,
+            actual: $attack->countPathSegments(),
+            message: 'Jutsu should not have more segments than distance to edge!'
+        );
     }
 
 

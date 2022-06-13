@@ -15,8 +15,8 @@ class BattleField {
     /** @var int[] */
     public array $fighter_locations;
 
-    protected int $min_tile;
-    protected int $max_tile;
+    public int $min_tile;
+    public int $max_tile;
 
     /**
      * BattleField constructor.
@@ -131,12 +131,11 @@ class BattleField {
         $tiles = $this->getTiles();
 
         $starting_tile_index = $this->getFighterLocation($attacker->combat_id) +
-            $target->isDirectionLeft() ? -1 : 1;
+            ($target->isDirectionLeft() ? -1 : 1);
         $starting_tile = $tiles[$starting_tile_index] ?? null;
         if(!$this->tileIsInBounds($starting_tile_index) || $tiles[$starting_tile_index] == null) {
-            throw new Exception("Invalid starting tile!");
+            throw new Exception("Invalid starting tile! {$starting_tile_index}");
         }
-
 
         $attack->first_tile = $starting_tile;
         $attack->root_path_segment = new AttackPathSegment(
@@ -158,6 +157,9 @@ class BattleField {
                 $tile = $this->getTiles()[$index] ?? null;
 
                 $distance_from_start = abs($index - $starting_tile_index);
+                if($distance_from_start >= $attack->jutsu->range) {
+                    return;
+                }
 
                 // +1 to include starting tile
                 $time_arrived = floor(

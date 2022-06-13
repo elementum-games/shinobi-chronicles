@@ -35,7 +35,6 @@ class BattleAttack {
      * Execute a function for each segment in the attack path.
      *
      * @param Closure $closure
-     * @return void
      * @throws Exception
      */
     public function forEachSegment(Closure $closure) {
@@ -50,6 +49,20 @@ class BattleAttack {
             $closure($current_segment);
             $current_segment = $current_segment->next_segment;
         }
+    }
+
+    /**
+     * @return int
+     * @throws Exception
+     */
+    public function countPathSegments(): int {
+        $count = 0;
+
+        $this->forEachSegment(function() use(&$count) {
+            $count += 1;
+        });
+
+        return $count;
     }
 }
 

@@ -20,6 +20,9 @@
     "autoload": {
       "classmap": [
         "classes/"
-      ]
+      ],
+      "psr-4": {
+        "SC\\Factories\\": "tests/factories"
+      }
     }
 }
