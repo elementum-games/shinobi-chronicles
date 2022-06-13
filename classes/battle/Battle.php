@@ -351,6 +351,10 @@ class Battle {
         return $this->turn_type === Battle::TURN_TYPE_MOVEMENT;
     }
 
+    public function isFighterActionSubmitted(Fighter $fighter): bool {
+        return isset($this->fighter_actions[$fighter->combat_id]);
+    }
+
     #[Pure]
     public function getCurrentPhaseLabel(): string {
         if($this->isMovementPhase()) {

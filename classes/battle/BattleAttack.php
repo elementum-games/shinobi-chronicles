@@ -16,7 +16,7 @@ class BattleAttack {
     public BattleFieldTile $first_tile;
 
     // A linked list of attack path segments
-    public ?AttackPathSegment $root_path_segment;
+    public ?AttackPathSegment $root_path_segment = null;
 
     /** @var BattleAttackHit[] */
     public array $hits = [];
