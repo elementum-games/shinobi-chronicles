@@ -18,13 +18,16 @@ class BattleAttack {
     // A linked list of attack path segments
     public ?AttackPathSegment $root_path_segment = null;
 
+    /** @var AttackPathSegment[] */
+    public array $path_segments = [];
+
     /** @var BattleAttackHit[] */
     public array $hits = [];
 
     public function __construct(
         string $attacker_id, AttackTarget $target, Jutsu $jutsu, int $turn, float $starting_raw_damage
     ) {
-        $this->id = implode(':', [$turn, $jutsu->combat_id]);
+        $this->id = implode(':', [$turn, $attacker_id, $jutsu->combat_id]);
         $this->attacker_id = $attacker_id;
         $this->target = $target;
         $this->jutsu = $jutsu;
@@ -49,20 +52,6 @@ class BattleAttack {
             $closure($current_segment);
             $current_segment = $current_segment->next_segment;
         }
-    }
-
-    /**
-     * @return int
-     * @throws Exception
-     */
-    public function countPathSegments(): int {
-        $count = 0;
-
-        $this->forEachSegment(function() use(&$count) {
-            $count += 1;
-        });
-
-        return $count;
     }
 }
 

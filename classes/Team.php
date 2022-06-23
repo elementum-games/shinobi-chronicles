@@ -260,7 +260,7 @@ class Team {
      * @throws Exception
      */
     public function fetchLeader(): User {
-        $leader = new User($this->leader);
+        $leader = User::loadFromId($system, $this->leader);
         $leader->loadData(User::UPDATE_NOTHING, true);
         return $leader;
     }

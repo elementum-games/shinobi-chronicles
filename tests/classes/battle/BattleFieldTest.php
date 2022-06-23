@@ -64,7 +64,7 @@ final class BattleFieldTest extends TestCase {
         /* ASSERT */
         $this->assertEquals(
             expected: $attack->jutsu->range,
-            actual: $attack->countPathSegments(),
+            actual: count($attack->path_segments),
             message: 'Segments must equal jutsu range!'
         );
     }
@@ -73,7 +73,7 @@ final class BattleFieldTest extends TestCase {
      * @return void
      * @throws Exception
      */
-    public function testDirectionAttackPathEndsAtEdge() {
+    public function testDirectionAttackPathEndsAtEdge(): void {
         $battle = $this->initBattle();
         $battleField = new BattleField(
             system: $this->createStub(System::class),
@@ -87,8 +87,6 @@ final class BattleFieldTest extends TestCase {
         $distance_from_edge = $attack->jutsu->range - 1;
         $battleField->fighter_locations[$attacker->combat_id] = $battleField->max_tile - $distance_from_edge;
 
-        // destroy path and rebuild
-        $attack->root_path_segment = null;
         $battleField->setupDirectionAttack(
             attacker: $attacker,
             attack: $attack,
@@ -98,9 +96,38 @@ final class BattleFieldTest extends TestCase {
         /* ASSERT */
         $this->assertEquals(
             expected: $distance_from_edge,
-            actual: $attack->countPathSegments(),
+            actual: count($attack->path_segments),
             message: 'Jutsu should not have more segments than distance to edge!'
         );
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function testDirectionAttackPathSegmentsHaveCorrectTime() {
+        $battle = $this->initBattle();
+        $battleField = new BattleField(
+            system: $this->createStub(System::class),
+            battle: $battle,
+        );
+
+        $attacker = $battle->player1;
+        $target = new AttackDirectionTarget(AttackDirectionTarget::DIRECTION_RIGHT);
+        $attack = $this->initAttack(attacker: $attacker, target: $target);
+
+        $battleField->setupDirectionAttack(
+            attacker: $attacker,
+            attack: $attack,
+            target: $target
+        );
+
+        /* ASSERT */
+        foreach($attack->path_segments as $segment) {
+            $distance_from_attacker = $segment->tile->index - $battleField->getFighterLocation($attacker->combat_id);
+            $expected_time_elapsed = $distance_from_attacker * $attack->jutsu->travel_speed;
+
+            $this->assertEquals($expected_time_elapsed, $segment->time_arrived);
+        }
     }
 
 

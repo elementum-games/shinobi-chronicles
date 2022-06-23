@@ -12,7 +12,7 @@ $user_id = 0;
 
 if(isset($_SESSION['user_id'])) {
     $guest_support = false;
-    $player = new User($_SESSION['user_id']);
+    $player = User::loadFromId($system, $_SESSION['user_id']);
     $player->loadData();
     $layout = $system->fetchLayoutByName($player->layout);
     $staff_level = $player->staff_level;

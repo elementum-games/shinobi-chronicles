@@ -100,7 +100,7 @@ if(!isset($_SESSION['user_id'])) {
 					$system->query("UPDATE `users` SET `failed_logins`= 0 WHERE `user_id`='{$result['user_id']}' LIMIT 1");
 				}
 
-				$player = new User($_SESSION['user_id']);
+				$player = User::loadFromId($system, $_SESSION['user_id']);
 				$player_display = $player->loadData();
 				$player->last_login = time();
 				$player->log(User::LOG_LOGIN, $_SERVER['REMOTE_ADDR']);
@@ -118,7 +118,7 @@ if(!isset($_SESSION['user_id'])) {
 }
 else {
 	$LOGGED_IN = true;
-	$player = new User($_SESSION['user_id']);
+	$player = User::loadFromId($system, $_SESSION['user_id']);
 	//This is in minutes.
 	if($player->hasAdminPanel()) {
 		$logout_limit = 1440;

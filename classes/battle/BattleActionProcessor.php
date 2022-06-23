@@ -336,91 +336,6 @@ class BattleActionProcessor {
     }
 
     /**
-     * @param BattleAttack $fighter1Attack
-     * @param BattleAttack $fighter2Attack
-     * @return array
-     * @throws Exception
-     */
-    protected function findCollisions(BattleAttack $fighter1Attack, BattleAttack $fighter2Attack): array {
-        $tile_attack_map = [];
-        $collisions = [];
-
-        foreach([$fighter1Attack, $fighter2Attack] as &$attack) {
-            $attack->forEachSegment(function (AttackPathSegment $segment) use (&$tile_attack_map, &$attack) {
-                if(!isset($tile_attack_map[$segment->tile->index])) {
-                    $tile_attack_map[$segment->tile->index] = [
-                        'attack_segments' => []
-                    ];
-                }
-                $tile =& $tile_attack_map[$segment->tile->index];
-
-                // TODO: how to handle multi attacks from same team?
-                $tile['attack_segments'][] = [
-                    'attack' => $attack,
-                    'segment' => $segment
-                ];
-            });
-        }
-
-        $colliding_attack_pairs = [];
-
-        foreach($tile_attack_map as $tile) {
-            if(count($tile['attack_segments']) < 2) {
-                continue;
-            }
-            if(count($tile['attack_segments']) > 2) {
-                throw new Exception("3-way collisions are currently not supported!");
-            }
-
-            $colliding_attack_pairs[] = [
-                $tile['attack_segments'][0]['attack'],
-                $tile['attack_segments'][1]['attack'],
-            ];
-        }
-
-
-        /*
-         * Proposed method
-         * - find earliest point each attack enters the other's path
-         * - later of the two is the collision point
-         * won't work
-         *
-         * for each tile, see if attack on same tile is <= same time
-         *  - if attack on next tile is <= time + 1
-         *
-         *
-         *        X
-         *  1 2 3 4 5 6 >
-         *    < 6 5 4 3 2 1
-         *          X
-         *
-         *          X
-         *  1 1 2 2 3 3 >
-         *      < 5 4 3 2 1
-         *              X
-         *
-         *    X
-         *  1 2 3 4 5 6 >
-         *    < 3 3 2 2 1 1
-         *        X
-         *
-         *         X
-         * 1 1 2 2 3 3 4 4 >
-         *     < 4 4 3 3 2 2 1 1
-                       X
-            */
-        foreach($colliding_attack_pairs as $colliding_attack_pair) {
-            $attack1 = $colliding_attack_pair[0];
-            $attack2 = $colliding_attack_pair[1];
-
-            // TODO: Find collision point
-        }
-
-
-        return [];
-    }
-
-    /**
      * @throws Exception
      */
     protected function runAttackPath(Fighter $attacker, BattleAttack $attack): BattleAttack {
@@ -462,7 +377,7 @@ class BattleActionProcessor {
         return $attack;
     }
 
-    protected function applyAttackHit(BattleAttack $attack, Fighter $user, Fighter $target, float $raw_damage) {
+    protected function applyAttackHit(BattleAttack $attack, Fighter $user, Fighter $target, float $raw_damage): void {
         $attack_damage = $raw_damage;
         if($attack->jutsu->jutsu_type != Jutsu::TYPE_GENJUTSU && empty($attack->jutsu->effect_only)) {
             $attack_damage = $target->calcDamageTaken($attack->starting_raw_damage, $attack->jutsu->jutsu_type);
@@ -569,5 +484,155 @@ class BattleActionProcessor {
             default:
                 return "black";
         }
+    }
+
+    /**
+     * The purpose of this function is to enable deterministic collision IDs whenever two attacks hit each other,
+     * regardless of which order the collision is being checked. In other words, both of these should return the same
+     * result:
+     *
+     * collisionId(attack1, attack2)
+     *
+     * collisionId(attack2, attack1)
+     *
+     * @param BattleAttack $attack1
+     * @param BattleAttack $attack2
+     * @return string
+     * @throws Exception
+     */
+    public static function collisionId(BattleAttack $attack1, BattleAttack $attack2): string {
+        if($attack1->id == $attack2->id) {
+            throw new Exception("Can't collide the same attack!");
+        }
+
+        if(strcmp($attack1->id, $attack2->id) < 0) {
+            return $attack1->id . ':' . $attack2->id;
+        }
+        else {
+            return $attack2->id . ':' . $attack1->id;
+        }
+    }
+
+    /**
+     * @param BattleAttack $fighter1Attack
+     * @param BattleAttack $fighter2Attack
+     * @return AttackCollision[]
+     * @throws Exception
+     */
+    public static function findCollisions(BattleAttack $fighter1Attack, BattleAttack $fighter2Attack): array {
+        $tile_attack_map = [];
+        $collisions = [];
+
+        foreach([$fighter1Attack, $fighter2Attack] as $attack) {
+            foreach($attack->path_segments as $segment) {
+                if(!isset($tile_attack_map[$segment->tile->index])) {
+                    $tile_attack_map[$segment->tile->index] = [
+                        'attack_segments' => []
+                    ];
+                }
+
+                // TODO: how to handle multi attacks from same team?
+                $tile_attack_map[$segment->tile->index]['attack_segments'][$attack->id] = [
+                    'attack' => $attack,
+                    'segment' => $segment
+                ];
+            }
+        }
+
+        // Find intersecting attacks
+        $colliding_attack_pairs = [];
+        foreach($tile_attack_map as $tile) {
+            if(count($tile['attack_segments']) < 2) {
+                continue;
+            }
+            if(count($tile['attack_segments']) > 2) {
+                throw new Exception("3-way collisions are currently not supported!");
+            }
+
+            $colliding_attack_pairs[] = array_values(
+                array_map(
+                    function($segment) {
+                        return $segment['attack'];
+                    },
+                    $tile['attack_segments']
+                )
+            );
+        }
+
+        /*
+         * For a pair of intersecting attacks, find their collision points (so the rest of the attack can be weakened)
+         */
+        foreach($colliding_attack_pairs as $colliding_attack_pair) {
+            /** @var BattleAttack $attack1 */
+            $attack1 = $colliding_attack_pair[0];
+            /** @var BattleAttack $attack2 */
+            $attack2 = $colliding_attack_pair[1];
+
+
+            $collision_id = self::collisionId($attack1, $attack2);
+            if(isset($collisions[$collision_id])) {
+                continue;
+            }
+
+            $attack1_collision_point = null;
+            $attack2_collision_point = null;
+
+            // TODO: Find collision point
+            /* $attack1_overlapping_segments = array_filter(
+                 $attack1->path_segments,
+                 function($segment) use ($tile_attack_map, $attack2) {
+                     return isset($tile_attack_map[$segment->tile->index]['attack_segments'][$attack2->id];
+                 }
+             );
+             $attack2_overlapping_segments = array_filter(
+                 $attack2->path_segments,
+                 function($segment) use ($tile_attack_map, $attack1) {
+                     return isset($tile_attack_map[$segment->tile->index]['attack_segments'][$attack1->id];
+                 }
+             );*/
+
+            // TYPE 1 - for each tile, see if attack on same tile is <= same time
+            foreach($attack1->path_segments as $segment) {
+                $other_attack_on_tile = $tile_attack_map[$segment->tile->index]['attack_segments'][$attack2->id] ?? null;
+                if($other_attack_on_tile != null) {
+                    /** @var AttackPathSegment $other_segment */
+                    $other_segment = $other_attack_on_tile['segment'];
+
+                    if($other_segment->time_arrived <= $segment->time_arrived) {
+                        $attack1_collision_point = $segment->tile->index;
+                        break;
+                    }
+                }
+            }
+            foreach($attack2->path_segments as $segment) {
+                $other_attack_on_tile = $tile_attack_map[$segment->tile->index]['attack_segments'][$attack1->id] ?? null;
+                if($other_attack_on_tile != null) {
+                    /** @var AttackPathSegment $other_segment */
+                    $other_segment = $other_attack_on_tile['segment'];
+                    if($other_segment->time_arrived <= $segment->time_arrived) {
+                        $attack2_collision_point = $segment->tile->index;
+                        break;
+                    }
+                }
+            }
+
+            if($attack1_collision_point != null && $attack2_collision_point == null) {
+                $attack2_collision_point = $attack1_collision_point;
+            }
+            if($attack2_collision_point != null && $attack1_collision_point == null) {
+                $attack1_collision_point = $attack2_collision_point;
+            }
+
+            // TYPE 2 - For each tile, see if attack on next tile is <= time + 1
+            $collisions[$collision_id] = new AttackCollision(
+                id: $collision_id,
+                attack1: $attack1,
+                attack2: $attack2,
+                attack1_collision_point: $attack1_collision_point,
+                attack2_collision_point: $attack2_collision_point
+            );
+        }
+
+        return $collisions;
     }
 }

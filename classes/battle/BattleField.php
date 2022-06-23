@@ -138,52 +138,36 @@ class BattleField {
         }
 
         $attack->first_tile = $starting_tile;
-        $attack->root_path_segment = new AttackPathSegment(
-            tile: $starting_tile,
-            raw_damage: $attack->starting_raw_damage,
-            time_arrived: $attack->jutsu->travel_speed,
-        );
 
-        $index = $starting_tile->index;
+        $attack->path_segments = [];
+        $index = $starting_tile_index;
+        for($count = 0; $count < $attack->jutsu->range; $count++) {
+            $tile = $this->getTiles()[$index] ?? null;
 
-        $attack->forEachSegment(
-            function (AttackPathSegment $segment) use (&$index, $attack, $target, $starting_tile_index) {
-                $next_index = $target->isDirectionLeft() ? $index - 1 : $index + 1;
-                if(!$this->tileIsInBounds($next_index)) {
-                    return;
-                }
-
-                $index = $next_index;
-                $tile = $this->getTiles()[$index] ?? null;
-
-                $distance_from_start = abs($index - $starting_tile_index);
-                if($distance_from_start >= $attack->jutsu->range) {
-                    return;
-                }
-
-                // +1 to include starting tile
-                $time_arrived = floor(
-                    ($distance_from_start + 1) / $attack->jutsu->travel_speed
-                );
-
-                $segment->next_segment = new AttackPathSegment(
-                    $tile,
-                    $segment->raw_damage,
-                    $time_arrived
-                );
+            $distance_from_start = abs($index - $starting_tile_index);
+            if($distance_from_start >= $attack->jutsu->range) {
+                break;
             }
-        );
 
+            // +1 to include starting tile
+            $time_arrived = floor(
+                ($distance_from_start + 1) / $attack->jutsu->travel_speed
+            );
+
+            $attack->path_segments[] = new AttackPathSegment(
+                $tile,
+                $attack->starting_raw_damage,
+                $time_arrived
+            );
+
+            $index += $target->isDirectionLeft() ? -1 : 1;
+            if(!$this->tileIsInBounds($index)) {
+                break;
+            }
+        }
 
         // sort collisions by time occurrence, process
         // if a collision takes place on a path segment that doesn't exist anymore, remove it
-
-        //       < - - - -
-        // - - - - - - >
-        //         < - - -
-
-
-        // TODO: iterate to attack range, adding tiles to attack path
 
         /*
         const USE_TYPE_MELEE = 'physical';

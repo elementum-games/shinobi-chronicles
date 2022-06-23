@@ -140,6 +140,62 @@ class Battle {
     }
 
     /**
+     * @throws Exception
+     */
+    public static function loadFromId(System $system, User $player, int $battle_id): Battle {
+        $battle = new Battle($system, $player, $battle_id);
+
+        $result = $system->query(
+            "SELECT * FROM `battles` WHERE `battle_id`='{$battle_id}' LIMIT 1"
+        );
+        if($battle->system->db_last_num_rows == 0) {
+            if($player->battle_id = $battle_id) {
+                $player->battle_id = 0;
+            }
+            throw new Exception("Invalid battle!");
+        }
+
+        $battle_data = $system->db_fetch($result);
+
+        $battle->raw_active_effects = $battle_data['active_effects'];
+        $battle->raw_active_genjutsu = $battle_data['active_genjutsu'];
+        $battle->raw_field = $battle_data['field'];
+
+        $battle->battle_type = $battle_data['battle_type'];
+
+        $battle->start_time = $battle_data['start_time'];
+        $battle->turn_time = $battle_data['turn_time'];
+        $battle->turn_count = $battle_data['turn_count'];
+        $battle->turn_type = $battle_data['turn_type'];
+
+        $battle->winner = $battle_data['winner'];
+
+        $battle->player1_id = $battle_data['player1'];
+        $battle->player2_id = $battle_data['player2'];
+
+        $battle->fighter_health = json_decode($battle_data['fighter_health'], true);
+        $battle->fighter_actions = array_map(function($action_data) {
+            return FighterAction::fromDb($action_data);
+        }, json_decode($battle_data['fighter_actions'], true));
+
+        $battle->jutsu_cooldowns = json_decode($battle_data['jutsu_cooldowns'] ?? "[]", true);
+
+        $battle->fighter_jutsu_used = json_decode($battle_data['fighter_jutsu_used'], true);
+
+        // lo9g
+        $last_turn_log = BattleLog::getLastTurn($battle->system, $battle->battle_id);
+        if($last_turn_log != null) {
+            $battle->log[$last_turn_log->turn_number] = $last_turn_log;
+            $battle->battle_text = $last_turn_log->content;
+        }
+        else {
+            $battle->battle_text = '';
+        }
+
+        return $battle;
+    }
+    
+    /**
      * Battle constructor.
      * @param System $system
      * @param User   $player
@@ -153,53 +209,6 @@ class Battle {
 
         $this->battle_id = $battle_id;
         $this->player = $player;
-
-        $result = $this->system->query(
-            "SELECT * FROM `battles` WHERE `battle_id`='{$battle_id}' LIMIT 1"
-        );
-        if($this->system->db_last_num_rows == 0) {
-            if($player->battle_id = $battle_id) {
-                $player->battle_id = 0;
-            }
-            throw new Exception("Invalid battle!");
-        }
-
-        $battle = $this->system->db_fetch($result);
-
-        $this->raw_active_effects = $battle['active_effects'];
-        $this->raw_active_genjutsu = $battle['active_genjutsu'];
-        $this->raw_field = $battle['field'];
-
-        $this->battle_type = $battle['battle_type'];
-
-        $this->start_time = $battle['start_time'];
-        $this->turn_time = $battle['turn_time'];
-        $this->turn_count = $battle['turn_count'];
-        $this->turn_type = $battle['turn_type'];
-
-        $this->winner = $battle['winner'];
-
-        $this->player1_id = $battle['player1'];
-        $this->player2_id = $battle['player2'];
-
-        $this->fighter_health = json_decode($battle['fighter_health'], true);
-        $this->fighter_actions = array_map(function($action_data) {
-            return FighterAction::fromDb($action_data);
-        }, json_decode($battle['fighter_actions'], true));
-
-        $this->jutsu_cooldowns = json_decode($battle['jutsu_cooldowns'] ?? "[]", true);
-
-        $this->fighter_jutsu_used = json_decode($battle['fighter_jutsu_used'], true);
-
-        // lo9g
-        $last_turn_log = BattleLog::getLastTurn($this->system, $this->battle_id);
-        if($last_turn_log != null) {
-            $this->log[$last_turn_log->turn_number] = $last_turn_log;
-            $this->battle_text = $last_turn_log->content;
-        }
-        else {
-            $this->battle_text = '';
-        }
     }
 
     /**
@@ -247,7 +256,7 @@ class Battle {
     protected function loadFighterFromEntityId(string $entity_id): Fighter {
     switch(Battle::getFighterEntityType($entity_id)) {
         case User::ENTITY_TYPE:
-            return User::fromEntityId($entity_id);
+            return User::fromEntityId($this->system, $entity_id);
         case NPC::ID_PREFIX:
             return NPC::fromEntityId($this->system, $entity_id);
         default:

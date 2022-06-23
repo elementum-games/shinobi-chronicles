@@ -115,7 +115,7 @@ class BattleManager {
         $this->battle_id = $battle_id;
         $this->player = $player;
         $this->spectate = $spectate;
-        $this->battle = new Battle($system, $player, $battle_id);
+        $this->battle = Battle::loadFromId($system, $player, $battle_id);
         $this->is_api_request = $is_api_request;
 
         $this->default_attacks = $this->getDefaultAttacks();
