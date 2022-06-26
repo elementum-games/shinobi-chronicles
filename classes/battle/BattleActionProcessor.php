@@ -641,8 +641,6 @@ class BattleActionProcessor {
             }
         }
 
-
-
         // Find intersecting attacks
         $colliding_attack_pairs = [];
         foreach($segments_by_tile_and_attack as $segments_by_attack) {
@@ -667,9 +665,7 @@ class BattleActionProcessor {
          * For a pair of intersecting attacks, find their collision points (so the rest of the attack can be weakened)
          */
         foreach($colliding_attack_pairs as $colliding_attack_pair) {
-            /** @var BattleAttack $attack1 */
             $attack1 = $colliding_attack_pair[0];
-            /** @var BattleAttack $attack2 */
             $attack2 = $colliding_attack_pair[1];
 
 
@@ -678,28 +674,51 @@ class BattleActionProcessor {
                 continue;
             }
 
-            // TODO: Find collision point
-            /* $attack1_overlapping_segments = array_filter(
-                 $attack1->path_segments,
-                 function($segment) use ($tile_attack_map, $attack2) {
-                     return isset($tile_attack_map[$segment->tile->index][$attack2->id];
-                 }
-             );
-             $attack2_overlapping_segments = array_filter(
-                 $attack2->path_segments,
-                 function($segment) use ($tile_attack_map, $attack1) {
-                     return isset($tile_attack_map[$segment->tile->index][$attack1->id];
-                 }
-             );*/
+            $attack1_collision_point = self::findNextTileCollisionPoint($attack1, $attack2, $segments_by_tile_and_attack);
+            $attack2_collision_point = self::findNextTileCollisionPoint($attack2, $attack1, $segments_by_tile_and_attack);
 
-            // Try for a direct overlap
-            $attack1_collision_point = self::findSameTileCollisionPoint($attack1, $attack2, $segments_by_tile_and_attack);
-            $attack2_collision_point = self::findSameTileCollisionPoint($attack2, $attack1, $segments_by_tile_and_attack);
+            /*
+                check for a collision range (collision valid across multiple tiles)
 
-            // Fall back to type 2 if no direct overlap
-            if($attack1_collision_point == null || $attack2_collision_point == null) {
-                $attack1_collision_point = self::findNextTileCollisionPoint($attack1, $attack2, $segments_by_tile_and_attack);
-                $attack2_collision_point = self::findNextTileCollisionPoint($attack2, $attack1, $segments_by_tile_and_attack);
+                example scenarios:
+                - Collision points at tiles 4 and 7: 4 5 6 7 (should be: 5 and 6)
+                - Collision points at tiles 4 and 8: 4 5 6 7 8 (should be: 6)
+            */
+
+            $collision_distance = abs($attack1_collision_point - $attack2_collision_point);
+            if($collision_distance > 1) {
+                /* Move each attack's collision point halfway towards the other.
+                In the 4 to 8 case, this results in an even number (2), so each attack collision is adjusted 2 tiles:
+
+                4 5 6 7 8
+                > > 6 < <
+
+                In the 4 to 7 case from above,
+                 there is no single center tile, so we remove the extra 0.5 from the number. E.g.
+
+                  distance: 7 - 4 = 3
+                  distance to adjust: 3 / 2 = 1.5
+                  final distance to adjust: floor(1.5) = 1
+
+                   4 5 6 7
+                   > 5 6 <
+                */
+                $distance_to_adjust = floor($collision_distance / 2);
+
+                // Attack 2 is to the right
+                if($attack2_collision_point > $attack1_collision_point) {
+                    $attack1_collision_point += $distance_to_adjust;
+                    $attack2_collision_point -= $distance_to_adjust;
+                }
+                // Attack 1 is to the right
+                else if($attack1_collision_point > $attack2_collision_point) {
+                    $attack1_collision_point -= $distance_to_adjust;
+                    $attack2_collision_point += $distance_to_adjust;
+                }
+                else {
+                    throw new Exception("unexpected: No distance between collision points!");
+                }
+
             }
 
             // SHARED - Persist collision
@@ -713,29 +732,6 @@ class BattleActionProcessor {
         }
 
         return $collisions;
-    }
-
-    /**
-     * Collision algorithm Type 1 - For each tile, see if attack on same tile is <= same time
-     *
-     * @param BattleAttack $attack
-     * @param BattleAttack $other_attack
-     * @param TileAttackSegment[][]        $segments_by_tile_and_attack
-     * @return ?int
-     */
-    public static function findSameTileCollisionPoint(BattleAttack $attack, BattleAttack $other_attack, array $segments_by_tile_and_attack): ?int {
-        foreach($attack->path_segments as $segment) {
-            $other_attack_on_tile = $segments_by_tile_and_attack[$segment->tile->index][$other_attack->id] ?? null;
-            if($other_attack_on_tile != null) {
-                $other_segment = $other_attack_on_tile->segment;
-
-                if($other_segment->time_arrived <= $segment->time_arrived) {
-                    return $segment->tile->index;
-                }
-            }
-        }
-
-        return null;
     }
 
     /**
