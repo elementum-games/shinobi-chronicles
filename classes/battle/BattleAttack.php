@@ -53,6 +53,30 @@ class BattleAttack {
             $current_segment = $current_segment->next_segment;
         }
     }
+
+    /**
+     * @return bool
+     * @throws Exception
+     */
+    public function isFacingRight(): bool {
+        if($this->target instanceof AttackDirectionTarget) {
+            return $this->target->isDirectionRight();
+        }
+
+        throw new Exception("Unsupported target type for direction check!");
+    }
+
+    /**
+     * @return bool
+     * @throws Exception
+     */
+    public function isFacingLeft(): bool {
+        if($this->target instanceof AttackDirectionTarget) {
+            return $this->target->isDirectionLeft();
+        }
+
+        throw new Exception("Unsupported target type for direction check!");
+    }
 }
 
 

@@ -520,41 +520,40 @@ class BattleActionProcessor {
      * @throws Exception
      */
     public static function findCollisions(BattleAttack $fighter1Attack, BattleAttack $fighter2Attack): array {
-        $tile_attack_map = [];
+        /** @var TileAttackSegment[][] $segments_by_tile_and_attack */
+        $segments_by_tile_and_attack = [];
         $collisions = [];
 
         foreach([$fighter1Attack, $fighter2Attack] as $attack) {
             foreach($attack->path_segments as $segment) {
-                if(!isset($tile_attack_map[$segment->tile->index])) {
-                    $tile_attack_map[$segment->tile->index] = [
-                        'attack_segments' => []
-                    ];
+                if(!isset($segments_by_tile_and_attack[$segment->tile->index])) {
+                    $segments_by_tile_and_attack[$segment->tile->index] = [];
                 }
 
                 // TODO: how to handle multi attacks from same team?
-                $tile_attack_map[$segment->tile->index]['attack_segments'][$attack->id] = [
-                    'attack' => $attack,
-                    'segment' => $segment
-                ];
+                $segments_by_tile_and_attack[$segment->tile->index][$attack->id] =
+                    new TileAttackSegment($attack, $segment);
             }
         }
 
+
+
         // Find intersecting attacks
         $colliding_attack_pairs = [];
-        foreach($tile_attack_map as $tile) {
-            if(count($tile['attack_segments']) < 2) {
+        foreach($segments_by_tile_and_attack as $segments_by_attack) {
+            if(count($segments_by_attack) < 2) {
                 continue;
             }
-            if(count($tile['attack_segments']) > 2) {
+            if(count($segments_by_attack) > 2) {
                 throw new Exception("3-way collisions are currently not supported!");
             }
 
             $colliding_attack_pairs[] = array_values(
                 array_map(
-                    function($segment) {
-                        return $segment['attack'];
+                    function(TileAttackSegment $segment) {
+                        return $segment->attack;
                     },
-                    $tile['attack_segments']
+                    $segments_by_attack
                 )
             );
         }
@@ -574,56 +573,31 @@ class BattleActionProcessor {
                 continue;
             }
 
-            $attack1_collision_point = null;
-            $attack2_collision_point = null;
-
             // TODO: Find collision point
             /* $attack1_overlapping_segments = array_filter(
                  $attack1->path_segments,
                  function($segment) use ($tile_attack_map, $attack2) {
-                     return isset($tile_attack_map[$segment->tile->index]['attack_segments'][$attack2->id];
+                     return isset($tile_attack_map[$segment->tile->index][$attack2->id];
                  }
              );
              $attack2_overlapping_segments = array_filter(
                  $attack2->path_segments,
                  function($segment) use ($tile_attack_map, $attack1) {
-                     return isset($tile_attack_map[$segment->tile->index]['attack_segments'][$attack1->id];
+                     return isset($tile_attack_map[$segment->tile->index][$attack1->id];
                  }
              );*/
 
-            // TYPE 1 - for each tile, see if attack on same tile is <= same time
-            foreach($attack1->path_segments as $segment) {
-                $other_attack_on_tile = $tile_attack_map[$segment->tile->index]['attack_segments'][$attack2->id] ?? null;
-                if($other_attack_on_tile != null) {
-                    /** @var AttackPathSegment $other_segment */
-                    $other_segment = $other_attack_on_tile['segment'];
+            // Try for a direct overlap
+            $attack1_collision_point = self::findSameTileCollisionPoint($attack1, $attack2, $segments_by_tile_and_attack);
+            $attack2_collision_point = self::findSameTileCollisionPoint($attack2, $attack1, $segments_by_tile_and_attack);
 
-                    if($other_segment->time_arrived <= $segment->time_arrived) {
-                        $attack1_collision_point = $segment->tile->index;
-                        break;
-                    }
-                }
-            }
-            foreach($attack2->path_segments as $segment) {
-                $other_attack_on_tile = $tile_attack_map[$segment->tile->index]['attack_segments'][$attack1->id] ?? null;
-                if($other_attack_on_tile != null) {
-                    /** @var AttackPathSegment $other_segment */
-                    $other_segment = $other_attack_on_tile['segment'];
-                    if($other_segment->time_arrived <= $segment->time_arrived) {
-                        $attack2_collision_point = $segment->tile->index;
-                        break;
-                    }
-                }
+            // Fall back to type 2 if no direct overlap
+            if($attack1_collision_point == null || $attack2_collision_point == null) {
+                $attack1_collision_point = self::findNextTileCollisionPoint($attack1, $attack2, $segments_by_tile_and_attack);
+                $attack2_collision_point = self::findNextTileCollisionPoint($attack2, $attack1, $segments_by_tile_and_attack);
             }
 
-            if($attack1_collision_point != null && $attack2_collision_point == null) {
-                $attack2_collision_point = $attack1_collision_point;
-            }
-            if($attack2_collision_point != null && $attack1_collision_point == null) {
-                $attack1_collision_point = $attack2_collision_point;
-            }
-
-            // TYPE 2 - For each tile, see if attack on next tile is <= time + 1
+            // SHARED - Persist collision
             $collisions[$collision_id] = new AttackCollision(
                 id: $collision_id,
                 attack1: $attack1,
@@ -635,4 +609,65 @@ class BattleActionProcessor {
 
         return $collisions;
     }
+
+    /**
+     * Collision algorithm Type 1 - For each tile, see if attack on same tile is <= same time
+     *
+     * @param BattleAttack $attack
+     * @param BattleAttack $other_attack
+     * @param TileAttackSegment[][]        $segments_by_tile_and_attack
+     * @return ?int
+     */
+    public static function findSameTileCollisionPoint(BattleAttack $attack, BattleAttack $other_attack, array $segments_by_tile_and_attack): ?int {
+        foreach($attack->path_segments as $segment) {
+            $other_attack_on_tile = $segments_by_tile_and_attack[$segment->tile->index][$other_attack->id] ?? null;
+            if($other_attack_on_tile != null) {
+                $other_segment = $other_attack_on_tile->segment;
+
+                if($other_segment->time_arrived <= $segment->time_arrived) {
+                    return $segment->tile->index;
+                }
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Collision algorithm Type 2 - For each tile, see if attack on next tile is <= time + 1
+     *
+     * @param BattleAttack          $attack
+     * @param BattleAttack          $other_attack
+     * @param TileAttackSegment[][] $segments_by_tile_and_attack
+     * @return ?int
+     * @throws Exception
+     */
+    public static function findNextTileCollisionPoint(BattleAttack $attack, BattleAttack $other_attack, array $segments_by_tile_and_attack): ?int {
+        foreach($attack->path_segments as $segment) {
+            if($attack->isFacingRight()) {
+                $next_tile_index = $segment->tile->index + 1;
+            }
+            else {
+                $next_tile_index = $segment->tile->index - 1;
+            }
+
+            $other_attack_on_next_tile = $segments_by_tile_and_attack[$next_tile_index][$other_attack->id] ?? null;
+            if($other_attack_on_next_tile != null) {
+                $other_segment = $other_attack_on_next_tile->segment;
+
+                if($other_segment->time_arrived <= $segment->time_arrived + 1) {
+                    return $segment->tile->index;
+                }
+            }
+        }
+
+        return null;
+    }
+}
+
+class TileAttackSegment {
+    public function __construct(
+        public BattleAttack $attack,
+        public AttackPathSegment $segment,
+    ) {}
 }
