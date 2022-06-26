@@ -265,7 +265,7 @@ function report() {
 			echo "<table class='table'><tr><th>Submit Report</th></tr>
 			<tr><td>
 				<form action='$self_link' method='post'>";
-				echo "<style type='text/css'>
+				echo "<style>
 				label {
 					display:inline-block;
 					width:110px;
@@ -366,7 +366,7 @@ function report() {
 			
 			echo "<table class='table'><tr><th>View Report</th></tr>
 			<tr><td>";
-				echo "<style type='text/css'>
+				echo "<style>
 				label {
 					display:inline-block;
 					width:10em;

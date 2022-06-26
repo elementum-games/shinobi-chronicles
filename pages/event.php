@@ -150,8 +150,8 @@ function event() {
                 $player->updateData();
 
                 $player->getInventory();
-                $player->items[17]['item_id'] = 17;
-                $player->items[17]['quantity'] = 1;
+                $player->items[17] = new Item(id: 17);
+                $player->items[17]->quantity = 1;
                 $player->updateInventory();
 
                 $system->message("You have claimed the " . $gifts[101]);

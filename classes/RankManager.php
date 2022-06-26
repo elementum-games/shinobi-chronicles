@@ -49,7 +49,7 @@ class RankManager {
             $this->loadRanks();
         }
 
-        $chakra = 100 - $this->ranks[1]->chakra_gain;
+        $chakra = 100 - $this->ranks[1]->pool_gain;
         foreach($this->ranks as $id => $rank) {
             if($id > $rank_id) {
                 continue;
@@ -81,4 +81,48 @@ class RankManager {
     }
 
     // public static
+
+    /**
+     * @param User $player
+     * @return void
+     * @throws Exception
+     */
+    public function increasePlayerRank(User $player) {
+        $new_rank = $player->rank + 1;
+        if($new_rank > System::SC_MAX_RANK) {
+            throw new Exception("Invalid max rank!");
+        }
+        if(!$this->ranks_loaded) {
+            $this->loadRanks();
+        }
+
+        if(!isset($this->ranks[$new_rank])) {
+            throw new Exception("Error loading new rank!");
+        }
+
+        $player->rank++;
+        $player->level++;
+
+        $player->max_health += $this->ranks[$new_rank]->health_gain;
+        $player->max_chakra += $this->ranks[$new_rank]->pool_gain;
+        $player->max_stamina += $this->ranks[$new_rank]->pool_gain;
+
+        $player->health = $player->max_health;
+        $player->chakra = $player->max_chakra;
+        $player->stamina = $player->max_stamina;
+
+        $player->exp = $player->total_stats * 10;
+
+        switch($new_rank) {
+            case 2:
+                $player->regen_rate += 20;
+                break;
+            case 3:
+                $player->regen_rate += 70;
+                break;
+            case 4:
+                $player->regen_rate += 200;
+                break;
+        }
+    }
 }

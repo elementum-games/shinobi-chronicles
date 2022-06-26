@@ -9,7 +9,19 @@
         }
     ],
     "require": {
-      "php": ">=7.4",
-      "ext-mysqli": "*"
+      "php": ">=8.0",
+      "ext-mysqli": "*",
+      "ext-ctype": "*"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^9"
+    },
+    "autoload": {
+      "classmap": [
+        "classes/"
+      ],
+      "psr-4": {
+        "SC\\Factories\\": "tests/factories"
+      }
     }
 }

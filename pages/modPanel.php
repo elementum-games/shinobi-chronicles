@@ -157,6 +157,7 @@ function modPanel() {
 			}
 			// Build query
 			$add_comma = false;
+            /** @noinspection */
 			$query = "UPDATE `users` SET ";
 			if($ban_journal) {
 				$query .= "`journal_ban`='1'";
@@ -677,7 +678,7 @@ function modPanel() {
 		</tr>
 		<tr><td>
 			<form action='$self_link' method='post'>
-			<style type='text/css'>
+			<style>
 			label {
 				display:inline-block;
 				width: 80px;
@@ -755,7 +756,7 @@ function modPanel() {
 			</tr>
 			<tr><td>
 				<form action='$self_link' method='post'>
-				<style type='text/css'>
+				<style>
 				label {
 					display:inline-block;
 					width: 80px;

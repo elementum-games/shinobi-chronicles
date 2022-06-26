@@ -1,5 +1,7 @@
 <?php
 
+use JetBrains\PhpStorm\Pure;
+
 abstract class Fighter {
     const BASE_OFFENSE = 35;
 
@@ -20,6 +22,9 @@ abstract class Fighter {
     public float $max_stamina;
     public float $chakra;
     public float $max_chakra;
+
+    public int $level = 1;
+    public int $money = 0;
 
     public string $avatar_link = '';
 
@@ -46,7 +51,7 @@ abstract class Fighter {
     public array $items;
 
     public array $equipped_jutsu;
-    public array $equipped_weapons;
+    public array $equipped_weapon_ids;
     public array $equipped_armor;
 
     public int $bloodline_id;
@@ -147,7 +152,7 @@ abstract class Fighter {
         }
     }
 
-    // abstract public function hasJutsu(int $jutsu_id): bool;
+    abstract public function hasJutsu(int $jutsu_id): bool;
     abstract public function hasItem(int $item_id): bool;
 
     abstract public function hasEquippedJutsu(int $jutsu_id): bool;
@@ -176,6 +181,7 @@ abstract class Fighter {
         }
     }
     
+    #[Pure]
     public function getDebuffResist(): float {
         $willpower = ($this->willpower + $this->willpower_boost - $this->willpower_nerf);
 
@@ -203,7 +209,7 @@ abstract class Fighter {
      * @return float|int
      * @throws Exception
      */
-    public function calcDamage(Jutsu $attack, bool $disable_randomness = false) {
+    public function calcDamage(Jutsu $attack, bool $disable_randomness = false): float|int {
         if($this->system->debug['damage'])  {
             echo "Debugging damage for {$this->getName()}<br />";
         }
@@ -230,7 +236,7 @@ abstract class Fighter {
 
         switch($attack->purchase_type) {
             case Jutsu::PURCHASE_TYPE_DEFAULT:
-            case Jutsu::PURCHASE_TYPE_PURCHASEABLE:
+            case Jutsu::PURCHASE_TYPE_PURCHASABLE:
                 $offense = self::BASE_OFFENSE + ($off_skill * self::SKILL_OFFENSE_RATIO);
                 break;
             case Jutsu::PURCHASE_TYPE_BLOODLINE:
@@ -306,7 +312,7 @@ abstract class Fighter {
      * @param bool   $residual_damage
      * @return float|int
      */
-    public function calcDamageTaken($raw_damage, string $defense_type, bool $residual_damage = false) {
+    public function calcDamageTaken($raw_damage, string $defense_type, bool $residual_damage = false): float|int {
         $defense = 50 * (1 + $this->defense_boost);
 
         if($defense <= 0) {
@@ -333,7 +339,7 @@ abstract class Fighter {
         }
 
         $def_multiplier = 0.003;
-        if($this instanceof AI) {
+        if($this instanceof NPC) {
             $def_multiplier = 0.001;
         }
 
@@ -354,7 +360,7 @@ abstract class Fighter {
                 error_log("Invalid defense type! {$defense_type}");
         }
 
-        if($this instanceof AI && $defense_type == 'genjutsu') {
+        if($this instanceof NPC && $defense_type == 'genjutsu') {
             $defense *= 0.8;
         }
 

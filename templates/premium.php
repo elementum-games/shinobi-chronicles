@@ -442,7 +442,7 @@
     </table>
 <!-- END CHAR CHANGES -->
 <?php elseif($view == 'buy_kunai'): ?>
-    <style type='text/css'>
+    <style>
         .kunaiPack {
             display: inline-block;
             box-sizing: border-box;

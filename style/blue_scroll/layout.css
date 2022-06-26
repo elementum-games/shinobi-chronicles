@@ -93,8 +93,8 @@ video {
     margin: 0;
     padding: 0;
     border: 0;
-    font-size: 100%;
     font: inherit;
+    font-size: 100%;
     vertical-align: baseline;
     box-sizing: border-box;
 }
@@ -128,11 +128,6 @@ b {
 }
 
 @font-face {
-    font-family: "Permanent_Marker";
-    src: url("./fonts/Permanent_Marker/PermanentMarker-Regular.ttf");
-}
-
-@font-face {
     font-family: "Share_Tech_Mono";
     src: url("./fonts/Share_Tech_Mono/ShareTechMono-Regular.ttf");
 }
@@ -143,8 +138,8 @@ html,
 body {
     height: 100%;
     width: 100%;
-    margin: 0px;
-    padding: 0px;
+    margin: 0;
+    padding: 0;
 }
 
 
@@ -250,8 +245,8 @@ body {
 
 #topMenu ul {
     list-style: none;
-    margin: 0px;
-    padding: 0px;
+    margin: 0;
+    padding: 0;
     display: flex;
     flex-flow: row nowrap;
 }
@@ -454,8 +449,8 @@ h2#title {
 
 #sideMenu ul {
     list-style: none;
-    margin: 0px;
-    padding: 0px;
+    margin: 0;
+    padding: 0;
 }
 
 #sideMenu h2 {
@@ -496,7 +491,7 @@ h2#title {
     background: #b99e4727;
 }
 
-#sidemenu a {
+#sideMenu a {
     display: block;
     position: relative;
     width: 100%;
@@ -508,12 +503,12 @@ h2#title {
     font-family: 'Teko', sans-serif;
 }
 
-#sidemenu a:hover {
+#sideMenu a:hover {
     color: #efefef;
     transition: color 200ms ease-in 150ms;
 }
 
-#sidemenu a::before {
+#sideMenu a::before {
     content: '';
     position: absolute;
     width: 42px;
@@ -526,7 +521,7 @@ h2#title {
     background-position: center center;
 }
 
-#sidemenu a:hover::before {
+#sideMenu a:hover::before {
     animation: menuOptionsIcon 200ms ease-in 1;
 
     background-repeat: no-repeat;
@@ -788,7 +783,7 @@ h2#title {
 #footer {
     max-width: 100%;
     height: 44px;
-    margin: 0px auto;
+    margin: 0 auto;
     position: relative;
     z-index: 80;
 
@@ -833,7 +828,7 @@ h2#title {
 }
 
 .avatarFrame {
-    margin: 0px;
+    margin: 0;
     margin-right: 15px;
 
     width: 150px;
@@ -846,7 +841,7 @@ h2#title {
     border: 1px solid #FFFFFF;
 
     border-radius: 10px;
-    box-shadow: 2px 2px 5px 0px #202020;
+    box-shadow: 2px 2px 5px 0 #202020;
 }
 
 .avatarFrame img {
@@ -856,7 +851,7 @@ h2#title {
     max-height: 150px;
     margin-bottom: 5px;
 
-    border: 0px;
+    border: 0;
 }
 
 label {
@@ -865,13 +860,13 @@ label {
 
 #content table.table {
     margin: 0 auto 10px auto;
-    padding: 0px;
+    padding: 0;
     width: 95%;
 
     color: #88806c;
     font-size: 0.9rem;
 
-    border-spacing: 0px;
+    border-spacing: 0;
     background: #0d111f;
     box-shadow: 0 0 2px #000000;
     border: 1px solid #b99e471f;
@@ -996,7 +991,7 @@ a.link:hover {
 }
 
 form {
-    margin: 0px;
+    margin: 0;
 }
 
 input[type=submit],
@@ -1091,7 +1086,6 @@ p {
 }
 
 .trainingNotification {
-    width: auto;
     position: absolute;
     top: 60px;
     right: 5px;
@@ -1107,7 +1101,6 @@ p {
 }
 
 #notifications {
-    width: auto;
     height: auto;
     position: absolute;
     right: 5px;
@@ -1148,7 +1141,7 @@ p {
 #notificationSlider {
     width: 200px;
     display: inline-block;
-    margin: 0px;
+    margin: 0;
     padding: 0;
     height: 26px;
     line-height: 26px;
@@ -1270,17 +1263,17 @@ p {
 #content .premiumUser:hover {
     --color-text-shadow: rgba(255, 255, 255, 0.4);
 
-    background: transparent url("/images/premium_glow.gif") repeat scroll 0% 0%;
+    background: transparent url("/images/premium_glow.gif") repeat scroll 0 0;
 }
 
 #content .staffMember {
     width: 100%;
-    margin: 1px 0px 3px;
-    padding: 0px;
+    margin: 1px 0 3px;
+    padding: 0;
     font-size: 10px;
     text-transform: uppercase;
     color: #E0E0E0;
-    text-shadow: 0px -1px 1px;
+    text-shadow: 0 -1px 1px;
 }
 
 #content a.chat.normalUser,
@@ -1300,7 +1293,7 @@ p {
 #content .premiumUser.blue,
 #content .table .premiumUser.blue,
 #content .table a.premiumUser.blue,
-#content a.premiumUser.blue:hover
+#content a.premiumUser.blue:hover,
 #content .chat_msg .premiumUser.blue,
 #content .chat_msg a.premiumUser.blue:hover {
     color: #a3b1fd;
@@ -1344,7 +1337,7 @@ p {
 #content .chat_msg .premiumUser.red,
 #content .chat_msg a.premiumUser.red:hover {
     color: #d67a65;
-    text-shadow: 1 1px 1px #681d0d,
+    text-shadow: 1px 1px 1px #681d0d,
                 -1px -1px 1px #681d0d;
 }
 
@@ -1451,8 +1444,8 @@ p {
 }
 
 #content table.table td.rowHeader {
-    padding: 1px 0px;
-    border: 0px;
+    padding: 1px 0;
+    border: 0;
     border-bottom: 1px solid #000000;
     font-weight: bold;
     text-align: center;
@@ -1460,12 +1453,12 @@ p {
 
 #content table.table td.row1 {
     padding: 5px;
-    border: 0px;
+    border: 0;
 }
 
 #content table.table td.row2 {
     padding: 5px;
-    border: 0px;
+    border: 0;
 }
 
 #content table.table td.row1:first-child {
@@ -1509,7 +1502,6 @@ tr.chat_msg:nth-child(odd) {
 }
 
 #content ul.submenu {
-    display: block;
     width: 90%;
     margin: 10px auto;
     display: flex;
@@ -1579,7 +1571,7 @@ input.link:hover {
 
 br.clear {
     clear: both;
-    margin: 0px;
+    margin: 0;
 }
 
 /* Travel */
@@ -1590,7 +1582,7 @@ br.clear {
     display: inline-block;
     height: 32px;
     width: 32px;
-    margin: 0px;
+    margin: 0;
     background-size: 100%;
     background-repeat: no-repeat;
 }
@@ -1648,13 +1640,13 @@ br.clear {
     max-width: 600px;
     height: 385px;
     border-radius: 15px;
-    border: 1px solid rgba(0, 0, 0.5);
+    border: 1px solid rgba(0, 0, 0, 0.5);
 }
 
 #content table.map td {
     height: 32px;
     width: 32px;
-    border: 1px solid rgba(0, 0, 0.5);
+    border: 1px solid rgba(0, 0, 0, 0.5);
     vertical-align: middle;
 }
 
@@ -2083,7 +2075,7 @@ br.clear {
     text-align: left;
 
     color: #beb28a;
-    font-family: 'Oswald';
+    font-family: 'Oswald', serif;
     font-size: 0.9rem;
 }
 

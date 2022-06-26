@@ -55,7 +55,7 @@ function bloodline() {
 		}
 		$system->printMessage();
 	}
-	echo "<style type='text/css'>
+	echo "<style>
 	label {
 		display: inline-block;
 	}
@@ -128,7 +128,7 @@ function bloodline() {
 	$bloodline_skill = 100 + $player->bloodline_skill;
 
 	echo "
-	<style type='text/css'>
+	<style>
 	span.amount {
 		color:#00C000;
 	}	
@@ -230,8 +230,8 @@ function bloodline() {
 			<label style='width:6.5em;'>Exp:</label>" . $jutsu->exp . "<br />";
 			echo "<br /><br />";
 			echo "<label style='width:6.5em;float:left;'>Description:</label>
-			<p style='display:inline-block;width:37.1em;margin:0px;'>" . $jutsu->description . "</p>
-			<br style='margin:0px;clear:both;' />";
+			<p style='display:inline-block;width:37.1em;margin:0;'>" . $jutsu->description . "</p>
+			<br style='margin:0;clear:both;' />";
 			
 		}
 		echo "</div>";

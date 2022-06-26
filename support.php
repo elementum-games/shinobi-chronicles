@@ -1,7 +1,7 @@
 <?php
 session_start();
 
-require_once("classes.php");
+require_once("classes/_autoload.php");
 
 $system = new System();
 $guest_support = true;
@@ -12,7 +12,7 @@ $user_id = 0;
 
 if(isset($_SESSION['user_id'])) {
     $guest_support = false;
-    $player = new User($_SESSION['user_id']);
+    $player = User::loadFromId($system, $_SESSION['user_id']);
     $player->loadData();
     $layout = $system->fetchLayoutByName($player->layout);
     $staff_level = $player->staff_level;
@@ -208,7 +208,7 @@ if(!$guest_support) {
     }
 
     // Load side menu
-    $pages = require_once('routes.php');
+    $pages = require_once('config/routes.php');
 
     if ($player->clan) {
         $pages[20]['menu'] = System::MENU_VILLAGE;

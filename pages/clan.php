@@ -102,7 +102,8 @@ function clan() {
 				// Claim empty seat
 				
 				// Update clan data
-				$system->query("UPDATE `clans` SET `{$positions[$challenge_position]}`='$player->user_id' WHERE `clan_id`='{$player->clan['id']}' LIMIT 1");
+                /** @noinspection SqlResolve */
+                $system->query("UPDATE `clans` SET `{$positions[$challenge_position]}`='$player->user_id' WHERE `clan_id`='{$player->clan['id']}' LIMIT 1");
 				// Update player data
 				$player->clan_office = $challenge_position;
 				// Display message
@@ -122,7 +123,8 @@ function clan() {
 			$office = $player->clan_office;
 			$office_names = array(1 => 'leader', 2 => 'elder_1', 3 => 'elder_2');
 			if($_POST['confirm_resign']) {
-				$system->query("UPDATE `clans` SET `{$office_names[$office]}`=0 WHERE `clan_id`='{$player->clan['id']}' LIMIT 1");
+                /** @noinspection SqlResolve */
+                $system->query("UPDATE `clans` SET `{$office_names[$office]}`=0 WHERE `clan_id`='{$player->clan['id']}' LIMIT 1");
 				$player->clan_office = 0;
 				$player->clan[$office_names[$office]] = 0;
 				$system->message("You have resigned as Clan {$player->clan['name']} " . ucfirst($office_names[$office]) . '.');
@@ -230,7 +232,7 @@ function clan() {
 	<div class='submenuMargin'></div>";
 	echo "<table class='table'><tr><th>" . $player->clan['name'] . " Clan</th></tr>
 	<tr><td>
-	<style type='text/css'>
+	<style>
 	label {
 		display: inline-block;
 	}
@@ -247,7 +249,7 @@ function clan() {
 		echo "<label style='width:7.2em;'>Reputation:</label>" . $player->clan['points'] . "<br />
 		<p style='font-style:italic;text-align:center;width:75%;'>" . $player->clan['motto'] . "</p>
 	</div>
-	<br style='clear:both;margin:0px;' />
+	<br style='clear:both;margin:0;' />
 	</td></tr></table>";
 	// Members
 	if($page == 'members') {

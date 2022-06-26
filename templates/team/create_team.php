@@ -18,7 +18,7 @@
 </table>
 
 <?php if($team_invited_to): ?>
-<style type='text/css'>
+<style>
     .teamInvite {
         display:inline-block;width:350px;vertical-align:top;margin-top:10px;
     }

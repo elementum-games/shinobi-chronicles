@@ -185,8 +185,8 @@ class BattleEffectsManager {
                         $fighter->combat_id,
                         $fighter->combat_id,
                         1,
-                        $fighter->items[$item_id]['effect'],
-                        $fighter->items[$item_id]['effect_amount'],
+                        $fighter->items[$item_id]->effect,
+                        $fighter->items[$item_id]->effect_amount,
                         BattleEffect::TYPE_BLOODLINE
                     );
                     $this->applyPassiveEffect($fighter, $effect);

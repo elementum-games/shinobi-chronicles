@@ -186,7 +186,7 @@ class Messaging {
 
 				echo "
 					</form>
-					<style type='text/css'>
+					<style>
 						label {
 							width: 90px;
 							display:inline-block;
@@ -225,7 +225,7 @@ class Messaging {
 			//Show the private message
 			case 'privateMessage':
 				echo "
-					<style type='text/css'>
+					<style>
 						label {
 							display: inline-block;
 							width:70px;

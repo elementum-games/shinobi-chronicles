@@ -8,9 +8,7 @@ Purpose:	Function for displaying and allowing users to post messages to tavern c
 Algorithm:	See master_plan.html
 */
 function chat() {
-
 	global $system;
-	global $ajax;
 	global $player;
 	global $self_link;
 
@@ -96,7 +94,7 @@ function chat() {
 		return true;
 	}
 	// Form to post message
-	if(!$ajax) {
+	if(!$system->is_legacy_ajax_request) {
 		echo "<div class='submenu'>
 		<ul class='submenu'>";
 			if(isset($_GET['no_refresh'])) {
@@ -270,7 +268,7 @@ function chat() {
 		echo "<a href='$self_link&min=$next&no_refresh=1'>Next</a>";
 	}
 	echo "</p>";
-	if(!$ajax) {
+	if(!$system->is_legacy_ajax_request) {
 		echo "</div>";
 	}
 }

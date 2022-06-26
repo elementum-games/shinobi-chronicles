@@ -4,6 +4,7 @@
 !/secure/vars.sample.php
 /tools
 .htaccess
+/node_modules
 
 /vendor/
 /layout/designs

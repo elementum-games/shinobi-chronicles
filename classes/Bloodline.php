@@ -72,24 +72,26 @@ class Bloodline {
             $uj = json_decode($bloodline_data['jutsu'], true);
             foreach($uj as $id => $j) {
                 $this->base_jutsu[$id] = new Jutsu(
-                    $id,
-                    $j['name'], 
-                    $j['rank'], 
-                    $j['jutsu_type'], 
-                    $j['power'],
-                    $j['effect'], 
-                    $j['effect_amount'] ?? 0,
-                    $j['effect_length'] ?? 0,
-                    $j['description'], 
-                    $j['battle_text'], 
-                    $j['cooldown'] ?? 0,
-                    $j['use_type'], 
-                    $j['use_cost'], 
-                    $j['purchase_cost'], 
-                    Jutsu::PURCHASE_TYPE_BLOODLINE,
-                    $j['parent_jutsu'] ?? 0,
-                    $j['element'], 
-                    $j['hand_seals']
+                    id: $id,
+                    name: $j['name'],
+                    rank: $j['rank'],
+                    jutsu_type: $j['jutsu_type'],
+                    base_power: $j['power'],
+                    range: 2,
+                    effect: $j['effect'],
+                    base_effect_amount: $j['effect_amount'] ?? 0,
+                    effect_length: $j['effect_length'] ?? 0,
+                    description: $j['description'],
+                    battle_text: $j['battle_text'],
+                    cooldown: $j['cooldown'] ?? 0,
+                    use_type: $j['use_type'],
+                    target_type: $j['target_type'] ?? Jutsu::TARGET_TYPE_FIGHTER_ID,
+                    use_cost: $j['use_cost'],
+                    purchase_cost: $j['purchase_cost'],
+                    purchase_type: Jutsu::PURCHASE_TYPE_BLOODLINE,
+                    parent_jutsu: $j['parent_jutsu'] ?? 0,
+                    element: $j['element'],
+                    hand_seals: $j['hand_seals']
                 );
                 $this->base_jutsu[$id]->is_bloodline = true;
             }

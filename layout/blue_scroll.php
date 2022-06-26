@@ -1,31 +1,9 @@
 <?php
-
-
 /** @var System $system */
 
-/** @noinspection HtmlUnknownTarget */
-$heading = <<<HTML
-<!doctype HTML public>
-<html lang="en">
-<head>
-	<title>Shinobi Chronicles RPG</title>
-	<link rel='stylesheet' type='text/css' href='./style/blue_scroll/layout.css' />
-	<link rel="icon" href="images/icons/favicon.ico" type="image/x-icon" />
-	<script type='text/javascript' src='./scripts/jquery-2.1.0.min.js'></script>
-	<script type='text/javascript' src="./scripts/jquery-ui.js"></script>
-	<script type='text/javascript' src="./scripts/functions.js"></script>
-	<script type='text/javascript' src="./scripts/timer.js"></script>
-	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-	<meta name="keywords" content="naruto, rpg, online, game, anime, manga, mmorpg" />
-	<meta name="description" content="Shinobi Chronicles: An online browser-based RPG inspired by the anime/manga Naruto." />
-	<script type='text/javascript'>
-	$(document).ready(function(){
-		if(typeof train_time !== 'undefined') {
-			countdownTimer(train_time, 'trainingTimer');
-		}
-	});
-	</script>
-</head>
+require 'layout/_common.php';
+$heading = coreHeading('./style/blue_scroll/layout.css') .
+<<<HTML
 <body>
 	<div id='header'>
         <div id="mainBanner">

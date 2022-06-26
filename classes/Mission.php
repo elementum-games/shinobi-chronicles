@@ -9,7 +9,13 @@ class Mission {
     const RANK_A = 4;
     const RANK_S = 5;
 
+    const TYPE_CLAN = 2;
     const TYPE_TEAM = 3;
+    const TYPE_SPECIAL = 4;
+    const TYPE_SURVIVAL = 5;
+
+    const STATUS_IN_PROGRESS = 1;
+    const STATUS_COMPLETE = 2;
 
     public static array $rank_names = [
         Mission::RANK_D => 'D-Rank',
@@ -79,7 +85,7 @@ class Mission {
         }
     }
 
-    public function nextStage($stage_id) {
+    public function nextStage($stage_id): int {
         $villages = $this->system->getVillageLocations();
 
         // Check for multi-count, stop stage ID
@@ -95,7 +101,7 @@ class Mission {
 
         // Return signal for mission complete
         if($stage_id > count($this->stages) + 1) {
-            return 2;
+            return Mission::STATUS_COMPLETE;
         }
         // Set to completion stage if all stages have been completed
         if($stage_id > count($this->stages)) {
@@ -105,12 +111,12 @@ class Mission {
                 'action_data' => $this->player->village_location,
                 'description' => 'Report back to the village to complete the mission.'
             );
-            if($this->mission_type == 5) {
+            if($this->mission_type == Mission::TYPE_SURVIVAL) {
                 $this->current_stage['ai_defeated'] = $this->player->mission_stage['ai_defeated'] ?? 0;
                 $this->current_stage['mission_money'] = $this->player->mission_stage['mission_money'] ?? 0;
             }
             $this->player->mission_stage = $this->current_stage;
-            return 1;
+            return Mission::STATUS_IN_PROGRESS;
         }
 
         // Load new stage data
@@ -142,12 +148,12 @@ class Mission {
 
         $this->current_stage['description'] = str_replace($search_array, $replace_array, $this->current_stage['description']);
 
-        if($this->mission_type == 5) {
+        if($this->mission_type == Mission::TYPE_SURVIVAL) {
             $this->current_stage['ai_defeated'] = $this->player->mission_stage['ai_defeated'] ?? 0;
             $this->current_stage['mission_money'] = $this->player->mission_stage['mission_money'] ?? 0;
         }
         $this->player->mission_stage = $this->current_stage;
-        return 1;
+        return Mission::STATUS_IN_PROGRESS;
     }
 
     public function nextTeamStage($stage_id): int {
@@ -155,7 +161,7 @@ class Mission {
 
         // Return signal for mission complete
         if($stage_id > count($this->stages) + 1) {
-            return 2;
+            return Mission::STATUS_COMPLETE;
         }
 
         // Check for old stage
@@ -185,13 +191,13 @@ class Mission {
                 'description' => 'Report back to the village to complete the mission.'
             );
             $this->player->mission_stage = $this->current_stage;
-            return 1;
+            return Mission::STATUS_IN_PROGRESS;
         }
 
         // Clear mission if it was cancelled
         if($new_stage && !$this->team->mission_id) {
             $this->player->clearMission();
-            return 1;
+            return Mission::STATUS_IN_PROGRESS;
         }
 
         // Load new stage data
@@ -231,7 +237,7 @@ class Mission {
         $this->current_stage['description'] = str_replace($search_array, $replace_array, $this->current_stage['description']);
 
         $this->player->mission_stage = $this->current_stage;
-        return 1;
+        return Mission::STATUS_IN_PROGRESS;
     }
 
     public function rollLocation($starting_location): string {

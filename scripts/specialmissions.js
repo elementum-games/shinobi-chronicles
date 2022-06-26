@@ -39,7 +39,7 @@
  */
 
 let startTime = 0;
-const specialMissionsUrl = 'ajax_specialmissions.php';
+const specialMissionsUrl = 'api/legacy_special_missions.php';
 
 // Mission event cooldown + 50ms to help prevent network variance causing premature refreshes
 const serverRefreshIntervalMs = (missionEventDurationMs || 3000) + 50;

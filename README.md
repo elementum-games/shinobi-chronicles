@@ -40,11 +40,12 @@ maintainer on it to avoid building something that's not going to get approved.
 
 ## Local Setup
 
-You need an environment with four things:
+You need an environment with five things:
 - A remote fork of the SC repository (e.g. `your-username/shinobi-chronicles`), on your GitHub account
 - A local clone of your fork 
 - A PHP local web server
 - A MySQL database 
+- A locally installed copy of Node.js and NPM
 
 You can use any IDE and setup you want if you have the know-how, but this guide lays out one way to get 
 started quickly with minimal PHP environment/Git knowledge.
@@ -61,7 +62,7 @@ started quickly with minimal PHP environment/Git knowledge.
    - Find DocumentRoot and change the path "C:\xampp\htdocs" to your shinobi-chronicles directory
      - (You can right-click the top folder in PhpStorm after opening it > copy path > absolute path)
    - Change the default path below in <Directory "C:\xampp\htdocs"> to your shinobi-chronicles directory
-6. Setup MySQL in XAMPP
+5. Setup MySQL in XAMPP
    - Go to MySQL > Admin/PhpMyAdmin > user accounts 
    - Go to add user
    - Enter the name `shinobi_chronicles` and give it a password (doesn't matter what it is, can just be "password") > check "create database with same name and grant all permissions"
@@ -84,12 +85,10 @@ started quickly with minimal PHP environment/Git knowledge.
 
 ### Installing PHP Manually
 
-**Ubuntu**
-https://www.linode.com/docs/guides/install-php-8-for-apache-and-nginx-on-ubuntu/
-
-**Windows**
-https://www.php.net/downloads.php  
-Then go to "Windows downloads"
+- Ubuntu
+  - https://www.linode.com/docs/guides/install-php-8-for-apache-and-nginx-on-ubuntu/
+- Windows
+  - Go to https://www.php.net/downloads.php and then look for "Windows Downloads"
 
 ### Composer
 
@@ -97,3 +96,61 @@ We use composer for managing some dependencies and info about PHP version. Downl
 at 
 https://getcomposer.org/download/
 and run `composer install` 
+
+Note that if you have some code that relies on Composer's `vendor/autoload.php` and you're getting
+`Class or interface "MyNewClass" does not exist` errors, you may need to run 
+`composer dump-autoload`. If that does not resolve it, you may need to add its directory to
+the `classmap` in `composer.json`.
+
+### Installing Required PHP Extensions
+This varies by system, but generally:
+
+**Windows**  
+- Find your php.ini file (php --ini from command line may help)
+- search for the extension name without prefix (e.g. if composer tells you to install `ext-mbstring`)
+- You should see a line like `;extension=mbstring.dll` - Remove the semicolon and save the file
+
+**Linux**  
+These extensions are usually managed by your package manager, try 
+installing, prefixed with `php<version>-`. Examples
+
+Ubuntu: `sudo apt-get install php8.0-mbstring`
+
+CentOS / RedHat: `sudo yum install php8.0-mbstring`
+
+**Note about ext-dom**
+  - This extension is included in the `xml` extension, install that
+
+
+### Node.js and NPM
+
+We use Node.js and NPM to install Javascript packages for some advanced 
+UI interfaces using [ReactJS](https://reactjs.org/) and other libraries, such as the Battle page. 
+(see the `ui_components` directory for the full list)
+
+If you are not making changes to any of these pages, you do not need to install Node.js and NPM.
+
+- Recommendation is to use a Node version manager so you can easily change version. See instructions here: 
+  - [Using a Node version manager to install Node.js and npm](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm#using-a-node-version-manager-to-install-node-js-and-npm)
+- Once installed, navigate to the root SC directory and run `npm install`
+
+### Advanced UI Components
+Some of the syntax used in these components (e.g. JSX) is not natively available in browsers, 
+so we have to compile the source code into plain JavaScript for it to run in browsers.
+- The editable source code lives in `ui_components/src`.
+- The compiled output lives in `ui_components/build`
+    - Do not make changes to code in the `build` folder, as it will be overwritten when the components are compiled.
+
+- When developing advanced UI components, navigate to the root SC directory in a terminal window
+and run `npm run watch-ui` to automatically compile source files from the `src` directory to 
+  compiled version in the `build` directory.
+
+
+## Testing
+You will need to install Composer and run `composer install` to install the PHPUnit
+testing framework. 
+
+Run `./vendor/bin/phpunit tests` to run all tests.
+
+For more on writing tests with PHPUnit, see the docs for PHPUnit here:
+https://phpunit.readthedocs.io/en/9.5/

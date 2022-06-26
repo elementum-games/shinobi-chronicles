@@ -39,16 +39,16 @@ function gear() {
 		$equipped_armor = 0;
 		$equipped_weapons = 0;
 		foreach($items as $id) {
-			if($player->checkInventory($id, 'item') && $player->items[$id]['use_type'] != 3) {
+			if($player->hasItem($id) && $player->items[$id]->use_type != 3) {
 				$equipped_items[] = $system->clean($id);
-				if($player->items[$id]['use_type'] == 1) {
+				if($player->items[$id]->use_type == 1) {
 					$equipped_weapons++;
 					if($equipped_weapons > $max_equipped_weapons) {
 						$system->message("You can only have " . $max_equipped_weapons . " equipped!");
 						$equip_ok = false;
 					}
 				}
-				if($player->items[$id]['use_type'] == 2) {
+				if($player->items[$id]->use_type == 2) {
 					$equipped_armor++;
 					if($equipped_armor > $max_equipped_armor) {
 						$system->message("You can only have " . $max_equipped_armor . " equipped!");
@@ -66,7 +66,7 @@ function gear() {
 	else if(isset($_GET['use_item'])) {
 		$item_id = (int)$system->clean($_GET['use_item']);
 		try {
-			if(!$player->checkInventory($item_id, 'item') or $player->items[$item_id]['use_type'] != 3) {
+			if(!$player->hasItem($item_id) or $player->items[$item_id]->use_type != 3) {
 				throw new Exception("Invalid item!");
 			}
 
@@ -74,22 +74,22 @@ function gear() {
 				throw new Exception("Your health is already maxed out!");
 			}
 
-			if($player->items[$item_id]['quantity'] <= 0) {
+			if($player->items[$item_id]->quantity <= 0) {
 				throw new Exception("You do not have any more of this item!");
 			}
 		
 
-			$player->items[$item_id]['quantity']--;
-			switch($player->items[$item_id]['effect']) {
+			$player->items[$item_id]->quantity--;
+			switch($player->items[$item_id]->effect) {
 				case 'heal':
-					$player->health += $player->items[$item_id]['effect_amount'];
+					$player->health += $player->items[$item_id]->effect_amount;
 					if($player->health > $player->max_health) {
 						$player->health = $player->max_health;
 					}
-					$system->message("Restored " . $player->items[$item_id]['effect_amount'] . " HP.");
+					$system->message("Restored " . $player->items[$item_id]->effect_amount . " HP.");
 					break;
 				default:
-					$player->items[$item_id]['quantity']++;
+					$player->items[$item_id]->quantity++;
 					break;
 			}
 
@@ -116,13 +116,13 @@ function gear() {
 	echo "<tr class='threeColumns'><td>";
 	if($player->items) {
 		foreach($player->items as $item) {
-			if($item['use_type'] != 1) {
+			if($item->use_type != 1) {
 				continue;
 			}
 
-			$item['effect'] = str_replace("_", " ", $item['effect']);
+			$item->effect = str_replace("_", " ", $item->effect);
 
-			echo sprintf("%s <sup style='font-size:9px;'>(%s %s)</sup> <br />", $item['name'], $item['effect_amount'], $item['effect']);
+			echo sprintf("%s <sup style='font-size:9px;'>(%s %s)</sup> <br />", $item->name, $item->effect_amount, $item->effect);
 		}
 	}
 	echo "</td>";
@@ -130,12 +130,12 @@ function gear() {
 	echo "<td>";
 	if($player->items) {
 		foreach($player->items as $item) {
-			if($item['use_type'] != 2) {
+			if($item->use_type != 2) {
 				continue;
 			}
 
 
-			echo sprintf("%s <sup style='font-size:9px;'>(%s %s)</sup> <br />", $item['name'], $item['effect_amount'], $item['effect']);
+			echo sprintf("%s <sup style='font-size:9px;'>(%s %s)</sup> <br />", $item->name, $item->effect_amount, $item->effect);
 
 		}
 	}
@@ -144,11 +144,11 @@ function gear() {
 	echo "<td>";
 	if($player->items) {
 		foreach($player->items as $item) {
-			if($item['use_type'] != 3) {
+			if($item->use_type != 3) {
 				continue;
 			}
 
-			echo sprintf("%s <sup style='font-size:9px;'>(%s %s)</sup> <br />", $item['name'], $item['effect_amount'], $item['effect']);
+			echo sprintf("%s <sup style='font-size:9px;'>(%s %s)</sup> <br />", $item->name, $item->effect_amount, $item->effect);
 		}
 	}
 	echo "</td>";
@@ -158,13 +158,13 @@ function gear() {
     if($player->items) {
         $header_displayed = false;
         foreach($player->items as $item) {
-            if($item['use_type'] == 4) {
+            if($item->use_type == 4) {
                 if(!$header_displayed) {
                     echo "<tr><th colspan='3'>Special</th></tr>";
                     $header_displayed = true;
                 }
                 echo "<td colspan='3'>";
-                echo sprintf("%s <sup style='font-size:9px;'>(%s %s)</sup> <br />", $item['name'], $item['effect_amount'], $item['effect']);
+                echo sprintf("%s <sup style='font-size:9px;'>(%s %s)</sup> <br />", $item->name, $item->effect_amount, $item->effect);
                 echo "</td>";
             }
         }
@@ -173,7 +173,7 @@ function gear() {
 
 
 	echo "
-	<form action='$self_link' method='post' style='margin:0px;'>
+	<form action='$self_link' method='post' style='margin:0;'>
 	<tr class='twoHeaders'>
 		<th colspan='2'>Equipped Gear</th>
 		<th>Use Items</th>
@@ -190,17 +190,17 @@ function gear() {
 		echo "<select name='items[" . ($item_count++) . "]'>
 		<option value='none'>None</option>";
 		foreach($player->items as $item) {
-			if($item['use_type'] != 1) {
+			if($item->use_type != 1) {
 				continue;
 			}
-			echo "<option value='{$item['item_id']}'";
-			if(array_search($item['item_id'], $player->equipped_items) !== false && !isset($equipped_weapons[$item['item_id']])
+			echo "<option value='{$item->id}'";
+			if(in_array($item->id, $player->equipped_items) && !isset($equipped_weapons[$item->id])
 			&& !$selected_displayed) {
 				$selected_displayed = true;
 				echo " selected='selected' ";
-				$equipped_weapons[$item['item_id']] = $item['item_id'];
+				$equipped_weapons[$item->id] = $item->id;
 			}
-			echo ">{$item['name']}</option>";
+			echo ">{$item->name}</option>";
 		}
 		echo "</select><br />";
 	}
@@ -213,19 +213,19 @@ function gear() {
 		echo "<select name='items[" . ($item_count++) . "]'>
 		<option value='none'>None</option>";
 		foreach($player->items as $item) {
-			if($item['use_type'] != 2) {
+			if($item->use_type != 2) {
 				continue;
 			}
-			echo "<option value='{$item['item_id']}'";
-			if(array_search($item['item_id'], $player->equipped_items) !== false && !isset($equipped_armor[$item['item_id']])
+			echo "<option value='{$item->id}'";
+			if(in_array($item->id, $player->equipped_items) && !isset($equipped_armor[$item->id])
 			&& !$selected_displayed) {
 				$selected_displayed = true;
 				echo " selected='selected' ";
-				$equipped_armor[$item['item_id']] = $item['item_id'];
+				$equipped_armor[$item->id] = $item->id;
 			}
 
 
-			echo ">{$item['name']}</option>";
+			echo ">{$item->name}</option>";
 		}
 		echo "</select><br />";
 	}
@@ -233,18 +233,18 @@ function gear() {
 
 	echo "<td class='fullwidth' style='text-align:center;'>";
 	foreach($player->items as $id => $item) {
-		if($item['use_type'] != 3) {
+		if($item->use_type != 3) {
 			continue;
 		}
 
-		if($item['quantity'] <= 0) {
+		if($item->quantity <= 0) {
 			continue;
 		}
 
-		echo "<a href='$self_link&use_item=$id'><span class='button' style='min-width:8em;'>" . $item['name'] . '<br />';
-		echo "<span style='font-weight:normal;'>Amount: {$item['quantity']}</span><br/>";
-		if($item['effect'] == 'heal') {
-			echo "<span style='font-weight:normal;'>(Heal " . $item['effect_amount'] . " HP)</span></span></a><br />";
+		echo "<a href='$self_link&use_item=$id'><span class='button' style='min-width:8em;'>" . $item->name . '<br />';
+		echo "<span style='font-weight:normal;'>Amount: {$item->quantity}</span><br/>";
+		if($item->effect == 'heal') {
+			echo "<span style='font-weight:normal;'>(Heal " . $item->effect_amount . " HP)</span></span></a><br />";
 		}
 		echo "<br />";
 	}
@@ -297,11 +297,10 @@ function jutsu() {
 					continue;
 				}
 
-				if(array_search($jutsu_array[0], $jutsu_types) === false) {
+				if(!in_array($jutsu_array[0], $jutsu_types)) {
 					throw new Exception("Invalid jutsu type!");
-					break;
 				}
-				if($player->checkInventory($jutsu_array[1], 'jutsu')) {
+				if($player->hasJutsu($jutsu_array[1])) {
 					$equipped_jutsu[$count]['id'] = $system->clean($jutsu_array[1]);
 					$equipped_jutsu[$count]['type'] = $system->clean($jutsu_array[0]);
 					$count++;
@@ -321,7 +320,7 @@ function jutsu() {
 			if(!isset($player->jutsu_scrolls[$jutsu_id])) {
 				throw new Exception("Invalid jutsu!");
 			}
-			if($player->checkInventory($jutsu_id, 'jutsu')) {
+			if($player->hasJutsu($jutsu_id)) {
 				throw new Exception("You already know that jutsu!");
 			}
 
@@ -364,7 +363,7 @@ function jutsu() {
 		$jutsu_id = (int)$_GET['forget_jutsu'];
 		try{
 			//Checking if player knows the jutsu he's trying to forget.
-			if(!$player->checkInventory($jutsu_id, 'jutsu')) {
+			if(!$player->hasJutsu($jutsu_id)) {
 				throw new Exception("Invalid Jutsu!");
 			}
 

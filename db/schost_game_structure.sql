@@ -1030,7 +1030,7 @@ INSERT INTO `missions` (`mission_id`, `name`, `rank`, `mission_type`, `stages`, 
 (11, 'ANBU Ambush', 4, 5, '[{\"action_type\":\"travel\",\"location_radius\":\"4\",\"description\":\"Retrieve enemy intel at [action_data].\"},{\"action_type\":\"combat\",\"action_data\":\"17\",\"description\":\"An ambush! Try to survive!\"},{\"action_type\":\"combat\",\"action_data\":\"18\",\"description\":\"An ambush! Try to survive!\"}]', 200);
 
 
--- Add AI opponents
+-- Add NPC opponents
 INSERT INTO `ai_opponents` (`ai_id`, `rank`, `money`, `name`, `max_health`, `level`, `ninjutsu_skill`, `genjutsu_skill`, `taijutsu_skill`, `cast_speed`, `speed`, `strength`, `endurance`, `intelligence`, `willpower`, `moves`) VALUES
 (1, 1, 20, 'Annoying Crow', 45, 1, 1.00, 1.00, 15.00, 5.00, 5.00, 10.00, 10.00, 10.00, 10.00, '[{\"battle_text\":\"[opponent] pecks at [player]&#039;s head with its beak.\",\"power\":\"1.2\",\"jutsu_type\":\"taijutsu\"}]'),
 (2, 1, 35, 'Academy Bully', 180, 5, 10.00, 10.00, 70.00, 10.00, 70.00, 10.00, 10.00, 10.00, 10.00, '[{\"battle_text\":\"[opponent] repeatedly punches [player] in the gut after throwing sand in [gender2] eyes.\",\"power\":\"1.4\",\"jutsu_type\":\"taijutsu\"},{\"battle_text\":\"[opponent] delivers a kick filled with chakra to [player]&#039;s side.\",\"power\":\"1.4\",\"jutsu_type\":\"taijutsu\"}]'),

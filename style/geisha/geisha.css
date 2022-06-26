@@ -145,7 +145,7 @@ h2#title {
 	width: 215px;
 	height: 35px;
 	
-	background-image: url(images/sidemenu_bg.png);
+	background-image: url(images/sideMenu_bg.png);
 	background-repeat: no-repeat;
 	
 	margin: 0;
@@ -154,7 +154,7 @@ h2#title {
 
 	position: relative;
 }
-#sidemenu h2 p {
+#sideMenu h2 p {
 	font-size: 16px;
 	font-weight: normal;
 	
@@ -170,19 +170,19 @@ h2#title {
 
 }
 
-#sidemenu div.headerMargin {
+#sideMenu div.headerMargin {
 	margin-top: 0;
 	margin-bottom: 50px;
 }
 
-#sidemenu a {
+#sideMenu a {
 	padding-left: 22px;
 	text-decoration: none;
 	
 	color: #a29986;
 	font-family: Corbel, sans-serif;
 }
-#sidemenu a:hover {
+#sideMenu a:hover {
 	color: #eee6d5;
 	/* text-shadow: 1px 1px 3px #EAEAEA; */
 	

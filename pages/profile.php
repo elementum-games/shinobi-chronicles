@@ -321,8 +321,8 @@ function userProfile() {
 		<br />
 		<label style='width:$label_width;'>PvP wins:</label>		$player->pvp_wins<br />
 		<label style='width:$label_width;'>PvP losses:</label> 	$player->pvp_losses<br />
-		<label style='width:$label_width;'>AI wins:</label>		$player->ai_wins<br />
-		<label style='width:$label_width;'>AI losses:</label>		$player->ai_losses<br />
+		<label style='width:$label_width;'>NPC wins:</label>		$player->ai_wins<br />
+		<label style='width:$label_width;'>NPC losses:</label>		$player->ai_losses<br />
 		</td>
 
 		<td style='width:50%;'>

@@ -1,0 +1,1 @@
+Generally all files in this directory should correspond 1:1 with a route in config/routes.php

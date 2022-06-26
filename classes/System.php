@@ -1,7 +1,11 @@
 <?php
 
+use JetBrains\PhpStorm\Pure;
+
 require_once __DIR__ . '/EntityId.php';
 require_once __DIR__ . '/User.php';
+require_once __DIR__ . '/MarkdownParser.php';
+require_once __DIR__ . '/API.php';
 
 /*	Class:		System
 	Purpose: 	Handle database connection and queries. Handle storing and printing of error messages.
@@ -47,21 +51,27 @@ class System {
     public $message;
     public $message_displayed;
 
+    public array $debug_messages = [];
+
     // Variable for DB connection resource
-    private $host;
-    private $username;
-    private $password;
-    private $database;
+    private string $host;
+    private string $username;
+    private string $password;
+    private string $database;
     public $con;
 
     public $environment;
 
-    public $SC_OPEN;
-    public $register_open;
+    public bool $SC_OPEN;
+    public bool $register_open;
 
-    public $link;
+    public string $link;
 
     public $timezoneOffset;
+
+    // Request lifecycle
+    public bool $is_legacy_ajax_request = false;
+    public bool $is_api_request = false;
 
     public array $villageLocations = [];
 
@@ -124,9 +134,13 @@ class System {
         'event' => 27,
         'team' => 24,
     ];
+
     public array $links = [
         'github' => 'https://github.com/elementum-games/shinobi-chronicles',
         'discord' => 'https://discord.gg/Kx52dbXEf3',
+    ];
+    public array $api_links = [
+        'battle' => ''
     ];
 
     //Chat variables
@@ -205,7 +219,7 @@ class System {
         'dildo',
     ];
 
-    public $debug = [
+    public array $debug = [
         'battle' => false,
         'battle_effects' => false,
         'jutsu_collision' => false,
@@ -233,6 +247,8 @@ class System {
         foreach(self::PAGE_IDS as $slug => $id) {
             $this->links[$slug] = $this->link . '?id=' . $id;
         }
+
+        $this->api_links['battle'] = $this->link . 'api/battle.php';
 
         $this->timezoneOffset = date('Z');
 
@@ -273,7 +289,11 @@ class System {
         $search_terms = array('&yen;');
         $replace_terms = array('[yen]');
         $input = str_replace($search_terms, $replace_terms, $input);
-        $input = htmlspecialchars($input, ENT_QUOTES);
+        $input = htmlspecialchars(
+            string: $input,
+            flags: ENT_QUOTES,
+            double_encode: false
+        );
 
         $input = str_replace($replace_terms, $search_terms, $input);
         $input = mysqli_real_escape_string($this->con, $input);
@@ -369,6 +389,10 @@ class System {
         }
     }
 
+    public function debugMessage($message) {
+        $this->debug_messages[] = $message;
+    }
+
     /* function printMessage()
         Displays message, if one is stored.
         -Parameters-
@@ -439,13 +463,17 @@ class System {
         }
 
         $this->message($message);
+        if($this->is_api_request) {
+            API::exitWithError($message);
+        }
+
         $this->printMessage();
 
         global $side_menu_start;
         global $side_menu_end;
         global $footer;
 
-        $pages = require 'routes.php';
+        $pages = require __DIR__ . '/../config/routes.php';
 
         echo $side_menu_start;
         foreach($pages as $id => $page) {
@@ -489,7 +517,7 @@ class System {
     }
 
     public function getMemes(): array {
-        $memes = require 'memes.php';
+        $memes = require 'config/memes.php';
 
         return [
             'codes' => array_map(function ($meme) {
@@ -568,6 +596,19 @@ class System {
 
         return $text;
 
+    }
+
+    public function parseMarkdown($text, $allow_images = false, $strip_breaks = true, $faces = false): string {
+        if($strip_breaks) {
+            $text = str_replace("\n", "", $text);
+        }
+
+        $text = str_replace("[br]", "\n", $text);
+
+        return MarkdownParser::instance()
+            ->setImagesDisabled(!$allow_images)
+            ->setBreaksEnabled(true)
+            ->text($text);
     }
 
     public function imageCheck($image, $size): string {
@@ -674,7 +715,7 @@ class System {
         return password_verify($password, $hash);
     }
 
-    public function renderStaticPageHeader($layout = System::DEFAULT_LAYOUT) {
+    public function renderStaticPageHeader(string $page_title, $layout = System::DEFAULT_LAYOUT) {
         $system = $this;
 
         require($this->fetchLayoutByName($layout));
@@ -689,7 +730,7 @@ class System {
         echo $heading;
         echo $top_menu;
         echo $header;
-        echo str_replace("[HEADER_TITLE]", "Rules", $body_start);
+        echo str_replace("[HEADER_TITLE]", $page_title, $body_start);
     }
 
     public function renderStaticPageFooter($layout = System::DEFAULT_LAYOUT) {
@@ -879,6 +920,12 @@ class System {
         }
 
         return $kunai_packs;
+    }
+
+    #[Pure]
+    public function getReactFile(string $component_name): string {
+        $filename = "ui_components/build/{$component_name}.js";
+        return $filename . "?q=" .  filemtime($filename);
     }
 }
 

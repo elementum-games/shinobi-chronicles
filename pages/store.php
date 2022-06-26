@@ -40,10 +40,11 @@ function store() {
 		}
 	}
 	else {
+        /** @var Item[] $shop_items */
 		$shop_items = array();
 		$result = $system->query("SELECT * FROM `items` WHERE `purchase_type` = '1' AND `rank` <= '$player->rank' ORDER BY `rank` ASC, `purchase_cost` ASC");
 		while($row = $system->db_fetch($result)) {
-			$shop_items[$row['item_id']] = $row;
+			$shop_items[$row['item_id']] = Item::fromDb($row);
 		}
 	}
 	
@@ -58,32 +59,32 @@ function store() {
 			}
 			
 			// check if already owned
-			if($player->checkInventory($item_id, 'item') && $shop_items[$item_id]['use_type'] != 3) {
+			if($player->hasItem($item_id) && $shop_items[$item_id]->use_type != 3) {
 				throw new Exception("You already own this item!");
 			}
 			
 			// Check for money requirement
-			if($player->money < $shop_items[$item_id]['purchase_cost']) {
+			if($player->money < $shop_items[$item_id]->purchase_cost) {
 				throw new Exception("You do not have enough money!");
 			}
 			
 			// Check for max consumables
-			if($player->checkInventory($item_id, 'item') && $shop_items[$item_id]['use_type'] == 3) {
-				if($player->items[$item_id]['quantity'] >= $max_consumables) {
+			if($player->hasItem($item_id) && $shop_items[$item_id]->use_type == 3) {
+				if($player->items[$item_id]->quantity >= $max_consumables) {
 					throw new Exception("Your supply of this item is already full!");
 				}
 			}
 			
 			
 			// Add to inventory or increment quantity
-			$player->money -= $shop_items[$item_id]['purchase_cost'];
+			$player->money -= $shop_items[$item_id]->purchase_cost;
 			
-			if(($shop_items[$item_id]['use_type'] == 1 || $shop_items[$item_id]['use_type'] == 2) || !$player->checkInventory($item_id, 'item')) {
-				$player->items[$item_id]['item_id'] = $item_id;
-				$player->items[$item_id]['quantity'] = 1;
+			if(($shop_items[$item_id]->use_type == 1 || $shop_items[$item_id]->use_type == 2) || !$player->hasItem($item_id)) {
+				$player->items[$item_id] = $shop_items[$item_id];
+				$player->items[$item_id]->quantity = 1;
 			}
-			else if($shop_items[$item_id]['use_type'] == 3) {
-				$player->items[$item_id]['quantity']++;
+			else if($shop_items[$item_id]->use_type == 3) {
+				$player->items[$item_id]->quantity++;
 			}
 			
 			$system->message("Item purchased!");
@@ -100,7 +101,7 @@ function store() {
 			}
 			
 			// check if already owned
-			if($player->checkInventory($jutsu_id, 'jutsu')) {
+			if($player->hasJutsu($jutsu_id)) {
 				throw new Exception("You have already learned this jutsu!");
 			}
 			
@@ -268,7 +269,7 @@ function store() {
 					continue;
 				}
 
-				if($player->checkInventory($jutsu['jutsu_id'], 'jutsu')) {
+				if($player->hasJutsu($jutsu['jutsu_id'])) {
 					continue;
 				}
 				if(isset($player->jutsu_scrolls[$jutsu['jutsu_id']])) {
@@ -318,33 +319,34 @@ function store() {
 		else {
 			$count = 0;
 			foreach($shop_items as $item) {
-				if($item['use_type'] == 3 && $category != 'consumables') {
+                /** @var Item $item */
+				if($item->use_type == 3 && $category != 'consumables') {
 					continue;
 				}
-				else if(($item['use_type'] == 1 || $item['use_type'] == 2) && $category != 'gear') {
+				else if(($item->use_type == 1 || $item->use_type == 2) && $category != 'gear') {
 					continue;
 				}
 
-				if($category != 'consumables' && $player->checkInventory($item['item_id'], 'item')) {
+				if($category != 'consumables' && $player->hasItem($item->id)) {
 					continue;
 				}
 
 				$count++;
 
-				if($category == 'consumables' && $player->checkInventory($item['item_id'], 'item')) {
-					$owned = $player->items[$item['item_id']]['quantity'];
+				if($category == 'consumables' && $player->hasItem($item->id)) {
+					$owned = $player->items[$item->id]->quantity;
 				}
 				else {
 					$owned = 0;
 				}
 
 				echo "<tr class='table_multicolumns' style='text-align:center;'>
-					<td style='width:35%;'>{$item['name']}" .
+					<td style='width:35%;'>{$item->name}" .
 					($owned ? "<br />(Owned: $owned/$max_consumables)" : "") .
 					"</td>
-					<td style='width:25%;'>" . ucwords(str_replace('_', ' ', $item['effect'])) . "</td>
-					<td style='width:20%;'>&yen;{$item['purchase_cost']}</td>
-					<td style='width:20%;'><a href='$self_link&view=$category&purchase_item={$item['item_id']}'>Purchase</a></td>
+					<td style='width:25%;'>" . ucwords(str_replace('_', ' ', $item->effect)) . "</td>
+					<td style='width:20%;'>&yen;{$item->purchase_cost}</td>
+					<td style='width:20%;'><a href='$self_link&view=$category&purchase_item={$item->id}'>Purchase</a></td>
 				</tr>";
 
 			}
