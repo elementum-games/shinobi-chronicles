@@ -313,10 +313,10 @@ class BattleActionProcessor {
             case Jutsu::USE_TYPE_MELEE:
             case Jutsu::USE_TYPE_PROJECTILE:
                 if($attack->target instanceof AttackTileTarget) {
-                    $this->field->setupTileAttack($attacker, $attack, $attack->target);
+                    $this->setupTileAttack($attacker, $attack, $attack->target);
                 }
                 else if($attack->target instanceof AttackDirectionTarget) {
-                    $this->field->setupDirectionAttack($attacker, $attack, $attack->target);
+                    $this->setupDirectionAttack($attacker, $attack, $attack->target);
                 }
                 else if($attack->target instanceof AttackFighterIdTarget) {
                     throw new Exception("setAttackPath: Unsupported target type!");
@@ -333,6 +333,111 @@ class BattleActionProcessor {
             default:
                 throw new Exception("setAttackPath: Invalid jutsu use type!");
         }
+    }
+
+    /**
+     * @param Fighter               $attacker
+     * @param BattleAttack          $attack
+     * @param AttackDirectionTarget $target
+     * @return BattleAttack
+     * @throws Exception
+     */
+    public function setupDirectionAttack(
+        Fighter $attacker, BattleAttack $attack, AttackDirectionTarget $target
+    ): BattleAttack {
+        if(!isset($this->field->fighter_locations[$attacker->combat_id])) {
+            throw new Exception("Invalid attacker location!");
+        }
+
+        $tiles = $this->field->getTiles();
+
+        $starting_tile_index = $this->field->getFighterLocation($attacker->combat_id) +
+            ($target->isDirectionLeft() ? -1 : 1);
+        $starting_tile = $tiles[$starting_tile_index] ?? null;
+        if(!$this->field->tileIsInBounds($starting_tile_index) || $tiles[$starting_tile_index] == null) {
+            throw new Exception("Invalid starting tile! {$starting_tile_index}");
+        }
+
+        $attack->first_tile = $starting_tile;
+
+        $attack->path_segments = [];
+        $index = $starting_tile_index;
+        for($count = 0; $count < $attack->jutsu->range; $count++) {
+            $tile = $this->field->getTiles()[$index] ?? null;
+
+            $distance_from_start = abs($index - $starting_tile_index);
+            if($distance_from_start >= $attack->jutsu->range) {
+                break;
+            }
+
+            // +1 to include starting tile
+            $time_arrived = ceil(
+                ($distance_from_start + 1) / $attack->jutsu->travel_speed
+            );
+
+            $attack->path_segments[] = new AttackPathSegment(
+                $tile,
+                $attack->starting_raw_damage,
+                $time_arrived
+            );
+
+            $index += $target->isDirectionLeft() ? -1 : 1;
+            if(!$this->field->tileIsInBounds($index)) {
+                break;
+            }
+        }
+
+        // sort collisions by time occurrence, process
+        // if a collision takes place on a path segment that doesn't exist anymore, remove it
+
+        /*
+        const USE_TYPE_MELEE = 'physical';
+        const USE_TYPE_PROJECTILE = 'projectile';
+        const USE_TYPE_PROJECTILE_AOE = 'projectile_aoe';
+        const USE_TYPE_REMOTE_SPAWN = 'spawn';
+        const USE_TYPE_BUFF = 'buff';
+        const USE_TYPE_BARRIER = 'barrier';
+        */
+
+        return $attack;
+    }
+
+    /**
+     * @param Fighter          $attacker
+     * @param BattleAttack     $attack
+     * @param AttackTileTarget $target
+     * @return BattleAttack
+     * @throws Exception
+     */
+    public function setupTileAttack(
+        Fighter $attacker, BattleAttack $attack, AttackTileTarget $target
+    ): BattleAttack {
+        if(!isset($this->field->fighter_locations[$attacker->combat_id])) {
+            throw new Exception("Invalid attacker location!");
+        }
+
+        $tile = $this->field->getTiles()[$target->tile_index] ?? null;
+        if($tile == null) {
+            throw new Exception("setupTileAttack: Invalid tile!");
+        }
+
+        $attack->first_tile = $tile;
+        $attack->root_path_segment = new AttackPathSegment(
+            tile: $tile,
+            raw_damage: $attack->starting_raw_damage,
+            time_arrived: (int)$attack->jutsu->travel_speed,
+        );
+
+        /*
+        const USE_TYPE_MELEE = 'physical';
+        const USE_TYPE_PROJECTILE = 'projectile';
+        const USE_TYPE_PROJECTILE_AOE = 'projectile_aoe';
+        const USE_TYPE_REMOTE_SPAWN = 'spawn';
+        const USE_TYPE_BUFF = 'buff';
+        const USE_TYPE_BARRIER = 'barrier';
+        */
+
+        return $attack;
     }
 
     /**
