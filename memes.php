@@ -462,4 +462,10 @@ return [
             'text' => ':sasukeeee:',
             'public' => true,
     ],
+    [
+            'code' => ':cat_jam:',
+            'image' => "<img src='./images/memes/cat-jam.gif' style='width:64px;height:64px;' />",
+            'text' => ':cat_jam:',
+            'public' => true,
+    ],
 ];
