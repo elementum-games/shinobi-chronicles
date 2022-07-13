@@ -463,9 +463,9 @@ return [
             'public' => true,
     ],
     [
-            'code' => ':cat_jam:',
+            'code' => ':catjam:',
             'image' => "<img src='./images/memes/cat-jam.gif' style='width:64px;height:64px;' />",
-            'text' => ':cat_jam:',
+            'text' => ':catjam:',
             'public' => true,
     ],
 ];
