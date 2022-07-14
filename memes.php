@@ -450,4 +450,22 @@ return [
         'text' => ':feelschatman:',
         'public' => true,
     ],
+    [
+            'code' => ':narutoooo:',
+            'image' => "<img src='./images/memes/narutoooo.png' style='width:64px;height:64px;' />",
+            'text' => ':narutoooo:',
+            'public' => true,
+    ],
+    [
+            'code' => ':sasukeeee:',
+            'image' => "<img src='./images/memes/sasukeeee.png' style='width:64px;height:64px;' />",
+            'text' => ':sasukeeee:',
+            'public' => true,
+    ],
+    [
+            'code' => ':catjam:',
+            'image' => "<img src='./images/memes/cat-jam.gif' style='width:64px;height:64px;' />",
+            'text' => ':catjam:',
+            'public' => true,
+    ],
 ];
