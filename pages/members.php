@@ -382,7 +382,7 @@ function members() {
 	$count = 0;
 
 	if($display_list == 'standard') {
-		$online_seconds = 120;
+		$online_seconds = 300; // 5 mins
         $results_per_page = 15;
 
 		$query_custom = '';
