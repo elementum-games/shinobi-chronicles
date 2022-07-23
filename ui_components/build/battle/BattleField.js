@@ -28,7 +28,9 @@ export default function BattleField({
     key: tile.index,
     index: tile.index,
     fighters: fightersForIds(tile.fighterIds),
-    canMoveTo: isMovementPhase && !tile.fighterIds.includes(player.id),
+    canMoveTo: isMovementPhase
+    /* && !tile.fighterIds.includes(player.id)*/
+    ,
     canAttack: jutsuToSelectTarget ? distanceToPlayer(tile.index) <= jutsuToSelectTarget.range : false,
     onSelect: () => onTileSelect(tile.index)
   })));

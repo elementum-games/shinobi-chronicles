@@ -30,7 +30,7 @@ class BattleActionProcessor {
     /**
      * @throws Exception
      */
-    public function runMovementPhaseActions() {
+    public function runMovementPhaseActions(): void {
         $player1_action = $this->battle->fighter_actions[$this->battle->player1->combat_id] ?? null;
         $player2_action = $this->battle->fighter_actions[$this->battle->player2->combat_id] ?? null;
 
@@ -49,10 +49,10 @@ class BattleActionProcessor {
 
         if($player2_action instanceof FighterMovementAction) {
             $this->field->moveFighterTo(
-                fighter_id: $this->battle->player1->combat_id,
+                fighter_id: $this->battle->player2->combat_id,
                 target_tile: $player2_action->target_tile
             );
-            $this->battle->battle_text .= $this->battle->player1->getName() .
+            $this->battle->battle_text .= $this->battle->player2->getName() .
                 ' moved to tile ' . $player2_action->target_tile . '.';
         }
     }
@@ -60,7 +60,7 @@ class BattleActionProcessor {
     /**
      * @throws Exception
      */
-    public function runAttackPhaseActions() {
+    public function runAttackPhaseActions(): void {
         $player1_attack = $this->getFighterAttackFromActions($this->battle->player1->combat_id);
         $player2_attack = $this->getFighterAttackFromActions($this->battle->player2->combat_id);
 
@@ -70,12 +70,23 @@ class BattleActionProcessor {
             'P1: ' . $player1_attack->starting_raw_damage . ' / P2: ' . $player2_attack->starting_raw_damage
         );
 
+        // Set tiles
         $this->setAttackPath($this->battle->player1, $player1_attack);
-        // $this->setAttackPath($this->battle->player2, $player2_attack);
+        $this->setAttackPath($this->battle->player2, $player2_attack);
 
+        // Find collisions
         $collisions = $this->findCollisions($player1_attack, $player2_attack);
 
-        $this->runAttackPath($this->battle->player1, $player1_attack);
+        // Walk through path and apply results of each collision
+        $this->processCollisions($collisions);
+
+        // - - - - >
+        // < - - - - - -
+        // - - >
+
+        // walk through paths and find hits
+
+        // $this->runAttackPath($this->battle->player1, $player1_attack);
 
 
         // For all attacks, have a cast/travel time and do stat checks against it
@@ -225,7 +236,7 @@ class BattleActionProcessor {
 
     // PRIVATE PROCESSING
 
-    private function debug(string $category, string $label, string $content) {
+    private function debug(string $category, string $label, string $content): void {
         ($this->debug_closure)($category, $label, $content);
     }
 
@@ -375,10 +386,10 @@ class BattleActionProcessor {
                 ($distance_from_start + 1) / $attack->jutsu->travel_speed
             );
 
-            $attack->path_segments[] = new AttackPathSegment(
-                $tile,
-                $attack->starting_raw_damage,
-                $time_arrived
+            $attack->addPathSegment(
+                tile: $tile,
+                raw_damage: $attack->starting_raw_damage,
+                time_arrived: $time_arrived
             );
 
             $index += $target->isDirectionLeft() ? -1 : 1;
@@ -422,10 +433,10 @@ class BattleActionProcessor {
         }
 
         $attack->first_tile = $tile;
-        $attack->root_path_segment = new AttackPathSegment(
+        $attack->addPathSegment(
             tile: $tile,
             raw_damage: $attack->starting_raw_damage,
-            time_arrived: (int)$attack->jutsu->travel_speed,
+            time_arrived: $attack->jutsu->travel_speed,
         );
 
         /*
@@ -480,6 +491,325 @@ class BattleActionProcessor {
         }
 
         return $attack;
+    }
+
+    /**
+     * @param AttackCollision[] $collisions
+     * @return void
+     * @throws Exception
+     */
+    public function processCollisions(array $collisions): void {
+        /*
+         We want to run collisions in order of time they occurred. This is mostly for team fights where we can have
+          situations like the following with multiple attacks from team A hitting one attack from team B (X marks collision)
+
+          A1   - - - - - - >
+          B1       < - X - X - -
+          A2 - - - - - >
+
+          Where the A1 / B1 collision should be processed first, then the B1 / A2 collision.
+         */
+        uasort($collisions, function (AttackCollision $a, AttackCollision $b) {
+            return $a->time_occurred <=> $b->time_occurred;
+        });
+
+        foreach($collisions as $collision) {
+            $attack1 =& $collision->attack1;
+            $attack2 =& $collision->attack2;
+
+            $attack1_segment = $collision->attack1_segment;
+            $attack2_segment = $collision->attack2_segment;
+
+            $attack1_user = $this->battle->getFighter($attack1->attacker_id);
+            $attack2_user = $this->battle->getFighter($attack2->attacker_id);
+            if($attack1_user == null || $attack2_user == null) {
+                throw new Exception("Attack had invalid user!");
+            }
+            
+            $attack1_damage = $attack1_segment->raw_damage;
+            $attack2_damage = $attack2_segment->raw_damage;
+
+            // Elemental interactions
+            if(!empty($attack1->jutsu->element) && !empty($attack2->jutsu->element)) {
+                // Fire > Wind > Lightning > Earth > Water > Fire
+                if($attack1->jutsu->element == Jutsu::ELEMENT_FIRE) {
+                    if($attack2->jutsu->element == Jutsu::ELEMENT_WIND) {
+                        $attack2_damage *= 0.8;
+                    }
+                    else if($attack2->jutsu->element == Jutsu::ELEMENT_WATER) {
+                        $attack1_damage *= 0.8;
+                    }
+                }
+                else if($attack1->jutsu->element == Jutsu::ELEMENT_WIND) {
+                    if($attack2->jutsu->element == Jutsu::ELEMENT_LIGHTNING) {
+                        $attack2_damage *= 0.8;
+                    }
+                    else if($attack2->jutsu->element == Jutsu::ELEMENT_FIRE) {
+                        $attack1_damage *= 0.8;
+                    }
+                }
+                else if($attack1->jutsu->element == Jutsu::ELEMENT_LIGHTNING) {
+                    if($attack2->jutsu->element == Jutsu::ELEMENT_EARTH) {
+                        $attack2_damage *= 0.8;
+                    }
+                    else if($attack2->jutsu->element == Jutsu::ELEMENT_WIND) {
+                        $attack1_damage *= 0.8;
+                    }
+                }
+                else if($attack1->jutsu->element == Jutsu::ELEMENT_EARTH) {
+                    if($attack2->jutsu->element == Jutsu::ELEMENT_WATER) {
+                        $attack2_damage *= 0.8;
+                    }
+                    else if($attack2->jutsu->element == Jutsu::ELEMENT_LIGHTNING) {
+                        $attack1_damage *= 0.8;
+                    }
+                }
+                else if($attack1->jutsu->element == Jutsu::ELEMENT_WATER) {
+                    if($attack2->jutsu->element == Jutsu::ELEMENT_FIRE) {
+                        $attack2_damage *= 0.8;
+                    }
+                    else if($attack2->jutsu->element == Jutsu::ELEMENT_EARTH) {
+                        $attack1_damage *= 0.8;
+                    }
+                }
+            }
+
+            // Barriers
+            /* if($attack1_user->barrier && $attack2->jutsu->jutsu_type != Jutsu::TYPE_GENJUTSU) {
+                 // Block damage from opponent's attack
+                 if($attack1_user->barrier >= $attack2_damage) {
+                     $block_amount = $attack2_damage;
+                 }
+                 else {
+                     $block_amount = $attack1_user->barrier;
+                 }
+ 
+                 $block_percent = ($attack2_damage >= 1) ? ($block_amount / $attack2_damage) * 100 : 100;
+                 $attack1_user->barrier -= $block_amount;
+                 $attack2_damage -= $block_amount;
+ 
+                 if($attack1_user->barrier < 0) {
+                     $attack1_user->barrier = 0;
+                 }
+                 if($attack2_damage < 0) {
+                     $attack2_damage = 0;
+                 }
+ 
+                 // Set display
+                 $block_percent = round($block_percent, 1);
+                 $collision_text .= "[player]'s barrier blocked $block_percent% of [opponent]'s damage![br]";
+             }
+             if($attack2_user->barrier && $attack1->jutsu->jutsu_type != Jutsu::TYPE_GENJUTSU) {
+                 // Block damage from opponent's attack
+                 if($attack2_user->barrier >= $attack1_damage) {
+                     $block_amount = $attack1_damage;
+                 }
+                 else {
+                     $block_amount = $attack2_user->barrier;
+                 }
+ 
+                 $block_percent = ($attack1_damage >= 1) ? ($block_amount / $attack1_damage) * 100 : 100;
+                 $attack2_user->barrier -= $block_amount;
+                 $attack1_damage -= $block_amount;
+ 
+                 if($attack2_user->barrier < 0) {
+                     $attack2_user->barrier = 0;
+                 }
+                 if($attack1_damage < 0) {
+                     $attack1_damage = 0;
+                 }
+ 
+                 // Set display
+                 $block_percent = round($block_percent, 1);
+                 $collision_text .= "[opponent]'s barrier blocked $block_percent% of [player]'s damage![br]";
+             }*/
+
+            // Weapon diffuse (tai diffuse nin)
+            /*
+            if($attack1->jutsu->weapon_id && $attack1->jutsu->weapon_effect->effect == 'diffuse' && $attack2->jutsu->jutsu_type == Jutsu::TYPE_NINJUTSU) {
+                    if($attack2_damage <= 0) {
+                        $attack1_diffuse_percent = 0;
+                    }
+                    else {
+                        $attack1_diffuse_percent = round(
+                            $attack1_damage / $attack2_damage * ($attack1->jutsu->weapon_effect->effect_amount / 100),
+                            1
+                        );
+
+                        if($attack1_diffuse_percent > Battle::MAX_DIFFUSE_PERCENT) {
+                            $attack1_diffuse_percent = Battle::MAX_DIFFUSE_PERCENT;
+                        }
+                    }
+                }
+                if($attack2->jutsu->weapon_id && $attack2->jutsu->weapon_effect->effect == 'diffuse' && $attack1->jutsu->jutsu_type == Jutsu::TYPE_NINJUTSU) {
+                    if($attack1_damage <= 0) {
+                        $attack2_diffuse_percent = 0;
+                    }
+                    else {
+                        $attack2_diffuse_percent = round(
+                            $attack2_damage / $attack1_damage * ($attack2->jutsu->weapon_effect->effect_amount / 100),
+                            1
+                        );
+                    }
+
+                    if($attack2_diffuse_percent > Battle::MAX_DIFFUSE_PERCENT) {
+                        $attack2_diffuse_percent = Battle::MAX_DIFFUSE_PERCENT;
+                    }
+                }
+                if(!empty($attack1_diffuse_percent)) {
+                    $attack2_damage *= 1 - $attack1_diffuse_percent;
+                    $collision_text .= "[player] diffused " . ($attack1_diffuse_percent * 100) . "% of [opponent]'s damage![br]";
+                }
+                if(!empty($attack2_diffuse_percent)) {
+                    $attack1_damage *= 1 - $attack2_diffuse_percent;
+                    $collision_text .= "[opponent] diffused " . ($attack2_diffuse_percent * 100) . "% of [player]'s damage![br]";
+                }
+            */
+
+            // Apply buffs/nerfs
+            $attack1_speed = $attack1_user->speed + $attack1_user->speed_boost - $attack1_user->speed_nerf;
+            $attack1_speed = 50 + ($attack1_speed * 0.5);
+            if($attack1_speed <= 0) {
+                $attack1_speed = 1;
+            }
+            $attack1_cast_speed = $attack1_user->cast_speed + $attack1_user->cast_speed_boost - $attack1_user->cast_speed_nerf;
+            $attack1_cast_speed = 50 + ($attack1_cast_speed * 0.5);
+            if($attack1_cast_speed <= 0) {
+                $attack1_cast_speed = 1;
+            }
+
+            $attack2_speed = $attack2_user->speed + $attack2_user->speed_boost - $attack2_user->speed_nerf;
+            $attack2_speed = 50 + ($attack2_speed * 0.5);
+            if($attack2_speed <= 0) {
+                $attack2_speed = 1;
+            }
+            $attack2_cast_speed = $attack2_user->cast_speed + $attack2_user->cast_speed_boost - $attack2_user->cast_speed_nerf;
+            $attack2_cast_speed = 50 + ($attack2_cast_speed * 0.5);
+            if($attack2_cast_speed <= 0) {
+                $attack2_cast_speed = 1;
+            }
+
+            $this->debug(
+                BattleManager::DEBUG_ATTACK_COLLISION,
+                'speed',
+                "Player1({$attack1_user->getName()}): {$attack1_user->speed} ({$attack1_user->speed_boost} - {$attack1_user->speed_nerf})<br />"
+                . "Player2({$attack2_user->getName()}): {$attack2_user->speed} ({$attack2_user->speed_boost} - {$attack2_user->speed_nerf})<br />"
+            );
+
+            // Ratios for damage reduction
+            $speed_ratio = 0.8;
+            $cast_speed_ratio = 0.8;
+            $max_damage_reduction = 0.5;
+            if($attack1->jutsu->jutsu_type == Jutsu::TYPE_NINJUTSU) {
+                // Nin vs Nin
+                if($attack2->jutsu->jutsu_type == Jutsu::TYPE_NINJUTSU) {
+                    if($attack1_cast_speed >= $attack2_cast_speed) {
+                        $damage_reduction = ($attack1_cast_speed / $attack2_cast_speed) - 1.0;
+                        $damage_reduction = round($damage_reduction * $cast_speed_ratio, 2);
+                        if($damage_reduction > $max_damage_reduction) {
+                            $damage_reduction = $max_damage_reduction;
+                        }
+                        if($damage_reduction >= 0.01) {
+                            $attack2_damage *= 1 - $damage_reduction;
+                            $collision_text .= "[player] cast [gender2] jutsu before [opponent] cast, negating " .
+                                ($damage_reduction * 100) . "% of [opponent]'s damage!";
+                        }
+                    }
+                    else {
+                        $damage_reduction = ($attack2_cast_speed / $attack1_cast_speed) - 1.0;
+                        $damage_reduction = round($damage_reduction * $cast_speed_ratio, 2);
+                        if($damage_reduction > $max_damage_reduction) {
+                            $damage_reduction = $max_damage_reduction;
+                        }
+                        if($damage_reduction >= 0.01) {
+                            $attack1_damage *= 1 - $damage_reduction;
+                            $collision_text .= "[opponent] cast their jutsu before [player] cast, negating " .
+                                ($damage_reduction * 100) . "% of [player]'s damage!";
+                        }
+                    }
+                }
+                // Nin vs Tai
+                else if($attack2->jutsu->jutsu_type == Jutsu::TYPE_TAIJUTSU) {
+                    if($attack1_cast_speed >= $attack2_speed) {
+                        $damage_reduction = ($attack1_cast_speed / $attack2_speed) - 1.0;
+                        $damage_reduction = round($damage_reduction * $cast_speed_ratio, 2);
+                        if($damage_reduction > $max_damage_reduction) {
+                            $damage_reduction = $max_damage_reduction;
+                        }
+                        if($damage_reduction >= 0.01) {
+                            $attack2_damage *= 1 - $damage_reduction;
+                            $collision_text .= "[player] cast [gender2] jutsu before [opponent] attacked, negating " . ($damage_reduction * 100) .
+                                "% of [opponent]'s damage!";
+                        }
+                    }
+                    else {
+                        $damage_reduction = ($attack2_speed / $attack1_cast_speed) - 1.0;
+                        $damage_reduction = round($damage_reduction * $speed_ratio, 2);
+                        if($damage_reduction > $max_damage_reduction) {
+                            $damage_reduction = $max_damage_reduction;
+                        }
+                        if($damage_reduction >= 0.01) {
+                            $attack1_damage *= 1 - $damage_reduction;
+                            $collision_text .= "[opponent] swiftly evaded " . ($damage_reduction * 100) . "% of [player]'s damage!";
+                        }
+                    }
+                }
+            }
+
+            // Taijutsu clash
+            else if($attack1->jutsu->jutsu_type == Jutsu::TYPE_TAIJUTSU) {
+                // Tai vs Tai
+                if($attack2->jutsu->jutsu_type == Jutsu::TYPE_TAIJUTSU) {
+                    if($attack1_speed >= $attack2_speed) {
+                        $damage_reduction = ($attack1_speed / $attack2_speed) - 1.0;
+                        $damage_reduction = round($damage_reduction * $speed_ratio, 2);
+                        if($damage_reduction > $max_damage_reduction) {
+                            $damage_reduction = $max_damage_reduction;
+                        }
+                        if($damage_reduction >= 0.01) {
+                            $attack2_damage *= 1 - $damage_reduction;
+                            $collision_text .= "[player] swiftly evaded " . ($damage_reduction * 100) . "% of [opponent]'s damage!";
+                        }
+                    }
+                    else {
+                        $damage_reduction = ($attack2_speed / $attack1_speed) - 1.0;
+                        $damage_reduction = round($damage_reduction * $speed_ratio, 2);
+                        if($damage_reduction > $max_damage_reduction) {
+                            $damage_reduction = $max_damage_reduction;
+                        }
+                        if($damage_reduction >= 0.01) {
+                            $attack1_damage *= 1 - $damage_reduction;
+                            $collision_text .= "[opponent] swiftly evaded " . ($damage_reduction * 100) . "% of [player]'s damage!";
+                        }
+                    }
+                }
+                else if($attack2->jutsu->jutsu_type == Jutsu::TYPE_NINJUTSU) {
+                    if($attack1_speed >= $attack2_cast_speed) {
+                        $damage_reduction = ($attack1_speed / $attack2_cast_speed) - 1.0;
+                        $damage_reduction = round($damage_reduction * $speed_ratio, 2);
+                        if($damage_reduction > $max_damage_reduction) {
+                            $damage_reduction = $max_damage_reduction;
+                        }
+                        if($damage_reduction >= 0.01) {
+                            $attack2_damage *= 1 - $damage_reduction;
+                            $collision_text .= "[player] swiftly evaded " . ($damage_reduction * 100) . "% of [opponent]'s damage!";
+                        }
+                    }
+                    else {
+                        $damage_reduction = ($attack2_cast_speed / $attack1_speed) - 1.0;
+                        $damage_reduction = round($damage_reduction * $cast_speed_ratio, 2);
+                        if($damage_reduction > $max_damage_reduction) {
+                            $damage_reduction = $max_damage_reduction;
+                        }
+                        if($damage_reduction >= 0.01) {
+                            $attack1_damage *= 1 - $damage_reduction;
+                            $collision_text .= "[opponent] cast their jutsu before [player] attacked, negating " . ($damage_reduction * 100) .
+                                "% of [player]'s damage!";
+                        }
+                    }
+                }
+            }
+        }
     }
 
     protected function applyAttackHit(BattleAttack $attack, Fighter $user, Fighter $target, float $raw_damage): void {
@@ -668,7 +998,6 @@ class BattleActionProcessor {
             $attack1 = $colliding_attack_pair[0];
             $attack2 = $colliding_attack_pair[1];
 
-
             $collision_id = self::collisionId($attack1, $attack2);
             if(isset($collisions[$collision_id])) {
                 continue;
@@ -703,7 +1032,8 @@ class BattleActionProcessor {
                    4 5 6 7
                    > 5 6 <
                 */
-                $distance_to_adjust = floor($collision_distance / 2);
+                // $distance_to_adjust = floor($collision_distance / 2);
+                $distance_to_adjust = 0;
 
                 // Attack 2 is to the right
                 if($attack2_collision_point > $attack1_collision_point) {
@@ -718,8 +1048,12 @@ class BattleActionProcessor {
                 else {
                     throw new Exception("unexpected: No distance between collision points!");
                 }
-
             }
+
+            $attack1_colliding_segment = $segments_by_tile_and_attack[$attack1_collision_point][$attack1->id];
+            $attack2_colliding_segment = $segments_by_tile_and_attack[$attack2_collision_point][$attack2->id];
+            $attack1_collision_time = $attack1_colliding_segment->time_arrived;
+            $attack2_collision_time = $attack2_colliding_segment->time_arrived;
 
             // SHARED - Persist collision
             $collisions[$collision_id] = new AttackCollision(
@@ -727,7 +1061,10 @@ class BattleActionProcessor {
                 attack1: $attack1,
                 attack2: $attack2,
                 attack1_collision_point: $attack1_collision_point,
-                attack2_collision_point: $attack2_collision_point
+                attack2_collision_point: $attack2_collision_point,
+                attack1_segment: $attack1_colliding_segment,
+                attack2_segment: $attack2_colliding_segment,
+                time_occurred: min($attack1_collision_time, $attack2_collision_time)
             );
         }
 

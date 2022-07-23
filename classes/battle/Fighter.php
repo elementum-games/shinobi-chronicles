@@ -66,6 +66,8 @@ abstract class Fighter {
 
     public string $gender;
 
+    public int $max_movement_distance = 2; // not in use yet
+
     // In-combat vars
     public $ninjutsu_boost = 0;
     public $taijutsu_boost = 0;

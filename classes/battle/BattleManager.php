@@ -84,11 +84,15 @@ class BattleManager {
     public bool $spectate = false;
 
     const DEBUG_PLAYER_ACTION = 'player_action';
+    const DEBUG_OPPONENT_ACTION = 'opponent_action';
     const DEBUG_DAMAGE = 'damage';
+    const DEBUG_ATTACK_COLLISION = 'attack_collision';
 
     public array $debug = [
         self::DEBUG_PLAYER_ACTION => true,
+        self::DEBUG_OPPONENT_ACTION => true,
         self::DEBUG_DAMAGE => true,
+        self::DEBUG_ATTACK_COLLISION => false,
     ];
 
     // INITIALIZATION
@@ -265,10 +269,12 @@ class BattleManager {
                 $this->setPlayerAction($this->player, $player_action);
 
                 if($this->opponent instanceof NPC) {
-                    $this->chooseAndSetNPCAttackAction($this->opponent);
+                    $this->chooseAndSetNPCAction($this->opponent);
                 }
             }
         }
+
+
 
         // If time is up or both people have submitted moves, RUN TURN
         if($this->battle->timeRemaining() <= 0 || $this->allActionsSubmitted()) {
@@ -514,198 +520,8 @@ class BattleManager {
     ) {
         $collision_text = '';
 
-        // Elemental interactions
-        if(!empty($player1_jutsu->element) && !empty($player2_jutsu->element)) {
-            $player1_jutsu->element = strtolower($player1_jutsu->element);
-            $player2_jutsu->element = strtolower($player2_jutsu->element);
-
-            // Fire > Wind > Lightning > Earth > Water > Fire
-            if($player1_jutsu->element == 'fire') {
-                if($player2_jutsu->element == 'wind') {
-                    $player2_damage *= 0.8;
-                }
-                else if($player2_jutsu->element == 'water') {
-                    $player1_damage *= 0.8;
-                }
-            }
-            else if($player1_jutsu->element == 'wind') {
-                if($player2_jutsu->element == 'lightning') {
-                    $player2_damage *= 0.8;
-                }
-                else if($player2_jutsu->element == 'fire') {
-                    $player1_damage *= 0.8;
-                }
-            }
-            else if($player1_jutsu->element == 'lightning') {
-                if($player2_jutsu->element == 'earth') {
-                    $player2_damage *= 0.8;
-                }
-                else if($player2_jutsu->element == 'wind') {
-                    $player1_damage *= 0.8;
-                }
-            }
-            else if($player1_jutsu->element == 'earth') {
-                if($player2_jutsu->element == 'water') {
-                    $player2_damage *= 0.8;
-                }
-                else if($player2_jutsu->element == 'lightning') {
-                    $player1_damage *= 0.8;
-                }
-            }
-            else if($player1_jutsu->element == 'water') {
-                if($player2_jutsu->element == 'fire') {
-                    $player2_damage *= 0.8;
-                }
-                else if($player2_jutsu->element == 'earth') {
-                    $player1_damage *= 0.8;
-                }
-            }
-        }
-
-        // Apply barrier
-        $player1_jutsu_is_attack = in_array($player1_jutsu->use_type, Jutsu::$attacking_use_types);
-        $player2_jutsu_is_attack = in_array($player2_jutsu->use_type, Jutsu::$attacking_use_types);
-
-        // Barriers
-        if($player1->barrier && $player2_jutsu_is_attack && $player2_jutsu->jutsu_type !== Jutsu::TYPE_GENJUTSU) {
-            // Block damage from opponent's attack
-            if($player1->barrier >= $player2_damage) {
-                $block_amount = $player2_damage;
-            }
-            else {
-                $block_amount = $player1->barrier;
-            }
-
-            $block_percent = ($player2_damage >= 1) ? ($block_amount / $player2_damage) * 100 : 100;
-            $player1->barrier -= $block_amount;
-            $player2_damage -= $block_amount;
-
-            if($player1->barrier < 0) {
-                $player1->barrier = 0;
-            }
-            if($player2_damage < 0) {
-                $player2_damage = 0;
-            }
-
-            // Set display
-            $block_percent = round($block_percent, 1);
-            $collision_text .= "[player]'s barrier blocked $block_percent% of [opponent]'s damage![br]";
-        }
-        if($player2->barrier && $player1_jutsu_is_attack && $player1_jutsu->jutsu_type !== Jutsu::TYPE_GENJUTSU) {
-            // Block damage from opponent's attack
-            if($player2->barrier >= $player1_damage) {
-                $block_amount = $player1_damage;
-            }
-            else {
-                $block_amount = $player2->barrier;
-            }
-
-            $block_percent = ($player1_damage >= 1) ? ($block_amount / $player1_damage) * 100 : 100;
-            $player2->barrier -= $block_amount;
-            $player1_damage -= $block_amount;
-
-            if($player2->barrier < 0) {
-                $player2->barrier = 0;
-            }
-            if($player1_damage < 0) {
-                $player1_damage = 0;
-            }
-
-            // Set display
-            $block_percent = round($block_percent, 1);
-            $collision_text .= "[opponent]'s barrier blocked $block_percent% of [player]'s damage![br]";
-        }
-
-        /* Calculate speed values */
-        if($this->system->debug['jutsu_collision']) {
-            echo "Player1({$player1->getName()}): {$player1->speed} ({$player1->speed_boost} - {$player1->speed_nerf})<br />";
-            echo "Player2({$player2->getName()}): {$player2->speed} ({$player2->speed_boost} - {$player2->speed_nerf})<br />";
-        }
-
-        // Player diffuse opponent
-        if($player1_jutsu->weapon_id
-            && $player1_jutsu->weapon_effect->effect == 'diffuse'
-            && $player2_jutsu->jutsu_type == Jutsu::TYPE_NINJUTSU
-            && $player2_jutsu_is_attack
-            && $player2_damage > 0
-        ) {
-            $player_diffuse_percent = round($player1_jutsu->weapon_effect->effect_amount / 100, 2);
-
-            if($player_diffuse_percent > Battle::MAX_DIFFUSE_PERCENT) {
-                $player_diffuse_percent = Battle::MAX_DIFFUSE_PERCENT;
-            }
-
-            if($player_diffuse_percent > 0) {
-                $player2_damage *= 1 - $player_diffuse_percent;
-                $collision_text .= "[player] diffused " . ($player_diffuse_percent * 100) . "% of [opponent]'s damage![br]";
-            }
-        }
-
-        // Opponent diffuse player
-        if($player2_jutsu->weapon_id
-            && $player2_jutsu->weapon_effect->effect == 'diffuse'
-            && $player1_jutsu->jutsu_type == Jutsu::TYPE_NINJUTSU
-            && $player1_jutsu_is_attack
-            && $player1_damage > 0
-        ) {
-            $opponent_diffuse_percent = round($player2_jutsu->weapon_effect->effect_amount / 100, 2);
-
-            if($opponent_diffuse_percent > Battle::MAX_DIFFUSE_PERCENT) {
-                $opponent_diffuse_percent = Battle::MAX_DIFFUSE_PERCENT;
-            }
-
-            if($opponent_diffuse_percent > 0) {
-                $player1_damage *= 1 - $opponent_diffuse_percent;
-                $collision_text .= "[opponent] diffused " . ($opponent_diffuse_percent * 100) . "% of [player]'s damage![br]";
-            }
-        }
-
-        $player1_evasion_stat_amount = $this->getEvasionStatAmount($player1, $player1_jutsu);
-        $player2_evasion_stat_amount = $this->getEvasionStatAmount($player2, $player2_jutsu);
-
-        if($player1_evasion_stat_amount >= $player2_evasion_stat_amount && $player2_jutsu_is_attack) {
-            $damage_reduction = ($player1_evasion_stat_amount / $player2_evasion_stat_amount) - 1.0;
-
-            $damage_reduction = $player1_jutsu->jutsu_type == Jutsu::TYPE_TAIJUTSU
-                ? round($damage_reduction * self::SPEED_DAMAGE_REDUCTION_RATIO, 2)
-                : round($damage_reduction * self::CAST_SPEED_DAMAGE_REDUCTION_RATIO, 2);
-
-            if($damage_reduction > self::MAX_EVASION_DAMAGE_REDUCTION) {
-                $damage_reduction = self::MAX_EVASION_DAMAGE_REDUCTION;
-            }
-            if($damage_reduction >= 0.01) {
-                $player2_damage *= 1 - $damage_reduction;
-
-                if($player1_jutsu->jutsu_type == Jutsu::TYPE_TAIJUTSU) {
-                    $collision_text .= "[player] swiftly evaded " . ($damage_reduction * 100) . "% of [opponent]'s damage!";
-                }
-                else {
-                    $collision_text .= "[player] cast [gender2] jutsu before [opponent] cast, negating " .
-                        ($damage_reduction * 100) . "% of [opponent]'s damage!";
-                }
-            }
-        }
-        else if($player2_evasion_stat_amount >= $player1_evasion_stat_amount && $player1_jutsu_is_attack) {
-            $damage_reduction = ($player2_evasion_stat_amount / $player1_evasion_stat_amount) - 1.0;
-
-            $damage_reduction = $player2_jutsu->jutsu_type == Jutsu::TYPE_TAIJUTSU
-                ? round($damage_reduction * self::SPEED_DAMAGE_REDUCTION_RATIO, 2)
-                : round($damage_reduction * self::CAST_SPEED_DAMAGE_REDUCTION_RATIO, 2);
-
-            if($damage_reduction > self::MAX_EVASION_DAMAGE_REDUCTION) {
-                $damage_reduction = self::MAX_EVASION_DAMAGE_REDUCTION;
-            }
-            if($damage_reduction >= 0.01) {
-                $player1_damage *= 1 - $damage_reduction;
-
-                if($player2_jutsu->jutsu_type == Jutsu::TYPE_TAIJUTSU) {
-                    $collision_text .= "[opponent] swiftly evaded " . ($damage_reduction * 100) . "% of [player]'s damage!";
-                }
-                else {
-                    $collision_text .= "[opponent] cast [gender2] jutsu before [player] cast, negating " .
-                        ($damage_reduction * 100) . "% of [player]'s damage!";
-                }
-            }
+        if($player_jutsu->jutsu_type == Jutsu::TYPE_GENJUTSU or $opponent_jutsu->jutsu_type == Jutsu::TYPE_GENJUTSU) {
+            return false;
         }
 
         // Parse text
@@ -815,21 +631,116 @@ class BattleManager {
      * @param Fighter $npc
      * @throws Exception
      */
-    protected function chooseAndSetNPCAttackAction(Fighter $npc) {
+    protected function chooseAndSetNPCAction(Fighter $npc): void {
         if(!($npc instanceof NPC)) {
-            throw new Exception("Calling chooseAndSetNPCAttackAction on non-NPC!");
+            throw new Exception("Calling chooseAndSetNPCAction on non-NPC!");
         }
 
+        $target_fighter_location = $this->field->getFighterLocation($this->player->combat_id);
+
+        $action = null;
+        if($this->battle->isMovementPhase()) {
+            $action = $this->chooseNPCMovementAction(
+                npc: $npc,
+                target_fighter_location: $target_fighter_location
+            );
+            $this->battle->fighter_actions[$npc->combat_id] = $action;
+        }
+        else if($this->battle->isAttackPhase()) {
+            $action = $this->chooseNPCAttackAction(
+                npc: $npc,
+                target: $this->player
+            );
+            $this->battle->fighter_actions[$npc->combat_id] = $action;
+        }
+
+        $this->debug(self::DEBUG_OPPONENT_ACTION, 'choosingOpponentAction', print_r($action, true));
+    }
+
+    protected function chooseNPCMovementAction(Fighter $npc, int $target_fighter_location): FighterMovementAction {
+        $npc_location = $this->field->getFighterLocation($npc->combat_id);
+
+        /*
+         * We want to move closer to our target - Imagine the field with 4 tiles and fighter A wants to move to fighter B.
+         * By subtracting fighter B's tile from fighter A's tile, you get the adjustment to fighter A's location
+         * necessary to move to fighter B.
+         *
+         * MOVING TO THE RIGHT:
+         *
+         * 1 2 3 4
+         * -------
+         * A   B
+         *
+         * B - A = movement to B
+         * 3 - 1 = 2
+         *
+         * A + movement to B = B's location
+         * 1 + 2 = 3
+         * 3 is indeed B's location
+         *
+         * MOVING TO THE LEFT
+         *
+         * 1 2 3 4
+         * -------
+         * B   A
+         *
+         * B - A = movement to B
+         * 1 - 3 = -2
+         *
+         * A + movement to B = B's location
+         * 3 + -2 = 1
+         *
+         * 1 is indeed B's location
+         *
+         */
+        $movement_needed_to_target = $target_fighter_location - $this->field->getFighterLocation($npc->combat_id);
+        $movement_is_negative = $movement_needed_to_target < 0;
+
+        $distance_to_target = abs($movement_needed_to_target) - 1; // -1 so we stand next to them, not on their tile
+        if($distance_to_target <= 0) {
+            return new FighterMovementAction(
+                fighter_id: $npc->combat_id,
+                target_tile: $npc_location,
+            );
+        }
+
+
+        $this->debug(
+            self::DEBUG_OPPONENT_ACTION,
+            'chooseNPCMovementAction',
+            print_r([
+                'target_fighter_location' => $target_fighter_location,
+                'npc_location' => $npc_location,
+                'movement_needed_to_target' => $movement_needed_to_target,
+            ], true)
+        );
+
+        $distance_to_move = min($distance_to_target, $npc->max_movement_distance);
+        $movement_to_do = $distance_to_move * ($movement_is_negative ? -1 : 1);
+
+        return new FighterMovementAction(
+            fighter_id: $npc->combat_id,
+            target_tile: $npc_location + $movement_to_do,
+        );
+    }
+
+    /**
+     * @throws Exception
+     */
+    protected function chooseNPCAttackAction(NPC $npc, Fighter $target): FighterAttackAction {
         $jutsu = $npc->chooseAttack();
         $jutsu->setCombatId($npc->combat_id);
 
-        $this->battle->fighter_actions[$npc->combat_id] = new FighterAttackAction(
+        // $fighter_id_target = new AttackFighterIdTarget($this->player->combat_id);
+        $target_fighter_location = $this->field->getFighterLocation($target->combat_id);
+        $target_direction = $this->field->getTileDirectionFromFighter($npc, $target_fighter_location);
+
+        return new FighterAttackAction(
             fighter_id: $npc->combat_id,
             jutsu_id: $jutsu->id,
             jutsu_purchase_type: Jutsu::PURCHASE_TYPE_PURCHASABLE,
             weapon_id: null,
-            // TODO: real AI targeting
-            target: new AttackFighterIdTarget($this->player->combat_id)
+            target: new AttackDirectionTarget($target_direction)
         );
     }
 

@@ -34,6 +34,16 @@ class BattleAttack {
         $this->starting_raw_damage = $starting_raw_damage;
     }
 
+    public function addPathSegment(BattleFieldTile $tile, float $raw_damage, int $time_arrived): void {
+        $index = count($this->path_segments);
+        $this->path_segments[$index] = new AttackPathSegment(
+            index: $index,
+            tile: $tile,
+            raw_damage: $raw_damage,
+            time_arrived: $time_arrived
+        );
+    }
+
     /**
      * Execute a function for each segment in the attack path.
      *
@@ -79,15 +89,22 @@ class BattleAttack {
     }
 }
 
-
 class AttackPathSegment {
+    public int $index;
     public BattleFieldTile $tile;
     public float $raw_damage;
     public int $time_arrived;
 
-    public ?AttackPathSegment $next_segment = null;
-
-    public function __construct(BattleFieldTile $tile, float $raw_damage, int $time_arrived) {
+    /**
+     * Direct usage of this constructor is not recommended, use BattleAttack#addPathSegment
+     *
+     * @param int             $index
+     * @param BattleFieldTile $tile
+     * @param float           $raw_damage
+     * @param int             $time_arrived
+     */
+    public function __construct(int $index, BattleFieldTile $tile, float $raw_damage, int $time_arrived) {
+        $this->index = $index;
         $this->tile = $tile;
         $this->raw_damage = $raw_damage;
         $this->time_arrived = $time_arrived;
