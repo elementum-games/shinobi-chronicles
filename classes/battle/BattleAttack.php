@@ -45,26 +45,6 @@ class BattleAttack {
     }
 
     /**
-     * Execute a function for each segment in the attack path.
-     *
-     * @param Closure $closure
-     * @throws Exception
-     */
-    public function forEachSegment(Closure $closure) {
-        $current_segment = $this->root_path_segment;
-        $count = 0;
-
-        while($current_segment != null) {
-            if($count++ > self::MAX_PATH_SEGMENTS) {
-                throw new Exception("forEachSegment: Max path segments reached!");
-            }
-
-            $closure($current_segment);
-            $current_segment = $current_segment->next_segment;
-        }
-    }
-
-    /**
      * @return bool
      * @throws Exception
      */
