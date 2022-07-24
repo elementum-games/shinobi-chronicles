@@ -142,7 +142,7 @@ function chat() {
 				$_SESSION['quick_reply'] = 1;
 			}
 		}
-		echo "<table id='chat_input_table' class='table' xmlns=\"http://www.w3.org/1999/html\">
+		echo "<table id='chat_input_table' class='table'>
 			<tr><th>Post Message</th></tr>
 			<tr><td style='text-align:center;'>
 			<form action='$self_link' method='post'>
