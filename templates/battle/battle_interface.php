@@ -71,10 +71,10 @@
 <?php $system->printMessage(); ?>
 <table class='table'>
     <tr>
-        <th style='width:50%;'>
+        <th id='bi_th_user' style='width:50%;'>
             <a href='<?= $system->links['members'] ?>&user=<?= $player->getName() ?>' style='text-decoration:none'><?= $player->getName() ?></a>
         </th>
-        <th style='width:50%;'>
+        <th id='bi_th_opponent' style='width:50%;'>
             <?php if($opponent instanceof AI): ?>
                 <?= $opponent->getName() ?>
             <?php else: ?>
@@ -82,7 +82,8 @@
             <?php endif; ?>
         </th>
     </tr>
-    <tr><td>
+    <tr>
+      <td id='bi_td_player'>
         <img src='<?= $player->avatar_link ?>' class='playerAvatar' />
         <label style='width:80px;'>Health:</label>
             <?= sprintf("%.2f", $player->health) ?> / <?= sprintf("%.2f", $player->max_health) ?><br />
@@ -97,12 +98,13 @@
             <div class='resourceBarOuter'><div class='staminaFill' style='width:<?= $stamina_percent ?>%;'></div></div>
         <?php endif; ?>
     </td>
-    <td>
+    <td id='bi_td_opponent'>
         <img src='<?= $opponent->avatar_link ?>' class='opponentAvatar' />
         <label style='width:80px;'>Health:</label>
         <?= sprintf("%.2f", $opponent->health) ?> / <?= sprintf("%.2f", $opponent->max_health) ?><br />
         <div class='resourceBarOuter'><div class='healthFill' style='width:<?= $opponent_health_percent ?>%;'></div></div>
-    </td></tr>
+    </td>
+  </tr>
 </table>
 
 <table class='table'>

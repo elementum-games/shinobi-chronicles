@@ -66,14 +66,14 @@ function scoutArea($in_existing_table = false, $show_spar_link = true) {
         <table class='table'>";
     }
 
-    echo "<tr>
+    echo "<tr id='scoutArea_headers'>
 		<th style='width:28%;'>Username</th>
 		<th style='width:20%;'>Rank</th>
 		<th style='width:17%;'>Village</th>
 		<th style='width:17%;'>Location</th>
 		<th style='width:18%;'>&nbsp;</th>
 	</tr>";
-	
+
 	if(is_array($users)) {
 		foreach($users as $user) {
 			echo "<tr class='table_multicolumns'>

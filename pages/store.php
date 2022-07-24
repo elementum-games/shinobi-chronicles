@@ -247,7 +247,8 @@ function store() {
 			<a href='$self_link&view=jutsu&jutsu_type=genjutsu' " . ($jutsu_type == 'genjutsu' ? $style : "") . ">Genjutsu</a>
 		</p>
 
-		<table class='table' style='margin-top:15px;'><tr>
+		<table class='table' style='margin-top:15px;'>
+		<tr id='shop_table_header' >
 			<th style='width:15%;'>Name</th>
 			<th style='width:15%;'>Effect</th>
 			<th style='width:10%;'>Type</th>

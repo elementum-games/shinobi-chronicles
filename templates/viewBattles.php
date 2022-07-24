@@ -5,13 +5,13 @@
 ?>
 <table class='table'>
     <tr><th colspan='3'>View Battles</th></tr>
-    <tr>
+    <tr id='viewBattles_headers'>
         <th>Player 1</th>
         <th>Player 2</th>
         <th>Winner</th>
     </tr>
     <?php foreach($battles as $battle): ?>
-        <tr>
+        <tr id='viewBattles_data'>
             <td><a href="<?= $system->links['members']?>&user=<?= $battle['player1'] ?>" style='text-decoration:none'><?= $battle['player1'] ?></a></td>
             <td><a href="<?= $system->links['members']?>&user=<?= $battle['player2'] ?>" style='text-decoration:none'><?= $battle['player2'] ?></a></td>
             <td>
