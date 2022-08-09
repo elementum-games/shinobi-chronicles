@@ -875,6 +875,8 @@ label {
     background: #0d111f;
     box-shadow: 0 0 2px #000000;
     border: 1px solid #b99e471f;
+
+    table-layout: fixed;
 }
 
 #content table.table a {
