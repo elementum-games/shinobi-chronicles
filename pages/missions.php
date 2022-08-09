@@ -168,7 +168,14 @@ function runActiveMission() {
                         else if($player->mission_stage['stage_id'] > 2){
                             $player->mission_stage['stage_id'] -= 1;
                         }
-                        $mission_status = $mission->nextStage($player->mission_stage['stage_id']);
+                        if ($player->location == $player->village_location)
+                        {
+                            $mission_status = $mission->nextStage($player->mission_stage['stage_id'] = 4);
+                        }
+                        else
+                        {
+                            $mission_status = $mission->nextStage($player->mission_stage['stage_id']);
+                        }
 
                         $player->mission_stage['ai_defeated']++;
                         $player->mission_stage['mission_money'] += $money_gain;
