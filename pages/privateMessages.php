@@ -183,7 +183,23 @@ class Messaging {
 
 			//Show the form for sending a new message
 			case 'form':
-
+                echo "<script type=text/javascript>
+                $(document).ready(function(){
+                    $('#messageContent').keyup(function (evt) {
+                            let max_length = {$this->constraints['message_limit']};
+                           
+                            if(this.value.length >= max_length  - 20)
+                            {
+                                let remaining = max_length - this.value.length;
+                                $('#remainingCharacters').text('Characters ramining: ' + remaining + ' out of ' + max_length);
+                            }
+                            else 
+                            {
+                                $('#remainingCharacters').text('');
+                            }
+                        })
+                    });
+                </script>";
 				echo "
 					</form>
 					<style type='text/css'>
@@ -210,8 +226,10 @@ class Messaging {
 										<label for='message'>Message</label>
 									</p>
 									<p style='text-align:center;'>
-										<textarea style='height:225px;width:500px;' name='message'></textarea>
-										<br /><br />
+										<textarea style='height:225px;width:500px;' name='message' id='messageContent'></textarea>
+										<br />
+										<span id='remainingCharacters' class='red'></span>
+										<br />
 										<input type='submit' name='new_message' value='Send' />
 									</p>
 								</td>

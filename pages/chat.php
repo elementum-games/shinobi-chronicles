@@ -117,6 +117,17 @@ function chat() {
 					$('#chatSubmit').trigger('click');
 				}
 			});
+            $('#chatMessage').keyup(function (evt) {
+                if(this.value.length >= $chat_max_post_length - 20)
+                {
+                    let remaining = $chat_max_post_length - this.value.length;
+                    $('#remainingCharacters').text('Characters ramining: ' + remaining + ' out of ' + $chat_max_post_length);
+                }
+                else 
+                {
+                    $('#remainingCharacters').text('');
+                }
+            })
 		});
 		</script>";
 		// Quick reply
@@ -139,6 +150,8 @@ function chat() {
 				<input type='checkbox' id='quickReply' name='quick_reply' value='1' " .
 				($_SESSION['quick_reply'] ? "checked='checked'" : '') .
 				"/> Quick reply<br />
+				<span id='remainingCharacters' class='red'></span>
+				<br />
 				<input id='chatSubmit' name='chat_submit' type='submit' value='Post' />
 			</form>
 			</td></tr>
