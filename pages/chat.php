@@ -121,7 +121,7 @@ function chat() {
                 if(this.value.length >= $chat_max_post_length - 20)
                 {
                     let remaining = $chat_max_post_length - this.value.length;
-                    $('#remainingCharacters').text('Characters ramining: ' + remaining + ' out of ' + $chat_max_post_length);
+                    $('#remainingCharacters').text('Characters remaining: ' + remaining + ' out of ' + $chat_max_post_length);
                 }
                 else 
                 {
