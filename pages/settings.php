@@ -321,7 +321,7 @@ function userSettings() {
                     if(this.value.length >= $max_journal_length - 20)
                     {
                         let remaining = $max_journal_length - this.value.length;
-                        $('#remainingCharacters').text('Characters ramining: ' + remaining + ' out of ' + $max_journal_length);
+                        $('#remainingCharacters').text('Characters remaining: ' + remaining + ' out of ' + $max_journal_length);
                     }
                     else 
                     {

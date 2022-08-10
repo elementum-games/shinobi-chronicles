@@ -445,6 +445,8 @@ p {
 
 	border-spacing:0px;
 	border-collapse:collapse;
+
+	table-layout: fixed;
 }
 #content table.table td {
 	padding: 5px;

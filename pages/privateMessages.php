@@ -191,7 +191,7 @@ class Messaging {
                             if(this.value.length >= max_length  - 20)
                             {
                                 let remaining = max_length - this.value.length;
-                                $('#remainingCharacters').text('Characters ramining: ' + remaining + ' out of ' + max_length);
+                                $('#remainingCharacters').text('Characters remaining: ' + remaining + ' out of ' + max_length);
                             }
                             else 
                             {
