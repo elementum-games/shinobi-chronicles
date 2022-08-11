@@ -259,7 +259,7 @@ $constraints['jutsu'] = [
     'name' => [
         'data_type' => 'string',
         'input_type' => 'text',
-        'max_length' => 25,
+        'max_length' => 35,
     ],
     'rank' => [
         'data_type' => 'int',

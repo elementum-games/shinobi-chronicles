@@ -23,7 +23,8 @@ function Battle({
   const [error, setError] = React.useState(null); // DERIVED STATE
 
   const isAttackSelected = battle.isAttackPhase && (attackInput.jutsuId !== -1 || attackInput.handSeals.length > 0);
-  const isSelectingTile = battle.isMovementPhase || isAttackSelected; // STATE MUTATORS
+  const isSelectingTile = battle.isMovementPhase || isAttackSelected;
+  const selectedJutsu = battle.isAttackPhase ? findPlayerJutsu(battle, attackInput.jutsuId, attackInput.jutsuCategory === 'bloodline') : null; // STATE MUTATORS
 
   const updateAttackInput = newAttackInput => {
     setAttackInput(prevSelectedAttack => ({ ...prevSelectedAttack,
@@ -71,6 +72,7 @@ function Battle({
     attackInput: attackInput,
     membersLink: membersLink,
     isSelectingTile: isSelectingTile,
+    selectedJutsu: selectedJutsu,
     onTileSelect: handleTileSelect
   }), battle.isSpectating && /*#__PURE__*/React.createElement(SpectateStatus, null), !battle.isSpectating && !battle.isComplete && /*#__PURE__*/React.createElement(BattleActionPrompt, {
     battle: battle,
@@ -88,6 +90,7 @@ function FightersAndField({
   attackInput,
   membersLink,
   isSelectingTile,
+  selectedJutsu,
   onTileSelect
 }) {
   const player = battle.fighters[battle.playerId];
@@ -102,7 +105,6 @@ function FightersAndField({
     onTileSelect(tileIndex);
   };
 
-  const selectedJutsu = battle.isAttackPhase;
   return /*#__PURE__*/React.createElement("table", {
     className: "table"
   }, /*#__PURE__*/React.createElement("tbody", null, /*#__PURE__*/React.createElement("tr", null, /*#__PURE__*/React.createElement("th", {
@@ -137,7 +139,7 @@ function FightersAndField({
     fighters: fighters,
     tiles: field.tiles,
     fighterLocations: field.fighterLocations,
-    jutsuToSelectTarget: battle.isAttackPhase ? findPlayerJutsu(battle, attackInput.jutsuId, attackInput.jutsuCategory === 'bloodline') : null,
+    selectedJutsu: selectedJutsu,
     isMovementPhase: battle.isMovementPhase,
     onTileSelect: handleTileSelect
   })))));

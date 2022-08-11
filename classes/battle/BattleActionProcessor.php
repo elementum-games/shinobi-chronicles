@@ -1,5 +1,7 @@
 <?php
 
+require_once __DIR__ . '/AttackCollision.php';
+
 class BattleActionProcessor {
     private System $system;
     private Battle $battle;
@@ -503,7 +505,7 @@ class BattleActionProcessor {
          We want to run collisions in order of time they occurred. This is mostly for team fights where we can have
           situations like the following with multiple attacks from team A hitting one attack from team B (X marks collision)
 
-          A1   - - - - - - >
+          A1     - - - - - >
           B1       < - X - X - -
           A2 - - - - - >
 

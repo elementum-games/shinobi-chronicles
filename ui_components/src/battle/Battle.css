@@ -79,6 +79,13 @@
     background: #b7af95;
 }
 
+.tile.attackPreview {
+    background: rgba(0, 0, 145, 0.4);
+}
+.tile.attackPreview:hover {
+    background: rgba(50, 50, 175, 0.4);
+}
+
 
 /* BATTLE ACTION PROMPT */
 #handSeals {

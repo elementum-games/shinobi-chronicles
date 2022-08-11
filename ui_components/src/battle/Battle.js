@@ -5,7 +5,7 @@ import BattleField from "./BattleField.js";
 import BattleLog from "./BattleLog.js";
 import BattleActionPrompt from "./BattleActionPrompt.js";
 
-import type { BattleType as BattleData } from "./battleSchema.js";
+import type { BattleType as BattleData, JutsuType } from "./battleSchema.js";
 import { apiFetch } from "../utils/network.js";
 import type { AttackInputFields } from "./AttackActionPrompt.js";
 import { findPlayerJutsu } from "./playerUtils.js";
@@ -36,6 +36,9 @@ function Battle({
     // DERIVED STATE
     const isAttackSelected = battle.isAttackPhase && (attackInput.jutsuId !== -1 || attackInput.handSeals.length > 0);
     const isSelectingTile = battle.isMovementPhase || isAttackSelected;
+    const selectedJutsu = battle.isAttackPhase
+        ? findPlayerJutsu(battle, attackInput.jutsuId, attackInput.jutsuCategory === 'bloodline')
+        : null;
 
     // STATE MUTATORS
     const updateAttackInput = (newAttackInput: $Shape<AttackInputFields>) => {
@@ -94,6 +97,7 @@ function Battle({
             attackInput={attackInput}
             membersLink={membersLink}
             isSelectingTile={isSelectingTile}
+            selectedJutsu={selectedJutsu}
             onTileSelect={handleTileSelect}
         />
         {battle.isSpectating && <SpectateStatus/>}
@@ -115,6 +119,7 @@ type FightersAndFieldProps = {|
     +attackInput: AttackInputFields,
     +membersLink: string,
     +isSelectingTile: boolean,
+    +selectedJutsu: ?JutsuType,
     +onTileSelect: (tileIndex: number) => void,
 |};
 
@@ -123,6 +128,7 @@ function FightersAndField({
     attackInput,
     membersLink,
     isSelectingTile,
+    selectedJutsu,
     onTileSelect
 }: FightersAndFieldProps) {
     const player = battle.fighters[ battle.playerId ];
@@ -133,8 +139,6 @@ function FightersAndField({
     const handleTileSelect = (tileIndex) => {
         onTileSelect(tileIndex);
     };
-
-    const selectedJutsu = battle.isAttackPhase
 
     return (
         <table className='table'>
@@ -177,11 +181,7 @@ function FightersAndField({
                         fighters={fighters}
                         tiles={field.tiles}
                         fighterLocations={field.fighterLocations}
-                        jutsuToSelectTarget={
-                            battle.isAttackPhase
-                                ? findPlayerJutsu(battle, attackInput.jutsuId, attackInput.jutsuCategory === 'bloodline')
-                                : null
-                        }
+                        selectedJutsu={selectedJutsu}
                         isMovementPhase={battle.isMovementPhase}
                         onTileSelect={handleTileSelect}
                     />
