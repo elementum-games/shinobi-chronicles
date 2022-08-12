@@ -250,7 +250,7 @@ if($LOGGED_IN) {
 		echo "<script type='text/javascript'>
 		var notificationRefreshID = setInterval(
             () => {
-                $('#notifications').load('./api/legacy_notifications.php');
+                // $('#notifications').load('./api/legacy_notifications.php');
             },
             5000
         );

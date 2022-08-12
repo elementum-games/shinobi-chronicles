@@ -77,7 +77,7 @@ class BattleActionProcessor {
         $this->setAttackPath($this->battle->player2, $player2_attack);
 
         // Find collisions
-        $collisions = $this->findCollisions($player1_attack, $player2_attack);
+        $collisions = $this->findCollisions($player1_attack, $player2_attack, $this->debug_closure);
 
         // Walk through path and apply results of each collision
         $this->processCollisions($collisions);
@@ -953,10 +953,19 @@ class BattleActionProcessor {
     /**
      * @param BattleAttack $fighter1Attack
      * @param BattleAttack $fighter2Attack
+     * @param Closure|null $debug_closure
      * @return AttackCollision[]
      * @throws Exception
      */
-    public static function findCollisions(BattleAttack $fighter1Attack, BattleAttack $fighter2Attack): array {
+    public static function findCollisions(BattleAttack $fighter1Attack, BattleAttack $fighter2Attack, ?Closure $debug_closure): array {
+        $debug = function(string $category, string $label, string $content) use($debug_closure) {
+            if($debug_closure == null) {
+                return;
+            }
+
+            ($debug_closure)($category, $label, $content);
+        };
+
         /** @var TileAttackSegment[][] $segments_by_tile_and_attack */
         $segments_by_tile_and_attack = [];
         $collisions = [];
@@ -1008,6 +1017,19 @@ class BattleActionProcessor {
             $attack1_collision_point = self::findNextTileCollisionPoint($attack1, $attack2, $segments_by_tile_and_attack);
             $attack2_collision_point = self::findNextTileCollisionPoint($attack2, $attack1, $segments_by_tile_and_attack);
 
+            $debug(BattleManager::DEBUG_ATTACK_COLLISION, 'initial_collision_points', json_encode([
+                'attack1' => $attack1_collision_point,
+                'attack2' => $attack2_collision_point,
+            ]));
+
+            /* Currently there's only one known case this can be null - If the attacks start on the same tile */
+            if($attack1_collision_point == null) {
+                $attack1_collision_point = self::findSameTileCollisionPoint($attack1, $attack2, $segments_by_tile_and_attack);
+            }
+            if($attack2_collision_point == null) {
+                $attack2_collision_point = self::findSameTileCollisionPoint($attack2, $attack1, $segments_by_tile_and_attack);
+            }
+
             /*
                 check for a collision range (collision valid across multiple tiles)
 
@@ -1052,8 +1074,13 @@ class BattleActionProcessor {
                 }
             }
 
-            $attack1_colliding_segment = $segments_by_tile_and_attack[$attack1_collision_point][$attack1->id];
-            $attack2_colliding_segment = $segments_by_tile_and_attack[$attack2_collision_point][$attack2->id];
+            $debug(BattleManager::DEBUG_ATTACK_COLLISION, 'final_collision_points', json_encode([
+                'attack1' => $attack1_collision_point,
+                'attack2' => $attack2_collision_point,
+            ]));
+
+            $attack1_colliding_segment = $segments_by_tile_and_attack[$attack1_collision_point][$attack1->id]->segment;
+            $attack2_colliding_segment = $segments_by_tile_and_attack[$attack2_collision_point][$attack2->id]->segment;
             $attack1_collision_time = $attack1_colliding_segment->time_arrived;
             $attack2_collision_time = $attack2_colliding_segment->time_arrived;
 
@@ -1098,6 +1125,28 @@ class BattleActionProcessor {
                 if($other_segment->time_arrived <= $segment->time_arrived + 1) {
                     return $segment->tile->index;
                 }
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Collision algorithm Type 2 - For each tile, see if attack on next tile is <= time + 1
+     *
+     * @param BattleAttack          $attack
+     * @param BattleAttack          $other_attack
+     * @param TileAttackSegment[][] $segments_by_tile_and_attack
+     * @return ?int
+     * @throws Exception
+     */
+    public static function findSameTileCollisionPoint(BattleAttack $attack, BattleAttack $other_attack, array $segments_by_tile_and_attack): ?int {
+        foreach($attack->path_segments as $segment) {
+            $other_attack_on_same_tile = $segments_by_tile_and_attack[$segment->tile->index][$other_attack->id] ?? null;
+            if($other_attack_on_same_tile != null &&
+                $other_attack_on_same_tile->segment->time_arrived == $segment->time_arrived
+            ) {
+                return $segment->tile->index;
             }
         }
 

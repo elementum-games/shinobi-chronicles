@@ -22,7 +22,8 @@
         "classes/"
       ],
       "psr-4": {
-        "SC\\Factories\\": "tests/factories"
+        "SC\\Factories\\": "tests/Factories",
+        "SC\\TestUtils\\": "tests/TestUtils"
       }
     }
 }

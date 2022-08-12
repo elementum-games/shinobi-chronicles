@@ -102,7 +102,7 @@ class BattleField {
      * @param int    $target_tile
      * @throws Exception
      */
-    public function moveFighterTo(string $fighter_id, int $target_tile) {
+    public function moveFighterTo(string $fighter_id, int $target_tile): void {
         if(!$this->tileIsInBounds($target_tile)) {
             throw new Exception("Cannot move to target tile - Out of bounds!");
         }

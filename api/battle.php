@@ -40,7 +40,16 @@ if($system->db_last_num_rows) {
     }
 
     require(__DIR__ . '/../pages/' . $battle_route['file_name']);
-    $response = $battle_route['battle_api_function_name']($system, $player);
+
+    try {
+        $response = $battle_route['battle_api_function_name']($system, $player);
+    } catch (Throwable $e) {
+        API::exitWithError(
+            message: $e->getMessage(),
+            debug_messages: $system->debug_messages
+        );
+    }
+
     if(!($response instanceof BattlePageAPIResponse)) {
         API::exitWithError("Invalid battle API response! - Expected BattlePageAPIResponse, got " . get_class($response));
     }
