@@ -72,7 +72,7 @@ class BattleActionProcessor {
             'P1: ' . $player1_attack->starting_raw_damage . ' / P2: ' . $player2_attack->starting_raw_damage
         );
 
-        // Set tiles
+        // Set attack tiles
         $this->setAttackPath($this->battle->player1, $player1_attack);
         $this->setAttackPath($this->battle->player2, $player2_attack);
 
@@ -90,11 +90,9 @@ class BattleActionProcessor {
 
         // $this->runAttackPath($this->battle->player1, $player1_attack);
 
-
         // For all attacks, have a cast/travel time and do stat checks against it
         // (e.g. attack vs replacement, raise/lower damage % taken)
 
-        // put attacks temporarily on all their squares
         // walk through path of attack, find collisions
 
         // for each collision check
@@ -111,6 +109,7 @@ class BattleActionProcessor {
         // travel time
 
         // Collision
+        $collision_text = "";
         // This doesn't apply the same way any more, move logic to field processing
         /*$collision_text = null;
         if($player1_attack != null && $player2_attack != null) {
@@ -317,10 +316,8 @@ class BattleActionProcessor {
     /**
      * @throws Exception
      */
-    protected function setAttackPath(Fighter $attacker, BattleAttack $attack) {
-        /*const TARGET_TYPE_FIGHTER_ID = 'fighter_id'
-        const TARGET_TYPE_TILE = 'tile';
-        const TARGET_TYPE_DIRECTION = 'direction';*/
+    protected function setAttackPath(Fighter $attacker, BattleAttack $attack): void {
+
 
         switch($attack->jutsu->use_type) {
             case Jutsu::USE_TYPE_MELEE:
@@ -515,6 +512,17 @@ class BattleActionProcessor {
             return $a->time_occurred <=> $b->time_occurred;
         });
 
+        $this->debug(
+            BattleManager::DEBUG_ATTACK_COLLISION,
+            'collisions',
+            json_encode(
+                array_map(
+                    function(AttackCollision $collision) { return $collision->toArray(); },
+                    $collisions
+                )
+            )
+        );
+
         foreach($collisions as $collision) {
             $attack1 =& $collision->attack1;
             $attack2 =& $collision->attack2;
@@ -527,7 +535,7 @@ class BattleActionProcessor {
             if($attack1_user == null || $attack2_user == null) {
                 throw new Exception("Attack had invalid user!");
             }
-            
+
             $attack1_damage = $attack1_segment->raw_damage;
             $attack2_damage = $attack2_segment->raw_damage;
 
@@ -576,6 +584,7 @@ class BattleActionProcessor {
                 }
             }
 
+            $collision_text = "";
             // Barriers
             /* if($attack1_user->barrier && $attack2->jutsu->jutsu_type != Jutsu::TYPE_GENJUTSU) {
                  // Block damage from opponent's attack
@@ -674,6 +683,7 @@ class BattleActionProcessor {
             if($attack1_speed <= 0) {
                 $attack1_speed = 1;
             }
+
             $attack1_cast_speed = $attack1_user->cast_speed + $attack1_user->cast_speed_boost - $attack1_user->cast_speed_nerf;
             $attack1_cast_speed = 50 + ($attack1_cast_speed * 0.5);
             if($attack1_cast_speed <= 0) {
@@ -685,6 +695,7 @@ class BattleActionProcessor {
             if($attack2_speed <= 0) {
                 $attack2_speed = 1;
             }
+
             $attack2_cast_speed = $attack2_user->cast_speed + $attack2_user->cast_speed_boost - $attack2_user->cast_speed_nerf;
             $attack2_cast_speed = 50 + ($attack2_cast_speed * 0.5);
             if($attack2_cast_speed <= 0) {
@@ -809,6 +820,18 @@ class BattleActionProcessor {
                                 "% of [player]'s damage!";
                         }
                     }
+                }
+            }
+
+            // Apply results of collision
+            if($attack1_damage < $attack1_segment->raw_damage) {
+                for($i = $attack1_segment->index; $i < count($attack1->path_segments); $i++) {
+                    $attack1->path_segments[$i]->raw_damage = $attack1_damage;
+                }
+            }
+            if($attack2_damage < $attack2_segment->raw_damage) {
+                for($i = $attack2_segment->index; $i < count($attack2->path_segments); $i++) {
+                    $attack2->path_segments[$i]->raw_damage = $attack2_damage;
                 }
             }
         }
@@ -965,6 +988,15 @@ class BattleActionProcessor {
 
             ($debug_closure)($category, $label, $content);
         };
+
+        if(count($fighter1Attack->path_segments) < 1) {
+            error_log("Fighter 1 attack {$fighter1Attack->id} has no path segments, cannot collide with anything!");
+            return [];
+        }
+        if(count($fighter2Attack->path_segments) < 1) {
+            error_log("Fighter 1 attack {$fighter2Attack->id} has no path segments, cannot collide with anything!");
+            return [];
+        }
 
         /** @var TileAttackSegment[][] $segments_by_tile_and_attack */
         $segments_by_tile_and_attack = [];

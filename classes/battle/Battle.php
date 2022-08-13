@@ -265,12 +265,15 @@ class Battle {
 }
 
     public function getFighter(string $combat_id): ?Fighter {
+        echo "getFighter";
         if($this->player1->combat_id === $combat_id) {
             return $this->player1;
         }
         if($this->player2->combat_id === $combat_id) {
             return $this->player2;
         }
+
+        echo "P1: {$this->player1->combat_id} / P2: {$this->player2->combat_id} / CID: $combat_id\r\n";
 
         return null;
     }
