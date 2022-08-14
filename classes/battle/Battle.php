@@ -265,7 +265,6 @@ class Battle {
 }
 
     public function getFighter(string $combat_id): ?Fighter {
-        echo "getFighter";
         if($this->player1->combat_id === $combat_id) {
             return $this->player1;
         }

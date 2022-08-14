@@ -1,64 +1,8 @@
 <?php /** @noinspection PhpIllegalPsrClassPathInspection */
 
-use PHPUnit\Framework\TestCase;
-use SC\Factories\JutsuFactory;
-use SC\TestUtils\CollisionScenario;
+use SC\TestUtils\BattleTestCase;
 
-class BattleActionProcessorAttackTest extends TestCase {
-    private static int $next_int = 1;
-
-    private function initBattle(): Battle {
-        $battle = $this->createStub(Battle::class);
-        $battle->player1 = $this->createStub(Fighter::class);
-        $battle->player1->combat_id = "P:1";
-
-        $battle->player2 = $this->createStub(Fighter::class);
-        $battle->player2->combat_id = "P:2";
-
-        $battle->method('getFighter')
-            ->will($this->returnValueMap([
-                [$battle->player1->combat_id, $battle->player1],
-                [$battle->player2->combat_id, $battle->player2],
-            ]));
-
-        $battle->raw_field = json_encode([
-            'fighter_locations' => [
-                $battle->player1->combat_id => 2,
-                $battle->player2->combat_id => 4,
-            ],
-        ]);
-
-        return $battle;
-    }
-
-    private function initAttack(Fighter $attacker, AttackTarget $target, Jutsu $jutsu = null): BattleAttack {
-        if($jutsu == null) {
-            $jutsu = JutsuFactory::create(
-                range: 3
-            );
-        }
-
-        return new BattleAttack(
-            attacker_id: $attacker->combat_id,
-            target: $target,
-            jutsu: $jutsu,
-            turn: self::$next_int++,
-            starting_raw_damage: 1000
-        );
-    }
-
-    private function initActionProcessor($battle, $battleField): BattleActionProcessor {
-        return new BattleActionProcessor(
-            $this->createStub(System::class),
-            $battle,
-            $battleField,
-            $this->createStub(BattleEffectsManager::class),
-            function () {
-            },
-            []
-        );
-    }
-
+class BattleActionProcessorAttackTest extends BattleTestCase {
     /**
      * @throws Exception
      */
@@ -150,5 +94,66 @@ class BattleActionProcessorAttackTest extends TestCase {
 
             $this->assertEquals($expected_time_elapsed, $segment->time_arrived);
         }
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function testAttackHitsOpponent() {
+        $battle = $this->initBattle(
+            player1Location: 1,
+            player2Location: 3
+        );
+        $battleField = new BattleField(
+            system: $this->createStub(System::class),
+            battle: $battle,
+        );
+        $battleActionProcessor = $this->initActionProcessor($battle, $battleField);
+
+        $fighter1Attack = $this->initAttack(
+            attacker: $battle->player1,
+            target: new AttackDirectionTarget(AttackDirectionTarget::DIRECTION_RIGHT),
+            range: 3
+        );
+        $fighter1Attack->path_segments = [
+            new AttackPathSegment(0, new BattleFieldTile(2, []), 1000, 1),
+            new AttackPathSegment(1, new BattleFieldTile(3, [$battle->player2->combat_id]), 900, 2),
+            new AttackPathSegment(2, new BattleFieldTile(4, []), 800, 3),
+        ];
+        $fighter1Attack->is_path_setup = true;
+
+        $fighter2Attack = $this->initAttack(
+            attacker: $battle->player2,
+            target: new AttackTileTarget(1),
+            range: 3
+        );
+        $fighter2Attack->path_segments = [
+            new AttackPathSegment(0, new BattleFieldTile(3, [$battle->player1->combat_id]), 500, 2),
+        ];
+        $fighter2Attack->is_path_setup = true;
+
+
+        /* ASSERT */
+        $this->assertEquals(false, $fighter1Attack->are_hits_calculated);
+        $this->assertEquals(false, $fighter2Attack->are_hits_calculated);
+
+        $battleActionProcessor->findAttackHits($battle->player1, $fighter1Attack);
+        $battleActionProcessor->findAttackHits($battle->player2, $fighter2Attack);
+
+        $this->assertEquals(true, $fighter1Attack->are_hits_calculated);
+        $this->assertEquals(true, $fighter2Attack->are_hits_calculated);
+        $this->assertCount(1, $fighter1Attack->hits);
+        $this->assertCount(1, $fighter2Attack->hits);
+
+        $hit1 = $fighter1Attack->hits[0];
+        $hit2 = $fighter2Attack->hits[0];
+
+        $this->assertEquals($battle->player1, $hit1->attacker);
+        $this->assertEquals($battle->player2, $hit1->target);
+        $this->assertEquals(900, $hit1->raw_damage);
+
+        $this->assertEquals($battle->player2, $hit2->attacker);
+        $this->assertEquals($battle->player1, $hit2->target);
+        $this->assertEquals(500, $hit2->raw_damage);
     }
 }

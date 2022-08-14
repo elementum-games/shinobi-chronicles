@@ -1,65 +1,10 @@
 <?php /** @noinspection PhpIllegalPsrClassPathInspection */
 
-use PHPUnit\Framework\TestCase;
 use SC\Factories\JutsuFactory;
+use SC\TestUtils\BattleTestCase;
 use SC\TestUtils\CollisionScenario;
 
-class BattleActionProcessorCollisionTest extends TestCase {
-    private static int $next_int = 1;
-
-    private function initBattle(int $player1Location = 2, int $player2Location = 4): Battle {
-        $battle = $this->createStub(Battle::class);
-        $battle->player1 = $this->createStub(Fighter::class);
-        $battle->player1->combat_id = "P:1";
-
-        $battle->player2 = $this->createStub(Fighter::class);
-        $battle->player2->combat_id = "P:2";
-
-        $battle->method('getFighter')
-               ->will($this->returnValueMap([
-                   [$battle->player1->combat_id, $battle->player1],
-                   [$battle->player2->combat_id, $battle->player2],
-               ]));
-
-        $battle->raw_field = json_encode([
-            'fighter_locations' => [
-                $battle->player1->combat_id => $player1Location,
-                $battle->player2->combat_id => $player2Location,
-            ],
-        ]);
-
-        return $battle;
-    }
-
-    private function initAttack(Fighter $attacker, AttackTarget $target, Jutsu $jutsu = null): BattleAttack {
-        if($jutsu == null) {
-            $jutsu = JutsuFactory::create(
-                range: 3
-            );
-        }
-
-        return new BattleAttack(
-            attacker_id: $attacker->combat_id,
-            target: $target,
-            jutsu: $jutsu,
-            turn: self::$next_int++,
-            starting_raw_damage: 1000
-        );
-    }
-
-    private function initActionProcessor($battle, $battleField): BattleActionProcessor {
-        return new BattleActionProcessor(
-            system: $this->createStub(System::class),
-            battle: $battle,
-            field: $battleField,
-            effects: $this->createStub(BattleEffectsManager::class),
-            debug_closure: function ($category, $label, $contents) {
-                echo "\r\nDEBUG ($label)\r\n$contents\r\n";
-            },
-            default_attacks: []
-        );
-    }
-
+class BattleActionProcessorCollisionTest extends BattleTestCase {
     /**
      * @throws Exception
      */
@@ -297,14 +242,14 @@ class BattleActionProcessorCollisionTest extends TestCase {
         $leftFighterAttack = $this->initAttack(
             attacker: $leftFighter,
             target: $leftFighterAttackTarget,
-            jutsu: JutsuFactory::create(range: 3),
+            range: 3,
         );
 
         $rightFighterAttackTarget = new AttackDirectionTarget(AttackDirectionTarget::DIRECTION_LEFT);
         $rightFighterAttack = $this->initAttack(
             attacker: $rightFighter,
             target: $rightFighterAttackTarget,
-            jutsu: JutsuFactory::create(range: 3),
+            range: 3,
         );
 
         $ORIGINAL_DAMAGE = 100;

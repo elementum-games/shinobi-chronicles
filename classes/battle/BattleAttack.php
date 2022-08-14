@@ -21,6 +21,11 @@ class BattleAttack {
     /** @var AttackPathSegment[] */
     public array $path_segments = [];
 
+    // Attack lifecycle status
+    public bool $is_path_setup = false;
+    public bool $are_collisions_applied = false;
+    public bool $are_hits_calculated = false;
+
     /** @var BattleAttackHit[] */
     public array $hits = [];
 

@@ -82,43 +82,15 @@ class BattleActionProcessor {
         // Walk through path and apply results of each collision
         $this->processCollisions($collisions);
 
-        // - - - - >
-        // < - - - - - -
-        // - - >
-
         // walk through paths and find hits
-
-        // $this->runAttackPath($this->battle->player1, $player1_attack);
+        $this->findAttackHits($this->battle->player1, $player1_attack);
+        $this->findAttackHits($this->battle->player2, $player2_attack);
 
         // For all attacks, have a cast/travel time and do stat checks against it
         // (e.g. attack vs replacement, raise/lower damage % taken)
 
-        // walk through path of attack, find collisions
-
-        // for each collision check
-        // - each attack square #
-        // - each attack travel speed
-        // and find a point of collision, weaken attack after that
-
-        $hits = $player1_attack->hits;
-
-        // squares hit
-        // direction
-
         // Cast time
         // travel time
-
-        // Collision
-        $collision_text = "";
-        // This doesn't apply the same way any more, move logic to field processing
-        /*$collision_text = null;
-        if($player1_attack != null && $player2_attack != null) {
-            $collision_text = $this->jutsuCollision(
-                $this->battle->player1, $this->battle->player2,
-                $player1_attack->raw_damage, $player2_attack->raw_damage,
-                $player1_attack->jutsu, $player2_attack->jutsu
-            );
-        }*/
 
         // Apply remaining barrier
         if($player1_attack) {
@@ -409,6 +381,8 @@ class BattleActionProcessor {
         const USE_TYPE_BARRIER = 'barrier';
         */
 
+        $attack->is_path_setup = true;
+
         return $attack;
     }
 
@@ -447,27 +421,22 @@ class BattleActionProcessor {
         const USE_TYPE_BARRIER = 'barrier';
         */
 
+        $attack->is_path_setup = true;
+
         return $attack;
     }
 
     /**
      * @throws Exception
      */
-    protected function runAttackPath(Fighter $attacker, BattleAttack $attack): BattleAttack {
-        if($attack->root_path_segment == null) {
-            throw new Exception("runAttackPath: No root path segment!");
+    public function findAttackHits(Fighter $attacker, BattleAttack $attack): BattleAttack {
+        if(!$attack->is_path_setup) {
+            throw new Exception("Attack path not setup!");
         }
 
         $attacker_team = Battle::fighterTeam($attacker);
 
-        $path_segment = $attack->root_path_segment;
-
-        $count = 0;
-        while($path_segment != null) {
-            if($count++ > 100) {
-                throw new Exception("runAttackPath: Attack path tried over 100 segments, exiting!");
-            }
-
+        foreach($attack->path_segments as $path_segment) {
             foreach($path_segment->tile->fighter_ids as $fighter_id) {
                 $fighter = $this->battle->getFighter($fighter_id);
                 if($fighter === null) {
@@ -485,9 +454,9 @@ class BattleActionProcessor {
                     raw_damage: $path_segment->raw_damage,
                 );
             }
-
-            $path_segment = $path_segment->next_segment;
         }
+
+        $attack->are_hits_calculated = true;
 
         return $attack;
     }
@@ -523,9 +492,14 @@ class BattleActionProcessor {
             )
         );
 
+        $attacks_with_collision = [];
+
         foreach($collisions as $collision) {
             $attack1 =& $collision->attack1;
             $attack2 =& $collision->attack2;
+
+            $attacks_with_collision[$attack1->id] = $attack1;
+            $attacks_with_collision[$attack2->id] = $attack2;
 
             $attack1_segment = $collision->attack1_segment;
             $attack2_segment = $collision->attack2_segment;
@@ -835,6 +809,10 @@ class BattleActionProcessor {
                 }
             }
         }
+
+        foreach($attacks_with_collision as $attack) {
+            $attack->are_collisions_applied = true;
+        }
     }
 
     protected function applyAttackHit(BattleAttack $attack, Fighter $user, Fighter $target, float $raw_damage): void {
@@ -988,6 +966,13 @@ class BattleActionProcessor {
 
             ($debug_closure)($category, $label, $content);
         };
+
+        if(!$fighter1Attack->is_path_setup) {
+            throw new Exception("Attack $fighter1Attack->id path not setup!");
+        }
+        if(!$fighter2Attack->is_path_setup) {
+            throw new Exception("Attack $fighter2Attack->id path not setup!");
+        }
 
         if(count($fighter1Attack->path_segments) < 1) {
             error_log("Fighter 1 attack {$fighter1Attack->id} has no path segments, cannot collide with anything!");
