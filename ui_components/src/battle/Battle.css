@@ -4,9 +4,16 @@
 
 /* BATTLE FIELD */
 .tilesContainer {
+    padding: 0;
+    position: relative;
+    height: 96px;
+
+    margin: -5px; /* Offset the TD padding */
+}
+
+.tileContainer {
+    position: absolute;
     display: flex;
-    justify-content: space-evenly;
-    padding: 10px 0;
 }
 
 .tile {
@@ -21,7 +28,7 @@
     z-index: 2;
 
     background: #948d78;
-    border-radius: 35px;
+    border-radius: 50%;
     border: 1px solid #807a68;
 }
 

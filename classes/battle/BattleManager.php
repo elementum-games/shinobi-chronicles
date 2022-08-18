@@ -961,7 +961,7 @@ class BattleManager {
      * @param string $content
      * @return void
      */
-    private function debug(string $category, string $label, string $content) {
+    private function debug(string $category, string $label, string $content): void {
         if(($this->debug[$category] ?? false) !== true) {
             return;
         }
@@ -970,22 +970,7 @@ class BattleManager {
             $content = "[empty]";
         }
 
-        if($this->is_api_request) {
-            $this->system->debugMessage($label . ': ' . $content);
-            return;
-        }
-
-        echo "<div style='background:#222;
-                color:#e0e0e0;
-                white-space:pre-wrap;
-                padding: 5px 5px 5px 10px;
-                margin: 10px;
-                border: 1px solid #333;
-                '
-        >" .
-            "<p style='font-weight:bold;margin-top:0;'>{$label}</p>" .
-            $content .
-            "</div>";
+        $this->system->debugMessage($label . ': ' . $content);
     }
 
 }

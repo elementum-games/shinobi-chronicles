@@ -5,8 +5,8 @@ import type { FighterType, BattleFieldTileType, JutsuType } from "./battleSchema
 
 type Props = {|
     +player: FighterType,
-    +fighters: { [key: string]: FighterType },
-    +fighterLocations: { [key: string]: number },
+    +fighters: { [ key: string ]: FighterType },
+    +fighterLocations: { [ key: string ]: number },
     +tiles: $ReadOnlyArray<BattleFieldTileType>,
     +selectedJutsu: ?JutsuType,
     +isMovementPhase: boolean,
@@ -22,36 +22,101 @@ export default function BattleField({
     isMovementPhase,
     onTileSelect
 }: Props): React$Node {
-    const [hoveredTile, setHoveredTile] = React.useState(null);
+    const [tilesToDisplay, setTilesToDisplay] = React.useState(tiles);
 
-    const fightersForIds = (ids: $ReadOnlyArray<string>) => {
-        return ids.map(id => fighters[id]).filter(Boolean)
+    const [containerSize, setContainerSize] = React.useState(null);
+
+    const containerRef = React.useRef(null);
+    const setContainerRef = (el) => {
+        console.log(containerRef.current, el);
+        containerRef.current = el;
     };
 
-    const playerLocation = fighterLocations[player.id];
-    if(playerLocation == null) {
+    React.useEffect(() => {
+        if(containerRef.current == null) {
+            setContainerSize(containerRef.current);
+        }
+        else {
+            setContainerSize({
+                width: containerRef.current.offsetWidth,
+                height: containerRef.current.offsetHeight
+            });
+        }
+    }, [containerRef.current])
+
+    return (
+        <div className={`tilesContainer`} ref={setContainerRef}>
+            {containerSize != null &&
+                <BattleFieldTiles
+                    containerSize={containerSize}
+                    tiles={tilesToDisplay}
+                    player={player}
+                    fighters={fighters}
+                    fighterLocations={fighterLocations}
+                    isMovementPhase={isMovementPhase}
+                    selectedJutsu={selectedJutsu}
+                    onTileSelect={onTileSelect}
+                />
+            }
+        </div>
+    )
+}
+
+
+type BattleFieldTilesProps = {|
+    +containerSize: {|
+        +width: number,
+        +height: number,
+    |},
+    +tiles: $ReadOnlyArray<BattleFieldTileType>,
+    +player: FighterType,
+    +fighters: { [ key: string ]: FighterType },
+    +fighterLocations: { [ key: string ]: number },
+    +isMovementPhase: boolean,
+    +selectedJutsu: ?JutsuType,
+    +onTileSelect: (tileIndex: number) => void,
+|};
+function BattleFieldTiles({
+    containerSize,
+    tiles,
+    player,
+    fighters,
+    fighterLocations,
+    isMovementPhase,
+    selectedJutsu,
+    onTileSelect
+}) {
+    const [hoveredTile, setHoveredTile] = React.useState(null);
+
+    const tileSize = 70;
+
+    const fightersForIds = (ids: $ReadOnlyArray<string>) => {
+        return ids.map(id => fighters[ id ]).filter(Boolean)
+    };
+
+    const playerLocation = fighterLocations[ player.id ];
+    if (playerLocation == null) {
         throw new Error("Invalid player location!");
     }
 
     const distanceToPlayer = (tileIndex: number) => {
         return Math.abs(tileIndex - playerLocation);
     };
-
     const shouldShowAttackTarget = (tile) => {
-        if(selectedJutsu == null) {
+        if (selectedJutsu == null) {
             return false;
         }
 
-        if(selectedJutsu.targetType === "tile") {
+        if (selectedJutsu.targetType === "tile") {
             return selectedJutsu
                 ? distanceToPlayer(tile.index) <= selectedJutsu.range
                 : false
         }
-        else if(selectedJutsu.targetType === "fighter_id") {
+        else if (selectedJutsu.targetType === "fighter_id") {
             return true;
         }
-        else if(selectedJutsu.targetType === "direction") {
-            if(tile.index === playerLocation) {
+        else if (selectedJutsu.targetType === "direction") {
+            if (tile.index === playerLocation) {
                 return false;
             }
 
@@ -63,27 +128,50 @@ export default function BattleField({
         return false;
     };
     const shouldShowAttackPreview = (tile) => {
-        if(selectedJutsu == null || selectedJutsu.targetType !== "direction") {
+        if (selectedJutsu == null || selectedJutsu.targetType !== "direction") {
             return false;
         }
-        if(hoveredTile == null) {
+        if (hoveredTile == null) {
             return false;
         }
 
         return distanceToPlayer(tile.index) <= selectedJutsu.range &&
             distanceToPlayer(hoveredTile) <= selectedJutsu.range &&
             (
-            (hoveredTile > playerLocation && tile.index > playerLocation)
-            ||
-            (hoveredTile < playerLocation && tile.index < playerLocation)
-        );
+                (hoveredTile > playerLocation && tile.index > playerLocation)
+                ||
+                (hoveredTile < playerLocation && tile.index < playerLocation)
+            );
     };
 
-    return (
-        <div className={`tilesContainer`}>
-            {tiles.map((tile) => (
+    const freeWidth = containerSize.width - (tileSize * tiles.length);
+    const freeHeight = containerSize.height - tileSize;
+    if(freeWidth < 0) {
+        throw new Error("Rendering too many tiles!");
+    }
+    if(freeHeight < 0) {
+        throw new Error("Container is not tall enough!");
+    }
+
+    const leftPadding = freeWidth / (tiles.length + 1); // + 1 so we have an equal margin to the right of the last tile
+    const topPadding = freeHeight / 2;
+    console.log("left padding", leftPadding);
+
+
+    return <React.Fragment>
+        {tiles.map((tile, i) => {
+            const cumulativeLeftPadding = leftPadding * (i + 1);
+            const cumulativeTileWidth = tileSize * i;
+
+            const tileStyles = {
+                width: tileSize,
+                height: tileSize,
+                top: topPadding,
+                left: cumulativeTileWidth + cumulativeLeftPadding,
+            };
+
+            return <div className="tileContainer" style={tileStyles} key={tile.index}>
                 <BattleFieldTile
-                    key={tile.index}
                     index={tile.index}
                     fighters={fightersForIds(tile.fighterIds)}
                     canMoveTo={isMovementPhase/* && !tile.fighterIds.includes(player.id)*/}
@@ -93,9 +181,9 @@ export default function BattleField({
                     onMouseEnter={() => setHoveredTile(tile.index)}
                     onMouseLeave={() => setHoveredTile(null)}
                 />
-            ))}
-        </div>
-    )
+            </div>;
+        })}
+    </React.Fragment>;
 }
 
 function BattleFieldTile({
@@ -109,13 +197,13 @@ function BattleFieldTile({
     onMouseLeave
 }) {
     const classes = ['tile'];
-    if(canMoveTo) {
+    if (canMoveTo) {
         classes.push('movementTarget');
     }
-    if(showAttackTarget) {
+    if (showAttackTarget) {
         classes.push('attackTarget');
     }
-    if(showAttackPreview) {
+    if (showAttackPreview) {
         classes.push('attackPreview');
     }
 
