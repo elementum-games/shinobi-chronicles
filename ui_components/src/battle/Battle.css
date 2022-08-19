@@ -4,9 +4,8 @@
 
 /* BATTLE FIELD */
 .tilesContainer {
-    padding: 0;
+    padding: 20px 0;
     position: relative;
-    height: 96px;
 
     margin: -5px; /* Offset the TD padding */
 }
@@ -14,11 +13,12 @@
 .tileContainer {
     position: absolute;
     display: flex;
+    z-index: 1;
 }
 
 .tile {
-    height: 70px;
-    width: 70px;
+    height: 100%;
+    width: 100%;
 
     display: inline-flex;
     position: relative;
@@ -45,14 +45,15 @@
 }
 
 .tileFighter {
-    height: 30px;
-    width: 30px;
     display: flex;
     align-items: center;
     justify-content: center;
 
+    position: absolute;
+    z-index: 2;
+
     background: rgba(255, 255, 255, 0.5);
-    border-radius: 15px;
+    border-radius: 50%;
     border: 1px solid rgba(0, 0, 0, 0.4);
     color: black;
 }
