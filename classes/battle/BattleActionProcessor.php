@@ -57,6 +57,8 @@ class BattleActionProcessor {
             $this->battle->battle_text .= $this->battle->player2->getName() .
                 ' moved to tile ' . $player2_action->target_tile . '.';
         }
+
+        $this->field->reInit();
     }
 
     /**

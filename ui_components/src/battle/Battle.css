@@ -3,11 +3,19 @@
 }
 
 /* BATTLE FIELD */
-.tilesContainer {
-    padding: 20px 0;
+.battleFieldContainer {
+    padding: 10px 0;
     position: relative;
 
     margin: -5px; /* Offset the TD padding */
+    overflow: hidden;
+}
+
+.tilesContainer {
+    height: 80px;
+
+    position: absolute;
+    transition: transform 500ms ease-in-out;
 }
 
 .tileContainer {
@@ -56,6 +64,8 @@
     border-radius: 50%;
     border: 1px solid rgba(0, 0, 0, 0.4);
     color: black;
+
+    transition: top 400ms linear, left 400ms linear;
 }
 
 .tileFighter.ally {

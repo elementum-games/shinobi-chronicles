@@ -97,6 +97,10 @@ class BattleField {
 
     // PUBLIC MUTATION API
 
+    public function reInit(): void {
+        $this->init();
+    }
+
     /**
      * @param string $fighter_id
      * @param int    $target_tile
