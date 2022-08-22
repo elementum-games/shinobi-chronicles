@@ -15,7 +15,6 @@
     height: 80px;
 
     position: absolute;
-    transition: transform 500ms ease-in-out;
 }
 
 .tileContainer {
@@ -64,8 +63,6 @@
     border-radius: 50%;
     border: 1px solid rgba(0, 0, 0, 0.4);
     color: black;
-
-    transition: top 400ms linear, left 400ms linear;
 }
 
 .tileFighter.ally {

@@ -5,6 +5,7 @@ import BattleActionPrompt from "./BattleActionPrompt.js";
 import { apiFetch } from "../utils/network.js";
 import { findPlayerJutsu } from "./playerUtils.js";
 
+// TODO: Make battle send new battle field
 function Battle({
   battle: initialBattle,
   battleApiLink,

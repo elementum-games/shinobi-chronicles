@@ -20,6 +20,8 @@ type Props = {|
     +onTileSelect: (tileIndex: number) => void,
 |};
 
+const transitionTimeMs = 600;
+
 export default function BattleField({
     player,
     fighters,
@@ -66,7 +68,6 @@ export default function BattleField({
     )
 }
 
-
 type BattleFieldContentProps = {|
     +containerSize: {|
         +width: number,
@@ -93,7 +94,6 @@ function BattleFieldContent({
     onTileSelect
 }: BattleFieldContentProps) {
     const tilesContainerEdgeBuffer = tileSize * 5;
-    const fighterMovementMaxDurationMs = 1000;
 
     /*
      Why a ref for tilesToDisplay? We need to use latest tilesToDisplay value inside the tile transition hook without
@@ -108,25 +108,44 @@ function BattleFieldContent({
     }
 
     const [leftmostVisibleTileIndex, setLeftmostVisibleTileIndex] = React.useState(tiles[0].index);
-    const [rightmostVisibleTileIndex, setRightmostVisibleTileIndex] = React.useState(tiles.slice(-1)[0].index);
+
+    const [numVisibleTiles, setNumVisibleTiles] = React.useState(tiles.length);
+
+    const [manualCameraTilesOffset, setManualCameraTilesOffset] = React.useState(0);
+    const [disableTransitions, setDisableTransitions] = React.useState(false);
 
     debug('----------------');
 
-    debug('leftmostVisibleTileIndex', leftmostVisibleTileIndex);
-    debug('rightmostVisibleTileIndex', rightmostVisibleTileIndex);
+    /* Transition tile display
 
-    /* Transition tile display - Example:
+        Example 1:
             Starting tiles
             | 3 4 5 6 7 |
 
             Add new tiles
         1 2 | 3 4 5 6 7 |
 
+            Animate container over
+            1 2 | 3 4 5 6 7 |
+
             Move(animated) to new visible set
             | 1 2 3 4 5 | 6 7
 
             Remove old tiles
             | 1 2 3 4 5 |
+
+        Example 2:
+            Starting tiles
+            | 3 4 5 6 7 |
+
+            Add new tiles
+        1 2 | 3 4 5 6 7 |
+
+            Animate container over
+            1 2 | 3 4 5 6 7 |
+
+            Disable transitions and update to tiles
+            | 1 2 3 4 5 6 |
      */
     React.useEffect(() => {
         const latestTilesToDisplay = latestTilesToDisplayRef.current;
@@ -144,7 +163,7 @@ function BattleFieldContent({
 
         // Add new tiles
         if(newLeftIndex < leftIndex) {
-            let newTiles = tiles.slice(0, newLeftIndex - leftIndex);
+            let newTiles = tiles.slice(0, leftIndex - newLeftIndex);
             debug('newTiles (left)', newTiles);
 
             setTilesToDisplay([
@@ -168,22 +187,33 @@ function BattleFieldContent({
             return;
         }
 
-        // Move to new visible set
+        // Animated scroll container to show new tiles
+        const scrollContainerDelay = transitionTimeMs + 100;
         setTimeout(() => {
-            debug('Move to new visible set');
-            setLeftmostVisibleTileIndex(newLeftIndex);
-            setRightmostVisibleTileIndex(newRightIndex);
+            debug('Scroll container to new tiles', leftIndex, newLeftIndex);
 
-        }, fighterMovementMaxDurationMs);
+            setManualCameraTilesOffset(newLeftIndex - leftIndex);
+            setNumVisibleTiles(tiles.length);
+        }, scrollContainerDelay);
 
-        // Remove old tiles
+        // Turn off transitions and snap battlefield to new state
         setTimeout(() => {
-            debug('Remove old tiles');
-            // setTilesToDisplay(tiles);
-        }, fighterMovementMaxDurationMs + 500)
+            debug('Switch visible tiles to new visible set', leftIndex, newLeftIndex);
+
+            setDisableTransitions(true);
+
+            requestAnimationFrame(() => {
+                setManualCameraTilesOffset(0);
+                setLeftmostVisibleTileIndex(newLeftIndex);
+                setTilesToDisplay(tiles);
+
+                requestAnimationFrame(() => {
+                    setDisableTransitions(false);
+                })
+            });
+
+        }, scrollContainerDelay + transitionTimeMs + 100);
     }, [tiles]);
-
-    const numVisibleTiles = (rightmostVisibleTileIndex - leftmostVisibleTileIndex) + 1;
 
     const freeWidth = containerSize.width - (tileSize * numVisibleTiles);
     const freeHeight = containerSize.height - tileSize;
@@ -215,20 +245,17 @@ function BattleFieldContent({
         };
     }
 
-    debug('leftmostVisibleTileIndex', leftmostVisibleTileIndex);
-    const leftmostVisibleTilePosition = getBoundingRectForTile(leftmostVisibleTileIndex);
-    debug('leftmostVisibleTilePosition', leftmostVisibleTilePosition)
-
-    //
-    const leftCameraOffset = leftmostVisibleTilePosition.left - tileHorizontalGap;
-    const leftCameraPosition = (tilesContainerEdgeBuffer * -1);
-    debug('leftCameraPosition', leftCameraPosition);
+    const offset = manualCameraTilesOffset * offsetPerTile;
+    const leftCameraPosition = (tilesContainerEdgeBuffer + offset) * -1;
 
     return <div
         className="tilesContainer"
         style={{
             width: containerSize.width + (tilesContainerEdgeBuffer * 2),
-            transform: `translateX(${leftCameraPosition}px)`
+            transform: `translateX(${leftCameraPosition}px)`,
+            transition: disableTransitions
+                ? ""
+                : `transform ${transitionTimeMs}ms ease-in-out`
         }}
     >
         <BattleFieldTiles
@@ -237,12 +264,14 @@ function BattleFieldContent({
             selectedJutsu={selectedJutsu}
             playerLocation={fighterLocations[ player.id ]}
             isMovementPhase={isMovementPhase}
+            disableTransitions={disableTransitions}
             onTileSelect={onTileSelect}
         />
         <BattleFieldFighters
             tileSize={tileSize}
             fighters={fighters}
             fighterLocations={fighterLocations}
+            disableTransitions={disableTransitions}
             getBoundingRectForTile={getBoundingRectForTile}
         />
     </div>;
@@ -254,6 +283,7 @@ type BattleFieldTilesProps = {|
     +selectedJutsu: ?JutsuType,
     +playerLocation: number,
     +isMovementPhase: boolean,
+    +disableTransitions: boolean,
     +onTileSelect: (tileIndex: number) => void,
 |};
 function BattleFieldTiles({
@@ -262,6 +292,7 @@ function BattleFieldTiles({
     selectedJutsu,
     playerLocation,
     isMovementPhase,
+    disableTransitions,
     onTileSelect
 }: BattleFieldTilesProps) {
     const [hoveredTile, setHoveredTile] = React.useState(null);
@@ -317,7 +348,19 @@ function BattleFieldTiles({
             {tilesToDisplay.map((tile) => {
                 const tileBoundingRect = getBoundingRectForTile(tile.index);
 
-                return <div className="tileContainer" style={tileBoundingRect} key={`tile:${tile.index}`}>
+                return <div
+                    key={`tile:${tile.index}`}
+                    className="tileContainer"
+                    style={{
+                        top: tileBoundingRect.top,
+                        left: tileBoundingRect.left,
+                        width: tileBoundingRect.width,
+                        height: tileBoundingRect.height,
+                        transition: disableTransitions
+                            ? ""
+                            : `left ${transitionTimeMs}ms linear`,
+                    }}
+                >
                     <BattleFieldTile
                         index={tile.index}
                         canMoveTo={isMovementPhase/* && !tile.fighterIds.includes(player.id)*/}
@@ -369,12 +412,14 @@ type BattleFieldFightersProps = {|
     +tileSize: number,
     +fighters: { [key: string]: FighterType},
     +fighterLocations: { [ key: string ]: number },
+    +disableTransitions: boolean,
     +getBoundingRectForTile: (tileIndex: number) => BoundingRect,
 |};
 function BattleFieldFighters({
     tileSize,
     fighters,
     fighterLocations,
+    disableTransitions,
     getBoundingRectForTile
 }: BattleFieldFightersProps) {
     const fighterDisplaySize = 25;
@@ -486,11 +531,18 @@ function BattleFieldFighters({
             {fighterIds.map(fighterId => {
                 const fighter = fighters[fighterId];
 
+                const transition = disableTransitions
+                    ? ""
+                    : `top ${transitionTimeMs}ms linear, left ${transitionTimeMs}ms linear`;
+
                 return (
                     <div
                         key={`fighter:${fighterId}`}
                         className={`tileFighter ${fighter.isAlly ? 'ally' : 'enemy'}`}
-                        style={fighterPositions[fighter.id]}
+                        style={{
+                            ...fighterPositions[fighter.id],
+                            transition: transition
+                        }}
                     >
                         <FighterAvatar
                             displaySize={fighterDisplaySize}
