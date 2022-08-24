@@ -230,7 +230,7 @@ function userProfile() {
 				if((health + regen) >= max_health){
 					health = max_health;
 				} else {
-					health += regen; //health ignores regen boost
+					health += regen * 2; //health ignores regen boost
 				}
 
 				if((chakra + regen) >= max_chakra){
