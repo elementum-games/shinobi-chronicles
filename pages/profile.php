@@ -227,10 +227,10 @@ function userProfile() {
 			if(remainingtime <= 0){
 				remainingtime = 60;
 
-				if((health + regen) >= max_health){
+				if((health + (regen * 2)) >= max_health){
 					health = max_health;
 				} else {
-					health += regen; //health ignores regen boost
+					health += regen * 2; //health ignores regen boost
 				}
 
 				if((chakra + regen) >= max_chakra){
