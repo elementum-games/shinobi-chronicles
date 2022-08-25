@@ -235,6 +235,7 @@ function userProfile() {
                     if(statusBars[bar][0] + (regen * 2) > statusBars[bar][1])
                     {
                         statusBars[bar][0] = statusBars[bar][1];
+                        statusBars[bar][2] = statusBars[bar][1];
                     }
                     else
                     {
@@ -245,6 +246,7 @@ function userProfile() {
                 else if (statusBars[bar][0] + regen > statusBars[bar][1])
                 {
                     statusBars[bar][0] = statusBars[bar][1];
+                    statusBars[bar][2] = statusBars[bar][1];
                 }
                 else 
                 {
