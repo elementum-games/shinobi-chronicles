@@ -212,55 +212,80 @@ function userProfile() {
 		<script>
 		var remainingtime = " . (59 - $time_since_last_regen) . ";
         var statusBars = {
-            health: [{$player->health}, {$player->max_health}, 0],         
-            chakra: [{$player->chakra}, {$player->max_chakra}, 0],
-            stamina: [{$player->stamina}, {$player->max_stamina}, 0],     
+            health: {
+                current: {$player->health}, 
+                max: {$player->max_health},
+                next_regen: 0
+            },         
+            chakra: {
+                current: {$player->chakra}, 
+                max: {$player->max_chakra}, 
+                next_regen: 0
+            },
+            stamina: {
+                current: {$player->stamina},
+                max: {$player->max_stamina},
+                next_regen: 0 
+            }
         };
 
 		var regen = {$player->regen_rate} + {$player->regen_boost}; //no regen cut
 
-		setInterval(() => {
-
+		setInterval(() => 
+		{
+            
 			$('#regentimer').text(remainingtime); //minus 1 to compensate for lag
 
 
 			if(remainingtime <= 0){
 				remainingtime = 60;
 
-			//update health amounts / bars
-			for (const bar in statusBars)
-			{            
-                if(bar === 'health')
+                //Check each bar to see if regen will exceed max.
+                if(statusBars.health.current + (regen * 2) > statusBars.health.max)
                 {
-                    if(statusBars[bar][0] + (regen * 2) > statusBars[bar][1])
-                    {
-                        statusBars[bar][0] = statusBars[bar][1];
-                        statusBars[bar][2] = statusBars[bar][1];
-                    }
-                    else
-                    {
-                        statusBars[bar][0] += (regen * 2);
-                        statusBars[bar][2] =  statusBars[bar][0] + (regen * 2);
-                    }                                
+                    statusBars.health.current = statusBars.health.max;
+                    statusBars.health.next_regen = statusBars.health.max;
                 }
-                else if (statusBars[bar][0] + regen > statusBars[bar][1])
+                else
                 {
-                    statusBars[bar][0] = statusBars[bar][1];
-                    statusBars[bar][2] = statusBars[bar][1];
+                    statusBars.health.current += (regen * 2);
+                    statusBars.health.next_regen = statusBars.health.current + (regen * 2);
                 }
-                else 
+                
+                //Check Chakra Bar
+                if(statusBars.chakra.current + regen > statusBars.chakra.max)
                 {
-                    statusBars[bar][0] += regen;
-                    statusBars[bar][2] =  statusBars[bar][0] + regen;
+                    statusBars.chakra.current = statusBars.chakra.max;
+                    statusBars.chakra.next_regen = statusBars.chakra.max; 
                 }
-                //console.log(bar, statusBars[bar]);
-                if(bar.startsWith('max')) continue;
-                $('#' + bar).html((statusBars[bar][0] == statusBars[bar][1])? statusBars[bar][0].toFixed(2) + '/' + statusBars[bar][1].toFixed(2) : statusBars[bar][0].toFixed(2) + '/' + statusBars[bar][1].toFixed(2) + '-> <b style=\'color: green\'>' + statusBars[bar][2].toFixed(2) + '</b>');
-			    $('#' + bar + 'bar').val(statusBars[bar][0]);  
-            };
-            
-
-			
+                else
+                {
+                    statusBars.chakra.current += regen ;
+                    statusBars.chakra.next_regen = statusBars.chakra.current + regen;  
+                }
+                //Check Stamina Bar
+                if(statusBars.stamina.current + regen > statusBars.stamina.max)
+                {
+                    statusBars.stamina.current = statusBars.stamina.max;
+                    statusBars.stamina.next_regen = statusBars.stamina.max; 
+                }
+                else
+                {
+                    statusBars.stamina.current += regen ;
+                    statusBars.stamina.next_regen = statusBars.stamina.current + regen;  
+                }
+                
+                //Update Health Bar
+                $('#health').html((statusBars.health.current === statusBars.health.max)? statusBars.health.current.toFixed(2) + '/' + statusBars.health.max.toFixed(2) : statusBars.health.current.toFixed(2) + '/' + statusBars.health.max.toFixed(2) + '-> <b style=\'color: green\'>' + statusBars.health.next_regen.toFixed(2) + '</b>');
+                $('#healthbar').val(statusBars.health.current);
+                
+                //Update Chakra Bar
+                $('#chakra').html((statusBars.chakra.current === statusBars.chakra.max)? statusBars.chakra.current.toFixed(2) + '/' + statusBars.chakra.max.toFixed(2) : statusBars.chakra.current.toFixed(2) + '/' + statusBars.chakra.max.toFixed(2) + '-> <b style=\'color: green\'>' + statusBars.chakra.next_regen.toFixed(2) + '</b>');
+                $('#chakrabar').val(statusBars.chakra.current);	
+                
+                //Update Stamina Bar
+                $('#stamina').html((statusBars.stamina.current === statusBars.stamina.max)? statusBars.stamina.current.toFixed(2) + '/' + statusBars.stamina.max.toFixed(2) : statusBars.stamina.current.toFixed(2) + '/' + statusBars.stamina.max.toFixed(2) + '-> <b style=\'color: green\'>' + statusBars.stamina.next_regen.toFixed(2) + '</b>');
+                $('#staminabar').val(statusBars.stamina.current);	
 			}
 
 			remainingtime--;
