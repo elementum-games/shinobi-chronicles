@@ -241,39 +241,19 @@ function userProfile() {
 				remainingtime = 60;
 
                 //Check each bar to see if regen will exceed max.
-                if(statusBars.health.current + (regen * 2) > statusBars.health.max)
-                {
-                    statusBars.health.current = statusBars.health.max;
-                    statusBars.health.next_regen = statusBars.health.max;
-                }
-                else
-                {
-                    statusBars.health.current += (regen * 2);
-                    statusBars.health.next_regen = statusBars.health.current + (regen * 2);
-                }
+                let healthRegen = regen * 2;
+                
+                statusBars.health.current = Math.min(statusBars.health.current + healthRegen, statusBars.health.max);
+                statusBars.health.next_regen = Math.min(statusBars.health.current + healthRegen, statusBars.health.max);
                 
                 //Check Chakra Bar
-                if(statusBars.chakra.current + regen > statusBars.chakra.max)
-                {
-                    statusBars.chakra.current = statusBars.chakra.max;
-                    statusBars.chakra.next_regen = statusBars.chakra.max; 
-                }
-                else
-                {
-                    statusBars.chakra.current += regen ;
-                    statusBars.chakra.next_regen = statusBars.chakra.current + regen;  
-                }
+                statusBars.chakra.current = Math.min(statusBars.chakra.current + regen, statusBars.chakra.max);
+                statusBars.chakra.next_regen = Math.min(statusBars.chakra.current + regen, statusBars.chakra.max);
+                
                 //Check Stamina Bar
-                if(statusBars.stamina.current + regen > statusBars.stamina.max)
-                {
-                    statusBars.stamina.current = statusBars.stamina.max;
-                    statusBars.stamina.next_regen = statusBars.stamina.max; 
-                }
-                else
-                {
-                    statusBars.stamina.current += regen ;
-                    statusBars.stamina.next_regen = statusBars.stamina.current + regen;  
-                }
+                statusBars.stamina.current = Math.min(statusBars.stamina.current + regen, statusBars.stamina.max);
+                statusBars.stamina.next_regen = Math.min(statusBars.stamina.current + regen, statusBars.stamina.max);
+                
                 
                 //Update Health Bar
                 $('#health').html((statusBars.health.current === statusBars.health.max)? statusBars.health.current.toFixed(2) + '/' + statusBars.health.max.toFixed(2) : statusBars.health.current.toFixed(2) + '/' + statusBars.health.max.toFixed(2) + '-> <b style=\'color: green\'>' + statusBars.health.next_regen.toFixed(2) + '</b>');
@@ -296,7 +276,11 @@ function userProfile() {
 		//can't figure out why? its like the Regen changes every other minute in intervals or it doubles
 		//can't find the error with my script
 		//can't seem to find out where the error is, need help.
-
+		
+		function updateBarValue(bar)
+		{
+            
+		}
 		</script>
 		";
 
