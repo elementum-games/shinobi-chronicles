@@ -163,37 +163,41 @@ function userProfile() {
         }
         $exp_width = round($exp_percent * 2);
 
-        $health_percent = round(($player->health / $player->max_health) * 100);
-        $chakra_percent = round(($player->chakra / $player->max_chakra) * 100);
-        $stamina_percent = round(($player->stamina / $player->max_stamina) * 100);
-
-        echo "<td style='width:50%;'>
-		<label style='width:6.7em;'>Health:</label>" .
-            "<span id='health'>" . sprintf("%.2f", $player->health) . '/' . sprintf("%.2f", $player->max_health) . "</span><br />" .
-
-            "<div style='height:6px;width:250px;border-style:solid;border-width:1px;'>" .
-            "<div id='healthbar' style='background-color:#C00000;height:6px;width:" . $health_percent . "%;' /></div>" . "</div>" .
-            "<label style='width:6.7em;'>Chakra:</label>" .
-            "<span id='chakra'>" . sprintf("%.2f", $player->chakra) . '/' . sprintf("%.2f", $player->max_chakra) . "</span><br />" .
-
-            "<div style='height:6px;width:250px;border-style:solid;border-width:1px;'>" .
-            "<div id='chakrabar' style='background-color:#0000B0;height:6px;width:" . $chakra_percent . "%;' /></div>" . "</div>" .
-            "<label style='width:6.7em;'>Stamina:</label>" .
-            "<span id='stamina'>" . sprintf("%.2f", $player->stamina) . '/' . sprintf("%.2f", $player->max_stamina) . "</span><br />" .
-
-            "<div style='height:6px;width:250px;border-style:solid;border-width:1px;'>" .
-            "<div id='staminabar' style='background-color:#00B000;height:6px;width:" . $stamina_percent . "%;' /></div>" . "</div>" .
-            "<br />
-		Regeneration Rate: " . $player->regen_rate;
-
         $regen_cut = 0;
         if($player->battle_id or isset($_SESSION['ai_id'])) {
             $regen_cut = round(($player->regen_rate + $player->regen_boost) * 0.7, 1);
         }
 
+        $health_after_regen = ($player->health + ($player->regen_rate + $player->regen_boost - $regen_cut) * 2 > $player->max_health)? $player->max_health : $player->health + (($player->regen_rate + $player->regen_boost - $regen_cut) * 2);
+        $chakra_after_regen = ($player->chakra + ($player->regen_rate + $player->regen_boost - $regen_cut) > $player->max_chakra)? $player->max_chakra : $player-chakra + ($player->regen_rate + $player->regen_boost - $regen_cut);
+        $stamina_after_regen = ($player->stamina + ($player->regen_rate + $player->regen_boost - $regen_cut) > $player->max_stamina)? $player->max_stamina : $player->stamina + ($player->regen_rate + $player->regen_boost - $regen_cut);
+
+        $total_regen_rate = $player->regen_rate + $player->regen_boost - $regen_cut;
+
+        echo "<td style='width:50%;'>
+		<label style='width:6.7em;' for='healthbar'>Health:</label>" .
+            "<span id='health'>" . sprintf("%.2f", $player->health) .'/' . sprintf("%.2f", $player->max_health) . ($player->health != $player->max_health ? " -> <b style='color: green;'>" . sprintf("%.2f",$health_after_regen) . "</b>" : "") . "</span><br />" .
+
+            "<div style='height:6px;width:250px;border-style:solid;border-width:1px;border-radius: 4px;'>" .
+            "<progress id='healthbar' style='accent-color:#C00000;height:6px;width: 100%;' value='" . $player->health . "' max='" . $player->max_health . "'/></div>" . "</div>" .
+            "<label style='width:6.7em;' for='chakrabar'>Chakra:</label>" .
+            "<span id='chakra'>" . sprintf("%.2f", $player->chakra) . '/' . sprintf("%.2f", $player->max_chakra) . ($player->chakra != $player->max_chakra ? " -> <b style='color: green;'>" . sprintf("%.2f",$chakra_after_regen) . "</b>" : "") . "</span><br />" .
+
+            "<div style='height:6px;width:250px;border-style:solid;border-width:1px;border-radius: 4px;'>" .
+            "<progress id='chakrabar' style='accent-color:#0000B0;height:6px;width:100%;' value='" . $player->chakra . "' max='" . $player->max_chakra . "'/></div>" . "</div>" .
+            "<label style='width:6.7em;' for='staminabar'>Stamina:</label>" .
+            "<span id='stamina'>" . sprintf("%.2f", $player->stamina) . '/' . sprintf("%.2f", $player->max_stamina) . ($player->stamina != $player->max_stamina ? " -> <b style='color: green;'>" . sprintf("%.2f",$stamina_after_regen) . "</b>" : "") . "</span><br />" .
+
+            "<div style='height:6px;width:250px;border-style:solid;border-width:1px;border-radius: 4px;'>" .
+            "<progress id='staminabar' style='accent-color:#00B000;height:6px;width:100%;' value='" . $player->stamina . "' max='" . $player->max_stamina . "'/></div>" . "</div>" .
+            "<br />
+		Regeneration Rate: " . $player->regen_rate;
+
+
+
         if($player->regen_boost) {
             echo " (+" . $player->regen_boost . ") " . ($regen_cut ? "<span style='color:#8A0000;'>(-{$regen_cut})</span> " : "") .
-                "-> <span style='color:#00C000;'>" . ($player->regen_rate + $player->regen_boost - $regen_cut) . "</span>";
+                "-> <span style='color:#00C000;'>" . ($total_regen_rate) . "</span>";
         }
         else if(isset($regen_cut)) {
 
@@ -207,53 +211,54 @@ function userProfile() {
         echo "
 		<script>
 		var remainingtime = " . (59 - $time_since_last_regen) . ";
-
-		var health = {$player->health};
-		var max_health = {$player->max_health};
-
-		var chakra = {$player->chakra};
-		var max_chakra = {$player->max_chakra};
-
-		var stamina = {$player->stamina};
-		var max_stamina = {$player->max_stamina};
+        var statusBars = {
+            health: [{$player->health}, {$player->max_health}, 0],         
+            chakra: [{$player->chakra}, {$player->max_chakra}, 0],
+            stamina: [{$player->stamina}, {$player->max_stamina}, 0],     
+        };
 
 		var regen = {$player->regen_rate} + {$player->regen_boost}; //no regen cut
 
 		setInterval(() => {
 
-			document.getElementById('regentimer').innerHTML = remainingtime; //minus 1 to compensate for lag
+			$('#regentimer').text(remainingtime); //minus 1 to compensate for lag
 
 
 			if(remainingtime <= 0){
 				remainingtime = 60;
 
-				if((health + (regen * 2)) >= max_health){
-					health = max_health;
-				} else {
-					health += regen * 2; //health ignores regen boost
-				}
-
-				if((chakra + regen) >= max_chakra){
-					chakra = max_chakra;
-				} else {
-					chakra += regen;
-				}
-
-				if((stamina + regen) >= max_stamina){
-					stamina = max_stamina;
-				} else {
-					stamina += regen;
-				}
-
 			//update health amounts / bars
-			document.getElementById('health').innerHTML = health.toFixed(2) + '/' + max_health.toFixed(2);
-			document.getElementById('healthbar').style.width = ( health / max_health )*100 + '%';
+			for (const bar in statusBars)
+			{            
+                if(bar === 'health')
+                {
+                    if(statusBars[bar][0] + (regen * 2) > statusBars[bar][1])
+                    {
+                        statusBars[bar][0] = statusBars[bar][1];
+                    }
+                    else
+                    {
+                        statusBars[bar][0] += (regen * 2);
+                        statusBars[bar][2] =  statusBars[bar][0] + (regen * 2);
+                    }                                
+                }
+                else if (statusBars[bar][0] + regen > statusBars[bar][1])
+                {
+                    statusBars[bar][0] = statusBars[bar][1];
+                }
+                else 
+                {
+                    statusBars[bar][0] += regen;
+                    statusBars[bar][2] =  statusBars[bar][0] + regen;
+                }
+                //console.log(bar, statusBars[bar]);
+                if(bar.startsWith('max')) continue;
+                $('#' + bar).html((statusBars[bar][0] == statusBars[bar][1])? statusBars[bar][0].toFixed(2) + '/' + statusBars[bar][1].toFixed(2) : statusBars[bar][0].toFixed(2) + '/' + statusBars[bar][1].toFixed(2) + '-> <b style=\'color: green\'>' + statusBars[bar][2].toFixed(2) + '</b>');
+			    $('#' + bar + 'bar').val(statusBars[bar][0]);  
+            };
+            
 
-			document.getElementById('chakra').innerHTML = chakra.toFixed(2) + '/' + max_chakra.toFixed(2);
-			document.getElementById('chakrabar').style.width = ( chakra / max_chakra )*100 + '%';
-
-			document.getElementById('stamina').innerHTML = stamina.toFixed(2) + '/' + max_stamina.toFixed(2);
-			document.getElementById('staminabar').style.width = ( stamina / max_stamina )*100 + '%';
+			
 			}
 
 			remainingtime--;
