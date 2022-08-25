@@ -169,7 +169,7 @@ function userProfile() {
         }
 
         $health_after_regen = ($player->health + ($player->regen_rate + $player->regen_boost - $regen_cut) * 2 > $player->max_health)? $player->max_health : $player->health + (($player->regen_rate + $player->regen_boost - $regen_cut) * 2);
-        $chakra_after_regen = ($player->chakra + ($player->regen_rate + $player->regen_boost - $regen_cut) > $player->max_chakra)? $player->max_chakra : $player-chakra + ($player->regen_rate + $player->regen_boost - $regen_cut);
+        $chakra_after_regen = ($player->chakra + ($player->regen_rate + $player->regen_boost - $regen_cut) > $player->max_chakra)? $player->max_chakra : $player->chakra + ($player->regen_rate + $player->regen_boost - $regen_cut);
         $stamina_after_regen = ($player->stamina + ($player->regen_rate + $player->regen_boost - $regen_cut) > $player->max_stamina)? $player->max_stamina : $player->stamina + ($player->regen_rate + $player->regen_boost - $regen_cut);
 
         $total_regen_rate = $player->regen_rate + $player->regen_boost - $regen_cut;
