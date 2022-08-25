@@ -168,11 +168,12 @@ function userProfile() {
             $regen_cut = round(($player->regen_rate + $player->regen_boost) * 0.7, 1);
         }
 
-        $health_after_regen = ($player->health + ($player->regen_rate + $player->regen_boost - $regen_cut) * 2 > $player->max_health)? $player->max_health : $player->health + (($player->regen_rate + $player->regen_boost - $regen_cut) * 2);
-        $chakra_after_regen = ($player->chakra + ($player->regen_rate + $player->regen_boost - $regen_cut) > $player->max_chakra)? $player->max_chakra : $player->chakra + ($player->regen_rate + $player->regen_boost - $regen_cut);
-        $stamina_after_regen = ($player->stamina + ($player->regen_rate + $player->regen_boost - $regen_cut) > $player->max_stamina)? $player->max_stamina : $player->stamina + ($player->regen_rate + $player->regen_boost - $regen_cut);
+        $healthRegen = ($player->regen_rate + $player->regen_boost - $regen_cut) * 2;
+        $standardRegen = $player->regen_rate + $player->regen_boost - $regen_cut;
 
-        $total_regen_rate = $player->regen_rate + $player->regen_boost - $regen_cut;
+        $health_after_regen = min($player->health + $healthRegen, $player->max_health);
+        $chakra_after_regen = min($player->chakra + $standardRegen, $player->max_chakra);
+        $stamina_after_regen = min($player->stamina + $standardRegen, $player->max_stamina);
 
         echo "<td style='width:50%;'>
 		<label style='width:6.7em;' for='healthbar'>Health:</label>" .
@@ -197,7 +198,7 @@ function userProfile() {
 
         if($player->regen_boost) {
             echo " (+" . $player->regen_boost . ") " . ($regen_cut ? "<span style='color:#8A0000;'>(-{$regen_cut})</span> " : "") .
-                "-> <span style='color:#00C000;'>" . ($total_regen_rate) . "</span>";
+                "-> <span style='color:#00C000;'>" . ($standardRegen) . "</span>";
         }
         else if(isset($regen_cut)) {
 
@@ -256,15 +257,18 @@ function userProfile() {
                 
                 
                 //Update Health Bar
-                $('#health').html((statusBars.health.current === statusBars.health.max)? statusBars.health.current.toFixed(2) + '/' + statusBars.health.max.toFixed(2) : statusBars.health.current.toFixed(2) + '/' + statusBars.health.max.toFixed(2) + '-> <b style=\'color: green\'>' + statusBars.health.next_regen.toFixed(2) + '</b>');
+                const currentAndMaxHealth = statusBars.health.current.toFixed(2) + '/' + statusBars.health.max.toFixed(2);
+                $('#health').html(currentAndMaxHealth.concat((statusBars.health.current !== statusBars.health.max) ? ('-> <b style=\'color: green\'>' + statusBars.health.next_regen.toFixed(2) + '</b>') : ''));
                 $('#healthbar').val(statusBars.health.current);
                 
                 //Update Chakra Bar
-                $('#chakra').html((statusBars.chakra.current === statusBars.chakra.max)? statusBars.chakra.current.toFixed(2) + '/' + statusBars.chakra.max.toFixed(2) : statusBars.chakra.current.toFixed(2) + '/' + statusBars.chakra.max.toFixed(2) + '-> <b style=\'color: green\'>' + statusBars.chakra.next_regen.toFixed(2) + '</b>');
+                 const currentAndMaxChakra = statusBars.chakra.current.toFixed(2) + '/' + statusBars.chakra.max.toFixed(2);
+                $('#chakra').html(currentAndMaxChakra.concat((statusBars.chakra.current !== statusBars.chakra.max)? ('-> <b style=\'color: green\'>' + statusBars.chakra.next_regen.toFixed(2) + '</b>') : ''));
                 $('#chakrabar').val(statusBars.chakra.current);	
                 
                 //Update Stamina Bar
-                $('#stamina').html((statusBars.stamina.current === statusBars.stamina.max)? statusBars.stamina.current.toFixed(2) + '/' + statusBars.stamina.max.toFixed(2) : statusBars.stamina.current.toFixed(2) + '/' + statusBars.stamina.max.toFixed(2) + '-> <b style=\'color: green\'>' + statusBars.stamina.next_regen.toFixed(2) + '</b>');
+                const currentAndMaxStamina = statusBars.stamina.current.toFixed(2) + '/' + statusBars.stamina.max.toFixed(2);
+                $('#stamina').html(currentAndMaxStamina.concat((statusBars.stamina.current !== statusBars.stamina.max)? ('-> <b style=\'color: green\'>' + statusBars.stamina.next_regen.toFixed(2) + '</b>') : ''));
                 $('#staminabar').val(statusBars.stamina.current);	
 			}
 
