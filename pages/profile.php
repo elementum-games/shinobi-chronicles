@@ -234,7 +234,7 @@ function userProfile() {
 		setInterval(() => 
 		{
             
-			$('#regentimer').text(remainingtime); //minus 1 to compensate for lag
+			document.getElementById('regentimer').innerHTML = remainingtime; //minus 1 to compensate for lag
 
 
 			if(remainingtime <= 0){
