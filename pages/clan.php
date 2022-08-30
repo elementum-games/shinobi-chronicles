@@ -36,6 +36,10 @@ function clan() {
 	if($current_boost_id) {
 		unset($training_boosts[$current_boost_id]);
 	}
+
+    // Kick Idle Time
+    $max_idle_time = time() - (60 * 60 * 24 * 30);
+
 	// Mission stuff
 	$max_mission_rank = 1;
 	if($player->rank == 3) {
@@ -116,6 +120,53 @@ function clan() {
 			$system->printMessage();
 		}
 	}
+    //Kick Controls
+    if($page == 'kick' && $_GET['kick']) {
+        $positions = array (
+            1 => 'leader',
+            2 => 'elder_1',
+            3 => 'elder_2',
+        );
+        try {
+            $kick_player = $_GET['kick'];
+
+            $result = $system->query("SELECT `user_id`, `user_name`,`last_login`, `clan_id`, `clan_office` FROM `users` WHERE `user_id` = '{$kick_player}' LIMIT 1");
+
+            if ($system->db_last_num_rows < 0)
+            {
+                throw new Exception("Invalid User To Kick");
+            }
+            else
+            {
+                $kick_player = $system->db_fetch($result);
+            }
+
+            if (!isset($kick_player["clan_office"]))
+            {
+                throw new Exception("Player isn't currently holding a position");
+
+            }
+            if (isset($kick_playerp["clan_office"]) && $kick_player["last_login"] <= $max_idle_time)
+            {
+                throw new Exception("You must wait for 30 days of inactivity before forcibly kicking a player.");
+            }
+
+
+            // Update clan data
+            $system->query("UPDATE `clans` SET `{$positions[$kick_player['clan_office']]}`='0' WHERE `clan_id`='{$kick_player['clan_id']}' LIMIT 1");
+            // Update player data
+            $system->query("UPDATE `users` SET `clan_office`='0' WHERE `user_id`='{$kick_player['user_id']}' LIMIT 1");
+            // Display message
+            $system->message(sprintf("You have kicked %s from the position of %s!", $kick_player['user_name'], ucfirst($positions[$kick_player['clan_office']])));
+            $page = 'HQ';
+
+        } catch (Exception $e) {
+            $system->message($e->getMessage());
+            $page = 'HQ';
+        }
+        $system->printMessage();
+    }
+
 	// Office controls
 	if($player->clan_office && $page == 'controls') {
 		if($_POST['resign']) {
@@ -401,7 +452,7 @@ function clan() {
 		}
 		// Load data
 		if(count($officers) > 0) {
-			$query = "SELECT `user_name`, `avatar_link`, `clan_office` FROM `users` WHERE `user_id` IN (" . implode(',', $officers) . ")";
+			$query = "SELECT `user_name`, `user_id`, `avatar_link`, `clan_office`, `last_login` FROM `users` WHERE `user_id` IN (" . implode(',', $officers) . ")";
 			$result = $system->query($query);
 			$officers = array();
 			$positions = array(
@@ -432,6 +483,11 @@ function clan() {
 				echo "<img src='" . $officers[$position]['avatar_link'] . "' /><br />
 				<span style='font-weight:bold;'>
 					<a href='{$system->links['members']}&user={$officers[$position]['user_name']}'>" . $officers[$position]['user_name'] . "</a></span><br />";
+
+                if ($officers[$position]['user_id'] != $player->user_id && $officers[$position]['last_login'] <= $max_idle_time)
+                {
+                    echo "<a href='$self_link&page=kick&kick={$officers[$position]['user_id']}'>(Kick)</a>";
+                }
 				if($player->rank >= 4 && $player->clan_office != $position) {
 					// echo "<a href='$self_link&page=challenge&challenge=$position'>(Challenge)</a>";
 				}
