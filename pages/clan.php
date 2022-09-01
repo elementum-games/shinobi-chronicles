@@ -38,7 +38,7 @@ function clan() {
 	}
 
     // Kick Idle Time
-    $max_idle_time = time() - System::MAX_CLAN_HOLDER_IDLE_TIME;
+    $max_idle_time = time() - (System::MAX_CLAN_HOLDER_IDLE_TIME / 2);
 
 	// Mission stuff
 	$max_mission_rank = 1;
@@ -130,7 +130,7 @@ function clan() {
         try {
             $kick_player = $_GET['kick'];
 
-            $result = $system->query("SELECT `user_id`, `user_name`,`last_login`, `clan_id`, `clan_office` FROM `users` WHERE `user_id` = '{$kick_player}' LIMIT 1");
+            $result = $system->query("SELECT `user_id`, `user_name`,`last_login`, `clan_id`, `clan_office`, `staff_level` FROM `users` WHERE `user_id` = '{$kick_player}' LIMIT 1");
 
             if ($system->db_last_num_rows < 0)
             {
@@ -141,14 +141,22 @@ function clan() {
                 $kick_player = $system->db_fetch($result);
             }
 
+            if ($player->staff_level == 0 & $kick_player['staff_level'] > User::STAFF_MODERATOR)
+            {
+                throw new Exception("You cannot kick a staff member.");
+            }
+            if ($player->staff_level < $kick_player['staff_level'])
+            {
+                throw new Exception("You cannot kick a higher ranked staff member.");
+            }
             if (!isset($kick_player["clan_office"]))
             {
                 throw new Exception("Player isn't currently holding a position");
 
             }
-            if (isset($kick_playerp["clan_office"]) && $kick_player["last_login"] <= $max_idle_time)
+            if ($kick_player["last_login"] > $max_idle_time)
             {
-                throw new Exception("You must wait for 30 days of inactivity before forcibly kicking a player.");
+                throw new Exception("You must wait for {$system->time_remaining($kick_player["last_login"] - $max_idle_time)} of inactivity before forcibly kicking this player.");
             }
 
 
@@ -157,7 +165,7 @@ function clan() {
             // Update player data
             $system->query("UPDATE `users` SET `clan_office`='0' WHERE `user_id`='{$kick_player['user_id']}' LIMIT 1");
             // Display message
-            $system->message(sprintf("You have kicked %s from the position of %s!", $kick_player['user_name'], ucfirst($positions[$kick_player['clan_office']])));
+            $system->message(sprintf("You have kicked %s from the position of %s!", $kick_player['user_name'], ucfirst(str_replace('_', ' ', $positions[$kick_player['clan_office']]))));
             $page = 'HQ';
 
         } catch (Exception $e) {
@@ -452,7 +460,7 @@ function clan() {
 		}
 		// Load data
 		if(count($officers) > 0) {
-			$query = "SELECT `user_name`, `user_id`, `avatar_link`, `clan_office`, `last_login` FROM `users` WHERE `user_id` IN (" . implode(',', $officers) . ")";
+			$query = "SELECT `user_name`, `user_id`, `avatar_link`, `clan_office`, `last_login`, `staff_level` FROM `users` WHERE `user_id` IN (" . implode(',', $officers) . ")";
 			$result = $system->query($query);
 			$officers = array();
 			$positions = array(
@@ -484,7 +492,7 @@ function clan() {
 				<span style='font-weight:bold;'>
 					<a href='{$system->links['members']}&user={$officers[$position]['user_name']}'>" . $officers[$position]['user_name'] . "</a></span><br />";
 
-                if ($officers[$position]['user_id'] != $player->user_id && $officers[$position]['last_login'] <= $max_idle_time)
+                if ($officers[$position]['user_id'] != $player->user_id && ($player->staff_level > $officers[$position]['staff_level'] || $officers[$position]['last_login'] <= $max_idle_time))
                 {
                     echo "<a href='$self_link&page=kick&kick={$officers[$position]['user_id']}'>(Kick)</a>";
                 }
