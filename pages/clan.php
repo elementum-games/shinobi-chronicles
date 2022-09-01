@@ -38,7 +38,7 @@ function clan() {
 	}
 
     // Kick Idle Time
-    $max_idle_time = time() - (60 * 60 * 24 * 30);
+    $max_idle_time = time() - System::MAX_CLAN_HOLDER_IDLE_TIME;
 
 	// Mission stuff
 	$max_mission_rank = 1;
