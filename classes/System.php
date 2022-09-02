@@ -666,10 +666,8 @@ class System {
         {
             $contents = json_encode($contents);
         }
-        else
-        {
-            $contents = $this->clean($contents);
-        }
+
+        $contents = $this->clean($contents);
 
         $this->query("INSERT INTO `logs` (`log_type`, `log_title`, `log_time`, `log_contents`)
 			VALUES ('$type', '$title', " . time() . ", '$contents')");
