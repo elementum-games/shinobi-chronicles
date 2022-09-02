@@ -7,7 +7,7 @@ function clean_clan_position_holders()
 {
     global $system;
 
-    $max_idle_time = time(); //- System::MAX_CLAN_HOLDER_IDLE_TIME;
+    $max_idle_time = time() - System::MAX_CLAN_HOLDER_IDLE_TIME;
 
     $result = $system->query("SELECT clans.clan_id, clans.leader, clans.elder_1, clans.elder_2, users.user_name, users.user_id, users.last_login, users.clan_office, users.staff_level FROM clans
         JOIN users ON clans.leader = users.user_id OR clans.elder_1 = users.user_id OR clans.elder_2 = users.user_id
