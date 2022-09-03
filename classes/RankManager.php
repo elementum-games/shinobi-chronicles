@@ -160,4 +160,15 @@ class RankManager {
                 break;
         }
     }
+
+    public static function fetchNames(System $system): array {
+        $result = $system->query("SELECT `rank_id`, `name` FROM `ranks`");
+
+        $rank_names = [];
+        while($rank = $system->db_fetch($result)) {
+            $rank_names[$rank['rank_id']] = $rank['name'];
+        }
+
+        return $rank_names;
+    }
 }

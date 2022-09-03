@@ -276,11 +276,7 @@ if($LOGGED_IN) {
 	$villages = $system->getVillageLocations();
 
 	// Load rank data// Rank names
-	$RANK_NAMES = array();
-	$result = $system->query("SELECT `rank_id`, `name` FROM `ranks`");
-	while($rank = $system->db_fetch($result)) {
-		$RANK_NAMES[$rank['rank_id']] = $rank['name'];
-	}
+	$RANK_NAMES = RankManager::fetchNames($system);
 
 	// Route list
 	$routes = require 'config/routes.php';
