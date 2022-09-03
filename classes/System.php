@@ -142,6 +142,7 @@ class System {
 
     // Misc stuff
     const SC_MAX_RANK = 3;
+    const MAX_CLAN_HOLDER_IDLE_TIME =  (60 * 60 * 24 * 30); // 30 Days
 
     const MAX_LINK_DISPLAY_LENGTH = 60;
 
@@ -660,6 +661,12 @@ class System {
     public function log($type, $title, $contents) {
         $type = $this->clean($type);
         $title = $this->clean($title);
+
+        if (is_array($contents))
+        {
+            $contents = json_encode($contents);
+        }
+
         $contents = $this->clean($contents);
 
         $this->query("INSERT INTO `logs` (`log_type`, `log_title`, `log_time`, `log_contents`)
