@@ -70,11 +70,7 @@ export function JutsuInput({ battle, player, onChange }: JutsuInputProps): React
             numericKey -= 1;
 
             const category = jutsuCategories[selectedCategory];
-            if(category == null) {
-                return;
-            }
-
-            if(category?.jutsu[numericKey] != null) {
+            if(category.jutsu[numericKey] != null) {
                 handleJutsuSelect(selectedCategory, category.jutsu[numericKey]);
             }
         }
