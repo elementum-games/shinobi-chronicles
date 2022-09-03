@@ -55,10 +55,8 @@ export function JutsuInput({ battle, player, onChange }: JutsuInputProps): React
     };
 
     const handleKeyDown = (event: KeyboardEvent) => {
-        // Check for category select
-        for(let categoryKey of Object.keys(jutsuCategories)) {
-            const category = jutsuCategories[categoryKey];
-
+        // $FlowIssue[incompatible-type]: Flow doesn't infer Object.values return type from the argument
+        for(const category: $Values<typeof jutsuCategories> of Object.values(jutsuCategories)) {
             if(event.key === category.initial.toLowerCase() || event.key === category.initial.toUpperCase()) {
                 setSelectedCategory(category.key);
                 return;
