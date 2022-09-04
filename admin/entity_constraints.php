@@ -307,12 +307,12 @@ $constraints['jutsu'] = [
     ],
     'description' => [
         'data_type' => 'string',
-        'input_type' => 'text',
+        'input_type' => 'text_area',
         'max_length' => 200,
     ],
     'battle_text' => [
         'data_type' => 'string',
-        'input_type' => 'text',
+        'input_type' => 'text_area',
         'max_length' => 450,
     ],
     'use_type' => [
