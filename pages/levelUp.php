@@ -333,79 +333,83 @@ function geninExam(System $system, User $player, RankManager $rankManager) {
                 if($system->db_last_num_rows == 0) {
                     $result = $system->query("SELECT `bloodline_id`, `clan_id`, `name` FROM `bloodlines` 
 						WHERE `village`='$player->village' AND `rank` < 5");
-					}
-					
-					if($system->db_last_num_rows == 0) {
-						$bloodline_rolled = false;
-					}
-					
-					// If no bloodlines were found, this flag will have been set to false
-					if($bloodline_rolled) {
-						$bloodlines = array();
-						$count = 0;
-						while($row = $system->db_fetch($result)) {
-							$bloodlines[$row['bloodline_id']] = $row;
-							$count++;
-						}
-						
-						$query = "SELECT ";
-						$x = 0;
-						foreach($bloodlines as $id => $bloodline) {
-							$query .= "SUM(IF(`bloodline_id` = $id, 1, 0)) as `$id`";
-							$x++;
-							if($x < $count) {
-								$query .= ', ';
-							}
-						}
-						$query .= " FROM `users`";
-						
-						$bloodline_counts = array();
-						$result = $system->query($query);
-						$row = $system->db_fetch($result);
-						$total_users = 0;
-						foreach($row as $id => $user_count) {
-							$bloodline_counts[$id] = $user_count;
-							$total_users += $user_count;
-						}
-						
-						$average_users = round($total_users / $count);
-						
-						$bloodline_rolls = array();
-						foreach($bloodlines as $id => $bloodline) {
-							$entries = 4;
-							if($bloodline_counts[$id] > $average_users) {
-								$entries--;
-								if($bloodline_counts[$id] / 3 > $average_users) {
-									$entries--;
-								}
-								
-								
-							}
-							for($i = 0; $i < $entries; $i++) {
-								$bloodline_rolls[] = $id;
-							}
-						}
-						
-						$bloodline_id = $bloodline_rolls[mt_rand(0, count($bloodline_rolls) - 1)];	
-						$bloodline_name = $bloodlines[$bloodline_id]['name'];
-						
-						$result = $system->query("SELECT `name` FROM `clans` WHERE `clan_id`='" . $bloodlines[$bloodline_id]['clan_id'] . "'");
-						if($system->db_last_num_rows > 0) {
-							$result = $system->db_fetch($result);
-							$clan_name = $result['name'];
-							$player->clan = array();
-							$player->clan['id'] = $bloodlines[$bloodline_id]['clan_id'];
-							$player->clan_office = 0;
-						}
-						
-						// Give bloodline
-						Bloodline::giveBloodline(system: $system, bloodline_id: $bloodline_id, user_id: $player->user_id);
-					}
-				}
-				
-				// Clan roll(failsafe if no bloodlines were found on bl roll)
-				if(!$bloodline_rolled) {
-					$result = $system->query("SELECT `clan_id`, `name` FROM `clans` 
+                }
+
+                if($system->db_last_num_rows == 0) {
+                    $bloodline_rolled = false;
+                }
+
+                // If no bloodlines were found, this flag will have been set to false
+                if($bloodline_rolled) {
+                    $bloodlines = array();
+                    $count = 0;
+                    while($row = $system->db_fetch($result)) {
+                        $bloodlines[$row['bloodline_id']] = $row;
+                        $count++;
+                    }
+
+                    $query = "SELECT ";
+                    $x = 0;
+                    foreach($bloodlines as $id => $bloodline) {
+                        $query .= "SUM(IF(`bloodline_id` = $id, 1, 0)) as `$id`";
+                        $x++;
+                        if($x < $count) {
+                            $query .= ', ';
+                        }
+                    }
+                    $query .= " FROM `users`";
+
+                    $bloodline_counts = array();
+                    $result = $system->query($query);
+                    $row = $system->db_fetch($result);
+                    $total_users = 0;
+                    foreach($row as $id => $user_count) {
+                        $bloodline_counts[$id] = $user_count;
+                        $total_users += $user_count;
+                    }
+
+                    $average_users = round($total_users / $count);
+
+                    $bloodline_rolls = array();
+                    foreach($bloodlines as $id => $bloodline) {
+                        $entries = 4;
+                        if($bloodline_counts[$id] > $average_users) {
+                            $entries--;
+                            if($bloodline_counts[$id] / 3 > $average_users) {
+                                $entries--;
+                            }
+
+
+                        }
+                        for($i = 0; $i < $entries; $i++) {
+                            $bloodline_rolls[] = $id;
+                        }
+                    }
+
+                    $bloodline_id = $bloodline_rolls[mt_rand(0, count($bloodline_rolls) - 1)];
+                    $bloodline_name = $bloodlines[$bloodline_id]['name'];
+
+                    $result = $system->query("SELECT `name` FROM `clans` WHERE `clan_id`='" . $bloodlines[$bloodline_id]['clan_id'] . "'");
+                    if($system->db_last_num_rows > 0) {
+                        $result = $system->db_fetch($result);
+                        $clan_name = $result['name'];
+                        $player->clan = array();
+                        $player->clan['id'] = $bloodlines[$bloodline_id]['clan_id'];
+                        $player->clan_office = 0;
+                    }
+
+                    // Give bloodline
+                    Bloodline::giveBloodline(
+                        system: $system,
+                        bloodline_id: $bloodline_id,
+                        user_id: $player->user_id
+                    );
+                }
+            }
+
+            // Clan roll(failsafe if no bloodlines were found on bl roll)
+            if(!$bloodline_rolled) {
+                $result = $system->query("SELECT `clan_id`, `name` FROM `clans` 
 						WHERE `village`='$player->village' AND `bloodline_only`='0'");
                 if($system->db_last_num_rows == 0) {
                     $result = $system->query("SELECT `clan_id`, `name` FROM `clans` 
