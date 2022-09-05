@@ -1030,7 +1030,9 @@ class BattleActionProcessor {
          * For a pair of intersecting attacks, find their collision points (so the rest of the attack can be weakened)
          */
         foreach($colliding_attack_pairs as $colliding_attack_pair) {
+            /** @var BattleAttack $attack1 */
             $attack1 = $colliding_attack_pair[0];
+            /** @var BattleAttack $attack2 */
             $attack2 = $colliding_attack_pair[1];
 
             $collision_id = self::collisionId($attack1, $attack2);
@@ -1065,6 +1067,44 @@ class BattleActionProcessor {
             }
             if($attack2_collision_point == null) {
                 $attack2_collision_point = self::findSameTileCollisionPoint($attack2, $attack1, $segments_by_tile_and_attack);
+            }
+
+            $debug(BattleManager::DEBUG_ATTACK_COLLISION, 'second_collision_points', json_encode([
+                'attack1' => $attack1_collision_point,
+                'attack2' => $attack2_collision_point,
+            ]));
+
+            /*
+             * Only known scenario for this - Crossing direction attacks where they do not intersect at close enough
+               times for one attack (top in this example) to find a next tile collision point (because they happen after
+                the top attack is finished traveling). But we want attacks to still collide in all cases they overlap,
+                so we need to set a collision point on the top one.
+
+                Best way I can think of to do this is use the other attack's collision point, then adjust to the closest
+                tile actually found in the other attack.
+
+                   1 2 3 >
+                 < 7 6 5 4 3 2 1
+             */
+            if($attack1_collision_point == null && $attack2_collision_point == null) {
+                throw new Exception("No collision points found!");
+            }
+
+            if($attack1_collision_point == null && $attack2_collision_point != null) {
+                $attack1_collision_point = self::findClosestTileInAttackPath($attack2_collision_point, $attack1);
+
+                $debug(BattleManager::DEBUG_ATTACK_COLLISION, 'half_collision_fixed', json_encode([
+                    'attack1' => $attack1_collision_point,
+                    'attack2' => $attack2_collision_point,
+                ]));
+            }
+            else if($attack2_collision_point == null && $attack1_collision_point != null) {
+                $attack2_collision_point = self::findClosestTileInAttackPath($attack1_collision_point, $attack2);
+
+                $debug(BattleManager::DEBUG_ATTACK_COLLISION, 'half_collision_fixed', json_encode([
+                    'attack1' => $attack1_collision_point,
+                    'attack2' => $attack2_collision_point,
+                ]));
             }
 
             /*
@@ -1200,6 +1240,24 @@ class BattleActionProcessor {
         }
 
         return null;
+    }
+
+    public static function findClosestTileInAttackPath(int $tile_index, BattleAttack $attack): int {
+        $first_segment = $attack->path_segments[0];
+        $last_segment = $attack->path_segments[array_key_last($attack->path_segments)];
+
+        $min_segment_tile = min($last_segment->tile->index, $first_segment->tile->index);
+        $max_segment_tile = max($last_segment->tile->index, $first_segment->tile->index);
+
+        if($tile_index > $max_segment_tile) {
+            return $max_segment_tile;
+        }
+        else if($tile_index < $min_segment_tile) {
+            return $min_segment_tile;
+        }
+        else {
+            return $tile_index;
+        }
     }
 }
 

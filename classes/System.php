@@ -966,6 +966,17 @@ class System {
         return ucwords(str_replace('_', ' ', $slug));
     }
 
+    public static function getEchoDebugClosure(): Closure {
+        return function ($category, $label, $contents) {
+            if(php_sapi_name() == "cli") {
+                echo "\r\nDEBUG ($label)\r\n" . $contents . "\r\n";
+            }
+            else {
+                echo "<br />DEBUG ($label)<br />" . $contents . "<br />";
+            }
+        };
+    }
+
     public static function currentYear(): int {
         return (int) date('Y', time());
     }

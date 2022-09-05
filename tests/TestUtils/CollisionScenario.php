@@ -201,6 +201,21 @@ class CollisionScenario {
                 left_attack_target: new \AttackTileTarget(3),
             ),
 
+            /*
+             *   1 2 3 >
+             *   < 7 6 5 4 3 2 1
+             */
+            10 => new CollisionScenario(
+                distance: 8,
+                leftAttackUser: $leftFighter,
+                rightAttackUser: $rightFighter,
+                leftAttackRange: 3,
+                rightAttackRange: 7,
+                leftAttackSpeed: 1,
+                rightAttackSpeed: 1,
+                expected_left_attack_collision_point: 3,
+                expected_right_attack_collision_point: 4,
+            ),
         ];
     }
 }

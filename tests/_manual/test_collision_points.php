@@ -20,7 +20,7 @@ function runSimulation(): void {
         foreach($scenarios as $index => $scenario) {
             $battle = new Battle($system, $leftAttackUser, 1);
             $battle->raw_field = json_encode([
-                'fighter_locations' => $scenario->getFighterLocations()
+                'fighter_locations' => $scenario->getFighterLocations(),
             ]);
 
             $field = new BattleField($system, $battle);
@@ -37,11 +37,15 @@ function runSimulation(): void {
             $actionProcessor->setAttackPath($leftAttackUser, $scenario->leftAttack);
             $actionProcessor->setAttackPath($rightAttackUser, $scenario->rightAttack);
 
-            $collisions = BattleActionProcessor::findCollisions($scenario->leftAttack, $scenario->rightAttack, function() {});
+            $collisions = BattleActionProcessor::findCollisions(
+                fighter1Attack: $scenario->leftAttack,
+                fighter2Attack: $scenario->rightAttack,
+                debug_closure: function () {}
+            );
 
             renderResults($index, $scenario, $collisions);
         }
-    } catch (Throwable $e) {
+    } catch(Throwable $e) {
         echo $e->getMessage();
     }
 }
@@ -79,27 +83,29 @@ function renderResults(int $scenarioNum, CollisionScenario $scenario, array $col
             border: 1px solid blue;
             background: #dadada;
         }
+
         .scenarioLabel {
             margin-bottom: 4px;
         }
 
         .leftAttack {
-            display:flex;
-            background:rgba(0,0,255,0.2);
+            display: flex;
+            background: rgba(0, 0, 255, 0.2);
         }
         .rightAttack {
             display: flex;
             flex-direction: row-reverse;
-            background: rgba(0,255,0,0.2);
+            background: rgba(0, 255, 0, 0.2);
         }
 
 
         .tile {
-            display:inline-flex;
+            display: inline-flex;
             position: relative;
             justify-content: center;
             text-align: center;
         }
+
         .index {
             position: absolute;
             font-size: 10px;
@@ -124,7 +130,8 @@ function renderResults(int $scenarioNum, CollisionScenario $scenario, array $col
                 <?php endforeach; ?>
             </div>
 
-            <div class='rightAttack' style='width: <?= $right_attack_width ?>px;margin-left: <?= ($total_width - $right_attack_width) ?>px;'>
+            <div class='rightAttack'
+                 style='width: <?= $right_attack_width ?>px;margin-left: <?= ($total_width - $right_attack_width) ?>px;'>
                 <?php foreach($scenario->rightAttack->path_segments as $segment): ?>
                     <div class='tile' style='
                             width:<?= $tile_width ?>px;
@@ -144,8 +151,8 @@ function renderResults(int $scenarioNum, CollisionScenario $scenario, array $col
 ?>
 
 <html lang="en">
-    <body style='background: #e0e0e0;'>
-        <?php runSimulation(); ?>
-    </body>
+<body style='background: #e0e0e0;'>
+    <?php runSimulation(); ?>
+</body>
 </html>
 
