@@ -25,5 +25,8 @@
         "SC\\Factories\\": "tests/Factories",
         "SC\\TestUtils\\": "tests/TestUtils"
       }
+    },
+    "scripts": {
+      "test": "phpunit tests"
     }
 }

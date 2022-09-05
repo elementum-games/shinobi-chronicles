@@ -14,15 +14,13 @@ function runSimulation(): void {
         $rightAttackUser = new User($system, 234);
         $rightAttackUser->combat_id = Battle::combatId(Battle::TEAM2, $rightAttackUser);
 
+        /** @var CollisionScenario[] $scenarios */
         $scenarios = CollisionScenario::testScenarios($leftAttackUser, $rightAttackUser);
 
         foreach($scenarios as $index => $scenario) {
             $battle = new Battle($system, $leftAttackUser, 1);
             $battle->raw_field = json_encode([
-                'fighter_locations' => [
-                    $leftAttackUser->combat_id => 0,
-                    $rightAttackUser->combat_id => $scenario->distance + 1
-                ]
+                'fighter_locations' => $scenario->getFighterLocations()
             ]);
 
             $field = new BattleField($system, $battle);
@@ -36,8 +34,8 @@ function runSimulation(): void {
                 []
             );
 
-            $actionProcessor->setupDirectionAttack($leftAttackUser, $scenario->leftAttack, $scenario->leftAttackTarget);
-            $actionProcessor->setupDirectionAttack($rightAttackUser, $scenario->rightAttack, $scenario->rightAttackTarget);
+            $actionProcessor->setAttackPath($leftAttackUser, $scenario->leftAttack);
+            $actionProcessor->setAttackPath($rightAttackUser, $scenario->rightAttack);
 
             $collisions = BattleActionProcessor::findCollisions($scenario->leftAttack, $scenario->rightAttack, function() {});
 

@@ -157,15 +157,20 @@ class BattleActionProcessorCollisionTest extends BattleTestCase {
     /**
      *
      * @throws Exception
+     * @noinspection PhpUnitMisorderedAssertEqualsArgumentsInspection
      */
     public function testFindCollisions() {
         $battle = $this->initBattle();
 
-        $rightAttackUser = $battle->player1;
-        $leftAttackUser = $battle->player2;
+        $leftAttackUser = $battle->player1;
+        $rightAttackUser = $battle->player2;
 
         // Open /tests/_manual/test_collision_points.php in your browser for a visualization of these test cases
-        $scenarios = CollisionScenario::testScenarios($battle->player1, $battle->player2);
+        /** @var CollisionScenario[] $scenarios */
+        $scenarios = CollisionScenario::testScenarios(
+            leftFighter: $battle->player1,
+            rightFighter: $battle->player2
+        );
 
         $debug_closure = function ($category, $label, $contents) {
             // echo "\r\nDEBUG ($label)\r\n" . $contents . "\r\n";
@@ -173,22 +178,28 @@ class BattleActionProcessorCollisionTest extends BattleTestCase {
 
         foreach($scenarios as $index => $scenario) {
             $battle->raw_field = json_encode([
-                'fighter_locations' => [
-                    $leftAttackUser->combat_id => 0,
-                    $rightAttackUser->combat_id => $scenario->distance + 1,
-                ]
+                'fighter_locations' => $scenario->getFighterLocations()
             ]);
 
             $field = new BattleField($this->createStub(System::class), $battle);
 
             $actionProcessor = $this->initActionProcessor($battle, $field);
 
-            $actionProcessor->setupDirectionAttack($leftAttackUser, $scenario->leftAttack, $scenario->leftAttackTarget);
-            $actionProcessor->setupDirectionAttack($rightAttackUser, $scenario->rightAttack, $scenario->rightAttackTarget);
+            $actionProcessor->setAttackPath($leftAttackUser, $scenario->leftAttack);
+            $actionProcessor->setAttackPath($rightAttackUser, $scenario->rightAttack);
 
             $collisions = BattleActionProcessor::findCollisions($scenario->leftAttack, $scenario->rightAttack, $debug_closure);
 
-            $this->assertCount(1, $collisions, "Scenario $index collision count");
+            $expected_collision_count = 1;
+            if($scenario->expected_left_attack_collision_point == null && $scenario->expected_right_attack_collision_point == null) {
+                $expected_collision_count = 0;
+            }
+
+            $this->assertCount($expected_collision_count, $collisions, "Scenario $index collision count");
+
+            if($expected_collision_count == 0) {
+                continue;
+            }
 
             $collision_id = array_key_first($collisions);
             $collision = $collisions[$collision_id];

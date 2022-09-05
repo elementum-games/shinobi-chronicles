@@ -210,6 +210,7 @@ class BattleActionProcessor {
     }
 
     // PRIVATE PROCESSING
+    // (some methods may be marked as public to enable testing)
 
     private function debug(string $category, string $label, string $content): void {
         ($this->debug_closure)($category, $label, $content);
@@ -227,8 +228,7 @@ class BattleActionProcessor {
         }
 
         $fighter_action = $this->battle->fighter_actions[$combat_id] ?? null;
-
-        if($fighter_action != null && ($fighter_action instanceof FighterAttackAction)) {
+        if($fighter_action instanceof FighterAttackAction) {
             return $this->setupFighterAttack(
                 $fighter,
                 $fighter_action
@@ -239,8 +239,8 @@ class BattleActionProcessor {
     }
 
     /**
-     * @param Fighter       $fighter
-     * @param FighterAction $action
+     * @param Fighter             $fighter
+     * @param FighterAttackAction $action
      * @return BattleAttack
      * @throws Exception
      */
@@ -290,9 +290,7 @@ class BattleActionProcessor {
     /**
      * @throws Exception
      */
-    protected function setAttackPath(Fighter $attacker, BattleAttack $attack): void {
-
-
+    public function setAttackPath(Fighter $attacker, BattleAttack $attack): void {
         switch($attack->jutsu->use_type) {
             case Jutsu::USE_TYPE_MELEE:
             case Jutsu::USE_TYPE_PROJECTILE:
@@ -954,6 +952,13 @@ class BattleActionProcessor {
     }
 
     /**
+     * Note: A key design feature of collisions is that if two attacks touch the same tile at any point in their path,
+     * they should be considered to have collided. We intentionally do not want to fully realistically simulate time,
+     * but instead use the time of arrival as a variable to:
+     * 1) Set the collision location as close as possible to where it should take place, so that subsequent tiles of
+     *   the attack are weakened in a logical manner from the player's POV
+     * 2) Calculate time-based effects.
+     *
      * @param BattleAttack $fighter1Attack
      * @param BattleAttack $fighter2Attack
      * @param Closure|null $debug_closure
@@ -1041,7 +1046,20 @@ class BattleActionProcessor {
                 'attack2' => $attack2_collision_point,
             ]));
 
-            /* Currently there's only one known case this can be null - If the attacks start on the same tile */
+            /* Scenarios we need this:
+                #1: If the attacks start on the same tile, when they move to their next tiles
+                    they have no overlapping segments. We then need to run a same-tile collision check.
+                           1 2 3 >
+                     < 3 2 1
+
+                #2: One of the attacks is direction and the other is tile-based. "Next-tile" collision fundamentally
+                    doesn't make sense for single-tile attacks, so this collision needs to be calculated entirely
+                    from the direction attack's side, where next-tile collision will work as the tile-based attack will
+                    start at time arrived = 1. e.g.
+                       1
+                 < 4 3 2 1
+
+            */
             if($attack1_collision_point == null) {
                 $attack1_collision_point = self::findSameTileCollisionPoint($attack1, $attack2, $segments_by_tile_and_attack);
             }
@@ -1129,6 +1147,11 @@ class BattleActionProcessor {
      * @throws Exception
      */
     public static function findNextTileCollisionPoint(BattleAttack $attack, BattleAttack $other_attack, array $segments_by_tile_and_attack): ?int {
+        // Tile attacks do not have a next target
+        if($attack->target instanceof AttackTileTarget) {
+            return null;
+        }
+
         foreach($attack->path_segments as $segment) {
             if($attack->isFacingRight()) {
                 $next_tile_index = $segment->tile->index + 1;
@@ -1151,7 +1174,7 @@ class BattleActionProcessor {
     }
 
     /**
-     * Collision algorithm Type 2 - For each tile, see if attack on next tile is <= time + 1
+     * Collision algorithm Type 1 - For each tile, see if attack on next tile is == time
      *
      * @param BattleAttack          $attack
      * @param BattleAttack          $other_attack
@@ -1162,9 +1185,16 @@ class BattleActionProcessor {
     public static function findSameTileCollisionPoint(BattleAttack $attack, BattleAttack $other_attack, array $segments_by_tile_and_attack): ?int {
         foreach($attack->path_segments as $segment) {
             $other_attack_on_same_tile = $segments_by_tile_and_attack[$segment->tile->index][$other_attack->id] ?? null;
-            if($other_attack_on_same_tile != null &&
-                $other_attack_on_same_tile->segment->time_arrived == $segment->time_arrived
-            ) {
+            if($other_attack_on_same_tile == null) {
+                continue;
+            }
+
+            if($other_attack_on_same_tile->segment->time_arrived == $segment->time_arrived) {
+                return $segment->tile->index;
+            }
+            /* Because we want every overlapping attack to collide regardless of time (see findCollisions documentation),
+              tile-based attacks always collide if another attack touches their tile */
+            else if($attack->target instanceof AttackTileTarget) {
                 return $segment->tile->index;
             }
         }

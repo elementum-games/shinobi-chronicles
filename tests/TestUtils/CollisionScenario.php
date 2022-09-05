@@ -3,6 +3,7 @@
 namespace SC\TestUtils;
 
 use AttackDirectionTarget;
+use AttackTarget;
 use BattleAttack;
 use Fighter;
 use SC\Factories\JutsuFactory;
@@ -13,8 +14,11 @@ class CollisionScenario {
     // The attack coming from the right
     public BattleAttack $rightAttack;
 
-    public AttackDirectionTarget $rightAttackTarget;
-    public AttackDirectionTarget $leftAttackTarget;
+    public Fighter $left_attack_user;
+    public Fighter $right_attack_user;
+
+    public AttackTarget $right_attack_target;
+    public AttackTarget $left_attack_target;
 
     public ?int $expected_left_attack_collision_point;
     public ?int $expected_right_attack_collision_point;
@@ -31,45 +35,66 @@ class CollisionScenario {
         float $rightAttackSpeed = 1,
         int $expected_left_attack_collision_point = null,
         int $expected_right_attack_collision_point = null,
+        ?AttackTarget $left_attack_target = null,
+        ?AttackTarget $right_attack_target = null
     ) {
         $this->leftAttack = $this->createLeftAttack(
-            $leftAttackUser->combat_id, $leftAttackRange, $leftAttackSpeed
+            $leftAttackUser->combat_id, $leftAttackRange, $leftAttackSpeed, $left_attack_target
         );
-        $this->rightAttack = $this->createRightAttack($rightAttackUser->combat_id, $rightAttackRange, $rightAttackSpeed);
+        $this->rightAttack = $this->createRightAttack(
+            $rightAttackUser->combat_id, $rightAttackRange, $rightAttackSpeed, $right_attack_target
+        );
+
+        $this->left_attack_user = $leftAttackUser;
+        $this->right_attack_user = $rightAttackUser;
+
         $this->distance = $distance;
 
         $this->expected_right_attack_collision_point = $expected_right_attack_collision_point;
         $this->expected_left_attack_collision_point = $expected_left_attack_collision_point;
     }
 
-    private function createRightAttack(string $attacker_id, int $range, float $speed): BattleAttack {
+    private function createRightAttack(string $attacker_id, int $range, float $speed, ?AttackTarget $target): BattleAttack {
         $jutsu = JutsuFactory::create($range);
         $jutsu->travel_speed = $speed;
 
-        $this->rightAttackTarget = new AttackDirectionTarget(AttackDirectionTarget::DIRECTION_LEFT);
+        if(!$target) {
+            $target = new AttackDirectionTarget(AttackDirectionTarget::DIRECTION_LEFT);
+        }
+        $this->right_attack_target = $target;
 
         return new BattleAttack(
-            $attacker_id,
-            $this->rightAttackTarget,
-            $jutsu,
-            1,
-            1000
+            attacker_id: $attacker_id,
+            target: $this->right_attack_target,
+            jutsu: $jutsu,
+            turn: 1,
+            starting_raw_damage: 1000
         );
     }
 
-    private function createLeftAttack(string $attacker_id, int $range, float $speed): BattleAttack {
+    private function createLeftAttack(string $attacker_id, int $range, float $speed, ?AttackTarget $target): BattleAttack {
         $jutsu = JutsuFactory::create($range);
         $jutsu->travel_speed = $speed;
 
-        $this->leftAttackTarget = new AttackDirectionTarget(AttackDirectionTarget::DIRECTION_RIGHT);
+        if(!$target) {
+            $target = new AttackDirectionTarget(AttackDirectionTarget::DIRECTION_RIGHT);
+        }
+        $this->left_attack_target = $target;
 
         return new BattleAttack(
-            $attacker_id,
-            $this->leftAttackTarget,
-            $jutsu,
-            1,
-            1000
+            attacker_id: $attacker_id,
+            target: $this->left_attack_target,
+            jutsu: $jutsu,
+            turn: 1,
+            starting_raw_damage: 1000
         );
+    }
+
+    public function getFighterLocations(): array {
+        return [
+            $this->left_attack_user->combat_id => 0,
+            $this->right_attack_user->combat_id => $this->distance + 1
+        ];
     }
 
     public static function testScenarios(Fighter $leftFighter, Fighter $rightFighter): array {
@@ -131,6 +156,51 @@ class CollisionScenario {
                 expected_left_attack_collision_point: 4,
                 expected_right_attack_collision_point: 5,
             ),
+
+            // TIle vs tile - No collision
+            7 => new CollisionScenario(
+                distance: 4,
+                leftAttackUser: $leftFighter,
+                rightAttackUser: $rightFighter,
+                leftAttackRange: 4,
+                rightAttackRange: 4,
+                leftAttackSpeed: 1,
+                rightAttackSpeed: 1,
+                expected_left_attack_collision_point: null,
+                expected_right_attack_collision_point: null,
+                left_attack_target: new \AttackTileTarget(2),
+                right_attack_target: new \AttackTileTarget(3),
+            ),
+
+            // Tile vs tile collision
+            8 => new CollisionScenario(
+                distance: 4,
+                leftAttackUser: $leftFighter,
+                rightAttackUser: $rightFighter,
+                leftAttackRange: 4,
+                rightAttackRange: 4,
+                leftAttackSpeed: 1,
+                rightAttackSpeed: 1,
+                expected_left_attack_collision_point: 3,
+                expected_right_attack_collision_point: 3,
+                left_attack_target: new \AttackTileTarget(3),
+                right_attack_target: new \AttackTileTarget(3),
+            ),
+
+            // Tile vs direction collision
+            9 => new CollisionScenario(
+                distance: 4,
+                leftAttackUser: $leftFighter,
+                rightAttackUser: $rightFighter,
+                leftAttackRange: 4,
+                rightAttackRange: 4,
+                leftAttackSpeed: 1,
+                rightAttackSpeed: 1,
+                expected_left_attack_collision_point: 3,
+                expected_right_attack_collision_point: 4,
+                left_attack_target: new \AttackTileTarget(3),
+            ),
+
         ];
     }
 }
