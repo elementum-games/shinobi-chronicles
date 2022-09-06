@@ -203,7 +203,7 @@ and run `npm run watch-ui` to automatically compile source files from the `src` 
 You will need to install Composer and run `composer install` to install the PHPUnit
 testing framework. 
 
-Run `./vendor/bin/phpunit tests` to run all tests.
+Run `composer test` to run all tests.
 
 For more on writing tests with PHPUnit, see the docs for PHPUnit here:
 https://phpunit.readthedocs.io/en/9.5/
