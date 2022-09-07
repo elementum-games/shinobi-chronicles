@@ -484,7 +484,7 @@ class User extends Fighter {
         if($this->system->db_last_num_rows != 0) {
             $result = $this->system->db_fetch($result);
             $this->village_location = $result['location'];
-            if($this->location == $this->village_location) {
+            if($this->location === $this->village_location) {
                 $this->in_village = true;
             }
         }
