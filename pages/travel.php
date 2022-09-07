@@ -18,8 +18,8 @@ function travel() {
     $villages = $system->getVillageLocations();
 
 	if(!empty($_GET['travel'])) {
-		$target_x = $player->x;
-		$target_y = $player->y;
+        $target_x = intval($player->x);
+        $target_y = intval($player->y);
 
 		$ignore_travel_restrictions = $player->isHeadAdmin();
 
@@ -90,7 +90,7 @@ function travel() {
         }
 		
 		// Village check
-		if($player->location == $player->village_location) {
+		if($player->location === $player->village_location) {
 			$player->in_village = true;
 		}
 		else {
