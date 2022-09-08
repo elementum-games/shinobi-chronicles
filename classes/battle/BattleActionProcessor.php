@@ -41,12 +41,10 @@ class BattleActionProcessor {
                 fighter_id: $this->battle->player1->combat_id,
                 target_tile: $player1_action->target_tile
             );
-            $this->battle->battle_text .= $this->battle->player1->getName() .
-                ' moved to tile ' . $player1_action->target_tile . '.';
-        }
-
-        if($player1_action != null && $player2_action != null) {
-            $this->battle->battle_text .= '[hr]';
+            $this->battle->current_turn_log->addFighterActionDescription(
+                $this->battle->player1,
+                $this->battle->player1->getName() . ' moved to tile ' . $player1_action->target_tile . '.'
+            );
         }
 
         if($player2_action instanceof FighterMovementAction) {
@@ -54,8 +52,10 @@ class BattleActionProcessor {
                 fighter_id: $this->battle->player2->combat_id,
                 target_tile: $player2_action->target_tile
             );
-            $this->battle->battle_text .= $this->battle->player2->getName() .
-                ' moved to tile ' . $player2_action->target_tile . '.';
+            $this->battle->current_turn_log->addFighterActionDescription(
+                $this->battle->player2,
+                $this->battle->player2->getName() . ' moved to tile ' . $player2_action->target_tile . '.'
+            );
         }
 
         $this->field->reInit();
@@ -108,8 +108,11 @@ class BattleActionProcessor {
             if(count($player1_attack->hits) === 0) {
                 $text .= "[player]'s attack misses.";
             }
-            $this->battle->battle_text .= $this->parseCombatText(
-                $text, $this->battle->player1, $this->battle->player2
+            $this->battle->current_turn_log->addFighterActionDescription(
+                $this->battle->player1,
+                $this->parseCombatText(
+                    $text, $this->battle->player1, $this->battle->player2
+                )
             );
 
             foreach($player1_attack->hits as $hit) {
@@ -123,15 +126,20 @@ class BattleActionProcessor {
             }
         }
         else {
-            $this->battle->battle_text .= $this->battle->player1->getName() . ' stood still and did nothing.';
+            $this->battle->current_turn_log->addFighterActionDescription(
+                $this->battle->player1,
+                $this->battle->player1->getName() . ' stood still and did nothing.'
+            );
             if($this->effects->hasDisplays($this->battle->player1)) {
-                $this->battle->battle_text .= '<p>' .
+                $this->battle->current_turn_log->addFighterAppliedEffectDescription(
+                    $this->battle->player1,
                     $this->parseCombatText(
+                        // TODO: This is probably not right
                         $this->effects->getDisplayText($this->battle->player1),
                         $this->battle->player1,
                         $this->battle->player2
-                    ) .
-                    '</p>';
+                    )
+                );
             }
         }
 
@@ -139,7 +147,6 @@ class BattleActionProcessor {
             $collision_text = $this->parseCombatText($collision_text, $this->battle->player1, $this->battle->player2);
             $this->battle->battle_text .= '[hr]' . $this->system->clean($collision_text);
         }*/
-        $this->battle->battle_text .= '[hr]';
 
         // Apply damage/effects and set display
         if($player2_attack) {
@@ -147,8 +154,11 @@ class BattleActionProcessor {
             if(count($player2_attack->hits) === 0) {
                 $text .= "[player]'s attack misses.";
             }
-            $this->battle->battle_text .= $this->parseCombatText(
-                $text, $this->battle->player2, $this->battle->player1
+            $this->battle->current_turn_log->addFighterActionDescription(
+                $this->battle->player2,
+                $this->parseCombatText(
+                    $text, $this->battle->player2, $this->battle->player1
+                )
             );
 
             foreach($player2_attack->hits as $hit) {
@@ -162,13 +172,20 @@ class BattleActionProcessor {
             }
         }
         else {
-            $this->battle->battle_text .= $this->battle->player2->getName() . ' stood still and did nothing.';
+            $this->battle->current_turn_log->addFighterActionDescription(
+                $this->battle->player2,
+                $this->battle->player2->getName() . ' stood still and did nothing.'
+            );
             if($this->effects->hasDisplays($this->battle->player2)) {
-                $this->battle->battle_text .= "<p>" . $this->parseCombatText(
+                $this->battle->current_turn_log->addFighterAppliedEffectDescription(
+                    $this->battle->player2,
+                    $this->parseCombatText(
+                        // TODO: This is probably not right
                         $this->effects->getDisplayText($this->battle->player2),
                         $this->battle->player2,
                         $this->battle->player1
-                    ) . "</p>";
+                    )
+                );
             }
         }
     }
@@ -889,7 +906,10 @@ class BattleActionProcessor {
                 "</p>";
         }
 
-        $this->battle->battle_text .= $this->parseCombatText($text, $user, $target);
+        $this->battle->current_turn_log->addFighterAttackHitDescription(
+            $user,
+            $this->parseCombatText($text, $user, $target)
+        );
     }
 
     private function parseCombatText(string $text, Fighter $attacker, Fighter $target): string {

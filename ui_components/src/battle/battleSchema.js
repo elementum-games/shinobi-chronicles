@@ -19,6 +19,7 @@ export type BattleType = {|
     +playerActionSubmitted: boolean,
     +turnSecondsRemaining: number,
     +lastTurnText: string,
+    +lastTurnLog: BattleLogType,
     +currentPhaseLabel: string,
     +jutsuTypes: {|
         +ninjutsu: string,
@@ -56,6 +57,8 @@ export type BattleFieldTileType = {|
     +fighterIds: $ReadOnlyArray<string>
 |};
 
+export type JutsuCategory = 'ninjutsu' | 'genjutsu' | 'taijutsu' | "bloodline";
+
 // BattleApiPresenter::jutsuResponse
 export type JutsuType = {|
     +id: number,
@@ -76,5 +79,16 @@ export type WeaponType = {|
     +effectAmount: number,
 |};
 
-export type JutsuCategory = 'ninjutsu' | 'genjutsu' | 'taijutsu' | "bloodline";
+export type BattleLogType = {|
+    +fighterActions: { [key: string]: FighterActionLogType }
+|};
+
+export type FighterActionLogType = {|
+    +fighterId: string,
+    +actionDescription: string,
+    +hitDescriptions: $ReadOnlyArray<string>,
+    +appliedEffectDescriptions: $ReadOnlyArray<string>,
+    +newEffectAnnouncements: $ReadOnlyArray<string>,
+|};
+
 

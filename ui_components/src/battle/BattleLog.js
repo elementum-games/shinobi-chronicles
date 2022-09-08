@@ -1,11 +1,15 @@
 // @flow strict
 
+import type { BattleLogType, FighterActionLogType } from "./battleSchema.js";
+
 type Props = {|
-    +lastTurnText: string
+    +lastTurnLog: ?BattleLogType
 |};
 
-export default function BattleLog({ lastTurnText }: Props): React$Node {
-    const textSegments = lastTurnText.split('[hr]');
+export default function BattleLog({ lastTurnLog }: Props): React$Node {
+    if(lastTurnLog == null) {
+        return null;
+    }
 
     return <table className='table'>
         <tbody>
@@ -14,9 +18,15 @@ export default function BattleLog({ lastTurnText }: Props): React$Node {
         </tr>
         <tr>
             <td style={{ textAlign: "center"}}>
-                {textSegments.map((segment, i) => (
-                    <p key={i}>{segment}</p>
-                ))}
+                {Object.keys(lastTurnLog.fighterActions).map((fighterId, i) => {
+                    const action = lastTurnLog.fighterActions[ fighterId ];
+
+                    return (
+                        <p key={i} style={{ borderBottom: '1px solid rgba(0,0,0,0.5)' }}>
+                            {action.actionDescription}
+                        </p>
+                    );
+                })}
             </td>
         </tr>
         </tbody>

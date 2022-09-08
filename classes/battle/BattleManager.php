@@ -415,8 +415,6 @@ class BattleManager {
     protected function runActions(): void {
         $this->processTurnEffects();
 
-        $this->battle->battle_text = '';
-
         if($this->battle->isMovementPhase()) {
             $this->actions->runMovementPhaseActions();
         }
@@ -614,9 +612,12 @@ class BattleManager {
 
                         $this->player->updateData();
                         $this->player->updateInventory();
-                        $this->battle->battle_text .= sprintf(
-                            "%s used a %s and healed for %.2f[br]", $this->player->user_name, $item->name,
-                            $item->effect_amount
+                        $this->battle->current_turn_log->addFighterActionDescription(
+                            $this->player,
+                            sprintf(
+                                "%s used a %s and healed for %.2f[br]", $this->player->user_name, $item->name,
+                                $item->effect_amount
+                            )
                         );
                         $this->updateData();
                     }

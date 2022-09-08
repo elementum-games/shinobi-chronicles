@@ -112,7 +112,7 @@ function Battle({
                 isAttackSelected={isSelectingTile}
             />
         )}
-        {battle.lastTurnText != null && <BattleLog lastTurnText={battle.lastTurnText}/>}
+        <BattleLog lastTurnLog={battle.lastTurnLog} />
     </div>;
 }
 

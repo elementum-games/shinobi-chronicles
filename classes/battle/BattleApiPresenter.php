@@ -62,7 +62,8 @@ class BattleApiPresenter {
             'isComplete' => $battle->isComplete(),
             'playerActionSubmitted' => $player_action_submitted,
             'turnSecondsRemaining' => $battle->timeRemaining(),
-            'lastTurnText' => str_replace("&#039;", "'", $battle->battle_text),
+            'lastTurnText' => '',
+            'lastTurnLog' => BattleApiPresenter::turnLogResponse($battle->getLastTurnLog()),
             'currentPhaseLabel' => $battle->getCurrentPhaseLabel(),
             'jutsuTypes' => [
                 'taijutsu' => Jutsu::TYPE_TAIJUTSU,
@@ -114,6 +115,7 @@ class BattleApiPresenter {
         ];
     }
 
+    #[ArrayShape(['id' => "int", 'combatId' => "null|string", 'name' => "string", 'activeCooldownTurnsLeft' => "int|mixed", 'jutsuType' => "string", 'targetType' => "string", 'handSeals' => "string[]", 'range' => "int"])]
     private static function jutsuResponse(Jutsu $jutsu, Battle $battle): array {
         return [
             'id' => $jutsu->id,
@@ -127,12 +129,35 @@ class BattleApiPresenter {
         ];
     }
 
+    #[ArrayShape(['id' => "int", 'name' => "string", 'effect' => "string", 'effectAmount' => "float"])]
     private static function weaponResponse(Item $weapon): array {
         return [
             'id' => $weapon->id,
             'name' => $weapon->name,
             'effect' => $weapon->effect,
             'effectAmount' => $weapon->effect_amount,
+        ];
+    }
+
+    #[ArrayShape(['fighterActions' => "array|array[]"])]
+    private static function turnLogResponse(?BattleLog $turn_log): ?array {
+        if($turn_log == null) {
+            return null;
+        }
+
+        return [
+            'fighterActions' => array_map(
+                function(FighterActionLog $action_log){
+                    return [
+                        "fighterId" => $action_log->fighter_id,
+                        "actionDescription" => str_replace("&#039;", "'", $action_log->action_description),
+                        "hitDescriptions" => $action_log->hit_descriptions,
+                        "appliedEffectDescriptions" => $action_log->applied_effect_descriptions,
+                        "newEffectAnnouncements" => $action_log->new_effect_announcements,
+                    ];
+                },
+                $turn_log->fighter_action_logs
+            )
         ];
     }
 }

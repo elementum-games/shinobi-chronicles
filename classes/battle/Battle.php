@@ -62,6 +62,7 @@ class Battle {
 
     /** @var BattleLog[] */
     public array $log;
+    public BattleLog $current_turn_log;
 
     public array $jutsu_cooldowns;
 
@@ -182,15 +183,25 @@ class Battle {
 
         $battle->fighter_jutsu_used = json_decode($battle_data['fighter_jutsu_used'], true);
 
-        // lo9g
+        // log
         $last_turn_log = BattleLog::getLastTurn($battle->system, $battle->battle_id);
         if($last_turn_log != null) {
             $battle->log[$last_turn_log->turn_number] = $last_turn_log;
-            $battle->battle_text = $last_turn_log->content;
         }
-        else {
-            $battle->battle_text = '';
+
+        $current_turn_log = BattleLog::getTurn($battle->system, $battle->battle_id, $battle->turn_count);
+        if($current_turn_log == null) {
+            $current_turn_log = new BattleLog(
+                system: $battle->system,
+                battle_id: $battle->battle_id,
+                turn_number: $battle->turn_count,
+                content: $battle_id,
+                fighter_action_logs: []
+            );
         }
+
+        $battle->current_turn_log = $current_turn_log;
+        $battle->log[$battle->turn_count] = $battle->current_turn_log;
 
         return $battle;
     }
@@ -214,7 +225,7 @@ class Battle {
     /**
      * @throws Exception
      */
-    public function loadFighters() {
+    public function loadFighters(): void {
         if($this->player1_id != $this->player->id) {
             $this->player1 = $this->loadFighterFromEntityId($this->player1_id);
         }
@@ -301,14 +312,14 @@ class Battle {
         }
 
         $time_remaining = Battle::TURN_LENGTH - (time() - $this->turn_time);
-        return $time_remaining >= 0 ? $time_remaining : 0;
+        return max($time_remaining, 0);
     }
 
     protected function prepTimeRemaining(): int {
         return Battle::PREP_LENGTH - (time() - $this->start_time);
     }
 
-    public function updateData() {
+    public function updateData(): void {
         $this->system->query("START TRANSACTION;");
 
         $this->system->query("UPDATE `battles` SET
@@ -329,7 +340,7 @@ class Battle {
             `fighter_jutsu_used` = '" . json_encode($this->fighter_jutsu_used) . "'
         WHERE `battle_id` = '{$this->battle_id}' LIMIT 1");
         
-        BattleLog::addOrUpdateTurnLog($this->system, $this->battle_id, $this->turn_count, $this->battle_text);
+        BattleLog::addOrUpdateTurnLog($this->system, $this->current_turn_log);
 
         $this->system->query("COMMIT;");
     }
@@ -378,4 +389,9 @@ class Battle {
             return "[Invalid]";
         }
     }
+
+    public function getLastTurnLog(): ?BattleLog {
+        return $this->log[$this->turn_count - 1] ?? null;
+    }
+
 }
