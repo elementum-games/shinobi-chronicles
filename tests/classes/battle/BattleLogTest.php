@@ -5,13 +5,17 @@ use PHPUnit\Framework\TestCase;
 class BattleLogTest extends TestCase {
 
     public function testAddingContents() {
+        $system = $this->createStub(System::class);
+        $system->method('clean')
+            ->will($this->returnArgument(0));
+
         $fighter1 = $this->createStub(Fighter::class);
         $fighter1->combat_id = "U:1";
 
         $fighter2 = $this->createStub(Fighter::class);
         $fighter2->combat_id = "U:2";
 
-        $log = new BattleLog(1, 1, '', []);
+        $log = new BattleLog($system, 1, 1, '', []);
 
         $fighter1_action_text = "Does the thing";
         $log->addFighterActionDescription($fighter1, $fighter1_action_text);

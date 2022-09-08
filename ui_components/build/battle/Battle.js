@@ -80,8 +80,8 @@ function Battle({
     attackInput: attackInput,
     updateAttackInput: updateAttackInput,
     isAttackSelected: isSelectingTile
-  }), battle.lastTurnText != null && /*#__PURE__*/React.createElement(BattleLog, {
-    lastTurnText: battle.lastTurnText
+  }), /*#__PURE__*/React.createElement(BattleLog, {
+    lastTurnLog: battle.lastTurnLog
   }));
 } // Fighters and Field
 
