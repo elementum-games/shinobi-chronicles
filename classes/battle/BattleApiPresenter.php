@@ -150,10 +150,18 @@ class BattleApiPresenter {
                 function(FighterActionLog $action_log){
                     return [
                         "fighterId" => $action_log->fighter_id,
-                        "actionDescription" => str_replace("&#039;", "'", $action_log->action_description),
-                        "hitDescriptions" => $action_log->hit_descriptions,
-                        "appliedEffectDescriptions" => $action_log->applied_effect_descriptions,
-                        "newEffectAnnouncements" => $action_log->new_effect_announcements,
+                        "actionDescription" => str_replace(
+                            "&#039;", "'", $action_log->action_description
+                        ),
+                        "hitDescriptions" => str_replace(
+                            "&#039;", "'", $action_log->hit_descriptions
+                        ),
+                        "appliedEffectDescriptions" => str_replace(
+                            "&#039;", "'", $action_log->applied_effect_descriptions
+                        ),
+                        "newEffectAnnouncements" => str_replace(
+                            "&#039;", "'", $action_log->new_effect_announcements
+                        ),
                     ];
                 },
                 $turn_log->fighter_action_logs

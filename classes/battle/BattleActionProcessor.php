@@ -104,14 +104,10 @@ class BattleActionProcessor {
 
         // Apply damage/effects and set display
         if($player1_attack) {
-            $text = $player1_attack->jutsu->battle_text;
-            if(count($player1_attack->hits) === 0) {
-                $text .= "[player]'s attack misses.";
-            }
             $this->battle->current_turn_log->addFighterActionDescription(
                 $this->battle->player1,
                 $this->parseCombatText(
-                    $text, $this->battle->player1, $this->battle->player2
+                    $player1_attack->jutsu->battle_text, $this->battle->player1, $this->battle->player2
                 )
             );
 
@@ -124,23 +120,19 @@ class BattleActionProcessor {
                     raw_damage: $hit->raw_damage
                 );
             }
+
+            if(count($player1_attack->hits) === 0) {
+                $this->battle->current_turn_log->addFighterAttackHitDescription(
+                    $this->battle->player1,
+                    "[player1]'s attack misses."
+                );
+            }
         }
         else {
             $this->battle->current_turn_log->addFighterActionDescription(
                 $this->battle->player1,
                 $this->battle->player1->getName() . ' stood still and did nothing.'
             );
-            if($this->effects->hasDisplays($this->battle->player1)) {
-                $this->battle->current_turn_log->addFighterAppliedEffectDescription(
-                    $this->battle->player1,
-                    $this->parseCombatText(
-                        // TODO: This is probably not right
-                        $this->effects->getDisplayText($this->battle->player1),
-                        $this->battle->player1,
-                        $this->battle->player2
-                    )
-                );
-            }
         }
 
         /*if($collision_text) {
@@ -150,14 +142,10 @@ class BattleActionProcessor {
 
         // Apply damage/effects and set display
         if($player2_attack) {
-            $text = $player2_attack->jutsu->battle_text;
-            if(count($player2_attack->hits) === 0) {
-                $text .= "[player]'s attack misses.";
-            }
             $this->battle->current_turn_log->addFighterActionDescription(
                 $this->battle->player2,
                 $this->parseCombatText(
-                    $text, $this->battle->player2, $this->battle->player1
+                    $player2_attack->jutsu->battle_text, $this->battle->player2, $this->battle->player1
                 )
             );
 
@@ -170,23 +158,19 @@ class BattleActionProcessor {
                     raw_damage: $hit->raw_damage
                 );
             }
+
+            if(count($player2_attack->hits) === 0) {
+                $this->battle->current_turn_log->addFighterAttackHitDescription(
+                    $this->battle->player2,
+                    "[player2]'s attack misses."
+                );
+            }
         }
         else {
             $this->battle->current_turn_log->addFighterActionDescription(
                 $this->battle->player2,
                 $this->battle->player2->getName() . ' stood still and did nothing.'
             );
-            if($this->effects->hasDisplays($this->battle->player2)) {
-                $this->battle->current_turn_log->addFighterAppliedEffectDescription(
-                    $this->battle->player2,
-                    $this->parseCombatText(
-                        // TODO: This is probably not right
-                        $this->effects->getDisplayText($this->battle->player2),
-                        $this->battle->player2,
-                        $this->battle->player1
-                    )
-                );
-            }
         }
     }
 
@@ -878,41 +862,42 @@ class BattleActionProcessor {
             );
         }
 
-        $text = "";
-        $attack_jutsu_color = BattleActionProcessor::getJutsuTextColor($attack->jutsu->jutsu_type);
-
         if($attack->jutsu->jutsu_type != Jutsu::TYPE_GENJUTSU && empty($attack->jutsu->effect_only)) {
-            $text .= "<p style=\"font-weight:bold;\">
-                            {$user->getName()} deals
-                                <span style=\"color:{$attack_jutsu_color}\">
-                                    " . sprintf('%.2f', $attack_damage) . " damage
-                                </span>
-                            to {$target->getName()}.
-                        </p>";
+            $tag = "{$attack->jutsu->jutsu_type}_damage";
+            $this->battle->current_turn_log->addFighterAttackHitDescription(
+                $user,
+                $this->parseCombatText(
+                    "{$user->getName()} deals "
+                        . "[{$tag}]" . sprintf('%.2f', $attack_damage) . "[/{$tag}] "
+                        . "to {$target->getName()}.",
+                    $user,
+                    $target
+                )
+            );
         }
         if($this->effects->hasDisplays($user)) {
-            $text .= '<p>' . $this->effects->getDisplayText($user) . '</p>';
+            $this->battle->current_turn_log->addFighterAppliedEffectDescription(
+                $user,
+                $this->effects->getDisplayText($user)
+            );
         }
 
         if($attack->jutsu->hasEffect()) {
-            $text .= "<p style=\"font-style:italic;margin-top:3px;\">" .
-                $this->system->clean($this->effects->getAnnouncementText($attack->jutsu->effect)) .
-                "</p>";
+            $this->battle->current_turn_log->addFighterEffectAnnouncement(
+                $user,
+                $this->effects->getAnnouncementText($attack->jutsu->effect)
+            );
         }
 
         if($attack->jutsu->weapon_id) {
-            $text .= "<p style=\"font-style:italic;margin-top:3px;\">" .
-                $this->system->clean($this->effects->getAnnouncementText($attack->jutsu->weapon_effect->effect)) .
-                "</p>";
+            $this->battle->current_turn_log->addFighterEffectAnnouncement(
+                $user,
+                $this->effects->getAnnouncementText($attack->jutsu->weapon_effect->effect)
+            );
         }
-
-        $this->battle->current_turn_log->addFighterAttackHitDescription(
-            $user,
-            $this->parseCombatText($text, $user, $target)
-        );
     }
 
-    private function parseCombatText(string $text, Fighter $attacker, Fighter $target): string {
+    public function parseCombatText(string $text, Fighter $attacker, Fighter $target): string {
         return str_replace(
             [
                 '[player]',
@@ -928,20 +913,6 @@ class BattleActionProcessor {
             ],
             $text
         );
-    }
-
-    protected static function getJutsuTextColor($jutsu_type): string {
-        switch($jutsu_type) {
-            case Jutsu::TYPE_NINJUTSU:
-                return "blue";
-            case Jutsu::TYPE_TAIJUTSU:
-                return "red";
-            case Jutsu::TYPE_GENJUTSU:
-                return "purple";
-            case 'none':
-            default:
-                return "black";
-        }
     }
 
     /**

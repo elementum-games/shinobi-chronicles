@@ -47,6 +47,11 @@ class BattleLog {
         $fighter_action_log->applied_effect_descriptions[] = $this->system->clean($effect_description);
     }
 
+    public function addFighterEffectAnnouncement(Fighter $fighter, string $announcement_text): void {
+        $fighter_action_log = $this->getFighterActionLog($fighter->combat_id);
+        $fighter_action_log->applied_effect_descriptions[] = $this->system->clean($announcement_text);
+    }
+
     protected function getFighterActionLog(string $fighter_id) {
         if(!isset($this->fighter_action_logs[$fighter_id])) {
             $this->fighter_action_logs[$fighter_id] = new FighterActionLog(
