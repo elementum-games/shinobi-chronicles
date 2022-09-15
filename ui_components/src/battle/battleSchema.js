@@ -86,9 +86,17 @@ export type BattleLogType = {|
 export type FighterActionLogType = {|
     +fighterId: string,
     +actionDescription: string,
-    +hitDescriptions: $ReadOnlyArray<string>,
+    +hits: $ReadOnlyArray<AttackHitLogType>,
     +appliedEffectDescriptions: $ReadOnlyArray<string>,
     +newEffectAnnouncements: $ReadOnlyArray<string>,
 |};
 
+export type AttackHitLogType = {|
+    +attackerId: string,
+    +attackerName: string,
+    +targetId: string,
+    +targetName: string,
+    +damageType: JutsuType["jutsuType"],
+    +damage: number,
+|};
 

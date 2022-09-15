@@ -1,6 +1,6 @@
 // @flow strict
 
-import type { BattleLogType, FighterActionLogType } from "./battleSchema.js";
+import type { AttackHitLogType, BattleLogType } from "./battleSchema.js";
 
 type Props = {|
     +lastTurnLog: ?BattleLogType
@@ -25,9 +25,18 @@ export default function BattleLog({ lastTurnLog }: Props): React$Node {
                         <div key={i} style={{ borderBottom: '1px solid rgba(0,0,0,0.5)' }}>
                             <p>{action.actionDescription}</p>
                             <br />
-                            {action.hitDescriptions.map((description, i) => (
-                                <p key={i} style={{fontWeight: 'bold'}}>{description}</p>
-                            ))}
+                            {action.hits.map((hit: AttackHitLogType, i) => {
+                                return (
+                                    <p key={i} className={`${hit.damageType}Damage`} style={{fontWeight: 'bold'}}>
+                                        {hit.attackerName} deals {hit.damage} {hit.damageType} damage to {hit.targetName}.
+                                    </p>
+                                );
+                            })}
+                            {action.hits.length < 1 &&
+                                <p key={i} style={{fontStyle: 'italic'}}>
+                                    The attack missed.
+                                </p>
+                            }
                             {action.appliedEffectDescriptions.map((description, i) => (
                                 <p key={i}>{description}</p>
                             ))}

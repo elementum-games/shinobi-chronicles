@@ -150,22 +150,33 @@ class BattleApiPresenter {
                 function(FighterActionLog $action_log){
                     return [
                         "fighterId" => $action_log->fighter_id,
-                        "actionDescription" => str_replace(
-                            "&#039;", "'", $action_log->action_description
+                        "actionDescription" => self::unescapeQuotes(
+                            $action_log->action_description
                         ),
-                        "hitDescriptions" => str_replace(
-                            "&#039;", "'", $action_log->hit_descriptions
+                        "hits" => array_map(function(AttackHitLog $hit) {
+                            return [
+                                'attackerId' =>  $hit->attacker_id,
+                                'attackerName' => self::unescapeQuotes($hit->attacker_name),
+                                'targetId' => $hit->target_id,
+                                'targetName' => self::unescapeQuotes($hit->target_name),
+                                'damageType' => $hit->damage_type,
+                                'damage' => $hit->damage,
+                            ];
+                        }, $action_log->hits),
+                        "appliedEffectDescriptions" => self::unescapeQuotes(
+                            $action_log->applied_effect_descriptions
                         ),
-                        "appliedEffectDescriptions" => str_replace(
-                            "&#039;", "'", $action_log->applied_effect_descriptions
-                        ),
-                        "newEffectAnnouncements" => str_replace(
-                            "&#039;", "'", $action_log->new_effect_announcements
+                        "newEffectAnnouncements" => self::unescapeQuotes(
+                            $action_log->new_effect_announcements
                         ),
                     ];
                 },
                 $turn_log->fighter_action_logs
             )
         ];
+    }
+
+    private static function unescapeQuotes(string|array $content): array|string {
+        return str_replace("&#039;", "'", $content);
     }
 }

@@ -120,13 +120,6 @@ class BattleActionProcessor {
                     raw_damage: $hit->raw_damage
                 );
             }
-
-            if(count($player1_attack->hits) === 0) {
-                $this->battle->current_turn_log->addFighterAttackHitDescription(
-                    $this->battle->player1,
-                    "[player1]'s attack misses."
-                );
-            }
         }
         else {
             $this->battle->current_turn_log->addFighterActionDescription(
@@ -156,13 +149,6 @@ class BattleActionProcessor {
                     user: $hit->attacker,
                     target: $hit->target,
                     raw_damage: $hit->raw_damage
-                );
-            }
-
-            if(count($player2_attack->hits) === 0) {
-                $this->battle->current_turn_log->addFighterAttackHitDescription(
-                    $this->battle->player2,
-                    "[player2]'s attack misses."
                 );
             }
         }
@@ -864,15 +850,11 @@ class BattleActionProcessor {
 
         if($attack->jutsu->jutsu_type != Jutsu::TYPE_GENJUTSU && empty($attack->jutsu->effect_only)) {
             $tag = "{$attack->jutsu->jutsu_type}_damage";
-            $this->battle->current_turn_log->addFighterAttackHitDescription(
-                $user,
-                $this->parseCombatText(
-                    "{$user->getName()} deals "
-                        . "[{$tag}]" . sprintf('%.2f', $attack_damage) . "[/{$tag}] "
-                        . "to {$target->getName()}.",
-                    $user,
-                    $target
-                )
+            $this->battle->current_turn_log->addFighterAttackHit(
+                attacker: $user,
+                target: $target,
+                damage_type: $attack->jutsu->jutsu_type,
+                damage: $attack_damage
             );
         }
         if($this->effects->hasDisplays($user)) {

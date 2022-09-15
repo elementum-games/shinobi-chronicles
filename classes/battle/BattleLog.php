@@ -37,9 +37,18 @@ class BattleLog {
         $fighter_action_log->action_description .= $this->system->clean($action_description);
     }
 
-    public function addFighterAttackHitDescription(Fighter $fighter, string $hit_description): void {
-        $fighter_action_log = $this->getFighterActionLog($fighter->combat_id);
-        $fighter_action_log->hit_descriptions[] = $this->system->clean($hit_description);
+    public function addFighterAttackHit(
+        Fighter $attacker, Fighter $target, string $damage_type, float $damage
+    ): void {
+        $fighter_action_log = $this->getFighterActionLog($attacker->combat_id);
+        $fighter_action_log->hits[] = new AttackHitLog(
+            attacker_id: $attacker->combat_id,
+            attacker_name: $attacker->getName(),
+            target_id: $target->combat_id,
+            target_name: $target->getName(),
+            damage_type: $damage_type,
+            damage: $damage,
+        );
     }
 
     public function addFighterAppliedEffectDescription(Fighter $fighter, string $effect_description): void {
@@ -55,7 +64,11 @@ class BattleLog {
     protected function getFighterActionLog(string $fighter_id) {
         if(!isset($this->fighter_action_logs[$fighter_id])) {
             $this->fighter_action_logs[$fighter_id] = new FighterActionLog(
-                $fighter_id, '', [], [], []
+                fighter_id: $fighter_id,
+                action_description: '',
+                hits: [],
+                applied_effect_descriptions: [],
+                new_effect_announcements: []
             );
         }
 
@@ -107,7 +120,9 @@ class BattleLog {
                 return new FighterActionLog(
                     fighter_id: $action_log['fighter_id'],
                     action_description: $action_log['action_description'],
-                    hit_descriptions: $action_log['hit_descriptions'],
+                    hits: array_map(function($hit) {
+                        return AttackHitLog::fromArray($hit);
+                    }, $action_log['hits']),
                     applied_effect_descriptions: $action_log['applied_effect_descriptions'],
                     new_effect_announcements: $action_log['new_effect_announcements']
                 );
@@ -140,11 +155,40 @@ class BattleLog {
 }
 
 class FighterActionLog {
+    /**
+     * @param string         $fighter_id
+     * @param string         $action_description
+     * @param AttackHitLog[] $hits
+     * @param array          $applied_effect_descriptions
+     * @param array          $new_effect_announcements
+     */
     public function __construct(
         public string $fighter_id,
         public string $action_description,
-        public array $hit_descriptions,
+        public array $hits,
         public array $applied_effect_descriptions,
         public array $new_effect_announcements
     ) {}
+}
+
+class AttackHitLog {
+    public function __construct(
+        public string $attacker_id,
+        public string $attacker_name,
+        public string $target_id,
+        public string $target_name,
+        public string $damage_type,
+        public float $damage,
+    ) {}
+
+    public static function fromArray($array): AttackHitLog {
+        return new AttackHitLog(
+            attacker_id: $array['attacker_id'],
+            attacker_name: $array['attacker_name'],
+            target_id: $array['target_id'],
+            target_name: $array['target_name'],
+            damage_type: $array['damage_type'],
+            damage: $array['damage'],
+        );
+    }
 }

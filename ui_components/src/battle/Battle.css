@@ -101,6 +101,15 @@
     background: rgba(50, 50, 175, 0.4);
 }
 
+.ninjutsuDamage {
+    color: rgb(0, 0, 240);
+}
+.genjutsuDamage {
+    color: rgb(200, 0, 240);
+}
+.taijutsuDamage {
+    color: rgb(240, 0, 0);
+}
 
 /* BATTLE ACTION PROMPT */
 #handSeals {
