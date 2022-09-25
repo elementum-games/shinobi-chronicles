@@ -113,6 +113,7 @@ class BattleManager {
     ) {
         $this->system = $system;
         $this->battle = $battle;
+        $this->battle_id = $battle->battle_id;
         $this->player = $player;
         $this->spectate = $spectate;
 
@@ -342,7 +343,7 @@ class BattleManager {
             opponent: $opponent,
             is_spectating: $this->spectate,
             player_action_submitted: $this->playerActionSubmitted(),
-            player_default_attacks: $this->getDefaultAttacks(),
+            player_default_attacks: BattleManager::getDefaultAttacks($this->system),
             player_equipped_jutsu: $player->equipped_jutsu
         );
     }
