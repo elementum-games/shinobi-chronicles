@@ -63,12 +63,7 @@ class BattleApiPresenter {
             'playerActionSubmitted' => $player_action_submitted,
             'turnSecondsRemaining' => $battle->timeRemaining(),
             'lastTurnText' => '',
-            'lastTurnLog' => BattleApiPresenter::turnLogResponse(
-                turn_log: $battle->getLastTurnLog(),
-                isMovementPhase: $battle->isMovementPhase(),
-                isAttackPhase: $battle->isAttackPhase(),
-                isPreparationPhase: $battle->isPreparationPhase(),
-            ),
+            'lastTurnLog' => BattleApiPresenter::turnLogResponse($battle->getLastTurnLog()),
             'currentPhaseLabel' => $battle->getCurrentPhaseLabel(),
             'jutsuTypes' => [
                 'taijutsu' => Jutsu::TYPE_TAIJUTSU,
@@ -144,20 +139,15 @@ class BattleApiPresenter {
         ];
     }
 
-    private static function turnLogResponse(
-        ?BattleLog $turn_log,
-        bool $isMovementPhase,
-        bool $isAttackPhase,
-        bool $isPreparationPhase
-    ): ?array {
+    private static function turnLogResponse(?BattleLog $turn_log): ?array {
         if($turn_log == null) {
             return null;
         }
 
         return [
-            'isMovementPhase' => $isMovementPhase,
-            'isAttackPhase' => $isAttackPhase,
-            'isPreparationPhase' => $isPreparationPhase,
+            'isMovementPhase' => $turn_log->turn_phase === Battle::TURN_TYPE_MOVEMENT,
+            'isAttackPhase' => $turn_log->turn_phase === Battle::TURN_TYPE_ATTACK,
+            'isPreparationPhase' => false,
             'fighterActions' => array_map(
                 function(FighterActionLog $action_log){
                     return [

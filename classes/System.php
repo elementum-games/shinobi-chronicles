@@ -314,7 +314,7 @@ class System {
 
         //Debugging
         if($debug) {
-            echo $query;
+            $this->debugMessage($query);
             return false;
         }
 

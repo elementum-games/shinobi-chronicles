@@ -195,6 +195,7 @@ class Battle {
                 system: $battle->system,
                 battle_id: $battle->battle_id,
                 turn_number: $battle->turn_count,
+                turn_phase: $battle->turn_type,
                 content: $battle_id,
                 fighter_action_logs: []
             );

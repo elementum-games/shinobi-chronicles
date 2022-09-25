@@ -979,6 +979,21 @@ class BattleActionProcessor {
             }
         }
 
+        $debug(
+            BattleManager::DEBUG_ATTACK_COLLISION,
+            'segments_by_tile_and_attack',
+            json_encode(
+                array_map(function($tile_segments_by_attack) {
+                    return implode(
+                        ' ',
+                        array_map(function(TileAttackSegment $segment) {
+                            return "Attack: " . $segment->attack->id . '(Time: ' . $segment->segment->time_arrived . ')';
+                        }, $tile_segments_by_attack)
+                    );
+                }, $segments_by_tile_and_attack)
+            )
+        );
+
         // Find intersecting attacks
         $colliding_attack_pairs = [];
         foreach($segments_by_tile_and_attack as $segments_by_attack) {
@@ -1035,10 +1050,10 @@ class BattleActionProcessor {
                  < 4 3 2 1
 
             */
-            if($attack1_collision_point == null) {
+            if($attack1_collision_point === null) {
                 $attack1_collision_point = self::findSameTileCollisionPoint($attack1, $attack2, $segments_by_tile_and_attack);
             }
-            if($attack2_collision_point == null) {
+            if($attack2_collision_point === null) {
                 $attack2_collision_point = self::findSameTileCollisionPoint($attack2, $attack1, $segments_by_tile_and_attack);
             }
 
@@ -1059,11 +1074,11 @@ class BattleActionProcessor {
                    1 2 3 >
                  < 7 6 5 4 3 2 1
              */
-            if($attack1_collision_point == null && $attack2_collision_point == null) {
+            if($attack1_collision_point === null && $attack2_collision_point === null) {
                 throw new Exception("No collision points found!");
             }
 
-            if($attack1_collision_point == null && $attack2_collision_point != null) {
+            if($attack1_collision_point === null && $attack2_collision_point !== null) {
                 $attack1_collision_point = self::findClosestTileInAttackPath($attack2_collision_point, $attack1);
 
                 $debug(BattleManager::DEBUG_ATTACK_COLLISION, 'half_collision_fixed', json_encode([
@@ -1071,7 +1086,7 @@ class BattleActionProcessor {
                     'attack2' => $attack2_collision_point,
                 ]));
             }
-            else if($attack2_collision_point == null && $attack1_collision_point != null) {
+            else if($attack2_collision_point === null && $attack1_collision_point !== null) {
                 $attack2_collision_point = self::findClosestTileInAttackPath($attack1_collision_point, $attack2);
 
                 $debug(BattleManager::DEBUG_ATTACK_COLLISION, 'half_collision_fixed', json_encode([

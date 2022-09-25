@@ -6,6 +6,13 @@ class BattleLog {
     public int $battle_id;
     public int $turn_number;
 
+    /*
+     * One of
+     *     Battle::TURN_TYPE_MOVEMENT
+     *     Battle::TURN_TYPE_ATTACK
+     */
+    public string $turn_phase;
+
     /** @var FighterActionLog[] - Map of combat_id => FighterActionLog */
     public array $fighter_action_logs;
 
@@ -22,12 +29,14 @@ class BattleLog {
         System $system,
         int $battle_id,
         int $turn_number,
+        string $turn_phase,
         string $content,
         array $fighter_action_logs
     ) {
         $this->system = $system;
         $this->battle_id = $battle_id;
         $this->turn_number = $turn_number;
+        $this->turn_phase = $turn_phase;
         $this->content = $content;
         $this->fighter_action_logs = $fighter_action_logs;
     }
@@ -115,6 +124,7 @@ class BattleLog {
             system: $system,
             battle_id: $raw_data['battle_id'],
             turn_number: $raw_data['turn_number'],
+            turn_phase: $raw_data['turn_phase'],
             content: $raw_data['content'],
             fighter_action_logs: array_map(function ($action_log) {
                 return new FighterActionLog(
@@ -137,7 +147,6 @@ class BattleLog {
     public static function addOrUpdateTurnLog(
         System $system, BattleLog $log
     ): void {
-        // int $battle_id, int $turn_number, string $content, array $fighter_action_logs
         $clean_content = $system->clean($log->content);
 
         $fighter_action_logs_json = json_encode($log->fighter_action_logs);
@@ -145,12 +154,13 @@ class BattleLog {
         $system->query("INSERT INTO `battle_logs` 
             SET `battle_id`='{$log->battle_id}',
                 `turn_number`='{$log->turn_number}',
+                `turn_phase`='{$log->turn_phase}',
                 `content`='{$clean_content}',
                 `fighter_action_logs`='{$fighter_action_logs_json}'
             ON DUPLICATE KEY UPDATE
                 `content`='{$clean_content}',
                 `fighter_action_logs`='{$fighter_action_logs_json}'
-        ");
+        ", true);
     }
 }
 

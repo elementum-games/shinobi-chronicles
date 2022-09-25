@@ -122,7 +122,7 @@ function arenaFightAPI(System $system, User $player): BattlePageAPIResponse {
     $response = new BattlePageAPIResponse();
 
     try {
-        $battle = BattleManager::init(system: $system, player: $player, battle_id: $player->battle_id, spectate: true);
+        $battle = BattleManager::init(system: $system, player: $player, battle_id: $player->battle_id);
         $battle->checkInputAndRunTurn();
 
         $response->battle_data = $battle->getApiResponse();
