@@ -97,30 +97,26 @@ class BattleManager {
 
     /**
      * BattleManager constructor.
+     *
      * @param System $system
      * @param User   $player
-     * @param int    $battle_id
+     * @param Battle $battle
+     * @param array  $default_attacks
      * @param bool   $spectate
-     * @param bool   $load_fighters
-     * @param bool   $is_api_request
-     * @throws Exception
      */
     public function __construct(
         System $system,
         User $player,
-        int $battle_id,
-        bool $spectate = false,
-        bool $load_fighters = true,
-        bool $is_api_request = false
+        Battle $battle,
+        array $default_attacks,
+        bool $spectate,
     ) {
         $this->system = $system;
-        $this->battle_id = $battle_id;
+        $this->battle = $battle;
         $this->player = $player;
         $this->spectate = $spectate;
-        $this->battle = Battle::loadFromId($system, $player, $battle_id);
-        $this->is_api_request = $is_api_request;
 
-        $this->default_attacks = $this->getDefaultAttacks();
+        $this->default_attacks = $default_attacks;
 
         $this->field = new BattleField(
             $system,
@@ -132,12 +128,6 @@ class BattleManager {
             json_decode($this->battle->raw_active_effects, true),
             json_decode($this->battle->raw_active_genjutsu, true)
         );
-
-        if($load_fighters) {
-            $this->loadFighters();
-
-            $this->effects->applyPassiveEffects($this->battle->player1, $this->battle->player2);
-        }
 
         $debug_closure = function(string $category, string $label, string $content) {
             $this->debug($category, $label, $content);
@@ -154,9 +144,41 @@ class BattleManager {
     }
 
     /**
+     * The database calls necessary for spinning up a working instance of BattleManager are captured in this method,
+     * so that for testing we can inject mocks.
+     *
      * @throws Exception
      */
-    protected function loadFighters() {
+    public static function init(
+        System $system,
+        User $player,
+        int $battle_id,
+        bool $spectate = false,
+        bool $load_fighters = true
+    ): BattleManager {
+        $battle = Battle::loadFromId($system, $player, $battle_id);
+        $default_attacks = BattleManager::getDefaultAttacks($system);
+
+        $battleManager = new BattleManager(
+            system: $system,
+            player: $player,
+            battle: $battle,
+            default_attacks: $default_attacks,
+            spectate: $spectate,
+        );
+
+        if($load_fighters) {
+            $battleManager->loadFighters();
+            $battleManager->effects->applyPassiveEffects($battle->player1, $battle->player2);
+        }
+
+        return $battleManager;
+    }
+
+    /**
+     * @throws Exception
+     */
+    protected function loadFighters(): void {
         if($this->player->id == $this->battle->player1_id) {
             $this->player_side = Battle::TEAM1;
             $this->opponent_side = Battle::TEAM2;
@@ -219,17 +241,6 @@ class BattleManager {
                 return;
             }
         }
-    }
-
-    protected function getDefaultAttacks(): array {
-        $default_attacks = [];
-
-        $query = "SELECT * FROM `jutsu` WHERE `purchase_type`='1'";
-        $result = $this->system->query($query);
-        while($row = $this->system->db_fetch($result)) {
-            $default_attacks[$row['jutsu_id']] = Jutsu::fromArray($row['jutsu_id'], $row);
-        }
-        return $default_attacks;
     }
 
 
@@ -771,100 +782,98 @@ class BattleManager {
         );
     }
 
-    // PRIVATE UTILS - PLAYER ACTIONS
+    // PRIVATE UTILS - PLAYER ACTIONS (public only for unit testing)
 
-    protected function collectPlayerAction(array $FORM_DATA): ?FighterAction {
+    /**
+     * @throws Exception
+     */
+    public function collectPlayerAction(array $FORM_DATA): ?FighterAction {
         if($this->battle->isAttackPhase() && !empty($FORM_DATA['submit_attack'])) {
-            try {
-                $jutsu_category = $FORM_DATA['jutsu_category'];
-                $jutsu_id = (int)$FORM_DATA['jutsu_id'] ?? null;
-                $hand_seals = $FORM_DATA['hand_seals'] ?? null;
-                $weapon_id = (int)$FORM_DATA['weapon_id'] ?? 0;
-                $target_tile = (int)$FORM_DATA['target_tile'] ?? null;
+            $jutsu_category = $FORM_DATA['jutsu_category'];
+            $jutsu_id = (int)$FORM_DATA['jutsu_id'] ?? null;
+            $hand_seals = $FORM_DATA['hand_seals'] ?? null;
+            $weapon_id = (int)$FORM_DATA['weapon_id'] ?? 0;
+            $target_tile = (int)$FORM_DATA['target_tile'] ?? null;
 
-                $this->debug(
-                    self::DEBUG_PLAYER_ACTION,
-                    'collecting attack action',
-                    json_encode([
-                        'jutsu_type' => $jutsu_category,
-                        'jutsu_id' => $jutsu_id,
-                        'hand_seals' => $hand_seals,
-                        'weapon_id' => $weapon_id,
-                    ])
+            $this->debug(
+                self::DEBUG_PLAYER_ACTION,
+                'collecting attack action',
+                json_encode([
+                    'jutsu_type' => $jutsu_category,
+                    'jutsu_id' => $jutsu_id,
+                    'hand_seals' => $hand_seals,
+                    'weapon_id' => $weapon_id,
+                    'target_tile' => $target_tile,
+                ])
+            );
+
+            // Check for handseals if ninjutsu/genjutsu
+            if($jutsu_category == Jutsu::TYPE_NINJUTSU or $jutsu_category == Jutsu::TYPE_GENJUTSU) {
+                if(!$hand_seals) {
+                    throw new Exception("Please enter hand seals!");
+                }
+
+                $player_jutsu = $this->getJutsuFromHandSeals($this->player, $hand_seals);
+
+                // Layered genjutsu check
+                if($player_jutsu && $player_jutsu->jutsu_type == Jutsu::TYPE_GENJUTSU && !empty($player_jutsu->parent_jutsu)) {
+                    $this->effects->assertParentGenjutsuActive($this->player, $player_jutsu);
+                }
+            }
+
+            // Check jutsu ID if taijutsu
+            else if($jutsu_category == Jutsu::TYPE_TAIJUTSU) {
+                $player_jutsu = $this->getJutsuFromId($this->player, $jutsu_id);
+            }
+            // Check BL jutsu ID if bloodline jutsu
+            else if($jutsu_category == 'bloodline_jutsu' && $this->player->bloodline_id) {
+                $player_jutsu = null;
+                if(isset($this->player->bloodline->jutsu[$jutsu_id])) {
+                    $player_jutsu = $this->player->bloodline->jutsu[$jutsu_id];
+                    $player_jutsu->setCombatId($this->player->combat_id);
+                }
+            }
+            else {
+                throw new Exception("Invalid jutsu selection!");
+            }
+
+            // Check jutsu cooldown
+            if(!$player_jutsu) {
+                throw new Exception("Invalid jutsu!");
+            }
+            if(isset($this->battle->jutsu_cooldowns[$player_jutsu->combat_id])) {
+                throw new Exception(
+                    "Cannot use that jutsu, it is on cooldown for " . $this->battle->jutsu_cooldowns[$player_jutsu->combat_id] . " more turns!"
                 );
+            }
 
-                // Check for handseals if ninjutsu/genjutsu
-                if($jutsu_category == Jutsu::TYPE_NINJUTSU or $jutsu_category == Jutsu::TYPE_GENJUTSU) {
-                    if(!$hand_seals) {
-                        throw new Exception("Please enter hand seals!");
-                    }
+            if(!$this->player->useJutsu($player_jutsu)) {
+                throw new Exception($this->system->message);
+            }
 
-                    $player_jutsu = $this->getJutsuFromHandSeals($this->player, $hand_seals);
-
-                    // Layered genjutsu check
-                    if($player_jutsu && $player_jutsu->jutsu_type == Jutsu::TYPE_GENJUTSU && !empty($player_jutsu->parent_jutsu)) {
-                        $this->effects->assertParentGenjutsuActive($this->player, $player_jutsu);
-                    }
-                }
-
-                // Check jutsu ID if taijutsu
-                else if($jutsu_category == Jutsu::TYPE_TAIJUTSU) {
-                    $player_jutsu = $this->getJutsuFromId($this->player, $jutsu_id);
-                }
-                // Check BL jutsu ID if bloodline jutsu
-                else if($jutsu_category == 'bloodline_jutsu' && $this->player->bloodline_id) {
-                    $player_jutsu = null;
-                    if(isset($this->player->bloodline->jutsu[$jutsu_id])) {
-                        $player_jutsu = $this->player->bloodline->jutsu[$jutsu_id];
-                        $player_jutsu->setCombatId($this->player->combat_id);
-                    }
-                }
-                else {
-                    throw new Exception("Invalid jutsu selection!");
-                }
-
-                // Check jutsu cooldown
-                if(!$player_jutsu) {
-                    throw new Exception("Invalid jutsu!");
-                }
-                if(isset($this->battle->jutsu_cooldowns[$player_jutsu->combat_id])) {
-                    throw new Exception(
-                        "Cannot use that jutsu, it is on cooldown for " . $this->battle->jutsu_cooldowns[$player_jutsu->combat_id] . " more turns!"
-                    );
-                }
-
-                if(!$this->player->useJutsu($player_jutsu)) {
-                    throw new Exception($this->system->message);
-                }
-
-                // Check for weapon if non-BL taijutsu
-                if($jutsu_category == Jutsu::TYPE_TAIJUTSU && !empty($weapon_id)) {
-                    if($this->player->hasItem($weapon_id)) {
-                        if(!in_array($weapon_id, $this->player->equipped_weapon_ids)) {
-                            $weapon_id = 0;
-                        }
-                    }
-                    else {
+            // Check for weapon if non-BL taijutsu
+            if($jutsu_category == Jutsu::TYPE_TAIJUTSU && !empty($weapon_id)) {
+                if($this->player->hasItem($weapon_id)) {
+                    if(!in_array($weapon_id, $this->player->equipped_weapon_ids)) {
                         $weapon_id = 0;
                     }
                 }
-
-                // Check target
-                $target = $this->getTarget($this->player, $player_jutsu, $target_tile);
-
-                // Log jutsu used
-                return new FighterAttackAction(
-                    fighter_id: $this->player->combat_id,
-                    jutsu_id: $player_jutsu->id,
-                    jutsu_purchase_type: $player_jutsu->purchase_type,
-                    weapon_id: $weapon_id,
-                    target: $target,
-                );
-
-            } catch(Exception $e) {
-                $this->system->message($e->getMessage());
-                return null;
+                else {
+                    $weapon_id = 0;
+                }
             }
+
+            // Check target
+            $target = $this->getTarget($this->player, $player_jutsu, $target_tile);
+
+            // Log jutsu used
+            return new FighterAttackAction(
+                fighter_id: $this->player->combat_id,
+                jutsu_id: $player_jutsu->id,
+                jutsu_purchase_type: $player_jutsu->purchase_type,
+                weapon_id: $weapon_id,
+                target: $target,
+            );
         }
         else if($this->battle->isMovementPhase() && !empty($FORM_DATA['submit_movement_action'])) {
             $target_tile = $FORM_DATA['selected_tile'] ?? null;
@@ -872,36 +881,31 @@ class BattleManager {
             $this->debug(self::DEBUG_PLAYER_ACTION, 'collecting movement action', $target_tile);
 
             // Run player attack
-            try {
-                if($target_tile == null) {
-                    throw new Exception("Invalid tile!");
-                }
-                if(!$this->field->tileIsInBounds($target_tile)) {
-                    throw new Exception("Invalid tile - out of bounds!");
-                }
-
-                return new FighterMovementAction(
-                    fighter_id: $this->player->combat_id,
-                    target_tile: $target_tile
-                );
-            } catch(Exception $e) {
-                $this->system->message($e->getMessage());
-                return null;
+            if($target_tile === null) {
+                throw new Exception("Invalid tile!");
             }
+            if(!$this->field->tileIsInBounds($target_tile)) {
+                throw new Exception("Invalid tile - out of bounds!");
+            }
+
+            return new FighterMovementAction(
+                fighter_id: $this->player->combat_id,
+                target_tile: $target_tile
+            );
         }
 
         return null;
     }
 
     /**
-     * @param Fighter $fighter
-     * @param Jutsu $
-     * @param int     $target_tile
+     * @param Fighter  $fighter
+     * @param Jutsu    $jutsu
+     * @param int|null $target_tile
      * @return AttackTarget
      * @throws Exception
      */
     private function getTarget(Fighter $fighter, Jutsu $jutsu, ?int $target_tile): AttackTarget {
-        if($target_tile != null) {
+        if($target_tile !== null) {
             $distance_to_target = $this->field->distanceFromFighter($fighter->combat_id, $target_tile);
             if($distance_to_target > $jutsu->range) {
                 throw new Exception("getTarget: Target is not in range!");
@@ -998,6 +1002,19 @@ class BattleManager {
         }
 
         $this->system->debugMessage($label . ': ' . $content);
+    }
+
+    // STATIC UTILS
+
+    protected static function getDefaultAttacks(System $system): array {
+        $default_attacks = [];
+
+        $query = "SELECT * FROM `jutsu` WHERE `purchase_type`='1'";
+        $result = $system->query($query);
+        while($row = $system->db_fetch($result)) {
+            $default_attacks[$row['jutsu_id']] = Jutsu::fromArray($row['jutsu_id'], $row);
+        }
+        return $default_attacks;
     }
 
 }

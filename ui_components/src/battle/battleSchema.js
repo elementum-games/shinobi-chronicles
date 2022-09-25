@@ -80,6 +80,9 @@ export type WeaponType = {|
 |};
 
 export type BattleLogType = {|
+    +isMovementPhase: boolean,
+    +isAttackPhase: boolean,
+    +isPreparationPhase: boolean,
     +fighterActions: { [key: string]: FighterActionLogType }
 |};
 

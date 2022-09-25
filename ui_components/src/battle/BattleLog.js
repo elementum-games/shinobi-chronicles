@@ -32,7 +32,7 @@ export default function BattleLog({ lastTurnLog }: Props): React$Node {
                                     </p>
                                 );
                             })}
-                            {action.hits.length < 1 &&
+                            {lastTurnLog.isAttackPhase && action.hits.length < 1 &&
                                 <p key={i} style={{fontStyle: 'italic'}}>
                                     The attack missed.
                                 </p>

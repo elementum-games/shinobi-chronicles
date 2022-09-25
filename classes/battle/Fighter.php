@@ -20,12 +20,12 @@ abstract class Fighter {
     public string $combat_id;
 
     // Energy
-    public float $health;
-    public float $max_health;
-    public float $stamina;
-    public float $max_stamina;
-    public float $chakra;
-    public float $max_chakra;
+    public float $health = 100;
+    public float $max_health = 100;
+    public float $stamina = 100;
+    public float $max_stamina = 100;
+    public float $chakra = 100;
+    public float $max_chakra = 100;
 
     public int $level = 1;
     public int $money = 0;

@@ -26,7 +26,7 @@ export default function BattleLog({
           fontWeight: 'bold'
         }
       }, hit.attackerName, " deals ", hit.damage, " ", hit.damageType, " damage to ", hit.targetName, ".");
-    }), action.hits.length < 1 && /*#__PURE__*/React.createElement("p", {
+    }), lastTurnLog.isAttackPhase && action.hits.length < 1 && /*#__PURE__*/React.createElement("p", {
       key: i,
       style: {
         fontStyle: 'italic'

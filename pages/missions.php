@@ -162,7 +162,7 @@ function runActiveMission(): bool {
                 Battle::start($system, $player, $opponent, Battle::TYPE_AI_MISSION);
             }
 
-            $battle = new BattleManager($system, $player, $player->battle_id);
+            $battle = BattleManager::init($system, $player, $player->battle_id);
             $battle->checkInputAndRunTurn();
 
             $battle->renderBattle();
@@ -426,7 +426,7 @@ function missionFightAPI(System $system, User $player): BattlePageAPIResponse {
     $response = new BattlePageAPIResponse();
 
     try {
-        $battle = new BattleManager($system, $player, $player->battle_id);
+        $battle = BattleManager::init($system, $player, $player->battle_id);
         $battle->checkInputAndRunTurn();
 
         $response->battle_data = $battle->getApiResponse();

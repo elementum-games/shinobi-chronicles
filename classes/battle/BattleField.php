@@ -9,7 +9,6 @@ require_once __DIR__ . '/BattleFieldTile.php';
 require_once __DIR__ . '/AttackTarget.php';
 
 class BattleField {
-    private System $system;
     private Battle $battle;
 
     /** @var int[] */
@@ -20,12 +19,13 @@ class BattleField {
 
     /**
      * BattleField constructor.
+     *
+     * Not sure if we'll ever need system here?
+     *
      * @param System $system
      * @param Battle $battle
-     * @throws Exception
      */
     public function __construct(System $system, Battle &$battle) {
-        $this->system = $system;
         $this->battle = &$battle;
 
         $field_data = json_decode($battle->raw_field, true);

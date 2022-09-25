@@ -250,16 +250,17 @@ class User extends Fighter {
 
     /**
      * User constructor.
-     * @param $user_id
+     * @param System $system
+     * @param int    $user_id
      * @throws Exception
      */
-    public function __construct(System $system, $user_id) {
+    public function __construct(System $system, int $user_id) {
         $this->system =& $system;
         if(!$user_id) {
             throw new Exception("Invalid user id!");
         }
-
-        $this->user_id = $this->system->clean($user_id);
+        
+        $this->user_id = $user_id;
         $this->id = self::ENTITY_TYPE . ':' . $this->user_id;
     }
 

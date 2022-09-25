@@ -17,7 +17,7 @@ function spar() {
 
 	if($player->battle_id) {
 		try {
-            $battle = new BattleManager($system, $player, $player->battle_id);
+            $battle = BattleManager::init($system, $player, $player->battle_id);
 
             $battle->checkInputAndRunTurn();
 
@@ -220,7 +220,7 @@ function sparFightAPI(System $system, User $player): BattlePageAPIResponse {
     $response = new BattlePageAPIResponse();
 
     try {
-        $battle = new BattleManager($system, $player, $player->battle_id);
+        $battle = BattleManager::init($system, $player, $player->battle_id);
         $battle->checkInputAndRunTurn();
 
         $response->battle_data = $battle->getApiResponse();

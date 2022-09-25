@@ -18,7 +18,7 @@ function battle(): bool {
 	global $self_link;
 
 	if($player->battle_id) {
-        $battle = new BattleManager($system, $player, $player->battle_id);
+        $battle = BattleManager::init($system, $player, $player->battle_id);
 
         $battle->checkInputAndRunTurn();
 
@@ -192,7 +192,7 @@ function battleFightAPI(System $system, User $player): BattlePageAPIResponse {
     $response = new BattlePageAPIResponse();
 
     try {
-        $battle = new BattleManager($system, $player, $player->battle_id);
+        $battle = BattleManager::init($system, $player, $player->battle_id);
         $battle->checkInputAndRunTurn();
 
         $response->battle_data = $battle->getApiResponse();

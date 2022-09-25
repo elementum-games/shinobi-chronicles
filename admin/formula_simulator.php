@@ -127,14 +127,8 @@ function calcDamage(Fighter $player1, Fighter $player2, Jutsu $player1_jutsu, Ju
     $player2_raw_damage = $player2->calcDamage($player2_jutsu, true);
 
     // Collision
-    $battle_id = Battle::start(
-        system: $system,
-        player1: $player1,
-        player2: $player2,
-        battle_type: Battle::TYPE_SPAR
-    );
-    $battle = new BattleManager($system, $user, $battle_id, true, false);
-
+    $battle_id = Battle::start($system, $player1, $player2, Battle::TYPE_SPAR);
+    $battle = BattleManager::init($system, $user, $battle_id, true, false);
     $collision_text = $battle->jutsuCollision(
         player1: $player1,
         player2: $player2,

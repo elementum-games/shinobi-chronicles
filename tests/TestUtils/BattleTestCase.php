@@ -9,6 +9,7 @@ use BattleAttack;
 use BattleEffectsManager;
 use Fighter;
 use Jutsu;
+use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;
 use SC\Factories\JutsuFactory;
 use System;
@@ -16,7 +17,12 @@ use System;
 class BattleTestCase extends TestCase {
     private static int $next_int = 1;
 
-    protected function initBattle(int $player1Location = 2, int $player2Location = 4): Battle {
+    /**
+     * @param int $player1Location
+     * @param int $player2Location
+     * @return Battle|Stub
+     */
+    protected function initBattle(int $player1Location = 2, int $player2Location = 4): Stub|Battle {
         $battle = $this->createStub(Battle::class);
         $battle->player1 = $this->createStub(Fighter::class);
         $battle->player1->id = 1;
@@ -40,6 +46,9 @@ class BattleTestCase extends TestCase {
                 $battle->player2->combat_id => $player2Location,
             ],
         ]);
+
+        $battle->raw_active_effects = json_encode([]);
+        $battle->raw_active_genjutsu = json_encode([]);
 
         return $battle;
     }

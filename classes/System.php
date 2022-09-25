@@ -313,7 +313,7 @@ class System {
         $query = trim($query);
 
         //Debugging
-        if($debug == true) {
+        if($debug) {
             echo $query;
             return false;
         }
