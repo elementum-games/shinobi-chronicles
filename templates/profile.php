@@ -205,7 +205,7 @@ $clan_positions = [
                 ></div>
             </div>
         </div>
-        
+
         <!--Chakra Bar-->
         <div class='resourceContainer'>
             <span>Chakra:</span>
@@ -284,7 +284,7 @@ $clan_positions = [
 
                     //Check each bar to see if regen will exceed max.
                     let healthRegen = regen * 2;
-                    
+
                     statusBars.health.current = Math.min(statusBars.health.current + healthRegen, statusBars.health.max);
                     statusBars.chakra.current = Math.min(statusBars.chakra.current + regen, statusBars.chakra.max);
                     statusBars.stamina.current = Math.min(statusBars.stamina.current + regen, statusBars.stamina.max);
@@ -301,7 +301,7 @@ $clan_positions = [
                     const healthRegenWidth = round(healthRegenAmount / statusBars.health.max, 2);
                     const chakraRegenWidth = round(chakraRegenAmount / statusBars.chakra.max, 2);
                     const staminaRegenWidth = round(staminaRegenAmount / statusBars.stamina.max, 2);
-                    
+
                     document.querySelector('#health label').innerText =
                         statusBars.health.current.toFixed(2) + '/' + statusBars.health.max.toFixed(2);
                     document.querySelector('#health .fill').style.width = `${healthWidth}%`;
