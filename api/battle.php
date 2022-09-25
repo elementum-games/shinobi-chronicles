@@ -57,7 +57,7 @@ if($system->db_last_num_rows) {
     API::exitWithData(
         data: [
             'battle' => $response->battle_data,
-            'battle_result' => $response->battle_result,
+            'battleResult' =>$response->battle_result,
         ],
         errors: $response->errors,
         debug_messages: $system->debug_messages,

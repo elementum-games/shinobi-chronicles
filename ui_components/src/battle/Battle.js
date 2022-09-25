@@ -26,6 +26,8 @@ function Battle({
 }: Props) {
     // STATE
     const [battle, setBattle] = React.useState(initialBattle);
+    const [battleResult, setBattleResult] = React.useState<?string>(null);
+
     const [attackInput, setAttackInput] = React.useState<AttackInputFields>({
         handSeals: [],
         jutsuId: -1,
@@ -55,6 +57,10 @@ function Battle({
         if (response.data.battle != null && Object.keys(response.data.battle).length > 0) {
             setBattle(response.data.battle);
         }
+        if(response.data.battleResult != null) {
+            setBattleResult(response.data.battleResult);
+        }
+
         if(response.errors.length > 0) {
             setError(response.errors.join(' '));
         }
@@ -113,6 +119,7 @@ function Battle({
             />
         )}
         <BattleLog lastTurnLog={battle.lastTurnLog} />
+        {battleResult && <BattleResult description={battleResult} />}
     </div>;
 }
 
@@ -218,6 +225,17 @@ function SpectateStatus() {
     </table>
 
      */
+}
+
+function BattleResult({description}) {
+    return <table className='table'>
+        <tbody>
+            <tr><th>Battle Results</th></tr>
+            <tr><td>
+                <div dangerouslySetInnerHTML={{__html: description}}></div>
+            </td></tr>
+        </tbody>
+    </table>;
 }
 
 
