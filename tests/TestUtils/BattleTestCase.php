@@ -24,6 +24,8 @@ class BattleTestCase extends TestCase {
      */
     protected function initBattle(int $player1Location = 2, int $player2Location = 4): Stub|Battle {
         $battle = $this->createStub(Battle::class);
+        $battle->battle_id = self::$next_int++;
+
         $battle->player1 = $this->createStub(Fighter::class);
         $battle->player1->id = 1;
         $battle->player1->combat_id = Battle::combatId(Battle::TEAM1, $battle->player1);
