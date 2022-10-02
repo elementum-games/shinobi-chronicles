@@ -116,7 +116,6 @@ class BattleApiPresenter {
         ];
     }
 
-    #[ArrayShape(['id' => "int", 'combatId' => "null|string", 'name' => "string", 'activeCooldownTurnsLeft' => "int|mixed", 'jutsuType' => "string", 'targetType' => "string", 'handSeals' => "string[]", 'range' => "int"])]
     private static function jutsuResponse(Jutsu $jutsu, Battle $battle): array {
         return [
             'id' => $jutsu->id,
@@ -127,6 +126,7 @@ class BattleApiPresenter {
             'targetType' => $jutsu->target_type,
             'handSeals' => explode('-', $jutsu->hand_seals),
             'range' => $jutsu->range,
+            'element' => $jutsu->element,
         ];
     }
 
@@ -156,6 +156,13 @@ class BattleApiPresenter {
                         "actionDescription" => self::unescapeQuotes(
                             $action_log->action_description
                         ),
+                        "pathSegments" => array_map(function(AttackPathSegment $segment) {
+                            return [
+                                'tileIndex' => $segment->tile->index,
+                                'rawDamage' => $segment->raw_damage,
+                                'timeArrived' => $segment->time_arrived,
+                            ];
+                        }, $action_log->path_segments),
                         "hits" => array_map(function(AttackHitLog $hit) {
                             return [
                                 'attackerId' =>  $hit->attacker_id,
@@ -172,6 +179,10 @@ class BattleApiPresenter {
                         "newEffectAnnouncements" => self::unescapeQuotes(
                             $action_log->new_effect_announcements
                         ),
+                        "jutsuElement" => $action_log->jutsu_element,
+                        "jutsuType" => $action_log->jutsu_type,
+                        "jutsuUseType" => $action_log->jutsu_use_type,
+                        "jutsuTargetType" => $action_log->jutsu_target_type,
                     ];
                 },
                 $turn_log->fighter_action_logs

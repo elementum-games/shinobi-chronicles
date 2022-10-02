@@ -46,6 +46,16 @@ class BattleLog {
         $fighter_action_log->action_description .= $this->system->clean($action_description);
     }
 
+    /**
+     * @param Fighter             $fighter
+     * @param AttackPathSegment[] $path_segments
+     * @return void
+     */
+    public function setFighterAttackPathSegments(Fighter $fighter, array $path_segments): void {
+        $fighter_action_log = $this->getFighterActionLog($fighter->combat_id);
+        $fighter_action_log->path_segments = $path_segments;
+    }
+
     public function addFighterAttackHit(
         Fighter $attacker, Fighter $target, string $damage_type, float $damage
     ): void {
@@ -70,11 +80,20 @@ class BattleLog {
         $fighter_action_log->applied_effect_descriptions[] = $this->system->clean($announcement_text);
     }
 
+    public function addFighterAttackJutsuInfo(Fighter $fighter, Jutsu $jutsu): void {
+        $fighter_action_log = $this->getFighterActionLog($fighter->combat_id);
+        $fighter_action_log->jutsu_element = $jutsu->element;
+        $fighter_action_log->jutsu_type = $jutsu->jutsu_type;
+        $fighter_action_log->jutsu_use_type = $jutsu->use_type;
+        $fighter_action_log->jutsu_target_type = $jutsu->target_type;
+    }
+
     protected function getFighterActionLog(string $fighter_id) {
         if(!isset($this->fighter_action_logs[$fighter_id])) {
             $this->fighter_action_logs[$fighter_id] = new FighterActionLog(
                 fighter_id: $fighter_id,
                 action_description: '',
+                path_segments: [],
                 hits: [],
                 applied_effect_descriptions: [],
                 new_effect_announcements: []
@@ -130,6 +149,9 @@ class BattleLog {
                 return new FighterActionLog(
                     fighter_id: $action_log['fighter_id'],
                     action_description: $action_log['action_description'],
+                    path_segments: array_map(function ($segment) {
+                        return AttackPathSegment::fromArray($segment);
+                    }, $action_log['path_segments']),
                     hits: array_map(function($hit) {
                         return AttackHitLog::fromArray($hit);
                     }, $action_log['hits']),
@@ -168,6 +190,7 @@ class FighterActionLog {
     /**
      * @param string         $fighter_id
      * @param string         $action_description
+     * @param AttackPathSegment[] $path_segments
      * @param AttackHitLog[] $hits
      * @param array          $applied_effect_descriptions
      * @param array          $new_effect_announcements
@@ -175,9 +198,14 @@ class FighterActionLog {
     public function __construct(
         public string $fighter_id,
         public string $action_description,
+        public array $path_segments,
         public array $hits,
         public array $applied_effect_descriptions,
-        public array $new_effect_announcements
+        public array $new_effect_announcements,
+        public ?string $jutsu_element = null,
+        public ?string $jutsu_type = null,
+        public ?string $jutsu_use_type = null,
+        public ?string $jutsu_target_type = null,
     ) {}
 }
 

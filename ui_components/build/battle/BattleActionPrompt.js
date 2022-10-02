@@ -51,5 +51,27 @@ export default function BattleActionPrompt({
     style: {
       textAlign: "center"
     }
-  }, /*#__PURE__*/React.createElement("b", null, battle.turnSecondsRemaining), " seconds remaining"))));
+  }, /*#__PURE__*/React.createElement(TimeRemaining, {
+    turnSecondsRemaining: battle.turnSecondsRemaining,
+    turnCount: battle.turnCount
+  })))));
+}
+
+function TimeRemaining({
+  turnSecondsRemaining,
+  turnCount
+}) {
+  const [secondsRemaining, setSecondsRemaining] = React.useState(turnSecondsRemaining);
+  React.useEffect(() => {
+    setSecondsRemaining(turnSecondsRemaining);
+  }, [turnCount]);
+  React.useEffect(() => {
+    const decrementTimeRemaining = () => {
+      setSecondsRemaining(prevSeconds => prevSeconds <= 0 ? 0 : prevSeconds - 1);
+    };
+
+    const intervalId = setInterval(decrementTimeRemaining, 1000);
+    return () => clearInterval(intervalId);
+  }, []);
+  return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("b", null, secondsRemaining), " seconds remaining");
 }

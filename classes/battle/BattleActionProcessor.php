@@ -110,6 +110,11 @@ class BattleActionProcessor {
                     $player1_attack->jutsu->battle_text, $this->battle->player1, $this->battle->player2
                 )
             );
+            $this->battle->current_turn_log->addFighterAttackJutsuInfo($this->battle->player1, $player1_attack->jutsu);
+            $this->battle->current_turn_log->setFighterAttackPathSegments(
+                $this->battle->player1,
+                $player1_attack->path_segments
+            );
 
             foreach($player1_attack->hits as $hit) {
                 /** @var BattleAttackHit $hit */
@@ -140,6 +145,11 @@ class BattleActionProcessor {
                 $this->parseCombatText(
                     $player2_attack->jutsu->battle_text, $this->battle->player2, $this->battle->player1
                 )
+            );
+            $this->battle->current_turn_log->addFighterAttackJutsuInfo($this->battle->player2, $player2_attack->jutsu);
+            $this->battle->current_turn_log->setFighterAttackPathSegments(
+                $this->battle->player2,
+                $player2_attack->path_segments
             );
 
             foreach($player2_attack->hits as $hit) {

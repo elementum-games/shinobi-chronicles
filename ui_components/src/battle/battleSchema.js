@@ -67,9 +67,11 @@ export type JutsuType = {|
     +name: string,
     +activeCooldownTurnsLeft: number,
     +jutsuType: 'ninjutsu' | 'genjutsu' | 'taijutsu',
-    +targetType:  'fighter_id' | 'tile' | 'direction',
+    +useType: 'physical' | 'projectile' | 'projectile_aoe' | 'spawn' | 'barrier',
+    +targetType: 'fighter_id' | 'tile' | 'direction',
     +handSeals: $ReadOnlyArray<string>,
     +range: number,
+    +element: 'None' | 'Fire' | 'Earth' | 'Wind' | 'Water' | 'Lightning';
 |};
 
 // BattleApiPresenter::weaponResponse
@@ -90,9 +92,20 @@ export type BattleLogType = {|
 export type FighterActionLogType = {|
     +fighterId: string,
     +actionDescription: string,
+    +pathSegments: $ReadOnlyArray<AttackPathSegmentType>,
     +hits: $ReadOnlyArray<AttackHitLogType>,
     +appliedEffectDescriptions: $ReadOnlyArray<string>,
     +newEffectAnnouncements: $ReadOnlyArray<string>,
+    +jutsuElement: JutsuType["element"],
+    +jutsuType: JutsuType["jutsuType"],
+    +jutsuUseType: JutsuType["useType"],
+    +jutsuTargetType: JutsuType["targetType"],
+|};
+
+export type AttackPathSegmentType = {|
+    +tileIndex: number,
+    +rawDamage: number,
+    +timeArrived: number,
 |};
 
 export type AttackHitLogType = {|

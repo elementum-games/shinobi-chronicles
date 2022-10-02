@@ -94,4 +94,13 @@ class AttackPathSegment {
         $this->raw_damage = $raw_damage;
         $this->time_arrived = $time_arrived;
     }
+
+    public static function fromArray(array $segment): AttackPathSegment {
+        return new AttackPathSegment(
+            index: $segment['index'],
+            tile: new BattleFieldTile($segment['tile']['index'], $segment['tile']['fighter_ids']),
+            raw_damage: $segment['raw_damage'],
+            time_arrived: $segment['time_arrived'],
+        );
+    }
 }
