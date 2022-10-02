@@ -62,6 +62,7 @@ class BattleApiPresenter {
             'isComplete' => $battle->isComplete(),
             'playerActionSubmitted' => $player_action_submitted,
             'turnSecondsRemaining' => $battle->timeRemaining(),
+            'turnCount' => $battle->turn_count,
             'lastTurnText' => '',
             'lastTurnLog' => BattleApiPresenter::turnLogResponse($battle->getLastTurnLog()),
             'currentPhaseLabel' => $battle->getCurrentPhaseLabel(),

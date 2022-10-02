@@ -17,6 +17,7 @@ export type BattleType = {|
     +isPreparationPhase: boolean,
     +isComplete: boolean,
     +playerActionSubmitted: boolean,
+    +turnCount: number,
     +turnSecondsRemaining: number,
     +lastTurnText: string,
     +lastTurnLog: BattleLogType,

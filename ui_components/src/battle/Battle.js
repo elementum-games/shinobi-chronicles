@@ -16,9 +16,6 @@ type Props = {|
     +membersLink: string,
 |};
 
-
-// TODO: Make battle send new battle field
-
 function Battle({
     battle: initialBattle,
     battleApiLink,
@@ -201,7 +198,6 @@ function FightersAndField({
         </table>
     );
 }
-
 
 function SpectateStatus() {
     return <div>

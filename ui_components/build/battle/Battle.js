@@ -5,7 +5,6 @@ import BattleActionPrompt from "./BattleActionPrompt.js";
 import { apiFetch } from "../utils/network.js";
 import { findPlayerJutsu } from "./playerUtils.js";
 
-// TODO: Make battle send new battle field
 function Battle({
   battle: initialBattle,
   battleApiLink,
@@ -13,6 +12,7 @@ function Battle({
 }) {
   // STATE
   const [battle, setBattle] = React.useState(initialBattle);
+  const [battleResult, setBattleResult] = React.useState(null);
   const [attackInput, setAttackInput] = React.useState({
     handSeals: [],
     jutsuId: -1,
@@ -36,6 +36,10 @@ function Battle({
   const handleApiResponse = response => {
     if (response.data.battle != null && Object.keys(response.data.battle).length > 0) {
       setBattle(response.data.battle);
+    }
+
+    if (response.data.battleResult != null) {
+      setBattleResult(response.data.battleResult);
     }
 
     if (response.errors.length > 0) {
@@ -82,6 +86,8 @@ function Battle({
     isAttackSelected: isSelectingTile
   }), /*#__PURE__*/React.createElement(BattleLog, {
     lastTurnLog: battle.lastTurnLog
+  }), battleResult && /*#__PURE__*/React.createElement(BattleResult, {
+    description: battleResult
   }));
 } // Fighters and Field
 
@@ -164,6 +170,18 @@ function SpectateStatus() {
       </td></tr>
   </table>
      */
+}
+
+function BattleResult({
+  description
+}) {
+  return /*#__PURE__*/React.createElement("table", {
+    className: "table"
+  }, /*#__PURE__*/React.createElement("tbody", null, /*#__PURE__*/React.createElement("tr", null, /*#__PURE__*/React.createElement("th", null, "Battle Results")), /*#__PURE__*/React.createElement("tr", null, /*#__PURE__*/React.createElement("td", null, /*#__PURE__*/React.createElement("div", {
+    dangerouslySetInnerHTML: {
+      __html: description
+    }
+  })))));
 }
 
 window.Battle = Battle;
