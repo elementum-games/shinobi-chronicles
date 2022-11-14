@@ -148,7 +148,21 @@ function marriage() {
 
     if(isset($_POST['confirm_divorce'])) {
         try {
-            $system->query("UPDATE `users` SET `spouse`='0', `marriage_time`='0' WHERE `user_id`='$player->spouse' LIMIT 1");
+            $result = $system->query("SELECT user_id, user_name, spouse FROM users WHERE user_id ='$player->spouse' LIMIT 1");
+            if (!$system->db_last_num_rows)
+            {
+                throw new Exception("Failed to fetch marriage information");
+            }
+            $current_marriage = $system->db_fetch($result);
+            if ($current_marriage['spouse'] === $player->user_id)
+            {
+                $system->query("UPDATE `users` SET `spouse`='0', `marriage_time`='0' WHERE `user_id`='$player->spouse' LIMIT 1");
+            }
+           else
+           {
+                $system->query("UPDATE `users` SET `spouse`='0', `marriage_time`='0' WHERE `user_id`='$player->spouse' OR `user_id`=" . $current_marriage['spouse'] . " LIMIT 2");
+           }
+
             if(!$system->db_last_affected_rows) {
                 throw new Exception("Error processing divorce!");
             }
