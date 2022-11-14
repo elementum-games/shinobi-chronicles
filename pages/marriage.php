@@ -154,18 +154,29 @@ function marriage() {
                 throw new Exception("Failed to fetch marriage information");
             }
             $current_marriage = $system->db_fetch($result);
-            if ($current_marriage['spouse'] === $player->user_id)
-            {
+            if ($current_marriage['spouse'] === $player->user_id) {
                 $system->query("UPDATE `users` SET `spouse`='0', `marriage_time`='0' WHERE `user_id`='$player->spouse' LIMIT 1");
+                if(!$system->db_last_affected_rows) {
+                    throw new Exception("Error processing divorce!");
+                }
             }
-           else
+            else
            {
-                $system->query("UPDATE `users` SET `spouse`='0', `marriage_time`='0' WHERE `user_id`='$player->spouse' OR `user_id`=" . $current_marriage['spouse'] . " LIMIT 2");
-           }
+               $spouses_spouse_result = $system->query("SELECT user_id, user_name, spouse FROM users WHERE user_id =" . $current_marriage['spouse'] . " LIMIT 1");
+               if (!$system->db_last_num_rows)
+               {
+                   throw new Exception("Failed to fetch spouse information");
+               }
+               $spouses_spouse = $system->db_fetch($spouses_spouse_result);
 
-            if(!$system->db_last_affected_rows) {
-                throw new Exception("Error processing divorce!");
-            }
+               if (!$current_marriage['user_id'] === $spouses_spouse['spouse'])
+               {
+                   $system->query("UPDATE `users` SET `spouse`='0', `marriage_time`='0' WHERE `user_id`='$player->spouse' OR `user_id`=" . $current_marriage['spouse'] . " LIMIT 2");
+                   if(!$system->db_last_affected_rows) {
+                       throw new Exception("Error processing divorce!");
+                   }
+               }
+           }
 
             $system->message("You have divorced $player->spouse_name!");
 
