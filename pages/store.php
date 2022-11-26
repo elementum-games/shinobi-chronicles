@@ -62,9 +62,23 @@ function store() {
 				throw new Exception("You already own this item!");
 			}
 			
+			$max_missing = -1;
+			if (isset($_GET['max'])) {
+				if ($player->checkInventory($item_id, 'item')) {
+					$max_missing = $max_consumables - $player->items[$item_id]['quantity'];
+				} else {
+					$max_missing = $max_consumables;
+				}
+			}
 			// Check for money requirement
 			if($player->money < $shop_items[$item_id]['purchase_cost']) {
 				throw new Exception("You do not have enough money!");
+			}
+			if ($max_missing > 0) {
+				if ($player->money < $shop_items[$item_id]['purchase_cost'] * $max_missing) {
+					throw new Exception("You do not have enough money to buy the max amount!");
+
+				}
 			}
 			
 			// Check for max consumables
@@ -74,16 +88,21 @@ function store() {
 				}
 			}
 			
-			
+			if ($max_missing < 0) {
 			// Add to inventory or increment quantity
-			$player->money -= $shop_items[$item_id]['purchase_cost'];
-			
-			if(($shop_items[$item_id]['use_type'] == 1 || $shop_items[$item_id]['use_type'] == 2) || !$player->checkInventory($item_id, 'item')) {
+				$player->money -= $shop_items[$item_id]['purchase_cost'];
+				
+				if(($shop_items[$item_id]['use_type'] == 1 || $shop_items[$item_id]['use_type'] == 2) || !$player->checkInventory($item_id, 'item')) {
+					$player->items[$item_id]['item_id'] = $item_id;
+					$player->items[$item_id]['quantity'] = 1;
+				}
+				else if($shop_items[$item_id]['use_type'] == 3) {
+					$player->items[$item_id]['quantity']++;
+				}
+			} else {
+				$player->money -= $shop_items[$item_id]['purchase_cost'] * $max_missing;
 				$player->items[$item_id]['item_id'] = $item_id;
-				$player->items[$item_id]['quantity'] = 1;
-			}
-			else if($shop_items[$item_id]['use_type'] == 3) {
-				$player->items[$item_id]['quantity']++;
+				$player->items[$item_id]['quantity'] = $max_consumables;
 			}
 			
 			$system->message("Item purchased!");
@@ -345,7 +364,9 @@ function store() {
 					"</td>
 					<td style='width:25%;'>" . ucwords(str_replace('_', ' ', $item['effect'])) . "</td>
 					<td style='width:20%;'>&yen;{$item['purchase_cost']}</td>
-					<td style='width:20%;'><a href='$self_link&view=$category&purchase_item={$item['item_id']}'>Purchase</a></td>
+					<td style='width:20%;'><a href='$self_link&view=$category&purchase_item={$item['item_id']}'>Purchase</a>" .
+					($category == 'consumables' ? "/<br><a href='$self_link&view=$category&purchase_item={$item['item_id']}&max=true'>Purchase Max</a>" : "") .
+					"</td>
 				</tr>";
 
 			}
