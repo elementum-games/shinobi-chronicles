@@ -69,7 +69,7 @@ started quickly with minimal PHP environment/Git knowledge.
    - Select the database `shinobi_chronicles` in PhpMyAdmin
    - Click "Import" at the top menu
    - Click "Choose file" and navigate to your SC directory
-     - Select `shinobi-chronicles/db/schost_game_structure.sql` and proceed with the import
+     - Select `shinobi-chronicles/db/V1__schost_game_structure.sql` and proceed with the import
 8. Setup game config in PhpStorm
    - Find `secure/vars.sample.php`
    - Make a copy of it as `secure/vars.php` 
@@ -96,4 +96,12 @@ Then go to "Windows downloads"
 We use composer for managing some dependencies and info about PHP version. Download
 at 
 https://getcomposer.org/download/
-and run `composer install` 
+and run `composer install`
+
+### Docker compose
+If you want to use docker before starting php set up your database with 
+```
+docker compose up -d
+```
+
+This will set up mysql and perform database migration in order to initialize database with needed data.
