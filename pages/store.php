@@ -62,34 +62,39 @@ function store() {
 				throw new Exception("You already own this item!");
 			}
 			
-			$max_missing = -1;
-			if (isset($_GET['max'])) {
+			if (isset($_GET['max'])) { // Code for handling buying bulk
+				$max_missing = 0;
 				if ($player->checkInventory($item_id, 'item')) {
 					$max_missing = $max_consumables - $player->items[$item_id]['quantity'];
 				} else {
 					$max_missing = $max_consumables;
 				}
-			}
-			// Check for money requirement
-			if($player->money < $shop_items[$item_id]['purchase_cost']) {
-				throw new Exception("You do not have enough money!");
-			}
-			if ($max_missing > 0) {
+
+				if($player->items[$item_id]['quantity'] >= $max_consumables) {
+					throw new Exception("Your supply of this item is already full!");
+				}
+
 				if ($player->money < $shop_items[$item_id]['purchase_cost'] * $max_missing) {
 					throw new Exception("You do not have enough money to buy the max amount!");
 
 				}
-			}
-			
-			// Check for max consumables
-			if($player->checkInventory($item_id, 'item') && $shop_items[$item_id]['use_type'] == 3) {
-				if($player->items[$item_id]['quantity'] >= $max_consumables) {
-					throw new Exception("Your supply of this item is already full!");
+				$player->money -= $shop_items[$item_id]['purchase_cost'] * $max_missing;
+				$player->items[$item_id]['item_id'] = $item_id;
+				$player->items[$item_id]['quantity'] = $max_consumables;
+
+			} else { //code for handling single purchases
+				// Check for money requirement
+				if($player->money < $shop_items[$item_id]['purchase_cost']) {
+					throw new Exception("You do not have enough money!");
 				}
-			}
 			
-			if ($max_missing < 0) {
-			// Add to inventory or increment quantity
+				// Check for max consumables
+				if($player->checkInventory($item_id, 'item') && $shop_items[$item_id]['use_type'] == 3) {
+					if($player->items[$item_id]['quantity'] >= $max_consumables) {
+						throw new Exception("Your supply of this item is already full!");
+					}
+				}
+
 				$player->money -= $shop_items[$item_id]['purchase_cost'];
 				
 				if(($shop_items[$item_id]['use_type'] == 1 || $shop_items[$item_id]['use_type'] == 2) || !$player->checkInventory($item_id, 'item')) {
@@ -99,12 +104,7 @@ function store() {
 				else if($shop_items[$item_id]['use_type'] == 3) {
 					$player->items[$item_id]['quantity']++;
 				}
-			} else {
-				$player->money -= $shop_items[$item_id]['purchase_cost'] * $max_missing;
-				$player->items[$item_id]['item_id'] = $item_id;
-				$player->items[$item_id]['quantity'] = $max_consumables;
-			}
-			
+			} 
 			$system->message("Item purchased!");
 		} catch (Exception $e) {
 			$system->message($e->getMessage());
