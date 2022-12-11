@@ -1,5 +1,17 @@
 version: '3'
 services:
+
+  shinobi-chronicles-app:
+    build:
+      dockerfile: docker/php/Dockerfile
+      context:  ./
+    ports:
+      - "8000:80"
+    volumes:
+      - ./:/var/www/html
+    links:
+      - shinobi-chronicles-db
+
   # Standard Mysql Box, we have to add tricky things else logging by workbench is hard
   shinobi-chronicles-db:
     image: mysql
