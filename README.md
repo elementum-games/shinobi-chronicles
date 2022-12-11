@@ -69,7 +69,7 @@ started quickly with minimal PHP environment/Git knowledge.
    - Select the database `shinobi_chronicles` in PhpMyAdmin
    - Click "Import" at the top menu
    - Click "Choose file" and navigate to your SC directory
-     - Select `shinobi-chronicles/db/V1__schost_game_structure.sql` and proceed with the import
+     - Select `shinobi-chronicles/db/V1_0__schost_game_structure.sql` and proceed with the import
 8. Setup game config in PhpStorm
    - Find `secure/vars.sample.php`
    - Make a copy of it as `secure/vars.php` 
