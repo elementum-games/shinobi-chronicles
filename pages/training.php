@@ -42,7 +42,7 @@ function training() {
 
 	$HOLIDAY_TRAINING = false;
 	$player->getInventory();
-	if($_POST['train_type'] && !$player->train_time) {
+	if(!empty($_POST['train_type']) && !$player->train_time) {
 		try {	
 			$train_type = '';
 			$train_length = $stat_train_length;
@@ -131,7 +131,7 @@ function training() {
 		}
 		$system->printMessage();
 	}
-	else if($_GET['cancel_training'] && $player->train_time) {
+	else if(!empty($_GET['cancel_training']) && $player->train_time) {
 		$player->train_time = 0;
 		$system->message("Training cancelled.");
 		$system->printMessage();
