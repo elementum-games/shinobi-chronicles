@@ -41,6 +41,9 @@ function clan() {
 		unset($training_boosts[$current_boost_id]);
 	}
 
+    $BOOST_AMOUNT = 10;
+    $BOOST_COST = 100;
+
 	// Mission stuff
 	$max_mission_rank = 1;
 	if($player->rank == 3) {
@@ -180,19 +183,19 @@ function clan() {
 		else if(!empty($_POST['boost'])) {
 			$new_boost = $system->clean($_POST['boost']);
 			try {
-				if(array_search($new_boost, $training_boosts) === false) {
+                if(array_search($new_boost, $training_boosts) === false) {
 					throw new Exception("Invalid boost!");
 				}
-				if($player->clan['points'] < 100) {
+				if($player->clan['points'] < $BOOST_COST) {
 					throw new Exception("Not enough points!");
 				}
 				$new_boost = 'training:' . $new_boost;
-				$boost_amount = 20;
-				$player->clan['points'] -= 100;
-				$system->query("UPDATE `clans` SET `boost`='$new_boost', `boost_amount`='$boost_amount', `points`=`points` - 100 
+				$player->clan['points'] -= $BOOST_COST;
+
+				$system->query("UPDATE `clans` SET `boost`='$new_boost', `boost_amount`='$BOOST_AMOUNT', `points`=`points` - {$BOOST_COST} 
 					WHERE `clan_id`='{$player->clan['id']}' LIMIT 1");
 				$player->clan['boost'] = $new_boost;
-				$player->clan['boost_amount'] = $boost_amount;
+				$player->clan['boost_amount'] = $BOOST_AMOUNT;
 				$system->message("Boost updated!");
 				$boost = explode(':', $player->clan['boost']);
 			} catch (Exception $e) {
@@ -365,7 +368,7 @@ function clan() {
 					</div>
 				</td>
 			</tr>
-			<tr><th colspan='2'>Change Boost (100 Reputation)</th></tr>
+			<tr><th colspan='2'>Change Boost ($BOOST_COST Reputation)</th></tr>
 			<tr><td colspan='2' style='text-align:center;'>
 				<!--Boost-->
 				<div style='text-align:center;'>
