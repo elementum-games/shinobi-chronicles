@@ -141,7 +141,7 @@ class System {
     const MAP_SIZE_Y = 12;
 
     // Misc stuff
-    const SC_MAX_RANK = 3;
+    const SC_MAX_RANK = 4;
     const MAX_CLAN_HOLDER_IDLE_TIME =  (60 * 60 * 24 * 30); // 30 Days
 
     const MAX_LINK_DISPLAY_LENGTH = 60;
