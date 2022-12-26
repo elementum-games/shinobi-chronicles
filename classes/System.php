@@ -168,8 +168,8 @@ class System {
         'cunt',
 
         'bitch',
-        'bich',
-        'bish',
+        ' bich',
+        ' bish',
 
         'retard',
 
@@ -201,7 +201,6 @@ class System {
         'rimjob',
 
         ' rape',
-        'rape ',
 
         'dildo',
     ];
