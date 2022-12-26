@@ -105,12 +105,18 @@ function battle(): bool {
 			if($user->village == $player->village) {
 				throw new Exception("You cannot attack people from your own village!");
 			}
-			if($user->rank < 3) {
+
+            if($user->rank < 3) {
 				throw new Exception("You cannot attack people below Chuunin rank!");
 			}
 			if($player->rank < 3) {
 				throw new Exception("You cannot attack people Chuunin rank and higher!");
 			}
+
+            if($user->rank !== $player->rank) {
+                throw new Exception("You can only attack people of the same rank!");
+            }
+
 			if($user->location !== $player->location) {
 				throw new Exception("Target is not at your location!");
 			}
