@@ -116,7 +116,7 @@ class Mission {
         // Load new stage data
         if($new_stage) {
             $this->current_stage = $this->stages[$stage_id];
-            if($this->current_stage['count'] > 1) {
+            if($this->current_stage['count'] ?? 0 > 1) {
                 $this->current_stage['count_needed'] = $this->current_stage['count'];
                 $this->current_stage['count'] = 0;
             }
