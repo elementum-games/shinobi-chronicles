@@ -42,7 +42,7 @@ function clan() {
 	}
 
     $BOOST_AMOUNT = 10;
-    $BOOST_COST = 100;
+    $BOOST_COST = 75;
 
 	// Mission stuff
 	$max_mission_rank = 1;
