@@ -404,8 +404,7 @@ function rankUp(): bool {
 						}
 						
 						// Give bloodline
-						require("adminPanel.php");
-						giveBloodline($bloodline_id, $player->user_id);
+						Bloodline::giveBloodline(system: $system, bloodline_id: $bloodline_id, user_id: $player->user_id);
 					}
 				}
 				

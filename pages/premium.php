@@ -455,8 +455,12 @@ function premium() {
 			$clan_id = $result['clan_id'];
 			$bloodline_name = $result['name'];
 
-			require("adminPanel.php");
-			$status = giveBloodline($bloodline_id, $player->user_id, false);
+			$status = Bloodline::giveBloodline(
+                system: $system,
+                bloodline_id: $bloodline_id,
+                user_id: $player->user_id,
+                display: false
+            );
 
 			$message = "You now have the bloodline <b>$bloodline_name</b>.";
 
