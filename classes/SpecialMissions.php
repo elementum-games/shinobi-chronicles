@@ -28,25 +28,25 @@ class SpecialMission {
             'yen_per_battle' => 6,
             'yen_per_mission' => 30,
             'hp_lost_percent' => 4, // 20% => 60% lost
-            'intel_gain' => 20, // est. 5 fights
+            'intel_gain' => 20, // est. 5 fights (rank * 45 yen)
         ],
         SpecialMission::DIFFICULTY_NORMAL => [
             'yen_per_battle' => 8,
             'yen_per_mission' => 40,
             'hp_lost_percent' => 6, // 33% => 100% lost
-            'intel_gain' => 18 // 5.5 fights
+            'intel_gain' => 18 // 5.5 fights (rank * 84 yen)
         ],
         SpecialMission::DIFFICULTY_HARD => [
             'yen_per_battle' => 10,
             'yen_per_mission' => 50,
             'hp_lost_percent' => 8, // 50% => 150% lost
-            'intel_gain' => 16 // 6.25 fights
+            'intel_gain' => 16 // 6.25 fights (rank * 112.5 yen)
         ],
         SpecialMission::DIFFICULTY_NIGHTMARE => [
             'yen_per_battle' => 12,
             'yen_per_mission' => 60,
             'hp_lost_percent' => 11, // 78.5% => 235.5% lost
-            'intel_gain' => 14 // 7.14 fights
+            'intel_gain' => 14 // 7.14 fights (rank * 145 yen)
         ]
     ];
 
