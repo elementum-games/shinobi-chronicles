@@ -25,26 +25,26 @@ class SpecialMission {
     */
     public static array $difficulties = [
         SpecialMission::DIFFICULTY_EASY => [
-            'yen_per_battle' => 4,
-            'yen_per_mission' => 25,
+            'yen_per_battle' => 6,
+            'yen_per_mission' => 30,
             'hp_lost_percent' => 4, // 20% => 60% lost
             'intel_gain' => 20, // est. 5 fights
         ],
         SpecialMission::DIFFICULTY_NORMAL => [
-            'yen_per_battle' => 6,
-            'yen_per_mission' => 30,
+            'yen_per_battle' => 8,
+            'yen_per_mission' => 40,
             'hp_lost_percent' => 6, // 33% => 100% lost
             'intel_gain' => 18 // 5.5 fights
         ],
         SpecialMission::DIFFICULTY_HARD => [
-            'yen_per_battle' => 8,
-            'yen_per_mission' => 35,
+            'yen_per_battle' => 10,
+            'yen_per_mission' => 50,
             'hp_lost_percent' => 8, // 50% => 150% lost
             'intel_gain' => 16 // 6.25 fights
         ],
         SpecialMission::DIFFICULTY_NIGHTMARE => [
-            'yen_per_battle' => 10,
-            'yen_per_mission' => 40,
+            'yen_per_battle' => 12,
+            'yen_per_mission' => 60,
             'hp_lost_percent' => 11, // 78.5% => 235.5% lost
             'intel_gain' => 14 // 7.14 fights
         ]
