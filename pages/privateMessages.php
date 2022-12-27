@@ -325,7 +325,7 @@ class Messaging {
 						}
 						// Staff-level
 						$staff = $this->staffColor($message['staff_level']);
-						$persons_name = ($this->Users[$message['sender']]) ? $this->Users[$message['sender']] : $message['sender'];
+						$persons_name = $this->Users[$message['sender']] ?? $message['sender'];
 
 						$sender = $this->Users[$message['sender']];
 
