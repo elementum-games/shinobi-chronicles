@@ -29,9 +29,9 @@ class SpecialMission {
     public static array $difficulties = [
         SpecialMission::DIFFICULTY_EASY => [
             'yen_per_battle' => 8, // 8 * 5 = 40
-            'yen_per_mission' => 40,
+            'yen_per_mission' => 35,
             'hp_lost_percent' => 4, // 20% => 60% lost
-            'intel_gain' => 20, // est. 5 fights (rank * 80 yen) (old: 45)
+            'intel_gain' => 20, // est. 5 fights (rank * 75 yen) (old: 45)
         ],
         SpecialMission::DIFFICULTY_NORMAL => [
             'yen_per_battle' => 10, // 10 * 5.5 = 55
