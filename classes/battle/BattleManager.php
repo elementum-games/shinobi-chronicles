@@ -240,7 +240,7 @@ class BattleManager {
 
                         // Layered genjutsu check
                         if($player_jutsu && $player_jutsu->jutsu_type == Jutsu::TYPE_GENJUTSU && !empty($player_jutsu->parent_jutsu)) {
-                            $this->effects->assertParentGenjutsuActive($this->player, $player_jutsu);
+                            // $this->effects->assertParentGenjutsuActive($this->player, $player_jutsu);
                         }
                     }
 
