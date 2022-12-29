@@ -41,8 +41,8 @@
 let startTime = 0;
 const specialMissionsUrl = 'ajax_specialmissions.php';
 
-// Mission event cooldown + 50ms to help prevent network variance causing premature refreshes
-const serverRefreshIntervalMs = (missionEventDurationMs || 3000) + 50;
+// Mission event cooldown + 100ms to help prevent network variance causing premature refreshes
+const serverRefreshIntervalMs = (missionEventDurationMs || 3000) + 100;
 
 // Ping server to progress mission on cooldown
 let queryInterval = setInterval(() => getMissionData(), serverRefreshIntervalMs);
