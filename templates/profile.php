@@ -227,6 +227,7 @@ $clan_positions = [
     <label style='width:<?= $label_width ?>;'>PvP losses:</label> 	<?= $player->pvp_losses ?><br />
     <label style='width:<?= $label_width ?>;'>AI wins:</label>		<?= $player->ai_wins ?><br />
     <label style='width:<?= $label_width ?>;'>AI losses:</label>	<?= $player->ai_losses ?><br />
+    
     </td>
 
     <td style='width:50%;'>
@@ -273,6 +274,134 @@ $clan_positions = [
         <br />
     </td>
 </tr>
+
+    <!-- Stat Graph-->
+    <tr>
+        <td colspan = '2'>
+            <br />
+                <div style="border: 1px solid; border-radius: 30px; background-color: rgba(50, 50, 50, 1)">
+                    <canvas style="min-width: 30%; margin: 20px 25%" id="myChart"></canvas>
+                </div>
+
+                <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+                <script>
+                    const ctx = document.getElementById('myChart');
+
+                    /**takes [input] calculates against [largest_value] and returns Number between 1-5*/
+                    function getSkillRange(input, largest_value){
+                        var r = 1;
+
+                        
+                        let i = input/largest_value;
+                        console.log(i);
+
+                        if(i < 0){
+                            return 1;
+                        }
+
+                        if(i >= 0 && i < 0.2){
+                            return 1;
+                        }
+                        if(i >= 0.2 && i < 0.4){
+                            return 2;
+                        }
+                        if(i >= 0.4 && i < 0.6){
+                            return 3;
+                        }
+                        if(i >= 0.6 && i < 0.8){
+                            return 4;
+                        }
+                        if(i >= 0.8){
+                            return 5;
+                        }
+
+                        if(r <= 1) {
+                            return 1;
+                        }
+
+                        return r;
+                    }
+                
+                    //player skills
+                    var ninjutsu_skill = <?= $player->ninjutsu_skill ?>;
+                    var genjutsu_skill = <?= $player->genjutsu_skill ?>;
+                    var taijutsu_skill = <?= $player->taijutsu_skill ?>;
+                    var cast_speed = <?= $player->cast_speed ?>;
+                    var intelligence = <?= $player->intelligence ?>;
+                    var speed = <?= $player->speed ?>;
+                    var willpower = <?= $player->willpower ?>;
+
+                    let largest_base_skill = Math.max(ninjutsu_skill, genjutsu_skill, taijutsu_skill);
+                    let largest_general_skill = Math.max(cast_speed, intelligence, speed, willpower);
+
+
+                    new Chart(ctx, {
+                        type: 'radar',
+                        data: {
+                        labels: ['Ninjutsu', 'Genjutsu', 'Cast Speed', 'Intelligence', 'Speed', 'Willpower', 'Taijutsu'],
+                        datasets: [{
+                            label: 'Range of Skill Proficiency',
+                            data: [
+                                getSkillRange(ninjutsu_skill, largest_base_skill), 
+                                getSkillRange(genjutsu_skill, largest_base_skill), 
+                                getSkillRange(cast_speed, largest_general_skill), 
+                                getSkillRange(intelligence, largest_general_skill), 
+                                getSkillRange(speed, largest_general_skill), 
+                                getSkillRange(willpower, largest_general_skill), 
+                                getSkillRange(taijutsu_skill, largest_base_skill)
+                            ],
+                            borderWidth: 1,
+                            backgroundColor: 'rgba(140, <?= 30 ?>, 70, 0.8)',
+                            borderColor: 'rgba(250, 250, 250, 1)',
+                            borderJoinStyle: 'round',
+                            borderWidth: 1,
+
+                        }]},
+
+                        options: {
+                            scales: {
+                                r: {
+                                    min:0,
+                                    max: 5,
+                                    grid: {
+                                        display: true,
+                                        color: 'rgba(150, 50, 50, 1)'
+                                    },
+                                    angleLines: {
+                                    color: 'rgba(150, 50, 50, 1)'
+                                    },
+                                    pointLabels: {
+                                        color: 'white'
+                                    },
+                                    ticks: {
+                                        display: false, /*Hides Count*/
+                                        count: '5',
+                                        showLabelBackdrop: false
+                                    }
+                                }
+                            },
+
+                            plugins: {
+                                title: {
+                                    display: true,
+                                    text: 'Range of Skill Proficiency',
+                                    color: 'white',
+                                    padding: {
+                                        top: 10,
+                                        bottom: 30
+                                    }
+                                },
+                                legend: {
+                                    display: false
+                                }
+                            }
+                        }   
+                    });
+                </script>
+            <br />
+        </td>
+    </tr>
 </table>
 
 <?php
