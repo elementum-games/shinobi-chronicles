@@ -100,8 +100,8 @@ class Battle {
         $system->query(
             "INSERT INTO `battles` SET 
                 `battle_type` = '" . $battle_type . "',
-                `start_time` = '" . (time() + self::PREP_LENGTH) . "',
-                `turn_time` = '" . time() . "',
+                `start_time` = '" . time() . "',
+                `turn_time` = '" . (time() + self::PREP_LENGTH) . "',
                 `turn_count` = '" . 0 . "',
                 `winner` = '',
                 `player1` = '" . $player1->id . "',
