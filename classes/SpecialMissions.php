@@ -423,7 +423,7 @@ class SpecialMission {
                 // 33% chance of using bloodline jutsu, if there are any
                 if($this->player->bloodline
                     && count($this->player->bloodline->jutsu) > 0
-                    && mt_rand(1, 100) < 33
+                    && mt_rand(1, 100) < 25
                 ) {
                     $jutsu_key = array_rand($this->player->bloodline->jutsu);
                     $jutsu = $this->player->bloodline->jutsu[$jutsu_key];
