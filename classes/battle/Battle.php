@@ -12,7 +12,7 @@ class Battle {
     const TYPE_AI_RANKUP = 6;
 
     const TURN_LENGTH = 40;
-    const PREP_LENGTH = 15;
+    const PREP_LENGTH = 20;
 
     const MAX_PRE_FIGHT_HEAL_PERCENT = 85;
 
@@ -100,8 +100,8 @@ class Battle {
         $system->query(
             "INSERT INTO `battles` SET 
                 `battle_type` = '" . $battle_type . "',
-                `start_time` = '" . (time() + self::PREP_LENGTH) . "',
-                `turn_time` = '" . time() . "',
+                `start_time` = '" . time() . "',
+                `turn_time` = '" . (time() + self::PREP_LENGTH - 5) . "',
                 `turn_count` = '" . 0 . "',
                 `winner` = '',
                 `player1` = '" . $player1->id . "',

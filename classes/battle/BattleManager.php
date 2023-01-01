@@ -154,10 +154,24 @@ class BattleManager {
 
         if(!$this->spectate && !$this->battle->isComplete()) {
             if($this->battle->player1 instanceof User && $this->battle->player1->battle_id != $this->battle_id) {
+                $this->system->log(
+                    'debug',
+                    'battle_stopped',
+                    "Battle #{$this->battle_id} stopped - "
+                        . "P1 battle ID #{$this->battle->player1->battle_id} - "
+                        . "P2 battle ID #{$this->battle->player2->battle_id}"
+                );
                 $this->stopBattle();
                 return;
             }
             if($this->battle->player2 instanceof User && $this->battle->player2->battle_id != $this->battle_id) {
+                $this->system->log(
+                    'debug',
+                    'battle_stopped',
+                    "Battle #{$this->battle_id} stopped - "
+                    . "P2 battle ID #{$this->battle->player2->battle_id} - "
+                    . "P1 battle ID #{$this->battle->player1->battle_id}"
+                );
                 $this->stopBattle();
                 return;
             }

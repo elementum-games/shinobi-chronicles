@@ -36,19 +36,19 @@ class SpecialMission {
         SpecialMission::DIFFICULTY_NORMAL => [
             'yen_per_battle' => 10, // 10 * 5.5 = 55
             'yen_per_mission' => 50,
-            'hp_lost_percent' => 6, // 33% => 100% lost
+            'hp_lost_percent' => 5, // 27.5% => 82.5% lost
             'intel_gain' => 18 // 5.5 fights (rank * 105 yen) (old: 63)
         ],
         SpecialMission::DIFFICULTY_HARD => [
             'yen_per_battle' => 12, // 12 * 6.25 = 75
             'yen_per_mission' => 60,
-            'hp_lost_percent' => 8, // 50% => 150% lost
+            'hp_lost_percent' => 7, // 44% => 132% lost
             'intel_gain' => 16 // 6.25 fights (rank * 135 yen) (old: 85)
         ],
         SpecialMission::DIFFICULTY_NIGHTMARE => [
             'yen_per_battle' => 14, // 20 * 7.14 = 100
             'yen_per_mission' => 70,
-            'hp_lost_percent' => 11, // 78.5% => 235.5% lost
+            'hp_lost_percent' => 10, // 71.4% => 214.2% lost
             'intel_gain' => 14 // 7.14 fights (rank * 170 yen) (old: 111)
         ]
     ];
@@ -423,7 +423,7 @@ class SpecialMission {
                 // 33% chance of using bloodline jutsu, if there are any
                 if($this->player->bloodline
                     && count($this->player->bloodline->jutsu) > 0
-                    && mt_rand(1, 100) < 33
+                    && mt_rand(1, 100) < 25
                 ) {
                     $jutsu_key = array_rand($this->player->bloodline->jutsu);
                     $jutsu = $this->player->bloodline->jutsu[$jutsu_key];
