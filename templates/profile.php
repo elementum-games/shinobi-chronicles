@@ -259,7 +259,7 @@ $clan_positions = [
             </div>
             
             <!-- Stat Graph-->
-            <div style='display: inline-block; width: 57%; padding: 0; margin: auto 0'>
+            <div style='display: inline-block; width: 45%; padding: 0; margin: auto 0'>
                 <div style="display: inline-block; max-width: 100%; border-radius: 5px; background-color: rgba(50, 50, 50, 1)">
                     <canvas id="myChart"></canvas>
                 </div>
@@ -360,11 +360,11 @@ $clan_positions = [
                                         display: false
                                     },
                                     pointLabels: {
-                                        padding: 2,
+                                        padding: 3,
                                         color: 'white',
                                         font: {
                                             family: "Lucida Sans",
-                                            size: '7'
+                                            size: '12'
                                         }
                                     },
                                     ticks: {
