@@ -44,12 +44,12 @@ $clan_positions = [
 
 <table class='profile_table table'>
 <tr>
-    <td style='width:50%;text-align:center;'>
+    <td style='width:45%;text-align:center;'>
         <span style='font-size:1.3em;font-family:\"tempus sans itc\",serif;font-weight:bold;'><?= $player->user_name ?></span><br />
         <?= $system->imageCheck($player->avatar_link, $player->getAvatarSize()) ?>
         <br />
     </td>
-    <td style='width:50%;'>
+    <td style='width:55%;'>
 		<label style='width:6.7em;' for='healthbar'>Health:</label>
         <span id='health'>
             <?= sprintf("%.2f", $player->health) ?> / <?= sprintf("%.2f", $player->max_health) ?>
@@ -189,7 +189,7 @@ $clan_positions = [
 </tr>
 <?php $label_width = '7.1em'; ?>
 <tr>
-    <td style='width:50%;'>
+    <td style='width:45%;'>
 		<label style='width:<?= $label_width ?>;'>Level:</label> <?= $player->level ?><br />
 		<label style='width:<?= $label_width ?>;'>Rank:</label> <?= $player->rank_name ?><br />
         <?php if($player->clan): ?>
@@ -230,7 +230,7 @@ $clan_positions = [
     
     </td>
 
-    <td style='width:50%;'>
+    <td style='width:55%;'>
     <label style='width:9.2em;'>Total stats:</label>
         <?= sprintf("%.2f", $player->total_stats) ?> / <?= sprintf("%.2f", $player->stat_cap) ?><br />
     <br />
@@ -246,41 +246,22 @@ $clan_positions = [
     <?php endif; ?>
 
     <br />
-    <label style='width:9.2em;'>Ninjutsu skill:</label><?= $player->ninjutsu_skill ?><br />
-    <label style='width:9.2em;'>Genjutsu skill:</label><?= $player->genjutsu_skill ?><br />
-    <label style='width:9.2em;'>Taijutsu skill:</label><?= $player->taijutsu_skill ?><br />
-    <br />
-    <label style='width:9.2em;'>Cast speed:</label><?= sprintf("%.2f", $player->cast_speed) ?><br />
-    <label style='width:9.2em;'>Speed:</label><?= sprintf("%.2f", $player->speed) ?><br />
-    <label style='width:9.2em;'>Intelligence:</label><?= sprintf("%.2f", $player->intelligence) ?><br />
-    <label style='width:9.2em;'>Willpower:</label><?= sprintf("%.2f", $player->willpower) ?><br />
-    <br />
-
-    <b>Missions Completed:</b><br />
-    &nbsp;&nbsp;<label style='width:5em;'><?= Mission::$rank_names[Mission::RANK_D] ?>:</label>
-        <?= (($player->missions_completed[Mission::RANK_D]) ??'0') ?>
-        <br />
-    &nbsp;&nbsp;<label style='width:5em;'><?= Mission::$rank_names[Mission::RANK_C] ?>:</label>
-        <?= (($player->missions_completed[Mission::RANK_C]) ?? '0') ?>
-        <br />
-    &nbsp;&nbsp;<label style='width:5em;'><?= Mission::$rank_names[Mission::RANK_B] ?>:</label>
-        <?= (($player->missions_completed[Mission::RANK_B]) ?? '0') ?>
-        <br />
-    &nbsp;&nbsp;<label style='width:5em;'><?= Mission::$rank_names[Mission::RANK_A] ?>:</label>
-        <?= (($player->missions_completed[Mission::RANK_A]) ?? '0') ?>
-        <br />
-    &nbsp;&nbsp;<label style='width:5em;'><?= Mission::$rank_names[Mission::RANK_S] ?>:</label>
-        <?= (($player->missions_completed[Mission::RANK_S]) ?? '0') ?>
-        <br />
-    </td>
-</tr>
-
-    <!-- Stat Graph-->
-    <tr>
-        <td colspan = '2'>
-            <br />
-                <div style="border: 1px solid; border-radius: 30px; background-color: rgba(50, 50, 50, 1)">
-                    <canvas style="min-width: 30%; margin: 20px 25%" id="myChart"></canvas>
+        <div style="display: flex; height: 100%; margin-bottom: 20px; align-items: center; justify-content: space-between;">
+            <div style='display: inline-block;'>
+                <label style='width:9.2em;'>Ninjutsu skill:</label><?= $player->ninjutsu_skill ?><br />
+                <label style='width:9.2em;'>Genjutsu skill:</label><?= $player->genjutsu_skill ?><br />
+                <label style='width:9.2em;'>Taijutsu skill:</label><?= $player->taijutsu_skill ?><br />
+                <br />
+                <label style='width:9.2em;'>Cast speed:</label><?= sprintf("%.2f", $player->cast_speed) ?><br />
+                <label style='width:9.2em;'>Speed:</label><?= sprintf("%.2f", $player->speed) ?><br />
+                <label style='width:9.2em;'>Intelligence:</label><?= sprintf("%.2f", $player->intelligence) ?><br />
+                <label style='width:9.2em;'>Willpower:</label><?= sprintf("%.2f", $player->willpower) ?><br />
+            </div>
+            
+            <!-- Stat Graph-->
+            <div style='display: inline-block; width: 57%; padding: 0; margin: auto 0'>
+                <div style="display: inline-block; max-width: 100%; border-radius: 5px; background-color: rgba(50, 50, 50, 1)">
+                    <canvas id="myChart"></canvas>
                 </div>
 
                 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -294,7 +275,6 @@ $clan_positions = [
 
                         
                         let i = input/largest_value;
-                        console.log(i);
 
                         if(i < 0){
                             return 1;
@@ -352,7 +332,7 @@ $clan_positions = [
                                 getSkillRange(taijutsu_skill, largest_base_skill)
                             ],
                             borderWidth: 1,
-                            backgroundColor: 'rgba(140, <?= 30 ?>, 70, 0.8)',
+                            backgroundColor: 'rgba(140, 30, 70, 0.8)',
                             borderColor: 'rgba(250, 250, 250, 1)',
                             borderJoinStyle: 'round',
                             borderWidth: 1,
@@ -360,6 +340,11 @@ $clan_positions = [
                         }]},
 
                         options: {
+                            elements:{
+                                point: {
+                                    pointStyle: false
+                                }
+                            },
                             scales: {
                                 r: {
                                     min:0,
@@ -371,8 +356,16 @@ $clan_positions = [
                                     angleLines: {
                                     color: 'rgba(150, 50, 50, 1)'
                                     },
+                                    pointStyle: {
+                                        display: false
+                                    },
                                     pointLabels: {
-                                        color: 'white'
+                                        padding: 2,
+                                        color: 'white',
+                                        font: {
+                                            family: "Lucida Sans",
+                                            size: '7'
+                                        }
                                     },
                                     ticks: {
                                         display: false, /*Hides Count*/
@@ -384,13 +377,9 @@ $clan_positions = [
 
                             plugins: {
                                 title: {
-                                    display: true,
+                                    display: false,
                                     text: 'Range of Skill Proficiency',
-                                    color: 'white',
-                                    padding: {
-                                        top: 10,
-                                        bottom: 30
-                                    }
+                                    color: 'white'
                                 },
                                 legend: {
                                     display: false
@@ -399,9 +388,28 @@ $clan_positions = [
                         }   
                     });
                 </script>
-            <br />
-        </td>
-    </tr>
+            </div>
+        </div>
+    <br />
+
+    <b>Missions Completed:</b><br />
+    &nbsp;&nbsp;<label style='width:5em;'><?= Mission::$rank_names[Mission::RANK_D] ?>:</label>
+        <?= (($player->missions_completed[Mission::RANK_D]) ??'0') ?>
+        <br />
+    &nbsp;&nbsp;<label style='width:5em;'><?= Mission::$rank_names[Mission::RANK_C] ?>:</label>
+        <?= (($player->missions_completed[Mission::RANK_C]) ?? '0') ?>
+        <br />
+    &nbsp;&nbsp;<label style='width:5em;'><?= Mission::$rank_names[Mission::RANK_B] ?>:</label>
+        <?= (($player->missions_completed[Mission::RANK_B]) ?? '0') ?>
+        <br />
+    &nbsp;&nbsp;<label style='width:5em;'><?= Mission::$rank_names[Mission::RANK_A] ?>:</label>
+        <?= (($player->missions_completed[Mission::RANK_A]) ?? '0') ?>
+        <br />
+    &nbsp;&nbsp;<label style='width:5em;'><?= Mission::$rank_names[Mission::RANK_S] ?>:</label>
+        <?= (($player->missions_completed[Mission::RANK_S]) ?? '0') ?>
+        <br />
+    </td>
+</tr>
 </table>
 
 <?php
