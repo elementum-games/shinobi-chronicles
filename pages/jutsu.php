@@ -1,5 +1,14 @@
 <?php
 
+/*
+File: 		equip.php
+Coder:		Levi Meahan
+Created:	09/04/2013
+Revised:	04/22/2014 by Levi Meahan
+Purpose:	Functions for equip where users can equip items and jutsu
+Algorithm:	See master_plan.html
+*/
+
 function jutsu(): void {
     global $system;
 
@@ -22,11 +31,11 @@ function jutsu(): void {
 
     if(!empty($_POST['equip_jutsu'])) {
         $jutsu = $_POST['jutsu'];
-        $equipped_jutsu = array();
+        $equipped_jutsu = [];
 
         try {
             $count = 0;
-            $jutsu_types = array('ninjutsu', 'taijutsu', 'genjutsu');
+            $jutsu_types = ['ninjutsu', 'taijutsu', 'genjutsu'];
             foreach($jutsu as $jutsu_data) {
                 if($count >= $max_equipped_jutsu) {
                     break;
@@ -40,7 +49,7 @@ function jutsu(): void {
                 if(!in_array($jutsu_array[0], $jutsu_types)) {
                     throw new Exception("Invalid jutsu type!");
                 }
-                if($player->checkInventory($jutsu_array[1], 'jutsu')) {
+                if($player->hasJutsu($jutsu_array[1])) {
                     $equipped_jutsu[$count]['id'] = $system->clean($jutsu_array[1]);
                     $equipped_jutsu[$count]['type'] = $system->clean($jutsu_array[0]);
                     $count++;
@@ -49,7 +58,7 @@ function jutsu(): void {
 
             $player->equipped_jutsu = $equipped_jutsu;
             $system->message("Jutsu equipped!");
-        } catch (Exception $e) {
+        } catch(Exception $e) {
             $system->message($e->getMessage());
         }
     }
@@ -60,7 +69,7 @@ function jutsu(): void {
             if(!isset($player->jutsu_scrolls[$jutsu_id])) {
                 throw new Exception("Invalid jutsu!");
             }
-            if($player->checkInventory($jutsu_id, 'jutsu')) {
+            if($player->hasJutsu($jutsu_id)) {
                 throw new Exception("You already know that jutsu!");
             }
 
@@ -72,8 +81,10 @@ function jutsu(): void {
                 }
 
                 if($player->jutsu[$id]->level < 50) {
-                    throw new Exception("You are not skilled enough with " . $player->jutsu[$id]->name .
-                        "! (Level " . $player->jutsu[$id]->level . "/50)");
+                    throw new Exception(
+                        "You are not skilled enough with " . $player->jutsu[$id]->name .
+                        "! (Level " . $player->jutsu[$id]->level . "/50)"
+                    );
                 }
             }
 
@@ -95,15 +106,15 @@ function jutsu(): void {
 
             unset($player->jutsu_scrolls[$jutsu_id]);
             $system->message("You have learned $jutsu_name!");
-        } catch (Exception $e) {
+        } catch(Exception $e) {
             $system->message($e->getMessage());
         }
     }
     else if(!empty($_GET['forget_jutsu'])) {
         $jutsu_id = (int)$_GET['forget_jutsu'];
-        try{
+        try {
             //Checking if player knows the jutsu he's trying to forget.
-            if(!$player->checkInventory($jutsu_id, 'jutsu')) {
+            if(!$player->hasJutsu($jutsu_id)) {
                 throw new Exception("Invalid Jutsu!");
             }
 
@@ -148,9 +159,7 @@ function jutsu(): void {
 				    </table>";
             }
 
-
-        }
-        catch (Exception $e) {
+        } catch(Exception $e) {
             $system->message($e->getMessage());
         }
     }
@@ -221,12 +230,12 @@ function jutsu(): void {
 
         echo "<tr><td id='ninjutsu_table_data'>";
         if($player->ninjutsu_ids) {
-            $sortedJutsu = array();
+            $sortedJutsu = [];
             foreach($player->ninjutsu_ids as $jutsu_id) {
                 $sortedJutsu[] = $player->jutsu[$jutsu_id]->rank;
             }
             array_multisort($sortedJutsu, $player->ninjutsu_ids);
-            foreach ($player->ninjutsu_ids as $jutsu_id) {
+            foreach($player->ninjutsu_ids as $jutsu_id) {
                 echo "<a href='$self_link&view_jutsu=$jutsu_id' title='Level: {$player->jutsu[$jutsu_id]->level}'>" . $player->jutsu[$jutsu_id]->name . "</a><br />";
             }
         }
@@ -234,7 +243,7 @@ function jutsu(): void {
 
         echo "<td id='taijutsu_table_data'>";
         if($player->taijutsu_ids) {
-            $sortedJutsu = array();
+            $sortedJutsu = [];
             foreach($player->taijutsu_ids as $jutsu_id) {
                 $sortedJutsu[] = $player->jutsu[$jutsu_id]->rank;
             }
@@ -247,7 +256,7 @@ function jutsu(): void {
 
         echo "<td id='genjutsu_table_data'>";
         if($player->genjutsu_ids) {
-            $sortedJutsu = array();
+            $sortedJutsu = [];
             foreach($player->genjutsu_ids as $jutsu_id) {
                 $sortedJutsu[] = $player->jutsu[$jutsu_id]->rank;
             }
@@ -289,7 +298,6 @@ function jutsu(): void {
 		</form>
 		</tr>";
 
-
         // Purchase jutsu
         if(!empty($player->jutsu_scrolls)) {
             echo "<tr><th colspan='3'>Jutsu scrolls</th></tr>";
@@ -319,8 +327,8 @@ function jutsu(): void {
 }
 
 function userHasChildrenJutsu($id, $player): bool {
-    foreach($player->jutsu as $element){
-        if($id == $element->parent_jutsu){
+    foreach($player->jutsu as $jutsu){
+        if($id == $jutsu->parent_jutsu){
             return false;
         }
     }
