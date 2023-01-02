@@ -106,7 +106,7 @@ class BattleActionProcessor {
         if($player1_attack) {
             $this->battle->current_turn_log->addFighterActionDescription(
                 $this->battle->player1,
-                $this->parseCombatText(
+                BattleLog::parseCombatText(
                     $player1_attack->jutsu->battle_text, $this->battle->player1, $this->battle->player2
                 )
             );
@@ -142,7 +142,7 @@ class BattleActionProcessor {
         if($player2_attack) {
             $this->battle->current_turn_log->addFighterActionDescription(
                 $this->battle->player2,
-                $this->parseCombatText(
+                BattleLog::parseCombatText(
                     $player2_attack->jutsu->battle_text, $this->battle->player2, $this->battle->player1
                 )
             );
@@ -870,35 +870,19 @@ class BattleActionProcessor {
 
         if($attack->jutsu->hasEffect()) {
             $this->battle->current_turn_log->addFighterEffectAnnouncement(
-                $user,
-                $this->effects->getAnnouncementText($attack->jutsu->effect)
+                caster: $user,
+                target: $target,
+                announcement_text: $this->effects->getAnnouncementText($attack->jutsu->effect)
             );
         }
 
         if($attack->jutsu->weapon_id) {
             $this->battle->current_turn_log->addFighterEffectAnnouncement(
-                $user,
-                $this->effects->getAnnouncementText($attack->jutsu->weapon_effect->effect)
+                caster: $user,
+                target: $target,
+                announcement_text: $this->effects->getAnnouncementText($attack->jutsu->weapon_effect->effect)
             );
         }
-    }
-
-    public function parseCombatText(string $text, Fighter $attacker, Fighter $target): string {
-        return str_replace(
-            [
-                '[player]',
-                '[opponent]',
-                '[gender]',
-                '[gender2]',
-            ],
-            [
-                $attacker->getName(),
-                $target->getName(),
-                $attacker->getSingularPronoun(),
-                $attacker->getPossessivePronoun(),
-            ],
-            $text
-        );
     }
 
     /**

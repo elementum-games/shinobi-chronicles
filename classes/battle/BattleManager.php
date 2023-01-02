@@ -509,7 +509,7 @@ class BattleManager {
         if($this->effects->hasEffectHits($this->battle->player1)) {
             foreach($this->effects->getEffectHits($this->battle->player1) as $effect_hit) {
                 /** @var EffectHitLog $effect_hit */
-                $effect_hit->description = $this->actions->parseCombatText(
+                $effect_hit->description = BattleLog::parseCombatText(
                     text: $effect_hit->description,
                     attacker: $this->battle->getFighter($effect_hit->caster_id),
                     target: $this->battle->player1,
@@ -521,7 +521,7 @@ class BattleManager {
         if($this->effects->hasEffectHits($this->battle->player2)) {
             foreach($this->effects->getEffectHits($this->battle->player2) as $effect_hit) {
                 /** @var EffectHitLog $effect_hit */
-                $effect_hit->description = $this->actions->parseCombatText(
+                $effect_hit->description = BattleLog::parseCombatText(
                     text: $effect_hit->description,
                     attacker: $this->battle->getFighter($effect_hit->caster_id),
                     target: $this->battle->player2,

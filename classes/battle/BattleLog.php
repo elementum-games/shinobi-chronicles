@@ -86,9 +86,11 @@ class BattleLog {
         $fighter_action_log->effect_hits[] = $effect_hit;
     }
 
-    public function addFighterEffectAnnouncement(Fighter $fighter, string $announcement_text): void {
-        $fighter_action_log = $this->getFighterActionLog($fighter->combat_id);
-        $fighter_action_log->new_effect_announcements[] = $this->system->clean($announcement_text);
+    public function addFighterEffectAnnouncement(Fighter $caster, Fighter $target, string $announcement_text): void {
+        $fighter_action_log = $this->getFighterActionLog($caster->combat_id);
+        $fighter_action_log->new_effect_announcements[] = $this->system->clean(
+            BattleLog::parseCombatText(text: $announcement_text, attacker: $caster, target: $target)
+        );
     }
 
     public function addFighterAttackJutsuInfo(Fighter $fighter, Jutsu $jutsu): void {
@@ -184,6 +186,26 @@ class BattleLog {
                 `content`='{$clean_content}',
                 `fighter_action_logs`='{$fighter_action_logs_json}'
         ");
+    }
+
+    public static function parseCombatText(string $text, Fighter $attacker, Fighter $target): string {
+        return str_replace(
+            [
+                '[player]',
+                '[opponent]',
+                '[target]',
+                '[gender]',
+                '[gender2]',
+            ],
+            [
+                $attacker->getName(),
+                $target->getName(),
+                $target->getName(),
+                $attacker->getSingularPronoun(),
+                $attacker->getPossessivePronoun(),
+            ],
+            $text
+        );
     }
 }
 
