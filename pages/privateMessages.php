@@ -11,7 +11,6 @@
 */
 
 class Messaging {
-
 	const
 		MIN_SUBJECT_LENGTH = 2,
 		MIN_MESSAGE_LENGTH = 4,
@@ -42,9 +41,19 @@ class Messaging {
 		$this->self_link = $self_link;
 		$this->colors = $system->SC_STAFF_COLORS;
 
-		$this->constraints['message_limit'] = ($player->staff_level || $player->forbidden_seal) ? self::SEAL_MAX_MESSAGE_LENGTH : self::MAX_MESSAGE_LENGTH;
-		$this->constraints['inbox_limit'] = ($player->staff_level || $player->forbidden_seal) ? (($player->staff_level) ? self::STAFF_INBOX_LIMIT : self::SEAL_INBOX_LIMIT) : self::INBOX_LIMIT;
+		$this->constraints['message_limit'] = ($player->staff_level || $player->forbidden_seal)
+            ? self::SEAL_MAX_MESSAGE_LENGTH
+            : self::MAX_MESSAGE_LENGTH;
 
+        if($player->staff_level) {
+            $this->constraints['inbox_limit'] = self::STAFF_INBOX_LIMIT;
+        }
+        else if($player->forbidden_seal) {
+            $this->constraints['inbox_limit'] = self::SEAL_INBOX_LIMIT;
+        }
+        else {
+            $this->constraints['inbox_limit'] = self::INBOX_LIMIT;
+        }
 	}
 
 	function validateForm() {
@@ -308,7 +317,7 @@ class Messaging {
 							<th class='rowHeader' style='width:20%;'>Sender</th>
 							<th class='rowHeader' style='width:40%;'>Subject</th>
 							<th class='rowHeader' style='width:15%;'></th>
-							<th class='rowHeader' colspan='2' style='text-shadow:0px 1px 1px #000000;color:{$this->label_color};'>{$this->msg_count} / {$this->constraints['inbox_limit']}</th>
+							<th class='rowHeader' colspan='2' style='text-shadow:0 1px 1px #000000;color:{$this->label_color};'>{$this->msg_count} / {$this->constraints['inbox_limit']}</th>
 						</tr>
 					";
 					$count = 0;
@@ -327,10 +336,7 @@ class Messaging {
 						$staff = $this->staffColor($message['staff_level']);
 						$persons_name = $this->Users[$message['sender']] ?? $message['sender'];
 
-						$sender = $this->Users[$message['sender']];
-
-						if(! ctype_digit($persons_name)) {
-
+						if(!ctype_digit($persons_name)) {
 							echo "
 								<tr class='table_multicolumns'>
 									<td style='text-align:center;width:20%;' class='$class'>
