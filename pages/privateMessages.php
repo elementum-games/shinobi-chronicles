@@ -21,7 +21,7 @@ class Messaging {
 		SEAL_INBOX_LIMIT = 75,
 		STAFF_INBOX_LIMIT = 100;
 
-	public $message_id;
+	public int $message_id;
 
     private
 		$Messages,
@@ -32,6 +32,9 @@ class Messaging {
 			"#CBCB10",
 			"#E00000"
 		];
+
+    public string $form_user = "";
+    public string $form_subject = "";
 
 	function __construct() {
 		global $system, $player, $self_link;
@@ -171,7 +174,7 @@ class Messaging {
 	 * @param $type
 	 * @param bool|false $report_link
      */
-	function display($type, $report_link = false) {
+	function display($type, $report_link = false): void {
         global $system;
 
 		switch($type) {
@@ -373,7 +376,7 @@ class Messaging {
 
 	}
 
-	function inbox() {
+	function inbox(): void {
 
 		$sql = sprintf("SELECT `message_id`, `sender`, `subject`, `message_read`, `staff_level` FROM `private_messages` WHERE `recipient` = '%d' AND `message_read` < 2 ORDER BY `message_id` DESC LIMIT 0, %d", $this->player->user_id, $this->constraints['inbox_limit'] + 50);
 		$this->system->query($sql);
@@ -418,10 +421,8 @@ class Messaging {
 
 	}
 
-	function displayPrivateMessage() {
-
+	function displayPrivateMessage(): bool {
 		$query = "SELECT * FROM `private_messages` WHERE `message_id` = '%d' AND `recipient` = '%d' AND `message_read` < 2 LIMIT 1";
-		$queried = $this->system->query(sprintf($query, $this->message_id, $this->player->user_id));
 		$message = $this->system->db_fetch();
 		
 		if(! $message) {
@@ -436,17 +437,15 @@ class Messaging {
 			$user_info = $this->system->db_fetch($query);
 			$sender = $user_info['user_name'];
 		}
-		
-		$staff = $this->staffcolor($message['staff_level']);
-		$pmsubject = stripslashes($message['subject']);
+
 		$subject = $message['subject'];
 		$msg = $this->system->html_parse($message['message'], false, false);
 		
-		if(substr($subject, 0, 3) != "RE:") {
+		if(!str_starts_with($subject, "RE:")) {
 			$subject = "RE: " . $subject;
 		}
 		
-		if(! $message['read']) {
+		if(!$message['message_read']) {
 			$this->system->query("UPDATE `private_messages` SET `message_read`='1' WHERE `message_id`='{$this->message_id}' LIMIT 1");
 		}
 
@@ -467,7 +466,7 @@ class Messaging {
 
 }
 
-function privateMessages() {
+function privateMessages(): void {
 	/*
 	-send messages
 	-view list of messages
