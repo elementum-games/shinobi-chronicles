@@ -173,9 +173,14 @@ class BattleApiPresenter {
                                 'damage' => $hit->damage,
                             ];
                         }, $action_log->hits),
-                        "appliedEffectDescriptions" => self::unescapeQuotes(
-                            $action_log->applied_effect_descriptions
-                        ),
+                        "effectHits" => array_map(function(EffectHitLog $hit) {
+                            return [
+                                'casterId' =>  $hit->caster_id,
+                                'targetId' => $hit->target_id,
+                                'type' => $hit->type,
+                                'description' =>  self::unescapeQuotes($hit->description),
+                            ];
+                        }, $action_log->effect_hits),
                         "newEffectAnnouncements" => self::unescapeQuotes(
                             $action_log->new_effect_announcements
                         ),

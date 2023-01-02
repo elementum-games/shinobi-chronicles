@@ -184,9 +184,9 @@ class Battle {
         $battle->fighter_jutsu_used = json_decode($battle_data['fighter_jutsu_used'], true);
 
         // log
-        $last_turn_log = BattleLog::getLastTurn($battle->system, $battle->battle_id);
-        if($last_turn_log != null) {
-            $battle->log[$last_turn_log->turn_number] = $last_turn_log;
+        $previous_turn_log = BattleLog::getTurn($battle->system, $battle->battle_id, $battle->turn_count - 1);
+        if($previous_turn_log != null) {
+            $battle->log[$previous_turn_log->turn_number] = $previous_turn_log;
         }
 
         $current_turn_log = BattleLog::getTurn($battle->system, $battle->battle_id, $battle->turn_count);

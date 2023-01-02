@@ -20,8 +20,10 @@ class BattleLog {
 
     /**
      * BattleLog constructor.
+     * @param System $system
      * @param int    $battle_id
      * @param int    $turn_number
+     * @param string $turn_phase
      * @param string $content
      * @param array  $fighter_action_logs
      */
@@ -70,14 +72,23 @@ class BattleLog {
         );
     }
 
-    public function addFighterAppliedEffectDescription(Fighter $fighter, string $effect_description): void {
-        $fighter_action_log = $this->getFighterActionLog($fighter->combat_id);
-        $fighter_action_log->applied_effect_descriptions[] = $this->system->clean($effect_description);
+    /**
+     * @param Fighter      $target
+     * @param EffectHitLog $effect_hit
+     * @return void
+     */
+    public function addFighterEffectHit(
+        Fighter $target, EffectHitLog $effect_hit
+    ): void {
+        $effect_hit->description = $this->system->clean($effect_hit->description);
+
+        $fighter_action_log = $this->getFighterActionLog($target->combat_id);
+        $fighter_action_log->effect_hits[] = $effect_hit;
     }
 
     public function addFighterEffectAnnouncement(Fighter $fighter, string $announcement_text): void {
         $fighter_action_log = $this->getFighterActionLog($fighter->combat_id);
-        $fighter_action_log->applied_effect_descriptions[] = $this->system->clean($announcement_text);
+        $fighter_action_log->new_effect_announcements[] = $this->system->clean($announcement_text);
     }
 
     public function addFighterAttackJutsuInfo(Fighter $fighter, Jutsu $jutsu): void {
@@ -95,7 +106,7 @@ class BattleLog {
                 action_description: '',
                 path_segments: [],
                 hits: [],
-                applied_effect_descriptions: [],
+                effect_hits: [],
                 new_effect_announcements: []
             );
         }
@@ -108,6 +119,7 @@ class BattleLog {
      * @param int    $battle_id
      * @param int    $turn_count
      * @return BattleLog|null
+     * @throws Exception
      */
     public static function getTurn(System $system, int $battle_id, int $turn_count): ?BattleLog {
         $result = $system->query("SELECT * FROM `battle_logs` 
@@ -121,21 +133,8 @@ class BattleLog {
     }
 
     /**
-     * @param System $system
-     * @param int    $battle_id
-     * @return BattleLog|null
+     * @throws Exception
      */
-    public static function getLastTurn(System $system, int $battle_id): ?BattleLog {
-        $result = $system->query("SELECT * FROM `battle_logs` 
-            WHERE `battle_id`='{$battle_id}' ORDER BY `turn_number` DESC LIMIT 1");
-        if($system->db_last_num_rows > 0) {
-            return BattleLog::fromDbArray($system, $system->db_fetch($result));
-        }
-        else {
-            return null;
-        }
-    }
-
     public static function fromDbArray(System $system, array $raw_data): BattleLog {
         $fighter_action_logs = json_decode($raw_data['fighter_action_logs'], true);
 
@@ -155,7 +154,9 @@ class BattleLog {
                     hits: array_map(function($hit) {
                         return AttackHitLog::fromArray($hit);
                     }, $action_log['hits']),
-                    applied_effect_descriptions: $action_log['applied_effect_descriptions'],
+                    effect_hits: array_map(function($effect_hit) {
+                        return EffectHitLog::fromArray($effect_hit);
+                    }, $action_log['effect_hits']),
                     new_effect_announcements: $action_log['new_effect_announcements']
                 );
             }, $fighter_action_logs)
@@ -182,25 +183,29 @@ class BattleLog {
             ON DUPLICATE KEY UPDATE
                 `content`='{$clean_content}',
                 `fighter_action_logs`='{$fighter_action_logs_json}'
-        ", true);
+        ");
     }
 }
 
 class FighterActionLog {
     /**
-     * @param string         $fighter_id
-     * @param string         $action_description
+     * @param string              $fighter_id
+     * @param string              $action_description
      * @param AttackPathSegment[] $path_segments
-     * @param AttackHitLog[] $hits
-     * @param array          $applied_effect_descriptions
-     * @param array          $new_effect_announcements
+     * @param AttackHitLog[]      $hits
+     * @param array               $effect_hits
+     * @param array               $new_effect_announcements
+     * @param string|null         $jutsu_element
+     * @param string|null         $jutsu_type
+     * @param string|null         $jutsu_use_type
+     * @param string|null         $jutsu_target_type
      */
     public function __construct(
         public string $fighter_id,
         public string $action_description,
         public array $path_segments,
         public array $hits,
-        public array $applied_effect_descriptions,
+        public array $effect_hits,
         public array $new_effect_announcements,
         public ?string $jutsu_element = null,
         public ?string $jutsu_type = null,
@@ -228,5 +233,62 @@ class AttackHitLog {
             damage_type: $array['damage_type'],
             damage: $array['damage'],
         );
+    }
+}
+
+class EffectHitLog {
+    const TYPE_HEAL = 'heal';
+    const TYPE_BREAK_GENJUTSU = 'break_genjutsu';
+    const TYPE_NINJUTSU_DAMAGE = 'ninjutsu_damage';
+    const TYPE_TAIJUTSU_DAMAGE = 'taijutsu_damage';
+    const TYPE_GENJUTSU_DAMAGE = 'genjutsu_damage';
+
+    /**
+     * @throws Exception
+     */
+    public function __construct(
+        public string $caster_id,
+        public string $target_id,
+        public string $type,
+        public string $description
+    ) {
+        switch($this->type) {
+            case EffectHitLog::TYPE_HEAL:
+            case EffectHitLog::TYPE_NINJUTSU_DAMAGE:
+            case EffectHitLog::TYPE_TAIJUTSU_DAMAGE:
+            case EffectHitLog::TYPE_GENJUTSU_DAMAGE:
+                break;
+            default:
+                throw new Exception("Invalid effect tick type! {$this->type}");
+        }
+    }
+
+    /**
+     * @throws Exception
+     */
+    public static function fromArray($array): EffectHitLog {
+        return new EffectHitLog(
+            caster_id: $array['caster_id'],
+            target_id: $array['target_id'],
+            type: $array['type'],
+            description: $array['description']
+        );
+    }
+
+    /**
+     * @throws Exception
+     */
+    public static function getTypeFromDamageType(string $damage_type): string {
+        switch($damage_type) {
+            case Jutsu::TYPE_NINJUTSU:
+                return EffectHitLog::TYPE_NINJUTSU_DAMAGE;
+            case Jutsu::TYPE_GENJUTSU:
+                return EffectHitLog::TYPE_GENJUTSU_DAMAGE;
+            case Jutsu::TYPE_TAIJUTSU:
+                return EffectHitLog::TYPE_TAIJUTSU_DAMAGE;
+            default:
+                throw new Exception("Invalid damage type!");
+        }
+
     }
 }

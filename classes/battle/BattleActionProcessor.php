@@ -867,12 +867,6 @@ class BattleActionProcessor {
                 damage: $attack_damage
             );
         }
-        if($this->effects->hasDisplays($user)) {
-            $this->battle->current_turn_log->addFighterAppliedEffectDescription(
-                $user,
-                $this->effects->getDisplayText($user)
-            );
-        }
 
         if($attack->jutsu->hasEffect()) {
             $this->battle->current_turn_log->addFighterEffectAnnouncement(

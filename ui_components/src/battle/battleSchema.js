@@ -94,7 +94,7 @@ export type FighterActionLogType = {|
     +actionDescription: string,
     +pathSegments: $ReadOnlyArray<AttackPathSegmentType>,
     +hits: $ReadOnlyArray<AttackHitLogType>,
-    +appliedEffectDescriptions: $ReadOnlyArray<string>,
+    +effectHits: $ReadOnlyArray<EffectHitLogType>,
     +newEffectAnnouncements: $ReadOnlyArray<string>,
     +jutsuElement: JutsuType["element"],
     +jutsuType: JutsuType["jutsuType"],
@@ -117,3 +117,9 @@ export type AttackHitLogType = {|
     +damage: number,
 |};
 
+export type EffectHitLogType = {|
+    +casterId: string,
+    +targetId: string,
+    +type: 'heal' | 'break_genjutsu' | 'ninjutsu_damage' | 'taijutsu_damage' | 'genjutsu_damage',
+    +description: string,
+|};

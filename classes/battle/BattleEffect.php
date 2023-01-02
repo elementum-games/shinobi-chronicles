@@ -7,8 +7,6 @@ class BattleEffect {
         'ninjutsu_resist','genjutsu_resist','taijutsu_resist','harden'
     ];
 
-    const TYPE_BLOODLINE = 'bloodline';
-
     // combat id
     public string $user;
     // combat Id
@@ -18,8 +16,8 @@ class BattleEffect {
     public string $effect;
     public float $effect_amount;
 
-    // Jutsu type or 'BLOODLINE'
-    public string $effect_type;
+    // Required unless this is a passive effect. Should be a valid Jutsu#jutsuType
+    public ?string $damage_type;
 
     public float $power = 0;
 
@@ -32,7 +30,7 @@ class BattleEffect {
         int $turns,
         string $effect,
         float $effect_amount,
-        string $effect_type,
+        ?string $damage_type = null,
         float $power = 0,
         bool $first_turn = false,
         bool $layer_active = false
@@ -42,7 +40,7 @@ class BattleEffect {
         $this->turns = $turns;
         $this->effect = $effect;
         $this->effect_amount = $effect_amount;
-        $this->effect_type = $effect_type;
+        $this->damage_type = $damage_type;
 
         $this->power = $power;
         $this->first_turn = $first_turn;
@@ -51,15 +49,15 @@ class BattleEffect {
 
     public static function fromArray(array $raw_data): BattleEffect {
         return new BattleEffect(
-            $raw_data['user'],
-            $raw_data['target'],
-            $raw_data['turns'],
-            $raw_data['effect'],
-            $raw_data['effect_amount'],
-            $raw_data['effect_type'],
-            $raw_data['power'] ?? 0,
-            $raw_data['first_turn'] ?? false,
-            $raw_data['layer_active'] ?? false,
+            user: $raw_data['user'],
+            target: $raw_data['target'],
+            turns: $raw_data['turns'],
+            effect: $raw_data['effect'],
+            effect_amount: $raw_data['effect_amount'],
+            damage_type: $raw_data['damage_type'] ?? null,
+            power: $raw_data['power'] ?? 0,
+            first_turn: $raw_data['first_turn'] ?? false,
+            layer_active: $raw_data['layer_active'] ?? false,
         );    
     }
 }

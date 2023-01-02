@@ -506,27 +506,29 @@ class BattleManager {
     }
 
     private function setEffectDescriptions(): void {
-        if($this->effects->hasDisplays($this->battle->player1)) {
-            $this->battle->current_turn_log->addFighterAppliedEffectDescription(
-                $this->battle->player1,
-                $this->actions->parseCombatText(
-                // TODO: This is probably not right
-                    $this->effects->getDisplayText($this->battle->player1),
-                    $this->battle->player1,
-                    $this->battle->player2
-                )
-            );
+        if($this->effects->hasEffectHits($this->battle->player1)) {
+            foreach($this->effects->getEffectHits($this->battle->player1) as $effect_hit) {
+                /** @var EffectHitLog $effect_hit */
+                $effect_hit->description = $this->actions->parseCombatText(
+                    text: $effect_hit->description,
+                    attacker: $this->battle->getFighter($effect_hit->caster_id),
+                    target: $this->battle->player1,
+                );
+
+                $this->battle->current_turn_log->addFighterEffectHit($this->battle->player1, $effect_hit);
+            }
         }
-        if($this->effects->hasDisplays($this->battle->player2)) {
-            $this->battle->current_turn_log->addFighterAppliedEffectDescription(
-                $this->battle->player2,
-                $this->actions->parseCombatText(
-                // TODO: This is probably not right
-                    $this->effects->getDisplayText($this->battle->player2),
-                    $this->battle->player2,
-                    $this->battle->player1
-                )
-            );
+        if($this->effects->hasEffectHits($this->battle->player2)) {
+            foreach($this->effects->getEffectHits($this->battle->player2) as $effect_hit) {
+                /** @var EffectHitLog $effect_hit */
+                $effect_hit->description = $this->actions->parseCombatText(
+                    text: $effect_hit->description,
+                    attacker: $this->battle->getFighter($effect_hit->caster_id),
+                    target: $this->battle->player2,
+                );
+
+                $this->battle->current_turn_log->addFighterEffectHit($this->battle->player2, $effect_hit);
+            }
         }
     }
 

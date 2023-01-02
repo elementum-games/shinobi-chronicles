@@ -115,7 +115,11 @@ function Battle({
                 isAttackSelected={isSelectingTile}
             />
         )}
-        <BattleLog lastTurnLog={battle.lastTurnLog} />
+        <BattleLog
+            lastTurnLog={battle.lastTurnLog}
+            leftFighterId={battle.playerId}
+            rightFighterId={battle.opponentId}
+        />
         {battleResult && <BattleResult description={battleResult} />}
     </div>;
 }

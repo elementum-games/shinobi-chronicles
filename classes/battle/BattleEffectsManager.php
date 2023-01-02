@@ -12,7 +12,7 @@ class BattleEffectsManager {
     public array $active_genjutsu;
 
     /** @var String[][] */
-    public array $displays = [];
+    public array $effect_hits = [];
 
     /**
      * BattleEffectsManager constructor.
@@ -108,14 +108,14 @@ class BattleEffectsManager {
                 $effect_id = $effect_user->combat_id . ':WE:' . $jutsu->effect;
             }
 
-            $this->active_effects[$effect_id] = BattleEffect::fromArray([
-                'user' => $effect_user->combat_id,
-                'target' => $target_id,
-                'turns' => $jutsu->effect_length,
-                'effect' => $jutsu->effect,
-                'effect_amount' => $jutsu->effect_amount,
-                'effect_type' => $jutsu->jutsu_type
-            ]);
+            $this->active_effects[$effect_id] = new BattleEffect(
+                user: $effect_user->combat_id,
+                target: $target_id,
+                turns: $jutsu->effect_length,
+                effect: $jutsu->effect,
+                effect_amount: $jutsu->effect_amount,
+                damage_type: $jutsu->jutsu_type
+            );
             if($jutsu->jutsu_type == Jutsu::TYPE_GENJUTSU) {
                 $intelligence = ($effect_user->intelligence + $effect_user->intelligence_boost - $effect_user->intelligence_nerf);
                 if($intelligence <= 0) {
@@ -184,12 +184,11 @@ class BattleEffectsManager {
             foreach($fighter->equipped_armor as $item_id) {
                 if($fighter->hasItem($item_id)) {
                     $effect = new BattleEffect(
-                        $fighter->combat_id,
-                        $fighter->combat_id,
-                        1,
-                        $fighter->items[$item_id]->effect,
-                        $fighter->items[$item_id]->effect_amount,
-                        BattleEffect::TYPE_BLOODLINE
+                        user: $fighter->combat_id,
+                        target: $fighter->combat_id,
+                        turns: 1,
+                        effect: $fighter->items[$item_id]->effect,
+                        effect_amount: $fighter->items[$item_id]->effect_amount
                     );
                     $this->applyPassiveEffect($fighter, $effect);
                 }
@@ -334,7 +333,7 @@ class BattleEffectsManager {
         $this->applyBloodlineActiveBoosts($player2);
     }
     
-    public function applyBloodlineActiveBoosts(Fighter $fighter) {
+    public function applyBloodlineActiveBoosts(Fighter $fighter): void {
         if(!empty($fighter->bloodline->combat_boosts)) {
             foreach($fighter->bloodline->combat_boosts as $id=>$effect) {
                 $this->applyActiveEffect(
@@ -352,15 +351,23 @@ class BattleEffectsManager {
             }
         }
     }
-    
+
+    /**
+     * @throws Exception
+     */
     public function applyActiveEffect(Fighter $target, Fighter $attacker, BattleEffect $effect): bool {
         if($target->health <= 0) {
             return false;
         }
 
         if($effect->effect == 'residual_damage' || $effect->effect == 'bleed') {
-            $damage = $target->calcDamageTaken($effect->effect_amount, $effect->effect_type, true);
-            $this->addDisplay($target, $target->getName() . " takes $damage residual damage");
+            $damage = $target->calcDamageTaken($effect->effect_amount, $effect->damage_type, true);
+            $this->addEffectHit($target, new EffectHitLog(
+                caster_id: $attacker->combat_id,
+                target_id: $target->combat_id,
+                type: EffectHitLog::getTypeFromDamageType($effect->damage_type),
+                description: $target->getName() . " takes $damage residual damage"
+            ));
 
             $target->health -= $damage;
             if($target->health < 0) {
@@ -369,7 +376,12 @@ class BattleEffectsManager {
         }
         else if($effect->effect == 'heal') {
             $heal = $effect->effect_amount;
-            $this->addDisplay($target, $target->getName() . " heals $heal health");
+            $this->addEffectHit($target, new EffectHitLog(
+                caster_id: $attacker->combat_id,
+                target_id: $target->combat_id,
+                type: EffectHitLog::TYPE_HEAL,
+                description: $target->getName() . " heals $heal health"
+            ));
 
             $target->health += $heal;
             if($target->health > $target->max_health) {
@@ -377,10 +389,13 @@ class BattleEffectsManager {
             }
         }
         else if($effect->effect == 'drain_chakra') {
-            $drain = $target->calcDamageTaken($effect->effect_amount, $effect->effect_type);
-            $this->addDisplay($target,
-                $attacker->getName() . " drains $drain of " . $target->getName() . "'s chakra-"
-            );
+            $drain = $target->calcDamageTaken($effect->effect_amount, $effect->damage_type);
+            $this->addEffectHit($target, new EffectHitLog(
+                caster_id: $attacker->combat_id,
+                target_id: $target->combat_id,
+                type: EffectHitLog::getTypeFromDamageType($effect->damage_type),
+                description: $attacker->getName() . " drains $drain of " . $target->getName() . "'s chakra"
+            ));
 
             $target->chakra -= $drain;
             if($target->chakra < 0) {
@@ -388,10 +403,13 @@ class BattleEffectsManager {
             }
         }
         else if($effect->effect == 'drain_stamina') {
-            $drain = $target->calcDamageTaken($effect->effect_amount, $effect->effect_type);
-            $this->addDisplay($target,
-                $attacker->getName() . " drains $drain of " . $target->getName() . "'s stamina-"
-            );
+            $drain = $target->calcDamageTaken($effect->effect_amount, $effect->damage_type);
+            $this->addEffectHit($target, new EffectHitLog(
+                caster_id: $attacker->combat_id,
+                target_id: $target->combat_id,
+                type: EffectHitLog::getTypeFromDamageType($effect->damage_type),
+                description: $attacker->getName() . " drains $drain of " . $target->getName() . "'s stamina"
+            ));
 
             $target->stamina -= $drain;
             if($target->stamina < 0) {
@@ -399,10 +417,13 @@ class BattleEffectsManager {
             }
         }
         else if($effect->effect == 'absorb_chakra') {
-            $drain = $target->calcDamageTaken($effect->effect_amount, $effect->effect_type);
-            $this->addDisplay($target,
-                $attacker->getName() . " absorbs $drain of " . $target->getName() . "'s chakra-"
-            );
+            $drain = $target->calcDamageTaken($effect->effect_amount, $effect->damage_type);
+            $this->addEffectHit($target, new EffectHitLog(
+                caster_id: $attacker->combat_id,
+                target_id: $target->combat_id,
+                type: EffectHitLog::getTypeFromDamageType($effect->damage_type),
+                description: $attacker->getName() . " absorbs $drain of " . $target->getName() . "'s chakra"
+            ));
 
             $target->chakra -= $drain;
             if($target->chakra < 0) {
@@ -414,10 +435,13 @@ class BattleEffectsManager {
             }
         }
         else if($effect->effect == 'absorb_stamina') {
-            $drain = $target->calcDamageTaken($effect->effect_amount, $effect->effect_type);
-            $this->addDisplay($target,
-                $attacker->getName() . " absorbs $drain of " . $target->getName() . "'s stamina-"
-            );
+            $drain = $target->calcDamageTaken($effect->effect_amount, $effect->damage_type);
+            $this->addEffectHit($target, new EffectHitLog(
+                caster_id: $attacker->combat_id,
+                target_id: $target->combat_id,
+                type: EffectHitLog::getTypeFromDamageType($effect->damage_type),
+                description: $attacker->getName() . " absorbs $drain of " . $target->getName() . "'s stamina"
+            ));
 
             $target->stamina -= $drain;
             if($target->stamina < 0) {
@@ -510,7 +534,10 @@ class BattleEffectsManager {
         return $fighter->combat_id . ':BARRIER';
     }
 
-    public function releaseGenjutsu(Fighter $fighter, Jutsu $fighter_jutsu) {
+    /**
+     * @throws Exception
+     */
+    public function releaseGenjutsu(Fighter $fighter, Jutsu $fighter_jutsu): void {
         $intelligence = ($fighter->intelligence + $fighter->intelligence_boost - $fighter->intelligence_nerf);
         if($intelligence <= 0) {
             $intelligence = 1;
@@ -523,8 +550,15 @@ class BattleEffectsManager {
                 $g_power = $genjutsu['power'] * mt_rand(9, 11);
                 if($r_power > $g_power) {
                     unset($this->active_genjutsu[$id]);
-                    $this->addDisplay($fighter,
-                        $fighter->getName() . " broke free from [opponent]'s Genjutsu!");
+                    $this->addEffectHit(
+                        $fighter,
+                        new EffectHitLog(
+                            $fighter->combat_id,
+                            $fighter->combat_id,
+                            EffectHitLog::TYPE_BREAK_GENJUTSU,
+                            $fighter->getName() . " broke free from [opponent]'s Genjutsu!"
+                        )
+                    );
                 }
             }
         }
@@ -550,26 +584,19 @@ class BattleEffectsManager {
         }
     }
 
-    public function hasDisplays(Fighter $fighter): bool {
-        return count($this->displays[$fighter->combat_id] ?? []) > 0;
+    public function hasEffectHits(Fighter $fighter): bool {
+        return count($this->effect_hits[$fighter->combat_id] ?? []) > 0;
     }
 
-    public function getDisplayText(Fighter $fighter): string {
-        return $this->system->clean(
-            implode(
-                '[br]',
-                array_map(function($text) {
-                    return "-{$text}-";
-                }, $this->displays[$fighter->combat_id])
-            )
-        );
+    public function getEffectHits(Fighter $fighter): array {
+        return $this->effect_hits[$fighter->combat_id] ?? [];
     }
 
-    public function addDisplay(Fighter $fighter, string $display) {
-        if(!isset($this->displays[$fighter->combat_id])) {
-            $this->displays[$fighter->combat_id] = [];
+    public function addEffectHit(Fighter $target, EffectHitLog $effect_hit): void {
+        if(!isset($this->effect_hits[$target->combat_id])) {
+            $this->effect_hits[$target->combat_id] = [];
         }
 
-        $this->displays[$fighter->combat_id][] = $display;
+        $this->effect_hits[$target->combat_id][] = $effect_hit;
     }
 }

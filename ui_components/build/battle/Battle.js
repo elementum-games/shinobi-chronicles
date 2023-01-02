@@ -85,7 +85,9 @@ function Battle({
     updateAttackInput: updateAttackInput,
     isAttackSelected: isSelectingTile
   }), /*#__PURE__*/React.createElement(BattleLog, {
-    lastTurnLog: battle.lastTurnLog
+    lastTurnLog: battle.lastTurnLog,
+    leftFighterId: battle.playerId,
+    rightFighterId: battle.opponentId
   }), battleResult && /*#__PURE__*/React.createElement(BattleResult, {
     description: battleResult
   }));
