@@ -135,7 +135,7 @@ function chat() {
 			$_SESSION['quick_reply'] = 1;
 		}
 		if(isset($_POST['chat_submit'])) {
-			if($_POST['quick_reply'] == 0) {
+			if(!empty($_POST['quick_reply'])) {
 				$_SESSION['quick_reply'] = 0;
 			}
 			else {

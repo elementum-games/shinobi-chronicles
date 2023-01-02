@@ -44,8 +44,8 @@ class System {
     public static bool $SC_EVENT_ACTIVE = true;
 
     // Variable for error message
-    public string $message;
-    public bool $message_displayed;
+    public string $message = "";
+    public bool $message_displayed = false;
 
     // Variable for DB connection resource
     private string $host;

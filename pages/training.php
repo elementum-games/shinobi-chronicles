@@ -53,7 +53,7 @@ function training() {
 				$train_gain = $stat_extended_train_gain;
 			}
 
-			if($_POST['skill']) {
+			if(!empty($_POST['skill'])) {
 				if($player->total_stats >= $player->stat_cap) {
 					throw new Exception("You cannot train any more at this rank!");
 				}
