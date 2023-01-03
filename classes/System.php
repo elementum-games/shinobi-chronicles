@@ -44,14 +44,14 @@ class System {
     public static bool $SC_EVENT_ACTIVE = true;
 
     // Variable for error message
-    public $message;
-    public $message_displayed;
+    public string $message = "";
+    public bool $message_displayed = false;
 
     // Variable for DB connection resource
-    private $host;
-    private $username;
-    private $password;
-    private $database;
+    private string $host;
+    private string $username;
+    private string $password;
+    private string $database;
     public $con;
 
     public $environment;
@@ -59,15 +59,15 @@ class System {
     public $SC_OPEN;
     public $register_open;
 
-    public $link;
+    public string $link;
 
     public $timezoneOffset;
 
     public array $villageLocations = [];
 
     // Training boost switches
-    public $TRAIN_BOOST = 0; // Extra points per training, 0 for none
-    public $LONG_TRAIN_BOOST = 0; // Extra points per long training, 0 for none
+    public int $TRAIN_BOOST = 0; // Extra points per training, 0 for none
+    public int $LONG_TRAIN_BOOST = 0; // Extra points per long training, 0 for none
 
     // Variables for query() function to track things
     public $db_result;
@@ -76,7 +76,7 @@ class System {
     public int $db_last_affected_rows;
     public $db_last_insert_id;
 
-    public $SC_STAFF_COLORS = array(
+    public array $SC_STAFF_COLORS = array(
         User::STAFF_MODERATOR => array(
             'staffBanner' => "moderator",
             'staffColor' => "009020",
@@ -146,7 +146,7 @@ class System {
 
     const MAX_LINK_DISPLAY_LENGTH = 60;
 
-    public static $banned_words = [
+    public static array $banned_words = [
         'fuck',
         'fuk',
         'fck',
@@ -205,7 +205,7 @@ class System {
         'dildo',
     ];
 
-    public $debug = [
+    public array $debug = [
         'battle' => false,
         'battle_effects' => false,
         'jutsu_collision' => false,
@@ -281,7 +281,7 @@ class System {
     }
 
     /* function query(query) */
-    public function query($query, $debug = false) {
+    public function query($query, $debug = false): mysqli_result|bool {
         $query = trim($query);
 
         //Debugging
@@ -363,7 +363,7 @@ class System {
         @force_message: Whether or not to overwrite a pre-stored message that has not been displayed. Defaults to false.
 
     */
-    public function message($message, $force_message = false) {
+    public function message($message, $force_message = false): void {
         if(strlen($this->message) == 0 || $force_message) {
             $this->message = $message;
         }
@@ -424,7 +424,7 @@ class System {
      *
      * @param $error_message
      */
-    public function error($error_message) {
+     public function error($error_message): void {
         // DEBUG MODE
         // error_log($error_message);
         //echo $error_message;
@@ -504,7 +504,7 @@ class System {
         ];
     }
 
-    public function html_parse($text, $img = false, $faces = false) {
+    public function html_parse($text, $img = false, $faces = false): array|string {
         $search_array = array(
             "[b]","[/b]","[u]","[/u]","[i]","[/i]",
             "&lt;3","[strike]","[/strike]","[super]","[/super]","[sub]","[/sub]", "[center]", "[/center]", "[right]", "[/right]",
@@ -657,7 +657,7 @@ class System {
         return $message;
     }
 
-    public function log($type, $title, $contents) {
+    public function log($type, $title, $contents): void {
         $type = $this->clean($type);
         $title = $this->clean($title);
 
@@ -672,7 +672,7 @@ class System {
 			VALUES ('$type', '$title', " . time() . ", '$contents')");
     }
 
-    public function hash_password($password) {
+    public function hash_password($password): string {
         return password_hash($password, PASSWORD_DEFAULT);
     }
 
@@ -680,7 +680,7 @@ class System {
         return password_verify($password, $hash);
     }
 
-    public function renderStaticPageHeader($layout = System::DEFAULT_LAYOUT) {
+    public function renderStaticPageHeader($layout = System::DEFAULT_LAYOUT): void {
         $system = $this;
 
         require($this->fetchLayoutByName($layout));
@@ -698,7 +698,7 @@ class System {
         echo str_replace("[HEADER_TITLE]", "Rules", $body_start);
     }
 
-    public function renderStaticPageFooter($layout = System::DEFAULT_LAYOUT) {
+    public function renderStaticPageFooter($layout = System::DEFAULT_LAYOUT): void {
         $system = $this;
 
         require($this->fetchLayoutByName($layout));
@@ -721,7 +721,7 @@ class System {
         echo str_replace('<!--[VERSION_NUMBER]-->', System::VERSION_NUMBER, $footer);
     }
 
-    public function fetchLayoutByName($layout) {
+    public function fetchLayoutByName($layout): string {
         switch($layout) {
             case 'cextralite':
                 return "layout/cextralite.php";
@@ -771,7 +771,7 @@ class System {
         return new EntityId($arr[0], (int)$arr[1]);
     }
 
-    public static function diminishing_returns($val, $scale) {
+    public static function diminishing_returns($val, $scale): float {
         if($val < 0) {
             return -self::diminishing_returns(-$val, $scale);
         }
@@ -846,14 +846,18 @@ class System {
         return $string;
     }
 
-    public static function dateTimeFromMicrotime(float $microtime) {
+    public static function dateTimeFromMicrotime(float $microtime): DateTime|bool {
         return DateTime::createFromFormat(
             'U.u',
             number_format($microtime, 2, '.', '')
         );
     }
 
-    public static function unSlug(string $slug) {
+    public static function slug(string $string): string {
+        return strtolower(str_replace(' ', '_', $string));
+    }
+
+    public static function unSlug(string $slug): string {
         return ucwords(str_replace('_', ' ', $slug));
     }
 
