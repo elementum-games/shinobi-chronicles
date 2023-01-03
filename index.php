@@ -13,13 +13,16 @@ session_start();
 
 // Turn errors off unless Lsm
 if(!isset($_SESSION['user_id']) || $_SESSION['user_id'] != 1 || $_SESSION['user_id'] != 190) {
-	// ini_set('display_errors', 'Off');
+	ini_set('display_errors', 'Off');
 }
-ini_set('display_errors', 'On');
 
 $PAGE_LOAD_START = microtime(true);
 require_once("classes.php");
 $system = new System();
+
+if($system->environment == System::ENVIRONMENT_DEV) {
+    ini_set('display_errors', 'On');
+}
 
 // Check for logout
 if(isset($_GET['logout']) && $_GET['logout'] == 1) {

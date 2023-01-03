@@ -494,7 +494,7 @@ CREATE TABLE `users` (
   `village_changes` tinyint(4) NOT NULL DEFAULT '0',
   `username_changes` tinyint(4) NOT NULL DEFAULT '1',
   `clan_changes` tinyint(4) NOT NULL DEFAULT '0'
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
 

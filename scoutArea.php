@@ -97,7 +97,11 @@ function scoutArea($in_existing_table = false, $show_spar_link = true) {
 					if($show_spar_link) {
 					    $links[] = "<a href='{$system->links['spar']}}&challenge={$user['user_id']}'>Spar</a>";
                     }
-					if($user['village'] != $player->village && $user['rank'] > 2 && $player->rank > 2) {
+					if($user['village'] != $player->village
+                        && $user['rank'] > 2
+                        && $player->rank > 2
+                        && $user['rank'] == $player->rank
+                    ) {
 					    $links[] = "<a href='{$system->links['battle']}&attack={$user['user_id']}'>Attack</a>";
                     }
 

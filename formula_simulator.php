@@ -10,6 +10,7 @@ class TestFighter extends Fighter {
     public int $rank = 1;
 
     public $id;
+    public string $gender = 'Non-binary';
 
     public function getAvatarSize(): int {
         return 125;

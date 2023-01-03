@@ -455,8 +455,12 @@ function premium() {
 			$clan_id = $result['clan_id'];
 			$bloodline_name = $result['name'];
 
-			require("adminPanel.php");
-			$status = giveBloodline($bloodline_id, $player->user_id, false);
+			$status = Bloodline::giveBloodline(
+                system: $system,
+                bloodline_id: $bloodline_id,
+                user_id: $player->user_id,
+                display: false
+            );
 
 			$message = "You now have the bloodline <b>$bloodline_name</b>.";
 
@@ -1163,7 +1167,7 @@ function premiumCreditExchange() {
 
 		while($row = $system->db_fetch($result)) {
 
-			if(! in_array($credit_users[$row['seller']], $credit_users))
+			if(!in_array($row['seller'], $credit_users))
 			{
 				$query = $system->query("SELECT `user_name` FROM `users` WHERE `user_id`='{$row['seller']}'");
 				$user_info = $system->db_fetch();

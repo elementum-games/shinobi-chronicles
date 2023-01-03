@@ -11,20 +11,19 @@ function training() {
 	global $system;
 	global $player;
 	global $self_link;
-	// Vars
 
-	$stat_train_length = 300; // 300
-	$stat_train_gain = 2 + ($player->rank * 2);
+	$stat_train_length = 600;
+	$stat_train_gain = 4 + ($player->rank * 4);
 
 	$jutsu_train_gain = User::$jutsu_train_gain;
 
 	// 56.25% of standard
-	$stat_long_train_length = $stat_train_length * 8;
-	$stat_long_train_gain = $stat_train_gain * 4.5;
+	$stat_long_train_length = $stat_train_length * 4;
+	$stat_long_train_gain = $stat_train_gain * 2.25;
 
-    // 48x length, 16x gains: 33% of standard
-    $stat_extended_train_length = $stat_train_length * 48;
-	$stat_extended_train_gain = $stat_train_gain * 16;
+    // 24x length, 8x gains: 33% of standard
+    $stat_extended_train_length = $stat_train_length * 24;
+	$stat_extended_train_gain = $stat_train_gain * 8;
 
 	// Forbidden seal trainings boost
 	if($player->forbidden_seal && $player->forbidden_seal['level'] >= 2) {
@@ -40,11 +39,9 @@ function training() {
 	$stat_long_train_gain += $system->LONG_TRAIN_BOOST;
 	$stat_extended_train_gain += ($system->LONG_TRAIN_BOOST * 5);
 
-	$HOLIDAY_TRAINING = false;
 	$player->getInventory();
-	if($_POST['train_type'] && !$player->train_time) {
-		try {	
-			$train_type = '';
+	if(!empty($_POST['train_type']) && !$player->train_time) {
+		try {
 			$train_length = $stat_train_length;
 			$train_gain = $stat_train_gain;
 			if($_POST['train_type'] == 'Long') {
@@ -55,11 +52,8 @@ function training() {
 				$train_length = $stat_extended_train_length;
 				$train_gain = $stat_extended_train_gain;
 			}
-			else if($_POST['train_type'] == 'Extended' && $HOLIDAY_TRAINING) {
-				$train_length = $stat_extended_train_length;
-				$train_gain = $stat_extended_train_gain - 20;
-			}
-			if($_POST['skill']) {
+
+			if(!empty($_POST['skill'])) {
 				if($player->total_stats >= $player->stat_cap) {
 					throw new Exception("You cannot train any more at this rank!");
 				}
@@ -101,25 +95,27 @@ function training() {
 				if($player->jutsu[$jutsu_id]->level >= 100) {
 					throw new Exception("You cannot train this jutsu any further!");
 				}
-				$train_type = 'jutsu:' . strtolower(str_replace(' ', '_', $player->jutsu[$jutsu_id]->name));
+				$train_type = 'jutsu:' . System::slug($player->jutsu[$jutsu_id]->name);
 				$train_type = $system->clean($train_type);
 				$train_gain = $jutsu_id;
 				$train_length = 600 + (60 * round(pow($player->jutsu[$jutsu_id]->level, 1.1)));
-				if($player->user_id == 190) {
-					$train_length = 5;	
-				}
 			}
 			else {
 				throw new Exception("Invalid training type!");
 			}
-			// Check for clan training boost
-			// if($player->clan && substr($player->clan['boost'], 0, 9) == 'training:') {
-			// 	if($train_type == substr($player->clan['boost'], 9) || strpos($train_type, 'jutsu') !== false && substr($player->clan['boost'], 9) == 'jutsu') {
-			// 		$system->message("Your training was reduced by " . ($train_length * ($player->clan['boost_amount'] / 100)) . " seconds
-			// 		due to your clan boost.");
-			// 		$train_length *= 1 - ($player->clan['boost_amount'] / 100);
-			// 	}
-			// }
+
+            // Check for clan training boost
+            if($player->clan && str_starts_with($player->clan['boost'], 'training:')) {
+			 	if($train_type == substr($player->clan['boost'], 9)
+                    || str_contains($train_type, 'jutsu')
+                    && substr($player->clan['boost'], 9) == 'jutsu'
+                ) {
+			 		$system->message("Your training was reduced by "
+                        . ($train_length * ($player->clan['boost_amount'] / 100))
+                        . " seconds due to your clan boost.");
+			 		$train_length *= 1 - ($player->clan['boost_amount'] / 100);
+			 	}
+			}
 
 			$player->log(User::LOG_TRAINING, "Type: {$train_type} / Length: {$train_length}");
 
@@ -131,7 +127,7 @@ function training() {
 		}
 		$system->printMessage();
 	}
-	else if($_GET['cancel_training'] && $player->train_time) {
+	else if(!empty($_GET['cancel_training']) && $player->train_time) {
 		$player->train_time = 0;
 		$system->message("Training cancelled.");
 		$system->printMessage();
@@ -159,7 +155,7 @@ function training() {
 	if($player->train_time) {
 		echo "<tr><th colspan='3'>Currently Training</th></tr>
 		<tr><td colspan='3' style='text-align:center'>";
-		if(strpos($player->train_type, 'jutsu:') !== false) {
+		if(str_contains($player->train_type, 'jutsu:')) {
 			$train_type = str_replace('jutsu:', '', $player->train_type);
 			echo "Currently training: " . ucwords(str_replace('_', ' ', $train_type)) . "<br />" .
 			System::timeRemaining($player->train_time - time(), 'short', false, true) . " remaining";
@@ -233,4 +229,3 @@ function training() {
 		</table>";
 	}
 }
-?>

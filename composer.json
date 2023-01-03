@@ -9,7 +9,8 @@
         }
     ],
     "require": {
-      "php": ">=7.4",
-      "ext-mysqli": "*"
+      "php": ">=8.0",
+      "ext-mysqli": "*",
+      "ext-ctype": "*"
     }
 }

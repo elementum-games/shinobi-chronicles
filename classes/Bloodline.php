@@ -298,4 +298,159 @@ class Bloodline {
         }
         return $skill_ratio;
     }
+
+    /**
+     * @param System $system
+     * @param int    $bloodline_id
+     * @param int    $user_id
+     * @param bool   $display
+     * @return bool
+     * @throws Exception
+     */
+    public static function giveBloodline(System $system, int $bloodline_id, int $user_id, bool $display = true): bool {
+        $result = $system->query("SELECT * FROM `bloodlines` WHERE `bloodline_id` = '$bloodline_id' LIMIT 1");
+        if($system->db_last_num_rows == 0) {
+            throw new Exception("Invalid bloodline!");
+        }
+        $bloodline = $system->db_fetch($result);
+
+        $user_bloodline['bloodline_id'] = $bloodline['bloodline_id'];
+        $user_bloodline['name'] = $bloodline['name'];
+        $user_bloodline['passive_boosts'] = $bloodline['passive_boosts'];
+        $user_bloodline['combat_boosts'] = $bloodline['combat_boosts'];
+        // 5000 bl skill -> 20 power = 1 increment of BL effect
+        // Heal: 1 increment = 100 heal
+
+        $effects = [
+            // Passive boosts
+            'scout_range' => [
+                'multiplier' => 0.00004,
+            ],
+            'stealth' => [
+                'multiplier' => 0.00004,
+            ],
+            'regen' => [
+                'multiplier' => 0.0001,
+            ],
+            // Combat boosts
+            'heal' => [
+                'multiplier' => 0.001,
+            ],
+            'ninjutsu_boost' => [
+                'multiplier' => 0.01,
+            ],
+            'taijutsu_boost' => [
+                'multiplier' => 0.01,
+            ],
+            'genjutsu_boost' => [
+                'multiplier' => 0.01,
+            ],
+            'ninjutsu_resist' => [
+                'multiplier' => 0.01,
+            ],
+            'taijutsu_resist' => [
+                'multiplier' => 0.01,
+            ],
+            'genjutsu_resist' => [
+                'multiplier' => 0.01,
+            ],
+            'speed_boost' => [
+                'multiplier' => 0.001,
+            ],
+            'cast_speed_boost' => [
+                'multiplier' => 0.001,
+            ],
+            'endurance_boost' => [
+                'multiplier' => 0.001,
+            ],
+            'intelligence_boost' => [
+                'multiplier' => 0.001,
+            ],
+            'willpower_boost' => [
+                'multiplier' => 0.001,
+            ],
+        ];
+        if($user_bloodline['passive_boosts']) {
+            $user_bloodline['passive_boosts'] = json_decode($user_bloodline['passive_boosts'], true);
+            foreach($user_bloodline['passive_boosts'] as $id => $boost) {
+                if(isset($effects[$boost['effect']])) {
+                    $user_bloodline['passive_boosts'][$id]['power'] =
+                        round($boost['power'] * $effects[$boost['effect']]['multiplier'], 6);
+                }
+            }
+            $user_bloodline['passive_boosts'] = json_encode($user_bloodline['passive_boosts']);
+        }
+        if($user_bloodline['combat_boosts']) {
+            $user_bloodline['combat_boosts'] = json_decode($user_bloodline['combat_boosts'], true);
+            foreach($user_bloodline['combat_boosts'] as $id => $boost) {
+                if(isset($effects[$boost['effect']])) {
+                    $user_bloodline['combat_boosts'][$id]['power'] =
+                        round($boost['power'] * $effects[$boost['effect']]['multiplier'], 6);
+                }
+            }
+            $user_bloodline['combat_boosts'] = json_encode($user_bloodline['combat_boosts']);
+        }
+
+        // move ids (level & exp -> 0)
+        $user_bloodline['jutsu'] = false;
+        $result = $system->query("SELECT `bloodline_id` FROM `user_bloodlines` WHERE `user_id`='$user_id' LIMIT 1");
+
+        // Insert new row
+        if($system->db_last_num_rows == 0) {
+            $query = "INSERT INTO `user_bloodlines` (`user_id`, `bloodline_id`, `name`, `passive_boosts`, `combat_boosts`, `jutsu`)
+			VALUES ('$user_id', '$bloodline_id', '{$user_bloodline['name']}', '{$user_bloodline['passive_boosts']}', 
+			'{$user_bloodline['combat_boosts']}', '{$user_bloodline['jutsu']}')";
+        }
+
+        // Update existing row
+        else {
+            $query = "UPDATE `user_bloodlines` SET
+			`bloodline_id` = '$bloodline_id',
+			`name` = '{$user_bloodline['name']}',
+			`passive_boosts` = '{$user_bloodline['passive_boosts']}',
+			`combat_boosts` = '{$user_bloodline['combat_boosts']}',
+			`jutsu` = '{$user_bloodline['jutsu']}'
+			WHERE `user_id`='$user_id' LIMIT 1";
+        }
+        $system->query($query);
+
+        if($system->db_last_affected_rows == 1) {
+            if($display) {
+                $system->message("Bloodline given!");
+            }
+            $result = $system->query("SELECT `exp`, `bloodline_skill` FROM `users` WHERE `user_id`='$user_id' LIMIT 1");
+            $result = $system->db_fetch($result);
+            $new_exp = $result['exp'];
+            $new_bloodline_skill = $result['bloodline_skill'];
+            if($result['bloodline_skill'] > 10) {
+                $bloodline_skill_reduction = ($result['bloodline_skill'] - 10) * Bloodline::SKILL_REDUCTION_ON_CHANGE;
+                $new_exp -= $bloodline_skill_reduction * 10;
+                $new_bloodline_skill -= $bloodline_skill_reduction;
+            }
+
+            $query = "UPDATE `users` SET 
+            `bloodline_id`='$bloodline_id', 
+            `bloodline_name`='{$bloodline['name']}', 
+            `bloodline_skill`='{$new_bloodline_skill}',
+            `exp`='{$new_exp}'
+			WHERE `user_id`='$user_id' LIMIT 1";
+
+            $system->query($query);
+            if($user_id == $_SESSION['user_id']) {
+                global $player;
+                $player->bloodline_id = $bloodline_id;
+                $player->bloodline_name = $bloodline['name'];
+                $player->exp = $new_exp;
+                $player->bloodline_skill = $new_bloodline_skill;
+            }
+        }
+        else {
+            throw new Exception("Error giving bloodline! (Or user already has this BL)");
+        }
+
+        if($display) {
+            $system->printMessage();
+        }
+        return true;
+    }
 }
