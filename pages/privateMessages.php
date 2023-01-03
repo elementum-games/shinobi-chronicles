@@ -422,8 +422,13 @@ class Messaging {
 	}
 
 	function displayPrivateMessage(): bool {
-		$query = "SELECT * FROM `private_messages` WHERE `message_id` = '%d' AND `recipient` = '%d' AND `message_read` < 2 LIMIT 1";
-		$message = $this->system->db_fetch();
+		$result = $this->system->query(
+        "SELECT * FROM `private_messages` 
+                WHERE `message_id` = '{$this->message_id}' 
+                AND `recipient` = '{$this->player->user_id}' 
+                AND `message_read` < 2 LIMIT 1"
+        );
+        $message = $this->system->db_fetch($result);
 		
 		if(! $message) {
 			return false;
@@ -504,7 +509,9 @@ function privateMessages(): void {
 
 		//For viewing private messages	
 		case 'view_message':
-			($Messaging->displayPrivateMessage()) ? $Messaging->display('privateMessage', $system->links['members'], $system->links['report']) : $Messaging->display('privateMessage:Error');
+			($Messaging->displayPrivateMessage())
+                ? $Messaging->display('privateMessage', $system->links['members'], $system->links['report'])
+                : $Messaging->display('privateMessage:Error');
 		break;
 		
 		//For deleting messages
