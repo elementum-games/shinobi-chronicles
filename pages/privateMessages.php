@@ -21,7 +21,7 @@ class Messaging {
 		SEAL_INBOX_LIMIT = 75,
 		STAFF_INBOX_LIMIT = 100;
 
-	public ?int $message_id;
+	public int|string|null $message_id;
 
     private
 		$Messages,
