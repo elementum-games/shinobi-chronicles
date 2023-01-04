@@ -1167,7 +1167,7 @@ function premiumCreditExchange() {
 
 		while($row = $system->db_fetch($result)) {
 
-			if(! in_array($credit_users[$row['seller']], $credit_users))
+			if(!in_array($row['seller'], $credit_users))
 			{
 				$query = $system->query("SELECT `user_name` FROM `users` WHERE `user_id`='{$row['seller']}'");
 				$user_info = $system->db_fetch();
