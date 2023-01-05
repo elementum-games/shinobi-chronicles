@@ -178,9 +178,11 @@ class User extends Fighter {
     public int $stats_max_level;
     public int $regen_rate;
 
-    public int $sensei_id; //id # in DB that holds sensei student data
+    public bool $isRegisteredSensei;
+    public bool $isRegisteredStudent;
+    public int $sensei_id; //DB sensei_list ID 
     public int $sensei_skill_total;
-    public $students;
+    public array $students;
     public int $student_learning_boost;
     public bool $isSensei;
     public bool $isStudent;
@@ -290,20 +292,44 @@ class User extends Fighter {
 
         $this->inventory_loaded = false;
 
-        //get sensei_id
+        //Prepare Manager & allocate sensei data to user
         $this->sensei_manager = new SenseiManager($system, $this->user_id);
-        $this->sensei_id = $this->sensei_manager->getSenseiID();
-        // $this->students = $this->sensei_manager->getStudentIDS();
-        $this->students = $this->sensei_manager->getStudentInformation();
-        $this->isSensei = $this->sensei_manager->isSensei();
-        $this->isStudent = $this->sensei_manager->isStudent();
+        $this->isRegisteredSensei = $this->sensei_manager->checkIfRegisteredSensei();
+        $this->isRegisteredStudent = $this->sensei_manager->checkIfRegisteredStudent();
+
+        if ($this->isRegisteredSensei) {
+            // $this->sensei_id = $this->sensei_manager->sensei_id(); //todo get teacher id
+            $this->students = $this->sensei_manager->getStudentInformation();
+            $this->isSensei = $this->sensei_manager->isSensei(); // redundant should be true 
+            $this->isStudent = $this->sensei_manager->isStudent(); // redundant should be false
+        }
+
+        if ($this->isRegisteredStudent) {
+            $this->sensei_id = $this->sensei_manager->getMySenseisID(); //might be null
+            $this->isSensei = $this->sensei_manager->isSensei(); // redundant should be true 
+            $this->isStudent = $this->sensei_manager->isStudent(); // redundant should be false
+        }
 
         return true;
     }
 
+    //Sensei Functions
     public function getSenseiID(): int{
         return $this->sensei_id;
     }
+
+    public function setSenseiId(int $id){
+        $this->sensei_manager->setSenseiIDinDB($id);
+        $this->updateSenseiData();
+    }
+
+    public function updateSenseiData(){
+        $this->sensei_id = $this->sensei_manager->getSenseiID();
+        $this->students = $this->sensei_manager->getStudentInformation();
+        $this->isSensei = $this->sensei_manager->isSensei();
+        $this->isStudent = $this->sensei_manager->isStudent();
+    }
+    //Sensei Functions
 
     /* function loadData()
         Loads user data from the database into class members
