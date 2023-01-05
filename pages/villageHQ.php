@@ -88,7 +88,25 @@ function villageHQ() {
 			<img src='./images/village_icons/" . strtolower($player->village) . "_large.png' style='max-width:64px;max-height:64px;' />
 		</div>
 		<br style='margin:0px;clear:both;' />
-		</td></tr></table>";
+		</td></tr>";
+		?>
+
+		<tr>
+			<td>
+			<?php if(!$player->isRegisteredStudent && $player->rank < 3) : ?>
+				<div>Register yourself as a student!</div>
+			<?php elseif($player->isRegisteredStudent && $player->rank < 3) : ?>
+				<div>List of Available Teachers</div>
+			<?php elseif(!$player->isRegisteredSensei && $player->rank >= 2) : ?>
+				<div>Register yourself as a teacher!</div>
+			<?php elseif($player->isRegisteredSensei && $player->rank >= 2) : ?>
+				<div>List of Available Students</div>
+			<?php endif; ?>
+			</td>
+		</tr>
+
+		<?php
+		echo "</table>";
 	}
 	else if($view == 'members') {
 		// Load rank data

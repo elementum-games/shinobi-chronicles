@@ -24,7 +24,7 @@ interface Sensei{
  */
 class SenseiManager implements Sensei, Student{
 
-    private int $sensei_id;
+    private int|null $sensei_id; //TODO: This Variable is shared by both student and teacher and should be changed into two different variables
     private int $student_id;
     private System $system;
     private int $sensei_skill;
@@ -75,12 +75,12 @@ class SenseiManager implements Sensei, Student{
             }
 
             //check if student
-            $result = $this->system->query("SELECT `sensei_id` from `users` WHERE `sensei_id`='$this->user_id' LIMIT 1");
+            $result = $this->system->query("SELECT `my_senseis_id` from `users` WHERE `user_id`='$this->user_id' LIMIT 1");
             $sensei_object = $this->system->db_fetch($result);
 
             //if sensei_id is found
             if($this->system->db_last_num_rows != 0){
-                $sensei_object = $sensei_object['sensei_id'];
+                $sensei_object = $sensei_object['my_senseis_id'];
                 $this->sensei_id = $sensei_object;
             } else {
                 return true;
@@ -137,12 +137,12 @@ class SenseiManager implements Sensei, Student{
      * Grabs Teacher ID located in student's DB
 	 */
 	public function getMySenseisID(): int|null {
-        $result = $this->system->query("SELECT `sensei_id` from `users` WHERE `user_id`='$this->user_id' LIMIT 1");
+        $result = $this->system->query("SELECT `my_senseis_id` from `users` WHERE `user_id`='$this->user_id' LIMIT 1");
         $senseiId = $this->system->db_fetch($result);
 
         //if sensei_id is found
         if($this->system->db_last_num_rows != 0){
-            $senseiId = $senseiId['sensei_id'];
+            $senseiId = $senseiId['my_senseis_id'];
 
             return $senseiId; //int
         }
@@ -155,7 +155,7 @@ class SenseiManager implements Sensei, Student{
 	 * @param int $id
 	 */
 	public function setMySenseisIDinDB(int $id): void {
-        $this->system->query("INSERT INTO `users` (`sensei_id`)
+        $this->system->query("INSERT INTO `users` (`my_senseis_id`)
             VALUES ('{$id}')");
 
         $this->isStudent = true;
