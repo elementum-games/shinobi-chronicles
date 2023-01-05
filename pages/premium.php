@@ -35,6 +35,7 @@ function premium() {
 	}
 
     $free_stat_change_timer = 86400;
+    $stat_transfer_points_per_min = 10;
 
 	$available_clans = array();
 
@@ -354,7 +355,7 @@ function premium() {
 				throw new Exception("You do not have enough Ancient Kunai!");
 			}
 
-			$time = $transfer_amount * 0.2;
+			$time = $transfer_amount / $stat_transfer_points_per_min;
 
 			// Check for minimum stat amount
 			if($player->{$original_stat} <= $reset_amount) {
