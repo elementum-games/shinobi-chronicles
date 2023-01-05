@@ -410,6 +410,24 @@ $clan_positions = [
         <br />
     </td>
 </tr>
+
+<!-- Sensei Row -->
+
+<?php if($player->isSensei) : ?>
+    <tr>
+        <td colspan='2'>
+            <!-- <?= ($player->getSenseiID()) ?> -->
+            <!-- <?= print_r($player->students) ?> -->
+            <?php foreach($player->students as $listItem): ?>
+
+                <?php foreach($listItem as $student): ?>
+                    <div><?= ($student['name']) ?></div>
+                <?php endforeach;?>
+
+            <?php endforeach;?>
+        </td>
+    </tr>
+<?php endif; ?>
 </table>
 
 <?php
