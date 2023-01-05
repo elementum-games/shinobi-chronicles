@@ -238,6 +238,8 @@ function premium() {
 			$system->message($e->getMessage());
 		}
 	}
+
+	// Gender change
 	else if(isset($_POST['change_gender'])) {
         try {
             $new_gender = $system->clean($_POST['new_gender']);
