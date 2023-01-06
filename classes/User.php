@@ -292,22 +292,21 @@ class User extends Fighter {
 
         $this->inventory_loaded = false;
 
+        //TODO: If User Sensei ID no longer exists among sensei_list table for any reason, user should automatically be unregistered
+        //TODO: Training Boost should be in 'user' table not sensei_list
         //Prepare Manager & allocate sensei data to user
         $this->sensei_manager = new SenseiManager($system, $this->user_id);
         $this->isRegisteredSensei = $this->sensei_manager->checkIfRegisteredSensei();
         $this->isRegisteredStudent = $this->sensei_manager->checkIfRegisteredStudent();
 
         if ($this->isRegisteredSensei) {
-            // $this->sensei_id = $this->sensei_manager->sensei_id(); //todo get teacher id
+            $this->sensei_id = $this->sensei_manager->getMyTeachingID() ?? '0';
             $this->students = $this->sensei_manager->getStudentInformation();
-            $this->isSensei = $this->sensei_manager->isSensei(); // redundant should be true 
-            $this->isStudent = $this->sensei_manager->isStudent(); // redundant should be false
+            // $this->sensei_skill_total = 
         }
 
         if ($this->isRegisteredStudent) {
             $this->sensei_id = $this->sensei_manager->getMySenseisID(); //might be null
-            $this->isSensei = $this->sensei_manager->isSensei(); // redundant should be true 
-            $this->isStudent = $this->sensei_manager->isStudent(); // redundant should be false
         }
 
         return true;

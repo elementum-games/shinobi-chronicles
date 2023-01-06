@@ -33,6 +33,7 @@ class SenseiManager implements Sensei, Student{
     private bool $isStudent;
     private int $user_id;
     private int $user_rank;
+    private int $default_teacher_boost_amount;
 
     public function __construct(System $system, int $user_id){
 
@@ -45,6 +46,7 @@ class SenseiManager implements Sensei, Student{
         $this->sensei_skill = 0;
         $this->user_id = $user_id;
         $this->user_rank = -1;
+        $this->default_teacher_boost_amount = 1.05;
 
         //Grab [Rank] from DB 
         $result = $this->system->query("SELECT `rank` from `users` WHERE `user_id`='$this->user_id' LIMIT 1");
@@ -110,7 +112,7 @@ class SenseiManager implements Sensei, Student{
 
     private function insertNewSenseiDataIntoDB(int $user_id){
         $this->system->query("INSERT INTO `sensei_list` (`sensei_id`, `assoc_user_id`, `student_list`, `teaching_boost_amount`, `sensei_skill`)
-        VALUES ('0', '{$user_id}', '" . json_encode([]) . "', '1.00', '0')");
+        VALUES ('0', '{$user_id}', '" . json_encode([]) . "', '$this->default_teacher_boost_amount', '0')");
 
         $this->system->query("UPDATE users SET isRegisteredSensei = 1 WHERE user_id = ${user_id}");
     }
@@ -125,13 +127,6 @@ class SenseiManager implements Sensei, Student{
         $this->myTeachingID = $id;
         $this->isSensei = true;
         $this->isStudent = false;
-    }
-
-    public function isSensei(){
-        return $this->isSensei;
-    }
-    public function isStudent(){
-        return $this->isStudent;
     }
 
 
@@ -163,6 +158,22 @@ class SenseiManager implements Sensei, Student{
 	 * @param int $id
 	 */
 	public function deleteStudentID(int $id): void {
+
+	}
+
+
+    public function getMyTeachingID(): int|null {
+        $result = $this->system->query("SELECT `sensei_id` from `sensei_list` WHERE `assoc_user_id`='$this->user_id' LIMIT 1");
+        $senseiId = $this->system->db_fetch($result);
+
+        //if sensei_id is found
+        if($this->system->db_last_num_rows != 0){
+            $senseiId = $senseiId['sensei_id'];
+
+            return $senseiId; //int
+        }
+
+        return null; //no id was found
 	}
 
 	/**
@@ -221,15 +232,14 @@ class SenseiManager implements Sensei, Student{
         $registryStatus = $this->system->db_fetch($result);
 
         //if sensei_id is found
-        if($this->system->db_last_num_rows != 0){
-            $registryStatus = $registryStatus['isRegisteredSensei'];
+        if($this->system->db_last_num_rows != 0 && $registryStatus['isRegisteredSensei']){
 
-            return $registryStatus; //true or false
+            return $registryStatus['isRegisteredSensei']; //true or false
         }
 
         return false; //default setting
 	}
-
+    
 	/**
 	 * @return bool
 	 */
