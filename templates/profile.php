@@ -413,11 +413,9 @@ $clan_positions = [
 
 <!-- Sensei Row -->
 
-<?php if($player->isRegisteredSensei) : ?>
+<?php if($player->isRegisteredSensei && !empty($player->students)) : ?>
     <tr>
         <td colspan='2'>
-            <?= ($player->sensei_id) ?>
-            <?= print_r($player->students) ?>
             <?php foreach($player->students as $listItem): ?>
 
                 <?php foreach($listItem as $student): ?>

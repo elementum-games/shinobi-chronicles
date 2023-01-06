@@ -1,9 +1,12 @@
 <?php
 
+//Regarding the Interfaces, I was meant to split the SenseiManager into two.
+//I'm thinking about using a SenseiManagerFactory to handle whether the USER is a Student or a Teacher and have different classes to manage different functions but I think i'll do that later. I'm still learning about Factory implimentation. 
+
 interface Student{
     public function getMySenseisID(): int|null;
     public function setMySenseisIDinDB(Int $id): void;
-    public function deleteMySenseiID(int $id): void;
+    public function deleteMySenseisID(int $id): void;
     public function addToMySenseiSkillAmount(int $amount): void;
     public function checkIfRegisteredStudent(): bool;
 
@@ -17,14 +20,12 @@ interface Sensei{
 }
 
 /**
- * Sensei Manager Handles DB interaction and holds properties for students and teachers
- * 
- * This object can only be used and set during User construction
- * 
+ * SenseiManager Handles Database(DB) interaction from within the USER object regarding all Sensei/Student interaction such as Registration/Deletion.
+ * This class also returns properties used to update properties within the USER class to be shown globally. 
  */
 class SenseiManager implements Sensei, Student{
 
-    private int|null $myTeachingID; //TODO: This Variable is shared by both student and teacher and should be changed into two different variables
+    private int|null $myTeachingID;
     private int|null $mySenseisID;
     private int $student_id;
     private System $system;
@@ -75,13 +76,17 @@ class SenseiManager implements Sensei, Student{
             );
             //if Sensei ID found -> set Sensei Status
             if ($this->system->db_last_num_rows != 0) {
-
                 $result = $this->system->db_fetch($result);
                 $this->allocateTeachingData($result['sensei_id']);
             }
         }
     }
 
+    /**
+     * The USER's User_ID is passed through various filters before being allowed to register as a new sensei in the 'sensei_list' DB table
+     * @param int $user_id
+     * @return void
+     */
     public function registerNewTeacher(int $user_id){
         if ($this->user_rank > 2) {
             //Search for Teaching ID
@@ -110,6 +115,13 @@ class SenseiManager implements Sensei, Student{
         }
     }
 
+    /**
+     * Insert a NEW teacher into the 'sensei_list' table.
+     * registerANewTeacher() - is for the user to pass through various filters and should be called instead of this function.
+     * this function should only be called from inside registerANewTeacher()
+     * @param int $user_id
+     * @return void
+     */
     private function insertNewSenseiDataIntoDB(int $user_id){
         $this->system->query("INSERT INTO `sensei_list` (`sensei_id`, `assoc_user_id`, `student_list`, `teaching_boost_amount`, `sensei_skill`)
         VALUES ('0', '{$user_id}', '" . json_encode([]) . "', '$this->default_teacher_boost_amount', '0')");
@@ -117,6 +129,11 @@ class SenseiManager implements Sensei, Student{
         $this->system->query("UPDATE users SET isRegisteredSensei = 1 WHERE user_id = ${user_id}");
     }
 
+    /**
+     * Updates the Student's Sensei ID to a new Sensei
+     * @param int $id
+     * @return void
+     */
     private function allocateStudentData(int $id){
         $this->mySenseisID = $id;
         $this->isSensei = false;
@@ -135,15 +152,30 @@ class SenseiManager implements Sensei, Student{
     }
 
 	/**
+     * Returns a decoded JSON array of student information
+     * 
 	 * @return array
 	 */
 	public function getStudentInformation(): array {
-        return json_decode('{ "names": [
-            {"name": "Educba", "rank": "1"},
-            {"name": "Snehal"},
-            {"name": "Amardeep"}
-        ]
-        }', true);
+
+        $result = $this->system->query("SELECT `student_list` from `sensei_list` WHERE `assoc_user_id`='$this->user_id' LIMIT 1");
+        $studentList = $this->system->db_fetch($result);
+
+        //if sensei_id is found
+        if($this->system->db_last_num_rows != 0){
+            $studentList = $studentList['student_list'];
+
+            return json_decode($studentList, true); //array
+        }   
+
+        // return json_decode('{ "names": [
+        //     {"name": "Educba", "rank": "1"},
+        //     {"name": "Snehal"},
+        //     {"name": "Amardeep"}
+        // ]
+        // }', true); //Saving this here for testing
+
+        return []; //default
 	}
 	
 	/**
@@ -161,7 +193,10 @@ class SenseiManager implements Sensei, Student{
 
 	}
 
-
+    /**
+     * If User is a practicing Teacher, this function will return their Teaching ID within the `sensei_list` table | otherwise NULL.
+     * @return int|null
+     */
     public function getMyTeachingID(): int|null {
         $result = $this->system->query("SELECT `sensei_id` from `sensei_list` WHERE `assoc_user_id`='$this->user_id' LIMIT 1");
         $senseiId = $this->system->db_fetch($result);
@@ -177,9 +212,8 @@ class SenseiManager implements Sensei, Student{
 	}
 
 	/**
+     * If this User is a Student, this function will return their sensei's ID from inside the `user` table.
 	 * @return int|null
-     * 
-     * Grabs Teacher ID located in student's DB
 	 */
 	public function getMySenseisID(): int|null {
         $result = $this->system->query("SELECT `my_senseis_id` from `users` WHERE `user_id`='$this->user_id' LIMIT 1");
@@ -196,26 +230,26 @@ class SenseiManager implements Sensei, Student{
 	}
 	
 	/**
-	 *
-	 * @param int $id
+	 * If this User is a Student this function will update/set the ID of their Sensei within the `user` table.
+	 * @param int $id The Sensei's Teaching ID - not their personal USER_ID
 	 */
 	public function setMySenseisIDinDB(int $id): void {
-        $this->system->query("INSERT INTO `users` (`my_senseis_id`)
-            VALUES ('{$id}')");
+        $this->system->query("UPDATE `users` (`my_senseis_id`)
+            VALUES ('{$id}') WHERE user_id = {$this->user_id}");
 
         $this->isStudent = true;
         $this->isSensei = false;
 	}
 	
 	/**
-	 *
+	 * If Student, removes their Sensei's ID from the Student's `user` table;
 	 * @param int $id
 	 */
-	public function deleteMySenseiID(int $id): void {
+	public function deleteMySenseisID(int $id): void {
 	}
 	
 	/**
-	 *
+	 * Add to the Sensei's Total Skill Amount when called
 	 * @param int $amount
 	 */
 	public function addToMySenseiSkillAmount(int $amount): void {
@@ -233,11 +267,10 @@ class SenseiManager implements Sensei, Student{
 
         //if sensei_id is found
         if($this->system->db_last_num_rows != 0 && $registryStatus['isRegisteredSensei']){
-
             return $registryStatus['isRegisteredSensei']; //true or false
         }
 
-        return false; //default setting
+        return false; //default
 	}
     
 	/**
@@ -252,10 +285,9 @@ class SenseiManager implements Sensei, Student{
         //if sensei_id is found
         if($this->system->db_last_num_rows != 0){
             $registryStatus = $registryStatus['isRegisteredStudent'];
-
             return $registryStatus; //true or false
         }
 
-        return false; //default setting
+        return false; //default
 	}
 }
