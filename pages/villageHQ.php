@@ -91,16 +91,31 @@ function villageHQ() {
 		</td></tr>";
 		?>
 
+		<!--Register-->
+		<?php if(isset($_GET['register'])): ?>
+			<?= $player->registerTeacher() ?>
+		<?php endif; ?>
+
 		<tr>
 			<td>
 			<?php if(!$player->isRegisteredStudent && $player->rank < 3) : ?>
 				<div>Register yourself as a student!</div>
+
 			<?php elseif($player->isRegisteredStudent && $player->rank < 3) : ?>
 				<div>List of Available Teachers</div>
+				
 			<?php elseif(!$player->isRegisteredSensei && $player->rank >= 2) : ?>
-				<div>Register yourself as a teacher!</div>
+				<div style='text-align: center' >
+					<!--TODO: Might not be implimenting the self link correct-->
+					<form action="<?=$self_link?>&register=sensei" method="POST">
+					<p style='display: inline; margin-right: 5px'>Sign up for Sensei Duty</p>
+					<input type='submit' value='Register' /><br />
+					</form>
+				</div>
+
 			<?php elseif($player->isRegisteredSensei && $player->rank >= 2) : ?>
 				<div>List of Available Students</div>
+
 			<?php endif; ?>
 			</td>
 		</tr>

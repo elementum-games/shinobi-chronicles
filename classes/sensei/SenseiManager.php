@@ -24,73 +24,107 @@ interface Sensei{
  */
 class SenseiManager implements Sensei, Student{
 
-    private int|null $sensei_id; //TODO: This Variable is shared by both student and teacher and should be changed into two different variables
+    private int|null $myTeachingID; //TODO: This Variable is shared by both student and teacher and should be changed into two different variables
+    private int|null $mySenseisID;
     private int $student_id;
     private System $system;
     private int $sensei_skill;
     private bool $isSensei;
     private bool $isStudent;
     private int $user_id;
+    private int $user_rank;
 
     public function __construct(System $system, int $user_id){
-        $this->sensei_id = 0;
+
+        $this->myTeachingID = 0;
+        $this->mySenseisID = 0;
         $this->student_id = 0;
+        $this->isSensei = false;
+        $this->isStudent = false;
         $this->system = $system;
         $this->sensei_skill = 0;
         $this->user_id = $user_id;
+        $this->user_rank = -1;
 
-        //Search for Sensei ID
-        $result = $this->system->query("SELECT `sensei_id` FROM `sensei_list` WHERE `assoc_user_id`='$user_id' LIMIT 1"
-        );
+        //Grab [Rank] from DB 
+        $result = $this->system->query("SELECT `rank` from `users` WHERE `user_id`='$this->user_id' LIMIT 1");
+        $user_rank = $this->system->db_fetch($result);
+        if($this->system->db_last_num_rows != 0){
+            $this->user_rank = $user_rank['rank'];
+        }
 
-        //if Sensei ID found -> set Sensei Status
-        if ($this->system->db_last_num_rows != 0) {
-            $result = $this->system->db_fetch($result);
-            $this->sensei_id = $result['sensei_id'];
-            $this->isSensei = true;
-            $this->isStudent = false;
-
-        //if No Sensei ID found
-        } else {
-
-            $result = $this->system->query("SELECT `rank` from `users` WHERE `user_id`='$this->user_id' LIMIT 1");
-            $user_rank = $this->system->db_fetch($result);
-
-            if($this->system->db_last_num_rows != 0){
-                $user_rank = $user_rank['rank'];
-            }
-
-            //check if rank is high enough for Sensei Status
-            if ($user_rank > 2) {
-            $this->isSensei = true;
-            $this->isStudent = false;   
-
-            $this->system->query("INSERT INTO `sensei_list` (`sensei_id`, `assoc_user_id`, `student_list`, `teaching_boost_amount`, `sensei_skill`)
-            VALUES ('0', '{$user_id}', '" . json_encode([]) . "', '1.00', '0')");
-            
-            //if rank is not high enough set default not sensei/ not student status
-            } else {
-                $this->isSensei = false;
-                $this->isStudent = false;
-            }
-
-            //check if student
+        //Academy Student / Genin
+        if ($this->user_rank <= 2) {
+            //check if student has a Sensei
             $result = $this->system->query("SELECT `my_senseis_id` from `users` WHERE `user_id`='$this->user_id' LIMIT 1");
             $sensei_object = $this->system->db_fetch($result);
+            //If Sensei ID found && Set Data
+            if ($this->system->db_last_num_rows != 0 && $sensei_object['my_senseis_id'] != null) {
+                $this->allocateStudentData($sensei_object['my_senseis_id']);
+                return;
+            }
+        }
 
-            //if sensei_id is found
-            if($this->system->db_last_num_rows != 0){
-                $sensei_object = $sensei_object['my_senseis_id'];
-                $this->sensei_id = $sensei_object;
-            } else {
-                return true;
+        //Chuunin+
+        if ($this->user_rank > 2) {
+            //Search for Teaching ID
+            $result = $this->system->query(
+                "SELECT `sensei_id` FROM `sensei_list` WHERE `assoc_user_id`='$user_id' LIMIT 1"
+            );
+            //if Sensei ID found -> set Sensei Status
+            if ($this->system->db_last_num_rows != 0) {
+
+                $result = $this->system->db_fetch($result);
+                $this->allocateTeachingData($result['sensei_id']);
+            }
+        }
+    }
+
+    public function registerNewTeacher(int $user_id){
+        if ($this->user_rank > 2) {
+            //Search for Teaching ID
+            $result = $this->system->query(
+                "SELECT `sensei_id` FROM `sensei_list` WHERE `assoc_user_id`='$user_id' LIMIT 1"
+            );
+            //if Sensei ID found -> set Sensei Status
+            if ($this->system->db_last_num_rows != 0) {
+                $this->system->message(("You cannot register twice!"));
+                $this->system->printMessage();
+                return;
             }
 
-            $this->isStudent = true;
-            $this->isSensei = false;
+            //pass checks -> register
+            $this->insertNewSenseiDataIntoDB($user_id);
+            $this->system->message("Congratulations! You are now registered as a Sensei!");
+            $this->system->printMessage();
+            return;
         }
-        
 
+        //not high enough rank
+        if($this->user_rank < 2){
+            $this->system->message("You're not high enough rank to register as a Sensei!");
+            $this->system->printMessage();
+            return;
+        }
+    }
+
+    private function insertNewSenseiDataIntoDB(int $user_id){
+        $this->system->query("INSERT INTO `sensei_list` (`sensei_id`, `assoc_user_id`, `student_list`, `teaching_boost_amount`, `sensei_skill`)
+        VALUES ('0', '{$user_id}', '" . json_encode([]) . "', '1.00', '0')");
+
+        $this->system->query("UPDATE users SET isRegisteredSensei = 1 WHERE user_id = ${user_id}");
+    }
+
+    private function allocateStudentData(int $id){
+        $this->mySenseisID = $id;
+        $this->isSensei = false;
+        $this->isStudent = true;
+    }
+
+    private function allocateTeachingData(int $id){
+        $this->myTeachingID = $id;
+        $this->isSensei = true;
+        $this->isStudent = false;
     }
 
     public function isSensei(){

@@ -314,17 +314,28 @@ class User extends Fighter {
     }
 
     //Sensei Functions
+
+    public function registerTeacher(){
+        $this->sensei_manager->registerNewTeacher($this->user_id);
+        $this->isRegisteredSensei = $this->sensei_manager->checkIfRegisteredSensei();
+    }
+
+    public function registerAsStudent(){
+        // $this->sensei_manager->registerNewTeacher($this->user_id);
+        $this->isRegisteredStudent = $this->sensei_manager->checkIfRegisteredStudent();
+    }
+
     public function getSenseiID(): int{
         return $this->sensei_id;
     }
 
-    public function setSenseiId(int $id){
-        $this->sensei_manager->setSenseiIDinDB($id);
-        $this->updateSenseiData();
+    public function setMySenseisId(int $id){
+        $this->sensei_manager->setMySenseisIDinDB($id);
+        $this->updateMySenseiData();
     }
 
-    public function updateSenseiData(){
-        $this->sensei_id = $this->sensei_manager->getSenseiID();
+    public function updateMySenseiData(){
+        $this->sensei_id = $this->sensei_manager->getMySenseisID();
         $this->students = $this->sensei_manager->getStudentInformation();
         $this->isSensei = $this->sensei_manager->isSensei();
         $this->isStudent = $this->sensei_manager->isStudent();
