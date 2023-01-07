@@ -468,4 +468,10 @@ return [
             'text' => ':catjam:',
             'public' => true,
     ],
+     [
+            'code' => ':sokkatribe:',
+            'image' => "<img src='./images/memes/sokkatribe.gif' />",
+            'text' => ':Guess Sokka will die too:',
+            'public' => true,
+    ],   
 ];
