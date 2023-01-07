@@ -547,10 +547,12 @@ function adminPanel() {
         /* Variables */
         $variables =& $constraints['ai'];
         $select_ai = true;
+        $self_link = $admin_panel_url . '&page=edit_ai';
+
         // Validate NPC id
-        if($_POST['ai_id']) {
-            $ai_id = (int)$system->clean($_POST['ai_id']);
-            $result = $system->query("SELECT * FROM `ai_opponents` WHERE `ai_id`='$ai_id'");
+        if(!empty($_GET['npc_id'])) {
+            $npc_id = (int)$system->clean($_GET['npc_id']);
+            $result = $system->query("SELECT * FROM `ai_opponents` WHERE `ai_id`='$npc_id'");
             if($system->db_last_num_rows == 0) {
                 $system->message("Invalid NPC!");
                 $system->printMessage();
@@ -560,8 +562,9 @@ function adminPanel() {
                 $select_ai = false;
             }
         }
+
         // POST submit edited data
-        if($_POST['ai_data'] && !$select_ai) {
+        if(!empty($_POST['ai_data']) && !$select_ai) {
             try {
                 $data = [];
                 validateFormData($variables, $data);
@@ -578,7 +581,7 @@ function adminPanel() {
                     }
                     $count++;
                 }
-                $query .= "WHERE `ai_id`='$ai_id'";
+                $query .= "WHERE `ai_id`='$npc_id'";
                 $system->query($query);
                 if($system->db_last_affected_rows == 1) {
                     $system->message("NPC " . $data['name'] . " has been edited!");
@@ -594,32 +597,26 @@ function adminPanel() {
             $system->printMessage();
         }
         // Form for editing data
-        if($ai_data && !$select_ai) {
+        if(isset($ai_data) && !$select_ai) {
             $data =& $ai_data;
             echo "<table class='table'><tr><th>Edit NPC (" . stripslashes($ai_data['name']) . ")</th></tr>
 			<tr><td>
-			<form action='$admin_panel_url&page=edit_ai' method='post'>";
+			<form action='{$admin_panel_url}&page=edit_ai&npc_id={$ai_data['ai_id']}' method='post'>";
             displayFormFields($variables, $data);
             echo "<br />
-			<input type='hidden' name='ai_id' value='{$ai_data['ai_id']}' />
 			<input type='submit' name='ai_data' value='Edit' />
 			</form>
 			</td></tr></table>";
         }
         // Show form for selecting ID
         if($select_ai) {
-            $result = $system->query("SELECT `ai_id`, `name` FROM `ai_opponents`");
-            echo "<table class='table'><tr><th>Select NPC</th></tr>
-			<tr><td>
-			<form action='$admin_panel_url&page=edit_ai' method='post'>
-			<select name='ai_id'>";
+            $all_npcs = [];
+            $result = $system->query("SELECT * FROM `ai_opponents` ORDER BY `level` ASC");
             while($row = $system->db_fetch($result)) {
-                echo "<option value='{$row['ai_id']}'>" . stripslashes($row['name']) . "</option>";
+                $all_npcs[$row['ai_id']] = $row;
             }
-            echo "</select>
-			<input type='submit' value='Select' />
-			</form>
-			</td></tr></table>";
+
+            require 'templates/admin/edit_npc_select.php';
         }
     }
     // Edit jutsu

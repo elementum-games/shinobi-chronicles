@@ -23,20 +23,28 @@ class Messaging {
 
 	public int|string|null $message_id;
 
-    private
-		$Messages,
-		$Users,
-		$constraints = [],
-		$label_colors = [
-			"#00C000",
-			"#CBCB10",
-			"#E00000"
-		];
+    private array $Messages = [];
+    private array $Users = [];
+    private array $constraints = [];
+	private array $label_colors = [
+        "#00C000",
+        "#CBCB10",
+        "#E00000"
+    ];
 
     public string $form_user = "";
     public string $form_subject = "";
 
-	function __construct() {
+    private System $system;
+    private User $player;
+    private string $self_link;
+
+    /**
+     * @var array|string[][]
+     */
+    private array $colors;
+
+    function __construct() {
 		global $system, $player, $self_link;
 
 		$this->system = $system;
@@ -59,11 +67,12 @@ class Messaging {
         }
 	}
 
-	function validateForm() {
+	function validateForm(): void {
 		$inbox_limit = $this->constraints['inbox_limit'];
 		$subject = $this->system->clean(trim($_POST['subject']));
 		$recipient = $this->system->clean(trim($_POST['recipient']));
 		$message = $this->system->clean(trim($_POST['message']));
+
 		try {
 			// Check minimum length 
 			if(strlen($subject) < self::MIN_SUBJECT_LENGTH) {
@@ -76,6 +85,7 @@ class Messaging {
 			if(strlen($message) < self::MIN_MESSAGE_LENGTH) {
 				throw new Exception("Please enter a message!");
 			}
+
 			// Check max length of subject/message
 			if(strlen($subject) > self::MAX_SUBJECT_LENGTH) {
 				throw new Exception(sprintf("Subject is too long! (%d/%d chars)", strlen($subject), self::MAX_SUBJECT_LENGTH));
@@ -91,6 +101,7 @@ class Messaging {
 			if($result['forbidden_seal']) {
 				$result['forbidden_seal'] = json_decode($result['forbidden_seal'], true);
 			}
+
 			/* Place Blacklist Here */
 			if($recipient != $this->player->user_name){
 				$blacklist = $this->system->query("SELECT `blocked_ids` FROM `blacklist` WHERE `user_id`='{$result['user_id']}' LIMIT 1");
@@ -142,7 +153,7 @@ class Messaging {
 		$this->system->printMessage();
 	}
 	
-	function deleteMessage($msg_id = false) {
+	function deleteMessage($msg_id = false): void {
 
 		if($msg_id) {
 			$this->system->query(sprintf("UPDATE `private_messages` SET `message_read` = 2 WHERE `message_id` IN(%s) AND `recipient`='%d'", $msg_id, $this->player->user_id));
@@ -172,9 +183,8 @@ class Messaging {
 
 	/**
 	 * @param $type
-	 * @param bool|false $report_link
      */
-	function display($type, $report_link = false): void {
+	function display($type): void {
         global $system;
 
 		switch($type) {
@@ -282,7 +292,7 @@ class Messaging {
 						</tr>
 						<tr>
 							<td style='text-align:center;'>
-								<a href='{$report_link}&report_type=2&content_id=$this->message_id'>Report Message</a>
+								<a href='{$this->system->links['report']}&report_type=2&content_id=$this->message_id'>Report Message</a>
 							</td>
 						</tr>
 					</table>
@@ -510,7 +520,7 @@ function privateMessages(): void {
 		//For viewing private messages	
 		case 'view_message':
 			($Messaging->displayPrivateMessage())
-                ? $Messaging->display('privateMessage', $system->links['members'], $system->links['report'])
+                ? $Messaging->display(type: 'privateMessage')
                 : $Messaging->display('privateMessage:Error');
 		break;
 		
