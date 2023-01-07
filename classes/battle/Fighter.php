@@ -203,7 +203,7 @@ abstract class Fighter {
      * @return float|int
      * @throws Exception
      */
-    public function calcDamage(Jutsu $attack, bool $disable_randomness = false) {
+    public function calcDamage(Jutsu $attack, bool $disable_randomness = false): float|int {
         if($this->system->debug['damage'])  {
             echo "Debugging damage for {$this->getName()}<br />";
         }
@@ -306,7 +306,7 @@ abstract class Fighter {
      * @param bool   $residual_damage
      * @return float|int
      */
-    public function calcDamageTaken($raw_damage, string $defense_type, bool $residual_damage = false) {
+    public function calcDamageTaken($raw_damage, string $defense_type, bool $residual_damage = false): float|int {
         $defense = 50 * (1 + $this->defense_boost);
 
         if($defense <= 0) {
@@ -332,22 +332,16 @@ abstract class Fighter {
             }
         }
 
-        $def_multiplier = 0.003;
-        if($this instanceof AI) {
-            $def_multiplier = 0.001;
-        }
-
         switch($defense_type) {
             case 'ninjutsu':
-                $defense += System::diminishing_returns($this->ninjutsu_skill * $def_multiplier, 50);
+                // Resist unfairly applies to nin/tai residuals which only have a 25% or so effect amount, so we lower its effectiveness compared to a regular hit
                 $raw_damage -= $residual_damage ? $this->ninjutsu_resist * 0.5 : $this->ninjutsu_resist;
                 break;
             case 'genjutsu':
-                $defense += System::diminishing_returns($this->genjutsu_skill * $def_multiplier, 50);
-                $raw_damage -= $residual_damage ? $this->genjutsu_resist * 1 : $this->genjutsu_resist;
+                $raw_damage -= $this->genjutsu_resist;
                 break;
             case 'taijutsu':
-                $defense += System::diminishing_returns($this->taijutsu_skill * $def_multiplier, 50);
+                // Resist unfairly applies to residuals, so we lower its effectiveness compared to a regular hit
                 $raw_damage -= $residual_damage ? $this->taijutsu_resist * 0.5 : $this->taijutsu_resist;
                 break;
             default:
