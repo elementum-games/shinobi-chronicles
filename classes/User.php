@@ -302,11 +302,10 @@ class User extends Fighter {
         if ($this->isRegisteredSensei) {
             $this->sensei_id = $this->sensei_manager->getMyTeachingID() ?? '0';
             $this->students = $this->sensei_manager->getStudentInformation();
-            // $this->sensei_skill_total = 
         }
 
         if ($this->isRegisteredStudent) {
-            $this->sensei_id = $this->sensei_manager->getMySenseisID(); //might be null
+            $this->sensei_id = $this->sensei_manager->getMySenseisID() ?? '-1'; //might be null
         }
 
         return true;
@@ -314,13 +313,13 @@ class User extends Fighter {
 
     //Sensei Functions
 
-    public function registerTeacher(){
-        $this->sensei_manager->registerNewTeacher($this->user_id);
+    public function registerAsTeacher(){
+        $this->sensei_manager->registerNewTeacher($this->user_id, $this->user_name);
         $this->isRegisteredSensei = $this->sensei_manager->checkIfRegisteredSensei();
     }
 
     public function registerAsStudent(){
-        // $this->sensei_manager->registerNewTeacher($this->user_id);
+        $this->sensei_manager->registerNewStudent($this->user_id);
         $this->isRegisteredStudent = $this->sensei_manager->checkIfRegisteredStudent();
     }
 

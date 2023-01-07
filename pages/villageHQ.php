@@ -91,19 +91,53 @@ function villageHQ() {
 		</td></tr>";
 		?>
 
-		<!--Register-->
-		<?php if(isset($_GET['register'])): ?>
-			<?= $player->registerTeacher() ?>
+		<!--Sensei System Stuff-->
+		<?php if(isset($_GET['register']) && $_GET['register'] == 'sensei'): ?>
+			<?= $player->registerAsTeacher() ?>
+		<?php endif; ?>
+
+		<?php if(isset($_GET['register']) && $_GET['register'] == 'student'): ?>
+			<?= $player->registerAsStudent() ?>
 		<?php endif; ?>
 
 		<tr>
 			<td>
 			<?php if(!$player->isRegisteredStudent && $player->rank < 3) : ?>
-				<div>Register yourself as a student!</div>
+				<div style='text-align: center;'>Register yourself as a student to find a Sensei!</div>
+
+				<div style='text-align: center' >
+					<!--TODO: Might not be implimenting the self link correct-->
+					<form action="<?=$self_link?>&register=student" method="POST">
+					<input type='submit' value='Become a Student' /><br />
+					</form>
+				</div>
 
 			<?php elseif($player->isRegisteredStudent && $player->rank < 3) : ?>
-				<div>List of Available Teachers</div>
-				
+				<div style='text-align: center;'>List of Available Teachers</div>
+
+				<!--List of Available Teachers-->
+				<?php
+					$result = $system->query("SELECT `sensei_id`, `sensei_name` FROM `sensei_list` WHERE `isTeamFull`='false'");
+					$sensei = $system->db_fetch($result);
+				?>
+
+				<!--TODO: **Critical** Work on the method and style this is displayed -->
+				<!--TODO: Change the way this array is displayed - maybe array items could be mapped to a new array holding sensei data in their own sensei type object -->
+				<?php if(!empty($sensei)): ?>
+					<div id='available_sensei_list' style="margin: 0 20%; text-align: center;">
+						<?php foreach($sensei as $key => $item){
+							echo '<div style="display: inline-block; margin: 0 30px;"><p>'.$item.'</p></div>';
+							//this is bad practice but this if statement only triggers after the name to display the button just once otherwise the foreach would make multiple buttons
+							if($key == 'sensei_name'){
+								echo "<button id='sign_up_teacher_id_".$sensei['sensei_id']."'} >Request Sensei</button>"; //workaround
+							}
+						}?>
+					</div>
+				<?php endif; ?>
+				<!--End list of Available Teachers-->
+
+
+								
 			<?php elseif(!$player->isRegisteredSensei && $player->rank >= 2) : ?>
 				<div style='text-align: center' >
 					<!--TODO: Might not be implimenting the self link correct-->
@@ -114,13 +148,36 @@ function villageHQ() {
 				</div>
 
 			<?php elseif($player->isRegisteredSensei && $player->rank >= 2) : ?>
-				<div>List of Available Students</div>
+				<div style='text-align: center;'>List of Available Students</div>
+
+				<!--List of Available Students-->
+				<?php
+					$result = $system->query("SELECT `user_id`, `user_name` FROM `users` WHERE `isRegisteredStudent`='1'");
+					$student = $system->db_fetch($result);
+				?>
+
+				<!--TODO: **Critical** Work on the method and style this is displayed -->
+				<!--TODO: Change the way this array is displayed - maybe array items could be mapped to a new array holding sensei data in their own sensei type object -->
+				<?php if(!empty($student)): ?>
+					<div id='available_student_list' style="margin: 0 20%; text-align: center;">
+						<?php foreach($student as $key => $item){
+							echo '<div style="display: inline-block; margin: 0 30px;"><p>'.$item.'</p></div>';
+							//this is bad practice but this if statement only triggers after the name to display the button just once otherwise the foreach would make multiple buttons
+							if($key == 'user_name'){
+								echo "<button id='sign_up_student_id_".$student['user_name']."'} >Request Student</button>"; //workaround
+							}
+						}?>
+					</div>
+				<?php endif; ?>
+				<!--End list of Available Students-->
 
 			<?php endif; ?>
 			</td>
 		</tr>
 
+		<!--End Sensei System Stuff-->
 		<?php
+		
 		echo "</table>";
 	}
 	else if($view == 'members') {

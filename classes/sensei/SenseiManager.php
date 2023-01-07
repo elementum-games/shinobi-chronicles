@@ -87,7 +87,7 @@ class SenseiManager implements Sensei, Student{
      * @param int $user_id
      * @return void
      */
-    public function registerNewTeacher(int $user_id){
+    public function registerNewTeacher(int $user_id, string $user_name){
         if ($this->user_rank > 2) {
             //Search for Teaching ID
             $result = $this->system->query(
@@ -101,7 +101,7 @@ class SenseiManager implements Sensei, Student{
             }
 
             //pass checks -> register
-            $this->insertNewSenseiDataIntoDB($user_id);
+            $this->insertNewSenseiDataIntoDB($user_id, $user_name);
             $this->system->message("Congratulations! You are now registered as a Sensei!");
             $this->system->printMessage();
             return;
@@ -115,6 +115,42 @@ class SenseiManager implements Sensei, Student{
         }
     }
 
+    public function registerNewStudent(int $user_id){
+        if ($this->user_rank <= 2) {
+            //Check if already registered
+            $result = $this->system->query(
+                "SELECT `isRegisteredStudent`, `my_senseis_id` FROM `users` WHERE `user_id`='$user_id' LIMIT 1"
+            );
+            $student_db = $this->system->db_fetch($result);
+
+            //if registeredStudent && my_senseis_id found -> return;
+            if ($this->system->db_last_num_rows != 0) {
+                if($student_db['isRegisteredStudent']){
+                    $this->system->message("You cannot register twice!");
+                    $this->system->printMessage();
+                    return;
+                }
+
+                if(!empty($student_db['my_senseis_id'])){
+                    $this->system->message("You already have a sensei!");
+                    $this->system->printMessage();
+                    return;
+                }
+            }
+
+            //pass checks -> register
+            $this->registerStudent($user_id);
+            $this->system->message("Congratulations! You are now a registered student!");
+            $this->system->printMessage();
+            return;
+
+        } else {
+            $this->system->message("You cannot register as a student you're rank is too high!");
+            $this->system->printMessage();
+        }
+    }
+
+
     /**
      * Insert a NEW teacher into the 'sensei_list' table.
      * registerANewTeacher() - is for the user to pass through various filters and should be called instead of this function.
@@ -122,11 +158,15 @@ class SenseiManager implements Sensei, Student{
      * @param int $user_id
      * @return void
      */
-    private function insertNewSenseiDataIntoDB(int $user_id){
-        $this->system->query("INSERT INTO `sensei_list` (`sensei_id`, `assoc_user_id`, `student_list`, `teaching_boost_amount`, `sensei_skill`)
-        VALUES ('0', '{$user_id}', '" . json_encode([]) . "', '$this->default_teacher_boost_amount', '0')");
+    private function insertNewSenseiDataIntoDB(int $user_id, string $user_name){
+        $this->system->query("INSERT INTO `sensei_list` (`sensei_id`, `assoc_user_id`, `sensei_name`, `isTeamFull`, `student_list`, `teaching_boost_amount`, `sensei_skill`)
+        VALUES ('0', '{$user_id}', '{$user_name}', '0', '" . json_encode([]) . "', '$this->default_teacher_boost_amount', '0')");
 
         $this->system->query("UPDATE users SET isRegisteredSensei = 1 WHERE user_id = ${user_id}");
+    }
+
+    private function registerStudent(int $user_id){
+        $this->system->query("UPDATE users SET isRegisteredStudent = 1 WHERE user_id = ${user_id}");
     }
 
     /**
