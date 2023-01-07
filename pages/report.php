@@ -16,7 +16,7 @@ function report() {
 	global $self_link;
 	
 	$page = 'report';
-	if($_GET['page']) {
+	if(!empty($_GET['page'])) {
 		$page = $_GET['page'];
 	}
 	
@@ -40,7 +40,7 @@ function report() {
 	
 	
 	// Submit report
-	if($_POST['submit_report']) {
+	if(!empty($_POST['submit_report'])) {
 		// Content already reported(if not profile) 
 		
 		try {
