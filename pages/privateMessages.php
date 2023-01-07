@@ -23,8 +23,8 @@ class Messaging {
 
 	public int|string|null $message_id;
 
-    private array $Messages = [];
-    private array $Users = [];
+    private array $messages = [];
+    private array $users = [];
     private array $constraints = [];
 	private array $label_colors = [
         "#00C000",
@@ -321,7 +321,7 @@ class Messaging {
 				echo "
 					<table class='table'>
 				";
-				if(! $this->Messages) {
+				if(count($this->messages) <= 0) {
 					echo "<tr><td style='text-align:center;' colspan='5'>No new messages</td></tr>";
 				}
 				else {
@@ -334,7 +334,7 @@ class Messaging {
 						</tr>
 					";
 					$count = 0;
-					foreach($this->Messages as $message) {	
+					foreach($this->messages as $message) {
 						$class = '';
 						if(is_int($count++ / 2)) {
 							$class = 'row1';
@@ -347,7 +347,7 @@ class Messaging {
 						}
 						// Staff-level
 						$staff = $this->staffColor($message['staff_level']);
-						$persons_name = $this->Users[$message['sender']] ?? $message['sender'];
+						$persons_name = $this->users[$message['sender']] ?? $message['sender'];
 
 						if(!ctype_digit($persons_name)) {
 							echo "
@@ -400,7 +400,7 @@ class Messaging {
 		}
 
 		if(! $this->system->db_last_num_rows) {
-			$this->Messages = NULL;
+			$this->messages = [];
 		}
 		else {
 
@@ -419,10 +419,10 @@ class Messaging {
 					$users[$user_fetch['user_id']] = $user_fetch['user_name'];
 
 				}
-				$this->Users = $users;
+				$this->users = $users;
 			}
 
-			$this->Messages = $messages;
+			$this->messages = $messages;
 
 			// Set count color
 			$this->label_color = ($this->msg_count < ($this->constraints['inbox_limit'] - 10)) ? $this->label_colors[0] : ( ($this->msg_count < $this->constraints['inbox_limit']) ? $this->label_colors[1] : $this->label_colors[2]);
