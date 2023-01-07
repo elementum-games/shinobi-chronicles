@@ -158,24 +158,27 @@ class SenseiManager implements Sensei, Student{
 	 */
 	public function getStudentInformation(): array {
 
-        $result = $this->system->query("SELECT `student_list` from `sensei_list` WHERE `assoc_user_id`='$this->user_id' LIMIT 1");
-        $studentList = $this->system->db_fetch($result);
+        // $result = $this->system->query("SELECT `student_list` from `sensei_list` WHERE `assoc_user_id`='$this->user_id' LIMIT 1");
+        // $studentList = $this->system->db_fetch($result);
 
-        //if sensei_id is found
-        if($this->system->db_last_num_rows != 0){
-            $studentList = $studentList['student_list'];
+        // //if sensei_id is found
+        // if($this->system->db_last_num_rows != 0){
+        //     $studentList = $studentList['student_list'];
 
-            return json_decode($studentList, true); //array
-        }   
+        //     return json_decode($studentList, true); //array
+        // }   
+        
+        // return []; //default
 
-        // return json_decode('{ "names": [
-        //     {"name": "Educba", "rank": "1"},
-        //     {"name": "Snehal"},
-        //     {"name": "Amardeep"}
-        // ]
-        // }', true); //Saving this here for testing
-
-        return []; //default
+        
+        return json_decode('{
+            "names": 
+                [
+                    {"name": "Educba", "rank": "1", "skill_points_earned": "0", "avatar_link": "./images/default_avatar.png"},
+                    {"name": "Snehal", "rank" : "2", "skill_points_earned": "0", "avatar_link": "./images/default_avatar.png"},
+                    {"name": "Amardeep", "rank" : "1", "skill_points_earned": "0", "avatar_link": "./images/default_avatar.png"}
+                ]
+            }', true ); //Saving this here for testing
 	}
 	
 	/**
