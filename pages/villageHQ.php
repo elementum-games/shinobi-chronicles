@@ -117,23 +117,23 @@ function villageHQ() {
 
 				<!--List of Available Teachers-->
 				<?php
-					$result = $system->query("SELECT `sensei_id`, `sensei_name` FROM `sensei_list` WHERE `isTeamFull`='false'");
-					$sensei = $system->db_fetch($result);
+					$result = $system->query("SELECT `sensei_id`, `teaching_village`, `sensei_name` FROM `sensei_list` WHERE `isTeamFull`='false'");
 				?>
 
 				<!--TODO: **Critical** Work on the method and style this is displayed -->
 				<!--TODO: Change the way this array is displayed - maybe array items could be mapped to a new array holding sensei data in their own sensei type object -->
-				<?php if(!empty($sensei)): ?>
-					<div id='available_sensei_list' style="margin: 0 20%; text-align: center;">
-						<?php foreach($sensei as $key => $item){
-							echo '<div style="display: inline-block; margin: 0 30px;"><p>'.$item.'</p></div>';
-							//this is bad practice but this if statement only triggers after the name to display the button just once otherwise the foreach would make multiple buttons
-							if($key == 'sensei_name'){
-								echo "<button id='sign_up_teacher_id_".$sensei['sensei_id']."'} >Request Sensei</button>"; //workaround
-							}
-						}?>
-					</div>
-				<?php endif; ?>
+				<div id='available_sensei_list' style="margin: 0 20%; text-align: center;">
+					<?php 
+						while($sensei = $system->db_fetch($result)){
+						if ($sensei['teaching_village'] == $player->village) {
+							echo '<div style="display:inline;">'. $sensei['sensei_name'] .'</div>';
+							echo '<div style="display:inline;">'. $sensei['teaching_village'] .'</div>';
+							echo '<button type="input" style="display:inline;"> Request Sensei </button>';
+							echo '<br>';
+						}
+						}
+					?>
+				</div>
 				<!--End list of Available Teachers-->
 
 
@@ -152,23 +152,21 @@ function villageHQ() {
 
 				<!--List of Available Students-->
 				<?php
-					$result = $system->query("SELECT `user_id`, `user_name` FROM `users` WHERE `isRegisteredStudent`='1'");
-					$student = $system->db_fetch($result);
+					$result = $system->query("SELECT `user_id`, `user_name`, `village` FROM `users` WHERE `isRegisteredStudent`='1'");
 				?>
 
-				<!--TODO: **Critical** Work on the method and style this is displayed -->
-				<!--TODO: Change the way this array is displayed - maybe array items could be mapped to a new array holding sensei data in their own sensei type object -->
-				<?php if(!empty($student)): ?>
-					<div id='available_student_list' style="margin: 0 20%; text-align: center;">
-						<?php foreach($student as $key => $item){
-							echo '<div style="display: inline-block; margin: 0 30px;"><p>'.$item.'</p></div>';
-							//this is bad practice but this if statement only triggers after the name to display the button just once otherwise the foreach would make multiple buttons
-							if($key == 'user_name'){
-								echo "<button id='sign_up_student_id_".$student['user_name']."'} >Request Student</button>"; //workaround
-							}
-						}?>
-					</div>
-				<?php endif; ?>
+				<div id='available_sensei_list' style="margin: 0 20%; text-align: center;">
+					<?php 
+						while($student = $system->db_fetch($result)){
+						if ($student['village'] == $player->village) {
+							echo '<div style="display:inline;">'. $student['user_name'] .'</div>';
+							echo '<div style="display:inline;">'. $student['village'] .'</div>';
+							echo '<button type="input" style="display:inline;"> Request Student </button>';
+							echo '<br>';
+						}
+						}
+					?>
+				</div>
 				<!--End list of Available Students-->
 
 			<?php endif; ?>

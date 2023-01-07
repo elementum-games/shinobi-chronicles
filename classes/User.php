@@ -314,7 +314,7 @@ class User extends Fighter {
     //Sensei Functions
 
     public function registerAsTeacher(){
-        $this->sensei_manager->registerNewTeacher($this->user_id, $this->user_name);
+        $this->sensei_manager->registerNewTeacher($this->user_id, $this->user_name, $this->village);
         $this->isRegisteredSensei = $this->sensei_manager->checkIfRegisteredSensei();
     }
 

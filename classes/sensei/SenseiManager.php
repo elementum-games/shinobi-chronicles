@@ -37,18 +37,26 @@ class SenseiManager implements Sensei, Student{
     private int $default_teacher_boost_amount;
 
     public function __construct(System $system, int $user_id){
+       
+        $this->system = $system;
+        $this->user_id = $user_id;
 
+        //teacher
         $this->myTeachingID = 0;
+
+        //student
         $this->mySenseisID = 0;
         $this->student_id = 0;
+
         $this->isSensei = false;
         $this->isStudent = false;
-        $this->system = $system;
+
         $this->sensei_skill = 0;
-        $this->user_id = $user_id;
         $this->user_rank = -1;
         $this->default_teacher_boost_amount = 1.05;
 
+
+        /** These functions tell $this object whether or not to function like a Student or a Sensei*/
         //Grab [Rank] from DB 
         $result = $this->system->query("SELECT `rank` from `users` WHERE `user_id`='$this->user_id' LIMIT 1");
         $user_rank = $this->system->db_fetch($result);
@@ -87,7 +95,7 @@ class SenseiManager implements Sensei, Student{
      * @param int $user_id
      * @return void
      */
-    public function registerNewTeacher(int $user_id, string $user_name){
+    public function registerNewTeacher(int $user_id, string $user_name, string $user_village){
         if ($this->user_rank > 2) {
             //Search for Teaching ID
             $result = $this->system->query(
@@ -101,7 +109,7 @@ class SenseiManager implements Sensei, Student{
             }
 
             //pass checks -> register
-            $this->insertNewSenseiDataIntoDB($user_id, $user_name);
+            $this->insertNewSenseiDataIntoDB($user_id, $user_name, $user_village);
             $this->system->message("Congratulations! You are now registered as a Sensei!");
             $this->system->printMessage();
             return;
@@ -158,9 +166,9 @@ class SenseiManager implements Sensei, Student{
      * @param int $user_id
      * @return void
      */
-    private function insertNewSenseiDataIntoDB(int $user_id, string $user_name){
-        $this->system->query("INSERT INTO `sensei_list` (`sensei_id`, `assoc_user_id`, `sensei_name`, `isTeamFull`, `student_list`, `teaching_boost_amount`, `sensei_skill`)
-        VALUES ('0', '{$user_id}', '{$user_name}', '0', '" . json_encode([]) . "', '$this->default_teacher_boost_amount', '0')");
+    private function insertNewSenseiDataIntoDB(int $user_id, string $user_name, string $user_village){
+        $this->system->query("INSERT INTO `sensei_list` (`sensei_id`, `assoc_user_id`, `teaching_village`, `sensei_name`, `isTeamFull`, `student_list`, `teaching_boost_amount`, `sensei_skill`)
+        VALUES ('0', '{$user_id}', '{$user_village}', '{$user_name}', '0', '" . json_encode([]) . "', '$this->default_teacher_boost_amount', '0')");
 
         $this->system->query("UPDATE users SET isRegisteredSensei = 1 WHERE user_id = ${user_id}");
     }
@@ -214,9 +222,9 @@ class SenseiManager implements Sensei, Student{
         return json_decode('{
             "names": 
                 [
-                    {"name": "Educba", "rank": "1", "skill_points_earned": "0", "avatar_link": "./images/default_avatar.png"},
-                    {"name": "Snehal", "rank" : "2", "skill_points_earned": "0", "avatar_link": "./images/default_avatar.png"},
-                    {"name": "Amardeep", "rank" : "1", "skill_points_earned": "0", "avatar_link": "./images/default_avatar.png"}
+                    {"name": "Educba", "rank": "1", "village": "default_village", "skill_points_earned": "0", "avatar_link": "./images/default_avatar.png"},
+                    {"name": "Snehal", "rank" : "2", "village": "default_village", "skill_points_earned": "0", "avatar_link": "./images/default_avatar.png"},
+                    {"name": "Amardeep", "rank" : "1", "village": "default_village", "skill_points_earned": "0", "avatar_link": "./images/default_avatar.png"}
                 ]
             }', true ); //Saving this here for testing
 	}
