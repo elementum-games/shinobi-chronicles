@@ -417,15 +417,18 @@ $clan_positions = [
 
 <?php if($player->isRegisteredSensei && !empty($player->students)) : ?>
     <tr>
+        <th colspan='2'>Students</th>
+    </tr>
         <td colspan='2'>
             <?php foreach($player->students as $listItem): ?>
 
-                <?php foreach($listItem as $student): ?>
-                    <div id='student_list_container'>
-                        <div id='student_<?=($student['name'])?>' class='student_container' style='display: block; margin: 10px 0px; border: 2px solid black'>
-                            <div style='display: inline-block; margin: 0px 10px; width: 120px' class='student_image_container'>
+                <div id='student_list_container'>
+
+                    <?php foreach($listItem as $student): ?>
+                        <div id='student_<?=($student['name'])?>' class='student_container' style='display: block; margin: 5px 0px; border: 1px solid black'>
+                            <div style='display: inline-block; margin: 0px 8px; width: 120px' class='student_image_container'>
                                 <img src="<?= ($student['avatar_link']) ?? './images/default_avatar.png' ?>" alt="Student Avy">
-                            </div>
+                            </div>  
                             <div style='display: inline-block; margin:: 0px;' class='student_data_container'> <!--set margin of <p> to 0 to remove awkward height - should create style such as .student_data_container p{ margin: 0;} to better adjust <p> height-->
                                 <p style='font-size: 14px; font-weight: bold'><?= ($student['name']) ?></p>
                                 <p>Rank: <?= $student['rank'] ?></p>
@@ -433,8 +436,9 @@ $clan_positions = [
                                 <p>Exp to next level: 3400</p>
                             </div>
                         </div>
-                    </div>
-                <?php endforeach;?>
+                    <?php endforeach;?>
+
+                </div>
 
             <?php endforeach;?>
         </td>
