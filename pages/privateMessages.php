@@ -66,7 +66,7 @@ class Messaging {
 	}
 
 	function validateForm(): void {
-		$inbox_limit = $this->constraints['inbox_size'];
+		$inbox_limit = $this->constraints['inbox_limit'];
 		$subject = $this->system->clean(trim($_POST['subject']));
 		$recipient = $this->system->clean(trim($_POST['recipient']));
 		$message = $this->system->clean(trim($_POST['message']));
