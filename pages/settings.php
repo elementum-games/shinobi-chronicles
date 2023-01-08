@@ -191,7 +191,7 @@ function userSettings() {
 		try {
 			$user_exists = $player->blacklist[$user_remove];
 
-			$message = ($user_exists) ? "{$player->blacklist[$user_remove]['user_name']} has been removed from your blacklist" : "This user is not on your blacklist.";
+            $message = ($user_exists) ? "{$player->blacklist[$user_remove][$user_remove]['user_name']} has been removed from your blacklist" : "This user is not on your blacklist.";
 
 			if($user_exists) {
 				unset($player->blacklist[$user_remove]);
