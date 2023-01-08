@@ -42,7 +42,7 @@
     <tr><th>Password</th></tr>
     <tr>
         <td>
-            <form action='<?$self_link?>' method='post'>
+            <form action='<?=$self_link?>' method='post'>
                 <label for='current_password' style='width:150px;'>Current password:</label>
                 <input type='password' name='current_password' /><br />
                 <label for='new_password' style='width:150px;'>New password:</label>
