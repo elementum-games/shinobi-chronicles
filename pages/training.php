@@ -72,7 +72,7 @@ function training() {
 				}
 				$train_type = $_POST['skill'] . '_skill';
 			}
-			else if($_POST['attributes']) {
+			else if(!empty($_POST['attributes'])) {
 				if($player->total_stats >= $player->stat_cap) {
 					throw new Exception("You cannot train any more at this rank!");
 				}
@@ -87,7 +87,7 @@ function training() {
 				}
 				$train_type = $_POST['attributes'];
 			}
-			else if($_POST['jutsu']) {
+			else if(!empty($_POST['jutsu'])) {
 				$jutsu_id = (int)$_POST['jutsu'];
 				if(!$player->checkInventory($jutsu_id, 'jutsu')) {
 					throw new Exception("Invalid jutsu!");

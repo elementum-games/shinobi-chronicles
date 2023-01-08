@@ -30,7 +30,7 @@ class BattleEffectsManager {
         }, $raw_active_genjutsu);
     }
 
-    public function setEffect(Fighter $effect_user, $target_id, Jutsu $jutsu, $raw_damage) {
+    public function setEffect(Fighter $effect_user, $target_id, Jutsu $jutsu, $raw_damage): void {
         if(!$jutsu->combat_id) {
             $jutsu->setCombatId($effect_user->combat_id);
         }

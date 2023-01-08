@@ -473,7 +473,7 @@ $prefill_item_id = $_POST['item_id'] ?? '';
                 $width = '23.5%';
             }
             else {
-                $width = '32%';
+                $width = '31.8%';
             }
         ?>
         <span style='display:inline-block;width:<?= $width ?>;'>Ninjutsu</span>

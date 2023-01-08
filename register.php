@@ -97,7 +97,7 @@ while($row = mysqli_fetch_array($result)) {
 }
 
 $register_ok = false;
-if($_POST['register']) {
+if(isset($_POST['register'])) {
     try {
         if(isset($_POST['user_name'])) {
             $user_name = $system->clean(trim($_POST['user_name']));

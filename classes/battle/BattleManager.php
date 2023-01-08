@@ -253,9 +253,9 @@ class BattleManager {
                         $player_jutsu = $this->getJutsuFromHandSeals($this->player, $_POST['hand_seals']);
 
                         // Layered genjutsu check
-                        if($player_jutsu && $player_jutsu->jutsu_type == Jutsu::TYPE_GENJUTSU && !empty($player_jutsu->parent_jutsu)) {
-                            // $this->effects->assertParentGenjutsuActive($this->player, $player_jutsu);
-                        }
+                        /*if($player_jutsu && $player_jutsu->jutsu_type == Jutsu::TYPE_GENJUTSU && !empty($player_jutsu->parent_jutsu)) {
+                            $this->effects->assertParentGenjutsuActive($this->player, $player_jutsu);
+                        }*/
                     }
 
                     // Check jutsu ID if taijutsu
@@ -338,9 +338,8 @@ class BattleManager {
 
     /**
      * @throws Exception
-     * @noinspection PhpUnusedLocalVariableInspection
      */
-    public function renderBattle() {
+    public function renderBattle(): void {
         global $self_link;
 
         if($this->player === $this->battle->player1) {
