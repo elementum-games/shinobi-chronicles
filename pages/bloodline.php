@@ -190,19 +190,12 @@ function bloodline() {
 				case 'genjutsu_boost':
 					$replace_array[3] = round($boost['effect_amount'] / (35 + $player->genjutsu_skill * 0.10), 2) * 100;
 					break;
-				case 'ninjutsu_resist':
-					$replace_array[2] = round(($boost['effect_amount'] * 35) /
-					(50 + $player->ninjutsu_skill * 0.02), 2);
+                case 'taijutsu_resist':
+                case 'genjutsu_resist':
+                case 'ninjutsu_resist':
+					$replace_array[2] = round(($boost['effect_amount'] * 35) / 50, 2);
 					break;
-				case 'taijutsu_resist':
-					$replace_array[2] = round(($boost['effect_amount'] * 35) /
-					(50 + $player->taijutsu_skill * 0.02), 2);
-					break;
-				case 'genjutsu_resist':
-					$replace_array[2] = round(($boost['effect_amount'] * 35) /
-					(50 + $player->genjutsu_skill * 0.02), 2);
-					break;
-			}
+            }
 			echo "<label style='width:9em;'>" . ucwords(str_replace('_', ' ', $boost['effect'])) . ":</label>" .
 				str_replace($search_array, $replace_array, $boosts[$boost['effect']]['text']) . "<br />";
 		}
