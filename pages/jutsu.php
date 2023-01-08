@@ -16,8 +16,8 @@ function jutsu(): void {
     if($player->rank >= 4) {
         $max_equipped_jutsu++;
     }
-    if($player->forbidden_seal && $player->forbidden_seal['level'] >= 2) {
-        $max_equipped_jutsu++;
+    if($player->forbidden_seal) {
+        $max_equipped_jutsu += System::$premium_benefits[$player->forbidden_seal['level']]['jutsu_equips'];
     }
 
     if(!empty($_POST['equip_jutsu'])) {

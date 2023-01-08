@@ -7,9 +7,9 @@
  * @var array  $costs
  * @var array  $available_clans
  * @var array $name_colors
+ * @var array $premium_benefits
  * @var int $kunai_per_dollar
  * @var int $stat_transfer_points_per_min
- *
  * @var string $paypal_url
  * @var string $paypal_business_id
  * @var string $paypal_listener_url
@@ -386,23 +386,24 @@
             </td>
         </tr>
         <tr>
-            <th id='premium_twinSparrowSeal_header'>Twin Sparrow Seal</th>
-            <th id='premium_fourDragonSeal_header'>Four Dragon Seal</th>
+            <th id='premium_twinSparrowSeal_header'><?=System::$forbidden_seals[1]?></th>
+            <th id='premium_fourDragonSeal_header'><?=System::$forbidden_seals[2]?></th>
         </tr>
         <tr>
             <td id='premium_twinSparrowSeal_data' style='width:50%;vertical-align:top;'>
                 <p style='font-weight:bold;text-align:center;'>
                     <?= $costs['forbidden_seal'][1] ?> Ancient Kunai / 30 days</p>
                 <br/>
-                +10% regen rate<br/>
-                Blue/Pink username color in chat<br/>
-                Larger avatar (125x125 -> 175x175)<br/>
-                Longer logout timer (60 -> 90 minutes)<br/>
-                Larger inbox (50 -> 75 messages)<br/>
-                Longer journal (1000 -> 2000 characters)<br/>
-                Larger journal images (300x200 -> 500x500)<br/>
-                Longer chat posts (350 -> 450 characters)<br/>
-                Longer PMs (1000 -> 1500 characters)<br/>
+                +<?=$premium_benefits[1]['regen_boost']?>% regen rate<br/>
+                <?=$premium_benefits[1]['name_color_display']?> username color in chat<br/>
+                Larger avatar (<?=$premium_benefits[0]['avatar_size_display']?> -> <?=$premium_benefits[1]['avatar_size_display']?>)<br/>
+                Longer logout timer (<?=$premium_benefits[0]['logout_timer']?> -> <?=$premium_benefits[1]['logout_timer']?>
+                minutes)<br/>
+                Larger inbox (<?=$premium_benefits[0]['inbox_size']?> -> <?=$premium_benefits[1]['inbox_size']?> messages)<br/>
+                Longer journal (<?=$premium_benefits[0]['journal_size']?> -> <?=$premium_benefits[1]['journal_size']?> characters)<br/>
+                Larger journal images (<?=$premium_benefits[0]['journal_image_display']?> -> <?=$premium_benefits[1]['journal_image_display']?>)<br/>
+                Longer chat posts (<?=$premium_benefits[0]['chat_post_size']?> -> <?=$premium_benefits[1]['chat_post_size']?> characters)<br/>
+                Longer PMs (<?=$premium_benefits[0]['pm_size']?> -> <?=$premium_benefits[1]['pm_size']?> characters)<br/>
                 <form action='<?= $self_link ?>&view=forbidden_seal' method='post'>
                     <p style='width:100%;text-align:center;margin: 1em 0 0;'>
                         <input type='hidden' name='seal_level' value='1'/>
@@ -421,12 +422,17 @@
                     <?= $costs['forbidden_seal'][2] ?> Ancient Kunai / 30 days</p>
                 <br/>
                 All benefits of Twin Sparrow Seal<br/>
-                +20% regen rate<br/>
-                +1 jutsu equip slots<br/>
-                +1 weapon equip slots<br/>
-                +1 armor equip slots<br/>
-                Enhanced long trainings (1.5x length, 2x gains)<br/>
-                Enhanced extended trainings (1.5x length, 2x gains)<br/>
+                +<?=$premium_benefits[2]['regen_boost']?>% regen rate<br/>
+                +<?=$premium_benefits[2]['jutsu_equips']?> jutsu equip slots<br/>
+                +<?=$premium_benefits[2]['weapon_equips']?> weapon equip slots<br/>
+                +<?=$premium_benefits[2]['armor_equips']?> armor equip slots<br/>
+                Longer logout timer (<?=$premium_benefits[0]['logout_timer']?> -> <?=$premium_benefits[2]['logout_timer']?>
+                minutes)<br />
+                Longer journal (<?=$premium_benefits[0]['journal_size']?> -> <?=$premium_benefits[2]['journal_size']?> characters)<br/>
+                Enhanced long trainings (<?=$premium_benefits[2]['enhanced_long_training']['time']?>x length,
+                <?=$premium_benefits[2]['enhanced_long_training']['gains']?>x gains)<br/>
+                Enhanced extended trainings (<?=$premium_benefits[2]['enhanced_extended_training']['time']?>x length,
+                <?=$premium_benefits[2]['enhanced_extended_training']['gains']?>x gains)<br/>
                 <form action='<?= $self_link ?>&view=forbidden_seal' method='post'>
                     <p style='width:100%;text-align:center;margin: 2.2em 0 0;'>
                         <input type='hidden' name='seal_level' value='2'/>

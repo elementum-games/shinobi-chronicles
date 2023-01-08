@@ -36,6 +36,83 @@ class System {
 
     public static array $villages = ['Stone', 'Cloud', 'Leaf', 'Sand', 'Mist'];
     public static array $forbidden_seals = array(1 => 'Twin Sparrow Seal', 2 => 'Four Dragon Seal');
+    /**
+     * Manage premium benefits here. Seal level 0 is for display purposes on the premium pages and does not have effect.
+     * Any changes made to seal levels 1 and 2 will update the market info and update the benefits on the relevant pages.
+     * Note: Any free staff perks will use seal level 2 by default.
+     * ANY ADDITIONAL BOOST SHOULD BE ADDED TO BOTH LEVEL 1 & 2 SEALS TO CONFORM WITH THE OPTION BEING PRESENT AT ALL TIMES.
+     * EVEN IF THERE IS NO INCREASE TO SPECIFIC THINGS (TAKE NOTE OF EQUIPMENT/JUTUSU/TRAINING BOOSTS)
+     */
+    public static array $premium_benefits = array(
+        0 => [
+            'avatar_size_display' => '125x125',
+            'logout_timer' => SELF::LOGOUT_LIMIT,
+            'inbox_size' => 50,
+            'journal_size' => 1000,
+            'journal_image_display' => '300x200',
+            'chat_post_size' => 350,
+            'pm_size' => 1000,
+
+        ],
+        1 => [
+            'regen_boost' => 10, //Report in whole percentages (10 will be .1 bonus)
+            'name_colors' => [
+                'blue' => 'blue',
+                'pink' => 'pink',
+            ],
+            'name_color_display' => 'Blue/Pink', //Premium page display only.
+            'avatar_size' => 200,
+            'avatar_size_display' => '200x200', //Premium page display only.
+            'logout_timer' => 180,
+            'inbox_size' => 75,
+            'journal_size' => 2000,
+            'journal_image_x' => 500,
+            'journal_image_y' => 500,
+            'journal_image_display' => '500x500', //Premium page display only.
+            'chat_post_size' => 350,
+            'pm_size' => 1500,
+            'jutsu_equips' => 0,
+            'weapon_equips' => 0,
+            'armor_equips' => 0,
+            'enhanced_long_training' => [
+                'time' => 1,
+                'gains' => 1,
+            ],
+            'enhanced_extended_training' => [
+                'time' => 1,
+                'gains'=> 1,
+            ],
+        ],
+        2 => [
+            'regen_boost' => 20, //Report in whole percentages (20 will be .2 bonus)
+            'name_colors' => [
+                'blue' => 'blue',
+                'pink' => 'pink',
+            ],
+            'name_color_display' => 'Blue/Pink', //Premium page desc display only
+            'avatar_size' => 200,
+            'avatar_size_display' => '200x200', //Premium page display only.
+            'logout_timer' => 240,
+            'inbox_size' => 75,
+            'journal_size' => 2500,
+            'journal_image_x' => 500,
+            'journal_image_y' => 500,
+            'journal_image_display' => '500x500', //Premium page display only.
+            'chat_post_size' => 350,
+            'pm_size' => 1500,
+            'jutsu_equips' => 1,
+            'weapon_equips' => 1,
+            'armor_equips' => 1,
+            'enhanced_long_training' => [
+                'time' => 1.5,
+                'gains' => 2,
+            ],
+            'enhanced_extended_training' => [
+                'time' => 1.5,
+                'gains' => 2,
+            ],
+        ],
+    );
 
     // TODO: Remove! This is a temporary way to do events
     const SC_EVENT_START = 0;
