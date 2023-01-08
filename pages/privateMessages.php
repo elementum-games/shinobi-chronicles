@@ -17,9 +17,7 @@ class Messaging {
 		MAX_SUBJECT_LENGTH = 50,
 		MAX_MESSAGE_LENGTH = 1000,
 		SEAL_MAX_MESSAGE_LENGTH = 1500, //also same for moderators
-		INBOX_LIMIT = 50,
-		SEAL_INBOX_LIMIT = 75,
-		STAFF_INBOX_LIMIT = 100;
+		INBOX_LIMIT = 50;
 
 	public int|string|null $message_id;
 
@@ -57,10 +55,10 @@ class Messaging {
             : self::MAX_MESSAGE_LENGTH;
 
         if($player->staff_level) {
-            $this->constraints['inbox_limit'] = self::STAFF_INBOX_LIMIT;
+            $this->constraints['inbox_limit'] = System::$premium_benefits[2]['inbox_size'] + 25; //Add 25 for 100 staff limit
         }
         else if($player->forbidden_seal) {
-            $this->constraints['inbox_limit'] = self::SEAL_INBOX_LIMIT;
+            $this->constraints['inbox_limit'] = System::$premium_benefits[$player->forbidden_seal['level']]['inbox_size'];
         }
         else {
             $this->constraints['inbox_limit'] = self::INBOX_LIMIT;
@@ -68,7 +66,7 @@ class Messaging {
 	}
 
 	function validateForm(): void {
-		$inbox_limit = $this->constraints['inbox_limit'];
+		$inbox_limit = $this->constraints['inbox_size'];
 		$subject = $this->system->clean(trim($_POST['subject']));
 		$recipient = $this->system->clean(trim($_POST['recipient']));
 		$message = $this->system->clean(trim($_POST['message']));
@@ -125,7 +123,7 @@ class Messaging {
 				$ErrorMsg = "User's inbox is full";
 				if($message_count >= $inbox_limit && $result['staff_level'] < User::STAFF_MODERATOR) {
 					if($result['forbidden_seal']) {
-						if($message_count >= self::SEAL_INBOX_LIMIT) {
+						if($message_count >= System::$premium_benefits[$result['forbidden_seal']['level']]['inbox_size']) {
 							throw new Exception($ErrorMsg);
 						}
 					}
@@ -133,7 +131,7 @@ class Messaging {
 						throw new Exception($ErrorMsg);
 					}
 				}
-				else if($message_count >= self::STAFF_INBOX_LIMIT) {
+				else if($message_count >= System::$premium_benefits[2]['inbox_size']) {
 					throw new Exception($ErrorMsg);
 				}
 			}

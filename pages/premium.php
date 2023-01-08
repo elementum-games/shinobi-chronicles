@@ -977,6 +977,7 @@ function premium() {
     }
 
     $name_colors = $player->getNameColors();
+    $premium_benefits = System::$premium_benefits;
 
     // Buying shards
     if($system->environment == System::ENVIRONMENT_DEV) {

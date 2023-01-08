@@ -27,9 +27,17 @@ function chat() {
 
 	// Validate post and submit to DB
     $chat_max_post_length = System::CHAT_MAX_POST_LENGTH;
+    //Increase chat length limit for seal users & staff members
+    if($player->forbidden_seal || $player->staff_level) {
+        if($player->staff_level) {
+            $chat_max_post_length = System::$premium_benefits[2]['chat_post_size'];
+        }
+        else {
+            $chat_max_post_length = System::$premium_benefits[$player->forbidden_seal['level']]['chat_post_size'];
+        }
+    }
+
 	if(isset($_POST['post'])) {
-		//If user has seal or is of staff, give them their words
-		$chat_max_post_length += $player->forbidden_seal ? 100 : 0;
 		$message = $system->clean(stripslashes(trim($_POST['post'])));
 		try {
 			$result = $system->query("SELECT `message` FROM `chat` WHERE `user_name` = '$player->user_name' ORDER BY  `post_id` DESC LIMIT 1");

@@ -13,7 +13,6 @@ class User extends Fighter {
     const ENTITY_TYPE = 'U';
 
     const AVATAR_MAX_SIZE = 150;
-    const AVATAR_MAX_SEAL_SIZE = 200;
     const AVATAR_MAX_FILE_SIZE = 1024 ** 2; // 1024 kb
 
     const GENDER_MALE = 'Male';
@@ -750,13 +749,14 @@ class User extends Fighter {
 
             // Regen boost
             else {
-                if($this->forbidden_seal['level'] == 1) {
-                    $this->regen_boost += $this->regen_rate * 0.1;
+                if($this->forbidden_seal) {
+                    $this->regen_boost += $this->regen_rate * (System::$premium_benefits[$this->forbidden_seal['level']]['regen_boost']/100);
                 }
-                else if($this->forbidden_seal['level'] == 2) {
-                    $this->regen_boost += $this->regen_rate * 0.2;
+                if($this->isHeadModerator() || $this->isUserAdmin() || $this->isContentAdmin() || $this->isHeadAdmin()) {
+                    if(!$this->forbidden_seal) {
+                        $this->regen_boost += $this->regen_rate * (System::$premium_benefits[1]['regen_boost']/100);
+                    }
                 }
-
             }
         }
 
@@ -1491,7 +1491,17 @@ class User extends Fighter {
     }
 
     public function getAvatarSize(): int {
-        return $this->forbidden_seal ? self::AVATAR_MAX_SEAL_SIZE : self::AVATAR_MAX_SIZE;
+        if($this->forbidden_seal || $this->staff_level) {
+            if($this->staff_level) {
+                return System::$premium_benefits[2]['avatar_size'];
+            }
+            else {
+                return System::$premium_benefits[2]['avatar_size'];
+            }
+        }
+        else {
+            return self::AVATAR_MAX_SIZE;
+        }
     }
 
     public function canChangeChatColor(): bool {
@@ -1523,10 +1533,12 @@ class User extends Fighter {
         ];
 
         if($this->forbidden_seal || $this->isHeadAdmin()) {
-            $return = array_merge($return, [
-                'blue' => 'blue',
-                'pink' => 'pink',
-            ]);
+            if($this->isHeadAdmin()) {
+                $return = array_merge($return, System::$premium_benefits[2]['name_colors']);
+            }
+            else {
+                $return = array_merge($return, System::$premium_benefits[$this->forbidden_seal['level']]['name_colors']);
+            }
         }
 
         if($this->premium_credits_purchased > 0 || $this->isHeadAdmin()) {
