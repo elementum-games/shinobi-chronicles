@@ -144,11 +144,11 @@ class Bloodline {
         int $regen_rate
     ): void {
         $ratios = [
-            'offense_boost' => 0.04,
+            'offense_boost' => 0.03,
             'defense_boost' => 0.04,
             'speed_boost' => 0.08,
             'mental_boost' => 0.1,
-            'heal' => 0.04,
+            'heal' => 0.03,
             'regen' => 0.15,
         ];
         $bloodline_skill += self::BASE_BLOODLINE_SKILL;
@@ -228,28 +228,15 @@ class Bloodline {
                 case 'ninjutsu_boost':
                 case 'genjutsu_boost':
                 case 'taijutsu_boost':
-                    $skill_ratio = $this->skillRatio($jutsu_type_skill, $bloodline_skill);
                     $this->combat_boosts[$id]['power'] =
-                        round($boost_power * $skill_ratio * $ratios['offense_boost'], 3);
+                        round($boost_power * $ratios['offense_boost'], 3);
                     break;
 
                 case 'ninjutsu_resist':
                 case 'genjutsu_resist':
                 case 'taijutsu_resist':
-                    $skill_ratio = $this->skillRatio($jutsu_type_skill, $bloodline_skill);
-
-                    // Est. jutsu power
-                    $skill = $bloodline_skill + $jutsu_type_skill;
-                    $jutsu_power = $user_rank;
-                    $jutsu_power += round($skill / $stats_max_level, 3);
-                    if($jutsu_power > $user_rank + 1) {
-                        $jutsu_power = $user_rank + 1;
-                    }
-
-                    $multiplier = $jutsu_power;
-
                     $this->combat_boosts[$id]['power'] =
-                        round($boost_power * $multiplier * $skill_ratio * $ratios['defense_boost'], 3);
+                        round($boost_power * $ratios['defense_boost'], 3);
                     break;
 
                 case 'speed_boost':
@@ -262,42 +249,14 @@ class Bloodline {
                     $this->combat_boosts[$id]['power'] = round($boost_power * $ratios['mental_boost'], 3);
                     break;
 
-                // (NEEDS TESTING/ADJUSTMENT)
                 case 'heal':
-                    // Est. jutsu power
-                    $skill = $bloodline_skill;
-                    $jutsu_power = $user_rank;
-                    $jutsu_power += round($skill / $stats_max_level, 3);
-                    if($jutsu_power > $user_rank + 1) {
-                        $jutsu_power = $user_rank + 1;
-                    }
-                    $stat_multiplier = 35 * $jutsu_power; /* est jutsu power */
-
-                    // Defensive power
-                    $defense = 50 + ($total_stats * 0.01);
-
                     $this->combat_boosts[$id]['power'] =
-                        round($boost_power * $stat_multiplier * $ratios['heal'] / $defense, 3);
-                    $this->combat_boosts[$id]['divider'] = $defense;
-
+                        round($boost_power * $ratios['heal'], 3);
                     break;
             }
 
             $this->combat_boosts[$id]['effect_amount'] = round($this->combat_boosts[$id]['power'] * $bloodline_skill, 3);
         }
-    }
-
-    private function skillRatio(int $offense_skill, int $bloodline_skill): float {
-        $bloodline_skill += 10;
-
-        $skill_ratio = round($offense_skill / $bloodline_skill, 3);
-        if($skill_ratio > 1.0) {
-            $skill_ratio = 1.0;
-        }
-        else if($skill_ratio < 0.55) {
-            $skill_ratio = 0.55;
-        }
-        return $skill_ratio;
     }
 
     /**

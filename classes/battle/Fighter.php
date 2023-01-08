@@ -2,9 +2,11 @@
 
 abstract class Fighter {
     const BASE_OFFENSE = 35;
+    const BASE_DEFENSE = 50;
 
     const SKILL_OFFENSE_RATIO = 0.10;
-    CONST BLOODLINE_OFFENSE_RATIO = self::SKILL_OFFENSE_RATIO * 0.8;
+    const BLOODLINE_OFFENSE_RATIO = self::SKILL_OFFENSE_RATIO * 0.8;
+    const BLOODLINE_DEFENSE_MULTIPLIER = 35;
 
     const MIN_RAND = 33;
     const MAX_RAND = 37;
@@ -307,7 +309,7 @@ abstract class Fighter {
      * @return float|int
      */
     public function calcDamageTaken($raw_damage, string $defense_type, bool $residual_damage = false): float|int {
-        $defense = 50 * (1 + $this->defense_boost);
+        $defense = self::BASE_DEFENSE * (1 + $this->defense_boost);
 
         if($defense <= 0) {
             $defense = 1;
@@ -320,9 +322,9 @@ abstract class Fighter {
                     continue;
                 }
 
-                $boost_amount = $boost['effect_amount'] * 35;
+                $boost_amount = $boost['effect_amount'] * self::BLOODLINE_DEFENSE_MULTIPLIER;
                 if($raw_damage < $boost_amount) {
-                    $this->bloodline_defense_boosts[$id]['effect_amount'] -= ($raw_damage / 35);
+                    $this->bloodline_defense_boosts[$id]['effect_amount'] -= ($raw_damage / self::BLOODLINE_DEFENSE_MULTIPLIER);
                     $raw_damage = 0;
                 }
                 else {
