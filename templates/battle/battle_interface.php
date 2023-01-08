@@ -83,26 +83,30 @@
         </th>
     </tr>
     <tr>
-      <td id='bi_td_player'>
-        <img src='<?= $player->avatar_link ?>' class='playerAvatar' />
-        <label style='width:80px;'>Health:</label>
-            <?= sprintf("%.2f", $player->health) ?> / <?= sprintf("%.2f", $player->max_health) ?><br />
-        <div class='resourceBarOuter'><div class='healthFill' style='width:<?= $health_percent ?>%;'></div></div>
+    <td style='text-align: center;' id='bi_td_player'>
+            <img src='<?= $player->avatar_link ?>' class='playerAvatar' alt='player_profile_img' />
+            <div id='battle_stats_container' style='display: inline-block; text-align: center; margin-top: 10px;'>
+            <label style='width:80px;'>Health:</label>
+                <?= sprintf("%.2f", $player->health) ?> / <?= sprintf("%.2f", $player->max_health) ?><br />
+            <div class='resourceBarOuter'><div class='healthFill' style='width:<?= $health_percent ?>%;'></div></div>
 
-        <?php if(!$battleManager->spectate): ?>
-            <label style='width:80px;'>Chakra:</label>
-            <?= sprintf("%.2f", $player->chakra) ?> / <?= sprintf("%.2f", $player->max_chakra) ?><br />
-            <div class='resourceBarOuter'><div class='chakraFill' style='width:<?= $chakra_percent ?>%;'></div></div>
-            <label style='width:80px;'>Stamina:</label>
-            <?= sprintf("%.2f", $player->stamina) ?> / <?= sprintf("%.2f", $player->max_stamina) ?><br />
-            <div class='resourceBarOuter'><div class='staminaFill' style='width:<?= $stamina_percent ?>%;'></div></div>
-        <?php endif; ?>
+            <?php if(!$battleManager->spectate): ?>
+                <label style='width:80px;'>Chakra:</label>
+                <?= sprintf("%.2f", $player->chakra) ?> / <?= sprintf("%.2f", $player->max_chakra) ?><br />
+                <div class='resourceBarOuter'><div class='chakraFill' style='width:<?= $chakra_percent ?>%;'></div></div>
+                <label style='width:80px;'>Stamina:</label>
+                <?= sprintf("%.2f", $player->stamina) ?> / <?= sprintf("%.2f", $player->max_stamina) ?><br />
+                <div class='resourceBarOuter'><div class='staminaFill' style='width:<?= $stamina_percent ?>%;'></div></div>
+            <?php endif; ?>
+            </div>
     </td>
-    <td id='bi_td_opponent'>
+    <td style='text-align: center;' id='bi_td_opponent'>
         <img src='<?= $opponent->avatar_link ?>' class='opponentAvatar' />
+        <div id='battle_stats_container' style='display: inline-block; text-align: center; margin-top: 10px;'>
         <label style='width:80px;'>Health:</label>
         <?= sprintf("%.2f", $opponent->health) ?> / <?= sprintf("%.2f", $opponent->max_health) ?><br />
         <div class='resourceBarOuter'><div class='healthFill' style='width:<?= $opponent_health_percent ?>%;'></div></div>
+        </div>
     </td>
   </tr>
 </table>
