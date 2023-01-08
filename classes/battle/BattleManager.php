@@ -876,10 +876,7 @@ class BattleManager {
                 $player_diffuse_percent = 0;
             }
             else {
-                $player_diffuse_percent = round(
-                    $player_damage / $opponent_damage * ($player_jutsu->weapon_effect->effect_amount / 100),
-                    1
-                );
+                $player_diffuse_percent = round($player_jutsu->weapon_effect->effect_amount / 100, 1);
 
                 if($player_diffuse_percent > Battle::MAX_DIFFUSE_PERCENT) {
                     $player_diffuse_percent = Battle::MAX_DIFFUSE_PERCENT;
@@ -891,10 +888,7 @@ class BattleManager {
                 $opponent_diffuse_percent = 0;
             }
             else {
-                $opponent_diffuse_percent = round(
-                    $opponent_damage / $player_damage * ($opponent_jutsu->weapon_effect->effect_amount / 100),
-                    1
-                );
+                $opponent_diffuse_percent = round($opponent_jutsu->weapon_effect->effect_amount / 100, 1);
             }
 
             if($opponent_diffuse_percent > Battle::MAX_DIFFUSE_PERCENT) {
