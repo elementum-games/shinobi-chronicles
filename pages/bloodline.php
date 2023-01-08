@@ -3,6 +3,9 @@
 	Author:		Levi Meahan
 	Created:	04/10/2014
 */
+/**
+ * @throws Exception
+ */
 function bloodline() {
 	global $system;
 	/** @var User */
@@ -14,7 +17,7 @@ function bloodline() {
 		$system->printMessage();
 		return false;
 	}
-	$base_bloodline = new Bloodline($player->bloodline_id);
+	$base_bloodline = Bloodline::loadFromId($system, $player->bloodline_id);
 	$player->getInventory();
 
     require_once "profile.php";

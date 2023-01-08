@@ -20,9 +20,7 @@ class Bloodline {
         self::RANK_LESSER  => 'Lesser'
     ];
 
-    public System $system;
-
-    public $bloodline_id;
+    public int $bloodline_id;
     public int $id;
     public string $name;
     public int $clan_id;
@@ -32,31 +30,17 @@ class Bloodline {
     protected ?string $raw_passive_boosts;
     protected ?string $raw_combat_boosts;
 
-    public $passive_boosts;
-    public $combat_boosts;
+    public array $passive_boosts = [];
+    public array $combat_boosts = [];
 
     /** @var Jutsu[] */
     private array $base_jutsu;
     /** @var Jutsu[] */
     public array $jutsu;
 
-    public function __construct(int $bloodline_id, ?int $user_id = null) {
-        global $system;
-        $this->system =& $system;
-        if(!$bloodline_id) {
-            $system->error("Invalid bloodline id!");
-            return false;
-        }
-        $this->bloodline_id = (int)$bloodline_id;
+    public function __construct(array $bloodline_data) {
+        $this->bloodline_id = $bloodline_data['bloodline_id'];
         // $this->id = 'BL' . $this->user_id;
-
-        $result = $system->query("SELECT * FROM `bloodlines` WHERE `bloodline_id`='$this->bloodline_id' LIMIT 1");
-        if($system->db_last_num_rows == 0) {
-            $system->error("Bloodline does not exist!");
-            return false;
-        }
-
-        $bloodline_data = $system->db_fetch($result);
 
         $this->name = $bloodline_data['name'];
         $this->clan_id = $bloodline_data['clan_id'];
@@ -69,63 +53,32 @@ class Bloodline {
         $this->jutsu = [];
         $jutsu_data = $bloodline_data['jutsu'];
         if($jutsu_data) {
-            $uj = json_decode($bloodline_data['jutsu'], true);
-            foreach($uj as $id => $j) {
+            $jutsu_arr = json_decode($bloodline_data['jutsu'], true);
+            foreach($jutsu_arr as $id => $j) {
                 $this->base_jutsu[$id] = new Jutsu(
-                    $id,
-                    $j['name'], 
-                    $j['rank'], 
-                    $j['jutsu_type'], 
-                    $j['power'],
-                    $j['effect'], 
-                    $j['effect_amount'] ?? 0,
-                    $j['effect_length'] ?? 0,
-                    $j['description'], 
-                    $j['battle_text'], 
-                    $j['cooldown'] ?? 0,
-                    $j['use_type'], 
-                    $j['use_cost'], 
-                    $j['purchase_cost'], 
-                    Jutsu::PURCHASE_TYPE_BLOODLINE,
-                    $j['parent_jutsu'] ?? 0,
-                    $j['element'], 
-                    $j['hand_seals']
+                    id: $id,
+                    name: $j['name'],
+                    rank: $j['rank'],
+                    jutsu_type: $j['jutsu_type'],
+                    base_power: $j['power'],
+                    effect: $j['effect'],
+                    base_effect_amount: $j['effect_amount'] ?? 0,
+                    effect_length: $j['effect_length'] ?? 0,
+                    description: $j['description'],
+                    battle_text: $j['battle_text'],
+                    cooldown: $j['cooldown'] ?? 0,
+                    use_type: $j['use_type'],
+                    use_cost: $j['use_cost'] ?? 0,
+                    purchase_cost: $j['purchase_cost'] ?? 0,
+                    purchase_type: Jutsu::PURCHASE_TYPE_BLOODLINE,
+                    parent_jutsu: $j['parent_jutsu'] ?? 0,
+                    element: $j['element'],
+                    hand_seals: $j['hand_seals']
                 );
                 $this->base_jutsu[$id]->is_bloodline = true;
             }
 
             $this->jutsu = $this->base_jutsu;
-        }
-
-        // Load user-related BL data if relevant
-        if($user_id) {
-            $result = $system->query("SELECT * FROM `user_bloodlines` WHERE `user_id`=$user_id LIMIT 1");
-            if(mysqli_num_rows($result) == 0) {
-                $this->system->message("Invalid user bloodline data!");
-                $this->system->printMessage();
-                return false;
-            }
-
-            $user_bloodline = mysqli_fetch_assoc($result);
-            $this->name = $user_bloodline['name'];
-
-            if($user_bloodline['jutsu']) {
-                $user_jutsu = json_decode($user_bloodline['jutsu'], true);
-                $this->jutsu = array();
-
-                if(is_array($user_jutsu)) {
-                    foreach($user_jutsu as $uj) {
-                        $id = $uj['jutsu_id'];
-                        
-                        $this->jutsu[$id] = $this->base_jutsu[$id];
-                        $this->jutsu[$id]->id = $id;
-                        $this->jutsu[$id]->setLevel($uj['level'], $uj['exp']);
-                    }
-                }
-            }
-            else {
-                $this->jutsu = array();
-            }
         }
 
         if($this->raw_passive_boosts) {
@@ -135,13 +88,61 @@ class Bloodline {
             $this->combat_boosts = json_decode($this->raw_combat_boosts, true);
         }
     }
-    
+
+    /**
+     * @throws Exception
+     */
+    public static function loadFromId(System $system, int $bloodline_id, ?int $user_id = null): Bloodline {
+        if(!$bloodline_id) {
+            throw new Exception("Invalid bloodline id!");
+        }
+
+        $result = $system->query("SELECT * FROM `bloodlines` WHERE `bloodline_id`='$bloodline_id' LIMIT 1");
+        if($system->db_last_num_rows == 0) {
+            throw new Exception("Bloodline does not exist!");
+        }
+        $bloodline_data = $system->db_fetch($result);
+
+        $bloodline = new Bloodline($bloodline_data);
+
+        // Load user-related BL data if relevant
+        if($user_id) {
+            $result = $system->query("SELECT * FROM `user_bloodlines` WHERE `user_id`=$user_id LIMIT 1");
+            if(mysqli_num_rows($result) == 0) {
+                throw new Exception("Invalid user bloodline data!");
+            }
+
+            $user_bloodline = mysqli_fetch_assoc($result);
+            $bloodline->name = $user_bloodline['name'];
+
+            if($user_bloodline['jutsu']) {
+                $user_jutsu = json_decode($user_bloodline['jutsu'], true);
+                $bloodline->jutsu = array();
+
+                if(is_array($user_jutsu)) {
+                    foreach($user_jutsu as $uj) {
+                        $id = $uj['jutsu_id'];
+
+                        $bloodline->jutsu[$id] = $bloodline->base_jutsu[$id];
+                        $bloodline->jutsu[$id]->id = $id;
+                        $bloodline->jutsu[$id]->setLevel($uj['level'], $uj['exp']);
+                    }
+                }
+            }
+            else {
+                $bloodline->jutsu = array();
+            }
+        }
+
+        return $bloodline;
+    }
+
     public function setBoostAmounts(
         int $user_rank,
         int $ninjutsu_skill, int $taijutsu_skill, int $genjutsu_skill, int $bloodline_skill,
         int $base_stats, int $total_stats, int $stats_max_level,
         int $regen_rate
-    ) {
+    ): void {
         $ratios = [
             'offense_boost' => 0.04,
             'defense_boost' => 0.04,
