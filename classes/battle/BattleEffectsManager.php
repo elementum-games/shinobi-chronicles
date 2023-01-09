@@ -81,12 +81,12 @@ class BattleEffectsManager {
                 break;
             case 'speed_boost':
             case 'cast_speed_boost':
+            case 'speed_nerf':
+            case 'cast_speed_nerf':
                 // No changes needed to base number, calculated in applyPassiveEffects
                 break;
             case 'intelligence_boost':
             case 'willpower_boost':
-            case 'cast_speed_nerf':
-            case 'speed_nerf':
             case 'intelligence_nerf':
             case 'willpower_nerf':
                 $jutsu->effect_amount = round($debuff_power * ($jutsu->effect_amount / 100), 2);
