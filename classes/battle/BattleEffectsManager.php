@@ -81,6 +81,8 @@ class BattleEffectsManager {
                 break;
             case 'speed_boost':
             case 'cast_speed_boost':
+                $jutsu->effect_amount = round($jutsu->effect_amount / 100, 2);
+                break;
             case 'intelligence_boost':
             case 'willpower_boost':
             case 'cast_speed_nerf':
