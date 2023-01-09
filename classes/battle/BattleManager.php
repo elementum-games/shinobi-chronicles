@@ -876,19 +876,19 @@ class BattleManager {
                 $player_diffuse_percent = 0;
             }
             else {
-                $player_diffuse_percent = round($player_jutsu->weapon_effect->effect_amount / 100, 1);
+                $player_diffuse_percent = round($player_jutsu->weapon_effect->effect_amount / 100, 2);
 
                 if($player_diffuse_percent > Battle::MAX_DIFFUSE_PERCENT) {
                     $player_diffuse_percent = Battle::MAX_DIFFUSE_PERCENT;
                 }
             }
         }
-        if($opponent_jutsu->weapon_id && $opponent_jutsu->weapon_effect->effect == 'diffuse' &&  $player_jutsu->jutsu_type == Jutsu::TYPE_NINJUTSU) {
+        if($opponent_jutsu->weapon_id && $opponent_jutsu->weapon_effect->effect == 'diffuse' && $player_jutsu->jutsu_type == Jutsu::TYPE_NINJUTSU) {
             if($player_damage <= 0){
                 $opponent_diffuse_percent = 0;
             }
             else {
-                $opponent_diffuse_percent = round($opponent_jutsu->weapon_effect->effect_amount / 100, 1);
+                $opponent_diffuse_percent = round($opponent_jutsu->weapon_effect->effect_amount / 100, 2);
             }
 
             if($opponent_diffuse_percent > Battle::MAX_DIFFUSE_PERCENT) {
