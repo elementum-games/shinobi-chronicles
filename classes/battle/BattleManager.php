@@ -936,9 +936,9 @@ class BattleManager {
             echo "Player2({$player2->getName()}): {$player2->speed} ({$player2->speed_boost} - {$player2->speed_nerf})<br />";
         }
 
-        // Ratios for damage reduction
-        $speed_ratio = 0.8;
-        $cast_speed_ratio = 0.8;
+        // Ratios for damage reduction (% more speed = % damage redution)
+        $speed_ratio = 0.65;
+        $cast_speed_ratio = 0.65;
         $max_damage_reduction = 0.5;
         if($player_jutsu->jutsu_type == Jutsu::TYPE_NINJUTSU) {
             // Nin vs Nin
