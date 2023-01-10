@@ -8,6 +8,7 @@
  * @var array  $available_clans
  * @var array $name_colors
  * @var int $kunai_per_dollar
+ * @var int $stat_transfer_points_per_min
  *
  * @var string $paypal_url
  * @var string $paypal_business_id
@@ -119,6 +120,7 @@
                 <!--suppress JSUnresolvedFunction -->
                 <script type='text/javascript'>
                     let stats = {};
+                    let pointsPerMin = <?= $stat_transfer_points_per_min ?>;
 
                     function statSelectChange() {
                         $('#transferAmount').val(stats[ $('#statAllocateSelect').val() ]);
@@ -134,7 +136,7 @@
                         else {
                             cost = 1 + Math.floor(transferAmount / 300);
                         }
-                        const time = transferAmount * 0.2;
+                        const time = transferAmount / pointsPerMin;
                         const display = cost + ' AK / ' + time + ' minutes';
                         $('#statAllocateCost').html(display);
                     }

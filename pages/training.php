@@ -11,20 +11,19 @@ function training() {
 	global $system;
 	global $player;
 	global $self_link;
-	// Vars
 
-	$stat_train_length = 300; // 300
-	$stat_train_gain = 2 + ($player->rank * 2);
+	$stat_train_length = 600;
+	$stat_train_gain = 4 + ($player->rank * 4);
 
 	$jutsu_train_gain = User::$jutsu_train_gain;
 
 	// 56.25% of standard
-	$stat_long_train_length = $stat_train_length * 8;
-	$stat_long_train_gain = $stat_train_gain * 4.5;
+	$stat_long_train_length = $stat_train_length * 4;
+	$stat_long_train_gain = $stat_train_gain * 2.25;
 
-    // 48x length, 16x gains: 33% of standard
-    $stat_extended_train_length = $stat_train_length * 48;
-	$stat_extended_train_gain = $stat_train_gain * 16;
+    // 24x length, 8x gains: 33% of standard
+    $stat_extended_train_length = $stat_train_length * 24;
+	$stat_extended_train_gain = $stat_train_gain * 8;
 
 	// Forbidden seal trainings boost
 	if($player->forbidden_seal && $player->forbidden_seal['level'] >= 2) {
@@ -40,11 +39,9 @@ function training() {
 	$stat_long_train_gain += $system->LONG_TRAIN_BOOST;
 	$stat_extended_train_gain += ($system->LONG_TRAIN_BOOST * 5);
 
-	$HOLIDAY_TRAINING = false;
 	$player->getInventory();
 	if(!empty($_POST['train_type']) && !$player->train_time) {
-		try {	
-			$train_type = '';
+		try {
 			$train_length = $stat_train_length;
 			$train_gain = $stat_train_gain;
 			if($_POST['train_type'] == 'Long') {
@@ -55,11 +52,8 @@ function training() {
 				$train_length = $stat_extended_train_length;
 				$train_gain = $stat_extended_train_gain;
 			}
-			else if($_POST['train_type'] == 'Extended' && $HOLIDAY_TRAINING) {
-				$train_length = $stat_extended_train_length;
-				$train_gain = $stat_extended_train_gain - 20;
-			}
-			if($_POST['skill']) {
+
+			if(!empty($_POST['skill'])) {
 				if($player->total_stats >= $player->stat_cap) {
 					throw new Exception("You cannot train any more at this rank!");
 				}
@@ -78,7 +72,7 @@ function training() {
 				}
 				$train_type = $_POST['skill'] . '_skill';
 			}
-			else if($_POST['attributes']) {
+			else if(!empty($_POST['attributes'])) {
 				if($player->total_stats >= $player->stat_cap) {
 					throw new Exception("You cannot train any more at this rank!");
 				}
@@ -93,7 +87,7 @@ function training() {
 				}
 				$train_type = $_POST['attributes'];
 			}
-			else if($_POST['jutsu']) {
+			else if(!empty($_POST['jutsu'])) {
 				$jutsu_id = (int)$_POST['jutsu'];
 				if(!$player->checkInventory($jutsu_id, 'jutsu')) {
 					throw new Exception("Invalid jutsu!");
@@ -101,13 +95,10 @@ function training() {
 				if($player->jutsu[$jutsu_id]->level >= 100) {
 					throw new Exception("You cannot train this jutsu any further!");
 				}
-				$train_type = 'jutsu:' . strtolower(str_replace(' ', '_', $player->jutsu[$jutsu_id]->name));
+				$train_type = 'jutsu:' . System::slug($player->jutsu[$jutsu_id]->name);
 				$train_type = $system->clean($train_type);
 				$train_gain = $jutsu_id;
 				$train_length = 600 + (60 * round(pow($player->jutsu[$jutsu_id]->level, 1.1)));
-				if($player->user_id == 190) {
-					$train_length = 5;	
-				}
 			}
 			else {
 				throw new Exception("Invalid training type!");

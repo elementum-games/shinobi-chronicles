@@ -178,7 +178,7 @@ function displayFormFields($variables, $data, $input_name_prefix = ''): bool {
             if(isset($variable['count'])) {
                 echo "<label for='{$var_name}'>" . ucwords(str_replace("_", " ", $var_name)) . ":</label>" .
                     (isset($variable['num_required']) ? "<i>(" . $variable['num_required'] . " required)</i>" : "") .
-                    "<div style='margin-left:20px;margin-top:0px;'>";
+                    "<div style='margin-left:20px;margin-top:0;'>";
                 $data_vars = json_decode($data[$var_name], true);
                 for($i = 0; $i < $variable['count']; $i++) {
                     $name = $var_name . '[' . $i . ']';

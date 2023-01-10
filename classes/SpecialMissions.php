@@ -61,7 +61,7 @@ class SpecialMission {
 
     Nightmare (14% intel gain, ~7 encounters): 1:27 -> 2:47
     */
-    const EVENT_DURATION_MS = 1150;
+    const EVENT_DURATION_MS = 1000;
 
     const EVENT_START = 'start';
     const EVENT_MOVE_X = 'move_x';

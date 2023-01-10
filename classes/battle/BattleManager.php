@@ -253,9 +253,9 @@ class BattleManager {
                         $player_jutsu = $this->getJutsuFromHandSeals($this->player, $_POST['hand_seals']);
 
                         // Layered genjutsu check
-                        if($player_jutsu && $player_jutsu->jutsu_type == Jutsu::TYPE_GENJUTSU && !empty($player_jutsu->parent_jutsu)) {
-                            // $this->effects->assertParentGenjutsuActive($this->player, $player_jutsu);
-                        }
+                        /*if($player_jutsu && $player_jutsu->jutsu_type == Jutsu::TYPE_GENJUTSU && !empty($player_jutsu->parent_jutsu)) {
+                            $this->effects->assertParentGenjutsuActive($this->player, $player_jutsu);
+                        }*/
                     }
 
                     // Check jutsu ID if taijutsu
@@ -338,9 +338,8 @@ class BattleManager {
 
     /**
      * @throws Exception
-     * @noinspection PhpUnusedLocalVariableInspection
      */
-    public function renderBattle() {
+    public function renderBattle(): void {
         global $self_link;
 
         if($this->player === $this->battle->player1) {
@@ -877,25 +876,19 @@ class BattleManager {
                 $player_diffuse_percent = 0;
             }
             else {
-                $player_diffuse_percent = round(
-                    $player_damage / $opponent_damage * ($player_jutsu->weapon_effect->effect_amount / 100),
-                    1
-                );
+                $player_diffuse_percent = round($player_jutsu->weapon_effect->effect_amount / 100, 2);
 
                 if($player_diffuse_percent > Battle::MAX_DIFFUSE_PERCENT) {
                     $player_diffuse_percent = Battle::MAX_DIFFUSE_PERCENT;
                 }
             }
         }
-        if($opponent_jutsu->weapon_id && $opponent_jutsu->weapon_effect->effect == 'diffuse' &&  $player_jutsu->jutsu_type == Jutsu::TYPE_NINJUTSU) {
+        if($opponent_jutsu->weapon_id && $opponent_jutsu->weapon_effect->effect == 'diffuse' && $player_jutsu->jutsu_type == Jutsu::TYPE_NINJUTSU) {
             if($player_damage <= 0){
                 $opponent_diffuse_percent = 0;
             }
             else {
-                $opponent_diffuse_percent = round(
-                    $opponent_damage / $player_damage * ($opponent_jutsu->weapon_effect->effect_amount / 100),
-                    1
-                );
+                $opponent_diffuse_percent = round($opponent_jutsu->weapon_effect->effect_amount / 100, 2);
             }
 
             if($opponent_diffuse_percent > Battle::MAX_DIFFUSE_PERCENT) {
@@ -943,9 +936,9 @@ class BattleManager {
             echo "Player2({$player2->getName()}): {$player2->speed} ({$player2->speed_boost} - {$player2->speed_nerf})<br />";
         }
 
-        // Ratios for damage reduction
-        $speed_ratio = 0.8;
-        $cast_speed_ratio = 0.8;
+        // Ratios for damage reduction (% more speed = % damage redution)
+        $speed_ratio = 0.65;
+        $cast_speed_ratio = 0.65;
         $max_damage_reduction = 0.5;
         if($player_jutsu->jutsu_type == Jutsu::TYPE_NINJUTSU) {
             // Nin vs Nin

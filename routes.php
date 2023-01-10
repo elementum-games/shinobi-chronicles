@@ -25,14 +25,14 @@ $pages = [
         'menu' => System::MENU_USER,
     ],
     4 => [
-        'file_name' => 'equip.php',
+        'file_name' => 'jutsu.php',
         'title' => 'Jutsu',
         'function_name' => 'jutsu',
         'battle_ok' => false,
         'menu' => System::MENU_USER,
     ],
     5 => [
-        'file_name' => 'equip.php',
+        'file_name' => 'gear.php',
         'title' => 'Gear',
         'function_name' => 'gear',
         'battle_ok' => false,

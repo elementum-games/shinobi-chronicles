@@ -473,11 +473,12 @@ return [
             'image' => "<img src='./images/memes/sokkatribe.gif' />",
             'text' => ':Guess Sokka will die too:',
             'public' => true,
+
     ],  
      [
             'code' => ':holdup:',
             'image' => "<img src='./images/memes/holdup.png' />",
             'text' => ':hold up:',
-            'public' => true,
-    ],      
+            'public' => true,    
+    ],   
 ];
