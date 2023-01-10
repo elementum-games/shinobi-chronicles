@@ -160,6 +160,8 @@ function chat() {
 			echo "<script type='text/javascript'>
 			var refreshID;
 			$(document).ready(function(){
+				const system_message =  document.querySelector('div');
+				div.classList.remove('socialPosts'); //quick fix - removes system messages from appearing twice on social chat page
 				refreshID = setInterval('javascript:$(\'#socialPosts\').load(\'$self_link&request_type=ajax\');', 3000);
 			});
 			</script>";

@@ -409,12 +409,14 @@ p {
 }
 
 .systemMessage {
-	position: absolute;
-	margin: 0;
-	width: 670px;
-	
-	left: 0;
-	top: 24px;
+	/* position: absolute; */
+	margin: 10px 15px;
+	padding: 20px 0;
+
+	background-color: rgb(55, 47, 38);
+
+	border: solid rgba(20, 20, 20) 1px;
+	border-radius: 5px;
 	
 	z-index: 50;
 	
@@ -423,6 +425,9 @@ p {
 	font-size: 14px;
 	text-align: center;
 	color: #3ec03e;
+}
+.systemMessage p{
+	margin: 0;
 }
 .trainingNotification {
 	width: 215px;
