@@ -53,7 +53,7 @@ class TestFighter extends Fighter {
 
 }
 
-function fighterFromData(array $fighter_data) {
+function fighterFromData(array $fighter_data, string $name): TestFighter {
     global $system;
     global $rankManager;
 
@@ -61,7 +61,7 @@ function fighterFromData(array $fighter_data) {
     $fighter->rank = 3;
     $fighter->health = 1000000;
     $fighter->max_health = 1000000;
-    $fighter->name = "Player 1";
+    $fighter->name = $name;
     $fighter->system = $system;
     $fighter->ninjutsu_skill = (int)$fighter_data['ninjutsu_skill'];
     $fighter->taijutsu_skill = (int)$fighter_data['taijutsu_skill'];
@@ -124,14 +124,21 @@ function calcDamage(Fighter $player1, Fighter $player2, Jutsu $player1_jutsu, Ju
     $player2_raw_damage = $player2->calcDamage($player2_jutsu, true);
 
     // Collision
-    $battle_id = Battle::start($system, $player1, $player2, Battle::TYPE_SPAR);
+    $battle_id = Battle::start(
+        system: $system,
+        player1: $player1,
+        player2: $player2,
+        battle_type: Battle::TYPE_SPAR
+    );
     $battle = new BattleManager($system, $user, $battle_id, true, false);
 
-
     $collision_text = $battle->jutsuCollision(
-        $player1, $player2,
-        $player1_raw_damage, $player2_raw_damage,
-        $player1_jutsu, $player2_jutsu
+        player1: $player1,
+        player2: $player2,
+        player_damage: $player1_raw_damage,
+        opponent_damage: $player2_raw_damage,
+        player_jutsu: $player1_jutsu,
+        opponent_jutsu: $player2_jutsu
     );
 
     $system->query("DELETE FROM battles WHERE `battle_id`={$battle_id}");
@@ -143,7 +150,7 @@ function calcDamage(Fighter $player1, Fighter $player2, Jutsu $player1_jutsu, Ju
     $player2_damage = $player1->calcDamageTaken($player2_collision_damage, $player2_jutsu->jutsu_type);
 
     // Display
-    $damages = [
+    return [
         'player1' => [
             'raw_damage' => $player1_raw_damage,
             'collision_damage' => $player1_collision_damage,
@@ -156,7 +163,6 @@ function calcDamage(Fighter $player1, Fighter $player2, Jutsu $player1_jutsu, Ju
         ],
         'collision_text' => $collision_text,
     ];
-    return $damages;
 }
 
 /** @var string[] $bloodline_combat_boosts */
@@ -208,7 +214,7 @@ if(isset($_POST['run_simulation']) && $mode == 'vs') {
             throw new Exception("Invalid jutsu type for player 2!");
         }
 
-        $player1 = fighterFromData($player1_data);
+        $player1 = fighterFromData($player1_data, "Player 1");
         $player1_jutsu = new Jutsu(
             1,
             'p1j',
@@ -231,7 +237,7 @@ if(isset($_POST['run_simulation']) && $mode == 'vs') {
         );
         $player1_jutsu->setLevel(50, 0);
 
-        $player2 = fighterFromData($player2_data);
+        $player2 = fighterFromData($player2_data, "Player 2");
         $player2_jutsu = new Jutsu(
             1,
             'p1j',
