@@ -699,6 +699,8 @@ function modPanel() {
 							<option value='3'>3 days</option>
 							<option value='7'>1 week</option>
 							<option value='30'>1 month</option>
+							<option value='90'>3 months</option>
+							<option value='365'>1 year</option>
 						</select>
 				</p>
 				</div>
@@ -734,7 +736,8 @@ function modPanel() {
 				<input type='submit' name='profile_ban' />
 			</p>
 			</form>
-		</td></tr>";	
+		</td></tr>";
+
 		// View record
 		echo "<tr><th colspan='2'>View Record</th></tr>
 		<tr><td colspan='2' style='text-align:center;'>
@@ -745,7 +748,8 @@ function modPanel() {
 			<input type='submit' value='View' />
 		</form>
 		</td></tr>";
-		echo "</table>";	
+		echo "</table>";
+
 		// HM actions
 		if($player->isHeadModerator()) {
 			echo "<br />
@@ -825,6 +829,7 @@ function modPanel() {
 			</td></tr>";
 			echo "</table>";
 		}
+
 		// Global message
 		// Rules/manual edit
 		// View locked out accounts / links to unlock

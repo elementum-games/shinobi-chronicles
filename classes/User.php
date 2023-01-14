@@ -288,6 +288,9 @@ class User extends Fighter {
         Update (1 = regen, 2 = training)
     */
 
+    /**
+     * @throws Exception
+     */
     public function loadData($UPDATE = User::UPDATE_FULL, $remote_view = false): string {
         $result = $this->system->query("SELECT * FROM `users` WHERE `user_id`='$this->user_id' LIMIT 1");
         $user_data = $this->system->db_fetch($result);
@@ -601,7 +604,11 @@ class User extends Fighter {
 
         // Bloodline
         if($this->bloodline_id) {
-            $this->bloodline = new Bloodline($this->bloodline_id, $this->user_id);
+            $this->bloodline = Bloodline::loadFromId(
+                system: $this->system,
+                bloodline_id: $this->bloodline_id,
+                user_id: $this->user_id
+            );
 
             // Debug info
             if($this->system->debug['bloodline']) {

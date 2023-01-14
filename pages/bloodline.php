@@ -3,6 +3,9 @@
 	Author:		Levi Meahan
 	Created:	04/10/2014
 */
+/**
+ * @throws Exception
+ */
 function bloodline() {
 	global $system;
 	/** @var User */
@@ -14,7 +17,7 @@ function bloodline() {
 		$system->printMessage();
 		return false;
 	}
-	$base_bloodline = new Bloodline($player->bloodline_id);
+	$base_bloodline = Bloodline::loadFromId($system, $player->bloodline_id);
 	$player->getInventory();
 
     require_once "profile.php";
@@ -170,6 +173,7 @@ function bloodline() {
 		<div style='margin-left:2em;margin-top:7px;'>";
 		foreach($player->bloodline->combat_boosts as $boost) {
 			$replace_array = array($bloodline_skill, $boost['power'], $boost['effect_amount'], 0);
+
 			if(isset($boosts[$boost['effect']]['ratio_multiplier'])) {
 				$replace_array[1] *= $boosts[$boost['effect']]['ratio_multiplier'];
 			}
@@ -177,29 +181,29 @@ function bloodline() {
 				$replace_array[2] *= $boosts[$boost['effect']]['amount_multiplier'];
 			}
 			$replace_array[2] = round($replace_array[2], 2);
+
 			switch($boost['effect']) {
 				case 'ninjutsu_boost':
-					$replace_array[3] = round($boost['effect_amount'] / (35 + $player->ninjutsu_skill * 0.10), 2) * 100;
+                    $player_offense = Fighter::BASE_OFFENSE + ($player->ninjutsu_skill * Fighter::SKILL_OFFENSE_RATIO);
+					$replace_array[3] = round($boost['effect_amount'] / $player_offense, 2) * 100;
 					break;
 				case 'taijutsu_boost':
-					$replace_array[3] = round($boost['effect_amount'] / (35 + $player->taijutsu_skill * 0.10), 2) * 100;
+                    $player_offense = Fighter::BASE_OFFENSE + ($player->taijutsu_skill * Fighter::SKILL_OFFENSE_RATIO);
+                    $replace_array[3] = round($boost['effect_amount'] / $player_offense, 2) * 100;
 					break;
 				case 'genjutsu_boost':
-					$replace_array[3] = round($boost['effect_amount'] / (35 + $player->genjutsu_skill * 0.10), 2) * 100;
+                    $player_offense = Fighter::BASE_OFFENSE + ($player->genjutsu_skill * Fighter::SKILL_OFFENSE_RATIO);
+                    $replace_array[3] = round($boost['effect_amount'] / $player_offense, 2) * 100;
 					break;
-				case 'ninjutsu_resist':
-					$replace_array[2] = round(($boost['effect_amount'] * 35) /
-					(50 + $player->ninjutsu_skill * 0.02), 2);
+                case 'taijutsu_resist':
+                case 'genjutsu_resist':
+                case 'ninjutsu_resist':
+					$replace_array[2] = round(
+                        ($boost['effect_amount'] * Fighter::BLOODLINE_DEFENSE_MULTIPLIER) / Fighter::BASE_DEFENSE,
+                        2
+                    );
 					break;
-				case 'taijutsu_resist':
-					$replace_array[2] = round(($boost['effect_amount'] * 35) /
-					(50 + $player->taijutsu_skill * 0.02), 2);
-					break;
-				case 'genjutsu_resist':
-					$replace_array[2] = round(($boost['effect_amount'] * 35) /
-					(50 + $player->genjutsu_skill * 0.02), 2);
-					break;
-			}
+            }
 			echo "<label style='width:9em;'>" . ucwords(str_replace('_', ' ', $boost['effect'])) . ":</label>" .
 				str_replace($search_array, $replace_array, $boosts[$boost['effect']]['text']) . "<br />";
 		}
@@ -230,8 +234,8 @@ function bloodline() {
 			<label style='width:6.5em;'>Exp:</label>" . $jutsu->exp . "<br />";
 			echo "<br /><br />";
 			echo "<label style='width:6.5em;float:left;'>Description:</label>
-			<p style='display:inline-block;width:37.1em;margin:0px;'>" . $jutsu->description . "</p>
-			<br style='margin:0px;clear:both;' />";
+			<p style='display:inline-block;width:37.1em;margin:0;'>" . $jutsu->description . "</p>
+			<br style='margin:0;clear:both;' />";
 			
 		}
 		echo "</div>";
@@ -257,11 +261,11 @@ function bloodline() {
 					}
 					echo "<label style='width:6.5em;'>Use cost:</label>" . $jutsu->use_cost . "<br />
 					<label style='width:6.5em;float:left;'>Description:</label> 
-						<p style='display:inline-block;margin:0px;width:37.1em;'>" . $jutsu->description . "</p>
+						<p style='display:inline-block;margin:0;width:37.1em;'>" . $jutsu->description . "</p>
 					<br style='clear:both;' />
 				<label style='width:6.5em;'>Jutsu type:</label>" . ucwords($jutsu->jutsu_type) . "<br />
 				</div>
-				<p style='text-align:right;margin:0px;'><a href='$self_link&learn_jutsu=$id'>Learn</a></p>
+				<p style='text-align:right;margin:0;'><a href='$self_link&learn_jutsu=$id'>Learn</a></p>
 			</td></tr>";
 		}
 	}

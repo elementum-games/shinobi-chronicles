@@ -466,12 +466,11 @@ class System {
     */
     public function explicitLanguageCheck($string): bool {
         foreach(self::$banned_words as $word) {
-            if(strpos(strtolower($string), $word) !== false) {
+            if(str_contains(strtolower($string), $word)) {
                 return true;
             }
         }
         return false;
-
     }
 
     /**

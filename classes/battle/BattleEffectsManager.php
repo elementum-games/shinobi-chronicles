@@ -81,10 +81,12 @@ class BattleEffectsManager {
                 break;
             case 'speed_boost':
             case 'cast_speed_boost':
+            case 'speed_nerf':
+            case 'cast_speed_nerf':
+                // No changes needed to base number, calculated in applyPassiveEffects
+                break;
             case 'intelligence_boost':
             case 'willpower_boost':
-            case 'cast_speed_nerf':
-            case 'speed_nerf':
             case 'intelligence_nerf':
             case 'willpower_nerf':
                 $jutsu->effect_amount = round($debuff_power * ($jutsu->effect_amount / 100), 2);
@@ -207,10 +209,10 @@ class BattleEffectsManager {
             $target->genjutsu_boost += $effect->effect_amount;
         }
         else if($effect->effect == 'cast_speed_boost') {
-            $target->cast_speed_boost += $effect->effect_amount;
+            $target->cast_speed_boost += $target->cast_speed * ($effect->effect_amount / 100);
         }
         else if($effect->effect == 'speed_boost' or $effect->effect == 'lighten') {
-            $target->speed_boost += $effect->effect_amount;
+            $target->speed_boost += $target->speed * ($effect->effect_amount / 100);
         }
         else if($effect->effect == 'intelligence_boost') {
             $target->intelligence_boost += $effect->effect_amount;
@@ -247,10 +249,10 @@ class BattleEffectsManager {
             $target->genjutsu_nerf += $effect_amount;
         }
         else if($effect->effect == 'cast_speed_nerf') {
-            $target->cast_speed_nerf += $effect_amount;
+            $target->cast_speed_nerf += $target->cast_speed * ($effect_amount / 100);
         }
         else if($effect->effect == 'speed_nerf' or $effect->effect == 'cripple') {
-            $target->speed_nerf += $effect_amount;
+            $target->speed_nerf += $target->speed * ($effect_amount / 100);
         }
         else if($effect->effect == 'intelligence_nerf' or $effect->effect == 'daze') {
             $target->intelligence_nerf += $effect_amount;
@@ -490,6 +492,12 @@ class BattleEffectsManager {
                 break;
             case 'genjutsu_boost':
                 $announcement_text = "[player]'s Genjutsu offense is being increased";
+                break;
+            case 'speed_boost':
+                $announcement_text = "[player]'s Speed is being increased";
+                break;
+            case 'cast_speed_boost':
+                $announcement_text = "[player]'s Cast Speed is being increased";
                 break;
             default:
                 break;

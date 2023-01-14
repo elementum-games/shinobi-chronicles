@@ -207,7 +207,6 @@ function premium() {
 	}
 
 	// Gender change
-
 	else if(isset($_POST['change_gender'])) {
 		try {
 			$new_gender = $_POST['new_gender'];
@@ -255,9 +254,6 @@ function premium() {
 		$system->message($e->getMessage());
 		}
 	}
-
-
-
 	else if(isset($_POST['stat_reset'])) {
 
 		try {
