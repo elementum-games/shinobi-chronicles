@@ -509,18 +509,24 @@ function premium() {
 			$player->subtractPremiumCredits($cost, "Purchased {$seal_length} days of level $seal_level forbidden seal");
 
 			// Extend
-			if($player->forbidden_seal && $player->forbidden_seal['level'] == $seal_level) {
-				$player->forbidden_seal['time'] += $seal_length * 86400;
+			if($player->forbidden_seal_loaded && $player->forbidden_seal->level == $seal_level) {
+				$player->forbidden_seal->addSeal($seal_level, $seal_length);
 				$system->message("Seal extended!");
 			}
+            // Overwrite seal
+            if($player->forbidden_seal_loaded) {
+                // Confirm change in seal... time will not be reimbursed
+                if(!isset($_POST['confirm_seal_overwrite'])) {
+                    require_once ('templates/overwriteSealConfirmation.php');
+                }
+                else {
+                    $player->forbidden_seal->addSeal($seal_level, $seal_length);
+                    $system->message("You changed your seal!");
+                }
+            }
 			// Purchase new
 			else {
-				$forbidden_seal = array(
-					'level' => $seal_level,
-					'time' => time() + ($seal_length * 86400),
-					'color' => 'blue'
-				);
-				$player->forbidden_seal = $forbidden_seal;
+				$player->forbidden_seal = new ForbiddenSeal($system, $seal_level, $seal_length*86400);
 				$system->message("Seal infused!");
 			}
 		} catch (Exception $e) {
@@ -530,6 +536,13 @@ function premium() {
 	}
 	else if(isset($_POST['change_color']) && $player->canChangeChatColor()) {
 		$color = $system->clean($_POST['name_color']);
+
+        // Premium effect
+        $chat_effect = (isset($_POST['chat_effect']) ? $system->clean($_POST['chat_effect']) : "");
+
+        if($player->premium_credits_purchased && in_array($chat_effect, ["", "sparkles"])) {
+            $player->chat_effect = $chat_effect;
+        }
 		switch($color) {
 			case 'blue':
 			case 'pink':
@@ -538,7 +551,7 @@ function premium() {
 				$system->message("Color changed!");
 				break;
 			case 'gold':
-				if(!$player->premium_credits_purchased) {
+				if(!$player->premium_credits_purchased && !$player->isHeadAdmin()) {
 					$system->message("Invalid color!");
 					break;
 				}
@@ -977,7 +990,6 @@ function premium() {
     }
 
     $name_colors = $player->getNameColors();
-    $premium_benefits = System::$premium_benefits;
 
     // Buying shards
     if($system->environment == System::ENVIRONMENT_DEV) {
@@ -989,6 +1001,13 @@ function premium() {
         $paypal_business_id = 'lsmjudoka05@yahoo.com';
     }
     $paypal_listener_url = $system->link . 'paypal_listener.php';
+
+    //Load premium seals
+    $baseDisplay = ForbiddenSeal::$benefits[0];
+    $twinSeal = new ForbiddenSeal($system, 1);
+    $twinSeal->setBenefits();
+    $fourDragonSeal = new ForbiddenSeal($system, 2);
+    $fourDragonSeal->setBenefits();
 
     require "templates/premium.php";
     return true;

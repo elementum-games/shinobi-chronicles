@@ -28,13 +28,11 @@ function chat() {
 	// Validate post and submit to DB
     $chat_max_post_length = System::CHAT_MAX_POST_LENGTH;
     //Increase chat length limit for seal users & staff members
-    if($player->forbidden_seal || $player->staff_level) {
-        if($player->staff_level) {
-            $chat_max_post_length = System::$premium_benefits[2]['chat_post_size'];
-        }
-        else {
-            $chat_max_post_length = System::$premium_benefits[$player->forbidden_seal['level']]['chat_post_size'];
-        }
+    if($player->staff_level && !$player->forbidden_seal instanceof ForbiddenSeal) {
+        $chat_max_post_length = ForbiddenSeal::$benefits[ForbiddenSeal::$STAFF_SEAL_LEVEL]['chat_post_size'];
+    }
+    if($player->forbidden_seal_loaded && $player->forbidden_seal->level != 0) {
+        $chat_max_post_length = $player->forbidden_seal->chat_post_size;
     }
 
 	if(isset($_POST['post'])) {
@@ -185,12 +183,12 @@ function chat() {
 			echo "<tr><td colspan='2' style='text-align:center;'>No posts!</td></tr>";
 		}
 		while($post = $system->db_fetch($result)) {
-			$user_result = $system->query("SELECT `premium_credits_purchased`, `avatar_link` FROM `users`
+			$user_result = $system->query("SELECT `premium_credits_purchased`, `chat_effect`, `avatar_link` FROM `users`
                 WHERE `user_name` = '{$system->clean($post['user_name'])}'");
 			$userData = $system->db_fetch($user_result);
 
             $statusType = "userLink ";
-            $statusType .= ($userData['premium_credits_purchased']) ? "premiumUser" : "";
+            $statusType .= ($userData['premium_credits_purchased'] && $userData['chat_effect'] == 'sparkles') ? "premiumUser" : "";
             $class = "chat ";
             if(isset($post['user_color'])) {
                 $class .= $post['user_color'];

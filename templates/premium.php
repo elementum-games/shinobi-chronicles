@@ -2,12 +2,14 @@
 /**
  * @var System $system
  * @var User   $player
+ * @var ForbiddenSeal $twinSeal
+ * @var ForbiddenSeal $fourDragonSeal
  * @var string $self_link
  * @var string $view
  * @var array  $costs
  * @var array  $available_clans
  * @var array $name_colors
- * @var array $premium_benefits
+ * @var array $baseDisplay;
  * @var int $kunai_per_dollar
  * @var int $stat_transfer_points_per_min
  * @var string $paypal_url
@@ -361,9 +363,9 @@
                 <br/>
 
                 <b>Your Forbidden Seal</b><br/>
-                <?php if(isset($player->forbidden_seal['level'])): ?>
-                    <?= System::$forbidden_seals[$player->forbidden_seal['level']] ?><br/>
-                    <?= $system->time_remaining($player->forbidden_seal['time'] - time()) ?>
+                <?php if($player->forbidden_seal_loaded): ?>
+                    <?= $player->forbidden_seal->name ?><br/>
+                    <?= $system->time_remaining($player->forbidden_seal->seal_time_remaining) ?>
                     <br />
                 <?php else: ?>
                     None<br />
@@ -378,6 +380,12 @@
                             <span class='<?= $class ?>' style='font-weight:bold;'><?= ucwords($name_color) ?></span>
                         <?php endforeach; ?>
                         <br />
+                        <?php if($player->premium_credits_purchased):?>
+                            <b>Toggle Chat Effect (sparkles on name)</b><br />
+                            <input type="radio" name="chat_effect" value="" <?= ($player->chat_effect == "" ? "checked='checked'" : "") ?> />Off
+                            <input type="radio" name="chat_effect" value="sparkles" <?= ($player->chat_effect == "sparkles" ? "checked='checked'" : "") ?> />On
+                        <?php endif ?>
+                        <br />
                         <input type='submit' name='change_color' value='Change Name Color'/>
                     </form>
                 <?php else: ?>
@@ -386,24 +394,24 @@
             </td>
         </tr>
         <tr>
-            <th id='premium_twinSparrowSeal_header'><?=System::$forbidden_seals[1]?></th>
-            <th id='premium_fourDragonSeal_header'><?=System::$forbidden_seals[2]?></th>
+            <th id='premium_twinSparrowSeal_header'><?=ForbiddenSeal::$forbidden_seals[1]?></th>
+            <th id='premium_fourDragonSeal_header'><?=ForbiddenSeal::$forbidden_seals[2]?></th>
         </tr>
         <tr>
             <td id='premium_twinSparrowSeal_data' style='width:50%;vertical-align:top;'>
                 <p style='font-weight:bold;text-align:center;'>
                     <?= $costs['forbidden_seal'][1] ?> Ancient Kunai / 30 days</p>
                 <br/>
-                +<?=$premium_benefits[1]['regen_boost']?>% regen rate<br/>
-                <?=$premium_benefits[1]['name_color_display']?> username color in chat<br/>
-                Larger avatar (<?=$premium_benefits[0]['avatar_size_display']?> -> <?=$premium_benefits[1]['avatar_size_display']?>)<br/>
-                Longer logout timer (<?=$premium_benefits[0]['logout_timer']?> -> <?=$premium_benefits[1]['logout_timer']?>
+                +<?=$twinSeal->regen_boost?>% regen rate<br/>
+                <?=$twinSeal->name_color_display?> username color in chat<br/>
+                Larger avatar (<?=$baseDisplay['avatar_size_display']?> -> <?=$twinSeal->avatar_size_display?>)<br/>
+                Longer logout timer (<?=$baseDisplay['logout_timer']?> -> <?=$twinSeal->logout_timer?>
                 minutes)<br/>
-                Larger inbox (<?=$premium_benefits[0]['inbox_size']?> -> <?=$premium_benefits[1]['inbox_size']?> messages)<br/>
-                Longer journal (<?=$premium_benefits[0]['journal_size']?> -> <?=$premium_benefits[1]['journal_size']?> characters)<br/>
-                Larger journal images (<?=$premium_benefits[0]['journal_image_display']?> -> <?=$premium_benefits[1]['journal_image_display']?>)<br/>
-                Longer chat posts (<?=$premium_benefits[0]['chat_post_size']?> -> <?=$premium_benefits[1]['chat_post_size']?> characters)<br/>
-                Longer PMs (<?=$premium_benefits[0]['pm_size']?> -> <?=$premium_benefits[1]['pm_size']?> characters)<br/>
+                Larger inbox (<?=$baseDisplay['inbox_size']?> -> <?=$twinSeal->inbox_size?> messages)<br/>
+                Longer journal (<?=$baseDisplay['journal_size']?> -> <?=$twinSeal->journal_size?> characters)<br/>
+                Larger journal images (<?=$baseDisplay['journal_image_display']?> -> <?=$twinSeal->journal_image_display?>)<br/>
+                Longer chat posts (<?=$baseDisplay['chat_post_size']?> -> <?=$twinSeal->chat_post_size?> characters)<br/>
+                Longer PMs (<?=$baseDisplay['pm_size']?> -> <?=$twinSeal->pm_size?> characters)<br/>
                 <form action='<?= $self_link ?>&view=forbidden_seal' method='post'>
                     <p style='width:100%;text-align:center;margin: 1em 0 0;'>
                         <input type='hidden' name='seal_level' value='1'/>
@@ -412,8 +420,8 @@
                             <option value='60'>60 days (<?= ($costs['forbidden_seal'][1] * 2) ?> AK)</option>
                             <option value='90'>90 days (<?= ($costs['forbidden_seal'][1] * 3) ?> AK)</option>
                         </select><br/>
-                        <input type='submit' name='forbidden_seal' value='<?= ($player->forbidden_seal &&
-                            $player->forbidden_seal['level'] == 1 ? 'Extend' : 'Purchase') ?>' />
+                        <input type='submit' name='forbidden_seal' value='<?= ($player->forbidden_seal_loaded &&
+                            $player->forbidden_seal->level == 1 ? 'Extend' : 'Purchase') ?>' />
                     </p>
                 </form>
             </td>
@@ -422,17 +430,15 @@
                     <?= $costs['forbidden_seal'][2] ?> Ancient Kunai / 30 days</p>
                 <br/>
                 All benefits of Twin Sparrow Seal<br/>
-                +<?=$premium_benefits[2]['regen_boost']?>% regen rate<br/>
-                +<?=$premium_benefits[2]['jutsu_equips']?> jutsu equip slots<br/>
-                +<?=$premium_benefits[2]['weapon_equips']?> weapon equip slots<br/>
-                +<?=$premium_benefits[2]['armor_equips']?> armor equip slots<br/>
-                Longer logout timer (<?=$premium_benefits[0]['logout_timer']?> -> <?=$premium_benefits[2]['logout_timer']?>
+                +<?=$fourDragonSeal->regen_boost?>% regen rate<br/>
+                +<?=$fourDragonSeal->extra_jutsu_equips?> jutsu equip slots<br/>
+                +<?=$fourDragonSeal->extra_weapon_equips?> weapon equip slots<br/>
+                +<?=$fourDragonSeal->extra_armor_equips?> armor equip slots<br/>
+                Longer logout timer (<?=$baseDisplay['logout_timer']?> -> <?=$fourDragonSeal->logout_timer?>
                 minutes)<br />
-                Longer journal (<?=$premium_benefits[0]['journal_size']?> -> <?=$premium_benefits[2]['journal_size']?> characters)<br/>
-                Enhanced long trainings (<?=$premium_benefits[2]['enhanced_long_training']['time']?>x length,
-                <?=$premium_benefits[2]['enhanced_long_training']['gains']?>x gains)<br/>
-                Enhanced extended trainings (<?=$premium_benefits[2]['enhanced_extended_training']['time']?>x length,
-                <?=$premium_benefits[2]['enhanced_extended_training']['gains']?>x gains)<br/>
+                Longer journal (<?=$baseDisplay['journal_size']?> -> <?=$fourDragonSeal->journal_size?> characters)<br/>
+                Enhanced long trainings (<?=$fourDragonSeal->long_training_time?>x length, <?=$fourDragonSeal->long_training_gains?>x gains)<br/>
+                Enhanced extended trainings (<?=$fourDragonSeal->extended_training_time?>x length, <?=$fourDragonSeal->extended_training_gains?>x gains)<br/>
                 <form action='<?= $self_link ?>&view=forbidden_seal' method='post'>
                     <p style='width:100%;text-align:center;margin: 2.2em 0 0;'>
                         <input type='hidden' name='seal_level' value='2'/>
@@ -441,8 +447,8 @@
                             <option value='60'>60 days (<?= ($costs['forbidden_seal'][2] * 2) ?> AK)</option>
                             <option value='90'>90 days (<?= ($costs['forbidden_seal'][2] * 3) ?> AK)</option>
                         </select><br/>
-                        <input type='submit' name='forbidden_seal' value='<?= ($player->forbidden_seal &&
-                            $player->forbidden_seal['level'] == 2 ? 'Extend' : 'Purchase') ?>' />
+                        <input type='submit' name='forbidden_seal' value='<?= ($player->forbidden_seal_loaded &&
+                            $player->forbidden_seal->level == 2 ? 'Extend' : 'Purchase') ?>' />
                     </p>
                 </form>
             </td>

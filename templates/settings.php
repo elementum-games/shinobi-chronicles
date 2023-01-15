@@ -2,6 +2,7 @@
 /**
  * @var System $system
  * @var User $player
+ * @var ForbiddenSeal $psuedoSeal
  *
  * @var string $self_link
  * @var string $journal
@@ -87,8 +88,12 @@
     <tr><th>Journal</th></tr>
     <tr>
         <td style='text-align:center;'>
-            <?php if(!$player->forbidden_seal): ?>
-                <i>(Images will be resized down to a max of 300x200)</i>
+            <?php if($player->staff_level && !$player->forbidden_seal_loaded): ?>
+                <i>(Images will be resized down to a max of <?=$psuedoSeal->journal_image_x?>x<?=$psuedoSeal->journal_image_y?>)</i>
+            <?php elseif($player->forbidden_seal_loaded && $player->forbidden_seal->level != 0): ?>
+                <i>(images will be resized down to a max of <?=$player->forbidden_seal->journal_image_x?>x<?=$player->forbidden_seal->journal_image_y?>)</i>
+            <?php else: ?>
+                <i>(images will be resized down to a max of 200x300)</i>
             <?php endif ?>
             <?php if(!$player->journal_ban):?>
                 <script type=text/javascript>

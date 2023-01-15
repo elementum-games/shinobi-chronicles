@@ -16,18 +16,13 @@ function userSettings() {
 	global $self_link;
 	$max_journal_length = 1000;
 	// Forbidden seal increase
-	if($player->forbidden_seal or $player->staff_level) {
-        if($player->staff_level) {
-            if($player->isHeadAdmin() || $player->isUserAdmin() || $player->isHeadModerator()) {
-                $max_journal_length = System::$premium_benefits[2]['journal_size'];
-            }
-            else {
-                $max_journal_length = System::$premium_benefits[1]['journal_size'];
-            }
-        }
-        else {
-            $max_journal_length = System::$premium_benefits[$player->forbidden_seal['level']]['journal_size'];
-        }
+    if($player->staff_level && !$player->forbidden_seal_loaded) {
+        $psuedoSeal = new ForbiddenSeal($system, ForbiddenSeal::$STAFF_SEAL_LEVEL);
+        $psuedoSeal->setBenefits();
+        $max_journal_length = $psuedoSeal->journal_size;
+    }
+	if($player->forbidden_seal_loaded && $player->forbidden_seal->level != 0) {
+        $max_journal_length = $player->forbidden_seal->journal_size;
 	}
 	
 	$layouts = array('shadow_ribbon', 'geisha', 'classic_blue', 'blue_scroll');
