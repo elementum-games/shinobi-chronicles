@@ -114,9 +114,22 @@ function runActiveMission() {
     // Check status/stage
     $mission_status = 1;
 
+    //Survival Mission State Controls
     if(!empty($_GET['retreat'])) {
         $player->battle_id = 0;
         $mission->nextStage($player->mission_stage['stage_id'] = 4);
+    }
+
+    $continue_mission = false;
+    if(!empty($_GET['continue']))
+    {
+        $continue_mission = boolval($_GET['continue']);
+    }
+    if ($player->mission_stage['round_complete'] && $continue_mission)
+    {
+        $player->mission_stage['round_complete'] = false;
+        $player->battle_id = 0;
+        $mission_status = $mission->nextStage($player->mission_stage['stage_id']);
     }
 
     if($mission_status < 2) {
@@ -154,18 +167,7 @@ function runActiveMission() {
                     return true;
                 }
                 else if($mission->mission_type == 5) {		//Survival Mission Combat
-                    $continue_mission = false;
-                    if(!empty($_GET['continue']))
-                    {
-                        $continue_mission = boolval($_GET['continue']);
-                    }
-                    if ($player->mission_stage['round_complete'] && $continue_mission)
-                    {
-                        $player->mission_stage['round_complete'] = false;
-                        $player->battle_id = 0;
-                        return true;
-                    }
-                    else if ($player->mission_stage['round_complete'] && !$continue_mission)
+                    if ($player->mission_stage['round_complete'] && !$continue_mission)
                     {
                         echo("<table class='table'><tr><th>Battle Results</th></tr>
                         <tr><td>You have defeated your enemy. Either turn back now or push on.
@@ -190,9 +192,7 @@ function runActiveMission() {
                         }
                         if ($player->location == $player->village_location) {
                             $player->mission_stage['stage_id'] = 4;
-                        }  
-                        
-                        $mission_status = $mission->nextStage($player->mission_stage['stage_id']);
+                        }
 
                         $player->mission_stage['ai_defeated']++;
                         $player->mission_stage['mission_money'] += $money_gain;
