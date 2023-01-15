@@ -1076,19 +1076,32 @@ function premiumCreditExchange() {
 			$offer = $system->db_fetch($result);
 
 			// Check user has enough money
-			if($player->money < $offer['money']) {
+			if($player->getMoney() < $offer['money']) {
 				throw new Exception("You do not have enough money!");
 			}
 
 			// Run purchase and log [NOTE: Updating first is to avoid as much server lag and possibility for glitching]
 			$system->query("UPDATE `premium_credit_exchange` SET `completed`='1' WHERE `id`='$id' LIMIT 1");
 
-			$player->money -= $offer['money'];
-			$player->premium_credits += $offer['premium_credits'];
+			$player->subtractMoney($offer['money'], "Purchased AK from exchange");
+			$player->premium_credits += $offer['premium_credits']; // TODO: addPremiumCredits
 			$player->updateData();
+
+            $result = $system->query("SELECT `money` FROM `users` WHERE `user_id`='{$offer['seller']}' LIMIT 1");
+            $seller_before_money = $system->db_fetch($result)[0] ?? null;
 
 			$system->query("UPDATE `users` SET `money`=`money` + {$offer['money']}
 				WHERE `user_id`='{$offer['seller']}'");
+
+            $system->currencyLog(
+                character_id: $offer['seller'],
+                currency_type: System::CURRENCY_TYPE_MONEY,
+                previous_balance: $seller_before_money,
+                new_balance: $seller_before_money + $offer['money'],
+                transaction_amount: $offer['money'],
+                transaction_description: "Sold AK on exchange"
+            );
+
 			$system->log("Kunai Exchange", "Completed Sale", "ID# {$offer['id']}; #{$offer['seller']} to #{$player->user_id} ($player->user_name) :: {$offer['premium_credits']} for &yen;{$offer['money']}");
 			$system->send_pm('Ancient Kunai Exchange', $offer['seller'], 'Transaction Complete', $player->user_name . " has purchased {$offer['premium_credits']} Ancient Kunai for &yen;{$offer['money']}.");
 			$system->message("Ancient Kunai purchased!");
@@ -1140,7 +1153,7 @@ function premiumCreditExchange() {
 	<tr>
 		<td colspan='4' style='text-align:center;'>
 			<div style='width:200px;margin-left:auto;margin-right:auto;text-align:left;'>
-			<b>Your money:</b> &yen;$player->money<br />
+			<b>Your money:</b> &yen;{$player->getMoney()}<br />
 			<b>Your Ancient Kunai:</b> $player->premium_credits
 			</div>
 			<br />

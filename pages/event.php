@@ -1,5 +1,8 @@
 <?php
 
+/**
+ * @throws Exception
+ */
 function event() {
     global $system;
 
@@ -33,7 +36,7 @@ function event() {
 
                 $amount = $player->rank * 1000;
 
-                $player->money += $amount;
+                $player->addMoney($amount, "Christmas event present");
                 $player->presents_claimed[] = 1227;
                 $player->updateData();
 
@@ -110,7 +113,7 @@ function event() {
 
                 $amount = $player->rank * 2000;
 
-                $player->money += $amount;
+                $player->addMoney($amount, "Christmas event present");
                 $player->presents_claimed[] = 1230;
                 $player->updateData();
 

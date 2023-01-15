@@ -89,6 +89,9 @@ function missions() {
 	return true;
 }
 
+/**
+ * @throws Exception
+ */
 function runActiveMission() {
     global $system;
     global $player;
@@ -256,7 +259,7 @@ function runActiveMission() {
         }
         // Team mission
         else if($mission->mission_type == 3) {
-            $player->money += $mission->money;
+            $player->addMoney($mission->money, "Team mission");
             $player->clearMission();
 
             $team_points = 2;
@@ -277,7 +280,7 @@ function runActiveMission() {
         }
         // Clan mission
         else if($mission->mission_type == 2) {
-            $player->money += $mission->money;
+            $player->addMoney($mission->money, "Clan mission");
             $player->clearMission();
             $player->last_ai = time();
 
@@ -323,7 +326,7 @@ function runActiveMission() {
                 $player->missions_completed[$mission->rank] = 1;
             }
 
-            $player->money += $mission->money;
+            $player->addMoney($mission->money, "Village mission complete");
             $player->clearMission();
             $player->last_ai = time();
 

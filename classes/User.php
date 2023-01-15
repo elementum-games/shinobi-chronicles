@@ -106,7 +106,7 @@ class User extends Fighter {
     public $train_gain;
     public $train_time;
 
-    public $money;
+    private int $money;
 
     public $pvp_wins;
     public $pvp_losses;
@@ -530,7 +530,7 @@ class User extends Fighter {
                 if(!$task->complete && $task->progress >= $task->amount) {
                     $task->progress = $task->amount;
                     $task->complete = true;
-                    $this->money += $task->reward;
+                    $this->addMoney($task->reward, "Completed daily task");
 
                     $this->system->message('You have completed ' . $task->name . ' and earned ¥' . $task->reward);
                 }
@@ -1117,6 +1117,43 @@ class User extends Fighter {
 
         return true;
     }
+
+    public function getMoney(): int {
+        return $this->money;
+    }
+
+    /**
+     * @throws Exception
+     */
+    private function setMoney(int $new_amount, string $description) {
+        $this->system->currencyLog(
+            $this->user_id,
+            System::CURRENCY_TYPE_MONEY,
+            $this->money,
+            $new_amount,
+            $new_amount - $this->money,
+            $description
+        );
+        $this->money = $new_amount;
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function addMoney(int $amount, string $description) {
+        $this->setMoney($this->money + $amount, $description);
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function subtractMoney(int $amount, string $description) {
+        if($this->money < $amount) {
+            throw new Exception("Not enough money!");
+        }
+        $this->setMoney($this->money - $amount, $description);
+    }
+
 
     /* function moteToVillage()
         moves user to village */
