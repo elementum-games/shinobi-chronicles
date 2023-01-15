@@ -5,7 +5,7 @@
 *
 **/
 
-function inbox() {
+function inbox(): void {
 	/*
 	-Create conversation with players (Individual and multiple)
 		- Send a new message instead of creating a convo if a convo already exists
@@ -29,12 +29,12 @@ function inbox() {
 }
 
 /**
- * @param class System $system
- * @param class User $player
+ * @param System $system
+ * @param User $player
  */
-function LoadConvoList($system, $player) {
+function LoadConvoList($system, $player): InboxAPIResponse {
 	$response = new InboxAPIResponse();
-	$inbox = new InboxUser($system, $player);
+	$inbox = new InboxManager($system, $player);
 	try {		
 		// error management
 		if ($system->message) {
@@ -51,18 +51,19 @@ function LoadConvoList($system, $player) {
 }
 
 /**
- * @param class System $system
- * @param class User $player
- * @param int $convo_id
+ * @param System $system
+ * @param User   $player
+ * @param int    $convo_id
+ * @return InboxAPIResponse
  */
-function ViewConvo($system, $player, $convo_id) {
-	try {
-		$response = new InboxAPIResponse();
-		$inbox = new InboxUser($system, $player);
+function ViewConvo(System $system, User $player, int|string $convo_id): InboxAPIResponse {
+    $response = new InboxAPIResponse();
+
+    try {
+		$inbox = new InboxManager($system, $player);
 
 		// check if the convo is a system message
 		if (in_array($convo_id, Inbox::SYSTEM_MESSAGE_CODES)) {
-
 			$requested_system = array_search($convo_id, Inbox::SYSTEM_MESSAGE_CODES);
 
 			$convo_data = Inbox::getSystemConvo($system, $requested_system);
@@ -109,14 +110,14 @@ function ViewConvo($system, $player, $convo_id) {
 }
 
 /**
- * @param class System $system
- * @param class User $player
- * @param int $convo_id
+ * @param System $system
+ * @param User   $player
+ * @param int    $convo_id
  * @param string $message
  */
-function SendMessage($system, $player, $convo_id, $message) {
+function SendMessage(System $system, User $player, int $convo_id, string $message): InboxAPIResponse {
 	$response = new InboxAPIResponse();
-	$inbox = new InboxUser($system, $player);
+	$inbox = new InboxManager($system, $player);
 	try {		
 		// check if the convo exists
 		$exists = Inbox::checkConvo($system, $convo_id);
@@ -133,7 +134,9 @@ function SendMessage($system, $player, $convo_id, $message) {
 		}
 		
 		// Check if the message is too thicc
-		$max_message_length = ($player->forbidden_seal || $player->staff_level) ? Inbox::MAX_MESSAGE_LENGTH_SEAL : Inbox::MAX_MESSAGE_LENGTH;
+		$max_message_length = ($player->forbidden_seal || $player->staff_level)
+            ? Inbox::MAX_MESSAGE_LENGTH_SEAL
+            : Inbox::MAX_MESSAGE_LENGTH;
 		if (strlen($message) > $max_message_length) {
 			$response->errors[] = 'Message exceeds ' . $max_message_length . ' characters';
 			return $response;
@@ -168,14 +171,14 @@ function SendMessage($system, $player, $convo_id, $message) {
 }
 
 /**
- * @param class System $system
- * @param class User $player
- * @param int $convo_id
+ * @param System $system
+ * @param User   $player
+ * @param int    $convo_id
  * @param string $new_title
  */
-function ChangeTitle($system, $player, $convo_id, $new_title) {
+function ChangeTitle(System $system, User $player, int $convo_id, string $new_title): InboxAPIResponse {
 	$response = new InboxAPIResponse();
-	$inbox = new InboxUser($system, $player);
+	$inbox = new InboxManager($system, $player);
 	try {
 		// check if the convo exists
 		$exists = Inbox::checkConvo($system, $convo_id);
@@ -215,14 +218,14 @@ function ChangeTitle($system, $player, $convo_id, $new_title) {
 }
 
 /**
- * @param class System $system
- * @param class User $player
- * @param int $convo_id
+ * @param System $system
+ * @param User   $player
+ * @param int    $convo_id
  * @param string $new_player
  */
-function AddPlayer($system, $player, $convo_id, $new_player) {
+function AddPlayer(System $system, User $player, int $convo_id, string $new_player): InboxAPIResponse {
 	$response = new InboxAPIResponse();
-	$inbox = new InboxUser($system, $player);
+	$inbox = new InboxManager($system, $player);
 	try {
 		// check if the convo exists
 		$exists = Inbox::checkConvo($system, $convo_id);
@@ -252,13 +255,13 @@ function AddPlayer($system, $player, $convo_id, $new_player) {
 		}
 
 		// check if the player is already in the convo
-		if (Inbox::checkIfUserInConvo($convo_members, $new_user_data['user_id'])) {
+		if (Inbox::checkIfUserInConvo($convo_members, $new_user_data->user_id)) {
 			$response->errors[] = $new_player . ' is already in this conversation';
 			return $response;
 		}
 
 		// get the blacklist for the new member
-		$convo_members[] = ['user_id' => $new_user_data['user_id'], 'blocked_ids' => $new_user_data['blocked_ids']];
+		$convo_members[] = $new_user_data;
 		// check each members blacklist
 		if (Inbox::checkBlacklist($convo_members)) {
 			$response->errors[] = 'Blacklist active';
@@ -266,8 +269,8 @@ function AddPlayer($system, $player, $convo_id, $new_player) {
 		}
 
 		// check if the new player is allowed more convos
-		$current_count = Inbox::conversationCountForUser($system, $new_user_data['user_id']);
-		$max_allowed = Inbox::maxConvosAllowed($new_user_data['forbidden_seal'], $new_user_data['staff_level']);
+		$current_count = Inbox::conversationCountForUser($system, $new_user_data->user_id);
+		$max_allowed = Inbox::maxConvosAllowed($new_user_data->forbidden_seal, $new_user_data->staff_level);
 		if ($current_count >= $max_allowed) {
 			$response->errors[] = $new_player . '\'s inbox is full';
 			return $response;
@@ -280,7 +283,7 @@ function AddPlayer($system, $player, $convo_id, $new_player) {
 		}
 
 		// add player
-		if (Inbox::addUserToConvo($system, $convo_id, $new_user_data['user_id'])) {
+		if (Inbox::addUserToConvo($system, $convo_id, $new_user_data->user_id)) {
 			$response->response_data[] = true;
 		} else {
 			$response->errors[] = 'Fatal error adding player';
@@ -294,14 +297,15 @@ function AddPlayer($system, $player, $convo_id, $new_player) {
 }
 
 /**
- * @param class System $system
- * @param class User $player
- * @param int $convo_id
- * @param string $new_player
+ * @param System $system
+ * @param User   $player
+ * @param int    $convo_id
+ * @param        $remove_player
+ * @return InboxAPIResponse
  */
-function RemovePlayer($system, $player, $convo_id, $remove_player) {
+function RemovePlayer($system, $player, $convo_id, $remove_player): InboxAPIResponse {
 	$response = new InboxAPIResponse();
-	$inbox = new InboxUser($system, $player);
+	$inbox = new InboxManager($system, $player);
 	try {
 		// check if the player exists
 		$remove_player_data = Inbox::getUserData($system, $remove_player);
@@ -309,32 +313,38 @@ function RemovePlayer($system, $player, $convo_id, $remove_player) {
 			$response->errors[] = 'This player does not exist';
 			return $response;
 		}
+
 		// check if the convo exists
 		$exists = Inbox::checkConvo($system, $convo_id);
 		if (!$exists) {
 			$response->errors[] = 'This conversation does not exist';
 			return $response;
 		}
+
 		// get the convo owner
 		$owner_id = Inbox::getConvoOwner($system, $convo_id);
+
 		// check if the player is not the convo owner
 		if ($player->user_id != $owner_id) {
 			$response->errors[] = 'You are not the owner of this conversation!';
 			return $response;
 		}
+
 		// check if the removed player is the owner
-		if ($owner_id == $remove_player_data['user_id']) {
+		if ($owner_id == $remove_player_data->user_id) {
 			$response->errors[] = 'You cannot remove the owner of this conversation!';
 			return $response;
 		}
+
 		// get all members in a convo
 		$convo_members = Inbox::getConvoMembers($system, $convo_id);
 		if (!$convo_members) {
 			$response->errors[] = 'No members in this conversation';
 			return $response;
 		}
+
 		// check if the player is already in the convo
-		if (!Inbox::checkIfUserInConvo($convo_members, $remove_player_data['user_id'])) {
+		if (!Inbox::checkIfUserInConvo($convo_members, $remove_player_data->user_id)) {
 			$response->errors[] = $remove_player_data . ' is not in this conversation!';
 			return $response;
 		}
@@ -353,7 +363,7 @@ function RemovePlayer($system, $player, $convo_id, $remove_player) {
 		}
 
 		// remove player from convo
-		if (Inbox::removePlayerFromConvo($system, $convo_id, $remove_player_data['user_id'])) {
+		if (Inbox::removePlayerFromConvo($system, $convo_id, $remove_player_data->user_id)) {
 			$response->response_data[] = 'Removed';
 		} else {
 			$response->errors[] = 'Fatal error removing player';
@@ -368,13 +378,13 @@ function RemovePlayer($system, $player, $convo_id, $remove_player) {
 }
 
 /**
- * @param class System $system
- * @param class User $player
+ * @param System $system
+ * @param User $player
  * @param int $convo_id
  */
-function LeaveConversation($system, $player, $convo_id) {
+function LeaveConversation($system, $player, $convo_id): InboxAPIResponse {
 	$response = new InboxAPIResponse();
-	$inbox = new InboxUser($system, $player);
+	$inbox = new InboxManager($system, $player);
 	try {
 		// check if the convo exists
 		$exists = Inbox::checkConvo($system, $convo_id);
@@ -403,7 +413,7 @@ function LeaveConversation($system, $player, $convo_id) {
 		// get the convo owner
 		$owner_id = Inbox::getConvoOwner($system, $convo_id);
 		// remove conversation
-		if ($inbox->LeaveConversation($convo_id, $owner_id, $convo_members)) {
+		if ($inbox->leaveConversation($convo_id, $owner_id, $convo_members)) {
 			$response->response_data[] = true;
 		} else {
 			$response->errors[] = 'Fatal error leaving the conversation';
@@ -417,15 +427,15 @@ function LeaveConversation($system, $player, $convo_id) {
 }
 
 /**
- * @param class System $system
- * @param class User $player
+ * @param System $system
+ * @param User $player
  * @param string $members
  * @param string? $title
  * @param string $message
  */
-function CreateNewConvo($system, $player, $members, $title, $message) {
+function CreateNewConvo($system, $player, $members, $title, $message): InboxAPIResponse {
 	$response = new InboxAPIResponse();
-	$inbox = new InboxUser($system, $player);
+	$inbox = new InboxManager($system, $player);
 	try {
 		// check if the message is too long or too short
 		if (!Inbox::checkMessageLength($message, $player->forbidden_seal, $player->staff_level)) {
@@ -459,10 +469,8 @@ function CreateNewConvo($system, $player, $members, $title, $message) {
 			}
 
             // check the count of active convos for a user
-            $player_data['convo_count'] = Inbox::conversationCountForUser($system, $player_data['user_id']);
-			$player_data['max_convos_allowed'] = Inbox::maxConvosAllowed($player_data['forbidden_seal'], $player_data['staff_level']);
-			if ($player_data['convo_count'] >= $player_data['max_convos_allowed']) {
-				$response->errors[] = $player_data['user_name'] . '\'s inbox is full!';
+			if ($player_data->getConvoCount($system) >= $player_data->max_convos_allowed) {
+				$response->errors[] = $player_data->user_name . '\'s inbox is full!';
 				return $response;
 			}
 			$all_player_data[] = $player_data;
@@ -483,14 +491,14 @@ function CreateNewConvo($system, $player, $members, $title, $message) {
 
 		// add users to the convo
 		foreach($all_player_data as $player_data) {
-			if (!Inbox::addUserToConvo($system, $convo_id, $player_data['user_id'])) {
-				$response->error[] = 'Fatal error add players to the conversation';
+			if (!Inbox::addUserToConvo($system, $convo_id, $player_data->user_id)) {
+				$response->errors[] = 'Fatal error add players to the conversation';
 				return $response;
 			}
 		}
 
 		// send the message
-		if (Inbox::SendMessage($system, $convo_id, $player->user_id, $message)) {
+		if (Inbox::sendMessage($system, $convo_id, $player->user_id, $message)) {
 			$response->response_data[] = 'Success';
 		} else {
 			$response->errors[] = 'Fatal error sending message!';
@@ -510,14 +518,14 @@ function CreateNewConvo($system, $player, $members, $title, $message) {
 }
 
 /**
- * @param class System $system
- * @param class User $player
+ * @param System $system
+ * @param User $player
  * @param int $convo_id
  * @param int $timestamp
  */
-function CheckForNewMessages($system, $player, $convo_id, $timestamp) {
+function CheckForNewMessages($system, $player, $convo_id, $timestamp): InboxAPIResponse {
 	$response = new InboxAPIResponse();
-	$inbox = new InboxUser($system, $player);
+	$inbox = new InboxManager($system, $player);
 	try {
 		
 		// check if the convo is a system message
@@ -568,14 +576,14 @@ function CheckForNewMessages($system, $player, $convo_id, $timestamp) {
 }
 
 /**
- * @param class System $system
- * @param class User $player
+ * @param System $system
+ * @param User $player
  * @param int $convo_id
  * @param int $oldest_message_id
  */
-function LoadNextPage($system, $player, $convo_id, $oldest_message_id) {
+function LoadNextPage($system, $player, $convo_id, $oldest_message_id): InboxAPIResponse {
 	$response = new InboxAPIResponse();
-	$inbox = new InboxUser($system, $player);
+	$inbox = new InboxManager($system, $player);
 	try {
 		// check if the convo exists
 		$exists = Inbox::checkConvo($system, $convo_id);
@@ -597,7 +605,13 @@ function LoadNextPage($system, $player, $convo_id, $oldest_message_id) {
 			return $response;
 		}
 		// get older messages
-		$response->response_data['older_messages'] = Inbox::getMessages($system, $player, $convo_id, 0, $oldest_message_id);
+		$response->response_data['older_messages'] = Inbox::getMessages(
+            system: $system,
+            user: $player,
+            convo_id: $convo_id,
+            timestamp: 0,
+            message_id: $oldest_message_id
+        );
 		if ($response->response_data['older_messages']) {
 			$response->response_data['older_messages'][0]['focusTarget'] = true;
 		}

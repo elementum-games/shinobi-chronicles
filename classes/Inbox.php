@@ -1,5 +1,7 @@
 <?php
 
+require_once __DIR__ . '/InboxUser.php';
+
 class Inbox {
 
 	const INBOX_SIZE = 50;
@@ -37,11 +39,11 @@ class Inbox {
     }
 
     /**
-     * @param class System $system
-     * @param int $message_id
+     * @param System $system
+     * @param int    $message_id
      * @return array db_fetch
      */
-    public static function getInfoFromMessageId($system, $message_id) {
+    public static function getInfoFromMessageId(System $system, int $message_id): array {
         $sql = "SELECT `convos_messages`.*, `users`.`user_name`, `users`.`staff_level`
                 FROM `convos_messages`
                 INNER JOIN `users`
@@ -52,10 +54,11 @@ class Inbox {
     }
 
     /**
+     * @param     $system
      * @param int $convo_id
-     * @return int convo_id
+     * @return int
      */
-    public static function checkConvo($system, $convo_id) {
+    public static function checkConvo($system, int $convo_id): int {
         $sql = "SELECT COUNT(`convo_id`) FROM `convos` WHERE `convo_id`='{$convo_id}' AND `active`=1";
         $result = $system->query($sql);
         $count = $result->fetch_row();
@@ -63,38 +66,52 @@ class Inbox {
     }
 
     /**
+     * @param System $system
      * @param string $user_name
-     * @return int user_id
+     * @return array|null
      */
-    public static function getUserData($system, $user_name) {
-        $sql = "SELECT `users`.`user_id`, `users`.`forbidden_seal`, `users`.`staff_level`, `blacklist`.`blocked_ids`
+    public static function getUserData(System $system, string $user_name): ?InboxUser {
+        $sql = "SELECT `users`.`user_id`, 
+                `users`.`user_name`,
+                `users`.`avatar_link`,
+               `users`.`forbidden_seal`, 
+               `users`.`staff_level`, 
+               `blacklist`.`blocked_ids`
                 FROM `users` 
                 INNER JOIN `blacklist`
                 ON `users`.`user_id`=`blacklist`.`user_id`
                 WHERE `users`.`user_name`='{$user_name}'";
         $result = $system->query($sql);
         if (!$system->db_last_num_rows) {
-            return false;
+            return null;
         }
-        $user = $system->db_fetch($result);
-        return $user;
+
+        $data = $system->db_fetch($result);
+
+        return new InboxUser(
+            user_id: $data['user_id'],
+            user_name: $data['user_name'],
+            avatar_link: $data['avatar_link'],
+            forbidden_seal: $data['forbidden_seal'] ? json_decode($data['forbidden_seal'], true) : null,
+            staff_level: $data['staff_level'],
+            blocked_ids: json_decode($data['blocked_ids'])
+        );
     }
 
     /**
-     * @param array $convo_members
+     * @param InboxUser[] $convo_members
      * @return boolean
      */
-    public static function checkBlacklist($convo_members) {
+    public static function checkBlacklist(array $convo_members): bool {
         $user_ids = [];
         foreach($convo_members as $member) {
-            $user_ids[$member['user_id']] = $member['user_id'];
+            $user_ids[$member->user_id] = $member->user_id;
         }
         foreach($convo_members as $member) {
-            $json = json_decode($member['blocked_ids'], true);
-            if (empty($json)) {
+            if (empty($member->blocked_ids)) {
                 continue;
             }
-            $comparison = array_intersect_key($user_ids, $json);
+            $comparison = array_intersect_key($user_ids, $member->blocked_ids);
             if ($comparison) {
                 return true;
             }
@@ -103,27 +120,27 @@ class Inbox {
     }
 
     /**
-     * @param array $owner_id
-     * @param str|NULL $title
-     * @return int convo_id
+     * @param System      $system
+     * @param int         $owner_id
+     * @param string|null $title
+     * @return int
      */
-    public static function createConversation($system, $owner_id, $title) {
-        $sql = "INSERT INTO `convos` (`owner_id`, `title`) VALUES ('{$owner_id}', '{$title}')";
-        $result = $system->query($sql);
+    public static function createConversation(System $system, int $owner_id, ?string $title): int {
+        $system->query("INSERT INTO `convos` (`owner_id`, `title`) VALUES ('{$owner_id}', '{$title}')");
         return $system->db_last_insert_id;
     }
 
     /**
      * @param int $convo_id
      * @param int $sender_id
-     * @param str $message
+     * @param string $message
      * @return int message_id
      */
-    public static function sendMessage($system, $convo_id, $sender_id, $message) {
+    public static function sendMessage($system, $convo_id, $sender_id, $message): int {
         $timestamp = time();
         $sql = "INSERT INTO `convos_messages` (`convo_id`, `sender_id`, `message`, `time`) 
                 VALUES ('{$convo_id}', '{$sender_id}', '{$message}', '{$timestamp}')";
-        $result = $system->query($sql);
+        $system->query($sql);
         return $system->db_last_insert_id;
     }
 
@@ -135,7 +152,7 @@ class Inbox {
      * @param string message
      * @return int insert_id
      */
-    public static function sendAlert($system, $type, $sender_id, $target_id, $message) {
+    public static function sendAlert($system, $type, $sender_id, $target_id, $message): int {
         $time = time();
         $sql = "INSERT INTO `convos_alerts` (`system_id`, `sender_id`, `target_id`, `message`, `time`)
                 VALUES ('{$type}', '{$sender_id}', '{$target_id}', '{$message}', '{$time}')";
@@ -148,7 +165,7 @@ class Inbox {
      * @param string $title
      * @return int last_affected_rows
      */
-    public static function updateTitle($system, $convo_id, $title) {
+    public static function updateTitle($system, $convo_id, $title): int {
         $sql = "UPDATE `convos` SET `title`='{$title}' WHERE `convo_id`='{$convo_id}'";
         $result = $system->query($sql);
         return $system->db_last_affected_rows;
@@ -159,7 +176,7 @@ class Inbox {
      * @param int $user_id
      * @return int entry_id
      */
-    public static function addUserToConvo($system, $convo_id, $user_id) {
+    public static function addUserToConvo($system, $convo_id, $user_id): int {
         $sql = "INSERT INTO `convos_users` (`convo_id`, `user_id`) 
                 VALUES ('{$convo_id}', '{$user_id}')";
         $result = $system->query($sql);
@@ -171,27 +188,26 @@ class Inbox {
      * @param int user_id
      * @return int last_affected_rows
      */
-    public static function removePlayerFromConvo($system, $convo_id, $user_id) {
-        $sql = "DELETE FROM `convos_users` WHERE `convo_id`='{$convo_id}' AND `user_id`='{$user_id}'";
-        $result = $system->query($sql);
-        return $system->db_last_affected_rows;
+    public static function removePlayerFromConvo($system, $convo_id, $user_id): bool {
+        $system->query("DELETE FROM `convos_users` WHERE `convo_id`='{$convo_id}' AND `user_id`='{$user_id}'");
+        return $system->db_last_affected_rows > 0;
     }
 
     /**
-     * @param int $convo_id
-     * @return int db_last_affected_rows
+     * @param System $system
+     * @param int    $convo_id
+     * @return bool whether delete succeeded or not
      */
-    public static function deleteConvo($system, $convo_id) {
-        $sql = "UPDATE `convos` SET `active`=0 WHERE `convo_id`='{$convo_id}'";
-        $result = $system->query($sql);
-        return $system->db_last_affected_rows;
+    public static function deleteConvo(System $system, int $convo_id): bool {
+        $system->query("UPDATE `convos` SET `active`=0 WHERE `convo_id`='{$convo_id}'");
+        return $system->db_last_affected_rows > 0;
     }
 
     /**
      * @param int $user_id
      * @return int $count
      */
-    public static function conversationCountForUser($system, $user_id) {
+    public static function conversationCountForUser($system, $user_id): int {
         $sql = "SELECT COUNT(`entry_id`) FROM `convos_users` WHERE `user_id`='{$user_id}'";
         $result = $system->query($sql);
         $count = $result->fetch_row();
@@ -203,7 +219,7 @@ class Inbox {
      * @param int $staff_level
      * @return int
      */
-    public static function maxConvosAllowed($forbidden_seal, $staff_level) {
+    public static function maxConvosAllowed($forbidden_seal, $staff_level): int {
         $max_size = self::INBOX_SIZE;
         if ($forbidden_seal) {
             $max_size = self::INBOX_SIZE_SEAL;
@@ -213,13 +229,13 @@ class Inbox {
         }
         return $max_size;
     }
-    
+
     /**
-     * @param string $title
-     * @param return boolean
+     * @param $title
+     * @return bool
      */
-    public static function checkTitleLength($title) {
-        return strlen($title) <= self::MAX_TITLE_LENGTH ? true : false;
+    public static function checkTitleLength($title): bool {
+        return strlen($title) <= self::MAX_TITLE_LENGTH;
     }
 
     /**
@@ -227,7 +243,7 @@ class Inbox {
      * @param int $staff_level
      * @return int MAX_MESSAGE_LENGTH
      */
-    public static function checkMaxMessageLength($forbidden_seal, $staff_level) {
+    public static function checkMaxMessageLength($forbidden_seal, $staff_level): int {
         return $forbidden_seal || $staff_level ? self::MAX_MESSAGE_LENGTH_SEAL : self::MAX_MESSAGE_LENGTH;
     }
 
@@ -237,18 +253,18 @@ class Inbox {
      * @param int $staff_level
      * @return boolean
      */
-    public static function checkMessageLength($message, $forbidden_seal, $staff_level) {
+    public static function checkMessageLength($message, $forbidden_seal, $staff_level): bool {
         return strlen($message) <= self::checkMaxMessageLength($forbidden_seal, $staff_level) ? true : false;
     }
 
     /**
-     * @param array convo_members
+     * @param InboxUser[] convo_members
      * @param int user_id
      * @return boolean
      */
-    public static function checkIfUserInConvo($convo_members, $user_id) {
+    public static function checkIfUserInConvo($convo_members, $user_id): bool {
         foreach($convo_members as $member) {
-            if ($member['user_id'] == $user_id) {
+            if ($member->user_id == $user_id) {
                 return true;
             }
         }
@@ -259,7 +275,7 @@ class Inbox {
      * @param int $convo_id
      * @return boolean
      */
-    public static function updateLastViewedForUser($system, $convo_id, $user_id) {
+    public static function updateLastViewedForUser($system, $convo_id, $user_id): bool {
         $timestamp = time();
         $sql = "UPDATE `convos_users` SET `last_read`={$timestamp} WHERE `convo_id`='{$convo_id}' AND `user_id`={$user_id}";
         $result = $system->query($sql);
@@ -267,11 +283,12 @@ class Inbox {
     }
 
     /**
+     * @param     $system
      * @param int $convo_id
-     * @param int $player_id
+     * @param     $user_id
      * @return int (0,1)
      */
-    public static function verifyAccessToConvo($system, $convo_id, $user_id) {
+    public static function verifyAccessToConvo($system, $convo_id, $user_id): int {
         $sql = "SELECT COUNT(`entry_id`) FROM `convos_users` WHERE `convo_id`='{$convo_id}' AND `user_id`='{$user_id}'";
         $result = $system->query($sql);
         $count = $result->fetch_row();
@@ -279,10 +296,11 @@ class Inbox {
     }
 
     /**
-     * @param int $convo_id
-     * @return array $convo_members
+     * @param System $system
+     * @param int    $convo_id
+     * @return null|InboxUser[] $convo_members
      */
-    public static function getConvoMembers($system, $convo_id) {
+    public static function getConvoMembers(System $system, int $convo_id): ?array {
         $sql = "SELECT `users`.`user_name`, `users`.`user_id`, `users`.`avatar_link`, `blacklist`.`blocked_ids`
                 FROM `convos_users`
                 INNER JOIN `users`
@@ -292,12 +310,26 @@ class Inbox {
                 WHERE `convos_users`.`convo_id`='{$convo_id}'";
         $result = $system->query($sql);
         if (!$system->db_last_num_rows) {
-            return false;
+            return null;
         }
-        return $system->db_fetch_all($result);
+
+        $users_data = $system->db_fetch_all($result);
+
+        return array_map(function ($user_data) {
+            return new InboxUser(
+                user_id: $user_data['user_id'],
+                user_name: $user_data['user_name'],
+                avatar_link: $user_data['avatar_link'],
+                forbidden_seal: $user_data['forbidden_seal']
+                    ? json_decode($user_data['forbidden_seal'], true)
+                    : null,
+                staff_level: $user_data['staff_level'],
+                blocked_ids: json_decode($user_data['blocked_ids'], true)
+            );
+        }, $users_data);
     }
 
-    public static function getSystemConvo($system, $system_id) {
+    public static function getSystemConvo($system, $system_id): array {
         $convo = ['convo_id' => self::SYSTEM_MESSAGE_CODES[$system_id], 'convo_members' => []];
         $sql = "SELECT * 
                 FROM `convos_alerts` 
@@ -341,7 +373,7 @@ class Inbox {
      * @param int? $timestamp
      * @return boolean|array $messages_data
      */
-    public static function getMessages($system, $user, $convo_id, $timestamp = 0, $message_id = 99999999999) {
+    public static function getMessages($system, $user, $convo_id, $timestamp = 0, $message_id = 99999999999): bool|array {
         $limit = self::MAX_MESSAGE_FETCH;
         $profile_link = $system->links['members'] . '&user=';
         $report_link = $system->links['report'] . '&report_type=2&content_id=';
@@ -377,7 +409,7 @@ class Inbox {
      * @param int $convo_id
      * @return int $owner_id
      */
-    public static function getConvoOwner($system, $convo_id) {
+    public static function getConvoOwner($system, $convo_id): int {
         $sql = "SELECT `owner_id` FROM `convos` WHERE `convo_id`='{$convo_id}'";
         $result = $system->query($sql);
         $owner_id = $system->db_fetch();
@@ -390,7 +422,7 @@ class Inbox {
      * @param int user_id
      * @return int last_affacted_rows
      */
-    public static function updateUnreadSystemAlert($system, $system_id, $user_id) {
+    public static function updateUnreadSystemAlert($system, $system_id, $user_id): int {
         $sql = "UPDATE `convos_alerts` 
                 SET `unread`=0 
                 WHERE `unread`=1 
@@ -405,7 +437,7 @@ class Inbox {
      * @param int user_id
      * @return array 
      */
-    public static function getUnreadAlertsForUser($system, $user_id) {
+    public static function getUnreadAlertsForUser($system, $user_id): array {
         $return_arr = [];
         // grab all the alerts for the user
         $sql = "SELECT `system_id`, MAX(`time`) as `time`
@@ -441,7 +473,7 @@ class Inbox {
      * @param int $user_id
      * @return array $convos
      */
-    public static function allConvosForUser($system, $user_id) {
+    public static function allConvosForUser($system, $user_id): array {
         $convos = []; // return array
 
         // get all alerts and add it to the return array 
@@ -505,3 +537,4 @@ class Inbox {
     }
 
 }
+

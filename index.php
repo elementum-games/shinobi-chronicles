@@ -226,7 +226,7 @@ if($LOGGED_IN) {
 	}
 	
 	// NEW MESSAGE ALERT
-	$playerInbox = new InboxUser($system, $player);
+	$playerInbox = new InboxManager($system, $player);
 	$new_inbox_message = $playerInbox->checkIfUnreadMessages();
 	$new_inbox_alerts = $playerInbox->checkIfUnreadAlerts();
 
