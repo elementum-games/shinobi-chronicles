@@ -37,13 +37,13 @@ function healingShop() {
 			if(!isset($healing[$heal])) {
 				throw new Exception("Invalid choice!");
 			}
-			if($player->money < $healing[$heal]['cost']) {
+			if($player->getMoney() < $healing[$heal]['cost']) {
 				throw new Exception("You do not have enough money!");
 			}
           	if($player->health >= $player->max_health) {
 				throw new Exception("Your health is already maxed out!");
 			}
-			$player->money -= $healing[$heal]['cost'];
+			$player->subtractMoney($healing[$heal]['cost'], "Purchased {$heal} health");
 			$player->health += $healing[$heal]['amount'];
 			if($player->health > $player->max_health) {
 				$player->health = $player->max_health;
@@ -59,7 +59,7 @@ function healingShop() {
 	Our prices are below.<br />
 	<br />
 	<label style='width:9em;font-weight:bold;'>Your Money:</label> 
-		&yen;{$player->money}<br />
+		&yen;{$player->getMoney()}<br />
 	<label style='width:9em;font-weight:bold;'>Health:</label>" . 
 			sprintf("%.2f", $player->health) . '/' . sprintf("%.2f", $player->max_health) . 
 	"</td></tr>";

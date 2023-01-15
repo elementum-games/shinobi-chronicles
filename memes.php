@@ -473,5 +473,11 @@ return [
             'image' => "<img src='./images/memes/sokkatribe.gif' />",
             'text' => ':Guess Sokka will die too:',
             'public' => true,
-    ],   
+    ],
+    [
+        'code' => ':selfmedal:',
+        'image' => "<img src='./images/memes/lsm_self_medal.png' />",
+        'text' => ':lsm giving himself a medal:',
+        'public' => true,
+    ],
 ];

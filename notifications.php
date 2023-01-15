@@ -3,6 +3,8 @@
 function displayNotifications() {
 	global $system;
 	global $player;
+	global $new_inbox_message;
+	global $new_inbox_alerts;
 	
 	// Notifications
 	$notifications = array();
@@ -41,9 +43,7 @@ function displayNotifications() {
 		}
 	}
 	
-	$result = $system->query("SELECT `message_id` FROM `private_messages` 
-		WHERE `recipient`='{$player->user_id}' AND `message_read`=0 LIMIT 1");
-	if($system->db_last_num_rows) {
+	if($new_inbox_message || $new_inbox_alerts) {
 		$notifications[] = "<a class='link' href='{$system->link}?id=2'>You have unread PM(s)</a>";
 	}
 

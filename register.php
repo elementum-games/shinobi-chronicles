@@ -131,22 +131,8 @@ if(isset($_POST['register'])) {
         }
 
         // Banned words
-        $banned_words = [
-            'fuck',
-            'shit',
-            'asshole',
-            'bitch',
-            'cunt',
-            'fag',
-            'asshat',
-            'pussy',
-            ' dick',
-            'whore',
-        ];
-        foreach($banned_words as $word) {
-            if(strpos(strtolower($user_name), $word) !== false) {
-                throw new Exception("Inappropriate language is not allowed in usernames!");
-            }
+        if($system->explicitLanguageCheck($user_name)) {
+            throw new Exception("Inappropriate language is not allowed in usernames!");
         }
 
         // Password

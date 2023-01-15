@@ -647,9 +647,9 @@ function adminPanel() {
         // POST submit edited data
         if(!empty($_POST['jutsu_data']) && !$select_jutsu) {
             try {
-                $content_id = $jutsu_id;
+                $editing_bloodline_id = $jutsu_id;
                 $data = [];
-                validateFormData($variables, $data, $content_id);
+                validateFormData($variables, $data, $editing_bloodline_id);
 
                 // Insert into database
                 $column_names = '';
@@ -805,45 +805,44 @@ function adminPanel() {
     }
     // Edit Bloodline
     else if($page == 'edit_bloodline') {
-        $table_name = 'bloodlines';
-        $content_name = 'bloodline';
-        /* Variables */
         $variables =& $constraints['bloodline'];
-        $select_content = true;
+        $self_link = $admin_panel_url . '&page=edit_bloodline';
+
         // Validate NPC id
-        if($_POST[$content_name . '_id']) {
-            $content_id = (int)$system->clean($_POST[$content_name . '_id']);
-            $result = $system->query("SELECT * FROM `{$table_name}` WHERE `{$content_name}_id`='$content_id'");
+        $editing_bloodline_id = null;
+        $bloodline_data = null;
+        if(!empty($_GET['bloodline_id'])) {
+            $editing_bloodline_id = (int)$system->clean($_GET['bloodline_id']);
+            $result = $system->query("SELECT * FROM `bloodlines` WHERE `bloodline_id`='$editing_bloodline_id'");
             if($system->db_last_num_rows == 0) {
-                $system->message("Invalid $content_name!");
+                $system->message("Invalid bloodline!");
                 $system->printMessage();
+                $editing_bloodline_id = null;
             }
             else {
-                $content_data = $system->db_fetch($result);
+                $bloodline_data = $system->db_fetch($result);
                 $select_content = false;
             }
         }
+
         // POST submit edited data
-        if($_POST[$content_name . '_data'] && !$select_content) {
+        if(isset($_POST['bloodline_data']) && $editing_bloodline_id != null) {
             try {
                 $data = [];
+
                 validateFormData($variables, $data);
-                // Insert into database
-                $column_names = '';
-                $column_data = '';
-                $count = 1;
-                $query = "UPDATE `$table_name` SET ";
+
+                $update_set_clauses = [];
                 foreach($data as $name => $var) {
-                    $query .= "`$name` = '$var'";
-                    if($count < count($data)) {
-                        $query .= ', ';
-                    }
-                    $count++;
+                    $update_set_clauses[] = "`$name` = '$var'";
                 }
-                $query .= "WHERE `{$content_name}_id`='$content_id'";
-                $system->query($query);
+
+                $system->query("UPDATE `bloodlines` SET "
+                    . implode(', ', $update_set_clauses)
+                    . " WHERE `bloodline_id`='$editing_bloodline_id'");
+
                 if($system->db_last_affected_rows == 1) {
-                    $system->message(ucwords($content_name) . ' ' . $data['name'] . " has been edited!");
+                    $system->message('Bloodline ' . $data['name'] . " has been edited!");
                     $select_content = true;
                 }
                 else {
@@ -851,36 +850,25 @@ function adminPanel() {
                 }
             } catch(Exception $e) {
                 $system->message($e->getMessage());
-                $select_content = false;
+                $editing_bloodline_id = null;
             }
             $system->printMessage();
         }
+
         // Form for editing data
-        if($content_data && !$select_content) {
-            echo "<table class='table'><tr><th>Edit " . $content_name . " (" . stripslashes($content_data['name']) . ")</th></tr>
-			<tr><td>
-			<form action='$admin_panel_url&page=edit_{$content_name}' method='post'>";
-            displayFormFields($variables, $content_data);
-            echo "<br />
-			<input type='hidden' name='{$content_name}_id' value='" . $content_data[$content_name . '_id'] . "' />
-			<input type='submit' name='{$content_name}_data' value='Edit' />
-			</form>
-			</td></tr></table>";
+        if($bloodline_data && $editing_bloodline_id) {
+            require 'templates/admin/edit_bloodline.php';
         }
+
         // Show form for selecting ID
-        if($select_content) {
-            $result = $system->query("SELECT `{$content_name}_id`, `name` FROM `$table_name`");
-            echo "<table class='table'><tr><th>Select $content_name</th></tr>
-			<tr><td>
-			<form action='$admin_panel_url&page=edit_{$content_name}' method='post'>
-			<select name='{$content_name}_id'>";
+        if($editing_bloodline_id == null) {
+            $result = $system->query("SELECT * FROM `bloodlines` ORDER BY `rank` ASC");
+            $all_bloodlines = [];
             while($row = $system->db_fetch($result)) {
-                echo "<option value='" . $row[$content_name . '_id'] . "'>" . stripslashes($row['name']) . "</option>";
+                $all_bloodlines[$row['bloodline_id']] = new Bloodline($row);
             }
-            echo "</select>
-			<input type='submit' value='Select' />
-			</form>
-			</td></tr></table>";
+
+            require 'templates/admin/edit_bloodline_select.php';
         }
     }
     // Edit NPC
@@ -892,8 +880,8 @@ function adminPanel() {
         $select_content = true;
         // Validate content id
         if($_POST[$content_name . '_id']) {
-            $content_id = (int)$system->clean($_POST[$content_name . '_id']);
-            $result = $system->query("SELECT * FROM `{$table_name}` WHERE `{$content_name}_id`='$content_id'");
+            $editing_bloodline_id = (int)$system->clean($_POST[$content_name . '_id']);
+            $result = $system->query("SELECT * FROM `{$table_name}` WHERE `{$content_name}_id`='$editing_bloodline_id'");
             if($system->db_last_num_rows == 0) {
                 $system->message("Invalid $content_name!");
                 $system->printMessage();
@@ -921,7 +909,7 @@ function adminPanel() {
                     }
                     $count++;
                 }
-                $query .= "WHERE `{$content_name}_id`='$content_id'";
+                $query .= "WHERE `{$content_name}_id`='$editing_bloodline_id'";
                 $system->query($query);
                 if($system->db_last_affected_rows == 1) {
                     $system->message(ucwords($content_name) . ' ' . $data['name'] . " has been edited!");
@@ -974,8 +962,8 @@ function adminPanel() {
         $select_content = true;
         // Validate NPC id
         if($_POST[$content_name . '_id']) {
-            $content_id = (int)$system->clean($_POST[$content_name . '_id']);
-            $result = $system->query("SELECT * FROM `{$table_name}` WHERE `{$content_name}_id`='$content_id'");
+            $editing_bloodline_id = (int)$system->clean($_POST[$content_name . '_id']);
+            $result = $system->query("SELECT * FROM `{$table_name}` WHERE `{$content_name}_id`='$editing_bloodline_id'");
             if($system->db_last_num_rows == 0) {
                 $system->message("Invalid $content_name!");
                 $system->printMessage();
@@ -1003,7 +991,7 @@ function adminPanel() {
                     }
                     $count++;
                 }
-                $query .= "WHERE `{$content_name}_id`='$content_id'";
+                $query .= "WHERE `{$content_name}_id`='$editing_bloodline_id'";
                 $system->query($query);
                 if($system->db_last_affected_rows == 1) {
                     $system->message(ucwords($content_name) . ' ' . $data['name'] . " has been edited!");
@@ -1057,8 +1045,8 @@ function adminPanel() {
         $select_content = true;
         // Validate NPC id
         if($_POST[$content_name . '_id']) {
-            $content_id = (int)$system->clean($_POST[$content_name . '_id']);
-            $result = $system->query("SELECT * FROM `{$table_name}` WHERE `{$content_name}_id`='$content_id'");
+            $editing_bloodline_id = (int)$system->clean($_POST[$content_name . '_id']);
+            $result = $system->query("SELECT * FROM `{$table_name}` WHERE `{$content_name}_id`='$editing_bloodline_id'");
             if($system->db_last_num_rows == 0) {
                 $system->message("Invalid $content_name!");
                 $system->printMessage();
@@ -1086,7 +1074,7 @@ function adminPanel() {
                     }
                     $count++;
                 }
-                $query .= "WHERE `{$content_name}_id`='$content_id'";
+                $query .= "WHERE `{$content_name}_id`='$editing_bloodline_id'";
                 $system->query($query);
                 if($system->db_last_affected_rows == 1) {
                     $system->message(ucwords($content_name) . ' ' . $data['name'] . " has been edited!");
@@ -1140,8 +1128,8 @@ function adminPanel() {
         $select_content = true;
         // Validate content id
         if($_POST[$content_name . '_id']) {
-            $content_id = (int)$system->clean($_POST[$content_name . '_id']);
-            $result = $system->query("SELECT * FROM `{$table_name}` WHERE `{$content_name}_id`='$content_id'");
+            $editing_bloodline_id = (int)$system->clean($_POST[$content_name . '_id']);
+            $result = $system->query("SELECT * FROM `{$table_name}` WHERE `{$content_name}_id`='$editing_bloodline_id'");
             if($system->db_last_num_rows == 0) {
                 $system->message("Invalid $content_name!");
                 $system->printMessage();
@@ -1169,7 +1157,7 @@ function adminPanel() {
                     }
                     $count++;
                 }
-                $query .= "WHERE `{$content_name}_id`='$content_id'";
+                $query .= "WHERE `{$content_name}_id`='$editing_bloodline_id'";
                 $system->query($query);
                 if($system->db_last_affected_rows == 1) {
                     $system->message(ucwords($content_name) . ' ' . $data['name'] . " has been edited!");
@@ -1414,10 +1402,10 @@ function adminPanel() {
             $bloodlines[$row['bloodline_id']]['name'] = $row['name'];
         }
         if($_POST['give_bloodline']) {
-            $bloodline_id = (int)$system->clean($_POST['bloodline_id']);
+            $editing_bloodline_id = (int)$system->clean($_POST['bloodline_id']);
             $user_name = $system->clean($_POST['user_name']);
             try {
-                if(!isset($bloodlines[$bloodline_id])) {
+                if(!isset($bloodlines[$editing_bloodline_id])) {
                     throw new Exception("Invalid bloodline!");
                 }
                 $result = $system->query("SELECT `user_id` FROM `users` WHERE `user_name`='$user_name' LIMIT 1");
@@ -1428,7 +1416,7 @@ function adminPanel() {
                 $user_id = $result['user_id'];
                 $status = Bloodline::giveBloodline(
                     system: $system,
-                    bloodline_id: $bloodline_id,
+                    bloodline_id: $editing_bloodline_id,
                     user_id: $user_id
                 );
             } catch(Exception $e) {

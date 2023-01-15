@@ -359,6 +359,7 @@ $item_effects = [
     'daze',
     'harden',
     'lighten',
+    'cast_speed_boost',
     'heal',
     'diffuse',
     'element',
@@ -405,7 +406,7 @@ $constraints['item'] = [
 ];
 
 /* Bloodline */
-$combat_boosts = [
+$bloodline_combat_boosts = [
     'ninjutsu_boost',
     'genjutsu_boost',
     'taijutsu_boost',
@@ -474,7 +475,7 @@ $constraints['bloodline'] = [
             'effect' => [
                 'data_type' => 'string',
                 'input_type' => 'radio',
-                'options' => $combat_boosts,
+                'options' => $bloodline_combat_boosts,
             ],
             'remove' => [
                 'special' => 'remove',

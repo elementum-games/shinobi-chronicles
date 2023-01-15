@@ -192,7 +192,7 @@ function arenaFight(): bool {
                 }
             }
 
-            $player->money += $money_gain;
+            $player->addMoney($money_gain, 'arena');
 
             echo "<table class='table'><tr><th>Battle Results</th></tr>
 			<tr><td>You have defeated your arena opponent.<br />

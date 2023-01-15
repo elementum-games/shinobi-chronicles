@@ -24,6 +24,7 @@ class Jutsu {
 
     const POWER_PER_LEVEL_PERCENT = 0.3;
     const BL_POWER_PER_LEVEL_PERCENT = 0.5;
+    const EFFECT_PER_LEVEL_PERCENT = 0.2;
     
     public static array $elements = [    
         self::ELEMENT_FIRE,
@@ -161,12 +162,14 @@ class Jutsu {
         $this->level = $level;
         $this->exp = $exp;
 
-        $level_multiplier = $this->is_bloodline ?
+        $level_power_multiplier = $this->is_bloodline ?
             self::BL_POWER_PER_LEVEL_PERCENT / 100 : self::POWER_PER_LEVEL_PERCENT / 100;
+        $level_effect_multiplier = self::EFFECT_PER_LEVEL_PERCENT / 100;
 
-        $this->power = $this->base_power * (1 + round($this->level * $level_multiplier, 2));
+        $this->power = $this->base_power * (1 + round($this->level * $level_power_multiplier, 2));
         if($this->effect && $this->effect != 'none') {
-            $this->effect_amount = $this->base_effect_amount * (1 + round($this->level * 0.002, 3));
+            $this->effect_amount = $this->base_effect_amount *
+                (1 + round($this->level * $level_effect_multiplier, 3));
         }
     }
 

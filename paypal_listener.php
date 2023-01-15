@@ -120,13 +120,32 @@ else {
                 }
 
 				$bonus = $selected_pack['bonus'] ?? 0;
-				
+
+                $total_amount = $kunai_amount + $bonus;
+
 				$query = "UPDATE `users` SET 
-				`premium_credits` = `premium_credits` + '" . ($kunai_amount + $bonus) . "', 
-				`premium_credits_purchased` = `premium_credits_purchased` + '" . ($kunai_amount + $bonus) . "'
+				`premium_credits` = `premium_credits` + '" . ($total_amount) . "', 
+				`premium_credits_purchased` = `premium_credits_purchased` + '" . ($total_amount) . "'
 				WHERE `user_id`='$user_id' LIMIT 1";
 				$system->query($query);
-				
+
+                $result = $system->query("SELECT `premium_credits` FROM `users` WHERE `user_id`='{$user_id}'");
+                $user = $system->db_fetch($result);
+
+                if($user == null) {
+                    $system->log('shard_purchase', 'invalid_user',"Transaction $txn_id for user #{$user_id}");
+                }
+                else {
+                    $system->currencyLog(
+                        $user_id,
+                        System::CURRENCY_TYPE_PREMIUM_CREDITS,
+                        $user['premium_credits'] - $total_amount,
+                        $user['premium_credits'],
+                        $total_amount,
+                        "Purchased AK via Paypal (TXN: $txn_id)"
+                    );
+                }
+
 				$system->send_pm("Lsmjudoka", "$user_id", "Shard purchase",
 				"Your purchase of " . ($kunai_amount + $bonus) . " Ancient Kunai" . ($bonus > 0 ? " ($kunai_amount + $bonus bonus)" : "") .
 				" has been processed and credited to your account. Thank you!");
