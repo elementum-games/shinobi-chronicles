@@ -23,12 +23,6 @@ class System {
     const IN_VILLAGE_OKAY = 1;
     const ONLY_IN_VILLAGE = 2;
 
-    const SC_MODERATOR = 1;
-    const SC_HEAD_MODERATOR = 2;
-    const SC_CONTENT_ADMINISTRATOR = 3;
-    const SC_ADMINISTRATOR = 4;
-    const SC_HEAD_ADMINISTRATOR = 5;
-
     const CURRENCY_TYPE_MONEY = 'money';
     const CURRENCY_TYPE_PREMIUM_CREDITS = 'premium_credits';
 
@@ -601,7 +595,7 @@ class System {
         return "<img src='$image' style='max-width:{$width}px;max-height:{$height}px;' />";
 
     }
-    
+
     public function timeAgo($timestamp): string {
 
         $time = time() - $timestamp;
@@ -707,7 +701,7 @@ class System {
            default:
                throw new Exception("Invalid currency type!");
        }
-        
+
         $this->query(
             "INSERT INTO `currency_logs` (
                 `character_id`,

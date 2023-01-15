@@ -393,13 +393,13 @@ function members() {
 			$view = 'highest_exp';
 		}
 		else if(isset($_GET['view']) && $_GET['view'] == 'highest_pvp') {
-			$query_custom = " WHERE `staff_level` < " . System::SC_ADMINISTRATOR .
+			$query_custom = " WHERE `staff_level` < " . USER::STAFF_ADMINISTRATOR .
                 " ORDER BY `pvp_wins` DESC";
 			$view = 'highest_pvp';
 		}
 		//Teams
 		else if(isset($_GET['view']) && $_GET['view'] == 'highest_teams') {
-			$query_custom = " WHERE `staff_level` < " . System::SC_ADMINISTRATOR .
+			$query_custom = " WHERE `staff_level` < " . USER::STAFF_ADMINISTRATOR .
                 " ORDER BY `pvp_wins` DESC";
 			$view = 'highest_teams';
 		}
