@@ -329,11 +329,12 @@ class Inbox {
         }, $users_data);
     }
 
-    public static function getSystemConvo($system, $system_id): array {
+    public static function getSystemConvo($system, $system_id, $user_id): array {
         $convo = ['convo_id' => self::SYSTEM_MESSAGE_CODES[$system_id], 'convo_members' => []];
         $sql = "SELECT * 
                 FROM `convos_alerts` 
-                WHERE `system_id`='{$system_id}' 
+                WHERE `system_id`='{$system_id}'
+                AND `target_id`={$user_id}
                 AND `alert_deleted`=0 
                 ORDER BY `alert_id` DESC";
         $result = $system->query($sql);
