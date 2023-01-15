@@ -288,6 +288,9 @@ class User extends Fighter {
         Update (1 = regen, 2 = training)
     */
 
+    /**
+     * @throws Exception
+     */
     public function loadData($UPDATE = User::UPDATE_FULL, $remote_view = false): string {
         $result = $this->system->query("SELECT * FROM `users` WHERE `user_id`='$this->user_id' LIMIT 1");
         $user_data = $this->system->db_fetch($result);
@@ -484,7 +487,7 @@ class User extends Fighter {
         if($this->system->db_last_num_rows != 0) {
             $result = $this->system->db_fetch($result);
             $this->village_location = $result['location'];
-            if($this->location == $this->village_location) {
+            if($this->location === $this->village_location) {
                 $this->in_village = true;
             }
         }
@@ -601,7 +604,11 @@ class User extends Fighter {
 
         // Bloodline
         if($this->bloodline_id) {
-            $this->bloodline = new Bloodline($this->bloodline_id, $this->user_id);
+            $this->bloodline = Bloodline::loadFromId(
+                system: $this->system,
+                bloodline_id: $this->bloodline_id,
+                user_id: $this->user_id
+            );
 
             // Debug info
             if($this->system->debug['bloodline']) {
@@ -746,8 +753,10 @@ class User extends Fighter {
         $display = '';
         if($this->train_time && $UPDATE >= User::UPDATE_FULL) {
             if($this->train_time < time()) {
+                $team_boost_description = "";
+
                 // Jutsu training
-                if(strpos($this->train_type, 'jutsu:') !== false) {
+                if(str_contains($this->train_type, 'jutsu:')) {
                     $jutsu_id = $this->train_gain;
                     $this->getInventory();
 
@@ -799,7 +808,7 @@ class User extends Fighter {
                             $boost_amount = round($this->train_gain * $boost_percent, 0, PHP_ROUND_HALF_DOWN);
                             $this->train_gain += $boost_amount;
 
-                            $team_boost = '<br />LUCKY! Your team bond triggered a breakthrough and resulted in increased progress!
+                            $team_boost_description = '<br />LUCKY! Your team bond triggered a breakthrough and resulted in increased progress!
 							<br />
 							You gained an additional <b>[ ' . $boost_amount . ' ]</b> point(s)';
                         }
@@ -822,7 +831,7 @@ class User extends Fighter {
 
                     $this->train_time = 0;
                     $this->system->message("You have gained " . $gain . " " . ucwords(str_replace('_', ' ', $this->train_type)) .
-                        " and " . ($gain * 10) . " experience." . $team_boost
+                        " and " . ($gain * 10) . " experience." . $team_boost_description
                     );
                 }
             }

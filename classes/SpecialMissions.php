@@ -22,31 +22,34 @@ class SpecialMission {
      * Pricing context:
      *  - Yen gains here will be multiplied by player's rank
      *  - healing shop cost is rank * 5 / rank * 20 / rank * 40
+     *  - arena battles are approximately rank * 20-45 / 25-60 / 50-80 / 60-80
+     *  - arena battles takes ~20 seconds
+     *  - each fight in a mission takes ~25 seconds
     */
     public static array $difficulties = [
         SpecialMission::DIFFICULTY_EASY => [
-            'yen_per_battle' => 4,
-            'yen_per_mission' => 25,
+            'yen_per_battle' => 8, // 8 * 5 = 40
+            'yen_per_mission' => 35,
             'hp_lost_percent' => 4, // 20% => 60% lost
-            'intel_gain' => 20, // est. 5 fights
+            'intel_gain' => 20, // est. 5 fights (rank * 75 yen) (old: 45)
         ],
         SpecialMission::DIFFICULTY_NORMAL => [
-            'yen_per_battle' => 6,
-            'yen_per_mission' => 30,
-            'hp_lost_percent' => 6, // 33% => 100% lost
-            'intel_gain' => 18 // 5.5 fights
+            'yen_per_battle' => 10, // 10 * 5.5 = 55
+            'yen_per_mission' => 50,
+            'hp_lost_percent' => 5, // 27.5% => 82.5% lost
+            'intel_gain' => 18 // 5.5 fights (rank * 105 yen) (old: 63)
         ],
         SpecialMission::DIFFICULTY_HARD => [
-            'yen_per_battle' => 8,
-            'yen_per_mission' => 35,
-            'hp_lost_percent' => 8, // 50% => 150% lost
-            'intel_gain' => 16 // 6.25 fights
+            'yen_per_battle' => 12, // 12 * 6.25 = 75
+            'yen_per_mission' => 60,
+            'hp_lost_percent' => 7, // 44% => 132% lost
+            'intel_gain' => 16 // 6.25 fights (rank * 135 yen) (old: 85)
         ],
         SpecialMission::DIFFICULTY_NIGHTMARE => [
-            'yen_per_battle' => 10,
-            'yen_per_mission' => 40,
-            'hp_lost_percent' => 11, // 78.5% => 235.5% lost
-            'intel_gain' => 14 // 7.14 fights
+            'yen_per_battle' => 14, // 20 * 7.14 = 100
+            'yen_per_mission' => 70,
+            'hp_lost_percent' => 10, // 71.4% => 214.2% lost
+            'intel_gain' => 14 // 7.14 fights (rank * 170 yen) (old: 111)
         ]
     ];
 
@@ -58,7 +61,7 @@ class SpecialMission {
 
     Nightmare (14% intel gain, ~7 encounters): 1:27 -> 2:47
     */
-    const EVENT_DURATION_MS = 1200;
+    const EVENT_DURATION_MS = 1000;
 
     const EVENT_START = 'start';
     const EVENT_MOVE_X = 'move_x';
@@ -420,7 +423,7 @@ class SpecialMission {
                 // 33% chance of using bloodline jutsu, if there are any
                 if($this->player->bloodline
                     && count($this->player->bloodline->jutsu) > 0
-                    && mt_rand(1, 100) < 33
+                    && mt_rand(1, 100) < 25
                 ) {
                     $jutsu_key = array_rand($this->player->bloodline->jutsu);
                     $jutsu = $this->player->bloodline->jutsu[$jutsu_key];

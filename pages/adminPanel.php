@@ -1,5 +1,6 @@
-<?php
-/* 
+<?php /** @noinspection SqlWithoutWhere */
+
+/*
 File: 		admin_panel.php
 Coder:		Levi Meahan
 Created:	11/14/2013
@@ -7,17 +8,26 @@ Revised:	12/03/2013 by Levi Meahan
 Purpose:	Function for admin panel where user and content data can be submitted and edited
 Algorithm:	See master_plan.html
 */
+
+require_once 'admin/formTools.php';
+
+/**
+ * @noinspection SqlResolve
+ * @noinspection SqlInsertValues
+ * @throws Exception
+ */
 function adminPanel() {
     global $system;
     global $player;
     global $self_link;
     global $id;
-    global $RANK_NAMES;
 
     // Staff level check
     if(!$player->hasAdminPanel()) {
         return false;
     }
+
+    $admin_panel_url = $self_link;
 
     $content_create_pages = [
         'create_ai',
@@ -46,26 +56,25 @@ function adminPanel() {
         'give_bloodline',
     ];
 
-
     // Menu
     echo "<table class='table'>
         <tr><th>Admin Panel Menu</th></tr>";
-	if($player->isContentAdmin()) {
-	    echo "<tr><td style='text-align:center'>";
-	    echo implode(
-	        "&nbsp;&nbsp;|&nbsp;&nbsp;",
-            array_map(function($page_slug) use ($self_link) {
-                return "<a href='{$self_link}&page={$page_slug}'>" . System::unSlug($page_slug) . "</a>";
+    if($player->isContentAdmin()) {
+        echo "<tr><td style='text-align:center'>";
+        echo implode(
+            "&nbsp;&nbsp;|&nbsp;&nbsp;",
+            array_map(function($page_slug) use ($admin_panel_url) {
+                return "<a href='{$admin_panel_url}&page={$page_slug}'>" . System::unSlug($page_slug) . "</a>";
             }, $content_create_pages)
         );
-	    echo "</td></tr>";
+        echo "</td></tr>";
     }
     if($player->isContentAdmin()) {
         echo "<tr><td style='text-align:center'>";
         echo implode(
             "&nbsp;&nbsp;|&nbsp;&nbsp;",
-            array_map(function($page_slug) use ($self_link) {
-                return "<a href='{$self_link}&page={$page_slug}'>" . System::unSlug($page_slug) . "</a>";
+            array_map(function($page_slug) use ($admin_panel_url) {
+                return "<a href='{$admin_panel_url}&page={$page_slug}'>" . System::unSlug($page_slug) . "</a>";
             }, $content_edit_pages)
         );
         echo "</td></tr>";
@@ -74,8 +83,8 @@ function adminPanel() {
         echo "<tr><td style='text-align:center'>";
         echo implode(
             "&nbsp;&nbsp;|&nbsp;&nbsp;",
-            array_map(function($page_slug) use ($self_link) {
-                return "<a href='{$self_link}&page={$page_slug}'>" . System::unSlug($page_slug) . "</a>";
+            array_map(function($page_slug) use ($admin_panel_url) {
+                return "<a href='{$admin_panel_url}&page={$page_slug}'>" . System::unSlug($page_slug) . "</a>";
             }, $user_admin_pages)
         );
         echo "</td></tr>";
@@ -87,17 +96,19 @@ function adminPanel() {
 
     $page = $_GET['page'] ?? '';
 
-    if(array_search($page, $user_admin_pages) !== false && !$player->isUserAdmin()) {
+    if(in_array($page, $user_admin_pages) && !$player->isUserAdmin()) {
         $page = '';
     }
-    else if(array_search($page, $content_create_pages) !== false && !$player->isContentAdmin()) {
+    else if(in_array($page, $content_create_pages) && !$player->isContentAdmin()) {
         $page = '';
     }
-    else if(array_search($page, $content_edit_pages) !== false && !$player->isContentAdmin()) {
+    else if(in_array($page, $content_edit_pages) && !$player->isContentAdmin()) {
         $page = '';
     }
 
-    // Create AI
+    $RANK_NAMES = RankManager::fetchNames($system);
+
+    // Create NPC
     if($page == 'create_ai') {
         /* Variables
         -ai_id
@@ -138,10 +149,10 @@ function adminPanel() {
                 $query = "INSERT INTO `ai_opponents` ($column_names) VALUES ($column_data)";
                 $system->query($query);
                 if($system->db_last_affected_rows == 1) {
-                    $system->message("AI created!");
+                    $system->message("NPC created!");
                 }
                 else {
-                    throw new Exception("Error creating AI!");
+                    throw new Exception("Error creating NPC!");
                 }
             } catch(Exception $e) {
                 $system->message($e->getMessage());
@@ -155,15 +166,9 @@ function adminPanel() {
         else {
             formPreloadData($variables, $data, false);
         }
-        echo "<table class='table'><tr><th>Create AI</th></tr>
+        echo "<table class='table'><tr><th>Create NPC</th></tr>
 		<tr><td>
-		<form action='$self_link&page=create_ai' method='post'>
-		<style type='text/css'>
-		label {
-			display:inline-block;
-			width:120px;
-		}
-		</style>";
+		<form action='$admin_panel_url&page=create_ai' method='post'>";
         displayFormFields($variables, $data);
         echo "<br />
 		<input type='submit' name='ai_data' value='Create' />
@@ -243,13 +248,7 @@ function adminPanel() {
         }
         echo "<table class='table'><tr><th>Create Jutsu</th></tr>
 		<tr><td>
-		<form action='$self_link&page=create_jutsu' method='post'>
-		<style type='text/css'>
-		label {
-			display:inline-block;
-			width:120px;
-		}
-		</style>";
+		<form action='$admin_panel_url&page=create_jutsu' method='post'>";
         displayFormFields($variables, $data);
         echo "<br />
 		<input type='submit' name='jutsu_data' value='Create' />
@@ -320,13 +319,7 @@ function adminPanel() {
         }
         echo "<table class='table'><tr><th>Create Item</th></tr>
 		<tr><td>
-		<form action='$self_link&page=create_item' method='post'>
-		<style type='text/css'>
-		label {
-			display:inline-block;
-			width:120px;
-		}
-		</style>";
+		<form action='$admin_panel_url&page=create_item' method='post'>";
         displayFormFields($variables, $data);
         echo "<br />
 		<input type='submit' name='item_data' value='Create' />
@@ -380,13 +373,7 @@ function adminPanel() {
         }
         echo "<table class='table'><tr><th>Create " . ucwords(str_replace('_', ' ', $content_name)) . "</th></tr>
 		<tr><td>
-		<form action='$self_link&page=create_" . $content_name . "' method='post'>
-		<style type='text/css'>
-		label {
-			display:inline-block;
-			width:120px;
-		}
-		</style>";
+		<form action='$admin_panel_url&page=create_" . $content_name . "' method='post'>";
         displayFormFields($variables, $data);
         echo "<br />
 		<input type='submit' name='" . $content_name . "_data' value='Create' />
@@ -440,13 +427,7 @@ function adminPanel() {
         }
         echo "<table class='table'><tr><th>Create " . ucwords(str_replace('_', ' ', $content_name)) . "</th></tr>
 		<tr><td>
-		<form action='$self_link&page=create_" . $content_name . "' method='post'>
-		<style type='text/css'>
-		label {
-			display:inline-block;
-			width:120px;
-		}
-		</style>";
+		<form action='$admin_panel_url&page=create_" . $content_name . "' method='post'>";
         displayFormFields($variables, $data);
         echo "<br />
 		<input type='submit' name='" . $content_name . "_data' value='Create' />
@@ -500,13 +481,7 @@ function adminPanel() {
         }
         echo "<table class='table'><tr><th>Create " . ucwords(str_replace('_', ' ', $content_name)) . "</th></tr>
 		<tr><td>
-		<form action='$self_link&page=create_" . $content_name . "' method='post'>
-		<style type='text/css'>
-		label {
-			display:inline-block;
-			width:120px;
-		}
-		</style>";
+		<form action='$admin_panel_url&page=create_" . $content_name . "' method='post'>";
         displayFormFields($variables, $data);
         echo "<br />
 		<input type='submit' name='" . $content_name . "_data' value='Create' />
@@ -560,30 +535,26 @@ function adminPanel() {
         }
         echo "<table class='table'><tr><th>Create " . ucwords(str_replace('_', ' ', $content_name)) . "</th></tr>
 		<tr><td>
-		<form action='$self_link&page=create_" . $content_name . "' method='post'>
-		<style type='text/css'>
-		label {
-			display:inline-block;
-			width:120px;
-		}
-		</style>";
+		<form action='$admin_panel_url&page=create_" . $content_name . "' method='post'>";
         displayFormFields($variables, $data);
         echo "<br />
 		<input type='submit' name='" . $content_name . "_data' value='Create' />
 		</form>
 		</td></tr></table>";
     }
-    // Edit AI
+    // Edit NPC
     else if($page == 'edit_ai') {
         /* Variables */
         $variables =& $constraints['ai'];
         $select_ai = true;
-        // Validate AI id
-        if($_POST['ai_id']) {
-            $ai_id = (int)$system->clean($_POST['ai_id']);
-            $result = $system->query("SELECT * FROM `ai_opponents` WHERE `ai_id`='$ai_id'");
+        $self_link = $admin_panel_url . '&page=edit_ai';
+
+        // Validate NPC id
+        if(!empty($_GET['npc_id'])) {
+            $npc_id = (int)$system->clean($_GET['npc_id']);
+            $result = $system->query("SELECT * FROM `ai_opponents` WHERE `ai_id`='$npc_id'");
             if($system->db_last_num_rows == 0) {
-                $system->message("Invalid AI!");
+                $system->message("Invalid NPC!");
                 $system->printMessage();
             }
             else {
@@ -591,8 +562,9 @@ function adminPanel() {
                 $select_ai = false;
             }
         }
+
         // POST submit edited data
-        if($_POST['ai_data'] && !$select_ai) {
+        if(!empty($_POST['ai_data']) && !$select_ai) {
             try {
                 $data = [];
                 validateFormData($variables, $data);
@@ -609,10 +581,10 @@ function adminPanel() {
                     }
                     $count++;
                 }
-                $query .= "WHERE `ai_id`='$ai_id'";
+                $query .= "WHERE `ai_id`='$npc_id'";
                 $system->query($query);
                 if($system->db_last_affected_rows == 1) {
-                    $system->message("AI " . $data['name'] . " has been edited!");
+                    $system->message("NPC " . $data['name'] . " has been edited!");
                     $select_ai = true;
                 }
                 else {
@@ -625,48 +597,42 @@ function adminPanel() {
             $system->printMessage();
         }
         // Form for editing data
-        if($ai_data && !$select_ai) {
+        if(isset($ai_data) && !$select_ai) {
             $data =& $ai_data;
-            echo "<table class='table'><tr><th>Edit AI (" . stripslashes($ai_data['name']) . ")</th></tr>
+            echo "<table class='table'><tr><th>Edit NPC (" . stripslashes($ai_data['name']) . ")</th></tr>
 			<tr><td>
-			<form action='$self_link&page=edit_ai' method='post'>
-			<style type='text/css'>
-			label {
-				display:inline-block;
-				width:120px;
-			}
-			</style>";
+			<form action='{$admin_panel_url}&page=edit_ai&npc_id={$ai_data['ai_id']}' method='post'>";
             displayFormFields($variables, $data);
             echo "<br />
-			<input type='hidden' name='ai_id' value='{$ai_data['ai_id']}' />
 			<input type='submit' name='ai_data' value='Edit' />
 			</form>
 			</td></tr></table>";
         }
         // Show form for selecting ID
         if($select_ai) {
-            $result = $system->query("SELECT `ai_id`, `name` FROM `ai_opponents`");
-            echo "<table class='table'><tr><th>Select AI</th></tr>
-			<tr><td>
-			<form action='$self_link&page=edit_ai' method='post'>
-			<select name='ai_id'>";
+            $all_npcs = [];
+            $result = $system->query("SELECT * FROM `ai_opponents` ORDER BY `level` ASC");
             while($row = $system->db_fetch($result)) {
-                echo "<option value='{$row['ai_id']}'>" . stripslashes($row['name']) . "</option>";
+                $all_npcs[$row['ai_id']] = $row;
             }
-            echo "</select>
-			<input type='submit' value='Select' />
-			</form>
-			</td></tr></table>";
+
+            require 'templates/admin/edit_npc_select.php';
         }
     }
     // Edit jutsu
     else if($page == 'edit_jutsu') {
         $select_jutsu = true;
+        $self_link = $admin_panel_url . '&page=edit_jutsu';
+
         /* Variables */
         $variables =& $constraints['jutsu'];
+
         // Validate jutsu id
-        if($_POST['jutsu_id']) {
-            $jutsu_id = (int)$system->clean($_POST['jutsu_id']);
+        $jutsu_id = null;
+        $jutsu_data = null;
+        if(!empty($_GET['jutsu_id'])) {
+            $jutsu_id = (int)$_GET['jutsu_id'];
+
             $result = $system->query("SELECT * FROM `jutsu` WHERE `jutsu_id`='$jutsu_id'");
             if($system->db_last_num_rows == 0) {
                 $system->message("Invalid Jutsu!");
@@ -677,17 +643,20 @@ function adminPanel() {
                 $select_jutsu = false;
             }
         }
+
         // POST submit edited data
-        if($_POST['jutsu_data'] && !$select_jutsu) {
+        if(!empty($_POST['jutsu_data']) && !$select_jutsu) {
             try {
-                $content_id = $jutsu_id;
+                $editing_bloodline_id = $jutsu_id;
                 $data = [];
-                validateFormData($variables, $data, $content_id);
+                validateFormData($variables, $data, $editing_bloodline_id);
+
                 // Insert into database
                 $column_names = '';
                 $column_data = '';
                 $count = 1;
-                $query = "UPDATE `jutsu` SET ";
+
+                $query = "UPDATE `jutsu` SET";
                 foreach($data as $name => $var) {
                     $query .= "`$name` = '$var'";
                     if($count < count($data)) {
@@ -696,8 +665,10 @@ function adminPanel() {
                     $count++;
                 }
                 $query .= "WHERE `jutsu_id`='{$jutsu_data['jutsu_id']}'";
+
                 //echo $query;
                 $system->query($query);
+
                 if($system->db_last_affected_rows == 1) {
                     $system->message("Jutsu edited!");
                     $select_jutsu = true;
@@ -710,167 +681,71 @@ function adminPanel() {
             }
             $system->printMessage();
         }
+
         // Form for editing data
         if($jutsu_data && !$select_jutsu) {
             $data =& $jutsu_data;
-            echo "<table class='table'><tr><th>Edit Jutsu (" . stripslashes($jutsu_data['name']) . ")</th></tr>
-			<tr><td>
-			<form action='$self_link&page=edit_jutsu' method='post'>
-			<style type='text/css'>
-			label {
-				display:inline-block;
-				width:120px;
-			}
-			</style>
-			<label>Jutsu ID:</label> $jutsu_id<br />";
+            echo "<p style='text-align:center;margin-top:20px;margin-bottom:-5px;'>
+                <a href='$self_link' style='font-size:14px;'>Back to jutsu list</a>
+            </p>
+            <table class='table'>
+                <tr><th>Edit Jutsu (" . stripslashes($jutsu_data['name']) . ")</th></tr>
+                <tr><td>
+                <form action='$self_link&jutsu_id={$jutsu_data['jutsu_id']}' method='post'>
+                <label>Jutsu ID:</label> $jutsu_id<br />";
             displayFormFields($variables, $data);
             echo "<br />
-			<input type='hidden' name='jutsu_id' value='{$jutsu_data['jutsu_id']}' />
-			<input type='submit' name='jutsu_data' value='Edit' />
-			</form>
-			</td></tr></table>";
+                <input type='submit' name='jutsu_data' value='Edit' />
+                </form>
+                </td></tr>
+			</table>";
         }
+
         // Show form for selecting ID
         if($select_jutsu) {
-            $jutsu_array = [];
-            $result = $system->query("SELECT `jutsu_id`, `name`, `jutsu_type`, `power`, `effect`, `effect_amount`, `effect_length`,
-				`purchase_cost`, `element`, `rank` 
-				FROM `jutsu` ORDER BY `rank` ASC, `purchase_cost` ASC"
-            );
+            $all_jutsu = [];
+            $result = $system->query("SELECT * FROM `jutsu` ORDER BY `rank` ASC, `purchase_cost` ASC");
             while($row = $system->db_fetch($result)) {
-                $jutsu_array[$row['jutsu_id']] = $row;
+                $all_jutsu[$row['jutsu_id']] = Jutsu::fromArray($row['jutsu_id'], $row);
             }
-            echo "<table class='table'><tr><th colspan='3'>Select Jutsu</th></tr>
-			<tr>
-				<th>Ninjutsu</th>
-				<th>Taijutsu</th>
-				<th>Genjutsu</th>
-			</tr>
-			<tr>
-			<!--NINJUTSU-->
-			<td>		
-				<form action='$self_link&page=edit_jutsu' method='post'>
-				<select name='jutsu_id'>";
-            foreach($jutsu_array as $id => $jutsu) {
-                if($jutsu['jutsu_type'] != 'ninjutsu') {
-                    continue;
-                }
-                echo "<option value='$id'>" . stripslashes($jutsu['name']) . "</option>";
-            }
-            echo "</select>
-				<input type='submit' value='Select' />
-				</form>
-			</td>
-			<!--TAIJUTSU-->
-			<td>
-			<form action='$self_link&page=edit_jutsu' method='post'>
-			<select name='jutsu_id'>";
-            foreach($jutsu_array as $id => $jutsu) {
-                if($jutsu['jutsu_type'] != 'taijutsu') {
-                    continue;
-                }
-                echo "<option value='$id'>" . stripslashes($jutsu['name']) . "</option>";
-            }
-            echo "</select>
-			<input type='submit' value='Select' />
-			</form>
-			</td>
-			<!--GENJUTSU-->
-			<td>
-			<form action='$self_link&page=edit_jutsu' method='post'>
-			<select name='jutsu_id'>";
-            foreach($jutsu_array as $id => $jutsu) {
-                if($jutsu['jutsu_type'] != 'genjutsu') {
-                    continue;
-                }
-                echo "<option value='$id'>" . stripslashes($jutsu['name']) . "</option>";
-            }
-            echo "</select>
-			<input type='submit' value='Select' />
-			</form>
-			</td></tr></table>";
-            $jutsu_type = 'ninjutsu';
-            if($_GET['jutsu_type']) {
-                switch($_GET['jutsu_type']) {
-                    case 'ninjutsu':
-                        $jutsu_type = 'ninjutsu';
-                        break;
-                    case 'taijutsu':
-                        $jutsu_type = 'taijutsu';
-                        break;
-                    case 'genjutsu':
-                        $jutsu_type = 'genjutsu';
-                        break;
-                }
-            }
-            $style = "style='text-decoration:none;'";
-            // Filter links
-            echo "<p style='text-align:center;margin-bottom:0px;'>
-				<a href='$self_link&page=edit_jutsu&jutsu_type=ninjutsu' " .
-                ($jutsu_type == 'ninjutsu' ? $style : "") . ">Ninjutsu</a> |
-				<a href='$self_link&page=edit_jutsu&jutsu_type=taijutsu' " .
-                ($jutsu_type == 'taijutsu' ? $style : "") . ">Taijutsu</a> |
-				<a href='$self_link&page=edit_jutsu&jutsu_type=genjutsu' " .
-                ($jutsu_type == 'genjutsu' ? $style : "") . ">Genjutsu</a>
-			</p>";
-            // Show lists
-            echo "<table class='table' style='margin-top:15px;'><tr>
-				<th style='width:25%;'>Name</th>
-				<th style='width:8%;'>Power</th>
-				<th style='width:30%;'>Effect</th>
-				<th style='width:18%;'>Element</th>
-				<th style='width:19%;'>Cost</th>
-			</tr>";
-            echo "<tr><th colspan='5'>" . $RANK_NAMES[1] . "</th></tr>";
-            $current_rank = 1;
-            foreach($jutsu_array as $id => $jutsu) {
-                if($jutsu['jutsu_type'] != $jutsu_type) {
-                    continue;
-                }
-                if($jutsu['rank'] > $current_rank) {
-                    $current_rank = $jutsu['rank'];
-                    echo "<tr><th colspan='5'>" . $RANK_NAMES[$current_rank] . "</th></tr>";
-                }
-                echo "<tr>
-					<td>" . $jutsu['name'] . "</td>
-					<td>" . $jutsu['power'] . "</td>
-					<td>" . ucwords(str_replace('_', ' ', $jutsu['effect'])) . ($jutsu['effect'] == 'none' ? '' :
-                        " (" . $jutsu['effect_amount'] . "% / " . $jutsu['effect_length'] . ")") . "</td>
-					<td>" . ucwords($jutsu['element']) . "</td>
-					<td>&yen;" . $jutsu['purchase_cost'] . "</td>
-				</tr>";
-            }
-            echo "</table>";
+
+            require 'templates/admin/edit_jutsu_select.php';
         }
     }
     // Edit item
     else if($page == 'edit_item') {
-        $select_item = true;
+        $item_being_edited = null;
         $table_name = 'items';
+        $self_link = $admin_panel_url . '&page=edit_item';
+
         /* Variables */
         $variables =& $constraints['item'];
+
         // Validate item id
-        if($_POST['item_id']) {
-            $item_id = (int)$system->clean($_POST['item_id']);
+        if(!empty($_GET['item_id'])) {
+            $item_id = (int)$_GET['item_id'];
+
             $result = $system->query("SELECT * FROM `$table_name` WHERE `item_id`='$item_id'");
             if($system->db_last_num_rows == 0) {
                 $system->message("Invalid item!");
                 $system->printMessage();
             }
             else {
-                $item_data = $system->db_fetch($result);
-                $select_item = false;
+                $item_being_edited = $system->db_fetch($result);
             }
         }
+
         // POST submit edited data
-        if($_POST['item_data'] && !$select_item) {
+        if(!empty($_POST['item_data']) && $item_being_edited != null) {
             try {
                 $data = [];
                 validateFormData($variables, $data);
+
                 // Insert into database
                 $column_names = '';
                 $column_data = '';
                 $count = 1;
+
                 $query = "UPDATE `$table_name` SET ";
                 foreach($data as $name => $var) {
                     $query .= "`$name` = '$var'";
@@ -879,9 +754,11 @@ function adminPanel() {
                     }
                     $count++;
                 }
-                $query .= "WHERE `item_id`='{$item_data['item_id']}'";
+                $query .= "WHERE `item_id`='{$item_being_edited['item_id']}'";
+
                 //echo $query;
                 $system->query($query);
+
                 if($system->db_last_affected_rows == 1) {
                     $system->message("Item edited!");
                     $select_item = true;
@@ -894,163 +771,78 @@ function adminPanel() {
             }
             $system->printMessage();
         }
+
         // Form for editing data
-        if($item_data && !$select_item) {
-            $data =& $item_data;
-            echo "<table class='table'><tr><th>Edit Item (" . stripslashes($item_data['name']) . ")</th></tr>
-			<tr><td>
-			<form action='$self_link&page=edit_item' method='post'>
-			<style type='text/css'>
-			label {
-				display:inline-block;
-				width:120px;
-			}
-			</style>";
-            foreach($variables as $var_name => $variable) {
-                if($variable['input_type'] == 'text') {
-                    echo "<label for='$var_name'>" . ucwords(str_replace("_", " ", $var_name)) . ":</label>
-					<input type='text' name='$var_name' value='" . stripslashes($data[$var_name]) . "' /><br />";
-                }
-                else if($variable['input_type'] == 'text_area') {
-                    echo "<label for='$var_name'>" . ucwords(str_replace("_", " ", $var_name)) . ":</label><br />
-		                <label></label>&nbsp;<textarea name='$var_name'>" . stripslashes($data[$var_name]) . "</textarea><br />";
-                }
-                else if($variable['input_type'] == 'radio' && !empty($variable['options'])) {
-                    echo "<label for='$var_name' style='margin-top:5px;'>" . ucwords(str_replace("_", " ", $var_name)) . ":</label>
-					<p style='padding-left:10px;margin-top:5px;'>";
-                    $count = 1;
-                    foreach($variable['options'] as $id => $option) {
-                        if($variable['data_type'] == 'int' || $variable['data_type'] == 'float') {
-                            echo "<input type='radio' name='$var_name' value='$count' " .
-                                ($data[$var_name] == $count ? "checked='checked'" : '') .
-                                " />" . ucwords(str_replace("_", " ", $option));
-                            $count++;
-                        }
-                        else if($variable['data_type'] == 'string') {
-                            echo "<input type='radio' name='$var_name' value='$option' " .
-                                ($data[$var_name] == $option ? "checked='checked'" : '') .
-                                " />" . ucwords(str_replace("_", " ", $option));
-                        }
-                        echo "<br />";
-                    }
-                    echo "</p>";
-                }
-                else {
-                    echo "Coming soon!<br />";
-                }
-            }
+        if($item_being_edited) {
+            $data =& $item_being_edited;
+            echo "<p style='text-align:center;margin-top:20px;margin-bottom:-5px;'>
+                <a href='$self_link' style='font-size:14px;'>Back to item select</a> 
+            </p>            
+            <table class='table'>
+                <tr><th>Edit Item (" . stripslashes($item_being_edited['name']) . ")</th></tr>
+                <tr><td>
+                    <form action='$self_link&item_id={$item_being_edited['item_id']}' method='post'>";
+
+            displayFormFields($variables, $data);
+
             echo "<br />
-			<input type='hidden' name='item_id' value='{$item_data['item_id']}' />
-			<input type='submit' name='item_data' value='Edit' />
-			</form>
-			</td></tr></table>";
+                    <input type='submit' name='item_data' value='Edit' />
+                    </form>
+                </td></tr>
+			</table>";
         }
+
         // Show form for selecting ID
-        if($select_item) {
-            $result = $system->query("SELECT `item_id`, `name`, `effect`, `effect_amount`, `use_type`, `purchase_cost` 
-				FROM `$table_name`"
-            );
-            $item_array = [];
+        if(!$item_being_edited) {
+            $result = $system->query("SELECT * FROM `items`");
+            $all_items = [];
             while($row = $system->db_fetch($result)) {
-                $item_array[$row['item_id']] = $row;
+                $all_items[$row['item_id']] = Item::fromDb($row);
             }
-            echo "<table class='table'><tr><th>Select Item</th></tr>
-			<tr><td>
-			<form action='$self_link&page=edit_item' method='post'>
-			<select name='item_id'>";
-            foreach($item_array as $id => $item) {
-                echo "<option value='$id'>" . stripslashes($item['name']) . "</option>";
-            }
-            echo "</select>
-			<input type='submit' value='Select' />
-			</form>
-			</td></tr></table>";
-            $item_type = 1;
-            if(isset($_GET['item_type'])) {
-                switch($_GET['item_type']) {
-                    case 'weapon':
-                        $item_type = 1;
-                        break;
-                    case 'armor':
-                        $item_type = 2;
-                        break;
-                    case 'consumable':
-                        $item_type = 3;
-                        break;
-                }
-            }
-            $style = "style='text-decoration:none;'";
-            // Filter links
-            echo "<p style='text-align:center;margin-bottom:0px;'>
-				<a href='$self_link&page=edit_item&item_type=weapon' " .
-                ($item_type == 1 ? $style : "") . ">Weapons</a> |
-				<a href='$self_link&page=edit_item&item_type=armor' " .
-                ($item_type == 2 ? $style : "") . ">Armor</a> |
-				<a href='$self_link&page=edit_item&item_type=consumable' " .
-                ($item_type == 3 ? $style : "") . ">Consumables</a>
-			</p>";
-            // Show lists
-            echo "<table class='table' style='margin-top:15px;'><tr>
-				<th style='width:25%;'>Name</th>
-				<th style='width:10%;'>Power</th>
-				<th style='width:25%;'>Effect</th>
-				<th style='width:20%;'>Cost</th>
-			</tr>";
-            foreach($item_array as $id => $item) {
-                if($item['use_type'] != $item_type) {
-                    continue;
-                }
-                echo "<tr>
-					<td>" . $item['name'] . "</td>
-					<td>" . $item['effect_amount'] . "</td>
-					<td>" . ucwords(str_replace('_', ' ', $item['effect'])) . "</td>
-					<td>&yen;" . $item['purchase_cost'] . "</td>
-				</tr>";
-            }
-            echo "</table>";
+
+            require 'templates/admin/edit_item_select.php';
         }
     }
     // Edit Bloodline
     else if($page == 'edit_bloodline') {
-        $table_name = 'bloodlines';
-        $content_name = 'bloodline';
-        /* Variables */
         $variables =& $constraints['bloodline'];
-        $select_content = true;
-        // Validate AI id
-        if($_POST[$content_name . '_id']) {
-            $content_id = (int)$system->clean($_POST[$content_name . '_id']);
-            $result = $system->query("SELECT * FROM `{$table_name}` WHERE `{$content_name}_id`='$content_id'");
+        $self_link = $admin_panel_url . '&page=edit_bloodline';
+
+        // Validate NPC id
+        $editing_bloodline_id = null;
+        $bloodline_data = null;
+        if(!empty($_GET['bloodline_id'])) {
+            $editing_bloodline_id = (int)$system->clean($_GET['bloodline_id']);
+            $result = $system->query("SELECT * FROM `bloodlines` WHERE `bloodline_id`='$editing_bloodline_id'");
             if($system->db_last_num_rows == 0) {
-                $system->message("Invalid $content_name!");
+                $system->message("Invalid bloodline!");
                 $system->printMessage();
+                $editing_bloodline_id = null;
             }
             else {
-                $content_data = $system->db_fetch($result);
+                $bloodline_data = $system->db_fetch($result);
                 $select_content = false;
             }
         }
+
         // POST submit edited data
-        if($_POST[$content_name . '_data'] && !$select_content) {
+        if(isset($_POST['bloodline_data']) && $editing_bloodline_id != null) {
             try {
                 $data = [];
+
                 validateFormData($variables, $data);
-                // Insert into database
-                $column_names = '';
-                $column_data = '';
-                $count = 1;
-                $query = "UPDATE `$table_name` SET ";
+
+                $update_set_clauses = [];
                 foreach($data as $name => $var) {
-                    $query .= "`$name` = '$var'";
-                    if($count < count($data)) {
-                        $query .= ', ';
-                    }
-                    $count++;
+                    $update_set_clauses[] = "`$name` = '$var'";
                 }
-                $query .= "WHERE `{$content_name}_id`='$content_id'";
-                $system->query($query);
+
+                $system->query("UPDATE `bloodlines` SET "
+                    . implode(', ', $update_set_clauses)
+                    . " WHERE `bloodline_id`='$editing_bloodline_id'");
+
                 if($system->db_last_affected_rows == 1) {
-                    $system->message(ucwords($content_name) . ' ' . $data['name'] . " has been edited!");
+                    $system->message('Bloodline ' . $data['name'] . " has been edited!");
                     $select_content = true;
                 }
                 else {
@@ -1058,45 +850,28 @@ function adminPanel() {
                 }
             } catch(Exception $e) {
                 $system->message($e->getMessage());
-                $select_content = false;
+                $editing_bloodline_id = null;
             }
             $system->printMessage();
         }
+
         // Form for editing data
-        if($content_data && !$select_content) {
-            echo "<table class='table'><tr><th>Edit " . $content_name . " (" . stripslashes($content_data['name']) . ")</th></tr>
-			<tr><td>
-			<form action='$self_link&page=edit_{$content_name}' method='post'>
-			<style type='text/css'>
-			label {
-				display:inline-block;
-				width:120px;
-			}
-			</style>";
-            displayFormFields($variables, $content_data);
-            echo "<br />
-			<input type='hidden' name='{$content_name}_id' value='" . $content_data[$content_name . '_id'] . "' />
-			<input type='submit' name='{$content_name}_data' value='Edit' />
-			</form>
-			</td></tr></table>";
+        if($bloodline_data && $editing_bloodline_id) {
+            require 'templates/admin/edit_bloodline.php';
         }
+
         // Show form for selecting ID
-        if($select_content) {
-            $result = $system->query("SELECT `{$content_name}_id`, `name` FROM `$table_name`");
-            echo "<table class='table'><tr><th>Select $content_name</th></tr>
-			<tr><td>
-			<form action='$self_link&page=edit_{$content_name}' method='post'>
-			<select name='{$content_name}_id'>";
+        if($editing_bloodline_id == null) {
+            $result = $system->query("SELECT * FROM `bloodlines` ORDER BY `rank` ASC");
+            $all_bloodlines = [];
             while($row = $system->db_fetch($result)) {
-                echo "<option value='" . $row[$content_name . '_id'] . "'>" . stripslashes($row['name']) . "</option>";
+                $all_bloodlines[$row['bloodline_id']] = new Bloodline($row);
             }
-            echo "</select>
-			<input type='submit' value='Select' />
-			</form>
-			</td></tr></table>";
+
+            require 'templates/admin/edit_bloodline_select.php';
         }
     }
-    // Edit AI
+    // Edit NPC
     else if($page == 'edit_rank') {
         $table_name = 'ranks';
         $content_name = 'rank';
@@ -1105,8 +880,8 @@ function adminPanel() {
         $select_content = true;
         // Validate content id
         if($_POST[$content_name . '_id']) {
-            $content_id = (int)$system->clean($_POST[$content_name . '_id']);
-            $result = $system->query("SELECT * FROM `{$table_name}` WHERE `{$content_name}_id`='$content_id'");
+            $editing_bloodline_id = (int)$system->clean($_POST[$content_name . '_id']);
+            $result = $system->query("SELECT * FROM `{$table_name}` WHERE `{$content_name}_id`='$editing_bloodline_id'");
             if($system->db_last_num_rows == 0) {
                 $system->message("Invalid $content_name!");
                 $system->printMessage();
@@ -1134,7 +909,7 @@ function adminPanel() {
                     }
                     $count++;
                 }
-                $query .= "WHERE `{$content_name}_id`='$content_id'";
+                $query .= "WHERE `{$content_name}_id`='$editing_bloodline_id'";
                 $system->query($query);
                 if($system->db_last_affected_rows == 1) {
                     $system->message(ucwords($content_name) . ' ' . $data['name'] . " has been edited!");
@@ -1153,13 +928,7 @@ function adminPanel() {
         if($content_data && !$select_content) {
             echo "<table class='table'><tr><th>Edit " . $content_name . " (" . stripslashes($content_data['name']) . ")</th></tr>
 			<tr><td>
-			<form action='$self_link&page=edit_{$content_name}' method='post'>
-			<style type='text/css'>
-			label {
-				display:inline-block;
-				width:120px;
-			}
-			</style>";
+			<form action='$admin_panel_url&page=edit_{$content_name}' method='post'>";
             displayFormFields($variables, $content_data);
             echo "<br />
 			<input type='hidden' name='{$content_name}_id' value='" . $content_data[$content_name . '_id'] . "' />
@@ -1172,7 +941,7 @@ function adminPanel() {
             $result = $system->query("SELECT `{$content_name}_id`, `name` FROM `$table_name`");
             echo "<table class='table'><tr><th>Select $content_name</th></tr>
 			<tr><td>
-			<form action='$self_link&page=edit_{$content_name}' method='post'>
+			<form action='$admin_panel_url&page=edit_{$content_name}' method='post'>
 			<select name='{$content_name}_id'>";
             while($row = $system->db_fetch($result)) {
                 echo "<option value='" . $row[$content_name . '_id'] . "'>" . stripslashes($row['name']) . "</option>";
@@ -1191,10 +960,10 @@ function adminPanel() {
         $variables =& $constraints['edit_clan'];
 
         $select_content = true;
-        // Validate AI id
+        // Validate NPC id
         if($_POST[$content_name . '_id']) {
-            $content_id = (int)$system->clean($_POST[$content_name . '_id']);
-            $result = $system->query("SELECT * FROM `{$table_name}` WHERE `{$content_name}_id`='$content_id'");
+            $editing_bloodline_id = (int)$system->clean($_POST[$content_name . '_id']);
+            $result = $system->query("SELECT * FROM `{$table_name}` WHERE `{$content_name}_id`='$editing_bloodline_id'");
             if($system->db_last_num_rows == 0) {
                 $system->message("Invalid $content_name!");
                 $system->printMessage();
@@ -1222,7 +991,7 @@ function adminPanel() {
                     }
                     $count++;
                 }
-                $query .= "WHERE `{$content_name}_id`='$content_id'";
+                $query .= "WHERE `{$content_name}_id`='$editing_bloodline_id'";
                 $system->query($query);
                 if($system->db_last_affected_rows == 1) {
                     $system->message(ucwords($content_name) . ' ' . $data['name'] . " has been edited!");
@@ -1241,13 +1010,7 @@ function adminPanel() {
         if($content_data && !$select_content) {
             echo "<table class='table'><tr><th>Edit " . $content_name . " (" . stripslashes($content_data['name']) . ")</th></tr>
 			<tr><td>
-			<form action='$self_link&page=edit_{$content_name}' method='post'>
-			<style type='text/css'>
-			label {
-				display:inline-block;
-				width:120px;
-			}
-			</style>
+			<form action='$admin_panel_url&page=edit_{$content_name}' method='post'>
 			<label>Clan ID:</label> " . $content_data['clan_id'] . "<br />";
             displayFormFields($variables, $content_data);
             echo "<br />
@@ -1261,7 +1024,7 @@ function adminPanel() {
             $result = $system->query("SELECT `{$content_name}_id`, `name` FROM `$table_name`");
             echo "<table class='table'><tr><th>Select $content_name</th></tr>
 			<tr><td>
-			<form action='$self_link&page=edit_{$content_name}' method='post'>
+			<form action='$admin_panel_url&page=edit_{$content_name}' method='post'>
 			<select name='{$content_name}_id'>";
             while($row = $system->db_fetch($result)) {
                 echo "<option value='" . $row[$content_name . '_id'] . "'>" . stripslashes($row['name']) . "</option>";
@@ -1280,10 +1043,10 @@ function adminPanel() {
         $variables =& $constraints['team'];
 
         $select_content = true;
-        // Validate AI id
+        // Validate NPC id
         if($_POST[$content_name . '_id']) {
-            $content_id = (int)$system->clean($_POST[$content_name . '_id']);
-            $result = $system->query("SELECT * FROM `{$table_name}` WHERE `{$content_name}_id`='$content_id'");
+            $editing_bloodline_id = (int)$system->clean($_POST[$content_name . '_id']);
+            $result = $system->query("SELECT * FROM `{$table_name}` WHERE `{$content_name}_id`='$editing_bloodline_id'");
             if($system->db_last_num_rows == 0) {
                 $system->message("Invalid $content_name!");
                 $system->printMessage();
@@ -1311,7 +1074,7 @@ function adminPanel() {
                     }
                     $count++;
                 }
-                $query .= "WHERE `{$content_name}_id`='$content_id'";
+                $query .= "WHERE `{$content_name}_id`='$editing_bloodline_id'";
                 $system->query($query);
                 if($system->db_last_affected_rows == 1) {
                     $system->message(ucwords($content_name) . ' ' . $data['name'] . " has been edited!");
@@ -1330,13 +1093,7 @@ function adminPanel() {
         if($content_data && !$select_content) {
             echo "<table class='table'><tr><th>Edit " . $content_name . " (" . stripslashes($content_data['name']) . ")</th></tr>
 			<tr><td>
-			<form action='$self_link&page=edit_{$content_name}' method='post'>
-			<style type='text/css'>
-			label {
-				display:inline-block;
-				width:120px;
-			}
-			</style>
+			<form action='$admin_panel_url&page=edit_{$content_name}' method='post'>
 			<label>Team ID:</label> " . $content_data['team_id'] . "<br />";
             displayFormFields($variables, $content_data);
             echo "<br />
@@ -1350,7 +1107,7 @@ function adminPanel() {
             $result = $system->query("SELECT `{$content_name}_id`, `name` FROM `$table_name`");
             echo "<table class='table'><tr><th>Select $content_name</th></tr>
 			<tr><td>
-			<form action='$self_link&page=edit_{$content_name}' method='post'>
+			<form action='$admin_panel_url&page=edit_{$content_name}' method='post'>
 			<select name='{$content_name}_id'>";
             while($row = $system->db_fetch($result)) {
                 echo "<option value='" . $row[$content_name . '_id'] . "'>" . stripslashes($row['name']) . "</option>";
@@ -1371,8 +1128,8 @@ function adminPanel() {
         $select_content = true;
         // Validate content id
         if($_POST[$content_name . '_id']) {
-            $content_id = (int)$system->clean($_POST[$content_name . '_id']);
-            $result = $system->query("SELECT * FROM `{$table_name}` WHERE `{$content_name}_id`='$content_id'");
+            $editing_bloodline_id = (int)$system->clean($_POST[$content_name . '_id']);
+            $result = $system->query("SELECT * FROM `{$table_name}` WHERE `{$content_name}_id`='$editing_bloodline_id'");
             if($system->db_last_num_rows == 0) {
                 $system->message("Invalid $content_name!");
                 $system->printMessage();
@@ -1400,7 +1157,7 @@ function adminPanel() {
                     }
                     $count++;
                 }
-                $query .= "WHERE `{$content_name}_id`='$content_id'";
+                $query .= "WHERE `{$content_name}_id`='$editing_bloodline_id'";
                 $system->query($query);
                 if($system->db_last_affected_rows == 1) {
                     $system->message(ucwords($content_name) . ' ' . $data['name'] . " has been edited!");
@@ -1419,13 +1176,7 @@ function adminPanel() {
         if($content_data && !$select_content) {
             echo "<table class='table'><tr><th>Edit " . $content_name . " (" . stripslashes($content_data['name']) . ")</th></tr>
 			<tr><td>
-			<form action='$self_link&page=edit_{$content_name}' method='post'>
-			<style type='text/css'>
-			label {
-				display:inline-block;
-				width:120px;
-			}
-			</style>
+			<form action='$admin_panel_url&page=edit_{$content_name}' method='post'>
 			<label>Mission ID:</label> " . $content_data['mission_id'] . "<br />";
             displayFormFields($variables, $content_data);
             echo "<br />
@@ -1439,7 +1190,7 @@ function adminPanel() {
             $result = $system->query("SELECT `{$content_name}_id`, `name` FROM `$table_name`");
             echo "<table class='table'><tr><th>Select $content_name</th></tr>
 			<tr><td>
-			<form action='$self_link&page=edit_{$content_name}' method='post'>
+			<form action='$admin_panel_url&page=edit_{$content_name}' method='post'>
 			<select name='{$content_name}_id'>";
             while($row = $system->db_fetch($result)) {
                 echo "<option value='" . $row[$content_name . '_id'] . "'>" . stripslashes($row['name']) . "</option>";
@@ -1542,13 +1293,7 @@ function adminPanel() {
             $data =& $user_data;
             echo "<table class='table'><tr><th>Edit User (" . stripslashes($data['user_name']) . ")</th></tr>
 			<tr><td>
-			<form action='$self_link&page=edit_user&user_name={$data['user_name']}' method='post'>
-			<style type='text/css'>
-			label {
-				display:inline-block;
-				width:120px;
-			}
-			</style>";
+			<form action='$admin_panel_url&page=edit_user&user_name={$data['user_name']}' method='post'>";
             displayFormFields($variables, $data);
             echo "<br />
 			<input type='hidden' name='user_name' value='{$data['user_name']}' />
@@ -1560,7 +1305,7 @@ function adminPanel() {
         if($select_user) {
             echo "<table class='table'><tr><th>Edit User</th></tr>
 			<tr><td style='text-align:center;'>
-			<form action='$self_link&page=edit_user' method='get'>
+			<form action='$admin_panel_url&page=edit_user' method='get'>
 			<b>Username</b><br />
 			<input type='hidden' name='page' value='edit_user' />
 			<input type='hidden' name='id' value='{$_GET['id']}'' />
@@ -1585,7 +1330,7 @@ function adminPanel() {
         }
         echo "<table class='table'><tr><th>Activate User</th></tr>
 		<tr><td style='text-align:center;'>
-			<form action='$self_link&page=activate_user' method='post'>
+			<form action='$admin_panel_url&page=activate_user' method='post'>
 			<b>-Username-</b><br />
 			<input type='text' name='activate' /><br />
 			<input type='submit' value='Activate' />
@@ -1611,7 +1356,7 @@ function adminPanel() {
                 if(!isset($_POST['confirm'])) {
                     echo "<table class='table'><tr><th>Delete User</th></tr>
 					<tr><td style='text-align:center;'>
-						<form action='$self_link&page=delete_user' method='post'>
+						<form action='$admin_panel_url&page=delete_user' method='post'>
 						Are you sure you want to delete <b>$user_name</b>?<br />
 						<input type='hidden' name='user_name' value='$user_name' />
 						<input type='hidden' name='confirm' value='1' />
@@ -1635,7 +1380,7 @@ function adminPanel() {
             $system->printMessage();
             echo "<table class='table'><tr><th>Delete User</th></tr>
 			<tr><td style='text-align:center;'>
-				<form action='$self_link&page=delete_user' method='post'>
+				<form action='$admin_panel_url&page=delete_user' method='post'>
 				<b>Username</b><br />
 				<input type='text' name='user_name' /><br />
 				<input type='submit' name='Delete' />
@@ -1657,10 +1402,10 @@ function adminPanel() {
             $bloodlines[$row['bloodline_id']]['name'] = $row['name'];
         }
         if($_POST['give_bloodline']) {
-            $bloodline_id = (int)$system->clean($_POST['bloodline_id']);
+            $editing_bloodline_id = (int)$system->clean($_POST['bloodline_id']);
             $user_name = $system->clean($_POST['user_name']);
             try {
-                if(!isset($bloodlines[$bloodline_id])) {
+                if(!isset($bloodlines[$editing_bloodline_id])) {
                     throw new Exception("Invalid bloodline!");
                 }
                 $result = $system->query("SELECT `user_id` FROM `users` WHERE `user_name`='$user_name' LIMIT 1");
@@ -1669,7 +1414,11 @@ function adminPanel() {
                 }
                 $result = $system->db_fetch($result);
                 $user_id = $result['user_id'];
-                $status = giveBloodline($bloodline_id, $user_id);
+                $status = Bloodline::giveBloodline(
+                    system: $system,
+                    bloodline_id: $editing_bloodline_id,
+                    user_id: $user_id
+                );
             } catch(Exception $e) {
                 $system->message($e->getMessage());
             }
@@ -1677,7 +1426,7 @@ function adminPanel() {
         }
         echo "<table class='table'><tr><th>Give Bloodline</th></tr>
 		<tr><td>
-		<form action='$self_link&page=give_bloodline' method='post'>
+		<form action='$admin_panel_url&page=give_bloodline' method='post'>
 		<b>Bloodline</b><br />
 		<select name='bloodline_id'>";
         foreach($bloodlines as $id => $bloodline) {
@@ -1692,408 +1441,3 @@ function adminPanel() {
     }
 }
 
-function formPreloadData($variables, &$data, $post = true, $post_array = false) {
-    if($post_array == false) {
-        $post_array = $_POST;
-    }
-    foreach($variables as $var_name => $variable) {
-        if(isset($variable['count']) or is_array(reset($variable))) {
-            if(isset($variable['count'])) {
-                $data_array = [];
-                for($i = 0; $i < $variable['count']; $i++) {
-                    $data_array[$i] = [];
-                    formPreloadData($variable['variables'], $data_array[$i], $post, $post_array[$var_name][$i]);
-                }
-                $data[$var_name] = json_encode($data_array);
-            }
-            else {
-            }
-        }
-        else {
-            if(isset($post_array[$var_name]) && $post) {
-                $data[$var_name] = htmlspecialchars($post_array[$var_name], ENT_QUOTES);
-            }
-            else {
-                $data[$var_name] = '';
-            }
-        }
-    }
-}
-
-// Throws exception if any validation error
-function validateFormData($variables, &$data, $content_id = null) {
-    global $system;
-    foreach($variables as $var_name => $variable) {
-        if(isset($_POST[$var_name])) {
-            if(isset($variable['count']) or is_array(reset($variable))) {
-                // Validate a set number of exact same variables
-                if(isset($variable['count'])) {
-                    $data_array = [];
-                    $count = 0;
-                    for($i = 0; $i < $variable['count']; $i++) {
-                        $data_array[$count] = [];
-                        foreach($variable['variables'] as $name => $var) {
-                            if($var['special'] == 'remove' and !empty($_POST[$var_name][$i][$name])) {
-                                $data_array[$count] = [];
-                                break;
-                            }
-                            if(empty($_POST[$var_name][$i][$name])) {
-                                continue;
-                            }
-                            else {
-                                validateVariable($name, $_POST[$var_name][$i][$name], $var, $variables, $data_array[$count], $content_id);
-                            }
-                        }
-                        if(empty($data_array[$count])) {
-                            unset($data_array[$count]);
-                        }
-                        else {
-                            $count++;
-                        }
-                    }
-                    if(!isset($variable['num_required'])) {
-                        $variable['num_required'] = $variable['count'];
-                    }
-                    if($count < $variable['num_required']) {
-                        throw new Exception("Invalid $var_name! (needs at least " . $variable['num_required'] . ")");
-                    }
-                    $data[$var_name] = json_encode($data_array);
-                }
-                else {
-                }
-            }
-            else {
-                validateVariable($var_name, $_POST[$var_name], $variable, $variables, $data, $content_id);
-            }
-        }
-        else {
-            throw new Exception("Invalid " . ucwords(str_replace("_", " ", $var_name)) . "!");
-        }
-    }
-}
-
-function validateVariable($var_name, $input, $variable, &$variables, &$data, $content_id = null) {
-    global $system;
-    // Skip variable if it is not required
-    if(isset($variable['required_if'])) {
-        $req_var = $variable['required_if'];
-        // If variable false/not set, continue
-        if(empty($data[$req_var]) && empty($_POST[$req_var])) {
-            return true;
-        }
-        // If variable is set and value matches not required key
-        if(!empty($data[$req_var]) && $data[$req_var] == $variables[$req_var]['not_required_value']) {
-            return true;
-        }
-        if(!empty($_POST[$req_var]) && $_POST[$req_var] == $variables[$req_var]['not_required_value']) {
-            return true;
-        }
-    }
-    // Check for special remove variable
-    if(isset($variable['special']) && $variable['special'] == 'remove') {
-        return true;
-    }
-    $data[$var_name] = $system->clean($input);
-    // Check for entry
-    if(strlen($data[$var_name]) < 1) {
-        throw new Exception("Please enter " . ucwords(str_replace("_", " ", $var_name)) . "!");
-    }
-    // Check numeric variables
-    if($variable['data_type'] != 'string') {
-        if(!is_numeric($data[$var_name])) {
-            throw new Exception("Invalid " . ucwords(str_replace("_", " ", $var_name)) . "!");
-        }
-    }
-    // Check variable matches restricted possibles list, if any
-    if(!empty($variable['options'])) {
-        if($variable['data_type'] == 'string') {
-            if(array_search($data[$var_name], $variable['options']) === false) {
-                throw new Exception("Invalid " . ucwords(str_replace("_", " ", $var_name)) . "!");
-            }
-        }
-        else {
-            if(!isset($variable['options'][$data[$var_name]])) {
-                throw new Exception("Invalid " . ucwords(str_replace("_", " ", $var_name)) . "!");
-            }
-        }
-    }
-    // Check max length
-    if(isset($variable['max_length'])) {
-        if(strlen($data[$var_name]) > $variable['max_length']) {
-            throw new Exception(ucwords(str_replace("_", " ", $var_name)) .
-                " is too long! (" . strlen($data[$var_name]) . "/" . $variable['max_length'] . " chars)"
-            );
-        }
-    }
-    // Check pattern
-    if(isset($variable['pattern'])) {
-        if(!preg_match($variable['pattern'], $data[$var_name])) {
-            throw new Exception("Invalid " . ucwords(str_replace("_", " ", $var_name)) . "!");
-        }
-    }
-    // Check for uniqueness
-    if(isset($variable['unique_required']) && $variable['unique_required'] == true) {
-        if($content_id) {
-            $query = "SELECT `{$variable['unique_column']}` FROM `{$variable['unique_table']}` 
-				WHERE `{$variable['unique_column']}` = '" . $data[$var_name] . "' and `{$variable['id_column']}` != '$content_id' LIMIT 1";
-        }
-        else {
-            $query = "SELECT `{$variable['unique_column']}` FROM `{$variable['unique_table']}` 
-				WHERE `{$variable['unique_column']}` = '" . $data[$var_name] . "' LIMIT 1";
-        }
-        $result = $system->query($query);
-        if($system->db_last_num_rows > 0) {
-            throw new Exception("'" . ucwords(str_replace("_", " ", $var_name)) . "' needs to be unique, the value '" . $data[$var_name] . "' is already taken!");
-        }
-    }
-}
-
-function displayFormFields($variables, $data, $input_name_prefix = '') {
-    foreach($variables as $var_name => $variable) {
-        // Variable is an array of sub-variables
-        if(isset($variable['count']) or is_array(reset($variable))) {
-            // Display a set number of exact same variables
-            if(isset($variable['count'])) {
-                echo "<label for='{$var_name}'>" . ucwords(str_replace("_", " ", $var_name)) . ":</label>" .
-                    (isset($variable['num_required']) ? "<i>(" . $variable['num_required'] . " required)</i>" : "") .
-                    "<div style='margin-left:20px;margin-top:0px;'>";
-                $data_vars = json_decode($data[$var_name], true);
-                for($i = 0; $i < $variable['count']; $i++) {
-                    $name = $var_name . '[' . $i . ']';
-                    echo "<span style='display:block;margin-top:10px;font-weight:bold;'>#" . ($i + 1) .
-                        ": <button onclick='$(\"#" . $var_name . '_' . $i . "\").toggle();return false;'>Show/Hide</button></span>";
-                    echo "<div id='" . $var_name . '_' . $i . "'" .
-                        (count($variable['variables']) > 4 ? " style='display:none;'" : '') . ">";
-                    displayFormFields($variable['variables'], $data_vars[$i], $name);
-                    echo "</div>";
-                }
-                if($variable['deselect']) {
-                    $name = $var_name;
-                    if($input_name_prefix) {
-                        $name = $input_name_prefix . '[' . $name . ']';
-                    }
-                    echo "<br />
-					<input type='radio' name='name' value='none' />None<br />";
-                }
-                echo "</div>";
-            }
-            // Display unique data structure based on array key names
-            else {
-                echo "<label for='$var_name'>" . ucwords(str_replace("_", " ", $var_name)) . ":</label>
-				<p style='margin-left:20px;margin-top:0px;'>";
-                $data_vars = json_decode($data[$var_name], true);
-                displayFormFields($variable, $data_vars, $var_name);
-                if($variable['deselect']) {
-                    $name = $var_name;
-                    if($input_name_prefix) {
-                        $name = $input_name_prefix . '[' . $name . ']';
-                    }
-                    echo "<br />
-					<input type='radio' name='name' value='none' />None<br />";
-                }
-                echo "</p>";
-            }
-        }
-        else {
-            displayVariable($var_name, $variable, $data[$var_name], $input_name_prefix);
-        }
-    }
-    return true;
-}
-
-function displayVariable($var_name, $variable, $current_value, $input_name_prefix = '') {
-    global $system;
-    // Set input name
-    $name = $var_name;
-    if($input_name_prefix) {
-        $name = $input_name_prefix . '[' . $name . ']';
-    }
-    if($variable['input_type'] == 'text') {
-        echo "<label for='$name'>" . ucwords(str_replace("_", " ", $var_name)) . ":</label>
-		<input type='text' name='$name' value='" . stripslashes($current_value) . "' /><br />";
-    }
-    else if($variable['input_type'] == 'text_area') {
-        echo "<label for='$var_name'>" . ucwords(str_replace("_", " ", $var_name)) . ":</label><br />
-        <label></label>&nbsp;<textarea name='$var_name'>" . stripslashes($data[$var_name]) . "</textarea><br />";
-    }
-    else if($variable['input_type'] == 'radio' && !empty($variable['options'])) {
-        echo "<label for='$name' style='margin-top:5px;'>" . ucwords(str_replace("_", " ", $var_name)) . ":</label>
-		<p style='padding-left:10px;margin-top:5px;'>";
-        $count = 1;
-        foreach($variable['options'] as $id => $option) {
-            if($variable['data_type'] == 'int' || $variable['data_type'] == 'float') {
-                echo "<input type='radio' name='$name' value='$id' " .
-                    ($current_value == $id ? "checked='checked'" : '') .
-                    " />" . ucwords(str_replace("_", " ", $option));
-                $count++;
-            }
-            else if($variable['data_type'] == 'string') {
-                echo "<input type='radio' name='$name' value='$option' " .
-                    ($current_value == $option ? "checked='checked'" : '') .
-                    " />" . ucwords(str_replace("_", " ", $option));
-            }
-            echo "<br />";
-        }
-        echo "</p>";
-    }
-    else if($variable['special'] == 'remove') {
-        echo "<label for='$name' style='margin-top:5px;'>Remove:</label>
-		<p style='padding-left:10px;margin-top:5px;'>
-			<input type='checkbox' name='$name' value='1' />";
-    }
-    else {
-        echo "Coming soon!<br />";
-    }
-    return true;
-}
-
-function giveBloodline($bloodline_id, $user_id, $display = true) {
-    global $system;
-    $result = $system->query("SELECT * FROM `bloodlines` WHERE `bloodline_id` = '$bloodline_id' LIMIT 1");
-    if($system->db_last_num_rows == 0) {
-        throw new Exception("Invalid bloodline!");
-    }
-    $bloodline = $system->db_fetch($result);
-
-    $user_bloodline['bloodline_id'] = $bloodline['bloodline_id'];
-    $user_bloodline['name'] = $bloodline['name'];
-    $user_bloodline['passive_boosts'] = $bloodline['passive_boosts'];
-    $user_bloodline['combat_boosts'] = $bloodline['combat_boosts'];
-    $user_bloodline['jutsu'] = $bloodline['jutsu'];
-    // 5000 bl skill -> 20 power = 1 increment of BL effect
-    // Heal: 1 increment = 100 heal
-
-    $effects = [
-        // Passive boosts
-        'scout_range' => [
-            'multiplier' => 0.00004,
-        ],
-        'stealth' => [
-            'multiplier' => 0.00004,
-        ],
-        'regen' => [
-            'multiplier' => 0.0001,
-        ],
-        // Combat boosts
-        'heal' => [
-            'multiplier' => 0.001,
-        ],
-        'ninjutsu_boost' => [
-            'multiplier' => 0.01,
-        ],
-        'taijutsu_boost' => [
-            'multiplier' => 0.01,
-        ],
-        'genjutsu_boost' => [
-            'multiplier' => 0.01,
-        ],
-        'ninjutsu_resist' => [
-            'multiplier' => 0.01,
-        ],
-        'taijutsu_resist' => [
-            'multiplier' => 0.01,
-        ],
-        'genjutsu_resist' => [
-            'multiplier' => 0.01,
-        ],
-        'speed_boost' => [
-            'multiplier' => 0.001,
-        ],
-        'cast_speed_boost' => [
-            'multiplier' => 0.001,
-        ],
-        'endurance_boost' => [
-            'multiplier' => 0.001,
-        ],
-        'intelligence_boost' => [
-            'multiplier' => 0.001,
-        ],
-        'willpower_boost' => [
-            'multiplier' => 0.001,
-        ],
-    ];
-    if($user_bloodline['passive_boosts']) {
-        $user_bloodline['passive_boosts'] = json_decode($user_bloodline['passive_boosts'], true);
-        foreach($user_bloodline['passive_boosts'] as $id => $boost) {
-            if(!isset($effects[$boost['effect']])) {
-            }
-            else {
-                $user_bloodline['passive_boosts'][$id]['power'] = round($boost['power'] * $effects[$boost['effect']]['multiplier'], 6);
-            }
-        }
-        $user_bloodline['passive_boosts'] = json_encode($user_bloodline['passive_boosts']);
-    }
-    if($user_bloodline['combat_boosts']) {
-        $user_bloodline['combat_boosts'] = json_decode($user_bloodline['combat_boosts'], true);
-        foreach($user_bloodline['combat_boosts'] as $id => $boost) {
-            if(!isset($effects[$boost['effect']])) {
-            }
-            else {
-                $user_bloodline['combat_boosts'][$id]['power'] = round($boost['power'] * $effects[$boost['effect']]['multiplier'], 6);
-            }
-        }
-        $user_bloodline['combat_boosts'] = json_encode($user_bloodline['combat_boosts']);
-    }
-
-    // move ids (level & exp -> 0)
-    $user_bloodline['jutsu'] = false;
-    $result = $system->query("SELECT `bloodline_id` FROM `user_bloodlines` WHERE `user_id`='$user_id' LIMIT 1");
-
-    // Insert new row
-    if($system->db_last_num_rows == 0) {
-        $query = "INSERT INTO `user_bloodlines` (`user_id`, `bloodline_id`, `name`, `passive_boosts`, `combat_boosts`, `jutsu`)
-			VALUES ('$user_id', '$bloodline_id', '{$user_bloodline['name']}', '{$user_bloodline['passive_boosts']}', 
-			'{$user_bloodline['combat_boosts']}', '{$user_bloodline['jutsu']}')";
-    }
-
-    // Update existing row
-    else {
-        $query = "UPDATE `user_bloodlines` SET
-			`bloodline_id` = '$bloodline_id',
-			`name` = '{$user_bloodline['name']}',
-			`passive_boosts` = '{$user_bloodline['passive_boosts']}',
-			`combat_boosts` = '{$user_bloodline['combat_boosts']}',
-			`jutsu` = '{$user_bloodline['jutsu']}'
-			WHERE `user_id`='$user_id' LIMIT 1";
-    }
-    $system->query($query);
-
-    if($system->db_last_affected_rows == 1) {
-        if($display) {
-            $system->message("Bloodline given!");
-        }
-        $result = $system->query("SELECT `exp`, `bloodline_skill` FROM `users` WHERE `user_id`='$user_id' LIMIT 1");
-        $result = $system->db_fetch($result);
-        $new_exp = $result['exp'];
-        $new_bloodline_skill = $result['bloodline_skill'];
-        if($result['bloodline_skill'] > 10) {
-            $bloodline_skill_reduction = ($result['bloodline_skill'] - 10) * Bloodline::SKILL_REDUCTION_ON_CHANGE;
-            $new_exp -= $bloodline_skill_reduction * 10;
-            $new_bloodline_skill -= $bloodline_skill_reduction;
-        }
-
-        $query = "UPDATE `users` SET 
-            `bloodline_id`='$bloodline_id', 
-            `bloodline_name`='{$bloodline['name']}', 
-            `bloodline_skill`='{$new_bloodline_skill}',
-            `exp`='{$new_exp}'
-			WHERE `user_id`='$user_id' LIMIT 1";
-
-        $system->query($query);
-        if($user_id == $_SESSION['user_id']) {
-            global $player;
-            $player->bloodline_id = $bloodline_id;
-            $player->bloodline_name = $bloodline['name'];
-            $player->exp = $new_exp;
-            $player->bloodline_skill = $new_bloodline_skill;
-        }
-    }
-    else {
-        throw new Exception("Error giving bloodline! (Or user already has this BL)");
-    }
-
-    if($display) {
-        $system->printMessage();
-    }
-    return true;
-}

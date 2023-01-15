@@ -14,6 +14,11 @@ Body{
 	color: white;
 	margin: 0px;
 	padding: 0px;
+	padding-bottom: 50px; /*Due to Menu stuck at bottom*/
+	background-image: url("./images/temp-background-lowquality.jpg");
+	background-repeat: no-repeat;
+	background-position: center;
+	background-size: cover;
 	background-color: rgba(0,0,0,1);
 	font-size: 1em;
 }
@@ -27,7 +32,7 @@ p{
 }
 b{
 	/* width: 100%; */
-	/* display: none; /*Hides warning messages*/ */
+	display: none; /*Hides warning messages*/
 }
 a{
 	color: rgba(220,220,220,1);
@@ -46,7 +51,12 @@ table{
 }
 
 #sidebar {
-	position: static;
+	z-index: 99;
+	position: fixed;
+	bottom: 0;
+	right: 0;
+	left: 0;
+	min-width: 50px;
 }
 
 #chat_table{
@@ -80,7 +90,6 @@ table{
 	display: grid;
 	grid-template-columns: 1fr 1fr 1fr;
 	height: auto;
-	margin: 0em 0em 1em 0em;
 }
 
 .buttonList{
@@ -93,7 +102,8 @@ table{
 	padding: 1em 0em;
 
 	text-decoration: none;
-	border: 1px solid white;
+	border: 3px solid rgba(140, 140, 140);
+	border-bottom: 0px;
 	font-weight: bold;
 
 	background-color: rgba(75,75,75, 1);
@@ -138,11 +148,19 @@ table{
 }
 /*when topMenu gets the class {.open} applied*/
 .topMenu.open{
-	height: auto;
+	height: 220px;
+	position: fixed;
+	top: 0;
+	bottom: 0;
 }
 
 .menuTouchItem{
-	/* display: inline-block; */
+	display: inline;
+	position: fixed;
+	bottom: 60;
+	right: 10;
+	height: 50px !important;
+	width: 50px !important;
 }
 
 #newstable td{
@@ -173,6 +191,7 @@ table{
 }
 #player_menu.open{
 	height: auto;
+	bottom: 100%; /* makes list appear above instead of below */
 }
 
 #character_menu.open{
@@ -181,6 +200,7 @@ table{
 }
 #character_menu.open{
 	height: auto;
+	bottom: 100%; /* makes list appear above instead of below */
 }
 
 #travel_menu{
@@ -190,11 +210,13 @@ table{
 
 #travel_menu.open{
 	height: auto;
+	bottom: 100%; /* makes list appear above instead of below */
 }
 
 #staff_menu{
 	height: 0;
 	overflow: hidden;
+	bottom: 100%; /* makes list appear above instead of below */
 }
 
 #staff_menu.open{
@@ -217,11 +239,13 @@ table{
 
 #action_menu.open{
 	height: auto;
+	bottom: 100%; /* makes list appear above instead of below */
 }
 
 ul.submenu{
 	display: grid;
-	grid-template-columns: repeat(3, 1fr);
+	/* grid-template-columns: repeat(3, 1fr); */
+	grid-auto-flow: row;
 	/* grid-column-gap: 0.25fr; */
 }
 
@@ -229,15 +253,16 @@ ul.submenu{
 	display: inline-block;
 	text-align: center;
 	font-size: 1em;
+	margin: 0em auto;
 	width: 100%;
 }
 .submenu li{
 	display: block;
 	text-align: center;
 	width: 90% !important;
-	margin: 0.5em auto;
 	list-style: none;
-	/* padding: 0.2em 0em; */
+	padding: 0.2em 0em;
+	margin: 0em auto;
 }
 .submenu li a{
 	display: block;
@@ -245,7 +270,9 @@ ul.submenu{
 	padding: 0.5em 0.3em;
 	margin: 0em auto;
 	text-decoration: none;
-	background: linear-gradient(0deg, rgba(40,40,40,1) 0%, rgba(62,62,62,1) 38%, rgba(40,40,40,1) 100%);
+	/* background: linear-gradient(0deg, rgba(40,40,40,1) 0%, rgba(62,62,62,1) 38%, rgba(40,40,40,1) 100%); */
+	background-color: rgba(40, 40, 40);
+	border-radius: 5px;
 }
 .submenu li a:hover{
 	background: linear-gradient(0deg, rgba(40,40,40,1) 0%, rgba(82,82,82,1) 38%, rgba(40,40,40,1) 100%);
@@ -340,18 +367,26 @@ ul.submenu{
 }
 .table tr{
 	margin: 0.5em auto;
+	display: grid;
+	/*change this to column vvv for larger screen sizes*/
+	grid-auto-flow: row;
+	justify-content: space-around;
 }
 .table tr td{
-	display: inline-block;
-	width: 90%;
+	display: block;
 	margin: .5em 0;
-	padding: 1em 0;
-	border-radius: 10px 10px 10px 10px;
+	padding: 0.5em 1em;
+	overflow: scroll;
+	border-radius: 5px 5px 5px 5px;
 
-	font-size: 1.2em;
+	width: 100%;
 
-	background-color: rgba(20,20,20, 0.7);
+	font-size: 1.1em;
+	text-align: left;
+
+	background-color: rgba(20,20,20, 0.1);
 }
+
 .table th a{
 	display: inline-block;
 	padding: 0.5em;
@@ -374,11 +409,125 @@ ul.submenu{
 }
 .profile_table td{
 	display: block;
-	width: 100% !important;
+	width: 90% !important;
 	margin: 0px auto;
 	font-size: 1em;
 }
 .profile_table tbody{
+}
+
+/*Profile Daily Tasks*/
+.contentDiv{
+	background-color: #06404C;
+	padding: 1em 0.5em;
+	text-align: left;
+}
+.contentDiv h2{
+	text-align: center;
+}
+
+.dailyTask{
+	margin: 1.75em 0em;
+}
+
+.dailyTaskTitle{
+	font-size: 28px;
+}
+
+.dailyTaskGoal:nth-child(2){
+	font-weight: bold;
+}
+
+.dailyTaskProgress{
+	display: grid;
+	width: 100%;
+	height: 20px;
+	border: 2px solid #39545c;
+	border-radius: 50px;
+}
+
+.dailyTaskProgressBar div{
+	height: 20px;
+	background-color: #4fb052;
+	border: 0px solid white;
+	border-radius: 50px;
+}
+
+.dailyTaskProgressCaption{
+	text-align: center;
+}
+
+.contentDivCaption{
+	font-weight: bold;
+}
+
+/*Special Mission Page*/
+/*Hopefully class name is only on this page and no where else hehehehe*/
+/*i'm gonna leave it very bare bone just in case*/
+.contentDiv{
+	display: grid;
+	grid-auto-flow: row;
+}
+.contentDiv a button{
+	width: 100%;
+	padding: 1em 0em;
+	margin: 0.5em 0em;
+}
+/*Special Mission Page*/
+/*Special Missions - status page thing*/
+#spec_miss_wrapper{
+	background-color: #06404C;
+}
+#spec_miss_header{
+	padding: 1em 0em;
+	margin: 1.5em 0em;
+	display: grid;
+	grid-template-columns: 1fr 1fr 1fr;
+	background-color: #15242e;
+}
+#spec_miss_cancel_wrapper{
+	padding: 1em 0em;
+}
+#spec_miss_cancel{
+	font-weight: bold;
+}
+
+.spec_miss_log_entry{
+	padding: 0.5em 0em;
+	border-top: 1px;
+	border-bottom: 1px;
+	border-right: 0px;
+	border-left: 0px;
+	border-color: #6c7ba1;
+	border-style: solid;
+}
+/*Special Missions - status page thing*/
+
+/*Members Page*/
+#members_table tbody tr:nth-child(2){
+	grid-auto-flow: column;
+}
+
+#members_team_table  tbody tr:nth-child(2){
+	grid-auto-flow: column;
+}
+
+#team_team_title{
+	font-size: 1.5rem;
+}
+
+#team_teamMembers_row{
+	grid-auto-flow: column;
+}
+
+/*View Battles Page*/
+#viewBattles_headers{
+	grid-auto-flow: column;
+}
+
+/*Spar Page*/
+#scoutArea_headers{
+	grid-auto-flow: column;
 }
 
 .header{
@@ -386,15 +535,20 @@ ul.submenu{
 	font-size: 1em;
 	padding: 1em 0em;
 	background-color: rgba(40,40,40,1);
+	border: 1px solid white rgba(255,255,255, 0.4);
+	border-left: 1px solid rgba(80,80,80);
+	border-right: 1px solid rgba(80,80,80);
+	border-top: 1px solid rgba(40,40,40);
+	border-radius: 7px 7px 0px 0px;
 }
 
 .contentHeader{
-	font-size: 1.2em;
+	font-size: 1.5em;
 	font-weight: bold;
 
 	padding: 0.5em 0em;
-	background: linear-gradient(0deg, rgba(40,40,40,1) 0%, rgba(20,20,20,1) 23%, rgba(49,62,56,0.7) 38%, rgba(40,40,40,1) 100%);
-	border-radius: 20px 20px 0px 0px;
+	border: 1px solid rgba(255,255,255,0.5);
+	border-radius: 10px 10px 0px 0px;
 	margin-bottom: 0.8em;
 }
 
@@ -425,9 +579,6 @@ ul.submenu{
 .chat_msg{
 	display: grid !important;
 	grid-template-columns: 1fr 3fr 1fr;
-	/* grid-template-rows: 0.3fr 0.7fr; */
-	align-items: center;
-	/* grid-row-gap: 0.5em; */
 	width: 98% !important;
 	margin: 1.5em auto !important;
 }
@@ -459,7 +610,6 @@ ul.submenu{
 	font-size: 1.2em;
 	align-items: center;
 	grid-column: 1 / span 2;
-	width: auto !important;
 	padding: 0.5em 0em 0em 0.5em !important;
 	overflow: scroll !important;
 }
@@ -513,12 +663,15 @@ ul.submenu{
 }
 
 #socialPosts a{
-	background: none;
+	background: rgba(40, 40, 40);
+	border-radius: 5px 5px;
+	padding: 10px;
 	border: none;
 	box-shadow: none;
 }
 #socialPosts tr{
 	width: 95%;
+	grid-auto-flow: column;
 	/* width: auto; */
 	background-color: rgba(50,50,50,1);
 	padding: 0.3em 0em;
@@ -541,11 +694,28 @@ ul.submenu{
 	display: block;
 }
 
+#handSeal_td{
+	text-align: center; /*important*/
+}
+
 #handseals{
 	display: inline-block;
 	width: 90%;
+	text-align: center !important; /*important*/
 }
 #handseals p{
+	display: inline-block;
+	text-align: center !important;
+}
+
+#weapons{
+	display: inline-block;
+	width: 90%;
+	margin: 0em auto;
+}
+#weapons p{
+	min-width: 15px;
+	font-size: 0.8em;
 	display: inline-block;
 }
 
@@ -557,12 +727,11 @@ ul.submenu{
 	color: black;
 	font-size: 0.65em;
 	padding: 0.15em 0em !important;
-	border-radius: 0px !important;
+	border-radius: 5px !important;
 }
 
 #jutsu input{
 	padding: 0.3em 0.1em;
-	/* border-radius: 5px; */
 }
 
 #jutsu span{
@@ -609,6 +778,22 @@ ul.submenu{
 /*Travel Page*/
 #scoutTable .scrollable{
 	overflow: scroll;
+}
+
+#scoutTable tbody tr:nth-child(4){
+	grid-auto-flow: column;
+}
+/*Travel Page*/
+
+.table_multicolumns{
+	grid-auto-flow: column;
+}
+.table_multicolumns a{
+	text-align: center;
+}
+
+#shop_table_header{
+	grid-auto-flow: column;
 }
 
 
@@ -704,6 +889,7 @@ ul.submenu{
 tbody{
 	display: block;
 	margin: 0em auto;
+	background-color: #06404C;
 }
 /*Separates menu items*/
 hr{
@@ -714,6 +900,7 @@ hr{
 
 label{
 	text-align: left;
+	font-size: 17px;
 }
 
 /*health bars*/
@@ -729,8 +916,16 @@ td div div{
 /*health bars*/
 
 tr{
-	display: block;
+	display: grid;
 	text-align: center;
+	justify-content: space-around;
+	align-items: center;
+	justify-items: center;
+}
+
+#kunaiExchange tr{
+	justify-content: space-around;
+	grid-auto-flow: column;
 }
 
 input{
@@ -738,7 +933,7 @@ input{
 	padding: 0.4em 0.2em;
 	font-size: 0.8em;
 	margin: 0.2em 0em;
-	border-radius: 10px 10px 10px 10px;
+	/* border-radius: 10px 10px 10px 10px; */
 
 	background-color: white;
 
@@ -761,6 +956,12 @@ textarea{
 th{
 	padding: 1em;
 	font-size: 1.2em;
+	display: grid;
+	grid-auto-flow: column;
+	justify-content: space-around;
+}
+th span{
+	margin: 0em 1em;
 }
 
 td label{
@@ -778,6 +979,20 @@ select{
 	background-color: white;
 }
 
+/*Arena*/
+#jutsu{
+	overflow: scroll;
+	text-align: center;
+}
+.jutsuCategory{
+	width: 25% !important;
+}
+.jutsuCategory span{
+	width: 70% !important;
+}
+/*Arena*/
+
+/*Notification Blink*/
 .systemMessage{
 	color: rgba(240,240,20, 1);
 }
@@ -789,4 +1004,24 @@ select{
   50% {
     opacity: 0.75;
   }
+}
+/*Notification Blink*/
+
+/*Battle Jutsu Signs Responsive Design*/
+@media (min-width: 470px) {
+
+	#handseals{
+		display: grid;
+		grid-template-columns: repeat(6, 1fr);
+		overflow: scroll;
+	}
+	#handseals p img{
+		border-radius: 20px;
+	}
+	#handseals br{
+		display: none; /*removes element*/
+	}
+	.handsealNumber{
+		background-color: #ab902e	!important; /*override default color*/
+	}
 }

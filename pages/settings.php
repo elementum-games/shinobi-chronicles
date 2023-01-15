@@ -315,8 +315,25 @@ function userSettings() {
     }
 
 	if(!$player->journal_ban) {
+        echo "<script type=text/javascript>
+        $(document).ready(function(){
+            $('#journalMessage').keyup(function (evt) {
+                    if(this.value.length >= $max_journal_length - 20)
+                    {
+                        let remaining = $max_journal_length - this.value.length;
+                        $('#remainingCharacters').text('Characters remaining: ' + remaining + ' out of ' + $max_journal_length);
+                    }
+                    else 
+                    {
+                        $('#remainingCharacters').text('');
+                    }
+                })
+            });
+        </script>";
 		echo "<form action='$self_link' method='post'>
-		<textarea style='height:350px;width:95%;margin:10px 0;' name='journal'>" . stripslashes($journal) . "</textarea>
+		<textarea style='height:350px;width:95%;margin:10px 0;' name='journal' id='journalMessage'>" . stripslashes($journal) . "</textarea>
+		<br />
+		<span id='remainingCharacters' class='red'></span>
 		<br />
 		<input type='submit' name='change_journal' value='Update' />
 		</form>";

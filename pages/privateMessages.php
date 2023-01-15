@@ -11,7 +11,6 @@
 */
 
 class Messaging {
-
 	const
 		MIN_SUBJECT_LENGTH = 2,
 		MIN_MESSAGE_LENGTH = 4,
@@ -22,19 +21,30 @@ class Messaging {
 		SEAL_INBOX_LIMIT = 75,
 		STAFF_INBOX_LIMIT = 100;
 
-	public $message_id;
+	public int|string|null $message_id;
 
-    private
-		$Messages,
-		$Users,
-		$constraints = [],
-		$label_colors = [
-			"#00C000",
-			"#CBCB10",
-			"#E00000"
-		];
+    private array $messages = [];
+    private array $users = [];
+    private array $constraints = [];
+	private array $label_colors = [
+        "#00C000",
+        "#CBCB10",
+        "#E00000"
+    ];
 
-	function __construct() {
+    public string $form_user = "";
+    public string $form_subject = "";
+
+    private System $system;
+    private User $player;
+    private string $self_link;
+
+    /**
+     * @var array|string[][]
+     */
+    private array $colors;
+
+    function __construct() {
 		global $system, $player, $self_link;
 
 		$this->system = $system;
@@ -42,16 +52,27 @@ class Messaging {
 		$this->self_link = $self_link;
 		$this->colors = $system->SC_STAFF_COLORS;
 
-		$this->constraints['message_limit'] = ($player->staff_level || $player->forbidden_seal) ? self::SEAL_MAX_MESSAGE_LENGTH : self::MAX_MESSAGE_LENGTH;
-		$this->constraints['inbox_limit'] = ($player->staff_level || $player->forbidden_seal) ? (($player->staff_level) ? self::STAFF_INBOX_LIMIT : self::SEAL_INBOX_LIMIT) : self::INBOX_LIMIT;
+		$this->constraints['message_limit'] = ($player->staff_level || $player->forbidden_seal)
+            ? self::SEAL_MAX_MESSAGE_LENGTH
+            : self::MAX_MESSAGE_LENGTH;
 
+        if($player->staff_level) {
+            $this->constraints['inbox_limit'] = self::STAFF_INBOX_LIMIT;
+        }
+        else if($player->forbidden_seal) {
+            $this->constraints['inbox_limit'] = self::SEAL_INBOX_LIMIT;
+        }
+        else {
+            $this->constraints['inbox_limit'] = self::INBOX_LIMIT;
+        }
 	}
 
-	function validateForm() {
+	function validateForm(): void {
 		$inbox_limit = $this->constraints['inbox_limit'];
 		$subject = $this->system->clean(trim($_POST['subject']));
 		$recipient = $this->system->clean(trim($_POST['recipient']));
 		$message = $this->system->clean(trim($_POST['message']));
+
 		try {
 			// Check minimum length 
 			if(strlen($subject) < self::MIN_SUBJECT_LENGTH) {
@@ -64,6 +85,7 @@ class Messaging {
 			if(strlen($message) < self::MIN_MESSAGE_LENGTH) {
 				throw new Exception("Please enter a message!");
 			}
+
 			// Check max length of subject/message
 			if(strlen($subject) > self::MAX_SUBJECT_LENGTH) {
 				throw new Exception(sprintf("Subject is too long! (%d/%d chars)", strlen($subject), self::MAX_SUBJECT_LENGTH));
@@ -79,6 +101,7 @@ class Messaging {
 			if($result['forbidden_seal']) {
 				$result['forbidden_seal'] = json_decode($result['forbidden_seal'], true);
 			}
+
 			/* Place Blacklist Here */
 			if($recipient != $this->player->user_name){
 				$blacklist = $this->system->query("SELECT `blocked_ids` FROM `blacklist` WHERE `user_id`='{$result['user_id']}' LIMIT 1");
@@ -130,7 +153,7 @@ class Messaging {
 		$this->system->printMessage();
 	}
 	
-	function deleteMessage($msg_id = false) {
+	function deleteMessage($msg_id = false): void {
 
 		if($msg_id) {
 			$this->system->query(sprintf("UPDATE `private_messages` SET `message_read` = 2 WHERE `message_id` IN(%s) AND `recipient`='%d'", $msg_id, $this->player->user_id));
@@ -160,9 +183,8 @@ class Messaging {
 
 	/**
 	 * @param $type
-	 * @param bool|false $report_link
      */
-	function display($type, $report_link = false) {
+	function display($type): void {
         global $system;
 
 		switch($type) {
@@ -183,7 +205,23 @@ class Messaging {
 
 			//Show the form for sending a new message
 			case 'form':
-
+                echo "<script type=text/javascript>
+                $(document).ready(function(){
+                    $('#messageContent').keyup(function (evt) {
+                            let max_length = {$this->constraints['message_limit']};
+                           
+                            if(this.value.length >= max_length  - 20)
+                            {
+                                let remaining = max_length - this.value.length;
+                                $('#remainingCharacters').text('Characters remaining: ' + remaining + ' out of ' + max_length);
+                            }
+                            else 
+                            {
+                                $('#remainingCharacters').text('');
+                            }
+                        })
+                    });
+                </script>";
 				echo "
 					</form>
 					<style type='text/css'>
@@ -210,8 +248,10 @@ class Messaging {
 										<label for='message'>Message</label>
 									</p>
 									<p style='text-align:center;'>
-										<textarea style='height:225px;width:500px;' name='message'></textarea>
-										<br /><br />
+										<textarea style='height:225px;width:500px;' name='message' id='messageContent'></textarea>
+										<br />
+										<span id='remainingCharacters' class='red'></span>
+										<br />
 										<input type='submit' name='new_message' value='Send' />
 									</p>
 								</td>
@@ -252,7 +292,7 @@ class Messaging {
 						</tr>
 						<tr>
 							<td style='text-align:center;'>
-								<a href='{$report_link}&report_type=2&content_id=$this->message_id'>Report Message</a>
+								<a href='{$this->system->links['report']}&report_type=2&content_id=$this->message_id'>Report Message</a>
 							</td>
 						</tr>
 					</table>
@@ -281,7 +321,7 @@ class Messaging {
 				echo "
 					<table class='table'>
 				";
-				if(! $this->Messages) {
+				if(count($this->messages) <= 0) {
 					echo "<tr><td style='text-align:center;' colspan='5'>No new messages</td></tr>";
 				}
 				else {
@@ -290,11 +330,11 @@ class Messaging {
 							<th class='rowHeader' style='width:20%;'>Sender</th>
 							<th class='rowHeader' style='width:40%;'>Subject</th>
 							<th class='rowHeader' style='width:15%;'></th>
-							<th class='rowHeader' colspan='2' style='text-shadow:0px 1px 1px #000000;color:{$this->label_color};'>{$this->msg_count} / {$this->constraints['inbox_limit']}</th>
+							<th class='rowHeader' colspan='2' style='text-shadow:0 1px 1px #000000;color:{$this->label_color};'>{$this->msg_count} / {$this->constraints['inbox_limit']}</th>
 						</tr>
 					";
 					$count = 0;
-					foreach($this->Messages as $message) {	
+					foreach($this->messages as $message) {
 						$class = '';
 						if(is_int($count++ / 2)) {
 							$class = 'row1';
@@ -307,12 +347,9 @@ class Messaging {
 						}
 						// Staff-level
 						$staff = $this->staffColor($message['staff_level']);
-						$persons_name = ($this->Users[$message['sender']]) ? $this->Users[$message['sender']] : $message['sender'];
+						$persons_name = $this->users[$message['sender']] ?? $message['sender'];
 
-						$sender = $this->Users[$message['sender']];
-
-						if(! ctype_digit($persons_name)) {
-
+						if(!ctype_digit($persons_name)) {
 							echo "
 								<tr class='table_multicolumns'>
 									<td style='text-align:center;width:20%;' class='$class'>
@@ -349,7 +386,7 @@ class Messaging {
 
 	}
 
-	function inbox() {
+	function inbox(): void {
 
 		$sql = sprintf("SELECT `message_id`, `sender`, `subject`, `message_read`, `staff_level` FROM `private_messages` WHERE `recipient` = '%d' AND `message_read` < 2 ORDER BY `message_id` DESC LIMIT 0, %d", $this->player->user_id, $this->constraints['inbox_limit'] + 50);
 		$this->system->query($sql);
@@ -363,7 +400,7 @@ class Messaging {
 		}
 
 		if(! $this->system->db_last_num_rows) {
-			$this->Messages = NULL;
+			$this->messages = [];
 		}
 		else {
 
@@ -382,10 +419,10 @@ class Messaging {
 					$users[$user_fetch['user_id']] = $user_fetch['user_name'];
 
 				}
-				$this->Users = $users;
+				$this->users = $users;
 			}
 
-			$this->Messages = $messages;
+			$this->messages = $messages;
 
 			// Set count color
 			$this->label_color = ($this->msg_count < ($this->constraints['inbox_limit'] - 10)) ? $this->label_colors[0] : ( ($this->msg_count < $this->constraints['inbox_limit']) ? $this->label_colors[1] : $this->label_colors[2]);
@@ -394,11 +431,14 @@ class Messaging {
 
 	}
 
-	function displayPrivateMessage() {
-
-		$query = "SELECT * FROM `private_messages` WHERE `message_id` = '%d' AND `recipient` = '%d' AND `message_read` < 2 LIMIT 1";
-		$queried = $this->system->query(sprintf($query, $this->message_id, $this->player->user_id));
-		$message = $this->system->db_fetch();
+	function displayPrivateMessage(): bool {
+		$result = $this->system->query(
+        "SELECT * FROM `private_messages` 
+                WHERE `message_id` = '{$this->message_id}' 
+                AND `recipient` = '{$this->player->user_id}' 
+                AND `message_read` < 2 LIMIT 1"
+        );
+        $message = $this->system->db_fetch($result);
 		
 		if(! $message) {
 			return false;
@@ -412,17 +452,15 @@ class Messaging {
 			$user_info = $this->system->db_fetch($query);
 			$sender = $user_info['user_name'];
 		}
-		
-		$staff = $this->staffcolor($message['staff_level']);
-		$pmsubject = stripslashes($message['subject']);
+
 		$subject = $message['subject'];
 		$msg = $this->system->html_parse($message['message'], false, false);
 		
-		if(substr($subject, 0, 3) != "RE:") {
+		if(!str_starts_with($subject, "RE:")) {
 			$subject = "RE: " . $subject;
 		}
 		
-		if(! $message['read']) {
+		if(!$message['message_read']) {
 			$this->system->query("UPDATE `private_messages` SET `message_read`='1' WHERE `message_id`='{$this->message_id}' LIMIT 1");
 		}
 
@@ -443,7 +481,7 @@ class Messaging {
 
 }
 
-function privateMessages() {
+function privateMessages(): void {
 	/*
 	-send messages
 	-view list of messages
@@ -481,7 +519,9 @@ function privateMessages() {
 
 		//For viewing private messages	
 		case 'view_message':
-			($Messaging->displayPrivateMessage()) ? $Messaging->display('privateMessage', $system->links['members'], $system->links['report']) : $Messaging->display('privateMessage:Error');
+			($Messaging->displayPrivateMessage())
+                ? $Messaging->display(type: 'privateMessage')
+                : $Messaging->display('privateMessage:Error');
 		break;
 		
 		//For deleting messages

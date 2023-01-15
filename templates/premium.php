@@ -8,6 +8,7 @@
  * @var array  $available_clans
  * @var array $name_colors
  * @var int $kunai_per_dollar
+ * @var int $stat_transfer_points_per_min
  *
  * @var string $paypal_url
  * @var string $paypal_business_id
@@ -46,16 +47,16 @@
     <!--// Character reset-->
     <table class='table'>
         <tr>
-            <th>Character Reset</th>
-            <th>Individual Stat Resets</th>
+            <th id='premium_characterReset_header' >Character Reset</th>
+            <th id='premium_individualStatReset_header'>Individual Stat Resets</th>
         </tr>
         <tr>
-            <td style='text-align:center;'>You can reset your character and start over as a level 1 Akademi-sei. This is <b>free.</b><br/>
+            <td id='premium_characterReset_data' style='text-align:center;'>You can reset your character and start over as a level 1 Akademi-sei. This is <b>free.</b><br/>
                 <form action='<?= $self_link ?>' method='post'>
                     <input type='submit' name='user_reset' value='Reset Character' style='margin-top:8px;'/>
                 </form>
             </td>
-            <td style='text-align:center;'>
+            <td id='premium_individualStatReset_data' style='text-align:center;'>
                 You can reset an individual stat, freeing up space in your total stat cap to train something else higher.
                 This is <b>free.</b><br/>
                 <form action='<?= $self_link ?>&view=character_changes' method='post'>
@@ -119,6 +120,7 @@
                 <!--suppress JSUnresolvedFunction -->
                 <script type='text/javascript'>
                     let stats = {};
+                    let pointsPerMin = <?= $stat_transfer_points_per_min ?>;
 
                     function statSelectChange() {
                         $('#transferAmount').val(stats[ $('#statAllocateSelect').val() ]);
@@ -134,7 +136,7 @@
                         else {
                             cost = 1 + Math.floor(transferAmount / 300);
                         }
-                        const time = transferAmount * 0.2;
+                        const time = transferAmount / pointsPerMin;
                         const display = cost + ' AK / ' + time + ' minutes';
                         $('#statAllocateCost').html(display);
                     }
@@ -384,11 +386,11 @@
             </td>
         </tr>
         <tr>
-            <th>Twin Sparrow Seal</th>
-            <th>Four Dragon Seal</th>
+            <th id='premium_twinSparrowSeal_header'>Twin Sparrow Seal</th>
+            <th id='premium_fourDragonSeal_header'>Four Dragon Seal</th>
         </tr>
         <tr>
-            <td style='width:50%;vertical-align:top;'>
+            <td id='premium_twinSparrowSeal_data' style='width:50%;vertical-align:top;'>
                 <p style='font-weight:bold;text-align:center;'>
                     <?= $costs['forbidden_seal'][1] ?> Ancient Kunai / 30 days</p>
                 <br/>
@@ -414,7 +416,7 @@
                     </p>
                 </form>
             </td>
-            <td style='width:50%;vertical-align:top;'>
+            <td id='premium_fourDragonSeal_data' style='width:50%;vertical-align:top;'>
                 <p style='font-weight:bold;text-align:center;'>
                     <?= $costs['forbidden_seal'][2] ?> Ancient Kunai / 30 days</p>
                 <br/>

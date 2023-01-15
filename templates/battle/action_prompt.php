@@ -407,7 +407,7 @@ $prefill_item_id = $_POST['item_id'] ?? '';
     });
 </script>
 
-<tr><td colspan='2'>
+<tr><td id="handSeal_td" colspan='2'>
 <div style='margin:0;position:relative;'>
     <?php if($battle->isPreparationPhase()): ?>
         <p style='text-align:center;font-style:italic;'>
@@ -473,7 +473,7 @@ $prefill_item_id = $_POST['item_id'] ?? '';
                 $width = '23.5%';
             }
             else {
-                $width = '32%';
+                $width = '31.8%';
             }
         ?>
         <span style='display:inline-block;width:<?= $width ?>;'>Ninjutsu</span>

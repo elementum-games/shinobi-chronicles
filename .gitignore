@@ -1,9 +1,11 @@
 /.idea
 /planning/server_info.txt
 /secure
-!/secure/vars.sample.php
+!/secure/vars.php
 /tools
 .htaccess
+node_modules
 
 /vendor/
 /layout/designs
+/planning/combat

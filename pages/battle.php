@@ -60,7 +60,15 @@ function battle(): bool {
 				$player->last_pvp = time();
 				$player->last_death = time();
 				$player->moveToVillage();
-				// Daily Tasks
+
+                // If player is killed during a survival mission as a result of PVP, clear the survival mission
+                if($player->mission_id != null)
+                {
+                    check_survival_missions($player->mission_id);
+                }
+
+
+                // Daily Tasks
 				foreach ($player->daily_tasks as $task) {
 					if ($task->activity == DailyTask::ACTIVITY_PVP && $task->sub_task == DailyTask::SUB_TASK_COMPLETE && !$task->complete) {
 						$task->progress++;
@@ -73,12 +81,11 @@ function battle(): bool {
 				$player->moveToVillage();
 				$player->last_pvp = time();
 
-				// Daily Tasks
-				foreach ($player->daily_tasks as $task) {
-					if ($task->activity == DailyTask::ACTIVITY_PVP && $task->sub_task == DailyTask::SUB_TASK_COMPLETE && !$task->complete) {
-						$task->progress++;
-					}
-				}
+                // If player is killed during a survival mission as a result of PVP, clear the survival mission
+                if($player->mission_id != null)
+                {
+                    check_survival_missions($player->mission_id);
+                }
 			}
 			echo "</td></tr></table>";
 			$player->battle_id = 0;
@@ -98,12 +105,18 @@ function battle(): bool {
 			if($user->village == $player->village) {
 				throw new Exception("You cannot attack people from your own village!");
 			}
-			if($user->rank < 3) {
+
+            if($user->rank < 3) {
 				throw new Exception("You cannot attack people below Chuunin rank!");
 			}
 			if($player->rank < 3) {
 				throw new Exception("You cannot attack people Chuunin rank and higher!");
 			}
+
+            if($user->rank !== $player->rank) {
+                throw new Exception("You can only attack people of the same rank!");
+            }
+
 			if($user->location !== $player->location) {
 				throw new Exception("Target is not at your location!");
 			}
@@ -138,4 +151,25 @@ function battle(): bool {
 		scoutArea();
 	}
 	return true;
+}
+
+/**
+ * @param int $mission_id
+ * @return void
+ */
+function check_survival_missions(Int $mission_id): void
+{
+    global $system;
+    global $player;
+
+    $result = $system->query("SELECT `mission_type` FROM `missions` WHERE `mission_id`='$mission_id' LIMIT 1");
+    if ($system->db_last_num_rows == 0) {
+        return;
+    }
+    $mission_data = $system->db_fetch($result);
+
+    if ($mission_data['mission_type'] == "5") {
+        $mission = new Mission($player->mission_id, $player);
+        $mission->nextStage($player->mission_stage['stage_id'] = 4);
+    }
 }

@@ -84,7 +84,7 @@ $side_menu_start = <<<HTML
 
 						<div>
 						<div id="character_header" class='header'>
-						Character Menu
+						Character
 						</div>
 				  	<div id="player_menu" class='buttonList'>
 HTML;
@@ -94,7 +94,7 @@ $village_menu_start = <<<HTML
 
 				<div>
 				<div id="travel_header" class='header'>
-				Travel Menu
+			  Village
 				</div>
 		  	<div id="travel_menu" class='buttonList'>
 HTML;
@@ -104,7 +104,7 @@ $action_menu_header = <<<HTML
 
 		<div>
 		<div id="action_header" class='header'>
-				Action Menu
+				Travel
 		</div>
 		<div id="action_menu" class='buttonList'>
 HTML;
@@ -114,7 +114,7 @@ $staff_menu_header = <<<HTML
 
 				<div>
 				<div id="staff_header" class='header'>
-					Staff Menu
+					Staff
 				</div>
 				<div id="staff_menu" class='buttonList'>
 HTML;

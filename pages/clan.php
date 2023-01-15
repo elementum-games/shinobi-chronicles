@@ -16,7 +16,7 @@ function clan() {
 		return false;
 	}
 	$page = 'HQ';
-	if($_GET['page']) {
+	if(!empty($_GET['page'])) {
 		$page = $_GET['page'];
 	}
 	// Available boosts
@@ -32,10 +32,18 @@ function clan() {
 		'jutsu',
 	);
 	$boost = explode(':', $player->clan['boost']);
-	$current_boost_id = array_search($boost[1], $training_boosts);
+    $current_boost_id = null;
+
+    if(count($boost) >= 2) {
+        $current_boost_id = array_search($boost[1], $training_boosts);
+    }
 	if($current_boost_id) {
 		unset($training_boosts[$current_boost_id]);
 	}
+
+    $BOOST_AMOUNT = 10;
+    $BOOST_COST = 75;
+
 	// Mission stuff
 	$max_mission_rank = 1;
 	if($player->rank == 3) {
@@ -51,7 +59,7 @@ function clan() {
 		$missions[$row['mission_id']] = $row;
 	}
 	// Check start mission
-	if($_GET['start_mission']) {
+	if(!empty($_GET['start_mission'])) {
 		$mission_id = $_GET['start_mission'];
 		try {
 			if(!isset($missions[$mission_id])) {
@@ -118,10 +126,10 @@ function clan() {
 	}
 	// Office controls
 	if($player->clan_office && $page == 'controls') {
-		if($_POST['resign']) {
+		if(!empty($_POST['resign'])) {
 			$office = $player->clan_office;
 			$office_names = array(1 => 'leader', 2 => 'elder_1', 3 => 'elder_2');
-			if($_POST['confirm_resign']) {
+			if(!empty($_POST['confirm_resign'])) {
 				$system->query("UPDATE `clans` SET `{$office_names[$office]}`=0 WHERE `clan_id`='{$player->clan['id']}' LIMIT 1");
 				$player->clan_office = 0;
 				$player->clan[$office_names[$office]] = 0;
@@ -144,7 +152,7 @@ function clan() {
 				</table>";
 			}
 		}
-		else if($_POST['motto']) {
+		else if(!empty($_POST['motto'])) {
 			$motto = $system->clean($_POST['motto']);
 			try {
 				if(strlen($motto) > 180) {
@@ -158,7 +166,7 @@ function clan() {
 			}
 			$system->printMessage();
 		}
-		else if($_POST['logo']) {
+		else if(!empty($_POST['logo'])) {
 			$logo = $system->clean($_POST['logo']);
 			try {
 				if(strlen($logo) > 150) {
@@ -172,22 +180,22 @@ function clan() {
 			}
 			$system->printMessage();
 		}
-		else if($_POST['boost']) {
+		else if(!empty($_POST['boost'])) {
 			$new_boost = $system->clean($_POST['boost']);
 			try {
-				if(array_search($new_boost, $training_boosts) === false) {
+                if(array_search($new_boost, $training_boosts) === false) {
 					throw new Exception("Invalid boost!");
 				}
-				if($player->clan['points'] < 100) {
+				if($player->clan['points'] < $BOOST_COST) {
 					throw new Exception("Not enough points!");
 				}
 				$new_boost = 'training:' . $new_boost;
-				$boost_amount = 20;
-				$player->clan['points'] -= 100;
-				$system->query("UPDATE `clans` SET `boost`='$new_boost', `boost_amount`='$boost_amount', `points`=`points` - 100 
+				$player->clan['points'] -= $BOOST_COST;
+
+				$system->query("UPDATE `clans` SET `boost`='$new_boost', `boost_amount`='$BOOST_AMOUNT', `points`=`points` - {$BOOST_COST} 
 					WHERE `clan_id`='{$player->clan['id']}' LIMIT 1");
 				$player->clan['boost'] = $new_boost;
-				$player->clan['boost_amount'] = $boost_amount;
+				$player->clan['boost_amount'] = $BOOST_AMOUNT;
 				$system->message("Boost updated!");
 				$boost = explode(':', $player->clan['boost']);
 			} catch (Exception $e) {
@@ -195,7 +203,7 @@ function clan() {
 			}
 			$system->printMessage();
 		}
-		else if($_POST['info']) {
+		else if(!empty($_POST['info'])) {
 			$info = $system->clean($_POST['info']);
 			try {
 				if(strlen($info) > 700) {
@@ -360,7 +368,7 @@ function clan() {
 					</div>
 				</td>
 			</tr>
-			<tr><th colspan='2'>Change Boost (100 Reputation)</th></tr>
+			<tr><th colspan='2'>Change Boost ($BOOST_COST Reputation)</th></tr>
 			<tr><td colspan='2' style='text-align:center;'>
 				<!--Boost-->
 				<div style='text-align:center;'>

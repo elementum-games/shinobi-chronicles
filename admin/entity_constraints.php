@@ -144,6 +144,10 @@ $constraints['edit_user'] = [
         'data_type' => 'string',
         'input_type' => 'text',
     ],
+    'spouse' => [
+        'data_type' => 'int',
+        'input_type' => 'text',
+    ],
     'village' => [
         'data_type' => 'string',
         'input_type' => 'radio',
@@ -208,7 +212,7 @@ $constraints['ai'] = [
             'battle_text' => [
                 'data_type' => 'string',
                 'input_type' => 'text',
-                'max_length' => 300,
+                'max_length' => 375,
             ],
             'power' => [
                 'data_type' => 'float',
@@ -401,7 +405,7 @@ $constraints['item'] = [
 ];
 
 /* Bloodline */
-$combat_boosts = [
+$bloodline_combat_boosts = [
     'ninjutsu_boost',
     'genjutsu_boost',
     'taijutsu_boost',
@@ -470,7 +474,7 @@ $constraints['bloodline'] = [
             'effect' => [
                 'data_type' => 'string',
                 'input_type' => 'radio',
-                'options' => $combat_boosts,
+                'options' => $bloodline_combat_boosts,
             ],
             'remove' => [
                 'special' => 'remove',

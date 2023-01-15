@@ -35,6 +35,7 @@ function premium() {
 	}
 
     $free_stat_change_timer = 86400;
+    $stat_transfer_points_per_min = 10;
 
 	$available_clans = array();
 
@@ -206,7 +207,6 @@ function premium() {
 	}
 
 	// Gender change
-
 	else if(isset($_POST['change_gender'])) {
 		try {
 			$new_gender = $_POST['new_gender'];
@@ -254,9 +254,6 @@ function premium() {
 		$system->message($e->getMessage());
 		}
 	}
-
-
-
 	else if(isset($_POST['stat_reset'])) {
 
 		try {
@@ -354,7 +351,7 @@ function premium() {
 				throw new Exception("You do not have enough Ancient Kunai!");
 			}
 
-			$time = $transfer_amount * 0.2;
+			$time = $transfer_amount / $stat_transfer_points_per_min;
 
 			// Check for minimum stat amount
 			if($player->{$original_stat} <= $reset_amount) {
@@ -455,8 +452,12 @@ function premium() {
 			$clan_id = $result['clan_id'];
 			$bloodline_name = $result['name'];
 
-			require("adminPanel.php");
-			$status = giveBloodline($bloodline_id, $player->user_id, false);
+			$status = Bloodline::giveBloodline(
+                system: $system,
+                bloodline_id: $bloodline_id,
+                user_id: $player->user_id,
+                display: false
+            );
 
 			$message = "You now have the bloodline <b>$bloodline_name</b>.";
 
@@ -1163,7 +1164,7 @@ function premiumCreditExchange() {
 
 		while($row = $system->db_fetch($result)) {
 
-			if(! in_array($credit_users[$row['seller']], $credit_users))
+			if(!in_array($row['seller'], $credit_users))
 			{
 				$query = $system->query("SELECT `user_name` FROM `users` WHERE `user_id`='{$row['seller']}'");
 				$user_info = $system->db_fetch();

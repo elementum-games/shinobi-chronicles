@@ -382,7 +382,7 @@ function members() {
 	$count = 0;
 
 	if($display_list == 'standard') {
-		$online_seconds = 120;
+		$online_seconds = 900; // 15 mins
         $results_per_page = 15;
 
 		$query_custom = '';
@@ -476,7 +476,7 @@ function members() {
 					}
 				}
 					// Team display
-				   echo "<table class='table'><tr><th colspan='4'>Top {$results_per_page} Teams - Points This Month</th></tr><tr>
+				   echo "<table id='members_team_table' class='table'><tr><th colspan='4'>Top {$results_per_page} Teams - Points This Month</th></tr><tr>
 						   <th>Name</th>
 						   <th>Leader</th>
 						   <th>Village</th>
@@ -494,7 +494,7 @@ function members() {
 
 		// List top 15 users by experience
 		else {
-			echo "<table class='table'><tr><th colspan='4'>$list_name</th></tr>
+			echo "<table id='members_table' class='table'><tr><th colspan='4'>$list_name</th></tr>
 				<tr>
 					<th style='width:30%;'>Username</th>
 					<th style='width:20%;'>Rank</th>
