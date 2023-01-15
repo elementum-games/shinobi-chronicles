@@ -76,9 +76,9 @@ class User extends Fighter {
     public float $chakra;
     public float $max_chakra;
 
-    public $current_ip;
-    public $last_ip;
-    public $email;
+    public string $current_ip;
+    public string $last_ip;
+    public string $email;
     public $failed_logins;
     public $global_message_viewed;
 
@@ -201,7 +201,8 @@ class User extends Fighter {
 
     public int $last_pvp;
     public int $last_death;
-    public int $premium_credits;
+
+    private int $premium_credits;
     public int $premium_credits_purchased;
 
     public int $total_stats;
@@ -209,10 +210,10 @@ class User extends Fighter {
     public int $scout_range;
 
     public int $stealth;
-    public $village_changes;
-    public $clan_changes;
+    public int $village_changes;
+    public int $clan_changes;
 
-    public $clan_office;
+    public int $clan_office;
 
     public array $equipped_armor;
     public array $bloodline_offense_boosts;
@@ -1152,6 +1153,43 @@ class User extends Fighter {
             throw new Exception("Not enough money!");
         }
         $this->setMoney($this->money - $amount, $description);
+    }
+
+    public function getPremiumCredits(): int {
+        return $this->premium_credits;
+    }
+
+    /**
+     * @throws Exception
+     */
+    private function setPremiumCredits(int $new_amount, string $description) {
+        $this->system->currencyLog(
+            $this->user_id,
+            System::CURRENCY_TYPE_PREMIUM_CREDITS,
+            $this->premium_credits,
+            $new_amount,
+            $new_amount - $this->premium_credits,
+            $description
+        );
+        $this->premium_credits = $new_amount;
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function addPremiumCredits(int $amount, string $description) {
+        $this->setPremiumCredits($this->premium_credits + $amount, $description);
+    }
+
+
+    /**
+     * @throws Exception
+     */
+    public function subtractPremiumCredits(int $amount, string $description) {
+        if($this->money < $amount) {
+            throw new Exception("Not enough Ancient Kunai!");
+        }
+        $this->setPremiumCredits($this->premium_credits - $amount, $description);
     }
 
 

@@ -93,7 +93,7 @@ function event() {
                     break;
                 }
 
-                $player->premium_credits += 1;
+                $player->addPremiumCredits(1, "Christmas event present");
                 $player->presents_claimed[] = 1229;
                 $player->updateData();
 
@@ -132,7 +132,7 @@ function event() {
 
                 $amount = 10;
 
-                $player->premium_credits += $amount;
+                $player->addPremiumCredits($amount, "Christmas event present");
                 $player->presents_claimed[] = 1231;
                 $player->updateData();
 

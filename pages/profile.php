@@ -74,7 +74,7 @@ function sendMoney(System $system, User $player, string $currency_type): void {
     }
     else if($currency_type == System::CURRENCY_TYPE_PREMIUM_CREDITS) {
         $label = "Ancient Kunai";
-        $current_amount = $player->premium_credits;
+        $current_amount = $player->getPremiumCredits();
         $page = 'send_ak';
     }
     else {
@@ -128,10 +128,10 @@ function sendMoney(System $system, User $player, string $currency_type): void {
                 $system->message("&yen;{$amount} sent to {$recipient['user_name']}!");
             }
             else if($currency_type == System::CURRENCY_TYPE_PREMIUM_CREDITS) {
-                if($amount > $player->premium_credits) {
+                if($amount > $player->getPremiumCredits()) {
                     throw new Exception("You do not have that much AK!");
                 }
-                $player->premium_credits -= $amount;
+                $player->subtractPremiumCredits($amount, "Sent AK to {$recipient['user_name']} (#{$recipient['user_id']})");
 
                 $system->query("UPDATE `users` SET `premium_credits`=`premium_credits` + $amount WHERE `user_id`='{$recipient['user_id']}' LIMIT 1");
                 $system->currencyLog(
@@ -156,6 +156,13 @@ function sendMoney(System $system, User $player, string $currency_type): void {
             $system->message($e->getMessage());
         }
         $system->printMessage();
+    }
+
+    if($currency_type == System::CURRENCY_TYPE_MONEY) {
+        $current_amount = "&yen;" . $player->getMoney();
+    }
+    else if($currency_type == System::CURRENCY_TYPE_PREMIUM_CREDITS) {
+        $current_amount = $player->getPremiumCredits();
     }
 
     $recipient = $_GET['recipient'] ?? '';
