@@ -45,8 +45,8 @@
         position: relative;
         height: 17px;
         width: 250px;
-        border-style:solid;
-        border-radius: 12px;
+        border: 0.1px solid black;
+        border-radius: 17px;
         
         background-color: rgba(30, 30, 30, 1);
     }
@@ -71,16 +71,19 @@
 
     .healthFill {
         background-color: #C00000;
+        background-image: linear-gradient(180deg, rgb(200, 10, 10), rgb(255, 100, 100), rgb(230, 60, 60), rgb(220, 20, 20), rgb(160, 10, 10));
         height:17px;
         border-radius: 12px;
     }
     .chakraFill {
         background-color: #0000B0;
+        background-image: linear-gradient(180deg, rgb(20, 20, 160), rgb(90, 90, 255), rgb(70, 70, 205), rgb(10, 10, 180), rgb(10, 10, 140));
         height:17px;
         border-radius: 12px;
     }
     .staminaFill {
         background-color: #00B000;
+        background-image: linear-gradient(180deg, rgb(30, 150, 30), rgb(80, 230, 80), rgb(60, 200, 60), rgb(25, 140, 25), rgb(5, 100, 5));
         height:17px;
         border-radius: 12px;
     }
