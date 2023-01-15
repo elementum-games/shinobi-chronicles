@@ -269,7 +269,7 @@ function members() {
 				}
 				$journal = $system->html_parse(stripslashes($journal), true, true);
 
-				$class_name = $player->forbidden_seal ? 'forbidden_seal' : 'normal';
+				$class_name = $player->forbidden_seal_loaded ? 'forbidden_seal' : 'normal';
 				echo "<style type='text/css'>
                     #journal {
                         white-space: pre-wrap;

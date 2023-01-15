@@ -123,7 +123,12 @@ else {
 		$logout_limit = 1440;
 	}
 	else if($player->forbidden_seal) {
-        $logout_limit = System::$premium_benefits[json_decode($player->forbidden_seal, true)['level']]['logout_timer'];
+        if(is_object(json_decode($player->forbidden_seal))) {
+            $seal_data = json_decode($player->forbidden_seal);
+            $seal = new ForbiddenSeal($system, $seal_data->level, $seal_data->time);
+            $seal->setBenefits();
+            $logout_limit = $seal->logout_timer;
+        }
 	}
 	// Check logout timer
 	if($player->last_login < time() - ($logout_limit * 60)) {

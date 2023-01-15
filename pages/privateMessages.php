@@ -17,7 +17,8 @@ class Messaging {
 		MAX_SUBJECT_LENGTH = 50,
 		MAX_MESSAGE_LENGTH = 1000,
 		SEAL_MAX_MESSAGE_LENGTH = 1500, //also same for moderators
-		INBOX_LIMIT = 50;
+		INBOX_LIMIT = 50,
+        STAFF_ADITIONAL_LIMIT = 25;
 
 	public int|string|null $message_id;
 
@@ -55,10 +56,10 @@ class Messaging {
             : self::MAX_MESSAGE_LENGTH;
 
         if($player->staff_level) {
-            $this->constraints['inbox_limit'] = System::$premium_benefits[2]['inbox_size'] + 25; //Add 25 for 100 staff limit
+            $this->constraints['inbox_limit'] = ForbiddenSeal::$benefits[ForbiddenSeal::$STAFF_SEAL_LEVEL]['inbox_size'] + self::STAFF_ADITIONAL_LIMIT; //Add 25 for 100 staff limit
         }
-        else if($player->forbidden_seal) {
-            $this->constraints['inbox_limit'] = System::$premium_benefits[$player->forbidden_seal['level']]['inbox_size'];
+        else if($player->forbidden_seal_loaded && $player->forbidden_seal->level != 0) {
+            $this->constraints['inbox_limit'] = $player->forbidden_seal->inbox_size;
         }
         else {
             $this->constraints['inbox_limit'] = self::INBOX_LIMIT;
@@ -96,7 +97,7 @@ class Messaging {
 				throw new Exception("User does not exist!");
 			}
 			$result = $this->system->db_fetch($result);
-			if($result['forbidden_seal']) {
+			if(is_object(json_decode($result['forbidden_seal']))) {
 				$result['forbidden_seal'] = json_decode($result['forbidden_seal'], true);
 			}
 
@@ -122,8 +123,11 @@ class Messaging {
 				$message_count = $mc_result['message_count'];
 				$ErrorMsg = "User's inbox is full";
 				if($message_count >= $inbox_limit && $result['staff_level'] < User::STAFF_MODERATOR) {
-					if($result['forbidden_seal']) {
-						if($message_count >= System::$premium_benefits[$result['forbidden_seal']['level']]['inbox_size']) {
+					if(is_object(json_decode($result['forbidden_seal']))) {
+                        $result = json_decode($result['forbidden_seal'], true);
+                        $pseudoSeal = new ForbiddenSeal($this->system, $result['level'], $result['time']);
+                        $pseudoSeal->setBenefits();
+						if($message_count >= $pseudoSeal->inbox_size) {
 							throw new Exception($ErrorMsg);
 						}
 					}
@@ -131,7 +135,8 @@ class Messaging {
 						throw new Exception($ErrorMsg);
 					}
 				}
-				else if($message_count >= System::$premium_benefits[2]['inbox_size']) {
+                //Set this to staff max
+				else if($message_count >= ForbiddenSeal::$benefits[ForbiddenSeal::$STAFF_SEAL_LEVEL]['inbox_size'] + self::STAFF_ADITIONAL_LIMIT) {
 					throw new Exception($ErrorMsg);
 				}
 			}

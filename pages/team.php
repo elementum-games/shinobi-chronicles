@@ -408,9 +408,11 @@ function team() {
             $leader_name = $result['user_name'];
             $leader_avatar = $result['avatar_link'];
             $leader_avatar_size = User::AVATAR_MAX_SIZE;
-            if($result['forbidden_seal']) {
+            if(is_object(json_decode($result['forbidden_seal']))) {
                 $result['forbidden_seal'] = json_decode($result['forbidden_seal'], true);
-                $leader_avatar_size = System::$premium_benefits[$result['forbidden_seal']['level']]['avatar_size'];
+                $pseudoSeal = new ForbiddenSeal($system, $result['forbidden_seal']['level'], $result['forbidden_seal']['time']);
+                $pseudoSeal->setBenefits();
+                $leader_avatar_size = $pseudoSeal->avatar_size;
             }
         }
         else {
