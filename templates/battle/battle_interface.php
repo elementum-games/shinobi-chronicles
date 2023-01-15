@@ -42,22 +42,50 @@
     }
 
     .resourceBarOuter {
-        height:6px;
-        width:250px;
-        border-style:solid;
-        border-width:1px;
+        position: relative;
+        height: 17px;
+        width: 250px;
+        border: 0.1px solid black;
+        border-radius: 17px;
+        
+        background-color: rgba(30, 30, 30, 1);
     }
+
+    /* Parent must be Position: relative */
+    .innerResourceBarLabel{
+        display: block; 
+        position: absolute; 
+        left: 0; 
+        right: 0; 
+
+        font-family: Verdana, sans-serif;
+        font-weight: bold;
+        
+        color: black;
+        -webkit-text-fill-color: white; /* Will override color (regardless of order) */
+        -webkit-text-stroke-width: 0.6px;
+        -webkit-text-stroke-color: black;
+        
+        z-index: 100;
+    }
+
     .healthFill {
-        background-color:#C00000;
-        height:6px;
+        background-color: #C00000;
+        background-image: linear-gradient(180deg, rgb(200, 10, 10), rgb(255, 100, 100), rgb(230, 60, 60), rgb(220, 20, 20), rgb(160, 10, 10));
+        height:17px;
+        border-radius: 12px;
     }
     .chakraFill {
-        background-color:#0000B0;
-        height:6px;
+        background-color: #0000B0;
+        background-image: linear-gradient(180deg, rgb(20, 20, 160), rgb(90, 90, 255), rgb(70, 70, 205), rgb(10, 10, 180), rgb(10, 10, 140));
+        height:17px;
+        border-radius: 12px;
     }
     .staminaFill {
-        background-color:#00B000;
-        height:6px;
+        background-color: #00B000;
+        background-image: linear-gradient(180deg, rgb(30, 150, 30), rgb(80, 230, 80), rgb(60, 200, 60), rgb(25, 140, 25), rgb(5, 100, 5));
+        height:17px;
+        border-radius: 12px;
     }
 </style>
 
@@ -83,26 +111,45 @@
         </th>
     </tr>
     <tr>
-      <td id='bi_td_player'>
-        <img src='<?= $player->avatar_link ?>' class='playerAvatar' />
-        <label style='width:80px;'>Health:</label>
-            <?= sprintf("%.2f", $player->health) ?> / <?= sprintf("%.2f", $player->max_health) ?><br />
-        <div class='resourceBarOuter'><div class='healthFill' style='width:<?= $health_percent ?>%;'></div></div>
+    <td style='text-align: center;' id='bi_td_player'>
+            <img src='<?= $player->avatar_link ?>' class='playerAvatar' alt='player_profile_img' />
+            <div id='player_battle_stats_container' style='display: inline-block; text-align: center; margin-top: 10px;'>
+                
+                <!-- Health -->
+                <label>Health</label>
+                <div class='resourceBarOuter'>
+                    <label class='innerResourceBarLabel' ><?= sprintf("%.2f", $player->health) ?> / <?= sprintf("%.2f", $player->max_health) ?></label>
+                    <div class='healthFill' style='width:<?= $health_percent ?>%;'></div>
+                </div>
 
-        <?php if(!$battleManager->spectate): ?>
-            <label style='width:80px;'>Chakra:</label>
-            <?= sprintf("%.2f", $player->chakra) ?> / <?= sprintf("%.2f", $player->max_chakra) ?><br />
-            <div class='resourceBarOuter'><div class='chakraFill' style='width:<?= $chakra_percent ?>%;'></div></div>
-            <label style='width:80px;'>Stamina:</label>
-            <?= sprintf("%.2f", $player->stamina) ?> / <?= sprintf("%.2f", $player->max_stamina) ?><br />
-            <div class='resourceBarOuter'><div class='staminaFill' style='width:<?= $stamina_percent ?>%;'></div></div>
-        <?php endif; ?>
+            <?php if(!$battleManager->spectate): ?>
+
+                <!-- Chakra -->
+                <label style='margin-top: 8px'>Chakra</label>
+                <div class='resourceBarOuter'>
+                    <label class='innerResourceBarLabel'><?= sprintf("%.2f", $player->chakra) ?> / <?= sprintf("%.2f", $player->max_chakra) ?></label>
+                    <div class='chakraFill' style='width:<?= $chakra_percent ?>%;'></div>
+                </div>
+
+                <!-- Stamina -->
+                <label style='margin-top: 8px'>Stamina</label>
+                <div class='resourceBarOuter'>
+                    <label class='innerResourceBarLabel'><?= sprintf("%.2f", $player->stamina) ?> / <?= sprintf("%.2f", $player->max_stamina) ?></label>
+                    <div class='staminaFill' style='width:<?= $stamina_percent ?>%;'></div>
+                </div>
+
+            <?php endif; ?>
+            </div>
     </td>
-    <td id='bi_td_opponent'>
+    <td style='text-align: center;' id='bi_td_opponent'>
         <img src='<?= $opponent->avatar_link ?>' class='opponentAvatar' />
-        <label style='width:80px;'>Health:</label>
-        <?= sprintf("%.2f", $opponent->health) ?> / <?= sprintf("%.2f", $opponent->max_health) ?><br />
-        <div class='resourceBarOuter'><div class='healthFill' style='width:<?= $opponent_health_percent ?>%;'></div></div>
+        <div id='ai_battle_stats_container' style='display: inline-block; text-align: center; margin-top: 10px;'>
+            <label style='margin-top: 8px; width:80px;'>Health</label>
+            <div class='resourceBarOuter'><div class='healthFill' style='width:<?= $opponent_health_percent ?>%;'>
+                <label  class='innerResourceBarLabel'><?= sprintf("%.2f", $opponent->health) ?> / <?= sprintf("%.2f", $opponent->max_health) ?></label>
+            </div>
+        </div>
+    </div>
     </td>
   </tr>
 </table>
