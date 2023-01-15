@@ -116,7 +116,6 @@
             <div id='player_battle_stats_container' style='display: inline-block; text-align: center; margin-top: 10px;'>
                 
                 <!-- Health -->
-                <label>Health</label>
                 <div class='resourceBarOuter'>
                     <label class='innerResourceBarLabel' ><?= sprintf("%.2f", $player->health) ?> / <?= sprintf("%.2f", $player->max_health) ?></label>
                     <div class='healthFill' style='width:<?= $health_percent ?>%;'></div>
@@ -125,15 +124,13 @@
             <?php if(!$battleManager->spectate): ?>
 
                 <!-- Chakra -->
-                <label style='margin-top: 8px'>Chakra</label>
-                <div class='resourceBarOuter'>
+                <div class='resourceBarOuter' style='margin-top:8px;'>
                     <label class='innerResourceBarLabel'><?= sprintf("%.2f", $player->chakra) ?> / <?= sprintf("%.2f", $player->max_chakra) ?></label>
                     <div class='chakraFill' style='width:<?= $chakra_percent ?>%;'></div>
                 </div>
 
                 <!-- Stamina -->
-                <label style='margin-top: 8px'>Stamina</label>
-                <div class='resourceBarOuter'>
+                <div class='resourceBarOuter' style='margin-top:8px;'>
                     <label class='innerResourceBarLabel'><?= sprintf("%.2f", $player->stamina) ?> / <?= sprintf("%.2f", $player->max_stamina) ?></label>
                     <div class='staminaFill' style='width:<?= $stamina_percent ?>%;'></div>
                 </div>
@@ -144,8 +141,7 @@
     <td style='text-align: center;' id='bi_td_opponent'>
         <img src='<?= $opponent->avatar_link ?>' class='opponentAvatar' />
         <div id='ai_battle_stats_container' style='display: inline-block; text-align: center; margin-top: 10px;'>
-            <label style='margin-top: 8px; width:80px;'>Health</label>
-            <div class='resourceBarOuter'><div class='healthFill' style='width:<?= $opponent_health_percent ?>%;'>
+            <div class='resourceBarOuter' style='margin-top:8px;'><div class='healthFill' style='width:<?= $opponent_health_percent ?>%;'>
                 <label  class='innerResourceBarLabel'><?= sprintf("%.2f", $opponent->health) ?> / <?= sprintf("%.2f", $opponent->max_health) ?></label>
             </div>
         </div>
