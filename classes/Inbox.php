@@ -5,14 +5,13 @@ require_once __DIR__ . '/InboxUser.php';
 class Inbox {
 
 	const INBOX_SIZE = 50;
-	const INBOX_SIZE_SEAL = 75;
+    // Seal inbox size is managed in the Forbidden Seal Class
 	const INBOX_SIZE_STAFF = 100;
 
 	const MIN_CONVO_SIZE = 2;
 	const MAX_CONVO_SIZE = 10;
 	const MIN_MESSAGE_LENGTH = 2;
 	const MAX_MESSAGE_LENGTH = 1000;
-	const MAX_MESSAGE_LENGTH_SEAL = 1500;
 
     const MAX_TITLE_LENGTH = 26;
     const MAX_MESSAGE_FETCH = 25;
@@ -22,13 +21,15 @@ class Inbox {
     const SYSTEM_MESSAGE_NAMES = [
         1 => 'Money Transfer System',
         2 => 'Kunai Transfer System',
-        3 => 'Ancient Kunai Exchange'
+        3 => 'Ancient Kunai Exchange',
+        4 => 'Support System'
     ];
 
     const SYSTEM_MESSAGE_CODES = [
         1 => 'money_transfer',
         2 => 'kunai_transfer',
-        3 => 'market_exchange'
+        3 => 'market_exchange',
+        4 => 'support_system'
     ];
 
     /**
@@ -215,17 +216,17 @@ class Inbox {
     }
 
     /**
-     * @param array? $forbidden_seal
+     * @param ForbiddenSeal|array $forbidden_seal
      * @param int $staff_level
      * @return int
      */
     public static function maxConvosAllowed($forbidden_seal, $staff_level): int {
         $max_size = self::INBOX_SIZE;
-        if ($forbidden_seal) {
-            $max_size = self::INBOX_SIZE_SEAL;
-        }
-        if ($staff_level > 0) {
+        if ($staff_level) {
             $max_size = self::INBOX_SIZE_STAFF;
+        }
+        elseif ($forbidden_seal instanceof ForbiddenSeal) {
+            $max_size = $forbidden_seal->inbox_size;
         }
         return $max_size;
     }
@@ -239,12 +240,20 @@ class Inbox {
     }
 
     /**
-     * @param array? $forbidden_seal
+     * @param array|ForbiddenSeal $forbidden_seal
      * @param int $staff_level
      * @return int MAX_MESSAGE_LENGTH
      */
     public static function checkMaxMessageLength($forbidden_seal, $staff_level): int {
-        return $forbidden_seal || $staff_level ? self::MAX_MESSAGE_LENGTH_SEAL : self::MAX_MESSAGE_LENGTH;
+        if($staff_level) {
+            return ForbiddenSeal::$benefits[ForbiddenSeal::$STAFF_SEAL_LEVEL]['pm_size'];
+        }
+        elseif($forbidden_seal instanceof ForbiddenSeal) {
+            return $forbidden_seal->pm_size;
+        }
+        else {
+            return self::MAX_MESSAGE_LENGTH;
+        }
     }
 
     /**
@@ -301,7 +310,8 @@ class Inbox {
      * @return null|InboxUser[] $convo_members
      */
     public static function getConvoMembers(System $system, int|string $convo_id): ?array {
-        $sql = "SELECT `users`.`user_name`, `users`.`user_id`, `users`.`avatar_link`, `blacklist`.`blocked_ids`
+        $sql = "SELECT `users`.`user_name`, `users`.`user_id`, `users`.`avatar_link`, `blacklist`.`blocked_ids`,
+                        `users`.`forbidden_seal`, `users`.`staff_level`
                 FROM `convos_users`
                 INNER JOIN `users`
                 ON `convos_users`.`user_id`=`users`.`user_id`
