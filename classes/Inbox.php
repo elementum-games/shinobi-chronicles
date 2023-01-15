@@ -94,7 +94,7 @@ class Inbox {
             avatar_link: $data['avatar_link'],
             forbidden_seal: $data['forbidden_seal'] ? json_decode($data['forbidden_seal'], true) : null,
             staff_level: $data['staff_level'],
-            blocked_ids: json_decode($data['blocked_ids'])
+            blocked_ids: json_decode($data['blocked_ids'], true)
         );
     }
 
