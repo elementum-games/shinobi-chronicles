@@ -506,20 +506,21 @@ function premium() {
 			if($player->getPremiumCredits() < $cost) {
 				throw new Exception("You do not have enough Ancient Kunai! ($cost needed)");
 			}
-			$player->subtractPremiumCredits($cost, "Purchased {$seal_length} days of level $seal_level forbidden seal");
 
 			// Extend
 			if($player->forbidden_seal_loaded && $player->forbidden_seal->level == $seal_level) {
+                $player->premium_credits -= $cost;
 				$player->forbidden_seal->addSeal($seal_level, $seal_length);
 				$system->message("Seal extended!");
 			}
             // Overwrite seal
-            if($player->forbidden_seal_loaded) {
+            elseif($player->forbidden_seal_loaded) {
                 // Confirm change in seal... time will not be reimbursed
-                if(!isset($_POST['confirm_seal_overwrite'])) {
+                if(!isset($_POST['confirm_seal_overwrite']) && $seal_level != $player->forbidden_seal->level) {
                     require_once ('templates/overwriteSealConfirmation.php');
                 }
                 else {
+                    $player->premium_credits -= $cost;
                     $player->forbidden_seal->addSeal($seal_level, $seal_length);
                     $system->message("You changed your seal!");
                 }
@@ -1125,7 +1126,7 @@ function premiumCreditExchange() {
             );
 
 			$system->log("Kunai Exchange", "Completed Sale", "ID# {$offer['id']}; #{$offer['seller']} to #{$player->user_id} ($player->user_name) :: {$offer['premium_credits']} for &yen;{$offer['money']}");
-			
+
 			$alert_message = $player->user_name . " has purchased {$offer['premium_credits']} Ancient Kunai for &yen;{$offer['money']}.";
 			Inbox::sendAlert($system, 3, $player->user_id, $offer['seller'], $alert_message);
 
