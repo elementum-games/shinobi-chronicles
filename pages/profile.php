@@ -107,7 +107,8 @@ function userProfile() {
                     'Money Sent',
                     "{$amount} yen - #{$player->user_id} ($player->user_name) to #{$recipient['user_id']}"
                 );
-                $system->send_pm('Currency Transfer System', $recipient['user_id'], 'Money Received', $player->user_name . " has sent you &yen;$amount.");
+                $alert_message = $player->user_name . " has sent you &yen;$amount.";
+                Inbox::sendAlert($system, 1, $player->user_id, $recipient['user_id'], $alert_message);
             }
             else {
                 $system->log(
@@ -115,7 +116,8 @@ function userProfile() {
                     'Premium Credits Sent',
                     "{$amount} AK - #{$player->user_id} ($player->user_name) to #{$recipient['user_id']}"
                 );
-                $system->send_pm('Currency Transfer System', $recipient['user_id'], 'AK Received', $player->user_name . " has sent you $amount Ancient Kunai.");
+                $alert_message = $player->user_name . " has sent you $amount Ancient Kunai.";
+                Inbox::sendAlert($system, 2, $player->user_id, $recipient['user_id'], $alert_message);
             }
 
             $system->message("Currency sent!");

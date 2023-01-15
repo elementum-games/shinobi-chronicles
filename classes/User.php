@@ -282,6 +282,67 @@ class User extends Fighter {
         return true;
     }
 
+    /**
+     * @param System $system
+     * @param int    $user_id
+     * @return User
+     * @throws Exception
+     */
+    public static function loadFromId(System $system, int $user_id): User {
+        $user = new User($user_id);
+
+        $result = $system->query("SELECT 
+            `user_id`, 
+            `user_name`, 
+            `ban_type`, 
+            `ban_expire`, 
+            `journal_ban`, 
+            `avatar_ban`, 
+            `song_ban`, 
+            `last_login`,
+			`forbidden_seal`, 
+			`chat_color`, 
+			`staff_level`, 
+			`username_changes`, 
+			`support_level`, 
+			`special_mission`
+			FROM `users` WHERE `user_id`='$user_id' LIMIT 1"
+        );
+        if($system->db_last_num_rows == 0) {
+            throw new Exception("User does not exist!");
+        }
+
+        $result = $system->db_fetch($result);
+
+        $user->user_name = $result['user_name'];
+        $user->username_changes = $result['username_changes'];
+
+        $user->staff_level = $result['staff_level'];
+        $user->support_level = $result['support_level'];
+
+        $user->ban_type = $result['ban_type'];
+        $user->ban_expire = $result['ban_expire'];
+        $user->journal_ban = $result['journal_ban'];
+        $user->avatar_ban = $result['avatar_ban'];
+        $user->song_ban = $result['song_ban'];
+
+        $user->last_login = $result['last_login'];
+
+        $user->forbidden_seal = $result['forbidden_seal'];
+        $user->chat_color = $result['chat_color'];
+
+        if($user->ban_type && $user->ban_expire <= time()) {
+            $system->message("Your " . $user->ban_type . " ban has ended.");
+            $user->ban_type = '';
+
+            $system->query("UPDATE `users` SET `ban_type`='', `ban_expire`='0' WHERE `user_id`='$user->user_id' LIMIT 1");
+        }
+
+        $user->inventory_loaded = false;
+
+        return $user;
+    }
+    
     /* function loadData()
         Loads user data from the database into class members
         -Parameters-
