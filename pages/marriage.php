@@ -149,7 +149,7 @@ function marriage() {
     if(isset($_POST['confirm_divorce'])) {
         try {
             $result = $system->query("SELECT user_id, user_name, spouse FROM users WHERE user_id ='$player->spouse' LIMIT 1");
-            if ($system->db_last_num_rows) {
+            /*if ($system->db_last_num_rows) {
                 $current_marriage = $system->db_fetch($result);
 
                 // All data matches, process divorce.
@@ -159,32 +159,57 @@ function marriage() {
                         throw new Exception("Error processing divorce!");
                     }
                 }
-//                else
-//                {
-//                    $spouses_spouse_result = $system->query("SELECT user_id, user_name, spouse FROM users WHERE user_id =" . $current_marriage['spouse'] . " LIMIT 1");
-//                    if (!$system->db_last_num_rows) {
-//                        throw new Exception("Failed to fetch spouse information");
-//                    }
-//                    $spouses_spouse = $system->db_fetch($spouses_spouse_result);
-//                    // Players marriage is invalid and spouse has invalid marriage
-//                    if (!$current_marriage['user_id'] === $spouses_spouse['spouse']) {
-//                        $system->query("UPDATE `users` SET `spouse`='0', `marriage_time`='0' WHERE `user_id`='$player->spouse' OR `user_id`=" . $current_marriage['spouse'] . " LIMIT 2");
-//                        if (!$system->db_last_affected_rows) {
-//                            throw new Exception("Error processing divorce!");
-//                        }
-//                    }
-//                    $spouse_player_result = $system->query("SELECT user_id, user_name, spouse FROM users WHERE spouse ='$player->user_id' LIMIT 1");
-//
-//                    // Another player has an unexpected marriage with player
-//                    if ($system->db_last_num_rows) {
-//                        $spouse_player = $system->db_fetch($spouse_player_result);
-//
-//                        $system->query("UPDATE `users` SET `spouse`='0', `marriage_time`='0' WHERE `user_id`=" . $spouse_player['user_id'] . " LIMIT 1");
-//                        if (!$system->db_last_affected_rows) {
-//                            throw new Exception("Error processing divorce!");
-//                        }
-//                    }
-//                }
+            }*/
+
+            if ($system->db_last_num_rows) {
+                $players_spouse = $system->db_fetch($result);
+
+                // Both Players are married to eachother. Clear marriage.
+                if (intval($players_spouse['spouse']) === $player->user_id) {
+                    $system->query("UPDATE `users` SET `spouse`='0', `marriage_time`='0' WHERE `user_id`='$player->spouse' LIMIT 1");
+                    if (!$system->db_last_affected_rows) {
+                        throw new Exception("Error processing divorce!");
+                    }
+                }
+                else {
+                    // Handle weird chains of marriage. A -> B, B -> C, C -> A
+                    $spouses_spouse_result = $system->query("SELECT user_id, user_name, spouse FROM users WHERE user_id =" . $players_spouse['spouse'] . " LIMIT 1");
+                    if (!$system->db_last_num_rows) {
+                        throw new Exception("Failed to fetch spouse information");
+                    }
+
+                    // Spouses Spouse = Player married to the spouse of player B -> C Chain
+                    $players_spouses_spouse = $system->db_fetch($spouses_spouse_result);
+
+                    /* Player's spouse is mixed up. Both players are not married to each other.
+                    Clear player's spouse marriage chain. */
+                    if (intval($players_spouse['user_id']) !== intval($players_spouses_spouse['spouse'])) {
+                        // Clear the marriage of the player's spouse.
+                        $system->query(
+                            "UPDATE `users` SET `spouse`='0', `marriage_time`='0' 
+                                    WHERE `user_id`='$player->spouse' 
+                                    OR `user_id`=" . $players_spouse['spouse'] . " LIMIT 2"
+                        );
+                        if (!$system->db_last_affected_rows) {
+                            throw new Exception("Error processing divorce!");
+                        }
+                    }
+
+                    // Final C -> A check, is anyone else married to the player.
+                    $spouse_player_result = $system->query(
+                        "SELECT user_id, user_name, spouse FROM users WHERE spouse ='$player->user_id' LIMIT 1"
+                    );
+
+                    // Another player has an unexpected marriage with player
+                    if ($system->db_last_num_rows) {
+                        $spouse_player = $system->db_fetch($spouse_player_result);
+
+                        $system->query("UPDATE `users` SET `spouse`='0', `marriage_time`='0' WHERE `user_id`=" . $spouse_player['user_id'] . " LIMIT 1");
+                        if (!$system->db_last_affected_rows) {
+                            throw new Exception("Error processing divorce!");
+                        }
+                    }
+                }
             }
 
             $system->message("You have divorced $player->spouse_name!");
