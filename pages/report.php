@@ -65,22 +65,14 @@ function report() {
 			}
 			// Private message
 			else if($report_type == 2) {
-				$result = $system->query("SELECT `sender`, `recipient`, `message`, `time` FROM `private_messages` 
-					WHERE `message_id`='$content_id' LIMIT 1");
-				if(! $system->db_last_num_rows) {
+				$content_data = Inbox::getInfoFromMessageId($system, $content_id);
+				if(!$content_data) {
 					throw new Exception("Invalid message!");
 				}
-			
-				$content_data = $system->db_fetch($result);
 				
-				$result = $system->query("SELECT `user_id`, `user_name`, `staff_level` FROM `users` WHERE `user_id`='" . $content_data['sender'] . "' LIMIT 1");
-				if(! $system->db_last_num_rows) {
-					throw new Exception("Invalid user!");
-				}
-				$result = $system->db_fetch($result);
-				$user_id = $result['user_id'];
-				$user_name = $result['user_name'];
-				$staff_level = $result['staff_level'];
+				$user_id = $content_data['sender_id'];
+				$user_name = $content_data['user_name'];
+				$staff_level = $content_data['staff_level'];
 				$time = $content_data['time'];
 				$content = $content_data['message'];
 			}
@@ -213,21 +205,13 @@ function report() {
 			}
 			// Private message
 			else if($report_type == 2) {
-				$result = $system->query("SELECT `sender`, `recipient`, `message` FROM `private_messages` 
-					WHERE `message_id`='$content_id' LIMIT 1");
-				if(! $system->db_last_num_rows) {
+				$content_data = Inbox::getInfoFromMessageId($system, $content_id);
+				if(!$content_data) {
 					throw new Exception("Invalid message!");
 				}
-			
-				$content_data = $system->db_fetch($result);
-				
-				$result = $system->query("SELECT `user_id`, `user_name`, `staff_level` FROM `users` WHERE `user_id`='" . $content_data['sender'] . "' LIMIT 1");
-				if(! $system->db_last_num_rows) {
-					throw new Exception("Invalid user!");
-				}
-				$result = $system->db_fetch($result);
-				$user_id = $result['user_id'];
-				$user_name = $result['user_name'];
+
+				$user_id = $content_data['user_id'];
+				$user_name = $content_data['user_name'];
 			}
 			// Chat post
 			else if($report_type == 3) {

@@ -124,8 +124,12 @@ function sendMoney(System $system, User $player, string $currency_type): void {
                     'Money Sent',
                     "{$amount} yen - #{$player->user_id} ($player->user_name) to #{$recipient['user_id']}"
                 );
-                $system->send_pm('Currency Transfer System', $recipient['user_id'], 'Money Received', $player->user_name . " has sent you &yen;$amount.");
+                
+                $alert_message = $player->user_name . " has sent you &yen;$amount.";
+                Inbox::sendAlert($system, 1, $player->user_id, $recipient['user_id'], $alert_message
+                
                 $system->message("&yen;{$amount} sent to {$recipient['user_name']}!");
+                
             }
             else if($currency_type == System::CURRENCY_TYPE_PREMIUM_CREDITS) {
                 if($amount > $player->getPremiumCredits()) {
@@ -148,7 +152,10 @@ function sendMoney(System $system, User $player, string $currency_type): void {
                     'Premium Credits Sent',
                     "{$amount} AK - #{$player->user_id} ($player->user_name) to #{$recipient['user_id']}"
                 );
-                $system->send_pm('Currency Transfer System', $recipient['user_id'], 'AK Received', $player->user_name . " has sent you $amount Ancient Kunai.");
+                
+                $alert_message = $player->user_name . " has sent you $amount Ancient Kunai.";
+                Inbox::sendAlert($system, 2, $player->user_id, $recipient['user_id'], $alert_message);
+                
                 $system->message("{$amount} AK sent to {$recipient['user_name']}!");
             }
 

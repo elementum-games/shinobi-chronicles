@@ -1105,7 +1105,10 @@ function premiumCreditExchange() {
             );
 
 			$system->log("Kunai Exchange", "Completed Sale", "ID# {$offer['id']}; #{$offer['seller']} to #{$player->user_id} ($player->user_name) :: {$offer['premium_credits']} for &yen;{$offer['money']}");
-			$system->send_pm('Ancient Kunai Exchange', $offer['seller'], 'Transaction Complete', $player->user_name . " has purchased {$offer['premium_credits']} Ancient Kunai for &yen;{$offer['money']}.");
+			
+			$alert_message = $player->user_name . " has purchased {$offer['premium_credits']} Ancient Kunai for &yen;{$offer['money']}.";
+			Inbox::sendAlert($system, 3, $player->user_id, $offer['seller'], $alert_message);
+
 			$system->message("Ancient Kunai purchased!");
 			$system->printMessage();
 		} catch(Exception $e) {

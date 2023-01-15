@@ -2,6 +2,7 @@
 
 require_once __DIR__ . '/EntityId.php';
 require_once __DIR__ . '/User.php';
+require_once __DIR__ . '/API.php';
 
 /*	Class:		System
 	Purpose: 	Handle database connection and queries. Handle storing and printing of error messages.
@@ -50,6 +51,8 @@ class System {
     public string $message = "";
     public bool $message_displayed = false;
 
+    public array $debug_messages = [];
+
     // Variable for DB connection resource
     private string $host;
     private string $username;
@@ -63,6 +66,9 @@ class System {
     public $register_open;
 
     public string $link;
+
+    // Request lifecycle
+    public bool $is_api_request = false;
 
     public $timezoneOffset;
 
@@ -110,6 +116,7 @@ class System {
     // Keep in sync with pages.php
     const PAGE_IDS = [
         'profile' => 1,
+        'inbox' => 2,
         'settings' => 3,
         'members' => 6,
         'bloodline' => 10,
@@ -237,6 +244,8 @@ class System {
         foreach(self::PAGE_IDS as $slug => $id) {
             $this->links[$slug] = $this->link . '?id=' . $id;
         }
+
+        $this->api_links['inbox'] = $this->link . 'api/inbox.php';
 
         $this->timezoneOffset = date('Z');
 
@@ -390,7 +399,7 @@ class System {
 
     /**
      * Sends PM to specified recipient
-     *
+     * * OLD PRIVATE MESSAGES
      * @param $sender
      * @param $recipient
      * @param $subject
@@ -443,6 +452,9 @@ class System {
         }
 
         $this->message($message);
+        if($this->is_api_request) {
+            API::exitWithError($message);
+        }
         $this->printMessage();
 
         global $side_menu_start;
@@ -492,7 +504,7 @@ class System {
     }
 
     public function getMemes(): array {
-        $memes = require 'memes.php';
+        $memes = require __DIR__ . '/../memes.php';
 
         return [
             'codes' => array_map(function ($meme) {
@@ -921,6 +933,11 @@ class System {
         }
 
         return $kunai_packs;
+    }
+
+    public function getReactFile(string $component_name): string {
+        $filename = "ui_components/build/{$component_name}.js";
+        return $filename . "?q=" .  filemtime($filename);
     }
 }
 
