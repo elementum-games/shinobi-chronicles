@@ -523,8 +523,8 @@ function premium() {
                 else {
                     $message = "Purchased " . ForbiddenSeal::$forbidden_seals[$seal_level] . " seal for {$seal_length} days.";
                     if($overwrite) {
-                        $message .= "This purchase removed {$system->time_remaining($player->forbidden_seal->seal_time_remaining)}
-                            of their {$player->forbidden_seal->name}.";
+                        $message .= " This purchase removed {$system->time_remaining($player->forbidden_seal->seal_time_remaining)}" .
+                            " of their {$player->forbidden_seal->name}.";
                     }
                     $player->subtractPremiumCredits($cost, $message);
                     $player->forbidden_seal->addSeal($seal_level, $seal_length);
@@ -533,7 +533,11 @@ function premium() {
             }
 			// Purchase new
 			else {
-				$player->forbidden_seal = new ForbiddenSeal($system, $seal_level, $seal_length*86400);
+                $player->subtractPremiumCredits($cost, "Purchased " . ForbiddenSeal::$forbidden_seals[$seal_level]
+                    . " for {$seal_length} days.");
+				$player->forbidden_seal = new ForbiddenSeal($system, 0, 0);
+                $player->forbidden_seal->addSeal($seal_level, $seal_length);
+                $player->forbidden_seal_loaded = true; //Force this for db storage
 				$system->message("Seal infused!");
 			}
 		} catch (Exception $e) {
