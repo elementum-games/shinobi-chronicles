@@ -513,20 +513,21 @@ function premium() {
 			if($player->premium_credits < $cost) {
 				throw new Exception("You do not have enough Ancient Kunai! ($cost needed)");
 			}
-			$player->premium_credits -= $cost;
 
 			// Extend
 			if($player->forbidden_seal_loaded && $player->forbidden_seal->level == $seal_level) {
+                $player->premium_credits -= $cost;
 				$player->forbidden_seal->addSeal($seal_level, $seal_length);
 				$system->message("Seal extended!");
 			}
             // Overwrite seal
-            if($player->forbidden_seal_loaded) {
+            elseif($player->forbidden_seal_loaded) {
                 // Confirm change in seal... time will not be reimbursed
-                if(!isset($_POST['confirm_seal_overwrite'])) {
+                if(!isset($_POST['confirm_seal_overwrite']) && $seal_level != $player->forbidden_seal->level) {
                     require_once ('templates/overwriteSealConfirmation.php');
                 }
                 else {
+                    $player->premium_credits -= $cost;
                     $player->forbidden_seal->addSeal($seal_level, $seal_length);
                     $system->message("You changed your seal!");
                 }
