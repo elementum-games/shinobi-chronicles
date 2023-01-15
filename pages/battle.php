@@ -35,7 +35,7 @@ function battle(): bool {
 				$player->last_pvp = time();
 				$village_point_gain = 1;
 				$team_point_gain = 1;
-				$player->money += $pvp_yen;
+				$player->addMoney($pvp_yen, "PVP win");
 				echo "You win the fight and earn ¥$pvp_yen!<br />";
 				// Village points
 				$system->query("UPDATE `villages` SET `points`=`points`+'$village_point_gain' WHERE `name`='$player->village' LIMIT 1");
