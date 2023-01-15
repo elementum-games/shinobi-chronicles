@@ -451,6 +451,59 @@ return [
         'public' => true,
     ],
     [
+            'code' => ':shukaku_kun:',
+            'image' => "<img src='./images/memes/shukaku_kun.png' style='width:64px;height:64px;' />",
+            'text' => ':shukaku_kun:',
+            'public' => true,
+    ],
+    [
+            'code' => ':matatabi_kun:',
+            'image' => "<img src='./images/memes/matatabi_kun.png' style='width:64px;height:64px;' />",
+            'text' => ':matatabi_kun:',
+            'public' => true,
+    ],
+    [
+            'code' => ':isobu_kun:',
+            'image' => "<img src='./images/memes/isobu_kun.png' style='width:64px;height:64px;' />",
+            'text' => ':isobu_kun:',
+            'public' => true,
+    ],
+    [
+            'code' => ':goku_kun:',
+            'image' => "<img src='./images/memes/goku_kun.png' style='width:64px;height:64px;' />",
+            'text' => ':goku_kun:',
+            'public' => true,
+    ],
+    [
+            'code' => ':kokuo_kun:',
+            'image' => "<img src='./images/memes/kokuo_kun.png' style='width:64px;height:64px;' />",
+            'text' => ':kokuo_kun:',
+            'public' => true,
+    ],
+    [
+            'code' => ':saiken_kun:',
+            'image' => "<img src='./images/memes/saiken_kun.png' style='width:64px;height:64px;' />",
+            'text' => ':saiken_kun:',
+            'public' => true,
+    ],
+    [
+            'code' => ':chomei_kun:',
+            'image' => "<img src='./images/memes/chomei_kun.png' style='width:64px;height:64px;' />",
+            'text' => ':chomei_kun:',
+            'public' => true,
+    ],
+    [
+            'code' => ':gyuki_kun:',
+            'image' => "<img src='./images/memes/gyuki_kun.png' style='width:64px;height:64px;' />",
+            'text' => ':gyuki_kun:',
+            'public' => true,
+    ],
+    [
+            'code' => ':kurama_kun:',
+            'image' => "<img src='./images/memes/kurama_kun.png' style='width:64px;height:64px;' />",
+            'text' => ':kurama_kun:',
+            'public' => true,
+    ],
             'code' => ':narutoooo:',
             'image' => "<img src='./images/memes/narutoooo.png' style='width:64px;height:64px;' />",
             'text' => ':narutoooo:',
@@ -481,3 +534,4 @@ return [
         'public' => true,
     ],
 ];
+
