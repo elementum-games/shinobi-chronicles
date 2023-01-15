@@ -301,7 +301,7 @@ class Inbox {
      * @return null|InboxUser[] $convo_members
      */
     public static function getConvoMembers(System $system, int|string $convo_id): ?array {
-        $sql = "SELECT `users`.`user_name`, `users`.`user_id`, `users`.`avatar_link`, `blacklist`.`blocked_ids`
+        $sql = "SELECT `users`.`user_name`, `users`.`user_id`, `users`.`avatar_link`, `blacklist`.`blocked_ids`, `users`.`forbidden_seal`, `users`.`staff_level`
                 FROM `convos_users`
                 INNER JOIN `users`
                 ON `convos_users`.`user_id`=`users`.`user_id`
@@ -329,11 +329,12 @@ class Inbox {
         }, $users_data);
     }
 
-    public static function getSystemConvo($system, $system_id): array {
+    public static function getSystemConvo($system, $system_id, $user_id): array {
         $convo = ['convo_id' => self::SYSTEM_MESSAGE_CODES[$system_id], 'convo_members' => []];
         $sql = "SELECT * 
                 FROM `convos_alerts` 
-                WHERE `system_id`='{$system_id}' 
+                WHERE `system_id`='{$system_id}'
+                AND `target_id`={$user_id}
                 AND `alert_deleted`=0 
                 ORDER BY `alert_id` DESC";
         $result = $system->query($sql);
@@ -375,8 +376,6 @@ class Inbox {
      */
     public static function getMessages($system, $user, $convo_id, $timestamp = 0, $message_id = 99999999999): bool|array {
         $limit = self::MAX_MESSAGE_FETCH;
-        $profile_link = $system->links['members'] . '&user=';
-        $report_link = $system->links['report'] . '&report_type=2&content_id=';
         $new_message_array = [];
 
         $sql = "SELECT `convos_messages`.*, `users`.`user_name`, `users`.`avatar_link`, `users`.`forbidden_seal`, `users`.`staff_level`, `users`.`chat_color`
@@ -397,8 +396,6 @@ class Inbox {
         foreach($all_message_data as $message_data) {
             $message_data['message'] = $system->html_parse(stripslashes($message_data['message']), false, true);
             $message_data['self_message'] = $message_data['sender_id'] == $user->user_id ? true : false;
-            $message_data['profile_link'] = $profile_link . $message_data['user_name'];
-            $message_data['report_link'] = $report_link . $message_data['message_id'];
             $new_message_array[] = $message_data;
         }
 
@@ -443,6 +440,7 @@ class Inbox {
         $sql = "SELECT `system_id`, MAX(`time`) as `time`
                 FROM `convos_alerts`
                 WHERE `target_id`='{$user_id}'
+                AND `unread`=1
                 AND `alert_deleted`=0
                 GROUP BY `system_id`";
         $result = $system->query($sql);
