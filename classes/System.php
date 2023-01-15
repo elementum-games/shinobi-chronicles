@@ -22,12 +22,6 @@ class System {
     const IN_VILLAGE_OKAY = 1;
     const ONLY_IN_VILLAGE = 2;
 
-    const SC_MODERATOR = 1;
-    const SC_HEAD_MODERATOR = 2;
-    const SC_CONTENT_ADMINISTRATOR = 3;
-    const SC_ADMINISTRATOR = 4;
-    const SC_HEAD_ADMINISTRATOR = 5;
-
     const DB_DATETIME_MS_FORMAT = 'Y-m-d H:i:s.u';
 
     const SC_ADMIN_EMAIL = "admin@shinobichronicles.com";
