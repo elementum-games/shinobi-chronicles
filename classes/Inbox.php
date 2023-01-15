@@ -452,7 +452,6 @@ class Inbox {
         $sql = "SELECT `system_id`, MAX(`time`) as `time`
                 FROM `convos_alerts`
                 WHERE `target_id`='{$user_id}'
-                AND `unread`=1
                 AND `alert_deleted`=0
                 GROUP BY `system_id`";
         $result = $system->query($sql);

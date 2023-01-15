@@ -30,11 +30,12 @@ function inbox(): void {
 
 /**
  * @param System $system
- * @param User $player
+ * @param User   $player
+ * @return InboxAPIResponse
  */
-function LoadConvoList($system, $player): InboxAPIResponse {
+function LoadConvoList(System $system, User $player): InboxAPIResponse {
 	$response = new InboxAPIResponse();
-	$inbox = new InboxManager($system, $player);
+
 	try {		
 		// error management
 		if ($system->message) {
@@ -51,9 +52,9 @@ function LoadConvoList($system, $player): InboxAPIResponse {
 }
 
 /**
- * @param System $system
- * @param User   $player
- * @param int    $convo_id
+ * @param System     $system
+ * @param User       $player
+ * @param int|string $convo_id
  * @return InboxAPIResponse
  */
 function ViewConvo(System $system, User $player, int|string $convo_id): InboxAPIResponse {
@@ -97,7 +98,7 @@ function ViewConvo(System $system, User $player, int|string $convo_id): InboxAPI
 		}
 
 		// update the last viewed for the player
-		$update_result = Inbox::updateLastViewedForUser($system, $convo_id, $player->user_id);
+		Inbox::updateLastViewedForUser($system, $convo_id, $player->user_id);
 
 		// get convo data
 		$response->response_data = $inbox->getConversation($convo_id);
@@ -110,10 +111,11 @@ function ViewConvo(System $system, User $player, int|string $convo_id): InboxAPI
 }
 
 /**
- * @param System $system
- * @param User   $player
- * @param int    $convo_id
- * @param string $message
+ * @param System     $system
+ * @param User       $player
+ * @param int|string $convo_id
+ * @param string     $message
+ * @return InboxAPIResponse
  */
 function SendMessage(System $system, User $player, int|string $convo_id, string $message): InboxAPIResponse {
 	$response = new InboxAPIResponse();
@@ -175,14 +177,14 @@ function SendMessage(System $system, User $player, int|string $convo_id, string 
 }
 
 /**
- * @param System $system
- * @param User   $player
- * @param int    $convo_id
- * @param string $new_title
+ * @param System     $system
+ * @param User       $player
+ * @param int|string $convo_id
+ * @param string     $new_title
+ * @return InboxAPIResponse
  */
 function ChangeTitle(System $system, User $player, int|string $convo_id, string $new_title): InboxAPIResponse {
 	$response = new InboxAPIResponse();
-	$inbox = new InboxManager($system, $player);
 	try {
 		// check if the convo exists
 		$exists = Inbox::checkConvo($system, $convo_id);
@@ -201,7 +203,7 @@ function ChangeTitle(System $system, User $player, int|string $convo_id, string 
 			return $response;
 		}
 		// check if the player is the convo owner
-		if (!$player->user_id === Inbox::getConvoOwner($system, $convo_id)) {
+		if ($player->user_id !== Inbox::getConvoOwner($system, $convo_id)) {
 			$response->errors[] = 'You are not the owner of this conversation';
 			return $response;
 		}
@@ -222,14 +224,14 @@ function ChangeTitle(System $system, User $player, int|string $convo_id, string 
 }
 
 /**
- * @param System $system
- * @param User   $player
- * @param int    $convo_id
- * @param string $new_player
+ * @param System     $system
+ * @param User       $player
+ * @param int|string $convo_id
+ * @param string     $new_player
+ * @return InboxAPIResponse
  */
 function AddPlayer(System $system, User $player, int|string $convo_id, string $new_player): InboxAPIResponse {
 	$response = new InboxAPIResponse();
-	$inbox = new InboxManager($system, $player);
 	try {
 		// check if the convo exists
 		$exists = Inbox::checkConvo($system, $convo_id);
@@ -239,7 +241,7 @@ function AddPlayer(System $system, User $player, int|string $convo_id, string $n
 		}
 
 		// check if the player is the convo owner
-		if (!$player->user_id === Inbox::getConvoOwner($system, $convo_id)) {
+		if ($player->user_id !== Inbox::getConvoOwner($system, $convo_id)) {
 			$response->errors[] = 'You are not the owner of this conversation';
 			return $response;
 		}
@@ -301,15 +303,15 @@ function AddPlayer(System $system, User $player, int|string $convo_id, string $n
 }
 
 /**
- * @param System $system
- * @param User   $player
- * @param int    $convo_id
- * @param        $remove_player
+ * @param System     $system
+ * @param User       $player
+ * @param int|string $convo_id
+ * @param            $remove_player
  * @return InboxAPIResponse
  */
-function RemovePlayer($system, $player, $convo_id, $remove_player): InboxAPIResponse {
+function RemovePlayer(System $system, User $player, int|string $convo_id, $remove_player): InboxAPIResponse {
 	$response = new InboxAPIResponse();
-	$inbox = new InboxManager($system, $player);
+
 	try {
 		// check if the player exists
 		$remove_player_data = Inbox::getUserData($system, $remove_player);
@@ -382,11 +384,12 @@ function RemovePlayer($system, $player, $convo_id, $remove_player): InboxAPIResp
 }
 
 /**
- * @param System $system
- * @param User $player
+ * @param System     $system
+ * @param User       $player
  * @param int|string $convo_id
+ * @return InboxAPIResponse
  */
-function LeaveConversation($system, $player, $convo_id): InboxAPIResponse {
+function LeaveConversation(System $system, User $player, int|string $convo_id): InboxAPIResponse {
 	$response = new InboxAPIResponse();
 	$inbox = new InboxManager($system, $player);
 	try {
@@ -431,15 +434,16 @@ function LeaveConversation($system, $player, $convo_id): InboxAPIResponse {
 }
 
 /**
- * @param System $system
- * @param User $player
- * @param string $members
- * @param string? $title
- * @param string $message
+ * @param System      $system
+ * @param User        $player
+ * @param string      $members
+ * @param string|null $title
+ * @param string      $message
+ * @return InboxAPIResponse
  */
-function CreateNewConvo($system, $player, $members, $title, $message): InboxAPIResponse {
+function CreateNewConvo(System $system, User $player, string $members, ?string $title, string $message): InboxAPIResponse {
 	$response = new InboxAPIResponse();
-	$inbox = new InboxManager($system, $player);
+
 	try {
 		// check if the message is too long or too short
 		if (!Inbox::checkMessageLength($message, $player->forbidden_seal, $player->staff_level)) {
@@ -522,20 +526,20 @@ function CreateNewConvo($system, $player, $members, $title, $message): InboxAPIR
 }
 
 /**
- * @param System $system
- * @param User $player
+ * @param System     $system
+ * @param User       $player
  * @param int|string $convo_id
- * @param int $timestamp
+ * @param int        $timestamp
+ * @return InboxAPIResponse
  */
-function CheckForNewMessages($system, $player, $convo_id, $timestamp): InboxAPIResponse {
+function CheckForNewMessages(System $system, User $player, int|string $convo_id, int $timestamp): InboxAPIResponse {
 	$response = new InboxAPIResponse();
-	$inbox = new InboxManager($system, $player);
+
 	try {
-		
 		// check if the convo is a system message
 		if (in_array($convo_id, Inbox::SYSTEM_MESSAGE_CODES)) {
 			$requested_system = array_search($convo_id, Inbox::SYSTEM_MESSAGE_CODES);
-			$convo_data = Inbox::getSystemConvo($system, $requested_system);
+			$convo_data = Inbox::getSystemConvo($system, $requested_system, $player->user_id);
 			// set all messages to unread
 			if (!empty($convo_data)) {
 				Inbox::updateUnreadSystemAlert($system, $requested_system, $player->user_id);
@@ -580,14 +584,15 @@ function CheckForNewMessages($system, $player, $convo_id, $timestamp): InboxAPIR
 }
 
 /**
- * @param System $system
- * @param User $player
+ * @param System     $system
+ * @param User       $player
  * @param int|string $convo_id
- * @param int $oldest_message_id
+ * @param int        $oldest_message_id
+ * @return InboxAPIResponse
  */
-function LoadNextPage($system, $player, $convo_id, $oldest_message_id): InboxAPIResponse {
+function LoadNextPage(System $system, User $player, int|string $convo_id, int $oldest_message_id): InboxAPIResponse {
 	$response = new InboxAPIResponse();
-	$inbox = new InboxManager($system, $player);
+
 	try {
 		// check if the convo exists
 		$exists = Inbox::checkConvo($system, $convo_id);
@@ -613,7 +618,6 @@ function LoadNextPage($system, $player, $convo_id, $oldest_message_id): InboxAPI
             system: $system,
             user: $player,
             convo_id: $convo_id,
-            timestamp: 0,
             message_id: $oldest_message_id
         );
 		if ($response->response_data['older_messages']) {
