@@ -1126,6 +1126,7 @@ function premiumCreditExchange() {
 			$system->query("UPDATE `users` SET `money`=`money` + {$offer['money']}
 				WHERE `user_id`='{$offer['seller']}'");
 
+            //TODO: Check this works? Looks like it would not
             $system->currencyLog(
                 character_id: $offer['seller'],
                 currency_type: System::CURRENCY_TYPE_MONEY,
