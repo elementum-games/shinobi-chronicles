@@ -509,18 +509,24 @@ function premium() {
 
 			// Extend
 			if($player->forbidden_seal_loaded && $player->forbidden_seal->level == $seal_level) {
-                $player->premium_credits -= $cost;
+                $player->subtractPremiumCredits($cost, "Extended {$player->forbidden_seal->name} by {$seal_length} days.");
 				$player->forbidden_seal->addSeal($seal_level, $seal_length);
 				$system->message("Seal extended!");
 			}
             // Overwrite seal
             elseif($player->forbidden_seal_loaded) {
+                $overwrite = isset($_POST['confirm_seal_overwrite']) ? true : false;
                 // Confirm change in seal... time will not be reimbursed
                 if(!isset($_POST['confirm_seal_overwrite']) && $seal_level != $player->forbidden_seal->level) {
                     require_once ('templates/overwriteSealConfirmation.php');
                 }
                 else {
-                    $player->premium_credits -= $cost;
+                    $message = "Purchased " . ForbiddenSeal::$forbidden_seals[$seal_level] . " seal for {$seal_length} days.";
+                    if($overwrite) {
+                        $message .= "This purchase removed {$system->time_remaining($player->forbidden_seal->seal_time_remaining)}
+                            of their {$player->forbidden_seal->name}.";
+                    }
+                    $player->subtractPremiumCredits($cost, $message);
                     $player->forbidden_seal->addSeal($seal_level, $seal_length);
                     $system->message("You changed your seal!");
                 }
