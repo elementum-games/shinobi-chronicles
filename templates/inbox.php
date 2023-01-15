@@ -24,13 +24,17 @@
     const inboxAPILink = "<?= $system->api_links['inbox'] ?>";
     const convo_count = <?= $convo_count ?>;
     const convo_count_max = <?= $convo_count_max ?>;
+    const url_object = new URL(window.location.href);
+    const sender = url_object.searchParams.get('sender');
+
 
     window.addEventListener('load', () => {
         ReactDOM.render(
             React.createElement(Inbox, {
                 inboxAPILink: inboxAPILink,
                 convo_count: convo_count,
-                convo_count_max: convo_count_max
+                convo_count_max: convo_count_max,
+                sender: sender
             }),
             inboxContainer
         );

@@ -66,7 +66,7 @@ function ViewConvo(System $system, User $player, int|string $convo_id): InboxAPI
 		if (in_array($convo_id, Inbox::SYSTEM_MESSAGE_CODES)) {
 			$requested_system = array_search($convo_id, Inbox::SYSTEM_MESSAGE_CODES);
 
-			$convo_data = Inbox::getSystemConvo($system, $requested_system);
+			$convo_data = Inbox::getSystemConvo($system, $requested_system, $player->user_id);
 			// set all messages to unread
 			if (!empty($convo_data)) {
 				Inbox::updateUnreadSystemAlert($system, $requested_system, $player->user_id);

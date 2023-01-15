@@ -310,8 +310,7 @@ class Inbox {
      * @return null|InboxUser[] $convo_members
      */
     public static function getConvoMembers(System $system, int|string $convo_id): ?array {
-        $sql = "SELECT `users`.`user_name`, `users`.`user_id`, `users`.`avatar_link`, `blacklist`.`blocked_ids`,
-                        `users`.`forbidden_seal`, `users`.`staff_level`
+        $sql = "SELECT `users`.`user_name`, `users`.`user_id`, `users`.`avatar_link`, `blacklist`.`blocked_ids`, `users`.`forbidden_seal`, `users`.`staff_level`
                 FROM `convos_users`
                 INNER JOIN `users`
                 ON `convos_users`.`user_id`=`users`.`user_id`
@@ -453,6 +452,7 @@ class Inbox {
         $sql = "SELECT `system_id`, MAX(`time`) as `time`
                 FROM `convos_alerts`
                 WHERE `target_id`='{$user_id}'
+                AND `unread`=1
                 AND `alert_deleted`=0
                 GROUP BY `system_id`";
         $result = $system->query($sql);
