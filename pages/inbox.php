@@ -115,7 +115,7 @@ function ViewConvo(System $system, User $player, int|string $convo_id): InboxAPI
  * @param int    $convo_id
  * @param string $message
  */
-function SendMessage(System $system, User $player, int $convo_id, string $message): InboxAPIResponse {
+function SendMessage(System $system, User $player, int|string $convo_id, string $message): InboxAPIResponse {
 	$response = new InboxAPIResponse();
 	$inbox = new InboxManager($system, $player);
 	try {		
@@ -176,7 +176,7 @@ function SendMessage(System $system, User $player, int $convo_id, string $messag
  * @param int    $convo_id
  * @param string $new_title
  */
-function ChangeTitle(System $system, User $player, int $convo_id, string $new_title): InboxAPIResponse {
+function ChangeTitle(System $system, User $player, int|string $convo_id, string $new_title): InboxAPIResponse {
 	$response = new InboxAPIResponse();
 	$inbox = new InboxManager($system, $player);
 	try {
@@ -223,7 +223,7 @@ function ChangeTitle(System $system, User $player, int $convo_id, string $new_ti
  * @param int    $convo_id
  * @param string $new_player
  */
-function AddPlayer(System $system, User $player, int $convo_id, string $new_player): InboxAPIResponse {
+function AddPlayer(System $system, User $player, int|string $convo_id, string $new_player): InboxAPIResponse {
 	$response = new InboxAPIResponse();
 	$inbox = new InboxManager($system, $player);
 	try {
@@ -380,7 +380,7 @@ function RemovePlayer($system, $player, $convo_id, $remove_player): InboxAPIResp
 /**
  * @param System $system
  * @param User $player
- * @param int $convo_id
+ * @param int|string $convo_id
  */
 function LeaveConversation($system, $player, $convo_id): InboxAPIResponse {
 	$response = new InboxAPIResponse();
@@ -520,7 +520,7 @@ function CreateNewConvo($system, $player, $members, $title, $message): InboxAPIR
 /**
  * @param System $system
  * @param User $player
- * @param int $convo_id
+ * @param int|string $convo_id
  * @param int $timestamp
  */
 function CheckForNewMessages($system, $player, $convo_id, $timestamp): InboxAPIResponse {
@@ -578,7 +578,7 @@ function CheckForNewMessages($system, $player, $convo_id, $timestamp): InboxAPIR
 /**
  * @param System $system
  * @param User $player
- * @param int $convo_id
+ * @param int|string $convo_id
  * @param int $oldest_message_id
  */
 function LoadNextPage($system, $player, $convo_id, $oldest_message_id): InboxAPIResponse {

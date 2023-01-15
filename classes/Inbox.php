@@ -55,10 +55,10 @@ class Inbox {
 
     /**
      * @param     $system
-     * @param int $convo_id
+     * @param int|string $convo_id
      * @return int
      */
-    public static function checkConvo($system, int $convo_id): int {
+    public static function checkConvo($system, int|string $convo_id): int {
         $sql = "SELECT COUNT(`convo_id`) FROM `convos` WHERE `convo_id`='{$convo_id}' AND `active`=1";
         $result = $system->query($sql);
         $count = $result->fetch_row();
@@ -131,7 +131,7 @@ class Inbox {
     }
 
     /**
-     * @param int $convo_id
+     * @param int|string $convo_id
      * @param int $sender_id
      * @param string $message
      * @return int message_id
@@ -161,7 +161,7 @@ class Inbox {
     }
 
     /**
-     * @param int $convo_id
+     * @param int|string $convo_id
      * @param string $title
      * @return int last_affected_rows
      */
@@ -172,7 +172,7 @@ class Inbox {
     }
 
     /**
-     * @param int $convo_id
+     * @param int|string $convo_id
      * @param int $user_id
      * @return int entry_id
      */
@@ -184,7 +184,7 @@ class Inbox {
     }
 
     /**
-     * @param int $convo_id
+     * @param int|string $convo_id
      * @param int user_id
      * @return int last_affected_rows
      */
@@ -198,7 +198,7 @@ class Inbox {
      * @param int    $convo_id
      * @return bool whether delete succeeded or not
      */
-    public static function deleteConvo(System $system, int $convo_id): bool {
+    public static function deleteConvo(System $system, int|string $convo_id): bool {
         $system->query("UPDATE `convos` SET `active`=0 WHERE `convo_id`='{$convo_id}'");
         return $system->db_last_affected_rows > 0;
     }
@@ -272,7 +272,7 @@ class Inbox {
     }
 
     /**
-     * @param int $convo_id
+     * @param int|string $convo_id
      * @return boolean
      */
     public static function updateLastViewedForUser($system, $convo_id, $user_id): bool {
@@ -284,7 +284,7 @@ class Inbox {
 
     /**
      * @param     $system
-     * @param int $convo_id
+     * @param int|string $convo_id
      * @param     $user_id
      * @return int (0,1)
      */
@@ -300,7 +300,7 @@ class Inbox {
      * @param int    $convo_id
      * @return null|InboxUser[] $convo_members
      */
-    public static function getConvoMembers(System $system, int $convo_id): ?array {
+    public static function getConvoMembers(System $system, int|string $convo_id): ?array {
         $sql = "SELECT `users`.`user_name`, `users`.`user_id`, `users`.`avatar_link`, `blacklist`.`blocked_ids`
                 FROM `convos_users`
                 INNER JOIN `users`
@@ -369,7 +369,7 @@ class Inbox {
     /**
      * @param System $system
      * @param User $user
-     * @param int $convo_id
+     * @param int|string $convo_id
      * @param int? $timestamp
      * @return boolean|array $messages_data
      */
@@ -406,7 +406,7 @@ class Inbox {
     }
 
     /**
-     * @param int $convo_id
+     * @param int|string $convo_id
      * @return int $owner_id
      */
     public static function getConvoOwner($system, $convo_id): int {
@@ -437,14 +437,13 @@ class Inbox {
      * @param int user_id
      * @return array 
      */
-    public static function getUnreadAlertsForUser($system, $user_id): array {
+    public static function getAlertsForUser($system, $user_id): array {
         $return_arr = [];
         // grab all the alerts for the user
         $sql = "SELECT `system_id`, MAX(`time`) as `time`
                 FROM `convos_alerts`
                 WHERE `target_id`='{$user_id}'
                 AND `alert_deleted`=0
-                AND `unread`=1
                 GROUP BY `system_id`";
         $result = $system->query($sql);
         if (!$system->db_last_num_rows) {
@@ -477,7 +476,7 @@ class Inbox {
         $convos = []; // return array
 
         // get all alerts and add it to the return array 
-        $alerts = self::getUnreadAlertsForUser($system, $user_id);
+        $alerts = self::getAlertsForUser($system, $user_id);
         if (!empty($alerts)) {
             $convos = array_merge($convos, $alerts);
         }
