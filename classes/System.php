@@ -23,12 +23,6 @@ class System {
     const IN_VILLAGE_OKAY = 1;
     const ONLY_IN_VILLAGE = 2;
 
-    const SC_MODERATOR = 1;
-    const SC_HEAD_MODERATOR = 2;
-    const SC_CONTENT_ADMINISTRATOR = 3;
-    const SC_ADMINISTRATOR = 4;
-    const SC_HEAD_ADMINISTRATOR = 5;
-
     const CURRENCY_TYPE_MONEY = 'money';
     const CURRENCY_TYPE_PREMIUM_CREDITS = 'premium_credits';
 
