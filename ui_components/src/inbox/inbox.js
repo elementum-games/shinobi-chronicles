@@ -26,7 +26,8 @@ const max_messages_per_fetch = 25;
 const Inbox = ({
     inboxAPILink,
     convo_count,
-    convo_count_max
+    convo_count_max,
+    sender
 }) => {
     const [successMessage, setSuccessMessage] = React.useState(null);
     const [errorMessage, setErrorMessage] = React.useState(null);
@@ -37,6 +38,8 @@ const Inbox = ({
 
     const [viewDetailsPanel, setViewDetailsPanel] = React.useState(false);
     const [newConvoPanel, setNewConvoPanel] = React.useState(false);
+
+    const [sendToName, setSendToName] = React.useState(sender);
 
     // load convos
     React.useEffect(() => {
@@ -228,6 +231,7 @@ const Inbox = ({
                     setViewDetailsPanel(false); // REMOVE THE DETAILS PANEL IF ON
                     setNewConvoPanel(false); // REMOVE THE NEW CONVO PANEL IF ON
                     ClearTextbox(textboxInput, true); // CLEAR THE TEXTBOX
+                    setSendToName(null); // CLEAR THE NEW CONVO INPUT
                     break;
 
                 case 'LoadNextPage':
@@ -299,6 +303,8 @@ const Inbox = ({
                     ClearTextbox(newConvoMembersInput, false, true);
                     ClearTextbox(newConvoTitleInput, false, true);
                     ClearTextbox(newConvoMessageInput, false, true);
+                    setNewConvoPanel(null);
+                    setSendToName(null);
 
                     // Success Message
                     ResetMessages();
@@ -445,6 +451,7 @@ const Inbox = ({
                             <ConvoMessageCard
                                 key={"convoMessageCard:" + message_data.message_id}
                                 message_data={message_data}
+                                convo_data={selectedConvoData}
                             />
                         ))}
                         {(selectedConvoData.all_messages.length >= max_messages_per_fetch) && (
@@ -477,6 +484,7 @@ const Inbox = ({
                                 key={ member.user_id }
                                 member_data={ member }
                                 convoData={selectedConvoData}
+                                onClick={() => RemoveFromConvo(selectedConvoData.convo_id, member.user_name)}
                             />
                         ))}
                     </div>
@@ -493,7 +501,7 @@ const Inbox = ({
                             </button>
                         </div>
                         {/* CONVO DETAILS OWNER ACTIONS */}
-                        { (selectedConvoData['owner_id'] === selectedConvoData['self']) && (
+                        { (parseInt(selectedConvoData.owner_id, 10) === selectedConvoData.self) && (
                         <>
                             <div className='inbox_convo_details_action'>
                                 <div>
@@ -532,12 +540,12 @@ const Inbox = ({
                 )}
 
                 {/* NEW CONVO PANEL */}
-                { (newConvoPanel) && (
+                { (newConvoPanel || sendToName) && (
                 <div id='inbox_new_convo_container'>
                     {/* NEW CONVO MEMBERS INPUT */}
                     <input type='text' 
                             className={ newConvoMembersInput } 
-                            placeholder='Seperate users with commas' />
+                            placeholder='Seperate users with commas' defaultValue={sendToName} />
                     {/* NEW CONVO TITLE INPUT */}
                     <input type='text' 
                             className={ newConvoTitleInput } 
@@ -575,7 +583,7 @@ const Inbox = ({
  * @param convoData
  * @returns
  */
-const ConvoDetailsMemberCard = ({member_data, convoData}) => {
+const ConvoDetailsMemberCard = ({member_data, convoData, onClick}) => {
 
     // if the member is this user return nothing
     if (convoData.self === member_data.user_id) {
@@ -596,10 +604,10 @@ const ConvoDetailsMemberCard = ({member_data, convoData}) => {
                    className='userLink'>{ member_data.user_name }</a>
             </div>
             {/* CONVO DETAILS MEMBER OWNER ACTION */}
-            { convoData.owner_id === convoData.self && (
+            { parseInt(convoData.owner_id, 10) === convoData.self && (
                 <div className='inbox_convo_details_member_actions'>
                     <a href='#'
-                       onClick={() => RemoveFromConvo(convoData.convo_id, member_data.user_name)}
+                       onClick={onClick}
                        className='inbox_convo_details_member_remove'></a>
                 </div>
             )}
@@ -613,7 +621,7 @@ const ConvoDetailsMemberCard = ({member_data, convoData}) => {
  * @param {array} message_data
  * @returns
  */
-const ConvoMessageCard = ({message_data}) => {
+const ConvoMessageCard = ({message_data, convo_data}) => {
 
     // if the message was posted by the user
     const messageClass = message_data.self_message ? 'inbox_message inbox_message_self' : 'inbox_message';
@@ -621,17 +629,17 @@ const ConvoMessageCard = ({message_data}) => {
     return (
         <div className={messageClass}>
             <div className='inbox_message_avatar'>
-                <a href={ message_data.profile_link }><img src={message_data.avatar_link} /></a>
+                <a href={ convo_data.profile_link + message_data.user_name }><img src={message_data.avatar_link} /></a>
             </div>
             <div className='inbox_message_container'>
                 <div className='inbox_message_sender'>
-                    <a href={ message_data.profile_link } className={message_data.chat_color + ' chat userLink'}>{message_data.user_name}</a>
+                    <a href={ convo_data.profile_link + message_data.user_name } className={message_data.chat_color + ' chat userLink'}>{message_data.user_name}</a>
                 </div>
                 <div className='inbox_message_timestamp'>
                     { timeSince(message_data.time, 'short', true) }
                 </div>
                 <div className='inbox_message_report'>
-                    <a href={message_data.report_link}>Report</a>
+                    <a href={convo_data.report_link + message_data.message_id}>Report</a>
                 </div>
                 <div className='inbox_message_content'>
                     <pre dangerouslySetInnerHTML={{__html: message_data.message }}></pre>
