@@ -1353,6 +1353,8 @@ class User extends Fighter {
             $presents_claimed = json_encode($this->presents_claimed);
         }
 
+        var_dump($forbidden_seal);
+
         $query .= "`forbidden_seal`='$forbidden_seal',
         `chat_color` = '$this->chat_color',
         `chat_effect` = '$this->chat_effect',
