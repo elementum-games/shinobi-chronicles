@@ -20,7 +20,7 @@ function userSettings() {
 		$max_journal_length = 2000;
 	}
 	
-	$layouts = array('shadow_ribbon', 'geisha', 'classic_blue', 'blue_scroll');
+	$layouts = array('shadow_ribbon', 'geisha', 'classic_blue', 'blue_scroll', 'rainbow_road');
 	if($system->environment == 'dev') {
 	    $layouts[] = 'cextralite';
 	}
