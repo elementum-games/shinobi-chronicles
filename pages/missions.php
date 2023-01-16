@@ -115,21 +115,21 @@ function runActiveMission() {
     $mission_status = 1;
 
     //Survival Mission State Controls
-    if(!empty($_GET['retreat'])) {
-        $player->battle_id = 0;
-        $mission->nextStage($player->mission_stage['stage_id'] = 4);
-    }
+    if ($mission->mission_type == 5) {
+        if (!empty($_GET['retreat'])) {
+            $player->battle_id = 0;
+            $mission->nextStage($player->mission_stage['stage_id'] = 4);
+        }
 
-    $continue_mission = false;
-    if(!empty($_GET['continue']))
-    {
-        $continue_mission = boolval($_GET['continue']);
-    }
-    if ($player->mission_stage['round_complete'] && $continue_mission)
-    {
-        $player->mission_stage['round_complete'] = false;
-        $player->battle_id = 0;
-        $mission_status = $mission->nextStage($player->mission_stage['stage_id']);
+        $continue_mission = false;
+        if (!empty($_GET['continue'])) {
+            $continue_mission = boolval($_GET['continue']);
+        }
+        if ($player->mission_stage['round_complete'] && $continue_mission) {
+            $player->mission_stage['round_complete'] = false;
+            $player->battle_id = 0;
+            $mission_status = $mission->nextStage($player->mission_stage['stage_id']);
+        }
     }
 
     if($mission_status < 2) {
