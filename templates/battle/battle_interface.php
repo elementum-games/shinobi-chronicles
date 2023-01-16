@@ -12,19 +12,19 @@
  * @var string $refresh_link
  */
 
-    $health_percent = round(($player->health / $player->max_health) * 100);
-    $chakra_percent = round(($player->chakra / $player->max_chakra) * 100);
-    $stamina_percent = round(($player->stamina / $player->max_stamina) * 100);
-    $player_avatar_size = $player->getAvatarSize() . 'px';
+$health_percent = round(($player->health / $player->max_health) * 100);
+$chakra_percent = round(($player->chakra / $player->max_chakra) * 100);
+$stamina_percent = round(($player->stamina / $player->max_stamina) * 100);
+$player_avatar_size = $player->getAvatarSize() . 'px';
 
-    $opponent_health_percent = round(($opponent->health / $opponent->max_health) * 100);
-    $opponent_avatar_size = $opponent->getAvatarSize() . 'px';
+$opponent_health_percent = round(($opponent->health / $opponent->max_health) * 100);
+$opponent_avatar_size = $opponent->getAvatarSize() . 'px';
 
-    $battle_text = null;
-    if($battle->battle_text) {
-        $battle_text = $system->html_parse(stripslashes($battle->battle_text));
-        $battle_text = str_replace(array('[br]', '[hr]'), array('<br />', '<hr />'), $battle_text);
-    }
+$battle_text = null;
+if($battle->battle_text) {
+    $battle_text = $system->html_parse(stripslashes($battle->battle_text));
+    $battle_text = str_replace(array('[br]', '[hr]'), array('<br />', '<hr />'), $battle_text);
+}
 ?>
 
 <style type='text/css'>
@@ -43,48 +43,58 @@
 
     .resourceBarOuter {
         position: relative;
-        height: 17px;
-        width: 250px;
-        border: 0.1px solid black;
+        height: 15px;
+        width: 240px;
+        border: 1px solid black;
         border-radius: 17px;
         
-        background-color: rgba(30, 30, 30, 1);
+        background-color: rgba(0, 0, 0, 0.6);
     }
 
     /* Parent must be Position: relative */
     .innerResourceBarLabel{
-        display: block; 
-        position: absolute; 
-        left: 0; 
-        right: 0; 
+        display: block;
+        position: absolute;
+        left: 0;
+        right: 0;
 
-        font-family: Verdana, sans-serif;
+        font-size: 12px;
         font-weight: bold;
-        
-        color: black;
-        -webkit-text-fill-color: white; /* Will override color (regardless of order) */
-        -webkit-text-stroke-width: 0.6px;
-        -webkit-text-stroke-color: black;
-        
+        letter-spacing: 0.2px;
+        line-height:15px;
+
+        color: #ffffff;
+        text-shadow: 
+            -1px 0 0 rgba(0,0,0,0.7),
+            -1px -1px 0 rgba(0,0,0,0.7),
+            0 -1px 0 rgba(0,0,0,0.7),
+            1px -1px 0 rgba(0,0,0,0.7),
+            1px 0 0 rgba(0,0,0,0.7),
+            1px 1px 0 rgba(0,0,0,0.7),
+            0 1px 0 rgba(0,0,0,0.7),
+            -1px 1px 0 rgba(0,0,0,0.7);
+
         z-index: 100;
     }
 
     .healthFill {
         background-color: #C00000;
-        background-image: linear-gradient(180deg, rgb(200, 10, 10), rgb(255, 100, 100), rgb(230, 60, 60), rgb(220, 20, 20), rgb(160, 10, 10));
-        height:17px;
+        background-image: linear-gradient(180deg, rgb(250, 90, 90), rgb(230, 60, 60), rgb(220, 20, 20), rgb(160, 10, 10));
+        height: 100%;
         border-radius: 12px;
     }
     .chakraFill {
         background-color: #0000B0;
-        background-image: linear-gradient(180deg, rgb(20, 20, 160), rgb(90, 90, 255), rgb(70, 70, 205), rgb(10, 10, 180), rgb(10, 10, 140));
-        height:17px;
+        /*background-image: linear-gradient(180deg, rgb(70, 70, 240), rgb(70, 70, 205), rgb(10, 10, 180), rgb(10, 10, 140));*/
+        background-image: linear-gradient(180deg, rgb(80, 80, 250), rgb(60, 60, 230), rgb(20, 20, 220), rgb(10, 10, 160));
+        height: 100%;
         border-radius: 12px;
     }
     .staminaFill {
         background-color: #00B000;
-        background-image: linear-gradient(180deg, rgb(30, 150, 30), rgb(80, 230, 80), rgb(60, 200, 60), rgb(25, 140, 25), rgb(5, 100, 5));
-        height:17px;
+        /* background-image: linear-gradient(180deg, rgb(70, 230, 70), rgb(60, 200, 60), rgb(25, 140, 25), rgb(5, 100, 5));*/
+        background-image: linear-gradient(180deg, rgb(80, 250, 80), rgb(60, 230, 60), rgb(20, 220, 20), rgb(10, 160, 10));
+        height: 100%;
         border-radius: 12px;
     }
 </style>
@@ -111,43 +121,43 @@
         </th>
     </tr>
     <tr>
-    <td style='text-align: center;' id='bi_td_player'>
+        <td style='text-align: center;' id='bi_td_player'>
             <img src='<?= $player->avatar_link ?>' class='playerAvatar' alt='player_profile_img' />
             <div id='player_battle_stats_container' style='display: inline-block; text-align: center; margin-top: 10px;'>
-                
+
                 <!-- Health -->
                 <div class='resourceBarOuter'>
                     <label class='innerResourceBarLabel' ><?= sprintf("%.2f", $player->health) ?> / <?= sprintf("%.2f", $player->max_health) ?></label>
                     <div class='healthFill' style='width:<?= $health_percent ?>%;'></div>
                 </div>
 
-            <?php if(!$battleManager->spectate): ?>
+                <?php if(!$battleManager->spectate): ?>
 
-                <!-- Chakra -->
-                <div class='resourceBarOuter' style='margin-top:8px;'>
-                    <label class='innerResourceBarLabel'><?= sprintf("%.2f", $player->chakra) ?> / <?= sprintf("%.2f", $player->max_chakra) ?></label>
-                    <div class='chakraFill' style='width:<?= $chakra_percent ?>%;'></div>
-                </div>
+                    <!-- Chakra -->
+                    <div class='resourceBarOuter' style='margin-top:6px;'>
+                        <label class='innerResourceBarLabel'><?= sprintf("%.2f", $player->chakra) ?> / <?= sprintf("%.2f", $player->max_chakra) ?></label>
+                        <div class='chakraFill' style='width:<?= $chakra_percent ?>%;'></div>
+                    </div>
 
-                <!-- Stamina -->
-                <div class='resourceBarOuter' style='margin-top:8px;'>
-                    <label class='innerResourceBarLabel'><?= sprintf("%.2f", $player->stamina) ?> / <?= sprintf("%.2f", $player->max_stamina) ?></label>
-                    <div class='staminaFill' style='width:<?= $stamina_percent ?>%;'></div>
-                </div>
+                    <!-- Stamina -->
+                    <div class='resourceBarOuter' style='margin-top:6px;'>
+                        <label class='innerResourceBarLabel'><?= sprintf("%.2f", $player->stamina) ?> / <?= sprintf("%.2f", $player->max_stamina) ?></label>
+                        <div class='staminaFill' style='width:<?= $stamina_percent ?>%;'></div>
+                    </div>
 
-            <?php endif; ?>
+                <?php endif; ?>
             </div>
-    </td>
-    <td style='text-align: center;' id='bi_td_opponent'>
-        <img src='<?= $opponent->avatar_link ?>' class='opponentAvatar' />
-        <div id='ai_battle_stats_container' style='display: inline-block; text-align: center; margin-top: 10px;'>
-            <div class='resourceBarOuter' style='margin-top:8px;'><div class='healthFill' style='width:<?= $opponent_health_percent ?>%;'>
-                <label  class='innerResourceBarLabel'><?= sprintf("%.2f", $opponent->health) ?> / <?= sprintf("%.2f", $opponent->max_health) ?></label>
+        </td>
+        <td style='text-align: center;' id='bi_td_opponent'>
+            <img src='<?= $opponent->avatar_link ?>' class='opponentAvatar' />
+            <div id='ai_battle_stats_container' style='display: inline-block; text-align: center; margin-top: 10px;'>
+                <div class='resourceBarOuter' style='margin-top:8px;'><div class='healthFill' style='width:<?= $opponent_health_percent ?>%;'>
+                        <label  class='innerResourceBarLabel'><?= sprintf("%.2f", $opponent->health) ?> / <?= sprintf("%.2f", $opponent->max_health) ?></label>
+                    </div>
+                </div>
             </div>
-        </div>
-    </div>
-    </td>
-  </tr>
+        </td>
+    </tr>
 </table>
 
 <table class='table'>
@@ -169,22 +179,22 @@
 
         <!--// Turn timer-->
         <tr><td style='text-align:center;' colspan='2'>
-            <?= ($battle->isPreparationPhase() ? "Prep-" : "") ?>Time remaining:
+                <?= ($battle->isPreparationPhase() ? "Prep-" : "") ?>Time remaining:
                 <?= $battle->isPreparationPhase() ? $battle->prepTimeRemaining() : $battle->timeRemaining() ?> seconds
-        </td></tr>
+            </td></tr>
     <?php endif; ?>
 
     <?php if($battleManager->spectate): ?>
         <tr><td style='text-align:center;' colspan='2'>
-            <?php if($battle->winner == Battle::TEAM1): ?>
-               <?=  $battle->player1->getName() ?> won!
-            <?php elseif($battle->winner == Battle::TEAM2): ?>
-                <?= $battle->player2->getName() ?> won!
-            <?php elseif($battle->winner == Battle::DRAW): ?>
-                Fight ended in a draw.
-            <?php else: ?>
-                Time remaining: <?= $battle->timeRemaining() ?> seconds
-            <?php endif; ?>
-        </td></tr>
+                <?php if($battle->winner == Battle::TEAM1): ?>
+                    <?=  $battle->player1->getName() ?> won!
+                <?php elseif($battle->winner == Battle::TEAM2): ?>
+                    <?= $battle->player2->getName() ?> won!
+                <?php elseif($battle->winner == Battle::DRAW): ?>
+                    Fight ended in a draw.
+                <?php else: ?>
+                    Time remaining: <?= $battle->timeRemaining() ?> seconds
+                <?php endif; ?>
+            </td></tr>
     <?php endif; ?>
 </table>
