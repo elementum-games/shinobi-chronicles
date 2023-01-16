@@ -226,10 +226,16 @@ class Bloodline {
 
             switch($boost['effect']) {
                 case 'ninjutsu_boost':
+                    $this->combat_boosts[$id]['power'] =
+                        round($boost_power * $this->offenseToBloodlineRatio($ninjutsu_skill, $bloodline_skill) * $ratios['offense_boost'], 3);
+                    break;
                 case 'genjutsu_boost':
+                    $this->combat_boosts[$id]['power'] =
+                        round($boost_power * $this->offenseToBloodlineRatio($genjutsu_skill, $bloodline_skill) * $ratios['offense_boost'], 3);
+                    break;
                 case 'taijutsu_boost':
                     $this->combat_boosts[$id]['power'] =
-                        round($boost_power * $ratios['offense_boost'], 3);
+                        round($boost_power * $this->offenseToBloodlineRatio($taijutsu_skill, $bloodline_skill) * $ratios['offense_boost'], 3);
                     break;
 
                 case 'ninjutsu_resist':
@@ -257,6 +263,26 @@ class Bloodline {
 
             $this->combat_boosts[$id]['effect_amount'] = round($this->combat_boosts[$id]['power'] * $bloodline_skill, 3);
         }
+    }
+
+    /**
+     * Discourage training exclusively bloodline skill past a certain point
+     *
+     * @param int $offense_skill
+     * @param int $bloodline_skill
+     * @return float
+     */
+    private function offenseToBloodlineRatio(int $offense_skill, int $bloodline_skill): float {
+        $bloodline_skill += 10;
+
+        $offense_to_bloodline = round($offense_skill / $bloodline_skill, 3);
+        if($offense_to_bloodline > 1.0) {
+            $offense_to_bloodline = 1.0;
+        }
+        else if($offense_to_bloodline < 0.8) {
+            $offense_to_bloodline = 0.8;
+        }
+        return $offense_to_bloodline;
     }
 
     /**

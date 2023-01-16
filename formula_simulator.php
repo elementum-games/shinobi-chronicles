@@ -8,9 +8,11 @@ require "authenticate_admin.php";
 class TestFighter extends Fighter {
     public string $name = 'test';
     public int $rank = 1;
+    public int $regen_rate = 20;
 
     public $id;
     public string $gender = 'Non-binary';
+    public int $total_stats;
 
     public function getAvatarSize(): int {
         return 125;
@@ -35,6 +37,11 @@ class TestFighter extends Fighter {
 
     }
 
+    public function setTotalStats() {
+        $this->total_stats = $this->ninjutsu_skill + $this->genjutsu_skill + $this->taijutsu_skill + $this->bloodline_skill +
+            $this->cast_speed + $this->speed + $this->intelligence + $this->willpower;
+    }
+
     public function updateInventory() {
 
     }
@@ -44,6 +51,61 @@ class TestFighter extends Fighter {
     }
 
 
+}
+
+function fighterFromData(array $fighter_data, string $name): TestFighter {
+    global $system;
+    global $rankManager;
+
+    $fighter = new TestFighter();
+    $fighter->rank = 3;
+    $fighter->health = 1000000;
+    $fighter->max_health = 1000000;
+    $fighter->name = $name;
+    $fighter->system = $system;
+    $fighter->ninjutsu_skill = (int)$fighter_data['ninjutsu_skill'];
+    $fighter->taijutsu_skill = (int)$fighter_data['taijutsu_skill'];
+    $fighter->genjutsu_skill = (int)$fighter_data['genjutsu_skill'];
+    $fighter->bloodline_skill = (int)$fighter_data['bloodline_skill'];
+    $fighter->speed = (int)$fighter_data['speed'];
+    $fighter->cast_speed = (int)$fighter_data['cast_speed'];
+    $fighter->intelligence = (int)$fighter_data['intelligence'];
+    $fighter->willpower = (int)$fighter_data['willpower'];
+    $fighter->setTotalStats();
+
+    $fighter_bloodline_boosts = [];
+    for($i = 1; $i <= 3; $i++) {
+        if($fighter_data["bloodline_boost_{$i}"] != 'none') {
+            $fighter_bloodline_boosts[] = [
+                'effect' => $fighter_data["bloodline_boost_{$i}"],
+                'power' => $fighter_data["bloodline_boost_{$i}_power"]
+            ];
+        }
+    }
+
+    if(count($fighter_bloodline_boosts) > 0) {
+        $fighter->bloodline_id = 1;
+        $fighter->bloodline = new Bloodline([
+            'bloodline_id' => 1,
+            'name' => 'P1 Bloodline',
+            'clan_id' => 1,
+            'rank' => $fighter->rank,
+            'jutsu' => json_encode([]),
+            'passive_boosts' => json_encode([]),
+            'combat_boosts' => json_encode($fighter_bloodline_boosts),
+        ]);
+
+        $rank = $rankManager->ranks[$fighter->rank];
+        $fighter->bloodline->setBoostAmounts(
+            $fighter->rank,
+            $fighter->ninjutsu_skill, $fighter->taijutsu_skill, $fighter->genjutsu_skill, $fighter->bloodline_skill,
+            $rank->base_stats, $fighter->total_stats, $rankManager->statsForRankAndLevel($rank->id, $rank->max_level),
+            $fighter->regen_rate
+        );
+        $fighter->applyBloodlineBoosts();
+    }
+
+    return $fighter;
 }
 
 /**
@@ -62,12 +124,21 @@ function calcDamage(Fighter $player1, Fighter $player2, Jutsu $player1_jutsu, Ju
     $player2_raw_damage = $player2->calcDamage($player2_jutsu, true);
 
     // Collision
-    $battle_id = Battle::start($system, $player1, $player2, Battle::TYPE_SPAR);
+    $battle_id = Battle::start(
+        system: $system,
+        player1: $player1,
+        player2: $player2,
+        battle_type: Battle::TYPE_SPAR
+    );
     $battle = new BattleManager($system, $user, $battle_id, true, false);
+
     $collision_text = $battle->jutsuCollision(
-        $player1, $player2,
-        $player1_raw_damage, $player2_raw_damage,
-        $player1_jutsu, $player2_jutsu
+        player1: $player1,
+        player2: $player2,
+        player_damage: $player1_raw_damage,
+        opponent_damage: $player2_raw_damage,
+        player_jutsu: $player1_jutsu,
+        opponent_jutsu: $player2_jutsu
     );
 
     $system->query("DELETE FROM battles WHERE `battle_id`={$battle_id}");
@@ -79,7 +150,7 @@ function calcDamage(Fighter $player1, Fighter $player2, Jutsu $player1_jutsu, Ju
     $player2_damage = $player1->calcDamageTaken($player2_collision_damage, $player2_jutsu->jutsu_type);
 
     // Display
-    $damages = [
+    return [
         'player1' => [
             'raw_damage' => $player1_raw_damage,
             'collision_damage' => $player1_collision_damage,
@@ -92,13 +163,16 @@ function calcDamage(Fighter $player1, Fighter $player2, Jutsu $player1_jutsu, Ju
         ],
         'collision_text' => $collision_text,
     ];
-    return $damages;
 }
+
+/** @var string[] $bloodline_combat_boosts */
+require_once __DIR__ . '/admin/entity_constraints.php';
 
 $stats = [
     'ninjutsu_skill',
     'taijutsu_skill',
     'genjutsu_skill',
+    'bloodline_skill',
     'speed',
     'cast_speed',
     'intelligence',
@@ -112,6 +186,9 @@ $jutsu_type = 'ninjutsu';
 $player1_jutsu_type = $jutsu_type;
 $player2_jutsu_type = $jutsu_type;
 
+$rankManager = new RankManager($system);
+$rankManager->loadRanks();
+
 $mode = 'scenarios';
 if(($_POST['mode'] ?? '') == 'scenarios' || ($_GET['mode'] ?? '') == 'scenarios') {
     $mode = 'scenarios';
@@ -120,36 +197,101 @@ if(($_POST['mode'] ?? '') == 'vs' || ($_GET['mode'] ?? '') == 'vs') {
     $mode = 'vs';
 }
 
-/* if($_POST['run_simulation'] && $mode == 'vs') {
-   $player1_data = $_POST['stats1'];
+if(isset($_POST['run_simulation']) && $mode == 'vs') {
+    $player1_data = $_POST['stats1'];
     $player2_data = $_POST['stats2'];
 
-    $player2_jutsu->power = $player1_jutsu->power;
+    $valid_jutsu_types = [
+      Jutsu::TYPE_NINJUTSU,
+      Jutsu::TYPE_TAIJUTSU,
+      Jutsu::TYPE_GENJUTSU,
+    ];
+    try {
+        if(!in_array($player1_data['jutsu_type'], $valid_jutsu_types)) {
+            throw new Exception("Invalid jutsu type for player 1!");
+        }
+        if(!in_array($player2_data['jutsu_type'], $valid_jutsu_types)) {
+            throw new Exception("Invalid jutsu type for player 2!");
+        }
 
-    $damages = calcDamage($player1, $player2);
+        $player1 = fighterFromData($player1_data, "Player 1");
+        $player1_jutsu = new Jutsu(
+            1,
+            'p1j',
+            $player1->rank,
+            $player1_data['jutsu_type'],
+            (int)$player1_data['jutsu_power'],
+            'none',
+            0,
+            0,
+            'no',
+            'nope',
+            0,
+            Jutsu::USE_TYPE_PROJECTILE,
+            0,
+            0,
+            Jutsu::PURCHASE_TYPE_PURCHASEABLE,
+            0,
+            Jutsu::ELEMENT_NONE,
+            1
+        );
+        $player1_jutsu->setLevel(50, 0);
 
-    echo "<div style='width:500px;background-color:#EAEAEA;text-align:center;margin-left:auto;margin-right:auto;
-		padding:8px;border:1px solid #000000;border-radius:10px;'>
-	Player 1:<br />
-	{$damages['player1']['raw_damage']} raw damage<br />
-	{$damages['player1']['collision_damage']} post-collision damage<br />
-	{$damages['player1']['damage']} final damage<br />";
+        $player2 = fighterFromData($player2_data, "Player 2");
+        $player2_jutsu = new Jutsu(
+            1,
+            'p1j',
+            $player2->rank,
+            $player2_data['jutsu_type'],
+            (int)$player2_data['jutsu_power'],
+            'none',
+            0,
+            0,
+            'no',
+            'nope',
+            0,
+            Jutsu::USE_TYPE_PROJECTILE,
+            0,
+            0,
+            Jutsu::PURCHASE_TYPE_PURCHASEABLE,
+            0,
+            Jutsu::ELEMENT_NONE,
+            1
+        );
+        $player2_jutsu->setLevel(50, 0);
 
-    if($damages['collision_text']) {
-        echo "<hr />" . $damages['collision_text'] . "<hr />";
+
+        $damages = calcDamage(
+            player1: $player1,
+            player2: $player2,
+            player1_jutsu: $player1_jutsu,
+            player2_jutsu: $player2_jutsu
+        );
+
+        echo "<div style='width:500px;background-color:#EAEAEA;text-align:center;margin-left:auto;margin-right:auto;
+            padding:8px;border:1px solid #000000;border-radius:10px;'>
+        Player 1:<br />
+        {$damages['player1']['raw_damage']} raw damage<br />
+        {$damages['player1']['collision_damage']} post-collision damage<br />
+        {$damages['player1']['damage']} final damage<br />";
+
+        if($damages['collision_text']) {
+            echo "<hr />" . $damages['collision_text'] . "<hr />";
+        }
+        else {
+            echo "<hr />";
+        }
+
+        echo "Player 2:<br />
+        {$damages['player2']['raw_damage']} raw damage<br />
+        {$damages['player2']['collision_damage']} post-collision damage<br />
+        {$damages['player2']['damage']} final damage<br />
+        </div>";
+    } catch (Exception $e) {
+        echo $e->getMessage();
     }
-    else {
-        echo "<hr />";
-    }
-
-    echo "Player 2:<br />
-	{$damages['player2']['raw_damage']} raw damage<br />
-	{$damages['player2']['collision_damage']} post-collision damage<br />
-	{$damages['player2']['damage']} final damage<br />
-	</div>";
 }
-else */
-if($_POST['run_simulation'] && $mode == 'scenarios') {
+else if(isset($_POST['run_simulation']) && $mode == 'scenarios') {
     $base_level = $_POST['base_level'];
     $max_level = $_POST['max_level'];
     
@@ -372,9 +514,6 @@ if($_POST['run_simulation'] && $mode == 'scenarios') {
 	</div>";
 }
 
-
-$rankManager = new RankManager($system);
-$rankManager->loadRanks();
 $ranks_prefill_data = array_map(function($rank) use ($rankManager) {
     return [
         'id' => $rank->id,
@@ -391,10 +530,27 @@ $ranks_prefill_data = array_map(function($rank) use ($rankManager) {
 }, $rankManager->ranks);
 
 // Display form
-echo "<style type='text/css'>
-label {
-	display: inline-block;
-}
+?>
+<style>
+    label {
+        display: inline-block;
+    }
+
+    .versusFighterInput {
+        width:300px;
+        display:inline-block;
+        border:1px solid #000000;
+        border-radius:10px;
+    }
+
+    .scenario_input {
+        width:500px;
+        display:inline-block;
+        border:1px solid #000000;
+        background: rgba(0,0,0,0.4);
+        border-radius:10px;
+        padding:5px;
+    }
 </style>
 
 <br />
@@ -414,63 +570,186 @@ label {
 <br />
 
 <!--VS DISPLAY-->
-<div id='vs' class='displayDiv' " . ($mode == 'scenarios' ? "style='display:none;'" : '') . ">
+<div id='vs' class='displayDiv' <?= ($mode == 'scenarios' ? "style='display:none;'" : '') ?>>
 	<form action='./formula_simulator.php' method='post'>
-	<div style='width:300px;display:inline-block;border:1px solid #000000;border-radius:10px;'>
-		Player 1<br />";
-foreach($stats as $stat) {
-    echo "<label style='width:110px;'>$stat:</label>
-				<input type='text' name='stats1[$stat]' value='{$_POST['stats1'][$stat]}' /><br />";
-		}
-		echo "<label style='width:110px;'>Jutsu power:</label>
-			<input type='text' name='stats1[jutsu_power]' value='{$_POST['stats1']['jutsu_power']}' /><br /> 
-		<input type='radio' name='stats1[jutsu_type]' value='ninjutsu' " . 
-			($_POST['stats1']['jutsu_type'] == 'ninjutsu' ? "checked='checked'" : '') . "/> Ninjutsu<br />
-		<input type='radio' name='stats1[jutsu_type]' value='taijutsu' " . 
-			($_POST['stats1']['jutsu_type'] == 'taijutsu' ? "checked='checked'" : '') . "/> Taijutsu<br />
-		<input type='radio' name='stats1[jutsu_type]' value='genjutsu' " . 
-			($_POST['stats1']['jutsu_type'] == 'genjutsu' ? "checked='checked'" : '') . "/> Genjutsu<br />
-	</div>
+	<div class='versusFighterInput'>
+		Player 1<br />
+        <?php foreach($stats as $stat): ?>
+            <label style='width:110px;'><?= $stat ?>:</label>
+            <input type='text' name='stats1[<?= $stat ?>]' value='<?= $_POST['stats1'][$stat] ?? 10 ?>' /><br />
+		<?php endforeach; ?>
+		<label style='width:110px;'>Jutsu power:</label>
+			<input type='text' name='stats1[jutsu_power]' value='<?= $_POST['stats1']['jutsu_power'] ?? 1 ?>' /><br />
+        <label>
+            <input type='radio' name='stats1[jutsu_type]' value='ninjutsu'
+                <?= ($_POST['stats1']['jutsu_type'] == 'ninjutsu' ? "checked='checked'" : '') ?>
+            />
+            Ninjutsu
+        </label><br />
+        <label>
+            <input type='radio' name='stats1[jutsu_type]' value='taijutsu'
+                <?= ($_POST['stats1']['jutsu_type'] == 'taijutsu' ? "checked='checked'" : '') ?>
+            />
+            Taijutsu
+        </label><br />
+		<label>
+            <input type='radio' name='stats1[jutsu_type]' value='genjutsu'
+                <?= ($_POST['stats1']['jutsu_type'] == 'genjutsu' ? "checked='checked'" : '') ?>
+            />
+            Genjutsu
+        </label><br />
+		<br />
+		Bloodline boost 1<br />
+		<select name='stats1[bloodline_boost_1]'>
+            <option value='none'>None</option>
+            <?php foreach($bloodline_combat_boosts as $boost): ?>
+                <option value='<?= $boost ?>'
+                    <?= ($_POST['stats1']['bloodline_boost_1'] == $boost ? "selected='selected'" : '') ?>
+                >
+                    <?= $boost ?>
+                </option>
+            <?php endforeach; ?>
+        </select>
+        <input
+            type='number'
+            name='stats1[bloodline_boost_1_power]'
+            style='width:60px'
+            value='<?= $_POST['stats1']['bloodline_boost_1_power'] ?? 0 ?>'
+        />
+        <br />
 
-	<div style='width:300px;display:inline-block;border:1px solid #000000;border-radius:10px;margin-left:20px;'>
-		Player 2<br />";
-		foreach($stats as $stat) {
-            echo "<label style='width:110px;'>$stat:</label>
-				<input type='text' name='stats2[$stat]' value='{$_POST['stats2'][$stat]}' /><br />";
-        }
-/** @noinspection JSCheckFunctionSignatures */
-/** @noinspection JSUnnecessarySemicolon */
-echo "<label style='width:110px;'>Jutsu power:</label>
-			<input type='text' name='stats2[jutsu_power]' value='{$_POST['stats2']['jutsu_power']}' /><br /> 
-		<input type='radio' name='stats2[jutsu_type]' value='ninjutsu' " . 
-			($_POST['stats2']['jutsu_type'] == 'ninjutsu' ? "checked='checked'" : '') . "/> Ninjutsu<br />
-		<input type='radio' name='stats2[jutsu_type]' value='taijutsu' " . 
-			($_POST['stats2']['jutsu_type'] == 'taijutsu' ? "checked='checked'" : '') . "/> Taijutsu<br />
-		<input type='radio' name='stats2[jutsu_type]' value='genjutsu' " . 
-			($_POST['stats2']['jutsu_type'] == 'genjutsu' ? "checked='checked'" : '') . "/> Genjutsu<br />
+        Bloodline boost 2<br />
+        <select name='stats1[bloodline_boost_2]'>
+            <option value='none'>None</option>
+            <?php foreach($bloodline_combat_boosts as $boost): ?>
+                <option value='<?= $boost ?>'
+                    <?= ($_POST['stats1']['bloodline_boost_2'] == $boost ? "selected='selected'" : '') ?>
+                >
+                    <?= $boost ?>
+                </option>
+            <?php endforeach; ?>
+        </select>
+        <input
+            type='number'
+            name='stats1[bloodline_boost_2_power]'
+            style='width:60px'
+            value='<?= $_POST['stats1']['bloodline_boost_2_power'] ?? 0 ?>'
+        />
+        <br />
+
+        Bloodline boost 3<br />
+        <select name='stats1[bloodline_boost_3]'>
+            <option value='none'>None</option>
+            <?php foreach($bloodline_combat_boosts as $boost): ?>
+                <option value='<?= $boost ?>'
+                    <?= ($_POST['stats1']['bloodline_boost_3'] == $boost ? "selected='selected'" : '') ?>
+                >
+                    <?= $boost ?>
+                </option>
+            <?php endforeach; ?>
+        </select>
+        <input
+            type='number'
+            name='stats1[bloodline_boost_3_power]'
+            style='width:60px'
+            value='<?= $_POST['stats1']['bloodline_boost_3_power'] ?? 0 ?>'
+        />
+        <br />
 	</div>
-	
+    <div class='versusFighterInput' style='margin-left: 20px;'>
+        Player 2<br />
+        <?php foreach($stats as $stat): ?>
+            <label style='width:110px;'><?= $stat ?>:</label>
+            <input type='text' name='stats2[<?= $stat ?>]' value='<?= $_POST['stats2'][$stat] ?? 10 ?>' /><br />
+        <?php endforeach; ?>
+        <label style='width:110px;'>Jutsu power:</label>
+        <input type='text' name='stats2[jutsu_power]' value='<?= $_POST['stats2']['jutsu_power'] ?? 1 ?>' /><br />
+        <label>
+            <input type='radio' name='stats2[jutsu_type]' value='ninjutsu'
+                <?= ($_POST['stats2']['jutsu_type'] == 'ninjutsu' ? "checked='checked'" : '') ?>
+            />
+            Ninjutsu
+        </label><br />
+        <label>
+            <input type='radio' name='stats2[jutsu_type]' value='taijutsu'
+                <?= ($_POST['stats2']['jutsu_type'] == 'taijutsu' ? "checked='checked'" : '') ?>
+            />
+            Taijutsu
+        </label><br />
+        <label>
+            <input type='radio' name='stats2[jutsu_type]' value='genjutsu'
+                <?= ($_POST['stats2']['jutsu_type'] == 'genjutsu' ? "checked='checked'" : '') ?>
+            />
+            Genjutsu
+        </label><br />
+        <br />
+        Bloodline boost 1<br />
+        <select name='stats2[bloodline_boost_1]'>
+            <option value='none'>None</option>
+            <?php foreach($bloodline_combat_boosts as $boost): ?>
+                <option value='<?= $boost ?>'
+                    <?= ($_POST['stats2']['bloodline_boost_1'] == $boost ? "selected='selected'" : '') ?>
+                >
+                    <?= $boost ?>
+                </option>
+            <?php endforeach; ?>
+        </select>
+        <input
+            type='number'
+            name='stats2[bloodline_boost_1_power]'
+            style='width:60px'
+            value='<?= $_POST['stats2']['bloodline_boost_1_power'] ?? 0 ?>'
+        />
+        <br />
+
+        Bloodline boost 2<br />
+        <select name='stats2[bloodline_boost_2]'>
+            <option value='none'>None</option>
+            <?php foreach($bloodline_combat_boosts as $boost): ?>
+                <option value='<?= $boost ?>'
+                    <?= ($_POST['stats2']['bloodline_boost_2'] == $boost ? "selected='selected'" : '') ?>
+                >
+                    <?= $boost ?>
+                </option>
+            <?php endforeach; ?>
+        </select>
+        <input
+            type='number'
+            name='stats2[bloodline_boost_2_power]'
+            style='width:60px'
+            value='<?= $_POST['stats2']['bloodline_boost_2_power'] ?? 0 ?>'
+        />
+        <br />
+
+        Bloodline boost 3<br />
+        <select name='stats2[bloodline_boost_3]'>
+            <option value='none'>None</option>
+            <?php foreach($bloodline_combat_boosts as $boost): ?>
+                <option value='<?= $boost ?>'
+                    <?= ($_POST['stats2']['bloodline_boost_3'] == $boost ? "selected='selected'" : '') ?>
+                >
+                    <?= $boost ?>
+                </option>
+            <?php endforeach; ?>
+        </select>
+        <input
+            type='number'
+            name='stats2[bloodline_boost_3_power]'
+            style='width:60px'
+            value='<?= $_POST['stats2']['bloodline_boost_3_power'] ?? 0 ?>'
+        />
+        <br />
+    </div>
 	<br />
-	<br />
-	<input type='radio' name='mode' value='vs' onclick='changeDisplay(\"vs\")' checked='checked' /> Versus<br />
-	<input type='radio' name='mode' value='scenarios' onclick='changeDisplay(\"scenario\")' /> Scenarios<br />
+	<input type='radio' name='mode' value='vs' onclick='changeDisplay("vs")' checked='checked' /> Versus<br />
+	<input type='radio' name='mode' value='scenarios' onclick='changeDisplay("scenario")' /> Scenarios<br />
 	<input type='submit' name='run_simulation' value='Run Simulation' />
 	</form>
 </div>
 
 <!--SCENARIO DISPLAY-->
-<style type='text/css'>
-    .scenario_input {
-        width:500px;
-        display:inline-block;
-        border:1px solid #000000;
-        background: rgba(0,0,0,0.4);
-        border-radius:10px;
-        padding:5px;
-    }
-</style>
 <script type='text/javascript'>
-    let ranks = " . json_encode($ranks_prefill_data) . ";
+    let ranks = <?= json_encode($ranks_prefill_data) ?>;
     function prefillRank(id) {
         if(typeof ranks[id] === 'undefined') {
             return;
@@ -488,46 +767,50 @@ echo "<label style='width:110px;'>Jutsu power:</label>
             'max_level_stats',
             'max_level_jutsu_power',
         ]
-        fields.forEach(field => {  
+        fields.forEach(field => {
             document.getElementById(field).value = rank[field];
         })
     }
 </script>
-<div id='scenario' class='displayDiv' " . ($mode == 'vs' ? "style='display:none;'" : '') . ">
-    <div id='rank_select'>";
-        foreach($ranks_prefill_data as $id => $rank) {
-            echo "<button onClick='prefillRank({$rank['id']})'>{$rank['id']}: {$rank['name']}</button>";
-        }
-    echo "</div>
+<div id='scenario' class='displayDiv' <?= ($mode == 'vs' ? "style='display:none;'" : '') ?>>
+    <div id='rank_select'>
+        <?php foreach($ranks_prefill_data as $id => $rank): ?>
+            <button onClick='prefillRank(<?= $rank['id'] ?>)'><?= $rank['id'] ?>: <?= $rank['name'] ?></button>
+        <?php endforeach; ?>
+    </div>
 	<form action='./formula_simulator.php' method='post'>
         <div class='scenario_input'>
             Sim details<br />
-            Base level: <input type='text' id='base_level' name='base_level' value='{$_POST['base_level']}' /><br />
-            Max level: <input type='text' id='max_level' name='max_level' value='{$_POST['max_level']}' /><br />
-            Base stats: <input type='text' id='base_stats' name='base_stats' value='{$_POST['base_stats']}' /><br />
+            Base level: <input type='text' id='base_level' name='base_level' value='<?= $_POST['base_level'] ?? "" ?>' /><br />
+            Max level: <input type='text' id='max_level' name='max_level' value='<?= $_POST['max_level'] ?? "" ?>' /><br />
+            Base stats: <input type='text' id='base_stats' name='base_stats' value='<?= $_POST['base_stats'] ?? "" ?>' /><br />
             Attribute ratio: 
-                <select name='attribute_ratio''>";
-                    for($i = 10; $i < 60; $i += 10) {
-                        echo "<option value='{$i}' " . (($_POST['attribute_ratio'] ?? 40) == $i ? "selected='selected'" : "") . ">{$i}%</option>";
-                    }
-                echo "</select><br />
-            Base health: <input type='text' id='base_health' name='base_health' value='{$_POST['base_health']}' /><br />
-            Base jutsu power: <input type='text' id='base_jutsu_power' name='base_jutsu_power' value='{$_POST['base_jutsu_power']}' /><br />
+                <select name='attribute_ratio'>
+                <?php for($i = 10; $i < 60; $i += 10): ?>
+                    <option value='<?= $i ?>'
+                        <?= (($_POST['attribute_ratio'] ?? 40) == $i ? "selected='selected'" : "") ?>
+                    >
+                        <?= $i ?>%
+                    </option>
+                <?php endfor; ?>
+                </select><br />
+            Base health: <input type='text' id='base_health' name='base_health' value='<?= $_POST['base_health'] ?? "" ?>' /><br />
+            Base jutsu power: <input type='text' id='base_jutsu_power' name='base_jutsu_power' value='<?= $_POST['base_jutsu_power'] ?? "" ?>' /><br />
             <br />
-            Max level health: <input type='text' id='max_level_health' name='max_level_health' value='{$_POST['max_level_health']}' /><br />
-            Max level stats: <input type='text' id='max_level_stats' name='max_level_stats' value='{$_POST['max_level_stats']}' /><br />
-            Max level jutsu power: <input type='text' id='max_level_jutsu_power' name='max_level_jutsu_power' value='{$_POST['max_level_jutsu_power']}' /><br />
+            Max level health: <input type='text' id='max_level_health' name='max_level_health' value='<?= $_POST['max_level_health'] ?? "" ?>' /><br />
+            Max level stats: <input type='text' id='max_level_stats' name='max_level_stats' value='<?= $_POST['max_level_stats'] ?? "" ?>' /><br />
+            Max level jutsu power: <input type='text' id='max_level_jutsu_power' name='max_level_jutsu_power' value='<?= $_POST['max_level_jutsu_power'] ?? "" ?>' /><br />
             Max level jutsu level: <input type='text' id='max_level_jutsu_level' name='max_level_jutsu_level' 
-                value='" . ($_POST['max_level_jutsu_level'] ?? 50) . "' /><br />
+                value='<?= ($_POST['max_level_jutsu_level'] ?? 50) ?>' /><br />
         </div>
         <br />
         <br />
-        <input type='radio' name='mode' value='vs' onclick='changeDisplay(\"vs\")' /> Versus<br />
-        <input type='radio' name='mode' value='scenarios' onclick='changeDisplay(\"scenario\")' checked='checked' /> Damage/Level Curve<br />
+        <input type='radio' name='mode' value='vs' onclick='changeDisplay("vs")' /> Versus<br />
+        <input type='radio' name='mode' value='scenarios' onclick='changeDisplay("scenario")' checked='checked' /> Damage/Level Curve<br />
         <input type='submit' name='run_simulation' value='Run Simulation' />
 	</form>
 </div>
-</div>";
+</div>
 
 
 
