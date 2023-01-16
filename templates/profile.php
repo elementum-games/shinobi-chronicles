@@ -50,48 +50,69 @@ $clan_positions = [
         <br />
     </td>
     <td style='width:50%;'>
-		<label style='width:6.7em;' for='healthbar'>Health:</label>
-        <span id='health'>
+
+        <!--Health Bar-->
+        <div id='health_text_container' style="display: flex; justify-content: space-between;">
+            <label for='healthbar'>Health:</label>
+            <div id='health' style='margin-right: 23px;'>
+                <p style='display: inline'>
             <?= sprintf("%.2f", $player->health) ?> / <?= sprintf("%.2f", $player->max_health) ?>
             <?php if($player->health != $player->max_health): ?>
-                -> <b style='color: green;'><?= sprintf("%.2f",$health_after_regen) ?></b>
+                        <span>-></span>
+                        <span style='color: green;'><b> <?= sprintf("%.2f",$health_after_regen) ?> </b></span>
             <?php endif; ?>
-        </span><br />
-
-        <div style='height:6px;width:250px;border-style:solid;border-width:1px;border-radius: 4px;'>
+                </p>
+            </div>
+        </div>
+        <div style='height:14px; margin-top: -7px;'>
             <progress
                 id='healthbar'
-                style='accent-color:#C00000;height:6px;width: 100%;'
+                style='accent-color:#C00000; height: 18px; width: 100%;'
                 value='<?= $player->health ?>'
-                max='<?= $player->max_health ?>'></progress>
+                max='<?= $player->max_health ?>'>
+            </progress>
         </div>
-        <label style='width:6.7em;' for='chakrabar'>Chakra:</label>
-        <span id='chakra'>
+
+        <!--Chakra Bar-->
+        <div id='chakra_text_container' style="display: flex; justify-content: space-between; margin-top: 10px">
+            <label for='chakrabar'>Chakra:</label>
+            <div id='chakra' style='margin-right: 23px;'>
+                <p style='display: inline'>
             <?= sprintf("%.2f", $player->chakra) ?> / <?= sprintf("%.2f", $player->max_chakra) ?>
             <?php if($player->chakra != $player->max_chakra): ?>
-                -> <b style='color: green;'><?= sprintf("%.2f",$chakra_after_regen) ?></b>
+                        <span>-></span>
+                        <span><b style='color: green;'><?= sprintf("%.2f",$chakra_after_regen) ?></b></span>
             <?php endif; ?>
-        </span><br />
-
-        <div style='height:6px;width:250px;border-style:solid;border-width:1px;border-radius: 4px;'>
+                </p>
+            </div>
+        </div>
+        <div style='height:14px; margin-top: -7px;'>
             <progress
                 id='chakrabar'
-                style='accent-color:#0000B0;height:6px;width:100%;'
+                style='accent-color:#0000B0; height: 18px; width: 100%;'
                 value='<?= $player->chakra ?>'
-                max='<?= $player->max_chakra ?>'></progress>
+                max='<?= $player->max_chakra ?>'>
+            </progress>
         </div>
+
+        <!--Stamina Bar-->
+        <div id='chakra_text_container' style="display: flex; justify-content: space-between; margin-top: 10px">
         <label style='width:6.7em;' for='staminabar'>Stamina:</label>
-        <span id='stamina'>
+            <div id='stamina' style='margin-right: 23px;'>
+                <p style='display: inline'>
             <?= sprintf("%.2f", $player->stamina) ?> / <?= sprintf("%.2f", $player->max_stamina) ?>
             <?php if($player->stamina != $player->max_stamina): ?>
-                -> <b style='color: green;'><?= sprintf("%.2f",$stamina_after_regen) ?></b>
+                        <span>-></span>
+                        <span><b style='color: green;'><?= sprintf("%.2f",$stamina_after_regen) ?></b></span>
             <?php endif; ?>
-        </span><br />
+                </p>
+            </div>
+        </div>
 
-        <div style='height:6px;width:250px;border-style:solid;border-width:1px;border-radius: 4px;'>
+        <div style='height:14px; margin-top: -7px;'>
         <progress
             id='staminabar'
-            style='accent-color:#00B000;height:6px;width:100%;'
+            style='accent-color:#00B000; height: 18px; width: 100%;'
             value='<?= $player->stamina ?>'
             max='<?= $player->max_stamina ?>'></progress>
         </div>
@@ -158,7 +179,7 @@ $clan_positions = [
                     $('#healthbar').val(statusBars.health.current);
 
                     //Update Chakra Bar
-                     const currentAndMaxChakra = statusBars.chakra.current.toFixed(2) + '/' + statusBars.chakra.max.toFixed(2);
+                     const currentAndMaxChakra = statusBars.cha kra.current.toFixed(2) + '/' + statusBars.chakra.max.toFixed(2);
                     $('#chakra').html(currentAndMaxChakra.concat((statusBars.chakra.current !== statusBars.chakra.max)? ('-> <b style=\'color: green\'>' + statusBars.chakra.next_regen.toFixed(2) + '</b>') : ''));
                     $('#chakrabar').val(statusBars.chakra.current);
 
