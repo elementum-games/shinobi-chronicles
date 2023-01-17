@@ -144,6 +144,15 @@ const Inbox = ({
     }).then(handleAPIResponse);
   };
 
+  // mute/unmute conversation
+  const ToggleMute = convo_id => {
+    console.log('Mute/Unmuting...');
+    apiFetch(inboxAPILink, {
+      request: 'ToggleMute',
+      requested_convo_id: convo_id
+    }).then(handleAPIResponse);
+  };
+
   // create a new convo
   const CreateNewConvo = () => {
     console.log('Creating a new conversation...');
@@ -171,7 +180,7 @@ const Inbox = ({
           setConvoList(response.data.response_data); // SET CONVO LIST
           break;
         case 'ViewConvo':
-          console.log('Viewing conversation.', response);
+          console.log('Viewing conversation.');
           setSelectedConvoData(response.data.response_data); // SET CONVO
           LoadConvoList(); // RELOAD CONVO LIST
           setViewDetailsPanel(false); // REMOVE THE DETAILS PANEL IF ON
@@ -247,6 +256,14 @@ const Inbox = ({
           // Success Message
           ResetMessages();
           setSuccessMessage('Conversation created!');
+          break;
+        case 'ToggleMute':
+          console.log('Mute/Unmuting.');
+          ViewConvo(selectedConvoData.convo_id);
+
+          // Success Message
+          ResetMessages();
+          setSuccessMessage('Mute has been toggled successfully.');
           break;
       }
     }
@@ -408,7 +425,10 @@ const Inbox = ({
     }, /*#__PURE__*/React.createElement("button", {
       type: "button",
       onClick: () => LeaveConversation(selectedConvoData.convo_id)
-    }, "Leave Conversation")), parseInt(selectedConvoData.owner_id, 10) === selectedConvoData.self && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
+    }, "Leave Conversation"), /*#__PURE__*/React.createElement("button", {
+      type: "button",
+      onClick: () => ToggleMute(selectedConvoData.convo_id)
+    }, selectedConvoData.muted == 1 ? /*#__PURE__*/React.createElement(React.Fragment, null, "Unmute Conversation") : /*#__PURE__*/React.createElement(React.Fragment, null, "Mute Conversation"))), parseInt(selectedConvoData.owner_id, 10) === selectedConvoData.self && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
       className: "inbox_convo_details_action"
     }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("input", {
       type: "text",
@@ -504,6 +524,7 @@ const ConvoMessageCard = ({
   // if the message was posted by the user
   const messageClass = message_data.self_message ? 'inbox_message inbox_message_self' : 'inbox_message';
   return /*#__PURE__*/React.createElement("div", {
+    key: message_data.message_id,
     className: messageClass
   }, /*#__PURE__*/React.createElement("div", {
     className: "inbox_message_avatar"

@@ -84,6 +84,13 @@ try {
 
             $response = CreateNewConvo($system, $player, $members, $title, $message);
             break;
+
+        case 'ToggleMute':
+            $requested_convo_id = $system->clean($_POST['requested_convo_id']);
+
+            $response = ToggleMute($system, $player, $requested_convo_id);
+            break;
+            
         default:
             API::exitWithError("Invalid request!");
     }
