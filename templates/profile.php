@@ -64,7 +64,7 @@ $clan_positions = [
                 </p>
             </div>
         </div>
-        <div style='height:14px; margin-top: -7px;'>
+        <div style='height:14px; margin-top: -5px;'>
             <progress
                 id='healthbar'
                 style='accent-color:#C00000; height: 18px; width: 100%;'
@@ -86,7 +86,7 @@ $clan_positions = [
                 </p>
             </div>
         </div>
-        <div style='height:14px; margin-top: -7px;'>
+        <div style='height:14px; margin-top: -5px;'>
             <progress
                 id='chakrabar'
                 style='accent-color:#0000B0; height: 18px; width: 100%;'
@@ -109,12 +109,13 @@ $clan_positions = [
             </div>
         </div>
 
-        <div style='height:14px; margin-top: -7px;'>
-        <progress
-            id='staminabar'
-            style='accent-color:#00B000; height: 18px; width: 100%;'
-            value='<?= $player->stamina ?>'
-            max='<?= $player->max_stamina ?>'></progress>
+        <div style='height:14px; margin-top: -5px;'>
+            <progress
+                id='staminabar'
+                style='accent-color:#00B000; height: 18px; width: 100%;'
+                value='<?= $player->stamina ?>'
+                max='<?= $player->max_stamina ?>'>
+            </progress>
         </div>
         <br />
         Regeneration Rate: <?= $player->regen_rate ?>
@@ -179,7 +180,7 @@ $clan_positions = [
                     $('#healthbar').val(statusBars.health.current);
 
                     //Update Chakra Bar
-                     const currentAndMaxChakra = statusBars.cha kra.current.toFixed(2) + '/' + statusBars.chakra.max.toFixed(2);
+                     const currentAndMaxChakra = statusBars.chakra.current.toFixed(2) + '/' + statusBars.chakra.max.toFixed(2);
                     $('#chakra').html(currentAndMaxChakra.concat((statusBars.chakra.current !== statusBars.chakra.max)? ('-> <b style=\'color: green\'>' + statusBars.chakra.next_regen.toFixed(2) + '</b>') : ''));
                     $('#chakrabar').val(statusBars.chakra.current);
 
