@@ -355,6 +355,10 @@ class SpecialMission {
     }
 
     // Complete the mission
+
+    /**
+     * @throws Exception
+     */
     public function completeMission(): string {
         // Yen gain for completing the mission
         $yen_gain = self::$difficulties[$this->difficulty]['yen_per_mission'] * $this->player->rank;
@@ -363,7 +367,7 @@ class SpecialMission {
 
         $this->status = 1;
         $this->end_time = time();
-        $this->player->money += $yen_gain;
+        $this->player->addMoney($yen_gain, "Special mission");
         $this->reward += $yen_gain;
         $this->player->special_mission = 0;
 
@@ -373,6 +377,10 @@ class SpecialMission {
     }
 
     // Simulates a battle with an ai
+
+    /**
+     * @throws Exception
+     */
     public function simulateBattle(): array {
 
         $battle_result = self::EVENT_BATTLE_WIN; // Winning by default, suffering from success
@@ -413,7 +421,7 @@ class SpecialMission {
             $this->player_health -= $health_lost;
 
             // Yen Gain
-            $this->player->money += $yen_gain;
+            $this->player->addMoney($yen_gain, "Special mission encounter");
             $this->reward += $yen_gain;
 
             $this->player->getInventory();

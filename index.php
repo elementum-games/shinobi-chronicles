@@ -224,6 +224,11 @@ if($LOGGED_IN) {
 		}
 		exit;
 	}
+	
+	// NEW MESSAGE ALERT
+	$playerInbox = new InboxManager($system, $player);
+	$new_inbox_message = $playerInbox->checkIfUnreadMessages();
+	$new_inbox_alerts = $playerInbox->checkIfUnreadAlerts();
 
 	// Notifications
 	if(!$ajax) {
@@ -446,7 +451,9 @@ if($LOGGED_IN) {
                 continue;
             }
 
-            echo "<li><a id='sideMenuOption-".str_replace(' ', '', $page['title'])."' href='{$system->link}?id=$id'>" . $page['title'] . "</a></li>";
+			$menu_alert_icon =  ($page['title'] === 'Inbox' && ($new_inbox_message || $new_inbox_alerts)) ? 'sidemenu_new_message_alert' : null;
+
+            echo "<li><a id='sideMenuOption-".str_replace(' ', '', $page['title'])."' href='{$system->link}?id=$id' class='{$menu_alert_icon}'>" . $page['title'] . "</a></li>";
         }
 
 		echo $action_menu_header;

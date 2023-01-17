@@ -38,7 +38,7 @@
         <td style='text-align:center;'>
             Here you can purchase and spend Ancient Kunai on a variety of boosts and in-game items.<br/>
             <br/>
-            <b>Your Ancient Kunai:</b> <?= $player->premium_credits ?>
+            <b>Your Ancient Kunai:</b> <?= $player->getPremiumCredits() ?>
         </td>
     </tr>
 </table>

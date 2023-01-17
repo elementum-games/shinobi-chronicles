@@ -121,7 +121,7 @@ function jutsu(): void {
                 $refund = ($player->jutsu[$jutsu_id]->purchase_cost * 0.1); //10% Refund
                 $refund = intval(round($refund)); //round and then convert Float=>Int
                 if($refund > 0 && gettype($refund) == "integer"){
-                    $player->money += $refund; //need an addMoney() function for $Player
+                    $player->addMoney($refund, "Sell jutsu");
                 }
 
                 $player->removeJutsu($jutsu_id);

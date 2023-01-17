@@ -76,9 +76,9 @@ class User extends Fighter {
     public float $chakra;
     public float $max_chakra;
 
-    public $current_ip;
-    public $last_ip;
-    public $email;
+    public string $current_ip;
+    public string $last_ip;
+    public string $email;
     public $failed_logins;
     public $global_message_viewed;
 
@@ -106,7 +106,7 @@ class User extends Fighter {
     public $train_gain;
     public $train_time;
 
-    public $money;
+    private int $money;
 
     public $pvp_wins;
     public $pvp_losses;
@@ -201,7 +201,8 @@ class User extends Fighter {
 
     public int $last_pvp;
     public int $last_death;
-    public int $premium_credits;
+
+    private int $premium_credits;
     public int $premium_credits_purchased;
 
     public int $total_stats;
@@ -209,10 +210,10 @@ class User extends Fighter {
     public int $scout_range;
 
     public int $stealth;
-    public $village_changes;
-    public $clan_changes;
+    public int $village_changes;
+    public int $clan_changes;
 
-    public $clan_office;
+    public int $clan_office;
 
     public array $equipped_armor;
     public array $bloodline_offense_boosts;
@@ -282,6 +283,67 @@ class User extends Fighter {
         return true;
     }
 
+    /**
+     * @param System $system
+     * @param int    $user_id
+     * @return User
+     * @throws Exception
+     */
+    public static function loadFromId(System $system, int $user_id): User {
+        $user = new User($user_id);
+
+        $result = $system->query("SELECT 
+            `user_id`, 
+            `user_name`, 
+            `ban_type`, 
+            `ban_expire`, 
+            `journal_ban`, 
+            `avatar_ban`, 
+            `song_ban`, 
+            `last_login`,
+			`forbidden_seal`, 
+			`chat_color`, 
+			`staff_level`, 
+			`username_changes`, 
+			`support_level`, 
+			`special_mission`
+			FROM `users` WHERE `user_id`='$user_id' LIMIT 1"
+        );
+        if($system->db_last_num_rows == 0) {
+            throw new Exception("User does not exist!");
+        }
+
+        $result = $system->db_fetch($result);
+
+        $user->user_name = $result['user_name'];
+        $user->username_changes = $result['username_changes'];
+
+        $user->staff_level = $result['staff_level'];
+        $user->support_level = $result['support_level'];
+
+        $user->ban_type = $result['ban_type'];
+        $user->ban_expire = $result['ban_expire'];
+        $user->journal_ban = $result['journal_ban'];
+        $user->avatar_ban = $result['avatar_ban'];
+        $user->song_ban = $result['song_ban'];
+
+        $user->last_login = $result['last_login'];
+
+        $user->forbidden_seal = $result['forbidden_seal'];
+        $user->chat_color = $result['chat_color'];
+
+        if($user->ban_type && $user->ban_expire <= time()) {
+            $system->message("Your " . $user->ban_type . " ban has ended.");
+            $user->ban_type = '';
+
+            $system->query("UPDATE `users` SET `ban_type`='', `ban_expire`='0' WHERE `user_id`='$user->user_id' LIMIT 1");
+        }
+
+        $user->inventory_loaded = false;
+
+        return $user;
+    }
+    
     /* function loadData()
         Loads user data from the database into class members
         -Parameters-
@@ -530,7 +592,7 @@ class User extends Fighter {
                 if(!$task->complete && $task->progress >= $task->amount) {
                     $task->progress = $task->amount;
                     $task->complete = true;
-                    $this->money += $task->reward;
+                    $this->addMoney($task->reward, "Completed daily task");
 
                     $this->system->message('You have completed ' . $task->name . ' and earned ¥' . $task->reward);
                 }
@@ -1117,6 +1179,80 @@ class User extends Fighter {
 
         return true;
     }
+
+    public function getMoney(): int {
+        return $this->money;
+    }
+
+    /**
+     * @throws Exception
+     */
+    private function setMoney(int $new_amount, string $description) {
+        $this->system->currencyLog(
+            $this->user_id,
+            System::CURRENCY_TYPE_MONEY,
+            $this->money,
+            $new_amount,
+            $new_amount - $this->money,
+            $description
+        );
+        $this->money = $new_amount;
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function addMoney(int $amount, string $description) {
+        $this->setMoney($this->money + $amount, $description);
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function subtractMoney(int $amount, string $description) {
+        if($this->money < $amount) {
+            throw new Exception("Not enough money!");
+        }
+        $this->setMoney($this->money - $amount, $description);
+    }
+
+    public function getPremiumCredits(): int {
+        return $this->premium_credits;
+    }
+
+    /**
+     * @throws Exception
+     */
+    private function setPremiumCredits(int $new_amount, string $description) {
+        $this->system->currencyLog(
+            $this->user_id,
+            System::CURRENCY_TYPE_PREMIUM_CREDITS,
+            $this->premium_credits,
+            $new_amount,
+            $new_amount - $this->premium_credits,
+            $description
+        );
+        $this->premium_credits = $new_amount;
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function addPremiumCredits(int $amount, string $description) {
+        $this->setPremiumCredits($this->premium_credits + $amount, $description);
+    }
+
+
+    /**
+     * @throws Exception
+     */
+    public function subtractPremiumCredits(int $amount, string $description) {
+        if($this->money < $amount) {
+            throw new Exception("Not enough Ancient Kunai!");
+        }
+        $this->setPremiumCredits($this->premium_credits - $amount, $description);
+    }
+
 
     /* function moteToVillage()
         moves user to village */
