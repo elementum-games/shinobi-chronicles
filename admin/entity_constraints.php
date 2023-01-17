@@ -359,6 +359,7 @@ $item_effects = [
     'daze',
     'harden',
     'lighten',
+    'cast_speed_boost',
     'heal',
     'diffuse',
     'element',

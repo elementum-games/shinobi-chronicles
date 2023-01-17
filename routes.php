@@ -12,9 +12,9 @@ $pages = [
         'menu' => System::MENU_USER,
     ],
     2 => [
-        'file_name' => 'privateMessages.php',
+        'file_name' => 'inbox.php',
         'title' => 'Inbox',
-        'function_name' => 'privateMessages',
+        'function_name' => 'inbox',
         'menu' => System::MENU_USER,
     ],
     7 => [

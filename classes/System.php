@@ -2,6 +2,7 @@
 
 require_once __DIR__ . '/EntityId.php';
 require_once __DIR__ . '/User.php';
+require_once __DIR__ . '/API.php';
 
 /*	Class:		System
 	Purpose: 	Handle database connection and queries. Handle storing and printing of error messages.
@@ -28,6 +29,9 @@ class System {
     const SC_ADMINISTRATOR = 4;
     const SC_HEAD_ADMINISTRATOR = 5;
 
+    const CURRENCY_TYPE_MONEY = 'money';
+    const CURRENCY_TYPE_PREMIUM_CREDITS = 'premium_credits';
+
     const DB_DATETIME_MS_FORMAT = 'Y-m-d H:i:s.u';
 
     const SC_ADMIN_EMAIL = "admin@shinobichronicles.com";
@@ -47,6 +51,8 @@ class System {
     public string $message = "";
     public bool $message_displayed = false;
 
+    public array $debug_messages = [];
+
     // Variable for DB connection resource
     private string $host;
     private string $username;
@@ -60,6 +66,9 @@ class System {
     public $register_open;
 
     public string $link;
+
+    // Request lifecycle
+    public bool $is_api_request = false;
 
     public $timezoneOffset;
 
@@ -107,22 +116,24 @@ class System {
     // Keep in sync with pages.php
     const PAGE_IDS = [
         'profile' => 1,
+        'inbox' => 2,
         'settings' => 3,
         'members' => 6,
         'bloodline' => 10,
         'arena' => 12,
+        'mission' => 14,
+        'specialmissions' => 15,
         'mod' => 16,
         'admin' => 17,
         'report' => 18,
         'battle' => 19,
+        'premium' => 21,
         'spar' => 22,
-        'mission' => 14,
-        'specialmissions' => 15,
-        'rankup' => 25,
-        'support' => 30,
-        'marriage' => 29,
-        'event' => 27,
         'team' => 24,
+        'rankup' => 25,
+        'event' => 27,
+        'marriage' => 29,
+        'support' => 30,
     ];
     public array $links = [
         'github' => 'https://github.com/elementum-games/shinobi-chronicles',
@@ -233,6 +244,8 @@ class System {
         foreach(self::PAGE_IDS as $slug => $id) {
             $this->links[$slug] = $this->link . '?id=' . $id;
         }
+
+        $this->api_links['inbox'] = $this->link . 'api/inbox.php';
 
         $this->timezoneOffset = date('Z');
 
@@ -386,7 +399,7 @@ class System {
 
     /**
      * Sends PM to specified recipient
-     *
+     * * OLD PRIVATE MESSAGES
      * @param $sender
      * @param $recipient
      * @param $subject
@@ -439,6 +452,9 @@ class System {
         }
 
         $this->message($message);
+        if($this->is_api_request) {
+            API::exitWithError($message);
+        }
         $this->printMessage();
 
         global $side_menu_start;
@@ -488,7 +504,7 @@ class System {
     }
 
     public function getMemes(): array {
-        $memes = require 'memes.php';
+        $memes = require __DIR__ . '/../memes.php';
 
         return [
             'codes' => array_map(function ($meme) {
@@ -584,6 +600,7 @@ class System {
         return "<img src='$image' style='max-width:{$width}px;max-height:{$height}px;' />";
 
     }
+    
     public function timeAgo($timestamp): string {
 
         $time = time() - $timestamp;
@@ -669,6 +686,43 @@ class System {
 
         $this->query("INSERT INTO `logs` (`log_type`, `log_title`, `log_time`, `log_contents`)
 			VALUES ('$type', '$title', " . time() . ", '$contents')");
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function currencyLog(
+        int $character_id,
+        string $currency_type,
+        int $previous_balance,
+        int $new_balance,
+        int $transaction_amount,
+        string $transaction_description
+    ): void {
+       switch($currency_type) {
+           case 'premium_credits':
+           case 'money':
+               break;
+           default:
+               throw new Exception("Invalid currency type!");
+       }
+        
+        $this->query(
+            "INSERT INTO `currency_logs` (
+                `character_id`,
+                `currency_type`,
+                `previous_balance`,
+                `new_balance`,
+                `transaction_amount`,
+                `transaction_description`
+            ) VALUES (
+               '{$character_id}',
+                '{$currency_type}',
+                '{$previous_balance}',
+                '{$new_balance}',
+                '{$transaction_amount}',
+                '{$this->clean($transaction_description)}'
+            )");
     }
 
     public function hash_password($password): string {
@@ -768,15 +822,6 @@ class System {
         }
 
         return new EntityId($arr[0], (int)$arr[1]);
-    }
-
-    public static function diminishing_returns($val, $scale): float {
-        if($val < 0) {
-            return -self::diminishing_returns(-$val, $scale);
-        }
-        $mult = $val / $scale;
-        $trinum = (sqrt(8.0 * $mult + 1.0) - 1.0) / 2.0;
-        return $trinum * $scale;
     }
 
     public static function timeRemaining($time_remaining, $format = 'short', $include_days = true, $include_seconds = true): string {
@@ -888,6 +933,11 @@ class System {
         }
 
         return $kunai_packs;
+    }
+
+    public function getReactFile(string $component_name): string {
+        $filename = "ui_components/build/{$component_name}.js";
+        return $filename . "?q=" .  filemtime($filename);
     }
 }
 

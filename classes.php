@@ -20,3 +20,8 @@ require_once __DIR__ . "/classes/SpecialMissions.php";
 
 require_once __DIR__ . "/classes/battle/Battle.php";
 require_once __DIR__ . "/classes/battle/BattleManager.php";
+
+require_once __DIR__ . "/classes/Inbox.php";
+require_once __DIR__ . "/classes/InboxUser.php";
+require_once __DIR__ . "/classes/InboxManager.php";
+require_once __DIR__ . "/classes/InboxAPIResponse.php";

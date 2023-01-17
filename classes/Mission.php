@@ -108,6 +108,7 @@ class Mission {
             if($this->mission_type == 5) {
                 $this->current_stage['ai_defeated'] = $this->player->mission_stage['ai_defeated'] ?? 0;
                 $this->current_stage['mission_money'] = $this->player->mission_stage['mission_money'] ?? 0;
+                $this->current_stage['round_complete'] = $this->player->mission_stage['round_complete'] ?? false;
             }
             $this->player->mission_stage = $this->current_stage;
             return 1;
@@ -145,6 +146,7 @@ class Mission {
         if($this->mission_type == 5) {
             $this->current_stage['ai_defeated'] = $this->player->mission_stage['ai_defeated'] ?? 0;
             $this->current_stage['mission_money'] = $this->player->mission_stage['mission_money'] ?? 0;
+            $this->current_stage['round_complete'] = $this->player->mission_stage['round_complete'] ?? false;
         }
         $this->player->mission_stage = $this->current_stage;
         return 1;

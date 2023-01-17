@@ -8,11 +8,12 @@ Purpose:	Functions for displaying user profile
 Algorithm:	See master_plan.html
 */
 
+/**
+ * @throws Exception
+ */
 function userProfile() {
     global $system;
-
     global $player;
-    global $self_link;
 
     // Submenu
     renderProfileSubmenu();
@@ -52,102 +53,142 @@ function userProfile() {
         }
     }
 
-    $page = 'profile';
-    if(isset($_GET['page'])) {
-        switch($_GET['page']) {
-            case 'send_money':
-                if($player->rank > 1) {
-                    $page = 'send_money';
-                }
-                break;
-            case 'send_ak':
-                if($player->rank > 1) {
-                    $page = 'send_ak';
-                }
-                break;
-        }
+    $page = $_GET['page'] ?? 'profile';
+    if($player->rank > 1 && $page == 'send_money') {
+        sendMoney($system, $player, System::CURRENCY_TYPE_MONEY);
+        return;
+    }
+    else if($player->rank > 1 && $page == 'send_ak') {
+        sendMoney($system, $player, System::CURRENCY_TYPE_PREMIUM_CREDITS);
+        return;
     }
 
-    // Process input
+    require 'templates/profile.php';
+}
+
+/**
+ * @throws Exception
+ */
+function sendMoney(System $system, User $player, string $currency_type): void {
+    if($currency_type == System::CURRENCY_TYPE_MONEY) {
+        $label = "Money";
+        $current_amount = "&yen;" . $player->getMoney();
+        $page = 'send_money';
+    }
+    else if($currency_type == System::CURRENCY_TYPE_PREMIUM_CREDITS) {
+        $label = "Ancient Kunai";
+        $current_amount = $player->getPremiumCredits();
+        $page = 'send_ak';
+    }
+    else {
+        throw new Exception("Invalid currency type!");
+    }
+
     if(isset($_POST['send_currency'])) {
         $recipient = $system->clean($_POST['recipient']);
-        $amount = (int)$system->clean($_POST['amount']);
+        $amount = (int)$_POST['amount'];
 
         try {
             if(strtolower($recipient) == strtolower($player->user_name)) {
                 throw new Exception("You cannot send money/AK to yourself!");
             }
-            $result = $system->query("SELECT `user_id`, `user_name` FROM `users` WHERE `user_name`='$recipient' LIMIT 1");
-            if(!$system->db_last_num_rows) {
-                throw new Exception("Invalid user!");
-            }
-            else {
-                $recipient = $system->db_fetch($result);
-            }
-            if(isset($_POST['yen'])) {
-                $type = 'money';
-            }
-            else if(isset($_POST['kunai'])) {
-                $type = 'premium_credits';
-            }
-            else {
-                throw new Exception("Invalid Currency Type!");
-            }
             if($amount <= 0 && !$player->isHeadAdmin()) {
                 throw new Exception("Invalid amount!");
             }
-            if($amount > $player->$type) {
-                throw new Exception("You do not have that much money/AK!");
+
+            $result = $system->query(
+                "SELECT `user_id`, `user_name`, `money`, `premium_credits` 
+                        FROM `users` 
+                        WHERE `user_name`='$recipient' LIMIT 1"
+            );
+            if(!$system->db_last_num_rows) {
+                throw new Exception("Invalid user!");
             }
-            $player->$type -= $amount;
-            $system->query("UPDATE `users` SET `{$type}`=`{$type}` + $amount WHERE `user_id`='{$recipient['user_id']}' LIMIT 1");
-            if($type == 'money') {
+            $recipient = $system->db_fetch($result);
+
+            if($currency_type == System::CURRENCY_TYPE_MONEY) {
+                if($amount > $player->getMoney()) {
+                    throw new Exception("You do not have that much money/AK!");
+                }
+                $player->subtractMoney($amount, "Sent money to {$recipient['user_name']} (#{$recipient['user_id']})");
+
+                $system->query("UPDATE `users` SET `money`=`money` + $amount WHERE `user_id`='{$recipient['user_id']}' LIMIT 1");
+                $system->currencyLog(
+                    $recipient['user_id'],
+                    $currency_type,
+                    $recipient['money'],
+                    $recipient['money'] + $amount,
+                    $amount,
+                    "Received money from $player->user_name (#$player->user_id)"
+                );
+
                 $system->log(
                     'money_transfer',
                     'Money Sent',
                     "{$amount} yen - #{$player->user_id} ($player->user_name) to #{$recipient['user_id']}"
                 );
-                $system->send_pm('Currency Transfer System', $recipient['user_id'], 'Money Received', $player->user_name . " has sent you &yen;$amount.");
+                
+                $alert_message = $player->user_name . " has sent you &yen;$amount.";
+                Inbox::sendAlert($system, 1, $player->user_id, $recipient['user_id'], $alert_message);
+                
+                $system->message("&yen;{$amount} sent to {$recipient['user_name']}!");
+                
             }
-            else {
+            else if($currency_type == System::CURRENCY_TYPE_PREMIUM_CREDITS) {
+                if($amount > $player->getPremiumCredits()) {
+                    throw new Exception("You do not have that much AK!");
+                }
+                $player->subtractPremiumCredits($amount, "Sent AK to {$recipient['user_name']} (#{$recipient['user_id']})");
+
+                $system->query("UPDATE `users` SET `premium_credits`=`premium_credits` + $amount WHERE `user_id`='{$recipient['user_id']}' LIMIT 1");
+                $system->currencyLog(
+                    $recipient['user_id'],
+                    $currency_type,
+                    $recipient['premium_credits'],
+                    $recipient['premium_credits'] + $amount,
+                    $amount,
+                    "Received AK from $player->user_name (#$player->user_id)"
+                );
+
                 $system->log(
                     'premium_credit_transfer',
                     'Premium Credits Sent',
                     "{$amount} AK - #{$player->user_id} ($player->user_name) to #{$recipient['user_id']}"
                 );
-                $system->send_pm('Currency Transfer System', $recipient['user_id'], 'AK Received', $player->user_name . " has sent you $amount Ancient Kunai.");
+                
+                $alert_message = $player->user_name . " has sent you $amount Ancient Kunai.";
+                Inbox::sendAlert($system, 2, $player->user_id, $recipient['user_id'], $alert_message);
+                
+                $system->message("{$amount} AK sent to {$recipient['user_name']}!");
             }
 
-            $system->message("Currency sent!");
         } catch(Exception $e) {
             $system->message($e->getMessage());
         }
         $system->printMessage();
     }
-    if($page == 'send_money' || $page == 'send_ak') {
-        $type = ($page == 'send_money') ? "Money" : "AK";
-        $currency = ($type == 'Money') ? "money" : "premium_credits";
-        $hidden = ($type == 'Money') ? "yen" : "kunai";
 
-        $recipient = !empty($_GET['recipient']) ? $_GET['recipient'] : '';
+    if($currency_type == System::CURRENCY_TYPE_MONEY) {
+        $current_amount = "&yen;" . $player->getMoney();
+    }
+    else if($currency_type == System::CURRENCY_TYPE_PREMIUM_CREDITS) {
+        $current_amount = $player->getPremiumCredits();
+    }
 
-        echo "<table class='table'><tr><th>Send {$type}</th></tr>
-		<tr><td style='text-align:center;'>
-		<form action='{$self_link}&page={$page}' method='post'>
-		<b>Your {$type}:</b> {$player->$currency}<br />
-		<br />
-		Send {$type} to:<br />
-		<input type='hidden' name='{$hidden}' value='1'/>
-		<input type='text' name='recipient' value='{$recipient}' /><br />
-		Amount:<br />
-		<input type='text' name='amount' /><br />
-		<input type='submit' name='send_currency' value='Send {$type}' />
-		</form>
-		</td></tr></table>";
-    }
-    else if($page == 'profile') {
-       require 'templates/profile.php';
-    }
+    $recipient = $_GET['recipient'] ?? '';
+
+    echo "<table class='table'><tr><th>Send {$label}</th></tr>
+    <tr><td style='text-align:center;'>
+    <form action='{$system->links['profile']}&page={$page}' method='post'>
+    <b>Your {$label}:</b> {$current_amount}<br />
+    <br />
+    Send {$label} to:<br />
+    <input type='text' name='recipient' value='{$recipient}' /><br />
+    Amount:<br />
+    <input type='text' name='amount' /><br />
+    <input type='submit' name='send_currency' value='Send {$label}' />
+    </form>
+    </td></tr></table>";
 }
 
 function renderProfileSubmenu() {
