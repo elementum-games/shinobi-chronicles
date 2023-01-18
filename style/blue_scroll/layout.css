@@ -132,11 +132,6 @@ b {
 }
 
 @font-face {
-    font-family: "Permanent_Marker";
-    src: url("./fonts/Permanent_Marker/PermanentMarker-Regular.ttf");
-}
-
-@font-face {
     font-family: "Share_Tech_Mono";
     src: url("./fonts/Share_Tech_Mono/ShareTechMono-Regular.ttf");
 }
@@ -2324,7 +2319,7 @@ a#spec_miss_cancel:hover::after {
     border-top-right-radius: 4px;
     
     color: var(--theme-text-color-normal);
-    font-family: 'BebasNeue', sans-serif;
+    font-family: 'Oswald', sans-serif;
     font-weight: normal;
 }
 
@@ -2416,14 +2411,14 @@ a#spec_miss_cancel:hover::after {
 
 #inbox_convo_list_title {
     /* styling */
-    font-family: 'BebasNeue', sans-serif;
+    font-family: 'Oswald', sans-serif;
     color: var(--theme-text-color-dark);
     font-size: 1.1rem;
 }
 
 #inbox_convo_list_count {
     /* styling */
-    font-family: 'BebasNeue', sans-serif;
+    font-family: 'Oswald', sans-serif;
     color: var(--theme-text-color-dark);
 }
 
@@ -2559,8 +2554,8 @@ a#spec_miss_cancel:hover::after {
 
     /* styling */
     color: var(--theme-text-color-light);
-    font-family: 'Teko', sans-serif;
-    font-size: 1.1rem;
+    font-family: 'Oswald', sans-serif;
+    font-size: 0.85rem;
 }
 
 .inbox_convo_list_container:hover .inbox_convo_title,
@@ -2580,7 +2575,8 @@ a#spec_miss_cancel:hover::after {
 
     /* styling */
     color: var(--theme-text-color-normal);
-    font-family: 'Teko', sans-serif;
+    font-family: 'Oswald', sans-serif;
+    font-size: 0.8rem;
 }
 
 .inbox_convo_list_container:hover .inbox_convo_lastmessage,
@@ -2622,7 +2618,7 @@ a#spec_miss_cancel:hover::after {
 
     /* styling */
     color: var(--theme-text-color-light);
-    font-family: 'BebasNeue', sans-serif;
+    font-family: 'Oswald', sans-serif;
     font-size: 1.4rem;
 }
 
@@ -2667,7 +2663,7 @@ a#spec_miss_cancel:hover::after {
 
     /* styling */
     color: #413510;
-    font-family: 'BebasNeue', sans-serif;
+    font-family: 'Oswald', sans-serif;
 }
 
 #inbox_convo_main_controls_submit {
@@ -2714,7 +2710,7 @@ a#spec_miss_cancel:hover::after {
     padding: 10px 10px;
 
     /* styling */
-    font-family: 'BebasNeue', sans-serif;
+    font-family: 'Oswald', sans-serif;
     color: var(--theme-text-color-normal);
 }
 
@@ -2758,7 +2754,7 @@ a#spec_miss_cancel:hover::after {
     text-indent: 10px;
 
     /* styling */
-    font-family: 'BebasNeue', sans-serif;
+    font-family: 'Oswald', sans-serif;
     text-decoration: none;
     font-weight: normal;
 }
@@ -2825,7 +2821,7 @@ a#spec_miss_cancel:hover::after {
 
     /* styling */
     font-size: 1.2rem;
-    font-family: 'BebasNeue', sans-serif;
+    font-family: 'Oswald', sans-serif;
 }
 
 .inbox_message_timestamp {
@@ -2928,7 +2924,7 @@ a#spec_miss_cancel:hover::after {
 
     /* styling */
     color: var(--theme-text-color-dark);
-    font-family: 'BebasNeue', sans-serif;
+    font-family: 'Oswald', sans-serif;
     font-size: 1.3rem;
 
     border-top: 1px solid var(--theme-text-color-dark);
@@ -3027,7 +3023,7 @@ a#spec_miss_cancel:hover::after {
     border-radius: 4px;
 
     /* styling */
-    font-family: 'BebasNeue', sans-serif;
+    font-family: 'Oswald', sans-serif;
 }
 
 .systemMessage-new::before {
@@ -3094,11 +3090,11 @@ a#spec_miss_cancel:hover::after {
     }
     
     #topmenu, #footer {
-        width: calc(100vw - 40px);
+        width: calc(100vw - 50px);
     }
 
     #container {
-        width: calc(100vw - 60px);
+        width: calc(100vw - 70px);
     }
 }
 
