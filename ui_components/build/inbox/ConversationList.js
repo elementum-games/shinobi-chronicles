@@ -26,17 +26,18 @@ export default function ConversationList({
     selectedConvo: selectedConvoData,
     viewConvo: viewConvo
   }))));
-} // CUSTOM COMPONENTS
+}
 
+// CUSTOM COMPONENTS
 const ConvoListCard = ({
   convo,
   selectedConvo,
   viewConvo
 }) => {
   // if the user is currently viewing this convo
-  const listClass = (convo.convo_id === selectedConvo.convo_id && 'inbox_convo_list_container_selected') + ' inbox_convo_list_container';
+  const listClass = (convo.convo_id == selectedConvo.convo_id && 'inbox_convo_list_container_selected') + ' inbox_convo_list_container';
   return /*#__PURE__*/React.createElement("div", {
-    key: convo.convo_id,
+    key: 'convoid:' + convo.latest_timestamp,
     onClick: () => viewConvo(convo.convo_id),
     className: listClass
   }, /*#__PURE__*/React.createElement("div", {
