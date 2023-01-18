@@ -41,11 +41,11 @@ export default function ConversationList({ convoCount, convoCountMax, convoList,
 const ConvoListCard = ({convo, selectedConvo, viewConvo }) => {
 
     // if the user is currently viewing this convo
-    const listClass = (convo.convo_id === selectedConvo.convo_id && 'inbox_convo_list_container_selected')
+    const listClass = ((convo.convo_id == selectedConvo.convo_id) && 'inbox_convo_list_container_selected')
         + ' inbox_convo_list_container';
 
     return (
-        <div key={convo.convo_id}
+        <div key={'convoid:' + convo.latest_timestamp}
              onClick={() => viewConvo(convo.convo_id)}
              className={ listClass }>
 
@@ -69,7 +69,7 @@ const ConvoListCard = ({convo, selectedConvo, viewConvo }) => {
 
             {/* CONVO SELECT CARD UNREAD NOTIFICATION */}
             <div className='inbox_convo_unread'>
-                { convo.unread && <div></div> }
+                { (convo.unread) && <div></div> }
             </div>
         </div>
     );

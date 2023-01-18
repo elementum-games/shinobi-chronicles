@@ -194,6 +194,17 @@ class Inbox {
     }
 
     /**
+     * @param System system
+     * @param int convo_id
+     * @param int user_id
+     * @return boolean
+     */
+    public static function toggleMute(System $system, int $convo_id, int $user_id): bool {
+        $system->query("UPDATE `convos_users` SET `muted`=(`muted` ^ 1) WHERE `convo_id`='{$convo_id}' AND `user_id`={$user_id}");
+        return $system->db_last_affected_rows > 0;            
+    }
+
+    /**
      * @param System $system
      * @param int    $convo_id
      * @return bool whether delete succeeded or not
@@ -329,7 +340,7 @@ class Inbox {
         }, $users_data);
     }
 
-    public static function getSystemConvo($system, $system_id, $user_id): array {
+    public static function getSystemConvo(System $system, int $system_id, int $user_id): array {
         $convo = ['convo_id' => self::SYSTEM_MESSAGE_CODES[$system_id], 'convo_members' => []];
         $sql = "SELECT * 
                 FROM `convos_alerts` 
@@ -345,6 +356,7 @@ class Inbox {
         $all_messages = [];
         foreach($convo_data as $message_data) {
             $message = [];
+            $message['message_id'] = $message_data['alert_id'];
             // self_message
             $message['self_message'] = false;
             // profile_link
@@ -437,11 +449,16 @@ class Inbox {
     public static function getAlertsForUser($system, $user_id): array {
         $return_arr = [];
         // grab all the alerts for the user
-        $sql = "SELECT `system_id`, MAX(`time`) as `time`
-                FROM `convos_alerts`
-                WHERE `target_id`='{$user_id}'
-                AND `alert_deleted`=0
-                GROUP BY `system_id`";
+        $sql = "SELECT t1.* 
+                FROM `convos_alerts` t1 
+                JOIN (
+                    SELECT MAX(`alert_id`) as `alert_id`
+                    FROM `convos_alerts` 
+                    WHERE `target_id`={$user_id}
+                    GROUP BY `system_id`
+                ) t2 
+                ON t1.`alert_id` = t2.`alert_id`
+                WHERE t1.`target_id`={$user_id}";
         $result = $system->query($sql);
         if (!$system->db_last_num_rows) {
             return [];
@@ -456,7 +473,7 @@ class Inbox {
             $tmp_array['title'] = self::SYSTEM_MESSAGE_NAMES[$alert['system_id']];
             // time = we have this
             $tmp_array['latest_timestamp'] = $alert['time'];
-            $tmp_array['unread'] = true;
+            $tmp_array['unread'] = $alert['unread'] ? true : false;
             $tmp_array['convo_id'] = self::SYSTEM_MESSAGE_CODES[$alert['system_id']];
 
             $return_arr[] = $tmp_array;

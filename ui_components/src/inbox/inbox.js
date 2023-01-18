@@ -188,6 +188,19 @@ const Inbox = ({
         )
         .then(handleAPIResponse);
     }
+
+    // mute/unmute conversation
+    const ToggleMute = (convo_id) => {
+        console.log('Mute/Unmuting...');
+        apiFetch(
+            inboxAPILink,
+            {
+                request: 'ToggleMute',
+                requested_convo_id: convo_id
+            }
+        )
+        .then(handleAPIResponse);
+    };
     
     // create a new convo
     const CreateNewConvo = () => {
@@ -225,7 +238,7 @@ const Inbox = ({
                     break;
 
                 case 'ViewConvo':
-                    console.log('Viewing conversation.', response);
+                    console.log('Viewing conversation.');
                     setSelectedConvoData(response.data.response_data); // SET CONVO
                     LoadConvoList(); // RELOAD CONVO LIST
                     setViewDetailsPanel(false); // REMOVE THE DETAILS PANEL IF ON
@@ -309,6 +322,15 @@ const Inbox = ({
                     // Success Message
                     ResetMessages();
                     setSuccessMessage('Conversation created!');
+                    break;
+
+                case 'ToggleMute':
+                    console.log('Mute/Unmuting.');
+                    ViewConvo(selectedConvoData.convo_id);
+
+                    // Success Message
+                    ResetMessages();
+                    setSuccessMessage('Mute has been toggled successfully.');
                     break;
 
             }
@@ -499,6 +521,15 @@ const Inbox = ({
                                     onClick={() => LeaveConversation(selectedConvoData.convo_id)}>
                                     Leave Conversation
                             </button>
+                            {/*  CONVO DETAILS ACTION MUTE CONVERSATION */}
+                            <button type='button'
+                                onClick={() => ToggleMute(selectedConvoData.convo_id)}>
+                                    {
+                                    (selectedConvoData.muted) == 1
+                                    ? <>Unmute Conversation</>
+                                    : <>Mute Conversation</>
+                                    }
+                            </button>
                         </div>
                         {/* CONVO DETAILS OWNER ACTIONS */}
                         { (parseInt(selectedConvoData.owner_id, 10) === selectedConvoData.self) && (
@@ -627,7 +658,7 @@ const ConvoMessageCard = ({message_data, convo_data}) => {
     const messageClass = message_data.self_message ? 'inbox_message inbox_message_self' : 'inbox_message';
 
     return (
-        <div className={messageClass}>
+        <div key={message_data.message_id} className={messageClass}>
             <div className='inbox_message_avatar'>
                 <a href={ convo_data.profile_link + message_data.user_name }><img src={message_data.avatar_link} /></a>
             </div>
