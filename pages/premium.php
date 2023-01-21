@@ -537,9 +537,13 @@ function premium() {
             else {
                 $player->subtractPremiumCredits($seal_cost, "Purchased " . ForbiddenSeal::$forbidden_seals[$seal_level]
                     . " for {$seal_length} days.");
+                //Load blank seal
                 $player->forbidden_seal = new ForbiddenSeal($system, 0, 0);
+                //Set new seal
                 $player->forbidden_seal->addSeal($seal_level, $seal_length);
-                $player->forbidden_seal_loaded = true; //Force this for db storage
+                //Load benefits for displaying market & storing in db
+                $player->forbidden_seal->setBenefits();
+                $player->forbidden_seal_loaded = true;
                 $system->message("Seal infused!");
             }
         } catch (Exception $e) {
