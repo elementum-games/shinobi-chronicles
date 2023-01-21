@@ -400,7 +400,7 @@
         <tr>
             <td id='premium_twinSparrowSeal_data' style='width:50%;vertical-align:top;'>
                 <p style='font-weight:bold;text-align:center;'>
-                    <?= $costs['forbidden_seal'][1] ?> Ancient Kunai / 30 days</p>
+                    <?= $costs['forbidden_seal_monthly_cost'][1] ?> Ancient Kunai / 30 days</p>
                 <br/>
                 +<?=$twinSeal->regen_boost?>% regen rate<br/>
                 <?=$twinSeal->name_color_display?> username color in chat<br/>
@@ -416,9 +416,9 @@
                     <p style='width:100%;text-align:center;margin: 1em 0 0;'>
                         <input type='hidden' name='seal_level' value='1'/>
                         <select name='seal_length'>
-                            <option value='30'>30 days (<?= ($costs['forbidden_seal'][1] * 1) ?> AK)</option>
-                            <option value='60'>60 days (<?= ($costs['forbidden_seal'][1] * 2) ?> AK)</option>
-                            <option value='90'>90 days (<?= ($costs['forbidden_seal'][1] * 3) ?> AK)</option>
+                            <?php foreach($costs['forbidden_seal'][1] as $pLength => $pCost): ?>
+                                <option value="<?=$pLength?>"><?=$pLength?> days (<?=$pCost?> AK)</option>
+                            <?php endforeach ?>
                         </select><br/>
                         <input type='submit' name='forbidden_seal' value='<?= ($player->forbidden_seal_loaded &&
                             $player->forbidden_seal->level == 1 ? 'Extend' : 'Purchase') ?>' />
@@ -427,7 +427,7 @@
             </td>
             <td id='premium_fourDragonSeal_data' style='width:50%;vertical-align:top;'>
                 <p style='font-weight:bold;text-align:center;'>
-                    <?= $costs['forbidden_seal'][2] ?> Ancient Kunai / 30 days</p>
+                    <?= $costs['forbidden_seal_monthly_cost'][2] ?> Ancient Kunai / 30 days</p>
                 <br/>
                 All benefits of Twin Sparrow Seal<br/>
                 +<?=$fourDragonSeal->regen_boost?>% regen rate<br/>
@@ -443,9 +443,9 @@
                     <p style='width:100%;text-align:center;margin: 2.2em 0 0;'>
                         <input type='hidden' name='seal_level' value='2'/>
                         <select name='seal_length'>
-                            <option value='30'>30 days (<?= ($costs['forbidden_seal'][2] * 1) ?> AK)</option>
-                            <option value='60'>60 days (<?= ($costs['forbidden_seal'][2] * 2) ?> AK)</option>
-                            <option value='90'>90 days (<?= ($costs['forbidden_seal'][2] * 3) ?> AK)</option>
+                            <?php foreach($costs['forbidden_seal'][2] as $pLength => $pCost): ?>
+                                <option value="<?=$pLength?>"><?=$pLength?> days (<?=$pCost?> AK)</option>
+                            <?php endforeach ?>
                         </select><br/>
                         <input type='submit' name='forbidden_seal' value='<?= ($player->forbidden_seal_loaded &&
                             $player->forbidden_seal->level == 2 ? 'Extend' : 'Purchase') ?>' />
