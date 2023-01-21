@@ -118,14 +118,16 @@ function userSettings() {
 		$system->printMessage();
 	}
 	else if(!empty($_POST['change_journal'])) {
-		$journal = $system->clean(trim($_POST['journal']));
 		try {
+            $journal_length = strlen(preg_replace('/[\\n\\r]+/', '', trim($_POST['journal'])));
+            if($journal_length > $max_journal_length) {
+                throw new Exception("Journal is too long! " . $journal_length . "/{$max_journal_length} characters");
+            }
+
+            $journal = $system->clean($_POST['journal']);
+
 			if($player->journal_ban) {
 				throw new Exception("You are currently banned from changing your avatar.");
-			}
-			
-			if(strlen($journal) > $max_journal_length) {
-				throw new Exception("Journal is too long! " . strlen($journal) . "/{$max_journal_length} characters");
 			}
 			
 			$system->query("UPDATE `journals` SET `journal`='$journal' WHERE `user_id`='{$player->user_id}' LIMIT 1");
@@ -320,7 +322,7 @@ function userSettings() {
             $('#journalMessage').keyup(function (evt) {
                     if(this.value.length >= $max_journal_length - 20)
                     {
-                        let remaining = $max_journal_length - this.value.length;
+                        let remaining = $max_journal_length - this.textLength;
                         $('#remainingCharacters').text('Characters remaining: ' + remaining + ' out of ' + $max_journal_length);
                     }
                     else 
@@ -331,7 +333,7 @@ function userSettings() {
             });
         </script>";
 		echo "<form action='$self_link' method='post'>
-		<textarea style='height:350px;width:95%;margin:10px 0;' name='journal' id='journalMessage'>" . stripslashes($journal) . "</textarea>
+		<textarea style='height:350px;width:95%;margin:10px 0;' name='journal' id='journalMessage' maxlength='" . $max_journal_length ."'>" . stripslashes($journal) . "</textarea>
 		<br />
 		<span id='remainingCharacters' class='red'></span>
 		<br />
