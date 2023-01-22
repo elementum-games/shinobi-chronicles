@@ -718,7 +718,7 @@ class System {
                 '{$new_balance}',
                 '{$transaction_amount}',
                 '{$this->clean($transaction_description)}',
-                {time()}
+                " . time() . "
             )");
     }
 
