@@ -733,11 +733,11 @@ class User extends Fighter {
         }
 
         // Forbidden seal
-        if($this->forbidden_seal) {
+        if($user_data['forbidden_seal']) {
             // Prep seal data from DB
-            $this->forbidden_seal = json_decode($this->forbidden_seal, true);
+            $forbidden_seal = json_decode($user_data['forbidden_seal'], true);
             // Set seal data
-            $this->forbidden_seal = new ForbiddenSeal($this->system, $this->forbidden_seal['level'], $this->forbidden_seal['time']);
+            $this->forbidden_seal = new ForbiddenSeal($this->system, $forbidden_seal['level'], $forbidden_seal['time']);
             $this->forbidden_seal_loaded = true;
             // Check if seal is expired & remove if it is
             $this->forbidden_seal->checkExpiration();
