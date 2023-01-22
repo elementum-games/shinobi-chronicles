@@ -709,14 +709,16 @@ class System {
                 `previous_balance`,
                 `new_balance`,
                 `transaction_amount`,
-                `transaction_description`
+                `transaction_description`,
+                `transaction_time`
             ) VALUES (
                '{$character_id}',
                 '{$currency_type}',
                 '{$previous_balance}',
                 '{$new_balance}',
                 '{$transaction_amount}',
-                '{$this->clean($transaction_description)}'
+                '{$this->clean($transaction_description)}',
+                {time()}
             )");
     }
 
