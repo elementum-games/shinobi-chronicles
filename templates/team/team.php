@@ -8,6 +8,7 @@
  *
  * @var string $leader_name
  * @var string $leader_avatar
+ * @var int $leader_avatar_size
  *
  * @var string $boost_text
  * @var string $boost_time
@@ -51,7 +52,7 @@
 
         <td id='team_leader_data' rowspan='2' style='text-align: center;vertical-align: middle;'>
             <p style='font-size:1.1rem;font-weight:bold;margin-bottom:5px;'><?= $leader_name ?></p>
-            <img src='<?= $leader_avatar ?>' style='max-width:125px;max-height:125px;' />
+            <img src='<?= $leader_avatar ?>' style='max-width:<?=$leader_avatar_size?>px;max-height:<?=$leader_avatar_size?>px;' />
         </td>
     </tr>
     <tr>

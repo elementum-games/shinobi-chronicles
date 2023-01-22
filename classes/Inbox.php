@@ -5,14 +5,13 @@ require_once __DIR__ . '/InboxUser.php';
 class Inbox {
 
 	const INBOX_SIZE = 50;
-	const INBOX_SIZE_SEAL = 75;
+    // Seal inbox size is managed in the Forbidden Seal Class
 	const INBOX_SIZE_STAFF = 100;
 
 	const MIN_CONVO_SIZE = 2;
 	const MAX_CONVO_SIZE = 10;
 	const MIN_MESSAGE_LENGTH = 2;
 	const MAX_MESSAGE_LENGTH = 1000;
-	const MAX_MESSAGE_LENGTH_SEAL = 1500;
 
     const MAX_TITLE_LENGTH = 26;
     const MAX_MESSAGE_FETCH = 25;
@@ -22,13 +21,15 @@ class Inbox {
     const SYSTEM_MESSAGE_NAMES = [
         1 => 'Money Transfer System',
         2 => 'Kunai Transfer System',
-        3 => 'Ancient Kunai Exchange'
+        3 => 'Ancient Kunai Exchange',
+        4 => 'Support System'
     ];
 
     const SYSTEM_MESSAGE_CODES = [
         1 => 'money_transfer',
         2 => 'kunai_transfer',
-        3 => 'market_exchange'
+        3 => 'market_exchange',
+        4 => 'support_system'
     ];
 
     /**
@@ -194,6 +195,17 @@ class Inbox {
     }
 
     /**
+     * @param System system
+     * @param int convo_id
+     * @param int user_id
+     * @return boolean
+     */
+    public static function toggleMute(System $system, int $convo_id, int $user_id): bool {
+        $system->query("UPDATE `convos_users` SET `muted`=(`muted` ^ 1) WHERE `convo_id`='{$convo_id}' AND `user_id`={$user_id}");
+        return $system->db_last_affected_rows > 0;
+    }
+
+    /**
      * @param System $system
      * @param int    $convo_id
      * @return bool whether delete succeeded or not
@@ -215,17 +227,17 @@ class Inbox {
     }
 
     /**
-     * @param array? $forbidden_seal
+     * @param ForbiddenSeal|array $forbidden_seal
      * @param int $staff_level
      * @return int
      */
     public static function maxConvosAllowed($forbidden_seal, $staff_level): int {
         $max_size = self::INBOX_SIZE;
-        if ($forbidden_seal) {
-            $max_size = self::INBOX_SIZE_SEAL;
-        }
-        if ($staff_level > 0) {
+        if ($staff_level) {
             $max_size = self::INBOX_SIZE_STAFF;
+        }
+        elseif ($forbidden_seal instanceof ForbiddenSeal) {
+            $max_size = $forbidden_seal->inbox_size;
         }
         return $max_size;
     }
@@ -239,12 +251,20 @@ class Inbox {
     }
 
     /**
-     * @param array? $forbidden_seal
+     * @param array|ForbiddenSeal $forbidden_seal
      * @param int $staff_level
      * @return int MAX_MESSAGE_LENGTH
      */
     public static function checkMaxMessageLength($forbidden_seal, $staff_level): int {
-        return $forbidden_seal || $staff_level ? self::MAX_MESSAGE_LENGTH_SEAL : self::MAX_MESSAGE_LENGTH;
+        if($staff_level) {
+            return ForbiddenSeal::$benefits[ForbiddenSeal::$STAFF_SEAL_LEVEL]['pm_size'];
+        }
+        elseif($forbidden_seal instanceof ForbiddenSeal) {
+            return $forbidden_seal->pm_size;
+        }
+        else {
+            return self::MAX_MESSAGE_LENGTH;
+        }
     }
 
     /**
@@ -329,7 +349,7 @@ class Inbox {
         }, $users_data);
     }
 
-    public static function getSystemConvo($system, $system_id, $user_id): array {
+    public static function getSystemConvo(System $system, int $system_id, int $user_id): array {
         $convo = ['convo_id' => self::SYSTEM_MESSAGE_CODES[$system_id], 'convo_members' => []];
         $sql = "SELECT * 
                 FROM `convos_alerts` 
@@ -345,6 +365,7 @@ class Inbox {
         $all_messages = [];
         foreach($convo_data as $message_data) {
             $message = [];
+            $message['message_id'] = $message_data['alert_id'];
             // self_message
             $message['self_message'] = false;
             // profile_link
@@ -437,11 +458,16 @@ class Inbox {
     public static function getAlertsForUser($system, $user_id): array {
         $return_arr = [];
         // grab all the alerts for the user
-        $sql = "SELECT `system_id`, MAX(`time`) as `time`
-                FROM `convos_alerts`
-                WHERE `target_id`='{$user_id}'
-                AND `alert_deleted`=0
-                GROUP BY `system_id`";
+        $sql = "SELECT t1.* 
+                FROM `convos_alerts` t1 
+                JOIN (
+                    SELECT MAX(`alert_id`) as `alert_id`
+                    FROM `convos_alerts` 
+                    WHERE `target_id`={$user_id}
+                    GROUP BY `system_id`
+                ) t2 
+                ON t1.`alert_id` = t2.`alert_id`
+                WHERE t1.`target_id`={$user_id}";
         $result = $system->query($sql);
         if (!$system->db_last_num_rows) {
             return [];
@@ -456,7 +482,7 @@ class Inbox {
             $tmp_array['title'] = self::SYSTEM_MESSAGE_NAMES[$alert['system_id']];
             // time = we have this
             $tmp_array['latest_timestamp'] = $alert['time'];
-            $tmp_array['unread'] = true;
+            $tmp_array['unread'] = $alert['unread'] ? true : false;
             $tmp_array['convo_id'] = self::SYSTEM_MESSAGE_CODES[$alert['system_id']];
 
             $return_arr[] = $tmp_array;

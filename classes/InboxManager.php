@@ -26,6 +26,7 @@ class InboxManager {
                 ON `convos_users`.`convo_id`=`convos_messages`.`convo_id`
                 WHERE `convos_users`.`last_read`<`convos_messages`.`time`
                 AND `convos_users`.`user_id`='{$this->user->user_id}'
+                AND `convos_users`.`muted`=0
                 ORDER BY `convos_messages`.`time` DESC";
         $result = $this->system->query($sql);
         $count = $result->fetch_row();
@@ -88,7 +89,13 @@ class InboxManager {
      * @return array $convo_data
      */
     public function getConversation(int $convo_id): array {
-        $sql = "SELECT * FROM `convos` WHERE `convo_id`='{$convo_id}' AND `active`=1";
+        $sql = "SELECT `convos`.*, `convos_users`.`muted` 
+                FROM `convos`
+                INNER JOIN `convos_users`
+                ON `convos`.`convo_id`=`convos_users`.`convo_id`
+                WHERE `convos`.`convo_id`='{$convo_id}' 
+                AND `convos_users`.`user_id`={$this->user->user_id}
+                AND `convos`.`active`=1";
         $result = $this->system->query($sql);
         $convo_data = $this->system->db_fetch($result);
 
@@ -121,5 +128,9 @@ class InboxManager {
 
     public function removePlayerFromConvo(int $convo_id, int $user_id): bool {
         return Inbox::removePlayerFromConvo($this->system, $convo_id, $user_id);
+    }
+
+    public function toggleMute(int $convo_id) {
+        return Inbox::toggleMute($this->system, $convo_id, $this->user->user_id);
     }
 }

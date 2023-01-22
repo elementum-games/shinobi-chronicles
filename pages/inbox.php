@@ -136,9 +136,13 @@ function SendMessage(System $system, User $player, int|string $convo_id, string 
 		}
 		
 		// Check if the message is too thicc
-		$max_message_length = ($player->forbidden_seal || $player->staff_level)
-            ? Inbox::MAX_MESSAGE_LENGTH_SEAL
-            : Inbox::MAX_MESSAGE_LENGTH;
+        $max_message_length = Inbox::MAX_MESSAGE_LENGTH;
+        if($player->staff_level && !$player->forbidden_seal_loaded) {
+            $max_message_length = ForbiddenSeal::$benefits[ForbiddenSeal::$STAFF_SEAL_LEVEL]['pm_size'];
+        }
+        elseif($player->forbidden_seal_loaded) {
+            $max_message_length = $player->forbidden_seal->pm_size;
+        }
 		if (strlen($message) > $max_message_length) {
 			$response->errors[] = 'Message exceeds ' . $max_message_length . ' characters';
 			return $response;
@@ -502,10 +506,16 @@ function CreateNewConvo(System $system, User $player, string $members, ?string $
 		}
 
 		// send the message
-		if (Inbox::sendMessage($system, $convo_id, $player->user_id, $message)) {
+		if (!Inbox::sendMessage($system, $convo_id, $player->user_id, $message)) {
+			$response->errors[] = 'Fatal error sending message!';
+			return $response;
+		}
+
+		// mark the message read for the creator
+		if (Inbox::updateLastViewedForUser($system, $convo_id, $player->user_id)) {
 			$response->response_data[] = 'Success';
 		} else {
-			$response->errors[] = 'Fatal error sending message!';
+			$response->errors[] = 'Error marking message as read.';
 		}
 		
 		// error management
@@ -616,9 +626,50 @@ function LoadNextPage(System $system, User $player, int|string $convo_id, int $o
             convo_id: $convo_id,
             message_id: $oldest_message_id
         );
-		if ($response->response_data['older_messages']) {
-			$response->response_data['older_messages'][0]['focusTarget'] = true;
+		
+	} catch (Exception $e) {
+		$response->errors[] = $e->getMessage();
+	}
+
+	return $response;
+}
+
+/**
+ * @param System     $system
+ * @param User       $player
+ * @param int|string $convo_id
+ * @return InboxAPIResponse
+ */
+function ToggleMute(System $system, User $player, int|string $convo_id): InboxAPIResponse {
+	$response = new InboxAPIResponse();
+	try {
+		$inbox = new InboxManager($system, $player);
+
+		// check if the convo exists
+		if (!Inbox::checkConvo($system, $convo_id)) {
+			$response->errors[] = 'This conversation does not exist';
+			return $response;
 		}
+
+		// Check if the player is allowed in this conversation
+		if (!Inbox::verifyAccessToConvo($system, $convo_id, $player->user_id)) {
+			$response->errors[] = 'This conversation does not exist';
+			return $response;
+		}
+
+		// error management
+		if ($system->message) {
+			$response->errors[] = $system->message;
+			return $response;
+		}
+
+		// mute/unmute conversation
+		if ($inbox->toggleMute($convo_id)) {
+			$response->response_data['toggled'] = true;
+		} else {
+			$response->errors[] = 'Error toggling mute status.';
+		}
+
 	} catch (Exception $e) {
 		$response->errors[] = $e->getMessage();
 	}

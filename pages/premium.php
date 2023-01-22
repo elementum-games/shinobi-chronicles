@@ -22,8 +22,22 @@ function premium() {
 	$costs['bloodline'][2] = 60;
 	$costs['bloodline'][3] = 40;
 	$costs['bloodline'][4] = 20;
-	$costs['forbidden_seal'][1] = 5;
-	$costs['forbidden_seal'][2] = 15;
+    $costs['forbidden_seal_monthly_cost'] = [
+        1 => 5,
+        2 => 15
+    ];
+    $costs['forbidden_seal'] = [
+        1 => [
+            30 => $costs['forbidden_seal_monthly_cost'][1],
+            60 => $costs['forbidden_seal_monthly_cost'][1] * 2,
+            90 => $costs['forbidden_seal_monthly_cost'][1] * 3
+        ],
+        2 => [
+            30 => $costs['forbidden_seal_monthly_cost'][2],
+            60 => $costs['forbidden_seal_monthly_cost'][2] * 2,
+            90 => $costs['forbidden_seal_monthly_cost'][2] * 3
+        ]
+    ];
 	$costs['element_change'] = 10;
 	$costs['village_change'] = 5 * $player->village_changes;
 	$costs['clan_change'] = 5 * $player->clan_changes;
@@ -477,59 +491,75 @@ function premium() {
 		}
 	}
 	else if(isset($_POST['forbidden_seal'])) {
-		$seal_level = (int)$system->clean($_POST['seal_level']);
-		$seal_length = (int)$system->clean($_POST['seal_length']);
-		try {
-			// Check seal level
-			switch($seal_level) {
-				case 1:
-				case 2:
-					break;
-				default:
-					throw new Exception("Invalid seal!");
-					break;
-			}
+        try {
+            $seal_level = (int)$_POST['seal_level'];
+            $seal_length = (int)$_POST['seal_length'];
 
-			// Check seal length
-			switch($seal_length) {
-				case 30:
-				case 60:
-				case 90:
-					break;
-				default:
-					throw new Exception("Invalid length!");
-					break;
-			}
+            //Check for valid seal level
+            if(!isset(ForbiddenSeal::$forbidden_seals[$seal_level]) || $seal_level === 0) {
+                throw new Exception("Invalid forbidden seal!");
+            }
+            //Check seal lengths
+            if(!isset($costs['forbidden_seal'][$seal_level][$seal_length])) {
+                throw new Exception("Invalid seal length!");
+            }
+            $seal_cost = $costs['forbidden_seal'][$seal_level][$seal_length];
+            //Check cost
+            if($player->getPremiumCredits() < $seal_cost) {
+                throw new Exception("You do not have enough Ancient Kunai!");
+            }
 
-			// Check cost
-			$cost = $costs['forbidden_seal'][$seal_level] * ($seal_length / 30);
-			if($player->getPremiumCredits() < $cost) {
-				throw new Exception("You do not have enough Ancient Kunai! ($cost needed)");
-			}
-			$player->subtractPremiumCredits($cost, "Purchased {$seal_length} days of level $seal_level forbidden seal");
-
-			// Extend
-			if($player->forbidden_seal && $player->forbidden_seal['level'] == $seal_level) {
-				$player->forbidden_seal['time'] += $seal_length * 86400;
-				$system->message("Seal extended!");
-			}
-			// Purchase new
-			else {
-				$forbidden_seal = array(
-					'level' => $seal_level,
-					'time' => time() + ($seal_length * 86400),
-					'color' => 'blue'
-				);
-				$player->forbidden_seal = $forbidden_seal;
-				$system->message("Seal infused!");
-			}
-		} catch (Exception $e) {
-			$system->message($e->getMessage());
-		}
-		$system->printMessage();
+            //Extend seal
+            if($player->forbidden_seal_loaded && $player->forbidden_seal->level == $seal_level) {
+                $player->subtractPremiumCredits($seal_cost, "Extended {$player->forbidden_seal->name} by {$seal_length} days.");
+                $player->forbidden_seal->addSeal($seal_level, $seal_length);
+                $system->message("Seal extended!");
+            }
+            //Overwrite seal
+            elseif($player->forbidden_seal_loaded) {
+                $overwrite = isset($_POST['confirm_seal_overwrite']) ? true : false;
+                // Confirm change in seal... time will not be reimbursed
+                if(!isset($_POST['confirm_seal_overwrite']) && $seal_level != $player->forbidden_seal->level) {
+                    require_once ('templates/overwriteSealConfirmation.php');
+                }
+                else {
+                    $message = "Purchased " . ForbiddenSeal::$forbidden_seals[$seal_level] . " seal for {$seal_length} days.";
+                    if($overwrite) {
+                        $message .= " This purchase removed {$system->time_remaining($player->forbidden_seal->seal_time_remaining)}" .
+                            " of their {$player->forbidden_seal->name}.";
+                    }
+                    $player->subtractPremiumCredits($seal_cost, $message);
+                    $player->forbidden_seal->addSeal($seal_level, $seal_length);
+                    $system->message("You changed your seal!");
+                }
+            }
+            //New seal
+            else {
+                $player->subtractPremiumCredits($seal_cost, "Purchased " . ForbiddenSeal::$forbidden_seals[$seal_level]
+                    . " for {$seal_length} days.");
+                //Load blank seal
+                $player->forbidden_seal = new ForbiddenSeal($system, 0, 0);
+                //Set new seal
+                $player->forbidden_seal->addSeal($seal_level, $seal_length);
+                //Load benefits for displaying market & storing in db
+                $player->forbidden_seal->setBenefits();
+                $player->forbidden_seal_loaded = true;
+                $system->message("Seal infused!");
+            }
+        } catch (Exception $e) {
+            $system->message($e->getMessage());
+            $system->printMessage();
+        }
 	}
 	else if(isset($_POST['change_color']) && $player->canChangeChatColor()) {
 		$color = $system->clean($_POST['name_color']);
+
+        // Premium effect
+        $chat_effect = (isset($_POST['chat_effect']) ? $system->clean($_POST['chat_effect']) : "");
+
+        if($player->premium_credits_purchased && in_array($chat_effect, ["", "sparkles"])) {
+            $player->chat_effect = $chat_effect;
+        }
 		switch($color) {
 			case 'blue':
 			case 'pink':
@@ -538,7 +568,7 @@ function premium() {
 				$system->message("Color changed!");
 				break;
 			case 'gold':
-				if(!$player->premium_credits_purchased) {
+				if(!$player->premium_credits_purchased && !$player->isHeadAdmin()) {
 					$system->message("Invalid color!");
 					break;
 				}
@@ -989,6 +1019,13 @@ function premium() {
     }
     $paypal_listener_url = $system->link . 'paypal_listener.php';
 
+    //Load premium seals
+    $baseDisplay = ForbiddenSeal::$benefits[0];
+    $twinSeal = new ForbiddenSeal($system, 1);
+    $twinSeal->setBenefits();
+    $fourDragonSeal = new ForbiddenSeal($system, 2);
+    $fourDragonSeal->setBenefits();
+
     require "templates/premium.php";
     return true;
 }
@@ -1105,7 +1142,7 @@ function premiumCreditExchange() {
             );
 
 			$system->log("Kunai Exchange", "Completed Sale", "ID# {$offer['id']}; #{$offer['seller']} to #{$player->user_id} ($player->user_name) :: {$offer['premium_credits']} for &yen;{$offer['money']}");
-			
+
 			$alert_message = $player->user_name . " has purchased {$offer['premium_credits']} Ancient Kunai for &yen;{$offer['money']}.";
 			Inbox::sendAlert($system, 3, $player->user_id, $offer['seller'], $alert_message);
 
