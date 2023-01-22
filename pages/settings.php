@@ -123,14 +123,16 @@ function userSettings() {
 		$system->printMessage();
 	}
 	else if(!empty($_POST['change_journal'])) {
-		$journal = $system->clean(trim($_POST['journal']));
 		try {
+            $journal_length = strlen(preg_replace('/[\\n\\r]+/', '', trim($_POST['journal'])));
+            if($journal_length > $max_journal_length) {
+                throw new Exception("Journal is too long! " . $journal_length . "/{$max_journal_length} characters");
+            }
+
+            $journal = $system->clean($_POST['journal']);
+
 			if($player->journal_ban) {
 				throw new Exception("You are currently banned from changing your avatar.");
-			}
-			
-			if(strlen($journal) > $max_journal_length) {
-				throw new Exception("Journal is too long! " . strlen($journal) . "/{$max_journal_length} characters");
 			}
 			
 			$system->query("UPDATE `journals` SET `journal`='$journal' WHERE `user_id`='{$player->user_id}' LIMIT 1");

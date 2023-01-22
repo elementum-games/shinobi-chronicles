@@ -36,7 +36,11 @@ function chat() {
     }
 
 	if(isset($_POST['post'])) {
-		$message = $system->clean(stripslashes(trim($_POST['post'])));
+    //If user has seal or is of staff, give them their words
+		$chat_max_post_length += $player->forbidden_seal ? 100 : 0;
+        $message_length = strlen(preg_replace('/[\\n\\r]+/', '', trim($_POST['post'])));
+		$message = $system->clean(stripslashes($_POST['post']));
+    
 		try {
 			$result = $system->query("SELECT `message` FROM `chat` WHERE `user_name` = '$player->user_name' ORDER BY  `post_id` DESC LIMIT 1");
 			if($system->db_last_num_rows) {
@@ -45,10 +49,10 @@ function chat() {
 					throw new Exception("You cannot post the same message twice in a row!");
 				}
 			}
-			if(strlen($message) < 3) {
+			if(strlen($message_length) < 3) {
 				throw new Exception("Message is too short!");
 			}
-			if(strlen($message) > $chat_max_post_length) {
+			if(strlen($message_length) > $chat_max_post_length) {
 				throw new Exception("Message is too long!");
 			}
 
@@ -126,7 +130,7 @@ function chat() {
             $('#chatMessage').keyup(function (evt) {
                 if(this.value.length >= $chat_max_post_length - 20)
                 {
-                    let remaining = $chat_max_post_length - this.value.length;
+                    let remaining = $chat_max_post_length - this.textLength;
                     $('#remainingCharacters').text('Characters remaining: ' + remaining + ' out of ' + $chat_max_post_length);
                 }
                 else 
@@ -152,13 +156,13 @@ function chat() {
 			<tr><th>Post Message</th></tr>
 			<tr><td style='text-align:center;'>
 			<form action='$self_link' method='post'>
-				<textarea id='chatMessage' name='post' style='width:375px;height:100px;'></textarea><br />
+				<textarea id='chatMessage' name='post' style='width:375px;height:100px;' minlength='3' maxlength='". $chat_max_post_length ."'></textarea><br />
 				<input type='checkbox' id='quickReply' name='quick_reply' value='1' " .
 				($_SESSION['quick_reply'] ? "checked='checked'" : '') .
 				"/> Quick reply<br />
 				<span id='remainingCharacters' class='red'></span>
 				<br />
-				<input id='chatSubmit' name='chat_submit' type='submit' value='Post' />
+				<input id='chatSubmit' name='chat_submit' type='submit' value='Post'/>
 			</form>
 			</td></tr>
 		</table>";
