@@ -21,10 +21,10 @@ class ForbiddenSeal {
     public int $extra_jutsu_equips;
     public int $extra_armor_equips;
     public int $extra_weapon_equips;
-    public int $long_training_time;
-    public int $long_training_gains;
-    public int $extended_training_time;
-    public int $extended_training_gains;
+    public float $long_training_time;
+    public float $long_training_gains;
+    public float $extended_training_time;
+    public float $extended_training_gains;
 
 
     /** Display Members (used only in Ancient Market) */
