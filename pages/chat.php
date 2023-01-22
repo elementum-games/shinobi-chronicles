@@ -49,10 +49,10 @@ function chat() {
 					throw new Exception("You cannot post the same message twice in a row!");
 				}
 			}
-			if(strlen($message_length) < 3) {
+			if($message_length < 3) {
 				throw new Exception("Message is too short!");
 			}
-			if(strlen($message_length) > $chat_max_post_length) {
+			if($message_length > $chat_max_post_length) {
 				throw new Exception("Message is too long!");
 			}
 
