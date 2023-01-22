@@ -24,7 +24,7 @@ function clean_clan_position_holders()
 
     if($system->db_last_num_rows > 0) {
         while($row = $system->db_fetch($result)) {
-            if ($row["last_login"] <= $max_idle_time && $row['staff_level'] < System::SC_MODERATOR)
+            if ($row["last_login"] <= $max_idle_time && $row['staff_level'] < User::STAFF_MODERATOR)
             {
                 $expired_holders[$row['user_id']] = $row;
             }

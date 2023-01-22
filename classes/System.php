@@ -23,12 +23,6 @@ class System {
     const IN_VILLAGE_OKAY = 1;
     const ONLY_IN_VILLAGE = 2;
 
-    const SC_MODERATOR = 1;
-    const SC_HEAD_MODERATOR = 2;
-    const SC_CONTENT_ADMINISTRATOR = 3;
-    const SC_ADMINISTRATOR = 4;
-    const SC_HEAD_ADMINISTRATOR = 5;
-
     const CURRENCY_TYPE_MONEY = 'money';
     const CURRENCY_TYPE_PREMIUM_CREDITS = 'premium_credits';
 
@@ -39,7 +33,8 @@ class System {
     const UNSERVICEABLE_EMAIL_DOMAINS = ['hotmail.com', 'live.com', 'msn.com', 'outlook.com'];
 
     public static array $villages = ['Stone', 'Cloud', 'Leaf', 'Sand', 'Mist'];
-    public static array $forbidden_seals = array(1 => 'Twin Sparrow Seal', 2 => 'Four Dragon Seal');
+
+    // See the ForbiddenSeal class for maintaining all forbidden seal details/benefits
 
     // TODO: Remove! This is a temporary way to do events
     const SC_EVENT_START = 0;
@@ -600,7 +595,7 @@ class System {
         return "<img src='$image' style='max-width:{$width}px;max-height:{$height}px;' />";
 
     }
-    
+
     public function timeAgo($timestamp): string {
 
         $time = time() - $timestamp;
@@ -706,7 +701,7 @@ class System {
            default:
                throw new Exception("Invalid currency type!");
        }
-        
+
         $this->query(
             "INSERT INTO `currency_logs` (
                 `character_id`,

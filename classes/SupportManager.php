@@ -1,5 +1,7 @@
 <?php
 
+require_once __DIR__ . '/Inbox.php';
+
 class SupportManager {
     public int $user_id;
     public string $user_name;
@@ -403,9 +405,9 @@ class SupportManager {
         // Notify user of update
         if($this->staff) {
             if($support_data['user_id']) {
-                $this->system->send_pm($this->user_id, $support_data['user_id'], "Support Updated!",
-                    "Your support {$support_data['subject']} has been updated and can be viewed here "
-                    . $this->system->link . "support.php?support_id=" . $support_id, $this->user->staff_level);
+                $message = "Your support {$support_data['subject']} has been updated and can be viewed here " .
+                    $this->system->link . "support.php?support_id=" . $support_id;
+                Inbox::sendAlert($this->system, 4, $this->user_id, $support_data['user_id'], $message);
             }
         }
         // Email if ticket submitted by guest
