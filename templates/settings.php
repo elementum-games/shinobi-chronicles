@@ -101,7 +101,7 @@
                         $('#journalMessage').keyup(function (evt) {
                             if(this.value.length >= <?=$max_journal_length?> - 20)
                             {
-                                let remaining = <?=$max_journal_length?> - this.value.length;
+                                let remaining = <?=$max_journal_length?> - this.textLength;
                                 $('#remainingCharacters').text('Characters remaining: ' + remaining + ' out of ' + <?=$max_journal_length?>);
                             }
                             else
@@ -112,7 +112,12 @@
                     });
                 </script>
             <form action='<?=$self_link?>' method='post'>
-                <textarea style='height:350px;width:95%;margin:10px 0;' name='journal' id='journalMessage'><?=stripslashes($journal)?></textarea>
+                <textarea
+                    style='height:350px;width:95%;margin:10px 0;'
+                    name='journal'
+                    id='journalMessage'
+                    maxlength='<?= $max_journal_length ?>'
+                ><?= stripslashes($journal) ?></textarea>
                 <br />
                 <span id='remainingCharacters' class='red'></span>
                 <br />
