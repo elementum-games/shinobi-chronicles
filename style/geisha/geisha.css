@@ -587,7 +587,12 @@ p {
 	color: #E030C0;
 }
 #content .gold, #content a.gold:hover {
-    text-shadow: 1px 1px rgba(0, 0, 0, 0.5);
+    --color-text-shadow: rgba(0,0,0,0.4);
+    text-shadow:
+            0 1px 1px var(--color-text-shadow),
+            0 -1px 1px var(--color-text-shadow),
+            -1px 0 1px var(--color-text-shadow),
+            1px 0 1px var(--color-text-shadow);
 	color: rgb(255,215,0);
 }
 
