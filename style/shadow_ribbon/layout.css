@@ -606,7 +606,7 @@ p {
 	color: #CF4020;
 }
 #content .gold, #content a.gold:hover {
-    --color-text-shadow: rgba(0, 0, 0, 0.6);
+    text-shadow: 1px 1px rgba(0, 0, 0, 0.5);
 	color: rgb(255, 215, 0);
 }
 

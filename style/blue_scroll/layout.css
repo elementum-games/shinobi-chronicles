@@ -1363,7 +1363,7 @@ p {
 #content .table a.red,
 #content a.red:hover,
 #content .chat_msg .red,
-#content .chat_msg a.pirednk:hover {
+#content .chat_msg a.red:hover {
     color: #CF4020;
 }
 
@@ -1374,7 +1374,7 @@ p {
 #content .chat_msg .premiumUser.red,
 #content .chat_msg a.premiumUser.red:hover {
     color: #d67a65;
-    text-shadow: 1 1px 1px #681d0d,
+    text-shadow: 1px 1px 1px #681d0d,
                 -1px -1px 1px #681d0d;
 }
 
@@ -1384,7 +1384,7 @@ p {
 #content a.gold:hover,
 #content .chat_msg .gold,
 #content .chat_msg a.gold:hover {
-    --color-text-shadow: rgba(0, 0, 0, 0.6);
+    text-shadow: 1px 1px rgba(0, 0, 0, 0.5);
     color: rgb(197, 171, 22);
 }
 
