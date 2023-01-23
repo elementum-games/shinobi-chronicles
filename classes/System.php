@@ -775,22 +775,18 @@ class System {
         switch($layout) {
             case 'cextralite':
                 return "layout/cextralite.php";
-                break;
             case 'classic_blue':
                 return "layout/classic_blue.php";
-                break;
             case 'shadow_ribbon':
                 return "layout/shadow_ribbon.php";
-                break;
             case 'geisha':
                 return "layout/geisha.php";
-                break;
             case 'blue_scroll':
                 return "layout/blue_scroll.php";
-                break;
+            case 'rainbow_road':
+                return "layout/rainbow_road.php";
             default:
                 return "layout/" . self::DEFAULT_LAYOUT . ".php";
-                break;
         }
     }
 

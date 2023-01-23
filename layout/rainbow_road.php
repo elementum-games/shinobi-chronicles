@@ -129,6 +129,7 @@ $footer = <<<HTML
 	</div>
 	<div id='footer'>
 		<p>Shinobi Chronicles v<!--[VERSION_NUMBER]--> &bull; Copyright &copy; LM Visions &bull; :<!--[PAGE_LOAD_TIME]-->:</p>
+		<p>Layout by Uraraka</p>
 	</div>
 </body>
 </html>
