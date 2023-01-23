@@ -25,7 +25,7 @@ function userSettings() {
         $max_journal_length = $player->forbidden_seal->journal_size;
 	}
 	
-	$layouts = array('shadow_ribbon', 'geisha', 'classic_blue', 'blue_scroll');
+	$layouts = array('shadow_ribbon', 'geisha', 'classic_blue', 'blue_scroll', 'rainbow_road');
 	if($system->environment == 'dev') {
 	    $layouts[] = 'cextralite';
 	}
