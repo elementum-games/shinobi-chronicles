@@ -534,5 +534,35 @@ return [
         'text' => ':lsm giving himself a medal:',
         'public' => true,
     ],
+    [
+            'code' => ':hatcloud:',
+            'image' => "<img src='./images/memes/hats/hat-cloud.png' />",
+            'text' => ':basically a neat kite:',
+            'public' => true,
+    ],
+    [
+            'code' => ':hatleaf:',
+            'image' => "<img src='./images/memes/hats/hat-leaf.png' />",
+            'text' => ':this hat is on fiaaaahhhh',
+            'public' => true,
+    ],
+    [
+            'code' => ':hatmist:',
+            'image' => "<img src='./images/memes/hats/hat-mist.png' />",
+            'text' => ':there must be a mist opportunity here:',
+            'public' => true,
+    ],
+    [
+            'code' => ':hatsand:',
+            'image' => "<img src='./images/memes/hats/hat-sand.png' />",
+            'text' => ':i hate this hat its so coarse and it gets into everything:',
+            'public' => true,
+    ],
+    [
+            'code' => ':hatstone:',
+            'image' => "<img src='./images/memes/hats/hat-stone.png' />",
+            'text' => ':like a rock, also makes a great pet:',
+            'public' => true,
+    ],
 ];
 
