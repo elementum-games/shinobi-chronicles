@@ -2261,3 +2261,21 @@ a#spec_miss_cancel:hover::after {
 	background: url('./images/new-message-info.png') no-repeat center;
 	background-size: 70% 70%;
 }
+
+
+/* temp fix for travel sync with side menu */
+.sm-tmp-invillage #sideMenuOption-Arena,
+.sm-tmp-invillage #sideMenuOption-Training
+{
+	display: none;
+	height: 0;
+}
+
+.sm-tmp-outvillage #sideMenuOption-RamenShop,
+.sm-tmp-outvillage #sideMenuOption-Shop,
+.sm-tmp-outvillage #sideMenuOption-VillageHQ,
+.sm-tmp-outvillage #sideMenuOption-Clan
+{
+	display: none;
+	height: 0;
+}
