@@ -98,10 +98,13 @@ class User extends Fighter {
     public $clan;
     public $village_location;
     public $in_village;
-    public $location; // x.y
+    public $location; // x.y.z
+    public $z;
     public $x;
     public $y;
-
+    public $last_movement;
+    public $attack_id;
+    public $attack_id_time;
     public $train_type;
     public $train_gain;
     public $train_time;
@@ -463,10 +466,22 @@ class User extends Fighter {
             array_unshift($this->stats, 'bloodline_skill');
         }
 
-        $this->location = $user_data['location']; // x.y
+        $this->location = $user_data['location']; // x.y.z
         $location = explode(".", $this->location);
+        // new travel
         $this->x = $location[0];
         $this->y = $location[1];
+        $this->z = $location[2];
+        $this->last_movement = $user_data['last_movement'];
+        $this->attack_id = $user_data['attack_id'];
+        $this->attack_id_time = $user_data['attack_id_time'];
+
+        // generate a new attack link if it's been 10 minutes
+        $generate_id_minutes = 10;
+        if ($this->attack_id_time <= (time() - (60 * $generate_id_minutes))) {
+            $this->attack_id = uniqid();
+            $this->attack_id_time = time();
+        }
 
         $this->train_type = $user_data['train_type'];
         $this->train_gain = $user_data['train_gain'];
@@ -761,8 +776,15 @@ class User extends Fighter {
         }
 
         //In Village Regen
-        if($this->in_village) {
-            $this->regen_boost += 20 + $this->regen_rate;
+//        if($this->in_village) {
+//            // regen boost or regen rate?
+//            $this->regen_boost += ($this->regen_rate / 2);
+//        }
+
+        // Location with Regen Boost
+        $location_data = Travel::getLocation($this->system, $this->x, $this->y, $this->z);
+        if ($location_data && $location_data['regen']) {
+            $this->regen_boost += ($location_data['regen'] / 100) * $this->regen_rate;
         }
 
         // Elements
@@ -1261,6 +1283,7 @@ class User extends Fighter {
         $location = explode('.', $this->location);
         $this->x = $location[0];
         $this->y = $location[1];
+        $this->z = $location[2];
     }
 
     /* function updateData()
@@ -1268,7 +1291,7 @@ class User extends Fighter {
         -Parameters-
     */
     public function updateData() {
-        $this->location = $this->x . '.' . $this->y;
+        $this->location = $this->x . '.' . $this->y . '.' . $this->z;
 
         $query = "UPDATE `users` SET
 		`current_ip` = '$this->current_ip',
@@ -1314,6 +1337,9 @@ class User extends Fighter {
 
         $query .= "`battle_id` = '$this->battle_id',
 		`challenge` = '$this->challenge',
+		`last_movement` = '$this->last_movement',
+		`attack_id` = '$this->attack_id',
+		`attack_id_time` = '$this->attack_id_time',
 		`location` = '$this->location',";
         if($this->mission_id) {
             if(is_array($this->mission_stage)) {

@@ -246,6 +246,7 @@ class System {
         }
 
         $this->api_links['inbox'] = $this->link . 'api/inbox.php';
+        $this->api_links['travel'] = $this->link . 'api/travel.php';
 
         $this->timezoneOffset = date('Z');
 

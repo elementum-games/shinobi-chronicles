@@ -160,9 +160,11 @@ else {
 // Start display
 if(!$LOGGED_IN) {
 	$layout = $system->fetchLayoutByName(System::DEFAULT_LAYOUT);
+    $sm_tmp_class = null;
 }
 else {
 	$layout = $system->fetchLayoutByName($player->layout);
+    $sm_tmp_class = $player->in_village ? 'sm-tmp-invillage' : 'sm-tmp-outvillage';
 }
 require($layout);
 
@@ -385,7 +387,10 @@ if($LOGGED_IN) {
             }
 
             if(!$ajax || !isset($routes[$id]['ajax_ok']) ) {
-				echo str_replace("[HEADER_TITLE]", $routes[$id]['title'], $body_start);
+                $loc_data = Travel::getLocation($system, $player->x, $player->y, $player->z);
+                $location_name = !empty($loc_data) ? ' ' . ' <div id="contentHeaderLocation">&middot; '.$loc_data['name'].'</div>' : null;
+
+				echo str_replace("[HEADER_TITLE]", $routes[$id]['title'] . $location_name, $body_start);
 			}
 
 			$self_link = $system->link . '?id=' . $id;
@@ -463,7 +468,8 @@ if($LOGGED_IN) {
 					continue;
 				}
 				// Page ok if an in-village page or player rank is below chuunin
-				if($page['village_ok'] != System::NOT_IN_VILLAGE || $player->rank < 3) {
+//				if($page['village_ok'] != System::NOT_IN_VILLAGE || $player->rank < 3) {
+                if (true) {
 					echo "<li><a id='sideMenuOption-".str_replace(' ', '', $page['title'])."' href='{$system->link}?id=$id'>" . $page['title'] . "</a></li>";
 				}
 			}
@@ -473,14 +479,16 @@ if($LOGGED_IN) {
 				if(!isset($page['menu']) || $page['menu'] != 'activity') {
 					continue;
 				}
-				if($page['village_ok'] != System::ONLY_IN_VILLAGE) {
+//				if($page['village_ok'] != System::ONLY_IN_VILLAGE) {
+                if(true) {
 					echo "<li><a id='sideMenuOption-".str_replace(' ', '', $page['title'])."' href='{$system->link}?id=$id'>" . $page['title'] . "</a></li>";
 				}
 			}
 		}
 
         // In village or not
-        if($player->in_village) {
+//        if($player->in_village) {
+        if (true) {
             echo $village_menu_start;
             foreach($routes as $id => $page) {
                 if(!isset($page['menu']) || $page['menu'] != System::MENU_VILLAGE) {

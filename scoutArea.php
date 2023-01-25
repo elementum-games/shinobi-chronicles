@@ -30,18 +30,19 @@ function scoutArea($in_existing_table = false, $show_spar_link = true) {
 	}
 	
 	
-	$result = $system->query("SELECT `user_id`, `user_name`, `rank`, `village`, `exp`, `location`, `battle_id`, `stealth` FROM `users` 
+	$result = $system->query("SELECT `user_id`, `user_name`, `rank`, `village`, `exp`, `location`, `battle_id`, `stealth`, `attack_id` FROM `users` 
 		WHERE `last_active` > UNIX_TIMESTAMP() - 120 ORDER BY `exp` DESC LIMIT $min, $users_per_page");
 	$users = array();
 	while($row = $system->db_fetch($result)) {
 		$location = explode('.', $row['location']);
 		$scout_range = $player->scout_range - $row['stealth'];
-		if($scout_range < 0) {
-			$scout_range = 0;
+		if($scout_range < 1) {
+			$scout_range = 1;
 		}
 		
-		if(abs($location[0] - $player->x) <= ($scout_range) 
-		&& abs($location[1] - $player->y) <= ($scout_range)) {
+		if($location[2] === $player->z &&
+            abs($location[0] - $player->x) <= ($scout_range) &&
+            abs($location[1] - $player->y) <= ($scout_range)) {
 			$users[] = $row;
 		}
 	}
@@ -102,7 +103,7 @@ function scoutArea($in_existing_table = false, $show_spar_link = true) {
                         && $player->rank > 2
                         && $user['rank'] == $player->rank
                     ) {
-					    $links[] = "<a href='{$system->links['battle']}&attack={$user['user_id']}'>Attack</a>";
+					    $links[] = "<a href='{$system->links['battle']}&attack={$user['attack_id']}'>Attack</a>";
                     }
 
 					echo implode(" | ", $links);

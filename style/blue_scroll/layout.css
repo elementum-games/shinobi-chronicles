@@ -412,6 +412,7 @@ body {
 
 #content {
     min-height: 500px;
+    min-width: 691px;
 }
 
 h2#title {
@@ -978,9 +979,8 @@ table.globalMessage th {
 #content .contentHeader {
     width: 100%;
     position: relative;
-    padding: 5px 0 0 55px;
+    padding: 5px 0 5px 55px;
 
-    line-height: 40px;
     color: #b99f47;
     font-family: 'BebasNeue', sans-serif;
     font-size: 2rem;
@@ -999,6 +999,17 @@ table.globalMessage th {
     background-size: 100% 100%;
     background-repeat: no-repeat;
     background-position: center center;
+}
+
+
+.contentHeader {
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: center;
+}
+
+#contentHeaderLocation {
+    padding-left: 5px;
 }
 
 /* Imported */
@@ -1619,121 +1630,272 @@ br.clear {
 }
 
 /* Travel */
-.upArrow,
-.leftArrow,
-.rightArrow,
-.downArrow {
-    display: inline-block;
-    height: 32px;
-    width: 32px;
-    margin: 0px;
-    background-size: 100%;
-    background-repeat: no-repeat;
+
+.travel {
+    box-sizing: border-box;
+    width: 95%;
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: center;
+    min-width: 691px;
 }
 
-.upArrow {
-    background-image: url(../../images/icons/up.png);
-}
-
-.upArrow:hover {
-    background-image: url(../../images/icons/up_hover.png);
-}
-
-.leftArrow {
-    background-image: url(../../images/icons/left.png);
-}
-
-.leftArrow:hover {
-    background-image: url(../../images/icons/left_hover.png);
-}
-
-.downArrow {
-    background-image: url(../../images/icons/down.png);
-}
-
-.downArrow:hover {
-    background-image: url(../../images/icons/down_hover.png);
-}
-
-.rightArrow {
-    background-image: url(../../images/icons/right.png);
-}
-
-.rightArrow:hover {
-    background-image: url(../../images/icons/right_hover.png);
-}
-
-
-
-
-.travelContainer {
-    width: 681px;
-    height: 466px;
+.travelMapContainer {
+    flex-grow: 0;
+    margin: 0 10px;
+    display: flex;
+    flex-flow: column wrap;
+    justify-content: center;
+    align-items: center;
     position: relative;
-    margin: 0 auto;
-    /* Match content size to mapContainer, but pad */
-    padding: var(--travel-button-size);
+}
+
+.mapMobileContainer {
+    display: none;
+}
+
+@media (width < 1055px) {
+
+
+    .travelMapContainer {
+        padding: 25px 30px 20px 10px;
+    }
+
+
+    .mapMobileContainer {
+        display: block;
+        width: 100%;
+        height: calc(100% - 5px);
+        position: absolute;
+        top: 0;
+        left: 0;
+    }
+
+    .mapMobileContainer a {
+        display: block;
+        position: absolute;
+
+        background: #b99e47;
+        border: 1px solid #413510;
+    }
+    .mapMobileContainer a:nth-of-type(1) {
+        top: 0;
+        left: 0;
+    }
+    .mapMobileContainer a:nth-of-type(2) {
+        top: 0;
+        left: 0;
+        right: 0;
+        margin: 0 auto;
+    }
+    .mapMobileContainer a:nth-of-type(3) {
+        top: 0;
+        right: 0;
+    }
+    .mapMobileContainer a:nth-of-type(4) {
+        top: 33%;
+        left: 0;
+    }
+    .mapMobileContainer a:nth-of-type(5) {
+        top: 33%;
+        left: 0;
+        right: 0;
+        margin: 0 auto;
+    }
+    .mapMobileContainer a:nth-of-type(6) {
+        top: 33%;
+        right: 0;
+    }
+    .mapMobileContainer a:nth-of-type(7) {
+        top: 66%;
+        left: 0;
+    }
+    .mapMobileContainer a:nth-of-type(8) {
+        top: 66%;
+        left: 0;
+        right: 0;
+        margin: 0 auto;
+    }
+    .mapMobileContainer a:nth-of-type(9) {
+        top: 66%;
+        right: 0;
+    }
+
+
+    .mapMobileContainer a:hover {
+        background: #beb28a;
+    }
+}
+
+
+.travelScoutContainer {
+    flex-grow: 2;
+    display: flex;
+    padding: 10px;
+    align-items: flex-start;
+    justify-content: flex-start;
+}
+
+
+#content table.scoutTable {
+    margin: 0;
+    flex-grow: 2;
+    width: auto;
+
+    background: var(--theme-content-darker-bg-color);
+
+}
+
+#content table.scoutTable th {
+    width: 16%;
+    text-align: center;
+
+    font-size: 0.9rem;
+}
+
+#content table.scoutTable td {
+    width: 16%;
+    padding: 5px;
+    text-align: center;
+}
+
+.scoutTable tr:nth-of-type(even) {
+    background-color: var(--theme-content-darker2-bg-color);
+}
+
+.scoutTableVillageIcon {
+    height: 18px;
+    width: 18px;
+    margin-right: 10px;
+}
+
+.scoutTableAlignAlly {
+    color: #50c03f;
+}
+.scoutTableAlignEnemy {
+    color: #ce4848;
+}
+
+.travelAction {
+    text-align: center;
+    display: flex;
+    flex-flow: column nowrap;
+    width: 100%;
+    justify-content: center;
+    align-items: flex-start;
+    margin: 0 auto 20px auto;
+}
+
+.travelLabel {
+    padding: 20px 10px;
+    width: 100%;
+    height: 50px;
+    line-height: 50px;
+    text-align: center;
+
+    font-style: italic;
+    font-family: 'Oswald', sans-serif;
+    font-size: 0.9rem;
+    color: #beb28a;
 }
 
 .mapContainer {
-    width: 600px;
-    height: 385px;
+    margin-top: 33px;
+    margin-left: 50px;
+    background: var(--theme-content-bg-color);
+    position: relative;
 }
 
-#content table.map {
-    max-width: 600px;
-    height: 385px;
-    border-radius: 15px;
-    border: 1px solid rgba(0, 0, 0.5);
-}
-
-#content table.map td {
-    height: 32px;
-    width: 32px;
-    border: 1px solid rgba(0, 0, 0.5);
-    vertical-align: middle;
-}
-
-
-.travelButton {
+.mapGutterX, .mapGutterY {
     position: absolute;
+    display: flex;
 
+    background-color: var(--theme-content-bg-color);
+
+    color: #544c35;
+    font-size: 0.9rem;
+    font-family: 'Oswald', sans-serif;
+}
+.mapGutterX div, .mapGutterY div {
+    border: 1px solid #141926;
+}
+
+.mapGutterX {
+    left: 0;
+    top: -32px;
+    flex-flow: row wrap;
+}
+
+.mapGutterY {
+    left: -32px;
+    top: 0;
+    flex-flow: column wrap;
+}
+
+.mapGutterX div, .mapGutterY div {
     display: flex;
     align-items: center;
     justify-content: center;
-    background: rgba(0, 0, 0, 0.5);
 }
 
-.travelButton:hover {
-    background: #b99f47;
-}
-
-.north {
-    left: var(--travel-button-size);
-    right: var(--travel-button-size);
+.map, .mapLocations, .mapPlayer, .mapGrid {
+    position: absolute;
     top: 0;
-    height: var(--travel-button-size);
-}
-
-.east {
-    width: var(--travel-button-size);
-    right: 0;
-    top: var(--travel-button-size);
-    bottom: var(--travel-button-size);
-}
-
-.west {
     left: 0;
-    width: var(--travel-button-size);
-    top: var(--travel-button-size);
-    bottom: var(--travel-button-size);
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
 }
 
-.south {
-    left: var(--travel-button-size);
-    right: var(--travel-button-size);
-    height: var(--travel-button-size);
-    bottom: 0;
+.map {
+    background-repeat: no-repeat;
+    z-index: 10;
+}
+
+.mapLocations {
+    z-index: 100;
+}
+
+.mapGrid {
+    display: flex;
+    flex-flow: row wrap;
+    z-index: 400;
+}
+
+.mapPlayer {
+    z-index: 500;
+}
+
+
+.mapGridTileBlank {
+    border-right: 1px solid rgba(0, 0, 0, 0.22);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.22);
+
+    font-size: 9px;
+    color: #000000;
+}
+
+.mapGridAction {
+    position: relative;
+    cursor: pointer;
+}
+
+.mapGridAction:hover {
+    background: rgba(67, 67, 210, 0.58);
+    box-shadow: 0 0 0 3px #3550e1 inset;
+}
+
+.mapGridLocationTile {
+    position: absolute;
+    background-size: 80% 80%;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+.mapIcon {
+    position: absolute;
+    background-position: center center;
+    background-repeat: no-repeat;
 }
 
 .contentDiv,
@@ -1749,6 +1911,16 @@ br.clear {
     background: var(--theme-content-bg-color);
     box-shadow: 0 0 2px #000000;
     border: 1px solid #b99e471f;
+}
+
+.contentDivMessages {
+    width: 95%;
+    margin: 10px auto;
+    height: 50px;
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: flex-start;
+    align-items: flex-end;
 }
 
 .contentDiv p {
@@ -1793,6 +1965,8 @@ br.clear {
 
     color: var(--theme-text-color-normal);
 }
+
+/** daily task **/
 
 #dailyTaskWrapper {
     width: 95%;
@@ -3109,4 +3283,21 @@ a#spec_miss_cancel:hover::after {
         width: calc(var(--total-width) - 60px);
     }
 
+}
+
+/* temp fix for travel sync with side menu */
+.sm-tmp-invillage #sideMenuOption-Arena,
+.sm-tmp-invillage #sideMenuOption-Training
+{
+    display: none;
+    height: 0;
+}
+
+.sm-tmp-outvillage #sideMenuOption-RamenShop,
+.sm-tmp-outvillage #sideMenuOption-Shop,
+.sm-tmp-outvillage #sideMenuOption-VillageHQ,
+.sm-tmp-outvillage #sideMenuOption-Clan
+{
+    display: none;
+    height: 0;
 }

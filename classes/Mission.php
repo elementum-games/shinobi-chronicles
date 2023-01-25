@@ -242,6 +242,7 @@ class Mission {
         $max = $this->current_stage['location_radius'] * 2;
         $x = mt_rand(0, $max) - $this->current_stage['location_radius'];
         $y = mt_rand(0, $max) - $this->current_stage['location_radius'];
+        $z = 1;
         if($x == 0 && $y == 0) {
             $x++;
         }
@@ -256,14 +257,16 @@ class Mission {
             $y = 1;
         }
 
-        if($x > System::MAP_SIZE_X) {
-            $x = System::MAP_SIZE_X;
+        $map_data = Travel::getMapData($this->system, $this->player->z);
+
+        if($x > $map_data['map_width']) {
+            $x = $map_data['map_width'];
         }
-        if($y > System::MAP_SIZE_Y) {
-            $y = System::MAP_SIZE_Y;
+        if($y > $map_data['map_height']) {
+            $y = $map_data['map_height'];
         }
 
-        return $x . '.' . $y;
+        return $x . '.' . $y . '.' . $z;
     }
 
     /**

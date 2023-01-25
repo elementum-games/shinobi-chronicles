@@ -381,12 +381,18 @@ table.globalMessage tr:last-child td:last-child  {
 	margin-top: 20px;
 	margin-left: 20px;
     margin-bottom: -5px;
+	display: flex;
+	flex-flow: row nowrap;
 	
 	/* Style */
 	font-size: 24px;
 	font-weight: bold;
 	font-family: "Lucida Sans Unicode", "Lucida Grande", sans-serif;
 	color: #A02000;
+}
+
+#contentHeaderLocation {
+	padding-left: 5px;
 }
 
 #footer p {
@@ -761,103 +767,194 @@ br.clear {
 }
 
 /* Travel */
-.upArrow, .leftArrow, .rightArrow, .downArrow {
-    display: inline-block;
-    height:32px;
-    width:32px;
-    margin:0;
-    background-size: 100%;
-    background-repeat: no-repeat;
+
+.travel {
+	box-sizing: border-box;
+	width: 100%;
+	display: flex;
+	flex-flow: row wrap;
+	justify-content: center;
+	align-items: flex-start;
 }
 
-.upArrow {
-    background-image: url(../../images/icons/up.png);
-}
-.upArrow:hover {
-    background-image: url(../../images/icons/up_hover.png);
+.travel * {
+	box-sizing: border-box;
 }
 
-.leftArrow {
-    background-image: url(../../images/icons/left.png);
-}
-.leftArrow:hover {
-    background-image: url(../../images/icons/left_hover.png);
-}
-
-.downArrow {
-    background-image: url(../../images/icons/down.png);
-}
-.downArrow:hover {
-    background-image: url(../../images/icons/down_hover.png);
+.travelMapContainer {
+	flex-grow: 1;
+	/*margin: 0 10px;*/
+	display: flex;
+	flex-flow: column wrap;
+	justify-content: center;
+	align-items: center;
+	position: relative;
 }
 
-.rightArrow {
-    background-image: url(../../images/icons/right.png);
-}
-.rightArrow:hover {
-    background-image: url(../../images/icons/right_hover.png);
+.mapMobileContainer {
+	display: none;
 }
 
-.travelContainer {
-    width: 600px;
-    height: 385px;
-    position: relative;
-
-    /* Match content size to mapContainer, but pad */
-    padding: var(--travel-button-size);
+.travelScoutContainer {
+	width: 40%;
+	flex-grow: 1;
+	padding: 0;
 }
+
+#content table.scoutTable {
+	margin: 0;
+
+	background: var(--theme-content-darker-bg-color);
+}
+
+#content table.scoutTable th {
+	text-align: center;
+	font-size: 0.8rem;
+}
+
+#content table.scoutTable td {
+	padding: 5px;
+	font-size: 0.8rem;
+	text-align: center;
+}
+
+
+.scoutTable tr:nth-of-type(even) {
+	background-color: var(--theme-content-darker2-bg-color);
+}
+
+.scoutTableVillageIcon {
+	height: 18px;
+	width: 18px;
+	margin-right: 2px;
+}
+
+.scoutTableAlignAlly {
+	color: #50c03f;
+	font-weight: bold;
+}
+.scoutTableAlignEnemy {
+	color: #ce4848;
+	font-weight: bold;
+}
+
+.travelAction {
+	text-align: center;
+	display: flex;
+	flex-flow: column nowrap;
+	width: 100%;
+	justify-content: center;
+	align-items: center;
+	margin: 0 auto 20px auto;
+}
+
+.travelLabel {
+	padding: 20px 10px;
+	width: 100%;
+	height: 50px;
+	line-height: 50px;
+	text-align: center;
+
+	font-style: italic;
+	font-size: 0.9rem;
+	color: #3d3a2e;
+}
+
 .mapContainer {
-    width: 600px;
-    height: 385px;
+	margin: 33px 0 0 50px;
+	background: var(--theme-content-bg-color);
+	position: relative;
 }
 
-.travelButton {
-    position: absolute;
+.mapGutterX, .mapGutterY {
+	position: absolute;
+	display: flex;
 
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: rgba(0,0,0,0.1);
+	background-color: var(--theme-content-bg-color);
+
+	color: #544c35;
+	font-size: 0.9rem;
 }
-.travelButton:hover {
-    background: rgba(0,0,0,0.2);
+.mapGutterX div, .mapGutterY div {
+	border: 1px solid #141926;
 }
 
-.north {
-    left: var(--travel-button-size);
-    right: var(--travel-button-size);
-    top: 0;
-    height: var(--travel-button-size);
-
-    border-top-left-radius: 10px;
-    border-top-right-radius: 10px;
+.mapGutterX {
+	left: 0;
+	top: -32px;
+	flex-flow: row wrap;
 }
-.east {
-    width: var(--travel-button-size);
-    right: 0;
-    top: var(--travel-button-size);
-    bottom: var(--travel-button-size);
 
-    border-top-right-radius: 10px;
-    border-bottom-right-radius: 10px;
+.mapGutterY {
+	left: -32px;
+	top: 0;
+	flex-flow: column wrap;
 }
-.west {
-    left: 0;
-    width: var(--travel-button-size);
-    top: var(--travel-button-size);
-    bottom: var(--travel-button-size);
 
-    border-top-left-radius: 10px;
-    border-bottom-left-radius: 10px;
+.mapGutterX div, .mapGutterY div {
+	display: flex;
+	align-items: center;
+	justify-content: center;
 }
-.south {
-    left: var(--travel-button-size);
-    right: var(--travel-button-size);
-    height: var(--travel-button-size);
-    bottom: 0;
 
-    border-bottom-left-radius: 10px;
-    border-bottom-right-radius: 10px;
+.map, .mapLocations, .mapPlayer, .mapGrid {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	overflow: hidden;
+}
+
+.map {
+	background-repeat: no-repeat;
+	z-index: 10;
+}
+
+.mapLocations {
+	z-index: 100;
+}
+
+.mapGrid {
+	display: flex;
+	flex-flow: row wrap;
+	z-index: 400;
+}
+
+.mapPlayer {
+	z-index: 500;
+}
+
+
+.mapGridTileBlank {
+	border-right: 1px solid rgba(0, 0, 0, 0.22);
+	border-bottom: 1px solid rgba(0, 0, 0, 0.22);
+
+	font-size: 9px;
+	color: #000000;
+}
+
+.mapGridAction {
+	position: relative;
+	cursor: pointer;
+}
+
+.mapGridAction:hover {
+	background: rgba(67, 67, 210, 0.58);
+	box-shadow: 0 0 0 3px #3550e1 inset;
+}
+
+.mapGridLocationTile {
+	position: absolute;
+	background-size: 80% 80%;
+	background-position: center;
+	background-repeat: no-repeat;
+}
+
+.mapIcon {
+	position: absolute;
+	background-position: center center;
+	background-repeat: no-repeat;
 }
 
 .contentDiv,
@@ -869,6 +966,16 @@ br.clear {
     background: #FAFAFA linear-gradient(to bottom right, #FAFAFA, #F0F0F0);
     border-radius: 10px;
 	border: 1px solid #2020209d;
+}
+
+.contentDivMessages {
+	width: 95%;
+	margin: 10px auto;
+	height: 50px;
+	display: flex;
+	flex-flow: row wrap;
+	justify-content: flex-start;
+	align-items: flex-end;
 }
 
 .contentDivMed {

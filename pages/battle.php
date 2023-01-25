@@ -91,15 +91,29 @@ function battle(): bool {
 			$player->battle_id = 0;
 		}
 	}
-	else if($_GET['attack']) {
+	else if(isset($_GET['attack'])) {
 		try {
-			$attack_id = (int)$system->clean($_GET['attack']);
+			$attack_id = $system->clean($_GET['attack']);
 
 			try {
+                // get user id off the attack link
+                $result = $system->query("SELECT `user_id` FROM `users` WHERE `attack_id`='{$attack_id}' LIMIT 1");
+                if ($system->db_last_num_rows == 0) {
+                    throw new Exception("Invalid user!");
+                }
+                $attack_link = $system->db_fetch($result);
+                $attack_id = $attack_link['user_id'];
+
 			    $user = new User($attack_id);
 			    $user->loadData(User::UPDATE_NOTHING, true);
             } catch(Exception $e) {
                 throw new Exception("Invalid user! " . $e->getMessage());
+            }
+
+            // check if the location forbids pvp
+            $location_data = Travel::getLocation($system, $player->x, $player->y, $player->z);
+            if ($location_data && $location_data['pvp_allowed'] == 0) {
+                throw new Exception("You cannot fight at this location!");
             }
 
 			if($user->village == $player->village) {

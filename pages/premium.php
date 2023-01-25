@@ -91,7 +91,6 @@ function premium() {
 			$player->bloodline_name = '';
 			$player->clan = array();
 			$player->clan['id'] = 0;
-			$player->location = $player->village_location;
 			$player->pvp_wins = 0;
 			$player->pvp_losses = 0;
 			$player->ai_wins = 0;
@@ -808,7 +807,6 @@ function premium() {
 			// Location
 			$result = $system->query("SELECT `location` FROM `villages` WHERE `name`='$player->village' LIMIT 1");
 			$location = $system->db_fetch($result)['location'];
-			$player->location = $location;
 
 			// Clan
 			$result = $system->query("SELECT `clan_id`, `name` FROM `clans`
@@ -875,9 +873,10 @@ function premium() {
 			}
 
 			$system->message("You have moved to the $village village, and been placed in the $clan_name clan.");
-			$location = explode('.', $player->location);
+			$location = explode('.', $location);
 			$player->x = $location[0];
 			$player->y = $location[1];
+            $player->z = $location[2];
 
 		} catch (Exception $e) {
 			$system->message($e->getMessage());

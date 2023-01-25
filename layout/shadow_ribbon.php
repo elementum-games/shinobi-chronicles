@@ -68,7 +68,7 @@ HTML;
 
 $side_menu_start = <<<HTML
 	</div>
-	<div id='sideMenu'>
+	<div id='sideMenu' class='sm-tmp-class {$sm_tmp_class}'>
 		<div id='notifications'><!--[NOTIFICATIONS]--></div>
 	
 	<ul class='menu'>
