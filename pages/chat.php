@@ -27,10 +27,20 @@ function chat() {
 
 	// Validate post and submit to DB
     $chat_max_post_length = System::CHAT_MAX_POST_LENGTH;
+    //Increase chat length limit for seal users & staff members
+    if($player->staff_level && !$player->forbidden_seal instanceof ForbiddenSeal) {
+        $chat_max_post_length = ForbiddenSeal::$benefits[ForbiddenSeal::$STAFF_SEAL_LEVEL]['chat_post_size'];
+    }
+    if($player->forbidden_seal_loaded && $player->forbidden_seal->level != 0) {
+        $chat_max_post_length = $player->forbidden_seal->chat_post_size;
+    }
+
 	if(isset($_POST['post'])) {
-		//If user has seal or is of staff, give them their words
+    //If user has seal or is of staff, give them their words
 		$chat_max_post_length += $player->forbidden_seal ? 100 : 0;
-		$message = $system->clean(stripslashes(trim($_POST['post'])));
+        $message_length = strlen(preg_replace('/[\\n\\r]+/', '', trim($_POST['post'])));
+		$message = $system->clean(stripslashes($_POST['post']));
+    
 		try {
 			$result = $system->query("SELECT `message` FROM `chat` WHERE `user_name` = '$player->user_name' ORDER BY  `post_id` DESC LIMIT 1");
 			if($system->db_last_num_rows) {
@@ -39,10 +49,10 @@ function chat() {
 					throw new Exception("You cannot post the same message twice in a row!");
 				}
 			}
-			if(strlen($message) < 3) {
+			if($message_length < 3) {
 				throw new Exception("Message is too short!");
 			}
-			if(strlen($message) > $chat_max_post_length) {
+			if($message_length > $chat_max_post_length) {
 				throw new Exception("Message is too long!");
 			}
 
@@ -120,7 +130,7 @@ function chat() {
             $('#chatMessage').keyup(function (evt) {
                 if(this.value.length >= $chat_max_post_length - 20)
                 {
-                    let remaining = $chat_max_post_length - this.value.length;
+                    let remaining = $chat_max_post_length - this.textLength;
                     $('#remainingCharacters').text('Characters remaining: ' + remaining + ' out of ' + $chat_max_post_length);
                 }
                 else 
@@ -146,13 +156,13 @@ function chat() {
 			<tr><th>Post Message</th></tr>
 			<tr><td style='text-align:center;'>
 			<form action='$self_link' method='post'>
-				<textarea id='chatMessage' name='post' style='width:375px;height:100px;'></textarea><br />
+				<textarea id='chatMessage' name='post' style='width:375px;height:100px;' minlength='3' maxlength='". $chat_max_post_length ."'></textarea><br />
 				<input type='checkbox' id='quickReply' name='quick_reply' value='1' " .
 				($_SESSION['quick_reply'] ? "checked='checked'" : '') .
 				"/> Quick reply<br />
 				<span id='remainingCharacters' class='red'></span>
 				<br />
-				<input id='chatSubmit' name='chat_submit' type='submit' value='Post' />
+				<input id='chatSubmit' name='chat_submit' type='submit' value='Post'/>
 			</form>
 			</td></tr>
 		</table>";
@@ -177,12 +187,12 @@ function chat() {
 			echo "<tr><td colspan='2' style='text-align:center;'>No posts!</td></tr>";
 		}
 		while($post = $system->db_fetch($result)) {
-			$user_result = $system->query("SELECT `premium_credits_purchased`, `avatar_link` FROM `users`
+			$user_result = $system->query("SELECT `premium_credits_purchased`, `chat_effect`, `avatar_link` FROM `users`
                 WHERE `user_name` = '{$system->clean($post['user_name'])}'");
 			$userData = $system->db_fetch($user_result);
 
             $statusType = "userLink ";
-            $statusType .= ($userData['premium_credits_purchased']) ? "premiumUser" : "";
+            $statusType .= ($userData['premium_credits_purchased'] && $userData['chat_effect'] == 'sparkles') ? "premiumUser" : "";
             $class = "chat ";
             if(isset($post['user_color'])) {
                 $class .= $post['user_color'];

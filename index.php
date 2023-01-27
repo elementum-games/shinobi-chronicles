@@ -123,7 +123,12 @@ else {
 		$logout_limit = 1440;
 	}
 	else if($player->forbidden_seal) {
-		$logout_limit *= 2;
+        if(is_object(json_decode($player->forbidden_seal))) {
+            $seal_data = json_decode($player->forbidden_seal);
+            $seal = new ForbiddenSeal($system, $seal_data->level, $seal_data->time);
+            $seal->setBenefits();
+            $logout_limit = $seal->logout_timer;
+        }
 	}
 	// Check logout timer
 	if($player->last_login < time() - ($logout_limit * 60)) {
@@ -224,6 +229,11 @@ if($LOGGED_IN) {
 		}
 		exit;
 	}
+	
+	// NEW MESSAGE ALERT
+	$playerInbox = new InboxManager($system, $player);
+	$new_inbox_message = $playerInbox->checkIfUnreadMessages();
+	$new_inbox_alerts = $playerInbox->checkIfUnreadAlerts();
 
 	// Notifications
 	if(!$ajax) {
@@ -446,7 +456,9 @@ if($LOGGED_IN) {
                 continue;
             }
 
-            echo "<li><a id='sideMenuOption-".str_replace(' ', '', $page['title'])."' href='{$system->link}?id=$id'>" . $page['title'] . "</a></li>";
+			$menu_alert_icon =  ($page['title'] === 'Inbox' && ($new_inbox_message || $new_inbox_alerts)) ? 'sidemenu_new_message_alert' : null;
+
+            echo "<li><a id='sideMenuOption-".str_replace(' ', '', $page['title'])."' href='{$system->link}?id=$id' class='{$menu_alert_icon}'>" . $page['title'] . "</a></li>";
         }
 
 		echo $action_menu_header;

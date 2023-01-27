@@ -74,17 +74,20 @@ function store() {
 					throw new Exception("Your supply of this item is already full!");
 				}
 
-				if ($player->money < $shop_items[$item_id]['purchase_cost'] * $max_missing) {
+				if ($player->getMoney() < $shop_items[$item_id]['purchase_cost'] * $max_missing) {
 					throw new Exception("You do not have enough money to buy the max amount!");
 
 				}
-				$player->money -= $shop_items[$item_id]['purchase_cost'] * $max_missing;
+				$player->subtractMoney(
+                    $shop_items[$item_id]['purchase_cost'] * $max_missing,
+                    "Purchased {$max_missing} of item #{$item_id}"
+                );
 				$player->items[$item_id]['item_id'] = $item_id;
 				$player->items[$item_id]['quantity'] = $max_consumables;
 
 			} else { //code for handling single purchases
 				// Check for money requirement
-				if($player->money < $shop_items[$item_id]['purchase_cost']) {
+				if($player->getMoney() < $shop_items[$item_id]['purchase_cost']) {
 					throw new Exception("You do not have enough money!");
 				}
 			
@@ -95,7 +98,7 @@ function store() {
 					}
 				}
 
-				$player->money -= $shop_items[$item_id]['purchase_cost'];
+				$player->subtractMoney($shop_items[$item_id]['purchase_cost'], "Purchased item #{$item_id}");
 				
 				if(($shop_items[$item_id]['use_type'] == 1 || $shop_items[$item_id]['use_type'] == 2) || !$player->checkInventory($item_id, 'item')) {
 					$player->items[$item_id]['item_id'] = $item_id;
@@ -124,7 +127,7 @@ function store() {
 			}
 			
 			// Check for money requirement
-			if($player->money < $shop_jutsu[$jutsu_id]['purchase_cost']) {
+			if($player->getMoney() < $shop_jutsu[$jutsu_id]['purchase_cost']) {
 				throw new Exception("You do not have enough money!");
 			}
 			
@@ -145,7 +148,7 @@ function store() {
 			
 			
 			// Add to inventory
-			$player->money -= $shop_jutsu[$jutsu_id]['purchase_cost'];
+			$player->subtractMoney($shop_jutsu[$jutsu_id]['purchase_cost'], "Purchased jutsu #{$jutsu_id}");
 
 			$player->jutsu_scrolls[$jutsu_id] = Jutsu::fromArray($jutsu_id, $shop_jutsu[$jutsu_id]);
 			
@@ -258,9 +261,9 @@ function store() {
 		<tr><td style='text-align:center;'>You can buy Jutsu Scrolls in this section for any jutsu of your rank or below.
 		Once you have purchased a scroll, go to the Jutsu page to learn the jutsu.<br />
 		<br />
-		<b>Your money:</b> &yen;$player->money</td></tr></table>
+		<b>Your money:</b> &yen;{$player->getMoney()}</td></tr></table>
 
-		<p style='text-align:center;margin-bottom:0px;'>
+		<p style='text-align:center;margin-bottom:0;'>
 			<a href='$self_link&view=jutsu&jutsu_type=ninjutsu' " . ($jutsu_type == 'ninjutsu' ? $style : "") . ">Ninjutsu</a> |
 			<a href='$self_link&view=jutsu&jutsu_type=taijutsu' " . ($jutsu_type == 'taijutsu' ? $style : "") . ">Taijutsu</a> |
 			<a href='$self_link&view=jutsu&jutsu_type=genjutsu' " . ($jutsu_type == 'genjutsu' ? $style : "") . ">Genjutsu</a>
@@ -322,8 +325,7 @@ function store() {
 		echo "<table class='table'><tr><th>" . ucwords($category) . "</th></tr>
 		<tr><td style='text-align:center;'>You can buy armor/consumable items in this section for your rank or below.<br />
 		<br />
-		<b>Your money:</b> &yen;$player->money</td></tr></table>
-		
+		<b>Your money:</b> &yen;{$player->getMoney()}</td></tr></table>
 		
 		<table class='table'><tr>
 			<th style='width:35%;'>Name</th>

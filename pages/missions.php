@@ -89,6 +89,9 @@ function missions() {
 	return true;
 }
 
+/**
+ * @throws Exception
+ */
 function runActiveMission() {
     global $system;
     global $player;
@@ -111,9 +114,22 @@ function runActiveMission() {
     // Check status/stage
     $mission_status = 1;
 
-    if(!empty($_GET['retreat'])) {
-        $player->battle_id = 0;
-        $mission->nextStage($player->mission_stage['stage_id'] = 4);
+    //Survival Mission State Controls
+    if ($mission->mission_type == 5) {
+        if (!empty($_GET['retreat'])) {
+            $player->battle_id = 0;
+            $mission->nextStage($player->mission_stage['stage_id'] = 4);
+        }
+
+        $continue_mission = false;
+        if (!empty($_GET['continue'])) {
+            $continue_mission = boolval($_GET['continue']);
+        }
+        if ($player->mission_stage['round_complete'] && $continue_mission) {
+            $player->mission_stage['round_complete'] = false;
+            $player->battle_id = 0;
+            $mission_status = $mission->nextStage($player->mission_stage['stage_id']);
+        }
     }
 
     if($mission_status < 2) {
@@ -151,7 +167,13 @@ function runActiveMission() {
                     return true;
                 }
                 else if($mission->mission_type == 5) {		//Survival Mission Combat
-                    if($battle->isPlayerWinner()) {
+                    if ($player->mission_stage['round_complete'] && !$continue_mission)
+                    {
+                        echo("<table class='table'><tr><th>Battle Results</th></tr>
+                        <tr><td>You have defeated your enemy. Either turn back now or push on.
+                        </td></tr></table>");
+                    }
+                    else if($battle->isPlayerWinner() && !$player->mission_stage['round_complete']) {
                         $money_gain = $mission->money;
                         $level_difference = $player->level - $opponent->level;
                         if($level_difference > 9) {
@@ -170,13 +192,11 @@ function runActiveMission() {
                         }
                         if ($player->location == $player->village_location) {
                             $player->mission_stage['stage_id'] = 4;
-                        }  
-                        
-                        $mission_status = $mission->nextStage($player->mission_stage['stage_id']);
+                        }
 
                         $player->mission_stage['ai_defeated']++;
                         $player->mission_stage['mission_money'] += $money_gain;
-                        $player->battle_id = 0;
+                        $player->mission_stage['round_complete'] = true;
                     }
                     else if($battle->isOpponentWinner() || $battle->isDraw()) { //Player Defeat
                         $player->battle_id = 0;
@@ -256,7 +276,7 @@ function runActiveMission() {
         }
         // Team mission
         else if($mission->mission_type == 3) {
-            $player->money += $mission->money;
+            $player->addMoney($mission->money, "Team mission");
             $player->clearMission();
 
             $team_points = 2;
@@ -277,7 +297,7 @@ function runActiveMission() {
         }
         // Clan mission
         else if($mission->mission_type == 2) {
-            $player->money += $mission->money;
+            $player->addMoney($mission->money, "Clan mission");
             $player->clearMission();
             $player->last_ai = time();
 
@@ -323,7 +343,7 @@ function runActiveMission() {
                 $player->missions_completed[$mission->rank] = 1;
             }
 
-            $player->money += $mission->money;
+            $player->addMoney($mission->money, "Village mission complete");
             $player->clearMission();
             $player->last_ai = time();
 
@@ -349,9 +369,13 @@ function runActiveMission() {
 
         // Display to battle link
         if($player->mission_stage['action_type'] == 'combat') {
-            echo "<br /><a href='$self_link'>Enter Combat</a>";
+
             if($mission->mission_type == 5 && $player->mission_stage['action_type'] == 'combat') {
-                echo "| <a href='$self_link&retreat=1'>Retreat</a>";
+                echo "<br /><a href='$self_link&continue=1'>Enter Combat</a> | <a href='$self_link&retreat=1'>Retreat</a>";
+            }
+            else
+            {
+                echo "<br /><a href='$self_link'>Enter Combat</a>";
             }
         }
 

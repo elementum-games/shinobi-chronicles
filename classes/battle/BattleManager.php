@@ -465,7 +465,7 @@ class BattleManager {
     /**
      * @throws Exception
      */
-    protected function runActions() {
+    protected function runActions(): void {
         $this->processTurnEffects();
 
         $this->battle->battle_text = '';

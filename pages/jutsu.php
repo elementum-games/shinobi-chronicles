@@ -16,8 +16,8 @@ function jutsu(): void {
     if($player->rank >= 4) {
         $max_equipped_jutsu++;
     }
-    if($player->forbidden_seal && $player->forbidden_seal['level'] >= 2) {
-        $max_equipped_jutsu++;
+    if($player->forbidden_seal_loaded && $player->forbidden_seal->level != 0) {
+        $max_equipped_jutsu += $player->forbidden_seal->extra_jutsu_equips;
     }
 
     if(!empty($_POST['equip_jutsu'])) {
@@ -121,7 +121,7 @@ function jutsu(): void {
                 $refund = ($player->jutsu[$jutsu_id]->purchase_cost * 0.1); //10% Refund
                 $refund = intval(round($refund)); //round and then convert Float=>Int
                 if($refund > 0 && gettype($refund) == "integer"){
-                    $player->money += $refund; //need an addMoney() function for $Player
+                    $player->addMoney($refund, "Sell jutsu");
                 }
 
                 $player->removeJutsu($jutsu_id);

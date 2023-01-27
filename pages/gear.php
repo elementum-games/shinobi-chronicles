@@ -16,9 +16,9 @@ function gear(): void {
 		$max_equipped_armor++;
 		$max_equipped_weapons++;
 	}
-	if($player->forbidden_seal && $player->forbidden_seal['level'] >= 2) {
-		$max_equipped_armor++;
-		$max_equipped_weapons++;
+	if($player->forbidden_seal_loaded && $player->forbidden_seal->level != 0) {
+		$max_equipped_armor += $player->forbidden_seal->extra_armor_equips;
+		$max_equipped_weapons += $player->forbidden_seal->extra_weapon_equips;
 	}
 
 	if(isset($_POST['equip_item'])) {

@@ -1,0 +1,6 @@
+START TRANSACTION;
+
+ALTER TABLE `users`
+    ADD COLUMN `chat_effect` VARCHAR(100) AFTER `chat_color`;
+
+COMMIT;
