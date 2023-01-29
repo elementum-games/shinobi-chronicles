@@ -198,23 +198,24 @@ if($LOGGED_IN) {
 		}
 		exit;
 	}	
-	if($player->ban_type == 'game') {
-		$ban_time = $player->ban_expire - time();
-		$ban_message = 'You are currently banned from the game. Time remaining: ';
-		$ban_message .= $system->time_remaining($ban_time);
-		if(!$ajax) {
-			echo str_replace("[HEADER_TITLE]", "Profile", $body_start);
-		}
-		echo "<table class='table'><tr><th>Game Ban</th></tr>
-		<tr><td style='text-align:center;'>
-		$ban_message
-		</td></tr></table>";
-		if(!$ajax) {
-			echo $side_menu_start . $side_menu_end;
-			echo str_replace('<!--[VERSION_NUMBER]-->', System::VERSION_NUMBER, $footer);
-		}
-		exit;
-	}
+	if($player->checkBan(StaffManager::BAN_TYPE_GAME)) {
+        $ban_type = StaffManager::BAN_TYPE_GAME;
+        $expire_int = $player->ban_data[$ban_type];
+        $ban_expire = ($expire_int == StaffManager::PERM_BAN_VALUE ? $expire_int : $system->time_remaining($player->ban_data[StaffManager::BAN_TYPE_GAME] - time()));
+
+        //Display header
+        if(!$ajax) {
+            echo str_replace("[HEADER_TITLE]", "Profile", $body_start);
+        }
+        //Ban info
+        require 'templates/ban_info.php';
+        // Footer
+        if(!$ajax) {
+            echo $side_menu_start . $side_menu_end;
+            echo str_replace('<!--[VERSION_NUMBER]-->', System::VERSION_NUMBER, $footer);
+        }
+        exit;
+    }
 	$result = $system->query("SELECT `id` FROM `banned_ips` WHERE `ip_address`='" . $system->clean($_SERVER['REMOTE_ADDR']) . "' LIMIT 1");
 	if($system->db_last_num_rows > 0) {
 		if(!$ajax) {
