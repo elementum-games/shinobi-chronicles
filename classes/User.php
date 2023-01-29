@@ -5,6 +5,7 @@ require_once __DIR__ . "/Team.php";
 require_once __DIR__ . "/DailyTask.php";
 require_once __DIR__ . "/ForbiddenSeal.php";
 require_once __DIR__ . "/battle/Fighter.php";
+require_once __DIR__ . "/StaffManager.php";
 
 /*	Class:		User
 	Purpose:	Fetch user data and load into class variables.
@@ -41,6 +42,10 @@ class User extends Fighter {
     const STAFF_CONTENT_ADMIN = 3;
     const STAFF_ADMINISTRATOR = 4;
     const STAFF_HEAD_ADMINISTRATOR = 5;
+
+    static public $staff_names = [
+
+    ];
 
     const SUPPORT_NONE = 0;
     const SUPPORT_BASIC = 1;
@@ -92,6 +97,7 @@ class User extends Fighter {
 
     public $exp;
     public $staff_level;
+    public bool|StaffManager $staff_manager;
     public $support_level;
     public int $bloodline_id;
     public $bloodline_name;
@@ -134,6 +140,7 @@ class User extends Fighter {
     public ?Bloodline $bloodline = null;
     public float $bloodline_skill;
 
+    public $ban_data;
     public $ban_type;
     public $ban_expire;
     public $journal_ban;
@@ -246,7 +253,7 @@ class User extends Fighter {
         $this->user_id = $this->system->clean($user_id);
         $this->id = self::ENTITY_TYPE . ':' . $this->user_id;
 
-        $result = $this->system->query("SELECT `user_id`, `user_name`, `ban_type`, `ban_expire`, `journal_ban`, `avatar_ban`, `song_ban`, `last_login`,
+        $result = $this->system->query("SELECT `user_id`, `user_name`, `ban_data`, `ban_type`, `ban_expire`, `journal_ban`, `avatar_ban`, `song_ban`, `last_login`,
 			`forbidden_seal`, `chat_color`, `chat_effect`, `staff_level`, `username_changes`, `support_level`, `special_mission`
 			FROM `users` WHERE `user_id`='$this->user_id' LIMIT 1"
         );
@@ -261,7 +268,12 @@ class User extends Fighter {
 
         $this->staff_level = $result['staff_level'];
         $this->support_level = $result['support_level'];
+        //Run loadStaffManager on pages that require it be used (examples Mod Functions [done -Hitori], Admin Functions [work not started]
+        //Admin side of support [work not started], Chat [not started]
+        //Legacy support will remain in place until this system is fully utilized (i.e. using $player->isModerator, etc.)
+        $this->staff_manager = false;
 
+        $this->ban_data = $this->loadBanData($result['ban_data']);
         $this->ban_type = $result['ban_type'];
         $this->ban_expire = $result['ban_expire'];
         $this->journal_ban = $result['journal_ban'];
@@ -275,12 +287,25 @@ class User extends Fighter {
         $this->chat_color = $result['chat_color'];
         $this->chat_effect = $result['chat_effect'];
 
-        if($this->ban_type && $this->ban_expire <= time()) {
-            $this->system->message("Your " . $this->ban_type . " ban has ended.");
-            $this->ban_type = '';
-
-            $this->system->query("UPDATE `users` SET `ban_type`='', `ban_expire`='0' WHERE `user_id`='$this->user_id' LIMIT 1");
+        //Todo: Remove this in a couple months, only a temporary measure to support current bans
+        if($this->ban_type) {
+            if($this->ban_expire > time()) {
+                $this->ban_data[$this->ban_type] = $this->ban_expire;
+                $ban_data = json_encode($this->ban_data);
+                $this->system->query("UPDATE `users` SET
+                    `ban_data` = '{$ban_data}',
+                   `ban_type` = '',
+                   `ban_expire` = NULL
+                WHERE `user_id`='{$this->user_id}' LIMIT 1");
+            }
         }
+
+        //Check ban expiry
+        $ban_expiry = $this->checkBanExpiry();
+        if($ban_expiry != false) {
+            $this->system->message($ban_expiry);
+        }
+
 
         $this->inventory_loaded = false;
 
@@ -919,6 +944,60 @@ class User extends Fighter {
         }
 
         return $display;
+    }
+
+    public function loadBanData($ban_data) {
+        if($ban_data === null) {
+            return array(
+                StaffManager::BAN_TYPE_CHAT => false,
+                StaffManager::BAN_TYPE_GAME => false
+            );
+        }
+        else {
+            return json_decode($ban_data, true);
+        }
+    }
+    public function checkBanExpiry():bool|string {
+        if($this->ban_data != null) {
+            $ban_expired = false;
+            $ban_expire_return_string = 'Your ';
+
+            foreach($this->ban_data as $ban_name => $ban_expire_time) {
+                if($ban_expire_time != -1 && $ban_expire_time - time() <= 0) {
+                    $ban_expired = true;
+                    unset($this->ban_data[$ban_name]);
+                    $ban_expire_return_string .= "$ban_name ban & ";
+                }
+            }
+
+            if($ban_expired) {
+                //Format data if no bans are presnet
+                $ban_data = (!empty($this->ban_data)) ? json_encode($this->ban_data) : null;
+                //Update user table to remove ban(s)
+                $this->system->query("UPDATE `users` SET `ban_data`='{$ban_data}' WHERE `user_id`='{$this->user_id}' LIMIT 1");
+                //Return ban message expiry message for display
+                if ($this->system->db_last_affected_rows) {
+                    echo "I am returning...";
+                    return substr($ban_expire_return_string, 0, strlen($ban_expire_return_string) - 2)
+                        . " has expired.";
+                }
+            }
+        }
+        return false;
+    }
+    public function checkBan($type):bool {
+        if(in_array($type, StaffManager::$ban_types) && isset($this->ban_data[$type])) {
+            if($this->ban_data[$type] == StaffManager::PERM_BAN_VALUE || $this->ban_data[$type] - time() >= 1) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public function loadStaffManager() {
+        if(!$this->staff_manager instanceof StaffManager) {
+            $this->staff_manager = new StaffManager($this);
+        }
     }
 
     public function getInventory() {
