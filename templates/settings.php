@@ -21,22 +21,22 @@
             <div style='float:left;width:200px;'>
                 <?=$system->imageCheck($player->avatar_link, $player->getAvatarSize())?>
             </div>
-            <div>
-                <b>Avatar info:</b><br />
-                Avatar must be hosted on another website<br />
-                Default limit: <?=$player->getAvatarSize()?> x <?=$player->getAvatarSize()?> pixels<br />
-                Avatar can be larger than the limit, but it will be resized<br />
-                Max filesize: <?=$player->getAvatarFileSize()?><br />
-            </div>
-            <br style='clear:both;' />
-            <br />
-            <?php if(!$player->avatar_ban):?>
-                <form action='<?=$self_link?>' method='post'>
-                    <input type='text' name='avatar_link' value='<?=$player->avatar_link?>' style='width:250px;' /><br />
-                    <input type='submit' name='change_avatar' value='Change' />
-                </form>
+            <?php if(!$player->checkBan(StaffManager::BAN_TYPE_AVATAR)):?>
+                <div>
+                    <b>Avatar info:</b><br />
+                    Avatar must be hosted on another website<br />
+                    Default limit: <?=$player->getAvatarSize()?> x <?=$player->getAvatarSize()?> pixels<br />
+                    Avatar can be larger than the limit, but it will be resized<br />
+                    Max filesize: <?=$player->getAvatarFileSize()?><br />
+                    <br />
+                    <form action='<?=$self_link?>' method='post'>
+                        <input type='text' name='avatar_link' value='<?=$player->avatar_link?>' style='width:250px;margin-bottom:5px;' />
+                        <input type='submit' name='change_avatar' value='Change' />
+                    </form>
+                </div>
+                <br style='clear:both;' />
             <?php else: ?>
-                <p>You are currently banned from changing your avatar.</p>
+                <p style="margin-top:90px;">You are currently banned from changing your avatar.</p>
             <?php endif ?>
         </td>
     </tr>
@@ -44,13 +44,15 @@
     <tr>
         <td>
             <form action='<?=$self_link?>' method='post'>
-                <label for='current_password' style='width:150px;'>Current password:</label>
-                <input type='password' name='current_password' /><br />
-                <label for='new_password' style='width:150px;'>New password:</label>
-                <input type='password' name='new_password' /><br />
-                <label for='confirm_new_password' style='width:150px;'>Confirm new password:</label>
-                <input type='password' name='confirm_new_password' /><br />
-                <p style='text-align:center;'>
+                <div style="margin-left:145px;">
+                    <label for='current_password' style='width:150px;margin-bottom:5px;'>Current password:</label>
+                    <input type='password' name='current_password' /><br />
+                    <label for='new_password' style='width:150px;margin-bottom:5px;'>New password:</label>
+                    <input type='password' name='new_password' /><br />
+                    <label for='confirm_new_password' style='width:150px;margin-bottom:5px;'>Confirm new password:</label>
+                    <input type='password' name='confirm_new_password' />
+                </div>
+                <p style='text-align:center;margin:0;'>
                     <input type='submit' name='change_password' value='Change' />
                 </p>
             </form>
@@ -58,7 +60,7 @@
     </tr>
     <tr><th>Layout</th></tr>
     <tr>
-        <td>
+        <td style="text-align: center;">
             <form action='<?=$self_link?>' method='post'>
                 <select name='layout'>";
                     <?php foreach($layouts as $layout):?>
@@ -79,7 +81,7 @@
             <?php endif ?>
             <br />
             <form action='<?=$self_link?>' method='post'>
-                <input type='text' name='blacklist_name' style='width:250px;' /> <br />
+                <input type='text' name='blacklist_name' style='width:250px;margin-bottom:5px;' /> <br />
                 <input type='submit' name='blacklist_add' value='Add' />
                 <input type='submit' name='blacklist_remove' value='Remove' />
             </form>
@@ -88,14 +90,14 @@
     <tr><th>Journal</th></tr>
     <tr>
         <td style='text-align:center;'>
-            <?php if($player->staff_level && !$player->forbidden_seal_loaded): ?>
-                <i>(Images will be resized down to a max of <?=$psuedoSeal->journal_image_x?>x<?=$psuedoSeal->journal_image_y?>)</i>
-            <?php elseif($player->forbidden_seal_loaded && $player->forbidden_seal->level != 0): ?>
-                <i>(images will be resized down to a max of <?=$player->forbidden_seal->journal_image_x?>x<?=$player->forbidden_seal->journal_image_y?>)</i>
-            <?php else: ?>
-                <i>(images will be resized down to a max of 200x300)</i>
-            <?php endif ?>
-            <?php if(!$player->journal_ban):?>
+            <?php if(!$player->checkBan(StaffManager::BAN_TYPE_JOURNAL)):?>
+                <?php if($player->staff_level && !$player->forbidden_seal_loaded): ?>
+                    <i>(Images will be resized down to a max of <?=$psuedoSeal->journal_image_x?>x<?=$psuedoSeal->journal_image_y?>)</i>
+                <?php elseif($player->forbidden_seal_loaded && $player->forbidden_seal->level != 0): ?>
+                    <i>(images will be resized down to a max of <?=$player->forbidden_seal->journal_image_x?>x<?=$player->forbidden_seal->journal_image_y?>)</i>
+                <?php else: ?>
+                    <i>(images will be resized down to a max of 200x300)</i>
+                <?php endif ?>
                 <script type=text/javascript>
                     $(document).ready(function(){
                         $('#journalMessage').keyup(function (evt) {
@@ -120,7 +122,6 @@
                 ><?= stripslashes($journal) ?></textarea>
                 <br />
                 <span id='remainingCharacters' class='red'></span>
-                <br />
                 <input type='submit' name='change_journal' value='Update' />
             </form>
             <?php else: ?>

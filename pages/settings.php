@@ -36,9 +36,9 @@ function userSettings() {
 	if(!empty($_POST['change_avatar'])) {
 		$avatar_link = trim($_POST['avatar_link']);
 		try {
-			if($player->avatar_ban) {
-				throw new Exception("You are currently banned from changing your avatar.");
-			}
+			if($player->checkBan(StaffManager::BAN_TYPE_AVATAR)) {
+                throw new Exception("You are currently banned from changing your avatar.");
+            }
 		
 			if(strlen($avatar_link) < 5) {
 				throw new Exception("Please enter an avatar link!");
@@ -131,8 +131,8 @@ function userSettings() {
 
             $journal = $system->clean($_POST['journal']);
 
-			if($player->journal_ban) {
-				throw new Exception("You are currently banned from changing your avatar.");
+			if($player->checkBan(StaffManager::BAN_TYPE_JOURNAL)) {
+				throw new Exception("You are currently banned from changing your journal.");
 			}
 			
 			$system->query("UPDATE `journals` SET `journal`='$journal' WHERE `user_id`='{$player->user_id}' LIMIT 1");

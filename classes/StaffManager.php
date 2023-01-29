@@ -9,8 +9,6 @@ class StaffManager {
     public int $user_id;
     public string $user_name;
 
-    const FULL_LOCK = 5;
-    const PARTIAL_LOCK = 3;
     const PERM_BAN_VALUE = -1;
 
     const BAN_TYPE_GAME = 'game';
@@ -20,6 +18,7 @@ class StaffManager {
     //They are managed in a different manner
     const BAN_TYPE_AVATAR = 'avatar';
     const BAN_TYPE_JOURNAL = 'journal';
+    const BAN_TYPE_IP = 'restricted site access';
     public static array $ban_types = [
         self::BAN_TYPE_CHAT, self::BAN_TYPE_GAME, self::BAN_TYPE_PM
     ];
@@ -96,7 +95,7 @@ class StaffManager {
      */
     public function getLockedUsers():array {
         $return = [];
-        $query = "SELECT `user_name`, `user_id`, `failed_logins` FROM `users` WHERE `failed_logins` >= " . self::PARTIAL_LOCK
+        $query = "SELECT `user_name`, `user_id`, `failed_logins` FROM `users` WHERE `failed_logins` >= " . User::PARTIAL_LOCK
             . " ORDER BY `failed_logins` DESC";
         $result = $this->system->query($query);
         if($this->system->db_last_num_rows) {
@@ -239,6 +238,14 @@ class StaffManager {
         return $this->system->db_fetch($result);
     }
 
+    public function getBannedIP($ip_address) {
+        $result = $this->system->query("SELECT * FROM `banned_ips` WHERE `ip_address`='{$ip_address}' LIMIT 1");
+        if($this->system->db_last_num_rows) {
+            return $this->system->db_fetch($result);
+        }
+        return false;
+    }
+
     public function canBanUser($new_ban_type, $new_ban_expire, $user_data) {
         $new_ban_expire = time() + ($new_ban_expire * 86400);
         $ban_data = json_decode($user_data['ban_data'], true);
@@ -291,6 +298,25 @@ class StaffManager {
                 return true;
             default:
                 throw new Exception("Invalid staff level!");
+        }
+    }
+
+    public function canUnbanUser($user_data) {
+        switch($this->staff_level) {
+            case self::STAFF_HEAD_MODERATOR:
+                if($user_data['staff_level'] == self::STAFF_HEAD_MODERATOR || $user_data['staff_level'] >= self::STAFF_ADMINISTRATOR) {
+                    throw new Exception("You do not have permission to unban this user!");
+                }
+                return true;
+            case self::STAFF_ADMINISTRATOR:
+                if($user_data['staff_level'] == self::STAFF_HEAD_ADMINISTRATOR) {
+                    throw new Exception("You do not have permission to unban this user!");
+                }
+                return true;
+            case self::STAFF_HEAD_ADMINISTRATOR:
+                return true;
+            default:
+                throw new Exception("You do not have permission to unban members!");
         }
     }
 
@@ -347,6 +373,44 @@ class StaffManager {
             return false;
         }
 
+        return false;
+    }
+
+    public function unbanUser($unban_type, $user_data) {
+        $ban_data = json_decode($user_data['ban_data'], true);
+        $unban_string = '';
+
+        if(is_array($unban_type)) {
+            $unbanned = false;
+            foreach($unban_type as $ban_type) {
+                if(isset($ban_data[$ban_type])) {
+                    $unbanned = true;
+                    $unban_string = ucwords($ban_type) . " Ban, ";
+                    unset($ban_data[$ban_type]);
+                }
+            }
+            if(!$unbanned) {
+                throw new Exception("Player is not currently banned.");
+            }
+            $unban_string = substr($unban_string, 0, strlen($unban_string)-2);
+        }
+        else {
+            if(!isset($ban_data[$unban_type])) {
+                return false;
+            }
+            $unban_string = ucwords($unban_type) . " Ban";
+            unset($ban_data[$unban_type]);
+        }
+
+        $ban_data = empty($ban_data) ? '' : json_encode($ban_data);
+
+        $this->system->query("UPDATE `users` SET `ban_data`='{$ban_data}' WHERE `user_id`='{$user_data['user_id']}' LIMIT 1");
+        if($this->system->db_last_affected_rows) {
+            $this->staffLog(StaffManager::STAFF_LOG_HEAD_MOD,
+                "($this->user_name} ({$this->user_id}) removed {$user_data['user_name']}\'s ({$user_data['user_id']}) "
+                . $unban_string . ".");
+            return true;
+        }
         return false;
     }
 

@@ -21,6 +21,11 @@
                 <div style='width:210px;margin-left:auto;margin-right:auto;text-align:center;'>
                     <p>Username</p>
                     <input type='text' name='user_name' value='<?=($_GET['unban_user_name'] ?? "")?>' /><br />
+                    <select name='ban_type' style='width:100px;margin-top:5px;'>
+                        <?php foreach(StaffManager::$ban_types as $type): ?>
+                            <option value="<?=$type?>"><?=ucwords($type)?> Ban</option>
+                        <?php endforeach ?>
+                    </select>
                 </div>
                 <p style='margin-top:3px;text-align:center;'>
                     <input type='submit' name='unban' value='Unban'  />
@@ -65,6 +70,11 @@
                 <input type='text' name='ip_address' value='<?=($_GET['unban_ip_address'] ?? "")?>' /><br />
                 <input style='margin-top:5px;' type='submit' name='unban_ip' value='Unban' />
             </form>
+        </td>
+    </tr>
+    <tr>
+        <td colspan="2" style="text-align: center">
+            <a href="<?=$self_link?>&view=banned_ips">View Banned IP Addresses</a>
         </td>
     </tr>
     <tr><th colspan='2'>Global Message</th></tr>

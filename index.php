@@ -81,13 +81,13 @@ if(!isset($_SESSION['user_id'])) {
 			}
 
 			// Check failed logins
-			if($result['failed_logins'] >= 3 && $_SERVER['REMOTE_ADDR'] != $result['current_ip'] && $_SERVER['REMOTE_ADDR'] != $result['last_ip']) {
+			if($result['failed_logins'] >= User::PARTIAL_LOCK && $_SERVER['REMOTE_ADDR'] != $result['current_ip'] && $_SERVER['REMOTE_ADDR'] != $result['last_ip']) {
 				throw new Exception("Account has been locked out!");
 				$system->query("INSERT INTO `logs` (`log_type`, `log_time`, `log_contents`)
 					VALUES ('malicious_lockout', '" . time() . "', 'IP address " . $_SERVER['REMOTE_ADDR'] . " failed login on account " .
 					$result['user_name'] . " not matching previous IPs " . $result['current_ip'] . " or " . $result['last_ip'] . ".'");
 			}
-			else if($result['failed_logins'] >= 5) {
+			else if($result['failed_logins'] >= User::FULL_LOCK) {
 				throw new Exception("Account has been locked out!");
 			}
 
@@ -218,17 +218,22 @@ if($LOGGED_IN) {
     }
 	$result = $system->query("SELECT `id` FROM `banned_ips` WHERE `ip_address`='" . $system->clean($_SERVER['REMOTE_ADDR']) . "' LIMIT 1");
 	if($system->db_last_num_rows > 0) {
-		if(!$ajax) {
-			echo str_replace("[HEADER_TITLE]", "Profile", $body_start);
-		}
-		echo "<table class='table'><tr><th>Game Ban</th></tr>
-		<tr><td style='text-align:center;'>
-		You are currently banned from the game. Please contact a head moderator on the forums if you have any questions.
-		</td></tr></table>";
-		if(!$ajax) {
-			echo $side_menu . $menu_end . $footer;
-		}
-		exit;
+        $ban_type = StaffManager::BAN_TYPE_IP;
+        $expire_int = -1;
+        $ban_expire = ($expire_int == StaffManager::PERM_BAN_VALUE ? $expire_int : $system->time_remaining($player->ban_data[StaffManager::BAN_TYPE_GAME] - time()));
+
+        //Display header
+        if(!$ajax) {
+            echo str_replace("[HEADER_TITLE]", "Profile", $body_start);
+        }
+        //Ban info
+        require 'templates/ban_info.php';
+        // Footer
+        if(!$ajax) {
+            echo $side_menu_start . $side_menu_end;
+            echo str_replace('<!--[VERSION_NUMBER]-->', System::VERSION_NUMBER, $footer);
+        }
+        exit;
 	}
 	
 	// NEW MESSAGE ALERT

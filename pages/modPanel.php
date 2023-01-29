@@ -114,6 +114,10 @@ function modPanel() {
                 }
             }
 
+            if(!$avatar_ban && !$avatar_remove && !$journal_ban && !$journal_remove) {
+                throw new Exception("Please select an option!");
+            }
+
             //Check if avatar ban/remove can be performed
             if($avatar_ban || $avatar_remove) {
                 $player->staff_manager->canBanUser(StaffManager::BAN_TYPE_AVATAR, StaffManager::PERM_BAN_VALUE, $user_data);
@@ -300,11 +304,12 @@ function modPanel() {
 		}
 		$system->printMessage();
 	}
-	// Locked out users
+	// Locked out users [panel upgrade done -Hitori]
 	if(!empty($_GET['unlock_account']) && $player->staff_manager->isHeadModerator()) {
 		$user_id = (int)$system->clean($_GET['unlock_account']);
 		$result = $system->query("UPDATE `users` SET `failed_logins`=0 WHERE `user_id`='$user_id' LIMIT 1");
 		if($system->db_last_affected_rows > 0) {
+            $player->staff_manager->staffLog(StaffManager::STAFF_LOG_HEAD_MOD, "{$player->user_name} ({$player->user_id}) unlocked account ID {$user_id}.");
 			$system->message("Account unlocked!");
 		}
 		else {
@@ -314,16 +319,17 @@ function modPanel() {
 	}
 	// HM actions
 	if($player->staff_manager->isHeadModerator()) {
-		// Ban IP
+		// Ban IP [mod panel upgrade done -Hitori]
 		if(!empty($_POST['ban_ip'])) {
 			try {
 				$ip_address = $system->clean($_POST['ip_address']);
-				$result = $system->query("SELECT `id` FROM `banned_ips` WHERE `ip_address`='$ip_address' LIMIT 1");
-				if($system->db_last_num_rows > 0) {
+				if($player->staff_manager->getBannedIP($ip_address)) {
 					throw new Exception("IP address has already been banned!");
 				}
 				$system->query("INSERT INTO `banned_ips` (`ip_address`, `ban_level`) VALUES ('$ip_address', 2)");
 				if($system->db_last_affected_rows == 1) {
+                    $player->staff_manager->staffLog(StaffManager::STAFF_LOG_HEAD_MOD,
+                        "{$player->user_name} ({$player->user_id}) banned IP Address: $ip_address.");
 					$system->message("IP address '$ip_address' banned!");
 				}
 				else {
@@ -333,43 +339,40 @@ function modPanel() {
 				$system->message($e->getMessage());
 			}
 		}
-		// Social/game unban
+		// Social/game/pm unban [mod panel upgrade done -Hitori]
 		if(!empty($_POST['unban'])) {
 			try {
-				if(!isset($_POST['user_name'])) {
-					throw new Exception("Invalid username!");
-				}
 				$user_name = $system->clean($_POST['user_name']);
-				$result = $system->query("SELECT `user_id`, `user_name`, `staff_level`, `ban_type`, `ban_expire` FROM `users` WHERE `user_name`='$user_name'");
-				if($system->db_last_num_rows == 0) {
+                $unban_type = $system->clean($_POST['ban_type']);
+                $user_data = $player->staff_manager->getUserByName($user_name);
+
+                //Check if user exists
+                if(!isset($_POST['user_name'])) {
+                    throw new Exception("Invalid username!");
+                }
+				if(!$user_data) {
 					throw new Exception("Invalid username!");
 				}
-				$user_data = $system->db_fetch($result);
-                // TODO: rewrite this logic to take content admins out of it
-				if($user_data['staff_level'] >= $player->staff_level and !$player->isHeadAdmin()) {
-					throw new Exception("You cannot unban fellow staff members!");
-				}
-				if(!$user_data['ban_type']) {
-					throw new Exception("User is not banned!");
-				}
+                //Check if unban can be performed by user
+                $player->staff_manager->canUnbanUser($user_data);
+                //Check if ban exists
+                $ban_data = json_decode($user_data['ban_data'], true);
+                if(empty($ban_data) || !isset($ban_data[$unban_type])) {
+                    throw new Exception("$user_name does not currently have a " . ucwords($unban_type) . " Ban!");
+                }
+                //Check if unban data is correct
+                if(!in_array($unban_type, StaffManager::$ban_types)) {
+                    throw new Exception("Invalid ban type!");
+                }
+
 				// Run query if confirmed
 				if(!isset($_POST['confirm'])) {
-					echo "<table class='table'><tr><th>Confirm Ban Removal</th></tr>
-					<tr><td style='text-align:center;'>" .
-					"Remove " . $user_data['user_name'] . "'s " . ucwords($user_data['ban_type']) . " ban?<br />" .
-					"<form action='$self_link' method='post'>
-					<input type='hidden' name='user_name' value='{$user_data['user_name']}' />
-					<input type='hidden' name='confirm' value='1' />
-					<input type='submit' name='unban' value='Confirm' />
-					</form>
-					</td></tr></table>";
+					require 'templates/staff/mod/unban_confirm.php';
 				}
 				else {
-					$system->query("UPDATE `users` SET `ban_type`='', `ban_expire`='0' 
-						WHERE `user_id`='{$user_data['user_id']}' LIMIT 1");
-					if($system->db_last_affected_rows == 1) {
-						$system->message("User unbanned!");
-					}
+					if($player->staff_manager->unbanUser($unban_type, $user_data)) {
+                        $system->message("User unbanned!");
+                    }
 					else {
 						$system->message("Error unbanning user!");
 					}
@@ -378,16 +381,17 @@ function modPanel() {
 				$system->message($e->getMessage());
 			}
 		}
-		// Unban IP
+		// Unban IP [mod penal upgrade complete -Hitori]
 		if(!empty($_POST['unban_ip'])) {
 			try {
 				$ip_address = $system->clean($_POST['ip_address']);
-				$result = $system->query("SELECT `id` FROM `banned_ips` WHERE `ip_address`='$ip_address' LIMIT 1");
-				if($system->db_last_num_rows == 0) {
+				if(!$player->staff_manager->getBannedIP($ip_address)) {
 					throw new Exception("IP address is not banned!");
 				}
 				$system->query("DELETE FROM `banned_ips` WHERE `ip_address`='$ip_address' LIMIT 1");
 				if($system->db_last_affected_rows == 1) {
+                    $player->staff_manager->staffLog(StaffManager::STAFF_LOG_HEAD_MOD,
+                        "{$player->user_name} ({$player->user_id}) unbanned IP: $ip_address.");
 					$system->message("IP address '$ip_address' unbanned!");
 				}
 				else {
@@ -397,123 +401,63 @@ function modPanel() {
 				$system->message($e->getMessage());
 			}
 		}
-		// Journal/avatar/profile song unban
+		// Journal/avatar/profile song unban [mod panel upgrade compelte -Hitori]
 		else if(!empty($_POST['profile_unban'])) {
 			try {
-				if(!empty($_POST['journal'])) {
-					$journal = $_POST['journal'];
-				}
-				if(!empty($_POST['avatar'])) {
-					$avatar = $_POST['avatar'];
-				}
-				if(!empty($_POST['song'])) {
-					$song = $_POST['song'];
-				}
-				$unban_journal = false;
-				$unban_avatar = false;
-				$unban_song = false;
-				if($journal == 'unban') {
-					$unban_journal = true;
-				}
-				if($avatar == 'unban') {
-					$unban_avatar = true;
-				}
-				if($song == 'unban') {
-					$unban_song = true;
-				}
-				if(!$unban_journal && !$unban_avatar && !$unban_song) {
-					throw new Exception("Please select an option!");
-				}
-				// Check username
+                $unban_avatar = (isset($_POST['journal'])) ?? false;
+                $unban_journal = (isset($_POST['avatar'])) ?? false;
+
+				$to_unban = [];
+                if($unban_avatar) {
+                    $to_unban[] = StaffManager::BAN_TYPE_AVATAR;
+                }
+                if($unban_journal) {
+                    $to_unban[] = StaffManager::BAN_TYPE_JOURNAL;
+                }
+
+                //Check if unban set
+                if(empty($to_unban)) {
+                    throw new Exception("Select an option to unban!");
+                }
+                // Check username
 				$user_name = $system->clean($_POST['user_name']);
-				$result = $system->query("SELECT `user_id`, `user_name`, `staff_level` FROM `users` WHERE `user_name`='$user_name'");
-				if($system->db_last_num_rows == 0) {
+                $user_data = $player->staff_manager->getUserByName($user_name);
+				if(!$user_data) {
 					throw new Exception("Invalid username!");
 				}
-				$user_data = $system->db_fetch($result);
-				// TODO: rewrite this logic to take content admins out of it
-				if($user_data['staff_level'] >= $player->staff_level and !$player->isHeadAdmin()) {
-					throw new Exception("You cannot unban fellow staff members!");
-				}
-				// Build query
-				$add_comma = false;
-				$query = "UPDATE `users` SET ";
-				if($unban_journal) {
-					$query .= "`journal_ban`='0'";
-					$add_comma = true;
-				}
-				if($unban_avatar) {
-					if($add_comma) {
-						$query .= ", ";
-						$add_comma = false;
-					}
-					$query .= "`avatar_ban`='0'";
-					$add_comma = true;
-				}
-				if($unban_song) {
-					if($add_comma) {
-						$query .= ", ";
-						$add_comma = false;
-					}
-					$query .= "`song_ban`='0'";
-					$add_comma = true;
-				}
-				$query .= " WHERE `user_id` = '{$user_data['user_id']}' LIMIT 1";
-				$system->query($query);
-				// Set error flags
-				$error = false;
-				if($system->db_last_affected_rows == 0) {
-					$error = true;
-					if($unban_journal) {
-						$ban_journal = -1;
-					}
-					if($unban_avatar) {
-						$ban_avatar = -1;
-					}
-					if($unban_song) {
-						$ban_avatar = -1;
-					}
-				}
-				// Error message
-				if($error) {
-					if($unban_journal == -1 || $unban_avatar == -1 || $unban_song == -1) {
-						$system->message("Error unbanning journal/avatar/profile song! (or it is already banned)");
-					}
-				}
-				// Success message
-				if(!$error) {
-					$add_comma = false;
-					$message = '';
-					if($unban_journal) {
-						$message .= "journal unbanned";
-						$add_comma = true;
-					}
-					if($unban_avatar) {
-						if($add_comma) {
-							$message .= ', ';
-						}
-						$message .= "avatar unbanned";
-						$add_comma = true;
-					}
-					if($unban_song) {
-						if($add_comma) {
-							$message .= ', ';
-						}
-						$message .= "profile song unbanned";
-						$add_comma = true;
-					}
-					$message .= '!';
-					$message = ucfirst($message);
-					$system->message($message);
-				}
+                $player->staff_manager->canUnbanUser($user_data);
+
+                if($player->staff_manager->unbanUser($to_unban, $user_data)) {
+                    $message_string = "{$user_data['user_name']}'s ";
+                    $appendAnd = false;
+                    if($unban_avatar) {
+                        $message_string .= "avatar ";
+                        $appendAnd = true;
+                    }
+                    if($unban_journal) {
+                        if($appendAnd) {
+                            $message_string .= "& ";
+                        }
+                        $message_string .= "journal ";
+                    }
+
+                    if($appendAnd) {
+                        $message_string .= "bans ";
+                    }
+                    else {
+                        $message_string .= "ban ";
+                    }
+                    $message_string .= "have been removed.";
+                    $system->message($message_string);
+                }
+                else {
+                    $system->message("Error removing avatar/journal ban.");
+                }
 			} catch (Exception $e) {
 				$system->message($e->getMessage());
 			}
 		}
-		// Unlock account
-		else if(!empty($_GET['locked_out_users'])) {
-		}
-		// Global message
+		// Global message [mod panel upgrade complete -Hitori]
 		else if(!empty($_POST['global_message'])) {
 			$message = $system->clean($_POST['global_message']);
 			try {
@@ -526,6 +470,8 @@ function modPanel() {
 				$system->query("UPDATE `system_storage` SET `global_message`='$message', `time`='".time()."'");
 				$system->query("UPDATE `users` SET `global_message_viewed`=0");
 				$player->global_message_viewed = 0;
+                $player->staff_manager->staffLog(StaffManager::STAFF_LOG_HEAD_MOD, "Posted global: <br />"
+                . $message);
 				$system->message("Message posted!");
 			} catch (Exception $e) {
 				$system->message($e->getMessage());
@@ -541,17 +487,29 @@ function modPanel() {
     $view = $_GET['view'] ?? '';
 
 
-    //Mod panel rework complete -Hitori
+    //Banned Users [Mod panel rework complete -Hitori]
 	if($view == 'banned_users') {
         $banned_users = $player->staff_manager->getBannedUsers();
         require 'templates/staff/mod/banned_users.php';
 	}
-    //TODO: Update locked out users for new mod panel
+    //Locked out users [Mod panel rework complete -Hitori]
 	else if($view == 'locked_out_users') {
         $locked_out_users = $player->staff_manager->getLockedUsers();
 		require 'templates/staff/mod/locked_out_users.php';
 	}
-    //Mod panel rework complete -Hitori
+    //New with mod panel upgrade -Hitori
+    else if($view == 'banned_ips' && $player->staff_manager->isHeadModerator()) {
+        $banned_ips = [];
+        $result = $system->query("SELECT * FROM `banned_ips`");
+        if($system->db_last_num_rows) {
+            while($ip = $system->db_fetch($result)) {
+                $banned_ips[] = $ip;
+            }
+        }
+
+        require 'templates/staff/mod/banned_ips.php';
+    }
+    //Main menu display [Mod panel rework complete -Hitori]
 	else if($display_menu) {
 		// Mod actions
 		require 'templates/staff/mod/mod_menu.php';

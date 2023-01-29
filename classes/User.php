@@ -31,6 +31,8 @@ class User extends Fighter {
 
     const MIN_NAME_LENGTH = 2;
     const MIN_PASSWORD_LENGTH = 6;
+    const PARTIAL_LOCK = 3;
+    const FULL_LOCK = 5;
 
     const BASE_EXP = 500;
 
@@ -977,7 +979,6 @@ class User extends Fighter {
                 $this->system->query("UPDATE `users` SET `ban_data`='{$ban_data}' WHERE `user_id`='{$this->user_id}' LIMIT 1");
                 //Return ban message expiry message for display
                 if ($this->system->db_last_affected_rows) {
-                    echo "I am returning...";
                     return substr($ban_expire_return_string, 0, strlen($ban_expire_return_string) - 2)
                         . " has expired.";
                 }
@@ -986,7 +987,9 @@ class User extends Fighter {
         return false;
     }
     public function checkBan($type):bool {
-        if(in_array($type, StaffManager::$ban_types) && isset($this->ban_data[$type])) {
+        //Add in avatar and jounral bans for this check
+        $ban_types = array_replace(StaffManager::$ban_types, [StaffManager::BAN_TYPE_AVATAR, StaffManager::BAN_TYPE_JOURNAL]);
+        if(in_array($type, $ban_types) && isset($this->ban_data[$type])) {
             if($this->ban_data[$type] == StaffManager::PERM_BAN_VALUE || $this->ban_data[$type] - time() >= 1) {
                 return true;
             }
