@@ -6,6 +6,15 @@
  * @var int $convo_count_max
  * 
  */
+
+//PM ban
+if($player->checkBan(StaffManager::BAN_TYPE_PM)) {
+    $ban_type = StaffManager::BAN_TYPE_PM;
+    $expire_int = $player->ban_data[$ban_type];
+    $ban_expire = ($expire_int == StaffManager::PERM_BAN_VALUE ? $expire_int : $system->time_remaining($expire_int-time()));
+    require 'templates/ban_info.php';
+    return true;
+}
 ?>
 
 <link rel="stylesheet" type="text/css" href="ui_components/src/inbox/inbox.css" />
