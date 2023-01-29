@@ -12,6 +12,10 @@ clarify exactly what needs to be done.
 You can also create a new issue if there's something you want to add that's not on the list and get the yay/nay from a 
 maintainer on it to avoid building something that's not going to get approved.
 
+### Large Features
+
+If you want to work on a large feature (either in the Issues tab or not), the recommendation is to write up a proposal with the details (from a gameplay perspective) and post it in the #sc-coding channel on discord, tagging @Lsmjudoka for review. Then the details of the feature and compensation can be agreed upon before work is started.
+
 ### Recommended workflow
 
 1. Fork repo on GitHub (top right)  
