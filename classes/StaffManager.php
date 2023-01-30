@@ -10,6 +10,8 @@ class StaffManager {
     public string $user_name;
 
     const PERM_BAN_VALUE = -1;
+    const OW_MIN = 10;
+    const OW_MAX = 1000;
 
     const BAN_TYPE_GAME = 'game';
     const BAN_TYPE_CHAT = 'tavern';
@@ -293,6 +295,9 @@ class StaffManager {
                 if($user_data['staff_level'] == self::STAFF_HEAD_ADMINISTRATOR) {
                     throw new Exception("You are not allowed to ban {$this->getStaffLevelName(self::STAFF_HEAD_ADMINISTRATOR, 'long')}s!");
                 }
+                if($user_data['staff_level'] == self::STAFF_ADMINISTRATOR) {
+                    throw new Exception("You can not ban fellow " . $this->getStaffLevelName(self::STAFF_ADMINISTRATOR, 'long') . "!");
+                }
                 return true;
             case self::STAFF_HEAD_ADMINISTRATOR:
                 return true;
@@ -309,7 +314,7 @@ class StaffManager {
                 }
                 return true;
             case self::STAFF_ADMINISTRATOR:
-                if($user_data['staff_level'] == self::STAFF_HEAD_ADMINISTRATOR) {
+                if($user_data['staff_level'] >= self::STAFF_ADMINISTRATOR) {
                     throw new Exception("You do not have permission to unban this user!");
                 }
                 return true;
@@ -317,6 +322,30 @@ class StaffManager {
                 return true;
             default:
                 throw new Exception("You do not have permission to unban members!");
+        }
+    }
+
+    public function canIssueOW($staff_level) {
+        switch($this->staff_level) {
+            case self::STAFF_MODERATOR:
+                if($staff_level >= self::STAFF_MODERATOR) {
+                    return false;
+                }
+                return true;
+            case self::STAFF_HEAD_MODERATOR:
+                if($staff_level != self::STAFF_HEAD_MODERATOR && $staff_level < self::STAFF_ADMINISTRATOR) {
+                    return true;
+                }
+                return false;
+            case self::STAFF_ADMINISTRATOR:
+                if($staff_level < self::STAFF_ADMINISTRATOR) {
+                    return true;
+                }
+                return false;
+            case self::STAFF_HEAD_ADMINISTRATOR:
+                return true;
+            default:
+                return false;
         }
     }
 
@@ -406,9 +435,25 @@ class StaffManager {
 
         $this->system->query("UPDATE `users` SET `ban_data`='{$ban_data}' WHERE `user_id`='{$user_data['user_id']}' LIMIT 1");
         if($this->system->db_last_affected_rows) {
+            $this->addRecord($user_data['user_id'], $user_data['user_name'], self::RECORD_BAN_REMOVED,
+                "Removed " . ucwords($unban_type) . " Ban.", false);
             $this->staffLog(StaffManager::STAFF_LOG_HEAD_MOD,
                 "($this->user_name} ({$this->user_id}) removed {$user_data['user_name']}\'s ({$user_data['user_id']}) "
                 . $unban_string . ".");
+            return true;
+        }
+        return false;
+    }
+
+    public function sendOW($content, $user_data) {
+        $this->system->query("INSERT INTO `official_warnings` 
+            (`staff_id`, `staff_name`, `user_id`, `time`, `data`, `viewed`)
+            VALUES 
+            ('{$this->user_id}', '{$this->user_name}', '{$user_data['user_id']}', '" . time() . "', '{$content}', 0)
+        ");
+        if($this->system->db_last_insert_id) {
+            $this->addRecord($user_data['user_id'], $user_data['user_name'], self::RECORD_OFFICIAL_WARNING, $content, false);
+            $this->staffLog(self::STAFF_LOG_MOD, "{$this->user_name}($this->user_id}) sent {$user_data['user_name']}({$user_data['user_id']}) an Official Warning.");
             return true;
         }
         return false;

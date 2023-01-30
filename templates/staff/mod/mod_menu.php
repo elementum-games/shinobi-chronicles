@@ -65,13 +65,25 @@
             </form>
         </td>
     </tr>
-    <tr><th colspan='2'>View Record</th></tr>
-    <tr><td colspan='2' style='text-align:center;'>
+    <tr>
+        <th>View Record</th>
+        <th>Send Official Warning</th>
+    </tr>
+    <tr>
+        <td style='text-align:center;'>
             <form action='<?=$self_link?>' method='get'>
                 <input type='hidden' name='id' value='16' />
                 Username<br />
                 <input type='text' name='view_record' /><br />
                 <input style='margin-top: 5px;' type='submit' value='View' />
+            </form>
+        </td>
+        <td style='text-align:center;'>
+            <form action='<?=$self_link?>' method='get'>
+                <input type='hidden' name='id' value='16' />
+                Username<br />
+                <input type='text' name='official_warning' /><br />
+                <input style='margin-top: 5px;' type='submit' value='Open Form' />
             </form>
         </td>
     </tr>

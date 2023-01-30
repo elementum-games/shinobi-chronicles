@@ -997,6 +997,52 @@ class User extends Fighter {
         return false;
     }
 
+    /**
+     * Providing an actual ID will return the OW and mark the warning as read
+     * @param $id
+     * @return bool|void|array
+     */
+    public function getOfficialWarning($id) {
+        $result = $this->system->query("SELECT * FROM `official_warnings` WHERE `user_id`='{$this->user_id}' AND `warning_id`='{$id}' LIMIT 1");
+        if($this->system->db_last_num_rows) {
+            $this->system->query("UPDATE `official_warnings` SET `viewed`=1 WHERE `warning_id`='{$id}' LIMIT 1");
+            return $this->system->db_fetch($result);
+        }
+        else {
+            return false;
+        }
+    }
+
+    public function getOfficialWarnings($for_notification = false) {
+        $query = "SELECT * FROM `official_warnings` WHERE `user_id`='{$this->user_id}'";
+        if($for_notification) {
+            $query .= " AND `viewed`=0";
+        }
+        $query .= " ORDER BY `time` DESC";
+
+        $result = $this->system->query($query);
+        if($this->system->db_last_num_rows) {
+            if($for_notification) {
+                return true;
+            }
+            else {
+                $warnings = [];
+                while($warning = $this->system->db_fetch($result)) {
+                    $warnings[] = $warning;
+                }
+                return $warnings;
+            }
+        }
+        else {
+            if($for_notification) {
+                return false;
+            }
+            else {
+                return array();
+            }
+        }
+    }
+
     public function loadStaffManager() {
         if(!$this->staff_manager instanceof StaffManager) {
             $this->staff_manager = new StaffManager($this);

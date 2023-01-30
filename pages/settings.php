@@ -246,5 +246,27 @@ function userSettings() {
         }
     }
 
+    // Account details
+    if(isset($_GET['view'])) {
+        switch($_GET['view']) {
+            case 'account':
+                $warnings = $player->getOfficialWarnings();
+                $warning = false;
+                $bans = false;
+                $ban_result = $system->query("SELECT * FROM `user_record` WHERE `user_id`='{$player->user_id}' AND `record_type` IN ('"
+                . StaffManager::RECORD_BAN_ISSUED . "', '" . StaffManager::RECORD_BAN_REMOVED . "') ORDER BY `time` DESC");
+                if($system->db_last_num_rows) {
+                    while($ban = $system->db_fetch($ban_result)) {
+                        $bans[] = $ban;
+                    }
+                }
+
+                if(isset($_GET['warning_id'])) {
+                    $warning = $player->getOfficialWarning((int)$_GET['warning_id']);
+                }
+                break;
+        }
+    }
+
     require_once('templates/settings.php');
 }

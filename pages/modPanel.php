@@ -304,6 +304,48 @@ function modPanel() {
 		}
 		$system->printMessage();
 	}
+    elseif(!empty($_GET['official_warning'])) {
+        try {
+            $display_menu = false;
+            $content = '';
+            $user_name = $system->clean($_GET['official_warning']);
+            $user_data = $player->staff_manager->getUserByName($user_name);
+
+            if(!$user_data) {
+                throw new Exception("Invalid user!");
+            }
+
+            if(isset($_POST['send_official_warning'])) {
+                $content = $system->clean(trim($_POST['content']));
+                //Official warnings follow same rules as banning
+                if(!$player->staff_manager->canIssueOW($user_data['staff_level'])) {
+                    throw new Exception("You do not have permission to send warnings to this user!");
+                }
+                if(strlen($content) < StaffManager::OW_MIN) {
+                    throw new Exception("Warning must be at least " . StaffManager::OW_MIN . " characters long.");
+                }
+                if(strlen($content) > StaffManager::OW_MAX) {
+                    throw new Exception("Warning may not exceed " . StaffManager::OW_MAX . " characters long.");
+                }
+
+                //Send Official Warning
+                if($player->staff_manager->sendOW($content, $user_data)) {
+                    $system->message("Official Warning sent!");
+                    $display_menu = true;
+                }
+                else {
+                    $system->message("Error sending warning.");
+                }
+            }
+        }catch (Exception $e) {
+            $system->message($e->getMessage());
+        }
+
+        if(!$display_menu) {
+            require 'templates/staff/mod/official_warning.php';
+        }
+        $system->printMessage();
+    }
 	// Locked out users [panel upgrade done -Hitori]
 	if(!empty($_GET['unlock_account']) && $player->staff_manager->isHeadModerator()) {
 		$user_id = (int)$system->clean($_GET['unlock_account']);

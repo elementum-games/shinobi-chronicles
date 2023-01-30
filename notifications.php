@@ -53,6 +53,10 @@ function displayNotifications() {
 	if($new_inbox_message || $new_inbox_alerts) {
 		$notifications[] = "<a class='link' href='{$system->link}?id=2'>You have unread PM(s)</a>";
 	}
+    // Official Warning
+    if($player->getOfficialWarnings(true)) {
+        $notifications[] = "<a class='link' href='{$system->links['settings']}&view=account'>New Official Warning(s)!</a>";
+    }
     //Reports
 	if($player->staff_manager->isModerator() && $reportManager->getActiveReports(true)) {
         $notifications[] = "<a class='link' href='{$system->links['report']}&page=view_all_reports'>New report(s)!</a>";
