@@ -409,9 +409,12 @@ p {
 }
 
 .systemMessage {
-	/* position: absolute; */
-	margin: 10px 15px;
-	padding: 20px 0;
+	position: absolute;
+	right: 20px;
+	bottom: 88%;
+
+	width: 600px;
+	padding: 10px 10px;
 
 	background-color: rgb(55, 47, 38);
 
