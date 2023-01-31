@@ -263,8 +263,8 @@ class Bloodline {
         if($offense_to_bloodline > 1.0) {
             $offense_to_bloodline = 1.0;
         }
-        else if($offense_to_bloodline < 0.7) {
-            $offense_to_bloodline = 0.7;
+        else if($offense_to_bloodline < 0.75) {
+            $offense_to_bloodline = 0.75;
         }
         return $offense_to_bloodline;
     }
