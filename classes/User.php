@@ -1700,9 +1700,13 @@ class User extends Fighter {
     const LOG_TRAINING = 'training';
     const LOG_ARENA = 'arena';
     const LOG_LOGIN = 'login';
+    const LOG_MISSION = 'mission';
+    const LOG_SPECIAL_MISSION = 'special_mission';
 
     public function log(string $log_type, string $log_contents): bool {
-        $valid_log_types = [self::LOG_TRAINING, self::LOG_ARENA, self::LOG_LOGIN];
+        $valid_log_types = [
+            self::LOG_TRAINING, self::LOG_ARENA, self::LOG_LOGIN, self::LOG_MISSION, self::LOG_SPECIAL_MISSION
+        ];
         if(!in_array($log_type, $valid_log_types)) {
             error_log("Invalid player log type {$log_type}");
             return false;
