@@ -444,13 +444,13 @@ function premium() {
 				throw new Exception("You do not have enough Ancient Kunai!");
 			}
 
-			if($player->clan['leader'] == $player->user_id) {
+			if($player->clan && $player->clan['leader'] == $player->user_id) {
 				$system->query("UPDATE `clans` SET `leader` = '0' WHERE `clan_id` = '{$player->clan['id']}'");
 			}
-			else if($player->clan['elder_1'] == $player->user_id) {
+			else if($player->clan && $player->clan['elder_1'] == $player->user_id) {
 				$system->query("UPDATE `clans` SET `elder_1` = '0' WHERE `clan_id` = '{$player->clan['id']}'");
 			}
-			else if($player->clan['elder_2'] == $player->user_id) {
+			else if($player->clan && $player->clan['elder_2'] == $player->user_id) {
 				$system->query("UPDATE `clans` SET `elder_2` = '0' WHERE `clan_id` = '{$player->clan['id']}'");
 			}
 

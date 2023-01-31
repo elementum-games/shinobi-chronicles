@@ -605,6 +605,7 @@ class User extends Fighter {
 
         // Clan
         $this->clan = $user_data['clan_id'];
+        $this->clan_office = 0;
         if($this->clan) {
             $result = $this->system->query("SELECT * FROM `clans` WHERE `clan_id`='$this->clan' LIMIT 1");
             if($this->system->db_last_num_rows == 0) {
