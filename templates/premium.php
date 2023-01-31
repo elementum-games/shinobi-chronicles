@@ -165,6 +165,7 @@
                     to<br/>
                     <select name='target_stat'>
                         <?php foreach($player->stats as $stat): ?>
+                            <?php if($stat === 'intelligence' || $stat === 'willpower') continue; ?>
                             <option value='<?= $stat ?>'><?= ucwords(str_replace('_', ' ', $stat)) ?></option>
                         <?php endforeach; ?>
                     </select>
