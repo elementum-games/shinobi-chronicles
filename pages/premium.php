@@ -340,7 +340,6 @@ function premium() {
 
             $is_free_stat_change = $transfer_amount <= 10;
 
-
 			if($is_free_stat_change) {
 				$cost = 0;
 
@@ -359,6 +358,10 @@ function premium() {
 			} else {
 				$cost = 1 + floor($transfer_amount / 300);
 			}
+
+            if($original_stat == 'intelligence' || $original_stat == 'willpower') {
+                $cost = 0;
+            }
 
 			if($player->getPremiumCredits() < $cost) {
 				throw new Exception("You do not have enough Ancient Kunai!");

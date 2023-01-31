@@ -52,6 +52,10 @@ require_once __DIR__ . '/FighterAction.php';
 */
 
 class BattleManager {
+    const SPEED_DAMAGE_REDUCTION_RATIO = 0.4;
+    const CAST_SPEED_DAMAGE_REDUCTION_RATIO = 0.4;
+    const MAX_EVASION_DAMAGE_REDUCTION = 0.55;
+
     private System $system;
 
     private int $battle_id;
@@ -937,17 +941,14 @@ class BattleManager {
         }
 
         // Ratios for damage reduction (% more speed = % damage redution)
-        $speed_ratio = 0.65;
-        $cast_speed_ratio = 0.65;
-        $max_damage_reduction = 0.5;
         if($player_jutsu->jutsu_type == Jutsu::TYPE_NINJUTSU) {
             // Nin vs Nin
             if($opponent_jutsu->jutsu_type == Jutsu::TYPE_NINJUTSU) {
                 if($player_cast_speed >= $opponent_cast_speed) {
                     $damage_reduction = ($player_cast_speed / $opponent_cast_speed) - 1.0;
-                    $damage_reduction = round($damage_reduction * $cast_speed_ratio, 2);
-                    if($damage_reduction > $max_damage_reduction) {
-                        $damage_reduction = $max_damage_reduction;
+                    $damage_reduction = round($damage_reduction * self::CAST_SPEED_DAMAGE_REDUCTION_RATIO, 2);
+                    if($damage_reduction > self::MAX_EVASION_DAMAGE_REDUCTION) {
+                        $damage_reduction = self::MAX_EVASION_DAMAGE_REDUCTION;
                     }
                     if($damage_reduction >= 0.01) {
                         $opponent_damage *= 1 - $damage_reduction;
@@ -957,9 +958,9 @@ class BattleManager {
                 }
                 else {
                     $damage_reduction = ($opponent_cast_speed / $player_cast_speed) - 1.0;
-                    $damage_reduction = round($damage_reduction * $cast_speed_ratio, 2);
-                    if($damage_reduction > $max_damage_reduction) {
-                        $damage_reduction = $max_damage_reduction;
+                    $damage_reduction = round($damage_reduction * self::CAST_SPEED_DAMAGE_REDUCTION_RATIO, 2);
+                    if($damage_reduction > self::MAX_EVASION_DAMAGE_REDUCTION) {
+                        $damage_reduction = self::MAX_EVASION_DAMAGE_REDUCTION;
                     }
                     if($damage_reduction >= 0.01) {
                         $player_damage *= 1 - $damage_reduction;
@@ -972,9 +973,9 @@ class BattleManager {
             else if($opponent_jutsu->jutsu_type == Jutsu::TYPE_TAIJUTSU) {
                 if($player_cast_speed >= $opponent_speed) {
                     $damage_reduction = ($player_cast_speed / $opponent_speed) - 1.0;
-                    $damage_reduction = round($damage_reduction * $cast_speed_ratio, 2);
-                    if($damage_reduction > $max_damage_reduction) {
-                        $damage_reduction = $max_damage_reduction;
+                    $damage_reduction = round($damage_reduction * self::CAST_SPEED_DAMAGE_REDUCTION_RATIO, 2);
+                    if($damage_reduction > self::MAX_EVASION_DAMAGE_REDUCTION) {
+                        $damage_reduction = self::MAX_EVASION_DAMAGE_REDUCTION;
                     }
                     if($damage_reduction >= 0.01) {
                         $opponent_damage *= 1 - $damage_reduction;
@@ -984,9 +985,9 @@ class BattleManager {
                 }
                 else {
                     $damage_reduction = ($opponent_speed / $player_cast_speed) - 1.0;
-                    $damage_reduction = round($damage_reduction * $speed_ratio, 2);
-                    if($damage_reduction > $max_damage_reduction) {
-                        $damage_reduction = $max_damage_reduction;
+                    $damage_reduction = round($damage_reduction * self::SPEED_DAMAGE_REDUCTION_RATIO, 2);
+                    if($damage_reduction > self::MAX_EVASION_DAMAGE_REDUCTION) {
+                        $damage_reduction = self::MAX_EVASION_DAMAGE_REDUCTION;
                     }
                     if($damage_reduction >= 0.01) {
                         $player_damage *= 1 - $damage_reduction;
@@ -1002,9 +1003,9 @@ class BattleManager {
             if($opponent_jutsu->jutsu_type == Jutsu::TYPE_TAIJUTSU) {
                 if($player_speed >= $opponent_speed) {
                     $damage_reduction = ($player_speed / $opponent_speed) - 1.0;
-                    $damage_reduction = round($damage_reduction * $speed_ratio, 2);
-                    if($damage_reduction > $max_damage_reduction) {
-                        $damage_reduction = $max_damage_reduction;
+                    $damage_reduction = round($damage_reduction * self::SPEED_DAMAGE_REDUCTION_RATIO, 2);
+                    if($damage_reduction > self::MAX_EVASION_DAMAGE_REDUCTION) {
+                        $damage_reduction = self::MAX_EVASION_DAMAGE_REDUCTION;
                     }
                     if($damage_reduction >= 0.01) {
                         $opponent_damage *= 1 - $damage_reduction;
@@ -1013,9 +1014,9 @@ class BattleManager {
                 }
                 else {
                     $damage_reduction = ($opponent_speed / $player_speed) - 1.0;
-                    $damage_reduction = round($damage_reduction * $speed_ratio, 2);
-                    if($damage_reduction > $max_damage_reduction) {
-                        $damage_reduction = $max_damage_reduction;
+                    $damage_reduction = round($damage_reduction * self::SPEED_DAMAGE_REDUCTION_RATIO, 2);
+                    if($damage_reduction > self::MAX_EVASION_DAMAGE_REDUCTION) {
+                        $damage_reduction = self::MAX_EVASION_DAMAGE_REDUCTION;
                     }
                     if($damage_reduction >= 0.01) {
                         $player_damage *= 1 - $damage_reduction;
@@ -1026,9 +1027,9 @@ class BattleManager {
             else if($opponent_jutsu->jutsu_type == Jutsu::TYPE_NINJUTSU) {
                 if($player_speed >= $opponent_cast_speed) {
                     $damage_reduction = ($player_speed / $opponent_cast_speed) - 1.0;
-                    $damage_reduction = round($damage_reduction * $speed_ratio, 2);
-                    if($damage_reduction > $max_damage_reduction) {
-                        $damage_reduction = $max_damage_reduction;
+                    $damage_reduction = round($damage_reduction * self::SPEED_DAMAGE_REDUCTION_RATIO, 2);
+                    if($damage_reduction > self::MAX_EVASION_DAMAGE_REDUCTION) {
+                        $damage_reduction = self::MAX_EVASION_DAMAGE_REDUCTION;
                     }
                     if($damage_reduction >= 0.01) {
                         $opponent_damage *= 1 - $damage_reduction;
@@ -1037,9 +1038,9 @@ class BattleManager {
                 }
                 else {
                     $damage_reduction = ($opponent_cast_speed / $player_speed) - 1.0;
-                    $damage_reduction = round($damage_reduction * $cast_speed_ratio, 2);
-                    if($damage_reduction > $max_damage_reduction) {
-                        $damage_reduction = $max_damage_reduction;
+                    $damage_reduction = round($damage_reduction * self::CAST_SPEED_DAMAGE_REDUCTION_RATIO, 2);
+                    if($damage_reduction > self::MAX_EVASION_DAMAGE_REDUCTION) {
+                        $damage_reduction = self::MAX_EVASION_DAMAGE_REDUCTION;
                     }
                     if($damage_reduction >= 0.01) {
                         $player_damage *= 1 - $damage_reduction;

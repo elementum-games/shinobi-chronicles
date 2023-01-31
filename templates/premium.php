@@ -118,31 +118,38 @@
             <th>Stat Transfers</th>
         </tr>
         <tr>
+            <!--suppress JSUnresolvedFunction -->
+            <script type='text/javascript'>
+                let stats = {};
+                let pointsPerMin = <?= $stat_transfer_points_per_min ?>;
+                let statBeingTransferred = 'ninjutsu_skill';
+
+                function statSelectChange() {
+                    statBeingTransferred = document.getElementById('statAllocateSelect').value;
+                    $('#transferAmount').val(stats[statBeingTransferred]);
+                    statAllocateCostDisplay();
+                }
+
+                function statAllocateCostDisplay() {
+                    let cost;
+                    const transferAmount = parseInt($('#transferAmount').val());
+                    if (transferAmount <= 10) {
+                        cost = 0;
+                    }
+                    else {
+                        cost = 1 + Math.floor(transferAmount / 300);
+                    }
+
+                    if(statBeingTransferred === 'intelligence' || statBeingTransferred === 'willpower') {
+                        cost = 0;
+                    }
+
+                    const time = transferAmount / pointsPerMin;
+                    const display = cost + ' AK / ' + time + ' minutes';
+                    $('#statAllocateCost').html(display);
+                }
+            </script>
             <td style='text-align:center;'>
-                <!--suppress JSUnresolvedFunction -->
-                <script type='text/javascript'>
-                    let stats = {};
-                    let pointsPerMin = <?= $stat_transfer_points_per_min ?>;
-
-                    function statSelectChange() {
-                        $('#transferAmount').val(stats[ $('#statAllocateSelect').val() ]);
-                        statAllocateCostDisplay();
-                    }
-
-                    function statAllocateCostDisplay() {
-                        let cost;
-                        const transferAmount = parseInt($('#transferAmount').val());
-                        if (transferAmount <= 10) {
-                            cost = 0;
-                        }
-                        else {
-                            cost = 1 + Math.floor(transferAmount / 300);
-                        }
-                        const time = transferAmount / pointsPerMin;
-                        const display = cost + ' AK / ' + time + ' minutes';
-                        $('#statAllocateCost').html(display);
-                    }
-                </script>
                 You can transfer points from one stat to another. This costs Ancient Kunai and takes time to complete, both
                 cost and time increase
                 the higher your stat amount is.<br/>
@@ -154,7 +161,6 @@
                         <?php foreach($player->stats as $stat): ?>
                             <option value='<?= $stat ?>'><?= ucwords(str_replace('_', ' ', $stat)) ?></option>
                         <?php endforeach; ?>
-
                     </select><br/>
                     to<br/>
                     <select name='target_stat'>
@@ -163,8 +169,9 @@
                         <?php endforeach; ?>
                     </select>
                     <script type='text/javascript'>
+                        statBeingTransferred = document.getElementById('statAllocateSelect').value;
                         <?php foreach($player->stats as $stat): ?>
-                        <?php if(strpos($stat, 'skill') !== false): ?>
+                        <?php if(str_contains($stat, 'skill')): ?>
                         stats.<?= $stat ?> = <?= ($player->{$stat} - 10) ?>;
                         <?php else: ?>
                         stats.<?= $stat ?> = <?= ($player->{$stat} - 5) ?>;
@@ -175,12 +182,12 @@
                     if($player->bloodline_id) {
                         $init_cost = (1 + floor(($player->bloodline_skill - 10) / 300));
                         $init_transfer_amount = $player->bloodline_skill - 10;
-                        $init_length = ($player->bloodline_skill - 10) * 0.25;
+                        $init_length = ($player->bloodline_skill - 10) / $stat_transfer_points_per_min;
                     }
                     else {
                         $init_cost = (1 + floor(($player->ninjutsu_skill - 10) / 300));
                         $init_transfer_amount = $player->ninjutsu_skill - 10;
-                        $init_length = ($player->ninjutsu_skill - 10) * 0.25;
+                        $init_length = ($player->ninjutsu_skill - 10) / $stat_transfer_points_per_min;
                     }
                     ?>
                     <br/>
