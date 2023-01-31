@@ -317,6 +317,14 @@ if($LOGGED_IN) {
 			// Check for battle if page is restricted
 			if(isset($routes[$id]['battle_ok']) && $routes[$id]['battle_ok'] == false) {
 				if($player->battle_id) {
+                    $contents_arr = [];
+                    foreach($_GET as $key => $val) {
+                        $contents_arr[] = "GET[{$key}]=$val";
+                    }
+                    foreach($_POST as $key => $val) {
+                        $contents_arr[] = "POST[{$key}]=$val";
+                    }
+                    $player->log(User::LOG_IN_BATTLE, implode(',', $contents_arr));
 					throw new Exception("You cannot visit this page while in battle!");
 				}
 			}
