@@ -1042,7 +1042,7 @@ function premiumCreditExchange() {
 	$self_link .= '&view=buy_kunai';
 
 	$price_min = 1.0;
-	$price_max = 10.0;
+	$price_max = 20.0;
 
 	// Create offer
 	if(isset($_POST['new_offer'])) {
@@ -1277,7 +1277,7 @@ function premiumCreditExchange() {
 		<span style='display:inline-block;width:120px;'>Money per kunai: </span>
 		<select onchange='calcPreview();' name='money' id='money'>&yen;";
 
-		for($i = $price_min; $i < $price_max; $i += 0.1) {
+		for($i = $price_min; $i < $price_max; $i += 0.5) {
 			echo "<option value='" . sprintf("%.1f", $i) . "'>" . sprintf("%.1f", $i) . "</option>";
 		}
 

@@ -366,6 +366,15 @@ if($LOGGED_IN) {
 					throw new Exception("You cannot access this page while in a village!");
 				}
 				if($routes[$id]['village_ok'] == System::ONLY_IN_VILLAGE && $player->location !== $player->village_location) {
+                    $contents_arr = [];
+                    foreach($_GET as $key => $val) {
+                        $contents_arr[] = "GET[{$key}]=$val";
+                    }
+                    foreach($_POST as $key => $val) {
+                        $contents_arr[] = "POST[{$key}]=$val";
+                    }
+                    $player->log(User::LOG_NOT_IN_VILLAGE, implode(',', $contents_arr));
+
 					throw new Exception("You must be in your village to access this page!");
 				}
 			}
