@@ -1277,7 +1277,7 @@ function premiumCreditExchange() {
 		<span style='display:inline-block;width:120px;'>Money per kunai: </span>
 		<select onchange='calcPreview();' name='money' id='money'>&yen;";
 
-		for($i = $price_min; $i < $price_max; $i += 0.5) {
+		for($i = $price_min; $i <= $price_max; $i += 0.5) {
 			echo "<option value='" . sprintf("%.1f", $i) . "'>" . sprintf("%.1f", $i) . "</option>";
 		}
 
