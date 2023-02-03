@@ -767,7 +767,9 @@ class User extends Fighter {
             $this->forbidden_seal = new ForbiddenSeal($this->system, $forbidden_seal['level'], $forbidden_seal['time']);
             $this->forbidden_seal_loaded = true;
             // Check if seal is expired & remove if it is
-            $this->forbidden_seal->checkExpiration();
+            if(!$remote_view) {
+                $this->forbidden_seal->checkExpiration();
+            }
             // If seal is not expired, load benefits & apply seal regen boost
             if($this->forbidden_seal->level != 0) {
                 $this->forbidden_seal->setBenefits();
