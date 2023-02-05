@@ -593,6 +593,12 @@ return [
             'image' => "<img src='./images/memes/tiredphone.png' />",
             'text' => ':what is this:',
             'public' => true,       
-    ],       
+    ],  
+    [
+            'code' => ':popcorn:',
+            'image' => "<img src='./images/memes/popcorn.png' />",
+            'text' => ':popcorn:',
+            'public' => true,       
+    ], 
 ];
 
