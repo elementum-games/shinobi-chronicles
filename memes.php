@@ -564,11 +564,35 @@ return [
             'text' => ':like a rock, also makes a great pet:',
             'public' => true,
     ],  
-     [
+    [
             'code' => ':holdup:',
             'image' => "<img src='./images/memes/holdup.png' />",
             'text' => ':hold up:',
             'public' => true,       
     ],
+    [
+            'code' => ':hehecat:',
+            'image' => "<img src='./images/memes/hehecat.png' />",
+            'text' => ':hehe cat:',
+            'public' => true,       
+    ],
+    [
+            'code' => ':nothehecat:',
+            'image' => "<img src='./images/memes/nothehecat.png' />",
+            'text' => ':not hehe cat:',
+            'public' => true,       
+    ],
+    [
+            'code' => ':sadcatthumbsup:',
+            'image' => "<img src='./images/memes/sadcatthumbsup.png' />",
+            'text' => ':sad cat thumbs up:',
+            'public' => true,       
+    ],
+    [
+            'code' => ':whatisthis:',
+            'image' => "<img src='./images/memes/tiredphone.png' />",
+            'text' => ':what is this:',
+            'public' => true,       
+    ],       
 ];
 
