@@ -596,7 +596,7 @@ return [
     ],  
     [
             'code' => ':popcorn:',
-            'image' => "<img src='./images/memes/popcorn.png' />",
+            'image' => "<img src='./images/memes/Michael-Jackson-Popcorn.gif' />",
             'text' => ':popcorn:',
             'public' => true,       
     ], 
