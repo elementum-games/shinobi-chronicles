@@ -563,6 +563,12 @@ return [
             'image' => "<img src='./images/memes/hats/hat-stone.png'  style='max-height:70px;' />",
             'text' => ':like a rock, also makes a great pet:',
             'public' => true,
+    ],  
+     [
+            'code' => ':holdup:',
+            'image' => "<img src='./images/memes/holdup.png' />",
+            'text' => ':hold up:',
+            'public' => true,       
     ],
 ];
 
