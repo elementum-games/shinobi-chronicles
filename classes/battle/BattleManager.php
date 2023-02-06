@@ -869,50 +869,7 @@ class BattleManager {
             $collision_text .= "[opponent]'s barrier blocked $block_percent% of [player]'s damage![br]";
         }
 
-        // Stop if one side is not a collidable jutsu (gen, buff, using a barrier)
-        if(!$player1_jutsu_is_attack or !$player2_jutsu_is_attack) {
-           return $this->parseCombatText(
-                $collision_text,
-                $player1,
-                $player2
-            );
-        }
-
-        // Weapon diffuse (tai diffuse nin)
-        if($player_jutsu->weapon_id && $player_jutsu->weapon_effect->effect == 'diffuse' && $opponent_jutsu->jutsu_type == Jutsu::TYPE_NINJUTSU) {
-            if($opponent_damage <= 0){
-                $player_diffuse_percent = 0;
-            }
-            else {
-                $player_diffuse_percent = round($player_jutsu->weapon_effect->effect_amount / 100, 2);
-
-                if($player_diffuse_percent > Battle::MAX_DIFFUSE_PERCENT) {
-                    $player_diffuse_percent = Battle::MAX_DIFFUSE_PERCENT;
-                }
-            }
-        }
-        if($opponent_jutsu->weapon_id && $opponent_jutsu->weapon_effect->effect == 'diffuse' && $player_jutsu->jutsu_type == Jutsu::TYPE_NINJUTSU) {
-            if($player_damage <= 0){
-                $opponent_diffuse_percent = 0;
-            }
-            else {
-                $opponent_diffuse_percent = round($opponent_jutsu->weapon_effect->effect_amount / 100, 2);
-            }
-
-            if($opponent_diffuse_percent > Battle::MAX_DIFFUSE_PERCENT) {
-                $opponent_diffuse_percent = Battle::MAX_DIFFUSE_PERCENT;
-            }
-        }
-        if(!empty($player_diffuse_percent)) {
-            $opponent_damage *= 1 - $player_diffuse_percent;
-            $collision_text .= "[player] diffused " . ($player_diffuse_percent * 100) . "% of [opponent]'s damage![br]";
-        }
-        if(!empty($opponent_diffuse_percent)) {
-            $player_damage *= 1 - $opponent_diffuse_percent;
-            $collision_text .= "[opponent] diffused " . ($opponent_diffuse_percent * 100) . "% of [player]'s damage![br]";
-        }
-
-        // Apply buffs/nerfs
+        /* Calculate speed values */
         $player_speed = $player1->speed + $player1->speed_boost - $player1->speed_nerf;
         $player_speed = 50 + ($player_speed * 0.5);
         if($player_speed <= 0) {
@@ -940,120 +897,162 @@ class BattleManager {
             echo "Player2({$player2->getName()}): {$player2->speed} ({$player2->speed_boost} - {$player2->speed_nerf})<br />";
         }
 
-        // Ratios for damage reduction (% more speed = % damage redution)
-        if($player_jutsu->jutsu_type == Jutsu::TYPE_NINJUTSU) {
-            // Nin vs Nin
-            if($opponent_jutsu->jutsu_type == Jutsu::TYPE_NINJUTSU) {
-                if($player_cast_speed >= $opponent_cast_speed) {
-                    $damage_reduction = ($player_cast_speed / $opponent_cast_speed) - 1.0;
-                    $damage_reduction = round($damage_reduction * self::CAST_SPEED_DAMAGE_REDUCTION_RATIO, 2);
-                    if($damage_reduction > self::MAX_EVASION_DAMAGE_REDUCTION) {
-                        $damage_reduction = self::MAX_EVASION_DAMAGE_REDUCTION;
-                    }
-                    if($damage_reduction >= 0.01) {
-                        $opponent_damage *= 1 - $damage_reduction;
-                        $collision_text .= "[player] cast [gender2] jutsu before [opponent] cast, negating " .
-                            ($damage_reduction * 100) . "% of [opponent]'s damage!";
-                    }
+        // Player diffuse opponent
+        if($player_jutsu->weapon_id
+            && $player_jutsu->weapon_effect->effect == 'diffuse'
+            && $opponent_jutsu->jutsu_type == Jutsu::TYPE_NINJUTSU
+            && $player2_jutsu_is_attack
+            && $opponent_damage > 0
+        ) {
+            $player_diffuse_percent = round($player_jutsu->weapon_effect->effect_amount / 100, 2);
+
+            if($player_diffuse_percent > Battle::MAX_DIFFUSE_PERCENT) {
+                $player_diffuse_percent = Battle::MAX_DIFFUSE_PERCENT;
+            }
+
+            if($player_diffuse_percent > 0) {
+                $opponent_damage *= 1 - $player_diffuse_percent;
+                $collision_text .= "[player] diffused " . ($player_diffuse_percent * 100) . "% of [opponent]'s damage![br]";
+            }
+        }
+
+        // Opponent diffuse player
+        if($opponent_jutsu->weapon_id
+            && $opponent_jutsu->weapon_effect->effect == 'diffuse'
+            && $player_jutsu->jutsu_type == Jutsu::TYPE_NINJUTSU
+            && $player1_jutsu_is_attack
+            && $player_damage > 0
+        ) {
+            $opponent_diffuse_percent = round($opponent_jutsu->weapon_effect->effect_amount / 100, 2);
+
+            if($opponent_diffuse_percent > Battle::MAX_DIFFUSE_PERCENT) {
+                $opponent_diffuse_percent = Battle::MAX_DIFFUSE_PERCENT;
+            }
+
+            if($opponent_diffuse_percent > 0) {
+                $player_damage *= 1 - $opponent_diffuse_percent;
+                $collision_text .= "[opponent] diffused " . ($opponent_diffuse_percent * 100) . "% of [player]'s damage![br]";
+            }
+        }
+
+        // Ratios for damage reduction (% more speed = % damage reduction)
+        if($player_jutsu->jutsu_type == Jutsu::TYPE_NINJUTSU
+            && $opponent_jutsu->jutsu_type == Jutsu::TYPE_NINJUTSU
+            && $player2_jutsu_is_attack
+        ) {
+            if($player_cast_speed >= $opponent_cast_speed) {
+                $damage_reduction = ($player_cast_speed / $opponent_cast_speed) - 1.0;
+                $damage_reduction = round($damage_reduction * self::CAST_SPEED_DAMAGE_REDUCTION_RATIO, 2);
+                if($damage_reduction > self::MAX_EVASION_DAMAGE_REDUCTION) {
+                    $damage_reduction = self::MAX_EVASION_DAMAGE_REDUCTION;
                 }
-                else {
-                    $damage_reduction = ($opponent_cast_speed / $player_cast_speed) - 1.0;
-                    $damage_reduction = round($damage_reduction * self::CAST_SPEED_DAMAGE_REDUCTION_RATIO, 2);
-                    if($damage_reduction > self::MAX_EVASION_DAMAGE_REDUCTION) {
-                        $damage_reduction = self::MAX_EVASION_DAMAGE_REDUCTION;
-                    }
-                    if($damage_reduction >= 0.01) {
-                        $player_damage *= 1 - $damage_reduction;
-                        $collision_text .= "[opponent] cast their jutsu before [player] cast, negating " .
-                            ($damage_reduction * 100) . "% of [player]'s damage!";
-                    }
+                if($damage_reduction >= 0.01) {
+                    $opponent_damage *= 1 - $damage_reduction;
+                    $collision_text .= "[player] cast [gender2] jutsu before [opponent] cast, negating " .
+                        ($damage_reduction * 100) . "% of [opponent]'s damage!";
                 }
             }
-            // Nin vs Tai
-            else if($opponent_jutsu->jutsu_type == Jutsu::TYPE_TAIJUTSU) {
-                if($player_cast_speed >= $opponent_speed) {
-                    $damage_reduction = ($player_cast_speed / $opponent_speed) - 1.0;
-                    $damage_reduction = round($damage_reduction * self::CAST_SPEED_DAMAGE_REDUCTION_RATIO, 2);
-                    if($damage_reduction > self::MAX_EVASION_DAMAGE_REDUCTION) {
-                        $damage_reduction = self::MAX_EVASION_DAMAGE_REDUCTION;
-                    }
-                    if($damage_reduction >= 0.01) {
-                        $opponent_damage *= 1 - $damage_reduction;
-                        $collision_text .= "[player] cast [gender2] jutsu before [opponent] attacked, negating " . ($damage_reduction * 100) .
-                            "% of [opponent]'s damage!";
-                    }
+            else {
+                $damage_reduction = ($opponent_cast_speed / $player_cast_speed) - 1.0;
+                $damage_reduction = round($damage_reduction * self::CAST_SPEED_DAMAGE_REDUCTION_RATIO, 2);
+                if($damage_reduction > self::MAX_EVASION_DAMAGE_REDUCTION) {
+                    $damage_reduction = self::MAX_EVASION_DAMAGE_REDUCTION;
                 }
-                else {
-                    $damage_reduction = ($opponent_speed / $player_cast_speed) - 1.0;
-                    $damage_reduction = round($damage_reduction * self::SPEED_DAMAGE_REDUCTION_RATIO, 2);
-                    if($damage_reduction > self::MAX_EVASION_DAMAGE_REDUCTION) {
-                        $damage_reduction = self::MAX_EVASION_DAMAGE_REDUCTION;
-                    }
-                    if($damage_reduction >= 0.01) {
-                        $player_damage *= 1 - $damage_reduction;
-                        $collision_text .= "[opponent] swiftly evaded " . ($damage_reduction * 100) . "% of [player]'s damage!";
-                    }
+                if($damage_reduction >= 0.01) {
+                    $player_damage *= 1 - $damage_reduction;
+                    $collision_text .= "[opponent] cast their jutsu before [player] cast, negating " .
+                        ($damage_reduction * 100) . "% of [player]'s damage!";
+                }
+            }
+        }
+        // Nin vs Tai
+        else if($player_jutsu->jutsu_type == Jutsu::TYPE_NINJUTSU
+            && $opponent_jutsu->jutsu_type == Jutsu::TYPE_TAIJUTSU
+            && $player2_jutsu_is_attack
+        ) {
+            if($player_cast_speed >= $opponent_speed) {
+                $damage_reduction = ($player_cast_speed / $opponent_speed) - 1.0;
+                $damage_reduction = round($damage_reduction * self::CAST_SPEED_DAMAGE_REDUCTION_RATIO, 2);
+                if($damage_reduction > self::MAX_EVASION_DAMAGE_REDUCTION) {
+                    $damage_reduction = self::MAX_EVASION_DAMAGE_REDUCTION;
+                }
+                if($damage_reduction >= 0.01) {
+                    $opponent_damage *= 1 - $damage_reduction;
+                    $collision_text .= "[player] cast [gender2] jutsu before [opponent] attacked, negating " . ($damage_reduction * 100) .
+                        "% of [opponent]'s damage!";
+                }
+            }
+            else {
+                $damage_reduction = ($opponent_speed / $player_cast_speed) - 1.0;
+                $damage_reduction = round($damage_reduction * self::SPEED_DAMAGE_REDUCTION_RATIO, 2);
+                if($damage_reduction > self::MAX_EVASION_DAMAGE_REDUCTION) {
+                    $damage_reduction = self::MAX_EVASION_DAMAGE_REDUCTION;
+                }
+                if($damage_reduction >= 0.01) {
+                    $player_damage *= 1 - $damage_reduction;
+                    $collision_text .= "[opponent] swiftly evaded " . ($damage_reduction * 100) . "% of [player]'s damage!";
                 }
             }
         }
 
         // Taijutsu clash
-        else if($player_jutsu->jutsu_type == Jutsu::TYPE_TAIJUTSU) {
-            // Tai vs Tai
-            if($opponent_jutsu->jutsu_type == Jutsu::TYPE_TAIJUTSU) {
-                if($player_speed >= $opponent_speed) {
-                    $damage_reduction = ($player_speed / $opponent_speed) - 1.0;
-                    $damage_reduction = round($damage_reduction * self::SPEED_DAMAGE_REDUCTION_RATIO, 2);
-                    if($damage_reduction > self::MAX_EVASION_DAMAGE_REDUCTION) {
-                        $damage_reduction = self::MAX_EVASION_DAMAGE_REDUCTION;
-                    }
-                    if($damage_reduction >= 0.01) {
-                        $opponent_damage *= 1 - $damage_reduction;
-                        $collision_text .= "[player] swiftly evaded " . ($damage_reduction * 100) . "% of [opponent]'s damage!";
-                    }
+        else if($player_jutsu->jutsu_type == Jutsu::TYPE_TAIJUTSU
+            && $opponent_jutsu->jutsu_type == Jutsu::TYPE_TAIJUTSU
+            && $player1_jutsu_is_attack
+        ) {
+            if($player_speed >= $opponent_speed) {
+                $damage_reduction = ($player_speed / $opponent_speed) - 1.0;
+                $damage_reduction = round($damage_reduction * self::SPEED_DAMAGE_REDUCTION_RATIO, 2);
+                if($damage_reduction > self::MAX_EVASION_DAMAGE_REDUCTION) {
+                    $damage_reduction = self::MAX_EVASION_DAMAGE_REDUCTION;
                 }
-                else {
-                    $damage_reduction = ($opponent_speed / $player_speed) - 1.0;
-                    $damage_reduction = round($damage_reduction * self::SPEED_DAMAGE_REDUCTION_RATIO, 2);
-                    if($damage_reduction > self::MAX_EVASION_DAMAGE_REDUCTION) {
-                        $damage_reduction = self::MAX_EVASION_DAMAGE_REDUCTION;
-                    }
-                    if($damage_reduction >= 0.01) {
-                        $player_damage *= 1 - $damage_reduction;
-                        $collision_text .= "[opponent] swiftly evaded " . ($damage_reduction * 100) . "% of [player]'s damage!";
-                    }
+                if($damage_reduction >= 0.01) {
+                    $opponent_damage *= 1 - $damage_reduction;
+                    $collision_text .= "[player] swiftly evaded " . ($damage_reduction * 100) . "% of [opponent]'s damage!";
                 }
             }
-            else if($opponent_jutsu->jutsu_type == Jutsu::TYPE_NINJUTSU) {
-                if($player_speed >= $opponent_cast_speed) {
-                    $damage_reduction = ($player_speed / $opponent_cast_speed) - 1.0;
-                    $damage_reduction = round($damage_reduction * self::SPEED_DAMAGE_REDUCTION_RATIO, 2);
-                    if($damage_reduction > self::MAX_EVASION_DAMAGE_REDUCTION) {
-                        $damage_reduction = self::MAX_EVASION_DAMAGE_REDUCTION;
-                    }
-                    if($damage_reduction >= 0.01) {
-                        $opponent_damage *= 1 - $damage_reduction;
-                        $collision_text .= "[player] swiftly evaded " . ($damage_reduction * 100) . "% of [opponent]'s damage!";
-                    }
+            else {
+                $damage_reduction = ($opponent_speed / $player_speed) - 1.0;
+                $damage_reduction = round($damage_reduction * self::SPEED_DAMAGE_REDUCTION_RATIO, 2);
+                if($damage_reduction > self::MAX_EVASION_DAMAGE_REDUCTION) {
+                    $damage_reduction = self::MAX_EVASION_DAMAGE_REDUCTION;
                 }
-                else {
-                    $damage_reduction = ($opponent_cast_speed / $player_speed) - 1.0;
-                    $damage_reduction = round($damage_reduction * self::CAST_SPEED_DAMAGE_REDUCTION_RATIO, 2);
-                    if($damage_reduction > self::MAX_EVASION_DAMAGE_REDUCTION) {
-                        $damage_reduction = self::MAX_EVASION_DAMAGE_REDUCTION;
-                    }
-                    if($damage_reduction >= 0.01) {
-                        $player_damage *= 1 - $damage_reduction;
-                        $collision_text .= "[opponent] cast their jutsu before [player] attacked, negating " . ($damage_reduction * 100) .
-                            "% of [player]'s damage!";
-                    }
+                if($damage_reduction >= 0.01) {
+                    $player_damage *= 1 - $damage_reduction;
+                    $collision_text .= "[opponent] swiftly evaded " . ($damage_reduction * 100) . "% of [player]'s damage!";
+                }
+            }
+        }
+        else if($player_jutsu->jutsu_type == Jutsu::TYPE_TAIJUTSU
+            && $opponent_jutsu->jutsu_type == Jutsu::TYPE_NINJUTSU
+            && $player1_jutsu_is_attack
+        ) {
+            if($player_speed >= $opponent_cast_speed) {
+                $damage_reduction = ($player_speed / $opponent_cast_speed) - 1.0;
+                $damage_reduction = round($damage_reduction * self::SPEED_DAMAGE_REDUCTION_RATIO, 2);
+                if($damage_reduction > self::MAX_EVASION_DAMAGE_REDUCTION) {
+                    $damage_reduction = self::MAX_EVASION_DAMAGE_REDUCTION;
+                }
+                if($damage_reduction >= 0.01) {
+                    $opponent_damage *= 1 - $damage_reduction;
+                    $collision_text .= "[player] swiftly evaded " . ($damage_reduction * 100) . "% of [opponent]'s damage!";
+                }
+            }
+            else {
+                $damage_reduction = ($opponent_cast_speed / $player_speed) - 1.0;
+                $damage_reduction = round($damage_reduction * self::CAST_SPEED_DAMAGE_REDUCTION_RATIO, 2);
+                if($damage_reduction > self::MAX_EVASION_DAMAGE_REDUCTION) {
+                    $damage_reduction = self::MAX_EVASION_DAMAGE_REDUCTION;
+                }
+                if($damage_reduction >= 0.01) {
+                    $player_damage *= 1 - $damage_reduction;
+                    $collision_text .= "[opponent] cast their jutsu before [player] attacked, negating " . ($damage_reduction * 100) .
+                        "% of [player]'s damage!";
                 }
             }
         }
 
-        // Parse text
-        $collision_text = $this->parseCombatText($collision_text, $player1, $player2);
-        return $collision_text;
+        return $this->parseCombatText($collision_text, $player1, $player2);
     }
 
 
