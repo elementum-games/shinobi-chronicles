@@ -600,5 +600,65 @@ return [
             'text' => ':popcorn:',
             'public' => true,       
     ], 
+    [
+            'code' => ':huhh:',
+            'image' => "<img src='./images/memes/HUHH.png' />",
+            'text' => ':huhh:',
+            'public' => true,       
+    ], 
+    [
+            'code' => ':blonk:',
+            'image' => "<img src='./images/memes/Blonk.png' />",
+            'text' => ':blonk:',
+            'public' => true,       
+    ], 
+    [
+            'code' => ':mockingspongebob:',
+            'image' => "<img src='./images/memes/Mocking-Spongebob.png' />",
+            'text' => ':mocking spongebob:',
+            'public' => true,       
+    ], 
+    [
+            'code' => ':patrick:',
+            'image' => "<img src='./images/memes/Patrick.png' />",
+            'text' => ':patrick:',
+            'public' => true,       
+    ], 
+    [
+            'code' => ':handsome:',
+            'image' => "<img src='./images/memes/Handsome-Squidward.png' />",
+            'text' => ':handsome:',
+            'public' => true,       
+    ], 
+    [
+            'code' => ':dab:',
+            'image' => "<img src='./images/memes/Squidward-Dab.png' />",
+            'text' => ':dab:',
+            'public' => true,       
+    ], 
+    [
+            'code' => ':krabbypatties:',
+            'image' => "<img src='./images/memes/You-Like-Krabby-Patties.png' />",
+            'text' => ':krabbypatties:',
+            'public' => true,       
+    ], 
+    [
+            'code' => ':reptar:',
+            'image' => "<img src='./images/memes/Reptar.png' />",
+            'text' => ':reptar:',
+            'public' => true,       
+    ], 
+    [
+            'code' => ':tuxedopooh:',
+            'image' => "<img src='./images/memes/Tuxedo-Pooh' />",
+            'text' => ':tuxedopooh:',
+            'public' => true,       
+    ], 
+    [
+            'code' => ':stitch:',
+            'image' => "<img src='./images/memes/Stitch.gif' />",
+            'text' => ':stitch:',
+            'public' => true,       
+    ], 
 ];
 
