@@ -763,7 +763,7 @@ class BattleManager {
     }
 
     public function jutsuCollision(
-        Fighter $player1, Fighter $player2, &$player_damage, &$opponent_damage, $player_jutsu, $opponent_jutsu
+        Fighter $player1, Fighter $player2, &$player_damage, &$opponent_damage, Jutsu $player_jutsu, Jutsu $opponent_jutsu
     ) {
         $collision_text = '';
 
@@ -815,8 +815,12 @@ class BattleManager {
             }
         }
 
+        // Apply barrier
+        $player1_jutsu_is_attack = $player_jutsu->jutsu_type !== Jutsu::TYPE_GENJUTSU && in_array($player_jutsu->use_type, Jutsu::$attacking_use_types);
+        $player2_jutsu_is_attack = $opponent_jutsu->jutsu_type !== Jutsu::TYPE_GENJUTSU && in_array($opponent_jutsu->use_type, Jutsu::$attacking_use_types);
+
         // Barriers
-        if($player1->barrier && $opponent_jutsu->jutsu_type != Jutsu::TYPE_GENJUTSU) {
+        if($player1->barrier && $player2_jutsu_is_attack) {
             // Block damage from opponent's attack
             if($player1->barrier >= $opponent_damage) {
                 $block_amount = $opponent_damage;
@@ -840,7 +844,7 @@ class BattleManager {
             $block_percent = round($block_percent, 1);
             $collision_text .= "[player]'s barrier blocked $block_percent% of [opponent]'s damage![br]";
         }
-        if($player2->barrier && $player_jutsu->jutsu_type != Jutsu::TYPE_GENJUTSU) {
+        if($player2->barrier && $player1_jutsu_is_attack) {
             // Block damage from opponent's attack
             if($player2->barrier >= $player_damage) {
                 $block_amount = $player_damage;
@@ -865,9 +869,9 @@ class BattleManager {
             $collision_text .= "[opponent]'s barrier blocked $block_percent% of [player]'s damage![br]";
         }
 
-        // Quit if barrier was used by one person (no collision remaining)
-        if($player_jutsu->use_type == Jutsu::USE_TYPE_BARRIER or $opponent_jutsu->use_type == Jutsu::USE_TYPE_BARRIER) {
-            return $this->parseCombatText(
+        // Stop if one side is not a collidable jutsu (gen, buff, using a barrier)
+        if(!$player1_jutsu_is_attack or !$player2_jutsu_is_attack) {
+           return $this->parseCombatText(
                 $collision_text,
                 $player1,
                 $player2
@@ -906,10 +910,6 @@ class BattleManager {
         if(!empty($opponent_diffuse_percent)) {
             $player_damage *= 1 - $opponent_diffuse_percent;
             $collision_text .= "[opponent] diffused " . ($opponent_diffuse_percent * 100) . "% of [player]'s damage![br]";
-        }
-
-        if($player_jutsu->jutsu_type == Jutsu::TYPE_GENJUTSU or $opponent_jutsu->jutsu_type == Jutsu::TYPE_GENJUTSU) {
-            return false;
         }
 
         // Apply buffs/nerfs

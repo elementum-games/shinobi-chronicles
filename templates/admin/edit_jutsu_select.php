@@ -67,9 +67,13 @@ $selected_link_style = "text-decoration:none;";
             </td>
             <td><?= $jutsu->power ?></td>
             <td>
-                <?= System::unSlug($jutsu->effect) ?>
-                <?php if($jutsu->effect !== 'none'): ?>
-                    (<?= $jutsu->effect_amount ?>% / <?= $jutsu->effect_length ?> turns)
+                <?php if($jutsu->use_type == Jutsu::USE_TYPE_BARRIER): ?>
+                    Barrier
+                <?php else: ?>
+                    <?= System::unSlug($jutsu->effect) ?>
+                    <?php if($jutsu->effect !== 'none'): ?>
+                        (<?= $jutsu->effect_amount ?>% / <?= $jutsu->effect_length ?> turns)
+                    <?php endif; ?>
                 <?php endif; ?>
             </td>
             <td><?= ucwords($jutsu->element) ?></td>
