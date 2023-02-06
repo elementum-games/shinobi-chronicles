@@ -23,9 +23,22 @@ if($player->battle_id or isset($_SESSION['ai_id'])) {
 $healthRegen = ($player->regen_rate + $player->regen_boost - $regen_cut) * 2;
 $standardRegen = $player->regen_rate + $player->regen_boost - $regen_cut;
 
-$health_after_regen = min($player->health + $healthRegen, $player->max_health);
-$chakra_after_regen = min($player->chakra + $standardRegen, $player->max_chakra);
-$stamina_after_regen = min($player->stamina + $standardRegen, $player->max_stamina);
+$health_width = round(($player->health / $player->max_health) * 100, 3);
+$health_width = min($health_width, 100.0);
+
+$chakra_width = round(($player->chakra / $player->max_chakra) * 100, 3);
+$chakra_width = min($chakra_width, 100.0);
+
+$stamina_width = round(($player->stamina / $player->max_stamina) * 100, 3);
+$stamina_width = min($stamina_width, 100.0);
+
+$health_regen_amount = min($healthRegen, $player->max_health - $player->health);
+$chakra_regen_amount = min($standardRegen, $player->max_chakra - $player->chakra);
+$stamina_regen_amount = min($standardRegen, $player->max_stamina - $player->stamina);
+
+$health_regen_width = round($health_regen_amount / $player->max_health, 3) * 100;
+$chakra_regen_width = round($chakra_regen_amount / $player->max_chakra, 3) * 100;
+$stamina_regen_width = round($stamina_regen_amount / $player->max_stamina, 3) * 100;
 
 $time_since_last_regen = time() - $player->last_update;
 
@@ -42,6 +55,133 @@ $clan_positions = [
 
 ?>
 
+<style>
+    .resourceContainer {
+        width: 100%;
+        margin: 4px auto;
+
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .resourceBarOuter {
+        display: flex;
+        position: relative;
+        height: 17px;
+        width: 260px;
+        border: 1px solid black;
+        border-radius: 17px;
+
+        background: rgba(0,0,0,0.7);
+        overflow: hidden;
+    }
+
+    /* Parent must be Position: relative */
+    .innerResourceBarLabel{
+        display: block;
+        position: absolute;
+        left: 0;
+        right: 0;
+        align-self: center;
+
+        font-size: 12px;
+        font-weight: bold;
+        letter-spacing: 0.2px;
+        line-height:15px;
+        text-align: center;
+
+        color: #ffffff;
+        text-shadow:
+                -1px 0 0 rgba(0,0,0,0.7),
+                -1px -1px 0 rgba(0,0,0,0.7),
+                0 -1px 0 rgba(0,0,0,0.7),
+                1px -1px 0 rgba(0,0,0,0.7),
+                1px 0 0 rgba(0,0,0,0.7),
+                1px 1px 0 rgba(0,0,0,0.7),
+                0 1px 0 rgba(0,0,0,0.7),
+                -1px 1px 0 rgba(0,0,0,0.7);
+
+        z-index: 100;
+    }
+
+    .fill {
+        position: absolute;
+        top: 0;
+        z-index: 2;
+        height: 100%;
+    }
+    .preview {
+        position: absolute;
+        top: 0;
+        z-index: 2;
+        height: 100%;
+
+        opacity: 0.5;
+        overflow: hidden;
+    }
+
+    .health {
+        background: linear-gradient(to right, rgb(200, 30, 20), rgb(240, 50, 50));
+    }
+    .health.preview {
+        background: rgb(240, 50, 50);
+    }
+
+    .chakra {
+        background: #1060ff linear-gradient(to right, #1060ff, #2080ff);
+    }
+    .chakra.preview {
+        background: #2080ff;
+    }
+
+    .stamina {
+        background: linear-gradient(to right, rgb(10, 180, 10), rgb(40, 220, 40));
+    }
+    .stamina.preview {
+        background:  rgb(40, 220, 40);
+    }
+
+
+    .preview::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 400%;
+        height: 100%;
+        transform: translate3d(-100%, 0, 0);
+
+        background: linear-gradient(
+            to right,
+            transparent,
+            rgba(255,255,255,0.1),
+            rgba(255,255,255,0.3),
+            rgba(255,255,255,0.4),
+            rgba(255,255,255,0.3),
+            rgba(255,255,255,0.1),
+            transparent
+        );
+
+        animation-duration: 2.4s;
+        animation-name: gleam;
+        animation-iteration-count: infinite;
+        animation-timing-function: linear;
+    }
+    @keyframes gleam {
+        0% {
+            transform: translate3d(-100%, 0, 0);
+        }
+        40% {
+            transform: translate3d(25%, 0, 0);
+        }
+        100% {
+            transform: translate3d(25%, 0, 0);
+        }
+    }
+</style>
+
 <table class='profile_table table'>
 <tr>
     <td style='width:50%;text-align:center;'>
@@ -52,71 +192,51 @@ $clan_positions = [
     <td style='width:50%;'>
 
         <!--Health Bar-->
-        <div id='health_text_container' style="display: flex; justify-content: space-between;">
-            <label for='healthbar'>Health:</label>
-            <div id='health' style='margin-right: 23px;'>
-                <p style='display: inline'>
-            <?= sprintf("%.2f", $player->health) ?> / <?= sprintf("%.2f", $player->max_health) ?>
-            <?php if($player->health != $player->max_health): ?>
-                        <span>-></span>
-                        <span style='color: green;'><b> <?= sprintf("%.2f",$health_after_regen) ?> </b></span>
-            <?php endif; ?>
-                </p>
+        <div class='resourceContainer'>
+            <span>Health:</span>
+            <div id='health' class='resourceBarOuter'>
+                <label class='innerResourceBarLabel'>
+                    <?= sprintf("%.2f", $player->health) ?> / <?= sprintf("%.2f", $player->max_health) ?>
+                </label>
+                <div class='health fill' style='width:<?= $health_width ?>%;'></div>
+                <div class='health preview' style='
+                    left:<?= $health_width ?>%;
+                    width:<?= $health_regen_width ?>%;'
+                ></div>
             </div>
         </div>
-        <div style='height:14px; margin-top: -5px;'>
-            <progress
-                id='healthbar'
-                style='accent-color:#C00000; height: 18px; width: 100%;'
-                value='<?= $player->health ?>'
-                max='<?= $player->max_health ?>'>
-            </progress>
-        </div>
-
+        
         <!--Chakra Bar-->
-        <div id='chakra_text_container' style="display: flex; justify-content: space-between; margin-top: 10px">
-            <label for='chakrabar'>Chakra:</label>
-            <div id='chakra' style='margin-right: 23px;'>
-                <p style='display: inline'>
-            <?= sprintf("%.2f", $player->chakra) ?> / <?= sprintf("%.2f", $player->max_chakra) ?>
-            <?php if($player->chakra != $player->max_chakra): ?>
-                        <span>-></span>
-                        <span><b style='color: green;'><?= sprintf("%.2f",$chakra_after_regen) ?></b></span>
-            <?php endif; ?>
-                </p>
-            </div>
-        </div>
-        <div style='height:14px; margin-top: -5px;'>
-            <progress
-                id='chakrabar'
-                style='accent-color:#0000B0; height: 18px; width: 100%;'
-                value='<?= $player->chakra ?>'
-                max='<?= $player->max_chakra ?>'>
-            </progress>
-        </div>
-
-        <!--Stamina Bar-->
-        <div id='chakra_text_container' style="display: flex; justify-content: space-between; margin-top: 10px">
-        <label style='width:6.7em;' for='staminabar'>Stamina:</label>
-            <div id='stamina' style='margin-right: 23px;'>
-                <p style='display: inline'>
-            <?= sprintf("%.2f", $player->stamina) ?> / <?= sprintf("%.2f", $player->max_stamina) ?>
-            <?php if($player->stamina != $player->max_stamina): ?>
-                        <span>-></span>
-                        <span><b style='color: green;'><?= sprintf("%.2f",$stamina_after_regen) ?></b></span>
-            <?php endif; ?>
-                </p>
+        <div class='resourceContainer'>
+            <span>Chakra:</span>
+            <div id='chakra' class='resourceBarOuter'>
+                <label class='innerResourceBarLabel'>
+                    <?= sprintf("%.2f", $player->chakra) ?> / <?= sprintf("%.2f", $player->max_chakra) ?>
+                </label>
+                <div class='chakra fill' style='width:<?= $chakra_width ?>%;'></div>
+                <div class='chakra preview' style='
+                    left:<?= $chakra_width ?>%;
+                    width:<?= $chakra_regen_width ?>%;'
+                ></div>
             </div>
         </div>
 
-        <div style='height:14px; margin-top: -5px;'>
-            <progress
-                id='staminabar'
-                style='accent-color:#00B000; height: 18px; width: 100%;'
-                value='<?= $player->stamina ?>'
-                max='<?= $player->max_stamina ?>'>
-            </progress>
+
+        <!--stamina Bar-->
+        <div class='resourceContainer'>
+            <span>Stamina:</span>
+            <div id='stamina' class='resourceBarOuter'>
+                <label class='innerResourceBarLabel'>
+                    <?= sprintf("%.2f", $player->stamina) ?> / <?= sprintf("%.2f", $player->max_stamina) ?>
+                </label>
+                <div class='stamina fill' style='width:<?= $stamina_width ?>%;'></div>
+                <div class='stamina preview' style='
+                        left:<?= $stamina_width ?>%;
+                        width:<?= $stamina_regen_width ?>%;'
+                ></div>
+            </div>
         </div>
+
         <br />
         Regeneration Rate: <?= $player->regen_rate ?>
 
@@ -131,9 +251,8 @@ $clan_positions = [
         <br />
 
         <script>
-            //regen timer script - can be moved to its own script.js file
-            var remainingtime = <?= (59 - $time_since_last_regen) ?>;
-            var statusBars = {
+            let remainingtime = <?= (59 - $time_since_last_regen) ?>;
+            const statusBars = {
                 health: {
                     current: <?= $player->health ?>,
                     max: <?= $player->max_health ?>,
@@ -151,7 +270,11 @@ $clan_positions = [
                 }
             };
 
-            var regen = <?= $player->regen_rate + $player->regen_boost ?>; // no regen cut
+            function round(num, places) {
+                return Math.round(num * Math.pow(10, places + 2)) / Math.pow(10, places);
+            }
+
+            let regen = <?= $player->regen_rate + $player->regen_boost ?>; // no regen cut
 
             setInterval(() => {
                 document.getElementById('regentimer').innerHTML = remainingtime; //minus 1 to compensate for lag
@@ -161,48 +284,46 @@ $clan_positions = [
 
                     //Check each bar to see if regen will exceed max.
                     let healthRegen = regen * 2;
-
+                    
                     statusBars.health.current = Math.min(statusBars.health.current + healthRegen, statusBars.health.max);
-                    statusBars.health.next_regen = Math.min(statusBars.health.current + healthRegen, statusBars.health.max);
-
-                    //Check Chakra Bar
                     statusBars.chakra.current = Math.min(statusBars.chakra.current + regen, statusBars.chakra.max);
-                    statusBars.chakra.next_regen = Math.min(statusBars.chakra.current + regen, statusBars.chakra.max);
-
-                    //Check Stamina Bar
                     statusBars.stamina.current = Math.min(statusBars.stamina.current + regen, statusBars.stamina.max);
-                    statusBars.stamina.next_regen = Math.min(statusBars.stamina.current + regen, statusBars.stamina.max);
 
+                    // Round to 1 decimal place
+                    const healthWidth = round(statusBars.health.current / statusBars.health.max, 2);
+                    const chakraWidth = round(statusBars.chakra.current / statusBars.chakra.max, 2);
+                    const staminaWidth = round(statusBars.stamina.current / statusBars.stamina.max, 2);
 
-                    //Update Health Bar
-                    const currentAndMaxHealth = statusBars.health.current.toFixed(2) + '/' + statusBars.health.max.toFixed(2);
-                    $('#health').html(currentAndMaxHealth.concat((statusBars.health.current !== statusBars.health.max) ? ('-> <b style=\'color: green\'>' + statusBars.health.next_regen.toFixed(2) + '</b>') : ''));
-                    $('#healthbar').val(statusBars.health.current);
+                    const healthRegenAmount = Math.min(healthRegen, statusBars.health.max - statusBars.health.current);
+                    const chakraRegenAmount = Math.min(regen, statusBars.chakra.max - statusBars.chakra.current);
+                    const staminaRegenAmount = Math.min(regen, statusBars.stamina.max - statusBars.stamina.current);
 
-                    //Update Chakra Bar
-                     const currentAndMaxChakra = statusBars.chakra.current.toFixed(2) + '/' + statusBars.chakra.max.toFixed(2);
-                    $('#chakra').html(currentAndMaxChakra.concat((statusBars.chakra.current !== statusBars.chakra.max)? ('-> <b style=\'color: green\'>' + statusBars.chakra.next_regen.toFixed(2) + '</b>') : ''));
-                    $('#chakrabar').val(statusBars.chakra.current);
+                    const healthRegenWidth = round(healthRegenAmount / statusBars.health.max, 2);
+                    const chakraRegenWidth = round(chakraRegenAmount / statusBars.chakra.max, 2);
+                    const staminaRegenWidth = round(staminaRegenAmount / statusBars.stamina.max, 2);
+                    
+                    document.querySelector('#health label').innerText =
+                        statusBars.health.current.toFixed(2) + '/' + statusBars.health.max.toFixed(2);
+                    document.querySelector('#health .fill').style.width = `${healthWidth}%`;
+                    document.querySelector('#health .preview').style.left = `${healthWidth}%`;
+                    document.querySelector('#health .preview').style.width = `${healthRegenWidth}%`;
 
-                    //Update Stamina Bar
-                    const currentAndMaxStamina = statusBars.stamina.current.toFixed(2) + '/' + statusBars.stamina.max.toFixed(2);
-                    $('#stamina').html(currentAndMaxStamina.concat((statusBars.stamina.current !== statusBars.stamina.max)? ('-> <b style=\'color: green\'>' + statusBars.stamina.next_regen.toFixed(2) + '</b>') : ''));
-                    $('#staminabar').val(statusBars.stamina.current);
+                    document.querySelector('#chakra label').innerText =
+                        statusBars.chakra.current.toFixed(2) + '/' + statusBars.chakra.max.toFixed(2);
+                    document.querySelector('#chakra .fill').style.width = `${chakraWidth}%`;
+                    document.querySelector('#chakra .preview').style.left = `${chakraWidth}%`;
+                    document.querySelector('#chakra .preview').style.width = `${chakraRegenWidth}%`;
+
+                    document.querySelector('#stamina label').innerText =
+                        statusBars.stamina.current.toFixed(2) + '/' + statusBars.stamina.max.toFixed(2);
+                    document.querySelector('#stamina .fill').style.width = `${staminaWidth}%`;
+                    document.querySelector('#stamina .preview').style.left = `${staminaWidth}%`;
+                    document.querySelector('#stamina .preview').style.width = `${staminaRegenWidth}%`;
                 }
 
                 remainingtime--;
 
             }, 1000);
-
-            //for some reason every other tick the javascript regen is ahead of the actual regen?
-            //can't figure out why? its like the Regen changes every other minute in intervals or it doubles
-            //can't find the error with my script
-            //can't seem to find out where the error is, need help.
-
-            function updateBarValue(bar)
-            {
-
-            }
         </script>
 
         <label style='width:9.2em;'>Regen Timer:</label>
