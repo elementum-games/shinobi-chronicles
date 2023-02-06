@@ -639,7 +639,7 @@ return [
     [
             'code' => ':krabbypatties:',
             'image' => "<img src='./images/memes/You-Like-Krabby-Patties.png' />",
-            'text' => ':krabbypatties:',
+            'text' => ':krabby patties:',
             'public' => true,       
     ], 
     [
@@ -651,7 +651,7 @@ return [
     [
             'code' => ':tuxedopooh:',
             'image' => "<img src='./images/memes/Tuxedo-Pooh' />",
-            'text' => ':tuxedopooh:',
+            'text' => ':tuxedo pooh:',
             'public' => true,       
     ], 
     [
