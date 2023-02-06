@@ -52,8 +52,8 @@ require_once __DIR__ . '/FighterAction.php';
 */
 
 class BattleManager {
-    const SPEED_DAMAGE_REDUCTION_RATIO = 0.5;
-    const CAST_SPEED_DAMAGE_REDUCTION_RATIO = 0.5;
+    const SPEED_DAMAGE_REDUCTION_RATIO = 0.55;
+    const CAST_SPEED_DAMAGE_REDUCTION_RATIO = 0.55;
     const MAX_EVASION_DAMAGE_REDUCTION = 0.55;
 
     private System $system;
