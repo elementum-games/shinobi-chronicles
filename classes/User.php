@@ -1237,7 +1237,7 @@ class User extends Fighter {
      * @throws Exception
      */
     public function subtractPremiumCredits(int $amount, string $description) {
-        if($this->money < $amount) {
+        if($this->getPremiumCredits() < $amount) {
             throw new Exception("Not enough Ancient Kunai!");
         }
         $this->setPremiumCredits($this->premium_credits - $amount, $description);
