@@ -29,6 +29,7 @@ class User extends Fighter {
         ];
 
     const MIN_NAME_LENGTH = 2;
+    const MAX_NAME_LENGTH = 18;
     const MIN_PASSWORD_LENGTH = 6;
 
     const BASE_EXP = 500;

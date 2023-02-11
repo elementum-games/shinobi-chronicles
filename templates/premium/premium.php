@@ -40,7 +40,7 @@
         <td style='text-align:center;'>
             Here you can purchase and spend Ancient Kunai on a variety of boosts and in-game items.<br/>
             <br/>
-            <b>Your Ancient Kunai:</b> <?= $player->getPremiumCredits() ?>
+            <b>Your Ancient Kunai:</b> <?= number_format($player->getPremiumCredits()) ?>
         </td>
     </tr>
 </table>
@@ -99,9 +99,7 @@
                 <form action='<?= $self_link ?>' method='post'>
                     <select name='new_gender'>
                         <?php foreach(User::$genders as $new_gender): ?>
-                            <?php if($player->gender == $new_gender): ?>
-                                continue;
-                            <?php else: ?>
+                            <?php if($player->gender != $new_gender): ?>
                                 <option value='<?= $new_gender ?>'><?= $new_gender ?></option>
                             <?php endif; ?>
                         <?php endforeach; ?>
@@ -334,7 +332,7 @@
                     <?php foreach(Bloodline::$public_ranks as $rank_id => $rank): ?>
                         <?php if(empty($bloodlines[$rank_id])) continue; ?>
                         <?= $rank ?> Bloodlines (<?= $costs['bloodline'][$rank_id] ?> Ancient Kunai)<br/>
-                        <form action='<?= $self_link ?>' method='post'>
+                        <form action='<?= $self_link ?>&view=bloodlines' method='post'>
                             <select name='bloodline_id'>
                                 <?php foreach($bloodlines[$rank_id] as $bloodline_id => $bloodline): ?>
                                     <!-- Need to keep bloodline in the bloodlines array for bloodline list-->
@@ -445,6 +443,7 @@
                 Longer logout timer (<?=$baseDisplay['logout_timer']?> -> <?=$fourDragonSeal->logout_timer?>
                 minutes)<br />
                 Longer journal (<?=$baseDisplay['journal_size']?> -> <?=$fourDragonSeal->journal_size?> characters)<br/>
+                Faster stat transfers (+<?=$fourDragonSeal->stat_transfer_boost?>/minute)<br />
                 Enhanced long trainings (<?=$fourDragonSeal->long_training_time?>x length, <?=$fourDragonSeal->long_training_gains?>x gains)<br/>
                 Enhanced extended trainings (<?=$fourDragonSeal->extended_training_time?>x length, <?=$fourDragonSeal->extended_training_gains?>x gains)<br/>
                 <form action='<?= $self_link ?>&view=forbidden_seal' method='post'>
