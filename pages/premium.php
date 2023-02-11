@@ -1025,13 +1025,7 @@ function premiumCreditExchange() {
 	global $self_link;
 	$self_link .= '&view=buy_kunai';
 
-    $TRADE_TYPE_ANCIENT_KUNAI = 1;
-    $TRADE_TYPE_YEN = 2;
-    $trade_types = [
-        $TRADE_TYPE_ANCIENT_KUNAI => 'Ancient Kunai',
-        $TRADE_TYPE_YEN => "¥ Yen"
-    ];
-	$price_min = 1.0;
+    $price_min = 1.0;
 	$price_max = 20.0;
 
 	// Create offer
@@ -1039,7 +1033,6 @@ function premiumCreditExchange() {
 		try {
             $premium_credits = (int) $_POST['premium_credits'];
             $money = round($_POST['money'], 1);
-            $offer_type = $_POST['offer_type'];
 
             if(!is_numeric($premium_credits)) {
                 throw new Exception("Invalid Ancient Kunai amount!");
@@ -1057,32 +1050,17 @@ function premiumCreditExchange() {
             // Adjust money value for processing and insertion into market
             $money = $premium_credits * $money * 1000;
 
-            // Process request
-            if($offer_type == $TRADE_TYPE_ANCIENT_KUNAI) {
-                // Check financing
-                if ($player->getPremiumCredits() < $premium_credits) {
-                    throw new Exception("You do not have enough Ancient Kunai!");
-                }
-                // Subtract premium_credits from user
-                $player->subtractPremiumCredits($premium_credits, "Placed AK for sale on exchange");
-                $player->updateData();
+            // Check financing
+            if ($player->getPremiumCredits() < $premium_credits) {
+                throw new Exception("You do not have enough Ancient Kunai!");
             }
-            elseif($offer_type == $TRADE_TYPE_YEN) {
-                //Check financing
-                if($player->getMoney() < $money) {
-                    throw new Exception("Not enough Yen to place offer!");
-                }
-                // Subtract money from user
-                $player->subtractMoney($money, "Placed yen on Ancient Market for exchange.");
-                $player->updateData();
-            }
-            else {
-                throw new Exception("Invalid offer type!");
-            }
+            // Subtract premium_credits from user
+            $player->subtractPremiumCredits($premium_credits, "Placed AK for sale on exchange");
+            $player->updateData();
 
             //Add offer to market
-            $system->query("INSERT INTO `premium_credit_exchange` (`seller`, `premium_credits`, `money`, `offer_type`)
-			VALUES ('$player->user_id', '$premium_credits', '$money', '$offer_type')");
+            $system->query("INSERT INTO `premium_credit_exchange` (`seller`, `premium_credits`, `money`)
+			VALUES ('$player->user_id', '$premium_credits', '$money')");
             if ($system->db_last_affected_rows > 0) {
                 $system->message("Offer placed!");
             }
@@ -1114,73 +1092,42 @@ function premiumCreditExchange() {
                 throw new Exception("This offer has already been processed!");
             }
 
-            if($offer['offer_type'] == $TRADE_TYPE_ANCIENT_KUNAI) {
-                // Check user has enough money
-                if($player->getMoney() < $offer['money']) {
-                    throw new Exception("You do not have enough money!");
-                }
-                // Process payment
-                $player->subtractMoney($offer['money'], "Purchased AK from exchange.");
-                $player->addPremiumCredits($offer['premium_credits'], "Purchased AK from exchange.");
-                $player->updateData();
+            // Check user has enough money
+            if($player->getMoney() < $offer['money']) {
+                throw new Exception("You do not have enough money!");
             }
-            elseif($offer['offer_type'] == $TRADE_TYPE_YEN) {
-                if($player->getPremiumCredits() < $offer['premium_credits']) {
-                    throw new Exception("You do not have enough Ancient Kunai!");
-                }
-                // Process payment
-                $player->subtractPremiumCredits($offer['premium_credits'], "Purchased money from AK exchange.");
-                $player->addMoney($offer['money'], "Purchased money from AK exchange.");
-                $player->updateData();
-            }
-            else {
-                throw new Exception("Invalid offer type!");
-            }
+            // Process payment
+            $player->subtractMoney($offer['money'], "Purchased AK from exchange.");
+            $player->addPremiumCredits($offer['premium_credits'], "Purchased AK from exchange.");
+            $player->updateData();
 
 			// Run purchase and log [NOTE: Updating first is to avoid as much server lag and possibility for glitching]
 			$system->query("UPDATE `premium_credit_exchange` SET `completed`='1' WHERE `id`='$id' LIMIT 1");
 
-            $currency_type = ($offer['offer_type'] == $TRADE_TYPE_ANCIENT_KUNAI) ? "money" : "premium_credits";
-            $log_type = ($offer['offer_type'] == $TRADE_TYPE_ANCIENT_KUNAI) ? System::CURRENCY_TYPE_PREMIUM_CREDITS : System::CURRENCY_TYPE_MONEY;
-            $add_amount = ($offer['offer_type'] == $TRADE_TYPE_ANCIENT_KUNAI) ? $offer['money'] : $offer['premium_credits'];
+            $result = $system->query("SELECT `money` FROM `users` WHERE `user_id`='{$offer['seller']}' LIMIT 1");
+            $current_balance = $system->db_fetch($result)['money'] ?? null;
 
-            $result = $system->query("SELECT `" . $currency_type . "` FROM `users` WHERE `user_id`='{$offer['seller']}' LIMIT 1");
-            $current_balance = $system->db_fetch($result)[$currency_type] ?? null;
-
-			$system->query("UPDATE `users` SET `" . $currency_type . "`=`" . $currency_type . "` + {$add_amount}
-				WHERE `user_id`='{$offer['seller']}'");
+			$system->query("UPDATE `users` SET `money`=`money` + {$offer['money']} WHERE `user_id`='{$offer['seller']}'");
 
             $system->currencyLog(
                 character_id: $offer['seller'],
-                currency_type: ($log_type == System::CURRENCY_TYPE_MONEY) ? System::CURRENCY_TYPE_PREMIUM_CREDITS : System::CURRENCY_TYPE_MONEY,
+                currency_type: System::CURRENCY_TYPE_MONEY,
                 previous_balance: $current_balance,
-                new_balance: $current_balance + $add_amount,
-                transaction_amount: $add_amount,
-                transaction_description: "Sold $log_type on AK exchange"
+                new_balance: $current_balance + $offer['money'],
+                transaction_amount: $offer['money'],
+                transaction_description: "Sold credits on AK exchange"
             );
 
-            $log_data = "ID# {$offer['id']}; #{$offer['seller']} to #{$player->user_id} ({$player->user_name}) :: ";
-            if($offer['offer_type'] == $TRADE_TYPE_ANCIENT_KUNAI) {
-                $log_data .= "{$offer['premium_credits']} AK for &yen;{$offer['money']}";
-                $alert_message = "{$player->user_name} has purchased {$offer['premium_credits']} AK for &yen;{$offer['money']}.";
-                $purchase_message = "Ancient Kunai purchased!";
-            }
-            else if($offer['offer_type'] == $TRADE_TYPE_YEN) {
-                $log_data .= "&yen;{$offer['money']} for {$offer['premium_credits']} AK";
-                $alert_message = "{$player->user_name} has purchased &yen;{$offer['money']} for {$offer['premium_credits']} AK.";
-                $purchase_message = "Money received!";
-            }
-            else {
-                throw new Exception("Invalid offer type!");
-            }
+            $log_data = "ID# {$offer['id']}; #{$offer['seller']} to #{$player->user_id} ({$player->user_name}) :: "
+            . "{$offer['premium_credits']} AK for &yen;{$offer['money']}";
+            $alert_message = "{$player->user_name} has purchased {$offer['premium_credits']} AK for &yen;{$offer['money']}.";
 
             //Add system log
 			$system->log("Kunai Exchange", "Completed Sale", $log_data);
             //Notify seller of purchase
 			Inbox::sendAlert($system, 3, $player->user_id, $offer['seller'], $alert_message);
 
-
-			$system->message($purchase_message);
+			$system->message("Ancient Kunai purchased!");
 			$system->printMessage();
 		} catch(Exception $e) {
 			$system->message($e->getMessage());
@@ -1202,7 +1149,7 @@ function premiumCreditExchange() {
 
             // Offer complete
             if($offer['completed']) {
-                throw new Exception("This offer has already bee processed!");
+                throw new Exception("This offer has already been processed!");
             }
 
 			// Check offer belongs to user
@@ -1213,23 +1160,11 @@ function premiumCreditExchange() {
 			// Cancel log [NOTE: Updating first is to avoid as much server lag and possibility for glitching]
 			$system->query("UPDATE `premium_credit_exchange` SET `completed`='1' WHERE `id`='$id' LIMIT 1");
 
-            if($offer['offer_type'] == $TRADE_TYPE_ANCIENT_KUNAI) {
-                $player->addPremiumCredits($offer['premium_credits'], "Cancelled AK offer on exchange");
-                $player->updateData();
-            }
-            elseif($offer['offer_type'] == $TRADE_TYPE_YEN) {
-                $player->addMoney($offer['money'], "Cancelled money offer on AK exchange");
-                $player->updateData();
-            }
+            $player->addPremiumCredits($offer['premium_credits'], "Cancelled AK offer on exchange");
+            $player->updateData();
 
-            $log_data = "ID# {$offer['id']}; {$offer['seller']} - Cancelled :: ";
-            if($offer['offer_type'] == $TRADE_TYPE_ANCIENT_KUNAI) {
-                $log_data .= "{$offer['premium_credits']} for &yen;{$offer['money']}";
-            }
-            elseif($offer['offer_type'] == $TRADE_TYPE_YEN) {
-                $log_data .= "&yen;{$offer['money']} for {$offer['premium_credits']} AK";
-            }
-
+            $log_data = "ID# {$offer['id']}; {$offer['seller']} - Cancelled :: "
+            . "{$offer['premium_credits']} for &yen;{$offer['money']}";
 			$system->log("Kunai Exchange", "Cancelled Offer", $log_data);
 
 			$system->message("Offer cancelled!");
