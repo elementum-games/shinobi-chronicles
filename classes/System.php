@@ -499,19 +499,31 @@ class System {
     }
 
     public function getMemes(): array {
-        $memes = require __DIR__ . '/../memes.php';
+        $memes_dir = __DIR__ . '/../images/memes';
+        $meme_files = scandir($memes_dir);
+        $file_type_filter = '/(?:.png|.jpg|.gif)$/i';
 
-        return [
-            'codes' => array_map(function ($meme) {
-                return $meme['code'];
-            }, $memes),
-            'images' => array_map(function ($meme) {
-                return $meme['image'];
-            }, $memes),
-            'texts' => array_map(function ($meme) {
-                return $meme['text'];
-            }, $memes),
+        if ($meme_files === False)
+        {
+            return [];
+        }
+        $cleaned_memes = array_filter($meme_files, function ($meme) use ($file_type_filter) {
+            return preg_match($file_type_filter, $meme) == 1;
+        });
+        $search_symbols = ['-', '_'];
+        $meme_array = [
+            'codes' => [],
+            'images' => [],
+            'texts' => []
         ];
+        foreach ($cleaned_memes as $meme)
+        {
+            $meme_code = strtolower(':' . preg_replace($file_type_filter,'', str_replace($search_symbols, '', $meme)) . ':');
+            $meme_array['codes'][] = $meme_code;
+            $meme_array['images'][] = "<img src='./images/memes/${meme}' title='${meme_code}' alt='${meme_code}' style='max-width: 75px;max-height: 75px'/>";
+            $meme_array['texts'][] = $meme_code;
+        }
+        return $meme_array;
     }
 
     public function html_parse($text, $img = false, $faces = false): array|string {
