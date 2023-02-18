@@ -436,10 +436,13 @@ class SpecialMission {
                     $jutsu_key = array_rand($this->player->bloodline->jutsu);
                     $jutsu = $this->player->bloodline->jutsu[$jutsu_key];
                 }
-                else {
+                else if(count($this->player->equipped_jutsu) > 0) {
                     $jutsu_key = array_rand($this->player->equipped_jutsu);
                     $jutsu_id = $this->player->equipped_jutsu[$jutsu_key]['id'];
                     $jutsu = $this->player->jutsu[$jutsu_id] ?? null;
+                }
+                else {
+                    $jutsu = null;
                 }
 
                 if($jutsu == null) {

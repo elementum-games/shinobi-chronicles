@@ -78,22 +78,17 @@ if($battle->battle_text) {
     }
 
     .healthFill {
-        background-color: #C00000;
-        background-image: linear-gradient(180deg, rgb(250, 90, 90), rgb(230, 60, 60), rgb(220, 20, 20), rgb(160, 10, 10));
+        background: linear-gradient(to right, rgb(200, 30, 20), rgb(240, 50, 50));
         height: 100%;
         border-radius: 12px;
     }
     .chakraFill {
-        background-color: #0000B0;
-        /*background-image: linear-gradient(180deg, rgb(70, 70, 240), rgb(70, 70, 205), rgb(10, 10, 180), rgb(10, 10, 140));*/
-        background-image: linear-gradient(180deg, rgb(80, 80, 250), rgb(60, 60, 230), rgb(20, 20, 220), rgb(10, 10, 160));
+        background: #1060ff linear-gradient(to right, #1060ff, #2080ff);
         height: 100%;
         border-radius: 12px;
     }
     .staminaFill {
-        background-color: #00B000;
-        /* background-image: linear-gradient(180deg, rgb(70, 230, 70), rgb(60, 200, 60), rgb(25, 140, 25), rgb(5, 100, 5));*/
-        background-image: linear-gradient(180deg, rgb(80, 250, 80), rgb(60, 230, 60), rgb(20, 220, 20), rgb(10, 160, 10));
+        background: linear-gradient(to right, rgb(10, 180, 10), rgb(40, 220, 40));
         height: 100%;
         border-radius: 12px;
     }

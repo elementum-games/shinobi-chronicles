@@ -33,6 +33,11 @@ class Jutsu {
         self::ELEMENT_WATER,
         self::ELEMENT_LIGHTNING,
     ];
+
+    public static array $attacking_use_types = [
+        self::USE_TYPE_PHYSICAL,
+        self::USE_TYPE_PROJECTILE,
+    ];
     
     public int $id;
     public string $name;

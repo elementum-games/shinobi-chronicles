@@ -620,6 +620,7 @@ class User extends Fighter {
 
         // Clan
         $this->clan = $user_data['clan_id'];
+        $this->clan_office = 0;
         if($this->clan) {
             $result = $this->system->query("SELECT * FROM `clans` WHERE `clan_id`='$this->clan' LIMIT 1");
             if($this->system->db_last_num_rows == 0) {
@@ -1725,9 +1726,15 @@ class User extends Fighter {
     const LOG_TRAINING = 'training';
     const LOG_ARENA = 'arena';
     const LOG_LOGIN = 'login';
+    const LOG_MISSION = 'mission';
+    const LOG_SPECIAL_MISSION = 'special_mission';
+    const LOG_IN_BATTLE = 'in_battle';
+    const LOG_NOT_IN_VILLAGE = 'not_in_village';
 
     public function log(string $log_type, string $log_contents): bool {
-        $valid_log_types = [self::LOG_TRAINING, self::LOG_ARENA, self::LOG_LOGIN];
+        $valid_log_types = [
+            self::LOG_TRAINING, self::LOG_ARENA, self::LOG_LOGIN, self::LOG_MISSION, self::LOG_SPECIAL_MISSION, self::LOG_IN_BATTLE, self::LOG_NOT_IN_VILLAGE
+        ];
         if(!in_array($log_type, $valid_log_types)) {
             error_log("Invalid player log type {$log_type}");
             return false;

@@ -180,6 +180,7 @@ function team() {
             $mission = new Mission($mission_id, $player, $player->team);
 
             $player->mission_id = $mission_id;
+            $player->log(User::LOG_MISSION, "Team Mission ID #{$mission_id}");
 
             $system->message("Mission joined!");
         }

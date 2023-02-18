@@ -534,5 +534,71 @@ return [
         'text' => ':lsm giving himself a medal:',
         'public' => true,
     ],
+    [
+            'code' => ':hatcloud:',
+            'image' => "<img src='./images/memes/hats/hat-cloud.png' style='max-height:70px;' />",
+            'text' => ':basically a neat kite:',
+            'public' => true,
+    ],
+    [
+            'code' => ':hatleaf:',
+            'image' => "<img src='./images/memes/hats/hat-leaf.png'  style='max-height:70px;' />",
+            'text' => ':this hat is on fiaaaahhhh',
+            'public' => true,
+    ],
+    [
+            'code' => ':hatmist:',
+            'image' => "<img src='./images/memes/hats/hat-mist.png' style='max-height:70px;' />",
+            'text' => ':there must be a mist opportunity here:',
+            'public' => true,
+    ],
+    [
+            'code' => ':hatsand:',
+            'image' => "<img src='./images/memes/hats/hat-sand.png' style='max-height:70px;' />",
+            'text' => ':i hate this hat its so coarse and it gets into everything:',
+            'public' => true,
+    ],
+    [
+            'code' => ':hatstone:',
+            'image' => "<img src='./images/memes/hats/hat-stone.png'  style='max-height:70px;' />",
+            'text' => ':like a rock, also makes a great pet:',
+            'public' => true,
+    ],  
+    [
+            'code' => ':holdup:',
+            'image' => "<img src='./images/memes/holdup.png' />",
+            'text' => ':hold up:',
+            'public' => true,       
+    ],
+    [
+            'code' => ':hehecat:',
+            'image' => "<img src='./images/memes/hehecat.png' />",
+            'text' => ':hehe cat:',
+            'public' => true,       
+    ],
+    [
+            'code' => ':nothehecat:',
+            'image' => "<img src='./images/memes/nothehecat.png' />",
+            'text' => ':not hehe cat:',
+            'public' => true,       
+    ],
+    [
+            'code' => ':sadcatthumbsup:',
+            'image' => "<img src='./images/memes/sadcatthumbsup.png' />",
+            'text' => ':sad cat thumbs up:',
+            'public' => true,       
+    ],
+    [
+            'code' => ':whatisthis:',
+            'image' => "<img src='./images/memes/tiredphone.png' />",
+            'text' => ':what is this:',
+            'public' => true,       
+    ],  
+    [
+            'code' => ':popcorn:',
+            'image' => "<img src='./images/memes/Michael-Jackson-Popcorn.gif' />",
+            'text' => ':popcorn:',
+            'public' => true,       
+    ], 
 ];
 

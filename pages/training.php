@@ -201,10 +201,6 @@ function training() {
 								">Cast speed</option>
 							<option value='speed'" . ($player->train_type == 'speed' ? "selected='selected'" : "") . 
 								">Speed</option>
-							<option value='intelligence'" . ($player->train_type == 'intelligence' ? "selected='selected'" : "") . 
-								">Intelligence</option>
-							<option value='willpower'" . ($player->train_type == 'willpower' ? "selected='selected'" : "") . 
-								">Willpower</option>
 						</select><br />
 						<input type='submit' name='train_type' value='Short' />
 						<input type='submit' name='train_type' value='Long' />

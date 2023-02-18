@@ -56,6 +56,7 @@ function missions() {
                 throw new Exception("Invalid mission!");
             }
             Mission::start($player, $mission_id);
+            $player->log(User::LOG_MISSION, "Mission ID #{$mission_id}");
 
             missions();
 			return true;

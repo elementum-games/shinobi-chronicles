@@ -339,7 +339,6 @@ function premium() {
 
             $is_free_stat_change = $transfer_amount <= 10;
 
-
 			if($is_free_stat_change) {
 				$cost = 0;
 
@@ -358,6 +357,10 @@ function premium() {
 			} else {
 				$cost = 1 + floor($transfer_amount / 300);
 			}
+
+            if($original_stat == 'intelligence' || $original_stat == 'willpower') {
+                $cost = 0;
+            }
 
 			if($player->getPremiumCredits() < $cost) {
 				throw new Exception("You do not have enough Ancient Kunai!");
@@ -443,13 +446,13 @@ function premium() {
 				throw new Exception("You do not have enough Ancient Kunai!");
 			}
 
-			if($player->clan['leader'] == $player->user_id) {
+			if($player->clan && $player->clan['leader'] == $player->user_id) {
 				$system->query("UPDATE `clans` SET `leader` = '0' WHERE `clan_id` = '{$player->clan['id']}'");
 			}
-			else if($player->clan['elder_1'] == $player->user_id) {
+			else if($player->clan && $player->clan['elder_1'] == $player->user_id) {
 				$system->query("UPDATE `clans` SET `elder_1` = '0' WHERE `clan_id` = '{$player->clan['id']}'");
 			}
-			else if($player->clan['elder_2'] == $player->user_id) {
+			else if($player->clan && $player->clan['elder_2'] == $player->user_id) {
 				$system->query("UPDATE `clans` SET `elder_2` = '0' WHERE `clan_id` = '{$player->clan['id']}'");
 			}
 
@@ -1038,7 +1041,7 @@ function premiumCreditExchange() {
 	$self_link .= '&view=buy_kunai';
 
 	$price_min = 1.0;
-	$price_max = 10.0;
+	$price_max = 20.0;
 
 	// Create offer
 	if(isset($_POST['new_offer'])) {
@@ -1273,7 +1276,7 @@ function premiumCreditExchange() {
 		<span style='display:inline-block;width:120px;'>Money per kunai: </span>
 		<select onchange='calcPreview();' name='money' id='money'>&yen;";
 
-		for($i = $price_min; $i < $price_max; $i += 0.1) {
+		for($i = $price_min; $i <= $price_max; $i += 0.5) {
 			echo "<option value='" . sprintf("%.1f", $i) . "'>" . sprintf("%.1f", $i) . "</option>";
 		}
 
