@@ -208,7 +208,7 @@ $system->renderStaticPageHeader($layout);
         <p><em>The current drop rate for stats are as followed</em></p>
         <p>A base of a 25% drop per fight</p>
         <p>Increased by 15% if you are under or same level as AI</p>
-        <p>ncreased by 10% if the fight lasts longer than 4 turns</p>
+        <p>Increased by 10% if the fight lasts longer than 4 turns</p>
       </div>
 
 
