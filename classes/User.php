@@ -29,6 +29,7 @@ class User extends Fighter {
         ];
 
     const MIN_NAME_LENGTH = 2;
+    const MAX_NAME_LENGTH = 18;
     const MIN_PASSWORD_LENGTH = 6;
 
     const BASE_EXP = 500;
@@ -1237,7 +1238,7 @@ class User extends Fighter {
      * @throws Exception
      */
     public function subtractPremiumCredits(int $amount, string $description) {
-        if($this->money < $amount) {
+        if($this->getPremiumCredits() < $amount) {
             throw new Exception("Not enough Ancient Kunai!");
         }
         $this->setPremiumCredits($this->premium_credits - $amount, $description);

@@ -405,8 +405,9 @@ class SupportManager {
         // Notify user of update
         if($this->staff) {
             if($support_data['user_id']) {
-                $message = "Your support {$support_data['subject']} has been updated and can be viewed here " .
-                    $this->system->link . "support.php?support_id=" . $support_id;
+                $message = "Your support {$support_data['subject']} has been updated and can be viewed here <a href=\'" .
+                    $this->system->link . "support.php?support_id=" . $support_id . "\'>" .
+                    "{$this->system->link}support.php?support_id=$support_id</a>";
                 Inbox::sendAlert($this->system, 4, $this->user_id, $support_data['user_id'], $message);
             }
         }

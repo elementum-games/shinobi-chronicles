@@ -21,6 +21,7 @@ class ForbiddenSeal {
     public int $extra_jutsu_equips;
     public int $extra_armor_equips;
     public int $extra_weapon_equips;
+    public int $stat_transfer_boost;
     public float $long_training_time;
     public float $long_training_gains;
     public float $extended_training_time;
@@ -49,6 +50,7 @@ class ForbiddenSeal {
             'journal_image_display' => '300x200',
             'chat_post_size' => 350,
             'pm_size' => 1000,
+            'stat_transfer_boost' => 0
         ],
         1 => [
             'regen_boost' => 10,
@@ -74,6 +76,7 @@ class ForbiddenSeal {
             'long_training_gains' => 1,
             'extended_training_time' => 1,
             'extended_training_gains' => 1,
+            'stat_transfer_boost' => 0,
         ],
         2 => [
             'regen_boost' => 20, //Report in whole percentages (20 will be .2 bonus)
@@ -99,6 +102,7 @@ class ForbiddenSeal {
             'long_training_gains' => 2,
             'extended_training_time' => 1.5,
             'extended_training_gains' => 2,
+            'stat_transfer_boost' => 5,
         ]
     );
 
@@ -163,6 +167,7 @@ class ForbiddenSeal {
         $this->long_training_gains = self::$benefits[$this->level]['long_training_gains'];
         $this->extended_training_time = self::$benefits[$this->level]['extended_training_time'];
         $this->extended_training_gains = self::$benefits[$this->level]['extended_training_gains'];
+        $this->stat_transfer_boost = self::$benefits[$this->level]['stat_transfer_boost'];
 
         // Display variables
         $this->name_color_display = self::$benefits[$this->level]['name_color_display'];

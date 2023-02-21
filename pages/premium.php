@@ -50,6 +50,18 @@ function premium() {
 
     $free_stat_change_timer = 86400;
     $stat_transfer_points_per_min = 10;
+    //Apply premium boost
+    if($player->forbidden_seal_loaded) {
+        $stat_transfer_points_per_min += $player->forbidden_seal->stat_transfer_boost;
+    }
+    //Apply Chuunin boost
+    if($player->rank >= 3) {
+        $stat_transfer_points_per_min += 5;
+    }
+    //Apply Jonin boost
+    if($player->rank >= 4) {
+        $stat_transfer_points_per_min += 5;
+    }
 
 	$available_clans = array();
 
@@ -71,64 +83,63 @@ function premium() {
 
 	if(isset($_POST['user_reset'])) {
 		try {
-			if(!isset($_POST['confirm_reset'])) {
-				echo "<table class='table'><tr><th>Confirm Reset</th></tr>
-				<tr><td style='text-align:center;'>Are you sure you want to reset your character? You will lose all your stats,
-				bloodline, rank, and clan. You will keep your money.<br />
-				<form action='$self_link' method='post'>
-				<input type='hidden' name='confirm_reset' value='1' />
-				<input type='submit' name='user_reset' value='Reset my Account' />
-				</form>
-				</td></tr></table>";
-				return true;
-			}
-
-			if($player->team) {
-				throw new Exception("You must leave your team before resetting!");
-			}
+            if($player->team) {
+                throw new Exception("You must leave your team before resetting!");
+            }
             if($player->clan_office) {
                 throw new Exception("You must resign from your clan office first!");
             }
 
-			$player->level = 1;
-			$player->level = 1;
-			$player->rank = 1;
-			$player->health = 100;
-			$player->max_health = 100;
-			$player->stamina = 100;
-			$player->max_stamina = 100;
-			$player->chakra = 100;
-			$player->max_chakra = 100;
-			$player->regen_rate = 10;
-			$player->exp = User::BASE_EXP;
-			$player->bloodline_id = 0;
-			$player->bloodline_name = '';
-			$player->clan = array();
-			$player->clan['id'] = 0;
-			$player->location = $player->village_location;
-			$player->pvp_wins = 0;
-			$player->pvp_losses = 0;
-			$player->ai_wins = 0;
-			$player->ai_losses = 0;
-			$player->monthly_pvp = 0;
-			$player->ninjutsu_skill = 10;
-			$player->genjutsu_skill = 10;
-			$player->taijutsu_skill = 10;
-			$player->bloodline_skill = 0;
-			$player->cast_speed = 5;
-			$player->speed = 5;
-			$player->intelligence = 5;
-			$player->willpower = 5;
+			if(!isset($_POST['confirm_reset'])) {
+                $confirmation_type = "confirm_reset";
+                $confirmation_string = "Are you sure you want to reset your character? You will lose all your stats,
+                bloodline, rank and clan. You will keep your money.";
+                $submit_value = "user_reset";
+                $button_value = "Reset my Account";
 
-			//Bug fix: Elements previously was not cleared. -- Shadekun
-			$player->elements = [];
+				require 'templates/premium/purchase_confirmation.php';
+			}
+            else {
+                $player->level = 1;
+                $player->level = 1;
+                $player->rank = 1;
+                $player->health = 100;
+                $player->max_health = 100;
+                $player->stamina = 100;
+                $player->max_stamina = 100;
+                $player->chakra = 100;
+                $player->max_chakra = 100;
+                $player->regen_rate = 10;
+                $player->exp = User::BASE_EXP;
+                $player->bloodline_id = 0;
+                $player->bloodline_name = '';
+                $player->clan = array();
+                $player->clan['id'] = 0;
+                $player->location = $player->village_location;
+                $player->pvp_wins = 0;
+                $player->pvp_losses = 0;
+                $player->ai_wins = 0;
+                $player->ai_losses = 0;
+                $player->monthly_pvp = 0;
+                $player->ninjutsu_skill = 10;
+                $player->genjutsu_skill = 10;
+                $player->taijutsu_skill = 10;
+                $player->bloodline_skill = 0;
+                $player->cast_speed = 5;
+                $player->speed = 5;
+                $player->intelligence = 5;
+                $player->willpower = 5;
 
-			$player->exam_stage = 0;
+                //Bug fix: Elements previously was not cleared. -- Shadekun
+                $player->elements = array();
+                $player->missions_completed = array(); //Reset missions complete -- Hitori
 
-			$player->updateData();
+                $player->exam_stage = 0;
 
-			$system->query("DELETE FROM `user_bloodlines` WHERE `user_id`='$player->user_id'");
-			$system->query("UPDATE `user_inventory` SET
+                $player->updateData();
+
+                $system->query("DELETE FROM `user_bloodlines` WHERE `user_id`='$player->user_id'");
+                $system->query("UPDATE `user_inventory` SET
 				`jutsu` = '',
 				`items` = '',
 				`bloodline_jutsu` = '',
@@ -137,27 +148,24 @@ function premium() {
 				WHERE `user_id`='$player->user_id'");
 
 
-			echo "<table class='table'><tr><th>Character Reset</th></tr>
-			<tr><td style='text-align:center;'>
-			You have reset your character.<br />
-			<a href='{$system->link}?id=1'>Continue</a>
-			</td></tr>
-			</table>";
-			return true;
+                require 'templates/premium/character_reset_complete.php';
+                return true;
+            }
 		} catch (Exception $e) {
 			$system->message($e->getMessage());
 		}
 	}
 	else if(isset($_POST['name_change'])) {
 		$new_name = $system->clean($_POST['new_name']);
-		$nameCost = 1;
 		$akCost = $costs['name_change'];
+        $deductNameChanges = 1;
 		try {
 			if(!$player->username_changes and $player->getPremiumCredits() < $akCost) {
 				throw new Exception("You do not have enough Ancient Kunai!");
 			}
-			if(strlen($new_name) < User::MIN_NAME_LENGTH || strlen($new_name) >= 18) {
-				throw new Exception("New user name is to short/long! Please enter a name between 4 and 18 characters long.");
+			if(strlen($new_name) < User::MIN_NAME_LENGTH || strlen($new_name) > User::MAX_NAME_LENGTH) {
+				throw new Exception("New user name is to short/long! Please enter a name between "
+                    . User::MIN_NAME_LENGTH . " and " . User::MAX_NAME_LENGTH . " characters long.");
 			}
 			if($player->user_name == $new_name) {
 				throw new Exception("Please select a different name than your current one.");
@@ -173,102 +181,81 @@ function premium() {
 			if($player->username_changes > 0){
 				$akCost = 0;
 			}
-			else {
-				$nameCost = 0;
-			}
+            elseif(strtolower($player->user_name) == strtolower($new_name)) {
+                $akCost = 0;
+                $deductNameChanges = 0;
+                $_POST['confirm_name_change'] = 1; //Bypass need to confirm
+            }
+            else {
+                $deductNameChanges = 0;
+            }
 
 			$result = $system->query("SELECT `user_name` FROM `users` WHERE `user_name`='$new_name' LIMIT 1");
 			if($system->db_last_num_rows) {
 				$result = $system->db_fetch();
-				if(strtolower($player->user_name) == strtolower($new_name)) {
-					$nameCost = 0;
-					$akCost = 0;
-				}
-				else if(strtolower($result['user_name']) == strtolower($new_name)) {
-					throw new Exception("Username already in use!");
-				}
+                if(strtolower($result['user_name']) == strtolower($new_name) && $result['user_name'] != $player->user_name) {
+                    throw new Exception("Username already in use!");
+                }
 			}
 
-			if(!isset($_POST['confirm_nameChange'])) {
-				echo "<table class='table'><tr><th>Confirm Change</th></tr>
-				<tr><td style='text-align:center;'>Are you sure you want to change your username?
-				Doing this will also change your log in name to the new selected one.
-				Please remember to clear your inbox before changing name.<br />
-				<form action='$self_link' method='post'>
-				<input type='hidden' name='confirm_nameChange' value='1' />
-				<input type='text' name='new_name' value='{$new_name}'/>
-				<input type='submit' name='name_change' value='Confirm Change' />
-				</form>
-				</td></tr></table>";
-				return true;
-				throw new Exception('');
+			if(!isset($_POST['confirm_name_change'])) {
+                $confirmation_type = 'confirm_name_change';
+                $confirmation_string = "Are you sure you want to change your username?<br />
+                Doing this will also change your login name to the name you select.<br />
+                Changing your name will make it available for use to anyone!";
+                $additional_form_data = ['new_name' => ['input_type'=>'text', 'value'=>$new_name]];
+                $submit_value = "name_change";
+                $button_value = "Confirm Change";
+
+                require 'templates/premium/purchase_confirmation.php';
 			}
+            else {
+                $sql = "UPDATE `users` SET `user_name` = '%s', `username_changes` = `username_changes` - %d WHERE `user_id` = %d LIMIT 1;";
+                $system->query(sprintf($sql, $new_name, $deductNameChanges, $player->user_id));
+                $player->subtractPremiumCredits($akCost, "Username change");
 
-			$sql = "UPDATE `users` SET `user_name` = '%s',  `premium_credits` = `premium_credits` - %d, `username_changes` = `username_changes` - %d WHERE `user_id` = %d LIMIT 1;";
-			$system->query(sprintf($sql, $new_name, $akCost, $nameCost, $player->user_id));
-			$player->subtractPremiumCredits($akCost, "Username change");
-
-			echo "<table class='table'><tr><th>Username Change</th></tr>
-			<tr><td style='text-align:center;'>
-			You have changed your username to {$new_name}.<br />
-			<a href='{$system->link}?id=1'>Continue</a>
-			</td></tr>
-			</table>";
+                $system->message("You have changed your name to $new_name.");
+            }
 		} catch (Exception $e) {
 			$system->message($e->getMessage());
 		}
 	}
-
-	// Gender change
 	else if(isset($_POST['change_gender'])) {
-		try {
-			$new_gender = $_POST['new_gender'];
-			$gender_change_cost = $costs['gender_change'];
-			if($player->getPremiumCredits() < $gender_change_cost) {
-				throw new Exception("You do not have enough Ancient Kunai!");
-			}
-			if($player->gender == $new_gender) {
-				throw new Exception("You are already a {$new_gender}!");
-			}
-			if(!in_array($new_gender, User::$genders, true)) {
-				throw new Exception("Invalid gender!");
-			}
+        try {
+            $new_gender = $system->clean($_POST['new_gender']);
+            $akCost = $costs['gender_change'];
+            if($player->getPremiumCredits() < $akCost) {
+            throw new Exception("You do not have enough Ancient Kunai!");
+            }
+            if($player->gender == $new_gender) {
+            throw new Exception("You are already a {$new_gender}!");
+            }
+            if(!in_array($new_gender, User::$genders, true)) {
+            throw new Exception("Invalid gender!");
+            }
 
-	 if(!isset($_POST['confirm'])) {
-		echo "
-			<table class='table'><tr><th>Confirm Gender Change</th></tr>
-				<tr>
-					<td style='text-align:center;'>Are you sure you want to change your gender to $new_gender?<br />
-						<form action='$self_link' method='post'>
-							<input type='hidden' name='confirm' value='1' />
-							<input type='hidden' name='new_gender' value='$new_gender' />
-							<input type='submit' name='change_gender' value='Change Gender' />
-						</form>
-					</td>
-				</tr>
-			</table>";
-			return true;
-		} else {
-				echo "<table class='table'><tr><th>Gender Change</th></tr>
-					<tr><td style='text-align:center;'>
-					You have changed your gender to {$new_gender}.<br />
-					<a href='{$system->link}?id=1'>Continue</a>
-					</td></tr>
-					</table>";
+            //Confirm purchase
+            if(!isset($_POST['confirm_gender_change'])) {
+                $confirmation_type = "confirm_gender_change";
+                $confirmation_string = "Are you sure you want to change your gender to $new_gender?";
+                $additional_form_data = ['new_gender' => ['input_type'=>'hidden', 'value'=>$new_gender]];
+                $submit_value = 'change_gender';
+                $button_value = 'Change Gender';
 
-					$player->subtractPremiumCredits($gender_change_cost, "Gender change to {$new_gender}");
-					$player->gender = $new_gender;
-					$player->updateData();
-
-					return false;
-				}
-
-		} catch (Exception $e) {
-		$system->message($e->getMessage());
-		}
-	}
+                require 'templates/premium/purchase_confirmation.php';
+            }
+            //Complete purchase
+            else {
+                $system->message("You have changed your gender to $new_gender.");
+                $player->subtractPremiumCredits($akCost, "Gender change to {$new_gender}");
+                $player->gender = $new_gender;
+                $player->updateData();
+            }
+        } catch (Exception $e) {
+            $system->message($e->getMessage());
+        }
+    }
 	else if(isset($_POST['stat_reset'])) {
-
 		try {
 			$stat = $system->clean($_POST['stat']);
 			if(array_search($stat, $player->stats) === false) {
@@ -281,26 +268,22 @@ function premium() {
 				$reset_amount = 10;
 			}
 
-			if(!isset($_POST['confirm'])) {
-				echo "<table class='table'><tr><th>Confirm stat reset</th></tr>
-				<tr><td style='text-align:center;'>
-				Are you sure you want to reset your " . ucwords(str_replace('_', ' ', $stat)) . " from " . $player->{$stat} . " -> $reset_amount?
-				<form action='$self_link&view=character_changes' method='post'>
-				<input type='hidden' name='stat' value='$stat' />
-				<input type='hidden' name='confirm' value='1' />
-				<input type='submit' name='stat_reset' value='Confirm reset' />
-				</form>
-				</td></tr></table>";
-
-				throw new Exception('');
+			if(!isset($_POST['confirm_stat_reset'])) {
+                $confirmation_type = "confirm_stat_reset";
+                $confirmation_string = "Are you sure you want to reset your " . system::unSlug($stat) .
+                    " from {$player->{$stat}} to $reset_amount?";
+                $additional_form_data = ['stat' => ['input_type'=>'hidden', 'value'=>$stat]];
+                $submit_value = 'stat_reset';
+                $button_value = 'Confirm Reset';
+                require 'templates/premium/purchase_confirmation.php';
 			}
+            else {
+                $exp = ($player->{$stat} - $reset_amount) * 10;
 
-			$exp = ($player->{$stat} - $reset_amount) * 10;
-
-			$player->{$stat} = $reset_amount;
-			$player->exp -= $exp;
-
-			$system->message("You have reset your " . ucwords(str_replace('_', ' ', $stat)) . " to $reset_amount.");
+                $player->{$stat} = $reset_amount;
+                $player->exp -= $exp;
+                $system->message("You have reset your " . System::unSlug($stat). " to $reset_amount.");
+            }
 		} catch (Exception $e) {
 			$system->message($e->getMessage());
 		}
@@ -341,7 +324,7 @@ function premium() {
             $is_free_stat_change = $transfer_amount <= 10;
 
 			if($is_free_stat_change) {
-				$cost = 0;
+				$akCost = 0;
 
 				// Check for last free stat change
 	            if($player->last_free_stat_change > time() - $free_stat_change_timer) {
@@ -355,15 +338,16 @@ function premium() {
                         )
                     );
 	            }
-			} else {
-				$cost = 1 + floor($transfer_amount / 300);
 			}
-
+            else {
+				$akCost = 1 + floor($transfer_amount / 300);
+			}
+            //Int and Willpower are free
             if($original_stat == 'intelligence' || $original_stat == 'willpower') {
-                $cost = 0;
+                $akCost = 0;
             }
 
-			if($player->getPremiumCredits() < $cost) {
+			if($player->getPremiumCredits() < $akCost) {
 				throw new Exception("You do not have enough Ancient Kunai!");
 			}
 
@@ -379,116 +363,129 @@ function premium() {
 				throw new Exception("Please finish or cancel your training!");
 			}
 
-			 if(!isset($_POST['confirm'])) {
-				echo "<table class='table'><tr><th>Confirm stat reset</th></tr>
-				<tr><td style='text-align:center;'>
-				Are you sure you want to transfer $transfer_amount " . ucwords(str_replace('_', ' ', $original_stat)) . " to " .
-					ucwords(str_replace('_', ' ', $target_stat)) . "?<br />" .
-				ucwords(str_replace('_', ' ', $original_stat)) . ": " . $player->{$original_stat} . " -> " . ($player->{$original_stat} - $transfer_amount) . "<br />" .
-				ucwords(str_replace('_', ' ', $target_stat)) . ": " . $player->{$target_stat} . " -> " . ($player->{$target_stat} + $transfer_amount) .
-				"<br />
-				Cost: $cost AK<br />
-				Time: $time minutes<br />
-				<form action='$self_link&view=character_changes' method='post'>
-				<input type='hidden' name='original_stat' value='$original_stat' />
-				<input type='hidden' name='target_stat' value='$target_stat' />
-				<input type='hidden' name='transfer_amount' value='$transfer_amount' />
-				<input type='hidden' name='confirm' value='1' />
-				<input type='submit' name='stat_allocate' value='Confirm transfer' />
-				</form>
-				</td></tr></table>";
+			 if(!isset($_POST['confirm_stat_reset'])) {
+                 $confirmation_type = 'confirm_stat_reset';
+                 $confirmation_string = "Are you sure you want to transfer $transfer_amount " . System::unSlug($original_stat) .
+                 " to " . System::unSlug($target_stat) . "?<br />" . System::unSlug($original_stat) . ": {$player->{$original_stat}} -> " .
+                 ($player->{$original_stat}-$transfer_amount) . "<br />" . System::unSlug($target_stat). ": {$player->{$target_stat}} -> " .
+                 ($player->{$target_stat}+$transfer_amount) . "<br /> This will take " . System::timeRemaining($time*60, 'long', true, true);
+                 $additional_form_data = [
+                     'original_stat' => ['input_type' => 'hidden', 'value' => $original_stat],
+                     'target_stat' => ['input_type' => 'hidden', 'value' => $target_stat],
+                     'transfer_amount' => ['input_type' => 'hidden', 'value' => $transfer_amount],
+                 ];
+                 $submit_value = 'stat_allocate';
+                 $button_value = 'Confirm Transfer';
 
-				throw new Exception('');
+                 require 'templates/premium/purchase_confirmation.php';
 			}
+            else {
+                 $player->subtractPremiumCredits($akCost, "Transferred {$transfer_amount} {$original_stat} to {$target_stat}");
 
-			$player->subtractPremiumCredits($cost, "Transferred {$transfer_amount} {$original_stat} to {$target_stat}");
+                 $exp = $transfer_amount * 10;
+                 $player->exp -= $exp;
+                 $player->{$original_stat} -= $transfer_amount;
 
-			$exp = $transfer_amount * 10;
-			$player->exp -= $exp;
-			$player->{$original_stat} -= $transfer_amount;
+                 $player->train_type = $target_stat;
+                 $player->train_gain = $transfer_amount;
+                 $player->train_time = time() + ($time * 60);
 
-			$player->train_type = $target_stat;
-			$player->train_gain = $transfer_amount;
-			$player->train_time = time() + ($time * 60);
+                 if ($is_free_stat_change) {
+                     $player->last_free_stat_change = time();
+                 }
 
-			if($is_free_stat_change) {
-				$player->last_free_stat_change = time();
-			}
-
-			$player->updateData();
-
-			echo "<table class='table'><tr><th>Stat Transfer Started</th></tr>
-			<tr><td style='text-align:center;'>You have started the transfer of your " . ucwords(str_replace('_', ' ', $original_stat)) . " to " .
-				ucwords(str_replace('_', ' ', $target_stat)) . ".<br />
-				<b><u>IMPORTANT</u></b>:<br />
-				Do not cancel the training that was just started or you will not receive the transferred stats, and staff will not refund you for the
-				transfer cost!
-				</td></tr></table>";
+                 $player->updateData();
+                 require 'templates/premium/stat_transfer_confirmation.php';
+             }
 		} catch (Exception $e) {
 			$system->message($e->getMessage());
 		}
 		$system->printMessage();
 	}
 	else if(isset($_POST['purchase_bloodline'])) {
-		$bloodline_id = $system->clean($_POST['bloodline_id']);
 		try {
+            $self_link .= '&view=bloodlines';
+            $bloodline_id = (int) $_POST['bloodline_id'];
 			$result = $system->query("SELECT `bloodline_id`, `name`, `clan_id`, `rank` FROM `bloodlines`
 				WHERE `bloodline_id`='$bloodline_id' AND `rank` < 5 ORDER BY `rank` ASC");
+
+            //BL not found
 			if($system->db_last_num_rows == 0) {
 				throw new Exception("Invalid bloodline!");
 			}
-			$result = $system->db_fetch($result);
-
-			if($player->bloodline_id == $bloodline_id) {
-				throw new Exception("You already have this bloodline!");
-			}
-
-			if($player->getPremiumCredits() < $costs['bloodline'][$result['rank']]) {
-				throw new Exception("You do not have enough Ancient Kunai!");
-			}
-
-			if($player->clan && $player->clan['leader'] == $player->user_id) {
-				$system->query("UPDATE `clans` SET `leader` = '0' WHERE `clan_id` = '{$player->clan['id']}'");
-			}
-			else if($player->clan && $player->clan['elder_1'] == $player->user_id) {
-				$system->query("UPDATE `clans` SET `elder_1` = '0' WHERE `clan_id` = '{$player->clan['id']}'");
-			}
-			else if($player->clan && $player->clan['elder_2'] == $player->user_id) {
-				$system->query("UPDATE `clans` SET `elder_2` = '0' WHERE `clan_id` = '{$player->clan['id']}'");
-			}
-
-			if($player->clan_office) {
-				$player->clan_office = 0;
-			}
-
+            //Load BL data
+            $result = $system->db_fetch($result);
+            $akCost = $costs['bloodline'][$result['rank']];
             $bloodline_name = $result['name'];
-			$player->subtractPremiumCredits($costs['bloodline'][$result['rank']], "Purchased bloodline {$bloodline_name} (#$bloodline_id)");
 
-			// Give bloodline
-			$status = Bloodline::giveBloodline(
-                system: $system,
-                bloodline_id: $bloodline_id,
-                user_id: $player->user_id,
-                display: false
-            );
+            //Confirm purchase
+            if(!isset($_POST['confirm_bloodline_purchase'])) {
+                $confirmation_type = 'confirm_bloodline_purchase';
+                $confirmation_string = "Are you sure you want to purchase the Bloodline $bloodline_name?";
+                $additional_form_data = [
+                    'bloodline_id' => ['input_type' => 'hidden', 'value'=>$bloodline_id]
+                ];
+                $submit_value = 'purchase_bloodline';
+                $button_value = 'Receive Bloodline';
+                //If player has bloodline, add warning
+                if($player->bloodline) {
+                    $confirmation_string .= "<br /><b>WARNING:</b><br />
+                    Purchasing the Bloodline $bloodline_name will result in the loss of your current Bloodline
+                    {$player->bloodline_name}. This will result in loss of all Bloodline jutsu level and unlocks and 10%
+                    of your Bloodline skill!<br />
+                    <b>This process can not be undone!</b><br />
+                    If you are part of a clan, you may also be removed from any office and be assigned a new clan.";
+                }
+                require_once 'templates/premium/purchase_confirmation.php';
+            }
+            else {
+                if ($player->bloodline_id == $bloodline_id) {
+                    throw new Exception("You already have this bloodline!");
+                }
+                if ($player->getPremiumCredits() < $akCost) {
+                    throw new Exception("You do not have enough Ancient Kunai!");
+                }
+                //Check clan office detail & remove player from clan data if present
+                if ($player->clan && $player->clan['leader'] == $player->user_id) {
+                    $system->query("UPDATE `clans` SET `leader` = '0' WHERE `clan_id` = '{$player->clan['id']}'");
+                } else if ($player->clan && $player->clan['elder_1'] == $player->user_id) {
+                    $system->query("UPDATE `clans` SET `elder_1` = '0' WHERE `clan_id` = '{$player->clan['id']}'");
+                } else if ($player->clan && $player->clan['elder_2'] == $player->user_id) {
+                    $system->query("UPDATE `clans` SET `elder_2` = '0' WHERE `clan_id` = '{$player->clan['id']}'");
+                }
+                //Remove office from player data if present
+                if ($player->clan_office) {
+                    $player->clan_office = 0;
+                }
 
-			$message = "You now have the bloodline <b>$bloodline_name</b>.";
+                //Process purchase
+                $player->subtractPremiumCredits($akCost, "Purchased bloodline {$bloodline_name} (#$bloodline_id)");
 
-			// Set clan
-            $clan_id = $result['clan_id'];
-			$result = $system->query("SELECT `name` FROM `clans` WHERE `clan_id` = '$clan_id' LIMIT 1");
-			if($system->db_last_num_rows > 0) {
-				$clan_result = $system->db_fetch($result);
+                // Give bloodline
+                $status = Bloodline::giveBloodline(
+                    system: $system,
+                    bloodline_id: $bloodline_id,
+                    user_id: $player->user_id,
+                    display: false
+                );
+
+                $message = "You now have the bloodline <b>$bloodline_name</b>.";
+
+                // Set clan
+                $clan_id = $result['clan_id'];
+                $result = $system->query("SELECT `name` FROM `clans` WHERE `clan_id` = '$clan_id' LIMIT 1");
+                if ($system->db_last_num_rows > 0) {
+                    $clan_result = $system->db_fetch($result);
 
 
-				$player->clan = array();
-				$player->clan['id'] = $clan_id;
-				$message .= " With your new bloodline you have been kicked out of your previous clan, and have been accepted by
-				the " . $clan_result['name'] . " Clan.";
-			}
+                    $player->clan = array();
+                    $player->clan['id'] = $clan_id;
+                    $message .= "<br />With your new bloodline you have been kicked out of your previous clan, and have been accepted by
+				    the " . $clan_result['name'] . " Clan.";
+                }
 
-			echo "<table class='table'><tr><th>New Bloodline!</th></tr>
-			<tr><td style='text-align:center;'>$message</td></tr></table>";
+                require 'templates/premium/bloodline_purchase_confirmation.php';
+            }
 		} catch (Exception $e) {
 			$system->message($e->getMessage());
 		}
@@ -506,9 +503,9 @@ function premium() {
             if(!isset($costs['forbidden_seal'][$seal_level][$seal_length])) {
                 throw new Exception("Invalid seal length!");
             }
-            $seal_cost = $costs['forbidden_seal'][$seal_level][$seal_length];
+            $akCost = $costs['forbidden_seal'][$seal_level][$seal_length];
             //Check cost
-            if($player->getPremiumCredits() < $seal_cost) {
+            if($player->getPremiumCredits() < $akCost) {
                 throw new Exception("You do not have enough Ancient Kunai!");
             }
 
@@ -522,8 +519,18 @@ function premium() {
             elseif($player->forbidden_seal_loaded) {
                 $overwrite = isset($_POST['confirm_seal_overwrite']) ? true : false;
                 // Confirm change in seal... time will not be reimbursed
-                if(!isset($_POST['confirm_seal_overwrite']) && $seal_level != $player->forbidden_seal->level) {
-                    require_once ('templates/overwriteSealConfirmation.php');
+                if(!isset($_POST['change_forbidden_seal']) && $seal_level != $player->forbidden_seal->level) {
+                    $confirmation_type = 'change_forbidden_seal';
+                    $confirmation_string = "Are you sure you would like to change from your {$player->forbidden_seal->name}?<br />
+                    You will lose {$system->time_remaining($player->forbidden_seal->seal_time_remaining)} of premium time.<br />
+                    <b>This can not be undone!</b>";
+                    $additional_form_data = [
+                        'seal_level' => ['input_type' => 'hidden', 'value' => $seal_level],
+                        'seal_length' => ['input_type' => 'hidden', 'value' => $seal_length],
+                    ];
+                    $submit_value = 'forbidden_seal';
+                    $button_value = 'Confirm Seal Change';
+                    require 'templates/premium/purchase_confirmation.php';
                 }
                 else {
                     $message = "Purchased " . ForbiddenSeal::$forbidden_seals[$seal_level] . " seal for {$seal_length} days.";
@@ -531,7 +538,7 @@ function premium() {
                         $message .= " This purchase removed {$system->time_remaining($player->forbidden_seal->seal_time_remaining)}" .
                             " of their {$player->forbidden_seal->name}.";
                     }
-                    $player->subtractPremiumCredits($seal_cost, $message);
+                    $player->subtractPremiumCredits($akCost, $message);
                     $player->forbidden_seal->addSeal($seal_level, $seal_length);
                     $system->message("You changed your seal!");
                 }
@@ -616,164 +623,153 @@ function premium() {
 		}
 		$system->printMessage();
 	}
-	// Change elements
 	else if(isset($_POST['change_element']) && $player->rank >= 3) {
         try {
-			$current_element = $_POST['current_element'];
-			$new_element = $_POST['new_element'];
+            $akCost = $costs['element_change'];
+			$current_element = $system->clean($_POST['current_element']);
+			$new_element = $system->clean($_POST['new_element']);
+            //Player already has new element
+            if(in_array($new_element, $player->elements)) {
+                throw new Exception("You already attuned to the $new_element element!");
+            }
+            //Check player's current element is valid
+            switch($player->elements[$current_element]) {
+                case Jutsu::ELEMENT_FIRE:
+                case Jutsu::ELEMENT_WIND:
+                case Jutsu::ELEMENT_LIGHTNING:
+                case Jutsu::ELEMENT_EARTH:
+                case Jutsu::ELEMENT_WATER:
+                    break;
+                default:
+                    throw new Exception("The $current_element element ({$player->elements[$current_element]}) is invalid!");
+            }
+            //Check that new element is valid
+            switch($new_element) {
+                case Jutsu::ELEMENT_FIRE:
+                case Jutsu::ELEMENT_WIND:
+                case Jutsu::ELEMENT_LIGHTNING:
+                case Jutsu::ELEMENT_EARTH:
+                case Jutsu::ELEMENT_WATER:
+                    break;
+                default:
+                    throw new Exception("New element $new_element is invalid!");
+            }
+            //Check cost
+            if($player->getPremiumCredits() < $akCost) {
+                throw new Exception("You do not have enough Ancient Kunai!");
+            }
+            //Confirm purchase
+            if(!isset($_POST['confirm_chakra_element_change'])) {
+                $confirmation_type = 'confirm_chakra_element_change';
+                $confirmation_string = "Are you sure you want to <b>forget the {$player->elements[$current_element]} nature</b>
+                and any jutsus you have to <b>attune to the $new_element nature</b>?<br />
+                <br />
+                <b>(IMPORTANT: This is non-reversable once completed! If you want to return to your original element you
+                will have to pay another fee. You will forget any elemental jutsu you currently have of this nature.)</b>";
+                $additional_form_data = [
+                    'current_element' => ['input_type' => 'hidden', 'value' => $current_element],
+                    'new_element' => ['input_type' => 'hidden', 'value' => $new_element],
+                ];
+                $submit_value = 'change_element';
+                $button_value = 'Change Element';
 
-	            if($new_element == $player->elements) {
-	                throw new Exception("Invalid element selected!");
-	            }
+                require 'templates/premium/purchase_confirmation.php';
+            }
+            else {
+                //Display purchase information
+                $message = '';
+                switch ($new_element) {
+                    case Jutsu::ELEMENT_FIRE:
+                        $message = "With the image of blazing fires in your mind, you flow chakra from your stomach,
+                    down through your legs and into the seal on the floor. Suddenly one of the pedestals bursts into
+                    fire, breaking your focus, and the elders smile and say:<br /
+                    <br />\"Congratulations, you now have the Fire element. Fire is the embodiment of
+                    consuming destruction, that devours anything in its path. Your Fire jutsu will be strong against Wind jutsu, as
+                    they will only fan the flames and strengthen your jutsu. However, you must be careful against Water jutsu, as they
+                    can extinguish your fires.\"
+                    <br />";
+                        break;
+                    case Jutsu::ELEMENT_WIND:
+                        $message = "Picturing a tempestuous tornado, you flow chakra from your stomach,
+                    down through your legs and into the seal on the floor. You feel a disturbance in the room and
+                    suddenly realize that a small whirlwind has formed around one of the pedestals, and the elders smile and say:<br /
+                    <br />\"Congratulations, you have the Wind element. Wind is the sharpest out of all chakra natures,
+                    and can slice through anything when used properly. Your Wind chakra will be strong against
+                    Lightning jutsu, as you can cut and dissipate it, but you will be weak against Fire jutsu,
+                    because your wind only serves to fan their flames and make them stronger.\"
+                    <br />";
+                        break;
+                    case Jutsu::ELEMENT_LIGHTNING:
+                        $message = "Imagining the feel of electricity coursing through your veins, you flow chakra from your stomach,
+                    down through your legs and into the seal on the floor. Suddenly you feel a charge in the air and
+                    one of the pedestals begins to spark with crackling electricity, and the elders smile and say:<br />
+                    <br />\"Congratulations, you have the Lightning element. Lightning embodies pure speed, and skilled users of
+                    this element physically augment themselves to swiftly strike through almost anything. Your Lightning
+                    jutsu will be strong against Earth as your speed can slice straight through the slower techniques of Earth,
+                    but you must be careful against Wind jutsu as they will dissipate your Lightning.\"
+                    <br />";
+                        break;
+                    case Jutsu::ELEMENT_EARTH:
+                        $message = "Envisioning stone as hard as the temple you are sitting in, you flow chakra from your stomach,
+                    down through your legs and into the seal on the floor. Suddenly dirt from nowhere begins to fall off one of the
+                    pedestals and the elders smile and say:<br />
+                    <br />\"Congratulations, you have the Earth element. Earth
+                    is the hardiest of elements and can protect you or your teammates from enemy attacks. Your Earth jutsu will be
+                    strong against Water jutsu, as you can turn the water to mud and render it useless, but you will be weak to
+                    Lightning jutsu, as they are one of the few types that can swiftly evade and strike through your techniques.\"
+                    <br />";
+                        break;
+                    case Jutsu::ELEMENT_WATER:
+                        $message = "With thoughts of splashing rivers flowing through your mind, you flow chakra from your stomach,
+                    down through your legs and into the seal on the floor. Suddenly a small geyser erupts from one of
+                    the pedestals, and the elders smile and say:<br />
+                    <br />\"Congratulations, you have the Water element. Water is a versatile element that can control the flow
+                    of the battle, trapping enemies or launching large-scale attacks at them. Your Water jutsu will be strong against
+                    Fire jutsu because you can extinguish them, but Earth jutsu can turn your water into mud and render it useless.\"
+                    <br />";
+                        break;
+                }
 
-				switch($player->elements[$current_element]) {
-						case Jutsu::ELEMENT_FIRE:
-						case Jutsu::ELEMENT_WIND:
-						case Jutsu::ELEMENT_LIGHTNING:
-						case Jutsu::ELEMENT_EARTH:
-						case Jutsu::ELEMENT_WATER:
-							break;
-						default:
-							throw new Exception("Invalid element! {$current_element}");
-							break;
-					}
+                require 'templates/premium/chakra_purchase_confirmation.php';
 
-				switch($new_element) {
-					case Jutsu::ELEMENT_FIRE:
-					case Jutsu::ELEMENT_WIND:
-					case Jutsu::ELEMENT_LIGHTNING:
-					case Jutsu::ELEMENT_EARTH:
-					case Jutsu::ELEMENT_WATER:
-							break;
-						default:
-							throw new Exception("Invalid element! new element");
-							break;
-					}
+                // Process purchase
+                $player->subtractPremiumCredits(
+                    $akCost,
+                    "Changed {$current_element} element from {$player->elements[$current_element]} to $new_element"
+                );
 
-					if($player->getPremiumCredits() < $costs['element_change']) {
-						throw new Exception("You do not have enough Ancient Kunai!");
-					}
+                $player->getInventory();
 
-					 if(!isset($_POST['confirm'])) {
-						echo "
-							<table class='table'><tr><th>Confirm Chakra Element Change</th></tr>
-								<tr>
-									<td style='text-align:center;'>
-										Are you sure you want to <b>forget the " . $player->elements[$current_element] . " nature</b> and any jutsus you have to <b>attune to the $new_element nature</b>?<br />
-										<br />
-										<b>(IMPORTANT: This is non-reversable once completed, if you want to return to your original element you will have to pay another fee. You will forget any elemental jutsu you currently have of this nature.)</b><br />
-										<form action='$self_link' method='post'>
-											<input type='hidden' name='confirm' value='1' />
-											<input type='hidden' name='current_element' value='$current_element' />
-											<input type='hidden' name='new_element' value='$new_element' />
-											<input type='submit' name='change_element' value='Change Element' />
-										</form>
-									</td>
-								</tr>
-							</table>";
-							return true;
-						} else {
-								echo "<table class='table'><tr><th>Chakra Element Change</th></tr>
-										<td style='text-align:center;'>";
-											switch($new_element) {
-												case Jutsu::ELEMENT_FIRE:
-													echo "With the image of blazing fires in your mind, you flow chakra from your stomach,
-													down through your legs and into the seal on the floor. Suddenly one of the pedestals bursts into
-													fire, breaking your focus, and the elders smile and say
-													<br />\"Congratulations, you now have the Fire element. Fire is the embodiment of
-													consuming destruction, that devours anything in its path. Your Fire jutsu will be strong against Wind jutsu, as
-													they will only fan the flames and strengthen your jutsu. However, you must be careful against Water jutsu, as they
-													can extinguish your fires.\"
-													<br />";
-													break;
-												case Jutsu::ELEMENT_WIND:
-													echo "Picturing a tempestuous tornado, you flow chakra from your stomach,
-													down through your legs and into the seal on the floor. You feel a disturbance in the room and
-													suddenly realize that a small whirlwind has formed around one of the pedestals, and the elders smile and say
-													<br />\"Congratulations, you have the Wind element. Wind is the sharpest out of all chakra natures,
-													and can slice through anything when used properly. Your Wind chakra will be strong against
-													Lightning jutsu, as you can cut and dissipate it, but you will be weak against Fire jutsu,
-													because your wind only serves to fan their flames and make them stronger.\"
-													<br />";
-													break;
-												case Jutsu::ELEMENT_LIGHTNING:
-													echo "Imagining the feel of electricity coursing through your veins, you flow chakra from your stomach,
-													down through your legs and into the seal on the floor. Suddenly you feel a charge in the air and
-													one of the pedestals begins to spark with crackling electricity, and the elders smile and say
-													<br />\"Congratulations, you have the Lightning element. Lightning embodies pure speed, and skilled users of
-													this element physically augment themselves to swiftly strike through almost anything. Your Lightning
-													jutsu will be strong against Earth as your speed can slice straight through the slower techniques of Earth,
-													but you must be careful against Wind jutsu as they will dissipate your Lightning.\"
-													<br />";
-													break;
-												case Jutsu::ELEMENT_EARTH:
-													echo "Envisioning stone as hard as the temple you are sitting in, you flow chakra from your stomach,
-													down through your legs and into the seal on the floor. Suddenly dirt from nowhere begins to fall off one of the
-													pedstals and the elders smile and say
-													<br />\"Congratulations, you have the Earth element. Earth
-													is the hardiest of elements and can protect you or your teammates from enemy attacks. Your Earth jutsu will be
-													strong against Water jutsu, as you can turn the water to mud and render it useless, but you will be weak to
-													Lightning jutsu, as they are one of the few types that can swiftly evade and strike through your techniques.\"
-													<br />";
-													break;
-												case Jutsu::ELEMENT_WATER:
-													echo "With thoughts of splashing rivers flowing through your mind, you flow chakra from your stomach,
-													down through your legs and into the seal on the floor. Suddenly a small geyser erupts from one of
-													the pedestals, and the elders smile and say
-													<br />\"Congratulations, you have the Water element. Water is a versatile element that can control the flow
-													of the battle, trapping enemies or launching large-scale attacks at them. Your Water jutsu will be strong against
-													Fire jutsu because you can extinguish them, but Earth jutsu can turn your water into mud and render it useless.\"
-													<br />";
-													break;
-												}
-								echo "
-								<br/>
-								<b style='color:green'>You have forgotten the " . $player->elements[$current_element] ." nature and all its jutsu and are now attuned to the $new_element nature.</b>
-								<br />
-								<br />
-								<a href='{$system->links['premium']}'>Continue</a>
-								<br />
-								<tr><td style='text-align:center;'></table>";
-								}
+                // Chuunin element change
+                if ($player->rank >= 3 && $current_element === 'first') {
+                    foreach ($player->jutsu as $jutsu) {
+                        if ($jutsu->element == $player->elements[$current_element]) {
+                            $player->removeJutsu($jutsu->id);
+                        }
+                    }
+                    $player->elements['first'] = $new_element;
+                }
+                // Jonin+ element change
+                else if ($player->rank >= 4 && $current_element === 'second') {
+                    foreach ($player->jutsu as $jutsu) {
+                        if ($jutsu->element == $player->elements[$current_element]) {
+                            $player->removeJutsu($jutsu->id);
+                        }
+                    }
+                    $player->elements['second'] = $new_element;
+                }
 
-						// Cost
-						$player->subtractPremiumCredits(
-                            $costs['element_change'],
-                            "Changed {$current_element} element from {$player->elements[$current_element]} to $new_element"
-                        );
-
-						$player->getInventory();
-
-						// Chuunin element change
-						if($player->rank >= 3 && $current_element === 'first') {
-							foreach($player->jutsu as $jutsu) {
-								if($jutsu->element == $player->elements[$current_element]) {
-                        				$player->removeJutsu($jutsu->id);
-                    				}
-                			}
-                			$player->elements['first'] = $new_element;
-            			}
-						// Jonin+ element change
-						else if($player->rank >= 4 && $current_element === 'second') {
-							foreach($player->jutsu as $jutsu) {
-								if($jutsu->element == $player->elements[$current_element]) {
-                        				$player->removeJutsu($jutsu->id);
-                    				}
-                			}
-                		$player->elements['second'] = $new_element;
-            		}
-
-						$player->updateData();
-						$player->updateInventory();
-
-					} catch (Exception $e) {
-						$system->message($e->getMessage());
-					}
-					$system->printMessage();
-					return false;
-			}
+                $player->updateData();
+                $player->updateInventory();
+            }
+        } catch (Exception $e) {
+            $system->message($e->getMessage());
+        }
+        $system->printMessage();
+    }
 	else if(isset($_POST['change_village']) && $player->rank >= 2) {
 		$village = $_POST['new_village'];
+        $akCost = $costs['village_change'];
 		try {
 			if($village == $player->village) {
 				throw new Exception("Invalid village!");
@@ -796,194 +792,182 @@ function premium() {
 				throw new Exception($debug . "You must leave your team first!");
 			}
 
-			if($player->getPremiumCredits() < $costs['village_change']) {
+			if($player->getPremiumCredits() < $akCost) {
 				throw new Exception("You do not have enough Ancient Kunai!");
 			}
 
-			if(!isset($_POST['confirm'])) {
-				echo "<table class='table'><tr><th>Confirm Village Change</th></tr>
-				<tr><td style='text-align:center;'>
-				Are you sure you want to move from the $player->village village to the $village village? You will be kicked out of your clan
-				and placed in a random clan in the new village.<br />
-				<br />
-				<b>(IMPORTANT: This is non-reversable once completed, if you want to return to your original village you will have to pay
-				a higher transfer fee)</b><br />
-				<form action='$self_link' method='post'>
-				<input type='hidden' name='new_village' value='$village' />
-				<input type='hidden' name='confirm' value='1' />
-				<input type='submit' name='change_village' value='Change Village' />
-				</form>
-				</td></tr></table>";
-				return true;
+			if(!isset($_POST['confirm_village_change'])) {
+                $confirmation_type = 'confirm_village_change';
+                $confirmation_string = "Are you sure you want to move from the $player->village village to the $village
+                village? You will be kicked out of your clan and placed in a random clan in the new village.<br />
+                <b>(IMPORTANT: This is non-reversable once completed, if you want to return to your original village 
+                you will have to pay a higher transfer fee)</b>";
+                $additional_form_data = [
+                    'new_village' => ['input_type' => 'hidden', 'value' => $village]
+                ];
+                $submit_value = 'change_village';
+                $button_value = 'Change Village';
+                require 'templates/premium/purchase_confirmation.php';
 			}
+            else {
+                //Update clan data if player holds a seat
+                if ($player->clan['leader'] == $player->user_id) {
+                    $system->query("UPDATE `clans` SET `leader` = '0' WHERE `clan_id` = '{$player->clan['id']}'");
+                }
+                else if ($player->clan['elder_1'] == $player->user_id) {
+                    $system->query("UPDATE `clans` SET `elder_1` = '0' WHERE `clan_id` = '{$player->clan['id']}'");
+                }
+                else if ($player->clan['elder_2'] == $player->user_id) {
+                    $system->query("UPDATE `clans` SET `elder_2` = '0' WHERE `clan_id` = '{$player->clan['id']}'");
+                }
+                //Remove clan seat from player if they hold seat
+                if ($player->clan_office) {
+                    $player->clan_office = 0;
+                }
 
-			if($player->clan['leader'] == $player->user_id) {
-				$system->query("UPDATE `clans` SET `leader` = '0' WHERE `clan_id` = '{$player->clan['id']}'");
-			}
-			else if($player->clan['elder_1'] == $player->user_id) {
-				$system->query("UPDATE `clans` SET `elder_1` = '0' WHERE `clan_id` = '{$player->clan['id']}'");
-			}
-			else if($player->clan['elder_2'] == $player->user_id) {
-				$system->query("UPDATE `clans` SET `elder_2` = '0' WHERE `clan_id` = '{$player->clan['id']}'");
-			}
+                // Cost
+                $player->subtractPremiumCredits($akCost, "Changed villages from {$player->village} to $village");
+                $player->village_changes++;
 
-			if($player->clan_office) {
-				$player->clan_office = 0;
-			}
+                // Village
+                $player->village = $village;
 
-			// Cost
-			$player->subtractPremiumCredits($costs['village_change'], "Changed villages from {$player->village} to $village");
-			$player->village_changes++;
+                // Location
+                $result = $system->query("SELECT `location` FROM `villages` WHERE `name`='$player->village' LIMIT 1");
+                $location = $system->db_fetch($result)['location'];
+                $player->location = $location;
 
-			// Village
-			$player->village = $village;
+                // Clan
+                $result = $system->query("SELECT `clan_id`, `name` FROM `clans` 
+                    WHERE `village`='$player->village' AND `bloodline_only`='0'");
+                if ($system->db_last_num_rows == 0) {
+                    $result = $system->query("SELECT `clan_id`, `name` FROM `clans` WHERE `bloodline_only`='0'");
+                }
 
-			// Location
-			$result = $system->query("SELECT `location` FROM `villages` WHERE `name`='$player->village' LIMIT 1");
-			$location = $system->db_fetch($result)['location'];
-			$player->location = $location;
+                if (!$system->db_last_num_rows) {
+                    throw new Exception("No clans available!");
+                }
 
-			// Clan
-			$result = $system->query("SELECT `clan_id`, `name` FROM `clans`
-					WHERE `village`='$player->village' AND `bloodline_only`='0'");
-			if($system->db_last_num_rows == 0) {
-				$result = $system->query("SELECT `clan_id`, `name` FROM `clans`
-				WHERE `bloodline_only`='0'");
-			}
+                $clans = array();
+                $count = 0;
+                while ($row = $system->db_fetch($result)) {
+                    $clans[$row['clan_id']] = $row;
+                    $count++;
+                }
 
-			if(! $system->db_last_num_rows) {
-				throw new Exception("No clans available!");
-			}
+                $query = "SELECT ";
+                $x = 0;
+                foreach ($clans as $id => $clan) {
+                    $query .= "SUM(IF(`clan_id` = $id, 1, 0)) as `$id`";
+                    $x++;
+                    if ($x < $count) {
+                        $query .= ', ';
+                    }
+                }
+                $query .= " FROM `users`";
 
-			$clans = array();
-			$count = 0;
-			while($row = $system->db_fetch($result)) {
-				$clans[$row['clan_id']] = $row;
-				$count++;
-			}
+                $clan_counts = array();
+                $result = $system->query($query);
+                $row = $system->db_fetch($result);
+                $total_users = 0;
+                foreach ($row as $id => $user_count) {
+                    $clan_counts[$id] = $user_count;
+                    $total_users += $user_count;
+                }
 
-			$query = "SELECT ";
-			$x = 0;
-			foreach($clans as $id => $clan) {
-				$query .= "SUM(IF(`clan_id` = $id, 1, 0)) as `$id`";
-				$x++;
-				if($x < $count) {
-					$query .= ', ';
-				}
-			}
-			$query .= " FROM `users`";
+                $average_users = round($total_users / $count);
 
-			$clan_counts = array();
-			$result = $system->query($query);
-			$row = $system->db_fetch($result);
-			$total_users = 0;
-			foreach($row as $id => $user_count) {
-				$clan_counts[$id] = $user_count;
-				$total_users += $user_count;
-			}
-
-			$average_users = round($total_users / $count);
-
-			$clan_rolls = array();
-			foreach($clans as $id => $clan) {
-				$entries = 4;
-				if($clan_counts[$id] > $average_users) {
-					$entries--;
-					if($clan_counts[$id] / 3 > $average_users) {
-						$entries--;
-					}
-
-
-				}
-				for($i = 0; $i < $entries; $i++) {
-					$clan_rolls[] = $id;
-				}
-
-				$clan_id = $clan_rolls[mt_rand(0, count($clan_rolls) - 1)];
+                $clan_rolls = array();
+                foreach ($clans as $id => $clan) {
+                    $entries = 4;
+                    if ($clan_counts[$id] > $average_users) {
+                        $entries--;
+                        if ($clan_counts[$id] / 3 > $average_users) {
+                            $entries--;
+                        }
 
 
-				$player->clan = array();
-				$player->clan['id'] = $clan_id;
-				$clan_name = $clans[$clan_id]['name'];
-			}
+                    }
+                    for ($i = 0; $i < $entries; $i++) {
+                        $clan_rolls[] = $id;
+                    }
 
-			$system->message("You have moved to the $village village, and been placed in the $clan_name clan.");
-			$location = explode('.', $player->location);
-			$player->x = $location[0];
-			$player->y = $location[1];
+                    $clan_id = $clan_rolls[mt_rand(0, count($clan_rolls) - 1)];
 
+
+                    $player->clan = array();
+                    $player->clan['id'] = $clan_id;
+                    $clan_name = $clans[$clan_id]['name'];
+                }
+
+                $system->message("You have moved to the $village village, and been placed in the $clan_name clan.");
+                $location = explode('.', $player->location);
+                $player->x = $location[0];
+                $player->y = $location[1];
+            }
 		} catch (Exception $e) {
 			$system->message($e->getMessage());
 		}
 		$system->printMessage();
 	}
-
-
-	//Clan Change
 	else if(isset($_POST['change_clan']) && $player->rank >= 2) {
 		$new_clan_id = abs((int) $_POST['clan_change_id']);
+        $akCost = $costs['clan_change'];
 		try {
-
+            //Check if clan exists and playe not in clan
 			$clan_exists = in_array($new_clan_id, array_keys($available_clans));
-
 			if( ($new_clan_id == $player->clan['id']) || !$clan_exists) {
 				throw new Exception("Invalid clan!");
 			}
 
-			if($player->getPremiumCredits() < $costs['clan_change']) {
+			if($player->getPremiumCredits() < $akCost) {
 				throw new Exception("You do not have enough Ancient Kunai!");
 			}
 
 			$clan_name = $available_clans[$new_clan_id];
 
-			if(!isset($_POST['confirm'])) {
-				echo "
-					<table class='table'><tr><th>Confirm Clan Change</th></tr>
-						<tr>
-							<td style='text-align:center;'>
-								Are you sure you want to move from the {$player->clan['name']} clan to the $clan_name clan?<br />
-								<br />
-								<b>(IMPORTANT: This is non-reversable once completed, if you want to return to your original clan you will have to pay a higher transfer fee)</b><br />
-								<form action='$self_link' method='post'>
-									<input type='hidden' name='clan_change_id' value='$new_clan_id' />
-									<input type='hidden' name='confirm' value='1' />
-									<input type='submit' name='change_clan' value='Change Clan' />
-								</form>
-							</td>
-						</tr>
-					</table>";
-				return true;
+			if(!isset($_POST['confirm_clan_change'])) {
+                $confirmation_type = 'confirm_clan_change';
+                $confirmation_string = "Are you sure you want to move from the {$player->clan['name']} clan to the
+                $clan_name clan?<br /><br />
+                <b>(IMPORTANT: This is non-reversable once completed, if you want to return to your original clan you 
+                will have to pay a higher transfer fee)</b><br />";
+                $additional_form_data = ['clan_change_id' => ['input_type' => 'hidden', 'value' => $new_clan_id]];
+                $submit_value = 'change_clan';
+                $button_value = 'Change Clan';
+                require 'templates/premium/purchase_confirmation.php';
 			}
+            else {
+                // Cost
+                $player->subtractPremiumCredits(
+                    $akCost,
+                    "Changed clan from {$player->clan['name']} ({$player->clan['id']}) to $clan_name ({$new_clan_id})"
+                );
+                $player->clan_changes++;
 
-			// Cost
-			$player->subtractPremiumCredits(
-                $costs['clan_change'],
-                "Changed clan from {$player->clan['name']} ({$player->clan['id']}) to $clan_name ({$new_clan_id})"
-            );
-			$player->clan_changes++;
-
-			// Village
-			if($player->clan['leader'] == $player->user_id) {
-				$system->query("UPDATE `clans` SET `leader` = '0' WHERE `clan_id` = '{$player->clan['id']}'");
-			}
-			else if($player->clan['elder_1'] == $player->user_id) {
-				$system->query("UPDATE `clans` SET `elder_1` = '0' WHERE `clan_id` = '{$player->clan['id']}'");
-			}
-			else if($player->clan['elder_2'] == $player->user_id) {
-				$system->query("UPDATE `clans` SET `elder_2` = '0' WHERE `clan_id` = '{$player->clan['id']}'");
-			}
-
-			$player->clan['id'] = $new_clan_id;
-			$player->clan_office = 0;
-
-			$system->message("You have moved to the $clan_name clan.");
-
+                // Remove player from clan data, if seat held
+                if ($player->clan['leader'] == $player->user_id) {
+                    $system->query("UPDATE `clans` SET `leader` = '0' WHERE `clan_id` = '{$player->clan['id']}'");
+                }
+                else if ($player->clan['elder_1'] == $player->user_id) {
+                    $system->query("UPDATE `clans` SET `elder_1` = '0' WHERE `clan_id` = '{$player->clan['id']}'");
+                }
+                else if ($player->clan['elder_2'] == $player->user_id) {
+                    $system->query("UPDATE `clans` SET `elder_2` = '0' WHERE `clan_id` = '{$player->clan['id']}'");
+                }
+                //Remove seat from player if held
+                if($player->clan_office) {
+                    $player->clan_office = 0;
+                }
+                //Set new clan
+                $player->clan['id'] = $new_clan_id;
+                $system->message("You have moved to the $clan_name clan.");
+            }
 		} catch (Exception $e) {
 			$system->message($e->getMessage());
 		}
 		$system->printMessage();
 	}
-	// End Clan Change
 
     $view = 'character_changes';
     if($player->getPremiumCredits() == 0) {
@@ -1029,7 +1013,7 @@ function premium() {
     $fourDragonSeal = new ForbiddenSeal($system, 2);
     $fourDragonSeal->setBenefits();
 
-    require "templates/premium.php";
+    require "templates/premium/premium.php";
     return true;
 }
 
@@ -1041,63 +1025,48 @@ function premiumCreditExchange() {
 	global $self_link;
 	$self_link .= '&view=buy_kunai';
 
-	$price_min = 1.0;
+    $price_min = 1.0;
 	$price_max = 20.0;
 
 	// Create offer
 	if(isset($_POST['new_offer'])) {
 		try {
-			// Verify input
-			if(isset($_POST['premium_credits'])) {
-				$premium_credits = $system->clean($_POST['premium_credits']);
-				if(!is_numeric($premium_credits)) {
-					throw new Exception("Invalid kunai amount!");
-				}
-				$premium_credits = (int)$premium_credits;
-			}
-			else {
-				throw new Exception("Invalid kunai amount!");
-			}
+            $premium_credits = (int) $_POST['premium_credits'];
+            $money = round($_POST['money'], 1);
 
-			if(isset($_POST['money'])) {
-				$money = $system->clean($_POST['money']);
-				if(!is_numeric($money)) {
-					throw new Exception("Invalid money amount!");
-				}
-				$money = round((float)$money, 1);
-				if($money < $price_min || $money > $price_max) {
-					throw new Exception("Invalid money amount!");
-				}
-			}
-			else {
-				throw new Exception("Invalid money amount!");
-			}
+            if(!is_numeric($premium_credits)) {
+                throw new Exception("Invalid Ancient Kunai amount!");
+            }
+            if($premium_credits < 1) {
+                throw new Exception("Offer must contain at least one (1) Ancient Kunai!");
+            }
+            if(!is_numeric($money)) {
+                throw new Exception("Invalid yen amount!");
+            }
+            if($money < $price_min || $money > $price_max) {
+                throw new Exception("Offer must be between &yen;" . $price_min * 1000 . " & &yen;" . $price_max * 1000 . " each!");
+            }
 
-			// Check offer is greater than 0
-			if($premium_credits <= 0) {
-				throw new Exception("Offer must be at least 1 kunai!");
-			}
+            // Adjust money value for processing and insertion into market
+            $money = $premium_credits * $money * 1000;
 
-			// Check user has premium_credits
-			if($player->getPremiumCredits() < $premium_credits) {
-				throw new Exception("You do not have enough Ancient Kunai!");
-			}
+            // Check financing
+            if ($player->getPremiumCredits() < $premium_credits) {
+                throw new Exception("You do not have enough Ancient Kunai!");
+            }
+            // Subtract premium_credits from user
+            $player->subtractPremiumCredits($premium_credits, "Placed AK for sale on exchange");
+            $player->updateData();
 
-
-			// Subtract premium_credits from user count and submit offer.
-			$player->subtractPremiumCredits($premium_credits, "Placed AK for sale on exchange");
-			$player->updateData();
-
-			$money = $money * $premium_credits * 1000;
-
-			$system->query("INSERT INTO `premium_credit_exchange` (`seller`, `premium_credits`, `money`)
+            //Add offer to market
+            $system->query("INSERT INTO `premium_credit_exchange` (`seller`, `premium_credits`, `money`)
 			VALUES ('$player->user_id', '$premium_credits', '$money')");
-			if($system->db_last_affected_rows > 0) {
-				$system->message("Offer placed!");
-			}
-			else {
-				$system->message("Error placing offer.");
-			}
+            if ($system->db_last_affected_rows > 0) {
+                $system->message("Offer placed!");
+            }
+            else {
+                $system->message("Error placing offer.");
+            }
 			$system->printMessage();
 		} catch (Exception $e) {
 			$system->message($e->getMessage());
@@ -1110,43 +1079,52 @@ function premiumCreditExchange() {
 		try {
 			// Validate input for offer id
 			$id = (int)$system->clean($_GET['purchase']);
-			$result = $system->query("SELECT * FROM `premium_credit_exchange` WHERE `id`='$id' AND `completed`='0' LIMIT 1");
+			$result = $system->query("SELECT * FROM `premium_credit_exchange` WHERE `id`='$id' LIMIT 1");
 			if($system->db_last_num_rows == 0) {
 				 throw new Exception("Invalid offer!");
 			}
 
+            //Load offer
 			$offer = $system->db_fetch($result);
 
-			// Check user has enough money
-			if($player->getMoney() < $offer['money']) {
-				throw new Exception("You do not have enough money!");
-			}
+            //Check if offer is completed
+            if($offer['completed'] == 1) {
+                throw new Exception("This offer has already been processed!");
+            }
+
+            // Check user has enough money
+            if($player->getMoney() < $offer['money']) {
+                throw new Exception("You do not have enough money!");
+            }
+            // Process payment
+            $player->subtractMoney($offer['money'], "Purchased AK from exchange.");
+            $player->addPremiumCredits($offer['premium_credits'], "Purchased AK from exchange.");
+            $player->updateData();
 
 			// Run purchase and log [NOTE: Updating first is to avoid as much server lag and possibility for glitching]
 			$system->query("UPDATE `premium_credit_exchange` SET `completed`='1' WHERE `id`='$id' LIMIT 1");
 
-			$player->subtractMoney($offer['money'], "Purchased AK from exchange");
-			$player->addPremiumCredits($offer['premium_credits'], "Purchased AK from exchange");
-			$player->updateData();
-
             $result = $system->query("SELECT `money` FROM `users` WHERE `user_id`='{$offer['seller']}' LIMIT 1");
-            $seller_before_money = $system->db_fetch($result)[0] ?? null;
+            $current_balance = $system->db_fetch($result)['money'] ?? null;
 
-			$system->query("UPDATE `users` SET `money`=`money` + {$offer['money']}
-				WHERE `user_id`='{$offer['seller']}'");
+			$system->query("UPDATE `users` SET `money`=`money` + {$offer['money']} WHERE `user_id`='{$offer['seller']}'");
 
             $system->currencyLog(
                 character_id: $offer['seller'],
                 currency_type: System::CURRENCY_TYPE_MONEY,
-                previous_balance: $seller_before_money,
-                new_balance: $seller_before_money + $offer['money'],
+                previous_balance: $current_balance,
+                new_balance: $current_balance + $offer['money'],
                 transaction_amount: $offer['money'],
-                transaction_description: "Sold AK on exchange"
+                transaction_description: "Sold credits on AK exchange"
             );
 
-			$system->log("Kunai Exchange", "Completed Sale", "ID# {$offer['id']}; #{$offer['seller']} to #{$player->user_id} ($player->user_name) :: {$offer['premium_credits']} for &yen;{$offer['money']}");
+            $log_data = "ID# {$offer['id']}; #{$offer['seller']} to #{$player->user_id} ({$player->user_name}) :: "
+            . "{$offer['premium_credits']} AK for &yen;{$offer['money']}";
+            $alert_message = "{$player->user_name} has purchased {$offer['premium_credits']} AK for &yen;{$offer['money']}.";
 
-			$alert_message = $player->user_name . " has purchased {$offer['premium_credits']} Ancient Kunai for &yen;{$offer['money']}.";
+            //Add system log
+			$system->log("Kunai Exchange", "Completed Sale", $log_data);
+            //Notify seller of purchase
 			Inbox::sendAlert($system, 3, $player->user_id, $offer['seller'], $alert_message);
 
 			$system->message("Ancient Kunai purchased!");
@@ -1162,25 +1140,32 @@ function premiumCreditExchange() {
 		try {
 			// Validate input for offer id
 			$id = (int)$system->clean($_GET['cancel']);
-			$result = $system->query("SELECT * FROM `premium_credit_exchange` WHERE `id`='$id' AND `completed`='0' LIMIT 1");
+			$result = $system->query("SELECT * FROM `premium_credit_exchange` WHERE `id`='$id' LIMIT 1");
 			if($system->db_last_num_rows == 0) {
 				 throw new Exception("Invalid offer!");
 			}
 
 			$offer = $system->db_fetch($result);
 
+            // Offer complete
+            if($offer['completed']) {
+                throw new Exception("This offer has already been processed!");
+            }
+
 			// Check offer belongs to user
 			if($player->user_id != $offer['seller']) {
-				throw new Exception("Offer is not yours!");
+				throw new Exception("This is not your offer!");
 			}
 
 			// Cancel log [NOTE: Updating first is to avoid as much server lag and possibility for glitching]
 			$system->query("UPDATE `premium_credit_exchange` SET `completed`='1' WHERE `id`='$id' LIMIT 1");
 
-			$player->addPremiumCredits($offer['premium_credits'], "Cancelled AK offer on exchange");
-			$player->updateData();
+            $player->addPremiumCredits($offer['premium_credits'], "Cancelled AK offer on exchange");
+            $player->updateData();
 
-			$system->log("Kunai Exchange", "Cancelled Offer", "ID# {$offer['id']}; {$offer['seller']} - Cancelled :: {$offer['premium_credits']} for &yen;{$offer['money']}=");
+            $log_data = "ID# {$offer['id']}; {$offer['seller']} - Cancelled :: "
+            . "{$offer['premium_credits']} for &yen;{$offer['money']}";
+			$system->log("Kunai Exchange", "Cancelled Offer", $log_data);
 
 			$system->message("Offer cancelled!");
 			$system->printMessage();
@@ -1190,102 +1175,27 @@ function premiumCreditExchange() {
 		}
 	}
 
-	/* [DISPLAY] */
-
-	// View offers
-	echo "<table id='kunaiExchange' class='table' cellspacing='0' style='width:95%;'>
-	<tr'><th colspan='4'><a href='$self_link'>Ancient Kunai Exchange</a></th></tr>
-	<tr>
-		<td colspan='4' style='text-align:center;'>
-			<div style='width:200px;margin-left:auto;margin-right:auto;text-align:left;'>
-			<b>Your money:</b> &yen;{$player->getMoney()}<br />
-			<b>Your Ancient Kunai:</b> {$player->getPremiumCredits()}
-			</div>
-			<br />
-			<a href='#createoffer'>Create offer</a>
-		</td>
-	</tr>
-	<tr>
-		<th style='width:30%;border-radius:0px;moz-border-radius:0px;-webkit-border-radius:0px;'>Seller</th>
-		<th style='width:30%;border-radius:0px;moz-border-radius:0px;-webkit-border-radius:0px;'>Ancient Kunai</th>
-		<th style='width:30%;border-radius:0px;moz-border-radius:0px;-webkit-border-radius:0px;'>Money</th>
-		<th style='width:10%;border-radius:0px;moz-border-radius:0px;-webkit-border-radius:0px;'>&nbsp;</th>
-	</tr>";
-
-	$query = "SELECT * FROM `premium_credit_exchange` WHERE `completed`='0' ORDER BY `id` DESC";
+    $query = "SELECT * FROM `premium_credit_exchange` WHERE `completed`='0' ORDER BY `id` DESC";
 	$result = $system->query($query);
 
 	$credit_users = array();
+    $offers = array();
 
 	//If there are offers in the database
 	if($system->db_last_num_rows) {
-
 		while($row = $system->db_fetch($result)) {
-
+            //Fetch seller information if not already done
 			if(!in_array($row['seller'], $credit_users))
 			{
-				$query = $system->query("SELECT `user_name` FROM `users` WHERE `user_id`='{$row['seller']}'");
-				$user_info = $system->db_fetch();
+				$user_result = $system->query("SELECT `user_name` FROM `users` WHERE `user_id`='{$row['seller']}'");
+				$user_info = $system->db_fetch($user_result);
 				$credit_users[$row['seller']] = $user_info['user_name'];
 			}
-
-			$sellerName = $credit_users[$row['seller']];
-
-			echo "<tr  class='fourColGrid' >
-				<td style='text-align:center;'><a href='{$system->links['members']}&user={$sellerName}'>{$sellerName}</a></td>
-				<td style='text-align:center;'>{$row['premium_credits']} AK</td>
-				<td style='text-align:center;'>&yen;{$row['money']}</td>";
-			if($player->user_id == $row['seller']) {
-				echo "<td style='text-align:center;'><a href='$self_link&cancel={$row['id']}'>Cancel</a></td>";
-			}
-			else {
-				echo "<td style='text-align:center;'><a href='$self_link&purchase={$row['id']}'>Purchase</a></td>";
-			}
-			echo "</tr>";
+            $row['seller_name'] = $credit_users[$row['seller']];
+            $offers[] = $row;
 		}
 	}
-	else {	// Display no offers message
-		echo "<tr><td colspan='4' style='text-align:center;'>No offers!</td></tr>";
-	}
 
-	echo "</table>";
-
-
-	// Show form for create offer
-	echo "<a name='createoffer'></a>
-		<table class='table'>
-		<tr><th>Create Offer</th></tr>
-		<tr><td style='text-align:center;'>
-		<script type='text/javascript'>
-		function calcPreview() {
-			var premium_credits = parseInt($('#premium_credits').val());
-			var money = parseFloat($('#money option:selected').val());
-			var result = premium_credits * (money * 1000);
-			if(isNaN(result)) {
-				return false;
-			}
-			else {
-				$('#offerPreview').html('<b>' + premium_credits + '</b> Ancient Kunai for &yen;<b>' + result + '</b>');
-				return true;
-			}
-		}
-		</script>
-		<form action='$self_link' method='post'>
-		<div style='width:350px;margin-left:auto;margin-right:auto;text-align:left;'>
-		<span style='display:inline-block;width:120px;'>Ancient Kunai to sell:</span>
-			<input type='text' name='premium_credits' id='premium_credits' style='width:80px;margin-left:2px;' onKeyUp='calcPreview();' /><br />
-		<span style='display:inline-block;width:120px;'>Money per kunai: </span>
-		<select onchange='calcPreview();' name='money' id='money'>&yen;";
-
-		for($i = $price_min; $i <= $price_max; $i += 0.5) {
-			echo "<option value='" . sprintf("%.1f", $i) . "'>" . sprintf("%.1f", $i) . "</option>";
-		}
-
-	echo "</select> x 1000 per kunai
-		</div>
-		<span id='offerPreview'>&nbsp;</span><br />
-		<input type='submit' name='new_offer' value='Submit' />
-		</form>
-		</td></tr></table>";
-
+    // View offers
+    require 'templates/premium/premium_market_table.php';
 }
