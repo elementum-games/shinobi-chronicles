@@ -2,8 +2,9 @@
 /*
 File: 		chat.php
 Coder:		Levi Meahan
+Update By:  Hitori
 Created:	02/26/2013
-Revised:	11/26/2013 by Levi Meahan
+Revised:	1/27/2023 by Hitori
 Purpose:	Function for displaying and allowing users to post messages to tavern chat
 Algorithm:	See master_plan.html
 */
@@ -14,16 +15,18 @@ function chat() {
 	global $player;
 	global $self_link;
 
-	if($player->ban_type == 'tavern') {
-		$ban_time = $player->ban_expire - time();
-		$ban_message = 'You are currently banned from the chat. Time remaining: ';
-		$ban_message .= $system->time_remaining($ban_time);
-		echo "<table class='table'><tr><th>Chat</th></tr>
-		<tr><td style='text-align:center;'>
-		$ban_message
-		</td></tr></table>";
-		return true;
-	}
+	if($player->checkBan(StaffManager::BAN_TYPE_CHAT)) {
+        $ban_type = StaffManager::BAN_TYPE_CHAT;
+        $expire_int = $player->ban_data[$ban_type];
+        $ban_expire = ($expire_int == StaffManager::PERM_BAN_VALUE ? $expire_int : $system->time_remaining($player->ban_data[StaffManager::BAN_TYPE_CHAT] - time()));
+        require 'templates/ban_info.php';
+        return true;
+    }
+
+    //Load staff manager
+    if($player->staff_manager === false) {
+        $player->loadStaffManager();
+    }
 
 	// Validate post and submit to DB
     $chat_max_post_length = System::CHAT_MAX_POST_LENGTH;
@@ -55,6 +58,10 @@ function chat() {
 			if($message_length > $chat_max_post_length) {
 				throw new Exception("Message is too long!");
 			}
+            //Failsafe, prevent posting if ban
+            if($player->checkBan(StaffManager::BAN_TYPE_CHAT)) {
+                throw new Exception("You are currently banned from the chat!");
+            }
 
 			$title = $player->rank_name;
 			$staff_level = $player->staff_level;
@@ -79,7 +86,7 @@ function chat() {
 		}
 		$system->printMessage();
 	}
-	else if(isset($_GET['delete']) && $player->isModerator()) {
+	else if(isset($_GET['delete']) && $player->staff_manager->isModerator()) {
 		$delete = (int) $system->clean($_GET['delete']);
 		$result = $system->query("DELETE FROM `chat` WHERE `post_id` = $delete LIMIT 1");
 		$return_message = ($system->db_last_affected_rows) ? "Post deleted!" : "Error deleting post!";
@@ -255,7 +262,7 @@ function chat() {
 				echo "<td style='text-align:center;font-style:italic;'>
                     <div style='margin-bottom: 2px;'>{$posted}</div>";
 
-                    if($player->isModerator()) {
+                    if($player->staff_manager->isModerator()) {
                         echo sprintf("<a class='imageLink' href='$self_link&delete=%d'><img src='../images/delete_icon.png' style='max-width:20px;max-height:20px;' /></a>", $post['post_id']);
                     }
                     echo "<a class='imageLink' href='{$system->links['report']}&report_type=3&content_id=" . $post['post_id'] . "'>

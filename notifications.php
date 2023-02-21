@@ -5,10 +5,17 @@ function displayNotifications() {
 	global $player;
 	global $new_inbox_message;
 	global $new_inbox_alerts;
-	
+
+    // Staff check
+    if($player->staff_manager === false) {
+        require_once 'classes/ReportManager.php';
+        $player->loadStaffManager();
+        $reportManager = new ReportManager($system, $player, true);
+    }
 	// Notifications
 	$notifications = array();
-	
+
+    // Battle
 	if($player->battle_id > 0) {
 		$result = $system->query("SELECT `battle_type` FROM `battles` WHERE `battle_id`='$player->battle_id' LIMIT 1");
 		if($system->db_last_num_rows == 0) {
@@ -42,26 +49,27 @@ function displayNotifications() {
             }
 		}
 	}
-	
+	// New PM
 	if($new_inbox_message || $new_inbox_alerts) {
 		$notifications[] = "<a class='link' href='{$system->link}?id=2'>You have unread PM(s)</a>";
 	}
-
-	if($player->isModerator()) {
-		$result = $system->query("SELECT `report_id` FROM `reports` WHERE `status` = 0 AND `staff_level` < $player->staff_level LIMIT 1");
-		if($system->db_last_num_rows > 0) {
-			$notifications[] = "<a class='link' href='{$system->links['report']}&page=view_all_reports'>New report(s)!</a>";
-		}
+    // Official Warning
+    if($player->getOfficialWarnings(true)) {
+        $notifications[] = "<a class='link' href='{$system->links['settings']}&view=account'>New Official Warning(s)!</a>";
+    }
+    //Reports
+	if($player->staff_manager->isModerator() && $reportManager->getActiveReports(true)) {
+        $notifications[] = "<a class='link' href='{$system->links['report']}&page=view_all_reports'>New report(s)!</a>";
 	}
-
+    //Spar
 	if($player->challenge) {
 		$notifications[] = "<a class='link' href='{$system->links['spar']}}'>Challenged!</a>";
 	}
-	
+	//Team
 	if($player->team_invite) {
 		$notifications[] = "<a class='link' href='{$system->link}?id=24'>Invited to team!</a>";
 	}
-
+    //Proposal
     if($player->spouse < 0) {
         $notifications[] = "<a class='link' href='{$system->links['marriage']}'>Proposal received!</a>";
     }

@@ -302,9 +302,24 @@ function members() {
 					Email address: $viewUser->email<br />
 					<h3>Ban status:</h3>";
 					$banned = false;
-					if($viewUser->ban_type) {
-						echo ucwords($viewUser->ban_type) . " banned: " . $system->time_remaining($viewUser->ban_expire - time()) . " remaining<br />";
-						$banned = true;
+					if($viewUser->ban_data) {
+                        $count = 0;
+                        $size = sizeof($viewUser->ban_data);
+
+                        foreach($viewUser->ban_data as $ban_name => $end_time) {
+                            $count++;
+                            echo "<b>" . ucwords($ban_name) . ":</b> (Expires: " . $system->time_remaining($end_time - time())
+                                . ")";
+                            if($count%2 == 0) {
+                                echo "<br />";
+                            }
+                            else {
+                                if($count != $size) {
+                                    echo ', ';
+                                }
+                            }
+                        }
+                        $banned = true;
 					}
 
 					if($viewUser->journal_ban) {
