@@ -100,7 +100,7 @@ class User extends Fighter {
 
     public $exp;
     public $staff_level;
-    public bool|StaffManager $staff_manager;
+    public $staff_manager;
     public $support_level;
     public int $bloodline_id;
     public $bloodline_name;
@@ -954,10 +954,7 @@ class User extends Fighter {
 
     public function loadBanData($ban_data) {
         if($ban_data === null) {
-            return array(
-                StaffManager::BAN_TYPE_CHAT => false,
-                StaffManager::BAN_TYPE_GAME => false
-            );
+            return array();
         }
         else {
             return json_decode($ban_data, true);
@@ -991,9 +988,7 @@ class User extends Fighter {
         return false;
     }
     public function checkBan($type):bool {
-        //Add in avatar and jounral bans for this check
-        $ban_types = array_replace(StaffManager::$ban_types, [StaffManager::BAN_TYPE_AVATAR, StaffManager::BAN_TYPE_JOURNAL]);
-        if(in_array($type, $ban_types) && isset($this->ban_data[$type])) {
+        if(in_array($type, StaffManager::$ban_types) && isset($this->ban_data[$type])) {
             if($this->ban_data[$type] == StaffManager::PERM_BAN_VALUE || $this->ban_data[$type] - time() >= 1) {
                 return true;
             }
@@ -1049,7 +1044,7 @@ class User extends Fighter {
 
     public function loadStaffManager() {
         if(!$this->staff_manager instanceof StaffManager) {
-            $this->staff_manager = new StaffManager($this);
+            $this->staff_manager = new StaffManager($this->system, $this->user_id, $this->user_name, $this->staff_level, $this->support_level);
         }
     }
 

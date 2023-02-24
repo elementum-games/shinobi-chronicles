@@ -1,7 +1,6 @@
 <?php
 
 class StaffManager {
-    public User $player;
     public System $system;
 
     public int $staff_level;
@@ -16,13 +15,29 @@ class StaffManager {
     const BAN_TYPE_GAME = 'game';
     const BAN_TYPE_CHAT = 'tavern';
     const BAN_TYPE_PM = 'PM';
-    //These ban types do not need to be added to the ban_types array
-    //They are managed in a different manner
     const BAN_TYPE_AVATAR = 'avatar';
     const BAN_TYPE_JOURNAL = 'journal';
     const BAN_TYPE_IP = 'restricted site access';
     public static array $ban_types = [
-        self::BAN_TYPE_CHAT, self::BAN_TYPE_GAME, self::BAN_TYPE_PM
+        self::BAN_TYPE_CHAT, self::BAN_TYPE_GAME, self::BAN_TYPE_PM,
+        self::BAN_TYPE_JOURNAL, self::BAN_TYPE_AVATAR, self::BAN_TYPE_IP
+    ];
+
+    public static array $ban_lengths = [
+        1 => '1 Day',
+        7 => '1 Week',
+        30 => '1 Month',
+        90 => '3 Months'
+    ];
+
+    public static array $hm_ban_lengths = [
+        180 => '6 Months',
+        365 => '1 Year'
+    ];
+
+    public static $admin_ban_lengths = [
+        545 => '1.5 Years',
+        self::PERM_BAN_VALUE => 'Permanent'
     ];
 
     const VERDICT_UNHANDLED = 0;
@@ -79,14 +94,13 @@ class StaffManager {
         self::VERDICT_NOT_GUILTY => 'Not Guilty'
     ];
 
-    public function __construct(User $player) {
-        $this->player = $player;
-        $this->system = $this->player->system;
+    public function __construct(System $system, $user_id, $user_name, $staff_level, $support_level) {
+        $this->system = $system;
 
-        $this->user_id = $this->player->user_id;
-        $this->user_name = $this->player->user_name;
-        $this->staff_level = $this->player->staff_level;
-        $this->support_level = $this->player->support_level;
+        $this->user_id = $user_id;
+        $this->user_name = $user_name;
+        $this->staff_level = $staff_level;
+        $this->support_level = $support_level;
     }
 
 
@@ -152,19 +166,19 @@ class StaffManager {
      * @return bool
      */
     public function canViewRecord($to_view_staff_level):bool {
-        switch($to_view_staff_level) {
+        switch($this->staff_level) {
             case $this->isHeadAdmin():
                 return true;
             case $this->isUserAdmin():
-                if($to_view_staff_level == self::STAFF_HEAD_ADMINISTRATOR) {
-                    return false;
+                if($to_view_staff_level < self::STAFF_ADMINISTRATOR) {
+                    return true;
                 }
-                return true;
+                return false;
             case $this->isHeadModerator():
-                if($to_view_staff_level == self::STAFF_HEAD_MODERATOR || $to_view_staff_level >= self::STAFF_ADMINISTRATOR) {
-                    return false;
+                if(in_array($to_view_staff_level, [self::STAFF_CONTENT_ADMIN, self::STAFF_MODERATOR, self::STAFF_NONE])) {
+                    return true;
                 }
-                return true;
+                return false;
             case $this->isModerator():
                 if($to_view_staff_level == self::STAFF_NONE) {
                     return true;
@@ -488,25 +502,15 @@ class StaffManager {
     }
 
     public function getBanLengths() {
-        $ban_lengths = [
-            1 => '1 Day',
-            7 => '1 Week',
-            30 => '1 Month',
-            90 => '3 Months'
-        ];
+        $ban_lengths = self::$ban_lengths;
+
         switch($this->staff_level) {
             case self::STAFF_HEAD_MODERATOR:
-                $ban_lengths = array_replace($ban_lengths, [
-                    180 => '6 Months',
-                    365 => '1 Year'
-                ]);
+                $ban_lengths = array_replace($ban_lengths, self::$hm_ban_lengths);
                 break;
             case self::STAFF_ADMINISTRATOR:
             case self::STAFF_HEAD_ADMINISTRATOR:
-                $ban_lengths = array_replace($ban_lengths, [
-                    545 => '1.5 Years',
-                    self::PERM_BAN_VALUE => 'Permanent'
-                ]);
+                $ban_lengths = array_replace($ban_lengths, self::$hm_ban_lengths, self::$admin_ban_lengths);
                 break;
         }
         return $ban_lengths;
@@ -538,31 +542,45 @@ class StaffManager {
     }
 
     public function isModerator(): bool {
-        return match ($this->staff_level) {
-            User::STAFF_MODERATOR, User::STAFF_HEAD_MODERATOR, User::STAFF_ADMINISTRATOR, User::STAFF_HEAD_ADMINISTRATOR => true,
-            default => false,
-        };
+        switch($this->staff_level) {
+            case self::STAFF_NONE:
+            case self::STAFF_CONTENT_ADMIN:
+                return false;
+            default:
+                return true;
+        }
     }
 
     public function isHeadModerator(): bool {
-        return match ($this->staff_level) {
-            User::STAFF_HEAD_MODERATOR, User::STAFF_ADMINISTRATOR, User::STAFF_HEAD_ADMINISTRATOR => true,
-            default => false,
-        };
+        switch($this->staff_level) {
+            case self::STAFF_HEAD_MODERATOR:
+            case self::STAFF_ADMINISTRATOR:
+            case self::STAFF_HEAD_ADMINISTRATOR:
+                return true;
+            default:
+                return false;
+        }
     }
 
     public function isContentAdmin(): bool {
-        return match ($this->staff_level) {
-            User::STAFF_CONTENT_ADMIN, User::STAFF_ADMINISTRATOR, User::STAFF_HEAD_ADMINISTRATOR => true,
-            default => false,
-        };
+        switch($this->staff_level) {
+            case self::STAFF_CONTENT_ADMIN:
+            case self::STAFF_ADMINISTRATOR:
+            case self::STAFF_HEAD_ADMINISTRATOR:
+                return true;
+            default:
+                return false;
+        }
     }
 
     public function isUserAdmin(): bool {
-        return match ($this->staff_level) {
-            User::STAFF_ADMINISTRATOR, User::STAFF_HEAD_ADMINISTRATOR => true,
-            default => false,
-        };
+        switch($this->staff_level) {
+            case self::STAFF_ADMINISTRATOR:
+            case self::STAFF_HEAD_ADMINISTRATOR:
+                return true;
+            default:
+                return false;
+        }
     }
 
     public function isHeadAdmin(): bool {
