@@ -8,6 +8,7 @@ class StaffManager {
     public int $user_id;
     public string $user_name;
 
+    const DATE_FORMAT = 'm/d/y H:i:s';
     const PERM_BAN_VALUE = -1;
     const OW_MIN = 10;
     const OW_MAX = 1000;
@@ -43,6 +44,14 @@ class StaffManager {
     const VERDICT_UNHANDLED = 0;
     const VERDICT_GUILTY = 1;
     const VERDICT_NOT_GUILTY = 2;
+
+    const MULTI_DEFAULT = '';
+    const MULTI_APPROVED = 'approved';
+    const MULTI_PENDING = 'pending';
+    const MULTI_DENIED = 'denied';
+    public static array $multi_statuses = [
+        self::MULTI_APPROVED, self::MULTI_PENDING, self::MULTI_DENIED
+    ];
 
     const STAFF_NONE = 0;
     const STAFF_MODERATOR = 1;
@@ -161,6 +170,20 @@ class StaffManager {
     }
 
     /**
+     * Queries multi account DB to check if staff member has done any work
+     *                  in regard to the specified account.
+     * @param $user_id
+     * @return array|string|null
+     */
+    public function checkMultiStatus($user_id) {
+        $result = $this->system->query("SELECT * FROM `multi_accounts` WHERE `user_id`='$user_id' LIMIT 1");
+        if($this->system->db_last_num_rows) {
+            return $this->system->db_fetch($result)['status'];
+        }
+        return false;
+    }
+
+    /**
      * Returns if a record can be viewed by requesting staff member
      * @param $to_view_staff_level
      * @return bool
@@ -227,6 +250,33 @@ class StaffManager {
         ");
     }
 
+    public function getStaffLogs($table, $log_type = 'all', $offset = 0, $limit = 100, $maxCount = false) {
+        $query = "SELECT " . ($maxCount ? 'COUNT(*)' : '*') . " FROM `" . $table . "` ";
+        switch($log_type) {
+            case self::STAFF_LOG_MOD:
+                $query .= "WHERE `type`='$log_type'";
+                break;
+            default:
+                break;
+        }
+
+        $id_name = 'log_id';
+        if($table == 'currency_logs' || $table == 'player_logs') {
+            $id_name = 'id';
+        }
+
+        $query .= " ORDER BY `" . $id_name . "` DESC LIMIT $limit OFFSET $offset";
+
+        $result = $this->system->query($query);
+        if($this->system->db_last_num_rows) {
+            if($maxCount) {
+                return (int) $this->system->db_fetch($result)['COUNT(*)'];
+            }
+            return $this->system->db_fetch_all($result);
+        }
+        return false;
+    }
+
     /**
      * Removes record note from a user record. Staff permission check is set handled in modPanel
      * @param $record_id
@@ -246,8 +296,43 @@ class StaffManager {
         return false;
     }
 
+    public function manageMulti($user_id, $status):bool {
+        $update = $this->checkMultiStatus($user_id);
+        if($update != false) {
+            $this->system->query("UPDATE `multi_accounts` SET `status`='$status' WHERE `user_id`='$user_id' LIMIT 1");
+            if($this->system->db_last_affected_rows) {
+                $this->staffLog(self::STAFF_LOG_HEAD_MOD, "{$this->user_name}({$this->user_id}) updated "
+                    . "multi-account status to $status for user# $user_id.");
+                return true;
+            }
+            return false;
+        }
+        else {
+            $this->system->query("INSERT INTO `multi_accounts`
+                (`user_id`, `status`)
+                VALUES
+                ('$user_id', '$status')
+            ");
+
+            if($this->system->db_last_insert_id) {
+                $this->staffLog(self::STAFF_LOG_HEAD_MOD, "{$this->user_name}({$this->user_id}) began "
+                    . "multi-account process for user# $user_id with a status of $status.");
+                return true;
+            }
+            return false;
+        }
+    }
+
     public function getUserByName($user_name) {
         $result = $this->system->query("SELECT `user_id`, `user_name`, `staff_level`, `ban_data`, `ban_type`, `ban_expire` FROM `users` WHERE `user_name`='{$user_name}' LIMIT 1");
+        if(!$this->system->db_last_num_rows) {
+            return false;
+        }
+        return $this->system->db_fetch($result);
+    }
+
+    public function getUserByID($user_id) {
+        $result = $this->system->query("SELECT `user_id`, `user_name`, `staff_level`, `ban_data`, `ban_type`, `ban_expire` FROM `users` WHERE `user_id`='{$user_id}' LIMIT 1");
         if(!$this->system->db_last_num_rows) {
             return false;
         }

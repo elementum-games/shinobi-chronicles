@@ -129,6 +129,7 @@ class System {
         'event' => 27,
         'marriage' => 29,
         'support' => 30,
+        'chat_log' => 31,
     ];
     public array $links = [
         'github' => 'https://github.com/elementum-games/shinobi-chronicles',

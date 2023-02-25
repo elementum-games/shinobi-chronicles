@@ -7,9 +7,8 @@ function displayNotifications() {
 	global $new_inbox_alerts;
 
     // Staff check
-    if($player->staff_manager === false) {
+    if($player->staff_manager->isModerator()) {
         require_once 'classes/ReportManager.php';
-        $player->loadStaffManager();
         $reportManager = new ReportManager($system, $player, true);
     }
 	// Notifications

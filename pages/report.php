@@ -11,9 +11,6 @@ function report() {
 		$page = $_GET['page'];
 	}
 
-    if($player->staff_manager === false) {
-        $player->loadStaffManager();
-    }
     if($player->staff_manager->isModerator()) {
         $reportManager = new ReportManager($system, $player, true);
         //Display mod submenu
