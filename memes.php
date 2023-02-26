@@ -292,7 +292,7 @@ return [
     ],
     [
         'code' => ':pogchamp:',
-        'image' => '<img src="./images/memes/pogchamp2.png" title=\':pogchamp:\' alt=\':pogchamp:\' />',
+        'image' => ' />',
         'text' => ':pogchamp:',
         'public' => true,
     ],
