@@ -23,9 +23,9 @@
 
 <table class='table'>
     <?php if(!isset($_GET['view'])): ?>
-        <tr><th>Avatar</th></tr>
+        <tr><th colspan='2'>Avatar</th></tr>
         <tr>
-            <td style='text-align:center;'>
+            <td colspan='2' style='text-align:center;'>
                 <div style='float:left;width:200px;'>
                     <?=$system->imageCheck($player->avatar_link, $player->getAvatarSize())?>
                 </div>
@@ -48,9 +48,9 @@
                 <?php endif ?>
             </td>
         </tr>
-        <tr><th>Password</th></tr>
+        <tr><th colspan='2'>Password</th></tr>
         <tr>
-            <td>
+            <td colspan='2'>
                 <form action='<?=$self_link?>' method='post'>
                     <div style="margin-left:145px;">
                         <label for='current_password' style='width:150px;margin-bottom:5px;'>Current password:</label>
@@ -66,9 +66,9 @@
                 </form>
             </td>
         </tr>
-        <tr><th>Layout</th></tr>
+        <tr><th colspan='2'>Layout</th></tr>
         <tr>
-            <td style="text-align: center;">
+            <td colspan='2' style="text-align: center;">
                 <form action='<?=$self_link?>' method='post'>
                     <select name='layout'>";
                         <?php foreach($layouts as $layout):?>
@@ -79,8 +79,21 @@
                 </form>
             </td>
         </tr>
-        <tr><th>Blocklist</th></tr>
         <tr>
+            <th>Explicit Language</th>
+            <th>Blocklist</th>
+        </tr>
+        <tr>
+            <td style='text-align:center;'>
+                Censor Explicit Language<br />
+                <form action='<?=$self_link?>' method='post'>
+                    <select name='censor_explicit_language'>
+                        <option value='on' <?= ($player->censor_explicit_language ? "selected='selected'" : "") ?>>On</option>
+                        <option value='off' <?= (!$player->censor_explicit_language ? "selected='selected'" : "") ?>>Off</option>
+                    </select>
+                    <input type='submit' value='Change' style='margin-left: 5px;' />
+                </form>
+            </td>
             <td style='text-align:center;'>
                 <?php if(!empty($player->blacklist)): ?>
                     <?=$list?>
@@ -95,9 +108,9 @@
                 </form>
             </td>
         </tr>
-        <tr><th>Journal</th></tr>
+        <tr><th colspan='2'>Journal</th></tr>
         <tr>
-            <td style='text-align:center;'>
+            <td colspan='2' style='text-align:center;'>
                 <?php if(!$player->checkBan(StaffManager::BAN_TYPE_JOURNAL)):?>
                     <?php if($player->staff_level && !$player->forbidden_seal_loaded): ?>
                         <i>(Images will be resized down to a max of <?=$psuedoSeal->journal_image_x?>x<?=$psuedoSeal->journal_image_y?>)</i>

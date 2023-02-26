@@ -1511,7 +1511,8 @@ class User extends Fighter {
 		`intelligence` = '$this->intelligence',
 		`willpower` = '$this->willpower',
 		`village_changes` = '$this->village_changes',
-		`clan_changes` = '$this->clan_changes'
+		`clan_changes` = '$this->clan_changes',
+		`censor_explicit_language` = " . (int)$this->censor_explicit_language . "
 		WHERE `user_id` = '{$this->user_id}' LIMIT 1";
         $this->system->query($query);
 

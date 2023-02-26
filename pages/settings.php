@@ -220,6 +220,17 @@ function userSettings() {
 			$system->printMessage();
 		}
 	}
+    else if(!empty($_POST['censor_explicit_language'])) {
+        if($_POST['censor_explicit_language'] == 'on') {
+            $player->censor_explicit_language = true;
+        }
+        else if($_POST['censor_explicit_language'] == 'off') {
+            $player->censor_explicit_language = false;
+        }
+
+        $system->message("Censor explicit language preference set to " . ($player->censor_explicit_language ? "on" : "off"));
+        $system->printMessage();
+    }
 
     // Fetch journal info
 	$result = $system->query("SELECT `journal` FROM `journals` WHERE `user_id` = '{$player->user_id}' LIMIT 1");
