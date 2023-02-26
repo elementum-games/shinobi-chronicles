@@ -24,7 +24,7 @@
                     <div style='text-align:left;padding-top:13px;'>
                         <label for='ban_type'>Ban type:</label>
                         <select name='ban_type' style='width:100px;'>
-                            <?php foreach(StaffManager::$ban_types as $type): ?>
+                            <?php foreach(StaffManager::$ban_menu_items as $type): ?>
                                 <option value="<?=$type?>"><?=ucwords($type)?> Ban</option>
                             <?php endforeach ?>
                         </select>

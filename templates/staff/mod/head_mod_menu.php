@@ -39,7 +39,7 @@
                     <p>Username</p>
                     <input type='text' name='user_name' value='<?=($_GET['unban_user_name'] ?? "")?>' /><br />
                     <select name='ban_type' style='width:100px;margin-top:5px;'>
-                        <?php foreach(StaffManager::$ban_types as $type): ?>
+                        <?php foreach(StaffManager::$ban_menu_items as $type): ?>
                             <option value="<?=$type?>"><?=ucwords($type)?> Ban</option>
                         <?php endforeach ?>
                     </select>
