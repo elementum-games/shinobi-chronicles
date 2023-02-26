@@ -219,6 +219,8 @@ class User extends Fighter {
     private int $premium_credits;
     public int $premium_credits_purchased;
 
+    public bool $censor_explicit_language = true;
+
     public int $total_stats;
 
     public int $scout_range;
@@ -363,6 +365,8 @@ class User extends Fighter {
         $user->forbidden_seal = $result['forbidden_seal'];
         $user->chat_color = $result['chat_color'];
 
+        $user->censor_explicit_language = (bool)$result['censor_explicit_language'];
+
         if($user->ban_type && $user->ban_expire <= time()) {
             $system->message("Your " . $user->ban_type . " ban has ended.");
             $user->ban_type = '';
@@ -406,6 +410,8 @@ class User extends Fighter {
         $this->profile_song = $user_data['profile_song'];
 
         $this->log_actions = $user_data['log_actions'];
+
+        $this->censor_explicit_language = (bool)$result['censor_explicit_language'];
 
         // Message blacklist
         $this->blacklist = [];

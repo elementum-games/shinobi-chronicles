@@ -16,7 +16,7 @@ return [
     ],
     [
         'code' => ':lol:',
-        'image' => '<img src="./images/memes/small_lol.png" title=\':lol:\' alt=\':lol:\' />',
+        'image' => '<img src="./images/memes/lol.png" title=\':lol:\' alt=\':lol:\' />',
         'text' => ':lol:',
         'public' => true,
     ],

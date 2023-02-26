@@ -215,8 +215,12 @@ function chat() {
 				continue;
 			}
 
-      $message = $system->explicitLanguageReplace($post['message']);
-      $message = $system->html_parse(stripslashes($message), false, true);
+            $message = $post['message'];
+            if($player->censor_explicit_language) {
+                $message = $system->explicitLanguageReplace($message);
+            }
+
+            $message = $system->html_parse(stripslashes($message), false, true);
 
 			echo "
 				<tr class='chat_msg' >
