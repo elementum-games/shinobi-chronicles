@@ -411,7 +411,7 @@ class User extends Fighter {
 
         $this->log_actions = $user_data['log_actions'];
 
-        $this->censor_explicit_language = (bool)$result['censor_explicit_language'];
+        $this->censor_explicit_language = (bool)$user_data['censor_explicit_language'];
 
         // Message blacklist
         $this->blacklist = [];
