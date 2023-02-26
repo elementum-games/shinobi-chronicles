@@ -323,16 +323,18 @@ class StaffManager {
         }
     }
 
-    public function getUserByName($user_name) {
-        $result = $this->system->query("SELECT `user_id`, `user_name`, `staff_level`, `ban_data`, `ban_type`, `ban_expire` FROM `users` WHERE `user_name`='{$user_name}' LIMIT 1");
+    public function getUserByName($user_name, $full_load = false) {
+        $query = "SELECT " . ($full_load ? "*" : "`user_id`, `user_name`, `staff_level`, `ban_data`, `ban_type`, `ban_expire`");
+        $result = $this->system->query($query . " FROM `users` WHERE `user_name`='{$user_name}' LIMIT 1");
         if(!$this->system->db_last_num_rows) {
             return false;
         }
         return $this->system->db_fetch($result);
     }
 
-    public function getUserByID($user_id) {
-        $result = $this->system->query("SELECT `user_id`, `user_name`, `staff_level`, `ban_data`, `ban_type`, `ban_expire` FROM `users` WHERE `user_id`='{$user_id}' LIMIT 1");
+    public function getUserByID($user_id, $full_load = false) {
+        $query = "SELECT " . ($full_load ? "*" : "`user_id`, `user_name`, `staff_level`, `ban_data`, `ban_type`, `ban_expire`");
+        $result = $this->system->query($query . " FROM `users` WHERE `user_id`='{$user_id}' LIMIT 1");
         if(!$this->system->db_last_num_rows) {
             return false;
         }

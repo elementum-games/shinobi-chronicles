@@ -82,7 +82,7 @@ elseif($view == 'player_logs') {
                     <td><?=$log['user_name']?></td>
                     <td><?=$log['user_id']?></td>
                     <td><?=System::unSlug($log['log_type'])?></td>
-                    <td><?=nl2br($log['log_contents'])?></td>
+                    <td style="word-wrap: break-word; overflow-wrap: break-word"><?=nl2br($log['log_contents'])?></td>
                 </tr>
             <?php endforeach ?>
         <?php endif ?>

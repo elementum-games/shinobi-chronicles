@@ -80,6 +80,32 @@ class RankManager {
         return $stats;
     }
 
+    public function calculateRankFromTotalStats(int $total_stats) {
+        $rank_id = 1;
+        foreach($this->ranks as $rank) {
+            if($total_stats >= $rank->base_stats) {
+                $rank_id = $rank->id;
+            }
+        }
+
+        return $rank_id;
+    }
+    public function calculateMaxLevel(int $total_stats, int $rank) {
+        $rank = $this->ranks[$rank];
+        $level = $rank->base_level;
+        $total_stats -= $rank->base_stats;
+
+        while($total_stats >= $rank->stats_per_level) {
+            $level++;
+            $total_stats -= $rank->stats_per_level;
+        }
+        if($level > $rank->max_level) {
+            $level = $rank->max_level;
+        }
+
+        return $level;
+    }
+
     public static function fetchNames(System $system): array {
         $result = $system->query("SELECT `rank_id`, `name` FROM `ranks`");
 
