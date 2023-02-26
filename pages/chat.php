@@ -23,11 +23,6 @@ function chat() {
         return true;
     }
 
-    //Load staff manager
-    if($player->staff_manager === false) {
-        $player->loadStaffManager();
-    }
-
 	// Validate post and submit to DB
     $chat_max_post_length = System::CHAT_MAX_POST_LENGTH;
     //Increase chat length limit for seal users & staff members

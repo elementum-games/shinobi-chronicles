@@ -14,10 +14,6 @@ function modPanel() {
 	global $player;
 	global $self_link;
 
-    // Load staff manager
-    if($player->staff_manager === false) {
-        $player->loadStaffManager();
-    }
 	// Staff level check
 	if(!$player->staff_manager->isModerator()) {
 		return false;
@@ -550,6 +546,105 @@ function modPanel() {
         }
 
         require 'templates/staff/mod/banned_ips.php';
+    }
+    //Multi accounts
+    else if($view == 'multi_accounts' && $player->staff_manager->isHeadModerator()) {
+        if(isset($_GET['action']) && isset($_GET['user_id'])) {
+            try {
+                $action = $_GET['action'];
+                $user_id = (int)($_GET['user_id']);
+                if(!in_array($action, StaffManager::$multi_statuses)) {
+                    throw new Exception("Invalid status: $action!");
+                }
+                if(!$player->staff_manager->getUserByID($user_id)) {
+                    throw new Exception("UID: $user_id not found!");
+                }
+
+                if($player->staff_manager->manageMulti($user_id, $action)) {
+                    $system->message("Multi-list updated!");
+                }
+                else {
+                    $system->message("Error updating multi-list!");
+                }
+            } catch (Exception $e) {
+                $system->message($e->getMessage());
+            }
+        }
+        $self_link .= "&view=multi_accounts";
+
+        $accounts = [];
+        $to_check = [];
+        $query_type = 'current_ip';
+        $query_types = ['current_ip', 'last_ip', 'email', 'password'];
+
+        //Multi type
+        if(isset($_GET['type'])) {
+            $query_type = $system->clean($_GET['type']);
+        }
+        //Only allow specified multi checks
+        if(!in_array($query_type, $query_types)) {
+            $query_type = 'current_ip';
+        }
+
+        $result = $system->query("SELECT 
+            `$query_type`, COUNT(`$query_type`)
+        FROM 
+             `users` 
+        GROUP BY 
+             `$query_type`
+        HAVING 
+            COUNT(`$query_type`) > 1");
+        if($system->db_last_num_rows) {
+            $to_check = $system->db_fetch_all($result);
+        }
+
+        if(!empty($to_check)) {
+            $query = "SELECT `user_id`, `user_name`, `password`, `current_ip`, `last_ip`, `email` FROM `users` WHERE `$query_type` IN (";
+            foreach ($to_check as $val) {
+                $query .= "'" . $val[$query_type] . "', ";
+            }
+            $query = substr($query, 0, strlen($query) - 2) . ") ORDER BY `$query_type` DESC";
+            $result2 = $system->query($query);
+            if ($system->db_last_num_rows) {
+                while($account = $system->db_fetch($result2)) {
+                    $account['multi_status'] = $player->staff_manager->checkMultiStatus($account['user_id']);
+                    $accounts[] = $account;
+                }
+            }
+        }
+
+        if($system->message) {
+            $system->printMessage();
+        }
+        require 'templates/staff/mod/multi_accounts.php';
+    }
+    //Mod logs
+    else if($view == 'mod_logs' && $player->staff_manager->isHeadModerator()) {
+        $self_link .= "&view=mod_logs";
+        $limit = 25;
+        $offset = 0;
+        $max = $player->staff_manager->getStaffLogs('staff_logs', StaffManager::STAFF_LOG_MOD, 0, $limit, true) - $limit;
+
+        if(isset($_GET['offset'])) {
+            $offset = (int) $_GET['offset'];
+            if($offset < 0) {
+                $offset = 0;
+            }
+            if($offset > $max) {
+                $offset = $max;
+            }
+        }
+        $next = $offset + $limit;
+        $previous = $offset - $limit;
+        if($next > $max) {
+            $next = $max;
+        }
+        if($previous < 0) {
+            $previous = 0;
+        }
+
+        $logs = $player->staff_manager->getStaffLogs('staff_logs', StaffManager::STAFF_LOG_MOD, $offset, $limit);
+        require_once 'templates/staff/mod/mod_logs.php';
     }
     //Main menu display [Mod panel rework complete -Hitori]
 	else if($display_menu) {

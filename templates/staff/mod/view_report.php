@@ -25,7 +25,11 @@
             <a target="_blank" href="<?=$system->links['mod']?>&view_record=<?=$user_names[$report['user_id']]?>">(View Record)</a>
             <br />
             <label>Reported by:</label><?=$user_names[$report['reporter_id']]?><br />
-            <label>Report type:</label><?=ReportManager::$report_types[$report['report_type']]?><br />
+            <label>Report type:</label><?=ReportManager::$report_types[$report['report_type']]?>
+            <?php if($report['report_type'] == ReportManager::REPORT_TYPE_CHAT): ?>
+                &nbsp;<a href="<?=$system->links['chat_log']?>&report_id=<?=$report['report_id']?>">(View Chat Log)</a>
+            <?php endif ?>
+            <br />
             <?php if($report['status'] != ReportManager::VERDICT_UNHANDLED): ?>
                 <label>Report verdict:</label><?=ReportManager::$report_verdicts[$report['status']]?><br />
             <?php endif ?>

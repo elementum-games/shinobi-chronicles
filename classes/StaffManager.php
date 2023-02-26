@@ -1,7 +1,6 @@
 <?php
 
 class StaffManager {
-    public User $player;
     public System $system;
 
     public int $staff_level;
@@ -9,6 +8,7 @@ class StaffManager {
     public int $user_id;
     public string $user_name;
 
+    const DATE_FORMAT = 'm/d/y H:i:s';
     const PERM_BAN_VALUE = -1;
     const OW_MIN = 10;
     const OW_MAX = 1000;
@@ -16,18 +16,42 @@ class StaffManager {
     const BAN_TYPE_GAME = 'game';
     const BAN_TYPE_CHAT = 'tavern';
     const BAN_TYPE_PM = 'PM';
-    //These ban types do not need to be added to the ban_types array
-    //They are managed in a different manner
     const BAN_TYPE_AVATAR = 'avatar';
     const BAN_TYPE_JOURNAL = 'journal';
     const BAN_TYPE_IP = 'restricted site access';
     public static array $ban_types = [
-        self::BAN_TYPE_CHAT, self::BAN_TYPE_GAME, self::BAN_TYPE_PM
+        self::BAN_TYPE_CHAT, self::BAN_TYPE_GAME, self::BAN_TYPE_PM,
+        self::BAN_TYPE_JOURNAL, self::BAN_TYPE_AVATAR, self::BAN_TYPE_IP
+    ];
+
+    public static array $ban_lengths = [
+        1 => '1 Day',
+        7 => '1 Week',
+        30 => '1 Month',
+        90 => '3 Months'
+    ];
+
+    public static array $hm_ban_lengths = [
+        180 => '6 Months',
+        365 => '1 Year'
+    ];
+
+    public static $admin_ban_lengths = [
+        545 => '1.5 Years',
+        self::PERM_BAN_VALUE => 'Permanent'
     ];
 
     const VERDICT_UNHANDLED = 0;
     const VERDICT_GUILTY = 1;
     const VERDICT_NOT_GUILTY = 2;
+
+    const MULTI_DEFAULT = '';
+    const MULTI_APPROVED = 'approved';
+    const MULTI_PENDING = 'pending';
+    const MULTI_DENIED = 'denied';
+    public static array $multi_statuses = [
+        self::MULTI_APPROVED, self::MULTI_PENDING, self::MULTI_DENIED
+    ];
 
     const STAFF_NONE = 0;
     const STAFF_MODERATOR = 1;
@@ -79,14 +103,13 @@ class StaffManager {
         self::VERDICT_NOT_GUILTY => 'Not Guilty'
     ];
 
-    public function __construct(User $player) {
-        $this->player = $player;
-        $this->system = $this->player->system;
+    public function __construct(System $system, $user_id, $user_name, $staff_level, $support_level) {
+        $this->system = $system;
 
-        $this->user_id = $this->player->user_id;
-        $this->user_name = $this->player->user_name;
-        $this->staff_level = $this->player->staff_level;
-        $this->support_level = $this->player->support_level;
+        $this->user_id = $user_id;
+        $this->user_name = $user_name;
+        $this->staff_level = $staff_level;
+        $this->support_level = $support_level;
     }
 
 
@@ -147,24 +170,38 @@ class StaffManager {
     }
 
     /**
+     * Queries multi account DB to check if staff member has done any work
+     *                  in regard to the specified account.
+     * @param $user_id
+     * @return array|string|null
+     */
+    public function checkMultiStatus($user_id) {
+        $result = $this->system->query("SELECT * FROM `multi_accounts` WHERE `user_id`='$user_id' LIMIT 1");
+        if($this->system->db_last_num_rows) {
+            return $this->system->db_fetch($result)['status'];
+        }
+        return false;
+    }
+
+    /**
      * Returns if a record can be viewed by requesting staff member
      * @param $to_view_staff_level
      * @return bool
      */
     public function canViewRecord($to_view_staff_level):bool {
-        switch($to_view_staff_level) {
+        switch($this->staff_level) {
             case $this->isHeadAdmin():
                 return true;
             case $this->isUserAdmin():
-                if($to_view_staff_level == self::STAFF_HEAD_ADMINISTRATOR) {
-                    return false;
+                if($to_view_staff_level < self::STAFF_ADMINISTRATOR) {
+                    return true;
                 }
-                return true;
+                return false;
             case $this->isHeadModerator():
-                if($to_view_staff_level == self::STAFF_HEAD_MODERATOR || $to_view_staff_level >= self::STAFF_ADMINISTRATOR) {
-                    return false;
+                if(in_array($to_view_staff_level, [self::STAFF_CONTENT_ADMIN, self::STAFF_MODERATOR, self::STAFF_NONE])) {
+                    return true;
                 }
-                return true;
+                return false;
             case $this->isModerator():
                 if($to_view_staff_level == self::STAFF_NONE) {
                     return true;
@@ -213,6 +250,33 @@ class StaffManager {
         ");
     }
 
+    public function getStaffLogs($table, $log_type = 'all', $offset = 0, $limit = 100, $maxCount = false) {
+        $query = "SELECT " . ($maxCount ? 'COUNT(*)' : '*') . " FROM `" . $table . "` ";
+        switch($log_type) {
+            case self::STAFF_LOG_MOD:
+                $query .= "WHERE `type`='$log_type'";
+                break;
+            default:
+                break;
+        }
+
+        $id_name = 'log_id';
+        if($table == 'currency_logs' || $table == 'player_logs') {
+            $id_name = 'id';
+        }
+
+        $query .= " ORDER BY `" . $id_name . "` DESC LIMIT $limit OFFSET $offset";
+
+        $result = $this->system->query($query);
+        if($this->system->db_last_num_rows) {
+            if($maxCount) {
+                return (int) $this->system->db_fetch($result)['COUNT(*)'];
+            }
+            return $this->system->db_fetch_all($result);
+        }
+        return false;
+    }
+
     /**
      * Removes record note from a user record. Staff permission check is set handled in modPanel
      * @param $record_id
@@ -232,8 +296,45 @@ class StaffManager {
         return false;
     }
 
-    public function getUserByName($user_name) {
-        $result = $this->system->query("SELECT `user_id`, `user_name`, `staff_level`, `ban_data`, `ban_type`, `ban_expire` FROM `users` WHERE `user_name`='{$user_name}' LIMIT 1");
+    public function manageMulti($user_id, $status):bool {
+        $update = $this->checkMultiStatus($user_id);
+        if($update != false) {
+            $this->system->query("UPDATE `multi_accounts` SET `status`='$status' WHERE `user_id`='$user_id' LIMIT 1");
+            if($this->system->db_last_affected_rows) {
+                $this->staffLog(self::STAFF_LOG_HEAD_MOD, "{$this->user_name}({$this->user_id}) updated "
+                    . "multi-account status to $status for user# $user_id.");
+                return true;
+            }
+            return false;
+        }
+        else {
+            $this->system->query("INSERT INTO `multi_accounts`
+                (`user_id`, `status`)
+                VALUES
+                ('$user_id', '$status')
+            ");
+
+            if($this->system->db_last_insert_id) {
+                $this->staffLog(self::STAFF_LOG_HEAD_MOD, "{$this->user_name}({$this->user_id}) began "
+                    . "multi-account process for user# $user_id with a status of $status.");
+                return true;
+            }
+            return false;
+        }
+    }
+
+    public function getUserByName($user_name, $full_load = false) {
+        $query = "SELECT " . ($full_load ? "*" : "`user_id`, `user_name`, `staff_level`, `ban_data`, `ban_type`, `ban_expire`");
+        $result = $this->system->query($query . " FROM `users` WHERE `user_name`='{$user_name}' LIMIT 1");
+        if(!$this->system->db_last_num_rows) {
+            return false;
+        }
+        return $this->system->db_fetch($result);
+    }
+
+    public function getUserByID($user_id, $full_load = false) {
+        $query = "SELECT " . ($full_load ? "*" : "`user_id`, `user_name`, `staff_level`, `ban_data`, `ban_type`, `ban_expire`");
+        $result = $this->system->query($query . " FROM `users` WHERE `user_id`='{$user_id}' LIMIT 1");
         if(!$this->system->db_last_num_rows) {
             return false;
         }
@@ -488,25 +589,15 @@ class StaffManager {
     }
 
     public function getBanLengths() {
-        $ban_lengths = [
-            1 => '1 Day',
-            7 => '1 Week',
-            30 => '1 Month',
-            90 => '3 Months'
-        ];
+        $ban_lengths = self::$ban_lengths;
+
         switch($this->staff_level) {
             case self::STAFF_HEAD_MODERATOR:
-                $ban_lengths = array_replace($ban_lengths, [
-                    180 => '6 Months',
-                    365 => '1 Year'
-                ]);
+                $ban_lengths = array_replace($ban_lengths, self::$hm_ban_lengths);
                 break;
             case self::STAFF_ADMINISTRATOR:
             case self::STAFF_HEAD_ADMINISTRATOR:
-                $ban_lengths = array_replace($ban_lengths, [
-                    545 => '1.5 Years',
-                    self::PERM_BAN_VALUE => 'Permanent'
-                ]);
+                $ban_lengths = array_replace($ban_lengths, self::$hm_ban_lengths, self::$admin_ban_lengths);
                 break;
         }
         return $ban_lengths;
@@ -538,31 +629,45 @@ class StaffManager {
     }
 
     public function isModerator(): bool {
-        return match ($this->staff_level) {
-            User::STAFF_MODERATOR, User::STAFF_HEAD_MODERATOR, User::STAFF_ADMINISTRATOR, User::STAFF_HEAD_ADMINISTRATOR => true,
-            default => false,
-        };
+        switch($this->staff_level) {
+            case self::STAFF_NONE:
+            case self::STAFF_CONTENT_ADMIN:
+                return false;
+            default:
+                return true;
+        }
     }
 
     public function isHeadModerator(): bool {
-        return match ($this->staff_level) {
-            User::STAFF_HEAD_MODERATOR, User::STAFF_ADMINISTRATOR, User::STAFF_HEAD_ADMINISTRATOR => true,
-            default => false,
-        };
+        switch($this->staff_level) {
+            case self::STAFF_HEAD_MODERATOR:
+            case self::STAFF_ADMINISTRATOR:
+            case self::STAFF_HEAD_ADMINISTRATOR:
+                return true;
+            default:
+                return false;
+        }
     }
 
     public function isContentAdmin(): bool {
-        return match ($this->staff_level) {
-            User::STAFF_CONTENT_ADMIN, User::STAFF_ADMINISTRATOR, User::STAFF_HEAD_ADMINISTRATOR => true,
-            default => false,
-        };
+        switch($this->staff_level) {
+            case self::STAFF_CONTENT_ADMIN:
+            case self::STAFF_ADMINISTRATOR:
+            case self::STAFF_HEAD_ADMINISTRATOR:
+                return true;
+            default:
+                return false;
+        }
     }
 
     public function isUserAdmin(): bool {
-        return match ($this->staff_level) {
-            User::STAFF_ADMINISTRATOR, User::STAFF_HEAD_ADMINISTRATOR => true,
-            default => false,
-        };
+        switch($this->staff_level) {
+            case self::STAFF_ADMINISTRATOR:
+            case self::STAFF_HEAD_ADMINISTRATOR:
+                return true;
+            default:
+                return false;
+        }
     }
 
     public function isHeadAdmin(): bool {
