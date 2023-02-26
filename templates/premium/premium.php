@@ -12,6 +12,7 @@
  * @var array $baseDisplay;
  * @var int $kunai_per_dollar
  * @var int $stat_transfer_points_per_min
+ * @var int $stat_transfer_points_per_ak
  * @var string $paypal_url
  * @var string $paypal_business_id
  * @var string $paypal_listener_url
@@ -120,6 +121,7 @@
             <script type='text/javascript'>
                 let stats = {};
                 let pointsPerMin = <?= $stat_transfer_points_per_min ?>;
+                let pointsPerAk = <?= $stat_transfer_points_per_ak ?>;
                 let statBeingTransferred = 'ninjutsu_skill';
 
                 function statSelectChange() {
@@ -135,7 +137,7 @@
                         cost = 0;
                     }
                     else {
-                        cost = 1 + Math.floor(transferAmount / 300);
+                        cost = 1 + Math.floor(transferAmount / pointsPerAk);
                     }
 
                     if(statBeingTransferred === 'intelligence' || statBeingTransferred === 'willpower') {

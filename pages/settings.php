@@ -228,7 +228,7 @@ function userSettings() {
             $player->censor_explicit_language = false;
         }
 
-        $system->message("Censor explicit language preference set to " . ($player->censor_explicit_language ? "on" : "off"));
+        $system->message("Censor explicit language preference set to <b>" . ($player->censor_explicit_language ? "on" : "off") . "</b>.");
         $system->printMessage();
     }
 

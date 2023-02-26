@@ -50,6 +50,8 @@ function premium() {
 
     $free_stat_change_timer = 86400;
     $stat_transfer_points_per_min = 10;
+    $stat_transfer_points_per_ak = 300;
+
     //Apply premium boost
     if($player->forbidden_seal_loaded) {
         $stat_transfer_points_per_min += $player->forbidden_seal->stat_transfer_boost;
@@ -57,10 +59,12 @@ function premium() {
     //Apply Chuunin boost
     if($player->rank >= 3) {
         $stat_transfer_points_per_min += 5;
+        $stat_transfer_points_per_ak = 350;
     }
     //Apply Jonin boost
     if($player->rank >= 4) {
         $stat_transfer_points_per_min += 5;
+        $stat_transfer_points_per_ak = 400;
     }
 
 	$available_clans = array();
@@ -340,7 +344,7 @@ function premium() {
 	            }
 			}
             else {
-				$akCost = 1 + floor($transfer_amount / 300);
+				$akCost = 1 + floor($transfer_amount / $stat_transfer_points_per_ak);
 			}
             //Int and Willpower are free
             if($original_stat == 'intelligence' || $original_stat == 'willpower') {
