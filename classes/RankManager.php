@@ -49,7 +49,7 @@ class RankManager {
             $this->loadRanks();
         }
 
-        $chakra = 100 - $this->ranks[1]->chakra_gain;
+        $chakra = 100 - $this->ranks[1]->pool_gain;
         foreach($this->ranks as $id => $rank) {
             if($id > $rank_id) {
                 continue;
