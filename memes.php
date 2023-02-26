@@ -52,7 +52,7 @@ return [
     ],
     [
         'code' => ':heckyeah:',
-        'image' => '<img src="./images/memes/f_yeah.png" title=\':heckyeah:\' alt=\':heckyeah:\' />',
+        'image' => ' />',
         'text' => ':heck yeah:',
         'public' => true,
     ],
@@ -64,7 +64,7 @@ return [
     ],
     [
         'code' => ':screwthis:',
-        'image' => '<img src="./images/memes/fts.png" title=\':screwthis:\' alt=\':screwthis:\' />',
+        'image' => ' />',
         'text' => ':screw this:',
         'public' => true,
     ],
@@ -638,7 +638,7 @@ return [
     ], 
     [
             'code' => ':krabbypatties:',
-            'image' => "<img src='./images/memes/You-Like-Krabby-Patties.png' />",
+            'image' => "<img src='images/memes/krabby-patties.png' />",
             'text' => ':krabby patties:',
             'public' => true,       
     ], 
