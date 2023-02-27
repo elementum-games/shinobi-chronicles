@@ -515,7 +515,7 @@ function premium() {
 
             //Extend seal
             if($player->forbidden_seal_loaded && $player->forbidden_seal->level == $seal_level) {
-                $player->subtractPremiumCredits($seal_cost, "Extended {$player->forbidden_seal->name} by {$seal_length} days.");
+                $player->subtractPremiumCredits($akCost, "Extended {$player->forbidden_seal->name} by {$seal_length} days.");
                 $player->forbidden_seal->addSeal($seal_level, $seal_length);
                 $system->message("Seal extended!");
             }
@@ -549,7 +549,7 @@ function premium() {
             }
             //New seal
             else {
-                $player->subtractPremiumCredits($seal_cost, "Purchased " . ForbiddenSeal::$forbidden_seals[$seal_level]
+                $player->subtractPremiumCredits($akCost, "Purchased " . ForbiddenSeal::$forbidden_seals[$seal_level]
                     . " for {$seal_length} days.");
                 //Load blank seal
                 $player->forbidden_seal = new ForbiddenSeal($system, 0, 0);
