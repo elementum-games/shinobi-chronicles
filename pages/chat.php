@@ -189,11 +189,14 @@ function chat() {
             elseif($time >= 3600) {
                 $time_string = floor($time/3600) . " hour(s) ago";
             }
+            elseif($time >= 120) {
+                $time_string = floor($time/60) . " mins ago";
+            }
             elseif($time >= 60) {
-                $time_string = floor($time/60) . " min(s) ago";
+                $time_string = "1 min ago";
             }
             else {
-                $time_string = "Just now";
+                $time_string = "< 1 min ago";
             }
             $post['time_string'] = $time_string;
 
