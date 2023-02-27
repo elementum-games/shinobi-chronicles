@@ -558,6 +558,7 @@ class Inbox {
         $convos_data = $system->db_fetch_all($result);
 
         foreach($convos_data as $convo) {
+            $convo['title'] = htmlspecialchars_decode($convo['title'], ENT_QUOTES);
 
             // Get a list of members for each conversation
             $sql = "SELECT `convos_users`.`user_id`, `users`.`user_name`,

@@ -21,7 +21,7 @@
     </tr>
     <?php if(empty($reports)): ?>
         <tr>
-            <td colspan="3" style="text-align: center;">No reports</td>
+            <td colspan="5" style="text-align: center;">No reports</td>
         </tr>
     <?php else:?>
         <?php foreach($reports as $id => $report): ?>

@@ -44,7 +44,7 @@ function modPanel() {
 			$ban_length = $system->clean($_POST['ban_length']);
 
             //Check ban type
-			if(array_search($ban_type, StaffManager::$ban_types) === false) {
+			if(array_search($ban_type, StaffManager::$ban_menu_items) === false) {
 				throw new Exception("Invalid ban type!");
 			}
             //Check ban length
@@ -367,7 +367,7 @@ function modPanel() {
 				$system->query("INSERT INTO `banned_ips` (`ip_address`, `ban_level`) VALUES ('$ip_address', 2)");
 				if($system->db_last_affected_rows == 1) {
                     $player->staff_manager->staffLog(StaffManager::STAFF_LOG_HEAD_MOD,
-                        "{$player->user_name} ({$player->user_id}) banned IP Address: $ip_address.");
+                        "{$player->user_name}({$player->user_id}) banned IP Address: $ip_address.");
 					$system->message("IP address '$ip_address' banned!");
 				}
 				else {
@@ -399,7 +399,7 @@ function modPanel() {
                     throw new Exception("$user_name does not currently have a " . ucwords($unban_type) . " Ban!");
                 }
                 //Check if unban data is correct
-                if(!in_array($unban_type, StaffManager::$ban_types)) {
+                if(!in_array($unban_type, StaffManager::$ban_menu_items)) {
                     throw new Exception("Invalid ban type!");
                 }
 
@@ -429,7 +429,7 @@ function modPanel() {
 				$system->query("DELETE FROM `banned_ips` WHERE `ip_address`='$ip_address' LIMIT 1");
 				if($system->db_last_affected_rows == 1) {
                     $player->staff_manager->staffLog(StaffManager::STAFF_LOG_HEAD_MOD,
-                        "{$player->user_name} ({$player->user_id}) unbanned IP: $ip_address.");
+                        "{$player->user_name}({$player->user_id}) unbanned IP: $ip_address.");
 					$system->message("IP address '$ip_address' unbanned!");
 				}
 				else {
@@ -508,7 +508,7 @@ function modPanel() {
 				$system->query("UPDATE `system_storage` SET `global_message`='$message', `time`='".time()."'");
 				$system->query("UPDATE `users` SET `global_message_viewed`=0");
 				$player->global_message_viewed = 0;
-                $player->staff_manager->staffLog(StaffManager::STAFF_LOG_HEAD_MOD, "Posted global: <br />"
+                $player->staff_manager->staffLog(StaffManager::STAFF_LOG_HEAD_MOD, "$player->user_name($player->user_id) posted global: <br />"
                 . $message);
 				$system->message("Message posted!");
 			} catch (Exception $e) {
@@ -593,7 +593,7 @@ function modPanel() {
         GROUP BY 
              `$query_type`
         HAVING 
-            COUNT(`$query_type`) > 1");
+            COUNT(`$query_type`) > 2");
         if($system->db_last_num_rows) {
             $to_check = $system->db_fetch_all($result);
         }

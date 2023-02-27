@@ -339,7 +339,8 @@ class User extends Fighter {
 			`staff_level`, 
 			`username_changes`, 
 			`support_level`, 
-			`special_mission`
+			`special_mission`,
+            `censor_explicit_language`
 			FROM `users` WHERE `user_id`='$user_id' LIMIT 1"
         );
         if($system->db_last_num_rows == 0) {

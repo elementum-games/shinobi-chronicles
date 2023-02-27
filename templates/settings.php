@@ -158,7 +158,14 @@
                 <tr><th>Official Warning</th></tr>
                 <tr>
                     <td>
-                        <?=$warning['data']?>
+                        <div>
+                            <label style="display: inline-block; width:7em; margin-left: 1rem; font-weight:bold;">Date:</label>
+                                <?=Date("F m Y", $warning['time'])?><br />
+                            <label style="display: inline-block; width:7em; margin-left: 1rem; font-weight:bold;">Issued By:</label>
+                                <?=$warning['staff_name']?>
+                        </div>
+                        <hr />
+                        <div style="text-align: center;"><?=$warning['data']?></div>
                     </td>
                 </tr>
             <?php endif ?>
@@ -205,7 +212,7 @@
                 </tr>
                 <?php foreach($bans as $info): ?>
                     <tr>
-                        <td colspan="1">
+                        <td colspan="1" style="text-align: center;">
                             <?=Date('F j, Y', $info['time'])?>
                         </td>
                         <td colspan="3">

@@ -23,6 +23,9 @@ class StaffManager {
         self::BAN_TYPE_CHAT, self::BAN_TYPE_GAME, self::BAN_TYPE_PM,
         self::BAN_TYPE_JOURNAL, self::BAN_TYPE_AVATAR, self::BAN_TYPE_IP
     ];
+    public static array $ban_menu_items = [
+        self::BAN_TYPE_CHAT, self::BAN_TYPE_GAME, self::BAN_TYPE_PM
+    ];
 
     public static array $ban_lengths = [
         1 => '1 Day',
@@ -537,9 +540,9 @@ class StaffManager {
         $this->system->query("UPDATE `users` SET `ban_data`='{$ban_data}' WHERE `user_id`='{$user_data['user_id']}' LIMIT 1");
         if($this->system->db_last_affected_rows) {
             $this->addRecord($user_data['user_id'], $user_data['user_name'], self::RECORD_BAN_REMOVED,
-                "Removed " . ucwords($unban_type) . " Ban.", false);
+                "Removed $unban_string.", false);
             $this->staffLog(StaffManager::STAFF_LOG_HEAD_MOD,
-                "($this->user_name} ({$this->user_id}) removed {$user_data['user_name']}\'s ({$user_data['user_id']}) "
+                "$this->user_name({$this->user_id}) removed {$user_data['user_name']}\'s ({$user_data['user_id']}) "
                 . $unban_string . ".");
             return true;
         }
@@ -554,7 +557,7 @@ class StaffManager {
         ");
         if($this->system->db_last_insert_id) {
             $this->addRecord($user_data['user_id'], $user_data['user_name'], self::RECORD_OFFICIAL_WARNING, $content, false);
-            $this->staffLog(self::STAFF_LOG_MOD, "{$this->user_name}($this->user_id}) sent {$user_data['user_name']}({$user_data['user_id']}) an Official Warning.");
+            $this->staffLog(self::STAFF_LOG_MOD, "{$this->user_name}($this->user_id) sent {$user_data['user_name']}({$user_data['user_id']}) an Official Warning.");
             return true;
         }
         return false;

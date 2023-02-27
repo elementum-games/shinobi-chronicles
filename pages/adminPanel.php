@@ -1555,10 +1555,33 @@ function adminPanel() {
                     }
                 }
 
+                //Rank & level
                 $new_data['rank'] = $rankManager->calculateRankFromTotalStats($total_stats);
-
                 $new_data['level'] = $rankManager->calculateMaxLevel($total_stats, $new_data['rank']);
 
+                //Elements
+                $max_elements = 0;
+                if($new_data['rank'] >= 3) {
+                    $max_elements++;
+                }
+                if($new_data['rank'] >= 4) {
+                    $max_elements++;
+                }
+                $user['elements'] = json_decode($user['elements'], true);
+                $element_count = count($user['elements']);
+
+                if($element_count > $max_elements) {
+                    $skills_to_cut[] = 'elements';
+                    if($max_elements == 0) {
+                        $new_data['elements'] = json_encode(array());
+                    }
+                    elseif($max_elements == 1) {
+                        $new_data['elements'] = json_encode(['first' => $user['elements']['first']]);
+                    }
+                }
+                $user['elements'] = json_encode($user['elements']); // Set back to string for debugging display
+
+                //Pools & health
                 $health = $rankManager->healthForRankAndLevel($new_data['rank'], $new_data['level']);
                 $pools = $rankManager->chakraForRankAndLevel($new_data['rank'], $new_data['level']);
 
@@ -1580,6 +1603,8 @@ function adminPanel() {
                     }, $skills_to_cut);
 
                     echo "</div>";
+
+                    throw new Exception("Debugging!");
                 }
 
                 $query = "UPDATE `users` SET ";
@@ -1594,7 +1619,7 @@ function adminPanel() {
                 if ($system->db_last_affected_rows) {
                     $system->message("{$user['user_name']} has had stats cut!");
                     $player->staff_manager->staffLog(StaffManager::STAFF_LOG_ADMIN, "{$player->user_name}({$player->user_id})"
-                        . " cut {$user['user_name']}\'s({$user['user_id']}) by " . $cut_amount * 100 . "%.
+                        . " cut {$user['user_name']}\'s({$user['user_id']}) by " . 100 - ($cut_amount * 100) . "%.
                         
                         " . $log_data);
                     $user = false;
