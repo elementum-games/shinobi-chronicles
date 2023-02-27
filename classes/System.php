@@ -520,6 +520,9 @@ class System {
         foreach ($cleaned_memes as $meme)
         {
             $meme_code = strtolower(':' . preg_replace($file_type_filter,'', str_replace($search_symbols, '', $meme)) . ':');
+
+            if (in_array($meme_code, $meme_array['codes'])) continue;
+
             $meme_array['codes'][] = $meme_code;
             $meme_array['images'][] = "<img src='./images/memes/${meme}' title='${meme_code}' alt='${meme_code}' style='max-width: 75px;max-height: 75px'/>";
             $meme_array['texts'][] = $meme_code;
