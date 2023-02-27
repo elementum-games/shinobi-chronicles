@@ -190,10 +190,10 @@ function chat() {
                 $time_string = floor($time/3600) . " hour(s) ago";
             }
             elseif($time >= 60) {
-                $time_string = floor($time/60) . " minute(s) ago";
+                $time_string = floor($time/60) . " min(s) ago";
             }
             else {
-                $time_string = "Moments ago";
+                $time_string = "Just now";
             }
             $post['time_string'] = $time_string;
 
