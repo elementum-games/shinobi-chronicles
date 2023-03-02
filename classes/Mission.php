@@ -162,20 +162,28 @@ class Mission {
 
         // Check for old stage
         $old_stage = false;
-        if($this->player->mission_stage['stage_id'] < $this->team->mission_stage['stage_id']) {
+        if(!isset($this->player->mission_stage) || $this->player->mission_stage['stage_id'] < $this->team->mission_stage['stage_id']) {
             $old_stage = true;
         }
 
         // Check multi counts, block stage id
         $new_stage = true;
-        if($this->team->mission_stage['count_needed'] && !$old_stage) {
-            $this->team->mission_stage['count']++;
-            if($this->team->mission_stage['count'] < $this->team->mission_stage['count_needed']) {
+        if(!isset($this->team->mission_stage) || $this->team->mission_stage['count_needed'] && !$old_stage) {
+            if(isset($this->team->mission_stage['count'])) {
+                $this->team->mission_stage['count']++;
+            }
+            else {
+                $this->team->mission_stage['count'] = 0;
+            }
+            if(isset($this->team->mission_stage['count_needed']) && $this->team->mission_stage['count'] < $this->team->mission_stage['count_needed']) {
                 $stage_id--;
                 $new_stage = false;
                 $mission_stage = json_encode($this->team->mission_stage);
                 $this->system->query("UPDATE `teams` SET `mission_stage`='$mission_stage' WHERE `team_id`={$this->team->id} LIMIT 1");
             }
+        }
+        else {
+            $new_stage = false;
         }
 
         // Set to completion stage if all stages have been completed
