@@ -16,12 +16,10 @@
             flex-direction: row;
         }
         #user_data_container .avatarContainer {
-            flex-shrink: 0;
-        }
-        #user_data_container .avatarContainer {
             max-width: 75px;
             max-height: 75px;
             vertical-align: text-bottom;
+            flex-shrink: 1;
         }
         #user_data_container .character_info {
             display: block;
