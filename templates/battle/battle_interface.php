@@ -31,14 +31,14 @@ if($battle->battle_text) {
     .playerAvatar {
         display:block;
         margin: auto;
-        max-width:<?= $player_avatar_size ?>;
-        max-height:<?= $player_avatar_size ?>;
+        max-width:<?= $player_avatar_size ?> !important;
+        max-height:<?= $player_avatar_size ?> !important;
     }
     .opponentAvatar {
         display:block;
         margin:auto;
-        max-width:<?= $opponent_avatar_size ?>;
-        max-height:<?= $opponent_avatar_size ?>;
+        max-width:<?= $opponent_avatar_size ?> !important;
+        max-height:<?= $opponent_avatar_size ?> !important;
     }
 
     .resourceBarOuter {
