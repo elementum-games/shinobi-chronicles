@@ -117,9 +117,7 @@
             <tr><td colspan="3" style="text-align: center;">No posts!</td></tr>
         <?php else: ?>
             <?php foreach($posts as $post): ?>
-                <tr class="chat_msg
-                    <?=(strpos(strtolower($post['message']), strtolower("@{$player->user_name}")) !== false ? " mention" : "")?>
-                    <?=($post['staff_level'] >= StaffManager::STAFF_MODERATOR && strpos($post['message'], "@everyone") !== false ? " mention" : "")?>" style="text-align: center;">
+                <tr class="chat_msg" style="text-align: center;">
                     <td>
                         <div id='user_data_container'>
                             <div class="avatarContainer"><img src="<?=$post['avatar']?>"/></div>
