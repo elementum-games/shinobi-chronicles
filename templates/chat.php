@@ -16,14 +16,14 @@
             flex-direction: row;
         }
         #user_data_container .avatarContainer {
-            flex-shrink: 0;
-        }
-        #user_data_container .avatarContainer img {
-            max-width: 45px;
-            max-height: 45px;
+            max-width: 75px;
+            max-height: 75px;
+            vertical-align: text-bottom;
+            flex-shrink: 1;
         }
         #user_data_container .character_info {
             display: block;
+            align-self: center;
             flex-grow: 1;
         }
         #user_data_container .character_info a {
@@ -32,7 +32,7 @@
         #user_data_container .character_info p {
             margin: 1px 0 3px;
         }
-        #user_data_container .character_info img {
+        #user_data_container .character_info .villageIco {
             max-width:20px;
             max-height:20px;
             vertical-align:text-bottom;
@@ -40,6 +40,10 @@
         .small_image {
             max-width:20px;
             max-height:20px;
+        }
+
+        .mention {
+            background-color: rgba(255, 255, 0, 0.3);
         }
     </style>
     <script type="text/javascript">
@@ -116,14 +120,12 @@
                 <tr class="chat_msg" style="text-align: center;">
                     <td>
                         <div id='user_data_container'>
-                            <div class="avatarContainer">
-                                <img src="<?=$post['avatar']?>" />
-                            </div>
+                            <div class="avatarContainer"><img src="<?=$post['avatar']?>"/></div>
                             <div class="character_info">
                                 <a href="<?=$system->links['members']?>&user=<?=$post['user_name']?>"
                                    class="<?=$post['class']?> <?=$post['status_type']?>"><?=$post['user_name']?></a><br />
                                 <p>
-                                    <img src="./images/village_icons/<?=strtolower($post['village'])?>.png" alt="<?=$post['village']?> Village"
+                                    <img class='villageIco' src="./images/village_icons/<?=strtolower($post['village'])?>.png" alt="<?=$post['village']?> Village"
                                         title="<?=$post['village']?> Village" />
                                     <?=stripslashes($post['title'])?>
                                 </p>

@@ -189,18 +189,20 @@ function chat() {
             elseif($time >= 3600) {
                 $time_string = floor($time/3600) . " hour(s) ago";
             }
-            elseif($time >= 60) {
-                $time_string = floor($time/60) . " min(s) ago";
-            }
             else {
-                $time_string = "< 1 min ago";
+                $mins = floor($time/60);
+                if($mins < 1) {
+                    $mins = 1;
+                }
+                $time_string = "$mins min(s) ago";
             }
+
             $post['time_string'] = $time_string;
 
             if($player->censor_explicit_language) {
                 $post['message'] = $system->explicitLanguageReplace($post['message']);
             }
-            $post['message'] = $system->html_parse($post['message'], false, true);
+            $post['message'] = nl2br($system->html_parse($post['message'], false, true));
 
             $posts[] = $post;
         }
