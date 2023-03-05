@@ -276,6 +276,7 @@ class User extends Fighter {
         $result = $system->query("SELECT 
             `user_id`, 
             `user_name`, 
+            `ban_data`,
             `ban_type`, 
             `ban_expire`, 
             `journal_ban`, 
@@ -284,6 +285,7 @@ class User extends Fighter {
             `last_login`,
 			`forbidden_seal`, 
 			`chat_color`, 
+			`chat_effect`,
 			`staff_level`, 
 			`username_changes`, 
 			`support_level`, 
@@ -299,90 +301,11 @@ class User extends Fighter {
         $user->user_name = $result['user_name'];
         $user->username_changes = $result['username_changes'];
 
-        $this->staff_level = $result['staff_level'];
-        $this->support_level = $result['support_level'];
-        $this->staff_manager = $this->loadStaffManager();
-
-        $this->ban_data = $this->loadBanData($result['ban_data']);
-        $this->ban_type = $result['ban_type'];
-        $this->ban_expire = $result['ban_expire'];
-        $this->journal_ban = $result['journal_ban'];
-        $this->avatar_ban = $result['avatar_ban'];
-        $this->song_ban = $result['song_ban'];
-
-        $user->last_login = $result['last_login'];
-
-        if($result['forbidden_seal']) {
-            $this->setForbiddenSealFromDb($result['forbidden_seal'], false);
-        }
-        $this->chat_color = $result['chat_color'];
-        $this->chat_effect = $result['chat_effect'];
-
-        //Todo: Remove this in a couple months, only a temporary measure to support current bans
-        if($this->ban_type) {
-            if($this->ban_expire > time()) {
-                $this->ban_data[$this->ban_type] = $this->ban_expire;
-                $ban_data = json_encode($this->ban_data);
-                $this->system->query("UPDATE `users` SET
-                    `ban_data` = '{$ban_data}',
-                   `ban_type` = '',
-                   `ban_expire` = NULL
-                WHERE `user_id`='{$this->user_id}' LIMIT 1");
-            }
-        }
-
-        //Check ban expiry
-        $ban_expiry = $this->checkBanExpiry();
-        if($ban_expiry != false) {
-            $this->system->message($ban_expiry);
-        }
-
-
-        $user->inventory_loaded = false;
-
-        return $user;
-    }
-
-    /**
-     * @param System $system
-     * @param int    $user_id
-     * @param bool   $remote_view
-     * @return User
-     * @throws Exception
-     */
-    public static function loadFromId(System $system, int $user_id, bool $remote_view = false): User {
-        $user = new User($user_id);
-
-        $result = $system->query("SELECT 
-            `user_id`, 
-            `user_name`, 
-            `ban_type`, 
-            `ban_expire`, 
-            `journal_ban`, 
-            `avatar_ban`, 
-            `song_ban`, 
-            `last_login`,
-			`forbidden_seal`, 
-			`chat_color`, 
-			`staff_level`, 
-			`username_changes`, 
-			`support_level`, 
-			`special_mission`,
-            `censor_explicit_language`
-			FROM `users` WHERE `user_id`='$user_id' LIMIT 1"
-        );
-        if($system->db_last_num_rows == 0) {
-            throw new Exception("User does not exist!");
-        }
-
-        $result = $system->db_fetch($result);
-
-        $user->user_name = $result['user_name'];
-        $user->username_changes = $result['username_changes'];
-
         $user->staff_level = $result['staff_level'];
         $user->support_level = $result['support_level'];
+        $user->staff_manager = $user->loadStaffManager();
 
+        $user->ban_data = $user->loadBanData($result['ban_data']);
         $user->ban_type = $result['ban_type'];
         $user->ban_expire = $result['ban_expire'];
         $user->journal_ban = $result['journal_ban'];
@@ -392,11 +315,23 @@ class User extends Fighter {
         $user->last_login = $result['last_login'];
 
         if($result['forbidden_seal']) {
-            $user->setForbiddenSealFromDb($result['forbidden_seal'], $remote_view);
+            $this->setForbiddenSealFromDb($result['forbidden_seal'], false);
         }
         $user->chat_color = $result['chat_color'];
+        $user->chat_effect = $result['chat_effect'];
 
-        $user->censor_explicit_language = (bool)$result['censor_explicit_language'];
+        //Todo: Remove this in a couple months, only a temporary measure to support current bans
+        if($user->ban_type) {
+            if($user->ban_expire > time()) {
+                $user->ban_data[$user->ban_type] = $user->ban_expire;
+                $ban_data = json_encode($user->ban_data);
+                $user->system->query("UPDATE `users` SET
+                    `ban_data` = '{$ban_data}',
+                   `ban_type` = '',
+                   `ban_expire` = NULL
+                WHERE `user_id`='{$user->user_id}' LIMIT 1");
+            }
+        }
 
         if(!$remote_view) {
             $user->checkBanExpiry();

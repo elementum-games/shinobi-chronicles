@@ -73,9 +73,8 @@ function displayNotifications() {
         $notifications[] = "<a class='link' href='{$system->links['marriage']}'>Proposal received!</a>";
     }
 	
-	
-	global $ajax;
-	if(!$ajax) {
+
+	if(!$system->is_legacy_ajax_request) {
 			echo "<div id='notifications'>";	
 	}
 	
@@ -117,7 +116,7 @@ function displayNotifications() {
 		}
 	}
 	
-	if(!$ajax) {
+	if(!$system->is_legacy_ajax_request) {
 		echo "</div>";
 	}
 }

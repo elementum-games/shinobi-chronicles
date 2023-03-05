@@ -28,7 +28,7 @@ abstract class Fighter {
     public float $max_chakra = 100;
 
     public int $level = 1;
-    public int $money = 0;
+    private int $money = 0;
 
     public string $avatar_link = '';
 
@@ -102,6 +102,10 @@ abstract class Fighter {
     abstract public function getAvatarSize(): int;
 
     abstract public function getInventory();
+
+    public function getMoney(): int {
+        return $this->money;
+    }
 
     public function applyBloodlineBoosts() {
         // Temp number fix inside

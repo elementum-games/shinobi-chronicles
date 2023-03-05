@@ -50,9 +50,8 @@ class Jutsu {
         self::USE_TYPE_BARRIER,
     ];
 
-
     public static array $attacking_use_types = [
-        self::USE_TYPE_PHYSICAL,
+        self::USE_TYPE_MELEE,
         self::USE_TYPE_PROJECTILE,
     ];
 

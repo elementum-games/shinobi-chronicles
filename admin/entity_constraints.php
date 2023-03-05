@@ -488,7 +488,7 @@ $constraints['bloodline'] = [
             'effect' => [
                 'data_type' => 'string',
                 'input_type' => 'select',
-                'options' => $combat_boosts,
+                'options' => $bloodline_combat_boosts,
             ],
             'remove' => [
                 'special' => 'remove',

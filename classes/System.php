@@ -73,7 +73,6 @@ class System {
 
     // Request lifecycle
     public bool $is_legacy_ajax_request = false;
-    public bool $is_api_request = false;
 
     public array $villageLocations = [];
 
@@ -91,12 +90,12 @@ class System {
     public array $SC_STAFF_COLORS = array(
         User::STAFF_MODERATOR => array(
             'staffBanner' => "moderator",
-            'staffColor' => "009020",
+            'staffColor' => "#009020",
             'pm_class' => 'moderator'
         ),
         User::STAFF_HEAD_MODERATOR => array(
             'staffBanner' => "head moderator",
-            'staffColor' => "0090A0",
+            'staffColor' => "#0090A0",
             'pm_class' => 'headModerator'
         ),
         User::STAFF_CONTENT_ADMIN => array(
@@ -106,12 +105,12 @@ class System {
         ),
         User::STAFF_ADMINISTRATOR => array(
             'staffBanner' => "administrator",
-            'staffColor' => "A00000",
+            'staffColor' => "#A00000",
             'pm_class' => 'administrator'
         ),
         User::STAFF_HEAD_ADMINISTRATOR => array(
             'staffBanner' => "head administrator",
-            'staffColor' => "A00000",
+            'staffColor' => "#A00000",
             'pm_class' => 'administrator'
         )
     );

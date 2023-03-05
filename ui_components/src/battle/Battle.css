@@ -63,6 +63,8 @@
     border-radius: 50%;
     border: 1px solid rgba(0, 0, 0, 0.4);
     color: black;
+
+    overflow: hidden;
 }
 
 .tileFighter.ally {

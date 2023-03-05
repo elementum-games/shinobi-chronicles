@@ -7,6 +7,12 @@ class Notifications {
     public static function displayNotifications(System $system, User $player, bool $ajax = false) {
         $notifications = Notifications::getNotifications($system, $player);
 
+        // New PM
+        $playerInbox = new InboxManager($system, $player);
+        if($playerInbox->checkIfUnreadMessages() || $playerInbox->checkIfUnreadAlerts()) {
+            $notifications[] = "<a class='link' href='{$system->link}?id=2'>You have unread PM(s)</a>";
+        }
+
         if(!$ajax) {
             echo "<div id='notifications'>";
         }

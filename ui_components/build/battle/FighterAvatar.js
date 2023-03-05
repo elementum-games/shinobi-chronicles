@@ -13,7 +13,9 @@ const styles = {
 
     /* for alt text */
     fontWeight: "bold",
-    textTransform: "uppercase"
+    textTransform: "uppercase",
+    maxWidth: "100%",
+    maxHeight: "100%"
   }
 };
 export function FighterAvatar({
@@ -32,12 +34,14 @@ export function FighterAvatar({
   } else {
     alt = name_initials;
   }
+  /*maxWidth: `${maxAvatarSize}px`,
+  maxHeight: `${maxAvatarSize}px`*/
+
 
   const img = /*#__PURE__*/React.createElement("img", {
     src: avatarLink,
     className: "avatarImage",
-    style: { ...styles.avatarImage,
-      maxWidth: `${maxAvatarSize}px`
+    style: { ...styles.avatarImage
     },
     alt: alt
   });

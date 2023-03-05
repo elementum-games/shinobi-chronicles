@@ -154,7 +154,7 @@ function processArenaBattleEnd(BattleManager $battle, User $player): string {
         $stat_gain_display = false;
         $opponent = $battle->opponent;
 
-        $money_gain = $battle->opponent->money;
+        $money_gain = $battle->opponent->getMoney();
 
             if($player->level > $opponent->level) {
                 $level_difference = $player->level - $opponent->level;

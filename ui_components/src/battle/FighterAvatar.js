@@ -17,6 +17,8 @@ const styles = {
         /* for alt text */
         fontWeight: "bold",
         textTransform: "uppercase",
+        maxWidth: "100%",
+        maxHeight: "100%",
     }
 };
 
@@ -33,13 +35,15 @@ export function FighterAvatar({ fighterName, avatarLink, maxAvatarSize, includeC
         alt = name_initials;
     }
 
+    /*maxWidth: `${maxAvatarSize}px`,
+    maxHeight: `${maxAvatarSize}px`*/
+
     const img = (
         <img
             src={avatarLink}
             className='avatarImage'
             style={{
                 ...styles.avatarImage,
-                maxWidth: `${maxAvatarSize}px`
             }}
             alt={alt}
         />

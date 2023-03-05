@@ -14,7 +14,6 @@ function chat() {
 	global $system;
 	global $player;
 	global $self_link;
-    $memes = require_once 'memes.php';
 
 	if($player->checkBan(StaffManager::BAN_TYPE_CHAT)) {
         $ban_type = StaffManager::BAN_TYPE_CHAT;

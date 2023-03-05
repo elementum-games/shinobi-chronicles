@@ -3,12 +3,11 @@ declare(strict_types=1);
 
 use Phinx\Migration\AbstractMigration;
 
-final class CombatUpdatePart1 extends AbstractMigration
-{
+final class CombatUpdatePart1 extends AbstractMigration {
     public function up(): void {
         $this->execute("
-            ALTER TABLE `battles` ADD COLUMN `turn_type` VARCHAR(128) not null AFTER `turn_count`;
-            alter table `jutsu` add column `target_type` varchar(64) after `use_type`;
+            ALTER TABLE `battles` ADD COLUMN `turn_type` VARCHAR(128) default 'movement' not null AFTER `turn_count`;
+            alter table `jutsu` add column `target_type` varchar(64) default 'tile' after `use_type`;
             alter table `battle_logs` add `fighter_action_logs` json null after content;
             alter table `battle_logs` add `turn_phase` varchar(128) default 'movement' not null;
         ");
