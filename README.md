@@ -71,21 +71,28 @@ started quickly with minimal PHP environment/Git knowledge.
    - Go to MySQL > Admin/PhpMyAdmin > user accounts 
    - Go to add user
    - Enter the name `shinobi_chronicles` and give it a password (doesn't matter what it is, can just be "password") > check "create database with same name and grant all permissions"
-7. Import the DB in XAMPP > MySQL
-   - Select the database `shinobi_chronicles` in PhpMyAdmin
-   - Click "Import" at the top menu
-   - Click "Choose file" and navigate to your SC directory
-     - Select `shinobi-chronicles/db/V1__schost_game_structure.sql` and proceed with the import
-8. Setup game config in PhpStorm
-   - Find `secure/vars.sample.php`
-   - Make a copy of it as `secure/vars.php` 
-   - Change the values to the ones from your database:
-     - user = shinobi_chronicles 
-     - database = shinobi_chronicles 
-     - password = (whatever you set as your password)
-9. Run it
-    - First, make sure Apache and MySQL are both started in XAMPP
-    - Then navigate to http://localhost/ and you should see the game come up
+7. Setup game config in PhpStorm
+    - Find `secure/vars.sample.php`
+    - Make a copy of it as `secure/vars.php`
+    - Change the values to the ones from your database:
+        - user = shinobi_chronicles
+        - database = shinobi_chronicles
+        - password = (whatever you set as your password)
+8. Install Composer
+    - Windows:
+        - Download and run https://getcomposer.org/Composer-Setup.exe
+    - Mac:
+        - See directions here https://getcomposer.org/doc/00-intro.md#installation-linux-unix-macos
+9. Use Composer to install important dependencies
+   - Open your command line/terminal, navigate to your SC directory, and run `composer install`
+10. Import the DB using Phinx
+    - *(Phinx is automatically installed in step 8)*
+    - In your command line/terminal, navigate to your SC directory and run 
+      - `vendor/bin/phinx seed:run`
+    - This will populate your database with all the relevant tables and sample data
+13. Run it
+     - First, make sure Apache and MySQL are both started in XAMPP
+     - Then navigate to http://localhost/ and you should see the game come up
     
 
 ### Installing PHP Manually
@@ -99,10 +106,43 @@ Then go to "Windows downloads"
 
 ### Composer
 
-We use composer for managing some dependencies and info about PHP version. Download
-at 
-https://getcomposer.org/download/
-and run `composer install`
+We use composer for managing some dependencies and info about PHP version. 
+- Windows:
+    - Download and run https://getcomposer.org/Composer-Setup.exe
+- Mac:
+    - See directions here https://getcomposer.org/doc/00-intro.md#installation-linux-unix-macos
+
+Once installed, navigate to your SC directory in your CLI and run `composer install`.
+
+### Database Migrations
+
+We use [Phinx](https://phinx.org/) for simple migration management. The documentation on writing migrations is here:
+https://book.cakephp.org/phinx/0/en/migrations.html
+
+**Initial Setup**  
+When first setting up your dev environment, run:
+- `vendor/bin/phinx seed:run`
+This will populate your database with the basic data needed, except for a 
+user account. You can create one from the register page and manually activate it by setting `user_verified=1` in your database.
+
+**Quick Cheatsheet**  
+- Run all migrations
+  - `vendor/bin/phinx migrate`
+  - Useful if you've just pulled some changes from GitHub that include DB migrations
+- Create a migration
+  - `vendor/bin/phinx create MyCoolMigration`
+  - If your DB is up to date except for this new migration, you can run the `vendor/bin/phinx migrate` command to execute it
+- Run all migrations up to a specific version
+  - `vendor/bin/phinx migrate -t <timestamp>`
+  - The timestamp is the filename, in the `db/migrations` folder. The filename should look like `20110103081132_my_cool_migration.php`, in this case `20110103081132` is the timestamp.
+- Rollback the most recent migration
+  - `vendor/bin/phinx rollback`
+- Rollback all migrations to a specific version
+  - `vendor/bin/phinx rollback -t <timestamp>`
+  - Optionally you can specify a date instead of the full timestamp:
+  - `vendor/bin/phinx rollback -d 20230101`
+
+See `/db/SampleSQLMigration.php` for a simple example of creating a migration that uses raw SQL queries.
 
 ### Docker compose
 If you want to use docker before starting php set up your database with 
