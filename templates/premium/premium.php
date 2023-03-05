@@ -83,7 +83,7 @@
             <td style='text-align:center;'>
                 This will reset your AI Wins and AI Losses to 0.<br />
                 <br />
-                Cost: <?= $costs['reset_ai_battles'] ?> shards
+                Cost: <?= $costs['reset_ai_battles'] ?> AK
                 <form action='<?= $self_link ?>' method='post'>
                     <input type='submit' name='reset_ai_battles' value='Reset AI Battles' style='margin-top:8px;'/>
                 </form>
@@ -91,7 +91,7 @@
             <td style='text-align:center;'>
                 This will reset your PvP Wins and PvP Losses to 0.<br />
                 <br />
-                Cost: <?= $costs['reset_pvp_battles'] ?> shards
+                Cost: <?= $costs['reset_pvp_battles'] ?> AK
                 <form action='<?= $self_link ?>' method='post'>
                     <input type='submit' name='reset_pvp_battles' value='Reset PvP Battles' style='margin-top:8px;'/>
                 </form>
