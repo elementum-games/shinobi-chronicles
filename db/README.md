@@ -4,11 +4,10 @@ We use [Phinx](https://phinx.org/) for simple migration management. The document
 https://book.cakephp.org/phinx/0/en/migrations.html
 
 **Initial Setup**  
-When first setting up your dev environment, run:
-- `vendor/bin/phinx seed:run`
-  This will populate your database with the basic data needed, except for a
-  user account. You can create one from the register page and manually activate it by setting `user_verified=1` in your database.
-
+- Make sure you have installed Composer and run `composer install` to install Phinx.
+- Run `vendor/bin/phinx seed:run` to populate your database with tables/data.
+  - If you have existing database structure, this will not run. You need to drop all tables and re-run the command.
+    
 **Quick Cheatsheet**
 - Run all migrations
     - `vendor/bin/phinx migrate`
