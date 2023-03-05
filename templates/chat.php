@@ -16,15 +16,20 @@
             flex-direction: row;
         }
         #user_data_container .avatarContainer {
-            max-width: 75px;
+            max-width: clamp(45px, 100%, 75px);
             max-height: 75px;
             vertical-align: text-bottom;
-            flex-shrink: 1;
+            flex-shrink: 0;
+        }
+        #user_data_container .avatarContainer img {
+            max-width: inherit !important;
+            max-height: inherit !important;
         }
         #user_data_container .character_info {
             display: block;
             align-self: center;
             flex-grow: 1;
+            word-wrap: anywhere;
         }
         #user_data_container .character_info a {
             display: inline-block;
