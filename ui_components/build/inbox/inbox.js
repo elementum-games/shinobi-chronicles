@@ -1,25 +1,25 @@
 import { timeSince } from "./util.js";
 import { apiFetch } from "../utils/network.js";
-import ConversationList from "./ConversationList.js";
+import ConversationList from "./ConversationList.js"; // NEW MESSAGE
 
-// NEW MESSAGE
 const textboxInput = 'PMSubmitMessageInput;';
 const textboxButton = 'PMSubmitMessageButton';
-const textboxCharCount = 'PMTextboxCharacterCount';
+const textboxCharCount = 'PMTextboxCharacterCount'; // CONVO DETAILS ACTIONS
 
-// CONVO DETAILS ACTIONS
 const addPlayerInput = 'PMAddPlayerInput';
 const addPlayerButton = 'PMAddPlayerButton';
 const changeTitleInput = 'PMChangeTitleInput';
-const changeTitleButton = 'PMChangeTitleButton';
+const changeTitleButton = 'PMChangeTitleButton'; // NEW CONVO
 
-// NEW CONVO
 const newConvoMembersInput = 'PMNewConvoMembers';
 const newConvoTitleInput = 'PMNewConvoTitle';
 const newConvoMessageInput = 'PMNewConvoMessage';
 const convoListRefreshDuration = 60000; // 60 seconds
+
 const convoDataRefreshDuration = 5000; // 5 seconds
+
 const max_messages_per_fetch = 25;
+
 const Inbox = ({
   inboxAPILink,
   convo_count,
@@ -32,9 +32,8 @@ const Inbox = ({
   const [selectedConvoData, setSelectedConvoData] = React.useState(false);
   const [viewDetailsPanel, setViewDetailsPanel] = React.useState(false);
   const [newConvoPanel, setNewConvoPanel] = React.useState(false);
-  const [sendToName, setSendToName] = React.useState(sender);
+  const [sendToName, setSendToName] = React.useState(sender); // load convos
 
-  // load convos
   React.useEffect(() => {
     // Load the convos and update ever X seconds
     LoadConvoList();
@@ -42,9 +41,8 @@ const Inbox = ({
       LoadConvoList();
     }, convoListRefreshDuration);
     return () => clearInterval(timerLoadConvoList);
-  }, []);
+  }, []); // refresh convo being viewed
 
-  // refresh convo being viewed
   React.useEffect(() => {
     if (selectedConvoData) {
       let timerCheckForUpdates = setInterval(() => {
@@ -52,10 +50,9 @@ const Inbox = ({
       }, convoDataRefreshDuration);
       return () => clearInterval(timerCheckForUpdates);
     }
-  }, [selectedConvoData]);
-
-  // API ACTIONS
+  }, [selectedConvoData]); // API ACTIONS
   // check for new messages
+
   const CheckForUpdates = () => {
     console.log('Checking for new messages...');
     apiFetch(inboxAPILink, {
@@ -63,17 +60,17 @@ const Inbox = ({
       requested_convo_id: selectedConvoData.convo_id,
       timestamp: selectedConvoData.all_messages[0].time
     }).then(handleAPIResponse);
-  };
+  }; // load the left panel convo list
 
-  // load the left panel convo list
+
   const LoadConvoList = () => {
     console.log('Updating conversation list....');
     apiFetch(inboxAPILink, {
       request: 'LoadConvoList'
     }).then(handleAPIResponse);
-  };
+  }; // view a convo
 
-  // view a convo
+
   const ViewConvo = view_convo_id => {
     console.log('Requesting conversation...');
     ResetMessages();
@@ -82,8 +79,10 @@ const Inbox = ({
       requested_convo_id: view_convo_id
     }).then(handleAPIResponse);
   };
+
   const LoadNextPage = event => {
     event.preventDefault();
+
     if (selectedConvoData) {
       console.log('Fetching next page...');
       const oldest_message_id = selectedConvoData.all_messages[selectedConvoData.all_messages.length - 1].message_id;
@@ -93,9 +92,9 @@ const Inbox = ({
         oldest_message_id: oldest_message_id
       }).then(handleAPIResponse);
     }
-  };
+  }; // submit a message in a convo
 
-  // submit a message in a convo
+
   const SubmitMessage = () => {
     console.log('Submitting message...');
     apiFetch(inboxAPILink, {
@@ -103,9 +102,9 @@ const Inbox = ({
       requested_convo_id: selectedConvoData.convo_id,
       message: document.getElementsByClassName(textboxInput)[0].innerText
     }).then(handleAPIResponse);
-  };
+  }; // change the title of the current convo
 
-  // change the title of the current convo
+
   const ChangeTitle = convo_id => {
     console.log('Changing Title...');
     apiFetch(inboxAPILink, {
@@ -113,9 +112,9 @@ const Inbox = ({
       requested_convo_id: convo_id,
       new_title: document.getElementsByClassName(changeTitleInput)[0].value
     }).then(handleAPIResponse);
-  };
+  }; // add a player to the convo
 
-  // add a player to the convo
+
   const AddPlayer = convo_id => {
     console.log('Adding player to conversation..');
     apiFetch(inboxAPILink, {
@@ -123,9 +122,9 @@ const Inbox = ({
       requested_convo_id: convo_id,
       new_player: document.getElementsByClassName(addPlayerInput)[0].value
     }).then(handleAPIResponse);
-  };
+  }; // remove a player from the convo
 
-  // remove a player from the convo
+
   const RemoveFromConvo = (convo_id, user_id) => {
     console.log('Removing player from conversation...');
     apiFetch(inboxAPILink, {
@@ -133,27 +132,27 @@ const Inbox = ({
       requested_convo_id: convo_id,
       remove_player: user_id
     }).then(handleAPIResponse);
-  };
+  }; // leave the conversation
 
-  // leave the conversation
+
   const LeaveConversation = convo_id => {
     console.log('Leaving conversation...');
     apiFetch(inboxAPILink, {
       request: 'LeaveConversation',
       requested_convo_id: convo_id
     }).then(handleAPIResponse);
-  };
+  }; // mute/unmute conversation
 
-  // mute/unmute conversation
+
   const ToggleMute = convo_id => {
     console.log('Mute/Unmuting...');
     apiFetch(inboxAPILink, {
       request: 'ToggleMute',
       requested_convo_id: convo_id
     }).then(handleAPIResponse);
-  };
+  }; // create a new convo
 
-  // create a new convo
+
   const CreateNewConvo = () => {
     console.log('Creating a new conversation...');
     apiFetch(inboxAPILink, {
@@ -162,8 +161,9 @@ const Inbox = ({
       title: document.getElementsByClassName(newConvoTitleInput)[0].value,
       message: document.getElementsByClassName(newConvoMessageInput)[0].value
     }).then(handleAPIResponse);
-  };
-  // HANDLE FETCH REQUESTS
+  }; // HANDLE FETCH REQUESTS
+
+
   const handleAPIResponse = response => {
     // Update errors
     if (response.errors.length > 0 && response.errors.isArray) {
@@ -173,130 +173,152 @@ const Inbox = ({
       ResetMessages();
       setErrorMessage(response.errors);
     }
+
     if (response.data && response.data.response_data && response.errors.length <= 0) {
       switch (response.data.request) {
         case 'LoadConvoList':
           console.log('Conversation list loaded successfully.');
           setConvoList(response.data.response_data); // SET CONVO LIST
+
           break;
+
         case 'ViewConvo':
           console.log('Viewing conversation.');
           setSelectedConvoData(response.data.response_data); // SET CONVO
+
           LoadConvoList(); // RELOAD CONVO LIST
+
           setViewDetailsPanel(false); // REMOVE THE DETAILS PANEL IF ON
+
           setNewConvoPanel(false); // REMOVE THE NEW CONVO PANEL IF ON
+
           ClearTextbox(textboxInput, true); // CLEAR THE TEXTBOX
+
           setSendToName(null); // CLEAR THE NEW CONVO INPUT
+
           break;
+
         case 'LoadNextPage':
           if (response.data.response_data.older_messages) {
             console.log('Rendering older messages.');
             setSelectedConvoData(updateConvoObject(selectedConvoData, response.data.response_data.older_messages, false));
           }
+
           break;
+
         case 'CheckForNewMessages':
           // if we get new entries, recreate the convo object with the new messages
           if (response.data.response_data.new_messages) {
             console.log('Rendering new messages.');
             setSelectedConvoData(updateConvoObject(selectedConvoData, response.data.response_data.new_messages));
           }
+
           break;
+
         case 'SendMessage':
           console.log('Message sent.');
           ViewConvo(selectedConvoData.convo_id); // REFRESH CONVO BEING VIEWED
-
           // Success Message
+
           ResetMessages();
           setSuccessMessage('Message sent!');
           break;
+
         case 'ChangeTitle':
           console.log('Title changed.');
           LoadConvoList(); // RELOAD CONVO LIST
-          ClearTextbox(changeTitleInput, false, true);
 
-          // Success Message
+          ClearTextbox(changeTitleInput, false, true); // Success Message
+
           ResetMessages();
           setSuccessMessage('Title Updated!');
           break;
+
         case 'AddPlayer':
           console.log('Player has been added.');
           ViewConvo(selectedConvoData.convo_id); // REFRESH CONVO BEING VIEWED
-
           // Success Message
+
           ResetMessages();
           setSuccessMessage('Player Added');
           break;
+
         case 'RemovePlayer':
           console.log('Player has been removed.');
           ViewConvo(selectedConvoData.convo_id); // REFRESH CONVO BEING VIEWED
-
           // Success Message
+
           ResetMessages();
           setSuccessMessage('Player has been removed');
           break;
+
         case 'LeaveConversation':
           console.log('You have left the conversation.');
           LoadConvoList(); // RELOAD CONVO LIST
-          setSelectedConvoData(false); // REMOVE THE CONVO BEING VIEWED
-          setViewDetails(false); // RESET DETAILS PANEL
 
+          setSelectedConvoData(false); // REMOVE THE CONVO BEING VIEWED
+
+          setViewDetails(false); // RESET DETAILS PANEL
           // Success Message
+
           ResetMessages();
           setSuccessMessage('You have left the conversation');
           break;
+
         case 'CreateNewConvo':
           console.log('Conversation has been created.');
           LoadConvoList(); // RELOAD CONVO LIST
+
           ClearTextbox(newConvoMembersInput, false, true);
           ClearTextbox(newConvoTitleInput, false, true);
           ClearTextbox(newConvoMessageInput, false, true);
           setNewConvoPanel(null);
-          setSendToName(null);
+          setSendToName(null); // Success Message
 
-          // Success Message
           ResetMessages();
           setSuccessMessage('Conversation created!');
           break;
+
         case 'ToggleMute':
           console.log('Mute/Unmuting.');
-          ViewConvo(selectedConvoData.convo_id);
+          ViewConvo(selectedConvoData.convo_id); // Success Message
 
-          // Success Message
           ResetMessages();
           setSuccessMessage('Mute has been toggled successfully.');
           break;
       }
     }
-  };
-
-  // Non API Actions
-
+  }; // Non API Actions
   // reset all displayed messages
-
   // update the convodata object with a new set of messages
+
+
   const updateConvoObject = (current_object, new_entries, start_of = true) => {
     const new_object = {};
+
     for (let [key, value] of Object.entries(current_object)) {
       new_object[key] = value;
     }
+
     const first_array = start_of ? new_entries : current_object.all_messages;
     const second_array = start_of ? current_object.all_messages : new_entries;
     new_object.all_messages = [...first_array, ...second_array];
     return new_object;
   };
+
   const ResetMessages = () => {
     setSuccessMessage(null);
     setErrorMessage(null);
-  };
+  }; // update the character count display
 
-  // update the character count display
+
   const CountCharacters = () => {
     const max_chars = document.getElementsByClassName(textboxCharCount)[0];
     const textbox = document.getElementsByClassName(textboxInput)[0];
     max_chars.innerText = selectedConvoData.max_characters - textbox.innerText.length + 1;
-  };
+  }; // shortcuts on input and textboxes
 
-  // shortcuts on input and textboxes
+
   const InputShortcuts = (event, targetButton) => {
     // Submit action on enter
     // Enter -> 13 --- Shift -> 16
@@ -304,37 +326,37 @@ const Inbox = ({
       event.preventDefault();
       document.getElementsByClassName(targetButton)[0].click();
     }
-  };
+  }; // toggle the view details pane;
 
-  // toggle the view details pane;
+
   const ToggleViewDetails = () => {
     // toggle
     setViewDetailsPanel(!viewDetailsPanel);
-  };
+  }; // toggle the new convo panel that
 
-  // toggle the new convo panel that
+
   const ToggleNewConvoPanel = () => {
     // toggle
-    setNewConvoPanel(!newConvoPanel);
+    setNewConvoPanel(!newConvoPanel); // Reset the convo being viewed
 
-    // Reset the convo being viewed
     setSelectedConvoData(false);
     setViewDetailsPanel(false);
-  };
+  }; // clear textboxes or inputs
 
-  // clear textboxes or inputs
+
   const ClearTextbox = (target, br = false, input_tag = false) => {
     // get the target from the DOM
-    const target_clear = document.getElementsByClassName(target)[0];
-    // text we will place in the target
-    const replace_text = br ? '<br />' : '';
-    // check if we're dealing with a <input> or <textbox>
+    const target_clear = document.getElementsByClassName(target)[0]; // text we will place in the target
+
+    const replace_text = br ? '<br />' : ''; // check if we're dealing with a <input> or <textbox>
+
     if (input_tag) {
       target_clear.value = replace_text;
     } else {
       target_clear.innerHTML = replace_text;
     }
   };
+
   return (
     /*#__PURE__*/
     // CONTAINER START
@@ -469,17 +491,18 @@ const Inbox = ({
       onClick: () => CreateNewConvo()
     }, "Create Conversation")), !selectedConvoData && /*#__PURE__*/React.createElement("div", {
       id: "inbox_convo_main_placeholder"
-    }, "Select a conversation to view it"))))
-    // CONTAINER
+    }, "Select a conversation to view it")))) // CONTAINER
+
   );
 };
-
 /**
  *
  * @param {array} member_data
  * @param convoData
  * @returns
  */
+
+
 const ConvoDetailsMemberCard = ({
   member_data,
   convoData,
@@ -489,6 +512,7 @@ const ConvoDetailsMemberCard = ({
   if (convoData.self === member_data.user_id) {
     return null;
   }
+
   return /*#__PURE__*/React.createElement("div", {
     key: member_data.user_id,
     className: "inbox_convo_details_member"
@@ -511,12 +535,13 @@ const ConvoDetailsMemberCard = ({
     className: "inbox_convo_details_member_remove"
   })));
 };
-
 /**
  *
  * @param {array} message_data
  * @returns
  */
+
+
 const ConvoMessageCard = ({
   message_data,
   convo_data
@@ -553,4 +578,5 @@ const ConvoMessageCard = ({
     }
   }))));
 };
+
 window.Inbox = Inbox;
