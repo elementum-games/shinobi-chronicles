@@ -7,6 +7,10 @@
 ?>
 <?php if(!$ajax): ?>
     <style>
+        :root {
+            --avatar-size: 60px;
+        }
+
         #chatMessage {
             width: 375px;
             height: 100px;
@@ -16,8 +20,8 @@
             flex-direction: row;
         }
         #user_data_container .avatarContainer {
-            max-width: clamp(45px, 100%, 75px);
-            max-height: 75px;
+            max-width: clamp(45px, 100%, var(--avatar-size));
+            max-height: var(--avatar-size);
             vertical-align: text-bottom;
             flex-shrink: 0;
         }
