@@ -48,6 +48,9 @@ function premium() {
 		$costs['clan_change'] = 40;
 	}
 
+    $costs['reset_ai_battles'] = 10;
+    $costs['reset_pvp_battles'] = 20;
+
     $free_stat_change_timer = 86400;
     $stat_transfer_points_per_min = 10;
     $stat_transfer_points_per_ak = 300;
@@ -406,6 +409,58 @@ function premium() {
 		}
 		$system->printMessage();
 	}
+    else if(isset($_POST['reset_ai_battles'])) {
+        try {
+            $cost = $costs['reset_ai_battles'];
+            if($player->getPremiumCredits() < $cost) {
+                throw new Exception("You do not have enough Ancient Kunai!");
+            }
+
+            if(!isset($_POST['confirm_ai_battle_reset'])) {
+                $confirmation_type = "confirm_ai_battle_reset";
+                $confirmation_string = "Are you sure you want to reset your AI Battle Win/Losses?";
+                $submit_value = 'reset_ai_battles';
+                $button_value = 'Confirm Reset';
+                require 'templates/premium/purchase_confirmation.php';
+            }
+            else {
+                $player->subtractPremiumCredits($cost, 'reset_ai_battles');
+                $player->ai_wins = 0;
+                $player->ai_losses = 0;
+
+                $system->message("You have reset your AI wins and losses to 0.");
+            }
+        } catch (Exception $e) {
+            $system->message($e->getMessage());
+        }
+        $system->printMessage();
+    }
+    else if(isset($_POST['reset_pvp_battles'])) {
+        try {
+            $cost = $costs['reset_pvp_battles'];
+            if($player->getPremiumCredits() < $cost) {
+                throw new Exception("You do not have enough Ancient Kunai!");
+            }
+
+            if(!isset($_POST['confirm_pvp_battle_reset'])) {
+                $confirmation_type = "confirm_pvp_battle_reset";
+                $confirmation_string = "Are you sure you want to reset your PvP Battle Win/Losses?";
+                $submit_value = 'reset_pvp_battles';
+                $button_value = 'Confirm Reset';
+                require 'templates/premium/purchase_confirmation.php';
+            }
+            else {
+                $player->subtractPremiumCredits($cost, 'reset_pvp_battles');
+                $player->pvp_wins = 0;
+                $player->pvp_losses = 0;
+
+                $system->message("You have reset your PvP wins and losses to 0.");
+            }
+        } catch (Exception $e) {
+            $system->message($e->getMessage());
+        }
+        $system->printMessage();
+    }
 	else if(isset($_POST['purchase_bloodline'])) {
 		try {
             $self_link .= '&view=bloodlines';

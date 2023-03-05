@@ -76,6 +76,29 @@
         </tr>
 
         <tr>
+            <th id='premium_characterReset_header'>Reset AI Battle Counts</th>
+            <th id='premium_individualStatReset_header'>Reset PvP Battle Counts</th>
+        </tr>
+        <tr>
+            <td style='text-align:center;'>
+                This will reset both your AI Wins and AI Losses to 0.<br />
+                <br />
+                Cost: <?= $costs['reset_ai_battles'] ?> shards
+                <form action='<?= $self_link ?>' method='post'>
+                    <input type='submit' name='reset_ai_battles' value='Reset AI Battles' style='margin-top:8px;'/>
+                </form>
+            </td>
+            <td style='text-align:center;'>
+                This will reset both your PvP Wins and PvP Losses to 0.<br />
+                <br />
+                Cost: <?= $costs['reset_pvp_battles'] ?> shards
+                <form action='<?= $self_link ?>' method='post'>
+                    <input type='submit' name='reset_pvp_battles' value='Reset PvP Battles' style='margin-top:8px;'/>
+                </form>
+            </td>
+        </tr>
+
+        <tr>
             <th colspan='2'>Username Change</th>
         </tr>
         <tr>
