@@ -92,6 +92,20 @@ if($battle->battle_text) {
         height: 100%;
         border-radius: 12px;
     }
+
+    #forfeitButton {
+        cursor: pointer;
+    }
+    #forfeitDialog button {
+        cursor: pointer;
+    }
+
+    .forfeitFormButtons {
+        display: flex;
+        justify-content: space-evenly;
+        margin-top: 12px;
+        padding: 0 25px;
+    }
 </style>
 
 <div class='submenu'>
@@ -174,22 +188,47 @@ if($battle->battle_text) {
 
         <!--// Turn timer-->
         <tr><td style='text-align:center;' colspan='2'>
+            <p>
                 <?= ($battle->isPreparationPhase() ? "Prep-" : "") ?>Time remaining:
                 <?= $battle->isPreparationPhase() ? $battle->prepTimeRemaining() : $battle->timeRemaining() ?> seconds
-            </td></tr>
+            </p>
+            <a id='forfeitButton'>Forfeit</a>
+            <dialog id="forfeitDialog">
+                <form method="post">
+                    <p>Are you sure you want to forfeit this battle?</p>
+                    <div class='forfeitFormButtons'>
+                        <button id="cancelBtn" value="cancel">Cancel</button>
+                        <button id="confirmBtn" name="forfeit" value="1">Confirm</button>
+                    </div>
+                </form>
+            </dialog>
+            <script type='text/javascript'>
+                const forfeitButton = document.getElementById('forfeitButton');
+                const forfeitDialog = document.getElementById('forfeitDialog');
+                const cancelButton = document.getElementById('cancelBtn');
+
+                forfeitButton.addEventListener('click', () => {
+                    forfeitDialog.showModal();
+                });
+                cancelButton.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    forfeitDialog.close();
+                });
+            </script>
+        </td></tr>
     <?php endif; ?>
 
     <?php if($battleManager->spectate): ?>
         <tr><td style='text-align:center;' colspan='2'>
-                <?php if($battle->winner == Battle::TEAM1): ?>
-                    <?=  $battle->player1->getName() ?> won!
-                <?php elseif($battle->winner == Battle::TEAM2): ?>
-                    <?= $battle->player2->getName() ?> won!
-                <?php elseif($battle->winner == Battle::DRAW): ?>
-                    Fight ended in a draw.
-                <?php else: ?>
-                    Time remaining: <?= $battle->timeRemaining() ?> seconds
-                <?php endif; ?>
-            </td></tr>
+            <?php if($battle->winner == Battle::TEAM1): ?>
+                <?=  $battle->player1->getName() ?> won!
+            <?php elseif($battle->winner == Battle::TEAM2): ?>
+                <?= $battle->player2->getName() ?> won!
+            <?php elseif($battle->winner == Battle::DRAW): ?>
+                Fight ended in a draw.
+            <?php else: ?>
+                Time remaining: <?= $battle->timeRemaining() ?> seconds
+            <?php endif; ?>
+        </td></tr>
     <?php endif; ?>
 </table>
