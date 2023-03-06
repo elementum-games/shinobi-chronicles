@@ -11,6 +11,7 @@
     "require": {
       "php": ">=8.0",
       "ext-mysqli": "*",
-      "ext-ctype": "*"
+      "ext-ctype": "*",
+      "robmorgan/phinx": "^0.13.4"
     }
 }

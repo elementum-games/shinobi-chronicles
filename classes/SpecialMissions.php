@@ -212,9 +212,9 @@ class SpecialMission {
         // Village info
         $villages = $this->system->getVillageLocations();
         foreach ($villages as $village) {
-            $location = explode('.', $village['location']);
-            self::$target_villages[$village['name']]['x'] = $location[0];
-            self::$target_villages[$village['name']]['y'] = $location[1];
+            $location = new TravelCoords($village['location']);
+            self::$target_villages[$village['name']]['x'] = $location->x;
+            self::$target_villages[$village['name']]['y'] = $location->y;
         }
 
         // generate a new target if null
@@ -251,7 +251,7 @@ class SpecialMission {
         $new_event = null;
 
         // Check if the user is in the target square
-        if ($this->target['x'] == $this->player->x && $this->target['y'] == $this->player->y) {
+        if ($this->target['x'] == $this->player->location->x && $this->target['y'] == $this->player->location->y) {
             $new_event = self::EVENT_BATTLE;
             $event_text = self::$event_names[$new_event]['text'];
         }
@@ -263,27 +263,27 @@ class SpecialMission {
         }
         
         // check if the user has enough progress to complete mission and is back home
-        if ($this->progress >= 100  && $this->player->x == self::$target_villages[$this->player->village]['x']
-                                    && $this->player->y == self::$target_villages[$this->player->village]['y']) {
+        if ($this->progress >= 100  && $this->player->location->x == self::$target_villages[$this->player->village]['x']
+                                    && $this->player->location->y == self::$target_villages[$this->player->village]['y']) {
             $new_event = self::EVENT_COMPLETE_SUCCESS;
             $event_text = self::$event_names[$new_event]['text'];
         }
 
         // check what direction the user has to travel
         $villages = $this->system->getVillageLocations();
-        $move_to_x = $this->player->x;
-        $move_to_y = $this->player->y;
-        if ($this->player->x != $this->target['x']) {
-            if ($this->target['x'] > $this->player->x) {
-                $move_to_x = $this->player->x + 1;
+        $move_to_x = $this->player->location->x;
+        $move_to_y = $this->player->location->y;
+        if ($this->player->location->x != $this->target['x']) {
+            if ($this->target['x'] > $this->player->location->x) {
+                $move_to_x = $this->player->location->x + 1;
             } else {
-                $move_to_x = $this->player->x - 1;
+                $move_to_x = $this->player->location->x - 1;
             }
 
             // Go around village not into it
             $target_location = $move_to_x . "." . $move_to_y;
             if(isset($villages[$target_location]) && $target_location !== $this->player->village_location) {
-                if($this->player->y > $this->target['y']) {
+                if($this->player->location->y > $this->target['y']) {
                     $move_to_y--;
                 }
                 else {
@@ -294,17 +294,17 @@ class SpecialMission {
             $new_event = self::EVENT_MOVE_X;
             $event_text = self::$event_names[$new_event]['text'] . $move_to_x . '.' . $move_to_y;
 
-        } else if ($this->player->y != $this->target['y']) {
-            if ($this->target['y'] > $this->player->y) {
-                $move_to_y = $this->player->y + 1;
+        } else if ($this->player->location->y != $this->target['y']) {
+            if ($this->target['y'] > $this->player->location->y) {
+                $move_to_y = $this->player->location->y + 1;
             } else {
-                $move_to_y = $this->player->y - 1;
+                $move_to_y = $this->player->location->y - 1;
             }
 
             // Skip past village if trying to move into it
             $target_location = $move_to_x . "." . $move_to_y;
             if(isset($villages[$target_location]) && $target_location !== $this->player->village_location) {
-                if($this->player->x > $this->target['x']) {
+                if($this->player->location->x > $this->target['x']) {
                     $move_to_x--;
                 }
                 else {
@@ -335,8 +335,8 @@ class SpecialMission {
 
             case self::EVENT_MOVE_Y:
             case self::EVENT_MOVE_X:
-                $this->player->x = $move_to_x;
-                $this->player->y = $move_to_y;
+                $this->player->location->x = $move_to_x;
+                $this->player->location->y = $move_to_y;
                 break;
             case self::EVENT_HOME:
                 $result = $this->generateTarget(true);
@@ -436,10 +436,13 @@ class SpecialMission {
                     $jutsu_key = array_rand($this->player->bloodline->jutsu);
                     $jutsu = $this->player->bloodline->jutsu[$jutsu_key];
                 }
-                else {
+                else if(count($this->player->equipped_jutsu) > 0) {
                     $jutsu_key = array_rand($this->player->equipped_jutsu);
                     $jutsu_id = $this->player->equipped_jutsu[$jutsu_key]['id'];
                     $jutsu = $this->player->jutsu[$jutsu_id] ?? null;
+                }
+                else {
+                    $jutsu = null;
                 }
 
                 if($jutsu == null) {
@@ -472,8 +475,8 @@ class SpecialMission {
     public function failMission(): bool {
         $this->end_time = time();
         $this->status = 2;
-        $this->player->x = self::$target_villages[$this->player->village]['x'];
-        $this->player->y = self::$target_villages[$this->player->village]['y'];
+        $this->player->location->x = self::$target_villages[$this->player->village]['x'];
+        $this->player->location->y = self::$target_villages[$this->player->village]['y'];
         $this->player->special_mission = 0;
         return true;
     }

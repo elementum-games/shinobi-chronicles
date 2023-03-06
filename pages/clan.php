@@ -66,6 +66,7 @@ function clan() {
 				throw new Exception("Invalid mission!");
 			}
 			Mission::start($player, $mission_id);
+            $player->log(User::LOG_MISSION, "Clan Mission ID #{$mission_id}");
 
 			require("missions.php");
 			runActiveMission();

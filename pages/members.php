@@ -156,6 +156,7 @@ function members() {
 				$journal = $journal_result['journal'];
 			}
 
+            require 'templates/view_user_profile.php';
 
 			echo "<table id='viewprofile' class='table'>
 			<tr><th colspan='2'>View Profile</th>";
@@ -235,7 +236,7 @@ function members() {
 
             // Spouse location
             if($player->user_id == $viewUser->spouse) {
-                echo "<label style='width:6.5em;'>Location:</label> {$viewUser->location}<br />";
+                echo "<label style='width:6.5em;'>Location:</label> {$viewUser->location->fetchString()}<br />";
             }
 
 
@@ -269,7 +270,7 @@ function members() {
 				}
 				$journal = $system->html_parse(stripslashes($journal), true, true);
 
-				$class_name = $player->forbidden_seal ? 'forbidden_seal' : 'normal';
+				$class_name = $player->forbidden_seal_loaded ? 'forbidden_seal' : 'normal';
 				echo "<style type='text/css'>
                     #journal {
                         white-space: pre-wrap;
@@ -393,13 +394,13 @@ function members() {
 			$view = 'highest_exp';
 		}
 		else if(isset($_GET['view']) && $_GET['view'] == 'highest_pvp') {
-			$query_custom = " WHERE `staff_level` < " . System::SC_ADMINISTRATOR .
+			$query_custom = " WHERE `staff_level` < " . User::STAFF_ADMINISTRATOR .
                 " ORDER BY `pvp_wins` DESC";
 			$view = 'highest_pvp';
 		}
 		//Teams
 		else if(isset($_GET['view']) && $_GET['view'] == 'highest_teams') {
-			$query_custom = " WHERE `staff_level` < " . System::SC_ADMINISTRATOR .
+			$query_custom = " WHERE `staff_level` < " . User::STAFF_ADMINISTRATOR .
                 " ORDER BY `pvp_wins` DESC";
 			$view = 'highest_teams';
 		}

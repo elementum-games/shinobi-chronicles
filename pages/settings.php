@@ -16,11 +16,16 @@ function userSettings() {
 	global $self_link;
 	$max_journal_length = 1000;
 	// Forbidden seal increase
-	if($player->forbidden_seal or $player->isHeadModerator()) {
-		$max_journal_length = 2000;
+    if($player->staff_level && !$player->forbidden_seal_loaded) {
+        $psuedoSeal = new ForbiddenSeal($system, ForbiddenSeal::$STAFF_SEAL_LEVEL);
+        $psuedoSeal->setBenefits();
+        $max_journal_length = $psuedoSeal->journal_size;
+    }
+	if($player->forbidden_seal_loaded && $player->forbidden_seal->level != 0) {
+        $max_journal_length = $player->forbidden_seal->journal_size;
 	}
 	
-	$layouts = array('shadow_ribbon', 'geisha', 'classic_blue', 'blue_scroll');
+	$layouts = array('shadow_ribbon', 'geisha', 'classic_blue', 'blue_scroll', 'rainbow_road');
 	if($system->environment == 'dev') {
 	    $layouts[] = 'cextralite';
 	}
@@ -31,9 +36,9 @@ function userSettings() {
 	if(!empty($_POST['change_avatar'])) {
 		$avatar_link = trim($_POST['avatar_link']);
 		try {
-			if($player->avatar_ban) {
-				throw new Exception("You are currently banned from changing your avatar.");
-			}
+			if($player->checkBan(StaffManager::BAN_TYPE_AVATAR)) {
+                throw new Exception("You are currently banned from changing your avatar.");
+            }
 		
 			if(strlen($avatar_link) < 5) {
 				throw new Exception("Please enter an avatar link!");
@@ -118,14 +123,16 @@ function userSettings() {
 		$system->printMessage();
 	}
 	else if(!empty($_POST['change_journal'])) {
-		$journal = $system->clean(trim($_POST['journal']));
 		try {
-			if($player->journal_ban) {
-				throw new Exception("You are currently banned from changing your avatar.");
-			}
-			
-			if(strlen($journal) > $max_journal_length) {
-				throw new Exception("Journal is too long! " . strlen($journal) . "/{$max_journal_length} characters");
+            $journal_length = strlen(preg_replace('/[\\n\\r]+/', '', trim($_POST['journal'])));
+            if($journal_length > $max_journal_length) {
+                throw new Exception("Journal is too long! " . $journal_length . "/{$max_journal_length} characters");
+            }
+
+            $journal = $system->clean($_POST['journal']);
+
+			if($player->checkBan(StaffManager::BAN_TYPE_JOURNAL)) {
+				throw new Exception("You are currently banned from changing your journal.");
 			}
 			
 			$system->query("UPDATE `journals` SET `journal`='$journal' WHERE `user_id`='{$player->user_id}' LIMIT 1");
@@ -181,7 +188,7 @@ function userSettings() {
 		try {
 			$user_exists = $player->blacklist[$user_remove];
 
-			$message = ($user_exists) ? "{$player->blacklist[$user_remove]['user_name']} has been removed from your blacklist" : "This user is not on your blacklist.";
+            $message = ($user_exists) ? "{$player->blacklist[$user_remove][$user_remove]['user_name']} has been removed from your blacklist" : "This user is not on your blacklist.";
 
 			if($user_exists) {
 				unset($player->blacklist[$user_remove]);
@@ -213,49 +220,19 @@ function userSettings() {
 			$system->printMessage();
 		}
 	}
-	
-	echo "<table class='table'>
-	<tr><th>Avatar</th></tr>
-	<tr><td style='text-align:center;'>
-		<div style='float:left;width:200px;'>
-			" . $system->imageCheck($player->avatar_link, $player->getAvatarSize()).  "
-		</div>
-		<div>
-			<b>Avatar info:</b><br />
-				Avatar must be hosted on another website<br />
-				Default limit: " . ($player->getAvatarSize() . "x" . $player->getAvatarSize()) . " pixels<br />
-				Avatar can be larger than the limit, but it will be resized<br />
-				Max filesize: " . $player->getAvatarFileSize() . "<br />
-				
-		</div>
-		<br style='clear:both;' />
-		<br />";
-		if(!$player->avatar_ban) {
-			echo "<form action='$self_link' method='post'>
-			<input type='text' name='avatar_link' value='{$player->avatar_link}' style='width:250px;' /><br />
-			<input type='submit' name='change_avatar' value='Change' />
-			</form>";
-		}
-		else {
-			echo "<p>You are currently banned from changing your avatar.</p>";
-		}
-		
-	echo "</td></tr>
-	<tr><th>Password</th></tr>
-	<tr><td>
-		<form action='$self_link' method='post'>
-		<label for='current_password' style='width:150px;'>Current password:</label>
-			<input type='password' name='current_password' /><br />
-		<label for='new_password' style='width:150px;'>New password:</label>
-			<input type='password' name='new_password' /><br />
-		<label for='confirm_new_password' style='width:150px;'>Confirm new password:</label>
-			<input type='password' name='confirm_new_password' /><br />
-		<p style='text-align:center;'>
-			<input type='submit' name='change_password' value='Change' />
-		</p>
-		</form>
-	</td></tr>";
-	
+    else if(!empty($_POST['censor_explicit_language'])) {
+        if($_POST['censor_explicit_language'] == 'on') {
+            $player->censor_explicit_language = true;
+        }
+        else if($_POST['censor_explicit_language'] == 'off') {
+            $player->censor_explicit_language = false;
+        }
+
+        $system->message("Censor explicit language preference set to <b>" . ($player->censor_explicit_language ? "on" : "off") . "</b>.");
+        $system->printMessage();
+    }
+
+    // Fetch journal info
 	$result = $system->query("SELECT `journal` FROM `journals` WHERE `user_id` = '{$player->user_id}' LIMIT 1");
 	if($system->db_last_num_rows == 0) {
 		$journal = '';
@@ -265,24 +242,8 @@ function userSettings() {
 		$result = $system->db_fetch($result);
 		$journal = $result['journal'];
 	}
-	
-	echo "<tr><th>Layout</th></tr>
-	<tr><td>
-	<form action='$self_link' method='post'>
-	<select name='layout'>";
-	foreach($layouts as $layout) {
-		echo "<option value='$layout' " . ($player->layout == $layout ? "selected='selected'" : "") . 
-			" >" . ucwords(str_replace("_", " ", $layout)) . "</option>";
-	}
-	echo "</select>
-	<input type='submit' name='change_layout' value='Change' />
-	</form>
-	</td></tr>";
 
-    //Blacklist
-    echo "<tr><th>Blocklist</th></tr>
-		<tr><td style='text-align:center;'>
-	";
+    // Fetch blacklist data
     if(!empty($player->blacklist)) {
         $list = "";
         $i = 0;
@@ -294,55 +255,29 @@ function userSettings() {
                 $list .= ", ";
             }
         }
-        echo "$list";
-    }
-    else {
-        echo "<p style='text-align:center;'>No blocked users!</p>";
-    }
-    echo "
-	<br />
-	<form action='$self_link' method='post'>
-		<input type='text' name='blacklist_name' style='width:250px;' /> <br />
-		<input type='submit' name='blacklist_add' value='Add' />
-		<input type='submit' name='blacklist_remove' value='Remove' />
-	</form>
-	</td></tr>";
-	
-	echo "<tr><th>Journal</th></tr>
-	<tr><td style='text-align:center;'>";
-    if(!$player->forbidden_seal) {
-        echo "<i>(Images will be resized down to a max of 300x200</i>";
     }
 
-	if(!$player->journal_ban) {
-        echo "<script type=text/javascript>
-        $(document).ready(function(){
-            $('#journalMessage').keyup(function (evt) {
-                    if(this.value.length >= $max_journal_length - 20)
-                    {
-                        let remaining = $max_journal_length - this.value.length;
-                        $('#remainingCharacters').text('Characters remaining: ' + remaining + ' out of ' + $max_journal_length);
+    // Account details
+    if(isset($_GET['view'])) {
+        switch($_GET['view']) {
+            case 'account':
+                $warnings = $player->getOfficialWarnings();
+                $warning = false;
+                $bans = false;
+                $ban_result = $system->query("SELECT * FROM `user_record` WHERE `user_id`='{$player->user_id}' AND `record_type` IN ('"
+                . StaffManager::RECORD_BAN_ISSUED . "', '" . StaffManager::RECORD_BAN_REMOVED . "') ORDER BY `time` DESC");
+                if($system->db_last_num_rows) {
+                    while($ban = $system->db_fetch($ban_result)) {
+                        $bans[] = $ban;
                     }
-                    else 
-                    {
-                        $('#remainingCharacters').text('');
-                    }
-                })
-            });
-        </script>";
-		echo "<form action='$self_link' method='post'>
-		<textarea style='height:350px;width:95%;margin:10px 0;' name='journal' id='journalMessage'>" . stripslashes($journal) . "</textarea>
-		<br />
-		<span id='remainingCharacters' class='red'></span>
-		<br />
-		<input type='submit' name='change_journal' value='Update' />
-		</form>";
-	}
-	else {
-		echo "<p>You are currently banned from editing your journal.</p>";
-	}
-	echo "</td></tr>";
-	
-	echo "</tr></table>";
-	
+                }
+
+                if(isset($_GET['warning_id'])) {
+                    $warning = $player->getOfficialWarning((int)$_GET['warning_id']);
+                }
+                break;
+        }
+    }
+
+    require_once('templates/settings.php');
 }

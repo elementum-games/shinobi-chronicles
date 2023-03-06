@@ -23,12 +23,6 @@ class System {
     const IN_VILLAGE_OKAY = 1;
     const ONLY_IN_VILLAGE = 2;
 
-    const SC_MODERATOR = 1;
-    const SC_HEAD_MODERATOR = 2;
-    const SC_CONTENT_ADMINISTRATOR = 3;
-    const SC_ADMINISTRATOR = 4;
-    const SC_HEAD_ADMINISTRATOR = 5;
-
     const CURRENCY_TYPE_MONEY = 'money';
     const CURRENCY_TYPE_PREMIUM_CREDITS = 'premium_credits';
 
@@ -39,7 +33,8 @@ class System {
     const UNSERVICEABLE_EMAIL_DOMAINS = ['hotmail.com', 'live.com', 'msn.com', 'outlook.com'];
 
     public static array $villages = ['Stone', 'Cloud', 'Leaf', 'Sand', 'Mist'];
-    public static array $forbidden_seals = array(1 => 'Twin Sparrow Seal', 2 => 'Four Dragon Seal');
+
+    // See the ForbiddenSeal class for maintaining all forbidden seal details/benefits
 
     // TODO: Remove! This is a temporary way to do events
     const SC_EVENT_START = 0;
@@ -134,6 +129,7 @@ class System {
         'event' => 27,
         'marriage' => 29,
         'support' => 30,
+        'chat_log' => 31,
     ];
     public array $links = [
         'github' => 'https://github.com/elementum-games/shinobi-chronicles',
@@ -246,6 +242,7 @@ class System {
         }
 
         $this->api_links['inbox'] = $this->link . 'api/inbox.php';
+        $this->api_links['travel'] = $this->link . 'api/travel.php';
 
         $this->timezoneOffset = date('Z');
 
@@ -431,6 +428,9 @@ class System {
         }
     }
 
+    public static function currentTimeMs(): int {
+        return floor(microtime(true) * 1000);
+    }
 
     /**
      * Logs an error message(usually from DB), displays a generic error message to user, displays page end, then exits script.
@@ -504,19 +504,34 @@ class System {
     }
 
     public function getMemes(): array {
-        $memes = require __DIR__ . '/../memes.php';
+        $memes_dir = __DIR__ . '/../images/memes';
+        $meme_files = scandir($memes_dir);
+        $file_type_filter = '/(?:.png|.jpg|.gif)$/i';
 
-        return [
-            'codes' => array_map(function ($meme) {
-                return $meme['code'];
-            }, $memes),
-            'images' => array_map(function ($meme) {
-                return $meme['image'];
-            }, $memes),
-            'texts' => array_map(function ($meme) {
-                return $meme['text'];
-            }, $memes),
+        if ($meme_files === False)
+        {
+            return [];
+        }
+        $cleaned_memes = array_filter($meme_files, function ($meme) use ($file_type_filter) {
+            return preg_match($file_type_filter, $meme) == 1;
+        });
+        $search_symbols = ['-', '_'];
+        $meme_array = [
+            'codes' => [],
+            'images' => [],
+            'texts' => []
         ];
+        foreach ($cleaned_memes as $meme)
+        {
+            $meme_code = strtolower(':' . preg_replace($file_type_filter,'', str_replace($search_symbols, '', $meme)) . ':');
+
+            if (in_array($meme_code, $meme_array['codes'])) continue;
+
+            $meme_array['codes'][] = $meme_code;
+            $meme_array['images'][] = "<img src='./images/memes/${meme}' title='${meme_code}' alt='${meme_code}' style='max-width: 75px;max-height: 75px'/>";
+            $meme_array['texts'][] = $meme_code;
+        }
+        return $meme_array;
     }
 
     public function html_parse($text, $img = false, $faces = false): array|string {
@@ -600,7 +615,7 @@ class System {
         return "<img src='$image' style='max-width:{$width}px;max-height:{$height}px;' />";
 
     }
-    
+
     public function timeAgo($timestamp): string {
 
         $time = time() - $timestamp;
@@ -706,7 +721,7 @@ class System {
            default:
                throw new Exception("Invalid currency type!");
        }
-        
+
         $this->query(
             "INSERT INTO `currency_logs` (
                 `character_id`,
@@ -714,14 +729,16 @@ class System {
                 `previous_balance`,
                 `new_balance`,
                 `transaction_amount`,
-                `transaction_description`
+                `transaction_description`,
+                `transaction_time`
             ) VALUES (
                '{$character_id}',
                 '{$currency_type}',
                 '{$previous_balance}',
                 '{$new_balance}',
                 '{$transaction_amount}',
-                '{$this->clean($transaction_description)}'
+                '{$this->clean($transaction_description)}',
+                " . time() . "
             )");
     }
 
@@ -778,22 +795,18 @@ class System {
         switch($layout) {
             case 'cextralite':
                 return "layout/cextralite.php";
-                break;
             case 'classic_blue':
                 return "layout/classic_blue.php";
-                break;
             case 'shadow_ribbon':
                 return "layout/shadow_ribbon.php";
-                break;
             case 'geisha':
                 return "layout/geisha.php";
-                break;
             case 'blue_scroll':
                 return "layout/blue_scroll.php";
-                break;
+            case 'rainbow_road':
+                return "layout/rainbow_road.php";
             default:
                 return "layout/" . self::DEFAULT_LAYOUT . ".php";
-                break;
         }
     }
 

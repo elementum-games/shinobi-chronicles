@@ -1,9 +1,14 @@
 <?php /** @noinspection PhpRedundantOptionalArgumentInspection */
 
+use JetBrains\PhpStorm\Pure;
+
 require_once __DIR__ . "/Jutsu.php";
 require_once __DIR__ . "/Team.php";
 require_once __DIR__ . "/DailyTask.php";
+require_once __DIR__ . "/ForbiddenSeal.php";
 require_once __DIR__ . "/battle/Fighter.php";
+require_once __DIR__ . "/TravelCoords.php";
+require_once __DIR__ . "/StaffManager.php";
 
 /*	Class:		User
 	Purpose:	Fetch user data and load into class variables.
@@ -13,7 +18,6 @@ class User extends Fighter {
     const ENTITY_TYPE = 'U';
 
     const AVATAR_MAX_SIZE = 150;
-    const AVATAR_MAX_SEAL_SIZE = 200;
     const AVATAR_MAX_FILE_SIZE = 1024 ** 2; // 1024 kb
 
     const GENDER_MALE = 'Male';
@@ -29,7 +33,10 @@ class User extends Fighter {
         ];
 
     const MIN_NAME_LENGTH = 2;
+    const MAX_NAME_LENGTH = 18;
     const MIN_PASSWORD_LENGTH = 6;
+    const PARTIAL_LOCK = 3;
+    const FULL_LOCK = 5;
 
     const BASE_EXP = 500;
 
@@ -42,6 +49,10 @@ class User extends Fighter {
     const STAFF_ADMINISTRATOR = 4;
     const STAFF_HEAD_ADMINISTRATOR = 5;
 
+    static public $staff_names = [
+
+    ];
+
     const SUPPORT_NONE = 0;
     const SUPPORT_BASIC = 1;
     const SUPPORT_INTERMEDIATE = 2;
@@ -52,6 +63,7 @@ class User extends Fighter {
     const UPDATE_NOTHING = 0;
     const UPDATE_REGEN = 1;
     const UPDATE_FULL = 2;
+    const ATTACK_LINK_DURATION_MIN = 10;
 
     public static int $jutsu_train_gain = 5;
 
@@ -92,16 +104,19 @@ class User extends Fighter {
 
     public $exp;
     public $staff_level;
+    public StaffManager $staff_manager;
     public $support_level;
     public int $bloodline_id;
     public $bloodline_name;
     public $clan;
     public $village_location;
     public $in_village;
-    public $location; // x.y
-    public $x;
-    public $y;
-
+    public $location;
+    public MapLocation $current_location;
+    public float $last_movement_ms;
+    public string $attack_id;
+    public int $attack_id_time;
+    public array $filters;
     public $train_type;
     public $train_gain;
     public $train_time;
@@ -134,6 +149,7 @@ class User extends Fighter {
     public ?Bloodline $bloodline = null;
     public float $bloodline_skill;
 
+    public $ban_data;
     public $ban_type;
     public $ban_expire;
     public $journal_ban;
@@ -155,7 +171,9 @@ class User extends Fighter {
     public $last_update;
     public $last_active;
     public $forbidden_seal;
+    public $forbidden_seal_loaded;
     public $chat_color;
+    public $chat_effect;
     public $last_login;
 
     public $jutsu_scrolls;
@@ -205,6 +223,8 @@ class User extends Fighter {
     private int $premium_credits;
     public int $premium_credits_purchased;
 
+    public bool $censor_explicit_language = true;
+
     public int $total_stats;
 
     public int $scout_range;
@@ -244,8 +264,8 @@ class User extends Fighter {
         $this->user_id = $this->system->clean($user_id);
         $this->id = self::ENTITY_TYPE . ':' . $this->user_id;
 
-        $result = $this->system->query("SELECT `user_id`, `user_name`, `ban_type`, `ban_expire`, `journal_ban`, `avatar_ban`, `song_ban`, `last_login`,
-			`forbidden_seal`, `chat_color`, `staff_level`, `username_changes`, `support_level`, `special_mission`
+        $result = $this->system->query("SELECT `user_id`, `user_name`, `ban_data`, `ban_type`, `ban_expire`, `journal_ban`, `avatar_ban`, `song_ban`, `last_login`,
+			`forbidden_seal`, `chat_color`, `chat_effect`, `staff_level`, `username_changes`, `support_level`, `special_mission`
 			FROM `users` WHERE `user_id`='$this->user_id' LIMIT 1"
         );
         if($this->system->db_last_num_rows == 0) {
@@ -259,7 +279,9 @@ class User extends Fighter {
 
         $this->staff_level = $result['staff_level'];
         $this->support_level = $result['support_level'];
+        $this->staff_manager = $this->loadStaffManager();
 
+        $this->ban_data = $this->loadBanData($result['ban_data']);
         $this->ban_type = $result['ban_type'];
         $this->ban_expire = $result['ban_expire'];
         $this->journal_ban = $result['journal_ban'];
@@ -269,14 +291,29 @@ class User extends Fighter {
         $this->last_login = $result['last_login'];
 
         $this->forbidden_seal = $result['forbidden_seal'];
+        $this->forbidden_seal_loaded = false;
         $this->chat_color = $result['chat_color'];
+        $this->chat_effect = $result['chat_effect'];
 
-        if($this->ban_type && $this->ban_expire <= time()) {
-            $this->system->message("Your " . $this->ban_type . " ban has ended.");
-            $this->ban_type = '';
-
-            $this->system->query("UPDATE `users` SET `ban_type`='', `ban_expire`='0' WHERE `user_id`='$this->user_id' LIMIT 1");
+        //Todo: Remove this in a couple months, only a temporary measure to support current bans
+        if($this->ban_type) {
+            if($this->ban_expire > time()) {
+                $this->ban_data[$this->ban_type] = $this->ban_expire;
+                $ban_data = json_encode($this->ban_data);
+                $this->system->query("UPDATE `users` SET
+                    `ban_data` = '{$ban_data}',
+                   `ban_type` = '',
+                   `ban_expire` = NULL
+                WHERE `user_id`='{$this->user_id}' LIMIT 1");
+            }
         }
+
+        //Check ban expiry
+        $ban_expiry = $this->checkBanExpiry();
+        if($ban_expiry != false) {
+            $this->system->message($ban_expiry);
+        }
+
 
         $this->inventory_loaded = false;
 
@@ -306,7 +343,8 @@ class User extends Fighter {
 			`staff_level`, 
 			`username_changes`, 
 			`support_level`, 
-			`special_mission`
+			`special_mission`,
+            `censor_explicit_language`
 			FROM `users` WHERE `user_id`='$user_id' LIMIT 1"
         );
         if($system->db_last_num_rows == 0) {
@@ -331,6 +369,8 @@ class User extends Fighter {
 
         $user->forbidden_seal = $result['forbidden_seal'];
         $user->chat_color = $result['chat_color'];
+
+        $user->censor_explicit_language = (bool)$result['censor_explicit_language'];
 
         if($user->ban_type && $user->ban_expire <= time()) {
             $system->message("Your " . $user->ban_type . " ban has ended.");
@@ -375,6 +415,8 @@ class User extends Fighter {
         $this->profile_song = $user_data['profile_song'];
 
         $this->log_actions = $user_data['log_actions'];
+
+        $this->censor_explicit_language = (bool)$user_data['censor_explicit_language'];
 
         // Message blacklist
         $this->blacklist = [];
@@ -463,10 +505,30 @@ class User extends Fighter {
             array_unshift($this->stats, 'bloodline_skill');
         }
 
-        $this->location = $user_data['location']; // x.y
-        $location = explode(".", $this->location);
-        $this->x = $location[0];
-        $this->y = $location[1];
+        $this->location = new TravelCoords($user_data['location']);
+        $this->current_location = Travel::getLocation($this->system, $this->location->x, $this->location->y, $this->location->z);
+        $this->last_movement_ms = $user_data['last_movement_ms'];
+        // generate a new attack link if it's been 10 minutes
+        if ($user_data['attack_id_time'] <= (time() - (60 * User::ATTACK_LINK_DURATION_MIN))) {
+            $this->attack_id = uniqid($this->id . ':');
+            $this->attack_id_time = time();
+        } else {
+            $this->attack_id = $user_data['attack_id'];
+            $this->attack_id_time = $user_data['attack_id_time'];
+        }
+
+        if ($user_data['filters'] === null) {
+            $filters = [
+                'travel_filter' => [
+                    'Akademi-sei'   => true,
+                    'Genin'         => true,
+                    'Chuunin'       => true,
+                    'Jonin'         => true
+                    ]
+            ];
+            $user_data['filters'] = json_encode($filters);
+        }
+        $this->filters = json_decode($user_data['filters'], true);
 
         $this->train_type = $user_data['train_type'];
         $this->train_gain = $user_data['train_gain'];
@@ -549,7 +611,7 @@ class User extends Fighter {
         if($this->system->db_last_num_rows != 0) {
             $result = $this->system->db_fetch($result);
             $this->village_location = $result['location'];
-            if($this->location === $this->village_location) {
+            if($this->location->fetchString() === $this->village_location) {
                 $this->in_village = true;
             }
         }
@@ -601,6 +663,7 @@ class User extends Fighter {
 
         // Clan
         $this->clan = $user_data['clan_id'];
+        $this->clan_office = 0;
         if($this->clan) {
             $result = $this->system->query("SELECT * FROM `clans` WHERE `clan_id`='$this->clan' LIMIT 1");
             if($this->system->db_last_num_rows == 0) {
@@ -729,40 +792,33 @@ class User extends Fighter {
         }
 
         // Forbidden seal
-        if($this->forbidden_seal) {
-            $this->forbidden_seal = json_decode($user_data['forbidden_seal'], true);
-
-            if($this->forbidden_seal['time'] < time() && $UPDATE >= User::UPDATE_FULL && !(!$this->forbidden_seal['level'] && $this->forbidden_seal['color'])) {
-                $this->system->message("Your Forbidden Seal has receded.");
-                $this->forbidden_seal = false;
+        if($user_data['forbidden_seal']) {
+            // Prep seal data from DB
+            $forbidden_seal = json_decode($user_data['forbidden_seal'], true);
+            // Set seal data
+            $this->forbidden_seal = new ForbiddenSeal($this->system, $forbidden_seal['level'], $forbidden_seal['time']);
+            $this->forbidden_seal_loaded = true;
+            // Check if seal is expired & remove if it is
+            if(!$remote_view) {
+                $this->forbidden_seal->checkExpiration();
             }
-
-            // Patch infinite premium from user name color
-            if(isset($this->forbidden_seal['color']) && $UPDATE >= User::UPDATE_FULL) {
-                if(!isset($this->forbidden_seal['level'])) {
-                    $this->chat_color = $this->forbidden_seal['color'];
-                    $this->forbidden_seal = false;
-                } else {
-                    $this->chat_color = $this->forbidden_seal['color'];
-                    unset($this->forbidden_seal['color']);
-                }
-            }
-
-            // Regen boost
-            else {
-                if($this->forbidden_seal['level'] == 1) {
-                    $this->regen_boost += $this->regen_rate * 0.1;
-                }
-                else if($this->forbidden_seal['level'] == 2) {
-                    $this->regen_boost += $this->regen_rate * 0.2;
-                }
-
+            // If seal is not expired, load benefits & apply seal regen boost
+            if($this->forbidden_seal->level != 0) {
+                $this->forbidden_seal->setBenefits();
+                /** REGEN BOOST **/
+                $this->regen_boost += $this->regen_rate * ($this->forbidden_seal->regen_boost/100);
             }
         }
 
         //In Village Regen
-        if($this->in_village) {
-            $this->regen_boost += 20 + $this->regen_rate;
+//        if($this->in_village) {
+//            // regen boost or regen rate?
+//            $this->regen_boost += ($this->regen_rate / 2);
+//        }
+
+        // Location with Regen Boost
+        if ($this->current_location->location_id && $this->current_location->regen) {
+            $this->regen_boost += ($this->current_location->regen / 100) * $this->regen_rate;
         }
 
         // Elements
@@ -922,14 +978,111 @@ class User extends Fighter {
 
         // Correction location
         $villages = $this->system->getVillageLocations();
-        if(isset($villages[$this->location]) &&
-            $this->location !== $this->village_location &&
+        if(isset($villages[$this->location->fetchString()]) &&
+            $this->location->fetchString() !== $this->village_location &&
             !$this->isHeadAdmin()
         ) {
-            $this->x--;
+            $this->location->x--;
         }
 
         return $display;
+    }
+
+    public function loadBanData($ban_data) {
+        if($ban_data === null) {
+            return array();
+        }
+        else {
+            return json_decode($ban_data, true);
+        }
+    }
+    public function checkBanExpiry():bool|string {
+        if($this->ban_data != null) {
+            $ban_expired = false;
+            $ban_expire_return_string = 'Your ';
+
+            foreach($this->ban_data as $ban_name => $ban_expire_time) {
+                if($ban_expire_time != -1 && $ban_expire_time - time() <= 0) {
+                    $ban_expired = true;
+                    unset($this->ban_data[$ban_name]);
+                    $ban_expire_return_string .= "$ban_name ban & ";
+                }
+            }
+
+            if($ban_expired) {
+                //Format data if no bans are presnet
+                $ban_data = (!empty($this->ban_data)) ? json_encode($this->ban_data) : null;
+                //Update user table to remove ban(s)
+                $this->system->query("UPDATE `users` SET `ban_data`='{$ban_data}' WHERE `user_id`='{$this->user_id}' LIMIT 1");
+                //Return ban message expiry message for display
+                if ($this->system->db_last_affected_rows) {
+                    return substr($ban_expire_return_string, 0, strlen($ban_expire_return_string) - 2)
+                        . " has expired.";
+                }
+            }
+        }
+        return false;
+    }
+    public function checkBan($type):bool {
+        if(in_array($type, StaffManager::$ban_types) && isset($this->ban_data[$type])) {
+            if($this->ban_data[$type] == StaffManager::PERM_BAN_VALUE || $this->ban_data[$type] - time() >= 1) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Providing an actual ID will return the OW and mark the warning as read
+     * @param $id
+     * @return bool|void|array
+     */
+    public function getOfficialWarning($id) {
+        $result = $this->system->query("SELECT * FROM `official_warnings` WHERE `user_id`='{$this->user_id}' AND `warning_id`='{$id}' LIMIT 1");
+        if($this->system->db_last_num_rows) {
+            $this->system->query("UPDATE `official_warnings` SET `viewed`=1 WHERE `warning_id`='{$id}' LIMIT 1");
+            return $this->system->db_fetch($result);
+        }
+        else {
+            return false;
+        }
+    }
+
+    public function getOfficialWarnings($for_notification = false) {
+        $query = "SELECT * FROM `official_warnings` WHERE `user_id`='{$this->user_id}'";
+        if($for_notification) {
+            $query .= " AND `viewed`=0";
+        }
+        $query .= " ORDER BY `time` DESC";
+
+        $result = $this->system->query($query);
+        if($this->system->db_last_num_rows) {
+            if($for_notification) {
+                return true;
+            }
+            else {
+                $warnings = [];
+                while($warning = $this->system->db_fetch($result)) {
+                    $warnings[] = $warning;
+                }
+                return $warnings;
+            }
+        }
+        else {
+            if($for_notification) {
+                return false;
+            }
+            else {
+                return array();
+            }
+        }
+    }
+
+    public function loadStaffManager() {
+        if(isset($this->staff_manager) && $this->staff_manager instanceof StaffManager) {
+            return $this->staff_manager;
+        }
+        return new StaffManager($this->system, $this->user_id, $this->user_name, $this->staff_level, $this->support_level);
     }
 
     public function getInventory() {
@@ -1247,7 +1400,7 @@ class User extends Fighter {
      * @throws Exception
      */
     public function subtractPremiumCredits(int $amount, string $description) {
-        if($this->money < $amount) {
+        if($this->getPremiumCredits() < $amount) {
             throw new Exception("Not enough Ancient Kunai!");
         }
         $this->setPremiumCredits($this->premium_credits - $amount, $description);
@@ -1257,10 +1410,7 @@ class User extends Fighter {
     /* function moteToVillage()
         moves user to village */
     public function moveToVillage() {
-        $this->location = $this->village_location;
-        $location = explode('.', $this->location);
-        $this->x = $location[0];
-        $this->y = $location[1];
+        $this->location = new TravelCoords($this->village_location);
     }
 
     /* function updateData()
@@ -1268,7 +1418,6 @@ class User extends Fighter {
         -Parameters-
     */
     public function updateData() {
-        $this->location = $this->x . '.' . $this->y;
 
         $query = "UPDATE `users` SET
 		`current_ip` = '$this->current_ip',
@@ -1314,7 +1463,11 @@ class User extends Fighter {
 
         $query .= "`battle_id` = '$this->battle_id',
 		`challenge` = '$this->challenge',
-		`location` = '$this->location',";
+		`last_movement_ms` = '$this->last_movement_ms',
+		`attack_id` = '$this->attack_id',
+		`attack_id_time` = '$this->attack_id_time',
+		`location` = '".$this->location->fetchString()."',
+		`filters` = '".json_encode($this->filters)."',";
         if($this->mission_id) {
             if(is_array($this->mission_stage)) {
                 $mission_stage = json_encode($this->mission_stage);
@@ -1342,7 +1495,10 @@ class User extends Fighter {
 		`last_death` = '$this->last_death',";
 
         $forbidden_seal = $this->forbidden_seal;
-        if(is_array($forbidden_seal)) {
+        if($this->forbidden_seal_loaded) {
+           $forbidden_seal = $this->forbidden_seal->dbEncode();
+        }
+        elseif(is_array($forbidden_seal)) {
             $forbidden_seal = json_encode($forbidden_seal);
         }
 
@@ -1363,6 +1519,7 @@ class User extends Fighter {
 
         $query .= "`forbidden_seal`='$forbidden_seal',
         `chat_color` = '$this->chat_color',
+        `chat_effect` = '$this->chat_effect',
 		`train_type` = '$this->train_type',
 		`train_gain` = '$this->train_gain',
 		`train_time` = '$this->train_time',
@@ -1385,7 +1542,8 @@ class User extends Fighter {
 		`intelligence` = '$this->intelligence',
 		`willpower` = '$this->willpower',
 		`village_changes` = '$this->village_changes',
-		`clan_changes` = '$this->clan_changes'
+		`clan_changes` = '$this->clan_changes',
+		`censor_explicit_language` = " . (int)$this->censor_explicit_language . "
 		WHERE `user_id` = '{$this->user_id}' LIMIT 1";
         $this->system->query($query);
 
@@ -1491,7 +1649,16 @@ class User extends Fighter {
     }
 
     public function getAvatarSize(): int {
-        return $this->forbidden_seal ? self::AVATAR_MAX_SEAL_SIZE : self::AVATAR_MAX_SIZE;
+        //Give staff members premium avatar size if they do not have seal
+        if($this->staff_level && !$this->forbidden_seal_loaded) {
+            return ForbiddenSeal::$benefits[ForbiddenSeal::$STAFF_SEAL_LEVEL]['avatar_size'];
+        }
+        elseif($this->forbidden_seal_loaded && $this->forbidden_seal->level != 0) {
+            return $this->forbidden_seal->avatar_size;
+        }
+        else {
+            return self::AVATAR_MAX_SIZE;
+        }
     }
 
     public function canChangeChatColor(): bool {
@@ -1501,7 +1668,7 @@ class User extends Fighter {
         }
 
         // Forbidden seal
-        if($this->forbidden_seal && $this->forbidden_seal['time'] > time()) {
+        if($this->forbidden_seal_loaded && $this->forbidden_seal->level != 0) {
             return true;
         }
 
@@ -1522,11 +1689,13 @@ class User extends Fighter {
             'black' => 'normalUser'
         ];
 
-        if($this->forbidden_seal || $this->isHeadAdmin()) {
-            $return = array_merge($return, [
-                'blue' => 'blue',
-                'pink' => 'pink',
-            ]);
+        if(($this->forbidden_seal_loaded && $this->forbidden_seal->level != 0) || $this->isHeadAdmin()) {
+            if($this->isHeadAdmin()) {
+                $return = array_merge($return, ForbiddenSeal::$benefits[ForbiddenSeal::$STAFF_SEAL_LEVEL]['name_colors']);
+            }
+            else {
+                $return = array_merge($return, $this->forbidden_seal->name_colors);
+            }
         }
 
         if($this->premium_credits_purchased > 0 || $this->isHeadAdmin()) {
@@ -1695,9 +1864,15 @@ class User extends Fighter {
     const LOG_TRAINING = 'training';
     const LOG_ARENA = 'arena';
     const LOG_LOGIN = 'login';
+    const LOG_MISSION = 'mission';
+    const LOG_SPECIAL_MISSION = 'special_mission';
+    const LOG_IN_BATTLE = 'in_battle';
+    const LOG_NOT_IN_VILLAGE = 'not_in_village';
 
     public function log(string $log_type, string $log_contents): bool {
-        $valid_log_types = [self::LOG_TRAINING, self::LOG_ARENA, self::LOG_LOGIN];
+        $valid_log_types = [
+            self::LOG_TRAINING, self::LOG_ARENA, self::LOG_LOGIN, self::LOG_MISSION, self::LOG_SPECIAL_MISSION, self::LOG_IN_BATTLE, self::LOG_NOT_IN_VILLAGE
+        ];
         if(!in_array($log_type, $valid_log_types)) {
             error_log("Invalid player log type {$log_type}");
             return false;

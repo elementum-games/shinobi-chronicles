@@ -54,6 +54,8 @@ function adminPanel() {
         'activate_user',
         'delete_user',
         'give_bloodline',
+        'logs',
+        'stat_cut',
     ];
 
     // Menu
@@ -1438,6 +1440,202 @@ function adminPanel() {
 		<input type='submit' name='give_bloodline' value='Select' />
 		</form>
 		</td></tr></table>";
+    }
+    // Logs
+    else if($page == 'logs') {
+        $self_link .= "&page=logs";
+        $default_view = 'staff_logs';
+        $view = $default_view;
+
+        //Pagination - log types
+        if(isset($_GET['view'])) {
+            $view = $system->clean($_GET['view']);
+            if(!in_array($view, ['staff_logs', 'currency_logs', 'player_logs'])) {
+                $view = $default_view;
+            }
+            $self_link .= "&view=$view";
+        }
+
+        $offset = 0;
+        $limit = 25;
+        $max = $player->staff_manager->getStaffLogs($view, 'all', $offset, $limit, true) - $limit;
+
+        if(isset($_GET['offset'])) {
+            $offset = (int) $_GET['offset'];
+            if($offset < 0) {
+                $offset = 0;
+            }
+            if($offset > $max) {
+                $offset = $max;
+            }
+        }
+        $next = $offset + $limit;
+        $previous = $offset - $limit;
+        if($next > $max) {
+            $next = $max;
+        }
+        if($previous < 0) {
+            $previous = 0;
+        }
+
+        $logs = $player->staff_manager->getStaffLogs($view, 'all', $offset, $limit);
+
+        if($system->message) {
+            $system->printMessage();
+        }
+        require 'templates/admin/logs.php';
+    }
+    // Stat cut
+    else if($page == 'stat_cut') {
+        $self_link .= '&page=stat_cut';
+        require_once 'classes/RankManager.php';
+        $rankManager = new RankManager($system);
+        $rankManager->loadRanks();
+        $user = false;
+
+        if(isset($_POST['set_user'])) {
+            try {
+                $name = $system->clean($_POST['user_name']);
+                $user = $player->staff_manager->getUserByName($name, true);
+                if(!$user) {
+                    throw new Exception("Invalid user!");
+                }
+            } catch (Exception $e) {
+                $system->message($e->getMessage());
+            }
+        }
+        if(isset($_POST['cut_stats'])) {
+            try {
+                $user_id = $system->clean($_POST['user_id']);
+                $cut_amount = round(1 - ($_POST['cut_amount'] / 100), 2);
+                $cut_ai = isset($_POST['cut_ai']);
+                $cut_pvp = isset($_POST['cut_pvp']);
+                $cut_yen = isset($_POST['cut_yen']);
+
+                $skills_to_cut = [
+                    'rank', 'level', 'exp', 'ai_wins', 'pvp_wins', 'money',
+                    'health', 'max_health', 'chakra', 'max_chakra', 'stamina', 'max_stamina',
+                    'ninjutsu_skill', 'taijutsu_skill', 'genjutsu_skill', 'bloodline_skill',
+                    'cast_speed', 'speed', 'intelligence', 'willpower'
+                ];
+
+                if(!$cut_ai) {
+                    unset($skills_to_cut[array_search('ai_wins', $skills_to_cut)]);
+                }
+                if(!$cut_pvp) {
+                    unset($skills_to_cut[array_search('pvp_wins', $skills_to_cut)]);
+                }
+                if(!$cut_yen) {
+                    unset($skills_to_cut[array_search('money', $skills_to_cut)]);
+                }
+
+                $user = $player->staff_manager->getUserByID($user_id, true);
+                if(!$user) {
+                    throw new Exception("Invalid user!");
+                }
+
+                if($user['user_id'] == $player->user_id) {
+                    $user = false;
+                    throw new Exception("You can not cut your own stats!");
+                }
+
+                //New data
+                $total_stats = 0;
+                $new_data = array();
+                foreach($skills_to_cut as $skill) {
+                    if($skill == 'level' || $skill =='rank') {
+                        continue;
+                    }
+                    else {
+                        $new_data[$skill] = floor($user[$skill] * $cut_amount);
+                    }
+                    if(in_array($skill, ['ninjutsu_skill', 'taijutsu_skill', 'genjutsu_skill', 'bloodline_skill',
+                        'intelligence', 'willpower', 'speed', 'cast_speed'])) {
+                        $total_stats += $new_data[$skill];
+                    }
+                }
+
+                //Rank & level
+                $new_data['rank'] = $rankManager->calculateRankFromTotalStats($total_stats);
+                $new_data['level'] = $rankManager->calculateMaxLevel($total_stats, $new_data['rank']);
+
+                //Elements
+                $max_elements = 0;
+                if($new_data['rank'] >= 3) {
+                    $max_elements++;
+                }
+                if($new_data['rank'] >= 4) {
+                    $max_elements++;
+                }
+                $user['elements'] = json_decode($user['elements'], true);
+                $element_count = count($user['elements']);
+
+                if($element_count > $max_elements) {
+                    $skills_to_cut[] = 'elements';
+                    if($max_elements == 0) {
+                        $new_data['elements'] = json_encode(array());
+                    }
+                    elseif($max_elements == 1) {
+                        $new_data['elements'] = json_encode(['first' => $user['elements']['first']]);
+                    }
+                }
+                $user['elements'] = json_encode($user['elements']); // Set back to string for debugging display
+
+                //Pools & health
+                $health = $rankManager->healthForRankAndLevel($new_data['rank'], $new_data['level']);
+                $pools = $rankManager->chakraForRankAndLevel($new_data['rank'], $new_data['level']);
+
+                $new_data['health'] = 0;
+                $new_data['max_health'] = $health;
+                $new_data['max_chakra'] = $pools;
+                $new_data['max_stamina'] = $pools;
+                $new_data['chakra'] = 0;
+                $new_data['stamina'] = 0;
+
+                //Debug
+                if(false) {
+                    echo "<div style='width:75%;margin:1rem auto;border:1px solid red;'>
+                        <label>UID:</label>$user_id<br />
+                        <label>Total Sstats:</label>$total_stats<br /><br />";
+
+                    array_map(function($skill) use ($user, $new_data) {
+                        echo "<label>" . System::unSlug($skill) . ":</label>{$user[$skill]} => {$new_data[$skill]}<br />";
+                    }, $skills_to_cut);
+
+                    echo "</div>";
+
+                    throw new Exception("Debugging!");
+                }
+
+                $query = "UPDATE `users` SET ";
+                $log_data = "";
+                foreach($skills_to_cut as $skill) {
+                    $log_data .= "$skill: {$user[$skill]} => {$new_data[$skill]}
+                    ";
+                    $query .= "`" . $skill . "`='{$new_data[$skill]}', ";
+                }
+                $query = substr($query, 0, strlen($query)-2) . " WHERE `user_id`='$user_id' LIMIT 1";
+                $system->query($query);
+                if ($system->db_last_affected_rows) {
+                    $system->message("{$user['user_name']} has had stats cut!");
+                    $player->staff_manager->staffLog(StaffManager::STAFF_LOG_ADMIN, "{$player->user_name}({$player->user_id})"
+                        . " cut {$user['user_name']}\'s({$user['user_id']}) by " . 100 - ($cut_amount * 100) . "%.
+                        
+                        " . $log_data);
+                    $user = false;
+                }
+                else {
+                    $system->message("Error cutting stats.");
+                }
+            } catch (Exception $e) {
+                $system->message($e->getMessage());
+            }
+        }
+
+        if($system->message) {
+            $system->printMessage();
+        }
+        require 'templates/admin/stat_cut.php';
     }
 }
 

@@ -81,13 +81,13 @@ if(!isset($_SESSION['user_id'])) {
 			}
 
 			// Check failed logins
-			if($result['failed_logins'] >= 3 && $_SERVER['REMOTE_ADDR'] != $result['current_ip'] && $_SERVER['REMOTE_ADDR'] != $result['last_ip']) {
+			if($result['failed_logins'] >= User::PARTIAL_LOCK && $_SERVER['REMOTE_ADDR'] != $result['current_ip'] && $_SERVER['REMOTE_ADDR'] != $result['last_ip']) {
 				throw new Exception("Account has been locked out!");
 				$system->query("INSERT INTO `logs` (`log_type`, `log_time`, `log_contents`)
 					VALUES ('malicious_lockout', '" . time() . "', 'IP address " . $_SERVER['REMOTE_ADDR'] . " failed login on account " .
 					$result['user_name'] . " not matching previous IPs " . $result['current_ip'] . " or " . $result['last_ip'] . ".'");
 			}
-			else if($result['failed_logins'] >= 5) {
+			else if($result['failed_logins'] >= User::FULL_LOCK) {
 				throw new Exception("Account has been locked out!");
 			}
 
@@ -123,7 +123,12 @@ else {
 		$logout_limit = 1440;
 	}
 	else if($player->forbidden_seal) {
-		$logout_limit *= 2;
+        if(is_object(json_decode($player->forbidden_seal))) {
+            $seal_data = json_decode($player->forbidden_seal);
+            $seal = new ForbiddenSeal($system, $seal_data->level, $seal_data->time);
+            $seal->setBenefits();
+            $logout_limit = $seal->logout_timer;
+        }
 	}
 	// Check logout timer
 	if($player->last_login < time() - ($logout_limit * 60)) {
@@ -160,9 +165,11 @@ else {
 // Start display
 if(!$LOGGED_IN) {
 	$layout = $system->fetchLayoutByName(System::DEFAULT_LAYOUT);
+    $side_menu_location_status_class  = null;
 }
 else {
 	$layout = $system->fetchLayoutByName($player->layout);
+    $side_menu_location_status_class = $player->in_village ? 'sm-tmp-invillage' : 'sm-tmp-outvillage';
 }
 require($layout);
 
@@ -193,36 +200,42 @@ if($LOGGED_IN) {
 		}
 		exit;
 	}	
-	if($player->ban_type == 'game') {
-		$ban_time = $player->ban_expire - time();
-		$ban_message = 'You are currently banned from the game. Time remaining: ';
-		$ban_message .= $system->time_remaining($ban_time);
-		if(!$ajax) {
-			echo str_replace("[HEADER_TITLE]", "Profile", $body_start);
-		}
-		echo "<table class='table'><tr><th>Game Ban</th></tr>
-		<tr><td style='text-align:center;'>
-		$ban_message
-		</td></tr></table>";
-		if(!$ajax) {
-			echo $side_menu_start . $side_menu_end;
-			echo str_replace('<!--[VERSION_NUMBER]-->', System::VERSION_NUMBER, $footer);
-		}
-		exit;
-	}
+	if($player->checkBan(StaffManager::BAN_TYPE_GAME)) {
+        $ban_type = StaffManager::BAN_TYPE_GAME;
+        $expire_int = $player->ban_data[$ban_type];
+        $ban_expire = ($expire_int == StaffManager::PERM_BAN_VALUE ? $expire_int : $system->time_remaining($player->ban_data[StaffManager::BAN_TYPE_GAME] - time()));
+
+        //Display header
+        if(!$ajax) {
+            echo str_replace("[HEADER_TITLE]", "Profile", $body_start);
+        }
+        //Ban info
+        require 'templates/ban_info.php';
+        // Footer
+        if(!$ajax) {
+            echo $side_menu_start . $side_menu_end;
+            echo str_replace('<!--[VERSION_NUMBER]-->', System::VERSION_NUMBER, $footer);
+        }
+        exit;
+    }
 	$result = $system->query("SELECT `id` FROM `banned_ips` WHERE `ip_address`='" . $system->clean($_SERVER['REMOTE_ADDR']) . "' LIMIT 1");
 	if($system->db_last_num_rows > 0) {
-		if(!$ajax) {
-			echo str_replace("[HEADER_TITLE]", "Profile", $body_start);
-		}
-		echo "<table class='table'><tr><th>Game Ban</th></tr>
-		<tr><td style='text-align:center;'>
-		You are currently banned from the game. Please contact a head moderator on the forums if you have any questions.
-		</td></tr></table>";
-		if(!$ajax) {
-			echo $side_menu . $menu_end . $footer;
-		}
-		exit;
+        $ban_type = StaffManager::BAN_TYPE_IP;
+        $expire_int = -1;
+        $ban_expire = ($expire_int == StaffManager::PERM_BAN_VALUE ? $expire_int : $system->time_remaining($player->ban_data[StaffManager::BAN_TYPE_GAME] - time()));
+
+        //Display header
+        if(!$ajax) {
+            echo str_replace("[HEADER_TITLE]", "Profile", $body_start);
+        }
+        //Ban info
+        require 'templates/ban_info.php';
+        // Footer
+        if(!$ajax) {
+            echo $side_menu_start . $side_menu_end;
+            echo str_replace('<!--[VERSION_NUMBER]-->', System::VERSION_NUMBER, $footer);
+        }
+        exit;
 	}
 	
 	// NEW MESSAGE ALERT
@@ -312,6 +325,14 @@ if($LOGGED_IN) {
 			// Check for battle if page is restricted
 			if(isset($routes[$id]['battle_ok']) && $routes[$id]['battle_ok'] == false) {
 				if($player->battle_id) {
+                    $contents_arr = [];
+                    foreach($_GET as $key => $val) {
+                        $contents_arr[] = "GET[{$key}]=$val";
+                    }
+                    foreach($_POST as $key => $val) {
+                        $contents_arr[] = "POST[{$key}]=$val";
+                    }
+                    $player->log(User::LOG_IN_BATTLE, implode(',', $contents_arr));
 					throw new Exception("You cannot visit this page while in battle!");
 				}
 			}
@@ -349,10 +370,19 @@ if($LOGGED_IN) {
 			// Check for being in village is not okay/okay/required
 			if(isset($routes[$id]['village_ok'])) {
 				// Player is alllowed in up to rank 3, then must go outside village
-				if($player->rank > 2 && $routes[$id]['village_ok'] == System::NOT_IN_VILLAGE && isset($villages[$player->location])) {
+				if($player->rank > 2 && $routes[$id]['village_ok'] == System::NOT_IN_VILLAGE && isset($villages[$player->location->fetchString()])) {
 					throw new Exception("You cannot access this page while in a village!");
 				}
-				if($routes[$id]['village_ok'] == System::ONLY_IN_VILLAGE && $player->location !== $player->village_location) {
+				if($routes[$id]['village_ok'] == System::ONLY_IN_VILLAGE && $player->location->fetchString() !== $player->village_location) {
+                    $contents_arr = [];
+                    foreach($_GET as $key => $val) {
+                        $contents_arr[] = "GET[{$key}]=$val";
+                    }
+                    foreach($_POST as $key => $val) {
+                        $contents_arr[] = "POST[{$key}]=$val";
+                    }
+                    $player->log(User::LOG_NOT_IN_VILLAGE, implode(',', $contents_arr));
+
 					throw new Exception("You must be in your village to access this page!");
 				}
 			}
@@ -385,7 +415,9 @@ if($LOGGED_IN) {
             }
 
             if(!$ajax || !isset($routes[$id]['ajax_ok']) ) {
-				echo str_replace("[HEADER_TITLE]", $routes[$id]['title'], $body_start);
+                $location_name = ($player->current_location->location_id) ? ' ' . ' <div id="contentHeaderLocation">&middot; '.$player->current_location->name.'</div>' : null;
+
+				echo str_replace("[HEADER_TITLE]", $routes[$id]['title'] . $location_name, $body_start);
 			}
 
 			$self_link = $system->link . '?id=' . $id;
@@ -463,7 +495,8 @@ if($LOGGED_IN) {
 					continue;
 				}
 				// Page ok if an in-village page or player rank is below chuunin
-				if($page['village_ok'] != System::NOT_IN_VILLAGE || $player->rank < 3) {
+//				if($page['village_ok'] != System::NOT_IN_VILLAGE || $player->rank < 3) {
+                if (true) {
 					echo "<li><a id='sideMenuOption-".str_replace(' ', '', $page['title'])."' href='{$system->link}?id=$id'>" . $page['title'] . "</a></li>";
 				}
 			}
@@ -473,14 +506,16 @@ if($LOGGED_IN) {
 				if(!isset($page['menu']) || $page['menu'] != 'activity') {
 					continue;
 				}
-				if($page['village_ok'] != System::ONLY_IN_VILLAGE) {
+//				if($page['village_ok'] != System::ONLY_IN_VILLAGE) {
+                if(true) {
 					echo "<li><a id='sideMenuOption-".str_replace(' ', '', $page['title'])."' href='{$system->link}?id=$id'>" . $page['title'] . "</a></li>";
 				}
 			}
 		}
 
         // In village or not
-        if($player->in_village) {
+//        if($player->in_village) {
+        if (true) {
             echo $village_menu_start;
             foreach($routes as $id => $page) {
                 if(!isset($page['menu']) || $page['menu'] != System::MENU_VILLAGE) {

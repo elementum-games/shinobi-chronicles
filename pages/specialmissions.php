@@ -13,6 +13,8 @@ function specialMissions() {
             $difficulty = $system->clean($_GET['start']);
             $special_mission = SpecialMission::startMission($system, $player, $difficulty);
             $player->special_mission = $special_mission->mission_id;
+
+            $player->log(User::LOG_SPECIAL_MISSION, "{$difficulty} $difficulty");
         } catch (Exception $e) {
             $system->message($e->getMessage());
         }

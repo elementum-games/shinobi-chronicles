@@ -162,20 +162,28 @@ class Mission {
 
         // Check for old stage
         $old_stage = false;
-        if($this->player->mission_stage['stage_id'] < $this->team->mission_stage['stage_id']) {
+        if(!isset($this->player->mission_stage) || $this->player->mission_stage['stage_id'] < $this->team->mission_stage['stage_id']) {
             $old_stage = true;
         }
 
         // Check multi counts, block stage id
         $new_stage = true;
-        if($this->team->mission_stage['count_needed'] && !$old_stage) {
-            $this->team->mission_stage['count']++;
-            if($this->team->mission_stage['count'] < $this->team->mission_stage['count_needed']) {
+        if(!isset($this->team->mission_stage) || $this->team->mission_stage['count_needed'] && !$old_stage) {
+            if(isset($this->team->mission_stage['count'])) {
+                $this->team->mission_stage['count']++;
+            }
+            else {
+                $this->team->mission_stage['count'] = 0;
+            }
+            if(isset($this->team->mission_stage['count_needed']) && $this->team->mission_stage['count'] < $this->team->mission_stage['count_needed']) {
                 $stage_id--;
                 $new_stage = false;
                 $mission_stage = json_encode($this->team->mission_stage);
                 $this->system->query("UPDATE `teams` SET `mission_stage`='$mission_stage' WHERE `team_id`={$this->team->id} LIMIT 1");
             }
+        }
+        else {
+            $new_stage = false;
         }
 
         // Set to completion stage if all stages have been completed
@@ -237,17 +245,18 @@ class Mission {
     }
 
     public function rollLocation($starting_location): string {
-        $starting_location = explode('.', $starting_location);
+        $starting_location = new TravelCoords($starting_location);
 
         $max = $this->current_stage['location_radius'] * 2;
         $x = mt_rand(0, $max) - $this->current_stage['location_radius'];
         $y = mt_rand(0, $max) - $this->current_stage['location_radius'];
+        $z = Travel::DEFAULT_MAP_ID;
         if($x == 0 && $y == 0) {
             $x++;
         }
 
-        $x += $starting_location[0];
-        $y += $starting_location[1];
+        $x += $starting_location->x;
+        $y += $starting_location->y;
 
         if($x < 1) {
             $x = 1;
@@ -256,14 +265,16 @@ class Mission {
             $y = 1;
         }
 
-        if($x > System::MAP_SIZE_X) {
-            $x = System::MAP_SIZE_X;
+        $map_data = Travel::getMapData($this->system, $this->player->location->z);
+
+        if($x > $map_data['end_x']) {
+            $x = $map_data['end_x'];
         }
-        if($y > System::MAP_SIZE_Y) {
-            $y = System::MAP_SIZE_Y;
+        if($y > $map_data['end_y']) {
+            $y = $map_data['end_y'];
         }
 
-        return $x . '.' . $y;
+        return $x . '.' . $y . '.' . $z;
     }
 
     /**

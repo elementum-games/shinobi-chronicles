@@ -1,5 +1,0 @@
-START TRANSACTION;
-
-ALTER TABLE `battles` ADD `start_time` INT(11) NULL DEFAULT 0 AFTER `turn_time`;
-
-COMMIT;

@@ -26,13 +26,12 @@ function training() {
 	$stat_extended_train_gain = $stat_train_gain * 8;
 
 	// Forbidden seal trainings boost
-	if($player->forbidden_seal && $player->forbidden_seal['level'] >= 2) {
-		// 12x length, 9x gain = 75% of regular long
-	    $stat_long_train_length *= 1.5;
-		$stat_long_train_gain *= 2;
+	if($player->forbidden_seal_loaded && $player->forbidden_seal->level != 0) {
+	    $stat_long_train_length *= $player->forbidden_seal->long_training_time;
+		$stat_long_train_gain *= $player->forbidden_seal->long_training_gains;
 
-        $stat_extended_train_length = round($stat_extended_train_length * 1.5);
-        $stat_extended_train_gain = round($stat_extended_train_gain * 2);
+        $stat_extended_train_length = round($stat_extended_train_length * $player->forbidden_seal->extended_training_time);
+        $stat_extended_train_gain = round($stat_extended_train_gain * $player->forbidden_seal->extended_training_gains);
 	}
 
 	$stat_train_gain += $system->TRAIN_BOOST;
@@ -202,10 +201,6 @@ function training() {
 								">Cast speed</option>
 							<option value='speed'" . ($player->train_type == 'speed' ? "selected='selected'" : "") . 
 								">Speed</option>
-							<option value='intelligence'" . ($player->train_type == 'intelligence' ? "selected='selected'" : "") . 
-								">Intelligence</option>
-							<option value='willpower'" . ($player->train_type == 'willpower' ? "selected='selected'" : "") . 
-								">Willpower</option>
 						</select><br />
 						<input type='submit' name='train_type' value='Short' />
 						<input type='submit' name='train_type' value='Long' />

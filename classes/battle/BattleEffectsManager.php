@@ -48,7 +48,7 @@ class BattleEffectsManager {
             echo sprintf("%s / %s<br />", $raw_damage, $debuff_power);
         }
 
-        if($jutsu->jutsu_type == Jutsu::TYPE_GENJUTSU && !empty($jutsu->parent_jutsu)) {
+        /*if($jutsu->jutsu_type == Jutsu::TYPE_GENJUTSU && !empty($jutsu->parent_jutsu)) {
             $parent_genjutsu_id = $effect_user->combat_id . ':J' . $jutsu->parent_jutsu;
             if(!empty($this->active_effects[$parent_genjutsu_id]->layer_active)) {
                 $this->active_effects[$parent_genjutsu_id]->layer_active = true;
@@ -56,7 +56,7 @@ class BattleEffectsManager {
             }
             $jutsu->power *= 1.1;
             $jutsu->effect_amount *= 1.1;
-        }
+        }*/
 
         switch($jutsu->effect) {
             case 'residual_damage':

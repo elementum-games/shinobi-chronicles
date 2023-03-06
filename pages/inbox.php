@@ -134,11 +134,20 @@ function SendMessage(System $system, User $player, int|string $convo_id, string 
 			$response->errors[] = 'This conversation does not exist';
 			return $response;
 		}
-		
+
+        // PM ban
+        if($player->checkBan(StaffManager::BAN_TYPE_PM)) {
+            $response->errors[] = "You are currently " . StaffManager::BAN_TYPE_PM . " banned.";
+            return $response;
+        }
 		// Check if the message is too thicc
-		$max_message_length = ($player->forbidden_seal || $player->staff_level)
-            ? Inbox::MAX_MESSAGE_LENGTH_SEAL
-            : Inbox::MAX_MESSAGE_LENGTH;
+        $max_message_length = Inbox::MAX_MESSAGE_LENGTH;
+        if($player->staff_level && !$player->forbidden_seal_loaded) {
+            $max_message_length = ForbiddenSeal::$benefits[ForbiddenSeal::$STAFF_SEAL_LEVEL]['pm_size'];
+        }
+        elseif($player->forbidden_seal_loaded) {
+            $max_message_length = $player->forbidden_seal->pm_size;
+        }
 		if (strlen($message) > $max_message_length) {
 			$response->errors[] = 'Message exceeds ' . $max_message_length . ' characters';
 			return $response;

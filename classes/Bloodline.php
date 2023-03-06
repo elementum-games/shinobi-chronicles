@@ -13,6 +13,8 @@ class Bloodline {
 
     const BASE_BLOODLINE_SKILL = 100;
 
+    const BOOST_POWER_PRECISION = 5;
+
     public static array $public_ranks = [
         self::RANK_LEGENDARY => 'Legendary',
         self::RANK_ELITE  => 'Elite',
@@ -144,7 +146,7 @@ class Bloodline {
         int $regen_rate
     ): void {
         $ratios = [
-            'offense_boost' => 0.03,
+            'offense_boost' => 0.02,
             'defense_boost' => 0.045,
             'speed_boost' => 0.08,
             'mental_boost' => 0.1,
@@ -162,7 +164,7 @@ class Bloodline {
 
         // Each ratio operates on assumption of 5 BLP
         foreach($this->passive_boosts as $id => $boost) {
-            $boost_power = floor($boost['power'] / 5);
+            $boost_power = round($boost['power'] / 5, 1);
 
             switch($boost['effect']) {
                 case 'regen':
@@ -203,65 +205,47 @@ class Bloodline {
             }
         }
 
-        // (boosts are 50% at 1:2 offense:bl_skill) - but why tho?
         foreach($this->combat_boosts as $id => $boost) {
-            $boost_power = floor($boost['power'] / 5);
-
-            $jutsu_type_skill = 10;
-
-            switch($boost['effect']) {
-                case 'ninjutsu_boost':
-                case 'ninjutsu_resist':
-                    $jutsu_type_skill = $ninjutsu_skill;
-                    break;
-                case 'genjutsu_boost':
-                case 'genjutsu_resist':
-                    $jutsu_type_skill = $genjutsu_skill;
-                    break;
-                case 'taijutsu_boost':
-                case 'taijutsu_resist':
-                    $jutsu_type_skill = $taijutsu_skill;
-                    break;
-            }
+            $boost_power = $boost['power'] / 5;
 
             switch($boost['effect']) {
                 case 'ninjutsu_boost':
                     $this->combat_boosts[$id]['power'] =
-                        round($boost_power * $this->offenseToBloodlineRatio($ninjutsu_skill, $bloodline_skill) * $ratios['offense_boost'], 3);
+                        round($boost_power * $this->offenseToBloodlineRatio($ninjutsu_skill, $bloodline_skill) * $ratios['offense_boost'], Bloodline::BOOST_POWER_PRECISION);
                     break;
                 case 'genjutsu_boost':
                     $this->combat_boosts[$id]['power'] =
-                        round($boost_power * $this->offenseToBloodlineRatio($genjutsu_skill, $bloodline_skill) * $ratios['offense_boost'], 3);
+                        round($boost_power * $this->offenseToBloodlineRatio($genjutsu_skill, $bloodline_skill) * $ratios['offense_boost'], Bloodline::BOOST_POWER_PRECISION);
                     break;
                 case 'taijutsu_boost':
                     $this->combat_boosts[$id]['power'] =
-                        round($boost_power * $this->offenseToBloodlineRatio($taijutsu_skill, $bloodline_skill) * $ratios['offense_boost'], 3);
+                        round($boost_power * $this->offenseToBloodlineRatio($taijutsu_skill, $bloodline_skill) * $ratios['offense_boost'], Bloodline::BOOST_POWER_PRECISION);
                     break;
 
                 case 'ninjutsu_resist':
                 case 'genjutsu_resist':
                 case 'taijutsu_resist':
                     $this->combat_boosts[$id]['power'] =
-                        round($boost_power * $ratios['defense_boost'], 3);
+                        round($boost_power * $ratios['defense_boost'], Bloodline::BOOST_POWER_PRECISION);
                     break;
 
                 case 'speed_boost':
                 case 'cast_speed_boost':
-                    $this->combat_boosts[$id]['power'] = round($boost_power * $ratios['speed_boost'], 3);
+                    $this->combat_boosts[$id]['power'] = round($boost_power * $ratios['speed_boost'], Bloodline::BOOST_POWER_PRECISION);
                     break;
 
                 case 'intelligence_boost':
                 case 'willpower_boost':
-                    $this->combat_boosts[$id]['power'] = round($boost_power * $ratios['mental_boost'], 3);
+                    $this->combat_boosts[$id]['power'] = round($boost_power * $ratios['mental_boost'], Bloodline::BOOST_POWER_PRECISION);
                     break;
 
                 case 'heal':
                     $this->combat_boosts[$id]['power'] =
-                        round($boost_power * $ratios['heal'], 3);
+                        round($boost_power * $ratios['heal'], Bloodline::BOOST_POWER_PRECISION);
                     break;
             }
 
-            $this->combat_boosts[$id]['effect_amount'] = round($this->combat_boosts[$id]['power'] * $bloodline_skill, 3);
+            $this->combat_boosts[$id]['effect_amount'] = round($this->combat_boosts[$id]['power'] * $bloodline_skill, Bloodline::BOOST_POWER_PRECISION);
         }
     }
 
@@ -279,8 +263,8 @@ class Bloodline {
         if($offense_to_bloodline > 1.0) {
             $offense_to_bloodline = 1.0;
         }
-        else if($offense_to_bloodline < 0.8) {
-            $offense_to_bloodline = 0.8;
+        else if($offense_to_bloodline < 0.75) {
+            $offense_to_bloodline = 0.75;
         }
         return $offense_to_bloodline;
     }

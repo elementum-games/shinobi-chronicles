@@ -25,3 +25,7 @@ require_once __DIR__ . "/classes/Inbox.php";
 require_once __DIR__ . "/classes/InboxUser.php";
 require_once __DIR__ . "/classes/InboxManager.php";
 require_once __DIR__ . "/classes/InboxAPIResponse.php";
+
+require_once __DIR__ . "/classes/Travel.php";
+require_once __DIR__ . "/classes/TravelManager.php";
+require_once __DIR__ . "/classes/TravelAPIResponse.php";

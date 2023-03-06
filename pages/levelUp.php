@@ -476,18 +476,11 @@ function rankUp(): bool {
 				
 				$player->rank++;
 				$player->level++;
-				
-				// Use old rank health/pool gains
-				$player->max_health += $player->health_gain;
-				$player->max_chakra += $player->pool_gain;
-				$player->max_stamina += $player->pool_gain;
-		
-				/*
-				// Use new rank health/pool gains
-				$player->max_health += $ranks[$new_rank]['health_gain'];
-				$player->max_chakra += $ranks[$new_rank]['pool_gain'];
-				$player->max_stamina += $ranks[$new_rank]['pool_gain'];
-				*/
+
+                // Use new rank health/pool gains
+				$player->max_health += $ranks[$player->rank]['health_gain'];
+				$player->max_chakra += $ranks[$player->rank]['pool_gain'];
+				$player->max_stamina += $ranks[$player->rank]['pool_gain'];
 				
 				$player->health = $player->max_health;
 				$player->chakra = $player->max_chakra;
