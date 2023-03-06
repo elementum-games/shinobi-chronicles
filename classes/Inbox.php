@@ -45,13 +45,56 @@ class Inbox {
      * @return array db_fetch
      */
     public static function getInfoFromMessageId(System $system, int $message_id): array {
-        $sql = "SELECT `convos_messages`.*, `users`.`user_name`, `users`.`staff_level`
+        $convo_result = $system->query("SELECT `convo_id`, `time` FROM `convos_messages` WHERE `message_id`='{$message_id}' LIMIT 1");
+        if($system->db_last_num_rows) {
+            $convo_data = $system->db_fetch($convo_result);
+            $timeMax = $convo_data['time'] + 43200;
+            $timeMin = $convo_data['time'] - 43200;
+
+            $sql = "SELECT `convos_messages`.*, `users`.`user_name`, `users`.`staff_level`
                 FROM `convos_messages`
                 INNER JOIN `users`
                 ON `convos_messages`.`sender_id`=`users`.`user_id`
-                WHERE `message_id`='{$message_id}'";
-        $result = $system->query($sql);
-        return $system->db_fetch($result);
+                WHERE `convo_id`='{$convo_data['convo_id']}' AND `time` BETWEEN {$timeMin} AND {$timeMax}
+                ORDER BY `time` DESC";
+
+            $result = $system->query($sql);
+            $sender_id = null;
+            $user_name = null;
+            $staff_level = null;
+            $time = null;
+
+            if($system->db_last_num_rows) {
+                $returnString = '';
+                while($post = $system->db_fetch($result)) {
+                    if($post['message_id'] == $message_id) {
+                        $sender_id = $post['sender_id'];
+                        $user_name = $post['user_name'];
+                        $staff_level = $post['staff_level'];
+                        $time = $post['time'];
+
+                        $returnString.= "<span style=color:red;>";
+                    }
+                    $returnString .= "<b>{$post['user_name']}:&nbsp;</b>{$post['message']}";
+                    if($post['message_id'] == $message_id) {
+                        $returnString .= "<br />(REPORTED MESSAGE)</span>";
+                    }
+
+                    $returnString .= "<br /><br />";
+                }
+                return [
+                    'message_id' => $message_id,
+                    'convo_id' => $convo_data['convo_id'],
+                    'sender_id' => $sender_id,
+                    'message' => $returnString,
+                    'user_name' => $user_name,
+                    'staff_level' => $staff_level,
+                    'time' => $time
+                ];
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -515,6 +558,7 @@ class Inbox {
         $convos_data = $system->db_fetch_all($result);
 
         foreach($convos_data as $convo) {
+            $convo['title'] = htmlspecialchars_decode($convo['title'], ENT_QUOTES);
 
             // Get a list of members for each conversation
             $sql = "SELECT `convos_users`.`user_id`, `users`.`user_name`,

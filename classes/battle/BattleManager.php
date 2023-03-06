@@ -205,6 +205,9 @@ class BattleManager {
         if($this->battle->winner) {
             return $this->battle->winner;
         }
+        if($this->spectate) {
+            return $this->battle->winner;
+        }
 
         if($this->battle->isPreparationPhase()) {
             try {
@@ -317,6 +320,9 @@ class BattleManager {
                 } catch (Exception $e) {
                     $this->system->message($e->getMessage());
                 }
+            }
+            else if(!empty($_POST['forfeit'])) {
+                $this->player->health = 0;
             }
         }
 

@@ -1,7 +1,7 @@
 <?php
 
 // KEEP IDS IN SYNC WITH System::PAGE_IDS
-// NEXT ID: 29 (i.e. if you add 28, update this to 29 to help other contributors)
+// NEXT ID: 32 (i.e. if you add 28, update this to 29 to help other contributors)
 
 $pages = [
     // User Menu
@@ -187,6 +187,14 @@ $pages = [
         'function_name' => 'adminPanel',
         'user_check' => function(User $u) {
             return $u->hasAdminPanel();
+        }
+    ],
+    31 => [
+        'file_name' => 'chat_log.php',
+        'title' => 'Chat Log',
+        'function_name' => 'chatLog',
+        'user_check' => function(User $u) {
+            return $u->isModerator();
         }
     ],
 

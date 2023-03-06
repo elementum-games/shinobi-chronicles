@@ -134,7 +134,12 @@ function SendMessage(System $system, User $player, int|string $convo_id, string 
 			$response->errors[] = 'This conversation does not exist';
 			return $response;
 		}
-		
+
+        // PM ban
+        if($player->checkBan(StaffManager::BAN_TYPE_PM)) {
+            $response->errors[] = "You are currently " . StaffManager::BAN_TYPE_PM . " banned.";
+            return $response;
+        }
 		// Check if the message is too thicc
         $max_message_length = Inbox::MAX_MESSAGE_LENGTH;
         if($player->staff_level && !$player->forbidden_seal_loaded) {

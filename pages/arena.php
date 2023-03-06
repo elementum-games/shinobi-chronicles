@@ -6,6 +6,8 @@ function arena() {
 	global $player;
 	global $self_link;
 
+    $fight_timer = 3;
+
 	if($player->exam_stage > 0) {
 		$system->message("You cannot access this page during the exam!");
 		$system->printMessage();
@@ -35,7 +37,6 @@ function arena() {
 			$ai_opponents[$row['ai_id']] = $row;
 		}
 		$fight_start = false;
-		$fight_timer = 20;
 		if(!empty($_GET['fight'])) {
 
             // check if the current location disallows ai fights

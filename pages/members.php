@@ -156,6 +156,7 @@ function members() {
 				$journal = $journal_result['journal'];
 			}
 
+            require 'templates/view_user_profile.php';
 
 			echo "<table id='viewprofile' class='table'>
 			<tr><th colspan='2'>View Profile</th>";

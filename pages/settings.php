@@ -36,9 +36,9 @@ function userSettings() {
 	if(!empty($_POST['change_avatar'])) {
 		$avatar_link = trim($_POST['avatar_link']);
 		try {
-			if($player->avatar_ban) {
-				throw new Exception("You are currently banned from changing your avatar.");
-			}
+			if($player->checkBan(StaffManager::BAN_TYPE_AVATAR)) {
+                throw new Exception("You are currently banned from changing your avatar.");
+            }
 		
 			if(strlen($avatar_link) < 5) {
 				throw new Exception("Please enter an avatar link!");
@@ -131,8 +131,8 @@ function userSettings() {
 
             $journal = $system->clean($_POST['journal']);
 
-			if($player->journal_ban) {
-				throw new Exception("You are currently banned from changing your avatar.");
+			if($player->checkBan(StaffManager::BAN_TYPE_JOURNAL)) {
+				throw new Exception("You are currently banned from changing your journal.");
 			}
 			
 			$system->query("UPDATE `journals` SET `journal`='$journal' WHERE `user_id`='{$player->user_id}' LIMIT 1");
@@ -220,6 +220,17 @@ function userSettings() {
 			$system->printMessage();
 		}
 	}
+    else if(!empty($_POST['censor_explicit_language'])) {
+        if($_POST['censor_explicit_language'] == 'on') {
+            $player->censor_explicit_language = true;
+        }
+        else if($_POST['censor_explicit_language'] == 'off') {
+            $player->censor_explicit_language = false;
+        }
+
+        $system->message("Censor explicit language preference set to <b>" . ($player->censor_explicit_language ? "on" : "off") . "</b>.");
+        $system->printMessage();
+    }
 
     // Fetch journal info
 	$result = $system->query("SELECT `journal` FROM `journals` WHERE `user_id` = '{$player->user_id}' LIMIT 1");
@@ -243,6 +254,28 @@ function userSettings() {
             if(count($player->blacklist) > $i) {
                 $list .= ", ";
             }
+        }
+    }
+
+    // Account details
+    if(isset($_GET['view'])) {
+        switch($_GET['view']) {
+            case 'account':
+                $warnings = $player->getOfficialWarnings();
+                $warning = false;
+                $bans = false;
+                $ban_result = $system->query("SELECT * FROM `user_record` WHERE `user_id`='{$player->user_id}' AND `record_type` IN ('"
+                . StaffManager::RECORD_BAN_ISSUED . "', '" . StaffManager::RECORD_BAN_REMOVED . "') ORDER BY `time` DESC");
+                if($system->db_last_num_rows) {
+                    while($ban = $system->db_fetch($ban_result)) {
+                        $bans[] = $ban;
+                    }
+                }
+
+                if(isset($_GET['warning_id'])) {
+                    $warning = $player->getOfficialWarning((int)$_GET['warning_id']);
+                }
+                break;
         }
     }
 

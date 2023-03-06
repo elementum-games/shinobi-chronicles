@@ -1,11 +1,14 @@
 <?php /** @noinspection PhpRedundantOptionalArgumentInspection */
 
+use JetBrains\PhpStorm\Pure;
+
 require_once __DIR__ . "/Jutsu.php";
 require_once __DIR__ . "/Team.php";
 require_once __DIR__ . "/DailyTask.php";
 require_once __DIR__ . "/ForbiddenSeal.php";
 require_once __DIR__ . "/battle/Fighter.php";
 require_once __DIR__ . "/TravelCoords.php";
+require_once __DIR__ . "/StaffManager.php";
 
 /*	Class:		User
 	Purpose:	Fetch user data and load into class variables.
@@ -30,7 +33,10 @@ class User extends Fighter {
         ];
 
     const MIN_NAME_LENGTH = 2;
+    const MAX_NAME_LENGTH = 18;
     const MIN_PASSWORD_LENGTH = 6;
+    const PARTIAL_LOCK = 3;
+    const FULL_LOCK = 5;
 
     const BASE_EXP = 500;
 
@@ -42,6 +48,10 @@ class User extends Fighter {
     const STAFF_CONTENT_ADMIN = 3;
     const STAFF_ADMINISTRATOR = 4;
     const STAFF_HEAD_ADMINISTRATOR = 5;
+
+    static public $staff_names = [
+
+    ];
 
     const SUPPORT_NONE = 0;
     const SUPPORT_BASIC = 1;
@@ -94,6 +104,7 @@ class User extends Fighter {
 
     public $exp;
     public $staff_level;
+    public StaffManager $staff_manager;
     public $support_level;
     public int $bloodline_id;
     public $bloodline_name;
@@ -138,6 +149,7 @@ class User extends Fighter {
     public ?Bloodline $bloodline = null;
     public float $bloodline_skill;
 
+    public $ban_data;
     public $ban_type;
     public $ban_expire;
     public $journal_ban;
@@ -211,6 +223,8 @@ class User extends Fighter {
     private int $premium_credits;
     public int $premium_credits_purchased;
 
+    public bool $censor_explicit_language = true;
+
     public int $total_stats;
 
     public int $scout_range;
@@ -250,7 +264,7 @@ class User extends Fighter {
         $this->user_id = $this->system->clean($user_id);
         $this->id = self::ENTITY_TYPE . ':' . $this->user_id;
 
-        $result = $this->system->query("SELECT `user_id`, `user_name`, `ban_type`, `ban_expire`, `journal_ban`, `avatar_ban`, `song_ban`, `last_login`,
+        $result = $this->system->query("SELECT `user_id`, `user_name`, `ban_data`, `ban_type`, `ban_expire`, `journal_ban`, `avatar_ban`, `song_ban`, `last_login`,
 			`forbidden_seal`, `chat_color`, `chat_effect`, `staff_level`, `username_changes`, `support_level`, `special_mission`
 			FROM `users` WHERE `user_id`='$this->user_id' LIMIT 1"
         );
@@ -265,7 +279,9 @@ class User extends Fighter {
 
         $this->staff_level = $result['staff_level'];
         $this->support_level = $result['support_level'];
+        $this->staff_manager = $this->loadStaffManager();
 
+        $this->ban_data = $this->loadBanData($result['ban_data']);
         $this->ban_type = $result['ban_type'];
         $this->ban_expire = $result['ban_expire'];
         $this->journal_ban = $result['journal_ban'];
@@ -279,12 +295,25 @@ class User extends Fighter {
         $this->chat_color = $result['chat_color'];
         $this->chat_effect = $result['chat_effect'];
 
-        if($this->ban_type && $this->ban_expire <= time()) {
-            $this->system->message("Your " . $this->ban_type . " ban has ended.");
-            $this->ban_type = '';
-
-            $this->system->query("UPDATE `users` SET `ban_type`='', `ban_expire`='0' WHERE `user_id`='$this->user_id' LIMIT 1");
+        //Todo: Remove this in a couple months, only a temporary measure to support current bans
+        if($this->ban_type) {
+            if($this->ban_expire > time()) {
+                $this->ban_data[$this->ban_type] = $this->ban_expire;
+                $ban_data = json_encode($this->ban_data);
+                $this->system->query("UPDATE `users` SET
+                    `ban_data` = '{$ban_data}',
+                   `ban_type` = '',
+                   `ban_expire` = NULL
+                WHERE `user_id`='{$this->user_id}' LIMIT 1");
+            }
         }
+
+        //Check ban expiry
+        $ban_expiry = $this->checkBanExpiry();
+        if($ban_expiry != false) {
+            $this->system->message($ban_expiry);
+        }
+
 
         $this->inventory_loaded = false;
 
@@ -314,7 +343,8 @@ class User extends Fighter {
 			`staff_level`, 
 			`username_changes`, 
 			`support_level`, 
-			`special_mission`
+			`special_mission`,
+            `censor_explicit_language`
 			FROM `users` WHERE `user_id`='$user_id' LIMIT 1"
         );
         if($system->db_last_num_rows == 0) {
@@ -339,6 +369,8 @@ class User extends Fighter {
 
         $user->forbidden_seal = $result['forbidden_seal'];
         $user->chat_color = $result['chat_color'];
+
+        $user->censor_explicit_language = (bool)$result['censor_explicit_language'];
 
         if($user->ban_type && $user->ban_expire <= time()) {
             $system->message("Your " . $user->ban_type . " ban has ended.");
@@ -383,6 +415,8 @@ class User extends Fighter {
         $this->profile_song = $user_data['profile_song'];
 
         $this->log_actions = $user_data['log_actions'];
+
+        $this->censor_explicit_language = (bool)$user_data['censor_explicit_language'];
 
         // Message blacklist
         $this->blacklist = [];
@@ -765,7 +799,9 @@ class User extends Fighter {
             $this->forbidden_seal = new ForbiddenSeal($this->system, $forbidden_seal['level'], $forbidden_seal['time']);
             $this->forbidden_seal_loaded = true;
             // Check if seal is expired & remove if it is
-            $this->forbidden_seal->checkExpiration();
+            if(!$remote_view) {
+                $this->forbidden_seal->checkExpiration();
+            }
             // If seal is not expired, load benefits & apply seal regen boost
             if($this->forbidden_seal->level != 0) {
                 $this->forbidden_seal->setBenefits();
@@ -950,6 +986,103 @@ class User extends Fighter {
         }
 
         return $display;
+    }
+
+    public function loadBanData($ban_data) {
+        if($ban_data === null) {
+            return array();
+        }
+        else {
+            return json_decode($ban_data, true);
+        }
+    }
+    public function checkBanExpiry():bool|string {
+        if($this->ban_data != null) {
+            $ban_expired = false;
+            $ban_expire_return_string = 'Your ';
+
+            foreach($this->ban_data as $ban_name => $ban_expire_time) {
+                if($ban_expire_time != -1 && $ban_expire_time - time() <= 0) {
+                    $ban_expired = true;
+                    unset($this->ban_data[$ban_name]);
+                    $ban_expire_return_string .= "$ban_name ban & ";
+                }
+            }
+
+            if($ban_expired) {
+                //Format data if no bans are presnet
+                $ban_data = (!empty($this->ban_data)) ? json_encode($this->ban_data) : null;
+                //Update user table to remove ban(s)
+                $this->system->query("UPDATE `users` SET `ban_data`='{$ban_data}' WHERE `user_id`='{$this->user_id}' LIMIT 1");
+                //Return ban message expiry message for display
+                if ($this->system->db_last_affected_rows) {
+                    return substr($ban_expire_return_string, 0, strlen($ban_expire_return_string) - 2)
+                        . " has expired.";
+                }
+            }
+        }
+        return false;
+    }
+    public function checkBan($type):bool {
+        if(in_array($type, StaffManager::$ban_types) && isset($this->ban_data[$type])) {
+            if($this->ban_data[$type] == StaffManager::PERM_BAN_VALUE || $this->ban_data[$type] - time() >= 1) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Providing an actual ID will return the OW and mark the warning as read
+     * @param $id
+     * @return bool|void|array
+     */
+    public function getOfficialWarning($id) {
+        $result = $this->system->query("SELECT * FROM `official_warnings` WHERE `user_id`='{$this->user_id}' AND `warning_id`='{$id}' LIMIT 1");
+        if($this->system->db_last_num_rows) {
+            $this->system->query("UPDATE `official_warnings` SET `viewed`=1 WHERE `warning_id`='{$id}' LIMIT 1");
+            return $this->system->db_fetch($result);
+        }
+        else {
+            return false;
+        }
+    }
+
+    public function getOfficialWarnings($for_notification = false) {
+        $query = "SELECT * FROM `official_warnings` WHERE `user_id`='{$this->user_id}'";
+        if($for_notification) {
+            $query .= " AND `viewed`=0";
+        }
+        $query .= " ORDER BY `time` DESC";
+
+        $result = $this->system->query($query);
+        if($this->system->db_last_num_rows) {
+            if($for_notification) {
+                return true;
+            }
+            else {
+                $warnings = [];
+                while($warning = $this->system->db_fetch($result)) {
+                    $warnings[] = $warning;
+                }
+                return $warnings;
+            }
+        }
+        else {
+            if($for_notification) {
+                return false;
+            }
+            else {
+                return array();
+            }
+        }
+    }
+
+    public function loadStaffManager() {
+        if(isset($this->staff_manager) && $this->staff_manager instanceof StaffManager) {
+            return $this->staff_manager;
+        }
+        return new StaffManager($this->system, $this->user_id, $this->user_name, $this->staff_level, $this->support_level);
     }
 
     public function getInventory() {
@@ -1267,7 +1400,7 @@ class User extends Fighter {
      * @throws Exception
      */
     public function subtractPremiumCredits(int $amount, string $description) {
-        if($this->money < $amount) {
+        if($this->getPremiumCredits() < $amount) {
             throw new Exception("Not enough Ancient Kunai!");
         }
         $this->setPremiumCredits($this->premium_credits - $amount, $description);
@@ -1409,7 +1542,8 @@ class User extends Fighter {
 		`intelligence` = '$this->intelligence',
 		`willpower` = '$this->willpower',
 		`village_changes` = '$this->village_changes',
-		`clan_changes` = '$this->clan_changes'
+		`clan_changes` = '$this->clan_changes',
+		`censor_explicit_language` = " . (int)$this->censor_explicit_language . "
 		WHERE `user_id` = '{$this->user_id}' LIMIT 1";
         $this->system->query($query);
 
