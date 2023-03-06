@@ -6,7 +6,7 @@ function arena() {
 	global $player;
 	global $self_link;
 
-    $fight_timer = 3;
+    $fight_timer = 4;
 
 	if($player->exam_stage > 0) {
 		$system->message("You cannot access this page during the exam!");
@@ -140,9 +140,9 @@ function arenaFight(): bool {
                 }
             }
 
-            // 5 levels below = -50% chance
+            // 5 levels below = -75% chance
             if($opponent->level < $player->level) {
-                $stat_gain_chance -= ($player->level - $opponent->level) * 10;
+                $stat_gain_chance -= ($player->level - $opponent->level) * 15;
             }
 
             if($player->total_stats < $player->stat_cap && $stat_gain_chance >= mt_rand(1, 100)) {
