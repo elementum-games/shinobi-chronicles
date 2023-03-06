@@ -64,7 +64,7 @@ function spar() {
 			}
 			*/
 			
-			if($user['location'] != $player->location) {
+			if($user['location'] != $player->location->fetchString()) {
 				throw new Exception("Target is not at your location!");
 			}
 			
@@ -105,7 +105,7 @@ function spar() {
                 throw new Exception("Invalid user! " . $e->getMessage());
             }
 			
-			if($user->location != $player->location) {
+			if($user->location->fetchString() != $player->location->fetchString()) {
 				throw new Exception("Target is not at your location!");
 			}
 			

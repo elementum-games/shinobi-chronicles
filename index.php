@@ -165,11 +165,11 @@ else {
 // Start display
 if(!$LOGGED_IN) {
 	$layout = $system->fetchLayoutByName(System::DEFAULT_LAYOUT);
-    $sm_tmp_class = null;
+    $side_menu_location_status_class  = null;
 }
 else {
 	$layout = $system->fetchLayoutByName($player->layout);
-    $sm_tmp_class = $player->in_village ? 'sm-tmp-invillage' : 'sm-tmp-outvillage';
+    $side_menu_location_status_class = $player->in_village ? 'sm-tmp-invillage' : 'sm-tmp-outvillage';
 }
 require($layout);
 
@@ -364,10 +364,10 @@ if($LOGGED_IN) {
 			// Check for being in village is not okay/okay/required
 			if(isset($routes[$id]['village_ok'])) {
 				// Player is alllowed in up to rank 3, then must go outside village
-				if($player->rank > 2 && $routes[$id]['village_ok'] == System::NOT_IN_VILLAGE && isset($villages[$player->location])) {
+				if($player->rank > 2 && $routes[$id]['village_ok'] == System::NOT_IN_VILLAGE && isset($villages[$player->location->fetchString()])) {
 					throw new Exception("You cannot access this page while in a village!");
 				}
-				if($routes[$id]['village_ok'] == System::ONLY_IN_VILLAGE && $player->location !== $player->village_location) {
+				if($routes[$id]['village_ok'] == System::ONLY_IN_VILLAGE && $player->location->fetchString() !== $player->village_location) {
                     $contents_arr = [];
                     foreach($_GET as $key => $val) {
                         $contents_arr[] = "GET[{$key}]=$val";
@@ -409,8 +409,7 @@ if($LOGGED_IN) {
             }
 
             if(!$ajax || !isset($routes[$id]['ajax_ok']) ) {
-                $loc_data = Travel::getLocation($system, $player->x, $player->y, $player->z);
-                $location_name = !empty($loc_data) ? ' ' . ' <div id="contentHeaderLocation">&middot; '.$loc_data['name'].'</div>' : null;
+                $location_name = ($player->current_location->location_id) ? ' ' . ' <div id="contentHeaderLocation">&middot; '.$player->current_location->name.'</div>' : null;
 
 				echo str_replace("[HEADER_TITLE]", $routes[$id]['title'] . $location_name, $body_start);
 			}

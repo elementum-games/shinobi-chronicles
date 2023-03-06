@@ -34,15 +34,15 @@ function scoutArea($in_existing_table = false, $show_spar_link = true) {
 		WHERE `last_active` > UNIX_TIMESTAMP() - 120 ORDER BY `exp` DESC LIMIT $min, $users_per_page");
 	$users = array();
 	while($row = $system->db_fetch($result)) {
-		$location = explode('.', $row['location']);
+		$location = new TravelCoords($row['location']);
 		$scout_range = $player->scout_range - $row['stealth'];
 		if($scout_range < 1) {
 			$scout_range = 1;
 		}
 		
-		if($location[2] === $player->z &&
-            abs($location[0] - $player->x) <= ($scout_range) &&
-            abs($location[1] - $player->y) <= ($scout_range)) {
+		if($location->z === $player->location->z &&
+            abs($location->x - $player->location->x) <= ($scout_range) &&
+            abs($location->y - $player->location->y) <= ($scout_range)) {
 			$users[] = $row;
 		}
 	}
@@ -91,7 +91,7 @@ function scoutArea($in_existing_table = false, $show_spar_link = true) {
 				if($user['battle_id']) {
 					echo "In battle";
 				}
-				else if($user['location'] == $player->location && $user['user_id'] != $player->user_id) {
+				else if($user['location'] == $player->location->fetchString() && $user['user_id'] != $player->user_id) {
 					$links = [];
 
 				    // Attack

@@ -135,7 +135,7 @@ function runActiveMission() {
 
     if($mission_status < 2) {
         if($player->mission_stage['action_type'] == 'travel' or $player->mission_stage['action_type'] == 'search') {
-            if($player->location == $player->mission_stage['action_data']) {
+            if($player->location->fetchString() == $player->mission_stage['action_data']) {
                 // Team or solo
                 if($mission->mission_type == 3) {
                     $mission_status = $mission->nextTeamStage($player->mission_stage['stage_id'] + 1);
@@ -191,7 +191,7 @@ function runActiveMission() {
                         else if($player->mission_stage['stage_id'] > 2){
                             $player->mission_stage['stage_id'] -= 1;
                         }
-                        if ($player->location == $player->village_location) {
+                        if ($player->location->fetchString() == $player->village_location) {
                             $player->mission_stage['stage_id'] = 4;
                         }
 

@@ -12,6 +12,9 @@ require_once __DIR__ . "/Inbox.php";
 require_once __DIR__ . "/InboxManager.php";
 require_once __DIR__ . "/InboxAPIResponse.php";
 
+require_once __DIR__ . "/TravelCoords.php";
 require_once __DIR__ . "/Travel.php";
 require_once __DIR__ . "/TravelManager.php";
 require_once __DIR__ . "/TravelAPIResponse.php";
+
+require_once __DIR__ . "/MapLocation.php";

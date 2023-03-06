@@ -1,106 +1,102 @@
-export const ScoutArea = ({mapData, scoutData, attackLink, membersLink}) => {
-
+/**
+ * @param array{{
+ * user_id:         int,
+ * user_name:       string,
+ * location_array:  [int, int, int],
+ * name:            string,
+ * village_icon:    string,
+ * alignment:       string,
+ * attack:          boolean,
+ * attack_id:       string
+ * }} player
+ */
+export const ScoutArea = ({
+    mapData,
+    scoutData,
+    membersLink,
+    attackLink,
+    view_as,
+    view_genin,
+    view_chuunin,
+    view_jonin
+}) => {
     return (
-        <div className='travelScoutContainer'>
-            <table className='table scoutTable'>
-                <thead>
-                <tr>
-                    <th>
-                        Name
-                    </th>
-                    <th>
-                        Rank
-                    </th>
-                    <th>
-                        Lvl
-                    </th>
-                    <th>
-                        Village
-                    </th>
-                    <th>
-                        Loc
-                    </th>
-                    <th>
-                        Action
-                    </th>
-                </tr>
-                </thead>
-                <tbody>
-                {(scoutData && mapData) && scoutData.map((player) => (
-                    <tr key={'userid:' + player.user_id}>
-                        <td>
-                            <a href={membersLink + '&user=' + player.user_name }>{player.user_name}</a>
-                        </td>
-                        <td>
-                            {player.name}
-                        </td>
-                        <td>
-                            {player.level}
-                        </td>
-                        <td>
-                            <img src={player.village_icon}
-                                 alt={player.village}
-                                 className='scoutTableVillageIcon' />
-                            &nbsp;
-                            <span className={'scoutTableAlign' + player.alignment}>
-                                {player.village}
-                            </span>
-                        </td>
-                        <td>
-                            {player.location}
-                        </td>
-                        <td>
-                            <ActionDisplay key={player.user_id}
-                                           player_data={player}
-                                           map_data={mapData}
-                                           attackLink={attackLink} />
-                        </td>
-                    </tr>
+        <div className='travel-scout-container'>
+            <div className='travel-scout'>
+                {(mapData) && scoutData.map((player_data) => (
+                    <Player key={player_data.user_id}
+                            player_data={player_data}
+                            membersLink={membersLink}
+                            attackLink={attackLink}
+                            view_as={view_as}
+                            view_genin={view_genin}
+                            view_chuunin={view_chuunin}
+                            view_jonin={view_jonin}
+                    />
                 ))}
-                </tbody>
-            </table>
+            </div>
         </div>
     );
 };
 
-const ActionDisplay = ({player_data, map_data, attackLink}) => {
+const Player = ({
+    player_data,
+    membersLink,
+    attackLink,
+    view_as,
+    view_genin,
+    view_chuunin,
+    view_jonin
+}) => {
 
-    let return_attack = false;
-    let return_blank = true;
-    let return_text = '';
-
-    const battle_id = parseInt(player_data.battle_id, 10);
-
-    // if the user is an ally or enemy
-    if (player_data.alignment === 'Ally') {
-        return_text = 'Ally';
-    } else {
-        return_text = 'Protected';
-        return_attack = true;
-    }
-
-    if (battle_id !== 0) {
-        return_text = 'In Battle';
-    }
-
-    // if the user is on the same tile
-    if (player_data.location === map_data.player_location) {
-        return_blank = false;
-    }
-
-    // if the user is the display player
-    if (parseInt(map_data.self_user_id, 10) === parseInt(player_data.user_id, 10)) {
-        return (<span>You</span>);
-    }
-
-    // if the user is on the same tile and it's an enemy of the same rank
-    if (!return_blank && return_attack && player_data.attackable && battle_id === 0) {
-        return (<a href={attackLink+'&attack='+player_data.attack_id}>Attack</a>);
-    }
-
-    if (!return_blank) {
-        return (<span>{return_text}</span>);
-    } else {
+    if (player_data.name === 'Akademi-sei' && view_as === false) {
+        return (<></>);
+    } else if (player_data.name === 'Genin' && view_genin === false) {
+        return (<></>);
+    } else if (player_data.name === 'Chuunin' && view_chuunin === false) {
+        return (<></>);
+    } else if (player_data.name === 'Jonin' && view_jonin === false) {
         return (<></>);
     }
-};
+
+    return (
+        <div key={player_data.user_id}
+             className={alignmentClass(player_data.alignment)}>
+            <div className='travel-scout-rank'>
+                {player_data.name.slice(0,2)}
+            </div>
+            <div className='travel-scout-name'>
+                <a href={membersLink + '&user=' + player_data.user_name}>
+                    {player_data.user_name}
+                </a>
+            </div>
+            <div className='travel-scout-location'>
+                {player_data.location_array[0]} &#8729; {player_data.location_array[1]}
+            </div>
+            <div className='travel-scout-faction'>
+                <img src={'./' + player_data.village_icon} alt='mist' />
+            </div>
+            <div className='travel-scout-attack'>
+                {(player_data.attack === true) && (
+                    <a href={attackLink + '&attack=' + player_data.attack_id}></a>
+                )}
+            </div>
+        </div>
+    );
+}
+
+const alignmentClass = (alignment) => {
+    let class_name = 'travel-scout-entry travel-scout-';
+    switch (alignment) {
+        case 'Ally':
+            class_name += 'ally';
+            break;
+        case 'Enemy':
+            class_name += 'enemy';
+            break;
+        case 'Neutral':
+            class_name += 'neutral';
+            break;
+    }
+    return class_name;
+}

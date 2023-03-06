@@ -427,6 +427,9 @@ class System {
         }
     }
 
+    public static function currentTimeMs(): int {
+        return floor(microtime(true) * 1000);
+    }
 
     /**
      * Logs an error message(usually from DB), displays a generic error message to user, displays page end, then exits script.

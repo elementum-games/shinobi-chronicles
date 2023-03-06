@@ -1,168 +1,79 @@
 export const Map = ({
-  map_data,
-  onClick
+  mapData
 }) => {
-  const containerStyle = {
-    width: map_data.container_width,
-    height: map_data.container_height
-  };
-  const mapStyle = {
-    background: "url(" + map_data.background_image + ")",
-    backgroundPositionY: "-" + map_data.bg_img_start_y + "px",
-    backgroundPositionX: "-" + map_data.bg_img_start_x + "px",
-    backgroundRepeat: "no-repeat"
-  };
-  const playerStyle = {
-    backgroundImage: "url(" + map_data.player_icon + ")",
-    backgroundPosition: "center center",
-    backgroundRepeat: "no-repeat",
-    width: map_data.tile_width,
-    height: map_data.tile_height,
+  // map should have a smallish border. this is the offset for the border
+  const offset = 12;
+  const map_div = document.getElementsByClassName('travel-container')[0];
+  const tile_width = parseInt(mapData.tile_width, 10);
+  const tile_height = parseInt(mapData.tile_height, 10);
+  const player_x = parseInt(mapData.player_x, 10);
+  const player_y = parseInt(mapData.player_y, 10);
+  const container_width = map_div.clientWidth - tile_width;
+  const container_height = map_div.clientHeight - tile_height;
+  const map_width = Math.floor(container_width / tile_width);
+  const map_height = Math.floor(container_height / tile_height);
+  const map_tiles = [...Array(map_width * map_height).keys()];
+  const gutter_start_x = Math.floor(player_x - map_width / 2 + 1);
+  const gutter_start_y = Math.floor(player_y - map_height / 2);
+  const gutter_x = Array.from(new Array(map_width), (x, i) => i + gutter_start_x);
+  const gutter_y = Array.from(new Array(map_height), (x, i) => i + gutter_start_y);
+  const player_start_x = Math.floor(map_width / 2);
+  const player_start_y = Math.floor(map_height / 2);
+  const player_icon_x = player_start_x * tile_width;
+  const player_icon_y = player_start_y * tile_height;
+  const map_start_x = player_icon_x - player_x * tile_width + tile_width - offset;
+  const map_start_y = player_icon_y - player_y * tile_height + tile_height - offset;
+  const PlayerStyle = {
     position: "absolute",
-    top: map_data.player_img_y,
-    left: map_data.player_img_x
+    backgroundImage: "url(./" + mapData.player_icon + ")",
+    top: player_icon_y + "px",
+    left: player_icon_x + "px"
   };
-  const mobileButtonStyle = {
-    width: parseInt(map_data.container_width, 10) / 3,
-    height: parseInt(map_data.container_height, 10) / 3
+  const MapStyle = {
+    backgroundImage: "url(./" + mapData.background_image + ")",
+    backgroundPositionX: map_start_x + "px",
+    backgroundPositionY: map_start_y + "px"
   };
   return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
-    className: "mapMobileContainer"
-  }, /*#__PURE__*/React.createElement("a", {
-    href: "#",
-    style: mobileButtonStyle,
-    onClick: () => onClick('move_northwest')
-  }, "\xA0"), /*#__PURE__*/React.createElement("a", {
-    href: "#",
-    style: mobileButtonStyle,
-    onClick: () => onClick('move_north')
-  }, "\xA0"), /*#__PURE__*/React.createElement("a", {
-    href: "#",
-    style: mobileButtonStyle,
-    onClick: () => onClick('move_northeast')
-  }, "\xA0"), /*#__PURE__*/React.createElement("a", {
-    href: "#",
-    style: mobileButtonStyle,
-    onClick: () => onClick('move_west')
-  }, "\xA0"), /*#__PURE__*/React.createElement("a", {
-    href: "#",
-    style: mobileButtonStyle
-  }, "\xA0"), /*#__PURE__*/React.createElement("a", {
-    href: "#",
-    style: mobileButtonStyle,
-    onClick: () => onClick('move_east')
-  }, "\xA0"), /*#__PURE__*/React.createElement("a", {
-    href: "#",
-    style: mobileButtonStyle,
-    onClick: () => onClick('move_southwest')
-  }, "\xA0"), /*#__PURE__*/React.createElement("a", {
-    href: "#",
-    style: mobileButtonStyle,
-    onClick: () => onClick('move_south')
-  }, "\xA0"), /*#__PURE__*/React.createElement("a", {
-    href: "#",
-    style: mobileButtonStyle,
-    onClick: () => onClick('move_southeast')
-  }, "\xA0")), /*#__PURE__*/React.createElement("div", {
-    className: "mapContainer",
-    style: containerStyle
-  }, /*#__PURE__*/React.createElement(GutterX, {
-    map_data: map_data
-  }), /*#__PURE__*/React.createElement(GutterY, {
-    map_data: map_data
-  }), /*#__PURE__*/React.createElement("div", {
-    className: "map",
-    style: mapStyle
-  }), /*#__PURE__*/React.createElement("div", {
-    className: "mapLocations"
-  }, /*#__PURE__*/React.createElement(MapLocations, {
-    map_data: map_data
-  })), /*#__PURE__*/React.createElement("div", {
-    className: "mapPlayer"
+    id: "travel-x-container"
+  }, gutter_x && gutter_x.map(gutter => /*#__PURE__*/React.createElement("div", {
+    key: 'gutter_x:' + gutter,
+    className: "travel-gutter-grid travel-gutter-grid-x"
+  }, gutter))), /*#__PURE__*/React.createElement("div", {
+    id: "travel-y-container"
+  }, gutter_y && gutter_y.map(gutter => /*#__PURE__*/React.createElement("div", {
+    key: 'gutter_y:' + gutter,
+    className: "travel-gutter-grid travel-gutter-grid-y"
+  }, gutter))), /*#__PURE__*/React.createElement("div", {
+    id: "travel-map-container"
   }, /*#__PURE__*/React.createElement("div", {
-    className: "playerIcon",
-    style: playerStyle
-  }), /*#__PURE__*/React.createElement(MapActions, {
-    map_data: map_data,
-    onClick: onClick
-  })), /*#__PURE__*/React.createElement("div", {
-    className: "mapGrid"
-  }, /*#__PURE__*/React.createElement(MapGrid, {
-    map_data: map_data
-  }))));
-};
-const GutterX = ({
-  map_data
-}) => {
-  return /*#__PURE__*/React.createElement("div", {
-    className: "mapGutterX"
-  }, Object.keys(map_data['gutters_x']).map(tile => /*#__PURE__*/React.createElement("div", {
-    key: 'gutter-x: ' + tile,
+    id: "map_background",
+    className: "map_background",
+    style: MapStyle
+  }), /*#__PURE__*/React.createElement("div", {
+    className: "map_grid_lines"
+  }, map_tiles && map_tiles.map(e => /*#__PURE__*/React.createElement("div", {
+    key: e,
     style: {
-      height: map_data.tile_height,
-      width: map_data.tile_width
+      width: mapData.tile_width,
+      height: mapData.tile_height
     }
-  }, tile)));
-};
-const GutterY = ({
-  map_data
-}) => {
-  return /*#__PURE__*/React.createElement("div", {
-    className: "mapGutterY"
-  }, Object.keys(map_data['gutters_y']).map(tile => /*#__PURE__*/React.createElement("div", {
-    key: 'gutter-y:' + tile,
+  }))), /*#__PURE__*/React.createElement("div", {
+    className: "map_locations"
+  }, mapData.all_locations && mapData.all_locations.map(location => /*#__PURE__*/React.createElement("div", {
+    key: location.location_id,
+    className: "map_location",
     style: {
-      height: map_data.tile_height,
-      width: map_data.tile_width
+      cursor: "pointer",
+      backgroundColor: "#" + location.background_color,
+      backgroundImage: "url(." + location.background_image + ")",
+      top: map_start_y + location.y * tile_height - tile_height + offset + "px",
+      left: map_start_x + location.x * tile_width - tile_width + offset + "px"
     }
-  }, tile)));
-};
-const MapLocations = ({
-  map_data
-}) => {
-  return /*#__PURE__*/React.createElement(React.Fragment, null, map_data['locations_data'].map(loc => /*#__PURE__*/React.createElement("div", {
-    key: loc.location_name,
-    className: 'mapGridLocationTile mapGridLocation' + loc.location_name,
-    style: {
-      top: loc.bm_img_start_y,
-      left: loc.bm_img_start_x,
-      width: map_data.tile_width,
-      height: map_data.tile_height,
-      backgroundColor: "#" + loc.background_color,
-      backgroundImage: "url(" + loc.background_image + ")"
-    }
-  })));
-};
-const MapActions = ({
-  map_data,
-  onClick
-}) => {
-  return /*#__PURE__*/React.createElement(React.Fragment, null, map_data['movement_actions'].map(action => /*#__PURE__*/React.createElement("a", {
-    key: 'act:' + action.move_direction,
-    className: "mapGridAction",
-    href: "#",
-    onClick: () => onClick(action.move_direction),
-    style: {
-      position: "absolute",
-      top: action.px_top,
-      left: action.px_left,
-      width: map_data.tile_width,
-      height: map_data.tile_height
-    }
-  })));
-};
-const MapGrid = ({
-  map_data
-}) => {
-  const tileBlankStyle = {
-    width: map_data.tile_width,
-    height: map_data.tile_height
-  };
-  const totalTiles = parseInt(map_data.container_width_tiles, 10) * parseInt(map_data.container_height_tiles, 10);
-  const emptyArray = [...Array(totalTiles).keys()];
-  return /*#__PURE__*/React.createElement(React.Fragment, null, emptyArray.map(tile => /*#__PURE__*/React.createElement("div", {
-    key: 'empty-grid:' + tile,
-    className: "mapGridTileBlank",
-    style: tileBlankStyle
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "map_locations_tooltip"
+  }, location.name)))), /*#__PURE__*/React.createElement("div", {
+    id: "map_player",
+    style: PlayerStyle
   })));
 };

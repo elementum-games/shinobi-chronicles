@@ -111,8 +111,7 @@ function battle(): bool {
             }
 
             // check if the location forbids pvp
-            $location_data = Travel::getLocation($system, $player->x, $player->y, $player->z);
-            if ($location_data && $location_data['pvp_allowed'] == 0) {
+            if ($player->current_location->location_id && $player->current_location->pvp_allowed == 0) {
                 throw new Exception("You cannot fight at this location!");
             }
 
@@ -131,7 +130,7 @@ function battle(): bool {
                 throw new Exception("You can only attack people of the same rank!");
             }
 
-			if($user->location !== $player->location) {
+			if($user->location->fetchString() !== $player->location->fetchString()) {
 				throw new Exception("Target is not at your location!");
 			}
 			if($user->battle_id) {

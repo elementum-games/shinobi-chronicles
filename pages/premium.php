@@ -906,10 +906,10 @@ function premium() {
 			}
 
 			$system->message("You have moved to the $village village, and been placed in the $clan_name clan.");
-			$location = explode('.', $location);
-			$player->x = $location[0];
-			$player->y = $location[1];
-            $player->z = $location[2];
+			$location = new TravelCoords($location);
+			$player->location->x = $location->x;
+			$player->location->y = $location->y;
+            $player->location->z = $location->z;
 
 		} catch (Exception $e) {
 			$system->message($e->getMessage());

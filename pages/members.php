@@ -235,7 +235,7 @@ function members() {
 
             // Spouse location
             if($player->user_id == $viewUser->spouse) {
-                echo "<label style='width:6.5em;'>Location:</label> {$viewUser->location}<br />";
+                echo "<label style='width:6.5em;'>Location:</label> {$viewUser->location->fetchString()}<br />";
             }
 
 

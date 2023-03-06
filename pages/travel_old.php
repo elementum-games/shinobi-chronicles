@@ -18,36 +18,36 @@ function travel() {
     $villages = $system->getVillageLocations();
 
 	if(!empty($_GET['travel'])) {
-        $target_x = intval($player->x);
-        $target_y = intval($player->y);
+        $target_x = intval($player->location->x);
+        $target_y = intval($player->location->y);
 
 		$ignore_travel_restrictions = $player->isHeadAdmin();
 
 		try {
             switch($_GET['travel']) {
                 case 'north':
-                    if($player->y <= 1 && !$ignore_travel_restrictions) {
+                    if($player->location->y <= 1 && !$ignore_travel_restrictions) {
                         throw new Exception("You cannot travel farther this way!");
                     }
 
                     $target_y--;
                     break;
                 case 'south':
-                    if($player->y >= System::MAP_SIZE_Y && !$ignore_travel_restrictions) {
+                    if($player->location->y >= System::MAP_SIZE_Y && !$ignore_travel_restrictions) {
                         throw new Exception("You cannot travel farther this way!");
                     }
 
                     $target_y++;
                     break;
                 case 'east':
-                    if($player->x >= System::MAP_SIZE_X && !$ignore_travel_restrictions) {
+                    if($player->location->x >= System::MAP_SIZE_X && !$ignore_travel_restrictions) {
                         throw new Exception("You cannot travel farther this way!");
                     }
 
                     $target_x++;
                     break;
                 case 'west':
-                    if($player->x <= 1 && !$ignore_travel_restrictions) {
+                    if($player->location->x <= 1 && !$ignore_travel_restrictions) {
                         throw new Exception("You cannot travel farther this way!");
                     }
 
@@ -71,8 +71,8 @@ function travel() {
 				throw new Exception("You are currently in a Special Mission and cannot travel!");
 			}
 
-            $player->y = $target_y;
-            $player->x = $target_x;
+            $player->location->y = $target_y;
+            $player->location->x = $target_x;
 
             if($player->mission_id && $player->mission_stage['action_type'] == 'combat') {
                 $mission = new Mission($player->mission_id, $player);
@@ -89,7 +89,7 @@ function travel() {
         }
 		
 		// Village check
-		if($player->location === $player->village_location) {
+		if($player->location->fetchString() === $player->village_location) {
 			$player->in_village = true;
 		}
 		else {
@@ -174,13 +174,13 @@ function travel() {
 	</script>";
 
 	echo "<table id='scoutTable' class='table' style='width:98%;'>
-    <tr><th colspan='5'>Your location: {$player->location}" .
-	(isset($villages[$player->location]) ? " (" . $villages[$player->location]['name'] . " Village)" : "") .
+    <tr><th colspan='5'>Your location: {$player->location->fetchString()}" .
+	(isset($villages[$player->location->fetchString()]) ? " (" . $villages[$player->location->fetchString()]['name'] . " Village)" : "") .
 	"</th></tr>
 	<tr><td colspan='5' style='text-align:center;'>";
 	if($player->mission_id) {
 		if($player->mission_stage['action_type'] == 'travel' or $player->mission_stage['action_type'] == 'search') {
-            if($player->location === $player->mission_stage['action_data']) {
+            if($player->location->fetchString() === $player->mission_stage['action_data']) {
 				echo "<a href='{$system->links['mission']}'><p class='button' style='margin-top:5px;'>Go to Mission Location</p></a><br />";
 			}
 		}
@@ -229,7 +229,7 @@ function renderMap($player, $villages, $icons) {
             else {
                 $output .= "<td>";
             }
-            $output .= ($y == $player->y && $x == $player->x ? "<img src='./images/ninja_head.png' />" : "&nbsp;") . "</td>";
+            $output .= ($y == $player->location->y && $x == $player->location->x ? "<img src='./images/ninja_head.png' />" : "&nbsp;") . "</td>";
         }
         $output .= "</tr>";
     }
