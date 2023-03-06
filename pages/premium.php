@@ -96,7 +96,6 @@ function premium() {
             if($player->clan_office) {
                 throw new Exception("You must resign from your clan office first!");
             }
-
 			if(!isset($_POST['confirm_reset'])) {
                 $confirmation_type = "confirm_reset";
                 $confirmation_string = "Are you sure you want to reset your character? You will lose all your stats,
@@ -894,7 +893,6 @@ function premium() {
                 // Location
                 $result = $system->query("SELECT `location` FROM `villages` WHERE `name`='$player->village' LIMIT 1");
                 $location = $system->db_fetch($result)['location'];
-                $player->location = $location;
 
                 // Clan
                 $result = $system->query("SELECT `clan_id`, `name` FROM `clans` 
@@ -953,16 +951,16 @@ function premium() {
 
                     $clan_id = $clan_rolls[mt_rand(0, count($clan_rolls) - 1)];
 
-
                     $player->clan = array();
                     $player->clan['id'] = $clan_id;
                     $clan_name = $clans[$clan_id]['name'];
-                }
 
-                $system->message("You have moved to the $village village, and been placed in the $clan_name clan.");
-                $location = explode('.', $player->location);
-                $player->x = $location[0];
-                $player->y = $location[1];
+                    $system->message("You have moved to the $village village, and been placed in the $clan_name clan.");
+                    $location = new TravelCoords($location);
+                    $player->location->x = $location->x;
+                    $player->location->y = $location->y;
+                    $player->location->z = $location->z;
+                }
             }
 		} catch (Exception $e) {
 			$system->message($e->getMessage());

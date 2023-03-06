@@ -245,17 +245,18 @@ class Mission {
     }
 
     public function rollLocation($starting_location): string {
-        $starting_location = explode('.', $starting_location);
+        $starting_location = new TravelCoords($starting_location);
 
         $max = $this->current_stage['location_radius'] * 2;
         $x = mt_rand(0, $max) - $this->current_stage['location_radius'];
         $y = mt_rand(0, $max) - $this->current_stage['location_radius'];
+        $z = Travel::DEFAULT_MAP_ID;
         if($x == 0 && $y == 0) {
             $x++;
         }
 
-        $x += $starting_location[0];
-        $y += $starting_location[1];
+        $x += $starting_location->x;
+        $y += $starting_location->y;
 
         if($x < 1) {
             $x = 1;
@@ -264,14 +265,16 @@ class Mission {
             $y = 1;
         }
 
-        if($x > System::MAP_SIZE_X) {
-            $x = System::MAP_SIZE_X;
+        $map_data = Travel::getMapData($this->system, $this->player->location->z);
+
+        if($x > $map_data['end_x']) {
+            $x = $map_data['end_x'];
         }
-        if($y > System::MAP_SIZE_Y) {
-            $y = System::MAP_SIZE_Y;
+        if($y > $map_data['end_y']) {
+            $y = $map_data['end_y'];
         }
 
-        return $x . '.' . $y;
+        return $x . '.' . $y . '.' . $z;
     }
 
     /**

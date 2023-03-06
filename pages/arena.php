@@ -38,11 +38,15 @@ function arena() {
 		}
 		$fight_start = false;
 		if(!empty($_GET['fight'])) {
-			if($player->last_ai > time() - $fight_timer) {
+
+            // check if the current location disallows ai fights
+            if ($player->current_location->location_id && $player->current_location->ai_allowed == 0) {
+                $system->message('You cannot fight at this location');
+            }
+            else if($player->last_ai > time() - $fight_timer) {
 				$system->message("Please wait " . ($player->last_ai - (time() - $fight_timer)) . " more seconds!");
 			}
 			else if(isset($ai_opponents[$_GET['fight']])) {
-
 
                 try {
                     $ai_id = $_GET['fight'];
