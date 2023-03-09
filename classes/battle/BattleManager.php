@@ -825,11 +825,11 @@ class BattleManager {
         }
 
         // Apply barrier
-        $player1_jutsu_is_attack = $player1_jutsu->jutsu_type !== Jutsu::TYPE_GENJUTSU && in_array($player1_jutsu->use_type, Jutsu::$attacking_use_types);
-        $player2_jutsu_is_attack = $player2_jutsu->jutsu_type !== Jutsu::TYPE_GENJUTSU && in_array($player2_jutsu->use_type, Jutsu::$attacking_use_types);
+        $player1_jutsu_is_attack = in_array($player1_jutsu->use_type, Jutsu::$attacking_use_types);
+        $player2_jutsu_is_attack = in_array($player2_jutsu->use_type, Jutsu::$attacking_use_types);
 
         // Barriers
-        if($player1->barrier && $player2_jutsu_is_attack) {
+        if($player1->barrier && $player2_jutsu_is_attack && $player2_jutsu->jutsu_type !== Jutsu::TYPE_GENJUTSU) {
             // Block damage from opponent's attack
             if($player1->barrier >= $player2_damage) {
                 $block_amount = $player2_damage;
@@ -853,7 +853,7 @@ class BattleManager {
             $block_percent = round($block_percent, 1);
             $collision_text .= "[player]'s barrier blocked $block_percent% of [opponent]'s damage![br]";
         }
-        if($player2->barrier && $player1_jutsu_is_attack) {
+        if($player2->barrier && $player1_jutsu_is_attack && $player1_jutsu->jutsu_type !== Jutsu::TYPE_GENJUTSU) {
             // Block damage from opponent's attack
             if($player2->barrier >= $player1_damage) {
                 $block_amount = $player1_damage;
