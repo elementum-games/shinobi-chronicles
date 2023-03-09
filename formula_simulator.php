@@ -69,8 +69,8 @@ function fighterFromData(array $fighter_data, string $name): TestFighter {
     $fighter->bloodline_skill = (int)$fighter_data['bloodline_skill'];
     $fighter->speed = (int)$fighter_data['speed'];
     $fighter->cast_speed = (int)$fighter_data['cast_speed'];
-    $fighter->intelligence = (int)$fighter_data['intelligence'];
-    $fighter->willpower = (int)$fighter_data['willpower'];
+    $fighter->intelligence = 10;
+    $fighter->willpower = 10;
     $fighter->setTotalStats();
 
     $fighter_bloodline_boosts = [];
@@ -175,8 +175,6 @@ $stats = [
     'bloodline_skill',
     'speed',
     'cast_speed',
-    'intelligence',
-    'willpower'
 ];
 $scenario_stats = ['offense', 'speed', 'intelligence', 'willpower'];
 
@@ -197,7 +195,7 @@ if(($_POST['mode'] ?? '') == 'vs' || ($_GET['mode'] ?? '') == 'vs') {
     $mode = 'vs';
 }
 if(($_POST['mode'] ?? '') == 'speed_graph' || ($_GET['mode'] ?? '') == 'speed_graph') {
-    $mode = 'vs';
+    $mode = 'speed_graph';
 }
 
 if(isset($_POST['run_simulation']) && $mode == 'vs') {
@@ -294,100 +292,227 @@ if(isset($_POST['run_simulation']) && $mode == 'vs') {
         echo $e->getMessage();
     }
 }
-else if(isset($_POST['run_simulation']) && $mode == 'speed_graph') {
-        $player1_data = $_POST['stats1'];
-        $player2_data = $_POST['stats2'];
+else if($mode == 'speed_graph') {
+    $jutsu_power = 4;
+    $total_stats = 220000;
 
-        $valid_jutsu_types = [
-            Jutsu::TYPE_NINJUTSU,
-            Jutsu::TYPE_TAIJUTSU,
-            Jutsu::TYPE_GENJUTSU,
+    try {
+        // Nominal is 33.4% / 33.4% / 33.4%
+        $scenarios = [
+            [
+                'player2_offense' => null,
+                'player2_bloodline_skill' => null,
+                'player2_speed' => 10,
+                'damages' => null,
+            ],
+            [
+                'player2_offense' => null,
+                'player2_bloodline_skill' => null,
+                'player2_speed' => $total_stats * 0.1,
+                'damages' => null,
+            ],
+            [
+                'player2_offense' => null,
+                'player2_bloodline_skill' => null,
+                'player2_speed' => $total_stats * 0.2,
+                'damages' => null,
+            ],
+            [
+                'player2_offense' => null,
+                'player2_bloodline_skill' => null,
+                'player2_speed' => $total_stats * 0.25,
+                'damages' => null,
+            ],
+            [
+                'player2_offense' => null,
+                'player2_bloodline_skill' => null,
+                'player2_speed' => $total_stats * 0.3,
+                'damages' => null,
+            ],
+            [
+                'player2_offense' => null,
+                'player2_bloodline_skill' => null,
+                'player2_speed' => $total_stats * 0.4,
+                'damages' => null,
+            ],
+            [
+                'player2_offense' => null,
+                'player2_bloodline_skill' => null,
+                'player2_speed' => $total_stats * 0.5,
+                'damages' => null,
+            ],
+            [
+                'player2_offense' => null,
+                'player2_bloodline_skill' => null,
+                'player2_speed' => $total_stats * 0.6,
+                'damages' => null,
+            ],
+            [
+                'player2_offense' => null,
+                'player2_bloodline_skill' => null,
+                'player2_speed' => $total_stats * 0.7,
+                'damages' => null,
+            ],
+            [
+                'player2_offense' => null,
+                'player2_bloodline_skill' => null,
+                'player2_speed' => $total_stats * 0.8,
+                'damages' => null,
+            ],
         ];
-        try {
-            if(!in_array($player1_data['jutsu_type'], $valid_jutsu_types)) {
-                throw new Exception("Invalid jutsu type for player 1!");
-            }
-            if(!in_array($player2_data['jutsu_type'], $valid_jutsu_types)) {
-                throw new Exception("Invalid jutsu type for player 2!");
-            }
 
-            $player1 = fighterFromData($player1_data, "Player 1");
+        foreach($scenarios as $key => &$scenario) {
+            $player1 = fighterFromData([
+                'ninjutsu_skill' => 10,
+                'taijutsu_skill' => floor($total_stats * 0.33334),
+                'genjutsu_skill' => 10,
+                'bloodline_skill' => floor($total_stats * 0.33334),
+                'speed' => floor($total_stats * 0.33334),
+                'cast_speed' => 10,
+                'bloodline_boost_1' => 'taijutsu_boost',
+                'bloodline_boost_1_power' => 30,
+                'bloodline_boost_2' => 'taijutsu_resist',
+                'bloodline_boost_2_power' => 10,
+            ], "Player 1");
             $player1_jutsu = new Jutsu(
-                1,
-                'p1j',
-                $player1->rank,
-                $player1_data['jutsu_type'],
-                (int)$player1_data['jutsu_power'],
-                'none',
-                0,
-                0,
-                'no',
-                'nope',
-                0,
-                Jutsu::USE_TYPE_PROJECTILE,
-                0,
-                0,
-                Jutsu::PURCHASE_TYPE_PURCHASEABLE,
-                0,
-                Jutsu::ELEMENT_NONE,
-                1
+                id: 1,
+                name: 'p1j',
+                rank: $player1->rank,
+                jutsu_type: Jutsu::TYPE_TAIJUTSU,
+                base_power: $jutsu_power,
+                effect: 'none',
+                base_effect_amount: 0,
+                effect_length: 0,
+                description: 'no',
+                battle_text: 'nope',
+                cooldown: 0,
+                use_type: Jutsu::USE_TYPE_PROJECTILE,
+                use_cost: 0,
+                purchase_cost: 0,
+                purchase_type: Jutsu::PURCHASE_TYPE_PURCHASEABLE,
+                parent_jutsu: 0,
+                element: Jutsu::ELEMENT_NONE,
+                hand_seals: 1
             );
             $player1_jutsu->setLevel(50, 0);
 
-            $player2 = fighterFromData($player2_data, "Player 2");
+            // This is the one we'll change
+            $remaining_stats = $total_stats - $scenario['player2_speed'];
+            $scenario['player2_offense'] = floor($remaining_stats / 2);
+            $scenario['player2_bloodline_skill'] = floor($remaining_stats / 2);
+
+            $player2 = fighterFromData([
+                'ninjutsu_skill' => 10,
+                'taijutsu_skill' => $scenario['player2_offense'],
+                'genjutsu_skill' => 10,
+                'bloodline_skill' => $scenario['player2_bloodline_skill'],
+                'speed' => ceil($scenario['player2_speed']),
+                'cast_speed' => 10,
+                'bloodline_boost_1' => 'taijutsu_boost',
+                'bloodline_boost_1_power' => 30,
+                'bloodline_boost_2' => 'taijutsu_resist',
+                'bloodline_boost_2_power' => 10,
+            ], "Player 2");
             $player2_jutsu = new Jutsu(
-                1,
-                'p1j',
-                $player2->rank,
-                $player2_data['jutsu_type'],
-                (int)$player2_data['jutsu_power'],
-                'none',
-                0,
-                0,
-                'no',
-                'nope',
-                0,
-                Jutsu::USE_TYPE_PROJECTILE,
-                0,
-                0,
-                Jutsu::PURCHASE_TYPE_PURCHASEABLE,
-                0,
-                Jutsu::ELEMENT_NONE,
-                1
+                id: 1,
+                name: 'p2j',
+                rank: $player2->rank,
+                jutsu_type: Jutsu::TYPE_TAIJUTSU,
+                base_power: $jutsu_power,
+                effect: 'none',
+                base_effect_amount: 0,
+                effect_length: 0,
+                description: 'no',
+                battle_text: 'nope',
+                cooldown: 0,
+                use_type: Jutsu::USE_TYPE_PROJECTILE,
+                use_cost: 0,
+                purchase_cost: 0,
+                purchase_type: Jutsu::PURCHASE_TYPE_PURCHASEABLE,
+                parent_jutsu: 0,
+                element: Jutsu::ELEMENT_NONE,
+                hand_seals: 1
             );
             $player2_jutsu->setLevel(50, 0);
 
-
-            $damages = calcDamage(
+            $scenarios[$key]['damages'] = calcDamage(
                 player1: $player1,
                 player2: $player2,
                 player1_jutsu: $player1_jutsu,
                 player2_jutsu: $player2_jutsu
             );
-
-            echo "<div style='width:500px;background-color:#EAEAEA;text-align:center;margin-left:auto;margin-right:auto;
-            padding:8px;border:1px solid #000000;border-radius:10px;'>
-        Player 1:<br />
-        {$damages['player1']['raw_damage']} raw damage<br />
-        {$damages['player1']['collision_damage']} post-collision damage<br />
-        {$damages['player1']['damage']} final damage<br />";
-
-            if($damages['collision_text']) {
-                echo "<hr />" . $damages['collision_text'] . "<hr />";
-            }
-            else {
-                echo "<hr />";
-            }
-
-            echo "Player 2:<br />
-        {$damages['player2']['raw_damage']} raw damage<br />
-        {$damages['player2']['collision_damage']} post-collision damage<br />
-        {$damages['player2']['damage']} final damage<br />
-        </div>";
-        } catch (Exception $e) {
-            echo $e->getMessage();
         }
+        unset($scenario);
+
+        $label_width = 100;
+
+        echo "
+        <style>
+            .speedGraphContainer {
+                width:500px;
+                background-color:#EAEAEA;
+                text-align:center;
+                margin-left:auto;
+                margin-right:auto;
+                padding:8px;
+                border:1px solid #000000;
+                border-radius:10px;
+            }
+            
+            .scenario {
+                margin: 5px auto 10px auto;
+            }
+            
+            label {
+                display: inline-block;
+                text-align: left;
+            }
+            .playerLabel {
+                width: 100px;
+            }
+            .statsLabel {
+                width: 260px;
+            }
+            
+        </style>
+        <div class='speedGraphContainer'>
+        Evasion DR Ratio: " . BattleManager::SPEED_DAMAGE_REDUCTION_RATIO . "<br />
+        Max Evasion DR: " . BattleManager::MAX_EVASION_DAMAGE_REDUCTION . "<br />
+        Speed Off Ratio: " . Fighter::SPEED_OFFENSE_RATIO . "<br />";
+
+        echo "<table>
+            <tr>
+                <th>Player 2 speed ratio</th>
+                <th>Player 2 damage ratio</th>
+            </tr>";
+        foreach($scenarios as $scenario) {
+            $player2_speed_ratio = round($scenario['player2_speed'] / $player1->speed, 2);
+            $player2_damage_ratio = round($scenario['damages']['player2']['damage'] / $scenario['damages']['player1']['damage'], 2);
+
+/*            echo "<div class='scenario'>"
+                . "<label class='playerLabel'>Player 1:</label>"
+                . "<label class='statsLabel'>{$player1->taijutsu_skill} off / {$player1->bloodline_skill} BL / {$player1->speed} speed</label>"
+                . "<br />"
+                . "<label class='playerLabel'>Player 2:</label>"
+                . "<label class='statsLabel'>{$scenario['player2_offense']} off / {$scenario['player2_bloodline_skill']} BL / {$scenario['player2_speed']} speed</label>"
+                . "<br />"
+                . "<b>Speed ratio: {$player2_speed_ratio}x</b><br />"
+                . "<b>Damage: {$player2_damage_ratio}x</b><br />"
+                // . "({$scenario['damages']['player2']['damage']} vs {$scenario['damages']['player1']['damage']})</b>"
+            . "</div>";*/
+
+            echo "<tr>
+                <td>{$player2_speed_ratio}</td>
+                <td>{$player2_damage_ratio}</td>
+            </tr>";
+        }
+        echo "</table>";
+
+        echo "</div>";
+    } catch (Exception $e) {
+        echo $e->getMessage();
     }
+}
 else if(isset($_POST['run_simulation']) && $mode == 'scenarios') {
     $base_level = $_POST['base_level'];
     $max_level = $_POST['max_level'];
@@ -663,11 +788,13 @@ $ranks_prefill_data = array_map(function($rank) use ($rankManager) {
 <a href='formula_simulator.php?mode=vs'>VS</a>
 &nbsp;&nbsp;|&nbsp;&nbsp;
 <a href='formula_simulator.php?mode=scenarios'>Damage/Level Curve</a>
+&nbsp;&nbsp;|&nbsp;&nbsp;
+<a href='formula_simulator.php?mode=speed_graph'>Speed Graph</a>
 <br />
 <br />
 
 <!--VS DISPLAY-->
-<div id='vs' class='displayDiv' <?= ($mode == 'scenarios' ? "style='display:none;'" : '') ?>>
+<div id='vs' class='displayDiv' <?= ($mode == 'vs' ? '' : "style='display:none;'") ?>>
 	<form action='./formula_simulator.php' method='post'>
 	<div class='versusFighterInput'>
 		Player 1<br />
@@ -869,7 +996,7 @@ $ranks_prefill_data = array_map(function($rank) use ($rankManager) {
         })
     }
 </script>
-<div id='scenario' class='displayDiv' <?= ($mode == 'vs' ? "style='display:none;'" : '') ?>>
+<div id='scenario' class='displayDiv' <?= ($mode == 'scenarios' ? '' : "style='display:none;'") ?>>
     <div id='rank_select'>
         <?php foreach($ranks_prefill_data as $id => $rank): ?>
             <button onClick='prefillRank(<?= $rank['id'] ?>)'><?= $rank['id'] ?>: <?= $rank['name'] ?></button>

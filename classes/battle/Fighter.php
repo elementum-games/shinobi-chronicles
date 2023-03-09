@@ -8,6 +8,8 @@ abstract class Fighter {
     const BLOODLINE_OFFENSE_RATIO = self::SKILL_OFFENSE_RATIO * 0.8;
     const BLOODLINE_DEFENSE_MULTIPLIER = 35;
 
+    const SPEED_OFFENSE_RATIO = 0.2;
+
     const MIN_RAND = 33;
     const MAX_RAND = 37;
 
@@ -210,19 +212,22 @@ abstract class Fighter {
             echo "Debugging damage for {$this->getName()}<br />";
         }
 
+        $speed = $this->speed + $this->speed_boost;
+        $cast_speed = $this->cast_speed + $this->cast_speed_boost;
+
         switch($attack->jutsu_type) {
             case Jutsu::TYPE_TAIJUTSU:
-                $off_skill = $this->taijutsu_skill;
+                $off_skill = $this->taijutsu_skill + ($speed * Fighter::SPEED_OFFENSE_RATIO);
                 $off_boost = $this->taijutsu_boost;
                 $off_nerf = $this->taijutsu_nerf;
                 break;
             case Jutsu::TYPE_GENJUTSU:
-                $off_skill = $this->genjutsu_skill;
+                $off_skill = $this->genjutsu_skill + ($cast_speed * Fighter::SPEED_OFFENSE_RATIO);
                 $off_boost = $this->genjutsu_boost;
                 $off_nerf = $this->genjutsu_nerf;
                 break;
             case Jutsu::TYPE_NINJUTSU:
-                $off_skill = $this->ninjutsu_skill;
+                $off_skill = $this->ninjutsu_skill + ($cast_speed * Fighter::SPEED_OFFENSE_RATIO);
                 $off_boost = $this->ninjutsu_boost;
                 $off_nerf = $this->ninjutsu_nerf;
                 break;
@@ -281,7 +286,6 @@ abstract class Fighter {
         }
 
         $rand = mt_rand(self::MIN_RAND, self::MAX_RAND);
-        $disable_randomness = true;
         if($disable_randomness) {
             $rand = (self::MIN_RAND + self::MAX_RAND) / 2;
         }
