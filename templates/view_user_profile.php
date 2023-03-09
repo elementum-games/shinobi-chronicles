@@ -50,7 +50,7 @@ $clan_positions = array(
         <td style='width:50%;'>
 			<label style='width:6.5em;'>Level:</label> 	<?= $viewUser->level ?><br />
 			<label style='width:6.5em;'>Exp:</label> 	<?= $viewUser->exp ?><br />
-			<label style='width:6.5em;'>Rank:</label> 	<?= $ranks[$viewUser->rank] ?><br />
+			<label style='width:6.5em;'>Rank:</label> 	<?= $ranks[$viewUser->rank_num] ?><br />
             <br />
 
             <?php if($viewUser->gender != User::GENDER_NONE): ?>
@@ -94,11 +94,11 @@ $clan_positions = array(
         <tr><td style='text-align:center;' colspan='2'>
 			<a href='<?= $system->link ?>?id=2&page=new_message&sender=<?= $viewUser->user_name ?>'>Send Message</a>
 
-            <?php if($player->rank > 1): ?>
+            <?php if($player->rank_num > 1): ?>
                 &nbsp;&nbsp;|&nbsp;&nbsp;<a href='<?= $system->links['profile'] ?>&page=send_money&recipient=<?= $viewUser->user_name ?>'>Send Money</a>
                 &nbsp;&nbsp;|&nbsp;&nbsp;<a href='<?= $system->links['profile'] ?>&page=send_ak&recipient=<?= $viewUser->user_name ?>'>Send AK</a>
             <?php endif; ?>
-            <?php if($viewUser->rank >= 3 && $player->team): ?>
+            <?php if($viewUser->rank_num >= 3 && $player->team): ?>
                 <?php if($player->user_id == $player->team->leader && !$viewUser->team && !$viewUser->team_invite &&
                     $player->village == $viewUser->village): ?>
                     &nbsp;&nbsp; |  &nbsp;&nbsp;

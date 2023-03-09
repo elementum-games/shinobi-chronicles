@@ -34,7 +34,7 @@ function event() {
                     break;
                 }
 
-                $amount = $player->rank * 1000;
+                $amount = $player->rank_num * 1000;
 
                 $player->addMoney($amount, "Christmas event present");
                 $player->presents_claimed[] = 1227;
@@ -111,7 +111,7 @@ function event() {
                 }
 
 
-                $amount = $player->rank * 2000;
+                $amount = $player->rank_num * 2000;
 
                 $player->addMoney($amount, "Christmas event present");
                 $player->presents_claimed[] = 1230;

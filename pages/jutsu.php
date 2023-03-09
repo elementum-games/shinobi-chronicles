@@ -10,10 +10,10 @@ function jutsu(): void {
     $player->getInventory();
 
     $max_equipped_jutsu = 3;
-    if($player->rank >= 3) {
+    if($player->rank_num >= 3) {
         $max_equipped_jutsu++;
     }
-    if($player->rank >= 4) {
+    if($player->rank_num >= 4) {
         $max_equipped_jutsu++;
     }
     if($player->forbidden_seal_loaded && $player->forbidden_seal->level != 0) {

@@ -20,7 +20,7 @@ function battle(): bool {
 	if($player->battle_id) {
         $battle = new BattleManager($system, $player, $player->battle_id);
 
-		$pvp_yen = $player->rank * 50;
+		$pvp_yen = $player->rank_num * 50;
 
         $battle->checkTurn();
 
@@ -106,14 +106,14 @@ function battle(): bool {
 				throw new Exception("You cannot attack people from your own village!");
 			}
 
-            if($user->rank < 3) {
+            if($user->rank_num < 3) {
 				throw new Exception("You cannot attack people below Chuunin rank!");
 			}
-			if($player->rank < 3) {
+			if($player->rank_num < 3) {
 				throw new Exception("You cannot attack people Chuunin rank and higher!");
 			}
 
-            if($user->rank !== $player->rank) {
+            if($user->rank_num !== $player->rank_num) {
                 throw new Exception("You can only attack people of the same rank!");
             }
 

@@ -135,10 +135,10 @@ function calcDamage(Fighter $player1, Fighter $player2, Jutsu $player1_jutsu, Ju
     $collision_text = $battle->jutsuCollision(
         player1: $player1,
         player2: $player2,
-        player_damage: $player1_raw_damage,
-        opponent_damage: $player2_raw_damage,
-        player_jutsu: $player1_jutsu,
-        opponent_jutsu: $player2_jutsu
+        player1_damage: $player1_raw_damage,
+        player2_damage: $player2_raw_damage,
+        player1_jutsu: $player1_jutsu,
+        player2_jutsu: $player2_jutsu
     );
 
     $system->query("DELETE FROM battles WHERE `battle_id`={$battle_id}");
@@ -194,6 +194,9 @@ if(($_POST['mode'] ?? '') == 'scenarios' || ($_GET['mode'] ?? '') == 'scenarios'
     $mode = 'scenarios';
 }
 if(($_POST['mode'] ?? '') == 'vs' || ($_GET['mode'] ?? '') == 'vs') {
+    $mode = 'vs';
+}
+if(($_POST['mode'] ?? '') == 'speed_graph' || ($_GET['mode'] ?? '') == 'speed_graph') {
     $mode = 'vs';
 }
 
@@ -291,6 +294,100 @@ if(isset($_POST['run_simulation']) && $mode == 'vs') {
         echo $e->getMessage();
     }
 }
+else if(isset($_POST['run_simulation']) && $mode == 'speed_graph') {
+        $player1_data = $_POST['stats1'];
+        $player2_data = $_POST['stats2'];
+
+        $valid_jutsu_types = [
+            Jutsu::TYPE_NINJUTSU,
+            Jutsu::TYPE_TAIJUTSU,
+            Jutsu::TYPE_GENJUTSU,
+        ];
+        try {
+            if(!in_array($player1_data['jutsu_type'], $valid_jutsu_types)) {
+                throw new Exception("Invalid jutsu type for player 1!");
+            }
+            if(!in_array($player2_data['jutsu_type'], $valid_jutsu_types)) {
+                throw new Exception("Invalid jutsu type for player 2!");
+            }
+
+            $player1 = fighterFromData($player1_data, "Player 1");
+            $player1_jutsu = new Jutsu(
+                1,
+                'p1j',
+                $player1->rank,
+                $player1_data['jutsu_type'],
+                (int)$player1_data['jutsu_power'],
+                'none',
+                0,
+                0,
+                'no',
+                'nope',
+                0,
+                Jutsu::USE_TYPE_PROJECTILE,
+                0,
+                0,
+                Jutsu::PURCHASE_TYPE_PURCHASEABLE,
+                0,
+                Jutsu::ELEMENT_NONE,
+                1
+            );
+            $player1_jutsu->setLevel(50, 0);
+
+            $player2 = fighterFromData($player2_data, "Player 2");
+            $player2_jutsu = new Jutsu(
+                1,
+                'p1j',
+                $player2->rank,
+                $player2_data['jutsu_type'],
+                (int)$player2_data['jutsu_power'],
+                'none',
+                0,
+                0,
+                'no',
+                'nope',
+                0,
+                Jutsu::USE_TYPE_PROJECTILE,
+                0,
+                0,
+                Jutsu::PURCHASE_TYPE_PURCHASEABLE,
+                0,
+                Jutsu::ELEMENT_NONE,
+                1
+            );
+            $player2_jutsu->setLevel(50, 0);
+
+
+            $damages = calcDamage(
+                player1: $player1,
+                player2: $player2,
+                player1_jutsu: $player1_jutsu,
+                player2_jutsu: $player2_jutsu
+            );
+
+            echo "<div style='width:500px;background-color:#EAEAEA;text-align:center;margin-left:auto;margin-right:auto;
+            padding:8px;border:1px solid #000000;border-radius:10px;'>
+        Player 1:<br />
+        {$damages['player1']['raw_damage']} raw damage<br />
+        {$damages['player1']['collision_damage']} post-collision damage<br />
+        {$damages['player1']['damage']} final damage<br />";
+
+            if($damages['collision_text']) {
+                echo "<hr />" . $damages['collision_text'] . "<hr />";
+            }
+            else {
+                echo "<hr />";
+            }
+
+            echo "Player 2:<br />
+        {$damages['player2']['raw_damage']} raw damage<br />
+        {$damages['player2']['collision_damage']} post-collision damage<br />
+        {$damages['player2']['damage']} final damage<br />
+        </div>";
+        } catch (Exception $e) {
+            echo $e->getMessage();
+        }
+    }
 else if(isset($_POST['run_simulation']) && $mode == 'scenarios') {
     $base_level = $_POST['base_level'];
     $max_level = $_POST['max_level'];

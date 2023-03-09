@@ -19,10 +19,10 @@ function arena() {
 	}
 	else {
 		$result = $system->query("SELECT `ai_id`, `name`, `level` FROM `ai_opponents`
-			WHERE `rank` ='$player->rank' ORDER BY `level` ASC");
+			WHERE `rank` ='$player->rank_num' ORDER BY `level` ASC");
 
 		// Addition by Kengetsu - Get access to AI if rank is higher than public max.
-		if($player->rank > System::SC_MAX_RANK) {
+		if($player->rank_num > System::SC_MAX_RANK) {
 			$result = $system->query("SELECT `ai_id`, `name`, `level` FROM `ai_opponents`
 			WHERE `rank` ='" . System::SC_MAX_RANK . "' ORDER BY `level` ASC");
 		}
@@ -145,7 +145,7 @@ function arenaFight(): bool {
                 $stat_gain_chance -= ($player->level - $opponent->level) * 15;
             }
 
-            if($player->total_stats < $player->stat_cap && $stat_gain_chance >= mt_rand(1, 100)) {
+            if($player->total_stats < $player->rank->stat_cap && $stat_gain_chance >= mt_rand(1, 100)) {
                 $stat = '';
                 $highest_count = 0;
                 $highest_used_stats = array();

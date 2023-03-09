@@ -98,7 +98,9 @@ class User extends Fighter {
     public int $marriage_time;
     public $village;
     public $level;
-    public $rank;
+
+    public int $rank_num;
+    public Rank $rank;
 
     public $exp;
     public $staff_level;
@@ -162,8 +164,6 @@ class User extends Fighter {
     // Internal class variables
     public $inventory_loaded;
 
-    public $rank_name;
-
     public $last_update;
     public $last_active;
     public $forbidden_seal;
@@ -177,15 +177,6 @@ class User extends Fighter {
     public $profile_song;
     public $log_actions;
 
-    public int $base_level;
-    public int $max_level;
-    public int $base_stats;
-    public int $stats_per_level;
-    public int $health_gain;
-    public int $pool_gain;
-    public int $stat_cap;
-    public int $exp_per_level;
-    public int $stats_max_level;
     public int $regen_rate;
 
     public array $elements;
@@ -429,26 +420,15 @@ class User extends Fighter {
         }
 
         // Rank stuff
-        $this->rank = $user_data['rank'];
-        $rank_data = $this->system->query("SELECT * FROM `ranks` WHERE `rank_id`='$this->rank'");
+        $this->rank_num = $user_data['rank'];
+        $rank_data = $this->system->query("SELECT * FROM `ranks` WHERE `rank_id`='$this->rank_num'");
         if($this->system->db_last_num_rows == 0) {
             $this->system->message("Invalid rank!");
             $this->system->printMessage("Invalid rank!");
         }
         else {
             $rank_data = $this->system->db_fetch($rank_data);
-            $this->rank_name = $rank_data['name'];
-            $this->base_level = $rank_data['base_level'];
-            $this->max_level = $rank_data['max_level'];
-            $this->base_stats = $rank_data['base_stats'];
-            $this->stats_per_level = $rank_data['stats_per_level'];
-            $this->health_gain = $rank_data['health_gain'];
-            $this->pool_gain = $rank_data['pool_gain'];
-            $this->stat_cap = $rank_data['stat_cap'];
-
-            $this->exp_per_level = $this->stats_per_level * 10;
-
-            $this->stats_max_level = $this->base_stats + ($this->stats_per_level * ($this->max_level - $this->base_level));
+            $this->rank = Rank::fromDb($rank_data);
         }
 
         $this->gender = $user_data['gender'];
@@ -572,7 +552,7 @@ class User extends Fighter {
         $this->scout_range = 1;
         $this->stealth = 0;
 
-        if($this->rank > 3) {
+        if($this->rank_num > 3) {
             $this->scout_range++;
         }
         if($this->isHeadAdmin()) {
@@ -724,9 +704,9 @@ class User extends Fighter {
             }
 
             $this->bloodline->setBoostAmounts(
-                $this->rank,
+                $this->rank_num,
                 $this->ninjutsu_skill, $this->taijutsu_skill, $this->genjutsu_skill, $this->bloodline_skill,
-                $this->base_stats, $this->total_stats, $this->stats_max_level,
+                $this->rank->base_stats, $this->total_stats, $this->rank->max_level_stats,
                 $this->regen_rate
             );
 
@@ -870,7 +850,7 @@ class User extends Fighter {
                                 $this->jutsu[$jutsu_id]->level . '.';
 
                             $jutsu_skill_type = $this->jutsu[$jutsu_id]->jutsu_type . '_skill';
-                            if($this->total_stats < $this->stat_cap) {
+                            if($this->total_stats < $this->rank->stat_cap) {
                                 $this->{$jutsu_skill_type}++;
                                 $this->exp += 10;
                                 $message .= ' You have gained 1 ' . ucwords(str_replace('_', ' ', $jutsu_skill_type)) .
@@ -907,8 +887,8 @@ class User extends Fighter {
 
                     $total_stats = $this->total_stats + $gain;
 
-                    if($total_stats > $this->stat_cap) {
-                        $gain -= $total_stats - $this->stat_cap;
+                    if($total_stats > $this->rank->stat_cap) {
+                        $gain -= $total_stats - $this->rank->stat_cap;
                         if($gain < 0) {
                             $gain = 0;
                         }
@@ -1097,7 +1077,7 @@ class User extends Fighter {
 
             $result = $this->system->query(
                 "SELECT * FROM `jutsu` WHERE `jutsu_id` IN ({$player_jutsu_string})
-				AND `purchase_type` != '1' AND `rank` <= '{$this->rank}'"
+				AND `purchase_type` != '1' AND `rank` <= '{$this->rank_num}'"
             );
             if($this->system->db_last_num_rows > 0) {
                 while($jutsu_data = $this->system->db_fetch($result)) {
@@ -1408,7 +1388,7 @@ class User extends Fighter {
 		`marriage_time` = '$this->marriage_time',
 		`village` = '$this->village',
 		`level` = '$this->level',
-		`rank` = '$this->rank',
+		`rank` = '$this->rank_num',
 		`health` = '$this->health',
 		`max_health` = '$this->max_health',
 		`stamina` = '$this->stamina',
@@ -1595,7 +1575,7 @@ class User extends Fighter {
         if($this->bloodline_id && !empty($this->bloodline->jutsu)) {
             $jutsu_count = 0;
             foreach($this->bloodline->jutsu as $jutsu) {
-                if($jutsu->rank > $this->rank) {
+                if($jutsu->rank > $this->rank_num) {
                     continue;
                 }
                 $bloodline_jutsu[$jutsu_count]['jutsu_id'] = $jutsu->id;
@@ -1709,7 +1689,7 @@ class User extends Fighter {
     }
 
     public function expForNextLevel() {
-        return $this->exp_per_level * (($this->level + 1) - $this->base_level) + ($this->base_stats * 10);
+        return $this->rank->exp_per_level * (($this->level + 1) - $this->rank->base_level) + ($this->rank->base_stats * 10);
     }
 
     public function hasEquippedJutsu(int $jutsu_id): bool {

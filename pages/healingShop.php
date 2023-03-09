@@ -22,14 +22,14 @@ function healingShop() {
 	$health[4] = $rankManager->healthForRankAndLevel(4, $rankManager->ranks[4]->max_level);
 	// $health[5] = $rankManager->healthForRankAndLevel(5, $rankManager->ranks[5]->max_level);
 
-	$healing['vegetable']['cost'] = $player->rank * 5;
-	$healing['vegetable']['amount'] = $health[$player->rank] * 0.1;
+	$healing['vegetable']['cost'] = $player->rank_num * 5;
+	$healing['vegetable']['amount'] = $health[$player->rank_num] * 0.1;
 
-	$healing['pork']['cost'] = $player->rank * 20;
-	$healing['pork']['amount'] = $health[$player->rank] * 0.4;
+	$healing['pork']['cost'] = $player->rank_num * 20;
+	$healing['pork']['amount'] = $health[$player->rank_num] * 0.4;
 
-	$healing['deluxe']['cost'] = $player->rank * 40;
-	$healing['deluxe']['amount'] = $health[$player->rank] * 0.8;
+	$healing['deluxe']['cost'] = $player->rank_num * 40;
+	$healing['deluxe']['amount'] = $health[$player->rank_num] * 0.8;
 
 	if(isset($_GET['heal'])) {
 		try {
