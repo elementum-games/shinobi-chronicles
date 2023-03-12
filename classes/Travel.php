@@ -5,9 +5,9 @@ require_once __DIR__ . "/MapLocation.php";
 class Travel {
 
     const TRAVEL_DELAY_MOVEMENT = 400; // milliseconds
-    const TRAVEL_DELAY_PVP = 1; // seconds
-    const TRAVEL_DELAY_AI = 1; // seconds
-    const TRAVEL_DELAY_DEATH = 15; // seconds
+    const TRAVEL_DELAY_PVP = 1000; // milliseconds
+    const TRAVEL_DELAY_AI = 1000; // milliseconds
+    const TRAVEL_DELAY_DEATH = 15000; // milliseconds
     const HOME_VILLAGE_COLOR = 'FFEF30';
     const PLAYER_ICON = '/images/ninja_head.png';
     const DEFAULT_MAP_ID = 1;
@@ -48,21 +48,21 @@ class Travel {
                 $new_y += 1;
                 break;
         }
-        return new TravelCoords($new_x . '.' . $new_y . '.' . $current->z);
+        return new TravelCoords($new_x, $new_y, $current->map_id);
     }
 
-    public static function checkPVPDelay(int $last_pvp): int {
-        $diff = time() - $last_pvp;
+    public static function checkPVPDelay(int $last_pvp_ms): int {
+        $diff = System::currentTimeMs() - $last_pvp_ms;
         return self::TRAVEL_DELAY_PVP - $diff;
     }
 
-    public static function checkAIDelay(int $last_ai): int {
-        $diff = time() - $last_ai;
+    public static function checkAIDelay(int $last_ai_ms): int {
+        $diff = System::currentTimeMs() - $last_ai_ms;
         return self::TRAVEL_DELAY_AI - $diff;
     }
 
-    public static function checkDeathDelay(int $last_death): int {
-        $diff = time() - $last_death;
+    public static function checkDeathDelay(int $last_death_ms): int {
+        $diff = System::currentTimeMs() - $last_death_ms;
         return self::TRAVEL_DELAY_DEATH - $diff;
     }
 

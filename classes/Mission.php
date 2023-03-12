@@ -129,7 +129,7 @@ class Mission {
         if($this->current_stage['action_type'] == 'travel' || $this->current_stage['action_type'] == 'search') {
             for($i = 0; $i < 3; $i++) {
                 $location = $this->rollLocation($this->player->village_location);
-                if(!isset($villages[$location]) || $location == $this->player->village_location) {
+                if(!isset($villages[$location->fetchString()]) || $location->equals(TravelCoords::fromDbString($this->player->village_location))) {
                     break;
                 }
             }
@@ -228,7 +228,7 @@ class Mission {
         if($this->current_stage['action_type'] == 'travel' || $this->current_stage['action_type'] == 'search') {
             for($i = 0; $i < 3; $i++) {
                 $location = $this->rollLocation($this->player->village_location);
-                if(!isset($villages[$location]) || $location == $this->player->village_location) {
+                if(!isset($villages[$location->fetchString()]) || $location->equals(TravelCoords::fromDbString($this->player->village_location))) {
                     break;
                 }
             }
@@ -244,13 +244,13 @@ class Mission {
         return 1;
     }
 
-    public function rollLocation($starting_location): string {
-        $starting_location = new TravelCoords($starting_location);
+    public function rollLocation($starting_location): TravelCoords {
+        $starting_location = TravelCoords::fromDbString($starting_location);
 
         $max = $this->current_stage['location_radius'] * 2;
         $x = mt_rand(0, $max) - $this->current_stage['location_radius'];
         $y = mt_rand(0, $max) - $this->current_stage['location_radius'];
-        $z = Travel::DEFAULT_MAP_ID;
+        $map_id = $starting_location->map_id;
         if($x == 0 && $y == 0) {
             $x++;
         }
@@ -265,7 +265,7 @@ class Mission {
             $y = 1;
         }
 
-        $map_data = Travel::getMapData($this->system, $this->player->location->z);
+        $map_data = Travel::getMapData($this->system, $this->player->location->map_id);
 
         if($x > $map_data['end_x']) {
             $x = $map_data['end_x'];
@@ -274,7 +274,7 @@ class Mission {
             $y = $map_data['end_y'];
         }
 
-        return $x . '.' . $y . '.' . $z;
+        return new TravelCoords($x, $y, $map_id);
     }
 
     /**
@@ -288,9 +288,9 @@ class Mission {
             throw new Exception("You are already on a mission!");
         }
 
-        $fight_timer = 20;
-        if($player->last_ai > time() - $fight_timer) {
-            throw new Exception("Please wait " . ($player->last_ai - (time() - $fight_timer)) . " more seconds!");
+        $fight_timer = 20 * 1000;
+        if($player->last_ai_ms > System::currentTimeMs() - $fight_timer) {
+            throw new Exception("Please wait " . ($player->last_ai_ms - (System::currentTimeMs() - $fight_timer) / 1000) . " more seconds!");
         }
 
         $mission = new Mission($mission_id, $player);

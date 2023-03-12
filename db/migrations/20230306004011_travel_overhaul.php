@@ -97,21 +97,52 @@ final class TravelOverhaul extends AbstractMigration
                    (2, 2, 1, 1, 1, 'Safety', 5, 4, 1, 'Mist,Leaf,Stone,Sand,Cloud');
         ");
         // users modifications
+
+        // add new columns
         $this->execute("
             ALTER TABLE `users`
                 ADD COLUMN `attack_id`          varchar(255) DEFAULT NULL,
-                ADD COLUMN `attack_id_time`     int(11) DEFAULT NULL,
+                ADD COLUMN `attack_id_time_ms`  bigint(14) DEFAULT NULL,
                 ADD COLUMN `filters`            TEXT DEFAULT NULL,
                 ADD COLUMN `last_movement_ms`   bigint(14) NOT NULL DEFAULT 0;
         ");
+
+        // change from x.y to x:y:map_id
+        $stmt = $this->query("SELECT `user_id`, `location` FROM `users`");
+        while ($user_data = $stmt->fetch()) {
+            $loc_data = explode('.', $user_data['location']);
+            if (count($loc_data) > 1) {
+                $new_loc = $loc_data[0] . ':' . $loc_data[1];
+                $this->execute("UPDATE `users` SET `location`=? WHERE `user_id`=?",
+                    [$new_loc, $user_data['user_id']]
+                );
+            }
+        }
+
+        // add map_id to user location
         $this->execute("
             UPDATE `users`
-                SET `location` = concat(`location`, '.1');
+                SET `location` = concat(`location`, ':1');
         ");
+
+        // use milliseconds instead of seconds
         $this->execute("
-            UPDATE `villages`
-                SET `location` = concat(`location`, '.1');
+            ALTER TABLE `users`
+                CHANGE `last_pvp` `last_pvp_ms` BIGINT(14),
+                CHANGE `last_ai` `last_ai_ms` BIGINT(14),
+                CHANGE `last_death` `last_death_ms` BIGINT(14)
         ");
+
+        // change villages from x.y to x:y:map_id
+        $stmt = $this->query("SELECT `village_id`, `location` FROM `villages`");
+        while ($village_data = $stmt->fetch()) {
+            $loc_data = explode('.', $village_data['location']);
+            if (count($loc_data) > 1) {
+                $new_loc = $loc_data[0] . ':' . $loc_data[1] . ':1';
+                $this->execute("UPDATE `villages` SET `location`=? WHERE `village_id`=?",
+                [$new_loc, $village_data['village_id']]);
+            }
+        }
 
     }
 
@@ -125,14 +156,53 @@ final class TravelOverhaul extends AbstractMigration
 
         // maps_portal table
         $this->execute("DROP TABLE `maps_portals`");
-        // users modifications
+
+        //users modifications
+
+        // add new columns
+        $this->execute("
+            ALTER TABLE `users`
+                DROP COLUMN `attack_id`,
+                DROP COLUMN `attack_id_time_ms`,
+                DROP COLUMN `filters`,
+                DROP COLUMN `last_movement_ms`
+        ");
+
+        // change back to seconds
+        $this->execute("
+            ALTER TABLE `users`
+                CHANGE `last_pvp_ms` `last_pvp` INT(11),
+                CHANGE `last_ai_ms` `last_ai` INT(11),
+                CHANGE `last_death_ms` `last_death` INT(11)
+        ");
+
+        // undo from x:y:map_id to x.y
+        $stmt = $this->query("SELECT `user_id`, `location` FROM `users`");
+        while ($user_data = $stmt->fetch()) {
+            $loc_data = explode(':', $user_data['location']);
+            if (count($loc_data) > 1) {
+                $new_loc = $loc_data[0] . '.' . $loc_data[1];
+                $this->execute("UPDATE `users` SET `location`=? WHERE `user_id`=?",
+                    [$new_loc, $user_data['user_id']]
+                );
+            }
+        }
+
+        // remove map id from location
         $this->execute("
             UPDATE `users`
                 SET `location` = SUBSTR(`location`, length(`location`)-2);
         ");
-        $this->execute("
-            UPDATE `villages`
-                SET `location` = SUBSTR(`location`, length(`location`)-2);
-        ");
+
+        // undo from x:y:map_id to x:y
+        $stmt = $this->query("SELECT `village_id`, `location` FROM `villages`");
+        while ($village_data = $stmt->fetch()) {
+            $loc_data = explode(':', $village_data['location']);
+            if (count($loc_data) > 1) {
+                $new_loc = $loc_data[0] . '.' . $loc_data[1];
+                $this->execute("UPDATE `villages` SET `location`=? WHERE `village_id`=?",
+                    [$new_loc, $village_data['village_id']]);
+            }
+        }
     }
 }

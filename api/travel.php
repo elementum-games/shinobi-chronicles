@@ -34,7 +34,7 @@ try {
             break;
 
         case 'LoadMapData':
-            $TravelAPIResponse->response['response'] = $TravelManager->fetchMapData();
+            $TravelAPIResponse->response['response'] = $TravelManager->fetchMapDataAPI();
             if (empty($TravelAPIResponse->response['response'])) {
                 API::exitWithError("Failed to load map!");
             }

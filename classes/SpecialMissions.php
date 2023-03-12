@@ -212,7 +212,7 @@ class SpecialMission {
         // Village info
         $villages = $this->system->getVillageLocations();
         foreach ($villages as $village) {
-            $location = new TravelCoords($village['location']);
+            $location = TravelCoords::fromDbString($village['location']);
             self::$target_villages[$village['name']]['x'] = $location->x;
             self::$target_villages[$village['name']]['y'] = $location->y;
         }

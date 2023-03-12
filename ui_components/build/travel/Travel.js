@@ -6,7 +6,7 @@ import { ScoutArea } from "./ScoutArea.js";
  * @param {{
  * player_x:            int,
  * player_y:            int,
- * player_z:            int,
+ * player_map_id:       int,
  * player_id:           int,
  * player_icon:         string,
  * player_filters:      object,

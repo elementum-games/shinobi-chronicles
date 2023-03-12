@@ -32,7 +32,7 @@ function battle(): bool {
 			if($battle->isPlayerWinner()) {
 				$player->pvp_wins++;
 				$player->monthly_pvp++;
-				$player->last_pvp = time();
+				$player->last_pvp_ms = System::currentTimeMs();
 				$village_point_gain = 1;
 				$team_point_gain = 1;
 				$player->addMoney($pvp_yen, "PVP win");
@@ -57,8 +57,8 @@ function battle(): bool {
 				echo "You lose. You were taken back to your village by some allied ninja.<br />";
 				$player->health = 5;
 				$player->pvp_losses++;
-				$player->last_pvp = time();
-				$player->last_death = time();
+				$player->last_pvp_ms = System::currentTimeMs();
+				$player->last_death_ms = System::currentTimeMs();
 				$player->moveToVillage();
 
                 // If player is killed during a survival mission as a result of PVP, clear the survival mission
@@ -79,7 +79,7 @@ function battle(): bool {
 				echo "You both knocked each other out. You were taken back to your village by some allied ninja.<br />";
 				$player->health = 5;
 				$player->moveToVillage();
-				$player->last_pvp = time();
+				$player->last_pvp_ms = System::currentTimeMs();
 
                 // If player is killed during a survival mission as a result of PVP, clear the survival mission
                 if($player->mission_id != null)
@@ -130,7 +130,7 @@ function battle(): bool {
                 throw new Exception("You can only attack people of the same rank!");
             }
 
-			if($user->location->fetchString() !== $player->location->fetchString()) {
+			if(!$user->location->equals($player->location)) {
 				throw new Exception("Target is not at your location!");
 			}
 			if($user->battle_id) {
@@ -139,13 +139,13 @@ function battle(): bool {
 			if($user->last_active < time() - 120) {
 				throw new Exception("Target is inactive/offline!");
 			}
-			if($player->last_death > time() - 60) {
+			if($player->last_death_ms > System::currentTimeMs() - (60 * 1000)) {
 				throw new Exception("You died within the last minute, please wait " .
-					(($player->last_death + 60) - time()) . " more seconds.");
+					((($player->last_death_ms + (60 * 1000)) - System::currentTimeMs()) / 1000) . " more seconds.");
 			}
-			if($user->last_death > time() - 60) {
+			if($user->last_death_ms > System::currentTimeMs() - (60 * 1000)) {
 				throw new Exception("Target has died within the last minute, please wait " .
-					(($user->last_death + 60) - time()) . " more seconds.");
+					((($user->last_death_ms + (60 * 1000)) - System::currentTimeMs()) / 1000) . " more seconds.");
 			}
 
 			Battle::start($system, $player, $user, Battle::TYPE_FIGHT);

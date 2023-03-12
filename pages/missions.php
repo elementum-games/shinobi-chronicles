@@ -135,7 +135,7 @@ function runActiveMission() {
 
     if($mission_status < 2) {
         if($player->mission_stage['action_type'] == 'travel' or $player->mission_stage['action_type'] == 'search') {
-            if($player->location->fetchString() == $player->mission_stage['action_data']) {
+            if($player->location->equals(TravelCoords::fromDbString($player->mission_stage['action_data']))) {
                 // Team or solo
                 if($mission->mission_type == 3) {
                     $mission_status = $mission->nextTeamStage($player->mission_stage['stage_id'] + 1);
@@ -191,7 +191,7 @@ function runActiveMission() {
                         else if($player->mission_stage['stage_id'] > 2){
                             $player->mission_stage['stage_id'] -= 1;
                         }
-                        if ($player->location->fetchString() == $player->village_location) {
+                        if ($player->location->equals(TravelCoords::fromDbString($player->village_location))) {
                             $player->mission_stage['stage_id'] = 4;
                         }
 
@@ -300,7 +300,7 @@ function runActiveMission() {
         else if($mission->mission_type == 2) {
             $player->addMoney($mission->money, "Clan mission");
             $player->clearMission();
-            $player->last_ai = time();
+            $player->last_ai_ms = System::currentTimeMs();
 
             $point_gain = 1;
             $system->query("UPDATE `clans` SET `points`=`points`+$point_gain WHERE `clan_id`={$player->clan['id']} LIMIT 1");
@@ -346,7 +346,7 @@ function runActiveMission() {
 
             $player->addMoney($mission->money, "Village mission complete");
             $player->clearMission();
-            $player->last_ai = time();
+            $player->last_ai_ms = System::currentTimeMs();
 
             echo "<a href='$self_link'>Continue</a>
 					</td></tr></table>";

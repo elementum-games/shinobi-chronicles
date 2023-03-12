@@ -64,7 +64,7 @@ function spar() {
 			}
 			*/
 			
-			if($user['location'] != $player->location->fetchString()) {
+			if(!$player->location->equals(TravelCoords::fromDbString($user['location']))) {
 				throw new Exception("Target is not at your location!");
 			}
 			
@@ -105,7 +105,7 @@ function spar() {
                 throw new Exception("Invalid user! " . $e->getMessage());
             }
 			
-			if($user->location->fetchString() != $player->location->fetchString()) {
+			if(!$user->location->equals($player->location)) {
 				throw new Exception("Target is not at your location!");
 			}
 			

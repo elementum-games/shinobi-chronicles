@@ -18,16 +18,16 @@ class TravelManager {
         $this->system = $system;
         $this->user = $user;
 
-        $result = $this->system->query("SELECT * FROM `maps` WHERE `map_id`={$this->user->location->z}");
+        $result = $this->system->query("SELECT * FROM `maps` WHERE `map_id`={$this->user->location->map_id}");
         $this->map_data = $this->system->db_fetch($result);
     }
 
-    public function fetchMapData(): array {
+    public function fetchMapDataAPI(): array {
         // all locations
         $result = $this->system->query("
             SELECT * 
             FROM `maps_locations` 
-            WHERE `map_id`={$this->user->location->z}
+            WHERE `map_id`={$this->user->location->map_id}
             ");
         $locations = [];
         foreach ($this->system->db_fetch_all($result) as $loc) {
@@ -41,7 +41,7 @@ class TravelManager {
             FROM `maps_portals` 
             WHERE `entrance_x`={$this->user->location->x} 
               AND `entrance_y`={$this->user->location->y} 
-              AND `from_id`={$this->user->location->z} 
+              AND `from_id`={$this->user->location->map_id} 
               AND `active`=1
               ");
         if ($this->system->db_last_num_rows) {
@@ -53,14 +53,14 @@ class TravelManager {
         if ($this->user->mission_id
             && ($this->user->mission_stage['action_type'] == 'travel'
             || $this->user->mission_stage['action_type'] == 'search')
-            && $this->user->location->fetchString() == $this->user->mission_stage['action_data']) {
+            && $this->user->location->equals(TravelCoords::fromDbString($this->user->mission_stage['action_data']))) {
             $mission_button = true;
         }
 
         return [
             'player_x'          => $this->user->location->x,
             'player_y'          => $this->user->location->y,
-            'player_z'          => $this->user->location->z,
+            'player_map_id'          => $this->user->location->map_id,
             'player_id'         => $this->user->user_id,
             'player_filters'    => $this->user->filters,
             'player_icon'       => Travel::PLAYER_ICON,
@@ -97,17 +97,17 @@ class TravelManager {
             throw new Exception('Moving...');
         }
         // check if the user has exited an AI too recently
-        $ai_time_left = Travel::checkAIDelay($this->user->last_ai);
+        $ai_time_left = Travel::checkAIDelay($this->user->last_ai_ms);
         if ($ai_time_left > 0 && !$ignore_travel_restrictions) {
             throw new Exception('You have recently left an AI battle and cannot move for ' . $ai_time_left . ' seconds!');
         }
         // check if the user has exited battle too recently
-        $pvp_time_left = Travel::checkPVPDelay($this->user->last_pvp);
+        $pvp_time_left = Travel::checkPVPDelay($this->user->last_pvp_ms);
         if ($pvp_time_left > 0 && !$ignore_travel_restrictions) {
             throw new Exception('You have recently left a battle and cannot move for ' . $pvp_time_left . ' seconds!');
         }
         // check if the user has died to recently
-        $death_time_left = Travel::checkDeathDelay($this->user->last_death);
+        $death_time_left = Travel::checkDeathDelay($this->user->last_death_ms);
         if ($death_time_left > 0 && !$ignore_travel_restrictions) {
             throw new Exception('You are still recovering from a defeat and cannot move for ' . $death_time_left . ' seconds!');
         }
@@ -154,12 +154,12 @@ class TravelManager {
         // check if the user is trying to move to a village that is not theirs
         $villages = $this->system->getVillageLocations();
         if (isset($villages[$new_coords->fetchString()])
-            && $new_coords->fetchString() !== $this->user->village_location
+            && !$new_coords->equals(TravelCoords::fromDbString($this->user->village_location))
             && !$ignore_travel_restrictions) {
             throw new Exception('You cannot enter another village!');
         }
         // check if the user is entering their own village or out of it
-        if ($new_coords->fetchString() == $this->user->village_location) {
+        if ($new_coords->equals(TravelCoords::fromDbString($this->user->village_location))) {
             $this->user->in_village = true;
         } else {
             $this->user->in_village = false;
@@ -186,7 +186,7 @@ class TravelManager {
             throw new Exception('Unable to move!');
         }
         // check if the player is at the correct entrance
-        if (($this->user->location->z !== $portal_data['from_id']
+        if (($this->user->location->map_id !== $portal_data['from_id']
             || $this->user->location->x !== $portal_data['entrance_x']
             || $this->user->location->y !== $portal_data['entrance_y'])
             && !$ignore_travel_restrictions) {
@@ -200,7 +200,7 @@ class TravelManager {
         // update the player data
         $this->user->location->x = $portal_data['exit_x'];
         $this->user->location->y = $portal_data['exit_y'];
-        $this->user->location->z = $portal_data['to_id'];
+        $this->user->location->map_id = $portal_data['to_id'];
         $this->user->last_movement_ms = System::currentTimeMs();
         $this->user->updateData();
         return true;
@@ -224,13 +224,14 @@ class TravelManager {
         foreach ($users as $user) {
             // check if the user is nearby (including stealth
             $scout_range = max(0, $this->user->scout_range - $user['stealth']);
-            $location = new TravelCoords($user['location']);
-            if ($location->z !== $this->user->location->z ||
-                abs($location->x - $this->user->location->x) > $scout_range ||
-                abs($location->y - $this->user->location->y) > $scout_range) {
+            $location = TravelCoords::fromDbString($user['location']);
+            if ($location->map_id !== $this->user->location->map_id ||
+                $location->distanceDifference($this->user->location) > $scout_range) {
                 continue;
             }
-            $user['location_array'] = [$location->x, $location->y, $location->z];
+            $user['target_x'] = $location->x;
+            $user['target_y'] = $location->y;
+            $user['target_map_id'] = $location->map_id;
             // village icon
             $user['village_icon'] = TravelManager::VILLAGE_ICONS[$user['village']];
 
@@ -245,7 +246,7 @@ class TravelManager {
             // only display attack links if the same rank
             $user['attack'] = false;
             if ($user['rank'] === $this->user->rank
-                && $user['location'] === $this->user->location->fetchString()
+                && $this->user->location->equals(TravelCoords::fromDbString($user['location']))
                 && $user['user_id'] != $this->user->user_id
                 && $user['village'] !== $this->user->village) {
                 $user['attack'] = true;

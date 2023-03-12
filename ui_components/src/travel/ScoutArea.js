@@ -2,8 +2,11 @@
  * @param array{{
  * user_id:         int,
  * user_name:       string,
- * location_array:  [int, int, int],
+ * target_x:        int,
+ * target_y:        int,
+ * target_map_id:   int,
  * name:            string,
+ * rank:            int,
  * village_icon:    string,
  * alignment:       string,
  * attack:          boolean,
@@ -49,13 +52,13 @@ const Player = ({
     view_jonin
 }) => {
 
-    if (player_data.name === 'Akademi-sei' && view_as === false) {
+    if (parseInt(player_data.rank, 10) === 1 && view_as === false) {
         return (<></>);
-    } else if (player_data.name === 'Genin' && view_genin === false) {
+    } else if (parseInt(player_data.rank, 10) === 2 && view_genin === false) {
         return (<></>);
-    } else if (player_data.name === 'Chuunin' && view_chuunin === false) {
+    } else if (parseInt(player_data.rank, 10) === 3 && view_chuunin === false) {
         return (<></>);
-    } else if (player_data.name === 'Jonin' && view_jonin === false) {
+    } else if (parseInt(player_data.rank, 10) === 4 && view_jonin === false) {
         return (<></>);
     }
 
@@ -71,7 +74,7 @@ const Player = ({
                 </a>
             </div>
             <div className='travel-scout-location'>
-                {player_data.location_array[0]} &#8729; {player_data.location_array[1]}
+                {player_data.target_x} &#8729; {player_data.target_y}
             </div>
             <div className='travel-scout-faction'>
                 <img src={'./' + player_data.village_icon} alt='mist' />

@@ -89,7 +89,7 @@ function travel() {
         }
 		
 		// Village check
-		if($player->location->fetchString() === $player->village_location) {
+		if($player->location->equals(TravelCoords::fromDbString($player->village_location))) {
 			$player->in_village = true;
 		}
 		else {
@@ -218,7 +218,7 @@ function renderMap($player, $villages, $icons) {
     for($y = 1; $y <= System::MAP_SIZE_Y; $y++) {
         $output .= "<tr>";
         for($x = 1; $x <= System::MAP_SIZE_X; $x++) {
-            $key = $x . '.' . $y;
+            $key = $x . ':' . $y;
             if(isset($villages[$key])) {
                 $output .= "<td class='village' style='background-image: url(./images/village_icons/" . $icons[$villages[$key]['count']] . ');';
                 if($key == $player->village_location) {
