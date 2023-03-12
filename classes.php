@@ -2,6 +2,7 @@
 
 require_once __DIR__ . "/classes/EntityId.php";
 require_once __DIR__ . "/classes/System.php";
+require_once __DIR__ . "/classes/Auth.php";
 
 require_once __DIR__ . "/classes/RankManager.php";
 
@@ -29,3 +30,5 @@ require_once __DIR__ . "/classes/InboxAPIResponse.php";
 require_once __DIR__ . "/classes/Travel.php";
 require_once __DIR__ . "/classes/TravelManager.php";
 require_once __DIR__ . "/classes/TravelAPIResponse.php";
+require_once __DIR__ . "/classes/TravelCoords.php";
+require_once __DIR__ . "/classes/MapLocation.php";
