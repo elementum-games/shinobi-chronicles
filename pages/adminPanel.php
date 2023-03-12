@@ -56,7 +56,8 @@ function adminPanel() {
         'give_bloodline',
         'logs',
         'stat_cut',
-        'dev_tools'
+        'dev_tools',
+        'staff_compensation'
     ];
 
     // Menu
@@ -1748,6 +1749,52 @@ function adminPanel() {
         }
 
         require 'templates/admin/dev_tools.php';
+    }
+    else if($page == 'staff_compensation') {
+        $self_link .= "&page=staff_compensation";
+        $base_rates = [
+            StaffManager::STAFF_HEAD_ADMINISTRATOR => 1000,
+            StaffManager::STAFF_ADMINISTRATOR => 750,
+            StaffManager::STAFF_CONTENT_ADMIN => 500,
+            StaffManager::STAFF_HEAD_MODERATOR => 200,
+            StaffManager::STAFF_MODERATOR => 25,
+        ];
+        $staff_members = [];
+        $result = $system->query("SELECT `user_name`, `user_id`, `staff_level` FROM `users` 
+            WHERE `staff_level` > " . StaffManager::STAFF_NONE);
+        if($system->db_last_num_rows) {
+            $staff_members = $system->db_fetch_all($result);
+        }
+
+        if(isset($_POST['comp_staff'])) {
+            try {
+                foreach ($staff_members as $member) {
+                    if (isset($_POST['include_' . $member['user_id']])) {
+                        $rate = (int)$_POST['pay_' . $member['user_id']];
+                        echo "Payment of $rate issued to " . $member['user_name'] . ".</br>";
+                        if ($member['user_id'] == $player->user_id) {
+                            $player->addPremiumCredits($rate, "Staff Compensation");
+                        } else {
+                            $user = User::findByName($system, $member['user_name']);
+                            if ($user == null) {
+                                throw new Exception("Invalid user " . $member['user_name'] . "!");
+                            }
+                            $user->loadData();
+                            $user->addPremiumCredits($rate, "Staff Compensation");
+                            $user->updateData();
+                        }
+                    } else {
+                        echo "No payment for " . $member['user_name'] . "<br />";
+                    }
+                }
+            }catch (Exception $e) {
+                $system->message($e->getMessage());
+            }
+        }
+        if($system->message) {
+            $system->printMessage();
+        }
+        require 'templates/admin/staff_compensation.php';
     }
 
 }
