@@ -51,34 +51,37 @@ function premium() {
     $costs['reset_ai_battles'] = 10;
     $costs['reset_pvp_battles'] = 20;
 
+    // Stat Transfers
+    $stat_transfer_points_per_min = 10;
+    $stat_transfer_points_per_ak = 300;
+
+    if($player->rank_num >= 3) {
+        $stat_transfer_points_per_min += 5;
+        $stat_transfer_points_per_ak = 450;
+    }
+    if($player->rank_num >= 4) {
+        $stat_transfer_points_per_min += 5;
+        $stat_transfer_points_per_ak = 600;
+    }
+
+    if($player->forbidden_seal_loaded) {
+        $stat_transfer_points_per_min += $player->forbidden_seal->stat_transfer_boost;
+        $stat_transfer_points_per_ak += $player->forbidden_seal->extra_stat_transfer_points_per_ak;
+    }
+
+    // Free stat transfers
     $free_stat_change_timer = 86400;
     $max_free_stat_change_amount = 100;
     if(System::currentYear() === 2023 && System::currentMonth() === 3 && System::currentDay() < 19) {
-        $free_stat_change_timer = 7 * 86400;
-        $max_free_stat_change_amount = 75000;
+        $free_stat_change_timer = 4 * 86400;
+        $max_free_stat_change_amount = 40000;
+        $stat_transfer_points_per_min *= 10;
     }
 
     $free_stat_change_cooldown_left = $player->last_free_stat_change - (time() - $free_stat_change_timer);
     $free_stat_change_timer_hours = $free_stat_change_timer / 3600;
 
-    $stat_transfer_points_per_min = 10;
-    $stat_transfer_points_per_ak = 300;
-
-    //Apply premium boost
-    if($player->forbidden_seal_loaded) {
-        $stat_transfer_points_per_min += $player->forbidden_seal->stat_transfer_boost;
-    }
-    //Apply Chuunin boost
-    if($player->rank_num >= 3) {
-        $stat_transfer_points_per_min += 5;
-        $stat_transfer_points_per_ak = 350;
-    }
-    //Apply Jonin boost
-    if($player->rank_num >= 4) {
-        $stat_transfer_points_per_min += 5;
-        $stat_transfer_points_per_ak = 400;
-    }
-
+    // Clans
 	$available_clans = array();
 
 	if($player->clan) {

@@ -166,12 +166,12 @@ class User extends Fighter {
     public ?int $team_invite;
 
     // Internal class variables
-    public $inventory_loaded;
+    public bool $inventory_loaded;
 
-    public $last_update;
-    public $last_active;
-    public $forbidden_seal;
-    public $forbidden_seal_loaded;
+    public int $last_update;
+    public int $last_active;
+    public ?ForbiddenSeal $forbidden_seal = null;
+    public bool $forbidden_seal_loaded = false;
     public $chat_color;
     public $chat_effect;
     public $last_login;
@@ -281,8 +281,10 @@ class User extends Fighter {
 
         $this->last_login = $result['last_login'];
 
-        $this->forbidden_seal = $result['forbidden_seal'];
-        $this->forbidden_seal_loaded = false;
+        if($result['forbidden_seal']) {
+            $this->setForbiddenSealFromDb($result['forbidden_seal'], false);
+            $this->regen_boost += $this->regen_rate * ($this->forbidden_seal->regen_boost / 100);
+        }
         $this->chat_color = $result['chat_color'];
         $this->chat_effect = $result['chat_effect'];
 
@@ -314,10 +316,11 @@ class User extends Fighter {
     /**
      * @param System $system
      * @param int    $user_id
+     * @param bool   $remote_view
      * @return User
      * @throws Exception
      */
-    public static function loadFromId(System $system, int $user_id): User {
+    public static function loadFromId(System $system, int $user_id, bool $remote_view = false): User {
         $user = new User($user_id);
 
         $result = $system->query("SELECT 
@@ -358,16 +361,16 @@ class User extends Fighter {
 
         $user->last_login = $result['last_login'];
 
-        $user->forbidden_seal = $result['forbidden_seal'];
+        if($result['forbidden_seal']) {
+            $user->setForbiddenSealFromDb($result['forbidden_seal'], $remote_view);
+            $user->regen_boost += $user->regen_rate * ($user->forbidden_seal->regen_boost / 100);
+        }
         $user->chat_color = $result['chat_color'];
 
         $user->censor_explicit_language = (bool)$result['censor_explicit_language'];
 
-        if($user->ban_type && $user->ban_expire <= time()) {
-            $system->message("Your " . $user->ban_type . " ban has ended.");
-            $user->ban_type = '';
-
-            $system->query("UPDATE `users` SET `ban_type`='', `ban_expire`='0' WHERE `user_id`='$user->user_id' LIMIT 1");
+        if(!$remote_view) {
+            $user->checkBanExpiry();
         }
 
         $user->inventory_loaded = false;
@@ -377,17 +380,18 @@ class User extends Fighter {
 
     /**
      * @param System $system
-     * @param int    $user_id
-     * @return User
+     * @param string $name
+     * @param bool   $remote_view
+     * @return User|null
      * @throws Exception
      */
-    public static function findByName(System $system, string $name): ?User {
+    public static function findByName(System $system, string $name, bool $remote_view = true): ?User {
         $result = $system->query("SELECT
                `user_id` FROM `users` WHERE `user_name`='{$name}'");
         $user_id = $system->db_fetch($result)['user_id'] ?? null;
 
         if($user_id) {
-            return User::loadFromId($system, $user_id);
+            return User::loadFromId(system: $system, user_id: $user_id, remote_view: $remote_view);
         }
 
         return null;
@@ -791,21 +795,8 @@ class User extends Fighter {
 
         // Forbidden seal
         if($user_data['forbidden_seal']) {
-            // Prep seal data from DB
-            $forbidden_seal = json_decode($user_data['forbidden_seal'], true);
-            // Set seal data
-            $this->forbidden_seal = new ForbiddenSeal($this->system, $forbidden_seal['level'], $forbidden_seal['time']);
-            $this->forbidden_seal_loaded = true;
-            // Check if seal is expired & remove if it is
-            if(!$remote_view) {
-                $this->forbidden_seal->checkExpiration();
-            }
-            // If seal is not expired, load benefits & apply seal regen boost
-            if($this->forbidden_seal->level != 0) {
-                $this->forbidden_seal->setBenefits();
-                /** REGEN BOOST **/
-                $this->regen_boost += $this->regen_rate * ($this->forbidden_seal->regen_boost/100);
-            }
+            $this->setForbiddenSealFromDb($user_data['forbidden_seal'], $remote_view);
+            $this->regen_boost += $this->regen_rate * ($this->forbidden_seal->regen_boost / 100);
         }
 
         //In Village Regen
@@ -1028,6 +1019,25 @@ class User extends Fighter {
             }
         }
         return false;
+    }
+
+    public function setForbiddenSealFromDb(string $forbidden_seal_db, bool $remote_view) {
+        // Prep seal data from DB
+        $forbidden_seal = json_decode($forbidden_seal_db, true);
+
+        // Set seal data
+        $this->forbidden_seal = new ForbiddenSeal($this->system, $forbidden_seal['level'], $forbidden_seal['time']);
+        $this->forbidden_seal_loaded = true;
+
+        // Check if seal is expired & remove if it is
+        if(!$remote_view) {
+            $this->forbidden_seal->checkExpiration();
+        }
+
+        // If seal is not expired, load benefits & apply seal regen boost
+        if($this->forbidden_seal->level != 0) {
+            $this->forbidden_seal->setBenefits();
+        }
     }
 
     /**

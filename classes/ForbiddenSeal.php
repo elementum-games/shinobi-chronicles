@@ -22,6 +22,7 @@ class ForbiddenSeal {
     public int $extra_armor_equips;
     public int $extra_weapon_equips;
     public int $stat_transfer_boost;
+    public int $extra_stat_transfer_points_per_ak;
     public float $long_training_time;
     public float $long_training_gains;
     public float $extended_training_time;
@@ -50,7 +51,8 @@ class ForbiddenSeal {
             'journal_image_display' => '300x200',
             'chat_post_size' => 350,
             'pm_size' => 1000,
-            'stat_transfer_boost' => 0
+            'stat_transfer_boost' => 0,
+            'extra_stat_transfer_points_per_ak' => 0,
         ],
         1 => [
             'regen_boost' => 10,
@@ -77,6 +79,7 @@ class ForbiddenSeal {
             'extended_training_time' => 1,
             'extended_training_gains' => 1,
             'stat_transfer_boost' => 0,
+            'extra_stat_transfer_points_per_ak' => 50,
         ],
         2 => [
             'regen_boost' => 20, //Report in whole percentages (20 will be .2 bonus)
@@ -103,6 +106,7 @@ class ForbiddenSeal {
             'extended_training_time' => 1.5,
             'extended_training_gains' => 2,
             'stat_transfer_boost' => 5,
+            'extra_stat_transfer_points_per_ak' => 100,
         ]
     );
 
@@ -168,6 +172,7 @@ class ForbiddenSeal {
         $this->extended_training_time = self::$benefits[$this->level]['extended_training_time'];
         $this->extended_training_gains = self::$benefits[$this->level]['extended_training_gains'];
         $this->stat_transfer_boost = self::$benefits[$this->level]['stat_transfer_boost'];
+        $this->extra_stat_transfer_points_per_ak = self::$benefits[$this->level]['extra_stat_transfer_points_per_ak'];
 
         // Display variables
         $this->name_color_display = self::$benefits[$this->level]['name_color_display'];
