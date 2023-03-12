@@ -186,9 +186,7 @@ class TravelManager {
             throw new Exception('Unable to move!');
         }
         // check if the player is at the correct entrance
-        if (($this->user->location->map_id !== $portal_data['from_id']
-            || $this->user->location->x !== $portal_data['entrance_x']
-            || $this->user->location->y !== $portal_data['entrance_y'])
+        if (!$this->user->location->equals(new TravelCoords($portal_data['entrance_x'], $portal_data['entrance_y'], $portal_data['from_id']))
             && !$ignore_travel_restrictions) {
             throw new Exception('You cannot enter here!');
         }
