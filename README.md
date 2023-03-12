@@ -150,3 +150,16 @@ docker compose up -d
 ```
 
 This will set up mysql and perform database migration in order to initialize database with needed data.
+
+## Remote Server Setup reference (CentOS 7)
+
+#### Install PHP 8 CLI 
+- `yum install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm`
+- `yum install -y https://rpms.remirepo.net/enterprise/remi-release-7.rpm`
+- `yum install -y --enablerepo=remi-php80 php php-cli php-mysqlnd`
+
+#### Install dependencies and setup database
+- `composer install`
+- `vendor/bin/phinx seed:run`
+- `vendor/bin/phinx migrate`
+
