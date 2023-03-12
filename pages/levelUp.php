@@ -145,6 +145,17 @@ function rankUp(): bool {
 					break;
 			}
 		}
+        // Add laziness for Head Admin testing
+        if(!empty($_POST['skip_exam'])) {
+            try {
+                if(!$player->isHeadAdmin()) {
+                    throw new Exception("Cheater!");
+                }
+                $player->exam_stage = 4;
+            }catch (Exception $e) {
+                $system->message($e->getMessage());
+            }
+        }
 		
 		// Display
 		$system->printMessage();
@@ -295,8 +306,11 @@ function rankUp(): bool {
 			<form action='$self_link' method='post'>
 			<input type='hidden' id='hand_seal_input' name='hand_seals' value='{$_POST['hand_seals']}' />
 			<p style='text-align:center;'>
-				<input type='submit' name='attack' value='Submit' />
-			</p>
+				<input type='submit' name='attack' value='Submit' />";
+            if($player->isHeadAdmin()) {
+                echo "<input type='submit' name='skip_exam' value='Skip Exam' />";
+            }
+			echo "</p>
 			</form>
 			</div>
 			</td></tr>";
@@ -538,7 +552,15 @@ function rankUp(): bool {
 				
 		// Input	
 		if(!empty($_POST)) {
-			if($player->exam_stage == 1) {
+            if(isset($_POST['skip_exam'])) {
+                if(!$player->isHeadAdmin()) {
+                    $system->message("Cheater!");
+                }
+                else {
+                    $player->exam_stage = 6;
+                }
+            }
+			else if($player->exam_stage == 1) {
 				$answer1 = $_POST['question1'];
 				$answer2 = $_POST['question2'];
 				$answer3 = $_POST['question3'];
@@ -633,8 +655,11 @@ function rankUp(): bool {
 				<input type='radio' name='question3' value='Sand' /> Sand<br />
 				<br />
 				
-				<input type='submit' value='Submit Answers' />
-				</form>
+				<input type='submit' value='Submit Answers' />";
+				    if($player->isHeadAdmin()) {
+                        echo "<input type='submit' name='skip_exam' value='Skip Exam' />";
+                    }
+                echo "</form>
 				
 				</td></tr></table>";
 				
@@ -926,6 +951,14 @@ function rankUp(): bool {
 		// Input	
 		if(!empty($_POST)) {
 			if($player->exam_stage == 1) {
+                if(isset($_POST['skip_exam'])) {
+                    if(!$player->isHeadAdmin()) {
+                        $system->message("Cheater!");
+                    }
+                    else {
+                        $player->exam_stage = 2;
+                    }
+                }
 				if(isset($_POST['start_exam'])) {
 					$mission_id = 10;
 				
@@ -950,8 +983,11 @@ function rankUp(): bool {
 			echo $exam_instructions . 
 				"<tr><td style='text-align:center;'>
 				<form action='$self_link' method='post'>
-					<button type='submit' name='start_exam'>Start mission</button>
-				</form>
+					<button type='submit' name='start_exam'>Start mission</button>";
+				if($player->isHeadAdmin()) {
+                    echo "<button type='submit' name='skip_exam'>Skip Exam</button>";
+                }
+            echo "</form>
 				</td></tr>";
 		}
 		else if($player->exam_stage == 2) { // Pass
