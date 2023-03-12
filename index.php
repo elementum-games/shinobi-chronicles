@@ -373,7 +373,7 @@ if($LOGGED_IN) {
 				if($player->rank > 2 && $routes[$id]['village_ok'] == System::NOT_IN_VILLAGE && isset($villages[$player->location->fetchString()])) {
 					throw new Exception("You cannot access this page while in a village!");
 				}
-				if($routes[$id]['village_ok'] == System::ONLY_IN_VILLAGE && !$player->location->equals(TravelCoords::fromDbString($player->village_location))) {
+				if($routes[$id]['village_ok'] == System::ONLY_IN_VILLAGE && !$player->location->equals($player->village_location)) {
                     $contents_arr = [];
                     foreach($_GET as $key => $val) {
                         $contents_arr[] = "GET[{$key}]=$val";

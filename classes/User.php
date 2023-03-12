@@ -109,7 +109,7 @@ class User extends Fighter {
     public int $bloodline_id;
     public $bloodline_name;
     public $clan;
-    public $village_location;
+    public TravelCoords $village_location;
     public $in_village;
     public $location;
     public MapLocation $current_location;
@@ -505,7 +505,6 @@ class User extends Fighter {
             array_unshift($this->stats, 'bloodline_skill');
         }
 
-        if ($user_data['location'])
         $this->location = TravelCoords::fromDbString($user_data['location']);
         $this->current_location = Travel::getLocation($this->system, $this->location->x, $this->location->y, $this->location->map_id);
         $this->last_movement_ms = $user_data['last_movement_ms'];
@@ -611,8 +610,8 @@ class User extends Fighter {
         $result = $this->system->query("SELECT `location` FROM `villages` WHERE `name`='{$this->village}' LIMIT 1");
         if($this->system->db_last_num_rows != 0) {
             $result = $this->system->db_fetch($result);
-            $this->village_location = $result['location'];
-            if($this->location->equals(TravelCoords::fromDbString($this->village_location))) {
+            $this->village_location = TravelCoords::fromDbString($result['location']);
+            if($this->location->equals($this->village_location)) {
                 $this->in_village = true;
             }
         }
@@ -980,7 +979,7 @@ class User extends Fighter {
         // Correction location
         $villages = $this->system->getVillageLocations();
         if(isset($villages[$this->location->fetchString()]) &&
-            !$this->location->equals(TravelCoords::fromDbString($this->village_location)) &&
+            !$this->location->equals($this->village_location) &&
             !$this->isHeadAdmin()
         ) {
             $this->location->x--;
@@ -1411,7 +1410,7 @@ class User extends Fighter {
     /* function moteToVillage()
         moves user to village */
     public function moveToVillage() {
-        $this->location = TravelCoords::fromDbString($this->village_location);
+        $this->location = $this->village_location;
     }
 
     /* function updateData()

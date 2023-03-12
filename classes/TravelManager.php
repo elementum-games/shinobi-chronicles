@@ -154,12 +154,12 @@ class TravelManager {
         // check if the user is trying to move to a village that is not theirs
         $villages = $this->system->getVillageLocations();
         if (isset($villages[$new_coords->fetchString()])
-            && !$new_coords->equals(TravelCoords::fromDbString($this->user->village_location))
+            && !$new_coords->equals($this->user->village_location)
             && !$ignore_travel_restrictions) {
             throw new Exception('You cannot enter another village!');
         }
         // check if the user is entering their own village or out of it
-        if ($new_coords->equals(TravelCoords::fromDbString($this->user->village_location))) {
+        if ($new_coords->equals($this->user->village_location)) {
             $this->user->in_village = true;
         } else {
             $this->user->in_village = false;

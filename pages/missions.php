@@ -191,7 +191,7 @@ function runActiveMission() {
                         else if($player->mission_stage['stage_id'] > 2){
                             $player->mission_stage['stage_id'] -= 1;
                         }
-                        if ($player->location->equals(TravelCoords::fromDbString($player->village_location))) {
+                        if ($player->location->equals($player->village_location)) {
                             $player->mission_stage['stage_id'] = 4;
                         }
 

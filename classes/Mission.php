@@ -102,7 +102,7 @@ class Mission {
             $this->current_stage = array(
                 'stage_id' => $stage_id + 1,
                 'action_type' => 'travel',
-                'action_data' => $this->player->village_location,
+                'action_data' => $this->player->village_location->fetchString(),
                 'description' => 'Report back to the village to complete the mission.'
             );
             if($this->mission_type == 5) {
@@ -129,7 +129,7 @@ class Mission {
         if($this->current_stage['action_type'] == 'travel' || $this->current_stage['action_type'] == 'search') {
             for($i = 0; $i < 3; $i++) {
                 $location = $this->rollLocation($this->player->village_location);
-                if(!isset($villages[$location->fetchString()]) || $location->equals(TravelCoords::fromDbString($this->player->village_location))) {
+                if(!isset($villages[$location->fetchString()]) || $location->equals($this->player->village_location)) {
                     break;
                 }
             }
@@ -191,7 +191,7 @@ class Mission {
             $this->current_stage = array(
                 'stage_id' => $stage_id + 1,
                 'action_type' => 'travel',
-                'action_data' => $this->player->village_location,
+                'action_data' => $this->player->village_location->fetchString(),
                 'description' => 'Report back to the village to complete the mission.'
             );
             $this->player->mission_stage = $this->current_stage;
@@ -228,7 +228,7 @@ class Mission {
         if($this->current_stage['action_type'] == 'travel' || $this->current_stage['action_type'] == 'search') {
             for($i = 0; $i < 3; $i++) {
                 $location = $this->rollLocation($this->player->village_location);
-                if(!isset($villages[$location->fetchString()]) || $location->equals(TravelCoords::fromDbString($this->player->village_location))) {
+                if(!isset($villages[$location->fetchString()]) || $location->equals($this->player->village_location)) {
                     break;
                 }
             }
@@ -244,8 +244,7 @@ class Mission {
         return 1;
     }
 
-    public function rollLocation($starting_location): TravelCoords {
-        $starting_location = TravelCoords::fromDbString($starting_location);
+    public function rollLocation(TravelCoords $starting_location): TravelCoords {
 
         $max = $this->current_stage['location_radius'] * 2;
         $x = mt_rand(0, $max) - $this->current_stage['location_radius'];
