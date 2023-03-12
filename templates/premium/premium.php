@@ -182,7 +182,7 @@
                 You can transfer points from one stat to another. This costs Ancient Kunai and takes time to complete, both
                 cost and time increase
                 the higher your stat amount is. Stat transfers under <?= $max_free_stat_change_amount ?> are free but have a <b><?= $free_stat_change_timer_hours ?> hour cool down</b>.<br/>
-                <?php if($free_stat_change_cooldown_left): ?>
+                <?php if($free_stat_change_cooldown_left > 0): ?>
                     <br /><b>Free stat change cooldown remaining</b><br />
                     <?= $system->time_remaining($free_stat_change_cooldown_left)?>
                 <?php endif; ?>
