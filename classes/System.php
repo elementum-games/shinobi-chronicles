@@ -244,6 +244,7 @@ class System {
         }
 
         $this->api_links['inbox'] = $this->link . 'api/inbox.php';
+        $this->api_links['travel'] = $this->link . 'api/travel.php';
 
         $this->timezoneOffset = date('Z');
 
@@ -429,6 +430,9 @@ class System {
         }
     }
 
+    public static function currentTimeMs(): int {
+        return floor(microtime(true) * 1000);
+    }
 
     /**
      * Logs an error message(usually from DB), displays a generic error message to user, displays page end, then exits script.

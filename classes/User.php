@@ -7,6 +7,7 @@ require_once __DIR__ . "/Team.php";
 require_once __DIR__ . "/DailyTask.php";
 require_once __DIR__ . "/ForbiddenSeal.php";
 require_once __DIR__ . "/battle/Fighter.php";
+require_once __DIR__ . "/TravelCoords.php";
 require_once __DIR__ . "/StaffManager.php";
 
 /*	Class:		User
@@ -62,6 +63,7 @@ class User extends Fighter {
     const UPDATE_NOTHING = 0;
     const UPDATE_REGEN = 1;
     const UPDATE_FULL = 2;
+    const ATTACK_LINK_DURATION_MIN = 10;
 
     public static int $jutsu_train_gain = 5;
 
@@ -109,12 +111,14 @@ class User extends Fighter {
     public int $bloodline_id;
     public $bloodline_name;
     public $clan;
-    public $village_location;
+    public TravelCoords $village_location;
     public $in_village;
-    public $location; // x.y
-    public $x;
-    public $y;
-
+    public $location;
+    public MapLocation $current_location;
+    public float $last_movement_ms;
+    public string $attack_id;
+    public int $attack_id_time_ms;
+    public array $filters;
     public $train_type;
     public $train_gain;
     public $train_time;
@@ -200,12 +204,12 @@ class User extends Fighter {
 
     public int $exam_stage;
 
-    public int $last_ai;
+    public int $last_ai_ms;
 
     public int $last_free_stat_change;
 
-    public int $last_pvp;
-    public int $last_death;
+    public int $last_pvp_ms;
+    public int $last_death_ms;
 
     private int $premium_credits;
     public int $premium_credits_purchased;
@@ -484,10 +488,10 @@ class User extends Fighter {
 
         $this->exam_stage = $user_data['exam_stage'];
 
-        $this->last_ai = $user_data['last_ai'];
+        $this->last_ai_ms = $user_data['last_ai_ms'];
         $this->last_free_stat_change = $user_data['last_free_stat_change'];
-        $this->last_pvp = $user_data['last_pvp'];
-        $this->last_death = $user_data['last_death'];
+        $this->last_pvp_ms = $user_data['last_pvp_ms'];
+        $this->last_death_ms = $user_data['last_death_ms'];
 
         $this->layout = $user_data['layout'];
 
@@ -499,10 +503,30 @@ class User extends Fighter {
             array_unshift($this->stats, 'bloodline_skill');
         }
 
-        $this->location = $user_data['location']; // x.y
-        $location = explode(".", $this->location);
-        $this->x = $location[0];
-        $this->y = $location[1];
+        $this->location = TravelCoords::fromDbString($user_data['location']);
+        $this->current_location = Travel::getLocation($this->system, $this->location->x, $this->location->y, $this->location->map_id);
+        $this->last_movement_ms = $user_data['last_movement_ms'];
+        // generate a new attack link if it's been 10 minutes
+        if ($user_data['attack_id_time_ms'] <= (System::currentTimeMs() - (60 * User::ATTACK_LINK_DURATION_MIN * 1000))) {
+            $this->attack_id = uniqid($this->id . ':');
+            $this->attack_id_time_ms = System::currentTimeMs();
+        } else {
+            $this->attack_id = $user_data['attack_id'];
+            $this->attack_id_time_ms = $user_data['attack_id_time_ms'];
+        }
+
+        if ($user_data['filters'] === null) {
+            $filters = [
+                'travel_filter' => [
+                    'Akademi-sei'   => true,
+                    'Genin'         => true,
+                    'Chuunin'       => true,
+                    'Jonin'         => true
+                    ]
+            ];
+            $user_data['filters'] = json_encode($filters);
+        }
+        $this->filters = json_decode($user_data['filters'], true);
 
         $this->train_type = $user_data['train_type'];
         $this->train_gain = $user_data['train_gain'];
@@ -584,8 +608,8 @@ class User extends Fighter {
         $result = $this->system->query("SELECT `location` FROM `villages` WHERE `name`='{$this->village}' LIMIT 1");
         if($this->system->db_last_num_rows != 0) {
             $result = $this->system->db_fetch($result);
-            $this->village_location = $result['location'];
-            if($this->location === $this->village_location) {
+            $this->village_location = TravelCoords::fromDbString($result['location']);
+            if($this->location->equals($this->village_location)) {
                 $this->in_village = true;
             }
         }
@@ -785,8 +809,14 @@ class User extends Fighter {
         }
 
         //In Village Regen
-        if($this->in_village) {
-            $this->regen_boost += 20 + $this->regen_rate;
+//        if($this->in_village) {
+//            // regen boost or regen rate?
+//            $this->regen_boost += ($this->regen_rate / 2);
+//        }
+
+        // Location with Regen Boost
+        if ($this->current_location->location_id && $this->current_location->regen) {
+            $this->regen_boost += ($this->current_location->regen / 100) * $this->regen_rate;
         }
 
         // Elements
@@ -946,11 +976,11 @@ class User extends Fighter {
 
         // Correction location
         $villages = $this->system->getVillageLocations();
-        if(isset($villages[$this->location]) &&
-            $this->location !== $this->village_location &&
+        if(isset($villages[$this->location->fetchString()]) &&
+            !$this->location->equals($this->village_location) &&
             !$this->isHeadAdmin()
         ) {
-            $this->x--;
+            $this->location->x--;
         }
 
         return $display;
@@ -1379,9 +1409,6 @@ class User extends Fighter {
         moves user to village */
     public function moveToVillage() {
         $this->location = $this->village_location;
-        $location = explode('.', $this->location);
-        $this->x = $location[0];
-        $this->y = $location[1];
     }
 
     /* function updateData()
@@ -1389,7 +1416,6 @@ class User extends Fighter {
         -Parameters-
     */
     public function updateData() {
-        $this->location = $this->x . '.' . $this->y;
 
         $query = "UPDATE `users` SET
 		`current_ip` = '$this->current_ip',
@@ -1435,7 +1461,11 @@ class User extends Fighter {
 
         $query .= "`battle_id` = '$this->battle_id',
 		`challenge` = '$this->challenge',
-		`location` = '$this->location',";
+		`last_movement_ms` = '$this->last_movement_ms',
+		`attack_id` = '$this->attack_id',
+		`attack_id_time_ms` = '$this->attack_id_time_ms',
+		`location` = '".$this->location->fetchString()."',
+		`filters` = '".json_encode($this->filters)."',";
         if($this->mission_id) {
             if(is_array($this->mission_stage)) {
                 $mission_stage = json_encode($this->mission_stage);
@@ -1457,10 +1487,10 @@ class User extends Fighter {
         }
 
         $query .= "`exam_stage` = '{$this->exam_stage}',
-		`last_ai` = '$this->last_ai',
+		`last_ai_ms` = '$this->last_ai_ms',
 		`last_free_stat_change` = '{$this->last_free_stat_change}',
-		`last_pvp` = '$this->last_pvp',
-		`last_death` = '$this->last_death',";
+		`last_pvp_ms` = '$this->last_pvp_ms',
+		`last_death_ms` = '$this->last_death_ms',";
 
         $forbidden_seal = $this->forbidden_seal;
         if($this->forbidden_seal_loaded) {
@@ -1944,10 +1974,10 @@ class User extends Fighter {
             'chat_color' => '',
             'current_ip' => $_SERVER['REMOTE_ADDR'],
             'profile_song' => '',
-            'last_ai' => 0,
+            'last_ai_ms' => 0,
             'last_free_stat_change' => 0,
-            'last_pvp' => 0,
-            'last_death' => 0,
+            'last_pvp_ms' => 0,
+            'last_death_ms' => 0,
 
             'mission_stage' => '',
             'ban_type' => '',

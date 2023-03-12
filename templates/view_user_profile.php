@@ -192,7 +192,7 @@ $clan_positions = array(
                     <?php endif; ?>
 
                     <!--// Last AI-->
-                    Last AI battle started: <?= System::timeRemaining(time() - $viewUser->last_ai, 'short') ?> ago<br />
+                    Last AI battle started: <?= System::timeRemaining((System::currentTimeMs() - $viewUser->last_ai_ms) / 1000, 'short') ?> ago<br />
 
                     <!--// Current training-->
                     <?php $display = ''; ?>

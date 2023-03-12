@@ -360,7 +360,7 @@ $clan_positions = [
     <br />
     <label style='width:<?= $label_width ?>;'>Gender:</label> <?= $player->gender ?><br />
     <label style='width:<?= $label_width ?>;'>Village:</label> <?= $player->village ?><br />
-    <label style='width:<?= $label_width ?>;'>Location:</label> <?= $player->location ?><br />
+    <label style='width:<?= $label_width ?>;'>Location:</label> <?= $player->location->x . '.' . $player->location->y ?><br />
     <label style='width:<?= $label_width ?>;'>Money:</label> &yen;<?= $player->getMoney() ?><br />
     <label style='width:<?= $label_width ?>;'>Ancient Kunai:</label> <?= $player->getPremiumCredits() ?><br />
     <label style='width:<?= $label_width ?>;'>Ancient Kunai purchased:</label> <?= $player->premium_credits_purchased ?><br />

@@ -102,7 +102,7 @@ class Mission {
             $this->current_stage = array(
                 'stage_id' => $stage_id + 1,
                 'action_type' => 'travel',
-                'action_data' => $this->player->village_location,
+                'action_data' => $this->player->village_location->fetchString(),
                 'description' => 'Report back to the village to complete the mission.'
             );
             if($this->mission_type == 5) {
@@ -129,7 +129,7 @@ class Mission {
         if($this->current_stage['action_type'] == 'travel' || $this->current_stage['action_type'] == 'search') {
             for($i = 0; $i < 3; $i++) {
                 $location = $this->rollLocation($this->player->village_location);
-                if(!isset($villages[$location]) || $location == $this->player->village_location) {
+                if(!isset($villages[$location->fetchString()]) || $location->equals($this->player->village_location)) {
                     break;
                 }
             }
@@ -191,7 +191,7 @@ class Mission {
             $this->current_stage = array(
                 'stage_id' => $stage_id + 1,
                 'action_type' => 'travel',
-                'action_data' => $this->player->village_location,
+                'action_data' => $this->player->village_location->fetchString(),
                 'description' => 'Report back to the village to complete the mission.'
             );
             $this->player->mission_stage = $this->current_stage;
@@ -228,7 +228,7 @@ class Mission {
         if($this->current_stage['action_type'] == 'travel' || $this->current_stage['action_type'] == 'search') {
             for($i = 0; $i < 3; $i++) {
                 $location = $this->rollLocation($this->player->village_location);
-                if(!isset($villages[$location]) || $location == $this->player->village_location) {
+                if(!isset($villages[$location->fetchString()]) || $location->equals($this->player->village_location)) {
                     break;
                 }
             }
@@ -244,18 +244,18 @@ class Mission {
         return 1;
     }
 
-    public function rollLocation($starting_location): string {
-        $starting_location = explode('.', $starting_location);
+    public function rollLocation(TravelCoords $starting_location): TravelCoords {
 
         $max = $this->current_stage['location_radius'] * 2;
         $x = mt_rand(0, $max) - $this->current_stage['location_radius'];
         $y = mt_rand(0, $max) - $this->current_stage['location_radius'];
+        $map_id = $starting_location->map_id;
         if($x == 0 && $y == 0) {
             $x++;
         }
 
-        $x += $starting_location[0];
-        $y += $starting_location[1];
+        $x += $starting_location->x;
+        $y += $starting_location->y;
 
         if($x < 1) {
             $x = 1;
@@ -264,14 +264,16 @@ class Mission {
             $y = 1;
         }
 
-        if($x > System::MAP_SIZE_X) {
-            $x = System::MAP_SIZE_X;
+        $map_data = Travel::getMapData($this->system, $this->player->location->map_id);
+
+        if($x > $map_data['end_x']) {
+            $x = $map_data['end_x'];
         }
-        if($y > System::MAP_SIZE_Y) {
-            $y = System::MAP_SIZE_Y;
+        if($y > $map_data['end_y']) {
+            $y = $map_data['end_y'];
         }
 
-        return $x . '.' . $y;
+        return new TravelCoords($x, $y, $map_id);
     }
 
     /**
@@ -285,9 +287,9 @@ class Mission {
             throw new Exception("You are already on a mission!");
         }
 
-        $fight_timer = 20;
-        if($player->last_ai > time() - $fight_timer) {
-            throw new Exception("Please wait " . ($player->last_ai - (time() - $fight_timer)) . " more seconds!");
+        $fight_timer = 20 * 1000;
+        if($player->last_ai_ms > System::currentTimeMs() - $fight_timer) {
+            throw new Exception("Please wait " . ($player->last_ai_ms - (System::currentTimeMs() - $fight_timer) / 1000) . " more seconds!");
         }
 
         $mission = new Mission($mission_id, $player);

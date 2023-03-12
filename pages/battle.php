@@ -32,7 +32,7 @@ function battle(): bool {
 			if($battle->isPlayerWinner()) {
 				$player->pvp_wins++;
 				$player->monthly_pvp++;
-				$player->last_pvp = time();
+				$player->last_pvp_ms = System::currentTimeMs();
 				$village_point_gain = 1;
 				$team_point_gain = 1;
 				$player->addMoney($pvp_yen, "PVP win");
@@ -57,8 +57,8 @@ function battle(): bool {
 				echo "You lose. You were taken back to your village by some allied ninja.<br />";
 				$player->health = 5;
 				$player->pvp_losses++;
-				$player->last_pvp = time();
-				$player->last_death = time();
+				$player->last_pvp_ms = System::currentTimeMs();
+				$player->last_death_ms = System::currentTimeMs();
 				$player->moveToVillage();
 
                 // If player is killed during a survival mission as a result of PVP, clear the survival mission
@@ -79,7 +79,7 @@ function battle(): bool {
 				echo "You both knocked each other out. You were taken back to your village by some allied ninja.<br />";
 				$player->health = 5;
 				$player->moveToVillage();
-				$player->last_pvp = time();
+				$player->last_pvp_ms = System::currentTimeMs();
 
                 // If player is killed during a survival mission as a result of PVP, clear the survival mission
                 if($player->mission_id != null)
@@ -91,15 +91,28 @@ function battle(): bool {
 			$player->battle_id = 0;
 		}
 	}
-	else if($_GET['attack']) {
+	else if(isset($_GET['attack'])) {
 		try {
-			$attack_id = (int)$system->clean($_GET['attack']);
+			$attack_id = $system->clean($_GET['attack']);
 
 			try {
+                // get user id off the attack link
+                $result = $system->query("SELECT `user_id` FROM `users` WHERE `attack_id`='{$attack_id}' LIMIT 1");
+                if ($system->db_last_num_rows == 0) {
+                    throw new Exception("Invalid user!");
+                }
+                $attack_link = $system->db_fetch($result);
+                $attack_id = $attack_link['user_id'];
+
 			    $user = new User($attack_id);
 			    $user->loadData(User::UPDATE_NOTHING, true);
             } catch(Exception $e) {
                 throw new Exception("Invalid user! " . $e->getMessage());
+            }
+
+            // check if the location forbids pvp
+            if ($player->current_location->location_id && $player->current_location->pvp_allowed == 0) {
+                throw new Exception("You cannot fight at this location!");
             }
 
 			if($user->village == $player->village) {
@@ -117,7 +130,7 @@ function battle(): bool {
                 throw new Exception("You can only attack people of the same rank!");
             }
 
-			if($user->location !== $player->location) {
+			if(!$user->location->equals($player->location)) {
 				throw new Exception("Target is not at your location!");
 			}
 			if($user->battle_id) {
@@ -126,13 +139,13 @@ function battle(): bool {
 			if($user->last_active < time() - 120) {
 				throw new Exception("Target is inactive/offline!");
 			}
-			if($player->last_death > time() - 60) {
+			if($player->last_death_ms > System::currentTimeMs() - (60 * 1000)) {
 				throw new Exception("You died within the last minute, please wait " .
-					(($player->last_death + 60) - time()) . " more seconds.");
+					((($player->last_death_ms + (60 * 1000)) - System::currentTimeMs()) / 1000) . " more seconds.");
 			}
-			if($user->last_death > time() - 60) {
+			if($user->last_death_ms > System::currentTimeMs() - (60 * 1000)) {
 				throw new Exception("Target has died within the last minute, please wait " .
-					(($user->last_death + 60) - time()) . " more seconds.");
+					((($user->last_death_ms + (60 * 1000)) - System::currentTimeMs()) / 1000) . " more seconds.");
 			}
 
 			Battle::start($system, $player, $user, Battle::TYPE_FIGHT);

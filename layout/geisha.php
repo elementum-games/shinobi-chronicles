@@ -66,7 +66,7 @@ HTML;
 
 $side_menu_start = <<<HTML
 	</div>
-	<div id='sideMenu'>
+	<div id='sideMenu' class='sm-tmp-class {$side_menu_location_status_class}'>
 	
 	<ul class='menu'>
 	<h2><p>User Menu</p></h2>

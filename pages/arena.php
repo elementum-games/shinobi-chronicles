@@ -6,7 +6,7 @@ function arena() {
 	global $player;
 	global $self_link;
 
-    $fight_timer = 4;
+  $fight_timer = 4 * 1000;
 
 	if($player->exam_stage > 0) {
 		$system->message("You cannot access this page during the exam!");
@@ -38,11 +38,15 @@ function arena() {
 		}
 		$fight_start = false;
 		if(!empty($_GET['fight'])) {
-			if($player->last_ai > time() - $fight_timer) {
-				$system->message("Please wait " . ($player->last_ai - (time() - $fight_timer)) . " more seconds!");
+
+            // check if the current location disallows ai fights
+            if ($player->current_location->location_id && $player->current_location->ai_allowed == 0) {
+                $system->message('You cannot fight at this location');
+            }
+            else if($player->last_ai_ms > System::currentTimeMs() - $fight_timer) {
+				$system->message("Please wait " . ($player->last_ai_ms - (System::currentTimeMs() - $fight_timer) / 1000) . " more seconds!");
 			}
 			else if(isset($ai_opponents[$_GET['fight']])) {
-
 
                 try {
                     $ai_id = $_GET['fight'];
@@ -50,7 +54,7 @@ function arena() {
                     $ai->loadData();
                     $ai->health = $ai->max_health;
 
-                    $player->last_ai = time();
+                    $player->last_ai_ms = System::currentTimeMs();
                     Battle::start($system, $player, $ai, Battle::TYPE_AI_ARENA);
 
                     arena();
@@ -202,7 +206,7 @@ function arenaFight(): bool {
             echo "</td></tr></table>";
             $player->ai_wins++;
             $player->battle_id = 0;
-            $player->last_pvp = time();
+            $player->last_pvp_ms = System::currentTimeMs();
 
             // Daily Tasks
             foreach ($player->daily_tasks as $task) {
@@ -219,7 +223,7 @@ function arenaFight(): bool {
             $player->ai_losses++;
 			$player->moveToVillage();
             $player->battle_id = 0;
-            $player->last_pvp = time();
+            $player->last_pvp_ms = System::currentTimeMs();
 
             // Daily Tasks
             foreach ($player->daily_tasks as &$task) {
@@ -235,7 +239,7 @@ function arenaFight(): bool {
 			$player->health = 5;
 			$player->moveToVillage();
             $player->battle_id = 0;
-            $player->last_pvp = time();
+            $player->last_pvp_ms = System::currentTimeMs();
 
             // Daily Tasks
             foreach ($player->daily_tasks as $task) {
