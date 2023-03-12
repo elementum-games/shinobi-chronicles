@@ -13,6 +13,10 @@
  * @var int $kunai_per_dollar
  * @var int $stat_transfer_points_per_min
  * @var int $stat_transfer_points_per_ak
+ * @var int $max_free_stat_change_amount
+ * @var int $free_stat_change_timer_hours
+ * @var int $free_stat_change_cooldown_left
+ *
  * @var string $paypal_url
  * @var string $paypal_business_id
  * @var string $paypal_listener_url
@@ -145,6 +149,8 @@
                 let stats = {};
                 let pointsPerMin = <?= $stat_transfer_points_per_min ?>;
                 let pointsPerAk = <?= $stat_transfer_points_per_ak ?>;
+                let maxFreeStatChangeAmount = <?= $max_free_stat_change_amount ?>;
+                let freeStatChangeActive = Boolean(<?= ($free_stat_change_cooldown_left <= 0) ?>);
                 let statBeingTransferred = 'ninjutsu_skill';
 
                 function statSelectChange() {
@@ -156,7 +162,7 @@
                 function statAllocateCostDisplay() {
                     let cost;
                     const transferAmount = parseInt($('#transferAmount').val());
-                    if (transferAmount <= 10) {
+                    if (transferAmount <= maxFreeStatChangeAmount && freeStatChangeActive) {
                         cost = 0;
                     }
                     else {
@@ -175,8 +181,12 @@
             <td style='text-align:center;'>
                 You can transfer points from one stat to another. This costs Ancient Kunai and takes time to complete, both
                 cost and time increase
-                the higher your stat amount is.<br/>
-                Stat transfers under 10 are free but have a <b>24 hour cool down</b>.<br/>
+                the higher your stat amount is. Stat transfers under <?= $max_free_stat_change_amount ?> are free but have a <b><?= $free_stat_change_timer_hours ?> hour cool down</b>.<br/>
+                <?php if($free_stat_change_cooldown_left): ?>
+                    <br /><b>Free stat change cooldown remaining</b><br />
+                    <?= $system->time_remaining($free_stat_change_cooldown_left)?>
+                <?php endif; ?>
+                
                 <form action='<?= $self_link ?>&view=character_changes' method='post'>
                     <br/>
                     Transfer<br/>

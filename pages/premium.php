@@ -52,6 +52,15 @@ function premium() {
     $costs['reset_pvp_battles'] = 20;
 
     $free_stat_change_timer = 86400;
+    $max_free_stat_change_amount = 100;
+    if(System::currentYear() === 2023 && System::currentMonth() === 3 && System::currentDay() < 19) {
+        $free_stat_change_timer = 7 * 86400;
+        $max_free_stat_change_amount = 75000;
+    }
+
+    $free_stat_change_cooldown_left = $player->last_free_stat_change - (time() - $free_stat_change_timer);
+    $free_stat_change_timer_hours = $free_stat_change_timer / 3600;
+
     $stat_transfer_points_per_min = 10;
     $stat_transfer_points_per_ak = 300;
 
@@ -313,7 +322,7 @@ function premium() {
 
             // Amount to reset to
             $reset_amount = 5;
-            if(strpos($original_stat, 'skill') !== false) {
+            if(str_contains($original_stat, 'skill')) {
                 $reset_amount = 10;
             }
 
@@ -327,23 +336,10 @@ function premium() {
 				throw new Exception("Invalid transfer amount!");
 			}
 
-            $is_free_stat_change = $transfer_amount <= 10;
+            $is_free_stat_change = $transfer_amount <= $max_free_stat_change_amount && $free_stat_change_cooldown_left <= 0;
 
 			if($is_free_stat_change) {
 				$akCost = 0;
-
-				// Check for last free stat change
-	            if($player->last_free_stat_change > time() - $free_stat_change_timer) {
-	                throw new Exception (
-	                    "You cannot stat transfer for free currently." . "<br />" .
-                        "Time remaining: " . System::timeRemaining(
-                            $player->last_free_stat_change - (time() - $free_stat_change_timer),
-                            'long',
-                            false,
-                            true
-                        )
-                    );
-	            }
 			}
             else {
 				$akCost = 1 + floor($transfer_amount / $stat_transfer_points_per_ak);

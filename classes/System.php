@@ -920,6 +920,31 @@ class System {
         return ucwords(str_replace('_', ' ', $slug));
     }
 
+    public static function currentYear(): int {
+        return (int) date('Y', time());
+    }
+
+    /**
+     * @return int month of the year: 1-12
+     */
+    public static function currentMonth(): int {
+        return (int) date('n', time());
+    }
+
+    /**
+     * @return int day of the month: 1-31
+     */
+    public static function currentDay(): int {
+        return (int) date('j', time());
+    }
+
+    /**
+     * @return int hour of the day in 24-hour format: 0-23
+     */
+    public static function currentHour(): int {
+        return (int) date('G', time());
+    }
+
     public function getKunaiPacks(): array {
         $kunai_packs = [
             [
@@ -955,4 +980,3 @@ class System {
         return $filename . "?q=" .  filemtime($filename);
     }
 }
-
