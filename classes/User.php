@@ -9,6 +9,7 @@ require_once __DIR__ . "/ForbiddenSeal.php";
 require_once __DIR__ . "/battle/Fighter.php";
 require_once __DIR__ . "/TravelCoords.php";
 require_once __DIR__ . "/StaffManager.php";
+require_once __DIR__ . "/RankManager.php"; //Required to be present this class for static pages
 
 /*	Class:		User
 	Purpose:	Fetch user data and load into class variables.
@@ -920,6 +921,113 @@ class User extends Fighter {
             }
         }
         return false;
+    }
+
+    public function logoutLimit() {
+        $limit = System::LOGOUT_LIMIT;
+        if($this->staff_manager->hasAdminPanel()) {
+            $limit = 1440;
+        }
+        elseif($this->forbidden_seal) {
+            if(!$this->forbidden_seal_loaded) {
+                $this->loadData(self::UPDATE_NOTHING);
+            }
+            $limit = $this->forbidden_seal->logout_timer;
+        }
+        return $limit;
+    }
+    public function generateSideMenu($side_menu_start, $side_menu_end, $debug = false) {
+        $routes = require 'routes.php';
+        $menu_items = array();
+        $logout_limit = $this->logoutLimit();
+        $time_remaining = $logout_limit * 60 - (time() - $this->last_login);
+        $logout_display = System::timeRemaining($time_remaining, 'short', false, true) . " remaining";
+        foreach($routes as $id => $page) {
+            //No Menu
+            if(!isset($page['menu']) || $page['menu'] == 'none') {
+                continue;
+            }
+            //Min Rank
+            if(isset($page['min_rank']) && $this->rank_num < $page['min_rank']) {
+                continue;
+            }
+            //Village only
+            if($page['menu'] == System::MENU_VILLAGE && !$this->in_village) {
+                continue;
+            }
+            //Additional village checks
+            if(isset($page['village_ok'])) {
+                if($page['village_ok'] == System::NOT_IN_VILLAGE && $this->in_village && $this->rank_num >= System::APPLY_RESTRICTION_RANK) {
+                    continue;
+                }
+                if($page['village_ok'] == System::ONLY_IN_VILLAGE && !$this->in_village) {
+                    continue;
+                }
+            }
+            if($page['menu'] == 'conditional') {
+                if(isset($page['condition'])) {
+                    $condition = $page['condition'];
+                    //Special case rank check
+                    if(str_contains($condition, 'rankNum')) {
+                        $rank_num = explode("_", $condition)[1];
+                        if($this->rank_num < $rank_num) {
+                            continue;
+                        }
+                        $page['menu'] = System::MENU_USER;
+                    }
+                    //Skip bloodlines
+                    if($id == System::PAGE_IDS['bloodline']) {
+                        continue;
+                    }
+                    //Clan
+                    if($condition == 'hasClan') {
+                        //Must be in a clan and in village for menu item to be present
+                        if(!$this->clan || !$this->in_village) {
+                            continue;
+                        }
+                        $page['menu'] = System::MENU_VILLAGE;
+                    }
+                    //Staff Menu Items
+                    if($condition == 'isSupportStaff') {
+                        if(!$this->isSupportStaff()) {
+                            continue;
+                        }
+                        $page['menu'] = System::MENU_STAFF;
+                    }
+                    if($condition == 'isModerator') {
+                        if(!$this->staff_manager->isModerator()) {
+                            continue;
+                        }
+                        $page['menu'] = System::MENU_STAFF;
+                    }
+                    if($condition == 'hasAdminPanel') {
+                        if(!$this->staff_manager->hasAdminPanel()) {
+                            continue;
+                        }
+                        $page['menu'] = System::MENU_STAFF;
+                    }
+                }
+                else {
+                    continue;
+                }
+            }
+            $menu_items[$page['menu']][] = [
+                'link' => $this->system->link . "?id=$id",
+                'id' => $id,
+                'menu_id' => "sideMenuOption-" . str_replace(' ', '', $page['title']),
+                'title' => $page['title']
+            ];
+        }
+        if($debug) {
+            foreach ($menu_items as $menu_name => $items) {
+                echo "<b>$menu_name</b><br />";
+                foreach ($items as $item) {
+                    echo $item['id'] . " - " . $item['title'] . "<br />";
+                }
+                echo "<br />";
+            }
+        }
+        require 'templates/sideMenu.php';
     }
 
     public function setForbiddenSealFromDb(string $forbidden_seal_db, bool $remote_view) {

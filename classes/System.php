@@ -19,10 +19,12 @@ class System {
     const MENU_USER = 'user';
     const MENU_ACTIVITY = 'activity';
     const MENU_VILLAGE = 'village';
+    const MENU_STAFF = 'staff';
 
     const NOT_IN_VILLAGE = 0;
     const IN_VILLAGE_OKAY = 1;
     const ONLY_IN_VILLAGE = 2;
+    const APPLY_RESTRICTION_RANK = 3;
 
     const CURRENCY_TYPE_MONEY = 'money';
     const CURRENCY_TYPE_PREMIUM_CREDITS = 'premium_credits';
@@ -32,6 +34,11 @@ class System {
     const SC_ADMIN_EMAIL = "admin@shinobichronicles.com";
     const SC_NO_REPLY_EMAIL = "no-reply@shinobichronicles.com";
     const UNSERVICEABLE_EMAIL_DOMAINS = ['hotmail.com', 'live.com', 'msn.com', 'outlook.com'];
+    const DEVELOPER_ADMINS = [
+        1, //Lsm
+        190, //jake6s (previously added in index)
+        254, //Hitori
+    ];
 
     public static array $villages = ['Stone', 'Cloud', 'Leaf', 'Sand', 'Mist'];
 
@@ -123,6 +130,7 @@ class System {
         'admin' => 17,
         'report' => 18,
         'battle' => 19,
+        'clan' => 20,
         'premium' => 21,
         'spar' => 22,
         'team' => 24,
@@ -770,7 +778,7 @@ class System {
         echo str_replace("[HEADER_TITLE]", "Rules", $body_start);
     }
 
-    public function renderStaticPageFooter($layout = System::DEFAULT_LAYOUT): void {
+    public function renderStaticPageFooter($layout = System::DEFAULT_LAYOUT, $player = false): void {
         $system = $this;
 
         require($this->fetchLayoutByName($layout));
@@ -782,8 +790,13 @@ class System {
          * @var $login_menu
          * @var $footer
          */
-        if(isset($_SESSION['user_id'])) {
+        if($player instanceof User) {
+            require_once 'classes.php';
+            $player->generateSideMenu($side_menu_start, $side_menu_end);
+        }
+        elseif(isset($_SESSION['user_id'])) {
             echo $side_menu_start;
+
             echo $side_menu_end;
         }
         else {

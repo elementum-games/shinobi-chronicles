@@ -45,6 +45,7 @@ $pages = [
         'battle_ok' => false,
         'village_ok' => System::IN_VILLAGE_OKAY,
         'menu' => 'conditional',
+        'condition' => 'hasBloodline'
     ],
     6 => [
         'file_name' => 'members.php',
@@ -58,11 +59,13 @@ $pages = [
         'function_name' => 'team',
         'min_rank' => 3,
         'menu' => 'conditional',
+        'condition' => 'rankNum_3'
     ],
     29 => [
         'file_name' => 'marriage.php',
         'title' => 'Marriage',
         'function_name' => 'marriage',
+        'village_ok' => System::ONLY_IN_VILLAGE,
         'menu' => System::MENU_USER,
     ],
 
@@ -156,6 +159,7 @@ $pages = [
         'title' => 'Clan',
         'function_name' => 'clan',
         'menu' => 'conditional',
+        'condition' => 'hasClan',
     ],
     21 => [
         'file_name' => 'premium.php',
@@ -169,6 +173,8 @@ $pages = [
         'file_name' => 'supportPanel.php',
         'title' => 'Support Panel',
         'function_name' => 'supportPanel',
+        'menu' => 'conditional',
+        'condition' => 'isSupportStaff',
         'user_check' => function(User $u) {
             return $u->isSupportStaff();
         }
@@ -177,6 +183,8 @@ $pages = [
         'file_name' => 'modPanel.php',
         'title' => 'Mod Panel',
         'function_name' => 'modPanel',
+        'menu' => 'conditional',
+        'condition' => 'isModerator',
         'user_check' => function(User $u) {
             return $u->isModerator();
         }
@@ -185,6 +193,8 @@ $pages = [
         'file_name' => 'adminPanel.php',
         'title' => 'Admin Panel',
         'function_name' => 'adminPanel',
+        'menu' => 'conditional',
+        'condition' => 'hasAdminPanel',
         'user_check' => function(User $u) {
             return $u->hasAdminPanel();
         }

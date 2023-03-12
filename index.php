@@ -11,17 +11,17 @@ Algorithm:	See master_plan.html
 //Start the session
 session_start();
 
-// Turn errors off unless Lsm
-if(!isset($_SESSION['user_id']) || $_SESSION['user_id'] != 1 || $_SESSION['user_id'] != 190) {
-	ini_set('display_errors', 'Off');
-}
-
 $PAGE_LOAD_START = microtime(true);
 require_once("classes.php");
 $system = new System();
 
 if($system->environment == System::ENVIRONMENT_DEV) {
     ini_set('display_errors', 'On');
+}
+
+// Display errors for developer staff
+if(!isset($_SESSION['user_id']) || !in_array($_SESSION['user_id'], System::DEVELOPER_ADMINS)) {
+    ini_set('display_errors', 'Off');
 }
 
 // Check for logout
@@ -48,7 +48,6 @@ if(isset($_GET['request_type']) && $_GET['request_type'] == 'ajax') {
 // Run login, load player data
 $player_display = '';
 
-$logout_limit = System::LOGOUT_LIMIT;
 if(!isset($_SESSION['user_id'])) {
 	// require("./securimage/securimage.php");
 	if(!empty($_POST['login'])) {
@@ -119,17 +118,7 @@ else {
 	$LOGGED_IN = true;
 	$player = new User($_SESSION['user_id']);
 	//This is in minutes.
-	if($player->hasAdminPanel()) {
-		$logout_limit = 1440;
-	}
-	else if($player->forbidden_seal) {
-        if(is_object(json_decode($player->forbidden_seal))) {
-            $seal_data = json_decode($player->forbidden_seal);
-            $seal = new ForbiddenSeal($system, $seal_data->level, $seal_data->time);
-            $seal->setBenefits();
-            $logout_limit = $seal->logout_timer;
-        }
-	}
+	$logout_limit = $player->logoutLimit();
 	// Check logout timer
 	if($player->last_login < time() - ($logout_limit * 60)) {
 		if($ajax) {	
@@ -470,13 +459,19 @@ if($LOGGED_IN) {
 	$player->updateData();
 
 	// Display side menu and footer
-	if(!$ajax) {
+    if(!$ajax) {
+        $player->generateSideMenu($side_menu_start, $side_menu_end);
+    }
+	if(!$ajax && false) {
+        //clan
 		if($player->clan) {
 		    $routes[20]['menu'] = System::MENU_VILLAGE;
 		}
+        //team
 		if($player->rank_num >= 3) {
 		    $routes[24]['menu'] = System::MENU_USER;
 		}
+
 
         echo $side_menu_start;
 		foreach($routes as $id => $page) {
