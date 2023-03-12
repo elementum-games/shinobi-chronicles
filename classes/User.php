@@ -370,6 +370,24 @@ class User extends Fighter {
 
         return $user;
     }
+
+    /**
+     * @param System $system
+     * @param int    $user_id
+     * @return User
+     * @throws Exception
+     */
+    public static function findByName(System $system, string $name): ?User {
+        $result = $system->query("SELECT
+               `user_id` FROM `users` WHERE `user_name`='{$name}'");
+        $user_id = $system->db_fetch($result)['user_id'] ?? null;
+
+        if($user_id) {
+            return User::loadFromId($system, $user_id);
+        }
+
+        return null;
+    }
     
     /* function loadData()
         Loads user data from the database into class members

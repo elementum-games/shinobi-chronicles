@@ -56,6 +56,7 @@ function adminPanel() {
         'give_bloodline',
         'logs',
         'stat_cut',
+        'dev_tools'
     ];
 
     // Menu
@@ -1593,7 +1594,7 @@ function adminPanel() {
                 $new_data['stamina'] = 0;
 
                 //Debug
-                if(false) {
+                if($system->debug['stat_cut']) {
                     echo "<div style='width:75%;margin:1rem auto;border:1px solid red;'>
                         <label>UID:</label>$user_id<br />
                         <label>Total Sstats:</label>$total_stats<br /><br />";
@@ -1637,5 +1638,103 @@ function adminPanel() {
         }
         require 'templates/admin/stat_cut.php';
     }
+    else if($page == 'dev_tools') {
+        $stats = [
+            'ninjutsu_skill',
+            'taijutsu_skill',
+            'genjutsu_skill',
+            'bloodline_skill',
+            'cast_speed',
+            'speed',
+        ];
+
+        if (!empty($_POST['cap_jutsu'])) {
+            $name = $system->clean($_POST['cap_jutsu']);
+
+            try {
+                $user = User::findByName($system, $name);
+                if($user == null) {
+                    throw new Exception("Invalid user!");
+                }
+
+                $user->loadData(UPDATE: User::UPDATE_NOTHING, remote_view: true);
+                $user->getInventory();
+
+                //Content admin restriction
+                if(!$player->isHeadAdmin() && $user->user_id != $player->user_id) {
+                    throw new Exception("You may only edit your own characters!");
+                }
+
+                foreach($user->jutsu as &$jutsu) {
+                    $jutsu->level = 100;
+                    $jutsu->exp = 0;
+                }
+                unset($jutsu);
+
+                if($user->bloodline != null && count($user->bloodline->jutsu) > 0) {
+                    foreach($user->bloodline->jutsu as &$jutsu) {
+                        $jutsu->level = 100;
+                        $jutsu->exp = 0;
+                    }
+                    unset($jutsu);
+                }
+
+                $system->log(
+                    'admin',
+                    'capped jutsu',
+                    "Admin {$user->user_name} (#{$user->user_id}) capped jutsu for player {$user->user_name} (#{$user->user_id})"
+                );
+                $user->updateInventory();
+
+                $system->message("Jutsu capped for {$user->user_name}.");
+            } catch (Exception $e) {
+                $system->message($e->getMessage());
+            }
+        }
+        else if (!empty($_POST['cap_stats'])) {
+            $name = $system->clean($_POST['user']);
+            $percent = (float)$_POST['percent_cap'];
+            $rank_num = (int)$_POST['rank'];
+
+            //Content admin constraints
+            try {
+                $user = User::findByName($system, $name);
+                if(!$player->isHeadAdmin() && $user->user_id != $player->user_id) {
+                    throw new Exception("You may only edit your own characters!");
+                }
+
+                $user->loadData(User::UPDATE_NOTHING);
+
+                $rankManager = new RankManager($system);
+                $rankManager->loadRanks();
+
+                if($rank_num == 'current') {
+                    $rank_num = $user->rank_num;
+                }
+
+                $rank = $rankManager->ranks[$rank_num];
+                $total_stats = $rank->stat_cap;
+
+                foreach($stats as $stat) {
+                    if(!empty($_POST[$stat . '_percent'])) {
+                        $amount = ($_POST[$stat . '_percent'] / 100) * $total_stats;
+                        $user->$stat = $amount;
+                    }
+                }
+
+                $system->log(
+                    'admin',
+                    'capped jutsu',
+                    "Admin {$user->user_name} (#{$user->user_id}) capped stats for player {$user->user_name} (#{$user->user_id})"
+                );
+                $system->message("Stats capped for $name.");
+            } catch (Exception $e) {
+                $system->message($e->getMessage());
+            }
+        }
+
+        require 'templates/admin/dev_tools.php';
+    }
+
 }
 

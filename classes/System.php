@@ -9,6 +9,7 @@ require_once __DIR__ . '/API.php';
 */
 class System {
     const ENVIRONMENT_DEV = 'dev';
+    const ENVIRONMENT_PROD = 'prod';
     const LOCAL_HOST = true;
 
     const KUNAI_PER_DOLLAR = 2;
@@ -218,6 +219,7 @@ class System {
         'jutsu_collision' => false,
         'damage' => false,
         'bloodline' => false,
+        'stat_cut' => false,
     ];
 
     public function __construct() {
