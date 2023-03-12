@@ -72,7 +72,6 @@ $side_menu_start = <<<HTML
 		<div id='notifications'><!--[NOTIFICATIONS]--></div>
 	
 	<ul class='menu'>
-	<h2><p>User Menu</p></h2>
 HTML;
 
 $village_menu_start = <<<HTML
