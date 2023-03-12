@@ -46,10 +46,10 @@ function clan() {
 
 	// Mission stuff
 	$max_mission_rank = 1;
-	if($player->rank == 3) {
+	if($player->rank_num == 3) {
 		$max_mission_rank = 3;
 	}
-	else if($player->rank == 4) {
+	else if($player->rank_num == 4) {
 		$max_mission_rank = 4;
 	}
 	$mission_rank_names = array(1 => 'D-Rank', 2 => 'C-Rank', 3 => 'B-Rank', 4 => 'A-Rank', 5 => 'S-Rank');
@@ -76,7 +76,7 @@ function clan() {
 		}		
 	}
 	// Challenge stuff
-	if($player->rank >= 3 && $page == 'challenge') {
+	if($player->rank_num >= 3 && $page == 'challenge') {
 		if($_GET['challenge']) {
 			$challenge_position = $_GET['challenge'];
 			$positions = array (
@@ -95,7 +95,7 @@ function clan() {
 
 			}
 			try {
-				if($player->rank < 4 && $challenge_position == 1) {
+				if($player->rank_num < 4 && $challenge_position == 1) {
 					throw new Exception("Unable to claim leader position at this rank.");
 				}
 				if($player->clan_office == $challenge_position) {
@@ -441,7 +441,7 @@ function clan() {
 				echo "<img src='" . $officers[$position]['avatar_link'] . "' /><br />
 				<span style='font-weight:bold;'>
 					<a href='{$system->links['members']}&user={$officers[$position]['user_name']}'>" . $officers[$position]['user_name'] . "</a></span><br />";
-				if($player->rank >= 4 && $player->clan_office != $position) {
+				if($player->rank_num >= 4 && $player->clan_office != $position) {
 					// echo "<a href='$self_link&page=challenge&challenge=$position'>(Challenge)</a>";
 				}
 				echo "<br />";
@@ -450,10 +450,10 @@ function clan() {
 				echo "<img src='../images/default_avatar.png' style='max-width:100px;max-height:100px;' /><br />
 				<span style='font-weight:bold;'>None</span><br />";
 				if(!$player->clan_office) {
-					if($player->rank >= 4 && $position == 1) {
+					if($player->rank_num >= 4 && $position == 1) {
 						 echo " <a style='text-decoration:none;' href='$self_link&page=challenge&challenge=$position'>(Claim)</a>";
 					}
-					else if($player->rank >= 3) {
+					else if($player->rank_num >= 3) {
 						echo " <a style='text-decoration:none;' href='$self_link&page=challenge&challenge=$position'>(Claim)</a>";
 					}
 				}

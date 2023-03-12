@@ -6,7 +6,7 @@
  * @var int $exp_needed
  */
 
-$exp_percent = ($player->exp_per_level - ($exp_needed - $player->exp)) / $player->exp_per_level * 100;
+$exp_percent = ($player->rank->exp_per_level - ($exp_needed - $player->exp)) / $player->rank->exp_per_level * 100;
 if($exp_percent < 0) {
     $exp_percent = 0;
 }
@@ -334,7 +334,7 @@ $clan_positions = [
 <tr>
     <td style='width:50%;'>
 		<label style='width:<?= $label_width ?>;'>Level:</label> <?= $player->level ?><br />
-		<label style='width:<?= $label_width ?>;'>Rank:</label> <?= $player->rank_name ?><br />
+		<label style='width:<?= $label_width ?>;'>Rank:</label> <?= $player->rank->name ?><br />
         <?php if($player->clan): ?>
 			<label style='width:<?= $label_width ?>;'>Clan:</label> <?= $player->clan['name'] ?>
 			<br />
@@ -374,7 +374,7 @@ $clan_positions = [
 
     <td style='width:50%;'>
     <label style='width:9.2em;'>Total stats:</label>
-        <?= sprintf("%.2f", $player->total_stats) ?> / <?= sprintf("%.2f", $player->stat_cap) ?><br />
+        <?= sprintf("%.2f", $player->total_stats) ?> / <?= sprintf("%.2f", $player->rank->stat_cap) ?><br />
     <br />
     <label style='width:9.2em;'>Bloodline:</label>
     <?= ($player->bloodline_id ? $player->bloodline_name : 'None') ?><br />

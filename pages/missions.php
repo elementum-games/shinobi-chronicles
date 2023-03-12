@@ -21,7 +21,7 @@ function missions() {
         return true;
 	}
 
-	$max_mission_rank = Mission::maxMissionRank($player->rank);
+	$max_mission_rank = Mission::maxMissionRank($player->rank_num);
 
 	$result = $system->query("SELECT `mission_id`, `name`, `rank` FROM `missions` WHERE `mission_type`=1 OR `mission_type`=5 AND `rank` <= $max_mission_rank");
 	if($system->db_last_num_rows == 0) {
@@ -77,7 +77,7 @@ function missions() {
 		}
 	}
 	echo "<table class='table'><tr><th>" . Mission::$rank_names[$view] . " Missions</th></tr>
-	<tr><td style='text-align:center;'>You can go on village missions here. As a " . $RANK_NAMES[$player->rank] . " you
+	<tr><td style='text-align:center;'>You can go on village missions here. As a " . $RANK_NAMES[$player->rank_num] . " you
 	can take on up to " . Mission::$rank_names[$max_mission_rank] . " missions.</td></tr>
 	<tr><td style='text-align:center;'>";
 	foreach($missions as $id => $mission) {

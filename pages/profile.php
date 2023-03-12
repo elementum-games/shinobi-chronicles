@@ -22,7 +22,7 @@ function userProfile() {
     $exp_needed = $player->expForNextLevel();
 
     // Level up
-    if($player->level < $player->max_level && $player->exp >= $exp_needed) {
+    if($player->level < $player->rank->max_level && $player->exp >= $exp_needed) {
         if($player->battle_id) {
             echo "<p style='text-align:center;font-style:italic;'>
 				You must be out of battle to level up.</p>";
@@ -34,7 +34,7 @@ function userProfile() {
         }
     }
     // Rank up
-    else if($player->level >= $player->max_level && $player->exp >= $exp_needed && $player->rank < System::SC_MAX_RANK) {
+    else if($player->level >= $player->rank->max_level && $player->exp >= $exp_needed && $player->rank_num < System::SC_MAX_RANK) {
         if($player->battle_id > 0 or !$player->in_village) {
             echo "<p style='text-align:center;font-style:italic;'>
 				You must be out of battle and in your village to rank up.</p>";
@@ -54,11 +54,11 @@ function userProfile() {
     }
 
     $page = $_GET['page'] ?? 'profile';
-    if($player->rank > 1 && $page == 'send_money') {
+    if($player->rank_num > 1 && $page == 'send_money') {
         sendMoney($system, $player, System::CURRENCY_TYPE_MONEY);
         return;
     }
-    else if($player->rank > 1 && $page == 'send_ak') {
+    else if($player->rank_num > 1 && $page == 'send_ak') {
         sendMoney($system, $player, System::CURRENCY_TYPE_PREMIUM_CREDITS);
         return;
     }
@@ -206,7 +206,7 @@ function renderProfileSubmenu() {
             'title' => 'Settings',
         ],
     ];
-    if($player->rank > 1) {
+    if($player->rank_num > 1) {
         $submenu_links[] = [
             'link' => $system->links['profile'] . "&page=send_money",
             'title' => 'Send Money',

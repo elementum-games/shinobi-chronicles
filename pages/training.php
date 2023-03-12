@@ -13,7 +13,7 @@ function training() {
 	global $self_link;
 
 	$stat_train_length = 600;
-	$stat_train_gain = 4 + ($player->rank * 4);
+	$stat_train_gain = 4 + ($player->rank_num * 4);
 
 	$jutsu_train_gain = User::$jutsu_train_gain;
 
@@ -53,7 +53,7 @@ function training() {
 			}
 
 			if(!empty($_POST['skill'])) {
-				if($player->total_stats >= $player->stat_cap) {
+				if($player->total_stats >= $player->rank->stat_cap) {
 					throw new Exception("You cannot train any more at this rank!");
 				}
 				switch($_POST['skill']) {
@@ -72,7 +72,7 @@ function training() {
 				$train_type = $_POST['skill'] . '_skill';
 			}
 			else if(!empty($_POST['attributes'])) {
-				if($player->total_stats >= $player->stat_cap) {
+				if($player->total_stats >= $player->rank->stat_cap) {
 					throw new Exception("You cannot train any more at this rank!");
 				}
 				switch($_POST['attributes']) {

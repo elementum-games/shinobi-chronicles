@@ -274,7 +274,7 @@
     <?php endif; ?>
 
     <!--// Village change-->
-    <?php if($player->rank >= 2): ?>
+    <?php if($player->rank_num >= 2): ?>
         <form method='POST'>
             <table class='table'>
                 <tr>
@@ -338,7 +338,7 @@
         </table>
     <?php endif; ?>
 <?php elseif($view == 'bloodlines'): ?>
-    <?php if($player->rank >= 2): ?>
+    <?php if($player->rank_num >= 2): ?>
         <table class='table'>
             <tr>
                 <th>Purchase New Bloodline</th>

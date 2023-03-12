@@ -33,7 +33,7 @@ function bloodline() {
 			if(isset($player->bloodline->jutsu[$jutsu_id])) {
 				throw new Exception("You already know this jutsu!");
 			}
-			if($base_bloodline->jutsu[$jutsu_id]->rank > $player->rank) {
+			if($base_bloodline->jutsu[$jutsu_id]->rank > $player->rank_num) {
 				throw new Exception("You are not high enough rank to learn this jutsu!");
 			}
 			// Parent jutsu check
@@ -72,10 +72,10 @@ function bloodline() {
 	echo "<br />";
 
 
-	$estimated_jutsu_power = $player->rank;
-	$estimated_jutsu_power += round($player->total_stats / $player->stats_max_level, 3);
-	if($estimated_jutsu_power > $player->rank + 1) {
-		$estimated_jutsu_power = $player->rank + 1;
+	$estimated_jutsu_power = $player->rank_num;
+	$estimated_jutsu_power += round($player->total_stats / $player->rank->max_level_stats, 3);
+	if($estimated_jutsu_power > $player->rank_num + 1) {
+		$estimated_jutsu_power = $player->rank_num + 1;
 	}
 	$estimated_offense = 35 * $estimated_jutsu_power;
 	$estimated_defense = 50 + ($player->total_stats * 0.01);

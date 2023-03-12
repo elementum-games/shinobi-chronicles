@@ -127,7 +127,7 @@ class DailyTask {
     public static function generateTask(User $user, string $task_activity, array $used_task_name_keys = []): DailyTask {
         // Generate new Daily Tasks if there's never been a new task or if 24hrs have ellapsed since last reset
 
-        $possible_tasks = DailyTask::getPossibleTasks($user->rank);
+        $possible_tasks = DailyTask::getPossibleTasks($user->rank_num);
         $task_config = $possible_tasks[$task_activity];
 
         // Randomly choose a mission type and amount
@@ -144,7 +144,7 @@ class DailyTask {
         }
 
         // Decide the Task difficulty for rewards
-        $task_reward = 200 + (pow($user->rank, 2) * 150);
+        $task_reward = 200 + (pow($user->rank_num, 2) * 150);
         $task_reward = round($task_reward * (mt_rand(90, 110) / 100)); // 20% randomness
 
         $task_win_multiplier = 1;
@@ -207,11 +207,11 @@ class DailyTask {
         $daily_tasks = [];
 
         $daily_tasks[] = DailyTask::generateTask($user, DailyTask::ACTIVITY_ARENA);
-        if($user->rank >= 2) {
+        if($user->rank_num >= 2) {
             $daily_tasks[] = DailyTask::generateTask($user, DailyTask::ACTIVITY_MISSIONS);
         }
 
-        if($user->rank >= 3) {
+        if($user->rank_num >= 3) {
             $daily_tasks[] = DailyTask::generateTask($user, DailyTask::ACTIVITY_PVP);
         }
 

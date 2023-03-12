@@ -70,7 +70,7 @@ function chat() {
                 throw new Exception("You are currently banned from the chat!");
             }
 
-			$title = $player->rank_name;
+			$title = $player->rank->name;
 			$staff_level = $player->staff_level;
 			$supported_colors = $player->getNameColors();
 

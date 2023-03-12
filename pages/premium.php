@@ -60,12 +60,12 @@ function premium() {
         $stat_transfer_points_per_min += $player->forbidden_seal->stat_transfer_boost;
     }
     //Apply Chuunin boost
-    if($player->rank >= 3) {
+    if($player->rank_num >= 3) {
         $stat_transfer_points_per_min += 5;
         $stat_transfer_points_per_ak = 350;
     }
     //Apply Jonin boost
-    if($player->rank >= 4) {
+    if($player->rank_num >= 4) {
         $stat_transfer_points_per_min += 5;
         $stat_transfer_points_per_ak = 400;
     }
@@ -108,7 +108,7 @@ function premium() {
             else {
                 $player->level = 1;
                 $player->level = 1;
-                $player->rank = 1;
+                $player->rank_num = 1;
                 $player->health = 100;
                 $player->max_health = 100;
                 $player->stamina = 100;
@@ -681,7 +681,7 @@ function premium() {
 		}
 		$system->printMessage();
 	}
-	else if(isset($_POST['change_element']) && $player->rank >= 3) {
+	else if(isset($_POST['change_element']) && $player->rank_num >= 3) {
         try {
             $akCost = $costs['element_change'];
 			$current_element = $system->clean($_POST['current_element']);
@@ -799,7 +799,7 @@ function premium() {
                 $player->getInventory();
 
                 // Chuunin element change
-                if ($player->rank >= 3 && $current_element === 'first') {
+                if ($player->rank_num >= 3 && $current_element === 'first') {
                     foreach ($player->jutsu as $jutsu) {
                         if ($jutsu->element == $player->elements[$current_element]) {
                             $player->removeJutsu($jutsu->id);
@@ -808,7 +808,7 @@ function premium() {
                     $player->elements['first'] = $new_element;
                 }
                 // Jonin+ element change
-                else if ($player->rank >= 4 && $current_element === 'second') {
+                else if ($player->rank_num >= 4 && $current_element === 'second') {
                     foreach ($player->jutsu as $jutsu) {
                         if ($jutsu->element == $player->elements[$current_element]) {
                             $player->removeJutsu($jutsu->id);
@@ -825,7 +825,7 @@ function premium() {
         }
         $system->printMessage();
     }
-	else if(isset($_POST['change_village']) && $player->rank >= 2) {
+	else if(isset($_POST['change_village']) && $player->rank_num >= 2) {
 		$village = $_POST['new_village'];
         $akCost = $costs['village_change'];
 		try {
@@ -967,7 +967,7 @@ function premium() {
 		}
 		$system->printMessage();
 	}
-	else if(isset($_POST['change_clan']) && $player->rank >= 2) {
+	else if(isset($_POST['change_clan']) && $player->rank_num >= 2) {
 		$new_clan_id = abs((int) $_POST['clan_change_id']);
         $akCost = $costs['clan_change'];
 		try {
