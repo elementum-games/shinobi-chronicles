@@ -13,37 +13,47 @@
     <h1 class='center'>WARNING: PRODUCTION ENVIRONMENT</h1>
 <?php endif; ?>
 
-<table>
-    <tr><th>Dev Tools</th></tr>
-    <tr><td>
-        <form action='' method='post'>
-            <input type='text' name='cap_jutsu' /><br />
-            <input type='submit' value='Cap Jutsu' />
-        </form>
-        <br />
-        <form action='' method='post'>
-            <input type='text' name='user' /><br />
-            <select name='rank'>
-                <option value='current'>Current Rank</option>
-                <?php for($i = 2; $i <= 8; $i++): ?>
-                    <option value='<?= $i ?>'>Rank <?= $i ?></option>
-                <?php endfor; ?>
-            </select><br />
+<table class='table'>
+    <tr><th colspan='2'>Dev Tools</th></tr>
+    <tr>
+        <th>Jutsu</th>
+        <th>Stats</th>
+    </tr>
+    <tr>
+        <td style='text-align: center;'>
+            <form action='' method='post'>
+                <input type='text' name='cap_jutsu' placeholder='Username' style='margin-bottom: 8px;' /><br />
+                <input type='submit' value='Cap Jutsu' />
+            </form>
+        </td>
+        <td>
+            <form action='' method='post'>
+                <input type='text' name='user' placeholder='Username' /><br />
+                <br />
 
-            Stats
-            <?php foreach($stats as $stat): ?>
-                <?= $stat ?>
-                <select name='<?= $stat ?>_percent'>
-                    <option value='0'>-</option>
-                    <?php for($i = 10; $i >= 1; $i--): ?>
-                        <?php $percent = $i / 10; ?>
-                        <option value='<?= $percent ?>'><?= ($percent * 100) ?>%</option>
+                Rank to set stats to:<br />
+                <select name='rank'>
+                    <option value='current'>Current Rank</option>
+                    <?php for($i = 1; $i <= 4; $i++): ?>
+                        <option value='<?= $i ?>'>Rank <?= $i ?></option>
                     <?php endfor; ?>
                 </select><br />
                 <br />
-            <?php endforeach; ?>
-            <input type='submit' name='cap_stats' value='Cap Stats' />
-        </form>
-        <br />
-    </td></tr>
+
+                <b>Stats</b><br />
+                <?php foreach($stats as $stat): ?>
+                    <label style='display: inline-block;width:105px;'><?= $stat ?></label>
+                    <select name='<?= $stat ?>_percent'>
+                        <option value='0'>-</option>
+                        <?php for($i = 10; $i >= 1; $i--): ?>
+                            <?php $percent = $i / 10; ?>
+                            <option value='<?= $percent ?>'><?= ($percent * 100) ?>%</option>
+                        <?php endfor; ?>
+                    </select><br />
+                <?php endforeach; ?>
+                <br />
+                <input type='submit' name='cap_stats' value='Cap Stats' />
+            </form>
+        </td>
+    </tr>
 </table>

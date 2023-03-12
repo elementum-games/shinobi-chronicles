@@ -1693,12 +1693,15 @@ function adminPanel() {
         }
         else if (!empty($_POST['cap_stats'])) {
             $name = $system->clean($_POST['user']);
-            $percent = (float)$_POST['percent_cap'];
-            $rank_num = (int)$_POST['rank'];
+            $selected_rank = $_POST['rank'];
 
             //Content admin constraints
             try {
                 $user = User::findByName($system, $name);
+                if($user == null) {
+                    throw new Exception("Invalid user!");
+                }
+
                 if(!$player->isHeadAdmin() && $user->user_id != $player->user_id) {
                     throw new Exception("You may only edit your own characters!");
                 }
@@ -1708,19 +1711,28 @@ function adminPanel() {
                 $rankManager = new RankManager($system);
                 $rankManager->loadRanks();
 
-                if($rank_num == 'current') {
-                    $rank_num = $user->rank_num;
+                if($selected_rank == 'current') {
+                    $selected_rank = $user->rank_num;
                 }
 
-                $rank = $rankManager->ranks[$rank_num];
+                $rank = $rankManager->ranks[$selected_rank];
                 $total_stats = $rank->stat_cap;
 
                 foreach($stats as $stat) {
                     if(!empty($_POST[$stat . '_percent'])) {
-                        $amount = ($_POST[$stat . '_percent'] / 100) * $total_stats;
+                        $percent = $_POST[$stat . '_percent'];
+                        $amount = $percent * $total_stats;
+
+                        echo "{$stat} to {$percent}x of rank {$rank->name} cap ({$amount})<br />";
                         $user->$stat = $amount;
+
+                        if($user->user_id == $player->user_id) {
+                            $player->$stat = $amount;
+                        }
                     }
                 }
+
+                $user->updateData();
 
                 $system->log(
                     'admin',
