@@ -61,7 +61,7 @@
                 <?= $team_invited_to_leader->getName() ?>
             </span><br>
             <img class='teamLeaderAvatar' src='<?= $team_invited_to_leader->avatar_link ?>' /><br />
-            <?= $team_invited_to_leader->rank_name ?>
+            <?= $team_invited_to_leader->rank->name ?>
         </div>
         <br />
     </td></tr>

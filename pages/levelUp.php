@@ -15,13 +15,13 @@ function levelUp() {
 	global $player;
 	global $self_link;
 	
-	if($player->level < $player->max_level) {
+	if($player->level < $player->rank->max_level) {
 		$player->level++;
 		$player->exp = $player->total_stats * 10;
 
-		$player->max_health += $player->health_gain;
-		$player->max_chakra += $player->pool_gain;
-		$player->max_stamina += $player->pool_gain;
+		$player->max_health += $player->rank->health_gain;
+		$player->max_chakra += $player->rank->pool_gain;
+		$player->max_stamina += $player->rank->pool_gain;
 		
 		$player->health = $player->max_health;
 		$player->chakra = $player->max_chakra;
@@ -29,7 +29,7 @@ function levelUp() {
 		
 		echo "<table class='table'><tr><th>Level Up</th></tr>
 		<tr><td style='text-align:center;'>
-		You have leveled up to level $player->level, gaining $player->health_gain health and $player->pool_gain chakra/stamina!
+		You have leveled up to level $player->level, gaining {$player->rank->health_gain} health and {$player->rank->pool_gain} chakra/stamina!
 		</td></tr></table>";
 	}
 	else {
@@ -66,7 +66,7 @@ function rankUp(): bool {
         return true;
     }
 
-    if($player->level < $player->max_level || $player->exp < $player->expForNextLevel() || $player->rank >= System::SC_MAX_RANK) {
+    if($player->level < $player->rank->max_level || $player->exp < $player->expForNextLevel() || $player->rank_num >= System::SC_MAX_RANK) {
         $player->exam_stage = 0;
         $system->message("You are not eligible for a rankup exam. <a href='{$system->links['profile']}'>Continue</a>");
         return true;
@@ -80,13 +80,13 @@ function rankUp(): bool {
     <div class='submenuMargin'></div>";
 	
 	// Akademi-sei -> Genin
-	if($player->rank == 1) {
+	if($player->rank_num == 1) {
 		$bloodline_roll_chance = System::BLOODLINE_ROLL_CHANCE;
 		
 		$player->getInventory();
 	
-		$new_rank = $player->rank + 1;
-		$result = $system->query("SELECT * FROM `ranks` WHERE `rank_id`=$player->rank OR `rank_id`=$new_rank");
+		$new_rank = $player->rank_num + 1;
+		$result = $system->query("SELECT * FROM `ranks` WHERE `rank_id`=$player->rank_num OR `rank_id`=$new_rank");
 		if($system->db_last_num_rows == 0) {
 			$system->message("Invalid rank data!");
 			return false;
@@ -474,13 +474,13 @@ function rankUp(): bool {
 					$clan_name = $clans[$clan_id]['name'];
 				}
 				
-				$player->rank++;
+				$player->rank_num++;
 				$player->level++;
 
                 // Use new rank health/pool gains
-				$player->max_health += $ranks[$player->rank]['health_gain'];
-				$player->max_chakra += $ranks[$player->rank]['pool_gain'];
-				$player->max_stamina += $ranks[$player->rank]['pool_gain'];
+				$player->max_health += $ranks[$player->rank_num]['health_gain'];
+				$player->max_chakra += $ranks[$player->rank_num]['pool_gain'];
+				$player->max_stamina += $ranks[$player->rank_num]['pool_gain'];
 				
 				$player->health = $player->max_health;
 				$player->chakra = $player->max_chakra;
@@ -520,9 +520,9 @@ function rankUp(): bool {
 		echo "</table>";
 	}
 	// Genin -> Chuunin
-	else if($player->rank == 2) {
-		$new_rank = $player->rank + 1;
-		$result = $system->query("SELECT * FROM `ranks` WHERE `rank_id`=$player->rank OR `rank_id`=$new_rank");
+	else if($player->rank_num == 2) {
+		$new_rank = $player->rank_num + 1;
+		$result = $system->query("SELECT * FROM `ranks` WHERE `rank_id`=$player->rank_num OR `rank_id`=$new_rank");
 		if($system->db_last_num_rows == 0) {
 			$system->message("Invalid rank data!");
 			return false;
@@ -887,7 +887,7 @@ function rankUp(): bool {
 
 				$player->exam_stage = 0;
 				
-				$player->rank++;
+				$player->rank_num++;
 				$player->level++;
 				$player->max_health += $ranks[$new_rank]['health_gain'];
 				$player->max_chakra += $ranks[$new_rank]['pool_gain'];
@@ -907,9 +907,9 @@ function rankUp(): bool {
 		
 	}
 	// Chuunin -> Jonin
-	else if($player->rank == 3) {
-		$new_rank = $player->rank + 1;
-		$result = $system->query("SELECT * FROM `ranks` WHERE `rank_id`=$player->rank OR `rank_id`=$new_rank");
+	else if($player->rank_num == 3) {
+		$new_rank = $player->rank_num + 1;
+		$result = $system->query("SELECT * FROM `ranks` WHERE `rank_id`=$player->rank_num OR `rank_id`=$new_rank");
 		if($system->db_last_num_rows == 0) {
 			$system->message("Invalid rank data!");
 			return false;
@@ -1067,7 +1067,7 @@ function rankUp(): bool {
 				
 				$player->exam_stage = 0;
 				
-				$player->rank++;
+				$player->rank_num++;
 				$player->level++;
 				$player->max_health += $ranks[$new_rank]['health_gain'];
 				$player->max_chakra += $ranks[$new_rank]['pool_gain'];

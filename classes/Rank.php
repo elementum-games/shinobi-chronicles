@@ -10,6 +10,9 @@ class Rank {
     public int $health_gain;
     public int $pool_gain;
     public int $stat_cap;
+
+    public int $exp_per_level;
+    public int $max_level_stats;
     
     public static function fromDb($db_rank_data): Rank {
         $rank = new Rank();
@@ -23,6 +26,9 @@ class Rank {
         $rank->health_gain = $db_rank_data['health_gain'];
         $rank->pool_gain = $db_rank_data['pool_gain'];
         $rank->stat_cap = $db_rank_data['stat_cap'];
+
+        $rank->exp_per_level = $rank->stats_per_level * 10;
+        $rank->max_level_stats = $rank->base_stats + ($rank->stats_per_level * ($rank->max_level - $rank->base_level));
 
         return $rank;
     }

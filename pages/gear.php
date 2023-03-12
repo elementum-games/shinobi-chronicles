@@ -12,7 +12,7 @@ function gear(): void {
 	$max_equipped_armor = 2;
 	$max_equipped_weapons = 1;
 
-	if($player->rank >= 3) {
+	if($player->rank_num >= 3) {
 		$max_equipped_armor++;
 		$max_equipped_weapons++;
 	}

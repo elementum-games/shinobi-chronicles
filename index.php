@@ -370,7 +370,8 @@ if($LOGGED_IN) {
 			// Check for being in village is not okay/okay/required
 			if(isset($routes[$id]['village_ok'])) {
 				// Player is alllowed in up to rank 3, then must go outside village
-				if($player->rank > 2 && $routes[$id]['village_ok'] == System::NOT_IN_VILLAGE && isset($villages[$player->location->fetchString()])) {
+
+				if($player->rank_num > 2 && $routes[$id]['village_ok'] == System::NOT_IN_VILLAGE && isset($villages[$player->location->fetchString()])) {
 					throw new Exception("You cannot access this page while in a village!");
 				}
 				if($routes[$id]['village_ok'] == System::ONLY_IN_VILLAGE && !$player->location->equals($player->village_location)) {
@@ -387,7 +388,7 @@ if($LOGGED_IN) {
 				}
 			}
 			if(isset($routes[$id]['min_rank'])) {
-				if($player->rank < $routes[$id]['min_rank']) {
+				if($player->rank_num < $routes[$id]['min_rank']) {
 					throw new Exception("You are not a high enough rank to access this page!");
 				}
 			}
@@ -473,7 +474,7 @@ if($LOGGED_IN) {
 		if($player->clan) {
 		    $routes[20]['menu'] = System::MENU_VILLAGE;
 		}
-		if($player->rank >= 3) {
+		if($player->rank_num >= 3) {
 		    $routes[24]['menu'] = System::MENU_USER;
 		}
 
@@ -495,8 +496,7 @@ if($LOGGED_IN) {
 					continue;
 				}
 				// Page ok if an in-village page or player rank is below chuunin
-//				if($page['village_ok'] != System::NOT_IN_VILLAGE || $player->rank < 3) {
-                if (true) {
+				if($page['village_ok'] != System::NOT_IN_VILLAGE || $player->rank_num < 3) {
 					echo "<li><a id='sideMenuOption-".str_replace(' ', '', $page['title'])."' href='{$system->link}?id=$id'>" . $page['title'] . "</a></li>";
 				}
 			}

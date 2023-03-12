@@ -361,7 +361,7 @@ class SpecialMission {
      */
     public function completeMission(): string {
         // Yen gain for completing the mission
-        $yen_gain = self::$difficulties[$this->difficulty]['yen_per_mission'] * $this->player->rank;
+        $yen_gain = self::$difficulties[$this->difficulty]['yen_per_mission'] * $this->player->rank_num;
         $yen_gain *= 0.8 + (mt_rand(1, 4) / 10);
         $yen_gain = floor($yen_gain);
 
@@ -393,7 +393,7 @@ class SpecialMission {
         $intel_gained *= 0.8 + (mt_rand(1, 4) / 10);
         $intel_gained = floor($intel_gained);
 
-        $yen_gain = self::$difficulties[$this->difficulty]['yen_per_battle'] * $this->player->rank;
+        $yen_gain = self::$difficulties[$this->difficulty]['yen_per_battle'] * $this->player->rank_num;
         $yen_gain *= 0.8 + (mt_rand(1, 4) / 10);
         $yen_gain = floor($yen_gain);
 
@@ -551,7 +551,7 @@ class SpecialMission {
 
     private function calcHealthLost(int $base_hp_lost_percent): int {
         // We Decrease the lost hp per turn by % of user stats compared to cap
-        $stats_percent = floor(($this->player->total_stats / $this->player->stat_cap) * 100);
+        $stats_percent = floor(($this->player->total_stats / $this->player->rank->stat_cap) * 100);
         if($stats_percent > 100) {
             $stats_percent = 100;
         }

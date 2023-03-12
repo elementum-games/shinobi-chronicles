@@ -6,7 +6,7 @@ function arena() {
 	global $player;
 	global $self_link;
 
-    $fight_timer = 3 * 1000;
+  $fight_timer = 4 * 1000;
 
 	if($player->exam_stage > 0) {
 		$system->message("You cannot access this page during the exam!");
@@ -19,10 +19,10 @@ function arena() {
 	}
 	else {
 		$result = $system->query("SELECT `ai_id`, `name`, `level` FROM `ai_opponents`
-			WHERE `rank` ='$player->rank' ORDER BY `level` ASC");
+			WHERE `rank` ='$player->rank_num' ORDER BY `level` ASC");
 
 		// Addition by Kengetsu - Get access to AI if rank is higher than public max.
-		if($player->rank > System::SC_MAX_RANK) {
+		if($player->rank_num > System::SC_MAX_RANK) {
 			$result = $system->query("SELECT `ai_id`, `name`, `level` FROM `ai_opponents`
 			WHERE `rank` ='" . System::SC_MAX_RANK . "' ORDER BY `level` ASC");
 		}
@@ -90,7 +90,8 @@ function arenaFight(): bool {
     global $system;
     global $player;
 
-    $stat_gain_chance = 26;
+    // Base chance at 100, goes down if fight is too short/lower level AI
+    $stat_gain_chance = 100;
 
     try {
         $battle = new BattleManager($system, $player, $player->battle_id);
@@ -118,74 +119,71 @@ function arenaFight(): bool {
                 }
             }
             // Stat gain
-            if($player->level <= $opponent->level + 1) {
-                $counts = array(
-                    'bloodline' => 0,
-                    'ninjutsu' => 0,
-                    'taijutsu' => 0,
-                    'genjutsu' => 0
-                );
-                $total_count = 0;
-                if(is_array($battle->player_jutsu_used)) {
-                    foreach(($battle->player_jutsu_used) as $id => $jutsu) {
-                        if(strpos($id, 'BL_J') !== false) {
-                            $counts['bloodline'] += $jutsu['count'];
-                        }
-                        else if($jutsu['jutsu_type'] == 'ninjutsu') {
-                            $counts['ninjutsu'] += $jutsu['count'];
-                        }
-                        else if($jutsu['jutsu_type'] == 'taijutsu') {
-                            $counts['taijutsu'] += $jutsu['count'];
-                        }
-                        else if($jutsu['jutsu_type'] == 'genjutsu') {
-                            $counts['genjutsu'] += $jutsu['count'];
-                        }
-                        $total_count += $jutsu['count'];
+            $counts = array(
+                'bloodline' => 0,
+                'ninjutsu' => 0,
+                'taijutsu' => 0,
+                'genjutsu' => 0
+            );
+            $total_count = 0;
+            if(is_array($battle->player_jutsu_used)) {
+                foreach(($battle->player_jutsu_used) as $id => $jutsu) {
+                    if(strpos($id, 'BL_J') !== false) {
+                        $counts['bloodline'] += $jutsu['count'];
+                    }
+                    else if($jutsu['jutsu_type'] == 'ninjutsu') {
+                        $counts['ninjutsu'] += $jutsu['count'];
+                    }
+                    else if($jutsu['jutsu_type'] == 'taijutsu') {
+                        $counts['taijutsu'] += $jutsu['count'];
+                    }
+                    else if($jutsu['jutsu_type'] == 'genjutsu') {
+                        $counts['genjutsu'] += $jutsu['count'];
+                    }
+                    $total_count += $jutsu['count'];
+                }
+            }
+
+            // 5 levels below = -75% chance
+            if($opponent->level < $player->level) {
+                $stat_gain_chance -= ($player->level - $opponent->level) * 15;
+            }
+
+            if($player->total_stats < $player->rank->stat_cap && $stat_gain_chance >= mt_rand(1, 100)) {
+                $stat = '';
+                $highest_count = 0;
+                $highest_used_stats = array();
+                foreach($counts as $id => $count) {
+                    if($count > $highest_count) {
+                        $highest_count = $count;
+                        $highest_used_stats = array($id);
+                    }
+                    else if($count == $highest_count) {
+                        $highest_used_stats[] = $id;
                     }
                 }
 
-                if($opponent->level >= $player->level) {
-                    $stat_gain_chance += 10;
+                // Ninjutsu
+                if(count($highest_used_stats) == 1) {
+                    $stat = $highest_used_stats[0] . '_skill';
                 }
-                if($total_count > 4) {
-                    $stat_gain_chance += 15;
-                }
-                if($player->total_stats < $player->stat_cap && $stat_gain_chance >= mt_rand(1, 100)) {
-                    $stat = '';
-                    $highest_count = 0;
-                    $highest_used_stats = array();
-                    foreach($counts as $id => $count) {
-                        if($count > $highest_count) {
-                            $highest_count = $count;
-                            $highest_used_stats = array($id);
-                        }
-                        else if($count == $highest_count) {
-                            $highest_used_stats[] = $id;
+                // Tie
+                else {
+                    $highest_stat_num = 0;
+                    $highest_stat = '';
+                    foreach($highest_used_stats as $tied_stat) {
+                        if($player->{$tied_stat . '_skill'} > $highest_stat_num) {
+                            $highest_stat_num = $player->{$tied_stat . '_skill'};
+                            $highest_stat = $tied_stat;
                         }
                     }
-
-                    // Ninjutsu
-                    if(count($highest_used_stats) == 1) {
-                        $stat = $highest_used_stats[0] . '_skill';
-                    }
-                    // Tie
-                    else {
-                        $highest_stat_num = 0;
-                        $highest_stat = '';
-                        foreach($highest_used_stats as $tied_stat) {
-                            if($player->{$tied_stat . '_skill'} > $highest_stat_num) {
-                                $highest_stat_num = $player->{$tied_stat . '_skill'};
-                                $highest_stat = $tied_stat;
-                            }
-                        }
-                        $stat = $highest_stat . '_skill';
-                    }
-                    $player->{$stat} += 1;
-                    $player->exp += 10;
-                    $stat_gain_display = '<br />During the fight you realized a way to use your ' . ucwords(explode('_', $stat)[0]) . ' a little
-						more effectively.
-						<br />You have gained 1 ' . ucwords(str_replace('_', ' ', $stat)) . '.';
+                    $stat = $highest_stat . '_skill';
                 }
+                $player->{$stat} += 1;
+                $player->exp += 10;
+                $stat_gain_display = '<br />During the fight you realized a way to use your ' . ucwords(explode('_', $stat)[0]) . ' a little
+                    more effectively.
+                    <br />You have gained 1 ' . ucwords(str_replace('_', ' ', $stat)) . '.';
             }
 
             // TEAM BOOST AI GAINS

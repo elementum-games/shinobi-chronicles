@@ -1,7 +1,7 @@
 <?php
 
 # Begin standard auth
-require "../classes/_autoload.php";
+require_once __DIR__ . "/../classes.php";
 
 $system = new System();
 $system->is_api_request = true;

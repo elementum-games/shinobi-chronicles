@@ -213,7 +213,7 @@ if(!$guest_support) {
     if ($player->clan) {
         $pages[20]['menu'] = System::MENU_VILLAGE;
     }
-    if ($player->rank >= 3) {
+    if ($player->rank_num >= 3) {
         $pages[24]['menu'] = System::MENU_USER;
     }
 
@@ -233,7 +233,7 @@ if(!$guest_support) {
                 continue;
             }
             // Page ok if an in-village page or player rank is below chuunin
-            if ($page['village_ok'] != System::NOT_IN_VILLAGE || $player->rank < 3) {
+            if ($page['village_ok'] != System::NOT_IN_VILLAGE || $player->rank_num < 3) {
                 echo "<li><a id='sideMenuOption-" . str_replace(' ', '', $page['title']) . "' href='{$system->link}?id=$id'>" . $page['title'] . "</a></li>";
             }
         }
