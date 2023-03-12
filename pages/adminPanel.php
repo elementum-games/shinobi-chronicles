@@ -1692,6 +1692,7 @@ function adminPanel() {
             }
         }
         else if (!empty($_POST['cap_stats'])) {
+            $set_exp = isset($_POST['set_exp']);
             $name = $system->clean($_POST['user']);
             $selected_rank = $_POST['rank'];
 
@@ -1729,6 +1730,21 @@ function adminPanel() {
                         if($user->user_id == $player->user_id) {
                             $player->$stat = $amount;
                         }
+                    }
+                }
+
+                //Calculate willpower and int for exp
+                if($set_exp) {
+                    $exp = 0;
+                    foreach($stats as $stat) {
+                        $exp += $user->$stat * 10;
+                    }
+                    $exp += $user->intelligence * 10;
+                    $exp += $user->willpower * 10;
+                    echo "exp => $exp<br />";
+                    $user->exp = $exp;
+                    if($user->user_id == $player->user_id) {
+                        $player->exp = $exp;
                     }
                 }
 

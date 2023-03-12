@@ -40,6 +40,9 @@
                 </select><br />
                 <br />
 
+                <b>Set Experience:</b><input type="checkbox" name="set_exp" /><br />
+                <br />
+
                 <b>Stats</b><br />
                 <?php foreach($stats as $stat): ?>
                     <label style='display: inline-block;width:105px;'><?= $stat ?></label>
