@@ -10,8 +10,8 @@ abstract class Fighter {
 
     const SPEED_OFFENSE_RATIO = 0.25;
 
-    const MIN_RAND = 33;
-    const MAX_RAND = 37;
+    const MIN_RAND = 34;
+    const MAX_RAND = 36;
 
     public System $system;
 
