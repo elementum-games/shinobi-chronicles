@@ -181,6 +181,12 @@ class User extends Fighter {
     public $profile_song;
     public $log_actions;
 
+    /*
+     * AS = 10
+     * Genin = 40
+     * Chuunin = 100
+     * Jonin = 170
+     */
     public int $regen_rate;
 
     public array $elements;

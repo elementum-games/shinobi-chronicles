@@ -486,7 +486,7 @@ function rankUp(): bool {
 				$player->chakra = $player->max_chakra;
 				$player->stamina = $player->max_stamina;
 				
-				$player->regen_rate += 20;
+				$player->regen_rate += 30;
 				
 				$player->exp = $player->total_stats * 10;
 				
@@ -897,7 +897,7 @@ function rankUp(): bool {
 				$player->chakra = $player->max_chakra;
 				$player->stamina = $player->max_stamina;
 				
-				$player->regen_rate += 70;
+				$player->regen_rate += 60;
 				
 				$player->exp = $player->total_stats * 10;	
 			} catch(Exception $e) {
@@ -1077,7 +1077,7 @@ function rankUp(): bool {
 				$player->chakra = $player->max_chakra;
 				$player->stamina = $player->max_stamina;
 				
-				$player->regen_rate += 200;
+				$player->regen_rate += 70;
 				
 				$player->exp = $player->total_stats * 10;	
 			} catch(Exception $e) {
