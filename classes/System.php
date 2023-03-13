@@ -800,6 +800,7 @@ class System {
 
     public function renderStaticPageHeader(string $page_title, $layout = System::DEFAULT_LAYOUT): void {
         $system = $this;
+        $side_menu_location_status_class = null; // TODO: Remove this temporary side menu class
 
         require($this->fetchLayoutByName($layout));
 
@@ -818,6 +819,7 @@ class System {
 
     public function renderStaticPageFooter($layout = System::DEFAULT_LAYOUT): void {
         $system = $this;
+        $side_menu_location_status_class = null; // TODO: Remove this temporary side menu class
 
         require($this->fetchLayoutByName($layout));
 
