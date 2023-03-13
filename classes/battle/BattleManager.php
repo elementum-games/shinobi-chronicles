@@ -660,7 +660,16 @@ class BattleManager {
         }
 
         $attack->jutsu->setCombatId($fighter->combat_id);
-        $attack->raw_damage = $fighter->calcDamage($attack->jutsu);
+
+        $disable_randomness = false;
+        switch($this->battle->battle_type) {
+            case Battle::TYPE_AI_ARENA:
+            case Battle::TYPE_AI_MISSION:
+                $disable_randomness = true;
+                break;
+        }
+
+        $attack->raw_damage = $fighter->calcDamage(attack: $attack->jutsu, disable_randomness: $disable_randomness);
 
         // Set weapon data into jutsu
         if($attack->jutsu->jutsu_type == Jutsu::TYPE_TAIJUTSU && $action->weapon_id) {
