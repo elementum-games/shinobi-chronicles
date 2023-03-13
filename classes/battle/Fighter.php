@@ -288,7 +288,7 @@ abstract class Fighter {
 
         // Make up for genjutsu's delayed damage. This assumes fights are about 10 turns
         if($attack->jutsu_type == Jutsu::TYPE_GENJUTSU) {
-            $offense *= 1.1;
+            $offense *= 1.15;
         }
 
 
