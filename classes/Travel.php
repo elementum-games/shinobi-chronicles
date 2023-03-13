@@ -5,8 +5,8 @@ require_once __DIR__ . "/MapLocation.php";
 class Travel {
 
     const TRAVEL_DELAY_MOVEMENT = 400; // milliseconds
-    const TRAVEL_DELAY_PVP = 1000; // milliseconds
-    const TRAVEL_DELAY_AI = 1000; // milliseconds
+    const TRAVEL_DELAY_PVP = 750; // milliseconds
+    const TRAVEL_DELAY_AI = 500; // milliseconds
     const TRAVEL_DELAY_DEATH = 15000; // milliseconds
     const HOME_VILLAGE_COLOR = 'FFEF30';
     const PLAYER_ICON = '/images/ninja_head.png';
