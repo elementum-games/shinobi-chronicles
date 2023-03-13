@@ -243,7 +243,7 @@ class TravelManager {
 
             // only display attack links if the same rank
             $user['attack'] = false;
-            if ($user['rank'] === $this->user->rank_num
+            if ((int)$user['rank'] === $this->user->rank_num
                 && $this->user->location->equals(TravelCoords::fromDbString($user['location']))
                 && $user['user_id'] != $this->user->user_id
                 && $user['village'] !== $this->user->village) {
