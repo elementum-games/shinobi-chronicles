@@ -84,6 +84,9 @@ function validateFormData($variables, &$data, $content_id = null) {
     }
 }
 
+/**
+ * @throws Exception
+ */
 function validateVariable($var_name, $input, $variable, &$variables, &$data, $content_id = null): bool {
     global $system;
     // Skip variable if it is not required
@@ -140,7 +143,7 @@ function validateVariable($var_name, $input, $variable, &$variables, &$data, $co
     // Check pattern
     if(isset($variable['pattern'])) {
         if(!preg_match($variable['pattern'], $data[$var_name])) {
-            throw new Exception("Invalid " . ucwords(str_replace("_", " ", $var_name)) . "!");
+            throw new Exception("Invalid " . ucwords(str_replace("_", " ", $var_name)) . " ({$data[$var_name]})!");
         }
     }
 

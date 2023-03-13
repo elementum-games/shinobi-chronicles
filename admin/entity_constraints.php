@@ -128,7 +128,7 @@ $constraints['edit_user'] = [
         'input_type' => 'text',
     ],
     'location' => [
-        'data_type' => 'float',
+        'data_type' => 'string',
         'input_type' => 'text',
         'pattern' => '/[0-9]+\:[0-9]+\:[0-9]+/',
     ],

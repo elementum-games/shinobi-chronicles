@@ -1732,6 +1732,8 @@ function adminPanel() {
                     }
                 }
 
+                $user->exp = $total_stats * 10;
+
                 $user->updateData();
 
                 $system->log(

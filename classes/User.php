@@ -104,7 +104,7 @@ class User extends Fighter {
     public int $rank_num;
     public Rank $rank;
 
-    public $exp;
+    public int $exp;
     public $staff_level;
     public StaffManager $staff_manager;
     public $support_level;
