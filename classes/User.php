@@ -863,110 +863,7 @@ class User extends Fighter {
         // Check training
         $display = '';
         if($this->train_time && $UPDATE >= User::UPDATE_FULL) {
-            if($this->train_time < time()) {
-                $team_boost_description = "";
-
-                // Jutsu training
-                if(str_contains($this->train_type, 'jutsu:')) {
-                    $jutsu_id = $this->train_gain;
-                    $this->getInventory();
-
-                    $gain = User::$jutsu_train_gain;
-                    if($this->system->TRAIN_BOOST) {
-                        $gain += $this->system->TRAIN_BOOST;
-                    }
-                    if($this->jutsu[$jutsu_id]->level + $gain > 100) {
-                        $gain = 100 - $this->jutsu[$jutsu_id]->level;
-                    }
-
-                    if($this->checkInventory($jutsu_id, 'jutsu')) {
-                        if($this->jutsu[$jutsu_id]->level < 100) {
-                            $new_level = $this->jutsu[$jutsu_id]->level + $gain;
-
-                            if($new_level > 100) {
-                                $this->jutsu[$jutsu_id]->level = 100;
-                            }
-                            else {
-                                $this->jutsu[$jutsu_id]->level += $gain;
-                            }
-                            $message = $this->jutsu[$jutsu_id]->name . " has increased to level " .
-                                $this->jutsu[$jutsu_id]->level . '.';
-
-                            $jutsu_skill_type = $this->jutsu[$jutsu_id]->jutsu_type . '_skill';
-                            if($this->total_stats < $this->rank->stat_cap) {
-                                $this->{$jutsu_skill_type}++;
-                                $this->exp += 10;
-                                $message .= ' You have gained 1 ' . ucwords(str_replace('_', ' ', $jutsu_skill_type)) .
-                                    ' and 10 experience.';
-                            }
-
-                            $this->system->message($message);
-
-                            if(!$this->ban_type) {
-                                $this->updateInventory();
-                            }
-                        }
-                    }
-
-                    $this->train_time = 0;
-                }
-                // Skill/attribute training
-                else {
-                    // TEAM BOOST TRAINING GAINS
-                    if($this->team != null) {
-                        $boost_percent = $this->team->checkForTrainingBoostTrigger();
-                        if($boost_percent != null) {
-                            $boost_amount = round($this->train_gain * $boost_percent, 0, PHP_ROUND_HALF_DOWN);
-                            $this->train_gain += $boost_amount;
-
-                            $team_boost_description = '<br />LUCKY! Your team bond triggered a breakthrough and resulted in increased progress!
-							<br />
-							You gained an additional <b>[ ' . $boost_amount . ' ]</b> point(s)';
-                        }
-                    }
-
-                    // Check caps
-                    $gain = $this->train_gain;
-
-                    $total_stats = $this->total_stats + $gain;
-
-                    if($total_stats > $this->rank->stat_cap) {
-                        $gain -= $total_stats - $this->rank->stat_cap;
-                        if($gain < 0) {
-                            $gain = 0;
-                        }
-                    }
-
-                    $this->{$this->train_type} += $gain;
-                    $this->exp += $gain * 10;
-
-                    $this->train_time = 0;
-                    $this->system->message("You have gained " . $gain . " " . ucwords(str_replace('_', ' ', $this->train_type)) .
-                        " and " . ($gain * 10) . " experience." . $team_boost_description
-                    );
-                }
-            }
-            else {
-                //*setTimeout is used to notify training finished*//
-                if(strpos($this->train_type, 'jutsu:') !== false) {
-                    $train_type = str_replace('jutsu:', '', $this->train_type);
-                    $display .= "<p class='trainingNotification'>Training: " . ucwords(str_replace('_', ' ', $train_type)) . "<br />" .
-                        "<span id='trainingTimer'>" . System::timeRemaining($this->train_time - time(), 'short', false, true) . " remaining</span></p>";
-                    $display .= "<script type='text/javascript'>
-					let train_time = " . ($this->train_time - time()) . ";
-          setTimeout(()=>{titleBarFlash();}, train_time * 1000);
-					</script>";
-                }
-                else {
-                    //*setTimeout is used to notify training finished*//
-                    $display .= "<p class='trainingNotification'>Training: " . ucwords(str_replace('_', ' ', $this->train_type)) . "<br />" .
-                        "<span id='trainingTimer'>" . System::timeRemaining($this->train_time - time(), 'short', false, true) . " remaining</span></p>";
-                    $display .= "<script type='text/javascript'>
-					let train_time = " . ($this->train_time - time()) . ";
-          setTimeout(()=>{titleBarFlash();}, train_time * 1000);
-					</script>";
-                }
-            }
+            $display = $this->checkTraining();
         }
 
         // Correction location
@@ -1262,6 +1159,146 @@ class User extends Fighter {
         }
 
         return false;
+    }
+
+    public function checkTraining(): string {
+        $display = '';
+
+        if($this->train_time < time()) {
+            $team_boost_description = "";
+
+            // Jutsu training
+            if(str_contains($this->train_type, 'jutsu:')) {
+                $jutsu_id = $this->train_gain;
+                $this->getInventory();
+
+                $gain = User::$jutsu_train_gain;
+                if($this->system->TRAIN_BOOST) {
+                    $gain += $this->system->TRAIN_BOOST;
+                }
+                if($this->jutsu[$jutsu_id]->level + $gain > 100) {
+                    $gain = 100 - $this->jutsu[$jutsu_id]->level;
+                }
+
+                if($this->checkInventory($jutsu_id, 'jutsu')) {
+                    if($this->jutsu[$jutsu_id]->level < 100) {
+                        $new_level = $this->jutsu[$jutsu_id]->level + $gain;
+
+                        if($new_level > 100) {
+                            $this->jutsu[$jutsu_id]->level = 100;
+                        }
+                        else {
+                            $this->jutsu[$jutsu_id]->level += $gain;
+                        }
+                        $message = $this->jutsu[$jutsu_id]->name . " has increased to level " .
+                            $this->jutsu[$jutsu_id]->level . '.';
+
+                        $jutsu_skill_type = $this->jutsu[$jutsu_id]->jutsu_type . '_skill';
+                        if($this->total_stats < $this->rank->stat_cap) {
+                            $this->{$jutsu_skill_type}++;
+                            $this->exp += 10;
+                            $message .= ' You have gained 1 ' . ucwords(str_replace('_', ' ', $jutsu_skill_type)) .
+                                ' and 10 experience.';
+                        }
+
+                        $this->system->message($message);
+
+                        if(!$this->ban_type) {
+                            $this->updateInventory();
+                        }
+                    }
+                }
+
+                $this->train_time = 0;
+            }
+            // Skill/attribute training
+            else {
+                // TEAM BOOST TRAINING GAINS
+                if($this->team != null) {
+                    $boost_percent = $this->team->checkForTrainingBoostTrigger();
+                    if($boost_percent != null) {
+                        $boost_amount = round($this->train_gain * $boost_percent, 0, PHP_ROUND_HALF_DOWN);
+                        $this->train_gain += $boost_amount;
+
+                        $team_boost_description = '<br />LUCKY! Your team bond triggered a breakthrough and resulted in increased progress!
+							<br />
+							You gained an additional <b>[ ' . $boost_amount . ' ]</b> point(s)';
+                    }
+                }
+
+                // Check caps
+                $gain = $this->train_gain;
+
+                $total_stats = $this->total_stats + $gain;
+
+                if($total_stats > $this->rank->stat_cap) {
+                    $gain -= $total_stats - $this->rank->stat_cap;
+                    if($gain < 0) {
+                        $gain = 0;
+                    }
+                }
+
+                $this->{$this->train_type} += $gain;
+                $this->exp += $gain * 10;
+
+                $this->train_time = 0;
+                $this->system->message("You have gained " . $gain . " " . ucwords(str_replace('_', ' ', $this->train_type)) .
+                    " and " . ($gain * 10) . " experience." . $team_boost_description
+                );
+            }
+        }
+        else {
+            if(str_contains($this->train_type, 'jutsu:')) {
+                $train_type = str_replace('jutsu:', '', $this->train_type);
+                $display .= "<p class='trainingNotification'>Training: " . ucwords(str_replace('_', ' ', $train_type)) . "<br />" .
+                    "<span id='trainingTimer'>" . System::timeRemaining($this->train_time - time(), 'short', false, true) . " remaining</span></p>";
+            }
+            else {
+                $display .= "<p class='trainingNotification'>Training: " . ucwords(str_replace('_', ' ', $this->train_type)) . "<br />" .
+                    "<span id='trainingTimer'>" . System::timeRemaining($this->train_time - time(), 'short', false, true) . " remaining</span></p>";
+            }
+
+            $display .= "<script type='text/javascript'>
+                let train_time = " . ($this->train_time - time()) . ";
+                setTimeout(()=>{titleBarFlash();}, train_time * 1000);
+            </script>";
+        }
+
+        return $display;
+    }
+
+    public function getTrainingStatForArena(): ?string {
+        $training_stat = null;
+
+        if($this->train_type) {
+            if(str_contains($this->train_type, 'jutsu:')) {
+                if(!$this->inventory_loaded) {
+                    $this->getInventory();
+                }
+
+                $jutsu_id = $this->train_gain;
+                $jutsu = $this->player->jutsu[$jutsu_id] ?? null;
+
+                if($jutsu != null) {
+                    switch($jutsu->jutsu_type) {
+                        case Jutsu::TYPE_GENJUTSU:
+                            $training_stat = 'genjutsu_skill';
+                            break;
+                        case Jutsu::TYPE_TAIJUTSU:
+                            $training_stat = 'taijutsu_skill';
+                            break;
+                        case Jutsu::TYPE_NINJUTSU:
+                            $training_stat = 'ninjutsu_skill';
+                            break;
+                    }
+                }
+            }
+            else {
+                $training_stat = $this->train_type;
+            }
+        }
+
+        return $training_stat;
     }
 
     public function hasJutsu(int $jutsu_id): bool {

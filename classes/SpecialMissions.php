@@ -12,7 +12,7 @@ class SpecialMission {
     const MAX_DAMAGE_MULTIPLIER = 3;
 
     // Number of jutsu to use per fight, picked at random from equipped and bloodline jutsu
-    const JUTSU_USES_PER_FIGHT = 3;
+    const JUTSU_USES_PER_FIGHT = 4;
 
     /*
      * DIFFICULTY
@@ -372,6 +372,14 @@ class SpecialMission {
         $this->player->special_mission = 0;
 
         $reward_text = self::$event_names[self::EVENT_COMPLETE_REWARD]['text'] . $yen_gain . '!';
+
+        $stat_to_gain = $this->player->getTrainingStatForArena();
+        if($stat_to_gain != null && $this->player->total_stats < $this->player->rank->stat_cap) {
+            $this->player->$stat_to_gain += 1;
+            $this->player->exp += 10;
+
+            $reward_text .= " You gained 1 " . System::unSlug($stat_to_gain) . "!";
+        }
 
         return $reward_text;
     }

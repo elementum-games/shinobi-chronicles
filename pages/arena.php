@@ -149,41 +149,18 @@ function arenaFight(): bool {
                 $stat_gain_chance -= ($player->level - $opponent->level) * 15;
             }
 
-            if($player->total_stats < $player->rank->stat_cap && $stat_gain_chance >= mt_rand(1, 100)) {
-                $stat = '';
-                $highest_count = 0;
-                $highest_used_stats = array();
-                foreach($counts as $id => $count) {
-                    if($count > $highest_count) {
-                        $highest_count = $count;
-                        $highest_used_stats = array($id);
-                    }
-                    else if($count == $highest_count) {
-                        $highest_used_stats[] = $id;
-                    }
-                }
+            if($player->total_stats < $player->rank->stat_cap
+                && $stat_gain_chance >= mt_rand(1, 100)
+                && $player->getTrainingStatForArena() != null
+            ) {
+                $stat_to_gain = $player->getTrainingStatForArena();
 
-                // Ninjutsu
-                if(count($highest_used_stats) == 1) {
-                    $stat = $highest_used_stats[0] . '_skill';
-                }
-                // Tie
-                else {
-                    $highest_stat_num = 0;
-                    $highest_stat = '';
-                    foreach($highest_used_stats as $tied_stat) {
-                        if($player->{$tied_stat . '_skill'} > $highest_stat_num) {
-                            $highest_stat_num = $player->{$tied_stat . '_skill'};
-                            $highest_stat = $tied_stat;
-                        }
-                    }
-                    $stat = $highest_stat . '_skill';
-                }
-                $player->{$stat} += 1;
+                $player->{$stat_to_gain} += 1;
                 $player->exp += 10;
-                $stat_gain_display = '<br />During the fight you realized a way to use your ' . ucwords(explode('_', $stat)[0]) . ' a little
-                    more effectively.
-                    <br />You have gained 1 ' . ucwords(str_replace('_', ' ', $stat)) . '.';
+
+                $stat_gain_display = '<br />During the fight you realized a way to use your ' . System::unSlug($stat_to_gain) . ' a little
+                more effectively.
+                <br />You have gained 1 ' . System::unSlug($stat_to_gain) . '.';
             }
 
             // TEAM BOOST AI GAINS
