@@ -2,15 +2,17 @@
 session_start();
 
 require "classes/System.php";
+require_once "classes/Bloodline.php";
 $system = new System();
 $layout = System::DEFAULT_LAYOUT;
 
 if (isset($_SESSION['user_id'])) {
-  require_once "classes/User.php";
-  require_once "classes/Bloodline.php";
-  $player = new User($_SESSION['user_id']);
-  $player->loadData();
-  $layout = $player->layout;
+    require_once "classes/RankManager.php";
+    require_once "classes/Travel.php";
+    require_once "classes/User.php";
+    $player = new User($_SESSION['user_id']);
+    $player->loadData();
+    $layout = $player->layout;
 }
 
 $system->renderStaticPageHeader($layout);
