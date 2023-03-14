@@ -980,6 +980,10 @@ table.globalMessage th {
     width: 100%;
     position: relative;
     padding: 5px 0 5px 55px;
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: center;
+    justify-content: flex-start;
 
     color: #b99f47;
     font-family: 'BebasNeue', sans-serif;
@@ -1009,7 +1013,17 @@ table.globalMessage th {
 }
 
 #contentHeaderLocation {
-    padding-left: 5px;
+    position: relative;
+    padding-left: 15px;
+    font-size: 16px;
+}
+
+#contentHeaderLocation::before {
+    content: "∙ ";
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    left: 5px;
 }
 
 /* Imported */
@@ -3225,9 +3239,13 @@ a#spec_miss_cancel:hover::after {
 .travel-scout-name {
     width: 100px;
     word-break: break-all;
+    display: flex;
+    flex-flow: column nowrap;
+    text-indent: 5px;
 }
 
 #content .travel-scout-name a {
+    width: 100%;
     text-decoration: none;
     color: var(--theme-text-color-normal);
     font-size: 0.8em;
@@ -3239,12 +3257,14 @@ a#spec_miss_cancel:hover::after {
     color: var(--theme-text-color-light);
 }
 
-.travel-scout-rank {
-    padding: 0 5px;
-
-    font-family: "Oswald", sans-serif;
-    color: rgba(225,200,150,0.4);
+.travel-scout-name span {
+    max-width: 100%;
+    color: rgba(225,200,150,0.6);
     font-size: 0.6em;
+    font-family: "Roboto", sans-serif;
+    overflow-x: hidden;
+    text-overflow: ellipsis;
+    word-break: keep-all;
 }
 
 .travel-scout-faction {
@@ -3264,7 +3284,7 @@ a#spec_miss_cancel:hover::after {
 
 .travel-scout-location {
     justify-self: flex-end;
-    width: 35px;
+    width: 55px;
     text-align: center;
 
     color: rgba(225,200,150,0.5);
@@ -3291,6 +3311,17 @@ a#spec_miss_cancel:hover::after {
 
 .travel-scout-attack a:hover {
     background-image: url("./../../images/map/icons/attack-on.png");
+}
+
+.travel-scout-attack span {
+    display: block;
+    width: 100%;
+    height: 100%;
+
+    background-image: url("./../../images/map/icons/in-battle.png");
+    background-size: 60% auto;
+    background-repeat: no-repeat;
+    background-position: center;
 }
 
 .travel-filter {
@@ -3355,6 +3386,10 @@ a#spec_miss_cancel:hover::after {
 
     /* styling */
     font-family: 'Oswald', sans-serif;
+}
+
+#travel-container .systemMessage-new {
+    max-width: 80%;
 }
 
 .systemMessage-new::before {
@@ -3489,8 +3524,21 @@ a#spec_miss_cancel:hover::after {
 .sm-tmp-invillage #sideMenuOption-Arena,
 .sm-tmp-invillage #sideMenuOption-Training
 {
-    display: none;
-    height: 0;
+    opacity: 0.3;
+    cursor: not-allowed;
+}
+
+#container .sm-tmp-invillage #sideMenuOption-Arena:hover,
+#container .sm-tmp-invillage #sideMenuOption-Training:hover
+{
+    color: var(--theme-text-color-light);
+    transition: none;
+}
+
+#container .sm-tmp-invillage #sideMenuOption-Arena:hover::before,
+#container .sm-tmp-invillage #sideMenuOption-Training:hover::before
+{
+    animation: none;
 }
 
 .sm-tmp-outvillage #sideMenuOption-RamenShop,
@@ -3498,6 +3546,23 @@ a#spec_miss_cancel:hover::after {
 .sm-tmp-outvillage #sideMenuOption-VillageHQ,
 .sm-tmp-outvillage #sideMenuOption-Clan
 {
-    display: none;
-    height: 0;
+    opacity: 0.3;
+    cursor: not-allowed;
+}
+
+#container .sm-tmp-outvillage #sideMenuOption-RamenShop:hover,
+#container .sm-tmp-outvillage #sideMenuOption-Shop:hover,
+#container .sm-tmp-outvillage #sideMenuOption-VillageHQ:hover,
+#container .sm-tmp-outvillage #sideMenuOption-Clan:hover
+{
+    color: var(--theme-text-color-light);
+    transition: none;
+}
+
+#container .sm-tmp-outvillage #sideMenuOption-RamenShop:hover::before,
+#container .sm-tmp-outvillage #sideMenuOption-Shop:hover::before,
+#container .sm-tmp-outvillage #sideMenuOption-VillageHQ:hover::before,
+#container .sm-tmp-outvillage #sideMenuOption-Clan:hover::before
+{
+    animation: none;
 }

@@ -356,7 +356,7 @@ label {
 	margin-left: 20px;
     margin-bottom: -5px;
 	display: flex;
-	flex-flow: row nowrap;
+	flex-flow: column nowrap;
 	
 	/* Style */
 	font-size: 22px;
@@ -365,7 +365,7 @@ label {
 }
 
 #contentHeaderLocation {
-	padding-left: 5px;
+	font-size: 12px;
 }
 
 #footer p {
@@ -2536,9 +2536,13 @@ a#spec_miss_cancel:hover::after {
 .travel-scout-name {
 	width: 100px;
 	word-break: break-all;
+	display: flex;
+	flex-flow: column nowrap;
+	text-indent: 5px;
 }
 
 #content .travel-scout-name a {
+	width: 100%;
 	text-decoration: none;
 	color: var(--theme-text-color-normal);
 	font-size: 1em;
@@ -2550,12 +2554,11 @@ a#spec_miss_cancel:hover::after {
 	color: var(--theme-text-color-light);
 }
 
-.travel-scout-rank {
-	padding: 0 5px;
-
+.travel-scout-name span {
+	max-width: 100%;
+	color: var(--theme-text-color-light);
+	font-size: 0.7em;
 	font-family: sans-serif;
-	color: rgba(0, 0, 0, 0.4);
-	font-size: 0.8em;
 }
 
 .travel-scout-faction {
@@ -2575,7 +2578,7 @@ a#spec_miss_cancel:hover::after {
 
 .travel-scout-location {
 	justify-self: flex-end;
-	width: 35px;
+	width: 55px;
 	text-align: center;
 
 	color: rgba(0, 0, 0, 0.5);
@@ -2602,6 +2605,17 @@ a#spec_miss_cancel:hover::after {
 
 .travel-scout-attack a:hover {
 	background-image: url("./../../images/map/icons/attack-on.png");
+}
+
+.travel-scout-attack span {
+	display: block;
+	width: 100%;
+	height: 100%;
+
+	background-image: url("./../../images/map/icons/in-battle.png");
+	background-size: 60% auto;
+	background-repeat: no-repeat;
+	background-position: center;
 }
 
 .travel-filter {
@@ -2659,8 +2673,14 @@ a#spec_miss_cancel:hover::after {
 .sm-tmp-invillage #sideMenuOption-Arena,
 .sm-tmp-invillage #sideMenuOption-Training
 {
-	display: none;
-	height: 0;
+	opacity: 0.3;
+	cursor: not-allowed;
+}
+
+#container .sm-tmp-invillage #sideMenuOption-Arena:hover,
+#container .sm-tmp-invillage #sideMenuOption-Training:hover
+{
+	color: #a29986;
 }
 
 .sm-tmp-outvillage #sideMenuOption-RamenShop,
@@ -2668,6 +2688,14 @@ a#spec_miss_cancel:hover::after {
 .sm-tmp-outvillage #sideMenuOption-VillageHQ,
 .sm-tmp-outvillage #sideMenuOption-Clan
 {
-	display: none;
-	height: 0;
+	opacity: 0.3;
+	cursor: not-allowed;
+}
+
+#container .sm-tmp-outvillage #sideMenuOption-RamenShop:hover,
+#container .sm-tmp-outvillage #sideMenuOption-Shop:hover,
+#container .sm-tmp-outvillage #sideMenuOption-VillageHQ:hover,
+#container .sm-tmp-outvillage #sideMenuOption-Clan:hover
+{
+	color: #a29986;
 }
