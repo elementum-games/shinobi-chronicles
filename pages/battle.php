@@ -141,7 +141,7 @@ function battle(): bool {
 			}
 			if($player->last_death_ms > System::currentTimeMs() - (60 * 1000)) {
 				throw new Exception("You died within the last minute, please wait " .
-					floor((($player->last_death_ms + (60 * 1000)) - System::currentTimeMs()) / 1000) . " more seconds.");
+					ceil((($player->last_death_ms + (60 * 1000)) - System::currentTimeMs()) / 1000) . " more seconds.");
 			}
 			if($user->last_death_ms > System::currentTimeMs() - (60 * 1000)) {
 				throw new Exception("Target has died within the last minute, please wait " .
