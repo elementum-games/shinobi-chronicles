@@ -198,6 +198,16 @@ so we have to compile the source code into plain JavaScript for it to run in bro
 and run `npm run watch-ui` to automatically compile source files from the `src` directory to 
   compiled version in the `build` directory.
 
+#### PhpStorm file watcher setup
+- Program: `$ProjectFileDir$\node_modules\.bin\babel`  
+- Arguments: `$FilePathRelativeToProjectRoot$ --out-dir ui_components/build/$FileDirRelativeToSourcepath$`  
+- Output paths to refresh: `$FileDirRelativeToSourcepath$/ui_components/build/$FileNameWithoutExtension$.js`  
+- Working Directory: `$ContentRoot$`  
+
+Scope
+- Set this string in pattern: `file[shinobi-chronicles]:ui_components/src//*`
+- The key point is just "files inside `ui_components/src`
+
 
 ## Testing
 You will need to install Composer and run `composer install` to install the PHPUnit
