@@ -10,7 +10,9 @@
  * village_icon:    string,
  * alignment:       string,
  * attack:          boolean,
- * attack_id:       string
+ * attack_id:       string,
+ * level:           int,
+ * battle_id:       int
  * }} player
  */
 export const ScoutArea = ({
@@ -60,12 +62,10 @@ const Player = ({
     key: player_data.user_id,
     className: alignmentClass(player_data.alignment)
   }, /*#__PURE__*/React.createElement("div", {
-    className: "travel-scout-rank"
-  }, player_data.name.slice(0, 2)), /*#__PURE__*/React.createElement("div", {
     className: "travel-scout-name"
   }, /*#__PURE__*/React.createElement("a", {
     href: membersLink + '&user=' + player_data.user_name
-  }, player_data.user_name)), /*#__PURE__*/React.createElement("div", {
+  }, player_data.user_name), /*#__PURE__*/React.createElement("span", null, "Lv.", player_data.level, " - ", player_data.name)), /*#__PURE__*/React.createElement("div", {
     className: "travel-scout-location"
   }, player_data.target_x, " \u2219 ", player_data.target_y), /*#__PURE__*/React.createElement("div", {
     className: "travel-scout-faction"
@@ -74,9 +74,9 @@ const Player = ({
     alt: "mist"
   })), /*#__PURE__*/React.createElement("div", {
     className: "travel-scout-attack"
-  }, player_data.attack === true && /*#__PURE__*/React.createElement("a", {
+  }, player_data.attack === true && parseInt(player_data.battle_id, 10) === 0 && /*#__PURE__*/React.createElement("a", {
     href: attackLink + '&attack=' + player_data.attack_id
-  })));
+  }), player_data.attack === true && parseInt(player_data.battle_id, 10) > 0 && /*#__PURE__*/React.createElement("span", null)));
 };
 const alignmentClass = alignment => {
   let class_name = 'travel-scout-entry travel-scout-';

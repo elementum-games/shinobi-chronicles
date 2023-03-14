@@ -99,17 +99,17 @@ class TravelManager {
         // check if the user has exited an AI too recently
         $ai_time_left = Travel::checkAIDelay($this->user->last_ai_ms);
         if ($ai_time_left > 0 && !$ignore_travel_restrictions) {
-            throw new Exception('You have recently left an AI battle and cannot move for ' . $ai_time_left . ' seconds!');
+            throw new Exception('You have recently left an AI battle and cannot move for ' . floor($ai_time_left / 1000) . ' seconds!');
         }
         // check if the user has exited battle too recently
         $pvp_time_left = Travel::checkPVPDelay($this->user->last_pvp_ms);
         if ($pvp_time_left > 0 && !$ignore_travel_restrictions) {
-            throw new Exception('You have recently left a battle and cannot move for ' . $pvp_time_left . ' seconds!');
+            throw new Exception('You have recently left a battle and cannot move for ' . floor($pvp_time_left / 1000) . ' seconds!');
         }
         // check if the user has died to recently
         $death_time_left = Travel::checkDeathDelay($this->user->last_death_ms);
         if ($death_time_left > 0 && !$ignore_travel_restrictions) {
-            throw new Exception('You are still recovering from a defeat and cannot move for ' . $death_time_left . ' seconds!');
+            throw new Exception('You are still recovering from a defeat and cannot move for ' . floor($death_time_left / 1000) . ' seconds!');
         }
         // check if the user is in battle
         if ($this->user->battle_id && !$ignore_travel_restrictions) {

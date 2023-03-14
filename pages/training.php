@@ -41,6 +41,12 @@ function training() {
 	$player->getInventory();
 	if(!empty($_POST['train_type']) && !$player->train_time) {
 		try {
+
+            // check if pvp is active at the current location
+            if ($player->current_location->location_id && !$player->current_location->pvp_allowed) {
+                throw new Exception("You cannot train at this location!");
+            }
+
 			$train_length = $stat_train_length;
 			$train_gain = $stat_train_gain;
 			if($_POST['train_type'] == 'Long') {

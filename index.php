@@ -416,7 +416,7 @@ if($LOGGED_IN) {
             }
 
             if(!$ajax || !isset($routes[$id]['ajax_ok']) ) {
-                $location_name = ($player->current_location->location_id) ? ' ' . ' <div id="contentHeaderLocation">&middot; '.$player->current_location->name.'</div>' : null;
+                $location_name = ($player->current_location->location_id) ? ' ' . ' <div id="contentHeaderLocation">'.$player->current_location->name.'</div>' : null;
 
 				echo str_replace("[HEADER_TITLE]", $routes[$id]['title'] . $location_name, $body_start);
 			}

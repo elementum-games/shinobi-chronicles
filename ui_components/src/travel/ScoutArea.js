@@ -10,7 +10,9 @@
  * village_icon:    string,
  * alignment:       string,
  * attack:          boolean,
- * attack_id:       string
+ * attack_id:       string,
+ * level:           int,
+ * battle_id:       int
  * }} player
  */
 export const ScoutArea = ({
@@ -65,13 +67,11 @@ const Player = ({
     return (
         <div key={player_data.user_id}
              className={alignmentClass(player_data.alignment)}>
-            <div className='travel-scout-rank'>
-                {player_data.name.slice(0,2)}
-            </div>
             <div className='travel-scout-name'>
                 <a href={membersLink + '&user=' + player_data.user_name}>
                     {player_data.user_name}
                 </a>
+                <span>Lv.{player_data.level} - {player_data.name}</span>
             </div>
             <div className='travel-scout-location'>
                 {player_data.target_x} &#8729; {player_data.target_y}
@@ -80,8 +80,11 @@ const Player = ({
                 <img src={'./' + player_data.village_icon} alt='mist' />
             </div>
             <div className='travel-scout-attack'>
-                {(player_data.attack === true) && (
+                {(player_data.attack === true && parseInt(player_data.battle_id, 10) === 0) && (
                     <a href={attackLink + '&attack=' + player_data.attack_id}></a>
+                )}
+                {(player_data.attack === true && parseInt(player_data.battle_id, 10) > 0) && (
+                    <span></span>
                 )}
             </div>
         </div>
