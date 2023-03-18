@@ -270,7 +270,7 @@ class BattleManager {
                     if($jutsu_type == Jutsu::TYPE_TAIJUTSU && !empty($_POST['weapon_id'])) {
                         $weapon_id = (int)$this->system->clean($_POST['weapon_id']);
                         if($weapon_id && $this->player->hasItem($weapon_id)) {
-                            if(array_search($weapon_id, $this->player->equipped_weapons) === false) {
+                            if(!in_array($weapon_id, $this->player->equipped_weapon_ids)) {
                                 $weapon_id = 0;
                             }
                         }
