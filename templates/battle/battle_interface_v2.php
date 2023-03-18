@@ -1,8 +1,8 @@
 <?php
   /**
-   * @var System $system
-   * @var BattleManager $battleManager
-   * @var Battle $battle
+   * @var System          $system
+   * @var BattleManagerV2 $battleManager
+   * @var BattleV2        $battle
    *
  */
 ?>

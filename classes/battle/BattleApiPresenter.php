@@ -5,7 +5,7 @@ use JetBrains\PhpStorm\Pure;
 
 class BattleApiPresenter {
     public static function buildResponse(
-        Battle $battle,
+        BattleV2 $battle,
         BattleField $battle_field,
         Fighter $player,
         Fighter $opponent,
@@ -116,7 +116,7 @@ class BattleApiPresenter {
         ];
     }
 
-    private static function jutsuResponse(Jutsu $jutsu, Battle $battle): array {
+    private static function jutsuResponse(Jutsu $jutsu, BattleV2 $battle): array {
         return [
             'id' => $jutsu->id,
             'combatId' => $jutsu->combat_id,
@@ -140,14 +140,14 @@ class BattleApiPresenter {
         ];
     }
 
-    private static function turnLogResponse(?BattleLog $turn_log): ?array {
+    private static function turnLogResponse(?BattleLogV2 $turn_log): ?array {
         if($turn_log == null) {
             return null;
         }
 
         return [
-            'isMovementPhase' => $turn_log->turn_phase === Battle::TURN_TYPE_MOVEMENT,
-            'isAttackPhase' => $turn_log->turn_phase === Battle::TURN_TYPE_ATTACK,
+            'isMovementPhase' => $turn_log->turn_phase === BattleV2::TURN_TYPE_MOVEMENT,
+            'isAttackPhase' => $turn_log->turn_phase === BattleV2::TURN_TYPE_ATTACK,
             'isPreparationPhase' => false,
             'fighterActions' => array_map(
                 function(FighterActionLog $action_log){

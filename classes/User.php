@@ -100,7 +100,6 @@ class User extends Fighter {
     public int $marriage_time;
     public $village;
     public int $level;
-    public $rank;
 
     public int $rank_num;
     public Rank $rank;
@@ -267,10 +266,11 @@ class User extends Fighter {
     /**
      * @param System $system
      * @param int    $user_id
+     * @param bool   $remote_view
      * @return User
      * @throws Exception
      */
-    public static function loadFromId(System $system, int $user_id): User {
+    public static function loadFromId(System $system, int $user_id, bool $remote_view = false): User {
         $user = new User($system, $user_id);
 
         $result = $system->query("SELECT 
@@ -315,7 +315,7 @@ class User extends Fighter {
         $user->last_login = $result['last_login'];
 
         if($result['forbidden_seal']) {
-            $this->setForbiddenSealFromDb($result['forbidden_seal'], false);
+            $user->setForbiddenSealFromDb($result['forbidden_seal'], $remote_view);
         }
         $user->chat_color = $result['chat_color'];
         $user->chat_effect = $result['chat_effect'];

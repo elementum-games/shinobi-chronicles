@@ -15,7 +15,7 @@ class BattleLogTest extends TestCase {
         $fighter2 = $this->createStub(Fighter::class);
         $fighter2->combat_id = "U:2";
 
-        $log = new BattleLog(
+        $log = new BattleLogV2(
             system: $system,
             battle_id: 1,
             turn_number: 1,

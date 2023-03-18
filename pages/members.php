@@ -144,7 +144,7 @@ function members() {
 			}
 
 			$result = $system->db_fetch($result);
-			$viewUser = User::loadFromId($system, $result['user_id']);
+			$viewUser = User::loadFromId($system, $result['user_id'], true);
 			$viewUser->loadData(false, true);
 
 			$journal_result = $system->query("SELECT `journal` FROM `journals` WHERE `user_id`='{$viewUser->user_id}'");

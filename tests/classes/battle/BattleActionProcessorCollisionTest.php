@@ -302,14 +302,14 @@ class BattleActionProcessorCollisionTest extends BattleTestCase {
      * @throws \Exception
      */
     public function testCollisionIdIsDeterministic(): void {
-        $attack1 = new BattleAttack(
+        $attack1 = new BattleAttackV2(
             attacker_id: "U:123",
             target: new AttackTileTarget(1),
             jutsu: JutsuFactory::create(),
             turn: 1,
             starting_raw_damage: 1
         );
-        $attack2 = new BattleAttack(
+        $attack2 = new BattleAttackV2(
             attacker_id: "U:124",
             target: new AttackTileTarget(1),
             jutsu: JutsuFactory::create(),

@@ -32,7 +32,7 @@ class BattleManagerTest extends BattleTestCase {
 
         $player->chakra = 100;
 
-        $battleManager = new BattleManager(
+        $battleManager = new BattleManagerV2(
             system: $system,
             player: $player,
             battle: $battle,

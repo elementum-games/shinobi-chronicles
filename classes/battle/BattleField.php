@@ -4,12 +4,12 @@ use JetBrains\PhpStorm\ArrayShape;
 
 require_once __DIR__ . '/../System.php';
 require_once __DIR__ . '/../Coords.php';
-require_once __DIR__ . '/Battle.php';
+require_once __DIR__ . '/BattleV2.php';
 require_once __DIR__ . '/BattleFieldTile.php';
 require_once __DIR__ . '/AttackTarget.php';
 
 class BattleField {
-    private Battle $battle;
+    private BattleV2 $battle;
 
     /** @var int[] */
     public array $fighter_locations;
@@ -22,10 +22,10 @@ class BattleField {
      *
      * Not sure if we'll ever need system here?
      *
-     * @param System $system
-     * @param Battle $battle
+     * @param System   $system
+     * @param BattleV2 $battle
      */
-    public function __construct(System $system, Battle &$battle) {
+    public function __construct(System $system, BattleV2 &$battle) {
         $this->battle = &$battle;
 
         $field_data = json_decode($battle->raw_field, true);

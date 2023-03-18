@@ -15,6 +15,8 @@ if (isset($_SESSION['user_id'])) {
 
 $system->renderStaticPageHeader('Manual', $layout);
 
+?>
+
 <!--
   Probably move the styles somewhere, but since all the
   themes has their own style IDK where to keep this,

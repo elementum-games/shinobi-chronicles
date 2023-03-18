@@ -4,15 +4,15 @@ namespace SC\TestUtils;
 
 use AttackDirectionTarget;
 use AttackTarget;
-use BattleAttack;
+use BattleAttackV2;
 use Fighter;
 use SC\Factories\JutsuFactory;
 
 class CollisionScenario {
     // The attack coming from the left
-    public BattleAttack $leftAttack;
+    public BattleAttackV2 $leftAttack;
     // The attack coming from the right
-    public BattleAttack $rightAttack;
+    public BattleAttackV2 $rightAttack;
 
     public Fighter $left_attack_user;
     public Fighter $right_attack_user;
@@ -54,7 +54,7 @@ class CollisionScenario {
         $this->expected_left_attack_collision_point = $expected_left_attack_collision_point;
     }
 
-    private function createRightAttack(string $attacker_id, int $range, float $speed, ?AttackTarget $target): BattleAttack {
+    private function createRightAttack(string $attacker_id, int $range, float $speed, ?AttackTarget $target): BattleAttackV2 {
         $jutsu = JutsuFactory::create($range);
         $jutsu->travel_speed = $speed;
 
@@ -63,7 +63,7 @@ class CollisionScenario {
         }
         $this->right_attack_target = $target;
 
-        return new BattleAttack(
+        return new BattleAttackV2(
             attacker_id: $attacker_id,
             target: $this->right_attack_target,
             jutsu: $jutsu,
@@ -72,7 +72,7 @@ class CollisionScenario {
         );
     }
 
-    private function createLeftAttack(string $attacker_id, int $range, float $speed, ?AttackTarget $target): BattleAttack {
+    private function createLeftAttack(string $attacker_id, int $range, float $speed, ?AttackTarget $target): BattleAttackV2 {
         $jutsu = JutsuFactory::create($range);
         $jutsu->travel_speed = $speed;
 
@@ -81,7 +81,7 @@ class CollisionScenario {
         }
         $this->left_attack_target = $target;
 
-        return new BattleAttack(
+        return new BattleAttackV2(
             attacker_id: $attacker_id,
             target: $this->left_attack_target,
             jutsu: $jutsu,

@@ -4,19 +4,19 @@ require_once __DIR__ . '/AttackCollision.php';
 
 class BattleActionProcessor {
     private System $system;
-    private Battle $battle;
+    private BattleV2 $battle;
 
     private BattleField $field;
-    private BattleEffectsManager $effects;
+    private BattleEffectsManagerV2 $effects;
 
     private Closure $debug_closure;
     private array $default_attacks;
 
     public function __construct(
         System $system,
-        Battle $battle,
+        BattleV2 $battle,
         BattleField $field,
-        BattleEffectsManager $effects,
+        BattleEffectsManagerV2 $effects,
         Closure $debug_closure,
         array $default_attacks
     ) {
@@ -69,7 +69,7 @@ class BattleActionProcessor {
         $player2_attack = $this->getFighterAttackFromActions($this->battle->player2->combat_id);
 
         $this->debug(
-            BattleManager::DEBUG_DAMAGE,
+            BattleManagerV2::DEBUG_DAMAGE,
             'Raw damage',
             'P1: ' . $player1_attack->starting_raw_damage . ' / P2: ' . $player2_attack->starting_raw_damage
         );
@@ -106,7 +106,7 @@ class BattleActionProcessor {
         if($player1_attack) {
             $this->battle->current_turn_log->addFighterActionDescription(
                 $this->battle->player1,
-                BattleLog::parseCombatText(
+                BattleLogV2::parseCombatText(
                     $player1_attack->jutsu->battle_text, $this->battle->player1, $this->battle->player2
                 )
             );
@@ -142,7 +142,7 @@ class BattleActionProcessor {
         if($player2_attack) {
             $this->battle->current_turn_log->addFighterActionDescription(
                 $this->battle->player2,
-                BattleLog::parseCombatText(
+                BattleLogV2::parseCombatText(
                     $player2_attack->jutsu->battle_text, $this->battle->player2, $this->battle->player1
                 )
             );
@@ -197,7 +197,7 @@ class BattleActionProcessor {
         }
 
         if($jutsu == null) {
-            $this->debug(BattleManager::DEBUG_PLAYER_ACTION, "getJutsuFromAttackAction", print_r($action, true));
+            $this->debug(BattleManagerV2::DEBUG_PLAYER_ACTION, "getJutsuFromAttackAction", print_r($action, true));
             throw new Exception(
                 "Invalid type {$action->jutsu_purchase_type} jutsu {$action->jutsu_id} for fighter {$fighter->getName()}"
             );
@@ -215,10 +215,10 @@ class BattleActionProcessor {
 
     /**
      * @param string $combat_id
-     * @return BattleAttack|null
+     * @return BattleAttackV2|null
      * @throws Exception
      */
-    protected function getFighterAttackFromActions(string $combat_id): ?BattleAttack {
+    protected function getFighterAttackFromActions(string $combat_id): ?BattleAttackV2 {
         $fighter = $this->battle->getFighter($combat_id);
         if($fighter == null) {
             return null;
@@ -238,14 +238,14 @@ class BattleActionProcessor {
     /**
      * @param Fighter             $fighter
      * @param FighterAttackAction $action
-     * @return BattleAttack
+     * @return BattleAttackV2
      * @throws Exception
      */
-    protected function setupFighterAttack(Fighter $fighter, FighterAttackAction $action): BattleAttack {
+    protected function setupFighterAttack(Fighter $fighter, FighterAttackAction $action): BattleAttackV2 {
         $jutsu = $this->getJutsuFromAttackAction($fighter, $action);
         $jutsu->setCombatId($fighter->combat_id);
 
-        $attack = new BattleAttack(
+        $attack = new BattleAttackV2(
             attacker_id: $action->fighter_id,
             target: $action->target,
             jutsu: $jutsu,
@@ -287,7 +287,7 @@ class BattleActionProcessor {
     /**
      * @throws Exception
      */
-    public function setAttackPath(Fighter $attacker, BattleAttack $attack): void {
+    public function setAttackPath(Fighter $attacker, BattleAttackV2 $attack): void {
         switch($attack->jutsu->use_type) {
             case Jutsu::USE_TYPE_MELEE:
             case Jutsu::USE_TYPE_PROJECTILE:
@@ -316,14 +316,14 @@ class BattleActionProcessor {
 
     /**
      * @param Fighter               $attacker
-     * @param BattleAttack          $attack
+     * @param BattleAttackV2        $attack
      * @param AttackDirectionTarget $target
-     * @return BattleAttack
+     * @return BattleAttackV2
      * @throws Exception
      */
     public function setupDirectionAttack(
-        Fighter $attacker, BattleAttack $attack, AttackDirectionTarget $target
-    ): BattleAttack {
+        Fighter $attacker, BattleAttackV2 $attack, AttackDirectionTarget $target
+    ): BattleAttackV2 {
         if(!isset($this->field->fighter_locations[$attacker->combat_id])) {
             throw new Exception("Invalid attacker location!");
         }
@@ -385,14 +385,14 @@ class BattleActionProcessor {
 
     /**
      * @param Fighter          $attacker
-     * @param BattleAttack     $attack
+     * @param BattleAttackV2   $attack
      * @param AttackTileTarget $target
-     * @return BattleAttack
+     * @return BattleAttackV2
      * @throws Exception
      */
     public function setupTileAttack(
-        Fighter $attacker, BattleAttack $attack, AttackTileTarget $target
-    ): BattleAttack {
+        Fighter $attacker, BattleAttackV2 $attack, AttackTileTarget $target
+    ): BattleAttackV2 {
         if(!isset($this->field->fighter_locations[$attacker->combat_id])) {
             throw new Exception("Invalid attacker location!");
         }
@@ -426,12 +426,12 @@ class BattleActionProcessor {
     /**
      * @throws Exception
      */
-    public function findAttackHits(Fighter $attacker, BattleAttack $attack): BattleAttack {
+    public function findAttackHits(Fighter $attacker, BattleAttackV2 $attack): BattleAttackV2 {
         if(!$attack->is_path_setup) {
             throw new Exception("Attack path not setup!");
         }
 
-        $attacker_team = Battle::fighterTeam($attacker);
+        $attacker_team = BattleV2::fighterTeam($attacker);
 
         foreach($attack->path_segments as $path_segment) {
             foreach($path_segment->tile->fighter_ids as $fighter_id) {
@@ -441,7 +441,7 @@ class BattleActionProcessor {
                 }
 
                 // TODO: Buff attacks
-                if(Battle::fighterTeam($fighter) === $attacker_team) {
+                if(BattleV2::fighterTeam($fighter) === $attacker_team) {
                     continue;
                 }
 
@@ -479,7 +479,7 @@ class BattleActionProcessor {
         });
 
         $this->debug(
-            BattleManager::DEBUG_ATTACK_COLLISION,
+            BattleManagerV2::DEBUG_ATTACK_COLLISION,
             'collisions',
             json_encode(
                 array_map(
@@ -618,8 +618,8 @@ class BattleActionProcessor {
                             1
                         );
 
-                        if($attack1_diffuse_percent > Battle::MAX_DIFFUSE_PERCENT) {
-                            $attack1_diffuse_percent = Battle::MAX_DIFFUSE_PERCENT;
+                        if($attack1_diffuse_percent > BattleV2::MAX_DIFFUSE_PERCENT) {
+                            $attack1_diffuse_percent = BattleV2::MAX_DIFFUSE_PERCENT;
                         }
                     }
                 }
@@ -634,8 +634,8 @@ class BattleActionProcessor {
                         );
                     }
 
-                    if($attack2_diffuse_percent > Battle::MAX_DIFFUSE_PERCENT) {
-                        $attack2_diffuse_percent = Battle::MAX_DIFFUSE_PERCENT;
+                    if($attack2_diffuse_percent > BattleV2::MAX_DIFFUSE_PERCENT) {
+                        $attack2_diffuse_percent = BattleV2::MAX_DIFFUSE_PERCENT;
                     }
                 }
                 if(!empty($attack1_diffuse_percent)) {
@@ -674,7 +674,7 @@ class BattleActionProcessor {
             }
 
             $this->debug(
-                BattleManager::DEBUG_ATTACK_COLLISION,
+                BattleManagerV2::DEBUG_ATTACK_COLLISION,
                 'speed',
                 "Player1({$attack1_user->getName()}): {$attack1_user->speed} ({$attack1_user->speed_boost} - {$attack1_user->speed_nerf})<br />"
                 . "Player2({$attack2_user->getName()}): {$attack2_user->speed} ({$attack2_user->speed_boost} - {$attack2_user->speed_nerf})<br />"
@@ -812,7 +812,7 @@ class BattleActionProcessor {
         }
     }
 
-    protected function applyAttackHit(BattleAttack $attack, Fighter $user, Fighter $target, float $raw_damage): void {
+    protected function applyAttackHit(BattleAttackV2 $attack, Fighter $user, Fighter $target, float $raw_damage): void {
         $attack_damage = $raw_damage;
         if($attack->jutsu->jutsu_type != Jutsu::TYPE_GENJUTSU && empty($attack->jutsu->effect_only)) {
             $attack_damage = $target->calcDamageTaken($attack->starting_raw_damage, $attack->jutsu->jutsu_type);
@@ -894,12 +894,12 @@ class BattleActionProcessor {
      *
      * collisionId(attack2, attack1)
      *
-     * @param BattleAttack $attack1
-     * @param BattleAttack $attack2
+     * @param BattleAttackV2 $attack1
+     * @param BattleAttackV2 $attack2
      * @return string
      * @throws Exception
      */
-    public static function collisionId(BattleAttack $attack1, BattleAttack $attack2): string {
+    public static function collisionId(BattleAttackV2 $attack1, BattleAttackV2 $attack2): string {
         if($attack1->id == $attack2->id) {
             throw new Exception("Can't collide the same attack!");
         }
@@ -920,13 +920,13 @@ class BattleActionProcessor {
      *   the attack are weakened in a logical manner from the player's POV
      * 2) Calculate time-based effects.
      *
-     * @param BattleAttack $fighter1Attack
-     * @param BattleAttack $fighter2Attack
-     * @param Closure|null $debug_closure
+     * @param BattleAttackV2 $fighter1Attack
+     * @param BattleAttackV2 $fighter2Attack
+     * @param Closure|null   $debug_closure
      * @return AttackCollision[]
      * @throws Exception
      */
-    public static function findCollisions(BattleAttack $fighter1Attack, BattleAttack $fighter2Attack, ?Closure $debug_closure): array {
+    public static function findCollisions(BattleAttackV2 $fighter1Attack, BattleAttackV2 $fighter2Attack, ?Closure $debug_closure): array {
         $debug = function(string $category, string $label, string $content) use($debug_closure) {
             if($debug_closure == null) {
                 return;
@@ -968,7 +968,7 @@ class BattleActionProcessor {
         }
 
         $debug(
-            BattleManager::DEBUG_ATTACK_COLLISION,
+            BattleManagerV2::DEBUG_ATTACK_COLLISION,
             'segments_by_tile_and_attack',
             json_encode(
                 array_map(function($tile_segments_by_attack) {
@@ -1006,9 +1006,9 @@ class BattleActionProcessor {
          * For a pair of intersecting attacks, find their collision points (so the rest of the attack can be weakened)
          */
         foreach($colliding_attack_pairs as $colliding_attack_pair) {
-            /** @var BattleAttack $attack1 */
+            /** @var BattleAttackV2 $attack1 */
             $attack1 = $colliding_attack_pair[0];
-            /** @var BattleAttack $attack2 */
+            /** @var BattleAttackV2 $attack2 */
             $attack2 = $colliding_attack_pair[1];
 
             $collision_id = self::collisionId($attack1, $attack2);
@@ -1019,7 +1019,7 @@ class BattleActionProcessor {
             $attack1_collision_point = self::findNextTileCollisionPoint($attack1, $attack2, $segments_by_tile_and_attack);
             $attack2_collision_point = self::findNextTileCollisionPoint($attack2, $attack1, $segments_by_tile_and_attack);
 
-            $debug(BattleManager::DEBUG_ATTACK_COLLISION, 'initial_collision_points', json_encode([
+            $debug(BattleManagerV2::DEBUG_ATTACK_COLLISION, 'initial_collision_points', json_encode([
                 'attack1' => $attack1_collision_point,
                 'attack2' => $attack2_collision_point,
             ]));
@@ -1045,7 +1045,7 @@ class BattleActionProcessor {
                 $attack2_collision_point = self::findSameTileCollisionPoint($attack2, $attack1, $segments_by_tile_and_attack);
             }
 
-            $debug(BattleManager::DEBUG_ATTACK_COLLISION, 'second_collision_points', json_encode([
+            $debug(BattleManagerV2::DEBUG_ATTACK_COLLISION, 'second_collision_points', json_encode([
                 'attack1' => $attack1_collision_point,
                 'attack2' => $attack2_collision_point,
             ]));
@@ -1069,7 +1069,7 @@ class BattleActionProcessor {
             if($attack1_collision_point === null && $attack2_collision_point !== null) {
                 $attack1_collision_point = self::findClosestTileInAttackPath($attack2_collision_point, $attack1);
 
-                $debug(BattleManager::DEBUG_ATTACK_COLLISION, 'half_collision_fixed', json_encode([
+                $debug(BattleManagerV2::DEBUG_ATTACK_COLLISION, 'half_collision_fixed', json_encode([
                     'attack1' => $attack1_collision_point,
                     'attack2' => $attack2_collision_point,
                 ]));
@@ -1077,7 +1077,7 @@ class BattleActionProcessor {
             else if($attack2_collision_point === null && $attack1_collision_point !== null) {
                 $attack2_collision_point = self::findClosestTileInAttackPath($attack1_collision_point, $attack2);
 
-                $debug(BattleManager::DEBUG_ATTACK_COLLISION, 'half_collision_fixed', json_encode([
+                $debug(BattleManagerV2::DEBUG_ATTACK_COLLISION, 'half_collision_fixed', json_encode([
                     'attack1' => $attack1_collision_point,
                     'attack2' => $attack2_collision_point,
                 ]));
@@ -1127,7 +1127,7 @@ class BattleActionProcessor {
                 }
             }
 
-            $debug(BattleManager::DEBUG_ATTACK_COLLISION, 'final_collision_points', json_encode([
+            $debug(BattleManagerV2::DEBUG_ATTACK_COLLISION, 'final_collision_points', json_encode([
                 'attack1' => $attack1_collision_point,
                 'attack2' => $attack2_collision_point,
             ]));
@@ -1156,13 +1156,13 @@ class BattleActionProcessor {
     /**
      * Collision algorithm Type 2 - For each tile, see if attack on next tile is <= time + 1
      *
-     * @param BattleAttack          $attack
-     * @param BattleAttack          $other_attack
+     * @param BattleAttackV2        $attack
+     * @param BattleAttackV2        $other_attack
      * @param TileAttackSegment[][] $segments_by_tile_and_attack
      * @return ?int
      * @throws Exception
      */
-    public static function findNextTileCollisionPoint(BattleAttack $attack, BattleAttack $other_attack, array $segments_by_tile_and_attack): ?int {
+    public static function findNextTileCollisionPoint(BattleAttackV2 $attack, BattleAttackV2 $other_attack, array $segments_by_tile_and_attack): ?int {
         // Tile attacks do not have a next target
         if($attack->target instanceof AttackTileTarget) {
             return null;
@@ -1192,13 +1192,13 @@ class BattleActionProcessor {
     /**
      * Collision algorithm Type 1 - For each tile, see if attack on next tile is == time
      *
-     * @param BattleAttack          $attack
-     * @param BattleAttack          $other_attack
+     * @param BattleAttackV2        $attack
+     * @param BattleAttackV2        $other_attack
      * @param TileAttackSegment[][] $segments_by_tile_and_attack
      * @return ?int
      * @throws Exception
      */
-    public static function findSameTileCollisionPoint(BattleAttack $attack, BattleAttack $other_attack, array $segments_by_tile_and_attack): ?int {
+    public static function findSameTileCollisionPoint(BattleAttackV2 $attack, BattleAttackV2 $other_attack, array $segments_by_tile_and_attack): ?int {
         foreach($attack->path_segments as $segment) {
             $other_attack_on_same_tile = $segments_by_tile_and_attack[$segment->tile->index][$other_attack->id] ?? null;
             if($other_attack_on_same_tile == null) {
@@ -1218,7 +1218,7 @@ class BattleActionProcessor {
         return null;
     }
 
-    public static function findClosestTileInAttackPath(int $tile_index, BattleAttack $attack): int {
+    public static function findClosestTileInAttackPath(int $tile_index, BattleAttackV2 $attack): int {
         $first_segment = $attack->path_segments[0];
         $last_segment = $attack->path_segments[array_key_last($attack->path_segments)];
 
@@ -1239,7 +1239,7 @@ class BattleActionProcessor {
 
 class TileAttackSegment {
     public function __construct(
-        public BattleAttack $attack,
+        public BattleAttackV2 $attack,
         public AttackPathSegment $segment,
     ) {}
 }

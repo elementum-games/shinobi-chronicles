@@ -9,16 +9,16 @@ function runSimulation(): void {
         $system = new System();
 
         $leftAttackUser = new User($system, 123);
-        $leftAttackUser->combat_id = Battle::combatId(Battle::TEAM1, $leftAttackUser);
+        $leftAttackUser->combat_id = BattleV2::combatId(BattleV2::TEAM1, $leftAttackUser);
 
         $rightAttackUser = new User($system, 234);
-        $rightAttackUser->combat_id = Battle::combatId(Battle::TEAM2, $rightAttackUser);
+        $rightAttackUser->combat_id = BattleV2::combatId(BattleV2::TEAM2, $rightAttackUser);
 
         /** @var CollisionScenario[] $scenarios */
         $scenarios = CollisionScenario::testScenarios($leftAttackUser, $rightAttackUser);
 
         foreach($scenarios as $index => $scenario) {
-            $battle = new Battle($system, $leftAttackUser, 1);
+            $battle = new BattleV2($system, $leftAttackUser, 1);
             $battle->raw_field = json_encode([
                 'fighter_locations' => $scenario->getFighterLocations(),
             ]);
@@ -29,7 +29,7 @@ function runSimulation(): void {
                 $system,
                 $battle,
                 $field,
-                new BattleEffectsManager($system, [], []),
+                new BattleEffectsManagerV2($system, [], []),
                 function() {},
                 []
             );

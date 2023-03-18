@@ -3,10 +3,10 @@
 namespace SC\TestUtils;
 
 use AttackTarget;
-use Battle;
+use BattleV2;
 use BattleActionProcessor;
-use BattleAttack;
-use BattleEffectsManager;
+use BattleAttackV2;
+use BattleEffectsManagerV2;
 use Fighter;
 use Jutsu;
 use PHPUnit\Framework\MockObject\Stub;
@@ -20,19 +20,19 @@ class BattleTestCase extends TestCase {
     /**
      * @param int $player1Location
      * @param int $player2Location
-     * @return Battle|Stub
+     * @return BattleV2|Stub
      */
-    protected function initBattle(int $player1Location = 2, int $player2Location = 4): Stub|Battle {
-        $battle = $this->createStub(Battle::class);
+    protected function initBattle(int $player1Location = 2, int $player2Location = 4): Stub|BattleV2 {
+        $battle = $this->createStub(BattleV2::class);
         $battle->battle_id = self::$next_int++;
 
         $battle->player1 = $this->createStub(Fighter::class);
         $battle->player1->id = 1;
-        $battle->player1->combat_id = Battle::combatId(Battle::TEAM1, $battle->player1);
+        $battle->player1->combat_id = BattleV2::combatId(BattleV2::TEAM1, $battle->player1);
 
         $battle->player2 = $this->createStub(Fighter::class);
         $battle->player2->id = 1;
-        $battle->player2->combat_id = Battle::combatId(Battle::TEAM2, $battle->player2);
+        $battle->player2->combat_id = BattleV2::combatId(BattleV2::TEAM2, $battle->player2);
 
         $battle->method('getFighter')
                ->will(
@@ -55,7 +55,7 @@ class BattleTestCase extends TestCase {
         return $battle;
     }
 
-    protected function initAttack(Fighter $attacker, AttackTarget $target, int $range = 3): BattleAttack {
+    protected function initAttack(Fighter $attacker, AttackTarget $target, int $range = 3): BattleAttackV2 {
         return $this->initAttackWithJutsu(
             $attacker,
             $target,
@@ -65,8 +65,8 @@ class BattleTestCase extends TestCase {
         );
     }
 
-    protected function initAttackWithJutsu(Fighter $attacker, AttackTarget $target, Jutsu $jutsu): BattleAttack {
-        return new BattleAttack(
+    protected function initAttackWithJutsu(Fighter $attacker, AttackTarget $target, Jutsu $jutsu): BattleAttackV2 {
+        return new BattleAttackV2(
             attacker_id: $attacker->combat_id,
             target: $target,
             jutsu: $jutsu,
@@ -80,7 +80,7 @@ class BattleTestCase extends TestCase {
             system: $this->createStub(System::class),
             battle: $battle,
             field: $battleField,
-            effects: $this->createStub(BattleEffectsManager::class),
+            effects: $this->createStub(BattleEffectsManagerV2::class),
             debug_closure: function ($category, $label, $contents) {
                 echo "\r\nDEBUG ($label)\r\n$contents\r\n";
             },

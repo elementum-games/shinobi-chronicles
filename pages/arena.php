@@ -91,6 +91,9 @@ function arena(): bool {
     return true;
 }
 
+/**
+ * @throws Exception
+ */
 function arenaFight(): bool {
     global $system;
     global $player;
@@ -122,7 +125,7 @@ function arenaFightAPI(System $system, User $player): BattlePageAPIResponse {
     $response = new BattlePageAPIResponse();
 
     try {
-        $battle = BattleManager::init(system: $system, player: $player, battle_id: $player->battle_id);
+        $battle = BattleManagerV2::init(system: $system, player: $player, battle_id: $player->battle_id);
         $battle->checkInputAndRunTurn();
 
         $response->battle_data = $battle->getApiResponse();
@@ -143,7 +146,7 @@ function arenaFightAPI(System $system, User $player): BattlePageAPIResponse {
 /**
  * @throws Exception
  */
-function processArenaBattleEnd(BattleManager $battle, User $player): string {
+function processArenaBattleEnd(BattleManager|BattleManagerV2 $battle, User $player): string {
     $stat_gain_chance = 26;
     $battle_result = "";
 

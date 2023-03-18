@@ -5,8 +5,8 @@ use JetBrains\PhpStorm\ArrayShape;
 class AttackCollision {
     public function __construct(
         public string $id,
-        public BattleAttack $attack1,
-        public BattleAttack $attack2,
+        public BattleAttackV2 $attack1,
+        public BattleAttackV2 $attack2,
         public int $attack1_collision_point,
         public int $attack2_collision_point,
         public AttackPathSegment $attack1_segment,

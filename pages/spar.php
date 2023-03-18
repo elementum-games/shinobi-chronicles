@@ -89,7 +89,7 @@ function spar() {
 			}
 
             try {
-                $user = User::loadFromId($system, $challenge);
+                $user = User::loadFromId($system, $challenge, true);
                 $user->loadData(User::UPDATE_NOTHING, true);
             } catch(Exception $e) {
                 throw new Exception("Invalid user! " . $e->getMessage());

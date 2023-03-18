@@ -211,11 +211,11 @@ function SpectateStatus() {
     /*
         <table class='table' style='margin-top:2px;'>
         <tr><td style='text-align:center;'>
-            <?php if($battle->winner == Battle::TEAM1): ?>
+            <?php if($battle->winner == BattleV2::TEAM1): ?>
                <?=  $battle->player1->getName() ?> won!
-            <?php elseif($battle->winner == Battle::TEAM2): ?>
+            <?php elseif($battle->winner == BattleV2::TEAM2): ?>
                 <?= $battle->player2->getName() ?> won!
-            <?php elseif($battle->winner == Battle::DRAW): ?>
+            <?php elseif($battle->winner == BattleV2::DRAW): ?>
                 Fight ended in a draw.
             <?php else: ?>
                 <b><?= $battle->timeRemaining() ?></b> seconds remaining<br />
