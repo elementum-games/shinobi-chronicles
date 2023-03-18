@@ -19,7 +19,6 @@ require_once 'admin/formTools.php';
 function adminPanel() {
     global $system;
     global $player;
-    global $self_link;
     global $id;
 
     // Staff level check
@@ -27,7 +26,7 @@ function adminPanel() {
         return false;
     }
 
-    $admin_panel_url = $self_link;
+    $admin_panel_url = $system->getUrl('admin');
 
     $content_create_pages = [
         'create_ai',

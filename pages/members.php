@@ -97,13 +97,13 @@ function members() {
 					</th>
 				</tr>
 				<tr>
-					<th tyle='width: 33%;'>
+					<th style='width: 33%;'>
 						Name
 					</th>
-					<th tyle='width: 33%;'>
+					<th style='width: 33%;'>
 						Rank
 					</th>
-					<th tyle='width: 33%;'>
+					<th style='width: 33%;'>
 						Level
 					</th>
 				</tr>";
@@ -144,7 +144,7 @@ function members() {
 			}
 
 			$result = $system->db_fetch($result);
-			$viewUser = new User($result['user_id']);
+			$viewUser = User::loadFromId($system, $result['user_id'], true);
 			$viewUser->loadData(false, true);
 
 			$journal_result = $system->query("SELECT `journal` FROM `journals` WHERE `user_id`='{$viewUser->user_id}'");

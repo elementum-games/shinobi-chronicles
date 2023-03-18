@@ -3,7 +3,7 @@
 /**
  * @var System $system
  */
-require "authenticate_admin.php";
+require "admin/_authenticate_admin.php";
 
 class TestFighter extends Fighter {
     public string $name = 'test';
@@ -50,7 +50,10 @@ class TestFighter extends Fighter {
 
     }
 
-
+    public function hasJutsu(int $jutsu_id): bool {
+        // TODO: Implement hasJutsu() method.
+        return true;
+    }
 }
 
 function fighterFromData(array $fighter_data, string $name): TestFighter {
@@ -124,14 +127,8 @@ function calcDamage(Fighter $player1, Fighter $player2, Jutsu $player1_jutsu, Ju
     $player2_raw_damage = $player2->calcDamage($player2_jutsu, true);
 
     // Collision
-    $battle_id = Battle::start(
-        system: $system,
-        player1: $player1,
-        player2: $player2,
-        battle_type: Battle::TYPE_SPAR
-    );
-    $battle = new BattleManager($system, $user, $battle_id, true, false);
-
+    $battle_id = Battle::start($system, $player1, $player2, Battle::TYPE_SPAR);
+    $battle = BattleManager::init($system, $user, $battle_id, true, false);
     $collision_text = $battle->jutsuCollision(
         player1: $player1,
         player2: $player2,
@@ -217,24 +214,26 @@ if(isset($_POST['run_simulation']) && $mode == 'vs') {
 
         $player1 = fighterFromData($player1_data, "Player 1");
         $player1_jutsu = new Jutsu(
-            1,
-            'p1j',
-            $player1->rank,
-            $player1_data['jutsu_type'],
-            (int)$player1_data['jutsu_power'],
-            'none',
-            0,
-            0,
-            'no',
-            'nope',
-            0,
-            Jutsu::USE_TYPE_PROJECTILE,
-            0,
-            0,
-            Jutsu::PURCHASE_TYPE_PURCHASEABLE,
-            0,
-            Jutsu::ELEMENT_NONE,
-            1
+            id: 1,
+            name: 'p1j',
+            rank: $player1->rank,
+            jutsu_type: $player1_data['jutsu_type'],
+            base_power: (int)$player1_data['jutsu_power'],
+            range: 1,
+            effect: Jutsu::TARGET_TYPE_TILE,
+            base_effect_amount: 'none',
+            effect_length: 0,
+            description: 0,
+            battle_text: 'no',
+            cooldown: 'nope',
+            use_type: 0,
+            target_type: Jutsu::USE_TYPE_PROJECTILE,
+            use_cost: 0,
+            purchase_cost: 0,
+            purchase_type: Jutsu::PURCHASE_TYPE_PURCHASABLE,
+            parent_jutsu: 0,
+            element: Jutsu::ELEMENT_NONE,
+            hand_seals: 1
         );
         $player1_jutsu->setLevel(50, 0);
 
@@ -245,6 +244,8 @@ if(isset($_POST['run_simulation']) && $mode == 'vs') {
             $player2->rank,
             $player2_data['jutsu_type'],
             (int)$player2_data['jutsu_power'],
+            1,
+            Jutsu::TARGET_TYPE_TILE,
             'none',
             0,
             0,
@@ -254,7 +255,7 @@ if(isset($_POST['run_simulation']) && $mode == 'vs') {
             Jutsu::USE_TYPE_PROJECTILE,
             0,
             0,
-            Jutsu::PURCHASE_TYPE_PURCHASEABLE,
+            Jutsu::PURCHASE_TYPE_PURCHASABLE,
             0,
             Jutsu::ELEMENT_NONE,
             1
@@ -380,6 +381,7 @@ else if($mode == 'speed_graph') {
                 rank: $player1->rank,
                 jutsu_type: Jutsu::TYPE_TAIJUTSU,
                 base_power: $jutsu_power,
+                range: 1,
                 effect: 'none',
                 base_effect_amount: 0,
                 effect_length: 0,
@@ -387,9 +389,10 @@ else if($mode == 'speed_graph') {
                 battle_text: 'nope',
                 cooldown: 0,
                 use_type: Jutsu::USE_TYPE_PROJECTILE,
+                target_type: Jutsu::TARGET_TYPE_TILE,
                 use_cost: 0,
                 purchase_cost: 0,
-                purchase_type: Jutsu::PURCHASE_TYPE_PURCHASEABLE,
+                purchase_type: Jutsu::PURCHASE_TYPE_PURCHASABLE,
                 parent_jutsu: 0,
                 element: Jutsu::ELEMENT_NONE,
                 hand_seals: 1
@@ -419,6 +422,8 @@ else if($mode == 'speed_graph') {
                 rank: $player2->rank,
                 jutsu_type: Jutsu::TYPE_TAIJUTSU,
                 base_power: $jutsu_power,
+                range: 1,
+                target_type: Jutsu::TARGET_TYPE_TILE,
                 effect: 'none',
                 base_effect_amount: 0,
                 effect_length: 0,
@@ -428,7 +433,7 @@ else if($mode == 'speed_graph') {
                 use_type: Jutsu::USE_TYPE_PROJECTILE,
                 use_cost: 0,
                 purchase_cost: 0,
-                purchase_type: Jutsu::PURCHASE_TYPE_PURCHASEABLE,
+                purchase_type: Jutsu::PURCHASE_TYPE_PURCHASABLE,
                 parent_jutsu: 0,
                 element: Jutsu::ELEMENT_NONE,
                 hand_seals: 1
@@ -547,24 +552,26 @@ else if(isset($_POST['run_simulation']) && $mode == 'scenarios') {
     $player1->intelligence = 10;
     $player1->willpower = 10;
     $player1_jutsu = new Jutsu(
-        1,
-        'p1j',
-        $player1->rank,
-        Jutsu::TYPE_NINJUTSU,
-        $base_jutsu_power,
-        'none',
-        0,
-        0,
-        'no',
-        'nope',
-        0,
-        Jutsu::USE_TYPE_PROJECTILE,
-        0,
-        0,
-        Jutsu::PURCHASE_TYPE_PURCHASEABLE,
-        0,
-        Jutsu::ELEMENT_NONE,
-        1
+        id: 1,
+        name: 'p1j',
+        rank: $player1->rank,
+        jutsu_type: Jutsu::TYPE_NINJUTSU,
+        base_power: $base_jutsu_power,
+        range: 1,
+        effect: 'none',
+        base_effect_amount: 0,
+        effect_length: 0,
+        description: 'no',
+        battle_text: 'nope',
+        cooldown: 0,
+        use_type: Jutsu::USE_TYPE_PROJECTILE,
+        target_type: Jutsu::TARGET_TYPE_DIRECTION,
+        use_cost: 0,
+        purchase_cost: 0,
+        purchase_type: Jutsu::PURCHASE_TYPE_PURCHASABLE,
+        parent_jutsu: 0,
+        element: Jutsu::ELEMENT_NONE,
+        hand_seals: 1
     );
     $player1_jutsu->setLevel($base_jutsu_level, 0);
 
@@ -579,24 +586,26 @@ else if(isset($_POST['run_simulation']) && $mode == 'scenarios') {
     $player2->intelligence = 10;
     $player2->willpower = 10;
     $player2_jutsu = new Jutsu(
-        2,
-        'p2j',
-        $player2->rank,
-        Jutsu::TYPE_TAIJUTSU,
-        $base_jutsu_power,
-        'none',
-        0,
-        0,
-        'no',
-        'nope',
-        0,
-        Jutsu::USE_TYPE_PHYSICAL,
-        0,
-        0,
-        Jutsu::PURCHASE_TYPE_PURCHASEABLE,
-        0,
-        Jutsu::ELEMENT_NONE,
-        2
+        id: 2,
+        name: 'p2j',
+        rank: $player2->rank,
+        jutsu_type: Jutsu::TYPE_TAIJUTSU,
+        base_power: $base_jutsu_power,
+        range: 1,
+        effect: 'none',
+        base_effect_amount: 0,
+        effect_length: 0,
+        description: 'no',
+        battle_text: 'nope',
+        cooldown: 0,
+        use_type: Jutsu::USE_TYPE_MELEE,
+        target_type: Jutsu::TARGET_TYPE_FIGHTER_ID,
+        use_cost: 0,
+        purchase_cost: 0,
+        purchase_type: Jutsu::PURCHASE_TYPE_PURCHASABLE,
+        parent_jutsu: 0,
+        element: Jutsu::ELEMENT_NONE,
+        hand_seals: 2
     );
     $player2_jutsu->setLevel($base_jutsu_level, 0);
 
@@ -699,7 +708,7 @@ else if(isset($_POST['run_simulation']) && $mode == 'scenarios') {
     }
 
     $label_width = 120;
-    echo "<style type='text/css'>
+    echo "<style>
         label {
             display: inline-block;
             text-align: left;
@@ -777,7 +786,7 @@ $ranks_prefill_data = array_map(function($rank) use ($rankManager) {
 
 <br />
 <div style='text-align:center;'>
-<script type='text/javascript' src='./scripts/jquery-2.1.0.min.js'></script>
+<script type='text/javascript' src='../scripts/jquery-2.1.0.min.js'></script>
 <script type='text/javascript'>
     function changeDisplay(display_id) {
         $('.displayDiv').hide();

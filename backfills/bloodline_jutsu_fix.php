@@ -1,14 +1,7 @@
 <?php
-session_start();
 
-if(!isset($_SESSION['user_id'])) {
-	exit;
-}
-
-/**
- * @var System $system;
- */
-require "authenticate_admin.php";
+/** @var System $system */
+require "admin/_authenticate_admin.php";
 
 $result = $system->query("SELECT `bloodline_id`, `jutsu` FROM `bloodlines`");
 $bloodlines = array();

@@ -1,0 +1,334 @@
+:root {
+    --gold-color: #FDD017;
+}
+
+/* BATTLE FIELD */
+.battleFieldContainer {
+    padding: 10px 0;
+    position: relative;
+
+    margin: -5px; /* Offset the TD padding */
+    overflow: hidden;
+}
+
+.tilesContainer {
+    height: 80px;
+
+    position: absolute;
+}
+
+.tileContainer {
+    position: absolute;
+    display: flex;
+    z-index: 1;
+}
+
+.tile {
+    height: 100%;
+    width: 100%;
+
+    display: inline-flex;
+    position: relative;
+    align-items: center;
+    justify-content: center;
+
+    z-index: 2;
+
+    background: #948d78;
+    border-radius: 50%;
+    border: 1px solid #807a68;
+}
+
+.tileIndex {
+    position: absolute;
+    bottom: 1px;
+    left: 0;
+    right: 0;
+    text-align: center;
+
+    color: white;
+    font-size: 8px;
+    opacity: 0.7;
+}
+
+.tileFighter {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    position: absolute;
+    z-index: 2;
+
+    background: rgba(255, 255, 255, 0.5);
+    border-radius: 50%;
+    border: 1px solid rgba(0, 0, 0, 0.4);
+    color: black;
+
+    overflow: hidden;
+}
+
+.tileFighter.ally {
+    background: rgba(0, 0, 255, 0.4);
+}
+
+.tileFighter.enemy {
+    background: rgba(255, 0, 0, 0.4);
+}
+
+.tile.movementTarget {
+    cursor: pointer;
+}
+.tile.movementTarget:hover {
+    background: #b1a990;
+}
+.tile.movementTarget.selected {
+    background: #b1a990;
+    border-color: #5d594c;
+    box-shadow: 0 0 3px 0 black;
+}
+
+.tile.attackTarget {
+    cursor: pointer;
+
+    box-shadow: 0 0 3px 1px #000091;
+}
+.tile.attackTarget:hover {
+    background: #b7af95;
+}
+
+.tile.attackPreview {
+    background: rgba(0, 0, 145, 0.4);
+}
+.tile.attackPreview:hover {
+    background: rgba(50, 50, 175, 0.4);
+}
+
+/* BATTLE ACTION PROMPT */
+#handSeals {
+    padding-top: 4px;
+    position: relative;
+
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+
+    align-content: center;
+    align-items: center;
+    justify-content: center;
+}
+
+.handSealContainer {
+    width: 15%; /* 6 per row */
+    height: 90px;
+    margin: 0;
+    padding: 0;
+    position: relative;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+:root {
+    --handseal-width: 62px;
+    --handseal-number-width: 20px;
+
+    --handseal-number-margin: calc((var(--handseal-width) - var(--handseal-number-width)) / 2);
+}
+.handSeal {
+    height: 62px;
+    width: var(--handseal-width);
+    position: relative;
+    z-index: 1;
+    border: 3px solid rgba(0, 0, 0, 0);
+    border-radius: 5px;
+
+    cursor: pointer;
+}
+.handSeal img {
+    height: 100%;
+    width: 100%;
+}
+.handSeal.selected {
+    border-color: var(--gold-color);
+}
+
+.handSealNumber {
+    width: var(--handseal-number-width);
+    position: absolute;
+    z-index: 20;
+    text-align: center;
+    left: var(--handseal-number-margin);
+    right: var(--handseal-number-margin);
+    bottom: 6px;
+
+    /* Style */
+    font-size: 14px;
+    font-weight: bold;
+    background-color: var(--gold-color);
+    border-radius: 10px;
+}
+
+#handSeals .handsealTooltip {
+    display: block;
+    margin: 0;
+    text-align: center;
+    height: 16px;
+}
+
+#handsealOverlay {
+    position: absolute;
+
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+
+    background-color: rgba(255, 255, 255, 0.9);
+    z-index: 50;
+    display: none;
+}
+
+/* WEAPONS */
+#weapons {
+    height: 200px;
+    padding-left: 20px;
+    padding-right: 20px;
+}
+.weapon {
+    display: inline-block;
+    padding: 8px 10px;
+    margin-top:14px;
+    margin-right: 15px;
+    vertical-align: top;
+
+    /* Style */
+    background-color: rgba(255, 255, 255, 0.1);
+    border: 1px solid #C0C0C0;
+    border-radius: 10px;
+    text-align: center;
+    box-shadow: 0 0 4px 0 rgba(0, 0, 0, 0);
+    user-select: none;
+}
+
+.weapon:last-child {
+    margin-right: 1px;
+}
+.weapon:hover {
+    background: rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+}
+.weapon.selected {
+    box-shadow: 0 0 4px 0 #000000;
+}
+
+
+#jutsuContainer {
+    padding-left: 5px;
+
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+}
+
+#jutsuContainer .jutsuCategory {
+    margin: 0;
+    text-align: center;
+
+    flex-basis: 25%;
+}
+.jutsuCategoryHeader div {
+    display: flex;
+    justify-content: space-evenly;
+}
+.jutsuCategoryHeader span {
+    flex-basis: 25%;
+}
+
+
+.jutsuButton {
+    display: inline-block;
+    padding: 5px 7px;
+    margin-bottom: 10px;
+
+    /* Style */
+    background: linear-gradient(#EFEFEF, #E4E4E4);
+    border: 1px solid #E0E0E0;
+    border-radius: 15px;
+    text-align: center;
+    box-shadow: 0 0 4px 0 rgba(0, 0, 0, 0);
+
+    user-select: none;
+}
+.jutsuButton.selected {
+    box-shadow: 0 0 4px 0 #000000;
+}
+
+.jutsuButton:last-child {
+    margin-bottom: 1px;
+}
+
+.jutsuButton:hover {
+    background: linear-gradient(#E4E4E4, #EFEFEF);
+    cursor: pointer;
+}
+
+.jutsuButton[aria-disabled='true'] {
+    opacity: 0.75;
+}
+
+.jutsuButton[aria-disabled='true']:hover {
+    background: linear-gradient(#EFEFEF, #E4E4E4);
+    cursor: default;
+}
+
+
+/* BATTLE LOG */
+.fighterActions {
+    border-bottom: 1px solid rgba(0,0,0,0.5);
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    padding: 5px;
+}
+.fighterActions:first-child {
+    padding-top: 0;
+}
+.fighterActions:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+.fighterActions p {
+    margin: 0;
+}
+
+.fighterActions .actionDescription {
+    margin: 5px 0;
+    padding: 5px;
+    background: rgba(0,0,0,0.06);
+    border-radius: 5px;
+}
+.appliedEffectDescription {
+    font-style: italic;
+}
+.effectAnnouncement {
+    font-style: italic;
+    margin-top: 3px;
+}
+
+.effectHit {
+
+}
+.heal {
+    color: rgb(0, 125, 0);
+    /*-webkit-text-stroke: 0.2px black;*/
+}
+.ninjutsuDamage {
+    color: rgb(0, 0, 240);
+}
+.genjutsuDamage {
+    color: rgb(200, 0, 240);
+}
+.taijutsuDamage {
+    color: rgb(240, 0, 0);
+}

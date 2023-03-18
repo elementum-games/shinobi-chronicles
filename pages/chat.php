@@ -12,10 +12,8 @@ function chat() {
 
     require_once 'classes/ReportManager.php';
 	global $system;
-	global $ajax;
 	global $player;
 	global $self_link;
-    $memes = require_once 'memes.php';
 
 	if($player->checkBan(StaffManager::BAN_TYPE_CHAT)) {
         $ban_type = StaffManager::BAN_TYPE_CHAT;
@@ -50,7 +48,7 @@ function chat() {
         else if(!isset($_POST['quick_reply']) && $_SESSION['quick_reply'] == true) {
             $_SESSION['quick_reply'] = false;
         }
-    
+
 		try {
 			$result = $system->query("SELECT `message` FROM `chat` WHERE `user_name` = '$player->user_name' ORDER BY  `post_id` DESC LIMIT 1");
 			if($system->db_last_num_rows) {

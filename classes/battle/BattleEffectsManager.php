@@ -178,7 +178,7 @@ class BattleEffectsManager {
         $this->applyArmorEffects($player1);
         $this->applyArmorEffects($player2);
     }
-    
+
     public function applyArmorEffects(Fighter $fighter) {
         if(!empty($fighter->equipped_armor)) {
             foreach($fighter->equipped_armor as $item_id) {
@@ -333,7 +333,7 @@ class BattleEffectsManager {
         $this->applyBloodlineActiveBoosts($player1);
         $this->applyBloodlineActiveBoosts($player2);
     }
-    
+
     public function applyBloodlineActiveBoosts(Fighter $fighter) {
         if(!empty($fighter->bloodline->combat_boosts)) {
             foreach($fighter->bloodline->combat_boosts as $id=>$effect) {
@@ -352,7 +352,7 @@ class BattleEffectsManager {
             }
         }
     }
-    
+
     public function applyActiveEffect(Fighter $target, Fighter $attacker, BattleEffect $effect): bool {
         if($target->health <= 0) {
             return false;

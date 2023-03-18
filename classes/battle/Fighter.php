@@ -1,5 +1,7 @@
 <?php
 
+use JetBrains\PhpStorm\Pure;
+
 abstract class Fighter {
     const BASE_OFFENSE = 35;
     const BASE_DEFENSE = 50;
@@ -18,12 +20,15 @@ abstract class Fighter {
     public string $combat_id;
 
     // Energy
-    public float $health;
-    public float $max_health;
-    public float $stamina;
-    public float $max_stamina;
-    public float $chakra;
-    public float $max_chakra;
+    public float $health = 100;
+    public float $max_health = 100;
+    public float $stamina = 100;
+    public float $max_stamina = 100;
+    public float $chakra = 100;
+    public float $max_chakra = 100;
+
+    public int $level = 1;
+    private int $money = 0;
 
     public string $avatar_link = '';
 
@@ -50,7 +55,7 @@ abstract class Fighter {
     public array $items;
 
     public array $equipped_jutsu;
-    public array $equipped_weapons;
+    public array $equipped_weapon_ids;
     public array $equipped_armor;
 
     public int $bloodline_id;
@@ -60,6 +65,8 @@ abstract class Fighter {
     public array $bloodline_defense_boosts;
 
     public string $gender;
+
+    public int $max_movement_distance = 2; // not in use yet
 
     // In-combat vars
     public $ninjutsu_boost = 0;
@@ -95,6 +102,10 @@ abstract class Fighter {
     abstract public function getAvatarSize(): int;
 
     abstract public function getInventory();
+
+    public function getMoney(): int {
+        return $this->money;
+    }
 
     public function applyBloodlineBoosts() {
         // Temp number fix inside
@@ -151,7 +162,7 @@ abstract class Fighter {
         }
     }
 
-    // abstract public function hasJutsu(int $jutsu_id): bool;
+    abstract public function hasJutsu(int $jutsu_id): bool;
     abstract public function hasItem(int $item_id): bool;
 
     abstract public function hasEquippedJutsu(int $jutsu_id): bool;
@@ -180,6 +191,7 @@ abstract class Fighter {
         }
     }
     
+    #[Pure]
     public function getDebuffResist(): float {
         $willpower = ($this->willpower + $this->willpower_boost - $this->willpower_nerf);
 
@@ -237,7 +249,7 @@ abstract class Fighter {
 
         switch($attack->purchase_type) {
             case Jutsu::PURCHASE_TYPE_DEFAULT:
-            case Jutsu::PURCHASE_TYPE_PURCHASEABLE:
+            case Jutsu::PURCHASE_TYPE_PURCHASABLE:
                 $offense = self::BASE_OFFENSE + ($off_skill * self::SKILL_OFFENSE_RATIO);
                 break;
             case Jutsu::PURCHASE_TYPE_BLOODLINE:
@@ -344,7 +356,6 @@ abstract class Fighter {
                 }
             }
         }
-
         switch($defense_type) {
             case 'ninjutsu':
                 // Resist unfairly applies to nin/tai residuals which only have a 25% or so effect amount, so we lower its effectiveness compared to a regular hit
@@ -361,7 +372,7 @@ abstract class Fighter {
                 error_log("Invalid defense type! {$defense_type}");
         }
 
-        if($this instanceof AI && $defense_type == 'genjutsu') {
+        if($this instanceof NPC && $defense_type == 'genjutsu') {
             $defense *= 0.8;
         }
 

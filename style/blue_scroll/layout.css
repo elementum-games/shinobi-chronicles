@@ -97,8 +97,8 @@ video {
     margin: 0;
     padding: 0;
     border: 0;
-    font-size: 100%;
     font: inherit;
+    font-size: 100%;
     vertical-align: baseline;
     box-sizing: border-box;
 }
@@ -142,8 +142,8 @@ html,
 body {
     height: 100%;
     width: 100%;
-    margin: 0px;
-    padding: 0px;
+    margin: 0;
+    padding: 0;
 }
 
 
@@ -186,7 +186,7 @@ body {
     position: relative;
     z-index: 80;
     padding: 0 0 26px 0;
-    
+
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -233,8 +233,8 @@ body {
 
 #topMenu ul {
     list-style: none;
-    margin: 0px;
-    padding: 0px;
+    margin: 0;
+    padding: 0;
     display: flex;
     flex-flow: row nowrap;
 }
@@ -485,7 +485,7 @@ h2#title {
     background: #b99e4747;
 }
 
-#sidemenu a {
+#sideMenu a {
     display: block;
     position: relative;
     width: 100%;
@@ -520,7 +520,7 @@ h2#title {
     transition: color 200ms ease-in 10ms;
 }
 
-#sidemenu a::before {
+#sideMenu a::before {
     content: '';
     position: absolute;
     width: 40px;
@@ -533,7 +533,7 @@ h2#title {
     background-position: center center;
 }
 
-#sidemenu a:hover::before {
+#sideMenu a:hover::before {
     animation: menuOptionsIcon 200ms ease-in 1;
 
     background-repeat: no-repeat;
@@ -815,7 +815,7 @@ h2#title {
 #footer {
     max-width: 100%;
     height: 44px;
-    margin: 0px auto;
+    margin: 0 auto;
     position: relative;
     z-index: 80;
 
@@ -862,7 +862,7 @@ h2#title {
 }
 
 .avatarFrame {
-    margin: 0px;
+    margin: 0;
     margin-right: 15px;
 
     width: 150px;
@@ -875,7 +875,7 @@ h2#title {
     border: 1px solid #FFFFFF;
 
     border-radius: 10px;
-    box-shadow: 2px 2px 5px 0px #202020;
+    box-shadow: 2px 2px 5px 0 #202020;
 }
 
 .avatarFrame img {
@@ -885,7 +885,7 @@ h2#title {
     max-height: 150px;
     margin-bottom: 5px;
 
-    border: 0px;
+    border: 0;
 }
 
 label {
@@ -894,7 +894,7 @@ label {
 
 #content table.table {
     margin: 0 auto 10px auto;
-    padding: 0px;
+    padding: 0;
     width: 95%;
 
     color: #88806c;
@@ -1051,7 +1051,7 @@ a.link:hover {
 }
 
 form {
-    margin: 0px;
+    margin: 0;
 }
 
 input[type=submit],
@@ -1146,7 +1146,6 @@ p {
 }
 
 .trainingNotification {
-    width: auto;
     position: absolute;
     top: 60px;
     right: 5px;
@@ -1162,7 +1161,6 @@ p {
 }
 
 #notifications {
-    width: auto;
     height: auto;
     position: absolute;
     right: 5px;
@@ -1203,7 +1201,7 @@ p {
 #notificationSlider {
     width: 200px;
     display: inline-block;
-    margin: 0px;
+    margin: 0;
     padding: 0;
     height: 26px;
     line-height: 26px;
@@ -1325,7 +1323,7 @@ p {
 #content .premiumUser:hover {
     --color-text-shadow: rgba(255, 255, 255, 0.4);
 
-    background: transparent url("/images/premium_glow.gif") repeat scroll 0% 0%;
+    background: transparent url("/images/premium_glow.gif") repeat scroll 0 0;
 }
 
 #content .staffMember {
@@ -1335,7 +1333,7 @@ p {
     font-size: 0.9rem;
     text-transform: uppercase;
     color: #E0E0E0;
-    text-shadow: 0px -1px 1px;
+    text-shadow: 0 -1px 1px;
 }
 
 #content a.chat.normalUser,
@@ -1355,7 +1353,7 @@ p {
 #content .premiumUser.blue,
 #content .table .premiumUser.blue,
 #content .table a.premiumUser.blue,
-#content a.premiumUser.blue:hover
+#content a.premiumUser.blue:hover,
 #content .chat_msg .premiumUser.blue,
 #content .chat_msg a.premiumUser.blue:hover {
     color: #a3b1fd;
@@ -1517,8 +1515,8 @@ p {
 }
 
 #content table.table td.rowHeader {
-    padding: 1px 0px;
-    border: 0px;
+    padding: 1px 0;
+    border: 0;
     border-bottom: 1px solid #000000;
     font-weight: bold;
     text-align: center;
@@ -1526,12 +1524,12 @@ p {
 
 #content table.table td.row1 {
     padding: 5px;
-    border: 0px;
+    border: 0;
 }
 
 #content table.table td.row2 {
     padding: 5px;
-    border: 0px;
+    border: 0;
 }
 
 #content table.table td.row1:first-child {
@@ -1575,7 +1573,6 @@ tr.chat_msg:nth-child(odd) {
 }
 
 #content ul.submenu {
-    display: block;
     width: 90%;
     margin: 10px auto;
     display: flex;
@@ -1645,7 +1642,7 @@ input.link:hover {
 
 br.clear {
     clear: both;
-    margin: 0px;
+    margin: 0;
 }
 
 .contentDiv,
@@ -2241,7 +2238,7 @@ a#spec_miss_cancel:hover::after {
     background: var(--theme-text-color-normal);
     border-top-left-radius: 4px;
     border-top-right-radius: 4px;
-    
+
     color: var(--theme-text-color-normal);
     font-family: 'Oswald', sans-serif;
     font-weight: normal;
@@ -2568,7 +2565,7 @@ a#spec_miss_cancel:hover::after {
     padding: 5px;
     display: inline-block;
     border-radius: 4px;
-    
+
     /* styling */
     background: var(--theme-content-bg-color);
     border: 1px solid var(--theme-text-color-normal);
@@ -2791,7 +2788,7 @@ a#spec_miss_cancel:hover::after {
     padding: 5px 5px 5px 5px;
     margin: 0;
     font-size: 0.9rem;
-    
+
     /* styling */
     color: var(--theme-text-color-light);
 }
@@ -2897,7 +2894,7 @@ a#spec_miss_cancel:hover::after {
 .inbox_convo_details_member_remove {
     width: 24px;
     height: 24px;
-    
+
     /* styling */
     background: url('./images/pm-details-close-off.png');
     background-repeat: no-repeat;
@@ -2931,7 +2928,7 @@ a#spec_miss_cancel:hover::after {
     flex-flow: row wrap;
     justify-content: center;
 }
-.inbox_convo_details_action div input, 
+.inbox_convo_details_action div input,
 .inbox_convo_details_action div button {
     width: 100%;
 }
@@ -3405,14 +3402,14 @@ a#spec_miss_cancel:hover::after {
 .systemMessage-new-success {
     background: #5fb463;
     border: 1px solid #18501b;
-    
+
     color: #18501b;
 }
 
 .systemMessage-new-error {
     background: #d44040;
     border: 1px solid #440c0c;
-    
+
     color: #440c0c;
 }
 
@@ -3454,7 +3451,7 @@ a#spec_miss_cancel:hover::after {
     :root {
         --total-width: 1024px;
     }
-    
+
     #topmenu, #footer {
         width: calc(100vw - 50px);
     }
@@ -3470,7 +3467,7 @@ a#spec_miss_cancel:hover::after {
     .travel-scout {
         flex-flow: column nowrap;
     }
-    
+
 }
 
 @media (min-width: 1400px) {

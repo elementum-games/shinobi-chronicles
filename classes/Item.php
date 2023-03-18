@@ -1,5 +1,7 @@
 <?php
 
+use JetBrains\PhpStorm\Pure;
+
 class Item {
     const USE_TYPE_WEAPON = 1;
     const USE_TYPE_ARMOR = 2;
@@ -75,6 +77,7 @@ class Item {
         }
     }
 
+    #[Pure]
     public static function fromDb(array $db_data, int $quantity = 0): Item {
         return new Item(
             id: $db_data['item_id'],

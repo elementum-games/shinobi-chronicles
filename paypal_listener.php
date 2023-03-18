@@ -3,7 +3,7 @@ if(!$_POST) {
 	exit;
 }
 
-require("classes.php");
+require("classes/_autoload.php");
 $system = new System();
 $system->dbConnect();
 

@@ -8,17 +8,18 @@ $layout = System::DEFAULT_LAYOUT;
 if (isset($_SESSION['user_id'])) {
   require_once "classes/User.php";
   require_once "classes/Bloodline.php";
-  $player = new User($_SESSION['user_id']);
+  $player = User::loadFromId($system, $_SESSION['user_id']);
   $player->loadData();
   $layout = $player->layout;
 }
 
-$system->renderStaticPageHeader($layout);
+$system->renderStaticPageHeader('Manual', $layout);
+
 ?>
 
-<!-- 
-  Probably move the styles somewhere, but since all the 
-  themes has their own style IDK where to keep this, 
+<!--
+  Probably move the styles somewhere, but since all the
+  themes has their own style IDK where to keep this,
   maybe manual should have its own styles?
   But for now I'm keeping styles here
 -->

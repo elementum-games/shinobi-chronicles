@@ -17,29 +17,19 @@ function spar() {
 
 	if($player->battle_id) {
 		try {
-            $battle = new BattleManager($system, $player, $player->battle_id);
+            $battle = BattleManager::init($system, $player, $player->battle_id);
 
-            $battle->checkTurn();
+            $battle->checkInputAndRunTurn();
 
             $battle->renderBattle();
 
             if($battle->isComplete()) {
-                echo "<table class='table'><tr><th>Battle complete</th></tr>
-			    <tr><td style='text-align:center;'>";
-                if($battle->isPlayerWinner()) {
-                    echo "You win!<br />";
-                }
-                else if($battle->isOpponentWinner()) {
-                    echo "You lose.<br />";
-                    $player->health = 5;
-                }
-                else if($battle->isDraw()) {
-                    echo "You both knocked each other out.<br />";
-                    $player->health = 5;
-                }
-                echo "</td></tr></table>";
+                $result = processSparFightEnd($battle, $player);
 
-                $player->battle_id = 0;
+                echo "<table class='table'>
+                    <tr><th>Battle complete</th></tr>
+			        <tr><td style='text-align:center;'>{$result}</td></tr>
+                </table>";
             }
         }
         catch (Exception $e) {
@@ -86,8 +76,8 @@ function spar() {
 		} catch (Exception $e) {
 			$system->message($e->getMessage());
 			$system->printMessage();
-			require("scoutArea.php");
-			scoutArea();
+
+            NearbyPlayers::renderScoutAreaList($system, $player, $self_link);
 		}
 	}
 	else if(isset($_GET['accept_challenge'])) {
@@ -99,7 +89,7 @@ function spar() {
 			}
 
             try {
-                $user = new User($challenge);
+                $user = User::loadFromId($system, $challenge, true);
                 $user->loadData(User::UPDATE_NOTHING, true);
             } catch(Exception $e) {
                 throw new Exception("Invalid user! " . $e->getMessage());
@@ -128,17 +118,16 @@ function spar() {
 			
 			$system->message($e->getMessage());
 			$system->printMessage();
-			require("scoutArea.php");
-			scoutArea();
+
+            NearbyPlayers::renderScoutAreaList($system, $player, $self_link);
 		}
 	}
 	else if(isset($_GET['decline_challenge'])) {
 		$player->challenge = 0;
 		$system->message("Challenge declined.");
 		$system->printMessage();
-		
-		require("scoutArea.php");
-		scoutArea();
+
+        NearbyPlayers::renderScoutAreaList($system, $player, $self_link);
 	}
 	else if(isset($_GET['cancel_challenge'])) {
 		$challenge = $system->clean($_GET['cancel_challenge']);
@@ -146,9 +135,8 @@ function spar() {
 		$result = $system->query("UPDATE `users` SET `challenge`=0 WHERE `user_id`='$challenge' AND `challenge`='$player->user_id' LIMIT 1");
 		$system->message("Challenge cancelled!");
 		$system->printMessage();
-			
-		require("scoutArea.php");
-		scoutArea();
+
+        NearbyPlayers::renderScoutAreaList($system, $player, $self_link);
 	}
 	else {
 		// Load user challenges sent
@@ -195,10 +183,55 @@ function spar() {
 			
 			echo "</table>";
 		}
-		
-		require("scoutArea.php");
-		scoutArea();
+
+        NearbyPlayers::renderScoutAreaList($system, $player, $self_link);
 	}
 	
 	return true;
+}
+
+/**
+ * @throws Exception
+ */
+function processSparFightEnd(BattleManager $battle, User $player): string {
+    $player->battle_id = 0;
+
+    if($battle->isPlayerWinner()) {
+        return "You win!";
+    }
+    else if($battle->isOpponentWinner()) {
+        $player->health = 5;
+        return "You lose.";
+    }
+    else if($battle->isDraw()) {
+        $player->health = 5;
+        return "You both knocked each other out.";
+    }
+    else {
+        throw new Exception("Invalid battle completion!");
+    }
+}
+
+function sparFightAPI(System $system, User $player): BattlePageAPIResponse {
+    if(!$player->battle_id) {
+        return new BattlePageAPIResponse(errors: ["Player is not in battle!"]);
+    }
+
+    $response = new BattlePageAPIResponse();
+
+    try {
+        $battle = BattleManager::init($system, $player, $player->battle_id);
+        $battle->checkInputAndRunTurn();
+
+        $response->battle_data = $battle->getApiResponse();
+
+        if($battle->isComplete()) {
+           $response->battle_result = processSparFightEnd($battle, $player);
+        }
+    }
+    catch (Exception $e) {
+        $response->errors[] = $e->getMessage();
+    }
+
+    return $response;
 }

@@ -99,7 +99,7 @@ class User extends Fighter {
     public string $spouse_name;
     public int $marriage_time;
     public $village;
-    public $level;
+    public int $level;
 
     public int $rank_num;
     public Rank $rank;
@@ -121,14 +121,14 @@ class User extends Fighter {
     public array $filters;
     public $train_type;
     public $train_gain;
-    public $train_time;
+    public int $train_time;
 
     private int $money;
 
-    public $pvp_wins;
-    public $pvp_losses;
-    public $ai_wins;
-    public $ai_losses;
+    public int $pvp_wins;
+    public int $pvp_losses;
+    public int $ai_wins;
+    public int $ai_losses;
 
     public $missions_completed;
     public $presents_claimed;
@@ -145,8 +145,9 @@ class User extends Fighter {
     public array $equipped_jutsu;
     public $equipped_items;
 
+    /** @var Item[] */
     public array $items;
-    public array $equipped_weapons;
+    public array $equipped_weapon_ids;
 
     public ?Bloodline $bloodline = null;
     public float $bloodline_skill;
@@ -248,74 +249,18 @@ class User extends Fighter {
 
     /**
      * User constructor.
-     * @param $user_id
+     * @param System $system
+     * @param int    $user_id
      * @throws Exception
      */
-    public function __construct($user_id) {
-        global $system;
+    public function __construct(System $system, int $user_id) {
         $this->system =& $system;
-
         if(!$user_id) {
             throw new Exception("Invalid user id!");
         }
-        $this->user_id = $this->system->clean($user_id);
+        
+        $this->user_id = $user_id;
         $this->id = self::ENTITY_TYPE . ':' . $this->user_id;
-
-        $result = $this->system->query("SELECT `user_id`, `user_name`, `ban_data`, `ban_type`, `ban_expire`, `journal_ban`, `avatar_ban`, `song_ban`, `last_login`,
-			`forbidden_seal`, `chat_color`, `chat_effect`, `staff_level`, `username_changes`, `support_level`, `special_mission`
-			FROM `users` WHERE `user_id`='$this->user_id' LIMIT 1"
-        );
-        if($this->system->db_last_num_rows == 0) {
-            throw new Exception("User does not exist!");
-        }
-
-        $result = $this->system->db_fetch($result);
-
-        $this->user_name = $result['user_name'];
-        $this->username_changes = $result['username_changes'];
-
-        $this->staff_level = $result['staff_level'];
-        $this->support_level = $result['support_level'];
-        $this->staff_manager = $this->loadStaffManager();
-
-        $this->ban_data = $this->loadBanData($result['ban_data']);
-        $this->ban_type = $result['ban_type'];
-        $this->ban_expire = $result['ban_expire'];
-        $this->journal_ban = $result['journal_ban'];
-        $this->avatar_ban = $result['avatar_ban'];
-        $this->song_ban = $result['song_ban'];
-
-        $this->last_login = $result['last_login'];
-
-        if($result['forbidden_seal']) {
-            $this->setForbiddenSealFromDb($result['forbidden_seal'], false);
-        }
-        $this->chat_color = $result['chat_color'];
-        $this->chat_effect = $result['chat_effect'];
-
-        //Todo: Remove this in a couple months, only a temporary measure to support current bans
-        if($this->ban_type) {
-            if($this->ban_expire > time()) {
-                $this->ban_data[$this->ban_type] = $this->ban_expire;
-                $ban_data = json_encode($this->ban_data);
-                $this->system->query("UPDATE `users` SET
-                    `ban_data` = '{$ban_data}',
-                   `ban_type` = '',
-                   `ban_expire` = NULL
-                WHERE `user_id`='{$this->user_id}' LIMIT 1");
-            }
-        }
-
-        //Check ban expiry
-        $ban_expiry = $this->checkBanExpiry();
-        if($ban_expiry != false) {
-            $this->system->message($ban_expiry);
-        }
-
-
-        $this->inventory_loaded = false;
-
-        return true;
     }
 
     /**
@@ -326,11 +271,12 @@ class User extends Fighter {
      * @throws Exception
      */
     public static function loadFromId(System $system, int $user_id, bool $remote_view = false): User {
-        $user = new User($user_id);
+        $user = new User($system, $user_id);
 
         $result = $system->query("SELECT 
             `user_id`, 
             `user_name`, 
+            `ban_data`,
             `ban_type`, 
             `ban_expire`, 
             `journal_ban`, 
@@ -339,11 +285,11 @@ class User extends Fighter {
             `last_login`,
 			`forbidden_seal`, 
 			`chat_color`, 
+			`chat_effect`,
 			`staff_level`, 
 			`username_changes`, 
 			`support_level`, 
-			`special_mission`,
-            `censor_explicit_language`
+			`special_mission`
 			FROM `users` WHERE `user_id`='$user_id' LIMIT 1"
         );
         if($system->db_last_num_rows == 0) {
@@ -357,7 +303,9 @@ class User extends Fighter {
 
         $user->staff_level = $result['staff_level'];
         $user->support_level = $result['support_level'];
+        $user->staff_manager = $user->loadStaffManager();
 
+        $user->ban_data = $user->loadBanData($result['ban_data']);
         $user->ban_type = $result['ban_type'];
         $user->ban_expire = $result['ban_expire'];
         $user->journal_ban = $result['journal_ban'];
@@ -370,8 +318,20 @@ class User extends Fighter {
             $user->setForbiddenSealFromDb($result['forbidden_seal'], $remote_view);
         }
         $user->chat_color = $result['chat_color'];
+        $user->chat_effect = $result['chat_effect'];
 
-        $user->censor_explicit_language = (bool)$result['censor_explicit_language'];
+        //Todo: Remove this in a couple months, only a temporary measure to support current bans
+        if($user->ban_type) {
+            if($user->ban_expire > time()) {
+                $user->ban_data[$user->ban_type] = $user->ban_expire;
+                $ban_data = json_encode($user->ban_data);
+                $user->system->query("UPDATE `users` SET
+                    `ban_data` = '{$ban_data}',
+                   `ban_type` = '',
+                   `ban_expire` = NULL
+                WHERE `user_id`='{$user->user_id}' LIMIT 1");
+            }
+        }
 
         if(!$remote_view) {
             $user->checkBanExpiry();
@@ -400,7 +360,7 @@ class User extends Fighter {
 
         return null;
     }
-    
+
     /* function loadData()
         Loads user data from the database into class members
         -Parameters-
@@ -625,7 +585,6 @@ class User extends Fighter {
             $this->in_village = false;
         }
 
-        // Daily Tasks
         // Daily Tasks
         $this->daily_tasks = [];
         $this->daily_tasks_reset = 0;
@@ -999,7 +958,7 @@ class User extends Fighter {
         $result = $this->system->query("SELECT * FROM `user_inventory` WHERE `user_id` = '{$this->user_id}'");
 
         $player_jutsu = [];
-        $player_items = [];
+        $player_item_inventory = [];
         $equipped_jutsu = [];
         $equipped_items = [];
 
@@ -1007,7 +966,7 @@ class User extends Fighter {
         if($this->system->db_last_num_rows > 0) {
             $user_inventory = $this->system->db_fetch($result);
             $player_jutsu = json_decode($user_inventory['jutsu'], true);
-            $player_items = json_decode($user_inventory['items']);
+            $player_item_inventory = json_decode($user_inventory['items'], true);
             $equipped_jutsu = json_decode($user_inventory['equipped_jutsu']);
             $equipped_items = json_decode($user_inventory['equipped_items']);
         }
@@ -1073,7 +1032,7 @@ class User extends Fighter {
         if(!empty($equipped_jutsu)) {
             $count = 0;
             foreach($equipped_jutsu as $jutsu_data) {
-                if($this->checkInventory($jutsu_data->id, 'jutsu')) {
+                if($this->hasJutsu($jutsu_data->id)) {
                     $this->equipped_jutsu[$count]['id'] = $jutsu_data->id;
                     $this->equipped_jutsu[$count]['type'] = $jutsu_data->type;
                     $count++;
@@ -1084,17 +1043,17 @@ class User extends Fighter {
             $this->equipped_jutsu = [];
         }
 
-        if($player_items) {
-            $player_items_array = $player_items;
-            $player_items = [];
+        if($player_item_inventory) {
+            $player_items_array = $player_item_inventory;
+            $player_item_inventory = [];
             $player_items_string = '';
 
             foreach($player_items_array as $item) {
-                if(!is_numeric($item->item_id)) {
+                if(!is_numeric($item['item_id'])) {
                     continue;
                 }
-                $player_items[$item->item_id] = $item;
-                $player_items_string .= $item->item_id . ',';
+                $player_item_inventory[$item['item_id']] = $item;
+                $player_items_string .= $item['item_id'] . ',';
             }
             $player_items_string = substr($player_items_string, 0, strlen($player_items_string) - 1);
 
@@ -1102,11 +1061,10 @@ class User extends Fighter {
 
             $result = $this->system->query("SELECT * FROM `items` WHERE `item_id` IN ({$player_items_string})");
             if($this->system->db_last_num_rows > 0) {
-                while($item = $this->system->db_fetch($result)) {
-                    $this->items[$item['item_id']] = $item;
-                    $this->items[$item['item_id']]['quantity'] = $player_items[$item['item_id']]->quantity;
+                while($item_data = $this->system->db_fetch($result)) {
+                    $item_id = $item_data['item_id'];
+                    $this->items[$item_id] = Item::fromDb($item_data, $player_item_inventory[$item_id]['quantity']);
                 }
-
             }
             else {
                 $this->items = [];
@@ -1117,16 +1075,16 @@ class User extends Fighter {
         }
 
         $this->equipped_items = [];
-        $this->equipped_weapons = [];
+        $this->equipped_weapon_ids = [];
         $this->equipped_armor = [];
         if($equipped_items) {
             foreach($equipped_items as $item_id) {
-                if($this->checkInventory($item_id, 'item')) {
+                if($this->hasItem($item_id)) {
                     $this->equipped_items[] = $item_id;
-                    if($this->items[$item_id]['use_type'] == 1) {
-                        $this->equipped_weapons[] = $item_id;
+                    if($this->items[$item_id]->use_type == 1) {
+                        $this->equipped_weapon_ids[] = $item_id;
                     }
-                    else if($this->items[$item_id]['use_type'] == 2) {
+                    else if($this->items[$item_id]->use_type == 2) {
                         $this->equipped_armor[] = $item_id;
                     }
                 }
@@ -1134,31 +1092,6 @@ class User extends Fighter {
         }
 
         $this->inventory_loaded = true;
-    }
-
-    /* function checkInventory()
-    *	Checks user inventory, returns true if the item/jutsu is owned, false if it isn't.
-        -Parameters-
-        @item_id: Id of the item/jutsu to be checked for
-        @inventory_type (jutsu, item): Type of thing to check for, either item or jutsu
-    */
-    public function checkInventory($item_id, $inventory_type = 'jutsu'): bool {
-        if(!$item_id) {
-            return false;
-        }
-
-        if($inventory_type == 'jutsu') {
-            if(isset($this->jutsu[$item_id])) {
-                return true;
-            }
-        }
-        else if($inventory_type == 'item') {
-            if(isset($this->items[$item_id])) {
-                return true;
-            }
-        }
-
-        return false;
     }
 
     public function checkTraining(): string {
@@ -1180,7 +1113,7 @@ class User extends Fighter {
                     $gain = 100 - $this->jutsu[$jutsu_id]->level;
                 }
 
-                if($this->checkInventory($jutsu_id, 'jutsu')) {
+                if($this->hasJutsu($jutsu_id)) {
                     if($this->jutsu[$jutsu_id]->level < 100) {
                         $new_level = $this->jutsu[$jutsu_id]->level + $gain;
 
@@ -1330,7 +1263,7 @@ class User extends Fighter {
         }
 
         switch($jutsu->purchase_type) {
-            case Jutsu::PURCHASE_TYPE_PURCHASEABLE:
+            case Jutsu::PURCHASE_TYPE_PURCHASABLE:
                 // Element check
                 if($jutsu->element && $jutsu->element != Jutsu::ELEMENT_NONE) {
                     if($this->elements) {
@@ -1468,6 +1401,7 @@ class User extends Fighter {
     */
     public function updateData() {
 
+        /** @noinspection SqlWithoutWhere */
         $query = "UPDATE `users` SET
 		`current_ip` = '$this->current_ip',
 		`last_ip` = '$this->last_ip',
@@ -1650,8 +1584,8 @@ class User extends Fighter {
         if($this->items && !empty($this->items)) {
             foreach($this->items as $item) {
                 $player_items[$item_count] = [
-                    'item_id' => $item['item_id'],
-                    'quantity' => $item['quantity'],
+                    'item_id' => $item->id,
+                    'quantity' => $item->quantity,
                 ];
                 $item_count++;
             }
@@ -1948,14 +1882,14 @@ class User extends Fighter {
      * @return User
      * @throws Exception
      */
-    public static function fromEntityId(string $entity_id): User {
+    public static function fromEntityId(System $system, string $entity_id): User {
         $entity_id = System::parseEntityId($entity_id);
 
         if($entity_id->entity_type != self::ENTITY_TYPE) {
             throw new Exception("Entity ID is not a User!");
         }
 
-        return new User($entity_id->id);
+        return User::loadFromId($system, $entity_id->id);
     }
 
     public static function create(

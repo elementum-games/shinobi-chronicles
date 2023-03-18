@@ -58,7 +58,7 @@ function bloodline() {
 		}
 		$system->printMessage();
 	}
-	echo "<style type='text/css'>
+	echo "<style>
 	label {
 		display: inline-block;
 	}
@@ -131,7 +131,7 @@ function bloodline() {
 	$bloodline_skill = 100 + $player->bloodline_skill;
 
 	echo "
-	<style type='text/css'>
+	<style>
 	span.amount {
 		color:#00C000;
 	}	

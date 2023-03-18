@@ -94,7 +94,7 @@ function training() {
 			}
 			else if(!empty($_POST['jutsu'])) {
 				$jutsu_id = (int)$_POST['jutsu'];
-				if(!$player->checkInventory($jutsu_id, 'jutsu')) {
+				if(!$player->hasJutsu($jutsu_id)) {
 					throw new Exception("Invalid jutsu!");
 				}
 				if($player->jutsu[$jutsu_id]->level >= 100) {

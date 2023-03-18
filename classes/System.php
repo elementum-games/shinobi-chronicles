@@ -1,7 +1,10 @@
 <?php
 
+use JetBrains\PhpStorm\Pure;
+
 require_once __DIR__ . '/EntityId.php';
 require_once __DIR__ . '/User.php';
+require_once __DIR__ . '/MarkdownParser.php';
 require_once __DIR__ . '/API.php';
 
 /*	Class:		System
@@ -58,8 +61,8 @@ class System {
 
     public $environment;
 
-    public $SC_OPEN;
-    public $register_open;
+    public bool $SC_OPEN;
+    public bool $register_open;
 
     public string $link;
 
@@ -67,6 +70,9 @@ class System {
     public bool $is_api_request = false;
 
     public $timezoneOffset;
+
+    // Request lifecycle
+    public bool $is_legacy_ajax_request = false;
 
     public array $villageLocations = [];
 
@@ -84,12 +90,12 @@ class System {
     public array $SC_STAFF_COLORS = array(
         User::STAFF_MODERATOR => array(
             'staffBanner' => "moderator",
-            'staffColor' => "009020",
+            'staffColor' => "#009020",
             'pm_class' => 'moderator'
         ),
         User::STAFF_HEAD_MODERATOR => array(
             'staffBanner' => "head moderator",
-            'staffColor' => "0090A0",
+            'staffColor' => "#0090A0",
             'pm_class' => 'headModerator'
         ),
         User::STAFF_CONTENT_ADMIN => array(
@@ -99,12 +105,12 @@ class System {
         ),
         User::STAFF_ADMINISTRATOR => array(
             'staffBanner' => "administrator",
-            'staffColor' => "A00000",
+            'staffColor' => "#A00000",
             'pm_class' => 'administrator'
         ),
         User::STAFF_HEAD_ADMINISTRATOR => array(
             'staffBanner' => "head administrator",
-            'staffColor' => "A00000",
+            'staffColor' => "#A00000",
             'pm_class' => 'administrator'
         )
     );
@@ -132,9 +138,13 @@ class System {
         'support' => 30,
         'chat_log' => 31,
     ];
+
     public array $links = [
         'github' => 'https://github.com/elementum-games/shinobi-chronicles',
         'discord' => 'https://discord.gg/Kx52dbXEf3',
+    ];
+    public array $api_links = [
+        'battle' => ''
     ];
 
     //Chat variables
@@ -243,6 +253,7 @@ class System {
             $this->links[$slug] = $this->link . '?id=' . $id;
         }
 
+        $this->api_links['battle'] = $this->link . 'api/battle.php';
         $this->api_links['inbox'] = $this->link . 'api/inbox.php';
         $this->api_links['travel'] = $this->link . 'api/travel.php';
 
@@ -285,7 +296,11 @@ class System {
         $search_terms = array('&yen;');
         $replace_terms = array('[yen]');
         $input = str_replace($search_terms, $replace_terms, $input);
-        $input = htmlspecialchars($input, ENT_QUOTES);
+        $input = htmlspecialchars(
+            string: $input,
+            flags: ENT_QUOTES,
+            double_encode: false
+        );
 
         $input = str_replace($replace_terms, $search_terms, $input);
         $input = mysqli_real_escape_string($this->con, $input);
@@ -297,8 +312,8 @@ class System {
         $query = trim($query);
 
         //Debugging
-        if($debug == true) {
-            echo $query;
+        if($debug) {
+            $this->debugMessage($query);
             return false;
         }
 
@@ -363,7 +378,6 @@ class System {
     }
 
 
-
     /* function message(message, force_message)
 
         Stores a message for display later.
@@ -381,6 +395,10 @@ class System {
         }
     }
 
+    public function debugMessage($message) {
+        $this->debug_messages[] = $message;
+    }
+
     /* function printMessage()
         Displays message, if one is stored.
         -Parameters-
@@ -394,6 +412,20 @@ class System {
             return true;
         }
         return true;
+    }
+
+    /**
+     * @param string $page_name
+     * @return string
+     * @throws Exception
+     */
+    public function getUrl(string $page_name): string {
+        $id = self::PAGE_IDS[$page_name] ?? null;
+        if($id == null) {
+            throw new Exception("Invalid page name!");
+        }
+
+        return $this->link . '?id=' . $id;
     }
 
     /**
@@ -463,7 +495,7 @@ class System {
         global $side_menu_end;
         global $footer;
 
-        $pages = require 'routes.php';
+        $pages = require __DIR__ . '/../config/routes.php';
 
         echo $side_menu_start;
         foreach($pages as $id => $page) {
@@ -600,6 +632,19 @@ class System {
 
         return $text;
 
+    }
+
+    public function parseMarkdown($text, $allow_images = false, $strip_breaks = true, $faces = false): string {
+        if($strip_breaks) {
+            $text = str_replace("\n", "", $text);
+        }
+
+        $text = str_replace("[br]", "\n", $text);
+
+        return MarkdownParser::instance()
+            ->setImagesDisabled(!$allow_images)
+            ->setBreaksEnabled(true)
+            ->text($text);
     }
 
     public function imageCheck($image, $size): string {
@@ -752,7 +797,7 @@ class System {
         return password_verify($password, $hash);
     }
 
-    public function renderStaticPageHeader($layout = System::DEFAULT_LAYOUT): void {
+    public function renderStaticPageHeader(string $page_title, $layout = System::DEFAULT_LAYOUT): void {
         $system = $this;
 
         require($this->fetchLayoutByName($layout));
@@ -767,7 +812,7 @@ class System {
         echo $heading;
         echo $top_menu;
         echo $header;
-        echo str_replace("[HEADER_TITLE]", "Rules", $body_start);
+        echo str_replace("[HEADER_TITLE]", $page_title, $body_start);
     }
 
     public function renderStaticPageFooter($layout = System::DEFAULT_LAYOUT): void {
@@ -920,6 +965,17 @@ class System {
         return ucwords(str_replace('_', ' ', $slug));
     }
 
+    public static function getEchoDebugClosure(): Closure {
+        return function ($category, $label, $contents) {
+            if(php_sapi_name() == "cli") {
+                echo "\r\nDEBUG ($label)\r\n" . $contents . "\r\n";
+            }
+            else {
+                echo "<br />DEBUG ($label)<br />" . $contents . "<br />";
+            }
+        };
+    }
+
     public static function currentYear(): int {
         return (int) date('Y', time());
     }
@@ -975,6 +1031,7 @@ class System {
         return $kunai_packs;
     }
 
+    #[Pure]
     public function getReactFile(string $component_name): string {
         $filename = "ui_components/build/{$component_name}.js";
         return $filename . "?q=" .  filemtime($filename);

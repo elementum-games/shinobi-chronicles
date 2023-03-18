@@ -96,7 +96,7 @@ class Battle {
             $player1->combat_id => $player1->health,
             $player2->combat_id => $player2->health
         ];
-        
+
         $system->query(
             "INSERT INTO `battles` SET 
                 `battle_type` = '" . $battle_type . "',
@@ -205,11 +205,11 @@ class Battle {
         $this->player1->combat_id = Battle::combatId(Battle::TEAM1, $this->player1);
         $this->player2->combat_id = Battle::combatId(Battle::TEAM2, $this->player2);
 
-        if($this->player1 instanceof AI) {
+        if($this->player1 instanceof NPC) {
             $this->player1->loadData();
             $this->player1->health = $this->fighter_health[$this->player1->combat_id];
         }
-        if($this->player2 instanceof AI) {
+        if($this->player2 instanceof NPC) {
             $this->player2->loadData();
             $this->player2->health = $this->fighter_health[$this->player2->combat_id];
         }
@@ -234,15 +234,15 @@ class Battle {
      * @throws Exception
      */
     protected function loadFighterFromEntityId(string $entity_id): Fighter {
-    switch(Battle::getFighterEntityType($entity_id)) {
-        case User::ENTITY_TYPE:
-            return User::fromEntityId($entity_id);
-        case AI::ID_PREFIX:
-            return AI::fromEntityId($this->system, $entity_id);
-        default:
-            throw new Exception("Invalid entity type! " . Battle::getFighterEntityType($entity_id));
+        switch(Battle::getFighterEntityType($entity_id)) {
+            case User::ENTITY_TYPE:
+                return User::fromEntityId($this->system, $entity_id);
+            case NPC::ID_PREFIX:
+                return NPC::fromEntityId($this->system, $entity_id);
+            default:
+                throw new Exception("Invalid entity type! " . Battle::getFighterEntityType($entity_id));
+        }
     }
-}
 
     /**
      * @param string $entity_id
@@ -293,7 +293,7 @@ class Battle {
             `jutsu_cooldowns` = '" . json_encode($this->jutsu_cooldowns) . "',
             `fighter_jutsu_used` = '" . json_encode($this->fighter_jutsu_used) . "'
         WHERE `battle_id` = '{$this->battle_id}' LIMIT 1");
-        
+
         BattleLog::addOrUpdateTurnLog($this->system, $this->battle_id, $this->turn_count, $this->battle_text);
 
         $this->system->query("COMMIT;");

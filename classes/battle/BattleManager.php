@@ -4,52 +4,7 @@ require_once __DIR__ . '/Battle.php';
 // require_once __DIR__ . '/BattleField.php';
 require_once __DIR__ . '/BattleEffectsManager.php';
 require_once __DIR__ . '/BattleAttack.php';
-require_once __DIR__ . '/FighterAction.php';
-
-/*
- *
- * - what turn is it
- * - collect actions
- *      - movements
- *      - attacks (ID/seals, target ID(single) or target tile or target direction(AoE))
- * - end when actions are collected or time elapsed
- *
- *
- * BATTLEFIELD
- * - what tiles are shown based on position
- * - at least 6 tiles
- * - show at least 2 tiles behind each user, to a max of 5(6?) tiles from the opponent
- * - handle:
- *   - movement
- *     - does the movement trigger an effect (tile status effect, or backstab bonus?)
- *     - if players move past each other, stop movement
- *   - player positions
- *   - do attacks hit
- *   - do attacks interact with anything while flying
- *
- * MOVEMENT PHASE
- * - allow same tile
- * - max 2 people from team per tile
- * - opportunity attacks to disincentivize running through opponent
- *
- *
- * ATTACK PHASE
- * - activate conditions (genjutsu)
- * - cast time (nin/gen)
- *   - is interrupted?
- *
- *
- *
- *
- */
-
-/* Types of ninjutsu
-- melee
-- projectile (single target)
-- projectile AoE
-- 360 defense
-- buff (cloak)
-*/
+require_once __DIR__ . '/LegacyFighterAction.php';
 
 class BattleManager {
     const SPEED_DAMAGE_REDUCTION_RATIO = 0.4;
@@ -115,6 +70,19 @@ class BattleManager {
     }
 
     /**
+     * @param System $system
+     * @param User   $player
+     * @param int    $battle_id
+     * @param bool   $spectate
+     * @param bool   $load_fighters
+     * @return BattleManager
+     * @throws Exception
+     */
+    public static function init(System $system, User $player, int $battle_id, bool $spectate = false, bool $load_fighters = true): BattleManager {
+        return new BattleManager($system, $player, $battle_id, $spectate, $load_fighters);
+    }
+
+    /**
      * @throws Exception
      */
     protected function loadFighters() {
@@ -162,8 +130,8 @@ class BattleManager {
                     'debug',
                     'battle_stopped',
                     "Battle #{$this->battle_id} stopped - "
-                        . "P1 battle ID #{$this->battle->player1->battle_id} - "
-                        . "P2 battle ID #{$this->battle->player2->battle_id}"
+                    . "P1 battle ID #{$this->battle->player1->battle_id} - "
+                    . "P2 battle ID #{$this->battle->player2->battle_id}"
                 );
                 $this->stopBattle();
                 return;
@@ -200,7 +168,7 @@ class BattleManager {
      * @return string|null
      * @throws Exception
      */
-    public function checkTurn(): ?string {
+    public function checkInputAndRunTurn(): ?string {
         // If someone is not in battle, this will be set
         if($this->battle->winner) {
             return $this->battle->winner;
@@ -302,7 +270,7 @@ class BattleManager {
                     if($jutsu_type == Jutsu::TYPE_TAIJUTSU && !empty($_POST['weapon_id'])) {
                         $weapon_id = (int)$this->system->clean($_POST['weapon_id']);
                         if($weapon_id && $this->player->hasItem($weapon_id)) {
-                            if(array_search($weapon_id, $this->player->equipped_weapons) === false) {
+                            if(!in_array($weapon_id, $this->player->equipped_weapon_ids)) {
                                 $weapon_id = 0;
                             }
                         }
@@ -314,7 +282,7 @@ class BattleManager {
                     // Log jutsu used
                     $this->setPlayerAction($this->player, $player_jutsu, $weapon_id);
 
-                    if($this->opponent instanceof AI) {
+                    if($this->opponent instanceof NPC) {
                         $this->chooseAndSetAIAction($this->opponent);
                     }
                 } catch (Exception $e) {
@@ -640,16 +608,16 @@ class BattleManager {
 
     /**
      * @param Fighter       $fighter
-     * @param FighterAction $action
+     * @param LegacyFighterAction $action
      * @return BattleAttack
      * @throws Exception
      */
-    protected function setupFighterAttack(Fighter $fighter, FighterAction $action): BattleAttack {
+    protected function setupFighterAttack(Fighter $fighter, LegacyFighterAction $action): BattleAttack {
         $attack = new BattleAttack();
         if($action->jutsu_purchase_type == Jutsu::PURCHASE_TYPE_DEFAULT) {
             $attack->jutsu = $this->default_attacks[$action->jutsu_id];
         }
-        else if($action->jutsu_purchase_type == Jutsu::PURCHASE_TYPE_PURCHASEABLE) {
+        else if($action->jutsu_purchase_type == Jutsu::PURCHASE_TYPE_PURCHASABLE) {
             $attack->jutsu = $fighter->jutsu[$action->jutsu_id];
         }
         else if($action->jutsu_purchase_type == Jutsu::PURCHASE_TYPE_BLOODLINE) {
@@ -1072,7 +1040,7 @@ class BattleManager {
     }
 
     protected function setPlayerAction(Fighter $player, Jutsu $jutsu, $weapon_id) {
-        $this->battle->fighter_actions[$player->combat_id] = new FighterAction(
+        $this->battle->fighter_actions[$player->combat_id] = new LegacyFighterAction(
             $jutsu->id,
             $jutsu->purchase_type,
             $weapon_id
@@ -1093,15 +1061,15 @@ class BattleManager {
      * @throws Exception
      */
     protected function chooseAndSetAIAction(Fighter $ai) {
-        if(!($ai instanceof AI)) {
+        if(!($ai instanceof NPC)) {
             throw new Exception("Calling chooseAndSetAIAction on non-AI!");
         }
 
-        $jutsu = $ai->chooseMove();
+        $jutsu = $ai->chooseAttack();
 
-        $this->battle->fighter_actions[$ai->combat_id] = new FighterAction(
+        $this->battle->fighter_actions[$ai->combat_id] = new LegacyFighterAction(
             $jutsu->id,
-            Jutsu::PURCHASE_TYPE_PURCHASEABLE,
+            Jutsu::PURCHASE_TYPE_PURCHASABLE,
             0,
         );
     }

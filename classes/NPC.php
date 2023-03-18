@@ -1,11 +1,11 @@
 <?php
 
-/* 	Class:		AI
-	Purpose:	Contains all information for a specific AI, functions for selecting move, calculated damage dealt and
+/* 	Class:		NPC
+	Purpose:	Contains all information for a specific NPC, functions for selecting move, calculated damage dealt and
 				received, etc
 */
-class AI extends Fighter {
-    const ID_PREFIX = 'AI';
+class NPC extends Fighter {
+    const ID_PREFIX = 'NPC';
 
     public System $system;
     public RankManager $rankManager;
@@ -13,7 +13,6 @@ class AI extends Fighter {
     public string $id;
     public int $ai_id;
     public string $name;
-    public float $max_health;
     public int $level;
     public string $gender;
 
@@ -21,7 +20,9 @@ class AI extends Fighter {
     public float $rank_progress;
 
     public float $health;
-    public float $chakra = 0;
+    public float $max_health;
+    public float $chakra = 100;
+    public float $max_chakra = 100;
     public float $stamina = 0;
 
     public float $ninjutsu_skill;
@@ -47,23 +48,22 @@ class AI extends Fighter {
     public int $staff_level = 0;
 
     /**
-     * AI constructor.
+     * NPC constructor.
      * @param System $system
-     * @param int    $ai_id Id of the AI, used to select and update data from database
+     * @param int    $ai_id Id of the NPC, used to select and update data from database
      * @throws Exception
      */
     public function __construct(System $system, int $ai_id) {
         $this->system =& $system;
         if(!$ai_id) {
-            $system->error("Invalid AI opponent!");
-            return false;
+            throw new Exception("Invalid NPC opponent!");
         }
         $this->ai_id = $system->clean($ai_id);
         $this->id = self::ID_PREFIX . ':' . $this->ai_id;
 
         $result = $system->query("SELECT `ai_id`, `name` FROM `ai_opponents` WHERE `ai_id`='$this->ai_id' LIMIT 1");
         if($system->db_last_num_rows == 0) {
-            throw new Exception("AI does not exist!");
+            throw new Exception("NPC does not exist!");
         }
 
         $result = $this->system->db_fetch($result);
@@ -79,7 +79,7 @@ class AI extends Fighter {
     }
 
     /**
-     * Loads AI data from the database into class members
+     * Loads NPC data from the database into class members
      * @throws Exception
      */
     public function loadData() {
@@ -132,7 +132,7 @@ class AI extends Fighter {
                     $jutsu->use_type = Jutsu::USE_TYPE_PROJECTILE;
                     break;
                 case Jutsu::TYPE_TAIJUTSU:
-                    $jutsu->use_type = Jutsu::USE_TYPE_PHYSICAL;
+                    $jutsu->use_type = Jutsu::USE_TYPE_MELEE;
                     break;
                 case Jutsu::TYPE_GENJUTSU:
                     $jutsu->effect = 'residual_damage';
@@ -203,9 +203,7 @@ class AI extends Fighter {
         }
     }
 
-    /* function chooseMove()
-    */
-    public function chooseMove(): Jutsu {
+    public function chooseAttack(): Jutsu {
         if(!$_SESSION['ai_logic']['special_move_used'] && $this->jutsu[1]) {
             $this->current_move =& $this->jutsu[1];
             $_SESSION['ai_logic']['special_move_used'] = true;
@@ -232,24 +230,26 @@ class AI extends Fighter {
         );
 
         $jutsu = new Jutsu(
-            $id,
-            'Move ' . $id,
-            $this->rank,
-            $jutsu_type,
-            $power,
-            'none',
-            0,
-            0,
-            "N/A",
-            $battle_text_swapped,
-            0,
-            Jutsu::USE_TYPE_PHYSICAL,
-            $this->rank * 5,
-            $this->rank * 1000,
-            Jutsu::PURCHASE_TYPE_PURCHASEABLE,
-            0,
-            Jutsu::ELEMENT_NONE,
-            ''
+            id: $id,
+            name: 'Move ' . $id,
+            rank: $this->rank,
+            jutsu_type: $jutsu_type,
+            base_power: $power,
+            range: 2,
+            effect: 'none',
+            base_effect_amount: 0,
+            effect_length: 0,
+            description: "N/A",
+            battle_text: $battle_text_swapped,
+            cooldown: 0,
+            use_type: Jutsu::USE_TYPE_MELEE,
+            target_type: Jutsu::TARGET_TYPE_FIGHTER_ID,
+            use_cost: $this->rank * 5,
+            purchase_cost: $this->rank * 1000,
+            purchase_type: Jutsu::PURCHASE_TYPE_PURCHASABLE,
+            parent_jutsu: 0,
+            element: Jutsu::ELEMENT_NONE,
+            hand_seals: ''
         );
 
         $jutsu_level = 5 + ($this->rank_progress * 50);
@@ -273,6 +273,9 @@ class AI extends Fighter {
     public function getInventory() {
     }
 
+    public function hasJutsu(int $jutsu_id): bool {
+        return false;
+    }
     public function hasItem(int $item_id): bool {
         return false;
     }
@@ -292,16 +295,16 @@ class AI extends Fighter {
     /**
      * @param System $system
      * @param string $entity_id_str
-     * @return AI
+     * @return NPC
      * @throws Exception
      */
-    public static function fromEntityId(System $system, string $entity_id_str): AI {
+    public static function fromEntityId(System $system, string $entity_id_str): NPC {
         $entityId = System::parseEntityId($entity_id_str);
 
         if($entityId->entity_type != self::ID_PREFIX) {
-            throw new Exception("Invalid entity type for AI class!");
+            throw new Exception("Invalid entity type for NPC class!");
         }
 
-        return new AI($system, $entityId->id);
+        return new NPC($system, $entityId->id);
     }
 }

@@ -5,7 +5,7 @@
  * @var string $self_link
  */
 ?>
-<?php if(!$ajax): ?>
+<?php if(!$system->is_legacy_ajax_request): ?>
     <style>
         :root {
             --avatar-size: 60px;
@@ -141,7 +141,7 @@
                             </div>
                         </div>
                         <?php if($post['staff_level']): ?>
-                            <p class="staffMember" style="background-color:<?=$post['staff_banner']['staffColor']?>">
+                            <p class="staffMember" style="background-color: <?=$post['staff_banner']['staffColor']?>">
                                 <?=$post['staff_banner']['staffBanner']?>
                             </p>
                         <?php endif ?>
@@ -176,6 +176,6 @@
             <a href="<?=$self_link?>&min=<?=$next?>&no_refresh=1">Next</a>
         <?php endif ?>
     </p>
-<?php if(!$ajax): ?>
+<?php if(!$system->is_legacy_ajax_request): ?>
     </div>
 <?php endif ?>
