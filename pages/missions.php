@@ -116,7 +116,8 @@ function runActiveMission(): bool {
     }
 
     // Check status/stage
-    $mission_status = 1;
+    $mission_status = Mission::STATUS_IN_PROGRESS;
+    $current_mission_stage_id = $player->mission_stage['stage_id'];
 
     //Survival Mission State Controls
     if($mission->mission_type === Mission::TYPE_SURVIVAL) {
@@ -136,15 +137,15 @@ function runActiveMission(): bool {
         }
     }
 
-    if($mission_status < 2) {
+    if($mission_status < Mission::STATUS_COMPLETE) {
         if($player->mission_stage['action_type'] == 'travel' or $player->mission_stage['action_type'] == 'search') {
             if($player->location->equals(TravelCoords::fromDbString($player->mission_stage['action_data']))) {
                 // Team or solo
-                if($mission->mission_type == 3) {
-                    $mission_status = $mission->nextTeamStage($player->mission_stage['stage_id'] + 1);
+                if($mission->mission_type == Mission::TYPE_TEAM) {
+                    $player->mission_stage['stage_id'] += 1;
                 }
                 else {
-                    $mission_status = $mission->nextStage($player->mission_stage['stage_id'] + 1);
+                    $player->mission_stage['stage_id'] += 1;
                 }
             }
         }
@@ -192,11 +193,13 @@ function runActiveMission(): bool {
             }
         }
 
-        if($mission->mission_type == Mission::TYPE_TEAM) {
-            $mission_status = $mission->nextTeamStage($player->mission_stage['stage_id']);
-        }
-        else {
-            $mission_status = $mission->nextStage($player->mission_stage['stage_id']);
+        if($player->mission_stage['stage_id'] > $current_mission_stage_id) {
+            if($mission->mission_type == Mission::TYPE_TEAM) {
+                $mission_status = $mission->nextTeamStage($player->mission_stage['stage_id']);
+            }
+            else {
+                $mission_status = $mission->nextStage($player->mission_stage['stage_id']);
+            }
         }
 
         // Complete mission

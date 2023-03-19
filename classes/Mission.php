@@ -72,7 +72,7 @@ class Mission {
             $this->stages[($id + 1)]['stage_id'] = ($id + 1);
         }
 
-        if($this->player && $this->player->mission_id) {
+        if($this->player->mission_id) {
             $this->current_stage = $this->player->mission_stage;
         }
         else {
@@ -95,6 +95,7 @@ class Mission {
             if($this->current_stage['count'] < $this->current_stage['count_needed']) {
                 $stage_id--;
                 $new_stage = false;
+
                 $this->current_stage['description'] = $this->stages[$stage_id]['description'];
             }
         }
@@ -140,8 +141,7 @@ class Mission {
                 }
             }
 
-            $this->current_stage['action_data'] = $location;
-
+            $this->current_stage['action_data'] = $location->fetchString();
         }
 
         $search_array = array('[action_data]', '[location_radius]');
