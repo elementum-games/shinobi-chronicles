@@ -43,7 +43,7 @@ function training() {
 		try {
 
             // check if pvp is active at the current location
-            if ($player->current_location->location_id && !$player->current_location->pvp_allowed) {
+            if ($player->rank_num > 2 && $player->current_location->location_id && !$player->current_location->pvp_allowed) {
                 throw new Exception("You cannot train at this location!");
             }
 
