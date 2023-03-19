@@ -286,9 +286,11 @@ function geninExam(System $system, User $player, RankManager $rankManager) {
             }
         }
 
+        $submitted_hand_seals = $_POST['hand_seals'] ?? '';
+
         echo "</div>
 			<form action='$self_link' method='post'>
-			<input type='hidden' id='hand_seal_input' name='hand_seals' value='{$_POST['hand_seals']}' />
+			<input type='hidden' id='hand_seal_input' name='hand_seals' value='{$submitted_hand_seals}' />
 			<p style='text-align:center;'>
 				<input type='submit' name='attack' value='Submit' />
 			</p>

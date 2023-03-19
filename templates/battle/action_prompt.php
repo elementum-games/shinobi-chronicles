@@ -417,7 +417,7 @@ $prefill_item_id = $_POST['item_id'] ?? '';
                 $heal_items = [];
                 if(!empty($player->items)) {
                     foreach($player->items as $item) {
-                        if ($item['effect'] === 'heal') {
+                        if ($item->effect === 'heal') {
                             $heal_items[] = $item;
                         }
                     }

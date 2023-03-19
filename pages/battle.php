@@ -112,7 +112,7 @@ function battle(): bool {
  * @throws Exception
  */
 function processBattleFightEnd(BattleManager $battle, User $player): string {
-    $pvp_yen = $player->rank * 50;
+    $pvp_yen = $player->rank_num * 50;
 
     $result = "";
 
