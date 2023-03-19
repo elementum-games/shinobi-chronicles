@@ -35,8 +35,8 @@ class NearbyPlayers {
                 $scout_range = 0;
             }
 
-            if(abs($location[0] - $player->x) <= ($scout_range)
-                && abs($location[1] - $player->y) <= ($scout_range)) {
+            if(abs($location[0] - $player->location->x) <= ($scout_range)
+                && abs($location[1] - $player->location->y) <= ($scout_range)) {
                 $users[] = $row;
             }
         }
