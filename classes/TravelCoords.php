@@ -17,6 +17,10 @@ class TravelCoords {
         return $this->x . ':' . $this->y . ':' . $this->map_id;
     }
 
+    public function displayString(): string {
+        return $this->x . ':' . $this->y;
+    }
+
     public function distanceDifference(TravelCoords $target_coords): int {
         $diff_x = abs($this->x - $target_coords->x);
         $diff_y = abs($this->y - $target_coords->y);

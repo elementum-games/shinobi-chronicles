@@ -30,6 +30,9 @@ class NearbyPlayers {
         $users = [];
         while($row = $system->db_fetch($result)) {
             $location = TravelCoords::fromDbString($row['location']);
+            $row['location_string'] = $row['location'];
+            $row['location'] = $location;
+
             $scout_range = $player->scout_range - $row['stealth'];
             if($scout_range < 0) {
                 $scout_range = 0;
@@ -77,13 +80,13 @@ class NearbyPlayers {
 				<span style='font-weight:bold;color:" . ($user['village'] == $player->village ? '#00C000;' : '#C00000;') .
                     "'>" . $user['village'] . "</span></td>
 					
-				<td style='width:17%;text-align:center;'>" . $user['location'] . "</td>
+				<td style='width:17%;text-align:center;'>" . $user['location']->displayString() . "</td>
 				<td style='width:18%;text-align:center;'>";
                 // Attack/spar link
                 if($user['battle_id']) {
                     echo "In battle";
                 }
-                else if($user['location'] == $player->location && $user['user_id'] != $player->user_id) {
+                else if($player->location->equals($user['location']) && $user['user_id'] != $player->user_id) {
                     $links = [];
 
                     // Attack
@@ -126,4 +129,5 @@ class NearbyPlayers {
 
     }
 }
+
 
