@@ -1,8 +1,8 @@
+
+// map should have a smallish border. this is the offset for the border
+const offset = 12;
+
 export const Map = ({mapData}) => {
-
-    // map should have a smallish border. this is the offset for the border
-    const offset = 12;
-
     const map_div = document.getElementsByClassName('travel-container')[0];
     const tile_width = parseInt(mapData.tile_width, 10);
     const tile_height = parseInt(mapData.tile_height, 10);
@@ -13,9 +13,8 @@ export const Map = ({mapData}) => {
 
     const map_width = Math.floor(container_width / tile_width);
     const map_height = Math.floor(container_height / tile_height);
-    const map_tiles = [...Array(map_width * map_height).keys()];
-    const gutter_start_x = Math.floor(player_x - (map_width / 2) + 1);
-    const gutter_start_y = Math.floor(player_y - (map_height / 2));
+    const gutter_start_x = Math.floor(player_x - (map_width / 2));
+    const gutter_start_y = Math.floor(player_y - (map_height / 2) + 1);
     const gutter_x = Array.from(new Array(map_width), (x, i) => i + gutter_start_x);
     const gutter_y = Array.from(new Array(map_height), (x, i) => i + gutter_start_y);
 
@@ -27,7 +26,6 @@ export const Map = ({mapData}) => {
 
     const map_start_x = player_icon_x - (player_x * tile_width) + tile_width - offset;
     const map_start_y = player_icon_y - (player_y * tile_height) + tile_height - offset;
-
 
     const PlayerStyle = {
         position: "absolute",
@@ -62,31 +60,61 @@ export const Map = ({mapData}) => {
         </div>
         <div id='travel-map-container'>
             <div id='map_background' className='map_background' style={ MapStyle }></div>
-            <div className='map_grid_lines'>
-                {(map_tiles) && map_tiles.map((e) =>
-                    <div key={e} style={{
-                        width: mapData.tile_width,
-                        height: mapData.tile_height
-                    }}></div>
-                )}
-            </div>
-            <div className='map_locations'>
-                {(mapData.all_locations) && mapData.all_locations.map((location) =>
-                    <div key={location.location_id}
-                         className='map_location'
-                         style={{
-                             cursor: "pointer",
-                             backgroundColor: "#" + location.background_color,
-                             backgroundImage: "url(." + location.background_image + ")",
-                             top: (map_start_y + location.y * tile_height - tile_height + offset) + "px",
-                             left: (map_start_x + location.x * tile_width - tile_width + offset) + "px",
-                         }}>
-                        <div className='map_locations_tooltip'>{location.name}</div>
-                    </div>
-                )}
-            </div>
+            <MapGridLines
+                mapWidth={map_width}
+                mapHeight={map_height}
+                tileWidth={tile_width}
+                tileHeight={tile_height}
+            />
+            <MapLocations
+                locations={mapData.all_locations || []}
+                mapStartY={map_start_y}
+                mapStartX={map_start_x}
+                tileWidth={tile_width}
+                tileHeight={tile_height}
+            />
             <div id='map_player' style={ PlayerStyle }></div>
         </div>
         </>
+    );
+}
+
+function MapGridLines({ mapWidth, mapHeight, tileWidth, tileHeight }) {
+    const rows = [...Array(mapHeight).keys()];
+    const cols = [...Array(mapWidth).keys()];
+
+    return (
+        <div className='map_grid_lines'>
+            {rows.map((row) => (
+                cols.map((col) => (
+                    <div key={`${row}:${col}`} style={{
+                        width: tileWidth,
+                        height: tileHeight,
+                        top: row * tileHeight,
+                        left: col * tileWidth
+                    }}></div>
+                ))
+            ))}
+        </div>
+    );
+}
+
+function MapLocations({ locations, mapStartX, mapStartY, tileWidth, tileHeight }) {
+    return (
+        <div className='map_locations'>
+            {locations.map((location) =>
+                <div key={location.location_id}
+                     className='map_location'
+                     style={{
+                         cursor: "pointer",
+                         backgroundColor: "#" + location.background_color,
+                         backgroundImage: "url(." + location.background_image + ")",
+                         top: (mapStartY + location.y * tileHeight - tileHeight + offset) + "px",
+                         left: (mapStartX + location.x * tileWidth - tileWidth + offset) + "px",
+                     }}>
+                    <div className='map_locations_tooltip'>{location.name}</div>
+                </div>
+            )}
+        </div>
     );
 }

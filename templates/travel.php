@@ -5,6 +5,7 @@
  */
 ?>
 
+<link rel="stylesheet" type="text/css" href="ui_components/src/travel/Travel.css" />
 <div id="travelContainer"></div>
 
 <script src="https://unpkg.com/react@17/umd/react.development.js" crossorigin></script>

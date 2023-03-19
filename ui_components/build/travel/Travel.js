@@ -1,7 +1,6 @@
 import { apiFetch } from "../utils/network.js";
 import { Map } from "./Map.js";
 import { ScoutArea } from "./ScoutArea.js";
-
 /**
  * @param {{
  * player_x:            int,
@@ -43,9 +42,12 @@ import { ScoutArea } from "./ScoutArea.js";
  **/
 
 const scoutAreaDataInterval = 500; // 500 ms
+
 const keyInterval = 100; // 100ms
 
 const keysPressed = {};
+window.travelRefreshActive = true;
+
 const Travel = ({
   travelAPILink,
   missionLink,
@@ -58,77 +60,80 @@ const Travel = ({
   const [viewAS, setViewAS] = React.useState(false);
   const [viewGenin, setViewGenin] = React.useState(false);
   const [viewChuunin, setViewChuunin] = React.useState(false);
-  const [viewJonin, setViewJonin] = React.useState(false);
+  const [viewJonin, setViewJonin] = React.useState(false); // Initial Load, fetch map info from user location
 
-  // Initial Load, fetch map info from user location
   React.useEffect(() => {
     // initial map load
-    LoadMapData();
-    // initial scout area load
-    LoadScoutData();
+    LoadMapData(); // initial scout area load
 
-    // scout area loading
-    const timerLoadScoutData = setInterval(() => LoadScoutData(), scoutAreaDataInterval);
+    LoadScoutData(); // scout area loading
 
-    // remove the loop  when  data is displayed
+    const timerLoadScoutData = setInterval(() => LoadScoutData(), scoutAreaDataInterval); // remove the loop  when  data is displayed
+
     return () => {
       clearInterval(timerLoadScoutData);
     };
-  }, []);
-
-  // this is the temporary workaround for the sidemenu reflecting the player's new location
+  }, []); // this is the temporary workaround for the sidemenu reflecting the player's new location
   // otherwise people will have to refresh before attempting to train outside of village
+
   React.useEffect(() => {
     const menu = document.getElementsByClassName('sm-tmp-class')[0];
+
     if (mapData && !mapData.in_village) {
       menu.classList.add('sm-tmp-outvillage');
       menu.classList.remove('sm-tmp-invillage');
     }
+
     if (mapData && mapData.in_village) {
       menu.classList.add('sm-tmp-invillage');
       menu.classList.remove('sm-tmp-outvillage');
     }
-  }, [mapData]);
+  }, [mapData]); // keyboard shortcut
 
-  // keyboard shortcut
   React.useEffect(() => {
     const allowed_keys = ['ArrowLeft', 'ArrowUp', 'ArrowRight', 'ArrowDown', 'w', 'a', 's', 'd'];
+
     const keyDown = e => {
       if (allowed_keys.includes(e.key)) {
         e.preventDefault();
         keysPressed[e.key] = true;
       }
     };
+
     const keyUp = e => {
       keysPressed[e.key] = false;
-    };
-    // shortcut listener
+    }; // shortcut listener
+
+
     window.addEventListener('keydown', keyDown);
-    window.addEventListener('keyup', keyUp);
+    window.addEventListener('keyup', keyUp); // timer to make is smoother
 
-    // timer to make is smoother
-    const timer = setInterval(checkKeyPressed, keyInterval);
+    const timer = setInterval(checkKeyPressed, keyInterval); // remove the listener
 
-    // remove the listener
     return () => {
       clearInterval(timer);
       window.removeEventListener('keydown', keyDown);
       window.removeEventListener('keyup', keyDown);
     };
   }, []);
+
   const checkKeyPressed = () => {
     const return_actions = {};
+
     for (const [key, value] of Object.entries(keysPressed)) {
       if (value) {
         return_actions[key] = value;
       }
     }
+
     if (Object.keys(return_actions).length > 0) {
       setMovement(return_actions);
     }
   };
+
   const setMovement = actions => {
     let direction;
+
     if (("ArrowUp" in actions || "w" in actions) && ("ArrowLeft" in actions || "a" in actions)) {
       direction = 'northwest';
     } else if (("ArrowUp" in actions || "w" in actions) && ("ArrowRight" in actions || "d" in actions)) {
@@ -146,45 +151,56 @@ const Travel = ({
     } else if ("ArrowUp" in actions || "w" in actions) {
       direction = 'north';
     }
+
     MovePlayer(direction);
   };
+
   const setFilters = travel_filters => {
     if (travel_filters['Akademi-sei']) {
       setViewAS(true);
     } else {
       setViewAS(false);
     }
+
     if (travel_filters['Genin']) {
       setViewGenin(true);
     } else {
       setViewGenin(false);
     }
+
     if (travel_filters['Chuunin']) {
       setViewChuunin(true);
     } else {
       setViewChuunin(false);
     }
+
     if (travel_filters['Jonin']) {
       setViewJonin(true);
     } else {
       setViewJonin(false);
     }
-  };
+  }; // API ACTIONS
 
-  // API ACTIONS
+
   const LoadMapData = () => {
-    console.log('Loading Map Data...');
-    // setFeedback('Moving...');
+    console.log('Loading Map Data...'); // setFeedback('Moving...');
+
     apiFetch(travelAPILink, {
       request: 'LoadMapData'
     }).then(handleAPIResponse);
   };
+
   const LoadScoutData = () => {
+    if (!window.travelRefreshActive) {
+      return;
+    }
+
     console.log('Loading Scout Area Data...');
     apiFetch(travelAPILink, {
       request: 'LoadScoutData'
     }).then(handleAPIResponse);
   };
+
   const MovePlayer = direction => {
     setFeedback(['Moving...', 'info']);
     console.log('Moving player...' + direction);
@@ -193,6 +209,7 @@ const Travel = ({
       direction: direction
     }).then(handleAPIResponse);
   };
+
   const EnterPortal = portal_id => {
     console.log('Entering Portal...');
     apiFetch(travelAPILink, {
@@ -200,6 +217,7 @@ const Travel = ({
       portal_id: portal_id
     }).then(handleAPIResponse);
   };
+
   const UpdateFilter = (filter, value) => {
     console.log('Updating Filter...');
     apiFetch(travelAPILink, {
@@ -207,9 +225,9 @@ const Travel = ({
       filter: filter,
       filter_value: +value
     }).then(handleAPIResponse);
-  };
+  }; // HANDLE API REQUESTS
 
-  // HANDLE API REQUESTS
+
   const handleAPIResponse = response => {
     // Update errors
     if (response.errors.length) {
@@ -217,42 +235,54 @@ const Travel = ({
       setFeedback([response.errors, 'info']);
       return;
     }
+
     switch (response.data.request) {
       case 'LoadMapData':
         console.log('Map loaded.');
         setFilters(response.data.response.player_filters.travel_filter);
         setMapData(response.data.response);
         break;
+
       case 'LoadScoutData':
         console.log('Scout Area updated.');
         setScoutData(response.data.response);
         break;
+
       case 'MovePlayer':
         if (response.data.response) {
           console.log('Player moved successfully');
           LoadMapData(); // Reload map
+
           LoadScoutData(); // Reload scout area
         } else {
           console.log('Cannot move player.');
         }
+
         break;
+
       case 'EnterPortal':
         if (response.data.response) {
           setFeedback(null);
           console.log('Player moved through portal.');
           LoadMapData(); // Reload map
+
           LoadScoutData(); // Reload scout area
         } else {
           console.log('Cannot move through gate!');
         }
+
         break;
+
       case 'UpdateFilter':
         console.log('Filter updated!');
         LoadMapData(); // Reload map
+
         LoadScoutData(); // Reload scout area
+
         break;
     }
   };
+
   return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
     className: "travel-filter"
   }, /*#__PURE__*/React.createElement("div", {
@@ -329,6 +359,7 @@ const Travel = ({
     view_jonin: viewJonin
   }));
 };
+
 const Message = ({
   message,
   messageType
@@ -337,4 +368,5 @@ const Message = ({
     className: `systemMessage-new systemMessage-new-${messageType}`
   }, message);
 };
+
 window.Travel = Travel;

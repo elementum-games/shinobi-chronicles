@@ -48,6 +48,8 @@ const keyInterval = 100; // 100ms
 
 const keysPressed = {};
 
+window.travelRefreshActive = true;
+
 const Travel = ({
     travelAPILink,
     missionLink,
@@ -197,6 +199,10 @@ const Travel = ({
     }
 
     const LoadScoutData = () => {
+        if(!window.travelRefreshActive) {
+            return;
+        }
+
         console.log('Loading Scout Area Data...');
         apiFetch(
             travelAPILink,

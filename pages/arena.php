@@ -232,7 +232,7 @@ function processArenaBattleEnd(BattleManager|BattleManagerV2 $battle, User $play
         }
         $player->ai_wins++;
         $player->battle_id = 0;
-        $player->last_pvp = time();
+        $player->last_pvp_ms = System::currentTimeMs();
 
         // Daily Tasks
         foreach ($player->daily_tasks as $task) {

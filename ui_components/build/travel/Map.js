@@ -1,8 +1,8 @@
+// map should have a smallish border. this is the offset for the border
+const offset = 12;
 export const Map = ({
   mapData
 }) => {
-  // map should have a smallish border. this is the offset for the border
-  const offset = 12;
   const map_div = document.getElementsByClassName('travel-container')[0];
   const tile_width = parseInt(mapData.tile_width, 10);
   const tile_height = parseInt(mapData.tile_height, 10);
@@ -12,9 +12,8 @@ export const Map = ({
   const container_height = map_div.clientHeight - tile_height;
   const map_width = Math.floor(container_width / tile_width);
   const map_height = Math.floor(container_height / tile_height);
-  const map_tiles = [...Array(map_width * map_height).keys()];
-  const gutter_start_x = Math.floor(player_x - map_width / 2 + 1);
-  const gutter_start_y = Math.floor(player_y - map_height / 2);
+  const gutter_start_x = Math.floor(player_x - map_width / 2);
+  const gutter_start_y = Math.floor(player_y - map_height / 2 + 1);
   const gutter_x = Array.from(new Array(map_width), (x, i) => i + gutter_start_x);
   const gutter_y = Array.from(new Array(map_height), (x, i) => i + gutter_start_y);
   const player_start_x = Math.floor(map_width / 2);
@@ -50,30 +49,64 @@ export const Map = ({
     id: "map_background",
     className: "map_background",
     style: MapStyle
+  }), /*#__PURE__*/React.createElement(MapGridLines, {
+    mapWidth: map_width,
+    mapHeight: map_height,
+    tileWidth: tile_width,
+    tileHeight: tile_height
+  }), /*#__PURE__*/React.createElement(MapLocations, {
+    locations: mapData.all_locations || [],
+    mapStartY: map_start_y,
+    mapStartX: map_start_x,
+    tileWidth: tile_width,
+    tileHeight: tile_height
   }), /*#__PURE__*/React.createElement("div", {
+    id: "map_player",
+    style: PlayerStyle
+  })));
+};
+
+function MapGridLines({
+  mapWidth,
+  mapHeight,
+  tileWidth,
+  tileHeight
+}) {
+  const rows = [...Array(mapHeight).keys()];
+  const cols = [...Array(mapWidth).keys()];
+  return /*#__PURE__*/React.createElement("div", {
     className: "map_grid_lines"
-  }, map_tiles && map_tiles.map(e => /*#__PURE__*/React.createElement("div", {
-    key: e,
+  }, rows.map(row => cols.map(col => /*#__PURE__*/React.createElement("div", {
+    key: `${row}:${col}`,
     style: {
-      width: mapData.tile_width,
-      height: mapData.tile_height
+      width: tileWidth,
+      height: tileHeight,
+      top: row * tileHeight,
+      left: col * tileWidth
     }
-  }))), /*#__PURE__*/React.createElement("div", {
+  }))));
+}
+
+function MapLocations({
+  locations,
+  mapStartX,
+  mapStartY,
+  tileWidth,
+  tileHeight
+}) {
+  return /*#__PURE__*/React.createElement("div", {
     className: "map_locations"
-  }, mapData.all_locations && mapData.all_locations.map(location => /*#__PURE__*/React.createElement("div", {
+  }, locations.map(location => /*#__PURE__*/React.createElement("div", {
     key: location.location_id,
     className: "map_location",
     style: {
       cursor: "pointer",
       backgroundColor: "#" + location.background_color,
       backgroundImage: "url(." + location.background_image + ")",
-      top: map_start_y + location.y * tile_height - tile_height + offset + "px",
-      left: map_start_x + location.x * tile_width - tile_width + offset + "px"
+      top: mapStartY + location.y * tileHeight - tileHeight + offset + "px",
+      left: mapStartX + location.x * tileWidth - tileWidth + offset + "px"
     }
   }, /*#__PURE__*/React.createElement("div", {
     className: "map_locations_tooltip"
-  }, location.name)))), /*#__PURE__*/React.createElement("div", {
-    id: "map_player",
-    style: PlayerStyle
-  })));
-};
+  }, location.name))));
+}
