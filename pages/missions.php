@@ -119,17 +119,17 @@ function runActiveMission(): bool {
     $mission_status = 1;
 
     //Survival Mission State Controls
-    if ($mission->mission_type === Mission::TYPE_SURVIVAL) {
-        if (!empty($_GET['retreat'])) {
+    if($mission->mission_type === Mission::TYPE_SURVIVAL) {
+        if(!empty($_GET['retreat'])) {
             $player->battle_id = 0;
             $mission->nextStage($player->mission_stage['stage_id'] = 4);
         }
 
         $continue_mission = false;
-        if (!empty($_GET['continue'])) {
+        if(!empty($_GET['continue'])) {
             $continue_mission = boolval($_GET['continue']);
         }
-        if ($player->mission_stage['round_complete'] && $continue_mission) {
+        if($player->mission_stage['round_complete'] && $continue_mission) {
             $player->mission_stage['round_complete'] = false;
             $player->battle_id = 0;
             $mission_status = $mission->nextStage($player->mission_stage['stage_id']);
@@ -157,172 +157,179 @@ function runActiveMission(): bool {
                 }
                 $opponent->loadData();
 
-            // Initialize start of battle stuff
-            if(!$player->battle_id) {
-                Battle::start($system, $player, $opponent, Battle::TYPE_AI_MISSION);
-            }
+                // Initialize start of battle stuff
+                if(!$player->battle_id) {
+                    Battle::start($system, $player, $opponent, Battle::TYPE_AI_MISSION);
+                }
 
-            $battle = BattleManager::init($system, $player, $player->battle_id);
-            $battle->checkInputAndRunTurn();
+                $battle = BattleManager::init($system, $player, $player->battle_id);
+                $battle->checkInputAndRunTurn();
 
-            $battle->renderBattle();
+                $battle->renderBattle();
 
-            if($battle->isComplete()) {
-                $result = processMissionBattleEnd($battle, $mission, $player);
-                if(strlen($result) > 0) {
-                    echo "<table class='table'>
+                if($battle->isComplete()) {
+                    $result = processMissionBattleEnd($battle, $mission, $player);
+                    if(strlen($result) > 0) {
+                        echo "<table class='table'>
                         <tr><th>Battle Results</th></tr>
                         <tr><td>{$result}</td></tr>
                     </table>";
+                    }
+                }
+                else {
+                    return true;
+                }
+            } catch(Exception $e) {
+                error_log($e->getMessage());
+
+                $player->clearMission();
+
+                $system->message(
+                    "There was an error with the mission - Your mission has been cancelled. <a href='$self_link'>Continue</a>"
+                );
+                $system->printMessage();
+                return true;
+            }
+        }
+
+        if($mission->mission_type == Mission::TYPE_TEAM) {
+            $mission_status = $mission->nextTeamStage($player->mission_stage['stage_id']);
+        }
+        else {
+            $mission_status = $mission->nextStage($player->mission_stage['stage_id']);
+        }
+
+        // Complete mission
+        if($mission_status == Mission::STATUS_COMPLETE) {
+            // Special mission
+            if($mission->mission_type == Mission::TYPE_SPECIAL) {
+                $player->clearMission();
+
+                // Jonin exam
+                if($mission->mission_id == 10) {
+                    $player->exam_stage = 2;
+                    $self_link = $system->link . '?id=1';
+
+                    require_once("levelUp.php");
+                    rankUp();
+                    return true;
                 }
             }
-            else {
-                return true;
-            }
-        } catch(Exception $e) {
-            error_log($e->getMessage());
+            // Team mission
+            else if($mission->mission_type == Mission::TYPE_TEAM) {
+                $player->addMoney($mission->money, "Team mission");
+                $player->clearMission();
 
-            $player->clearMission();
-
-            $system->message("There was an error with the mission - Your mission has been cancelled. <a href='$self_link'>Continue</a>");
-            $system->printMessage();
-            return true;
-        }
-    }
-
-    if($mission->mission_type == Mission::TYPE_TEAM) {
-        $mission_status = $mission->nextTeamStage($player->mission_stage['stage_id']);
-    }
-    else {
-        $mission_status = $mission->nextStage($player->mission_stage['stage_id']);
-    }
-
-    // Complete mission
-    if($mission_status == Mission::STATUS_COMPLETE) {
-        // Special mission
-        if($mission->mission_type == Mission::TYPE_SPECIAL) {
-            $player->clearMission();
-
-            // Jonin exam
-            if($mission->mission_id == 10) {
-                $player->exam_stage = 2;
-                $self_link = $system->link . '?id=1';
-
-                require_once("levelUp.php");
-                rankUp();
-                return true;
-            }
-        }
-        // Team mission
-        else if($mission->mission_type == Mission::TYPE_TEAM) {
-            $player->addMoney($mission->money, "Team mission");
-            $player->clearMission();
-
-            $team_points = 2;
-            // Process team rewards if this is the first completing player, then unset the mission ID
-            if($player->team->mission_id) {
-                $system->query("UPDATE `teams` SET
+                $team_points = 2;
+                // Process team rewards if this is the first completing player, then unset the mission ID
+                if($player->team->mission_id) {
+                    $system->query(
+                        "UPDATE `teams` SET
 						`points`=`points` + $team_points, `monthly_points`=`monthly_points` + $team_points,`mission_id`=0
-						WHERE `team_id`={$player->team->id}");
-            }
+						WHERE `team_id`={$player->team->id}"
+                    );
+                }
 
-            echo "<table class='table'><tr><th>Current Mission</th></tr>
+                echo "<table class='table'><tr><th>Current Mission</th></tr>
 				<tr><td style='text-align:center;'><span style='font-weight:bold;'>$mission->name Complete</span><br />
 				Your team has completed the mission.<br />
 				You have been paid &yen;$mission->money.<br />
 				Your team has received $team_points points.<br />
 				<a href='$self_link'>Continue</a>
 				</td></tr></table>";
-        }
-        // Clan mission
-        else if($mission->mission_type == Mission::TYPE_CLAN) {
-            $player->addMoney($mission->money, "Clan mission");
-            $player->clearMission();
-            $player->last_ai_ms = System::currentTimeMs();
+            }
+            // Clan mission
+            else if($mission->mission_type == Mission::TYPE_CLAN) {
+                $player->addMoney($mission->money, "Clan mission");
+                $player->clearMission();
+                $player->last_ai_ms = System::currentTimeMs();
 
-            $point_gain = 1;
-            $system->query("UPDATE `clans` SET `points`=`points`+$point_gain WHERE `clan_id`={$player->clan['id']} LIMIT 1");
+                $point_gain = 1;
+                $system->query(
+                    "UPDATE `clans` SET `points`=`points`+$point_gain WHERE `clan_id`={$player->clan['id']} LIMIT 1"
+                );
 
-            echo "<table class='table'><tr><th>Current Mission</th></tr>
+                echo "<table class='table'><tr><th>Current Mission</th></tr>
 				<tr><td style='text-align:center;'><span style='font-weight:bold;'>$mission->name Complete</span><br />
 				You have completed your mission for clan {$player->clan['name']}.<br />
 				You have been paid &yen;$mission->money.<br />
 				You have earned $point_gain reputation for your clan.<br />
 				<a href='$self_link'>Continue</a>
 				</td></tr></table>";
-        }
-        // Village/Survival mission
-        else {
-            echo "<table class='table'><tr><th>Current Mission</th></tr>
+            }
+            // Village/Survival mission
+            else {
+                echo "<table class='table'><tr><th>Current Mission</th></tr>
 				<tr><td style='text-align:center;'><span style='font-weight:bold;'>$mission->name Complete</span><br />
 				You have completed your mission.<br />";
-            if($mission->mission_type == 5) {
-                $mission->money = $player->mission_stage['mission_money'];
-                echo sprintf("For your effort in defeating %d enemies, you have received &yen;%d.<br />",
-                    $player->mission_stage['ai_defeated'], $mission->money);
+                if($mission->mission_type == 5) {
+                    $mission->money = $player->mission_stage['mission_money'];
+                    echo sprintf(
+                        "For your effort in defeating %d enemies, you have received &yen;%d.<br />",
+                        $player->mission_stage['ai_defeated'], $mission->money
+                    );
+                }
+                else {
+                    echo "You have been paid &yen;$mission->money.<br />";
+                }
+
+                // check what mission rank for daily Task
+                $all_mission_ranks = [0, 1, 2, 3, 4];
+                $mission_rank = $all_mission_ranks[$mission->rank];
+                foreach($player->daily_tasks as $task) {
+                    if($task->activity == DailyTask::ACTIVITY_MISSIONS && $task->mission_rank == $mission_rank && !$task->complete) {
+                        $task->progress++;
+                    }
+                }
+
+                if(isset($player->missions_completed[$mission->rank])) {
+                    $player->missions_completed[$mission->rank] += 1;
+                }
+                else {
+                    $player->missions_completed[$mission->rank] = 1;
+                }
+
+                $player->addMoney($mission->money, "Village mission complete");
+                $player->clearMission();
+                $player->last_ai_ms = System::currentTimeMs();
+
+                echo "<a href='$self_link'>Continue</a>
+					</td></tr></table>";
             }
-            else{
-                echo "You have been paid &yen;$mission->money.<br />";
+            $player->updateData();
+        }
+        // Display mission details
+        else if($player->mission_id) {
+            echo "<table class='table'><tr><th>Current Mission (<a href='$self_link&cancel_mission=1'>Abandon Mission</a>)</th></tr>
+			<tr><td style='text-align:center;'><span style='font-weight:bold;'>" .
+                ($mission->mission_type == 3 ? '[' . $player->team->name . '] ' : '') . "$mission->name</span><br />" .
+                $player->mission_stage['description'];
+
+            // Display counts of team/solo mission
+            if($mission->mission_type == 3 && $mission->team->mission_stage['count_needed']) {
+                echo ' (' . $mission->team->mission_stage['count'] . '/' . $mission->team->mission_stage['count_needed'] . ' complete)';
+            }
+            else if(!empty($player->mission_stage['count_needed'])) {
+                echo ' (' . $player->mission_stage['count'] . '/' . $player->mission_stage['count_needed'] . ' complete)';
             }
 
-            // check what mission rank for daily Task
-            $all_mission_ranks = [0, 1, 2, 3, 4];
-            $mission_rank = $all_mission_ranks[$mission->rank];
-            foreach ($player->daily_tasks as $task) {
-                if ($task->activity == DailyTask::ACTIVITY_MISSIONS && $task->mission_rank == $mission_rank && !$task->complete) {
-                    $task->progress++;
+            // Display to battle link
+            if($player->mission_stage['action_type'] == 'combat') {
+
+                if($mission->mission_type == 5 && $player->mission_stage['action_type'] == 'combat') {
+                    echo "<br /><a href='$self_link&continue=1'>Enter Combat</a> | <a href='$self_link&retreat=1'>Retreat</a>";
+                }
+                else {
+                    echo "<br /><a href='$self_link'>Enter Combat</a>";
                 }
             }
 
-
-            if(isset($player->missions_completed[$mission->rank])) {
-                $player->missions_completed[$mission->rank] += 1;
-            }
-            else {
-                $player->missions_completed[$mission->rank] = 1;
-            }
-
-            $player->addMoney($mission->money, "Village mission complete");
-            $player->clearMission();
-            $player->last_ai_ms = System::currentTimeMs();
-
-            echo "<a href='$self_link'>Continue</a>
-					</td></tr></table>";
-        }
-        $player->updateData();
-    }
-    // Display mission details
-    else if($player->mission_id){
-        echo "<table class='table'><tr><th>Current Mission (<a href='$self_link&cancel_mission=1'>Abandon Mission</a>)</th></tr>
-			<tr><td style='text-align:center;'><span style='font-weight:bold;'>" .
-            ($mission->mission_type == 3 ? '[' . $player->team->name . '] ' : '') . "$mission->name</span><br />" .
-            $player->mission_stage['description'];
-
-        // Display counts of team/solo mission
-        if($mission->mission_type == 3 && $mission->team->mission_stage['count_needed']) {
-            echo ' (' . $mission->team->mission_stage['count'] . '/' . $mission->team->mission_stage['count_needed'] . ' complete)';
-        }
-        else if(!empty($player->mission_stage['count_needed'])) {
-            echo ' (' . $player->mission_stage['count'] . '/' . $player->mission_stage['count_needed'] . ' complete)';
-        }
-
-        // Display to battle link
-        if($player->mission_stage['action_type'] == 'combat') {
-
-            if($mission->mission_type == 5 && $player->mission_stage['action_type'] == 'combat') {
-                echo "<br /><a href='$self_link&continue=1'>Enter Combat</a> | <a href='$self_link&retreat=1'>Retreat</a>";
-            }
-            else
-            {
-                echo "<br /><a href='$self_link'>Enter Combat</a>";
-            }
-        }
-
-        echo "<br />
+            echo "<br />
 			</td></tr></table>";
-    }
+        }
 
-    return true;
+        return true;
+    }
 }
 
 /**
@@ -332,7 +339,7 @@ function runActiveMission(): bool {
  * @return bool|void
  * @throws Exception
  */
-function processMissionBattleEnd(BattleManager $battle, Mission $mission, User $player): string {
+function processMissionBattleEnd(BattleManager|BattleManagerV2 $battle, Mission $mission, User $player): string {
     if(!$battle->isComplete()) {
         return true;
     }
@@ -342,12 +349,17 @@ function processMissionBattleEnd(BattleManager $battle, Mission $mission, User $
 
     $player->battle_id = 0;
 
+    $continue_mission = false;
+    if (!empty($_GET['continue'])) {
+        $continue_mission = boolval($_GET['continue']);
+    }
+
     if($mission->mission_type == Mission::TYPE_SURVIVAL) {
-        if ($player->mission_stage['round_complete'] && !$continue_mission)
-        {
-            echo("<table class='table'><tr><th>Battle Results</th></tr>
-                        <tr><td>You have defeated your enemy. Either turn back now or push on.
-                        </td></tr></table>");
+        if ($player->mission_stage['round_complete'] && !$continue_mission) {
+            echo "<table class='table'>
+                <tr><th>Battle Results</th></tr>
+                <tr><td>You have defeated your enemy. Either turn back now or push on.</td></tr>
+            </table>";
         }
         else if($battle->isPlayerWinner() && !$player->mission_stage['round_complete']) {
             $money_gain = $mission->money;
@@ -426,7 +438,7 @@ function missionFightAPI(System $system, User $player): BattlePageAPIResponse {
     $response = new BattlePageAPIResponse();
 
     try {
-        $battle = BattleManager::init($system, $player, $player->battle_id);
+        $battle = BattleManagerV2::init($system, $player, $player->battle_id);
         $battle->checkInputAndRunTurn();
 
         $response->battle_data = $battle->getApiResponse();

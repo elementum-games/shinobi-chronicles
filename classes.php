@@ -40,3 +40,5 @@ require_once __DIR__ . "/classes/TravelManager.php";
 require_once __DIR__ . "/classes/TravelAPIResponse.php";
 require_once __DIR__ . "/classes/TravelCoords.php";
 require_once __DIR__ . "/classes/MapLocation.php";
+
+require_once __DIR__ . "/classes/Village.php";

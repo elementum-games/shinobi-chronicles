@@ -131,7 +131,8 @@ else {
             $logout_limit = $seal->logout_timer;
         }
 	}
-	// Check logout timer
+
+    // Check logout timer
 	if($player->last_login < time() - ($logout_limit * 60)) {
 		if($system->is_legacy_ajax_request) {
 			echo "<script type='text/javascript'>
@@ -155,6 +156,7 @@ else {
 			exit;
 		}
 	}
+
 	if($system->is_legacy_ajax_request) {
 		$player_display = $player->loadData(User::UPDATE_REGEN);
 	}

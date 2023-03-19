@@ -10,6 +10,7 @@ $system->is_api_request = true;
 
 try {
     $player = Auth::getUserFromSession($system);
+    $player->loadData();
 } catch(Exception $e) {
     echo json_encode(['logout' => true]);
     exit;

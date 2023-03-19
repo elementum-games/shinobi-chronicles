@@ -111,10 +111,12 @@ class User extends Fighter {
     public int $bloodline_id;
     public $bloodline_name;
     public $clan;
+
+    public TravelCoords $location;
     public TravelCoords $village_location;
-    public $in_village;
-    public $location;
+    public bool $in_village;
     public MapLocation $current_location;
+
     public float $last_movement_ms;
     public string $attack_id;
     public int $attack_id_time_ms;
@@ -573,17 +575,9 @@ class User extends Fighter {
         $this->clan_changes = $user_data['clan_changes'];
 
         // Village
-        $result = $this->system->query("SELECT `location` FROM `villages` WHERE `name`='{$this->village}' LIMIT 1");
-        if($this->system->db_last_num_rows != 0) {
-            $result = $this->system->db_fetch($result);
-            $this->village_location = TravelCoords::fromDbString($result['location']);
-            if($this->location->equals($this->village_location)) {
-                $this->in_village = true;
-            }
-        }
-        else {
-            $this->in_village = false;
-        }
+        $this->village_location = Village::getLocation($this->system, $this->village);
+        /** @noinspection PhpConditionAlreadyCheckedInspection */
+        $this->in_village = $this->village_location !== null && $this->location->equals($this->village_location);
 
         // Daily Tasks
         $this->daily_tasks = [];
