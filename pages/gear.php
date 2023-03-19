@@ -30,8 +30,10 @@ function gear(): void {
         $equipped_armor = 0;
         $equipped_weapons = 0;
         foreach($items as $id) {
+            $id = (int)$id;
+
             if($player->hasItem($id) && $player->items[$id]->use_type != 3) {
-                $equipped_items[] = $system->clean($id);
+                $equipped_items[] = $id;
                 if($player->items[$id]->use_type == 1) {
                     $equipped_weapons++;
                     if($equipped_weapons > $max_equipped_weapons) {

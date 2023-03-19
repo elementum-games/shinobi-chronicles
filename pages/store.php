@@ -100,7 +100,7 @@ function store() {
                 }
 
                 // Add to inventory or increment quantity
-                $player->subtractMoney($shop_items[$item_id]['purchase_cost'], "Purchased item #{$item_id}");
+                $player->subtractMoney($shop_items[$item_id]->purchase_cost, "Purchased item #{$item_id}");
 
                 if(($shop_items[$item_id]->use_type == 1 || $shop_items[$item_id]->use_type == 2) || !$player->hasItem($item_id)) {
                     $player->items[$item_id] = $shop_items[$item_id];
@@ -143,7 +143,7 @@ function store() {
 			
 			// Element check
 			if($shop_jutsu[$jutsu_id]['element'] != 'None') {
-				if(!$player->elements or array_search($shop_jutsu[$jutsu_id]['element'], $player->elements) === false) {
+				if(!$player->elements or !in_array($shop_jutsu[$jutsu_id]['element'], $player->elements)) {
 					throw new Exception("You do not have the elemental chakra for this jutsu!");
 				}
 			}
@@ -370,7 +370,7 @@ function store() {
 					<td style='width:25%;'>" . ucwords(str_replace('_', ' ', $item->effect)) . "</td>
 					<td style='width:20%;'>&yen;{$item->purchase_cost}</td>
 					<td style='width:20%;'><a href='$self_link&view=$category&purchase_item={$item->id}'>Purchase</a>" .
-					($category == 'consumables' ? "/<br><a href='$self_link&view=$category&purchase_item={$item->item_id}&max=true'>Purchase Max</a>" : "") .
+					($category == 'consumables' ? "/<br><a href='$self_link&view=$category&purchase_item={$item->id}&max=true'>Purchase Max</a>" : "") .
 					"</td>
 				</tr>";
 

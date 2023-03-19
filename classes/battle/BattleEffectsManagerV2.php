@@ -340,12 +340,12 @@ class BattleEffectsManagerV2 {
                     $fighter,
                     $fighter,
                     new BattleEffect(
-                        $fighter->combat_id,
-                        $fighter->combat_id,
-                        1,
-                        $effect['effect'],
-                        $effect['effect_amount'],
-                        Jutsu::TYPE_TAIJUTSU
+                        user: $fighter->combat_id,
+                        target: $fighter->combat_id,
+                        turns: 1,
+                        effect: $effect['effect'],
+                        effect_amount: $effect['effect_amount'],
+                        damage_type: Jutsu::TYPE_TAIJUTSU
                     )
                 );
             }

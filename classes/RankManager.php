@@ -123,7 +123,7 @@ class RankManager {
      * @throws Exception
      */
     public function increasePlayerRank(User $player) {
-        $new_rank = $player->rank + 1;
+        $new_rank = $player->rank_num + 1;
         if($new_rank > System::SC_MAX_RANK) {
             throw new Exception("Invalid max rank!");
         }
@@ -135,7 +135,9 @@ class RankManager {
             throw new Exception("Error loading new rank!");
         }
 
-        $player->rank++;
+        $player->rank_num++;
+        $player->rank = $this->ranks[$player->rank_num];
+
         $player->level++;
 
         $player->max_health += $this->ranks[$new_rank]->health_gain;

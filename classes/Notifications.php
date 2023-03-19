@@ -10,7 +10,7 @@ class Notifications {
         // New PM
         $playerInbox = new InboxManager($system, $player);
         if($playerInbox->checkIfUnreadMessages() || $playerInbox->checkIfUnreadAlerts()) {
-            $notifications[] = "<a class='link' href='{$system->link}?id=2'>You have unread PM(s)</a>";
+            $notifications[] = new Notification("{$system->link}?id=2", "You have unread PM(s)");
         }
 
         if(!$ajax) {

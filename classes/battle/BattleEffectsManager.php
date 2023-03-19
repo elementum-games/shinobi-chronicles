@@ -108,14 +108,15 @@ class BattleEffectsManager {
                 $effect_id = $effect_user->combat_id . ':WE:' . $jutsu->effect;
             }
 
-            $this->active_effects[$effect_id] = BattleEffect::fromArray([
-                'user' => $effect_user->combat_id,
-                'target' => $target_id,
-                'turns' => $jutsu->effect_length,
-                'effect' => $jutsu->effect,
-                'effect_amount' => $jutsu->effect_amount,
-                'effect_type' => $jutsu->jutsu_type
-            ]);
+            $this->active_effects[$effect_id] = new BattleEffect(
+                user: $effect_user->combat_id,
+                target: $target_id,
+                turns: $jutsu->effect_length,
+                effect: $jutsu->effect,
+                effect_amount: $jutsu->effect_amount,
+                damage_type: $jutsu->jutsu_type
+            );
+
             if($jutsu->jutsu_type == Jutsu::TYPE_GENJUTSU) {
                 $intelligence = ($effect_user->intelligence + $effect_user->intelligence_boost - $effect_user->intelligence_nerf);
                 if($intelligence <= 0) {
@@ -179,7 +180,7 @@ class BattleEffectsManager {
         $this->applyArmorEffects($player2);
     }
 
-    public function applyArmorEffects(Fighter $fighter) {
+    public function applyArmorEffects(Fighter $fighter): void {
         if(!empty($fighter->equipped_armor)) {
             foreach($fighter->equipped_armor as $item_id) {
                 if($fighter->hasItem($item_id)) {
@@ -187,9 +188,8 @@ class BattleEffectsManager {
                         $fighter->combat_id,
                         $fighter->combat_id,
                         1,
-                        $fighter->items[$item_id]['effect'],
-                        $fighter->items[$item_id]['effect_amount'],
-                        BattleEffect::TYPE_BLOODLINE
+                        $fighter->items[$item_id]->effect,
+                        $fighter->items[$item_id]->effect_amount
                     );
                     $this->applyPassiveEffect($fighter, $effect);
                 }
@@ -341,12 +341,12 @@ class BattleEffectsManager {
                     $fighter,
                     $fighter,
                     new BattleEffect(
-                        $fighter->combat_id,
-                        $fighter->combat_id,
-                        1,
-                        $effect['effect'],
-                        $effect['effect_amount'],
-                        Jutsu::TYPE_TAIJUTSU
+                        user: $fighter->combat_id,
+                        target: $fighter->combat_id,
+                        turns: 1,
+                        effect: $effect['effect'],
+                        effect_amount: $effect['effect_amount'],
+                        damage_type: Jutsu::TYPE_TAIJUTSU
                     )
                 );
             }
@@ -359,7 +359,7 @@ class BattleEffectsManager {
         }
 
         if($effect->effect == 'residual_damage' || $effect->effect == 'bleed') {
-            $damage = $target->calcDamageTaken($effect->effect_amount, $effect->effect_type, true);
+            $damage = $target->calcDamageTaken($effect->effect_amount, $effect->damage_type, true);
             $this->addDisplay($target, $target->getName() . " takes $damage residual damage");
 
             $target->health -= $damage;
@@ -377,7 +377,7 @@ class BattleEffectsManager {
             }
         }
         else if($effect->effect == 'drain_chakra') {
-            $drain = $target->calcDamageTaken($effect->effect_amount, $effect->effect_type);
+            $drain = $target->calcDamageTaken($effect->effect_amount, $effect->damage_type);
             $this->addDisplay($target,
                 $attacker->getName() . " drains $drain of " . $target->getName() . "'s chakra-"
             );
@@ -388,7 +388,7 @@ class BattleEffectsManager {
             }
         }
         else if($effect->effect == 'drain_stamina') {
-            $drain = $target->calcDamageTaken($effect->effect_amount, $effect->effect_type);
+            $drain = $target->calcDamageTaken($effect->effect_amount, $effect->damage_type);
             $this->addDisplay($target,
                 $attacker->getName() . " drains $drain of " . $target->getName() . "'s stamina-"
             );
@@ -399,7 +399,7 @@ class BattleEffectsManager {
             }
         }
         else if($effect->effect == 'absorb_chakra') {
-            $drain = $target->calcDamageTaken($effect->effect_amount, $effect->effect_type);
+            $drain = $target->calcDamageTaken($effect->effect_amount, $effect->damage_type);
             $this->addDisplay($target,
                 $attacker->getName() . " absorbs $drain of " . $target->getName() . "'s chakra-"
             );
@@ -414,7 +414,7 @@ class BattleEffectsManager {
             }
         }
         else if($effect->effect == 'absorb_stamina') {
-            $drain = $target->calcDamageTaken($effect->effect_amount, $effect->effect_type);
+            $drain = $target->calcDamageTaken($effect->effect_amount, $effect->damage_type);
             $this->addDisplay($target,
                 $attacker->getName() . " absorbs $drain of " . $target->getName() . "'s stamina-"
             );

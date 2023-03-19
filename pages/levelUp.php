@@ -85,7 +85,7 @@ function rankUp(): bool {
 function geninExam(System $system, User $player, RankManager $rankManager) {
     global $self_link;
 
-    $new_rank = $player->rank + 1;
+    $new_rank = $player->rank_num + 1;
     $bloodline_roll_chance = System::BLOODLINE_ROLL_CHANCE;
 
     $player->getInventory();

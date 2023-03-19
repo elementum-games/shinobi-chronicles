@@ -190,7 +190,7 @@ class BattleManager {
                             throw new Exception("You can't heal any further!");
                         }
                         if ($item['effect'] === 'heal') {
-                            if (--$this->player->items[$item_id]['quantity'] === 0) {
+                            if (--$this->player->items[$item_id]->quantity === 0) {
                                 unset($this->player->items[$item_id]);
                             }
 
@@ -642,16 +642,16 @@ class BattleManager {
         // Set weapon data into jutsu
         if($attack->jutsu->jutsu_type == Jutsu::TYPE_TAIJUTSU && $action->weapon_id) {
             // Apply element to jutsu
-            if($fighter->items[$action->weapon_id]['effect'] == 'element') {
+            if($fighter->items[$action->weapon_id]->effect == 'element') {
                 $attack->jutsu->element = $fighter->elements['first'];
-                $attack->raw_damage *= 1 + ($fighter->items[$action->weapon_id]['effect_amount'] / 100);
+                $attack->raw_damage *= 1 + ($fighter->items[$action->weapon_id]->effect_amount / 100);
             }
             // Set effect in jutsu
             else {
                 $attack->jutsu->setWeapon(
                     $action->weapon_id,
-                    $fighter->items[$action->weapon_id]['effect'],
-                    $fighter->items[$action->weapon_id]['effect_amount'],
+                    $fighter->items[$action->weapon_id]->effect,
+                    $fighter->items[$action->weapon_id]->effect_amount,
                 );
             }
         }
@@ -682,7 +682,7 @@ class BattleManager {
 
         // Weapon effect for taijutsu (IN PROGRESS)
         if($attack->jutsu->weapon_id) {
-            if($user->items[$attack->jutsu->weapon_id]['effect'] != 'diffuse') {
+            if($user->items[$attack->jutsu->weapon_id]->effect != 'diffuse') {
                 $this->effects->setEffect(
                     $user,
                     $target->combat_id,
