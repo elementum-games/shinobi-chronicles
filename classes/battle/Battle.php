@@ -173,7 +173,7 @@ class Battle {
 
         $this->fighter_health = json_decode($battle['fighter_health'], true);
         $this->fighter_actions = array_map(function($action_data) {
-            return FighterAction::fromDb($action_data);
+            return LegacyFighterAction::fromDb($action_data);
         }, json_decode($battle['fighter_actions'], true));
 
         $this->jutsu_cooldowns = json_decode($battle['jutsu_cooldowns'] ?? "[]", true);

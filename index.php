@@ -83,11 +83,12 @@ if(!isset($_SESSION['user_id'])) {
 
 			// Check failed logins
 			if($result['failed_logins'] >= User::PARTIAL_LOCK && $_SERVER['REMOTE_ADDR'] != $result['current_ip'] && $_SERVER['REMOTE_ADDR'] != $result['last_ip']) {
-				throw new Exception("Account has been locked out!");
 				$system->query("INSERT INTO `logs` (`log_type`, `log_time`, `log_contents`)
 					VALUES ('malicious_lockout', '" . time() . "', 'IP address " . $_SERVER['REMOTE_ADDR'] . " failed login on account " .
 					$result['user_name'] . " not matching previous IPs " . $result['current_ip'] . " or " . $result['last_ip'] . ".'");
-			}
+
+                throw new Exception("Account has been locked out!");
+            }
 			else if($result['failed_logins'] >= User::FULL_LOCK) {
 				throw new Exception("Account has been locked out!");
 			}
@@ -124,12 +125,7 @@ else {
 		$logout_limit = 1440;
 	}
 	else if($player->forbidden_seal) {
-        if(is_object(json_decode($player->forbidden_seal))) {
-            $seal_data = json_decode($player->forbidden_seal);
-            $seal = new ForbiddenSeal($system, $seal_data->level, $seal_data->time);
-            $seal->setBenefits();
-            $logout_limit = $seal->logout_timer;
-        }
+        $logout_limit = $player->forbidden_seal->logout_timer;
 	}
 
     // Check logout timer
