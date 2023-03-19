@@ -67,15 +67,15 @@ function rankUp(): bool {
     $rankManager->loadRanks();
 
 	// Akademi-sei -> Genin
-	if($player->rank == 1) {
+	if($player->rank_num == 1) {
         geninExam($system, $player, $rankManager);
 	}
 	// Genin -> Chuunin
-	else if($player->rank == 2) {
+	else if($player->rank_num == 2) {
         chuuninExam($system, $player, $rankManager);
 	}
 	// Chuunin -> Jonin
-	else if($player->rank == 3) {
+	else if($player->rank_num == 3) {
 		joninExam($system, $player, $rankManager);
 	}
 
