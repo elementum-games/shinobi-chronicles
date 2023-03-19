@@ -5,6 +5,8 @@ use Phinx\Migration\AbstractMigration;
 
 final class IncreaseMapSize extends AbstractMigration {
     public function up(): void {
+        $this->execute("UPDATE `maps` SET `end_x`=27,`end_y`=18, `background`='/images/map/default_900x600.png' WHERE `map_name`='Earth'");
+        
         $this->execute("UPDATE `maps_locations` SET `x` = 4, `y` = 12 WHERE `name` = 'Sand'");
         $this->execute("UPDATE `maps_locations` SET `x` = 7, `y` = 5 WHERE `name` = 'Stone'");
         $this->execute("UPDATE `maps_locations` SET `x` = 10, `y` = 1, `regen`=100 WHERE `name` = 'Font of Vitality'");
@@ -15,6 +17,8 @@ final class IncreaseMapSize extends AbstractMigration {
     }
 
     public function down(): void {
+        $this->execute("UPDATE `maps` SET `end_x`=18,`end_y`=12, `background`='/images/map/default.png' WHERE `map_name`='Earth'");
+
         $this->execute("UPDATE `maps_locations` SET `x` = 3, `y` = 8 WHERE `name` = 'Sand'");
         $this->execute("UPDATE `maps_locations` SET `x` = 5, `y` = 3 WHERE `name` = 'Stone'");
         $this->execute("UPDATE `maps_locations` SET `x` = 10, `y` = 1, `regen`=200 WHERE `name` = 'Font of Vitality'");
