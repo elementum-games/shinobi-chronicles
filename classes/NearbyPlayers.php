@@ -29,14 +29,13 @@ class NearbyPlayers {
         );
         $users = [];
         while($row = $system->db_fetch($result)) {
-            $location = explode('.', $row['location']);
+            $location = TravelCoords::fromDbString($row['location']);
             $scout_range = $player->scout_range - $row['stealth'];
             if($scout_range < 0) {
                 $scout_range = 0;
             }
 
-            if(abs($location[0] - $player->location->x) <= ($scout_range)
-                && abs($location[1] - $player->location->y) <= ($scout_range)) {
+            if($location->distanceDifference($player->location) <= $scout_range) {
                 $users[] = $row;
             }
         }
