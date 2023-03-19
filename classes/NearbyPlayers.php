@@ -93,9 +93,6 @@ class NearbyPlayers {
                     if($show_spar_link) {
                         $links[] = "<a href='{$system->links['spar']}}&challenge={$user['user_id']}'>Spar</a>";
                     }
-                    if($user['village'] != $player->village && $user['rank'] > 2 && $player->rank > 2) {
-                        $links[] = "<a href='{$system->links['battle']}&attack={$user['user_id']}'>Attack</a>";
-                    }
 
                     echo implode(" | ", $links);
                 }
