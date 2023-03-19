@@ -112,13 +112,13 @@ class Notifications {
             }
         }
 
-        $result = $system->query(
+/*        $result = $system->query(
             "SELECT `message_id` FROM `private_messages` 
 		WHERE `recipient`='{$player->user_id}' AND `message_read`=0 LIMIT 1"
         );
         if($system->db_last_num_rows) {
             $notifications[] = new Notification("{$system->link}?id=2", "You have unread PM(s)");
-        }
+        }*/
 
         if($player->isModerator()) {
             $result = $system->query(
