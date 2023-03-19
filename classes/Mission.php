@@ -239,7 +239,7 @@ class Mission {
                 }
             }
 
-            $this->current_stage['action_data'] = $location;
+            $this->current_stage['action_data'] = $location->fetchString();
         }
 
         $search_array = array('[action_data]', '[location_radius]');
