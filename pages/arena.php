@@ -98,9 +98,6 @@ function arenaFight(): bool {
     global $system;
     global $player;
 
-    // Base chance at 100, goes down if fight is too short/lower level AI
-    $stat_gain_chance = 100;
-
     try {
         $battle = BattleManager::init($system, $player, $player->battle_id);
         $battle->checkInputAndRunTurn();
@@ -147,7 +144,9 @@ function arenaFightAPI(System $system, User $player): BattlePageAPIResponse {
  * @throws Exception
  */
 function processArenaBattleEnd(BattleManager|BattleManagerV2 $battle, User $player): string {
-    $stat_gain_chance = 26;
+    // Base chance at 100, goes down if fight is too short/lower level AI
+    $stat_gain_chance = 100;
+
     $battle_result = "";
 
     if(!$battle->isComplete()) {
@@ -159,60 +158,35 @@ function processArenaBattleEnd(BattleManager|BattleManagerV2 $battle, User $play
 
         $money_gain = $battle->opponent->getMoney();
 
-            if($player->level > $opponent->level) {
-                $level_difference = $player->level - $opponent->level;
-                if($level_difference > 9) {
-                    $level_difference = 9;
-                }
-                $money_gain = round($money_gain * (1 - $level_difference * 0.1));
-                if($money_gain < 5) {
-                    $money_gain = 5;
-                }
+        if($player->level > $opponent->level) {
+            $level_difference = $player->level - $opponent->level;
+            if($level_difference > 9) {
+                $level_difference = 9;
             }
-            // Stat gain
-            $counts = array(
-                'bloodline' => 0,
-                'ninjutsu' => 0,
-                'taijutsu' => 0,
-                'genjutsu' => 0
-            );
-            $total_count = 0;
-            if(is_array($battle->player_jutsu_used)) {
-                foreach(($battle->player_jutsu_used) as $id => $jutsu) {
-                    if(strpos($id, 'BL_J') !== false) {
-                        $counts['bloodline'] += $jutsu['count'];
-                    }
-                    else if($jutsu['jutsu_type'] == 'ninjutsu') {
-                        $counts['ninjutsu'] += $jutsu['count'];
-                    }
-                    else if($jutsu['jutsu_type'] == 'taijutsu') {
-                        $counts['taijutsu'] += $jutsu['count'];
-                    }
-                    else if($jutsu['jutsu_type'] == 'genjutsu') {
-                        $counts['genjutsu'] += $jutsu['count'];
-                    }
-                    $total_count += $jutsu['count'];
-                }
+            $money_gain = round($money_gain * (1 - $level_difference * 0.1));
+            if($money_gain < 5) {
+                $money_gain = 5;
             }
+        }
 
-            // 5 levels below = -75% chance
-            if($opponent->level < $player->level) {
-                $stat_gain_chance -= ($player->level - $opponent->level) * 15;
-            }
+        // 5 levels below = -75% chance
+        if($opponent->level < $player->level) {
+            $stat_gain_chance -= ($player->level - $opponent->level) * 15;
+        }
 
-            if($player->total_stats < $player->rank->stat_cap
-                && $stat_gain_chance >= mt_rand(1, 100)
-                && $player->getTrainingStatForArena() != null
-            ) {
-                $stat_to_gain = $player->getTrainingStatForArena();
+        if($player->total_stats < $player->rank->stat_cap
+            && $stat_gain_chance >= mt_rand(1, 100)
+            && $player->getTrainingStatForArena() != null
+        ) {
+            $stat_to_gain = $player->getTrainingStatForArena();
 
-                $player->{$stat_to_gain} += 1;
-                $player->exp += 10;
+            $player->{$stat_to_gain} += 1;
+            $player->exp += 10;
 
-                $stat_gain_display = '<br />During the fight you realized a way to use your ' . System::unSlug($stat_to_gain) . ' a little
-                more effectively.
-                <br />You have gained 1 ' . System::unSlug($stat_to_gain) . '.';
-            }
+            $stat_gain_display = '<br />During the fight you realized a way to use your ' . System::unSlug($stat_to_gain) . ' a little
+            more effectively.
+            <br />You have gained 1 ' . System::unSlug($stat_to_gain) . '.';
+        }
 
         // TEAM BOOST NPC GAINS
         if($player->team != null) {
@@ -223,7 +197,7 @@ function processArenaBattleEnd(BattleManager|BattleManagerV2 $battle, User $play
             }
         }
 
-            $player->addMoney($money_gain, 'arena');
+        $player->addMoney($money_gain, 'arena');
 
         $battle_result = "You have defeated your arena opponent.<br />
 			You have claimed your prize of &yen;$money_gain.";
