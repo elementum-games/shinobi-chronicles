@@ -43,7 +43,7 @@ function arena(): bool {
 		if(!empty($_GET['fight'])) {
 
             // check if the current location disallows ai fights
-            if ($player->current_location->location_id && $player->current_location->ai_allowed == 0) {
+            if ($player->rank_num > 2 && $player->current_location->location_id && $player->current_location->ai_allowed == 0) {
                 $system->message('You cannot fight at this location');
             }
             else if($player->last_ai_ms > System::currentTimeMs() - $fight_timer) {
