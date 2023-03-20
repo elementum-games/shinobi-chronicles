@@ -2947,10 +2947,6 @@ a#spec_miss_cancel:hover::after {
     font-family: 'Oswald', sans-serif;
 }
 
-#travel-container .systemMessage-new {
-    max-width: 80%;
-}
-
 .systemMessage-new::before {
     content: '';
     width: 24px;
@@ -3069,6 +3065,11 @@ a#spec_miss_cancel:hover::after {
         898 = 27
         994 = 30
      */
+}
+
+/* Travel overrides */
+.travel-scout-name span {
+    min-width: 110px !important;
 }
 
 /* temp fix for travel sync with side menu */

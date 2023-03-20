@@ -49,6 +49,13 @@ const keyInterval = 100; // 100ms
 const keysPressed = {};
 
 window.travelRefreshActive = true;
+window.travelDebug = false;
+
+function debug(message) {
+    if(window.travelDebug) {
+        console.log(message);
+    }
+}
 
 const Travel = ({
     travelAPILink,
@@ -188,7 +195,7 @@ const Travel = ({
 
     // API ACTIONS
     const LoadMapData = () => {
-        console.log('Loading Map Data...');
+        debug('Loading Map Data...');
         // setFeedback('Moving...');
         apiFetch(
             travelAPILink,
@@ -203,7 +210,7 @@ const Travel = ({
             return;
         }
 
-        console.log('Loading Scout Area Data...');
+        debug('Loading Scout Area Data...');
         apiFetch(
             travelAPILink,
             {
@@ -214,7 +221,7 @@ const Travel = ({
 
     const MovePlayer = (direction) => {
         setFeedback(['Moving...', 'info']);
-        console.log('Moving player...' + direction);
+        debug('Moving player...' + direction);
         apiFetch(
             travelAPILink,
             {
@@ -225,7 +232,7 @@ const Travel = ({
     }
 
     const EnterPortal = (portal_id) => {
-        console.log('Entering Portal...');
+        debug('Entering Portal...');
         apiFetch(
             travelAPILink,
             {
@@ -236,7 +243,7 @@ const Travel = ({
     }
 
     const UpdateFilter = (filter, value) => {
-        console.log('Updating Filter...');
+        debug('Updating Filter...');
         apiFetch(
             travelAPILink,
             {
@@ -258,35 +265,35 @@ const Travel = ({
 
         switch (response.data.request) {
             case 'LoadMapData':
-                console.log('Map loaded.');
+                debug('Map loaded.');
                 setFilters(response.data.response.player_filters.travel_filter);
                 setMapData(response.data.response);
                 break;
             case 'LoadScoutData':
-                console.log('Scout Area updated.');
+                debug('Scout Area updated.');
                 setScoutData(response.data.response);
                 break;
             case 'MovePlayer':
                 if (response.data.response) {
-                    console.log('Player moved successfully');
+                    debug('Player moved successfully');
                     LoadMapData(); // Reload map
                     LoadScoutData(); // Reload scout area
                 } else {
-                    console.log('Cannot move player.');
+                    debug('Cannot move player.');
                 }
                 break;
             case 'EnterPortal':
                 if (response.data.response) {
                     setFeedback(null);
-                    console.log('Player moved through portal.');
+                    debug('Player moved through portal.');
                     LoadMapData(); // Reload map
                     LoadScoutData(); // Reload scout area
                 } else {
-                    console.log('Cannot move through gate!');
+                    debug('Cannot move through gate!');
                 }
                 break;
             case 'UpdateFilter':
-                console.log('Filter updated!');
+                debug('Filter updated!');
                 LoadMapData(); // Reload map
                 LoadScoutData(); // Reload scout area
                 break;

@@ -1856,6 +1856,15 @@ a#spec_miss_cancel:hover::after {
 	width: 100%;
 }
 
+/* Travel overrides */
+#travelContainer {
+    margin: 10px auto 0 auto !important;
+}
+
+.travel-scout-location {
+    width: 48px !important;
+}
+
 /* temp maybe */
 .systemMessage-new {
 	position: relative;

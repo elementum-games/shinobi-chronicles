@@ -63,12 +63,12 @@ class NearbyPlayers {
         }
 
         echo "<tr>
-		<th style='width:28%;'>Username</th>
-		<th style='width:20%;'>Rank</th>
-		<th style='width:17%;'>Village</th>
-		<th style='width:17%;'>Location</th>
-		<th style='width:18%;'>&nbsp;</th>
-	</tr>";
+            <th style='width:28%;'>Username</th>
+            <th style='width:20%;'>Rank</th>
+            <th style='width:17%;'>Village</th>
+            <th style='width:17%;'>Location</th>
+            <th style='width:18%;'>&nbsp;</th>
+        </tr>";
 
         if(is_array($users)) {
             foreach($users as $user) {
@@ -123,7 +123,6 @@ class NearbyPlayers {
                 echo "</p>";
             }
         }
-
     }
 }
 

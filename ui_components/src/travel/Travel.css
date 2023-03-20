@@ -1,3 +1,4 @@
+/* Layout */
 #travelContainer {
     display: flex;
     flex-flow: row wrap;
@@ -6,22 +7,119 @@
     gap: 10px;
     margin: 20px auto 0 auto;
 }
-
 #travelContainer * {
     box-sizing: border-box;
 }
 
+:root {
+    --scout-container-side-width: 230px;
+}
+
+.travel-filter {
+    width: 95%;
+    max-width: calc(1000px);
+
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: center;
+    justify-content: flex-start;
+
+    background: var(--theme-content-bg-color);
+    border: 1px solid rgba(0, 0, 0, 0.12);
+}
 .travel-wrapper {
+    width: 95%;
+
     flex-grow: 0;
     position: relative;
-    padding: 25px;
+    padding: 30px;
 }
+
+.travel-scout-container {
+    width: 95%;
+
+    flex-grow: 0;
+    display: flex;
+}
+.travel-scout {
+    width: 100%;
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: space-between;
+    gap: 6px 0;
+}
+.travel-scout-entry {
+    width: 49.5%;
+
+    display: flex;
+    flex-flow: row wrap;
+    align-items: center;
+    justify-content: space-between;
+    position: relative;
+    padding: 8px 0 8px 8px;
+
+    background: var(--theme-content-bg-color);
+    border: 1px solid rgba(0, 0, 0, 0.12);
+}
+
+@media (max-width: 600px) {
+    .travel-wrapper {
+        width: calc(95% - 10px - var(--scout-container-side-width));
+    }
+
+    .travel-scout-container {
+        width: var(--scout-container-side-width);
+    }
+
+    .travel-scout-entry {
+        width: 100%;
+    }
+}
+
+/* Filters */
+.travel-filter-title {
+    flex-grow: 0;
+    margin: 0 auto;
+    padding: 5px 10px;
+
+    color: var(--theme-text-color-normal);
+    font-family: sans-serif;
+    font-weight: bold;
+
+}
+.travel-filter-options {
+    flex-grow: 2;
+    display: flex;
+    flex-flow: row wrap;
+    align-items: center;
+    padding: 10px;
+}
+.travel-filter-options label {
+    margin: 0 10px 0 0;
+
+    text-indent: 3px;
+    color: var(--theme-text-color-light);
+    text-transform: uppercase;
+    font-size: 0.8em;
+    font-family: sans-serif;
+}
+
+/* Map */
+
+/* Scout Container */
+
+
+/* Misc */
+#travel-container .systemMessage-new {
+    max-width: 85%;
+}
+
 
 .travel-messages {
     width: 100%;
     height: 40px;
     position: absolute;
-    bottom: 0%;
+    bottom: 0;
     left: 50px;
     z-index: 10000;
 }
@@ -35,9 +133,7 @@
     color: var(--theme-text-color-normal);
 }
 
-#travel-container .systemMessage-new {
-    max-width: 85%;
-}
+
 
 
 .travel-actions {
@@ -253,29 +349,6 @@
     background-size: 80% auto;
 }
 
-.travel-scout-container {
-    flex-grow: 0;
-    display: flex;
-    width: 230px;
-}
-
-.travel-scout {
-    display: flex;
-    flex-flow: column wrap;
-}
-
-.travel-scout-entry {
-    display: flex;
-    flex-flow: row wrap;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 2px;
-    position: relative;
-    padding: 10px 0 10px 10px;
-
-    background: var(--theme-content-bg-color);
-    border: 1px solid rgba(0, 0, 0, 0.12);
-}
 .travel-scout-entry::before {
     content: '';
     width: 2px;
@@ -300,13 +373,17 @@
 }
 
 .travel-scout-name {
-    width: 100px;
+    min-width: 190px;
     word-break: break-all;
     display: flex;
-    flex-flow: column nowrap;
+    flex-flow: row nowrap;
     text-indent: 5px;
-}
 
+    padding-right: 5px;
+
+    flex-grow: 2;
+    align-items: center;
+}
 #content .travel-scout-name a {
     width: 100%;
     text-decoration: none;
@@ -315,16 +392,23 @@
     font-family: sans-serif;
     font-weight: normal;
 }
-
 #content .travel-scout-name a:hover {
     color: var(--theme-text-color-light);
 }
-
 .travel-scout-name span {
-    max-width: 100%;
+    width: 50%;
+    min-width: 100px;
+
     color: var(--theme-text-color-light);
-    font-size: 0.7em;
+    font-size: 0.75em;
     font-family: sans-serif;
+
+}
+
+@media (max-width: 600px) {
+    .travel-scout-name {
+        min-width: 100px;
+    }
 }
 
 
@@ -385,51 +469,6 @@
     background-position: center;
 }
 
-.travel-filter {
-    width: 95%;
-    max-width: calc(1000px);
-    display: flex;
-    flex-flow: row nowrap;
-    align-items: center;
-    justify-content: flex-start;
-
-    background: var(--theme-content-bg-color);
-    border: 1px solid rgba(0, 0, 0, 0.12);
-}
-
-.travel-filter-title {
-    flex-grow: 0;
-    margin: 0 auto;
-    padding: 5px 10px;
-
-    color: var(--theme-text-color-normal);
-    font-family: sans-serif;
-    font-weight: bold;
-
-}
-
-.travel-filter-options {
-    flex-grow: 2;
-    display: flex;
-    flex-flow: row wrap;
-    align-items: center;
-    padding: 10px;
-}
-
-.travel-filter-options label {
-    margin: 0 10px 0 0;
-
-    text-indent: 3px;
-    color: var(--theme-text-color-light);
-    text-transform: uppercase;
-    font-size: 0.8em;
-    font-family: sans-serif;
-}
-
-.travel-wrapper {
-    width: calc(95% - 230px);
-    max-width: 760px;
-}
 
 #travel-container {
     height: 500px;
