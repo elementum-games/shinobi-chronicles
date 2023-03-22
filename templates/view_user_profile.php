@@ -80,7 +80,7 @@ $clan_positions = array(
             <?php endif; ?>
 
             <?php if($player->user_id == $viewUser->spouse): ?>
-                <label style='width:6.5em;'>Location:</label> <?= $viewUser->location ?><br />
+                <label style='width:6.5em;'>Location:</label> <?= $viewUser->location->displayString() ?><br />
             <?php endif; ?>
 
             <br />
