@@ -1916,7 +1916,7 @@ class User extends Fighter {
             'max_stamina' => 100.00,
             'chakra' => 100.00,
             'max_chakra' => 100.00,
-            'regen_rate' => 10,
+            'regen_rate' => 25,
 
             'exp' => User::BASE_EXP,
             'bloodline_id' => 0,
