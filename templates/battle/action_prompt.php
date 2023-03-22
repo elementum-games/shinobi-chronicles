@@ -427,9 +427,9 @@ $prefill_item_id = $_POST['item_id'] ?? '';
                 <?php if(count($heal_items) > 0): ?>
                     <div id='items'>
                         <?php foreach($heal_items as $item): ?>
-                        <p class='item' data-id='<?= $item['item_id'] ?>'>
-                            <b><?= $item['name'] ?></b> (<?= $item['effect'] ?> <?= $item['effect_amount'] ?>)<br />
-                            (Owned <?= $item['quantity'] ?>)
+                        <p class='item' data-id='<?= $item->id ?>'>
+                            <b><?= $item->name ?></b> (<?= $item->effect ?> <?= $item->effect_amount ?>)<br />
+                            (Owned <?= $item->quantity ?>)
                             <?php endforeach; ?>
                     </div>
                     <?php $show_submit_button = true; ?>
