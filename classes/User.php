@@ -9,6 +9,7 @@ require_once __DIR__ . "/ForbiddenSeal.php";
 require_once __DIR__ . "/battle/Fighter.php";
 require_once __DIR__ . "/TravelCoords.php";
 require_once __DIR__ . "/StaffManager.php";
+require_once __DIR__ . "/Rank.php";
 
 /*	Class:		User
 	Purpose:	Fetch user data and load into class variables.
