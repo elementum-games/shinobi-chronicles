@@ -7,17 +7,12 @@ $colspan = 3;
 if($view == 'currency_logs') {
     $colspan = 7;
 }
-elseif($view == 'player_logs') {
-    $colspan = 5;
-}
 ?>
-
 
 <div class='submenu'>
     <ul class='submenu'>
         <li style='width:32.9%;'><a href="<?=$system->links['admin']?>&page=logs&view=staff_logs">Staff Logs</a></li>
         <li style='width:32.9%;'><a href="<?=$system->links['admin']?>&page=logs&view=currency_logs">Currency Logs</a></li>
-        <li style='width:32.9%;'><a href="<?=$system->links['admin']?>&page=logs&view=player_logs">Player Logs</a></li>
     </ul>
 </div>
 

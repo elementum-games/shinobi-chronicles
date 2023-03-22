@@ -877,7 +877,6 @@ class User extends Fighter {
 
         if(!$forbidden_seal_db) {
             $this->forbidden_seal = new ForbiddenSeal($this->system, 0, 0);
-            return;
         }
         else {
             // Prep seal data from DB
@@ -1478,10 +1477,7 @@ class User extends Fighter {
 		`last_pvp_ms` = '$this->last_pvp_ms',
 		`last_death_ms` = '$this->last_death_ms',";
 
-        $forbidden_seal = $this->forbidden_seal;
-        if($this->forbidden_seal_loaded) {
-           $forbidden_seal = $this->forbidden_seal->dbEncode();
-        }
+        $forbidden_seal = $this->forbidden_seal->dbEncode();
 
         $elements = $this->elements;
         if(is_array($elements)) {

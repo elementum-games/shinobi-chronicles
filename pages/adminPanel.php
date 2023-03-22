@@ -1450,7 +1450,7 @@ function adminPanel() {
         //Pagination - log types
         if(isset($_GET['view'])) {
             $view = $system->clean($_GET['view']);
-            if(!in_array($view, ['staff_logs', 'currency_logs', 'player_logs'])) {
+            if(!in_array($view, ['staff_logs', 'currency_logs'])) {
                 $view = $default_view;
             }
             $self_link .= "&view=$view";
