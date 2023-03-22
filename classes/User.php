@@ -286,6 +286,7 @@ class User extends Fighter {
             `avatar_ban`, 
             `song_ban`, 
             `last_login`,
+            `regen_rate`,
 			`forbidden_seal`, 
 			`chat_color`, 
 			`chat_effect`,
@@ -316,6 +317,9 @@ class User extends Fighter {
         $user->song_ban = $result['song_ban'];
 
         $user->last_login = $result['last_login'];
+
+        $user->regen_rate = $result['regen_rate'];
+        $user->regen_boost = 0;
 
         $user->setForbiddenSealFromDb($result['forbidden_seal'], $remote_view);
         $user->chat_color = $result['chat_color'];
