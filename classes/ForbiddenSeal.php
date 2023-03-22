@@ -44,13 +44,26 @@ class ForbiddenSeal {
     );
     public static array $benefits = array (
         0 => [
+            'regen_boost' => 0,
+            'name_colors' => [],
+            'name_color_display' => '',
+            'avatar_size' => 125,
             'avatar_size_display' => '125x125',
             'logout_timer' => System::LOGOUT_LIMIT,
             'inbox_size' => 50,
             'journal_size' => 1000,
+            'journal_image_x' => 300,
+            'journal_image_y' => 200,
             'journal_image_display' => '300x200',
             'chat_post_size' => 350,
             'pm_size' => 1000,
+            'extra_jutsu_equips' => 0,
+            'extra_weapon_equips' => 0,
+            'extra_armor_equips' => 0,
+            'long_training_time' => 1,
+            'long_training_gains' => 1,
+            'extended_training_time' => 1,
+            'extended_training_gains' => 1,
             'stat_transfer_boost' => 0,
             'extra_stat_transfer_points_per_ak' => 0,
         ],
@@ -123,9 +136,10 @@ class ForbiddenSeal {
 
     public function checkExpiration() {
         // Seal expired, remove the seal
-        if(time() > $this->seal_end_time) {
+        if($this->level > 0 && time() > $this->seal_end_time) {
             $this->system->message("Your " . self::$forbidden_seals[$this->level] . " has expired!");
-            $this->level = false;
+            $this->level = 0;
+            $this->setBenefits();
         }
     }
 
@@ -146,7 +160,7 @@ class ForbiddenSeal {
 
     public function dbEncode() {
         switch($this->level) {
-            case false:
+            case 0:
                 return "";
             default:
                 return json_encode(array('level' => $this->level, 'time' => $this->seal_end_time));

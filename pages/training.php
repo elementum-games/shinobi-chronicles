@@ -26,13 +26,12 @@ function training() {
 	$stat_extended_train_gain = $stat_train_gain * 8;
 
 	// Forbidden seal trainings boost
-	if($player->forbidden_seal_loaded && $player->forbidden_seal->level != 0) {
-	    $stat_long_train_length *= $player->forbidden_seal->long_training_time;
-		$stat_long_train_gain *= $player->forbidden_seal->long_training_gains;
+    $stat_long_train_length *= $player->forbidden_seal->long_training_time;
+    $stat_long_train_gain *= $player->forbidden_seal->long_training_gains;
 
-        $stat_extended_train_length = round($stat_extended_train_length * $player->forbidden_seal->extended_training_time);
-        $stat_extended_train_gain = round($stat_extended_train_gain * $player->forbidden_seal->extended_training_gains);
-	}
+    $stat_extended_train_length = round($stat_extended_train_length * $player->forbidden_seal->extended_training_time);
+    $stat_extended_train_gain = round($stat_extended_train_gain * $player->forbidden_seal->extended_training_gains);
+
 
 	$stat_train_gain += $system->TRAIN_BOOST;
 	$stat_long_train_gain += $system->LONG_TRAIN_BOOST;

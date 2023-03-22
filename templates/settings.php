@@ -112,12 +112,10 @@
         <tr>
             <td colspan='2' style='text-align:center;'>
                 <?php if(!$player->checkBan(StaffManager::BAN_TYPE_JOURNAL)):?>
-                    <?php if($player->staff_level && !$player->forbidden_seal_loaded): ?>
+                    <?php if($player->staff_level && $player->forbidden_seal->level == 0): ?>
                         <i>(Images will be resized down to a max of <?=$psuedoSeal->journal_image_x?>x<?=$psuedoSeal->journal_image_y?>)</i>
-                    <?php elseif($player->forbidden_seal_loaded && $player->forbidden_seal->level != 0): ?>
-                        <i>(images will be resized down to a max of <?=$player->forbidden_seal->journal_image_x?>x<?=$player->forbidden_seal->journal_image_y?>)</i>
                     <?php else: ?>
-                        <i>(images will be resized down to a max of 200x300)</i>
+                        <i>(Images will be resized down to a max of <?=$player->forbidden_seal->journal_image_x?>x<?=$player->forbidden_seal->journal_image_y?>)</i>
                     <?php endif ?>
                     <script type=text/javascript>
                         $(document).ready(function(){

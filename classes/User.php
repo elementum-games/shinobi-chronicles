@@ -173,7 +173,7 @@ class User extends Fighter {
 
     public int $last_update;
     public int $last_active;
-    public ?ForbiddenSeal $forbidden_seal = null;
+    public ForbiddenSeal $forbidden_seal;
     public bool $forbidden_seal_loaded = false;
     public $chat_color;
     public $chat_effect;
@@ -316,9 +316,7 @@ class User extends Fighter {
 
         $user->last_login = $result['last_login'];
 
-        if($result['forbidden_seal']) {
-            $user->setForbiddenSealFromDb($result['forbidden_seal'], $remote_view);
-        }
+        $user->setForbiddenSealFromDb($result['forbidden_seal'], $remote_view);
         $user->chat_color = $result['chat_color'];
         $user->chat_effect = $result['chat_effect'];
 
@@ -751,10 +749,7 @@ class User extends Fighter {
         }
 
         // Forbidden seal
-        if($user_data['forbidden_seal']) {
-            $this->setForbiddenSealFromDb($user_data['forbidden_seal'], $remote_view);
-            $this->regen_boost += $this->regen_rate * ($this->forbidden_seal->regen_boost / 100);
-        }
+        $this->setForbiddenSealFromDb($user_data['forbidden_seal'], $remote_view);
 
         //In Village Regen
 //        if($this->in_village) {
@@ -876,11 +871,22 @@ class User extends Fighter {
     }
 
     public function setForbiddenSealFromDb(string $forbidden_seal_db, bool $remote_view) {
-        // Prep seal data from DB
-        $forbidden_seal = json_decode($forbidden_seal_db, true);
+        if($this->forbidden_seal_loaded) {
+            return;
+        }
 
-        // Set seal data
-        $this->forbidden_seal = new ForbiddenSeal($this->system, $forbidden_seal['level'], $forbidden_seal['time']);
+        if(!$forbidden_seal_db) {
+            $this->forbidden_seal = new ForbiddenSeal($this->system, 0, 0);
+            return;
+        }
+        else {
+            // Prep seal data from DB
+            $forbidden_seal = json_decode($forbidden_seal_db, true);
+
+            // Set seal data
+            $this->forbidden_seal = new ForbiddenSeal($this->system, $forbidden_seal['level'], $forbidden_seal['time']);
+        }
+
         $this->forbidden_seal_loaded = true;
 
         // Check if seal is expired & remove if it is
@@ -888,9 +894,10 @@ class User extends Fighter {
             $this->forbidden_seal->checkExpiration();
         }
 
-        // If seal is not expired, load benefits & apply seal regen boost
-        if($this->forbidden_seal->level != 0) {
-            $this->forbidden_seal->setBenefits();
+        // Load benefits
+        $this->forbidden_seal->setBenefits();
+        if($this->forbidden_seal->regen_boost) {
+            $this->regen_boost += $this->regen_rate * ($this->forbidden_seal->regen_boost / 100);
         }
     }
 
@@ -1475,9 +1482,6 @@ class User extends Fighter {
         if($this->forbidden_seal_loaded) {
            $forbidden_seal = $this->forbidden_seal->dbEncode();
         }
-        elseif(is_array($forbidden_seal)) {
-            $forbidden_seal = json_encode($forbidden_seal);
-        }
 
         $elements = $this->elements;
         if(is_array($elements)) {
@@ -1627,10 +1631,10 @@ class User extends Fighter {
 
     public function getAvatarSize(): int {
         //Give staff members premium avatar size if they do not have seal
-        if($this->staff_level && !$this->forbidden_seal_loaded) {
+        if($this->staff_level && $this->forbidden_seal->level == 0) {
             return ForbiddenSeal::$benefits[ForbiddenSeal::$STAFF_SEAL_LEVEL]['avatar_size'];
         }
-        elseif($this->forbidden_seal_loaded && $this->forbidden_seal->level != 0) {
+        elseif($this->forbidden_seal->level != 0) {
             return $this->forbidden_seal->avatar_size;
         }
         else {
@@ -1645,7 +1649,7 @@ class User extends Fighter {
         }
 
         // Forbidden seal
-        if($this->forbidden_seal_loaded && $this->forbidden_seal->level != 0) {
+        if($this->forbidden_seal->level != 0) {
             return true;
         }
 
@@ -1666,7 +1670,7 @@ class User extends Fighter {
             'black' => 'normalUser'
         ];
 
-        if(($this->forbidden_seal_loaded && $this->forbidden_seal->level != 0) || $this->isHeadAdmin()) {
+        if($this->forbidden_seal->level != 0 || $this->isHeadAdmin()) {
             if($this->isHeadAdmin()) {
                 $return = array_merge($return, ForbiddenSeal::$benefits[ForbiddenSeal::$STAFF_SEAL_LEVEL]['name_colors']);
             }

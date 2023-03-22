@@ -14,14 +14,14 @@ function userSettings() {
 	global $player;
 	
 	global $self_link;
-	$max_journal_length = 1000;
+
 	// Forbidden seal increase
-    if($player->staff_level && !$player->forbidden_seal_loaded) {
+    if($player->staff_level && $player->forbidden_seal->level == 0) {
         $psuedoSeal = new ForbiddenSeal($system, ForbiddenSeal::$STAFF_SEAL_LEVEL);
         $psuedoSeal->setBenefits();
         $max_journal_length = $psuedoSeal->journal_size;
     }
-	if($player->forbidden_seal_loaded && $player->forbidden_seal->level != 0) {
+	else {
         $max_journal_length = $player->forbidden_seal->journal_size;
 	}
 	

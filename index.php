@@ -124,7 +124,7 @@ else {
 	if($player->hasAdminPanel()) {
 		$logout_limit = 1440;
 	}
-	else if($player->forbidden_seal) {
+	else if($player->forbidden_seal && $player->forbidden_seal->level > 0) {
         $logout_limit = $player->forbidden_seal->logout_timer;
 	}
 

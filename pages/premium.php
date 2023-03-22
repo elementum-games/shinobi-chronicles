@@ -64,10 +64,8 @@ function premium() {
         $stat_transfer_points_per_ak = 600;
     }
 
-    if($player->forbidden_seal_loaded) {
-        $stat_transfer_points_per_min += $player->forbidden_seal->stat_transfer_boost;
-        $stat_transfer_points_per_ak += $player->forbidden_seal->extra_stat_transfer_points_per_ak;
-    }
+    $stat_transfer_points_per_min += $player->forbidden_seal->stat_transfer_boost;
+    $stat_transfer_points_per_ak += $player->forbidden_seal->extra_stat_transfer_points_per_ak;
 
     // Free stat transfers
     $free_stat_change_timer = 86400;
@@ -569,16 +567,16 @@ function premium() {
             }
 
             //Extend seal
-            if($player->forbidden_seal_loaded && $player->forbidden_seal->level == $seal_level) {
+            if($player->forbidden_seal->level == $seal_level) {
                 $player->subtractPremiumCredits($akCost, "Extended {$player->forbidden_seal->name} by {$seal_length} days.");
                 $player->forbidden_seal->addSeal($seal_level, $seal_length);
                 $system->message("Seal extended!");
             }
             //Overwrite seal
-            elseif($player->forbidden_seal_loaded) {
-                $overwrite = isset($_POST['confirm_seal_overwrite']) ? true : false;
+            elseif($player->forbidden_seal->level > 0) {
+                $overwrite = isset($_POST['confirm_seal_overwrite']);
                 // Confirm change in seal... time will not be reimbursed
-                if(!isset($_POST['change_forbidden_seal']) && $seal_level != $player->forbidden_seal->level) {
+                if(!isset($_POST['change_forbidden_seal'])) {
                     $confirmation_type = 'change_forbidden_seal';
                     $confirmation_string = "Are you sure you would like to change from your {$player->forbidden_seal->name}?<br />
                     You will lose {$system->time_remaining($player->forbidden_seal->seal_time_remaining)} of premium time.<br />

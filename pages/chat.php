@@ -26,10 +26,10 @@ function chat() {
 	// Validate post and submit to DB
     $chat_max_post_length = System::CHAT_MAX_POST_LENGTH;
     //Increase chat length limit for seal users & staff members
-    if($player->staff_level && !$player->forbidden_seal instanceof ForbiddenSeal) {
+    if($player->staff_level && $player->forbidden_seal->level == 0) {
         $chat_max_post_length = ForbiddenSeal::$benefits[ForbiddenSeal::$STAFF_SEAL_LEVEL]['chat_post_size'];
     }
-    if($player->forbidden_seal_loaded && $player->forbidden_seal->level != 0) {
+    if($player->forbidden_seal->level != 0) {
         $chat_max_post_length = $player->forbidden_seal->chat_post_size;
     }
 

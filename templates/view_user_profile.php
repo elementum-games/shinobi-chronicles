@@ -113,7 +113,7 @@ $clan_positions = array(
                         $journal = wordwrap($journal, 100, "\r\n", true);
                     }
                     $journal = $system->html_parse(stripslashes($journal), true, true);
-                    $class_name = $player->forbidden_seal_loaded ? 'forbidden_seal' : 'normal';
+                    $class_name = $player->forbidden_seal->level > 0 ? 'forbidden_seal' : 'normal';
                 ?>
                 <style>
                     #journal {

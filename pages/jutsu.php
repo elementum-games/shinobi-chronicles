@@ -25,7 +25,7 @@ function jutsu(): void {
     if($player->rank_num >= 4) {
         $max_equipped_jutsu++;
     }
-    if($player->forbidden_seal_loaded && $player->forbidden_seal->level != 0) {
+    if($player->forbidden_seal->level != 0) {
         $max_equipped_jutsu += $player->forbidden_seal->extra_jutsu_equips;
     }
 

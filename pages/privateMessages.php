@@ -58,7 +58,7 @@ class Messaging {
         if($player->staff_level) {
             $this->constraints['inbox_limit'] = ForbiddenSeal::$benefits[ForbiddenSeal::$STAFF_SEAL_LEVEL]['inbox_size'] + self::STAFF_ADITIONAL_LIMIT; //Add 25 for 100 staff limit
         }
-        else if($player->forbidden_seal_loaded && $player->forbidden_seal->level != 0) {
+        else if($player->forbidden_seal->level != 0) {
             $this->constraints['inbox_limit'] = $player->forbidden_seal->inbox_size;
         }
         else {

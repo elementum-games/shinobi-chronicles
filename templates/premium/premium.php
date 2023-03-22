@@ -404,7 +404,7 @@
                 <br/>
 
                 <b>Your Forbidden Seal</b><br/>
-                <?php if($player->forbidden_seal_loaded): ?>
+                <?php if($player->forbidden_seal->level > 0): ?>
                     <?= $player->forbidden_seal->name ?><br/>
                     <?= $system->time_remaining($player->forbidden_seal->seal_time_remaining) ?>
                     <br />
@@ -462,8 +462,7 @@
                                 <option value="<?=$pLength?>"><?=$pLength?> days (<?=$pCost?> AK)</option>
                             <?php endforeach ?>
                         </select><br/>
-                        <input type='submit' name='forbidden_seal' value='<?= ($player->forbidden_seal_loaded &&
-                            $player->forbidden_seal->level == 1 ? 'Extend' : 'Purchase') ?>' />
+                        <input type='submit' name='forbidden_seal' value='<?= ($player->forbidden_seal->level == 1 ? 'Extend' : 'Purchase') ?>' />
                     </p>
                 </form>
             </td>
@@ -491,8 +490,7 @@
                                 <option value="<?=$pLength?>"><?=$pLength?> days (<?=$pCost?> AK)</option>
                             <?php endforeach ?>
                         </select><br/>
-                        <input type='submit' name='forbidden_seal' value='<?= ($player->forbidden_seal_loaded &&
-                            $player->forbidden_seal->level == 2 ? 'Extend' : 'Purchase') ?>' />
+                        <input type='submit' name='forbidden_seal' value='<?= ($player->forbidden_seal->level == 2 ? 'Extend' : 'Purchase') ?>' />
                     </p>
                 </form>
             </td>
