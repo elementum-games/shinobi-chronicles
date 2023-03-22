@@ -13,6 +13,7 @@ services:
       interval: 1m30s
       timeout: 60s
       retries: 6
+    hostname: shinobi-chronicles-db
 
   # Flyway is best for mysql schema migration history.
   database-migration:
