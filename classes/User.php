@@ -195,7 +195,7 @@ class User extends Fighter {
 
     public array $elements;
 
-    public int $regen_boost;
+    public int $regen_boost = 0;
 
     public int $battle_id;
 
