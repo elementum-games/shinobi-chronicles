@@ -35,6 +35,36 @@
     padding: 30px;
 }
 
+#travel-container {
+    height: 600px;
+}
+
+@media (max-height: 1200px) {
+    #travel-container {
+        height: 550px;
+    }
+}
+@media (max-height: 1150px) {
+    #travel-container {
+        height: 500px;
+    }
+}
+@media (max-height: 1100px) {
+    #travel-container {
+        height: 450px;
+    }
+}
+@media (max-height: 1000px) {
+    #travel-container {
+        height: 400px;
+    }
+}
+@media (max-height: 950px) {
+    #travel-container {
+        height: 350px;
+    }
+}
+
 .travel-scout-container {
     width: 95%;
 
@@ -468,28 +498,6 @@
     background-repeat: no-repeat;
     background-position: center;
 }
-
-
-#travel-container {
-    height: 500px;
-}
-
-@media (max-height: 1100px) {
-    #travel-container {
-        height: 450px;
-    }
-}
-@media (max-height: 1000px) {
-    #travel-container {
-        height: 400px;
-    }
-}
-@media (max-height: 950px) {
-    #travel-container {
-        height: 350px;
-    }
-}
-
 
 /* temp fix for travel sync with side menu */
 .sm-tmp-invillage #sideMenuOption-Arena,

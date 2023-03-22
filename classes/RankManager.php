@@ -153,7 +153,7 @@ class RankManager {
         switch($new_rank) {
             case 2:
                 // Use cost 25
-                $player->regen_rate = 50;
+                $player->regen_rate = 40;
                 break;
             case 3:
                 // Use cost 50
