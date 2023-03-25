@@ -8,6 +8,7 @@ require_once __DIR__ . "/DailyTask.php";
 require_once __DIR__ . "/ForbiddenSeal.php";
 require_once __DIR__ . "/battle/Fighter.php";
 require_once __DIR__ . "/TravelCoords.php";
+require_once __DIR__ . "/Travel.php";
 require_once __DIR__ . "/StaffManager.php";
 require_once __DIR__ . "/Rank.php";
 
