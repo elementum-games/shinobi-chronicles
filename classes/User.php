@@ -876,10 +876,6 @@ class User extends Fighter {
     }
 
     public function setForbiddenSealFromDb(string $forbidden_seal_db, bool $remote_view) {
-        if($this->forbidden_seal_loaded) {
-            return;
-        }
-
         if(!$forbidden_seal_db) {
             $this->forbidden_seal = new ForbiddenSeal($this->system, 0, 0);
         }
@@ -900,9 +896,6 @@ class User extends Fighter {
 
         // Load benefits
         $this->forbidden_seal->setBenefits();
-        if($this->forbidden_seal->regen_boost) {
-            $this->regen_boost += $this->regen_rate * ($this->forbidden_seal->regen_boost / 100);
-        }
     }
 
     /**
