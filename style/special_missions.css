@@ -1,0 +1,364 @@
+
+#spec_miss_wrapper {
+    margin: 20px auto;
+    padding: 0 20px 0 20px;
+    display: flex;
+    flex-flow: row wrap;
+    align-items: stretch;
+}
+
+#spec_miss_header {
+    width: 100%;
+    display: flex;
+    flex-flow: row wrap;
+    align-items: stretch;
+    padding: 20px 0;
+}
+
+#spec_miss_timer_title,
+#spec_miss_progress_title,
+#spec_miss_status_title {
+    width: 100%;
+    height: 30px;
+    line-height: 30px;
+    text-align: center;
+
+    text-transform: uppercase;
+}
+
+#spec_miss_timer_wrapper,
+#spec_miss_progress_wrapper,
+#spec_miss_character_wrapper {
+    min-width: 33%;
+}
+
+#spec_miss_timer,
+#spec_miss_status_text,
+#spec_miss_progress_div {
+    text-align: center;
+
+    font-family: var(--font-primary);
+    color: #c4c4c4;
+    text-shadow: 0 1px 2px #000000;
+}
+
+#spec_miss_status_text.spec_miss_status_Success,
+#spec_miss_progress_div.spec_miss_status_Success {
+    color: #43a543;
+}
+
+#spec_miss_status_text.spec_miss_status_Failed,
+#spec_miss_progress_div.spec_miss_status_Failed {
+    color: #d32f2f;
+}
+
+#spec_miss_timer {
+    font-size: 3rem;
+}
+
+#spec_miss_status_text {
+    padding: 10px 0;
+
+    font-size: 1.5rem;
+    font-family: var(--font-primary);
+}
+
+#spec_miss_progress_div {
+    padding: 10px 0;
+
+    font-size: 2rem;
+}
+
+#spec_miss_health_wrapper {
+    display: flex;
+    width: 100%;
+    gap: 5px;
+    padding: 0 10px 0 0;
+    flex-flow: row nowrap;
+    align-items: center;
+}
+
+#spec_miss_health_icon {
+    width: 25px;
+    height: 25px;
+
+    background: url('../images/special_missions/helath.png') center center;
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+}
+
+#spec_miss_health_bar_wrapper {
+    flex-grow: 2;
+}
+
+#spec_miss_health_bar_out {
+    width: 100%;
+    height: 4px;
+    position: relative;
+
+    background: #212741;
+    box-shadow: 0 0 1px #000000 inset;
+}
+
+#spec_miss_health_bar {
+    background: #ca1d1d;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+#spec_miss_reward_wrapper {
+    width: 100%;
+    text-align: center;
+
+    color: #c4c4c4;
+    font-size: 1.2rem;
+}
+
+#spec_miss_log_wrapper {
+    min-width: 100%;
+    margin: 20px 0 10px 0;
+}
+
+.spec_miss_log_entry {
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: stretch;
+    overflow: hidden;
+    position: relative;
+}
+
+.spec_miss_log_entry::after {
+    content: '';
+    width: 100%;
+    height: 1px;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+
+    background: linear-gradient(to right, rgba(0,0,0,0), #707070);
+}
+
+
+.spec_miss_log_entry:first-of-type::before {
+    content: '';
+    width: 100%;
+    height: 1px;
+    position: absolute;
+    bottom: 0;
+    top: 0;
+
+    background: linear-gradient(to right, rgba(0,0,0,0), #b99e47);
+}
+
+.spec_miss_log_entry_timestamp_wrapper {
+    flex-grow: 0;
+    display: flex;
+    position: relative;
+    padding: 0 10px 0 0;
+    align-items: center;
+}
+
+#spec_miss_log_entry_timestamp {
+    font-family: var(--font-primary);
+    font-size: 1.5rem;
+    color: #3b3b3b;
+    font-style: italic;
+}
+
+.spec_miss_log_entry_icon_wrapper {
+    flex-grow: 0;
+    display: flex;
+    align-items: center;
+    position: relative;
+}
+
+.spec_miss_log_entry_icon {
+    width: 40px;
+    height: 40px;
+    position: relative;
+
+    box-shadow: 0 0 2px #000000 inset;
+    border-radius: 100%;
+}
+
+.spec_miss_log_entry_icon::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    left: 0;
+    height: 40px;
+    width: 40px;
+}
+
+.spec_miss_log_entry_text {
+    flex-grow: 1;
+    padding: 20px 15px;
+    text-align: left;
+
+    color: #3b3b3b;
+    font-family: var(--font-primary);
+    font-size: 0.9rem;
+}
+
+.spec_miss_page_warning {
+    font-size: 0.9em;
+    font-style: italic;
+    margin-right: 70px;
+    color: #3b3b3b;
+    opacity: 0.9;
+}
+#spec_miss_cancel_wrapper {
+    min-width: 100%;
+    text-align: right;
+    padding: 5px 0 5px 0;
+}
+
+a#spec_miss_cancel {
+    padding: 10px 30px 10px 20px;
+    display: inline-block;
+    text-align: center;
+    position: relative;
+
+    font-size: 1rem;
+    font-weight: bold;
+    color: #3b3b3b;
+    text-decoration: none;
+    text-transform: uppercase;
+    font-family: var(--font-primary);
+}
+
+a#spec_miss_cancel::after {
+    content: '';
+    position: absolute;
+    width: 25px;
+    height: 25px;
+    top: 45%;
+    transform: translateY(-50%);
+    right: 0;
+
+    background: url('../images/special_missions/cancel-off.png');
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+}
+
+a#spec_miss_cancel:hover {
+    color: rgb(10, 10, 10);
+}
+
+a#spec_miss_cancel:hover::after {
+    background: url('../images/special_missions/cancel-on.png');
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+}
+
+.spec_miss_event_move_x,
+.spec_miss_event_move_y {
+    background: #d4d24a;
+}
+
+.spec_miss_event_move_x::after {
+    background: url('../images/special_missions/move_x.png');
+    background-size: 90% 90%;
+    background-position: center center;
+    background-repeat: no-repeat;
+}
+
+.spec_miss_event_move_y::after {
+    background: url('../images/special_missions/move_y.png');
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+}
+
+.spec_miss_event_battle {
+    background: #db802b;
+}
+
+.spec_miss_event_battle::after {
+    background: url('../images/special_missions/battle.png');
+    background-size: 90% 90%;
+    background-position: center center;
+    background-repeat: no-repeat;
+}
+
+.spec_miss_event_battle_win {
+    background: #4ad44a;
+}
+
+.spec_miss_event_battle_win::after {
+    background: url('../images/special_missions/battle_win.png');
+    background-size: 100% 100%;
+    background-position: center center;
+    background-repeat: no-repeat;
+}
+
+.spec_miss_event_battle_lose {
+    background: #cc2a2a;
+}
+
+.spec_miss_event_battle_lose::after {
+    background: url('../images/special_missions/battle_lost.png');
+    background-size: 100% 100%;
+    background-position: center center;
+    background-repeat: no-repeat;
+}
+
+.spec_miss_event_mission_home {
+    background: #428bcf;
+}
+
+.spec_miss_event_mission_home::after {
+    background: url('../images/special_missions/mission_home.png');
+    background-size: 100% 100%;
+    background-position: center center;
+    background-repeat: no-repeat;
+}
+
+.spec_miss_event_mission_complete {
+    background: #4ad44a;
+}
+
+.spec_miss_event_mission_complete::after {
+    background: url('../images/special_missions/mission_success.png');
+    background-size: 100% 100%;
+    background-position: center center;
+    background-repeat: no-repeat;
+}
+
+.spec_miss_event_mission_failed {
+    background: #cc2a2a;
+}
+
+.spec_miss_event_mission_failed::after {
+    background: url('../images/special_missions/mission_failed.png');
+    background-size: 100% 100%;
+    background-position: center center;
+    background-repeat: no-repeat;
+}
+
+.spec_miss_event_mission_reward {
+    background: #d4d24a;
+}
+
+.spec_miss_event_mission_reward::after {
+    background: url('../images/special_missions/mission_reward.png');
+    background-size: 100% 100%;
+    background-position: center center;
+    background-repeat: no-repeat;
+}
+
+.spec_miss_event_start {
+    background: #4ad44a;
+}
+
+.spec_miss_event_start::after {
+    background: url('../images/special_missions/start.png');
+    background-size: 100% 100%;
+    background-position: center center;
+    background-repeat: no-repeat;
+}
