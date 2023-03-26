@@ -56,6 +56,7 @@ function debug(message) {
 }
 
 const Travel = ({
+  travelPageLink,
   travelAPILink,
   missionLink,
   membersLink,
@@ -318,25 +319,10 @@ const Travel = ({
     onChange: () => UpdateFilter('Akademi-sei', viewAS)
   }), /*#__PURE__*/React.createElement("label", null, "Akademi-sei"))), /*#__PURE__*/React.createElement("div", {
     className: "travel-wrapper"
-  }, /*#__PURE__*/React.createElement("div", {
-    className: "travel-actions"
-  }, /*#__PURE__*/React.createElement("a", {
-    onClick: () => MovePlayer('northwest')
-  }), /*#__PURE__*/React.createElement("a", {
-    onClick: () => MovePlayer('north')
-  }), /*#__PURE__*/React.createElement("a", {
-    onClick: () => MovePlayer('northeast')
-  }), /*#__PURE__*/React.createElement("a", {
-    onClick: () => MovePlayer('west')
-  }), /*#__PURE__*/React.createElement("a", {
-    onClick: () => MovePlayer('east')
-  }), /*#__PURE__*/React.createElement("a", {
-    onClick: () => MovePlayer('southwest')
-  }), /*#__PURE__*/React.createElement("a", {
-    onClick: () => MovePlayer('south')
-  }), /*#__PURE__*/React.createElement("a", {
-    onClick: () => MovePlayer('southeast')
-  })), /*#__PURE__*/React.createElement("div", {
+  }, /*#__PURE__*/React.createElement(TravelActions, {
+    travelPageLink: travelPageLink,
+    movePlayer: MovePlayer
+  }), /*#__PURE__*/React.createElement("div", {
     id: "travel-container",
     className: "travel-container"
   }, /*#__PURE__*/React.createElement("div", {
@@ -366,6 +352,46 @@ const Travel = ({
     view_jonin: viewJonin
   }));
 };
+
+function TravelActions({
+  travelPageLink,
+  movePlayer
+}) {
+  const makeTravelClickHandler = direction => {
+    return e => {
+      e.preventDefault();
+      movePlayer(direction);
+    };
+  };
+
+  return /*#__PURE__*/React.createElement("div", {
+    className: "travel-actions"
+  }, /*#__PURE__*/React.createElement("a", {
+    href: `${travelPageLink}&travel=northwest`,
+    onClick: makeTravelClickHandler('northwest')
+  }), /*#__PURE__*/React.createElement("a", {
+    href: `${travelPageLink}&travel=north`,
+    onClick: makeTravelClickHandler('north')
+  }), /*#__PURE__*/React.createElement("a", {
+    href: `${travelPageLink}&travel=northeast`,
+    onClick: makeTravelClickHandler('northeast')
+  }), /*#__PURE__*/React.createElement("a", {
+    href: `${travelPageLink}&travel=west`,
+    onClick: makeTravelClickHandler('west')
+  }), /*#__PURE__*/React.createElement("a", {
+    href: `${travelPageLink}&travel=east`,
+    onClick: makeTravelClickHandler('east')
+  }), /*#__PURE__*/React.createElement("a", {
+    href: `${travelPageLink}&travel=southwest`,
+    onClick: makeTravelClickHandler('southwest')
+  }), /*#__PURE__*/React.createElement("a", {
+    href: `${travelPageLink}&travel=south`,
+    onClick: makeTravelClickHandler('south')
+  }), /*#__PURE__*/React.createElement("a", {
+    href: `${travelPageLink}&travel=southeast`,
+    onClick: makeTravelClickHandler('southeast')
+  }));
+}
 
 const Message = ({
   message,
