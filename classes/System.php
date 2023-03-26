@@ -122,6 +122,7 @@ class System {
         'settings' => 3,
         'members' => 6,
         'bloodline' => 10,
+        'travel' => 11,
         'arena' => 12,
         'mission' => 14,
         'specialmissions' => 15,

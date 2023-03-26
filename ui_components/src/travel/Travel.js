@@ -58,6 +58,7 @@ function debug(message) {
 }
 
 const Travel = ({
+    travelPageLink,
     travelAPILink,
     missionLink,
     membersLink,
@@ -334,18 +335,10 @@ const Travel = ({
                 </div>
             </div>
         <div className='travel-wrapper'>
-            <div className='travel-actions'>
-                <a onClick={() => MovePlayer('northwest') }></a>
-                <a onClick={() => MovePlayer('north') }></a>
-                <a onClick={() => MovePlayer('northeast') }></a>
-
-                <a onClick={() => MovePlayer('west') }></a>
-                <a onClick={() => MovePlayer('east') }></a>
-
-                <a onClick={() => MovePlayer('southwest') }></a>
-                <a onClick={() => MovePlayer('south') }></a>
-                <a onClick={() => MovePlayer('southeast') }></a>
-            </div>
+            <TravelActions
+                travelPageLink={travelPageLink}
+                movePlayer={MovePlayer}
+            />
             <div id='travel-container' className='travel-container'>
                 <div className='travel-buttons'>
                     {(mapData && !Array.isArray(mapData.current_portal)) && (
@@ -381,6 +374,30 @@ const Travel = ({
             )}
         </>
     );
+}
+
+function TravelActions({ travelPageLink, movePlayer }) {
+    const makeTravelClickHandler = (direction) => {
+        return (e) => {
+            e.preventDefault();
+            movePlayer(direction);
+        }
+    }
+
+    return (
+        <div className='travel-actions'>
+            <a href={`${travelPageLink}&travel=northwest`} onClick={makeTravelClickHandler('northwest') }></a>
+            <a href={`${travelPageLink}&travel=north`} onClick={makeTravelClickHandler('north') }></a>
+            <a href={`${travelPageLink}&travel=northeast`} onClick={makeTravelClickHandler('northeast') }></a>
+
+            <a href={`${travelPageLink}&travel=west`} onClick={makeTravelClickHandler('west') }></a>
+            <a href={`${travelPageLink}&travel=east`} onClick={makeTravelClickHandler('east') }></a>
+
+            <a href={`${travelPageLink}&travel=southwest`} onClick={makeTravelClickHandler('southwest') }></a>
+            <a href={`${travelPageLink}&travel=south`} onClick={makeTravelClickHandler('south') }></a>
+            <a href={`${travelPageLink}&travel=southeast`} onClick={makeTravelClickHandler('southeast') }></a>
+        </div>
+    )
 }
 
 const Message = ({message, messageType}) => {
