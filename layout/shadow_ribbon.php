@@ -2,7 +2,7 @@
 
 /** @var System $system */
 
-require 'layout/_common.php';
+require_once 'layout/_common.php';
 $heading = coreHeading('./style/shadow_ribbon/layout.css') . <<<HTML
 <body>
 	<div id='header'>

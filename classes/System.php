@@ -18,6 +18,7 @@ class System {
     const KUNAI_PER_DOLLAR = 2;
     const LOGOUT_LIMIT = 120;
     const BLOODLINE_ROLL_CHANCE = 50;
+    const JONIN_EXAM_MISSION_ID = 10;
 
     const MENU_USER = 'user';
     const MENU_ACTIVITY = 'activity';
@@ -832,6 +833,7 @@ class System {
          */
         if(isset($_SESSION['user_id'])) {
             echo $side_menu_start;
+            echo "<li><a href='{$system->links['profile']}'>Profile</a></li>";
             echo $side_menu_end;
         }
         else {

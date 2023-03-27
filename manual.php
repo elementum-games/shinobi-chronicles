@@ -1,13 +1,13 @@
 <?php
 session_start();
 
-require "classes/System.php";
+require_once "classes/System.php";
+require_once "classes/Bloodline.php";
 $system = new System();
 $layout = System::DEFAULT_LAYOUT;
 
 if (isset($_SESSION['user_id'])) {
-  require_once "classes/User.php";
-  require_once "classes/Bloodline.php";
+  require_once "classes.php";
   $player = User::loadFromId($system, $_SESSION['user_id']);
   $player->loadData();
   $layout = $player->layout;

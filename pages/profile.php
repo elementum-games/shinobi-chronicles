@@ -23,18 +23,19 @@ function userProfile() {
 
     // Level up
     if($player->level < $player->rank->max_level && $player->exp >= $exp_needed) {
-        if($player->battle_id) {
-            echo "<p style='text-align:center;font-style:italic;'>
+        if($player->level_up) {
+            if ($player->battle_id) {
+                echo "<p style='text-align:center;font-style:italic;'>
 				You must be out of battle to level up.</p>";
-        }
-        else {
-            require("levelUp.php");
-            levelUp();
-            $exp_needed = $player->expForNextLevel();
+            } else {
+                require("levelUp.php");
+                levelUp();
+                $exp_needed = $player->expForNextLevel();
+            }
         }
     }
     // Rank up
-    else if($player->level >= $player->rank->max_level && $player->exp >= $exp_needed && $player->rank_num < System::SC_MAX_RANK) {
+    else if($player->level >= $player->rank->max_level && $player->exp >= $exp_needed && $player->rank_num < System::SC_MAX_RANK && $player->rank_up) {
         if($player->battle_id > 0 or !$player->in_village) {
             echo "<p style='text-align:center;font-style:italic;'>
 				You must be out of battle and in your village to rank up.</p>";

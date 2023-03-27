@@ -1,6 +1,6 @@
 <?php
 
-require 'layout/_common.php';
+require_once 'layout/_common.php';
 
 $heading = coreHeading('./style/geisha/geisha.css') .
 <<<HTML

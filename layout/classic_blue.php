@@ -9,7 +9,7 @@ Purpose:	Contains variables for layout HTML sections: Header, menus, footer
 
 /** @var System $system */
 
-require 'layout/_common.php';
+require_once 'layout/_common.php';
 $heading = coreHeading('./style/classic_blue/style.css') . <<<HTML
 <body>
 	<div id='container'>

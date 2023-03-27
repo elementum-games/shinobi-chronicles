@@ -66,9 +66,23 @@
                 </form>
             </td>
         </tr>
-        <tr><th colspan='2'>Layout</th></tr>
         <tr>
-            <td colspan='2' style="text-align: center;">
+            <th>Level & Rank</th>
+            <th>Layout</th>
+        </tr>
+        <tr>
+            <td style="text-align: center;">
+                <form action="<?=$self_link?>" method="post">
+                    By changing this setting, you can allow your character to stop leveling up and hide the exam links.<br />
+                    <br />
+                    <input type="checkbox" name="level_up" <?=($player->level_up ? "checked='checked'" : "")?>/>
+                    <label for="level_up">Level Up</label><br />
+                    <input type="checkbox" name="rank_up" <?=($player->rank_up ? "checked='checked'" : "")?>/>
+                    <label for="rank_up">Rank Up</label><br />
+                    <input type="submit" name="change_level_rank" value="Update" />
+                </form>
+            </td>
+            <td style="text-align: center;">
                 <form action='<?=$self_link?>' method='post'>
                     <select name='layout'>";
                         <?php foreach($layouts as $layout):?>

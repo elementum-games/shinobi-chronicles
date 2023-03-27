@@ -20,6 +20,7 @@ function adminPanel() {
     global $system;
     global $player;
     global $id;
+    global $self_link;
 
     // Staff level check
     if(!$player->hasAdminPanel()) {
@@ -1534,7 +1535,7 @@ function adminPanel() {
                     throw new Exception("Invalid user!");
                 }
 
-                if($user['user_id'] == $player->user_id) {
+                if($user['user_id'] == $player->user_id && !$player->staff_manager->isHeadAdmin()) {
                     $user = false;
                     throw new Exception("You can not cut your own stats!");
                 }

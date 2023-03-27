@@ -69,7 +69,6 @@ function missions(): bool {
 
 	}
 
-
 	// Display missions
 	$system->printMessage();
 	$view = $max_mission_rank;
@@ -101,11 +100,22 @@ function runActiveMission(): bool {
     global $player;
     global $self_link;
 
-    if(!empty($_GET['cancel_mission'])) {
-        $player->clearMission();
-        $system->message("You have abandoned your mission. <a href='$self_link'>Continue</a>");
+    if($player->mission_id == System::JONIN_EXAM_MISSION_ID && $player->exam_stage == 2) {
+        $system->message("You must complete your <a href='{$system->links['rankup']}'>Exam</a>!");
         $system->printMessage();
-        return true;
+        return false;
+    }
+    if(!empty($_GET['cancel_mission'])) {
+        if($player->mission_id == System::JONIN_EXAM_MISSION_ID) {
+            $system->message("You must abandon your exam to end this mission!");
+            $system->printMessage();
+        }
+        else {
+            $player->clearMission();
+            $system->message("You have abandoned your mission. <a href='$self_link'>Continue</a>");
+            $system->printMessage();
+            return true;
+        }
     }
     // Call mission (Pass team if player has one, class will determine if current mission is team or not)
     if($player->team) {
@@ -303,7 +313,12 @@ function runActiveMission(): bool {
         }
         // Display mission details
         else if($player->mission_id) {
-            echo "<table class='table'><tr><th>Current Mission (<a href='$self_link&cancel_mission=1'>Abandon Mission</a>)</th></tr>
+            echo "<table class='table'><tr><th>Current Mission";
+
+            if($player->mission_id != System::JONIN_EXAM_MISSION_ID) {
+                echo " (<a href='$self_link&cancel_mission=1'>Abandon Mission</a>)";
+            }
+            echo "</th></tr>
 			<tr><td style='text-align:center;'><span style='font-weight:bold;'>" .
                 ($mission->mission_type == 3 ? '[' . $player->team->name . '] ' : '') . "$mission->name</span><br />" .
                 $player->mission_stage['description'];
