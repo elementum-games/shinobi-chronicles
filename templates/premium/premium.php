@@ -429,8 +429,6 @@
                         <br />
                         <input type='submit' name='change_color' value='Change Name Color'/>
                     </form>
-                <?php else: ?>
-                    None
                 <?php endif; ?>
             </td>
         </tr>
