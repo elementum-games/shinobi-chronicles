@@ -1,0 +1,1 @@
+<p style='text-align:center;font-style:italic;'>You must be out of battle and in your village to rank up.</p>

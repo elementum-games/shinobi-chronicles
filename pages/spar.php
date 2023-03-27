@@ -49,7 +49,7 @@ function spar() {
 			$user = $system->db_fetch($result);
 			
 			/*
-			if($user['village'] != $player->village) {
+			if($user['village'] != $player->village->name) {
 				throw new Exception("You cannot spar ninja from enemy villages!");
 			}
 			*/

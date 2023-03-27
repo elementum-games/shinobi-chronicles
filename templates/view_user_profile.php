@@ -57,7 +57,7 @@ $clan_positions = array(
                 <label style='width:6.5em;'>Gender:</label> <?= $viewUser->gender ?><br />
             <?php endif; ?>
 
-			<label style='width:6.5em;'>Village:</label> <?= $viewUser->village ?><br />
+			<label style='width:6.5em;'>Village:</label> <?= $viewUser->village->name ?><br />
 			<label style='width:6.5em;'>Bloodline:</label> <?= ($viewUser->bloodline_id ? $viewUser->bloodline_name : "None") ?>
             <br />
 
@@ -100,7 +100,7 @@ $clan_positions = array(
             <?php endif; ?>
             <?php if($viewUser->rank_num >= 3 && $player->team): ?>
                 <?php if($player->user_id == $player->team->leader && !$viewUser->team && !$viewUser->team_invite &&
-                    $player->village == $viewUser->village): ?>
+                    $player->village->name == $viewUser->village->name): ?>
                     &nbsp;&nbsp; |  &nbsp;&nbsp;
                                 <a href='<?= $system->link ?>?id=24&invite=1&user_name=<?= $viewUser->user_name ?>'>Invite to Team</a>
                 <?php endif; ?>

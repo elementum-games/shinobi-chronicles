@@ -220,6 +220,26 @@ function userSettings() {
 			$system->printMessage();
 		}
 	}
+    else if(!empty($_POST['level_rank_up'])) {
+        $level_up = isset($_POST['level_up']);
+        $rank_up = isset($_POST['rank_up']);
+        $data_changed = false;
+        if($rank_up != $player->rank_up) {
+            $data_changed = true;
+            $player->rank_up = $rank_up;
+        }
+        if($level_up != $player->level_up) {
+            $data_changed = true;
+            $player->level_up = $level_up;
+        }
+        if($data_changed) {
+            $system->message("Rank and level settings updated!");
+        }
+        else {
+            $system->message("You must change rank or level settings!");
+        }
+        $system->printMessage();
+    }
     else if(!empty($_POST['censor_explicit_language'])) {
         if($_POST['censor_explicit_language'] == 'on') {
             $player->censor_explicit_language = true;

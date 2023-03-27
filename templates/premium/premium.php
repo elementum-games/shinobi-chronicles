@@ -337,7 +337,7 @@
                     <form action='<?= $self_link ?>' method='post'>
                         <select name='new_village'>
                             <?php foreach(System::$villages as $village): ?>
-                                <?php if($player->village == $village) continue; ?>
+                                <?php if($player->village->name == $village) continue; ?>
                                 <option value='<?= $village ?>'><?= $village ?></option>
                             <?php endforeach; ?>
                         </select><br/>
@@ -429,8 +429,6 @@
                         <br />
                         <input type='submit' name='change_color' value='Change Name Color'/>
                     </form>
-                <?php else: ?>
-                    None
                 <?php endif; ?>
             </td>
         </tr>

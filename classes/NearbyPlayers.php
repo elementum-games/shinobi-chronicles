@@ -77,7 +77,7 @@ class NearbyPlayers {
 				<td style='width:20%;text-align:center;'>" . $ranks[$user['rank']]['name'] . "</td>
 				<td style='width:17%;text-align:center;'>
 					<img src='./images/village_icons/" . strtolower($user['village']) . ".png' style='max-height:18px;max-width:18px;' />
-				<span style='font-weight:bold;color:" . ($user['village'] == $player->village ? '#00C000;' : '#C00000;') .
+				<span style='font-weight:bold;color:" . ($user['village'] == $player->village->name ? '#00C000;' : '#C00000;') .
                     "'>" . $user['village'] . "</span></td>
 					
 				<td style='width:17%;text-align:center;'>" . $user['location']->displayString() . "</td>

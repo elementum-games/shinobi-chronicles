@@ -58,7 +58,7 @@ function battle(): bool {
                 throw new Exception("You cannot fight at this location!");
             }
 
-			if($user->village == $player->village) {
+			if($user->village->name == $player->village->name) {
 				throw new Exception("You cannot attack people from your own village!");
 			}
 
@@ -126,7 +126,7 @@ function processBattleFightEnd(BattleManager $battle, User $player): string {
         $player->addMoney($pvp_yen, "PVP win");
         $result .= "You win the fight and earn ¥$pvp_yen![br]";
 
-        $player->system->query("UPDATE `villages` SET `points`=`points`+'$village_point_gain' WHERE `name`='$player->village' LIMIT 1");
+        $player->system->query("UPDATE `villages` SET `points`=`points`+'$village_point_gain' WHERE `name`='{$player->village->name}' LIMIT 1");
         $result .= "You have earned $village_point_gain point for your village.[br]";
 
         // Team points

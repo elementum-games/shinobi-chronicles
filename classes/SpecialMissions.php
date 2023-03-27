@@ -263,8 +263,8 @@ class SpecialMission {
         }
         
         // check if the user has enough progress to complete mission and is back home
-        if ($this->progress >= 100  && $this->player->location->x == self::$target_villages[$this->player->village]['x']
-                                    && $this->player->location->y == self::$target_villages[$this->player->village]['y']) {
+        if ($this->progress >= 100  && $this->player->location->x == self::$target_villages[$this->player->village->name]['x']
+                                    && $this->player->location->y == self::$target_villages[$this->player->village->name]['y']) {
             $new_event = self::EVENT_COMPLETE_SUCCESS;
             $event_text = self::$event_names[$new_event]['text'];
         }
@@ -317,7 +317,7 @@ class SpecialMission {
         }
 
         // check if the mission is complete
-        if ($this->progress >= 100 && $this->target['target'] != $this->player->village) {
+        if ($this->progress >= 100 && $this->target['target'] != $this->player->village->name) {
             $new_event = self::EVENT_HOME;
             $event_text = self::$event_names[$new_event]['text'];
         }
@@ -483,8 +483,8 @@ class SpecialMission {
     public function failMission(): bool {
         $this->end_time = time();
         $this->status = 2;
-        $this->player->location->x = self::$target_villages[$this->player->village]['x'];
-        $this->player->location->y = self::$target_villages[$this->player->village]['y'];
+        $this->player->location->x = self::$target_villages[$this->player->village->name]['x'];
+        $this->player->location->y = self::$target_villages[$this->player->village->name]['y'];
         $this->player->special_mission = 0;
         return true;
     }
@@ -506,7 +506,7 @@ class SpecialMission {
         $random_village_key = false;
         while($random_village_key == false) {
             $key = array_rand(self::$target_villages, 1);
-            if ($key != $this->player->village) {
+            if ($key != $this->player->village->name) {
                 $random_village_key = $key;
             }
         }
@@ -533,9 +533,9 @@ class SpecialMission {
         // if the user is going home just override everything lmao #dontlookatthislol
         if ($home) {
             $new_target = [
-                'target' => $this->player->village,
-                'x' => self::$target_villages[$this->player->village]['x'],
-                'y' => self::$target_villages[$this->player->village]['y']
+                'target' => $this->player->village->name,
+                'x' => self::$target_villages[$this->player->village->name]['x'],
+                'y' => self::$target_villages[$this->player->village->name]['y']
             ];
         }
 

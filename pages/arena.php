@@ -107,7 +107,7 @@ function arenaFight(): bool {
         if($battle->isComplete()) {
             $battle_result = processArenaBattleEnd($battle, $player);
             echo "<table class='table'><tr><th>Battle Results</th></tr>
-            <tr><td>" . $battle_result . "</td></tr></table>";
+            <tr><td style='text-align: center;'>" . $battle_result . "</td></tr></table>";
         }
     } catch(Exception $e) {
         $system->message($e->getMessage());
