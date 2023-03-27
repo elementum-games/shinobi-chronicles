@@ -1,12 +1,18 @@
 <?php
 
 class Village {
+    public System $system;
+    public TravelCoords $coords;
+
     public string $name;
     public string $kage_name;
 
-    public function __construct($village) {
+    public function __construct($system, $village) {
+        $this->system = $system;
+
         $this->name = $village;
         $this->kage_name = $this->getKageName();
+        $this->coords = $this->setVillageCoords();
     }
 
     public function getKageName() {
@@ -24,6 +30,10 @@ class Village {
             default:
                 return "Kage";
         }
+    }
+
+    public function setVillageCoords() {
+        return self::getLocation($this->system, $this->name);
     }
 
     public static function getLocation(System $system, string $village_name): ?TravelCoords {

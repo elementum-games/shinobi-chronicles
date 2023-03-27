@@ -887,11 +887,7 @@ function premium() {
                 $player->village_changes++;
 
                 // Village
-                $player->village = new Village($village);
-
-                // Location
-                $result = $system->query("SELECT `location` FROM `villages` WHERE `name`='{$player->village->name}' LIMIT 1");
-                $location = $system->db_fetch($result)['location'];
+                $player->village = new Village($system, $village);
 
                 // Clan
                 $result = $system->query("SELECT `clan_id`, `name` FROM `clans` 
@@ -955,10 +951,9 @@ function premium() {
                     $clan_name = $clans[$clan_id]['name'];
 
                     $system->message("You have moved to the $village village, and been placed in the $clan_name clan.");
-                    $location = TravelCoords::fromDbString($location);
-                    $player->location->x = $location->x;
-                    $player->location->y = $location->y;
-                    $player->location->map_id = $location->map_id;
+                    $player->location->x = $player->village->coords->x;
+                    $player->location->y = $player->village->coords->y;
+                    $player->location->map_id = $player->village->coords->map_id;
                 }
             }
 		} catch (Exception $e) {

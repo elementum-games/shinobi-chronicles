@@ -432,7 +432,7 @@ class User extends Fighter {
         }
 
         $this->gender = $user_data['gender'];
-        $this->village = new Village($user_data['village']);
+        $this->village = new Village($this->system, $user_data['village']);
         $this->level = $user_data['level'];
         $this->level_up = $user_data['level_up'];
         $this->health = $user_data['health'];
