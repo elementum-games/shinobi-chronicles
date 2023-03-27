@@ -3,7 +3,7 @@
 /**
  * @var System $system
  */
-require "admin/_authenticate_admin.php";
+require __DIR__ . "/_authenticate_admin.php";
 
 class TestFighter extends Fighter {
     public string $name = 'test';
@@ -163,7 +163,7 @@ function calcDamage(Fighter $player1, Fighter $player2, Jutsu $player1_jutsu, Ju
 }
 
 /** @var string[] $bloodline_combat_boosts */
-require_once __DIR__ . '/admin/entity_constraints.php';
+require_once __DIR__ . '/entity_constraints.php';
 
 $stats = [
     'ninjutsu_skill',
