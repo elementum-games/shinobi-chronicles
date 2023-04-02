@@ -151,6 +151,7 @@ class User extends Fighter {
 
     public array $equipped_jutsu;
     public $equipped_items;
+    public array $special_items;
 
     /** @var Item[] */
     public array $items;
@@ -965,6 +966,7 @@ class User extends Fighter {
         $player_item_inventory = [];
         $equipped_jutsu = [];
         $equipped_items = [];
+        $this->special_items = [];
 
         // Decode JSON of inventory into variables
         if($this->system->db_last_num_rows > 0) {
@@ -1068,6 +1070,9 @@ class User extends Fighter {
                 while($item_data = $this->system->db_fetch($result)) {
                     $item_id = $item_data['item_id'];
                     $this->items[$item_id] = Item::fromDb($item_data, $player_item_inventory[$item_id]['quantity']);
+                    if($this->items[$item_id]->use_type == Item::USE_TYPE_SPECIAL) {
+                        $this->special_items[$item_id] = $this->items[$item_id];
+                    }
                 }
             }
             else {

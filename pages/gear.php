@@ -112,7 +112,7 @@ function gear(): void {
             $item->effect = str_replace("_", " ", $item->effect);
 
             echo sprintf(
-                "%s <sup style='font-size:9px;'>(%s %s)</sup> <br />", $item->name, $item->effect_amount, $item->effect
+                "%s <sup style='font-size:9px;'>(%s %s)</sup> <br />", $item->name, $item->effect_amount, System::unSlug($item->effect)
             );
         }
     }
@@ -126,7 +126,7 @@ function gear(): void {
             }
 
             echo sprintf(
-                "%s <sup style='font-size:9px;'>(%s %s)</sup> <br />", $item->name, $item->effect_amount, $item->effect
+                "%s <sup style='font-size:9px;'>(%s %s)</sup> <br />", $item->name, $item->effect_amount, System::unSlug($item->effect)
             );
 
         }
@@ -141,7 +141,7 @@ function gear(): void {
             }
 
             echo sprintf(
-                "%s <sup style='font-size:9px;'>(%s %s)</sup> <br />", $item->name, $item->effect_amount, $item->effect
+                "%s <sup style='font-size:9px;'>(%s %s)</sup> <br />", $item->name, $item->effect_amount, System::unSlug($item->effect)
             );
         }
     }
@@ -149,21 +149,23 @@ function gear(): void {
 
     echo "</td></tr>";
 
-    if($player->items) {
+    if($player->special_items) {
         $header_displayed = false;
         foreach($player->items as $item) {
             if($item->use_type == 4) {
                 if(!$header_displayed) {
                     echo "<tr><th colspan='3'>Special</th></tr>";
+                    echo "<td colspan='3'>";
                     $header_displayed = true;
                 }
-                echo "<td colspan='3'>";
                 echo sprintf(
                     "%s <sup style='font-size:9px;'>(%s %s)</sup> <br />", $item->name, $item->effect_amount,
-                    $item->effect
+                    System::unSlug($item->effect)
                 );
-                echo "</td>";
             }
+        }
+        if($header_displayed) {
+            echo "</td>";
         }
     }
 

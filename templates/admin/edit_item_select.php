@@ -15,6 +15,8 @@ if(isset($_GET['item_type'])) {
             break;
         case 'consumable':
             $item_type = Item::USE_TYPE_CONSUMABLE;
+        case 'special':
+            $item_type = Item::USE_TYPE_SPECIAL;
             break;
     }
 }
@@ -39,13 +41,13 @@ $selected_link_style = "text-decoration:none;";
 
 <p class='categoryLinks'>
     <a href='<?= $self_link ?>&item_type=weapon' class='<?= ($item_type == Item::USE_TYPE_WEAPON ? 'selected' : "") ?>'>
-        Weapons
-    </a> |
+        Weapons</a> |
     <a href='<?= $self_link ?>&item_type=armor' class='<?= ($item_type == Item::USE_TYPE_ARMOR ? 'selected' : "") ?>'>
-        Armor
-    </a> |
+        Armor</a> |
     <a href='<?= $self_link ?>&item_type=consumable' class='<?= ($item_type == Item::USE_TYPE_CONSUMABLE ? 'selected' : "") ?>'>
-        Consumables
+        Consumables</a> |
+    <a href='<?= $self_link ?>&item_type=special' class='<?= ($item_type == Item::USE_TYPE_SPECIAL ? 'selected' : "") ?>'>
+        Special
     </a>
 </p>
 
