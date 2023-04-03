@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 use Phinx\Migration\AbstractMigration;
 
-final class MiscFixes extends AbstractMigration
+final class PageFixes extends AbstractMigration
 {
     /**
      * Change Method.
