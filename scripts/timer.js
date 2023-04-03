@@ -1,4 +1,4 @@
-function countdownTimer(time, element_id) {
+function countdownTimer(time, element_id, append_remaining_string = true) {
 	if(element_id.length < 1) {
 		return true;
 	}
@@ -9,10 +9,13 @@ function countdownTimer(time, element_id) {
 	
 	time--;
 	if(time > 0) {
-		timeDisplay = timeRemaining(time, 'short', true, true) + " remaining";
+		timeDisplay = timeRemaining(time, 'short', true, true);
+		if(append_remaining_string) {
+			timeDisplay += " remaining";
+		}
 		$("#" + element_id).text(timeDisplay);
 	
-		setTimeout("countdownTimer(" + time + ", '" + element_id + "')", 995);
+		setTimeout("countdownTimer(" + time + ", '" + element_id + "', " + append_remaining_string + ")", 995);
 	}
 	else {
 		$("#" + element_id).text('Finished');

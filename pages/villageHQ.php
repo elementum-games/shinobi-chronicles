@@ -33,7 +33,7 @@ function villageHQ() {
 	}
 
 	if($view == 'village_info') {
-		$result = $system->query("SELECT * FROM `villages` WHERE `name`='$player->village'");
+		$result = $system->query("SELECT * FROM `villages` WHERE `name`='{$player->village->name}'");
 		$village_data = $system->db_fetch($result);
 
 		$result = $system->query("SELECT
@@ -41,7 +41,7 @@ function villageHQ() {
 			COUNT(IF(`rank`=2,1,NULL)) as `count_2`,
 			COUNT(IF(`rank`=3,1,NULL)) as `count_3`,
 			COUNT(IF(`rank`=4,1,NULL)) as `count_4`
-			FROM `users` WHERE `village`='$player->village'");
+			FROM `users` WHERE `village`='{$player->village->name}'");
 		$villager_counts = $system->db_fetch($result);
 
 
@@ -56,7 +56,7 @@ function villageHQ() {
 			}
 		}
 
-		echo "<table class='table'><tr><th>$player->village Village</th></tr>
+		echo "<table class='table'><tr><th>{$player->village->name} Village</th></tr>
 		<tr><td class='villageView'>
 
 		<!--Info-->
@@ -85,7 +85,7 @@ function villageHQ() {
 		<div style='float:right;display:inline-block;width:84px;height:74px;margin:10px;margin-top:46px;margin-right:35px;
 			border-radius:75px;padding-top:10px;
 			background: radial-gradient(#808080, #707070, #000000);text-align:center;'>
-			<img src='./images/village_icons/" . strtolower($player->village) . "_large.png' style='max-width:64px;max-height:64px;' />
+			<img src='./images/village_icons/" . strtolower($player->village->name) . "_large.png' style='max-width:64px;max-height:64px;' />
 		</div>
 		<br style='margin:0px;clear:both;' />
 		</td></tr></table>";
@@ -106,7 +106,7 @@ function villageHQ() {
 		}
 
 		$result = $system->query("SELECT `user_name`, `rank`, `level`, `exp` FROM `users`
-			WHERE `village`='$player->village' ORDER BY `rank` DESC, `exp` DESC LIMIT $min, $users_per_page");
+			WHERE `village`='{$player->village->name}' ORDER BY `rank` DESC, `exp` DESC LIMIT $min, $users_per_page");
 
 		echo "<table class='table'><tr><th colspan='4'>Village Members</th></tr>
 		<tr>
@@ -144,7 +144,7 @@ function villageHQ() {
 			}
 			echo "<a href='$self_link&view=members&min=$prev'>Previous</a>";
 		}
-		$result = $system->query("SELECT COUNT(`user_id`) as `count` FROM `users` WHERE `village`='$player->village'");
+		$result = $system->query("SELECT COUNT(`user_id`) as `count` FROM `users` WHERE `village`='{$player->village->name}'");
 		$result = $system->db_fetch($result);
 		if($min + $users_per_page < $result['count']) {
 			if($min > 0) {
@@ -159,7 +159,7 @@ function villageHQ() {
 		$user_id_array = array();
 
 		// Clans
-		$result = $system->query("SELECT * FROM `clans` WHERE `village`='$player->village' ORDER BY `points` DESC LIMIT 5");
+		$result = $system->query("SELECT * FROM `clans` WHERE `village`='{$player->village->name}' ORDER BY `points` DESC LIMIT 5");
 		$clans = array();
 		while($row = $system->db_fetch($result)) {
 			$clans[] = $row;
@@ -169,7 +169,7 @@ function villageHQ() {
 		}
 
 		// Teams
-		$result = $system->query("SELECT * FROM `teams` WHERE `village`='$player->village' ORDER BY `points` DESC LIMIT 5");
+		$result = $system->query("SELECT * FROM `teams` WHERE `village`='{$player->village->name}' ORDER BY `points` DESC LIMIT 5");
 		$teams = array();
 		while($row = $system->db_fetch($result)) {
 			$teams[] = $row;

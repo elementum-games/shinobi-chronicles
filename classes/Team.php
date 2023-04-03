@@ -169,7 +169,7 @@ class Team {
      * @param User $player
      */
     public function addMember(User $player) {
-        if($this->village != $player->village) {
+        if($this->village != $player->village->name) {
             throw new Exception("You must be in the same village to join a team!");
         }
 

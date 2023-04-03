@@ -11,6 +11,7 @@ require_once __DIR__ . "/TravelCoords.php";
 require_once __DIR__ . "/Travel.php";
 require_once __DIR__ . "/StaffManager.php";
 require_once __DIR__ . "/Rank.php";
+require_once __DIR__ . "/Village.php";
 
 /*	Class:		User
 	Purpose:	Fetch user data and load into class variables.
@@ -99,11 +100,13 @@ class User extends Fighter {
     public int $spouse;
     public string $spouse_name;
     public int $marriage_time;
-    public $village;
+    public Village $village;
     public int $level;
+    public bool $level_up;
 
     public int $rank_num;
     public Rank $rank;
+    public bool $rank_up;
 
     public int $exp;
     public $staff_level;
@@ -147,6 +150,7 @@ class User extends Fighter {
 
     public array $equipped_jutsu;
     public $equipped_items;
+    public array $special_items;
 
     /** @var Item[] */
     public array $items;
@@ -416,6 +420,7 @@ class User extends Fighter {
 
         // Rank stuff
         $this->rank_num = $user_data['rank'];
+        $this->rank_up = $user_data['rank_up'];
         $rank_data = $this->system->query("SELECT * FROM `ranks` WHERE `rank_id`='$this->rank_num'");
         if($this->system->db_last_num_rows == 0) {
             $this->system->message("Invalid rank!");
@@ -427,8 +432,9 @@ class User extends Fighter {
         }
 
         $this->gender = $user_data['gender'];
-        $this->village = $user_data['village'];
+        $this->village = new Village($this->system, $user_data['village']);
         $this->level = $user_data['level'];
+        $this->level_up = $user_data['level_up'];
         $this->health = $user_data['health'];
         $this->max_health = $user_data['max_health'];
         $this->stamina = $user_data['stamina'];
@@ -578,7 +584,7 @@ class User extends Fighter {
         $this->clan_changes = $user_data['clan_changes'];
 
         // Village
-        $this->village_location = Village::getLocation($this->system, $this->village);
+        $this->village_location = Village::getLocation($this->system, $this->village->name);
         /** @noinspection PhpConditionAlreadyCheckedInspection */
         $this->in_village = $this->village_location !== null && $this->location->equals($this->village_location);
 
@@ -959,6 +965,7 @@ class User extends Fighter {
         $player_item_inventory = [];
         $equipped_jutsu = [];
         $equipped_items = [];
+        $this->special_items = [];
 
         // Decode JSON of inventory into variables
         if($this->system->db_last_num_rows > 0) {
@@ -1062,6 +1069,9 @@ class User extends Fighter {
                 while($item_data = $this->system->db_fetch($result)) {
                     $item_id = $item_data['item_id'];
                     $this->items[$item_id] = Item::fromDb($item_data, $player_item_inventory[$item_id]['quantity']);
+                    if($this->items[$item_id]->use_type == Item::USE_TYPE_SPECIAL) {
+                        $this->special_items[$item_id] = $this->items[$item_id];
+                    }
                 }
             }
             else {
@@ -1413,9 +1423,11 @@ class User extends Fighter {
 		`gender` = '$this->gender',
 		`spouse`  = '$this->spouse',
 		`marriage_time` = '$this->marriage_time',
-		`village` = '$this->village',
+		`village` = '{$this->village->name}',
 		`level` = '$this->level',
+		`level_up` = '$this->level_up',
 		`rank` = '$this->rank_num',
+		`rank_up` = '$this->rank_up',
 		`health` = '$this->health',
 		`max_health` = '$this->max_health',
 		`stamina` = '$this->stamina',

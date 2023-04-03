@@ -84,7 +84,7 @@ function premium() {
 
 	if($player->clan) {
 
-		$system->query("SELECT `clan_id`, `name` FROM `clans` WHERE `village` = '$player->village' AND `clan_id` != '{$player->clan['id']}' AND `bloodline_only` = '0'");
+		$system->query("SELECT `clan_id`, `name` FROM `clans` WHERE `village` = '{$player->village->name}' AND `clan_id` != '{$player->clan['id']}' AND `bloodline_only` = '0'");
 
 		while($village_clans = $system->db_fetch()) {
 			$available_clans[$village_clans['clan_id']] = stripslashes($village_clans['name']);
@@ -828,7 +828,7 @@ function premium() {
 		$village = $_POST['new_village'];
         $akCost = $costs['village_change'];
 		try {
-			if($village == $player->village) {
+			if($village == $player->village->name) {
 				throw new Exception("Invalid village!");
 			}
 
@@ -855,7 +855,7 @@ function premium() {
 
 			if(!isset($_POST['confirm_village_change'])) {
                 $confirmation_type = 'confirm_village_change';
-                $confirmation_string = "Are you sure you want to move from the $player->village village to the $village
+                $confirmation_string = "Are you sure you want to move from the {$player->village->name} village to the $village
                 village? You will be kicked out of your clan and placed in a random clan in the new village.<br />
                 <b>(IMPORTANT: This is non-reversable once completed, if you want to return to your original village 
                 you will have to pay a higher transfer fee)</b>";
@@ -883,19 +883,15 @@ function premium() {
                 }
 
                 // Cost
-                $player->subtractPremiumCredits($akCost, "Changed villages from {$player->village} to $village");
+                $player->subtractPremiumCredits($akCost, "Changed villages from {$player->village->name} to $village");
                 $player->village_changes++;
 
                 // Village
-                $player->village = $village;
-
-                // Location
-                $result = $system->query("SELECT `location` FROM `villages` WHERE `name`='$player->village' LIMIT 1");
-                $location = $system->db_fetch($result)['location'];
+                $player->village = new Village($system, $village);
 
                 // Clan
                 $result = $system->query("SELECT `clan_id`, `name` FROM `clans` 
-                    WHERE `village`='$player->village' AND `bloodline_only`='0'");
+                    WHERE `village`='{$player->village->name}' AND `bloodline_only`='0'");
                 if ($system->db_last_num_rows == 0) {
                     $result = $system->query("SELECT `clan_id`, `name` FROM `clans` WHERE `bloodline_only`='0'");
                 }
@@ -955,10 +951,9 @@ function premium() {
                     $clan_name = $clans[$clan_id]['name'];
 
                     $system->message("You have moved to the $village village, and been placed in the $clan_name clan.");
-                    $location = TravelCoords::fromDbString($location);
-                    $player->location->x = $location->x;
-                    $player->location->y = $location->y;
-                    $player->location->map_id = $location->map_id;
+                    $player->location->x = $player->village->coords->x;
+                    $player->location->y = $player->village->coords->y;
+                    $player->location->map_id = $player->village->coords->map_id;
                 }
             }
 		} catch (Exception $e) {

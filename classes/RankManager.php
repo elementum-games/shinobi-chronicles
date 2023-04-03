@@ -5,6 +5,8 @@ require_once __DIR__ . "/Rank.php";
 class RankManager {
     public System $system;
 
+    const JONIN_MISSION_ID = 10;
+
     /** @var Rank[] */
     public array $ranks = [];
     private bool $ranks_loaded = false;

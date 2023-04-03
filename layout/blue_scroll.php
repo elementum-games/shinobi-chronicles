@@ -1,7 +1,7 @@
 <?php
 /** @var System $system */
 
-require 'layout/_common.php';
+require_once 'layout/_common.php';
 $heading = coreHeading('./style/blue_scroll/layout.css') .
 <<<HTML
 <body>

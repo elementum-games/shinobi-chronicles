@@ -81,7 +81,7 @@ function chat() {
                     (`user_name`, `message`, `title`, `village`, `staff_level`, `user_color`, `time`, `edited`) VALUES
                            ('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s')";
 			$system->query(sprintf(
-			    $sql, $player->user_name, $message, $title, $player->village, $staff_level, $user_color, time(), 0
+			    $sql, $player->user_name, $message, $title, $player->village->name, $staff_level, $user_color, time(), 0
             ));
 			if($system->db_last_affected_rows) {
 				$system->message("Message posted!");

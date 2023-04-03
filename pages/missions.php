@@ -102,6 +102,12 @@ function runActiveMission(): bool {
     global $self_link;
 
     if(!empty($_GET['cancel_mission'])) {
+        if($player->mission_id == RankManager::JONIN_MISSION_ID) {
+            $system->message("You must visit the <a href='{$system->links['rankup']}'>{$player->village->kage_name}'s
+            Office</a> to end this mission.");
+            $system->printMessage();
+            return true;
+        }
         $player->clearMission();
         $system->message("You have abandoned your mission. <a href='$self_link'>Continue</a>");
         $system->printMessage();
@@ -303,7 +309,11 @@ function runActiveMission(): bool {
         }
         // Display mission details
         else if($player->mission_id) {
-            echo "<table class='table'><tr><th>Current Mission (<a href='$self_link&cancel_mission=1'>Abandon Mission</a>)</th></tr>
+            echo "<table class='table'><tr><th>Current Mission";
+            if($player->mission_id != RankManager::JONIN_MISSION_ID) {
+                echo " (<a href='$self_link&cancel_mission=1'>Abandon Mission</a>)";
+            }
+            echo "</th></tr>
 			<tr><td style='text-align:center;'><span style='font-weight:bold;'>" .
                 ($mission->mission_type == 3 ? '[' . $player->team->name . '] ' : '') . "$mission->name</span><br />" .
                 $player->mission_stage['description'];

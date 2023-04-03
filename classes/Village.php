@@ -1,6 +1,41 @@
 <?php
 
 class Village {
+    public System $system;
+    public TravelCoords $coords;
+
+    public string $name;
+    public string $kage_name;
+
+    public function __construct($system, $village) {
+        $this->system = $system;
+
+        $this->name = $village;
+        $this->kage_name = $this->getKageName();
+        $this->coords = $this->setVillageCoords();
+    }
+
+    public function getKageName() {
+        switch($this->name) {
+            case 'Leaf':
+                return 'Hokage';
+            case 'Mist':
+                return 'Mizukage';
+            case 'Cloud':
+                return 'Raikage';
+            case 'Sand':
+                return 'Kazekage';
+            case 'Stone':
+                return 'Tsuchikage';
+            default:
+                return "Kage";
+        }
+    }
+
+    public function setVillageCoords() {
+        return self::getLocation($this->system, $this->name);
+    }
+
     public static function getLocation(System $system, string $village_name): ?TravelCoords {
         $result = $system->query(
             "SELECT `maps_locations`.`x`, `maps_locations`.`y`, `maps_locations`.`map_id` FROM `villages` 

@@ -122,8 +122,12 @@ function store() {
 			if(!isset($shop_jutsu[$jutsu_id])) {
 				throw new Exception("Invalid jutsu!");
 			}
-			
+
 			// check if already owned
+			if(isset($player->jutsu_scrolls[$jutsu_id])) {
+				throw new Exception("You already purchased this scroll!");
+			}
+			// check if already learned
 			if($player->hasJutsu($jutsu_id)) {
 				throw new Exception("You have already learned this jutsu!");
 			}
@@ -343,10 +347,13 @@ function store() {
 			$count = 0;
 			foreach($shop_items as $item) {
                 /** @var Item $item */
-				if($item->use_type == 3 && $category != 'consumables') {
+				if($item->use_type == Item::USE_TYPE_CONSUMABLE && $category != 'consumables') {
 					continue;
 				}
-				else if(($item->use_type == 1 || $item->use_type == 2) && $category != 'gear') {
+				else if(($item->use_type == Item::USE_TYPE_WEAPON || $item->use_type == Item::USE_TYPE_ARMOR) && $category != 'gear') {
+					continue;
+				}
+				else if($item->use_type == Item::USE_TYPE_SPECIAL && $category != 'gear') {
 					continue;
 				}
 

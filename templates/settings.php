@@ -66,9 +66,20 @@
                 </form>
             </td>
         </tr>
-        <tr><th colspan='2'>Layout</th></tr>
         <tr>
-            <td colspan='2' style="text-align: center;">
+            <th>Level and Rank Settings</th>
+            <th>Layout</th>
+        </tr>
+        <tr>
+            <td style="text-align: center;">
+                By changing these settings, you will opt out of level or ranking up.<br />
+                <form action="<?=$self_link?>" method="post">
+                    Level up<input type="checkbox" name="level_up" <?=($player->level_up ? "checked='checked'" : "")?> /><br />
+                    Rank up<input type="checkbox" name="rank_up" <?=($player->rank_up ? "checked='checked'" : "")?> /><br />
+                    <input type="submit" name="level_rank_up" value="Update" />
+                </form>
+            </td>
+            <td style="text-align: center;">
                 <form action='<?=$self_link?>' method='post'>
                     <select name='layout'>";
                         <?php foreach($layouts as $layout):?>

@@ -107,7 +107,7 @@ function arenaFight(): bool {
         if($battle->isComplete()) {
             $battle_result = processArenaBattleEnd($battle, $player);
             echo "<table class='table'><tr><th>Battle Results</th></tr>
-            <tr><td>" . $battle_result . "</td></tr></table>";
+            <tr><td style='text-align: center;'>" . $battle_result . "</td></tr></table>";
         }
     } catch(Exception $e) {
         $system->message($e->getMessage());
@@ -197,10 +197,25 @@ function processArenaBattleEnd(BattleManager|BattleManagerV2 $battle, User $play
             }
         }
 
-        $player->addMoney($money_gain, 'arena');
+        $extra_yen = 0;
+        $append_message = "";
+        if($player->special_items) {
+            foreach($player->special_items as $item) {
+                if($item->effect == 'yen_boost') {
+                    $amount = ceil($money_gain * ($item->effect_amount/100));
+                    $extra_yen += $amount;
+                    $append_message .= "<br />Your $item->name has provided you with an extra &yen;$amount.";
+                }
+            }
+        }
+
+        $player->addMoney(($money_gain + $extra_yen), 'arena');
 
         $battle_result = "You have defeated your arena opponent.<br />
 			You have claimed your prize of &yen;$money_gain.";
+        if($append_message != "") {
+            $battle_result .= $append_message;
+        }
         if($stat_gain_display) {
             $battle_result .=  $stat_gain_display;
         }

@@ -22,10 +22,9 @@ function userProfile() {
     $exp_needed = $player->expForNextLevel();
 
     // Level up
-    if($player->level < $player->rank->max_level && $player->exp >= $exp_needed) {
+    if($player->level < $player->rank->max_level && $player->exp >= $exp_needed && $player->level_up) {
         if($player->battle_id) {
-            echo "<p style='text-align:center;font-style:italic;'>
-				You must be out of battle to level up.</p>";
+            require 'templates/level_rank_up/level_up_in_battle.php';
         }
         else {
             require("levelUp.php");
@@ -34,22 +33,21 @@ function userProfile() {
         }
     }
     // Rank up
-    else if($player->level >= $player->rank->max_level && $player->exp >= $exp_needed && $player->rank_num < System::SC_MAX_RANK) {
+    else if($player->level >= $player->rank->max_level && $player->exp >= $exp_needed && $player->rank_num < System::SC_MAX_RANK && $player->rank_up) {
         if($player->battle_id > 0 or !$player->in_village) {
-            echo "<p style='text-align:center;font-style:italic;'>
-				You must be out of battle and in your village to rank up.</p>";
+            require "templates/level_rank_up/rank_up_in_battle.php";
         }
         else {
+            $rankManager = new RankManager($system);
+            $rankManager->loadRanks();
+            $exam_name = $rankManager->ranks[$player->rank_num + 1]->name . " Exam";
             if($player->exam_stage) {
-                $prompt = "Resume exam for the next rank";
+                $prompt = "Resume $exam_name";
             }
             else {
-                $prompt = "Take exam for the next rank";
+                $prompt = "Take $exam_name";
             }
-
-            echo "<p style='text-align:center;font-size:1.1em;'>
-				<a class='button' style='padding:5px 10px 4px;margin-bottom:0;text-decoration:none;' href='{$system->links['rankup']}'>{$prompt}</a>
-			</p>";
+            require "templates/level_rank_up/rank_up_prompt.php";
         }
     }
 

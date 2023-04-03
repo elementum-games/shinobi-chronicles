@@ -368,6 +368,7 @@ $item_effects = [
     'heal',
     'diffuse',
     'element',
+    'yen_boost',
     'unknown',
 ];
 $constraints['item'] = [

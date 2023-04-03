@@ -55,7 +55,7 @@ function team() {
             $created = Team::create(
                 $system,
                 $name,
-                $player->village,
+                $player->village->name,
                 $player->user_id
             );
 
@@ -256,8 +256,8 @@ function team() {
                     if($user_data['rank'] < Team::MIN_RANK) {
                         throw new Exception("Team members must be a " . $RANK_NAMES[Team::MIN_RANK] . " or higher!");
                     }
-                    if($user_data['village'] != $player->village) {
-                        echo "$player->village | {$user_data['rank']}";
+                    if($user_data['village'] != $player->village->name) {
+                        echo "$player->village->name | {$user_data['rank']}";
                         throw new Exception("You can only invite members from your village! ");
                     }
                     if(!empty($user_data['team_id'])) {

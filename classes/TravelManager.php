@@ -203,7 +203,7 @@ class TravelManager {
         }
         // check if the player is in a faction that allows this portal
         $portal_whitelist = array_map('trim', explode(',', $portal_data['whitelist']));
-        if (!in_array($this->user->village, $portal_whitelist) && !$ignore_travel_restrictions) {
+        if (!in_array($this->user->village->name, $portal_whitelist) && !$ignore_travel_restrictions) {
             throw new Exception('You are unable to enter here!');
         }
         // update the player data
@@ -246,7 +246,7 @@ class TravelManager {
 
             // if ally or enemy
             // if there were alliance we can do additional checks here
-            if ($user['village'] === $this->user->village) {
+            if ($user['village'] === $this->user->village->name) {
                 $user['alignment'] = 'Ally';
             } else {
                 $user['alignment'] = 'Enemy';
@@ -257,7 +257,7 @@ class TravelManager {
             if ((int)$user['rank'] === $this->user->rank_num
                 && $this->user->location->equals(TravelCoords::fromDbString($user['location']))
                 && $user['user_id'] != $this->user->user_id
-                && $user['village'] !== $this->user->village) {
+                && $user['village'] !== $this->user->village->name) {
                 $user['attack'] = true;
             }
 

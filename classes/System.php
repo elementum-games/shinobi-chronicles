@@ -800,6 +800,7 @@ class System {
 
     public function renderStaticPageHeader(string $page_title, $layout = System::DEFAULT_LAYOUT): void {
         $system = $this;
+        $side_menu_location_status_class = null;
 
         require($this->fetchLayoutByName($layout));
 
@@ -818,6 +819,7 @@ class System {
 
     public function renderStaticPageFooter($layout = System::DEFAULT_LAYOUT): void {
         $system = $this;
+        $side_menu_location_status_class = null;
 
         require($this->fetchLayoutByName($layout));
 
@@ -829,8 +831,58 @@ class System {
          * @var $footer
          */
         if(isset($_SESSION['user_id'])) {
+            global $player;
+            $pages = require 'config/routes.php';
             echo $side_menu_start;
-            echo $side_menu_end;
+            $menu = System::MENU_USER;
+            foreach($pages as $id => $page) {
+                if(isset($page['menu']) && in_array($page['menu'], [System::MENU_USER, System::MENU_VILLAGE, System::MENU_ACTIVITY])) {
+                    if($page['menu'] != $menu) {
+                        $menu = $page['menu'];
+                        echo "<h2><p>" . ucwords($menu) . " Menu</p></h2>";
+                    }
+                    echo "<li><a href='{$system->link}?id=$id'>{$page['title']}</a></li>";
+                }
+            }
+            //Staff Menu
+            if($player->isSupportStaff()) {
+                if($menu != 'Staff') {
+                    $menu = 'Staff';
+                    echo "<h2><p>$menu Menu</p></h2>";
+                }
+                echo "<li><a href='{$system->links['support']}'>Support Panel</a></li>";
+            }
+            if($player->staff_manager->isModerator()) {
+                if($menu != 'Staff') {
+                    $menu = 'Staff';
+                    echo "<h2><p>$menu Menu</p></h2>";
+                }
+                echo "<li><a href='{$system->links['mod']}'>Mod Panel</a></li>";
+            }
+            if($player->staff_manager->hasAdminPanel()) {
+                if($menu != 'Staff') {
+                    $menu = 'Staff';
+                    echo "<h2><p>$menu Menu</p></h2>";
+                }
+                echo "<li><a href='{$system->links['admin']}'>Admin Panel</a></li>";
+            }
+            //  timer
+            $logout_limit = System::LOGOUT_LIMIT;
+            if($player->hasAdminPanel()) {
+                $logout_limit = 1440;
+            }
+            else if($player->forbidden_seal && $player->forbidden_seal->level > 0) {
+                $logout_limit = $player->forbidden_seal->logout_timer;
+            }
+            $time_remaining = ($logout_limit * 60) - (time() - $player->last_login);
+            $logout_time = System::timeRemaining($time_remaining, 'short', false, true) . " remaining";
+
+            $logout_display = $player->isUserAdmin() ? "Disabled" : $logout_time;
+            echo str_replace("<!--LOGOUT_TIMER-->", $logout_display, $side_menu_end);
+
+            if($logout_display != "Disabled") {
+                echo "<script type='text/javascript'>countdownTimer($time_remaining, 'logoutTimer');</script>";
+            }
         }
         else {
             echo $login_menu;

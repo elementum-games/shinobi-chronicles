@@ -20,6 +20,7 @@ function adminPanel() {
     global $system;
     global $player;
     global $id;
+    global $self_link;
 
     // Staff level check
     if(!$player->hasAdminPanel()) {
@@ -1732,6 +1733,9 @@ function adminPanel() {
                 }
 
                 $user->exp = $total_stats * 10;
+                if($user->user_id == $player->user_id) {
+                    $player->exp = $total_stats * 10;
+                }
 
                 $user->updateData();
 
