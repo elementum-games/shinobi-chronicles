@@ -20,7 +20,6 @@ class User extends Fighter {
     const ENTITY_TYPE = 'U';
 
     const AVATAR_MAX_SIZE = 150;
-    const AVATAR_MAX_FILE_SIZE = 1024 ** 2; // 1024 kb
 
     const GENDER_MALE = 'Male';
     const GENDER_FEMALE = 'Female';
@@ -1699,8 +1698,8 @@ class User extends Fighter {
         return $return;
     }
 
-    public function getAvatarFileSize($format='MB'): string {
-        $max_size = self::AVATAR_MAX_FILE_SIZE;
+    public function getAvatarFileSizeDisplay($format='MB'): string {
+        $max_size = $this->forbidden_seal->avatar_filesize;
         switch($format) {
             default:
                 $divisor = 1024 * 1024;

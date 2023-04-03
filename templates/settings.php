@@ -35,7 +35,7 @@
                         Avatar must be hosted on another website<br />
                         Default limit: <?=$player->getAvatarSize()?> x <?=$player->getAvatarSize()?> pixels<br />
                         Avatar can be larger than the limit, but it will be resized<br />
-                        Max filesize: <?=$player->getAvatarFileSize()?><br />
+                        Max filesize: <?=$player->getAvatarFileSizeDisplay()?><br />
                         <br />
                         <form action='<?=$self_link?>' method='post'>
                             <input type='text' name='avatar_link' value='<?=$player->avatar_link?>' style='width:250px;margin-bottom:5px;' />

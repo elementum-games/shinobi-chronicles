@@ -1,6 +1,8 @@
 <?php
 
 class ForbiddenSeal {
+    const ONE_MEGABYTE = 1024 ** 2;
+
     public System $system;
     public int $level;
     public int $seal_end_time;
@@ -11,6 +13,7 @@ class ForbiddenSeal {
     public array $name_colors;
     public int $regen_boost;
     public int $avatar_size;
+    public int $avatar_filesize;
     public int $logout_timer;
     public int $inbox_size;
     public int $journal_size;
@@ -49,6 +52,7 @@ class ForbiddenSeal {
             'name_color_display' => '',
             'avatar_size' => 125,
             'avatar_size_display' => '125x125',
+            'avatar_filesize' => self::ONE_MEGABYTE,
             'logout_timer' => System::LOGOUT_LIMIT,
             'inbox_size' => 50,
             'journal_size' => 1000,
@@ -76,7 +80,8 @@ class ForbiddenSeal {
             'name_color_display' => 'Blue/Pink', //Premium page display only.
             'avatar_size' => 200,
             'avatar_size_display' => '200x200', //Premium page display only.
-            'logout_timer' => 180,
+            'avatar_filesize' => self::ONE_MEGABYTE,
+            'logout_timer' => System::LOGOUT_LIMIT,
             'inbox_size' => 75,
             'journal_size' => 2000,
             'journal_image_x' => 500,
@@ -103,7 +108,8 @@ class ForbiddenSeal {
             'name_color_display' => 'Blue/Pink', //Premium page desc display only
             'avatar_size' => 200,
             'avatar_size_display' => '200x200', //Premium page display only.
-            'logout_timer' => 240,
+            'avatar_filesize' => self::ONE_MEGABYTE * 2,
+            'logout_timer' => System::LOGOUT_LIMIT,
             'inbox_size' => 75,
             'journal_size' => 2500,
             'journal_image_x' => 500,
@@ -171,6 +177,7 @@ class ForbiddenSeal {
         $this->regen_boost = self::$benefits[$this->level]['regen_boost'];
         $this->name_colors = self::$benefits[$this->level]['name_colors'];
         $this->avatar_size = self::$benefits[$this->level]['avatar_size'];
+        $this->avatar_filesize = self::$benefits[$this->level]['avatar_filesize'];
         $this->logout_timer = self::$benefits[$this->level]['logout_timer'];
         $this->inbox_size = self::$benefits[$this->level]['inbox_size'];
         $this->journal_size = self::$benefits[$this->level]['journal_size'];

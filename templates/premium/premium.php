@@ -446,8 +446,6 @@
                 +<?=$twinSeal->regen_boost?>% regen rate<br/>
                 <?=$twinSeal->name_color_display?> username color in chat<br/>
                 Larger avatar (<?=$baseDisplay['avatar_size_display']?> -> <?=$twinSeal->avatar_size_display?>)<br/>
-                Longer logout timer (<?=$baseDisplay['logout_timer']?> -> <?=$twinSeal->logout_timer?>
-                minutes)<br/>
                 Larger inbox (<?=$baseDisplay['inbox_size']?> -> <?=$twinSeal->inbox_size?> messages)<br/>
                 Longer journal (<?=$baseDisplay['journal_size']?> -> <?=$twinSeal->journal_size?> characters)<br/>
                 Larger journal images (<?=$baseDisplay['journal_image_display']?> -> <?=$twinSeal->journal_image_display?>)<br/>
@@ -475,8 +473,7 @@
                 +<?=$fourDragonSeal->extra_jutsu_equips?> jutsu equip slots<br/>
                 +<?=$fourDragonSeal->extra_weapon_equips?> weapon equip slots<br/>
                 +<?=$fourDragonSeal->extra_armor_equips?> armor equip slots<br/>
-                Longer logout timer (<?=$baseDisplay['logout_timer']?> -> <?=$fourDragonSeal->logout_timer?>
-                minutes)<br />
+                Larger avatar filesize (<?= ($fourDragonSeal->avatar_filesize / 1024) ?> KB)<br />
                 Longer journal (<?=$baseDisplay['journal_size']?> -> <?=$fourDragonSeal->journal_size?> characters)<br/>
                 Enhanced long trainings (<?=$fourDragonSeal->long_training_time?>x length, <?=$fourDragonSeal->long_training_gains?>x gains)<br/>
                 Enhanced extended trainings (<?=$fourDragonSeal->extended_training_time?>x length, <?=$fourDragonSeal->extended_training_gains?>x gains)<br/>

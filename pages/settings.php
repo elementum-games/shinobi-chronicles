@@ -48,24 +48,16 @@ function userSettings() {
 			if(!getimagesize($avatar_link)) {
 				throw new Exception("Image does not exist!");
 			}
-			
-			$suffix_array = explode(".", $avatar_link);
-			$suffix = $suffix_array[count($suffix_array) - 1];
-			unset($suffix_array);
-			$content = file_get_contents($avatar_link); 
-			$temp_filename = "./images/avatars/{$player->user_name}.$suffix";
-			$handle = fopen($temp_filename, "w+"); 
-			fwrite($handle, $content); 
-			fclose($handle);
-            if(filesize($temp_filename) > User::AVATAR_MAX_FILE_SIZE) {
-				$filesize = round(filesize($temp_filename) / 1024);
-				throw new Exception("Image is too large! Size {$filesize}kb, maximum is " . $player->getAvatarFileSize());
+
+            $avatar_filesize = getAvatarFileSize($avatar_link);
+
+            if($avatar_filesize > $player->forbidden_seal->avatar_filesize) {
+				$filesize_display = round($avatar_filesize / 1024);
+				throw new Exception("Image is too large! Size {$filesize_display}KB, maximum is " . $player->getAvatarFileSizeDisplay('kb'));
 			}
 
 			$player->avatar_link = $avatar_link;
 			$system->message("Avatar updated!");
-			
-			unlink($temp_filename); 		
 		} catch (Exception $e) {
 			$system->message($e->getMessage());
 		}
@@ -280,4 +272,23 @@ function userSettings() {
     }
 
     require_once('templates/settings.php');
+}
+
+function getAvatarFileSize(string $avatar_link): bool|int {
+    $suffix_array = explode(".", $avatar_link);
+    $suffix = $suffix_array[count($suffix_array) - 1];
+    unset($suffix_array);
+
+    $content = file_get_contents($avatar_link);
+    $temp_filename = "./images/avatars/" . uniqid(more_entropy: true) . $suffix;
+
+    $handle = fopen($temp_filename, "w+");
+    fwrite($handle, $content);
+    fclose($handle);
+
+    $size = filesize($temp_filename);
+
+    unlink($temp_filename);
+
+    return $size;
 }

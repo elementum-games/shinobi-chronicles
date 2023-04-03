@@ -16,7 +16,7 @@ class System {
     const LOCAL_HOST = true;
 
     const KUNAI_PER_DOLLAR = 2;
-    const LOGOUT_LIMIT = 120;
+    const LOGOUT_LIMIT = 720;
     const BLOODLINE_ROLL_CHANCE = 50;
 
     const MENU_USER = 'user';

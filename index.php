@@ -120,13 +120,6 @@ if(!isset($_SESSION['user_id'])) {
 else {
 	$LOGGED_IN = true;
 	$player = User::loadFromId($system, $_SESSION['user_id']);
-	//This is in minutes.
-	if($player->hasAdminPanel()) {
-		$logout_limit = 1440;
-	}
-	else if($player->forbidden_seal && $player->forbidden_seal->level > 0) {
-        $logout_limit = $player->forbidden_seal->logout_timer;
-	}
 
     // Check logout timer
 	if($player->last_login < time() - ($logout_limit * 60)) {
