@@ -1246,7 +1246,7 @@ function adminPanel() {
         }
 
         // Validate user name
-        if($_GET['user_name']) {
+        if(isset($_GET['user_name'])) {
             $user_name = $system->clean($_GET['user_name']);
             $result = $system->query("SELECT * FROM `users` WHERE `user_name`='$user_name'");
             if($system->db_last_num_rows == 0) {
@@ -1259,7 +1259,7 @@ function adminPanel() {
             }
         }
         // POST submit edited data
-        if($_POST['user_data'] && !$select_user) {
+        if(isset($_POST['user_data']) && !$select_user) {
             try {
                 // Additional data checking for Elements
                 $new_elements = array();
