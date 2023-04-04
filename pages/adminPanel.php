@@ -1297,7 +1297,8 @@ function adminPanel() {
                 else {
                     //Remove elements in case rank has been reduced
                     if($player->isHeadAdmin()) {
-                        $_POST['elements'] = null;
+                        unset($_POST['elements']);
+                        unset($variables['elements']);
                     }
                 }
                 // Load form data
