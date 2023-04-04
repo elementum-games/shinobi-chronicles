@@ -1211,6 +1211,11 @@ function adminPanel() {
         $variables =& $constraints['edit_user'];
 
         if($player->isHeadAdmin()) {
+            $variables ['elements'] = [
+                'data_type' => 'string',
+                'input_type' => 'checkbox',
+                'options' => User::$ELEMENTS,
+            ];
             $variables['staff_level'] = [
                 'data_type' => 'int',
                 'input_type' => 'radio',
@@ -1256,6 +1261,46 @@ function adminPanel() {
         // POST submit edited data
         if($_POST['user_data'] && !$select_user) {
             try {
+                // Additional data checking for Elements
+                $new_elements = array();
+                $current_elements = json_decode($user_data['elements'], true);
+                if($user_data['rank'] >= 3) {
+                    $required_elements = ($_POST['rank'] == 4) ? 2 : 1;
+                    if(count($_POST['elements']) > $required_elements) {
+                        throw new Exception("Only $required_elements element(s) allowed!");
+                    }
+                    if(count($_POST['elements']) < $required_elements) {
+                        throw new Exception("There must be at least $required_elements element(s)!");
+                    }
+                    if(!is_array($_POST['elements'])) {
+                        throw new Exception("Elements form data must be of type array!");
+                    }
+                    foreach($_POST['elements'] as $num => $element) {
+                        $key = ($num == 0) ? 'first' : 'second';
+                        if(!in_array($element, User::$ELEMENTS)) {
+                            throw new Exception("Invalid element ($element).");
+                        }
+                        $new_elements[$key] = $element;
+                    }
+
+                    // Prevent overwriting primary element based on admin panel structure
+                    if($new_elements['second'] == $current_elements['first'] || $new_elements['first'] == $current_elements['second']) {
+                        $new_elements = [
+                            'first' => $new_elements['second'],
+                            'second' => $new_elements['first']
+                        ];
+                    }
+
+                    //Assign new data as json string
+                    $_POST['elements'] = json_encode($new_elements);
+                }
+                else {
+                    //Remove elements in case rank has been reduced
+                    if($player->isHeadAdmin()) {
+                        unset($_POST['elements']);
+                        unset($variables['elements']);
+                    }
+                }
                 // Load form data
                 $data = [];
                 validateFormData($variables, $data);
@@ -1266,6 +1311,10 @@ function adminPanel() {
                 $count = 1;
                 $query = "UPDATE `users` SET ";
                 foreach($data as $name => $var) {
+                    //Allow quotes for elements to store in db
+                    if($name == 'elements') {
+                        $var = htmlspecialchars_decode($var, ENT_QUOTES);
+                    }
                     $query .= "`$name` = '$var'";
                     if($count < count($data)) {
                         $query .= ', ';
@@ -1273,7 +1322,7 @@ function adminPanel() {
                     $count++;
                 }
                 $query .= "WHERE `user_id`='{$user_data['user_id']}'";
-                // echo $query;
+                //echo $query;
                 $system->query($query);
 
                 if($system->db_last_affected_rows == 1) {

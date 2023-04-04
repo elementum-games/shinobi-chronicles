@@ -28,11 +28,15 @@ class User extends Fighter {
     const GENDER_NONE = 'None';
 
     public static array $genders = [
-            User::GENDER_MALE,
-            User::GENDER_FEMALE,
-            User::GENDER_NON_BINARY,
-            User::GENDER_NONE
-        ];
+        User::GENDER_MALE,
+        User::GENDER_FEMALE,
+        User::GENDER_NON_BINARY,
+        User::GENDER_NONE
+    ];
+
+    public static array $ELEMENTS = [
+        'Fire', 'Wind', 'Lightning', 'Earth', 'Water'
+    ];
 
     const MIN_NAME_LENGTH = 2;
     const MAX_NAME_LENGTH = 18;
