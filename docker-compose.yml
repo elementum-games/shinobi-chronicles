@@ -4,10 +4,8 @@ services:
   shinobi-chronicles-db:
     image: mysql
     command: --default-authentication-plugin=mysql_native_password --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
-    environment:
-      - MYSQL_ROOT_PASSWORD=P@ssw0rd
-      - MYSQL_ROOT_HOST=%
-      - MYSQL_DATABASE=test
+    env_file:
+      - infra/database.env
     ports:
       - "3306:3306"
     healthcheck:
@@ -15,6 +13,7 @@ services:
       interval: 1m30s
       timeout: 60s
       retries: 6
+    hostname: shinobi-chronicles-db
 
   # Flyway is best for mysql schema migration history.
   database-migration:
@@ -25,3 +24,14 @@ services:
       - "./flyway.conf:/flyway/conf/flyway.conf"
     depends_on:
       - shinobi-chronicles-db
+      
+  # PHP server
+  server:
+    build:
+      dockerfile: infra/server/Dockerfile
+      context: "."
+    image: server
+    ports:
+    - 80:80
+    volumes:
+    - ./:/var/www/html

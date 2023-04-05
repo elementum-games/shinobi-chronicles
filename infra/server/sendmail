@@ -1,0 +1,9 @@
+#!/bin/bash
+
+SENDMAIL_LOG_FILE=/var/log/sendmail
+
+echo "- Arguments:" >>$SENDMAIL_LOG_FILE
+echo $*
+
+echo "- Body:" >>$SENDMAIL_LOG_FILE
+cat
