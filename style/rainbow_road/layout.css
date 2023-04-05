@@ -165,7 +165,7 @@ h2#title {
 	position:relative;
 	right: 27px;
 }
-#sidemenu h2 p {
+#sideMenu h2 p {
 	font-size:20px;
 	font-weight:normal;
 	padding-left:55px;
@@ -176,11 +176,11 @@ h2#title {
 	text-shadow: 0 -1px 0 #ffdef3, 0 1px 0 #E01040;
 	font-style: italic;
 }
-#sidemenu div.headerMargin {
+#sideMenu div.headerMargin {
 	margin-top:0;
 	margin-bottom: 50px;
 }
-#sidemenu a {
+#sideMenu a {
 	padding-left:22px;
 	text-decoration: none;
 	color: #363636;
@@ -190,7 +190,7 @@ h2#title {
 	text-shadow: 0 1px 1px #ffdef3;
 
 }
-#sidemenu a:hover {
+#sideMenu a:hover {
 	color: #fff7de;
 	/* text-shadow: 1px 1px 3px #EAEAEA; */
 

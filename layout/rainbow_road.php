@@ -10,7 +10,6 @@ $heading = coreHeading('./style/rainbow_road/layout.css') .
 		<div id='topMenu'>
 HTML;
 			
-			
 $header = <<<HTML
 		</div>
 	</div>
