@@ -143,6 +143,9 @@ https://book.cakephp.org/phinx/0/en/migrations.html
 See `/db/SampleSQLMigration.php` for a simple example of creating a migration that uses raw SQL queries.
 
 ### Docker compose
+Before starting docker, it's recommended to install dependencies with `composer install` (step 9 at the beginning of this readme).
+Otherwise, they'll be re-installed every time you destroy the docker image or upgrade a dependency version.
+
 If you want to use docker before starting php set up your database with 
 ```
 docker compose up -d

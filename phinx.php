@@ -6,7 +6,7 @@ require 'secure/vars.php';
  * @var string $database
  * @var string $username
  * @var string $password
- * @var string $ENVIRONMENT "prod"|"dev"
+ * @var string $ENVIRONMENT "prod"|"dev" | "docker"
  */
 
 return
@@ -30,6 +30,15 @@ return
         'dev' => [
             'adapter' => 'mysql',
             'host' => $host,
+            'name' => $database,
+            'user' => $username,
+            'pass' => $password,
+            'port' => '3306',
+            'charset' => 'utf8',
+        ],
+        'docker' => [
+            'adapter' => 'mysql',
+            'host' => 'localhost',
             'name' => $database,
             'user' => $username,
             'pass' => $password,
