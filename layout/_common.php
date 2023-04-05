@@ -4,13 +4,13 @@ function coreHeading(string $stylesheet_path): string {
     global $system;
 
     $react_dev_tags = <<<HTML
-<script src="https://unpkg.com/react@17/umd/react.development.js" crossorigin></script>
-<script src="https://unpkg.com/react-dom@17/umd/react-dom.development.js" crossorigin></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/17.0.2/umd/react.development.js" crossorigin></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/17.0.2/umd/react-dom.development.js" crossorigin></script>
 HTML;
 
     $react_prod_tags = <<<HTML
-<script src="https://unpkg.com/react@17/umd/react.production.min.js" crossorigin></script>
-<script src="https://unpkg.com/react-dom@17/umd/react-dom.production.min.js" crossorigin></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/17.0.2/umd/react.production.min.js" crossorigin></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/17.0.2/umd/react-dom.production.min.js" crossorigin></script>
 HTML;
 
     if($system->environment == System::ENVIRONMENT_DEV) {
