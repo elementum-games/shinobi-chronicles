@@ -96,6 +96,7 @@ $system->renderStaticPageHeader('Manual', $layout);
           <ul>
             <li><a href="https://shinobichronicles.com/?id=6&user=Gojo">Gojo</a></li>
             <li><a href="https://shinobichronicles.com/?id=6&user=Stain">Stain</a></li>
+            <li><a href="https://shinobichronicles.com/?id=6&user=Tetsuishi">Tetsuishi</a></li>
           </ul>
         </div>
       </div>
@@ -140,20 +141,13 @@ $system->renderStaticPageHeader('Manual', $layout);
             </tr>
             <tr class="table-multicolumns">
               <td class="row1" style="text-align: center;font-weight: bold">Cast Speed</td>
-              <td class="row1" style="padding: 7px 10px;">Allows you to cast jutsu faster than other Ninjutsu users and avoid damage from Taijutsu users</td>
+              <td class="row1" style="padding: 7px 10px;">Primarily used by Ninjutsu and Genjutsu skills to determine damage done or damage reduced when it is higher than your Opponents Speed/Cast Speed</td>
             </tr>
             <tr class="table-multicolumns">
               <td class="row1" style="text-align: center;font-weight: bold">Speed</td>
-              <td class="row1" style="padding: 7px 10px;">Allows you to move faster than Ninjutsu and Taijutsu users to avoid damage</td>
+              <td class="row1" style="padding: 7px 10px;">Primarily used by Taijutsu skills to determine damage done or damage reduced when it is higher than your Opponents Speed/Cast Speed</td>
             </tr>
-            <tr class="table-multicolumns">
-              <td class="row1" style="text-align: center;font-weight: bold">Intelligence</td>
-              <td class="row1" style="padding: 7px 10px;">Allows Genjutsu users to keep people locked in their Genjutsu, and also allows other offense users to break out of them</td>
-            </tr>
-            <tr class="table-multicolumns">
-              <td class="row1" style="text-align: center;font-weight: bold">Willpower</td>
-              <td class="row1" style="padding: 7px 10px;">Allows you to resist a percentage of effects from all offenses (Nerfs/Drains/Residuals ect)</td>
-            </tr>
+            
           </tbody>
         </table>
 
@@ -201,17 +195,15 @@ $system->renderStaticPageHeader('Manual', $layout);
         </p>
         <p><em>The current training rates are as followed</em></p>
         <div>
-          <p>Academy Student - 4</p>
-          <p>Genin - 6</p>
-          <p>Chuunin - 8</p>
+          <p>Academy Student - 8</p>
+          <p>Genin - 12</p>
+          <p>Chuunin - 16</p>
+            <p>Jonin - 20</p>
         </div>
         <p>Note that a portion of stats gained from long and extended trainings are cut</p>
 
         <p>You can also make use of the Arena to fight AI to gain stat points while earning yen</p>
-        <p><em>The current drop rate for stats are as followed</em></p>
-        <p>A base of a 25% drop per fight</p>
-        <p>Increased by 15% if you are under or same level as AI</p>
-        <p>Increased by 10% if the fight lasts longer than 4 turns</p>
+        <p><em>The current drop rate of stat points is 100%, Stat dropped is determined by the current stat training ongoin or the last the stat training done.</em></p>
       </div>
 
 
@@ -317,17 +309,21 @@ $system->renderStaticPageHeader('Manual', $layout);
       <br>
       <!--Unedited-->
 
-      Twin Sparrow Seal Four Dragon Seal
-      5 Ancient Kunai / 30 days 15 Ancient Kunai / 30 days
-      +10% regen rate All benefits of Twin Sparrow
-      Blue/Pink username color in chat +20% regen rate
-      Larger avatar (125x125 -> 175x175) +1 jutsu equip slot
-      Longer logout timer (60 -> 90 minutes) +1 weapon equip slot
-      Larger inbox (50 -> 75 messages) +1 armor equip slot
-      Longer journal (1000 -> 2000 characters) Enhanced long trainings (1.5x length, 2x gains)
-      Larger journal images (300x200 -> 500x500) Enhanced extended trainings (1.5x length, 2.25x gains)
-      Longer chat posts (350 -> 450 characters)
-      Longer PMs (1000 -> 1500 characters)
+      <h3>
+        Four Dragon Seal
+      </h3>
+      <h4>
+        15 Ancient Kunai / 30 days
+      </h4>
+      <div>All benefits of Twin Sparrow Seal</div>
+      <div>+20% regen rate</div>
+      <div>+1 jutsu equip slot</div>
+      <div>+1 weapon equip slot</div>
+      <div>+1 armor equip slot</div>
+      <div>Enhanced long trainings (1.5x length, 2x gains)</div>
+      <div>Enhanced extended trainings (1.5x length, 2.25x gains)</div>
+      <div>Faster stat transfers (+5/minute)</div>
+      <div>Cheaper stat transfers +100 stat points per AK</div>
 
       <!--GOJO END MANUAL-->
 
