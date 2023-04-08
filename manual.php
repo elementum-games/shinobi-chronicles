@@ -315,15 +315,17 @@ $system->renderStaticPageHeader('Manual', $layout);
       <h4>
         15 Ancient Kunai / 30 days
       </h4>
-      <div>All benefits of Twin Sparrow Seal</div>
-      <div>+20% regen rate</div>
-      <div>+1 jutsu equip slot</div>
-      <div>+1 weapon equip slot</div>
-      <div>+1 armor equip slot</div>
-      <div>Enhanced long trainings (1.5x length, 2x gains)</div>
-      <div>Enhanced extended trainings (1.5x length, 2.25x gains)</div>
-      <div>Faster stat transfers (+5/minute)</div>
-      <div>Cheaper stat transfers +100 stat points per AK</div>
+      <ul>
+        <li>All benefits of Twin Sparrow Seal</li>
+        <li>+20% regen rate</li>
+        <li>+1 jutsu equip slot</li>
+        <li>+1 weapon equip slot</li>
+        <li>+1 armor equip slot</li>
+        <li>Enhanced long trainings (1.5x length, 2x gains)</li>
+        <li>Enhanced extended trainings (1.5x length, 2.25x gains)</li>
+        <li>Faster stat transfers (+5/minute)</li>
+        <li>Cheaper stat transfers +100 stat points per AK</li>
+      </ul>
 
       <!--GOJO END MANUAL-->
 
