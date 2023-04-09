@@ -86,7 +86,7 @@ class Mission {
     }
 
     public function nextStage($stage_id): int {
-        $villages = $this->system->getVillageLocations();
+        $villages = TravelManager::fetchVillageLocationsByCoordsStr($this->system);
 
         // Check for multi-count, stop stage ID
         $new_stage = true;
@@ -159,7 +159,7 @@ class Mission {
     }
 
     public function nextTeamStage($stage_id): int {
-        $villages = $this->system->getVillageLocations();
+        $villages = TravelManager::fetchVillageLocationsByCoordsStr($this->system);
 
         // Return signal for mission complete
         if($stage_id > count($this->stages) + 1) {

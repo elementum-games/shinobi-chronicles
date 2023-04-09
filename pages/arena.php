@@ -41,7 +41,6 @@ function arena(): bool {
 		}
 		$fight_start = false;
 		if(!empty($_GET['fight'])) {
-
             // check if the current location disallows ai fights
             if ($player->rank_num > 2 && $player->current_location->location_id && $player->current_location->ai_allowed == 0) {
                 $system->message('You cannot fight at this location');
@@ -50,7 +49,6 @@ function arena(): bool {
 				$system->message("Please wait " . ($player->last_ai_ms - (System::currentTimeMs() - $fight_timer) / 1000) . " more seconds!");
 			}
 			else if(isset($ai_opponents[$_GET['fight']])) {
-
                 try {
                     $ai_id = $_GET['fight'];
                     $ai = new NPC($system, $ai_id);

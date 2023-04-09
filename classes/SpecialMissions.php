@@ -210,7 +210,7 @@ class SpecialMission {
         $this->player_max_health = $this->player->max_health;
 
         // Village info
-        $villages = $this->system->getVillageLocations();
+        $villages = TravelManager::fetchVillageLocationsByCoordsStr($this->system);
         foreach ($villages as $village) {
             $location = TravelCoords::fromDbString($village['location']);
             self::$target_villages[$village['name']]['x'] = $location->x;
@@ -270,7 +270,7 @@ class SpecialMission {
         }
 
         // check what direction the user has to travel
-        $villages = $this->system->getVillageLocations();
+        $villages = TravelManager::fetchVillageLocationsByCoordsStr($this->system);
         $move_to_x = $this->player->location->x;
         $move_to_y = $this->player->location->y;
         if ($this->player->location->x != $this->target['x']) {

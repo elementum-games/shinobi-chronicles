@@ -14,12 +14,24 @@ class TravelManager {
     private User $user;
     private array $map_data;
 
+    /**
+     * @var TravelCoords[]
+     */
+    private array $village_locations;
+
     public function __construct(System $system, User $user) {
         $this->system = $system;
         $this->user = $user;
 
         $result = $this->system->query("SELECT * FROM `maps` WHERE `map_id`={$this->user->location->map_id}");
         $this->map_data = $this->system->db_fetch($result);
+    }
+
+    public static function locationIsInVillage(System $system, TravelCoords $location): bool {
+        $result = $system->query("SELECT COUNT(*) as `count` FROM `villages` WHERE `location`='{$location->fetchString()}' LIMIT 1");
+        $count = (int)$system->db_fetch($result)['count'];
+
+        return $count >= 1;
     }
 
     public function fetchMapDataAPI(): array {
@@ -160,8 +172,7 @@ class TravelManager {
         }
 
         // check if the user is trying to move to a village that is not theirs
-        $villages = $this->system->getVillageLocations();
-        if (isset($villages[$new_coords->fetchString()])
+        if (TravelManager::locationIsInVillage($this->system, $new_coords)
             && !$new_coords->equals($this->user->village_location)
             && !$ignore_travel_restrictions) {
             throw new Exception('You cannot enter another village!');
@@ -290,6 +301,20 @@ class TravelManager {
 
 
         return $return_arr;
+    }
+
+    /**
+     * @return TravelCoords[] travel coords per village, keyed by village name
+     */
+    public static function fetchVillageLocationsByCoordsStr(System $system): array {
+        $village_locations = [];
+
+        $result = $system->query("SELECT `name`, `location` FROM `villages`");
+        while($row = $system->db_fetch($result)) {
+            $village_locations[$row['location']] = $row['name'];
+        }
+
+        return $village_locations;
     }
 
 }

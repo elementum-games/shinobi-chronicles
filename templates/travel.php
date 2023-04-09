@@ -21,7 +21,8 @@
                 missionLink: "<?= $system->links['mission'] ?>",
                 membersLink: "<?= $system->links['members'] ?>",
                 attackLink: "<?= $system->links['battle'] ?>",
-                self_id: <?= $player->user_id ?>
+                self_id: <?= $player->user_id ?>,
+                playerRank: <?= $player->rank_num ?>
             }),
             travelContainer
         );

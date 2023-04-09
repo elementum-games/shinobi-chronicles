@@ -830,8 +830,7 @@ class User extends Fighter {
         }
 
         // Correction location
-        $villages = $this->system->getVillageLocations();
-        if(isset($villages[$this->location->fetchString()]) &&
+        if(TravelManager::locationIsInVillage($this->system, $this->location) &&
             !$this->location->equals($this->village_location) &&
             !$this->isHeadAdmin()
         ) {

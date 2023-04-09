@@ -500,34 +500,20 @@
 }
 
 /* temp fix for travel sync with side menu */
-.sm-tmp-invillage #sideMenuOption-Arena,
-.sm-tmp-invillage #sideMenuOption-Training
-{
+#container .sm-tmp-invillage .not-allowed-in-village {
     opacity: 0.3;
     cursor: not-allowed;
 }
-
-#container .sm-tmp-invillage #sideMenuOption-Arena:hover,
-#container .sm-tmp-invillage #sideMenuOption-Training:hover
-{
+#container .sm-tmp-invillage .not-allowed-in-village:hover {
     color: var(--theme-text-color-light);
     background-image: none;
 }
 
-.sm-tmp-outvillage #sideMenuOption-RamenShop,
-.sm-tmp-outvillage #sideMenuOption-Shop,
-.sm-tmp-outvillage #sideMenuOption-VillageHQ,
-.sm-tmp-outvillage #sideMenuOption-Clan
-{
+#container .sm-tmp-outvillage .only-allowed-in-village {
     opacity: 0.3;
     cursor: not-allowed;
 }
-
-#container .sm-tmp-outvillage #sideMenuOption-RamenShop:hover,
-#container .sm-tmp-outvillage #sideMenuOption-Shop:hover,
-#container .sm-tmp-outvillage #sideMenuOption-VillageHQ:hover,
-#container .sm-tmp-outvillage #sideMenuOption-Clan:hover
-{
+#container .sm-tmp-outvillage  .only-allowed-in-village:hover {
     color: var(--theme-text-color-light);
     background-image: none;
 }

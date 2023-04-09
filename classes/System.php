@@ -910,19 +910,6 @@ class System {
         }
     }
 
-    public function getVillageLocations(): array {
-        if(count($this->villageLocations) < 1) {
-            $result = $this->query("SELECT `name`, `location` FROM `villages`");
-            $count = 0;
-            while($row = $this->db_fetch($result)) {
-                $this->villageLocations[$row['location']] = $row;
-                $this->villageLocations[$row['location']]['count'] = $count++;
-            }
-        }
-
-        return $this->villageLocations;
-    }
-
     /**
      * @param string $entity_id
      * @return EntityId

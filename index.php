@@ -263,9 +263,6 @@ if($LOGGED_IN) {
 		$global_message = false;
 	}
 
-	// Load village list
-	$villages = $system->getVillageLocations();
-
 	// Load rank data// Rank names
 	$RANK_NAMES = RankManager::fetchNames($system);
 
@@ -361,11 +358,13 @@ if($LOGGED_IN) {
 
 			// Check for being in village is not okay/okay/required
 			if(isset($routes[$id]['village_ok'])) {
-				// Player is alllowed in up to rank 3, then must go outside village
-
-				if($player->rank_num > 2 && $routes[$id]['village_ok'] == System::NOT_IN_VILLAGE && isset($villages[$player->location->fetchString()])) {
+				// Player is allowed in up to rank 3, then must go outside village
+				if($player->rank_num > 2 && $routes[$id]['village_ok'] == System::NOT_IN_VILLAGE
+                    && TravelManager::locationIsInVillage($system, $player->location)
+                ) {
 					throw new Exception("You cannot access this page while in a village!");
 				}
+
 				if($routes[$id]['village_ok'] == System::ONLY_IN_VILLAGE && !$player->location->equals($player->village_location)) {
                     $contents_arr = [];
                     foreach($_GET as $key => $val) {
@@ -478,42 +477,51 @@ if($LOGGED_IN) {
 
 			$menu_alert_icon =  ($page['title'] === 'Inbox' && ($new_inbox_message || $new_inbox_alerts)) ? 'sidemenu_new_message_alert' : null;
 
-            echo "<li><a id='sideMenuOption-".str_replace(' ', '', $page['title'])."' href='{$system->link}?id=$id' class='{$menu_alert_icon}'>" . $page['title'] . "</a></li>";
+            echo "<li><a id='sideMenuOption-" . str_replace(' ', '', $page['title'])."' 
+                href='{$system->link}?id=$id' 
+                class='{$menu_alert_icon}'>"
+                . $page['title']
+                . "</a></li>";
         }
 
-		echo $action_menu_header;
-		if($player->in_village) {
-			foreach($routes as $id => $page) {
-				if(!isset($page['menu']) || $page['menu'] != 'activity') {
-					continue;
-				}
-				// Page ok if an in-village page or player rank is below chuunin
-                echo "<li><a id='sideMenuOption-".str_replace(' ', '', $page['title'])."' href='{$system->link}?id=$id'>" . $page['title'] . "</a></li>";
-			}
-		}
-		else {
-			foreach($routes as $id => $page) {
-				if(!isset($page['menu']) || $page['menu'] != 'activity') {
-					continue;
-				}
-//				if($page['village_ok'] != System::ONLY_IN_VILLAGE) {
-                if(true) {
-					echo "<li><a id='sideMenuOption-".str_replace(' ', '', $page['title'])."' href='{$system->link}?id=$id'>" . $page['title'] . "</a></li>";
-				}
-			}
-		}
 
-        // In village or not
-//        if($player->in_village) {
-        if (true) {
-            echo $village_menu_start;
-            foreach($routes as $id => $page) {
-                if(!isset($page['menu']) || $page['menu'] != System::MENU_VILLAGE) {
-                    continue;
-                }
-
-                echo "<li><a id='sideMenuOption-".str_replace(' ', '', $page['title'])."' href='{$system->link}?id=$id'>" . $page['title'] . "</a></li>";
+        // Activity Menu
+        echo $action_menu_header;
+        foreach($routes as $id => $page) {
+            if(!isset($page['menu']) || $page['menu'] != System::MENU_ACTIVITY) {
+                continue;
             }
+
+            $class = '';
+            if($page['village_ok'] === System::ONLY_IN_VILLAGE) {
+                $class = 'only-allowed-in-village';
+            }
+            if($page['village_ok'] == System::NOT_IN_VILLAGE && $player->rank_num > 2) {
+                $class = 'not-allowed-in-village';
+            }
+
+            echo "<li>
+                <a 
+                    id='sideMenuOption-" . str_replace(' ', '', $page['title']) . "' 
+                    href='{$system->link}?id=$id'
+                    class='{$class}'
+                >" . $page['title'] . "</a>
+            </li>";
+        }
+
+        // Village menu
+        echo $village_menu_start;
+        foreach($routes as $id => $page) {
+            if(!isset($page['menu']) || $page['menu'] != System::MENU_VILLAGE) {
+                continue;
+            }
+
+            echo "<li>
+                <a 
+                    id='sideMenuOption-" . str_replace(' ', '', $page['title']) . "' 
+                    href='{$system->link}?id=$id'
+                >" . $page['title'] . "</a>
+            </li>";
         }
 
         if($player->isModerator() || $player->hasAdminPanel() || $player->isSupportStaff()) {

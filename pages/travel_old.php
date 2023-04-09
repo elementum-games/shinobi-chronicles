@@ -15,7 +15,7 @@ function travel() {
 
 	global $self_link;
 
-    $villages = $system->getVillageLocations();
+    $villages = TravelManager::fetchVillageLocationsByCoordsStr($system);
 
 	if(!empty($_GET['travel'])) {
         $target_x = intval($player->location->x);
