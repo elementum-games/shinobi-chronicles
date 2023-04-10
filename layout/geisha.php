@@ -105,3 +105,19 @@ $footer = <<<HTML
 </body>
 </html>
 HTML;
+
+
+return new Layout(
+    key: 'geisha',
+    heading: $heading,
+    header: $header,
+    body_start: $body_start,
+    top_menu: $top_menu,
+    side_menu_start: $side_menu_start,
+    village_menu_start: $village_menu_start,
+    action_menu_header: $action_menu_header,
+    staff_menu_header: $staff_menu_header,
+    side_menu_end: $side_menu_end,
+    login_menu: $login_menu,
+    footer: $footer,
+);
