@@ -128,13 +128,13 @@ class Router {
         // Check for being in village is not okay/okay/required
         if(isset($route->village_ok)) {
             // Player is allowed in up to rank 3, then must go outside village
-            if($player->rank_num > 2 && $route->village_ok == Route::NOT_IN_VILLAGE
+            if($player->rank_num > 2 && $route->village_ok === Route::NOT_IN_VILLAGE
                 && TravelManager::locationIsInVillage($system, $player->location)
             ) {
                 throw new Exception("You cannot access this page while in a village!");
             }
 
-            if($route->village_ok == Route::ONLY_IN_VILLAGE && !$player->location->equals($player->village_location)) {
+            if($route->village_ok === Route::ONLY_IN_VILLAGE && !$player->location->equals($player->village_location)) {
                 $contents_arr = [];
                 foreach($_GET as $key => $val) {
                     $contents_arr[] = "GET[{$key}]=$val";
