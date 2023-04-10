@@ -7,12 +7,6 @@ class Notifications {
     public static function displayNotifications(System $system, User $player, bool $ajax = false) {
         $notifications = Notifications::getNotifications($system, $player);
 
-        // New PM
-        $playerInbox = new InboxManager($system, $player);
-        if($playerInbox->checkIfUnreadMessages() || $playerInbox->checkIfUnreadAlerts()) {
-            $notifications[] = new Notification("{$system->router->base_url}?id=2", "You have unread PM(s)");
-        }
-
         if(!$ajax) {
             echo "<div id='notifications'>";
         }
@@ -76,6 +70,15 @@ class Notifications {
         /** @var Notification[] $notifications */
         $notifications = [];
 
+        //Staff check
+        if($player->staff_manager->isModerator()) {
+            require_once 'classes/ReportManager.php';
+            $reportManager = new ReportManager($system, $player, true);
+        }
+        //Used for PM checks
+        $playerInbox = new InboxManager($system, $player);
+
+        //Battle
         if($player->battle_id > 0) {
             $result = $system->query(
                 "SELECT `battle_type` FROM `battles` WHERE `battle_id`='$player->battle_id' LIMIT 1"
@@ -111,36 +114,30 @@ class Notifications {
                 }
             }
         }
-
-/*        $result = $system->query(
-            "SELECT `message_id` FROM `private_messages` 
-		WHERE `recipient`='{$player->user_id}' AND `message_read`=0 LIMIT 1"
-        );
-        if($system->db_last_num_rows) {
-            $notifications[] = new Notification("{$system->router->base_url}?id=2", "You have unread PM(s)");
-        }*/
-
-        if($player->isModerator()) {
-            $result = $system->query(
-                "SELECT `report_id` FROM `reports` WHERE `status` = 0 AND `staff_level` < $player->staff_level LIMIT 1"
-            );
-            if($system->db_last_num_rows > 0) {
-                $notifications[] = new Notification("{$system->router->links['report']}&page=view_all_reports", "New report(s)!");
-            }
+        //New PM
+        if($playerInbox->checkIfUnreadMessages() || $playerInbox->checkIfUnreadAlerts()) {
+            $notifications[] = new Notification($system->router->links['inbox'], "You have unread PM(s)");
         }
-
+        //Official Warning
+        if($player->getOfficialWarnings(true)) {
+            $notifications[] = new Notification($system->router->links['settings'] . "&view=account", 'Official Warning(s)!');
+        }
+        //New Report
+        if($player->staff_manager->isModerator() && $reportManager->getActiveReports(true)) {
+            $notifications[] = new Notification($system->router->links['report'] . "&page=view_all_reports", 'New Report(s)!');
+        }
+        //New spar
         if($player->challenge) {
             $notifications[] = new Notification($system->router->links['spar'], "Challenged!");
         }
-
+        //Team invite
         if($player->team_invite) {
             $notifications[] = new Notification("{$system->router->base_url}?id=24", "Invited to team!");
         }
-
+        //Proposal
         if($player->spouse < 0) {
             $notifications[] = new Notification($system->router->links['marriage'], "Proposal received!");
         }
-        // "<a class='link' href='{$system->router->links['marriage']}'>Proposal received!</a>";
 
         return $notifications;
     }
