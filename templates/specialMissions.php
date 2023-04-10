@@ -116,5 +116,5 @@
     <script type="text/javascript">
         const missionEventDurationMs = <?= SpecialMission::EVENT_DURATION_MS ?>;
     </script>
-    <script type="text/javascript" src="<?= $system->link ?>/scripts/specialmissions.js"></script>
+    <script type="text/javascript" src="<?= $system->router->base_url ?>/scripts/specialmissions.js"></script>
 <?php endif; ?>

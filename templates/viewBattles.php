@@ -12,8 +12,8 @@
     </tr>
     <?php foreach($battles as $battle): ?>
         <tr id='viewBattles_data'>
-            <td><a href="<?= $system->links['members']?>&user=<?= $battle['player1'] ?>" style='text-decoration:none'><?= $battle['player1'] ?></a></td>
-            <td><a href="<?= $system->links['members']?>&user=<?= $battle['player2'] ?>" style='text-decoration:none'><?= $battle['player2'] ?></a></td>
+            <td><a href="<?= $system->router->links['members']?>&user=<?= $battle['player1'] ?>" style='text-decoration:none'><?= $battle['player1'] ?></a></td>
+            <td><a href="<?= $system->router->links['members']?>&user=<?= $battle['player2'] ?>" style='text-decoration:none'><?= $battle['player2'] ?></a></td>
             <td>
             <?php if($battle['winner']): ?>
                     <?= $battle['winner'] ?>

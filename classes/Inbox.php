@@ -3,7 +3,6 @@
 require_once __DIR__ . '/InboxUser.php';
 
 class Inbox {
-
 	const INBOX_SIZE = 50;
     // Seal inbox size is managed in the Forbidden Seal Class
 	const INBOX_SIZE_STAFF = 100;
@@ -15,7 +14,12 @@ class Inbox {
 
     const MAX_TITLE_LENGTH = 26;
     const MAX_MESSAGE_FETCH = 25;
-    
+
+    const ALERT_YEN_RECEIVED = 1;
+    const ALERT_AK_RECEIVED = 2;
+    const ALERT_AK_OFFER_COMPLETED = 3;
+    const ALERT_SUPPORT_REQUEST_UPDATED = 4;
+
     const DEFAULT_AVATAR = './images/default_avatar.png';
 
     const SYSTEM_MESSAGE_NAMES = [
@@ -412,7 +416,7 @@ class Inbox {
             // self_message
             $message['self_message'] = false;
             // profile_link
-            $message['profile_link'] = $system->links['members'];
+            $message['profile_link'] = $system->router->links['members'];
             // avatar_link
             $message['avatar_link'] = self::DEFAULT_AVATAR;
             // chat color
@@ -422,7 +426,7 @@ class Inbox {
             // time
             $message['time'] = $message_data['time'];
             // report link
-            $message['report_link'] = $system->links['report'];
+            $message['report_link'] = $system->router->links['report'];
             // message
             $message['message'] = $message_data['message'];
             $all_messages[] = $message;

@@ -202,7 +202,7 @@
                             <?=($warning['viewed'] ? 'Yes' : 'No')?>
                         </td>
                         <td>
-                            <a href="<?=$system->links['settings']?>&view=account&warning_id=<?=$warning['warning_id']?>">View</a>
+                            <a href="<?=$system->router->links['settings']?>&view=account&warning_id=<?=$warning['warning_id']?>">View</a>
                         </td>
                     </tr>
                 <?php endforeach ?>

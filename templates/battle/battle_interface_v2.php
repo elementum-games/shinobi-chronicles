@@ -14,8 +14,8 @@
     const battleContainer = document.querySelector("#battleReactContainer");
 
     const battle = <?= json_encode($battleManager->getApiResponse()) ?>;
-    const membersLink = "<?= $system->links['members'] ?>";
-    const battleApiLink = "<?= $system->api_links['battle'] ?>";
+    const membersLink = "<?= $system->router->links['members'] ?>";
+    const battleApiLink = "<?= $system->router->api_links['battle'] ?>";
 
     window.addEventListener('load', () => {
         ReactDOM.render(

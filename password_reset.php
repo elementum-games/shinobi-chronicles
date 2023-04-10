@@ -4,7 +4,7 @@ session_start();
 require_once("classes/_autoload.php");
 $system = new System();
 if(isset($_SESSION['user_id'])) {
-    header("Location: {$system->link}");
+    header("Location: {$system->router->base_url}");
     exit;
 }
 
@@ -27,7 +27,7 @@ if($_POST) {
 	$result = $system->query($query);
 	if($system->db_last_num_rows == 0) {
 		$system->message("Invalid username or email address! Please submit a 
-		    <a href='{$system->link}support.php'>support request</a>");
+		    <a href='{$system->router->base_url}support.php'>support request</a>");
 		$system->printMessage();
 	}
 	else {
@@ -43,15 +43,15 @@ if($_POST) {
 		$headers = "From: Shinobi Chronicles<" . System::SC_ADMIN_EMAIL . ">" . "\r\n";
 $message = "A password reset was requested for your account $user_name. Your temporary password is:
 $new_password
-You can login at {$system->link} with 
+You can login at {$system->router->base_url} with 
 your temporary password. We strongly suggest you change it to something easier to remember;
 It can be changed in the settings page, found on your profile.
 
-If this is your account but you did not request a password reset, please submit a support request: <a href='{$system->link}support.php'>here</a>.
+If this is your account but you did not request a password reset, please submit a support request: <a href='{$system->router->base_url}support.php'>here</a>.
 
-This message was sent because someone signed up at {$system->link} with this email 
+This message was sent because someone signed up at {$system->router->base_url} with this email 
 address and requested a password reset. If this is not your account, please disregard this email or submit a 
- <a href='{$system->link}support.php'>support.php</a> to have your address removed from our records.";
+ <a href='{$system->router->base_url}support.php'>support.php</a> to have your address removed from our records.";
 		mail($email, $subject, $message, $headers);
 		$system->message("Password sent!");
 		$system->printMessage();

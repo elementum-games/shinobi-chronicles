@@ -34,20 +34,20 @@ HTML;
 
 $top_menu = <<<HTML
 <ul class='topMenu'>
-	<li><a href='{$system->link}'>News</a></li>
-	<li><a href='{$system->links['discord']}' target='_blank'>Discord</a></li>
-	<li><a href='{$system->link}manual.php'>Manual</a></li>
-	<li><a href='{$system->links['github']}'>GitHub</a></li>
-	<li><a href='{$system->link}rules.php'>Rules</a></li>
-	<li><a href='{$system->link}terms.php'>Terms of Service</a></li>
-	<li><a href='{$system->link}support.php'>Support</a></li>
+	<li><a href='{$system->router->base_url}'>News</a></li>
+	<li><a href='{$system->router->links['discord']}' target='_blank'>Discord</a></li>
+	<li><a href='{$system->router->base_url}manual.php'>Manual</a></li>
+	<li><a href='{$system->router->links['github']}'>GitHub</a></li>
+	<li><a href='{$system->router->base_url}rules.php'>Rules</a></li>
+	<li><a href='{$system->router->base_url}terms.php'>Terms of Service</a></li>
+	<li><a href='{$system->router->base_url}support.php'>Support</a></li>
 </ul>
 HTML;
 
 $side_menu_start = <<<HTML
 	</div>
 </div>
-<div id='sidebar' class='sm-tmp-class {$side_menu_location_status_class}'>
+<div id='sidebar' class='sm-tmp-class [side-menu-location-status-class]'>
 	<div class='header'>
 	Menu
 	</div>
@@ -86,7 +86,7 @@ $login_menu = <<<HTML
 		Login
 		</div>
 		<div id='login'>
-			<form action='{$system->link}' method='post'>
+			<form action='{$system->router->base_url}' method='post'>
 			<span>Username</span><br />
 			<input type='text' name='user_name' /><br />
 			<span>Password</span><br />
@@ -94,7 +94,7 @@ $login_menu = <<<HTML
 			<input type='submit' name='login' value='Login' />
 			</form>
 			<p>
-				<a class='link' href='{$system->link}register.php'>Create an account</a>
+				<a class='link' href='{$system->router->base_url}register.php'>Create an account</a>
 			</p>
 		</div>
 	</div>
@@ -109,4 +109,17 @@ $footer = <<<HTML
 </html>
 HTML;
 
-
+return new Layout(
+    key: 'classic_blue',
+    heading: $heading,
+    header: $header,
+    body_start: $body_start,
+    top_menu: $top_menu,
+    side_menu_start: $side_menu_start,
+    village_menu_start: $village_menu_start,
+    action_menu_header: $action_menu_header,
+    staff_menu_header: $staff_menu_header,
+    side_menu_end: $side_menu_end,
+    login_menu: $login_menu,
+    footer: $footer,
+);

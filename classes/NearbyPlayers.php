@@ -73,7 +73,7 @@ class NearbyPlayers {
         if(is_array($users)) {
             foreach($users as $user) {
                 echo "<tr class='table_multicolumns'>
-				<td style='width:28%;'><a href='{$system->links['members']}&user={$user['user_name']}'>" . $user['user_name'] . "</a></td>
+				<td style='width:28%;'><a href='{$system->router->links['members']}&user={$user['user_name']}'>" . $user['user_name'] . "</a></td>
 				<td style='width:20%;text-align:center;'>" . $ranks[$user['rank']]['name'] . "</td>
 				<td style='width:17%;text-align:center;'>
 					<img src='./images/village_icons/" . strtolower($user['village']) . ".png' style='max-height:18px;max-width:18px;' />
@@ -91,7 +91,7 @@ class NearbyPlayers {
 
                     // Attack
                     if($show_spar_link) {
-                        $links[] = "<a href='{$system->links['spar']}}&challenge={$user['user_id']}'>Spar</a>";
+                        $links[] = "<a href='{$system->router->links['spar']}}&challenge={$user['user_id']}'>Spar</a>";
                     }
 
                     echo implode(" | ", $links);

@@ -286,7 +286,7 @@ function clan() {
 				$class = 'row2';
 			}
 			echo "<tr>
-				<td style='width:29%;' class='$class'><a href='{$system->links['members']}&user={$row['user_name']}'>" . $row['user_name'] . "</a></td>
+				<td style='width:29%;' class='$class'><a href='{$system->router->links['members']}&user={$row['user_name']}'>" . $row['user_name'] . "</a></td>
 				<td style='width:20%;text-align:center;' class='$class'>" . $RANK_NAMES[$row['rank']] . "</td>
 				<td style='width:20%;text-align:center;' class='$class'>" . $row['level'] . "</td>
 				<td style='width:30%;text-align:center;' class='$class'>" . $row['exp'] . "</td>
@@ -442,7 +442,7 @@ function clan() {
 			if(isset($officers[$position])) {
 				echo "<img src='" . $officers[$position]['avatar_link'] . "' /><br />
 				<span style='font-weight:bold;'>
-					<a href='{$system->links['members']}&user={$officers[$position]['user_name']}'>" . $officers[$position]['user_name'] . "</a></span><br />";
+					<a href='{$system->router->links['members']}&user={$officers[$position]['user_name']}'>" . $officers[$position]['user_name'] . "</a></span><br />";
 				if($player->rank_num >= 4 && $player->clan_office != $position) {
 					// echo "<a href='$self_link&page=challenge&challenge=$position'>(Challenge)</a>";
 				}

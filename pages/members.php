@@ -275,8 +275,8 @@ function members() {
 					   </tr>";
 					   foreach($teams as $row) {
 						   echo "<tr class='table_multicolumns'>
-							   <td><a href='{$system->links['members']}&view_team={$row['team_id']}' class='userLink'>" . $row['name'] . "</td>
-							   <td style='text-align: center;'><a href='{$system->links['members']}&user={$user_names[$row['leader']]}' class='userLink'>" . $user_names[$row['leader']] . "</td>
+							   <td><a href='{$system->router->links['members']}&view_team={$row['team_id']}' class='userLink'>" . $row['name'] . "</td>
+							   <td style='text-align: center;'><a href='{$system->router->links['members']}&user={$user_names[$row['leader']]}' class='userLink'>" . $user_names[$row['leader']] . "</td>
 							   <td style='text-align: center;'><img src='./images/village_icons/" . strtolower($row['village']) . ".png' style='max-height:18px;max-width:18px;' /> " . $row['village'] . "</td>
 							   <td style='text-align:center;'>" . $row['monthly_points']  . "</td>
 						   </tr>";
@@ -432,23 +432,23 @@ function renderMemberSubmenu() {
 
     $submenu_links = [
         [
-            'link' => $system->links['members'] . "&view=highest_exp",
+            'link' => $system->router->links['members'] . "&view=highest_exp",
             'title' => 'Highest Exp',
         ],
         [
-            'link' => $system->links['members'] . "&view=online_users",
+            'link' => $system->router->links['members'] . "&view=online_users",
             'title' => 'Online Users',
         ],
         $submenu_links[] = [
-            'link' => $system->links['members'] . "&view=highest_pvp",
+            'link' => $system->router->links['members'] . "&view=highest_pvp",
             'title' => 'Highest PvP',
         ],
         $submenu_links[] = [
-            'link' => $system->links['members'] . "&view=highest_teams",
+            'link' => $system->router->links['members'] . "&view=highest_teams",
             'title' => 'Top Teams',
         ],
 		$submenu_links[] = [
-            'link' => $system->links['members'] . "&view=staff",
+            'link' => $system->router->links['members'] . "&view=staff",
             'title' => 'Game Staff',
         ],
 	];

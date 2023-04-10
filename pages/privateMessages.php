@@ -284,7 +284,7 @@ class Messaging {
 						<tr>
 							<td>
 								<label>Sender:</label>
-									<a href='{$system->links['members']}&user={$this->sender}' class='userLink $this->staff'>{$this->sender}</a><br />
+									<a href='{$system->router->links['members']}&user={$this->sender}' class='userLink $this->staff'>{$this->sender}</a><br />
 								<label>Subject:</label>
 									{$this->subject['display']}<br />
 								<label>Sent:</label>{$this->time}<br />
@@ -295,7 +295,7 @@ class Messaging {
 						</tr>
 						<tr>
 							<td style='text-align:center;'>
-								<a href='{$this->system->links['report']}&report_type=2&content_id=$this->message_id'>Report Message</a>
+								<a href='{$this->system->router->links['report']}&report_type=2&content_id=$this->message_id'>Report Message</a>
 							</td>
 						</tr>
 					</table>
@@ -356,7 +356,7 @@ class Messaging {
 							echo "
 								<tr class='table_multicolumns'>
 									<td style='text-align:center;width:20%;' class='$class'>
-										<a href='{$system->links['members']}&user={$persons_name}' class='userLink $staff'>" . $persons_name . "</a>
+										<a href='{$system->router->links['members']}&user={$persons_name}' class='userLink $staff'>" . $persons_name . "</a>
 									</td>
 									<td style='text-align:center;width:30%;' class='$class'>" . stripslashes($message['subject']) . "</td>
 									<td style='text-align:center;width:20%;' class='$class'>

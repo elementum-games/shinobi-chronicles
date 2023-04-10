@@ -18,7 +18,7 @@
         <?php foreach($banned_users as $user): ?>
             <tr>
                 <td style="text-align: center;">
-                    <a href='<?=$system->links['members']?>&user=<?=$user['user_name']?>'><?=$user['user_name']?></a>
+                    <a href='<?=$system->router->links['members']?>&user=<?=$user['user_name']?>'><?=$user['user_name']?></a>
                 </td>
                 <td>
                     <?=$user['ban_string']?>

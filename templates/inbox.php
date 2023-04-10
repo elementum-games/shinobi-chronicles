@@ -21,11 +21,11 @@ if($player->checkBan(StaffManager::BAN_TYPE_PM)) {
 
 <div id="inboxReactContainer"></div>
 
-<script type="module" src="<?= $system->link?><?= $system->getReactFile("inbox/inbox") ?>"></script>
+<script type="module" src="<?= $system->router->base_url?><?= $system->getReactFile("inbox/inbox") ?>"></script>
 <script>
     const inboxContainer = document.querySelector("#inboxReactContainer");
 
-    const inboxAPILink = "<?= $system->api_links['inbox'] ?>";
+    const inboxAPILink = "<?= $system->router->api_links['inbox'] ?>";
     const convo_count = <?= $convo_count ?>;
     const convo_count_max = <?= $convo_count_max ?>;
     const url_object = new URL(window.location.href);

@@ -27,7 +27,7 @@ function adminPanel() {
         return false;
     }
 
-    $admin_panel_url = $system->getUrl('admin');
+    $admin_panel_url = $system->router->getUrl('admin');
 
     $content_create_pages = [
         'create_ai',

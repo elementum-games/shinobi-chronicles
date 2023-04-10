@@ -36,7 +36,7 @@ if(isset($_GET['logout']) && $_GET['logout'] == 1) {
 		);
 	}
 	session_destroy();
-	header("Location: {$system->link}");
+	header("Location: {$system->router->base_url}");
 	exit;
 }
 $LOGGED_IN = false;
@@ -78,7 +78,7 @@ if(!isset($_SESSION['user_id'])) {
 			$result = $system->db_fetch($result);
 			if(!$result['user_verified']) {
 				throw new Exception("Your account has not been verified. Please check your email for the activation code.
-				<a class='link' href='{$system->link}register.php?act=resend_verification&username=$user_name'>Resend Verification</a>");
+				<a class='link' href='{$system->router->base_url}register.php?act=resend_verification&username=$user_name'>Resend Verification</a>");
 			}
 
 			// Check failed logins
@@ -122,13 +122,13 @@ else {
 	$player = User::loadFromId($system, $_SESSION['user_id']);
 
     // Check logout timer
-	if($player->last_login < time() - ($logout_limit * 60)) {
+	if($player->last_login < time() - (System::LOGOUT_LIMIT * 60)) {
 		if($system->is_legacy_ajax_request) {
 			echo "<script type='text/javascript'>
 			clearInterval(refreshID);
 			clearInterval(notificationRefreshID);
 			</script>
-			<p style='text-align:center;'>Logout timer finished. <a href='{$system->link}'>Continue</a></p>";
+			<p style='text-align:center;'>Logout timer finished. <a href='{$system->router->base_url}'>Continue</a></p>";
 			exit;
 		}
 		else {
@@ -141,7 +141,7 @@ else {
 				);
 			}
 			session_destroy();
-			header("Location: {$system->link}");
+			header("Location: {$system->router->base_url}");
 			exit;
 		}
 	}
@@ -157,41 +157,38 @@ else {
 // Start display
 if(!$LOGGED_IN) {
 	$layout = $system->fetchLayoutByName(System::DEFAULT_LAYOUT);
-    $side_menu_location_status_class  = null;
 }
 else {
 	$layout = $system->fetchLayoutByName($player->layout);
-    $side_menu_location_status_class = $player->in_village ? 'sm-tmp-invillage' : 'sm-tmp-outvillage';
 }
-require($layout);
 
 if(!$system->is_legacy_ajax_request) {
-	echo $heading;
-	echo $top_menu;
-	echo $header;
+	echo $layout->heading;
+	echo $layout->top_menu;
+	echo $layout->header;
 }
-// Array to allow access to dev folders of coders
-$allowed_coders = array(
-	'lsmjudoka'
-);
 
 // Load page or news
 if($LOGGED_IN) {
 	// Master close
 	if(!$system->SC_OPEN && !$player->isUserAdmin()) {
 		if(!$system->is_legacy_ajax_request) {
-			echo str_replace("[HEADER_TITLE]", "Profile", $body_start);
+			echo str_replace("[HEADER_TITLE]", "Profile", $layout->body_start);
 		}
+
 		echo "<table class='table'><tr><th>Game Maintenance</th></tr>
 		<tr><td style='text-align:center;'>
 		Shinobi-Chronicles is currently closed for maintenace. Please check back in a few minutes!
 		</td></tr></table>";
-		if(!$system->is_legacy_ajax_request) {
-			echo $side_menu_start . $side_menu_end;
-			echo str_replace('<!--[VERSION_NUMBER]-->', System::VERSION_NUMBER, $footer);
+
+        if(!$system->is_legacy_ajax_request) {
+			echo $layout->side_menu_start . $layout->side_menu_end;
+			echo str_replace('<!--[VERSION_NUMBER]-->', System::VERSION_NUMBER, $layout->footer);
 		}
 		exit;
-	}	
+	}
+
+    // Check for ban
 	if($player->checkBan(StaffManager::BAN_TYPE_GAME)) {
         $ban_type = StaffManager::BAN_TYPE_GAME;
         $expire_int = $player->ban_data[$ban_type];
@@ -199,18 +196,19 @@ if($LOGGED_IN) {
 
         //Display header
         if(!$system->is_legacy_ajax_request) {
-            echo str_replace("[HEADER_TITLE]", "Profile", $body_start);
+            echo str_replace("[HEADER_TITLE]", "Profile", $layout->body_start);
         }
         //Ban info
         require 'templates/ban_info.php';
         // Footer
         if(!$system->is_legacy_ajax_request) {
-            echo $side_menu_start . $side_menu_end;
-            echo str_replace('<!--[VERSION_NUMBER]-->', System::VERSION_NUMBER, $footer);
+            echo $layout->side_menu_start . $layout->side_menu_end;
+            echo str_replace('<!--[VERSION_NUMBER]-->', System::VERSION_NUMBER, $layout->footer);
         }
         exit;
     }
-	$result = $system->query("SELECT `id` FROM `banned_ips` WHERE `ip_address`='" . $system->clean($_SERVER['REMOTE_ADDR']) . "' LIMIT 1");
+
+    $result = $system->query("SELECT `id` FROM `banned_ips` WHERE `ip_address`='" . $system->clean($_SERVER['REMOTE_ADDR']) . "' LIMIT 1");
 	if($system->db_last_num_rows > 0) {
         $ban_type = StaffManager::BAN_TYPE_IP;
         $expire_int = -1;
@@ -218,22 +216,17 @@ if($LOGGED_IN) {
 
         //Display header
         if(!$system->is_legacy_ajax_request) {
-            echo str_replace("[HEADER_TITLE]", "Profile", $body_start);
+            echo str_replace("[HEADER_TITLE]", "Profile", $layout->body_start);
         }
         //Ban info
         require 'templates/ban_info.php';
         // Footer
         if(!$system->is_legacy_ajax_request) {
-            echo $side_menu_start . $side_menu_end;
-            echo str_replace('<!--[VERSION_NUMBER]-->', System::VERSION_NUMBER, $footer);
+            echo $layout->side_menu_start . $layout->side_menu_end;
+            echo str_replace('<!--[VERSION_NUMBER]-->', System::VERSION_NUMBER, $layout->footer);
         }
         exit;
 	}
-
-	// NEW MESSAGE ALERT
-	$playerInbox = new InboxManager($system, $player);
-	$new_inbox_message = $playerInbox->checkIfUnreadMessages();
-	$new_inbox_alerts = $playerInbox->checkIfUnreadAlerts();
 
 	// Notifications
 	if(!$system->is_legacy_ajax_request) {
@@ -267,7 +260,7 @@ if($LOGGED_IN) {
 	$RANK_NAMES = RankManager::fetchNames($system);
 
 	// Route list
-	$routes = require 'config/routes.php';
+	$routes = Router::$routes;
 
 	// Action log
 	if($player->log_actions) {
@@ -306,88 +299,13 @@ if($LOGGED_IN) {
 
 	if(isset($_GET['id'])) {
 		$id = (int)$_GET['id'];
+        $route = Router::$routes[$id] ?? null;
+
 		try {
-			if(!isset($routes[$id])) {
-				throw new Exception("");
-			}
-
-			// Check for battle if page is restricted
-			if(isset($routes[$id]['battle_ok']) && $routes[$id]['battle_ok'] == false) {
-				if($player->battle_id) {
-                    $contents_arr = [];
-                    foreach($_GET as $key => $val) {
-                        $contents_arr[] = "GET[{$key}]=$val";
-                    }
-                    foreach($_POST as $key => $val) {
-                        $contents_arr[] = "POST[{$key}]=$val";
-                    }
-                    $player->log(User::LOG_IN_BATTLE, implode(',', $contents_arr));
-					throw new Exception("You cannot visit this page while in battle!");
-				}
-			}
-
-			//Check for survival mission restricted
-			if(isset($routes[$id]['survival_ok']) && $routes[$id]['survival_ok'] == false) {
-				if(isset($_SESSION['ai_defeated']) && $player->mission_stage['action_type'] == 'combat') {
-					throw new Exception("You cannot move while under attack!");
-				}
-			}
-
-			// Check for spar/fight PvP type, stop page if trying to load spar/battle while in NPC battle
-			if(isset($routes[$id]['battle_type'])) {
-				$result = $system->query("SELECT `battle_type` FROM `battles` WHERE `battle_id`='$player->battle_id' LIMIT 1");
-				if($system->db_last_num_rows > 0) {
-					$battle_type = $system->db_fetch($result)['battle_type'];
-					if($battle_type != $routes[$id]['battle_type']) {
-						throw new Exception("You cannot visit this page while in combat!");
-					}
-				}
-			}
-
-			if(isset($routes[$id]['user_check'])) {
-			    if(!($routes[$id]['user_check'] instanceof Closure)) {
-			        throw new Exception("Invalid user check!");
-                }
-
-			    $page_ok = $routes[$id]['user_check']($player);
-
-				if(!$page_ok) {
-					throw new Exception("");
-				}
-			}
-
-			// Check for being in village is not okay/okay/required
-			if(isset($routes[$id]['village_ok'])) {
-				// Player is allowed in up to rank 3, then must go outside village
-				if($player->rank_num > 2 && $routes[$id]['village_ok'] == System::NOT_IN_VILLAGE
-                    && TravelManager::locationIsInVillage($system, $player->location)
-                ) {
-					throw new Exception("You cannot access this page while in a village!");
-				}
-
-				if($routes[$id]['village_ok'] == System::ONLY_IN_VILLAGE && !$player->location->equals($player->village_location)) {
-                    $contents_arr = [];
-                    foreach($_GET as $key => $val) {
-                        $contents_arr[] = "GET[{$key}]=$val";
-                    }
-                    foreach($_POST as $key => $val) {
-                        $contents_arr[] = "POST[{$key}]=$val";
-                    }
-                    $player->log(User::LOG_NOT_IN_VILLAGE, implode(',', $contents_arr));
-
-					throw new Exception("You must be in your village to access this page!");
-				}
-			}
-			if(isset($routes[$id]['min_rank'])) {
-				if($player->rank_num < $routes[$id]['min_rank']) {
-					throw new Exception("You are not a high enough rank to access this page!");
-				}
-			}
-
-			// Page is okay
+            $system->router->assertRouteIsValid($route, $player);
 
             // Force view battle page if waiting too long
-            if($player->battle_id && empty($routes[$id]['battle_type'])) {
+            if($player->battle_id && empty($route->battle_type)) {
                 $battle_result = $system->query(
                     "SELECT winner, turn_time, battle_type FROM battles WHERE `battle_id`='{$player->battle_id}' LIMIT 1"
                 );
@@ -397,7 +315,7 @@ if($LOGGED_IN) {
 
                     if($battle_data['winner'] && $time_since_turn >= 60) {
                         foreach($routes as $page_id => $page) {
-                            $type = $page['battle_type'] ?? null;
+                            $type = $page->battle_type ?? null;
                             if($type == $battle_data['battle_type']) {
                                 $id = $page_id;
                             }
@@ -406,37 +324,39 @@ if($LOGGED_IN) {
                 }
             }
 
-            if(!$system->is_legacy_ajax_request || !isset($routes[$id]['ajax_ok']) ) {
-                $location_name = ($player->current_location->location_id) ? ' ' . ' <div id="contentHeaderLocation">'.$player->current_location->name.'</div>' : null;
+            if(!$system->is_legacy_ajax_request || !isset($route->ajax_ok) ) {
+                $location_name = $player->current_location->location_id
+                    ? ' ' . ' <div id="contentHeaderLocation">' . $player->current_location->name . '</div>'
+                    : null;
 
-				echo str_replace("[HEADER_TITLE]", $routes[$id]['title'] . $location_name, $body_start);
-			}
+                echo str_replace("[HEADER_TITLE]", $route->title . $location_name, $layout->body_start);
+            }
 
-			$self_link = $system->link . '?id=' . $id;
+            $self_link = $system->router->base_url . '?id=' . $id;
 
-			$system->printMessage();
-			if($global_message) {
-				echo "<table class='table globalMessage'><tr><th colspan='2'>Global message</th></tr>
+            $system->printMessage();
+            if($global_message) {
+                echo "<table class='table globalMessage'><tr><th colspan='2'>Global message</th></tr>
 				<tr><td style='text-align:center;' colspan='2'>" . $system->html_parse($global_message) . "</td></tr>
 				<tr><td style='width: 50px;' class='newsFooter'><a class='link' href='{$self_link}&clear_message=1'>Dismiss</a></td>
-				<td class='newsFooter'>".$global_message_time."</td></tr></table>";
-			}
+				<td class='newsFooter'>" . $global_message_time . "</td></tr></table>";
+            }
 
             // EVENT
             if($system::$SC_EVENT_ACTIVE && !$system->is_legacy_ajax_request) {
                 require 'templates/temp_event_header.php';
             }
 
-            /** @noinspection PhpIncludeInspection */
-            require('pages/' . $routes[$id]['file_name']);
+            require('pages/' . $route->file_name);
 
-			$routes[$id]['function_name']();
-			$page_loaded = true;
+            ($route->function_name)();
+
+            $page_loaded = true;
 		} catch (Exception $e) {
 			if(strlen($e->getMessage()) > 1) {
 				// Display page title if page is set
-				if(isset($routes[$id])) {
-					echo str_replace("[HEADER_TITLE]", $routes[$id]['title'], $body_start);
+				if($routes[$id] != null) {
+					echo str_replace("[HEADER_TITLE]", $route->title, $layout->body_start);
 					$page_loaded = true;
 				}
 				$system->message($e->getMessage());
@@ -446,13 +366,13 @@ if($LOGGED_IN) {
 	}
 
 	if(!$page_loaded) {
-		echo str_replace("[HEADER_TITLE]", "News", $body_start);
+		echo str_replace("[HEADER_TITLE]", "News", $layout->body_start);
 		$system->printMessage();
 		if($global_message) {
 			echo "<table class='table globalMessage'><tr><th colspan='2'>Global message</th></tr>
 			<tr><td style='text-align:center;' colspan='2'>" . $system->html_parse($global_message) . "
 			</td></tr>
-			<tr><td style='width: 50px;' class='newsFooter'><a class='link' href='{$system->link}?clear_message=1'>Dismiss</a></td>
+			<tr><td style='width: 50px;' class='newsFooter'><a class='link' href='{$system->router->base_url}?clear_message=1'>Dismiss</a></td>
 				<td class='newsFooter'>".$global_message_time."</td></tr></table>";
 		}
 		require("pages/news.php");
@@ -462,91 +382,7 @@ if($LOGGED_IN) {
 
 	// Display side menu and footer
 	if(!$system->is_legacy_ajax_request) {
-		if($player->clan) {
-		    $routes[20]['menu'] = System::MENU_VILLAGE;
-		}
-		if($player->rank_num >= 3) {
-		    $routes[24]['menu'] = System::MENU_USER;
-		}
-
-        echo $side_menu_start;
-		foreach($routes as $id => $page) {
-            if(!isset($page['menu']) || $page['menu'] != System::MENU_USER) {
-                continue;
-            }
-
-			$menu_alert_icon =  ($page['title'] === 'Inbox' && ($new_inbox_message || $new_inbox_alerts)) ? 'sidemenu_new_message_alert' : null;
-
-            echo "<li><a id='sideMenuOption-" . str_replace(' ', '', $page['title'])."' 
-                href='{$system->link}?id=$id' 
-                class='{$menu_alert_icon}'>"
-                . $page['title']
-                . "</a></li>";
-        }
-
-
-        // Activity Menu
-        echo $action_menu_header;
-        foreach($routes as $id => $page) {
-            if(!isset($page['menu']) || $page['menu'] != System::MENU_ACTIVITY) {
-                continue;
-            }
-
-            $class = '';
-            if($page['village_ok'] === System::ONLY_IN_VILLAGE) {
-                $class = 'only-allowed-in-village';
-            }
-            if($page['village_ok'] == System::NOT_IN_VILLAGE && $player->rank_num > 2) {
-                $class = 'not-allowed-in-village';
-            }
-
-            echo "<li>
-                <a 
-                    id='sideMenuOption-" . str_replace(' ', '', $page['title']) . "' 
-                    href='{$system->link}?id=$id'
-                    class='{$class}'
-                >" . $page['title'] . "</a>
-            </li>";
-        }
-
-        // Village menu
-        echo $village_menu_start;
-        foreach($routes as $id => $page) {
-            if(!isset($page['menu']) || $page['menu'] != System::MENU_VILLAGE) {
-                continue;
-            }
-
-            echo "<li>
-                <a 
-                    id='sideMenuOption-" . str_replace(' ', '', $page['title']) . "' 
-                    href='{$system->link}?id=$id'
-                >" . $page['title'] . "</a>
-            </li>";
-        }
-
-        if($player->isModerator() || $player->hasAdminPanel() || $player->isSupportStaff()) {
-            echo $staff_menu_header;
-            if($player->isSupportStaff()) {
-                echo "<li><a id='sideMenuOption-SupportPanel' href='{$system->link}?id=30'>Support Panel</a></li>";
-            }
-            if($player->isModerator()) {
-                echo "<li><a id='sideMenuOption-ModPanel' href='{$system->link}?id=16'>Mod Panel</a></li>";
-            }
-            if($player->hasAdminPanel()) {
-                echo "<li><a id='sideMenuOption-AdminPanel' href='{$system->link}?id=17'>Admin Panel</a></li>";
-            }
-        }
-
-		//  timer
-		$time_remaining = ($logout_limit * 60) - (time() - $player->last_login);
-		$logout_time = System::timeRemaining($time_remaining, 'short', false, true) . " remaining";
-
-		$logout_display = $player->isUserAdmin() ? "Disabled" : $logout_time;
-		echo str_replace("<!--LOGOUT_TIMER-->", $logout_display, $side_menu_end);
-
-		if($logout_display != "Disabled") {
-			echo "<script type='text/javascript'>countdownTimer($time_remaining, 'logoutTimer');</script>";
-		}
+        $layout->renderSideMenu($player, $system->router);
 	}
 }
 else if($system->is_legacy_ajax_request) {
@@ -554,10 +390,11 @@ else if($system->is_legacy_ajax_request) {
 			clearInterval(refreshID);
 			clearInterval(notificationRefreshID);
 			</script>
-	<p style='text-align:center;'>Logout timer finished. <a href='{$system->link}'>Continue</a></p>";
+	<p style='text-align:center;'>Logout timer finished. <a href='{$system->router->base_url}'>Continue</a></p>";
 }
+// Login
 else {
-	echo str_replace("[HEADER_TITLE]", "News", $body_start);
+	echo str_replace("[HEADER_TITLE]", "News", $layout->body_start);
 	// Display error messages
 	$system->printMessage();
 	if(!$system->SC_OPEN) {
@@ -565,18 +402,19 @@ else {
 		<tr><td style='text-align:center;'>
 		Shinobi-Chronicles is currently closed for maintenace. Please check back in a few minutes!
 		</td></tr></table>";
-	}	
+	}
+
 	require("pages/news.php");
 	newsPosts();
 
     $captcha = '';
-	echo str_replace('<!--CAPTCHA-->', $captcha, $login_menu);
+	echo str_replace('<!--CAPTCHA-->', $captcha, $layout->login_menu);
 }
+
+// Render footer
 if(!$system->is_legacy_ajax_request) {
 	$page_load_time = round(microtime(true) - $PAGE_LOAD_START, 3);
-	echo str_replace(
-		array('<!--[VERSION_NUMBER]-->', '<!--[PAGE_LOAD_TIME]-->'),
-		array(System::VERSION_NUMBER, $page_load_time),
-	$footer);
+
+    $layout->renderFooter($page_load_time);
 }
 

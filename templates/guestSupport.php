@@ -35,7 +35,7 @@
         If you already have submitted a support, you may enter the support key below to respond to staff replies or provide
             updated information if a staff member has yet to respond.<br />
             <br />
-        <form action="<?=$system->link?>support.php" method="get">
+        <form action="<?=$system->router->base_url?>support.php" method="get">
             <label style="width:8em; font-weight:bold;">Support Key:</label><input type="text" name="support_key" /><br />
             <label style="width:8em; font-weight:bold;">Email:</label><input type="text" name="email" /><br />
             <input type="submit" value="Search"/>
@@ -43,7 +43,7 @@
         </td></tr>
         <tr><th>Submit a new Support</th></tr>
         <tr><td>
-        <form action="<?=$system->link?>support.php" method="post">
+        <form action="<?=$system->router->base_url?>support.php" method="post">
             <label style="width:8em; font-weight:bold;">Name:</label><input type="text" name="name" /><br />
             <label style="width:8em; font-weight:bold;">Subject:</label><input type="text" name="subject" /><br />
             <label style="width:8em; font-weight:bold;">Email:</label><input type="text" name="email" /><br />
@@ -86,7 +86,7 @@
     <table class="table">
         <tr><th>Add Response</th></tr>
         <tr><td>
-            <form action="<?=$system->link?>support.php?support_key=<?=$supportData['support_key']?>&email=<?=$supportData['email']?>" method="post">
+            <form action="<?=$system->router->base_url?>support.php?support_key=<?=$supportData['support_key']?>&email=<?=$supportData['email']?>" method="post">
                 <textarea name="message" style="display:block;width:500px;height:200px;margin:5px auto 5px auto;"></textarea><br />
                 <input type="submit" name="add_response" value="Add Response" />
             </form>

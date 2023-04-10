@@ -13,7 +13,7 @@ function news() {
 
 	global $player;
 
-	$self_link = $system->link;
+	$self_link = $system->router->base_url;
 
 	$page = isset($_GET['page']) ? $_GET['page'] : false;
 
@@ -153,7 +153,7 @@ function news() {
 
 function newsPosts($ADMIN = false, $max_posts = 8) {
 	global $system;
-	$self_link = $system->link;
+	$self_link = $system->router->base_url;
 
 	$result = $system->query("SELECT * FROM `news_posts` ORDER BY `post_id` DESC LIMIT $max_posts");
 

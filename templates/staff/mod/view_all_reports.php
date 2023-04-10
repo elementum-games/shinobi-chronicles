@@ -21,7 +21,7 @@
                 <td><?=$reports['users'][$report['user_id']]?></td>
                 <td><?=$reports['users'][$report['reporter_id']]?></td>
                 <td><?=$report['reason']?></td>
-                <td><a href='<?=$system->links['report']?>&page=view_report&report_id=<?=$report['report_id']?>'>View</a></td>
+                <td><a href='<?=$system->router->links['report']?>&page=view_report&report_id=<?=$report['report_id']?>'>View</a></td>
             </tr>
         <?php endforeach ?>
     <?php endif ?>

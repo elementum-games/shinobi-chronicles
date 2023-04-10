@@ -27,18 +27,18 @@ HTML;
 
 $top_menu = <<<HTML
 <ul>
-	<li><a href='{$system->link}'>News</a></li>
-	<li><a href='{$system->links['discord']}' target='_blank'>Discord</a></li>
-	<li><a href='{$system->link}manual.php'>Manual</a></li>
-	<li><a href='{$system->links['github']}'>GitHub</a></li>
-	<li><a href='{$system->link}rules.php'>Rules</a></li>
-	<li><a href='{$system->link}support.php'>Support</a></li>
+	<li><a href='{$system->router->base_url}'>News</a></li>
+	<li><a href='{$system->router->links['discord']}' target='_blank'>Discord</a></li>
+	<li><a href='{$system->router->base_url}manual.php'>Manual</a></li>
+	<li><a href='{$system->router->links['github']}'>GitHub</a></li>
+	<li><a href='{$system->router->base_url}rules.php'>Rules</a></li>
+	<li><a href='{$system->router->base_url}support.php'>Support</a></li>
 </ul>
 HTML;
 
 $side_menu_start = <<<HTML
 	</div>
-	<div id='sideMenu' class='sm-tmp-class {$side_menu_location_status_class}'>
+	<div id='sideMenu' class='sm-tmp-class [side-menu-location-status-class]'>
 	
 	<ul class='menu'>
 	<h2><p>User Menu</p></h2>
@@ -77,7 +77,7 @@ $login_menu = <<<HTML
 	<ul class='menu'>
 	<h2><p>Login</p></h2>
 		<div id='login'>
-			<form action='{$system->link}' method='post'>
+			<form action='{$system->router->base_url}' method='post'>
 			<span>Username</span><br />
 			<input type='text' name='user_name' /><br />
 			<span>Password</span><br />
@@ -87,7 +87,7 @@ $login_menu = <<<HTML
 			<input type='submit' name='login' value='Login' />
 			</form>
 			<p>
-				<a class='link' style='font-size:16px;padding-right:18px;' href='{$system->link}register.php'>Create an account</a>
+				<a class='link' style='font-size:16px;padding-right:18px;' href='{$system->router->base_url}register.php'>Create an account</a>
 			</p>
 		</div>
 	</div>
@@ -100,7 +100,7 @@ $footer = <<<HTML
 	</div>
 	<div id='footer'>
 		<p>Shinobi Chronicles v<!--[VERSION_NUMBER]--> &bull; Copyright &copy; LM Visions</p>	
-	    <p><a href="{$system->link}terms.php">Terms of Service</a></p>	
+	    <p><a href="{$system->router->base_url}terms.php">Terms of Service</a></p>	
     </div>
 </body>
 </html>

@@ -76,7 +76,7 @@
         <tr><th>Marriage Detail</th></tr>
         <tr>
             <td style="padding: 8px;">
-                <label>Spouse: </label><a href="<?=$system->links['members']?>&user=<?=$player->spouse_name?>"><?=$player->spouse_name?></a><br />
+                <label>Spouse: </label><a href="<?=$system->router->links['members']?>&user=<?=$player->spouse_name?>"><?=$player->spouse_name?></a><br />
                 <label>Anniversary:</label><?=Date('F j, Y', $player->marriage_time)?><br />
                 <label>Location:</label><?=$spouse['location']?><br />
                 <label>Perks:</label><br />

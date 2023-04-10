@@ -30,7 +30,7 @@
                 <td><?=($users[$report['moderator_id']] ?? 'N/A')?></td>
                 <td><?=ReportManager::$report_types[$report['report_type']]?></td>
                 <td><?=ReportManager::$report_verdicts[$report['status']]?></td>
-                <td><a href='<?=$system->links['report']?>&page=view_report&report_id=<?=$id?>'>View</a></td>
+                <td><a href='<?=$system->router->links['report']?>&page=view_report&report_id=<?=$id?>'>View</a></td>
             </tr>
         <?php endforeach ?>
     <?php endif ?>

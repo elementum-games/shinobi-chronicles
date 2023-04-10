@@ -6,6 +6,7 @@ require_once __DIR__ . '/EntityId.php';
 require_once __DIR__ . '/User.php';
 require_once __DIR__ . '/MarkdownParser.php';
 require_once __DIR__ . '/API.php';
+require_once __DIR__ . '/Layout.php';
 
 /*	Class:		System
 	Purpose: 	Handle database connection and queries. Handle storing and printing of error messages.
@@ -22,6 +23,8 @@ class System {
     const MENU_USER = 'user';
     const MENU_ACTIVITY = 'activity';
     const MENU_VILLAGE = 'village';
+    const MENU_CONDITIONAL = 'conditional';
+    const MENU_NONE = 'none';
 
     const NOT_IN_VILLAGE = 0;
     const IN_VILLAGE_OKAY = 1;
@@ -36,15 +39,13 @@ class System {
     const SC_NO_REPLY_EMAIL = "no-reply@shinobichronicles.com";
     const UNSERVICEABLE_EMAIL_DOMAINS = ['hotmail.com', 'live.com', 'msn.com', 'outlook.com'];
 
-    public static array $villages = ['Stone', 'Cloud', 'Leaf', 'Sand', 'Mist'];
-
-    // See the ForbiddenSeal class for maintaining all forbidden seal details/benefits
-
     // TODO: Remove! This is a temporary way to do events
     const SC_EVENT_START = 0;
     const SC_EVENT_END = 1641769200;
     const SC_EVENT_NAME = 'Holiday 2021';
     public static bool $SC_EVENT_ACTIVE = true;
+
+    public static array $villages = ['Stone', 'Cloud', 'Leaf', 'Sand', 'Mist'];
 
     // Variable for error message
     public string $message = "";
@@ -68,13 +69,9 @@ class System {
 
     // Request lifecycle
     public bool $is_api_request = false;
-
-    public $timezoneOffset;
-
-    // Request lifecycle
     public bool $is_legacy_ajax_request = false;
 
-    public array $villageLocations = [];
+    public $timezoneOffset;
 
     // Training boost switches
     public int $TRAIN_BOOST = 0; // Extra points per training, 0 for none
@@ -115,49 +112,12 @@ class System {
         )
     );
 
-    // Keep in sync with pages.php
-    const PAGE_IDS = [
-        'profile' => 1,
-        'inbox' => 2,
-        'settings' => 3,
-        'members' => 6,
-        'bloodline' => 10,
-        'travel' => 11,
-        'arena' => 12,
-        'mission' => 14,
-        'specialmissions' => 15,
-        'mod' => 16,
-        'admin' => 17,
-        'report' => 18,
-        'battle' => 19,
-        'premium' => 21,
-        'spar' => 22,
-        'team' => 24,
-        'rankup' => 25,
-        'event' => 27,
-        'marriage' => 29,
-        'support' => 30,
-        'chat_log' => 31,
-    ];
-
-    public array $links = [
-        'github' => 'https://github.com/elementum-games/shinobi-chronicles',
-        'discord' => 'https://discord.gg/Kx52dbXEf3',
-    ];
-    public array $api_links = [
-        'battle' => ''
-    ];
-
     //Chat variables
     const CHAT_MAX_POST_LENGTH = 350;
 
     // Default layout
     const DEFAULT_LAYOUT = 'shadow_ribbon';
     const VERSION_NUMBER = '0.8.0';
-
-    // Map size
-    const MAP_SIZE_X = 18;
-    const MAP_SIZE_Y = 12;
 
     // Misc stuff
     const SC_MAX_RANK = 4;
@@ -233,6 +193,8 @@ class System {
         'stat_cut' => false,
     ];
 
+    public Router $router;
+
     public function __construct() {
         require __DIR__ . "/../secure/vars.php";
         /** @var $host */
@@ -244,19 +206,11 @@ class System {
         $this->password = $password;
         $this->database = $database;
 
-        $this->environment = isset($ENVIRONMENT) ? $ENVIRONMENT : self::ENVIRONMENT_DEV;
-        $this->link = isset($web_url) ? $web_url : 'http://localhost/';
+        $this->environment = $ENVIRONMENT ?? self::ENVIRONMENT_DEV;
+        $this->register_open = $register_open ?? false;
+        $this->SC_OPEN = $SC_OPEN ?? false;
 
-        $this->register_open = isset($register_open) ? $register_open : false;
-        $this->SC_OPEN = isset($SC_OPEN) ? $SC_OPEN : false;
-
-        foreach(self::PAGE_IDS as $slug => $id) {
-            $this->links[$slug] = $this->link . '?id=' . $id;
-        }
-
-        $this->api_links['battle'] = $this->link . 'api/battle.php';
-        $this->api_links['inbox'] = $this->link . 'api/inbox.php';
-        $this->api_links['travel'] = $this->link . 'api/travel.php';
+        $this->router = new Router($web_url ?? 'http://localhost/');
 
         $this->timezoneOffset = date('Z');
 
@@ -415,19 +369,6 @@ class System {
         return true;
     }
 
-    /**
-     * @param string $page_name
-     * @return string
-     * @throws Exception
-     */
-    public function getUrl(string $page_name): string {
-        $id = self::PAGE_IDS[$page_name] ?? null;
-        if($id == null) {
-            throw new Exception("Invalid page name!");
-        }
-
-        return $this->link . '?id=' . $id;
-    }
 
     /**
      * Sends PM to specified recipient
@@ -496,15 +437,15 @@ class System {
         global $side_menu_end;
         global $footer;
 
-        $pages = require __DIR__ . '/../config/routes.php';
+        $pages = Router::$routes;
 
         echo $side_menu_start;
         foreach($pages as $id => $page) {
-            if(!isset($page['menu']) || $page['menu'] != System::MENU_USER) {
+            if(!isset($page->menu) || $page->menu != System::MENU_USER) {
                 continue;
             }
 
-            echo "<li><a href='{$this->link}?id=$id'>" . $page['title'] . "</a></li>";
+            echo "<li><a href='{$this->link}?id=$id'>" . $page->title . "</a></li>";
         }
         echo $side_menu_end . $footer;
         exit;
@@ -798,115 +739,24 @@ class System {
         return password_verify($password, $hash);
     }
 
-    public function renderStaticPageHeader(string $page_title, $layout = System::DEFAULT_LAYOUT): void {
+    public function fetchLayoutByName($layout): Layout {
         $system = $this;
-        $side_menu_location_status_class = null;
 
-        require($this->fetchLayoutByName($layout));
-
-        /**
-         * @var $heading
-         * @var $top_menu
-         * @var $header
-         * @var $body_start
-         */
-
-        echo $heading;
-        echo $top_menu;
-        echo $header;
-        echo str_replace("[HEADER_TITLE]", $page_title, $body_start);
-    }
-
-    public function renderStaticPageFooter($layout = System::DEFAULT_LAYOUT): void {
-        $system = $this;
-        $side_menu_location_status_class = null;
-
-        require($this->fetchLayoutByName($layout));
-
-        /**
-         * @var $side_menu_start
-         * @var $side_menu_end
-         *
-         * @var $login_menu
-         * @var $footer
-         */
-        if(isset($_SESSION['user_id'])) {
-            global $player;
-            $pages = require 'config/routes.php';
-            echo $side_menu_start;
-            $menu = System::MENU_USER;
-            foreach($pages as $id => $page) {
-                if(isset($page['menu']) && in_array($page['menu'], [System::MENU_USER, System::MENU_VILLAGE, System::MENU_ACTIVITY])) {
-                    if($page['menu'] != $menu) {
-                        $menu = $page['menu'];
-                        echo "<h2><p>" . ucwords($menu) . " Menu</p></h2>";
-                    }
-                    echo "<li><a href='{$system->link}?id=$id'>{$page['title']}</a></li>";
-                }
-            }
-            //Staff Menu
-            if($player->isSupportStaff()) {
-                if($menu != 'Staff') {
-                    $menu = 'Staff';
-                    echo "<h2><p>$menu Menu</p></h2>";
-                }
-                echo "<li><a href='{$system->links['support']}'>Support Panel</a></li>";
-            }
-            if($player->staff_manager->isModerator()) {
-                if($menu != 'Staff') {
-                    $menu = 'Staff';
-                    echo "<h2><p>$menu Menu</p></h2>";
-                }
-                echo "<li><a href='{$system->links['mod']}'>Mod Panel</a></li>";
-            }
-            if($player->staff_manager->hasAdminPanel()) {
-                if($menu != 'Staff') {
-                    $menu = 'Staff';
-                    echo "<h2><p>$menu Menu</p></h2>";
-                }
-                echo "<li><a href='{$system->links['admin']}'>Admin Panel</a></li>";
-            }
-            //  timer
-            $logout_limit = System::LOGOUT_LIMIT;
-            if($player->hasAdminPanel()) {
-                $logout_limit = 1440;
-            }
-            else if($player->forbidden_seal && $player->forbidden_seal->level > 0) {
-                $logout_limit = $player->forbidden_seal->logout_timer;
-            }
-            $time_remaining = ($logout_limit * 60) - (time() - $player->last_login);
-            $logout_time = System::timeRemaining($time_remaining, 'short', false, true) . " remaining";
-
-            $logout_display = $player->isUserAdmin() ? "Disabled" : $logout_time;
-            echo str_replace("<!--LOGOUT_TIMER-->", $logout_display, $side_menu_end);
-
-            if($logout_display != "Disabled") {
-                echo "<script type='text/javascript'>countdownTimer($time_remaining, 'logoutTimer');</script>";
-            }
-        }
-        else {
-            echo $login_menu;
-        }
-
-        echo str_replace('<!--[VERSION_NUMBER]-->', System::VERSION_NUMBER, $footer);
-    }
-
-    public function fetchLayoutByName($layout): string {
         switch($layout) {
             case 'cextralite':
-                return "layout/cextralite.php";
+                return require "layout/cextralite.php";
             case 'classic_blue':
-                return "layout/classic_blue.php";
+                return require  "layout/classic_blue.php";
             case 'shadow_ribbon':
-                return "layout/shadow_ribbon.php";
+                return require  "layout/shadow_ribbon.php";
             case 'geisha':
-                return "layout/geisha.php";
+                return require  "layout/geisha.php";
             case 'blue_scroll':
-                return "layout/blue_scroll.php";
+                return require  "layout/blue_scroll.php";
             case 'rainbow_road':
-                return "layout/rainbow_road.php";
+                return require  "layout/rainbow_road.php";
             default:
-                return "layout/" . self::DEFAULT_LAYOUT . ".php";
+                return require  "layout/" . self::DEFAULT_LAYOUT . ".php";
         }
     }
 

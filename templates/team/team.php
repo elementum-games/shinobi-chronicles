@@ -125,7 +125,7 @@
     <?php foreach($team_members as $row): ?>
         <tr class='table_multicolumns'>
             <td style='width:29%;'>
-                <a href='<?= $system->links['members'] ?>&user=<?= $row['user_name'] ?>'><?= $row['user_name'] ?></a>
+                <a href='<?= $system->router->links['members'] ?>&user=<?= $row['user_name'] ?>'><?= $row['user_name'] ?></a>
             </td>
             <td style='width:20%;text-align:center;'><?= $RANK_NAMES[$row['rank']] ?></td>
             <td style='width:20%;text-align:center;'><?= $row['level'] ?></td>
@@ -149,7 +149,7 @@
                 <br />
                 <b>Invite Player</b><br />
                 <form action='<?= $self_link ?>' method='get'>
-                    <input type='hidden' name='id' value='<?= System::PAGE_IDS['team'] ?>'>
+                    <input type='hidden' name='id' value='<?= Router::PAGE_IDS['team'] ?>'>
                     <input type='text' name='user_name' /><br />
                     <input type='submit' name='invite' value='Send' />
                 </form>

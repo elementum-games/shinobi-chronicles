@@ -28,10 +28,10 @@ function rankUp(): bool {
 
 	global $player;
 	
-	$self_link = $system->links['rankup'];
+	$self_link = $system->router->links['rankup'];
 
     if(!$player->rank_up) {
-        $system->message("You must re-enable rank ups in the <a href='{$system->links['settings']}'>Settings</a> page.");
+        $system->message("You must re-enable rank ups in the <a href='{$system->router->links['settings']}'>Settings</a> page.");
         $system->printMessage();
         return true;
     }
@@ -49,7 +49,7 @@ function rankUp(): bool {
 
         $system->message("Understanding that this is not your time, you bow out of the exam. Maybe next time
             will be your chance!<br />
-            <a href='{$system->links['profile']}'>Continue</a>");
+            <a href='{$system->router->links['profile']}'>Continue</a>");
         $system->printMessage();
         return true;
     }
@@ -57,13 +57,13 @@ function rankUp(): bool {
 	// Can't even access this page if in a different type of battle
 	if($player->battle_id && $player->exam_stage == 0) {
 	    $player->battle_id = 0;
-        $system->message("Your exam battle has concluded. <a href='{$system->links['profile']}'>Continue</a>");
+        $system->message("Your exam battle has concluded. <a href='{$system->router->links['profile']}'>Continue</a>");
         return true;
     }
 
     if($player->level < $player->rank->max_level || $player->exp < $player->expForNextLevel() || $player->rank_num >= System::SC_MAX_RANK) {
         $player->exam_stage = 0;
-        $system->message("You are not eligible for a rankup exam. <a href='{$system->links['profile']}'>Continue</a>");
+        $system->message("You are not eligible for a rankup exam. <a href='{$system->router->links['profile']}'>Continue</a>");
         return true;
     }
 
@@ -377,13 +377,13 @@ function geninExam(System $system, User $player, RankManager $rankManager) {
 					and smiles, saying calmly 'You have the <b>$bloodline_name</b>. This is the 
 					bloodline of the <b>$clan_name</b> clan. From this day forward you shall join them, and study with them to train
 					your bloodline to its fullest potential.'<br />
-					<p style='text-align:center;'><a href='{$system->links['profile']}'>Continue</a></p>";
+					<p style='text-align:center;'><a href='{$system->router->links['profile']}'>Continue</a></p>";
             }
             else {
                 $bloodline_display = "After focusing deeply for several minutes, the elder withdraws $gender hand and says 'It appears you do not
 					have a bloodline. You are free to train as you wish, we will place you in the <b>$clan_name</b> clan. Train 
 					hard with them and become a strong ninja for your clan and village.'<br />
-					<p style='text-align:center;'><a href='{$system->links['profile']}'>Continue</a></p>";
+					<p style='text-align:center;'><a href='{$system->router->links['profile']}'>Continue</a></p>";
             }
         } catch(Exception $e) {
             $system->message($e->getMessage());
@@ -465,7 +465,7 @@ function chuuninExam(System $system, User $player, RankManager $rankManager): bo
             $system->message("You have passed stage 1!");
         } catch (Exception $e) {
             $system->message("Your answers were incorrect. You have failed the Chuunin exam. " . $e->getMessage() .
-                "<a href='{$system->links['profile']}'>Continue</a>");
+                "<a href='{$system->router->links['profile']}'>Continue</a>");
             $system->printMessage();
             $player->exam_stage = 0;
             return false;
@@ -519,7 +519,7 @@ function chuuninExam(System $system, User $player, RankManager $rankManager): bo
                     $battle_result = "You defeated your opponent, who had the scroll you needed, and have advanced to the
                     next stage of the exam. You can take a short break and heal up if you want, or continue to the
                     final battle.<br />
-                    <a href='{$system->links['profile']}'>Take a break</a>
+                    <a href='{$system->router->links['profile']}'>Take a break</a>
                     <a href='$self_link'>Continue</a>";
                 }
                 else {
@@ -531,14 +531,14 @@ function chuuninExam(System $system, User $player, RankManager $rankManager): bo
             else if($battle->isOpponentWinner()) {
                 $player->exam_stage = 0;
                 $battle_result = "You have been defeated. You have failed the $exam_name.<br />
-					<a href='{$system->links['profile']}'>Continue</a>";
+					<a href='{$system->router->links['profile']}'>Continue</a>";
                 require 'templates/level_rank_up/chuunin_survival_battle_results.php';
                 return false;
             }
             else if($battle->isDraw()) {
                 $player->exam_stage = 0;
                 $battle_result = "The battle ended in a draw. You were unable to continue the exam and failed.<br />
-                <a href='{$system->links['profile']}'>Continue</a>";
+                <a href='{$system->router->links['profile']}'>Continue</a>";
 
                 return false;
             }
@@ -608,7 +608,7 @@ function chuuninExam(System $system, User $player, RankManager $rankManager): bo
 							consuming destruction, that devours anything in its path. Your Fire jutsu will be strong against Wind jutsu, as
 							they will only fan the flames and strengthen your jutsu. However, you must be careful against Water jutsu, as they 
 							can extinguish your fires.\"<br />
-							<a href='{$system->links['profile']}'>Continue</a>";
+							<a href='{$system->router->links['profile']}'>Continue</a>";
                         break;
                     case 'Wind':
                         $element_display = "Picturing a tempestuous tornado, you focus on the paper and flow chakra from your stomach,
@@ -618,7 +618,7 @@ function chuuninExam(System $system, User $player, RankManager $rankManager): bo
 							will be strong against Lightning jutsu, as you can cut and dissipate it, but you will be weak against Fire jutsu,
 							because your wind only serves to fan their flames and make them stronger.\"
 							<br />
-							<a href='{$system->links['profile']}'>Continue</a>";
+							<a href='{$system->router->links['profile']}'>Continue</a>";
                         break;
                     case 'Lightning':
                         $element_display = "Imagining the feel of electricity coursing through your veins, you focus on the paper and flow chakra 
@@ -629,7 +629,7 @@ function chuuninExam(System $system, User $player, RankManager $rankManager): bo
 							jutsu will be strong against Earth as your speed can slice straight through the slower techniques of Earth,
 							but you must be careful against Wind jutsu as they will dissipate your Lightning.\"
 							<br />
-							<a href='{$system->links['profile']}'>Continue</a>";
+							<a href='{$system->router->links['profile']}'>Continue</a>";
                         break;
                     case 'Earth':
                         $element_display = "Firmly planting your feet in the dirt and embracing the feel of it, you focus on the paper and flow 
@@ -639,7 +639,7 @@ function chuuninExam(System $system, User $player, RankManager $rankManager): bo
 							strong against Water jutsu, as you can turn the water to mud and render it useless, but you will be weak to 
 							Lightning jutsu, as they are one of the few types that can swiftly evade and strike through your techniques.\"
 							<br />
-							<a href='{$system->links['profile']}'>Continue</a>";
+							<a href='{$system->router->links['profile']}'>Continue</a>";
                         break;
                     case 'Water':
                         $element_display = "With thoughts of splashing rivers flowing through your mind, you focus on the paper and flow chakra 
@@ -649,7 +649,7 @@ function chuuninExam(System $system, User $player, RankManager $rankManager): bo
 							of the battle, trapping enemies or launching large-scale attacks at them. Your Water jutsu will be strong against
 							Fire jutsu because you can extinguish them, but Earth jutsu can turn your water into mud and render it useless.\"
 							<br />
-							<a href='{$system->links['profile']}'>Continue</a>";
+							<a href='{$system->router->links['profile']}'>Continue</a>";
                         break;
                 }
             }
@@ -689,7 +689,7 @@ function processChuuninExamFightEnd(System $system, BattleManager $battle, User 
                 return "You defeated your opponent, who had the scroll you needed, and have advanced to the "
                     . "next stage of the exam. You can take a short break and heal up if you want, or continue to the "
                     . "final battle.[br]"
-                    . "[Take a break]({$system->links['profile']})"
+                    . "[Take a break]({$system->router->links['profile']})"
                     . "[Continue]({$self_link})";
             }
             else {
@@ -702,13 +702,13 @@ function processChuuninExamFightEnd(System $system, BattleManager $battle, User 
             $player->exam_stage = 0;
 
             return "You have been defeated. You have failed the chuunin exam.[br]"
-                . "[Continue]({$system->links['profile']})";
+                . "[Continue]({$system->router->links['profile']})";
         }
         else if($battle->isDraw()) {
             $player->exam_stage = 0;
 
             return "The battle ended in a draw. You were unable to continue the exam and failed.[br]"
-                . "[Continue]({$system->links['profile']})";
+                . "[Continue]({$system->router->links['profile']})";
         }
     }
     else if($player->exam_stage == $CHUUNIN_STAGE_DUEL) {
@@ -722,12 +722,12 @@ function processChuuninExamFightEnd(System $system, BattleManager $battle, User 
         else if($battle->isOpponentWinner()) {
             $player->exam_stage = 0;
             return "You have been defeated. You have failed the chuunin exam.[br]"
-                . "[Continue]({$system->links['profile']})";
+                . "[Continue]({$system->router->links['profile']})";
         }
         else if($battle->isDraw()) {
             $player->exam_stage = 0;
             return "The battle ended in a draw. You were unable to continue the exam and failed.[br]"
-                . "[Continue]({$system->links['profile']})";
+                . "[Continue]({$system->router->links['profile']})";
         }
     }
 
@@ -808,7 +808,7 @@ function joninExam(System $system, User $player, RankManager $rankManager): bool
 							consuming destruction, that devours anything in its path. Your Fire jutsu will be strong against Wind jutsu, as
 							they will only fan the flames and strengthen your jutsu. However, you must be careful against Water jutsu, as they 
 							can extinguish your fires.\"<br />
-							<a href='{$system->links['profile']}'>Continue</a>";
+							<a href='{$system->router->links['profile']}'>Continue</a>";
                         break;
                     case 'Wind':
                         $element_display = "Picturing a tempestuous tornado, you flow chakra from your stomach,
@@ -819,7 +819,7 @@ function joninExam(System $system, User $player, RankManager $rankManager): bool
 							Lightning jutsu, as you can cut and dissipate it, but you will be weak against Fire jutsu,
 							because your wind only serves to fan their flames and make them stronger.\"
 							<br />
-							<a href='{$system->links['profile']}'>Continue</a>";
+							<a href='{$system->router->links['profile']}'>Continue</a>";
                         break;
                     case 'Lightning':
                         $element_display = "Imagining the feel of electricity coursing through your veins, you flow chakra from your stomach,
@@ -830,7 +830,7 @@ function joninExam(System $system, User $player, RankManager $rankManager): bool
 							jutsu will be strong against Earth as your speed can slice straight through the slower techniques of Earth,
 							but you must be careful against Wind jutsu as they will dissipate your Lightning.\"
 							<br />
-							<a href='{$system->links['profile']}'>Continue</a>";
+							<a href='{$system->router->links['profile']}'>Continue</a>";
                         break;
                     case 'Earth':
                         $element_display = "Envisioning stone as hard as the temple you are sitting in, you flow chakra from your stomach,
@@ -840,7 +840,7 @@ function joninExam(System $system, User $player, RankManager $rankManager): bool
 							strong against Water jutsu, as you can turn the water to mud and render it useless, but you will be weak to 
 							Lightning jutsu, as they are one of the few types that can swiftly evade and strike through your techniques.\"
 							<br />
-							<a href='{$system->links['profile']}'>Continue</a>";
+							<a href='{$system->router->links['profile']}'>Continue</a>";
                         break;
                     case 'Water':
                         $element_display = "With thoughts of splashing rivers flowing through your mind, you flow chakra from your stomach,
@@ -850,7 +850,7 @@ function joninExam(System $system, User $player, RankManager $rankManager): bool
 							of the battle, trapping enemies or launching large-scale attacks at them. Your Water jutsu will be strong against
 							Fire jutsu because you can extinguish them, but Earth jutsu can turn your water into mud and render it useless.\"
 							<br />
-							<a href='{$system->links['profile']}'>Continue</a>";
+							<a href='{$system->router->links['profile']}'>Continue</a>";
                         break;
                 }
             }

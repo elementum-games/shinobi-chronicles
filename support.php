@@ -5,10 +5,11 @@ require_once("classes/_autoload.php");
 
 $system = new System();
 $guest_support = true;
-$layout = 'layout/' . System::DEFAULT_LAYOUT . '.php';
-$self_link = $system->link . 'support.php';
+$self_link = $system->router->base_url . 'support.php';
 $staff_level = 0;
 $user_id = 0;
+
+$player = null;
 
 if(isset($_SESSION['user_id'])) {
     $guest_support = false;
@@ -21,20 +22,19 @@ if(isset($_SESSION['user_id'])) {
     $supportSystem = new SupportManager($system, $player);
 }
 else {
+    $layout = $system->fetchLayoutByName(System::DEFAULT_LAYOUT);
     $supportSystem = new SupportManager($system);
 }
 
 $request_types = $supportSystem->getSupportTypes($staff_level);
 $supportCreated = false;
 
-require($layout);
+echo $layout->heading;
+echo $layout->top_menu;
+echo $layout->header;
+echo str_replace("[HEADER_TITLE]", "Support", $layout->body_start);
 
-echo $heading;
-echo $top_menu;
-echo $header;
-echo str_replace("[HEADER_TITLE]", "Support", $body_start);
-
-if(!$guest_support) {
+if($player != null) {
     //Form submitted // 11/6/21 SM{V2} supported
     if(isset($_POST['add_support']) || isset($_POST['add_support_prem']) || isset($_POST['confirm_prem_support'])) {
         try {
@@ -119,6 +119,7 @@ if(!$guest_support) {
     if($system->message && !$system->message_displayed) {
         $system->printMessage();
     }
+
     if(!isset($_GET['support_id'])) {
         // New Ticket form
         require('templates/supportTicketForm.php');
@@ -128,7 +129,8 @@ if(!$guest_support) {
         if (!empty($supports)) {
             require('templates/userTickets.php');
         }
-    } else {
+    }
+    else {
         $support_id = (int) $_GET['support_id'];
         $support = $supportSystem->fetchSupportByID($support_id);
 
@@ -208,83 +210,9 @@ if(!$guest_support) {
     }
 
     // Load side menu
-    $pages = require_once('config/routes.php');
-
-    if ($player->clan) {
-        $pages[20]['menu'] = System::MENU_VILLAGE;
-    }
-    if ($player->rank_num >= 3) {
-        $pages[24]['menu'] = System::MENU_USER;
-    }
-
-    echo $side_menu_start;
-    foreach ($pages as $id => $page) {
-        if (!isset($page['menu']) || $page['menu'] != System::MENU_USER) {
-            continue;
-        }
-
-        echo "<li><a id='sideMenuOption-" . str_replace(' ', '', $page['title']) . "' href='{$system->link}?id=$id'>" . $page['title'] . "</a></li>";
-    }
-
-    echo $action_menu_header;
-    if ($player->in_village) {
-        foreach ($pages as $id => $page) {
-            if (!isset($page['menu']) || $page['menu'] != 'activity') {
-                continue;
-            }
-            // Page ok if an in-village page or player rank is below chuunin
-            if ($page['village_ok'] != System::NOT_IN_VILLAGE || $player->rank_num < 3) {
-                echo "<li><a id='sideMenuOption-" . str_replace(' ', '', $page['title']) . "' href='{$system->link}?id=$id'>" . $page['title'] . "</a></li>";
-            }
-        }
-    } else {
-        foreach ($pages as $id => $page) {
-            if (!isset($page['menu']) || $page['menu'] != 'activity') {
-                continue;
-            }
-            if ($page['village_ok'] != System::ONLY_IN_VILLAGE) {
-                echo "<li><a id='sideMenuOption-" . str_replace(' ', '', $page['title']) . "' href='{$system->link}?id=$id'>" . $page['title'] . "</a></li>";
-            }
-        }
-    }
-
-// In village or not
-    if ($player->in_village) {
-        echo $village_menu_start;
-        foreach ($pages as $id => $page) {
-            if (!isset($page['menu']) || $page['menu'] != System::MENU_VILLAGE) {
-                continue;
-            }
-
-            echo "<li><a id='sideMenuOption-" . str_replace(' ', '', $page['title']) . "' href='{$system->link}?id=$id'>" . $page['title'] . "</a></li>";
-        }
-    }
-
-    if ($player->isModerator() || $player->hasAdminPanel() || $player->isSupportStaff()) {
-        echo $staff_menu_header;
-        if ($player->isSupportStaff()) {
-            echo "<li><a id='sideMenuOption-SupportPanel' href='{$system->link}?id=30'>Support Panel</a></li>";
-        }
-        if ($player->isModerator()) {
-            echo "<li><a id='sideMenuOption-ModPanel' href='{$system->link}?id=16'>Mod Panel</a></li>";
-        }
-        if ($player->hasAdminPanel()) {
-            echo "<li><a id='sideMenuOption-AdminPanel' href='{$system->link}?id=17'>Admin Panel</a></li>";
-        }
-    }
-
-// Logout timer
-    $logout_limit = System::LOGOUT_LIMIT;
-    $time_remaining = ($logout_limit * 60) - (time() - $player->last_login);
-    $logout_time = System::timeRemaining($time_remaining, 'short', false, true) . " remaining";
-
-    $logout_display = $player->isUserAdmin() ? "Disabled" : $logout_time;
-    echo str_replace("<!--LOGOUT_TIMER-->", $logout_display, $side_menu_end);
-
-    if ($logout_display != "Disabled") {
-        echo "<script type='text/javascript'>countdownTimer($time_remaining, 'logoutTimer');</script>";
-    }
-} else {
+    $layout->renderSideMenu($player, $player->system->router);
+}
+else {
     // Get support data
     if(isset($_GET['support_key'])) {
         $support_key = $system->clean($_GET['support_key']);
@@ -353,7 +281,7 @@ if(!$guest_support) {
                 // Send email to user
                 $subject = "Shinobi-Chronicles support request";
                 $message = "Thank you for submitting your support. Click the link below to access your support: \r\n" .
-                    "{$system->link}support.php?support_key={$support_key} \r\n" .
+                    "{$system->router->base_url}support.php?support_key={$support_key} \r\n" .
                     "If the link does not work, your support key is: {$support_key}";
                 $headers = "From: Shinobi-Chronicles<" . System::SC_ADMIN_EMAIL . ">" . "\r\n";
                 $headers .= "Reply-To: " . System::SC_NO_REPLY_EMAIL . "\r\n";
@@ -401,7 +329,7 @@ if(!$guest_support) {
     }
     require('templates/guestSupport.php');
 
-    echo $login_menu;
+    echo $layout->login_menu;
 }
 
-echo $footer;
+$layout->renderFooter();

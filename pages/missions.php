@@ -103,7 +103,7 @@ function runActiveMission(): bool {
 
     if(!empty($_GET['cancel_mission'])) {
         if($player->mission_id == RankManager::JONIN_MISSION_ID) {
-            $system->message("You must visit the <a href='{$system->links['rankup']}'>{$player->village->kage_name}'s
+            $system->message("You must visit the <a href='{$system->router->links['rankup']}'>{$player->village->kage_name}'s
             Office</a> to end this mission.");
             $system->printMessage();
             return true;
@@ -217,7 +217,7 @@ function runActiveMission(): bool {
                 // Jonin exam
                 if($mission->mission_id == 10) {
                     $player->exam_stage = 2;
-                    $self_link = $system->link . '?id=1';
+                    $self_link = $system->router->base_url . '?id=1';
 
                     require_once("levelUp.php");
                     rankUp();

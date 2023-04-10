@@ -92,17 +92,17 @@ $clan_positions = array(
 
         <!--//send message/money/ak-->
         <tr><td style='text-align:center;' colspan='2'>
-			<a href='<?= $system->link ?>?id=2&page=new_message&sender=<?= $viewUser->user_name ?>'>Send Message</a>
+			<a href='<?= $system->router->base_url ?>?id=2&page=new_message&sender=<?= $viewUser->user_name ?>'>Send Message</a>
 
             <?php if($player->rank_num > 1): ?>
-                &nbsp;&nbsp;|&nbsp;&nbsp;<a href='<?= $system->links['profile'] ?>&page=send_money&recipient=<?= $viewUser->user_name ?>'>Send Money</a>
-                &nbsp;&nbsp;|&nbsp;&nbsp;<a href='<?= $system->links['profile'] ?>&page=send_ak&recipient=<?= $viewUser->user_name ?>'>Send AK</a>
+                &nbsp;&nbsp;|&nbsp;&nbsp;<a href='<?= $system->router->links['profile'] ?>&page=send_money&recipient=<?= $viewUser->user_name ?>'>Send Money</a>
+                &nbsp;&nbsp;|&nbsp;&nbsp;<a href='<?= $system->router->links['profile'] ?>&page=send_ak&recipient=<?= $viewUser->user_name ?>'>Send AK</a>
             <?php endif; ?>
             <?php if($viewUser->rank_num >= 3 && $player->team): ?>
                 <?php if($player->user_id == $player->team->leader && !$viewUser->team && !$viewUser->team_invite &&
                     $player->village->name == $viewUser->village->name): ?>
                     &nbsp;&nbsp; |  &nbsp;&nbsp;
-                                <a href='<?= $system->link ?>?id=24&invite=1&user_name=<?= $viewUser->user_name ?>'>Invite to Team</a>
+                                <a href='<?= $system->router->base_url ?>?id=24&invite=1&user_name=<?= $viewUser->user_name ?>'>Invite to Team</a>
                 <?php endif; ?>
             <?php endif; ?>
         </td></tr>
@@ -133,7 +133,7 @@ $clan_positions = array(
             <!--//report player-->
             <tr>
 				<td style='text-align: center;' colspan='2'>
-					<a href='<?= $system->links['report'] ?>&report_type=1&content_id=<?= $viewUser->user_id ?>'>Report Profile/Journal</a>
+					<a href='<?= $system->router->links['report'] ?>&report_type=1&content_id=<?= $viewUser->user_id ?>'>Report Profile/Journal</a>
 				</td>
 			</tr>
 </table>
@@ -207,16 +207,16 @@ $clan_positions = array(
             <?php endif; ?>
         </td></tr>
         <tr><td colspan='2' style='text-align:center;'>
-        <a href='<?= $system->links['mod'] ?>&view_record=<?= $viewUser->user_name ?>'>View Record</a>&nbsp;&nbsp;|&nbsp;&nbsp;
-        <a href='<?= $system->links['mod'] ?>&ban_user_name=<?= $viewUser->user_name ?>'>Ban user</a>
+        <a href='<?= $system->router->links['mod'] ?>&view_record=<?= $viewUser->user_name ?>'>View Record</a>&nbsp;&nbsp;|&nbsp;&nbsp;
+        <a href='<?= $system->router->links['mod'] ?>&ban_user_name=<?= $viewUser->user_name ?>'>Ban user</a>
 
         <?php if($player->isHeadModerator()): ?>
-            &nbsp;&nbsp;|&nbsp;&nbsp;<a href='<?= $system->links['mod'] ?>&unban_user_name=<?= $viewUser->user_name ?>'>Unban user</a>
-            &nbsp;&nbsp;|&nbsp;&nbsp;<a href='<?= $system->links['mod'] ?>&ban_ip_address=<?= $viewUser->last_ip ?>'>Ban IP</a>
-            &nbsp;&nbsp;|&nbsp;&nbsp;<a href='<?= $system->links['mod'] ?>&unban_ip_address=<?= $viewUser->last_ip ?>'>Unban IP</a>
+            &nbsp;&nbsp;|&nbsp;&nbsp;<a href='<?= $system->router->links['mod'] ?>&unban_user_name=<?= $viewUser->user_name ?>'>Unban user</a>
+            &nbsp;&nbsp;|&nbsp;&nbsp;<a href='<?= $system->router->links['mod'] ?>&ban_ip_address=<?= $viewUser->last_ip ?>'>Ban IP</a>
+            &nbsp;&nbsp;|&nbsp;&nbsp;<a href='<?= $system->router->links['mod'] ?>&unban_ip_address=<?= $viewUser->last_ip ?>'>Unban IP</a>
         <?php endif; ?>
         <?php if($player->isUserAdmin()): ?>
-            &nbsp;&nbsp;|&nbsp;&nbsp;<a href='<?= $system->links['admin'] ?>&page=edit_user&user_name=<?= $viewUser->user_name ?>'>Edit user</a>
+            &nbsp;&nbsp;|&nbsp;&nbsp;<a href='<?= $system->router->links['admin'] ?>&page=edit_user&user_name=<?= $viewUser->user_name ?>'>Edit user</a>
         <?php endif; ?>
     </td></tr>
 <?php endif; ?>

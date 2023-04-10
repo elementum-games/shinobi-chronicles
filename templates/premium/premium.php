@@ -532,8 +532,8 @@
                         <form action='<?= $paypal_url ?>' method='post'>
                             <input type='hidden' name='cmd' value='_xclick' />
                             <input type='hidden' name='business' value='<?= $paypal_business_id ?>' />
-                            <input type='hidden' name='cancel_return' value='<?= $system->link ?>' />
-                            <input type='hidden' name='return' value='<?= $system->link ?>' />
+                            <input type='hidden' name='cancel_return' value='<?= $system->router->base_url ?>' />
+                            <input type='hidden' name='return' value='<?= $system->router->base_url ?>' />
                             <input type='hidden' name='amount' value='<?= $pack['cost'] ?>' />
                             <input type='hidden' name='quantity' value='1' />
                             <input type='hidden' name='cn' value='Spirit Shards' />

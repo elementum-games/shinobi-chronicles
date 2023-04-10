@@ -21,13 +21,13 @@
     <tr><th>View Report</th></tr>
     <tr>
         <td>
-            <label>Reported user:</label><a target="_blank" href="<?=$system->links['members']?>&user=<?=$user_names[$report['user_id']]?>"><?=$user_names[$report['user_id']]?></a>
-            <a target="_blank" href="<?=$system->links['mod']?>&view_record=<?=$user_names[$report['user_id']]?>">(View Record)</a>
+            <label>Reported user:</label><a target="_blank" href="<?=$system->router->links['members']?>&user=<?=$user_names[$report['user_id']]?>"><?=$user_names[$report['user_id']]?></a>
+            <a target="_blank" href="<?=$system->router->links['mod']?>&view_record=<?=$user_names[$report['user_id']]?>">(View Record)</a>
             <br />
             <label>Reported by:</label><?=$user_names[$report['reporter_id']]?><br />
             <label>Report type:</label><?=ReportManager::$report_types[$report['report_type']]?>
             <?php if($report['report_type'] == ReportManager::REPORT_TYPE_CHAT): ?>
-                &nbsp;<a href="<?=$system->links['chat_log']?>&report_id=<?=$report['report_id']?>">(View Chat Log)</a>
+                &nbsp;<a href="<?=$system->router->links['chat_log']?>&report_id=<?=$report['report_id']?>">(View Chat Log)</a>
             <?php endif ?>
             <br />
             <?php if($report['status'] != ReportManager::VERDICT_UNHANDLED): ?>

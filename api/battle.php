@@ -15,7 +15,7 @@ try {
 
 $player->loadData(User::UPDATE_NOTHING);
 
-$routes = require __DIR__ . '/../config/routes.php';
+$routes = Router::$routes;
 
 $battle_result = $system->query("SELECT battle_type FROM battles WHERE `battle_id`='{$player->battle_id}' LIMIT 1");
 if($system->db_last_num_rows) {
@@ -23,14 +23,14 @@ if($system->db_last_num_rows) {
 
     $battle_route = null;
     foreach($routes as $page_id => $page) {
-        if(empty($page['battle_api_function_name'])) {
+        if(empty($page->battle_api_function_name)) {
             continue;
         }
-        if(empty($page['battle_type'])) {
+        if(empty($page->battle_type)) {
             continue;
         }
 
-        if($page['battle_type'] == $battle_data['battle_type']) {
+        if($page->battle_type == $battle_data['battle_type']) {
             $battle_route = $page;
         }
     }

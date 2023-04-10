@@ -127,7 +127,7 @@ function sendMoney(System $system, User $player, string $currency_type): void {
                 );
                 
                 $alert_message = $player->user_name . " has sent you &yen;$amount.";
-                Inbox::sendAlert($system, 1, $player->user_id, $recipient['user_id'], $alert_message);
+                Inbox::sendAlert($system, Inbox::ALERT_YEN_RECEIVED, $player->user_id, $recipient['user_id'], $alert_message);
                 
                 $system->message("&yen;{$amount} sent to {$recipient['user_name']}!");
                 
@@ -155,7 +155,7 @@ function sendMoney(System $system, User $player, string $currency_type): void {
                 );
                 
                 $alert_message = $player->user_name . " has sent you $amount Ancient Kunai.";
-                Inbox::sendAlert($system, 2, $player->user_id, $recipient['user_id'], $alert_message);
+                Inbox::sendAlert($system, Inbox::ALERT_AK_RECEIVED, $player->user_id, $recipient['user_id'], $alert_message);
                 
                 $system->message("{$amount} AK sent to {$recipient['user_name']}!");
             }
@@ -177,7 +177,7 @@ function sendMoney(System $system, User $player, string $currency_type): void {
 
     echo "<table class='table'><tr><th>Send {$label}</th></tr>
     <tr><td style='text-align:center;'>
-    <form action='{$system->links['profile']}&page={$page}' method='post'>
+    <form action='{$system->router->links['profile']}&page={$page}' method='post'>
     <b>Your {$label}:</b> {$current_amount}<br />
     <br />
     Send {$label} to:<br />
@@ -196,27 +196,27 @@ function renderProfileSubmenu() {
 
     $submenu_links = [
         [
-            'link' => $system->links['profile'],
+            'link' => $system->router->links['profile'],
             'title' => 'Character',
         ],
         [
-            'link' => $system->links['settings'],
+            'link' => $system->router->links['settings'],
             'title' => 'Settings',
         ],
     ];
     if($player->rank_num > 1) {
         $submenu_links[] = [
-            'link' => $system->links['profile'] . "&page=send_money",
+            'link' => $system->router->links['profile'] . "&page=send_money",
             'title' => 'Send Money',
         ];
         $submenu_links[] = [
-            'link' => $system->links['profile'] . "&page=send_ak",
+            'link' => $system->router->links['profile'] . "&page=send_ak",
             'title' => 'Send AK',
         ];
     }
     if($player->bloodline_id) {
         $submenu_links[] = [
-            'link' => $system->links['bloodline'],
+            'link' => $system->router->links['bloodline'],
             'title' => 'Bloodline',
         ];
     }

@@ -38,7 +38,7 @@
         <?php foreach($offers as $offer): ?>
             <?php $seller_name = $credit_users[$offer['seller']]; ?>
             <tr class="fourColGrid" style="text-align: center;">
-                <td><a href='<?=$system->links['members']?>&user=<?=$offer['seller_name']?>'><?=$offer['seller_name']?></a></td>
+                <td><a href='<?=$system->router->links['members']?>&user=<?=$offer['seller_name']?>'><?=$offer['seller_name']?></a></td>
                 <td>
                     <?=number_format($offer['premium_credits'])?> Ancient Kunai
                 </td>

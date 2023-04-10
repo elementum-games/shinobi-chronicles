@@ -119,13 +119,13 @@ if($battle->battle_text) {
 <table class='table'>
     <tr>
         <th id='bi_th_user' style='width:50%;'>
-            <a href='<?= $system->links['members'] ?>&user=<?= $player->getName() ?>' style='text-decoration:none'><?= $player->getName() ?></a>
+            <a href='<?= $system->router->links['members'] ?>&user=<?= $player->getName() ?>' style='text-decoration:none'><?= $player->getName() ?></a>
         </th>
         <th id='bi_th_opponent' style='width:50%;'>
             <?php if($opponent instanceof AI): ?>
                 <?= $opponent->getName() ?>
             <?php else: ?>
-                <a href='<?= $system->links['members'] ?>&user=<?= $opponent->getName() ?>' style='text-decoration:none'><?= $opponent->getName() ?></a>
+                <a href='<?= $system->router->links['members'] ?>&user=<?= $opponent->getName() ?>' style='text-decoration:none'><?= $opponent->getName() ?></a>
             <?php endif; ?>
         </th>
     </tr>

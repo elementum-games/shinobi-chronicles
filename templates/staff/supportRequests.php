@@ -136,7 +136,7 @@
                 <td>
                     <label style="width:8em; font-weight:bold;">Submitted By:</label>
                     <?php if($supportData['user_id']): ?>
-                        <a href="<?=$system->link?>?id=<?=System::PAGE_IDS['members']?>&user=<?=$supportData['user_name']?>"
+                        <a href="<?=$system->router->base_url?>?id=<?=Router::PAGE_IDS['members']?>&user=<?=$supportData['user_name']?>"
                         target="_blank">
                             <?=$supportData['user_name']?>
                         </a><br />

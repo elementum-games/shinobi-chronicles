@@ -127,7 +127,7 @@ function villageHQ() {
 			}
 
 			echo "<tr id='villagemembertd' class='fourColGrid table_multicolumns'>
-				<td style='width:29%;' class='$class'><a href='{$system->links['members']}&user={$row['user_name']}'>" . $row['user_name'] . "</a></td>
+				<td style='width:29%;' class='$class'><a href='{$system->router->links['members']}&user={$row['user_name']}'>" . $row['user_name'] . "</a></td>
 				<td style='width:20%;text-align:center;' class='$class'>" . $ranks[$row['rank']]['name'] . "</td>
 				<td style='width:20%;text-align:center;' class='$class'>" . $row['level'] . "</td>
 				<td style='width:30%;text-align:center;' class='$class'>" . $row['exp'] . "</td>
@@ -210,7 +210,7 @@ function villageHQ() {
 		</tr>";
 		foreach($teams as $row) {
 			echo "<tr class='table_multicolumns'>
-				<td><a href='{$system->links['members']}&view_team={$row['team_id']}'>" . $row['name'] . "</td>
+				<td><a href='{$system->router->links['members']}&view_team={$row['team_id']}'>" . $row['name'] . "</td>
 				<td style='text-align: center;'>" . $user_names[$row['leader']] . "</td>
 				<td style='text-align:center;'>" . $row['points']  . "</td>
 			</tr>";

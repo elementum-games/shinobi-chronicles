@@ -25,22 +25,22 @@ function displayNotifications() {
 			$link = null;
 			switch($result['battle_type']) {
                 case Battle::TYPE_AI_ARENA:
-                    $link = $system->links['arena'];
+                    $link = $system->router->links['arena'];
 					break;
                 case Battle::TYPE_AI_MISSION:
-                    $link = $system->links['mission'];
+                    $link = $system->router->links['mission'];
                     break;
                 case Battle::TYPE_AI_RANKUP:
-                    $link = $system->links['rankup'];
+                    $link = $system->router->links['rankup'];
                     break;
 				case Battle::TYPE_SPAR:
-				    $link = $system->links['spar'];
+				    $link = $system->router->links['spar'];
 					break;
                 case Battle::TYPE_FIGHT:
-                    $link = $system->links['battle'];
+                    $link = $system->router->links['battle'];
                     break;
                /* case Battle::TYPE_CHALLENGE:
-                    $link = $system->links['spar'];
+                    $link = $system->router->links['spar'];
                     break;*/
 			}
 			if($link) {
@@ -50,27 +50,27 @@ function displayNotifications() {
 	}
 	// New PM
 	if($new_inbox_message || $new_inbox_alerts) {
-		$notifications[] = "<a class='link' href='{$system->link}?id=2'>You have unread PM(s)</a>";
+		$notifications[] = "<a class='link' href='{$system->router->base_url}?id=2'>You have unread PM(s)</a>";
 	}
     // Official Warning
     if($player->getOfficialWarnings(true)) {
-        $notifications[] = "<a class='link' href='{$system->links['settings']}&view=account'>New Official Warning(s)!</a>";
+        $notifications[] = "<a class='link' href='{$system->router->links['settings']}&view=account'>New Official Warning(s)!</a>";
     }
     //Reports
 	if($player->staff_manager->isModerator() && $reportManager->getActiveReports(true)) {
-        $notifications[] = "<a class='link' href='{$system->links['report']}&page=view_all_reports'>New report(s)!</a>";
+        $notifications[] = "<a class='link' href='{$system->router->links['report']}&page=view_all_reports'>New report(s)!</a>";
 	}
     //Spar
 	if($player->challenge) {
-		$notifications[] = "<a class='link' href='{$system->links['spar']}}'>Challenged!</a>";
+		$notifications[] = "<a class='link' href='{$system->router->links['spar']}}'>Challenged!</a>";
 	}
 	//Team
 	if($player->team_invite) {
-		$notifications[] = "<a class='link' href='{$system->link}?id=24'>Invited to team!</a>";
+		$notifications[] = "<a class='link' href='{$system->router->base_url}?id=24'>Invited to team!</a>";
 	}
     //Proposal
     if($player->spouse < 0) {
-        $notifications[] = "<a class='link' href='{$system->links['marriage']}'>Proposal received!</a>";
+        $notifications[] = "<a class='link' href='{$system->router->links['marriage']}'>Proposal received!</a>";
     }
 	
 

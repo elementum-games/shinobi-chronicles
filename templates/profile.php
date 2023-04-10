@@ -351,7 +351,7 @@ $clan_positions = [
 		
     <label style='width:<?= $label_width ?>;'>Spouse:</label>
     <?php if($player->spouse > 0): ?>
-        <a href='<?= $system->links['members'] ?>&user=<?= $player->spouse_name ?>'><?= $player->spouse_name ?></a><br />
+        <a href='<?= $system->router->links['members'] ?>&user=<?= $player->spouse_name ?>'><?= $player->spouse_name ?></a><br />
         <label style='width:<?= $label_width ?>;'>Anniversary:</label> <?= Date('F j, Y', $player->marriage_time) ?><br />
     <?php else: ?>
         None<br />

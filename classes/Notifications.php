@@ -10,7 +10,7 @@ class Notifications {
         // New PM
         $playerInbox = new InboxManager($system, $player);
         if($playerInbox->checkIfUnreadMessages() || $playerInbox->checkIfUnreadAlerts()) {
-            $notifications[] = new Notification("{$system->link}?id=2", "You have unread PM(s)");
+            $notifications[] = new Notification("{$system->router->base_url}?id=2", "You have unread PM(s)");
         }
 
         if(!$ajax) {
@@ -88,22 +88,22 @@ class Notifications {
                 $link = null;
                 switch($result['battle_type']) {
                     case Battle::TYPE_AI_ARENA:
-                        $link = $system->links['arena'];
+                        $link = $system->router->links['arena'];
                         break;
                     case Battle::TYPE_AI_MISSION:
-                        $link = $system->links['mission'];
+                        $link = $system->router->links['mission'];
                         break;
                     case Battle::TYPE_AI_RANKUP:
-                        $link = $system->links['rankup'];
+                        $link = $system->router->links['rankup'];
                         break;
                     case Battle::TYPE_SPAR:
-                        $link = $system->links['spar'];
+                        $link = $system->router->links['spar'];
                         break;
                     case Battle::TYPE_FIGHT:
-                        $link = $system->links['battle'];
+                        $link = $system->router->links['battle'];
                         break;
                     /* case Battle::TYPE_CHALLENGE:
-                         $link = $system->links['spar'];
+                         $link = $system->router->links['spar'];
                          break;*/
                 }
                 if($link) {
@@ -117,7 +117,7 @@ class Notifications {
 		WHERE `recipient`='{$player->user_id}' AND `message_read`=0 LIMIT 1"
         );
         if($system->db_last_num_rows) {
-            $notifications[] = new Notification("{$system->link}?id=2", "You have unread PM(s)");
+            $notifications[] = new Notification("{$system->router->base_url}?id=2", "You have unread PM(s)");
         }*/
 
         if($player->isModerator()) {
@@ -125,22 +125,22 @@ class Notifications {
                 "SELECT `report_id` FROM `reports` WHERE `status` = 0 AND `staff_level` < $player->staff_level LIMIT 1"
             );
             if($system->db_last_num_rows > 0) {
-                $notifications[] = new Notification("{$system->links['report']}&page=view_all_reports", "New report(s)!");
+                $notifications[] = new Notification("{$system->router->links['report']}&page=view_all_reports", "New report(s)!");
             }
         }
 
         if($player->challenge) {
-            $notifications[] = new Notification($system->links['spar'], "Challenged!");
+            $notifications[] = new Notification($system->router->links['spar'], "Challenged!");
         }
 
         if($player->team_invite) {
-            $notifications[] = new Notification("{$system->link}?id=24", "Invited to team!");
+            $notifications[] = new Notification("{$system->router->base_url}?id=24", "Invited to team!");
         }
 
         if($player->spouse < 0) {
-            $notifications[] = new Notification($system->links['marriage'], "Proposal received!");
+            $notifications[] = new Notification($system->router->links['marriage'], "Proposal received!");
         }
-        // "<a class='link' href='{$system->links['marriage']}'>Proposal received!</a>";
+        // "<a class='link' href='{$system->router->links['marriage']}'>Proposal received!</a>";
 
         return $notifications;
     }

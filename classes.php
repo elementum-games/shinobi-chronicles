@@ -2,6 +2,7 @@
 
 require_once __DIR__ . "/classes/EntityId.php";
 require_once __DIR__ . "/classes/System.php";
+require_once __DIR__ . "/classes/Router.php";
 require_once __DIR__ . "/classes/Auth.php";
 require_once __DIR__ . "/classes/API.php";
 

@@ -5,7 +5,7 @@ require_once("classes/_autoload.php");
 $system = new System();
 
 if(isset($_SESSION['user_id'])) {
-    header("Location: {$system->link}}");
+    header("Location: {$system->router->base_url}}");
     exit;
 }
 
@@ -36,14 +36,14 @@ if(isset($_GET['act'])) {
 
         $result = $system->query("UPDATE `users` SET `user_verified`=1 WHERE `user_name`='$user_name' AND `verify_key`='$key' LIMIT 1");
         if($system->db_last_affected_rows > 0) {
-            $system->message("Account activated! You may log in and start playing. <a href='{$system->link}'>Continue</a>");
+            $system->message("Account activated! You may log in and start playing. <a href='{$system->router->base_url}'>Continue</a>");
             $system->printMessage();
         }
         else {
             $accountData = $system->query("SELECT `user_verified` FROM `users` WHERE `user_name`='$user_name' AND `verify_key`='$key' LIMIT 1");
             if(!$system->db_last_num_rows) {
                 $system->message("User not found!. Please contact an administrator. Staff can be found on
-                        <a href='{$system->links['discord']}' target='_blank'>Discord.</a>");
+                        <a href='{$system->router->links['discord']}' target='_blank'>Discord.</a>");
             }
             else {
                 $accountData = $system->db_fetch($accountData);
@@ -52,7 +52,7 @@ if(isset($_GET['act'])) {
                 }
                 else {
                     $system->message("Account activation error! Please contact an administrator. Staff can be found on
-                        <a href='{$system->links['discord']}' target='_blank'>Discord.</a>");
+                        <a href='{$system->router->links['discord']}' target='_blank'>Discord.</a>");
                 }
             }
             $system->printMessage();
@@ -70,7 +70,7 @@ if(isset($_GET['act'])) {
 
             $subject = "Shinobi-Chronicles account verification";
             $message = "Welcome to Shinobi-Chronicles RPG. Please visit the link below to verify your account: \r\n" .
-                "{$system->link}register.php?act=verify&username={$user_name}&verify_key={$result['verify_key']}";
+                "{$system->router->base_url}register.php?act=verify&username={$user_name}&verify_key={$result['verify_key']}";
             $headers = "From: Shinobi-Chronicles<" . System::SC_ADMIN_EMAIL . ">" . "\r\n";
             $headers .= "Reply-To: " . System::SC_NO_REPLY_EMAIL . "\r\n";
             if(mail($result['email'], $subject, $message, $headers)) {
@@ -223,7 +223,7 @@ if(isset($_POST['register'])) {
 
         $subject = 'Shinobi-Chronicles account verification';
         $message = "Welcome to Shinobi-Chronicles RPG. Please visit the link below to verify your account: \r\n
-		{$system->link}register.php?act=verify&username={$user_name}&verify_key=$verification_code";
+		{$system->router->base_url}register.php?act=verify&username={$user_name}&verify_key=$verification_code";
         $headers = "From: Shinobi-Chronicles<" . System::SC_ADMIN_EMAIL . ">" . "\r\n";
         $headers .= "Reply-To: " . System::SC_NO_REPLY_EMAIL . "\r\n";
         if(mail($email, $subject, $message, $headers)) {
@@ -268,7 +268,7 @@ if(!$register_ok) {
 
 	<table class='table'><tr><th>Create an account</th></tr>
 	<tr><td>
-		<form action='{$system->link}register.php' method='post'>
+		<form action='{$system->router->base_url}register.php' method='post'>
 		<label for='user_name'>Username</label>
 			<input type='text' name='user_name' value='$user_name' /><br />
 			<br />

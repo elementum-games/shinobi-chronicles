@@ -19,7 +19,7 @@
                 <b>Time Remaining:</b> <?=$ban_expire?>
             <?php endif ?>
             <br />
-            Visit the <a href="<?=$system->link?>/support.php">Support Center</a> to appeal this
+            Visit the <a href="<?=$system->router->base_url?>/support.php">Support Center</a> to appeal this
             <?=($ban_type == StaffManager::BAN_TYPE_IP ? 'restriction' : 'ban')?>.
         </td>
     </tr>

@@ -102,8 +102,8 @@ class InboxManager {
         // get all members
         $convo_data['convo_members'] = $this->getConvoMembers($convo_id);
         $convo_data['self'] = $this->user->user_id;
-        $convo_data['profile_link'] = $this->system->links['members'] . '&user=';
-        $convo_data['report_link'] = $this->system->links['report'] . '&report_type=2&content_id=';
+        $convo_data['profile_link'] = $this->system->router->links['members'] . '&user=';
+        $convo_data['report_link'] = $this->system->router->links['report'] . '&report_type=2&content_id=';
 
         // send the max character limit
         $convo_data['max_characters'] = $this->getMaxMessageLength();

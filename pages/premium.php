@@ -1055,7 +1055,7 @@ function premium() {
         $paypal_url = 'https://www.paypal.com/cgi-bin/webscr';
         $paypal_business_id = 'lsmjudoka05@yahoo.com';
     }
-    $paypal_listener_url = $system->link . 'paypal_listener.php';
+    $paypal_listener_url = $system->router->base_url . 'paypal_listener.php';
 
     //Load premium seals
     $baseDisplay = ForbiddenSeal::$benefits[0];
@@ -1176,7 +1176,7 @@ function premiumCreditExchange() {
             //Add system log
 			$system->log("Kunai Exchange", "Completed Sale", $log_data);
             //Notify seller of purchase
-			Inbox::sendAlert($system, 3, $player->user_id, $offer['seller'], $alert_message);
+			Inbox::sendAlert($system, Inbox::ALERT_AK_OFFER_COMPLETED, $player->user_id, $offer['seller'], $alert_message);
 
 			$system->message("Ancient Kunai purchased!");
 			$system->printMessage();

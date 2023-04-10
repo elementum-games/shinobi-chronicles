@@ -406,9 +406,9 @@ class SupportManager {
         if($this->staff) {
             if($support_data['user_id']) {
                 $message = "Your support {$support_data['subject']} has been updated and can be viewed here <a href=\'" .
-                    $this->system->link . "support.php?support_id=" . $support_id . "\'>" .
-                    "{$this->system->link}support.php?support_id=$support_id</a>";
-                Inbox::sendAlert($this->system, 4, $this->user_id, $support_data['user_id'], $message);
+                    $this->system->router->base_url . "support.php?support_id=" . $support_id . "\'>" .
+                    "{$this->system->router->base_url}support.php?support_id=$support_id</a>";
+                Inbox::sendAlert($this->system, Inbox::ALERT_SUPPORT_REQUEST_UPDATED, $this->user_id, $support_data['user_id'], $message);
             }
         }
         // Email if ticket submitted by guest
@@ -418,7 +418,7 @@ class SupportManager {
 
             $subject = "Shinobi-Chronicles support request updated";
             $message = "Your support was updated by {$admin_name}. Click the link below to access your support: \r\n" .
-                "{$this->system->link}support.php?support_key={$support_data['support_key']} \r\n" .
+                "{$this->system->router->base_url}support.php?support_key={$support_data['support_key']} \r\n" .
                 "If the link does not work, your support key is: {$support_data['support_key']}";
             $headers = "From: Shinobi-Chronicles<" . System::SC_ADMIN_EMAIL . ">" . "\r\n";
             $headers .= "Reply-To: " . System::SC_NO_REPLY_EMAIL . "\r\n";

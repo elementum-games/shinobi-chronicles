@@ -60,7 +60,8 @@ const Travel = ({
   travelAPILink,
   missionLink,
   membersLink,
-  attackLink
+  attackLink,
+  playerRank
 }) => {
   const [feedback, setFeedback] = React.useState(null);
   const [mapData, setMapData] = React.useState(null);

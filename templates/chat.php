@@ -131,7 +131,7 @@
                         <div id='user_data_container'>
                             <div class="avatarContainer"><img src="<?=$post['avatar']?>"/></div>
                             <div class="character_info">
-                                <a href="<?=$system->links['members']?>&user=<?=$post['user_name']?>"
+                                <a href="<?=$system->router->links['members']?>&user=<?=$post['user_name']?>"
                                    class="<?=$post['class']?> <?=$post['status_type']?>"><?=$post['user_name']?></a><br />
                                 <p>
                                     <img class='villageIco' src="./images/village_icons/<?=strtolower($post['village'])?>.png" alt="<?=$post['village']?> Village"
@@ -156,7 +156,7 @@
                                     <img class='small_image' src='../images/delete_icon.png' />
                                 </a>", $post['post_id'])?>
                         <?php endif ?>
-                        <?= sprintf("<a class='imageLink' href='{$system->links['report']}&report_type="
+                        <?= sprintf("<a class='imageLink' href='{$system->router->links['report']}&report_type="
                             . ReportManager::REPORT_TYPE_CHAT . "&content_id=%d'>
                         <img class='small_image' src='../images/report_icon.png' /></a>", $post['post_id'])?>
                     </td>
