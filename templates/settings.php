@@ -74,7 +74,7 @@
             <td style="text-align: center;">
                 By changing these settings, you will opt out of level or ranking up.<br />
                 <form action="<?=$self_link?>" method="post">
-                    Level up<input type="checkbox" name="level_up" <?=($player->level_up ? "checked='checked'" : "")?> /><br />
+                    Level up (max hold: 2 levels)<input type="checkbox" name="level_up" <?=($player->level_up ? "checked='checked'" : "")?> /><br />
                     Rank up<input type="checkbox" name="rank_up" <?=($player->rank_up ? "checked='checked'" : "")?> /><br />
                     <input type="submit" name="level_rank_up" value="Update" />
                 </form>

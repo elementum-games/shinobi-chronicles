@@ -22,7 +22,10 @@ function userProfile() {
     $exp_needed = $player->expForNextLevel();
 
     // Level up
-    if($player->level < $player->rank->max_level && $player->exp >= $exp_needed && $player->level_up) {
+    if($player->level < $player->rank->max_level
+        && $player->exp >= $exp_needed
+        && ($player->level_up || $player->exp > $player->expForNextLevel(2))
+    ) {
         if($player->battle_id) {
             require 'templates/level_rank_up/level_up_in_battle.php';
         }

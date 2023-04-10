@@ -1728,8 +1728,8 @@ class User extends Fighter {
         return floor($max_size / $divisor) . $suffix;
     }
 
-    public function expForNextLevel() {
-        return $this->rank->exp_per_level * (($this->level + 1) - $this->rank->base_level) + ($this->rank->base_stats * 10);
+    public function expForNextLevel(?int $extra_levels = 0): float|int {
+        return $this->rank->exp_per_level * (($this->level + 1 + $extra_levels) - $this->rank->base_level) + ($this->rank->base_stats * 10);
     }
 
     public function hasEquippedJutsu(int $jutsu_id): bool {
