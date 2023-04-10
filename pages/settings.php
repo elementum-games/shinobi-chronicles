@@ -224,12 +224,14 @@ function userSettings() {
             $data_changed = true;
             $player->level_up = $level_up;
         }
+
         if($data_changed) {
             $system->message("Rank and level settings updated!");
         }
         else {
             $system->message("You must change rank or level settings!");
         }
+
         $system->printMessage();
     }
     else if(!empty($_POST['censor_explicit_language'])) {

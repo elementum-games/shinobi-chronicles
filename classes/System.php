@@ -424,14 +424,14 @@ class System {
             $message = $error_message;
         }
         else {
-            $message = "An error has occured. Please make a report to the administrators if the problem persists.";
+            $message = "An error has occurred. Please make a report to the administrators if the problem persists.";
         }
 
         $this->message($message);
         if($this->is_api_request) {
             API::exitWithError($message);
         }
-        $this->printMessage();
+        $this->printMessage(true);
 
         global $side_menu_start;
         global $side_menu_end;
@@ -445,7 +445,7 @@ class System {
                 continue;
             }
 
-            echo "<li><a href='{$this->link}?id=$id'>" . $page->title . "</a></li>";
+            echo "<li><a href='{$this->router->base_url}?id=$id'>" . $page->title . "</a></li>";
         }
         echo $side_menu_end . $footer;
         exit;

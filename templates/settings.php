@@ -73,9 +73,10 @@
         <tr>
             <td style="text-align: center;">
                 By changing these settings, you will opt out of level or ranking up.<br />
+                (Note: Disabling level up will only allow you to hold 2 levels lower than your exp)
                 <form action="<?=$self_link?>" method="post">
-                    Level up (max hold: 2 levels)<input type="checkbox" name="level_up" <?=($player->level_up ? "checked='checked'" : "")?> /><br />
-                    Rank up<input type="checkbox" name="rank_up" <?=($player->rank_up ? "checked='checked'" : "")?> /><br />
+                    Allow level up<input type="checkbox" name="level_up" <?=($player->level_up ? "checked='checked'" : "")?> /><br />
+                    Allow rank up<input type="checkbox" name="rank_up" <?=($player->rank_up ? "checked='checked'" : "")?> /><br />
                     <input type="submit" name="level_rank_up" value="Update" />
                 </form>
             </td>
