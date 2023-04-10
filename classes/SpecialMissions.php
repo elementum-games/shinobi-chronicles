@@ -211,10 +211,10 @@ class SpecialMission {
 
         // Village info
         $villages = TravelManager::fetchVillageLocationsByCoordsStr($this->system);
-        foreach ($villages as $village) {
-            $location = TravelCoords::fromDbString($village['location']);
-            self::$target_villages[$village['name']]['x'] = $location->x;
-            self::$target_villages[$village['name']]['y'] = $location->y;
+        foreach ($villages as $coords => $name) {
+            $location = TravelCoords::fromDbString($coords);
+            self::$target_villages[$name]['x'] = $location->x;
+            self::$target_villages[$name]['y'] = $location->y;
         }
 
         // generate a new target if null

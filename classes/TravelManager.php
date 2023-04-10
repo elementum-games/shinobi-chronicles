@@ -304,7 +304,7 @@ class TravelManager {
     }
 
     /**
-     * @return TravelCoords[] travel coords per village, keyed by village name
+     * @return array village names, keyed by travel coords str
      */
     public static function fetchVillageLocationsByCoordsStr(System $system): array {
         $village_locations = [];
