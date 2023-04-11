@@ -289,8 +289,8 @@ function geninExam(System $system, User $player, RankManager $rankManager) {
                     if($system->db_last_num_rows > 0) {
                         $result = $system->db_fetch($result);
                         $clan_name = $result['name'];
-                        $player->clan = array();
-                        $player->clan['id'] = $bloodlines[$bloodline_id]['clan_id'];
+                        $player->clan = Clan::loadFromId($system, $bloodlines[$bloodline_id]['clan_id']);
+                        $player->clan_id = $player->clan->id;
                         $player->clan_office = 0;
                     }
 
@@ -363,9 +363,8 @@ function geninExam(System $system, User $player, RankManager $rankManager) {
 
                 $clan_id = $clan_rolls[mt_rand(0, count($clan_rolls) - 1)];
 
-
-                $player->clan = array();
-                $player->clan['id'] = $clan_id;
+                $player->clan = Clan::loadFromId($system, $clan_id);
+                $player->clan_id = $clan_id;
                 $clan_name = $clans[$clan_id]['name'];
             }
 

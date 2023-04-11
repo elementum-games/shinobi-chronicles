@@ -293,15 +293,15 @@ class Mission {
             throw new Exception("You are already on a mission!");
         }
 
-        $fight_timer = 20 * 1000;
-        if($player->last_ai_ms > System::currentTimeMs() - $fight_timer) {
-            throw new Exception("Please wait " . ($player->last_ai_ms - (System::currentTimeMs() - $fight_timer) / 1000) . " more seconds!");
+        $fight_timer = System::ARENA_COOLDOWN;
+        $max_last_ai_ms = System::currentTimeMs() - $fight_timer;
+        if($player->last_ai_ms > $max_last_ai_ms) {
+            throw new Exception("Please wait " . ceil(($player->last_ai_ms - $max_last_ai_ms) / 1000) . " more seconds!");
         }
 
         $mission = new Mission($mission_id, $player);
 
         $player->mission_id = $mission_id;
-
 
         return $mission;
     }

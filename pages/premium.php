@@ -84,7 +84,7 @@ function premium() {
 
 	if($player->clan) {
 
-		$system->query("SELECT `clan_id`, `name` FROM `clans` WHERE `village` = '{$player->village->name}' AND `clan_id` != '{$player->clan['id']}' AND `bloodline_only` = '0'");
+		$system->query("SELECT `clan_id`, `name` FROM `clans` WHERE `village` = '{$player->village->name}' AND `clan_id` != '{$player->clan->id}' AND `bloodline_only` = '0'");
 
 		while($village_clans = $system->db_fetch()) {
 			$available_clans[$village_clans['clan_id']] = stripslashes($village_clans['name']);
@@ -92,7 +92,7 @@ function premium() {
 
 	}
 
-	if($player->bloodline_id && $player->clan['id'] != $player->bloodline->clan_id) {
+	if($player->bloodline_id && $player->clan->id != $player->bloodline->clan_id) {
 		$system->query(sprintf("SELECT `clan_id`, `name` FROM `clans` WHERE `clan_id` = '%d'", $player->bloodline->clan_id));
 		$result = $system->db_fetch();
 		$available_clans[$result['clan_id']] = stripslashes($result['name']);
@@ -129,8 +129,8 @@ function premium() {
                 $player->exp = User::BASE_EXP;
                 $player->bloodline_id = 0;
                 $player->bloodline_name = '';
-                $player->clan = array();
-                $player->clan['id'] = 0;
+                $player->clan = null;
+                $player->clan_id = 0;
                 $player->location = $player->village_location;
                 $player->pvp_wins = 0;
                 $player->pvp_losses = 0;
@@ -503,12 +503,12 @@ function premium() {
                     throw new Exception("You do not have enough Ancient Kunai!");
                 }
                 //Check clan office detail & remove player from clan data if present
-                if ($player->clan && $player->clan['leader'] == $player->user_id) {
-                    $system->query("UPDATE `clans` SET `leader` = '0' WHERE `clan_id` = '{$player->clan['id']}'");
-                } else if ($player->clan && $player->clan['elder_1'] == $player->user_id) {
-                    $system->query("UPDATE `clans` SET `elder_1` = '0' WHERE `clan_id` = '{$player->clan['id']}'");
-                } else if ($player->clan && $player->clan['elder_2'] == $player->user_id) {
-                    $system->query("UPDATE `clans` SET `elder_2` = '0' WHERE `clan_id` = '{$player->clan['id']}'");
+                if ($player->clan && $player->clan->leader_id == $player->user_id) {
+                    $system->query("UPDATE `clans` SET `leader` = '0' WHERE `clan_id` = '{$player->clan->id}'");
+                } else if ($player->clan && $player->clan->elder_1_id == $player->user_id) {
+                    $system->query("UPDATE `clans` SET `elder_1` = '0' WHERE `clan_id` = '{$player->clan->id}'");
+                } else if ($player->clan && $player->clan->elder_2_id == $player->user_id) {
+                    $system->query("UPDATE `clans` SET `elder_2` = '0' WHERE `clan_id` = '{$player->clan->id}'");
                 }
                 //Remove office from player data if present
                 if ($player->clan_office) {
@@ -535,8 +535,8 @@ function premium() {
                     $clan_result = $system->db_fetch($result);
 
 
-                    $player->clan = array();
-                    $player->clan['id'] = $clan_id;
+                    $player->clan = Clan::loadFromId($system, $clan_id);
+                    $player->clan_id = $clan_id;
                     $message .= "<br />With your new bloodline you have been kicked out of your previous clan, and have been accepted by
 				    the " . $clan_result['name'] . " Clan.";
                 }
@@ -868,14 +868,14 @@ function premium() {
 			}
             else {
                 //Update clan data if player holds a seat
-                if ($player->clan['leader'] == $player->user_id) {
-                    $system->query("UPDATE `clans` SET `leader` = '0' WHERE `clan_id` = '{$player->clan['id']}'");
+                if ($player->clan->leader_id == $player->user_id) {
+                    $system->query("UPDATE `clans` SET `leader` = '0' WHERE `clan_id` = '{$player->clan->id}'");
                 }
-                else if ($player->clan['elder_1'] == $player->user_id) {
-                    $system->query("UPDATE `clans` SET `elder_1` = '0' WHERE `clan_id` = '{$player->clan['id']}'");
+                else if ($player->clan->elder_1_id == $player->user_id) {
+                    $system->query("UPDATE `clans` SET `elder_1` = '0' WHERE `clan_id` = '{$player->clan->id}'");
                 }
-                else if ($player->clan['elder_2'] == $player->user_id) {
-                    $system->query("UPDATE `clans` SET `elder_2` = '0' WHERE `clan_id` = '{$player->clan['id']}'");
+                else if ($player->clan->elder_2_id == $player->user_id) {
+                    $system->query("UPDATE `clans` SET `elder_2` = '0' WHERE `clan_id` = '{$player->clan->id}'");
                 }
                 //Remove clan seat from player if they hold seat
                 if ($player->clan_office) {
@@ -946,8 +946,8 @@ function premium() {
 
                     $clan_id = $clan_rolls[mt_rand(0, count($clan_rolls) - 1)];
 
-                    $player->clan = array();
-                    $player->clan['id'] = $clan_id;
+                    $player->clan = Clan::loadFromId($system, $clan_id);
+                    $player->clan_id = $clan_id;
                     $clan_name = $clans[$clan_id]['name'];
 
                     $system->message("You have moved to the $village village, and been placed in the $clan_name clan.");
@@ -967,7 +967,7 @@ function premium() {
 		try {
             //Check if clan exists and playe not in clan
 			$clan_exists = in_array($new_clan_id, array_keys($available_clans));
-			if( ($new_clan_id == $player->clan['id']) || !$clan_exists) {
+			if( ($new_clan_id == $player->clan->id) || !$clan_exists) {
 				throw new Exception("Invalid clan!");
 			}
 
@@ -979,7 +979,7 @@ function premium() {
 
 			if(!isset($_POST['confirm_clan_change'])) {
                 $confirmation_type = 'confirm_clan_change';
-                $confirmation_string = "Are you sure you want to move from the {$player->clan['name']} clan to the
+                $confirmation_string = "Are you sure you want to move from the {$player->clan->name} clan to the
                 $clan_name clan?<br /><br />
                 <b>(IMPORTANT: This is non-reversable once completed, if you want to return to your original clan you 
                 will have to pay a higher transfer fee)</b><br />";
@@ -992,26 +992,26 @@ function premium() {
                 // Cost
                 $player->subtractPremiumCredits(
                     $akCost,
-                    "Changed clan from {$player->clan['name']} ({$player->clan['id']}) to $clan_name ({$new_clan_id})"
+                    "Changed clan from {$player->clan->name} ({$player->clan->id}) to $clan_name ({$new_clan_id})"
                 );
                 $player->clan_changes++;
 
                 // Remove player from clan data, if seat held
-                if ($player->clan['leader'] == $player->user_id) {
-                    $system->query("UPDATE `clans` SET `leader` = '0' WHERE `clan_id` = '{$player->clan['id']}'");
+                if ($player->clan->leader_id == $player->user_id) {
+                    $system->query("UPDATE `clans` SET `leader` = '0' WHERE `clan_id` = '{$player->clan->id}'");
                 }
-                else if ($player->clan['elder_1'] == $player->user_id) {
-                    $system->query("UPDATE `clans` SET `elder_1` = '0' WHERE `clan_id` = '{$player->clan['id']}'");
+                else if ($player->clan->elder_1_id == $player->user_id) {
+                    $system->query("UPDATE `clans` SET `elder_1` = '0' WHERE `clan_id` = '{$player->clan->id}'");
                 }
-                else if ($player->clan['elder_2'] == $player->user_id) {
-                    $system->query("UPDATE `clans` SET `elder_2` = '0' WHERE `clan_id` = '{$player->clan['id']}'");
+                else if ($player->clan->elder_2_id == $player->user_id) {
+                    $system->query("UPDATE `clans` SET `elder_2` = '0' WHERE `clan_id` = '{$player->clan->id}'");
                 }
                 //Remove seat from player if held
                 if($player->clan_office) {
                     $player->clan_office = 0;
                 }
                 //Set new clan
-                $player->clan['id'] = $new_clan_id;
+                $player->clan->id = $new_clan_id;
                 $system->message("You have moved to the $clan_name clan.");
             }
 		} catch (Exception $e) {

@@ -79,6 +79,7 @@ function missions(): bool {
 			$view = $max_mission_rank;
 		}
 	}
+
 	echo "<table class='table'><tr><th>" . Mission::$rank_names[$view] . " Missions</th></tr>
 	<tr><td style='text-align:center;'>You can go on village missions here. As a " . $RANK_NAMES[$player->rank_num] . " you
 	can take on up to " . Mission::$rank_names[$max_mission_rank] . " missions.</td></tr>
@@ -90,7 +91,8 @@ function missions(): bool {
 		echo "<a href='$self_link&start_mission=$id'><p class='button' style='margin:5px;'>" . $mission['name'] . "</p></a><br />";
 	}
 	echo "</td></tr></table>";
-	return true;
+
+    return true;
 }
 
 /**
@@ -255,12 +257,12 @@ function runActiveMission(): bool {
 
                 $point_gain = 1;
                 $system->query(
-                    "UPDATE `clans` SET `points`=`points`+$point_gain WHERE `clan_id`={$player->clan['id']} LIMIT 1"
+                    "UPDATE `clans` SET `points`=`points`+$point_gain WHERE `clan_id`={$player->clan->id} LIMIT 1"
                 );
 
                 echo "<table class='table'><tr><th>Current Mission</th></tr>
 				<tr><td style='text-align:center;'><span style='font-weight:bold;'>$mission->name Complete</span><br />
-				You have completed your mission for clan {$player->clan['name']}.<br />
+				You have completed your mission for clan {$player->clan->name}.<br />
 				You have been paid &yen;$mission->money.<br />
 				You have earned $point_gain reputation for your clan.<br />
 				<a href='$self_link'>Continue</a>

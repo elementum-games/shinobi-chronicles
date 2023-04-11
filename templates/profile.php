@@ -336,7 +336,7 @@ $clan_positions = [
 		<label style='width:<?= $label_width ?>;'>Level:</label> <?= $player->level ?><br />
 		<label style='width:<?= $label_width ?>;'>Rank:</label> <?= $player->rank->name ?><br />
         <?php if($player->clan): ?>
-			<label style='width:<?= $label_width ?>;'>Clan:</label> <?= $player->clan['name'] ?>
+			<label style='width:<?= $label_width ?>;'>Clan:</label> <?= $player->clan->name ?>
 			<br />
             <?php if($player->clan_office): ?>
                 <label style='width:<?= $label_width ?>;'>Clan Rank:</label> <?= $clan_positions[$player->clan_office] ?>

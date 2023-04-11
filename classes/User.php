@@ -12,6 +12,7 @@ require_once __DIR__ . "/Travel.php";
 require_once __DIR__ . "/StaffManager.php";
 require_once __DIR__ . "/Rank.php";
 require_once __DIR__ . "/Village.php";
+require_once __DIR__ . "/Clan.php";
 
 /*	Class:		User
 	Purpose:	Fetch user data and load into class variables.
@@ -118,7 +119,9 @@ class User extends Fighter {
     public $support_level;
     public int $bloodline_id;
     public $bloodline_name;
-    public $clan;
+
+    public int $clan_id = 0;
+    public ?Clan $clan = null;
 
     public TravelCoords $location;
     public TravelCoords $village_location;
@@ -634,32 +637,11 @@ class User extends Fighter {
         }
 
         // Clan
-        $this->clan = $user_data['clan_id'];
+        $this->clan_id = (int)$user_data['clan_id'];
         $this->clan_office = 0;
-        if($this->clan) {
-            $result = $this->system->query("SELECT * FROM `clans` WHERE `clan_id`='$this->clan' LIMIT 1");
-            if($this->system->db_last_num_rows == 0) {
-                $this->clan = false;
-            }
-            else {
-                $clan_data = $this->system->db_fetch($result);
-                $this->clan = [
-                    'id' => $clan_data['clan_id'],
-                    'name' => $clan_data['name'],
-                    'village' => $clan_data['village'],
-                    'bloodline_only' => $clan_data['bloodline_only'],
-                    'boost' => $clan_data['boost'],
-                    'boost_amount' => $clan_data['boost_amount'],
-                    'points' => $clan_data['points'],
-                    'leader' => $clan_data['leader'],
-                    'elder_1' => $clan_data['elder_1'],
-                    'elder_2' => $clan_data['elder_2'],
-                    'challenge_1' => $clan_data['challenge_1'],
-                    'logo' => $clan_data['logo'],
-                    'motto' => $clan_data['motto'],
-                    'info' => $clan_data['info'],
-                ];
-
+        if($this->clan_id) {
+            $this->clan = Clan::loadFromId($this->system, $this->clan_id);
+            if($this->clan) {
                 $this->clan_office = $user_data['clan_office'];
             }
         }
@@ -1443,7 +1425,7 @@ class User extends Fighter {
 		`bloodline_id` = '$this->bloodline_id',
 		`bloodline_name` = '$this->bloodline_name',";
         if($this->clan) {
-            $query .= "`clan_id` = '{$this->clan['id']}',
+            $query .= "`clan_id` = '{$this->clan->id}',
 			`clan_office`='{$this->clan_office}',";
         }
 

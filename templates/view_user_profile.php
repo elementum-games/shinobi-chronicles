@@ -62,7 +62,7 @@ $clan_positions = array(
             <br />
 
             <?php if($viewUser->clan): ?>
-                <label style='width:6.5em;'>Clan:</label> <?= $viewUser->clan['name'] ?><br />
+                <label style='width:6.5em;'>Clan:</label> <?= $viewUser->clan->name ?><br />
                 <?php if($viewUser->clan_office): ?>
                     <label style='width:6.5em;'>Clan Rank:</label> <?= $clan_positions[$viewUser->clan_office] ?><br />
                 <?php endif; ?>

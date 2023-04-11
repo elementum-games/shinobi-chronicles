@@ -19,6 +19,7 @@ class System {
     const KUNAI_PER_DOLLAR = 2;
     const LOGOUT_LIMIT = 720;
     const BLOODLINE_ROLL_CHANCE = 50;
+    const ARENA_COOLDOWN = 4 * 1000;
 
     const MENU_USER = 'user';
     const MENU_ACTIVITY = 'activity';
@@ -43,6 +44,7 @@ class System {
     const SC_EVENT_START = 0;
     const SC_EVENT_END = 1641769200;
     const SC_EVENT_NAME = 'Holiday 2021';
+
     public static bool $SC_EVENT_ACTIVE = true;
 
     public static array $villages = ['Stone', 'Cloud', 'Leaf', 'Sand', 'Mist'];

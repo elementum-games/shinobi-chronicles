@@ -109,15 +109,15 @@ function training() {
 			}
 
             // Check for clan training boost
-            if($player->clan && str_starts_with($player->clan['boost'], 'training:')) {
-			 	if($train_type == substr($player->clan['boost'], 9)
-                    || str_contains($train_type, 'jutsu')
-                    && substr($player->clan['boost'], 9) == 'jutsu'
+            if($player->clan && $player->clan->boost_type == 'training') {
+			 	if($train_type == $player->clan->boost_effect
+                     ||
+                     (str_contains($train_type, 'jutsu') && $player->clan->boost_effect == 'jutsu')
                 ) {
 			 		$system->message("Your training was reduced by "
-                        . ($train_length * ($player->clan['boost_amount'] / 100))
+                        . ($train_length * ($player->clan->boost_amount / 100))
                         . " seconds due to your clan boost.");
-			 		$train_length *= 1 - ($player->clan['boost_amount'] / 100);
+			 		$train_length *= 1 - ($player->clan->boost_amount / 100);
 			 	}
 			}
 

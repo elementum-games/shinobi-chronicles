@@ -9,7 +9,7 @@ function arena(): bool {
 	global $player;
 	global $self_link;
 
-  $fight_timer = 4 * 1000;
+    $fight_timer = System::ARENA_COOLDOWN;
 
 	if($player->exam_stage > 0) {
 		$system->message("You cannot access this page during the exam!");
