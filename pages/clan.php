@@ -134,7 +134,7 @@ function clan() {
         }
 
         $result = $system->query(
-            "SELECT `user_id`, `user_name`, `rank`, `level`, `exp` FROM `users` WHERE `clan_id`='{$player->clan->id}' 
+            "SELECT `user_id`, `user_name`, `rank`, `level`, `exp`, `last_active` FROM `users` WHERE `clan_id`='{$player->clan->id}' 
                     ORDER BY `rank` DESC, `exp` DESC LIMIT $min, $users_per_page"
         );
 
@@ -144,7 +144,8 @@ function clan() {
                 name: $row['user_name'],
                 rank_num: $row['rank'],
                 level: $row['level'],
-                exp: $row['exp']
+                exp: $row['exp'],
+                last_active: $row['last_active']
             );
         }
     }
@@ -155,6 +156,27 @@ function clan() {
     $missions = $player->clan->getClanMissions($player->rank_num);
 
     $active_mission = $player->mission_id ? new Mission($player->mission_id, $player) : null;
+
+    $can_challenge = [
+        Clan::OFFICE_LEADER => $player->rank_num >= 4 && $player->clan_office != Clan::OFFICE_LEADER,
+        Clan::OFFICE_ELDER_1 => $player->rank_num >= 3 && $player->clan_office != Clan::OFFICE_ELDER_1,
+        Clan::OFFICE_ELDER_2 => $player->rank_num >= 3 && $player->clan_office != Clan::OFFICE_ELDER_2,
+    ];
+
+    $one_week_ago = time() - (7 * 86400);
+    $two_weeks_ago = time() - (14 * 86400);
+
+    $can_claim = [
+        Clan::OFFICE_LEADER => $can_challenge[Clan::OFFICE_LEADER] && (
+            !isset($officers[Clan::OFFICE_LEADER]) || $officers[Clan::OFFICE_LEADER]->last_active < $one_week_ago
+        ),
+        Clan::OFFICE_ELDER_1 => $can_challenge[Clan::OFFICE_ELDER_1] && (
+            !isset($officers[Clan::OFFICE_ELDER_1]) || $officers[Clan::OFFICE_ELDER_1]->last_active < $two_weeks_ago
+        ),
+        Clan::OFFICE_ELDER_2 => $can_challenge[Clan::OFFICE_ELDER_2] && (
+            !isset($officers[Clan::OFFICE_ELDER_2]) || $officers[Clan::OFFICE_ELDER_2]->last_active < $two_weeks_ago
+        ),
+    ];
 
     $system->printMessage();
 

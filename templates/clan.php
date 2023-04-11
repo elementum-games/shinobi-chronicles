@@ -14,6 +14,9 @@
  * @var int $max_mission_rank
  * @var array $positions
  *
+ * @var array $can_challenge
+ * @var array $can_claim
+ *
  * @var int $min
  * @var int $prev
  * @var int $next
@@ -61,12 +64,14 @@
             <img src='<?= $player->clan->logo_url ?>' style='max-width:100px;max-height:100px;' />
         </div>
         <div class='clanInfo'>
-            <label style='width:7.2em;'>Village:</label><?= $player->clan->village ?><br />
+            <label style='width:7.2em;'>Village:</label>
+                <?= $player->clan->village ?><br />
             <?php if($clan->boost_type == 'training'): ?>
                 <label style='width:7.2em;'>Boost:</label>
-                <?= (int)$clan->boost_amount ?>% faster <?= System::unSlug($clan->boost_effect) ?> training<br />
+                    <?= (int)$clan->boost_amount ?>% faster <?= System::unSlug($clan->boost_effect) ?> training<br />
             <?php endif; ?>
-            <label style='width:7.2em;'>Reputation:</label><?= $player->clan->points ?><br />
+            <label style='width:7.2em;'>Reputation:</label>
+                <?= $player->clan->points ?><br />
             <p style='font-style:italic;text-align:center;width:75%;'><?= $player->clan->motto ?></p>
         </div>
         <br style='clear:both;margin:0;' />
@@ -94,7 +99,9 @@
                 }
             ?>
             <tr>
-                <td style='width:29%;' class='<?= $class ?>'><a href='<?= $system->router->links['members'] ?>&user=<?= $member->name ?>'><?= $member->name ?></a></td>
+                <td style='width:29%;' class='<?= $class ?>'>
+                    <a href='<?= $system->router->links['members'] ?>&user=<?= $member->name ?>'><?= $member->name ?></a>
+                </td>
                 <td style='width:20%;text-align:center;' class='<?= $class ?>'><?= $RANK_NAMES[$member->rank_num] ?></td>
                 <td style='width:20%;text-align:center;' class='<?= $class ?>'><?= $member->level ?></td>
                 <td style='width:30%;text-align:center;' class='<?= $class ?>'><?= $member->exp ?></td>
@@ -219,20 +226,21 @@
                     <?php if(isset($officers[$office])): ?>
                         <img src='<?= $officers[$office]->avatar_link ?>' /><br />
                         <span style='font-weight:bold;'>
-                        <a href='<?= $system->router->links['members'] ?>&user=<?= $officers[$office]->name ?>'><?= $officers[$office]->name ?></a></span><br />
-                        <?php if($player->rank_num >= 4 && $player->clan_office != $office): ?>
+                        <a href='<?= $system->router->links['members'] ?>&user=<?= $officers[$office]->name ?>'>
+                            <?= $officers[$office]->name ?>
+                        </a></span><br />
+
+                        <?php if($can_claim[$office]): ?>
+                            <a href='<?= $self_link ?>&page=challenge&challenge=<?= $office ?>'>(Claim)</a>
+                        <?php elseif($can_challenge[$office]): ?>
                             <a href='<?= $self_link ?>&page=challenge&challenge=<?= $office ?>'>(Challenge)</a>
                         <?php endif; ?>
                         <br />
                     <?php else: ?>
                         <img src='../images/default_avatar.png' style='max-width:100px;max-height:100px;' /><br />
                         <span style='font-weight:bold;'>None</span><br />
-                        <?php if(!$player->clan_office): ?>
-                            <?php if($player->rank_num >= 4 && $office == 1): ?>
-                                <a style='text-decoration:none;' href='<?= $self_link ?>&page=challenge&challenge=<?= $office ?>'>(Claim)</a>
-                            <?php elseif($player->rank_num >= 3): ?>
-                                <a style='text-decoration:none;' href='<?= $self_link ?>&page=challenge&challenge=<?= $office ?>'>(Claim)</a>
-                            <?php endif; ?>
+                        <?php if($can_claim[$office]): ?>
+                            <a style='text-decoration:none;' href='<?= $self_link ?>&page=challenge&challenge=<?= $office ?>'>(Claim)</a>
                         <?php endif; ?>
                         <br />
                     <?php endif; ?>

@@ -31,7 +31,8 @@ class Clan {
     public static int $BOOST_AMOUNT = 10;
     public static int $BOOST_COST = 75;
 
-    public static array $offices = [Clan::OFFICE_LEADER, Clan::OFFICE_ELDER_1, Clan::OFFICE_ELDER_2];
+    // Order here is so they show up like this on the clan page
+    public static array $offices = [Clan::OFFICE_ELDER_1, Clan::OFFICE_LEADER, Clan::OFFICE_ELDER_2];
     public static array $office_labels = [
         Clan::OFFICE_LEADER => "Leader",
         Clan::OFFICE_ELDER_1 => "Elder 1",
@@ -169,8 +170,9 @@ class Clan {
 
         $officers = [];
         if(count($officer_ids) > 0) {
-            $query = "SELECT `user_id`, `user_name`, `rank`, `level`, `exp`, `avatar_link`, `clan_office` FROM `users` 
-                     WHERE `user_id` IN (" . implode(',', $officer_ids) . ")";
+            $query = "SELECT `user_id`, `user_name`, `rank`, `level`, `exp`, `avatar_link`, `clan_office`, `last_active` 
+                FROM `users`
+                WHERE `user_id` IN (" . implode(',', $officer_ids) . ")";
             $result = $this->system->query($query);
 
             if($this->system->db_last_num_rows > 0) {
@@ -181,6 +183,7 @@ class Clan {
                         rank_num: $row['rank'],
                         level: $row['level'],
                         exp: $row['exp'],
+                        last_active: $row['last_active'],
                         avatar_link: $row['avatar_link'],
                         clan_office: $row['clan_office']
                     );
@@ -373,6 +376,7 @@ class ClanMemberDto {
         public int $rank_num,
         public int $level,
         public int $exp,
+        public int $last_active,
         public string $avatar_link = '',
         public int $clan_office = 0
     ) {}
