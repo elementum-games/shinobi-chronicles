@@ -10,17 +10,15 @@ if(isset($_SESSION['user_id'])) {
 }
 
 // Start display
-require($system->fetchLayoutByName(System::DEFAULT_LAYOUT));
-echo $heading;
-echo $top_menu;
-echo $header;
-echo str_replace("[HEADER_TITLE]", "Create Account", $body_start);
+$layout = $system->fetchLayoutByName(System::DEFAULT_LAYOUT);
+
+$layout->renderStaticPageHeader("Create Account");
 
 if(!$system->register_open) {
     echo "Sorry, not currently functional. Check back later.";
 
-    echo $login_menu;
-    echo $footer;
+    echo $layout->login_menu;
+    echo $layout->footer;
 
     exit;
 }
@@ -310,5 +308,4 @@ else {
     $system->printMessage();
 }
 
-echo $login_menu;
-echo $footer;
+$layout->renderStaticPageFooter();

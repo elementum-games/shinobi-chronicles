@@ -3,19 +3,19 @@ session_start();
 
 require "classes/System.php";
 $system = new System();
-$layout = System::DEFAULT_LAYOUT;
+$layout = $system->fetchLayoutByName(System::DEFAULT_LAYOUT);
 
-if (isset($_SESSION['user_id'])) {
+if(isset($_SESSION['user_id'])) {
     require_once 'classes.php';
     $player = User::loadFromId($system, $_SESSION['user_id']);
     $player->loadData();
-    $layout = $player->layout;
+    $layout = $system->fetchLayoutByName($player->layout);
 }
 else {
     require_once 'classes/Bloodline.php';
 }
 
-$system->renderStaticPageHeader('Manual', $layout);
+$layout->renderStaticPageHeader('Manual');
 
 ?>
 
@@ -352,4 +352,4 @@ $system->renderStaticPageHeader('Manual', $layout);
 </script>
 
 <?php
-$system->renderStaticPageFooter($layout);
+$layout->renderStaticPageFooter($player ?? null);
