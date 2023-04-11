@@ -160,6 +160,14 @@ function SendMessage(System $system, User $player, int|string $convo_id, string 
 			return $response;
 		}
 
+        //Disallow sending 1-to-1 messages if blacklisted
+        if(sizeof($inbox->getConvoMembers($convo_id)) == 2) {
+            if(Inbox::checkBlacklist($inbox->getConvoMembers($convo_id))) {
+                $response->errors[] = "Blacklist is active!";
+            }
+            return $response;
+        }
+
 		// error management
 		if ($system->message) {
 			$response->errors[] = $system->message;
