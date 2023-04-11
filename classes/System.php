@@ -7,6 +7,7 @@ require_once __DIR__ . '/User.php';
 require_once __DIR__ . '/MarkdownParser.php';
 require_once __DIR__ . '/API.php';
 require_once __DIR__ . '/Layout.php';
+require_once __DIR__ . '/Router.php';
 
 /*	Class:		System
 	Purpose: 	Handle database connection and queries. Handle storing and printing of error messages.
