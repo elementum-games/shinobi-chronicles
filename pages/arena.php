@@ -178,12 +178,9 @@ function processArenaBattleEnd(BattleManager|BattleManagerV2 $battle, User $play
         ) {
             $stat_to_gain = $player->getTrainingStatForArena();
 
-            $player->{$stat_to_gain} += 1;
-            $player->exp += 10;
-
             $stat_gain_display = '<br />During the fight you realized a way to use your ' . System::unSlug($stat_to_gain) . ' a little
-            more effectively.
-            <br />You have gained 1 ' . System::unSlug($stat_to_gain) . '.';
+            more effectively.';
+            $stat_gain_display .= $player->addStatGain($stat_to_gain, 1) . '.';
         }
 
         // TEAM BOOST NPC GAINS

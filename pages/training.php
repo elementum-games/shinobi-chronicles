@@ -21,9 +21,9 @@ function training() {
 	$stat_long_train_length = $stat_train_length * 4;
 	$stat_long_train_gain = $stat_train_gain * 2.25;
 
-    // 24x length, 8x gains: 33% of standard
-    $stat_extended_train_length = $stat_train_length * 24;
-	$stat_extended_train_gain = $stat_train_gain * 8;
+    // 30x length (5 hrs), 12x gains: 40% of standard
+    $stat_extended_train_length = $stat_train_length * 30;
+	$stat_extended_train_gain = $stat_train_gain * 12;
 
 	// Forbidden seal trainings boost
     $stat_long_train_length *= $player->forbidden_seal->long_training_time;

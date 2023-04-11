@@ -1087,6 +1087,10 @@ class User extends Fighter {
         $this->inventory_loaded = true;
     }
 
+    /**
+     * @return string
+     * @throws Exception
+     */
     public function checkTraining(): string {
         $display = '';
 
@@ -1140,7 +1144,7 @@ class User extends Fighter {
             // Skill/attribute training
             else {
                 // TEAM BOOST TRAINING GAINS
-                if($this->team != null) {
+                if($this->team != null && $this->train_gain < $this->rank->stat_cap * 0.05) {
                     $boost_percent = $this->team->checkForTrainingBoostTrigger();
                     if($boost_percent != null) {
                         $boost_amount = round($this->train_gain * $boost_percent, 0, PHP_ROUND_HALF_DOWN);
@@ -1153,24 +1157,10 @@ class User extends Fighter {
                 }
 
                 // Check caps
-                $gain = $this->train_gain;
-
-                $total_stats = $this->total_stats + $gain;
-
-                if($total_stats > $this->rank->stat_cap) {
-                    $gain -= $total_stats - $this->rank->stat_cap;
-                    if($gain < 0) {
-                        $gain = 0;
-                    }
-                }
-
-                $this->{$this->train_type} += $gain;
-                $this->exp += $gain * 10;
+                $gain_description = $this->addStatGain($this->train_type, $this->train_gain);
 
                 $this->train_time = 0;
-                $this->system->message("You have gained " . $gain . " " . ucwords(str_replace('_', ' ', $this->train_type)) .
-                    " and " . ($gain * 10) . " experience." . $team_boost_description
-                );
+                $this->system->message($gain_description . '.' . $team_boost_description);
             }
         }
         else {
@@ -1191,6 +1181,42 @@ class User extends Fighter {
         }
 
         return $display;
+    }
+
+    /**
+     * @param string $stat
+     * @param int    $stat_gain
+     * @return string
+     * @throws Exception
+     */
+    public function addStatGain(string $stat, int $stat_gain): string {
+        if(!in_array($stat, $this->stats)) {
+            throw new Exception("Invalid stat!");
+        }
+
+        $new_total_stats = $this->total_stats + $stat_gain;
+        if($new_total_stats > $this->rank->stat_cap) {
+            $stat_gain -= $new_total_stats - $this->rank->stat_cap;
+            if($stat_gain < 0) {
+                $stat_gain = 0;
+            }
+        }
+
+        $this->{$stat} += $stat_gain;
+        $this->updateTotalStats();
+
+        $this->exp = $this->total_stats * 10;
+
+        if($stat_gain == 0) {
+            return "";
+        }
+
+        return "You have gained {$stat_gain} " . System::unSlug($stat) . " and " . ($stat_gain * 10) . " experience";
+    }
+
+    public function updateTotalStats() {
+        $this->total_stats = $this->ninjutsu_skill + $this->genjutsu_skill + $this->taijutsu_skill + $this->bloodline_skill +
+            $this->cast_speed + $this->speed + $this->intelligence + $this->willpower;
     }
 
     public function getTrainingStatForArena(): ?string {

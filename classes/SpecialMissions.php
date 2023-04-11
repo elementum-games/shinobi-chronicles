@@ -28,28 +28,32 @@ class SpecialMission {
     */
     public static array $difficulties = [
         SpecialMission::DIFFICULTY_EASY => [
-            'yen_per_battle' => 8, // 8 * 5 = 40
-            'yen_per_mission' => 35,
-            'hp_lost_percent' => 4, // 20% => 60% lost
-            'intel_gain' => 20, // est. 5 fights (rank * 75 yen) (old: 45)
+            'yen_per_battle' => 8, // 8 * 10 = 80
+            'yen_per_mission' => 70,
+            'stats_per_mission' => 2,
+            'hp_lost_percent' => 2, // 20% => 60% lost
+            'intel_gain' => 10, // est. 10 fights (rank * 150 yen)
         ],
         SpecialMission::DIFFICULTY_NORMAL => [
-            'yen_per_battle' => 10, // 10 * 5.5 = 55
-            'yen_per_mission' => 50,
-            'hp_lost_percent' => 5, // 27.5% => 82.5% lost
-            'intel_gain' => 18 // 5.5 fights (rank * 105 yen) (old: 63)
+            'yen_per_battle' => 10, // 10 * 11 = 110
+            'yen_per_mission' => 110,
+            'stats_per_mission' => 3,
+            'hp_lost_percent' => 2.5, // 27.5% => 82.5% lost
+            'intel_gain' => 9 // 11 fights (rank * 210 yen) (old: 63)
         ],
         SpecialMission::DIFFICULTY_HARD => [
-            'yen_per_battle' => 12, // 12 * 6.25 = 75
-            'yen_per_mission' => 60,
-            'hp_lost_percent' => 7, // 44% => 132% lost
-            'intel_gain' => 16 // 6.25 fights (rank * 135 yen) (old: 85)
+            'yen_per_battle' => 12, // 12 * 12.5 = 150
+            'yen_per_mission' => 150,
+            'stats_per_mission' => 4,
+            'hp_lost_percent' => 3.5, // 44% => 132% lost
+            'intel_gain' => 8 // 12.5 fights (rank * 270 yen)
         ],
         SpecialMission::DIFFICULTY_NIGHTMARE => [
-            'yen_per_battle' => 14, // 20 * 7.14 = 100
-            'yen_per_mission' => 70,
-            'hp_lost_percent' => 10, // 71.4% => 214.2% lost
-            'intel_gain' => 14 // 7.14 fights (rank * 170 yen) (old: 111)
+            'yen_per_battle' => 14, // 20 * 14.28 = 285
+            'yen_per_mission' => 200,
+            'stats_per_mission' => 6,
+            'hp_lost_percent' => 4.5, // 71.4% => 214.2% lost
+            'intel_gain' => 7 // 14.28 fights (rank * 340 yen)
         ]
     ];
 
@@ -374,11 +378,10 @@ class SpecialMission {
         $reward_text = self::$event_names[self::EVENT_COMPLETE_REWARD]['text'] . $yen_gain . '!';
 
         $stat_to_gain = $this->player->getTrainingStatForArena();
-        if($stat_to_gain != null && $this->player->total_stats < $this->player->rank->stat_cap) {
-            $this->player->$stat_to_gain += 1;
-            $this->player->exp += 10;
-
-            $reward_text .= " You gained 1 " . System::unSlug($stat_to_gain) . "!";
+        $stat_gain = self::$difficulties[$this->difficulty]['stats_per_mission']
+            + max(0, $this->player->rank_num - 2);
+        if($stat_to_gain != null) {
+            $reward_text .= ' ' . $this->player->addStatGain($stat_to_gain, $stat_gain) . '!';
         }
 
         return $reward_text;
@@ -557,7 +560,7 @@ class SpecialMission {
         return $last_entry['timestamp_ms'];
     }
 
-    private function calcHealthLost(int $base_hp_lost_percent): int {
+    private function calcHealthLost(int|float $base_hp_lost_percent): int {
         // We Decrease the lost hp per turn by % of user stats compared to cap
         $stats_percent = floor(($this->player->total_stats / $this->player->rank->stat_cap) * 100);
         if($stats_percent > 100) {
