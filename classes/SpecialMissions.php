@@ -379,7 +379,7 @@ class SpecialMission {
 
         $stat_to_gain = $this->player->getTrainingStatForArena();
         $stat_gain = self::$difficulties[$this->difficulty]['stats_per_mission']
-            + max(0, $this->player->rank_num - 2);
+            + (max(0, $this->player->rank_num - 2) * 2);
         if($stat_to_gain != null) {
             $reward_text .= ' ' . $this->player->addStatGain($stat_to_gain, $stat_gain) . '!';
         }
