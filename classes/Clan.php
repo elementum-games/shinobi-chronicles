@@ -5,6 +5,9 @@ class Clan {
     const OFFICE_ELDER_1 = 2;
     const OFFICE_ELDER_2 = 3;
 
+    const LEADER_MAX_INACTIVITY = 7 * 86400;
+    const ELDER_MAX_INACTIVITY = 14 * 86400;
+
     private System $system;
 
     public int $id;
@@ -250,7 +253,7 @@ class Clan {
      * @throws Exception
      */
     public function challengeForOffice(User $player, int $office): bool {
-        if($player->rank_num < 4 && $office == 1) {
+        if($player->rank_num < 4 && $office == Clan::OFFICE_LEADER) {
             throw new Exception("Unable to claim leader position at this rank.");
         }
         if($player->clan_office == $office) {
@@ -262,7 +265,13 @@ class Clan {
 
         // Check cooldown
         $officers = $this->fetchOfficers();
-        if(isset($officers[$office])) {
+        $current_officer = $officers[$office] ?? null;
+
+        $min_officer_last_active = $office === Clan::OFFICE_LEADER
+            ? time() - Clan::LEADER_MAX_INACTIVITY
+            : time() - Clan::ELDER_MAX_INACTIVITY;
+
+        if($current_officer != null && $current_officer->last_active > $min_officer_last_active) {
             throw new Exception("Position already taken!");
         }
 

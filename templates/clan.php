@@ -233,7 +233,7 @@
                         <?php if($can_claim[$office]): ?>
                             <a href='<?= $self_link ?>&page=challenge&challenge=<?= $office ?>'>(Claim)</a>
                         <?php elseif($can_challenge[$office]): ?>
-                            <a href='<?= $self_link ?>&page=challenge&challenge=<?= $office ?>'>(Challenge)</a>
+                            <!--<a href='<?= $self_link ?>&page=challenge&challenge=<?= $office ?>'>(Challenge)</a>-->
                         <?php endif; ?>
                         <br />
                     <?php else: ?>

@@ -163,18 +163,18 @@ function clan() {
         Clan::OFFICE_ELDER_2 => $player->rank_num >= 3 && $player->clan_office != Clan::OFFICE_ELDER_2,
     ];
 
-    $one_week_ago = time() - (7 * 86400);
-    $two_weeks_ago = time() - (14 * 86400);
+    $min_leader_last_active = time() - Clan::LEADER_MAX_INACTIVITY;
+    $min_elder_last_active = time() - Clan::ELDER_MAX_INACTIVITY;
 
     $can_claim = [
         Clan::OFFICE_LEADER => $can_challenge[Clan::OFFICE_LEADER] && (
-            !isset($officers[Clan::OFFICE_LEADER]) || $officers[Clan::OFFICE_LEADER]->last_active < $one_week_ago
+            !isset($officers[Clan::OFFICE_LEADER]) || $officers[Clan::OFFICE_LEADER]->last_active < $min_leader_last_active
         ),
         Clan::OFFICE_ELDER_1 => $can_challenge[Clan::OFFICE_ELDER_1] && (
-            !isset($officers[Clan::OFFICE_ELDER_1]) || $officers[Clan::OFFICE_ELDER_1]->last_active < $two_weeks_ago
+            !isset($officers[Clan::OFFICE_ELDER_1]) || $officers[Clan::OFFICE_ELDER_1]->last_active < $min_elder_last_active
         ),
         Clan::OFFICE_ELDER_2 => $can_challenge[Clan::OFFICE_ELDER_2] && (
-            !isset($officers[Clan::OFFICE_ELDER_2]) || $officers[Clan::OFFICE_ELDER_2]->last_active < $two_weeks_ago
+            !isset($officers[Clan::OFFICE_ELDER_2]) || $officers[Clan::OFFICE_ELDER_2]->last_active < $min_elder_last_active
         ),
     ];
 
