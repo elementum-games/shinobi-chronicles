@@ -5,7 +5,7 @@ class Clan {
     const OFFICE_ELDER_1 = 2;
     const OFFICE_ELDER_2 = 3;
 
-    const LEADER_MAX_INACTIVITY = 7 * 86400;
+    const LEADER_MAX_INACTIVITY = 10 * 86400;
     const ELDER_MAX_INACTIVITY = 14 * 86400;
 
     private System $system;
