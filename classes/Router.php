@@ -153,8 +153,6 @@ class Router {
             }
         }
     }
-
-
 }
 
 Router::$routes = require __DIR__ . '/../config/routes.php';

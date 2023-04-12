@@ -83,7 +83,7 @@ class Layout {
             if($page->village_ok === Route::ONLY_IN_VILLAGE) {
                 $class = 'only-allowed-in-village';
             }
-            if($page->village_ok == Route::NOT_IN_VILLAGE && $player->rank_num > 2) {
+            if($page->village_ok === Route::NOT_IN_VILLAGE && $player->rank_num > 2) {
                 $class = 'not-allowed-in-village';
             }
 
