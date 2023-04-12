@@ -3,6 +3,9 @@
  * @var string $exam_name
  * @var bool|string $element
  * @var string $elment_display
+ *
+ * @var User $player
+ * @var string $self_link
  */
 ?>
 
@@ -13,7 +16,7 @@
             <td>
                 Congratulations, you have passed the Chuunin Exam!<br />
                 <br />
-                After passing all three exams, you have been recognized as an official ninja of the {$player->village->name} Village. You now
+                After passing all three exams, you have been recognized as an official ninja of the <?= $player->village->name ?> Village. You now
                 have more rights, and more responsibilities. You can create or join a team with up to 3 other ninja, as well as
                 take on C-rank and B-rank missions. You can no longer normally train or do arena fights inside the village, as your skills are too destructive to be
                 safe around the civilians. With your new uniform you can carry an extra weapon and wear another piece of armor, and as
