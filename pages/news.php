@@ -13,7 +13,7 @@ function news() {
 
 	global $player;
 
-	$self_link = $system->router->base_url;
+	$self_link = $system->router->links['news'];
 
 	$page = isset($_GET['page']) ? $_GET['page'] : false;
 
@@ -153,7 +153,7 @@ function news() {
 
 function newsPosts($ADMIN = false, $max_posts = 8) {
 	global $system;
-	$self_link = $system->router->base_url;
+	$self_link = $system->router->links['news'];
 
 	$result = $system->query("SELECT * FROM `news_posts` ORDER BY `post_id` DESC LIMIT $max_posts");
 
@@ -165,7 +165,7 @@ function newsPosts($ADMIN = false, $max_posts = 8) {
 	while($post = $system->db_fetch($result)) {
 		echo "<table id='newstable' class='table'><tr><th>" . $post['title'];
 		if($ADMIN) {
-			echo " ( <a style='color:inherit;' href='{$self_link}?page=edit_post&post={$post['post_id']}'>Edit</a> )";
+			echo " ( <a style='color:inherit;' href='{$self_link}&page=edit_post&post={$post['post_id']}'>Edit</a> )";
 		}
 		echo "</th></tr>
 			<tr><td>";
