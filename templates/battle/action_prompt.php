@@ -13,6 +13,7 @@ $show_submit_button = false;
 $prefill_hand_seals = $_POST['hand_seals'] ?? '';
 $prefill_jutsu_type = $_POST['jutsu_type'] ?? Jutsu::TYPE_NINJUTSU;
 $prefill_weapon_id = $_POST['weapon_id'] ?? '0';
+$prefill_weapon_element = $_POST['weapon_element'] ?? Jutsu::ELEMENT_NONE;
 $prefill_jutsu_id = $_POST['jutsu_id'] ?? '';
 $prefill_item_id = $_POST['item_id'] ?? '';
 ?>
@@ -250,6 +251,7 @@ $prefill_item_id = $_POST['item_id'] ?? '';
             currentlySelectedWeapon = this;
             $(currentlySelectedWeapon).css('box-shadow', '0px 0px 4px 0px #000000');
             $('#weaponID').val( $(this).attr('data-id') );
+            $('#weaponElement').val($(this).attr('data-element') || "None");
         });
 
         var currentlySelectedItem = false;
@@ -454,11 +456,21 @@ $prefill_item_id = $_POST['item_id'] ?? '';
                     <b>None</b>
                 </p>
                 <?php foreach($player->equipped_weapon_ids as $item_id): ?>
-                    <p class='weapon' data-id='<?= $item_id ?>'>
-                        <b><?= $player->items[$item_id]->name ?></b><br />
-                        <?= ucwords(str_replace('_', ' ', $player->items[$item_id]->effect)) ?>
-                        (<?= $player->items[$item_id]->effect_amount ?>%)
-                    </p>
+                    <?php if($player->items[$item_id]->effect == "element"): ?>
+                        <?php foreach($player->elements as $element): ?>
+                            <p class='weapon' data-id='<?= $item_id ?>' data-element='<?= $element ?>'>
+                                <b><?= $player->items[$item_id]->name ?></b><br />
+                                <?= $element ?>
+                                (<?= $player->items[$item_id]->effect_amount ?>%)
+                            </p>
+                        <?php endforeach; ?>
+                    <?php else: ?>
+                        <p class='weapon' data-id='<?= $item_id ?>'>
+                            <b><?= $player->items[$item_id]->name ?></b><br />
+                            <?= ucwords(str_replace('_', ' ', $player->items[$item_id]->effect)) ?>
+                            (<?= $player->items[$item_id]->effect_amount ?>%)
+                        </p>
+                    <?php endif; ?>
                 <?php endforeach; ?>
             </div>
             <div id='handsealOverlay'>
@@ -579,6 +591,7 @@ $prefill_item_id = $_POST['item_id'] ?? '';
                     <input type='hidden' id='hand_seal_input' name='hand_seals' value='<?= $prefill_hand_seals ?>' />
                     <input type='hidden' id='jutsuType' name='jutsu_type' value='<?= $prefill_jutsu_type ?>' />
                     <input type='hidden' id='weaponID' name='weapon_id' value='<?= $prefill_weapon_id ?>' />
+                    <input type='hidden' id='weaponElement' name='weapon_element' value='<?= $prefill_weapon_element ?>' />
                     <input type='hidden' id='jutsuID' name='jutsu_id' value='<?= $prefill_jutsu_id ?>' />
                     <input type='hidden' id='itemID' name='item_id' value='<?= $prefill_item_id ?>' />
                     <p style='display:block;text-align:center;margin:auto;'>

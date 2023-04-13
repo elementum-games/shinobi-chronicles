@@ -267,6 +267,7 @@ class BattleManager {
 
                     // Check for weapon if non-BL taijutsu
                     $weapon_id = 0;
+                    $weapon_element = Jutsu::ELEMENT_NONE;
                     if($jutsu_type == Jutsu::TYPE_TAIJUTSU && !empty($_POST['weapon_id'])) {
                         $weapon_id = (int)$this->system->clean($_POST['weapon_id']);
                         if($weapon_id && $this->player->hasItem($weapon_id)) {
@@ -277,10 +278,15 @@ class BattleManager {
                         else {
                             $weapon_id = 0;
                         }
+
+                        $weapon_element = $this->system->clean($_POST['weapon_element']);
+                        if(!in_array($weapon_element, $this->player->elements)) {
+                            $weapon_element = Jutsu::ELEMENT_NONE;
+                        }
                     }
 
                     // Log jutsu used
-                    $this->setPlayerAction($this->player, $player_jutsu, $weapon_id);
+                    $this->setPlayerAction($this->player, $player_jutsu, $weapon_id, $weapon_element);
 
                     if($this->opponent instanceof NPC) {
                         $this->chooseAndSetAIAction($this->opponent);
@@ -643,7 +649,7 @@ class BattleManager {
         if($attack->jutsu->jutsu_type == Jutsu::TYPE_TAIJUTSU && $action->weapon_id) {
             // Apply element to jutsu
             if($fighter->items[$action->weapon_id]->effect == 'element') {
-                $attack->jutsu->element = $fighter->elements['first'];
+                $attack->jutsu->element = $action->weapon_element;
                 $attack->raw_damage *= 1 + ($fighter->items[$action->weapon_id]->effect_amount / 100);
             }
             // Set effect in jutsu
@@ -1039,11 +1045,12 @@ class BattleManager {
         return $fighter_jutsu;
     }
 
-    protected function setPlayerAction(Fighter $player, Jutsu $jutsu, $weapon_id) {
+    protected function setPlayerAction(Fighter $player, Jutsu $jutsu, int $weapon_id, string $weapon_element) {
         $this->battle->fighter_actions[$player->combat_id] = new LegacyFighterAction(
             $jutsu->id,
             $jutsu->purchase_type,
-            $weapon_id
+            $weapon_id,
+            $weapon_element
         );
 
         if(isset($this->player_jutsu_used[$jutsu->combat_id])) {
@@ -1071,6 +1078,7 @@ class BattleManager {
             $jutsu->id,
             Jutsu::PURCHASE_TYPE_PURCHASABLE,
             0,
+            Jutsu::ELEMENT_NONE
         );
     }
 }
