@@ -1143,6 +1143,13 @@ class User extends Fighter {
             }
             // Skill/attribute training
             else {
+                if(!in_array($this->train_type, $this->stats)) {
+                    $this->system->message("Training an invalid stat: {$this->train_type}. Training cancelled.");
+                    $this->system->log('invalid_training', $this->user_id, "Stat: {$this->train_type} / Amount: $this->train_gain");
+                    $this->train_time = 0;
+                    return "";
+                }
+
                 // TEAM BOOST TRAINING GAINS
                 if($this->team != null && $this->train_gain < $this->rank->stat_cap * 0.05) {
                     $boost_percent = $this->team->checkForTrainingBoostTrigger();
