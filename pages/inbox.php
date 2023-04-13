@@ -164,8 +164,8 @@ function SendMessage(System $system, User $player, int|string $convo_id, string 
         if(sizeof($inbox->getConvoMembers($convo_id)) == 2) {
             if(Inbox::checkBlacklist($inbox->getConvoMembers($convo_id))) {
                 $response->errors[] = "Blacklist is active!";
+                return $response;
             }
-            return $response;
         }
 
 		// error management
