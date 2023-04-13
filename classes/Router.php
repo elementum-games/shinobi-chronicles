@@ -28,6 +28,7 @@ class Router {
         'marriage' => 29,
         'support' => 30,
         'chat_log' => 31,
+        'news' => 32,
     ];
 
     /** @var Route[] $routes */

@@ -41,7 +41,7 @@ HTML;
 
 $top_menu = <<<HTML
 <ul>
-	<li><a id='topMenuOption-News' href='{$system->router->base_url}'>News</a></li>
+	<li><a id='topMenuOption-News' href='{$system->router->links['news']}'>News</a></li>
 	<li><a id='topMenuOption-Discord' href='{$system->router->links['discord']}' target='_blank'>Discord</a></li>
 	<li><a id='topMenuOption-Manual' href='{$system->router->base_url}manual.php'>Manual</a></li>
 	<li><a id='topMenuOption-Github' href='https://github.com/elementum-games/shinobi-chronicles' target='_blank'>Github</a></li>

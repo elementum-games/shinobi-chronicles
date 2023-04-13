@@ -241,4 +241,10 @@ return $routes = [
         function_name: 'event',
         menu: System::MENU_NONE,
     ),
+    32 => new Route(
+        file_name: 'news.php',
+        title: 'News',
+        function_name: 'news',
+        menu: System::MENU_NONE
+    )
 ];

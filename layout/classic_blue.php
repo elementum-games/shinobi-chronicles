@@ -34,7 +34,7 @@ HTML;
 
 $top_menu = <<<HTML
 <ul class='topMenu'>
-	<li><a href='{$system->router->base_url}'>News</a></li>
+	<li><a href='{$system->router->links['news']}'>News</a></li>
 	<li><a href='{$system->router->links['discord']}' target='_blank'>Discord</a></li>
 	<li><a href='{$system->router->base_url}manual.php'>Manual</a></li>
 	<li><a href='{$system->router->links['github']}'>GitHub</a></li>
