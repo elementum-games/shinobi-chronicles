@@ -146,4 +146,19 @@ class Layout {
             $this->footer
         );
     }
+
+    public function renderGlobalMessage(System $system, array $global_message): void {
+        echo "<table class='table globalMessage'>
+            <tr><th colspan='2'>Global message</th></tr>
+            <tr><td style='text-align:center;' colspan='2'>"
+                . $system->html_parse($global_message['message'])
+            . "</td></tr>
+            <tr>
+                <td style='width: 50px;' class='newsFooter'>
+                    <a class='link' href='{$system->router->base_url}&clear_message=1'>Dismiss</a>
+                </td>
+                <td class='newsFooter'>" . $global_message['time'] . "</td>
+            </tr>
+        </table>";
+    }
 }

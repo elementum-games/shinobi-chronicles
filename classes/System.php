@@ -763,6 +763,20 @@ class System {
         }
     }
 
+    public function fetchGlobalMessage(): ?array {
+        $result = $this->query("SELECT `global_message`, `time` FROM `system_storage` LIMIT 1");
+        if($result->num_rows < 1) {
+            return null;
+        }
+
+        $results = $this->db_fetch($result);
+
+        return [
+            'message' => str_replace("\r\n", "<br />", $results['global_message']),
+            'time' => date("l, M j, Y - g:i A", $results['time'])
+        ];
+    }
+
     /**
      * @param string $entity_id
      * @return EntityId

@@ -245,16 +245,6 @@ if($LOGGED_IN) {
 	if(!$player->global_message_viewed && isset($_GET['clear_message'])) {
 		$player->global_message_viewed = 1;
 	}
-	if(!$player->global_message_viewed && !$system->is_legacy_ajax_request) {
-		$result = $system->query("SELECT `global_message`, `time` FROM `system_storage` LIMIT 1");
-		$results = $system->db_fetch($result);
-		$message = $results['global_message'];
-		$global_message = str_replace("\r\n", "<br />", $message);
-		$global_message_time = date("l, M j, Y - g:i A", $results['time']);
-	}
-	else {
-		$global_message = false;
-	}
 
 	// Load rank data// Rank names
 	$RANK_NAMES = RankManager::fetchNames($system);
@@ -335,11 +325,9 @@ if($LOGGED_IN) {
             $self_link = $system->router->base_url . '?id=' . $id;
 
             $system->printMessage();
-            if($global_message) {
-                echo "<table class='table globalMessage'><tr><th colspan='2'>Global message</th></tr>
-				<tr><td style='text-align:center;' colspan='2'>" . $system->html_parse($global_message) . "</td></tr>
-				<tr><td style='width: 50px;' class='newsFooter'><a class='link' href='{$self_link}&clear_message=1'>Dismiss</a></td>
-				<td class='newsFooter'>" . $global_message_time . "</td></tr></table>";
+            if(!$player->global_message_viewed && !$system->is_legacy_ajax_request) {
+                $global_message = $system->fetchGlobalMessage();
+                $layout->renderGlobalMessage($system, $global_message);
             }
 
             // EVENT
@@ -366,17 +354,20 @@ if($LOGGED_IN) {
 	}
 
 	if(!$page_loaded) {
-		echo str_replace("[HEADER_TITLE]", "News", $layout->body_start);
-		$system->printMessage();
-		if($global_message) {
-			echo "<table class='table globalMessage'><tr><th colspan='2'>Global message</th></tr>
-			<tr><td style='text-align:center;' colspan='2'>" . $system->html_parse($global_message) . "
-			</td></tr>
-			<tr><td style='width: 50px;' class='newsFooter'><a class='link' href='{$system->router->base_url}?clear_message=1'>Dismiss</a></td>
-				<td class='newsFooter'>".$global_message_time."</td></tr></table>";
-		}
-		require("pages/news.php");
-		news();
+		echo str_replace("[HEADER_TITLE]", "Profile", $layout->body_start);
+
+        if(!$player->global_message_viewed && !$system->is_legacy_ajax_request) {
+            $global_message = $system->fetchGlobalMessage();
+            $layout->renderGlobalMessage($system, $global_message);
+        }
+
+        try {
+            require("pages/profile.php");
+            userProfile();
+        } catch(Exception $e) {
+            $system->message($e->getMessage());
+            $system->printMessage(true);
+        }
 	}
 	$player->updateData();
 
