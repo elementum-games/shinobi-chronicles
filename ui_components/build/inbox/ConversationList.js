@@ -26,9 +26,8 @@ export default function ConversationList({
     selectedConvo: selectedConvoData,
     viewConvo: viewConvo
   }))));
-}
+} // CUSTOM COMPONENTS
 
-// CUSTOM COMPONENTS
 const ConvoListCard = ({
   convo,
   selectedConvo,
@@ -43,9 +42,9 @@ const ConvoListCard = ({
   }, /*#__PURE__*/React.createElement("div", {
     className: "inbox_convo_avatar"
   }, /*#__PURE__*/React.createElement("img", {
-    src: convo.members[0].avatar_link
+    src: convo.members[0]?.avatar_link || "images/default_avatar.png"
   }), convo.members.length > 1 && /*#__PURE__*/React.createElement("img", {
-    src: convo.members[1].avatar_link
+    src: convo.members[1]?.avatar_link || "images/default_avatar.png"
   })), /*#__PURE__*/React.createElement("div", {
     className: "inbox_convo_title"
   }, formatTitle(convo.title, convo.members)), /*#__PURE__*/React.createElement("div", {

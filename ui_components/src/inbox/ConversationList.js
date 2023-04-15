@@ -52,9 +52,9 @@ const ConvoListCard = ({convo, selectedConvo, viewConvo }) => {
             {/* CONVO SELECT CARD AVATAR */}
             <div className='inbox_convo_avatar'>
                 {/* DISPLAY MAIN AVATAR */}
-                <img src={ convo.members[0].avatar_link } />
+                <img src={ convo.members[0]?.avatar_link || "images/default_avatar.png" } />
                 {/* DISPLAY GROUP ONLY AVATAR  */}
-                { convo.members.length > 1 && (<img src={ convo.members[1].avatar_link } />) }
+                { convo.members.length > 1 && (<img src={ convo.members[1]?.avatar_link || "images/default_avatar.png" } />) }
             </div>
 
             {/* CONVO SELECT CARD TITLE */}
