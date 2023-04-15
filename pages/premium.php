@@ -125,7 +125,7 @@ function premium() {
                 $player->max_stamina = 100;
                 $player->chakra = 100;
                 $player->max_chakra = 100;
-                $player->regen_rate = 10;
+                $player->regen_rate = User::BASE_REGEN;
                 $player->exp = User::BASE_EXP;
                 $player->bloodline_id = 0;
                 $player->bloodline_name = '';

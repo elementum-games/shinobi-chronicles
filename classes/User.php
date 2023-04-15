@@ -46,6 +46,7 @@ class User extends Fighter {
     const FULL_LOCK = 5;
 
     const BASE_EXP = 500;
+    const BASE_REGEN = 25;
 
     const MAX_CONSUMABLES = 10;
 
@@ -1944,7 +1945,7 @@ class User extends Fighter {
             'max_stamina' => 100.00,
             'chakra' => 100.00,
             'max_chakra' => 100.00,
-            'regen_rate' => 25,
+            'regen_rate' => User::BASE_REGEN,
 
             'exp' => User::BASE_EXP,
             'bloodline_id' => 0,
