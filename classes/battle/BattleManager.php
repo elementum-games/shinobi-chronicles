@@ -279,7 +279,7 @@ class BattleManager {
                             $weapon_id = 0;
                         }
 
-                        $weapon_element = $this->system->clean($_POST['weapon_element']);
+                        $weapon_element = $this->system->clean($_POST['weapon_element'] ?? "None");
                         if(!in_array($weapon_element, $this->player->elements)) {
                             $weapon_element = Jutsu::ELEMENT_NONE;
                         }
