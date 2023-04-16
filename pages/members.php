@@ -145,7 +145,7 @@ function members() {
 
 			$result = $system->db_fetch($result);
 			$viewUser = User::loadFromId($system, $result['user_id'], true);
-			$viewUser->loadData(false, true);
+			$viewUser->loadData(User::UPDATE_NOTHING, true);
 
 			$journal_result = $system->query("SELECT `journal` FROM `journals` WHERE `user_id`='{$viewUser->user_id}'");
 			if($system->db_last_num_rows == 0) {

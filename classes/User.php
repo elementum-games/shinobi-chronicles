@@ -387,7 +387,7 @@ class User extends Fighter {
     /**
      * @throws Exception
      */
-    public function loadData($UPDATE = User::UPDATE_FULL, $remote_view = false): string {
+    public function loadData($UPDATE = User::UPDATE_FULL, $remote_view = false): void {
         $result = $this->system->query("SELECT * FROM `users` WHERE `user_id`='$this->user_id' LIMIT 1");
         $user_data = $this->system->db_fetch($result);
 
@@ -807,9 +807,8 @@ class User extends Fighter {
         }
 
         // Check training
-        $display = '';
         if($this->train_time && $UPDATE >= User::UPDATE_FULL) {
-            $display = $this->checkTraining();
+            $this->checkTraining();
         }
 
         // Correction location
@@ -820,7 +819,7 @@ class User extends Fighter {
             $this->location->x--;
         }
 
-        return $display;
+        return;
     }
 
     public function loadBanData($ban_data) {
@@ -1089,12 +1088,11 @@ class User extends Fighter {
     }
 
     /**
-     * @return string
+     * @return void
      * @throws Exception
      */
-    public function checkTraining(): string {
-        $display = '';
-
+    public function checkTraining(): void {
+        // Used for sidemenu display
         if($this->train_time < time()) {
             $team_boost_description = "";
 
@@ -1133,6 +1131,7 @@ class User extends Fighter {
                         }
 
                         $this->system->message($message);
+                        $this->system->printMessage();
 
                         if(!$this->ban_type) {
                             $this->updateInventory();
@@ -1148,7 +1147,7 @@ class User extends Fighter {
                     $this->system->message("Training an invalid stat: {$this->train_type}. Training cancelled.");
                     $this->system->log('invalid_training', $this->user_id, "Stat: {$this->train_type} / Amount: $this->train_gain");
                     $this->train_time = 0;
-                    return "";
+                    return;
                 }
 
                 // TEAM BOOST TRAINING GAINS
@@ -1171,24 +1170,6 @@ class User extends Fighter {
                 $this->system->message($gain_description . '.' . $team_boost_description);
             }
         }
-        else {
-            if(str_contains($this->train_type, 'jutsu:')) {
-                $train_type = str_replace('jutsu:', '', $this->train_type);
-                $display .= "<p class='trainingNotification'>Training: " . ucwords(str_replace('_', ' ', $train_type)) . "<br />" .
-                    "<span id='trainingTimer'>" . System::timeRemaining($this->train_time - time(), 'short', false, true) . " remaining</span></p>";
-            }
-            else {
-                $display .= "<p class='trainingNotification'>Training: " . ucwords(str_replace('_', ' ', $this->train_type)) . "<br />" .
-                    "<span id='trainingTimer'>" . System::timeRemaining($this->train_time - time(), 'short', false, true) . " remaining</span></p>";
-            }
-
-            $display .= "<script type='text/javascript'>
-                let train_time = " . ($this->train_time - time()) . ";
-                setTimeout(()=>{titleBarFlash();}, train_time * 1000);
-            </script>";
-        }
-
-        return $display;
     }
 
     /**

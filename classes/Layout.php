@@ -165,4 +165,29 @@ class Layout {
             </tr>
         </table>";
     }
+
+    public function renderTrainingDisplay(User $player) {
+        $display = "";
+
+        if(str_contains($player->train_type, 'jutsu:')) {
+            $train_type = str_replace('jutsu:', '', $player->train_type);
+            $display .= "<p class='trainingNotification'>Training: " . System::unSlug($train_type) . "<br />" .
+                "<span id='trainingTimer'>"
+                    . System::timeRemaining($player->train_time - time(), 'short', false, true)
+                    . " remaining</span></p>";
+        }
+        else {
+            $display .= "<p class='trainingNotification'>Training: " . System::unSlug($player->train_type) . "<br />" .
+                "<span id='trainingTimer'>"
+                . System::timeRemaining($player->train_time - time(), 'short', false, true)
+                . " remaining</span></p>";
+        }
+
+        $display .= "<script type='text/javascript'>
+                let train_time = " . ($player->train_time - time()) . ";
+                setTimeout(()=>{titleBarFlash();}, train_time * 1000);
+            </script>";
+
+        echo $display;
+    }
 }

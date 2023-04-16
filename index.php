@@ -102,7 +102,7 @@ if(!isset($_SESSION['user_id'])) {
 				}
 
 				$player = User::loadFromId($system, $_SESSION['user_id']);
-				$player_display = $player->loadData();
+				$player->loadData();
 				$player->last_login = time();
 				$player->log(User::LOG_LOGIN, $_SERVER['REMOTE_ADDR']);
 				$player->updateData();
@@ -147,10 +147,10 @@ else {
 	}
 
 	if($system->is_legacy_ajax_request) {
-		$player_display = $player->loadData(User::UPDATE_REGEN);
+		$player->loadData(User::UPDATE_REGEN);
 	}
 	else {
-		$player_display = $player->loadData();
+		$player->loadData();
 	}
 }
 
@@ -282,8 +282,8 @@ if($LOGGED_IN) {
 	}
 
 	// Pre-content display
-	if($player_display) {
-		echo $player_display;
+	if($player->train_time) {
+		$layout->renderTrainingDisplay($player);
 	}
 	$page_loaded = false;
 
