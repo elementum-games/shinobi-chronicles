@@ -282,7 +282,7 @@ if($LOGGED_IN) {
 	}
 
 	// Pre-content display
-	if($player->train_time) {
+	if($player->train_time && !$system->is_legacy_ajax_request) {
 		$layout->renderTrainingDisplay($player);
 	}
 	$page_loaded = false;
