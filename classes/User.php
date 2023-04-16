@@ -334,6 +334,8 @@ class User extends Fighter {
         $user->regen_boost = 0;
 
         $user->setForbiddenSealFromDb($result['forbidden_seal'], $remote_view);
+        $user->regen_boost += floor($user->regen_rate * ($user->forbidden_seal->regen_boost / 100));
+
         $user->chat_color = $result['chat_color'];
         $user->chat_effect = $result['chat_effect'];
 
@@ -748,6 +750,7 @@ class User extends Fighter {
 
         // Forbidden seal
         $this->setForbiddenSealFromDb($user_data['forbidden_seal'], $remote_view);
+        $this->regen_boost += floor($this->regen_rate * ($this->forbidden_seal->regen_boost / 100));
 
         //In Village Regen
 //        if($this->in_village) {
