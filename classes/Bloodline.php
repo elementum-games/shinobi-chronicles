@@ -177,7 +177,7 @@ class Bloodline {
                     $regen_multiplier *= $ratios['regen'];
 
                     $this->passive_boosts[$id]['power'] = round($boost_power * $regen_multiplier, 2);
-                    $this->passive_boosts[$id]['effect_amount'] = floor($this->passive_boosts[$id]['power'] * $regen_rate);
+                    $this->passive_boosts[$id]['effect_amount'] = ceil($this->passive_boosts[$id]['power'] * $regen_rate);
                     break;
 
                 case 'scout_range':
