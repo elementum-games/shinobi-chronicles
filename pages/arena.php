@@ -39,14 +39,16 @@ function arena(): bool {
 		while($row = $system->db_fetch($result)) {
 			$ai_opponents[$row['ai_id']] = $row;
 		}
-		$fight_start = false;
+
 		if(!empty($_GET['fight'])) {
+            $max_last_ai_ms = System::currentTimeMs() - $fight_timer;
+
             // check if the current location disallows ai fights
             if ($player->rank_num > 2 && $player->current_location->location_id && $player->current_location->ai_allowed == 0) {
                 $system->message('You cannot fight at this location');
             }
-            else if($player->last_ai_ms > System::currentTimeMs() - $fight_timer) {
-				$system->message("Please wait " . ($player->last_ai_ms - (System::currentTimeMs() - $fight_timer) / 1000) . " more seconds!");
+            else if($player->last_ai_ms > $max_last_ai_ms) {
+				$system->message("Please wait " . ceil(($player->last_ai_ms - $max_last_ai_ms) / 1000) . " more seconds!");
 			}
 			else if(isset($ai_opponents[$_GET['fight']])) {
                 try {
