@@ -356,6 +356,7 @@ if($LOGGED_IN) {
 	if(!$page_loaded) {
 		echo str_replace("[HEADER_TITLE]", "Profile", $layout->body_start);
 
+        $system->printMessage();
         if(!$player->global_message_viewed && !$system->is_legacy_ajax_request) {
             $global_message = $system->fetchGlobalMessage();
             $layout->renderGlobalMessage($system, $global_message);
