@@ -416,14 +416,18 @@ class BattleManager {
             [
                 '[player]',
                 '[opponent]',
-                '[gender]',
-                '[gender2]'
+                '[attackerGender]',
+                '[attackerGender2]',
+                '[targetGender]',
+                '[targetGender2]'
             ],
             [
                 $attacker->getName(),
                 $target->getName(),
                 $attacker->getSingularPronoun(),
                 $attacker->getPossessivePronoun(),
+                $target->getSingularPronoun(),
+                $target->getPossessivePronoun(),
             ],
             $text
         );
@@ -925,7 +929,7 @@ class BattleManager {
                     $collision_text .= "[player] swiftly evaded " . ($damage_reduction * 100) . "% of [opponent]'s damage!";
                 }
                 else {
-                    $collision_text .= "[player] cast [gender2] jutsu before [opponent] cast, negating " .
+                    $collision_text .= "[player] cast [attackerGender2] jutsu before [opponent] cast, negating " .
                         ($damage_reduction * 100) . "% of [opponent]'s damage!";
                 }
             }
@@ -947,7 +951,7 @@ class BattleManager {
                     $collision_text .= "[opponent] swiftly evaded " . ($damage_reduction * 100) . "% of [player]'s damage!";
                 }
                 else {
-                    $collision_text .= "[opponent] cast [gender2] jutsu before [player] cast, negating " .
+                    $collision_text .= "[opponent] cast [targetGender2] jutsu before [player] cast, negating " .
                         ($damage_reduction * 100) . "% of [player]'s damage!";
                 }
             }
