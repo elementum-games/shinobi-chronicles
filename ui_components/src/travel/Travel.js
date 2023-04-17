@@ -63,9 +63,9 @@ const Travel = ({
     missionLink,
     membersLink,
     attackLink,
+    playerId,
     playerRank
 }) => {
-
     const [feedback, setFeedback] = React.useState(null);
 
     const [mapData, setMapData] = React.useState(null);
@@ -96,7 +96,6 @@ const Travel = ({
     // this is the temporary workaround for the sidemenu reflecting the player's new location
     // otherwise people will have to refresh before attempting to train outside of village
     React.useEffect(() => {
-
         const menu = document.getElementsByClassName('sm-tmp-class')[0];
 
         if (mapData && !mapData.in_village) {
@@ -107,7 +106,6 @@ const Travel = ({
             menu.classList.add('sm-tmp-invillage');
             menu.classList.remove('sm-tmp-outvillage');
         }
-
     }, [mapData]);
 
     // keyboard shortcut
@@ -204,7 +202,16 @@ const Travel = ({
             {
                 request: 'LoadMapData'
             }
-        ).then(handleAPIResponse);
+        ).then((response) => {
+            if (response.errors.length) {
+                handleErrors(response.errors);
+                return;
+            }
+
+            debug('Map loaded.');
+            setFilters(response.data.response.player_filters.travel_filter);
+            setMapData(response.data.response);
+        });
     }
 
     const LoadScoutData = () => {
@@ -218,7 +225,24 @@ const Travel = ({
             {
                 request: 'LoadScoutData'
             }
-        ).then(handleAPIResponse);
+        ).then((response) => {
+            if (response.errors.length) {
+                handleErrors(response.errors);
+                return;
+            }
+
+            debug('Scout Area updated.');
+            setScoutData(response.data.response);
+
+            const player = response.data.response.filter(user => parseInt(user.user_id) === playerId)[0];
+            if(player != null) {
+                setMapData(prevMapData => ({
+                    ...prevMapData,
+                    player_x: player.target_x,
+                    player_y: player.target_y
+                }))
+            }
+        });
     }
 
     const MovePlayer = (direction) => {
@@ -230,7 +254,20 @@ const Travel = ({
                 request: 'MovePlayer',
                 direction: direction
             }
-        ).then(handleAPIResponse);
+        ).then((response) => {
+            if (response.errors.length) {
+                handleErrors(response.errors);
+                return;
+            }
+
+            if (response.data.response) {
+                debug('Player moved successfully');
+                LoadMapData(); // Reload map
+                LoadScoutData(); // Reload scout area
+            } else {
+                debug('Cannot move player.');
+            }
+        });
     }
 
     const EnterPortal = (portal_id) => {
@@ -241,7 +278,21 @@ const Travel = ({
                 request: 'EnterPortal',
                 portal_id: portal_id
             }
-        ).then(handleAPIResponse);
+        ).then((response) => {
+            if (response.errors.length) {
+                handleErrors(response.errors);
+                return;
+            }
+
+            if (response.data.response) {
+                setFeedback(null);
+                debug('Player moved through portal.');
+                LoadMapData(); // Reload map
+                LoadScoutData(); // Reload scout area
+            } else {
+                debug('Cannot move through gate!');
+            }
+        });
     }
 
     const UpdateFilter = (filter, value) => {
@@ -253,54 +304,22 @@ const Travel = ({
                 filter: filter,
                 filter_value: + value
             }
-        ).then(handleAPIResponse)
+        ).then((response) => {
+            if (response.errors.length) {
+                handleErrors(response.errors);
+                return;
+            }
+
+            debug('Filter updated!');
+            LoadMapData(); // Reload map
+            LoadScoutData(); // Reload scout area
+        });
     }
 
-    // HANDLE API REQUESTS
-    const handleAPIResponse = (response) => {
-        // Update errors
-        if (response.errors.length) {
-            console.log(response.errors);
-            setFeedback([response.errors, 'info']);
-            return;
-        }
-
-        switch (response.data.request) {
-            case 'LoadMapData':
-                debug('Map loaded.');
-                setFilters(response.data.response.player_filters.travel_filter);
-                setMapData(response.data.response);
-                break;
-            case 'LoadScoutData':
-                debug('Scout Area updated.');
-                setScoutData(response.data.response);
-                break;
-            case 'MovePlayer':
-                if (response.data.response) {
-                    debug('Player moved successfully');
-                    LoadMapData(); // Reload map
-                    LoadScoutData(); // Reload scout area
-                } else {
-                    debug('Cannot move player.');
-                }
-                break;
-            case 'EnterPortal':
-                if (response.data.response) {
-                    setFeedback(null);
-                    debug('Player moved through portal.');
-                    LoadMapData(); // Reload map
-                    LoadScoutData(); // Reload scout area
-                } else {
-                    debug('Cannot move through gate!');
-                }
-                break;
-            case 'UpdateFilter':
-                debug('Filter updated!');
-                LoadMapData(); // Reload map
-                LoadScoutData(); // Reload scout area
-                break;
-        }
-    };
+    function handleErrors(errors) {
+        console.log(errors);
+        setFeedback([errors, 'info']);
+    }
 
     return (
         <>

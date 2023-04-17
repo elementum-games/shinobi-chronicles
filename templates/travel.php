@@ -1,7 +1,7 @@
 <?php
 /**
- * @param System $system
- * @param User $player
+ * @var System $system
+ * @var User $player
  */
 ?>
 
@@ -21,7 +21,7 @@
                 missionLink: "<?= $system->router->links['mission'] ?>",
                 membersLink: "<?= $system->router->links['members'] ?>",
                 attackLink: "<?= $system->router->links['battle'] ?>",
-                self_id: <?= $player->user_id ?>,
+                playerId: <?= $player->user_id ?>,
                 playerRank: <?= $player->rank_num ?>
             }),
             travelContainer

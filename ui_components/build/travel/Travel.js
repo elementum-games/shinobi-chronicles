@@ -61,6 +61,7 @@ const Travel = ({
   missionLink,
   membersLink,
   attackLink,
+  playerId,
   playerRank
 }) => {
   const [feedback, setFeedback] = React.useState(null);
@@ -196,7 +197,16 @@ const Travel = ({
 
     apiFetch(travelAPILink, {
       request: 'LoadMapData'
-    }).then(handleAPIResponse);
+    }).then(response => {
+      if (response.errors.length) {
+        handleErrors(response.errors);
+        return;
+      }
+
+      debug('Map loaded.');
+      setFilters(response.data.response.player_filters.travel_filter);
+      setMapData(response.data.response);
+    });
   };
 
   const LoadScoutData = () => {
@@ -207,7 +217,23 @@ const Travel = ({
     debug('Loading Scout Area Data...');
     apiFetch(travelAPILink, {
       request: 'LoadScoutData'
-    }).then(handleAPIResponse);
+    }).then(response => {
+      if (response.errors.length) {
+        handleErrors(response.errors);
+        return;
+      }
+
+      debug('Scout Area updated.');
+      setScoutData(response.data.response);
+      const player = response.data.response.filter(user => parseInt(user.user_id) === playerId)[0];
+
+      if (player != null) {
+        setMapData(prevMapData => ({ ...prevMapData,
+          player_x: player.target_x,
+          player_y: player.target_y
+        }));
+      }
+    });
   };
 
   const MovePlayer = direction => {
@@ -216,7 +242,21 @@ const Travel = ({
     apiFetch(travelAPILink, {
       request: 'MovePlayer',
       direction: direction
-    }).then(handleAPIResponse);
+    }).then(response => {
+      if (response.errors.length) {
+        handleErrors(response.errors);
+        return;
+      }
+
+      if (response.data.response) {
+        debug('Player moved successfully');
+        LoadMapData(); // Reload map
+
+        LoadScoutData(); // Reload scout area
+      } else {
+        debug('Cannot move player.');
+      }
+    });
   };
 
   const EnterPortal = portal_id => {
@@ -224,7 +264,22 @@ const Travel = ({
     apiFetch(travelAPILink, {
       request: 'EnterPortal',
       portal_id: portal_id
-    }).then(handleAPIResponse);
+    }).then(response => {
+      if (response.errors.length) {
+        handleErrors(response.errors);
+        return;
+      }
+
+      if (response.data.response) {
+        setFeedback(null);
+        debug('Player moved through portal.');
+        LoadMapData(); // Reload map
+
+        LoadScoutData(); // Reload scout area
+      } else {
+        debug('Cannot move through gate!');
+      }
+    });
   };
 
   const UpdateFilter = (filter, value) => {
@@ -233,64 +288,23 @@ const Travel = ({
       request: 'UpdateFilter',
       filter: filter,
       filter_value: +value
-    }).then(handleAPIResponse);
-  }; // HANDLE API REQUESTS
+    }).then(response => {
+      if (response.errors.length) {
+        handleErrors(response.errors);
+        return;
+      }
 
+      debug('Filter updated!');
+      LoadMapData(); // Reload map
 
-  const handleAPIResponse = response => {
-    // Update errors
-    if (response.errors.length) {
-      console.log(response.errors);
-      setFeedback([response.errors, 'info']);
-      return;
-    }
-
-    switch (response.data.request) {
-      case 'LoadMapData':
-        debug('Map loaded.');
-        setFilters(response.data.response.player_filters.travel_filter);
-        setMapData(response.data.response);
-        break;
-
-      case 'LoadScoutData':
-        debug('Scout Area updated.');
-        setScoutData(response.data.response);
-        break;
-
-      case 'MovePlayer':
-        if (response.data.response) {
-          debug('Player moved successfully');
-          LoadMapData(); // Reload map
-
-          LoadScoutData(); // Reload scout area
-        } else {
-          debug('Cannot move player.');
-        }
-
-        break;
-
-      case 'EnterPortal':
-        if (response.data.response) {
-          setFeedback(null);
-          debug('Player moved through portal.');
-          LoadMapData(); // Reload map
-
-          LoadScoutData(); // Reload scout area
-        } else {
-          debug('Cannot move through gate!');
-        }
-
-        break;
-
-      case 'UpdateFilter':
-        debug('Filter updated!');
-        LoadMapData(); // Reload map
-
-        LoadScoutData(); // Reload scout area
-
-        break;
-    }
+      LoadScoutData(); // Reload scout area
+    });
   };
+
+  function handleErrors(errors) {
+    console.log(errors);
+    setFeedback([errors, 'info']);
+  }
 
   return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
     className: "travel-filter"
