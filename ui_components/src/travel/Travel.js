@@ -48,7 +48,7 @@ const keyInterval = 100; // 100ms
 
 const keysPressed = {};
 
-window.travelRefreshActive = false;
+window.travelRefreshActive = true;
 window.travelDebug = false;
 
 function debug(message) {
