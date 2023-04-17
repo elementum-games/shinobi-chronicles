@@ -1170,7 +1170,12 @@ class User extends Fighter {
                 $gain_description = $this->addStatGain($this->train_type, $this->train_gain);
 
                 $this->train_time = 0;
-                $this->system->message($gain_description . '.' . $team_boost_description);
+                if($gain_description) {
+                    $this->system->message($gain_description . '.' . $team_boost_description);
+                }
+                else if($this->total_stats >= $this->rank->stat_cap) {
+                    $this->system->message("Training has finished but you cannot gain any more stats!");
+                }
             }
         }
     }
