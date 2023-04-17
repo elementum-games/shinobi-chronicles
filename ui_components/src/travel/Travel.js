@@ -4,24 +4,24 @@ import { ScoutArea} from "./ScoutArea.js";
 
 /**
  * @param {{
- * player_x:            int,
- * player_y:            int,
- * player_map_id:       int,
- * player_id:           int,
- * player_icon:         string,
- * player_filters:      object,
- * map_name:            string,
- * background_image:    string,
- * start_x:             int,
- * end_x:               int,
- * start_y:             int,
- * end_y:               int,
- * in_village:          boolean,
- * current_portal:      object,
- * current_mission:     boolean,
- * all_locations:       object,
- * tile_width:          int,
- * tile_height:         int,
+  player_x:            int,
+    player_y:            int,
+    player_map_id:       int,
+    player_id:           int,
+    player_icon:         string,
+    player_filters:      object,
+    map_name:            string,
+    background_image:    string,
+    start_x:             int,
+    end_x:               int,
+    start_y:             int,
+    end_y:               int,
+    in_village:          boolean,
+    current_portal:      object,
+    current_mission:     boolean,
+    all_locations:       object,
+    tile_width:          int,
+    tile_height:         int,
  * }} mapData
  *
  * @param {{
@@ -35,11 +35,11 @@ import { ScoutArea} from "./ScoutArea.js";
  * }} current_portal
  *
  * @param {[
- * Akademi-sei: boolean,
- * genin:       boolean,
- * chuunin:     boolean,
- * jonin:       boolean
- * ]} player_filters.travel_filter
+ * 1: boolean,
+ * 2:       boolean,
+ * 3:     boolean,
+ * 4:       boolean
+ * ]} player_filters.travel_ranks_to_view
  **/
 
 
@@ -48,7 +48,7 @@ const keyInterval = 100; // 100ms
 
 const keysPressed = {};
 
-window.travelRefreshActive = true;
+window.travelRefreshActive = false;
 window.travelDebug = false;
 
 function debug(message) {
@@ -57,24 +57,34 @@ function debug(message) {
     }
 }
 
-const Travel = ({
+type Props = {|
+    +travelPageLink: string,
+    +travelAPILink: string,
+    +missionLink: string,
+    +membersLink: string,
+    +attackLink: string,
+    +playerId: number,
+|};
+
+function Travel({
     travelPageLink,
     travelAPILink,
     missionLink,
     membersLink,
     attackLink,
     playerId,
-    playerRank
-}) => {
+}): Props {
     const [feedback, setFeedback] = React.useState(null);
 
     const [mapData, setMapData] = React.useState(null);
     const [scoutData, setScoutData] = React.useState(null);
 
-    const [viewAS, setViewAS] = React.useState(false);
-    const [viewGenin, setViewGenin] = React.useState(false);
-    const [viewChuunin, setViewChuunin] = React.useState(false);
-    const [viewJonin, setViewJonin] = React.useState(false);
+    const [ranksToView, setRanksToView] = React.useState({
+        1: false,
+        2: false,
+        3: false,
+        4: false
+    });
 
     // Initial Load, fetch map info from user location
     React.useEffect(() => {
@@ -170,29 +180,6 @@ const Travel = ({
         MovePlayer(direction);
     }
 
-    const setFilters = (travel_filters) => {
-        if (travel_filters['Akademi-sei']) {
-            setViewAS(true);
-        } else {
-            setViewAS(false);
-        }
-        if (travel_filters['Genin']) {
-            setViewGenin(true);
-        } else {
-            setViewGenin(false);
-        }
-        if (travel_filters['Chuunin']) {
-            setViewChuunin(true);
-        } else {
-            setViewChuunin(false);
-        }
-        if (travel_filters['Jonin']) {
-            setViewJonin(true);
-        } else {
-            setViewJonin(false);
-        }
-    }
-
     // API ACTIONS
     const LoadMapData = () => {
         debug('Loading Map Data...');
@@ -209,7 +196,7 @@ const Travel = ({
             }
 
             debug('Map loaded.');
-            setFilters(response.data.response.player_filters.travel_filter);
+            setRanksToView(response.data.response.player_filters.travel_ranks_to_view);
             setMapData(response.data.response);
         });
     }
@@ -235,7 +222,7 @@ const Travel = ({
             setScoutData(response.data.response);
 
             const player = response.data.response.filter(user => parseInt(user.user_id) === playerId)[0];
-            if(player != null) {
+            if(player != null && mapData != null) {
                 setMapData(prevMapData => ({
                     ...prevMapData,
                     player_x: player.target_x,
@@ -302,7 +289,7 @@ const Travel = ({
             {
                 request: 'UpdateFilter',
                 filter: filter,
-                filter_value: + value
+                filter_value: value
             }
         ).then((response) => {
             if (response.errors.length) {
@@ -310,7 +297,7 @@ const Travel = ({
                 return;
             }
 
-            debug('Filter updated!');
+            debug('Filters updated!');
             LoadMapData(); // Reload map
             LoadScoutData(); // Reload scout area
         });
@@ -323,76 +310,98 @@ const Travel = ({
 
     return (
         <>
-            <div className='travel-filter'>
-                <div className='travel-filter-title'>
-                    Filter Options:
-                </div>
-                <div className='travel-filter-options'>
-                    <input id='travel-filter-jonin'
-                           type='checkbox'
-                           checked={viewJonin}
-                           onChange={() => UpdateFilter('Jonin', viewJonin)}
-                    />
-                    <label>Jonin</label>
-                    <input id='travel-filter-chuunin'
-                           type='checkbox'
-                           checked={viewChuunin}
-                           onChange={() => UpdateFilter('Chuunin', viewChuunin)}
-                    />
-                    <label>Chuunin</label>
-                    <input id='travel-filter-genin'
-                           type='checkbox'
-                           checked={viewGenin}
-                           onChange={() => UpdateFilter('Genin', viewGenin)}
-                    />
-                    <label>Genin</label>
-                    <input id='travel-filter-as'
-                           type='checkbox'
-                           checked={viewAS}
-                           onChange={() => UpdateFilter('Akademi-sei', viewAS)}
-                    />
-                    <label>Akademi-sei</label>
-                </div>
-            </div>
-        <div className='travel-wrapper'>
-            <TravelActions
-                travelPageLink={travelPageLink}
-                movePlayer={MovePlayer}
+            <TravelFilters
+                ranksToView={ranksToView}
+                updateRanksToView={(newRanksToView) => {
+                    let newRanksToViewCsv = Object.keys(newRanksToView)
+                        .filter(rank => newRanksToView[rank])
+                        .join(',');
+                    UpdateFilter("travel_ranks_to_view", newRanksToViewCsv)
+                }}
             />
-            <div id='travel-container' className='travel-container'>
-                <div className='travel-buttons'>
-                    {(mapData && !Array.isArray(mapData.current_portal)) && (
-                        <button className='button'
-                                onClick={() => EnterPortal(mapData.current_portal.portal_id)}>
-                            Go to {mapData.current_portal.entrance_name}
-                        </button>
-                    )}
-                    {(mapData && mapData.current_mission) && (
-                     <a href={missionLink}>
-                         <button className='button'>Go to Mission Location</button>
-                     </a>
-                    )}
-                </div>
-                {(feedback) && (
-                    <div className='travel-messages'>
-                        <Message message={feedback[0]} messageType={feedback[1]} />
+            <div className='travel-wrapper'>
+                <TravelActions
+                    travelPageLink={travelPageLink}
+                    movePlayer={MovePlayer}
+                />
+                <div id='travel-container' className='travel-container'>
+                    <div className='travel-buttons'>
+                        {mapData?.current_portal?.portal_id != null && (
+                            <button className='button'
+                                    onClick={() => EnterPortal(mapData.current_portal.portal_id)}>
+                                Go to {mapData.current_portal.entrance_name}
+                            </button>
+                        )}
+                        {(mapData && mapData.current_mission) && (
+                         <a href={missionLink}>
+                             <button className='button'>Go to Mission Location</button>
+                         </a>
+                        )}
                     </div>
-                )}
-                {(mapData) && (<Map mapData={mapData} />)}
+                    {(feedback) && (
+                        <div className='travel-messages'>
+                            <Message message={feedback[0]} messageType={feedback[1]} />
+                        </div>
+                    )}
+                    {(mapData) && (<Map mapData={mapData} />)}
+                </div>
             </div>
-        </div>
             {(mapData && scoutData) && (
-                <ScoutArea mapData={mapData}
-                           scoutData={scoutData}
-                           membersLink={membersLink}
-                           attackLink={attackLink}
-                           view_as={viewAS}
-                           view_genin={viewGenin}
-                           view_chuunin={viewChuunin}
-                           view_jonin={viewJonin}
+                <ScoutArea
+                    mapData={mapData}
+                    scoutData={scoutData}
+                    membersLink={membersLink}
+                    attackLink={attackLink}
+                    ranksToView={ranksToView}
                 />
             )}
         </>
+    );
+}
+
+function TravelFilters({ ranksToView, updateRanksToView}) {
+    function updateRankVisibility(rank, newValue) {
+        updateRanksToView({
+            ...ranksToView,
+            [rank]: newValue
+        });
+    }
+
+    return (
+        <div className='travel-filter'>
+            <div className='travel-filter-title'>
+                Filter Options:
+            </div>
+            <div className='travel-filter-options'>
+                <input id='travel-filter-jonin'
+                       type='checkbox'
+                       checked={ranksToView[4]}
+                       onChange={(e) => updateRankVisibility(4, e.target.checked)}
+                />
+                <label>Jonin</label>
+
+                <input id='travel-filter-chuunin'
+                       type='checkbox'
+                       checked={ranksToView[3]}
+                       onChange={(e) => updateRankVisibility(3, e.target.checked)}
+                />
+                <label>Chuunin</label>
+
+                <input id='travel-filter-genin'
+                       type='checkbox'
+                       checked={ranksToView[2]}
+                       onChange={(e) => updateRankVisibility(2, e.target.checked)}
+                />
+                <label>Genin</label>
+
+                <input id='travel-filter-as'
+                       type='checkbox'
+                       checked={ranksToView[1]}
+                       onChange={(e) => updateRankVisibility(1, e.target.checked)}
+                />
+                <label>Akademi-sei</label>
+            </div>
+        </div>
     );
 }
 
@@ -421,7 +430,6 @@ function TravelActions({ travelPageLink, movePlayer }) {
 }
 
 const Message = ({message, messageType}) => {
-
     return (
         <div className={`systemMessage-new systemMessage-new-${messageType}`}>
             {message}

@@ -20,25 +20,22 @@ export const ScoutArea = ({
     scoutData,
     membersLink,
     attackLink,
-    view_as,
-    view_genin,
-    view_chuunin,
-    view_jonin
+    ranksToView,
 }) => {
     return (
         <div className='travel-scout-container'>
             <div className='travel-scout'>
-                {(mapData) && scoutData.map((player_data) => (
-                    <Player key={player_data.user_id}
+                {(mapData) && scoutData
+                    .filter(user => ranksToView[parseInt(user.rank)] === true)
+                    .map((player_data) => (
+                        <Player
+                            key={player_data.user_id}
                             player_data={player_data}
                             membersLink={membersLink}
                             attackLink={attackLink}
-                            view_as={view_as}
-                            view_genin={view_genin}
-                            view_chuunin={view_chuunin}
-                            view_jonin={view_jonin}
-                    />
-                ))}
+                        />
+                    )
+                )}
             </div>
         </div>
     );
@@ -48,22 +45,7 @@ const Player = ({
     player_data,
     membersLink,
     attackLink,
-    view_as,
-    view_genin,
-    view_chuunin,
-    view_jonin
 }) => {
-
-    if (parseInt(player_data.rank, 10) === 1 && view_as === false) {
-        return (<></>);
-    } else if (parseInt(player_data.rank, 10) === 2 && view_genin === false) {
-        return (<></>);
-    } else if (parseInt(player_data.rank, 10) === 3 && view_chuunin === false) {
-        return (<></>);
-    } else if (parseInt(player_data.rank, 10) === 4 && view_jonin === false) {
-        return (<></>);
-    }
-
     return (
         <div key={player_data.user_id}
              className={alignmentClass(player_data.alignment)}>

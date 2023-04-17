@@ -20,44 +20,25 @@ export const ScoutArea = ({
   scoutData,
   membersLink,
   attackLink,
-  view_as,
-  view_genin,
-  view_chuunin,
-  view_jonin
+  ranksToView
 }) => {
   return /*#__PURE__*/React.createElement("div", {
     className: "travel-scout-container"
   }, /*#__PURE__*/React.createElement("div", {
     className: "travel-scout"
-  }, mapData && scoutData.map(player_data => /*#__PURE__*/React.createElement(Player, {
+  }, mapData && scoutData.filter(user => ranksToView[parseInt(user.rank)] === true).map(player_data => /*#__PURE__*/React.createElement(Player, {
     key: player_data.user_id,
     player_data: player_data,
     membersLink: membersLink,
-    attackLink: attackLink,
-    view_as: view_as,
-    view_genin: view_genin,
-    view_chuunin: view_chuunin,
-    view_jonin: view_jonin
+    attackLink: attackLink
   }))));
 };
+
 const Player = ({
   player_data,
   membersLink,
-  attackLink,
-  view_as,
-  view_genin,
-  view_chuunin,
-  view_jonin
+  attackLink
 }) => {
-  if (parseInt(player_data.rank, 10) === 1 && view_as === false) {
-    return /*#__PURE__*/React.createElement(React.Fragment, null);
-  } else if (parseInt(player_data.rank, 10) === 2 && view_genin === false) {
-    return /*#__PURE__*/React.createElement(React.Fragment, null);
-  } else if (parseInt(player_data.rank, 10) === 3 && view_chuunin === false) {
-    return /*#__PURE__*/React.createElement(React.Fragment, null);
-  } else if (parseInt(player_data.rank, 10) === 4 && view_jonin === false) {
-    return /*#__PURE__*/React.createElement(React.Fragment, null);
-  }
   return /*#__PURE__*/React.createElement("div", {
     key: player_data.user_id,
     className: alignmentClass(player_data.alignment)
@@ -78,18 +59,23 @@ const Player = ({
     href: attackLink + '&attack=' + player_data.attack_id
   }), player_data.attack === true && parseInt(player_data.battle_id, 10) > 0 && /*#__PURE__*/React.createElement("span", null)));
 };
+
 const alignmentClass = alignment => {
   let class_name = 'travel-scout-entry travel-scout-';
+
   switch (alignment) {
     case 'Ally':
       class_name += 'ally';
       break;
+
     case 'Enemy':
       class_name += 'enemy';
       break;
+
     case 'Neutral':
       class_name += 'neutral';
       break;
   }
+
   return class_name;
 };

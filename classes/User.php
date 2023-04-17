@@ -506,12 +506,7 @@ class User extends Fighter {
 
         if ($user_data['filters'] === null) {
             $filters = [
-                'travel_filter' => [
-                    'Akademi-sei'   => true,
-                    'Genin'         => true,
-                    'Chuunin'       => true,
-                    'Jonin'         => true
-                    ]
+                'travel_ranks_to_view' => array_fill(1, System::SC_MAX_RANK, true)
             ];
             $user_data['filters'] = json_encode($filters);
         }

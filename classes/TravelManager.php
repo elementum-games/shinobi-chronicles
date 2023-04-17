@@ -91,11 +91,22 @@ class TravelManager {
         ];
     }
 
-    public function updateFilter(string $filter, bool $filter_value): bool {
-        $new_value = !$filter_value;
-        $this->user->filters['travel_filter'][$filter] = $new_value;
-        $this->user->updateData();
-        return true;
+    public function updateFilter(string $filter, string $filter_value): bool {
+        switch($filter) {
+            case 'travel_ranks_to_view':
+                // $filter_value will be a CSV list
+                $filter_value_arr = explode(",", $filter_value);
+
+                $this->user->filters['travel_ranks_to_view'] = [];
+                for($i = 1; $i <= System::SC_MAX_RANK; $i++) {
+                    $this->user->filters['travel_ranks_to_view'][$i] = in_array($i, $filter_value_arr);
+                }
+
+                $this->user->updateData();
+                return true;
+            default;
+                return false;
+        }
     }
 
     /**
@@ -199,6 +210,7 @@ class TravelManager {
      */
     public function enterPortal($portal_id): bool {
         $ignore_travel_restrictions = $this->user->isHeadAdmin();
+
         // portal data
         $portal_data = Travel::getPortalData($this->system, $portal_id);
         if (empty($portal_data)) {
@@ -207,16 +219,19 @@ class TravelManager {
         if (!$this->checkRestrictions()) {
             throw new Exception('Unable to move!');
         }
+
         // check if the player is at the correct entrance
         if (!$this->user->location->equals(new TravelCoords($portal_data['entrance_x'], $portal_data['entrance_y'], $portal_data['from_id']))
             && !$ignore_travel_restrictions) {
             throw new Exception('You cannot enter here!');
         }
+
         // check if the player is in a faction that allows this portal
         $portal_whitelist = array_map('trim', explode(',', $portal_data['whitelist']));
         if (!in_array($this->user->village->name, $portal_whitelist) && !$ignore_travel_restrictions) {
             throw new Exception('You are unable to enter here!');
         }
+
         // update the player data
         $this->user->location->x = $portal_data['exit_x'];
         $this->user->location->y = $portal_data['exit_y'];
