@@ -416,8 +416,8 @@ class BattleManager {
             [
                 '[player]',
                 '[opponent]',
-                '[attackerGender]',
-                '[attackerGender2]',
+                '[gender]',
+                '[gender2]',
                 '[targetGender]',
                 '[targetGender2]'
             ],
