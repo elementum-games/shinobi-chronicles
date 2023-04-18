@@ -929,7 +929,7 @@ class BattleManager {
                     $collision_text .= "[player] swiftly evaded " . ($damage_reduction * 100) . "% of [opponent]'s damage!";
                 }
                 else {
-                    $collision_text .= "[player] cast [attackerGender2] jutsu before [opponent] cast, negating " .
+                    $collision_text .= "[player] cast [gender2] jutsu before [opponent] cast, negating " .
                         ($damage_reduction * 100) . "% of [opponent]'s damage!";
                 }
             }
