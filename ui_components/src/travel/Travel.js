@@ -222,12 +222,18 @@ function Travel({
             setScoutData(response.data.response);
 
             const player = response.data.response.filter(user => parseInt(user.user_id) === playerId)[0];
-            if(player != null && mapData != null) {
-                setMapData(prevMapData => ({
-                    ...prevMapData,
-                    player_x: player.target_x,
-                    player_y: player.target_y
-                }))
+            if(player != null) {
+                setMapData(prevMapData => {
+                    if (prevMapData == null) {
+                        return null;
+                    }
+
+                    return {
+                        ...prevMapData,
+                        player_x: player.target_x,
+                        player_y: player.target_y
+                    };
+                });
             }
         });
     }
