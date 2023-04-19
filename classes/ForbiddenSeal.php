@@ -200,4 +200,18 @@ class ForbiddenSeal {
         $this->journal_image_display = self::$benefits[$this->level]['journal_image_display'];
         $this->avatar_size_display = self::$benefits[$this->level]['avatar_size_display'];
     }
+
+    public function calcRemainingCredit(): int {
+        $akRatio = 1;
+        switch($this->level) {
+            case 1:
+                $akRatio = 6;
+                break;
+            case 2:
+                $akRatio = 2;
+                break;
+            default:
+        }
+        return floor(floor($this->seal_time_remaining / 86400) / $akRatio);
+    }
 }
