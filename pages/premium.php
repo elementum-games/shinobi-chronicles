@@ -578,12 +578,36 @@ function premium() {
                 // Confirm change in seal... time will not be reimbursed
                 if(!isset($_POST['change_forbidden_seal'])) {
                     $confirmation_type = 'change_forbidden_seal';
-                    $confirmation_string = "Are you sure you would like to change from your {$player->forbidden_seal->name}?<br />
-                    You will lose {$system->time_remaining($player->forbidden_seal->seal_time_remaining)} of premium time.<br />
-                    <b>This can not be undone!</b>";
+                    if ($player->forbidden_seal->name == "Twin Sparrow Seal") {
+                        // Convert remaining premium time to days and calculate AK value
+                        $akCredit = floor(floor($player->forbidden_seal->seal_time_remaining / 86400) / 6);
+                        // Adjust purchase cost with minimum 0
+                        if (($akCost -= $akCredit) < 0) {$akCost = 0;}
+                        $confirmation_string = "Are you sure you would like to change from your {$player->forbidden_seal->name}?<br />
+                        You will lose {$system->time_remaining($player->forbidden_seal->seal_time_remaining)} of premium time.<br />
+                        Up to {$akCredit} Ancient Kunai will be credited toward your purchase from existing premium time.<br />
+                        <b>This can not be undone!</b>";
+                    }
+                    else if ($player->forbidden_seal->name == "Four Dragon Seal") {
+                        // Convert remaining premium time to days and calculate AK value
+                        $akCredit = floor(floor($player->forbidden_seal->seal_time_remaining / 86400) / 2);
+                        // Adjust purchase cost with minimum 0
+                        if (($akCost -= $akCredit) < 0) {$akCost = 0;}
+                        $confirmation_string = "Are you sure you would like to change from your {$player->forbidden_seal->name}?<br />
+                        You will lose {$system->time_remaining($player->forbidden_seal->seal_time_remaining)} of premium time.<br />
+                        Up to {$akCredit} Ancient Kunai will be credited toward your purchase from existing premium time.<br />
+                        <b>This can not be undone!</b>";
+                    }
+                    else {
+                        $confirmation_string = "Are you sure you would like to change from your {$player->forbidden_seal->name}?<br />
+                        You will lose {$system->time_remaining($player->forbidden_seal->seal_time_remaining)} of premium time.<br />
+                        <b>This can not be undone!</b>";
+                    }
                     $additional_form_data = [
                         'seal_level' => ['input_type' => 'hidden', 'value' => $seal_level],
                         'seal_length' => ['input_type' => 'hidden', 'value' => $seal_length],
+                        // Pass adjusted akCost to confirmation form
+                        'seal_cost' => ['input_type' => 'hidden', 'value' => $akCost],
                     ];
                     $submit_value = 'forbidden_seal';
                     $button_value = 'Confirm Seal Change';
@@ -594,6 +618,17 @@ function premium() {
                     if($overwrite) {
                         $message .= " This purchase removed {$system->time_remaining($player->forbidden_seal->seal_time_remaining)}" .
                             " of their {$player->forbidden_seal->name}.";
+                    }
+                    // Recalculate adjusted akCost, $_POST['seal_cost'] is unsecure
+                    if (isset($_POST['seal_cost'])) {
+                        if ($player->forbidden_seal->name == "Twin Sparrow Seal") {
+                            $akCredit = floor(floor($player->forbidden_seal->seal_time_remaining / 86400) / 6);
+                            if (($akCost -= $akCredit) < 0) {$akCost = 0;}
+                        }
+                        else if ($player->forbidden_seal->name == "Four Dragon Seal") {
+                            $akCredit = floor(floor($player->forbidden_seal->seal_time_remaining / 86400) / 2);
+                            if (($akCost -= $akCredit) < 0) {$akCost = 0;}
+                        }
                     }
                     $player->subtractPremiumCredits($akCost, $message);
                     $player->forbidden_seal->addSeal($seal_level, $seal_length);
