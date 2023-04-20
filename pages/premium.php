@@ -606,7 +606,10 @@ function premium() {
                     // Recalculate adjusted akCost
                     if ($player->forbidden_seal->level > 0) {
                         $akCredit = $player->forbidden_seal->calcRemainingCredit();
-                        if (($akCost -= $akCredit) < 0) {$akCost = 0;}
+                        $akCost -= $akCredit;
+                        if ($akCost < 0) {
+                            $akCost = 0;
+                        }
                     }
                     $player->subtractPremiumCredits($akCost, $message);
                     $player->forbidden_seal->addSeal($seal_level, $seal_length);

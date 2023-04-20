@@ -202,16 +202,16 @@ class ForbiddenSeal {
     }
 
     public function calcRemainingCredit(): int {
-        $akRatio = 1;
+        $days_per_ak = 1;
         switch($this->level) {
             case 1:
-                $akRatio = 6;
+                $days_per_ak = 6;
                 break;
             case 2:
-                $akRatio = 2;
+                $days_per_ak = 2;
                 break;
             default:
         }
-        return floor(floor($this->seal_time_remaining / 86400) / $akRatio);
+        return floor(floor($this->seal_time_remaining / 86400) / $days_per_ak);
     }
 }
