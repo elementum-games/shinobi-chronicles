@@ -581,7 +581,10 @@ function premium() {
                     // Convert remaining premium time to days and calculate AK value
                     $akCredit = $player->forbidden_seal->calcRemainingCredit();
                     // Adjust purchase cost with minimum 0
-                    if (($akCost -= $akCredit) < 0) {$akCost = 0;}
+                    $akCost -= $akCredit;
+                    if ($akCost < 0) {
+                       $akCost = 0;
+                     }
                     $confirmation_string = "Are you sure you would like to change from your {$player->forbidden_seal->name}?<br />
                     You will lose {$system->time_remaining($player->forbidden_seal->seal_time_remaining)} of premium time.<br />
                     Up to {$akCredit} Ancient Kunai will be credited toward your purchase from existing premium time.<br />
