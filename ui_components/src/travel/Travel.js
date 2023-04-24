@@ -82,7 +82,7 @@ function Travel({
     attackLink,
     travelCooldownMs
 }): Props {
-    const travelIntervalFrequency = 50;
+    const travelIntervalFrequency = 40;
 
     const [feedback, setFeedback] = React.useState(null);
 
@@ -244,7 +244,7 @@ function Travel({
             return;
         }
 
-        const estimatedNetworkDelay = Math.floor(lastTravelLatencyMs.current / 3);
+        const estimatedNetworkDelay = Math.floor(lastTravelLatencyMs.current * 0.4);
         const timeToWait = travelCooldownMs + travelBufferMs - estimatedNetworkDelay;
 
         const timeSinceLastTravelStart = Date.now() - lastTravelStartTime.current;
