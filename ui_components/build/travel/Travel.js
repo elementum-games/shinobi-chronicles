@@ -71,7 +71,7 @@ function Travel({
   attackLink,
   travelCooldownMs
 }) {
-  const travelIntervalFrequency = 50;
+  const travelIntervalFrequency = 40;
   const [feedback, setFeedback] = React.useState(null);
   const [mapData, setMapData] = React.useState(null);
   const [scoutData, setScoutData] = React.useState(null);
@@ -103,7 +103,7 @@ function Travel({
 
       setRanksToView(response.data.mapData.player_filters.travel_ranks_to_view);
       setMapData(response.data.mapData);
-      setScoutData(response.data.scoutData);
+      setScoutData(response.data.nearbyPlayers);
     });
   };
 
@@ -206,7 +206,7 @@ function Travel({
       return;
     }
 
-    const estimatedNetworkDelay = Math.floor(lastTravelLatencyMs.current / 3);
+    const estimatedNetworkDelay = Math.floor(lastTravelLatencyMs.current * 0.4);
     const timeToWait = travelCooldownMs + travelBufferMs - estimatedNetworkDelay;
     const timeSinceLastTravelStart = Date.now() - lastTravelStartTime.current;
     const timeSinceLastTravelComplete = Date.now() - lastTravelCompleteTime.current;

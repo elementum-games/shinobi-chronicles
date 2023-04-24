@@ -123,7 +123,7 @@ function Travel({
 
             setRanksToView(response.data.mapData.player_filters.travel_ranks_to_view);
             setMapData(response.data.mapData);
-            setScoutData(response.data.scoutData);
+            setScoutData(response.data.nearbyPlayers);
         });
     }
 
