@@ -111,7 +111,6 @@ function Travel({
             return;
         }
 
-        debug('Loading Travel Data...');
         apiFetch(
             travelAPILink,
             {
@@ -123,7 +122,6 @@ function Travel({
                 return;
             }
 
-            debug('Map loaded.');
             setRanksToView(response.data.mapData.player_filters.travel_ranks_to_view);
             setMapData(response.data.mapData);
             setScoutData(response.data.scoutData);
