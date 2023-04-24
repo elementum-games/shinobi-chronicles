@@ -563,6 +563,10 @@ function TravelActions({ travelPageLink, updateMovementDirection }) {
                         directionButtonClicked.current = null;
                         setMovementDirection(null);
                     }}
+                    onTouchStart={e => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                    }}
                     onClick={e => {
                         e.preventDefault();
                     }}
