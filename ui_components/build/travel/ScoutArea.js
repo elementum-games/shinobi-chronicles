@@ -5,8 +5,8 @@
  * target_x:        int,
  * target_y:        int,
  * target_map_id:   int,
- * name:            string,
- * rank:            int,
+ * rank_name:       string,
+ * rank_num:            int,
  * village_icon:    string,
  * alignment:       string,
  * attack:          boolean,
@@ -26,7 +26,7 @@ export const ScoutArea = ({
     className: "travel-scout-container"
   }, /*#__PURE__*/React.createElement("div", {
     className: "travel-scout"
-  }, mapData && scoutData.filter(user => ranksToView[parseInt(user.rank)] === true).map(player_data => /*#__PURE__*/React.createElement(Player, {
+  }, mapData && scoutData.filter(user => ranksToView[parseInt(user.rank_num)] === true).map(player_data => /*#__PURE__*/React.createElement(Player, {
     key: player_data.user_id,
     player_data: player_data,
     membersLink: membersLink,
@@ -46,7 +46,7 @@ const Player = ({
     className: "travel-scout-name"
   }, /*#__PURE__*/React.createElement("a", {
     href: membersLink + '&user=' + player_data.user_name
-  }, player_data.user_name), /*#__PURE__*/React.createElement("span", null, "Lv.", player_data.level, " - ", player_data.name)), /*#__PURE__*/React.createElement("div", {
+  }, player_data.user_name), /*#__PURE__*/React.createElement("span", null, "Lv.", player_data.level, " - ", player_data.rank_name)), /*#__PURE__*/React.createElement("div", {
     className: "travel-scout-location"
   }, player_data.target_x, " \u2219 ", player_data.target_y), /*#__PURE__*/React.createElement("div", {
     className: "travel-scout-faction"

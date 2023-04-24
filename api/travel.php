@@ -15,7 +15,6 @@ try {
 # End standard auth
 
 try {
-
     // api requires a request
     if (isset($_POST['request'])) {
         $request = filter_input(INPUT_POST, 'request', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
@@ -24,36 +23,37 @@ try {
     }
 
     $TravelAPIResponse = new TravelAPIResponse();
-    $TravelAPIResponse->response['request'] = $request;
     $TravelManager = new TravelManager($system, $player);
 
     switch($request) {
-
-        case 'LoadScoutData':
-            $TravelAPIResponse->response['response'] = $TravelManager->fetchScoutData();
-            break;
-
-        case 'LoadMapData':
-            $TravelAPIResponse->response['response'] = $TravelManager->fetchMapDataAPI();
-            if (empty($TravelAPIResponse->response['response'])) {
-                API::exitWithError("Failed to load map!");
-            }
+        case 'LoadTravelData':
+            $TravelAPIResponse->response = [
+                'mapData' => TravelApiPresenter::mapDataResponse(player: $player, travelManager: $TravelManager),
+                'nearbyPlayers' => TravelApiPresenter::nearbyPlayersResponse(travelManager: $TravelManager),
+            ];
             break;
 
         case 'MovePlayer':
             $direction = $system->clean($_POST['direction']);
-            $TravelAPIResponse->response['response'] = $TravelManager->movePlayer($direction);
+
+            $success = $TravelManager->movePlayer($direction);
+            $TravelAPIResponse->response = TravelApiPresenter::travelActionResponse($success, $player, $TravelManager);
             break;
 
         case 'EnterPortal':
             $portal_id = $system->clean($_POST['portal_id']);
-            $TravelAPIResponse->response['response'] = $TravelManager->enterPortal($portal_id);
+
+            $success = $TravelManager->enterPortal($portal_id);
+            $TravelAPIResponse->response = TravelApiPresenter::travelActionResponse($success, $player, $TravelManager);
             break;
 
         case 'UpdateFilter':
             $filter = $system->clean($_POST['filter']);
             $filter_value = $system->clean($_POST['filter_value']);
-            $TravelAPIResponse->response['response'] = $TravelManager->updateFilter($filter, $filter_value);
+
+            $success = $TravelManager->updateFilter($filter, $filter_value);
+            $TravelAPIResponse->response = TravelApiPresenter::travelActionResponse($success, $player, $TravelManager);
+
             break;
 
         default:

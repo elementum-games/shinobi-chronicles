@@ -1,14 +1,12 @@
 <?php /** @noinspection PhpRedundantOptionalArgumentInspection */
 
-use JetBrains\PhpStorm\Pure;
-
 require_once __DIR__ . "/Jutsu.php";
 require_once __DIR__ . "/Team.php";
 require_once __DIR__ . "/DailyTask.php";
 require_once __DIR__ . "/ForbiddenSeal.php";
 require_once __DIR__ . "/battle/Fighter.php";
-require_once __DIR__ . "/TravelCoords.php";
-require_once __DIR__ . "/Travel.php";
+require_once __DIR__ . "/travel/TravelCoords.php";
+require_once __DIR__ . "/travel/Travel.php";
 require_once __DIR__ . "/StaffManager.php";
 require_once __DIR__ . "/Rank.php";
 require_once __DIR__ . "/Village.php";

@@ -941,6 +941,6 @@ class System {
     #[Pure]
     public function getReactFile(string $component_name): string {
         $filename = "ui_components/build/{$component_name}.js";
-        return $filename . "?q=" .  filemtime($filename);
+        return $this->router->base_url . $filename . "?v=" .  filemtime($filename);
     }
 }

@@ -5,8 +5,8 @@
  * target_x:        int,
  * target_y:        int,
  * target_map_id:   int,
- * name:            string,
- * rank:            int,
+ * rank_name:       string,
+ * rank_num:            int,
  * village_icon:    string,
  * alignment:       string,
  * attack:          boolean,
@@ -26,7 +26,7 @@ export const ScoutArea = ({
         <div className='travel-scout-container'>
             <div className='travel-scout'>
                 {(mapData) && scoutData
-                    .filter(user => ranksToView[parseInt(user.rank)] === true)
+                    .filter(user => ranksToView[parseInt(user.rank_num)] === true)
                     .map((player_data) => (
                         <Player
                             key={player_data.user_id}
@@ -53,7 +53,7 @@ const Player = ({
                 <a href={membersLink + '&user=' + player_data.user_name}>
                     {player_data.user_name}
                 </a>
-                <span>Lv.{player_data.level} - {player_data.name}</span>
+                <span>Lv.{player_data.level} - {player_data.rank_name}</span>
             </div>
             <div className='travel-scout-location'>
                 {player_data.target_x} &#8729; {player_data.target_y}

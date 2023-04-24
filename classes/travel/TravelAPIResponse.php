@@ -1,6 +1,6 @@
 <?php
 
-require_once __DIR__ . '/APIResponse.php';
+require_once __DIR__ . '/../APIResponse.php';
 
 class TravelAPIResponse extends APIResponse {
     public array $response;

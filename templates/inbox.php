@@ -21,7 +21,7 @@ if($player->checkBan(StaffManager::BAN_TYPE_PM)) {
 
 <div id="inboxReactContainer"></div>
 
-<script type="module" src="<?= $system->router->base_url?><?= $system->getReactFile("inbox/inbox") ?>"></script>
+<script type="module" src="<?= $system->getReactFile("inbox/inbox") ?>"></script>
 <script>
     const inboxContainer = document.querySelector("#inboxReactContainer");
 

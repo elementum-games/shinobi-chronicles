@@ -36,10 +36,11 @@ require_once __DIR__ . "/classes/InboxUser.php";
 require_once __DIR__ . "/classes/InboxManager.php";
 require_once __DIR__ . "/classes/InboxAPIResponse.php";
 
-require_once __DIR__ . "/classes/Travel.php";
-require_once __DIR__ . "/classes/TravelManager.php";
-require_once __DIR__ . "/classes/TravelAPIResponse.php";
-require_once __DIR__ . "/classes/TravelCoords.php";
-require_once __DIR__ . "/classes/MapLocation.php";
+require_once __DIR__ . "/classes/travel/Travel.php";
+require_once __DIR__ . "/classes/travel/TravelManager.php";
+require_once __DIR__ . "/classes/travel/TravelApiPresenter.php";
+require_once __DIR__ . "/classes/travel/TravelAPIResponse.php";
+require_once __DIR__ . "/classes/travel/TravelCoords.php";
+require_once __DIR__ . "/classes/travel/MapLocation.php";
 
 require_once __DIR__ . "/classes/Village.php";

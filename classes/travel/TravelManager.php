@@ -1,7 +1,8 @@
 <?php
 
-class TravelManager {
+require __DIR__ . '/NearbyPlayerDto.php';
 
+class TravelManager {
     const VILLAGE_ICONS = [
         'Stone' => 'images/village_icons/stone.png',
         'Mist' => 'images/village_icons/mist.png',
@@ -12,7 +13,8 @@ class TravelManager {
     
     private System $system;
     private User $user;
-    private array $map_data;
+
+    public array $map_data;
 
     /**
      * @var TravelCoords[]
@@ -34,62 +36,6 @@ class TravelManager {
         return $count >= 1;
     }
 
-    public function fetchMapDataAPI(): array {
-        // all locations
-        $result = $this->system->query("
-            SELECT * 
-            FROM `maps_locations` 
-            WHERE `map_id`={$this->user->location->map_id}
-            ");
-        $locations = [];
-        foreach ($this->system->db_fetch_all($result) as $loc) {
-            $locations[] = new MapLocation($loc);
-        }
-
-        // portal check
-        $portal_data = [];
-        $result = $this->system->query("
-            SELECT * 
-            FROM `maps_portals` 
-            WHERE `entrance_x`={$this->user->location->x} 
-              AND `entrance_y`={$this->user->location->y} 
-              AND `from_id`={$this->user->location->map_id} 
-              AND `active`=1
-              ");
-        if ($this->system->db_last_num_rows) {
-            $portal_data = $this->system->db_fetch($result);
-        }
-
-        // mission location check
-        $mission_button = false;
-        if ($this->user->mission_id
-            && ($this->user->mission_stage['action_type'] == 'travel'
-            || $this->user->mission_stage['action_type'] == 'search')
-            && $this->user->location->equals(TravelCoords::fromDbString($this->user->mission_stage['action_data']))) {
-            $mission_button = true;
-        }
-
-        return [
-            'player_x'          => $this->user->location->x,
-            'player_y'          => $this->user->location->y,
-            'player_map_id'          => $this->user->location->map_id,
-            'player_id'         => $this->user->user_id,
-            'player_filters'    => $this->user->filters,
-            'player_icon'       => Travel::PLAYER_ICON,
-            'map_name'          => $this->map_data['map_name'],
-            'background_image'  => $this->map_data['background'],
-            'start_x'           => $this->map_data['start_x'],
-            'start_y'           => $this->map_data['start_y'],
-            'end_x'             => $this->map_data['end_x'],
-            'end_y'             => $this->map_data['end_y'],
-            'in_village'        => $this->user->in_village,
-            'current_portal'    => $portal_data,
-            'current_mission'   => $mission_button,
-            'all_locations'     => $locations,
-            'tile_width'        => $this->map_data['tile_width'],
-            'tile_height'       => $this->map_data['tile_height']
-        ];
-    }
 
     public function updateFilter(string $filter, string $filter_value): bool {
         switch($filter) {
@@ -118,7 +64,7 @@ class TravelManager {
         // check if the user has moved too recently
         $move_time_left = Travel::checkMovementDelay($this->user->last_movement_ms);
         if ($move_time_left > 0) {
-            throw new Exception('Moving...');
+            throw new Exception("Moving... {$this->user->last_movement_ms} / " . System::currentTimeMs());
         }
 
         // check if the user has exited an AI too recently
@@ -202,6 +148,7 @@ class TravelManager {
         $this->user->location->y = $new_coords->y;
         $this->user->last_movement_ms = System::currentTimeMs();
         $this->user->updateData();
+
         return true;
     }
 
@@ -241,13 +188,12 @@ class TravelManager {
         return true;
     }
 
-    public function fetchScoutData(): array {
-        return $this->fetchNearbyPlayers();
-    }
-
+    /**
+     * @return NearbyPlayerDto[]
+     */
     public function fetchNearbyPlayers(): array {
         $sql = "SELECT `users`.`user_id`, `users`.`user_name`, `users`.`village`, `users`.`rank`, `users`.`stealth`,
-                `users`.`level`, `users`.`attack_id`, `users`.`battle_id`, `ranks`.`name`, `users`.`location`
+                `users`.`level`, `users`.`attack_id`, `users`.`battle_id`, `ranks`.`name` as `rank_name`, `users`.`location`
                 FROM `users`
                 INNER JOIN `ranks`
                 ON `users`.`rank`=`ranks`.`rank_id`
@@ -259,63 +205,122 @@ class TravelManager {
         foreach ($users as $user) {
             // check if the user is nearby (including stealth
             $scout_range = max(0, $this->user->scout_range - $user['stealth']);
-            $location = TravelCoords::fromDbString($user['location']);
-            if ($location->map_id !== $this->user->location->map_id ||
-                $location->distanceDifference($this->user->location) > $scout_range) {
+            $user_location = TravelCoords::fromDbString($user['location']);
+            if ($user_location->map_id !== $this->user->location->map_id ||
+                $user_location->distanceDifference($this->user->location) > $scout_range) {
                 continue;
             }
-            $user['target_x'] = $location->x;
-            $user['target_y'] = $location->y;
-            $user['target_map_id'] = $location->map_id;
-            // village icon
-            $user['village_icon'] = TravelManager::VILLAGE_ICONS[$user['village']];
 
             // if ally or enemy
             // if there were alliance we can do additional checks here
             if ($user['village'] === $this->user->village->name) {
-                $user['alignment'] = 'Ally';
+                $user_alignment = 'Ally';
             } else {
-                $user['alignment'] = 'Enemy';
+                $user_alignment = 'Enemy';
             }
 
             // only display attack links if the same rank
-            $user['attack'] = false;
+            $can_attack = false;
             if ((int)$user['rank'] === $this->user->rank_num
                 && $this->user->location->equals(TravelCoords::fromDbString($user['location']))
                 && $user['user_id'] != $this->user->user_id
                 && $user['village'] !== $this->user->village->name) {
-                $user['attack'] = true;
+                $can_attack = true;
             }
 
             // add to return
-            $return_arr[] = $user;
+            $return_arr[] = new NearbyPlayerDto(
+                user_id: $user['user_id'],
+                user_name: $user['user_name'],
+                target_x: $user_location->x,
+                target_y: $user_location->y,
+                target_map_id: $user_location->map_id,
+                rank_name: $user['rank_name'],
+                rank_num: $user['rank'],
+                village_icon: TravelManager::VILLAGE_ICONS[$user['village']],
+                alignment: $user_alignment,
+                attack: $can_attack,
+                attack_id: $user['attack_id'],
+                level: $user['level'],
+                battle_id: $user['battle_id'],
+            );
         }
 
         // Add more users for display
         if($this->system->environment == System::ENVIRONMENT_DEV) {
             for($i = 0; $i < 7; $i++) {
-                $return_arr[] = [
-                    'user_id' => $i . mt_rand(10000, 20000),
-                    'user_name' => 'Konohamaru',
-                    'name' => 'Akademi-sei', // rank name
-                    'rank' => 3,
-                    'level' => 30,
-                    'battle_id' => 0,
-
-                    'target_x' => 15,
-                    'target_y' => 15,
-                    'target_map_id' => 2,
-                    'village_icon' => TravelManager::VILLAGE_ICONS['Mist'],
-                    'alignment' => 'Enemy',
-                    'attack' => true,
-                    'attack_id' => 'abc' . $i . mt_rand(10000, 20000),
-                    'location' => '15:15:1'
-                ];
+                $return_arr[] = new NearbyPlayerDto(
+                    user_id: $i . mt_rand(10000, 20000),
+                    user_name: 'Konohamaru',
+                    target_x: 15, // rank name
+                    target_y: 15,
+                    target_map_id: 2,
+                    rank_name: 'Akademi-sei',
+                    rank_num: 3,
+                    village_icon: TravelManager::VILLAGE_ICONS['Mist'],
+                    alignment: 'Enemy',
+                    attack: true,
+                    attack_id: 'abc' . $i . mt_rand(10000, 20000),
+                    level: 30,
+                    battle_id: 0,
+                );
             }
         }
 
 
         return $return_arr;
+    }
+
+    public function shouldShowMissionLocationPrompt(): bool {
+        $mission_stage_uses_travel = $this->user->mission_stage['action_type'] == 'travel'
+            || $this->user->mission_stage['action_type'] == 'search';
+
+        if ($this->user->mission_id && $mission_stage_uses_travel
+            && $this->user->location->equals(TravelCoords::fromDbString($this->user->mission_stage['action_data']))) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * @return MapLocation[]
+     */
+    public function fetchCurrentMapLocations(): array {
+        $result = $this->system->query("
+            SELECT * 
+            FROM `maps_locations` 
+            WHERE `map_id`={$this->user->location->map_id}
+        ");
+
+        $locations = [];
+        foreach ($this->system->db_fetch_all($result) as $loc) {
+            $locations[] = new MapLocation($loc);
+        }
+
+        return $locations;
+    }
+
+    /**
+     * @return array|null
+     */
+    public function fetchCurrentLocationPortal(): ?array {
+        $portal_data = null;
+
+        $result = $this->system->query("
+            SELECT * 
+            FROM `maps_portals` 
+            WHERE `entrance_x`={$this->user->location->x} 
+              AND `entrance_y`={$this->user->location->y} 
+              AND `from_id`={$this->user->location->map_id} 
+              AND `active`=1
+              ");
+
+        if ($this->system->db_last_num_rows) {
+            $portal_data = $this->system->db_fetch($result);
+        }
+
+        return $portal_data;
     }
 
     /**
