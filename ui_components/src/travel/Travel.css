@@ -201,6 +201,7 @@
     height: 33.333%;
     z-index: 1;
     cursor: pointer;
+    user-select: none;
 
     background: var(--theme-content-darker2-bg-color);
     box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.12) inset;

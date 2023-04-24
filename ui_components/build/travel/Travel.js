@@ -493,13 +493,15 @@ function TravelActions({
     href: `${travelPageLink}&travel=${direction}`,
     onMouseDown: e => {
       e.preventDefault();
+      e.stopPropagation();
       directionButtonClicked.current = direction;
-      changeMovementDirection(direction);
+      setMovementDirection(direction);
     },
     onMouseUp: e => {
       e.preventDefault();
+      e.stopPropagation();
       directionButtonClicked.current = null;
-      changeMovementDirection(null);
+      setMovementDirection(null);
     },
     onClick: e => {
       e.preventDefault();
