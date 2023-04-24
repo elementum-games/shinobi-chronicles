@@ -64,7 +64,7 @@ class TravelManager {
         // check if the user has moved too recently
         $move_time_left = Travel::checkMovementDelay($this->user->last_movement_ms);
         if ($move_time_left > 0) {
-            throw new Exception("Moving... {$this->user->last_movement_ms} / " . System::currentTimeMs());
+            throw new Exception("Moving...");
         }
 
         // check if the user has exited an AI too recently
