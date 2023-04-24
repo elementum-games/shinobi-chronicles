@@ -409,6 +409,7 @@ function TravelActions({ travelPageLink, updateMovementDirection }) {
         right: false,
         down: false,
     });
+    const directionButtonClicked = React.useRef(null);
 
     const [movementDirection, _setMovementDirection] = React.useState(null);
     function setMovementDirection(newDirection) {
@@ -461,6 +462,12 @@ function TravelActions({ travelPageLink, updateMovementDirection }) {
 
     // Keyboard input
     const allowed_keys = ['ArrowLeft', 'ArrowUp', 'ArrowRight', 'ArrowDown', 'w', 'a', 's', 'd'];
+    // Top to bottom left to right so the grid stacks right
+    const allowedDirections = [
+        'northwest', 'north', 'northeast',
+        'west', 'east',
+        'southwest', 'south', 'southeast',
+    ];
 
     const keyDown = (e) => {
         if(e.repeat) return;
@@ -487,6 +494,11 @@ function TravelActions({ travelPageLink, updateMovementDirection }) {
         }
 
         e.preventDefault();
+
+        if(directionButtonClicked != null) {
+            return;
+        }
+
         changeMovementDirection(directionFromKeysPressed(directionKeysPressed.current));
     }
     const keyUp = (e) => {
@@ -516,6 +528,11 @@ function TravelActions({ travelPageLink, updateMovementDirection }) {
         }
 
         e.preventDefault();
+
+        if(directionButtonClicked != null) {
+            return;
+        }
+
         changeMovementDirection(directionFromKeysPressed(directionKeysPressed.current));
     }
 
@@ -531,26 +548,27 @@ function TravelActions({ travelPageLink, updateMovementDirection }) {
         };
     }, [keyDown, keyUp]);
 
-    // Mouse/touch input
-    const makeTravelClickHandler = (direction) => {
-        return (e) => {
-            e.preventDefault();
-            // movePlayer(direction);
-        }
-    }
-
     return (
         <div className='travel-actions'>
-            <a href={`${travelPageLink}&travel=northwest`} onClick={makeTravelClickHandler('northwest') }></a>
-            <a href={`${travelPageLink}&travel=north`} onClick={makeTravelClickHandler('north') }></a>
-            <a href={`${travelPageLink}&travel=northeast`} onClick={makeTravelClickHandler('northeast') }></a>
-
-            <a href={`${travelPageLink}&travel=west`} onClick={makeTravelClickHandler('west') }></a>
-            <a href={`${travelPageLink}&travel=east`} onClick={makeTravelClickHandler('east') }></a>
-
-            <a href={`${travelPageLink}&travel=southwest`} onClick={makeTravelClickHandler('southwest') }></a>
-            <a href={`${travelPageLink}&travel=south`} onClick={makeTravelClickHandler('south') }></a>
-            <a href={`${travelPageLink}&travel=southeast`} onClick={makeTravelClickHandler('southeast') }></a>
+            {allowedDirections.map((direction) => (
+                <a
+                    key={`travel:${direction}`}
+                    href={`${travelPageLink}&travel=${direction}`}
+                    onMouseDown={e => {
+                        e.preventDefault();
+                        directionButtonClicked.current = direction;
+                        changeMovementDirection(direction);
+                    }}
+                    onMouseUp={e => {
+                        e.preventDefault();
+                        directionButtonClicked.current = null;
+                        changeMovementDirection(null);
+                    }}
+                    onClick={e => {
+                        e.preventDefault();
+                    }}
+                ></a>
+            ))}
         </div>
     )
 }

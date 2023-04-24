@@ -353,6 +353,7 @@ function TravelActions({
     right: false,
     down: false
   });
+  const directionButtonClicked = React.useRef(null);
   const [movementDirection, _setMovementDirection] = React.useState(null);
 
   function setMovementDirection(newDirection) {
@@ -400,7 +401,9 @@ function TravelActions({
     }
   }, [movementDirection]); // Keyboard input
 
-  const allowed_keys = ['ArrowLeft', 'ArrowUp', 'ArrowRight', 'ArrowDown', 'w', 'a', 's', 'd'];
+  const allowed_keys = ['ArrowLeft', 'ArrowUp', 'ArrowRight', 'ArrowDown', 'w', 'a', 's', 'd']; // Top to bottom left to right so the grid stacks right
+
+  const allowedDirections = ['northwest', 'north', 'northeast', 'west', 'east', 'southwest', 'south', 'southeast'];
 
   const keyDown = e => {
     if (e.repeat) return;
@@ -431,6 +434,11 @@ function TravelActions({
     }
 
     e.preventDefault();
+
+    if (directionButtonClicked != null) {
+      return;
+    }
+
     changeMovementDirection(directionFromKeysPressed(directionKeysPressed.current));
   };
 
@@ -465,6 +473,11 @@ function TravelActions({
     }
 
     e.preventDefault();
+
+    if (directionButtonClicked != null) {
+      return;
+    }
+
     changeMovementDirection(directionFromKeysPressed(directionKeysPressed.current));
   };
 
@@ -477,41 +490,26 @@ function TravelActions({
       window.removeEventListener('keydown', keyDown);
       window.removeEventListener('keyup', keyUp);
     };
-  }, [keyDown, keyUp]); // Mouse/touch input
-
-  const makeTravelClickHandler = direction => {
-    return e => {
-      e.preventDefault(); // movePlayer(direction);
-    };
-  };
-
+  }, [keyDown, keyUp]);
   return /*#__PURE__*/React.createElement("div", {
     className: "travel-actions"
-  }, /*#__PURE__*/React.createElement("a", {
-    href: `${travelPageLink}&travel=northwest`,
-    onClick: makeTravelClickHandler('northwest')
-  }), /*#__PURE__*/React.createElement("a", {
-    href: `${travelPageLink}&travel=north`,
-    onClick: makeTravelClickHandler('north')
-  }), /*#__PURE__*/React.createElement("a", {
-    href: `${travelPageLink}&travel=northeast`,
-    onClick: makeTravelClickHandler('northeast')
-  }), /*#__PURE__*/React.createElement("a", {
-    href: `${travelPageLink}&travel=west`,
-    onClick: makeTravelClickHandler('west')
-  }), /*#__PURE__*/React.createElement("a", {
-    href: `${travelPageLink}&travel=east`,
-    onClick: makeTravelClickHandler('east')
-  }), /*#__PURE__*/React.createElement("a", {
-    href: `${travelPageLink}&travel=southwest`,
-    onClick: makeTravelClickHandler('southwest')
-  }), /*#__PURE__*/React.createElement("a", {
-    href: `${travelPageLink}&travel=south`,
-    onClick: makeTravelClickHandler('south')
-  }), /*#__PURE__*/React.createElement("a", {
-    href: `${travelPageLink}&travel=southeast`,
-    onClick: makeTravelClickHandler('southeast')
-  }));
+  }, allowedDirections.map(direction => /*#__PURE__*/React.createElement("a", {
+    key: `travel:${direction}`,
+    href: `${travelPageLink}&travel=${direction}`,
+    onMouseDown: e => {
+      e.preventDefault();
+      directionButtonClicked.current = direction;
+      changeMovementDirection(direction);
+    },
+    onMouseUp: e => {
+      e.preventDefault();
+      directionButtonClicked.current = null;
+      changeMovementDirection(null);
+    },
+    onClick: e => {
+      e.preventDefault();
+    }
+  })));
 }
 
 const Message = ({
