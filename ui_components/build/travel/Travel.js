@@ -53,10 +53,7 @@ window.travelDebugVerbose = false;
 
 if (window.location.host === 'localhost') {
   window.travelDebug = true;
-  scoutAreaDataInterval = 5000;
-  setTimeout(() => {
-    window.travelRefreshActive = false;
-  }, 1000);
+  scoutAreaDataInterval = 2500;
 }
 
 function debug(...args) {
@@ -96,7 +93,6 @@ function Travel({
       return;
     }
 
-    debug('Loading Travel Data...');
     apiFetch(travelAPILink, {
       request: 'LoadTravelData'
     }).then(response => {
@@ -105,7 +101,6 @@ function Travel({
         return;
       }
 
-      debug('Map loaded.');
       setRanksToView(response.data.mapData.player_filters.travel_ranks_to_view);
       setMapData(response.data.mapData);
       setScoutData(response.data.scoutData);
@@ -113,7 +108,7 @@ function Travel({
   };
 
   const MovePlayer = direction => {
-    // resetDataRefreshInterval();
+    resetRefreshInterval();
     setFeedback(['Moving...', 'info']);
     debug('Moving player...' + direction);
     lastTravelStartTime.current = Date.now();

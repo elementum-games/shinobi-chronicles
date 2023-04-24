@@ -54,8 +54,7 @@ window.travelDebugVerbose = false;
 
 if(window.location.host === 'localhost') {
     window.travelDebug = true;
-    scoutAreaDataInterval = 5000;
-    setTimeout(() => { window.travelRefreshActive = false; }, 1000);
+    scoutAreaDataInterval = 2500;
 }
 
 function debug(...args) {
@@ -129,7 +128,7 @@ function Travel({
     }
 
     const MovePlayer = (direction) => {
-        // resetDataRefreshInterval();
+        resetRefreshInterval();
 
         setFeedback(['Moving...', 'info']);
         debug('Moving player...' + direction);
