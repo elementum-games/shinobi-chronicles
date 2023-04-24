@@ -435,7 +435,7 @@ function TravelActions({
 
     e.preventDefault();
 
-    if (directionButtonClicked != null) {
+    if (directionButtonClicked.current != null) {
       return;
     }
 
@@ -474,7 +474,7 @@ function TravelActions({
 
     e.preventDefault();
 
-    if (directionButtonClicked != null) {
+    if (directionButtonClicked.current != null) {
       return;
     }
 

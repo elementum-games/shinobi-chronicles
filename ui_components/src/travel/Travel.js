@@ -495,7 +495,7 @@ function TravelActions({ travelPageLink, updateMovementDirection }) {
 
         e.preventDefault();
 
-        if(directionButtonClicked != null) {
+        if(directionButtonClicked.current != null) {
             return;
         }
 
@@ -529,7 +529,7 @@ function TravelActions({ travelPageLink, updateMovementDirection }) {
 
         e.preventDefault();
 
-        if(directionButtonClicked != null) {
+        if(directionButtonClicked.current != null) {
             return;
         }
 
