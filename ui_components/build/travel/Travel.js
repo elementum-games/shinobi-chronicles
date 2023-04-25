@@ -486,26 +486,37 @@ function TravelActions({
       window.removeEventListener('keyup', keyUp);
     };
   }, [keyDown, keyUp]);
+
+  const handlePointerUp = e => {
+    console.log(e); // e.preventDefault();
+
+    if (directionButtonClicked.current == null) return;
+    directionButtonClicked.current = null;
+    setMovementDirection(null);
+  };
+
   return /*#__PURE__*/React.createElement("div", {
     className: "travel-actions"
   }, allowedDirections.map(direction => /*#__PURE__*/React.createElement("a", {
     key: `travel:${direction}`,
     href: `${travelPageLink}&travel=${direction}`,
-    onMouseDown: e => {
+    className: direction === movementDirection ? "active" : "",
+    onPointerDown: e => {
       e.preventDefault();
-      e.stopPropagation();
+
+      if (e.button !== 0) {
+        return;
+      }
+
       directionButtonClicked.current = direction;
       setMovementDirection(direction);
     },
-    onMouseUp: e => {
-      e.preventDefault();
-      e.stopPropagation();
-      directionButtonClicked.current = null;
-      setMovementDirection(null);
-    },
-    onTouchStart: e => {
-      e.preventDefault();
-      e.stopPropagation();
+    onPointerUp: handlePointerUp,
+    onPointerLeave: handlePointerUp,
+    onContextMenu: e => {
+      if (e.nativeEvent.pointerType === "touch") {
+        e.preventDefault();
+      }
     },
     onClick: e => {
       e.preventDefault();

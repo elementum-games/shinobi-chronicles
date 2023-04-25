@@ -202,6 +202,8 @@
     z-index: 1;
     cursor: pointer;
     user-select: none;
+    touch-action: none;
+    -webkit-tap-highlight-color: transparent;
 
     background: var(--theme-content-darker2-bg-color);
     box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.12) inset;
@@ -212,9 +214,14 @@
     width: 50%;
     flex-grow: 2;
 }
-.travel-actions a:hover {
-    background: var(--theme-text-color-normal);
-    transition: background-color 200ms ease-in-out;
+.travel-actions a.active, .travel-actions a.active:hover {
+    background: var(--theme-content-bg-color);
+}
+@media(hover: hover) {
+    .travel-actions a:hover {
+        background: var(--theme-content-darker-bg-color);
+        transition: background-color 200ms ease-in-out;
+    }
 }
 
 #travel-container {
