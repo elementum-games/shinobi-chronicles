@@ -42,8 +42,6 @@ import { ScoutArea } from "./ScoutArea.js";
  **/
 
 let scoutAreaDataInterval = 500; // 500 ms
-
-const keyInterval = 100; // 100ms
 // Buffer time, go a little slower than the interval to account for network variance
 
 const travelBufferMs = 25;
@@ -84,7 +82,8 @@ function Travel({
   const refreshIntervalId = React.useRef(null);
   const movementDirection = React.useRef(null);
   const lastTravelStartTime = React.useRef(null);
-  const lastTravelCompleteTime = React.useRef(null);
+  const lastTravelEndTime = React.useRef(null);
+  const lastTravelSuccessTime = React.useRef(null);
   const lastTravelLatencyMs = React.useRef(0);
   const travelIntervalId = React.useRef(null); // API ACTIONS
 
@@ -118,6 +117,7 @@ function Travel({
       direction: direction
     }).then(response => {
       const requestEnd = Date.now();
+      lastTravelEndTime.current = requestEnd;
       lastTravelLatencyMs.current = requestEnd - requestStart;
       debug(`MovePlayer Latency: ${lastTravelLatencyMs.current}ms`);
 
@@ -127,8 +127,8 @@ function Travel({
       }
 
       if (response.data.success) {
-        debug(`Move completed ${requestEnd - lastTravelCompleteTime.current} ms after last move`);
-        lastTravelCompleteTime.current = requestEnd;
+        debug(`Move completed ${requestEnd - lastTravelSuccessTime.current} ms after last move`);
+        lastTravelSuccessTime.current = requestEnd;
         setMapData(response.data.mapData);
         setScoutData(response.data.nearbyPlayers);
       } else {
@@ -209,18 +209,18 @@ function Travel({
     const estimatedNetworkDelay = Math.floor(lastTravelLatencyMs.current * 0.4);
     const timeToWait = travelCooldownMs + travelBufferMs - estimatedNetworkDelay;
     const timeSinceLastTravelStart = Date.now() - lastTravelStartTime.current;
-    const timeSinceLastTravelComplete = Date.now() - lastTravelCompleteTime.current;
+    const timeSinceLastTravelSuccess = Date.now() - lastTravelSuccessTime.current; // If waiting on a travel request, don't send another one unless it's been more than 200ms
 
-    if (timeSinceLastTravelStart < timeToWait) {
+    if (lastTravelStartTime.current > lastTravelEndTime.current && timeSinceLastTravelStart < 200) {
       return;
     }
 
-    if (timeSinceLastTravelComplete < timeToWait) {
+    if (timeSinceLastTravelSuccess < timeToWait) {
       return;
     }
 
     debug('base time to wait / network delay', travelCooldownMs + travelBufferMs, estimatedNetworkDelay);
-    debug('traveling / +last start / +last end', timeSinceLastTravelStart, timeSinceLastTravelComplete);
+    debug('traveling / +last start / +last success', timeSinceLastTravelStart, timeSinceLastTravelSuccess);
     MovePlayer(movementDirection.current);
   } // Initial Load, fetch map info from user location
 
@@ -488,8 +488,7 @@ function TravelActions({
   }, [keyDown, keyUp]);
 
   const handlePointerUp = e => {
-    console.log(e); // e.preventDefault();
-
+    // e.preventDefault();
     if (directionButtonClicked.current == null) return;
     directionButtonClicked.current = null;
     setMovementDirection(null);
