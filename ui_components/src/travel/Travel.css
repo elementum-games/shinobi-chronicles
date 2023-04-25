@@ -231,47 +231,47 @@
     color: var(--theme-text-color-normal);
 }
 .travel-actions a.north::before {
-    top: 6px;
+    top: var(--travel-arrow-half-size);
     left: calc(50% - var(--travel-arrow-half-size));
     right: calc(50% - var(--travel-arrow-half-size));
     transform: rotate(-90deg);
 }
 .travel-actions a.northeast::before {
-    top: 6px;
-    right: 6px;
+    top: var(--travel-arrow-half-size);
+    right: var(--travel-arrow-half-size);
     transform: rotate(-45deg);
 }
 .travel-actions a.east::before {
-    right: 6px;
+    right: var(--travel-arrow-half-size);
     top: calc(50% - var(--travel-arrow-half-size));
     bottom: calc(50% - var(--travel-arrow-half-size));
     transform: rotate(0deg);
 }
 .travel-actions a.southeast::before {
-    bottom: 6px;
-    right: 6px;
+    bottom: var(--travel-arrow-half-size);
+    right: var(--travel-arrow-half-size);
     transform: rotate(45deg);
 }
 .travel-actions a.south::before {
-    bottom: 6px;
+    bottom: var(--travel-arrow-half-size);
     left: calc(50% - var(--travel-arrow-half-size));
     right: calc(50% - var(--travel-arrow-half-size));
     transform: rotate(90deg);
 }
 .travel-actions a.southwest::before {
-    bottom: 6px;
-    left: 6px;
+    bottom: var(--travel-arrow-half-size);
+    left: var(--travel-arrow-half-size);
     transform: rotate(135deg);
 }
 .travel-actions a.west::before {
-    left: 6px;
+    left: var(--travel-arrow-half-size);
     top: calc(50% - var(--travel-arrow-half-size));
     bottom: calc(50% - var(--travel-arrow-half-size));
     transform: rotate(180deg);
 }
 .travel-actions a.northwest::before {
-    top: 6px;
-    left: 6px;
+    top: var(--travel-arrow-half-size);
+    left: var(--travel-arrow-half-size);
     transform: rotate(-135deg);
 }
 

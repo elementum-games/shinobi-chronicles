@@ -831,40 +831,16 @@ br.clear {
     background: rgba(0,0,0,0.2);
 }
 
-.north {
-    left: var(--travel-button-size);
-    right: var(--travel-button-size);
-    top: 0;
-    height: var(--travel-button-size);
-
+.northwest {
     border-top-left-radius: 10px;
+}
+.northeast {
     border-top-right-radius: 10px;
 }
-.east {
-    width: var(--travel-button-size);
-    right: 0;
-    top: var(--travel-button-size);
-    bottom: var(--travel-button-size);
-
-    border-top-right-radius: 10px;
-    border-bottom-right-radius: 10px;
-}
-.west {
-    left: 0;
-    width: var(--travel-button-size);
-    top: var(--travel-button-size);
-    bottom: var(--travel-button-size);
-
-    border-top-left-radius: 10px;
+.southwest {
     border-bottom-left-radius: 10px;
 }
-.south {
-    left: var(--travel-button-size);
-    right: var(--travel-button-size);
-    height: var(--travel-button-size);
-    bottom: 0;
-
-    border-bottom-left-radius: 10px;
+.southeast {
     border-bottom-right-radius: 10px;
 }
 
