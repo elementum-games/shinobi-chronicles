@@ -144,40 +144,6 @@
             <th>Stat Transfers</th>
         </tr>
         <tr>
-            <!--suppress JSUnresolvedFunction -->
-            <script type='text/javascript'>
-                let stats = {};
-                let pointsPerMin = <?= $stat_transfer_points_per_min ?>;
-                let pointsPerAk = <?= $stat_transfer_points_per_ak ?>;
-                let maxFreeStatChangeAmount = <?= $max_free_stat_change_amount ?>;
-                let freeStatChangeActive = Boolean(<?= ($free_stat_change_cooldown_left <= 0) ?>);
-                let statBeingTransferred = 'ninjutsu_skill';
-
-                function statSelectChange() {
-                    statBeingTransferred = document.getElementById('statAllocateSelect').value;
-                    $('#transferAmount').val(stats[statBeingTransferred]);
-                    statAllocateCostDisplay();
-                }
-
-                function statAllocateCostDisplay() {
-                    let cost;
-                    const transferAmount = parseInt($('#transferAmount').val());
-                    if (transferAmount <= maxFreeStatChangeAmount && freeStatChangeActive) {
-                        cost = 0;
-                    }
-                    else {
-                        cost = 1 + Math.floor(transferAmount / pointsPerAk);
-                    }
-
-                    if(statBeingTransferred === 'intelligence' || statBeingTransferred === 'willpower') {
-                        cost = 0;
-                    }
-
-                    const time = transferAmount / pointsPerMin;
-                    const display = cost + ' AK / ' + time + ' minutes';
-                    $('#statAllocateCost').html(display);
-                }
-            </script>
             <td style='text-align:center;'>
                 You can transfer points from one stat to another. This costs Ancient Kunai and takes time to complete, both
                 cost and time increase
@@ -214,14 +180,10 @@
                     </script>
                     <?php
                     if($player->bloodline_id) {
-                        $init_cost = (1 + floor(($player->bloodline_skill - 10) / 300));
                         $init_transfer_amount = $player->bloodline_skill - 10;
-                        $init_length = ($player->bloodline_skill - 10) / $stat_transfer_points_per_min;
                     }
                     else {
-                        $init_cost = (1 + floor(($player->ninjutsu_skill - 10) / 300));
                         $init_transfer_amount = $player->ninjutsu_skill - 10;
-                        $init_length = ($player->ninjutsu_skill - 10) / $stat_transfer_points_per_min;
                     }
                     ?>
                     <br/>
@@ -229,12 +191,49 @@
                     Transfer amount:<br/>
                     <input type='text' id='transferAmount' name='transfer_amount' value='<?= $init_transfer_amount ?>'
                            onkeyup='statAllocateCostDisplay()'/><br/>
-                    <span id='statAllocateCost'><?= $init_cost ?> AK / <?= $init_length ?> minutes</span><br/>
+                    <span id='statAllocateCost'></span><br/>
                     <input type='submit' name='stat_allocate' value='Transfer Stat Points'/>
                 </form>
             </td>
         </tr>
     </table>
+
+    <!--suppress JSUnresolvedFunction -->
+    <script type='text/javascript'>
+        let stats = {};
+        let pointsPerMin = <?= $stat_transfer_points_per_min ?>;
+        let pointsPerAk = <?= $stat_transfer_points_per_ak ?>;
+        let maxFreeStatChangeAmount = <?= $max_free_stat_change_amount ?>;
+        let freeStatChangeActive = Boolean(<?= ($free_stat_change_cooldown_left <= 0) ?>);
+        let statBeingTransferred = 'ninjutsu_skill';
+
+        function statSelectChange() {
+            statBeingTransferred = document.getElementById('statAllocateSelect').value;
+            $('#transferAmount').val(stats[statBeingTransferred]);
+            statAllocateCostDisplay();
+        }
+
+        function statAllocateCostDisplay() {
+            let cost;
+            const transferAmount = parseInt($('#transferAmount').val());
+            if (transferAmount <= maxFreeStatChangeAmount && freeStatChangeActive) {
+                cost = 0;
+            }
+            else {
+                cost = 1 + Math.floor(transferAmount / pointsPerAk);
+            }
+
+            if(statBeingTransferred === 'intelligence' || statBeingTransferred === 'willpower') {
+                cost = 0;
+            }
+
+            const time = transferAmount / pointsPerMin;
+            const display = cost + ' AK / ' + time + ' minutes';
+            $('#statAllocateCost').html(display);
+        }
+
+        statAllocateCostDisplay();
+    </script>
 
     <!-- // Change Element-->
     <?php if($player->elements): ?>
