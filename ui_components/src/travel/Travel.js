@@ -562,7 +562,7 @@ function TravelActions({ travelPageLink, updateMovementDirection }) {
                 <a
                     key={`travel:${direction}`}
                     href={`${travelPageLink}&travel=${direction}`}
-                    className={direction === movementDirection ? "active" : ""}
+                    className={`${direction} ${direction === movementDirection ? "active" : ""}`}
                     onPointerDown={e => {
                         e.preventDefault();
                         if(e.button !== 0) {

@@ -499,7 +499,7 @@ function TravelActions({
   }, allowedDirections.map(direction => /*#__PURE__*/React.createElement("a", {
     key: `travel:${direction}`,
     href: `${travelPageLink}&travel=${direction}`,
-    className: direction === movementDirection ? "active" : "",
+    className: `${direction} ${direction === movementDirection ? "active" : ""}`,
     onPointerDown: e => {
       e.preventDefault();
 

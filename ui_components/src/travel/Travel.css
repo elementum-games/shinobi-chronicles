@@ -13,6 +13,7 @@
 
 :root {
     --scout-container-side-width: 230px;
+    --travel-button-size: 30px;
 }
 
 .travel-filter {
@@ -32,7 +33,7 @@
 
     flex-grow: 0;
     position: relative;
-    padding: 30px;
+    padding: var(--travel-button-size);
 }
 
 #travel-container {
@@ -203,6 +204,8 @@
     width: 33.333%;
     height: 33.333%;
     z-index: 1;
+    position: relative;
+
     cursor: pointer;
     user-select: none;
     touch-action: none;
@@ -210,6 +213,66 @@
 
     background: var(--theme-content-darker2-bg-color);
     box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.12) inset;
+}
+
+:root {
+    --travel-arrow-size: 16px;
+    --travel-arrow-half-size: 8px;
+}
+.travel-actions a::before {
+    content: ">";
+    position: absolute;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    height: var(--travel-arrow-size);
+    width: var(--travel-arrow-size);
+    color: var(--theme-text-color-normal);
+}
+.travel-actions a.north::before {
+    top: 6px;
+    left: calc(50% - var(--travel-arrow-half-size));
+    right: calc(50% - var(--travel-arrow-half-size));
+    transform: rotate(-90deg);
+}
+.travel-actions a.northeast::before {
+    top: 6px;
+    right: 6px;
+    transform: rotate(-45deg);
+}
+.travel-actions a.east::before {
+    right: 6px;
+    top: calc(50% - var(--travel-arrow-half-size));
+    bottom: calc(50% - var(--travel-arrow-half-size));
+    transform: rotate(0deg);
+}
+.travel-actions a.southeast::before {
+    bottom: 6px;
+    right: 6px;
+    transform: rotate(45deg);
+}
+.travel-actions a.south::before {
+    bottom: 6px;
+    left: calc(50% - var(--travel-arrow-half-size));
+    right: calc(50% - var(--travel-arrow-half-size));
+    transform: rotate(90deg);
+}
+.travel-actions a.southwest::before {
+    bottom: 6px;
+    left: 6px;
+    transform: rotate(135deg);
+}
+.travel-actions a.west::before {
+    left: 6px;
+    top: calc(50% - var(--travel-arrow-half-size));
+    bottom: calc(50% - var(--travel-arrow-half-size));
+    transform: rotate(180deg);
+}
+.travel-actions a.northwest::before {
+    top: 6px;
+    left: 6px;
+    transform: rotate(-135deg);
 }
 
 .travel-actions a:nth-of-type(4),
