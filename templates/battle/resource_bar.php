@@ -1,38 +1,73 @@
 <style>
     .resourceBarOuter {
-        height: 16px;
-        width: 225px;
-        margin: 2px 0;
-        border-style:solid;
-        border-width:1px;
-
+        display: flex;
         position: relative;
-        background: rgba(0, 0, 0, 0.7);
+        height: 17px;
+
+        width: 260px;
+        /* Allows overriding this from outside */
+        max-width: 100%;
+
+        border: 1px solid black;
+        border-radius: 17px;
+
+        background: rgba(0,0,0,0.7);
+        overflow: hidden;
     }
+
     .resourceBarOuter .text {
+        display: block;
         position: absolute;
         left: 0;
-        top: 0;
         right: 0;
+        align-self: center;
+
+        font-size: 12px;
+        font-weight: bold;
+        letter-spacing: 0.2px;
+        line-height:15px;
         text-align: center;
 
-        color: #f0f0f0;
-        line-height: 16px;
-        font-size: 12px;
-        text-shadow: 0 0 2px black;
+        color: #ffffff;
+        text-shadow:
+                -1px 0 0 rgba(0,0,0,0.7),
+                -1px -1px 0 rgba(0,0,0,0.7),
+                0 -1px 0 rgba(0,0,0,0.7),
+                1px -1px 0 rgba(0,0,0,0.7),
+                1px 0 0 rgba(0,0,0,0.7),
+                1px 1px 0 rgba(0,0,0,0.7),
+                0 1px 0 rgba(0,0,0,0.7),
+                -1px 1px 0 rgba(0,0,0,0.7);
+
+        z-index: 100;
     }
 
     .resourceFill {
+        position: absolute;
+        top: 0;
+        z-index: 2;
         height: 100%;
     }
-    .healthFill {
-        background: linear-gradient(to bottom, #A00000, #D00000, #A00000);
+
+    .health {
+        background: linear-gradient(to right, rgb(200, 30, 20), rgb(240, 50, 50));
     }
-    .chakraFill {
-        background: linear-gradient(to bottom, #001aA0, #1030e0, #001aA0);
+    .health.preview {
+        background: rgb(240, 50, 50);
     }
-    .staminaFill {
-        background: linear-gradient(to bottom, #00A000, #00D000, #00A000);
+
+    .chakra {
+        background: #1060ff linear-gradient(to right, #1060ff, #2080ff);
+    }
+    .chakra.preview {
+        background: #2080ff;
+    }
+
+    .stamina {
+        background: linear-gradient(to right, rgb(10, 180, 10), rgb(40, 220, 40));
+    }
+    .stamina.preview {
+        background:  rgb(40, 220, 40);
     }
 </style>
 <?php
@@ -46,7 +81,7 @@ function resourceBar(float $current_amount, float $max_amount, string $resource_
     $resource_percent =  round(($current_amount / $max_amount) * 100);
     ?>
     <div class='resourceBarOuter'>
-        <div class='resourceFill <?= $resource_type ?>Fill' style='width:<?= $resource_percent ?>%;'></div>
+        <div class='resourceFill <?= $resource_type ?>' style='width:<?= $resource_percent ?>%;'></div>
         <div class='text'><?= sprintf("%.2f", $current_amount) ?> / <?= sprintf("%.2f", $max_amount) ?></div>
     </div>
     <?php

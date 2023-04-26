@@ -22,29 +22,36 @@ function healingShop() {
 	$health[4] = $rankManager->healthForRankAndLevel(4, $rankManager->ranks[4]->max_level);
 	// $health[5] = $rankManager->healthForRankAndLevel(5, $rankManager->ranks[5]->max_level);
 
-	$healing['vegetable']['cost'] = $player->rank_num * 5;
-	$healing['vegetable']['amount'] = $health[$player->rank_num] * 0.1;
-
-	$healing['pork']['cost'] = $player->rank_num * 25;
-	$healing['pork']['amount'] = $health[$player->rank_num] * 0.5;
-
-	$healing['deluxe']['cost'] = $player->rank_num * 50;
-	$healing['deluxe']['amount'] = $health[$player->rank_num] * 1;
+	$ramen_choices['vegetable'] = [
+        'cost' => $player->rank_num * 5,
+        'health_amount' => $health[$player->rank_num] * 0.1,
+        'label' => 'Vegetable'
+    ];
+    $ramen_choices['pork'] = [
+        'cost' => $player->rank_num * 25,
+        'health_amount' => $health[$player->rank_num] * 0.5,
+        'label' => 'Pork'
+    ];
+    $ramen_choices['deluxe'] = [
+        'cost' => $player->rank_num * 50,
+        'health_amount' => $health[$player->rank_num] * 1,
+        'label' => 'Deluxe'
+    ];
 
 	if(isset($_GET['heal'])) {
 		try {
 			$heal = $system->clean($_GET['heal']);
-			if(!isset($healing[$heal])) {
+			if(!isset($ramen_choices[$heal])) {
 				throw new Exception("Invalid choice!");
 			}
-			if($player->getMoney() < $healing[$heal]['cost']) {
+			if($player->getMoney() < $ramen_choices[$heal]['cost']) {
 				throw new Exception("You do not have enough money!");
 			}
           	if($player->health >= $player->max_health) {
 				throw new Exception("Your health is already maxed out!");
 			}
-			$player->subtractMoney($healing[$heal]['cost'], "Purchased {$heal} health");
-			$player->health += $healing[$heal]['amount'];
+			$player->subtractMoney($ramen_choices[$heal]['cost'], "Purchased {$heal} health");
+			$player->health += $ramen_choices[$heal]['health_amount'];
 			if($player->health > $player->max_health) {
 				$player->health = $player->max_health;
 			}
@@ -53,20 +60,7 @@ function healingShop() {
 			$system->printMessage();
 		}
 	}
-	echo "<table class='table'><tr><th>Ichikawa Ramen</th></tr>
-	<tr><td style='text-align:center;'>
-	Welcome to Ichikawa Ramen. Our nutritious ramen is just the thing your body needs to recover after a long day of training or fighting.
-	Our prices are below.<br />
-	<br />
-	<label style='width:9em;font-weight:bold;'>Your Money:</label> 
-		&yen;{$player->getMoney()}<br />
-	<label style='width:9em;font-weight:bold;'>Health:</label>" . 
-			sprintf("%.2f", $player->health) . '/' . sprintf("%.2f", $player->max_health) . 
-	"</td></tr>";
-	echo "<tr><td style='text-align:center;'>";
-	foreach($healing as $level=>$heal) {
-		echo "<a href='$self_link&heal={$level}'><span class='button' style='width:10em;'>" . ucwords($level) . " ramen</span></a>
-			&nbsp;&nbsp;&nbsp;({$heal['amount']} health, -&yen;{$heal['cost']}) <br />";
-	}
-	echo "</td></tr></table>";
+
+    
+    require 'templates/ramen_shop.php';
 }
