@@ -8,6 +8,10 @@
     require_once __DIR__ . '/battle/resource_bar.php';
 ?>
 <style>
+    .playerInfo {
+        display: flex;
+        justify-content: space-evenly;
+    }
     .healthBarContainer {
         display: flex;
         justify-content: center;
@@ -38,11 +42,17 @@
         Welcome to Ichikawa Ramen. Our nutritious ramen is just the thing your body needs to recover after a long day
         of training or fighting!<br />
         <br />
-        <label style='width:9em;font-weight:bold;'>Your Money</label><br />
-        &yen;<?= number_format(num: $player->getMoney()) ?><br />
-        <label style='width:9em;font-weight:bold;margin-top:8px;'>Your Health</label>
-        <div class='healthBarContainer'>
-            <?php resourceBar($player->health, $player->max_health, 'health'); ?>
+        <div class='playerInfo'>
+            <div>
+                <label style='width:9em;font-weight:bold;margin-bottom:1px;'>Your Money</label><br />
+                &yen;<?= number_format(num: $player->getMoney()) ?><br />
+            </div>
+            <div>
+                <label style='width:9em;font-weight:bold;'>Your Health</label>
+                <div class='healthBarContainer'>
+                    <?php resourceBar($player->health, $player->max_health, 'health'); ?>
+                </div>
+            </div>
         </div>
     </td></tr>
     <tr><td style='text-align:center;'>
