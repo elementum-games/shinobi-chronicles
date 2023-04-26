@@ -145,6 +145,9 @@ class Jutsu {
         if($this->jutsu_type == Jutsu::TYPE_TAIJUTSU) {
             $this->range = 1;
         }
+        if($this->jutsu_type == Jutsu::TYPE_GENJUTSU) {
+            $this->power *= 0.5;
+        }
 
         $this->effect = $effect;
 

@@ -682,7 +682,7 @@ class BattleManager {
 
     protected function applyAttack(BattleAttack $attack, Fighter $user, Fighter $target) {
         $attack_damage = $attack->raw_damage;
-        if($attack->jutsu->jutsu_type != Jutsu::TYPE_GENJUTSU && empty($attack->jutsu->effect_only)) {
+        if(empty($attack->jutsu->effect_only)) {
             $attack_damage = $target->calcDamageTaken($attack->raw_damage, $attack->jutsu->jutsu_type);
             $target->health -= $attack_damage;
             if($target->health < 0) {
@@ -727,7 +727,7 @@ class BattleManager {
         $text = $attack->jutsu->battle_text;
         $attack_jutsu_color = BattleManager::getJutsuTextColor($attack->jutsu->jutsu_type);
 
-        if($attack->jutsu->jutsu_type != Jutsu::TYPE_GENJUTSU && empty($attack->jutsu->effect_only)) {
+        if(empty($attack->jutsu->effect_only)) {
             $text .= "<p style=\"font-weight:bold;\">
                             {$user->getName()} deals
                                 <span style=\"color:{$attack_jutsu_color}\">

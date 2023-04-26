@@ -814,7 +814,7 @@ class BattleActionProcessor {
 
     protected function applyAttackHit(BattleAttackV2 $attack, Fighter $user, Fighter $target, float $raw_damage): void {
         $attack_damage = $raw_damage;
-        if($attack->jutsu->jutsu_type != Jutsu::TYPE_GENJUTSU && empty($attack->jutsu->effect_only)) {
+        if(empty($attack->jutsu->effect_only)) {
             $attack_damage = $target->calcDamageTaken($attack->starting_raw_damage, $attack->jutsu->jutsu_type);
             $target->health -= $attack_damage;
             if($target->health < 0) {
@@ -858,7 +858,7 @@ class BattleActionProcessor {
             );
         }
 
-        if($attack->jutsu->jutsu_type != Jutsu::TYPE_GENJUTSU && empty($attack->jutsu->effect_only)) {
+        if(empty($attack->jutsu->effect_only)) {
             $tag = "{$attack->jutsu->jutsu_type}_damage";
             $this->battle->current_turn_log->addFighterAttackHit(
                 attacker: $user,
