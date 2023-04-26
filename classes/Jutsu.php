@@ -147,6 +147,7 @@ class Jutsu {
         }
         if($this->jutsu_type == Jutsu::TYPE_GENJUTSU) {
             $this->power *= 0.5;
+            // $this->effect_only = true; // toggle this if you turn the power back to 1
         }
 
         $this->effect = $effect;
