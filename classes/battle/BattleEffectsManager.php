@@ -249,10 +249,10 @@ class BattleEffectsManager {
             $target->genjutsu_nerf += $effect_amount;
         }
         else if($effect->effect == 'cast_speed_nerf') {
-            $target->cast_speed_nerf += $target->cast_speed * ($effect_amount / 100);
+            $target->cast_speed_nerf += $target->cast_speed * ($effect->effect_amount / 100);
         }
         else if($effect->effect == 'speed_nerf' or $effect->effect == 'cripple') {
-            $target->speed_nerf += $target->speed * ($effect_amount / 100);
+            $target->speed_nerf += $target->speed * ($effect->effect_amount / 100);
         }
         else if($effect->effect == 'intelligence_nerf' or $effect->effect == 'daze') {
             $target->intelligence_nerf += $effect_amount;
