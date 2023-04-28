@@ -3,6 +3,8 @@
 require_once __DIR__ . '/BattleEffect.php';
 
 class BattleEffectsManager {
+    const MAX_SPEED_REDUCTION = 50;
+
     protected System $system;
 
     /** @var BattleEffect[]  */
@@ -251,6 +253,9 @@ class BattleEffectsManager {
         else if($effect->effect == 'speed_nerf' or $effect->effect == 'cripple') {
             $target->speed_nerf += $target->speed * ($effect->effect_amount / 100);
             $target->cast_speed_nerf += $target->cast_speed * ($effect->effect_amount / 100);
+
+            $target->speed_nerf = min($target->speed_nerf, $target->speed * self::MAX_SPEED_REDUCTION);
+            $target->cast_speed_nerf = min($target->cast_speed_nerf, $target->cast_speed * self::MAX_SPEED_REDUCTION);
         }
         else if($effect->effect == 'intelligence_nerf' or $effect->effect == 'daze') {
             $target->intelligence_nerf += $effect_amount;
