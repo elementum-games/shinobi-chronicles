@@ -146,8 +146,8 @@ class Jutsu {
             $this->range = 1;
         }
         if($this->jutsu_type == Jutsu::TYPE_GENJUTSU) {
-            $this->base_power *= 0.55;
-            $this->power *= 0.55;
+            $this->base_power = $this->base_power * 0.55;
+            $this->power = round($this->base_power, 2);
             // $this->effect_only = true; // toggle this if you turn the power back to 1
         }
 
@@ -208,7 +208,10 @@ class Jutsu {
             self::BL_POWER_PER_LEVEL_PERCENT / 100 : self::POWER_PER_LEVEL_PERCENT / 100;
         $level_effect_multiplier = self::EFFECT_PER_LEVEL_PERCENT / 100;
 
-        $this->power = $this->base_power * (1 + round($this->level * $level_power_multiplier, 2));
+
+        $this->power = $this->base_power * (1 + ($this->level * $level_power_multiplier));
+        $this->power = round($this->power, 2);
+
         if($this->effect && $this->effect != 'none') {
             $this->effect_amount = $this->base_effect_amount *
                 (1 + round($this->level * $level_effect_multiplier, 3));
