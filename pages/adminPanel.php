@@ -694,10 +694,11 @@ function adminPanel() {
             <table class='table'>
                 <tr><th>Edit Jutsu (" . stripslashes($jutsu_data['name']) . ")</th></tr>
                 <tr><td>
-                <form action='$self_link&jutsu_id={$jutsu_data['jutsu_id']}' method='post'>
+                <form action='$self_link&jutsu_id={$jutsu_data['jutsu_id']}&jutsu_type={$jutsu_data['jutsu_type']}' method='post'>
                 <label>Jutsu ID:</label> $jutsu_id<br />";
             displayFormFields($variables, $data);
             echo "<br />
+                
                 <input type='submit' name='jutsu_data' value='Edit' />
                 </form>
                 </td></tr>
