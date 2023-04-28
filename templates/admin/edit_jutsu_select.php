@@ -46,8 +46,9 @@ $selected_link_style = "text-decoration:none;";
         <th style='width:25%;'>Name</th>
         <th style='width:8%;'>Power</th>
         <th style='width:30%;'>Effect</th>
-        <th style='width:18%;'>Element</th>
+        <th style='width:14%;'>Element</th>
         <th style='width:19%;'>Cost</th>
+        <th style='width:4%;'>CD</th>
     </tr>
     <tr><th colspan='5'><?= $RANK_NAMES[1] ?></th></tr>
     <?php $current_rank = 1; ?>
@@ -78,6 +79,7 @@ $selected_link_style = "text-decoration:none;";
             </td>
             <td><?= ucwords($jutsu->element) ?></td>
             <td>&yen;<?= $jutsu->purchase_cost ?></td>
+            <td><?= $jutsu->cooldown ?></td>
         </tr>
     <?php endforeach; ?>
 </table>
