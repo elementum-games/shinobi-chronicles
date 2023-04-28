@@ -83,6 +83,7 @@ class BattleEffectsManager {
             case 'cast_speed_boost':
             case 'speed_nerf':
             case 'cast_speed_nerf':
+            case 'cripple':
                 // No changes needed to base number, calculated in applyPassiveEffects
                 break;
             case 'intelligence_boost':
