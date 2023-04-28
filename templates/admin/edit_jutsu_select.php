@@ -59,7 +59,7 @@ $selected_link_style = "text-decoration:none;";
         }
         if($jutsu->rank > $current_rank) {
             $current_rank = $jutsu->rank;
-            echo "<tr><th colspan='5'>$RANK_NAMES[$current_rank]</th></tr>";
+            echo "<tr><th colspan='6'>$RANK_NAMES[$current_rank]</th></tr>";
         }
         ?>
         <tr>
