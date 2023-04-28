@@ -50,7 +50,7 @@ $selected_link_style = "text-decoration:none;";
         <th style='width:19%;'>Cost</th>
         <th style='width:4%;'>CD</th>
     </tr>
-    <tr><th colspan='5'><?= $RANK_NAMES[1] ?></th></tr>
+    <tr><th colspan='6'><?= $RANK_NAMES[1] ?></th></tr>
     <?php $current_rank = 1; ?>
     <?php foreach($all_jutsu as $id => $jutsu): ?>
         <?php
