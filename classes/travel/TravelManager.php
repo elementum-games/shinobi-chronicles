@@ -272,8 +272,9 @@ class TravelManager {
     }
 
     public function shouldShowMissionLocationPrompt(): bool {
-        $mission_stage_uses_travel = $this->user->mission_stage['action_type'] == 'travel'
-            || $this->user->mission_stage['action_type'] == 'search';
+        $mission_stage_uses_travel = $this->user->mission_stage != null && (
+            $this->user->mission_stage['action_type'] == 'travel' || $this->user->mission_stage['action_type'] == 'search'
+        );
 
         if ($this->user->mission_id && $mission_stage_uses_travel
             && $this->user->location->equals(TravelCoords::fromDbString($this->user->mission_stage['action_data']))) {
