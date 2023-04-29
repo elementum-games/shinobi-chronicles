@@ -145,7 +145,7 @@ class Jutsu {
         if($this->jutsu_type == Jutsu::TYPE_TAIJUTSU) {
             $this->range = 1;
         }
-        if($this->jutsu_type == Jutsu::TYPE_GENJUTSU) {
+        if($this->jutsu_type == Jutsu::TYPE_GENJUTSU && in_array($use_type, self::$attacking_use_types)) {
             $this->base_power = $this->base_power * 0.55;
             $this->power = round($this->base_power, 2);
             // $this->effect_only = true; // toggle this if you turn the power back to 1
