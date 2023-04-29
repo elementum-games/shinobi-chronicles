@@ -63,8 +63,8 @@ abstract class Fighter {
 
     public array $bloodline_offense_boosts;
     public array $bloodline_defense_boosts;
-    public int $bloodline_cast_speed_boost = 0;
-    public int $bloodline_speed_boost = 0;
+    public float $bloodline_cast_speed_boost = 0;
+    public float $bloodline_speed_boost = 0;
 
     public string $gender;
 
@@ -387,6 +387,13 @@ abstract class Fighter {
         return $damage;
     }
 
+    public function getCastSpeed(bool $include_bloodline = false): float {
+        return $include_bloodline ? $this->cast_speed + $this->bloodline_cast_speed_boost : $this->cast_speed;
+    }
+
+    public function getSpeed(bool $include_bloodline = false): float {
+        return $include_bloodline ? $this->speed + $this->bloodline_speed_boost : $this->speed;
+    }
 
     // Actions
     abstract public function useJutsu(Jutsu $jutsu);
