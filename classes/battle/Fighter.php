@@ -63,6 +63,8 @@ abstract class Fighter {
 
     public array $bloodline_offense_boosts;
     public array $bloodline_defense_boosts;
+    public float $bloodline_cast_speed_boost = 0;
+    public float $bloodline_speed_boost = 0;
 
     public string $gender;
 
@@ -142,9 +144,11 @@ abstract class Fighter {
                         break;
 
                     case 'cast_speed_boost':
+                        $this->bloodline_cast_speed_boost += $effect['effect_amount'];
                         $this->cast_speed_boost += $effect['effect_amount'];
                         break;
                     case 'speed_boost':
+                        $this->bloodline_speed_boost += $effect['effect_amount'];
                         $this->speed_boost += $effect['effect_amount'];
                         break;
                     case 'intelligence_boost':
@@ -190,7 +194,7 @@ abstract class Fighter {
             return 'their';
         }
     }
-    
+
     #[Pure]
     public function getDebuffResist(): float {
         $willpower = ($this->willpower + $this->willpower_boost - $this->willpower_nerf);
@@ -383,6 +387,13 @@ abstract class Fighter {
         return $damage;
     }
 
+    public function getCastSpeed(bool $include_bloodline = false): float {
+        return $include_bloodline ? $this->cast_speed + $this->bloodline_cast_speed_boost : $this->cast_speed;
+    }
+
+    public function getSpeed(bool $include_bloodline = false): float {
+        return $include_bloodline ? $this->speed + $this->bloodline_speed_boost : $this->speed;
+    }
 
     // Actions
     abstract public function useJutsu(Jutsu $jutsu);

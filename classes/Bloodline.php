@@ -50,7 +50,7 @@ class Bloodline {
 
         $this->raw_passive_boosts = $bloodline_data['passive_boosts'];
         $this->raw_combat_boosts = $bloodline_data['combat_boosts'];
-        
+
         $this->base_jutsu = [];
         $this->jutsu = [];
         $jutsu_data = $bloodline_data['jutsu'];
@@ -259,15 +259,27 @@ class Bloodline {
      * @return float
      */
     private function offenseToBloodlineRatio(int $offense_skill, int $bloodline_skill): float {
-        $bloodline_skill += 10;
+        $ratio_max = 1.0;
+        $ratio_min = 0.75;
 
-        $offense_to_bloodline = round($offense_skill / $bloodline_skill, 3);
-        if($offense_to_bloodline > 1.0) {
-            $offense_to_bloodline = 1.0;
+        // Adjust to use invested skill only
+        $bloodline_skill -= self::BASE_BLOODLINE_SKILL;
+
+        // Handle case with no skill investment
+        if ($bloodline_skill <= 0) {
+            $offense_to_bloodline = $ratio_max;
         }
-        else if($offense_to_bloodline < 0.75) {
-            $offense_to_bloodline = 0.75;
+
+        else {
+            $offense_to_bloodline = round($offense_skill / $bloodline_skill, 3);
+            if($offense_to_bloodline > $ratio_max) {
+                $offense_to_bloodline = $ratio_max;
+            }
+            else if($offense_to_bloodline < $ratio_min) {
+                $offense_to_bloodline = $ratio_min;
+            }
         }
+
         return $offense_to_bloodline;
     }
 
@@ -370,7 +382,7 @@ class Bloodline {
         // Insert new row
         if($system->db_last_num_rows == 0) {
             $query = "INSERT INTO `user_bloodlines` (`user_id`, `bloodline_id`, `name`, `passive_boosts`, `combat_boosts`, `jutsu`)
-			VALUES ('$user_id', '$bloodline_id', '{$user_bloodline['name']}', '{$user_bloodline['passive_boosts']}', 
+			VALUES ('$user_id', '$bloodline_id', '{$user_bloodline['name']}', '{$user_bloodline['passive_boosts']}',
 			'{$user_bloodline['combat_boosts']}', '{$user_bloodline['jutsu']}')";
         }
 
@@ -400,9 +412,9 @@ class Bloodline {
                 $new_bloodline_skill -= $bloodline_skill_reduction;
             }
 
-            $query = "UPDATE `users` SET 
-            `bloodline_id`='$bloodline_id', 
-            `bloodline_name`='{$bloodline['name']}', 
+            $query = "UPDATE `users` SET
+            `bloodline_id`='$bloodline_id',
+            `bloodline_name`='{$bloodline['name']}',
             `bloodline_skill`='{$new_bloodline_skill}',
             `exp`='{$new_exp}'
 			WHERE `user_id`='$user_id' LIMIT 1";

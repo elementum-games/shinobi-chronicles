@@ -211,10 +211,10 @@ class BattleEffectsManager {
             $target->genjutsu_boost += $effect->effect_amount;
         }
         else if($effect->effect == 'cast_speed_boost') {
-            $target->cast_speed_boost += $target->cast_speed * ($effect->effect_amount / 100);
+            $target->cast_speed_boost += $target->getCastSpeed(true) * ($effect->effect_amount / 100);
         }
         else if($effect->effect == 'speed_boost' or $effect->effect == 'lighten') {
-            $target->speed_boost += $target->speed * ($effect->effect_amount / 100);
+            $target->speed_boost += $target->getSpeed(true) * ($effect->effect_amount / 100);
         }
         else if($effect->effect == 'intelligence_boost') {
             $target->intelligence_boost += $effect->effect_amount;
@@ -251,11 +251,11 @@ class BattleEffectsManager {
             $target->genjutsu_nerf += $effect_amount;
         }
         else if($effect->effect == 'speed_nerf' or $effect->effect == 'cripple') {
-            $target->speed_nerf += $target->speed * ($effect->effect_amount / 100);
-            $target->cast_speed_nerf += $target->cast_speed * ($effect->effect_amount / 100);
+            $target->speed_nerf += $target->getSpeed(true) * ($effect->effect_amount / 100);
+            $target->cast_speed_nerf += $target->getCastSpeed(true) * ($effect->effect_amount / 100);
 
-            $target->speed_nerf = min($target->speed_nerf, $target->speed * self::MAX_SPEED_REDUCTION);
-            $target->cast_speed_nerf = min($target->cast_speed_nerf, $target->cast_speed * self::MAX_SPEED_REDUCTION);
+            $target->speed_nerf = min($target->speed_nerf, $target->getSpeed(true) * self::MAX_SPEED_REDUCTION);
+            $target->cast_speed_nerf = min($target->cast_speed_nerf, $target->getCastSpeed(true) * self::MAX_SPEED_REDUCTION);
         }
         else if($effect->effect == 'intelligence_nerf' or $effect->effect == 'daze') {
             $target->intelligence_nerf += $effect_amount;
