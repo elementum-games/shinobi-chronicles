@@ -9,8 +9,8 @@ function gear(): void {
 
     $player->getInventory();
 
-    $max_equipped_armor = 2;
-    $max_equipped_weapons = 1;
+    $max_equipped_armor = User::BASE_ARMOR_SLOTS;
+    $max_equipped_weapons = User::BASE_WEAPON_SLOTS;
 
 	if($player->rank_num >= 3) {
 		$max_equipped_armor++;

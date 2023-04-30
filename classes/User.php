@@ -46,6 +46,10 @@ class User extends Fighter {
     const BASE_EXP = 500;
     const BASE_REGEN = 25;
 
+    const BASE_JUTSU_SLOTS = 4;
+    const BASE_ARMOR_SLOTS = 2;
+    const BASE_WEAPON_SLOTS = 1;
+
     const MAX_CONSUMABLES = 10;
 
     const STAFF_NONE = 0;
@@ -54,10 +58,6 @@ class User extends Fighter {
     const STAFF_CONTENT_ADMIN = 3;
     const STAFF_ADMINISTRATOR = 4;
     const STAFF_HEAD_ADMINISTRATOR = 5;
-
-    static public $staff_names = [
-
-    ];
 
     const SUPPORT_NONE = 0;
     const SUPPORT_BASIC = 1;
