@@ -417,14 +417,13 @@ class System {
      * @param $error_message
      */
      public function error($error_message): void {
-        error_log($error_message);
-
+        error_log($error_message . ' in ' . System::simpleStackTrace());
         // DEBUG MODE
         //echo $error_message;
 
         $admins = array(1, 190, 193);
 
-        if($this->environment == 'dev' || in_array($_SESSION['user_id'], $admins)) {
+        if($this->environment == 'dev' || in_array($_SESSION['user_id'] ?? null, $admins)) {
             $message = $error_message;
         }
         else {
@@ -943,5 +942,19 @@ class System {
     public function getReactFile(string $component_name): string {
         $filename = "ui_components/build/{$component_name}.js";
         return $this->router->base_url . $filename . "?v=" .  filemtime($filename);
+    }
+
+    public static function simpleStackTrace(): string {
+        $stack_trace_arr = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 4);
+
+        // Display the first line as file_name (line # would be the line that called this method, not super useful)
+        $display = $stack_trace_arr[0]['file'];
+
+        // Display the rest of the lines as file:line_num
+        foreach(array_slice($stack_trace_arr, 1) as $stack_trace_row) {
+            $display .= " > " . $stack_trace_row['file'] . ":" . $stack_trace_row['line'];
+        }
+
+        return $display;
     }
 }
