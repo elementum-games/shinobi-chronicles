@@ -165,165 +165,36 @@ function jutsu(): void {
     }
 
     $system->printMessage();
-    echo "<table class='table'>";
+    $player->updateInventory();
 
-    // View single jutsu details
-    $jutsu_list = true;
+    $jutsu_to_view = null;
+    $jutsu_to_view_child_names = [];
 
     if(!empty($_GET['view_jutsu'])) {
-        $jutsu_list = false;
         $jutsu_id = (int)$system->clean($_GET['view_jutsu']);
         if(!isset($player->jutsu[$jutsu_id])) {
             $system->message("Invalid jutsu!");
             $system->printMessage();
         }
         else {
-            $jutsu = $player->jutsu[$jutsu_id];
-            echo "<tr><th>" . $jutsu->name . " (<a href='$self_link'>Return</a>)</th></tr>
-			<tr><td>
-				<label style='width:6.5em;'>Rank:</label>" . $jutsu->rank . "<br />";
-            if($jutsu->element != 'none') {
-                echo "<label style='width:6.5em;'>Element:</label>" . $jutsu->element . "<br />";
-            }
-            echo "<label style='width:6.5em;'>Use cost:</label>" . $jutsu->use_cost . "<br />";
-            if($jutsu->jutsu_type != 'taijutsu') {
-                echo "<label style='width:6.5em;'>Hand seals:</label>" . $jutsu->hand_seals . "<br />";
-            }
-            if($jutsu->cooldown) {
-                echo "<label style='width:6.5em;'>Cooldown:</label>" . $jutsu->cooldown . " turn(s)<br />";
-            }
-            if($jutsu->effect) {
-                echo "<label style='width:6.5em;'>Effect:</label>" .
-                    ucwords(str_replace('_', ' ', $jutsu->effect)) . " - " . $jutsu->effect_length . " turns<br />";
-            }
-            echo "<label style='width:6.5em;'>Jutsu type:</label>" . ucwords($jutsu->jutsu_type) . "<br />
-				<label style='width:6.5em;'>Power:</label>" . round($jutsu->power, 1) . "<br />
-				<label style='width:6.5em;'>Level:</label>" . $jutsu->level . "<br />
-				<label style='width:6.5em;'>Exp:</label>" . $jutsu->exp . "<br />";
+            $jutsu_to_view = $player->jutsu[$jutsu_id];
 
-            echo "<label style='width:6.5em;float:left;'>Description:</label>
-					<p style='display:inline-block;margin:0;width:37.1em;'>" . $jutsu->description . "</p>
-					<br style='clear:both;' />";
-
-            $result = $system->query("SELECT `name` FROM `jutsu` WHERE `parent_jutsu`='$jutsu_id'");
-            if($system->db_last_num_rows > 0) {
-                echo "<br />
-					<br /><label>Learn <b>" . $jutsu->name . "</b> to level 50 to unlock:</label>
-						<p style='margin-left:10px;margin-top:5px;'>";
-                while($row = $system->db_fetch($result)) {
-                    echo $row['name'] . "<br />";
-                }
-                echo "</p>";
-            }
-
-            echo "<p style='text-align:center'><a href='$self_link&view_jutsu={$jutsu->id}&forget_jutsu={$jutsu->id}'>Forget Jutsu!</a></p>";
-            echo "</td></tr>";
-        }
-    }
-
-    if($jutsu_list) {
-        echo "<tr>
-			<th id='ninjutsu_title_header' style='width:33%;'>Ninjutsu</th>
-			<th id='taijutsu_title_header' style='width:33%;'>Taijutsu</th>
-			<th id='genjutsu_title_header' style='width:33%;'>Genjutsu</th>
-		</tr>";
-
-        echo "<tr><td id='ninjutsu_table_data'>";
-        if($player->ninjutsu_ids) {
-            $sortedJutsu = [];
-            foreach($player->ninjutsu_ids as $jutsu_id) {
-                $sortedJutsu[] = $player->jutsu[$jutsu_id]->rank;
-            }
-            array_multisort($sortedJutsu, $player->ninjutsu_ids);
-            foreach($player->ninjutsu_ids as $jutsu_id) {
-                echo "<a href='$self_link&view_jutsu=$jutsu_id' title='Level: {$player->jutsu[$jutsu_id]->level}'>" . $player->jutsu[$jutsu_id]->name . "</a><br />";
-            }
-        }
-        echo "</td>";
-
-        echo "<td id='taijutsu_table_data'>";
-        if($player->taijutsu_ids) {
-            $sortedJutsu = [];
-            foreach($player->taijutsu_ids as $jutsu_id) {
-                $sortedJutsu[] = $player->jutsu[$jutsu_id]->rank;
-            }
-            array_multisort($sortedJutsu, $player->taijutsu_ids);
-            foreach($player->taijutsu_ids as $jutsu_id) {
-                echo "<a href='$self_link&view_jutsu=$jutsu_id' title='Level: {$player->jutsu[$jutsu_id]->level}'>" . $player->jutsu[$jutsu_id]->name . "</a><br />";
-            }
-        }
-        echo "</td>";
-
-        echo "<td id='genjutsu_table_data'>";
-        if($player->genjutsu_ids) {
-            $sortedJutsu = [];
-            foreach($player->genjutsu_ids as $jutsu_id) {
-                $sortedJutsu[] = $player->jutsu[$jutsu_id]->rank;
-            }
-            array_multisort($sortedJutsu, $player->genjutsu_ids);
-            foreach($player->genjutsu_ids as $jutsu_id) {
-                echo "<a href='$self_link&view_jutsu=$jutsu_id' title='Level: {$player->jutsu[$jutsu_id]->level}'>" . $player->jutsu[$jutsu_id]->name . "</a><br />";
-            }
-        }
-        echo "</td></tr>";
-        echo "<tr><th colspan='3'>Equipped Jutsu</th></tr>";
-
-        echo "<tr><td colspan='3'>
-		<form action='$self_link' method='post'>
-		<div style='text-align:center;'>";
-
-        echo "<div style='display:inline-block;'>";
-        $row_start = 1;
-        for($i = 0; $i < $max_equipped_jutsu; $i++) {
-            $slot_equipped_jutsu = $player->equipped_jutsu[$i]['id'] ?? null;
-            echo "<select name='jutsu[" . ($i + 1) . "]'>
-			<option value='none' " . (!$player->equipped_jutsu ? "selected='selected'" : "") . ">None</option>";
-            foreach($player->jutsu as $jutsu) {
-                echo "<option value='{$jutsu->jutsu_type}-{$jutsu->id}' " .
-                    ($jutsu->id == $slot_equipped_jutsu ? "selected='selected'" : "") .
-                    ">{$jutsu->name}</option>";
-            }
-            echo "</select><br />";
-
-            // Start second row
-            if($row_start++ > 2) {
-                echo "</div><div style='display:inline-block;'>";
-                $row_start = 1;
-            }
-        }
-        echo "</div><br />";
-
-        echo "<input type='submit' name='equip_jutsu' value='Equip' />
-		</div>
-		</form>
-		</tr>";
-
-        // Purchase jutsu
-        if(!empty($player->jutsu_scrolls)) {
-            echo "<tr><th colspan='3'>Jutsu scrolls</th></tr>";
-
-            foreach($player->jutsu_scrolls as $id => $jutsu_scroll) {
-                echo "<tr id='jutsu_scrolls' ><td colspan='3'>
-					<span style='font-weight:bold;'>" . $jutsu_scroll->name . "</span><br />
-					<div style='margin-left:2em;'>
-						<label style='width:6.5em;'>Rank:</label>" . $jutsu_scroll->rank . "<br />
-						<label style='width:6.5em;'>Element:</label>" . $jutsu_scroll->element . "<br />
-						<label style='width:6.5em;'>Use cost:</label>" . $jutsu_scroll->use_cost . "<br />" .
-                    ($jutsu_scroll->cooldown ? "<label style='width:6.5em;'>Cooldown:</label>" . $jutsu_scroll->cooldown . " turn(s)<br />" : "") .
-                    "<label style='width:6.5em;float:left;'>Description:</label>
-						<p style='display:inline-block;margin:0;width:37.1em;'>" . $jutsu_scroll->description . "</p>
-						<br style='clear:both;' />
-						<label style='width:6.5em;'>Jutsu type:</label>" . ucwords($jutsu_scroll->jutsu_type) . "<br />
-					</div>
-					<p style='text-align:right;margin:0;'><a href='$self_link&learn_jutsu=$id'>Learn</a></p>
-				</td></tr>";
+            $child_jutsu_result = $system->query("SELECT `name` FROM `jutsu` WHERE `parent_jutsu`='$jutsu_id'");
+            while($row = $system->db_fetch($child_jutsu_result)) {
+                $jutsu_to_view_child_names[] = $row['name'];
             }
         }
     }
 
-    echo "</table>";
+    if($jutsu_to_view == null) {
+        $sortedJutsu = [];
+        foreach($player->ninjutsu_ids as $jutsu_id) {
+            $sortedJutsu[] = $player->jutsu[$jutsu_id]->rank;
+        }
+        array_multisort($sortedJutsu, $player->ninjutsu_ids);
+    }
 
-    $player->updateInventory();
+    require 'templates/jutsu_page.php';
 }
 
 function userHasChildrenJutsu($id, $player): bool {
