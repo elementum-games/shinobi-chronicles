@@ -417,8 +417,9 @@ class System {
      * @param $error_message
      */
      public function error($error_message): void {
+        error_log($error_message);
+
         // DEBUG MODE
-        // error_log($error_message);
         //echo $error_message;
 
         $admins = array(1, 190, 193);
