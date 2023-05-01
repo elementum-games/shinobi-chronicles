@@ -124,11 +124,11 @@
                 <button id="meme_toggle">+ Meme</button>
                 <div id="meme_box" class="hidden">
                     <?php $memes = $system->getMemes(); ?>
-                    <?php for ($i = 0; $i < count($memes["codes"]); $i++) { ?>
+                    <?php for ($i = 0; $i < count($memes["codes"]); $i++): ?>
                     <div data-code="<?=$memes["codes"][$i]?>" class="meme_select">
                         <?=$memes["images"][$i]?>
                     </div>
-                    <?php }?>
+                    <?php endfor; ?>
                 </div>
                 <form action="<?=$self_link?>" method="post">
                     <textarea id="chatMessage" name="post" style="minlength='3' maxlength='<?=$chat_max_post_length?>"></textarea><br />
