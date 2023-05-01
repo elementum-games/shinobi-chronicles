@@ -61,6 +61,7 @@ class Item {
             case 'residual_damage':
             case 'diffuse':
             case 'element':
+            case 'daze':
                 return '%';
             case 'harden':
                 return ' damage';
@@ -69,8 +70,6 @@ class Item {
                 return ' speed';
             case 'heal':
                 return ' HP';
-            case 'daze':
-                return ' genjutsu';
             case 'unknown':
             default:
                 return '';
