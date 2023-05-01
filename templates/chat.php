@@ -50,9 +50,16 @@
             max-width:20px;
             max-height:20px;
         }
-
         .mention {
             background-color: rgba(255, 255, 0, 0.3);
+        }
+        #meme_box {
+            display: flex;
+            flex-direction: row;
+            flex-wrap: wrap;
+        }
+        .hidden {
+            display: none !important;
         }
     </style>
     <script type="text/javascript">
@@ -66,16 +73,28 @@
                 }
             });
             Chat.keyup(function (evt) {
-                if(this.value.length >= chat_max_length - 20)
-                {
+                if (this.value.length >= chat_max_length - 20) {
                     let remaining = chat_max_length - this.textLength;
                     $('#remainingCharacters').text('Characters remaining: ' + remaining + ' out of ' + chat_max_length);
                 }
-                else
-                {
+                else {
                     $('#remainingCharacters').text('');
                 }
-            })
+            });
+            $(document).on("click", ".meme_select", function () {
+                Chat.val(Chat.val() + $(this).attr("data-code"));
+                $("#meme_box").addClass("hidden");
+                $("#meme_toggle").text("+ Meme");
+            });
+            $(document).on("click", "#meme_toggle", function (e) {
+                $("#meme_box").toggleClass("hidden");
+                if ($(e.target).text() == "+ Meme") {
+                    $(e.target).text("- Meme");
+                }
+                else {
+                    $(e.target).text("+ Meme");
+                }
+            });
         });
     </script>
     <?php if(!isset($_GET['no_refresh'])): ?>
@@ -102,6 +121,15 @@
         <tr><th>Post Message</th></tr>
         <tr>
             <td style="text-align: center;">
+                <button id="meme_toggle">+ Meme</button>
+                <div id="meme_box" class="hidden">
+                    <?php $memes = $system->getMemes(); ?>
+                    <?php for ($i = 0; $i < count($memes["codes"]); $i++): ?>
+                    <div data-code="<?=$memes["codes"][$i]?>" class="meme_select">
+                        <?=$memes["images"][$i]?>
+                    </div>
+                    <?php endfor; ?>
+                </div>
                 <form action="<?=$self_link?>" method="post">
                     <textarea id="chatMessage" name="post" style="minlength='3' maxlength='<?=$chat_max_post_length?>"></textarea><br />
                     <input type="checkbox" id="quickReply" name="quick_reply" value="1"

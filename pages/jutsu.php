@@ -186,14 +186,6 @@ function jutsu(): void {
         }
     }
 
-    if($jutsu_to_view == null) {
-        $sortedJutsu = [];
-        foreach($player->ninjutsu_ids as $jutsu_id) {
-            $sortedJutsu[] = $player->jutsu[$jutsu_id]->rank;
-        }
-        array_multisort($sortedJutsu, $player->ninjutsu_ids);
-    }
-
     require 'templates/jutsu_page.php';
 }
 
