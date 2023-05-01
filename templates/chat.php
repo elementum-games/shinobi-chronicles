@@ -6,7 +6,7 @@
  */
 ?>
 <?php if(!$system->is_legacy_ajax_request): ?>
-    <style>
+<style>
         :root {
             --avatar-size: 60px;
         }
@@ -53,16 +53,38 @@
         .mention {
             background-color: rgba(255, 255, 0, 0.3);
         }
+        #meme_modal {
+            position: absolute;
+            z-index: 1001;
+	        top: 3%;
+            left: 50%;
+            border-radius: 10px;
+            background-color: var(--theme-content-bg-color);
+            transform: translate(-50%, -50%);
+        }
         #meme_box {
+            overflow-y: auto;
+	        height: 200px;
             display: flex;
             flex-direction: row;
             flex-wrap: wrap;
+            justify-content: center;
+        }
+        .meme_select {
+            cursor: pointer;
+            flex-basis: 40px;
+            min-width: 0;
+            padding: 4px;
+        }
+        .meme_select img {
+            max-width: 40px !important;
+            max-height: 40px !important;
         }
         .hidden {
             display: none !important;
         }
-    </style>
-    <script type="text/javascript">
+</style>
+<script type="text/javascript">
         $(document).ready(function(){
             let Chat = $('#chatMessage');
             let chat_max_length = <?=$chat_max_post_length?>
@@ -83,67 +105,82 @@
             });
             $(document).on("click", ".meme_select", function () {
                 Chat.val(Chat.val() + $(this).attr("data-code"));
-                $("#meme_box").addClass("hidden");
+                $("#meme_modal").addClass("hidden");
                 $("#meme_toggle").text("+ Meme");
             });
-            $(document).on("click", "#meme_toggle", function (e) {
-                $("#meme_box").toggleClass("hidden");
-                if ($(e.target).text() == "+ Meme") {
-                    $(e.target).text("- Meme");
-                }
-                else {
-                    $(e.target).text("+ Meme");
-                }
+            $(document).on("click", ".meme_toggle", function (e) {
+                $("#meme_modal").toggleClass("hidden");
             });
         });
-    </script>
-    <?php if(!isset($_GET['no_refresh'])): ?>
-        <script type="text/javascript">
+</script>
+<?php if(!isset($_GET['no_refresh'])): ?>
+<script type="text/javascript">
             var refreshID;
             $(document).ready(function(){
                 refreshID = setInterval(function(){$('#socialPosts').load('<?=$self_link?>&request_type=ajax')}, 3000);
             });
-        </script>
-    <?php endif ?>
-
-    <div class="submenu">
-        <ul class="submenu">
-            <?php if(isset($_GET['no_refresh'])): ?>
-                <li style="width:100%;"><a href="<?=$self_link?>">Turn Auto Chat On</a></li>
-            <?php else: ?>
-                <li style="width:100%;"><a href="<?=$self_link?>&no_refresh=1">Turn Auto Chat Off</a></li>
-            <?php endif ?>
-        </ul>
-    </div>
-    <div class="submenuMargin"></div>
-
-    <table id="chat_input_table" class="table">
-        <tr><th>Post Message</th></tr>
-        <tr>
-            <td style="text-align: center;">
-                <button id="meme_toggle">+ Meme</button>
-                <div id="meme_box" class="hidden">
-                    <?php $memes = $system->getMemes(); ?>
-                    <?php for ($i = 0; $i < count($memes["codes"]); $i++): ?>
-                    <div data-code="<?=$memes["codes"][$i]?>" class="meme_select">
-                        <?=$memes["images"][$i]?>
-                    </div>
-                    <?php endfor; ?>
-                </div>
-                <form action="<?=$self_link?>" method="post">
-                    <textarea id="chatMessage" name="post" style="minlength='3' maxlength='<?=$chat_max_post_length?>"></textarea><br />
-                    <input type="checkbox" id="quickReply" name="quick_reply" value="1"
-                        <?=($_SESSION['quick_reply'] ? "checked='checked'" : '')?> /> Quick reply<br />
-                    <span id="remainingCharacters" class="red"></span>
-                    <br />
-                    <input id="chatSubmit" name="chat_submit" type="submit" value="Post"/>
-                </form>
-            </td>
-        </tr>
-    </table>
-
-    <div id="socialPosts">
+</script>
 <?php endif ?>
+
+<div class="submenu">
+    <ul class="submenu">
+        <?php if(isset($_GET['no_refresh'])): ?>
+        <li style="width:100%;">
+            <a href="<?=$self_link?>">Turn Auto Chat On</a>
+        </li>
+        <?php else: ?>
+        <li style="width:100%;">
+            <a href="<?=$self_link?>&no_refresh=1">Turn Auto Chat Off</a>
+        </li>
+        <?php endif ?>
+    </ul>
+</div>
+<div class="submenuMargin"></div>
+
+<table id="meme_modal" class="table hidden">
+    <tr>
+        <th>Memes</th>
+    </tr>
+    <tr>
+        <td>
+            <div id="meme_box">
+                <?php $memes = $system->getMemes(); ?>
+                <?php for ($i = 0; $i < count($memes["codes"]); $i++): ?>
+                <div data-code="<?=$memes["codes"][$i]?>" class="meme_select">
+                    <?=$memes["images"][$i]?>
+                </div>
+                <?php endfor; ?>
+            </div>
+        </td>
+    </tr>
+    <tr>
+        <td style="text-align: center">
+            <button class="meme_toggle">Close</button>
+        </td>
+    </tr>
+</table>
+
+<table id="chat_input_table" class="table">
+    <tr>
+        <th>Post Message</th>
+    </tr>
+    <tr>
+        <td style="text-align: center;">
+            <button class="meme_toggle">Meme</button>
+            <form action="<?=$self_link?>" method="post">
+                <textarea id="chatMessage" name="post" style="minlength='3' maxlength='<?=$chat_max_post_length?>"></textarea><br />
+                <input type="checkbox" id="quickReply" name="quick_reply" value="1"
+                    <?=($_SESSION['quick_reply'] ? "checked='checked'" : '')?> /> Quick reply<br />
+                <span id="remainingCharacters" class="red"></span>
+                <br />
+                <input id="chatSubmit" name="chat_submit" type="submit" value="Post"/>
+            </form>
+        </td>
+    </tr>
+</table>
+
+<div id="socialPosts">
+    <?php endif ?>
     <table class="table" style="width: 98%;">
         <tr>
             <th style="width:28%;">Users</th>
@@ -151,33 +188,39 @@
             <th style="width:10%;">Time</th>
         </tr>
         <?php if(empty($posts)): ?>
-            <tr><td colspan="3" style="text-align: center;">No posts!</td></tr>
+        <tr>
+            <td colspan="3" style="text-align: center;">No posts!</td>
+        </tr>
         <?php else: ?>
-            <?php foreach($posts as $post): ?>
-                <tr class="chat_msg" style="text-align: center;">
-                    <td>
-                        <div id='user_data_container'>
-                            <div class="avatarContainer"><img src="<?=$post['avatar']?>"/></div>
-                            <div class="character_info">
-                                <a href="<?=$system->router->links['members']?>&user=<?=$post['user_name']?>"
-                                   class="<?=$post['class']?> <?=$post['status_type']?>"><?=$post['user_name']?></a><br />
-                                <p>
-                                    <img class='villageIco' src="./images/village_icons/<?=strtolower($post['village'])?>.png" alt="<?=$post['village']?> Village"
-                                        title="<?=$post['village']?> Village" />
-                                    <?=stripslashes($post['title'])?>
-                                </p>
-                            </div>
-                        </div>
-                        <?php if($post['staff_level']): ?>
-                            <p class="staffMember" style="background-color: <?=$post['staff_banner']['staffColor']?>">
-                                <?=$post['staff_banner']['staffBanner']?>
-                            </p>
-                        <?php endif ?>
-                    </td>
-                    <td>
-                        <?=$post['message']?>
-                    </td>
-                    <td style="font-style:italic;">
+        <?php foreach($posts as $post): ?>
+        <tr class="chat_msg" style="text-align: center;">
+            <td>
+                <div id='user_data_container'>
+                    <div class="avatarContainer">
+                        <img src="<?=$post['avatar']?>" />
+                    </div>
+                    <div class="character_info">
+                        <a href="<?=$system->router->links['members']?>&user=<?=$post['user_name']?>"
+                            class="<?=$post['class']?> <?=$post['status_type']?>">
+                            <?=$post['user_name']?>
+                        </a><br />
+                        <p>
+                            <img class='villageIco' src="./images/village_icons/<?=strtolower($post['village'])?>.png" alt="<?=$post['village']?> Village"
+                                title="<?=$post['village']?> Village" />
+                            <?=stripslashes($post['title'])?>
+                        </p>
+                    </div>
+                </div>
+                <?php if($post['staff_level']): ?>
+                <p class="staffMember" style="background-color: <?=$post['staff_banner']['staffColor']?>">
+                    <?=$post['staff_banner']['staffBanner']?>
+                </p>
+                <?php endif ?>
+            </td>
+            <td>
+                <?=$post['message']?>
+            </td>
+            <td style="font-style:italic;">
                         <div style="margin-bottom:2px"><?=$post['time_string']?></div>
                         <?php if($player->staff_manager->isModerator()): ?>
                             <?=sprintf("<a class='imageLink' href='{$self_link}&delete=%d'>
