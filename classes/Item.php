@@ -70,7 +70,7 @@ class Item {
             case 'heal':
                 return ' HP';
             case 'daze':
-                return ' intelligence';
+                return ' genjutsu';
             case 'unknown':
             default:
                 return '';

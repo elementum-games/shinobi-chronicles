@@ -8,21 +8,19 @@ $system->is_api_request = true;
 
 try {
     $player = Auth::getUserFromSession($system);
+    $player->loadData(User::UPDATE_NOTHING);
 } catch(Exception $e) {
     API::exitWithError($e->getMessage());
 }
 # End standard auth
 
-$player->loadData(User::UPDATE_NOTHING);
-
-$routes = Router::$routes;
 
 $battle_result = $system->query("SELECT battle_type FROM battles WHERE `battle_id`='{$player->battle_id}' LIMIT 1");
 if($system->db_last_num_rows) {
     $battle_data = $system->db_fetch($battle_result);
 
     $battle_route = null;
-    foreach($routes as $page_id => $page) {
+    foreach(Router::$routes as $page_id => $page) {
         if(empty($page->battle_api_function_name)) {
             continue;
         }
@@ -39,19 +37,19 @@ if($system->db_last_num_rows) {
         API::exitWithError("No route found for battle type!");
     }
 
-    require(__DIR__ . '/../pages/' . $battle_route['file_name']);
+    require(__DIR__ . '/../pages/' . $battle_route->file_name);
 
     try {
-        $response = $battle_route['battle_api_function_name']($system, $player);
+        /** @var BattlePageAPIResponse $response */
+        $response = ($battle_route->battle_api_function_name)($system, $player);
+        if(!($response instanceof BattlePageAPIResponse)) {
+            API::exitWithError("Invalid battle API response! - Expected BattlePageAPIResponse, got " . get_class($response));
+        }
     } catch (Throwable $e) {
         API::exitWithError(
             message: $e->getMessage(),
             debug_messages: $system->debug_messages
         );
-    }
-
-    if(!($response instanceof BattlePageAPIResponse)) {
-        API::exitWithError("Invalid battle API response! - Expected BattlePageAPIResponse, got " . get_class($response));
     }
 
     API::exitWithData(

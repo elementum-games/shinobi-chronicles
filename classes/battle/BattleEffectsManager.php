@@ -50,16 +50,6 @@ class BattleEffectsManager {
             echo sprintf("%s / %s<br />", $raw_damage, $debuff_power);
         }
 
-        /*if($jutsu->jutsu_type == Jutsu::TYPE_GENJUTSU && !empty($jutsu->parent_jutsu)) {
-            $parent_genjutsu_id = $effect_user->combat_id . ':J' . $jutsu->parent_jutsu;
-            if(!empty($this->active_effects[$parent_genjutsu_id]->layer_active)) {
-                $this->active_effects[$parent_genjutsu_id]->layer_active = true;
-                $this->active_effects[$parent_genjutsu_id]->power *= 1.1;
-            }
-            $jutsu->power *= 1.1;
-            $jutsu->effect_amount *= 1.1;
-        }*/
-
         switch($jutsu->effect) {
             case 'residual_damage':
             case 'ninjutsu_boost':
@@ -68,6 +58,7 @@ class BattleEffectsManager {
             case 'ninjutsu_nerf':
             case 'taijutsu_nerf':
             case 'genjutsu_nerf':
+            case 'daze':
             case 'ninjutsu_resist':
             case 'taijutsu_resist':
             case 'genjutsu_resist':
@@ -247,7 +238,7 @@ class BattleEffectsManager {
         else if($effect->effect == 'taijutsu_nerf') {
             $target->taijutsu_nerf += $effect_amount;
         }
-        else if($effect->effect == 'genjutsu_nerf') {
+        else if($effect->effect == 'genjutsu_nerf' or $effect->effect == 'daze') {
             $target->genjutsu_nerf += $effect_amount;
         }
         else if($effect->effect == 'speed_nerf' or $effect->effect == 'cripple') {
@@ -257,7 +248,7 @@ class BattleEffectsManager {
             $target->speed_nerf = min($target->speed_nerf, $target->getSpeed(true) * self::MAX_SPEED_REDUCTION);
             $target->cast_speed_nerf = min($target->cast_speed_nerf, $target->getCastSpeed(true) * self::MAX_SPEED_REDUCTION);
         }
-        else if($effect->effect == 'intelligence_nerf' or $effect->effect == 'daze') {
+        else if($effect->effect == 'intelligence_nerf') {
             $target->intelligence_nerf += $effect_amount;
         }
         else if($effect->effect == 'willpower_nerf') {

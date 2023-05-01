@@ -244,7 +244,7 @@ class BattleEffectsManagerV2 {
         else if($effect->effect == 'taijutsu_nerf') {
             $target->taijutsu_nerf += $effect_amount;
         }
-        else if($effect->effect == 'genjutsu_nerf') {
+        else if($effect->effect == 'genjutsu_nerf' or $effect->effect == 'daze') {
             $target->genjutsu_nerf += $effect_amount;
         }
         else if($effect->effect == 'cast_speed_nerf') {
@@ -253,7 +253,7 @@ class BattleEffectsManagerV2 {
         else if($effect->effect == 'speed_nerf' or $effect->effect == 'cripple') {
             $target->speed_nerf += $target->speed * ($effect_amount / 100);
         }
-        else if($effect->effect == 'intelligence_nerf' or $effect->effect == 'daze') {
+        else if($effect->effect == 'intelligence_nerf') {
             $target->intelligence_nerf += $effect_amount;
         }
         else if($effect->effect == 'willpower_nerf') {
