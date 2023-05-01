@@ -5,6 +5,12 @@ class Route {
     const IN_VILLAGE_OKAY = 1;
     const ONLY_IN_VILLAGE = 2;
 
+    const MENU_USER = 'user';
+    const MENU_ACTIVITY = 'activity';
+    const MENU_VILLAGE = 'village';
+    const MENU_CONDITIONAL = 'conditional';
+    const MENU_NONE = 'none';
+
     public function __construct(
         public string $file_name,
         public string $title,

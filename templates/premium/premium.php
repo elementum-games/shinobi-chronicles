@@ -523,7 +523,7 @@
                     Paypal account to
                     pay with a credit card.</p>
 
-                <?php foreach($system->getKunaiPacks() as $pack): ?>
+                <?php foreach(System::getKunaiPacks() as $pack): ?>
                     <div class='kunaiPack'>
                         <b>$<?= $pack['cost'] ?> USD</b><br />
                         <?= $pack['kunai'] ?> AK + <?= $pack['bonus'] ?> bonus<br />

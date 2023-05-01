@@ -493,7 +493,12 @@ function chuuninExam(System $system, User $player, RankManager $rankManager): bo
                 try {
                     $opponent = new NPC($system, $opponents[$player->exam_stage]);
                     $opponent->loadData();
-                    Battle::start($system, $player, $opponent, Battle::TYPE_AI_RANKUP);
+                    if($system->USE_NEW_BATTLES) {
+                        BattleV2::start($system, $player, $opponent, Battle::TYPE_AI_RANKUP);
+                    }
+                    else {
+                        Battle::start($system, $player, $opponent, Battle::TYPE_AI_RANKUP);
+                    }
                 } catch(Exception $e) {
                     $system->message($e->getMessage());
                     $system->printMessage();
@@ -501,7 +506,12 @@ function chuuninExam(System $system, User $player, RankManager $rankManager): bo
                 }
             }
 
-            $battle = BattleManager::init($system, $player, $player->battle_id);
+            if($system->USE_NEW_BATTLES) {
+                $battle = BattleManagerV2::init($system, $player, $player->battle_id);
+            }
+            else {
+                $battle = BattleManager::init($system, $player, $player->battle_id);
+            }
 
             $battle->checkInputAndRunTurn();
 
@@ -551,7 +561,13 @@ function chuuninExam(System $system, User $player, RankManager $rankManager): bo
                 try {
                     $opponent = new NPC($system, $opponent_id);
                     $opponent->loadData();
-                    Battle::start($system, $player, $opponent, Battle::TYPE_AI_RANKUP);
+
+                    if($system->USE_NEW_BATTLES) {
+                        BattleV2::start($system, $player, $opponent, Battle::TYPE_AI_RANKUP);
+                    }
+                    else {
+                        Battle::start($system, $player, $opponent, Battle::TYPE_AI_RANKUP);
+                    }
                 } catch(Exception $e) {
                     $system->message($e->getMessage());
                     $system->printMessage();
@@ -559,7 +575,12 @@ function chuuninExam(System $system, User $player, RankManager $rankManager): bo
                 }
             }
 
-            $battle = BattleManager::init($system, $player, $player->battle_id);
+            if($system->USE_NEW_BATTLES) {
+                $battle = BattleManagerV2::init($system, $player, $player->battle_id);
+            }
+            else {
+                $battle = BattleManager::init($system, $player, $player->battle_id);
+            }
             $battle->checkInputAndRunTurn();
 
             $battle->renderBattle();
@@ -880,7 +901,12 @@ function rankupFightAPI(System $system, User $player): BattlePageAPIResponse {
     $response = new BattlePageAPIResponse();
 
     try {
-        $battle = BattleManager::init($system, $player, $player->battle_id);
+        if($system->USE_NEW_BATTLES) {
+            $battle = BattleManagerV2::init($system, $player, $player->battle_id);
+        }
+        else {
+            $battle = BattleManager::init($system, $player, $player->battle_id);
+        }
         $battle->checkInputAndRunTurn();
 
         $response->battle_data = $battle->getApiResponse();

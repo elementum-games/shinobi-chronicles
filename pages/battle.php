@@ -18,7 +18,12 @@ function battle(): bool {
 	global $self_link;
 
 	if($player->battle_id) {
-        $battle = BattleManager::init($system, $player, $player->battle_id);
+        if($system->USE_NEW_BATTLES) {
+            $battle = BattleManagerV2::init($system, $player, $player->battle_id);
+        }
+        else {
+            $battle = BattleManager::init($system, $player, $player->battle_id);
+        }
 
         $battle->checkInputAndRunTurn();
 
@@ -91,8 +96,14 @@ function battle(): bool {
 					ceil((($user->last_death_ms + (60 * 1000)) - System::currentTimeMs()) / 1000) . " more seconds.");
 			}
 
-			Battle::start($system, $player, $user, Battle::TYPE_FIGHT);
-			$system->message("You have attacked!<br />
+            if($system->USE_NEW_BATTLES) {
+                BattleV2::start($system, $player, $user, Battle::TYPE_FIGHT);
+            }
+            else {
+                Battle::start($system, $player, $user, Battle::TYPE_FIGHT);
+            }
+
+            $system->message("You have attacked!<br />
 				<a class='link' href='$self_link'>To Battle</a>");
 			$system->printMessage();
 		} catch (Exception $e) {
@@ -184,6 +195,13 @@ function processBattleFightEnd(BattleManager $battle, User $player): string {
     return $result;
 }
 
+/**
+ * Note this function is V2 (new battles) only as old battles do not use the API
+ *
+ * @param System $system
+ * @param User   $player
+ * @return BattlePageAPIResponse
+ */
 function battleFightAPI(System $system, User $player): BattlePageAPIResponse {
     if(!$player->battle_id) {
         return new BattlePageAPIResponse(errors: ["Player is not in battle!"]);
@@ -192,7 +210,7 @@ function battleFightAPI(System $system, User $player): BattlePageAPIResponse {
     $response = new BattlePageAPIResponse();
 
     try {
-        $battle = BattleManager::init($system, $player, $player->battle_id);
+        $battle = BattleManagerV2::init($system, $player, $player->battle_id);
         $battle->checkInputAndRunTurn();
 
         $response->battle_data = $battle->getApiResponse();

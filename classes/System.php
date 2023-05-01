@@ -8,6 +8,7 @@ require_once __DIR__ . '/MarkdownParser.php';
 require_once __DIR__ . '/API.php';
 require_once __DIR__ . '/Layout.php';
 require_once __DIR__ . '/Router.php';
+require_once __DIR__ . '/Route.php';
 
 /*	Class:		System
 	Purpose: 	Handle database connection and queries. Handle storing and printing of error messages.
@@ -21,16 +22,6 @@ class System {
     const LOGOUT_LIMIT = 720;
     const BLOODLINE_ROLL_CHANCE = 50;
     const ARENA_COOLDOWN = 4 * 1000;
-
-    const MENU_USER = 'user';
-    const MENU_ACTIVITY = 'activity';
-    const MENU_VILLAGE = 'village';
-    const MENU_CONDITIONAL = 'conditional';
-    const MENU_NONE = 'none';
-
-    const NOT_IN_VILLAGE = 0;
-    const IN_VILLAGE_OKAY = 1;
-    const ONLY_IN_VILLAGE = 2;
 
     const CURRENCY_TYPE_MONEY = 'money';
     const CURRENCY_TYPE_PREMIUM_CREDITS = 'premium_credits';
@@ -67,6 +58,7 @@ class System {
 
     public bool $SC_OPEN;
     public bool $register_open;
+    public bool $USE_NEW_BATTLES = false;
 
     public string $link;
 
@@ -124,7 +116,6 @@ class System {
 
     // Misc stuff
     const SC_MAX_RANK = 4;
-    const MAX_CLAN_HOLDER_IDLE_TIME =  (60 * 60 * 24 * 30); // 30 Days
 
     const MAX_LINK_DISPLAY_LENGTH = 60;
 
@@ -212,6 +203,7 @@ class System {
         $this->environment = $ENVIRONMENT ?? self::ENVIRONMENT_DEV;
         $this->register_open = $register_open ?? false;
         $this->SC_OPEN = $SC_OPEN ?? false;
+        $this->USE_NEW_BATTLES = $USE_NEW_BATTLES ?? false;
 
         $this->router = new Router($web_url ?? 'http://localhost/');
 
@@ -444,7 +436,7 @@ class System {
 
         echo $side_menu_start;
         foreach($pages as $id => $page) {
-            if(!isset($page->menu) || $page->menu != System::MENU_USER) {
+            if(!isset($page->menu) || $page->menu != Route::MENU_USER) {
                 continue;
             }
 
@@ -593,37 +585,24 @@ class System {
     }
 
     public function imageCheck($image, $size): string {
-
         $avatar_limit = $size;
 
-
-
         $width = $avatar_limit;
-
         $height = $avatar_limit;
 
-
-
         return "<img src='$image' style='max-width:{$width}px;max-height:{$height}px;' />";
-
     }
 
     public function timeAgo($timestamp): string {
-
         $time = time() - $timestamp;
 
         $days = 0;
-
         $hours = 0;
-
         $minutes = 0;
-
-
 
         $time_string = '';
 
         // Days
-
         if($time >= 86400) {
 
             $days = floor($time / 86400);
@@ -635,7 +614,6 @@ class System {
         }
 
         // Hours
-
         if($time >= 3600) {
 
             $hours = floor($time / 3600);
@@ -647,13 +625,11 @@ class System {
         }
 
         // Minutes
-
         $minutes = ceil($time / 60);
 
         $time_string .= $minutes . ' minute(s) ago';
 
         return $time_string;
-
     }
 
     public function time_remaining($timestamp): string {
@@ -775,6 +751,12 @@ class System {
             'message' => str_replace("\r\n", "<br />", $results['global_message']),
             'time' => date("l, M j, Y - g:i A", $results['time'])
         ];
+    }
+
+    #[Pure]
+    public function getReactFile(string $component_name): string {
+        $filename = "ui_components/build/{$component_name}.js";
+        return $this->router->base_url . $filename . "?v=" .  filemtime($filename);
     }
 
     /**
@@ -908,7 +890,7 @@ class System {
         return (int) date('G', time());
     }
 
-    public function getKunaiPacks(): array {
+    public static function getKunaiPacks(): array {
         $kunai_packs = [
             [
                 'cost' => 5,
@@ -936,12 +918,6 @@ class System {
         }
 
         return $kunai_packs;
-    }
-
-    #[Pure]
-    public function getReactFile(string $component_name): string {
-        $filename = "ui_components/build/{$component_name}.js";
-        return $this->router->base_url . $filename . "?v=" .  filemtime($filename);
     }
 
     public static function simpleStackTrace(): string {

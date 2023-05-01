@@ -21,20 +21,15 @@ function arena(): bool {
         arenaFight();
 	}
 	else {
-		$result = $system->query("SELECT `ai_id`, `name`, `level` FROM `ai_opponents`
-			WHERE `rank` ='$player->rank_num' ORDER BY `level` ASC");
-
-		// Addition by Kengetsu - Get access to NPC if rank is higher than public max.
-		if($player->rank_num > System::SC_MAX_RANK) {
-			$result = $system->query("SELECT `ai_id`, `name`, `level` FROM `ai_opponents`
-			WHERE `rank` ='" . System::SC_MAX_RANK . "' ORDER BY `level` ASC");
-		}
-		//End
+        $ai_rank = min($player->rank_num, System::SC_MAX_RANK);
+        $result = $system->query("SELECT `ai_id`, `name`, `level` FROM `ai_opponents`
+			WHERE `rank` = {$ai_rank} ORDER BY `level` ASC");
 		if($system->db_last_num_rows == 0) {
 			$system->message("No NPC opponents found!");
 			$system->printMessage();
 			return false;
 		}
+
 		$ai_opponents = array();
 		while($row = $system->db_fetch($result)) {
 			$ai_opponents[$row['ai_id']] = $row;
@@ -58,7 +53,12 @@ function arena(): bool {
                     $ai->health = $ai->max_health;
 
                     $player->last_ai_ms = System::currentTimeMs();
-                    Battle::start($system, $player, $ai, Battle::TYPE_AI_ARENA);
+                    if($system->USE_NEW_BATTLES) {
+                        BattleV2::start($system, $player, $ai, BattleV2::TYPE_AI_ARENA);
+                    }
+                    else {
+                        Battle::start($system, $player, $ai, Battle::TYPE_AI_ARENA);
+                    }
 
                     arena();
                     $player->log(User::LOG_ARENA, "Opponent {$ai->id} ({$ai->getName()})");
@@ -99,7 +99,13 @@ function arenaFight(): bool {
     global $player;
 
     try {
-        $battle = BattleManager::init($system, $player, $player->battle_id);
+        if($system->USE_NEW_BATTLES) {
+            $battle = BattleManagerV2::init($system, $player, $player->battle_id);
+        }
+        else {
+            $battle = BattleManager::init($system, $player, $player->battle_id);
+        }
+
         $battle->checkInputAndRunTurn();
 
         $battle->renderBattle();

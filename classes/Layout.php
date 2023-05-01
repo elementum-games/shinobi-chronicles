@@ -1,5 +1,7 @@
 <?php
 
+require_once __DIR__ . '/Route.php';
+
 class Layout {
     public function __construct(
         public string $key,
@@ -38,10 +40,10 @@ class Layout {
         $routes = Router::$routes;
 
         if($player->clan) {
-            $routes[20]->menu = System::MENU_VILLAGE;
+            $routes[20]->menu = Route::MENU_VILLAGE;
         }
         if($player->rank_num >= 3) {
-            $routes[24]->menu = System::MENU_USER;
+            $routes[24]->menu = Route::MENU_USER;
         }
 
         // NEW MESSAGE ALERT
@@ -56,7 +58,7 @@ class Layout {
         );
 
         foreach($routes as $id => $page) {
-            if(!isset($page->menu) || $page->menu != System::MENU_USER) {
+            if(!isset($page->menu) || $page->menu != Route::MENU_USER) {
                 continue;
             }
 
@@ -75,7 +77,7 @@ class Layout {
         // Activity Menu
         echo $this->action_menu_header;
         foreach($routes as $id => $page) {
-            if(!isset($page->menu) || $page->menu != System::MENU_ACTIVITY) {
+            if(!isset($page->menu) || $page->menu != Route::MENU_ACTIVITY) {
                 continue;
             }
 
@@ -99,7 +101,7 @@ class Layout {
         // Village menu
         echo $this->village_menu_start;
         foreach($routes as $id => $page) {
-            if(!isset($page->menu) || $page->menu != System::MENU_VILLAGE) {
+            if(!isset($page->menu) || $page->menu != Route::MENU_VILLAGE) {
                 continue;
             }
 

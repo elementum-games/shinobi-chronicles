@@ -109,7 +109,7 @@ else {
 				
 				// Check shard amount
 				$bonus = 0;
-				$kunai_packs = $system->getKunaiPacks();
+				$kunai_packs = System::getKunaiPacks();
 				$selected_pack = null;
 				foreach($kunai_packs as $pack) {
 				    if($payment_amount < $pack['cost']) {

@@ -17,7 +17,12 @@ function spar() {
 
 	if($player->battle_id) {
 		try {
-            $battle = BattleManager::init($system, $player, $player->battle_id);
+            if($system->USE_NEW_BATTLES) {
+                $battle = BattleManagerV2::init($system, $player, $player->battle_id);
+            }
+            else {
+                $battle = BattleManager::init($system, $player, $player->battle_id);
+            }
 
             $battle->checkInputAndRunTurn();
 
@@ -108,7 +113,12 @@ function spar() {
 			}
 
             $player->challenge = 0;
-            Battle::start($system, $player, $user, Battle::TYPE_SPAR);
+            if($system->USE_NEW_BATTLES) {
+                BattleV2::start($system, $player, $user, Battle::TYPE_SPAR);
+            }
+            else {
+                Battle::start($system, $player, $user, Battle::TYPE_SPAR);
+            }
 
 			$system->message("You have accepted the challenge!<br />
 				<a class='link' href='$self_link'>To Battle</a>");
@@ -220,7 +230,12 @@ function sparFightAPI(System $system, User $player): BattlePageAPIResponse {
     $response = new BattlePageAPIResponse();
 
     try {
-        $battle = BattleManager::init($system, $player, $player->battle_id);
+        if($system->USE_NEW_BATTLES) {
+            $battle = BattleManagerV2::init($system, $player, $player->battle_id);
+        }
+        else {
+            $battle = BattleManager::init($system, $player, $player->battle_id);
+        }
         $battle->checkInputAndRunTurn();
 
         $response->battle_data = $battle->getApiResponse();

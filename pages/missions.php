@@ -168,10 +168,20 @@ function runActiveMission(): bool {
 
                 // Initialize start of battle stuff
                 if(!$player->battle_id) {
-                    Battle::start($system, $player, $opponent, Battle::TYPE_AI_MISSION);
+                    if($system->USE_NEW_BATTLES) {
+                        BattleV2::start($system, $player, $opponent, Battle::TYPE_AI_MISSION);
+                    }
+                    else {
+                        Battle::start($system, $player, $opponent, Battle::TYPE_AI_MISSION);
+                    }
                 }
 
-                $battle = BattleManager::init($system, $player, $player->battle_id);
+                if($system->USE_NEW_BATTLES) {
+                    $battle = BattleManagerV2::init($system, $player, $player->battle_id);
+                }
+                else {
+                    $battle = BattleManager::init($system, $player, $player->battle_id);
+                }
                 $battle->checkInputAndRunTurn();
 
                 $battle->renderBattle();

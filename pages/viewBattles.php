@@ -16,7 +16,13 @@ function viewBattles() {
     if(!empty($_GET['battle_id'])) {
         $battle_id = (int)$_GET['battle_id'];
         try {
-            $battleManager = BattleManager::init($system, $player, $battle_id, true);
+            if($system->USE_NEW_BATTLES) {
+                $battleManager = BattleManagerV2::init($system, $player, $battle_id, true);
+            }
+            else {
+                $battleManager = BattleManager::init($system, $player, $battle_id, true);
+            }
+
             if(!in_array($battleManager->getBattleType(), $battle_types)) {
                 throw new Exception("Invalid battle type!");
             }

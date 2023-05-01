@@ -10,33 +10,33 @@ return $routes = [
         file_name: 'profile.php',
         title: 'Profile',
         function_name: 'userProfile',
-        menu: System::MENU_USER,
+        menu: Route::MENU_USER,
     ),
     2 => new Route(
         file_name: 'inbox.php',
         title: 'Inbox',
         function_name: 'inbox',
-        menu: System::MENU_USER,
+        menu: Route::MENU_USER,
     ),
     7 => new Route(
         file_name: 'chat.php',
         title: 'Chat',
         function_name: 'chat',
-        menu: System::MENU_USER,
+        menu: Route::MENU_USER,
         ajax_ok: true,
     ),
     4 => new Route(
         file_name: 'jutsu.php',
         title: 'Jutsu',
         function_name: 'jutsu',
-        menu: System::MENU_USER,
+        menu: Route::MENU_USER,
         battle_ok: false,
     ),
     5 => new Route(
         file_name: 'gear.php',
         title: 'Gear',
         function_name: 'gear',
-        menu: System::MENU_USER,
+        menu: Route::MENU_USER,
         battle_ok: false,
     ),
     10 => new Route(
@@ -51,7 +51,7 @@ return $routes = [
         file_name: 'members.php',
         title: 'Members',
         function_name: 'members',
-        menu: System::MENU_USER,
+        menu: Route::MENU_USER,
     ),
     24 => new Route(
         file_name: 'team.php',
@@ -64,7 +64,7 @@ return $routes = [
         file_name: 'marriage.php',
         title: 'Marriage',
         function_name: 'marriage',
-        menu: System::MENU_USER,
+        menu: Route::MENU_USER,
     ),
 
     // Activity Menu
@@ -72,7 +72,7 @@ return $routes = [
         file_name: 'travel.php',
         title: 'Travel',
         function_name: 'travel',
-        menu: System::MENU_ACTIVITY,
+        menu: Route::MENU_ACTIVITY,
         min_rank: 2,
         battle_ok: false,
         village_ok: Route::IN_VILLAGE_OKAY,
@@ -82,7 +82,7 @@ return $routes = [
         file_name: 'arena.php',
         title: 'Arena',
         function_name: 'arena',
-        menu: System::MENU_ACTIVITY,
+        menu: Route::MENU_ACTIVITY,
         battle_api_function_name: 'arenaFightAPI',
         battle_type: Battle::TYPE_AI_ARENA,
         village_ok: Route::NOT_IN_VILLAGE,
@@ -91,7 +91,7 @@ return $routes = [
         file_name: 'training.php',
         title: 'Training',
         function_name: 'training',
-        menu: System::MENU_ACTIVITY,
+        menu: Route::MENU_ACTIVITY,
         battle_ok: false,
         village_ok: Route::NOT_IN_VILLAGE,
     ),
@@ -99,7 +99,7 @@ return $routes = [
         file_name: 'missions.php',
         title: 'Missions',
         function_name: 'missions',
-        menu: System::MENU_ACTIVITY,
+        menu: Route::MENU_ACTIVITY,
         battle_api_function_name: 'missionFightAPI',
         battle_type: Battle::TYPE_AI_MISSION,
         min_rank: 2,
@@ -109,7 +109,7 @@ return $routes = [
         file_name: 'specialmissions.php',
         title: 'Special Missions',
         function_name: 'specialMissions',
-        menu: System::MENU_ACTIVITY,
+        menu: Route::MENU_ACTIVITY,
         min_rank: 2,
         battle_ok: false,
         village_ok: Route::IN_VILLAGE_OKAY,
@@ -118,7 +118,7 @@ return $routes = [
         file_name: 'spar.php',
         title: 'Spar',
         function_name: 'spar',
-        menu: System::MENU_ACTIVITY,
+        menu: Route::MENU_ACTIVITY,
         battle_api_function_name: 'sparFightAPI',
         battle_type: Battle::TYPE_SPAR,
         village_ok: Route::IN_VILLAGE_OKAY,
@@ -127,7 +127,7 @@ return $routes = [
         file_name: 'healingShop.php',
         title: 'Ramen Shop',
         function_name: 'healingShop',
-        menu: System::MENU_ACTIVITY,
+        menu: Route::MENU_ACTIVITY,
         battle_ok: false,
         village_ok: Route::ONLY_IN_VILLAGE,
     ),
@@ -135,7 +135,7 @@ return $routes = [
         file_name: 'viewBattles.php',
         title: 'View Battles',
         function_name: 'viewBattles',
-        menu: System::MENU_ACTIVITY,
+        menu: Route::MENU_ACTIVITY,
         battle_ok: false,
         village_ok: Route::IN_VILLAGE_OKAY,
     ),
@@ -145,14 +145,14 @@ return $routes = [
         file_name: 'store.php',
         title: 'Shop',
         function_name: 'store',
-        menu: System::MENU_VILLAGE,
+        menu: Route::MENU_VILLAGE,
         village_ok: Route::ONLY_IN_VILLAGE,
     ),
     9 => new Route(
         file_name: 'villageHQ.php',
         title: 'Village HQ',
         function_name: 'villageHQ',
-        menu: System::MENU_VILLAGE,
+        menu: Route::MENU_VILLAGE,
         village_ok: Route::ONLY_IN_VILLAGE,
     ),
     20 => new Route(
@@ -165,7 +165,7 @@ return $routes = [
         file_name: 'premium.php',
         title: 'Ancient Market',
         function_name: 'premium',
-        menu: System::MENU_VILLAGE,
+        menu: Route::MENU_VILLAGE,
     ),
 
     // Staff menu
@@ -173,7 +173,7 @@ return $routes = [
         file_name: 'supportPanel.php',
         title: 'Support Panel',
         function_name: 'supportPanel',
-        menu: System::MENU_CONDITIONAL,
+        menu: Route::MENU_CONDITIONAL,
         user_check: function(User $u) {
             return $u->isSupportStaff();
         }
@@ -182,7 +182,7 @@ return $routes = [
         file_name: 'modPanel.php',
         title: 'Mod Panel',
         function_name: 'modPanel',
-        menu: System::MENU_CONDITIONAL,
+        menu: Route::MENU_CONDITIONAL,
         user_check: function(User $u) {
             return $u->isModerator();
         }
@@ -191,7 +191,7 @@ return $routes = [
         file_name: 'adminPanel.php',
         title: 'Admin Panel',
         function_name: 'adminPanel',
-        menu: System::MENU_CONDITIONAL,
+        menu: Route::MENU_CONDITIONAL,
         user_check: function(User $u) {
             return $u->hasAdminPanel();
         }
@@ -200,7 +200,7 @@ return $routes = [
         file_name: 'chat_log.php',
         title: 'Chat Log',
         function_name: 'chatLog',
-        menu: System::MENU_CONDITIONAL,
+        menu: Route::MENU_CONDITIONAL,
         user_check: function(User $u) {
             return $u->isModerator();
         }
@@ -211,19 +211,19 @@ return $routes = [
         file_name: 'settings.php',
         title: 'Settings',
         function_name: 'userSettings',
-        menu: System::MENU_NONE,
+        menu: Route::MENU_NONE,
     ),
     18 => new Route(
         file_name: 'report.php',
         title: 'Report',
         function_name: 'report',
-        menu: System::MENU_CONDITIONAL,
+        menu: Route::MENU_CONDITIONAL,
     ),
     19 => new Route(
         file_name: 'battle.php',
         title: 'Battle',
         function_name: 'battle',
-        menu: System::MENU_NONE,
+        menu: Route::MENU_NONE,
         battle_api_function_name: 'battleFightAPI',
         battle_type: Battle::TYPE_FIGHT,
     ),
@@ -231,7 +231,7 @@ return $routes = [
         file_name: 'levelUp.php',
         title: 'Rank Exam',
         function_name: 'rankUp',
-        menu: System::MENU_NONE,
+        menu: Route::MENU_NONE,
         battle_api_function_name: 'rankupFightAPI',
         battle_type: Battle::TYPE_AI_RANKUP,
     ),
@@ -239,12 +239,12 @@ return $routes = [
         file_name: 'event.php',
         title: 'Event',
         function_name: 'event',
-        menu: System::MENU_NONE,
+        menu: Route::MENU_NONE,
     ),
     32 => new Route(
         file_name: 'news.php',
         title: 'News',
         function_name: 'news',
-        menu: System::MENU_NONE
+        menu: Route::MENU_NONE
     )
 ];
