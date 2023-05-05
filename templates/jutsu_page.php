@@ -132,13 +132,16 @@
 
 <script type="text/javascript">
     $(document).ready(function () {
+        // hide details modal
         $(".jutsu_details_table").hide();
         $(".jutsu_details_close").on('click', function () {
             $(".jutsu_details_table").hide();
         });
         $(".jutsu_block_expand").on('click', function () {
             $(".jutsu_details_table").show();
+            // only display child jutsu if set
             $("#" + $(this).attr("data-target")).attr("data-jutsu_child") == "None" ? $("#jutsu_details_child_row").hide() : $("#jutsu_details_child_row").show();
+            // populate details modal with jutsu data
             $("#jutsu_name").text($("#" + $(this).attr("data-target")).attr("data-jutsu_name"));
             $("#jutsu_rank").text($("#" + $(this).attr("data-target")).attr("data-jutsu_rank"));
             $("#jutsu_type").text($("#" + $(this).attr("data-target")).attr("data-jutsu_type"));
@@ -158,6 +161,7 @@
             href = href.substring(0, href.indexOf("&forget_jutsu=") + "&forget_jutsu=".length) + $("#" + $(this).attr("data-target")).attr("data-jutsu_id");
             $("#forget_jutsu").attr("href", href);
         });
+        // trigger filter logic on user input
         $("#jutsu_filter_taijutsu").on('click', function () {
             this.classList.toggle('active');
             filter();
@@ -179,6 +183,7 @@
         $("#jutsu_filter_debuff").on('click', function () {
             filter();
         });
+        // get list of jutsu, filter and hide based on jutsu_filter input
         function filter() {
             var jutsu = $(".jutsu_block_table").removeClass('hidden');
             if (!$("#jutsu_filter_taijutsu").hasClass('active')) {
@@ -276,6 +281,7 @@
     <?php endif; ?>
 </table>
 
+<!--Jutsu Details Modal-->
 <table class="table jutsu_details_table">
     <tr>
         <th id="jutsu_name" colspan="2"></th>
@@ -345,6 +351,7 @@
     </tr>
 </table>
 
+<!--Jutsu List-->
 <table class="table jutsu_list_table">
     <tr>
         <th>Jutsu</th>
@@ -372,10 +379,12 @@
         <td>
             <div class="jutsu_list">
                 <?php foreach ($player->jutsu as $jutsu): ?>
+                    <!--data attributes used for filter logic-->
                     <table class="table jutsu_block_table" data-jutsu_type="<?= ucwords($jutsu->jutsu_type) ?>" data-jutsu_effect="<?= System::unSlug($jutsu->effect) ?>">
                         <tr class="jutsu_block_title">
                             <th colspan="2">
                                 <?= $jutsu->name ?>
+                                <!--data attributes used to populate details modal-->
                                 <div id="jutsu_<?=  $jutsu->id?>" class="jutsu_data" 
                                      data-jutsu_id="<?= $jutsu->id ?>"
                                      data-jutsu_name="<?= $jutsu->name ?>"
