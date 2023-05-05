@@ -210,7 +210,7 @@ function renderProfileSubmenu() {
         ];
         if($player->forbidden_seal->level > 0) {
             $submenu_links[] = [
-                'link' => $system->router->links['battlehistory'],
+                'link' => $system->router->links['battle_history'],
                 'title' => 'Battle History',
             ];
         }
