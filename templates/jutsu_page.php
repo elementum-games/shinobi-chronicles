@@ -161,17 +161,23 @@
             href = href.substring(0, href.indexOf("&forget_jutsu=") + "&forget_jutsu=".length) + $("#" + $(this).attr("data-target")).attr("data-jutsu_id");
             $("#forget_jutsu").attr("href", href);
         });
-        // trigger filter logic on user input
+        // trigger filter logic on user input, only allow one active type
         $("#jutsu_filter_taijutsu").on('click', function () {
             this.classList.toggle('active');
+            $("#jutsu_filter_ninjutsu").removeClass('active');
+            $("#jutsu_filter_genjutsu").removeClass('active');
             filter();
         });
         $("#jutsu_filter_ninjutsu").on('click', function () {
             this.classList.toggle('active');
+            $("#jutsu_filter_taijutsu").removeClass('active');
+            $("#jutsu_filter_genjutsu").removeClass('active');
             filter();
         });
         $("#jutsu_filter_genjutsu").on('click', function () {
             this.classList.toggle('active');
+            $("#jutsu_filter_taijutsu").removeClass('active');
+            $("#jutsu_filter_ninjutsu").removeClass('active');
             filter();
         });
         $("#jutsu_filter_damage").on('click', function () {
@@ -186,16 +192,17 @@
         // get list of jutsu, filter and hide based on jutsu_filter input
         function filter() {
             var jutsu = $(".jutsu_block_table").removeClass('hidden');
-            if (!$("#jutsu_filter_taijutsu").hasClass('active')) {
-                jutsu.filter('[data-jutsu_type="Taijutsu"]').addClass('hidden');
-
-            }
-            if (!$("#jutsu_filter_ninjutsu").hasClass('active')) {
-                jutsu.filter('[data-jutsu_type="Ninjutsu"]').addClass('hidden');
-
-            }
-            if (!$("#jutsu_filter_genjutsu").hasClass('active')) {
-                jutsu.filter('[data-jutsu_type="Genjutsu"]').addClass('hidden');
+            // if no type selected display all
+            if ($("#jutsu_filter_taijutsu").hasClass('active') || $("#jutsu_filter_ninjutsu").hasClass('active') || $("#jutsu_filter_genjutsu").hasClass('active')) {
+                if (!$("#jutsu_filter_taijutsu").hasClass('active')) {
+                    jutsu.filter('[data-jutsu_type="Taijutsu"]').addClass('hidden');
+                }
+                if (!$("#jutsu_filter_ninjutsu").hasClass('active')) {
+                    jutsu.filter('[data-jutsu_type="Ninjutsu"]').addClass('hidden');
+                }
+                if (!$("#jutsu_filter_genjutsu").hasClass('active')) {
+                    jutsu.filter('[data-jutsu_type="Genjutsu"]').addClass('hidden');
+                }
             }
             if (!$("#jutsu_filter_damage").is(':checked')) {
                 jutsu.filter('[data-jutsu_effect*="None"]').addClass('hidden');
@@ -360,9 +367,9 @@
         <th>
             <div class="jutsu_filter">
                 <div class="jutsu_filter_button_container">
-                    <button id="jutsu_filter_taijutsu" class="jutsu_filter_button active">Taijutsu</button>
-                    <button id="jutsu_filter_ninjutsu" class="jutsu_filter_button active">Ninjutsu</button>
-                    <button id="jutsu_filter_genjutsu" class="jutsu_filter_button active">Genjutsu</button>
+                    <button id="jutsu_filter_taijutsu" class="jutsu_filter_button">Taijutsu</button>
+                    <button id="jutsu_filter_ninjutsu" class="jutsu_filter_button">Ninjutsu</button>
+                    <button id="jutsu_filter_genjutsu" class="jutsu_filter_button">Genjutsu</button>
                 </div>
                 <div class="jutsu_filter_checkbox_container">
                     <input id="jutsu_filter_damage" class="jutsu_filter_checkbox" type="checkbox" name="damage_toggle" checked/>
