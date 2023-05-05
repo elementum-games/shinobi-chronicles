@@ -206,7 +206,7 @@ function renderProfileSubmenu() {
     if($player->rank_num > 1) {
         $submenu_links[] = [
             'link' => $system->router->links['profile'] . "&page=send_money",
-            'title' => 'Send Money',
+            'title' => 'Send Money/AK',
         ];
         if($player->forbidden_seal->max_battle_history_view > 0) {
             $submenu_links[] = [
