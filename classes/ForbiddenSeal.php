@@ -31,6 +31,7 @@ class ForbiddenSeal {
     public float $extended_training_time;
     public float $extended_training_gains;
 
+    public int $max_battle_history_view;
 
     /** Display Members (used only in Ancient Market) */
     public string $name_color_display;
@@ -70,6 +71,7 @@ class ForbiddenSeal {
             'extended_training_gains' => 1,
             'stat_transfer_boost' => 0,
             'extra_stat_transfer_points_per_ak' => 0,
+            'max_battle_history_view' => 0,
         ],
         1 => [
             'regen_boost' => 10,
@@ -98,6 +100,7 @@ class ForbiddenSeal {
             'extended_training_gains' => 1,
             'stat_transfer_boost' => 0,
             'extra_stat_transfer_points_per_ak' => 50,
+            'max_battle_history_view' => 10,
         ],
         2 => [
             'regen_boost' => 20, //Report in whole percentages (20 will be .2 bonus)
@@ -126,6 +129,7 @@ class ForbiddenSeal {
             'extended_training_gains' => 2,
             'stat_transfer_boost' => 5,
             'extra_stat_transfer_points_per_ak' => 100,
+            'max_battle_history_view' => 20,
         ]
     );
 
@@ -194,6 +198,7 @@ class ForbiddenSeal {
         $this->extended_training_gains = self::$benefits[$this->level]['extended_training_gains'];
         $this->stat_transfer_boost = self::$benefits[$this->level]['stat_transfer_boost'];
         $this->extra_stat_transfer_points_per_ak = self::$benefits[$this->level]['extra_stat_transfer_points_per_ak'];
+        $this->max_battle_history_view = self::$benefits[$this->level]['max_battle_history_view'];
 
         // Display variables
         $this->name_color_display = self::$benefits[$this->level]['name_color_display'];

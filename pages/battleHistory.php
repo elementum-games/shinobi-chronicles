@@ -3,9 +3,8 @@
 function battleHistory() {
     global $system;
 	global $player;
-    global $self_link;
 
-    if(!$player->rank_num > 1 || !$player->forbidden_seal->level > 0) {
+    if(!$player->rank_num > 1 || $player->forbidden_seal->max_battle_history_view <= 0) {
 		$system->message("You are not qualified to view this page!");
 		$system->printMessage();
 		return false;
@@ -15,7 +14,7 @@ function battleHistory() {
     renderProfileSubmenu();
 
     $battle_types = [Battle::TYPE_SPAR, Battle::TYPE_FIGHT, Battle::TYPE_CHALLENGE];
-    $limit = 20;
+    $limit = $player->forbidden_seal->max_battle_history_view;
 
     $battles_result = $system->query(
         "SELECT `battle_id`, `player1`, `player2`, `winner` FROM `battles`

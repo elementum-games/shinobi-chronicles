@@ -448,7 +448,8 @@
                 Larger journal images (<?=$baseDisplay['journal_image_display']?> -> <?=$twinSeal->journal_image_display?>)<br/>
                 Longer chat posts (<?=$baseDisplay['chat_post_size']?> -> <?=$twinSeal->chat_post_size?> characters)<br/>
                 Longer PMs (<?=$baseDisplay['pm_size']?> -> <?=$twinSeal->pm_size?> characters)<br/>
-                Cheaper stat transfers +<?= $twinSeal->extra_stat_transfer_points_per_ak ?> stat points per AK
+                Cheaper stat transfers +<?= $twinSeal->extra_stat_transfer_points_per_ak ?> stat points per AK<br />
+                View logs of your last <?= $twinSeal->max_battle_history_view ?> battles
                 <form action='<?= $self_link ?>&view=forbidden_seal' method='post'>
                     <p style='width:100%;text-align:center;margin: 1em 0 0;'>
                         <input type='hidden' name='seal_level' value='1'/>
@@ -476,6 +477,7 @@
                 Enhanced extended trainings (<?=$fourDragonSeal->extended_training_time?>x length, <?=$fourDragonSeal->extended_training_gains?>x gains)<br/>
                 Faster stat transfers (+<?=$fourDragonSeal->stat_transfer_boost?>/minute)<br />
                 Cheaper stat transfers +<?= $fourDragonSeal->extra_stat_transfer_points_per_ak ?> stat points per AK
+                View logs of your last <?= $fourDragonSeal->max_battle_history_view ?> battles
                 <form action='<?= $self_link ?>&view=forbidden_seal' method='post'>
                     <p style='width:100%;text-align:center;margin: 2.2em 0 0;'>
                         <input type='hidden' name='seal_level' value='2'/>
