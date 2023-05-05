@@ -71,17 +71,7 @@ function userProfile() {
  * @throws Exception
  */
 function sendMoney(System $system, User $player, string $currency_type): void {
-    if($currency_type == System::CURRENCY_TYPE_MONEY) {
-        $label = "Money";
-        $current_amount = "&yen;" . $player->getMoney();
-        $page = 'send_money';
-    }
-    else if($currency_type == System::CURRENCY_TYPE_PREMIUM_CREDITS) {
-        $label = "Ancient Kunai";
-        $current_amount = $player->getPremiumCredits();
-        $page = 'send_ak';
-    }
-    else {
+    if ($currency_type != System::CURRENCY_TYPE_MONEY && $currency_type != System::CURRENCY_TYPE_PREMIUM_CREDITS) {
         throw new Exception("Invalid currency type!");
     }
 
@@ -98,8 +88,8 @@ function sendMoney(System $system, User $player, string $currency_type): void {
             }
 
             $result = $system->query(
-                "SELECT `user_id`, `user_name`, `money`, `premium_credits` 
-                        FROM `users` 
+                "SELECT `user_id`, `user_name`, `money`, `premium_credits`
+                        FROM `users`
                         WHERE `user_name`='$recipient' LIMIT 1"
             );
             if(!$system->db_last_num_rows) {
@@ -128,12 +118,12 @@ function sendMoney(System $system, User $player, string $currency_type): void {
                     'Money Sent',
                     "{$amount} yen - #{$player->user_id} ($player->user_name) to #{$recipient['user_id']}"
                 );
-                
+
                 $alert_message = $player->user_name . " has sent you &yen;$amount.";
                 Inbox::sendAlert($system, Inbox::ALERT_YEN_RECEIVED, $player->user_id, $recipient['user_id'], $alert_message);
-                
+
                 $system->message("&yen;{$amount} sent to {$recipient['user_name']}!");
-                
+
             }
             else if($currency_type == System::CURRENCY_TYPE_PREMIUM_CREDITS) {
                 if($amount > $player->getPremiumCredits()) {
@@ -156,10 +146,10 @@ function sendMoney(System $system, User $player, string $currency_type): void {
                     'Premium Credits Sent',
                     "{$amount} AK - #{$player->user_id} ($player->user_name) to #{$recipient['user_id']}"
                 );
-                
+
                 $alert_message = $player->user_name . " has sent you $amount Ancient Kunai.";
                 Inbox::sendAlert($system, Inbox::ALERT_AK_RECEIVED, $player->user_id, $recipient['user_id'], $alert_message);
-                
+
                 $system->message("{$amount} AK sent to {$recipient['user_name']}!");
             }
 
@@ -169,27 +159,33 @@ function sendMoney(System $system, User $player, string $currency_type): void {
         $system->printMessage();
     }
 
-    if($currency_type == System::CURRENCY_TYPE_MONEY) {
-        $current_amount = "&yen;" . $player->getMoney();
-    }
-    else if($currency_type == System::CURRENCY_TYPE_PREMIUM_CREDITS) {
-        $current_amount = $player->getPremiumCredits();
-    }
+        $current_amount_money = "&yen;" . $player->getMoney();
+        $current_amount_ak = $player->getPremiumCredits();
 
     $recipient = $_GET['recipient'] ?? '';
 
-    echo "<table class='table'><tr><th>Send {$label}</th></tr>
+    echo "<table class='table'><tr><th>Send Money</th><th>Send AK</th></tr>
     <tr><td style='text-align:center;'>
-    <form action='{$system->router->links['profile']}&page={$page}' method='post'>
-    <b>Your {$label}:</b> {$current_amount}<br />
+    <form action='{$system->router->links['profile']}&page=send_money' method='post'>
+    <b>Your Money:</b> {$current_amount_money}<br />
     <br />
-    Send {$label} to:<br />
+    Send Money to:<br />
     <input type='text' name='recipient' value='{$recipient}' /><br />
     Amount:<br />
     <input type='text' name='amount' /><br />
-    <input type='submit' name='send_currency' value='Send {$label}' />
-    </form>
-    </td></tr></table>";
+    <input type='submit' name='send_currency' value='Send Money' />
+    </form></td>
+    <td style='text-align:center;'>
+    <form action='{$system->router->links['profile']}&page=send_ak' method='post'>
+    <b>Your AK:</b> {$current_amount_ak}<br />
+    <br />
+    Send AK to:<br />
+    <input type='text' name='recipient' value='{$recipient}' /><br />
+    Amount:<br />
+    <input type='text' name='amount' /><br />
+    <input type='submit' name='send_currency' value='Send AK' />
+    </form></td>
+    </tr></table>";
 }
 
 function renderProfileSubmenu() {
@@ -212,10 +208,12 @@ function renderProfileSubmenu() {
             'link' => $system->router->links['profile'] . "&page=send_money",
             'title' => 'Send Money',
         ];
-        $submenu_links[] = [
-            'link' => $system->router->links['profile'] . "&page=send_ak",
-            'title' => 'Send AK',
-        ];
+        if($player->forbidden_seal->level > 0) {
+            $submenu_links[] = [
+                'link' => $system->router->links['battlehistory'],
+                'title' => 'Battle History',
+            ];
+        }
     }
     if($player->bloodline_id) {
         $submenu_links[] = [
