@@ -245,6 +245,12 @@ return $routes = [
         file_name: 'news.php',
         title: 'News',
         function_name: 'news',
+        menu: Route::MENU_NONE,
+    ),
+    33 => new Route(
+        file_name: 'battleHistory.php',
+        title: 'Battle History',
+        function_name: 'battleHistory',
         menu: Route::MENU_NONE
     )
 ];
