@@ -1,7 +1,7 @@
 <?php
 /** @var array $battles */
 /** @var array $battle_logs */
-/** @var string $self_link */
+/** @var System $system */
 
 ?>
 <table class='table'>
@@ -30,7 +30,7 @@
             <?= $battle['winner'] ?>
         </td>
         <td style="text-align:center">
-            <a href="<?= $self_link ?>&view_log=<?= $battle['id'] ?>">View</a>
+            <a href="<?= $system->router->links['battle_history'] ?>&view_log=<?= $battle['id'] ?>">View</a>
         </td>
     </tr>
     <?php endforeach; ?>
