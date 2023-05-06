@@ -215,6 +215,7 @@
                 jutsu.filter('[data-jutsu_effect="Speed Boost"]').addClass('hidden');
                 jutsu.filter('[data-jutsu_effect="Cast Speed Boost"]').addClass('hidden');
                 jutsu.filter('[data-jutsu_effect="Barrier"]').addClass('hidden');
+                jutsu.filter('[data-jutsu_effect="Release Genjutsu"]').addClass('hidden');
             }
             if (!$("#jutsu_filter_debuff").is(':checked')) {
                 jutsu.filter('[data-jutsu_effect="Taijutsu Nerf"]').addClass('hidden');
@@ -222,6 +223,8 @@
                 jutsu.filter('[data-jutsu_effect="Genjutsu Nerf"]').addClass('hidden');
                 jutsu.filter('[data-jutsu_effect="Speed Nerf"]').addClass('hidden');
                 jutsu.filter('[data-jutsu_effect="Cast Speed Nerf"]').addClass('hidden');
+                jutsu.filter('[data-jutsu_effect="Willpower Nerf"]').addClass('hidden');
+                jutsu.filter('[data-jutsu_effect="Intelligence Nerf"]').addClass('hidden');
             }
         }
     });
