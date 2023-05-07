@@ -393,7 +393,7 @@
                     <table class="table jutsu_block_table" data-jutsu_type="<?= ucwords($jutsu->jutsu_type) ?>" data-jutsu_effect="<?= System::unSlug($jutsu->effect) ?>">
                         <tr class="jutsu_block_title">
                             <th colspan="2">
-                                <?= $jutsu->name ?>
+                                <?= strlen($jutsu->name) > 21 ? substr($jutsu->name,0,19)."..." : $jutsu->name; ?>
                                 <!--data attributes used to populate details modal-->
                                 <div id="jutsu_<?=  $jutsu->id?>" class="jutsu_data" 
                                      data-jutsu_id="<?= $jutsu->id ?>"
@@ -405,7 +405,7 @@
                                      data-jutsu_level="<?php echo $jutsu->level == 100 ? $jutsu->level : $jutsu->level . " (" . $jutsu->exp . "/1000)" ?>"
                                      data-jutsu_experience="<?= $jutsu->exp ?>"
                                      data-jutsu_seals="<?= $jutsu->jutsu_type == "taijutsu" ? "None" : $jutsu->hand_seals ?>"
-                                     data-jutsu_power="<?= $jutsu->power ?> (+<?= $jutsu->power - $jutsu->base_power ?>)"
+                                     data-jutsu_power="<?= $jutsu->power ?> (+<?= round($jutsu->power - $jutsu->base_power, 2) ?>)"
                                      data-jutsu_cooldown="<?php echo $jutsu->cooldown == 1 ? $jutsu->cooldown . " turn" :  $jutsu->cooldown . " turns" ?>"
                                      data-jutsu_effect="<?php echo System::unSlug($jutsu->effect) == "None" ? System::unSlug($jutsu->effect) : System::unSlug($jutsu->effect) . " (" . round($jutsu->effect_amount, 0) . "%)" ?>"
                                      data-jutsu_duration="<?php echo $jutsu->effect_length == 1 ? $jutsu->effect_length . " turn" :  $jutsu->effect_length . " turns" ?>"

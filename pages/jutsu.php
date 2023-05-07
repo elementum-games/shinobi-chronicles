@@ -179,6 +179,8 @@ function jutsu(): void {
 
     $system->printMessage();
     $player->updateInventory();
+    // sort jutsu list by base power
+    usort($player->jutsu, function($a, $b) {return $a->base_power < $b->base_power ? 1 : -1;});
 
     require 'templates/jutsu_page.php';
 }
