@@ -21,6 +21,28 @@
         text-align: center;
     }
 
+    .jutsu_select {
+        width:200px;
+        height:60px;
+        outline: none;
+        border: 0px;
+        text-align: center;
+        font-size: 15px;
+        font-weight: bold;
+    }
+    .jutsu_select_wrapper {
+        border-radius:36px;
+        border-color: var(--theme-content-darker2-bg-color) !important;
+        display:inline-block;
+        margin: 5px;
+        overflow:hidden;
+        border:solid;
+    }
+    .jutsu_select_wrapper.over {
+        border-color:var(--theme-text-color-normal) !important;
+        border:dashed;
+    }
+
     .jutsu_scrolls_expand:hover {
          box-shadow: 0px 0px 2px 2px rgb(0,0,0);
     }
@@ -33,6 +55,7 @@
         flex-basis: 170px;
         margin: 2px 2px !important;
         border-radius: 10px !important;
+        cursor: grab;
     }
     .jutsu_block_expand:hover {
          box-shadow: 0px 0px 2px 2px rgb(0,0,0);
@@ -239,12 +262,33 @@
                 jutsu.filter('[data-jutsu_effect="Intelligence Nerf"]').addClass('hidden');
             }
         }
+        // Drag and drop functionality
+        $(".jutsu_block_table").on('dragstart', function (e) {
+            e.originalEvent.dataTransfer.effectAllowed = 'move';
+            e.originalEvent.dataTransfer.dropEffect = 'move';
+            e.originalEvent.dataTransfer.setData('text/html', $(this).attr("data-jutsu_select"));
+        });
+        $(".jutsu_select").on('dragenter', function (e) {
+            e.preventDefault();
+            this.parentElement.classList.add('over');
+        });
+        $(".jutsu_select").on('dragover', function (e) {
+            e.preventDefault();
+        });
+        $(".jutsu_select").on('dragleave', function () {
+            this.parentElement.classList.remove('over');
+        });
+        $(".jutsu_select").on('drop', function (e) {
+            e.preventDefault();
+            this.parentElement.classList.remove('over');
+            console.log(e.originalEvent.dataTransfer.getData('text/html'));
+            $(this).val((e.originalEvent.dataTransfer.getData('text/html')));
+        });
     });
 </script>
 
 <table class='table'>
     <tr><th colspan='3'>Equipped Jutsu</th></tr>
-
     <tr><td colspan='3'>
         <form action='<?= $self_link ?>' method='post'>
             <div style='text-align:center;'>
@@ -252,17 +296,19 @@
                     <?php $row_start = 1; ?>
                     <?php for($i = 0; $i < $max_equipped_jutsu; $i++): ?>
                         <?php $slot_equipped_jutsu = $player->equipped_jutsu[$i]['id'] ?? null; ?>
-                        <select name='jutsu[<?= ($i + 1) ?>]'>
-                            <option value='none' <?= (!$player->equipped_jutsu ? "selected='selected'" : "") ?>>None</option>
-                            <?php foreach($player->jutsu as $jutsu): ?>
-                            <option
-                                value='<?= $jutsu->jutsu_type ?>-<?= $jutsu->id ?>'
-                                <?= ($jutsu->id == $slot_equipped_jutsu ? "selected='selected'" : "") ?>
-                            >
-                                <?= $jutsu->name ?>
-                            </option>
-                            <?php endforeach; ?>
-                        </select>
+                        <div class="jutsu_select_wrapper">
+                            <select class="jutsu_select" name='jutsu[<?= ($i + 1) ?>]'>
+                                <option value='none' <?= (!$player->equipped_jutsu ? "selected='selected'" : "") ?>>None</option>
+                                <?php foreach($player->jutsu as $jutsu): ?>
+                                <option
+                                    value='<?= $jutsu->jutsu_type ?>-<?= $jutsu->id ?>'
+                                    <?= ($jutsu->id == $slot_equipped_jutsu ? "selected='selected'" : "") ?>
+                                >
+                                    <?= $jutsu->name ?>
+                                </option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
                         <br />
 
                         <!--// Start second row-->
@@ -405,7 +451,7 @@
             <div class="jutsu_list">
                 <?php foreach ($player->jutsu as $jutsu): ?>
                     <!--data attributes used for filter logic-->
-                    <table class="table jutsu_block_table" data-jutsu_type="<?= ucwords($jutsu->jutsu_type) ?>" data-jutsu_effect="<?= System::unSlug($jutsu->effect) ?>">
+                    <table class="table jutsu_block_table" draggable="true" data-jutsu_type="<?= ucwords($jutsu->jutsu_type) ?>" data-jutsu_effect="<?= System::unSlug($jutsu->effect) ?>" data-jutsu_select="<?= $jutsu->jutsu_type . '-' . $jutsu->id ?>">
                         <tr class="jutsu_block_title">
                             <th colspan="2">
                                 <?= strlen($jutsu->name) > 21 ? substr($jutsu->name,0,19)."..." : $jutsu->name; ?>
