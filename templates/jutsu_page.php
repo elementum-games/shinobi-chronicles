@@ -21,6 +21,14 @@
         text-align: center;
     }
 
+    .jutsu_scrolls_expand:hover {
+         box-shadow: 0px 0px 2px 2px rgb(0,0,0);
+    }
+    .jutsu_scrolls_expand {
+        cursor: pointer;
+        border-radius: 0px 0px 10px 10px;
+    }
+
     .jutsu_block_table {
         flex-basis: 170px;
         margin: 2px 2px !important;
@@ -132,6 +140,10 @@
 
 <script type="text/javascript">
     $(document).ready(function () {
+        $(".jutsu_scrolls_expand").on('click', function () {
+            $('.jutsu_scroll').toggleClass('hidden');
+            $(this).html() == "+" ? $(this).html("-") : $(this).html("+");
+        });
         // hide details modal
         $(".jutsu_details_table").hide();
         $(".jutsu_details_close").on('click', function () {
@@ -268,10 +280,10 @@
 
     <!-- Purchase jutsu-->
     <?php if(!empty($player->jutsu_scrolls)): ?>
-        <tr><th colspan='3'>Jutsu scrolls</th></tr>
+        <tr><th colspan='3'>Jutsu Scrolls (<?= count($player->jutsu_scrolls) ?>)</th></tr>
 
         <?php foreach($player->jutsu_scrolls as $id => $jutsu_scroll): ?>
-            <tr id='jutsu_scrolls'><td colspan='3'>
+            <tr id='jutsu_scrolls' class="jutsu_scroll hidden"><td colspan='3'>
                 <span style='font-weight:bold;'><?= $jutsu_scroll->name ?></span><br />
                 <div style='margin-left:2em;'>
                     <label style='width:6.5em;'>Rank:</label><?= $jutsu_scroll->rank ?><br />
@@ -288,6 +300,9 @@
                 <p style='text-align:right;margin:0;'><a href='<?= $self_link ?>&learn_jutsu=<?= $id ?>'>Learn</a></p>
             </td></tr>
         <?php endforeach; ?>
+            <tr>
+                <th class="jutsu_scrolls_expand" colspan="3">+</th>
+            </tr>
     <?php endif; ?>
 </table>
 
@@ -434,9 +449,7 @@
                             </td>
                         </tr>
                         <tr>
-                            <th class="jutsu_block_expand" colspan="2" data-target="jutsu_<?= $jutsu->id?>">
-                                <div>+</div>
-                            </th>
+                            <th class="jutsu_block_expand" colspan="2" data-target="jutsu_<?= $jutsu->id?>">+</th>
                         </tr>
                     </table>
                 <?php endforeach; ?>
