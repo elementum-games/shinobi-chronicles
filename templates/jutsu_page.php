@@ -4,6 +4,7 @@
  * @var array $rank_names
  * @var array $child_jutsu
  * @var User $player
+ * @var array $jutsu_list
  * @var int $max_equipped_jutsu
  */
 ?>
@@ -449,7 +450,7 @@
     <tr>
         <td>
             <div class="jutsu_list">
-                <?php foreach ($player->jutsu as $jutsu): ?>
+                <?php foreach ($jutsu_list as $jutsu): ?>
                     <!--data attributes used for filter logic-->
                     <table class="table jutsu_block_table" draggable="true" data-jutsu_type="<?= ucwords($jutsu->jutsu_type) ?>" data-jutsu_effect="<?= System::unSlug($jutsu->effect) ?>" data-jutsu_select="<?= $jutsu->jutsu_type . '-' . $jutsu->id ?>">
                         <tr class="jutsu_block_title">
