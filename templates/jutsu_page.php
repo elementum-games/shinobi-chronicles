@@ -452,7 +452,7 @@
             <div class="jutsu_list">
                 <?php foreach ($jutsu_list as $jutsu): ?>
                     <!--data attributes used for filter logic-->
-                    <table class="table jutsu_block_table" draggable="true" data-jutsu_type="<?= ucwords($jutsu->jutsu_type) ?>" data-jutsu_effect="<?= System::unSlug($jutsu->effect) ?>" data-jutsu_select="<?= $jutsu->jutsu_type . '-' . $jutsu->id ?>">
+                    <table class="table jutsu_block_table" title="<?= $jutsu->name ?> (<?= $jutsu->level ?>)" draggable="true" data-jutsu_type="<?= ucwords($jutsu->jutsu_type) ?>" data-jutsu_effect="<?= System::unSlug($jutsu->effect) ?>" data-jutsu_select="<?= $jutsu->jutsu_type . '-' . $jutsu->id ?>">
                         <tr class="jutsu_block_title">
                             <th colspan="2">
                                 <?= strlen($jutsu->name) > 21 ? substr($jutsu->name,0,19)."..." : $jutsu->name; ?>
@@ -469,7 +469,7 @@
                                      data-jutsu_seals="<?= $jutsu->jutsu_type == "taijutsu" ? "None" : $jutsu->hand_seals ?>"
                                      data-jutsu_power="<?= $jutsu->power ?> (+<?= round($jutsu->power - $jutsu->base_power, 2) ?>)"
                                      data-jutsu_cooldown="<?php echo $jutsu->cooldown == 1 ? $jutsu->cooldown . " turn" :  $jutsu->cooldown . " turns" ?>"
-                                     data-jutsu_effect="<?php echo System::unSlug($jutsu->effect) == "None" ? System::unSlug($jutsu->effect) : System::unSlug($jutsu->effect) . " (" . round($jutsu->effect_amount, 0) . "%)" ?>"
+                                     data-jutsu_effect="<?php echo ($jutsu->effect == "none" || $jutsu->effect == "barrier") ? System::unSlug($jutsu->effect) : System::unSlug($jutsu->effect) . " (" . round($jutsu->effect_amount, 0) . "%)" ?>"
                                      data-jutsu_duration="<?php echo $jutsu->effect_length == 1 ? $jutsu->effect_length . " turn" :  $jutsu->effect_length . " turns" ?>"
                                      data-jutsu_description="<?= $jutsu->description ?>"
                                      data-jutsu_child="<?php echo array_key_exists($jutsu->id, $child_jutsu) ? implode(', ' , $child_jutsu[$jutsu->id][0]) : "None" ?>">
@@ -488,11 +488,11 @@
                         </tr>
                         <tr>
                             <td colspan="2">
-                                <?php if ($jutsu->hasEffect()): ?>
-                                <p><?= System::unSlug($jutsu->effect) ?> (<?= round($jutsu->effect_amount, 0) ?>%)</p>
-                                <?php else : ?>
+                                <?php if ($jutsu->effect == "none" || $jutsu->effect == "barrier"): ?>
                                 <p><?= System::unSlug($jutsu->effect) ?></p>
-                                <?php endif; ($jutsu->hasEffect()) ?>
+                                <?php else : ?>
+                                <p><?= System::unSlug($jutsu->effect) ?> (<?= round($jutsu->effect_amount, 0) ?>%)</p>
+                                <?php endif; ?>
                             </td>
                         </tr>
                         <tr>

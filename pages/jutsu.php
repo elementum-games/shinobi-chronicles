@@ -7,7 +7,7 @@ Created:	09/04/2013
 Revised:	04/22/2014 by Levi Meahan
 Purpose:	Functions for equip where users can equip items and jutsu
 Algorithm:	See master_plan.html
-*/
+ */
 
 function jutsu(): void {
     global $system;
@@ -60,7 +60,8 @@ function jutsu(): void {
 
             $player->equipped_jutsu = $equipped_jutsu;
             $system->message("Jutsu equipped!");
-        } catch(Exception $e) {
+        }
+        catch(Exception $e) {
             $system->message($e->getMessage());
         }
     }
@@ -108,7 +109,8 @@ function jutsu(): void {
 
             unset($player->jutsu_scrolls[$jutsu_id]);
             $system->message("You have learned $jutsu_name!");
-        } catch(Exception $e) {
+        }
+        catch(Exception $e) {
             $system->message($e->getMessage());
         }
     }
@@ -161,7 +163,8 @@ function jutsu(): void {
 				    </table>";
             }
 
-        } catch(Exception $e) {
+        }
+        catch(Exception $e) {
             $system->message($e->getMessage());
         }
     }
@@ -182,6 +185,12 @@ function jutsu(): void {
     // sort jutsu list by base power
     $jutsu_list = $player->jutsu;
     usort($jutsu_list, function($a, $b) {return $a->base_power < $b->base_power ? 1 : -1;});
+    // fix barrier
+    foreach ($jutsu_list as &$jutsu) {
+        if ($jutsu->use_type == "barrier") {
+            $jutsu->effect = "barrier";
+        }
+    }
 
     require 'templates/jutsu_page.php';
 }
