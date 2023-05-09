@@ -198,7 +198,7 @@ class TravelManager {
                 INNER JOIN `ranks`
                 ON `users`.`rank`=`ranks`.`rank_id`
                 WHERE `users`.`last_active` > UNIX_TIMESTAMP() - 120
-                ORDER BY `users`.`exp` DESC";
+                ORDER BY `users`.`exp` DESC, `users`.`user_name` DESC";
         $result = $this->system->query($sql);
         $users = $this->system->db_fetch_all($result);
         $return_arr = [];
