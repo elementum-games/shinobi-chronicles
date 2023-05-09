@@ -295,6 +295,7 @@ function runActiveMission(): bool {
                 }
 
                 // Village reputation
+                // TODO: Consider diminishing returns or daily/weekly caps
                 $reputation_gain = 1;
                 $reputation_chance = 50;
                 switch($player->rank_num) {

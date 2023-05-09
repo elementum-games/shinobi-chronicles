@@ -137,6 +137,9 @@ function processBattleFightEnd(BattleManager $battle, User $player): string {
 
         $player->addMoney($pvp_yen, "PVP win");
         $result .= "You win the fight and earn ¥$pvp_yen![br]";
+
+        //TODO: Add a feature that will make alt killing / targeting same user not worth while (diminish gains (negative for excessive chain kills?))
+        //TODO: Scale reputation gains based on opponents reputation
         $result .= "You have earned " . Village::PVP_REP_GAIN . " village reputation.[br]";
 
         $player->system->query("UPDATE `villages` SET `points`=`points`+'$village_point_gain' WHERE `name`='{$player->village->name}' LIMIT 1");

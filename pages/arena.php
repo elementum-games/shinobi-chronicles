@@ -196,6 +196,7 @@ function processArenaBattleEnd(BattleManager|BattleManagerV2 $battle, User $play
         }
 
         // Village reputation gain adjustments
+        // TODO: Daily cap these
         if($opponent->level > $player->level) {
             $lvl_diff = $opponent->level - $player->level;
 
