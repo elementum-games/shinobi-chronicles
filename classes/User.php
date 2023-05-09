@@ -104,9 +104,11 @@ class User extends Fighter {
     public int $spouse;
     public string $spouse_name;
     public int $marriage_time;
-    public Village $village;
     public int $level;
     public bool $level_up;
+
+    public Village $village;
+    public $village_rep;
 
     public int $rank_num;
     public Rank $rank;
@@ -440,7 +442,6 @@ class User extends Fighter {
         }
 
         $this->gender = $user_data['gender'];
-        $this->village = new Village($this->system, $user_data['village']);
         $this->level = $user_data['level'];
         $this->level_up = $user_data['level_up'];
         $this->health = $user_data['health'];
@@ -449,6 +450,9 @@ class User extends Fighter {
         $this->max_stamina = $user_data['max_stamina'];
         $this->chakra = $user_data['chakra'];
         $this->max_chakra = $user_data['max_chakra'];
+
+        $this->village = new Village($this->system, $user_data['village']);
+        $this->village_rep = $user_data['village_rep'];
 
         if($this->health > $this->max_health) {
             $this->health = $this->max_health;
@@ -626,8 +630,10 @@ class User extends Fighter {
                     $task->progress = $task->amount;
                     $task->complete = true;
                     $this->addMoney($task->reward, "Completed daily task");
+                    $this->village_rep += Village::DAILY_REP_GAIN[$task->difficulty];
 
-                    $this->system->message('You have completed ' . $task->name . ' and earned ¥' . $task->reward);
+                    $this->system->message('You have completed ' . $task->name . ' earning ¥' . $task->reward .
+                        " and " . Village::DAILY_REP_GAIN[$task->difficulty] . " village reputation.");
                 }
             }
         }
@@ -1425,6 +1431,7 @@ class User extends Fighter {
 		`spouse`  = '$this->spouse',
 		`marriage_time` = '$this->marriage_time',
 		`village` = '{$this->village->name}',
+		`village_rep` = '$this->village_rep',
 		`level` = '$this->level',
 		`level_up` = '" . (int)$this->level_up . "',
 		`rank` = '$this->rank_num',

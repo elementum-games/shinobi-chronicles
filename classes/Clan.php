@@ -8,6 +8,9 @@ class Clan {
     const LEADER_MAX_INACTIVITY = 10 * 86400;
     const ELDER_MAX_INACTIVITY = 14 * 86400;
 
+    const LEADER_REP_NEEDED = 1000;
+    const ELDER_REP_NEEDED  = 400;
+
     private System $system;
 
     public int $id;
@@ -261,6 +264,16 @@ class Clan {
         }
         if($player->clan_office) {
             throw new Exception("Please resign from your current position before taking a new one!");
+        }
+
+        // Village Reputation Check
+        $rep_needed = self::ELDER_REP_NEEDED;
+        if($office == self::OFFICE_LEADER) {
+            $rep_needed = self::LEADER_REP_NEEDED;
+        }
+        if($player->village_rep < $rep_needed) {
+            throw new Exception("The {$player->clan->name} Clan expects " . self::$office_labels[$office]
+                . " to be a " . $player->village->getRepName($rep_needed) . ".");
         }
 
         // Check cooldown

@@ -158,9 +158,9 @@ function clan() {
     $active_mission = $player->mission_id ? new Mission($player->mission_id, $player) : null;
 
     $can_challenge = [
-        Clan::OFFICE_LEADER => $player->rank_num >= 4 && $player->clan_office != Clan::OFFICE_LEADER,
-        Clan::OFFICE_ELDER_1 => $player->rank_num >= 3 && $player->clan_office != Clan::OFFICE_ELDER_1,
-        Clan::OFFICE_ELDER_2 => $player->rank_num >= 3 && $player->clan_office != Clan::OFFICE_ELDER_2,
+        Clan::OFFICE_LEADER => $player->rank_num >= 4 && $player->clan_office != Clan::OFFICE_LEADER && $player->village_rep >= Clan::LEADER_REP_NEEDED,
+        Clan::OFFICE_ELDER_1 => $player->rank_num >= 3 && $player->clan_office != Clan::OFFICE_ELDER_1 && $player->village_rep >= Clan::ELDER_REP_NEEDED,
+        Clan::OFFICE_ELDER_2 => $player->rank_num >= 3 && $player->clan_office != Clan::OFFICE_ELDER_2 && $player->village_rep >= Clan::ELDER_REP_NEEDED,
     ];
 
     $min_leader_last_active = time() - Clan::LEADER_MAX_INACTIVITY;

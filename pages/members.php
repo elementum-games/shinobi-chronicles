@@ -194,6 +194,12 @@ function members() {
                 " ORDER BY `pvp_wins` DESC";
 			$view = 'highest_teams';
 		}
+        //Reputation
+        else if(isset($_GET['view']) && $_GET['view'] == 'highest_rep') {
+            $query_custom = " WHERE `staff_level` < " . StaffManager::STAFF_ADMINISTRATOR .
+                " ORDER BY `village_rep` DESC";
+            $view = 'highest_rep';
+        }
 		else if(isset($_GET['view']) && $_GET['view'] == 'online_users') {
 			$query_custom = "WHERE `last_active` > UNIX_TIMESTAMP() - $online_seconds ORDER BY `level` DESC";
 
@@ -213,7 +219,7 @@ function members() {
 			$min = (int)$system->clean($_GET['min']);
 		}
 
-		$result = $system->query("SELECT `user_name`, `rank`, `village`, `exp`, `level` , `pvp_wins` FROM `users`
+		$result = $system->query("SELECT `user_name`, `rank`, `village`, `village_rep`, `exp`, `level` , `pvp_wins` FROM `users`
 			$query_custom LIMIT $min, $results_per_page");
 
 		$table_header = 'Level';
@@ -238,6 +244,10 @@ function members() {
             case "highest_teams":
                 $table_header = 'Highest Teams';
                 $list_name = "Top {$results_per_page} Teams - Points This Month";
+                break;
+            case 'highest_rep':
+                $table_header = "Highest Reputation";
+                $list_name = "Top {$results_per_page} Users - Highest Reputation";
                 break;
 		}
 
@@ -327,6 +337,9 @@ function members() {
 					else if($view == 'highest_pvp') {
 						echo $row['pvp_wins'];
 					}
+                    else if($view == 'highest_rep') {
+                        echo Village::repName($row['village_rep']) . " (" . $row['village_rep'] . ")";
+                    }
 					else {
 						echo $row['level'];
 					}
@@ -444,6 +457,10 @@ function renderMemberSubmenu() {
             'title' => 'Highest PvP',
         ],
         $submenu_links[] = [
+            'link' => $system->router->links['members'] . "&view=highest_rep",
+            'title' => 'Highest Rep',
+        ],
+        $submenu_links[] = [
             'link' => $system->router->links['members'] . "&view=highest_teams",
             'title' => 'Top Teams',
         ],
@@ -456,7 +473,7 @@ function renderMemberSubmenu() {
 	    echo "
 			<div class='submenu'>
 	    		<ul class='submenu'>";
-	    			$submenu_link_width = round(100 / count($submenu_links), 1);
+	    			$submenu_link_width = round(99.5 / count($submenu_links), 1);
 	    				foreach($submenu_links as $link) {
 	        				echo "<li style='width:{$submenu_link_width}%;'><a href='{$link['link']}'>{$link['title']}</a></li>";
 	    				}

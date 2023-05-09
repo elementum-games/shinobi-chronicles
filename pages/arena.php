@@ -153,6 +153,10 @@ function processArenaBattleEnd(BattleManager|BattleManagerV2 $battle, User $play
     // Base chance at 100, goes down if fight is too short/lower level AI
     $stat_gain_chance = 100;
 
+    // Base village reputation
+    $village_rep_chance = 50;
+    $village_rep_gain = Village::ARENA_REP_GAIN;
+
     $battle_result = "";
 
     if(!$battle->isComplete()) {
@@ -175,7 +179,7 @@ function processArenaBattleEnd(BattleManager|BattleManagerV2 $battle, User $play
             }
         }
 
-        // 5 levels below = -75% chance
+        // 5 levels below = -75% chance (stats)
         if($opponent->level < $player->level) {
             $stat_gain_chance -= ($player->level - $opponent->level) * 15;
         }
@@ -189,6 +193,43 @@ function processArenaBattleEnd(BattleManager|BattleManagerV2 $battle, User $play
             $stat_gain_display = '<br />During the fight you realized a way to use your ' . System::unSlug($stat_to_gain) . ' a little
             more effectively.';
             $stat_gain_display .= $player->addStatGain($stat_to_gain, 1) . '.';
+        }
+
+        // Village reputation gain adjustments
+        if($opponent->level > $player->level) {
+            $lvl_diff = $opponent->level - $player->level;
+
+            // 100%
+            if($level_difference > 7) {
+                $village_rep_chance = 100;
+                if(mt_rand(1, 100) >= 75) {
+                    $village_rep_chance++;
+                }
+            }
+            elseif($level_difference >= 5) {
+                $village_rep_chance += mt_rand(15, 25);
+            }
+            else {
+                $village_rep_chance += mt_rand(5, 10);
+            }
+        }
+        if($opponent->level < $player->level) {
+            $lvl_diff = $player->level - $opponent->level;
+            if($lvl_diff > 5) {
+                $village_rep_chance = 0;
+            }
+            elseif($level_difference >= 3) {
+                $village_rep_chance -= mt_rand(15, 25);
+            }
+            else {
+                $village_rep_chance -= mt_rand(5, 10);
+            }
+        }
+
+        if(mt_rand(1, 100) <= $village_rep_chance) {
+            $player->village_rep += $village_rep_gain;
+            $rep_gain_display = '<br />Fellow ' . $player->village->name . ' Shinobi learned from your battle, earning you ' .
+            $village_rep_gain . " village reputations.";
         }
 
         // TEAM BOOST NPC GAINS
@@ -221,6 +262,9 @@ function processArenaBattleEnd(BattleManager|BattleManagerV2 $battle, User $play
         }
         if($stat_gain_display) {
             $battle_result .=  $stat_gain_display;
+        }
+        if($rep_gain_display) {
+            $battle_result .= $rep_gain_display;
         }
         $player->ai_wins++;
         $player->battle_id = 0;

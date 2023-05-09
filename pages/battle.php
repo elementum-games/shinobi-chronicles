@@ -130,12 +130,14 @@ function processBattleFightEnd(BattleManager $battle, User $player): string {
     if($battle->isPlayerWinner()) {
         $player->pvp_wins++;
         $player->monthly_pvp++;
+        $player->village_rep += Village::PVP_REP_GAIN;
         $player->last_pvp_ms = System::currentTimeMs();
         $village_point_gain = 1;
         $team_point_gain = 1;
 
         $player->addMoney($pvp_yen, "PVP win");
         $result .= "You win the fight and earn ¥$pvp_yen![br]";
+        $result .= "You have earned " . Village::PVP_REP_GAIN . " village reputation.[br]";
 
         $player->system->query("UPDATE `villages` SET `points`=`points`+'$village_point_gain' WHERE `name`='{$player->village->name}' LIMIT 1");
         $result .= "You have earned $village_point_gain point for your village.[br]";

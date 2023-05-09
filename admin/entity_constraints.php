@@ -148,6 +148,10 @@ $constraints['edit_user'] = [
         'data_type' => 'int',
         'input_type' => 'text',
     ],
+    'village_rep' => [
+        'date_type' => 'string',
+        'input_type' => 'text',
+    ],
     'village' => [
         'data_type' => 'string',
         'input_type' => 'radio',

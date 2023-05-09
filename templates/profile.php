@@ -360,6 +360,7 @@ $clan_positions = [
     <br />
     <label style='width:<?= $label_width ?>;'>Gender:</label> <?= $player->gender ?><br />
     <label style='width:<?= $label_width ?>;'>Village:</label> <?= $player->village->name ?><br />
+    <label style='width:<?= $label_width ?>;'>Reputation:</label> <?= $player->village->getRepName($player->village_rep) ?> (<?= $player->village_rep ?>)<br />
     <label style='width:<?= $label_width ?>;'>Location:</label> <?= $player->location->x . '.' . $player->location->y ?><br />
     <label style='width:<?= $label_width ?>;'>Money:</label> &yen;<?= $player->getMoney() ?><br />
     <label style='width:<?= $label_width ?>;'>Ancient Kunai:</label> <?= $player->getPremiumCredits() ?><br />
@@ -454,7 +455,7 @@ $clan_positions = [
                 </div>
                 <div class='dailyTaskReward'>
                     <span>Reward:</span>
-                    <span>¥<?= $daily_task->reward ?></span>
+                    <span>¥<?= $daily_task->reward ?> & <?=Village::DAILY_REP_GAIN[$daily_task->difficulty]?> Reputation</span>
                 </div>
                 <div class='dailyTaskProgress'>
                     <div class='dailyTaskProgressBar dailyTask<?= $dt_status_class_name ?>'>

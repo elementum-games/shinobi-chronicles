@@ -294,6 +294,42 @@ function runActiveMission(): bool {
                     echo "You have been paid &yen;$mission->money.<br />";
                 }
 
+                // Village reputation
+                $reputation_gain = 1;
+                $reputation_chance = 50;
+                switch($player->rank_num) {
+                    case 4:
+                        if($mission->rank >= Mission::RANK_B) {
+                            $reputation_chance += 15;
+                            $reputation_gain++;
+                        }
+                        else {
+                            $reputation_chance -= 5;
+                        }
+                        break;
+                    case 3:
+                        if($mission->rank >= Mission::RANK_C) {
+                            $reputation_chance += 20;
+                            $reputation_gain++;
+                        }
+                        else {
+                            $reputation_gain -= 5;
+                        }
+                        break;
+                    default:
+                        $reputation_chance += 25;
+                        break;
+                }
+                if(mt_rand(1, 100) <= $reputation_chance) {
+                    $reputation_before = $player->village->getRepName($player->village_rep);
+                    $player->village_rep += $reputation_gain;
+                    echo "You have gained $reputation_gain village reputation!<br />";
+
+                    if($player->village->getRepName($player->village_rep) != $reputation_before) {
+                        echo "<b>Congratulations!</b> You have earned the <em>{$player->village->getRepName($player->village_rep)}</em> title!<br />";
+                    }
+                }
+
                 // check what mission rank for daily Task
                 $all_mission_ranks = [0, 1, 2, 3, 4];
                 $mission_rank = $all_mission_ranks[$mission->rank];
