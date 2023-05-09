@@ -18,6 +18,8 @@ function jutsu(): void {
 
     $player->getInventory();
 
+    $rank_names = RankManager::fetchNames($system);
+
     $max_equipped_jutsu = User::BASE_JUTSU_SLOTS;
     if($player->rank_num >= 3) {
         $max_equipped_jutsu++;
@@ -164,27 +166,22 @@ function jutsu(): void {
         }
     }
 
-    $system->printMessage();
-    $player->updateInventory();
-
-    $jutsu_to_view = null;
-    $jutsu_to_view_child_names = [];
-
-    if(!empty($_GET['view_jutsu'])) {
-        $jutsu_id = (int)$system->clean($_GET['view_jutsu']);
-        if(!isset($player->jutsu[$jutsu_id])) {
-            $system->message("Invalid jutsu!");
-            $system->printMessage();
+    $child_jutsu = [];
+    $child_jutsu_result = $system->query("SELECT `name`, `parent_jutsu` FROM `jutsu` WHERE `parent_jutsu` != '0'");
+    while($row = $system->db_fetch($child_jutsu_result)) {
+        if (array_key_exists($row['parent_jutsu'], $child_jutsu)) {
+            array_push($child_jutsu[$row['parent_jutsu']], $row['name']);
         }
         else {
-            $jutsu_to_view = $player->jutsu[$jutsu_id];
-
-            $child_jutsu_result = $system->query("SELECT `name` FROM `jutsu` WHERE `parent_jutsu`='$jutsu_id'");
-            while($row = $system->db_fetch($child_jutsu_result)) {
-                $jutsu_to_view_child_names[] = $row['name'];
-            }
+            $child_jutsu[$row['parent_jutsu']] = [array($row['name'])];
         }
     }
+
+    $system->printMessage();
+    $player->updateInventory();
+    // sort jutsu list by base power
+    $jutsu_list = $player->jutsu;
+    usort($jutsu_list, function($a, $b) {return $a->base_power < $b->base_power ? 1 : -1;});
 
     require 'templates/jutsu_page.php';
 }
