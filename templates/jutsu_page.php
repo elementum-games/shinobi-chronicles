@@ -172,30 +172,37 @@
         $(".jutsu_details_table").hide();
         $(".jutsu_details_close").on('click', function () {
             $(".jutsu_details_table").hide();
+            $("#jutsu_name").text('');
         });
         $(".jutsu_block_expand").on('click', function () {
-            $(".jutsu_details_table").show();
-            // only display child jutsu if set
-            $("#" + $(this).attr("data-target")).attr("data-jutsu_child") == "None" ? $("#jutsu_details_child_row").hide() : $("#jutsu_details_child_row").show();
-            // populate details modal with jutsu data
-            $("#jutsu_name").text($("#" + $(this).attr("data-target")).attr("data-jutsu_name"));
-            $("#jutsu_rank").text($("#" + $(this).attr("data-target")).attr("data-jutsu_rank"));
-            $("#jutsu_type").text($("#" + $(this).attr("data-target")).attr("data-jutsu_type"));
-            $("#jutsu_element").text($("#" + $(this).attr("data-target")).attr("data-jutsu_element"));
-            $("#jutsu_cost").text($("#" + $(this).attr("data-target")).attr("data-jutsu_cost"));
-            $("#jutsu_level").text($("#" + $(this).attr("data-target")).attr("data-jutsu_level"));
-            $("#jutsu_experience").text($("#" + $(this).attr("data-target")).attr("data-jutsu_experience"));
-            $("#jutsu_seals").text($("#" + $(this).attr("data-target")).attr("data-jutsu_seals"));
-            $("#jutsu_power").text($("#" + $(this).attr("data-target")).attr("data-jutsu_power"));
-            $("#jutsu_cooldown").text($("#" + $(this).attr("data-target")).attr("data-jutsu_cooldown"));
-            $("#jutsu_effect").text($("#" + $(this).attr("data-target")).attr("data-jutsu_effect"));
-            $("#jutsu_duration").text($("#" + $(this).attr("data-target")).attr("data-jutsu_duration"));
-            $("#jutsu_description").text($("#" + $(this).attr("data-target")).attr("data-jutsu_description"));
-            $("#jutsu_child").text($("#" + $(this).attr("data-target")).attr("data-jutsu_child"));
-            // set forget jutsu url
-            var href = $("#forget_jutsu").attr("href");
-            href = href.substring(0, href.indexOf("&forget_jutsu=") + "&forget_jutsu=".length) + $("#" + $(this).attr("data-target")).attr("data-jutsu_id");
-            $("#forget_jutsu").attr("href", href);
+            if ($("#" + $(this).attr("data-target")).attr("data-jutsu_name") == $("#jutsu_name").text()) {
+                $(".jutsu_details_table").hide();
+                $("#jutsu_name").text('');
+            }
+            else {
+                $(".jutsu_details_table").show();
+                // only display child jutsu if set
+                $("#" + $(this).attr("data-target")).attr("data-jutsu_child") == "None" ? $("#jutsu_details_child_row").hide() : $("#jutsu_details_child_row").show();
+                // populate details modal with jutsu data
+                $("#jutsu_name").text($("#" + $(this).attr("data-target")).attr("data-jutsu_name"));
+                $("#jutsu_rank").text($("#" + $(this).attr("data-target")).attr("data-jutsu_rank"));
+                $("#jutsu_type").text($("#" + $(this).attr("data-target")).attr("data-jutsu_type"));
+                $("#jutsu_element").text($("#" + $(this).attr("data-target")).attr("data-jutsu_element"));
+                $("#jutsu_cost").text($("#" + $(this).attr("data-target")).attr("data-jutsu_cost"));
+                $("#jutsu_level").text($("#" + $(this).attr("data-target")).attr("data-jutsu_level"));
+                $("#jutsu_experience").text($("#" + $(this).attr("data-target")).attr("data-jutsu_experience"));
+                $("#jutsu_seals").text($("#" + $(this).attr("data-target")).attr("data-jutsu_seals"));
+                $("#jutsu_power").text($("#" + $(this).attr("data-target")).attr("data-jutsu_power"));
+                $("#jutsu_cooldown").text($("#" + $(this).attr("data-target")).attr("data-jutsu_cooldown"));
+                $("#jutsu_effect").text($("#" + $(this).attr("data-target")).attr("data-jutsu_effect"));
+                $("#jutsu_duration").text($("#" + $(this).attr("data-target")).attr("data-jutsu_duration"));
+                $("#jutsu_description").text($("#" + $(this).attr("data-target")).attr("data-jutsu_description"));
+                $("#jutsu_child").text($("#" + $(this).attr("data-target")).attr("data-jutsu_child"));
+                // set forget jutsu url
+                var href = $("#forget_jutsu").attr("href");
+                href = href.substring(0, href.indexOf("&forget_jutsu=") + "&forget_jutsu=".length) + $("#" + $(this).attr("data-target")).attr("data-jutsu_id");
+                $("#forget_jutsu").attr("href", href);
+            }
         });
         // trigger filter logic on user input, only allow one active type
         $("#jutsu_filter_taijutsu").on('click', function () {
