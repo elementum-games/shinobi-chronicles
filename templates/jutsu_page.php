@@ -113,7 +113,7 @@
         z-index: 10;
 	    top: 35%;
         left: 43.75%;
-        width: 550px !important;
+        width: 580px !important;
         transform: translate(-50%, -50%);
     }
     .jutsu_details_label_column {
