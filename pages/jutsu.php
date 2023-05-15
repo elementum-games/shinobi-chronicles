@@ -190,6 +190,7 @@ function jutsu(): void {
         if ($jutsu->use_type == "barrier") {
             $jutsu->effect = "barrier";
         }
+        unset($jutsu);
     }
 
     require 'templates/jutsu_page.php';
