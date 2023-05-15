@@ -1,5 +1,5 @@
 <?php
-/* 
+/*
 File: 		training.php
 Coder:		Levi Meahan
 Created:	11/02/2013
@@ -121,6 +121,19 @@ function training() {
 			 	}
 			}
 
+			// Check for sensei training boost
+			if($player->sensei_id != 0 && $player->rank_num < 3) {
+				$sensei_boost = SenseiManager::getStudentBoostBySensei($player->sensei_id, $system);
+				if ($train_type == $sensei_boost['specialization'] . "_skill") {
+                    $system->message("Your training was reduced by " . ($train_length * ($sensei_boost['boost_primary'] / 100)) . " seconds due to your student boost.");
+					$train_length *= 1 - ($sensei_boost['boost_primary'] / 100);
+                }
+				else if ($sensei_boost['boost_secondary'] > 0) {
+					$system->message("Your training was reduced by " . ($train_length * ($sensei_boost['boost_secondary'] / 100)) . " seconds due to your student boost.");
+					$train_length *= 1 - ($sensei_boost['boost_secondary'] / 100);
+                }
+			}
+
 			$player->log(User::LOG_TRAINING, "Type: {$train_type} / Length: {$train_length}");
 
 			$player->train_type = $train_type;
@@ -140,7 +153,7 @@ function training() {
 	// Add rank stuff
 	echo "<table class='table'><tr><th colspan='3'>Academy</th></tr>
 		<tr><td colspan='3'>
-		<p style='text-align:center;'>Here at the academy, you can take classes to improve your skills, attributes, or skill with a 
+		<p style='text-align:center;'>Here at the academy, you can take classes to improve your skills, attributes, or skill with a
 		jutsu.</p>
 		<br />
 		<span style='font-weight:bold;'>Skill/Attribute training:</span><br />
@@ -152,7 +165,7 @@ function training() {
             <label style='font-weight:bold;width:70px;'>Extended:</label>
 				Takes " . ($stat_extended_train_length / 60) . " minutes, gives $stat_extended_train_gain point" . ($stat_extended_train_gain > 1 ? 's' : '') . "<br />
 			</p>
-		<span style='font-weight:bold;'>Jutsu training:</span><br /> 
+		<span style='font-weight:bold;'>Jutsu training:</span><br />
 			<p style='margin-left:20px;margin-top:5px;margin-bottom:8px;'>
 			Takes 10 minutes or more depending on the jutsu level, gives {$jutsu_train_gain} level" . ($jutsu_train_gain > 1 ? 's' : '') . ".</p>
 		</td></tr>";
@@ -183,14 +196,14 @@ function training() {
 				<td style='text-align:center;'>
 				<form action='$self_link' method='post'>
 						<select name='skill'>
-							<option value='ninjutsu' " . ($player->train_type == 'ninjutsu_skill' ? "selected='selected'" : "") . 
+							<option value='ninjutsu' " . ($player->train_type == 'ninjutsu_skill' ? "selected='selected'" : "") .
 								">Ninjutsu Skill</option>
-							<option value='taijutsu'" . ($player->train_type == 'taijutsu_skill' ? "selected='selected'" : "") . 
+							<option value='taijutsu'" . ($player->train_type == 'taijutsu_skill' ? "selected='selected'" : "") .
 								">Taijutsu Skill</option>
-							<option value='genjutsu'" . ($player->train_type == 'genjutsu_skill' ? "selected='selected'" : "") . 
+							<option value='genjutsu'" . ($player->train_type == 'genjutsu_skill' ? "selected='selected'" : "") .
 								">Genjutsu Skill</option>";
 							if($player->bloodline_id) {
-								echo "<option value='bloodline'" . ($player->train_type == 'bloodline_skill' ? "selected='selected'" : "") . 
+								echo "<option value='bloodline'" . ($player->train_type == 'bloodline_skill' ? "selected='selected'" : "") .
 									">Bloodline Skill</option>";
 							}
 						echo "</select><br />
@@ -202,9 +215,9 @@ function training() {
 				<td style='text-align:center;'>
 					<form action='$self_link' method='post'>
 						<select name='attributes'>
-							<option value='cast_speed'" . ($player->train_type == 'cast_speed' ? "selected='selected'" : "") . 
+							<option value='cast_speed'" . ($player->train_type == 'cast_speed' ? "selected='selected'" : "") .
 								">Cast speed</option>
-							<option value='speed'" . ($player->train_type == 'speed' ? "selected='selected'" : "") . 
+							<option value='speed'" . ($player->train_type == 'speed' ? "selected='selected'" : "") .
 								">Speed</option>
 						</select><br />
 						<input type='submit' name='train_type' value='Short' />

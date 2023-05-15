@@ -138,6 +138,12 @@ class Notifications {
         if($player->spouse < 0) {
             $notifications[] = new Notification($system->router->links['marriage'], "Proposal received!");
         }
+        //Student Applications
+        if($player->sensei_id == $player->user_id) {
+            if (SenseiManager::hasApplications($player->user_id, $system)) {
+                $notifications[] = new Notification($system->router->links['villageHQ'] . "&view=sensei", "Application received!");
+            }
+        }
 
         return $notifications;
     }
