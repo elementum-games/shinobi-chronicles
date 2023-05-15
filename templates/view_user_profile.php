@@ -105,7 +105,7 @@ $clan_positions = array(
                                 <a href='<?= $system->router->base_url ?>?id=24&invite=1&user_name=<?= $viewUser->user_name ?>'>Invite to Team</a>
                 <?php endif; ?>
             <?php endif; ?>
-            <?php if($player->rank_num < 3 && $player->sensei_id == 0 && $player->village->name == $viewUser->village->name): ?>
+            <?php if($player->rank_num < 3 && $player->sensei_id == 0 && $player->village->name == $viewUser->village->name && $viewUser->sensei_id == $viewUser->user_id && $viewUser->accept_students): ?>
                 &nbsp;&nbsp;|&nbsp;&nbsp;<a href='<?= $system->router->links['villageHQ'] ?>&view=sensei&apply=<?= $viewUser->user_id ?>'>Send Application</a>
             <?php endif; ?>
             <?php if($player->rank_num < 3 && $player->sensei_id == $viewUser->user_id): ?>

@@ -309,6 +309,7 @@ class User extends Fighter {
 			`special_mission`,
             `rank`,
             `sensei_id`,
+            `accept_students`,
             `village`
 			FROM `users` WHERE `user_id`='$user_id' LIMIT 1"
         );
@@ -347,6 +348,7 @@ class User extends Fighter {
         $user->sensei_id = $result['sensei_id'];
         $user->village = new Village($system, $result['village']);
         $user->rank_num = $result['rank'];
+        $user->accept_students = $result['accept_students'];
 
         //Todo: Remove this in a couple months, only a temporary measure to support current bans
         if($user->ban_type) {
