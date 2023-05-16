@@ -74,6 +74,7 @@ function userProfile() {
             if (!$success) {
                 throw new Exception('Something went wrong!');
             }
+            $system->message("Recruitment settings updated!");
         }
         catch(Exception $e) {
             $system->message($e->getMessage());
@@ -90,6 +91,7 @@ function userProfile() {
             if (!$success) {
                 throw new Exception('Something went wrong!');
             }
+            $system->message("Student settings updated!");
         }
         catch(Exception $e) {
             $system->message($e->getMessage());
