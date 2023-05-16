@@ -476,6 +476,33 @@ $clan_positions = [
     );
 ?>
 
+<script type="text/javascript">
+    $(document).ready(function () {
+        let student_message = $('#student_message');
+        let recruitment_message = $('#recruitment_message');
+        let student_message_max_length = <?=$student_message_max_length?>;
+        let recruitment_message_max_length = <?=$recruitment_message_max_length?>;
+        student_message.keyup(function (evt) {
+            if (this.value.length >= student_message_max_length - 100) {
+                let remaining = student_message_max_length - this.textLength;
+                $('#studentRemainingCharacters').text('Characters remaining: ' + remaining + ' out of ' + student_message_max_length);
+            }
+            else {
+                $('#studentRemainingCharacters').text('');
+            }
+        });
+        recruitment_message.keyup(function (evt) {
+            if (this.value.length >= recruitment_message_max_length - 100) {
+                let remaining = recruitment_message_max_length - this.textLength;
+                $('#recruitmentRemainingCharacters').text('Characters remaining: ' + remaining + ' out of ' + recruitment_message_max_length);
+            }
+            else {
+                $('#recruitmentRemainingCharacters').text('');
+            }
+        });
+    });
+</script>
+
 <!--Sensei Section-->
 <?php if (isset($sensei['sensei_id'])): ?>
     <!--if player is sensei-->
@@ -539,7 +566,8 @@ $clan_positions = [
                             <?php endif; ?>
                             <div><p class="student_message_label">Student Message</p></div>
                             <div class="message_wrapper"><?= $system->html_parse($sensei['student_message']) ?></div>
-                            <div><textarea name="student_message" class="message_input"><?= $sensei['student_message'] ?></textarea></div>
+                            <div><textarea id="student_message" name="student_message" class="message_input"><?= $sensei['student_message'] ?></textarea></div>
+                            <div><span id="studentRemainingCharacters" class="red">sdf</span></div>
                             <div class="update_container"><input name="update_student_settings" type="submit" value="Update" /></div>
                         </form>
                     </div>
@@ -556,7 +584,8 @@ $clan_positions = [
                             <label for="accept_students">Accept Students</label>
                             <div><p class="recruitment_message_wrapper">Recruitment Message</p></div>
                             <div class="message_wrapper"><?= $system->html_parse($sensei['recruitment_message']) ?></div>
-                            <textarea name="recruitment_message" class="message_input"><?= $sensei['recruitment_message'] ?></textarea>
+                            <textarea id="recruitment_message" name="recruitment_message" class="message_input"><?= $sensei['recruitment_message'] ?></textarea>
+                            <div><span id="recruitmentRemainingCharacters" class="red">dsf</span></div>
                             <div class="update_container"><input name="update_student_recruitment" type="submit" value="Update" /></div>
                         </form>
                      </div>

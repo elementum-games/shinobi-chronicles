@@ -65,6 +65,8 @@ function userProfile() {
     }
 
     // Student/Sensei section
+    $student_message_max_length = 500;
+    $recruitment_message_max_length = 100;
     if(!empty($_POST['update_student_recruitment'])) {
         $recruitment_message = $_POST['recruitment_message'];
         try {

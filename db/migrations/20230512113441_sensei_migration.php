@@ -17,7 +17,7 @@ final class SenseiMigration extends AbstractMigration
                 `students` varchar(50) NOT NULL DEFAULT '[]',
                 `graduated` int(11) NOT NULL DEFAULT 0,
                 `specialization` varchar(50) NOT NULL,
-                `recruitment_message` varchar(500) NOT NULL,
+                `recruitment_message` varchar(100) NOT NULL,
                 `student_message` varchar(500) NOT NULL
             )
         ");
