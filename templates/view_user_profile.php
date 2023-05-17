@@ -111,7 +111,7 @@ $clan_positions = array(
             <?php if($player->rank_num < 3 && $player->sensei_id == $viewUser->user_id): ?>
             &nbsp;&nbsp;|&nbsp;&nbsp;<a href='<?= $system->router->links['villageHQ'] ?>&view=sensei&leave=true'>Leave Sensei</a>
             <?php endif; ?>
-            <?php if($player->sensei_id == $player->user_id && $viewUser->sensei_id == $player->user_id): ?>
+            <?php if($player->sensei_id == $player->user_id && $viewUser->sensei_id == $player->user_id && $viewUser->user_id != $player->user_id): ?>
             &nbsp;&nbsp;|&nbsp;&nbsp;<a href='<?= $system->router->links['villageHQ'] ?>&view=sensei&kick=<?= $viewUser->user_id ?>'>Kick Student</a>
             <?php endif; ?>
         </td></tr>
