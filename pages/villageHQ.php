@@ -428,6 +428,22 @@ function villageHQ() {
                 $system->message($e->getMessage());
             }
         }
+		// If mod clear message
+		if (isset($_GET['clear'])) {
+            try {
+				if (!$player->staff_manager->isModerator()) {
+                    throw new Exception('Not a moderator!');
+                }
+				$success = SenseiManager::updateStudentRecruitment($_GET['clear'], '', $system);
+				if (!$success) {
+                    throw new Exception('Something went wrong!');
+                }
+				$system->message("You have removed a recruitment message!");
+            }
+			catch (Exception $e) {
+                $system->message($e->getMessage());
+            }
+        }
 		// If exam started
 		if (isset($_GET['sensei_exam'])) {
 			try {
@@ -471,7 +487,19 @@ function villageHQ() {
 			else if ($player->sensei_id == 0 && $player->rank_num < 3) {
                 $applications = SenseiManager::getApplicationsByStudent($player->user_id, $system);
             }
-            $sensei_list = SenseiManager::getSenseiByVillage($player->village->name, $system);
+			// If staff
+			if (isset($_GET['village'])) {
+                if ($player->staff_manager->isModerator()) {
+					$sensei_list = SenseiManager::getSenseiByVillage($_GET['village'], $system);
+				}
+				else {
+					$sensei_list = SenseiManager::getSenseiByVillage($player->village->name, $system);
+				}
+            }
+			// Default
+			else {
+				$sensei_list = SenseiManager::getSenseiByVillage($player->village->name, $system);
+            }
 			require 'templates/sensei.php';
         }
 		$system->printMessage();

@@ -4,7 +4,6 @@
  * @var System $system
  * @var array $sensei_list
  * @var array $applications
- * @var bool $resign
  */
 ?>
 
@@ -54,7 +53,36 @@
     .application_table {
         width: 75% !important;
     }
+    .small_image {
+        max-width:20px;
+        max-height:20px;
+    }
 </style>
+
+<?php if ($player->staff_manager->isModerator()): ?>
+    <table class="table">
+        <tr>
+            <th colspan="5">Mod View</th>
+        </tr>
+        <tr>
+            <td>
+                <a href="<?= $system->router->links['villageHQ'] ?>&view=sensei&village=Stone">Stone</a>
+            </td>
+            <td>
+                <a href="<?= $system->router->links['villageHQ'] ?>&view=sensei&village=Cloud">Cloud</a>
+            </td>
+            <td>
+                <a href="<?= $system->router->links['villageHQ'] ?>&view=sensei&village=Leaf">Leaf</a>
+            </td>
+            <td>
+                <a href="<?= $system->router->links['villageHQ'] ?>&view=sensei&village=Sand">Sand</a>
+            </td>
+            <td>
+                <a href="<?= $system->router->links['villageHQ'] ?>&view=sensei&village=Mist">Mist</a>
+            </td>
+        </tr>
+    </table>
+<?php endif; ?>
 
 <?php if ($resign): ?>
     <table class="table">
@@ -322,6 +350,13 @@
             <div>
                 <?= $system->html_parse($sensei['recruitment_message']) ?>
             </div>
+            <?php if($player->staff_manager->isModerator()): ?>
+            <div>
+                <a class='imageLink' href='<?= $system->router->links['villageHQ'] ?>&view=sensei&clear=<?= $sensei['sensei_id'] ?>'>
+                    <img class='small_image' src='../images/delete_icon.png' />
+                </a>
+            </div>
+            <?php endif ?>
         </td>
     </tr>
     <?php endforeach; ?>
