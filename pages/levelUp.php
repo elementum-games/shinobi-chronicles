@@ -679,23 +679,14 @@ function chuuninExam(System $system, User $player, RankManager $rankManager): bo
             $player->exam_stage = 0;
             if ($player->sensei_id != 0) {
                 // increase graduated count
-                $success = SenseiManager::incrementGraduated($player->sensei_id, $system);
-                if (!$success) {
-                    throw new Exception('Something went wrong!');
-                }
+                SenseiManager::incrementGraduated($player->sensei_id, $system);
                 // remove student
-                $success = SenseiManager::removeStudent($player->sensei_id, $player->user_id, $system);
-                if (!$success) {
-                    throw new Exception('Something went wrong!');
-                }
+                SenseiManager::removeStudent($player->sensei_id, $player->user_id, $system);
                 $player->sensei_id = 0;
             }
             else {
                 // close applications
-                $success = SenseiManager::closeApplicationsByStudent($player->user_id, $system);
-                if (!$success) {
-                    throw new Exception('Something went wrong!');
-                }
+                SenseiManager::closeApplicationsByStudent($player->user_id, $system);
             }
             $rankManager->increasePlayerRank($player);
             require 'templates/level_rank_up/chuunin_exam_graduation.php';
