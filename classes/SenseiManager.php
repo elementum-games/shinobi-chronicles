@@ -163,7 +163,7 @@ class SenseiManager {
         $result = $system->db_fetch($student_result);
         $students = json_decode($result['students']);
         $students = array_diff($students, array($student_id));
-        $students = json_encode($students);
+        $students = "[" . implode(', ', $students) . "]";
         $system->query("UPDATE `sensei` SET `students` = '{$students}' WHERE `sensei_id` = '{$sensei_id}'");
         $system->query("UPDATE `users` SET `sensei_id` = '0' WHERE `user_id` = '{$student_id}'");
         $system->query("COMMIT;");
@@ -225,7 +225,7 @@ class SenseiManager {
         if (count($students) < 3) {
             array_push($students, $student_id);
             $student_count = count($students);
-            $students = json_encode($students);
+            $students = "[" . implode(', ', $students) . "]";
             $system->query("UPDATE `sensei` SET `students` = '{$students}' WHERE `sensei_id` = '{$sensei_id}'");
             $system->query("UPDATE `users` SET `sensei_id` = '{$sensei_id}' WHERE `user_id` = '{$student_id}'");
             $system->query("DELETE FROM `student_applications` WHERE `sensei_id` = '{$sensei_id}' AND `student_id` = '{$student_id}'");

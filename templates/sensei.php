@@ -120,8 +120,8 @@
                         <div><span>5 Jutsu Mastered</span></div>
                         <div><span>Pass Aptitude Exam</span></div>
                     </div>
-                    <p>As a Sensei you may take up to three students at a time.
-                    <p>You will provide training bonuses based on your specialization and experience as a Sensei.</p>
+                    <p>As a Sensei you can have up to three students at a time.</p>
+                    <p>Your students receive training bonuses based on your specialization and experience as a Sensei.</p>
                     <table class="table">
                         <tr>
                             <th>Tier</th>
@@ -179,8 +179,8 @@
         <tr>
             <td>
                 <div>
-                    <p>As a Sensei you may take up to three students at a time.
-                    <p>You will provide training bonuses based on your specialization and experience as a Sensei.</p>
+                    <p>As a Sensei you can have up to three students at a time.</p>
+                    <p>Your students receive training bonuses based on your specialization and experience as a Sensei.</p>
                     <table class="table">
                         <tr>
                             <th>Tier</th>
@@ -263,7 +263,8 @@
             <td>
                 <div>
                     <p>Sensei are experienced players who provide training bonuses and teach you the ways of the Shinobi.</p>
-                    <p>You may apply to as many Sensei as you like, and are free to change Sensei at any time.</p>
+                    <p>Apply to any number of Sensei by clicking an available student slot in the listing below.</p>
+                    <p>You can change Sensei at any time by visiting their profile and selecting the "Leave Sensei" option.</p>
                     <?php if (count($applications) > 0): ?>
                         <table class="table application_table">
                             <tr>
