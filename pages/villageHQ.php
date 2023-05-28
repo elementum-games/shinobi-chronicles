@@ -14,15 +14,17 @@ function villageHQ() {
 	global $player;
 
 	global $self_link;
+
 	global $RANK_NAMES;
 
 	// Sub-menu
 	echo "<div class='submenu'>
 	<ul class='submenu'>
-		<li style='width:30.5%;'><a href='{$self_link}&view=village_info'>Village Info</a></li>
-		<li style='width:23%;'><a href='{$self_link}&view=members'>Members</a></li>
-		<li style='width:25.5%;'><a href='{$self_link}&view=clans_teams'>Clans/Teams</a></li>
-		<li style='width:18.5%;'><a href='{$self_link}&view=world_info'>World Info</a></li>
+		<li style='width:20%;'><a href='{$system->router->links['villageHQ']}&view=village_info'>Village Info</a></li>
+		<li style='width:18.5%;'><a href='{$system->router->links['villageHQ']}&view=members'>Members</a></li>
+		<li style='width:20%;'><a href='{$system->router->links['villageHQ']}&view=clans_teams'>Clans/Teams</a></li>
+		<li style='width:18.5%;'><a href='{$system->router->links['villageHQ']}&view=world_info'>World Info</a></li>
+		<li style='width:20%;'><a href='{$system->router->links['villageHQ']}&view=sensei'>Sensei</a></li>
 	</ul>
 	</div>
 	<div class='submenuMargin'></div>";
@@ -256,7 +258,251 @@ function villageHQ() {
 		}
 		echo "</table>";
 	}
-
-
+	else if ($view == 'sensei') {
+		// If exam submitted
+		if (isset($_POST['submit_exam'])) {
+			try {
+				// check if already sensei
+				if ($player->sensei_id != 0) {
+                    throw new Exception('You do not meet the requirements!');
+                }
+				// check rank
+                if ($player->rank_num < 4) {
+                    throw new Exception('You do not meet the requirements!');
+                }
+				// check level
+                if ($player->level < 75) {
+                    throw new Exception('You do not meet the requirements!');
+                }
+				// check justu mastered
+                $mastered_count = 0;
+                $player->getInventory();
+                foreach ($player->jutsu as $jutsu) {
+                    if ($jutsu->level == 100) {
+                        $mastered_count++;
+                    }
+                }
+                if ($mastered_count < 5) {
+                    throw new Exception('You do not meet the requirements!');
+                }
+				$answers = [$_POST['question1'], $_POST['question2'], $_POST['question3'], $_POST['question4'], $_POST['question5'], $_POST['question6']];
+				if (SenseiManager::scoreExam($answers, $system)) {
+					$success = SenseiManager::addSensei($player->user_id, $_POST['specialization'], $system);
+					if (!$success) {
+                        throw new Exception('Something went wrong!');
+                    }
+					$player->sensei_id = $player->user_id;
+					$system->message("You passed!");
+				}
+				else {
+                    throw new Exception('Check your answers and try again!');
+                }
+            }
+			catch (Exception $e) {
+				$system->message($e->getMessage());
+            }
+        }
+		// If resignation confirmed
+		if (isset($_POST['confirm_resignation'])) {
+			try {
+				// check if sensei
+				if ($player->sensei_id != $player->user_id) {
+                    throw new Exception('You are not a sensei!');
+                }
+                $success = SenseiManager::removeSensei($player->sensei_id, $system);
+				if (!$success) {
+                    throw new Exception('Something went wrong!');
+                }
+				$player->sensei_id = 0;
+				$system->message("You have resigned as Sensei!");
+            }
+			catch (Exception $e) {
+                $system->message($e->getMessage());
+            }
+        }
+		// If resign clicked, set flag
+		$resign = false;
+		if (isset($_GET['resign'])) {
+            if ($player->sensei_id = $player->user_id) {
+                $resign = true;
+            }
+        }
+		// If kick student
+		if (isset($_GET['kick'])) {
+			try {
+				$success = SenseiManager::removeStudent($player->user_id, $_GET['kick'], $system);
+				if (!$success) {
+                    throw new Exception('Something went wrong!');
+                }
+				$system->message("You have kicked your student!");
+            }
+			catch (Exception $e) {
+                $system->message($e->getMessage());
+            }
+        }
+		// If leave sensei
+		if (isset($_GET['leave'])) {
+			try {
+				$success = SenseiManager::removeStudent($player->sensei_id, $player->user_id, $system);
+				if (!$success) {
+                    throw new Exception('Something went wrong!');
+                }
+				$player->sensei_id = 0;
+				$system->message("You have left your Sensei!");
+            }
+			catch (Exception $e) {
+                $system->message($e->getMessage());
+            }
+        }
+		// If create application
+		if (isset($_GET['apply'])) {
+            try {
+				$sensei = User::loadFromId($system, $_GET['apply'], true);
+				// check if already student
+				if ($player->sensei_id != 0) {
+                    throw new Exception('You already have a sensei!');
+                }
+				// check eligibility
+				if ($player->rank_num > 2)
+                {
+                    throw new Exception('You are not eligible to become a student!');
+                }
+				// check is sensei
+				if ($sensei->sensei_id != $sensei->user_id || $sensei->rank_num < 4) {
+                    throw new Exception('Player is not a valid sensei!');
+                }
+				// check village
+				if ($sensei->village->name != $player->village->name) {
+                    throw new Exception('Player is not a valid sensei!');
+                }
+				// check if accepting students
+				if (!$sensei->accept_students) {
+                    throw new Exception('Player is not accepting students!');
+                }
+				$success = SenseiManager::createApplication($_GET['apply'], $player->user_id, $system);
+				if (!$success) {
+                    throw new Exception('Something went wrong!');
+                }
+				$system->message("You have submitted an application!");
+            }
+			catch (Exception $e) {
+                $system->message($e->getMessage());
+            }
+        }
+		// If cancel application
+		if (isset($_GET['close'])) {
+            try {
+				$success = SenseiManager::closeApplication($_GET['close'], $player->user_id, $system);
+				if (!$success) {
+                    throw new Exception('Something went wrong!');
+                }
+				$system->message("You have closed an application!");
+            }
+			catch (Exception $e) {
+                $system->message($e->getMessage());
+            }
+        }
+		// If accept application
+		if (isset($_GET['accept'])) {
+            try {
+				$success = SenseiManager::acceptApplication($player->user_id, $_GET['accept'], $system);
+				if (!$success) {
+                    throw new Exception('Something went wrong!');
+                }
+				$system->message("You have accepted an application!");
+            }
+			catch (Exception $e) {
+                $system->message($e->getMessage());
+            }
+        }
+		// If deny application
+		if (isset($_GET['deny'])) {
+            try {
+				$success = SenseiManager::closeApplication($player->user_id, $_GET['deny'], $system);
+				if (!$success) {
+                    throw new Exception('Something went wrong!');
+                }
+				$system->message("You have denied an application!");
+            }
+			catch (Exception $e) {
+                $system->message($e->getMessage());
+            }
+        }
+		// If mod clear message
+		if (isset($_GET['clear'])) {
+            try {
+				if (!$player->staff_manager->isModerator()) {
+                    throw new Exception('Not a moderator!');
+                }
+				$success = SenseiManager::updateStudentRecruitment($_GET['clear'], '', $system);
+				if (!$success) {
+                    throw new Exception('Something went wrong!');
+                }
+				$system->message("You have removed a recruitment message!");
+            }
+			catch (Exception $e) {
+                $system->message($e->getMessage());
+            }
+        }
+		// If exam started
+		if (isset($_GET['sensei_exam'])) {
+			try {
+				// check if already sensei
+                if ($player->sensei_id != 0) {
+                    throw new Exception('You do not meet the requirements!');
+                }
+                // check rank
+                if ($player->rank_num < 4) {
+                    throw new Exception('You do not meet the requirements!');
+                }
+                // check level
+                if ($player->level < 75) {
+                    throw new Exception('You do not meet the requirements!');
+                }
+                // check justu mastered
+                $mastered_count = 0;
+                $player->getInventory();
+                foreach ($player->jutsu as $jutsu) {
+                    if ($jutsu->level == 100) {
+                        $mastered_count++;
+                    }
+                }
+                if ($mastered_count < 5) {
+                    throw new Exception('You do not meet the requirements!');
+                }
+            }
+			catch (Exception $e) {
+                $system->message($e->getMessage());
+            }
+			require 'templates/sensei_exam.php';
+        }
+		// Default
+		else {
+			$applications = [];
+			// If Sensei
+			if ($player->sensei_id == $player->user_id) {
+                $applications = SenseiManager::getApplicationsBySensei($player->user_id, $system);
+            }
+			// If eligible Student
+			else if ($player->sensei_id == 0 && $player->rank_num < 3) {
+                $applications = SenseiManager::getApplicationsByStudent($player->user_id, $system);
+            }
+			// If staff
+			if (isset($_GET['village'])) {
+                if ($player->staff_manager->isModerator()) {
+					$sensei_list = SenseiManager::getSenseiByVillage($_GET['village'], $system);
+				}
+				else {
+					$sensei_list = SenseiManager::getSenseiByVillage($player->village->name, $system);
+				}
+            }
+			// Default
+			else {
+				$sensei_list = SenseiManager::getSenseiByVillage($player->village->name, $system);
+            }
+			require 'templates/sensei.php';
+        }
+		$system->printMessage();
+    }
 }
 ?>

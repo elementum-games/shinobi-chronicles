@@ -250,6 +250,9 @@ class User extends Fighter {
     public array $bloodline_offense_boosts;
     public array $bloodline_defense_boosts;
 
+    public ?int $sensei_id = null;
+    public bool $accept_students;
+
     public array $stats = [
         'ninjutsu_skill',
         'taijutsu_skill',
@@ -271,7 +274,7 @@ class User extends Fighter {
         if(!$user_id) {
             throw new Exception("Invalid user id!");
         }
-        
+
         $this->user_id = $user_id;
         $this->id = self::ENTITY_TYPE . ':' . $this->user_id;
     }
@@ -286,27 +289,32 @@ class User extends Fighter {
     public static function loadFromId(System $system, int $user_id, bool $remote_view = false): User {
         $user = new User($system, $user_id);
 
-        $result = $system->query("SELECT 
-            `user_id`, 
-            `user_name`, 
+        $result = $system->query("SELECT
+            `user_id`,
+            `user_name`,
             `ban_data`,
-            `ban_type`, 
-            `ban_expire`, 
-            `journal_ban`, 
-            `avatar_ban`, 
-            `song_ban`, 
+            `ban_type`,
+            `ban_expire`,
+            `journal_ban`,
+            `avatar_ban`,
+            `song_ban`,
             `last_login`,
             `regen_rate`,
-			`forbidden_seal`, 
-			`chat_color`, 
+			`forbidden_seal`,
+			`chat_color`,
 			`chat_effect`,
-			`staff_level`, 
-			`username_changes`, 
-			`support_level`, 
-			`special_mission`
+			`staff_level`,
+			`username_changes`,
+			`support_level`,
+			`special_mission`,
+            `rank`,
+            `sensei_id`,
+            `accept_students`,
+            `village`
 			FROM `users` WHERE `user_id`='$user_id' LIMIT 1"
         );
-        if($system->db_last_num_rows == 0) {
+        if (isset($system->db_last_num_rows))
+            if ($system->db_last_num_rows == 0) {
             throw new Exception("User does not exist!");
         }
 
@@ -336,6 +344,11 @@ class User extends Fighter {
 
         $user->chat_color = $result['chat_color'];
         $user->chat_effect = $result['chat_effect'];
+
+        $user->sensei_id = $result['sensei_id'];
+        $user->village = new Village($system, $result['village']);
+        $user->rank_num = $result['rank'];
+        $user->accept_students = $result['accept_students'];
 
         //Todo: Remove this in a couple months, only a temporary measure to support current bans
         if($user->ban_type) {
@@ -814,6 +827,10 @@ class User extends Fighter {
         ) {
             $this->location->x--;
         }
+
+        // Sensei
+        $this->sensei_id = $user_data['sensei_id'];
+        $this->accept_students = $user_data['accept_students'];
 
         return;
     }
@@ -1439,7 +1456,9 @@ class User extends Fighter {
 		`stealth` = '$this->stealth',
 		`exp` = '$this->exp',
 		`bloodline_id` = '$this->bloodline_id',
-		`bloodline_name` = '$this->bloodline_name',";
+		`bloodline_name` = '$this->bloodline_name',
+        `accept_students` = '" . (int)$this->accept_students . "',
+        `sensei_id` = '$this->sensei_id',";
         if($this->clan) {
             $query .= "`clan_id` = '{$this->clan->id}',
 			`clan_office`='{$this->clan_office}',";

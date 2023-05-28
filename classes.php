@@ -44,3 +44,5 @@ require_once __DIR__ . "/classes/travel/TravelCoords.php";
 require_once __DIR__ . "/classes/travel/MapLocation.php";
 
 require_once __DIR__ . "/classes/Village.php";
+
+require_once __DIR__ . "/classes/SenseiManager.php";

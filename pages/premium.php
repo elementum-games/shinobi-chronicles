@@ -869,11 +869,20 @@ function premium() {
 				throw new Exception("You do not have enough Ancient Kunai!");
 			}
 
+            if ($player->sensei_id) {
+                if ($player->rank_num < 3) {
+                    throw new Exception("You must leave your sensei first!");
+                }
+                else if (SenseiManager::hasStudents($player->user_id, $system)) {
+                    throw new Exception("You must leave your students first!");
+                }
+            }
+
 			if(!isset($_POST['confirm_village_change'])) {
                 $confirmation_type = 'confirm_village_change';
                 $confirmation_string = "Are you sure you want to move from the {$player->village->name} village to the $village
                 village? You will be kicked out of your clan and placed in a random clan in the new village.<br />
-                <b>(IMPORTANT: This is non-reversable once completed, if you want to return to your original village 
+                <b>(IMPORTANT: This is non-reversable once completed, if you want to return to your original village
                 you will have to pay a higher transfer fee)</b>";
                 $additional_form_data = [
                     'new_village' => ['input_type' => 'hidden', 'value' => $village]
@@ -898,6 +907,14 @@ function premium() {
                     $player->clan_office = 0;
                 }
 
+                //Remove active student applications
+                if ($player->sensei_id == $player->user_id) {
+                    SenseiManager::closeApplicationsBySensei($player->sensei_id, $system);
+                }
+                else if ($player->rank_num < 3) {
+                    SenseiManager::closeApplicationsByStudent($player->user_id, $system);
+                }
+
                 // Cost
                 $player->subtractPremiumCredits($akCost, "Changed villages from {$player->village->name} to $village");
                 $player->village_changes++;
@@ -906,7 +923,7 @@ function premium() {
                 $player->village = new Village($system, $village);
 
                 // Clan
-                $result = $system->query("SELECT `clan_id`, `name` FROM `clans` 
+                $result = $system->query("SELECT `clan_id`, `name` FROM `clans`
                     WHERE `village`='{$player->village->name}' AND `bloodline_only`='0'");
                 if ($system->db_last_num_rows == 0) {
                     $result = $system->query("SELECT `clan_id`, `name` FROM `clans` WHERE `bloodline_only`='0'");
@@ -997,7 +1014,7 @@ function premium() {
                 $confirmation_type = 'confirm_clan_change';
                 $confirmation_string = "Are you sure you want to move from the {$player->clan->name} clan to the
                 $clan_name clan?<br /><br />
-                <b>(IMPORTANT: This is non-reversable once completed, if you want to return to your original clan you 
+                <b>(IMPORTANT: This is non-reversable once completed, if you want to return to your original clan you
                 will have to pay a higher transfer fee)</b><br />";
                 $additional_form_data = ['clan_change_id' => ['input_type' => 'hidden', 'value' => $new_clan_id]];
                 $submit_value = 'change_clan';

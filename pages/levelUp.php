@@ -2,7 +2,7 @@
 
 function levelUp() {
 	global $player;
-	
+
 	if($player->level < $player->rank->max_level) {
 		$player->level++;
 		$player->exp = $player->total_stats * 10;
@@ -10,11 +10,11 @@ function levelUp() {
 		$player->max_health += $player->rank->health_gain;
 		$player->max_chakra += $player->rank->pool_gain;
 		$player->max_stamina += $player->rank->pool_gain;
-		
+
 		$player->health = $player->max_health;
 		$player->chakra = $player->max_chakra;
 		$player->stamina = $player->max_stamina;
-		
+
 		require 'templates/level_rank_up/level_up_message.php';
 	}
 }
@@ -27,7 +27,7 @@ function rankUp(): bool {
 	global $system;
 
 	global $player;
-	
+
 	$self_link = $system->router->links['rankup'];
 
     if(!$player->rank_up) {
@@ -224,10 +224,10 @@ function geninExam(System $system, User $player, RankManager $rankManager) {
                 $system->query("UPDATE `users` SET `bloodline_id`='0' WHERE `user_id`='$player->user_id'");
 
                 // Pull bloodlines
-                $result = $system->query("SELECT `bloodline_id`, `clan_id`, `name` FROM `bloodlines` 
+                $result = $system->query("SELECT `bloodline_id`, `clan_id`, `name` FROM `bloodlines`
 						WHERE `village`='{$player->village->name}' AND `rank`='$bloodline_rank'");
                 if($system->db_last_num_rows == 0) {
-                    $result = $system->query("SELECT `bloodline_id`, `clan_id`, `name` FROM `bloodlines` 
+                    $result = $system->query("SELECT `bloodline_id`, `clan_id`, `name` FROM `bloodlines`
 						WHERE `village`='{$player->village->name}' AND `rank` < 5");
                 }
 
@@ -305,10 +305,10 @@ function geninExam(System $system, User $player, RankManager $rankManager) {
 
             // Clan roll(failsafe if no bloodlines were found on bl roll)
             if(!$bloodline_rolled) {
-                $result = $system->query("SELECT `clan_id`, `name` FROM `clans` 
+                $result = $system->query("SELECT `clan_id`, `name` FROM `clans`
 						WHERE `village`='{$player->village->name}' AND `bloodline_only`='0'");
                 if($system->db_last_num_rows == 0) {
-                    $result = $system->query("SELECT `clan_id`, `name` FROM `clans` 
+                    $result = $system->query("SELECT `clan_id`, `name` FROM `clans`
 						WHERE `bloodline_only`='0'");
                 }
 
@@ -373,14 +373,14 @@ function geninExam(System $system, User $player, RankManager $rankManager) {
             if($bloodline_rolled) {
                 $bloodline_display = "Suddenly the elder senses something inside of you, and you feel a surge in power
 					as a strange force wells up inside you, answering the call of the elder's chakra. The elder withdraws $gender hand
-					and smiles, saying calmly 'You have the <b>$bloodline_name</b>. This is the 
+					and smiles, saying calmly 'You have the <b>$bloodline_name</b>. This is the
 					bloodline of the <b>$clan_name</b> clan. From this day forward you shall join them, and study with them to train
 					your bloodline to its fullest potential.'<br />
 					<p style='text-align:center;'><a href='{$system->router->links['profile']}'>Continue</a></p>";
             }
             else {
                 $bloodline_display = "After focusing deeply for several minutes, the elder withdraws $gender hand and says 'It appears you do not
-					have a bloodline. You are free to train as you wish, we will place you in the <b>$clan_name</b> clan. Train 
+					have a bloodline. You are free to train as you wish, we will place you in the <b>$clan_name</b> clan. Train
 					hard with them and become a strong ninja for your clan and village.'<br />
 					<p style='text-align:center;'><a href='{$system->router->links['profile']}'>Continue</a></p>";
             }
@@ -626,7 +626,7 @@ function chuuninExam(System $system, User $player, RankManager $rankManager): bo
 							through your arms, out your fingertips and into the paper. Suddenly it erupts into flame, and you drop it
 							in shock. The elders smile and say \"Congratulations, you have the Fire element. Fire is the embodiment of
 							consuming destruction, that devours anything in its path. Your Fire jutsu will be strong against Wind jutsu, as
-							they will only fan the flames and strengthen your jutsu. However, you must be careful against Water jutsu, as they 
+							they will only fan the flames and strengthen your jutsu. However, you must be careful against Water jutsu, as they
 							can extinguish your fires.\"<br />
 							<a href='{$system->router->links['profile']}'>Continue</a>";
                         break;
@@ -641,9 +641,9 @@ function chuuninExam(System $system, User $player, RankManager $rankManager): bo
 							<a href='{$system->router->links['profile']}'>Continue</a>";
                         break;
                     case 'Lightning':
-                        $element_display = "Imagining the feel of electricity coursing through your veins, you focus on the paper and flow chakra 
+                        $element_display = "Imagining the feel of electricity coursing through your veins, you focus on the paper and flow chakra
 							from your stomach, through your arms, out your fingertips and into the paper. With a slight shock the
-							paper crumples into a ball, and the elders smile and say 
+							paper crumples into a ball, and the elders smile and say
 							\"Congratulations, you have the Lightning element. Lightning embodies pure speed, and skilled users of
 							this element physically augment themselves to swiftly strike through almost anything. Your Lightning
 							jutsu will be strong against Earth as your speed can slice straight through the slower techniques of Earth,
@@ -652,19 +652,19 @@ function chuuninExam(System $system, User $player, RankManager $rankManager): bo
 							<a href='{$system->router->links['profile']}'>Continue</a>";
                         break;
                     case 'Earth':
-                        $element_display = "Firmly planting your feet in the dirt and embracing the feel of it, you focus on the paper and flow 
-							chakra from your stomach, through your arms, out your fingertips and into the paper. The paper gradually turns 
-							into dirt and crumbles away, and the elders smile and say \"Congratulations, you have the Earth element. Earth 
-							is the hardiest of elements and can protect you or your teammates from enemy attacks. Your Earth jutsu will be 
-							strong against Water jutsu, as you can turn the water to mud and render it useless, but you will be weak to 
+                        $element_display = "Firmly planting your feet in the dirt and embracing the feel of it, you focus on the paper and flow
+							chakra from your stomach, through your arms, out your fingertips and into the paper. The paper gradually turns
+							into dirt and crumbles away, and the elders smile and say \"Congratulations, you have the Earth element. Earth
+							is the hardiest of elements and can protect you or your teammates from enemy attacks. Your Earth jutsu will be
+							strong against Water jutsu, as you can turn the water to mud and render it useless, but you will be weak to
 							Lightning jutsu, as they are one of the few types that can swiftly evade and strike through your techniques.\"
 							<br />
 							<a href='{$system->router->links['profile']}'>Continue</a>";
                         break;
                     case 'Water':
-                        $element_display = "With thoughts of splashing rivers flowing through your mind, you focus on the paper and flow chakra 
+                        $element_display = "With thoughts of splashing rivers flowing through your mind, you focus on the paper and flow chakra
 							from your stomach, through your arms, out your fingertips and into the paper. The paper gradually moistens
-							and then turns completely soaked with water. The elders smile and say 
+							and then turns completely soaked with water. The elders smile and say
 							\"Congratulations, you have the Water element. Water is a versatile element that can control the flow
 							of the battle, trapping enemies or launching large-scale attacks at them. Your Water jutsu will be strong against
 							Fire jutsu because you can extinguish them, but Earth jutsu can turn your water into mud and render it useless.\"
@@ -677,6 +677,17 @@ function chuuninExam(System $system, User $player, RankManager $rankManager): bo
             //Exam complete, element selected
             $player->elements = array('first' => $element);
             $player->exam_stage = 0;
+            if ($player->sensei_id != 0) {
+                // increase graduated count
+                SenseiManager::incrementGraduated($player->sensei_id, $system);
+                // remove student
+                SenseiManager::removeStudent($player->sensei_id, $player->user_id, $system);
+                $player->sensei_id = 0;
+            }
+            else {
+                // close applications
+                SenseiManager::closeApplicationsByStudent($player->user_id, $system);
+            }
             $rankManager->increasePlayerRank($player);
             require 'templates/level_rank_up/chuunin_exam_graduation.php';
         } catch(Exception $e) {
@@ -823,19 +834,19 @@ function joninExam(System $system, User $player, RankManager $rankManager): bool
                 switch($element) {
                     case 'Fire':
                         $element_display = "With the image of blazing fires in your mind, you flow chakra from your stomach,
-							down through your legs and into the seal on the floor. Suddenly one of the pedestals bursts into 
+							down through your legs and into the seal on the floor. Suddenly one of the pedestals bursts into
 							fire, breaking your focus. The elders smile and say \"Congratulations, you now have the Fire element. Fire is the embodiment of
 							consuming destruction, that devours anything in its path. Your Fire jutsu will be strong against Wind jutsu, as
-							they will only fan the flames and strengthen your jutsu. However, you must be careful against Water jutsu, as they 
+							they will only fan the flames and strengthen your jutsu. However, you must be careful against Water jutsu, as they
 							can extinguish your fires.\"<br />
 							<a href='{$system->router->links['profile']}'>Continue</a>";
                         break;
                     case 'Wind':
                         $element_display = "Picturing a tempestuous tornado, you flow chakra from your stomach,
 							down through your legs and into the seal on the floor. You feel a disturbance in the room and
-							suddenly realize that a small whirlwind has formed around one of the pedestals. The elders smile and 
-							say \"Congratulations, you have the Wind element. Wind is the sharpest out of all chakra natures, 
-							and can slice through anything when used properly. Your Wind chakra will be strong against 
+							suddenly realize that a small whirlwind has formed around one of the pedestals. The elders smile and
+							say \"Congratulations, you have the Wind element. Wind is the sharpest out of all chakra natures,
+							and can slice through anything when used properly. Your Wind chakra will be strong against
 							Lightning jutsu, as you can cut and dissipate it, but you will be weak against Fire jutsu,
 							because your wind only serves to fan their flames and make them stronger.\"
 							<br />
@@ -854,10 +865,10 @@ function joninExam(System $system, User $player, RankManager $rankManager): bool
                         break;
                     case 'Earth':
                         $element_display = "Envisioning stone as hard as the temple you are sitting in, you flow chakra from your stomach,
-							down through your legs and into the seal on the floor. Suddenly dirt from nowhere begins to fall off one of the 
-							pedstals, and the elders smile and say \"Congratulations, you have the Earth element. Earth 
-							is the hardiest of elements and can protect you or your teammates from enemy attacks. Your Earth jutsu will be 
-							strong against Water jutsu, as you can turn the water to mud and render it useless, but you will be weak to 
+							down through your legs and into the seal on the floor. Suddenly dirt from nowhere begins to fall off one of the
+							pedstals, and the elders smile and say \"Congratulations, you have the Earth element. Earth
+							is the hardiest of elements and can protect you or your teammates from enemy attacks. Your Earth jutsu will be
+							strong against Water jutsu, as you can turn the water to mud and render it useless, but you will be weak to
 							Lightning jutsu, as they are one of the few types that can swiftly evade and strike through your techniques.\"
 							<br />
 							<a href='{$system->router->links['profile']}'>Continue</a>";
@@ -865,7 +876,7 @@ function joninExam(System $system, User $player, RankManager $rankManager): bool
                     case 'Water':
                         $element_display = "With thoughts of splashing rivers flowing through your mind, you flow chakra from your stomach,
 							down through your legs and into the seal on the floor. Suddenly a small geyser erupts from one of
-							the pedestals, and the elders smile and say 
+							the pedestals, and the elders smile and say
 							\"Congratulations, you have the Water element. Water is a versatile element that can control the flow
 							of the battle, trapping enemies or launching large-scale attacks at them. Your Water jutsu will be strong against
 							Fire jutsu because you can extinguish them, but Earth jutsu can turn your water into mud and render it useless.\"

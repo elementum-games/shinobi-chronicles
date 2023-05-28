@@ -11,6 +11,7 @@ class Router {
         'inbox' => 2,
         'settings' => 3,
         'members' => 6,
+        'villageHQ' => 9,
         'bloodline' => 10,
         'travel' => 11,
         'arena' => 12,
