@@ -62,13 +62,18 @@ class Router {
      * @return string
      * @throws Exception
      */
-    public function getUrl(string $page_name): string {
+    public function getUrl(string $page_name, array $url_params = []): string {
         $id = self::PAGE_IDS[$page_name] ?? null;
         if($id == null) {
             throw new Exception("Invalid page name!");
         }
 
-        return $this->base_url . '?id=' . $id;
+        $extra_params_str = "";
+        foreach($url_params as $key => $val) {
+            $extra_params_str .= "&{$key}={$val}";
+        }
+
+        return $this->base_url . '?id=' . $id . $extra_params_str;
     }
 
     /**

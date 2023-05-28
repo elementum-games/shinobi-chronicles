@@ -265,4 +265,19 @@ class Jutsu {
     /*public function getLevel() {
         return $this->level;
     }*/
+
+    /**
+     * @param System $system
+     * @return Jutsu[]
+     */
+    public static function fetchAll(System $system): array {
+        $result = $system->query("SELECT * FROM `jutsu` ORDER BY `rank` ASC, `purchase_cost` ASC");
+
+        $jutsu = [];
+        while($jutsu_db = $system->db_fetch($result)) {
+            $jutsu[$jutsu_db['jutsu_id']] = Jutsu::fromArray($jutsu_db['jutsu_id'], $jutsu_db);
+        }
+
+        return $jutsu;
+    }
 }

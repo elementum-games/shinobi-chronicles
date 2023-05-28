@@ -29,14 +29,19 @@ function formPreloadData($variables, &$data, $post = true, $post_array = false) 
 }
 
 /**
- * @param      $variables
+ * @param      $entity_constraints
  * @param      $data
  * @param null $content_id
+ * @param null $FORM_DATA
  * @throws Exception if any validation error
  */
-function validateFormData($variables, &$data, $content_id = null) {
-    foreach($variables as $var_name => $variable) {
-        if(isset($_POST[$var_name])) {
+function validateFormData($entity_constraints, &$data, $content_id = null, $FORM_DATA = null): void {
+    if($FORM_DATA == null) {
+        $FORM_DATA = $_POST;
+    }
+
+    foreach($entity_constraints as $var_name => $variable) {
+        if(isset($FORM_DATA[$var_name])) {
             if(isset($variable['count']) or is_array(reset($variable))) {
                 // Validate a set number of exact same variables
                 if(isset($variable['count'])) {
@@ -45,15 +50,15 @@ function validateFormData($variables, &$data, $content_id = null) {
                     for($i = 0; $i < $variable['count']; $i++) {
                         $data_array[$count] = [];
                         foreach($variable['variables'] as $name => $var) {
-                            if($var['special'] == 'remove' and !empty($_POST[$var_name][$i][$name])) {
+                            if($var['special'] == 'remove' and !empty($FORM_DATA[$var_name][$i][$name])) {
                                 $data_array[$count] = [];
                                 break;
                             }
-                            if(empty($_POST[$var_name][$i][$name])) {
+                            if(empty($FORM_DATA[$var_name][$i][$name])) {
                                 continue;
                             }
                             else {
-                                validateVariable($name, $_POST[$var_name][$i][$name], $var, $variables, $data_array[$count], $content_id);
+                                validateField($name, $FORM_DATA[$var_name][$i][$name], $var, $entity_constraints, $data_array[$count], $content_id);
                             }
                         }
                         if(empty($data_array[$count])) {
@@ -71,15 +76,21 @@ function validateFormData($variables, &$data, $content_id = null) {
                     }
                     $data[$var_name] = json_encode($data_array);
                 }
-                else {
-                }
             }
             else {
-                validateVariable($var_name, $_POST[$var_name], $variable, $variables, $data, $content_id);
+                validateField(
+                    var_name: $var_name,
+                    input: $FORM_DATA[$var_name],
+                    FORM_DATA: $FORM_DATA,
+                    field_constraints: $variable,
+                    all_constraints: $entity_constraints,
+                    data: $data,
+                    content_id: $content_id
+                );
             }
         }
         else {
-            throw new Exception("Invalid " . ucwords(str_replace("_", " ", $var_name)) . "!");
+            throw new Exception("Invalid " . System::unSlug($var_name) . "!");
         }
     }
 }
@@ -87,79 +98,81 @@ function validateFormData($variables, &$data, $content_id = null) {
 /**
  * @throws Exception
  */
-function validateVariable($var_name, $input, $variable, &$variables, &$data, $content_id = null): bool {
+function validateField($var_name, $input, $FORM_DATA, $field_constraints, &$all_constraints, &$data, $content_id = null): bool {
     global $system;
     // Skip variable if it is not required
-    if(isset($variable['required_if'])) {
-        $req_var = $variable['required_if'];
+    if(isset($field_constraints['required_if'])) {
+        $req_var = $field_constraints['required_if'];
         // If variable false/not set, continue
-        if(empty($data[$req_var]) && empty($_POST[$req_var])) {
+        if(empty($data[$req_var]) && empty($FORM_DATA[$req_var])) {
             return true;
         }
         // If variable is set and value matches not required key
-        if(!empty($data[$req_var]) && $data[$req_var] == $variables[$req_var]['not_required_value']) {
+        if(!empty($data[$req_var]) && $data[$req_var] == $all_constraints[$req_var]['not_required_value']) {
             return true;
         }
-        if(!empty($_POST[$req_var]) && $_POST[$req_var] == $variables[$req_var]['not_required_value']) {
+        if(!empty($FORM_DATA[$req_var]) && $FORM_DATA[$req_var] == $all_constraints[$req_var]['not_required_value']) {
             return true;
         }
     }
     // Check for special remove variable
-    if(($variable['special'] ?? '') == 'remove') {
+    if(($field_constraints['special'] ?? '') == 'remove') {
         return true;
     }
+
     $data[$var_name] = $system->clean($input);
+
     // Check for entry
     if(strlen($data[$var_name]) < 1) {
-        throw new Exception("Please enter " . ucwords(str_replace("_", " ", $var_name)) . "!");
+        throw new Exception("Please enter " . System::unSlug($var_name) . "!");
     }
     // Check numeric variables
-    if($variable['data_type'] != 'string') {
+    if($field_constraints['data_type'] != 'string') {
         if(!is_numeric($data[$var_name])) {
-            throw new Exception("Invalid " . ucwords(str_replace("_", " ", $var_name)) . "!");
+            throw new Exception("Invalid " . System::unSlug($var_name) . "!");
         }
     }
     // Check variable matches restricted possibles list, if any
-    if(!empty($variable['options'])) {
-        if($variable['data_type'] == 'string') {
-            if(array_search($data[$var_name], $variable['options']) === false && $var_name != 'elements') {
-                throw new Exception("Invalid " . ucwords(str_replace("_", " ", $var_name)) . "!");
+    if(!empty($field_constraints['options'])) {
+        if($field_constraints['data_type'] == 'string') {
+            if(array_search($data[$var_name], $field_constraints['options']) === false && $var_name != 'elements') {
+                throw new Exception("Invalid " . System::unSlug($var_name) . "!");
             }
         }
         else {
-            if(!isset($variable['options'][$data[$var_name]])) {
-                throw new Exception("Invalid " . ucwords(str_replace("_", " ", $var_name)) . "!");
+            if(!isset($field_constraints['options'][$data[$var_name]])) {
+                throw new Exception("Invalid " . System::unSlug($var_name) . "!");
             }
         }
     }
     // Check max length
-    if(isset($variable['max_length'])) {
-        if(strlen($data[$var_name]) > $variable['max_length']) {
-            throw new Exception(ucwords(str_replace("_", " ", $var_name)) .
-                " is too long! (" . strlen($data[$var_name]) . "/" . $variable['max_length'] . " chars)"
+    if(isset($field_constraints['max_length'])) {
+        if(strlen($data[$var_name]) > $field_constraints['max_length']) {
+            throw new Exception(System::unSlug($var_name) .
+                " is too long! (" . strlen($data[$var_name]) . "/" . $field_constraints['max_length'] . " chars)"
             );
         }
     }
     // Check pattern
-    if(isset($variable['pattern'])) {
-        if(!preg_match($variable['pattern'], $data[$var_name])) {
-            throw new Exception("Invalid " . ucwords(str_replace("_", " ", $var_name)) . " ({$data[$var_name]})!");
+    if(isset($field_constraints['pattern'])) {
+        if(!preg_match($field_constraints['pattern'], $data[$var_name])) {
+            throw new Exception("Invalid " . System::unSlug($var_name) . " ({$data[$var_name]})!");
         }
     }
 
     // Check for uniqueness
-    if(isset($variable['unique_required']) && $variable['unique_required'] == true) {
+    if(isset($field_constraints['unique_required']) && $field_constraints['unique_required'] == true) {
         if($content_id) {
-            $query = "SELECT `{$variable['unique_column']}` FROM `{$variable['unique_table']}` 
-				WHERE `{$variable['unique_column']}` = '" . $data[$var_name] . "' and `{$variable['id_column']}` != '$content_id' LIMIT 1";
+            $query = "SELECT `{$field_constraints['unique_column']}` FROM `{$field_constraints['unique_table']}` 
+				WHERE `{$field_constraints['unique_column']}` = '" . $data[$var_name] . "' and `{$field_constraints['id_column']}` != '$content_id' LIMIT 1";
         }
         else {
-            $query = "SELECT `{$variable['unique_column']}` FROM `{$variable['unique_table']}` 
-				WHERE `{$variable['unique_column']}` = '" . $data[$var_name] . "' LIMIT 1";
+            $query = "SELECT `{$field_constraints['unique_column']}` FROM `{$field_constraints['unique_table']}` 
+				WHERE `{$field_constraints['unique_column']}` = '" . $data[$var_name] . "' LIMIT 1";
         }
         $result = $system->query($query);
         if($system->db_last_num_rows > 0) {
-            throw new Exception("'" . ucwords(str_replace("_", " ", $var_name)) . "' needs to be unique, the value '" . $data[$var_name] . "' is already taken!");
+            throw new Exception("'" . System::unSlug($var_name) . "' needs to be unique, the value '" . $data[$var_name] . "' is already taken!");
         }
     }
 
@@ -179,7 +192,7 @@ function displayFormFields($variables, $data, $input_name_prefix = ''): bool {
         if(isset($variable['count']) or is_array(reset($variable))) {
             // Display a set number of exact same variables
             if(isset($variable['count'])) {
-                echo "<label for='{$var_name}'>" . ucwords(str_replace("_", " ", $var_name)) . ":</label>" .
+                echo "<label for='{$var_name}'>" . System::unSlug($var_name) . ":</label>" .
                     (isset($variable['num_required']) ? "<i>(" . $variable['num_required'] . " required)</i>" : "") .
                     "<div style='margin-left:20px;margin-top:0;'>";
                 $data_vars = json_decode($data[$var_name], true);
@@ -208,7 +221,7 @@ function displayFormFields($variables, $data, $input_name_prefix = ''): bool {
             // Display unique data structure based on array key names
             else {
                 echo "<label for='$var_name'>" .
-                    ucwords(str_replace("_", " ", $var_name)) .
+                    System::unSlug($var_name) .
                     ":</label>
 				<p style='margin-left:20px;margin-top:0;'>";
                 $data_vars = json_decode($data[$var_name], true);
@@ -241,17 +254,17 @@ function displayVariable($var_name, $variable, $current_value, $input_name_prefi
     $input_type = $variable['input_type'] ?? '';
 
     if($input_type == 'text') {
-        echo "<label for='$name'>" . ucwords(str_replace("_", " ", $var_name)) . ":</label>
+        echo "<label for='$name'>" . System::unSlug($var_name) . ":</label>
 		<input type='text' name='$name' value='" . stripslashes($current_value) . "' /><br />";
     }
     else if($variable['input_type'] == 'text_area') {
-        echo "<label for='$var_name'>" . ucwords(str_replace("_", " ", $var_name)) . ":</label><br />
+        echo "<label for='$var_name'>" . System::unSlug($var_name) . ":</label><br />
             <textarea name='$var_name' rows='3' style='width:60%;max-width:400px;'>"
             . stripslashes($current_value)
             . "</textarea><br />";
     }
     else if($input_type == 'radio' && !empty($variable['options'])) {
-        echo "<label for='$name' style='margin-top:5px;'>" . ucwords(str_replace("_", " ", $var_name)) . ":</label>
+        echo "<label for='$name' style='margin-top:5px;'>" . System::unSlug($var_name) . ":</label>
 		<p style='padding-left:10px;margin-top:5px;'>";
         $count = 1;
         foreach($variable['options'] as $id => $option) {
@@ -271,7 +284,7 @@ function displayVariable($var_name, $variable, $current_value, $input_name_prefi
         echo "</p>";
     }
     else if($input_type == 'select' && !empty($variable['options'])) {
-        echo "<label for='$name' style='margin-top:5px;'>" . ucwords(str_replace("_", " ", $var_name)) . ":</label>
+        echo "<label for='$name' style='margin-top:5px;'>" . System::unSlug($var_name) . ":</label>
 		<select name='{$name}'>
 		";
         $count = 1;
