@@ -146,6 +146,7 @@ class BattleApiPresenter {
         }
 
         return [
+            'turnNumber' => $turn_log->turn_number,
             'isMovementPhase' => $turn_log->turn_phase === BattleV2::TURN_TYPE_MOVEMENT,
             'isAttackPhase' => $turn_log->turn_phase === BattleV2::TURN_TYPE_ATTACK,
             'isPreparationPhase' => false,

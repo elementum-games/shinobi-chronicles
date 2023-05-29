@@ -70,6 +70,12 @@ function Battle({
     }
   };
 
+  const handleForfeit = () => {
+    apiFetch(battleApiLink, {
+      forfeit: "yes"
+    }).then(handleApiResponse);
+  };
+
   return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("p", {
     className: "systemMessage"
   }, error), /*#__PURE__*/React.createElement(FightersAndField, {
@@ -83,13 +89,15 @@ function Battle({
     battle: battle,
     attackInput: attackInput,
     updateAttackInput: updateAttackInput,
-    isAttackSelected: isSelectingTile
+    isAttackSelected: isSelectingTile,
+    forfeitBattle: handleForfeit
   }), /*#__PURE__*/React.createElement(BattleLog, {
     lastTurnLog: battle.lastTurnLog,
     leftFighterId: battle.playerId,
     rightFighterId: battle.opponentId
   }), battleResult && /*#__PURE__*/React.createElement(BattleResult, {
-    description: battleResult
+    description: battleResult,
+    isBattleComplete: battle.isComplete
   }));
 } // Fighters and Field
 
@@ -150,6 +158,7 @@ function FightersAndField({
     fighterLocations: field.fighterLocations,
     selectedJutsu: selectedJutsu,
     isMovementPhase: battle.isMovementPhase,
+    lastTurnLog: battle.lastTurnLog,
     onTileSelect: handleTileSelect
   })))));
 }
@@ -175,7 +184,8 @@ function SpectateStatus() {
 }
 
 function BattleResult({
-  description
+  description,
+  isBattleComplete
 }) {
   return /*#__PURE__*/React.createElement("table", {
     className: "table"
@@ -183,7 +193,9 @@ function BattleResult({
     dangerouslySetInnerHTML: {
       __html: description
     }
-  })))));
+  }), isBattleComplete && /*#__PURE__*/React.createElement("button", {
+    onClick: () => window.location.assign(window.location.href)
+  }, "Continue")))));
 }
 
 window.Battle = Battle;
