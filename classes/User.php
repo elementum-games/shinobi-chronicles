@@ -317,37 +317,37 @@ class User extends Fighter {
             throw new Exception("User does not exist!");
         }
 
-        $result = $system->db_fetch($result);
+        $user_data = $system->db_fetch($result);
 
-        $user->user_name = $result['user_name'];
-        $user->username_changes = $result['username_changes'];
+        $user->user_name = $user_data['user_name'];
+        $user->username_changes = $user_data['username_changes'];
 
-        $user->staff_level = $result['staff_level'];
-        $user->support_level = $result['support_level'];
+        $user->staff_level = $user_data['staff_level'];
+        $user->support_level = $user_data['support_level'];
         $user->staff_manager = $user->loadStaffManager();
 
-        $user->ban_data = $user->loadBanData($result['ban_data']);
-        $user->ban_type = $result['ban_type'];
-        $user->ban_expire = $result['ban_expire'];
-        $user->journal_ban = $result['journal_ban'];
-        $user->avatar_ban = $result['avatar_ban'];
-        $user->song_ban = $result['song_ban'];
+        $user->ban_data = $user->loadBanData($user_data['ban_data']);
+        $user->ban_type = $user_data['ban_type'];
+        $user->ban_expire = $user_data['ban_expire'];
+        $user->journal_ban = $user_data['journal_ban'];
+        $user->avatar_ban = $user_data['avatar_ban'];
+        $user->song_ban = $user_data['song_ban'];
 
-        $user->last_login = $result['last_login'];
+        $user->last_login = $user_data['last_login'];
 
-        $user->regen_rate = $result['regen_rate'];
+        $user->regen_rate = $user_data['regen_rate'];
         $user->regen_boost = 0;
 
-        $user->setForbiddenSealFromDb($result['forbidden_seal'], $remote_view);
+        $user->setForbiddenSealFromDb($user_data['forbidden_seal'], $remote_view);
         $user->regen_boost += ceil($user->regen_rate * ($user->forbidden_seal->regen_boost / 100));
 
-        $user->chat_color = $result['chat_color'];
-        $user->chat_effect = $result['chat_effect'];
+        $user->chat_color = $user_data['chat_color'];
+        $user->chat_effect = $user_data['chat_effect'];
 
-        $user->sensei_id = $result['sensei_id'];
-        $user->village = new Village($system, $result['village']);
-        $user->rank_num = $result['rank'];
-        $user->accept_students = $result['accept_students'];
+        $user->sensei_id = $user_data['sensei_id'];
+        $user->village = new Village($system, $user_data['village']);
+        $user->rank_num = $user_data['rank'];
+        $user->accept_students = $user_data['accept_students'];
 
         //Todo: Remove this in a couple months, only a temporary measure to support current bans
         if($user->ban_type) {
@@ -427,7 +427,7 @@ class User extends Fighter {
         // Message blacklist
         $this->blacklist = [];
         $result = $this->system->query("SELECT `blocked_ids` FROM `blacklist` WHERE `user_id`='$this->user_id' LIMIT 1");
-        if($this->system->db_last_num_rows != 0) {
+        if($result->num_rows != 0) {
             $blacklist = $this->system->db_fetch($result);
             $this->blacklist = json_decode($blacklist['blocked_ids'], true);
             $this->original_blacklist = $this->blacklist;

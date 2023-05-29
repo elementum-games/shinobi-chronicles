@@ -267,7 +267,18 @@ class System {
             return false;
         }
 
-        $this->db_query_type = strtolower(substr($query, 0, strpos($query, ' ')));
+        $expected_query_types = [
+            'select',
+            'insert',
+            'update',
+            'delete'
+        ];
+        $normalized_query = trim(strtolower($query));
+        foreach($expected_query_types as $query_type) {
+            if(str_starts_with($normalized_query, $query_type)) {
+                $this->db_query_type = $query_type;
+            }
+        }
 
         if(!$this->con) {
             $this->dbConnect();
