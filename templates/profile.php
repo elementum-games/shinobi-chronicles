@@ -229,6 +229,14 @@ $clan_positions = [
         margin-top: 10px;
         margin-bottom: 10px;
     }
+    .student_message_wrapper {
+        margin-top: 10px;
+    }
+    .label_italics {
+        font-weight: normal;
+        font-style: italic;
+        margin: 0px;
+    }
 </style>
 
 <table class='profile_table table'>
@@ -535,11 +543,6 @@ $clan_positions = [
                                     <?= ucwords($sensei['specialization'])?> (+<?= $sensei['boost_primary'] ?>%) | Other (+<?= $sensei['boost_secondary'] ?>%)
                                 </b>
                             </div>
-                            <div class="sensei_container">
-                                <span>Sensei</span>
-                                <img class="sensei_avatar" src='<?= $player->avatar_link ?>' /><br />
-                                <span><?= $player->user_name ?></span><br />
-                            </div>
                             <?php foreach ($students as $student): ?>
                             <div class="student_container">
                                 <span>Student</span>
@@ -617,7 +620,11 @@ $clan_positions = [
                             </b>
                         </div>
                         <div class="sensei_container">
-                            <span>Sensei</span>
+                            <div>
+                                <p class="label_italics">
+                                    <?= $sensei['bloodline_name'] ?>
+                                </p>
+                            </div>
                             <img class="sensei_avatar" src='<?= $sensei['avatar_link'] ?>'/><br />
                             <span>
                                 <a href='<?= $system->router->links['members'] ?>&user=<?= $sensei['user_name'] ?>'>
@@ -625,34 +632,7 @@ $clan_positions = [
                                 </a>
                             </span>
                         </div>
-                        <?php foreach ($students as $student): ?>
-                        <div class="student_container">
-                            <span>Student</span>
-                            <img class="student_avatar" src='<?= $student->avatar_link ?>'/><br />
-                            <span>
-                                <?php if ($player->user_name == $student->user_name): ?>
-                                    <?= $student->user_name ?>
-                                <?php else: ?>
-                                    <a href='<?= $system->router->links['members'] ?>&user=<?= $student->user_name ?>'>
-                                        <?= $student->user_name ?>
-                                    </a>
-                                <?php endif; ?>
-                            </span>
-                        </div>
-                        <?php endforeach; ?>
-                        <?php if (count($students) < 3): ?>
-                        <?php for ($i = 0; $i < (3 - count($students)); $i++): ?>
-                        <div class="student_container">
-                            <span>Student</span>
-                            <img class="student_avatar" src='../images/default_avatar.png'/><br />
-                            <span>
-                                    (Available)
-                            </span>
-                        </div>
-                        <?php endfor; ?>
-                        <?php endif; ?>
-                        <div><p class="student_message_label">Student Message</p></div>
-                        <div class="message_wrapper"><?= $system->html_parse($sensei['student_message']) ?></div>
+                        <div class="message_wrapper student_message_wrapper"><?= $system->html_parse($sensei['student_message']) ?></div>
                     </div>
                 </td>
             </tr> 

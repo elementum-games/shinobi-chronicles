@@ -80,11 +80,12 @@ class SenseiManager {
 
     public static function getSenseiUserData(int $sensei_id, System $system): array {
         $sensei_data = [];
-        $sensei_result = $system->query("SELECT `user_name`, `user_id`, `avatar_link` FROM `users` WHERE `user_id` = '{$sensei_id}'");
+        $sensei_result = $system->query("SELECT `user_name`, `user_id`, `avatar_link`, `bloodline_name` FROM `users` WHERE `user_id` = '{$sensei_id}'");
         $result = $system->db_fetch($sensei_result);
         $sensei_data['user_name'] = $result['user_name'];
         $sensei_data['user_id'] = $result['user_id'];
         $sensei_data['avatar_link'] = $result['avatar_link'];
+        $sensei_data['bloodline_name'] = $result['bloodline_name'];
         return $sensei_data;
     }
 

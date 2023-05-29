@@ -156,6 +156,25 @@ function members() {
 				$journal = $journal_result['journal'];
 			}
 
+			// Sensei Section
+            $sensei;
+            $students = [];
+            if ($viewUser->sensei_id != 0) {
+                // get sensei table data
+                $sensei = SenseiManager::getSenseiByID($viewUser->sensei_id, $system);
+                // get sensei user data
+                if (!SenseiManager::isSensei($viewUser->user_id, $system)) {
+                    $sensei += SenseiManager::getSenseiUserData($viewUser->sensei_id, $system);
+                }
+            } else if (SenseiManager::isSensei($viewUser->user_id, $system)) {
+                // get sensei table data
+                $sensei = SenseiManager::getSenseiByID($viewUser->user_id, $system);
+                // if sensei has students, get student data
+                if (count($sensei['students']) > 0) {
+                    $students = SenseiManager::getStudentData($sensei['students'], $system);
+                }
+            }
+
             require 'templates/view_user_profile.php';
 
 			$display_list = false;
