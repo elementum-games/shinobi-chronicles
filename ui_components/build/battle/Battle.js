@@ -158,6 +158,7 @@ function FightersAndField({
     fighterLocations: field.fighterLocations,
     selectedJutsu: selectedJutsu,
     isMovementPhase: battle.isMovementPhase,
+    lastTurnLog: battle.lastTurnLog,
     onTileSelect: handleTileSelect
   })))));
 }
