@@ -68,7 +68,7 @@ function userProfile() {
     $student_message_max_length = 500;
     $recruitment_message_max_length = 100;
     if(!empty($_POST['update_student_recruitment'])) {
-        $recruitment_message = $_POST['recruitment_message'];
+        $recruitment_message = $system->clean($_POST['recruitment_message']);
         try {
             isset($_POST['accept_students']) ? $player->accept_students = true : $player->accept_students = false;
             // Update recruitment settings
@@ -85,8 +85,8 @@ function userProfile() {
         $player->updateData();
     }
     if(!empty($_POST['update_student_settings'])) {
-        $student_message = $_POST['student_message'];
-        $specialization = $_POST['specialization'];
+        $student_message = $system->clean($_POST['student_message']);
+        $specialization = $system->clean($_POST['specialization']);
         try {
             // Update student settings
             $success = SenseiManager::updateStudentSettings($player->user_id, $student_message, $specialization, $system);

@@ -319,5 +319,3 @@ class SenseiManager {
         return $isSensei;
     }
 }
-
-?>
