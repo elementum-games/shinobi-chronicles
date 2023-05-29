@@ -112,10 +112,6 @@ function userProfile() {
         if (!SenseiManager::isSensei($player->user_id, $system)) {
             $sensei += SenseiManager::getSenseiUserData($player->sensei_id, $system);
         }
-        // if sensei has students, get student data
-        if (count($sensei['students']) > 0) {
-            $students = SenseiManager::getStudentData($sensei['students'], $system);
-        }
     }
     else if (SenseiManager::isSensei($player->user_id, $system)) {
         // get sensei table data

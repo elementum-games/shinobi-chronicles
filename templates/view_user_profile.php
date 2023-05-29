@@ -60,7 +60,22 @@ $clan_positions = array(
 			<label style='width:6.5em;'>Village:</label> <?= $viewUser->village->name ?><br />
 			<label style='width:6.5em;'>Bloodline:</label> <?= ($viewUser->bloodline_id ? $viewUser->bloodline_name : "None") ?>
             <br />
-
+            <?php if (SenseiManager::isSensei($viewUser->user_id, $system)): ?>
+                <label style='width:6.5em;'>Students:</label>
+                <?php foreach ($students as $student): ?>
+                    <a href='<?= $system->router->getUrl('members', ['user' => $student->user_name])?>'>
+                        <?= $student->user_name ?></a>
+                <?php endforeach; ?>
+                <?php if (count($students) == 0): ?>
+                    None
+                <?php endif; ?>
+                <br />
+            <?php endif; ?>
+            <?php if ($viewUser->sensei_id != 0): ?>
+            <label style='width:6.5em;'>Sensei:</label>
+            <a href='<?= $system->router->getUrl('members', ['user' => $sensei['user_name']])?>'>
+                <?= $sensei['user_name'] ?></a><br />
+            <?php endif; ?>
             <?php if($viewUser->clan): ?>
                 <label style='width:6.5em;'>Clan:</label> <?= $viewUser->clan->name ?><br />
                 <?php if($viewUser->clan_office): ?>
