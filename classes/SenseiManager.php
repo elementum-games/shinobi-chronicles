@@ -38,7 +38,7 @@ class SenseiManager {
         return $boost;
     }
 
-    public static function getSenseiByVillage($village_name, System $system): array {
+    public static function getSenseiByVillage(string $village_name, System $system): array {
         $sensei_list = [];
         $sensei_table_result = $system->query(
 			"SELECT `sensei`.`sensei_id`, `students`, `recruitment_message`, `graduated`, `specialization`, `avatar_link`, `user_name`, `bloodline_name` FROM `sensei`
@@ -205,7 +205,7 @@ class SenseiManager {
         if (count($students) < 3) {
             $system->query("START TRANSACTION;");
             $system->query("INSERT INTO `student_applications` (`sensei_id`, `student_id`)
-            SELECT '{$sensei_id}', '{$student_id}'
+            SELECT '{$sensei_id}', '{$student_id}' FROM DUAL
             WHERE NOT EXISTS (SELECT 1 FROM `student_applications` WHERE `sensei_id` = '{$sensei_id}' AND `student_id` = '{$student_id}')");
             $system->query("COMMIT;");
         }
