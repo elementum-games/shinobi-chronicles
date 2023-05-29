@@ -145,6 +145,16 @@ function validateField($var_name, $input, $FORM_DATA, $field_constraints, &$all_
             }
         }
     }
+    // Check number min/max
+    if(in_array($field_constraints['data_type'], ['int', 'float'])) {
+        if(isset($field_constraints['min']) && $data[$var_name] < $field_constraints['min']) {
+            throw new Exception(System::unSlug($var_name) . " cannot be lower than {$field_constraints['min']}!");
+        }
+        if(isset($field_constraints['max']) && $data[$var_name] > $field_constraints['max']) {
+            throw new Exception(System::unSlug($var_name) . " cannot be higher than {$field_constraints['max']}!");
+        }
+    }
+
     // Check max length
     if(isset($field_constraints['max_length'])) {
         if(strlen($data[$var_name]) > $field_constraints['max_length']) {

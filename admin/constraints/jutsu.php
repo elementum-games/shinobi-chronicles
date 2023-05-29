@@ -48,6 +48,12 @@ return [
         'data_type' => 'float',
         'input_type' => 'text',
     ],
+    'range' => [
+        'data_type' => 'int',
+        'input_type' => 'text',
+        'min' => 1,
+        'max' => 10,
+    ],
     // We validate hand seals manually
 /*    'hand_seals' => [
         'data_type' => 'string',

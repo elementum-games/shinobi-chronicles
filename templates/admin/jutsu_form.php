@@ -31,6 +31,9 @@
 <label for="power">Power:</label>
 <input type="number" name="power" step="0.1" value="<?= $existing_jutsu->power ?? 1.0 ?>" min="1.0"><br />
 
+<label for="range">Range:</label>
+<input type="number" name="range" step="1" value="<?= $existing_jutsu->range ?? 1 ?>" min="1" max="10"><br />
+
 <label for="element">Element:</label>
 <select name="element">
     <?php foreach($jutsu_constraints['element']['options'] as $option): ?>

@@ -182,7 +182,7 @@ class Jutsu {
             rank: $jutsu_data['rank'],
             jutsu_type: $jutsu_data['jutsu_type'],
             base_power: $jutsu_data['power'],
-            range: 2,
+            range: $jutsu_data['range'],
             effect: $jutsu_data['effect'],
             base_effect_amount: $jutsu_data['effect_amount'],
             effect_length: $jutsu_data['effect_length'],
