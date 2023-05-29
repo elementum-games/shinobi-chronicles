@@ -21,9 +21,6 @@ if($system->db_last_num_rows) {
 
     $battle_route = null;
     foreach(Router::$routes as $page_id => $page) {
-        if(empty($page->battle_api_function_name)) {
-            continue;
-        }
         if(empty($page->battle_type)) {
             continue;
         }
@@ -40,11 +37,31 @@ if($system->db_last_num_rows) {
     require(__DIR__ . '/../pages/' . $battle_route->file_name);
 
     try {
-        /** @var BattlePageAPIResponse $response */
-        $response = ($battle_route->battle_api_function_name)($system, $player);
+        switch($battle_route->battle_type) {
+            case Battle::TYPE_AI_ARENA:
+                $response = arenaFightAPI($system, $player);
+                break;
+            case Battle::TYPE_AI_MISSION:
+                $response = missionFightAPI($system, $player);
+                break;
+            case Battle::TYPE_SPAR:
+                $response = sparFightAPI($system, $player);
+                break;
+            case Battle::TYPE_FIGHT:
+                $response = battleFightAPI($system, $player);
+                break;
+            case Battle::TYPE_AI_RANKUP:
+                $response = rankupFightAPI($system, $player);
+                break;
+            default:
+                throw new Exception("Invalid battle route!");
+        }
+
         if(!($response instanceof BattlePageAPIResponse)) {
             API::exitWithError("Invalid battle API response! - Expected BattlePageAPIResponse, got " . get_class($response));
         }
+
+        $player->updateData();
     } catch (Throwable $e) {
         API::exitWithError(
             message: $e->getMessage(),

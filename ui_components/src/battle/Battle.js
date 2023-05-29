@@ -95,6 +95,13 @@ function Battle({
             .then(handleApiResponse);
         }
     };
+    const handleForfeit = () => {
+        apiFetch(
+            battleApiLink,
+            { forfeit: "yes" }
+        )
+        .then(handleApiResponse);
+    };
 
     return <div>
         <p className='systemMessage'>{error}</p>
@@ -113,6 +120,7 @@ function Battle({
                 attackInput={attackInput}
                 updateAttackInput={updateAttackInput}
                 isAttackSelected={isSelectingTile}
+                forfeitBattle={handleForfeit}
             />
         )}
         <BattleLog
@@ -120,7 +128,7 @@ function Battle({
             leftFighterId={battle.playerId}
             rightFighterId={battle.opponentId}
         />
-        {battleResult && <BattleResult description={battleResult} />}
+        {battleResult && <BattleResult description={battleResult} isBattleComplete={battle.isComplete} />}
     </div>;
 }
 
@@ -194,6 +202,7 @@ function FightersAndField({
                         fighterLocations={field.fighterLocations}
                         selectedJutsu={selectedJutsu}
                         isMovementPhase={battle.isMovementPhase}
+                        lastTurnLog={battle.lastTurnLog}
                         onTileSelect={handleTileSelect}
                     />
                 </td>
@@ -227,12 +236,15 @@ function SpectateStatus() {
      */
 }
 
-function BattleResult({description}) {
+function BattleResult({description, isBattleComplete}) {
     return <table className='table'>
         <tbody>
             <tr><th>Battle Results</th></tr>
             <tr><td>
                 <div dangerouslySetInnerHTML={{__html: description}}></div>
+                {isBattleComplete &&
+                    <button onClick={() => window.location.assign(window.location.href)}>Continue</button>
+                }
             </td></tr>
         </tbody>
     </table>;

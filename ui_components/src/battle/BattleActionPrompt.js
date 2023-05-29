@@ -10,6 +10,7 @@ type Props = {
     +isAttackSelected: boolean,
     +attackInput: AttackInputFields,
     +updateAttackInput: ($Shape<AttackInputFields>) => void,
+    +forfeitBattle: () => void,
 };
 
 export default function BattleActionPrompt({
@@ -17,6 +18,7 @@ export default function BattleActionPrompt({
     isAttackSelected,
     attackInput,
     updateAttackInput,
+    forfeitBattle,
 }: Props): React$Node {
     if(battle.isComplete) {
         return null;
@@ -88,6 +90,7 @@ export default function BattleActionPrompt({
                     turnSecondsRemaining={battle.turnSecondsRemaining}
                     turnCount={battle.turnCount}
                 />
+                <button onClick={forfeitBattle}>Forfeit</button>
             </td>
         </tr>
         </tbody>

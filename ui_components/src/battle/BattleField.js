@@ -1,7 +1,7 @@
 // @flow strict
 import { FighterAvatar } from "./FighterAvatar.js";
 
-import type { FighterType, BattleFieldTileType, JutsuType } from "./battleSchema.js";
+import type { FighterType, BattleFieldTileType, JutsuType, BattleLogType } from "./battleSchema.js";
 
 type BoundingRect = {|
     +top: number,
@@ -17,6 +17,7 @@ type Props = {|
     +tiles: $ReadOnlyArray<BattleFieldTileType>,
     +selectedJutsu: ?JutsuType,
     +isMovementPhase: boolean,
+    +lastTurnLog: ?BattleLogType,
     +onTileSelect: (tileIndex: number) => void,
 |};
 
@@ -29,6 +30,7 @@ export default function BattleField({
     fighterLocations,
     selectedJutsu,
     isMovementPhase,
+    lastTurnLog,
     onTileSelect
 }: Props): React$Node {
     debug('--- render(BattleField) ---');
@@ -60,6 +62,7 @@ export default function BattleField({
                     fighters={fighters}
                     fighterLocations={fighterLocations}
                     isMovementPhase={isMovementPhase}
+                    lastTurnLog={lastTurnLog}
                     selectedJutsu={selectedJutsu}
                     onTileSelect={onTileSelect}
                 />
@@ -79,6 +82,7 @@ type BattleFieldContentProps = {|
     +fighters: { [ key: string ]: FighterType },
     +fighterLocations: { [ key: string ]: number },
     +isMovementPhase: boolean,
+    +lastTurnLog: ?BattleLogType,
     +selectedJutsu: ?JutsuType,
     +onTileSelect: (tileIndex: number) => void,
 |};
@@ -90,6 +94,7 @@ function BattleFieldContent({
     fighters,
     fighterLocations,
     isMovementPhase,
+    lastTurnLog,
     selectedJutsu,
     onTileSelect
 }: BattleFieldContentProps) {
@@ -273,6 +278,12 @@ function BattleFieldContent({
             fighterLocations={fighterLocations}
             disableTransitions={disableTransitions}
             getBoundingRectForTile={getBoundingRectForTile}
+        />
+        <AttackActionsOccurred
+            lastTurnLog={lastTurnLog}
+            tileSize={tileSize}
+            tilesToDisplay={tilesToDisplay}
+            fighterLocations={fighterLocations}
         />
     </div>;
 }
@@ -556,6 +567,26 @@ function BattleFieldFighters({
             })}
         </React.Fragment>
     );
+}
+
+function AttackActionsOccurred({ lastTurnLog, tileSize, tilesToDisplay, fighterLocations }) {
+    const turnNumber = lastTurnLog?.turnNumber || 0;
+    const [prevTurnNumber, setPrevTurnNumber] = React.useState(turnNumber);
+
+    if(lastTurnLog == null) {
+        return null;
+    }
+
+    if(prevTurnNumber !== turnNumber) {
+        setPrevTurnNumber(turnNumber);
+
+        if(lastTurnLog.isAttackPhase) {
+            console.log(lastTurnLog);
+            // Trigger action displays
+        }
+    }
+
+    return null;
 }
 
 function debug(...contents) {

@@ -17,7 +17,6 @@ class Route {
         public string $function_name,
         public string $menu,
 
-        public string $battle_api_function_name = '',
         public ?int $battle_type = null,
         public ?int $min_rank = null,
 

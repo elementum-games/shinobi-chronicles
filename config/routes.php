@@ -83,7 +83,6 @@ return $routes = [
         title: 'Arena',
         function_name: 'arena',
         menu: Route::MENU_ACTIVITY,
-        battle_api_function_name: 'arenaFightAPI',
         battle_type: Battle::TYPE_AI_ARENA,
         village_ok: Route::NOT_IN_VILLAGE,
     ),
@@ -100,7 +99,6 @@ return $routes = [
         title: 'Missions',
         function_name: 'missions',
         menu: Route::MENU_ACTIVITY,
-        battle_api_function_name: 'missionFightAPI',
         battle_type: Battle::TYPE_AI_MISSION,
         min_rank: 2,
         village_ok: Route::IN_VILLAGE_OKAY
@@ -119,7 +117,6 @@ return $routes = [
         title: 'Spar',
         function_name: 'spar',
         menu: Route::MENU_ACTIVITY,
-        battle_api_function_name: 'sparFightAPI',
         battle_type: Battle::TYPE_SPAR,
         village_ok: Route::IN_VILLAGE_OKAY,
     ),
@@ -224,7 +221,6 @@ return $routes = [
         title: 'Battle',
         function_name: 'battle',
         menu: Route::MENU_NONE,
-        battle_api_function_name: 'battleFightAPI',
         battle_type: Battle::TYPE_FIGHT,
     ),
     25 => new Route(
@@ -232,7 +228,6 @@ return $routes = [
         title: 'Rank Exam',
         function_name: 'rankUp',
         menu: Route::MENU_NONE,
-        battle_api_function_name: 'rankupFightAPI',
         battle_type: Battle::TYPE_AI_RANKUP,
     ),
     27 => new Route(

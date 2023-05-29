@@ -20,7 +20,7 @@ export type BattleType = {|
     +turnCount: number,
     +turnSecondsRemaining: number,
     +lastTurnText: string,
-    +lastTurnLog: BattleLogType,
+    +lastTurnLog: ?BattleLogType,
     +currentPhaseLabel: string,
     +jutsuTypes: {|
         +ninjutsu: string,
@@ -83,6 +83,7 @@ export type WeaponType = {|
 |};
 
 export type BattleLogType = {|
+    +turnNumber: number,
     +isMovementPhase: boolean,
     +isAttackPhase: boolean,
     +isPreparationPhase: boolean,
