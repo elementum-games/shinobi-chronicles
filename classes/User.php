@@ -1269,7 +1269,7 @@ class User extends Fighter {
 
     /* function useJutsu
         pool check, calc exp, etc */
-    public function useJutsu(Jutsu $jutsu): bool {
+    public function useJutsu(Jutsu $jutsu): ActionResult {
         switch($jutsu->jutsu_type) {
             case 'ninjutsu':
             case 'genjutsu':
@@ -1279,12 +1279,11 @@ class User extends Fighter {
                 $energy_type = 'stamina';
                 break;
             default:
-                return false;
+                return ActionResult::failed("Invalid energy type!");
         }
 
         if($this->{$energy_type} < $jutsu->use_cost) {
-            $this->system->message("You do not have enough $energy_type!");
-            return false;
+            return ActionResult::failed("You do not have enough $energy_type!");
         }
 
         switch($jutsu->purchase_type) {
@@ -1292,14 +1291,12 @@ class User extends Fighter {
                 // Element check
                 if($jutsu->element && $jutsu->element != Jutsu::ELEMENT_NONE) {
                     if($this->elements) {
-                        if(array_search($jutsu->element, $this->elements) === false) {
-                            $this->system->message("You do not possess the elemental chakra for this jutsu!");
-                            return false;
+                        if(!in_array($jutsu->element, $this->elements)) {
+                            return ActionResult::failed("You do not possess the elemental chakra for this jutsu!");
                         }
                     }
                     else {
-                        $this->system->message("You do not possess the elemental chakra for this jutsu!");
-                        return false;
+                        return ActionResult::failed("You do not possess the elemental chakra for this jutsu!");
                     }
                 }
 
@@ -1333,11 +1330,10 @@ class User extends Fighter {
                 break;
 
             default:
-                $this->system->message("Invalid jutsu type!");
-                return false;
+                return ActionResult::failed("Invalid jutsu type!");
         }
 
-        return true;
+        return ActionResult::succeeded();
     }
 
     public function getMoney(): int {

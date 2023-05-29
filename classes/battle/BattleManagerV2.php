@@ -11,6 +11,7 @@ require_once __DIR__ . '/BattleAttackHit.php';
 require_once __DIR__ . '/BattleActionProcessor.php';
 require_once __DIR__ . '/AttackTarget.php';
 require_once __DIR__ . '/FighterAction.php';
+require_once __DIR__ . '/../ActionResult.php';
 
 /*
  *
@@ -819,8 +820,9 @@ class BattleManagerV2 {
                 );
             }
 
-            if(!$this->player->useJutsu($player_jutsu)) {
-                throw new Exception($this->system->message);
+            $result = $this->player->useJutsu($player_jutsu);
+            if($result->failed) {
+                throw new Exception($result->error_message);
             }
 
             // Check for weapon if non-BL taijutsu
