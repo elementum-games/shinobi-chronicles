@@ -274,6 +274,11 @@ class System {
             'delete'
         ];
         $normalized_query = trim(strtolower($query));
+
+        // default to first word
+        $this->db_query_type = explode(' ', $normalized_query)[0];
+
+        // double check for expected types in case of weird whitespace
         foreach($expected_query_types as $query_type) {
             if(str_starts_with($normalized_query, $query_type)) {
                 $this->db_query_type = $query_type;
