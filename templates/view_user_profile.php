@@ -105,13 +105,13 @@ $clan_positions = array(
                                 <a href='<?= $system->router->base_url ?>?id=24&invite=1&user_name=<?= $viewUser->user_name ?>'>Invite to Team</a>
                 <?php endif; ?>
             <?php endif; ?>
-            <?php if($player->rank_num < 3 && $player->sensei_id == 0 && $player->village->name == $viewUser->village->name && $viewUser->sensei_id == $viewUser->user_id && $viewUser->accept_students): ?>
+            <?php if($player->rank_num < 3 && $player->sensei_id == 0 && $player->village->name == $viewUser->village->name && SenseiManager::isSensei($viewUser->user_id, $system) && $viewUser->accept_students): ?>
                 &nbsp;&nbsp;|&nbsp;&nbsp;<a href='<?= $system->router->links['villageHQ'] ?>&view=sensei&apply=<?= $viewUser->user_id ?>'>Send Application</a>
             <?php endif; ?>
             <?php if($player->rank_num < 3 && $player->sensei_id == $viewUser->user_id): ?>
             &nbsp;&nbsp;|&nbsp;&nbsp;<a href='<?= $system->router->links['villageHQ'] ?>&view=sensei&leave=true'>Leave Sensei</a>
             <?php endif; ?>
-            <?php if($player->sensei_id == $player->user_id && $viewUser->sensei_id == $player->user_id && $viewUser->user_id != $player->user_id): ?>
+            <?php if(SenseiManager::isSensei($player->user_id, $system) && $viewUser->sensei_id == $player->user_id && $viewUser->user_id != $player->user_id): ?>
             &nbsp;&nbsp;|&nbsp;&nbsp;<a href='<?= $system->router->links['villageHQ'] ?>&view=sensei&kick=<?= $viewUser->user_id ?>'>Kick Student</a>
             <?php endif; ?>
         </td></tr>

@@ -176,7 +176,6 @@ class SenseiManager {
     public static function addSensei(int $sensei_id, $specialization, System $system): bool {
         $db_modified = false;
         $system->query("START TRANSACTION;");
-        $system->query("UPDATE `users` SET `sensei_id` = {$sensei_id} WHERE `user_id` = {$sensei_id}");
         $system->query("INSERT INTO `sensei` (`sensei_id`, `specialization`) VALUES ('{$sensei_id}', '{$specialization}')");
         $system->query("COMMIT;");
         if ($system->db_last_num_rows > 0) {
@@ -291,7 +290,7 @@ class SenseiManager {
 
     public static function hasStudents(int $sensei_id, System $system): bool {
         $hasStudents = false;
-        $sensei_result = $system->query("SELECT 1 FROM `users` WHERE `sensei_id` = '{$sensei_id}' AND `user_id` != '{$sensei_id}'");
+        $sensei_result = $system->query("SELECT 1 FROM `users` WHERE `sensei_id` = '{$sensei_id}'");
         $result = $system->db_fetch($sensei_result);
         if ($system->db_last_num_rows > 0) {
             $hasStudents = true;
@@ -307,6 +306,16 @@ class SenseiManager {
             $hasApplications = true;
         }
         return $hasApplications;
+    }
+
+    public static function isSensei(int $user_id, System $system): bool {
+        $isSensei = false;
+        $sensei_result = $system->query("SELECT 1 FROM `sensei` WHERE `sensei_id` = '{$user_id}'");
+        $result = $system->db_fetch($sensei_result);
+        if ($system->db_last_num_rows > 0) {
+            $isSensei = true;
+        }
+        return $isSensei;
     }
 }
 

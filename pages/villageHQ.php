@@ -263,7 +263,7 @@ function villageHQ() {
 		if (isset($_POST['submit_exam'])) {
 			try {
 				// check if already sensei
-				if ($player->sensei_id != 0) {
+				if (SenseiManager::isSensei($player->sensei_id, $system)) {
                     throw new Exception('You do not meet the requirements!');
                 }
 				// check rank
@@ -291,7 +291,6 @@ function villageHQ() {
 					if (!$success) {
                         throw new Exception('Something went wrong!');
                     }
-					$player->sensei_id = $player->user_id;
 					$system->message("You passed!");
 				}
 				else {
@@ -306,14 +305,13 @@ function villageHQ() {
 		if (isset($_POST['confirm_resignation'])) {
 			try {
 				// check if sensei
-				if ($player->sensei_id != $player->user_id) {
+				if (!SenseiManager::isSensei($player->user_id, $system)) {
                     throw new Exception('You are not a sensei!');
                 }
-                $success = SenseiManager::removeSensei($player->sensei_id, $system);
+                $success = SenseiManager::removeSensei($player->user_id, $system);
 				if (!$success) {
                     throw new Exception('Something went wrong!');
                 }
-				$player->sensei_id = 0;
 				$system->message("You have resigned as Sensei!");
             }
 			catch (Exception $e) {
@@ -368,7 +366,7 @@ function villageHQ() {
                     throw new Exception('You are not eligible to become a student!');
                 }
 				// check is sensei
-				if ($sensei->sensei_id != $sensei->user_id || $sensei->rank_num < 4) {
+				if (!SenseiManager::isSensei($sensei->user_id, $system)) {
                     throw new Exception('Player is not a valid sensei!');
                 }
 				// check village
@@ -448,7 +446,7 @@ function villageHQ() {
 		if (isset($_GET['sensei_exam'])) {
 			try {
 				// check if already sensei
-                if ($player->sensei_id != 0) {
+                if (SenseiManager::isSensei($player->user_id, $system)) {
                     throw new Exception('You do not meet the requirements!');
                 }
                 // check rank
@@ -480,7 +478,7 @@ function villageHQ() {
 		else {
 			$applications = [];
 			// If Sensei
-			if ($player->sensei_id == $player->user_id) {
+			if (SenseiManager::isSensei($player->user_id, $system)) {
                 $applications = SenseiManager::getApplicationsBySensei($player->user_id, $system);
             }
 			// If eligible Student

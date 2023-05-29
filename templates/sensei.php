@@ -104,7 +104,7 @@
     </table>
 <?php endif; ?>
 
-<?php if ($player->sensei_id == '0' && $player->rank_num > 3): ?>
+<?php if (!SenseiManager::isSensei($player->user_id, $system) && $player->rank_num > 3): ?>
     <table class="table">
         <tr>
             <th>
@@ -169,7 +169,7 @@
     </table>
 <?php endif; ?>
 
-<?php if ($player->user_id == $player->sensei_id): ?>
+<?php if (SenseiManager::isSensei($player->user_id, $system)): ?>
     <table class="table">
         <tr>
             <th>
