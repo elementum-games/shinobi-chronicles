@@ -122,7 +122,7 @@ function training() {
 			}
 
 			// Check for sensei training boost
-			if($player->sensei_id != 0 && $player->rank_num < 3) {
+			if($player->sensei_id != 0) {
 				$sensei_boost = SenseiManager::getStudentBoostBySensei($player->sensei_id, $system);
 				if ($train_type == $sensei_boost['specialization'] . "_skill") {
                     $system->message("Your training was reduced by " . ($train_length * ($sensei_boost['boost_primary'] / 100)) . " seconds due to your student boost.");

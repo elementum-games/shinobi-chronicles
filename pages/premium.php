@@ -106,6 +106,9 @@ function premium() {
             if($player->clan_office) {
                 throw new Exception("You must resign from your clan office first!");
             }
+            if (SenseiManager::isSensei($player->user_id, $system)) {
+                throw new Exception("You must resign from being a sensei first!");
+            }
 			if(!isset($_POST['confirm_reset'])) {
                 $confirmation_type = "confirm_reset";
                 $confirmation_string = "Are you sure you want to reset your character? You will lose all your stats,
@@ -873,7 +876,9 @@ function premium() {
                 if ($player->rank_num < 3) {
                     throw new Exception("You must leave your sensei first!");
                 }
-                else if (SenseiManager::hasStudents($player->user_id, $system)) {
+            }
+            if (SenseiManager::isSensei($player->user_id, $system)) {
+                if (SenseiManager::hasStudents($player->user_id, $system)) {
                     throw new Exception("You must leave your students first!");
                 }
             }
@@ -908,8 +913,8 @@ function premium() {
                 }
 
                 //Remove active student applications
-                if ($player->sensei_id == $player->user_id) {
-                    SenseiManager::closeApplicationsBySensei($player->sensei_id, $system);
+                if (SenseiManager::isSensei($player->user_id, $system)) {
+                    SenseiManager::closeApplicationsBySensei($player->user_id, $system);
                 }
                 else if ($player->rank_num < 3) {
                     SenseiManager::closeApplicationsByStudent($player->user_id, $system);
