@@ -321,7 +321,7 @@ function villageHQ() {
 		// If resign clicked, set flag
 		$resign = false;
 		if (isset($_GET['resign'])) {
-            if ($player->sensei_id == $player->user_id) {
+            if (SenseiManager::isSensei($player->user_id, $system)) {
                 $resign = true;
             }
         }
