@@ -313,8 +313,7 @@ class User extends Fighter {
             `village`
 			FROM `users` WHERE `user_id`='$user_id' LIMIT 1"
         );
-        if (isset($system->db_last_num_rows))
-            if ($system->db_last_num_rows == 0) {
+        if($system->db_last_num_rows == 0) {
             throw new Exception("User does not exist!");
         }
 

@@ -75,7 +75,7 @@ class System {
     // Variables for query() function to track things
     public $db_result;
     public string $db_query_type;
-    public int $db_last_num_rows;
+    public int $db_last_num_rows = 0;
     public int $db_last_affected_rows;
     public $db_last_insert_id;
 

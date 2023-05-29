@@ -149,16 +149,17 @@ function spar() {
         NearbyPlayers::renderScoutAreaList($system, $player, $self_link);
 	}
 	else {
+        $user_challenges = [];
+
 		// Load user challenges sent
 		$result = $system->query("SELECT `user_id`, `user_name` FROM `users` WHERE `challenge`='$player->user_id'");
 		if($system->db_last_num_rows > 0) {
-			$user_challenges = array();
 			while($row = $system->db_fetch($result)) {
 				$user_challenges[$row['user_id']] = $row['user_name'];
 			}
 		}
 		
-		if($player->challenge or isset($user_challenges)) {
+		if($player->challenge or count($user_challenges) > 0) {
 			echo "<table class='table'><tr><th>Challenges</th></tr>";
 				
 			// Challenge received
@@ -180,7 +181,7 @@ function spar() {
 
 				}
 			}
-			if($user_challenges) {
+			if(count($user_challenges) > 0) {
 				foreach($user_challenges as $id=>$name) {
 					echo "<tr><td>
 					<p style='display:inline-block;margin:0px;margin-left:20px;'>
