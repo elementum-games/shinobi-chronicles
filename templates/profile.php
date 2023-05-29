@@ -567,7 +567,7 @@ $clan_positions = [
                             <div><p class="student_message_label">Student Message</p></div>
                             <div class="message_wrapper"><?= $system->html_parse($sensei['student_message']) ?></div>
                             <div><textarea id="student_message" name="student_message" class="message_input"><?= $sensei['student_message'] ?></textarea></div>
-                            <div><span id="studentRemainingCharacters" class="red">sdf</span></div>
+                            <div><span id="studentRemainingCharacters" class="red"></span></div>
                             <div class="update_container"><input name="update_student_settings" type="submit" value="Update" /></div>
                         </form>
                     </div>
@@ -585,7 +585,7 @@ $clan_positions = [
                             <div><p class="recruitment_message_wrapper">Recruitment Message</p></div>
                             <div class="message_wrapper"><?= $system->html_parse($sensei['recruitment_message']) ?></div>
                             <textarea id="recruitment_message" name="recruitment_message" class="message_input"><?= $sensei['recruitment_message'] ?></textarea>
-                            <div><span id="recruitmentRemainingCharacters" class="red">dsf</span></div>
+                            <div><span id="recruitmentRemainingCharacters" class="red"></span></div>
                             <div class="update_container"><input name="update_student_recruitment" type="submit" value="Update" /></div>
                         </form>
                      </div>
