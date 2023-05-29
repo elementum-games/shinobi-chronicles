@@ -263,6 +263,20 @@ class BattleManagerV2 {
             return $this->battle->winner;
         }
 
+        if(!empty($_POST['forfeit'])) {
+            $this->player->health = 0;
+
+            $this->battle->current_turn_log->addFighterActionDescription(
+                $this->player,
+                $this->player->getName() . ' forfeits.'
+            );
+
+            $this->checkForWinner();
+            $this->updateData();
+
+            return $this->battle->winner;
+        }
+
         if($this->battle->isPreparationPhase()) {
             $this->runPlayerHealItemAction($_POST);
             return false;

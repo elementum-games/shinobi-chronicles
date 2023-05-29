@@ -3,7 +3,8 @@ export default function BattleActionPrompt({
   battle,
   isAttackSelected,
   attackInput,
-  updateAttackInput
+  updateAttackInput,
+  forfeitBattle
 }) {
   if (battle.isComplete) {
     return null;
@@ -54,7 +55,9 @@ export default function BattleActionPrompt({
   }, /*#__PURE__*/React.createElement(TimeRemaining, {
     turnSecondsRemaining: battle.turnSecondsRemaining,
     turnCount: battle.turnCount
-  })))));
+  }), /*#__PURE__*/React.createElement("button", {
+    onClick: forfeitBattle
+  }, "Forfeit")))));
 }
 
 function TimeRemaining({

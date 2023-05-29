@@ -139,6 +139,8 @@ function arenaFightAPI(System $system, User $player): BattlePageAPIResponse {
         if($battle->isComplete()) {
             $response->battle_result = processArenaBattleEnd($battle, $player);
         }
+
+        $player->updateData();
     } catch(Exception $e) {
         $response->errors[] = $e->getMessage();
     }
