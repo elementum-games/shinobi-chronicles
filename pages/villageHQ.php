@@ -328,7 +328,7 @@ function villageHQ() {
 		// If kick student
 		if (isset($_GET['kick'])) {
 			try {
-				$success = SenseiManager::removeStudent($player->user_id, $_GET['kick'], $system);
+				$success = SenseiManager::removeStudent($player->user_id, (int)$_GET['kick'], $system);
 				if (!$success) {
                     throw new Exception('Something went wrong!');
                 }
@@ -355,7 +355,7 @@ function villageHQ() {
 		// If create application
 		if (isset($_GET['apply'])) {
             try {
-				$sensei = User::loadFromId($system, $_GET['apply'], true);
+				$sensei = User::loadFromId($system, (int)$_GET['apply'], true);
 				// check if already student
 				if ($player->sensei_id != 0) {
                     throw new Exception('You already have a sensei!');
@@ -377,7 +377,7 @@ function villageHQ() {
 				if (!$sensei->accept_students) {
                     throw new Exception('Player is not accepting students!');
                 }
-				$success = SenseiManager::createApplication($_GET['apply'], $player->user_id, $system);
+				$success = SenseiManager::createApplication((int)$_GET['apply'], $player->user_id, $system);
 				if (!$success) {
                     throw new Exception('Something went wrong!');
                 }
@@ -390,7 +390,7 @@ function villageHQ() {
 		// If cancel application
 		if (isset($_GET['close'])) {
             try {
-				$success = SenseiManager::closeApplication($_GET['close'], $player->user_id, $system);
+				$success = SenseiManager::closeApplication((int)$_GET['close'], $player->user_id, $system);
 				if (!$success) {
                     throw new Exception('Something went wrong!');
                 }
@@ -403,7 +403,7 @@ function villageHQ() {
 		// If accept application
 		if (isset($_GET['accept'])) {
             try {
-				$success = SenseiManager::acceptApplication($player->user_id, $_GET['accept'], $system);
+				$success = SenseiManager::acceptApplication($player->user_id, (int)$_GET['accept'], $system);
 				if (!$success) {
                     throw new Exception('Something went wrong!');
                 }
@@ -416,7 +416,7 @@ function villageHQ() {
 		// If deny application
 		if (isset($_GET['deny'])) {
             try {
-				$success = SenseiManager::closeApplication($player->user_id, $_GET['deny'], $system);
+				$success = SenseiManager::closeApplication($player->user_id, (int)$_GET['deny'], $system);
 				if (!$success) {
                     throw new Exception('Something went wrong!');
                 }
@@ -432,7 +432,7 @@ function villageHQ() {
 				if (!$player->staff_manager->isModerator()) {
                     throw new Exception('Not a moderator!');
                 }
-				$success = SenseiManager::updateStudentRecruitment($_GET['clear'], '', $system);
+				$success = SenseiManager::updateStudentRecruitment((int)$_GET['clear'], '', $system);
 				if (!$success) {
                     throw new Exception('Something went wrong!');
                 }
@@ -488,7 +488,7 @@ function villageHQ() {
 			// If staff
 			if (isset($_GET['village'])) {
                 if ($player->staff_manager->isModerator()) {
-					$sensei_list = SenseiManager::getSenseiByVillage($_GET['village'], $system);
+					$sensei_list = SenseiManager::getSenseiByVillage($system->clean($_GET['village']), $system);
 				}
 				else {
 					$sensei_list = SenseiManager::getSenseiByVillage($player->village->name, $system);
