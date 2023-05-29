@@ -93,11 +93,11 @@ function editJutsuPage(System $system, array $RANK_NAMES) {
     $ALL_JUTSU = Jutsu::fetchAll($system);
 
     /* Variables */
-    $variables = require 'admin/constraints/jutsu.php';
+    $jutsu_constraints = require 'admin/constraints/jutsu.php';
 
     // Validate jutsu id
     $jutsu_id = null;
-    $jutsu_data = null;
+    $jutsu = null;
     if(!empty($_GET['jutsu_id'])) {
         $jutsu_id = (int)$_GET['jutsu_id'];
 
@@ -108,6 +108,7 @@ function editJutsuPage(System $system, array $RANK_NAMES) {
         }
         else {
             $jutsu_data = $system->db_fetch($result);
+            $jutsu = Jutsu::fromArray($jutsu_data['jutsu_id'], $jutsu_data);
             $select_jutsu = false;
         }
     }
@@ -120,7 +121,7 @@ function editJutsuPage(System $system, array $RANK_NAMES) {
             unset($form_data['hand_seals']);
 
             $data = [];
-            validateFormData($variables, $data, $editing_jutsu_id);
+            validateFormData($jutsu_constraints, $data, $editing_jutsu_id);
 
             // Do manual hand seal validation
             if($form_data['jutsu_type'] == Jutsu::TYPE_TAIJUTSU) {
@@ -130,7 +131,7 @@ function editJutsuPage(System $system, array $RANK_NAMES) {
                 $data['hand_seals'] = validateHandSeals(
                     system: $system,
                     raw_hand_seals: $_POST['hand_seals'] ?? null,
-                    jutsu_id: null,
+                    jutsu_id: $jutsu->id,
                     ALL_JUTSU: $ALL_JUTSU
                 );
             }
@@ -148,7 +149,7 @@ function editJutsuPage(System $system, array $RANK_NAMES) {
                 }
                 $count++;
             }
-            $query .= "WHERE `jutsu_id`='{$jutsu_data['jutsu_id']}'";
+            $query .= "WHERE `jutsu_id`='{$jutsu->id}'";
 
             //echo $query;
             $system->query($query);
@@ -167,23 +168,9 @@ function editJutsuPage(System $system, array $RANK_NAMES) {
     }
 
     // Form for editing data
-    if($jutsu_data && !$select_jutsu) {
-        $data =& $jutsu_data;
-        echo "<p style='text-align:center;margin-top:20px;margin-bottom:-5px;'>
-                <a href='$self_link' style='font-size:14px;'>Back to jutsu list</a>
-            </p>
-            <table class='table'>
-                <tr><th>Edit Jutsu (" . stripslashes($jutsu_data['name']) . ")</th></tr>
-                <tr><td>
-                <form action='$self_link&jutsu_id={$jutsu_data['jutsu_id']}&jutsu_type={$jutsu_data['jutsu_type']}' method='post'>
-                <label>Jutsu ID:</label> $jutsu_id<br />";
-        displayFormFields($variables, $data);
-        echo "<br />
-                
-                <input type='submit' name='jutsu_data' value='Edit' />
-                </form>
-                </td></tr>
-			</table>";
+    if($jutsu && !$select_jutsu) {
+        $existing_jutsu = $jutsu;
+        require 'templates/admin/edit_jutsu.php';
     }
 
     // Show form for selecting ID
