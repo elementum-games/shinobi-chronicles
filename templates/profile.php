@@ -237,9 +237,6 @@ $clan_positions = [
         font-style: italic;
         margin: 0px;
     }
-    .leave_sensei_wrapper {
-        margin: 20px 0px 10px 0px;
-    }
 </style>
 
 <table class='profile_table table'>
