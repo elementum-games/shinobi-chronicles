@@ -60,6 +60,8 @@ if($system->db_last_num_rows) {
         if(!($response instanceof BattlePageAPIResponse)) {
             API::exitWithError("Invalid battle API response! - Expected BattlePageAPIResponse, got " . get_class($response));
         }
+
+        $player->updateData();
     } catch (Throwable $e) {
         API::exitWithError(
             message: $e->getMessage(),
