@@ -20,10 +20,10 @@ class SenseiManager {
         return $passed;
     }
 
-    public static function getStudentBoost(int $graduated): array {
+    public static function getStudentBoost(int $graduated_count): array {
         $boost = [];
         foreach (self::$boost_tiers as $key => $tier) {
-            if ($graduated >= $key) {
+            if ($graduated_count >= $key) {
                 $boost = $tier;
             }
         }
@@ -31,9 +31,9 @@ class SenseiManager {
     }
 
     public static function getStudentBoostBySensei(int $sensei_id, System $system): array {
-        $sensei_result = $system->query("SELECT `graduated`, `specialization` FROM `sensei` where `sensei_id` = '{$sensei_id}'");
+        $sensei_result = $system->query("SELECT `graduated_count`, `specialization` FROM `sensei` where `sensei_id` = '{$sensei_id}'");
         $result = $system->db_fetch($sensei_result);
-        $boost = SenseiManager::getStudentBoost((int)$result['graduated']);
+        $boost = SenseiManager::getStudentBoost((int)$result['graduated_count']);
         $boost['specialization'] = $result['specialization'];
         return $boost;
     }
@@ -41,15 +41,15 @@ class SenseiManager {
     public static function getSenseiByVillage(string $village_name, System $system): array {
         $sensei_list = [];
         $sensei_table_result = $system->query(
-			"SELECT `sensei`.`sensei_id`, `students`, `recruitment_message`, `graduated`, `specialization`, `avatar_link`, `user_name`, `bloodline_name` FROM `sensei`
+			"SELECT `sensei`.`sensei_id`, `students`, `recruitment_message`, `graduated_count`, `specialization`, `avatar_link`, `user_name`, `bloodline_name` FROM `sensei`
 			INNER JOIN `users` ON `sensei`.`sensei_id` = `users`.`user_id`
-			WHERE `village` = '{$village_name}' AND `accept_students` = '1' ORDER BY `graduated` DESC");
+			WHERE `village` = '{$village_name}' AND `accept_students` = '1' ORDER BY `graduated_count` DESC");
         while ($result = $system->db_fetch($sensei_table_result)) {
             $sensei_list[] = [
                 'sensei_id' => $result['sensei_id'],
                 'students' => json_decode($result['students']),
                 'recruitment_message' => $result['recruitment_message'],
-                'graduated' => $result['graduated'],
+                'graduated' => $result['graduated_count'],
                 'specialization' => $result['specialization'],
 			    'avatar_link' => $result['avatar_link'],
 			    'user_name' => $result['user_name'],
@@ -65,14 +65,14 @@ class SenseiManager {
 
     public static function getSenseiByID(int $sensei_id, System $system): array {
         $sensei = [];
-        $sensei_table_result = $system->query("SELECT `students`, `recruitment_message`, `student_message`, `graduated`, `specialization` FROM `sensei` WHERE `sensei_id` = '{$sensei_id}'");
+        $sensei_table_result = $system->query("SELECT `students`, `recruitment_message`, `student_message`, `graduated_count`, `specialization` FROM `sensei` WHERE `sensei_id` = '{$sensei_id}'");
         $result = $system->db_fetch($sensei_table_result);
         $sensei = array(
             'sensei_id' => $sensei_id,
             'students' => json_decode($result['students']),
             'recruitment_message' => $result['recruitment_message'],
             'student_message' => $result['student_message'],
-            'graduated' => $result['graduated'],
+            'graduated' => $result['graduated_count'],
             'specialization' => $result['specialization']
         );
         return $sensei;
@@ -274,17 +274,22 @@ class SenseiManager {
         return $db_modified;
     }
 
-    public static function incrementGraduated(int $sensei_id, System $system): bool {
+    public static function incrementGraduatedCount(int $sensei_id, int $student_id, System $system): bool {
         $db_modified = false;
-        $system->query("START TRANSACTION;");
-        $sensei_result = $system->query("SELECT `graduated` FROM `sensei` WHERE `sensei_id` = '{$sensei_id}'");
+        $sensei_result = $system->query("SELECT `graduated_count`, `graduated_students` FROM `sensei` WHERE `sensei_id` = '{$sensei_id}'");
         $result = $system->db_fetch($sensei_result);
-        $graduated = (int)$result['graduated'];
-        $graduated++;
-        $system->query("UPDATE `sensei` SET `graduated` = {$graduated} WHERE `sensei_id` = '{$sensei_id}'");
-        $system->query("COMMIT;");
-        if ($system->db_last_num_rows > 0) {
-            $db_modified = true;
+        $graduated_students = json_decode($result['graduated_students']);
+        if (!in_array($student_id, $graduated_students)) {
+            array_push($graduated_students, $student_id);
+            $graduated_students = "[" . implode(', ', $graduated_students) . "]";
+            $graduated_count = (int)$result['graduated_count'];
+            $graduated_count++;
+            $system->query("START TRANSACTION;");
+            $system->query("UPDATE `sensei` SET `graduated_count` = {$graduated_count}, `graduated_students` = '{$graduated_students}' WHERE `sensei_id` = '{$sensei_id}'");
+            $system->query("COMMIT;");
+            if ($system->db_last_num_rows > 0) {
+                $db_modified = true;
+            }
         }
         return $db_modified;
     }
