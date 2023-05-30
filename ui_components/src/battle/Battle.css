@@ -9,6 +9,10 @@
 
     margin: -5px; /* Offset the TD padding */
     overflow: hidden;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
 }
 
 .tilesContainer {
@@ -101,6 +105,17 @@
 }
 .tile.attackPreview:hover {
     background: rgba(50, 50, 175, 0.4);
+}
+
+.attackDisplay {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    z-index: 4;
+}
+.projectile.left {
+    transform: scaleX(-1);
 }
 
 /* BATTLE ACTION PROMPT */

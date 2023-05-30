@@ -59,7 +59,7 @@ class BattleLogV2 {
     }
 
     public function addFighterAttackHit(
-        Fighter $attacker, Fighter $target, string $damage_type, float $damage
+        Fighter $attacker, Fighter $target, string $damage_type, float $damage, int $time_occurred
     ): void {
         $fighter_action_log = $this->getFighterActionLog($attacker->combat_id);
         $fighter_action_log->hits[] = new AttackHitLog(
@@ -69,6 +69,7 @@ class BattleLogV2 {
             target_name: $target->getName(),
             damage_type: $damage_type,
             damage: $damage,
+            time_occurred: $time_occurred
         );
     }
 
@@ -244,6 +245,7 @@ class AttackHitLog {
         public string $target_name,
         public string $damage_type,
         public float $damage,
+        public int $time_occurred
     ) {}
 
     public static function fromArray($array): AttackHitLog {
@@ -254,6 +256,7 @@ class AttackHitLog {
             target_name: $array['target_name'],
             damage_type: $array['damage_type'],
             damage: $array['damage'],
+            time_occurred: $array['time_occurred'] ?? 0
         );
     }
 }

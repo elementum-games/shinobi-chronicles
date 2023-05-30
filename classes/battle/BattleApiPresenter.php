@@ -172,6 +172,7 @@ class BattleApiPresenter {
                                 'targetName' => self::unescapeQuotes($hit->target_name),
                                 'damageType' => $hit->damage_type,
                                 'damage' => $hit->damage,
+                                'timeOccurred' => $hit->time_occurred
                             ];
                         }, $action_log->hits),
                         "effectHits" => array_map(function(EffectHitLog $hit) {

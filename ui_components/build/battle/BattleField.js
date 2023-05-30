@@ -7,6 +7,7 @@ export default function BattleField({
   fighterLocations,
   selectedJutsu,
   isMovementPhase,
+  lastTurnLog,
   onTileSelect
 }) {
   debug('--- render(BattleField) ---');
@@ -29,7 +30,7 @@ export default function BattleField({
   return /*#__PURE__*/React.createElement("div", {
     className: `battleFieldContainer`,
     style: {
-      height: tileSize
+      height: tileSize + 10
     },
     ref: setContainerRef
   }, containerSize != null && /*#__PURE__*/React.createElement(BattleFieldContent, {
@@ -40,6 +41,7 @@ export default function BattleField({
     fighters: fighters,
     fighterLocations: fighterLocations,
     isMovementPhase: isMovementPhase,
+    lastTurnLog: lastTurnLog,
     selectedJutsu: selectedJutsu,
     onTileSelect: onTileSelect
   }));
@@ -53,6 +55,7 @@ function BattleFieldContent({
   fighters,
   fighterLocations,
   isMovementPhase,
+  lastTurnLog,
   selectedJutsu,
   onTileSelect
 }) {
@@ -203,6 +206,12 @@ function BattleFieldContent({
     fighterLocations: fighterLocations,
     disableTransitions: disableTransitions,
     getBoundingRectForTile: getBoundingRectForTile
+  }), /*#__PURE__*/React.createElement(AttackActionsOccurred, {
+    lastTurnLog: lastTurnLog,
+    tileSize: tileSize,
+    tilesToDisplay: tilesToDisplay,
+    fighterLocations: fighterLocations,
+    getBoundingRectForTile: getBoundingRectForTile
   }));
 }
 
@@ -319,7 +328,7 @@ function BattleFieldFighters({
   disableTransitions,
   getBoundingRectForTile
 }) {
-  const fighterDisplaySize = 25;
+  const fighterDisplaySize = 30;
 
   const fightersForIds = ids => {
     return ids.map(id => fighters[id]).filter(Boolean);
@@ -428,6 +437,103 @@ function BattleFieldFighters({
       maxAvatarSize: 20,
       includeContainer: false
     }));
+  }));
+}
+
+function AttackActionsOccurred({
+  lastTurnLog,
+  tileSize,
+  tilesToDisplay,
+  fighterLocations,
+  getBoundingRectForTile
+}) {
+  const turnNumber = lastTurnLog?.turnNumber || 0;
+  const [prevTurnNumber, setPrevTurnNumber] = React.useState(turnNumber);
+  const [attacksToRender, setAttacksToRender] = React.useState([]);
+
+  if (lastTurnLog == null) {
+    return null;
+  }
+
+  const renderProjectileAttack = (fighterId, element, targetType, jutsuType, pathSegments, hits) => {
+    element = "fire";
+    console.log('renderProjectileAttack', pathSegments);
+    const startingTileIndex = pathSegments[0].tileIndex;
+    const endingTileIndex = pathSegments[pathSegments.length - 1].tileIndex;
+    const travelTimePerTile = 500; // fireball appears at player's tile, flies to end of its range, then disappears
+
+    setAttacksToRender(prevValue => [...prevValue, {
+      fighterId: fighterId,
+      startingTileIndex: startingTileIndex,
+      endingTileIndex: endingTileIndex,
+      durationMs: Math.abs(endingTileIndex - startingTileIndex) * travelTimePerTile
+    }]);
+  };
+
+  if (prevTurnNumber !== turnNumber) {
+    setPrevTurnNumber(turnNumber);
+    setAttacksToRender([]);
+
+    if (lastTurnLog.isAttackPhase) {
+      console.log(lastTurnLog); // Trigger action displays
+
+      Object.values(lastTurnLog.fighterActions).forEach(action => {
+        if (action.jutsuUseType === 'projectile' && action.jutsuType === 'ninjutsu') {
+          renderProjectileAttack(action.fighterId, action.jutsuElement, action.jutsuTargetType, action.jutsuType, action.pathSegments, action.hits);
+        }
+      });
+    }
+  }
+
+  console.log('attacksToRender', attacksToRender);
+  return /*#__PURE__*/React.createElement(React.Fragment, null, attacksToRender.map((attack, i) => {
+    const startingTileRect = getBoundingRectForTile(attack.startingTileIndex);
+    const endingTileRect = getBoundingRectForTile(attack.endingTileIndex);
+    const direction = attack.startingTileIndex > fighterLocations[attack.fighterId] ? "right" : "left"; // move attack start 0.5 tile closer to caster
+
+    const offset = (fighterLocations[attack.fighterId] - attack.startingTileIndex) * 0.5 * tileSize;
+    startingTileRect.left += offset;
+    const leftDifference = endingTileRect.left - startingTileRect.left;
+    return /*#__PURE__*/React.createElement(React.Fragment, {
+      key: `attack_container:${i}`
+    }, /*#__PURE__*/React.createElement("style", {
+      key: `attack_style:${i}`
+    }, `
+                        @keyframes attack_${i} {
+                            0% {
+                                transform: translateX(0px);
+                                opacity: 1;
+                            }
+                            85% {
+                                transform: translateX(${leftDifference}px);
+                                opacity: 1;
+                            }
+                            100% {
+                                transform: translateX(${leftDifference}px);
+                                opacity: 0;
+                            }
+                        }
+                    `), /*#__PURE__*/React.createElement("div", {
+      key: `attack:${i}`,
+      className: "attackDisplay",
+      style: {
+        top: startingTileRect.top,
+        left: startingTileRect.left,
+        width: startingTileRect.width,
+        height: startingTileRect.height,
+        animationName: `attack_${i}`,
+        animationDuration: `${attack.durationMs}ms`,
+        animationFillMode: "forwards",
+        animationTimingFunction: "linear"
+      }
+    }, /*#__PURE__*/React.createElement("img", {
+      src: "/images/battle/fireball.png",
+      className: `projectile ${direction}`,
+      style: {
+        width: 50,
+        height: 50
+      }
+    })));
   }));
 }
 

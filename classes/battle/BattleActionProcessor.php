@@ -117,12 +117,9 @@ class BattleActionProcessor {
             );
 
             foreach($player1_attack->hits as $hit) {
-                /** @var BattleAttackHit $hit */
                 $this->applyAttackHit(
                     attack: $player1_attack,
-                    user: $hit->attacker,
-                    target: $hit->target,
-                    raw_damage: $hit->raw_damage
+                    hit: $hit,
                 );
             }
         }
@@ -153,12 +150,9 @@ class BattleActionProcessor {
             );
 
             foreach($player2_attack->hits as $hit) {
-                /** @var BattleAttackHit $hit */
                 $this->applyAttackHit(
                     attack: $player2_attack,
-                    user: $hit->attacker,
-                    target: $hit->target,
-                    raw_damage: $hit->raw_damage
+                    hit: $hit,
                 );
             }
         }
@@ -449,6 +443,7 @@ class BattleActionProcessor {
                     attacker: $attacker,
                     target: $fighter,
                     raw_damage: $path_segment->raw_damage,
+                    time_occurred: $path_segment->time_arrived
                 );
             }
         }
@@ -812,7 +807,11 @@ class BattleActionProcessor {
         }
     }
 
-    protected function applyAttackHit(BattleAttackV2 $attack, Fighter $user, Fighter $target, float $raw_damage): void {
+    protected function applyAttackHit(BattleAttackV2 $attack, BattleAttackHit $hit): void {
+        $user = $hit->attacker;
+        $target = $hit->target;
+        $raw_damage = $hit->raw_damage;
+
         $attack_damage = $raw_damage;
         if(empty($attack->jutsu->effect_only)) {
             $attack_damage = $target->calcDamageTaken($attack->starting_raw_damage, $attack->jutsu->jutsu_type);
@@ -864,7 +863,8 @@ class BattleActionProcessor {
                 attacker: $user,
                 target: $target,
                 damage_type: $attack->jutsu->jutsu_type,
-                damage: $attack_damage
+                damage: $attack_damage,
+                time_occurred: $hit->time_occurred
             );
         }
 
