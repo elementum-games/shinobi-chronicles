@@ -1,14 +1,8 @@
 // @flow strict
 import { FighterAvatar } from "./FighterAvatar.js";
+import { PlayAttackActions} from "./PlayAttackActions.js";
 
-import type { FighterType, BattleFieldTileType, JutsuType, BattleLogType } from "./battleSchema.js";
-
-type BoundingRect = {|
-    +top: number,
-    +left: number,
-    +width: number,
-    +height: number,
-|};
+import type { FighterType, BattleFieldTileType, JutsuType, BattleLogType, BoundingRect } from "./battleSchema.js";
 
 type Props = {|
     +player: FighterType,
@@ -279,10 +273,9 @@ function BattleFieldContent({
             disableTransitions={disableTransitions}
             getBoundingRectForTile={getBoundingRectForTile}
         />
-        <AttackActionsOccurred
+        <PlayAttackActions
             lastTurnLog={lastTurnLog}
             tileSize={tileSize}
-            tilesToDisplay={tilesToDisplay}
             fighterLocations={fighterLocations}
             getBoundingRectForTile={getBoundingRectForTile}
         />
@@ -570,126 +563,7 @@ function BattleFieldFighters({
     );
 }
 
-function AttackActionsOccurred({
-    lastTurnLog,
-    tileSize,
-    tilesToDisplay,
-    fighterLocations,
-    getBoundingRectForTile
-}) {
-    const turnNumber = lastTurnLog?.turnNumber || 0;
-    const [prevTurnNumber, setPrevTurnNumber] = React.useState(turnNumber);
-    const [attacksToRender, setAttacksToRender] = React.useState([]);
 
-    if(lastTurnLog == null) {
-        return null;
-    }
-
-    const renderProjectileAttack = (fighterId, element, targetType, jutsuType, pathSegments, hits) => {
-        element = "fire";
-
-        console.log('renderProjectileAttack', pathSegments);
-
-        const startingTileIndex = pathSegments[0].tileIndex;
-        const endingTileIndex = pathSegments[pathSegments.length - 1].tileIndex;
-
-        const travelTimePerTile = 500;
-
-        // fireball appears at player's tile, flies to end of its range, then disappears
-        setAttacksToRender(prevValue => ([
-            ...prevValue,
-            {
-                fighterId: fighterId,
-                startingTileIndex: startingTileIndex,
-                endingTileIndex: endingTileIndex,
-
-                durationMs: Math.abs(endingTileIndex - startingTileIndex) * travelTimePerTile
-            }
-        ]));
-    };
-
-    if(prevTurnNumber !== turnNumber) {
-        setPrevTurnNumber(turnNumber);
-        setAttacksToRender([]);
-
-        if(lastTurnLog.isAttackPhase) {
-            console.log(lastTurnLog);
-
-            // Trigger action displays
-            Object.values(lastTurnLog.fighterActions).forEach(action => {
-                if(action.jutsuUseType === 'projectile' && action.jutsuType === 'ninjutsu') {
-                    renderProjectileAttack(
-                        action.fighterId,
-                        action.jutsuElement,
-                        action.jutsuTargetType,
-                        action.jutsuType,
-                        action.pathSegments,
-                        action.hits
-                    )
-                }
-            });
-        }
-    }
-
-    console.log('attacksToRender', attacksToRender);
-
-    return <>
-        {attacksToRender.map((attack, i) => {
-            const startingTileRect = getBoundingRectForTile(attack.startingTileIndex);
-            const endingTileRect = getBoundingRectForTile(attack.endingTileIndex);
-
-            const direction = attack.startingTileIndex > fighterLocations[attack.fighterId] ? "right" : "left";
-
-            // move attack start 0.5 tile closer to caster
-            const offset = (fighterLocations[attack.fighterId] - attack.startingTileIndex) * 0.5 * tileSize;
-
-            startingTileRect.left += offset;
-
-            const leftDifference = endingTileRect.left - startingTileRect.left;
-
-            return <React.Fragment key={`attack_container:${i}`}>
-                <style key={`attack_style:${i}`}>
-                    {`
-                        @keyframes attack_${i} {
-                            0% {
-                                transform: translateX(0px);
-                                opacity: 1;
-                            }
-                            85% {
-                                transform: translateX(${leftDifference}px);
-                                opacity: 1;
-                            }
-                            100% {
-                                transform: translateX(${leftDifference}px);
-                                opacity: 0;
-                            }
-                        }
-                    `}
-                </style>
-                <div
-                   key={`attack:${i}`}
-                   className="attackDisplay"
-                   style={{
-                       top: startingTileRect.top,
-                       left: startingTileRect.left,
-                       width: startingTileRect.width,
-                       height: startingTileRect.height,
-                       animationName: `attack_${i}`,
-                       animationDuration: `${attack.durationMs}ms`,
-                       animationFillMode: "forwards",
-                       animationTimingFunction: "linear"
-                   }}
-                >
-                    <img
-                        src='/images/battle/fireball.png'
-                        className={`projectile ${direction}`}
-                        style={{ width: 50, height: 50 }}
-                    />
-                </div>
-            </React.Fragment>
-        })}
-    </>;
-}
 
 function debug(...contents) {
     //if(window.debug) {

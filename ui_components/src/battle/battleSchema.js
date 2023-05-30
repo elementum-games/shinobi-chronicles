@@ -124,3 +124,11 @@ export type EffectHitLogType = {|
     +type: 'heal' | 'break_genjutsu' | 'ninjutsu_damage' | 'taijutsu_damage' | 'genjutsu_damage',
     +description: string,
 |};
+
+// Utility types
+export type BoundingRect = {|
+    +top: number,
+    +left: number,
+    +width: number,
+    +height: number,
+|};
