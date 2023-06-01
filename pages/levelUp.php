@@ -679,7 +679,7 @@ function chuuninExam(System $system, User $player, RankManager $rankManager): bo
             $player->exam_stage = 0;
             if ($player->sensei_id != 0) {
                 // increase graduated count
-                SenseiManager::incrementGraduated($player->sensei_id, $system);
+                SenseiManager::incrementGraduatedCount($player->sensei_id, $player->user_id, $system);
                 // remove student
                 SenseiManager::removeStudent($player->sensei_id, $player->user_id, $system);
                 $player->sensei_id = 0;
