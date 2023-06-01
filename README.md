@@ -87,7 +87,7 @@ started quickly with minimal PHP environment/Git knowledge.
 9. Use Composer to install important dependencies
    - Open your command line/terminal, navigate to your SC directory, and run `composer install`
 10. Import the DB using Phinx
-    - *(Phinx is automatically installed in step 8)*
+    - *(Phinx is automatically installed when you run `composer install` in the previous step)*
     - In your command line/terminal, navigate to your SC directory and run 
       - `vendor/bin/phinx seed:run`
     - This will populate your database with all the relevant tables and sample data
