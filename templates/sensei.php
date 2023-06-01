@@ -137,7 +137,7 @@
                         </tr>
                         <tr>
                             <td>Tier 2</td>
-                            <td>Gradute 3 Students</td>
+                            <td>Graduate 3 Students</td>
                             <td colspan="2">
                                 <div>6% faster training in specialization</div>
                                 <div>3% faster in all other types</div>
@@ -145,7 +145,7 @@
                         </tr>
                         <tr>
                             <td>Tier 3</td>
-                            <td>Gradute 8 Students</td>
+                            <td>Graduate 8 Students</td>
                             <td colspan="2">
                                 <div>9% faster training in specialization</div>
                                 <div>4.5% faster in all other types</div>
@@ -153,7 +153,7 @@
                         </tr>
                         <tr>
                             <td>Tier 4</td>
-                            <td>Gradute 15 Students</td>
+                            <td>Graduate 15 Students</td>
                             <td colspan="2">
                                 <div>12% faster training in specialization</div>
                                 <div>6% faster in all other types</div>
