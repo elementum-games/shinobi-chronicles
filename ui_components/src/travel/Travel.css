@@ -93,12 +93,15 @@
     border: 1px solid rgba(0, 0, 0, 0.12);
 }
 
+@media (max-width: 1200px) {
+    /* Slightly bigger buttons for small touchscreens */
+    .travel-wrapper {
+        padding: 40px;
+    }
+}
 @media (max-width: 600px) {
     .travel-wrapper {
         width: calc(95% - 10px - var(--scout-container-side-width));
-
-        /* Slightly bigger buttons for small touchscreens */
-        padding: 32px;
     }
 
     .travel-scout-container {
