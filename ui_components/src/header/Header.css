@@ -1,0 +1,53 @@
+#headerContainer {
+    height: var(--header-height);
+    width: 100%;
+    background-color: var(--header-background-color);
+    z-index: 1000;
+    border-bottom: 3px solid;
+    border-color: var(--header-border-color);
+    display: flex;
+    justify-content: center;
+}
+ /* mirrors spacing of sidebar to position header_bar above content section */
+.header_bar_left {
+    width: var(--sb-width);
+}
+
+.header_bar {
+    width: var(--content-width);
+}
+
+.header_bar_inner {
+}
+
+.header_link_container {
+    height: 100%;
+    width: var(--content-width);
+    align-items: flex-end;
+    justify-content: center;
+    gap: 40px;
+}
+
+.header_label {
+    text-decoration: none;
+}
+
+.header_label:hover {
+    color: var(--font-color-1) !important;
+    text-decoration: underline;
+}
+
+.header_label:active {
+    color: var(--font-color-1);
+    text-decoration: underline;
+}
+
+.header_label:visited {
+    color: var(--font-color-5);
+    text-decoration: none;
+}
+
+.header_time_label {
+    margin-left: 20px;
+    text-transform: uppercase;
+}
