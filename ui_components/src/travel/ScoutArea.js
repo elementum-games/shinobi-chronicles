@@ -69,29 +69,8 @@ const Player = ({
                 {(player_data.attack === true && parseInt(player_data.battle_id, 10) > 0) && (
                     <span></span>
                 )}
-                {(player_data.attack === false && player_data.direction == 'north') && (
-                    <span className='direction north'></span>
-                )}
-                {(player_data.attack === false && player_data.direction == 'northeast') && (
-                    <span className='direction northeast'></span>
-                )}
-                {(player_data.attack === false && player_data.direction == 'east') && (
-                    <span className='direction east'></span>
-                )}
-                {(player_data.attack === false && player_data.direction == 'southeast') && (
-                    <span className='direction southeast'></span>
-                )}
-                {(player_data.attack === false && player_data.direction == 'south') && (
-                    <span className='direction south'></span>
-                )}
-                {(player_data.attack === false && player_data.direction == 'southwest') && (
-                    <span className='direction southwest'></span>
-                )}
-                {(player_data.attack === false && player_data.direction == 'west') && (
-                    <span className='direction west'></span>
-                )}
-                {(player_data.attack === false && player_data.direction == 'northwest') && (
-                    <span className='direction northwest'></span>
+                {(player_data.attack === false && player_data.direction !== 'none') && (
+                    <span className={`direction ${player_data.direction}`}></span>
                 )}
             </div>
         </div>
