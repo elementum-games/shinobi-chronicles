@@ -262,8 +262,27 @@ class TravelManager {
             );
         }
 
-
-
+        // Add more users for display
+        if ($this->system->environment == System::ENVIRONMENT_DEV) {
+            for ($i = 0; $i < 7; $i++) {
+                $return_arr[] = new NearbyPlayerDto(
+                    user_id: $i . mt_rand(10000, 20000),
+                    user_name: 'Konohamaru',
+                    target_x: 15, // rank name
+                    target_y: 15,
+                    target_map_id: 2,
+                    rank_name: 'Akademi-sei',
+                    rank_num: 3,
+                    village_icon: TravelManager::VILLAGE_ICONS['Mist'],
+                    alignment: 'Enemy',
+                    attack: true,
+                    attack_id: 'abc' . $i . mt_rand(10000, 20000),
+                    level: 30,
+                    battle_id: 0,
+                    direction: "none", 
+                );
+            }
+        }
 
         return $return_arr;
     }
