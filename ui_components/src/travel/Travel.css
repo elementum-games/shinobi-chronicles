@@ -576,6 +576,34 @@
     background-position: center;
 }
 
+.travel-scout-attack span.direction {
+    background-image: url("../../../images/icons/right.png");
+}
+.travel-scout-attack span.north {
+    transform: rotate(-90deg);
+}
+.travel-scout-attack span.northeast {
+    transform: rotate(-45deg);
+}
+.travel-scout-attack span.east {
+    transform: rotate(0deg);
+}
+.travel-scout-attack span.southeast {
+    transform: rotate(45deg);
+}
+.travel-scout-attack span.south {
+    transform: rotate(90deg);
+}
+.travel-scout-attack span.southwest {
+    transform: rotate(135deg);
+}
+.travel-scout-attack span.west {
+    transform: rotate(180deg);
+}
+.travel-scout-attack span.northwest {
+    transform: rotate(-135deg);
+}
+
 /* temp fix for travel sync with side menu */
 #container .sm-tmp-invillage .not-allowed-in-village {
     opacity: 0.3;
