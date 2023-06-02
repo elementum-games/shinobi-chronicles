@@ -15,5 +15,6 @@ class NearbyPlayerDto {
         public string $attack_id,
         public int $level,
         public int $battle_id,
+        public string $direction,
     ) {}
 }

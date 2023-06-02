@@ -12,7 +12,8 @@
  * attack:          boolean,
  * attack_id:       string,
  * level:           int,
- * battle_id:       int
+ * battle_id:       int,
+ * direction:       string
  * }} player
  */
 export const ScoutArea = ({
@@ -67,6 +68,9 @@ const Player = ({
                 )}
                 {(player_data.attack === true && parseInt(player_data.battle_id, 10) > 0) && (
                     <span></span>
+                )}
+                {(player_data.attack === false && player_data.direction !== 'none') && (
+                    <span className={`direction ${player_data.direction}`}></span>
                 )}
             </div>
         </div>

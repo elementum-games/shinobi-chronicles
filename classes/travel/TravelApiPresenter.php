@@ -52,6 +52,7 @@ class TravelApiPresenter {
                     'attack_id'     => $nearbyPlayer->attack_id,
                     'level'         => $nearbyPlayer->level,
                     'battle_id'     => $nearbyPlayer->battle_id,
+                    'direction'     => $nearbyPlayer->direction,
                 ];
             },
             $travelManager->fetchNearbyPlayers()

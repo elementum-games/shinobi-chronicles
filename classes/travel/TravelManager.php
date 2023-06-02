@@ -10,7 +10,7 @@ class TravelManager {
         'Sand' => 'images/village_icons/sand.png',
         'Leaf' => 'images/village_icons/leaf.png'
     ];
-    
+
     private System $system;
     private User $user;
 
@@ -228,6 +228,21 @@ class TravelManager {
                 $can_attack = true;
             }
 
+            // calculate direction
+            $user_direction = "none";
+            if ($user['user_id'] != $this->user->user_id) {
+                $diff_x = ($user_location->x - $this->user->location->x);
+                $diff_y = ($user_location->y - $this->user->location->y);
+                if ($diff_x != 0 || $diff_y != 0) {
+                    $angle = atan2($diff_y, $diff_x);
+                    $angle_degrees = rad2deg($angle);
+                    $angle_degrees = fmod(($angle_degrees + 450), 360);
+                    $directions = array("north", "northeast", "east", "southeast", "south", "southwest", "west", "northwest");
+                    $index = round($angle_degrees / (360 / count($directions)));
+                    $user_direction = $directions[$index % count($directions)];
+                }
+            }
+
             // add to return
             $return_arr[] = new NearbyPlayerDto(
                 user_id: $user['user_id'],
@@ -243,12 +258,13 @@ class TravelManager {
                 attack_id: $user['attack_id'],
                 level: $user['level'],
                 battle_id: $user['battle_id'],
+                direction: $user_direction,
             );
         }
 
         // Add more users for display
-        if($this->system->environment == System::ENVIRONMENT_DEV) {
-            for($i = 0; $i < 7; $i++) {
+        if ($this->system->environment == System::ENVIRONMENT_DEV) {
+            for ($i = 0; $i < 7; $i++) {
                 $return_arr[] = new NearbyPlayerDto(
                     user_id: $i . mt_rand(10000, 20000),
                     user_name: 'Konohamaru',
@@ -263,10 +279,10 @@ class TravelManager {
                     attack_id: 'abc' . $i . mt_rand(10000, 20000),
                     level: 30,
                     battle_id: 0,
+                    direction: "none", 
                 );
             }
         }
-
 
         return $return_arr;
     }
@@ -289,8 +305,8 @@ class TravelManager {
      */
     public function fetchCurrentMapLocations(): array {
         $result = $this->system->query("
-            SELECT * 
-            FROM `maps_locations` 
+            SELECT *
+            FROM `maps_locations`
             WHERE `map_id`={$this->user->location->map_id}
         ");
 
@@ -309,11 +325,11 @@ class TravelManager {
         $portal_data = null;
 
         $result = $this->system->query("
-            SELECT * 
-            FROM `maps_portals` 
-            WHERE `entrance_x`={$this->user->location->x} 
-              AND `entrance_y`={$this->user->location->y} 
-              AND `from_id`={$this->user->location->map_id} 
+            SELECT *
+            FROM `maps_portals`
+            WHERE `entrance_x`={$this->user->location->x}
+              AND `entrance_y`={$this->user->location->y}
+              AND `from_id`={$this->user->location->map_id}
               AND `active`=1
               ");
 
