@@ -9,7 +9,7 @@ function Hotbar({ linkData }) {
     const [regen_time, setRegenTime] = React.useState(null);
     const [regen_offset, setRegenOffset] = React.useState(null);
     const [quick_type, setQuickType] = React.useState("training");
-    const [display_hotbar, toggleHotbarDisplay] = React.useState(true);
+    const [display_hotbar, toggleHotbarDisplay] = React.useState(false);
     const [display_keybinds, toggleKeybindDisplay] = React.useState(false);
     const regen_time_var = React.useRef(0);
     const training_flag = React.useRef(0);
