@@ -1,0 +1,17 @@
+#topbarContainer {
+    position: absolute;
+}
+
+#topbar {
+    height: var(--topbar-height);
+}
+
+.topbar_left {
+    width: var(--sb-width);
+}
+
+.topbar_right {
+    width: var(--content-width);
+    justify-content: center;
+    align-items: center;
+}

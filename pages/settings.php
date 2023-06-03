@@ -1,5 +1,5 @@
 <?php
-/* 
+/*
 File: 		settings.php
 Coder:		Levi Meahan
 Created:	08/24/2013
@@ -10,9 +10,9 @@ Algorithm:	See master_plan.html
 
 function userSettings() {
 	global $system;
-	
+
 	global $player;
-	
+
 	global $self_link;
 
 	// Forbidden seal increase
@@ -24,10 +24,11 @@ function userSettings() {
 	else {
         $max_journal_length = $player->forbidden_seal->journal_size;
 	}
-	
+
 	$layouts = array('shadow_ribbon', 'geisha', 'classic_blue', 'blue_scroll', 'rainbow_road');
 	if($system->environment == 'dev') {
 	    $layouts[] = 'cextralite';
+		$layouts[] = 'new_geisha';
 	}
 
 	require_once "profile.php";
@@ -39,12 +40,12 @@ function userSettings() {
 			if($player->checkBan(StaffManager::BAN_TYPE_AVATAR)) {
                 throw new Exception("You are currently banned from changing your avatar.");
             }
-		
+
 			if(strlen($avatar_link) < 5) {
 				throw new Exception("Please enter an avatar link!");
 			}
 			$avatar_link = $system->clean($avatar_link);
-			
+
 			if(!getimagesize($avatar_link)) {
 				throw new Exception("Image does not exist!");
 			}
@@ -67,21 +68,21 @@ function userSettings() {
 		$password = trim($_POST['current_password']);
 		$new_password = trim($_POST['new_password']);
 		$confirm_password = trim($_POST['confirm_new_password']);
-		
+
 		$result = $system->query("SELECT `password` FROM `users` WHERE `user_id`='{$player->user_id}' LIMIT 1");
 		$result = $system->db_fetch($result);
-		
+
 		try {
 			if(!$system->verify_password($password, $result['password'])) {
 				throw new Exception("Current password is incorrect!");
 			}
-			
+
 			$password = $new_password;
-			
+
 			if(strlen($password) < User::MIN_PASSWORD_LENGTH) {
 				throw new Exception("Please enter a password longer than 3 characters!");
 			}
-			
+
 			if(preg_match('/[0-9]/', $password) == false) {
 				throw new Exception("Password must include at least one number!");
 			}
@@ -99,11 +100,11 @@ function userSettings() {
 					throw new Exception("This password is too common, please choose a more unique password!");
 				}
 			}
-			
+
 			if($password != $confirm_password) {
 				throw new Exception("The passwords do not match!");
 			}
-		
+
 			$password = $system->hash_password($password);
 			$system->query("UPDATE `users` SET `password`='$password' WHERE `user_id`='{$player->user_id}' LIMIT 1");
 			if($system->db_last_affected_rows >= 1) {
@@ -126,7 +127,7 @@ function userSettings() {
 			if($player->checkBan(StaffManager::BAN_TYPE_JOURNAL)) {
 				throw new Exception("You are currently banned from changing your journal.");
 			}
-			
+
 			$system->query("UPDATE `journals` SET `journal`='$journal' WHERE `user_id`='{$player->user_id}' LIMIT 1");
 			if($system->db_last_affected_rows == 1) {
 				$system->message("Journal updated!");
@@ -168,7 +169,7 @@ function userSettings() {
 					$system->message("{$blacklist_user['user_name']} is not on your blacklist");
 				}
 			}
-			
+
 		} catch (Exception $e) {
 			$system->message($e->getMessage());
 		}
@@ -185,7 +186,7 @@ function userSettings() {
 			if($user_exists) {
 				unset($player->blacklist[$user_remove]);
 			}
-			
+
 			$system->message($message);
 
 		}
@@ -199,7 +200,7 @@ function userSettings() {
 		if(array_search($layout, $layouts) === false) {
 			$layout = null;
 		}
-		
+
 		if(!$layout) {
 			$system->message("Invalid layout choice!");
 			$system->printMessage();

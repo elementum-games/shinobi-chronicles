@@ -1,180 +1,10 @@
 <?php
-/*
-File: 		index.php
-Coder:		Levi Meahan
-Created:	02/21/2012
-Revised:	11/25/2013 by Levi Meahan
-Purpose:	Authenticate/deauthenticate users, and direct logged in users to pages. Central gateway for entire game.
-Algorithm:	See master_plan.html
-*/
-
-//Start the session
-session_start();
-
-// Turn errors off unless Lsm
-if(!isset($_SESSION['user_id']) || $_SESSION['user_id'] != 1 || $_SESSION['user_id'] != 190) {
-	ini_set('display_errors', 'Off');
-}
-
-$PAGE_LOAD_START = microtime(true);
-
-require_once("classes/_autoload.php");
-$system = new System();
-
-if($system->environment == System::ENVIRONMENT_DEV) {
-    ini_set('display_errors', 'On');
-}
-
-// Check for logout
-if(isset($_GET['logout']) && $_GET['logout'] == 1) {
-	$_SESSION = array();
-	if(ini_get("session.use_cookies")) {
-		$params = session_get_cookie_params();
-		setcookie(session_name(), '', time() - 42000,
-			$params["path"], $params["domain"],
-			$params["secure"], $params["httponly"]
-		);
-	}
-	session_destroy();
-	header("Location: {$system->router->base_url}");
-	exit;
-}
-$LOGGED_IN = false;
-
-// Ajax
-$system->is_legacy_ajax_request = false;
-if(isset($_GET['request_type']) && $_GET['request_type'] == 'ajax') {
-	$system->is_legacy_ajax_request = true;
-}
-// Run login, load player data
-$player_display = '';
-
-$logout_limit = System::LOGOUT_LIMIT;
-if(!isset($_SESSION['user_id'])) {
-	// require("./securimage/securimage.php");
-	if(!empty($_POST['login'])) {
-		try {
-/*			$image = new Securimage();
-			if(!$image->check($_POST['login_code']) && $system->environment == 'prod') {
-				throw new Exception("Invalid login code!");
-			}*/
-
-			// Basic input check - user_name/password
-			$user_name = $system->clean($_POST['user_name']);
-			if(empty($user_name)) {
-				throw new Exception("Please enter username!");
-			}
-			$password = $system->clean($_POST['password']);
-			if(empty($password)) {
-				throw new Exception("Please enter password!");
-			}
-
-			// Get result
-			$result = $system->query("SELECT `user_id`, `user_name`, `password`, `failed_logins`, `current_ip`, `last_ip`, `user_verified`
-				FROM `users` WHERE `user_name`='$user_name' LIMIT 1");
-			if($system->db_last_num_rows == 0) {
-				throw new Exception("User does not exist!");
-			}
-			$result = $system->db_fetch($result);
-			if(!$result['user_verified']) {
-				throw new Exception("Your account has not been verified. Please check your email for the activation code.
-				<a class='link' href='{$system->router->base_url}register.php?act=resend_verification&username=$user_name'>Resend Verification</a>");
-			}
-
-			// Check failed logins
-			if($result['failed_logins'] >= User::PARTIAL_LOCK && $_SERVER['REMOTE_ADDR'] != $result['current_ip'] && $_SERVER['REMOTE_ADDR'] != $result['last_ip']) {
-                $system->log(
-                    'malicious_lockout',
-                    $result['user_id'],
-                    "IP address {$_SERVER['REMOTE_ADDR']} failed login on account {$result['user_name']} not matching previous IPs {$result['current_ip']} or {$result['last_ip']}."
-                );
-
-                throw new Exception("Account has been locked out!");
-            }
-			else if($result['failed_logins'] >= User::FULL_LOCK) {
-				throw new Exception("Account has been locked out!");
-			}
-
-			// Check password (NOTE: Due to importance of login, it is inclusive instead of exclusive (if statement must be true for user to be logged in) )
-			if($system->verify_password($password, $result['password'])) {
-				$_SESSION['user_id'] = $result['user_id'];
-				$LOGGED_IN = true;
-				if($result['failed_logins'] > 0) {
-					$system->query("UPDATE `users` SET `failed_logins`= 0 WHERE `user_id`='{$result['user_id']}' LIMIT 1");
-				}
-
-				$player = User::loadFromId($system, $_SESSION['user_id']);
-				$player->loadData();
-				$player->last_login = time();
-				$player->log(User::LOG_LOGIN, $_SERVER['REMOTE_ADDR']);
-				$player->updateData();
-			}
-			// If wrong, increment failed logins
-			else {
-				$system->query("UPDATE `users` SET `failed_logins` = `failed_logins` + 1 WHERE `user_id`='{$result['user_id']}' LIMIT 1");
-				throw new Exception("Invalid password! <a href='./password_reset.php'>Forgot password?</a>");
-			}
-		} catch (Exception $e) {
-			$system->message($e->getMessage());
-		}
-	}
-}
-else {
-	$LOGGED_IN = true;
-	$player = User::loadFromId($system, $_SESSION['user_id']);
-
-    // Check logout timer
-	if($player->last_login < time() - (System::LOGOUT_LIMIT * 60)) {
-		if($system->is_legacy_ajax_request) {
-			echo "<script type='text/javascript'>
-			clearInterval(refreshID);
-			clearInterval(notificationRefreshID);
-			</script>
-			<p style='text-align:center;'>Logout timer finished. <a href='{$system->router->base_url}'>Continue</a></p>";
-			exit;
-		}
-		else {
-			$_SESSION = array();
-			if(ini_get("session.use_cookies")) {
-				$params = session_get_cookie_params();
-				setcookie(session_name(), '', time() - 42000,
-					$params["path"], $params["domain"],
-					$params["secure"], $params["httponly"]
-				);
-			}
-			session_destroy();
-			header("Location: {$system->router->base_url}");
-			exit;
-		}
-	}
-
-	if($system->is_legacy_ajax_request) {
-		$player->loadData(User::UPDATE_REGEN);
-	}
-	else {
-		$player->loadData();
-	}
-}
-
-// Start display
-if(!$LOGGED_IN) {
-	$layout = $system->fetchLayoutByName(System::DEFAULT_LAYOUT);
-}
-else {
-	$layout = $system->fetchLayoutByName($player->layout);
-}
-
-if ($layout->key == "new_geisha") {
-    require("index_new.php");
-}
-else {
+    // WIP - fork of Index.php to test new_geisha
     if (!$system->is_legacy_ajax_request) {
+        require($layout->headerModule);
         echo $layout->heading;
-        echo $layout->top_menu;
-        echo $layout->header;
     }
-
-	// Load page or news
+    // Load page or news
     if($LOGGED_IN) {
         // Master close
         if(!$system->SC_OPEN && !$player->isUserAdmin()) {
@@ -232,19 +62,6 @@ else {
                 echo str_replace('<!--[VERSION_NUMBER]-->', System::VERSION_NUMBER, $layout->footer);
             }
             exit;
-        }
-
-        // Notifications
-        if(!$system->is_legacy_ajax_request) {
-            Notifications::displayNotifications($system, $player);
-            echo "<script type='text/javascript'>
-		var notificationRefreshID = setInterval(
-            () => {
-                // $('#notifications').load('./api/legacy_notifications.php');
-            },
-            5000
-        );
-		</script>";
         }
 
         // Global message
@@ -324,7 +141,8 @@ else {
                     $location_name = $player->current_location->location_id
                         ? ' ' . ' <div id="contentHeaderLocation">' . $player->current_location->name . '</div>'
                         : null;
-
+                    require($layout->sidebarModule);
+                    require($layout->topbarModule); 
                     echo str_replace("[HEADER_TITLE]", $route->title . $location_name, $layout->body_start);
                 }
 
@@ -346,7 +164,8 @@ else {
                 ($route->function_name)();
 
                 $page_loaded = true;
-            } catch (Exception $e) {
+            }
+            catch (Exception $e) {
                 if(strlen($e->getMessage()) > 1) {
                     // Display page title if page is set
                     if($routes[$id] != null) {
@@ -360,6 +179,8 @@ else {
         }
 
         if(!$page_loaded) {
+            require($layout->sidebarModule);
+            require($layout->topbarModule); 
             echo str_replace("[HEADER_TITLE]", "Profile", $layout->body_start);
 
             $system->printMessage();
@@ -371,16 +192,16 @@ else {
             try {
                 require("pages/profile.php");
                 userProfile();
-            } catch(Exception $e) {
+            }
+            catch(Exception $e) {
                 $system->message($e->getMessage());
                 $system->printMessage(true);
             }
         }
         $player->updateData();
 
-        // Display side menu and footer
         if(!$system->is_legacy_ajax_request) {
-            $layout->renderSideMenu($player, $system->router);
+            echo "</div>";
         }
     }
     else if($system->is_legacy_ajax_request) {
@@ -409,10 +230,36 @@ else {
         echo str_replace('<!--CAPTCHA-->', $captcha, $layout->login_menu);
     }
 
+    // End content
+    echo "</div>";
+
+    // Render hotbar
+    if (!$system->is_legacy_ajax_request && isset($player)) {
+        $rank_names = RankManager::fetchNames($system);
+        $max_mission_rank = Mission::maxMissionRank($player->rank_num);
+
+        $result = $system->query("SELECT `mission_id`, `name` FROM `missions` WHERE `mission_type`=1 OR `mission_type`=5 AND `rank` <= $max_mission_rank");
+
+        $missions = array();
+        while($row = $system->db_fetch($result)) {
+            $missions[$row['mission_id']] = $row;
+        }
+
+        $ai_rank = min($player->rank_num, System::SC_MAX_RANK);
+        $result = $system->query("SELECT `ai_id`, `name` FROM `ai_opponents`
+			WHERE `rank` = {$ai_rank} ORDER BY `level` ASC");
+
+        $ai_opponents = array();
+        while($row = $system->db_fetch($result)) {
+            $ai_opponents[$row['ai_id']] = $row;
+        }
+
+        require($layout->hotbarModule);
+    }
+
     // Render footer
     if(!$system->is_legacy_ajax_request) {
         $page_load_time = round(microtime(true) - $PAGE_LOAD_START, 3);
-
         $layout->renderFooter($page_load_time);
     }
-}
+?>

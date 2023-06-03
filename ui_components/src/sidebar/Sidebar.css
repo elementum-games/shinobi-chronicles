@@ -1,0 +1,107 @@
+#sidebarContainer {
+    vertical-align: top;
+    top: calc(20px + var(--header-height));
+    position: sticky;
+    align-self: flex-start;
+}
+
+#sidebar {
+    width: var(--sb-width);
+}
+
+.sb_header_bar {
+    background-color: var(--sb-header-background-color);
+    height: var(--sb-header-height);
+    align-items: center;
+}
+
+.sb_header_image_wrapper {
+    left: -16px;
+    position: relative;
+    top: 50%;
+    transform: translate(0%, -40%)
+}
+
+.sb_header_text_wrapper {
+    left: -10px;
+    position: relative;
+}
+
+.sb_link_container {
+    width: 98%;
+    flex-wrap: wrap;
+    gap: 1px 1px;
+    background-color: var(--sb-button-background-hover);
+    align-items: center;
+    justify-content: center;
+    padding-bottom: 2px;
+}
+
+.sb_link_wrapper {
+    flex-basis: 49%;
+    height: 25px;
+    background-color: var(--sb-button-background-color);
+    border-color: var(--sb-button-border-color);
+    border-width: 1px;
+}
+
+.sb_link_filler {
+    flex-basis: 49%;
+    height: 25px;
+    background-color: var(--sb-button-background-color);
+    border-color: var(--sb-button-border-color);
+    border-width: 1px;
+}
+
+.sb_link_wrapper.selected {
+    color: var(--text-hover);
+    background-color: var(--sb-button-background-hover);
+}
+
+.sb_link_wrapper:hover {
+    color: var(--text-hover);
+    background-color: var(--sb-button-background-hover);
+}
+
+.sb_label {
+    position: relative;
+    top: 15%;
+}
+
+.sb_avatar_container {
+    overflow: visible;
+}
+
+.sb_avatar_wrapper {
+    clip-path: circle(50% at 50% 50%);
+    background: var(--avatar-frame-border_gradient);
+    height: 200px;
+    width: 200px;
+    position: relative;
+    left: 50%;
+    transform: translateX(-50%);
+    bottom: 10px;
+}
+
+.sb_avatar_img {
+    position: relative;
+    top: 5px;
+    left: 5px;
+    height: 190px;
+    width: 190px;
+    clip-path: circle(49% at 50% 50%);
+}
+
+.sb_button {
+    color: var(--font-color-1);
+    font-family: var(--font-primary);
+    font-variant: var(--font-primary-variant);
+    font-size: 12px;
+}
+
+#sb_logout_button {
+    top: 20px;
+    position: relative;
+    left: 50%;
+    transform: translateX(-50%);
+}

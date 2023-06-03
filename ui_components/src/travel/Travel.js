@@ -288,14 +288,15 @@ function Travel({
     // otherwise people will have to refresh before attempting to train outside of village
     React.useEffect(() => {
         const menu = document.getElementsByClassName('sm-tmp-class')[0];
-
-        if (mapData && !mapData.in_village) {
-            menu.classList.add('sm-tmp-outvillage');
-            menu.classList.remove('sm-tmp-invillage');
-        }
-        if (mapData && mapData.in_village) {
-            menu.classList.add('sm-tmp-invillage');
-            menu.classList.remove('sm-tmp-outvillage');
+        if (menu) {
+            if (mapData && !mapData.in_village) {
+                menu.classList.add('sm-tmp-outvillage');
+                menu.classList.remove('sm-tmp-invillage');
+            }
+            if (mapData && mapData.in_village) {
+                menu.classList.add('sm-tmp-invillage');
+                menu.classList.remove('sm-tmp-outvillage');
+            }
         }
     }, [mapData]);
 

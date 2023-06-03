@@ -16,6 +16,10 @@ class Layout {
         public string $side_menu_end,
         public string $login_menu,
         public string $footer,
+        public string $hotbarModule = "",
+        public string $sidebarModule = "",
+        public string $headerModule = "",
+        public string $topbarModule = "",
     ) {}
 
     public function renderStaticPageHeader(string $page_title): void {

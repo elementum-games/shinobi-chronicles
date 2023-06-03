@@ -15,6 +15,7 @@ class Router {
         'bloodline' => 10,
         'travel' => 11,
         'arena' => 12,
+        'training' => 13,
         'mission' => 14,
         'specialmissions' => 15,
         'mod' => 16,
@@ -23,6 +24,7 @@ class Router {
         'battle' => 19,
         'premium' => 21,
         'spar' => 22,
+        'healingShop' => 23,
         'team' => 24,
         'rankup' => 25,
         'event' => 27,
@@ -56,6 +58,10 @@ class Router {
         $this->api_links['battle'] = $this->base_url . 'api/battle.php';
         $this->api_links['inbox'] = $this->base_url . 'api/inbox.php';
         $this->api_links['travel'] = $this->base_url . 'api/travel.php';
+        $this->api_links['hotbar'] = $this->base_url . 'api/hotbar.php';
+        $this->api_links['sidebar'] = $this->base_url . 'api/sidebar.php';
+        $this->api_links['header'] = $this->base_url . 'api/header.php';
+        $this->api_links['topbar'] = $this->base_url . 'api/topbar.php';
     }
 
     /**
