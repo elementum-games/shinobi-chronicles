@@ -39,7 +39,7 @@ class SidebarManager {
         }
         $return_arr[] = new SidebarLinkDto(
             title: "Logout",
-            url: $this->system->router->base_url . "?logout=1" . $id,
+            url: $this->system->router->base_url . "?logout=1",
             active: true,
             id: 0,
         );
