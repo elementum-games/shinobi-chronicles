@@ -1,8 +1,8 @@
 <?php
 
-require __DIR__ . '/SidebarLinkDto.php';
+require __DIR__ . '/NavigationLinkDto.php';
 
-class SidebarManager {
+class NavigationAPIManager {
     private System $system;
     private User $player;
 
@@ -13,7 +13,7 @@ class SidebarManager {
     }
 
     /**
-     * @return SidebarLinkDto[]
+     * @return NavigationLinkDto[]
      */
     public function getUserMenu() : array {
         $routes = Router::$routes;
@@ -30,14 +30,14 @@ class SidebarManager {
                 continue;
             }
 
-            $return_arr[] = new SidebarLinkDto(
+            $return_arr[] = new NavigationLinkDto(
                 title: $page->title,
                 url: $this->system->router->base_url . "?id=" . $id,
                 active: true,
                 id: $id,
             );
         }
-        $return_arr[] = new SidebarLinkDto(
+        $return_arr[] = new NavigationLinkDto(
             title: "Logout",
             url: $this->system->router->base_url . "?logout=1",
             active: true,
@@ -47,7 +47,7 @@ class SidebarManager {
     }
 
     /**
-     * @return SidebarLinkDto[]
+     * @return NavigationLinkDto[]
      */
     public function getActivityMenu(): array
     {
@@ -66,7 +66,7 @@ class SidebarManager {
                 continue;
             }
 
-            $return_arr[] = new SidebarLinkDto(
+            $return_arr[] = new NavigationLinkDto(
                 title: $page->title,
                 url: $this->system->router->base_url . "?id=" . $id,
                 active: true,
@@ -84,7 +84,7 @@ class SidebarManager {
     }
 
     /**
-     * @return SidebarLinkDto[]
+     * @return NavigationLinkDto[]
      */
     public function getVillageMenu(): array
     {
@@ -102,7 +102,7 @@ class SidebarManager {
                 continue;
             }
 
-            $return_arr[] = new SidebarLinkDto(
+            $return_arr[] = new NavigationLinkDto(
                 title: $page->title,
                 url: $this->system->router->base_url . "?id=" . $id,
                 active: true,
@@ -112,7 +112,7 @@ class SidebarManager {
         return $return_arr;
     }
     /**
-     * @return SidebarLinkDto[]
+     * @return NavigationLinkDto[]
      */
     public function getStaffMenu(): array
     {
@@ -137,6 +137,52 @@ class SidebarManager {
             }
         }
         */
+        return $return_arr;
+    }
+
+    /**
+     * @return NavigationLinkDto[]
+     */
+    public function getHeaderMenu(): array
+    {
+        $routes = Router::$routes;
+        $return_arr = [];
+        $return_arr[] = new NavigationLinkDto(
+            title: "NEWS",
+            url: $this->system->router->links['news'],
+            active: true,
+            id: 0,
+        );
+        $return_arr[] = new NavigationLinkDto(
+            title: "DISCORD",
+            url: $this->system->router->links['discord'],
+            active: true,
+            id: 0,
+        );
+        $return_arr[] = new NavigationLinkDto(
+            title: "MANUAL",
+            url: $this->system->router->base_url . "manual.php",
+            active: true,
+            id: 0,
+        );
+        $return_arr[] = new NavigationLinkDto(
+            title: "GITHUB",
+            url: $this->system->router->links['github'],
+            active: true,
+            id: 0,
+        );
+        $return_arr[] = new NavigationLinkDto(
+            title: "RULES",
+            url: $this->system->router->base_url . "rules.php",
+            active: true,
+            id: 0,
+        );
+        $return_arr[] = new NavigationLinkDto(
+            title: "SUPPORT",
+            url: $this->system->router->base_url . "support.php",
+            active: true,
+            id: 0,
+        );
         return $return_arr;
     }
 

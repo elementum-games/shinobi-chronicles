@@ -31,7 +31,7 @@ function sidebar(): void {
         ReactDOM.render(
             React.createElement(Sidebar, {
                     linkData: {
-                    sidebar_api: "<?= $system->router->api_links['sidebar'] ?>",
+                    navigation_api: "<?= $system->router->api_links['navigation'] ?>",
                     avatar_link: "<?= $player->avatar_link ?>",
                 },
             }),

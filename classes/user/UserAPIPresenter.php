@@ -1,6 +1,6 @@
 <?php
 
-class HotbarApiPresenter {
+class UserApiPresenter {
     public static function playerDataResponse(User $player, array $rank_names): array {
         return [
             'avatar_link' => $player->avatar_link,
@@ -21,27 +21,27 @@ class HotbarApiPresenter {
         ];
     }
 
-    public static function missionDataResponse(HotbarManager $hotbarManager): array {
+    public static function missionDataResponse(UserAPIManager $userManager): array {
         return array_map(
-            function(HotbarMissionDto $mission) {
+            function(QuickActionMissionDto $mission) {
                 return [
                     'mission_id' => $mission->mission_id,
                     'name' => $mission->name,
                 ];
             },
-            $hotbarManager->getMissions()
+            $userManager->getMissions()
         );
     }
 
-    public static function aiDataResponse(HotbarManager $hotbarManager): array {
+    public static function aiDataResponse(UserAPIManager $userManager): array {
         return array_map(
-            function(HotbarAIDto $ai) {
+            function(QuickActionAIDto $ai) {
                 return [
                     'ai_id' => $ai->ai_id,
                     'name' => $ai->name,
                 ];
             },
-            $hotbarManager->getAI()
+            $userManager->getAI()
         );
     }
 }

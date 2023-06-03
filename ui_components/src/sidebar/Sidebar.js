@@ -11,8 +11,8 @@ function Sidebar({ linkData }) {
 
     // API
     function getSidebarLinks() {
-        apiFetch(linkData.sidebar_api, {
-            request: 'getSidebarLinks'
+        apiFetch(linkData.navigation_api, {
+            request: 'getNavigationLinks'
         }).then(response => {
             if (response.errors.length) {
                 handleErrors(response.errors);
@@ -29,9 +29,7 @@ function Sidebar({ linkData }) {
     function sbLinkOnClick(event) {
         window.location.href = event.currentTarget.getAttribute("href");
     }
-    function logoutOnClick(event) {
-        window.location.href = event.currentTarget.getAttribute("href");
-    }
+
     // Content
     function displaySection(section_data, title) {
         return (

@@ -48,18 +48,14 @@ require_once __DIR__ . "/classes/Village.php";
 
 require_once __DIR__ . "/classes/SenseiManager.php";
 
-require_once __DIR__ . "/classes/hotbar/HotbarAPIResponse.php";
-require_once __DIR__ . "/classes/hotbar/HotbarAPIPresenter.php";
-require_once __DIR__ . "/classes/hotbar/HotbarManager.php";
+require_once __DIR__ . "/classes/user/UserAPIResponse.php";
+require_once __DIR__ . "/classes/user/UserAPIPresenter.php";
+require_once __DIR__ . "/classes/user/UserAPIManager.php";
 
-require_once __DIR__ . "/classes/sidebar/SidebarAPIResponse.php";
-require_once __DIR__ . "/classes/sidebar/SidebarAPIPresenter.php";
-require_once __DIR__ . "/classes/sidebar/SidebarManager.php";
+require_once __DIR__ . "/classes/navigation/NavigationAPIResponse.php";
+require_once __DIR__ . "/classes/navigation/NavigationAPIPresenter.php";
+require_once __DIR__ . "/classes/navigation/NavigationAPIManager.php";
 
-require_once __DIR__ . "/classes/header/HeaderAPIResponse.php";
-require_once __DIR__ . "/classes/header/HeaderAPIPresenter.php";
-require_once __DIR__ . "/classes/header/HeaderManager.php";
-
-require_once __DIR__ . "/classes/topbar/TopbarAPIResponse.php";
-require_once __DIR__ . "/classes/topbar/TopbarAPIPresenter.php";
-require_once __DIR__ . "/classes/topbar/TopbarManager.php";
+require_once __DIR__ . "/classes/notification/NotificationAPIResponse.php";
+require_once __DIR__ . "/classes/notification/NotificationAPIPresenter.php";
+require_once __DIR__ . "/classes/notification/NotificationAPIManager.php";

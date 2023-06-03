@@ -9,8 +9,7 @@ $system->is_api_request = true;
 try {
     $player = Auth::getUserFromSession($system);
     $player->loadData(User::UPDATE_REGEN);
-}
-catch(Exception $e) {
+} catch (Exception $e) {
     API::exitWithError($e->getMessage());
 }
 # End standard auth
@@ -23,23 +22,24 @@ try {
         throw new Exception('No request was made!');
     }
 
-    $HotbarAPIResponse = new HotbarAPIResponse();
-    $HotbarManager = new HotbarManager($system, $player);
+    $UserAPIResponse = new UserAPIResponse();
+    $UserAPIManager = new UserAPIManager($system, $player);
 
-    switch($request) {
+    switch ($request) {
         case "getPlayerData":
-            $HotbarAPIResponse->response_data = [
-                'playerData' => HotbarAPIPresenter::playerDataResponse(player: $player, rank_names: RankManager::fetchNames($system)),
+            $UserAPIResponse->response_data = [
+                'playerData' => UserAPIPresenter::playerDataResponse(player: $player,
+                    rank_names: RankManager::fetchNames($system)),
             ];
             break;
         case "getMissionData":
-            $HotbarAPIResponse->response_data = [
-                'missionData' => HotbarAPIPresenter::missionDataResponse(hotbarManager: $HotbarManager),
+            $UserAPIResponse->response_data = [
+                'missionData' => UserAPIPresenter::missionDataResponse(userManager: $UserAPIManager),
             ];
             break;
         case "getAIData":
-            $HotbarAPIResponse->response_data = [
-                'aiData' => HotbarAPIPresenter::aiDataResponse(hotbarManager: $HotbarManager),
+            $UserAPIResponse->response_data = [
+                'aiData' => UserAPIPresenter::aiDataResponse(userManager: $UserAPIManager),
             ];
             break;
         default:
@@ -47,12 +47,10 @@ try {
     }
 
     API::exitWithData(
-        data: $HotbarAPIResponse->response_data,
-        errors: $HotbarAPIResponse->errors,
+        data: $UserAPIResponse->response_data,
+        errors: $UserAPIResponse->errors,
         debug_messages: $system->debug_messages,
     );
-}
-catch (Throwable $e) {
+} catch (Throwable $e) {
     API::exitWithError($e->getMessage());
 }
-

@@ -9,8 +9,7 @@ $system->is_api_request = true;
 try {
     $player = Auth::getUserFromSession($system);
     $player->loadData(User::UPDATE_NOTHING);
-}
-catch(Exception $e) {
+} catch (Exception $e) {
     API::exitWithError($e->getMessage());
 }
 # End standard auth
@@ -23,26 +22,19 @@ try {
         throw new Exception('No request was made!');
     }
 
-    $HeaderResponse = new HeaderAPIResponse();
-    $HeaderManager = new HeaderManager($system, $player);
+    $NotificationResponse = new NotificationAPIResponse();
+    $NotificationManager = new NotificationAPIManager($system, $player);
 
-    switch($request) {
-        case "getHeaderMenu":
-            $HeaderResponse->response_data = [
-                'headerMenu' => HeaderAPIPresenter::headerMenuResponse(headerManager: $HeaderManager),
-            ];
-            break;
+    switch ($request) {
         default:
             API::exitWithError("Invalid request!");
     }
 
     API::exitWithData(
-        data: $HeaderResponse->response_data,
-        errors: $HeaderResponse->errors,
+        data: $NotificationResponse->response_data,
+        errors: $NotificationResponse->errors,
         debug_messages: $system->debug_messages,
     );
-}
-catch (Throwable $e) {
+} catch (Throwable $e) {
     API::exitWithError($e->getMessage());
 }
-

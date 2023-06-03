@@ -38,7 +38,7 @@ function Topbar({ linkData }) {
 
     // Display
     return (
-        <div id="topbar" class="d-flex">
+        <div id="topbar" className="d-flex">
             {displayTopbar()}
         </div>
     )

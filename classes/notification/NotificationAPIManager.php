@@ -1,8 +1,8 @@
 <?php
 
-require __DIR__ . '/TopbarNotificationDto.php';
+require __DIR__ . '/NotificationDto.php';
 
-class TopbarManager {
+class NotificationAPIManager {
     private System $system;
     private User $player;
 

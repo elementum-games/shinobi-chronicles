@@ -7,7 +7,7 @@ function Header({ linkData }) {
 
     // API
     function getHeaderMenu() {
-        apiFetch(linkData.header_api, {
+        apiFetch(linkData.navigation_api, {
             request: 'getHeaderMenu'
         }).then(response => {
             if (response.errors.length) {

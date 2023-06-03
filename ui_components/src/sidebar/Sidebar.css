@@ -6,12 +6,12 @@
 }
 
 #sidebar {
-    width: var(--sb-width);
+    width: var(--sidebar-width);
 }
 
 .sb_header_bar {
-    background-color: var(--sb-header-background-color);
-    height: var(--sb-header-height);
+    background-color: var(--sidebar-header-background-color);
+    height: var(--sidebar-header-height);
     align-items: center;
 }
 
@@ -31,7 +31,7 @@
     width: 98%;
     flex-wrap: wrap;
     gap: 1px 1px;
-    background-color: var(--sb-button-background-hover);
+    background-color: var(--sidebar-button-background-hover);
     align-items: center;
     justify-content: center;
     padding-bottom: 2px;
@@ -40,27 +40,27 @@
 .sb_link_wrapper {
     flex-basis: 49%;
     height: 25px;
-    background-color: var(--sb-button-background-color);
-    border-color: var(--sb-button-border-color);
+    background-color: var(--sidebar-button-background-color);
+    border-color: var(--sidebar-button-border-color);
     border-width: 1px;
 }
 
 .sb_link_filler {
     flex-basis: 49%;
     height: 25px;
-    background-color: var(--sb-button-background-color);
-    border-color: var(--sb-button-border-color);
+    background-color: var(--sidebar-button-background-color);
+    border-color: var(--sidebar-button-border-color);
     border-width: 1px;
 }
 
 .sb_link_wrapper.selected {
     color: var(--text-hover);
-    background-color: var(--sb-button-background-hover);
+    background-color: var(--sidebar-button-background-hover);
 }
 
 .sb_link_wrapper:hover {
     color: var(--text-hover);
-    background-color: var(--sb-button-background-hover);
+    background-color: var(--sidebar-button-background-hover);
 }
 
 .sb_label {

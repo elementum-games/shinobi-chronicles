@@ -21,7 +21,7 @@ function Hotbar({
 
   // API
   function getPlayerData() {
-    apiFetch(linkData.hotbar_api, {
+    apiFetch(linkData.user_api, {
       request: 'getPlayerData'
     }).then(response => {
       if (response.errors.length) {
@@ -37,7 +37,7 @@ function Hotbar({
     });
   }
   function getAIData() {
-    apiFetch(linkData.hotbar_api, {
+    apiFetch(linkData.user_api, {
       request: 'getAIData'
     }).then(response => {
       if (response.errors.length) {
@@ -49,7 +49,7 @@ function Hotbar({
     });
   }
   function getMissionData() {
-    apiFetch(linkData.hotbar_api, {
+    apiFetch(linkData.user_api, {
       request: 'getMissionData'
     }).then(response => {
       if (response.errors.length) {

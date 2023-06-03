@@ -2,7 +2,7 @@
 
 require_once __DIR__ . '/../APIResponse.php';
 
-class SidebarAPIResponse extends APIResponse {
+class NavigationAPIResponse extends APIResponse {
     public array $response_data;
 
     public function __construct(array $response_data = [], array $errors = []) {

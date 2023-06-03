@@ -1,6 +1,6 @@
 <?php
 
-class TopbarNotificationDto {
+class NavigationLinkDto {
     public function __construct(
         public string $title,
         public string $url,

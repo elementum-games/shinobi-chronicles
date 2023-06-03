@@ -1,12 +1,12 @@
 #hotbar {
-    background-color: var(--hb-background-color);
+    background-color: var(--hotbar-background-color);
     width: 100%;
-    height: var(--hb-height);
+    height: var(--hotbar-height);
     position: fixed;
     bottom: var(--footer-height);
     z-index: 10;
     margin-bottom: 0px;
-    border-top: 3px solid var(--hb-border-color);
+    border-top: 3px solid var(--hotbar-border-color);
     transition: height 0.25s;
 }
 
@@ -16,7 +16,7 @@
 }
 
 .hb_section {
-    height: var(--hb-height);
+    height: var(--hotbar-height);
     margin-right: 30px;
     margin-left: 30px;
 }
@@ -36,7 +36,7 @@
 
 .hb_avatar_wrapper {
     clip-path: circle(50% at 50% 50%);
-    background-color: var(--hb-border-color);
+    background-color: var(--hotbar-border-color);
     height: 150px;
     width: 150px;
     position: relative;
@@ -167,7 +167,7 @@
     font-variant: var(--font-secondary-variant);
     color: var(--font-color-3) !important;
     font-weight: bold;
-    background-color: var(--hb-background-color) !important;
+    background-color: var(--hotbar-background-color) !important;
     border-color: var(--font-color-1) !important;
     border-radius: 4px;
     border-width: 1px;
@@ -182,7 +182,7 @@
 
 .hb_checkbox {
     outline: 1px solid var(--font-color-1);
-    accent-color: var(--hb-background-color);
+    accent-color: var(--hotbar-background-color);
     margin-right: 5px;
 }
 
@@ -255,7 +255,7 @@
 }
 
 #hb_toggle {
-    background-color: var(--hb-background-color);
+    background-color: var(--hotbar-background-color);
     position: absolute;
     top: -20px;
     left: calc(50% - 325px);
@@ -265,14 +265,14 @@
 }
 
 #hb_keybind_modal {
-    width: var(--hb-keybind-modal-width);
-    height: var(--hb-keybind-modal-height);
-    background-color: var(--hb-background-color);
+    width: var(--hotbar-keybind-modal-width);
+    height: var(--hotbar-keybind-modal-height);
+    background-color: var(--hotbar-background-color);
     border-color: var(--border-color-default);
     position: absolute;
     right: 50%;
     transform: translateX(50%);
-    top: calc(-50px - var(--hb-keybind-modal-height));
+    top: calc(-50px - var(--hotbar-keybind-modal-height));
     text-align: center;
     transition: width 0.5s;
     overflow: hidden;

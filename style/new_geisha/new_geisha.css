@@ -42,19 +42,19 @@
     --stamina-preview: #2e362c;
     --stamina-highlight: #7f9d89;
     /* Hotbar Config */
-    --hb-height: 150px;
-    --hb-background-color: #100f11;
-    --hb-border-color: #0E0D0E;
-    --hb-keybind-modal-width: 700px;
-    --hb-keybind-modal-height: 400px;
-    --hb-regentimer-color: blue;
+    --hotbar-height: 150px;
+    --hotbar-background-color: #100f11;
+    --hotbar-border-color: #0E0D0E;
+    --hotbar-keybind-modal-width: 700px;
+    --hotbar-keybind-modal-height: 400px;
+    --hotbar-regentimer-color: blue;
     /* Sidebar Config */
-    --sb-header-background-color: #8c7b58;
-    --sb-width: 250px;
-    --sb-header-height: 23px;
-    --sb-button-background-color: rgba(26,25,33,1);
-    --sb-button-background-hover: rgba(37,35,46,1);
-    --sb-button-border-color: rgba(37,35,46,1);
+    --sidebar-header-background-color: #8c7b58;
+    --sidebar-width: 250px;
+    --sidebar-header-height: 23px;
+    --sidebar-button-background-color: rgba(26,25,33,1);
+    --sidebar-button-background-hover: rgba(37,35,46,1);
+    --sidebar-button-border-color: rgba(37,35,46,1);
     /* Header Config */
     --header-height: 35px;
     --header-background-color: #151417;
@@ -160,7 +160,7 @@ body {
     float: none;
     margin-left: 10px;
     margin-top: var(--topbar-height);
-    margin-bottom: var(--hb-height);
+    margin-bottom: var(--hotbar-height);
     width: var(--content-width);
     background-color: var(--content-background-color);
     background-image: var(--content-background-gradient);
