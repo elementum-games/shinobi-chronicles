@@ -7,5 +7,6 @@
 /node_modules
 
 /vendor/
+/images/_image_library/raw
 /layout/designs
 /planning/combat
