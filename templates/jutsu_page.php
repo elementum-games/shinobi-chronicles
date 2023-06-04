@@ -25,7 +25,7 @@
     .jutsu_slots_container {
         display: flex;
         flex-wrap: wrap;
-        justify-content: space-evenly;
+        justify-content: center;
     }
     .jutsu_select {
         width:200px;
@@ -37,10 +37,10 @@
         font-weight: bold;
     }
     .jutsu_select_wrapper {
-        border-radius:36px;
+        border-radius: 36px;
         border-color: var(--theme-content-darker2-bg-color) !important;
         display:inline-block;
-        margin: 5px;
+        margin: 10px;
         overflow:hidden;
         border:solid;
     }
@@ -320,7 +320,6 @@
                             <?php endforeach; ?>
                         </select>
                     </div>
-                    <br />
                 <?php endfor; ?>
             </div>
             <div style='text-align:center;margin:8px 0 5px;'>
