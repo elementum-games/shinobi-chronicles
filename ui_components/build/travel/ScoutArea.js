@@ -34,6 +34,7 @@ export const ScoutArea = ({
     attackLink: attackLink
   }))));
 };
+
 const Player = ({
   player_data,
   membersLink,
@@ -57,36 +58,29 @@ const Player = ({
     className: "travel-scout-attack"
   }, player_data.attack === true && parseInt(player_data.battle_id, 10) === 0 && /*#__PURE__*/React.createElement("a", {
     href: attackLink + '&attack=' + player_data.attack_id
-  }), player_data.attack === true && parseInt(player_data.battle_id, 10) > 0 && /*#__PURE__*/React.createElement("span", null), player_data.attack === false && player_data.direction == 'north' && /*#__PURE__*/React.createElement("span", {
-    className: "direction north"
-  }), player_data.attack === false && player_data.direction == 'northeast' && /*#__PURE__*/React.createElement("span", {
-    className: "direction northeast"
-  }), player_data.attack === false && player_data.direction == 'east' && /*#__PURE__*/React.createElement("span", {
-    className: "direction east"
-  }), player_data.attack === false && player_data.direction == 'southeast' && /*#__PURE__*/React.createElement("span", {
-    className: "direction southeast"
-  }), player_data.attack === false && player_data.direction == 'south' && /*#__PURE__*/React.createElement("span", {
-    className: "direction south"
-  }), player_data.attack === false && player_data.direction == 'southwest' && /*#__PURE__*/React.createElement("span", {
-    className: "direction southwest"
-  }), player_data.attack === false && player_data.direction == 'west' && /*#__PURE__*/React.createElement("span", {
-    className: "direction west"
-  }), player_data.attack === false && player_data.direction == 'northwest' && /*#__PURE__*/React.createElement("span", {
-    className: "direction northwest"
+  }), player_data.attack === true && parseInt(player_data.battle_id, 10) > 0 && /*#__PURE__*/React.createElement("span", {
+    className: "in-battle"
+  }), player_data.attack === false && player_data.direction !== 'none' && /*#__PURE__*/React.createElement("span", {
+    className: `direction ${player_data.direction}`
   })));
 };
+
 const alignmentClass = alignment => {
   let class_name = 'travel-scout-entry travel-scout-';
+
   switch (alignment) {
     case 'Ally':
       class_name += 'ally';
       break;
+
     case 'Enemy':
       class_name += 'enemy';
       break;
+
     case 'Neutral':
       class_name += 'neutral';
       break;
   }
+
   return class_name;
 };

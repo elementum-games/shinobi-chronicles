@@ -231,16 +231,7 @@ class TravelManager {
             // calculate direction
             $user_direction = "none";
             if ($user['user_id'] != $this->user->user_id) {
-                $diff_x = ($user_location->x - $this->user->location->x);
-                $diff_y = ($user_location->y - $this->user->location->y);
-                if ($diff_x != 0 || $diff_y != 0) {
-                    $angle = atan2($diff_y, $diff_x);
-                    $angle_degrees = rad2deg($angle);
-                    $angle_degrees = fmod(($angle_degrees + 450), 360);
-                    $directions = array("north", "northeast", "east", "southeast", "south", "southwest", "west", "northwest");
-                    $index = round($angle_degrees / (360 / count($directions)));
-                    $user_direction = $directions[$index % count($directions)];
-                }
+                $user_direction = $this->user->location->directionToTarget($user_location);
             }
 
             // add to return
@@ -264,22 +255,24 @@ class TravelManager {
 
         // Add more users for display
         if ($this->system->environment == System::ENVIRONMENT_DEV) {
+            $placeholder_coords = new TravelCoords(15, 15, 1);
+
             for ($i = 0; $i < 7; $i++) {
                 $return_arr[] = new NearbyPlayerDto(
                     user_id: $i . mt_rand(10000, 20000),
                     user_name: 'Konohamaru',
-                    target_x: 15, // rank name
-                    target_y: 15,
-                    target_map_id: 2,
+                    target_x: $placeholder_coords->x,
+                    target_y: $placeholder_coords->y,
+                    target_map_id: $placeholder_coords->map_id,
                     rank_name: 'Akademi-sei',
                     rank_num: 3,
                     village_icon: TravelManager::VILLAGE_ICONS['Mist'],
                     alignment: 'Enemy',
-                    attack: true,
+                    attack: $this->user->location->equals($placeholder_coords),
                     attack_id: 'abc' . $i . mt_rand(10000, 20000),
                     level: 30,
                     battle_id: 0,
-                    direction: "none", 
+                    direction: $this->user->location->directionToTarget($placeholder_coords),
                 );
             }
         }

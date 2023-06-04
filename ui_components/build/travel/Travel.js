@@ -246,14 +246,16 @@ function Travel({
   React.useEffect(() => {
     const menu = document.getElementsByClassName('sm-tmp-class')[0];
 
-    if (mapData && !mapData.in_village) {
-      menu.classList.add('sm-tmp-outvillage');
-      menu.classList.remove('sm-tmp-invillage');
-    }
+    if (menu) {
+      if (mapData && !mapData.in_village) {
+        menu.classList.add('sm-tmp-outvillage');
+        menu.classList.remove('sm-tmp-invillage');
+      }
 
-    if (mapData && mapData.in_village) {
-      menu.classList.add('sm-tmp-invillage');
-      menu.classList.remove('sm-tmp-outvillage');
+      if (mapData && mapData.in_village) {
+        menu.classList.add('sm-tmp-invillage');
+        menu.classList.remove('sm-tmp-outvillage');
+      }
     }
   }, [mapData]);
   return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement(TravelFilters, {
