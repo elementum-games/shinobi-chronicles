@@ -22,6 +22,11 @@
         text-align: center;
     }
 
+    .jutsu_slots_container {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-evenly;
+    }
     .jutsu_select {
         width:200px;
         height:60px;
@@ -299,34 +304,26 @@
     <tr><th colspan='3'>Equipped Jutsu</th></tr>
     <tr><td colspan='3'>
         <form action='<?= $self_link ?>' method='post'>
-            <div style='text-align:center;'>
-                <div style='display:inline-block;'>
-                    <?php $row_start = 1; ?>
-                    <?php for($i = 0; $i < $max_equipped_jutsu; $i++): ?>
-                        <?php $slot_equipped_jutsu = $player->equipped_jutsu[$i]['id'] ?? null; ?>
-                        <div class="jutsu_select_wrapper">
-                            <select class="jutsu_select" name='jutsu[<?= ($i + 1) ?>]'>
-                                <option value='none' <?= (!$player->equipped_jutsu ? "selected='selected'" : "") ?>>None</option>
-                                <?php foreach($player->jutsu as $jutsu): ?>
+            <div class='jutsu_slots_container'>
+                <?php for($i = 0; $i < $max_equipped_jutsu; $i++): ?>
+                    <?php $slot_equipped_jutsu = $player->equipped_jutsu[$i]['id'] ?? null; ?>
+                    <div class="jutsu_select_wrapper">
+                        <select class="jutsu_select" name='jutsu[<?= ($i + 1) ?>]'>
+                            <option value='none' <?= (!$player->equipped_jutsu ? "selected='selected'" : "") ?>>None</option>
+                            <?php foreach($player->jutsu as $jutsu): ?>
                                 <option
-                                    value='<?= $jutsu->jutsu_type ?>-<?= $jutsu->id ?>'
+                                        value='<?= $jutsu->jutsu_type ?>-<?= $jutsu->id ?>'
                                     <?= ($jutsu->id == $slot_equipped_jutsu ? "selected='selected'" : "") ?>
                                 >
                                     <?= $jutsu->name ?>
                                 </option>
-                                <?php endforeach; ?>
-                            </select>
-                        </div>
-                        <br />
-
-                        <!--// Start second row-->
-                        <?php if($row_start++ > 2): ?>
-                            </div><div style='display:inline-block;'>
-                            <?php $row_start = 1; ?>
-                        <?php endif; ?>
-                    <?php endfor; ?>
-                </div>
-                <br />
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                    <br />
+                <?php endfor; ?>
+            </div>
+            <div style='text-align:center;margin:8px 0 5px;'>
                 <input type='submit' name='equip_jutsu' value='Equip' />
             </div>
         </form>
