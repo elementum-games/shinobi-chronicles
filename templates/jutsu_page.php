@@ -337,7 +337,7 @@
         <tr><th colspan='3'>Jutsu Scrolls (<?= count($player->jutsu_scrolls) ?>)</th></tr>
 
         <?php foreach($player->jutsu_scrolls as $id => $jutsu_scroll): ?>
-            <tr id='jutsu_scrolls' class="jutsu_scroll hidden"><td colspan='3'>
+            <tr id='jutsu_scrolls' class="jutsu_scroll"><td colspan='3'>
                 <span style='font-weight:bold;'><?= $jutsu_scroll->name ?></span><br />
                 <div style='margin-left:2em;'>
                     <label style='width:6.5em;'>Rank:</label><?= $jutsu_scroll->rank ?><br />
@@ -355,7 +355,7 @@
             </td></tr>
         <?php endforeach; ?>
             <tr>
-                <th class="jutsu_scrolls_expand" colspan="3">+</th>
+                <th class="jutsu_scrolls_expand" colspan="3">-</th>
             </tr>
     <?php endif; ?>
 </table>
