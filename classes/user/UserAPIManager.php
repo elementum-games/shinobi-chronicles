@@ -1,9 +1,9 @@
 <?php
 
-require __DIR__ . '/HotbarAIDto.php';
-require __DIR__ . '/HotbarMissionDto.php';
+require __DIR__ . '/QuickActionAIDto.php';
+require __DIR__ . '/QuickActionMissionDto.php';
 
-class HotbarManager {
+class UserAPIManager {
     private System $system;
     private User $player;
 
@@ -13,7 +13,7 @@ class HotbarManager {
     }
 
     /**
-     * @return HotbarMissionDto[]
+     * @return QuickActionMissionDto[]
      */
     public function getMissions() : array {
         $max_mission_rank = Mission::maxMissionRank($this->player->rank_num);
@@ -21,7 +21,7 @@ class HotbarManager {
 
         $return_arr = [];
         while($row = $this->system->db_fetch($result)) {
-            $return_arr[] = new HotbarMissionDto(
+            $return_arr[] = new QuickActionMissionDto(
                 mission_id: $row['mission_id'],
                 name: $row['name'],
             );
@@ -30,7 +30,7 @@ class HotbarManager {
     }
 
     /**
-     * @return HotbarAIDto[]
+     * @return QuickActionAIDto[]
      */
     public function getAI() : array {
         $ai_rank = min($this->player->rank_num, System::SC_MAX_RANK);
@@ -39,7 +39,7 @@ class HotbarManager {
 
         $return_arr = [];
         while($row = $this->system->db_fetch($result)) {
-            $return_arr[] = new HotbarAIDto(
+            $return_arr[] = new QuickActionAIDto(
                 ai_id: $row['ai_id'],
                 name: $row['name'],
             );

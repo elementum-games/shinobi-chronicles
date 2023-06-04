@@ -31,7 +31,7 @@ function topbar(): void {
         ReactDOM.render(
             React.createElement(Topbar, {
                 linkData: {
-                    topbar_api: "<?= $system->router->api_links['topbar'] ?>",
+                    notification_api: "<?= $system->router->api_links['notification'] ?>",
                 },
             }),
             topbarContainer

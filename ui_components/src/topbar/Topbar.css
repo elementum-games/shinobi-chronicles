@@ -7,7 +7,7 @@
 }
 
 .topbar_left {
-    width: var(--sb-width);
+    width: var(--sidebar-width);
 }
 
 .topbar_right {

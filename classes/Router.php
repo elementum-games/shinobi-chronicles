@@ -58,10 +58,9 @@ class Router {
         $this->api_links['battle'] = $this->base_url . 'api/battle.php';
         $this->api_links['inbox'] = $this->base_url . 'api/inbox.php';
         $this->api_links['travel'] = $this->base_url . 'api/travel.php';
-        $this->api_links['hotbar'] = $this->base_url . 'api/hotbar.php';
-        $this->api_links['sidebar'] = $this->base_url . 'api/sidebar.php';
-        $this->api_links['header'] = $this->base_url . 'api/header.php';
-        $this->api_links['topbar'] = $this->base_url . 'api/topbar.php';
+        $this->api_links['notification'] = $this->base_url . 'api/notification.php';
+        $this->api_links['navigation'] = $this->base_url . 'api/navigation.php';
+        $this->api_links['user'] = $this->base_url . 'api/user.php';
     }
 
     /**

@@ -39,7 +39,7 @@ function Topbar({
   // Display
   return /*#__PURE__*/React.createElement("div", {
     id: "topbar",
-    class: "d-flex"
+    className: "d-flex"
   }, displayTopbar());
 }
 window.Topbar = Topbar;

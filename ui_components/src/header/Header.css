@@ -10,7 +10,7 @@
 }
  /* mirrors spacing of sidebar to position header_bar above content section */
 .header_bar_left {
-    width: var(--sb-width);
+    width: var(--sidebar-width);
 }
 
 .header_bar {
