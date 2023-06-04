@@ -1,0 +1,654 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="6087.2578"
+   height="445.64374"
+   viewBox="0 0 1610.5869 117.90991"
+   version="1.1"
+   id="svg23489"
+   inkscape:version="0.48.5 r10040"
+   sodipodi:docname="energy_pop.svg">
+  <defs
+     id="defs23483">
+    <filter
+       inkscape:collect="always"
+       id="filter4277"
+       x="-0.36059844"
+       width="1.7211969"
+       y="-0.07197611"
+       height="1.1439523"
+       color-interpolation-filters="sRGB">
+      <feGaussianBlur
+         inkscape:collect="always"
+         stdDeviation="3.7303434"
+         id="feGaussianBlur4279" />
+    </filter>
+    <filter
+       inkscape:collect="always"
+       id="filter4287"
+       x="-0.39430541"
+       width="1.7886108"
+       y="-0.070768595"
+       height="1.1415372"
+       color-interpolation-filters="sRGB">
+      <feGaussianBlur
+         inkscape:collect="always"
+         stdDeviation="9.1058537"
+         id="feGaussianBlur4289" />
+    </filter>
+    <filter
+       inkscape:collect="always"
+       id="filter4294"
+       x="-0.19541635"
+       width="1.3908327"
+       y="-0.08658468"
+       height="1.1731694"
+       color-interpolation-filters="sRGB">
+      <feGaussianBlur
+         inkscape:collect="always"
+         stdDeviation="12.191673"
+         id="feGaussianBlur4296" />
+    </filter>
+    <filter
+       inkscape:collect="always"
+       id="filter4342"
+       x="-0.083692148"
+       width="1.1673843"
+       y="-0.21194905"
+       height="1.4238981"
+       color-interpolation-filters="sRGB">
+      <feGaussianBlur
+         inkscape:collect="always"
+         stdDeviation="8.6588103"
+         id="feGaussianBlur4344" />
+    </filter>
+    <filter
+       inkscape:collect="always"
+       id="filter4364"
+       x="-0.084044605"
+       width="1.1680892"
+       y="-0.20972173"
+       height="1.4194435"
+       color-interpolation-filters="sRGB">
+      <feGaussianBlur
+         inkscape:collect="always"
+         stdDeviation="45.605073"
+         id="feGaussianBlur4366" />
+    </filter>
+    <filter
+       inkscape:collect="always"
+       id="filter4374"
+       x="-0.081122249"
+       width="1.1622446"
+       y="-0.23043635"
+       height="1.4608727"
+       color-interpolation-filters="sRGB">
+      <feGaussianBlur
+         inkscape:collect="always"
+         stdDeviation="63.616597"
+         id="feGaussianBlur4376" />
+    </filter>
+    <filter
+       inkscape:collect="always"
+       id="filter4395"
+       x="-0.040329892"
+       width="1.0806597"
+       y="-0.11712579"
+       height="1.2342516"
+       color-interpolation-filters="sRGB">
+      <feGaussianBlur
+         inkscape:collect="always"
+         stdDeviation="9.1967363"
+         id="feGaussianBlur4397" />
+    </filter>
+    <filter
+       inkscape:collect="always"
+       id="filter4402"
+       color-interpolation-filters="sRGB">
+      <feGaussianBlur
+         inkscape:collect="always"
+         stdDeviation="9.0418418"
+         id="feGaussianBlur4404" />
+    </filter>
+    <filter
+       inkscape:collect="always"
+       id="filter4413"
+       color-interpolation-filters="sRGB">
+      <feGaussianBlur
+         inkscape:collect="always"
+         stdDeviation="8.8956945"
+         id="feGaussianBlur4415" />
+    </filter>
+  </defs>
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#525252"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="0.3190877"
+     inkscape:cx="5623.6598"
+     inkscape:cy="-254.74987"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer1"
+     showgrid="false"
+     inkscape:pagecheckerboard="false"
+     showborder="true"
+     units="px"
+     inkscape:window-width="1920"
+     inkscape:window-height="1017"
+     inkscape:window-x="-8"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
+     fit-margin-top="0"
+     fit-margin-left="0"
+     fit-margin-right="0"
+     fit-margin-bottom="0"
+     showguides="true"
+     inkscape:guide-bbox="true"
+     inkscape:snap-global="true"
+     inkscape:snap-bbox="false">
+    <inkscape:grid
+       type="xygrid"
+       id="grid24034"
+       spacingx="2.6458333"
+       spacingy="2.6458333"
+       empspacing="10"
+       visible="true"
+       enabled="true"
+       snapvisiblegridlinesonly="true"
+       originx="201.13168px"
+       originy="-2208.7145px" />
+  </sodipodi:namedview>
+  <metadata
+     id="metadata23486">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+        <cc:license
+           rdf:resource="" />
+        <dc:creator>
+          <cc:Agent>
+            <dc:title>Robert Brooks</dc:title>
+          </cc:Agent>
+        </dc:creator>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(53.216089,405.29895)">
+    <g
+       id="g4561"
+       transform="translate(-213.57983,0)" />
+    <g
+       id="g4417"
+       transform="translate(-799.33617,-726.36772)"
+       inkscape:export-filename="C:\Users\rober\Desktop\assets\ASSETS_2019\electrical_effects\energy_pop\animation\energy_pop_01.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90">
+      <g
+         inkscape:export-ydpi="90"
+         inkscape:export-xdpi="90"
+         inkscape:export-filename="C:\Users\rober\Desktop\assets\ASSETS_2019\electrical_effects\1.png"
+         transform="matrix(0.25807519,0,0,0.25807519,313.89328,828.05805)"
+         id="g4162">
+        <g
+           id="g4017">
+          <rect
+             style="opacity:0;color:#000000;fill:#333333;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:10;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+             id="rect3943"
+             width="640.13226"
+             height="456.88199"
+             x="1674.8094"
+             y="-1964.5022" />
+          <path
+             id="path3947"
+             transform="matrix(1.025218,0,0,1.025218,-1657.0361,-4124.1875)"
+             d="m 3564.9688,2268.7188 c -1.6561,0.023 -3.4534,1.9756 -4.1876,7 0.6385,1.9268 -0.089,35.9764 3.4376,35.5937 4.3286,-1.4628 2.6617,-29.9814 4.0312,-35.4687 0.7671,-3.9795 -1.1521,-7.1541 -3.2812,-7.125 z m -0.4063,47.5312 c -5.8645,-0.041 -10.125,4.5312 -10.125,4.5312 -13.7494,11.1605 5.6383,29.0103 15.3437,18.5938 9.7055,-10.4164 2.4391,-22.3185 -4.0312,-23.0625 -0.4044,-0.046 -0.7965,-0.06 -1.1875,-0.062 z m -0.3437,29.6562 c -3.5268,-0.4238 -2.7991,37.3039 -3.4376,39.4376 1.6781,12.717 8.8326,7.7088 7.4688,-0.125 -1.3695,-6.0764 0.2974,-37.6926 -4.0312,-39.3126 z"
+             style="color:#000000;fill:#00ffff;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:10;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+             inkscape:connector-curvature="0" />
+          <path
+             inkscape:connector-curvature="0"
+             id="path4238"
+             d="m 1995.8689,-1743.5222 c -1.4889,0.079 -2.8693,0.748 -4.0779,1.5791 -0.2189,0.1211 -0.4588,0.4089 -0.7177,0.5234 -0.7915,0.7058 -1.5912,1.4238 -2.1221,2.3566 -1.083,1.5285 -1.178,3.6102 -0.448,5.3107 0.2932,0.7403 0.8274,1.4312 1.2587,2.0377 0.4772,0.6137 1.0603,1.0273 1.692,1.4353 1.6362,1.1847 3.895,1.6985 5.7992,0.8666 0.6454,-0.3051 1.2117,-0.7132 1.7264,-1.1516 0.5632,-0.6041 1.0332,-1.2973 1.4777,-1.9923 0.9198,-1.4203 1.4214,-3.1447 1.2484,-4.8501 -0.085,-1.4618 -0.683,-2.8501 -1.5506,-4.0158 -0.2782,-0.4112 -0.7381,-0.8928 -1.1699,-1.1529 -0.8144,-0.6132 -1.8054,-1.0338 -2.849,-0.9641 -0.089,0 -0.1782,0.013 -0.2672,0.017 z"
+             style="color:#000000;fill:#ffffff;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:10;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate" />
+          <path
+             style="color:#000000;fill:#00ffff;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:10;marker:none;visibility:visible;display:inline;overflow:visible;filter:url(#filter4277);enable-background:accumulate"
+             d="m 3564.9688,2268.7188 c -1.6561,0.023 -3.4534,1.9756 -4.1876,7 0.6385,1.9268 -0.089,35.9764 3.4376,35.5937 4.3286,-1.4628 2.6617,-29.9814 4.0312,-35.4687 0.7671,-3.9795 -1.1521,-7.1541 -3.2812,-7.125 z m -0.4063,47.5312 c -5.8645,-0.041 -10.125,4.5312 -10.125,4.5312 -13.7494,11.1605 5.6383,29.0103 15.3437,18.5938 9.7055,-10.4164 2.4391,-22.3185 -4.0312,-23.0625 -0.4044,-0.046 -0.7965,-0.06 -1.1875,-0.062 z m -0.3437,29.6562 c -3.5268,-0.4238 -2.7991,37.3039 -3.4376,39.4376 1.6781,12.717 8.8326,7.7088 7.4688,-0.125 -1.3695,-6.0764 0.2974,-37.6926 -4.0312,-39.3126 z"
+             transform="matrix(1.025218,0,0,1.025218,-1657.0361,-4124.1875)"
+             id="path4275"
+             inkscape:connector-curvature="0" />
+        </g>
+      </g>
+    </g>
+    <g
+       id="g4425"
+       transform="translate(-799.33617,-726.36772)"
+       inkscape:export-filename="C:\Users\rober\Desktop\assets\ASSETS_2019\electrical_effects\energy_pop\animation\energy_pop_02.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90">
+      <g
+         inkscape:export-ydpi="90"
+         inkscape:export-xdpi="90"
+         inkscape:export-filename="C:\Users\rober\Desktop\assets\ASSETS_2019\electrical_effects\2.png"
+         transform="matrix(0.25807519,0,0,0.25807519,312.67268,828.05805)"
+         id="g4169">
+        <g
+           id="g4023">
+          <rect
+             y="-1964.5022"
+             x="2379.6184"
+             height="456.88199"
+             width="640.13226"
+             id="rect3959"
+             style="opacity:0;color:#000000;fill:#333333;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:10;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate" />
+          <path
+             style="color:#000000;fill:#00ffff;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:10;marker:none;visibility:visible;display:inline;overflow:visible;filter:url(#filter4287);enable-background:accumulate"
+             d="m 4247.8125,2169.2188 c -1.656,0.075 -3.4221,6.623 -4.1563,23.375 0.5141,5.1725 0.1668,79.7126 1.8438,107.9374 -10.4548,1.9681 -17.625,9.6563 -17.625,9.6563 -23.7788,19.3014 -3.1165,47.5581 17.4688,48.4687 -1.5023,27.9436 -1.1897,92.9985 -1.6876,97.6563 1.6781,35.6002 8.8014,21.5552 7.4376,-0.375 -1.0826,-13.447 -0.2544,-71.4105 -2,-97.4063 4.6725,-0.5866 9.2194,-2.7191 13.0624,-6.8437 21.6514,-23.2376 5.4032,-49.8089 -9.0312,-51.4687 -1.4326,-0.1648 -2.8331,-0.1663 -4.1875,-0.094 1.9419,-26.7156 1.044,-92.2963 2.1563,-107.1562 0.7671,-13.2681 -1.1521,-23.847 -3.2813,-23.75 z"
+             transform="matrix(1.025218,0,0,1.025218,-1652.3064,-4124.1875)"
+             id="path4281"
+             inkscape:connector-curvature="0" />
+          <path
+             id="path3961"
+             transform="matrix(1.025218,0,0,1.025218,-1652.3064,-4124.1875)"
+             d="m 4247.8125,2169.2188 c -1.656,0.075 -3.4221,6.623 -4.1563,23.375 0.5141,5.1725 0.1668,79.7126 1.8438,107.9374 -10.4548,1.9681 -17.625,9.6563 -17.625,9.6563 -23.7788,19.3014 -3.1165,47.5581 17.4688,48.4687 -1.5023,27.9436 -1.1897,92.9985 -1.6876,97.6563 1.6781,35.6002 8.8014,21.5552 7.4376,-0.375 -1.0826,-13.447 -0.2544,-71.4105 -2,-97.4063 4.6725,-0.5866 9.2194,-2.7191 13.0624,-6.8437 21.6514,-23.2376 5.4032,-49.8089 -9.0312,-51.4687 -1.4326,-0.1648 -2.8331,-0.1663 -4.1875,-0.094 1.9419,-26.7156 1.044,-92.2963 2.1563,-107.1562 0.7671,-13.2681 -1.1521,-23.847 -3.2813,-23.75 z"
+             style="color:#000000;fill:#00ffff;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:10;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+             inkscape:connector-curvature="0" />
+          <path
+             style="color:#000000;fill:#ffffff;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:10;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+             d="m 2688.6252,-1747.6377 c -19.8589,16.1196 8.1774,41.9111 22.1955,26.8661 14.018,-15.045 3.5046,-32.2395 -5.8409,-33.3141 -9.3453,-1.0746 -16.3546,6.448 -16.3546,6.448 z"
+             id="path4249"
+             inkscape:connector-curvature="0" />
+        </g>
+      </g>
+    </g>
+    <g
+       id="g4477"
+       transform="translate(-799.33617,-726.36772)"
+       inkscape:export-filename="C:\Users\rober\Desktop\assets\ASSETS_2019\electrical_effects\energy_pop\animation\energy_pop_07.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90">
+      <g
+         inkscape:export-ydpi="90"
+         inkscape:export-xdpi="90"
+         inkscape:export-filename="C:\Users\rober\Desktop\assets\ASSETS_2019\electrical_effects\7.png"
+         transform="matrix(0.25807519,0,0,0.25807519,319.54508,828.05805)"
+         id="g4205">
+        <g
+           id="g4128">
+          <g
+             transform="translate(2066.176,0)"
+             id="g4100">
+            <g
+               transform="translate(-136.02709,0)"
+               id="g4102">
+              <rect
+                 style="opacity:0;color:#000000;fill:#333333;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:10;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+                 id="rect4104"
+                 width="640.13226"
+                 height="456.88199"
+                 x="3923.2368"
+                 y="-1964.5022" />
+            </g>
+          </g>
+          <path
+             id="path4112"
+             transform="matrix(1.025218,0,0,1.025218,-1678.9359,-4124.1875)"
+             d="m 7854.8125,2224.5938 c -34.551,-0.2177 -79.0615,8.3035 -122.2813,37.875 0,0 43.6936,-19.2135 99.5,-24.875 55.8067,-5.6616 105.125,16.1562 105.125,16.1562 0,0 -3.2252,-7.2707 -25.0624,-18.5938 -9.5539,-4.9538 -30.4083,-10.3931 -57.2813,-10.5624 z m -254.7813,133.2187 c -3.9465,0.011 -9.5847,2.845 -15.25,12.4063 -55.7359,60.9599 -199.9287,20.9318 -194.7812,25.4374 5.1477,5.3949 67.6759,23.9417 129.5625,14.9688 61.8865,-8.9729 83.2807,-44.9839 85.5313,-48.3438 1.1252,-1.6799 -1.116,-4.4794 -5.0626,-4.4687 z"
+             style="color:#000000;fill:#00ffff;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:10;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+             inkscape:connector-curvature="0" />
+          <path
+             style="color:#000000;fill:#00ffff;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:10;marker:none;visibility:visible;display:inline;overflow:visible;filter:url(#filter4395);enable-background:accumulate"
+             d="m 7854.8125,2224.5938 c -34.551,-0.2177 -79.0615,8.3035 -122.2813,37.875 0,0 43.6936,-19.2135 99.5,-24.875 55.8067,-5.6616 105.125,16.1562 105.125,16.1562 0,0 -3.2252,-7.2707 -25.0624,-18.5938 -9.5539,-4.9538 -30.4083,-10.3931 -57.2813,-10.5624 z m -254.7813,133.2187 c -3.9465,0.011 -9.5847,2.845 -15.25,12.4063 -55.7359,60.9599 -199.9287,20.9318 -194.7812,25.4374 5.1477,5.3949 67.6759,23.9417 129.5625,14.9688 61.8865,-8.9729 83.2807,-44.9839 85.5313,-48.3438 1.1252,-1.6799 -1.116,-4.4794 -5.0626,-4.4687 z"
+             transform="matrix(1.025218,0,0,1.025218,-1678.9359,-4124.1875)"
+             id="path4381"
+             inkscape:connector-curvature="0" />
+        </g>
+      </g>
+    </g>
+    <g
+       id="g4486"
+       transform="translate(-799.33617,-726.36772)"
+       inkscape:export-filename="C:\Users\rober\Desktop\assets\ASSETS_2019\electrical_effects\energy_pop\animation\energy_pop_08.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90">
+      <g
+         inkscape:export-ydpi="90"
+         inkscape:export-xdpi="90"
+         inkscape:export-filename="C:\Users\rober\Desktop\assets\ASSETS_2019\electrical_effects\8.png"
+         transform="matrix(0.25807519,0,0,0.25807519,323.24558,828.05805)"
+         id="g4222">
+        <g
+           id="g4139"
+           transform="translate(-189.05461,0)">
+          <g
+             id="g4118"
+             transform="translate(2940.9709,0)">
+            <g
+               id="g4120"
+               transform="translate(-136.02709,0)">
+              <rect
+                 y="-1964.5022"
+                 x="3923.2368"
+                 height="456.88199"
+                 width="640.13226"
+                 id="rect4122"
+                 style="opacity:0;color:#000000;fill:#333333;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:10;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate" />
+            </g>
+          </g>
+          <path
+             id="path4135"
+             transform="matrix(1.025218,0,0,1.025218,-1504.2201,-4124.1875)"
+             d="m 8566.1562,2196.8125 c -9.6794,-0.3406 -67.147,19.0866 -111.125,45.625 0,0 -0.019,3.2336 -4.0624,6.4687 -4.0441,3.2352 22.67,-7.2818 46.125,-21.0312 23.4549,-13.7494 73.5789,-27.4836 70.3437,-30.7188 -0.2022,-0.2021 -0.636,-0.321 -1.2813,-0.3437 z M 8231,2393.6875 c -54.1888,2.4264 -119.6949,49.3406 -121.3125,62.2813 -1.6176,12.9406 0.8093,1.6154 13.75,-7.2813 12.9407,-8.8967 70.3627,-36.3935 88.1563,-40.4375 17.7932,-4.044 19.4062,-14.5625 19.4062,-14.5625 z"
+             style="color:#000000;fill:#00ffff;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:10;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+             inkscape:connector-curvature="0" />
+          <path
+             style="color:#000000;fill:#00ffff;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:10;marker:none;visibility:visible;display:inline;overflow:visible;filter:url(#filter4402);enable-background:accumulate"
+             d="m 8566.1562,2196.8125 c -9.6794,-0.3406 -67.147,19.0866 -111.125,45.625 0,0 -0.019,3.2336 -4.0624,6.4687 -4.0441,3.2352 22.67,-7.2818 46.125,-21.0312 23.4549,-13.7494 73.5789,-27.4836 70.3437,-30.7188 -0.2022,-0.2021 -0.636,-0.321 -1.2813,-0.3437 z M 8231,2393.6875 c -54.1888,2.4264 -119.6949,49.3406 -121.3125,62.2813 -1.6176,12.9406 0.8093,1.6154 13.75,-7.2813 12.9407,-8.8967 70.3627,-36.3935 88.1563,-40.4375 17.7932,-4.044 19.4062,-14.5625 19.4062,-14.5625 z"
+             transform="matrix(1.025218,0,0,1.025218,-1504.2201,-4124.1875)"
+             id="path4400"
+             inkscape:connector-curvature="0" />
+        </g>
+      </g>
+    </g>
+    <g
+       id="g4495"
+       transform="translate(-799.33617,-726.36772)"
+       inkscape:export-filename="C:\Users\rober\Desktop\assets\ASSETS_2019\electrical_effects\energy_pop\animation\energy_pop_09.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90">
+      <g
+         inkscape:export-ydpi="90"
+         inkscape:export-xdpi="90"
+         inkscape:export-filename="C:\Users\rober\Desktop\assets\ASSETS_2019\electrical_effects\9.png"
+         transform="matrix(0.25807519,0,0,0.25807519,313.89328,828.05805)"
+         id="g4230">
+        <g
+           transform="translate(547.26335,0)"
+           id="g4146">
+          <g
+             transform="translate(2940.9709,0)"
+             id="g4148">
+            <g
+               transform="translate(-136.02709,0)"
+               id="g4150">
+              <rect
+                 style="opacity:0;color:#000000;fill:#333333;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:10;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+                 id="rect4152"
+                 width="640.13226"
+                 height="456.88199"
+                 x="3923.2368"
+                 y="-1964.5022" />
+            </g>
+          </g>
+        </g>
+        <path
+           id="path4158"
+           transform="matrix(1.025218,0,0,1.025218,-1657.0361,-4124.1875)"
+           d="m 9219.5625,2177.75 c -11.323,13.7494 -14.5566,28.2902 -6.4687,23.4375 8.0878,-4.8527 16.9926,-11.3072 15.375,-16.9687 -1.6177,-5.6616 -8.9063,-6.4688 -8.9063,-6.4688 z m -393.4063,252.0312 c -1.6491,0.071 -2.875,0.3126 -2.875,0.3126 -25.8813,17.7934 -21.8417,38.0089 -14.5624,33.1562 7.279,-4.8527 26.6801,-26.706 25.0624,-30.75 -1.011,-2.5275 -4.8763,-2.8372 -7.625,-2.7188 z"
+           style="opacity:0.67256637;color:#000000;fill:#00ffff;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:10;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+           inkscape:connector-curvature="0" />
+        <path
+           style="opacity:0.55309735;color:#000000;fill:#00ffff;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:10;marker:none;visibility:visible;display:inline;overflow:visible;filter:url(#filter4413);enable-background:accumulate"
+           d="m 9219.5625,2177.75 c -11.323,13.7494 -14.5566,28.2902 -6.4687,23.4375 8.0878,-4.8527 16.9926,-11.3072 15.375,-16.9687 -1.6177,-5.6616 -8.9063,-6.4688 -8.9063,-6.4688 z m -393.4063,252.0312 c -1.6491,0.071 -2.875,0.3126 -2.875,0.3126 -25.8813,17.7934 -21.8417,38.0089 -14.5624,33.1562 7.279,-4.8527 26.6801,-26.706 25.0624,-30.75 -1.011,-2.5275 -4.8763,-2.8372 -7.625,-2.7188 z"
+           transform="matrix(1.025218,0,0,1.025218,-1657.0361,-4124.1875)"
+           id="path4407"
+           inkscape:connector-curvature="0" />
+      </g>
+    </g>
+    <g
+       id="g4433"
+       transform="translate(-799.33617,-726.36772)"
+       inkscape:export-filename="C:\Users\rober\Desktop\assets\ASSETS_2019\electrical_effects\energy_pop\animation\energy_pop_03.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90">
+      <g
+         inkscape:export-ydpi="90"
+         inkscape:export-xdpi="90"
+         inkscape:export-filename="C:\Users\rober\Desktop\assets\ASSETS_2019\electrical_effects\3.png"
+         transform="matrix(0.25807519,0,0,0.25807519,310.44958,828.05805)"
+         id="g4176">
+        <g
+           id="g4029">
+          <rect
+             style="opacity:0;color:#000000;fill:#333333;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:10;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+             id="rect3967"
+             width="640.13226"
+             height="456.88199"
+             x="3088.312"
+             y="-1964.5022" />
+          <path
+             style="color:#000000;fill:#00ffff;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:10;marker:none;visibility:visible;display:inline;overflow:visible;filter:url(#filter4294);enable-background:accumulate"
+             d="m 4930.2812,2142.5312 c -1.656,0.048 -3.4533,4.1644 -4.1874,14.7188 0.6384,4.0477 -0.089,75.6165 3.4374,74.8125 4.3287,-3.0728 2.6618,-63.0356 4.0313,-74.5625 0.7671,-8.3594 -1.1521,-15.0298 -3.2813,-14.9688 z M 4976.9062,2283 c -14.0293,0.355 -30.7001,9.012 -46.3124,30.8438 0,0 20.0688,-21.491 38.4062,-17.5313 18.3369,3.9597 32.2592,16.8911 17.25,31.4687 -12.3347,11.9802 -49.5625,15.375 -49.5625,15.375 0,0 7.5283,3.4975 31.8437,2.625 27.2697,-0.9786 49.2179,-21.0448 38.9376,-43.8124 -5.1402,-11.3839 -16.5332,-19.3238 -30.5626,-18.9688 z m -78.7187,16.5312 c -33.2928,0.3093 -50.0913,36.8784 -27.5937,54 31.7676,24.1767 65.4503,-4.7046 61.5937,-9.1874 -7.4495,6.4721 -29.6085,13.9107 -41.8437,-0.9376 -20.1993,-24.6537 17.4808,-41.9019 39.1874,-34.375 -11.4074,-6.8175 -22.0217,-9.5865 -31.3437,-9.5 z m 31.1875,112.7188 c -3.3422,1.0677 -2.6527,53.9638 -3.2812,57 1.678,18.3833 8.8325,11.1368 7.4687,-0.1875 -1.3695,-8.7838 0.2974,-54.4707 -4.0313,-56.8125 -0.055,-0.01 -0.1031,-0.017 -0.1562,0 z"
+             transform="matrix(1.025218,0,0,1.025218,-1643.6923,-4124.1875)"
+             id="path4292"
+             inkscape:connector-curvature="0" />
+          <path
+             id="path3971"
+             transform="matrix(1.025218,0,0,1.025218,-1643.6923,-4124.1875)"
+             d="m 4930.2812,2142.5312 c -1.656,0.048 -3.4533,4.1644 -4.1874,14.7188 0.6384,4.0477 -0.089,75.6165 3.4374,74.8125 4.3287,-3.0728 2.6618,-63.0356 4.0313,-74.5625 0.7671,-8.3594 -1.1521,-15.0298 -3.2813,-14.9688 z M 4976.9062,2283 c -14.0293,0.355 -30.7001,9.012 -46.3124,30.8438 0,0 20.0688,-21.491 38.4062,-17.5313 18.3369,3.9597 32.2592,16.8911 17.25,31.4687 -12.3347,11.9802 -49.5625,15.375 -49.5625,15.375 0,0 7.5283,3.4975 31.8437,2.625 27.2697,-0.9786 49.2179,-21.0448 38.9376,-43.8124 -5.1402,-11.3839 -16.5332,-19.3238 -30.5626,-18.9688 z m -78.7187,16.5312 c -33.2928,0.3093 -50.0913,36.8784 -27.5937,54 31.7676,24.1767 65.4503,-4.7046 61.5937,-9.1874 -7.4495,6.4721 -29.6085,13.9107 -41.8437,-0.9376 -20.1993,-24.6537 17.4808,-41.9019 39.1874,-34.375 -11.4074,-6.8175 -22.0217,-9.5865 -31.3437,-9.5 z m 31.1875,112.7188 c -3.3422,1.0677 -2.6527,53.9638 -3.2812,57 1.678,18.3833 8.8325,11.1368 7.4687,-0.1875 -1.3695,-8.7838 0.2974,-54.4707 -4.0313,-56.8125 -0.055,-0.01 -0.1031,-0.017 -0.1562,0 z"
+             style="color:#000000;fill:#00ffff;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:10;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+             inkscape:connector-curvature="0" />
+        </g>
+      </g>
+      <path
+         sodipodi:nodetypes="ccccc"
+         transform="matrix(0.26458334,0,0,0.26458334,-113.74661,-236.29243)"
+         inkscape:connector-curvature="0"
+         id="path4253"
+         d="m 4906.5664,2303.5288 c 0,0 -39.5659,2.7422 -39.1742,32.1228 1.1752,22.3293 35.2568,22.3293 35.2568,22.3293 0,0 -25.4632,-6.6596 -26.2467,-24.288 -0.7835,-22.721 30.1641,-30.1641 30.1641,-30.1641 z"
+         style="color:#000000;fill:#ffffff;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:10;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate" />
+      <path
+         sodipodi:nodetypes="ccccc"
+         transform="matrix(0.26458334,0,0,0.26458334,-113.74661,-236.29243)"
+         inkscape:connector-curvature="0"
+         id="path4257"
+         d="m 4952.4002,2295.6939 c 0,0 34.8651,-22.3292 50.143,9.4019 9.7935,35.6485 -40.3495,37.6072 -40.3495,37.6072 0,0 42.6999,-6.2679 34.0816,-36.8238 -8.2266,-23.5045 -43.8751,-10.1853 -43.8751,-10.1853 z"
+         style="color:#000000;fill:#ffffff;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:10;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate" />
+    </g>
+    <g
+       id="g4442"
+       transform="translate(-799.33617,-726.36772)"
+       inkscape:export-filename="C:\Users\rober\Desktop\assets\ASSETS_2019\electrical_effects\energy_pop\animation\energy_pop_04.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90">
+      <g
+         inkscape:export-ydpi="90"
+         inkscape:export-xdpi="90"
+         inkscape:export-filename="C:\Users\rober\Desktop\assets\ASSETS_2019\electrical_effects\4.png"
+         transform="matrix(0.25807519,0,0,0.25807519,310.75448,828.05805)"
+         id="g4184">
+        <g
+           id="g4063">
+          <g
+             transform="translate(-136.02709,0)"
+             id="g4040">
+            <rect
+               style="opacity:0;color:#000000;fill:#333333;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:10;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+               id="rect4007"
+               width="640.13226"
+               height="456.88199"
+               x="3923.2368"
+               y="-1964.5022" />
+            <path
+               id="path4356"
+               d="m 4245.7661,-1954.1535 c -1.3276,0.012 -2.7754,1.1037 -3.364,3.9088 0.512,1.0756 -0.073,20.1091 2.7553,19.8956 3.4703,-0.8166 2.1379,-16.7681 3.2358,-19.8316 0.6151,-2.2216 -0.9201,-3.989 -2.6271,-3.9728 z"
+               style="opacity:0.5;color:#000000;fill:#00ffff;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:10;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+               inkscape:connector-curvature="0" />
+            <path
+               id="path4354"
+               d="m 4315.6412,-1788.4846 c -20.0884,0.052 -44.6918,10.5527 -62.1219,31.9419 26.271,-21.8118 61.6307,-29.9088 80.0632,-12.2384 25.2251,30.5247 -32.9575,55.5811 -73.1749,40.1756 2.6427,3.024 16.2318,8.5565 27.5206,10.3803 11.9986,1.9387 55.302,1.748 62.4101,-35.434 2.9604,-23.0866 -13.3128,-34.8813 -34.6971,-34.8254 z"
+               style="color:#000000;fill:#00ffff;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:10;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+               inkscape:connector-curvature="0" />
+            <path
+               id="path4009"
+               d="m 4183.6444,-1771.8248 c -52.729,0.8569 -104.3378,27.4091 -82.3059,58.7899 31.6616,38.6973 103.1904,24.0291 124.8844,12.3026 21.694,-11.7265 23.6983,-21.5638 22.8752,-22.8432 -40.6257,37.0677 -135.2117,17.6721 -112.0051,-18.7743 18.8724,-25.8501 70.0475,-25.5774 108.4809,-15.2501 -17.205,-10.3676 -39.6663,-14.5867 -61.9295,-14.2249 z"
+               style="color:#000000;fill:#00ffff;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:10;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+               inkscape:connector-curvature="0" />
+            <path
+               id="path4317"
+               transform="matrix(1.025218,0,0,1.025218,-1508.8466,-4124.1875)"
+               d="m 5681.2188,2278.25 c -19.5943,0.052 -43.5924,10.2932 -60.5938,31.1562 25.6248,-21.2752 60.1146,-29.1732 78.0938,-11.9374 24.6046,29.7738 -32.1469,54.214 -71.375,39.1874 2.5776,2.9497 15.8326,8.3461 26.8437,10.125 11.7035,1.8911 53.9417,1.705 60.875,-34.5624 2.8876,-22.5188 -12.9855,-34.0233 -33.8437,-33.9688 z m -128.75,16.25 c -51.432,0.8358 -101.7713,26.7348 -80.2813,57.3438 30.8828,37.7454 100.6521,23.438 121.8125,12 21.1604,-11.4381 23.1154,-21.0334 22.3125,-22.2813 -39.6264,36.1559 -131.8858,17.2374 -109.25,-18.3125 18.4082,-25.2142 68.3245,-24.9483 105.8125,-14.875 -16.7818,-10.1126 -38.6907,-14.2279 -60.4062,-13.875 z"
+               style="color:#000000;fill:#00ffff;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:10;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+               inkscape:connector-curvature="0" />
+            <path
+               id="path4298"
+               d="m 4244.869,-1538.3314 c -2.7888,0.5898 -2.2102,12.0206 -2.7552,12.6871 1.4786,4.1001 7.7695,2.4939 6.5677,-0.032 -1.2068,-1.9593 0.2902,-12.1328 -3.5241,-12.6551 -0.097,0 -0.1984,-0.019 -0.2884,0 z"
+               style="opacity:0.48672563;color:#000000;fill:#00ffff;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:10;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+               inkscape:connector-curvature="0" />
+            <path
+               style="color:#000000;fill:#00ffff;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:10;marker:none;visibility:visible;display:inline;overflow:visible;filter:url(#filter4342);enable-background:accumulate"
+               d="m 5681.2188,2278.25 c -19.5943,0.052 -43.5924,10.2932 -60.5938,31.1562 25.6248,-21.2752 60.1146,-29.1732 78.0938,-11.9374 24.6046,29.7738 -32.1469,54.214 -71.375,39.1874 2.5776,2.9497 15.8326,8.3461 26.8437,10.125 11.7035,1.8911 53.9417,1.705 60.875,-34.5624 2.8876,-22.5188 -12.9855,-34.0233 -33.8437,-33.9688 z m -128.75,16.25 c -51.432,0.8358 -101.7713,26.7348 -80.2813,57.3438 30.8828,37.7454 100.6521,23.438 121.8125,12 21.1604,-11.4381 23.1154,-21.0334 22.3125,-22.2813 -39.6264,36.1559 -131.8858,17.2374 -109.25,-18.3125 18.4082,-25.2142 68.3245,-24.9483 105.8125,-14.875 -16.7818,-10.1126 -38.6907,-14.2279 -60.4062,-13.875 z"
+               transform="matrix(1.025218,0,0,1.025218,-1508.8466,-4124.1875)"
+               id="path4336"
+               inkscape:connector-curvature="0" />
+          </g>
+        </g>
+      </g>
+      <path
+         sodipodi:nodetypes="ccccc"
+         transform="matrix(0.26458334,0,0,0.26458334,-113.74661,-236.29243)"
+         inkscape:connector-curvature="0"
+         id="path4259"
+         d="m 5572.7525,2299.3667 c -3.324,-4.709 -97.703,-1.385 -98.3362,37.9673 2.216,43.7487 101.6602,28.7905 101.6602,28.7905 0,0 -81.993,10.2492 -82.824,-28.2543 -0.831,-36.2874 59.5558,-40.4425 79.5,-38.5035 z"
+         style="color:#000000;fill:#ffffff;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:10;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate" />
+      <path
+         sodipodi:nodetypes="ccccc"
+         transform="matrix(0.26458334,0,0,0.26458334,-113.74661,-236.29243)"
+         inkscape:connector-curvature="0"
+         id="path4261"
+         d="m 5642.5573,2292.4417 c 0,0 50.1376,-28.8084 66.7578,6.371 9.9721,37.6724 -32.4094,43.7666 -32.4094,43.7666 0,0 36.8415,-8.5871 28.5314,-42.1045 -15.7892,-28.5313 -62.8798,-8.0331 -62.8798,-8.0331 z"
+         style="color:#000000;fill:#ffffff;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:10;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate" />
+    </g>
+    <g
+       id="g4457"
+       transform="translate(-799.33617,-726.36772)"
+       inkscape:export-filename="C:\Users\rober\Desktop\assets\ASSETS_2019\electrical_effects\energy_pop\animation\energy_pop_05.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90">
+      <g
+         inkscape:export-ydpi="90"
+         inkscape:export-xdpi="90"
+         inkscape:export-filename="C:\Users\rober\Desktop\assets\ASSETS_2019\electrical_effects\5.png"
+         transform="matrix(0.25807519,0,0,0.25807519,309.24368,828.05805)"
+         id="g4193">
+        <g
+           id="g4071"
+           transform="translate(705.93371,0)">
+          <g
+             id="g4073"
+             transform="translate(-136.02709,0)">
+            <rect
+               y="-1964.5022"
+               x="3923.2368"
+               height="456.88199"
+               width="640.13226"
+               id="rect4075"
+               style="opacity:0;color:#000000;fill:#333333;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:10;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate" />
+          </g>
+        </g>
+        <path
+           style="color:#000000;fill:#00ffff;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:10;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+           d="m 19032.375,-5950.0625 c -99.467,0.3332 -216.651,35.634 -319.875,129.75 0,0 15.656,-12.5582 103.406,-47.0313 343.809,-120.972 498.703,87.9975 300.875,329.0626 -36.029,45.6336 255.174,-107.3996 134.75,-322.7813 -27.471,-50.094 -113.272,-89.3547 -219.156,-89 z m -654.781,21.3125 c -319.26,-1.0329 -471.539,282.966 -365.549,409.0092 115.956,137.893 300.789,99.5292 385.103,19.0043 45.325,-43.2885 62.673,-94.0362 37.602,-75.2323 -25.072,18.8036 -205.966,118.9069 -291.17,16.9069 -154.39,-197.8934 159.956,-360.4305 328.764,-361.6256 -33.127,-5.3864 -64.734,-7.9654 -94.75,-8.0625 z"
+           transform="matrix(0.26458334,0,0,0.26458334,-113.74661,-236.29243)"
+           id="path4059"
+           inkscape:connector-curvature="0"
+           sodipodi:nodetypes="sccccsssscccs" />
+        <path
+           sodipodi:nodetypes="sccccsssscccs"
+           inkscape:connector-curvature="0"
+           id="path4358"
+           transform="matrix(0.26458334,0,0,0.26458334,-113.74661,-236.29243)"
+           d="m 19032.375,-5950.0625 c -99.467,0.3332 -216.651,35.634 -319.875,129.75 0,0 15.656,-12.5582 103.406,-47.0313 343.809,-120.972 498.703,87.9975 300.875,329.0626 -36.029,45.6336 255.174,-107.3996 134.75,-322.7813 -27.471,-50.094 -113.272,-89.3547 -219.156,-89 z m -654.781,21.3125 c -319.26,-1.0329 -471.539,282.966 -365.549,409.0092 115.956,137.893 300.789,99.5292 385.103,19.0043 45.325,-43.2885 62.673,-94.0362 37.602,-75.2323 -25.072,18.8036 -205.966,118.9069 -291.17,16.9069 -154.39,-197.8934 159.956,-360.4305 328.764,-361.6256 -33.127,-5.3864 -64.734,-7.9654 -94.75,-8.0625 z"
+           style="color:#000000;fill:#00ffff;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:10;marker:none;visibility:visible;display:inline;overflow:visible;filter:url(#filter4364);enable-background:accumulate" />
+      </g>
+      <path
+         sodipodi:nodetypes="ccccc"
+         transform="matrix(0.26458334,0,0,0.26458334,-113.74661,-236.29243)"
+         inkscape:connector-curvature="0"
+         id="path4263"
+         d="m 6221.252,2265.1381 c 0,0 -103.4199,23.5045 -81.8741,94.018 25.4632,49.3595 89.3172,14.1027 91.2759,9.4018 0,0 -54.4521,23.1128 -75.9979,-15.6696 -21.1541,-58.3695 66.5961,-87.7502 66.5961,-87.7502 z"
+         style="color:#000000;fill:#ffffff;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:10;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate" />
+      <path
+         sodipodi:nodetypes="ccccc"
+         transform="matrix(0.26458334,0,0,0.26458334,-113.74661,-236.29243)"
+         inkscape:connector-curvature="0"
+         id="path4265"
+         d="m 6354.0525,2268.6638 c 0,0 59.153,-21.5459 93.6263,8.2265 23.1128,41.9164 -11.7523,74.0392 -11.7523,74.0392 0,0 26.2467,-43.8751 5.4844,-71.297 -22.721,-27.4219 -87.3584,-10.9687 -87.3584,-10.9687 z"
+         style="color:#000000;fill:#ffffff;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:10;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate" />
+    </g>
+    <g
+       id="g4467"
+       transform="translate(-799.33617,-726.36772)"
+       inkscape:export-filename="C:\Users\rober\Desktop\assets\ASSETS_2019\electrical_effects\energy_pop\animation\energy_pop_06.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90">
+      <g
+         inkscape:export-ydpi="90"
+         inkscape:export-xdpi="90"
+         inkscape:export-filename="C:\Users\rober\Desktop\assets\ASSETS_2019\electrical_effects\6.png"
+         transform="matrix(0.25807519,0,0,0.25807519,318.02228,828.05805)"
+         id="g4199">
+        <g
+           transform="translate(1371.9974,0)"
+           id="g4086">
+          <g
+             transform="translate(-136.02709,0)"
+             id="g4088">
+            <rect
+               style="opacity:0;color:#000000;fill:#333333;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:10;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+               id="rect4090"
+               width="640.13226"
+               height="456.88199"
+               x="3923.2368"
+               y="-1964.5022" />
+          </g>
+        </g>
+        <path
+           sodipodi:nodetypes="scscsscscsc"
+           inkscape:connector-curvature="0"
+           style="color:#000000;fill:#00ffff;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:10;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+           d="m 21676.188,-6023.9688 c -117.741,-0.033 -253.004,46.9043 -390.594,176.4376 0,0 329.783,-185.7226 559.294,-66.2409 215.125,111.9928 190.8,395.0846 190.8,395.0846 0,0 65.817,-134.781 9.406,-288.3437 -34.816,-94.7771 -179.08,-216.8844 -368.906,-216.9376 z m -1490.344,129.25 c 69.697,482.0803 435.986,581.1373 585.562,514.875 149.576,-66.2626 200.656,-207.25 200.656,-207.25 0,0 -176.218,165.5537 -412.468,110.7188 -236.252,-54.8345 -373.75,-418.3438 -373.75,-418.3438 z"
+           transform="matrix(0.26458334,0,0,0.26458334,-113.74661,-236.29243)"
+           id="path4096" />
+        <path
+           id="path4372"
+           transform="matrix(0.26458334,0,0,0.26458334,-113.74661,-236.29243)"
+           d="m 21676.188,-6023.9688 c -117.741,-0.033 -253.004,46.9043 -390.594,176.4376 0,0 329.783,-185.7226 559.294,-66.2409 215.125,111.9928 190.8,395.0846 190.8,395.0846 0,0 65.817,-134.781 9.406,-288.3437 -34.816,-94.7771 -179.08,-216.8844 -368.906,-216.9376 z m -1490.344,129.25 c 69.697,482.0803 435.986,581.1373 585.562,514.875 149.576,-66.2626 200.656,-207.25 200.656,-207.25 0,0 -176.218,165.5537 -412.468,110.7188 -236.252,-54.8345 -373.75,-418.3438 -373.75,-418.3438 z"
+           style="color:#000000;fill:#00ffff;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:10;marker:none;visibility:visible;display:inline;overflow:visible;filter:url(#filter4374);enable-background:accumulate"
+           inkscape:connector-curvature="0"
+           sodipodi:nodetypes="scscsscscsc" />
+      </g>
+      <path
+         sodipodi:nodetypes="cccc"
+         transform="matrix(0.26458334,0,0,0.26458334,-113.74661,-236.29243)"
+         inkscape:connector-curvature="0"
+         id="path4267"
+         d="m 6747.3613,2319.1985 c 0.7834,1.5669 75.9979,126.5325 173.9333,43.4833 -0.7834,1.567 -18.8036,30.1641 -56.4108,38.7824 -85.008,1.1752 -110.8629,-65.0291 -117.5225,-82.2657 z"
+         style="color:#000000;fill:#ffffff;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:10;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate" />
+      <path
+         sodipodi:nodetypes="ccccc"
+         transform="matrix(0.26458334,0,0,0.26458334,-113.74661,-236.29243)"
+         inkscape:connector-curvature="0"
+         id="path4269"
+         d="m 7059.9712,2256.128 c 0,0 70.5136,-27.4219 110.863,1.567 44.2668,36.0402 40.3494,70.5135 40.3494,70.5135 0,0 -9.0101,-39.1741 -45.4421,-66.2043 -54.8439,-27.422 -105.7703,-5.8762 -105.7703,-5.8762 z"
+         style="color:#000000;fill:#ffffff;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:10;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate" />
+    </g>
+  </g>
+</svg>
