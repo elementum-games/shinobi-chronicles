@@ -15,3 +15,42 @@
     justify-content: center;
     align-items: center;
 }
+
+.topbar_inner_left {
+    flex-basis: 30%;
+}
+.topbar_inner_center {
+    flex-basis: 40%;
+}
+.topbar_inner_right {
+    flex-basis: 30%;
+}
+
+.topbar_notifications_container {
+    justify-content: flex-end;
+    gap: 5px;
+}
+
+.topbar_notification_wrapper {
+    cursor: pointer;
+}
+
+.topbar_notification_important {
+    fill: white;
+    font-weight: bold;
+    font-size: 60px;
+}
+
+.topbar_notification_mission {
+    fill: #9aa6c6;
+    font-family: Andale Mono, AndaleMono, monospace;
+    font-size: 50px;
+    text-transform: uppercase;
+}
+
+.topbar_notification_specialmission {
+    fill: #9aa6c6;
+    font-family: Andale Mono, AndaleMono, monospace;
+    font-size: 45px;
+    text-transform: uppercase;
+}

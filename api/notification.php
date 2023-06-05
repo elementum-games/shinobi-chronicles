@@ -26,6 +26,11 @@ try {
     $NotificationManager = new NotificationAPIManager($system, $player);
 
     switch ($request) {
+        case "getUserNotifications":
+            $NotificationResponse->response_data = [
+                'userNotifications' => NotificationAPIPresenter::userNotificationResponse(notificationManager: $NotificationManager),
+            ];
+            break;
         default:
             API::exitWithError("Invalid request!");
     }
