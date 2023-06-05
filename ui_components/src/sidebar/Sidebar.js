@@ -249,7 +249,7 @@ function Sidebar({ links, logoutTimer }) {
             {userMenu && displaySection(userMenu, "Player Menu")}
             {activityMenu && displaySection(activityMenu, "Action Menu")}
             {villageMenu && displaySection(villageMenu, "Village Menu")}
-            {staffMenu && displaySection(staffMenu, "Staff Menu")}
+            {staffMenu && (staffMenu.length ? displaySection(staffMenu, "Staff Menu") : null)}
             {displayLogout(links.logout_link, logoutTime)}
         </div>
     )

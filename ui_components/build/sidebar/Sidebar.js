@@ -295,6 +295,6 @@ function Sidebar({
   // Display
   return /*#__PURE__*/React.createElement("div", {
     id: "sidebar"
-  }, playerData && displayCharacterSection(playerData, regenTime, regenOffset), userMenu && displaySection(userMenu, "Player Menu"), activityMenu && displaySection(activityMenu, "Action Menu"), villageMenu && displaySection(villageMenu, "Village Menu"), staffMenu && displaySection(staffMenu, "Staff Menu"), displayLogout(links.logout_link, logoutTime));
+  }, playerData && displayCharacterSection(playerData, regenTime, regenOffset), userMenu && displaySection(userMenu, "Player Menu"), activityMenu && displaySection(activityMenu, "Action Menu"), villageMenu && displaySection(villageMenu, "Village Menu"), staffMenu && (staffMenu.length ? displaySection(staffMenu, "Staff Menu") : null), displayLogout(links.logout_link, logoutTime));
 }
 window.Sidebar = Sidebar;
