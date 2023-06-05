@@ -30,7 +30,7 @@ function hotbar(): void {
         window.addEventListener('load', () => {
         ReactDOM.render(
             React.createElement(Hotbar, {
-                linkData: {
+                links: {
                     user_api: "<?= $system->router->api_links['user'] ?>",
                     training: "<?= $system->router->links['training'] ?>",
                     arena: "<?= $system->router->links['arena'] ?>",

@@ -30,7 +30,7 @@ function topbar(): void {
         window.addEventListener('load', () => {
         ReactDOM.render(
             React.createElement(Topbar, {
-                linkData: {
+                links: {
                     notification_api: "<?= $system->router->api_links['notification'] ?>",
                 },
             }),

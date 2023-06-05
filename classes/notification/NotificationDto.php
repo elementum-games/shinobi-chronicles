@@ -2,10 +2,14 @@
 
 class NotificationDto {
     public function __construct(
-        public string $action_url,
-        public string $type,
-        public string $label,
-        public bool $critical = false,
+        public string $action_url = "",
+        public string $type = "",
+        public string $message = "",
+        public int $notification_id = 0,
+        public int $user_id = 0,
+        public int $created = 0,
+        public int $duration = 0,
+        public bool $alert = false,
     ) {
     }
 }

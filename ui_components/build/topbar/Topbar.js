@@ -2,14 +2,14 @@ import { apiFetch } from "../utils/network.js";
 
 // Initialize
 function Topbar({
-  linkData
+  links
 }) {
   // Hooks
-  const [notification_data, setNotificationData] = React.useState(null);
+  const [notificationData, setNotificationData] = React.useState(null);
 
   // API
   function getNotificationData() {
-    apiFetch(linkData.notification_api, {
+    apiFetch(links.notification_api, {
       request: 'getUserNotifications'
     }).then(response => {
       if (response.errors.length) {
@@ -22,12 +22,23 @@ function Topbar({
   }
 
   // Utility
-  function topbarNotificationOnClick(event) {
-    window.location.href = event.currentTarget.getAttribute("href");
+  function calculateTimeRemaining(created, duration) {
+    var currentTimeTicks = new Date().getTime();
+    return formatTimeRemaining(created + duration - currentTimeTicks / 1000);
+  }
+  function formatTimeRemaining(seconds) {
+    console.log(seconds);
+    var hours = Math.floor(seconds / 3600);
+    var minutes = Math.floor(seconds % 3600 / 60);
+    var seconds = Math.floor(seconds % 60);
+    var formattedHours = hours.toString().padStart(2, '0');
+    var formattedMinutes = minutes.toString().padStart(2, '0');
+    var formattedSeconds = seconds.toString().padStart(2, '0');
+    return formattedHours > 0 ? formattedHours + ':' + formattedMinutes + ':' + formattedSeconds : formattedMinutes + ':' + formattedSeconds;
   }
 
   // Content
-  function displayTopbar(notification_data) {
+  function displayTopbar(notificationData) {
     return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
       className: "topbar_left"
     }), /*#__PURE__*/React.createElement("div", {
@@ -40,18 +51,19 @@ function Topbar({
       className: "topbar_inner_right"
     }, /*#__PURE__*/React.createElement("div", {
       className: "topbar_notifications_container d-flex"
-    }, notification_data && notification_data.map(function (notification, i) {
-      return /*#__PURE__*/React.createElement("div", {
-        onClick: topbarNotificationOnClick,
+    }, notificationData && notificationData.map(function (notification, i) {
+      return /*#__PURE__*/React.createElement("a", {
         href: notification.action_url,
         key: i,
-        className: "topbar_notification_wrapper"
+        className: notification.duration > 0 ? "topbar_notification_wrapper has_duration" : "topbar_notification_wrapper",
+        "data-content": notification.message,
+        "data-time": calculateTimeRemaining(notification.created, notification.duration)
       }, /*#__PURE__*/React.createElement("svg", {
         className: "topbar_notification_svg",
         width: "35",
         height: "35",
         viewBox: "0 0 100 100"
-      }, notification.type == "Battle" && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("polygon", {
+      }, notification.type == "battle" && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("polygon", {
         points: "6,50 50,94 94,50 50,6",
         strokeWidth: "8px",
         stroke: "#5d5c4b",
@@ -68,7 +80,7 @@ function Topbar({
         x: "25.5%",
         y: "27.5%",
         href: "images/v2/icons/anbutracking.png"
-      })), notification.type == "Report" && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("polygon", {
+      })), notification.type == "report" && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("polygon", {
         points: "6,50 50,94 94,50 50,6",
         strokeWidth: "8px",
         stroke: "#5d5c4b",
@@ -82,7 +94,7 @@ function Topbar({
         x: "40%",
         y: "70%",
         className: "topbar_notification_important"
-      }, "!")), notification.type == "Training" && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("polygon", {
+      }, "!")), notification.type == "training" && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("polygon", {
         points: "6,50 50,94 94,50 50,6",
         strokeWidth: "8px",
         stroke: "#5d5c4b",
@@ -99,7 +111,24 @@ function Topbar({
         x: "25.5%",
         y: "27.5%",
         href: "images/v2/icons/timer.png"
-      })), notification.type == "Mission" && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("polygon", {
+      })), notification.type == "training_complete" && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("polygon", {
+        points: "6,50 50,94 94,50 50,6",
+        strokeWidth: "8px",
+        stroke: "#5d5c4b",
+        fill: "#5964a6"
+      }), /*#__PURE__*/React.createElement("polygon", {
+        points: "6,50 50,94 94,50 50,6",
+        strokeWidth: "2px",
+        stroke: "#000000",
+        fill: "#5964a6"
+      }), /*#__PURE__*/React.createElement("image", {
+        className: "topbar_notification_icon",
+        height: "50",
+        width: "50",
+        x: "25.5%",
+        y: "27.5%",
+        href: "images/v2/icons/timer.png"
+      })), notification.type == "mission" && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("polygon", {
         points: "6,50 50,94 94,50 50,6",
         strokeWidth: "8px",
         stroke: "#5d5c4b",
@@ -121,7 +150,7 @@ function Topbar({
         x: "60%",
         y: "50%",
         className: "topbar_notification_mission"
-      }, "A")), notification.type == "Special Mission" && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("polygon", {
+      }, "A")), notification.type == "specialmission" && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("polygon", {
         points: "6,50 50,94 94,50 50,6",
         strokeWidth: "8px",
         stroke: "#5d5c4b",
@@ -135,7 +164,41 @@ function Topbar({
         x: "24%",
         y: "65%",
         className: "topbar_notification_specialmission"
-      }, "sm"))));
+      }, "sm")), notification.type == "rank" && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("polygon", {
+        points: "6,50 50,94 94,50 50,6",
+        strokeWidth: "8px",
+        stroke: "#5d5c4b",
+        fill: "#2e2c36"
+      }), /*#__PURE__*/React.createElement("polygon", {
+        points: "6,50 50,94 94,50 50,6",
+        strokeWidth: "2px",
+        stroke: "#000000",
+        fill: "#2e2c36"
+      }), /*#__PURE__*/React.createElement("image", {
+        className: "topbar_notification_icon",
+        height: "50",
+        width: "50",
+        x: "25.5%",
+        y: "27.5%",
+        href: "images/v2/icons/levelup.png"
+      })), notification.type == "level" && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("polygon", {
+        points: "6,50 50,94 94,50 50,6",
+        strokeWidth: "8px",
+        stroke: "#5d5c4b",
+        fill: "#2e2c36"
+      }), /*#__PURE__*/React.createElement("polygon", {
+        points: "6,50 50,94 94,50 50,6",
+        strokeWidth: "2px",
+        stroke: "#000000",
+        fill: "#2e2c36"
+      }), /*#__PURE__*/React.createElement("image", {
+        className: "topbar_notification_icon",
+        height: "50",
+        width: "50",
+        x: "25.5%",
+        y: "27.5%",
+        href: "images/v2/icons/levelup.png"
+      }))));
     })))));
   }
 
@@ -154,6 +217,6 @@ function Topbar({
   return /*#__PURE__*/React.createElement("div", {
     id: "topbar",
     className: "d-flex"
-  }, displayTopbar(notification_data));
+  }, displayTopbar(notificationData));
 }
 window.Topbar = Topbar;

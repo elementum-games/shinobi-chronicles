@@ -30,7 +30,7 @@ function headerModule(): void {
         window.addEventListener('load', () => {
         ReactDOM.render(
             React.createElement(Header, {
-                linkData: {
+                links: {
                     navigation_api: "<?= $system->router->api_links['navigation'] ?>",
                 },
             }),

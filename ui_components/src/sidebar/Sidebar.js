@@ -1,24 +1,24 @@
 import { apiFetch } from "../utils/network.js";
 
 // Initialize
-function Sidebar({ linkData, logout_timer }) {
+function Sidebar({ links, logoutTimer }) {
     // Hooks
-    const [user_menu, setUserMenu] = React.useState(null);
-    const [activity_menu, setActivityMenu] = React.useState(null);
-    const [village_menu, setVillageMenu] = React.useState(null);
-    const [staff_menu, setStaffMenu] = React.useState(null);
-    const [player_data, setPlayerData] = React.useState(null);
-    const [regen_time, setRegenTime] = React.useState(null);
-    const [regen_offset, setRegenOffset] = React.useState(null);
-    const [logout_time, setLogoutTime] = React.useState(null);
-    const regen_time_var = React.useRef(0);
-    const logout_time_var = React.useRef(logout_timer);
+    const [userMenu, setUserMenu] = React.useState(null);
+    const [activityMenu, setActivityMenu] = React.useState(null);
+    const [villageMenu, setVillageMenu] = React.useState(null);
+    const [staffMenu, setStaffMenu] = React.useState(null);
+    const [playerData, setPlayerData] = React.useState(null);
+    const [regenTime, setRegenTime] = React.useState(null);
+    const [regenOffset, setRegenOffset] = React.useState(null);
+    const [logoutTime, setLogoutTime] = React.useState(null);
+    const regenTimeVar = React.useRef(0);
+    const logoutTimeVar = React.useRef(logoutTimer);
     const queryParameters = new URLSearchParams(window.location.search);
     const pageID = React.useRef(queryParameters.get("id"));
 
     // API
     function getSidebarLinks() {
-        apiFetch(linkData.navigation_api, {
+        apiFetch(links.navigation_api, {
             request: 'getNavigationLinks'
         }).then(response => {
             if (response.errors.length) {
@@ -34,7 +34,7 @@ function Sidebar({ linkData, logout_timer }) {
         })
     }
     function getPlayerData() {
-        apiFetch(linkData.user_api, {
+        apiFetch(links.user_api, {
             request: 'getPlayerData'
         }).then(response => {
             if (response.errors.length) {
@@ -45,19 +45,19 @@ function Sidebar({ linkData, logout_timer }) {
                 setPlayerData(response.data.playerData);
                 setRegenTime(response.data.playerData.regen_time);
                 setRegenOffset(calculateRegenOffset(response.data.playerData.regen_time));
-                regen_time_var.current = response.data.playerData.regen_time;
+                regenTimeVar.current = response.data.playerData.regen_time;
             }
         })
     }
     // Utility
     function handleRegen() {
-        if (regen_time_var.current <= 0 || regen_time_var.current == 30) {
+        if (regenTimeVar.current <= 0 || regenTimeVar.current == 30) {
             getPlayerData();
         }
         else {
-            regen_time_var.current = regen_time_var.current - 1;
-            setRegenTime(regen_time => regen_time - 1);
-            setRegenOffset(calculateRegenOffset(regen_time_var.current));
+            regenTimeVar.current = regenTimeVar.current - 1;
+            setRegenTime(regenTime => regenTime - 1);
+            setRegenOffset(calculateRegenOffset(regenTimeVar.current));
         }
     }
 
@@ -68,8 +68,8 @@ function Sidebar({ linkData, logout_timer }) {
     }
 
     function handleLogout() {
-        logout_time_var.current--;
-        setLogoutTime(logout_time_var.current);
+        logoutTimeVar.current--;
+        setLogoutTime(logoutTimeVar.current);
     }
 
     function formatLogoutTimer(ticks) {
@@ -114,29 +114,29 @@ function Sidebar({ linkData, logout_timer }) {
         )
     }
 
-    function displayCharacterSection(player_data, regen_time, regen_offset) {
-        const health_width = Math.round((player_data.health / player_data.max_health) * 100);
-        const chakra_width = Math.round((player_data.chakra / player_data.max_chakra) * 100);
-        const stamina_width = Math.round((player_data.stamina / player_data.max_stamina) * 100);
+    function displayCharacterSection(playerData, regenTime, regenOffset) {
+        const health_width = Math.round((playerData.health / playerData.max_health) * 100);
+        const chakra_width = Math.round((playerData.chakra / playerData.max_chakra) * 100);
+        const stamina_width = Math.round((playerData.stamina / playerData.max_stamina) * 100);
 
         return (
             <>
                 <div className="sb_avatar_container">
                     <div className="sb_avatar_wrapper">
-                        <img className="sb_avatar_img" src={player_data.avatar_link}/>
+                        <img className="sb_avatar_img" src={playerData.avatar_link}/>
                     </div>
                 </div>
                 <div className={"sb_resources d-in_block"}>
                     <div className={"sb_name_container t-left d-flex"}>
                         <div className="d-in_block">
-                            <div className={"ft-p ft-c1 ft-xlarge ft-b"}>{player_data.user_name}</div>
-                            <div className={"ft-s ft-c1 ft-default"}>{player_data.rank_name} lvl {player_data.level}</div>
+                            <div className={"ft-p ft-c1 ft-xlarge ft-b"}>{playerData.user_name}</div>
+                            <div className={"ft-s ft-c1 ft-default"}>{playerData.rank_name} lvl {playerData.level}</div>
                         </div>
                         <div style={{ width: "100%" }} className="d-in_block">
                             <div id="sb_regentimer">
                                 <svg height="40" width="40" viewBox="0 0 50 50">
-                                    <circle id="sb_regentimer_circle" stroke="#7C88C3" cx="24.5" cy="24" r="20" strokeWidth="4" stroke-mitterlimit="0" fill="none" strokeDasharray="126" strokeDashoffset={regen_offset} transform="rotate(-90, 24.5, 24)"></circle>
-                                    <text id="sb_regentimer_text" className={"ft-s ft-b ft-large"} x="50%" y="50%" textAnchor="middle" dominantBaseline="middle">{regen_time}</text>
+                                    <circle id="sb_regentimer_circle" stroke="#7C88C3" cx="24.5" cy="24" r="20" strokeWidth="4" stroke-mitterlimit="0" fill="none" strokeDasharray="126" strokeDashoffset={regenOffset} transform="rotate(-90, 24.5, 24)"></circle>
+                                    <text id="sb_regentimer_text" className={"ft-s ft-b ft-large"} x="50%" y="50%" textAnchor="middle" dominantBaseline="middle">{regenTime}</text>
                                 </svg>
                             </div>
                         </div>
@@ -147,7 +147,7 @@ function Sidebar({ linkData, logout_timer }) {
                         <div id="sb_health" className="sb_resourceBarOuter">
                             <img className="sb_resource_corner_left" src="images/v2/decorations/barrightcorner.png" />
                             <label className="sb_innerResourceBarLabel">
-                                {player_data.health} / {player_data.max_health}
+                                {playerData.health} / {playerData.max_health}
                             </label>
                             <div className={"sb_health sb_fill"} style={{ width: health_width + "%" }}>
                                 <svg className="sb_resource_highlight_container">
@@ -166,7 +166,7 @@ function Sidebar({ linkData, logout_timer }) {
                         <div id="sb_chakra" className="sb_resourceBarOuter">
                             <img className="sb_resource_corner_left" src="images/v2/decorations/barrightcorner.png" />
                             <label className="sb_innerResourceBarLabel">
-                                {player_data.chakra} / {player_data.max_chakra}
+                                {playerData.chakra} / {playerData.max_chakra}
                             </label>
                             <div className={"sb_chakra sb_fill"} style={{ width: chakra_width + "%" }}>
                                 <svg className="sb_resource_highlight_container">
@@ -185,7 +185,7 @@ function Sidebar({ linkData, logout_timer }) {
                         <div id="sb_stamina" className="sb_resourceBarOuter">
                             <img className="sb_resource_corner_left" src="images/v2/decorations/barrightcorner.png" />
                             <label className="sb_innerResourceBarLabel">
-                                {player_data.stamina} / {player_data.max_stamina}
+                                {playerData.stamina} / {playerData.max_stamina}
                             </label>
                             <div className={"sb_stamina sb_fill"} style={{ width: stamina_width + "%" }}>
                                 <svg className="sb_resource_highlight_container">
@@ -203,11 +203,11 @@ function Sidebar({ linkData, logout_timer }) {
         )
     }
 
-    function displayLogout(logout_link, logout_time) {
+    function displayLogout(logout_link, logoutTime) {
         return (
             <div className="sb_logout_container">
                 <div className="sb_logout_timer_wrapper">
-                    {formatLogoutTimer(logout_time)}
+                    {formatLogoutTimer(logoutTime)}
                 </div>
                 <div className="sb_logout_button_wrapper">
                     <input className={"sb_logout_button button-bar_large t-hover"} type="button" value="LOGOUT" />
@@ -228,8 +228,7 @@ function Sidebar({ linkData, logout_timer }) {
     React.useEffect(() => {
         getPlayerData();
         getSidebarLinks();
-        setLogoutTime(logout_time_var.current);
-        console.log(logout_time_var.current);
+        setLogoutTime(logoutTimeVar.current);
 
         const regenInterval = setInterval(() => {
             handleLogout();
@@ -242,12 +241,12 @@ function Sidebar({ linkData, logout_timer }) {
     // Display
     return (
         <div id="sidebar">
-            {player_data && displayCharacterSection(player_data, regen_time, regen_offset)}
-            {user_menu && displaySection(user_menu, "Player Menu")}
-            {activity_menu && displaySection(activity_menu, "Action Menu")}
-            {village_menu && displaySection(village_menu, "Village Menu")}
-            {staff_menu && displaySection(staff_menu, "Staff Menu")}
-            {displayLogout(linkData.logout_link, logout_time)}
+            {playerData && displayCharacterSection(playerData, regenTime, regenOffset)}
+            {userMenu && displaySection(userMenu, "Player Menu")}
+            {activityMenu && displaySection(activityMenu, "Action Menu")}
+            {villageMenu && displaySection(villageMenu, "Village Menu")}
+            {staffMenu && displaySection(staffMenu, "Staff Menu")}
+            {displayLogout(links.logout_link, logoutTime)}
         </div>
     )
 }

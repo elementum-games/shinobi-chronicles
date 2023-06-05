@@ -28,15 +28,15 @@ try {
     switch ($request) {
         case "getNavigationLinks":
             $NavigationResponse->response_data = [
-                'userMenu' => NavigationAPIPresenter::userMenuResponse(navigationManager: $NavigationManager),
-                'activityMenu' => NavigationAPIPresenter::activityMenuResponse(navigationManager: $NavigationManager),
-                'villageMenu' => NavigationAPIPresenter::villageMenuResponse(navigationManager: $NavigationManager),
-                'staffMenu' => NavigationAPIPresenter::staffMenuResponse(navigationManager: $NavigationManager),
+                'userMenu' => NavigationAPIPresenter::menuLinksResponse($NavigationManager->getUserMenu()),
+                'activityMenu' => NavigationAPIPresenter::menuLinksResponse($NavigationManager->getActivityMenu()),
+                'villageMenu' => NavigationAPIPresenter::menuLinksResponse($NavigationManager->getVillageMenu()),
+                'staffMenu' => NavigationAPIPresenter::menuLinksResponse($NavigationManager->getStaffMenu()),
             ];
             break;
         case "getHeaderMenu":
             $NavigationResponse->response_data = [
-                'headerMenu' => NavigationAPIPresenter::headerMenuResponse(navigationManager: $NavigationManager),
+                'headerMenu' => NavigationAPIPresenter::menuLinksResponse($NavigationManager->getHeaderMenu()),
             ];
             break;
         default:

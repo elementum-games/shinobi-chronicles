@@ -2,15 +2,15 @@ import { apiFetch } from "../utils/network.js";
 
 // Initialize
 function Header({
-  linkData
+  links
 }) {
   // Hooks
-  const [header_menu, setHeaderMenu] = React.useState(null);
-  const [server_time, setServerTime] = React.useState(null);
+  const [headerMenu, setHeaderMenu] = React.useState(null);
+  const [serverTime, setServerTime] = React.useState(null);
 
   // API
   function getHeaderMenu() {
-    apiFetch(linkData.navigation_api, {
+    apiFetch(links.navigation_api, {
       request: 'getHeaderMenu'
     }).then(response => {
       if (response.errors.length) {
@@ -37,14 +37,14 @@ function Header({
     setServerTime(formattedDate + ' - ' + formattedTime);
   }
   // Content
-  function displayHeader(header_data, server_time) {
+  function displayHeader(headerData, serverTime) {
     return /*#__PURE__*/React.createElement("div", {
       className: "header_bar"
     }, /*#__PURE__*/React.createElement("div", {
       className: "header_bar_inner"
     }, /*#__PURE__*/React.createElement("div", {
       className: "header_link_container d-flex"
-    }, header_data && header_data.map(function (link, i) {
+    }, headerData && headerData.map(function (link, i) {
       return /*#__PURE__*/React.createElement("div", {
         key: i,
         className: "header_link_wrapper t-center"
@@ -54,7 +54,7 @@ function Header({
       }, link.title));
     }), /*#__PURE__*/React.createElement("div", {
       className: "header_time_label ft-default ft-s ft-c5"
-    }, server_time))));
+    }, serverTime))));
   }
 
   // Misc
@@ -76,6 +76,6 @@ function Header({
   // Display
   return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
     className: "header_bar_left"
-  }), header_menu && displayHeader(header_menu, server_time));
+  }), headerMenu && displayHeader(headerMenu, serverTime));
 }
 window.Header = Header;
