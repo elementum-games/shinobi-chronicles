@@ -80,6 +80,7 @@ function Topbar({ links, notificationAPIData }) {
                                                 <polygon points="6,50 50,94 94,50 50,6" strokeWidth="8px" stroke="#5d5c4b" fill="#5964a6" />
                                                 <polygon points="6,50 50,94 94,50 50,6" strokeWidth="2px" stroke="#000000" fill="#5964a6" />
                                                 <image className="topbar_notification_icon" height="50" width="50" x="25.5%" y="27.5%" href="images/v2/icons/timer.png" />
+                                                <circle cx="75" cy="25" r="12" fill="#ff4141"/>
                                                 </>
                                             }
                                             {notification.type == "mission" &&
@@ -96,6 +97,14 @@ function Topbar({ links, notificationAPIData }) {
                                                 <polygon points="6,50 50,94 94,50 50,6" strokeWidth="8px" stroke="#5d5c4b" fill="#52466a" />
                                                 <polygon points="6,50 50,94 94,50 50,6" strokeWidth="2px" stroke="#000000" fill="#52466a" />
                                                 <text x="24%" y="65%" className="topbar_notification_specialmission">sm</text>
+                                                </>
+                                            }
+                                            {notification.type == "specialmission_complete" &&
+                                                <>
+                                                <polygon points="6,50 50,94 94,50 50,6" strokeWidth="8px" stroke="#5d5c4b" fill="#5964a6" />
+                                                <polygon points="6,50 50,94 94,50 50,6" strokeWidth="2px" stroke="#000000" fill="#5964a6" />
+                                                <text x="24%" y="65%" className="topbar_notification_specialmission">sm</text>
+                                                <circle cx="75" cy="25" r="12" fill="#ff4141" />
                                                 </>
                                             }
                                             {notification.type == "rank" &&

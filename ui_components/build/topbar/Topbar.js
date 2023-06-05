@@ -129,6 +129,11 @@ function Topbar({
         x: "25.5%",
         y: "27.5%",
         href: "images/v2/icons/timer.png"
+      }), /*#__PURE__*/React.createElement("circle", {
+        cx: "75",
+        cy: "25",
+        r: "12",
+        fill: "#ff4141"
       })), notification.type == "mission" && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("polygon", {
         points: "6,50 50,94 94,50 50,6",
         strokeWidth: "8px",
@@ -165,7 +170,26 @@ function Topbar({
         x: "24%",
         y: "65%",
         className: "topbar_notification_specialmission"
-      }, "sm")), notification.type == "rank" && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("polygon", {
+      }, "sm")), notification.type == "specialmission_complete" && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("polygon", {
+        points: "6,50 50,94 94,50 50,6",
+        strokeWidth: "8px",
+        stroke: "#5d5c4b",
+        fill: "#5964a6"
+      }), /*#__PURE__*/React.createElement("polygon", {
+        points: "6,50 50,94 94,50 50,6",
+        strokeWidth: "2px",
+        stroke: "#000000",
+        fill: "#5964a6"
+      }), /*#__PURE__*/React.createElement("text", {
+        x: "24%",
+        y: "65%",
+        className: "topbar_notification_specialmission"
+      }, "sm"), /*#__PURE__*/React.createElement("circle", {
+        cx: "75",
+        cy: "25",
+        r: "12",
+        fill: "#ff4141"
+      })), notification.type == "rank" && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("polygon", {
         points: "6,50 50,94 94,50 50,6",
         strokeWidth: "8px",
         stroke: "#5d5c4b",
