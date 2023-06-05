@@ -72,7 +72,8 @@ function ProjectileAttack({
     getBoundingRectForTile,
     fighterLocations
 }: ProjectileAttackProps) {
-    const travelTimePerTile = 500;
+    const initialTravelTime = 200;
+    const travelTimePerTile = 400;
 
     const startingTileIndex = attack.pathSegments[0].tileIndex;
     const endingTileIndex = attack.pathSegments[attack.pathSegments.length - 1].tileIndex;
@@ -85,15 +86,31 @@ function ProjectileAttack({
     // move attack start 0.5 tile closer to caster
     const leftOffset = (fighterLocations[attack.fighterId] - startingTileIndex) * 0.5 * tileSize;
 
-    const leftDifference = endingTileRect.left - startingTileRect.left;
+    const leftDifference = endingTileRect.left - (startingTileRect.left + leftOffset);
 
-    const durationMs = Math.abs(endingTileIndex - startingTileIndex) * travelTimePerTile;
+    const durationMs = initialTravelTime + (Math.abs(endingTileIndex - startingTileIndex) * travelTimePerTile);
+
+    const ninjutsuElementImages = {
+        "Fire": '/images/battle/fireball.png',
+        "Earth": '/images/battle/rock.png',
+        "Wind": '/images/battle/fireball.png',
+        "Water": '/images/battle/fireball.png',
+        "Lightning": '/images/battle/fireball.png',
+        "None": '/images/battle/fireball.png',
+    };
+
+    const attackImage = ninjutsuElementImages[attack.jutsuElement];
+    // TODO: Taijutsu/Genjutsu
 
     return <>
         <style>
             {`
                 @keyframes attack_${attackIndex} {
                     0% {
+                        transform: translateX(0px);
+                        opacity: 0;
+                    }
+                    10% {
                         transform: translateX(0px);
                         opacity: 1;
                     }
@@ -122,9 +139,8 @@ function ProjectileAttack({
             }}
         >
             <img
-                src='/images/battle/fireball.png'
+                src={attackImage}
                 className={`projectile ${direction}`}
-                style={{ width: 50, height: 50 }}
             />
         </div>
     </>

@@ -99,6 +99,8 @@ $footer = <<<HTML
 	<div id='footer'>
 		<div id='footer_text'>
 			Shinobi Chronicles v<!--[VERSION_NUMBER]--> &bull; Copyright &copy; LM Visions <a href="{$system->router->base_url}terms.php">Terms of Service</a>
+			<br />
+			<a href="https://www.vecteezy.com/free-png/stone">Stone PNG by Vecteezy</a>
 		</div>
     </div>
 </body>

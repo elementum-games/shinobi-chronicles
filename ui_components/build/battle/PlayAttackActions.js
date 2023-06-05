@@ -49,7 +49,8 @@ function ProjectileAttack({
   getBoundingRectForTile,
   fighterLocations
 }) {
-  const travelTimePerTile = 500;
+  const initialTravelTime = 200;
+  const travelTimePerTile = 400;
   const startingTileIndex = attack.pathSegments[0].tileIndex;
   const endingTileIndex = attack.pathSegments[attack.pathSegments.length - 1].tileIndex;
   const startingTileRect = getBoundingRectForTile(startingTileIndex);
@@ -57,11 +58,25 @@ function ProjectileAttack({
   const direction = startingTileIndex > fighterLocations[attack.fighterId] ? "right" : "left"; // move attack start 0.5 tile closer to caster
 
   const leftOffset = (fighterLocations[attack.fighterId] - startingTileIndex) * 0.5 * tileSize;
-  const leftDifference = endingTileRect.left - startingTileRect.left;
-  const durationMs = Math.abs(endingTileIndex - startingTileIndex) * travelTimePerTile;
+  const leftDifference = endingTileRect.left - (startingTileRect.left + leftOffset);
+  const durationMs = initialTravelTime + Math.abs(endingTileIndex - startingTileIndex) * travelTimePerTile;
+  const ninjutsuElementImages = {
+    "Fire": '/images/battle/fireball.png',
+    "Earth": '/images/battle/rock.png',
+    "Wind": '/images/battle/fireball.png',
+    "Water": '/images/battle/fireball.png',
+    "Lightning": '/images/battle/fireball.png',
+    "None": '/images/battle/fireball.png'
+  };
+  const attackImage = ninjutsuElementImages[attack.jutsuElement]; // TODO: Taijutsu/Genjutsu
+
   return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("style", null, `
                 @keyframes attack_${attackIndex} {
                     0% {
+                        transform: translateX(0px);
+                        opacity: 0;
+                    }
+                    10% {
                         transform: translateX(0px);
                         opacity: 1;
                     }
@@ -87,11 +102,7 @@ function ProjectileAttack({
       animationTimingFunction: "linear"
     }
   }, /*#__PURE__*/React.createElement("img", {
-    src: "/images/battle/fireball.png",
-    className: `projectile ${direction}`,
-    style: {
-      width: 50,
-      height: 50
-    }
+    src: attackImage,
+    className: `projectile ${direction}`
   })));
 }
