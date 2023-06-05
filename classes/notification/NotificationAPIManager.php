@@ -18,13 +18,14 @@ class NotificationAPIManager {
     public function getUserNotifications(): array
     {
         $notifications = [];
+        $notification_ids_to_delete = [];
         $notification_table_result = $this->system->query("SELECT * FROM `notifications` WHERE `user_id` = {$this->player->user_id}");
         while ($row = $this->system->db_fetch($notification_table_result)) {
-            $delete = false;
             switch ($row['type']) {
                 case "training":
                     if ($this->player->train_time <= 0) {
-                        $delete = true;
+                        $notification_ids_to_delete[] = $row['notification_id'];
+                        continue 2;
                     }
                     else {
                         $row['action_url'] = $this->system->router->getUrl("training");
@@ -32,7 +33,8 @@ class NotificationAPIManager {
                     break;
                 case "training_complete":
                     if ($this->player->train_time > 0) {
-                        $delete = true;
+                        $notification_ids_to_delete[] = $row['notification_id'];
+                        continue 2;
                     }
                     else {
                         $row['action_url'] = $this->system->router->getUrl("training");
@@ -40,21 +42,24 @@ class NotificationAPIManager {
                     break;
                 case "specialmission":
                     if ($this->player->special_mission == 0) {
-                        $delete = true;
+                        $notification_ids_to_delete[] = $row['notification_id'];
+                        continue 2;
                     } else {
                         $row['action_url'] = $this->system->router->getUrl("specialmissions");
                     }
                     break;
                 case "specialmission_complete":
                     if ($this->player->special_mission != 0) {
-                        $delete = true;
+                        $notification_ids_to_delete[] = $row['notification_id'];
+                        continue 2;
                     } else {
                         $row['action_url'] = $this->system->router->getUrl("specialmissions");
                     }
                     break;
                 case "mission":
                     if ($this->player->mission_id == 0) {
-                        $delete = true;
+                        $notification_ids_to_delete[] = $row['notification_id'];
+                        continue 2;
                     } else {
                         $row['action_url'] = $this->system->router->getUrl("mission");
                     }
@@ -62,12 +67,7 @@ class NotificationAPIManager {
                 default:
                     break;
             }
-            if ($delete) {
-                $this->system->query("START TRANSACTION;");
-                $this->system->query("DELETE FROM `notifications` WHERE `notification_id` = {$row['notification_id']}");
-                $this->system->query("COMMIT;");
-                continue;
-            }
+
             $notifications[] = new NotificationDto(
                 type: $row['type'],
                 message: $row['message'],
@@ -79,13 +79,14 @@ class NotificationAPIManager {
                 action_url: $row['action_url'],
             );
         }
+        if (count($notification_ids_to_delete) > 0) {
+            $this->system->query("DELETE FROM `notifications` WHERE `notification_id` IN (" . implode(",", $notification_ids_to_delete) . ")");
+        }
         return $notifications;
     }
 
     public function closeNotification(int $notification_id): bool {
-        $this->system->query("START TRANSACTION;");
         $this->system->query("DELETE FROM `notifications` WHERE `notification_id` = {$notification_id}");
-        $this->system->query("COMMIT;");
         return $this->system->db_last_num_rows > 0 ? true : false;
     }
 }

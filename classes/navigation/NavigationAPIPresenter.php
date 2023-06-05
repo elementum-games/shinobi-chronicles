@@ -1,7 +1,11 @@
 <?php
 
 class NavigationApiPresenter {
-    public static function menuLinksResponse(array $navigationList): array
+    /**
+     * @param NavigationLinkDto[] $menuLinks
+     * @return array
+     */
+    public static function menuLinksResponse(array $menuLinks): array
     {
         return array_map(
             function (NavigationLinkDto $link) {
@@ -12,7 +16,7 @@ class NavigationApiPresenter {
                     'id' => $link->id,
                 ];
             },
-            $navigationList
+            $menuLinks
         );
     }
 }
