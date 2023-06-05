@@ -31,6 +31,11 @@ try {
                 'userNotifications' => NotificationAPIPresenter::userNotificationResponse(notificationManager: $NotificationManager),
             ];
             break;
+        case "closeNotification":
+            $NotificationResponse->response_data = [
+                'success' => NotificationAPIPresenter::closeNotificationResponse(notificationManager: $NotificationManager, notification_id: $_POST['notification_id']),
+            ];
+            break;
         default:
             API::exitWithError("Invalid request!");
     }

@@ -63,7 +63,9 @@ class NotificationAPIManager {
                     break;
             }
             if ($delete) {
+                $this->system->query("START TRANSACTION;");
                 $this->system->query("DELETE FROM `notifications` WHERE `notification_id` = {$row['notification_id']}");
+                $this->system->query("COMMIT;");
                 continue;
             }
             $notifications[] = new NotificationDto(
@@ -78,5 +80,12 @@ class NotificationAPIManager {
             );
         }
         return $notifications;
+    }
+
+    public function closeNotification(int $notification_id): bool {
+        $this->system->query("START TRANSACTION;");
+        $this->system->query("DELETE FROM `notifications` WHERE `notification_id` = {$notification_id}");
+        $this->system->query("COMMIT;");
+        return $this->system->db_last_num_rows > 0 ? true : false;
     }
 }

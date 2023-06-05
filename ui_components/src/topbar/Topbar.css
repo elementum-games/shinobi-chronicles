@@ -77,3 +77,11 @@
     font-size: 45px;
     text-transform: uppercase;
 }
+
+.topbar_close_notification {
+    color: #c04f78;
+    position: absolute;
+    font-family: Andale Mono, AndaleMono, monospace;
+    font-size: 20px;
+    transform: translate(0, -10px);
+}
