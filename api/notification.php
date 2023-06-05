@@ -28,7 +28,12 @@ try {
     switch ($request) {
         case "getUserNotifications":
             $NotificationResponse->response_data = [
-                'userNotifications' => NotificationAPIPresenter::userNotificationResponse(notificationManager: $NotificationManager),
+                'userNotifications' => NotificationAPIPresenter::userNotificationResponse($NotificationManager),
+            ];
+            break;
+        case "closeNotification":
+            $NotificationResponse->response_data = [
+                'success' => NotificationAPIPresenter::closeNotificationResponse(notificationManager: $NotificationManager, notification_id: $_POST['notification_id']),
             ];
             break;
         default:

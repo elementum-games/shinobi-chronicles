@@ -184,7 +184,7 @@ class SpecialMission {
     public int $player_max_health;
     public int $reward;
 
-    // 
+    //
     public function __construct(System $system, User $player, $mission_id) {
         $this->system = $system;
         $this->player = $player;
@@ -198,7 +198,7 @@ class SpecialMission {
         if ($this->system->db_last_num_rows == 0) {
             return false;
         }
-        
+
         $mission_data = $this->system->db_fetch($result);
 
         $this->status = $mission_data['status'];
@@ -209,7 +209,7 @@ class SpecialMission {
         $this->target = json_decode($mission_data['target'], true);
         $this->log = json_decode($mission_data['log'], true);
         $this->reward = $mission_data['reward'];
-        
+
         $this->player_health = $this->player->health;
         $this->player_max_health = $this->player->max_health;
 
@@ -233,7 +233,7 @@ class SpecialMission {
         $target = json_encode($this->target);
         $log = json_encode($this->log);
         $sql = "UPDATE `special_missions`
-                SET `status`={$this->status}, 
+                SET `status`={$this->status},
                 `end_time`={$this->end_time},
                 `progress`={$this->progress},
                 `target`='{$target}',
@@ -265,7 +265,7 @@ class SpecialMission {
             $new_event = self::EVENT_COMPLETE_FAIL;
             $event_text = self::$event_names[$new_event]['text'];
         }
-        
+
         // check if the user has enough progress to complete mission and is back home
         if ($this->progress >= 100  && $this->player->location->x == self::$target_villages[$this->player->village->name]['x']
                                     && $this->player->location->y == self::$target_villages[$this->player->village->name]['y']) {
@@ -348,12 +348,32 @@ class SpecialMission {
             case self::EVENT_COMPLETE_SUCCESS:
                 $result = $this->completeMission();
                 $this->logNewEvent(self::EVENT_COMPLETE_REWARD, $result);
+                // Create notification
+                require_once __DIR__ . '/../classes/notification/NotificationManager.php';
+                $new_notification = new NotificationDto(
+                    type: "specialmission_complete",
+                    message: "Special Mission completed",
+                    user_id: $this->player->user_id,
+                    created: time(),
+                    alert: true,
+                );
+                NotificationManager::createNotification($new_notification, $this->system, false);
                 break;
             case self::EVENT_COMPLETE_FAIL:
                 $result = $this->failMission();
+                // Create notification
+                require_once __DIR__ . '/../classes/notification/NotificationManager.php';
+                $new_notification = new NotificationDto(
+                    type: "specialmission_complete",
+                    message: "Special Mission failed",
+                    user_id: $this->player->user_id,
+                    created: time(),
+                    alert: true,
+                );
+                NotificationManager::createNotification($new_notification, $this->system, false);
                 break;
         }
-        
+
         // Update stuff
         $this->updateMission();
     }
@@ -605,11 +625,11 @@ SET `status`=2, `end_time`={$timestamp} WHERE `mission_id`={$mission_id}");
     }
 
     public static function startMission($system, $player, $difficulty): SpecialMission {
-        
+
         if ($player->special_mission != 0) {
             throw new Exception('You cannot start multiple missions!');
         }
-        
+
         if (!array_key_exists($difficulty, self::$difficulties)) {
             throw new Exception('Error setting difficulty!');
         }
@@ -625,7 +645,7 @@ SET `status`=2, `end_time`={$timestamp} WHERE `mission_id`={$mission_id}");
         ];
         $log_encode = json_encode($log);
 
-        $sql = "INSERT INTO `special_missions` (`user_id`, `start_time`, `log`, `difficulty`) 
+        $sql = "INSERT INTO `special_missions` (`user_id`, `start_time`, `log`, `difficulty`)
                 VALUES ('{$player->user_id}', '{$timestamp}', '$log_encode', '{$difficulty}')";
         $result = $system->query($sql);
 

@@ -1142,6 +1142,16 @@ class User extends Fighter {
                                 ' and 10 experience.';
                         }
 
+                        // Create notification
+                        $new_notification = new NotificationDto(
+                            type: "training_complete",
+                            message: "Training " . $this->jutsu[$jutsu_id]->name . " Complete",
+                            user_id: $this->user_id,
+                            created: time(),
+                            alert: false,
+                        );
+                        NotificationManager::createNotification($new_notification, $this->system, false);
+
                         $this->system->message($message);
                         $this->system->printMessage();
 
@@ -1185,6 +1195,16 @@ class User extends Fighter {
                 else if($this->total_stats >= $this->rank->stat_cap) {
                     $this->system->message("Training has finished but you cannot gain any more stats!");
                 }
+
+                // Create notification
+                $new_notification = new NotificationDto(
+                    type: "training_complete",
+                    message: "Training " . System::unSlug($this->train_type) . " Complete",
+                    user_id: $this->user_id,
+                    created: time(),
+                    alert: false,
+                );
+                NotificationManager::createNotification($new_notification, $this->system, false);
             }
         }
     }

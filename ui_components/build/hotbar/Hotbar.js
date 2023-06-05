@@ -2,26 +2,27 @@ import { apiFetch } from "../utils/network.js";
 
 // Initialize
 function Hotbar({
-  linkData
+  links,
+  userAPIData
 }) {
   // Hooks
-  const [player_data, setPlayerData] = React.useState(null);
-  const [ai_data, setAIData] = React.useState(null);
-  const [mission_data, setMissionData] = React.useState(null);
+  const [playerData, setPlayerData] = React.useState(userAPIData.playerData);
+  const [aiData, setAIData] = React.useState(userAPIData.aiData);
+  const [missionData, setMissionData] = React.useState(userAPIData.missionData);
   //const [regen_time, setRegenTime] = React.useState(null);
   //const [regen_offset, setRegenOffset] = React.useState(null);
-  const [quick_type, setQuickType] = React.useState("training");
-  const [display_hotbar, toggleHotbarDisplay] = React.useState(false);
-  const [display_keybinds, toggleKeybindDisplay] = React.useState(false);
+  const [quickType, setQuickType] = React.useState("training");
+  const [displayHotbar, toggleHotbarDisplay] = React.useState(false);
+  const [displayKeybinds, toggleKeybindDisplay] = React.useState(false);
   //const regen_time_var = React.useRef(0);
-  const training_flag = React.useRef(0);
-  const special_flag = React.useRef(0);
-  const battle_flag = React.useRef(null);
-  const quick_form_ref = React.useRef(null);
+  const trainingFlag = React.useRef(0);
+  const specialFlag = React.useRef(0);
+  const battleFlag = React.useRef(null);
+  const quickFormRef = React.useRef(null);
 
   // API
   function getPlayerData() {
-    apiFetch(linkData.user_api, {
+    apiFetch(links.user_api, {
       request: 'getPlayerData'
     }).then(response => {
       if (response.errors.length) {
@@ -37,7 +38,7 @@ function Hotbar({
     });
   }
   function getAIData() {
-    apiFetch(linkData.user_api, {
+    apiFetch(links.user_api, {
       request: 'getAIData'
     }).then(response => {
       if (response.errors.length) {
@@ -49,7 +50,7 @@ function Hotbar({
     });
   }
   function getMissionData() {
-    apiFetch(linkData.user_api, {
+    apiFetch(links.user_api, {
       request: 'getMissionData'
     }).then(response => {
       if (response.errors.length) {
@@ -85,27 +86,27 @@ function Hotbar({
     event.target.setAttribute("name", event.target.selectedOptions[0].getAttribute('data-name'));
   }
   function quickSubmitOnClick() {
-    quick_form_ref.current.submit();
+    quickFormRef.current.submit();
   }
   function setKeybindsOnClick() {
-    toggleKeybindDisplay(!display_keybinds);
+    toggleKeybindDisplay(!displayKeybinds);
   }
   function hotbarToggle() {
-    toggleHotbarDisplay(!display_hotbar);
+    toggleHotbarDisplay(!displayHotbar);
   }
   function checkNotificationFlags(training, special, battle) {
-    if (training == '0' && training_flag.current != '0') {
+    if (training == '0' && trainingFlag.current != '0') {
       createNotification("Training Complete!");
     }
-    training_flag.current = training;
-    if (special == '0' && special_flag.current != '0') {
+    trainingFlag.current = training;
+    if (special == '0' && specialFlag.current != '0') {
       createNotification("Special Mission Complete!");
     }
-    special_flag.current = special;
-    if (battle != '0' && battle_flag.current == '0') {
+    specialFlag.current = special;
+    if (battle != '0' && battleFlag.current == '0') {
       createNotification("You are in battle!");
     }
-    battle_flag.current = battle;
+    battleFlag.current = battle;
   }
   function createNotification(message) {
     if (!window.Notification) {
@@ -144,23 +145,23 @@ function Hotbar({
     }, "Toggle Hotbar");
   }
 
-  /*function displayCharacterSection(player_data, regen_time, regen_offset) {
-      const health_width = Math.round((player_data.health / player_data.max_health) * 100);
-      const chakra_width = Math.round((player_data.chakra / player_data.max_chakra) * 100);
-      const stamina_width = Math.round((player_data.stamina / player_data.max_stamina) * 100);
+  /*function displayCharacterSection(playerData, regen_time, regen_offset) {
+      const health_width = Math.round((playerData.health / playerData.max_health) * 100);
+      const chakra_width = Math.round((playerData.chakra / playerData.max_chakra) * 100);
+      const stamina_width = Math.round((playerData.stamina / playerData.max_stamina) * 100);
         return (
           <div id="hb_character_section" className="hb_section">
               <div id="hb_character_container" className="d-flex">
-                  {<div className={display_hotbar ? "hb_avatar_container d-in_block" : "hb_avatar_container d-in_block minimize"}>
+                  {<div className={displayHotbar ? "hb_avatar_container d-in_block" : "hb_avatar_container d-in_block minimize"}>
                       <div className="hb_avatar_wrapper">
-                          <img className="hb_avatar_img" src={player_data.avatar_link} />
+                          <img className="hb_avatar_img" src={playerData.avatar_link} />
                       </div>
                   </div>}
                   <div className={"hb_resources d-in_block"}>
                       <div className={"hb_name_container t-left d-flex"}>
                           <div className="d-in_block">
-                              <div className={"ft-p ft-c1 ft-xlarge ft-b"}>{player_data.user_name}</div>
-                              <div className={"ft-s ft-c1 ft-default"}>{player_data.rank_name} lvl {player_data.level}</div>
+                              <div className={"ft-p ft-c1 ft-xlarge ft-b"}>{playerData.user_name}</div>
+                              <div className={"ft-s ft-c1 ft-default"}>{playerData.rank_name} lvl {playerData.level}</div>
                           </div>
                           <div style={{ width: "100%" }} className="d-in_block">
                               <div id="hb_regentimer">
@@ -176,7 +177,7 @@ function Hotbar({
                           <div id="hb_health" className="hb_resourceBarOuter">
                               <img className="hb_resource_corner_left" src="images/v2/decorations/barrightcorner.png" />
                               <label className="hb_innerResourceBarLabel">
-                                  {player_data.health} / {player_data.max_health}
+                                  {playerData.health} / {playerData.max_health}
                               </label>
                               <div className={"hb_health hb_fill"} style={{ width: health_width + "%" }}>
                                   <svg className="hb_resource_highlight_container">
@@ -194,7 +195,7 @@ function Hotbar({
                           <div id="hb_chakra" className="hb_resourceBarOuter">
                               <img className="hb_resource_corner_left" src="images/v2/decorations/barrightcorner.png" />
                               <label className="hb_innerResourceBarLabel">
-                                  {player_data.chakra} / {player_data.max_chakra}
+                                  {playerData.chakra} / {playerData.max_chakra}
                               </label>
                               <div className={"hb_chakra hb_fill"} style={{ width: chakra_width + "%" }}>
                                   <svg className="hb_resource_highlight_container">
@@ -212,7 +213,7 @@ function Hotbar({
                           <div id="hb_stamina" className="hb_resourceBarOuter">
                               <img className="hb_resource_corner_left" src="images/v2/decorations/barrightcorner.png" />
                               <label className="hb_innerResourceBarLabel">
-                                  {player_data.stamina} / {player_data.max_stamina}
+                                  {playerData.stamina} / {playerData.max_stamina}
                               </label>
                               <div className={"hb_stamina hb_fill"} style={{ width: stamina_width + "%" }}>
                                   <svg className="hb_resource_highlight_container">
@@ -231,7 +232,7 @@ function Hotbar({
       );
   }*/
 
-  function displayQuickSection(player_data, mission_data, ai_data, link_data, quick_type) {
+  function displayQuickSection(playerData, missionData, aiData, link_data, quickType) {
     return /*#__PURE__*/React.createElement("div", {
       id: "hb_quick_section",
       className: "hb_section"
@@ -239,9 +240,9 @@ function Hotbar({
       className: "hb_divider d-in_block"
     }, /*#__PURE__*/React.createElement("div", {
       className: "hb_quick_title ft-s ft-c1 ft-min ft-b"
-    }, "QUICK MENU"), /*#__PURE__*/React.createElement("div", null, quick_type == "training" && /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("form", {
+    }, "QUICK MENU"), /*#__PURE__*/React.createElement("div", null, quickType == "training" && /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("form", {
       id: "hb_quick_form",
-      ref: quick_form_ref,
+      ref: quickFormRef,
       action: link_data.training,
       method: "post"
     }, /*#__PURE__*/React.createElement("input", {
@@ -251,9 +252,9 @@ function Hotbar({
       className: "hb_button button-bar_large t-hover",
       type: "button",
       value: "TRAINING"
-    }))), quick_type == "arena" && /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("form", {
+    }))), quickType == "arena" && /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("form", {
       id: "hb_quick_form",
-      ref: quick_form_ref,
+      ref: quickFormRef,
       action: link_data.arena,
       method: "get"
     }, /*#__PURE__*/React.createElement("input", {
@@ -263,9 +264,9 @@ function Hotbar({
       className: "hb_button button-bar_large t-hover",
       type: "button",
       value: "ARENA"
-    }))), quick_type == "missions" && /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("form", {
+    }))), quickType == "missions" && /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("form", {
       id: "hb_quick_form",
-      ref: quick_form_ref,
+      ref: quickFormRef,
       action: link_data.mission,
       method: "get"
     }, /*#__PURE__*/React.createElement("input", {
@@ -275,9 +276,9 @@ function Hotbar({
       className: "hb_button button-bar_large t-hover",
       type: "button",
       value: "MISSIONS"
-    }))), quick_type == "specialmissions" && /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("form", {
+    }))), quickType == "specialmissions" && /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("form", {
       id: "hb_quick_form",
-      ref: quick_form_ref,
+      ref: quickFormRef,
       action: link_data.specialmissions,
       method: "get"
     }, /*#__PURE__*/React.createElement("input", {
@@ -287,9 +288,9 @@ function Hotbar({
       className: "hb_button button-bar_large t-hover",
       type: "button",
       value: "SPECIAL"
-    }))), quick_type == "ramen" && /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("form", {
+    }))), quickType == "ramen" && /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("form", {
       id: "hb_quick_form",
-      ref: quick_form_ref,
+      ref: quickFormRef,
       action: link_data.healingShop,
       method: "get"
     }, /*#__PURE__*/React.createElement("input", {
@@ -322,7 +323,7 @@ function Hotbar({
     }, "Special Missions"), /*#__PURE__*/React.createElement("option", {
       "data-state": "ramen",
       value: link_data.healingShop.slice(link_data.training.indexOf('=') + 1)
-    }, "Ramen"))), quick_type == "training" && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("select", {
+    }, "Ramen"))), quickType == "training" && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("select", {
       onChange: trainingSelectOnChange,
       form: "hb_quick_form",
       id: "hb_training_select",
@@ -339,7 +340,7 @@ function Hotbar({
     }, "Ninjutsu Skill"), /*#__PURE__*/React.createElement("option", {
       "data-name": "skill",
       value: "genjutsu"
-    }, "Genjutsu Skill"), player_data.has_bloodline == true && /*#__PURE__*/React.createElement("option", {
+    }, "Genjutsu Skill"), playerData.has_bloodline == true && /*#__PURE__*/React.createElement("option", {
       "data-name": "skill",
       value: "bloodline"
     }, "Bloodline Skill")), /*#__PURE__*/React.createElement("optgroup", {
@@ -365,27 +366,27 @@ function Hotbar({
       value: "Long"
     }, "Long"), /*#__PURE__*/React.createElement("option", {
       value: "Extended"
-    }, "Extended")))), quick_type == "arena" && /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("select", {
+    }, "Extended")))), quickType == "arena" && /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("select", {
       form: "hb_quick_form",
       id: "hb_arena_select",
       name: "fight",
       className: "hb_quick_select"
-    }, ai_data && ai_data.map(function (ai, i) {
+    }, aiData && aiData.map(function (ai, i) {
       return /*#__PURE__*/React.createElement("option", {
         key: i,
         value: ai.ai_id
       }, ai.name);
-    }))), quick_type == "missions" && /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("select", {
+    }))), quickType == "missions" && /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("select", {
       name: "start_mission",
       form: "hb_quick_form",
       id: "hb_missions_select",
       className: "hb_quick_select"
-    }, mission_data && mission_data.map(function (mission, i) {
+    }, missionData && missionData.map(function (mission, i) {
       return /*#__PURE__*/React.createElement("option", {
         key: i,
         value: mission.mission_id
       }, mission.name);
-    }))), quick_type == "specialmissions" && /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("select", {
+    }))), quickType == "specialmissions" && /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("select", {
       name: "start",
       form: "hb_quick_form",
       id: "hb_specialmissions_select",
@@ -398,7 +399,7 @@ function Hotbar({
       value: "hard"
     }, "Hard"), /*#__PURE__*/React.createElement("option", {
       value: "nightmare"
-    }, "Nightmare"))), quick_type == "ramen" && /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("select", {
+    }, "Nightmare"))), quickType == "ramen" && /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("select", {
       form: "hb_quick_form",
       id: "hb_ramen_select",
       name: "heal",
@@ -411,7 +412,7 @@ function Hotbar({
       value: "deluxe"
     }, "Deluxe"))))));
   }
-  function displaySettingsSection(player_data) {
+  function displaySettingsSection(playerData) {
     return /*#__PURE__*/React.createElement("div", {
       id: "hb_settings_section",
       className: "hb_section"
@@ -452,7 +453,7 @@ function Hotbar({
   function displaySetKeybinds() {
     return /*#__PURE__*/React.createElement("div", {
       id: "hb_keybind_modal",
-      className: display_keybinds ? "" : "minimize"
+      className: displayKeybinds ? "" : "minimize"
     }, /*#__PURE__*/React.createElement("img", {
       src: "images/v2/decorations/nwbigcorner.png",
       className: "nwbigcorner"
@@ -478,9 +479,6 @@ function Hotbar({
 
   // Initialize
   React.useEffect(() => {
-    getPlayerData();
-    getMissionData();
-    getAIData();
 
     /*const regenInterval = setInterval(() => {
         handleRegen();
@@ -491,7 +489,7 @@ function Hotbar({
   // Display
   return /*#__PURE__*/React.createElement("div", {
     id: "hotbar",
-    className: display_hotbar ? "jc-center d-flex" : "jc-center d-flex minimize"
-  }, displayToggle(), player_data && displayQuickSection(player_data, mission_data, ai_data, linkData, quick_type), player_data && displaySettingsSection(player_data), displaySetKeybinds());
+    className: displayHotbar ? "jc-center d-flex" : "jc-center d-flex minimize"
+  }, displayToggle(), playerData && displayQuickSection(playerData, missionData, aiData, links, quickType), playerData && displaySettingsSection(playerData), displaySetKeybinds());
 }
 window.Hotbar = Hotbar;

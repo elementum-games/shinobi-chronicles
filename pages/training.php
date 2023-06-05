@@ -139,6 +139,19 @@ function training() {
 			$player->train_type = $train_type;
 			$player->train_gain = $train_gain;
 			$player->train_time = time() + $train_length;
+
+			// Create notification
+			require_once __DIR__ . '/../classes/notification/NotificationManager.php';
+            $new_notification = new NotificationDto(
+				type: "training",
+				message: "Training " . System::unSlug($train_type),
+				user_id: $player->user_id,
+				created: time(),
+				duration: $train_length,
+				alert: false,
+            );
+			NotificationManager::createNotification($new_notification, $system, false);
+
 		} catch (Exception $e) {
 			$system->message($e->getMessage());
 		}

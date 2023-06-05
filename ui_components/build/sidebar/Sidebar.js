@@ -2,26 +2,28 @@ import { apiFetch } from "../utils/network.js";
 
 // Initialize
 function Sidebar({
-  linkData,
-  logout_timer
+  links,
+  logoutTimer,
+  navigationAPIData,
+  userAPIData
 }) {
   // Hooks
-  const [user_menu, setUserMenu] = React.useState(null);
-  const [activity_menu, setActivityMenu] = React.useState(null);
-  const [village_menu, setVillageMenu] = React.useState(null);
-  const [staff_menu, setStaffMenu] = React.useState(null);
-  const [player_data, setPlayerData] = React.useState(null);
-  const [regen_time, setRegenTime] = React.useState(null);
-  const [regen_offset, setRegenOffset] = React.useState(null);
-  const [logout_time, setLogoutTime] = React.useState(null);
-  const regen_time_var = React.useRef(0);
-  const logout_time_var = React.useRef(logout_timer);
+  const [userMenu, setUserMenu] = React.useState(navigationAPIData.userMenu);
+  const [activityMenu, setActivityMenu] = React.useState(navigationAPIData.activityMenu);
+  const [villageMenu, setVillageMenu] = React.useState(navigationAPIData.villageMenu);
+  const [staffMenu, setStaffMenu] = React.useState(navigationAPIData.staffMenu);
+  const [playerData, setPlayerData] = React.useState(userAPIData.playerData);
+  const [regenTime, setRegenTime] = React.useState(userAPIData.playerData.regen_time);
+  const [regenOffset, setRegenOffset] = React.useState(calculateRegenOffset(userAPIData.playerData.regen_time));
+  const [logoutTime, setLogoutTime] = React.useState(null);
+  const regenTimeVar = React.useRef(userAPIData.playerData.regen_time);
+  const logoutTimeVar = React.useRef(logoutTimer);
   const queryParameters = new URLSearchParams(window.location.search);
   const pageID = React.useRef(queryParameters.get("id"));
 
   // API
   function getSidebarLinks() {
-    apiFetch(linkData.navigation_api, {
+    apiFetch(links.navigation_api, {
       request: 'getNavigationLinks'
     }).then(response => {
       if (response.errors.length) {
@@ -36,7 +38,7 @@ function Sidebar({
     });
   }
   function getPlayerData() {
-    apiFetch(linkData.user_api, {
+    apiFetch(links.user_api, {
       request: 'getPlayerData'
     }).then(response => {
       if (response.errors.length) {
@@ -46,18 +48,18 @@ function Sidebar({
         setPlayerData(response.data.playerData);
         setRegenTime(response.data.playerData.regen_time);
         setRegenOffset(calculateRegenOffset(response.data.playerData.regen_time));
-        regen_time_var.current = response.data.playerData.regen_time;
+        regenTimeVar.current = response.data.playerData.regen_time;
       }
     });
   }
   // Utility
   function handleRegen() {
-    if (regen_time_var.current <= 0 || regen_time_var.current == 30) {
+    if (regenTimeVar.current <= 0 || regenTimeVar.current == 30) {
       getPlayerData();
     } else {
-      regen_time_var.current = regen_time_var.current - 1;
-      setRegenTime(regen_time => regen_time - 1);
-      setRegenOffset(calculateRegenOffset(regen_time_var.current));
+      regenTimeVar.current = regenTimeVar.current - 1;
+      setRegenTime(regenTime => regenTime - 1);
+      setRegenOffset(calculateRegenOffset(regenTimeVar.current));
     }
   }
   function calculateRegenOffset(time) {
@@ -66,8 +68,8 @@ function Sidebar({
     return offset;
   }
   function handleLogout() {
-    logout_time_var.current--;
-    setLogoutTime(logout_time_var.current);
+    logoutTimeVar.current--;
+    setLogoutTime(logoutTimeVar.current);
   }
   function formatLogoutTimer(ticks) {
     var hours = Math.floor(ticks / 3600);
@@ -77,6 +79,9 @@ function Sidebar({
     var formattedMinutes = minutes.toString().padStart(2, '0');
     var formattedSeconds = seconds.toString().padStart(2, '0');
     return formattedHours + ':' + formattedMinutes + ':' + formattedSeconds;
+  }
+  function logoutOnClick(event) {
+    window.location.href = event.currentTarget.getAttribute("href");
   }
 
   // Content
@@ -106,31 +111,31 @@ function Sidebar({
       className: "sb_link_filler"
     })));
   }
-  function displayCharacterSection(player_data, regen_time, regen_offset) {
-    const health_width = Math.round(player_data.health / player_data.max_health * 100);
-    const chakra_width = Math.round(player_data.chakra / player_data.max_chakra * 100);
-    const stamina_width = Math.round(player_data.stamina / player_data.max_stamina * 100);
+  function displayCharacterSection(playerData, regenTime, regenOffset) {
+    const health_width = Math.round(playerData.health / playerData.max_health * 100);
+    const chakra_width = Math.round(playerData.chakra / playerData.max_chakra * 100);
+    const stamina_width = Math.round(playerData.stamina / playerData.max_stamina * 100);
     return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
       className: "sb_avatar_container"
     }, /*#__PURE__*/React.createElement("div", {
       className: "sb_avatar_wrapper"
     }, /*#__PURE__*/React.createElement("img", {
       className: "sb_avatar_img",
-      src: player_data.avatar_link
+      src: playerData.avatar_link
     }))), /*#__PURE__*/React.createElement("div", {
       className: "sb_resources d-in_block"
     }, /*#__PURE__*/React.createElement("div", {
       className: "sb_name_container t-left d-flex"
     }, /*#__PURE__*/React.createElement("div", {
-      className: "d-in_block"
-    }, /*#__PURE__*/React.createElement("div", {
-      className: "ft-p ft-c1 ft-xlarge ft-b"
-    }, player_data.user_name), /*#__PURE__*/React.createElement("div", {
-      className: "ft-s ft-c1 ft-default"
-    }, player_data.rank_name, " lvl ", player_data.level)), /*#__PURE__*/React.createElement("div", {
+      className: "d-in_block",
       style: {
         width: "100%"
-      },
+      }
+    }, /*#__PURE__*/React.createElement("div", {
+      className: "ft-p ft-c1 ft-xlarge ft-b"
+    }, playerData.user_name), /*#__PURE__*/React.createElement("div", {
+      className: "ft-s ft-c1 ft-default"
+    }, playerData.rank_name, " lvl ", playerData.level)), /*#__PURE__*/React.createElement("div", {
       className: "d-in_block"
     }, /*#__PURE__*/React.createElement("div", {
       id: "sb_regentimer"
@@ -148,7 +153,7 @@ function Sidebar({
       "stroke-mitterlimit": "0",
       fill: "none",
       strokeDasharray: "126",
-      strokeDashoffset: regen_offset,
+      strokeDashoffset: regenOffset,
       transform: "rotate(-90, 24.5, 24)"
     }), /*#__PURE__*/React.createElement("text", {
       id: "sb_regentimer_text",
@@ -157,7 +162,7 @@ function Sidebar({
       y: "50%",
       textAnchor: "middle",
       dominantBaseline: "middle"
-    }, regen_time))))), /*#__PURE__*/React.createElement("div", {
+    }, regenTime))))), /*#__PURE__*/React.createElement("div", {
       className: "sb_resourceContainer"
     }, /*#__PURE__*/React.createElement("div", {
       id: "sb_health",
@@ -167,7 +172,7 @@ function Sidebar({
       src: "images/v2/decorations/barrightcorner.png"
     }), /*#__PURE__*/React.createElement("label", {
       className: "sb_innerResourceBarLabel"
-    }, player_data.health, " / ", player_data.max_health), /*#__PURE__*/React.createElement("div", {
+    }, playerData.health, " / ", playerData.max_health), /*#__PURE__*/React.createElement("div", {
       className: "sb_health sb_fill",
       style: {
         width: health_width + "%"
@@ -197,7 +202,7 @@ function Sidebar({
       src: "images/v2/decorations/barrightcorner.png"
     }), /*#__PURE__*/React.createElement("label", {
       className: "sb_innerResourceBarLabel"
-    }, player_data.chakra, " / ", player_data.max_chakra), /*#__PURE__*/React.createElement("div", {
+    }, playerData.chakra, " / ", playerData.max_chakra), /*#__PURE__*/React.createElement("div", {
       className: "sb_chakra sb_fill",
       style: {
         width: chakra_width + "%"
@@ -227,7 +232,7 @@ function Sidebar({
       src: "images/v2/decorations/barrightcorner.png"
     }), /*#__PURE__*/React.createElement("label", {
       className: "sb_innerResourceBarLabel"
-    }, player_data.stamina, " / ", player_data.max_stamina), /*#__PURE__*/React.createElement("div", {
+    }, playerData.stamina, " / ", playerData.max_stamina), /*#__PURE__*/React.createElement("div", {
       className: "sb_stamina sb_fill",
       style: {
         width: stamina_width + "%"
@@ -249,15 +254,17 @@ function Sidebar({
       src: "images/v2/decorations/barrightcorner.png"
     })))));
   }
-  function displayLogout(logout_link, logout_time) {
+  function displayLogout(logout_link, logoutTime) {
     return /*#__PURE__*/React.createElement("div", {
       className: "sb_logout_container"
     }, /*#__PURE__*/React.createElement("div", {
       className: "sb_logout_timer_wrapper"
-    }, formatLogoutTimer(logout_time)), /*#__PURE__*/React.createElement("div", {
+    }, formatLogoutTimer(logoutTime)), /*#__PURE__*/React.createElement("div", {
       className: "sb_logout_button_wrapper"
     }, /*#__PURE__*/React.createElement("input", {
       className: "sb_logout_button button-bar_large t-hover",
+      href: logout_link,
+      onClick: logoutOnClick,
       type: "button",
       value: "LOGOUT"
     })), /*#__PURE__*/React.createElement("img", {
@@ -277,10 +284,7 @@ function Sidebar({
 
   // Initialize
   React.useEffect(() => {
-    getPlayerData();
-    getSidebarLinks();
-    setLogoutTime(logout_time_var.current);
-    console.log(logout_time_var.current);
+    setLogoutTime(logoutTimeVar.current);
     const regenInterval = setInterval(() => {
       handleLogout();
       handleRegen();
@@ -291,6 +295,6 @@ function Sidebar({
   // Display
   return /*#__PURE__*/React.createElement("div", {
     id: "sidebar"
-  }, player_data && displayCharacterSection(player_data, regen_time, regen_offset), user_menu && displaySection(user_menu, "Player Menu"), activity_menu && displaySection(activity_menu, "Action Menu"), village_menu && displaySection(village_menu, "Village Menu"), staff_menu && displaySection(staff_menu, "Staff Menu"), displayLogout(linkData.logout_link, logout_time));
+  }, playerData && displayCharacterSection(playerData, regenTime, regenOffset), userMenu && displaySection(userMenu, "Player Menu"), activityMenu && displaySection(activityMenu, "Action Menu"), villageMenu && displaySection(villageMenu, "Village Menu"), staffMenu && (staffMenu.length ? displaySection(staffMenu, "Staff Menu") : null), displayLogout(links.logout_link, logoutTime));
 }
 window.Sidebar = Sidebar;
