@@ -132,11 +132,11 @@ function Sidebar({ links, logoutTimer }) {
                 </div>
                 <div className={"sb_resources d-in_block"}>
                     <div className={"sb_name_container t-left d-flex"}>
-                        <div className="d-in_block">
+                        <div className="d-in_block" style={{ width: "100%" }}>
                             <div className={"ft-p ft-c1 ft-xlarge ft-b"}>{playerData.user_name}</div>
                             <div className={"ft-s ft-c1 ft-default"}>{playerData.rank_name} lvl {playerData.level}</div>
                         </div>
-                        <div style={{ width: "100%" }} className="d-in_block">
+                        <div className="d-in_block">
                             <div id="sb_regentimer">
                                 <svg height="40" width="40" viewBox="0 0 50 50">
                                     <circle id="sb_regentimer_circle" stroke="#7C88C3" cx="24.5" cy="24" r="20" strokeWidth="4" stroke-mitterlimit="0" fill="none" strokeDasharray="126" strokeDashoffset={regenOffset} transform="rotate(-90, 24.5, 24)"></circle>

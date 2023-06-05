@@ -78,6 +78,9 @@ function Sidebar({
     var formattedSeconds = seconds.toString().padStart(2, '0');
     return formattedHours + ':' + formattedMinutes + ':' + formattedSeconds;
   }
+  function logoutOnClick(event) {
+    window.location.href = event.currentTarget.getAttribute("href");
+  }
 
   // Content
   function displaySection(section_data, title) {
@@ -122,15 +125,15 @@ function Sidebar({
     }, /*#__PURE__*/React.createElement("div", {
       className: "sb_name_container t-left d-flex"
     }, /*#__PURE__*/React.createElement("div", {
-      className: "d-in_block"
+      className: "d-in_block",
+      style: {
+        width: "100%"
+      }
     }, /*#__PURE__*/React.createElement("div", {
       className: "ft-p ft-c1 ft-xlarge ft-b"
     }, playerData.user_name), /*#__PURE__*/React.createElement("div", {
       className: "ft-s ft-c1 ft-default"
     }, playerData.rank_name, " lvl ", playerData.level)), /*#__PURE__*/React.createElement("div", {
-      style: {
-        width: "100%"
-      },
       className: "d-in_block"
     }, /*#__PURE__*/React.createElement("div", {
       id: "sb_regentimer"
@@ -258,6 +261,8 @@ function Sidebar({
       className: "sb_logout_button_wrapper"
     }, /*#__PURE__*/React.createElement("input", {
       className: "sb_logout_button button-bar_large t-hover",
+      href: logout_link,
+      onClick: logoutOnClick,
       type: "button",
       value: "LOGOUT"
     })), /*#__PURE__*/React.createElement("img", {
