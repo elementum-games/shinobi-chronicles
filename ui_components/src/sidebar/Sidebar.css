@@ -3,7 +3,7 @@
     top: calc(20px + var(--header-height));
     position: sticky;
     align-self: flex-start;
-    padding-left: 15px;
+    margin-left: 15px;
 }
 
 #sidebar {
