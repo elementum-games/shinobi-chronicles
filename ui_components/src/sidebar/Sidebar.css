@@ -139,6 +139,9 @@
     transform: translateY(-50%);
     height: 80%;
     clip-path: polygon(8px 0, calc(100% - 8px) 0px, 100% 50%, calc(100% - 8px) 100%, 8px 100%, 0 50%);
+    transition-property: width;
+    transition-duration: 0.3s;
+    transition-timing-function: linear;
 }
 
 .sb_preview {

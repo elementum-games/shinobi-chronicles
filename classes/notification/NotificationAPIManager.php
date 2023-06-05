@@ -38,6 +38,27 @@ class NotificationAPIManager {
                         $row['action_url'] = $this->system->router->getUrl("training");
                     }
                     break;
+                case "specialmission":
+                    if ($this->player->special_mission == 0) {
+                        $delete = true;
+                    } else {
+                        $row['action_url'] = $this->system->router->getUrl("specialmissions");
+                    }
+                    break;
+                case "specialmission_complete":
+                    if ($this->player->special_mission != 0) {
+                        $delete = true;
+                    } else {
+                        $row['action_url'] = $this->system->router->getUrl("specialmissions");
+                    }
+                    break;
+                case "mission":
+                    if ($this->player->mission_id == 0) {
+                        $delete = true;
+                    } else {
+                        $row['action_url'] = $this->system->router->getUrl("mission");
+                    }
+                    break;
                 default:
                     break;
             }
