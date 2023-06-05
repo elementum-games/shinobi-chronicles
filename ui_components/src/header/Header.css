@@ -3,7 +3,7 @@
     width: 100%;
     background-color: var(--header-background-color);
     z-index: 1000;
-    border-bottom: 3px solid;
+    border-bottom: var(--header-border-height) solid;
     border-color: var(--header-border-color);
     display: flex;
     justify-content: center;

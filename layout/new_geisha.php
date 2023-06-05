@@ -6,7 +6,7 @@ $heading = coreHeading('style/geisha/geisha.css') .
 <<<HTML
 <body>
 	<link rel='stylesheet' type='text/css' href='style/new_geisha/new_geisha.css' />
-	<div id='container' style='margin-bottom: 170px'>
+	<div id='container'>
 HTML;
 
 

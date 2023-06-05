@@ -22,7 +22,7 @@ $NotificationAPIManager = new NotificationAPIManager($system, $player);
                     notification_api: "<?= $system->router->api_links['notification'] ?>",
                 },
                 notificationAPIData: {
-                    userNotifications: <?= json_encode(NotificationAPIPresenter::userNotificationResponse(notificationManager: $NotificationAPIManager)) ?>,
+                    userNotifications: <?= json_encode(NotificationAPIPresenter::userNotificationResponse($NotificationAPIManager)) ?>,
                 },
             }),
             topbarContainer

@@ -60,6 +60,7 @@
     --header-height: 35px;
     --header-background-color: #151417;
     --header-border-color: #0E0D0E;
+    --header-border-height: 3px;
     /* Topbar Config */
     --topbar-height: 60px;
 }
