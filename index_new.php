@@ -105,9 +105,6 @@
         }
 
         // Pre-content display
-        if($player->train_time && !$system->is_legacy_ajax_request) {
-            $layout->renderTrainingDisplay($player);
-        }
         $page_loaded = false;
 
         if(isset($_GET['id'])) {

@@ -23,7 +23,7 @@
 .header_link_container {
     height: 100%;
     width: var(--content-width);
-    align-items: flex-end;
+    align-items: center;
     justify-content: center;
     gap: 40px;
 }

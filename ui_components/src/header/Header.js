@@ -4,6 +4,7 @@ import { apiFetch } from "../utils/network.js";
 function Header({ linkData }) {
     // Hooks
     const [header_menu, setHeaderMenu] = React.useState(null);
+    const [server_time, setServerTime] = React.useState(null);
 
     // API
     function getHeaderMenu() {
@@ -30,10 +31,10 @@ function Header({ linkData }) {
         };
         var formattedDate = currentDate.toLocaleDateString('en-US', options);
         var formattedTime = currentDate.toLocaleTimeString('en-US', { hour12: true });
-        return formattedDate + ' - ' + formattedTime;
+        setServerTime(formattedDate + ' - ' + formattedTime);
     }
     // Content
-    function displayHeader(header_data) {
+    function displayHeader(header_data, server_time) {
         return (
             <div className="header_bar">
                 <div className="header_bar_inner">
@@ -47,7 +48,7 @@ function Header({ linkData }) {
                                 )
                             })
                         }
-                        <div className={"header_time_label ft-default ft-s ft-c5"}>{getCurrentTime()}</div>
+                        <div className={"header_time_label ft-default ft-s ft-c5"}>{server_time}</div>
                     </div>
                 </div>
             </div>
@@ -63,13 +64,21 @@ function Header({ linkData }) {
     // Initialize
     React.useEffect(() => {
         getHeaderMenu();
+        getCurrentTime();
+
+        const timeInterval = setInterval(() => {
+            getCurrentTime();
+        }, 1000);
+
+        return () => clearInterval(timeInterval);
+
     }, []);
 
     // Display
     return (
         <>
             <div className="header_bar_left"></div> 
-            {header_menu && displayHeader(header_menu)}
+            {header_menu && displayHeader(header_menu, server_time)}
         </>
     )
 }

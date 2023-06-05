@@ -6,12 +6,12 @@ function Hotbar({ linkData }) {
     const [player_data, setPlayerData] = React.useState(null);
     const [ai_data, setAIData] = React.useState(null);
     const [mission_data, setMissionData] = React.useState(null);
-    const [regen_time, setRegenTime] = React.useState(null);
-    const [regen_offset, setRegenOffset] = React.useState(null);
+    //const [regen_time, setRegenTime] = React.useState(null);
+    //const [regen_offset, setRegenOffset] = React.useState(null);
     const [quick_type, setQuickType] = React.useState("training");
     const [display_hotbar, toggleHotbarDisplay] = React.useState(false);
     const [display_keybinds, toggleKeybindDisplay] = React.useState(false);
-    const regen_time_var = React.useRef(0);
+    //const regen_time_var = React.useRef(0);
     const training_flag = React.useRef(0);
     const special_flag = React.useRef(0);
     const battle_flag = React.useRef(null);
@@ -28,9 +28,9 @@ function Hotbar({ linkData }) {
             }
             else {
                 setPlayerData(response.data.playerData);
-                setRegenTime(response.data.playerData.regen_time);
-                setRegenOffset(calculateRegenOffset(response.data.playerData.regen_time));
-                regen_time_var.current = response.data.playerData.regen_time;
+                //setRegenTime(response.data.playerData.regen_time);
+                //setRegenOffset(calculateRegenOffset(response.data.playerData.regen_time));
+                //regen_time_var.current = response.data.playerData.regen_time;
                 checkNotificationFlags(response.data.playerData.training, response.data.playerData.special, response.data.playerData.battle);
             }
         })
@@ -65,7 +65,7 @@ function Hotbar({ linkData }) {
     }
 
     // Utility
-    function handleRegen() {
+    /*function handleRegen() {
         if (regen_time_var.current <= 0 || regen_time_var.current == 30) {
             getPlayerData();
         }
@@ -80,7 +80,7 @@ function Hotbar({ linkData }) {
         var percent = ((time / 60) * 100).toFixed(0);
         var offset = 126 - (126 * percent) / 100;
         return offset;
-    }
+    }*/
 
     function quickSelectOnChange(event) {
         setQuickType(event.target.selectedOptions[0].getAttribute('data-state'));
@@ -152,7 +152,7 @@ function Hotbar({ linkData }) {
         );
     }
 
-    function displayCharacterSection(player_data, regen_time, regen_offset) {
+    /*function displayCharacterSection(player_data, regen_time, regen_offset) {
         const health_width = Math.round((player_data.health / player_data.max_health) * 100);
         const chakra_width = Math.round((player_data.chakra / player_data.max_chakra) * 100);
         const stamina_width = Math.round((player_data.stamina / player_data.max_stamina) * 100);
@@ -160,11 +160,11 @@ function Hotbar({ linkData }) {
         return (
             <div id="hb_character_section" className="hb_section">
                 <div id="hb_character_container" className="d-flex">
-                    {/*<div className={display_hotbar ? "hb_avatar_container d-in_block" : "hb_avatar_container d-in_block minimize"}>
+                    {<div className={display_hotbar ? "hb_avatar_container d-in_block" : "hb_avatar_container d-in_block minimize"}>
                         <div className="hb_avatar_wrapper">
                             <img className="hb_avatar_img" src={player_data.avatar_link} />
                         </div>
-                    </div>*/}
+                    </div>}
                     <div className={"hb_resources d-in_block"}>
                         <div className={"hb_name_container t-left d-flex"}>
                             <div className="d-in_block">
@@ -181,7 +181,7 @@ function Hotbar({ linkData }) {
                             </div>
                         </div>
 
-                        {/* Health Bar */}
+                        {/* Health Bar }
                         <div className="hb_resourceContainer">
                             <div id="hb_health" className="hb_resourceBarOuter">
                                 <img className="hb_resource_corner_left" src="images/v2/decorations/barrightcorner.png" />
@@ -200,7 +200,7 @@ function Hotbar({ linkData }) {
                             </div>
                         </div>
 
-                        {/* Chakra Bar */}
+                        {/* Chakra Bar }
                         <div className="hb_resourceContainer">
                             <div id="hb_chakra" className="hb_resourceBarOuter">
                                 <img className="hb_resource_corner_left" src="images/v2/decorations/barrightcorner.png" />
@@ -219,7 +219,7 @@ function Hotbar({ linkData }) {
                             </div>
                         </div>
 
-                        {/* Stamina Bar */}
+                        {/* Stamina Bar }
                         <div className="hb_resourceContainer">
                             <div id="hb_stamina" className="hb_resourceBarOuter">
                                 <img className="hb_resource_corner_left" src="images/v2/decorations/barrightcorner.png" />
@@ -241,50 +241,54 @@ function Hotbar({ linkData }) {
                 </div>
             </div>
         );
-    }
+    }*/
 
     function displayQuickSection(player_data, mission_data, ai_data, link_data, quick_type) {
         return (
             <div id="hb_quick_section" className="hb_section">
-                <div className={"hb_quick_title ft-s ft-c1 ft-min ft-b"}>QUICK MENU</div>
-                <div>
+                <div className="hb_divider d-in_block">
+                    <div className={"hb_quick_title ft-s ft-c1 ft-min ft-b"}>QUICK MENU</div>
+                    <div>
+                        {(quick_type == "training") &&
+                            <div>
+                                <form id="hb_quick_form" ref={quick_form_ref} action={link_data.training} method="post">
+                                    <input id="hb_quick_submit" onClick={quickSubmitOnClick} form="hb_quick_form" className={"hb_button button-bar_large t-hover"} type="button" value="TRAINING" />
+                                </form>
+                            </div>
+                        }
+                        {(quick_type == "arena") &&
+                            <div>
+                                <form id="hb_quick_form" ref={quick_form_ref} action={link_data.arena} method="get">
+                                    <input id="hb_quick_submit" onClick={quickSubmitOnClick} form="hb_quick_form" className={"hb_button button-bar_large t-hover"} type="button" value="ARENA" />
+                                </form>
+                            </div>
+                        }
+                        {(quick_type == "missions") &&
+                            <div>
+                                <form id="hb_quick_form" ref={quick_form_ref} action={link_data.mission} method="get">
+                                    <input id="hb_quick_submit" onClick={quickSubmitOnClick} form="hb_quick_form" className={"hb_button button-bar_large t-hover"} type="button" value="MISSIONS" />
+                                </form>
+                            </div>
+                        }
+                        {(quick_type == "specialmissions") &&
+                            <div>
+                                <form id="hb_quick_form" ref={quick_form_ref} action={link_data.specialmissions} method="get">
+                                    <input id="hb_quick_submit" onClick={quickSubmitOnClick} form="hb_quick_form" className={"hb_button button-bar_large t-hover"} type="button" value="SPECIAL" />
+                                </form>
+                            </div>
+                        }
+                        {(quick_type == "ramen") &&
+                            <div>
+                                <form id="hb_quick_form" ref={quick_form_ref} action={link_data.healingShop} method="get">
+                                    <input id="hb_quick_submit" onClick={quickSubmitOnClick} form="hb_quick_form" className={"hb_button button-bar_LARGE t-hover"} type="button" value="RAMEN" />
+                                </form>
+                            </div>
+                        }
+                    </div>
+                </div>
+                <div className={"hb_divider d-in_block"}>
                     <div>
                         <div>
-                            {(quick_type == "training") &&
-                                <div>
-                                    <form id="hb_quick_form" ref={quick_form_ref} action={link_data.training} method="post">
-                                        <input id="hb_quick_submit" onClick={quickSubmitOnClick} form="hb_quick_form" className={"hb_button button-bar_large t-hover"} type="button" value="TRAINING" />
-                                    </form>
-                                </div>
-                            }
-                            {(quick_type == "arena") &&
-                                <div>
-                                    <form id="hb_quick_form" ref={quick_form_ref} action={link_data.arena} method="get">
-                                    <input id="hb_quick_submit" onClick={quickSubmitOnClick} form="hb_quick_form" className={"hb_button button-bar_large t-hover"} type="button" value="ARENA" />
-                                    </form>
-                                </div>
-                            }
-                            {(quick_type == "missions") &&
-                                <div>
-                                    <form id="hb_quick_form" ref={quick_form_ref} action={link_data.mission} method="get">
-                                    <input id="hb_quick_submit" onClick={quickSubmitOnClick} form="hb_quick_form" className={"hb_button button-bar_large t-hover"} type="button" value="MISSIONS" />
-                                    </form>
-                                </div>
-                            }
-                            {(quick_type == "specialmissions") &&
-                                <div>
-                                    <form id="hb_quick_form" ref={quick_form_ref} action={link_data.specialmissions} method="get">
-                                    <input id="hb_quick_submit" onClick={quickSubmitOnClick} form="hb_quick_form" className={"hb_button button-bar_large t-hover"} type="button" value="SPECIAL" />
-                                    </form>
-                                </div>
-                            }
-                            {(quick_type == "ramen") &&
-                                <div>
-                                    <form id="hb_quick_form" ref={quick_form_ref} action={link_data.healingShop} method="get">
-                                        <input id="hb_quick_submit" onClick={quickSubmitOnClick} form="hb_quick_form" className={"hb_button button-bar_LARGE t-hover"} type="button" value="RAMEN" />
-                                    </form>
-                                </div>
-                            }
                             <select id="hb_category_select" onChange={quickSelectOnChange} form="hb_quick_form" name="id" className="hb_quick_select">
                                 <option data-state="training" value={link_data.training.slice(link_data.training.indexOf('=') + 1)}>Training</option>
                                 <option data-state="arena" value={link_data.arena.slice(link_data.training.indexOf('=') + 1)}>Arena</option>
@@ -295,41 +299,41 @@ function Hotbar({ linkData }) {
                         </div>
                         {(quick_type == "training") &&
                             <>
-                            <div>
-                                <select onChange={trainingSelectOnChange} form="hb_quick_form" id="hb_training_select" name="skill" className="hb_quick_select">
-                                    <optgroup label="Skills">
-                                        <option data-name="skill" value="taijutsu">Taijutsu Skill</option>
-                                        <option data-name="skill" value="ninjutsu">Ninjutsu Skill</option>
-                                        <option data-name="skill" value="genjutsu">Genjutsu Skill</option>
-                                        {player_data.has_bloodline == true &&
-                                            <option data-name="skill" value="bloodline">Bloodline Skill</option>
-                                        }
-                                    </optgroup>
-                                    <optgroup label="Attributes">
-                                        <option data-name="attributes" value="speed">Speed Skill</option>
-                                        <option data-name="attributes" value="cast_speed">Cast Speed Skill</option>
-                                    </optgroup>
-                                </select>
-                            </div>
-                            <div id="hb_time_container">
-                                <label className={"hb_time_label ft-s ft-c1 ft-min ft-b"}>TIME:</label>
-                                <select form="hb_quick_form" id="hb_time_select" name="train_type" className="hb_quick_select">
-                                    <option value="Short">Short</option>
-                                    <option value="Long">Long</option>
-                                    <option value="Extended">Extended</option>
-                                </select>
-                            </div>
+                                <div>
+                                    <select onChange={trainingSelectOnChange} form="hb_quick_form" id="hb_training_select" name="skill" className="hb_quick_select">
+                                        <optgroup label="Skills">
+                                            <option data-name="skill" value="taijutsu">Taijutsu Skill</option>
+                                            <option data-name="skill" value="ninjutsu">Ninjutsu Skill</option>
+                                            <option data-name="skill" value="genjutsu">Genjutsu Skill</option>
+                                            {player_data.has_bloodline == true &&
+                                                <option data-name="skill" value="bloodline">Bloodline Skill</option>
+                                            }
+                                        </optgroup>
+                                        <optgroup label="Attributes">
+                                            <option data-name="attributes" value="speed">Speed Skill</option>
+                                            <option data-name="attributes" value="cast_speed">Cast Speed Skill</option>
+                                        </optgroup>
+                                    </select>
+                                </div>
+                                <div id="hb_time_container">
+                                    <label className={"hb_time_label ft-s ft-c1 ft-min ft-b"}>TIME:</label>
+                                    <select form="hb_quick_form" id="hb_time_select" name="train_type" className="hb_quick_select">
+                                        <option value="Short">Short</option>
+                                        <option value="Long">Long</option>
+                                        <option value="Extended">Extended</option>
+                                    </select>
+                                </div>
                             </>
                         }
                         {(quick_type == "arena") &&
                             <div>
-                            <select form="hb_quick_form" id="hb_arena_select" name="fight" className="hb_quick_select">
-                                {(ai_data) &&
-                                    ai_data.map(function (ai, i) {
-                                        return <option key={i} value={ai.ai_id}>{ai.name}</option>
-                                    })
-                                }
-                            </select>
+                                <select form="hb_quick_form" id="hb_arena_select" name="fight" className="hb_quick_select">
+                                    {(ai_data) &&
+                                        ai_data.map(function (ai, i) {
+                                            return <option key={i} value={ai.ai_id}>{ai.name}</option>
+                                        })
+                                    }
+                                </select>
                             </div>
                         }
                         {(quick_type == "missions") &&
@@ -346,20 +350,20 @@ function Hotbar({ linkData }) {
                         {(quick_type == "specialmissions") &&
                             <div>
                                 <select name="start" form="hb_quick_form" id="hb_specialmissions_select" className="hb_quick_select">
-                                        <option value="easy">Easy</option>
-                                        <option value="normal">Normal</option>
-                                        <option value="hard">Hard</option>
-                                        <option value="nightmare">Nightmare</option>
+                                    <option value="easy">Easy</option>
+                                    <option value="normal">Normal</option>
+                                    <option value="hard">Hard</option>
+                                    <option value="nightmare">Nightmare</option>
                                 </select>
                             </div>
                         }
                         {(quick_type == "ramen") &&
                             <div>
-                            <select form="hb_quick_form" id="hb_ramen_select" name="heal" className="hb_quick_select">
-                                <option value="vegetable">Vegetable</option>
-                                <option value="pork">Pork</option>
-                                <option value="deluxe">Deluxe</option>
-                            </select>
+                                <select form="hb_quick_form" id="hb_ramen_select" name="heal" className="hb_quick_select">
+                                    <option value="vegetable">Vegetable</option>
+                                    <option value="pork">Pork</option>
+                                    <option value="deluxe">Deluxe</option>
+                                </select>
                             </div>
                         }
                     </div>
@@ -371,10 +375,14 @@ function Hotbar({ linkData }) {
     function displaySettingsSection(player_data) {
         return (
             <div id="hb_settings_section" className="hb_section">
-                <div className={"hb_settings_title ft-s ft-c1 ft-min ft-b"}>SETTINGS (WIP)</div>
-                <input id="hb_settings_display" onClick={setKeybindsOnClick} className={"hb_button button-bar_large t-hover"} type="button" value="SET KEYBINDS" />
-                <div className="hb_checkbox_wrapper"><input id="hb_alert_checkbox" type="checkbox" className="hb_checkbox" form="hb_quick_form" name="alert" value="true" /><label className={"ft-s ft-c1 ft-min"}>ENABLE ALERTS</label></div>
-                <div className="hb_checkbox_wrapper"><input id="hb_hotkey_checkbox" type="checkbox" className="hb_checkbox" value="wow" /><label className={"ft-s ft-c1 ft-min"}>ENABLE HOTKEYS</label></div>
+                <div className="d-in_block hb_divider">
+                    <div className={"hb_settings_title ft-s ft-c1 ft-min ft-b"}>SETTINGS (WIP)</div>
+                    <input id="hb_settings_display" onClick={setKeybindsOnClick} className={"hb_button button-bar_large t-hover"} type="button" value="SET KEYBINDS" />
+                </div>
+                <div className="d-in_block hb_divider">
+                    <div className="hb_checkbox_wrapper"><input id="hb_alert_checkbox" type="checkbox" className="hb_checkbox" form="hb_quick_form" name="alert" value="true" /><label className={"ft-s ft-c1 ft-min"}>ENABLE ALERTS</label></div>
+                    <div className="hb_checkbox_wrapper"><input id="hb_hotkey_checkbox" type="checkbox" className="hb_checkbox" value="wow" /><label className={"ft-s ft-c1 ft-min"}>ENABLE HOTKEYS</label></div>
+                </div>
             </div>
         );
     }
@@ -403,18 +411,17 @@ function Hotbar({ linkData }) {
         getMissionData();
         getAIData();
 
-        const regenInterval = setInterval(() => {
+        /*const regenInterval = setInterval(() => {
             handleRegen();
         }, 1000);
 
-        return () => clearInterval(regenInterval);
+        return () => clearInterval(regenInterval);*/
     }, []);
 
     // Display
     return (
         <div id="hotbar" className={display_hotbar ? "jc-center d-flex" : "jc-center d-flex minimize"}>
             {displayToggle()}
-            {player_data && displayCharacterSection(player_data, regen_time, regen_offset)}
             {player_data && displayQuickSection(player_data, mission_data, ai_data, linkData, quick_type)}
             {player_data && displaySettingsSection(player_data)}
             {displaySetKeybinds()}

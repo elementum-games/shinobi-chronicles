@@ -6,6 +6,7 @@ function Header({
 }) {
   // Hooks
   const [header_menu, setHeaderMenu] = React.useState(null);
+  const [server_time, setServerTime] = React.useState(null);
 
   // API
   function getHeaderMenu() {
@@ -33,10 +34,10 @@ function Header({
     var formattedTime = currentDate.toLocaleTimeString('en-US', {
       hour12: true
     });
-    return formattedDate + ' - ' + formattedTime;
+    setServerTime(formattedDate + ' - ' + formattedTime);
   }
   // Content
-  function displayHeader(header_data) {
+  function displayHeader(header_data, server_time) {
     return /*#__PURE__*/React.createElement("div", {
       className: "header_bar"
     }, /*#__PURE__*/React.createElement("div", {
@@ -53,7 +54,7 @@ function Header({
       }, link.title));
     }), /*#__PURE__*/React.createElement("div", {
       className: "header_time_label ft-default ft-s ft-c5"
-    }, getCurrentTime()))));
+    }, server_time))));
   }
 
   // Misc
@@ -65,11 +66,16 @@ function Header({
   // Initialize
   React.useEffect(() => {
     getHeaderMenu();
+    getCurrentTime();
+    const timeInterval = setInterval(() => {
+      getCurrentTime();
+    }, 1000);
+    return () => clearInterval(timeInterval);
   }, []);
 
   // Display
   return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
     className: "header_bar_left"
-  }), header_menu && displayHeader(header_menu));
+  }), header_menu && displayHeader(header_menu, server_time));
 }
 window.Header = Header;

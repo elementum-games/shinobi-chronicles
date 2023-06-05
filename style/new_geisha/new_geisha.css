@@ -18,6 +18,7 @@
     --footer-background-color: #0E0D0E;
     --content-width: 850px;
     --container-width: 1400px;
+    --regentimer-color: #7C88C3;
     /* Font Config */
     --font-primary: "Trebuchet MS";
     --font-primary-variant: small-caps;
@@ -42,12 +43,11 @@
     --stamina-preview: #2e362c;
     --stamina-highlight: #7f9d89;
     /* Hotbar Config */
-    --hotbar-height: 150px;
+    --hotbar-height: 85px;
     --hotbar-background-color: #100f11;
     --hotbar-border-color: #0E0D0E;
     --hotbar-keybind-modal-width: 700px;
     --hotbar-keybind-modal-height: 400px;
-    --hotbar-regentimer-color: blue;
     /* Sidebar Config */
     --sidebar-header-background-color: #8c7b58;
     --sidebar-width: 250px;

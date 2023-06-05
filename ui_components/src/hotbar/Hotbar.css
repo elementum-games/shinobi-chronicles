@@ -282,3 +282,10 @@
     width: 0;
     transition: width 0.5s;
 }
+
+.hb_divider {
+    height: var(--hotbar-height);
+    vertical-align: top;
+    margin-left: 10px;
+    margin-right: 10px;
+}

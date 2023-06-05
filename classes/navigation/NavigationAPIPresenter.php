@@ -43,6 +43,21 @@ class NavigationApiPresenter {
         );
     }
 
+    public static function staffMenuResponse(NavigationAPIManager $navigationManager): array
+    {
+        return array_map(
+            function (NavigationLinkDto $link) {
+                return [
+                    'title' => $link->title,
+                    'url' => $link->url,
+                    'active' => $link->active,
+                    'id' => $link->id,
+                ];
+            },
+            $navigationManager->getStaffMenu()
+        );
+    }
+
     public static function headerMenuResponse(NavigationAPIManager $navigationManager): array
     {
         return array_map(

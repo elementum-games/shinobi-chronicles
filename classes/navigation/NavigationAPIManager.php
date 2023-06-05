@@ -37,12 +37,12 @@ class NavigationAPIManager {
                 id: $id,
             );
         }
-        $return_arr[] = new NavigationLinkDto(
+        /*$return_arr[] = new NavigationLinkDto(
             title: "Logout",
             url: $this->system->router->base_url . "?logout=1",
             active: true,
             id: 0,
-        );
+        );*/
         return $return_arr;
     }
 
@@ -124,19 +124,34 @@ class NavigationAPIManager {
             $routes[24]->menu = Route::MENU_USER;
         }
         $return_arr = [];
-        /*
+
         if ($this->player->isModerator() || $this->player->hasAdminPanel() || $this->player->isSupportStaff()) {
             if ($this->player->isSupportStaff()) {
-                echo "<li><a id='sideMenuOption-SupportPanel' href='{$this->system->router->base_url}?id=30'>Support Panel</a></li>";
+                $return_arr[] = new NavigationLinkDto(
+                    title: "Support Panel",
+                    url: $this->system->router->base_url . "?id=30",
+                    active: true,
+                    id: 30,
+                );
             }
             if ($this->player->isModerator()) {
-                echo "<li><a id='sideMenuOption-ModPanel' href='{$this->system->router->base_url}?id=16'>Mod Panel</a></li>";
+                $return_arr[] = new NavigationLinkDto(
+                    title: "Mod Panel",
+                    url: $this->system->router->base_url . "?id=16",
+                    active: true,
+                    id: 16,
+                );
             }
             if ($this->player->hasAdminPanel()) {
-                echo "<li><a id='sideMenuOption-AdminPanel' href='{$this->system->router->base_url}?id=17'>Admin Panel</a></li>";
+                $return_arr[] = new NavigationLinkDto(
+                    title: "Admin Panel",
+                    url: $this->system->router->base_url . "?id=17",
+                    active: true,
+                    id: 17,
+                );
             }
         }
-        */
+
         return $return_arr;
     }
 

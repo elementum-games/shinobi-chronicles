@@ -31,6 +31,7 @@ try {
                 'userMenu' => NavigationAPIPresenter::userMenuResponse(navigationManager: $NavigationManager),
                 'activityMenu' => NavigationAPIPresenter::activityMenuResponse(navigationManager: $NavigationManager),
                 'villageMenu' => NavigationAPIPresenter::villageMenuResponse(navigationManager: $NavigationManager),
+                'staffMenu' => NavigationAPIPresenter::staffMenuResponse(navigationManager: $NavigationManager),
             ];
             break;
         case "getHeaderMenu":

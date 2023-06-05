@@ -6,6 +6,7 @@ require_once __DIR__ . "/classes/Router.php";
 require_once __DIR__ . "/classes/Auth.php";
 require_once __DIR__ . "/classes/API.php";
 require_once __DIR__ . "/classes/ActionResult.php";
+require_once __DIR__ . "/classes/ReportManager.php";
 
 require_once __DIR__ . "/classes/RankManager.php";
 

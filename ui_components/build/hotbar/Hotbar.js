@@ -8,12 +8,12 @@ function Hotbar({
   const [player_data, setPlayerData] = React.useState(null);
   const [ai_data, setAIData] = React.useState(null);
   const [mission_data, setMissionData] = React.useState(null);
-  const [regen_time, setRegenTime] = React.useState(null);
-  const [regen_offset, setRegenOffset] = React.useState(null);
+  //const [regen_time, setRegenTime] = React.useState(null);
+  //const [regen_offset, setRegenOffset] = React.useState(null);
   const [quick_type, setQuickType] = React.useState("training");
   const [display_hotbar, toggleHotbarDisplay] = React.useState(false);
   const [display_keybinds, toggleKeybindDisplay] = React.useState(false);
-  const regen_time_var = React.useRef(0);
+  //const regen_time_var = React.useRef(0);
   const training_flag = React.useRef(0);
   const special_flag = React.useRef(0);
   const battle_flag = React.useRef(null);
@@ -29,9 +29,9 @@ function Hotbar({
         return;
       } else {
         setPlayerData(response.data.playerData);
-        setRegenTime(response.data.playerData.regen_time);
-        setRegenOffset(calculateRegenOffset(response.data.playerData.regen_time));
-        regen_time_var.current = response.data.playerData.regen_time;
+        //setRegenTime(response.data.playerData.regen_time);
+        //setRegenOffset(calculateRegenOffset(response.data.playerData.regen_time));
+        //regen_time_var.current = response.data.playerData.regen_time;
         checkNotificationFlags(response.data.playerData.training, response.data.playerData.special, response.data.playerData.battle);
       }
     });
@@ -62,20 +62,22 @@ function Hotbar({
   }
 
   // Utility
-  function handleRegen() {
-    if (regen_time_var.current <= 0 || regen_time_var.current == 30) {
-      getPlayerData();
-    } else {
-      regen_time_var.current = regen_time_var.current - 1;
-      setRegenTime(regen_time => regen_time - 1);
-      setRegenOffset(calculateRegenOffset(regen_time_var.current));
-    }
+  /*function handleRegen() {
+      if (regen_time_var.current <= 0 || regen_time_var.current == 30) {
+          getPlayerData();
+      }
+      else {
+          regen_time_var.current = regen_time_var.current - 1;
+          setRegenTime(regen_time => regen_time - 1);
+          setRegenOffset(calculateRegenOffset(regen_time_var.current));
+      }
   }
-  function calculateRegenOffset(time) {
-    var percent = (time / 60 * 100).toFixed(0);
-    var offset = 126 - 126 * percent / 100;
-    return offset;
-  }
+    function calculateRegenOffset(time) {
+      var percent = ((time / 60) * 100).toFixed(0);
+      var offset = 126 - (126 * percent) / 100;
+      return offset;
+  }*/
+
   function quickSelectOnChange(event) {
     setQuickType(event.target.selectedOptions[0].getAttribute('data-state'));
   }
@@ -141,155 +143,103 @@ function Hotbar({
       className: "t-hover ft-s ft-c1 ft-default"
     }, "Toggle Hotbar");
   }
-  function displayCharacterSection(player_data, regen_time, regen_offset) {
-    const health_width = Math.round(player_data.health / player_data.max_health * 100);
-    const chakra_width = Math.round(player_data.chakra / player_data.max_chakra * 100);
-    const stamina_width = Math.round(player_data.stamina / player_data.max_stamina * 100);
-    return /*#__PURE__*/React.createElement("div", {
-      id: "hb_character_section",
-      className: "hb_section"
-    }, /*#__PURE__*/React.createElement("div", {
-      id: "hb_character_container",
-      className: "d-flex"
-    }, /*#__PURE__*/React.createElement("div", {
-      className: "hb_resources d-in_block"
-    }, /*#__PURE__*/React.createElement("div", {
-      className: "hb_name_container t-left d-flex"
-    }, /*#__PURE__*/React.createElement("div", {
-      className: "d-in_block"
-    }, /*#__PURE__*/React.createElement("div", {
-      className: "ft-p ft-c1 ft-xlarge ft-b"
-    }, player_data.user_name), /*#__PURE__*/React.createElement("div", {
-      className: "ft-s ft-c1 ft-default"
-    }, player_data.rank_name, " lvl ", player_data.level)), /*#__PURE__*/React.createElement("div", {
-      style: {
-        width: "100%"
-      },
-      className: "d-in_block"
-    }, /*#__PURE__*/React.createElement("div", {
-      id: "hb_regentimer"
-    }, /*#__PURE__*/React.createElement("svg", {
-      height: "40",
-      width: "40",
-      viewBox: "0 0 50 50"
-    }, /*#__PURE__*/React.createElement("circle", {
-      id: "hb_regentimer_circle",
-      stroke: "#7C88C3",
-      cx: "24.5",
-      cy: "24",
-      r: "20",
-      strokeWidth: "4",
-      "stroke-mitterlimit": "0",
-      fill: "none",
-      strokeDasharray: "126",
-      strokeDashoffset: regen_offset,
-      transform: "rotate(-90, 24.5, 24)"
-    }), /*#__PURE__*/React.createElement("text", {
-      id: "hb_regentimer_text",
-      className: "ft-s ft-b ft-large",
-      x: "50%",
-      y: "50%",
-      textAnchor: "middle",
-      dominantBaseline: "middle"
-    }, regen_time))))), /*#__PURE__*/React.createElement("div", {
-      className: "hb_resourceContainer"
-    }, /*#__PURE__*/React.createElement("div", {
-      id: "hb_health",
-      className: "hb_resourceBarOuter"
-    }, /*#__PURE__*/React.createElement("img", {
-      className: "hb_resource_corner_left",
-      src: "images/v2/decorations/barrightcorner.png"
-    }), /*#__PURE__*/React.createElement("label", {
-      className: "hb_innerResourceBarLabel"
-    }, player_data.health, " / ", player_data.max_health), /*#__PURE__*/React.createElement("div", {
-      className: "hb_health hb_fill",
-      style: {
-        width: health_width + "%"
-      }
-    }, /*#__PURE__*/React.createElement("svg", {
-      className: "hb_resource_highlight_container"
-    }, /*#__PURE__*/React.createElement("svg", {
-      className: "hb_resource_highlight_wrapper",
-      viewBox: "0 0 50 50"
-    }, /*#__PURE__*/React.createElement("polygon", {
-      x: "50",
-      points: "20,25 0,5 5,5 25,25 5,45 0,45",
-      id: "hb_health_highlight",
-      className: "hb_resource_highlight"
-    })))), /*#__PURE__*/React.createElement("div", {
-      className: "hb_health hb_preview"
-    }), /*#__PURE__*/React.createElement("img", {
-      className: "hb_resource_corner_right",
-      src: "images/v2/decorations/barrightcorner.png"
-    }))), /*#__PURE__*/React.createElement("div", {
-      className: "hb_resourceContainer"
-    }, /*#__PURE__*/React.createElement("div", {
-      id: "hb_chakra",
-      className: "hb_resourceBarOuter"
-    }, /*#__PURE__*/React.createElement("img", {
-      className: "hb_resource_corner_left",
-      src: "images/v2/decorations/barrightcorner.png"
-    }), /*#__PURE__*/React.createElement("label", {
-      className: "hb_innerResourceBarLabel"
-    }, player_data.chakra, " / ", player_data.max_chakra), /*#__PURE__*/React.createElement("div", {
-      className: "hb_chakra hb_fill",
-      style: {
-        width: chakra_width + "%"
-      }
-    }, /*#__PURE__*/React.createElement("svg", {
-      className: "hb_resource_highlight_container"
-    }, /*#__PURE__*/React.createElement("svg", {
-      className: "hb_resource_highlight_wrapper",
-      viewBox: "0 0 50 50"
-    }, /*#__PURE__*/React.createElement("polygon", {
-      x: "50",
-      points: "20,25 0,5 5,5 25,25 5,45 0,45",
-      id: "hb_chakra_highlight",
-      className: "hb_resource_highlight"
-    })))), /*#__PURE__*/React.createElement("div", {
-      className: "hb_chakra hb_preview"
-    }), /*#__PURE__*/React.createElement("img", {
-      className: "hb_resource_corner_right",
-      src: "images/v2/decorations/barrightcorner.png"
-    }))), /*#__PURE__*/React.createElement("div", {
-      className: "hb_resourceContainer"
-    }, /*#__PURE__*/React.createElement("div", {
-      id: "hb_stamina",
-      className: "hb_resourceBarOuter"
-    }, /*#__PURE__*/React.createElement("img", {
-      className: "hb_resource_corner_left",
-      src: "images/v2/decorations/barrightcorner.png"
-    }), /*#__PURE__*/React.createElement("label", {
-      className: "hb_innerResourceBarLabel"
-    }, player_data.stamina, " / ", player_data.max_stamina), /*#__PURE__*/React.createElement("div", {
-      className: "hb_stamina hb_fill",
-      style: {
-        width: stamina_width + "%"
-      }
-    }, /*#__PURE__*/React.createElement("svg", {
-      className: "hb_resource_highlight_container"
-    }, /*#__PURE__*/React.createElement("svg", {
-      className: "hb_resource_highlight_wrapper",
-      viewBox: "0 0 50 50"
-    }, /*#__PURE__*/React.createElement("polygon", {
-      x: "50",
-      points: "20,25 0,5 5,5 25,25 5,45 0,45",
-      id: "hb_stamina_highlight",
-      className: "hb_resource_highlight"
-    })))), /*#__PURE__*/React.createElement("div", {
-      className: "hb_stamina hb_preview"
-    }), /*#__PURE__*/React.createElement("img", {
-      className: "hb_resource_corner_right",
-      src: "images/v2/decorations/barrightcorner.png"
-    }))))));
-  }
+
+  /*function displayCharacterSection(player_data, regen_time, regen_offset) {
+      const health_width = Math.round((player_data.health / player_data.max_health) * 100);
+      const chakra_width = Math.round((player_data.chakra / player_data.max_chakra) * 100);
+      const stamina_width = Math.round((player_data.stamina / player_data.max_stamina) * 100);
+        return (
+          <div id="hb_character_section" className="hb_section">
+              <div id="hb_character_container" className="d-flex">
+                  {<div className={display_hotbar ? "hb_avatar_container d-in_block" : "hb_avatar_container d-in_block minimize"}>
+                      <div className="hb_avatar_wrapper">
+                          <img className="hb_avatar_img" src={player_data.avatar_link} />
+                      </div>
+                  </div>}
+                  <div className={"hb_resources d-in_block"}>
+                      <div className={"hb_name_container t-left d-flex"}>
+                          <div className="d-in_block">
+                              <div className={"ft-p ft-c1 ft-xlarge ft-b"}>{player_data.user_name}</div>
+                              <div className={"ft-s ft-c1 ft-default"}>{player_data.rank_name} lvl {player_data.level}</div>
+                          </div>
+                          <div style={{ width: "100%" }} className="d-in_block">
+                              <div id="hb_regentimer">
+                                  <svg height="40" width="40" viewBox="0 0 50 50">
+                                      <circle id="hb_regentimer_circle" stroke="#7C88C3" cx="24.5" cy="24" r="20" strokeWidth="4" stroke-mitterlimit="0" fill="none" strokeDasharray="126" strokeDashoffset={regen_offset} transform="rotate(-90, 24.5, 24)"></circle>
+                                      <text id="hb_regentimer_text" className={"ft-s ft-b ft-large"} x="50%" y="50%" textAnchor="middle" dominantBaseline="middle">{regen_time}</text>
+                                  </svg>
+                              </div>
+                          </div>
+                      </div>
+                        {/* Health Bar }
+                      <div className="hb_resourceContainer">
+                          <div id="hb_health" className="hb_resourceBarOuter">
+                              <img className="hb_resource_corner_left" src="images/v2/decorations/barrightcorner.png" />
+                              <label className="hb_innerResourceBarLabel">
+                                  {player_data.health} / {player_data.max_health}
+                              </label>
+                              <div className={"hb_health hb_fill"} style={{ width: health_width + "%" }}>
+                                  <svg className="hb_resource_highlight_container">
+                                      <svg className="hb_resource_highlight_wrapper" viewBox="0 0 50 50">
+                                          <polygon x="50" points="20,25 0,5 5,5 25,25 5,45 0,45" id="hb_health_highlight" className="hb_resource_highlight" />
+                                      </svg>
+                                  </svg>
+                              </div>
+                              <div className={"hb_health hb_preview"}></div>
+                              <img className={"hb_resource_corner_right"} src="images/v2/decorations/barrightcorner.png" />
+                          </div>
+                      </div>
+                        {/* Chakra Bar }
+                      <div className="hb_resourceContainer">
+                          <div id="hb_chakra" className="hb_resourceBarOuter">
+                              <img className="hb_resource_corner_left" src="images/v2/decorations/barrightcorner.png" />
+                              <label className="hb_innerResourceBarLabel">
+                                  {player_data.chakra} / {player_data.max_chakra}
+                              </label>
+                              <div className={"hb_chakra hb_fill"} style={{ width: chakra_width + "%" }}>
+                                  <svg className="hb_resource_highlight_container">
+                                      <svg className="hb_resource_highlight_wrapper" viewBox="0 0 50 50">
+                                          <polygon x="50" points="20,25 0,5 5,5 25,25 5,45 0,45" id="hb_chakra_highlight" className="hb_resource_highlight" />
+                                      </svg>
+                                  </svg>
+                              </div>
+                              <div className={"hb_chakra hb_preview"}></div>
+                              <img className="hb_resource_corner_right" src="images/v2/decorations/barrightcorner.png" />
+                          </div>
+                      </div>
+                        {/* Stamina Bar }
+                      <div className="hb_resourceContainer">
+                          <div id="hb_stamina" className="hb_resourceBarOuter">
+                              <img className="hb_resource_corner_left" src="images/v2/decorations/barrightcorner.png" />
+                              <label className="hb_innerResourceBarLabel">
+                                  {player_data.stamina} / {player_data.max_stamina}
+                              </label>
+                              <div className={"hb_stamina hb_fill"} style={{ width: stamina_width + "%" }}>
+                                  <svg className="hb_resource_highlight_container">
+                                      <svg className="hb_resource_highlight_wrapper" viewBox="0 0 50 50">
+                                          <polygon x="50" points="20,25 0,5 5,5 25,25 5,45 0,45" id="hb_stamina_highlight" className="hb_resource_highlight" />
+                                      </svg>
+                                  </svg>
+                              </div>
+                              <div className={"hb_stamina hb_preview"}></div>
+                              <img className="hb_resource_corner_right" src="images/v2/decorations/barrightcorner.png" />
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      );
+  }*/
+
   function displayQuickSection(player_data, mission_data, ai_data, link_data, quick_type) {
     return /*#__PURE__*/React.createElement("div", {
       id: "hb_quick_section",
       className: "hb_section"
     }, /*#__PURE__*/React.createElement("div", {
+      className: "hb_divider d-in_block"
+    }, /*#__PURE__*/React.createElement("div", {
       className: "hb_quick_title ft-s ft-c1 ft-min ft-b"
-    }, "QUICK MENU"), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", null, quick_type == "training" && /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("form", {
+    }, "QUICK MENU"), /*#__PURE__*/React.createElement("div", null, quick_type == "training" && /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("form", {
       id: "hb_quick_form",
       ref: quick_form_ref,
       action: link_data.training,
@@ -349,7 +299,9 @@ function Hotbar({
       className: "hb_button button-bar_LARGE t-hover",
       type: "button",
       value: "RAMEN"
-    }))), /*#__PURE__*/React.createElement("select", {
+    }))))), /*#__PURE__*/React.createElement("div", {
+      className: "hb_divider d-in_block"
+    }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("select", {
       id: "hb_category_select",
       onChange: quickSelectOnChange,
       form: "hb_quick_form",
@@ -464,6 +416,8 @@ function Hotbar({
       id: "hb_settings_section",
       className: "hb_section"
     }, /*#__PURE__*/React.createElement("div", {
+      className: "d-in_block hb_divider"
+    }, /*#__PURE__*/React.createElement("div", {
       className: "hb_settings_title ft-s ft-c1 ft-min ft-b"
     }, "SETTINGS (WIP)"), /*#__PURE__*/React.createElement("input", {
       id: "hb_settings_display",
@@ -471,7 +425,9 @@ function Hotbar({
       className: "hb_button button-bar_large t-hover",
       type: "button",
       value: "SET KEYBINDS"
-    }), /*#__PURE__*/React.createElement("div", {
+    })), /*#__PURE__*/React.createElement("div", {
+      className: "d-in_block hb_divider"
+    }, /*#__PURE__*/React.createElement("div", {
       className: "hb_checkbox_wrapper"
     }, /*#__PURE__*/React.createElement("input", {
       id: "hb_alert_checkbox",
@@ -491,7 +447,7 @@ function Hotbar({
       value: "wow"
     }), /*#__PURE__*/React.createElement("label", {
       className: "ft-s ft-c1 ft-min"
-    }, "ENABLE HOTKEYS")));
+    }, "ENABLE HOTKEYS"))));
   }
   function displaySetKeybinds() {
     return /*#__PURE__*/React.createElement("div", {
@@ -525,16 +481,17 @@ function Hotbar({
     getPlayerData();
     getMissionData();
     getAIData();
-    const regenInterval = setInterval(() => {
-      handleRegen();
+
+    /*const regenInterval = setInterval(() => {
+        handleRegen();
     }, 1000);
-    return () => clearInterval(regenInterval);
+      return () => clearInterval(regenInterval);*/
   }, []);
 
   // Display
   return /*#__PURE__*/React.createElement("div", {
     id: "hotbar",
     className: display_hotbar ? "jc-center d-flex" : "jc-center d-flex minimize"
-  }, displayToggle(), player_data && displayCharacterSection(player_data, regen_time, regen_offset), player_data && displayQuickSection(player_data, mission_data, ai_data, linkData, quick_type), player_data && displaySettingsSection(player_data), displaySetKeybinds());
+  }, displayToggle(), player_data && displayQuickSection(player_data, mission_data, ai_data, linkData, quick_type), player_data && displaySettingsSection(player_data), displaySetKeybinds());
 }
 window.Hotbar = Hotbar;

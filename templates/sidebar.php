@@ -30,10 +30,12 @@ function sidebar(): void {
         window.addEventListener('load', () => {
         ReactDOM.render(
             React.createElement(Sidebar, {
-                    linkData: {
+                linkData: {
                     navigation_api: "<?= $system->router->api_links['navigation'] ?>",
-                    avatar_link: "<?= $player->avatar_link ?>",
+                    user_api: "<?= $system->router->api_links['user'] ?>",
+                    logout_link: "<?= $system->router->base_url . "?logout=1" ?>",
                 },
+                logout_timer: "<?= (System::LOGOUT_LIMIT * 60) - (time() - $player->last_login) ?>",
             }),
             sidebarContainer
         );
