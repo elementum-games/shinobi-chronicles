@@ -2,10 +2,11 @@ import { apiFetch } from "../utils/network.js";
 
 // Initialize
 function Topbar({
-  links
+  links,
+  notificationAPIData
 }) {
   // Hooks
-  const [notificationData, setNotificationData] = React.useState(null);
+  const [notificationData, setNotificationData] = React.useState(notificationAPIData.userNotifications);
 
   // API
   function getNotificationData() {
@@ -209,9 +210,7 @@ function Topbar({
   }
 
   // Initialize
-  React.useEffect(() => {
-    getNotificationData();
-  }, []);
+  React.useEffect(() => {}, []);
 
   // Display
   return /*#__PURE__*/React.createElement("div", {

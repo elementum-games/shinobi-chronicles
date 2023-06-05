@@ -1,11 +1,11 @@
 import { apiFetch } from "../utils/network.js";
 
 // Initialize
-function Hotbar({ links }) {
+function Hotbar({ links, userAPIData }) {
     // Hooks
-    const [playerData, setPlayerData] = React.useState(null);
-    const [aiData, setAIData] = React.useState(null);
-    const [missionData, setMissionData] = React.useState(null);
+    const [playerData, setPlayerData] = React.useState(userAPIData.playerData);
+    const [aiData, setAIData] = React.useState(userAPIData.aiData);
+    const [missionData, setMissionData] = React.useState(userAPIData.missionData);
     //const [regen_time, setRegenTime] = React.useState(null);
     //const [regen_offset, setRegenOffset] = React.useState(null);
     const [quickType, setQuickType] = React.useState("training");
@@ -407,9 +407,6 @@ function Hotbar({ links }) {
 
     // Initialize
     React.useEffect(() => {
-        getPlayerData();
-        getMissionData();
-        getAIData();
 
         /*const regenInterval = setInterval(() => {
             handleRegen();

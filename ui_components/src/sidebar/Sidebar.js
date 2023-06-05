@@ -1,17 +1,17 @@
 import { apiFetch } from "../utils/network.js";
 
 // Initialize
-function Sidebar({ links, logoutTimer }) {
+function Sidebar({ links, logoutTimer, navigationAPIData, userAPIData }) {
     // Hooks
-    const [userMenu, setUserMenu] = React.useState(null);
-    const [activityMenu, setActivityMenu] = React.useState(null);
-    const [villageMenu, setVillageMenu] = React.useState(null);
-    const [staffMenu, setStaffMenu] = React.useState(null);
-    const [playerData, setPlayerData] = React.useState(null);
-    const [regenTime, setRegenTime] = React.useState(null);
-    const [regenOffset, setRegenOffset] = React.useState(null);
+    const [userMenu, setUserMenu] = React.useState(navigationAPIData.userMenu);
+    const [activityMenu, setActivityMenu] = React.useState(navigationAPIData.activityMenu);
+    const [villageMenu, setVillageMenu] = React.useState(navigationAPIData.villageMenu);
+    const [staffMenu, setStaffMenu] = React.useState(navigationAPIData.staffMenu);
+    const [playerData, setPlayerData] = React.useState(userAPIData.playerData);
+    const [regenTime, setRegenTime] = React.useState(userAPIData.playerData.regen_time);
+    const [regenOffset, setRegenOffset] = React.useState(calculateRegenOffset(userAPIData.playerData.regen_time));
     const [logoutTime, setLogoutTime] = React.useState(null);
-    const regenTimeVar = React.useRef(0);
+    const regenTimeVar = React.useRef(userAPIData.playerData.regen_time);
     const logoutTimeVar = React.useRef(logoutTimer);
     const queryParameters = new URLSearchParams(window.location.search);
     const pageID = React.useRef(queryParameters.get("id"));
@@ -230,8 +230,6 @@ function Sidebar({ links, logoutTimer }) {
 
     // Initialize
     React.useEffect(() => {
-        getPlayerData();
-        getSidebarLinks();
         setLogoutTime(logoutTimeVar.current);
 
         const regenInterval = setInterval(() => {

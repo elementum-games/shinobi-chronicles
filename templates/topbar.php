@@ -3,21 +3,9 @@
  * @var System $system
  * @var User $player
  */
-?>
 
-<?php
-function topbar(): void {
-	global $system;
-	global $player;
+$NotificationAPIManager = new NotificationAPIManager($system, $player);
 
-    try {
-        $topbarManager = new TopbarManager($system, $player);
-    } catch (Exception $e) {
-        $system->message($e->getMessage());
-    }
-
-    $system->printMessage();
-}
 ?>
 
 <link rel="stylesheet" type="text/css" href="ui_components/src/topbar/Topbar.css" />
@@ -32,6 +20,9 @@ function topbar(): void {
             React.createElement(Topbar, {
                 links: {
                     notification_api: "<?= $system->router->api_links['notification'] ?>",
+                },
+                notificationAPIData: {
+                    userNotifications: <?= json_encode(NotificationAPIPresenter::userNotificationResponse(notificationManager: $NotificationAPIManager)) ?>,
                 },
             }),
             topbarContainer

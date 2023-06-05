@@ -3,21 +3,9 @@
  * @var System $system
  * @var User $player
  */
-?>
 
-<?php
-function headerModule(): void {
-	global $system;
-	global $player;
+$NavigationAPIManager = new NavigationAPIManager($system, $player);
 
-    try {
-        $headerManager = new HeaderManager($system, $player);
-    } catch (Exception $e) {
-        $system->message($e->getMessage());
-    }
-
-    $system->printMessage();
-}
 ?>
 
 <link rel="stylesheet" type="text/css" href="ui_components/src/header/Header.css" />
@@ -32,6 +20,9 @@ function headerModule(): void {
             React.createElement(Header, {
                 links: {
                     navigation_api: "<?= $system->router->api_links['navigation'] ?>",
+                },
+                navigationAPIData: {
+                    headerMenu: <?= json_encode(NavigationAPIPresenter::menuLinksResponse($NavigationAPIManager->getHeaderMenu())) ?>,
                 },
             }),
             headerContainer

@@ -1,9 +1,9 @@
 import { apiFetch } from "../utils/network.js";
 
 // Initialize
-function Header({ links }) {
+function Header({ links, navigationAPIData }) {
     // Hooks
-    const [headerMenu, setHeaderMenu] = React.useState(null);
+    const [headerMenu, setHeaderMenu] = React.useState(navigationAPIData.headerMenu);
     const [serverTime, setServerTime] = React.useState(null);
 
     // API
@@ -63,7 +63,6 @@ function Header({ links }) {
 
     // Initialize
     React.useEffect(() => {
-        getHeaderMenu();
         getCurrentTime();
 
         const timeInterval = setInterval(() => {

@@ -3,21 +3,9 @@
  * @var System $system
  * @var User $player
  */
-?>
 
-<?php
-function hotbar(): void {
-	global $system;
-	global $player;
+$UserAPIManager = new UserAPIManager($system, $player);
 
-    try {
-        $hotbarManager = new HotbarManager($system, $player);
-    } catch (Exception $e) {
-        $system->message($e->getMessage());
-    }
-
-    $system->printMessage();
-}
 ?>
 
 <link rel="stylesheet" type="text/css" href="ui_components/src/hotbar/Hotbar.css" />
@@ -38,6 +26,11 @@ function hotbar(): void {
                     specialmissions: "<?= $system->router->links['specialmissions'] ?>",
                     healingShop: "<?= $system->router->links['healingShop'] ?>",
                     base_url: "<?= $system->router->base_url ?>"
+                },
+                userAPIData: {
+                    playerData: <?= json_encode(UserAPIPresenter::playerDataResponse(player: $player, rank_names: RankManager::fetchNames($system))) ?>,
+                    missionData: <?= json_encode(UserAPIPresenter::missionDataResponse(userManager: $UserAPIManager)) ?>,
+                    aiData: <?= json_encode(UserAPIPresenter::aiDataResponse(userManager: $UserAPIManager)) ?>,
                 },
             }),
             hotbarContainer
