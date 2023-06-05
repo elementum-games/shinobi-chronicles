@@ -84,6 +84,10 @@ function Sidebar({ links, logoutTimer }) {
         return formattedHours + ':' + formattedMinutes + ':' + formattedSeconds;
     }
 
+    function logoutOnClick(event) {
+        window.location.href = event.currentTarget.getAttribute("href");
+    }
+
     // Content
     function displaySection(section_data, title) {
         return (
@@ -210,7 +214,7 @@ function Sidebar({ links, logoutTimer }) {
                     {formatLogoutTimer(logoutTime)}
                 </div>
                 <div className="sb_logout_button_wrapper">
-                    <input className={"sb_logout_button button-bar_large t-hover"} type="button" value="LOGOUT" />
+                    <input className={"sb_logout_button button-bar_large t-hover"} href={logout_link} onClick={logoutOnClick} type="button" value="LOGOUT" />
                 </div>
                 <img className="swcorner" src="images/v2/decorations/swcorner.png" />
                 <img className="sidebar_secorner" src="images/v2/decorations/secorner.png" />

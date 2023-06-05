@@ -26,17 +26,23 @@ class NotificationAPIManager {
                     if ($this->player->train_time <= 0) {
                         $delete = true;
                     }
+                    else {
+                        $row['action_url'] = $this->system->router->getUrl("training");
+                    }
                     break;
                 case "training_complete":
                     if ($this->player->train_time > 0) {
                         $delete = true;
+                    }
+                    else {
+                        $row['action_url'] = $this->system->router->getUrl("training");
                     }
                     break;
                 default:
                     break;
             }
             if ($delete) {
-                $notification_delete_result = $this->system->query("DELETE FROM `notifications` WHERE `notification_id` = {$row['notification_id']}");
+                $this->system->query("DELETE FROM `notifications` WHERE `notification_id` = {$row['notification_id']}");
                 continue;
             }
             $notifications[] = new NotificationDto(
@@ -47,6 +53,7 @@ class NotificationAPIManager {
                 created: $row['created'],
                 duration: $row['duration'],
                 alert: $row['alert'],
+                action_url: $row['action_url'],
             );
         }
         return $notifications;
