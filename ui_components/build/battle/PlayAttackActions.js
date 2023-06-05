@@ -63,7 +63,7 @@ function ProjectileAttack({
   const ninjutsuElementImages = {
     "Fire": '/images/battle/fireball.png',
     "Earth": '/images/battle/rock.png',
-    "Wind": '/images/battle/fireball.png',
+    "Wind": '/images/battle/wind_tornado_300px.gif',
     "Water": '/images/battle/fireball.png',
     "Lightning": '/images/battle/fireball.png',
     "None": '/images/battle/fireball.png'
