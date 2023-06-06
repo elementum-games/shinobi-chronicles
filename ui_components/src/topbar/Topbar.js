@@ -191,7 +191,7 @@ function Topbar({ links, notificationAPIData }) {
 
     // Initialize
     React.useEffect(() => {
-        getNotificationData();
+
     }, []);
 
     // Display

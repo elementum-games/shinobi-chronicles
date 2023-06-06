@@ -340,9 +340,7 @@ function Topbar({
   }
 
   // Initialize
-  React.useEffect(() => {
-    getNotificationData();
-  }, []);
+  React.useEffect(() => {}, []);
 
   // Display
   return /*#__PURE__*/React.createElement("div", {
