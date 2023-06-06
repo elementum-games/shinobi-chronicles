@@ -64,6 +64,28 @@ class NotificationAPIManager {
                         $row['action_url'] = $this->system->router->getUrl("mission");
                     }
                     break;
+                case "rank":
+                    $row['action_url'] = $this->system->router->getUrl("profile");
+                case "level":
+                    $row['action_url'] = $this->system->router->getUrl("profile");
+                case "system":
+                    $row['action_url'] = $this->system->router->getUrl("profile");
+                case "warning":
+                    $row['action_url'] = $this->system->router->getUrl("profile");
+                case "report":
+                    $row['action_url'] = $this->system->router->getUrl("profile");
+                case "battle":
+                    $row['action_url'] = $this->system->router->getUrl("profile");
+                case "challenge":
+                    $row['action_url'] = $this->system->router->getUrl("profile");
+                case "team":
+                    $row['action_url'] = $this->system->router->getUrl("profile");
+                case "marriage":
+                    $row['action_url'] = $this->system->router->getUrl("profile");
+                case "student":
+                    $row['action_url'] = $this->system->router->getUrl("profile");
+                case "inbox":
+                    $row['action_url'] = $this->system->router->getUrl("profile");
                 default:
                     break;
             }
