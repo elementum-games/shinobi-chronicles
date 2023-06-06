@@ -115,13 +115,13 @@ function Topbar({ links, notificationAPIData }) {
                                         }
                                         {notification.type == "mission" &&
                                             <>
-                                                <a href={notification.action_url} key={i} className={(notification.duration > 0) ? "topbar_notification_wrapper has_duration" : "topbar_notification_wrapper"} data-content={notification.message} data-time={calculateTimeRemaining(notification.created, notification.duration)}>
+                                            <a href={notification.action_url} key={i} className={(notification.duration > 0) ? "topbar_notification_wrapper has_duration" : "topbar_notification_wrapper"} data-content={notification.message} data-time={calculateTimeRemaining(notification.created, notification.duration)}>
                                                     <svg className="topbar_notification_svg" width="35" height="35" viewBox="0 0 100 100">
-                                                        <polygon points="6,50 50,94 94,50 50,6" strokeWidth="8px" stroke="#5d5c4b" fill="#52466a" />
-                                                        <polygon points="6,50 50,94 94,50 50,6" strokeWidth="2px" stroke="#000000" fill="#52466a" />
-                                                        <text x="10%" y="80%" className="topbar_notification_mission">A</text>
-                                                        <text x="35%" y="65%" className="topbar_notification_mission">A</text>
-                                                        <text x="60%" y="50%" className="topbar_notification_mission">A</text>
+                                                    <polygon points="6,50 50,94 94,50 50,6" strokeWidth="8px" stroke="#5d5c4b" fill="#52466a" />
+                                                    <polygon points="6,50 50,94 94,50 50,6" strokeWidth="2px" stroke="#000000" fill="#52466a" />
+                                                    <text x="10%" y="80%" className="topbar_notification_mission">{notification.attributes.mission_rank}</text>
+                                                    <text x="35%" y="65%" className="topbar_notification_mission">{notification.attributes.mission_rank}</text>
+                                                    <text x="60%" y="50%" className="topbar_notification_mission">{notification.attributes.mission_rank}</text>
                                                     </svg>
                                                 </a>
                                             </>
@@ -191,7 +191,7 @@ function Topbar({ links, notificationAPIData }) {
 
     // Initialize
     React.useEffect(() => {
-
+        getNotificationData();
     }, []);
 
     // Display

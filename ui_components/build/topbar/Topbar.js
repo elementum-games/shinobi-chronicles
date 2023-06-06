@@ -206,15 +206,15 @@ function Topbar({
         x: "10%",
         y: "80%",
         className: "topbar_notification_mission"
-      }, "A"), /*#__PURE__*/React.createElement("text", {
+      }, notification.attributes.mission_rank), /*#__PURE__*/React.createElement("text", {
         x: "35%",
         y: "65%",
         className: "topbar_notification_mission"
-      }, "A"), /*#__PURE__*/React.createElement("text", {
+      }, notification.attributes.mission_rank), /*#__PURE__*/React.createElement("text", {
         x: "60%",
         y: "50%",
         className: "topbar_notification_mission"
-      }, "A")))), notification.type == "specialmission" && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("a", {
+      }, notification.attributes.mission_rank)))), notification.type == "specialmission" && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("a", {
         href: notification.action_url,
         key: i,
         className: notification.duration > 0 ? "topbar_notification_wrapper has_duration" : "topbar_notification_wrapper",
@@ -340,7 +340,9 @@ function Topbar({
   }
 
   // Initialize
-  React.useEffect(() => {}, []);
+  React.useEffect(() => {
+    getNotificationData();
+  }, []);
 
   // Display
   return /*#__PURE__*/React.createElement("div", {

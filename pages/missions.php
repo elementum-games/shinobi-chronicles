@@ -68,7 +68,8 @@ function missions(): bool {
                 message: "Mission in progress",
                 user_id: $player->user_id,
                 created: time(),
-                alert: true,
+                attributes: array('mission_rank' => substr(Mission::$rank_names[$missions[$mission_id]['rank']], 0, 1), 'mission_id' => $mission_id),
+                alert: false,
             );
             NotificationManager::createNotification($new_notification, $system, false);
 

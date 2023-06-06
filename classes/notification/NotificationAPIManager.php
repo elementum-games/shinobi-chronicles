@@ -76,6 +76,7 @@ class NotificationAPIManager {
                 created: $row['created'],
                 duration: $row['duration'],
                 alert: $row['alert'],
+                attributes: json_decode($row['attributes'], true),
                 action_url: $row['action_url'],
             );
         }
