@@ -652,6 +652,12 @@ return [
             'public' => true,
     ],
     [
+        'code' => ':dankjigglypuff:',
+        'image' => "<img src='./images/memes/dank_jigglypuff.gif' />",
+        'text' => ':dankjigglypuff:',
+        'public' => true,
+],
+    [
             'code' => ':stitch:',
             'image' => "<img src='./images/memes/Stitch.gif' />",
             'text' => ':stitch:',
