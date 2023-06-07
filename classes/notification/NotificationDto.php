@@ -1,5 +1,7 @@
 <?php
 
+require_once __DIR__ . '/types/MissionNotificationDto.php';
+
 class NotificationDto {
     public function __construct(
         public string $action_url = "",
@@ -10,7 +12,26 @@ class NotificationDto {
         public int $created = 0,
         public int $duration = 0,
         public bool $alert = false,
-        public array $attributes = [],
+        protected array $attributes = [],
     ) {
+    }
+
+    public static function fromDb($row, $action_url)
+    {
+        $notification = new NotificationDto(
+            action_url: $action_url,
+            type: $row['type'],
+            message: $row['message'],
+            notification_id: $row['notification_id'],
+            user_id: $row['user_id'],
+            created: $row['created'],
+            duration: $row['duration'],
+            alert: $row['alert'],
+        );
+        return $notification;
+    }
+
+    public function getAttributes() {
+        return $this->attributes;
     }
 }

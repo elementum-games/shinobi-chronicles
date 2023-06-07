@@ -23,6 +23,7 @@
 .header_link_container {
     height: 100%;
     width: var(--content-width);
+    margin-left: var(--content-sidebar-gap);
     align-items: center;
     justify-content: center;
     gap: 40px;

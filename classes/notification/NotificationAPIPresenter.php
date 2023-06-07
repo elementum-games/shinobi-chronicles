@@ -6,17 +6,31 @@ class NotificationApiPresenter
     {
         return array_map(
             function (NotificationDto $notification) {
-                return [
-                    'action_url' => $notification->action_url,
-                    'type' => $notification->type,
-                    'message' => $notification->message,
-                    'notification_id' => $notification->notification_id,
-                    'user_id' => $notification->user_id,
-                    'created' => $notification->created,
-                    'duration' => $notification->duration,
-                    'alert' => $notification->alert,
-                    'attributes' => $notification->attributes,
-                ];
+                if ($notification instanceof MissionNotificationDto) {
+                    return [
+                        'action_url' => $notification->action_url,
+                        'type' => $notification->type,
+                        'message' => $notification->message,
+                        'notification_id' => $notification->notification_id,
+                        'user_id' => $notification->user_id,
+                        'created' => $notification->created,
+                        'duration' => $notification->duration,
+                        'alert' => $notification->alert,
+                        'mission_rank' => $notification->mission_rank,
+                    ];
+                }
+                else {
+                    return [
+                        'action_url' => $notification->action_url,
+                        'type' => $notification->type,
+                        'message' => $notification->message,
+                        'notification_id' => $notification->notification_id,
+                        'user_id' => $notification->user_id,
+                        'created' => $notification->created,
+                        'duration' => $notification->duration,
+                        'alert' => $notification->alert,
+                    ];
+                }
             },
             $notificationManager->getUserNotifications()
         );

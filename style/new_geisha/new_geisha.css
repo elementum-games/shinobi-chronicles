@@ -18,6 +18,8 @@
     --footer-background-color: #0E0D0E;
     --footer-font-color: #423f39;
     --content-width: 950px;
+    --sidebar-width: 250px;
+    --content-sidebar-gap: 15px;
     --container-width: 1400px;
     --regentimer-color: #7C88C3;
     /* Font Config */
@@ -53,7 +55,6 @@
     --hotbar-keybind-modal-height: 400px;
     /* Sidebar Config */
     --sidebar-header-background-color: #8c7b58;
-    --sidebar-width: 250px;
     --sidebar-header-height: 23px;
     --sidebar-button-background-color: #1a191d;
     --sidebar-button-background-hover: linear-gradient(to bottom, #262631 50%, #22222a 50%);
@@ -162,7 +163,7 @@ body {
 #content {
     display: inline-block;
     float: none;
-    margin-left: 15px;
+    margin-left: var(--content-sidebar-gap);
     margin-top: var(--topbar-height);
     margin-bottom: var(--hotbar-height);
     width: var(--content-width);

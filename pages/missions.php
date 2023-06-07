@@ -63,15 +63,29 @@ function missions(): bool {
 
             // Create notification
             require_once __DIR__ . '/../classes/notification/NotificationManager.php';
-            $new_notification = new NotificationDto(
-                type: "mission",
-                message: "Mission in progress",
-                user_id: $player->user_id,
-                created: time(),
-                attributes: array('mission_rank' => substr(Mission::$rank_names[$missions[$mission_id]['rank']], 0, 1), 'mission_id' => $mission_id),
-                alert: false,
-            );
-            NotificationManager::createNotification($new_notification, $system, false);
+            if ($player->mission_stage['action_type'] == 'travel' or $player->mission_stage['action_type'] == 'search') {
+                $new_notification = new NotificationDto(
+                    type: "mission",
+                    message: $missions[$mission_id]['name'] . ": Travel to " . $player->mission_stage['action_data'],
+                    user_id: $player->user_id,
+                    created: time(),
+                    attributes: array('mission_rank' => Mission::$rank_names[$missions[$mission_id]['rank']]),
+                    alert: false,
+                );
+                NotificationManager::createNotification($new_notification, $system, false);
+            }
+            else {
+                require_once __DIR__ . '/../classes/notification/NotificationManager.php';
+                $new_notification = new NotificationDto(
+                    type: "mission",
+                    message: $missions[$mission_id]['name'] . " in progress",
+                    user_id: $player->user_id,
+                    created: time(),
+                    attributes: array('mission_rank' => Mission::$rank_names[$missions[$mission_id]['rank']]),
+                    alert: false,
+                );
+                NotificationManager::createNotification($new_notification, $system, false);
+            }
 
             missions();
 			return true;

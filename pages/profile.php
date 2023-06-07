@@ -37,6 +37,17 @@ function userProfile() {
     }
     // Rank up
     else if($player->level >= $player->rank->max_level && $player->exp >= $exp_needed && $player->rank_num < System::SC_MAX_RANK && $player->rank_up) {
+        // Create notification
+        require_once __DIR__ . '/../classes/notification/NotificationManager.php';
+        $new_notification = new NotificationDto(
+            type: "rank",
+            message: "Rank up available",
+            user_id: $player->user_id,
+            created: time(),
+            alert: false,
+        );
+        NotificationManager::createNotification($new_notification, $system, false);
+
         if($player->battle_id > 0 or !$player->in_village) {
             require "templates/level_rank_up/rank_up_in_battle.php";
         }

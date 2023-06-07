@@ -8,7 +8,7 @@ class NotificationManager {
         if (!$allow_duplicate) {
             NotificationManager::closeNotificationByType($notification->type, $notification->user_id, $system);
         }
-        $attributes = json_encode($notification->attributes);
+        $attributes = json_encode($notification->getAttributes(), JSON_FORCE_OBJECT);
         $system->query("INSERT INTO `notifications`
             (`notification_id`, `user_id`, `type`, `message`, `alert`, `created`, `duration`, `attributes`)
             VALUES ('{$notification->notification_id}', '{$notification->user_id}', '{$notification->type}', '{$notification->message}', '{$notification->alert}', '{$notification->created}', '{$notification->duration}', '{$attributes}')");
