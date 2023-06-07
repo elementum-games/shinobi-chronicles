@@ -52,7 +52,7 @@
     background-color: var(--sidebar-button-background-color);
     border-color: var(--sidebar-button-border-color);
     border-width: 1px;
-    font-weight: 600;
+    font-weight: 500;
 }
 
 .sb_link_filler {
@@ -119,7 +119,6 @@
     left: 50%;
     transform: translateX(-50%);
 }
-
 
 .sb_name_container {
     margin: 0px 0px 5px 10px;
