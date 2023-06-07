@@ -117,7 +117,7 @@ function training() {
                         duration: $train_length,
                         alert: false,
                     );
-                    NotificationManager::createNotification($new_notification, $system, false);
+                    NotificationManager::createNotification($new_notification, $system, NotificationManager::UPDATE_REPLACE);
                     $notification_created = true;
                 }
 			}
@@ -168,7 +168,7 @@ function training() {
                     duration: $train_length,
                     alert: false,
                 );
-                NotificationManager::createNotification($new_notification, $system, false);
+                NotificationManager::createNotification($new_notification, $system, NotificationManager::UPDATE_REPLACE);
             }
 
 		} catch (Exception $e) {

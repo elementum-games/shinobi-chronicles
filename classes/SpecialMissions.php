@@ -357,7 +357,7 @@ class SpecialMission {
                     created: time(),
                     alert: true,
                 );
-                NotificationManager::createNotification($new_notification, $this->system, false);
+                NotificationManager::createNotification($new_notification, $this->system, NotificationManager::UPDATE_REPLACE);
                 break;
             case self::EVENT_COMPLETE_FAIL:
                 $result = $this->failMission();
@@ -370,7 +370,7 @@ class SpecialMission {
                     created: time(),
                     alert: true,
                 );
-                NotificationManager::createNotification($new_notification, $this->system, false);
+                NotificationManager::createNotification($new_notification, $this->system, NotificationManager::UPDATE_REPLACE);
                 break;
         }
 

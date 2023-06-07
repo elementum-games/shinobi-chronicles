@@ -72,7 +72,7 @@ function missions(): bool {
                     attributes: array('mission_rank' => Mission::$rank_names[$missions[$mission_id]['rank']]),
                     alert: false,
                 );
-                NotificationManager::createNotification($new_notification, $system, false);
+                NotificationManager::createNotification($new_notification, $system, NotificationManager::UPDATE_REPLACE);
             }
             else {
                 require_once __DIR__ . '/../classes/notification/NotificationManager.php';
@@ -84,7 +84,7 @@ function missions(): bool {
                     attributes: array('mission_rank' => Mission::$rank_names[$missions[$mission_id]['rank']]),
                     alert: false,
                 );
-                NotificationManager::createNotification($new_notification, $system, false);
+                NotificationManager::createNotification($new_notification, $system, NotificationManager::UPDATE_REPLACE);
             }
 
             missions();

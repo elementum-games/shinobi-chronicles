@@ -46,7 +46,7 @@ function userProfile() {
             created: time(),
             alert: false,
         );
-        NotificationManager::createNotification($new_notification, $system, false);
+        NotificationManager::createNotification($new_notification, $system, NotificationManager::UPDATE_REPLACE);
 
         if($player->battle_id > 0 or !$player->in_village) {
             require "templates/level_rank_up/rank_up_in_battle.php";

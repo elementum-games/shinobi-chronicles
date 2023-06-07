@@ -137,7 +137,7 @@ class Battle {
                 attributes: array('battle_id' => $battle_id),
                 alert: false,
             );
-            NotificationManager::createNotification($new_notification, $system, false);
+            NotificationManager::createNotification($new_notification, $system, NotificationManager::UPDATE_REPLACE);
             $new_notification = new NotificationDto(
                 action_url: $system->router->getUrl('battle'),
                 type: "battle",
@@ -147,7 +147,7 @@ class Battle {
                 attributes: array('battle_id' => $battle_id),
                 alert: true,
             );
-            NotificationManager::createNotification($new_notification, $system, false);
+            NotificationManager::createNotification($new_notification, $system, NotificationManager::UPDATE_REPLACE);
         }
 
         return $battle_id;
