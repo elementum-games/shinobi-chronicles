@@ -11,6 +11,10 @@
     width: var(--sidebar-width);
 }
 
+.sb_section_container.first {
+    margin-top: 5px;
+}
+
 .sb_header_bar {
     background-color: var(--sidebar-header-background-color);
     height: var(--sidebar-header-height);
@@ -85,13 +89,14 @@
 
 .sb_avatar_container {
     overflow: visible;
+    margin-bottom: 5px;
 }
 
 .sb_avatar_wrapper {
     clip-path: circle(50% at 50% 50%);
     background: var(--avatar-frame-border_gradient);
-    height: 200px;
-    width: 200px;
+    height: 212px;
+    width: 212px;
     position: relative;
     left: 50%;
     transform: translateX(-50%);
@@ -99,10 +104,10 @@
 
 .sb_avatar_img {
     position: relative;
-    top: 5px;
-    left: 5px;
-    height: 190px;
-    width: 190px;
+    top: 6px;
+    left: 6px;
+    height: 200px;
+    width: 200px;
     clip-path: circle(49% at 50% 50%);
 }
 
@@ -127,7 +132,6 @@
 .sb_resources {
     width: var(--sidebar-width);
     margin-bottom: 5px;
-    margin-top: 5px;
 }
 
 .sb_resourceContainer {
