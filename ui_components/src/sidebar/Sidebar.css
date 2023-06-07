@@ -33,7 +33,7 @@
     width: 98%;
     flex-wrap: wrap;
     gap: 1px 1px;
-    background-color: var(--sidebar-button-background-hover);
+    background-color: var(--sidebar-button-border-color);
     align-items: center;
     justify-content: center;
     padding-bottom: 2px;
@@ -46,6 +46,7 @@
     background-color: var(--sidebar-button-background-color);
     border-color: var(--sidebar-button-border-color);
     border-width: 1px;
+    font-weight: 600;
 }
 
 .sb_link_filler {
@@ -58,12 +59,12 @@
 
 .sb_link_wrapper.selected {
     color: var(--text-hover) !important;
-    background-color: var(--sidebar-button-background-hover);
+    background: var(--sidebar-button-background-hover);
 }
 
 .sb_link_wrapper:hover {
     color: var(--text-hover) !important;
-    background-color: var(--sidebar-button-background-hover);
+    background: var(--sidebar-button-background-hover);
 }
 
 .sb_link_wrapper:visited {

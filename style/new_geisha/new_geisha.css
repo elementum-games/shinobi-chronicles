@@ -53,9 +53,9 @@
     --sidebar-header-background-color: #8c7b58;
     --sidebar-width: 250px;
     --sidebar-header-height: 23px;
-    --sidebar-button-background-color: rgba(26,25,33,1);
-    --sidebar-button-background-hover: rgba(37,35,46,1);
-    --sidebar-button-border-color: rgba(37,35,46,1);
+    --sidebar-button-background-color: #1a191d;
+    --sidebar-button-background-hover: linear-gradient(to bottom, #262631 50%, #22222a 50%);
+    --sidebar-button-border-color: #20222b;
     /* Header Config */
     --header-height: 35px;
     --header-background-color: #151417;
