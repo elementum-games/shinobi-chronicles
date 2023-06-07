@@ -97,7 +97,19 @@ function Sidebar({
       className: "sb_header_image"
     })), /*#__PURE__*/React.createElement("div", {
       className: "sb_header_text_wrapper ft-p ft-c2 ft-b ft-medium"
-    }, title)), /*#__PURE__*/React.createElement("div", {
+    }, title), /*#__PURE__*/React.createElement("div", {
+      className: "sb_header_line"
+    }, /*#__PURE__*/React.createElement("svg", {
+      width: "100%",
+      height: "2"
+    }, /*#__PURE__*/React.createElement("line", {
+      x1: "0%",
+      y1: "1",
+      x2: "95%",
+      y2: "1",
+      stroke: "#77694e",
+      strokeWidth: "1"
+    })))), /*#__PURE__*/React.createElement("div", {
       className: "sb_link_container d-flex"
     }, section_data && section_data.map(function (link, i) {
       return /*#__PURE__*/React.createElement("a", {
@@ -127,23 +139,30 @@ function Sidebar({
     }, /*#__PURE__*/React.createElement("div", {
       className: "sb_name_container t-left d-flex"
     }, /*#__PURE__*/React.createElement("div", {
-      className: "d-in_block",
-      style: {
-        width: "100%"
-      }
+      className: "sb_name_wrapper"
     }, /*#__PURE__*/React.createElement("div", {
       className: "ft-p ft-c1 ft-xlarge ft-b"
     }, playerData.user_name), /*#__PURE__*/React.createElement("div", {
       className: "ft-s ft-c1 ft-default"
     }, playerData.rank_name, " lvl ", playerData.level)), /*#__PURE__*/React.createElement("div", {
-      className: "d-in_block"
+      className: "sb_regentimer_container"
     }, /*#__PURE__*/React.createElement("div", {
       id: "sb_regentimer"
     }, /*#__PURE__*/React.createElement("svg", {
-      height: "40",
-      width: "40",
+      height: "30",
+      width: "30",
       viewBox: "0 0 50 50"
     }, /*#__PURE__*/React.createElement("circle", {
+      id: "sb_regentimer_circle_rear",
+      stroke: "#181b2c",
+      cx: "24.5",
+      cy: "24",
+      r: "20",
+      strokeWidth: "4",
+      "stroke-mitterlimit": "0",
+      fill: "none",
+      strokeDasharray: "126"
+    }), /*#__PURE__*/React.createElement("circle", {
       id: "sb_regentimer_circle",
       stroke: "#7C88C3",
       cx: "24.5",
@@ -158,8 +177,8 @@ function Sidebar({
     }), /*#__PURE__*/React.createElement("text", {
       id: "sb_regentimer_text",
       className: "ft-s ft-b ft-large",
-      x: "50%",
-      y: "50%",
+      x: "48.75%",
+      y: "50.5%",
       textAnchor: "middle",
       dominantBaseline: "middle"
     }, regenTime))))), /*#__PURE__*/React.createElement("div", {
@@ -184,7 +203,7 @@ function Sidebar({
       viewBox: "0 0 50 50"
     }, /*#__PURE__*/React.createElement("polygon", {
       x: "50",
-      points: "20,25 0,5 5,5 25,25 5,45 0,45",
+      points: "20,25 0,0 5,0 25,25 5,50 0,50",
       id: "sb_health_highlight",
       className: "sb_resource_highlight"
     })))), /*#__PURE__*/React.createElement("div", {
@@ -214,7 +233,7 @@ function Sidebar({
       viewBox: "0 0 50 50"
     }, /*#__PURE__*/React.createElement("polygon", {
       x: "50",
-      points: "20,25 0,5 5,5 25,25 5,45 0,45",
+      points: "20,25 0,0 5,0 25,25 5,50 0,50",
       id: "sb_chakra_highlight",
       className: "sb_resource_highlight"
     })))), /*#__PURE__*/React.createElement("div", {
@@ -244,7 +263,7 @@ function Sidebar({
       viewBox: "0 0 50 50"
     }, /*#__PURE__*/React.createElement("polygon", {
       x: "50",
-      points: "20,25 0,5 5,5 25,25 5,45 0,45",
+      points: "20,25 0,0 5,0 25,25 5,50 0,50",
       id: "sb_stamina_highlight",
       className: "sb_resource_highlight"
     })))), /*#__PURE__*/React.createElement("div", {

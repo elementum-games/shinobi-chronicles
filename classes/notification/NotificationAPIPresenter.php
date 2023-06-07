@@ -15,6 +15,7 @@ class NotificationApiPresenter
                     'created' => $notification->created,
                     'duration' => $notification->duration,
                     'alert' => $notification->alert,
+                    'attributes' => $notification->attributes,
                 ];
             },
             $notificationManager->getUserNotifications()

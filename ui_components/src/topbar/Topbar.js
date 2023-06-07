@@ -67,32 +67,10 @@ function Topbar({ links, notificationAPIData }) {
                             notificationData.map(function (notification, i) {
                                 return (
                                     <div key={i}>
-                                        {notification.type == "battle" &&
-                                            <>
-                                                <a href={notification.action_url} className={(notification.duration > 0) ? "topbar_notification_wrapper has_duration" : "topbar_notification_wrapper"} data-content={notification.message} data-time={calculateTimeRemaining(notification.created, notification.duration)}>
-                                                    <svg className="topbar_notification_svg" width="35" height="35" viewBox="0 0 100 100">
-                                                        <polygon points="6,50 50,94 94,50 50,6" strokeWidth="8px" stroke="#5d5c4b" fill="#ae5576" />
-                                                        <polygon points="6,50 50,94 94,50 50,6" strokeWidth="2px" stroke="#000000" fill="#ae5576" />
-                                                        <image className="topbar_notification_icon" height="50" width="50" x="25.5%" y="27.5%" href="images/map/icons/attack-off.png" />
-                                                    </svg>
-                                                </a>
-                                            </>
-                                        }
-                                        {notification.type == "report" &&
-                                            <>
-                                                <a href={notification.action_url} className={(notification.duration > 0) ? "topbar_notification_wrapper has_duration" : "topbar_notification_wrapper"} data-content={notification.message} data-time={calculateTimeRemaining(notification.created, notification.duration)}>
-                                                    <svg className="topbar_notification_svg" width="35" height="35" viewBox="0 0 100 100">
-                                                        <polygon points="6,50 50,94 94,50 50,6" strokeWidth="8px" stroke="#5d5c4b" fill="#ae5576" />
-                                                        <polygon points="6,50 50,94 94,50 50,6" strokeWidth="2px" stroke="#000000" fill="#ae5576" />
-                                                        <text x="40%" y="70%" className="topbar_notification_important">!</text>
-                                                    </svg>
-                                                </a>
-                                            </>
-                                        }
                                         {notification.type == "training" &&
                                             <>
                                                 <a href={notification.action_url} className={(notification.duration > 0) ? "topbar_notification_wrapper has_duration" : "topbar_notification_wrapper"} data-content={notification.message} data-time={calculateTimeRemaining(notification.created, notification.duration)}>
-                                                    <svg className="topbar_notification_svg" width="35" height="35" viewBox="0 0 100 100">
+                                                    <svg className="topbar_notification_svg" width="40" height="40" viewBox="0 0 100 100">
                                                         <polygon points="6,50 50,94 94,50 50,6" strokeWidth="8px" stroke="#5d5c4b" fill="#52466a" />
                                                         <polygon points="6,50 50,94 94,50 50,6" strokeWidth="2px" stroke="#000000" fill="#52466a" />
                                                         <image className="topbar_notification_icon" height="50" width="50" x="25.5%" y="27.5%" href="images/v2/icons/timer.png" />
@@ -104,7 +82,7 @@ function Topbar({ links, notificationAPIData }) {
                                             <>
                                             <label onClick={closeNotification} data-id={notification.notification_id} className={"topbar_close_notification"}>X</label>
                                             <a href={notification.action_url} className={(notification.duration > 0) ? "topbar_notification_wrapper has_duration" : "topbar_notification_wrapper"} data-content={notification.message} data-time={calculateTimeRemaining(notification.created, notification.duration)}>
-                                                    <svg className="topbar_notification_svg" width="35" height="35" viewBox="0 0 100 100">
+                                                <svg className="topbar_notification_svg" width="40" height="40" viewBox="0 0 100 100">
                                                         <polygon points="6,50 50,94 94,50 50,6" strokeWidth="8px" stroke="#5d5c4b" fill="#5964a6" />
                                                         <polygon points="6,50 50,94 94,50 50,6" strokeWidth="2px" stroke="#000000" fill="#5964a6" />
                                                         <image className="topbar_notification_icon" height="50" width="50" x="25.5%" y="27.5%" href="images/v2/icons/timer.png" />
@@ -113,23 +91,10 @@ function Topbar({ links, notificationAPIData }) {
                                                 </a>
                                             </>
                                         }
-                                        {notification.type == "mission" &&
-                                            <>
-                                                <a href={notification.action_url} key={i} className={(notification.duration > 0) ? "topbar_notification_wrapper has_duration" : "topbar_notification_wrapper"} data-content={notification.message} data-time={calculateTimeRemaining(notification.created, notification.duration)}>
-                                                    <svg className="topbar_notification_svg" width="35" height="35" viewBox="0 0 100 100">
-                                                        <polygon points="6,50 50,94 94,50 50,6" strokeWidth="8px" stroke="#5d5c4b" fill="#52466a" />
-                                                        <polygon points="6,50 50,94 94,50 50,6" strokeWidth="2px" stroke="#000000" fill="#52466a" />
-                                                        <text x="10%" y="80%" className="topbar_notification_mission">A</text>
-                                                        <text x="35%" y="65%" className="topbar_notification_mission">A</text>
-                                                        <text x="60%" y="50%" className="topbar_notification_mission">A</text>
-                                                    </svg>
-                                                </a>
-                                            </>
-                                        }
                                         {notification.type == "specialmission" &&
                                             <>
                                                 <a href={notification.action_url} key={i} className={(notification.duration > 0) ? "topbar_notification_wrapper has_duration" : "topbar_notification_wrapper"} data-content={notification.message} data-time={calculateTimeRemaining(notification.created, notification.duration)}>
-                                                    <svg className="topbar_notification_svg" width="35" height="35" viewBox="0 0 100 100">
+                                                <svg className="topbar_notification_svg" width="40" height="40" viewBox="0 0 100 100">
                                                         <polygon points="6,50 50,94 94,50 50,6" strokeWidth="8px" stroke="#5d5c4b" fill="#52466a" />
                                                         <polygon points="6,50 50,94 94,50 50,6" strokeWidth="2px" stroke="#000000" fill="#52466a" />
                                                         <text x="24%" y="65%" className="topbar_notification_specialmission">sm</text>
@@ -141,7 +106,7 @@ function Topbar({ links, notificationAPIData }) {
                                             <>
                                                 <label onClick={closeNotification} className={"topbar_close_notification"} data-id={notification.notification_id}>X</label>
                                                 <a href={notification.action_url} key={i} className={(notification.duration > 0) ? "topbar_notification_wrapper has_duration" : "topbar_notification_wrapper"} data-content={notification.message} data-time={calculateTimeRemaining(notification.created, notification.duration)}>
-                                                    <svg className="topbar_notification_svg" width="35" height="35" viewBox="0 0 100 100">
+                                                <svg className="topbar_notification_svg" width="40" height="40" viewBox="0 0 100 100">
                                                         <polygon points="6,50 50,94 94,50 50,6" strokeWidth="8px" stroke="#5d5c4b" fill="#5964a6" />
                                                         <polygon points="6,50 50,94 94,50 50,6" strokeWidth="2px" stroke="#000000" fill="#5964a6" />
                                                         <text x="24%" y="65%" className="topbar_notification_specialmission">sm</text>
@@ -150,13 +115,26 @@ function Topbar({ links, notificationAPIData }) {
                                                 </a>
                                             </>
                                         }
+                                        {notification.type == "mission" &&
+                                            <>
+                                            <a href={notification.action_url} key={i} className={(notification.duration > 0) ? "topbar_notification_wrapper has_duration" : "topbar_notification_wrapper"} data-content={notification.message} data-time={calculateTimeRemaining(notification.created, notification.duration)}>
+                                                <svg className="topbar_notification_svg" width="40" height="40" viewBox="0 0 100 100">
+                                                    <polygon points="6,50 50,94 94,50 50,6" strokeWidth="8px" stroke="#5d5c4b" fill="#52466a" />
+                                                    <polygon points="6,50 50,94 94,50 50,6" strokeWidth="2px" stroke="#000000" fill="#52466a" />
+                                                    <text x="10%" y="80%" className="topbar_notification_mission">{notification.attributes.mission_rank}</text>
+                                                    <text x="35%" y="65%" className="topbar_notification_mission">{notification.attributes.mission_rank}</text>
+                                                    <text x="60%" y="50%" className="topbar_notification_mission">{notification.attributes.mission_rank}</text>
+                                                    </svg>
+                                                </a>
+                                            </>
+                                        }
                                         {notification.type == "rank" &&
                                             <>
                                                 <a href={notification.action_url} key={i} className={(notification.duration > 0) ? "topbar_notification_wrapper has_duration" : "topbar_notification_wrapper"} data-content={notification.message} data-time={calculateTimeRemaining(notification.created, notification.duration)}>
-                                                    <svg className="topbar_notification_svg" width="35" height="35" viewBox="0 0 100 100">
-                                                        <polygon points="6,50 50,94 94,50 50,6" strokeWidth="8px" stroke="#5d5c4b" fill="#2e2c36" />
-                                                        <polygon points="6,50 50,94 94,50 50,6" strokeWidth="2px" stroke="#000000" fill="#2e2c36" />
-                                                        <image className="topbar_notification_icon" height="50" width="50" x="25.5%" y="27.5%" href="images/v2/icons/levelup.png" />
+                                                <svg className="topbar_notification_svg" width="40" height="40" viewBox="0 0 100 100">
+                                                    <polygon points="6,50 50,94 94,50 50,6" strokeWidth="8px" stroke="#5d5c4b" fill="#B09A65" />
+                                                    <polygon points="6,50 50,94 94,50 50,6" strokeWidth="2px" stroke="#000000" fill="#B09A65" />
+                                                        <image className="topbar_notification_icon" height="40" width="40" x="30%" y="27%" href="images/v2/icons/levelup.png" />
                                                     </svg>
                                                 </a>
                                             </>
@@ -164,10 +142,109 @@ function Topbar({ links, notificationAPIData }) {
                                         {notification.type == "level" &&
                                             <>
                                                 <a href={notification.action_url} key={i} className={(notification.duration > 0) ? "topbar_notification_wrapper has_duration" : "topbar_notification_wrapper"} data-content={notification.message} data-time={calculateTimeRemaining(notification.created, notification.duration)}>
-                                                    <svg className="topbar_notification_svg" width="35" height="35" viewBox="0 0 100 100">
-                                                        <polygon points="6,50 50,94 94,50 50,6" strokeWidth="8px" stroke="#5d5c4b" fill="#2e2c36" />
-                                                        <polygon points="6,50 50,94 94,50 50,6" strokeWidth="2px" stroke="#000000" fill="#2e2c36" />
-                                                        <image className="topbar_notification_icon" height="50" width="50" x="25.5%" y="27.5%" href="images/v2/icons/levelup.png" />
+                                                <svg className="topbar_notification_svg" width="40" height="40" viewBox="0 0 100 100">
+                                                    <polygon points="6,50 50,94 94,50 50,6" strokeWidth="8px" stroke="#5d5c4b" fill="#B09A65" />
+                                                    <polygon points="6,50 50,94 94,50 50,6" strokeWidth="2px" stroke="#000000" fill="#B09A65" />
+                                                        <image className="topbar_notification_icon" height="40" width="40" x="30%" y="27%" href="images/v2/icons/levelup.png" />
+                                                    </svg>
+                                                </a>
+                                            </>
+                                        }
+                                        {notification.type == "system" &&
+                                            <>
+                                                <a href={notification.action_url} className={(notification.duration > 0) ? "topbar_notification_wrapper has_duration" : "topbar_notification_wrapper"} data-content={notification.message} data-time={calculateTimeRemaining(notification.created, notification.duration)}>
+                                                <svg className="topbar_notification_svg" width="40" height="40" viewBox="0 0 100 100">
+                                                    <polygon points="6,50 50,94 94,50 50,6" strokeWidth="8px" stroke="#5d5c4b" fill="#ae5576" />
+                                                    <polygon points="6,50 50,94 94,50 50,6" strokeWidth="2px" stroke="#000000" fill="#ae5576" />
+                                                        <text x="40%" y="70%" className="topbar_notification_important">!</text>
+                                                    </svg>
+                                                </a>
+                                            </>
+                                        }
+                                        {notification.type == "warning" &&
+                                            <>
+                                                <a href={notification.action_url} className={(notification.duration > 0) ? "topbar_notification_wrapper has_duration" : "topbar_notification_wrapper"} data-content={notification.message} data-time={calculateTimeRemaining(notification.created, notification.duration)}>
+                                                <svg className="topbar_notification_svg" width="40" height="40" viewBox="0 0 100 100">
+                                                        <polygon points="6,50 50,94 94,50 50,6" strokeWidth="8px" stroke="#5d5c4b" fill="#ae5576" />
+                                                        <polygon points="6,50 50,94 94,50 50,6" strokeWidth="2px" stroke="#000000" fill="#ae5576" />
+                                                        <text x="40%" y="70%" className="topbar_notification_important">!</text>
+                                                    </svg>
+                                                </a>
+                                            </>
+                                        }
+                                        {notification.type == "report" &&
+                                            <>
+                                                <a href={notification.action_url} className={(notification.duration > 0) ? "topbar_notification_wrapper has_duration" : "topbar_notification_wrapper"} data-content={notification.message} data-time={calculateTimeRemaining(notification.created, notification.duration)}>
+                                                <svg className="topbar_notification_svg" width="40" height="40" viewBox="0 0 100 100">
+                                                        <polygon points="6,50 50,94 94,50 50,6" strokeWidth="8px" stroke="#5d5c4b" fill="#ae5576" />
+                                                        <polygon points="6,50 50,94 94,50 50,6" strokeWidth="2px" stroke="#000000" fill="#ae5576" />
+                                                        <text x="40%" y="70%" className="topbar_notification_important">!</text>
+                                                    </svg>
+                                                </a>
+                                            </>
+                                        }
+                                        {notification.type == "battle" &&
+                                            <>
+                                                <a href={notification.action_url} className={(notification.duration > 0) ? "topbar_notification_wrapper has_duration" : "topbar_notification_wrapper"} data-content={notification.message} data-time={calculateTimeRemaining(notification.created, notification.duration)}>
+                                                <svg className="topbar_notification_svg" width="40" height="40" viewBox="0 0 100 100">
+                                                        <polygon points="6,50 50,94 94,50 50,6" strokeWidth="8px" stroke="#5d5c4b" fill="#ae5576" />
+                                                        <polygon points="6,50 50,94 94,50 50,6" strokeWidth="2px" stroke="#000000" fill="#ae5576" />
+                                                        <text x="40%" y="70%" className="topbar_notification_important">!</text>
+                                                    </svg>
+                                                </a>
+                                            </>
+                                        }
+                                        {notification.type == "challenge" &&
+                                            <>
+                                                <a href={notification.action_url} className={(notification.duration > 0) ? "topbar_notification_wrapper has_duration" : "topbar_notification_wrapper"} data-content={notification.message} data-time={calculateTimeRemaining(notification.created, notification.duration)}>
+                                                <svg className="topbar_notification_svg" width="40" height="40" viewBox="0 0 100 100">
+                                                        <polygon points="6,50 50,94 94,50 50,6" strokeWidth="8px" stroke="#5d5c4b" fill="#ae5576" />
+                                                        <polygon points="6,50 50,94 94,50 50,6" strokeWidth="2px" stroke="#000000" fill="#ae5576" />
+                                                        <text x="40%" y="70%" className="topbar_notification_important">!</text>
+                                                    </svg>
+                                                </a>
+                                            </>
+                                        }
+                                        {notification.type == "team" &&
+                                            <>
+                                                <a href={notification.action_url} className={(notification.duration > 0) ? "topbar_notification_wrapper has_duration" : "topbar_notification_wrapper"} data-content={notification.message} data-time={calculateTimeRemaining(notification.created, notification.duration)}>
+                                                <svg className="topbar_notification_svg" width="40" height="40" viewBox="0 0 100 100">
+                                                        <polygon points="6,50 50,94 94,50 50,6" strokeWidth="8px" stroke="#5d5c4b" fill="#ae5576" />
+                                                        <polygon points="6,50 50,94 94,50 50,6" strokeWidth="2px" stroke="#000000" fill="#ae5576" />
+                                                        <text x="40%" y="70%" className="topbar_notification_important">!</text>
+                                                    </svg>
+                                                </a>
+                                            </>
+                                        }
+                                        {notification.type == "marriage" &&
+                                            <>
+                                                <a href={notification.action_url} className={(notification.duration > 0) ? "topbar_notification_wrapper has_duration" : "topbar_notification_wrapper"} data-content={notification.message} data-time={calculateTimeRemaining(notification.created, notification.duration)}>
+                                                <svg className="topbar_notification_svg" width="40" height="40" viewBox="0 0 100 100">
+                                                        <polygon points="6,50 50,94 94,50 50,6" strokeWidth="8px" stroke="#5d5c4b" fill="#ae5576" />
+                                                        <polygon points="6,50 50,94 94,50 50,6" strokeWidth="2px" stroke="#000000" fill="#ae5576" />
+                                                        <text x="40%" y="70%" className="topbar_notification_important">!</text>
+                                                    </svg>
+                                                </a>
+                                            </>
+                                        }
+                                        {notification.type == "student" &&
+                                            <>
+                                                <a href={notification.action_url} className={(notification.duration > 0) ? "topbar_notification_wrapper has_duration" : "topbar_notification_wrapper"} data-content={notification.message} data-time={calculateTimeRemaining(notification.created, notification.duration)}>
+                                                <svg className="topbar_notification_svg" width="40" height="40" viewBox="0 0 100 100">
+                                                        <polygon points="6,50 50,94 94,50 50,6" strokeWidth="8px" stroke="#5d5c4b" fill="#ae5576" />
+                                                        <polygon points="6,50 50,94 94,50 50,6" strokeWidth="2px" stroke="#000000" fill="#ae5576" />
+                                                        <text x="40%" y="70%" className="topbar_notification_important">!</text>
+                                                    </svg>
+                                                </a>
+                                            </>
+                                        }
+                                        {notification.type == "inbox" &&
+                                            <>
+                                                <a href={notification.action_url} className={(notification.duration > 0) ? "topbar_notification_wrapper has_duration" : "topbar_notification_wrapper"} data-content={notification.message} data-time={calculateTimeRemaining(notification.created, notification.duration)}>
+                                                <svg className="topbar_notification_svg" width="40" height="40" viewBox="0 0 100 100">
+                                                        <polygon points="6,50 50,94 94,50 50,6" strokeWidth="8px" stroke="#5d5c4b" fill="#ae5576" />
+                                                        <polygon points="6,50 50,94 94,50 50,6" strokeWidth="2px" stroke="#000000" fill="#ae5576" />
+                                                        <text x="40%" y="70%" className="topbar_notification_important">!</text>
                                                     </svg>
                                                 </a>
                                             </>

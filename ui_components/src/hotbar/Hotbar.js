@@ -246,7 +246,7 @@ function Hotbar({ links, userAPIData }) {
     function displayQuickSection(playerData, missionData, aiData, link_data, quickType) {
         return (
             <div id="hb_quick_section" className="hb_section">
-                <div className="hb_divider d-in_block">
+                <div className="hb_divider">
                     <div className={"hb_quick_title ft-s ft-c1 ft-min ft-b"}>QUICK MENU</div>
                     <div>
                         {(quickType == "training") &&
@@ -286,7 +286,7 @@ function Hotbar({ links, userAPIData }) {
                         }
                     </div>
                 </div>
-                <div className={"hb_divider d-in_block"}>
+                <div className="hb_divider">
                     <div>
                         <div>
                             <select id="hb_category_select" onChange={quickSelectOnChange} form="hb_quick_form" name="id" className="hb_quick_select">
@@ -375,11 +375,11 @@ function Hotbar({ links, userAPIData }) {
     function displaySettingsSection(playerData) {
         return (
             <div id="hb_settings_section" className="hb_section">
-                <div className="d-in_block hb_divider">
+                <div className="hb_divider">
                     <div className={"hb_settings_title ft-s ft-c1 ft-min ft-b"}>SETTINGS (WIP)</div>
                     <input id="hb_settings_display" onClick={setKeybindsOnClick} className={"hb_button button-bar_large t-hover"} type="button" value="SET KEYBINDS" />
                 </div>
-                <div className="d-in_block hb_divider">
+                <div className="hb_divider">
                     <div className="hb_checkbox_wrapper"><input id="hb_alert_checkbox" type="checkbox" className="hb_checkbox" form="hb_quick_form" name="alert" value="true" /><label className={"ft-s ft-c1 ft-min"}>ENABLE ALERTS</label></div>
                     <div className="hb_checkbox_wrapper"><input id="hb_hotkey_checkbox" type="checkbox" className="hb_checkbox" value="wow" /><label className={"ft-s ft-c1 ft-min"}>ENABLE HOTKEYS</label></div>
                 </div>
@@ -418,10 +418,13 @@ function Hotbar({ links, userAPIData }) {
     // Display
     return (
         <div id="hotbar" className={displayHotbar ? "jc-center d-flex" : "jc-center d-flex minimize"}>
-            {displayToggle()}
-            {playerData && displayQuickSection(playerData, missionData, aiData, links, quickType)}
-            {playerData && displaySettingsSection(playerData)}
-            {displaySetKeybinds()}
+            <div className="hb_inner">
+                <div className={"hb_section_spacer"}></div>
+                {displayToggle()}
+                {playerData && displayQuickSection(playerData, missionData, aiData, links, quickType)}
+                {playerData && displaySettingsSection(playerData)}
+                {displaySetKeybinds()}
+            </div>
         </div>
     );
 }

@@ -67,66 +67,15 @@ function Topbar({
     }, notificationData && notificationData.map(function (notification, i) {
       return /*#__PURE__*/React.createElement("div", {
         key: i
-      }, notification.type == "battle" && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("a", {
+      }, notification.type == "training" && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("a", {
         href: notification.action_url,
         className: notification.duration > 0 ? "topbar_notification_wrapper has_duration" : "topbar_notification_wrapper",
         "data-content": notification.message,
         "data-time": calculateTimeRemaining(notification.created, notification.duration)
       }, /*#__PURE__*/React.createElement("svg", {
         className: "topbar_notification_svg",
-        width: "35",
-        height: "35",
-        viewBox: "0 0 100 100"
-      }, /*#__PURE__*/React.createElement("polygon", {
-        points: "6,50 50,94 94,50 50,6",
-        strokeWidth: "8px",
-        stroke: "#5d5c4b",
-        fill: "#ae5576"
-      }), /*#__PURE__*/React.createElement("polygon", {
-        points: "6,50 50,94 94,50 50,6",
-        strokeWidth: "2px",
-        stroke: "#000000",
-        fill: "#ae5576"
-      }), /*#__PURE__*/React.createElement("image", {
-        className: "topbar_notification_icon",
-        height: "50",
-        width: "50",
-        x: "25.5%",
-        y: "27.5%",
-        href: "images/map/icons/attack-off.png"
-      })))), notification.type == "report" && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("a", {
-        href: notification.action_url,
-        className: notification.duration > 0 ? "topbar_notification_wrapper has_duration" : "topbar_notification_wrapper",
-        "data-content": notification.message,
-        "data-time": calculateTimeRemaining(notification.created, notification.duration)
-      }, /*#__PURE__*/React.createElement("svg", {
-        className: "topbar_notification_svg",
-        width: "35",
-        height: "35",
-        viewBox: "0 0 100 100"
-      }, /*#__PURE__*/React.createElement("polygon", {
-        points: "6,50 50,94 94,50 50,6",
-        strokeWidth: "8px",
-        stroke: "#5d5c4b",
-        fill: "#ae5576"
-      }), /*#__PURE__*/React.createElement("polygon", {
-        points: "6,50 50,94 94,50 50,6",
-        strokeWidth: "2px",
-        stroke: "#000000",
-        fill: "#ae5576"
-      }), /*#__PURE__*/React.createElement("text", {
-        x: "40%",
-        y: "70%",
-        className: "topbar_notification_important"
-      }, "!")))), notification.type == "training" && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("a", {
-        href: notification.action_url,
-        className: notification.duration > 0 ? "topbar_notification_wrapper has_duration" : "topbar_notification_wrapper",
-        "data-content": notification.message,
-        "data-time": calculateTimeRemaining(notification.created, notification.duration)
-      }, /*#__PURE__*/React.createElement("svg", {
-        className: "topbar_notification_svg",
-        width: "35",
-        height: "35",
+        width: "40",
+        height: "40",
         viewBox: "0 0 100 100"
       }, /*#__PURE__*/React.createElement("polygon", {
         points: "6,50 50,94 94,50 50,6",
@@ -156,8 +105,8 @@ function Topbar({
         "data-time": calculateTimeRemaining(notification.created, notification.duration)
       }, /*#__PURE__*/React.createElement("svg", {
         className: "topbar_notification_svg",
-        width: "35",
-        height: "35",
+        width: "40",
+        height: "40",
         viewBox: "0 0 100 100"
       }, /*#__PURE__*/React.createElement("polygon", {
         points: "6,50 50,94 94,50 50,6",
@@ -181,7 +130,7 @@ function Topbar({
         cy: "25",
         r: "12",
         fill: "#ff4141"
-      })))), notification.type == "mission" && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("a", {
+      })))), notification.type == "specialmission" && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("a", {
         href: notification.action_url,
         key: i,
         className: notification.duration > 0 ? "topbar_notification_wrapper has_duration" : "topbar_notification_wrapper",
@@ -189,41 +138,8 @@ function Topbar({
         "data-time": calculateTimeRemaining(notification.created, notification.duration)
       }, /*#__PURE__*/React.createElement("svg", {
         className: "topbar_notification_svg",
-        width: "35",
-        height: "35",
-        viewBox: "0 0 100 100"
-      }, /*#__PURE__*/React.createElement("polygon", {
-        points: "6,50 50,94 94,50 50,6",
-        strokeWidth: "8px",
-        stroke: "#5d5c4b",
-        fill: "#52466a"
-      }), /*#__PURE__*/React.createElement("polygon", {
-        points: "6,50 50,94 94,50 50,6",
-        strokeWidth: "2px",
-        stroke: "#000000",
-        fill: "#52466a"
-      }), /*#__PURE__*/React.createElement("text", {
-        x: "10%",
-        y: "80%",
-        className: "topbar_notification_mission"
-      }, "A"), /*#__PURE__*/React.createElement("text", {
-        x: "35%",
-        y: "65%",
-        className: "topbar_notification_mission"
-      }, "A"), /*#__PURE__*/React.createElement("text", {
-        x: "60%",
-        y: "50%",
-        className: "topbar_notification_mission"
-      }, "A")))), notification.type == "specialmission" && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("a", {
-        href: notification.action_url,
-        key: i,
-        className: notification.duration > 0 ? "topbar_notification_wrapper has_duration" : "topbar_notification_wrapper",
-        "data-content": notification.message,
-        "data-time": calculateTimeRemaining(notification.created, notification.duration)
-      }, /*#__PURE__*/React.createElement("svg", {
-        className: "topbar_notification_svg",
-        width: "35",
-        height: "35",
+        width: "40",
+        height: "40",
         viewBox: "0 0 100 100"
       }, /*#__PURE__*/React.createElement("polygon", {
         points: "6,50 50,94 94,50 50,6",
@@ -251,8 +167,8 @@ function Topbar({
         "data-time": calculateTimeRemaining(notification.created, notification.duration)
       }, /*#__PURE__*/React.createElement("svg", {
         className: "topbar_notification_svg",
-        width: "35",
-        height: "35",
+        width: "40",
+        height: "40",
         viewBox: "0 0 100 100"
       }, /*#__PURE__*/React.createElement("polygon", {
         points: "6,50 50,94 94,50 50,6",
@@ -273,7 +189,7 @@ function Topbar({
         cy: "25",
         r: "12",
         fill: "#ff4141"
-      })))), notification.type == "rank" && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("a", {
+      })))), notification.type == "mission" && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("a", {
         href: notification.action_url,
         key: i,
         className: notification.duration > 0 ? "topbar_notification_wrapper has_duration" : "topbar_notification_wrapper",
@@ -281,25 +197,58 @@ function Topbar({
         "data-time": calculateTimeRemaining(notification.created, notification.duration)
       }, /*#__PURE__*/React.createElement("svg", {
         className: "topbar_notification_svg",
-        width: "35",
-        height: "35",
+        width: "40",
+        height: "40",
         viewBox: "0 0 100 100"
       }, /*#__PURE__*/React.createElement("polygon", {
         points: "6,50 50,94 94,50 50,6",
         strokeWidth: "8px",
         stroke: "#5d5c4b",
-        fill: "#2e2c36"
+        fill: "#52466a"
       }), /*#__PURE__*/React.createElement("polygon", {
         points: "6,50 50,94 94,50 50,6",
         strokeWidth: "2px",
         stroke: "#000000",
-        fill: "#2e2c36"
+        fill: "#52466a"
+      }), /*#__PURE__*/React.createElement("text", {
+        x: "10%",
+        y: "80%",
+        className: "topbar_notification_mission"
+      }, notification.attributes.mission_rank), /*#__PURE__*/React.createElement("text", {
+        x: "35%",
+        y: "65%",
+        className: "topbar_notification_mission"
+      }, notification.attributes.mission_rank), /*#__PURE__*/React.createElement("text", {
+        x: "60%",
+        y: "50%",
+        className: "topbar_notification_mission"
+      }, notification.attributes.mission_rank)))), notification.type == "rank" && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("a", {
+        href: notification.action_url,
+        key: i,
+        className: notification.duration > 0 ? "topbar_notification_wrapper has_duration" : "topbar_notification_wrapper",
+        "data-content": notification.message,
+        "data-time": calculateTimeRemaining(notification.created, notification.duration)
+      }, /*#__PURE__*/React.createElement("svg", {
+        className: "topbar_notification_svg",
+        width: "40",
+        height: "40",
+        viewBox: "0 0 100 100"
+      }, /*#__PURE__*/React.createElement("polygon", {
+        points: "6,50 50,94 94,50 50,6",
+        strokeWidth: "8px",
+        stroke: "#5d5c4b",
+        fill: "#B09A65"
+      }), /*#__PURE__*/React.createElement("polygon", {
+        points: "6,50 50,94 94,50 50,6",
+        strokeWidth: "2px",
+        stroke: "#000000",
+        fill: "#B09A65"
       }), /*#__PURE__*/React.createElement("image", {
         className: "topbar_notification_icon",
-        height: "50",
-        width: "50",
-        x: "25.5%",
-        y: "27.5%",
+        height: "40",
+        width: "40",
+        x: "30%",
+        y: "27%",
         href: "images/v2/icons/levelup.png"
       })))), notification.type == "level" && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("a", {
         href: notification.action_url,
@@ -309,27 +258,243 @@ function Topbar({
         "data-time": calculateTimeRemaining(notification.created, notification.duration)
       }, /*#__PURE__*/React.createElement("svg", {
         className: "topbar_notification_svg",
-        width: "35",
-        height: "35",
+        width: "40",
+        height: "40",
         viewBox: "0 0 100 100"
       }, /*#__PURE__*/React.createElement("polygon", {
         points: "6,50 50,94 94,50 50,6",
         strokeWidth: "8px",
         stroke: "#5d5c4b",
-        fill: "#2e2c36"
+        fill: "#B09A65"
       }), /*#__PURE__*/React.createElement("polygon", {
         points: "6,50 50,94 94,50 50,6",
         strokeWidth: "2px",
         stroke: "#000000",
-        fill: "#2e2c36"
+        fill: "#B09A65"
       }), /*#__PURE__*/React.createElement("image", {
         className: "topbar_notification_icon",
-        height: "50",
-        width: "50",
-        x: "25.5%",
-        y: "27.5%",
+        height: "40",
+        width: "40",
+        x: "30%",
+        y: "27%",
         href: "images/v2/icons/levelup.png"
-      })))));
+      })))), notification.type == "system" && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("a", {
+        href: notification.action_url,
+        className: notification.duration > 0 ? "topbar_notification_wrapper has_duration" : "topbar_notification_wrapper",
+        "data-content": notification.message,
+        "data-time": calculateTimeRemaining(notification.created, notification.duration)
+      }, /*#__PURE__*/React.createElement("svg", {
+        className: "topbar_notification_svg",
+        width: "40",
+        height: "40",
+        viewBox: "0 0 100 100"
+      }, /*#__PURE__*/React.createElement("polygon", {
+        points: "6,50 50,94 94,50 50,6",
+        strokeWidth: "8px",
+        stroke: "#5d5c4b",
+        fill: "#ae5576"
+      }), /*#__PURE__*/React.createElement("polygon", {
+        points: "6,50 50,94 94,50 50,6",
+        strokeWidth: "2px",
+        stroke: "#000000",
+        fill: "#ae5576"
+      }), /*#__PURE__*/React.createElement("text", {
+        x: "40%",
+        y: "70%",
+        className: "topbar_notification_important"
+      }, "!")))), notification.type == "warning" && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("a", {
+        href: notification.action_url,
+        className: notification.duration > 0 ? "topbar_notification_wrapper has_duration" : "topbar_notification_wrapper",
+        "data-content": notification.message,
+        "data-time": calculateTimeRemaining(notification.created, notification.duration)
+      }, /*#__PURE__*/React.createElement("svg", {
+        className: "topbar_notification_svg",
+        width: "40",
+        height: "40",
+        viewBox: "0 0 100 100"
+      }, /*#__PURE__*/React.createElement("polygon", {
+        points: "6,50 50,94 94,50 50,6",
+        strokeWidth: "8px",
+        stroke: "#5d5c4b",
+        fill: "#ae5576"
+      }), /*#__PURE__*/React.createElement("polygon", {
+        points: "6,50 50,94 94,50 50,6",
+        strokeWidth: "2px",
+        stroke: "#000000",
+        fill: "#ae5576"
+      }), /*#__PURE__*/React.createElement("text", {
+        x: "40%",
+        y: "70%",
+        className: "topbar_notification_important"
+      }, "!")))), notification.type == "report" && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("a", {
+        href: notification.action_url,
+        className: notification.duration > 0 ? "topbar_notification_wrapper has_duration" : "topbar_notification_wrapper",
+        "data-content": notification.message,
+        "data-time": calculateTimeRemaining(notification.created, notification.duration)
+      }, /*#__PURE__*/React.createElement("svg", {
+        className: "topbar_notification_svg",
+        width: "40",
+        height: "40",
+        viewBox: "0 0 100 100"
+      }, /*#__PURE__*/React.createElement("polygon", {
+        points: "6,50 50,94 94,50 50,6",
+        strokeWidth: "8px",
+        stroke: "#5d5c4b",
+        fill: "#ae5576"
+      }), /*#__PURE__*/React.createElement("polygon", {
+        points: "6,50 50,94 94,50 50,6",
+        strokeWidth: "2px",
+        stroke: "#000000",
+        fill: "#ae5576"
+      }), /*#__PURE__*/React.createElement("text", {
+        x: "40%",
+        y: "70%",
+        className: "topbar_notification_important"
+      }, "!")))), notification.type == "battle" && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("a", {
+        href: notification.action_url,
+        className: notification.duration > 0 ? "topbar_notification_wrapper has_duration" : "topbar_notification_wrapper",
+        "data-content": notification.message,
+        "data-time": calculateTimeRemaining(notification.created, notification.duration)
+      }, /*#__PURE__*/React.createElement("svg", {
+        className: "topbar_notification_svg",
+        width: "40",
+        height: "40",
+        viewBox: "0 0 100 100"
+      }, /*#__PURE__*/React.createElement("polygon", {
+        points: "6,50 50,94 94,50 50,6",
+        strokeWidth: "8px",
+        stroke: "#5d5c4b",
+        fill: "#ae5576"
+      }), /*#__PURE__*/React.createElement("polygon", {
+        points: "6,50 50,94 94,50 50,6",
+        strokeWidth: "2px",
+        stroke: "#000000",
+        fill: "#ae5576"
+      }), /*#__PURE__*/React.createElement("text", {
+        x: "40%",
+        y: "70%",
+        className: "topbar_notification_important"
+      }, "!")))), notification.type == "challenge" && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("a", {
+        href: notification.action_url,
+        className: notification.duration > 0 ? "topbar_notification_wrapper has_duration" : "topbar_notification_wrapper",
+        "data-content": notification.message,
+        "data-time": calculateTimeRemaining(notification.created, notification.duration)
+      }, /*#__PURE__*/React.createElement("svg", {
+        className: "topbar_notification_svg",
+        width: "40",
+        height: "40",
+        viewBox: "0 0 100 100"
+      }, /*#__PURE__*/React.createElement("polygon", {
+        points: "6,50 50,94 94,50 50,6",
+        strokeWidth: "8px",
+        stroke: "#5d5c4b",
+        fill: "#ae5576"
+      }), /*#__PURE__*/React.createElement("polygon", {
+        points: "6,50 50,94 94,50 50,6",
+        strokeWidth: "2px",
+        stroke: "#000000",
+        fill: "#ae5576"
+      }), /*#__PURE__*/React.createElement("text", {
+        x: "40%",
+        y: "70%",
+        className: "topbar_notification_important"
+      }, "!")))), notification.type == "team" && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("a", {
+        href: notification.action_url,
+        className: notification.duration > 0 ? "topbar_notification_wrapper has_duration" : "topbar_notification_wrapper",
+        "data-content": notification.message,
+        "data-time": calculateTimeRemaining(notification.created, notification.duration)
+      }, /*#__PURE__*/React.createElement("svg", {
+        className: "topbar_notification_svg",
+        width: "40",
+        height: "40",
+        viewBox: "0 0 100 100"
+      }, /*#__PURE__*/React.createElement("polygon", {
+        points: "6,50 50,94 94,50 50,6",
+        strokeWidth: "8px",
+        stroke: "#5d5c4b",
+        fill: "#ae5576"
+      }), /*#__PURE__*/React.createElement("polygon", {
+        points: "6,50 50,94 94,50 50,6",
+        strokeWidth: "2px",
+        stroke: "#000000",
+        fill: "#ae5576"
+      }), /*#__PURE__*/React.createElement("text", {
+        x: "40%",
+        y: "70%",
+        className: "topbar_notification_important"
+      }, "!")))), notification.type == "marriage" && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("a", {
+        href: notification.action_url,
+        className: notification.duration > 0 ? "topbar_notification_wrapper has_duration" : "topbar_notification_wrapper",
+        "data-content": notification.message,
+        "data-time": calculateTimeRemaining(notification.created, notification.duration)
+      }, /*#__PURE__*/React.createElement("svg", {
+        className: "topbar_notification_svg",
+        width: "40",
+        height: "40",
+        viewBox: "0 0 100 100"
+      }, /*#__PURE__*/React.createElement("polygon", {
+        points: "6,50 50,94 94,50 50,6",
+        strokeWidth: "8px",
+        stroke: "#5d5c4b",
+        fill: "#ae5576"
+      }), /*#__PURE__*/React.createElement("polygon", {
+        points: "6,50 50,94 94,50 50,6",
+        strokeWidth: "2px",
+        stroke: "#000000",
+        fill: "#ae5576"
+      }), /*#__PURE__*/React.createElement("text", {
+        x: "40%",
+        y: "70%",
+        className: "topbar_notification_important"
+      }, "!")))), notification.type == "student" && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("a", {
+        href: notification.action_url,
+        className: notification.duration > 0 ? "topbar_notification_wrapper has_duration" : "topbar_notification_wrapper",
+        "data-content": notification.message,
+        "data-time": calculateTimeRemaining(notification.created, notification.duration)
+      }, /*#__PURE__*/React.createElement("svg", {
+        className: "topbar_notification_svg",
+        width: "40",
+        height: "40",
+        viewBox: "0 0 100 100"
+      }, /*#__PURE__*/React.createElement("polygon", {
+        points: "6,50 50,94 94,50 50,6",
+        strokeWidth: "8px",
+        stroke: "#5d5c4b",
+        fill: "#ae5576"
+      }), /*#__PURE__*/React.createElement("polygon", {
+        points: "6,50 50,94 94,50 50,6",
+        strokeWidth: "2px",
+        stroke: "#000000",
+        fill: "#ae5576"
+      }), /*#__PURE__*/React.createElement("text", {
+        x: "40%",
+        y: "70%",
+        className: "topbar_notification_important"
+      }, "!")))), notification.type == "inbox" && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("a", {
+        href: notification.action_url,
+        className: notification.duration > 0 ? "topbar_notification_wrapper has_duration" : "topbar_notification_wrapper",
+        "data-content": notification.message,
+        "data-time": calculateTimeRemaining(notification.created, notification.duration)
+      }, /*#__PURE__*/React.createElement("svg", {
+        className: "topbar_notification_svg",
+        width: "40",
+        height: "40",
+        viewBox: "0 0 100 100"
+      }, /*#__PURE__*/React.createElement("polygon", {
+        points: "6,50 50,94 94,50 50,6",
+        strokeWidth: "8px",
+        stroke: "#5d5c4b",
+        fill: "#ae5576"
+      }), /*#__PURE__*/React.createElement("polygon", {
+        points: "6,50 50,94 94,50 50,6",
+        strokeWidth: "2px",
+        stroke: "#000000",
+        fill: "#ae5576"
+      }), /*#__PURE__*/React.createElement("text", {
+        x: "40%",
+        y: "70%",
+        className: "topbar_notification_important"
+      }, "!")))));
     })))));
   }
 
