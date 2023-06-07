@@ -203,7 +203,7 @@ function Sidebar({
       viewBox: "0 0 50 50"
     }, /*#__PURE__*/React.createElement("polygon", {
       x: "50",
-      points: "20,25 0,5 5,5 25,25 5,45 0,45",
+      points: "20,25 0,0 5,0 25,25 5,50 0,50",
       id: "sb_health_highlight",
       className: "sb_resource_highlight"
     })))), /*#__PURE__*/React.createElement("div", {
@@ -233,7 +233,7 @@ function Sidebar({
       viewBox: "0 0 50 50"
     }, /*#__PURE__*/React.createElement("polygon", {
       x: "50",
-      points: "20,25 0,5 5,5 25,25 5,45 0,45",
+      points: "20,25 0,0 5,0 25,25 5,50 0,50",
       id: "sb_chakra_highlight",
       className: "sb_resource_highlight"
     })))), /*#__PURE__*/React.createElement("div", {
@@ -263,7 +263,7 @@ function Sidebar({
       viewBox: "0 0 50 50"
     }, /*#__PURE__*/React.createElement("polygon", {
       x: "50",
-      points: "20,25 0,5 5,5 25,25 5,45 0,45",
+      points: "20,25 0,0 5,0 25,25 5,50 0,50",
       id: "sb_stamina_highlight",
       className: "sb_resource_highlight"
     })))), /*#__PURE__*/React.createElement("div", {

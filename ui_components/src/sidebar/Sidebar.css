@@ -154,7 +154,7 @@
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
-    height: 80%;
+    height: var(--resource-bar-inner-height);
     clip-path: polygon(8px 0, calc(100% - 8px) 0px, 100% 50%, calc(100% - 8px) 100%, 8px 100%, 0 50%);
     transition-property: width;
     transition-duration: 0.3s;
@@ -165,7 +165,7 @@
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
-    height: 80%;
+    height: var(--resource-bar-inner-height);
     left: 0%;
     width: 100%;
     clip-path: polygon(3.5% 0, 96.5% 0, 100% 50%, 96.5% 100%, 3.5% 100%, 0 50%);
@@ -229,7 +229,7 @@
 
 .sb_resource_highlight_container {
     z-index: 11;
-    height: var(--resource-bar-height);
+    height: var(--resource-bar-inner-height);
     width: 100%;
     position: absolute;
     top: 50%;
