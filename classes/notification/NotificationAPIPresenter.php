@@ -40,4 +40,9 @@ class NotificationApiPresenter
     {
         return $notificationManager->closeNotification($notification_id);
     }
+
+    public static function clearNotificationAlertResponse(NotificationAPIManager $notificationManager, int $notification_id): bool
+    {
+        return $notificationManager->clearNotificationAlert($notification_id);
+    }
 }

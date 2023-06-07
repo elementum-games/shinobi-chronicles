@@ -18,6 +18,7 @@ function Topbar({
         return;
       } else {
         setNotificationData(response.data.userNotifications);
+        response.data.userNotifications.forEach(notification => checkNotificationAlert(notification));
       }
     });
   }
@@ -31,6 +32,17 @@ function Topbar({
         return;
       } else {
         getNotificationData();
+      }
+    });
+  }
+  function clearNotificationAlert(notification_id) {
+    apiFetch(links.notification_api, {
+      request: 'clearNotificationAlert',
+      notification_id: notification_id
+    }).then(response => {
+      if (response.errors.length) {
+        handleErrors(response.errors);
+        return;
       }
     });
   }
@@ -48,6 +60,40 @@ function Topbar({
     var formattedMinutes = minutes.toString().padStart(2, '0');
     var formattedSeconds = seconds.toString().padStart(2, '0');
     return formattedHours > 0 ? formattedHours + ':' + formattedMinutes + ':' + formattedSeconds : formattedMinutes + ':' + formattedSeconds;
+  }
+  function checkNotificationAlert(notification) {
+    if (notification.alert) {
+      console.log("here");
+      createNotification(notification.message);
+      clearNotificationAlert(notification.notification_id);
+    }
+  }
+  function createNotification(message) {
+    if (!window.Notification) {
+      console.log('Browser does not support notifications.');
+    } else {
+      // check if permission is already granted
+      if (Notification.permission === 'granted') {
+        // show notification here
+        var notify = new Notification('Shinobi Chronicles', {
+          body: message
+        });
+      } else {
+        // request permission from user
+        Notification.requestPermission().then(function (p) {
+          if (p === 'granted') {
+            // show notification here
+            var notify = new Notification('Shinobi Chronicles', {
+              body: message
+            });
+          } else {
+            console.log('User blocked notifications.');
+          }
+        }).catch(function (err) {
+          console.error(err);
+        });
+      }
+    }
   }
 
   // Content
@@ -484,6 +530,7 @@ function Topbar({
     const notificationInterval = setInterval(() => {
       getNotificationData();
     }, 10000);
+    notificationAPIData.userNotifications.forEach(notification => checkNotificationAlert(notification));
     return () => clearInterval(notificationInterval);
   }, []);
 

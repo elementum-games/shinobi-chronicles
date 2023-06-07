@@ -18,6 +18,14 @@ class NotificationAPIManager {
      */
     public function getUserNotifications(): array
     {
+        // Staff check
+        if ($this->player->staff_manager->isModerator()) {
+            $reportManager = new ReportManager($this->system, $this->player, true);
+        }
+        // Used for PM checks
+        $playerInbox = new InboxManager($this->system, $this->player);
+
+        // Return array
         $notifications = [];
         $notification_ids_to_delete = [];
         $notification_table_result = $this->system->query("SELECT * FROM `notifications` WHERE `user_id` = {$this->player->user_id}");
@@ -83,7 +91,7 @@ class NotificationAPIManager {
                     }
                     break;
                 case "warning":
-                    if (false) {
+                    if (!($this->player->getOfficialWarnings(true))) {
                         $notification_ids_to_delete[] = $row['notification_id'];
                         continue 2;
                     } else {
@@ -91,7 +99,7 @@ class NotificationAPIManager {
                     }
                     break;
                 case "report":
-                    if (false) {
+                    if (!($this->player->staff_manager->isModerator() && $reportManager->getActiveReports(true))) {
                         $notification_ids_to_delete[] = $row['notification_id'];
                         continue 2;
                     } else {
@@ -108,7 +116,7 @@ class NotificationAPIManager {
                     }
                     break;
                 case "challenge":
-                    if (false) {
+                    if (!($this->player->challenge)) {
                         $notification_ids_to_delete[] = $row['notification_id'];
                         continue 2;
                     } else {
@@ -116,7 +124,7 @@ class NotificationAPIManager {
                     }
                     break;
                 case "team":
-                    if (false) {
+                    if (!($this->player->team_invite)) {
                         $notification_ids_to_delete[] = $row['notification_id'];
                         continue 2;
                     } else {
@@ -124,7 +132,7 @@ class NotificationAPIManager {
                     }
                     break;
                 case "marriage":
-                    if (false) {
+                    if (!($this->player->spouse < 0)) {
                         $notification_ids_to_delete[] = $row['notification_id'];
                         continue 2;
                     } else {
@@ -132,7 +140,7 @@ class NotificationAPIManager {
                     }
                     break;
                 case "student":
-                    if (false) {
+                    if (!(SenseiManager::hasApplications($this->player->user_id, $this->system))) {
                         $notification_ids_to_delete[] = $row['notification_id'];
                         continue 2;
                     } else {
@@ -140,7 +148,7 @@ class NotificationAPIManager {
                     }
                     break;
                 case "inbox":
-                    if (false) {
+                    if (!($playerInbox->checkIfUnreadMessages() || $playerInbox->checkIfUnreadAlerts())) {
                         $notification_ids_to_delete[] = $row['notification_id'];
                         continue 2;
                     } else {
@@ -156,12 +164,7 @@ class NotificationAPIManager {
         }
 
         /* Check for general notifications */
-        // Staff check
-        if ($this->player->staff_manager->isModerator()) {
-            $reportManager = new ReportManager($this->system, $this->player, true);
-        }
-        //Used for PM checks
-        $playerInbox = new InboxManager($this->system, $this->player);
+
 
         //Battle
         if ($this->player->battle_id > 0) {
@@ -287,6 +290,11 @@ class NotificationAPIManager {
 
     public function closeNotification(int $notification_id): bool {
         $this->system->query("DELETE FROM `notifications` WHERE `notification_id` = {$notification_id}");
+        return $this->system->db_last_num_rows > 0 ? true : false;
+    }
+
+    public function clearNotificationAlert(int $notification_id): bool {
+        $this->system->query("UPDATE `notifications` set `alert` = 0 WHERE `notification_id` = {$notification_id}");
         return $this->system->db_last_num_rows > 0 ? true : false;
     }
 }
