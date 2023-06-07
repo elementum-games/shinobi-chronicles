@@ -137,15 +137,16 @@ function Sidebar({ links, logoutTimer, navigationAPIData, userAPIData }) {
                 </div>
                 <div className={"sb_resources d-in_block"}>
                     <div className={"sb_name_container t-left d-flex"}>
-                        <div className="d-in_block" style={{ width: "100%" }}>
+                        <div className="sb_name_wrapper">
                             <div className={"ft-p ft-c1 ft-xlarge ft-b"}>{playerData.user_name}</div>
                             <div className={"ft-s ft-c1 ft-default"}>{playerData.rank_name} lvl {playerData.level}</div>
                         </div>
-                        <div className="d-in_block">
+                        <div className="sb_regentimer_container">
                             <div id="sb_regentimer">
-                                <svg height="40" width="40" viewBox="0 0 50 50">
+                                <svg height="30" width="30" viewBox="0 0 50 50">
+                                    <circle id="sb_regentimer_circle_rear" stroke="#181b2c" cx="24.5" cy="24" r="20" strokeWidth="4" stroke-mitterlimit="0" fill="none" strokeDasharray="126"></circle>
                                     <circle id="sb_regentimer_circle" stroke="#7C88C3" cx="24.5" cy="24" r="20" strokeWidth="4" stroke-mitterlimit="0" fill="none" strokeDasharray="126" strokeDashoffset={regenOffset} transform="rotate(-90, 24.5, 24)"></circle>
-                                    <text id="sb_regentimer_text" className={"ft-s ft-b ft-large"} x="50%" y="50%" textAnchor="middle" dominantBaseline="middle">{regenTime}</text>
+                                    <text id="sb_regentimer_text" className={"ft-s ft-b ft-large"} x="48.75%" y="50.5%" textAnchor="middle" dominantBaseline="middle">{regenTime}</text>
                                 </svg>
                             </div>
                         </div>
