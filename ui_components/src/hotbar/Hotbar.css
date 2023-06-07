@@ -1,0 +1,302 @@
+#hotbar {
+    background-color: var(--hotbar-background-color);
+    width: 100%;
+    height: var(--hotbar-height);
+    position: fixed;
+    bottom: var(--footer-height);
+    z-index: 10;
+    margin-bottom: 0px;
+    border-top: 3px solid var(--hotbar-border-color);
+    transition: height 0.25s;
+}
+
+.hb_inner {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 50px;
+    width: calc(var(--sidebar-width) + var(--content-width));
+    justify-content: center;
+}
+
+#hotbar.minimize {
+    height: 0px;
+    transition: height 0.25s;
+}
+
+.hb_section {
+    height: var(--hotbar-height);
+    display: flex;
+}
+
+.hb_name_container {
+    margin: 12px 0px 5px 10px;
+    width: 100%;
+}
+
+.hb_avatar_container {
+    float: left;
+    overflow: visible;
+}
+.hb_avatar_container.minimize {
+    overflow: hidden;
+}
+
+.hb_avatar_wrapper {
+    clip-path: circle(50% at 50% 50%);
+    background-color: var(--hotbar-border-color);
+    height: 150px;
+    width: 150px;
+    position: relative;
+    bottom: 15px;
+}
+
+.hb_avatar_img {
+    position: relative;
+    top: 5px;
+    left: 5px;
+    height: 140px;
+    width: 140px;
+    clip-path: circle(49% at 50% 50%);
+}
+
+.hb_resources {
+    margin-left: 20px;
+    width: var(--resource-bar-width);
+}
+
+.hb_resourceContainer {
+    margin: 4px auto;
+}
+
+.hb_resourceBarOuter {
+    display: flex;
+    position: relative;
+    height: var(--resource-bar-height);
+}
+
+.hb_fill {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    height: 80%;
+    clip-path: polygon(8px 0, calc(100% - 8px) 0px, 100% 50%, calc(100% - 8px) 100%, 8px 100%, 0 50%);
+}
+
+.hb_preview {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    height: 80%;
+    left: 0%;
+    width: 100%;
+    clip-path: polygon(3.5% 0, 96.5% 0, 100% 50%, 96.5% 100%, 3.5% 100%, 0 50%);
+    opacity: 0.5;
+    overflow: hidden;
+}
+
+.hb_innerResourceBarLabel {
+    font-family: var(--font-secondary);
+    display: block;
+    position: absolute;
+    left: 0;
+    right: 0;
+    align-self: center;
+    font-size: 12px;
+    font-weight: bold;
+    letter-spacing: 0.2px;
+    line-height: 15px;
+    text-align: center;
+    color: #ffffff;
+    text-shadow: -1px 0 0 rgba(0,0,0,0.7), -1px -1px 0 rgba(0,0,0,0.7), 0 -1px 0 rgba(0,0,0,0.7), 1px -1px 0 rgba(0,0,0,0.7), 1px 0 0 rgba(0,0,0,0.7), 1px 1px 0 rgba(0,0,0,0.7), 0 1px 0 rgba(0,0,0,0.7), -1px 1px 0 rgba(0,0,0,0.7);
+    z-index: 100;
+}
+
+.hb_resource_corner_left {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    z-index: 11;
+    transform: translateY(-50%) rotate(180deg);
+}
+
+.hb_resource_corner_right {
+    position: absolute;
+    top: 50%;
+    right: 0;
+    transform: translateY(-50%);
+    z-index: 11;
+}
+
+#hb_regentimer {
+    float: right;
+    margin-right: 20px;
+}
+
+#hb_regentimer_text {
+    fill: #ad9357;
+}
+
+#hb_time_select {
+    width: 100px;
+    float: right;
+}
+
+.hb_time_label {
+    margin-top: 6.5px;
+}
+
+.hb_section_spacer {
+    width: var(--sidebar-width);
+}
+
+.hb_quick_title {
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+#hb_quick_form {
+    margin: 0;
+}
+
+.hb_quick_select optgroup {
+    font-style: normal;
+    font-family: var(--font-secondary);
+    font-variant: var(--font-secondary-variant);
+    color: var(--font-color-1);
+    font-weight: bold;
+}
+
+.hb_quick_select option {
+    font-family: var(--font-secondary);
+    font-variant: var(--font-secondary-variant);
+    color: var(--font-color-3);
+    font-weight: bold;
+}
+
+.hb_quick_select {
+    font-family: var(--font-secondary);
+    font-variant: var(--font-secondary-variant);
+    color: var(--font-color-3) !important;
+    font-weight: bold;
+    background-color: var(--hotbar-background-color) !important;
+    border-color: var(--font-color-1) !important;
+    border-radius: 4px;
+    border-width: 1px;
+    width: 150px;
+    margin-top: 5px;
+}
+
+.hb_settings_title {
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.hb_checkbox {
+    outline: 1px solid var(--font-color-1);
+    accent-color: var(--hotbar-background-color);
+    margin-right: 5px;
+}
+
+.hb_checkbox_wrapper {
+    margin-top: 10px;
+}
+
+.hb_resource_highlight_container {
+    z-index: 11;
+    height: var(--resource-bar-height);
+    width: 100%;
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.hb_resource_highlight_wrapper {
+    right: 0%;
+    transform: translate(50%,0px);
+}
+
+.hb_health {
+    background: var(--health-fill);
+}
+
+.hb_health.preview {
+    background: var(--health-preview);
+}
+
+#hb_health_highlight {
+    fill: var(--health-highlight);
+    stroke: var(--health-highlight);
+}
+
+.hb_chakra {
+    background: var(--chakra-fill);
+}
+
+.hb_chakra.preview {
+    background: var(--chakra-preview);
+}
+
+#hb_chakra_highlight {
+    fill: var(--chakra-highlight);
+    stroke: var(--chakra-highlight);
+}
+
+.hb_stamina {
+    background: var(--stamina-fill);
+}
+
+.hb_stamina.preview {
+    background: var(--stamina-preview);
+}
+
+#hb_stamina_highlight {
+    fill: var(--stamina-highlight);
+    stroke: var(--stamina-highlight);
+}
+
+#hb_quick_submit {
+    margin-bottom: 5px;
+}
+
+.hb_button {
+    color: var(--font-color-1);
+    font-family: var(--font-primary);
+    font-variant: var(--font-primary-variant);
+    font-size: 12px;
+}
+
+#hb_toggle {
+    background-color: var(--hotbar-background-color);
+    position: absolute;
+    top: -20px;
+    width: 150px;
+    text-align: center;
+    clip-path: polygon(10% 0, 90% 0, 100% 100%, 0% 100%);
+    height: 20px;
+}
+
+#hb_keybind_modal {
+    width: var(--hotbar-keybind-modal-width);
+    height: var(--hotbar-keybind-modal-height);
+    background-color: var(--hotbar-background-color);
+    border-color: var(--border-color-default);
+    position: absolute;
+    right: 50%;
+    transform: translateX(50%);
+    top: calc(-50px - var(--hotbar-keybind-modal-height));
+    text-align: center;
+    transition: width 0.5s;
+    overflow: hidden;
+}
+
+#hb_keybind_modal.minimize {
+    width: 0;
+    transition: width 0.5s;
+}
+
+.hb_divider {
+    height: var(--hotbar-height);
+    vertical-align: top;
+    margin-left: 10px;
+    margin-right: 10px;
+}

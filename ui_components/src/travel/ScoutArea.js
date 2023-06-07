@@ -67,7 +67,7 @@ const Player = ({
                     <a href={attackLink + '&attack=' + player_data.attack_id}></a>
                 )}
                 {(player_data.attack === true && parseInt(player_data.battle_id, 10) > 0) && (
-                    <span></span>
+                    <span className='in-battle'></span>
                 )}
                 {(player_data.attack === false && player_data.direction !== 'none') && (
                     <span className={`direction ${player_data.direction}`}></span>

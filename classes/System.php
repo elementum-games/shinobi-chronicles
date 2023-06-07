@@ -750,6 +750,8 @@ class System {
                 return require  "layout/blue_scroll.php";
             case 'rainbow_road':
                 return require  "layout/rainbow_road.php";
+            case 'new_geisha':
+                return require  "layout/new_geisha.php";
             default:
                 return require  "layout/" . self::DEFAULT_LAYOUT . ".php";
         }

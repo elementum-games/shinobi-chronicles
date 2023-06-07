@@ -1,0 +1,313 @@
+#sidebarContainer {
+    vertical-align: top;
+    margin-top: 20px;
+    position: sticky;
+    align-self: flex-start;
+    margin-left: 15px;
+    top: calc(var(--header-height) + var(--header-border-height) + 20px);
+}
+
+#sidebar {
+    width: var(--sidebar-width);
+}
+
+.sb_section_container.first {
+    margin-top: 5px;
+}
+
+.sb_header_bar {
+    background-color: var(--sidebar-header-background-color);
+    height: var(--sidebar-header-height);
+    align-items: center;
+}
+
+.sb_header_image_wrapper {
+    left: -16px;
+    position: relative;
+    top: 50%;
+    transform: translate(0%, -40%)
+}
+
+.sb_header_text_wrapper {
+    left: -10px;
+    position: relative;
+    text-shadow: 1.5px 1.5px 1px #564d3e;
+}
+
+.sb_header_line {
+    width: 42%;
+    margin-left: auto;
+    margin-right: 5px;
+}
+
+.sb_link_container {
+    width: 98%;
+    flex-wrap: wrap;
+    gap: 1px 1px;
+    background-color: var(--sidebar-button-border-color);
+    align-items: center;
+    justify-content: center;
+    padding-bottom: 2px;
+}
+
+.sb_link_wrapper {
+    flex-basis: 49%;
+    height: 30px;
+    color: var(--font-color-3);
+    background-color: var(--sidebar-button-background-color);
+    border-color: var(--sidebar-button-border-color);
+    border-width: 1px;
+    font-weight: 500;
+}
+
+.sb_link_filler {
+    flex-basis: 49%;
+    height: 30px;
+    background-color: var(--sidebar-button-background-color);
+    border-color: var(--sidebar-button-border-color);
+    border-width: 1px;
+}
+
+.sb_link_wrapper.selected {
+    color: var(--text-hover) !important;
+    background: var(--sidebar-button-background-hover);
+}
+
+.sb_link_wrapper:hover {
+    color: var(--text-hover) !important;
+    background: var(--sidebar-button-background-hover);
+}
+
+.sb_link_wrapper:visited {
+    color: var(--font-color-3);
+}
+
+.sb_label {
+    position: relative;
+    top: 15%;
+    cursor: pointer;
+}
+
+.sb_avatar_container {
+    overflow: visible;
+    margin-bottom: 5px;
+}
+
+.sb_avatar_wrapper {
+    clip-path: circle(50% at 50% 50%);
+    background: var(--avatar-frame-border_gradient);
+    height: 212px;
+    width: 212px;
+    position: relative;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.sb_avatar_img {
+    position: relative;
+    top: 6px;
+    left: 6px;
+    height: 200px;
+    width: 200px;
+    clip-path: circle(49% at 50% 50%);
+}
+
+.sb_button {
+    color: var(--font-color-1);
+    font-family: var(--font-primary);
+    font-variant: var(--font-primary-variant);
+    font-size: 12px;
+}
+
+#sb_logout_button {
+    top: 20px;
+    position: relative;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.sb_name_container {
+    margin: 0px 0px 5px 10px;
+    width: 100%;
+}
+
+.sb_name_wrapper {
+    width: 100%;
+}
+
+.sb_resources {
+    width: var(--sidebar-width);
+    margin-bottom: 5px;
+}
+
+.sb_resourceContainer {
+    margin: 4px auto;
+}
+
+.sb_resourceBarOuter {
+    display: flex;
+    position: relative;
+    height: var(--resource-bar-height);
+}
+
+.sb_fill {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    height: var(--resource-bar-inner-height);
+    clip-path: polygon(8px 0, calc(100% - 8px) 0px, 100% 50%, calc(100% - 8px) 100%, 8px 100%, 0 50%);
+    transition-property: width;
+    transition-duration: 0.3s;
+    transition-timing-function: linear;
+}
+
+.sb_preview {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    height: var(--resource-bar-inner-height);
+    left: 0%;
+    width: 100%;
+    clip-path: polygon(3.5% 0, 96.5% 0, 100% 50%, 96.5% 100%, 3.5% 100%, 0 50%);
+    opacity: 0.5;
+    overflow: hidden;
+}
+
+.sb_innerResourceBarLabel {
+    font-family: var(--font-secondary);
+    display: block;
+    position: absolute;
+    left: 0;
+    right: 0;
+    align-self: center;
+    font-size: 12px;
+    font-weight: bold;
+    line-height: 15px;
+    text-align: center;
+    color: white;
+    text-shadow: -1px 0 0 rgba(0,0,0,0.7), -1px -1px 0 rgba(0,0,0,0.7), 0 -1px 0 rgba(0,0,0,0.7), 1px -1px 0 rgba(0,0,0,0.7), 1px 0 0 rgba(0,0,0,0.7), 1px 1px 0 rgba(0,0,0,0.7), 0 1px 0 rgba(0,0,0,0.7), -1px 1px 0 rgba(0,0,0,0.7);
+    z-index: 100;
+}
+
+.sb_resource_corner_left {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    z-index: 11;
+    transform: translateY(-50%) rotate(180deg);
+}
+
+.sb_resource_corner_right {
+    position: absolute;
+    top: 50%;
+    right: 0;
+    transform: translateY(-50%);
+    z-index: 11;
+}
+
+.sb_regentimer_container {
+    display: flex;
+    align-items: flex-end;
+}
+
+#sb_regentimer {
+    float: right;
+    margin-right: 20px;
+    padding-top: 3px;
+}
+
+#sb_regentimer_circle {
+    stroke: var(--regentimer-color);
+    transition-property: stroke-dashoffset;
+    transition-duration: 0.5s;
+    transition-timing-function: ease-out;
+}
+
+#sb_regentimer_text {
+    fill: var(--font-color-3);
+}
+
+.sb_resource_highlight_container {
+    z-index: 11;
+    height: var(--resource-bar-inner-height);
+    width: 100%;
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.sb_resource_highlight_wrapper {
+    right: 0%;
+    transform: translate(50%,0px);
+}
+
+.sb_health {
+    background: var(--health-fill);
+}
+
+.sb_health.preview {
+    background: var(--health-preview);
+}
+
+#sb_health_highlight {
+    fill: var(--health-highlight);
+    stroke: var(--health-highlight);
+}
+
+.sb_chakra {
+    background: var(--chakra-fill);
+}
+
+.sb_chakra.preview {
+    background: var(--chakra-preview);
+}
+
+#sb_chakra_highlight {
+    fill: var(--chakra-highlight);
+    stroke: var(--chakra-highlight);
+}
+
+.sb_stamina {
+    background: var(--stamina-fill);
+}
+
+.sb_stamina.preview {
+    background: var(--stamina-preview);
+}
+
+#sb_stamina_highlight {
+    fill: var(--stamina-highlight);
+    stroke: var(--stamina-highlight);
+}
+
+.sb_logout_container {
+    height: 50px;
+    width: 98%;
+    text-align: center;
+    background-color: var(--sidebar-button-background-color);
+}
+
+.sb_logout_timer_wrapper {
+    color: var(--font-color-3);
+    font-family: var(--font-secondary);
+    font-variant: var(--font-secondary-variant);
+    font-size: 13px;
+}
+
+.sb_logout_button_wrapper {
+    margin-top: 5px;
+}
+
+.sidebar_secorner {
+    position: absolute;
+    bottom: 0;
+    right: 2%;
+}
+
+.sb_logout_button {
+    text-align: center;
+    color: var(--font-color-1);
+    font-family: var(--font-primary);
+    font-variant: var(--font-primary-variant);
+    font-size: 12px;
+}

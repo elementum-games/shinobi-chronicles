@@ -1,0 +1,92 @@
+#topbarContainer {
+    position: absolute;
+}
+
+#topbar {
+    height: var(--topbar-height);
+}
+
+.topbar_left {
+    width: var(--sidebar-width);
+}
+
+.topbar_right {
+    width: var(--content-width);
+    justify-content: center;
+    align-items: center;
+}
+
+.topbar_inner_left {
+    flex-basis: 30%;
+}
+.topbar_inner_center {
+    flex-basis: 40%;
+}
+.topbar_inner_right {
+    flex-basis: 30%;
+}
+
+.topbar_notifications_container {
+    justify-content: flex-end;
+    gap: 5px;
+}
+
+.topbar_notification_wrapper {
+    cursor: pointer;
+}
+
+.topbar_notification_wrapper:hover::after {
+    content: attr(data-content);
+    position: absolute;
+    top: 100%;
+    z-index: 1000;
+    transform: translate(-17px, -10px);
+    background-color: #141317;
+    border-color: #575749;
+    color: var(--font-color-6);
+    font-family: var(--font-secondary);
+    font-size: 12px;
+    font-style: italic;
+    border-width: 1.75px;
+    border-style: solid;
+    padding: 5px;
+    white-space: nowrap;
+    font-weight: bold;
+}
+
+.topbar_notification_wrapper.has_duration:hover::after {
+    content: attr(data-content) ": " attr(data-time); 
+}
+
+.topbar_notification_important {
+    fill: white;
+    font-weight: bold;
+    font-size: 60px;
+}
+
+.topbar_notification_mission {
+    fill: #9aa6c6;
+    font-family: Andale Mono, AndaleMono, monospace;
+    font-size: 50px;
+    text-transform: uppercase;
+}
+
+.topbar_notification_specialmission {
+    fill: #9aa6c6;
+    font-family: Andale Mono, AndaleMono, monospace;
+    font-size: 45px;
+    text-transform: uppercase;
+}
+
+.topbar_close_notification {
+    color: #c04f78;
+    position: absolute;
+    font-family: Andale Mono, AndaleMono, monospace;
+    font-size: 20px;
+    transform: translate(0, -10px);
+    cursor: pointer;
+}
+
+.topbar_close_notification:hover {
+    color: var(--text-hover);
+}

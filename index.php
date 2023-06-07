@@ -1,5 +1,5 @@
-<?php 
-/* 
+<?php
+/*
 File: 		index.php
 Coder:		Levi Meahan
 Created:	02/21/2012
@@ -70,7 +70,7 @@ if(!isset($_SESSION['user_id'])) {
 			}
 
 			// Get result
-			$result = $system->query("SELECT `user_id`, `user_name`, `password`, `failed_logins`, `current_ip`, `last_ip`, `user_verified` 
+			$result = $system->query("SELECT `user_id`, `user_name`, `password`, `failed_logins`, `current_ip`, `last_ip`, `user_verified`
 				FROM `users` WHERE `user_name`='$user_name' LIMIT 1");
 			if($system->db_last_num_rows == 0) {
 				throw new Exception("User does not exist!");
@@ -164,34 +164,39 @@ else {
 	$layout = $system->fetchLayoutByName($player->layout);
 }
 
-if(!$system->is_legacy_ajax_request) {
-	echo $layout->heading;
-	echo $layout->top_menu;
-	echo $layout->header;
+if ($layout->key == "new_geisha") {
+    require("index_new.php");
+    exit;
+}
+
+if (!$system->is_legacy_ajax_request) {
+    echo $layout->heading;
+    echo $layout->top_menu;
+    echo $layout->header;
 }
 
 // Load page or news
 if($LOGGED_IN) {
-	// Master close
-	if(!$system->SC_OPEN && !$player->isUserAdmin()) {
-		if(!$system->is_legacy_ajax_request) {
-			echo str_replace("[HEADER_TITLE]", "Profile", $layout->body_start);
-		}
+    // Master close
+    if(!$system->SC_OPEN && !$player->isUserAdmin()) {
+        if(!$system->is_legacy_ajax_request) {
+            echo str_replace("[HEADER_TITLE]", "Profile", $layout->body_start);
+        }
 
-		echo "<table class='table'><tr><th>Game Maintenance</th></tr>
-		<tr><td style='text-align:center;'>
-		Shinobi-Chronicles is currently closed for maintenace. Please check back in a few minutes!
-		</td></tr></table>";
+        echo "<table class='table'><tr><th>Game Maintenance</th></tr>
+	<tr><td style='text-align:center;'>
+	Shinobi-Chronicles is currently closed for maintenace. Please check back in a few minutes!
+	</td></tr></table>";
 
         if(!$system->is_legacy_ajax_request) {
-			echo $layout->side_menu_start . $layout->side_menu_end;
-			echo str_replace('<!--[VERSION_NUMBER]-->', System::VERSION_NUMBER, $layout->footer);
-		}
-		exit;
-	}
+            echo $layout->side_menu_start . $layout->side_menu_end;
+            echo str_replace('<!--[VERSION_NUMBER]-->', System::VERSION_NUMBER, $layout->footer);
+        }
+        exit;
+    }
 
     // Check for ban
-	if($player->checkBan(StaffManager::BAN_TYPE_GAME)) {
+    if($player->checkBan(StaffManager::BAN_TYPE_GAME)) {
         $ban_type = StaffManager::BAN_TYPE_GAME;
         $expire_int = $player->ban_data[$ban_type];
         $ban_expire = ($expire_int == StaffManager::PERM_BAN_VALUE ? $expire_int : $system->time_remaining($player->ban_data[StaffManager::BAN_TYPE_GAME] - time()));
@@ -211,7 +216,7 @@ if($LOGGED_IN) {
     }
 
     $result = $system->query("SELECT `id` FROM `banned_ips` WHERE `ip_address`='" . $system->clean($_SERVER['REMOTE_ADDR']) . "' LIMIT 1");
-	if($system->db_last_num_rows > 0) {
+    if($system->db_last_num_rows > 0) {
         $ban_type = StaffManager::BAN_TYPE_IP;
         $expire_int = -1;
         $ban_expire = ($expire_int == StaffManager::PERM_BAN_VALUE ? $expire_int : $system->time_remaining($player->ban_data[StaffManager::BAN_TYPE_GAME] - time()));
@@ -228,72 +233,72 @@ if($LOGGED_IN) {
             echo str_replace('<!--[VERSION_NUMBER]-->', System::VERSION_NUMBER, $layout->footer);
         }
         exit;
-	}
+    }
 
-	// Notifications
-	if(!$system->is_legacy_ajax_request) {
-		Notifications::displayNotifications($system, $player);
-		echo "<script type='text/javascript'>
-		var notificationRefreshID = setInterval(
-            () => {
-                // $('#notifications').load('./api/legacy_notifications.php');
-            },
-            5000
-        );
-		</script>";
-	}
+    // Notifications
+    if(!$system->is_legacy_ajax_request) {
+        Notifications::displayNotifications($system, $player);
+        echo "<script type='text/javascript'>
+	var notificationRefreshID = setInterval(
+        () => {
+            // $('#notifications').load('./api/legacy_notifications.php');
+        },
+        5000
+    );
+	</script>";
+    }
 
-	// Global message
-	if(!$player->global_message_viewed && isset($_GET['clear_message'])) {
-		$player->global_message_viewed = 1;
-	}
+    // Global message
+    if(!$player->global_message_viewed && isset($_GET['clear_message'])) {
+        $player->global_message_viewed = 1;
+    }
 
-	// Load rank data// Rank names
-	$RANK_NAMES = RankManager::fetchNames($system);
+    // Load rank data// Rank names
+    $RANK_NAMES = RankManager::fetchNames($system);
 
-	// Route list
-	$routes = Router::$routes;
+    // Route list
+    $routes = Router::$routes;
 
-	// Action log
-	if($player->log_actions) {
-		$log_contents = '';
-		if($_GET['id'] && isset($routes[$_GET['id']])) {
-			$log_contents .= 'Page: ' . $routes[$_GET['id']]['title'] . ' - Time: ' . round(microtime(true), 1) . '[br]';
-		}
-		foreach($_GET as $key => $value) {
-			$val = $value;
-			if($key == 'id') {
-				continue;
-			}
-			if(strlen($val) > 32) {
-				$val = substr($val, 0, 32) . '...';
-			}		
-			$log_contents .= $key . ': ' . $val . '[br]';
-		}
-		foreach($_POST as $key => $value) {
-			$val = $value;
-			if(strpos($key, 'password') !== false) {
-				$val = '*******';
-			}
-			if(strlen($val) > 32) {
-				$val = substr($val, 0, 32) . '...';
-			}			
-			$log_contents .= $key . ': ' . $val . '[br]';
-		}
-		$system->log('player_action', $player->user_name, $log_contents);
-	}
+    // Action log
+    if($player->log_actions) {
+        $log_contents = '';
+        if($_GET['id'] && isset($routes[$_GET['id']])) {
+            $log_contents .= 'Page: ' . $routes[$_GET['id']]['title'] . ' - Time: ' . round(microtime(true), 1) . '[br]';
+        }
+        foreach($_GET as $key => $value) {
+            $val = $value;
+            if($key == 'id') {
+                continue;
+            }
+            if(strlen($val) > 32) {
+                $val = substr($val, 0, 32) . '...';
+            }
+            $log_contents .= $key . ': ' . $val . '[br]';
+        }
+        foreach($_POST as $key => $value) {
+            $val = $value;
+            if(strpos($key, 'password') !== false) {
+                $val = '*******';
+            }
+            if(strlen($val) > 32) {
+                $val = substr($val, 0, 32) . '...';
+            }
+            $log_contents .= $key . ': ' . $val . '[br]';
+        }
+        $system->log('player_action', $player->user_name, $log_contents);
+    }
 
-	// Pre-content display
-	if($player->train_time && !$system->is_legacy_ajax_request) {
-		$layout->renderTrainingDisplay($player);
-	}
-	$page_loaded = false;
+    // Pre-content display
+    if($player->train_time && !$system->is_legacy_ajax_request) {
+        $layout->renderTrainingDisplay($player);
+    }
+    $page_loaded = false;
 
-	if(isset($_GET['id'])) {
-		$id = (int)$_GET['id'];
+    if(isset($_GET['id'])) {
+        $id = (int)$_GET['id'];
         $route = Router::$routes[$id] ?? null;
 
-		try {
+        try {
             $system->router->assertRouteIsValid($route, $player);
 
             // Force view battle page if waiting too long
@@ -342,21 +347,21 @@ if($LOGGED_IN) {
             ($route->function_name)();
 
             $page_loaded = true;
-		} catch (Exception $e) {
-			if(strlen($e->getMessage()) > 1) {
-				// Display page title if page is set
-				if($routes[$id] != null) {
-					echo str_replace("[HEADER_TITLE]", $route->title, $layout->body_start);
-					$page_loaded = true;
-				}
-				$system->message($e->getMessage());
-				$system->printMessage();
-			}
-		}
-	}
+        } catch (Exception $e) {
+            if(strlen($e->getMessage()) > 1) {
+                // Display page title if page is set
+                if($routes[$id] != null) {
+                    echo str_replace("[HEADER_TITLE]", $route->title, $layout->body_start);
+                    $page_loaded = true;
+                }
+                $system->message($e->getMessage());
+                $system->printMessage();
+            }
+        }
+    }
 
-	if(!$page_loaded) {
-		echo str_replace("[HEADER_TITLE]", "Profile", $layout->body_start);
+    if(!$page_loaded) {
+        echo str_replace("[HEADER_TITLE]", "Profile", $layout->body_start);
 
         $system->printMessage();
         if(!$player->global_message_viewed && !$system->is_legacy_ajax_request) {
@@ -371,43 +376,43 @@ if($LOGGED_IN) {
             $system->message($e->getMessage());
             $system->printMessage(true);
         }
-	}
-	$player->updateData();
+    }
+    $player->updateData();
 
-	// Display side menu and footer
-	if(!$system->is_legacy_ajax_request) {
+    // Display side menu and footer
+    if(!$system->is_legacy_ajax_request) {
         $layout->renderSideMenu($player, $system->router);
-	}
+    }
 }
 else if($system->is_legacy_ajax_request) {
-	echo "<script type='text/javascript'>
-			clearInterval(refreshID);
-			clearInterval(notificationRefreshID);
-			</script>
-	<p style='text-align:center;'>Logout timer finished. <a href='{$system->router->base_url}'>Continue</a></p>";
+    echo "<script type='text/javascript'>
+		clearInterval(refreshID);
+		clearInterval(notificationRefreshID);
+		</script>
+<p style='text-align:center;'>Logout timer finished. <a href='{$system->router->base_url}'>Continue</a></p>";
 }
 // Login
 else {
-	echo str_replace("[HEADER_TITLE]", "News", $layout->body_start);
-	// Display error messages
-	$system->printMessage();
-	if(!$system->SC_OPEN) {
-		echo "<table class='table'><tr><th>Game Maintenance</th></tr>
-		<tr><td style='text-align:center;'>
-		Shinobi-Chronicles is currently closed for maintenace. Please check back in a few minutes!
-		</td></tr></table>";
-	}
+    echo str_replace("[HEADER_TITLE]", "News", $layout->body_start);
+    // Display error messages
+    $system->printMessage();
+    if(!$system->SC_OPEN) {
+        echo "<table class='table'><tr><th>Game Maintenance</th></tr>
+	<tr><td style='text-align:center;'>
+	Shinobi-Chronicles is currently closed for maintenace. Please check back in a few minutes!
+	</td></tr></table>";
+    }
 
-	require("pages/news.php");
-	newsPosts();
+    require("pages/news.php");
+    newsPosts();
 
     $captcha = '';
-	echo str_replace('<!--CAPTCHA-->', $captcha, $layout->login_menu);
+    echo str_replace('<!--CAPTCHA-->', $captcha, $layout->login_menu);
 }
 
 // Render footer
 if(!$system->is_legacy_ajax_request) {
-	$page_load_time = round(microtime(true) - $PAGE_LOAD_START, 3);
+    $page_load_time = round(microtime(true) - $PAGE_LOAD_START, 3);
 
     $layout->renderFooter($page_load_time);
 }

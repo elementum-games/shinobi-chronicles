@@ -2770,6 +2770,9 @@ a#spec_miss_cancel:hover {
 .travel-scout-name span {
     min-width: 110px !important;
 }
+.travel-scout-attack span.direction {
+    background-image: url("../../images/icons/right_white.png") !important;
+}
 
 /* temp fix for travel sync with side menu */
 #container .sm-tmp-invillage #sideMenuOption-Arena:hover::before,
