@@ -29,6 +29,12 @@
     position: relative;
 }
 
+.sb_header_line {
+    width: 47%;
+    margin-left: auto;
+    margin-right: 5px;
+}
+
 .sb_link_container {
     width: 98%;
     flex-wrap: wrap;

@@ -46,7 +46,7 @@
     /* Hotbar Config */
     --hotbar-height: 85px;
     --hotbar-background-color: #100f11;
-    --hotbar-border-color: #0E0D0E;
+    --hotbar-border-color: #0c0c0e;
     --hotbar-keybind-modal-width: 700px;
     --hotbar-keybind-modal-height: 400px;
     /* Sidebar Config */
@@ -59,7 +59,7 @@
     /* Header Config */
     --header-height: 35px;
     --header-background-color: #151417;
-    --header-border-color: #0E0D0E;
+    --header-border-color: #0c0d0e;
     --header-border-height: 3px;
     /* Topbar Config */
     --topbar-height: 60px;
@@ -160,7 +160,7 @@ body {
 #content {
     display: inline-block;
     float: none;
-    margin-left: 10px;
+    margin-left: 15px;
     margin-top: var(--topbar-height);
     margin-bottom: var(--hotbar-height);
     width: var(--content-width);

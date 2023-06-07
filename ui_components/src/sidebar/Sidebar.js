@@ -99,6 +99,11 @@ function Sidebar({ links, logoutTimer, navigationAPIData, userAPIData }) {
                     <div className={"sb_header_text_wrapper ft-p ft-c2 ft-b ft-medium"}>
                         {title}
                     </div>
+                    <div className="sb_header_line">
+                        <svg width="100%" height="2">
+                            <line x1="0%" y1="1" x2="95%" y2="1" stroke="#77694e" stroke-width="1" />
+                        </svg>
+                    </div>
                 </div>
                 <div className="sb_link_container d-flex">
                     {(section_data) &&
