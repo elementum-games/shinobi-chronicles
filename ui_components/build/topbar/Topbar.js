@@ -74,8 +74,8 @@ function Topbar({
         "data-time": calculateTimeRemaining(notification.created, notification.duration)
       }, /*#__PURE__*/React.createElement("svg", {
         className: "topbar_notification_svg",
-        width: "35",
-        height: "35",
+        width: "40",
+        height: "40",
         viewBox: "0 0 100 100"
       }, /*#__PURE__*/React.createElement("polygon", {
         points: "6,50 50,94 94,50 50,6",
@@ -105,8 +105,8 @@ function Topbar({
         "data-time": calculateTimeRemaining(notification.created, notification.duration)
       }, /*#__PURE__*/React.createElement("svg", {
         className: "topbar_notification_svg",
-        width: "35",
-        height: "35",
+        width: "40",
+        height: "40",
         viewBox: "0 0 100 100"
       }, /*#__PURE__*/React.createElement("polygon", {
         points: "6,50 50,94 94,50 50,6",
@@ -138,8 +138,8 @@ function Topbar({
         "data-time": calculateTimeRemaining(notification.created, notification.duration)
       }, /*#__PURE__*/React.createElement("svg", {
         className: "topbar_notification_svg",
-        width: "35",
-        height: "35",
+        width: "40",
+        height: "40",
         viewBox: "0 0 100 100"
       }, /*#__PURE__*/React.createElement("polygon", {
         points: "6,50 50,94 94,50 50,6",
@@ -167,8 +167,8 @@ function Topbar({
         "data-time": calculateTimeRemaining(notification.created, notification.duration)
       }, /*#__PURE__*/React.createElement("svg", {
         className: "topbar_notification_svg",
-        width: "35",
-        height: "35",
+        width: "40",
+        height: "40",
         viewBox: "0 0 100 100"
       }, /*#__PURE__*/React.createElement("polygon", {
         points: "6,50 50,94 94,50 50,6",
@@ -197,8 +197,8 @@ function Topbar({
         "data-time": calculateTimeRemaining(notification.created, notification.duration)
       }, /*#__PURE__*/React.createElement("svg", {
         className: "topbar_notification_svg",
-        width: "35",
-        height: "35",
+        width: "40",
+        height: "40",
         viewBox: "0 0 100 100"
       }, /*#__PURE__*/React.createElement("polygon", {
         points: "6,50 50,94 94,50 50,6",
@@ -230,8 +230,8 @@ function Topbar({
         "data-time": calculateTimeRemaining(notification.created, notification.duration)
       }, /*#__PURE__*/React.createElement("svg", {
         className: "topbar_notification_svg",
-        width: "35",
-        height: "35",
+        width: "40",
+        height: "40",
         viewBox: "0 0 100 100"
       }, /*#__PURE__*/React.createElement("polygon", {
         points: "6,50 50,94 94,50 50,6",
@@ -258,8 +258,8 @@ function Topbar({
         "data-time": calculateTimeRemaining(notification.created, notification.duration)
       }, /*#__PURE__*/React.createElement("svg", {
         className: "topbar_notification_svg",
-        width: "35",
-        height: "35",
+        width: "40",
+        height: "40",
         viewBox: "0 0 100 100"
       }, /*#__PURE__*/React.createElement("polygon", {
         points: "6,50 50,94 94,50 50,6",
@@ -285,8 +285,8 @@ function Topbar({
         "data-time": calculateTimeRemaining(notification.created, notification.duration)
       }, /*#__PURE__*/React.createElement("svg", {
         className: "topbar_notification_svg",
-        width: "35",
-        height: "35",
+        width: "40",
+        height: "40",
         viewBox: "0 0 100 100"
       }, /*#__PURE__*/React.createElement("polygon", {
         points: "6,50 50,94 94,50 50,6",
@@ -309,8 +309,8 @@ function Topbar({
         "data-time": calculateTimeRemaining(notification.created, notification.duration)
       }, /*#__PURE__*/React.createElement("svg", {
         className: "topbar_notification_svg",
-        width: "35",
-        height: "35",
+        width: "40",
+        height: "40",
         viewBox: "0 0 100 100"
       }, /*#__PURE__*/React.createElement("polygon", {
         points: "6,50 50,94 94,50 50,6",
@@ -333,8 +333,8 @@ function Topbar({
         "data-time": calculateTimeRemaining(notification.created, notification.duration)
       }, /*#__PURE__*/React.createElement("svg", {
         className: "topbar_notification_svg",
-        width: "35",
-        height: "35",
+        width: "40",
+        height: "40",
         viewBox: "0 0 100 100"
       }, /*#__PURE__*/React.createElement("polygon", {
         points: "6,50 50,94 94,50 50,6",
@@ -357,8 +357,8 @@ function Topbar({
         "data-time": calculateTimeRemaining(notification.created, notification.duration)
       }, /*#__PURE__*/React.createElement("svg", {
         className: "topbar_notification_svg",
-        width: "35",
-        height: "35",
+        width: "40",
+        height: "40",
         viewBox: "0 0 100 100"
       }, /*#__PURE__*/React.createElement("polygon", {
         points: "6,50 50,94 94,50 50,6",
@@ -381,8 +381,8 @@ function Topbar({
         "data-time": calculateTimeRemaining(notification.created, notification.duration)
       }, /*#__PURE__*/React.createElement("svg", {
         className: "topbar_notification_svg",
-        width: "35",
-        height: "35",
+        width: "40",
+        height: "40",
         viewBox: "0 0 100 100"
       }, /*#__PURE__*/React.createElement("polygon", {
         points: "6,50 50,94 94,50 50,6",
@@ -405,8 +405,8 @@ function Topbar({
         "data-time": calculateTimeRemaining(notification.created, notification.duration)
       }, /*#__PURE__*/React.createElement("svg", {
         className: "topbar_notification_svg",
-        width: "35",
-        height: "35",
+        width: "40",
+        height: "40",
         viewBox: "0 0 100 100"
       }, /*#__PURE__*/React.createElement("polygon", {
         points: "6,50 50,94 94,50 50,6",
@@ -429,8 +429,8 @@ function Topbar({
         "data-time": calculateTimeRemaining(notification.created, notification.duration)
       }, /*#__PURE__*/React.createElement("svg", {
         className: "topbar_notification_svg",
-        width: "35",
-        height: "35",
+        width: "40",
+        height: "40",
         viewBox: "0 0 100 100"
       }, /*#__PURE__*/React.createElement("polygon", {
         points: "6,50 50,94 94,50 50,6",
@@ -453,8 +453,8 @@ function Topbar({
         "data-time": calculateTimeRemaining(notification.created, notification.duration)
       }, /*#__PURE__*/React.createElement("svg", {
         className: "topbar_notification_svg",
-        width: "35",
-        height: "35",
+        width: "40",
+        height: "40",
         viewBox: "0 0 100 100"
       }, /*#__PURE__*/React.createElement("polygon", {
         points: "6,50 50,94 94,50 50,6",
@@ -477,8 +477,8 @@ function Topbar({
         "data-time": calculateTimeRemaining(notification.created, notification.duration)
       }, /*#__PURE__*/React.createElement("svg", {
         className: "topbar_notification_svg",
-        width: "35",
-        height: "35",
+        width: "40",
+        height: "40",
         viewBox: "0 0 100 100"
       }, /*#__PURE__*/React.createElement("polygon", {
         points: "6,50 50,94 94,50 50,6",
