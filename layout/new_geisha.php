@@ -96,9 +96,12 @@ $login_menu = <<<HTML
 HTML;
 
 $footer = <<<HTML
-	<div id='footer'>
-		<div id='footer_text'>
-			Shinobi Chronicles v<!--[VERSION_NUMBER]--> &bull; Copyright &copy; LM Visions <a href="{$system->router->base_url}terms.php">Terms of Service</a>
+	<div id="footer">
+		<div class="footer-left"></div>
+		<div class="footer-right">
+			<div class="footer_text">
+				Shinobi Chronicles v<!--[VERSION_NUMBER]--> &bull; Copyright &copy; LM Visions <a href="{$system->router->base_url}terms.php">Terms of Service</a>
+			</div>
 		</div>
     </div>
 </body>

@@ -10,6 +10,14 @@
     transition: height 0.25s;
 }
 
+.hb_inner {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 50px;
+    width: calc(var(--sidebar-width) + var(--content-width));
+    justify-content: center;
+}
+
 #hotbar.minimize {
     height: 0px;
     transition: height 0.25s;
@@ -17,8 +25,7 @@
 
 .hb_section {
     height: var(--hotbar-height);
-    margin-right: 30px;
-    margin-left: 30px;
+    display: flex;
 }
 
 .hb_name_container {
@@ -136,6 +143,10 @@
 
 .hb_time_label {
     margin-top: 6.5px;
+}
+
+.hb_section_spacer {
+    width: var(--sidebar-width);
 }
 
 .hb_quick_title {
@@ -258,10 +269,10 @@
     background-color: var(--hotbar-background-color);
     position: absolute;
     top: -20px;
-    left: calc(50% - 325px);
     width: 150px;
     text-align: center;
     clip-path: polygon(10% 0, 90% 0, 100% 100%, 0% 100%);
+    height: 20px;
 }
 
 #hb_keybind_modal {

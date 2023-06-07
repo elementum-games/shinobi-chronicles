@@ -97,7 +97,19 @@ function Sidebar({
       className: "sb_header_image"
     })), /*#__PURE__*/React.createElement("div", {
       className: "sb_header_text_wrapper ft-p ft-c2 ft-b ft-medium"
-    }, title)), /*#__PURE__*/React.createElement("div", {
+    }, title), /*#__PURE__*/React.createElement("div", {
+      className: "sb_header_line"
+    }, /*#__PURE__*/React.createElement("svg", {
+      width: "100%",
+      height: "2"
+    }, /*#__PURE__*/React.createElement("line", {
+      x1: "0%",
+      y1: "1",
+      x2: "95%",
+      y2: "1",
+      stroke: "#77694e",
+      strokeWidth: "1"
+    })))), /*#__PURE__*/React.createElement("div", {
       className: "sb_link_container d-flex"
     }, section_data && section_data.map(function (link, i) {
       return /*#__PURE__*/React.createElement("a", {

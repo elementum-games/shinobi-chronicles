@@ -16,6 +16,7 @@
     --content-border-color: #14131a;
     --footer-height: 30px;
     --footer-background-color: #0E0D0E;
+    --footer-font-color: #423f39;
     --content-width: 850px;
     --container-width: 1400px;
     --regentimer-color: #7C88C3;
@@ -207,7 +208,7 @@ body {
 #footer {
     font-family: var(--font-primary);
     font-size: 12px;
-    color: var(--font-color-3);
+    color: var(--footer-font-color);
     background-color: var(--footer-background-color);
     width: 100%;
     height: var(--footer-height);
@@ -218,9 +219,18 @@ body {
     padding-bottom: 0px;
     margin-left: auto;
     margin-right: auto;
+    display: flex;
+    justify-content: center;
 }
 
-#footer_text {
+.footer-left {
+    width: var(--sidebar-width);
+}
+
+.footer-right {
+}
+
+.footer_text {
     text-align: center;
     padding-top: 10px;
 }

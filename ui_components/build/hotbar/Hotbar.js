@@ -237,7 +237,7 @@ function Hotbar({
       id: "hb_quick_section",
       className: "hb_section"
     }, /*#__PURE__*/React.createElement("div", {
-      className: "hb_divider d-in_block"
+      className: "hb_divider"
     }, /*#__PURE__*/React.createElement("div", {
       className: "hb_quick_title ft-s ft-c1 ft-min ft-b"
     }, "QUICK MENU"), /*#__PURE__*/React.createElement("div", null, quickType == "training" && /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("form", {
@@ -301,7 +301,7 @@ function Hotbar({
       type: "button",
       value: "RAMEN"
     }))))), /*#__PURE__*/React.createElement("div", {
-      className: "hb_divider d-in_block"
+      className: "hb_divider"
     }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("select", {
       id: "hb_category_select",
       onChange: quickSelectOnChange,
@@ -417,7 +417,7 @@ function Hotbar({
       id: "hb_settings_section",
       className: "hb_section"
     }, /*#__PURE__*/React.createElement("div", {
-      className: "d-in_block hb_divider"
+      className: "hb_divider"
     }, /*#__PURE__*/React.createElement("div", {
       className: "hb_settings_title ft-s ft-c1 ft-min ft-b"
     }, "SETTINGS (WIP)"), /*#__PURE__*/React.createElement("input", {
@@ -427,7 +427,7 @@ function Hotbar({
       type: "button",
       value: "SET KEYBINDS"
     })), /*#__PURE__*/React.createElement("div", {
-      className: "d-in_block hb_divider"
+      className: "hb_divider"
     }, /*#__PURE__*/React.createElement("div", {
       className: "hb_checkbox_wrapper"
     }, /*#__PURE__*/React.createElement("input", {
@@ -490,6 +490,10 @@ function Hotbar({
   return /*#__PURE__*/React.createElement("div", {
     id: "hotbar",
     className: displayHotbar ? "jc-center d-flex" : "jc-center d-flex minimize"
-  }, displayToggle(), playerData && displayQuickSection(playerData, missionData, aiData, links, quickType), playerData && displaySettingsSection(playerData), displaySetKeybinds());
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "hb_inner"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "hb_section_spacer"
+  }), displayToggle(), playerData && displayQuickSection(playerData, missionData, aiData, links, quickType), playerData && displaySettingsSection(playerData), displaySetKeybinds()));
 }
 window.Hotbar = Hotbar;

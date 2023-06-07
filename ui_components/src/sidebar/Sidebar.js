@@ -101,7 +101,7 @@ function Sidebar({ links, logoutTimer, navigationAPIData, userAPIData }) {
                     </div>
                     <div className="sb_header_line">
                         <svg width="100%" height="2">
-                            <line x1="0%" y1="1" x2="95%" y2="1" stroke="#77694e" stroke-width="1" />
+                            <line x1="0%" y1="1" x2="95%" y2="1" stroke="#77694e" strokeWidth="1" />
                         </svg>
                     </div>
                 </div>
