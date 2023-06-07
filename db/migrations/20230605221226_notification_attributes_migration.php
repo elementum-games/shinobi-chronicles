@@ -13,7 +13,7 @@ final class NotificationAttributesMigration extends AbstractMigration
         // add new columns
         $this->execute("
             ALTER TABLE `notifications`
-                ADD COLUMN `attributes` VARCHAR(200) NOT NULL DEFAULT '[]'
+                ADD COLUMN `attributes` VARCHAR(2000) NOT NULL DEFAULT '[]'
         ");
     }
 }
