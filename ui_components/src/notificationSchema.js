@@ -10,6 +10,7 @@ export type NotificationType = {|
         | "training_complete"
         | "specialmission"
         | "specialmission_complete"
+        | "specialmission_failed"
         | "rank"
         | "system"
         | "warning"
