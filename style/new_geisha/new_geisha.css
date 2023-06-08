@@ -38,7 +38,7 @@
     --resource-bar-width: 300px;
     --resource-bar-height: 21px;
     --resource-bar-inner-height: 19px;
-    --health-fill: linear-gradient(to right, #4c2626, #7c2d2d 35%);
+    --health-fill: linear-gradient(to right, #4c2626, #7c2d2d 15%);
     --health-preview: #4c2626;
     --health-highlight: #9d5454;
     --chakra-fill: linear-gradient(to right, #242639, #3F4979 15%);
