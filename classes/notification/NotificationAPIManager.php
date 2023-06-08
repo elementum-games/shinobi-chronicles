@@ -66,6 +66,14 @@ class NotificationAPIManager {
                         $notifications[] = NotificationDto::fromDb($row, $this->system->router->getUrl("specialmissions"));
                     }
                     break;
+                case "specialmission_failed":
+                    if ($this->player->special_mission != 0) {
+                        $notification_ids_to_delete[] = $row['notification_id'];
+                        continue 2;
+                    } else {
+                        $notifications[] = NotificationDto::fromDb($row, $this->system->router->getUrl("specialmissions"));
+                    }
+                    break;
                 case "mission":
                     if ($this->player->mission_id == 0) {
                         $notification_ids_to_delete[] = $row['notification_id'];
