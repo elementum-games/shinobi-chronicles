@@ -41,6 +41,7 @@
             require 'templates/ban_info.php';
             // Footer
             if(!$system->is_legacy_ajax_request) {
+                echo "</div>";
                 echo str_replace('<!--[VERSION_NUMBER]-->', System::VERSION_NUMBER, $layout->footer);
             }
             exit;
@@ -62,6 +63,7 @@
             require 'templates/ban_info.php';
             // Footer
             if(!$system->is_legacy_ajax_request) {
+                echo "</div>";
                 echo str_replace('<!--[VERSION_NUMBER]-->', System::VERSION_NUMBER, $layout->footer);
             }
             exit;
