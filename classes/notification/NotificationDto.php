@@ -6,6 +6,7 @@ require_once __DIR__ . '/types/BattleNotificationDto.php';
 class NotificationDto {
     public function __construct(
         public string $action_url = "",
+        // TODO: Enum/set of constants for types
         public string $type = "",
         public string $message = "",
         public int $notification_id = 0,
@@ -16,9 +17,8 @@ class NotificationDto {
     ) {
     }
 
-    public static function fromDb($row, $action_url)
-    {
-        $notification = new NotificationDto(
+    public static function fromDb($row, $action_url): NotificationDto {
+        return new NotificationDto(
             action_url: $action_url,
             type: $row['type'],
             message: $row['message'],
@@ -28,10 +28,9 @@ class NotificationDto {
             duration: $row['duration'],
             alert: $row['alert'],
         );
-        return $notification;
     }
 
-    public function getAttributes() {
+    public function getAttributes(): array {
         return [];
     }
 }
