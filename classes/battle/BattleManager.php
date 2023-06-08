@@ -684,6 +684,9 @@ class BattleManager {
         $attack_damage = $attack->raw_damage;
         if(empty($attack->jutsu->effect_only)) {
             $attack_damage = $target->calcDamageTaken($attack->raw_damage, $attack->jutsu->jutsu_type);
+            $attack_damage_raw = $target->calcDamageTaken($attack->raw_damage, $attack->jutsu->jutsu_type, apply_resists : false);
+            $damage_resisted = $attack_damage_raw - $attack_damage;
+
             $target->health -= $attack_damage;
             if($target->health < 0) {
                 $target->health = 0;
@@ -735,6 +738,16 @@ class BattleManager {
                                 </span>
                             to {$target->getName()}.
                         </p>";
+
+              if(!$damage_resisted <= 0 ) {
+                     $text .=  "<p style=\"font-weight:bold;\">
+                             {$target->getName()} resists
+                                 <span style=\"color:{$attack_jutsu_color}\">
+                                     " . sprintf('%.2f', $damage_resisted) . "
+                                 </span>
+                                    of {$user->getName()} damage.
+                                </p>";
+                        }
         }
         if($this->effects->hasDisplays($user)) {
             $text .= '<p>' . $this->effects->getDisplayText($user) . '</p>';
@@ -746,6 +759,7 @@ class BattleManager {
                 "</p>";
         }
 
+
         if($attack->jutsu->weapon_id) {
             $text .= "<p style=\"font-style:italic;margin-top:3px;\">" .
                 $this->system->clean($this->effects->getAnnouncementText($attack->jutsu->weapon_effect->effect)) .
@@ -753,6 +767,8 @@ class BattleManager {
         }
 
         $this->battle->battle_text .= $this->parseCombatText($text, $user, $target);
+        
+        
     }
 
     /**
