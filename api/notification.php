@@ -38,7 +38,7 @@ try {
             break;
         case "clearNotificationAlert":
             $NotificationResponse->response_data = [
-                'success' => NotificationAPIPresenter::clearNotificationAlertResponse(notificationManager: $NotificationManager, notification_id: $_POST['notification_id']),
+                'success' => $NotificationManager->clearNotificationAlert($_POST['notification_id']),
             ];
             break;
         default:

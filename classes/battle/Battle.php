@@ -128,23 +128,23 @@ class Battle {
 
         // Create Notifications
         if ($battle_type == self::TYPE_FIGHT) {
-            $new_notification = new NotificationDto(
+            $new_notification = new BattleNotificationDto(
                 action_url: $system->router->getUrl('battle'),
                 type: "battle",
                 message: "In battle!",
                 user_id: $player1->user_id,
                 created: time(),
-                attributes: array('battle_id' => $battle_id),
+                battle_id: $battle_id,
                 alert: false,
             );
             NotificationManager::createNotification($new_notification, $system, NotificationManager::UPDATE_REPLACE);
-            $new_notification = new NotificationDto(
+            $new_notification = new BattleNotificationDto(
                 action_url: $system->router->getUrl('battle'),
                 type: "battle",
                 message: "In battle!",
                 user_id: $player2->user_id,
                 created: time(),
-                attributes: array('battle_id' => $battle_id),
+                battle_id: $battle_id,
                 alert: true,
             );
             NotificationManager::createNotification($new_notification, $system, NotificationManager::UPDATE_REPLACE);

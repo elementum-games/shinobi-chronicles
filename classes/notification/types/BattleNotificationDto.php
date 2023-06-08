@@ -1,7 +1,7 @@
 <?php
 
-class MissionNotificationDto extends NotificationDto {
-    public string $mission_rank;
+class BattleNotificationDto extends NotificationDto {
+    public int $battle_id;
 
     public function __construct(
         string $action_url = "",
@@ -12,7 +12,7 @@ class MissionNotificationDto extends NotificationDto {
         int $created = 0,
         int $duration = 0,
         bool $alert = false,
-        string $mission_rank = "",
+        int $battle_id = 0,
     ) {
         parent::__construct(
             $action_url,
@@ -24,13 +24,12 @@ class MissionNotificationDto extends NotificationDto {
             $duration,
             $alert,
         );
-        $this->mission_rank = $mission_rank;
+        $this->battle_id = $battle_id;
     }
-
 
     public static function fromDb($row, $action_url) {
         $attributes = json_decode($row['attributes'], true);
-        $notification = new MissionNotificationDto();
+        $notification = new BattleNotificationDto();
         $notification->type = $row['type'];
         $notification->message = $row['message'];
         $notification->notification_id = $row['notification_id'];
@@ -39,13 +38,13 @@ class MissionNotificationDto extends NotificationDto {
         $notification->duration = $row['duration'];
         $notification->alert = $row['alert'];
         $notification->action_url = $action_url;
-        $notification->mission_rank = $attributes['mission_rank'];
+        $notification->battle_id = $attributes['battle_id'];
         return $notification;
     }
 
     public function getAttributes() {
         return [
-            'mission_rank' => $this->mission_rank,
+            'battle_id' => $this->battle_id,
         ];
     }
 }
