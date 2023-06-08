@@ -13,7 +13,7 @@
         <td>
             <form action='<?=$self_link?>' method='post'>
                 <style type='text/css'>
-                    label {
+                    #mod_panel label {
                         display:inline-block;
                         width: 80px;
                     }
