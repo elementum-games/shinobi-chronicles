@@ -139,7 +139,7 @@
                         ? ' ' . ' <div id="contentHeaderLocation">' . $player->current_location->name . '</div>'
                         : null;
                     require($layout->sidebarModule);
-                    require($layout->topbarModule); 
+                    require($layout->topbarModule);
                     echo str_replace("[HEADER_TITLE]", $route->title . $location_name, $layout->body_start);
                 }
 
@@ -166,7 +166,9 @@
                 if(strlen($e->getMessage()) > 1) {
                     // Display page title if page is set
                     if($routes[$id] != null) {
-                        echo str_replace("[HEADER_TITLE]", $route->title, $layout->body_start);
+                    require($layout->sidebarModule);
+                    require($layout->topbarModule);
+                    echo str_replace("[HEADER_TITLE]", $route->title, $layout->body_start);
                         $page_loaded = true;
                     }
                     $system->message($e->getMessage());
@@ -177,7 +179,7 @@
 
         if(!$page_loaded) {
             require($layout->sidebarModule);
-            require($layout->topbarModule); 
+            require($layout->topbarModule);
             echo str_replace("[HEADER_TITLE]", "Profile", $layout->body_start);
 
             $system->printMessage();
