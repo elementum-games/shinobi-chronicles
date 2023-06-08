@@ -343,7 +343,7 @@ else {
     echo $layout->login_menu;
 }
 
-if ($layout->key != "new_geisha") {
+if ($layout->key == "new_geisha") {
     echo "</div>";
 }
 
