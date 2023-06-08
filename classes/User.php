@@ -1148,7 +1148,7 @@ class User extends Fighter {
                             message: "Training " . $this->jutsu[$jutsu_id]->name . " Complete",
                             user_id: $this->user_id,
                             created: time(),
-                            alert: true,
+                            alert: $this->system->environment == System::ENVIRONMENT_DEV ? true : false,
                         );
                         NotificationManager::createNotification($new_notification, $this->system, NotificationManager::UPDATE_UNIQUE);
 
@@ -1202,7 +1202,7 @@ class User extends Fighter {
                     message: "Training " . System::unSlug($this->train_type) . " Complete",
                     user_id: $this->user_id,
                     created: time(),
-                    alert: true,
+                    alert: $this->system->environment == System::ENVIRONMENT_DEV ? true : false,
                 );
                 NotificationManager::createNotification($new_notification, $this->system, NotificationManager::UPDATE_UNIQUE);
             }

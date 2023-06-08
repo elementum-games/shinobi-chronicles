@@ -234,26 +234,9 @@
 
     // Render hotbar
     if (!$system->is_legacy_ajax_request && isset($player)) {
-        $rank_names = RankManager::fetchNames($system);
-        $max_mission_rank = Mission::maxMissionRank($player->rank_num);
-
-        $result = $system->query("SELECT `mission_id`, `name` FROM `missions` WHERE `mission_type`=1 OR `mission_type`=5 AND `rank` <= $max_mission_rank");
-
-        $missions = array();
-        while($row = $system->db_fetch($result)) {
-            $missions[$row['mission_id']] = $row;
+        if ($system->environment == System::ENVIRONMENT_DEV) {
+            require($layout->hotbarModule);
         }
-
-        $ai_rank = min($player->rank_num, System::SC_MAX_RANK);
-        $result = $system->query("SELECT `ai_id`, `name` FROM `ai_opponents`
-			WHERE `rank` = {$ai_rank} ORDER BY `level` ASC");
-
-        $ai_opponents = array();
-        while($row = $system->db_fetch($result)) {
-            $ai_opponents[$row['ai_id']] = $row;
-        }
-
-        require($layout->hotbarModule);
     }
 
     // Render footer

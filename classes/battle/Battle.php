@@ -145,7 +145,7 @@ class Battle {
                 user_id: $player2->user_id,
                 created: time(),
                 battle_id: $battle_id,
-                alert: true,
+                alert: $system->environment == System::ENVIRONMENT_DEV ? true : false,
             );
             NotificationManager::createNotification($new_notification, $system, NotificationManager::UPDATE_REPLACE);
         }

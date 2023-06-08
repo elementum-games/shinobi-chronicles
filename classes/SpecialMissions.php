@@ -355,7 +355,7 @@ class SpecialMission {
                     message: "Special Mission completed",
                     user_id: $this->player->user_id,
                     created: time(),
-                    alert: true,
+                    alert: $this->system->environment == System::ENVIRONMENT_DEV ? true : false,
                 );
                 NotificationManager::createNotification($new_notification, $this->system, NotificationManager::UPDATE_REPLACE);
                 break;
@@ -368,7 +368,7 @@ class SpecialMission {
                     message: "Special Mission failed",
                     user_id: $this->player->user_id,
                     created: time(),
-                    alert: true,
+                    alert: $this->system->environment == System::ENVIRONMENT_DEV ? true : false,
                 );
                 NotificationManager::createNotification($new_notification, $this->system, NotificationManager::UPDATE_REPLACE);
                 break;
