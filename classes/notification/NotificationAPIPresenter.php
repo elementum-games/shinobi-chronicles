@@ -35,14 +35,4 @@ class NotificationApiPresenter
             $notificationManager->getUserNotifications()
         );
     }
-
-    public static function closeNotificationResponse(NotificationAPIManager $notificationManager, int $notification_id): bool
-    {
-        return $notificationManager->closeNotification($notification_id);
-    }
-
-    public static function clearNotificationAlertResponse(NotificationAPIManager $notificationManager, int $notification_id): bool
-    {
-        return $notificationManager->clearNotificationAlert($notification_id);
-    }
 }
