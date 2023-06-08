@@ -27,7 +27,7 @@ class BattleNotificationDto extends NotificationDto {
         $this->battle_id = $battle_id;
     }
 
-    public static function fromDb($row, $action_url) {
+    public static function fromDb($row, $action_url): BattleNotificationDto {
         $attributes = json_decode($row['attributes'], true);
         $notification = new BattleNotificationDto();
         $notification->type = $row['type'];
@@ -42,7 +42,7 @@ class BattleNotificationDto extends NotificationDto {
         return $notification;
     }
 
-    public function getAttributes() {
+    public function getAttributes(): array {
         return [
             'battle_id' => $this->battle_id,
         ];
