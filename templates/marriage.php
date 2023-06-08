@@ -10,15 +10,15 @@
 ?>
 
 <style>
-    label {
+    #marriage_table label {
         width: 9em;
         display: inline-block;
     }
-    input[type=submit] {
+    #marriage_table input[type=submit] {
         margin: 3px;
     }
 
-    div#perk_details {
+    #marriage_table div#perk_details {
         width: 70%;
 
         margin-left: 9em;
@@ -28,7 +28,7 @@
     }
 </style>
 
-<table class="table">
+<table id="marriage_table" class="table">
     <?php if($proposal_sent): ?>
         <tr><th>Proposal to <?=$proposal_user['user_name']?></th></tr>
         <tr>

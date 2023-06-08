@@ -8,7 +8,7 @@ $system->is_api_request = true;
 
 try {
     $player = Auth::getUserFromSession($system);
-    $player->loadData(User::UPDATE_NOTHING);
+    $player->loadData(User::UPDATE_FULL);
 } catch (Exception $e) {
     API::exitWithError($e->getMessage());
 }
@@ -33,7 +33,12 @@ try {
             break;
         case "closeNotification":
             $NotificationResponse->response_data = [
-                'success' => NotificationAPIPresenter::closeNotificationResponse(notificationManager: $NotificationManager, notification_id: $_POST['notification_id']),
+                'success' => $NotificationManager->closeNotification($_POST['notification_id']),
+            ];
+            break;
+        case "clearNotificationAlert":
+            $NotificationResponse->response_data = [
+                'success' => $NotificationManager->clearNotificationAlert($_POST['notification_id']),
             ];
             break;
         default:

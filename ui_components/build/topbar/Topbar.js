@@ -18,6 +18,7 @@ function Topbar({
         return;
       } else {
         setNotificationData(response.data.userNotifications);
+        response.data.userNotifications.forEach(notification => checkNotificationAlert(notification));
       }
     });
   }
@@ -31,6 +32,17 @@ function Topbar({
         return;
       } else {
         getNotificationData();
+      }
+    });
+  }
+  function clearNotificationAlert(notification_id) {
+    apiFetch(links.notification_api, {
+      request: 'clearNotificationAlert',
+      notification_id: notification_id
+    }).then(response => {
+      if (response.errors.length) {
+        handleErrors(response.errors);
+        return;
       }
     });
   }
@@ -48,6 +60,40 @@ function Topbar({
     var formattedMinutes = minutes.toString().padStart(2, '0');
     var formattedSeconds = seconds.toString().padStart(2, '0');
     return formattedHours > 0 ? formattedHours + ':' + formattedMinutes + ':' + formattedSeconds : formattedMinutes + ':' + formattedSeconds;
+  }
+  function checkNotificationAlert(notification) {
+    if (notification.alert) {
+      console.log("here");
+      createNotification(notification.message);
+      clearNotificationAlert(notification.notification_id);
+    }
+  }
+  function createNotification(message) {
+    if (!window.Notification) {
+      console.log('Browser does not support notifications.');
+    } else {
+      // check if permission is already granted
+      if (Notification.permission === 'granted') {
+        // show notification here
+        var notify = new Notification('Shinobi Chronicles', {
+          body: message
+        });
+      } else {
+        // request permission from user
+        Notification.requestPermission().then(function (p) {
+          if (p === 'granted') {
+            // show notification here
+            var notify = new Notification('Shinobi Chronicles', {
+              body: message
+            });
+          } else {
+            console.log('User blocked notifications.');
+          }
+        }).catch(function (err) {
+          console.error(err);
+        });
+      }
+    }
   }
 
   // Content
@@ -214,43 +260,15 @@ function Topbar({
         x: "10%",
         y: "80%",
         className: "topbar_notification_mission"
-      }, notification.attributes.mission_rank), /*#__PURE__*/React.createElement("text", {
+      }, notification.mission_rank.charAt(0)), /*#__PURE__*/React.createElement("text", {
         x: "35%",
         y: "65%",
         className: "topbar_notification_mission"
-      }, notification.attributes.mission_rank), /*#__PURE__*/React.createElement("text", {
+      }, notification.mission_rank.charAt(0)), /*#__PURE__*/React.createElement("text", {
         x: "60%",
         y: "50%",
         className: "topbar_notification_mission"
-      }, notification.attributes.mission_rank)))), notification.type == "rank" && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("a", {
-        href: notification.action_url,
-        key: i,
-        className: notification.duration > 0 ? "topbar_notification_wrapper has_duration" : "topbar_notification_wrapper",
-        "data-content": notification.message,
-        "data-time": calculateTimeRemaining(notification.created, notification.duration)
-      }, /*#__PURE__*/React.createElement("svg", {
-        className: "topbar_notification_svg",
-        width: "40",
-        height: "40",
-        viewBox: "0 0 100 100"
-      }, /*#__PURE__*/React.createElement("polygon", {
-        points: "6,50 50,94 94,50 50,6",
-        strokeWidth: "8px",
-        stroke: "#5d5c4b",
-        fill: "#B09A65"
-      }), /*#__PURE__*/React.createElement("polygon", {
-        points: "6,50 50,94 94,50 50,6",
-        strokeWidth: "2px",
-        stroke: "#000000",
-        fill: "#B09A65"
-      }), /*#__PURE__*/React.createElement("image", {
-        className: "topbar_notification_icon",
-        height: "40",
-        width: "40",
-        x: "30%",
-        y: "27%",
-        href: "images/v2/icons/levelup.png"
-      })))), notification.type == "level" && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("a", {
+      }, notification.mission_rank.charAt(0))))), notification.type == "rank" && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("a", {
         href: notification.action_url,
         key: i,
         className: notification.duration > 0 ? "topbar_notification_wrapper has_duration" : "topbar_notification_wrapper",
@@ -340,12 +358,12 @@ function Topbar({
         points: "6,50 50,94 94,50 50,6",
         strokeWidth: "8px",
         stroke: "#5d5c4b",
-        fill: "#ae5576"
+        fill: "#B09A65"
       }), /*#__PURE__*/React.createElement("polygon", {
         points: "6,50 50,94 94,50 50,6",
         strokeWidth: "2px",
         stroke: "#000000",
-        fill: "#ae5576"
+        fill: "#B09A65"
       }), /*#__PURE__*/React.createElement("text", {
         x: "40%",
         y: "70%",
@@ -363,18 +381,21 @@ function Topbar({
       }, /*#__PURE__*/React.createElement("polygon", {
         points: "6,50 50,94 94,50 50,6",
         strokeWidth: "8px",
-        stroke: "#5d5c4b",
-        fill: "#ae5576"
+        stroke: "#4c1f1f",
+        fill: "#eb4648"
       }), /*#__PURE__*/React.createElement("polygon", {
         points: "6,50 50,94 94,50 50,6",
         strokeWidth: "2px",
         stroke: "#000000",
-        fill: "#ae5576"
-      }), /*#__PURE__*/React.createElement("text", {
-        x: "40%",
-        y: "70%",
-        className: "topbar_notification_important"
-      }, "!")))), notification.type == "challenge" && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("a", {
+        fill: "#eb4648"
+      }), /*#__PURE__*/React.createElement("image", {
+        className: "topbar_notification_icon",
+        height: "85",
+        width: "85",
+        x: "5%",
+        y: "12%",
+        href: "images/v2/icons/combat.png"
+      })))), notification.type == "challenge" && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("a", {
         href: notification.action_url,
         className: notification.duration > 0 ? "topbar_notification_wrapper has_duration" : "topbar_notification_wrapper",
         "data-content": notification.message,
@@ -388,12 +409,12 @@ function Topbar({
         points: "6,50 50,94 94,50 50,6",
         strokeWidth: "8px",
         stroke: "#5d5c4b",
-        fill: "#ae5576"
+        fill: "#B09A65"
       }), /*#__PURE__*/React.createElement("polygon", {
         points: "6,50 50,94 94,50 50,6",
         strokeWidth: "2px",
         stroke: "#000000",
-        fill: "#ae5576"
+        fill: "#B09A65"
       }), /*#__PURE__*/React.createElement("text", {
         x: "40%",
         y: "70%",
@@ -412,12 +433,12 @@ function Topbar({
         points: "6,50 50,94 94,50 50,6",
         strokeWidth: "8px",
         stroke: "#5d5c4b",
-        fill: "#ae5576"
+        fill: "#5964a6"
       }), /*#__PURE__*/React.createElement("polygon", {
         points: "6,50 50,94 94,50 50,6",
         strokeWidth: "2px",
         stroke: "#000000",
-        fill: "#ae5576"
+        fill: "#5964a6"
       }), /*#__PURE__*/React.createElement("text", {
         x: "40%",
         y: "70%",
@@ -436,12 +457,12 @@ function Topbar({
         points: "6,50 50,94 94,50 50,6",
         strokeWidth: "8px",
         stroke: "#5d5c4b",
-        fill: "#ae5576"
+        fill: "#5964a6"
       }), /*#__PURE__*/React.createElement("polygon", {
         points: "6,50 50,94 94,50 50,6",
         strokeWidth: "2px",
         stroke: "#000000",
-        fill: "#ae5576"
+        fill: "#5964a6"
       }), /*#__PURE__*/React.createElement("text", {
         x: "40%",
         y: "70%",
@@ -460,12 +481,12 @@ function Topbar({
         points: "6,50 50,94 94,50 50,6",
         strokeWidth: "8px",
         stroke: "#5d5c4b",
-        fill: "#ae5576"
+        fill: "#5964a6"
       }), /*#__PURE__*/React.createElement("polygon", {
         points: "6,50 50,94 94,50 50,6",
         strokeWidth: "2px",
         stroke: "#000000",
-        fill: "#ae5576"
+        fill: "#5964a6"
       }), /*#__PURE__*/React.createElement("text", {
         x: "40%",
         y: "70%",
@@ -484,12 +505,12 @@ function Topbar({
         points: "6,50 50,94 94,50 50,6",
         strokeWidth: "8px",
         stroke: "#5d5c4b",
-        fill: "#ae5576"
+        fill: "#5964a6"
       }), /*#__PURE__*/React.createElement("polygon", {
         points: "6,50 50,94 94,50 50,6",
         strokeWidth: "2px",
         stroke: "#000000",
-        fill: "#ae5576"
+        fill: "#5964a6"
       }), /*#__PURE__*/React.createElement("text", {
         x: "40%",
         y: "70%",
@@ -505,7 +526,13 @@ function Topbar({
   }
 
   // Initialize
-  React.useEffect(() => {}, []);
+  React.useEffect(() => {
+    const notificationInterval = setInterval(() => {
+      getNotificationData();
+    }, 10000);
+    notificationAPIData.userNotifications.forEach(notification => checkNotificationAlert(notification));
+    return () => clearInterval(notificationInterval);
+  }, []);
 
   // Display
   return /*#__PURE__*/React.createElement("div", {

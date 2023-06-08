@@ -12,6 +12,7 @@
 
 .topbar_right {
     width: var(--content-width);
+    margin-left: var(--content-sidebar-gap);
     justify-content: center;
     align-items: center;
 }

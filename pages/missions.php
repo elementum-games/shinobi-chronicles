@@ -63,15 +63,30 @@ function missions(): bool {
 
             // Create notification
             require_once __DIR__ . '/../classes/notification/NotificationManager.php';
-            $new_notification = new NotificationDto(
-                type: "mission",
-                message: "Mission in progress",
-                user_id: $player->user_id,
-                created: time(),
-                attributes: array('mission_rank' => substr(Mission::$rank_names[$missions[$mission_id]['rank']], 0, 1), 'mission_id' => $mission_id),
-                alert: false,
-            );
-            NotificationManager::createNotification($new_notification, $system, false);
+            if ($player->mission_stage['action_type'] == 'travel' or $player->mission_stage['action_type'] == 'search') {
+                $mission_location = TravelCoords::fromDbString($player->mission_stage['action_data']);
+                $new_notification = new MissionNotificationDto(
+                    type: "mission",
+                    message: $missions[$mission_id]['name'] . ": Travel to " . $mission_location->x . ":" . $mission_location->y,
+                    user_id: $player->user_id,
+                    created: time(),
+                    mission_rank: Mission::$rank_names[$missions[$mission_id]['rank']],
+                    alert: false,
+                );
+                NotificationManager::createNotification($new_notification, $system, NotificationManager::UPDATE_REPLACE);
+            }
+            else {
+                require_once __DIR__ . '/../classes/notification/NotificationManager.php';
+                $new_notification = new MissionNotificationDto(
+                    type: "mission",
+                    message: $missions[$mission_id]['name'] . " in progress",
+                    user_id: $player->user_id,
+                    created: time(),
+                    mission_rank: Mission::$rank_names[$missions[$mission_id]['rank']],
+                    alert: false,
+                );
+                NotificationManager::createNotification($new_notification, $system, NotificationManager::UPDATE_REPLACE);
+            }
 
             missions();
 			return true;

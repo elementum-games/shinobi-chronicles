@@ -54,7 +54,7 @@ function Sidebar({
   }
   // Utility
   function handleRegen() {
-    if (regenTimeVar.current <= 0 || regenTimeVar.current == 30) {
+    if (regenTimeVar.current <= 0) {
       getPlayerData();
     } else {
       regenTimeVar.current = regenTimeVar.current - 1;
@@ -124,9 +124,9 @@ function Sidebar({
     })));
   }
   function displayCharacterSection(playerData, regenTime, regenOffset) {
-    const health_width = Math.round(playerData.health / playerData.max_health * 100);
-    const chakra_width = Math.round(playerData.chakra / playerData.max_chakra * 100);
-    const stamina_width = Math.round(playerData.stamina / playerData.max_stamina * 100);
+    const health_width = Math.max(Math.round(playerData.health / playerData.max_health * 100), 6);
+    const chakra_width = Math.max(Math.round(playerData.chakra / playerData.max_chakra * 100), 6);
+    const stamina_width = Math.max(Math.round(playerData.stamina / playerData.max_stamina * 100), 6);
     return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
       className: "sb_avatar_container"
     }, /*#__PURE__*/React.createElement("div", {

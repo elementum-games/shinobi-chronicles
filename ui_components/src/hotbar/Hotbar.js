@@ -6,12 +6,9 @@ function Hotbar({ links, userAPIData }) {
     const [playerData, setPlayerData] = React.useState(userAPIData.playerData);
     const [aiData, setAIData] = React.useState(userAPIData.aiData);
     const [missionData, setMissionData] = React.useState(userAPIData.missionData);
-    //const [regen_time, setRegenTime] = React.useState(null);
-    //const [regen_offset, setRegenOffset] = React.useState(null);
     const [quickType, setQuickType] = React.useState("training");
     const [displayHotbar, toggleHotbarDisplay] = React.useState(false);
     const [displayKeybinds, toggleKeybindDisplay] = React.useState(false);
-    //const regen_time_var = React.useRef(0);
     const trainingFlag = React.useRef(0);
     const specialFlag = React.useRef(0);
     const battleFlag = React.useRef(null);
@@ -28,59 +25,10 @@ function Hotbar({ links, userAPIData }) {
             }
             else {
                 setPlayerData(response.data.playerData);
-                //setRegenTime(response.data.playerData.regen_time);
-                //setRegenOffset(calculateRegenOffset(response.data.playerData.regen_time));
-                //regen_time_var.current = response.data.playerData.regen_time;
                 checkNotificationFlags(response.data.playerData.training, response.data.playerData.special, response.data.playerData.battle);
             }
         })
     }
-
-    function getAIData() {
-        apiFetch(links.user_api, {
-            request: 'getAIData'
-        }).then(response => {
-            if (response.errors.length) {
-                handleErrors(response.errors);
-                return;
-            }
-            else {
-                setAIData(response.data.aiData);
-            }
-        })
-    }
-
-    function getMissionData() {
-        apiFetch(links.user_api, {
-            request: 'getMissionData'
-        }).then(response => {
-            if (response.errors.length) {
-                handleErrors(response.errors);
-                return;
-            }
-            else {
-                setMissionData(response.data.missionData);
-            }
-        })
-    }
-
-    // Utility
-    /*function handleRegen() {
-        if (regen_time_var.current <= 0 || regen_time_var.current == 30) {
-            getPlayerData();
-        }
-        else {
-            regen_time_var.current = regen_time_var.current - 1;
-            setRegenTime(regen_time => regen_time - 1);
-            setRegenOffset(calculateRegenOffset(regen_time_var.current));
-        }
-    }
-
-    function calculateRegenOffset(time) {
-        var percent = ((time / 60) * 100).toFixed(0);
-        var offset = 126 - (126 * percent) / 100;
-        return offset;
-    }*/
 
     function quickSelectOnChange(event) {
         setQuickType(event.target.selectedOptions[0].getAttribute('data-state'));
@@ -151,97 +99,6 @@ function Hotbar({ links, userAPIData }) {
             <div id="hb_toggle" onClick={hotbarToggle} className={"t-hover ft-s ft-c1 ft-default"}>Toggle Hotbar</div>
         );
     }
-
-    /*function displayCharacterSection(playerData, regen_time, regen_offset) {
-        const health_width = Math.round((playerData.health / playerData.max_health) * 100);
-        const chakra_width = Math.round((playerData.chakra / playerData.max_chakra) * 100);
-        const stamina_width = Math.round((playerData.stamina / playerData.max_stamina) * 100);
-
-        return (
-            <div id="hb_character_section" className="hb_section">
-                <div id="hb_character_container" className="d-flex">
-                    {<div className={displayHotbar ? "hb_avatar_container d-in_block" : "hb_avatar_container d-in_block minimize"}>
-                        <div className="hb_avatar_wrapper">
-                            <img className="hb_avatar_img" src={playerData.avatar_link} />
-                        </div>
-                    </div>}
-                    <div className={"hb_resources d-in_block"}>
-                        <div className={"hb_name_container t-left d-flex"}>
-                            <div className="d-in_block">
-                                <div className={"ft-p ft-c1 ft-xlarge ft-b"}>{playerData.user_name}</div>
-                                <div className={"ft-s ft-c1 ft-default"}>{playerData.rank_name} lvl {playerData.level}</div>
-                            </div>
-                            <div style={{ width: "100%" }} className="d-in_block">
-                                <div id="hb_regentimer">
-                                    <svg height="40" width="40" viewBox="0 0 50 50">
-                                        <circle id="hb_regentimer_circle" stroke="#7C88C3" cx="24.5" cy="24" r="20" strokeWidth="4" stroke-mitterlimit="0" fill="none" strokeDasharray="126" strokeDashoffset={regen_offset} transform="rotate(-90, 24.5, 24)"></circle>
-                                        <text id="hb_regentimer_text" className={"ft-s ft-b ft-large"} x="50%" y="50%" textAnchor="middle" dominantBaseline="middle">{regen_time}</text>
-                                    </svg>
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Health Bar }
-                        <div className="hb_resourceContainer">
-                            <div id="hb_health" className="hb_resourceBarOuter">
-                                <img className="hb_resource_corner_left" src="images/v2/decorations/barrightcorner.png" />
-                                <label className="hb_innerResourceBarLabel">
-                                    {playerData.health} / {playerData.max_health}
-                                </label>
-                                <div className={"hb_health hb_fill"} style={{ width: health_width + "%" }}>
-                                    <svg className="hb_resource_highlight_container">
-                                        <svg className="hb_resource_highlight_wrapper" viewBox="0 0 50 50">
-                                            <polygon x="50" points="20,25 0,5 5,5 25,25 5,45 0,45" id="hb_health_highlight" className="hb_resource_highlight" />
-                                        </svg>
-                                    </svg>
-                                </div>
-                                <div className={"hb_health hb_preview"}></div>
-                                <img className={"hb_resource_corner_right"} src="images/v2/decorations/barrightcorner.png" />
-                            </div>
-                        </div>
-
-                        {/* Chakra Bar }
-                        <div className="hb_resourceContainer">
-                            <div id="hb_chakra" className="hb_resourceBarOuter">
-                                <img className="hb_resource_corner_left" src="images/v2/decorations/barrightcorner.png" />
-                                <label className="hb_innerResourceBarLabel">
-                                    {playerData.chakra} / {playerData.max_chakra}
-                                </label>
-                                <div className={"hb_chakra hb_fill"} style={{ width: chakra_width + "%" }}>
-                                    <svg className="hb_resource_highlight_container">
-                                        <svg className="hb_resource_highlight_wrapper" viewBox="0 0 50 50">
-                                            <polygon x="50" points="20,25 0,5 5,5 25,25 5,45 0,45" id="hb_chakra_highlight" className="hb_resource_highlight" />
-                                        </svg>
-                                    </svg>
-                                </div>
-                                <div className={"hb_chakra hb_preview"}></div>
-                                <img className="hb_resource_corner_right" src="images/v2/decorations/barrightcorner.png" />
-                            </div>
-                        </div>
-
-                        {/* Stamina Bar }
-                        <div className="hb_resourceContainer">
-                            <div id="hb_stamina" className="hb_resourceBarOuter">
-                                <img className="hb_resource_corner_left" src="images/v2/decorations/barrightcorner.png" />
-                                <label className="hb_innerResourceBarLabel">
-                                    {playerData.stamina} / {playerData.max_stamina}
-                                </label>
-                                <div className={"hb_stamina hb_fill"} style={{ width: stamina_width + "%" }}>
-                                    <svg className="hb_resource_highlight_container">
-                                        <svg className="hb_resource_highlight_wrapper" viewBox="0 0 50 50">
-                                            <polygon x="50" points="20,25 0,5 5,5 25,25 5,45 0,45" id="hb_stamina_highlight" className="hb_resource_highlight" />
-                                        </svg>
-                                    </svg>
-                                </div>
-                                <div className={"hb_stamina hb_preview"}></div>
-                                <img className="hb_resource_corner_right" src="images/v2/decorations/barrightcorner.png" />
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        );
-    }*/
 
     function displayQuickSection(playerData, missionData, aiData, link_data, quickType) {
         return (
@@ -408,11 +265,6 @@ function Hotbar({ links, userAPIData }) {
     // Initialize
     React.useEffect(() => {
 
-        /*const regenInterval = setInterval(() => {
-            handleRegen();
-        }, 1000);
-
-        return () => clearInterval(regenInterval);*/
     }, []);
 
     // Display
