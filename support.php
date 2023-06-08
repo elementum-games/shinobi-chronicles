@@ -29,9 +29,18 @@ else {
 $request_types = $supportSystem->getSupportTypes($staff_level);
 $supportCreated = false;
 
-echo $layout->heading;
-echo $layout->top_menu;
-echo $layout->header;
+if ($layout->key == "new_geisha") {
+    require($layout->headerModule);
+    echo $layout->heading;
+    require($layout->sidebarModule);
+    require($layout->topbarModule);
+}
+else {
+    echo $layout->heading;
+    echo $layout->top_menu;
+    echo $layout->header;
+}
+
 echo str_replace("[HEADER_TITLE]", "Support", $layout->body_start);
 
 if($player != null) {
@@ -209,8 +218,10 @@ if($player != null) {
         }
     }
 
-    // Load side menu
-    $layout->renderSideMenu($player, $player->system->router);
+    if ($layout->key != "new_geisha") {
+        // Load side menu
+        $layout->renderSideMenu($player, $player->system->router);
+    }
 }
 else {
     // Get support data
@@ -330,6 +341,10 @@ else {
     require('templates/guestSupport.php');
 
     echo $layout->login_menu;
+}
+
+if ($layout->key == "new_geisha") {
+    echo "</div>";
 }
 
 $layout->renderFooter();

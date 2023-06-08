@@ -9,6 +9,8 @@
         // Master close
         if(!$system->SC_OPEN && !$player->isUserAdmin()) {
             if(!$system->is_legacy_ajax_request) {
+                require($layout->sidebarModule);
+                require($layout->topbarModule);
                 echo str_replace("[HEADER_TITLE]", "Profile", $layout->body_start);
             }
 
@@ -18,7 +20,6 @@
 		</td></tr></table>";
 
             if(!$system->is_legacy_ajax_request) {
-                echo $layout->side_menu_start . $layout->side_menu_end;
                 echo str_replace('<!--[VERSION_NUMBER]-->', System::VERSION_NUMBER, $layout->footer);
             }
             exit;
@@ -32,13 +33,14 @@
 
             //Display header
             if(!$system->is_legacy_ajax_request) {
+                require($layout->sidebarModule);
+                require($layout->topbarModule);
                 echo str_replace("[HEADER_TITLE]", "Profile", $layout->body_start);
             }
             //Ban info
             require 'templates/ban_info.php';
             // Footer
             if(!$system->is_legacy_ajax_request) {
-                echo $layout->side_menu_start . $layout->side_menu_end;
                 echo str_replace('<!--[VERSION_NUMBER]-->', System::VERSION_NUMBER, $layout->footer);
             }
             exit;
@@ -52,13 +54,14 @@
 
             //Display header
             if(!$system->is_legacy_ajax_request) {
+                require($layout->sidebarModule);
+                require($layout->topbarModule);
                 echo str_replace("[HEADER_TITLE]", "Profile", $layout->body_start);
             }
             //Ban info
             require 'templates/ban_info.php';
             // Footer
             if(!$system->is_legacy_ajax_request) {
-                echo $layout->side_menu_start . $layout->side_menu_end;
                 echo str_replace('<!--[VERSION_NUMBER]-->', System::VERSION_NUMBER, $layout->footer);
             }
             exit;
