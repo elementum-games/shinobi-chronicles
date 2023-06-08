@@ -1,0 +1,76 @@
+:root {
+    --avatar-size: 60px;
+}
+
+#chat_input_box {
+    width: 375px;
+    height: 100px;
+}
+#user_data_container {
+    display: flex;
+    flex-direction: row;
+}
+#user_data_container .avatarContainer {
+    max-width: clamp(45px, 100%, var(--avatar-size));
+    max-height: var(--avatar-size);
+    vertical-align: text-bottom;
+    flex-shrink: 0;
+}
+#user_data_container .avatarContainer img {
+    max-width: inherit !important;
+    max-height: inherit !important;
+}
+#user_data_container .character_info {
+    display: block;
+    align-self: center;
+    flex-grow: 1;
+    word-wrap: anywhere;
+}
+#user_data_container .character_info a {
+    display: inline-block;
+}
+#user_data_container .character_info p {
+    margin: 1px 0 3px;
+}
+#user_data_container .character_info .villageIco {
+    max-width:20px;
+    max-height:20px;
+    vertical-align:text-bottom;
+}
+.small_image {
+    max-width:20px;
+    max-height:20px;
+}
+.mention {
+    background-color: rgba(255, 255, 0, 0.3);
+}
+#meme_modal {
+    position: absolute;
+    z-index: 1001;
+    top: 3%;
+    left: 50%;
+    border-radius: 10px;
+    background-color: var(--theme-content-bg-color);
+    transform: translate(-50%, -50%);
+}
+#meme_box {
+    overflow-y: auto;
+    height: 200px;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+.meme_select {
+    cursor: pointer;
+    flex-basis: 40px;
+    min-width: 0;
+    padding: 4px;
+}
+.meme_select img {
+    max-width: 40px !important;
+    max-height: 40px !important;
+}
+.hidden {
+    display: none !important;
+}

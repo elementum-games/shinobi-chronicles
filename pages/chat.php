@@ -1,19 +1,18 @@
 <?php
-/*
-File: 		chat.php
-Coder:		Levi Meahan
-Update By:  Hitori
-Created:	02/26/2013
-Revised:	1/27/2023 by Hitori
-Purpose:	Function for displaying and allowing users to post messages to tavern chat
-Algorithm:	See master_plan.html
-*/
-function chat() {
 
+/**
+ * @throws Exception
+ */
+function chat() {
     require_once 'classes/ReportManager.php';
 	global $system;
 	global $player;
 	global $self_link;
+
+    if($system->environment == System::ENVIRONMENT_DEV) {
+        chatV2();
+        return true;
+    }
 
 	if($player->checkBan(StaffManager::BAN_TYPE_CHAT)) {
         $ban_type = StaffManager::BAN_TYPE_CHAT;
@@ -24,7 +23,7 @@ function chat() {
     }
 
 	// Validate post and submit to DB
-    $chat_max_post_length = System::CHAT_MAX_POST_LENGTH;
+    $chat_max_post_length = ChatManager::MAX_POST_LENGTH;
     //Increase chat length limit for seal users & staff members
     if($player->staff_level && $player->forbidden_seal->level == 0) {
         $chat_max_post_length = ForbiddenSeal::$benefits[ForbiddenSeal::$STAFF_SEAL_LEVEL]['chat_post_size'];
@@ -207,4 +206,17 @@ function chat() {
     }
 
     require 'templates/chat.php';
+}
+
+/**
+ * @throws Exception
+ */
+function chatV2(): void {
+    global $system;
+    global $player;
+
+    $chatManager = new ChatManager($system, $player);
+    $initialChatPostsResponse = $chatManager->loadPosts();
+
+    require 'templates/chat_v2.php';
 }

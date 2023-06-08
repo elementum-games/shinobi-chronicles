@@ -3,6 +3,8 @@
  * @var System $system
  * @var User $player
  * @var string $self_link
+ *
+<?php $memes = $system->getMemes(); ?>
  */
 ?>
 <?php if(!$system->is_legacy_ajax_request): ?>

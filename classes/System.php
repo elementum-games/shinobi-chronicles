@@ -107,9 +107,6 @@ class System {
         )
     );
 
-    //Chat variables
-    const CHAT_MAX_POST_LENGTH = 350;
-
     // Default layout
     const DEFAULT_LAYOUT = 'shadow_ribbon';
     const VERSION_NUMBER = '0.8.0';

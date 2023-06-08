@@ -244,4 +244,3 @@
         $page_load_time = round(microtime(true) - $PAGE_LOAD_START, 3);
         $layout->renderFooter($page_load_time);
     }
-?>
