@@ -1199,7 +1199,7 @@ class User extends Fighter {
                 // Create notification
                 $new_notification = new NotificationDto(
                     type: "training_complete",
-                    message: "Training " . System::unSlug($this->train_type) . " Complete",
+                    message: $gain_description . '.' . $team_boost_description,
                     user_id: $this->user_id,
                     created: time(),
                     alert: $this->system->environment == System::ENVIRONMENT_DEV ? true : false,
