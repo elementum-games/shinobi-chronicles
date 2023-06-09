@@ -298,11 +298,11 @@ class NotificationAPIManager {
 
     public function closeNotification(int $notification_id): bool {
         $this->system->query("DELETE FROM `notifications` WHERE `notification_id` = {$notification_id}");
-        return $this->system->db_last_num_rows > 0 ? true : false;
+        return $this->system->db_last_affected_rows > 0 ? true : false;
     }
 
     public function clearNotificationAlert(int $notification_id): bool {
         $this->system->query("UPDATE `notifications` set `alert` = 0 WHERE `notification_id` = {$notification_id}");
-        return $this->system->db_last_num_rows > 0 ? true : false;
+        return $this->system->db_last_affected_rows > 0 ? true : false;
     }
 }

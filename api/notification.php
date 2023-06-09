@@ -34,12 +34,12 @@ try {
             break;
         case "closeNotification":
             $NotificationResponse->response_data = [
-                'success' => $NotificationManager->closeNotification($_POST['notification_id']),
+                'success' => $NotificationManager->closeNotification($system->clean($_POST['notification_id'])),
             ];
             break;
         case "clearNotificationAlert":
             $NotificationResponse->response_data = [
-                'success' => $NotificationManager->clearNotificationAlert($_POST['notification_id']),
+                'success' => $NotificationManager->clearNotificationAlert($system->clean($_POST['notification_id'])),
             ];
             break;
         default:
