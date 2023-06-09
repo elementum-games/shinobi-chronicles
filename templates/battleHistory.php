@@ -4,7 +4,7 @@
 /** @var System $system */
 
 ?>
-<table class='table'>
+<table class='table' style="text-align:center;">
     <tr>
         <th colspan='4'>View Battles</th>
     </tr>
@@ -37,7 +37,7 @@
 </table>
 
 <?php if ($battle_logs): ?>
-<table class='table'>
+<table class='table' style="text-align:center;">
     <tr>
         <th>Battle Log</th>
     </tr>

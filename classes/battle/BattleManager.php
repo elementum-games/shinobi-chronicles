@@ -731,24 +731,49 @@ class BattleManager {
         $attack_jutsu_color = BattleManager::getJutsuTextColor($attack->jutsu->jutsu_type);
 
         if(empty($attack->jutsu->effect_only)) {
-            $text .= "<p style=\"font-weight:bold;\">
+           /* $text .= "<p style=\"font-weight:bold;\">
                             {$user->getName()} deals
                                 <span style=\"color:{$attack_jutsu_color}\">
                                     " . sprintf('%.2f', $attack_damage) . " damage
                                 </span>
                             to {$target->getName()}.
-                        </p>";
-
-              if(!$damage_resisted <= 0 ) {
-                     $text .=  "<p style=\"font-weight:bold;\">
-                             {$target->getName()} resists
-                                 <span style=\"color:{$attack_jutsu_color}\">
-                                     " . sprintf('%.2f', $damage_resisted) . "
-                                 </span>
-                                    of {$user->getName()} damage.
-                                </p>";
+                        </p>"; 
+                        
+                        if($damage_resisted > 0 ) {
+                 $text .=  "<p style=\"font-weight:bold;\">
+                         {$target->getName()} resists
+                            <span style=\"color:{$attack_jutsu_color}\">
+                                 " . sprintf('%.2f', $damage_resisted) . "
+                              </span>
+                                damage from {$user->getName()}.
+                            </p>";
                         }
-        }
+                        */
+
+              if($damage_resisted > 0 ) {
+                    $text .= "<p style=\"font-weight:bold;\">
+                            {$user->getName()} deals
+                                <span style=\"color:{$attack_jutsu_color}\">
+                                    " . sprintf('%.2f', $attack_damage) . " damage
+                                </span>
+                                    to {$target->getName()}. 
+                                <span style=\"font-weight:bold;\">
+                                    (resists
+                                 <span style=\"color:{$attack_jutsu_color}\">
+                                    " . sprintf('%.2f', $damage_resisted) . "
+                                </span>
+                                 damage)
+                            </p>"; }
+                else { 
+                    $text .= "<p style=\"font-weight:bold;\">
+                        {$user->getName()} deals
+                            <span style=\"color:{$attack_jutsu_color}\">
+                                " . sprintf('%.2f', $attack_damage) . " damage
+                            </span>
+                                to {$target->getName()}.
+                            </p>"; }
+                }
+
         if($this->effects->hasDisplays($user)) {
             $text .= '<p>' . $this->effects->getDisplayText($user) . '</p>';
         }

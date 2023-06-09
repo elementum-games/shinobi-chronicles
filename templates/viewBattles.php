@@ -3,7 +3,7 @@
 /** @var string $self_link */
 
 ?>
-<table class='table'>
+<table class='table' style="text-align:center;">
     <tr><th colspan='3'>View Battles</th></tr>
     <tr id='viewBattles_headers'>
         <th>Player 1</th>
