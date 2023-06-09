@@ -15,7 +15,16 @@ else {
     require_once 'classes/Bloodline.php';
 }
 
-$layout->renderStaticPageHeader('Manual');
+if ($layout->key == "new_geisha") {
+    require($layout->headerModule);
+    echo $layout->heading;
+    require($layout->sidebarModule);
+    require($layout->topbarModule);
+    echo "<div id='content'>";
+} else {
+    $layout->renderStaticPageHeader('Manual');
+}
+
 
 ?>
 
@@ -350,6 +359,11 @@ $layout->renderStaticPageHeader('Manual');
     }
   }
 </script>
-
+</div>
 <?php
-$layout->renderStaticPageFooter($player ?? null);
+if ($layout->key == "new_geisha") {
+    echo "</div></div>";
+    $layout->renderFooter();
+} else {
+    $layout->renderStaticPageFooter($player ?? null);
+}

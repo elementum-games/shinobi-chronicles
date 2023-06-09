@@ -364,7 +364,7 @@ class SpecialMission {
                 // Create notification
                 require_once __DIR__ . '/../classes/notification/NotificationManager.php';
                 $new_notification = new NotificationDto(
-                    type: "specialmission_complete",
+                    type: "specialmission_failed",
                     message: "Special Mission failed",
                     user_id: $this->player->user_id,
                     created: time(),

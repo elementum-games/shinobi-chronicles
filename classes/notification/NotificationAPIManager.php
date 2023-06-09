@@ -66,6 +66,14 @@ class NotificationAPIManager {
                         $notifications[] = NotificationDto::fromDb($row, $this->system->router->getUrl("specialmissions"));
                     }
                     break;
+                case "specialmission_failed":
+                    if ($this->player->special_mission != 0) {
+                        $notification_ids_to_delete[] = $row['notification_id'];
+                        continue 2;
+                    } else {
+                        $notifications[] = NotificationDto::fromDb($row, $this->system->router->getUrl("specialmissions"));
+                    }
+                    break;
                 case "mission":
                     if ($this->player->mission_id == 0) {
                         $notification_ids_to_delete[] = $row['notification_id'];
@@ -290,11 +298,11 @@ class NotificationAPIManager {
 
     public function closeNotification(int $notification_id): bool {
         $this->system->query("DELETE FROM `notifications` WHERE `notification_id` = {$notification_id}");
-        return $this->system->db_last_num_rows > 0 ? true : false;
+        return $this->system->db_last_affected_rows > 0 ? true : false;
     }
 
     public function clearNotificationAlert(int $notification_id): bool {
         $this->system->query("UPDATE `notifications` set `alert` = 0 WHERE `notification_id` = {$notification_id}");
-        return $this->system->db_last_num_rows > 0 ? true : false;
+        return $this->system->db_last_affected_rows > 0 ? true : false;
     }
 }
