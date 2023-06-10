@@ -21,8 +21,8 @@
             React.createElement(Chat, {
                 chatApiLink: "<?= $system->router->api_links['chat'] ?>",
                 initialPosts: initialPostsResponse.posts,
-                initialNextPageIndex: initialPostsResponse.nextPageIndex,
-                initialMaxPostIndex: initialPostsResponse.maxPostIndex,
+                initialNextPagePostId: initialPostsResponse.nextPagePostId,
+                initialLatestPostId: initialPostsResponse.latestPostId,
                 maxPostLength: <?= $chatManager->maxPostLength() ?>,
                 isModerator: <?= $player->isModerator() ?>,
                 initialBanInfo

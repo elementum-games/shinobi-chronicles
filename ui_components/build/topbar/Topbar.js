@@ -1,15 +1,13 @@
 import { apiFetch } from "../utils/network.js";
-const notificationRefreshInterval = 5000;
+const notificationRefreshInterval = 5000; // Initialize
 
-// Initialize
 function Topbar({
   links,
   notificationAPIData
 }) {
   // Hooks
-  const [notificationData, setNotificationData] = React.useState(notificationAPIData.userNotifications);
+  const [notificationData, setNotificationData] = React.useState(notificationAPIData.userNotifications); // API
 
-  // API
   function getNotificationData() {
     apiFetch(links.notification_api, {
       request: 'getUserNotifications'
@@ -18,10 +16,12 @@ function Topbar({
         handleErrors(response.errors);
         return;
       }
+
       setNotificationData(response.data.userNotifications);
       response.data.userNotifications.forEach(notification => checkNotificationAlert(notification));
     });
   }
+
   function closeNotification(notificationId) {
     apiFetch(links.notification_api, {
       request: 'closeNotification',
@@ -31,9 +31,11 @@ function Topbar({
         handleErrors(response.errors);
         return;
       }
+
       getNotificationData();
     });
   }
+
   function clearNotificationAlert(notification_id) {
     apiFetch(links.notification_api, {
       request: 'clearNotificationAlert',
@@ -44,6 +46,7 @@ function Topbar({
       }
     });
   }
+
   function checkNotificationAlert(notification) {
     if (notification.alert) {
       console.log("here");
@@ -51,6 +54,7 @@ function Topbar({
       clearNotificationAlert(notification.notification_id);
     }
   }
+
   function createNotification(message) {
     if (!window.Notification) {
       console.log('Browser does not support notifications.');
@@ -77,24 +81,22 @@ function Topbar({
         });
       }
     }
-  }
+  } // Misc
 
-  // Misc
+
   function handleErrors(errors) {
-    console.warn(errors);
-    //setFeedback([errors, 'info']);
-  }
+    console.warn(errors); //setFeedback([errors, 'info']);
+  } // Initialize
 
-  // Initialize
+
   React.useEffect(() => {
     const notificationIntervalId = setInterval(() => {
       getNotificationData();
     }, notificationRefreshInterval);
     notificationAPIData.userNotifications.forEach(notification => checkNotificationAlert(notification));
     return () => clearInterval(notificationIntervalId);
-  }, []);
+  }, []); // Display
 
-  // Display
   return /*#__PURE__*/React.createElement("div", {
     id: "topbar",
     className: "d-flex"
@@ -118,6 +120,7 @@ function Topbar({
     });
   })))));
 }
+
 function TopbarNotification({
   notification,
   closeNotification
@@ -551,13 +554,14 @@ function TopbarNotification({
     y: "70%",
     className: "topbar_notification_important"
   }, "!"))));
-}
+} // Utility
 
-// Utility
+
 function calculateTimeRemaining(created, duration) {
   const currentTimeTicks = new Date().getTime();
   return formatTimeRemaining(created + duration - currentTimeTicks / 1000);
 }
+
 function formatTimeRemaining(seconds) {
   const hours = Math.floor(seconds / 3600);
   const minutes = Math.floor(seconds % 3600 / 60);
@@ -567,4 +571,5 @@ function formatTimeRemaining(seconds) {
   const formattedSeconds = seconds.toString().padStart(2, '0');
   return hours > 0 ? formattedHours + ':' + formattedMinutes + ':' + formattedSeconds : formattedMinutes + ':' + formattedSeconds;
 }
+
 window.Topbar = Topbar;

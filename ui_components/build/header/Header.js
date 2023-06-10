@@ -1,15 +1,13 @@
-import { apiFetch } from "../utils/network.js";
+import { apiFetch } from "../utils/network.js"; // Initialize
 
-// Initialize
 function Header({
   links,
   navigationAPIData
 }) {
   // Hooks
   const [headerMenu, setHeaderMenu] = React.useState(navigationAPIData.headerMenu);
-  const [serverTime, setServerTime] = React.useState(null);
+  const [serverTime, setServerTime] = React.useState(null); // API
 
-  // API
   function getHeaderMenu() {
     apiFetch(links.navigation_api, {
       request: 'getHeaderMenu'
@@ -21,8 +19,9 @@ function Header({
         setHeaderMenu(response.data.headerMenu);
       }
     });
-  }
-  // Utility
+  } // Utility
+
+
   function getCurrentTime() {
     var currentDate = new Date();
     var options = {
@@ -36,8 +35,9 @@ function Header({
       hour12: true
     });
     setServerTime(formattedDate + ' - ' + formattedTime);
-  }
-  // Content
+  } // Content
+
+
   function displayHeader(headerData, serverTime) {
     return /*#__PURE__*/React.createElement("div", {
       className: "header_bar"
@@ -56,26 +56,25 @@ function Header({
     }), /*#__PURE__*/React.createElement("div", {
       className: "header_time_label ft-default ft-s ft-c5"
     }, serverTime))));
-  }
+  } // Misc
 
-  // Misc
+
   function handleErrors(errors) {
-    console.warn(errors);
-    //setFeedback([errors, 'info']);
-  }
+    console.warn(errors); //setFeedback([errors, 'info']);
+  } // Initialize
 
-  // Initialize
+
   React.useEffect(() => {
     getCurrentTime();
     const timeInterval = setInterval(() => {
       getCurrentTime();
     }, 1000);
     return () => clearInterval(timeInterval);
-  }, []);
+  }, []); // Display
 
-  // Display
   return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
     className: "header_bar_left"
   }), headerMenu && displayHeader(headerMenu, serverTime));
 }
+
 window.Header = Header;

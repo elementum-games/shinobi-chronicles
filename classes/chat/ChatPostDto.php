@@ -12,7 +12,7 @@ class ChatPostDto {
         public string $user_color,
         public string $avatar = "",
         public string $status_type = "",
-        public string $class = "",
+        public array $user_link_class_names = [],
         public string $staff_banner_name = "",
         public string $staff_banner_color = "",
         public string $time_string = ""

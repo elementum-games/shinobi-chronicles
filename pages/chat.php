@@ -36,7 +36,7 @@ function chat() {
         $_SESSION['quick_reply'] = true;
     }
 	if(isset($_POST['post'])) {
-    //If user has seal or is of staff, give them their words
+        // If user has seal or is of staff, give them their words
 		$chat_max_post_length += $player->forbidden_seal ? 100 : 0;
         $message_length = strlen(preg_replace('/[\\n\\r]+/', '', trim($_POST['post'])));
 		$message = $system->clean(stripslashes($_POST['post']));

@@ -4,18 +4,19 @@ const chatRefreshInterval = 5000;
 function Chat({
   chatApiLink,
   initialPosts,
-  initialNextPageIndex,
-  initialMaxPostIndex,
+  initialNextPagePostId,
+  initialLatestPostId,
   maxPostLength,
   isModerator,
   initialBanInfo
 }) {
   const [banInfo, setBanInfo] = React.useState(initialBanInfo);
   const [posts, setPosts] = React.useState(initialPosts);
-  const [previousPageIndex, setPreviousPageIndex] = React.useState(0);
-  const [currentPageIndex, setCurrentPageIndex] = React.useState(0);
-  const [nextPageIndex, setNextPageIndex] = React.useState(initialNextPageIndex);
-  const [maxPostIndex, setMaxPostIndex] = React.useState(initialMaxPostIndex);
+  const [nextPagePostId, setNextPagePostId] = React.useState(initialNextPagePostId);
+  const [latestPostId, setLatestPostId] = React.useState(initialLatestPostId); // Only set if we're paginating
+
+  const [previousPagePostId, setPreviousPagePostId] = React.useState(null);
+  const currentPagePostIdRef = React.useRef(null);
   const [error, setError] = React.useState(null);
 
   if (banInfo.isBanned) {
@@ -26,30 +27,58 @@ function Chat({
     });
   }
 
-  function getPosts() {
-    apiFetch('/api/chat.php', {
+  const refreshChat = function () {
+    if (currentPagePostIdRef.current != null) {
+      return;
+    }
+
+    apiFetch(chatApiLink, {
       request: 'load_posts'
     }).then(handleApiResponse);
-  }
+  };
+
+  React.useEffect(() => {
+    const intervalId = setInterval(refreshChat, chatRefreshInterval);
+    return () => clearInterval(intervalId);
+  }, []);
 
   function submitPost(message) {
-    apiFetch('/api/chat.php', {
+    apiFetch(chatApiLink, {
       request: 'submit_post',
       message: message
     }).then(handleApiResponse);
   }
 
   function deletePost(postId) {
-    apiFetch('/api/chat.php', {
+    apiFetch(chatApiLink, {
       request: 'delete_post',
       post_id: postId
     }).then(handleApiResponse);
   }
 
-  React.useEffect(() => {
-    const intervalId = setInterval(getPosts, chatRefreshInterval);
-    return () => clearInterval(intervalId);
-  }, []);
+  function changePage(newStartingPostId) {
+    if (newStartingPostId === currentPagePostIdRef.current) {
+      return;
+    }
+
+    if (newStartingPostId == null || newStartingPostId >= latestPostId) {
+      currentPagePostIdRef.current = null;
+      apiFetch(chatApiLink, {
+        request: 'load_posts'
+      }).then(handleApiResponse);
+      return;
+    }
+
+    if (newStartingPostId === currentPagePostIdRef.current) {
+      return;
+    }
+
+    currentPagePostIdRef.current = newStartingPostId;
+    apiFetch(chatApiLink, {
+      request: 'load_posts',
+      starting_post_id: newStartingPostId
+    }).then(handleApiResponse);
+  }
 
   const handleApiResponse = response => {
     if (response.data.banInfo && response.data.banInfo.isBanned) {
@@ -67,20 +96,16 @@ function Chat({
       setPosts(response.data.posts);
     }
 
-    if (response.data.previousPageIndex != null) {
-      setPreviousPageIndex(response.data.previousPageIndex);
+    if (response.data.latestPostId != null) {
+      setLatestPostId(response.data.latestPostId);
     }
 
-    if (response.data.currentPageIndex != null) {
-      setCurrentPageIndex(response.data.currentPageIndex);
+    if (typeof response.data.previousPagePostId != "undefined") {
+      setPreviousPagePostId(response.data.previousPagePostId);
     }
 
-    if (response.data.nextPageIndex != null) {
-      setNextPageIndex(response.data.nextPageIndex);
-    }
-
-    if (response.data.maxPostIndex != null) {
-      setMaxPostIndex(response.data.maxPostIndex);
+    if (typeof response.data.nextPagePostId != "undefined") {
+      setNextPagePostId(response.data.nextPagePostId);
     }
   };
 
@@ -91,12 +116,12 @@ function Chat({
     submitPost: submitPost
   }), /*#__PURE__*/React.createElement(ChatPosts, {
     posts: posts,
-    previousPostIndex: previousPageIndex,
-    currentPageIndex: currentPageIndex,
-    nextPageIndex: nextPageIndex,
-    maxPostIndex: maxPostIndex,
+    previousPagePostId: previousPagePostId,
+    nextPagePostId: nextPagePostId,
     isModerator: isModerator,
-    deletePost: deletePost
+    deletePost: deletePost,
+    goToNextPage: () => changePage(nextPagePostId),
+    goToPreviousPage: () => changePage(previousPagePostId)
   }));
 }
 
@@ -138,29 +163,22 @@ function ChatInput({
   }
 
   const handlePostSubmit = React.useCallback(() => {
+    console.log(message);
     submitPost(message); // TODO: Only clear this on a successful server response
 
     setMessage("");
   }, [message, submitPost]);
   const handleKeyDown = React.useCallback(e => {
-    if (e.which !== 13) {
+    if (e.code !== "Enter") {
       return;
     }
 
     if (quickReply && !e.shiftKey) {
       e.preventDefault();
+      setMessage(e.target.value);
       handlePostSubmit();
     }
-  }, [quickReply, message, submitPost]);
-
-  function handleInputFocus() {
-    document.addEventListener('keydown', handleKeyDown);
-  }
-
-  function handleInputBlur() {
-    document.removeEventListener('keydown', handleKeyDown);
-  }
-
+  }, [quickReply, handlePostSubmit]);
   const charactersRemaining = maxPostLength - message.length;
   const charactersRemainingDisplay = `Characters remaining: ${charactersRemaining} of ${maxPostLength}`;
   return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("table", {
@@ -178,8 +196,7 @@ function ChatInput({
     maxLength: maxPostLength,
     value: message,
     onChange: e => setMessage(e.target.value),
-    onFocus: handleInputFocus,
-    onBlur: handleInputBlur
+    onKeyDown: handleKeyDown
   }), /*#__PURE__*/React.createElement("br", null), /*#__PURE__*/React.createElement("input", {
     type: "checkbox",
     checked: quickReply,
@@ -215,15 +232,13 @@ function ChatMemeModal({
 
 function ChatPosts({
   posts,
-  currentPageIndex,
-  maxPostIndex,
+  previousPagePostId,
+  nextPagePostId,
   isModerator,
-  deletePost
+  deletePost,
+  goToPreviousPage,
+  goToNextPage
 }) {
-  function handlePreviousClick() {}
-
-  function handleNextClick() {}
-
   return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("table", {
     className: "table",
     style: {
@@ -262,7 +277,7 @@ function ChatPosts({
     className: "character_info"
   }, /*#__PURE__*/React.createElement("a", {
     href: post.userProfileLink,
-    className: `${post.class} ${post.statusType}`
+    className: post.userLinkClassNames.join(' ')
   }, post.userName), /*#__PURE__*/React.createElement("br", null), /*#__PURE__*/React.createElement("p", null, /*#__PURE__*/React.createElement("img", {
     className: "villageIcon",
     src: `./images/village_icons/${post.userVillage.toLowerCase()}.png`,
@@ -285,13 +300,11 @@ function ChatPosts({
     style: {
       marginBottom: "2px"
     }
-  }, post.timeString), isModerator && /*#__PURE__*/React.createElement("a", {
-    className: "imageLink",
+  }, post.timeString), isModerator && /*#__PURE__*/React.createElement("img", {
+    className: "delete_post_icon small_image",
+    src: "../images/delete_icon.png",
     onClick: () => deletePost(post.id)
-  }, /*#__PURE__*/React.createElement("img", {
-    className: "small_image",
-    src: "../images/delete_icon.png"
-  })), /*#__PURE__*/React.createElement("a", {
+  }), /*#__PURE__*/React.createElement("a", {
     className: "imageLink",
     href: post.reportLink
   }, /*#__PURE__*/React.createElement("img", {
@@ -301,10 +314,12 @@ function ChatPosts({
     style: {
       textAlign: "center"
     }
-  }, currentPageIndex > 0 && /*#__PURE__*/React.createElement("a", {
-    onClick: handlePreviousClick
-  }, "Previous"), currentPageIndex < maxPostIndex && /*#__PURE__*/React.createElement(React.Fragment, null, currentPageIndex !== 0 && "&nbsp;&nbsp;|&nbsp;&nbsp;", /*#__PURE__*/React.createElement("a", {
-    onClick: handleNextClick
+  }, previousPagePostId != null && /*#__PURE__*/React.createElement("a", {
+    className: "paginationLink",
+    onClick: goToPreviousPage
+  }, "Previous"), nextPagePostId != null && /*#__PURE__*/React.createElement(React.Fragment, null, previousPagePostId != null && /*#__PURE__*/React.createElement("span", null, "\xA0\xA0|\xA0\xA0"), /*#__PURE__*/React.createElement("a", {
+    className: "paginationLink",
+    onClick: goToNextPage
   }, "Next"))));
 }
 

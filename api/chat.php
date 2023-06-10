@@ -24,7 +24,12 @@ try {
 
     switch($request) {
         case 'load_posts':
-            API::exitWithData($chatManager->loadPosts(), [], []);
+            $starting_post_id = isset($_POST['starting_post_id'])
+                ? (int)$_POST['starting_post_id']
+                : null;
+
+            API::exitWithData($chatManager->loadPosts($starting_post_id), [], []);
+
         case 'submit_post':
             $message = $system->clean($_POST['message']);
 

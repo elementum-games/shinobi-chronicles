@@ -15,126 +15,134 @@ class ChatManager {
     /**
      * @throws Exception
      */
-    public function loadPosts(?int $current_page_index = null): array {
-        //Pagination
-        if($current_page_index == null) {
-            $current_page_index = 0;
-        }
-
-        $current_page_index = min($current_page_index, 200);
-        $current_page_index = max($current_page_index, 0);
-
-        $previous_page_index = (max($current_page_index - self::MAX_POSTS_PER_PAGE, 0));
-        $next_page_index = $current_page_index + self::MAX_POSTS_PER_PAGE;
-
-        $max_post_index = 0;
-        $result = $this->system->query("SELECT COUNT(`post_id`) as `count` FROM `chat`");
+    public function loadPosts(?int $current_page_post_id = null): array {
+        $result = $this->system->query("SELECT MAX(`post_id`) as `latest_post_id`, MIN(`post_id`) as `first_post_id` FROM `chat`");
         if($this->system->db_last_num_rows) {
-            $max_post_index = $this->system->db_fetch($result)['count'] - self::MAX_POSTS_PER_PAGE;
+            $bookend_posts = $this->system->db_fetch($result);
+            $latest_post_id = $bookend_posts['latest_post_id'];
+            $first_post_id = $bookend_posts['first_post_id'];
         }
-        if($next_page_index > $max_post_index) {
-            $next_page_index = $max_post_index;
+        else {
+            $latest_post_id = 0;
+            $first_post_id = 0;
+        }
+
+        //Pagination
+        if($current_page_post_id != null && $current_page_post_id < $latest_post_id) {
+            $previous_page_post_id = min($current_page_post_id + self::MAX_POSTS_PER_PAGE, $latest_post_id);
+            $next_page_post_id = $current_page_post_id - self::MAX_POSTS_PER_PAGE;
+        }
+        else {
+            $previous_page_post_id = null;
+            $next_page_post_id = max($latest_post_id - self::MAX_POSTS_PER_PAGE, 0);
+        }
+
+        if($next_page_post_id < $first_post_id) {
+            $next_page_post_id = null;
         }
 
         //Set post query limit
-        $posts = $this->fetchPosts($current_page_index, self::MAX_POSTS_PER_PAGE);
+        $posts = $this->fetchPosts($current_page_post_id);
 
         return ChatAPIPresenter::loadPostsResponse(
             system: $this->system,
             posts: $posts,
-            previous_page_index: $previous_page_index,
-            current_page_index: $current_page_index,
-            next_page_index: $next_page_index,
-            max_post_index: $max_post_index,
+            previous_page_post_id: $previous_page_post_id,
+            next_page_post_id: $next_page_post_id,
+            latest_post_id: $latest_post_id,
         );
     }
 
     /**
-     * @param int $starting_offset
-     * @param int $max_posts
+     * @param int|null $starting_post_id
+     * @param int      $max_posts
      * @return ChatPostDto[]
      */
-    private function fetchPosts(int $starting_offset, int $max_posts = self::MAX_POSTS_PER_PAGE): array {
-        $post_limit = $starting_offset . ',' . $max_posts;
+    private function fetchPosts(?int $starting_post_id = null, int $max_posts = self::MAX_POSTS_PER_PAGE): array {
+        if($starting_post_id != null) {
+            $query = "SELECT * FROM `chat` WHERE `post_id` <= $starting_post_id ORDER BY `post_id` DESC LIMIT $max_posts";
+        }
+        else {
+            $query = "SELECT * FROM `chat` ORDER BY `post_id` DESC LIMIT $max_posts";
+        }
+        $result = $this->system->query($query);
 
         $posts = [];
-        $result = $this->system->query("SELECT * FROM `chat` ORDER BY `post_id` DESC LIMIT $post_limit");
-        if($this->system->db_last_num_rows) {
-            while($row = $this->system->db_fetch($result)) {
-                $post = ChatPostDto::fromDb($row);
+        while($row = $this->system->db_fetch($result)) {
+            $post = ChatPostDto::fromDb($row);
 
-                //Skip post if user blacklisted
-                $blacklisted = false;
-                foreach($this->player->blacklist as $id => $blacklist) {
-                    if($post->user_name == $blacklist[$id]['user_name']) {
-                        $blacklisted = true;
-                        break;
-                    }
+            //Skip post if user blacklisted
+            $blacklisted = false;
+            foreach($this->player->blacklist as $id => $blacklist) {
+                if($post->user_name == $blacklist[$id]['user_name']) {
+                    $blacklisted = true;
+                    break;
                 }
-
-                //Base data
-                $post->avatar = './images/default_avatar.png';
-
-                //Fetch user data
-                $user_data = false;
-                $user_result = $this->system->query("SELECT `staff_level`, `premium_credits_purchased`, `chat_effect`, `avatar_link` FROM `users`
-                WHERE `user_name` = '{$this->system->clean($post->user_name)}'");
-                if($this->system->db_last_num_rows) {
-                    $user_data = $this->system->db_fetch($user_result);
-                    //If blacklisted block content, only if blacklisted user is not currently a staff member
-                    if($blacklisted && $user_data['staff_level'] == StaffManager::STAFF_NONE) {
-                        continue;
-                    }
-                }
-                else {
-                    if($blacklisted) {
-                        continue;
-                    }
-                }
-
-                //Format posts
-                $statusType = "userLink";
-                if($user_data != false) {
-                    $statusType .= ($user_data['premium_credits_purchased'] && $user_data['chat_effect'] == 'sparkles') ? " premiumUser" : "";
-                    $post->avatar = $user_data['avatar_link'];
-                }
-                $post->status_type = $statusType;
-
-                $class = "chat";
-                if(isset($post->user_color)) {
-                    $class .= " " . $post->user_color;
-                }
-                $post->class = $class;
-
-                if($post->staff_level) {
-                    $post->staff_banner_name = $this->system->SC_STAFF_COLORS[$post->staff_level]['staffBanner'];
-                    $post->staff_banner_color = $this->system->SC_STAFF_COLORS[$post->staff_level]['staffColor'];
-                }
-
-                $time = time() - $post->time;
-                if($time >= 86400) {
-                    $time_string = floor($time/86400) . " day(s) ago";
-                }
-                elseif($time >= 3600) {
-                    $time_string = floor($time/3600) . " hour(s) ago";
-                }
-                else {
-                    $mins = floor($time/60);
-                    if($mins < 1) {
-                        $mins = 1;
-                    }
-                    $time_string = "$mins min(s) ago";
-                }
-
-                $post->time_string = $time_string;
-
-                if($this->player->censor_explicit_language) {
-                    $post->message = $this->system->explicitLanguageReplace($post->message);
-                }
-                $post->message = nl2br($this->system->html_parse($post->message, false, true));
-
-                $posts[] = $post;
             }
+
+            //Base data
+            $post->avatar = './images/default_avatar.png';
+
+            //Fetch user data
+            $user_data = false;
+            $user_result = $this->system->query("SELECT `staff_level`, `premium_credits_purchased`, `chat_effect`, `avatar_link` FROM `users`
+            WHERE `user_name` = '{$this->system->clean($post->user_name)}'");
+            if($this->system->db_last_num_rows) {
+                $user_data = $this->system->db_fetch($user_result);
+                //If blacklisted block content, only if blacklisted user is not currently a staff member
+                if($blacklisted && $user_data['staff_level'] == StaffManager::STAFF_NONE) {
+                    continue;
+                }
+            }
+            else {
+                if($blacklisted) {
+                    continue;
+                }
+            }
+
+            //Format posts
+            $post->user_link_class_names = ["userLink"];
+            if($user_data) {
+                if($user_data['premium_credits_purchased'] && $user_data['chat_effect'] == 'sparkles') {
+                    $post->user_link_class_names[] = "premiumUser";
+                }
+                $post->user_link_class_names[] =
+                $post->avatar = $user_data['avatar_link'];
+            }
+
+            $post->user_link_class_names[] = "chat";
+            if(isset($post->user_color)) {
+                $post->user_link_class_names[] = $post->user_color;
+            }
+
+            if($post->staff_level) {
+                $post->staff_banner_name = $this->system->SC_STAFF_COLORS[$post->staff_level]['staffBanner'];
+                $post->staff_banner_color = $this->system->SC_STAFF_COLORS[$post->staff_level]['staffColor'];
+            }
+
+            $time = time() - $post->time;
+            if($time >= 86400) {
+                $time_string = floor($time/86400) . " day(s) ago";
+            }
+            elseif($time >= 3600) {
+                $time_string = floor($time/3600) . " hour(s) ago";
+            }
+            else {
+                $mins = floor($time/60);
+                if($mins < 1) {
+                    $mins = 1;
+                }
+                $time_string = "$mins min(s) ago";
+            }
+
+            $post->time_string = $time_string;
+
+            if($this->player->censor_explicit_language) {
+                $post->message = $this->system->explicitLanguageReplace($post->message);
+            }
+            $post->message = nl2br($this->system->html_parse($post->message, false, true));
+
+            $posts[] = $post;
         }
 
         return $posts;
@@ -144,7 +152,6 @@ class ChatManager {
         $chat_max_post_length = $this->maxPostLength();
 
         $message_length = strlen(preg_replace('/[\\n\\r]+/', '', trim($message)));
-        $message = $this->system->clean(stripslashes($message));
 
         try {
             $result = $this->system->query("SELECT `message` FROM `chat` 

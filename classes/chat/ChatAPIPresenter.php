@@ -20,6 +20,7 @@ class ChatAPIPresenter {
             ]),
             'staffBannerName' => $chatPost->staff_banner_name,
             'staffBannerColor' => $chatPost->staff_banner_color,
+            'userLinkClassNames' => $chatPost->user_link_class_names,
         ];
     }
 
@@ -53,29 +54,27 @@ class ChatAPIPresenter {
     /**
      * @param System        $system
      * @param ChatPostDto[] $posts
-     * @param int|null      $previous_page_index
-     * @param mixed         $current_page_index
-     * @param int|null      $next_page_index
-     * @param int           $max_post_index
+     * @param int|null      $previous_page_post_id
+     * @param mixed         $current_page_post_id
+     * @param int|null      $next_page_post_id
+     * @param int           $latest_post_id
      * @return array
      * @throws Exception
      */
     public static function loadPostsResponse(
         System $system,
         array $posts,
-        ?int $previous_page_index,
-        int $current_page_index,
-        ?int $next_page_index,
-        int $max_post_index
+        ?int $previous_page_post_id,
+        ?int $next_page_post_id,
+        int $latest_post_id
     ): array {
         return [
             'posts' => array_map(function(ChatPostDto $post) use($system) {
                 return self::chatPostResponse($system, $post);
             }, $posts),
-            'previousPageIndex' => $previous_page_index,
-            'currentPageIndex' => $current_page_index,
-            'nextPageIndex' => $next_page_index,
-            'maxPostIndex' => $max_post_index,
+            'previousPagePostId' => $previous_page_post_id,
+            'nextPagePostId' => $next_page_post_id,
+            'latestPostId' => $latest_post_id,
         ];
     }
 

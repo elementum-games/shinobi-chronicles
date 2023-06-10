@@ -1,24 +1,40 @@
 // @flow
 
 import { apiFetch } from "../utils/network.js";
+import type { ChatPostType } from "./chatSchema.js";
 
 const chatRefreshInterval = 5000;
 
+type Props = {|
+    +chatApiLink: string,
+    +initialPosts: $ReadOnlyArray<ChatPostType>,
+    +initialNextPagePostId: ?number,
+    +initialLatestPostId: number,
+    +maxPostLength: number,
+    +isModerator: boolean,
+    +initialBanInfo: {|
+        +name: string,
+        +description: string,
+        +timeRemaining: string,
+    |};
+|};
 function Chat({
     chatApiLink,
     initialPosts,
-    initialNextPageIndex,
-    initialMaxPostIndex,
+    initialNextPagePostId,
+    initialLatestPostId,
     maxPostLength,
     isModerator,
     initialBanInfo,
-}) {
+}: Props) {
     const [banInfo, setBanInfo] = React.useState(initialBanInfo);
     const [posts, setPosts] = React.useState(initialPosts);
-    const [previousPageIndex, setPreviousPageIndex] = React.useState(0);
-    const [currentPageIndex, setCurrentPageIndex] = React.useState(0);
-    const [nextPageIndex, setNextPageIndex] = React.useState(initialNextPageIndex);
-    const [maxPostIndex, setMaxPostIndex] = React.useState(initialMaxPostIndex);
+
+    const [nextPagePostId, setNextPagePostId] = React.useState(initialNextPagePostId);
+    const [latestPostId, setLatestPostId] = React.useState(initialLatestPostId);
+    // Only set if we're paginating
+    const [previousPagePostId, setPreviousPagePostId] = React.useState(null);
+    const currentPagePostIdRef = React.useRef(null);
 
     const [error, setError] = React.useState(null);
 
@@ -30,29 +46,61 @@ function Chat({
         />;
     }
 
-    function getPosts() {
-        apiFetch('/api/chat.php', {
-            request: 'load_posts',
-        }).then(handleApiResponse);
-    }
+    const refreshChat = function() {
+        if(currentPagePostIdRef.current != null) {
+            return;
+        }
+
+        apiFetch(
+            chatApiLink,
+            {
+                request: 'load_posts',
+            }
+        ).then(handleApiResponse);
+    };
+
+    React.useEffect(() => {
+        const intervalId = setInterval(refreshChat, chatRefreshInterval);
+
+        return () => clearInterval(intervalId);
+    }, []);
+
     function submitPost(message) {
-        apiFetch('/api/chat.php', {
+        apiFetch(chatApiLink, {
             request: 'submit_post',
             message: message,
         }).then(handleApiResponse);
     }
     function deletePost(postId) {
-        apiFetch('/api/chat.php', {
+        apiFetch(chatApiLink, {
             request: 'delete_post',
             post_id: postId,
         }).then(handleApiResponse);
     }
 
-    React.useEffect(() => {
-        const intervalId = setInterval(getPosts, chatRefreshInterval);
+    function changePage(newStartingPostId: ?number) {
+        if(newStartingPostId === currentPagePostIdRef.current) {
+            return;
+        }
+        if(newStartingPostId == null || newStartingPostId >= latestPostId) {
+            currentPagePostIdRef.current = null;
+            apiFetch(chatApiLink, { request: 'load_posts' })
+                .then(handleApiResponse);
+            return;
+        }
+        if(newStartingPostId === currentPagePostIdRef.current) {
+            return;
+        }
 
-        return () => clearInterval(intervalId);
-    }, []);
+        currentPagePostIdRef.current = newStartingPostId;
+        apiFetch(
+            chatApiLink,
+            {
+                request: 'load_posts',
+                starting_post_id: newStartingPostId
+            }
+        ).then(handleApiResponse);
+    }
 
     const handleApiResponse = (response) => {
         if(response.data.banInfo && response.data.banInfo.isBanned) {
@@ -70,17 +118,15 @@ function Chat({
         if(response.data.posts != null) {
             setPosts(response.data.posts);
         }
-        if(response.data.previousPageIndex != null) {
-            setPreviousPageIndex(response.data.previousPageIndex);
+        if(response.data.latestPostId != null) {
+            setLatestPostId(response.data.latestPostId);
         }
-        if(response.data.currentPageIndex != null) {
-            setCurrentPageIndex(response.data.currentPageIndex);
+
+        if(typeof response.data.previousPagePostId != "undefined") {
+            setPreviousPagePostId(response.data.previousPagePostId);
         }
-        if(response.data.nextPageIndex != null) {
-            setNextPageIndex(response.data.nextPageIndex);
-        }
-        if(response.data.maxPostIndex != null) {
-            setMaxPostIndex(response.data.maxPostIndex);
+        if(typeof response.data.nextPagePostId != "undefined") {
+            setNextPagePostId(response.data.nextPagePostId);
         }
     };
 
@@ -93,12 +139,12 @@ function Chat({
             />
             <ChatPosts
                 posts={posts}
-                previousPostIndex={previousPageIndex}
-                currentPageIndex={currentPageIndex}
-                nextPageIndex={nextPageIndex}
-                maxPostIndex={maxPostIndex}
+                previousPagePostId={previousPagePostId}
+                nextPagePostId={nextPagePostId}
                 isModerator={isModerator}
                 deletePost={deletePost}
+                goToNextPage={() => changePage(nextPagePostId)}
+                goToPreviousPage={() => changePage(previousPagePostId)}
             />
         </div>
     )
@@ -145,28 +191,23 @@ function ChatInput({maxPostLength, submitPost}) {
     }
 
     const handlePostSubmit = React.useCallback(() => {
+        console.log(message);
         submitPost(message);
         // TODO: Only clear this on a successful server response
         setMessage("");
     }, [message, submitPost]);
 
-    const handleKeyDown = React.useCallback((e: KeyboardEvent) => {
-        if(e.which !== 13) {
+    const handleKeyDown = React.useCallback((e) => {
+        if(e.code !== "Enter") {
             return;
         }
 
         if(quickReply && !e.shiftKey) {
             e.preventDefault();
+            setMessage(e.target.value);
             handlePostSubmit();
         }
-    }, [quickReply, message, submitPost]);
-
-    function handleInputFocus() {
-        document.addEventListener('keydown', handleKeyDown);
-    }
-    function handleInputBlur() {
-        document.removeEventListener('keydown', handleKeyDown);
-    }
+    }, [quickReply, handlePostSubmit]);
 
     const charactersRemaining = maxPostLength - message.length;
     const charactersRemainingDisplay = `Characters remaining: ${charactersRemaining} of ${maxPostLength}`;
@@ -184,8 +225,7 @@ function ChatInput({maxPostLength, submitPost}) {
                             maxLength={maxPostLength}
                             value={message}
                             onChange={e => setMessage(e.target.value)}
-                            onFocus={handleInputFocus}
-                            onBlur={handleInputBlur}
+                            onKeyDown={handleKeyDown}
                         ></textarea><br/>
                         <input type="checkbox" checked={quickReply} onChange={e => setQuickReply(e.target.checked)} /> Quick reply<br/>
                         <span className="red">{charactersRemaining < 50 && charactersRemainingDisplay}</span>
@@ -228,14 +268,15 @@ function ChatMemeModal({ memes }) {
     );
 }
 
-function ChatPosts({ posts, currentPageIndex, maxPostIndex, isModerator, deletePost }) {
-    function handlePreviousClick() {
-
-    }
-    function handleNextClick() {
-
-    }
-
+function ChatPosts({
+    posts,
+    previousPagePostId,
+    nextPagePostId,
+    isModerator,
+    deletePost,
+    goToPreviousPage,
+    goToNextPage
+}) {
     return (
         <div>
             <table className="table" style={{width: "98%"}}>
@@ -260,7 +301,7 @@ function ChatPosts({ posts, currentPageIndex, maxPostIndex, isModerator, deleteP
                                         <img src={post.avatarLink} />
                                     </div>
                                     <div className="character_info">
-                                        <a href={post.userProfileLink} className={`${post.class} ${post.statusType}`}>
+                                        <a href={post.userProfileLink} className={post.userLinkClassNames.join(' ')}>
                                             {post.userName}
                                         </a><br/>
                                         <p>
@@ -285,9 +326,11 @@ function ChatPosts({ posts, currentPageIndex, maxPostIndex, isModerator, deleteP
                             <td style={{ fontStyle: "italic" }}>
                                 <div style={{ marginBottom: "2px"}}>{post.timeString}</div>
                                 {isModerator &&
-                                    <a className='imageLink' onClick={() => deletePost(post.id)}>
-                                        <img className='small_image' src='../images/delete_icon.png'/>
-                                    </a>
+                                    <img
+                                        className='delete_post_icon small_image'
+                                        src='../images/delete_icon.png'
+                                        onClick={() => deletePost(post.id)}
+                                    />
                                 }
                                 <a className='imageLink' href={post.reportLink}>
                                     <img className='small_image' src='../images/report_icon.png'/>
@@ -299,12 +342,12 @@ function ChatPosts({ posts, currentPageIndex, maxPostIndex, isModerator, deleteP
             </table>
 
             <p style={{textAlign: "center"}}>
-                {currentPageIndex > 0 && <a onClick={handlePreviousClick}>Previous</a>}
+                {previousPagePostId != null && <a className="paginationLink" onClick={goToPreviousPage}>Previous</a>}
 
-                {currentPageIndex < maxPostIndex &&
+                {nextPagePostId != null &&
                     <>
-                        {currentPageIndex !== 0 && "&nbsp;&nbsp;|&nbsp;&nbsp;"}
-                        <a onClick={handleNextClick}>Next</a>
+                        {previousPagePostId != null && <span>&nbsp;&nbsp;|&nbsp;&nbsp;</span>}
+                        <a className="paginationLink" onClick={goToNextPage}>Next</a>
                     </>
                 }
             </p>

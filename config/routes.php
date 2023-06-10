@@ -21,7 +21,7 @@ return $routes = [
     7 => new Route(
         file_name: 'chat.php',
         title: 'Chat',
-        function_name: 'chatV2',
+        function_name: 'chat',
         menu: Route::MENU_USER,
         ajax_ok: true,
     ),
