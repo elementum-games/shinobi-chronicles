@@ -1,27 +1,28 @@
 <?php
+/**
+ * @var System $system
+ * @var User $player
+ * @var Layout $layout
+ */
+
     // WIP - fork of Index.php to test new_geisha
-    if (!$system->is_legacy_ajax_request) {
-        require($layout->headerModule);
-        echo $layout->heading;
-    }
+    require($layout->headerModule);
+    echo $layout->heading;
+
     // Load page or news
     if($LOGGED_IN) {
         // Master close
         if(!$system->SC_OPEN && !$player->isUserAdmin()) {
-            if(!$system->is_legacy_ajax_request) {
-                require($layout->sidebarModule);
-                require($layout->topbarModule);
-                echo str_replace("[HEADER_TITLE]", "Profile", $layout->body_start);
-            }
+            require($layout->sidebarModule);
+            require($layout->topbarModule);
+            echo str_replace("[HEADER_TITLE]", "Profile", $layout->body_start);
 
             echo "<table class='table'><tr><th>Game Maintenance</th></tr>
 		<tr><td style='text-align:center;'>
 		Shinobi-Chronicles is currently closed for maintenace. Please check back in a few minutes!
 		</td></tr></table>";
 
-            if(!$system->is_legacy_ajax_request) {
-                echo str_replace('<!--[VERSION_NUMBER]-->', System::VERSION_NUMBER, $layout->footer);
-            }
+            echo str_replace('<!--[VERSION_NUMBER]-->', System::VERSION_NUMBER, $layout->footer);
             exit;
         }
 
@@ -32,18 +33,15 @@
             $ban_expire = ($expire_int == StaffManager::PERM_BAN_VALUE ? $expire_int : $system->time_remaining($player->ban_data[StaffManager::BAN_TYPE_GAME] - time()));
 
             //Display header
-            if(!$system->is_legacy_ajax_request) {
-                require($layout->sidebarModule);
-                require($layout->topbarModule);
-                echo str_replace("[HEADER_TITLE]", "Profile", $layout->body_start);
-            }
+            require($layout->sidebarModule);
+            require($layout->topbarModule);
+            echo str_replace("[HEADER_TITLE]", "Profile", $layout->body_start);
+
             //Ban info
             require 'templates/ban_info.php';
             // Footer
-            if(!$system->is_legacy_ajax_request) {
-                echo "</div>";
-                echo str_replace('<!--[VERSION_NUMBER]-->', System::VERSION_NUMBER, $layout->footer);
-            }
+            echo "</div>";
+            echo str_replace('<!--[VERSION_NUMBER]-->', System::VERSION_NUMBER, $layout->footer);
             exit;
         }
 
@@ -54,18 +52,15 @@
             $ban_expire = ($expire_int == StaffManager::PERM_BAN_VALUE ? $expire_int : $system->time_remaining($player->ban_data[StaffManager::BAN_TYPE_GAME] - time()));
 
             //Display header
-            if(!$system->is_legacy_ajax_request) {
-                require($layout->sidebarModule);
-                require($layout->topbarModule);
-                echo str_replace("[HEADER_TITLE]", "Profile", $layout->body_start);
-            }
+            require($layout->sidebarModule);
+            require($layout->topbarModule);
+            echo str_replace("[HEADER_TITLE]", "Profile", $layout->body_start);
+
             //Ban info
             require 'templates/ban_info.php';
             // Footer
-            if(!$system->is_legacy_ajax_request) {
-                echo "</div>";
-                echo str_replace('<!--[VERSION_NUMBER]-->', System::VERSION_NUMBER, $layout->footer);
-            }
+            echo "</div>";
+            echo str_replace('<!--[VERSION_NUMBER]-->', System::VERSION_NUMBER, $layout->footer);
             exit;
         }
 
@@ -139,25 +134,23 @@
                     }
                 }
 
-                if(!$system->is_legacy_ajax_request || !isset($route->ajax_ok) ) {
-                    $location_name = $player->current_location->location_id
-                        ? ' ' . ' <div id="contentHeaderLocation">' . $player->current_location->name . '</div>'
-                        : null;
-                    require($layout->sidebarModule);
-                    require($layout->topbarModule);
-                    echo str_replace("[HEADER_TITLE]", $route->title . $location_name, $layout->body_start);
-                }
+                $location_name = $player->current_location->location_id
+                    ? ' ' . ' <div id="contentHeaderLocation">' . $player->current_location->name . '</div>'
+                    : null;
+                require($layout->sidebarModule);
+                require($layout->topbarModule);
+                echo str_replace("[HEADER_TITLE]", $route->title . $location_name, $layout->body_start);
 
                 $self_link = $system->router->base_url . '?id=' . $id;
 
                 $system->printMessage();
-                if(!$player->global_message_viewed && !$system->is_legacy_ajax_request) {
+                if(!$player->global_message_viewed) {
                     $global_message = $system->fetchGlobalMessage();
                     $layout->renderGlobalMessage($system, $global_message);
                 }
 
                 // EVENT
-                if($system::$SC_EVENT_ACTIVE && !$system->is_legacy_ajax_request) {
+                if($system::$SC_EVENT_ACTIVE) {
                     require 'templates/temp_event_header.php';
                 }
 
@@ -188,7 +181,7 @@
             echo str_replace("[HEADER_TITLE]", "Profile", $layout->body_start);
 
             $system->printMessage();
-            if(!$player->global_message_viewed && !$system->is_legacy_ajax_request) {
+            if(!$player->global_message_viewed) {
                 $global_message = $system->fetchGlobalMessage();
                 $layout->renderGlobalMessage($system, $global_message);
             }
@@ -204,16 +197,7 @@
         }
         $player->updateData();
 
-        if(!$system->is_legacy_ajax_request) {
-            echo "</div>";
-        }
-    }
-    else if($system->is_legacy_ajax_request) {
-        echo "<script type='text/javascript'>
-			clearInterval(refreshID);
-			clearInterval(notificationRefreshID);
-			</script>
-	<p style='text-align:center;'>Logout timer finished. <a href='{$system->router->base_url}'>Continue</a></p>";
+        echo "</div>";
     }
     // Login
     else {
@@ -238,14 +222,12 @@
     echo "</div>";
 
     // Render hotbar
-    if (!$system->is_legacy_ajax_request && isset($player)) {
+    if (isset($player)) {
         if ($system->environment == System::ENVIRONMENT_DEV) {
             require($layout->hotbarModule);
         }
     }
 
     // Render footer
-    if(!$system->is_legacy_ajax_request) {
-        $page_load_time = round(microtime(true) - $PAGE_LOAD_START, 3);
-        $layout->renderFooter($page_load_time);
-    }
+    $page_load_time = round(microtime(true) - $PAGE_LOAD_START, 3);
+    $layout->renderFooter($page_load_time);

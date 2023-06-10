@@ -204,7 +204,6 @@ function ChatInput({maxPostLength, memes, submitPost}) {
     }
 
     const handlePostSubmit = React.useCallback(() => {
-        console.log(message);
         submitPost(message);
         // TODO: Only clear this on a successful server response
         setMessage("");

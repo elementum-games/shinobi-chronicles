@@ -41,11 +41,6 @@ if(isset($_GET['logout']) && $_GET['logout'] == 1) {
 }
 $LOGGED_IN = false;
 
-// Ajax
-$system->is_legacy_ajax_request = false;
-if(isset($_GET['request_type']) && $_GET['request_type'] == 'ajax') {
-	$system->is_legacy_ajax_request = true;
-}
 // Run login, load player data
 $player_display = '';
 
@@ -125,35 +120,20 @@ else {
 
     // Check logout timer
 	if($player->last_login < time() - (System::LOGOUT_LIMIT * 60)) {
-		if($system->is_legacy_ajax_request) {
-			echo "<script type='text/javascript'>
-			clearInterval(refreshID);
-			clearInterval(notificationRefreshID);
-			</script>
-			<p style='text-align:center;'>Logout timer finished. <a href='{$system->router->base_url}'>Continue</a></p>";
-			exit;
-		}
-		else {
-			$_SESSION = array();
-			if(ini_get("session.use_cookies")) {
-				$params = session_get_cookie_params();
-				setcookie(session_name(), '', time() - 42000,
-					$params["path"], $params["domain"],
-					$params["secure"], $params["httponly"]
-				);
-			}
-			session_destroy();
-			header("Location: {$system->router->base_url}");
-			exit;
-		}
+        $_SESSION = array();
+        if(ini_get("session.use_cookies")) {
+            $params = session_get_cookie_params();
+            setcookie(session_name(), '', time() - 42000,
+                $params["path"], $params["domain"],
+                $params["secure"], $params["httponly"]
+            );
+        }
+        session_destroy();
+        header("Location: {$system->router->base_url}");
+        exit;
 	}
 
-	if($system->is_legacy_ajax_request) {
-		$player->loadData(User::UPDATE_REGEN);
-	}
-	else {
-		$player->loadData();
-	}
+	$player->loadData();
 }
 
 // Start display
@@ -169,11 +149,9 @@ if ($layout->key == "new_geisha") {
     exit;
 }
 
-if (!$system->is_legacy_ajax_request) {
-    echo $layout->heading;
-    echo $layout->top_menu;
-    echo $layout->header;
-}
+echo $layout->heading;
+echo $layout->top_menu;
+echo $layout->header;
 
 // Load page or news
 if($LOGGED_IN) {
@@ -188,10 +166,8 @@ if($LOGGED_IN) {
 	Shinobi-Chronicles is currently closed for maintenace. Please check back in a few minutes!
 	</td></tr></table>";
 
-        if(!$system->is_legacy_ajax_request) {
-            echo $layout->side_menu_start . $layout->side_menu_end;
-            echo str_replace('<!--[VERSION_NUMBER]-->', System::VERSION_NUMBER, $layout->footer);
-        }
+        echo $layout->side_menu_start . $layout->side_menu_end;
+        echo str_replace('<!--[VERSION_NUMBER]-->', System::VERSION_NUMBER, $layout->footer);
         exit;
     }
 
@@ -202,16 +178,12 @@ if($LOGGED_IN) {
         $ban_expire = ($expire_int == StaffManager::PERM_BAN_VALUE ? $expire_int : $system->time_remaining($player->ban_data[StaffManager::BAN_TYPE_GAME] - time()));
 
         //Display header
-        if(!$system->is_legacy_ajax_request) {
-            echo str_replace("[HEADER_TITLE]", "Profile", $layout->body_start);
-        }
+        echo str_replace("[HEADER_TITLE]", "Profile", $layout->body_start);
         //Ban info
         require 'templates/ban_info.php';
         // Footer
-        if(!$system->is_legacy_ajax_request) {
-            echo $layout->side_menu_start . $layout->side_menu_end;
-            echo str_replace('<!--[VERSION_NUMBER]-->', System::VERSION_NUMBER, $layout->footer);
-        }
+        echo $layout->side_menu_start . $layout->side_menu_end;
+        echo str_replace('<!--[VERSION_NUMBER]-->', System::VERSION_NUMBER, $layout->footer);
         exit;
     }
 
@@ -222,31 +194,27 @@ if($LOGGED_IN) {
         $ban_expire = ($expire_int == StaffManager::PERM_BAN_VALUE ? $expire_int : $system->time_remaining($player->ban_data[StaffManager::BAN_TYPE_GAME] - time()));
 
         //Display header
-        if(!$system->is_legacy_ajax_request) {
-            echo str_replace("[HEADER_TITLE]", "Profile", $layout->body_start);
-        }
+        echo str_replace("[HEADER_TITLE]", "Profile", $layout->body_start);
+
         //Ban info
         require 'templates/ban_info.php';
         // Footer
-        if(!$system->is_legacy_ajax_request) {
-            echo $layout->side_menu_start . $layout->side_menu_end;
-            echo str_replace('<!--[VERSION_NUMBER]-->', System::VERSION_NUMBER, $layout->footer);
-        }
+        echo $layout->side_menu_start . $layout->side_menu_end;
+        echo str_replace('<!--[VERSION_NUMBER]-->', System::VERSION_NUMBER, $layout->footer);
+
         exit;
     }
 
     // Notifications
-    if(!$system->is_legacy_ajax_request) {
-        Notifications::displayNotifications($system, $player);
-        echo "<script type='text/javascript'>
-	var notificationRefreshID = setInterval(
+    Notifications::displayNotifications($system, $player);
+    echo "<script type='text/javascript'>
+    var notificationRefreshID = setInterval(
         () => {
             // $('#notifications').load('./api/legacy_notifications.php');
         },
         5000
     );
-	</script>";
-    }
+    </script>";
 
     // Global message
     if(!$player->global_message_viewed && isset($_GET['clear_message'])) {
@@ -289,7 +257,7 @@ if($LOGGED_IN) {
     }
 
     // Pre-content display
-    if($player->train_time && !$system->is_legacy_ajax_request) {
+    if($player->train_time) {
         $layout->renderTrainingDisplay($player);
     }
     $page_loaded = false;
@@ -321,24 +289,22 @@ if($LOGGED_IN) {
                 }
             }
 
-            if(!$system->is_legacy_ajax_request || !isset($route->ajax_ok) ) {
-                $location_name = $player->current_location->location_id
-                    ? ' ' . ' <div id="contentHeaderLocation">' . $player->current_location->name . '</div>'
-                    : null;
+            $location_name = $player->current_location->location_id
+                ? ' ' . ' <div id="contentHeaderLocation">' . $player->current_location->name . '</div>'
+                : null;
 
-                echo str_replace("[HEADER_TITLE]", $route->title . $location_name, $layout->body_start);
-            }
+            echo str_replace("[HEADER_TITLE]", $route->title . $location_name, $layout->body_start);
 
             $self_link = $system->router->base_url . '?id=' . $id;
 
             $system->printMessage();
-            if(!$player->global_message_viewed && !$system->is_legacy_ajax_request) {
+            if(!$player->global_message_viewed) {
                 $global_message = $system->fetchGlobalMessage();
                 $layout->renderGlobalMessage($system, $global_message);
             }
 
             // EVENT
-            if($system::$SC_EVENT_ACTIVE && !$system->is_legacy_ajax_request) {
+            if($system::$SC_EVENT_ACTIVE) {
                 require 'templates/temp_event_header.php';
             }
 
@@ -364,7 +330,7 @@ if($LOGGED_IN) {
         echo str_replace("[HEADER_TITLE]", "Profile", $layout->body_start);
 
         $system->printMessage();
-        if(!$player->global_message_viewed && !$system->is_legacy_ajax_request) {
+        if(!$player->global_message_viewed) {
             $global_message = $system->fetchGlobalMessage();
             $layout->renderGlobalMessage($system, $global_message);
         }
@@ -380,16 +346,7 @@ if($LOGGED_IN) {
     $player->updateData();
 
     // Display side menu and footer
-    if(!$system->is_legacy_ajax_request) {
-        $layout->renderSideMenu($player, $system->router);
-    }
-}
-else if($system->is_legacy_ajax_request) {
-    echo "<script type='text/javascript'>
-		clearInterval(refreshID);
-		clearInterval(notificationRefreshID);
-		</script>
-<p style='text-align:center;'>Logout timer finished. <a href='{$system->router->base_url}'>Continue</a></p>";
+    $layout->renderSideMenu($player, $system->router);
 }
 // Login
 else {
@@ -411,9 +368,7 @@ else {
 }
 
 // Render footer
-if(!$system->is_legacy_ajax_request) {
-    $page_load_time = round(microtime(true) - $PAGE_LOAD_START, 3);
+$page_load_time = round(microtime(true) - $PAGE_LOAD_START, 3);
 
-    $layout->renderFooter($page_load_time);
-}
+$layout->renderFooter($page_load_time);
 

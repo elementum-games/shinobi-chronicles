@@ -23,7 +23,6 @@ return $routes = [
         title: 'Chat',
         function_name: 'chat',
         menu: Route::MENU_USER,
-        ajax_ok: true,
     ),
     4 => new Route(
         file_name: 'jutsu.php',

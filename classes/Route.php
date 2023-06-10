@@ -20,7 +20,6 @@ class Route {
         public ?int $battle_type = null,
         public ?int $min_rank = null,
 
-        public bool $ajax_ok = false,
         public bool $battle_ok = true,
         public int $village_ok = Route::IN_VILLAGE_OKAY,
         public bool $survival_mission_ok = true,

@@ -172,7 +172,6 @@ function ChatInput({
   }
 
   const handlePostSubmit = React.useCallback(() => {
-    console.log(message);
     submitPost(message); // TODO: Only clear this on a successful server response
 
     setMessage("");
