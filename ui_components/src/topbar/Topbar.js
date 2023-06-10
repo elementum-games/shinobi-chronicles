@@ -105,34 +105,31 @@ function Topbar({ links, notificationAPIData }) {
     // Display
     return (
         <div id="topbar" className="d-flex">
-            <div className="topbar_left"></div>
-            <div className={"topbar_right d-flex"}>
-                <div className="topbar_inner_left">
-                    <div className={"topbar_notifications_container_left d-flex"}>
-                        {(notificationData) &&
-                            notificationData.map(function (notification, i) {
-                                return <TopbarNotificationLeft
-                                    key={i}
-                                    notification={notification}
-                                    closeNotification={closeNotification}
-                                />;
-                            })
-                        }
-                    </div>
+            <div className="topbar_inner_left">
+                <div className={"topbar_notifications_container_left d-flex"}>
+                    {(notificationData) &&
+                        notificationData.map(function (notification, i) {
+                            return <TopbarNotificationLeft
+                                key={i}
+                                notification={notification}
+                                closeNotification={closeNotification}
+                            />;
+                        })
+                    }
                 </div>
-                <div className={"topbar_inner_center main_logo"}></div>
-                <div className="topbar_inner_right">
-                    <div className={"topbar_notifications_container_right d-flex"}>
-                        {(notificationData) &&
-                            notificationData.map(function (notification, i) {
-                                return <TopbarNotificationRight
-                                    key={i}
-                                    notification={notification}
-                                    closeNotification={closeNotification}
-                                />;
-                            })
-                        }
-                    </div>
+            </div>
+            <div className={"topbar_inner_center main_logo"}></div>
+            <div className="topbar_inner_right">
+                <div className={"topbar_notifications_container_right d-flex"}>
+                    {(notificationData) &&
+                        notificationData.map(function (notification, i) {
+                            return <TopbarNotificationRight
+                                key={i}
+                                notification={notification}
+                                closeNotification={closeNotification}
+                            />;
+                        })
+                    }
                 </div>
             </div>
         </div>

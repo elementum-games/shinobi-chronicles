@@ -99,10 +99,6 @@ function Topbar({
     id: "topbar",
     className: "d-flex"
   }, /*#__PURE__*/React.createElement("div", {
-    className: "topbar_left"
-  }), /*#__PURE__*/React.createElement("div", {
-    className: "topbar_right d-flex"
-  }, /*#__PURE__*/React.createElement("div", {
     className: "topbar_inner_left"
   }, /*#__PURE__*/React.createElement("div", {
     className: "topbar_notifications_container_left d-flex"
@@ -124,7 +120,7 @@ function Topbar({
       notification: notification,
       closeNotification: closeNotification
     });
-  })))));
+  }))));
 }
 function TopbarNotificationRight({
   notification,

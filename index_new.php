@@ -14,6 +14,7 @@
         // Master close
         if(!$system->SC_OPEN && !$player->isUserAdmin()) {
             require($layout->sidebarModule);
+            echo '<div id="content_wrapper">';
             require($layout->topbarModule);
             echo str_replace("[HEADER_TITLE]", "Profile", $layout->body_start);
 
@@ -21,7 +22,7 @@
 		<tr><td style='text-align:center;'>
 		Shinobi-Chronicles is currently closed for maintenace. Please check back in a few minutes!
 		</td></tr></table>";
-
+            echo '</div>';
             echo str_replace('<!--[VERSION_NUMBER]-->', System::VERSION_NUMBER, $layout->footer);
             exit;
         }
@@ -34,11 +35,13 @@
 
             //Display header
             require($layout->sidebarModule);
+            echo '<div id="content_wrapper">';
             require($layout->topbarModule);
             echo str_replace("[HEADER_TITLE]", "Profile", $layout->body_start);
 
             //Ban info
             require 'templates/ban_info.php';
+            echo '</div>';
             // Footer
             echo "</div>";
             echo str_replace('<!--[VERSION_NUMBER]-->', System::VERSION_NUMBER, $layout->footer);
@@ -53,11 +56,13 @@
 
             //Display header
             require($layout->sidebarModule);
+            echo '<div id="content_wrapper">';
             require($layout->topbarModule);
             echo str_replace("[HEADER_TITLE]", "Profile", $layout->body_start);
 
             //Ban info
             require 'templates/ban_info.php';
+            echo '</div>';
             // Footer
             echo "</div>";
             echo str_replace('<!--[VERSION_NUMBER]-->', System::VERSION_NUMBER, $layout->footer);
@@ -138,6 +143,7 @@
                     ? ' ' . ' <div id="contentHeaderLocation">' . $player->current_location->name . '</div>'
                     : null;
                 require($layout->sidebarModule);
+                echo '<div id="content_wrapper">';
                 require($layout->topbarModule);
                 echo str_replace("[HEADER_TITLE]", $route->title . $location_name, $layout->body_start);
 
@@ -157,6 +163,7 @@
                 require('pages/' . $route->file_name);
 
                 ($route->function_name)();
+                echo '</div>';
 
                 $page_loaded = true;
             }
@@ -165,18 +172,21 @@
                     // Display page title if page is set
                     if($routes[$id] != null) {
                     require($layout->sidebarModule);
+                    echo '<div id="content_wrapper">';
                     require($layout->topbarModule);
                     echo str_replace("[HEADER_TITLE]", $route->title, $layout->body_start);
                         $page_loaded = true;
                     }
                     $system->message($e->getMessage());
                     $system->printMessage();
+                    echo '</div>';
                 }
             }
         }
 
         if(!$page_loaded) {
             require($layout->sidebarModule);
+            echo '<div id="content_wrapper">';
             require($layout->topbarModule);
             echo str_replace("[HEADER_TITLE]", "Profile", $layout->body_start);
 
@@ -197,7 +207,7 @@
         }
         $player->updateData();
 
-        echo "</div>";
+        echo "</div></div>";
     }
     // Login
     else {

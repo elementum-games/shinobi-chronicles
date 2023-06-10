@@ -19,6 +19,7 @@ if ($layout->key == "new_geisha") {
     require($layout->headerModule);
     echo $layout->heading;
     require($layout->sidebarModule);
+    echo '<div id="content_wrapper">';
     require($layout->topbarModule);
     echo "<div id='content'>";
 } else {
@@ -362,7 +363,7 @@ if ($layout->key == "new_geisha") {
 </div>
 <?php
 if ($layout->key == "new_geisha") {
-    echo "</div></div>";
+    echo "</div></div></div>";
     $layout->renderFooter();
 } else {
     $layout->renderStaticPageFooter($player ?? null);

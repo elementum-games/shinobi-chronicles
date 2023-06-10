@@ -1,19 +1,10 @@
 #topbarContainer {
-    position: absolute;
+
 }
 
 #topbar {
     height: var(--topbar-height);
-    max-width: 100vw;
-}
-
-.topbar_left {
-    width: var(--sidebar-width);
-}
-
-.topbar_right {
-    width: var(--content-width);
-    margin-left: var(--content-sidebar-gap);
+    width: 100%;
     justify-content: center;
     align-items: center;
 }
