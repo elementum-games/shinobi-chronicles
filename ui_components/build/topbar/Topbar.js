@@ -130,7 +130,7 @@ function TopbarNotificationRight({
   notification,
   closeNotification
 }) {
-  return /*#__PURE__*/React.createElement("div", null, notification.type === "specialmission" && /*#__PURE__*/React.createElement("a", {
+  return /*#__PURE__*/React.createElement(React.Fragment, null, notification.type === "specialmission" && /*#__PURE__*/React.createElement("a", {
     href: notification.action_url,
     className: notification.duration > 0 ? "topbar_notification_wrapper has_duration" : "topbar_notification_wrapper",
     "data-content": notification.message,
@@ -502,7 +502,7 @@ function TopbarNotificationLeft({
   notification,
   closeNotification
 }) {
-  return /*#__PURE__*/React.createElement("div", null, notification.type === "training" && /*#__PURE__*/React.createElement("a", {
+  return /*#__PURE__*/React.createElement(React.Fragment, null, notification.type === "training" && /*#__PURE__*/React.createElement("a", {
     href: notification.action_url,
     className: "topbar_notification_wrapper_training",
     "data-content": notification.message,

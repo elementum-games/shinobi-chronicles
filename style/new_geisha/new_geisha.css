@@ -164,6 +164,7 @@ body {
     display: inline-block;
     float: none;
     margin-left: var(--content-sidebar-gap);
+    margin-right: var(--content-sidebar-gap);
     margin-top: var(--topbar-height);
     margin-bottom: var(--hotbar-height);
     width: var(--content-width);

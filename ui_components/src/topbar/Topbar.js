@@ -148,7 +148,7 @@ function TopbarNotificationRight({
     closeNotification
 }: TopbarNotificationPropsRight) {
     return (
-        <div>
+        <>
             {notification.type === "specialmission" &&
                 <a href={notification.action_url}
                    className={(notification.duration > 0) ? "topbar_notification_wrapper has_duration" : "topbar_notification_wrapper"}
@@ -341,7 +341,7 @@ function TopbarNotificationRight({
                     </svg>
                 </a>
             }
-        </div>
+        </>
     )
 }
 
@@ -354,7 +354,7 @@ function TopbarNotificationLeft({
     closeNotification
 }: TopbarNotificationPropsLeft) {
     return (
-        <div>
+        <>
             {notification.type === "training" &&
                 <a href={notification.action_url}
                     className="topbar_notification_wrapper_training"
@@ -385,7 +385,7 @@ function TopbarNotificationLeft({
                     </a>
                 </>
             }
-        </div>
+        </>
     )
 }
 
