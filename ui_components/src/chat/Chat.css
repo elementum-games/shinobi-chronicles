@@ -84,4 +84,8 @@
 }
 .paginationLink {
     cursor: pointer;
+    text-decoration: underline;
+}
+.paginationLink:hover {
+    text-decoration: none;
 }
