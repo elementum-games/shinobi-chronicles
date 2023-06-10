@@ -503,6 +503,7 @@ class System {
         $meme_array = [
             'codes' => [],
             'images' => [],
+            'urls' => [],
             'texts' => []
         ];
         foreach ($cleaned_memes as $meme)
@@ -511,8 +512,11 @@ class System {
 
             if (in_array($meme_code, $meme_array['codes'])) continue;
 
+            $url = "./images/memes/${meme}";
+
             $meme_array['codes'][] = $meme_code;
-            $meme_array['images'][] = "<img src='./images/memes/${meme}' title='${meme_code}' alt='${meme_code}' style='max-width: 75px;max-height: 75px'/>";
+            $meme_array['images'][] = "<img src='{$url}' title='${meme_code}' alt='${meme_code}' style='max-width: 75px;max-height: 75px'/>";
+            $meme_array['urls'][] = $url;
             $meme_array['texts'][] = $meme_code;
         }
         return $meme_array;

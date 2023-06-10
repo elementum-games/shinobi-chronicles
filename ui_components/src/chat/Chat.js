@@ -17,6 +17,12 @@ type Props = {|
         +description: string,
         +timeRemaining: string,
     |};
+    +memes: {|
+        +codes: $ReadOnlyArray<string>,
+        +images: $ReadOnlyArray<string>,
+        +urls: $ReadOnlyArray<string>,
+        +tests: $ReadOnlyArray<string>,
+    |}
 |};
 function Chat({
     chatApiLink,
@@ -26,6 +32,7 @@ function Chat({
     maxPostLength,
     isModerator,
     initialBanInfo,
+    memes
 }: Props) {
     const [banInfo, setBanInfo] = React.useState(initialBanInfo);
     const [posts, setPosts] = React.useState(initialPosts);
@@ -135,6 +142,7 @@ function Chat({
             {error != null && <p className='systemMessage'>{error}</p>}
             <ChatInput
                 maxPostLength={maxPostLength}
+                memes={memes}
                 submitPost={submitPost}
             />
             <ChatPosts
@@ -170,11 +178,12 @@ function ChatBanInfo({ banName, banDescription, banTimeRemaining }) {
     );
 }
 
-function ChatInput({maxPostLength, submitPost}) {
+function ChatInput({maxPostLength, memes, submitPost}) {
     const [quickReply, _setQuickReply] = React.useState(
         JSON.parse(localStorage.getItem("quick_reply_on") ?? "true")
     );
     const [message, setMessage] = React.useState("");
+    const [showMemeSelect, setShowMemeSelect] = React.useState(false);
 
     /*$(document).on("click", ".meme_select", function () {
         // Chat.val(Chat.val() + $(this).attr("data-code"));
@@ -188,6 +197,10 @@ function ChatInput({maxPostLength, submitPost}) {
     function setQuickReply(newValue: boolean) {
         localStorage.setItem("quick_reply_on", JSON.stringify(newValue));
         _setQuickReply(newValue);
+    }
+    function handleMemeSelect(memeIndex: number) {
+        setMessage(prevMessage => `${prevMessage}${memes.codes[memeIndex]}`);
+        setShowMemeSelect(false);
     }
 
     const handlePostSubmit = React.useCallback(() => {
@@ -214,11 +227,18 @@ function ChatInput({maxPostLength, submitPost}) {
 
     return (
         <div>
+            {showMemeSelect &&
+                <ChatMemeModal
+                    memes={memes}
+                    selectMeme={handleMemeSelect}
+                    closeMemeSelect={() => setShowMemeSelect(false)}
+                />
+            }
             <table id="chat_input_table" className="table">
                 <tbody>
                     <tr><th>Post Message</th></tr>
                     <tr><td style={{textAlign: "center"}}>
-                        <button className="meme_toggle">Meme</button><br />
+                        <button className="meme_toggle" onClick={() => setShowMemeSelect(!showMemeSelect)}>Memes</button><br />
                         <textarea
                             id="chat_input_box"
                             minLength="3"
@@ -238,11 +258,9 @@ function ChatInput({maxPostLength, submitPost}) {
     )
 }
 
-function ChatMemeModal({ memes }) {
-    const memeCodes = memes.map(meme => meme.code);
-
+function ChatMemeModal({ memes, selectMeme, closeMemeSelect }) {
     return (
-        <table id="meme_modal" className="table hidden">
+        <table id="meme_modal" className="table">
             <tbody>
                 <tr>
                     <th>Memes</th>
@@ -250,9 +268,9 @@ function ChatMemeModal({ memes }) {
                 <tr>
                     <td>
                         <div id="meme_box">
-                            {memes.map((meme, i) => (
-                                <div key={`meme:${i}`} data-code={meme.code} className="meme_select">
-                                    {meme.image}
+                            {memes.codes.map((meme, i) => (
+                                <div key={`meme:${i}`} className="meme_select">
+                                    <img src={memes.urls[i]} onClick={() => selectMeme(i)} />
                                 </div>
                             ))}
                         </div>
@@ -260,7 +278,7 @@ function ChatMemeModal({ memes }) {
                 </tr>
                 <tr>
                     <td style={{ textAlign: "center" }}>
-                        <button className="meme_toggle">Close</button>
+                        <button className="meme_toggle" onClick={closeMemeSelect}>Close</button>
                     </td>
                 </tr>
             </tbody>

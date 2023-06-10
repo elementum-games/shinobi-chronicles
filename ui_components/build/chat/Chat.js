@@ -8,7 +8,8 @@ function Chat({
   initialLatestPostId,
   maxPostLength,
   isModerator,
-  initialBanInfo
+  initialBanInfo,
+  memes
 }) {
   const [banInfo, setBanInfo] = React.useState(initialBanInfo);
   const [posts, setPosts] = React.useState(initialPosts);
@@ -113,6 +114,7 @@ function Chat({
     className: "systemMessage"
   }, error), /*#__PURE__*/React.createElement(ChatInput, {
     maxPostLength: maxPostLength,
+    memes: memes,
     submitPost: submitPost
   }), /*#__PURE__*/React.createElement(ChatPosts, {
     posts: posts,
@@ -143,10 +145,12 @@ function ChatBanInfo({
 
 function ChatInput({
   maxPostLength,
+  memes,
   submitPost
 }) {
   const [quickReply, _setQuickReply] = React.useState(JSON.parse(localStorage.getItem("quick_reply_on") ?? "true"));
   const [message, setMessage] = React.useState("");
+  const [showMemeSelect, setShowMemeSelect] = React.useState(false);
   /*$(document).on("click", ".meme_select", function () {
       // Chat.val(Chat.val() + $(this).attr("data-code"));
       $("#meme_modal").addClass("hidden");
@@ -160,6 +164,11 @@ function ChatInput({
     localStorage.setItem("quick_reply_on", JSON.stringify(newValue));
 
     _setQuickReply(newValue);
+  }
+
+  function handleMemeSelect(memeIndex) {
+    setMessage(prevMessage => `${prevMessage}${memes.codes[memeIndex]}`);
+    setShowMemeSelect(false);
   }
 
   const handlePostSubmit = React.useCallback(() => {
@@ -181,7 +190,11 @@ function ChatInput({
   }, [quickReply, handlePostSubmit]);
   const charactersRemaining = maxPostLength - message.length;
   const charactersRemainingDisplay = `Characters remaining: ${charactersRemaining} of ${maxPostLength}`;
-  return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("table", {
+  return /*#__PURE__*/React.createElement("div", null, showMemeSelect && /*#__PURE__*/React.createElement(ChatMemeModal, {
+    memes: memes,
+    selectMeme: handleMemeSelect,
+    closeMemeSelect: () => setShowMemeSelect(false)
+  }), /*#__PURE__*/React.createElement("table", {
     id: "chat_input_table",
     className: "table"
   }, /*#__PURE__*/React.createElement("tbody", null, /*#__PURE__*/React.createElement("tr", null, /*#__PURE__*/React.createElement("th", null, "Post Message")), /*#__PURE__*/React.createElement("tr", null, /*#__PURE__*/React.createElement("td", {
@@ -189,8 +202,9 @@ function ChatInput({
       textAlign: "center"
     }
   }, /*#__PURE__*/React.createElement("button", {
-    className: "meme_toggle"
-  }, "Meme"), /*#__PURE__*/React.createElement("br", null), /*#__PURE__*/React.createElement("textarea", {
+    className: "meme_toggle",
+    onClick: () => setShowMemeSelect(!showMemeSelect)
+  }, "Memes"), /*#__PURE__*/React.createElement("br", null), /*#__PURE__*/React.createElement("textarea", {
     id: "chat_input_box",
     minLength: "3",
     maxLength: maxPostLength,
@@ -209,24 +223,28 @@ function ChatInput({
 }
 
 function ChatMemeModal({
-  memes
+  memes,
+  selectMeme,
+  closeMemeSelect
 }) {
-  const memeCodes = memes.map(meme => meme.code);
   return /*#__PURE__*/React.createElement("table", {
     id: "meme_modal",
-    className: "table hidden"
+    className: "table"
   }, /*#__PURE__*/React.createElement("tbody", null, /*#__PURE__*/React.createElement("tr", null, /*#__PURE__*/React.createElement("th", null, "Memes")), /*#__PURE__*/React.createElement("tr", null, /*#__PURE__*/React.createElement("td", null, /*#__PURE__*/React.createElement("div", {
     id: "meme_box"
-  }, memes.map((meme, i) => /*#__PURE__*/React.createElement("div", {
+  }, memes.codes.map((meme, i) => /*#__PURE__*/React.createElement("div", {
     key: `meme:${i}`,
-    "data-code": meme.code,
     className: "meme_select"
-  }, meme.image))))), /*#__PURE__*/React.createElement("tr", null, /*#__PURE__*/React.createElement("td", {
+  }, /*#__PURE__*/React.createElement("img", {
+    src: memes.urls[i],
+    onClick: () => selectMeme(i)
+  })))))), /*#__PURE__*/React.createElement("tr", null, /*#__PURE__*/React.createElement("td", {
     style: {
       textAlign: "center"
     }
   }, /*#__PURE__*/React.createElement("button", {
-    className: "meme_toggle"
+    className: "meme_toggle",
+    onClick: closeMemeSelect
   }, "Close")))));
 }
 

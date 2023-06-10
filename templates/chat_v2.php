@@ -25,7 +25,8 @@
                 initialLatestPostId: initialPostsResponse.latestPostId,
                 maxPostLength: <?= $chatManager->maxPostLength() ?>,
                 isModerator: <?= $player->isModerator() ?>,
-                initialBanInfo
+                initialBanInfo: initialBanInfo,
+                memes: <?= json_encode($system->getMemes()) ?>,
             }),
             chatContainer
         );
