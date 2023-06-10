@@ -96,8 +96,7 @@
 .sb_avatar_wrapper {
     clip-path: circle(50% at 50% 50%);
     background: var(--avatar-frame-border_gradient);
-    height: 212px;
-    width: 212px;
+    padding: 6px;
     position: relative;
     left: 50%;
     transform: translateX(-50%);
@@ -105,10 +104,6 @@
 
 .sb_avatar_img {
     position: relative;
-    top: 6px;
-    left: 6px;
-    height: 200px;
-    width: 200px;
     clip-path: circle(49% at 50% 50%);
 }
 

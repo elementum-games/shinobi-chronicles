@@ -54,7 +54,7 @@ function Sidebar({
   }
   // Utility
   function handleRegen() {
-    if (regenTimeVar.current <= 0) {
+    if (regenTimeVar.current % 10 == 0 || regenTimeVar < 0) {
       getPlayerData();
     } else {
       regenTimeVar.current = regenTimeVar.current - 1;
@@ -130,9 +130,17 @@ function Sidebar({
     return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
       className: "sb_avatar_container"
     }, /*#__PURE__*/React.createElement("div", {
-      className: "sb_avatar_wrapper"
+      className: "sb_avatar_wrapper",
+      style: {
+        maxWidth: playerData.avatar_size,
+        maxHeight: playerData.avatar_size
+      }
     }, /*#__PURE__*/React.createElement("img", {
       className: "sb_avatar_img",
+      style: {
+        maxWidth: playerData.avatar_size,
+        maxHeight: playerData.avatar_size
+      },
       src: playerData.avatar_link
     }))), /*#__PURE__*/React.createElement("div", {
       className: "sb_resources d-in_block"
