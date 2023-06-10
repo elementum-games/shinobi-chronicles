@@ -130,9 +130,17 @@ function Sidebar({
     return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
       className: "sb_avatar_container"
     }, /*#__PURE__*/React.createElement("div", {
-      className: playerData.avatar_size < 200 ? "sb_avatar_wrapper_default" : "sb_avatar_wrapper_large"
+      className: "sb_avatar_wrapper",
+      style: {
+        maxWidth: playerData.avatar_size,
+        maxHeight: playerData.avatar_size
+      }
     }, /*#__PURE__*/React.createElement("img", {
-      className: playerData.avatar_size < 200 ? "sb_avatar_img_default" : "sb_avatar_img_large",
+      className: "sb_avatar_img",
+      style: {
+        maxWidth: playerData.avatar_size,
+        maxHeight: playerData.avatar_size
+      },
       src: playerData.avatar_link
     }))), /*#__PURE__*/React.createElement("div", {
       className: "sb_resources d-in_block"

@@ -131,8 +131,8 @@ function Sidebar({ links, logoutTimer, navigationAPIData, userAPIData }) {
         return (
             <>
                 <div className="sb_avatar_container">
-                    <div className={playerData.avatar_size < 200 ? "sb_avatar_wrapper_default" : "sb_avatar_wrapper_large"}>
-                        <img className={playerData.avatar_size < 200 ? "sb_avatar_img_default" : "sb_avatar_img_large"} src={playerData.avatar_link}/>
+                    <div className="sb_avatar_wrapper" style={{ maxWidth: playerData.avatar_size, maxHeight: playerData.avatar_size }}>
+                        <img className="sb_avatar_img" style={{ maxWidth: playerData.avatar_size, maxHeight: playerData.avatar_size }} src={playerData.avatar_link}/>
                     </div>
                 </div>
                 <div className={"sb_resources d-in_block"}>

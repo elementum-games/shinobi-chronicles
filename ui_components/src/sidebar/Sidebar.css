@@ -93,41 +93,17 @@
     margin-bottom: 5px;
 }
 
-.sb_avatar_wrapper_default {
+.sb_avatar_wrapper {
     clip-path: circle(50% at 50% 50%);
     background: var(--avatar-frame-border_gradient);
-    height: 137px;
-    width: 137px;
+    padding: 6px;
     position: relative;
     left: 50%;
     transform: translateX(-50%);
 }
 
-.sb_avatar_wrapper_large {
-    clip-path: circle(50% at 50% 50%);
-    background: var(--avatar-frame-border_gradient);
-    height: 212px;
-    width: 212px;
+.sb_avatar_img {
     position: relative;
-    left: 50%;
-    transform: translateX(-50%);
-}
-
-.sb_avatar_img_default {
-    position: relative;
-    top: 6px;
-    left: 6px;
-    height: 125px;
-    width: 125px;
-    clip-path: circle(49% at 50% 50%);
-}
-
-.sb_avatar_img_large {
-    position: relative;
-    top: 6px;
-    left: 6px;
-    height: 200px;
-    width: 200px;
     clip-path: circle(49% at 50% 50%);
 }
 
