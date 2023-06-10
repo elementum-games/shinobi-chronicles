@@ -91,6 +91,10 @@
 .sb_avatar_container {
     overflow: visible;
     margin-bottom: 5px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .sb_avatar_wrapper {
@@ -98,8 +102,6 @@
     background: var(--avatar-frame-border_gradient);
     padding: 6px;
     position: relative;
-    left: 50%;
-    transform: translateX(-50%);
 }
 
 .sb_avatar_img {

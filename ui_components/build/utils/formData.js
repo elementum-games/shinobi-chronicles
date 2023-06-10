@@ -24,6 +24,10 @@ function appendObjProps(formData, data, prefix = '') {
       name = key;
     }
 
+    if (data[key] == null) {
+      return;
+    }
+
     if (typeof data[key] === "object") {
       formData = appendObjProps(formData, data[key], name);
     } else {
