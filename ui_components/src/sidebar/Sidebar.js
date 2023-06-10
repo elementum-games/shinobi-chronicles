@@ -51,7 +51,7 @@ function Sidebar({ links, logoutTimer, navigationAPIData, userAPIData }) {
     }
     // Utility
     function handleRegen() {
-        if (regenTimeVar.current <= 0) {
+        if (regenTimeVar.current % 10 == 0 || regenTimeVar < 0) {
             getPlayerData();
         }
         else {
@@ -131,8 +131,8 @@ function Sidebar({ links, logoutTimer, navigationAPIData, userAPIData }) {
         return (
             <>
                 <div className="sb_avatar_container">
-                    <div className="sb_avatar_wrapper">
-                        <img className="sb_avatar_img" src={playerData.avatar_link}/>
+                    <div className={playerData.avatar_size < 200 ? "sb_avatar_wrapper_default" : "sb_avatar_wrapper_large"}>
+                        <img className={playerData.avatar_size < 200 ? "sb_avatar_img_default" : "sb_avatar_img_large"} src={playerData.avatar_link}/>
                     </div>
                 </div>
                 <div className={"sb_resources d-in_block"}>

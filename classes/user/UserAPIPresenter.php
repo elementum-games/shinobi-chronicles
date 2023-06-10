@@ -18,6 +18,7 @@ class UserApiPresenter {
             'training' => $player->train_time,
             'special' => $player->special_mission,
             'battle' => $player->battle_id,
+            'avatar_size' => $player->getAvatarSize(),
         ];
     }
 
