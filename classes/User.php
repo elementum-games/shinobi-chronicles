@@ -19,7 +19,7 @@ require_once __DIR__ . "/Clan.php";
 class User extends Fighter {
     const ENTITY_TYPE = 'U';
 
-    const AVATAR_MAX_SIZE = 150;
+    const AVATAR_MAX_SIZE = 125;
 
     const GENDER_MALE = 'Male';
     const GENDER_FEMALE = 'Female';
