@@ -3,9 +3,6 @@
     --avatar-frame-border_gradient: linear-gradient(0deg, rgba(140,123,88,1) 0%, rgba(181,156,106,1) 50%, rgba(225,207,159,1) 100%);
     --avatar-frame-border-width-large: 7px;
     --avatar-frame-border-width-small: 3px;
-    --avatar-frame-size-large: 200px;
-    --avatar-frame-size-default: 150px;
-    --avatar-frame-size-small: 40px;
     /* General Config */
     --border-color-default: #464234;
     --box-color-default: #141317;
@@ -160,14 +157,18 @@ body {
     display: flex;
 }
 
-#content {
+#content_wrapper {
+    max-width: var(--content-width);
+    width: 100%;
     display: inline-block;
-    float: none;
     margin-left: var(--content-sidebar-gap);
     margin-right: var(--content-sidebar-gap);
-    margin-top: var(--topbar-height);
     margin-bottom: var(--hotbar-height);
-    width: var(--content-width);
+}
+
+#content {
+    width: 100%;
+    float: none;
     background-color: var(--content-background-color);
     background-image: var(--content-background-gradient);
     border-width: 2px;
@@ -177,6 +178,9 @@ body {
     outline-color: var(--content-outline-color);
     outline-offset: 0px;
     outline-style: solid;
+    min-height: 500px;
+    padding-bottom: 0px;
+    margin: 0px;
 }
 
 .main_logo {
@@ -284,4 +288,21 @@ body {
     position: absolute;
     bottom: 0;
     left: 0;
+}
+
+/* Configuration Classes */
+.circle {
+    clip-path: clip-path: circle(49% at 50% 50%);
+}
+
+.four-point {
+    clip-path: none;
+}
+
+.six-point {
+    clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
+}
+
+.eight-point {
+    clip-path: polygon(30% 0%, 70% 0%, 100% 30%, 100% 70%, 70% 100%, 30% 100%, 0% 70%, 0% 30%);
 }
