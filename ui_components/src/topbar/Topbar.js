@@ -369,7 +369,7 @@ function TopbarNotificationLeft({
                 <>
                     <label onClick={() => closeNotification(notification.notification_id)} className="topbar_close_notification">X</label>
                     <a href={notification.action_url}
-                        className="topbar_notification_wrapper_training complete"
+                        className="topbar_notification_wrapper_training_complete"
                         data-content={notification.message}
                         data-time={calculateTimeRemaining(notification.created, notification.duration)}
                     >
