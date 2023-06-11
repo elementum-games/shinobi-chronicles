@@ -7,13 +7,6 @@ class UserApiPresenter {
             'user_name' => $player->user_name,
             'rank_name' => $rank_names[$player->rank_num],
             'level' => $player->level,
-            'regen_time' => 60 - (time() - $player->last_update),
-            'health' => (int)$player->health,
-            'max_health' => $player->max_health,
-            'chakra' => (int)$player->chakra,
-            'max_chakra' => $player->max_chakra,
-            'stamina' => (int)$player->stamina,
-            'max_stamina' => $player->max_stamina,
             'has_bloodline' => isset($player->bloodline),
             'avatar_size' => $player->getAvatarSize(),
         ];
