@@ -31,6 +31,8 @@ $NavigationAPIManager = new NavigationAPIManager($system, $player);
                 },
                 userAPIData: {
                     playerData: <?= json_encode(UserAPIPresenter::playerDataResponse(player: $player, rank_names: RankManager::fetchNames($system))) ?>,
+                    playerResources: <?= json_encode(UserAPIPresenter::playerResourcesResponse(player: $player)) ?>,
+                    playerSettings: <?= json_encode(UserAPIPresenter::playerSettingsResponse(player: $player)) ?>
                 },
                 logoutTimer: "<?= (System::LOGOUT_LIMIT * 60) - (time() - $player->last_login) ?>",
             }),

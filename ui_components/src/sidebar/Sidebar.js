@@ -8,10 +8,12 @@ function Sidebar({ links, logoutTimer, navigationAPIData, userAPIData }) {
     const [villageMenu, setVillageMenu] = React.useState(navigationAPIData.villageMenu);
     const [staffMenu, setStaffMenu] = React.useState(navigationAPIData.staffMenu);
     const [playerData, setPlayerData] = React.useState(userAPIData.playerData);
-    const [regenTime, setRegenTime] = React.useState(userAPIData.playerData.regen_time);
-    const [regenOffset, setRegenOffset] = React.useState(calculateRegenOffset(userAPIData.playerData.regen_time));
+    const [playerResources, setPlayerResources] = React.useState(userAPIData.playerResources);
+    const [playerSettings, setPlayerSettings] = React.useState(userAPIData.playerSettings);
+    const [regenTime, setRegenTime] = React.useState(userAPIData.playerResources.regen_time);
+    const [regenOffset, setRegenOffset] = React.useState(calculateRegenOffset(userAPIData.playerResources.regen_time));
     const [logoutTime, setLogoutTime] = React.useState(null);
-    const regenTimeVar = React.useRef(userAPIData.playerData.regen_time);
+    const regenTimeVar = React.useRef(userAPIData.playerResources.regen_time);
     const logoutTimeVar = React.useRef(logoutTimer);
     const queryParameters = new URLSearchParams(window.location.search);
     const pageID = React.useRef(queryParameters.get("id"));
@@ -35,17 +37,17 @@ function Sidebar({ links, logoutTimer, navigationAPIData, userAPIData }) {
     }
     function getPlayerData() {
         apiFetch(links.user_api, {
-            request: 'getPlayerData'
+            request: 'getPlayerResources'
         }).then(response => {
             if (response.errors.length) {
                 handleErrors(response.errors);
                 return;
             }
             else {
-                setPlayerData(response.data.playerData);
-                setRegenTime(response.data.playerData.regen_time);
-                setRegenOffset(calculateRegenOffset(response.data.playerData.regen_time));
-                regenTimeVar.current = response.data.playerData.regen_time;
+                setPlayerResources(response.data.playerResources);
+                setRegenTime(response.data.playerResources.regen_time);
+                setRegenOffset(calculateRegenOffset(response.data.playerResources.regen_time));
+                regenTimeVar.current = response.data.playerResources.regen_time;
             }
         })
     }
@@ -123,17 +125,39 @@ function Sidebar({ links, logoutTimer, navigationAPIData, userAPIData }) {
         )
     }
 
-    function displayCharacterSection(playerData, regenTime, regenOffset) {
-        const health_width = Math.max(Math.round((playerData.health / playerData.max_health) * 100), 6);
-        const chakra_width = Math.max(Math.round((playerData.chakra / playerData.max_chakra) * 100), 6);
-        const stamina_width = Math.max(Math.round((playerData.stamina / playerData.max_stamina) * 100), 6);
+    function displayCharacterSection(playerData, playerResources, playerSettings, regenTime, regenOffset) {
+        const health_width = Math.max(Math.round((playerResources.health / playerResources.max_health) * 100), 6);
+        const chakra_width = Math.max(Math.round((playerResources.chakra / playerResources.max_chakra) * 100), 6);
+        const stamina_width = Math.max(Math.round((playerResources.stamina / playerResources.max_stamina) * 100), 6);
 
         return (
             <>
                 <div className="sb_avatar_container">
-                    <div className="sb_avatar_wrapper" style={{ maxWidth: playerData.avatar_size, maxHeight: playerData.avatar_size }}>
-                        <img className="sb_avatar_img" style={{ maxWidth: playerData.avatar_size, maxHeight: playerData.avatar_size }} src={playerData.avatar_link}/>
-                    </div>
+                        {playerSettings.avatar_style === "round" &&
+                            <div className={"sb_avatar_wrapper circle"} style={{ maxWidth: playerData.avatar_size, maxHeight: playerData.avatar_size }}>
+                            <img className={"sb_avatar_img circle"} style={{ maxWidth: playerData.avatar_size, maxHeight: playerData.avatar_size }} src={playerData.avatar_link} />
+                            </div>
+                        }
+                        {playerSettings.avatar_style === "four-point" &&
+                            <div className={"sb_avatar_wrapper four-point"} style={{ maxWidth: playerData.avatar_size, maxHeight: playerData.avatar_size }}>
+                            <img className={"sb_avatar_img four-point"} style={{ maxWidth: playerData.avatar_size, maxHeight: playerData.avatar_size }} src={playerData.avatar_link} />
+                            </div>
+                        }
+                        {playerSettings.avatar_style === "six-point" &&
+                            <div className={"sb_avatar_wrapper six-point"} style={{ maxWidth: playerData.avatar_size, maxHeight: playerData.avatar_size }}>
+                            <img className={"sb_avatar_img six-point"} style={{ maxWidth: playerData.avatar_size, maxHeight: playerData.avatar_size }} src={playerData.avatar_link} />
+                            </div>
+                        }
+                        {playerSettings.avatar_style === "eight-point" &&
+                            <div className={"sb_avatar_wrapper eight-point"} style={{ maxWidth: playerData.avatar_size, maxHeight: playerData.avatar_size }}>
+                            <img className={"sb_avatar_img eight-point"} style={{ maxWidth: playerData.avatar_size, maxHeight: playerData.avatar_size }} src={playerData.avatar_link} />
+                            </div>
+                        }
+                        {playerSettings.avatar_style === "nine-point" &&
+                            <div className={"sb_avatar_wrapper nine-point"} style={{ maxWidth: playerData.avatar_size, maxHeight: playerData.avatar_size }}>
+                                <img className={"sb_avatar_img nine-point"} style={{ maxWidth: playerData.avatar_size, maxHeight: playerData.avatar_size }} src={playerData.avatar_link} />
+                            </div>
+                        }
                 </div>
                 <div className={"sb_resources d-in_block"}>
                     <div className={"sb_name_container t-left d-flex"}>
@@ -157,7 +181,7 @@ function Sidebar({ links, logoutTimer, navigationAPIData, userAPIData }) {
                         <div id="sb_health" className="sb_resourceBarOuter">
                             <img className="sb_resource_corner_left" src="images/v2/decorations/barrightcorner.png" />
                             <label className="sb_innerResourceBarLabel">
-                                {playerData.health} / {playerData.max_health}
+                                {playerResources.health} / {playerResources.max_health}
                             </label>
                             <div className={"sb_health sb_fill"} style={{ width: health_width + "%" }}>
                                 <svg className="sb_resource_highlight_container">
@@ -176,7 +200,7 @@ function Sidebar({ links, logoutTimer, navigationAPIData, userAPIData }) {
                         <div id="sb_chakra" className="sb_resourceBarOuter">
                             <img className="sb_resource_corner_left" src="images/v2/decorations/barrightcorner.png" />
                             <label className="sb_innerResourceBarLabel">
-                                {playerData.chakra} / {playerData.max_chakra}
+                                {playerResources.chakra} / {playerResources.max_chakra}
                             </label>
                             <div className={"sb_chakra sb_fill"} style={{ width: chakra_width + "%" }}>
                                 <svg className="sb_resource_highlight_container">
@@ -195,7 +219,7 @@ function Sidebar({ links, logoutTimer, navigationAPIData, userAPIData }) {
                         <div id="sb_stamina" className="sb_resourceBarOuter">
                             <img className="sb_resource_corner_left" src="images/v2/decorations/barrightcorner.png" />
                             <label className="sb_innerResourceBarLabel">
-                                {playerData.stamina} / {playerData.max_stamina}
+                                {playerResources.stamina} / {playerResources.max_stamina}
                             </label>
                             <div className={"sb_stamina sb_fill"} style={{ width: stamina_width + "%" }}>
                                 <svg className="sb_resource_highlight_container">
@@ -249,11 +273,11 @@ function Sidebar({ links, logoutTimer, navigationAPIData, userAPIData }) {
     // Display
     return (
         <div id="sidebar">
-            {playerData && displayCharacterSection(playerData, regenTime, regenOffset)}
-            {userMenu && displaySection(userMenu, "Player Menu")}
-            {activityMenu && displaySection(activityMenu, "Action Menu")}
-            {villageMenu && displaySection(villageMenu, "Village Menu")}
-            {staffMenu && (staffMenu.length ? displaySection(staffMenu, "Staff Menu") : null)}
+            {displayCharacterSection(playerData, playerResources, playerSettings, regenTime, regenOffset)}
+            {displaySection(userMenu, "Player Menu")}
+            {displaySection(activityMenu, "Action Menu")}
+            {displaySection(villageMenu, "Village Menu")}
+            {staffMenu.length ? displaySection(staffMenu, "Staff Menu") : null}
             {displayLogout(links.logout_link, logoutTime)}
         </div>
     )

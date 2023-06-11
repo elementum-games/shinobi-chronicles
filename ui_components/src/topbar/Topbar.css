@@ -119,7 +119,7 @@
     position: absolute;
     font-family: Andale Mono, AndaleMono, monospace;
     font-size: 20px;
-    transform: translate(0, -10px);
+    transform: translate(-40px, -10px);
     cursor: pointer;
 }
 

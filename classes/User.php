@@ -2022,4 +2022,42 @@ class User extends Fighter {
 
         return $system->db_last_insert_id;
     }
+
+    /* User Settings */
+
+    // TO-DO: Full user settings GET, assign to user class variables
+    public function setAvatarStyle(string $style): bool {
+        $settings_result = $this->system->query("UPDATE `user_settings` SET `avatar_style` = '{$style}' WHERE `user_id` = {$this->user_id}");
+        if ($this->system->db_last_affected_rows == 0) {
+            $settings_result = $this->system->query("INSERT INTO `user_settings` (`user_id`, `avatar_style`) VALUES ({$this->user_id}, '{$style}')");
+        }
+        return ($this->system->db_last_affected_rows > 0);
+    }
+    public function setSidebarPosition(string $position): bool {
+        $settings_result = $this->system->query("UPDATE `user_settings` SET `sidebar_position` = '{$position}' WHERE `user_id` = {$this->user_id}");
+        if ($this->system->db_last_affected_rows == 0) {
+            $settings_result = $this->system->query("INSERT INTO `user_settings` (`user_id`, `sidebar_position`) VALUES ({$this->user_id}, '{$position}')");
+        }
+        return ($this->system->db_last_affected_rows > 0);
+    }
+
+    // TO-DO: Replace with user class variables
+    public function getAvatarStyle(): string
+    {
+        $avatar_result = $this->system->query("SELECT `avatar_style` FROM `user_settings` WHERE `user_id` = {$this->user_id}");
+        $result = $this->system->db_fetch($avatar_result);
+        if ($result) {
+            return $result['avatar_style'];
+        }
+        return "round";
+    }
+    public function getSidebarPosition(): string
+    {
+        $avatar_result = $this->system->query("SELECT `sidebar_position` FROM `user_settings` WHERE `user_id` = {$this->user_id}");
+        $result = $this->system->db_fetch($avatar_result);
+        if ($result) {
+            return $result['sidebar_position'];
+        }
+        return "left";
+    }
 }
