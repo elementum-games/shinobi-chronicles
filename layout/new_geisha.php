@@ -6,14 +6,12 @@ $heading = coreHeading('style/geisha/geisha.css') .
 <<<HTML
 <body>
 	<link rel='stylesheet' type='text/css' href='style/new_geisha/new_geisha.css' />
-	<div id='container'>
 HTML;
 
 
 $header = <<<HTML
 		</div>
 	</div>
-
 HTML;
 
 $body_start = <<<HTML
@@ -111,11 +109,8 @@ $footer = <<<HTML
 HTML;
 
 $hotbarModule = "templates/hotbar.php";
-
 $sidebarModule = "templates/sidebar.php";
-
 $headerModule = "templates/header.php";
-
 $topbarModule = "templates/topbar.php";
 
 return new Layout(

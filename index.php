@@ -144,30 +144,18 @@ else {
 	$layout = $system->fetchLayoutByName($player->layout);
 }
 
-if ($layout->key == "new_geisha") {
-    require("index_new.php");
-    exit;
-}
-
-echo $layout->heading;
-echo $layout->top_menu;
-echo $layout->header;
-
 // Load page or news
 if($LOGGED_IN) {
     // Master close
     if(!$system->SC_OPEN && !$player->isUserAdmin()) {
-        if(!$system->is_legacy_ajax_request) {
-            echo str_replace("[HEADER_TITLE]", "Profile", $layout->body_start);
-        }
+        $layout->renderBeforeContentHTML($system, $player, "Profile");
 
         echo "<table class='table'><tr><th>Game Maintenance</th></tr>
-	<tr><td style='text-align:center;'>
-	Shinobi-Chronicles is currently closed for maintenace. Please check back in a few minutes!
-	</td></tr></table>";
+        <tr><td style='text-align:center;'>
+        Shinobi-Chronicles is currently closed for maintenace. Please check back in a few minutes!
+        </td></tr></table>";
 
-        echo $layout->side_menu_start . $layout->side_menu_end;
-        echo str_replace('<!--[VERSION_NUMBER]-->', System::VERSION_NUMBER, $layout->footer);
+        $layout->renderAfterContentHTML($system, $player);
         exit;
     }
 
@@ -178,12 +166,13 @@ if($LOGGED_IN) {
         $ban_expire = ($expire_int == StaffManager::PERM_BAN_VALUE ? $expire_int : $system->time_remaining($player->ban_data[StaffManager::BAN_TYPE_GAME] - time()));
 
         //Display header
-        echo str_replace("[HEADER_TITLE]", "Profile", $layout->body_start);
+        $layout->renderBeforeContentHTML($system, $player, "Profile");
+
         //Ban info
         require 'templates/ban_info.php';
+
         // Footer
-        echo $layout->side_menu_start . $layout->side_menu_end;
-        echo str_replace('<!--[VERSION_NUMBER]-->', System::VERSION_NUMBER, $layout->footer);
+        $layout->renderAfterContentHTML($system, $player);
         exit;
     }
 
@@ -193,28 +182,15 @@ if($LOGGED_IN) {
         $expire_int = -1;
         $ban_expire = ($expire_int == StaffManager::PERM_BAN_VALUE ? $expire_int : $system->time_remaining($player->ban_data[StaffManager::BAN_TYPE_GAME] - time()));
 
-        //Display header
-        echo str_replace("[HEADER_TITLE]", "Profile", $layout->body_start);
+        $layout->renderBeforeContentHTML($system, $player, "Profile");
 
         //Ban info
         require 'templates/ban_info.php';
-        // Footer
-        echo $layout->side_menu_start . $layout->side_menu_end;
-        echo str_replace('<!--[VERSION_NUMBER]-->', System::VERSION_NUMBER, $layout->footer);
 
+        // Footer
+        $layout->renderAfterContentHTML($system, $player);
         exit;
     }
-
-    // Notifications
-    Notifications::displayNotifications($system, $player);
-    echo "<script type='text/javascript'>
-    var notificationRefreshID = setInterval(
-        () => {
-            // $('#notifications').load('./api/legacy_notifications.php');
-        },
-        5000
-    );
-    </script>";
 
     // Global message
     if(!$player->global_message_viewed && isset($_GET['clear_message'])) {
@@ -257,9 +233,6 @@ if($LOGGED_IN) {
     }
 
     // Pre-content display
-    if($player->train_time) {
-        $layout->renderTrainingDisplay($player);
-    }
     $page_loaded = false;
 
     if(isset($_GET['id'])) {
@@ -293,15 +266,16 @@ if($LOGGED_IN) {
                 ? ' ' . ' <div id="contentHeaderLocation">' . $player->current_location->name . '</div>'
                 : null;
 
-            echo str_replace("[HEADER_TITLE]", $route->title . $location_name, $layout->body_start);
+            $layout->renderBeforeContentHTML(
+                system: $system,
+                player: $player,
+                page_title: $route->title . $location_name
+            );
 
             $self_link = $system->router->base_url . '?id=' . $id;
 
             $system->printMessage();
-            if(!$player->global_message_viewed) {
-                $global_message = $system->fetchGlobalMessage();
-                $layout->renderGlobalMessage($system, $global_message);
-            }
+
 
             // EVENT
             if($system::$SC_EVENT_ACTIVE) {
@@ -317,7 +291,11 @@ if($LOGGED_IN) {
             if(strlen($e->getMessage()) > 1) {
                 // Display page title if page is set
                 if($routes[$id] != null) {
-                    echo str_replace("[HEADER_TITLE]", $route->title, $layout->body_start);
+                    $layout->renderBeforeContentHTML(
+                        system: $system,
+                        player: $player,
+                        page_title: $route->title
+                    );
                     $page_loaded = true;
                 }
                 $system->message($e->getMessage());
@@ -327,7 +305,11 @@ if($LOGGED_IN) {
     }
 
     if(!$page_loaded) {
-        echo str_replace("[HEADER_TITLE]", "Profile", $layout->body_start);
+        $layout->renderBeforeContentHTML(
+            system: $system,
+            player: $player,
+            page_title: "Profile"
+        );
 
         $system->printMessage();
         if(!$player->global_message_viewed) {
@@ -344,31 +326,27 @@ if($LOGGED_IN) {
         }
     }
     $player->updateData();
-
-    // Display side menu and footer
-    $layout->renderSideMenu($player, $system->router);
 }
 // Login
 else {
-    echo str_replace("[HEADER_TITLE]", "News", $layout->body_start);
+    $layout->renderBeforeContentHTML($system, null, "News");
+
     // Display error messages
     $system->printMessage();
     if(!$system->SC_OPEN) {
         echo "<table class='table'><tr><th>Game Maintenance</th></tr>
-	<tr><td style='text-align:center;'>
-	Shinobi-Chronicles is currently closed for maintenace. Please check back in a few minutes!
-	</td></tr></table>";
+        <tr><td style='text-align:center;'>
+        Shinobi-Chronicles is currently closed for maintenace. Please check back in a few minutes!
+        </td></tr></table>";
     }
 
     require("pages/news.php");
     newsPosts();
 
     $captcha = '';
-    echo str_replace('<!--CAPTCHA-->', $captcha, $layout->login_menu);
 }
 
 // Render footer
 $page_load_time = round(microtime(true) - $PAGE_LOAD_START, 3);
-
-$layout->renderFooter($page_load_time);
+$layout->renderAfterContentHTML($system, $player ?? null, $page_load_time);
 

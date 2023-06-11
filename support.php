@@ -29,20 +29,7 @@ else {
 $request_types = $supportSystem->getSupportTypes($staff_level);
 $supportCreated = false;
 
-if ($layout->key == "new_geisha") {
-    require($layout->headerModule);
-    echo $layout->heading;
-    require($layout->sidebarModule);
-    echo '<div id="content_wrapper">';
-    require($layout->topbarModule);
-}
-else {
-    echo $layout->heading;
-    echo $layout->top_menu;
-    echo $layout->header;
-}
-
-echo str_replace("[HEADER_TITLE]", "Support", $layout->body_start);
+$layout->renderBeforeContentHTML($system, $player ?? null, "Support");
 
 if($player != null) {
     //Form submitted // 11/6/21 SM{V2} supported
@@ -344,8 +331,4 @@ else {
     echo $layout->login_menu;
 }
 
-if ($layout->key == "new_geisha") {
-    echo "</div></div>";
-}
-
-$layout->renderFooter();
+$layout->renderAfterContentHTML($system, $player);

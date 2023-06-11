@@ -158,43 +158,43 @@ class NavigationAPIManager {
     /**
      * @return NavigationLinkDto[]
      */
-    public function getHeaderMenu(): array
+    public static function getHeaderMenu(System $system): array
     {
         $routes = Router::$routes;
         $return_arr = [];
         $return_arr[] = new NavigationLinkDto(
             title: "NEWS",
-            url: $this->system->router->links['news'],
+            url: $system->router->links['news'],
             active: true,
             id: 0,
         );
         $return_arr[] = new NavigationLinkDto(
             title: "DISCORD",
-            url: $this->system->router->links['discord'],
+            url: $system->router->links['discord'],
             active: true,
             id: 0,
         );
         $return_arr[] = new NavigationLinkDto(
             title: "MANUAL",
-            url: $this->system->router->base_url . "manual.php",
+            url: $system->router->base_url . "manual.php",
             active: true,
             id: 0,
         );
         $return_arr[] = new NavigationLinkDto(
             title: "GITHUB",
-            url: $this->system->router->links['github'],
+            url: $system->router->links['github'],
             active: true,
             id: 0,
         );
         $return_arr[] = new NavigationLinkDto(
             title: "RULES",
-            url: $this->system->router->base_url . "rules.php",
+            url: $system->router->base_url . "rules.php",
             active: true,
             id: 0,
         );
         $return_arr[] = new NavigationLinkDto(
             title: "SUPPORT",
-            url: $this->system->router->base_url . "support.php",
+            url: $system->router->base_url . "support.php",
             active: true,
             id: 0,
         );

@@ -14,7 +14,7 @@ class NotificationManager {
         if ($UPDATE == self::UPDATE_UNIQUE) {
             $system->query("INSERT INTO `notifications`
             (`notification_id`, `user_id`, `type`, `message`, `alert`, `created`, `duration`, `attributes`)
-            SELECT '{$notification->notification_id}', '{$notification->user_id}', '{$notification->type}', '{$notification->message}', '{$notification->alert}', '{$notification->created}', '{$notification->duration}', '{$attributes}' FROM DUAL
+            SELECT '{$notification->notification_id}', '{$notification->user_id}', '{$notification->type}', '{$notification->message}', " . (int)$notification->alert . ", '{$notification->created}', '{$notification->duration}', '{$attributes}' FROM DUAL
             WHERE NOT EXISTS (SELECT 1 FROM `notifications` WHERE `type` = '{$notification->type}' AND `user_id` = '{$notification->user_id}')");
             if ($system->db_last_num_rows > 0) {
                 $db_modified = true;
@@ -27,7 +27,7 @@ class NotificationManager {
         }
         $system->query("INSERT INTO `notifications`
             (`notification_id`, `user_id`, `type`, `message`, `alert`, `created`, `duration`, `attributes`)
-            VALUES ('{$notification->notification_id}', '{$notification->user_id}', '{$notification->type}', '{$notification->message}', '{$notification->alert}', '{$notification->created}', '{$notification->duration}', '{$attributes}')");
+            VALUES ('{$notification->notification_id}', '{$notification->user_id}', '{$notification->type}', '{$notification->message}', " . (int)$notification->alert . ", '{$notification->created}', '{$notification->duration}', '{$attributes}')");
         if ($system->db_last_num_rows > 0) {
             $db_modified = true;
         }

@@ -15,17 +15,7 @@ else {
     require_once 'classes/Bloodline.php';
 }
 
-if ($layout->key == "new_geisha") {
-    require($layout->headerModule);
-    echo $layout->heading;
-    require($layout->sidebarModule);
-    echo '<div id="content_wrapper">';
-    require($layout->topbarModule);
-    echo "<div id='content'>";
-} else {
-    $layout->renderStaticPageHeader('Manual');
-}
-
+$layout->renderBeforeContentHTML($system, $player ?? null, 'Manual');
 
 ?>
 
@@ -161,7 +151,7 @@ if ($layout->key == "new_geisha") {
           </tbody>
         </table>
 
-        </br></br>
+        <br><br>
         Apart from the offenses and the skills, there's also Gears and Weapons which can be equipped to get certain effects.
 
         <table class="table">
@@ -272,7 +262,7 @@ if ($layout->key == "new_geisha") {
         <div><b>Common</b> - 40 AK</div>
         <div><b>Lesser</b> - 20 AK</div>
 
-        </br>
+        <br />
 
         <?php include('templates/bloodlineList.php') ?>
       </div>
@@ -285,11 +275,11 @@ if ($layout->key == "new_geisha") {
         </a>
         <p>Yen is the primary currency for Shinobi Chronicles, use Yen to purchase the jutsus of your offense type in the shop, gear to help you in battle, and healing items for after combat.</p>
         <p>You can earn Yen by fighting enemies in Arena, completing Missions and Special Missions or ask your friend to transfer you some!</p>
-        </br>
+        <br />
         <h3>Ancient Kunai</h3>
         <p>It is a premium currency used for various changes toward your character</p>
         <p>Use <b>Ancient Kunai</b> to reset your character, change your username, transfer skill points into other stats, reset an individual stat, or to change your current clan</p>
-        </br>
+        <br />
         <h3>Auras</h3>
         <p>With the use of Ancient Kunai, you can imbue your character with a forbidden seal for enhanced benefits toward your character.</p>
 
@@ -313,7 +303,6 @@ if ($layout->key == "new_geisha") {
         <div>Larger journal images (300x200 -> 500x500)</div>
         <div>Longer chat posts (350 -> 450 characters)</div>
         Longer PMs (1000 -> 1500 characters)rs)
-      </div>
       </div>
 
       <br>
@@ -339,8 +328,6 @@ if ($layout->key == "new_geisha") {
 
       <!--GOJO END MANUAL-->
 
-      </div>
-
       <!-- Content -->
       <div>
 
@@ -360,11 +347,6 @@ if ($layout->key == "new_geisha") {
     }
   }
 </script>
-</div>
+
 <?php
-if ($layout->key == "new_geisha") {
-    echo "</div></div></div>";
-    $layout->renderFooter();
-} else {
-    $layout->renderStaticPageFooter($player ?? null);
-}
+$layout->renderAfterContentHTML($system, $player ?? null);

@@ -36,7 +36,9 @@ try {
             break;
         case "getHeaderMenu":
             $NavigationResponse->response_data = [
-                'headerMenu' => NavigationAPIPresenter::menuLinksResponse($NavigationManager->getHeaderMenu()),
+                'headerMenu' => NavigationAPIPresenter::menuLinksResponse(
+                    NavigationAPIManager::getHeaderMenu($system)
+                ),
             ];
             break;
         default:

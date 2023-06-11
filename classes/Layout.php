@@ -1,6 +1,8 @@
 <?php
 
 require_once __DIR__ . '/Route.php';
+require_once __DIR__ . "/navigation/NavigationAPIPresenter.php";
+require_once __DIR__ . '/navigation/NavigationAPIManager.php';
 
 class Layout {
     public function __construct(
@@ -21,6 +23,87 @@ class Layout {
         public string $headerModule = "",
         public string $topbarModule = "",
     ) {}
+
+    public function renderBeforeContentHTML(System $system, ?User $player, string $page_title): void {
+        // Old manual new geisha
+        /*
+        require($layout->headerModule);
+        echo $layout->heading;
+        require($layout->sidebarModule);
+        require($layout->topbarModule);
+        echo "<div id='content'>";
+        */
+
+        if($this->key == 'new_geisha') {
+            echo $this->heading;
+            require 'templates/header.php';
+
+            echo "<div id='container'>";
+
+            if($player != null) {
+                require 'templates/sidebar.php';
+                echo '<div id="content_wrapper">';
+                require 'templates/topbar.php';
+            }
+
+            echo str_replace("[HEADER_TITLE]", $page_title, $this->body_start);
+
+            if($player != null && !$player->global_message_viewed) {
+                $global_message = $system->fetchGlobalMessage();
+                $this->renderGlobalMessage($system, $global_message);
+            }
+        }
+        else {
+            echo $this->heading;
+            echo $this->top_menu;
+            echo $this->header;
+
+            if($player != null) {
+                Notifications::displayNotifications($system, $player);
+
+                if($player->train_time) {
+                    $this->renderTrainingDisplay($player);
+                }
+            }
+
+            echo str_replace("[HEADER_TITLE]", "Profile", $this->body_start);
+
+            if($player != null) {
+                if(!$player->global_message_viewed) {
+                    $global_message = $system->fetchGlobalMessage();
+                    $this->renderGlobalMessage($system, $global_message);
+                }
+            }
+        }
+    }
+
+    public function renderAfterContentHTML(System $system, ?User $player, ?float $page_load_time = null): void {
+        if($this->key == 'new_geisha') {
+            echo "</div>";
+
+            if($player != null) {
+                echo "</div>";
+                if ($system->environment == System::ENVIRONMENT_DEV) {
+                    require($this->hotbarModule);
+                }
+            }
+
+            echo "</div>";
+
+            $this->renderFooter($page_load_time);
+        }
+        else {
+            // Display side menu and footer
+            if($player != null) {
+                $this->renderSideMenu($player, $system->router);
+            }
+            else {
+                echo str_replace('<!--CAPTCHA-->', '', $this->login_menu);
+            }
+
+            echo str_replace('<!--[VERSION_NUMBER]-->', System::VERSION_NUMBER, $this->footer);
+        }
+    }
 
     public function renderStaticPageHeader(string $page_title): void {
         echo $this->heading;
