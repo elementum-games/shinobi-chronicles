@@ -33,6 +33,7 @@ if ($layout->key == "new_geisha") {
     require($layout->headerModule);
     echo $layout->heading;
     require($layout->sidebarModule);
+    echo '<div id="content_wrapper">';
     require($layout->topbarModule);
 }
 else {
@@ -344,7 +345,7 @@ else {
 }
 
 if ($layout->key == "new_geisha") {
-    echo "</div>";
+    echo "</div></div>";
 }
 
 $layout->renderFooter();

@@ -105,34 +105,31 @@ function Topbar({ links, notificationAPIData }) {
     // Display
     return (
         <div id="topbar" className="d-flex">
-            <div className="topbar_left"></div>
-            <div className={"topbar_right d-flex"}>
-                <div className="topbar_inner_left">
-                    <div className={"topbar_notifications_container_left d-flex"}>
-                        {(notificationData) &&
-                            notificationData.map(function (notification, i) {
-                                return <TopbarNotificationLeft
-                                    key={i}
-                                    notification={notification}
-                                    closeNotification={closeNotification}
-                                />;
-                            })
-                        }
-                    </div>
+            <div className="topbar_inner_left">
+                <div className={"topbar_notifications_container_left d-flex"}>
+                    {(notificationData) &&
+                        notificationData.map(function (notification, i) {
+                            return <TopbarNotificationLeft
+                                key={i}
+                                notification={notification}
+                                closeNotification={closeNotification}
+                            />;
+                        })
+                    }
                 </div>
-                <div className={"topbar_inner_center main_logo"}></div>
-                <div className="topbar_inner_right">
-                    <div className={"topbar_notifications_container_right d-flex"}>
-                        {(notificationData) &&
-                            notificationData.map(function (notification, i) {
-                                return <TopbarNotificationRight
-                                    key={i}
-                                    notification={notification}
-                                    closeNotification={closeNotification}
-                                />;
-                            })
-                        }
-                    </div>
+            </div>
+            <div className={"topbar_inner_center main_logo"}></div>
+            <div className="topbar_inner_right">
+                <div className={"topbar_notifications_container_right d-flex"}>
+                    {(notificationData) &&
+                        notificationData.map(function (notification, i) {
+                            return <TopbarNotificationRight
+                                key={i}
+                                notification={notification}
+                                closeNotification={closeNotification}
+                            />;
+                        })
+                    }
                 </div>
             </div>
         </div>
@@ -148,7 +145,7 @@ function TopbarNotificationRight({
     closeNotification
 }: TopbarNotificationPropsRight) {
     return (
-        <div>
+        <>
             {notification.type === "specialmission" &&
                 <a href={notification.action_url}
                    className={(notification.duration > 0) ? "topbar_notification_wrapper has_duration" : "topbar_notification_wrapper"}
@@ -341,7 +338,7 @@ function TopbarNotificationRight({
                     </svg>
                 </a>
             }
-        </div>
+        </>
     )
 }
 
@@ -354,7 +351,7 @@ function TopbarNotificationLeft({
     closeNotification
 }: TopbarNotificationPropsLeft) {
     return (
-        <div>
+        <>
             {notification.type === "training" &&
                 <a href={notification.action_url}
                     className="topbar_notification_wrapper_training"
@@ -385,7 +382,7 @@ function TopbarNotificationLeft({
                     </a>
                 </>
             }
-        </div>
+        </>
     )
 }
 

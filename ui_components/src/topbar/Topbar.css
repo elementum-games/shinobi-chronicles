@@ -1,18 +1,10 @@
 #topbarContainer {
-    position: absolute;
+
 }
 
 #topbar {
     height: var(--topbar-height);
-}
-
-.topbar_left {
-    width: var(--sidebar-width);
-}
-
-.topbar_right {
-    width: var(--content-width);
-    margin-left: var(--content-sidebar-gap);
+    width: 100%;
     justify-content: center;
     align-items: center;
 }
@@ -22,6 +14,7 @@
 }
 .topbar_inner_center {
     flex-basis: 40%;
+    min-width: 305px;
 }
 .topbar_inner_right {
     flex-basis: 30%;
@@ -33,17 +26,18 @@
 }
 
 .topbar_notifications_container_left {
-    margin-left: 20px;
+
 }
 
 .topbar_notification_wrapper {
     cursor: pointer;
+    position: relative;
 }
 
 .topbar_notification_wrapper_training::after {
     content: attr(data-content) ": " attr(data-time);
     position: absolute;
-    transform: translate(5px, 5px);
+    transform: translate(10px, 5px);
     z-index: 1000;
     background-color: #141317;
     border-color: #575749;
@@ -65,7 +59,6 @@
 .topbar_notification_wrapper:hover::after {
     content: attr(data-content);
     position: absolute;
-    top: 100%;
     z-index: 1000;
     transform: translate(-17px, -10px);
     background-color: #141317;
@@ -79,6 +72,8 @@
     padding: 5px;
     white-space: nowrap;
     font-weight: bold;
+    top: 100%;
+    transform: translate(calc(-100% - 20px), 0%);
 }
 
 .topbar_notification_wrapper.has_duration:hover::after {
