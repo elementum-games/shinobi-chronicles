@@ -59,6 +59,7 @@ class Village {
     public static array $VillageRenown = [
 
     ];
+    const ARENA_MISSION_CD = 300;
     const WEEKLY_REP_CAP = 150;
     const MISSION_GAINS = [
         Mission::RANK_D => 1,

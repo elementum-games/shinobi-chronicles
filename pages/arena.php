@@ -192,10 +192,12 @@ function processArenaBattleEnd(BattleManager|BattleManagerV2 $battle, User $play
         }
 
         // Village Rep Gains
-        $rep_gain = $player->calMaxRepGain($player->village->awardArenaReputation($player->level, $opponent->level));
-        $rep_gain_string = ($rep_gain > 0)
-            ? "Fellow " . $player->village->name . " Shinobi learned from your battle, earning you $rep_gain Reputation.<br />"
-            : "";
+        if($player->mission_rep_cd - time() <= 0) {
+            $rep_gain = $player->calMaxRepGain($player->village->awardArenaReputation($player->level, $opponent->level));
+            $rep_gain_string = ($rep_gain > 0)
+                ? "Fellow " . $player->village->name . " Shinobi learned from your battle, earning you $rep_gain Reputation.<br />"
+                : "";
+        }
 
         // TEAM BOOST NPC GAINS
         if($player->team != null) {
@@ -232,6 +234,7 @@ function processArenaBattleEnd(BattleManager|BattleManagerV2 $battle, User $play
 
         $player->addMoney(($money_gain + $extra_yen), 'arena');
         if($rep_gain > 0) {
+            $player->mission_rep_cd = time() + Village::ARENA_MISSION_CD;
             $player->addRep($rep_gain);
         }
         $player->ai_wins++;
