@@ -32,6 +32,9 @@ class System {
     const SC_NO_REPLY_EMAIL = "no-reply@shinobichronicles.com";
     const UNSERVICEABLE_EMAIL_DOMAINS = ['hotmail.com', 'live.com', 'msn.com', 'outlook.com'];
 
+    public bool $ENABLE_ROW_LOCKING = true;
+    public bool $in_db_transaction = false;
+
     // TODO: Remove! This is a temporary way to do events
     const SC_EVENT_START = 0;
     const SC_EVENT_END = 1641769200;
@@ -338,6 +341,27 @@ class System {
             }
         }
         return $entities;
+    }
+
+    public function startTransaction() {
+        if ($this->ENABLE_ROW_LOCKING) {
+            $this->query("START TRANSACTION;");
+            $this->in_db_transaction = true;
+        }
+    }
+
+    public function commitTransaction() {
+        if ($this->ENABLE_ROW_LOCKING) {
+            $this->query("COMMIT;");
+            $this->in_db_transaction = false;
+        }
+    }
+    public function rollbackTransaction()
+    {
+        if ($this->ENABLE_ROW_LOCKING) {
+            $this->query("ROLLBACK;");
+            $this->in_db_transaction = false;
+         }
     }
 
 

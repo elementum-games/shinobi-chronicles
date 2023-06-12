@@ -311,7 +311,7 @@ class User extends Fighter {
             `sensei_id`,
             `accept_students`,
             `village`
-			FROM `users` WHERE `user_id`='$user_id' LIMIT 1"
+			FROM `users` WHERE `user_id`='$user_id' LIMIT 1 FOR UPDATE"
         );
         if($system->db_last_num_rows == 0) {
             throw new Exception("User does not exist!");
@@ -400,7 +400,7 @@ class User extends Fighter {
      * @throws Exception
      */
     public function loadData($UPDATE = User::UPDATE_FULL, $remote_view = false): void {
-        $result = $this->system->query("SELECT * FROM `users` WHERE `user_id`='$this->user_id' LIMIT 1");
+        $result = $this->system->query("SELECT * FROM `users` WHERE `user_id`='$this->user_id' LIMIT 1 FOR UPDATE");
         $user_data = $this->system->db_fetch($result);
 
         $this->current_ip = $user_data['current_ip'];

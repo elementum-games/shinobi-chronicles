@@ -4,6 +4,7 @@ session_start();
 require_once("classes/_autoload.php");
 
 $system = new System();
+$system->startTransaction();
 $guest_support = true;
 $self_link = $system->router->base_url . 'support.php';
 $staff_level = 0;
@@ -90,6 +91,7 @@ if($player != null) {
                 }
             }
         }catch (Exception $e) {
+            $system->rollbackTransaction();
             $system->message($e->getMessage());
         }
     }
@@ -157,6 +159,7 @@ if($player != null) {
                         throw new Exception("Error adding response!");
                     }
                 } catch (Exception $e) {
+                    $system->rollbackTransaction();
                     $system->message($e->getMessage());
                 }
             }
@@ -193,6 +196,7 @@ if($player != null) {
                         $system->message("Support closed.");
                     }
                 }catch (Exception $e) {
+                    $system->rollbackTransaction();
                     $system->message($e->getMessage());
                 }
             }
@@ -291,6 +295,7 @@ else {
                 $system->message("Error creating support.");
             }
         }catch(Exception $e) {
+            $system->rollbackTransaction();
             $system->message($e->getMessage());
         }
     }
@@ -318,6 +323,7 @@ else {
                 throw new Exception("Error adding response!");
             }
         }catch (Exception $e) {
+            $system->rollbackTransaction();
             $system->message($e->getMessage());
         }
     }
@@ -332,3 +338,5 @@ else {
 }
 
 $layout->renderAfterContentHTML($system, $player);
+
+$system->commitTransaction();
