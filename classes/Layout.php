@@ -27,6 +27,9 @@ class Layout {
     public function renderBeforeContentHTML(System $system, ?User $player, string $page_title): void {
         if($this->key == 'new_geisha') {
             echo $this->heading;
+            if ($player->getSidebarPosition() == 'right') {
+                echo "<link rel='stylesheet' type='text/css' href='style/sidebar_right.css' />";
+            }
             require 'templates/header.php';
 
             echo "<div id='container'>";
@@ -75,7 +78,7 @@ class Layout {
             if($player != null) {
                 echo "</div>";
                 if ($system->environment == System::ENVIRONMENT_DEV) {
-                    require($this->hotbarModule);
+                    require 'templates/hotbar.php';
                 }
             }
 
@@ -144,8 +147,8 @@ class Layout {
                 ? 'sidemenu_new_message_alert'
                 : null;
 
-            echo "<li><a id='sideMenuOption-" . str_replace(' ', '', $page->title)."' 
-                href='{$router->base_url}?id=$id' 
+            echo "<li><a id='sideMenuOption-" . str_replace(' ', '', $page->title)."'
+                href='{$router->base_url}?id=$id'
                 class='{$menu_alert_icon}'>"
                 . $page->title
                 . "</a></li>";
@@ -168,8 +171,8 @@ class Layout {
             }
 
             echo "<li>
-                <a 
-                    id='sideMenuOption-" . str_replace(' ', '', $page->title) . "' 
+                <a
+                    id='sideMenuOption-" . str_replace(' ', '', $page->title) . "'
                     href='{$router->base_url}?id=$id'
                     class='{$class}'
                 >" . $page->title . "</a>
@@ -184,8 +187,8 @@ class Layout {
             }
 
             echo "<li>
-                <a 
-                    id='sideMenuOption-" . str_replace(' ', '', $page->title) . "' 
+                <a
+                    id='sideMenuOption-" . str_replace(' ', '', $page->title) . "'
                     href='{$router->base_url}?id=$id'
                 >" . $page->title . "</a>
             </li>";

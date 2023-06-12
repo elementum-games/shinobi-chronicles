@@ -1,0 +1,9 @@
+#container {
+    flex-direction: row-reverse;
+}
+#headerContainer {
+    flex-direction: row-reverse;
+}
+#footer {
+    flex-direction: row-reverse;
+}
