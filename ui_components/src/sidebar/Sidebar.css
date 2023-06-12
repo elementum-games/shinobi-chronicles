@@ -24,8 +24,7 @@
 .sb_header_image_wrapper {
     left: -16px;
     position: relative;
-    top: 50%;
-    transform: translate(0%, -40%)
+    display: flex;
 }
 
 .sb_header_text_wrapper {
