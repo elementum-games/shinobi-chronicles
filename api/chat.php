@@ -30,7 +30,7 @@ try {
                 ? (int)$_POST['starting_post_id']
                 : null;
 
-            API::exitWithData($chatManager->loadPosts($starting_post_id), [], []);
+            API::exitWithData($chatManager->loadPosts($starting_post_id), [], [], system: $system);
 
         case 'submit_post':
             $message = $system->clean($_POST['message']);
