@@ -108,11 +108,6 @@ $footer = <<<HTML
 </html>
 HTML;
 
-$hotbarModule = "templates/hotbar.php";
-$sidebarModule = "templates/sidebar.php";
-$headerModule = "templates/header.php";
-$topbarModule = "templates/topbar.php";
-
 return new Layout(
     key: 'new_geisha',
     heading: $heading,
@@ -126,8 +121,4 @@ return new Layout(
     side_menu_end: $side_menu_end,
     login_menu: $login_menu,
     footer: $footer,
-	hotbarModule: $hotbarModule,
-	sidebarModule: $sidebarModule,
-	headerModule: $headerModule,
-	topbarModule: $topbarModule,
 );
