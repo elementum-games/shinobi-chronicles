@@ -81,6 +81,7 @@
                 </form>
             </td>
             <td style="text-align: center;">
+                <label>Layout</label>
                 <form action='<?=$self_link?>' method='post'>
                     <select name='layout'>";
                         <?php foreach($layouts as $layout):?>
@@ -89,6 +90,26 @@
                     </select>
                     <input type='submit' name='change_layout' value='Change' />
                 </form>
+                <?php if($player->layout == "new_geisha"): ?>
+                <label>Avatar Style</label>
+                <form action='<?=$system->router->getUrl('settings')?>' method='post'>
+                    <select name='avatar_style'>";
+                        <option value='round' <?=($avatar_style == "round" ? "selected='selected'" : "")?>>Round</option>
+                        <option value='four-point' <?=($avatar_style == "four-point" ? "selected='selected'" : "")?>>Square</option>
+                    </select>
+                    <input type='submit' name='change_avatar_style' value='Change' />
+                </form>
+                <?php if($system->environment == System::ENVIRONMENT_DEV): ?>
+                <label>Sidebar Position</label>
+                <form action='<?=$system->router->getUrl('settings')?>' method='post'>
+                    <select name='sidebar_position'>";
+                        <option value='left' <?=($sidebar_position == "left" ? "selected='selected'" : "")?>>Left</option>
+                        <option value='right' <?=($sidebar_position == "right" ? "selected='selected'" : "")?>>Right</option>
+                    </select>
+                    <input type='submit' name='change_sidebar_position' value='Change' />
+                </form>
+                <?php endif; ?>
+                <?php endif; ?>
             </td>
         </tr>
         <tr>

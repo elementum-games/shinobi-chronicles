@@ -98,15 +98,13 @@
 }
 
 .sb_avatar_wrapper {
-    clip-path: circle(50% at 50% 50%);
     background: var(--avatar-frame-border_gradient);
-    padding: 6px;
+    padding: var(--avatar-frame-border-width-large);
     position: relative;
 }
 
 .sb_avatar_img {
     position: relative;
-    clip-path: circle(49% at 50% 50%);
 }
 
 .sb_button {

@@ -52,8 +52,22 @@
     font-weight: bold;
 }
 
-.topbar_notification_wrapper_training.complete::after {
+.topbar_notification_wrapper_training_complete:hover::after {
     content: attr(data-content);
+    position: absolute;
+    transform: translate(10px, 5px);
+    z-index: 1000;
+    background-color: #141317;
+    border-color: #575749;
+    color: var(--font-color-6);
+    font-family: var(--font-secondary);
+    font-size: 12px;
+    font-style: italic;
+    border-width: 1.75px;
+    border-style: solid;
+    padding: 5px;
+    white-space: nowrap;
+    font-weight: bold;
 }
 
 .topbar_notification_wrapper:hover::after {
@@ -105,7 +119,7 @@
     position: absolute;
     font-family: Andale Mono, AndaleMono, monospace;
     font-size: 20px;
-    transform: translate(0, -10px);
+    transform: translate(-40px, -10px);
     cursor: pointer;
 }
 

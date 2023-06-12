@@ -173,12 +173,12 @@ function TopbarNotificationRight({
                             <text x="24%" y="65%" className="topbar_notification_specialmission">sm</text>
                         <circle cx="75" cy="25" r="12" fill="#31e1a1" />
                         </svg>
+                    <label onClick={() => closeNotification(notification.notification_id)} className="topbar_close_notification">X</label>
                     </a>
                 </>
             }
             {notification.type === "specialmission_failed" &&
-                <>
-                    <label onClick={() => closeNotification(notification.notification_id)} className={"topbar_close_notification"}>X</label>
+                <>                    
                     <a href={notification.action_url}
                         className={(notification.duration > 0) ? "topbar_notification_wrapper has_duration" : "topbar_notification_wrapper"}
                         data-content={notification.message}
@@ -190,6 +190,7 @@ function TopbarNotificationRight({
                             <text x="24%" y="65%" className="topbar_notification_specialmission">sm</text>
                             <circle cx="75" cy="25" r="12" fill="#ff4141" />
                         </svg>
+                        <label onClick={() => closeNotification(notification.notification_id)} className="topbar_close_notification">X</label>
                     </a>
                 </>
             }
@@ -367,9 +368,8 @@ function TopbarNotificationLeft({
             }
             {notification.type === "training_complete" &&
                 <>
-                    <label onClick={() => closeNotification(notification.notification_id)} className="topbar_close_notification">X</label>
                     <a href={notification.action_url}
-                        className="topbar_notification_wrapper_training complete"
+                        className="topbar_notification_wrapper_training_complete"
                         data-content={notification.message}
                         data-time={calculateTimeRemaining(notification.created, notification.duration)}
                     >
@@ -378,7 +378,8 @@ function TopbarNotificationLeft({
                             <polygon points="6,50 50,94 94,50 50,6" strokeWidth="2px" stroke="#000000" fill="#5964a6" />
                             <image className="topbar_notification_icon" height="50" width="50" x="25.5%" y="27.5%" href="images/v2/icons/timer.png" />
                             <circle cx="75" cy="25" r="12" fill="#31e1a1" />
-                        </svg>
+                    </svg>
+                    <label onClick={() => closeNotification(notification.notification_id)} className="topbar_close_notification">X</label>
                     </a>
                 </>
             }

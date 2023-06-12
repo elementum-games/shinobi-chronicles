@@ -182,10 +182,10 @@ function TopbarNotificationRight({
     cy: "25",
     r: "12",
     fill: "#31e1a1"
-  })))), notification.type === "specialmission_failed" && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("label", {
+  })), /*#__PURE__*/React.createElement("label", {
     onClick: () => closeNotification(notification.notification_id),
     className: "topbar_close_notification"
-  }, "X"), /*#__PURE__*/React.createElement("a", {
+  }, "X"))), notification.type === "specialmission_failed" && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("a", {
     href: notification.action_url,
     className: notification.duration > 0 ? "topbar_notification_wrapper has_duration" : "topbar_notification_wrapper",
     "data-content": notification.message,
@@ -214,7 +214,10 @@ function TopbarNotificationRight({
     cy: "25",
     r: "12",
     fill: "#ff4141"
-  })))), notification.type === "mission" && /*#__PURE__*/React.createElement("a", {
+  })), /*#__PURE__*/React.createElement("label", {
+    onClick: () => closeNotification(notification.notification_id),
+    className: "topbar_close_notification"
+  }, "X"))), notification.type === "mission" && /*#__PURE__*/React.createElement("a", {
     href: notification.action_url,
     className: notification.duration > 0 ? "topbar_notification_wrapper has_duration" : "topbar_notification_wrapper",
     "data-content": notification.message,
@@ -525,12 +528,9 @@ function TopbarNotificationLeft({
     x: "25.5%",
     y: "27.5%",
     href: "images/v2/icons/timer.png"
-  }))), notification.type === "training_complete" && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("label", {
-    onClick: () => closeNotification(notification.notification_id),
-    className: "topbar_close_notification"
-  }, "X"), /*#__PURE__*/React.createElement("a", {
+  }))), notification.type === "training_complete" && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("a", {
     href: notification.action_url,
-    className: "topbar_notification_wrapper_training complete",
+    className: "topbar_notification_wrapper_training_complete",
     "data-content": notification.message,
     "data-time": calculateTimeRemaining(notification.created, notification.duration)
   }, /*#__PURE__*/React.createElement("svg", {
@@ -560,7 +560,10 @@ function TopbarNotificationLeft({
     cy: "25",
     r: "12",
     fill: "#31e1a1"
-  })))));
+  })), /*#__PURE__*/React.createElement("label", {
+    onClick: () => closeNotification(notification.notification_id),
+    className: "topbar_close_notification"
+  }, "X"))));
 }
 
 // Utility

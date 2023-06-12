@@ -292,7 +292,7 @@ body {
 
 /* Configuration Classes */
 .circle {
-    clip-path: clip-path: circle(49% at 50% 50%);
+    clip-path: circle(50% at 50% 50%);
 }
 
 .four-point {
@@ -305,4 +305,12 @@ body {
 
 .eight-point {
     clip-path: polygon(30% 0%, 70% 0%, 100% 30%, 100% 70%, 70% 100%, 30% 100%, 0% 70%, 0% 30%);
+}
+
+.nine-point {
+    clip-path: polygon(50% 0%, 83% 12%, 100% 43%, 94% 78%, 68% 100%, 32% 100%, 6% 78%, 0% 43%, 17% 12%);
+}
+
+.sidebar-right {
+    flex-direction: row-reverse;
 }

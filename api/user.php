@@ -32,6 +32,16 @@ try {
                     rank_names: RankManager::fetchNames($system)),
             ];
             break;
+        case "getPlayerResources":
+            $UserAPIResponse->response_data = [
+                'playerResources' => UserAPIPresenter::playerResourcesResponse($player),
+            ];
+            break;
+        case "getPlayerSettings":
+            $UserAPIResponse->response_data = [
+                'playerSettings' => UserAPIPresenter::playerSettingsResponse($player),
+            ];
+            break;
         case "getMissionData":
             $UserAPIResponse->response_data = [
                 'missionData' => UserAPIPresenter::missionDataResponse(userManager: $UserAPIManager),
