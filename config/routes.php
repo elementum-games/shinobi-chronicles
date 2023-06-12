@@ -22,7 +22,7 @@ return $routes = [
         file_name: 'chat.php',
         title: 'Chat',
         function_name: 'chat',
-        menu: Route::MENU_USER,
+        menu: Route::MENU_ACTIVITY,
     ),
     4 => new Route(
         file_name: 'jutsu.php',
@@ -207,7 +207,7 @@ return $routes = [
         file_name: 'settings.php',
         title: 'Settings',
         function_name: 'userSettings',
-        menu: Route::MENU_NONE,
+        menu: Route::MENU_USER,
     ),
     18 => new Route(
         file_name: 'report.php',
@@ -246,5 +246,11 @@ return $routes = [
         title: 'Battle History',
         function_name: 'battleHistory',
         menu: Route::MENU_NONE
-    )
+    ),
+    34 => new Route(
+        file_name: 'accountRecord.php',
+        title: 'Account Record',
+        function_name: 'accountRecord',
+        menu: Route::MENU_NONE,
+    ),
 ];

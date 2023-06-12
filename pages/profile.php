@@ -134,6 +134,7 @@ function userProfile() {
             $students = SenseiManager::getStudentData($sensei['students'], $system);
         }
     }
+
     require 'templates/profile.php';
 }
 
@@ -258,7 +259,10 @@ function sendMoney(System $system, User $player, string $currency_type): void {
     </tr></table>";
 }
 
-function renderProfileSubmenu() {
+/**
+ * @throws Exception
+ */
+function renderProfileSubmenu(): void {
     global $system;
     global $player;
     global $self_link;
@@ -268,14 +272,10 @@ function renderProfileSubmenu() {
             'link' => $system->router->links['profile'],
             'title' => 'Character',
         ],
-        [
-            'link' => $system->router->links['settings'],
-            'title' => 'Settings',
-        ],
     ];
     if($player->rank_num > 1) {
         $submenu_links[] = [
-            'link' => $system->router->links['profile'] . "&page=send_money",
+            'link' => $system->router->getUrl('profile', ['page' => 'send_money']),
             'title' => 'Send Money/AK',
         ];
         if($player->forbidden_seal->max_battle_history_view > 0) {

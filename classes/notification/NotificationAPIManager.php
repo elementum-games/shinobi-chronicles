@@ -103,7 +103,7 @@ class NotificationAPIManager {
                         $notification_ids_to_delete[] = $row['notification_id'];
                         continue 2;
                     } else {
-                        $notifications[] = NotificationDto::fromDb($row, $this->system->router->getUrl('settings', ['view' => 'account']));
+                        $notifications[] = NotificationDto::fromDb($row, $this->system->router->getUrl('account_record'));
                     }
                     break;
                 case "report":
@@ -227,7 +227,7 @@ class NotificationAPIManager {
         //Official Warning
         if ($this->player->getOfficialWarnings(true)) {
             $notifications[] = new NotificationDto(
-                action_url: $this->system->router->getUrl('settings', ['view' => 'account']),
+                action_url: $this->system->router->getUrl('account_record'),
                 type: "warning",
                 message: "Official Warning(s)!",
                 user_id: $this->player->user_id,

@@ -10,9 +10,7 @@ Algorithm:	See master_plan.html
 
 function userSettings() {
 	global $system;
-
 	global $player;
-
 	global $self_link;
 
 	// Forbidden seal increase
@@ -29,9 +27,6 @@ function userSettings() {
 	if($system->environment == 'dev') {
 	    $layouts[] = 'cextralite';
 	}
-
-	require_once "profile.php";
-	renderProfileSubmenu();
 
 	if(!empty($_POST['change_avatar'])) {
 		$avatar_link = trim($_POST['avatar_link']);
@@ -221,7 +216,8 @@ function userSettings() {
             $system->message("Avatar style update failed!");
             $system->printMessage();
         }
-    } else if (!empty($_POST['change_sidebar_position'])) {
+    }
+    else if (!empty($_POST['change_sidebar_position'])) {
         $position = $system->clean($_POST['sidebar_position']);
         if ($player->setSidebarPosition($position)) {
             $system->message("Sidebar position updated!");
@@ -230,7 +226,8 @@ function userSettings() {
             $system->message("Sidebar position update failed!");
             $system->printMessage();
         }
-    } else if(!empty($_POST['level_rank_up'])) {
+    }
+    else if(!empty($_POST['level_rank_up'])) {
         $level_up = isset($_POST['level_up']);
         $rank_up = isset($_POST['rank_up']);
         $data_changed = false;
@@ -286,28 +283,6 @@ function userSettings() {
             if(count($player->blacklist) > $i) {
                 $list .= ", ";
             }
-        }
-    }
-
-    // Account details
-    if(isset($_GET['view'])) {
-        switch($_GET['view']) {
-            case 'account':
-                $warnings = $player->getOfficialWarnings();
-                $warning = false;
-                $bans = false;
-                $ban_result = $system->query("SELECT * FROM `user_record` WHERE `user_id`='{$player->user_id}' AND `record_type` IN ('"
-                . StaffManager::RECORD_BAN_ISSUED . "', '" . StaffManager::RECORD_BAN_REMOVED . "') ORDER BY `time` DESC");
-                if($system->db_last_num_rows) {
-                    while($ban = $system->db_fetch($ban_result)) {
-                        $bans[] = $ban;
-                    }
-                }
-
-                if(isset($_GET['warning_id'])) {
-                    $warning = $player->getOfficialWarning((int)$_GET['warning_id']);
-                }
-                break;
         }
     }
 

@@ -33,6 +33,7 @@ class Router {
         'chat_log' => 31,
         'news' => 32,
         'battle_history' => 33,
+        'account_record' => 34,
     ];
 
     /** @var Route[] $routes */

@@ -25,15 +25,6 @@ class Layout {
     ) {}
 
     public function renderBeforeContentHTML(System $system, ?User $player, string $page_title): void {
-        // Old manual new geisha
-        /*
-        require($layout->headerModule);
-        echo $layout->heading;
-        require($layout->sidebarModule);
-        require($layout->topbarModule);
-        echo "<div id='content'>";
-        */
-
         if($this->key == 'new_geisha') {
             echo $this->heading;
             require 'templates/header.php';
@@ -66,7 +57,7 @@ class Layout {
                 }
             }
 
-            echo str_replace("[HEADER_TITLE]", "Profile", $this->body_start);
+            echo str_replace("[HEADER_TITLE]", $page_title, $this->body_start);
 
             if($player != null) {
                 if(!$player->global_message_viewed) {

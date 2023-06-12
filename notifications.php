@@ -54,7 +54,7 @@ function displayNotifications() {
 	}
     // Official Warning - in Notifications
     if($player->getOfficialWarnings(true)) {
-        $notifications[] = "<a class='link' href='{$system->router->links['settings']}&view=account'>New Official Warning(s)!</a>";
+        $notifications[] = "<a class='link' href='{$system->router->getUrl('account_record')}'>New Official Warning(s)!</a>";
     }
     //Reports - in Notifications
 	if($player->staff_manager->isModerator() && $reportManager->getActiveReports(true)) {

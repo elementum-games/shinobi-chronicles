@@ -100,6 +100,7 @@
     background: var(--avatar-frame-border_gradient);
     padding: var(--avatar-frame-border-width-large);
     position: relative;
+    display: flex;
 }
 
 .sb_avatar_img {
