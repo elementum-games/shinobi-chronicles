@@ -19,7 +19,11 @@
                     navigation_api: "<?= $system->router->api_links['navigation'] ?>",
                 },
                 navigationAPIData: {
-                    headerMenu: <?= json_encode(NavigationAPIPresenter::menuLinksResponse(NavigationAPIManager::getHeaderMenu($system))) ?>
+                    headerMenu: <?= json_encode(
+                        NavigationAPIPresenter::menuLinksResponse(
+                            NavigationAPIManager::getHeaderMenu($system)
+                        )
+                    ) ?>
                 },
             }),
             headerContainer
