@@ -74,6 +74,7 @@ class Village {
         DailyTask::DIFFICULTY_HARD => 3,
     ];
     const PVP_REP = 3;
+    const DECAY = 0.95;
 
     public string $name;
     public string $kage_name;
