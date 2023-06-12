@@ -210,7 +210,7 @@ function members() {
         //Reputation
         else if(isset($_GET['view']) && $_GET['view'] == 'highest_rep') {
             $query_custom = " WHERE `staff_level` < " . StaffManager::STAFF_ADMINISTRATOR .
-                " ORDER BY `village_rep` DESC";
+                " ORDER BY ABS(`village_rep`) DESC";
             $view = 'highest_rep';
         }
 		//Teams
@@ -261,7 +261,7 @@ function members() {
                 $list_name = "Top {$results_per_page} Users - Highest PvP";
                 break;
             case "highest_rep":
-                $table_header = 'Village Reputation';
+                $table_header = 'Reputation';
                 $list_name = "Top {$results_per_page} Users - Highest Reputation";
                 break;
             case "highest_teams":
