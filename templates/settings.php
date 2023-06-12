@@ -95,7 +95,7 @@
                 <form action='<?=$system->router->getUrl('settings')?>' method='post'>
                     <select name='avatar_style'>";
                         <option value='round' <?=($avatar_style == "round" ? "selected='selected'" : "")?>>Round</option>
-                        <option value='four-point' <?=($avatar_style == "four-point" ? "selected='selected'" : "")?>>Four-Point</option>
+                        <option value='four-point' <?=($avatar_style == "four-point" ? "selected='selected'" : "")?>>Square</option>
                     </select>
                     <input type='submit' name='change_avatar_style' value='Change' />
                 </form>
