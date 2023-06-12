@@ -50,6 +50,11 @@ class Village {
             'outlaw_title' => 'Legendary Assassin',
             'min_rep' => 3000
         ],
+        1337 => [
+            'title' => 'Mythos',
+            'outlaw_title' => 'Mythos',
+            'min_rep' => 2147483647
+        ]
     ];
     public static array $VillageRenown = [
 
