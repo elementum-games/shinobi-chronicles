@@ -99,7 +99,8 @@
                     </select>
                     <input type='submit' name='change_avatar_style' value='Change' />
                 </form>
-                <label>Sidebar Position (Coming Soon)</label>
+                <?php if($system->environment == System::ENVIRONMENT_DEV): ?>
+                <label>Sidebar Position</label>
                 <form action='<?=$system->router->getUrl('settings')?>' method='post'>
                     <select name='sidebar_position'>";
                         <option value='left' <?=($sidebar_position == "left" ? "selected='selected'" : "")?>>Left</option>
@@ -107,6 +108,7 @@
                     </select>
                     <input type='submit' name='change_sidebar_position' value='Change' />
                 </form>
+                <?php endif; ?>
                 <?php endif; ?>
             </td>
         </tr>
