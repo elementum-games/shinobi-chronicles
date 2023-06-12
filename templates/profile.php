@@ -405,7 +405,8 @@ $clan_positions = [
 		<div style='height:6px;width:200px;border-style:solid;border-width:1px;'>
     <div style='background-color:#FFD700;height:6px;width:<?= $exp_width ?>px;'></div></div>
     <br />
-		
+
+        <label style='width:<?= $label_width ?>;'>Gender:</label> <?= $player->gender ?><br />
     <label style='width:<?= $label_width ?>;'>Spouse:</label>
     <?php if($player->spouse > 0): ?>
         <a href='<?= $system->router->links['members'] ?>&user=<?= $player->spouse_name ?>'><?= $player->spouse_name ?></a><br />
@@ -413,11 +414,11 @@ $clan_positions = [
     <?php else: ?>
         None<br />
     <?php endif; ?>
-
     <br />
-    <label style='width:<?= $label_width ?>;'>Gender:</label> <?= $player->gender ?><br />
     <label style='width:<?= $label_width ?>;'>Village:</label> <?= $player->village->name ?><br />
-    <label style='width:<?= $label_width ?>;'>Location:</label> <?= $player->location->x . '.' . $player->location->y ?><br />
+    <label style='width:<?= $label_width ?>;'>Reputation:</label> <?= $player->village->getRepName($player->village_rep) ?> <em>(<?= $player->village_rep?>)</em><br />
+    <label style='width:<?= $label_width ?>;'>Weekly Cap:</label> <?= $player->weekly_rep ?> / <?= Village::WEEKLY_REP_CAP ?><br />
+    <br />
     <label style='width:<?= $label_width ?>;'>Money:</label> &yen;<?= $player->getMoney() ?><br />
     <label style='width:<?= $label_width ?>;'>Ancient Kunai:</label> <?= $player->getPremiumCredits() ?><br />
     <label style='width:<?= $label_width ?>;'>Ancient Kunai purchased:</label> <?= $player->premium_credits_purchased ?><br />
@@ -683,7 +684,7 @@ $clan_positions = [
                 </div>
                 <div class='dailyTaskReward'>
                     <span>Reward:</span>
-                    <span>¥<?= $daily_task->reward ?></span>
+                    <span>¥<?= $daily_task->reward ?> & <?= Village::DAILY_TASK[$daily_task->difficulty] ?> Rep</span>
                 </div>
                 <div class='dailyTaskProgress'>
                     <div class='dailyTaskProgressBar dailyTask<?= $dt_status_class_name ?>'>
