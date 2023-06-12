@@ -455,6 +455,7 @@ class User extends Fighter {
             $this->rank = Rank::fromDb($rank_data);
         }
 
+        $this->gender = $user_data['gender'];
         $this->village = new Village($this->system, $user_data['village']);
         $this->village_rep = $user_data['village_rep'];
         $this->weekly_rep = $user_data['weekly_rep'];
