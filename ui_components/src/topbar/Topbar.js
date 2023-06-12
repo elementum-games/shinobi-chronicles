@@ -103,32 +103,53 @@ function Topbar({ links, notificationAPIData }) {
     }, []);
 
     // Display
+    const leftNotificationTypes = [
+        "training",
+        "training_complete"
+    ];
+
+    const rightNotificationTypes = [
+         "specialmission",
+         "specialmission_complete",
+         "specialmission_failed",
+         "rank",
+         "system",
+         "warning",
+         "report",
+         "battle",
+         "challenge",
+         "team",
+         "marriage",
+         "student",
+         "inbox",
+    ];
+
     return (
         <div id="topbar" className="d-flex">
             <div className="topbar_inner_left">
                 <div className={"topbar_notifications_container_left d-flex"}>
-                    {(notificationData) &&
-                        notificationData.map(function (notification, i) {
-                            return <TopbarNotificationLeft
-                                key={i}
-                                notification={notification}
-                                closeNotification={closeNotification}
-                            />;
-                        })
+                    {notificationData
+                        .filter(notification => leftNotificationTypes.includes(notification.type))
+                        .map((notification, i) => (
+                            <TopbarNotification
+                            key={i}
+                            notification={notification}
+                            closeNotification={closeNotification}
+                        />))
                     }
                 </div>
             </div>
             <div className={"topbar_inner_center main_logo"}></div>
             <div className="topbar_inner_right">
                 <div className={"topbar_notifications_container_right d-flex"}>
-                    {(notificationData) &&
-                        notificationData.map(function (notification, i) {
-                            return <TopbarNotificationRight
+                    {notificationData
+                        .filter(notification => rightNotificationTypes.includes(notification.type))
+                        .map((notification, i) => (
+                            <TopbarNotification
                                 key={i}
                                 notification={notification}
                                 closeNotification={closeNotification}
-                            />;
-                        })
+                            />))
                     }
                 </div>
             </div>
@@ -136,64 +157,35 @@ function Topbar({ links, notificationAPIData }) {
     )
 }
 
-type TopbarNotificationPropsRight = {|
+type TopbarNotificationProps = {|
     +notification: NotificationType | MissionNotificationType,
     +closeNotification: (number) => void,
 |};
-function TopbarNotificationRight({
+
+function TopbarNotification({
     notification,
     closeNotification
-}: TopbarNotificationPropsRight) {
+}: TopbarNotificationProps) {
+    switch(notification.type) {
+        case "training":
+        case "training_complete":
+            return <TrainingNotification
+                notification={notification}
+                closeNotification={closeNotification}
+            />;
+        case "specialmission":
+        case "specialmission_complete":
+        case "specialmission_failed":
+            return <SpecialMissionNotification
+                notification={notification}
+                closeNotification={closeNotification}
+            />;
+        default:
+            break;
+    }
+
     return (
         <>
-            {notification.type === "specialmission" &&
-                <a href={notification.action_url}
-                   className={(notification.duration > 0) ? "topbar_notification_wrapper has_duration" : "topbar_notification_wrapper"}
-                   data-content={notification.message}
-                   data-time={calculateTimeRemaining(notification.created, notification.duration)}
-                >
-                    <svg className="topbar_notification_svg" width="40" height="40" viewBox="0 0 100 100">
-                        <polygon points="6,50 50,94 94,50 50,6" strokeWidth="8px" stroke="#5d5c4b" fill="#52466a" />
-                        <polygon points="6,50 50,94 94,50 50,6" strokeWidth="2px" stroke="#000000" fill="#52466a" />
-                        <text x="24%" y="65%" className="topbar_notification_specialmission">sm</text>
-                    </svg>
-                </a>
-            }
-            {notification.type === "specialmission_complete" &&
-                <>
-                    <label onClick={() => closeNotification(notification.notification_id)} className={"topbar_close_notification"}>X</label>
-                    <a href={notification.action_url}
-                       className={(notification.duration > 0) ? "topbar_notification_wrapper has_duration" : "topbar_notification_wrapper"}
-                       data-content={notification.message}
-                       data-time={calculateTimeRemaining(notification.created, notification.duration)}
-                    >
-                        <svg className="topbar_notification_svg" width="40" height="40" viewBox="0 0 100 100">
-                            <polygon points="6,50 50,94 94,50 50,6" strokeWidth="8px" stroke="#5d5c4b" fill="#5964a6" />
-                            <polygon points="6,50 50,94 94,50 50,6" strokeWidth="2px" stroke="#000000" fill="#5964a6" />
-                            <text x="24%" y="65%" className="topbar_notification_specialmission">sm</text>
-                        <circle cx="75" cy="25" r="12" fill="#31e1a1" />
-                        </svg>
-                    <label onClick={() => closeNotification(notification.notification_id)} className="topbar_close_notification">X</label>
-                    </a>
-                </>
-            }
-            {notification.type === "specialmission_failed" &&
-                <>                    
-                    <a href={notification.action_url}
-                        className={(notification.duration > 0) ? "topbar_notification_wrapper has_duration" : "topbar_notification_wrapper"}
-                        data-content={notification.message}
-                        data-time={calculateTimeRemaining(notification.created, notification.duration)}
-                    >
-                        <svg className="topbar_notification_svg" width="40" height="40" viewBox="0 0 100 100">
-                            <polygon points="6,50 50,94 94,50 50,6" strokeWidth="8px" stroke="#5d5c4b" fill="#5964a6" />
-                            <polygon points="6,50 50,94 94,50 50,6" strokeWidth="2px" stroke="#000000" fill="#5964a6" />
-                            <text x="24%" y="65%" className="topbar_notification_specialmission">sm</text>
-                            <circle cx="75" cy="25" r="12" fill="#ff4141" />
-                        </svg>
-                        <label onClick={() => closeNotification(notification.notification_id)} className="topbar_close_notification">X</label>
-                    </a>
-                </>
-            }
             {notification.type === "mission" &&
                 <a href={notification.action_url}
                    className={(notification.duration > 0) ? "topbar_notification_wrapper has_duration" : "topbar_notification_wrapper"}
@@ -343,11 +335,64 @@ function TopbarNotificationRight({
     )
 }
 
-type TopbarNotificationPropsLeft = {|
-    +notification: NotificationType,
-    +closeNotification: (number) => void,
-|};
-function TopbarNotificationLeft({
+function SpecialMissionNotification({
+    notification,
+    closeNotification
+}: TopbarNotificationProps) {
+    return (
+        <>
+            {notification.type === "specialmission" &&
+                <a href={notification.action_url}
+                   className={(notification.duration > 0) ? "topbar_notification_wrapper has_duration" : "topbar_notification_wrapper"}
+                   data-content={notification.message}
+                   data-time={calculateTimeRemaining(notification.created, notification.duration)}
+                >
+                    <svg className="topbar_notification_svg" width="40" height="40" viewBox="0 0 100 100">
+                        <polygon points="6,50 50,94 94,50 50,6" strokeWidth="8px" stroke="#5d5c4b" fill="#52466a" />
+                        <polygon points="6,50 50,94 94,50 50,6" strokeWidth="2px" stroke="#000000" fill="#52466a" />
+                        <text x="24%" y="65%" className="topbar_notification_specialmission">sm</text>
+                    </svg>
+                </a>
+            }
+            {notification.type === "specialmission_complete" &&
+                <>
+                    <a href={notification.action_url}
+                       className={(notification.duration > 0) ? "topbar_notification_wrapper has_duration" : "topbar_notification_wrapper"}
+                       data-content={notification.message}
+                       data-time={calculateTimeRemaining(notification.created, notification.duration)}
+                    >
+                        <svg className="topbar_notification_svg" width="40" height="40" viewBox="0 0 100 100">
+                            <polygon points="6,50 50,94 94,50 50,6" strokeWidth="8px" stroke="#5d5c4b" fill="#5964a6" />
+                            <polygon points="6,50 50,94 94,50 50,6" strokeWidth="2px" stroke="#000000" fill="#5964a6" />
+                            <text x="24%" y="65%" className="topbar_notification_specialmission">sm</text>
+                            <circle cx="75" cy="25" r="12" fill="#31e1a1" />
+                        </svg>
+                        <label onClick={() => closeNotification(notification.notification_id)} className="topbar_close_notification">X</label>
+                    </a>
+                </>
+            }
+            {notification.type === "specialmission_failed" &&
+                <>
+                    <a href={notification.action_url}
+                       className={(notification.duration > 0) ? "topbar_notification_wrapper has_duration" : "topbar_notification_wrapper"}
+                       data-content={notification.message}
+                       data-time={calculateTimeRemaining(notification.created, notification.duration)}
+                    >
+                        <svg className="topbar_notification_svg" width="40" height="40" viewBox="0 0 100 100">
+                            <polygon points="6,50 50,94 94,50 50,6" strokeWidth="8px" stroke="#5d5c4b" fill="#5964a6" />
+                            <polygon points="6,50 50,94 94,50 50,6" strokeWidth="2px" stroke="#000000" fill="#5964a6" />
+                            <text x="24%" y="65%" className="topbar_notification_specialmission">sm</text>
+                            <circle cx="75" cy="25" r="12" fill="#ff4141" />
+                        </svg>
+                        <label onClick={() => closeNotification(notification.notification_id)} className="topbar_close_notification">X</label>
+                    </a>
+                </>
+            }
+        </>
+    )
+}
+
+function TrainingNotification({
     notification,
     closeNotification
 }: TopbarNotificationPropsLeft) {
