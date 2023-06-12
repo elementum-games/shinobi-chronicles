@@ -142,7 +142,7 @@ function news() {
 
 	if(!$page) {
 		if($player->hasAdminPanel()) {
-			echo "<p style='text-align:center;'><a href='$self_link?page=create_post'>New post</a></p>";
+			echo "<p style='text-align:center;'><a href='$self_link&page=create_post'>New post</a></p>";
 			newsPosts($player->isUserAdmin());
 		}
 		else {
