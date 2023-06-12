@@ -9,26 +9,23 @@
 ?>
 
 <table class='table'>
-    <?php if(isset($_GET['warning_id'])):?>
-        <?php if($warning_to_view != null): ?>
-            <tr><td>Invalid warning!</td></tr>
-        <?php else: ?>
-            <tr><th>Official Warning</th></tr>
-            <tr>
-                <td>
-                    <div>
-                        <label style="display: inline-block; width:7em; margin-left: 1rem; font-weight:bold;">Date:</label>
-                        <?=Date("F m Y", $warning_to_view['time'])?><br />
-                        <label style="display: inline-block; width:7em; margin-left: 1rem; font-weight:bold;">Issued By:</label>
-                        <?=$warning_to_view['staff_name']?>
-                    </div>
-                    <hr />
-                    <div style="text-align: center;"><?=$warning_to_view['data']?></div>
-                </td>
-            </tr>
-        <?php endif ?>
+    <?php if($warning_to_view != null):?>
+        <tr><th>
+            Official Warning (<a href="<?= $system->router->getUrl('account_record')?>">Back</a>)
+        </th></tr>
+        <tr>
+            <td>
+                <div>
+                    <label style="display: inline-block; width:7em; margin-left: 1rem; font-weight:bold;">Date:</label>
+                    <?=Date("F m Y", $warning_to_view['time'])?><br />
+                    <label style="display: inline-block; width:7em; margin-left: 1rem; font-weight:bold;">Issued By:</label>
+                    <?=$warning_to_view['staff_name']?>
+                </div>
+                <hr />
+                <div style="text-align: center;"><?=$warning_to_view['data']?></div>
+            </td>
+        </tr>
     <?php else: ?>
-        <tr><th colspan="4">Account Details</th></tr>
         <tr><th colspan="4">Official Warning(s)</th></tr>
         <?php if(empty($warnings)): ?>
             <tr><td colspan="4" style="text-align: center;">No Warnings</td></tr>
@@ -59,7 +56,7 @@
             <?php endforeach ?>
         <?php endif ?>
         <tr><th colspan="4">Bans</th></tr>
-        <?php if($bans == false): ?>
+        <?php if(count($bans) < 1): ?>
             <tr>
                 <td colspan="4" style="text-align: center;">
                     No bans.

@@ -908,9 +908,11 @@ class User extends Fighter {
      */
     public function getOfficialWarning($id): ?array {
         $result = $this->system->query("SELECT * FROM `official_warnings` WHERE `user_id`='{$this->user_id}' AND `warning_id`='{$id}' LIMIT 1");
-        if($this->system->db_last_num_rows) {
+        $warning = $this->system->db_fetch($result);
+
+        if($warning != null) {
             $this->system->query("UPDATE `official_warnings` SET `viewed`=1 WHERE `warning_id`='{$id}' LIMIT 1");
-            return $this->system->db_fetch($result);
+            return $warning;
         }
         else {
             return null;
