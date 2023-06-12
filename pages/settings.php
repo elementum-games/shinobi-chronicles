@@ -211,21 +211,17 @@ function userSettings() {
         $style = $system->clean($_POST['avatar_style']);
         if ($player->setAvatarStyle($style)) {
             $system->message("Avatar style updated!");
-            $system->printMessage();
-        } else {
-            $system->message("Avatar style update failed!");
-            $system->printMessage();
         }
+
+        $system->printMessage();
     }
     else if (!empty($_POST['change_sidebar_position'])) {
         $position = $system->clean($_POST['sidebar_position']);
         if ($player->setSidebarPosition($position)) {
             $system->message("Sidebar position updated!");
-            $system->printMessage();
-        } else {
-            $system->message("Sidebar position update failed!");
-            $system->printMessage();
         }
+
+        $system->printMessage();
     }
     else if(!empty($_POST['level_rank_up'])) {
         $level_up = isset($_POST['level_up']);

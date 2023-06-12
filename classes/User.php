@@ -2029,17 +2029,17 @@ class User extends Fighter {
 
     // TO-DO: Full user settings GET, assign to user class variables
     public function setAvatarStyle(string $style): bool {
-        $this->system->query("UPDATE `user_settings` SET `avatar_style` = '{$style}' WHERE `user_id` = {$this->user_id}");
-        if ($this->system->db_last_affected_rows == 0) {
-            $this->system->query("INSERT INTO `user_settings` (`user_id`, `avatar_style`) VALUES ({$this->user_id}, '{$style}')");
-        }
+        $this->system->query("INSERT INTO `user_settings` (`user_id`, `avatar_style`) 
+            VALUES ({$this->user_id}, '{$style}') 
+            ON DUPLICATE KEY UPDATE `avatar_style`='{$style}';");
+
         return ($this->system->db_last_affected_rows > 0);
     }
     public function setSidebarPosition(string $position): bool {
-        $this->system->query("UPDATE `user_settings` SET `sidebar_position` = '{$position}' WHERE `user_id` = {$this->user_id}");
-        if ($this->system->db_last_affected_rows == 0) {
-            $this->system->query("INSERT INTO `user_settings` (`user_id`, `sidebar_position`) VALUES ({$this->user_id}, '{$position}')");
-        }
+        $this->system->query("INSERT INTO `user_settings` (`user_id`, `sidebar_position`) 
+            VALUES ({$this->user_id}, '{$position}')
+            ON DUPLICATE KEY UPDATE `sidebar_position`='{$position}';");
+
         return ($this->system->db_last_affected_rows > 0);
     }
 
