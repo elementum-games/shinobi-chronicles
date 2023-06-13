@@ -16,11 +16,17 @@ final class VillageRep extends AbstractMigration
      * Remember to call "create()" or "update()" and NOT "save()" when working
      * with the Table class.
      */
-    public function change(): void
-    {
+    public function up(): void {
         $this->execute("ALTER TABLE `users` 
             ADD COLUMN `village_rep` INT NOT NULL DEFAULT 0,
             ADD COLUMN `weekly_rep` INT NOT NULL DEFAULT 0,
             ADD COLUMN `mission_rep_cd` INT NOT NULL DEFAULT 0;");
+    }
+
+    public function down(): void {
+        $this->execute("ALTER TABLE `users` 
+            DROP COLUMN `village_rep` INT NOT NULL DEFAULT 0,
+            DROP COLUMN `weekly_rep` INT NOT NULL DEFAULT 0,
+            DROP COLUMN `mission_rep_cd` INT NOT NULL DEFAULT 0;");
     }
 }
