@@ -25,8 +25,8 @@ final class VillageRep extends AbstractMigration
 
     public function down(): void {
         $this->execute("ALTER TABLE `users` 
-            DROP COLUMN `village_rep` INT NOT NULL DEFAULT 0,
-            DROP COLUMN `weekly_rep` INT NOT NULL DEFAULT 0,
-            DROP COLUMN `mission_rep_cd` INT NOT NULL DEFAULT 0;");
+            DROP COLUMN `village_rep`,
+            DROP COLUMN `weekly_rep`,
+            DROP COLUMN `mission_rep_cd`;");
     }
 }
