@@ -191,6 +191,15 @@ function processArenaBattleEnd(BattleManager|BattleManagerV2 $battle, User $play
             $stat_gain_display .= $player->addStatGain($stat_to_gain, 1) . '.';
         }
 
+        // Village Rep Gains
+        $rep_gain = 0;
+        if($player->mission_rep_cd - time() <= 0) {
+            $rep_gain = $player->calMaxRepGain($player->village->awardArenaReputation($player->level, $opponent->level));
+        }
+        $rep_gain_string = ($rep_gain > 0)
+            ? "Fellow " . $player->village->name . " Shinobi learned from your battle, earning you $rep_gain Reputation.<br />"
+            : "";
+
         // TEAM BOOST NPC GAINS
         if($player->team != null) {
             $boost_percent = $player->team->getAIMoneyBoostAmount();
@@ -207,20 +216,27 @@ function processArenaBattleEnd(BattleManager|BattleManagerV2 $battle, User $play
                 if($item->effect == 'yen_boost') {
                     $amount = ceil($money_gain * ($item->effect_amount/100));
                     $extra_yen += $amount;
-                    $append_message .= "<br />Your $item->name has provided you with an extra &yen;$amount.";
+                    $append_message .= "Your $item->name has provided you with an extra &yen;$amount.<br />";
                 }
             }
         }
 
-        $player->addMoney(($money_gain + $extra_yen), 'arena');
-
-        $battle_result = "You have defeated your arena opponent.<br />
-			You have claimed your prize of &yen;$money_gain.";
+        $battle_result = "You have defeated your arena opponent.<br />";
+        if($rep_gain_string != "") {
+            $battle_result .= $rep_gain_string;
+        }
+		$battle_result .= "You have claimed your prize of &yen;$money_gain.<br />";
         if($append_message != "") {
             $battle_result .= $append_message;
         }
         if($stat_gain_display) {
             $battle_result .=  $stat_gain_display;
+        }
+
+        $player->addMoney(($money_gain + $extra_yen), 'arena');
+        if($rep_gain > 0) {
+            $player->mission_rep_cd = time() + Village::ARENA_MISSION_CD;
+            $player->addRep($rep_gain);
         }
         $player->ai_wins++;
         $player->battle_id = 0;
