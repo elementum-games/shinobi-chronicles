@@ -133,31 +133,9 @@ function Sidebar({ links, logoutTimer, navigationAPIData, userAPIData }) {
         return (
             <>
                 <div className="sb_avatar_container">
-                        {playerSettings.avatar_style === "round" &&
-                            <div className={"sb_avatar_wrapper circle"} style={{ maxWidth: playerData.avatar_size, maxHeight: playerData.avatar_size }}>
-                            <img className={"sb_avatar_img circle"} style={{ maxWidth: playerData.avatar_size, maxHeight: playerData.avatar_size }} src={playerData.avatar_link} />
-                            </div>
-                        }
-                        {playerSettings.avatar_style === "four-point" &&
-                            <div className={"sb_avatar_wrapper four-point"} style={{ maxWidth: playerData.avatar_size, maxHeight: playerData.avatar_size }}>
-                            <img className={"sb_avatar_img four-point"} style={{ maxWidth: playerData.avatar_size, maxHeight: playerData.avatar_size }} src={playerData.avatar_link} />
-                            </div>
-                        }
-                        {playerSettings.avatar_style === "six-point" &&
-                            <div className={"sb_avatar_wrapper six-point"} style={{ maxWidth: playerData.avatar_size, maxHeight: playerData.avatar_size }}>
-                            <img className={"sb_avatar_img six-point"} style={{ maxWidth: playerData.avatar_size, maxHeight: playerData.avatar_size }} src={playerData.avatar_link} />
-                            </div>
-                        }
-                        {playerSettings.avatar_style === "eight-point" &&
-                            <div className={"sb_avatar_wrapper eight-point"} style={{ maxWidth: playerData.avatar_size, maxHeight: playerData.avatar_size }}>
-                            <img className={"sb_avatar_img eight-point"} style={{ maxWidth: playerData.avatar_size, maxHeight: playerData.avatar_size }} src={playerData.avatar_link} />
-                            </div>
-                        }
-                        {playerSettings.avatar_style === "nine-point" &&
-                            <div className={"sb_avatar_wrapper nine-point"} style={{ maxWidth: playerData.avatar_size, maxHeight: playerData.avatar_size }}>
-                                <img className={"sb_avatar_img nine-point"} style={{ maxWidth: playerData.avatar_size, maxHeight: playerData.avatar_size }} src={playerData.avatar_link} />
-                            </div>
-                        }
+                    <div className={"sb_avatar_wrapper " + playerSettings.avatar_style} style={{ maxWidth: playerData.avatar_size, maxHeight: playerData.avatar_size }}>
+                        <img className={"sb_avatar_img circle " + playerSettings.avatar_style} style={{ maxWidth: playerData.avatar_size, maxHeight: playerData.avatar_size }} src={playerData.avatar_link} />
+                    </div>
                 </div>
                 <div className={"sb_resources d-in_block"}>
                     <div className={"sb_name_container t-left d-flex"}>

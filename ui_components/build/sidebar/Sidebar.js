@@ -131,66 +131,14 @@ function Sidebar({
     const stamina_width = Math.max(Math.round(playerResources.stamina / playerResources.max_stamina * 100), 6);
     return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
       className: "sb_avatar_container"
-    }, playerSettings.avatar_style === "round" && /*#__PURE__*/React.createElement("div", {
-      className: "sb_avatar_wrapper circle",
+    }, /*#__PURE__*/React.createElement("div", {
+      className: "sb_avatar_wrapper " + playerSettings.avatar_style,
       style: {
         maxWidth: playerData.avatar_size,
         maxHeight: playerData.avatar_size
       }
     }, /*#__PURE__*/React.createElement("img", {
-      className: "sb_avatar_img circle",
-      style: {
-        maxWidth: playerData.avatar_size,
-        maxHeight: playerData.avatar_size
-      },
-      src: playerData.avatar_link
-    })), playerSettings.avatar_style === "four-point" && /*#__PURE__*/React.createElement("div", {
-      className: "sb_avatar_wrapper four-point",
-      style: {
-        maxWidth: playerData.avatar_size,
-        maxHeight: playerData.avatar_size
-      }
-    }, /*#__PURE__*/React.createElement("img", {
-      className: "sb_avatar_img four-point",
-      style: {
-        maxWidth: playerData.avatar_size,
-        maxHeight: playerData.avatar_size
-      },
-      src: playerData.avatar_link
-    })), playerSettings.avatar_style === "six-point" && /*#__PURE__*/React.createElement("div", {
-      className: "sb_avatar_wrapper six-point",
-      style: {
-        maxWidth: playerData.avatar_size,
-        maxHeight: playerData.avatar_size
-      }
-    }, /*#__PURE__*/React.createElement("img", {
-      className: "sb_avatar_img six-point",
-      style: {
-        maxWidth: playerData.avatar_size,
-        maxHeight: playerData.avatar_size
-      },
-      src: playerData.avatar_link
-    })), playerSettings.avatar_style === "eight-point" && /*#__PURE__*/React.createElement("div", {
-      className: "sb_avatar_wrapper eight-point",
-      style: {
-        maxWidth: playerData.avatar_size,
-        maxHeight: playerData.avatar_size
-      }
-    }, /*#__PURE__*/React.createElement("img", {
-      className: "sb_avatar_img eight-point",
-      style: {
-        maxWidth: playerData.avatar_size,
-        maxHeight: playerData.avatar_size
-      },
-      src: playerData.avatar_link
-    })), playerSettings.avatar_style === "nine-point" && /*#__PURE__*/React.createElement("div", {
-      className: "sb_avatar_wrapper nine-point",
-      style: {
-        maxWidth: playerData.avatar_size,
-        maxHeight: playerData.avatar_size
-      }
-    }, /*#__PURE__*/React.createElement("img", {
-      className: "sb_avatar_img nine-point",
+      className: "sb_avatar_img circle " + playerSettings.avatar_style,
       style: {
         maxWidth: playerData.avatar_size,
         maxHeight: playerData.avatar_size

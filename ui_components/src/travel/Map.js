@@ -156,15 +156,20 @@ function MapLocations({ locations, mapOffsetX, mapOffsetY, tileWidth, tileHeight
         <div className='map_locations'>
             {locations.map((location) => (
                 <div key={location.location_id}
-                     className='map_location'
-                     style={{
-                         cursor: "pointer",
-                         backgroundColor: "#" + location.background_color,
-                         backgroundImage: "url(." + location.background_image + ")",
-                         top: ((mapOffsetY + location.y - 1) * tileHeight) + "px",
-                         left: ((mapOffsetX + location.x - 1) * tileWidth) + "px",
-                     }}>
+                    className='map_location'
+                    style={{
+                        cursor: "pointer",
+                        backgroundColor: "#" + location.background_color,
+                        backgroundImage: "url(." + location.background_image + ")",
+                        top: ((mapOffsetY + location.y - 1) * tileHeight) + "px",
+                        left: ((mapOffsetX + location.x - 1) * tileWidth) + "px",
+                    }}>
                     <div className='map_locations_tooltip'>{location.name}</div>
+                    {location.objective_image &&
+                        <div className='map_location_objective' style={{
+                            backgroundImage: "url(." + location.objective_image + ")",
+                        }}></div>
+                    }
                 </div>
             ))}
         </div>

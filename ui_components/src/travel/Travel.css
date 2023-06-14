@@ -420,17 +420,30 @@
     background-position: center;
     background-size: auto 100%;
 }
+.map_location_objective {
+    width: 32px;
+    height: 32px;
+    position: absolute;
+    top: 0;
+    left: 0;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: auto 100%;
+}
+
 
 .map_locations_tooltip {
     display: none;
     position: absolute;
     bottom: 110%;
-    left: -100%;
+    left: 50%;
     right: 0;
+    transform: translateX(-50%);
     margin: 0 auto;
     padding: 5px 10px;
     text-align: center;
-    width: 100px;
+    width: fit-content;
+    white-space: pre;
 
     background: var(--theme-content-bg-color);
     border-radius: 4px;
