@@ -358,7 +358,7 @@ class System {
     }
     public function rollbackTransaction()
     {
-        if ($this->ENABLE_ROW_LOCKING) {
+        if ($this->ENABLE_ROW_LOCKING && $this->in_db_transaction) {
             $this->query("ROLLBACK;");
             $this->in_db_transaction = false;
          }
