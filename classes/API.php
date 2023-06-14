@@ -9,6 +9,7 @@ class API {
     #[NoReturn]
     public static function exitWithError(string $message, array $debug_messages = [], System $system): void {
         $system->rollbackTransaction();
+        error_log($message);
         echo json_encode([
             'errors' => $message,
             'debug' => $debug_messages
