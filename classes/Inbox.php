@@ -119,13 +119,13 @@ class Inbox {
      * @return array|null
      */
     public static function getUserData(System $system, string $user_name): ?InboxUser {
-        $sql = "SELECT `users`.`user_id`, 
+        $sql = "SELECT `users`.`user_id`,
                 `users`.`user_name`,
                 `users`.`avatar_link`,
-               `users`.`forbidden_seal`, 
-               `users`.`staff_level`, 
+               `users`.`forbidden_seal`,
+               `users`.`staff_level`,
                `blacklist`.`blocked_ids`
-                FROM `users` 
+                FROM `users`
                 INNER JOIN `blacklist`
                 ON `users`.`user_id`=`blacklist`.`user_id`
                 WHERE `users`.`user_name`='{$user_name}'";
@@ -186,7 +186,7 @@ class Inbox {
      */
     public static function sendMessage($system, $convo_id, $sender_id, $message): int {
         $timestamp = time();
-        $sql = "INSERT INTO `convos_messages` (`convo_id`, `sender_id`, `message`, `time`) 
+        $sql = "INSERT INTO `convos_messages` (`convo_id`, `sender_id`, `message`, `time`)
                 VALUES ('{$convo_id}', '{$sender_id}', '{$message}', '{$timestamp}')";
         $system->query($sql);
         return $system->db_last_insert_id;
@@ -225,7 +225,7 @@ class Inbox {
      * @return int entry_id
      */
     public static function addUserToConvo($system, $convo_id, $user_id): int {
-        $sql = "INSERT INTO `convos_users` (`convo_id`, `user_id`) 
+        $sql = "INSERT INTO `convos_users` (`convo_id`, `user_id`)
                 VALUES ('{$convo_id}', '{$user_id}')";
         $result = $system->query($sql);
         return $system->db_last_insert_id;
@@ -282,9 +282,12 @@ class Inbox {
         $max_size = self::INBOX_SIZE;
         if ($staff_level) {
             $max_size = self::INBOX_SIZE_STAFF;
-        }
+        } 
         elseif ($forbidden_seal instanceof ForbiddenSeal) {
             $max_size = $forbidden_seal->inbox_size;
+        } 
+        elseif (is_array($forbidden_seal)) {
+            $max_size = ForbiddenSeal::$benefits[$forbidden_seal['level']]['inbox_size'];
         }
         return $max_size;
     }
@@ -398,11 +401,11 @@ class Inbox {
 
     public static function getSystemConvo(System $system, int $system_id, int $user_id): array {
         $convo = ['convo_id' => self::SYSTEM_MESSAGE_CODES[$system_id], 'convo_members' => []];
-        $sql = "SELECT * 
-                FROM `convos_alerts` 
+        $sql = "SELECT *
+                FROM `convos_alerts`
                 WHERE `system_id`='{$system_id}'
                 AND `target_id`={$user_id}
-                AND `alert_deleted`=0 
+                AND `alert_deleted`=0
                 ORDER BY `alert_id` DESC";
         $result = $system->query($sql);
         if (!$system->db_last_num_rows) {
@@ -488,10 +491,10 @@ class Inbox {
      * @return int last_affacted_rows
      */
     public static function updateUnreadSystemAlert($system, $system_id, $user_id): int {
-        $sql = "UPDATE `convos_alerts` 
-                SET `unread`=0 
-                WHERE `unread`=1 
-                AND `system_id`='{$system_id}' 
+        $sql = "UPDATE `convos_alerts`
+                SET `unread`=0
+                WHERE `unread`=1
+                AND `system_id`='{$system_id}'
                 AND `target_id`='{$user_id}'";
         $result = $system->query($sql);
         return $system->db_last_affected_rows;
@@ -500,19 +503,19 @@ class Inbox {
     /**
      * @param System system
      * @param int user_id
-     * @return array 
+     * @return array
      */
     public static function getAlertsForUser($system, $user_id): array {
         $return_arr = [];
         // grab all the alerts for the user
-        $sql = "SELECT t1.* 
-                FROM `convos_alerts` t1 
+        $sql = "SELECT t1.*
+                FROM `convos_alerts` t1
                 JOIN (
                     SELECT MAX(`alert_id`) as `alert_id`
-                    FROM `convos_alerts` 
+                    FROM `convos_alerts`
                     WHERE `target_id`={$user_id}
                     GROUP BY `system_id`
-                ) t2 
+                ) t2
                 ON t1.`alert_id` = t2.`alert_id`
                 WHERE t1.`target_id`={$user_id}";
         $result = $system->query($sql);
@@ -545,14 +548,14 @@ class Inbox {
     public static function allConvosForUser($system, $user_id): array {
         $convos = []; // return array
 
-        // get all alerts and add it to the return array 
+        // get all alerts and add it to the return array
         $alerts = self::getAlertsForUser($system, $user_id);
         if (!empty($alerts)) {
             $convos = array_merge($convos, $alerts);
         }
 
         // Grab all convos the user is a member of
-        $sql = "SELECT * FROM `convos` 
+        $sql = "SELECT * FROM `convos`
                 INNER JOIN `convos_users`
                 ON `convos`.`convo_id` = `convos_users`.`convo_id`
                 WHERE `convos_users`.`user_id`='{$user_id}'
@@ -570,14 +573,14 @@ class Inbox {
                     FROM `convos_users`
                     INNER JOIN `users`
                     ON `convos_users`.`user_id` = `users`.`user_id`
-                    WHERE `convos_users`.`convo_id`='{$convo['convo_id']}' 
+                    WHERE `convos_users`.`convo_id`='{$convo['convo_id']}'
                     AND `convos_users`.`user_id`<>'{$user_id}'";
             $result = $system->query($sql);
             $user_data = $system->db_fetch_all($result);
             $convo['members'] = $user_data;
 
             // get last message data from each convo
-            $sql = "SELECT `time` 
+            $sql = "SELECT `time`
                     FROM `convos_messages`
                     WHERE `convo_id`='{$convo['convo_id']}'
                     AND `deleted`=0

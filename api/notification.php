@@ -4,6 +4,7 @@
 require_once __DIR__ . "/../classes.php";
 
 $system = new System();
+$system->startTransaction();
 $system->is_api_request = true;
 
 try {
@@ -11,7 +12,7 @@ try {
     $player->loadData(User::UPDATE_FULL);
     $player->updateData();
 } catch (Exception $e) {
-    API::exitWithError($e->getMessage());
+    API::exitWithError($e->getMessage(), system: $system);
 }
 # End standard auth
 
@@ -43,14 +44,15 @@ try {
             ];
             break;
         default:
-            API::exitWithError("Invalid request!");
+            API::exitWithError("Invalid request!", system: $system);
     }
 
     API::exitWithData(
         data: $NotificationResponse->response_data,
         errors: $NotificationResponse->errors,
         debug_messages: $system->debug_messages,
+        system: $system,
     );
 } catch (Throwable $e) {
-    API::exitWithError($e->getMessage());
+    API::exitWithError($e->getMessage(), system: $system);
 }
