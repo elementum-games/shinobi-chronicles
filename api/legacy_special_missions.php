@@ -5,9 +5,7 @@ header('Content-Type: application/json');
 # Begin standard auth
 require "../classes/_autoload.php";
 
-$system = new System();
-$system->startTransaction();
-$system->is_api_request = true;
+$system = API::init();
 
 try {
     $player = Auth::getUserFromSession($system);
