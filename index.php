@@ -113,6 +113,7 @@ if(!isset($_SESSION['user_id'])) {
 		} catch (Exception $e) {
             $system->rollbackTransaction();
 			$system->message($e->getMessage());
+			error_log($e->getMessage());
 		}
 	}
 }
