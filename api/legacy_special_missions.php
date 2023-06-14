@@ -15,6 +15,7 @@ try {
 } catch(Exception $e) {
     echo json_encode(['logout' => true]);
     $system->rollbackTransaction();
+    error_log($e->getMessage());
     exit;
     // API::exitWithError($e->getMessage());
 }
