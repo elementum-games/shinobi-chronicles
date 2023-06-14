@@ -197,6 +197,7 @@ if($player != null) {
                     }
                 }catch (Exception $e) {
                     $system->rollbackTransaction();
+                    error_log($e->getMessage());
                     $system->message($e->getMessage());
                 }
             }
