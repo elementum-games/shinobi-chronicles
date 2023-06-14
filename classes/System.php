@@ -351,7 +351,7 @@ class System {
     }
 
     public function commitTransaction() {
-        if ($this->ENABLE_ROW_LOCKING) {
+        if ($this->ENABLE_ROW_LOCKING && $this->in_db_transaction) {
             $this->query("COMMIT;");
             $this->in_db_transaction = false;
         }
