@@ -7,14 +7,14 @@
  * @var Layout $layout
  */
 ?>
-<?php if ($system->fetchLayoutByName($player->layout)->key == 'new_geisha'): ?>
-<link rel="stylesheet" type="text/css" href="ui_components/src/chat/Chat_new.css" />
-<div id="chatReactContainer"></div>
-<script type="module" src="<?= $system->getReactFile("chat/Chat_new") ?>"></script>
+<?php if ($system->fetchLayoutByName($player->layout)->key == 'new_geisha' && $system->environment == System::ENVIRONMENT_DEV): ?>
+    <link rel="stylesheet" type="text/css" href="ui_components/src/chat/Chat_new.css" />
+    <div id="chatReactContainer"></div>
+    <script type="module" src="<?= $system->getReactFile("chat/Chat_new") ?>"></script>
 <?php else: ?>
-<link rel="stylesheet" type="text/css" href="ui_components/src/chat/Chat.css" />
-<div id="chatReactContainer"></div>
-<script type="module" src="<?= $system->getReactFile("chat/Chat") ?>"></script>
+    <link rel="stylesheet" type="text/css" href="ui_components/src/chat/Chat.css" />
+    <div id="chatReactContainer"></div>
+    <script type="module" src="<?= $system->getReactFile("chat/Chat") ?>"></script>
 <?php endif; ?>
 <!--suppress JSUnresolvedVariable, JSUnresolvedFunction -->
 <script type="text/javascript">
