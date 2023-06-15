@@ -244,12 +244,13 @@ class ChatManager {
             $has_quote = preg_match_all($pattern, $message, $matches);
             if ($has_quote) {
                 foreach ($matches[0] as $match) {
-                    // get chat post contents
                     $pattern = "/\[quote:(\d+)\]/";
                     preg_match($pattern, $match, $id);
                     $quote = $this->fetchPosts($id[1], 1, false);
                     if ($quote) {
-                        // if id match
+                        if ($this->player->user_name == $quote[0]->user_name) {
+                            continue;
+                        }
                         $result = $this->system->query("SELECT `user_id` FROM `users` WHERE `user_name`='{$quote[0]->user_name}' LIMIT 1");
 			            if($this->system->db_last_num_rows == 0) {
 				            throw new Exception("User does not exist!");
@@ -273,6 +274,9 @@ class ChatManager {
             $has_mention = preg_match_all($pattern, $message, $matches);
             if ($has_mention) {
                 foreach ($matches[1] as $match) {
+                    if ($this->player->user_name == $match) {
+                        continue;
+                    }
                     $result = $this->system->query("SELECT `user_id` FROM `users` WHERE `user_name`='{$match}' LIMIT 1");
                     if ($this->system->db_last_num_rows == 0) {
                         throw new Exception("User does not exist!");
