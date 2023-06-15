@@ -281,7 +281,7 @@ function ChatPosts({
     strokeWidth: "1"
   }))), /*#__PURE__*/React.createElement("div", {
     className: "chat_pagination_wrapper"
-  }, nextPagePostId != null && /*#__PURE__*/React.createElement(React.Fragment, null, previousPagePostId != null && /*#__PURE__*/React.createElement("span", null, "\xA0\xA0|\xA0\xA0"), /*#__PURE__*/React.createElement("a", {
+  }, nextPagePostId != null && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("a", {
     className: "chat_pagination",
     onClick: goToNextPage
   }, "Older >>"))), /*#__PURE__*/React.createElement("div", {
