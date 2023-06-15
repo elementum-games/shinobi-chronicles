@@ -308,7 +308,6 @@ function ChatPosts({
                 <div className="chat_pagination_wrapper">
                 {nextPagePostId != null &&
                     <>
-                        {previousPagePostId != null && <span>&nbsp;&nbsp;|&nbsp;&nbsp;</span>}
                     <a className="chat_pagination" onClick={goToNextPage}>{"Older >>"}</a>
                     </>
                 }
