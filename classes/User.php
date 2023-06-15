@@ -1455,10 +1455,13 @@ class User extends Fighter {
     }
 
     public function calMaxRepGain($repGain) {
-        if($repGain + $this->weekly_rep > Village::WEEKLY_REP_CAP) {
+        // Temp disable
+        return 0;
+
+       /* if($repGain + $this->weekly_rep > Village::WEEKLY_REP_CAP) {
             $repGain = Village::WEEKLY_REP_CAP - $this->weekly_rep;
         }
-        return $repGain;
+        return $repGain;*/
     }
     public function addRep($amount) {
         $this->village_rep += $amount;

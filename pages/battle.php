@@ -144,8 +144,10 @@ function processBattleFightEnd(BattleManager $battle, User $player): string {
         //TODO: Scale reputation gains based on opponents reputation
         if($player->weekly_rep < Village::WEEKLY_REP_CAP) {
             $rep_gain = $player->calMaxRepGain(Village::PVP_REP);
-            $result .= "You have earned $rep_gain village reputation.[br]";
-            $player->addRep($rep_gain);
+            if($rep_gain > 0) {
+                $result .= "You have earned $rep_gain village reputation.[br]";
+                $player->addRep($rep_gain);
+            }
         }
 
         // Team points
