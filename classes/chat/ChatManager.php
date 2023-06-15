@@ -151,24 +151,21 @@ class ChatManager {
             $post->message = nl2br($this->system->html_parse($post->message, false, true));
 
             // Handle Mention
-            $pattern = "/@([^ \n\s!?.<>:\[\]]+)(?=[^A-Za-z0-9_]|$)/";
+            $pattern = "/@([^ \n\s!?.<>:@\[\]]+)(?=[^A-Za-z0-9_]|$)/";
             $has_mention = preg_match_all($pattern, $post->message, $matches);
             $mention_count = 0;
             if ($has_mention) {
                 if (!$is_quote) {
                     foreach ($matches[1] as $match) {
                         $mention_count++;
-                        // if at limit, remove
+                        // if at limit, stop
                         if ($mention_count > 3) {
-                            $post->message = str_replace($matches[0], "", $post->message);
                             break;
                         }
                         // format each mention
-                        $formatted_mention = "<div class='mention_container'><a class='chat_user_name userLink' href='" . $this->system->router->getURL("members", ["user" => $match]) . "'>" . $match . "</a></div>";
+                        $formatted_mention = "<div class='mention_container'><a class='chat_user_name userLink' href='" . $this->system->router->getURL("members", ["user" => $match]) . "'>@" . $match . "</a></div>";
                         // replace first
-                        $post->message = preg_replace("/" . preg_quote('@' . $match, '/') . '/', $formatted_mention, $post->message, 1);
-                        // remove duplicates
-                        $post->message = str_replace('@' . $match, "", $post->message);
+                        $post->message = preg_replace('/@('.$match.')(?![a-zA-Z0-9-_])/', $formatted_mention, $post->message, 1);
                     }
                 }
             }
@@ -296,7 +293,7 @@ class ChatManager {
             }
 
             // Handle Mention
-            $pattern = "@([^ \n\s!?.<>:\[\]]+)(?=[^A-Za-z0-9_]|$)/";
+            $pattern = "/@([^ \n\s!?.<>:@\[\]]+)(?=[^A-Za-z0-9_]|$)/";
             $has_mention = preg_match_all($pattern, $message, $matches);
             $mention_count = 0;
             if ($has_mention) {
