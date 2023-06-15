@@ -9,6 +9,7 @@ class MapLocation {
     public int $y;
     public string $background_image;
     public string $background_color;
+    public string $objective_image = "";
     public int $pvp_allowed;
     public int $ai_allowed;
     public int $regen;

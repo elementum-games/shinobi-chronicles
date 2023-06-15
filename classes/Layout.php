@@ -70,6 +70,7 @@ class Layout {
     public function renderAfterContentHTML(System $system, ?User $player, ?float $page_load_time = null): void {
         if($this->key == 'new_geisha') {
             echo "</div>";
+            echo "</div>";
 
             if($player != null) {
                 echo "</div>";
@@ -77,8 +78,6 @@ class Layout {
                     require 'templates/hotbar.php';
                 }
             }
-
-            echo "</div>";
 
             $this->renderFooter($page_load_time);
         }

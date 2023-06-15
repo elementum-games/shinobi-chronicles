@@ -1,14 +1,16 @@
 import { apiFetch } from "../utils/network.js";
 import { TopbarNotification } from "./TopbarNotification.js";
-const notificationRefreshInterval = 5000; // Initialize
+const notificationRefreshInterval = 5000;
 
+// Initialize
 function Topbar({
   links,
   notificationAPIData
 }) {
   // Hooks
-  const [notificationData, setNotificationData] = React.useState(notificationAPIData.userNotifications); // API
+  const [notificationData, setNotificationData] = React.useState(notificationAPIData.userNotifications);
 
+  // API
   function getNotificationData() {
     apiFetch(links.notification_api, {
       request: 'getUserNotifications'
@@ -17,12 +19,10 @@ function Topbar({
         handleErrors(response.errors);
         return;
       }
-
       setNotificationData(response.data.userNotifications);
       response.data.userNotifications.forEach(notification => checkNotificationAlert(notification));
     });
   }
-
   function closeNotification(notificationId) {
     apiFetch(links.notification_api, {
       request: 'closeNotification',
@@ -32,11 +32,9 @@ function Topbar({
         handleErrors(response.errors);
         return;
       }
-
       getNotificationData();
     });
   }
-
   function clearNotificationAlert(notification_id) {
     apiFetch(links.notification_api, {
       request: 'clearNotificationAlert',
@@ -47,7 +45,6 @@ function Topbar({
       }
     });
   }
-
   function checkNotificationAlert(notification) {
     if (notification.alert) {
       console.log("here");
@@ -55,7 +52,6 @@ function Topbar({
       clearNotificationAlert(notification.notification_id);
     }
   }
-
   function createNotification(message) {
     if (!window.Notification) {
       console.log('Browser does not support notifications.');
@@ -82,24 +78,26 @@ function Topbar({
         });
       }
     }
-  } // Misc
+  }
 
-
+  // Misc
   function handleErrors(errors) {
-    console.warn(errors); //setFeedback([errors, 'info']);
-  } // Initialize
+    console.warn(errors);
+    //setFeedback([errors, 'info']);
+  }
 
-
+  // Initialize
   React.useEffect(() => {
     const notificationIntervalId = setInterval(() => {
       getNotificationData();
     }, notificationRefreshInterval);
     notificationAPIData.userNotifications.forEach(notification => checkNotificationAlert(notification));
     return () => clearInterval(notificationIntervalId);
-  }, []); // Display
+  }, []);
 
+  // Display
   const leftNotificationTypes = ["training", "training_complete"];
-  const rightNotificationTypes = ["specialmission", "specialmission_complete", "specialmission_failed", "rank", "system", "warning", "report", "battle", "challenge", "team", "marriage", "student", "inbox"];
+  const rightNotificationTypes = ["specialmission", "specialmission_complete", "specialmission_failed", "rank", "system", "warning", "report", "battle", "challenge", "team", "marriage", "student", "inbox", "chat"];
   return /*#__PURE__*/React.createElement("div", {
     id: "topbar",
     className: "d-flex"
@@ -123,5 +121,4 @@ function Topbar({
     closeNotification: closeNotification
   })))));
 }
-
 window.Topbar = Topbar;

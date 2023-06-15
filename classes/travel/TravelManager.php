@@ -1,6 +1,7 @@
 <?php
 
 require __DIR__ . '/NearbyPlayerDto.php';
+require __DIR__ . '/MapObjectiveLocation.php';
 
 class TravelManager {
     const VILLAGE_ICONS = [
@@ -308,7 +309,54 @@ class TravelManager {
             $locations[] = new MapLocation($loc);
         }
 
-        return $locations;
+        // Get objectives
+        $objectives = [];
+        if ($this->user->mission_id > 0) {
+            if ($this->user->mission_stage['action_type'] == 'travel' || $this->user->mission_stage['action_type'] == 'search') {
+                $mission_result = $this->system->query("SELECT `name` FROM `missions` WHERE `mission_id` = '{$this->user->mission_id}' LIMIT 1");
+                $mission_location = TravelCoords::fromDbString($this->user->mission_stage['action_data']);
+                $objectives[] = new MapObjectiveLocation(
+                    name: $this->system->db_fetch($mission_result)['name'],
+                    map_id: $mission_location->map_id,
+                    x: $mission_location->x,
+                    y: $mission_location->y,
+                    image: "/images/v2/icons/anbutracking.png",
+                );
+            }
+        }
+
+        // Check if objectives match existing locations
+        $new_locations = [];
+        foreach ($objectives as $obj) {
+            $match = false;
+            foreach ($locations as $loc) {
+                // If yes, pass data
+                if ($obj->x == $loc->x && $obj->y == $loc->y && $obj->map_id == $loc->map_id) {
+                    $loc->objective_image = $obj->image;
+                    $loc->name = $loc->name . "\n " . $obj->name;
+                    $match = true;
+                }
+            }
+            // If no, create location
+            if (!$match) {
+                $location_data = array(
+                        "name" => $obj->name,
+                        "map_id" => $obj->map_id,
+                        "x" => $obj->x,
+                        "y" => $obj->y,
+                        "background_image" => "",
+                        "background_color" => "",
+                        "objective_image" => $obj->image,
+                        "pvp_allowed" => 1,
+                        "ai_allowed" => 1,
+                        "regen" => 50,
+                    );
+                $new_locations[] = new MapLocation($location_data);
+            }
+        }
+
+        // Include new locations in return array
+        return array_merge($locations, $new_locations);
     }
 
     /**

@@ -9,7 +9,6 @@ export function TopbarNotification({
         notification: notification,
         closeNotification: closeNotification
       });
-
     case "specialmission":
     case "specialmission_complete":
     case "specialmission_failed":
@@ -17,11 +16,9 @@ export function TopbarNotification({
         notification: notification,
         closeNotification: closeNotification
       });
-
     default:
       break;
   }
-
   return /*#__PURE__*/React.createElement(React.Fragment, null, notification.type === "mission" && /*#__PURE__*/React.createElement("a", {
     href: notification.action_url,
     className: notification.duration > 0 ? "topbar_notification_wrapper has_duration" : "topbar_notification_wrapper",
@@ -300,9 +297,41 @@ export function TopbarNotification({
     x: "40%",
     y: "70%",
     className: "topbar_notification_important"
-  }, "!"))));
+  }, "!"))), notification.type === "chat" && /*#__PURE__*/React.createElement("a", {
+    href: notification.action_url,
+    className: "topbar_notification_wrapper",
+    "data-content": notification.message,
+    "data-time": calculateTimeRemaining(notification.created, notification.duration)
+  }, /*#__PURE__*/React.createElement("svg", {
+    className: "topbar_notification_svg",
+    width: "40",
+    height: "40",
+    viewBox: "0 0 100 100"
+  }, /*#__PURE__*/React.createElement("polygon", {
+    points: "6,50 50,94 94,50 50,6",
+    strokeWidth: "8px",
+    stroke: "#5d5c4b",
+    fill: "#5964a6"
+  }), /*#__PURE__*/React.createElement("polygon", {
+    points: "6,50 50,94 94,50 50,6",
+    strokeWidth: "2px",
+    stroke: "#000000",
+    fill: "#5964a6"
+  }), /*#__PURE__*/React.createElement("image", {
+    className: "topbar_notification_icon",
+    height: "40",
+    width: "40",
+    x: "30%",
+    y: "32%",
+    href: "images/v2/icons/quote_hover.png"
+  })), /*#__PURE__*/React.createElement("label", {
+    className: "topbar_close_notification",
+    onClick: e => {
+      e.preventDefault();
+      closeNotification(notification.notification_id);
+    }
+  }, "X")));
 }
-
 function SpecialMissionNotification({
   notification,
   closeNotification
@@ -403,7 +432,6 @@ function SpecialMissionNotification({
     }
   }, "X"))));
 }
-
 function TrainingNotification({
   notification,
   closeNotification
@@ -474,14 +502,13 @@ function TrainingNotification({
       closeNotification(notification.notification_id);
     }
   }, "X"))));
-} // Utilities
+}
 
-
+// Utilities
 function calculateTimeRemaining(created, duration) {
   const currentTimeTicks = new Date().getTime();
   return formatTimeRemaining(created + duration - currentTimeTicks / 1000);
 }
-
 function formatTimeRemaining(seconds) {
   const hours = Math.floor(seconds / 3600);
   const minutes = Math.floor(seconds % 3600 / 60);

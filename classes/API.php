@@ -5,6 +5,12 @@ use JetBrains\PhpStorm\NoReturn;
 require __DIR__ . '/APIResponse.php';
 
 class API {
+    public static function init(): System {
+        $system = new System();
+        $system->startTransaction();
+        $system->is_api_request = true;
+        return $system;
+    }
 
     #[NoReturn]
     public static function exitWithError(string $message, array $debug_messages = [], System $system): void {

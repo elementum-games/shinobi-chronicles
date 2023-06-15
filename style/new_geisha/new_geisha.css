@@ -2,12 +2,12 @@
     /* Avatar Config */
     --avatar-frame-border_gradient: linear-gradient(0deg, rgba(140,123,88,1) 0%, rgba(181,156,106,1) 50%, rgba(225,207,159,1) 100%);
     --avatar-frame-border-width-large: 7px;
-    --avatar-frame-border-width-small: 3px;
+    --avatar-frame-border-width-small: 2px;
     /* General Config */
     --border-color-default: #464234;
     --box-color-default: #141317;
     --main-background-color: #101113;
-    --content-background-gradient: linear-gradient(to bottom, #272733, #201f26); 
+    --content-background-gradient: linear-gradient(to bottom, #272733, #201f26);
     --content-outline-color: #1f212a;
     --content-border-color: #14131a;
     --footer-background-color: #0E0D0E;
@@ -32,6 +32,7 @@
     --font-color-4: #d0c7f3;
     --font-color-5: #a3a3c5;
     --font-color-6: #a59e8d;
+    --font-color-7: #948768;
     --font-min: 12px;
     --font-small: 13px;
     --font-default: 14px;
@@ -68,6 +69,8 @@
     --header-background-color: #151417;
     --header-border-color: #0c0d0e;
     --header-border-height: 3px;
+    /* Chat Config */
+    --chat-secondary-background-color: #1a1921;
 }
 
 /* Helper Classes - TO-DO: remove helpers, organize module CSS classes */
@@ -293,7 +296,7 @@ body {
 }
 
 /* Configuration Classes */
-.circle {
+.round {
     clip-path: circle(50% at 50% 50%);
 }
 

@@ -42,7 +42,7 @@ class ChatManager {
         }
 
         //Set post query limit
-        $posts = $this->fetchPosts($current_page_post_id);
+        $posts = $this->fetchPosts($current_page_post_id, allow_quote: true);
 
         return ChatAPIPresenter::loadPostsResponse(
             system: $this->system,
@@ -56,9 +56,10 @@ class ChatManager {
     /**
      * @param int|null $starting_post_id
      * @param int      $max_posts
+     * @param bool     $allow_quote
      * @return ChatPostDto[]
      */
-    private function fetchPosts(?int $starting_post_id = null, int $max_posts = self::MAX_POSTS_PER_PAGE): array {
+    private function fetchPosts(?int $starting_post_id = null, int $max_posts = self::MAX_POSTS_PER_PAGE, bool $allow_quote = false): array {
         if($starting_post_id != null) {
             $query = "SELECT * FROM `chat` WHERE `post_id` <= $starting_post_id ORDER BY `post_id` DESC LIMIT $max_posts";
         }
@@ -85,10 +86,16 @@ class ChatManager {
 
             //Fetch user data
             $user_data = false;
-            $user_result = $this->system->query("SELECT `staff_level`, `premium_credits_purchased`, `chat_effect`, `avatar_link` FROM `users`
+            $user_result = $this->system->query("SELECT `user_id`, `staff_level`, `premium_credits_purchased`, `chat_effect`, `avatar_link` FROM `users`
             WHERE `user_name` = '{$this->system->clean($post->user_name)}'");
             if($this->system->db_last_num_rows) {
                 $user_data = $this->system->db_fetch($user_result);
+                $settings_result = $this->system->query("SELECT `avatar_style` from `user_settings` where `user_id` = '{$user_data['user_id']}'");
+                if ($this->system->db_last_num_rows) {
+                    $user_data['avatar_style'] = $this->system->db_fetch($settings_result)['avatar_style'];
+                } else {
+                    $user_data['avatar_style'] = "round";
+                }
                 //If blacklisted block content, only if blacklisted user is not currently a staff member
                 if($blacklisted && $user_data['staff_level'] == StaffManager::STAFF_NONE) {
                     continue;
@@ -108,6 +115,7 @@ class ChatManager {
                 }
                 $post->user_link_class_names[] =
                 $post->avatar = $user_data['avatar_link'];
+                $post->avatar_style = $user_data['avatar_style'];
             }
 
             $post->user_link_class_names[] = "chat";
@@ -142,6 +150,45 @@ class ChatManager {
             }
             $post->message = nl2br($this->system->html_parse($post->message, false, true));
 
+            // Handle Quotes
+            $pattern = "/\[quote:\d+\]/";
+            $has_quote = preg_match_all($pattern, $post->message, $matches);
+            if ($has_quote) {
+                if ($allow_quote) {
+                    foreach ($matches[0] as $match) {
+                        // get chat post contents
+                        $pattern = "/\[quote:(\d+)\]/";
+                        preg_match($pattern, $match, $id);
+                        $quote = $this->fetchPosts($id[1], 1, false);
+                        if ($quote) {
+                            // if id match
+                            if ($quote[0]->id == $id[1]) {
+                                // format each entry in $quotes
+                                $formatted_quote = "<div class='quote_container'><a class='chat_user_name " . implode(' ', $quote[0]->user_link_class_names) . "' href='" . $this->system->router->getURL("members", ["user" => $quote[0]->user_name]) . "'>" . $quote[0]->user_name . "</a><div class='quote_message'>" . $quote[0]->message . "</div></div>";
+                                // run replace on $test using $matches as search and $quotes as replace
+                                $post->message = str_replace($match, $formatted_quote, $post->message);
+                            }
+                            else {
+                                $post->message = str_replace($matches[0], "<i>(removed)</i>", $post->message);
+                            }
+                        }
+                    }
+                }
+                else {
+                    $post->message = str_replace($matches[0], "(...)", $post->message);
+                }
+            }
+
+            // Handle Mention
+            $pattern = "/@([^ \n\s!?.]+)(?=[^A-Za-z0-9_]|$)/";
+            $has_mention = preg_match_all($pattern, $post->message, $matches);
+            if ($has_mention) {
+                foreach ($matches[1] as $match) {
+                    $formatted_mention = "<div class='quote_container'><a class='chat_user_name userLink' href='" . $this->system->router->getURL("members", ["user" => $match]) . "'>@" . $match . "</a></div>";
+                    $post->message = str_replace('@' . $match, $formatted_mention, $post->message);
+                }
+            }
+
             $posts[] = $post;
         }
 
@@ -154,7 +201,7 @@ class ChatManager {
         $message_length = strlen(preg_replace('/[\\n\\r]+/', '', trim($message)));
 
         try {
-            $result = $this->system->query("SELECT `message` FROM `chat` 
+            $result = $this->system->query("SELECT `message` FROM `chat`
                  WHERE `user_name` = '{$this->player->user_name}' ORDER BY  `post_id` DESC LIMIT 1");
             if($this->system->db_last_num_rows) {
                 $post = $this->system->db_fetch($result);
@@ -191,13 +238,69 @@ class ChatManager {
             if($this->system->db_last_affected_rows) {
                 $this->system->message("Message posted!");
             }
+
+            // Handle Quotes
+            $pattern = "/\[quote:\d+\]/";
+            $has_quote = preg_match_all($pattern, $message, $matches);
+            if ($has_quote) {
+                foreach ($matches[0] as $match) {
+                    $pattern = "/\[quote:(\d+)\]/";
+                    preg_match($pattern, $match, $id);
+                    $quote = $this->fetchPosts($id[1], 1, false);
+                    if ($quote) {
+                        if ($this->player->user_name == $quote[0]->user_name) {
+                            continue;
+                        }
+                        $result = $this->system->query("SELECT `user_id` FROM `users` WHERE `user_name`='{$quote[0]->user_name}' LIMIT 1");
+			            if($this->system->db_last_num_rows == 0) {
+				            throw new Exception("User does not exist!");
+			            }
+			            $result = $this->system->db_fetch($result);
+                        require_once __DIR__ . '/../notification/NotificationManager.php';
+                        $new_notification = new NotificationDto(
+                            type: "chat",
+                            message: $this->player->user_name . " replied to your post!",
+                            user_id: $result['user_id'],
+                            created: time(),
+                            alert: false,
+                        );
+                        NotificationManager::createNotification($new_notification, $this->system, NotificationManager::UPDATE_REPLACE);
+                    }
+                }
+            }
+
+            // Handle Mention
+            $pattern = "/@([^ \n\s!?.]+)(?=[^A-Za-z0-9_]|$)/";
+            $has_mention = preg_match_all($pattern, $message, $matches);
+            if ($has_mention) {
+                foreach ($matches[1] as $match) {
+                    if ($this->player->user_name == $match) {
+                        continue;
+                    }
+                    $result = $this->system->query("SELECT `user_id` FROM `users` WHERE `user_name`='{$match}' LIMIT 1");
+                    if ($this->system->db_last_num_rows == 0) {
+                        throw new Exception("User does not exist!");
+                    }
+                    $result = $this->system->db_fetch($result);
+                    require_once __DIR__ . '/../notification/NotificationManager.php';
+                    $new_notification = new NotificationDto(
+                        type: "chat",
+                        message: $this->player->user_name . " mentioned you in chat!",
+                        user_id: $result['user_id'],
+                        created: time(),
+                        alert: false,
+                    );
+                    NotificationManager::createNotification($new_notification, $this->system, NotificationManager::UPDATE_REPLACE);
+                }
+            }
+
         } catch(Exception $e) {
             $this->system->message($e->getMessage());
         }
 
         return ChatAPIPresenter::submitPostResponse(
             $this->system,
-            $this->fetchPosts(0 )
+            $this->fetchPosts(0, allow_quote: true)
         );
     }
 
@@ -213,7 +316,7 @@ class ChatManager {
 
         return ChatAPIPresenter::deletePostResponse(
             $this->system,
-            $this->fetchPosts(0 )
+            $this->fetchPosts(0, allow_quote: true)
 
         );
     }
