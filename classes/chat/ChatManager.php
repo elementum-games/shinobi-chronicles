@@ -258,7 +258,7 @@ class ChatManager {
                         require_once __DIR__ . '/../notification/NotificationManager.php';
                         $new_notification = new NotificationDto(
                             type: "chat",
-                            message: $this->player->user_name . " quoted you in chat!",
+                            message: $this->player->user_name . " replied to your post!",
                             user_id: $result['user_id'],
                             created: time(),
                             alert: false,
