@@ -20,6 +20,7 @@ $PAGE_LOAD_START = microtime(true);
 
 require_once("classes/_autoload.php");
 $system = new System();
+$system->startTransaction();
 
 if($system->environment == System::ENVIRONMENT_DEV) {
     ini_set('display_errors', 'On');
@@ -110,7 +111,9 @@ if(!isset($_SESSION['user_id'])) {
 				throw new Exception("Invalid password! <a href='./password_reset.php'>Forgot password?</a>");
 			}
 		} catch (Exception $e) {
+            $system->rollbackTransaction();
 			$system->message($e->getMessage());
+			error_log($e->getMessage());
 		}
 	}
 }
@@ -298,6 +301,7 @@ if($LOGGED_IN) {
                     );
                     $page_loaded = true;
                 }
+                $system->rollbackTransaction();
                 $system->message($e->getMessage());
                 $system->printMessage();
             }
@@ -321,6 +325,7 @@ if($LOGGED_IN) {
             require("pages/profile.php");
             userProfile();
         } catch(Exception $e) {
+            $system->rollbackTransaction();
             $system->message($e->getMessage());
             $system->printMessage(true);
         }
@@ -350,3 +355,4 @@ else {
 $page_load_time = round(microtime(true) - $PAGE_LOAD_START, 3);
 $layout->renderAfterContentHTML($system, $player ?? null, $page_load_time);
 
+$system->commitTransaction();

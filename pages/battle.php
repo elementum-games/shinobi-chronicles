@@ -140,6 +140,14 @@ function processBattleFightEnd(BattleManager $battle, User $player): string {
         $player->system->query("UPDATE `villages` SET `points`=`points`+'$village_point_gain' WHERE `name`='{$player->village->name}' LIMIT 1");
         $result .= "You have earned $village_point_gain point for your village.[br]";
 
+        //TODO: Add a feature that will make alt killing / targeting same user not worth while (diminish gains (negative for excessive chain kills?))
+        //TODO: Scale reputation gains based on opponents reputation
+        if($player->weekly_rep < Village::WEEKLY_REP_CAP) {
+            $rep_gain = $player->calMaxRepGain(Village::PVP_REP);
+            $result .= "You have earned $rep_gain village reputation.[br]";
+            $player->addRep($rep_gain);
+        }
+
         // Team points
         if($player->team != null) {
             $player->team->addPoints($team_point_gain);

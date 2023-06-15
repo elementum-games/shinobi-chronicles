@@ -4,13 +4,14 @@
 require_once __DIR__ . "/../classes.php";
 
 $system = new System();
+$system->startTransaction();
 $system->is_api_request = true;
 
 try {
     $player = Auth::getUserFromSession($system);
     $player->loadData(User::UPDATE_NOTHING);
 } catch(Exception $e) {
-    API::exitWithError($e->getMessage());
+    API::exitWithError($e->getMessage(), system: $system);
 }
 # End standard auth
 
@@ -57,15 +58,16 @@ try {
             break;
 
         default:
-            API::exitWithError("Invalid request!");
+            API::exitWithError("Invalid request!", system: $system);
     }
 
     API::exitWithData(
         data: $TravelAPIResponse->response,
         errors: $TravelAPIResponse->errors,
         debug_messages: $system->debug_messages,
+        system: $system,
     );
 } catch (Throwable $e) {
-    API::exitWithError($e->getMessage());
+    API::exitWithError($e->getMessage(), system: $system);
 }
 

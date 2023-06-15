@@ -104,9 +104,13 @@ class User extends Fighter {
     public int $spouse;
     public string $spouse_name;
     public int $marriage_time;
-    public Village $village;
     public int $level;
     public bool $level_up;
+
+    public Village $village;
+    public int $village_rep;
+    public int $weekly_rep;
+    public int $mission_rep_cd;
 
     public int $rank_num;
     public Rank $rank;
@@ -311,7 +315,7 @@ class User extends Fighter {
             `sensei_id`,
             `accept_students`,
             `village`
-			FROM `users` WHERE `user_id`='$user_id' LIMIT 1"
+			FROM `users` WHERE `user_id`='$user_id' LIMIT 1 FOR UPDATE"
         );
         if($system->db_last_num_rows == 0) {
             throw new Exception("User does not exist!");
@@ -400,7 +404,7 @@ class User extends Fighter {
      * @throws Exception
      */
     public function loadData($UPDATE = User::UPDATE_FULL, $remote_view = false): void {
-        $result = $this->system->query("SELECT * FROM `users` WHERE `user_id`='$this->user_id' LIMIT 1");
+        $result = $this->system->query("SELECT * FROM `users` WHERE `user_id`='$this->user_id' LIMIT 1 FOR UPDATE");
         $user_data = $this->system->db_fetch($result);
 
         $this->current_ip = $user_data['current_ip'];
@@ -453,6 +457,11 @@ class User extends Fighter {
 
         $this->gender = $user_data['gender'];
         $this->village = new Village($this->system, $user_data['village']);
+        $this->village_rep = $user_data['village_rep'];
+        $this->weekly_rep = $user_data['weekly_rep'];
+        $this->mission_rep_cd = $user_data['mission_rep_cd'];
+
+        $this->gender = $user_data['gender'];
         $this->level = $user_data['level'];
         $this->level_up = $user_data['level_up'];
         $this->health = $user_data['health'];
@@ -638,8 +647,15 @@ class User extends Fighter {
                     $task->progress = $task->amount;
                     $task->complete = true;
                     $this->addMoney($task->reward, "Completed daily task");
+                    $task_message = "You have completed {$task->name} and earned &yen;{$task->reward}";
 
-                    $this->system->message('You have completed ' . $task->name . ' and earned ¥' . $task->reward);
+                    $rep_gain = $this->calMaxRepGain(Village::DAILY_TASK[$task->difficulty]);
+                    if($rep_gain > 0) {
+                        $this->addRep($rep_gain);
+                        $task_message .= " and $rep_gain Reputation";
+                    }
+
+                    $this->system->message($task_message);
                 }
             }
         }
@@ -1438,6 +1454,17 @@ class User extends Fighter {
         $this->location = $this->village_location;
     }
 
+    public function calMaxRepGain($repGain) {
+        if($repGain + $this->weekly_rep > Village::WEEKLY_REP_CAP) {
+            $repGain = Village::WEEKLY_REP_CAP - $this->weekly_rep;
+        }
+        return $repGain;
+    }
+    public function addRep($amount) {
+        $this->village_rep += $amount;
+        $this->weekly_rep += $amount;
+    }
+
     /* function updateData()
         Updates user data from class members into database
         -Parameters-
@@ -1459,6 +1486,9 @@ class User extends Fighter {
 		`spouse`  = '$this->spouse',
 		`marriage_time` = '$this->marriage_time',
 		`village` = '{$this->village->name}',
+		`village_rep` = '$this->village_rep',
+		`weekly_rep` = '$this->weekly_rep',
+		`mission_rep_cd` = '$this->mission_rep_cd',
 		`level` = '$this->level',
 		`level_up` = '" . (int)$this->level_up . "',
 		`rank` = '$this->rank_num',

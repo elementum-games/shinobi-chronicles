@@ -4,6 +4,7 @@
 require "../classes/_autoload.php";
 
 $system = new System();
+$system->startTransaction();
 $system->is_api_request = true;
 
 try {
@@ -14,7 +15,8 @@ try {
         API::exitWithData(
             data: ChatAPIPresenter::banInfoResponse(system: $system, player: $player),
             errors: [],
-            debug_messages: []
+            debug_messages: [],
+            system: $system
         );
     }
 
@@ -28,7 +30,7 @@ try {
                 ? (int)$_POST['starting_post_id']
                 : null;
 
-            API::exitWithData($chatManager->loadPosts($starting_post_id), [], []);
+            API::exitWithData($chatManager->loadPosts($starting_post_id), [], [], system: $system);
 
         case 'submit_post':
             $message = $system->clean($_POST['message']);
@@ -36,7 +38,8 @@ try {
             API::exitWithData(
                 data: $chatManager->submitPost($message),
                 errors: [],
-                debug_messages: []
+                debug_messages: [],
+                system: $system
             );
         case 'delete_post':
             $post_id = (int)$_POST['post_id'];
@@ -44,11 +47,12 @@ try {
             API::exitWithData(
                 data: $chatManager->deletePost($post_id),
                 errors: [],
-                debug_messages: []
+                debug_messages: [],
+                system: $system,
             );
     }
 } catch(Exception $e) {
-    API::exitWithError($e->getMessage());
+    API::exitWithError($e->getMessage(), system: $system);
 }
 # End standard auth
 
