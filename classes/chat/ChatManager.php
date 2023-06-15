@@ -164,7 +164,7 @@ class ChatManager {
                             break;
                         }
                         // format each mention
-                        $formatted_mention = "</div><div class='mention_container'><a class='chat_user_name userLink' href='" . $this->system->router->getURL("members", ["user" => $match]) . "'>" . $match . "</a></div><div class='chat_message_segment'>";
+                        $formatted_mention = "<div class='mention_container'><a class='chat_user_name userLink' href='" . $this->system->router->getURL("members", ["user" => $match]) . "'>" . $match . "</a></div>";
                         // replace first
                         $post->message = preg_replace("/" . preg_quote('@' . $match, '/') . '/', $formatted_mention, $post->message, 1);
                         // remove duplicates
@@ -194,7 +194,7 @@ class ChatManager {
                             // if id match
                             if ($quote[0]->id == $id[1]) {
                                 // format each entry in $quotes
-                                $formatted_quote = "</div><div class='quote_container'><a class='chat_user_name " . implode(' ', $quote[0]->user_link_class_names) . "' href='" . $this->system->router->getURL("members", ["user" => $quote[0]->user_name]) . "'>" . $quote[0]->user_name . "</a><div class='quote_message'>" . $quote[0]->message . "</div></div><div class='chat_message_segment'>";
+                                $formatted_quote = "<div class='quote_container'><a class='chat_user_name " . implode(' ', $quote[0]->user_link_class_names) . "' href='" . $this->system->router->getURL("members", ["user" => $quote[0]->user_name]) . "'>" . $quote[0]->user_name . "</a><div class='quote_message chat_meme_small'>" . $quote[0]->message . "</div></div>";
                                 // replace one instance
                                 $post->message = preg_replace("/" . preg_quote($match, '/') . '/', $formatted_quote, $post->message, 1);
                             }
@@ -209,12 +209,6 @@ class ChatManager {
                 }
             }
 
-            // Wrap Post
-            if (!$is_quote) {
-                $post->message = "<div class='chat_message_segment'>" . $post->message . "</div>";
-            } else {
-                $post->message = "<div class='chat_message_segment chat_meme_small'>" . $post->message . "</div>";
-            }
 
             $posts[] = $post;
         }

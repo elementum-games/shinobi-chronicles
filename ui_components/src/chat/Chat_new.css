@@ -301,7 +301,6 @@
 
 .post_message_container {
     text-align: left;
-    display: flex;
     font-variant: normal;
     box-sizing: border-box;
     padding-top: 10px;
@@ -313,11 +312,10 @@
     background-color: var(--box-color-default);
     background-clip: padding-box;
     overflow-wrap: break-word;
-    flex-direction: column;
 }
-.chat_message_segment {
-    display: inline-flex;
-    align-items: center;
+.post_message_container > img {
+    padding-left: 2px;
+    padding-right: 2px;
 }
 
 .post_controls_container {
@@ -420,7 +418,8 @@
 .chat_meme_small > img {
     max-width: 30px !important;
     max-height: 30px !important;
-    margin-left: 5px;
+    padding-left: 2px;
+    padding-right: 2px;
 }
 
 /* User Colors */
