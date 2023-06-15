@@ -180,7 +180,7 @@ class ChatManager {
             }
 
             // Handle Mention
-            $pattern = "/@([^ \n\s!?.]+)(?=[^A-Za-z0-9_]|$)/";
+            $pattern = "/@([^ \n\s!?.<>:]+)(?=[^A-Za-z0-9_]|$)/";
             $has_mention = preg_match_all($pattern, $post->message, $matches);
             if ($has_mention) {
                 foreach ($matches[1] as $match) {
@@ -270,7 +270,7 @@ class ChatManager {
             }
 
             // Handle Mention
-            $pattern = "/@([^ \n\s!?.]+)(?=[^A-Za-z0-9_]|$)/";
+            $pattern = "/@([^ \n\s!?.<>:]+)(?=[^A-Za-z0-9_]|$)/";
             $has_mention = preg_match_all($pattern, $message, $matches);
             if ($has_mention) {
                 foreach ($matches[1] as $match) {

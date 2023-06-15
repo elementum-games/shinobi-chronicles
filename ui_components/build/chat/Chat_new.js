@@ -139,16 +139,6 @@ function ChatInput({
 }) {
   const [quickReply, _setQuickReply] = React.useState(JSON.parse(localStorage.getItem("quick_reply_on") ?? "true"));
   const [showMemeSelect, setShowMemeSelect] = React.useState(false);
-
-  /*$(document).on("click", ".meme_select", function () {
-      // Chat.val(Chat.val() + $(this).attr("data-code"));
-      $("#meme_modal").addClass("hidden");
-      $("#meme_toggle").text("+ Meme");
-  });
-  $(document).on("click", ".meme_toggle", function (e) {
-      $("#meme_modal").toggleClass("hidden");
-  });*/
-
   function setQuickReply(newValue) {
     localStorage.setItem("quick_reply_on", JSON.stringify(newValue));
     _setQuickReply(newValue);
@@ -336,11 +326,13 @@ function ChatPosts({
     }
   }, post.staffBannerName)))), /*#__PURE__*/React.createElement("div", {
     className: "post_message_container ft-s ft-c3 ft-default",
-    "data-id": post.id,
+    "data-id": post.id
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "post_message_wrapper",
     dangerouslySetInnerHTML: {
       __html: post.message
     }
-  }), /*#__PURE__*/React.createElement("div", {
+  })), /*#__PURE__*/React.createElement("div", {
     className: "post_controls_container ft-s ft-c3"
   }, /*#__PURE__*/React.createElement("div", {
     className: "post_controls_wrapper"
