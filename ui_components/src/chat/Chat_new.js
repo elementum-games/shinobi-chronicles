@@ -193,14 +193,6 @@ function ChatInput({maxPostLength, memes, submitPost, message, setMessage}) {
     );
     const [showMemeSelect, setShowMemeSelect] = React.useState(false);
 
-    /*$(document).on("click", ".meme_select", function () {
-        // Chat.val(Chat.val() + $(this).attr("data-code"));
-        $("#meme_modal").addClass("hidden");
-        $("#meme_toggle").text("+ Meme");
-    });
-    $(document).on("click", ".meme_toggle", function (e) {
-        $("#meme_modal").toggleClass("hidden");
-    });*/
 
     function setQuickReply(newValue: boolean) {
         localStorage.setItem("quick_reply_on", JSON.stringify(newValue));
@@ -302,7 +294,9 @@ function ChatPosts({
     return (
         <>
             <div id="chat_navigation">
-                <div className="chat_navigation_divider_left"><svg width="100%" height="2"><line x1="0%" y1="1" x2="100%" y2="1" stroke="#4e4535" strokeWidth="1"></line></svg></div>
+                <div className="chat_navigation_divider_left">
+                  <svg width="100%" height="2"><line x1="0%" y1="1" x2="100%" y2="1" stroke="#4e4535" strokeWidth="1"></line></svg>
+                </div>
                 <div className="chat_pagination_wrapper">{previousPagePostId != null && <a className="chat_pagination" onClick={goToPreviousPage}>{"<< Newer"}</a>}</div>
                 <div className="chat_navigation_divider_middle"><svg width="100%" height="2"><line x1="0%" y1="1" x2="100%" y2="1" stroke="#4e4535" strokeWidth="1"></line></svg></div>
                 <div className="chat_pagination_wrapper">
