@@ -32,7 +32,7 @@
     --font-color-4: #d0c7f3;
     --font-color-5: #a3a3c5;
     --font-color-6: #a59e8d;
-    --font-color-7: #948768; 
+    --font-color-7: #948768;
     --font-min: 12px;
     --font-small: 13px;
     --font-default: 14px;
@@ -69,6 +69,8 @@
     --header-background-color: #151417;
     --header-border-color: #0c0d0e;
     --header-border-height: 3px;
+    /* Chat Config */
+    --chat-secondary-background-color: #1a1921;
 }
 
 /* Helper Classes - TO-DO: remove helpers, organize module CSS classes */

@@ -121,6 +121,7 @@ function Topbar({ links, notificationAPIData }) {
          "marriage",
          "student",
          "inbox",
+         "chat"
     ];
 
     return (

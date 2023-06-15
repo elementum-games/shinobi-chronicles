@@ -163,6 +163,13 @@ class NotificationAPIManager {
                         $notifications[] = NotificationDto::fromDb($row, $this->system->router->getUrl("inbox"));
                     }
                     break;
+                case "chat":
+                    if (false) {
+                        $notification_ids_to_delete[] = $row['notification_id'];
+                        continue 2;
+                    } else {
+                        $notifications[] = NotificationDto::fromDb($row, $this->system->router->getUrl("chat"));
+                    }
                 default:
                     break;
             }
