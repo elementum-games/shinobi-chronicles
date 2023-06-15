@@ -1,6 +1,6 @@
 <?php
 
-class ObjectiveLocation {
+class MapObjectiveLocation {
     public function __construct(
         public string $name,
         public int $map_id,

@@ -1,7 +1,7 @@
 <?php
 
 require __DIR__ . '/NearbyPlayerDto.php';
-require __DIR__ . '/ObjectiveLocation.php';
+require __DIR__ . '/MapObjectiveLocation.php';
 
 class TravelManager {
     const VILLAGE_ICONS = [
@@ -315,7 +315,7 @@ class TravelManager {
             if ($this->user->mission_stage['action_type'] == 'travel' || $this->user->mission_stage['action_type'] == 'search') {
                 $mission_result = $this->system->query("SELECT `name` FROM `missions` WHERE `mission_id` = '{$this->user->mission_id}' LIMIT 1");
                 $mission_location = TravelCoords::fromDbString($this->user->mission_stage['action_data']);
-                $objectives[] = new ObjectiveLocation(
+                $objectives[] = new MapObjectiveLocation(
                     name: $this->system->db_fetch($mission_result)['name'],
                     map_id: $mission_location->map_id,
                     x: $mission_location->x,
