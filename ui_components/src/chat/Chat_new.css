@@ -315,6 +315,10 @@
     overflow-wrap: break-word;
     flex-direction: column;
 }
+.chat_message_segment {
+    display: inline-flex;
+    align-items: center;
+}
 
 .post_controls_container {
     width: 150px;
@@ -383,7 +387,7 @@
 }
 
 .quote_container {
-    display: flex;
+    display: inline-flex;
     gap: 10px;
     font-style: italic;
     font-size: var(--font-min);
@@ -391,14 +395,32 @@
     background-color: var(--chat-secondary-background-color);
     padding-left: 15px;
     padding-right: 15px;
-    margin-left: -5px;
-    margin-right: 5px;
     padding-top: 3px;
     padding-bottom: 3px;
 }
 .quote_message {
     font-style: italic;
     font-size: var(--font-min);
+    display: flex;
+    align-items: center;
+}
+.mention_container {
+    text-align: center;
+    display: inline-flex;
+    gap: 10px;
+    font-style: italic;
+    font-size: var(--font-min);
+    clip-path: polygon(8px 0, calc(100% - 8px) 0px, 100% 50%, calc(100% - 8px) 100%, 8px 100%, 0 50%);
+    background-color: var(--chat-secondary-background-color);
+    padding-left: 15px;
+    padding-right: 15px;
+    padding-top: 3px;
+    padding-bottom: 3px;
+}
+.chat_meme_small > img {
+    max-width: 30px !important;
+    max-height: 30px !important;
+    margin-left: 5px;
 }
 
 /* User Colors */
@@ -406,6 +428,7 @@
     background: none !important;
     clip-path: none !important;
     cursor: pointer;
+    align-self: center;
 }
 
 #chatReactContainer .premiumUser, #content .premiumUser:hover {

@@ -42,7 +42,7 @@ class ChatManager {
         }
 
         //Set post query limit
-        $posts = $this->fetchPosts($current_page_post_id, allow_quote: true);
+        $posts = $this->fetchPosts($current_page_post_id, is_quote: false);
 
         return ChatAPIPresenter::loadPostsResponse(
             system: $this->system,
@@ -56,10 +56,10 @@ class ChatManager {
     /**
      * @param int|null $starting_post_id
      * @param int      $max_posts
-     * @param bool     $allow_quote
+     * @param bool     $is_quote
      * @return ChatPostDto[]
      */
-    private function fetchPosts(?int $starting_post_id = null, int $max_posts = self::MAX_POSTS_PER_PAGE, bool $allow_quote = false): array {
+    private function fetchPosts(?int $starting_post_id = null, int $max_posts = self::MAX_POSTS_PER_PAGE, bool $is_quote = false): array {
         if($starting_post_id != null) {
             $query = "SELECT * FROM `chat` WHERE `post_id` <= $starting_post_id ORDER BY `post_id` DESC LIMIT $max_posts";
         }
@@ -150,23 +150,53 @@ class ChatManager {
             }
             $post->message = nl2br($this->system->html_parse($post->message, false, true));
 
+            // Handle Mention
+            $pattern = "/@([^ \n\s!?.<>:\[\]]+)(?=[^A-Za-z0-9_]|$)/";
+            $has_mention = preg_match_all($pattern, $post->message, $matches);
+            $mention_count = 0;
+            if ($has_mention) {
+                if (!$is_quote) {
+                    foreach ($matches[1] as $match) {
+                        $mention_count++;
+                        // if at limit, remove
+                        if ($mention_count > 3) {
+                            $post->message = str_replace($matches[0], "", $post->message);
+                            break;
+                        }
+                        // format each mention
+                        $formatted_mention = "</div><div class='mention_container'><a class='chat_user_name userLink' href='" . $this->system->router->getURL("members", ["user" => $match]) . "'>" . $match . "</a></div><div class='chat_message_segment'>";
+                        // replace first
+                        $post->message = preg_replace("/" . preg_quote('@' . $match, '/') . '/', $formatted_mention, $post->message, 1);
+                        // remove duplicates
+                        $post->message = str_replace('@' . $match, "", $post->message);
+                    }
+                }
+            }
+
             // Handle Quotes
             $pattern = "/\[quote:\d+\]/";
             $has_quote = preg_match_all($pattern, $post->message, $matches);
+            $quote_count = 0;
             if ($has_quote) {
-                if ($allow_quote) {
+                if (!$is_quote) {
                     foreach ($matches[0] as $match) {
+                        $quote_count++;
+                        // if at limit, remove
+                        if ($quote_count > 3) {
+                            $post->message = str_replace($matches[0], "", $post->message);
+                            break;
+                        }
                         // get chat post contents
                         $pattern = "/\[quote:(\d+)\]/";
                         preg_match($pattern, $match, $id);
-                        $quote = $this->fetchPosts($id[1], 1, false);
+                        $quote = $this->fetchPosts($id[1], 1, true);
                         if ($quote) {
                             // if id match
                             if ($quote[0]->id == $id[1]) {
                                 // format each entry in $quotes
-                                $formatted_quote = "<div class='quote_container'><a class='chat_user_name " . implode(' ', $quote[0]->user_link_class_names) . "' href='" . $this->system->router->getURL("members", ["user" => $quote[0]->user_name]) . "'>" . $quote[0]->user_name . "</a><div class='quote_message'>" . $quote[0]->message . "</div></div>";
-                                // run replace on $test using $matches as search and $quotes as replace
-                                $post->message = str_replace($match, $formatted_quote, $post->message);
+                                $formatted_quote = "</div><div class='quote_container'><a class='chat_user_name " . implode(' ', $quote[0]->user_link_class_names) . "' href='" . $this->system->router->getURL("members", ["user" => $quote[0]->user_name]) . "'>" . $quote[0]->user_name . "</a><div class='quote_message'>" . $quote[0]->message . "</div></div><div class='chat_message_segment'>";
+                                // replace one instance
+                                $post->message = preg_replace("/" . preg_quote($match, '/') . '/', $formatted_quote, $post->message, 1);
                             }
                             else {
                                 $post->message = str_replace($matches[0], "<i>(removed)</i>", $post->message);
@@ -179,14 +209,11 @@ class ChatManager {
                 }
             }
 
-            // Handle Mention
-            $pattern = "/@([^ \n\s!?.<>:]+)(?=[^A-Za-z0-9_]|$)/";
-            $has_mention = preg_match_all($pattern, $post->message, $matches);
-            if ($has_mention) {
-                foreach ($matches[1] as $match) {
-                    $formatted_mention = "<div class='quote_container'><a class='chat_user_name userLink' href='" . $this->system->router->getURL("members", ["user" => $match]) . "'>@" . $match . "</a></div>";
-                    $post->message = str_replace('@' . $match, $formatted_mention, $post->message);
-                }
+            // Wrap Post
+            if (!$is_quote) {
+                $post->message = "<div class='chat_message_segment'>" . $post->message . "</div>";
+            } else {
+                $post->message = "<div class='chat_message_segment chat_meme_small'>" . $post->message . "</div>";
             }
 
             $posts[] = $post;
@@ -242,11 +269,16 @@ class ChatManager {
             // Handle Quotes
             $pattern = "/\[quote:\d+\]/";
             $has_quote = preg_match_all($pattern, $message, $matches);
+            $quote_count = 0;
             if ($has_quote) {
                 foreach ($matches[0] as $match) {
+                    $quote_count++;
+                    if ($quote_count > 3) {
+                        break;
+                    }
                     $pattern = "/\[quote:(\d+)\]/";
                     preg_match($pattern, $match, $id);
-                    $quote = $this->fetchPosts($id[1], 1, false);
+                    $quote = $this->fetchPosts($id[1], 1, true);
                     if ($quote) {
                         if ($this->player->user_name == $quote[0]->user_name) {
                             continue;
@@ -270,10 +302,15 @@ class ChatManager {
             }
 
             // Handle Mention
-            $pattern = "/@([^ \n\s!?.<>:]+)(?=[^A-Za-z0-9_]|$)/";
+            $pattern = "@([^ \n\s!?.<>:\[\]]+)(?=[^A-Za-z0-9_]|$)/";
             $has_mention = preg_match_all($pattern, $message, $matches);
+            $mention_count = 0;
             if ($has_mention) {
                 foreach ($matches[1] as $match) {
+                    $mention_count++;
+                    if ($mention_count > 3) {
+                        break;
+                    }
                     if ($this->player->user_name == $match) {
                         continue;
                     }
@@ -300,7 +337,7 @@ class ChatManager {
 
         return ChatAPIPresenter::submitPostResponse(
             $this->system,
-            $this->fetchPosts(0, allow_quote: true)
+            $this->fetchPosts(0, is_quote: false)
         );
     }
 
@@ -316,7 +353,7 @@ class ChatManager {
 
         return ChatAPIPresenter::deletePostResponse(
             $this->system,
-            $this->fetchPosts(0, allow_quote: true)
+            $this->fetchPosts(0, is_quote: false)
 
         );
     }

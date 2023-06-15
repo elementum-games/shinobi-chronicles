@@ -340,9 +340,7 @@ function ChatPosts({
                                 </div>
                             </div>
                         </div>
-                        <div className="post_message_container ft-s ft-c3 ft-default" data-id={post.id} >
-                            <div className="post_message_wrapper" dangerouslySetInnerHTML={{ __html: post.message }}>
-                            </div>
+                        <div className="post_message_container ft-s ft-c3 ft-default" data-id={post.id} dangerouslySetInnerHTML={{ __html: post.message }}>
                         </div>
                         <div className="post_controls_container ft-s ft-c3">
                             <div className="post_controls_wrapper">

@@ -326,13 +326,11 @@ function ChatPosts({
     }
   }, post.staffBannerName)))), /*#__PURE__*/React.createElement("div", {
     className: "post_message_container ft-s ft-c3 ft-default",
-    "data-id": post.id
-  }, /*#__PURE__*/React.createElement("div", {
-    className: "post_message_wrapper",
+    "data-id": post.id,
     dangerouslySetInnerHTML: {
       __html: post.message
     }
-  })), /*#__PURE__*/React.createElement("div", {
+  }), /*#__PURE__*/React.createElement("div", {
     className: "post_controls_container ft-s ft-c3"
   }, /*#__PURE__*/React.createElement("div", {
     className: "post_controls_wrapper"
