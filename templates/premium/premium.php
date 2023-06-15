@@ -8,7 +8,7 @@
  * @var string $view
  * @var array  $costs
  * @var array  $available_clans
- * @var array $name_colors
+ * @var array $available_name_colors
  * @var array $baseDisplay;
  * @var int $kunai_per_dollar
  * @var int $stat_transfer_points_per_min
@@ -414,7 +414,7 @@
                 <?php if($player->canChangeChatColor()): ?>
                     <br /><b>Change Name Color:</b><br />
                     <form action='<?= $self_link ?>&view=forbidden_seal' method='post'>
-                        <?php foreach($name_colors as $name_color=>$class): ?>
+                        <?php foreach($available_name_colors as $name_color=>$class): ?>
                             <input type='radio' name='name_color' value='<?= $name_color ?>'
                                 <?= ($player->chat_color == $name_color ? "checked='checked'" : '') ?> />
                             <span class='<?= $class ?>' style='font-weight:bold;'><?= ucwords($name_color) ?></span>

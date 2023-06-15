@@ -1777,6 +1777,11 @@ class User extends Fighter {
             $return['red'] = 'administrator';
         }
 
+        // Arthesia override
+        if($this->system->environment == System::ENVIRONMENT_PROD && $this->user_id == 1603) {
+            $return['purple'] = 'contentAdmin';
+        }
+
         return $return;
     }
 
