@@ -10,7 +10,7 @@ try {
     $player->loadData(User::UPDATE_FULL);
     $player->updateData();
 } catch (Exception $e) {
-    API::exitWithError($e->getMessage(), system: $system);
+    API::exitWithException($e, system: $system);
 }
 # End standard auth
 
@@ -52,5 +52,5 @@ try {
         system: $system,
     );
 } catch (Throwable $e) {
-    API::exitWithError($e->getMessage(), system: $system);
+    API::exitWithException($e, system: $system);
 }

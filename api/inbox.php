@@ -9,7 +9,7 @@ try {
     $player = Auth::getUserFromSession($system);
     $player->loadData(User::UPDATE_NOTHING);
 } catch(Exception $e) {
-    API::exitWithError($e->getMessage(), system: $system);
+    API::exitWithException($e, system: $system);
 }
 # End standard auth
 
@@ -91,7 +91,7 @@ try {
             break;
 
         default:
-            API::exitWithError("Invalid request!", system: $system);
+            API::exitWithError(message: "Invalid request!", system: $system);
     }
 
     API::exitWithData(
@@ -104,6 +104,6 @@ try {
         system: $system,
     );
 } catch (Throwable $e) {
-    API::exitWithError($e->getMessage(), system: $system);
+    API::exitWithException($e, system: $system);
 }
 

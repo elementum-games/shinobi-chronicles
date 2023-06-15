@@ -461,7 +461,7 @@ class System {
 
         $this->message($message);
         if($this->is_api_request) {
-            API::exitWithError($message);
+            API::exitWithError(message: $message, system: $this);
         }
         $this->printMessage(true);
 

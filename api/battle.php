@@ -9,7 +9,7 @@ try {
     $player = Auth::getUserFromSession($system);
     $player->loadData(User::UPDATE_NOTHING);
 } catch(Exception $e) {
-    API::exitWithError($e->getMessage(), system: $system);
+    API::exitWithException($e, system: $system);
 }
 # End standard auth
 
@@ -30,7 +30,10 @@ if($system->db_last_num_rows) {
     }
 
     if($battle_route == null) {
-        API::exitWithError("No route found for battle type!", system: $system);
+        API::exitWithError(
+            message: "No route found for battle type!",
+            system: $system
+        );
     }
 
     require(__DIR__ . '/../pages/' . $battle_route->file_name);
@@ -57,15 +60,18 @@ if($system->db_last_num_rows) {
         }
 
         if(!($response instanceof BattlePageAPIResponse)) {
-            API::exitWithError("Invalid battle API response! - Expected BattlePageAPIResponse, got " . get_class($response), system: $system);
+            API::exitWithError(
+                message: "Invalid battle API response! - Expected BattlePageAPIResponse, got " . get_class($response),
+                system: $system,
+            );
         }
 
         $player->updateData();
     } catch (Throwable $e) {
-        API::exitWithError(
-            message: $e->getMessage(),
-            debug_messages: $system->debug_messages,
-            system: $system
+        API::exitWithException(
+            exception: $e,
+            system: $system,
+            debug_messages: $system->debug_messages
         );
     }
 
@@ -80,7 +86,7 @@ if($system->db_last_num_rows) {
     );
 }
 else {
-    API::exitWithError('Not in battle!', system: $system);
+    API::exitWithError(message: 'Not in battle!', system: $system);
 }
 
 

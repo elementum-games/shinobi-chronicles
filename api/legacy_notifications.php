@@ -8,7 +8,7 @@ $system = API::init();
 try {
     $player = Auth::getUserFromSession($system);
 } catch(Exception $e) {
-    API::exitWithError($e->getMessage());
+    API::exitWithException($e, $system);
 }
 # End standard auth
 

@@ -50,7 +50,7 @@ try {
             );
     }
 } catch(Exception $e) {
-    API::exitWithError($e->getMessage(), system: $system);
+    API::exitWithException($e, system: $system);
 }
 # End standard auth
 
