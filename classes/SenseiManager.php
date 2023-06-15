@@ -137,10 +137,8 @@ class SenseiManager {
 
     public static function updateStudentRecruitment(int $sensei_id, $recruitment_message, System $system): bool {
         $db_modified = false;
-        $system->query("START TRANSACTION;");
         $system->query("UPDATE `sensei` SET `recruitment_message` = '{$recruitment_message}' WHERE `sensei_id` = '{$sensei_id}'");
-        $system->query("COMMIT;");
-        if ($system->db_last_num_rows > 0) {
+        if ($system->db_last_affected_rows > 0) {
             $db_modified = true;
         }
         return $db_modified;
@@ -148,10 +146,8 @@ class SenseiManager {
 
     public static function updateStudentSettings(int $sensei_id, $student_message, $specialization, System $system): bool {
         $db_modified = false;
-        $system->query("START TRANSACTION;");
         $system->query("UPDATE `sensei` SET `student_message` = '{$student_message}', `specialization` = '{$specialization}' WHERE `sensei_id` = '{$sensei_id}'");
-        $system->query("COMMIT;");
-        if ($system->db_last_num_rows > 0) {
+        if ($system->db_last_affected_rows > 0) {
             $db_modified = true;
         }
         return $db_modified;
@@ -159,7 +155,6 @@ class SenseiManager {
 
     public static function removeStudent(int $sensei_id, int $student_id, System $system): bool {
         $db_modified = false;
-        $system->query("START TRANSACTION;");
         $student_result = $system->query("SELECT `students` FROM `sensei` WHERE `sensei_id` = '{$sensei_id}'");
         $result = $system->db_fetch($student_result);
         $students = json_decode($result['students']);
@@ -167,8 +162,7 @@ class SenseiManager {
         $students = "[" . implode(', ', $students) . "]";
         $system->query("UPDATE `sensei` SET `students` = '{$students}' WHERE `sensei_id` = '{$sensei_id}'");
         $system->query("UPDATE `users` SET `sensei_id` = '0' WHERE `user_id` = '{$student_id}'");
-        $system->query("COMMIT;");
-        if ($system->db_last_num_rows > 0) {
+        if ($system->db_last_affected_rows > 0) {
             $db_modified = true;
         }
         return $db_modified;
@@ -176,10 +170,8 @@ class SenseiManager {
 
     public static function addSensei(int $sensei_id, $specialization, System $system): bool {
         $db_modified = false;
-        $system->query("START TRANSACTION;");
         $system->query("INSERT INTO `sensei` (`sensei_id`, `specialization`) VALUES ('{$sensei_id}', '{$specialization}')");
-        $system->query("COMMIT;");
-        if ($system->db_last_num_rows > 0) {
+        if ($system->db_last_affected_rows > 0) {
             $db_modified = true;
         }
         return $db_modified;
@@ -187,12 +179,10 @@ class SenseiManager {
 
     public static function removeSensei(int $sensei_id, System $system): bool {
         $db_modified = false;
-        $system->query("START TRANSACTION;");
         $system->query("UPDATE `users` SET `sensei_id` = '0' WHERE `sensei_id` = {$sensei_id}");
         $system->query("DELETE FROM `sensei` WHERE `sensei_id` = {$sensei_id}");
         $system->query("DELETE FROM `student_applications` WHERE `sensei_id` = {$sensei_id}");
-        $system->query("COMMIT;");
-        if ($system->db_last_num_rows > 0) {
+        if ($system->db_last_affected_rows > 0) {
             $db_modified = true;
         }
         return $db_modified;
@@ -204,13 +194,11 @@ class SenseiManager {
         $result = $system->db_fetch($student_result);
         $students = json_decode($result['students']);
         if (count($students) < 3) {
-            $system->query("START TRANSACTION;");
             $system->query("INSERT INTO `student_applications` (`sensei_id`, `student_id`)
             SELECT '{$sensei_id}', '{$student_id}' FROM DUAL
             WHERE NOT EXISTS (SELECT 1 FROM `student_applications` WHERE `sensei_id` = '{$sensei_id}' AND `student_id` = '{$student_id}')");
-            $system->query("COMMIT;");
         }
-        if ($system->db_last_num_rows > 0) {
+        if ($system->db_last_affected_rows > 0) {
             $db_modified = true;
         }
         return $db_modified;
@@ -218,7 +206,6 @@ class SenseiManager {
 
     public static function acceptApplication(int $sensei_id, int $student_id, System $system): bool {
         $db_modified = false;
-        $system->query("START TRANSACTION;");
         $student_result = $system->query("SELECT `students` FROM `sensei` WHERE `sensei_id` = '{$sensei_id}'");
         $result = $system->db_fetch($student_result);
         $students = json_decode($result['students']);
@@ -228,25 +215,23 @@ class SenseiManager {
             $students = "[" . implode(', ', $students) . "]";
             $system->query("UPDATE `sensei` SET `students` = '{$students}' WHERE `sensei_id` = '{$sensei_id}'");
             $system->query("UPDATE `users` SET `sensei_id` = '{$sensei_id}' WHERE `user_id` = '{$student_id}'");
+            if ($system->db_last_affected_rows > 0) {
+                $db_modified = true;
+            }
             $system->query("DELETE FROM `student_applications` WHERE `sensei_id` = '{$sensei_id}' AND `student_id` = '{$student_id}'");
-            $system->query("COMMIT;");
             SenseiManager::closeApplicationsByStudent($student_id, $system);
             if ($student_count == 3) {
                 SenseiManager::closeApplicationsBySensei($sensei_id, $system);
             }
         }
-        if ($system->db_last_num_rows > 0) {
-            $db_modified = true;
-        }
+
         return $db_modified;
     }
 
     public static function closeApplication(int $sensei_id, int $student_id, System $system): bool {
         $db_modified = false;
-        $system->query("START TRANSACTION;");
         $system->query("DELETE FROM `student_applications` WHERE `sensei_id` = '{$sensei_id}' AND `student_id` = '{$student_id}'");
-        $system->query("COMMIT;");
-        if ($system->db_last_num_rows > 0) {
+        if ($system->db_last_affected_rows > 0) {
             $db_modified = true;
         }
         return $db_modified;
@@ -254,10 +239,8 @@ class SenseiManager {
 
     public static function closeApplicationsBySensei(int $sensei_id, System $system): bool {
         $db_modified = false;
-        $system->query("START TRANSACTION;");
         $system->query("DELETE FROM `student_applications` WHERE `sensei_id` = '{$sensei_id}'");
-        $system->query("COMMIT;");
-        if ($system->db_last_num_rows > 0) {
+        if ($system->db_last_affected_rows > 0) {
             $db_modified = true;
         }
         return $db_modified;
@@ -265,10 +248,8 @@ class SenseiManager {
 
     public static function closeApplicationsByStudent(int $student_id, System $system): bool {
         $db_modified = false;
-        $system->query("START TRANSACTION;");
         $system->query("DELETE FROM `student_applications` WHERE `student_id` = '{$student_id}'");
-        $system->query("COMMIT;");
-        if ($system->db_last_num_rows > 0) {
+        if ($system->db_last_affected_rows > 0) {
             $db_modified = true;
         }
         return $db_modified;
@@ -284,10 +265,8 @@ class SenseiManager {
             $graduated_students = "[" . implode(', ', $graduated_students) . "]";
             $graduated_count = (int)$result['graduated_count'];
             $graduated_count++;
-            $system->query("START TRANSACTION;");
             $system->query("UPDATE `sensei` SET `graduated_count` = {$graduated_count}, `graduated_students` = '{$graduated_students}' WHERE `sensei_id` = '{$sensei_id}'");
-            $system->query("COMMIT;");
-            if ($system->db_last_num_rows > 0) {
+            if ($system->db_last_affected_rows > 0) {
                 $db_modified = true;
             }
         }
