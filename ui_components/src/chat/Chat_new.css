@@ -311,7 +311,7 @@
     border-bottom-left-radius: 10px;
     background-color: var(--box-color-default);
     background-clip: padding-box;
-    overflow-wrap: break-word;
+    overflow-wrap: anywhere;
 }
 .post_message_container > img {
     padding-left: 2px;
