@@ -93,7 +93,7 @@ function gear(): void {
 
     $system->printMessage();
 
-    echo "<table id='equipment gear' class='table'>";
+    echo "<table id='equipment gear' class='table' style='text-align:center;'>";
 
     echo "<tr class='threeColumns'>
 		<th style='width:33%;'>Weapons</th>
@@ -172,7 +172,8 @@ function gear(): void {
     echo "
 	<form action='$self_link' method='post' style='margin:0;'>
 	<tr class='twoHeaders'>
-		<th colspan='2'>Equipped Gear</th>
+		<th>Equipped Weapons</th>
+        <th>Equipped Gear</th>
 		<th>Use Items</th>
 	</tr>";
 

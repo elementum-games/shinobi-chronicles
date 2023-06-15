@@ -335,28 +335,28 @@ abstract class Fighter {
      * @param bool   $residual_damage
      * @return float|int
      */
-    public function calcDamageTaken($raw_damage, string $defense_type, bool $residual_damage = false): float|int {
+    public function calcDamageTaken($raw_damage, string $defense_type, bool $residual_damage = false, bool $apply_resists = true): float|int {
         $defense = self::BASE_DEFENSE * (1 + $this->defense_boost);
 
         if($defense <= 0) {
             $defense = 1;
         }
+        if($apply_resists) {
+            if (!empty($this->bloodline_defense_boosts)) {
+                foreach ($this->bloodline_defense_boosts as $id => $boost) {
+                    $boost_type = explode('_', $boost['effect'])[0];
+                    if ($boost_type != $defense_type) {
+                        continue;
+                    }
 
-        if(!empty($this->bloodline_defense_boosts)) {
-            foreach($this->bloodline_defense_boosts as $id => $boost) {
-                $boost_type = explode('_', $boost['effect'])[0];
-                if($boost_type != $defense_type) {
-                    continue;
-                }
-
-                $boost_amount = $boost['effect_amount'] * self::BLOODLINE_DEFENSE_MULTIPLIER;
-                if($raw_damage < $boost_amount) {
-                    $this->bloodline_defense_boosts[$id]['effect_amount'] -= ($raw_damage / self::BLOODLINE_DEFENSE_MULTIPLIER);
-                    $raw_damage = 0;
-                }
-                else {
-                    $raw_damage -= $boost_amount;
-                    unset($this->bloodline_defense_boosts[$id]);
+                    $boost_amount = $boost['effect_amount'] * self::BLOODLINE_DEFENSE_MULTIPLIER;
+                    if ($raw_damage < $boost_amount) {
+                        $this->bloodline_defense_boosts[$id]['effect_amount'] -= ($raw_damage / self::BLOODLINE_DEFENSE_MULTIPLIER);
+                        $raw_damage = 0;
+                    } else {
+                        $raw_damage -= $boost_amount;
+                        unset($this->bloodline_defense_boosts[$id]);
+                    }
                 }
             }
         }
