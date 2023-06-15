@@ -193,14 +193,6 @@ function ChatInput({maxPostLength, memes, submitPost, message, setMessage}) {
     );
     const [showMemeSelect, setShowMemeSelect] = React.useState(false);
 
-    /*$(document).on("click", ".meme_select", function () {
-        // Chat.val(Chat.val() + $(this).attr("data-code"));
-        $("#meme_modal").addClass("hidden");
-        $("#meme_toggle").text("+ Meme");
-    });
-    $(document).on("click", ".meme_toggle", function (e) {
-        $("#meme_modal").toggleClass("hidden");
-    });*/
 
     function setQuickReply(newValue: boolean) {
         localStorage.setItem("quick_reply_on", JSON.stringify(newValue));
