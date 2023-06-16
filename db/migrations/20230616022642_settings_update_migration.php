@@ -19,7 +19,7 @@ final class SettingsUpdateMigration extends AbstractMigration
 
         // User Settings table, reset columns to default
         $this->execute("
-            UPDATE TABLE `user_settings` 
+            UPDATE `user_settings` 
                 SET `enable_keybinds` = 0,
                 `enable_alerts` = 0;
         ");

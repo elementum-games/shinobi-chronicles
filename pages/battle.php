@@ -97,6 +97,8 @@ function battle(): bool {
 					ceil((($user->last_death_ms + (60 * 1000)) - System::currentTimeMs()) / 1000) . " more seconds.");
 			}
 
+            sleep(10);
+
             if($system->USE_NEW_BATTLES) {
                 BattleV2::start($system, $player, $user, Battle::TYPE_FIGHT);
             }

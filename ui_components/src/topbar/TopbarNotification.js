@@ -10,7 +10,7 @@ type TopbarNotificationProps = {|
 export function TopbarNotification({
     notification,
     closeNotification
-}: TopbarNotificationProps) {
+}: TopbarNotificationProps): React$Node {
     switch(notification.type) {
         case "training":
         case "training_complete":
@@ -29,13 +29,17 @@ export function TopbarNotification({
             break;
     }
 
+    const timeRemainingDisplay = formatTimeRemaining(
+            calculateTimeRemaining(notification.created, notification.duration)
+    );
+
     return (
         <>
             {notification.type === "mission" &&
                 <a href={notification.action_url}
                    className={(notification.duration > 0) ? "topbar_notification_wrapper has_duration" : "topbar_notification_wrapper"}
                    data-content={notification.message}
-                   data-time={calculateTimeRemaining(notification.created, notification.duration)}
+                   data-time={timeRemainingDisplay}
                 >
                     <svg className="topbar_notification_svg" width="40" height="40" viewBox="0 0 100 100">
                         <polygon points="6,50 50,94 94,50 50,6" strokeWidth="8px" stroke="#5d5c4b" fill="#52466a" />
@@ -50,7 +54,7 @@ export function TopbarNotification({
                 <a href={notification.action_url}
                    className={(notification.duration > 0) ? "topbar_notification_wrapper has_duration" : "topbar_notification_wrapper"}
                    data-content={notification.message}
-                   data-time={calculateTimeRemaining(notification.created, notification.duration)}
+                   data-time={timeRemainingDisplay}
                 >
                     <svg className="topbar_notification_svg" width="40" height="40" viewBox="0 0 100 100">
                         <polygon points="6,50 50,94 94,50 50,6" strokeWidth="8px" stroke="#5d5c4b" fill="#B09A65" />
@@ -63,7 +67,7 @@ export function TopbarNotification({
                 <a href={notification.action_url}
                    className={(notification.duration > 0) ? "topbar_notification_wrapper has_duration" : "topbar_notification_wrapper"}
                    data-content={notification.message}
-                   data-time={calculateTimeRemaining(notification.created, notification.duration)}
+                   data-time={timeRemainingDisplay}
                 >
                     <svg className="topbar_notification_svg" width="40" height="40" viewBox="0 0 100 100">
                         <polygon points="6,50 50,94 94,50 50,6" strokeWidth="8px" stroke="#5d5c4b" fill="#ae5576" />
@@ -76,7 +80,7 @@ export function TopbarNotification({
                 <a href={notification.action_url}
                    className={(notification.duration > 0) ? "topbar_notification_wrapper has_duration" : "topbar_notification_wrapper"}
                    data-content={notification.message}
-                   data-time={calculateTimeRemaining(notification.created, notification.duration)}
+                   data-time={timeRemainingDisplay}
                 >
                     <svg className="topbar_notification_svg" width="40" height="40" viewBox="0 0 100 100">
                         <polygon points="6,50 50,94 94,50 50,6" strokeWidth="8px" stroke="#5d5c4b" fill="#ae5576" />
@@ -89,7 +93,7 @@ export function TopbarNotification({
                 <a href={notification.action_url}
                    className={(notification.duration > 0) ? "topbar_notification_wrapper has_duration" : "topbar_notification_wrapper"}
                    data-content={notification.message}
-                   data-time={calculateTimeRemaining(notification.created, notification.duration)}
+                   data-time={timeRemainingDisplay}
                 >
                     <svg className="topbar_notification_svg" width="40" height="40" viewBox="0 0 100 100">
                         <polygon points="6,50 50,94 94,50 50,6" strokeWidth="8px" stroke="#5d5c4b" fill="#B09A65" />
@@ -102,7 +106,7 @@ export function TopbarNotification({
                 <a href={notification.action_url}
                    className={(notification.duration > 0) ? "topbar_notification_wrapper has_duration" : "topbar_notification_wrapper"}
                    data-content={notification.message}
-                   data-time={calculateTimeRemaining(notification.created, notification.duration)}
+                   data-time={timeRemainingDisplay}
                 >
                     <svg className="topbar_notification_svg" width="40" height="40" viewBox="0 0 100 100">
                         <polygon points="6,50 50,94 94,50 50,6" strokeWidth="8px" stroke="#4c1f1f" fill="#eb4648" />
@@ -115,7 +119,7 @@ export function TopbarNotification({
                 <a href={notification.action_url}
                    className={(notification.duration > 0) ? "topbar_notification_wrapper has_duration" : "topbar_notification_wrapper"}
                    data-content={notification.message}
-                   data-time={calculateTimeRemaining(notification.created, notification.duration)}
+                   data-time={timeRemainingDisplay}
                 >
                     <svg className="topbar_notification_svg" width="40" height="40" viewBox="0 0 100 100">
                         <polygon points="6,50 50,94 94,50 50,6" strokeWidth="8px" stroke="#5d5c4b" fill="#B09A65" />
@@ -128,7 +132,7 @@ export function TopbarNotification({
                 <a href={notification.action_url}
                    className={(notification.duration > 0) ? "topbar_notification_wrapper has_duration" : "topbar_notification_wrapper"}
                    data-content={notification.message}
-                   data-time={calculateTimeRemaining(notification.created, notification.duration)}
+                   data-time={timeRemainingDisplay}
                 >
                     <svg className="topbar_notification_svg" width="40" height="40" viewBox="0 0 100 100">
                         <polygon points="6,50 50,94 94,50 50,6" strokeWidth="8px" stroke="#5d5c4b" fill="#5964a6" />
@@ -141,7 +145,7 @@ export function TopbarNotification({
                 <a href={notification.action_url}
                    className={(notification.duration > 0) ? "topbar_notification_wrapper has_duration" : "topbar_notification_wrapper"}
                    data-content={notification.message}
-                   data-time={calculateTimeRemaining(notification.created, notification.duration)}
+                   data-time={timeRemainingDisplay}
                 >
                     <svg className="topbar_notification_svg" width="40" height="40" viewBox="0 0 100 100">
                         <polygon points="6,50 50,94 94,50 50,6" strokeWidth="8px" stroke="#5d5c4b" fill="#5964a6" />
@@ -154,7 +158,7 @@ export function TopbarNotification({
                 <a href={notification.action_url}
                    className={(notification.duration > 0) ? "topbar_notification_wrapper has_duration" : "topbar_notification_wrapper"}
                    data-content={notification.message}
-                   data-time={calculateTimeRemaining(notification.created, notification.duration)}
+                   data-time={timeRemainingDisplay}
                 >
                     <svg className="topbar_notification_svg" width="40" height="40" viewBox="0 0 100 100">
                         <polygon points="6,50 50,94 94,50 50,6" strokeWidth="8px" stroke="#5d5c4b" fill="#5964a6" />
@@ -167,7 +171,7 @@ export function TopbarNotification({
                 <a href={notification.action_url}
                    className={(notification.duration > 0) ? "topbar_notification_wrapper has_duration" : "topbar_notification_wrapper"}
                    data-content={notification.message}
-                   data-time={calculateTimeRemaining(notification.created, notification.duration)}
+                   data-time={timeRemainingDisplay}
                 >
                     <svg className="topbar_notification_svg" width="40" height="40" viewBox="0 0 100 100">
                         <polygon points="6,50 50,94 94,50 50,6" strokeWidth="8px" stroke="#5d5c4b" fill="#5964a6" />
@@ -180,7 +184,7 @@ export function TopbarNotification({
                 <a href={notification.action_url}
                     className="topbar_notification_wrapper"
                     data-content={notification.message}
-                    data-time={calculateTimeRemaining(notification.created, notification.duration)}
+                    data-time={timeRemainingDisplay}
                 >
                     <svg className="topbar_notification_svg" width="40" height="40" viewBox="0 0 100 100">
                         <polygon points="6,50 50,94 94,50 50,6" strokeWidth="8px" stroke="#5d5c4b" fill="#5964a6" />
@@ -204,13 +208,17 @@ function SpecialMissionNotification({
     notification,
     closeNotification
 }: TopbarNotificationProps) {
+    const timeRemainingDisplay = formatTimeRemaining(
+        calculateTimeRemaining(notification.created, notification.duration)
+    );
+
     return (
         <>
             {notification.type === "specialmission" &&
                 <a href={notification.action_url}
                    className={(notification.duration > 0) ? "topbar_notification_wrapper has_duration" : "topbar_notification_wrapper"}
                    data-content={notification.message}
-                   data-time={calculateTimeRemaining(notification.created, notification.duration)}
+                   data-time={timeRemainingDisplay}
                 >
                     <svg className="topbar_notification_svg" width="40" height="40" viewBox="0 0 100 100">
                         <polygon points="6,50 50,94 94,50 50,6" strokeWidth="8px" stroke="#5d5c4b" fill="#52466a" />
@@ -224,7 +232,7 @@ function SpecialMissionNotification({
                     <a href={notification.action_url}
                        className={(notification.duration > 0) ? "topbar_notification_wrapper has_duration" : "topbar_notification_wrapper"}
                        data-content={notification.message}
-                       data-time={calculateTimeRemaining(notification.created, notification.duration)}
+                       data-time={timeRemainingDisplay}
                     >
                         <svg className="topbar_notification_svg" width="40" height="40" viewBox="0 0 100 100">
                             <polygon points="6,50 50,94 94,50 50,6" strokeWidth="8px" stroke="#5d5c4b" fill="#5964a6" />
@@ -247,7 +255,7 @@ function SpecialMissionNotification({
                     <a href={notification.action_url}
                        className={(notification.duration > 0) ? "topbar_notification_wrapper has_duration" : "topbar_notification_wrapper"}
                        data-content={notification.message}
-                       data-time={calculateTimeRemaining(notification.created, notification.duration)}
+                       data-time={timeRemainingDisplay}
                     >
                         <svg className="topbar_notification_svg" width="40" height="40" viewBox="0 0 100 100">
                             <polygon points="6,50 50,94 94,50 50,6" strokeWidth="8px" stroke="#5d5c4b" fill="#5964a6" />
@@ -272,14 +280,26 @@ function SpecialMissionNotification({
 function TrainingNotification({
     notification,
     closeNotification
-}: TopbarNotificationPropsLeft) {
+}: TopbarNotificationProps) {
+    const [timeRemaining, setTimeRemaining] = React.useState(
+        calculateTimeRemaining(notification.created, notification.duration)
+    );
+
+    React.useEffect(() => {
+        const intervalId = setInterval(function () {
+            setTimeRemaining(prevTime => prevTime - 1);
+        }, 999);
+
+        return () => clearInterval(intervalId);
+    }, [timeRemaining]);
+
     return (
         <>
             {notification.type === "training" &&
                 <a href={notification.action_url}
                    className="topbar_notification_wrapper_training"
                    data-content={notification.message}
-                   data-time={calculateTimeRemaining(notification.created, notification.duration)}
+                   data-time={formatTimeRemaining(timeRemaining)}
                 >
                     <svg className="topbar_notification_svg" width="40" height="40" viewBox="0 0 100 100">
                         <polygon points="6,50 50,94 94,50 50,6" strokeWidth="8px" stroke="#5d5c4b" fill="#52466a" />
@@ -293,7 +313,7 @@ function TrainingNotification({
                     <a href={notification.action_url}
                        className="topbar_notification_wrapper_training_complete"
                        data-content={notification.message}
-                       data-time={calculateTimeRemaining(notification.created, notification.duration)}
+                       data-time={formatTimeRemaining(timeRemaining)}
                     >
                         <svg className="topbar_notification_svg" width="40" height="40" viewBox="0 0 100 100">
                             <polygon points="6,50 50,94 94,50 50,6" strokeWidth="8px" stroke="#5d5c4b" fill="#5964a6" />
@@ -318,7 +338,7 @@ function TrainingNotification({
 // Utilities
 function calculateTimeRemaining(created, duration) {
     const currentTimeTicks = new Date().getTime();
-    return formatTimeRemaining((created + duration) - currentTimeTicks / 1000);
+    return (created + duration) - currentTimeTicks / 1000;
 }
 
 function formatTimeRemaining(seconds) {
