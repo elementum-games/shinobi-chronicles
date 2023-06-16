@@ -211,6 +211,8 @@ function userSettings() {
         $style = $system->clean($_POST['avatar_style']);
         if ($player->setAvatarStyle($style)) {
             $system->message("Avatar style updated!");
+        } else {
+            $system->message("No change detected, check your selection and try again.");
         }
 
         $system->printMessage();
@@ -219,15 +221,18 @@ function userSettings() {
         $position = $system->clean($_POST['sidebar_position']);
         if ($player->setSidebarPosition($position)) {
             $system->message("Sidebar position updated!");
+        } else {
+            $system->message("No change detected, check your selection and try again.");
         }
 
         $system->printMessage();
     } else if (!empty($_POST['change_enable_alerts'])) {
         $enable = $system->clean($_POST['enable_alerts']);
-        if ($player->setEnableAlerts($enable)) {
+        if ($player->setEnableAlerts((bool)$enable)) {
             $system->message("Alert settings updated!");
+        } else {
+            $system->message("No change detected, check your selection and try again.");
         }
-
         $system->printMessage();
     }
     else if(!empty($_POST['level_rank_up'])) {

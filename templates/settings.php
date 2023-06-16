@@ -118,8 +118,8 @@
                     <label>Enable Alerts</label>
                     <form action='<?=$system->router->getUrl('settings')?>' method='post'>
                         <select name='enable_alerts'>";
-                            <option value='true' <?=($enable_alerts == true ? "selected='selected'" : "")?>>True</option>
-                            <option value='false' <?=($enable_alerts == false ? "selected='selected'" : "")?>>False</option>
+                            <option value='1' <?=($enable_alerts == true ? "selected='selected'" : "")?>>True</option>
+                            <option value='0' <?=($enable_alerts == false ? "selected='selected'" : "")?>>False</option>
                         </select>
                         <br />
                         <input type='submit' name='change_enable_alerts' value='Change' />
