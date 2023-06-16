@@ -442,6 +442,7 @@
                 <br/>
                 +<?=$twinSeal->regen_boost?>% regen rate<br/>
                 <?=$twinSeal->name_color_display?> username color in chat<br/>
+                Additional avatar styles (new layout)<br/>
                 Larger avatar (<?=$baseDisplay['avatar_size_display']?> -> <?=$twinSeal->avatar_size_display?>)<br/>
                 Larger inbox (<?=$baseDisplay['inbox_size']?> -> <?=$twinSeal->inbox_size?> messages)<br/>
                 Longer journal (<?=$baseDisplay['journal_size']?> -> <?=$twinSeal->journal_size?> characters)<br/>

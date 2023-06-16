@@ -14,6 +14,7 @@ class ForbiddenSeal {
     public int $regen_boost;
     public int $avatar_size;
     public int $avatar_filesize;
+    public array $avatar_styles;
     public int $logout_timer;
     public int $inbox_size;
     public int $journal_size;
@@ -54,6 +55,12 @@ class ForbiddenSeal {
             'avatar_size' => 125,
             'avatar_size_display' => '125x125',
             'avatar_filesize' => self::ONE_MEGABYTE,
+            'avatar_styles' => [
+                'avy_none' => 'none',
+                'avy_borderless' => 'borderless',
+                'avy_round' => 'circle',
+                'avy_four-point' => 'square',
+            ],
             'logout_timer' => System::LOGOUT_LIMIT,
             'inbox_size' => 50,
             'journal_size' => 1000,
@@ -83,6 +90,20 @@ class ForbiddenSeal {
             'avatar_size' => 200,
             'avatar_size_display' => '200x200', //Premium page display only.
             'avatar_filesize' => self::ONE_MEGABYTE,
+            'avatar_styles' => [
+                'avy_none' => 'none',
+                'avy_borderless' => 'borderless',
+                'avy_round' => 'circle',
+                'avy_three-point' => 'triangle',
+                'avy_four-point' => 'square',
+                'avy_four-point-90' => 'diamond',
+                'avy_four-point-oblique' => 'oblique',
+                'avy_six-point' => 'hexagaon',
+                'avy_eight-point' => 'octagon',
+                'avy_eight-point-wide' => 'octagon wide',
+                'avy_nine-point' => 'nonagon',
+                'avy-twelve-point' => 'cross',
+            ],
             'logout_timer' => System::LOGOUT_LIMIT,
             'inbox_size' => 75,
             'journal_size' => 2000,
@@ -112,6 +133,20 @@ class ForbiddenSeal {
             'avatar_size' => 200,
             'avatar_size_display' => '200x200', //Premium page display only.
             'avatar_filesize' => self::ONE_MEGABYTE * 2,
+            'avatar_styles' => [
+                'avy_none' => 'none',
+                'avy_borderless' => 'borderless',
+                'avy_round' => 'circle',
+                'avy_three-point' => 'triangle',
+                'avy_four-point' => 'square',
+                'avy_four-point-90' => 'diamond',
+                'avy_four-point-oblique' => 'oblique',
+                'avy_six-point' => 'hexagaon',
+                'avy_eight-point' => 'octagon',
+                'avy_eight-point-wide' => 'octagon wide',
+                'avy_nine-point' => 'nonagon',
+                'avy-twelve-point' => 'cross',
+            ],
             'logout_timer' => System::LOGOUT_LIMIT,
             'inbox_size' => 75,
             'journal_size' => 2500,
@@ -182,6 +217,7 @@ class ForbiddenSeal {
         $this->name_colors = self::$benefits[$this->level]['name_colors'];
         $this->avatar_size = self::$benefits[$this->level]['avatar_size'];
         $this->avatar_filesize = self::$benefits[$this->level]['avatar_filesize'];
+        $this->avatar_styles = self::$benefits[$this->level]['avatar_styles'];
         $this->logout_timer = self::$benefits[$this->level]['logout_timer'];
         $this->inbox_size = self::$benefits[$this->level]['inbox_size'];
         $this->journal_size = self::$benefits[$this->level]['journal_size'];

@@ -139,16 +139,6 @@ function ChatInput({
 }) {
   const [quickReply, _setQuickReply] = React.useState(JSON.parse(localStorage.getItem("quick_reply_on") ?? "true"));
   const [showMemeSelect, setShowMemeSelect] = React.useState(false);
-
-  /*$(document).on("click", ".meme_select", function () {
-      // Chat.val(Chat.val() + $(this).attr("data-code"));
-      $("#meme_modal").addClass("hidden");
-      $("#meme_toggle").text("+ Meme");
-  });
-  $(document).on("click", ".meme_toggle", function (e) {
-      $("#meme_modal").toggleClass("hidden");
-  });*/
-
   function setQuickReply(newValue) {
     localStorage.setItem("quick_reply_on", JSON.stringify(newValue));
     _setQuickReply(newValue);
