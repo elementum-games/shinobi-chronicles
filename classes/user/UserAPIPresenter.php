@@ -27,7 +27,8 @@ class UserApiPresenter {
     public static function playerSettingsResponse(User $player): array {
         return [
             'avatar_style' => $player->getAvatarStyle(),
-            'sidebar_position' => $player->getAvatarStyle()
+            'sidebar_position' => $player->getSidebarPosition(),
+            'enable_alerts' => $player->getEnableAlerts(),
         ];
     }
 
