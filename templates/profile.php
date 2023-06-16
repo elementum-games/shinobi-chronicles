@@ -538,6 +538,8 @@ $clan_positions = [
                                     <option value="taijutsu" <?= ($sensei['specialization'] == 'taijutsu' ? "selected='selected'" : "") ?>>Taijutsu</option>
                                     <option value="ninjutsu" <?= ($sensei['specialization'] == 'ninjutsu' ? "selected='selected'" : "") ?>>Ninjutsu</option>
                                     <option value="genjutsu" <?= ($sensei['specialization'] == 'genjutsu' ? "selected='selected'" : "") ?>>Genjutsu</option>
+                                    <option value="speed" <?= ($sensei['specialization'] == 'speed' ? "selected='selected'" : "") ?>>Speed</option>
+                                    <option value="cast_speed" <?= ($sensei['specialization'] == 'cast_speed' ? "selected='selected'" : "") ?>>Cast Speed</option>
                                 </select>
                             </div>
                             <div>
