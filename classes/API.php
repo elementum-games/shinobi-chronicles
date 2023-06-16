@@ -25,7 +25,10 @@ class API {
 
     #[NoReturn]
     public static function exitWithException(Exception $exception, System $system, array $debug_messages = []): void {
-        if($exception instanceof LoggedOutException) {
+        if(
+            $exception instanceof LoggedOutException
+            || $exception instanceof InvalidMovementException
+        ) {
             $system->rollbackTransaction();
             echo json_encode([
                 'errors' => $exception->getMessage(),

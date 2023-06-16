@@ -2,6 +2,7 @@
 
 require __DIR__ . '/NearbyPlayerDto.php';
 require __DIR__ . '/MapObjectiveLocation.php';
+require __DIR__ . '/InvalidMovementException.php';
 
 class TravelManager {
     const VILLAGE_ICONS = [
@@ -65,35 +66,35 @@ class TravelManager {
         // check if the user has moved too recently
         $move_time_left = Travel::checkMovementDelay($this->user->last_movement_ms);
         if ($move_time_left > 0) {
-            throw new Exception("Moving...");
+            throw new InvalidMovementException("Moving...");
         }
 
         // check if the user has exited an AI too recently
         $ai_time_left = Travel::checkAIDelay($this->user->last_ai_ms);
         if ($ai_time_left > 0 && !$ignore_travel_restrictions) {
-            throw new Exception('You have recently left an AI battle and cannot move for ' . floor($ai_time_left / 1000) . ' seconds!');
+            throw new InvalidMovementException('You have recently left an AI battle and cannot move for ' . floor($ai_time_left / 1000) . ' seconds!');
         }
 
         // check if the user has exited battle too recently
         $pvp_time_left = Travel::checkPVPDelay($this->user->last_pvp_ms);
         if ($pvp_time_left > 0 && !$ignore_travel_restrictions) {
-            throw new Exception('You have recently left a battle and cannot move for ' . floor($pvp_time_left / 1000) . ' seconds!');
+            throw new InvalidMovementException('You have recently left a battle and cannot move for ' . floor($pvp_time_left / 1000) . ' seconds!');
         }
 
         // check if the user has died to recently
         $death_time_left = Travel::checkDeathDelay($this->user->last_death_ms);
         if ($death_time_left > 0 && !$ignore_travel_restrictions) {
-            throw new Exception('You are still recovering from a defeat and cannot move for ' . floor($death_time_left / 1000) . ' seconds!');
+            throw new InvalidMovementException('You are still recovering from a defeat and cannot move for ' . floor($death_time_left / 1000) . ' seconds!');
         }
 
         // check if the user is in battle
         if ($this->user->battle_id && !$ignore_travel_restrictions) {
-            throw new Exception('You are in battle!');
+            throw new InvalidMovementException('You are in battle!');
         }
 
         // check if the user is in a special mission
         if ($this->user->special_mission && !$ignore_travel_restrictions) {
-            throw new Exception('You are currently in a Special Mission and cannot travel!');
+            throw new InvalidMovementException('You are currently in a Special Mission and cannot travel!');
         }
 
         // check if the user is in a combat mission fail it
@@ -103,7 +104,7 @@ class TravelManager {
             if ($mission->mission_type == 5) {
                 $mission->nextStage($this->user->mission_stage['stage_id'] = 4);
                 $this->user->mission_stage['mission_money'] /= 2;
-                throw new Exception('Mission failed! Return to the village');
+                throw new InvalidMovementException('Mission failed! Return to the village');
             }
         }
         return true;
@@ -117,7 +118,7 @@ class TravelManager {
         $ignore_travel_restrictions = $this->user->isHeadAdmin();
 
         if (!$this->checkRestrictions()) {
-            throw new Exception('Unable to move!');
+            throw new InvalidMovementException('Unable to move!');
         }
 
         // check if the coords exceed the map dimensions
@@ -126,14 +127,14 @@ class TravelManager {
             || $new_coords->x < 1
             || $new_coords->y < 1)
             && !$ignore_travel_restrictions) {
-            throw new Exception('You cannot move past this point!');
+            throw new InvalidMovementException('You cannot move past this point!');
         }
 
         // check if the user is trying to move to a village that is not theirs
         if (TravelManager::locationIsInVillage($this->system, $new_coords)
             && !$new_coords->equals($this->user->village_location)
             && !$ignore_travel_restrictions) {
-            throw new Exception('You cannot enter another village!');
+            throw new InvalidMovementException('You cannot enter another village!');
         }
 
         // check if the user is entering their own village or out of it
@@ -162,22 +163,22 @@ class TravelManager {
         // portal data
         $portal_data = Travel::getPortalData($this->system, $portal_id);
         if (empty($portal_data)) {
-            throw new Exception('You cannot enter here!');
+            throw new InvalidMovementException('You cannot enter here!');
         }
         if (!$this->checkRestrictions()) {
-            throw new Exception('Unable to move!');
+            throw new InvalidMovementException('Unable to move!');
         }
 
         // check if the player is at the correct entrance
         if (!$this->user->location->equals(new TravelCoords($portal_data['entrance_x'], $portal_data['entrance_y'], $portal_data['from_id']))
             && !$ignore_travel_restrictions) {
-            throw new Exception('You cannot enter here!');
+            throw new InvalidMovementException('You cannot enter here!');
         }
 
         // check if the player is in a faction that allows this portal
         $portal_whitelist = array_map('trim', explode(',', $portal_data['whitelist']));
         if (!in_array($this->user->village->name, $portal_whitelist) && !$ignore_travel_restrictions) {
-            throw new Exception('You are unable to enter here!');
+            throw new InvalidMovementException('You are unable to enter here!');
         }
 
         // update the player data
