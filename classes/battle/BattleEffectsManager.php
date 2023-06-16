@@ -354,7 +354,14 @@ class BattleEffectsManager {
 
         if($effect->effect == 'residual_damage' || $effect->effect == 'bleed') {
             $damage = $target->calcDamageTaken($effect->effect_amount, $effect->damage_type, true);
-            $this->addDisplay($target, $target->getName() . " takes $damage residual damage");
+            $residual_damage_raw = $target->calcDamageTaken($effect->effect_amount, $effect->damage_type, true, apply_resists : false);
+            $residual_damage_resisted = $residual_damage_raw - $damage;
+            
+            if($residual_damage_resisted > 0) {
+                $this->addDisplay($target, $target->getName() . " takes $damage residual damage (resists $residual_damage_resisted residual damage)");
+            } else {
+                $this->addDisplay($target, $target->getName() . " takes $damage residual damage");
+            }
 
             $target->health -= $damage;
             if($target->health < 0) {
