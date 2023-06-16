@@ -295,17 +295,26 @@ class ChatManager {
             // Handle Mention
             $pattern = "/@([^ \n\s!?.<>:@\[\]]+)(?=[^A-Za-z0-9_]|$)/";
             $has_mention = preg_match_all($pattern, $message, $matches);
-            $mention_count = 0;
+
+            $mentioned_users = [];
+
             if ($has_mention) {
                 foreach ($matches[1] as $match) {
-                    $mention_count++;
-                    if ($mention_count > 3) {
-                        break;
-                    }
                     if ($this->player->user_name == $match) {
                         continue;
                     }
-                    $result = $this->system->query("SELECT `user_id` FROM `users` WHERE `user_name`='{$match}' LIMIT 1");
+                    if(in_array(strtolower($match), $mentioned_users)) {
+                        continue;
+                    }
+                    if(count($mentioned_users) >= 3) {
+                        break;
+                    }
+
+                    $mentioned_users[] = $this->system->clean(strtolower($match));
+                }
+
+                foreach($mentioned_users as $mentioned_user) {
+                    $result = $this->system->query("SELECT `user_id` FROM `users` WHERE `user_name`='{$mentioned_user}' LIMIT 1");
                     if ($this->system->db_last_num_rows == 0) {
                         throw new Exception("User does not exist!");
                     }
