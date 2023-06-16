@@ -163,6 +163,12 @@ function ProjectileAttack({
                     100% {
                         transform: translateX(${leftDifference}px);
                         opacity: 0;
+                        z-index: 4;
+                    }
+                    101% {
+                        transform: translateX(${leftDifference}px);
+                        opacity: 0;
+                        z-index: -1;
                     }
                 }
             `}
@@ -261,9 +267,15 @@ function PhysicalAttack({
                         transform: translateX(${leftDifference}px);
                         opacity: 1;
                     }
+                    99% {
+                        transform: translateX(${leftDifference}px);
+                        opacity: 0;
+                        z-index: 4;
+                    }
                     100% {
                         transform: translateX(${leftDifference}px);
                         opacity: 0;
+                        z-index: -1;
                     }
                 }
             `}
