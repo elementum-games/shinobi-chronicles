@@ -93,8 +93,9 @@
             <label>Avatar Style</label>
             <form action='<?=$system->router->getUrl('settings')?>' method='post'>
                 <select name='avatar_style'>";
-                    <option value='round' <?=($avatar_style == "round" ? "selected='selected'" : "")?>>Round</option>
-                    <option value='four-point' <?=($avatar_style == "four-point" ? "selected='selected'" : "")?>>Square</option>
+                    <?php foreach ($avatar_styles as $style_key => $style_value): ?>
+                        <option value='<?= $style_key ?>' <?= $style_key == $avatar_style ? "selected='selected'" : "" ?>><?= ucwords($style_value) ?></option>
+                    <?php endforeach; ?>
                 </select>
                 <input type='submit' name='change_avatar_style' value='Change' />
             </form>

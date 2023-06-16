@@ -2067,14 +2067,14 @@ class User extends Fighter {
 
     // TO-DO: Full user settings GET, assign to user class variables
     public function setAvatarStyle(string $style): bool {
-        $this->system->query("INSERT INTO `user_settings` (`user_id`, `avatar_style`) 
-            VALUES ({$this->user_id}, '{$style}') 
+        $this->system->query("INSERT INTO `user_settings` (`user_id`, `avatar_style`)
+            VALUES ({$this->user_id}, '{$style}')
             ON DUPLICATE KEY UPDATE `avatar_style`='{$style}';");
 
         return ($this->system->db_last_affected_rows > 0);
     }
     public function setSidebarPosition(string $position): bool {
-        $this->system->query("INSERT INTO `user_settings` (`user_id`, `sidebar_position`) 
+        $this->system->query("INSERT INTO `user_settings` (`user_id`, `sidebar_position`)
             VALUES ({$this->user_id}, '{$position}')
             ON DUPLICATE KEY UPDATE `sidebar_position`='{$position}';");
 
@@ -2087,6 +2087,9 @@ class User extends Fighter {
         $avatar_result = $this->system->query("SELECT `avatar_style` FROM `user_settings` WHERE `user_id` = {$this->user_id}");
         $result = $this->system->db_fetch($avatar_result);
         if ($result) {
+            if (!array_key_exists($result['avatar_style'], $this->forbidden_seal->avatar_styles)) {
+                return "round";
+            }
             return $result['avatar_style'];
         }
         return "round";

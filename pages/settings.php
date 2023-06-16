@@ -285,6 +285,7 @@ function userSettings() {
 	// Temp settings
     $sidebar_position = $player->getSidebarPosition();
     $avatar_style = $player->getAvatarStyle();
+    $avatar_styles = $player->forbidden_seal->avatar_styles;
 
     require_once('templates/settings.php');
 }

@@ -297,22 +297,27 @@ body {
 }
 
 /* Configuration Classes */
-.round {
+.avy_none {
+    display: none !important;
+}
+.avy_borderless {
+    padding: 0 !important;
+}
+.avy_round {
     clip-path: circle(50% at 50% 50%);
 }
-
-.four-point {
+.avy_three-point {
+    clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+}
+.avy_four-point {
     clip-path: none;
 }
-
-.six-point {
-    clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
+.avy_six-point {
+    clip-path: polygon(21% 0, 79% 0, 100% 50%, 79% 100%, 21% 100%, 0% 50%);
 }
-
-.eight-point {
+.avy_eight-point {
     clip-path: polygon(30% 0%, 70% 0%, 100% 30%, 100% 70%, 70% 100%, 30% 100%, 0% 70%, 0% 30%);
 }
-
-.nine-point {
+.avy_nine-point {
     clip-path: polygon(50% 0%, 83% 12%, 100% 43%, 94% 78%, 68% 100%, 32% 100%, 6% 78%, 0% 43%, 17% 12%);
 }
