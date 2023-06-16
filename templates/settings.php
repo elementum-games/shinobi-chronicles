@@ -90,24 +90,44 @@
                 <input type='submit' name='change_layout' value='Change' />
             </form>
             <?php if($player->layout == "new_geisha"): ?>
-            <label>Avatar Style</label>
-            <form action='<?=$system->router->getUrl('settings')?>' method='post'>
-                <select name='avatar_style'>";
-                    <?php foreach ($avatar_styles as $style_key => $style_value): ?>
-                        <option value='<?= $style_key ?>' <?= $style_key == $avatar_style ? "selected='selected'" : "" ?>><?= ucwords($style_value) ?></option>
-                    <?php endforeach; ?>
-                </select>
-                <input type='submit' name='change_avatar_style' value='Change' />
-            </form>
-            <label>Sidebar Position</label>
-            <form action='<?=$system->router->getUrl('settings')?>' method='post'>
-                <select name='sidebar_position'>";
-                    <option value='left' <?=($sidebar_position == "left" ? "selected='selected'" : "")?>>Left</option>
-                    <option value='right' <?=($sidebar_position == "right" ? "selected='selected'" : "")?>>Right</option>
-                </select>
-                <input type='submit' name='change_sidebar_position' value='Change' />
-            </form>
+            <div style="display: flex; justify-content: center; gap: 10px; margin-top: 10px;">
+                <div>
+                    <label>Avatar Style</label>
+                    <form action='<?=$system->router->getUrl('settings')?>' method='post'>
+                        <select name='avatar_style'>";
+                            <?php foreach ($avatar_styles as $style_key => $style_value): ?>
+                                <option value='<?= $style_key ?>' <?= $style_key == $avatar_style ? "selected='selected'" : "" ?>><?= ucwords($style_value) ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                        <br />
+                        <input type='submit' name='change_avatar_style' value='Change' />
+                    </form>
+                </div>
+                <div>
+                    <label>Sidebar Position</label>
+                    <form action='<?=$system->router->getUrl('settings')?>' method='post'>
+                        <select name='sidebar_position'>";
+                            <option value='left' <?=($sidebar_position == "left" ? "selected='selected'" : "")?>>Left</option>
+                            <option value='right' <?=($sidebar_position == "right" ? "selected='selected'" : "")?>>Right</option>
+                        </select>
+                        <br />
+                        <input type='submit' name='change_sidebar_position' value='Change' />
+                    </form>
+                </div>
+                <div>
+                    <label>Enable Alerts</label>
+                    <form action='<?=$system->router->getUrl('settings')?>' method='post'>
+                        <select name='enable_alerts'>";
+                            <option value='true' <?=($enable_alerts == true ? "selected='selected'" : "")?>>True</option>
+                            <option value='false' <?=($enable_alerts == false ? "selected='selected'" : "")?>>False</option>
+                        </select>
+                        <br />
+                        <input type='submit' name='change_enable_alerts' value='Change' />
+                    </form>
+                </div>
+            </div>
             <?php endif; ?>
+            
         </td>
     </tr>
     <tr>

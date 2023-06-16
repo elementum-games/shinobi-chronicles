@@ -6,9 +6,10 @@ import { TopbarNotification } from "./TopbarNotification.js";
 const notificationRefreshInterval = 5000;
 
 // Initialize
-function Topbar({ links, notificationAPIData }) {
+function Topbar({ links, notificationAPIData, userAPIData}) {
     // Hooks
     const [notificationData, setNotificationData] = React.useState(notificationAPIData.userNotifications);
+    const [enableAlerts, setEnableAlerts] = React.useState(userAPIData.playerSettings.enable_alerts);
 
     // API
     function getNotificationData() {
@@ -52,8 +53,9 @@ function Topbar({ links, notificationAPIData }) {
 
     function checkNotificationAlert(notification) {
         if (notification.alert) {
-            console.log("here");
-            createNotification(notification.message);
+            if (enableAlerts) {
+                createNotification(notification.message);
+            }
             clearNotificationAlert(notification.notification_id);
         }
     }

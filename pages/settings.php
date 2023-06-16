@@ -222,6 +222,13 @@ function userSettings() {
         }
 
         $system->printMessage();
+    } else if (!empty($_POST['change_enable_alerts'])) {
+        $enable = $system->clean($_POST['enable_alerts']);
+        if ($player->setEnableAlerts($enable)) {
+            $system->message("Alert settings updated!");
+        }
+
+        $system->printMessage();
     }
     else if(!empty($_POST['level_rank_up'])) {
         $level_up = isset($_POST['level_up']);
@@ -286,6 +293,7 @@ function userSettings() {
     $sidebar_position = $player->getSidebarPosition();
     $avatar_style = $player->getAvatarStyle();
     $avatar_styles = $player->forbidden_seal->avatar_styles;
+    $enable_alerts = $player->getEnableAlerts();
 
     require_once('templates/settings.php');
 }

@@ -24,6 +24,9 @@ $NotificationAPIManager = new NotificationAPIManager($system, $player);
                 notificationAPIData: {
                     userNotifications: <?= json_encode(NotificationAPIPresenter::userNotificationResponse($NotificationAPIManager)) ?>,
                 },
+                userAPIData: {
+                    playerSettings: <?= json_encode(UserAPIPresenter::playerSettingsResponse(player: $player)) ?>,
+                },
             }),
             topbarContainer
         );

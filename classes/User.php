@@ -1166,7 +1166,7 @@ class User extends Fighter {
                             message: "Training " . $this->jutsu[$jutsu_id]->name . " Complete",
                             user_id: $this->user_id,
                             created: time(),
-                            alert: $this->system->environment == System::ENVIRONMENT_DEV ? true : false,
+                            alert: true,
                         );
                         NotificationManager::createNotification($new_notification, $this->system, NotificationManager::UPDATE_UNIQUE);
 
@@ -1220,7 +1220,7 @@ class User extends Fighter {
                     message: str_replace(["<br />", "<b>", "</b>"], " ", $gain_description . '.' . $team_boost_description),
                     user_id: $this->user_id,
                     created: time(),
-                    alert: $this->system->environment == System::ENVIRONMENT_DEV ? true : false,
+                    alert: true,
                 );
                 NotificationManager::createNotification($new_notification, $this->system, NotificationManager::UPDATE_UNIQUE);
             }
@@ -2080,6 +2080,13 @@ class User extends Fighter {
 
         return ($this->system->db_last_affected_rows > 0);
     }
+    public function setEnableAlerts(bool $enable): bool {
+        $this->system->query("INSERT INTO `user_settings` (`user_id`, `enable_alerts`)
+            VALUES ({$this->user_id}, '{$enable}')
+            ON DUPLICATE KEY UPDATE `enable_alerts`='{$enable}';");
+
+        return ($this->system->db_last_affected_rows > 0);
+    }
 
     // TO-DO: Replace with user class variables
     public function getAvatarStyle(): string
@@ -2100,6 +2107,15 @@ class User extends Fighter {
         $result = $this->system->db_fetch($avatar_result);
         if ($result) {
             return $result['sidebar_position'];
+        }
+        return "left";
+    }
+    public function getEnableAlerts(): bool
+    {
+        $alerts_result = $this->system->query("SELECT `enable_alerts` FROM `user_settings` WHERE `user_id` = {$this->user_id}");
+        $result = $this->system->db_fetch($alerts_result);
+        if ($result) {
+            return $result['enable_alerts'];
         }
         return "left";
     }
