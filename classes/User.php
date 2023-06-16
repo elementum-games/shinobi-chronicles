@@ -1981,7 +1981,6 @@ class User extends Fighter {
         $location,
         $verification_code
     ) {
-
         $initial_vars = [
             'user_name' => $user_name,
             'password' => $password,
@@ -2045,6 +2044,7 @@ class User extends Fighter {
 
             'mission_stage' => '',
             'ban_type' => '',
+            'sensei_id' => 0
         ];
 
         $columns = array_map(function($key) {

@@ -24,7 +24,7 @@ class API {
     }
 
     #[NoReturn]
-    public static function exitWithException(Exception $exception, System $system, array $debug_messages = []): void {
+    public static function exitWithException(Throwable $exception, System $system, array $debug_messages = []): void {
         if(
             $exception instanceof LoggedOutException
             || $exception instanceof InvalidMovementException

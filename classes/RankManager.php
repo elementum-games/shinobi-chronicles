@@ -5,6 +5,13 @@ require_once __DIR__ . "/Rank.php";
 class RankManager {
     public System $system;
 
+    const CHUUNIN_STAGE_WRITTEN = 1;
+    const CHUUNIN_STAGE_SURVIVAL_START = 2;
+    const CHUUNIN_STAGE_SURVIVAL_MIDDLE = 3;
+    const CHUUNIN_STAGE_SURVIVAL_END = 4;
+    const CHUUNIN_STAGE_DUEL = 5;
+    const CHUUNIN_STAGE_PASS = 6;
+
     const JONIN_MISSION_ID = 10;
 
     /** @var Rank[] */

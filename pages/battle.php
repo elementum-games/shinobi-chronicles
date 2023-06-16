@@ -49,6 +49,7 @@ function battle(): bool {
                 if ($system->db_last_num_rows == 0) {
                     throw new Exception("Invalid user!");
                 }
+
                 $attack_link = $system->db_fetch($result);
                 $attack_id = $attack_link['user_id'];
 
