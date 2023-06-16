@@ -8,7 +8,7 @@
  * @var string $view
  * @var array  $costs
  * @var array  $available_clans
- * @var array $name_colors
+ * @var array $available_name_colors
  * @var array $baseDisplay;
  * @var int $kunai_per_dollar
  * @var int $stat_transfer_points_per_min
@@ -414,7 +414,7 @@
                 <?php if($player->canChangeChatColor()): ?>
                     <br /><b>Change Name Color:</b><br />
                     <form action='<?= $self_link ?>&view=forbidden_seal' method='post'>
-                        <?php foreach($name_colors as $name_color=>$class): ?>
+                        <?php foreach($available_name_colors as $name_color=>$class): ?>
                             <input type='radio' name='name_color' value='<?= $name_color ?>'
                                 <?= ($player->chat_color == $name_color ? "checked='checked'" : '') ?> />
                             <span class='<?= $class ?>' style='font-weight:bold;'><?= ucwords($name_color) ?></span>
@@ -442,6 +442,7 @@
                 <br/>
                 +<?=$twinSeal->regen_boost?>% regen rate<br/>
                 <?=$twinSeal->name_color_display?> username color in chat<br/>
+                Additional avatar styles (new layout)<br/>
                 Larger avatar (<?=$baseDisplay['avatar_size_display']?> -> <?=$twinSeal->avatar_size_display?>)<br/>
                 Larger inbox (<?=$baseDisplay['inbox_size']?> -> <?=$twinSeal->inbox_size?> messages)<br/>
                 Longer journal (<?=$baseDisplay['journal_size']?> -> <?=$twinSeal->journal_size?> characters)<br/>

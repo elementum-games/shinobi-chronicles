@@ -5,11 +5,11 @@
 ?>
 
 <style>
-    label {
+    #content label {
         display:inline-block;
         width: 80px;
     }
-    div.modForm {
+    #content div.modForm {
         width: 210px;
         margin: 0 auto;
         text-align: center;

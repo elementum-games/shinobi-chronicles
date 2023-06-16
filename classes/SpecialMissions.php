@@ -357,20 +357,20 @@ class SpecialMission {
                     created: time(),
                     alert: true,
                 );
-                NotificationManager::createNotification($new_notification, $this->system, false);
+                NotificationManager::createNotification($new_notification, $this->system, NotificationManager::UPDATE_REPLACE);
                 break;
             case self::EVENT_COMPLETE_FAIL:
                 $result = $this->failMission();
                 // Create notification
                 require_once __DIR__ . '/../classes/notification/NotificationManager.php';
                 $new_notification = new NotificationDto(
-                    type: "specialmission_complete",
+                    type: "specialmission_failed",
                     message: "Special Mission failed",
                     user_id: $this->player->user_id,
                     created: time(),
                     alert: true,
                 );
-                NotificationManager::createNotification($new_notification, $this->system, false);
+                NotificationManager::createNotification($new_notification, $this->system, NotificationManager::UPDATE_REPLACE);
                 break;
         }
 

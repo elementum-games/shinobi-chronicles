@@ -37,6 +37,17 @@ function userProfile() {
     }
     // Rank up
     else if($player->level >= $player->rank->max_level && $player->exp >= $exp_needed && $player->rank_num < System::SC_MAX_RANK && $player->rank_up) {
+        // Create notification
+        require_once __DIR__ . '/../classes/notification/NotificationManager.php';
+        $new_notification = new NotificationDto(
+            type: "rank",
+            message: "Rank up available",
+            user_id: $player->user_id,
+            created: time(),
+            alert: false,
+        );
+        NotificationManager::createNotification($new_notification, $system, NotificationManager::UPDATE_REPLACE);
+
         if($player->battle_id > 0 or !$player->in_village) {
             require "templates/level_rank_up/rank_up_in_battle.php";
         }
@@ -123,6 +134,7 @@ function userProfile() {
             $students = SenseiManager::getStudentData($sensei['students'], $system);
         }
     }
+
     require 'templates/profile.php';
 }
 
@@ -247,7 +259,10 @@ function sendMoney(System $system, User $player, string $currency_type): void {
     </tr></table>";
 }
 
-function renderProfileSubmenu() {
+/**
+ * @throws Exception
+ */
+function renderProfileSubmenu(): void {
     global $system;
     global $player;
     global $self_link;
@@ -257,14 +272,10 @@ function renderProfileSubmenu() {
             'link' => $system->router->links['profile'],
             'title' => 'Character',
         ],
-        [
-            'link' => $system->router->links['settings'],
-            'title' => 'Settings',
-        ],
     ];
     if($player->rank_num > 1) {
         $submenu_links[] = [
-            'link' => $system->router->links['profile'] . "&page=send_money",
+            'link' => $system->router->getUrl('profile', ['page' => 'send_money']),
             'title' => 'Send Money/AK',
         ];
         if($player->forbidden_seal->max_battle_history_view > 0) {

@@ -46,6 +46,9 @@ function training() {
                 throw new Exception("You cannot train at this location!");
             }
 
+			// track if notification already created
+            $notification_created = false;
+
 			$train_length = $stat_train_length;
 			$train_gain = $stat_train_gain;
 			if($_POST['train_type'] == 'Long') {
@@ -103,6 +106,21 @@ function training() {
 				$train_type = $system->clean($train_type);
 				$train_gain = $jutsu_id;
 				$train_length = 600 + (60 * round(pow($player->jutsu[$jutsu_id]->level, 1.1)));
+
+                // Create notification
+                if (!$notification_created) {
+                    require_once __DIR__ . '/../classes/notification/NotificationManager.php';
+                    $new_notification = new NotificationDto(
+                        type: "training",
+                        message: "Training " . System::unSlug($player->jutsu[$jutsu_id]->name),
+                        user_id: $player->user_id,
+                        created: time(),
+                        duration: $train_length,
+                        alert: false,
+                    );
+                    NotificationManager::createNotification($new_notification, $system, NotificationManager::UPDATE_REPLACE);
+                    $notification_created = true;
+                }
 			}
 			else {
 				throw new Exception("Invalid training type!");
@@ -124,7 +142,7 @@ function training() {
 			// Check for sensei training boost
 			if($player->sensei_id != 0) {
 				$sensei_boost = SenseiManager::getStudentBoostBySensei($player->sensei_id, $system);
-				if ($train_type == $sensei_boost['specialization'] . "_skill") {
+				if ($train_type == $sensei_boost['specialization'] . "_skill" || $train_type == $sensei_boost['specialization']) {
                     $system->message("Your training was reduced by " . ($train_length * ($sensei_boost['boost_primary'] / 100)) . " seconds due to your student boost.");
 					$train_length *= 1 - ($sensei_boost['boost_primary'] / 100);
                 }
@@ -141,16 +159,18 @@ function training() {
 			$player->train_time = time() + $train_length;
 
 			// Create notification
-			require_once __DIR__ . '/../classes/notification/NotificationManager.php';
-            $new_notification = new NotificationDto(
-				type: "training",
-				message: "Training " . System::unSlug($train_type),
-				user_id: $player->user_id,
-				created: time(),
-				duration: $train_length,
-				alert: false,
-            );
-			NotificationManager::createNotification($new_notification, $system, false);
+            if (!$notification_created) {
+                require_once __DIR__ . '/../classes/notification/NotificationManager.php';
+                $new_notification = new NotificationDto(
+                    type: "training",
+                    message: "Training " . System::unSlug($train_type),
+                    user_id: $player->user_id,
+                    created: time(),
+                    duration: $train_length,
+                    alert: false,
+                );
+                NotificationManager::createNotification($new_notification, $system, NotificationManager::UPDATE_REPLACE);
+            }
 
 		} catch (Exception $e) {
 			$system->message($e->getMessage());

@@ -98,6 +98,9 @@ function premium() {
 		$available_clans[$result['clan_id']] = stripslashes($result['name']);
 	}
 
+    // Chat name colors
+    $available_name_colors = $player->getNameColors();
+
 	if(isset($_POST['user_reset'])) {
 		try {
             if($player->team) {
@@ -239,8 +242,6 @@ function premium() {
 			$system->message($e->getMessage());
 		}
 	}
-
-	// Gender change
 	else if(isset($_POST['change_gender'])) {
         try {
             $new_gender = $system->clean($_POST['new_gender']);
@@ -646,57 +647,15 @@ function premium() {
         if($player->premium_credits_purchased && in_array($chat_effect, ["", "sparkles"])) {
             $player->chat_effect = $chat_effect;
         }
-		switch($color) {
-			case 'blue':
-			case 'pink':
-			case 'black':
-				$player->chat_color = $color;
-				$system->message("Color changed!");
-				break;
-			case 'gold':
-				if(!$player->premium_credits_purchased && !$player->isHeadAdmin()) {
-					$system->message("Invalid color!");
-					break;
-				}
-				$player->chat_color = $color;
-				$system->message("Color changed!");
-				break;
-			 case 'green':
-                if(!$player->isModerator()) {
-                    $system->message("Invalid color!");
-                    break;
-                }
-                $player->chat_color = $color;
-                $system->message("Color changed");
-                break;
-			case 'teal':
-				if (!$player->isHeadModerator()) {
-					$system->message("Invalid color!");
-					break;
-				}
-				$player->chat_color = $color;
-				$system->message("Color changed");
-				break;
-            case 'purple':
-                if (!$player->isContentAdmin()) {
-                    $system->message("Invalid color!");
-                    break;
-                }
-                $player->chat_color = $color;
-                $system->message("Color changed");
-                break;
-			case 'red':
-				if(!$player->isUserAdmin()) {
-					$system->message("Invalid color!");
-					break;
-				}
-				$player->chat_color = $color;
-				$system->message("Color changed");
-			break;
-			/* End Shadekun edit */
-			default:
-				$system->message("Invalid color!");
-		}
+
+        if(isset($available_name_colors[$color])) {
+            $player->chat_color = $color;
+            $system->message("Color changed!");
+        }
+        else {
+            $system->message("Invalid color!");
+        }
+
 		$system->printMessage();
 	}
 	else if(isset($_POST['change_element']) && $player->rank_num >= 3) {
@@ -1081,8 +1040,6 @@ function premium() {
             $bloodlines[$row['rank']][$row['bloodline_id']] = $row;
         }
     }
-
-    $name_colors = $player->getNameColors();
 
     // Buying shards
     if($system->environment == System::ENVIRONMENT_DEV) {

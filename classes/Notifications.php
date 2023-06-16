@@ -120,7 +120,7 @@ class Notifications {
         }
         //Official Warning
         if($player->getOfficialWarnings(true)) {
-            $notifications[] = new Notification($system->router->links['settings'] . "&view=account", 'Official Warning(s)!');
+            $notifications[] = new Notification($system->router->getUrl('account_record'), 'Official Warning(s)!');
         }
         //New Report
         if($player->staff_manager->isModerator() && $reportManager->getActiveReports(true)) {

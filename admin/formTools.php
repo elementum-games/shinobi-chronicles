@@ -50,7 +50,7 @@ function validateFormData($entity_constraints, &$data, $content_id = null, $FORM
                     for($i = 0; $i < $variable['count']; $i++) {
                         $data_array[$count] = [];
                         foreach($variable['variables'] as $name => $var) {
-                            if($var['special'] == 'remove' and !empty($FORM_DATA[$var_name][$i][$name])) {
+                            if(isset($var['special']) && $var['special'] == 'remove' and !empty($FORM_DATA[$var_name][$i][$name])) {
                                 $data_array[$count] = [];
                                 break;
                             }
@@ -58,7 +58,15 @@ function validateFormData($entity_constraints, &$data, $content_id = null, $FORM
                                 continue;
                             }
                             else {
-                                validateField($name, $FORM_DATA[$var_name][$i][$name], $var, $entity_constraints, $data_array[$count], $content_id);
+                                validateField(
+                                    var_name: $name,
+                                    input: $FORM_DATA[$var_name][$i][$name],
+                                    FORM_DATA: $var,
+                                    field_constraints: $entity_constraints[$var_name]['variables'][$name],
+                                    all_constraints: $entity_constraints,
+                                    data: $data_array[$count],
+                                    content_id: $content_id
+                                );
                             }
                         }
                         if(empty($data_array[$count])) {
@@ -264,8 +272,18 @@ function displayVariable($var_name, $variable, $current_value, $input_name_prefi
     $input_type = $variable['input_type'] ?? '';
 
     if($input_type == 'text') {
-        echo "<label for='$name'>" . System::unSlug($var_name) . ":</label>
-		<input type='text' name='$name' value='" . stripslashes($current_value) . "' /><br />";
+        echo "<label for='$name'>" . System::unSlug($var_name) . ":</label>";
+        if(isset($variable['options']) && !empty($variable['options'])) {
+            echo "<select name='$name'>";
+                foreach($variable['options'] as $option) {
+                    echo "<option value='$option'" . ($current_value == $option ? "selected='selected'" : '') . ">"
+                        . System::unSlug($option) . "</option>";
+                }
+            echo "</select>";
+        }
+        else {
+		    echo "<input type='text' name='$name' value='" . stripslashes($current_value) . "' /><br />";
+        }
     }
     else if($variable['input_type'] == 'text_area') {
         echo "<label for='$var_name'>" . System::unSlug($var_name) . ":</label><br />

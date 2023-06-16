@@ -98,7 +98,7 @@ class Battle {
         ];
 
         $system->query(
-            "INSERT INTO `battles` SET 
+            "INSERT INTO `battles` SET
                 `battle_type` = '" . $battle_type . "',
                 `start_time` = '" . time() . "',
                 `turn_time` = '" . (time() + self::PREP_LENGTH - 5) . "',
@@ -124,6 +124,30 @@ class Battle {
         if($player2 instanceof User) {
             $player2->battle_id = $battle_id;
             $player2->updateData();
+        }
+
+        // Create Notifications
+        if ($battle_type == self::TYPE_FIGHT) {
+            $new_notification = new BattleNotificationDto(
+                action_url: $system->router->getUrl('battle'),
+                type: "battle",
+                message: "In battle!",
+                user_id: $player1->user_id,
+                created: time(),
+                battle_id: $battle_id,
+                alert: false,
+            );
+            NotificationManager::createNotification($new_notification, $system, NotificationManager::UPDATE_REPLACE);
+            $new_notification = new BattleNotificationDto(
+                action_url: $system->router->getUrl('battle'),
+                type: "battle",
+                message: "In battle!",
+                user_id: $player2->user_id,
+                created: time(),
+                battle_id: $battle_id,
+                alert: true,
+            );
+            NotificationManager::createNotification($new_notification, $system, NotificationManager::UPDATE_REPLACE);
         }
 
         return $battle_id;
@@ -281,10 +305,10 @@ class Battle {
             `turn_time` = {$this->turn_time},
             `turn_count` = {$this->turn_count},
             `winner` = '{$this->winner}',
-    
+
             `fighter_health` = '" . json_encode($this->fighter_health) . "',
             `fighter_actions` = '" . json_encode($this->fighter_actions) . "',
-            
+
             `field` = '" . $this->raw_field . "',
 
             `active_effects` = '" . $this->raw_active_effects . "',

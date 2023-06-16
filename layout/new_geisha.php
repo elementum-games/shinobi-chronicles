@@ -6,14 +6,12 @@ $heading = coreHeading('style/geisha/geisha.css') .
 <<<HTML
 <body>
 	<link rel='stylesheet' type='text/css' href='style/new_geisha/new_geisha.css' />
-	<div id='container'>
 HTML;
 
 
 $header = <<<HTML
 		</div>
 	</div>
-
 HTML;
 
 $body_start = <<<HTML
@@ -100,8 +98,8 @@ $footer = <<<HTML
 		<div class="footer-left"></div>
 		<div class="footer-right">
 			<div class="footer_text">
-				Shinobi Chronicles v<!--[VERSION_NUMBER]--> &bull; Copyright &copy; LM Visions <a href="{$system->router->base_url}terms.php">Terms of Service</a>
-				<br />
+				Shinobi Chronicles v<!--[VERSION_NUMBER]--> &bull; Copyright &copy; LM Visions
+				<a href="{$system->router->base_url}terms.php">Terms of Service</a>
 				<a href="https://www.vecteezy.com/free-png/stone">Stone PNG by Vecteezy</a>
 			</div>
 		</div>
@@ -109,14 +107,6 @@ $footer = <<<HTML
 </body>
 </html>
 HTML;
-
-$hotbarModule = "templates/hotbar.php";
-
-$sidebarModule = "templates/sidebar.php";
-
-$headerModule = "templates/header.php";
-
-$topbarModule = "templates/topbar.php";
 
 return new Layout(
     key: 'new_geisha',
@@ -131,8 +121,4 @@ return new Layout(
     side_menu_end: $side_menu_end,
     login_menu: $login_menu,
     footer: $footer,
-	hotbarModule: $hotbarModule,
-	sidebarModule: $sidebarModule,
-	headerModule: $headerModule,
-	topbarModule: $topbarModule,
 );

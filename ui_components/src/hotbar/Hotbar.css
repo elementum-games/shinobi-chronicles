@@ -147,6 +147,7 @@
 
 .hb_section_spacer {
     width: var(--sidebar-width);
+    margin-right: var(--content-sidebar-gap);
 }
 
 .hb_quick_title {

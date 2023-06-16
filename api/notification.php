@@ -3,14 +3,14 @@
 # Begin standard auth
 require_once __DIR__ . "/../classes.php";
 
-$system = new System();
-$system->is_api_request = true;
+$system = API::init();
 
 try {
     $player = Auth::getUserFromSession($system);
-    $player->loadData(User::UPDATE_NOTHING);
+    $player->loadData(User::UPDATE_FULL);
+    $player->updateData();
 } catch (Exception $e) {
-    API::exitWithError($e->getMessage());
+    API::exitWithException($e, system: $system);
 }
 # End standard auth
 
@@ -33,18 +33,24 @@ try {
             break;
         case "closeNotification":
             $NotificationResponse->response_data = [
-                'success' => NotificationAPIPresenter::closeNotificationResponse(notificationManager: $NotificationManager, notification_id: $_POST['notification_id']),
+                'success' => $NotificationManager->closeNotification($system->clean($_POST['notification_id'])),
+            ];
+            break;
+        case "clearNotificationAlert":
+            $NotificationResponse->response_data = [
+                'success' => $NotificationManager->clearNotificationAlert($system->clean($_POST['notification_id'])),
             ];
             break;
         default:
-            API::exitWithError("Invalid request!");
+            API::exitWithError("Invalid request!", system: $system);
     }
 
     API::exitWithData(
         data: $NotificationResponse->response_data,
         errors: $NotificationResponse->errors,
         debug_messages: $system->debug_messages,
+        system: $system,
     );
 } catch (Throwable $e) {
-    API::exitWithError($e->getMessage());
+    API::exitWithException($e, system: $system);
 }

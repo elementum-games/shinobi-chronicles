@@ -38,6 +38,9 @@ require_once __DIR__ . "/classes/InboxUser.php";
 require_once __DIR__ . "/classes/InboxManager.php";
 require_once __DIR__ . "/classes/InboxAPIResponse.php";
 
+require_once __DIR__ . "/classes/chat/ChatManager.php";
+require_once __DIR__ . "/classes/chat/ChatAPIPresenter.php";
+
 require_once __DIR__ . "/classes/travel/Travel.php";
 require_once __DIR__ . "/classes/travel/TravelManager.php";
 require_once __DIR__ . "/classes/travel/TravelApiPresenter.php";

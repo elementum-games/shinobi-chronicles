@@ -1,10 +1,7 @@
 <?php
 /**
  * @var System $system
- * @var User $player
  */
-
-$NavigationAPIManager = new NavigationAPIManager($system, $player);
 
 ?>
 
@@ -22,7 +19,11 @@ $NavigationAPIManager = new NavigationAPIManager($system, $player);
                     navigation_api: "<?= $system->router->api_links['navigation'] ?>",
                 },
                 navigationAPIData: {
-                    headerMenu: <?= json_encode(NavigationAPIPresenter::menuLinksResponse($NavigationAPIManager->getHeaderMenu())) ?>,
+                    headerMenu: <?= json_encode(
+                        NavigationAPIPresenter::menuLinksResponse(
+                            NavigationAPIManager::getHeaderMenu($system)
+                        )
+                    ) ?>
                 },
             }),
             headerContainer

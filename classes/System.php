@@ -32,6 +32,9 @@ class System {
     const SC_NO_REPLY_EMAIL = "no-reply@shinobichronicles.com";
     const UNSERVICEABLE_EMAIL_DOMAINS = ['hotmail.com', 'live.com', 'msn.com', 'outlook.com'];
 
+    public bool $ENABLE_ROW_LOCKING = true;
+    public bool $in_db_transaction = false;
+
     // TODO: Remove! This is a temporary way to do events
     const SC_EVENT_START = 0;
     const SC_EVENT_END = 1641769200;
@@ -106,9 +109,6 @@ class System {
             'pm_class' => 'administrator'
         )
     );
-
-    //Chat variables
-    const CHAT_MAX_POST_LENGTH = 350;
 
     // Default layout
     const DEFAULT_LAYOUT = 'shadow_ribbon';
@@ -343,6 +343,27 @@ class System {
         return $entities;
     }
 
+    public function startTransaction() {
+        if ($this->ENABLE_ROW_LOCKING) {
+            $this->query("START TRANSACTION;");
+            $this->in_db_transaction = true;
+        }
+    }
+
+    public function commitTransaction() {
+        if ($this->ENABLE_ROW_LOCKING && $this->in_db_transaction) {
+            $this->query("COMMIT;");
+            $this->in_db_transaction = false;
+        }
+    }
+    public function rollbackTransaction()
+    {
+        if ($this->ENABLE_ROW_LOCKING && $this->in_db_transaction) {
+            $this->query("ROLLBACK;");
+            $this->in_db_transaction = false;
+         }
+    }
+
 
     /* function message(message, force_message)
 
@@ -440,7 +461,7 @@ class System {
 
         $this->message($message);
         if($this->is_api_request) {
-            API::exitWithError($message);
+            API::exitWithError(message: $message, system: $this);
         }
         $this->printMessage(true);
 
@@ -506,6 +527,7 @@ class System {
         $meme_array = [
             'codes' => [],
             'images' => [],
+            'urls' => [],
             'texts' => []
         ];
         foreach ($cleaned_memes as $meme)
@@ -514,8 +536,11 @@ class System {
 
             if (in_array($meme_code, $meme_array['codes'])) continue;
 
+            $url = "./images/memes/${meme}";
+
             $meme_array['codes'][] = $meme_code;
-            $meme_array['images'][] = "<img src='./images/memes/${meme}' title='${meme_code}' alt='${meme_code}' style='max-width: 75px;max-height: 75px'/>";
+            $meme_array['images'][] = "<img src='{$url}' title='${meme_code}' alt='${meme_code}' style='max-width: 75px;max-height: 75px'/>";
+            $meme_array['urls'][] = $url;
             $meme_array['texts'][] = $meme_code;
         }
         return $meme_array;

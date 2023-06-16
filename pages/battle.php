@@ -49,6 +49,7 @@ function battle(): bool {
                 if ($system->db_last_num_rows == 0) {
                     throw new Exception("Invalid user!");
                 }
+
                 $attack_link = $system->db_fetch($result);
                 $attack_id = $attack_link['user_id'];
 
@@ -96,6 +97,8 @@ function battle(): bool {
 					ceil((($user->last_death_ms + (60 * 1000)) - System::currentTimeMs()) / 1000) . " more seconds.");
 			}
 
+            sleep(10);
+
             if($system->USE_NEW_BATTLES) {
                 BattleV2::start($system, $player, $user, Battle::TYPE_FIGHT);
             }
@@ -139,6 +142,16 @@ function processBattleFightEnd(BattleManager $battle, User $player): string {
 
         $player->system->query("UPDATE `villages` SET `points`=`points`+'$village_point_gain' WHERE `name`='{$player->village->name}' LIMIT 1");
         $result .= "You have earned $village_point_gain point for your village.[br]";
+
+        //TODO: Add a feature that will make alt killing / targeting same user not worth while (diminish gains (negative for excessive chain kills?))
+        //TODO: Scale reputation gains based on opponents reputation
+        if($player->weekly_rep < Village::WEEKLY_REP_CAP) {
+            $rep_gain = $player->calMaxRepGain(Village::PVP_REP);
+            if($rep_gain > 0) {
+                $result .= "You have earned $rep_gain village reputation.[br]";
+                $player->addRep($rep_gain);
+            }
+        }
 
         // Team points
         if($player->team != null) {

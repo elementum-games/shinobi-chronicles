@@ -12,6 +12,7 @@ import { ScoutArea} from "./ScoutArea.js";
     player_filters:      object,
     map_name:            string,
     background_image:    string,
+    objective_image:     string,
     start_x:             int,
     end_x:               int,
     start_y:             int,

@@ -19,7 +19,7 @@ require_once __DIR__ . "/Clan.php";
 class User extends Fighter {
     const ENTITY_TYPE = 'U';
 
-    const AVATAR_MAX_SIZE = 150;
+    const AVATAR_MAX_SIZE = 125;
 
     const GENDER_MALE = 'Male';
     const GENDER_FEMALE = 'Female';
@@ -104,9 +104,13 @@ class User extends Fighter {
     public int $spouse;
     public string $spouse_name;
     public int $marriage_time;
-    public Village $village;
     public int $level;
     public bool $level_up;
+
+    public Village $village;
+    public int $village_rep;
+    public int $weekly_rep;
+    public int $mission_rep_cd;
 
     public int $rank_num;
     public Rank $rank;
@@ -311,7 +315,7 @@ class User extends Fighter {
             `sensei_id`,
             `accept_students`,
             `village`
-			FROM `users` WHERE `user_id`='$user_id' LIMIT 1"
+			FROM `users` WHERE `user_id`='$user_id' LIMIT 1 FOR UPDATE"
         );
         if($system->db_last_num_rows == 0) {
             throw new Exception("User does not exist!");
@@ -400,7 +404,7 @@ class User extends Fighter {
      * @throws Exception
      */
     public function loadData($UPDATE = User::UPDATE_FULL, $remote_view = false): void {
-        $result = $this->system->query("SELECT * FROM `users` WHERE `user_id`='$this->user_id' LIMIT 1");
+        $result = $this->system->query("SELECT * FROM `users` WHERE `user_id`='$this->user_id' LIMIT 1 FOR UPDATE");
         $user_data = $this->system->db_fetch($result);
 
         $this->current_ip = $user_data['current_ip'];
@@ -453,6 +457,11 @@ class User extends Fighter {
 
         $this->gender = $user_data['gender'];
         $this->village = new Village($this->system, $user_data['village']);
+        $this->village_rep = $user_data['village_rep'];
+        $this->weekly_rep = $user_data['weekly_rep'];
+        $this->mission_rep_cd = $user_data['mission_rep_cd'];
+
+        $this->gender = $user_data['gender'];
         $this->level = $user_data['level'];
         $this->level_up = $user_data['level_up'];
         $this->health = $user_data['health'];
@@ -638,8 +647,15 @@ class User extends Fighter {
                     $task->progress = $task->amount;
                     $task->complete = true;
                     $this->addMoney($task->reward, "Completed daily task");
+                    $task_message = "You have completed {$task->name} and earned &yen;{$task->reward}";
 
-                    $this->system->message('You have completed ' . $task->name . ' and earned ¥' . $task->reward);
+                    $rep_gain = $this->calMaxRepGain(Village::DAILY_TASK[$task->difficulty]);
+                    if($rep_gain > 0) {
+                        $this->addRep($rep_gain);
+                        $task_message .= " and $rep_gain Reputation";
+                    }
+
+                    $this->system->message($task_message);
                 }
             }
         }
@@ -904,16 +920,18 @@ class User extends Fighter {
     /**
      * Providing an actual ID will return the OW and mark the warning as read
      * @param $id
-     * @return bool|void|array
+     * @return null|array
      */
-    public function getOfficialWarning($id) {
+    public function getOfficialWarning($id): ?array {
         $result = $this->system->query("SELECT * FROM `official_warnings` WHERE `user_id`='{$this->user_id}' AND `warning_id`='{$id}' LIMIT 1");
-        if($this->system->db_last_num_rows) {
+        $warning = $this->system->db_fetch($result);
+
+        if($warning != null) {
             $this->system->query("UPDATE `official_warnings` SET `viewed`=1 WHERE `warning_id`='{$id}' LIMIT 1");
-            return $this->system->db_fetch($result);
+            return $warning;
         }
         else {
-            return false;
+            return null;
         }
     }
 
@@ -1148,9 +1166,9 @@ class User extends Fighter {
                             message: "Training " . $this->jutsu[$jutsu_id]->name . " Complete",
                             user_id: $this->user_id,
                             created: time(),
-                            alert: false,
+                            alert: true,
                         );
-                        NotificationManager::createNotification($new_notification, $this->system, false);
+                        NotificationManager::createNotification($new_notification, $this->system, NotificationManager::UPDATE_UNIQUE);
 
                         $this->system->message($message);
                         $this->system->printMessage();
@@ -1199,12 +1217,12 @@ class User extends Fighter {
                 // Create notification
                 $new_notification = new NotificationDto(
                     type: "training_complete",
-                    message: "Training " . System::unSlug($this->train_type) . " Complete",
+                    message: str_replace(["<br />", "<b>", "</b>"], " ", $gain_description . '.' . $team_boost_description),
                     user_id: $this->user_id,
                     created: time(),
-                    alert: false,
+                    alert: true,
                 );
-                NotificationManager::createNotification($new_notification, $this->system, false);
+                NotificationManager::createNotification($new_notification, $this->system, NotificationManager::UPDATE_UNIQUE);
             }
         }
     }
@@ -1436,6 +1454,20 @@ class User extends Fighter {
         $this->location = $this->village_location;
     }
 
+    public function calMaxRepGain($repGain) {
+        // Temp disable
+        return 0;
+
+       /* if($repGain + $this->weekly_rep > Village::WEEKLY_REP_CAP) {
+            $repGain = Village::WEEKLY_REP_CAP - $this->weekly_rep;
+        }
+        return $repGain;*/
+    }
+    public function addRep($amount) {
+        $this->village_rep += $amount;
+        $this->weekly_rep += $amount;
+    }
+
     /* function updateData()
         Updates user data from class members into database
         -Parameters-
@@ -1457,6 +1489,9 @@ class User extends Fighter {
 		`spouse`  = '$this->spouse',
 		`marriage_time` = '$this->marriage_time',
 		`village` = '{$this->village->name}',
+		`village_rep` = '$this->village_rep',
+		`weekly_rep` = '$this->weekly_rep',
+		`mission_rep_cd` = '$this->mission_rep_cd',
 		`level` = '$this->level',
 		`level_up` = '" . (int)$this->level_up . "',
 		`rank` = '$this->rank_num',
@@ -1742,6 +1777,11 @@ class User extends Fighter {
             $return['red'] = 'administrator';
         }
 
+        // Arthesia override
+        if($this->system->environment == System::ENVIRONMENT_PROD && $this->user_id == 1603) {
+            $return['purple'] = 'contentAdmin';
+        }
+
         return $return;
     }
 
@@ -1941,7 +1981,6 @@ class User extends Fighter {
         $location,
         $verification_code
     ) {
-
         $initial_vars = [
             'user_name' => $user_name,
             'password' => $password,
@@ -2005,6 +2044,7 @@ class User extends Fighter {
 
             'mission_stage' => '',
             'ban_type' => '',
+            'sensei_id' => 0
         ];
 
         $columns = array_map(function($key) {
@@ -2021,5 +2061,62 @@ class User extends Fighter {
         $system->query($query);
 
         return $system->db_last_insert_id;
+    }
+
+    /* User Settings */
+
+    // TO-DO: Full user settings GET, assign to user class variables
+    public function setAvatarStyle(string $style): bool {
+        $this->system->query("INSERT INTO `user_settings` (`user_id`, `avatar_style`)
+            VALUES ({$this->user_id}, '{$style}')
+            ON DUPLICATE KEY UPDATE `avatar_style`='{$style}';");
+
+        return ($this->system->db_last_affected_rows > 0);
+    }
+    public function setSidebarPosition(string $position): bool {
+        $this->system->query("INSERT INTO `user_settings` (`user_id`, `sidebar_position`)
+            VALUES ({$this->user_id}, '{$position}')
+            ON DUPLICATE KEY UPDATE `sidebar_position`='{$position}';");
+
+        return ($this->system->db_last_affected_rows > 0);
+    }
+    public function setEnableAlerts(bool $enable): bool {
+        $this->system->query("INSERT INTO `user_settings` (`user_id`, `enable_alerts`)
+            VALUES ({$this->user_id}, '{$enable}')
+            ON DUPLICATE KEY UPDATE `enable_alerts`='{$enable}';");
+
+        return ($this->system->db_last_affected_rows > 0);
+    }
+
+    // TO-DO: Replace with user class variables
+    public function getAvatarStyle(): string
+    {
+        $avatar_result = $this->system->query("SELECT `avatar_style` FROM `user_settings` WHERE `user_id` = {$this->user_id}");
+        $result = $this->system->db_fetch($avatar_result);
+        if ($result) {
+            if (!array_key_exists($result['avatar_style'], $this->forbidden_seal->avatar_styles)) {
+                return "round";
+            }
+            return $result['avatar_style'];
+        }
+        return "round";
+    }
+    public function getSidebarPosition(): string
+    {
+        $avatar_result = $this->system->query("SELECT `sidebar_position` FROM `user_settings` WHERE `user_id` = {$this->user_id}");
+        $result = $this->system->db_fetch($avatar_result);
+        if ($result) {
+            return $result['sidebar_position'];
+        }
+        return "left";
+    }
+    public function getEnableAlerts(): bool
+    {
+        $alerts_result = $this->system->query("SELECT `enable_alerts` FROM `user_settings` WHERE `user_id` = {$this->user_id}");
+        $result = $this->system->db_fetch($alerts_result);
+        if ($result) {
+            return $result['enable_alerts'];
+        }
+        return "left";
     }
 }

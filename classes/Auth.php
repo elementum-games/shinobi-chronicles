@@ -2,6 +2,7 @@
 
 require_once __DIR__ . "/User.php";
 require_once __DIR__ . "/System.php";
+require_once __DIR__ . "/LoggedOutException.php";
 
 class Auth {
     /**
@@ -13,7 +14,7 @@ class Auth {
         session_start();
         
         if(!isset($_SESSION['user_id'])) {
-            throw new Exception("User is not logged in!");
+            throw new LoggedOutException("User is not logged in!");
         }
 
         $system = new System();

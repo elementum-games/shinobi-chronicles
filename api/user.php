@@ -3,14 +3,13 @@
 # Begin standard auth
 require_once __DIR__ . "/../classes.php";
 
-$system = new System();
-$system->is_api_request = true;
+$system = API::init();
 
 try {
     $player = Auth::getUserFromSession($system);
     $player->loadData(User::UPDATE_REGEN);
 } catch (Exception $e) {
-    API::exitWithError($e->getMessage());
+    API::exitWithException($e, system: $system);
 }
 # End standard auth
 
@@ -32,6 +31,16 @@ try {
                     rank_names: RankManager::fetchNames($system)),
             ];
             break;
+        case "getPlayerResources":
+            $UserAPIResponse->response_data = [
+                'playerResources' => UserAPIPresenter::playerResourcesResponse($player),
+            ];
+            break;
+        case "getPlayerSettings":
+            $UserAPIResponse->response_data = [
+                'playerSettings' => UserAPIPresenter::playerSettingsResponse($player),
+            ];
+            break;
         case "getMissionData":
             $UserAPIResponse->response_data = [
                 'missionData' => UserAPIPresenter::missionDataResponse(userManager: $UserAPIManager),
@@ -43,14 +52,15 @@ try {
             ];
             break;
         default:
-            API::exitWithError("Invalid request!");
+            API::exitWithError(message: "Invalid request!", system: $system);
     }
 
     API::exitWithData(
         data: $UserAPIResponse->response_data,
         errors: $UserAPIResponse->errors,
         debug_messages: $system->debug_messages,
+        system: $system,
     );
 } catch (Throwable $e) {
-    API::exitWithError($e->getMessage());
+    API::exitWithException($e, system: $system);
 }

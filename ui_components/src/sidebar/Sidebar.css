@@ -1,10 +1,10 @@
 #sidebarContainer {
     vertical-align: top;
-    margin-top: 20px;
+    margin-top: 15px;
     position: sticky;
     align-self: flex-start;
     margin-left: 15px;
-    top: calc(var(--header-height) + var(--header-border-height) + 20px);
+    top: calc(var(--header-height) + var(--header-border-height) + 15px);
 }
 
 #sidebar {
@@ -24,8 +24,7 @@
 .sb_header_image_wrapper {
     left: -16px;
     position: relative;
-    top: 50%;
-    transform: translate(0%, -40%)
+    display: flex;
 }
 
 .sb_header_text_wrapper {
@@ -57,7 +56,7 @@
     background-color: var(--sidebar-button-background-color);
     border-color: var(--sidebar-button-border-color);
     border-width: 1px;
-    font-weight: 500;
+    font-weight: 400;
 }
 
 .sb_link_filler {
@@ -90,26 +89,22 @@
 
 .sb_avatar_container {
     overflow: visible;
-    margin-bottom: 5px;
+    margin-bottom: 8px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .sb_avatar_wrapper {
-    clip-path: circle(50% at 50% 50%);
     background: var(--avatar-frame-border_gradient);
-    height: 212px;
-    width: 212px;
+    padding: var(--avatar-frame-border-width-large);
     position: relative;
-    left: 50%;
-    transform: translateX(-50%);
+    display: flex;
 }
 
 .sb_avatar_img {
     position: relative;
-    top: 6px;
-    left: 6px;
-    height: 200px;
-    width: 200px;
-    clip-path: circle(49% at 50% 50%);
 }
 
 .sb_button {

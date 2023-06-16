@@ -4,6 +4,7 @@ session_start();
 require_once("classes/_autoload.php");
 
 $system = new System();
+$system->startTransaction();
 $guest_support = true;
 $self_link = $system->router->base_url . 'support.php';
 $staff_level = 0;
@@ -29,10 +30,7 @@ else {
 $request_types = $supportSystem->getSupportTypes($staff_level);
 $supportCreated = false;
 
-echo $layout->heading;
-echo $layout->top_menu;
-echo $layout->header;
-echo str_replace("[HEADER_TITLE]", "Support", $layout->body_start);
+$layout->renderBeforeContentHTML($system, $player ?? null, "Support");
 
 if($player != null) {
     //Form submitted // 11/6/21 SM{V2} supported
@@ -93,6 +91,8 @@ if($player != null) {
                 }
             }
         }catch (Exception $e) {
+            $system->rollbackTransaction();
+            error_log($e->getMessage());
             $system->message($e->getMessage());
         }
     }
@@ -160,6 +160,8 @@ if($player != null) {
                         throw new Exception("Error adding response!");
                     }
                 } catch (Exception $e) {
+                    $system->rollbackTransaction();
+                    error_log($e->getMessage());
                     $system->message($e->getMessage());
                 }
             }
@@ -196,6 +198,8 @@ if($player != null) {
                         $system->message("Support closed.");
                     }
                 }catch (Exception $e) {
+                    $system->rollbackTransaction();
+                    error_log($e->getMessage());
                     $system->message($e->getMessage());
                 }
             }
@@ -209,8 +213,10 @@ if($player != null) {
         }
     }
 
-    // Load side menu
-    $layout->renderSideMenu($player, $player->system->router);
+    if ($layout->key != "new_geisha") {
+        // Load side menu
+        $layout->renderSideMenu($player, $player->system->router);
+    }
 }
 else {
     // Get support data
@@ -292,6 +298,8 @@ else {
                 $system->message("Error creating support.");
             }
         }catch(Exception $e) {
+            $system->rollbackTransaction();
+            error_log($e->getMessage());
             $system->message($e->getMessage());
         }
     }
@@ -319,6 +327,7 @@ else {
                 throw new Exception("Error adding response!");
             }
         }catch (Exception $e) {
+            $system->rollbackTransaction();
             $system->message($e->getMessage());
         }
     }
@@ -332,4 +341,6 @@ else {
     echo $layout->login_menu;
 }
 
-$layout->renderFooter();
+$layout->renderAfterContentHTML($system, $player);
+
+$system->commitTransaction();

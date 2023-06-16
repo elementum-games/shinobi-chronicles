@@ -398,16 +398,10 @@ function geninExam(System $system, User $player, RankManager $rankManager) {
 function chuuninExam(System $system, User $player, RankManager $rankManager): bool {
     global $self_link;
     $exam_name = $rankManager->ranks[$player->rank_num + 1]->name . " Exam";
-    $CHUUNIN_STAGE_WRITTEN = 1;
-    $CHUUNIN_STAGE_SURVIVAL_START = 2;
-    $CHUUNIN_STAGE_SURVIVAL_MIDDLE = 3;
-    $CHUUNIN_STAGE_SURVIVAL_END = 4;
-    $CHUUNIN_STAGE_DUEL = 5;
-    $CHUUNIN_STAGE_PASS = 6;
 
     // Begin exam
     if(isset($_POST['begin_exam'])) {
-        $player->exam_stage = $CHUUNIN_STAGE_WRITTEN;
+        $player->exam_stage = RankManager::CHUUNIN_STAGE_WRITTEN;
     }
     // Display exam introduction
     if(!$player->exam_stage) {
@@ -416,7 +410,7 @@ function chuuninExam(System $system, User $player, RankManager $rankManager): bo
     }
 
     // Input
-    if($player->exam_stage == $CHUUNIN_STAGE_WRITTEN && isset($_POST['written_exam'])) {
+    if($player->exam_stage == RankManager::CHUUNIN_STAGE_WRITTEN && isset($_POST['written_exam'])) {
         $answer1 = $_POST['question1'];
         $answer2 = $_POST['question2'];
         $answer3 = $_POST['question3'];
@@ -460,7 +454,7 @@ function chuuninExam(System $system, User $player, RankManager $rankManager): bo
                 throw new Exception('');
             }
 
-            $player->exam_stage = $CHUUNIN_STAGE_SURVIVAL_START;
+            $player->exam_stage = RankManager::CHUUNIN_STAGE_SURVIVAL_START;
             $system->message("You have passed stage 1!");
         } catch (Exception $e) {
             $system->message("Your answers were incorrect. You have failed the Chuunin exam. " . $e->getMessage() .
@@ -474,18 +468,18 @@ function chuuninExam(System $system, User $player, RankManager $rankManager): bo
 
     // Display
     $system->printMessage();
-    if($player->exam_stage > 0 && $player->exam_stage < $CHUUNIN_STAGE_PASS) {
+    if($player->exam_stage > 0 && $player->exam_stage < RankManager::CHUUNIN_STAGE_PASS) {
         require 'templates/level_rank_up/abandon_exam.php';
     }
 
-    if($player->exam_stage < $CHUUNIN_STAGE_PASS) {
-        if($player->exam_stage == $CHUUNIN_STAGE_WRITTEN) {
+    if($player->exam_stage < RankManager::CHUUNIN_STAGE_PASS) {
+        if($player->exam_stage == RankManager::CHUUNIN_STAGE_WRITTEN) {
             require 'templates/level_rank_up/chuunin_written_exam.php';
         }
-        if($player->exam_stage >= $CHUUNIN_STAGE_SURVIVAL_START && $player->exam_stage <= $CHUUNIN_STAGE_SURVIVAL_END) {
-            $opponents[$CHUUNIN_STAGE_SURVIVAL_START] = 6;
-            $opponents[$CHUUNIN_STAGE_SURVIVAL_MIDDLE] = 5;
-            $opponents[$CHUUNIN_STAGE_SURVIVAL_END] = 10;
+        if($player->exam_stage >= RankManager::CHUUNIN_STAGE_SURVIVAL_START && $player->exam_stage <= RankManager::CHUUNIN_STAGE_SURVIVAL_END) {
+            $opponents[RankManager::CHUUNIN_STAGE_SURVIVAL_START] = 6;
+            $opponents[RankManager::CHUUNIN_STAGE_SURVIVAL_MIDDLE] = 5;
+            $opponents[RankManager::CHUUNIN_STAGE_SURVIVAL_END] = 10;
 
             require 'templates/level_rank_up/chuunin_survival.php';
 
@@ -524,7 +518,7 @@ function chuuninExam(System $system, User $player, RankManager $rankManager): bo
             $player->battle_id = 0;
             if($battle->isPlayerWinner()) {
                 $player->exam_stage++;
-                if($player->exam_stage == $CHUUNIN_STAGE_SURVIVAL_END) {
+                if($player->exam_stage == RankManager::CHUUNIN_STAGE_SURVIVAL_END) {
                     $battle_result = "You defeated your opponent, who had the scroll you needed, and have advanced to the
                     next stage of the exam. You can take a short break and heal up if you want, or continue to the
                     final battle.<br />
@@ -552,7 +546,7 @@ function chuuninExam(System $system, User $player, RankManager $rankManager): bo
                 return false;
             }
         }
-        else if($player->exam_stage == $CHUUNIN_STAGE_DUEL) {
+        else if($player->exam_stage == RankManager::CHUUNIN_STAGE_DUEL) {
             $opponent_id = 11;
 
             require 'templates/level_rank_up/chuunin_battle_exam.php';
@@ -588,12 +582,12 @@ function chuuninExam(System $system, User $player, RankManager $rankManager): bo
                 return true;
             }
 
-            $result = processChuuninExamFightEnd($system, $battle, $player, $CHUUNIN_STAGE_SURVIVAL_START, $CHUUNIN_STAGE_SURVIVAL_END, $CHUUNIN_STAGE_DUEL);
+            $result = processChuuninExamFightEnd($system, $battle, $player, RankManager::CHUUNIN_STAGE_SURVIVAL_START, RankManager::CHUUNIN_STAGE_SURVIVAL_END, RankManager::CHUUNIN_STAGE_DUEL);
             $battle_result = $system->parseMarkdown($result);
             require_once 'templates/level_rank_up/chuunin_survival_battle_results.php';
         }
     }
-    else if($player->exam_stage == $CHUUNIN_STAGE_PASS) {
+    else if($player->exam_stage == RankManager::CHUUNIN_STAGE_PASS) {
         try {
             $element = $_POST['element'] ?? false;
 
@@ -702,8 +696,11 @@ function chuuninExam(System $system, User $player, RankManager $rankManager): bo
 /**
  * @throws Exception
  */
-function processChuuninExamFightEnd(System $system, BattleManager $battle, User $player, $CHUUNIN_STAGE_SURVIVAL_START,
-        $CHUUNIN_STAGE_SURVIVAL_END, $CHUUNIN_STAGE_DUEL): bool|string {
+function processChuuninExamFightEnd(
+    System $system,
+    BattleManager|BattleManagerV2 $battle,
+    User $player
+): bool|string {
     global $self_link;
 
     if(!$battle->isComplete()) {
@@ -712,11 +709,11 @@ function processChuuninExamFightEnd(System $system, BattleManager $battle, User 
 
     $player->battle_id = 0;
 
-    if($player->exam_stage >= $CHUUNIN_STAGE_SURVIVAL_START && $player->exam_stage <= $CHUUNIN_STAGE_SURVIVAL_END) {
+    if($player->exam_stage >= RankManager::CHUUNIN_STAGE_SURVIVAL_START && $player->exam_stage <= RankManager::CHUUNIN_STAGE_SURVIVAL_END) {
         if($battle->isPlayerWinner()) {
             $player->exam_stage++;
 
-            if($player->exam_stage == $CHUUNIN_STAGE_SURVIVAL_END) {
+            if($player->exam_stage == RankManager::CHUUNIN_STAGE_SURVIVAL_END) {
                 return "You defeated your opponent, who had the scroll you needed, and have advanced to the "
                     . "next stage of the exam. You can take a short break and heal up if you want, or continue to the "
                     . "final battle.[br]"
@@ -742,7 +739,7 @@ function processChuuninExamFightEnd(System $system, BattleManager $battle, User 
                 . "[Continue]({$system->router->links['profile']})";
         }
     }
-    else if($player->exam_stage == $CHUUNIN_STAGE_DUEL) {
+    else if($player->exam_stage == RankManager::CHUUNIN_STAGE_DUEL) {
         $player->battle_id = 0;
         if($battle->isPlayerWinner()) {
             $player->exam_stage++;
@@ -901,7 +898,7 @@ function joninExam(System $system, User $player, RankManager $rankManager): bool
 
 function rankupFightAPI(System $system, User $player): BattlePageAPIResponse {
     // Only chuunin exam has direct battles
-    if($player->rank != 2) {
+    if($player->rank_num != 2) {
         return new BattlePageAPIResponse(errors: ["Battles only supported for Chuunin exam!"]);
     }
 

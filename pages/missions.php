@@ -63,15 +63,30 @@ function missions(): bool {
 
             // Create notification
             require_once __DIR__ . '/../classes/notification/NotificationManager.php';
-            $new_notification = new NotificationDto(
-                type: "mission",
-                message: "Mission in progress",
-                user_id: $player->user_id,
-                created: time(),
-                attributes: array('mission_rank' => substr(Mission::$rank_names[$missions[$mission_id]['rank']], 0, 1), 'mission_id' => $mission_id),
-                alert: false,
-            );
-            NotificationManager::createNotification($new_notification, $system, false);
+            if ($player->mission_stage['action_type'] == 'travel' or $player->mission_stage['action_type'] == 'search') {
+                $mission_location = TravelCoords::fromDbString($player->mission_stage['action_data']);
+                $new_notification = new MissionNotificationDto(
+                    type: "mission",
+                    message: $missions[$mission_id]['name'] . ": Travel to " . $mission_location->x . ":" . $mission_location->y,
+                    user_id: $player->user_id,
+                    created: time(),
+                    mission_rank: Mission::$rank_names[$missions[$mission_id]['rank']],
+                    alert: false,
+                );
+                NotificationManager::createNotification($new_notification, $system, NotificationManager::UPDATE_REPLACE);
+            }
+            else {
+                require_once __DIR__ . '/../classes/notification/NotificationManager.php';
+                $new_notification = new MissionNotificationDto(
+                    type: "mission",
+                    message: $missions[$mission_id]['name'] . " in progress",
+                    user_id: $player->user_id,
+                    created: time(),
+                    mission_rank: Mission::$rank_names[$missions[$mission_id]['rank']],
+                    alert: false,
+                );
+                NotificationManager::createNotification($new_notification, $system, NotificationManager::UPDATE_REPLACE);
+            }
 
             missions();
 			return true;
@@ -94,7 +109,14 @@ function missions(): bool {
 
 	echo "<table class='table'><tr><th>" . Mission::$rank_names[$view] . " Missions</th></tr>
 	<tr><td style='text-align:center;'>You can go on village missions here. As a " . $RANK_NAMES[$player->rank_num] . " you
-	can take on up to " . Mission::$rank_names[$max_mission_rank] . " missions.</td></tr>
+	can take on up to " . Mission::$rank_names[$max_mission_rank] . " missions.";
+    if($player->mission_rep_cd - time() > 0) {
+        $remaining = $player->mission_rep_cd - time();
+        echo "<br /><br />You can gain village reputation in: <div id='rep_cd' style='display: inline-block'>"
+            . System::timeRemaining($remaining) . "</div>
+        <script type='text/javascript'>countdownTimer($remaining, 'rep_cd', false);</script>";
+    }
+    echo "</td></tr>
 	<tr><td style='text-align:center;'>";
 	foreach($missions as $id => $mission) {
 		if($mission['rank'] != $view) {
@@ -306,6 +328,17 @@ function runActiveMission(): bool {
                     echo "You have been paid &yen;$mission->money.<br />";
                 }
 
+                // Village reputation
+                if($player->mission_rep_cd - time() <= 0) {
+                    $rep_gain = $player->calMaxRepGain(Village::MISSION_GAINS[$mission->rank]);
+
+                    if ($rep_gain > 0) {
+                        $player->addRep($rep_gain);
+                        $player->mission_rep_cd = time() + Village::ARENA_MISSION_CD;
+                        echo "You have gained $rep_gain village reputation!<br />";
+                    }
+                }
+
                 // check what mission rank for daily Task
                 $all_mission_ranks = [0, 1, 2, 3, 4];
                 $mission_rank = $all_mission_ranks[$mission->rank];
@@ -438,6 +471,8 @@ function processMissionBattleEnd(BattleManager|BattleManagerV2 $battle, Mission 
     }
     else if($battle->isPlayerWinner()) {
         $player->mission_stage['stage_id'] += 1;
+        $mission->nextStage($player->mission_stage['stage_id']);
+        $result_text .= "You have defeated your opponent! " . $player->mission_stage['description'];
     }
     else if($battle->isOpponentWinner()) {
         $result_text .= "You have been defeated. You have failed your mission.";

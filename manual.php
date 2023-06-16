@@ -3,6 +3,7 @@ session_start();
 
 require "classes/System.php";
 $system = new System();
+$system->startTransaction();
 $layout = $system->fetchLayoutByName(System::DEFAULT_LAYOUT);
 
 if(isset($_SESSION['user_id'])) {
@@ -15,7 +16,7 @@ else {
     require_once 'classes/Bloodline.php';
 }
 
-$layout->renderStaticPageHeader('Manual');
+$layout->renderBeforeContentHTML($system, $player ?? null, 'Manual');
 
 ?>
 
@@ -151,7 +152,7 @@ $layout->renderStaticPageHeader('Manual');
           </tbody>
         </table>
 
-        </br></br>
+        <br><br>
         Apart from the offenses and the skills, there's also Gears and Weapons which can be equipped to get certain effects.
 
         <table class="table">
@@ -262,7 +263,7 @@ $layout->renderStaticPageHeader('Manual');
         <div><b>Common</b> - 40 AK</div>
         <div><b>Lesser</b> - 20 AK</div>
 
-        </br>
+        <br />
 
         <?php include('templates/bloodlineList.php') ?>
       </div>
@@ -275,11 +276,11 @@ $layout->renderStaticPageHeader('Manual');
         </a>
         <p>Yen is the primary currency for Shinobi Chronicles, use Yen to purchase the jutsus of your offense type in the shop, gear to help you in battle, and healing items for after combat.</p>
         <p>You can earn Yen by fighting enemies in Arena, completing Missions and Special Missions or ask your friend to transfer you some!</p>
-        </br>
+        <br />
         <h3>Ancient Kunai</h3>
         <p>It is a premium currency used for various changes toward your character</p>
         <p>Use <b>Ancient Kunai</b> to reset your character, change your username, transfer skill points into other stats, reset an individual stat, or to change your current clan</p>
-        </br>
+        <br />
         <h3>Auras</h3>
         <p>With the use of Ancient Kunai, you can imbue your character with a forbidden seal for enhanced benefits toward your character.</p>
 
@@ -303,7 +304,6 @@ $layout->renderStaticPageHeader('Manual');
         <div>Larger journal images (300x200 -> 500x500)</div>
         <div>Longer chat posts (350 -> 450 characters)</div>
         Longer PMs (1000 -> 1500 characters)rs)
-      </div>
       </div>
 
       <br>
@@ -329,8 +329,6 @@ $layout->renderStaticPageHeader('Manual');
 
       <!--GOJO END MANUAL-->
 
-      </div>
-
       <!-- Content -->
       <div>
 
@@ -352,4 +350,6 @@ $layout->renderStaticPageHeader('Manual');
 </script>
 
 <?php
-$layout->renderStaticPageFooter($player ?? null);
+$layout->renderAfterContentHTML($system, $player ?? null);
+
+$system->commitTransaction();

@@ -11,6 +11,7 @@ class Router {
         'inbox' => 2,
         'settings' => 3,
         'members' => 6,
+        'chat' => 7,
         'villageHQ' => 9,
         'bloodline' => 10,
         'travel' => 11,
@@ -33,6 +34,7 @@ class Router {
         'chat_log' => 31,
         'news' => 32,
         'battle_history' => 33,
+        'account_record' => 34,
     ];
 
     /** @var Route[] $routes */
@@ -61,6 +63,7 @@ class Router {
         $this->api_links['notification'] = $this->base_url . 'api/notification.php';
         $this->api_links['navigation'] = $this->base_url . 'api/navigation.php';
         $this->api_links['user'] = $this->base_url . 'api/user.php';
+        $this->api_links['chat'] = $this->base_url . 'api/chat.php';
     }
 
     /**

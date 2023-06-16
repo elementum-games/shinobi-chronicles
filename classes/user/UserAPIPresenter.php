@@ -7,17 +7,28 @@ class UserApiPresenter {
             'user_name' => $player->user_name,
             'rank_name' => $rank_names[$player->rank_num],
             'level' => $player->level,
-            'regen_time' => 60 - (time() - $player->last_update),
-            'health' => (int)$player->health,
-            'max_health' => $player->max_health,
-            'chakra' => (int)$player->chakra,
-            'max_chakra' => $player->max_chakra,
-            'stamina' => (int)$player->stamina,
-            'max_stamina' => $player->max_stamina,
             'has_bloodline' => isset($player->bloodline),
-            'training' => $player->train_time,
-            'special' => $player->special_mission,
-            'battle' => $player->battle_id,
+            'avatar_size' => $player->getAvatarSize(),
+        ];
+    }
+
+    public static function playerResourcesResponse(User $player): array {
+        return [
+            'regen_time' => 60 - (time() - $player->last_update),
+            'health' => (int) $player->health,
+            'max_health' => $player->max_health,
+            'chakra' => (int) $player->chakra,
+            'max_chakra' => $player->max_chakra,
+            'stamina' => (int) $player->stamina,
+            'max_stamina' => $player->max_stamina,
+        ];
+    }
+
+    public static function playerSettingsResponse(User $player): array {
+        return [
+            'avatar_style' => $player->getAvatarStyle(),
+            'sidebar_position' => $player->getSidebarPosition(),
+            'enable_alerts' => $player->getEnableAlerts(),
         ];
     }
 
