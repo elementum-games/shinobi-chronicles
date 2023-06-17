@@ -243,8 +243,10 @@ class ChatManager {
             $supported_colors = $this->player->getNameColors();
 
             $user_color = '';
-            if(isset($supported_colors[$this->player->chat_color])) {
+            if (isset($supported_colors[$this->player->chat_color])) {
                 $user_color = $supported_colors[$this->player->chat_color];
+            } else {
+                $user_color = 'normalUser';
             }
 
             $sql = "INSERT INTO `chat`
