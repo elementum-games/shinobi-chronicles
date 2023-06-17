@@ -213,6 +213,7 @@
     font-size: var(--font-small);
     font-family: var(--font-secondary);
     font-variant: var(--font-secondary-variant);
+    user-select: none;
 }
 .chat_pagination_wrapper {
     margin-top: 2px;
