@@ -488,7 +488,7 @@
 }
 
 #chatReactContainer .chat_user_name.contentAdmin, #chatReactContainer a.contentAdmin:hover {
-    color: #AF99FF;
+    color: #c3afff;
 }
 #chatReactContainer .post_user_avatar_wrapper.contentAdmin {
     background: linear-gradient(0deg, rgba(103, 89, 176, 1) 0%, rgba(195, 175, 255, 1) 100%);
