@@ -1,6 +1,6 @@
 <?php
 
-class CHatNotificationDto extends NotificationDto {
+class ChatNotificationDto extends NotificationDto {
     public int $post_id;
 
     public function __construct(
