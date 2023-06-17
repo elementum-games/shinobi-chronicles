@@ -168,7 +168,11 @@ class NotificationAPIManager {
                         $notification_ids_to_delete[] = $row['notification_id'];
                         continue 2;
                     } else {
-                        $notifications[] = NotificationDto::fromDb($row, $this->system->router->getUrl("chat"));
+                        $chat_notification = ChatNotificationDto::fromDb($row, $this->system->router->getUrl("chat"));
+                        if (isset($chat_notification->post_id)) {
+                            $chat_notification->action_url = $this->system->router->getUrl("chat", ['post_id' => $chat_notification->post_id]);
+                        }
+                        $notifications[] = $chat_notification;
                     }
                 default:
                     break;

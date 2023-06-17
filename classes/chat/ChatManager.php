@@ -255,6 +255,7 @@ class ChatManager {
             $this->system->query(sprintf(
                 $sql, $this->player->user_name, $message, $title, $this->player->village->name, $staff_level, $user_color, time(), 0
             ));
+            $new_post_id = $this->system->db_last_insert_id;
             if($this->system->db_last_affected_rows) {
                 $this->system->message("Message posted!");
             }
@@ -282,12 +283,13 @@ class ChatManager {
 			            }
 			            $result = $this->system->db_fetch($result);
                         require_once __DIR__ . '/../notification/NotificationManager.php';
-                        $new_notification = new NotificationDto(
+                        $new_notification = new ChatNotificationDto(
                             type: "chat",
                             message: $this->player->user_name . " replied to your post!",
                             user_id: $result['user_id'],
                             created: time(),
                             alert: false,
+                            post_id: $new_post_id,
                         );
                         NotificationManager::createNotification($new_notification, $this->system, NotificationManager::UPDATE_REPLACE);
                     }
@@ -322,12 +324,13 @@ class ChatManager {
                     }
                     $result = $this->system->db_fetch($result);
                     require_once __DIR__ . '/../notification/NotificationManager.php';
-                    $new_notification = new NotificationDto(
+                    $new_notification = new ChatNotificationDto(
                         type: "chat",
                         message: $this->player->user_name . " mentioned you in chat!",
                         user_id: $result['user_id'],
                         created: time(),
                         alert: false,
+                        post_id: $new_post_id,
                     );
                     NotificationManager::createNotification($new_notification, $this->system, NotificationManager::UPDATE_REPLACE);
                 }

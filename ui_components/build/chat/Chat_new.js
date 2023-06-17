@@ -3,7 +3,9 @@ const chatRefreshInterval = 5000;
 function Chat({
   chatApiLink,
   initialPosts,
+  initialPostId,
   initialNextPagePostId,
+  initialPreviousPagePostId,
   initialLatestPostId,
   maxPostLength,
   isModerator,
@@ -15,7 +17,8 @@ function Chat({
   const [nextPagePostId, setNextPagePostId] = React.useState(initialNextPagePostId);
   const [latestPostId, setLatestPostId] = React.useState(initialLatestPostId);
   // Only set if we're paginating
-  const [previousPagePostId, setPreviousPagePostId] = React.useState(null);
+  const [previousPagePostId, setPreviousPagePostId] = React.useState(initialPreviousPagePostId);
+  const initialPostIdRef = React.useRef(initialPostId);
   const currentPagePostIdRef = React.useRef(null);
   const [error, setError] = React.useState(null);
   const [message, setMessage] = React.useState("");
@@ -28,6 +31,9 @@ function Chat({
   }
   const refreshChat = function () {
     if (currentPagePostIdRef.current != null) {
+      return;
+    }
+    if (initialPostIdRef.current != null) {
       return;
     }
     apiFetch(chatApiLink, {
@@ -51,6 +57,7 @@ function Chat({
     }).then(handleApiResponse);
   }
   function changePage(newStartingPostId) {
+    initialPostIdRef.current = null;
     if (newStartingPostId === currentPagePostIdRef.current) {
       return;
     }

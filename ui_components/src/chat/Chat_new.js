@@ -7,7 +7,8 @@ const chatRefreshInterval = 5000;
 
 type Props = {|
     +chatApiLink: string,
-    +initialPosts: $ReadOnlyArray<ChatPostType>,
+    +initialPosts: $ReadOnlyArray < ChatPostType >,
+    +initialPostId: ?number,
     +initialNextPagePostId: ?number,
     +initialLatestPostId: number,
     +maxPostLength: number,
@@ -27,12 +28,14 @@ type Props = {|
 function Chat({
     chatApiLink,
     initialPosts,
+    initialPostId,
     initialNextPagePostId,
+    initialPreviousPagePostId,
     initialLatestPostId,
     maxPostLength,
     isModerator,
     initialBanInfo,
-    memes
+    memes,
 }: Props) {
     const [banInfo, setBanInfo] = React.useState(initialBanInfo);
     const [posts, setPosts] = React.useState(initialPosts);
@@ -40,7 +43,8 @@ function Chat({
     const [nextPagePostId, setNextPagePostId] = React.useState(initialNextPagePostId);
     const [latestPostId, setLatestPostId] = React.useState(initialLatestPostId);
     // Only set if we're paginating
-    const [previousPagePostId, setPreviousPagePostId] = React.useState(null);
+    const [previousPagePostId, setPreviousPagePostId] = React.useState(initialPreviousPagePostId);
+    const initialPostIdRef = React.useRef(initialPostId);
     const currentPagePostIdRef = React.useRef(null);
 
     const [error, setError] = React.useState(null);
@@ -57,6 +61,10 @@ function Chat({
 
     const refreshChat = function() {
         if(currentPagePostIdRef.current != null) {
+            return;
+        }
+
+        if (initialPostIdRef.current != null) {
             return;
         }
 
@@ -88,6 +96,7 @@ function Chat({
     }
 
     function changePage(newStartingPostId: ?number) {
+        initialPostIdRef.current = null;
         if(newStartingPostId === currentPagePostIdRef.current) {
             return;
         }
