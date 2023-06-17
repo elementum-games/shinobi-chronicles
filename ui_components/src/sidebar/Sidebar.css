@@ -25,6 +25,7 @@
     left: -16px;
     position: relative;
     display: flex;
+    user-select: none;
 }
 
 .sb_header_text_wrapper {
