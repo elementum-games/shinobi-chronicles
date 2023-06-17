@@ -171,6 +171,8 @@ function Chat({
                 quotePost={quotePost}
                 goToNextPage={() => changePage(nextPagePostId)}
                 goToPreviousPage={() => changePage(previousPagePostId)}
+                goToLatestPage={() => changePage(latestPostId)}
+                postsBehind={currentPagePostIdRef.current > 0 ? latestPostId - currentPagePostIdRef.current : initialPostIdRef.current > 0 ? latestPostId - initialPostIdRef.current : 0}
             />
         </div>
     )
@@ -298,10 +300,16 @@ function ChatPosts({
     deletePost,
     quotePost,
     goToPreviousPage,
-    goToNextPage
+    goToNextPage,
+    goToLatestPage,
+    postsBehind,
 }) {
     return (
-        <>
+        <>  {(postsBehind > 200) &&
+                <div id="chat_navigation_latest">
+                    <a className="chat_pagination" onClick={goToLatestPage}>{"<< Jump To Latest >>"}</a>
+                </div>
+            }
             <div id="chat_navigation_top">
                 <div className="chat_navigation_divider_left">
                   <svg width="100%" height="2"><line x1="0%" y1="1" x2="100%" y2="1" stroke="#4e4535" strokeWidth="1"></line></svg>

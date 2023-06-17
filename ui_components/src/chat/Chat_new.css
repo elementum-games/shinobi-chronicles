@@ -180,6 +180,9 @@
     padding-bottom: 25px;
 }
 
+#chat_navigation_latest {
+    text-align: center;
+}
 #chat_navigation_top {
     display: flex;
     gap: 10px;
@@ -216,6 +219,9 @@
     width: 60px;
     flex-shrink: 0;
     text-align: center;
+}
+#chat_navigation_latest .chat_pagination {
+    color: var(--font-color-5);
 }
 #chat_navigation_top .chat_pagination {
     color: var(--font-color-5);

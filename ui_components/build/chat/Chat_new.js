@@ -119,7 +119,9 @@ function Chat({
     deletePost: deletePost,
     quotePost: quotePost,
     goToNextPage: () => changePage(nextPagePostId),
-    goToPreviousPage: () => changePage(previousPagePostId)
+    goToPreviousPage: () => changePage(previousPagePostId),
+    goToLatestPage: () => changePage(latestPostId),
+    postsBehind: currentPagePostIdRef.current > 0 ? latestPostId - currentPagePostIdRef.current : initialPostIdRef.current > 0 ? latestPostId - initialPostIdRef.current : 0
   }));
 }
 function ChatBanInfo({
@@ -243,9 +245,16 @@ function ChatPosts({
   deletePost,
   quotePost,
   goToPreviousPage,
-  goToNextPage
+  goToNextPage,
+  goToLatestPage,
+  postsBehind
 }) {
-  return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
+  return /*#__PURE__*/React.createElement(React.Fragment, null, "  ", postsBehind > 200 && /*#__PURE__*/React.createElement("div", {
+    id: "chat_navigation_latest"
+  }, /*#__PURE__*/React.createElement("a", {
+    className: "chat_pagination",
+    onClick: goToLatestPage
+  }, "<< Jump To Latest >>")), /*#__PURE__*/React.createElement("div", {
     id: "chat_navigation_top"
   }, /*#__PURE__*/React.createElement("div", {
     className: "chat_navigation_divider_left"
