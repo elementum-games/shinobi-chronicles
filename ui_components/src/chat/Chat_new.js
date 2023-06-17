@@ -60,7 +60,8 @@ function Chat({
     }
 
     const refreshChat = function() {
-        return;
+        if(currentPagePostIdRef.current != null) {
+            return;
         }
 
         apiFetch(
