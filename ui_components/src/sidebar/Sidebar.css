@@ -85,6 +85,7 @@
     position: relative;
     top: 15%;
     cursor: pointer;
+    user-select: none;
 }
 
 .sb_avatar_container {
