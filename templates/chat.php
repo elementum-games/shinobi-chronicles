@@ -29,9 +29,7 @@
             React.createElement(Chat, {
                 chatApiLink: "<?= $system->router->api_links['chat'] ?>",
                 initialPosts: initialPostsResponse.posts,
-                <?php if (isset($initialChatPostId)): ?>
-                initialPostId: <?= $initialChatPostId ?>,
-                <?php endif; ?>
+                initialPostId: <?= $initialChatPostId ?? null ?>,
                 initialNextPagePostId: initialPostsResponse.nextPagePostId,
                 initialPreviousPagePostId: initialPostsResponse.previousPagePostId,
                 initialLatestPostId: initialPostsResponse.latestPostId,

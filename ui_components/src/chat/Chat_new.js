@@ -60,11 +60,7 @@ function Chat({
     }
 
     const refreshChat = function() {
-        if (currentPagePostIdRef.current != null) {
-            // always refresh when initialized to latest
-            if (currentPagePostIdRef.current != latestPostId) {
-                return;
-            }
+        return;
         }
 
         apiFetch(
@@ -170,7 +166,7 @@ function Chat({
                 goToNextPage={() => changePage(nextPagePostId)}
                 goToPreviousPage={() => changePage(previousPagePostId)}
                 goToLatestPage={() => changePage(latestPostId)}
-                postsBehind={currentPagePostIdRef.current > 0 ? latestPostId - currentPagePostIdRef.current : 0}
+                postsBehind={currentPagePostIdRef.current != null ? latestPostId - currentPagePostIdRef.current : 0}
             />
         </div>
     )
