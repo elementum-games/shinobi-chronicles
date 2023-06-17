@@ -462,7 +462,7 @@
 }
 
 #chatReactContainer .chat_user_name.blue, #chatReactContainer a.blue:hover {
-    color: #75AFFF;
+    color: #92c0ff;
 }
 #chatReactContainer .post_user_avatar_wrapper.blue {
     background: linear-gradient(0deg, rgba(87, 130, 188, 1) 0%, rgba(146, 192, 255, 1) 100%);
