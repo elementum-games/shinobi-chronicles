@@ -239,7 +239,7 @@ function ChatPosts({
   goToNextPage
 }) {
   return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
-    id: "chat_navigation"
+    id: "chat_navigation_top"
   }, /*#__PURE__*/React.createElement("div", {
     className: "chat_navigation_divider_left"
   }, /*#__PURE__*/React.createElement("svg", {
@@ -360,6 +360,54 @@ function ChatPosts({
     style: {
       marginBottom: "2px"
     }
-  }, post.timeString)))))));
+  }, post.timeString)))))), /*#__PURE__*/React.createElement("div", {
+    id: "chat_navigation_bottom"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "chat_navigation_divider_left"
+  }, /*#__PURE__*/React.createElement("svg", {
+    width: "100%",
+    height: "2"
+  }, /*#__PURE__*/React.createElement("line", {
+    x1: "0%",
+    y1: "1",
+    x2: "100%",
+    y2: "1",
+    stroke: "#4e4535",
+    strokeWidth: "1"
+  }))), /*#__PURE__*/React.createElement("div", {
+    className: "chat_pagination_wrapper"
+  }, previousPagePostId != null && /*#__PURE__*/React.createElement("a", {
+    className: "chat_pagination",
+    onClick: goToPreviousPage
+  }, "<< Newer")), /*#__PURE__*/React.createElement("div", {
+    className: "chat_navigation_divider_middle"
+  }, /*#__PURE__*/React.createElement("svg", {
+    width: "100%",
+    height: "2"
+  }, /*#__PURE__*/React.createElement("line", {
+    x1: "0%",
+    y1: "1",
+    x2: "100%",
+    y2: "1",
+    stroke: "#4e4535",
+    strokeWidth: "1"
+  }))), /*#__PURE__*/React.createElement("div", {
+    className: "chat_pagination_wrapper"
+  }, nextPagePostId != null && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("a", {
+    className: "chat_pagination",
+    onClick: goToNextPage
+  }, "Older >>"))), /*#__PURE__*/React.createElement("div", {
+    className: "chat_navigation_divider_right"
+  }, /*#__PURE__*/React.createElement("svg", {
+    width: "100%",
+    height: "2"
+  }, /*#__PURE__*/React.createElement("line", {
+    x1: "0%",
+    y1: "1",
+    x2: "100%",
+    y2: "1",
+    stroke: "#4e4535",
+    strokeWidth: "1"
+  })))));
 }
 window.Chat = Chat;

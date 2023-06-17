@@ -293,7 +293,7 @@ function ChatPosts({
 }) {
     return (
         <>
-            <div id="chat_navigation">
+            <div id="chat_navigation_top">
                 <div className="chat_navigation_divider_left">
                   <svg width="100%" height="2"><line x1="0%" y1="1" x2="100%" y2="1" stroke="#4e4535" strokeWidth="1"></line></svg>
                 </div>
@@ -371,6 +371,21 @@ function ChatPosts({
                         </div>
                     </div>
                 ))}
+            </div>
+            <div id="chat_navigation_bottom">
+                <div className="chat_navigation_divider_left">
+                    <svg width="100%" height="2"><line x1="0%" y1="1" x2="100%" y2="1" stroke="#4e4535" strokeWidth="1"></line></svg>
+                </div>
+                <div className="chat_pagination_wrapper">{previousPagePostId != null && <a className="chat_pagination" onClick={goToPreviousPage}>{"<< Newer"}</a>}</div>
+                <div className="chat_navigation_divider_middle"><svg width="100%" height="2"><line x1="0%" y1="1" x2="100%" y2="1" stroke="#4e4535" strokeWidth="1"></line></svg></div>
+                <div className="chat_pagination_wrapper">
+                    {nextPagePostId != null &&
+                        <>
+                            <a className="chat_pagination" onClick={goToNextPage}>{"Older >>"}</a>
+                        </>
+                    }
+                </div>
+                <div className="chat_navigation_divider_right"><svg width="100%" height="2"><line x1="0%" y1="1" x2="100%" y2="1" stroke="#4e4535" strokeWidth="1"></line></svg></div>
             </div>
         </>
     );
