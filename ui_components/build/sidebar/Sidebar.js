@@ -117,7 +117,8 @@ function Sidebar({
       return /*#__PURE__*/React.createElement("a", {
         key: i,
         href: link.url,
-        className: pageID.current == link.id ? "sb_link_wrapper selected t-center ft-small ft-s ft-c3" : "sb_link_wrapper t-center ft-small ft-s ft-c3"
+        className: pageID.current == link.id ? "sb_link_wrapper selected t-center ft-small ft-s ft-c3" : "sb_link_wrapper t-center ft-small ft-s ft-c3",
+        draggable: "false"
       }, /*#__PURE__*/React.createElement("label", {
         className: "sb_label"
       }, link.title));

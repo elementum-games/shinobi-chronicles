@@ -7,7 +7,8 @@ const chatRefreshInterval = 5000;
 
 type Props = {|
     +chatApiLink: string,
-    +initialPosts: $ReadOnlyArray<ChatPostType>,
+    +initialPosts: $ReadOnlyArray < ChatPostType >,
+    +initialPostId: ?number,
     +initialNextPagePostId: ?number,
     +initialLatestPostId: number,
     +maxPostLength: number,
@@ -27,12 +28,14 @@ type Props = {|
 function Chat({
     chatApiLink,
     initialPosts,
+    initialPostId,
     initialNextPagePostId,
+    initialPreviousPagePostId,
     initialLatestPostId,
     maxPostLength,
     isModerator,
     initialBanInfo,
-    memes
+    memes,
 }: Props) {
     const [banInfo, setBanInfo] = React.useState(initialBanInfo);
     const [posts, setPosts] = React.useState(initialPosts);
@@ -40,8 +43,9 @@ function Chat({
     const [nextPagePostId, setNextPagePostId] = React.useState(initialNextPagePostId);
     const [latestPostId, setLatestPostId] = React.useState(initialLatestPostId);
     // Only set if we're paginating
-    const [previousPagePostId, setPreviousPagePostId] = React.useState(null);
-    const currentPagePostIdRef = React.useRef(null);
+    const [previousPagePostId, setPreviousPagePostId] = React.useState(initialPreviousPagePostId);
+    const [highlightPostId, setHighlightPostId] = React.useState(initialPostId);
+    const currentPagePostIdRef = React.useRef(initialPostId);
 
     const [error, setError] = React.useState(null);
 
@@ -56,8 +60,7 @@ function Chat({
     }
 
     const refreshChat = function() {
-        if(currentPagePostIdRef.current != null) {
-            return;
+        return;
         }
 
         apiFetch(
@@ -162,6 +165,8 @@ function Chat({
                 quotePost={quotePost}
                 goToNextPage={() => changePage(nextPagePostId)}
                 goToPreviousPage={() => changePage(previousPagePostId)}
+                goToLatestPage={() => changePage(latestPostId)}
+                postsBehind={currentPagePostIdRef.current != null ? latestPostId - currentPagePostIdRef.current : 0}
             />
         </div>
     )
@@ -289,11 +294,17 @@ function ChatPosts({
     deletePost,
     quotePost,
     goToPreviousPage,
-    goToNextPage
+    goToNextPage,
+    goToLatestPage,
+    postsBehind,
 }) {
     return (
-        <>
-            <div id="chat_navigation">
+        <>  {(postsBehind > 200) &&
+                <div id="chat_navigation_latest">
+                    <a className="chat_pagination" onClick={goToLatestPage}>{"<< Jump To Latest >>"}</a>
+                </div>
+            }
+            <div id="chat_navigation_top">
                 <div className="chat_navigation_divider_left">
                   <svg width="100%" height="2"><line x1="0%" y1="1" x2="100%" y2="1" stroke="#4e4535" strokeWidth="1"></line></svg>
                 </div>
@@ -371,6 +382,21 @@ function ChatPosts({
                         </div>
                     </div>
                 ))}
+            </div>
+            <div id="chat_navigation_bottom">
+                <div className="chat_navigation_divider_left">
+                    <svg width="100%" height="2"><line x1="0%" y1="1" x2="100%" y2="1" stroke="#4e4535" strokeWidth="1"></line></svg>
+                </div>
+                <div className="chat_pagination_wrapper">{previousPagePostId != null && <a className="chat_pagination" onClick={goToPreviousPage}>{"<< Newer"}</a>}</div>
+                <div className="chat_navigation_divider_middle"><svg width="100%" height="2"><line x1="0%" y1="1" x2="100%" y2="1" stroke="#4e4535" strokeWidth="1"></line></svg></div>
+                <div className="chat_pagination_wrapper">
+                    {nextPagePostId != null &&
+                        <>
+                            <a className="chat_pagination" onClick={goToNextPage}>{"Older >>"}</a>
+                        </>
+                    }
+                </div>
+                <div className="chat_navigation_divider_right"><svg width="100%" height="2"><line x1="0%" y1="1" x2="100%" y2="1" stroke="#4e4535" strokeWidth="1"></line></svg></div>
             </div>
         </>
     );

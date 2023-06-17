@@ -4,6 +4,7 @@
  * @var User $player
  * @var ChatManager $chatManager
  * @var array $initialChatPostsResponse from ChatApiPresenter::loadPostsResponse
+ * @var int $initialChatPostId
  * @var Layout $layout
  */
 ?>
@@ -28,7 +29,9 @@
             React.createElement(Chat, {
                 chatApiLink: "<?= $system->router->api_links['chat'] ?>",
                 initialPosts: initialPostsResponse.posts,
+                initialPostId: <?= $initialChatPostId ?? null ?>,
                 initialNextPagePostId: initialPostsResponse.nextPagePostId,
+                initialPreviousPagePostId: initialPostsResponse.previousPagePostId,
                 initialLatestPostId: initialPostsResponse.latestPostId,
                 maxPostLength: <?= $chatManager->maxPostLength() ?>,
                 isModerator: Boolean(<?= (int)$player->isModerator() ?>),

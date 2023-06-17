@@ -25,12 +25,14 @@
     left: -16px;
     position: relative;
     display: flex;
+    user-select: none;
 }
 
 .sb_header_text_wrapper {
     left: -10px;
     position: relative;
     text-shadow: 1.5px 1.5px 1px #564d3e;
+    user-select: none;
 }
 
 .sb_header_line {
@@ -85,6 +87,7 @@
     position: relative;
     top: 15%;
     cursor: pointer;
+    user-select: none;
 }
 
 .sb_avatar_container {

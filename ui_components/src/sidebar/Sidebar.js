@@ -111,7 +111,7 @@ function Sidebar({ links, logoutTimer, navigationAPIData, userAPIData }) {
                     {(section_data) &&
                         section_data.map(function (link, i) {
                             return (
-                                <a key={i} href={link.url} className={pageID.current == link.id ? "sb_link_wrapper selected t-center ft-small ft-s ft-c3" : "sb_link_wrapper t-center ft-small ft-s ft-c3"}>
+                                <a key={i} href={link.url} className={pageID.current == link.id ? "sb_link_wrapper selected t-center ft-small ft-s ft-c3" : "sb_link_wrapper t-center ft-small ft-s ft-c3"} draggable="false">
                                         <label className={"sb_label"}>{link.title}</label>
                                 </a>
                             )
