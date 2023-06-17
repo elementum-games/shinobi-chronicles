@@ -9,7 +9,6 @@ export function TopbarNotification({
         notification: notification,
         closeNotification: closeNotification
       });
-
     case "specialmission":
     case "specialmission_complete":
     case "specialmission_failed":
@@ -17,11 +16,9 @@ export function TopbarNotification({
         notification: notification,
         closeNotification: closeNotification
       });
-
     default:
       break;
   }
-
   const timeRemainingDisplay = formatTimeRemaining(calculateTimeRemaining(notification.created, notification.duration));
   return /*#__PURE__*/React.createElement(React.Fragment, null, notification.type === "mission" && /*#__PURE__*/React.createElement("a", {
     href: notification.action_url,
@@ -336,7 +333,6 @@ export function TopbarNotification({
     }
   }, "X")));
 }
-
 function SpecialMissionNotification({
   notification,
   closeNotification
@@ -438,7 +434,6 @@ function SpecialMissionNotification({
     }
   }, "X"))));
 }
-
 function TrainingNotification({
   notification,
   closeNotification
@@ -516,15 +511,17 @@ function TrainingNotification({
       closeNotification(notification.notification_id);
     }
   }, "X"))));
-} // Utilities
+}
 
-
+// Utilities
 function calculateTimeRemaining(created, duration) {
   const currentTimeTicks = new Date().getTime();
   return created + duration - currentTimeTicks / 1000;
 }
-
 function formatTimeRemaining(seconds) {
+  if (seconds <= 0) {
+    return "Complete";
+  }
   const hours = Math.floor(seconds / 3600);
   const minutes = Math.floor(seconds % 3600 / 60);
   seconds = Math.floor(seconds % 60);

@@ -342,6 +342,9 @@ function calculateTimeRemaining(created, duration) {
 }
 
 function formatTimeRemaining(seconds) {
+    if (seconds <= 0) {
+        return "Complete";
+    }
     const hours = Math.floor(seconds / 3600);
     const minutes = Math.floor((seconds % 3600) / 60);
     seconds = Math.floor(seconds % 60);
