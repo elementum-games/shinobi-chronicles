@@ -1,7 +1,6 @@
 
 
 <table class="table">
-    <?php if($player->exam_stage == $CHUUNIN_STAGE_WRITTEN): ?>
         <tr><th><?=$exam_name?> - Stage 1 - Written</th></tr>
         <tr>
             <td>
@@ -35,5 +34,4 @@
                 </form>
             </td>
         </tr>
-    <?php endif ?>
 </table>
