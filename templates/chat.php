@@ -30,7 +30,7 @@
                 chatApiLink: "<?= $system->router->api_links['chat'] ?>",
                 initialPosts: initialPostsResponse.posts,
                 <?php if (isset($initialChatPostId)): ?>
-                initialPostId: <?= isset($initialChatPostId) ? $initialChatPostId : "1" ?>,
+                initialPostId: <?= $initialChatPostId ?>,
                 <?php endif; ?>
                 initialNextPagePostId: initialPostsResponse.nextPagePostId,
                 initialPreviousPagePostId: initialPostsResponse.previousPagePostId,

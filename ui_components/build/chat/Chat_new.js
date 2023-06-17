@@ -18,8 +18,8 @@ function Chat({
   const [latestPostId, setLatestPostId] = React.useState(initialLatestPostId);
   // Only set if we're paginating
   const [previousPagePostId, setPreviousPagePostId] = React.useState(initialPreviousPagePostId);
-  const initialPostIdRef = React.useRef(initialPostId);
-  const currentPagePostIdRef = React.useRef(null);
+  const [highlightPostId, setHighlightPostId] = React.useState(initialPostId);
+  const currentPagePostIdRef = React.useRef(initialPostId);
   const [error, setError] = React.useState(null);
   const [message, setMessage] = React.useState("");
   if (banInfo.isBanned) {
@@ -31,10 +31,10 @@ function Chat({
   }
   const refreshChat = function () {
     if (currentPagePostIdRef.current != null) {
-      return;
-    }
-    if (initialPostIdRef.current != null) {
-      return;
+      // always refresh when initialized to latest
+      if (currentPagePostIdRef.current != latestPostId) {
+        return;
+      }
     }
     apiFetch(chatApiLink, {
       request: 'load_posts'
@@ -57,7 +57,6 @@ function Chat({
     }).then(handleApiResponse);
   }
   function changePage(newStartingPostId) {
-    initialPostIdRef.current = null;
     if (newStartingPostId === currentPagePostIdRef.current) {
       return;
     }
@@ -121,7 +120,7 @@ function Chat({
     goToNextPage: () => changePage(nextPagePostId),
     goToPreviousPage: () => changePage(previousPagePostId),
     goToLatestPage: () => changePage(latestPostId),
-    postsBehind: currentPagePostIdRef.current > 0 ? latestPostId - currentPagePostIdRef.current : initialPostIdRef.current > 0 ? latestPostId - initialPostIdRef.current : 0
+    postsBehind: currentPagePostIdRef.current > 0 ? latestPostId - currentPagePostIdRef.current : 0
   }));
 }
 function ChatBanInfo({

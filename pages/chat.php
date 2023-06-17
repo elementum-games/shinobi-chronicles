@@ -14,7 +14,5 @@ function chat(): void {
         $initialChatPostsResponse = $chatManager->loadPosts();
     }
 
-
-
     require 'templates/chat.php';
 }
