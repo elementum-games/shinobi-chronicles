@@ -453,10 +453,10 @@
 }
 
 #chatReactContainer .chat_user_name.blue, #chatReactContainer a.blue:hover {
-    color: #92c0ff;
+    color: #75AFFF;
 }
 #chatReactContainer .post_user_avatar_wrapper.blue {
-    background: linear-gradient(0deg, rgba(85, 111, 141, 1) 0%, rgba(146, 192, 255, 1) 100%);
+    background: linear-gradient(0deg, rgba(87, 130, 188, 1) 0%, rgba(146, 192, 255, 1) 100%);
 }
 
 #chatReactContainer .chat_user_name.pink, #chatReactContainer a.pink:hover {
@@ -488,10 +488,10 @@
 }
 
 #chatReactContainer .chat_user_name.contentAdmin, #chatReactContainer a.contentAdmin:hover {
-    color: #c3afff;
+    color: #AF99FF;
 }
 #chatReactContainer .post_user_avatar_wrapper.contentAdmin {
-    background: linear-gradient(0deg, rgba(115, 105, 141, 1) 0%, rgba(195, 175, 255, 1) 100%);
+    background: linear-gradient(0deg, rgba(103, 89, 176, 1) 0%, rgba(195, 175, 255, 1) 100%);
 }
 
 
