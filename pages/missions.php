@@ -63,7 +63,7 @@ function missions(): bool {
 
             // Create notification
             require_once __DIR__ . '/../classes/notification/NotificationManager.php';
-            if ($player->mission_stage['action_type'] == 'travel' or $player->mission_stage['action_type'] == 'search') {
+            if ($player->mission_stage['action_type'] == 'travel') {
                 $mission_location = TravelCoords::fromDbString($player->mission_stage['action_data']);
                 $new_notification = new MissionNotificationDto(
                     type: "mission",

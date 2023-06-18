@@ -11,6 +11,9 @@ export type NotificationType = {|
         | "specialmission"
         | "specialmission_complete"
         | "specialmission_failed"
+        | "mission"
+        | "mission_team"
+        | "mission_clain"
         | "rank"
         | "system"
         | "warning"
@@ -33,5 +36,19 @@ export type NotificationType = {|
 export type MissionNotificationType = $ReadOnly<{
     ...NotificationType,
     +type: "mission",
+    +type: "mission_team",
+    +type: "mission_clan",
     +mission_rank: string,
+}>;
+
+export type ChatNotificationType = $ReadOnly<{
+    ...NotificationType,
+    +type: "chat",
+    +post_id: number,
+}>;
+
+export type BattleNotificationType = $ReadOnly<{
+    ...NotificationType,
+    +type: "battle",
+    +battle_id: number,
 }>;

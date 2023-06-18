@@ -176,13 +176,47 @@ function team() {
     }
     else {
         if(isset($_GET['join_mission']) && $player->team->mission_id) {
-            $mission_id = $player->team->mission_id;
-            $mission = new Mission($mission_id, $player, $player->team);
+            if ($player->mission_id) {
+                $system->message("You are already on a mission!");
+            }
+            else {
+                $mission_id = $player->team->mission_id;
+                $mission = new Mission($mission_id, $player, $player->team);
 
-            $player->mission_id = $mission_id;
-            $player->log(User::LOG_MISSION, "Team Mission ID #{$mission_id}");
+                $player->mission_id = $mission_id;
+                $player->log(User::LOG_MISSION, "Team Mission ID #{$mission_id}");
 
-            $system->message("Mission joined!");
+                $system->message("Mission joined!");
+
+                // Create notification
+                $result = $system->query("SELECT `name` FROM `missions` WHERE `mission_id` = {$mission_id}");
+                $mission_name = $system->db_fetch($result)['name'];
+                require_once __DIR__ . '/../classes/notification/NotificationManager.php';
+                if ($player->mission_stage['action_type'] == 'travel') {
+                    $mission_location = TravelCoords::fromDbString($player->mission_stage['action_data']);
+                    $new_notification = new MissionNotificationDto(
+                        type: "mission_team",
+                        message: $mission_name . ": Travel to " . $mission_location->x . ":" . $mission_location->y,
+                        user_id: $player->user_id,
+                        created: time(),
+                        mission_rank: "Team",
+                        alert: false,
+                    );
+                    NotificationManager::createNotification($new_notification, $system, NotificationManager::UPDATE_REPLACE);
+                }
+                else {
+                    require_once __DIR__ . '/../classes/notification/NotificationManager.php';
+                    $new_notification = new MissionNotificationDto(
+                        type: "mission_team",
+                        message: $mission_name . " in progress",
+                        user_id: $player->user_id,
+                        created: time(),
+                        mission_rank: "Team",
+                        alert: false,
+                    );
+                    NotificationManager::createNotification($new_notification, $system, NotificationManager::UPDATE_REPLACE);
+                }
+            }
         }
 
         //Leader controls
@@ -363,6 +397,33 @@ function team() {
                     $system->query("UPDATE `teams` SET `mission_id`='{$mission_id}' WHERE `team_id`='{$player->team->id}' LIMIT 1");
                     if($system->db_last_affected_rows) {
                         $system->message("Mission started!");
+                        // Create notification
+                        $result = $system->query("SELECT `name` FROM `missions` WHERE `mission_id` = {$mission_id}");
+                        $mission_name = $system->db_fetch($result)['name'];
+                        require_once __DIR__ . '/../classes/notification/NotificationManager.php';
+                        if ($player->mission_stage['action_type'] == 'travel') {
+                            $mission_location = TravelCoords::fromDbString($player->mission_stage['action_data']);
+                            $new_notification = new MissionNotificationDto(
+                                type: "mission_team",
+                                message: $mission_name . ": Travel to " . $mission_location->x . ":" . $mission_location->y,
+                                user_id: $player->user_id,
+                                created: time(),
+                                mission_rank: "Team",
+                                alert: false,
+                            );
+                            NotificationManager::createNotification($new_notification, $system, NotificationManager::UPDATE_REPLACE);
+                        } else {
+                            require_once __DIR__ . '/../classes/notification/NotificationManager.php';
+                            $new_notification = new MissionNotificationDto(
+                                type: "mission_team",
+                                message: $mission_name . " in progress",
+                                user_id: $player->user_id,
+                                created: time(),
+                                mission_rank: "Team",
+                                alert: false,
+                            );
+                            NotificationManager::createNotification($new_notification, $system, NotificationManager::UPDATE_REPLACE);
+                        }
                     }
                     else {
                         $system->message("Error starting mission!");

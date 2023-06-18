@@ -61,7 +61,10 @@ function Chat({
 
     const refreshChat = function() {
         if(currentPagePostIdRef.current != null) {
-            return;
+            // always refresh when initialized to latest
+            if (currentPagePostIdRef.current != latestPostId) {
+                return;
+            }
         }
 
         apiFetch(

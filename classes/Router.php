@@ -23,6 +23,7 @@ class Router {
         'admin' => 17,
         'report' => 18,
         'battle' => 19,
+        'clan' => 20,
         'premium' => 21,
         'spar' => 22,
         'healingShop' => 23,

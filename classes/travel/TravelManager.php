@@ -313,7 +313,7 @@ class TravelManager {
         // Get objectives
         $objectives = [];
         if ($this->user->mission_id > 0) {
-            if ($this->user->mission_stage['action_type'] == 'travel' || $this->user->mission_stage['action_type'] == 'search') {
+            if ($this->user->mission_stage['action_type'] == 'travel') {
                 $mission_result = $this->system->query("SELECT `name` FROM `missions` WHERE `mission_id` = '{$this->user->mission_id}' LIMIT 1");
                 $mission_location = TravelCoords::fromDbString($this->user->mission_stage['action_data']);
                 $objectives[] = new MapObjectiveLocation(

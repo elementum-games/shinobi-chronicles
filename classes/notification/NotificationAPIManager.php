@@ -82,6 +82,22 @@ class NotificationAPIManager {
                         $notifications[] = MissionNotificationDto::fromDb($row, $this->system->router->getUrl("mission"));
                     }
                     break;
+                case "mission_team":
+                    if ($this->player->mission_id == 0) {
+                        $notification_ids_to_delete[] = $row['notification_id'];
+                        continue 2;
+                    } else {
+                        $notifications[] = MissionNotificationDto::fromDb($row, $this->system->router->getUrl("team"));
+                    }
+                    break;
+                case "mission_clan":
+                    if ($this->player->mission_id == 0) {
+                        $notification_ids_to_delete[] = $row['notification_id'];
+                        continue 2;
+                    } else {
+                        $notifications[] = MissionNotificationDto::fromDb($row, $this->system->router->getUrl("clan"));
+                    }
+                    break;
                 case "rank":
                     if (!($this->player->level >= $this->player->rank->max_level && $this->player->exp >= $this->player->expForNextLevel() && $this->player->rank_num < System::SC_MAX_RANK && $this->player->rank_up)) {
                         $notification_ids_to_delete[] = $row['notification_id'];

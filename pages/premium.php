@@ -404,6 +404,18 @@ function premium() {
                  }
 
                  $player->updateData();
+
+                require_once __DIR__ . '/../classes/notification/NotificationManager.php';
+                $new_notification = new NotificationDto(
+                    type: "training",
+                    message: "Retraining " . System::unSlug($target_stat),
+                    user_id: $player->user_id,
+                    created: time(),
+                    duration: $time * 60,
+                    alert: false,
+                );
+                NotificationManager::createNotification($new_notification, $system, NotificationManager::UPDATE_REPLACE);
+
                  require 'templates/premium/stat_transfer_confirmation.php';
              }
 		} catch (Exception $e) {
