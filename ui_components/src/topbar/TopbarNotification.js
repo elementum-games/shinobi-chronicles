@@ -50,6 +50,32 @@ export function TopbarNotification({
                     </svg>
                 </a>
             }
+            {notification.type === "mission_team" &&
+                <a href={notification.action_url}
+                    className={(notification.duration > 0) ? "topbar_notification_wrapper has_duration" : "topbar_notification_wrapper"}
+                    data-content={notification.message}
+                    data-time={timeRemainingDisplay}
+                >
+                    <svg className="topbar_notification_svg" width="40" height="40" viewBox="0 0 100 100">
+                        <polygon points="6,50 50,94 94,50 50,6" strokeWidth="8px" stroke="#5d5c4b" fill="#52466a" />
+                        <polygon points="6,50 50,94 94,50 50,6" strokeWidth="2px" stroke="#000000" fill="#52466a" />
+                        <text x="31%" y="74%" className="topbar_notification_mission_team">{notification.mission_rank.charAt(0)}</text>
+                    </svg>
+                </a>
+            }
+            {notification.type === "mission_clan" &&
+                <a href={notification.action_url}
+                    className={(notification.duration > 0) ? "topbar_notification_wrapper has_duration" : "topbar_notification_wrapper"}
+                    data-content={notification.message}
+                    data-time={timeRemainingDisplay}
+                >
+                    <svg className="topbar_notification_svg" width="40" height="40" viewBox="0 0 100 100">
+                        <polygon points="6,50 50,94 94,50 50,6" strokeWidth="8px" stroke="#5d5c4b" fill="#52466a" />
+                        <polygon points="6,50 50,94 94,50 50,6" strokeWidth="2px" stroke="#000000" fill="#52466a" />
+                        <text x="30%" y="72%" className="topbar_notification_mission_clan">{notification.mission_rank.charAt(0)}</text>
+                    </svg>
+                </a>
+            }
             {notification.type === "rank" &&
                 <a href={notification.action_url}
                    className={(notification.duration > 0) ? "topbar_notification_wrapper has_duration" : "topbar_notification_wrapper"}

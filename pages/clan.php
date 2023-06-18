@@ -23,11 +23,38 @@ function clan() {
             if($player->clan->startMission($player, $mission_id)) {
                 require("missions.php");
                 runActiveMission();
+                // Create notification
+                $result = $system->query("SELECT `name` FROM `missions` WHERE `mission_id` = {$mission_id}");
+                $mission_name = $system->db_fetch($result)['name'];
+                require_once __DIR__ . '/../classes/notification/NotificationManager.php';
+                if ($player->mission_stage['action_type'] == 'travel') {
+                    $mission_location = TravelCoords::fromDbString($player->mission_stage['action_data']);
+                    $new_notification = new MissionNotificationDto(
+                        type: "mission_clan",
+                        message: $mission_name . ": Travel to " . $mission_location->x . ":" . $mission_location->y,
+                        user_id: $player->user_id,
+                        created: time(),
+                        mission_rank: "Clan",
+                        alert: false,
+                    );
+                    NotificationManager::createNotification($new_notification, $system, NotificationManager::UPDATE_REPLACE);
+                } else {
+                    require_once __DIR__ . '/../classes/notification/NotificationManager.php';
+                    $new_notification = new MissionNotificationDto(
+                        type: "mission_clan",
+                        message: $mission_name . " in progress",
+                        user_id: $player->user_id,
+                        created: time(),
+                        mission_rank: "Clan",
+                        alert: false,
+                    );
+                    NotificationManager::createNotification($new_notification, $system, NotificationManager::UPDATE_REPLACE);
+                }
                 return true;
             }
 		} catch (Exception $e) {
 			$system->message($e->getMessage());
-		}		
+		}
 	}
 
     // Challenge stuff
@@ -134,7 +161,7 @@ function clan() {
         }
 
         $result = $system->query(
-            "SELECT `user_id`, `user_name`, `rank`, `level`, `exp`, `last_active` FROM `users` WHERE `clan_id`='{$player->clan->id}' 
+            "SELECT `user_id`, `user_name`, `rank`, `level`, `exp`, `last_active` FROM `users` WHERE `clan_id`='{$player->clan->id}'
                     ORDER BY `rank` DESC, `exp` DESC LIMIT $min, $users_per_page"
         );
 

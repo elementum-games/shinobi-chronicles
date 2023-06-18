@@ -106,6 +106,18 @@
     font-size: 50px;
     text-transform: uppercase;
 }
+.topbar_notification_mission_team {
+    fill: #9aa6c6;
+    font-family: Andale Mono, AndaleMono, monospace;
+    font-size: 65px;
+    text-transform: uppercase;
+}
+.topbar_notification_mission_clan {
+    fill: #9aa6c6;
+    font-family: Andale Mono, AndaleMono, monospace;
+    font-size: 65px;
+    text-transform: uppercase;
+}
 
 .topbar_notification_specialmission {
     fill: #9aa6c6;

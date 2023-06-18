@@ -114,6 +114,8 @@ function Topbar({ links, notificationAPIData, userAPIData}) {
          "specialmission_complete",
          "specialmission_failed",
          "mission",
+         "mission_team",
+         "mission_clan",
          "rank",
          "system",
          "warning",
