@@ -58,7 +58,7 @@ function missions(): bool {
 		$mission_id = $_GET['start_mission'];
 		try {
             if(!isset($missions[$mission_id])) {
-                throw new Exception("Invalid mission!");
+                throw new RuntimeException("Invalid mission!");
             }
             Mission::start($player, $mission_id);
             $player->log(User::LOG_MISSION, "Mission ID #{$mission_id}");
@@ -198,7 +198,7 @@ function runActiveMission(): bool {
                 // monster id
                 $opponent = new NPC($system, $player->mission_stage['action_data']);
                 if(!$opponent) {
-                    throw new Exception("Couldn't load opponent for mission!");
+                    throw new RuntimeException("Couldn't load opponent for mission!");
                 }
                 $opponent->loadData();
 
@@ -234,7 +234,7 @@ function runActiveMission(): bool {
                 else {
                     return true;
                 }
-            } catch(Exception $e) {
+            } catch(RuntimeException $e) {
                 error_log($e->getMessage());
 
                 $player->clearMission();
@@ -520,7 +520,7 @@ function missionFightAPI(System $system, User $player): BattlePageAPIResponse {
         if($battle->isComplete()) {
             $response->battle_result = processMissionBattleEnd($battle, $mission, $player);
         }
-    } catch(Exception $e) {
+    } catch(RuntimeException $e) {
         $response->errors[] = $e->getMessage();
     }
 

@@ -37,9 +37,10 @@ function spar() {
                 </table>";
             }
         }
-        catch (Exception $e) {
-            $system->printMessage($e->getMessage());
-            $player->battle_id = 0;
+        catch (RuntimeException $e) {
+            error_log($e->getMessage());
+            $system->message($e->getMessage());
+            $system->printMessage();
             return false;
         }
 	}
@@ -51,30 +52,30 @@ function spar() {
                     FROM `users` WHERE `user_id`='$challenge' LIMIT 1"
             );
 			if($system->db->last_num_rows == 0) {
-				throw new Exception("Invalid user!");
+				throw new RuntimeException("Invalid user!");
 			}
 			$user = $system->db->fetch($result);
 			
 			/*
 			if($user['village'] != $player->village->name) {
-				throw new Exception("You cannot spar ninja from enemy villages!");
+				throw new RuntimeException("You cannot spar ninja from enemy villages!");
 			}
 			*/
 			
 			if(!$player->location->equals(TravelCoords::fromDbString($user['location']))) {
-				throw new Exception("Target is not at your location!");
+				throw new RuntimeException("Target is not at your location!");
 			}
 			
 			if($user['challenge']) {
-				throw new Exception("Target has already been challenged!");
+				throw new RuntimeException("Target has already been challenged!");
 			}
 				
 			if($user['battle_id']) {
-				throw new Exception("Target is in battle!");
+				throw new RuntimeException("Target is in battle!");
 			}
 			
 			if($user['last_active'] < time() - 120) {
-				throw new Exception("Target is inactive/offline!");
+				throw new RuntimeException("Target is inactive/offline!");
 			}
 			
 			$system->db->query("UPDATE `users` SET `challenge`='$player->user_id' WHERE `user_id`='$challenge' LIMIT 1");
@@ -92,26 +93,26 @@ function spar() {
 			$challenge = (int)$system->db->clean($_GET['accept_challenge']);
 			
 			if($challenge != $player->challenge) {
-				throw new Exception("Invalid challenge!");
+				throw new RuntimeException("Invalid challenge!");
 			}
 
             try {
                 $user = User::loadFromId($system, $challenge, true);
                 $user->loadData(User::UPDATE_NOTHING, true);
-            } catch(Exception $e) {
-                throw new Exception("Invalid user! " . $e->getMessage());
+            } catch(RuntimeException $e) {
+                throw new RuntimeException("Invalid user! " . $e->getMessage());
             }
 			
 			if(!$user->location->equals($player->location)) {
-				throw new Exception("Target is not at your location!");
+				throw new RuntimeException("Target is not at your location!");
 			}
 			
 			if($user->battle_id) {
-				throw new Exception("User is in battle!");
+				throw new RuntimeException("User is in battle!");
 			}
 			
 			if($user->last_active < time() - 120) {
-				throw new Exception("Target is inactive/offline!");
+				throw new RuntimeException("Target is inactive/offline!");
 			}
 
             $player->challenge = 0;
@@ -225,7 +226,7 @@ function processSparFightEnd(BattleManager $battle, User $player): string {
         return "You both knocked each other out.";
     }
     else {
-        throw new Exception("Invalid battle completion!");
+        throw new RuntimeException("Invalid battle completion!");
     }
 }
 

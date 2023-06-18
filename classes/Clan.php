@@ -208,10 +208,10 @@ class Clan {
         $training_boosts = $this->getTrainingBoostOptions();
 
         if(!in_array($new_boost, $training_boosts)) {
-            throw new Exception("Invalid boost!");
+            throw new RuntimeException("Invalid boost!");
         }
         if($this->points < $boost_cost) {
-            throw new Exception("Not enough points!");
+            throw new RuntimeException("Not enough points!");
         }
 
         $new_boost = 'training:' . $new_boost;
@@ -241,7 +241,7 @@ class Clan {
         $missions = $this->getClanMissions($player->rank_num);
 
         if(!isset($missions[$mission_id])) {
-            throw new Exception("Invalid mission!");
+            throw new RuntimeException("Invalid mission!");
         }
         Mission::start($player, $mission_id);
         $player->log(User::LOG_MISSION, "Clan Mission ID #{$mission_id}");
@@ -257,13 +257,13 @@ class Clan {
      */
     public function challengeForOffice(User $player, int $office): bool {
         if($player->rank_num < 4 && $office == Clan::OFFICE_LEADER) {
-            throw new Exception("Unable to claim leader position at this rank.");
+            throw new RuntimeException("Unable to claim leader position at this rank.");
         }
         if($player->clan_office == $office) {
-            throw new Exception("You cannot challenge yourself!");
+            throw new RuntimeException("You cannot challenge yourself!");
         }
         if($player->clan_office) {
-            throw new Exception("Please resign from your current position before taking a new one!");
+            throw new RuntimeException("Please resign from your current position before taking a new one!");
         }
 
         // Check cooldown
@@ -275,7 +275,7 @@ class Clan {
             : time() - Clan::ELDER_MAX_INACTIVITY;
 
         if($current_officer != null && $current_officer->last_active > $min_officer_last_active) {
-            throw new Exception("Position already taken!");
+            throw new RuntimeException("Position already taken!");
         }
 
         // Claim empty seat
@@ -303,7 +303,7 @@ class Clan {
                 $this->elder_2_id = $player->user_id;
                 break;
             default:
-                throw new Exception("Invalid office!");
+                throw new RuntimeException("Invalid office!");
         }
 
         $player->clan_office = $office;
@@ -321,7 +321,7 @@ class Clan {
      */
     public function setInfo(string $info): void {
         if(strlen($info) > 700) {
-            throw new Exception("Clan info is too long!");
+            throw new RuntimeException("Clan info is too long!");
         }
 
         $this->system->db->query("UPDATE `clans` SET `info`='$info' WHERE `clan_id`='{$this->id}' LIMIT 1");
@@ -337,7 +337,7 @@ class Clan {
      */
     public function setLogoUrl(string $logo_url) {
         if(strlen($logo_url) > 150) {
-            throw new Exception("Link is too long!");
+            throw new RuntimeException("Link is too long!");
         }
 
         $this->system->db->query("UPDATE `clans` SET `logo`='$logo_url' WHERE `clan_id`='{$this->id}' LIMIT 1");
@@ -350,7 +350,7 @@ class Clan {
      */
     public function setMotto(string $motto): void {
         if(strlen($motto) > 180) {
-            throw new Exception("Motto is too long!");
+            throw new RuntimeException("Motto is too long!");
         }
 
         $this->system->db->query("UPDATE `clans` SET `motto`='$motto' WHERE `clan_id`='{$this->id}' LIMIT 1");

@@ -325,7 +325,7 @@ function geninExam(System $system, User $player, RankManager $rankManager) {
                 }
 
                 if($system->db->last_num_rows == 0) {
-                    throw new Exception("No clans available!");
+                    throw new RuntimeException("No clans available!");
                 }
 
                 $clans = array();
@@ -396,7 +396,7 @@ function geninExam(System $system, User $player, RankManager $rankManager) {
 					hard with them and become a strong ninja for your clan and village.'<br />
 					<p style='text-align:center;'><a href='{$system->router->links['profile']}'>Continue</a></p>";
             }
-        } catch(Exception $e) {
+        } catch(RuntimeException $e) {
             $system->message($e->getMessage());
         }
         $system->printMessage();
@@ -430,12 +430,12 @@ function chuuninExam(System $system, User $player, RankManager $rankManager): bo
         try {
             // Question 1 - Illusion jutsu is what type
             if($answer1 != 'genjutsu') {
-                throw new Exception('');
+                throw new RuntimeException('');
             }
 
             // Question 2 - Armor protects against what
             if($answer2 != 'taijutsu') {
-                throw new Exception('');
+                throw new RuntimeException('');
             }
 
             // Question 3 - Most villagers
@@ -463,7 +463,7 @@ function chuuninExam(System $system, User $player, RankManager $rankManager): bo
             }
 
             if($answer3 != $highest_village) {
-                throw new Exception('');
+                throw new RuntimeException('');
             }
 
             $player->exam_stage = RankManager::CHUUNIN_STAGE_SURVIVAL_START;
@@ -505,7 +505,7 @@ function chuuninExam(System $system, User $player, RankManager $rankManager): bo
                     else {
                         Battle::start($system, $player, $opponent, Battle::TYPE_AI_RANKUP);
                     }
-                } catch(Exception $e) {
+                } catch(RuntimeException $e) {
                     $system->message($e->getMessage());
                     $system->printMessage();
                     return false;
@@ -574,7 +574,7 @@ function chuuninExam(System $system, User $player, RankManager $rankManager): bo
                     else {
                         Battle::start($system, $player, $opponent, Battle::TYPE_AI_RANKUP);
                     }
-                } catch(Exception $e) {
+                } catch(RuntimeException $e) {
                     $system->message($e->getMessage());
                     $system->printMessage();
                     return false;
@@ -696,7 +696,7 @@ function chuuninExam(System $system, User $player, RankManager $rankManager): bo
             }
             $rankManager->increasePlayerRank($player);
             require 'templates/level_rank_up/chuunin_exam_graduation.php';
-        } catch(Exception $e) {
+        } catch(RuntimeException $e) {
             $system->message($e->getMessage());
             $system->printMessage();
         }
@@ -899,7 +899,7 @@ function joninExam(System $system, User $player, RankManager $rankManager): bool
             $player->exam_stage = 0;
             $rankManager->increasePlayerRank($player);
             require 'templates/level_rank_up/jonin_exam_graduation.php';
-        } catch(Exception $e) {
+        } catch(RuntimeException $e) {
             echo "<tr><td style='text-align:center;'>" . $e->getMessage() . "</td></tr>";
         }
 
@@ -934,7 +934,7 @@ function rankupFightAPI(System $system, User $player): BattlePageAPIResponse {
         if($battle->isComplete()) {
             $response->battle_result = processChuuninExamFightEnd($system, $battle, $player);
         }
-    } catch(Exception $e) {
+    } catch(RuntimeException $e) {
         $response->errors[] = $e->getMessage();
     }
 

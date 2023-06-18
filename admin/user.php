@@ -91,18 +91,18 @@ function editUserPage(System $system, User $player): void {
             if($user_data['rank'] >= 3) {
                 $required_elements = ($_POST['rank'] == 4) ? 2 : 1;
                 if(count($_POST['elements']) > $required_elements) {
-                    throw new Exception("Only $required_elements element(s) allowed!");
+                    throw new RuntimeException("Only $required_elements element(s) allowed!");
                 }
                 if(count($_POST['elements']) < $required_elements) {
-                    throw new Exception("There must be at least $required_elements element(s)!");
+                    throw new RuntimeException("There must be at least $required_elements element(s)!");
                 }
                 if(!is_array($_POST['elements'])) {
-                    throw new Exception("Elements form data must be of type array!");
+                    throw new RuntimeException("Elements form data must be of type array!");
                 }
                 foreach($_POST['elements'] as $num => $element) {
                     $key = ($num == 0) ? 'first' : 'second';
                     if(!in_array($element, User::$ELEMENTS)) {
-                        throw new Exception("Invalid element ($element).");
+                        throw new RuntimeException("Invalid element ($element).");
                     }
                     $new_elements[$key] = $element;
                 }
@@ -157,9 +157,9 @@ function editUserPage(System $system, User $player): void {
                 }
             }
             else {
-                throw new Exception("Error editing user!");
+                throw new RuntimeException("Error editing user!");
             }
-        } catch(Exception $e) {
+        } catch(RuntimeException $e) {
             $system->message($e->getMessage());
         }
         $system->printMessage();
@@ -207,7 +207,7 @@ function statCutPage(System $system, User $player): void {
             $name = $system->db->clean($_POST['user_name']);
             $user = $player->staff_manager->getUserByName($name, true);
             if(!$user) {
-                throw new Exception("Invalid user!");
+                throw new RuntimeException("Invalid user!");
             }
         } catch (Exception $e) {
             $system->message($e->getMessage());
@@ -240,12 +240,12 @@ function statCutPage(System $system, User $player): void {
 
             $user = $player->staff_manager->getUserByID($user_id, true);
             if(!$user) {
-                throw new Exception("Invalid user!");
+                throw new RuntimeException("Invalid user!");
             }
 
             if($user['user_id'] == $player->user_id) {
                 $user = false;
-                throw new Exception("You can not cut your own stats!");
+                throw new RuntimeException("You can not cut your own stats!");
             }
 
             //New data
@@ -313,7 +313,7 @@ function statCutPage(System $system, User $player): void {
 
                 echo "</div>";
 
-                throw new Exception("Debugging!");
+                throw new RuntimeException("Debugging!");
             }
 
             $query = "UPDATE `users` SET";
@@ -359,13 +359,13 @@ function deleteUserPage(System $system, User $player): void {
                 "SELECT `user_id`, `user_name`, `staff_level` FROM `users` WHERE `user_name`='$user_name' LIMIT 1"
             );
             if($system->db->last_num_rows == 0) {
-                throw new Exception("Invalid user!");
+                throw new RuntimeException("Invalid user!");
             }
             $result = $system->db->fetch($result);
             $user_id = $result['user_id'];
             $user_name = $result['user_name'];
             if($result['staff_level'] >= $player->staff_level && !$player->isHeadAdmin()) {
-                throw new Exception("You cannot delete other admins!");
+                throw new RuntimeException("You cannot delete other admins!");
             }
             if(!isset($_POST['confirm'])) {
                 echo "<table class='table'><tr><th>Delete User</th></tr>
@@ -378,7 +378,7 @@ function deleteUserPage(System $system, User $player): void {
 						</form>
 					</td></tr></table>";
                 $select_user = false;
-                throw new Exception('');
+                throw new RuntimeException('');
             }
             // Success, delete
             $system->db->query("DELETE FROM `users` WHERE `user_id`='$user_id' LIMIT 1");
@@ -386,7 +386,7 @@ function deleteUserPage(System $system, User $player): void {
             $system->db->query("DELETE FROM `user_bloodlines` WHERE `user_id`='$user_id' LIMIT 1");
             $system->message("User <b>$user_name</b> deleted.");
             // */
-        } catch(Exception $e) {
+        } catch(RuntimeException $e) {
             $system->message($e->getMessage());
         }
     }
@@ -419,7 +419,7 @@ function devToolsPage(System $system, User $player): void {
         try {
             $user = User::findByName($system, $name);
             if($user == null) {
-                throw new Exception("Invalid user!");
+                throw new RuntimeException("Invalid user!");
             }
 
             $user->loadData(UPDATE: User::UPDATE_NOTHING, remote_view: true);
@@ -427,7 +427,7 @@ function devToolsPage(System $system, User $player): void {
 
             //Content admin restriction
             if(!$player->isHeadAdmin() && $user->user_id != $player->user_id) {
-                throw new Exception("You may only edit your own characters!");
+                throw new RuntimeException("You may only edit your own characters!");
             }
 
             foreach($user->jutsu as &$jutsu) {
@@ -464,11 +464,11 @@ function devToolsPage(System $system, User $player): void {
         try {
             $user = User::findByName($system, $name);
             if($user == null) {
-                throw new Exception("Invalid user!");
+                throw new RuntimeException("Invalid user!");
             }
 
             if(!$player->isHeadAdmin() && $user->user_id != $player->user_id) {
-                throw new Exception("You may only edit your own characters!");
+                throw new RuntimeException("You may only edit your own characters!");
             }
 
             $user->loadData(User::UPDATE_NOTHING);
@@ -540,11 +540,11 @@ function giveBloodlinePage(System $system): void {
         $user_name = $system->db->clean($_POST['user_name']);
         try {
             if(!isset($bloodlines[$editing_bloodline_id])) {
-                throw new Exception("Invalid bloodline!");
+                throw new RuntimeException("Invalid bloodline!");
             }
             $result = $system->db->query("SELECT `user_id` FROM `users` WHERE `user_name`='$user_name' LIMIT 1");
             if($system->db->last_num_rows == 0) {
-                throw new Exception("User does not exist!");
+                throw new RuntimeException("User does not exist!");
             }
             $result = $system->db->fetch($result);
             $user_id = $result['user_id'];
@@ -553,7 +553,7 @@ function giveBloodlinePage(System $system): void {
                 bloodline_id: $editing_bloodline_id,
                 user_id: $user_id
             );
-        } catch(Exception $e) {
+        } catch(RuntimeException $e) {
             $system->message($e->getMessage());
         }
         $system->printMessage();

@@ -43,7 +43,7 @@ function members() {
             );
 
 			if ($system->db->last_num_rows == 0) {
-				throw new Exception ('Team does not exist');
+				throw new RuntimeException ('Team does not exist');
 			}
 
 			$team_info = $system->db->fetch($result);
@@ -146,7 +146,7 @@ function members() {
 
 		try {
 			if($system->db->last_num_rows == 0) {
-				throw new Exception("User does not exist!");
+				throw new RuntimeException("User does not exist!");
 			}
 
 			$result = $system->db->fetch($result);

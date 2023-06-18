@@ -25,31 +25,31 @@ function marriage() {
             );
 
             if(!$system->db->last_num_rows) {
-                throw new Exception("Invalid user!");
+                throw new RuntimeException("Invalid user!");
             }
 
             $user_to_marry = $system->db->fetch($result);
 
             // Only one proposal allowed
             if($proposal_sent) {
-                throw new Exception("You must cancel your current proposal!");
+                throw new RuntimeException("You must cancel your current proposal!");
             }
             // Cannot self marry
             if($user_to_marry['user_id'] == $player->user_id && !$player->isUserAdmin()) {
-                throw new Exception("You cannot marry yourself!");
+                throw new RuntimeException("You cannot marry yourself!");
             }
             // Existing proposal/marriage
             if($user_to_marry['spouse'] != 0) {
                 $to_pend = ($user_to_marry['spouse'] < 0) ? "pending marriage!" : "spouse!";
 
-                throw new Exception("{$user_to_marry['user_name']} already has a " . $to_pend);
+                throw new RuntimeException("{$user_to_marry['user_name']} already has a " . $to_pend);
             }
 
             $result = $system->db->query(
                 "SELECT `user_name` FROM `users` WHERE `spouse`='-{$user_to_marry['user_id']}'"
             );
             if($system->db->last_num_rows) {
-                throw new Exception("{$user_to_marry['user_name']} has a pending marriage!");
+                throw new RuntimeException("{$user_to_marry['user_name']} has a pending marriage!");
             }
 
             // Blacklist check
@@ -61,12 +61,12 @@ function marriage() {
                 $blacklist = json_decode($blacklist['blocked_ids'], true);
 
                 if(array_key_exists($player->user_id, $blacklist)) {
-                    throw new Exception("{$user_to_marry['user_name']} has chosen not to receive marriage proposals!");
+                    throw new RuntimeException("{$user_to_marry['user_name']} has chosen not to receive marriage proposals!");
                 }
             }
 
             if(array_key_exists($user_to_marry['user_id'], $player->blacklist)) {
-                throw new Exception("You cannot send proposals to users on your blacklist!");
+                throw new RuntimeException("You cannot send proposals to users on your blacklist!");
             }
 
             // Send proposal
@@ -108,7 +108,7 @@ function marriage() {
             $result = $system->db->query("SELECT `user_name` FROM `users` WHERE `user_id`='$proposer_id' LIMIT 1");
 
             if (!$system->db->last_num_rows) {
-                throw new Exception("Invalid proposal id!");
+                throw new RuntimeException("Invalid proposal id!");
             }
 
             $user_name = $system->db->fetch($result)['user_name'];
@@ -119,7 +119,7 @@ function marriage() {
                     WHERE `user_id`='$proposer_id' LIMIT 1"
             );
             if(!$system->db->last_affected_rows) {
-                throw new Exception("Error accepting proposal!");
+                throw new RuntimeException("Error accepting proposal!");
             }
 
             $player->spouse = $proposer_id;
@@ -165,7 +165,7 @@ function marriage() {
                 if (intval($current_marriage['spouse']) === $player->user_id) {
                     $system->db->query("UPDATE `users` SET `spouse`='0', `marriage_time`='0' WHERE `user_id`='$player->spouse' LIMIT 1");
                     if (!$system->db->last_affected_rows) {
-                        throw new Exception("Error processing divorce!");
+                        throw new RuntimeException("Error processing divorce!");
                     }
                 }
             }*/
@@ -179,7 +179,7 @@ function marriage() {
                         "UPDATE `users` SET `spouse`='0', `marriage_time`='0' WHERE `user_id`='$player->spouse' LIMIT 1"
                     );
                     if (!$system->db->last_affected_rows) {
-                        throw new Exception("Error processing divorce!");
+                        throw new RuntimeException("Error processing divorce!");
                     }
                 }
                 else {
@@ -188,7 +188,7 @@ function marriage() {
                         "SELECT user_id, user_name, spouse FROM users WHERE user_id =" . $players_spouse['spouse'] . " LIMIT 1"
                     );
                     if (!$system->db->last_num_rows) {
-                        throw new Exception("Failed to fetch spouse information");
+                        throw new RuntimeException("Failed to fetch spouse information");
                     }
 
                     // Spouses Spouse = Player married to the spouse of player B -> C Chain
@@ -204,7 +204,7 @@ function marriage() {
                                     OR `user_id`=" . $players_spouse['spouse'] . " LIMIT 2"
                         );
                         if (!$system->db->last_affected_rows) {
-                            throw new Exception("Error processing divorce!");
+                            throw new RuntimeException("Error processing divorce!");
                         }
                     }
 
@@ -221,7 +221,7 @@ function marriage() {
                             "UPDATE `users` SET `spouse`='0', `marriage_time`='0' WHERE `user_id`=" . $spouse_player['user_id'] . " LIMIT 1"
                         );
                         if (!$system->db->last_affected_rows) {
-                            throw new Exception("Error processing divorce!");
+                            throw new RuntimeException("Error processing divorce!");
                         }
                     }
                 }

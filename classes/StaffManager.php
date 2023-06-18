@@ -370,17 +370,17 @@ class StaffManager {
 
         //No self banning
         if($user_data['user_id'] == $this->user_id) {
-            throw new Exception("You can not ban yourself!");
+            throw new RuntimeException("You can not ban yourself!");
         }
         if(isset($ban_data[$new_ban_type]) && $ban_data[$new_ban_type] == StaffManager::PERM_BAN_VALUE) {
             if(!in_array($new_ban_type, [self::BAN_TYPE_JOURNAL, self::BAN_TYPE_AVATAR])) {
-                throw new Exception("Permanent bans must be removed by using the unban system!");
+                throw new RuntimeException("Permanent bans must be removed by using the unban system!");
             }
         }
         switch($this->staff_level) {
             case self::STAFF_MODERATOR:
                 if($user_data['staff_level'] >= self::STAFF_MODERATOR) {
-                    throw new Exception("You do not have permission to ban " .
+                    throw new RuntimeException("You do not have permission to ban " .
                     self::$staff_level_names[$user_data['staff_level']]['long'] . "s!");
                 }
                 //No need to check any further on journal/avatar bans, these do not have expires
@@ -398,27 +398,27 @@ class StaffManager {
                         echo "yeahhhh...";
                         return true;
                     }
-                    throw new Exception("{$this->getStaffLevelName(null, 'long')}s can't reduce bans.");
+                    throw new RuntimeException("{$this->getStaffLevelName(null, 'long')}s can't reduce bans.");
                 }
             case self::STAFF_HEAD_MODERATOR:
                 if($user_data['staff_level'] == self::STAFF_HEAD_MODERATOR || $user_data['staff_level'] >= self::STAFF_ADMINISTRATOR) {
-                    throw new Exception("You are not allowed to ban {$this->getStaffLevelName(null, 'long')}s, "
+                    throw new RuntimeException("You are not allowed to ban {$this->getStaffLevelName(null, 'long')}s, "
                     . "{$this->getStaffLevelName(self::STAFF_ADMINISTRATOR, 'long')}s or "
                     . "{$this->getStaffLevelName(self::STAFF_HEAD_ADMINISTRATOR)}s!");
                 }
                 return true;
             case self::STAFF_ADMINISTRATOR:
                 if($user_data['staff_level'] == self::STAFF_HEAD_ADMINISTRATOR) {
-                    throw new Exception("You are not allowed to ban {$this->getStaffLevelName(self::STAFF_HEAD_ADMINISTRATOR, 'long')}s!");
+                    throw new RuntimeException("You are not allowed to ban {$this->getStaffLevelName(self::STAFF_HEAD_ADMINISTRATOR, 'long')}s!");
                 }
                 if($user_data['staff_level'] == self::STAFF_ADMINISTRATOR) {
-                    throw new Exception("You can not ban fellow " . $this->getStaffLevelName(self::STAFF_ADMINISTRATOR, 'long') . "!");
+                    throw new RuntimeException("You can not ban fellow " . $this->getStaffLevelName(self::STAFF_ADMINISTRATOR, 'long') . "!");
                 }
                 return true;
             case self::STAFF_HEAD_ADMINISTRATOR:
                 return true;
             default:
-                throw new Exception("Invalid staff level!");
+                throw new RuntimeException("Invalid staff level!");
         }
     }
 
@@ -426,18 +426,18 @@ class StaffManager {
         switch($this->staff_level) {
             case self::STAFF_HEAD_MODERATOR:
                 if($user_data['staff_level'] == self::STAFF_HEAD_MODERATOR || $user_data['staff_level'] >= self::STAFF_ADMINISTRATOR) {
-                    throw new Exception("You do not have permission to unban this user!");
+                    throw new RuntimeException("You do not have permission to unban this user!");
                 }
                 return true;
             case self::STAFF_ADMINISTRATOR:
                 if($user_data['staff_level'] >= self::STAFF_ADMINISTRATOR) {
-                    throw new Exception("You do not have permission to unban this user!");
+                    throw new RuntimeException("You do not have permission to unban this user!");
                 }
                 return true;
             case self::STAFF_HEAD_ADMINISTRATOR:
                 return true;
             default:
-                throw new Exception("You do not have permission to unban members!");
+                throw new RuntimeException("You do not have permission to unban members!");
         }
     }
 
@@ -537,7 +537,7 @@ class StaffManager {
                 }
             }
             if(!$unbanned) {
-                throw new Exception("Player is not currently banned.");
+                throw new RuntimeException("Player is not currently banned.");
             }
             $unban_string = substr($unban_string, 0, strlen($unban_string)-2);
         }

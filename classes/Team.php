@@ -174,12 +174,12 @@ class Team {
      */
     public function addMember(User $player) {
         if($this->village != $player->village->name) {
-            throw new Exception("You must be in the same village to join a team!");
+            throw new RuntimeException("You must be in the same village to join a team!");
         }
 
         $first_open_slot = array_search(0, $this->members);
         if($first_open_slot === false) {
-            throw new Exception("No open slot available!");
+            throw new RuntimeException("No open slot available!");
         }
 
         $this->members[$first_open_slot] = $player->user_id;
@@ -195,7 +195,7 @@ class Team {
             $player->team_invite = 0;
         }
         else {
-            throw new Exception("Error adding you to the team!");
+            throw new RuntimeException("Error adding you to the team!");
         }
     }
 
@@ -207,11 +207,11 @@ class Team {
     public function setBoost(string $boost_type, string $boost_size) {
         $boost = self::$allowed_boosts[$boost_type][$boost_size] ?? null;
         if($boost == null) {
-            throw new Exception("Invalid boost!");
+            throw new RuntimeException("Invalid boost!");
         }
 
         if ($boost['points_cost'] > $this->points) {
-            throw new Exception('Your team does not have enough points for this boost!');
+            throw new RuntimeException('Your team does not have enough points for this boost!');
         }
 
         //Set values for display

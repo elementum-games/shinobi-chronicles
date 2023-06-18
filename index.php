@@ -51,17 +51,17 @@ if(!isset($_SESSION['user_id'])) {
 		try {
 /*			$image = new Securimage();
 			if(!$image->check($_POST['login_code']) && $system->environment == 'prod') {
-				throw new Exception("Invalid login code!");
+				throw new RuntimeException("Invalid login code!");
 			}*/
 
 			// Basic input check - user_name/password
 			$user_name = $system->db->clean($_POST['user_name']);
 			if(empty($user_name)) {
-				throw new Exception("Please enter username!");
+				throw new RuntimeException("Please enter username!");
 			}
 			$password = $system->db->clean($_POST['password']);
 			if(empty($password)) {
-				throw new Exception("Please enter password!");
+				throw new RuntimeException("Please enter password!");
 			}
 
 			// Get result
@@ -70,11 +70,11 @@ if(!isset($_SESSION['user_id'])) {
                     FROM `users` WHERE `user_name`='$user_name' LIMIT 1"
             );
 			if($system->db->last_num_rows == 0) {
-				throw new Exception("User does not exist!");
+				throw new RuntimeException("User does not exist!");
 			}
 			$result = $system->db->fetch($result);
 			if(!$result['user_verified']) {
-				throw new Exception("Your account has not been verified. Please check your email for the activation code.
+				throw new RuntimeException("Your account has not been verified. Please check your email for the activation code.
 				<a class='link' href='{$system->router->base_url}register.php?act=resend_verification&username=$user_name'>Resend Verification</a>");
 			}
 
@@ -86,10 +86,10 @@ if(!isset($_SESSION['user_id'])) {
                     "IP address {$_SERVER['REMOTE_ADDR']} failed login on account {$result['user_name']} not matching previous IPs {$result['current_ip']} or {$result['last_ip']}."
                 );
 
-                throw new Exception("Account has been locked out!");
+                throw new RuntimeException("Account has been locked out!");
             }
 			else if($result['failed_logins'] >= User::FULL_LOCK) {
-				throw new Exception("Account has been locked out!");
+				throw new RuntimeException("Account has been locked out!");
 			}
 
 			// Check password (NOTE: Due to importance of login, it is inclusive instead of exclusive (if statement must be true for user to be logged in) )
@@ -113,7 +113,7 @@ if(!isset($_SESSION['user_id'])) {
 				$system->db->query(
                     "UPDATE `users` SET `failed_logins` = `failed_logins` + 1 WHERE `user_id`='{$result['user_id']}' LIMIT 1"
                 );
-				throw new Exception("Invalid password! <a href='./password_reset.php'>Forgot password?</a>");
+				throw new RuntimeException("Invalid password! <a href='./password_reset.php'>Forgot password?</a>");
 			}
 		} catch (Exception $e) {
             $system->db->rollbackTransaction();
@@ -279,8 +279,6 @@ if($LOGGED_IN) {
 
             $self_link = $system->router->base_url . '?id=' . $id;
 
-            $system->printMessage();
-
             // EVENT
             if($system::$SC_EVENT_ACTIVE) {
                 require 'templates/temp_event_header.php';
@@ -288,16 +286,30 @@ if($LOGGED_IN) {
 
             require('pages/' . $route->file_name);
 
-            ($route->function_name)();
+            try {
+                ($route->function_name)();
+            } catch (DatabaseDeadlockException $e) {
+                // Wait 1ms, then retry deadlocked transaction
+                $system->db->rollbackTransaction();
+                usleep(1000);
+
+                $system->db->startTransaction();
+                $player->loadData();
+                ($route->function_name)();
+            }
 
             $page_loaded = true;
         } catch (Exception $e) {
-            error_log(get_class($e));
-
-            if(strlen($e->getMessage()) > 1) {
+            if($e instanceof DatabaseDeadlockException) {
+                error_log("DEADLOCK - retry did not solve");
+                $system->db->rollbackTransaction();
+                $system->message("Database deadlock, please reload your page and tell Lsm to fix!");
+                $system->printMessage(true);
+            }
+            else if(strlen($e->getMessage()) > 1) {
                 $system->db->rollbackTransaction();
                 $system->message($e->getMessage());
-                $system->printMessage();
+                $system->printMessage(true);
             }
         }
     }
@@ -317,7 +329,7 @@ if($LOGGED_IN) {
         try {
             require("pages/profile.php");
             userProfile();
-        } catch(Exception $e) {
+        } catch(RuntimeException $e) {
             $system->db->rollbackTransaction();
             $system->message($e->getMessage());
             $system->printMessage(true);

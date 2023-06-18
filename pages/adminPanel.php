@@ -153,9 +153,9 @@ function adminPanel() {
                     $system->message("NPC created!");
                 }
                 else {
-                    throw new Exception("Error creating NPC!");
+                    throw new RuntimeException("Error creating NPC!");
                 }
-            } catch(Exception $e) {
+            } catch(RuntimeException $e) {
                 $system->message($e->getMessage());
                 $error = true;
             }
@@ -227,9 +227,9 @@ function adminPanel() {
                     $system->message("Item created!");
                 }
                 else {
-                    throw new Exception("Error creating item!");
+                    throw new RuntimeException("Error creating item!");
                 }
-            } catch(Exception $e) {
+            } catch(RuntimeException $e) {
                 $system->message($e->getMessage());
                 $error = true;
             }
@@ -290,9 +290,9 @@ function adminPanel() {
                     $system->message(ucwords($content_name) . " created!");
                 }
                 else {
-                    throw new Exception("Error creating " . $content_name . "!");
+                    throw new RuntimeException("Error creating " . $content_name . "!");
                 }
-            } catch(Exception $e) {
+            } catch(RuntimeException $e) {
                 $system->message($e->getMessage());
                 $error = true;
             }
@@ -344,9 +344,9 @@ function adminPanel() {
                     $system->message(ucwords($content_name) . " created!");
                 }
                 else {
-                    throw new Exception("Error creating " . $content_name . "!");
+                    throw new RuntimeException("Error creating " . $content_name . "!");
                 }
-            } catch(Exception $e) {
+            } catch(RuntimeException $e) {
                 $system->message($e->getMessage());
                 $error = true;
             }
@@ -398,9 +398,9 @@ function adminPanel() {
                     $system->message(ucwords($content_name) . " created!");
                 }
                 else {
-                    throw new Exception("Error creating " . $content_name . "!");
+                    throw new RuntimeException("Error creating " . $content_name . "!");
                 }
-            } catch(Exception $e) {
+            } catch(RuntimeException $e) {
                 $system->message($e->getMessage());
                 $error = true;
             }
@@ -452,9 +452,9 @@ function adminPanel() {
                     $system->message(ucwords($content_name) . " created!");
                 }
                 else {
-                    throw new Exception("Error creating " . $content_name . "!");
+                    throw new RuntimeException("Error creating " . $content_name . "!");
                 }
-            } catch(Exception $e) {
+            } catch(RuntimeException $e) {
                 $system->message($e->getMessage());
                 $error = true;
             }
@@ -521,9 +521,9 @@ function adminPanel() {
                     $select_ai = true;
                 }
                 else {
-                    throw new Exception("Error editing " . $data['name'] . "! (Or data is the same)");
+                    throw new RuntimeException("Error editing " . $data['name'] . "! (Or data is the same)");
                 }
-            } catch(Exception $e) {
+            } catch(RuntimeException $e) {
                 $system->message($e->getMessage());
                 $select_ai = false;
             }
@@ -604,9 +604,9 @@ function adminPanel() {
                     $select_item = true;
                 }
                 else {
-                    throw new Exception("Error editing item!");
+                    throw new RuntimeException("Error editing item!");
                 }
-            } catch(Exception $e) {
+            } catch(RuntimeException $e) {
                 $system->message($e->getMessage());
             }
             $system->printMessage();
@@ -688,9 +688,9 @@ function adminPanel() {
                     $select_content = true;
                 }
                 else {
-                    throw new Exception("Error editing " . $data['name'] . "! (Or data is the same)");
+                    throw new RuntimeException("Error editing " . $data['name'] . "! (Or data is the same)");
                 }
-            } catch(Exception $e) {
+            } catch(RuntimeException $e) {
                 $system->message($e->getMessage());
                 $editing_bloodline_id = null;
             }
@@ -760,9 +760,9 @@ function adminPanel() {
                     $select_content = true;
                 }
                 else {
-                    throw new Exception("Error editing " . $data['name'] . "! (Or data is the same)");
+                    throw new RuntimeException("Error editing " . $data['name'] . "! (Or data is the same)");
                 }
-            } catch(Exception $e) {
+            } catch(RuntimeException $e) {
                 $system->message($e->getMessage());
                 $select_content = false;
             }
@@ -844,9 +844,9 @@ function adminPanel() {
                     $select_content = true;
                 }
                 else {
-                    throw new Exception("Error editing " . $data['name'] . "! (Or data is the same)");
+                    throw new RuntimeException("Error editing " . $data['name'] . "! (Or data is the same)");
                 }
-            } catch(Exception $e) {
+            } catch(RuntimeException $e) {
                 $system->message($e->getMessage());
                 $select_content = false;
             }
@@ -929,9 +929,9 @@ function adminPanel() {
                     $select_content = true;
                 }
                 else {
-                    throw new Exception("Error editing " . $data['name'] . "! (Or data is the same)");
+                    throw new RuntimeException("Error editing " . $data['name'] . "! (Or data is the same)");
                 }
-            } catch(Exception $e) {
+            } catch(RuntimeException $e) {
                 $system->message($e->getMessage());
                 $select_content = false;
             }
@@ -1014,9 +1014,9 @@ function adminPanel() {
                     $select_content = true;
                 }
                 else {
-                    throw new Exception("Error editing " . $data['name'] . "! (Or data is the same)");
+                    throw new RuntimeException("Error editing " . $data['name'] . "! (Or data is the same)");
                 }
-            } catch(Exception $e) {
+            } catch(RuntimeException $e) {
                 $system->message($e->getMessage());
                 $select_content = false;
             }

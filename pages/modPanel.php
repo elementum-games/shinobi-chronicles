@@ -31,13 +31,13 @@ function modPanel() {
 	if(!empty($_POST['ban'])) {
 		try {
 			if(!isset($_POST['user_name'])) {
-				throw new Exception("Invalid username!");
+				throw new RuntimeException("Invalid username!");
 			}
 			if(!isset($_POST['ban_type'])) {
-				throw new Exception("Invalid ban type!");
+				throw new RuntimeException("Invalid ban type!");
 			}
 			if(!isset($_POST['ban_length'])) {
-				throw new Exception("Invalid ban length!");
+				throw new RuntimeException("Invalid ban length!");
 			}
 			$user_name = $system->db->clean($_POST['user_name']);
 			$ban_type = $system->db->clean($_POST['ban_type']);
@@ -45,16 +45,16 @@ function modPanel() {
 
             //Check ban type
 			if(array_search($ban_type, StaffManager::$ban_menu_items) === false) {
-				throw new Exception("Invalid ban type!");
+				throw new RuntimeException("Invalid ban type!");
 			}
             //Check ban length
             if(!isset($ban_lengths[$ban_length])) {
-                throw new Exception("Invalid ban length!");
+                throw new RuntimeException("Invalid ban length!");
             }
 
             $user_data = $player->staff_manager->getUserByName($user_name);
 			if($user_data == false) {
-				throw new Exception("Invalid username!");
+				throw new RuntimeException("Invalid username!");
 			}
 
             $player->staff_manager->canBanUser($ban_type, $ban_length, $user_data);
@@ -86,7 +86,7 @@ function modPanel() {
 
             $user_data = $player->staff_manager->getUserByName($user_name);
             if(!$user_data) {
-                throw new Exception("Invalid user!");
+                throw new RuntimeException("Invalid user!");
             }
 
             if(isset($_POST['avatar'])) {
@@ -111,7 +111,7 @@ function modPanel() {
             }
 
             if(!$avatar_ban && !$avatar_remove && !$journal_ban && !$journal_remove) {
-                throw new Exception("Please select an option!");
+                throw new RuntimeException("Please select an option!");
             }
 
             //Check if avatar ban/remove can be performed
@@ -191,7 +191,7 @@ function modPanel() {
                 "SELECT `user_id`, `user_name`, `staff_level` FROM `users` WHERE `user_name`='$user_name' LIMIT 1"
             );
 			if($system->db->last_num_rows == 0) {
-				throw new Exception("Invalid user!");
+				throw new RuntimeException("Invalid user!");
 			}
 
             //Fetch user data
@@ -202,7 +202,7 @@ function modPanel() {
 
             //Check permission to view record
 			if(!$player->staff_manager->canViewRecord($staff_level)) {
-                throw new Exception("You do not have permission to view "
+                throw new RuntimeException("You do not have permission to view "
                 . "{$player->staff_manager->getStaffLevelName($staff_level, 'long')} records!");
             }
 
@@ -216,7 +216,7 @@ function modPanel() {
                     $record_type = StaffManager::RECORD_NOTE;
 
                     if (strlen($data) < StaffManager::RECORD_NOT_MIN_SIZE) {
-                        throw new Exception("Record notes must be at least " . StaffManager::RECORD_NOT_MIN_SIZE . " characters long.");
+                        throw new RuntimeException("Record notes must be at least " . StaffManager::RECORD_NOT_MIN_SIZE . " characters long.");
                     }
 
                     $player->staff_manager->addRecord($user_id, $user_name, $record_type, $data);
@@ -233,7 +233,7 @@ function modPanel() {
                     $user_id = (int)$_POST['user_id'];
 
                     if(!$player->staff_manager->isHeadModerator()) {
-                        throw new Exception("You do not have permission to delete record notes!");
+                        throw new RuntimeException("You do not have permission to delete record notes!");
                     }
 
                     if ($player->staff_manager->manageRecord($record_id, $user_id, $user_name)) {
@@ -251,7 +251,7 @@ function modPanel() {
                     $user_id = (int)$_POST['user_id'];
 
                     if(!$player->staff_manager->isUserAdmin()) {
-                        throw new Exception("You do not have permission to recover record notes!");
+                        throw new RuntimeException("You do not have permission to recover record notes!");
                     }
 
                     if ($player->staff_manager->manageRecord($record_id, $user_id, $user_name, false)) {
@@ -316,20 +316,20 @@ function modPanel() {
             $user_data = $player->staff_manager->getUserByName($user_name);
 
             if(!$user_data) {
-                throw new Exception("Invalid user!");
+                throw new RuntimeException("Invalid user!");
             }
 
             if(isset($_POST['send_official_warning'])) {
                 $content = $system->db->clean(trim($_POST['content']));
                 //Official warnings follow same rules as banning
                 if(!$player->staff_manager->canIssueOW($user_data['staff_level'])) {
-                    throw new Exception("You do not have permission to send warnings to this user!");
+                    throw new RuntimeException("You do not have permission to send warnings to this user!");
                 }
                 if(strlen($content) < StaffManager::OW_MIN) {
-                    throw new Exception("Warning must be at least " . StaffManager::OW_MIN . " characters long.");
+                    throw new RuntimeException("Warning must be at least " . StaffManager::OW_MIN . " characters long.");
                 }
                 if(strlen($content) > StaffManager::OW_MAX) {
-                    throw new Exception("Warning may not exceed " . StaffManager::OW_MAX . " characters long.");
+                    throw new RuntimeException("Warning may not exceed " . StaffManager::OW_MAX . " characters long.");
                 }
 
                 //Send Official Warning
@@ -370,7 +370,7 @@ function modPanel() {
 			try {
 				$ip_address = $system->db->clean($_POST['ip_address']);
 				if($player->staff_manager->getBannedIP($ip_address)) {
-					throw new Exception("IP address has already been banned!");
+					throw new RuntimeException("IP address has already been banned!");
 				}
 				$system->db->query("INSERT INTO `banned_ips` (`ip_address`, `ban_level`) VALUES ('$ip_address', 2)");
 				if($system->db->last_affected_rows == 1) {
@@ -394,21 +394,21 @@ function modPanel() {
 
                 //Check if user exists
                 if(!isset($_POST['user_name'])) {
-                    throw new Exception("Invalid username!");
+                    throw new RuntimeException("Invalid username!");
                 }
 				if(!$user_data) {
-					throw new Exception("Invalid username!");
+					throw new RuntimeException("Invalid username!");
 				}
                 //Check if unban can be performed by user
                 $player->staff_manager->canUnbanUser($user_data);
                 //Check if ban exists
                 $ban_data = json_decode($user_data['ban_data'], true);
                 if(empty($ban_data) || !isset($ban_data[$unban_type])) {
-                    throw new Exception("$user_name does not currently have a " . ucwords($unban_type) . " Ban!");
+                    throw new RuntimeException("$user_name does not currently have a " . ucwords($unban_type) . " Ban!");
                 }
                 //Check if unban data is correct
                 if(!in_array($unban_type, StaffManager::$ban_menu_items)) {
-                    throw new Exception("Invalid ban type!");
+                    throw new RuntimeException("Invalid ban type!");
                 }
 
 				// Run query if confirmed
@@ -432,7 +432,7 @@ function modPanel() {
 			try {
 				$ip_address = $system->db->clean($_POST['ip_address']);
 				if(!$player->staff_manager->getBannedIP($ip_address)) {
-					throw new Exception("IP address is not banned!");
+					throw new RuntimeException("IP address is not banned!");
 				}
 				$system->db->query("DELETE FROM `banned_ips` WHERE `ip_address`='$ip_address' LIMIT 1");
 				if($system->db->last_affected_rows == 1) {
@@ -463,13 +463,13 @@ function modPanel() {
 
                 //Check if unban set
                 if(empty($to_unban)) {
-                    throw new Exception("Select an option to unban!");
+                    throw new RuntimeException("Select an option to unban!");
                 }
                 // Check username
 				$user_name = $system->db->clean($_POST['user_name']);
                 $user_data = $player->staff_manager->getUserByName($user_name);
 				if(!$user_data) {
-					throw new Exception("Invalid username!");
+					throw new RuntimeException("Invalid username!");
 				}
                 $player->staff_manager->canUnbanUser($user_data);
 
@@ -508,10 +508,10 @@ function modPanel() {
 			$message = $system->db->clean($_POST['global_message']);
 			try {
 				if(strlen($message) < 5) {
-					throw new Exception("Please enter a message!");
+					throw new RuntimeException("Please enter a message!");
 				}
 				if(strlen($message) > 1000) {
-					throw new Exception("Message is too long! (" . strlen($message) . "/1000 chars)");
+					throw new RuntimeException("Message is too long! (" . strlen($message) . "/1000 chars)");
 				}
 				$system->db->query("UPDATE `system_storage` SET `global_message`='$message', `time`='".time()."'");
 				$system->db->query("UPDATE `users` SET `global_message_viewed`=0");
@@ -562,10 +562,10 @@ function modPanel() {
                 $action = $_GET['action'];
                 $user_id = (int)($_GET['user_id']);
                 if(!in_array($action, StaffManager::$multi_statuses)) {
-                    throw new Exception("Invalid status: $action!");
+                    throw new RuntimeException("Invalid status: $action!");
                 }
                 if(!$player->staff_manager->getUserByID($user_id)) {
-                    throw new Exception("UID: $user_id not found!");
+                    throw new RuntimeException("UID: $user_id not found!");
                 }
 
                 if($player->staff_manager->manageMulti($user_id, $action)) {

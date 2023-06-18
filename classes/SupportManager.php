@@ -403,7 +403,7 @@ class SupportManager {
         $support_data = $this->fetchSupportByID($support_id);
 
         if(!$support_data) {
-            throw new Exception("Invalid support!");
+            throw new RuntimeException("Invalid support!");
         }
 
         // Notify user of update
@@ -478,14 +478,14 @@ class SupportManager {
 
         // Support not found
         if(!$support) {
-            throw new Exception("Invalid support data!");
+            throw new RuntimeException("Invalid support data!");
         }
         // Support does not belong to user and user is not staff
         if($support['user_id'] != $this->user_id && !$this->staff) {
-            throw new Exception("Not authorized to view this support!");
+            throw new RuntimeException("Not authorized to view this support!");
         }
         if(!$support['open'] && !$inactive) {
-            throw new Exception("Support already closed!");
+            throw new RuntimeException("Support already closed!");
         }
 
         $this->system->db->query("UPDATE `support_request` SET `open`=0 WHERE `support_id`={$support_id} LIMIT 1");
@@ -506,11 +506,11 @@ class SupportManager {
 
         // Support not found
         if(!$support) {
-            throw new Exception("Invalid support data!");
+            throw new RuntimeException("Invalid support data!");
         }
         // Support does not belong to user and user is not staff
         if($support['user_id'] != $this->user_id && !$this->staff) {
-            throw new Exception("Not authorized to view this support!");
+            throw new RuntimeException("Not authorized to view this support!");
         }
 
         $this->system->db->query("UPDATE `support_request` SET `open`=1 WHERE `support_id`={$support_id} LIMIT 1");
@@ -561,12 +561,12 @@ class SupportManager {
 
         // User must be set
         if(!$this->user) {
-            throw new Exception("No user to assign to!");
+            throw new RuntimeException("No user to assign to!");
         }
         // Request not found or already assigned
         if(!$data || $data['user_id'] != 0) {
             var_dump($data);
-            throw new Exception("User already assigned!");
+            throw new RuntimeException("User already assigned!");
         }
 
         $this->system->db->query(

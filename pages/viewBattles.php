@@ -24,13 +24,13 @@ function viewBattles() {
             }
 
             if(!in_array($battleManager->getBattleType(), $battle_types)) {
-                throw new Exception("Invalid battle type!");
+                throw new RuntimeException("Invalid battle type!");
             }
 
             $battleManager->renderBattle();
 
             return true;
-        } catch(Exception $e) {
+        } catch(RuntimeException $e) {
             $system->message($e->getMessage());
             $system->printMessage();
         }

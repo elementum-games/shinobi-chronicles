@@ -21,7 +21,7 @@ abstract class AttackTarget {
             return new AttackDirectionTarget($target_data['direction']);
         }
         else {
-            throw new Exception("Invalid AttackTarget db data!");
+            throw new RuntimeException("Invalid AttackTarget db data!");
         }
     }
 }
@@ -79,7 +79,7 @@ class AttackDirectionTarget extends AttackTarget {
                 $this->direction = $direction;
                 break;
             default:
-                throw new Exception("Invalid direction!");
+                throw new RuntimeException("Invalid direction!");
         }
     }
 

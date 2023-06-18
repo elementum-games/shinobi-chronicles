@@ -8,7 +8,7 @@ $system = API::init();
 try {
     $player = Auth::getUserFromSession($system);
     $player->loadData(User::UPDATE_NOTHING);
-} catch(Exception $e) {
+} catch(RuntimeException $e) {
     API::exitWithException($e, system: $system);
 }
 # End standard auth
@@ -18,7 +18,7 @@ try {
     if (isset($_POST['request'])) {
         $request = filter_input(INPUT_POST, 'request', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
     } else {
-        throw new Exception('No request was made!');
+        throw new RuntimeException('No request was made!');
     }
 
     $TravelAPIResponse = new TravelAPIResponse();

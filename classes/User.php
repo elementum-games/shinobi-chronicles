@@ -276,7 +276,7 @@ class User extends Fighter {
     public function __construct(System $system, int $user_id) {
         $this->system =& $system;
         if(!$user_id) {
-            throw new Exception("Invalid user id!");
+            throw new RuntimeException("Invalid user id!");
         }
 
         $this->user_id = $user_id;
@@ -319,7 +319,7 @@ class User extends Fighter {
                 FROM `users` WHERE `user_id`='$user_id' LIMIT 1 FOR UPDATE"
         );
         if($system->db->last_num_rows == 0) {
-            throw new Exception("User does not exist!");
+            throw new RuntimeException("User does not exist!");
         }
 
         $user_data = $system->db->fetch($result);
@@ -1254,7 +1254,7 @@ class User extends Fighter {
      */
     public function addStatGain(string $stat, int $stat_gain): string {
         if(!in_array($stat, $this->stats)) {
-            throw new Exception("Invalid stat!");
+            throw new RuntimeException("Invalid stat!");
         }
 
         $new_total_stats = $this->total_stats + $stat_gain;
@@ -1424,7 +1424,7 @@ class User extends Fighter {
      */
     public function subtractMoney(int $amount, string $description) {
         if($this->money < $amount) {
-            throw new Exception("Not enough money!");
+            throw new RuntimeException("Not enough money!");
         }
         $this->setMoney($this->money - $amount, $description);
     }
@@ -1461,7 +1461,7 @@ class User extends Fighter {
      */
     public function subtractPremiumCredits(int $amount, string $description) {
         if($this->getPremiumCredits() < $amount) {
-            throw new Exception("Not enough Ancient Kunai!");
+            throw new RuntimeException("Not enough Ancient Kunai!");
         }
         $this->setPremiumCredits($this->premium_credits - $amount, $description);
     }
@@ -1643,7 +1643,7 @@ class User extends Fighter {
      */
     public function updateInventory(): bool {
         if(!$this->inventory_loaded) {
-            throw new Exception("Called update without fetching inventory!");
+            throw new RuntimeException("Called update without fetching inventory!");
         }
 
         $player_jutsu = [];
@@ -1987,7 +1987,7 @@ class User extends Fighter {
         $entity_id = System::parseEntityId($entity_id);
 
         if($entity_id->entity_type != self::ENTITY_TYPE) {
-            throw new Exception("Entity ID is not a User!");
+            throw new RuntimeException("Entity ID is not a User!");
         }
 
         return User::loadFromId($system, $entity_id->id);

@@ -56,14 +56,14 @@ class NPC extends Fighter {
     public function __construct(System $system, int $ai_id) {
         $this->system =& $system;
         if(!$ai_id) {
-            throw new Exception("Invalid NPC opponent!");
+            throw new RuntimeException("Invalid NPC opponent!");
         }
         $this->ai_id = $system->db->clean($ai_id);
         $this->id = self::ID_PREFIX . ':' . $this->ai_id;
 
         $result = $system->db->query("SELECT `ai_id`, `name` FROM `ai_opponents` WHERE `ai_id`='$this->ai_id' LIMIT 1");
         if($system->db->last_num_rows == 0) {
-            throw new Exception("NPC does not exist!");
+            throw new RuntimeException("NPC does not exist!");
         }
 
         $result = $this->system->db->fetch($result);
@@ -140,7 +140,7 @@ class NPC extends Fighter {
                     $jutsu->effect_length = 3;
                     break;
                 default:
-                    throw new Exception("Invalid jutsu type!");
+                    throw new RuntimeException("Invalid jutsu type!");
             }
 
             $this->jutsu[] = $jutsu;
@@ -308,7 +308,7 @@ class NPC extends Fighter {
         $entityId = System::parseEntityId($entity_id_str);
 
         if($entityId->entity_type != self::ID_PREFIX) {
-            throw new Exception("Invalid entity type for NPC class!");
+            throw new RuntimeException("Invalid entity type for NPC class!");
         }
 
         return new NPC($system, $entityId->id);

@@ -23,17 +23,17 @@ function news() {
 
 		try {
 			if(strlen($post) < 5) {
-				throw new Exception("Please enter a post!");
+				throw new RuntimeException("Please enter a post!");
 			}
 			if(strlen($title) < 4) {
-				throw new Exception("Please enter a title!");
+				throw new RuntimeException("Please enter a title!");
 			}
 
 			if(strlen($post) > 2000) {
-				throw new Exception("Post is too long! (" . strlen($post) . "/2000 chars)");
+				throw new RuntimeException("Post is too long! (" . strlen($post) . "/2000 chars)");
 			}
 			if(strlen($title) > 50) {
-				throw new Exception("Title is too long! (" . strlen($title) . "/50 chars)");
+				throw new RuntimeException("Title is too long! (" . strlen($title) . "/50 chars)");
 			}
 
 			$query = "INSERT INTO `news_posts` (`sender`, `title`, `message`, `time`)
@@ -45,7 +45,7 @@ function news() {
 				$page = false;
 			}
 			else {
-				throw new Exception("There was an error posting.");
+				throw new RuntimeException("There was an error posting.");
 			}
 
 		} catch (Exception $e) {
@@ -62,21 +62,21 @@ function news() {
 		try {
 			$result = $system->db->query("SELECT `post_id` FROM `news_posts` WHERE `post_id`='$post_id'");
 			if($system->db->last_num_rows == 0) {
-				throw new Exception("Invalid post!");
+				throw new RuntimeException("Invalid post!");
 			}
 
 			if(strlen($message) < 5) {
-				throw new Exception("Please enter a post!");
+				throw new RuntimeException("Please enter a post!");
 			}
 			if(strlen($title) < 4) {
-				throw new Exception("Please enter a title!");
+				throw new RuntimeException("Please enter a title!");
 			}
 
 			if(strlen($message) > 2000) {
-				throw new Exception("Post is too long! (" . strlen($message) . "/2000 chars)");
+				throw new RuntimeException("Post is too long! (" . strlen($message) . "/2000 chars)");
 			}
 			if(strlen($title) > 50) {
-				throw new Exception("Title is too long! (" . strlen($title) . "/50 chars)");
+				throw new RuntimeException("Title is too long! (" . strlen($title) . "/50 chars)");
 			}
 
 			$query = "UPDATE `news_posts` SET
@@ -90,7 +90,7 @@ function news() {
 				$page = false;
 			}
 			else {
-				throw new Exception("There was an error posting.");
+				throw new RuntimeException("There was an error posting.");
 			}
 
 		} catch (Exception $e) {

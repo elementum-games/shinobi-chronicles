@@ -59,12 +59,12 @@ function store() {
 		try {
 			// Check if item exists
 			if(!isset($shop_items[$item_id])) {
-				throw new Exception("Invalid item!");
+				throw new RuntimeException("Invalid item!");
 			}
 			
 			// check if already owned
 			if($player->hasItem($item_id) && $shop_items[$item_id]->use_type != 3) {
-				throw new Exception("You already own this item!");
+				throw new RuntimeException("You already own this item!");
 			}
 			
 			if (isset($_GET['max'])) { // Code for handling buying bulk
@@ -76,11 +76,11 @@ function store() {
 				}
 
 				if($player->items[$item_id]->quantity >= $max_consumables) {
-					throw new Exception("Your supply of this item is already full!");
+					throw new RuntimeException("Your supply of this item is already full!");
 				}
 
 				if ($player->getMoney() < $shop_items[$item_id]->purchase_cost * $max_missing) {
-					throw new Exception("You do not have enough money to buy the max amount!");
+					throw new RuntimeException("You do not have enough money to buy the max amount!");
 
 				}
 				$player->subtractMoney(
@@ -93,13 +93,13 @@ function store() {
 			} else { //code for handling single purchases
                 // Check for money requirement
                 if($player->getMoney() < $shop_items[$item_id]->purchase_cost) {
-                    throw new Exception("You do not have enough money!");
+                    throw new RuntimeException("You do not have enough money!");
                 }
 
                 // Check for max consumables
                 if($player->hasItem($item_id) && $shop_items[$item_id]->use_type == 3) {
                     if($player->items[$item_id]->quantity >= $max_consumables) {
-                        throw new Exception("Your supply of this item is already full!");
+                        throw new RuntimeException("Your supply of this item is already full!");
                     }
                 }
 
@@ -124,35 +124,35 @@ function store() {
 		try {
 			// Check if jutsu exists
 			if(!isset($shop_jutsu[$jutsu_id])) {
-				throw new Exception("Invalid jutsu!");
+				throw new RuntimeException("Invalid jutsu!");
 			}
 
 			// check if already owned
 			if(isset($player->jutsu_scrolls[$jutsu_id])) {
-				throw new Exception("You already purchased this scroll!");
+				throw new RuntimeException("You already purchased this scroll!");
 			}
 			// check if already learned
 			if($player->hasJutsu($jutsu_id)) {
-				throw new Exception("You have already learned this jutsu!");
+				throw new RuntimeException("You have already learned this jutsu!");
 			}
 			
 			// Check for money requirement
 			if($player->getMoney() < $shop_jutsu[$jutsu_id]['purchase_cost']) {
-				throw new Exception("You do not have enough money!");
+				throw new RuntimeException("You do not have enough money!");
 			}
 			
 			// Parent jutsu check
 			if($shop_jutsu[$jutsu_id]['parent_jutsu']) {
 				$id = $shop_jutsu[$jutsu_id]['parent_jutsu'];
 				if(!isset($player->jutsu[$id])) {
-					throw new Exception("You need to learn " . $shop_jutsu[$id]['name'] . " first!");
+					throw new RuntimeException("You need to learn " . $shop_jutsu[$id]['name'] . " first!");
 				}
 			}	
 			
 			// Element check
 			if($shop_jutsu[$jutsu_id]['element'] != 'None') {
 				if(!$player->elements or !in_array($shop_jutsu[$jutsu_id]['element'], $player->elements)) {
-					throw new Exception("You do not have the elemental chakra for this jutsu!");
+					throw new RuntimeException("You do not have the elemental chakra for this jutsu!");
 				}
 			}
 			

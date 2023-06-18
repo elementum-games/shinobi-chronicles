@@ -98,12 +98,12 @@ class Bloodline {
      */
     public static function loadFromId(System $system, int $bloodline_id, ?int $user_id = null): Bloodline {
         if(!$bloodline_id) {
-            throw new Exception("Invalid bloodline id!");
+            throw new RuntimeException("Invalid bloodline id!");
         }
 
         $result = $system->db->query("SELECT * FROM `bloodlines` WHERE `bloodline_id`='$bloodline_id' LIMIT 1");
         if($system->db->last_num_rows == 0) {
-            throw new Exception("Bloodline does not exist!");
+            throw new RuntimeException("Bloodline does not exist!");
         }
         $bloodline_data = $system->db->fetch($result);
 
@@ -113,7 +113,7 @@ class Bloodline {
         if($user_id) {
             $result = $system->db->query("SELECT * FROM `user_bloodlines` WHERE `user_id`=$user_id LIMIT 1");
             if(mysqli_num_rows($result) == 0) {
-                throw new Exception("Invalid user bloodline data!");
+                throw new RuntimeException("Invalid user bloodline data!");
             }
 
             $user_bloodline = mysqli_fetch_assoc($result);
@@ -294,7 +294,7 @@ class Bloodline {
     public static function giveBloodline(System $system, int $bloodline_id, int $user_id, bool $display = true): bool {
         $result = $system->db->query("SELECT * FROM `bloodlines` WHERE `bloodline_id` = '$bloodline_id' LIMIT 1");
         if($system->db->last_num_rows == 0) {
-            throw new Exception("Invalid bloodline!");
+            throw new RuntimeException("Invalid bloodline!");
         }
         $bloodline = $system->db->fetch($result);
 
@@ -431,7 +431,7 @@ class Bloodline {
             }
         }
         else {
-            throw new Exception("Error giving bloodline! (Or user already has this BL)");
+            throw new RuntimeException("Error giving bloodline! (Or user already has this BL)");
         }
 
         if($display) {

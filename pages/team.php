@@ -16,13 +16,13 @@ function team() {
         try {
             // Name validation
             if($name_len < $min_name_len) {
-                throw new Exception("Please enter a name longer than " . ($min_name_len - 1) . " characters!");
+                throw new RuntimeException("Please enter a name longer than " . ($min_name_len - 1) . " characters!");
             }
             if($name_len > $max_name_len) {
-                throw new Exception("Please enter a name shorter than " . ($max_name_len + 1) . " characters!");
+                throw new RuntimeException("Please enter a name shorter than " . ($max_name_len + 1) . " characters!");
             }
             if(!preg_match('/^[a-zA-Z0-9 _-]+$/', $name)) {
-                throw new Exception("Only alphanumeric characters, dashes, space, and underscores are allowed in names!");
+                throw new RuntimeException("Only alphanumeric characters, dashes, space, and underscores are allowed in names!");
             }
 
             //Check for at least 3 letters
@@ -37,18 +37,18 @@ function team() {
                 }
             }
             if($symbol_count >= $letter_count) {
-                throw new Exception("Name must be more than half letters!");
+                throw new RuntimeException("Name must be more than half letters!");
             }
 
             //Explicit language
             if($system->explicitLanguageCheck($name)) {
-                throw new Exception("Inappropriate language is not allowed in team names!");
+                throw new RuntimeException("Inappropriate language is not allowed in team names!");
             }
 
             //Check if team exists
             $system->db->query("SELECT `team_id` FROM `teams` WHERE `name`='$name' LIMIT 1");
             if($system->db->last_num_rows > 0) {
-                throw new Exception("Team name already in use!");
+                throw new RuntimeException("Team name already in use!");
             }
 
             //Create team
@@ -77,7 +77,7 @@ function team() {
             $team_id = $player->team_invite;
             $team = Team::findById($system, $team_id);
             if($team == null) {
-                throw new Exception("Invalid team!");
+                throw new RuntimeException("Invalid team!");
             }
 
             $team->addMember($player);
@@ -111,7 +111,7 @@ function team() {
 
             //Leader must transfer leadership before leaving
             if($player->user_id == $player->team->leader && $count > 1) {
-                throw new Exception("You must first transfer leadership!");
+                throw new RuntimeException("You must first transfer leadership!");
             }
 
             if(!isset($_GET['leave_confirm'])) {
@@ -229,17 +229,17 @@ function team() {
                     $team = $player->team;
 
                     if($new_leader == $team->leader || $new_leader == 0) {
-                        throw new Exception("You must select a new leader!");
+                        throw new RuntimeException("You must select a new leader!");
                     }
                     if(!in_array($new_leader, $team->members)) {
-                        throw new Exception("Invalid replacement!");
+                        throw new RuntimeException("Invalid replacement!");
                     }
 
                     $result = $system->db->query(
                         "SELECT `user_name` FROM `users` WHERE `user_id`='{$new_leader}' LIMIT 1"
                     );
                     if(!$system->db->last_num_rows) {
-                        throw new Exception("Invalid leader!");
+                        throw new RuntimeException("Invalid leader!");
                     }
                     $new_leader_name = $system->db->fetch($result)['user_name'];
 
@@ -270,10 +270,10 @@ function team() {
                     $allowed_boosts = Team::$allowed_boosts;
 
                     if(!isset($allowed_boosts[$boost_type])) {
-                        throw new Exception("Invalid boost!");
+                        throw new RuntimeException("Invalid boost!");
                     }
                     if(!isset($allowed_boosts[$boost_type][$boost_size])) {
-                        throw new Exception("Invalid boost length!");
+                        throw new RuntimeException("Invalid boost length!");
                     }
 
                     $player->team->setBoost($boost_type, $boost_size);
@@ -290,19 +290,19 @@ function team() {
                     );
 
                     if($system->db->last_num_rows == 0) {
-                        throw new Exception("Invalid user!");
+                        throw new RuntimeException("Invalid user!");
                     }
 
                     $user_data = $system->db->fetch($result);
 
                     if($user_data['rank'] < Team::MIN_RANK) {
-                        throw new Exception("Team members must be a " . $RANK_NAMES[Team::MIN_RANK] . " or higher!");
+                        throw new RuntimeException("Team members must be a " . $RANK_NAMES[Team::MIN_RANK] . " or higher!");
                     }
                     if($user_data['village'] != $player->village->name) {
-                        throw new Exception("You can only invite members from your village! ");
+                        throw new RuntimeException("You can only invite members from your village! ");
                     }
                     if(!empty($user_data['team_id'])) {
-                        throw new Exception("Player is already in a team or is invited to one!");
+                        throw new RuntimeException("Player is already in a team or is invited to one!");
                     }
 
                     $system->db->query(
@@ -337,14 +337,14 @@ function team() {
                     }
 
                     if($kick_key === false) {
-                        throw new Exception("Invalid user key!");
+                        throw new RuntimeException("Invalid user key!");
                     }
 
                     $result = $system->db->query(
                         "SELECT `user_id`, `user_name` FROM `users` WHERE `user_id`='{$user_to_kick}' LIMIT 1"
                     );
                     if($system->db->last_num_rows == 0) {
-                        throw new Exception("Invalid user!");
+                        throw new RuntimeException("Invalid user!");
                     }
                     $user_name = $system->db->fetch($result)['user_name'];
 
@@ -399,13 +399,13 @@ function team() {
                     );
 
                     if($system->db->last_num_rows == 0) {
-                        throw new Exception("Invalid mission!");
+                        throw new RuntimeException("Invalid mission!");
                     }
                     if($player->team->mission_id) {
-                        throw new Exception("Team is already on a mission!");
+                        throw new RuntimeException("Team is already on a mission!");
                     }
                     if($player->mission_id) {
-                        throw new Exception("You are already on a mission!");
+                        throw new RuntimeException("You are already on a mission!");
                     }
 
                     $player->team->mission_id = $mission_id;
@@ -457,7 +457,7 @@ function team() {
                     $mission_id = $player->team->mission_id;
 
                     if($mission_id == 0) {
-                        throw new Exception("Your team is not performing a mission!");
+                        throw new RuntimeException("Your team is not performing a mission!");
                     }
 
                     if(!isset($_GET['confirm'])) {

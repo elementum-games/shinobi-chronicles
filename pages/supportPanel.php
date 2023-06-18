@@ -83,27 +83,27 @@ function supportPanel() {
 
                 // Support not found
                 if (!$supportData) {
-                    throw new Exception("Support not found!");
+                    throw new RuntimeException("Support not found!");
                 }
                 // Support closed
                 if (!$supportData['open']) {
-                    throw new Exception("Support is closed!");
+                    throw new RuntimeException("Support is closed!");
                 }
                 // Message validation
                 if ($message == '') {
-                    throw new Exception("You must enter a reply!");
+                    throw new RuntimeException("You must enter a reply!");
                 }
                 if (strlen($message) < SupportManager::$validationConstraints['message']['min']) {
-                    throw new Exception("Response must be at least "
+                    throw new RuntimeException("Response must be at least "
                         . SupportManager::$validationConstraints['message']['min'] . " characters long.");
                 }
                 if (strlen($message) > SupportManager::$validationConstraints['message']['max']) {
-                    throw new Exception("Response cannot exceed "
+                    throw new RuntimeException("Response cannot exceed "
                         . SupportManager::$validationConstraints['message']['max'] . " characters long.");
                 }
                 // No valid permission
                 if(!$supportManager->canProcess($supportData['support_type'])) {
-                    throw new Exception("You do not have permission to process this support type!");
+                    throw new RuntimeException("You do not have permission to process this support type!");
                 }
 
                 if($supportManager->addSupportResponse($support_id, $player->user_name, $message)) {
@@ -120,17 +120,17 @@ function supportPanel() {
 
                 // Not found
                 if(!$supportData) {
-                    throw new Exception("Support not found!");
+                    throw new RuntimeException("Support not found!");
                 }
                 // No valid permission
                 if(!$supportManager->canProcess($supportData['support_type'])) {
-                    throw new Exception("You do not have permission to process this support type!");
+                    throw new RuntimeException("You do not have permission to process this support type!");
                 }
 
                 if ($supportManager->closeSupport($support_id)) {
                     $system->message("Support closed!");
                 } else {
-                    throw new Exception("Error closing support!");
+                    throw new RuntimeException("Error closing support!");
                 }
 
                 if ($message != '') {
@@ -147,18 +147,18 @@ function supportPanel() {
 
                 // Not found
                 if(!$supportData) {
-                    throw new Exception("Support not found!");
+                    throw new RuntimeException("Support not found!");
                 }
                 // No valid permission
                 if(!$supportManager->canProcess($supportData['support_type'])) {
-                    throw new Exception("You do not have permission to process this support type!");
+                    throw new RuntimeException("You do not have permission to process this support type!");
                 }
 
                 // Open support
                 if ($supportManager->openSupport($support_id)) {
                     $system->message("Support opened!");
                 } else {
-                    throw new Exception("Error opening support!");
+                    throw new RuntimeException("Error opening support!");
                 }
 
                 // Add message if supplied

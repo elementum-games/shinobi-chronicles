@@ -49,7 +49,7 @@ function jutsu(): void {
                 }
 
                 if(!in_array($jutsu_array[0], $jutsu_types)) {
-                    throw new Exception("Invalid jutsu type!");
+                    throw new RuntimeException("Invalid jutsu type!");
                 }
                 if($player->hasJutsu($jutsu_array[1])) {
                     $equipped_jutsu[$count]['id'] = $system->db->clean($jutsu_array[1]);
@@ -61,7 +61,7 @@ function jutsu(): void {
             $player->equipped_jutsu = $equipped_jutsu;
             $system->message("Jutsu equipped!");
         }
-        catch(Exception $e) {
+        catch(RuntimeException $e) {
             $system->message($e->getMessage());
         }
     }
@@ -70,21 +70,21 @@ function jutsu(): void {
         $jutsu_id = (int)$_GET['learn_jutsu'];
         try {
             if(!isset($player->jutsu_scrolls[$jutsu_id])) {
-                throw new Exception("Invalid jutsu!");
+                throw new RuntimeException("Invalid jutsu!");
             }
             if($player->hasJutsu($jutsu_id)) {
-                throw new Exception("You already know that jutsu!");
+                throw new RuntimeException("You already know that jutsu!");
             }
 
             // Parent jutsu check
             if($player->jutsu_scrolls[$jutsu_id]->parent_jutsu) {
                 $id = $player->jutsu_scrolls[$jutsu_id]->parent_jutsu;
                 if(!isset($player->jutsu[$id])) {
-                    throw new Exception("You need to learn " . $player->jutsu[$id]->name . " first!");
+                    throw new RuntimeException("You need to learn " . $player->jutsu[$id]->name . " first!");
                 }
 
                 if($player->jutsu[$id]->level < 50) {
-                    throw new Exception(
+                    throw new RuntimeException(
                         "You are not skilled enough with " . $player->jutsu[$id]->name .
                         "! (Level " . $player->jutsu[$id]->level . "/50)"
                     );
@@ -110,7 +110,7 @@ function jutsu(): void {
             unset($player->jutsu_scrolls[$jutsu_id]);
             $system->message("You have learned $jutsu_name!");
         }
-        catch(Exception $e) {
+        catch(RuntimeException $e) {
             $system->message($e->getMessage());
         }
     }
@@ -119,13 +119,13 @@ function jutsu(): void {
         try {
             //Checking if player knows the jutsu he's trying to forget.
             if(!$player->hasJutsu($jutsu_id)) {
-                throw new Exception("Invalid Jutsu!");
+                throw new RuntimeException("Invalid Jutsu!");
             }
 
             //Checking if player has jutsu that depend on the jutsu he's trying to forget.
             $can_forget = userHasChildrenJutsu($jutsu_id, $player);
             if(!$can_forget){
-                throw new Exception("You cannot forget the parent of a jutsu you know!");
+                throw new RuntimeException("You cannot forget the parent of a jutsu you know!");
             }
 
             if(!empty($_POST['confirm_forget'])) {
@@ -164,7 +164,7 @@ function jutsu(): void {
             }
 
         }
-        catch(Exception $e) {
+        catch(RuntimeException $e) {
             $system->message($e->getMessage());
         }
     }

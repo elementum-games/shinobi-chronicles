@@ -75,7 +75,7 @@ class Router {
     public function getUrl(string $page_name, array $url_params = []): string {
         $id = self::PAGE_IDS[$page_name] ?? null;
         if($id == null) {
-            throw new Exception("Invalid page name!");
+            throw new RuntimeException("Invalid page name!");
         }
 
         $extra_params_str = "";
@@ -108,14 +108,14 @@ class Router {
                     $contents_arr[] = "POST[{$key}]=$val";
                 }
                 $player->log(User::LOG_IN_BATTLE, implode(',', $contents_arr));
-                throw new Exception("You cannot visit this page while in battle!");
+                throw new RuntimeException("You cannot visit this page while in battle!");
             }
         }
 
         //Check for survival mission restricted
         if(isset($route->survival_ok) && $route->survival_ok === false) {
             if(isset($_SESSION['ai_defeated']) && $player->mission_stage['action_type'] == 'combat') {
-                throw new Exception("You cannot move while under attack!");
+                throw new RuntimeException("You cannot move while under attack!");
             }
         }
 
@@ -127,20 +127,20 @@ class Router {
             if($system->db->last_num_rows > 0) {
                 $battle_type = $system->db->fetch($result)['battle_type'];
                 if($battle_type != $route->battle_type) {
-                    throw new Exception("You cannot visit this page while in combat!");
+                    throw new RuntimeException("You cannot visit this page while in combat!");
                 }
             }
         }
 
         if(isset($route->user_check)) {
             if(!($route->user_check instanceof Closure)) {
-                throw new Exception("Invalid user check!");
+                throw new RuntimeException("Invalid user check!");
             }
 
             $page_ok = $route->user_check->call($this, $player);
 
             if(!$page_ok) {
-                throw new Exception("");
+                throw new RuntimeException("");
             }
         }
 
@@ -150,7 +150,7 @@ class Router {
             if($player->rank_num > 2 && $route->village_ok === Route::NOT_IN_VILLAGE
                 && TravelManager::locationIsInVillage($system, $player->location)
             ) {
-                throw new Exception("You cannot access this page while in a village!");
+                throw new RuntimeException("You cannot access this page while in a village!");
             }
 
             if($route->village_ok === Route::ONLY_IN_VILLAGE && !$player->location->equals($player->village_location)) {
@@ -163,12 +163,12 @@ class Router {
                 }
                 $player->log(User::LOG_NOT_IN_VILLAGE, implode(',', $contents_arr));
 
-                throw new Exception("You must be in your village to access this page!");
+                throw new RuntimeException("You must be in your village to access this page!");
             }
         }
         if(isset($route->min_rank)) {
             if($player->rank_num < $route->min_rank) {
-                throw new Exception("You are not a high enough rank to access this page!");
+                throw new RuntimeException("You are not a high enough rank to access this page!");
             }
         }
     }

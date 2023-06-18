@@ -85,11 +85,11 @@ function userProfile() {
             // Update recruitment settings
             $success = SenseiManager::updateStudentRecruitment($player->user_id, $recruitment_message, $system);
             if (!$success) {
-                throw new Exception('Something went wrong!');
+                throw new RuntimeException('Something went wrong!');
             }
             $system->message("Recruitment settings updated!");
         }
-        catch(Exception $e) {
+        catch(RuntimeException $e) {
             $system->message($e->getMessage());
         }
         $system->printMessage();
@@ -102,11 +102,11 @@ function userProfile() {
             // Update student settings
             $success = SenseiManager::updateStudentSettings($player->user_id, $student_message, $specialization, $system);
             if (!$success) {
-                throw new Exception('Something went wrong!');
+                throw new RuntimeException('Something went wrong!');
             }
             $system->message("Student settings updated!");
         }
-        catch(Exception $e) {
+        catch(RuntimeException $e) {
             $system->message($e->getMessage());
         }
         $system->printMessage();
@@ -143,7 +143,7 @@ function userProfile() {
  */
 function sendMoney(System $system, User $player, string $currency_type): void {
     if ($currency_type != System::CURRENCY_TYPE_MONEY && $currency_type != System::CURRENCY_TYPE_PREMIUM_CREDITS) {
-        throw new Exception("Invalid currency type!");
+        throw new RuntimeException("Invalid currency type!");
     }
 
     if(isset($_POST['send_currency'])) {
@@ -152,10 +152,10 @@ function sendMoney(System $system, User $player, string $currency_type): void {
 
         try {
             if(strtolower($recipient) == strtolower($player->user_name)) {
-                throw new Exception("You cannot send money/AK to yourself!");
+                throw new RuntimeException("You cannot send money/AK to yourself!");
             }
             if($amount <= 0 && !$player->isHeadAdmin()) {
-                throw new Exception("Invalid amount!");
+                throw new RuntimeException("Invalid amount!");
             }
 
             $result = $system->db->query(
@@ -164,13 +164,13 @@ function sendMoney(System $system, User $player, string $currency_type): void {
                         WHERE `user_name`='$recipient' LIMIT 1"
             );
             if(!$system->db->last_num_rows) {
-                throw new Exception("Invalid user!");
+                throw new RuntimeException("Invalid user!");
             }
             $recipient = $system->db->fetch($result);
 
             if($currency_type == System::CURRENCY_TYPE_MONEY) {
                 if($amount > $player->getMoney()) {
-                    throw new Exception("You do not have that much money/AK!");
+                    throw new RuntimeException("You do not have that much money/AK!");
                 }
                 $player->subtractMoney($amount, "Sent money to {$recipient['user_name']} (#{$recipient['user_id']})");
 
@@ -200,7 +200,7 @@ function sendMoney(System $system, User $player, string $currency_type): void {
             }
             else if($currency_type == System::CURRENCY_TYPE_PREMIUM_CREDITS) {
                 if($amount > $player->getPremiumCredits()) {
-                    throw new Exception("You do not have that much AK!");
+                    throw new RuntimeException("You do not have that much AK!");
                 }
                 $player->subtractPremiumCredits($amount, "Sent AK to {$recipient['user_name']} (#{$recipient['user_id']})");
 
@@ -228,7 +228,7 @@ function sendMoney(System $system, User $player, string $currency_type): void {
                 $system->message("{$amount} AK sent to {$recipient['user_name']}!");
             }
 
-        } catch(Exception $e) {
+        } catch(RuntimeException $e) {
             $system->message($e->getMessage());
         }
         $system->printMessage();

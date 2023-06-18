@@ -36,7 +36,7 @@ abstract class FighterAction {
             );
         }
         else {
-            throw new Exception("Invalid FighterAction db data!");
+            throw new RuntimeException("Invalid FighterAction db data!");
         }
     }
 }

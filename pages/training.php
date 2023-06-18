@@ -43,7 +43,7 @@ function training() {
 
             // check if pvp is active at the current location
             if ($player->rank_num > 2 && $player->current_location->location_id && !$player->current_location->pvp_allowed) {
-                throw new Exception("You cannot train at this location!");
+                throw new RuntimeException("You cannot train at this location!");
             }
 
 			// track if notification already created
@@ -62,7 +62,7 @@ function training() {
 
 			if(!empty($_POST['skill'])) {
 				if($player->total_stats >= $player->rank->stat_cap) {
-					throw new Exception("You cannot train any more at this rank!");
+					throw new RuntimeException("You cannot train any more at this rank!");
 				}
 				switch($_POST['skill']) {
 					case 'ninjutsu':
@@ -71,17 +71,17 @@ function training() {
 						break;
 					case 'bloodline':
 						if(!$player->bloodline_id) {
-							throw new Exception("Invalid skill type!");
+							throw new RuntimeException("Invalid skill type!");
 						}
 						break;
 					default:
-						throw new Exception("Invalid skill type!");
+						throw new RuntimeException("Invalid skill type!");
 				}
 				$train_type = $_POST['skill'] . '_skill';
 			}
 			else if(!empty($_POST['attributes'])) {
 				if($player->total_stats >= $player->rank->stat_cap) {
-					throw new Exception("You cannot train any more at this rank!");
+					throw new RuntimeException("You cannot train any more at this rank!");
 				}
 				switch($_POST['attributes']) {
 					case 'cast_speed':
@@ -90,17 +90,17 @@ function training() {
 					case 'willpower':
 						break;
 					default:
-						throw new Exception("Invalid attributes!");
+						throw new RuntimeException("Invalid attributes!");
 				}
 				$train_type = $_POST['attributes'];
 			}
 			else if(!empty($_POST['jutsu'])) {
 				$jutsu_id = (int)$_POST['jutsu'];
 				if(!$player->hasJutsu($jutsu_id)) {
-					throw new Exception("Invalid jutsu!");
+					throw new RuntimeException("Invalid jutsu!");
 				}
 				if($player->jutsu[$jutsu_id]->level >= 100) {
-					throw new Exception("You cannot train this jutsu any further!");
+					throw new RuntimeException("You cannot train this jutsu any further!");
 				}
 				$train_type = 'jutsu:' . System::slug($player->jutsu[$jutsu_id]->name);
 				$train_type = $system->db->clean($train_type);
@@ -123,7 +123,7 @@ function training() {
                 }
 			}
 			else {
-				throw new Exception("Invalid training type!");
+				throw new RuntimeException("Invalid training type!");
 			}
 
             // Check for clan training boost

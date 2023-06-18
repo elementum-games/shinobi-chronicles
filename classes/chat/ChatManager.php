@@ -232,18 +232,18 @@ class ChatManager {
             if($this->system->db->last_num_rows) {
                 $post = $this->system->db->fetch($result);
                 if($post['message'] == $message) {
-                    throw new Exception("You cannot post the same message twice in a row!");
+                    throw new RuntimeException("You cannot post the same message twice in a row!");
                 }
             }
             if($message_length < 3) {
-                throw new Exception("Message is too short!");
+                throw new RuntimeException("Message is too short!");
             }
             if($message_length > $chat_max_post_length) {
-                throw new Exception("Message is too long!");
+                throw new RuntimeException("Message is too long!");
             }
             //Failsafe, prevent posting if ban
             if($this->player->checkBan(StaffManager::BAN_TYPE_CHAT)) {
-                throw new Exception("You are currently banned from the chat!");
+                throw new RuntimeException("You are currently banned from the chat!");
             }
 
             $title = $this->player->rank->name;
@@ -291,7 +291,7 @@ class ChatManager {
                             "SELECT `user_id` FROM `users` WHERE `user_name`='{$quote[0]->user_name}' LIMIT 1"
                         );
 			            if($this->system->db->last_num_rows == 0) {
-				            throw new Exception("User does not exist!");
+				            throw new RuntimeException("User does not exist!");
 			            }
 			            $result = $this->system->db->fetch($result);
                         require_once __DIR__ . '/../notification/NotificationManager.php';
@@ -334,7 +334,7 @@ class ChatManager {
                         "SELECT `user_id` FROM `users` WHERE `user_name`='{$mentioned_user}' LIMIT 1"
                     );
                     if ($this->system->db->last_num_rows == 0) {
-                        throw new Exception("User does not exist!");
+                        throw new RuntimeException("User does not exist!");
                     }
                     $result = $this->system->db->fetch($result);
                     require_once __DIR__ . '/../notification/NotificationManager.php';
@@ -350,7 +350,7 @@ class ChatManager {
                 }
             }
 
-        } catch(Exception $e) {
+        } catch(RuntimeException $e) {
             $this->system->message($e->getMessage());
         }
 
@@ -367,7 +367,7 @@ class ChatManager {
         $this->system->db->query("DELETE FROM `chat` WHERE `post_id` = $post_id LIMIT 1");
 
         if($this->system->db->last_affected_rows == 0) {
-            throw new Exception("Error deleting post!");
+            throw new RuntimeException("Error deleting post!");
         }
 
         return ChatAPIPresenter::deletePostResponse(

@@ -111,7 +111,7 @@ function battleHistory() {
                 }
             }
             else {
-                throw new Exception("Invalid battle!");
+                throw new RuntimeException("Invalid battle!");
             }
         }
         catch (Exception $e) {

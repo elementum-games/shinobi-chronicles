@@ -206,10 +206,10 @@ if(isset($_POST['run_simulation']) && $mode == 'vs') {
     ];
     try {
         if(!in_array($player1_data['jutsu_type'], $valid_jutsu_types)) {
-            throw new Exception("Invalid jutsu type for player 1!");
+            throw new RuntimeException("Invalid jutsu type for player 1!");
         }
         if(!in_array($player2_data['jutsu_type'], $valid_jutsu_types)) {
-            throw new Exception("Invalid jutsu type for player 2!");
+            throw new RuntimeException("Invalid jutsu type for player 2!");
         }
 
         $player1 = fighterFromData($player1_data, "Player 1");

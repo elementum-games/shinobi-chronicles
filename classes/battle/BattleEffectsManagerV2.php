@@ -277,7 +277,7 @@ class BattleEffectsManagerV2 {
                     $effect_target =& $player2;
                 }
                 else {
-                    throw new Exception("Invalid effect target {$effect->target}");
+                    throw new RuntimeException("Invalid effect target {$effect->target}");
                 }
 
                 if($effect->user == $player1->combat_id) {
@@ -287,7 +287,7 @@ class BattleEffectsManagerV2 {
                     $effect_user =& $player2;
                 }
                 else {
-                    throw new Exception("Invalid effect user {$effect->user}");
+                    throw new RuntimeException("Invalid effect user {$effect->user}");
                 }
 
                 $this->applyActiveEffect(
@@ -578,7 +578,7 @@ class BattleEffectsManagerV2 {
         $parent_jutsu = $fighter->jutsu[$fighter_jutsu->parent_jutsu];
         if(!isset($this->active_genjutsu[$parent_genjutsu_id]) or
             $this->active_genjutsu[$parent_genjutsu_id]['turns'] == $parent_jutsu->effect_length) {
-            throw new Exception($parent_jutsu->name .
+            throw new RuntimeException($parent_jutsu->name .
                 ' must be active for 1 turn before using this jutsu!'
             );
         }

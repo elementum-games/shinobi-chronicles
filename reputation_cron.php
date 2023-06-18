@@ -21,7 +21,7 @@ $system = new System();
 $system->db->connect();
 
 if(!$system->db->con) {
-    throw new Exception("Error connecting to DB!");
+    throw new RuntimeException("Error connecting to DB!");
 }
 
 $player = false;

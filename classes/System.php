@@ -477,7 +477,7 @@ class System {
            case 'money':
                break;
            default:
-               throw new Exception("Invalid currency type!");
+               throw new RuntimeException("Invalid currency type!");
        }
 
         $this->db->query(
@@ -562,7 +562,7 @@ class System {
     public static function parseEntityId(string $entity_id): EntityId {
         $arr = explode(':', $entity_id);
         if(count($arr) != 2) {
-            throw new Exception("Invalid entity id {$entity_id}!");
+            throw new RuntimeException("Invalid entity id {$entity_id}!");
         }
 
         return new EntityId($arr[0], (int)$arr[1]);

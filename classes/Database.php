@@ -3,6 +3,8 @@
 require_once __DIR__ . '/DatabaseDeadlockException.php';
 
 class Database {
+    const MYSQL_DEADLOCK_ERROR_CODE = 1213;
+
     public ?mysqli $con = null;
 
     public bool $ENABLE_ROW_LOCKING = true;
@@ -35,8 +37,8 @@ class Database {
             return $this->con;
         }
 
-        $con = new mysqli($this->host, $this->username, $this->password) or throw new Exception(mysqli_error($this->con));
-        mysqli_select_db($con, $this->database) or throw new Exception(mysqli_error($this->con));
+        $con = new mysqli($this->host, $this->username, $this->password) or throw new RuntimeException(mysqli_error($this->con));
+        mysqli_select_db($con, $this->database) or throw new RuntimeException(mysqli_error($this->con));
 
         $this->con = $con;
         return $con;
@@ -115,19 +117,18 @@ class Database {
     }
 
     /**
-     * @throws DatabaseDeadlockException
-     * @throws Exception
+     * @throws DatabaseDeadlockException|Exception
      */
     protected function handleQueryError() {
         $error_code = mysqli_errno($this->con);
-        if($error_code == 1213) {
+        if($error_code == self::MYSQL_DEADLOCK_ERROR_CODE) {
             throw new DatabaseDeadlockException();
         }
 
         $error_message = mysqli_error($this->con);
         error_log($error_message . ' in ' . System::simpleStackTrace());
 
-        throw new Exception($error_message);
+        throw new RuntimeException($error_message);
     }
 
     /* function fetch(result set, return_type)

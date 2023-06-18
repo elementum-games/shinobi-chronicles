@@ -8,7 +8,7 @@ $system = API::init();
 try {
     $player = Auth::getUserFromSession($system);
     $player->loadData(User::UPDATE_NOTHING);
-} catch(Exception $e) {
+} catch(RuntimeException $e) {
     API::exitWithException($e, system: $system);
 }
 # End standard auth
@@ -56,7 +56,7 @@ if($system->db->last_num_rows) {
                 $response = rankupFightAPI($system, $player);
                 break;
             default:
-                throw new Exception("Invalid battle route!");
+                throw new RuntimeException("Invalid battle route!");
         }
 
         if(!($response instanceof BattlePageAPIResponse)) {

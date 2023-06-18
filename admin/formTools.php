@@ -80,7 +80,7 @@ function validateFormData($entity_constraints, &$data, $content_id = null, $FORM
                         $variable['num_required'] = $variable['count'];
                     }
                     if($count < $variable['num_required']) {
-                        throw new Exception("Invalid $var_name! (needs at least " . $variable['num_required'] . ")");
+                        throw new RuntimeException("Invalid $var_name! (needs at least " . $variable['num_required'] . ")");
                     }
                     $data[$var_name] = json_encode($data_array);
                 }
@@ -98,7 +98,7 @@ function validateFormData($entity_constraints, &$data, $content_id = null, $FORM
             }
         }
         else {
-            throw new Exception("Invalid " . System::unSlug($var_name) . "!");
+            throw new RuntimeException("Invalid " . System::unSlug($var_name) . "!");
         }
     }
 }
@@ -132,41 +132,41 @@ function validateField($var_name, $input, $FORM_DATA, $field_constraints, &$all_
 
     // Check for entry
     if(strlen($data[$var_name]) < 1) {
-        throw new Exception("Please enter " . System::unSlug($var_name) . "!");
+        throw new RuntimeException("Please enter " . System::unSlug($var_name) . "!");
     }
     // Check numeric variables
     if($field_constraints['data_type'] != 'string') {
         if(!is_numeric($data[$var_name])) {
-            throw new Exception("Invalid " . System::unSlug($var_name) . "!");
+            throw new RuntimeException("Invalid " . System::unSlug($var_name) . "!");
         }
     }
     // Check variable matches restricted possibles list, if any
     if(!empty($field_constraints['options'])) {
         if($field_constraints['data_type'] == 'string') {
             if(array_search($data[$var_name], $field_constraints['options']) === false && $var_name != 'elements') {
-                throw new Exception("Invalid " . System::unSlug($var_name) . "!");
+                throw new RuntimeException("Invalid " . System::unSlug($var_name) . "!");
             }
         }
         else {
             if(!isset($field_constraints['options'][$data[$var_name]])) {
-                throw new Exception("Invalid " . System::unSlug($var_name) . "!");
+                throw new RuntimeException("Invalid " . System::unSlug($var_name) . "!");
             }
         }
     }
     // Check number min/max
     if(in_array($field_constraints['data_type'], ['int', 'float'])) {
         if(isset($field_constraints['min']) && $data[$var_name] < $field_constraints['min']) {
-            throw new Exception(System::unSlug($var_name) . " cannot be lower than {$field_constraints['min']}!");
+            throw new RuntimeException(System::unSlug($var_name) . " cannot be lower than {$field_constraints['min']}!");
         }
         if(isset($field_constraints['max']) && $data[$var_name] > $field_constraints['max']) {
-            throw new Exception(System::unSlug($var_name) . " cannot be higher than {$field_constraints['max']}!");
+            throw new RuntimeException(System::unSlug($var_name) . " cannot be higher than {$field_constraints['max']}!");
         }
     }
 
     // Check max length
     if(isset($field_constraints['max_length'])) {
         if(strlen($data[$var_name]) > $field_constraints['max_length']) {
-            throw new Exception(System::unSlug($var_name) .
+            throw new RuntimeException(System::unSlug($var_name) .
                 " is too long! (" . strlen($data[$var_name]) . "/" . $field_constraints['max_length'] . " chars)"
             );
         }
@@ -174,7 +174,7 @@ function validateField($var_name, $input, $FORM_DATA, $field_constraints, &$all_
     // Check pattern
     if(isset($field_constraints['pattern'])) {
         if(!preg_match($field_constraints['pattern'], $data[$var_name])) {
-            throw new Exception("Invalid " . System::unSlug($var_name) . " ({$data[$var_name]})!");
+            throw new RuntimeException("Invalid " . System::unSlug($var_name) . " ({$data[$var_name]})!");
         }
     }
 
@@ -190,7 +190,7 @@ function validateField($var_name, $input, $FORM_DATA, $field_constraints, &$all_
         }
         $result = $system->db->query($query);
         if($system->db->last_num_rows > 0) {
-            throw new Exception("'" . System::unSlug($var_name) . "' needs to be unique, the value '" . $data[$var_name] . "' is already taken!");
+            throw new RuntimeException("'" . System::unSlug($var_name) . "' needs to be unique, the value '" . $data[$var_name] . "' is already taken!");
         }
     }
 

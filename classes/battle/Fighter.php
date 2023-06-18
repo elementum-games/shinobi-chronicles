@@ -248,7 +248,7 @@ abstract class Fighter {
                 $off_nerf = $this->ninjutsu_nerf;
                 break;
             default:
-                throw new Exception("Invalid jutsu type!");
+                throw new RuntimeException("Invalid jutsu type!");
         }
 
         switch($attack->purchase_type) {
@@ -261,7 +261,7 @@ abstract class Fighter {
                     ($off_skill * self::BLOODLINE_OFFENSE_RATIO) + ($this->bloodline_skill * self::BLOODLINE_OFFENSE_RATIO);
                 break;
             default:
-                throw new Exception("Invalid jutsu type!");
+                throw new RuntimeException("Invalid jutsu type!");
         }
         $offense_boost = 0;
 

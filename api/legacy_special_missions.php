@@ -10,7 +10,7 @@ $system = API::init();
 try {
     $player = Auth::getUserFromSession($system);
     $player->loadData();
-} catch(Exception $e) {
+} catch(RuntimeException $e) {
     echo json_encode(['logout' => true]);
     $system->db->rollbackTransaction();
     error_log($e->getMessage());

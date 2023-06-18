@@ -288,7 +288,7 @@ class EffectHitLog {
             case EffectHitLog::TYPE_GENJUTSU_DAMAGE:
                 break;
             default:
-                throw new Exception("Invalid effect tick type! {$this->type}");
+                throw new RuntimeException("Invalid effect tick type! {$this->type}");
         }
     }
 
@@ -316,7 +316,7 @@ class EffectHitLog {
             case Jutsu::TYPE_TAIJUTSU:
                 return EffectHitLog::TYPE_TAIJUTSU_DAMAGE;
             default:
-                throw new Exception("Invalid damage type!");
+                throw new RuntimeException("Invalid damage type!");
         }
 
     }

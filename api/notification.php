@@ -19,7 +19,7 @@ try {
     if (isset($_POST['request'])) {
         $request = filter_input(INPUT_POST, 'request', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
     } else {
-        throw new Exception('No request was made!');
+        throw new RuntimeException('No request was made!');
     }
 
     $NotificationResponse = new NotificationAPIResponse();

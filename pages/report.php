@@ -37,7 +37,7 @@ function report() {
                         "SELECT `user_name`, `staff_level` FROM `users` WHERE `user_id`='$content_id' LIMIT 1"
                     );
                     if(! $system->db->last_num_rows) {
-                        throw new Exception("Invalid user!");
+                        throw new RuntimeException("Invalid user!");
                     }
 
                     $content_data = $system->db->fetch($result);
@@ -49,7 +49,7 @@ function report() {
                 case ReportManager::REPORT_TYPE_PM:
                     $content_data = Inbox::getInfoFromMessageId($system, $content_id);
                     if(!$content_data) {
-                        throw new Exception("Invalid message!");
+                        throw new RuntimeException("Invalid message!");
                     }
 
                     $user_id = $content_data['sender_id'];
@@ -63,7 +63,7 @@ function report() {
                         "SELECT `user_name`, `message`, `time` FROM `chat` WHERE `post_id`='$content_id' LIMIT 1"
                     );
                     if($system->db->last_num_rows == 0) {
-                        throw new Exception("Invalid user!");
+                        throw new RuntimeException("Invalid user!");
                     }
 
                     $content_data = $system->db->fetch($result);
@@ -72,7 +72,7 @@ function report() {
                         "SELECT `user_id`, `staff_level` FROM `users` WHERE `user_name`='" . $content_data['user_name'] . "' LIMIT 1"
                     );
                     if(! $system->db->last_num_rows) {
-                        throw new Exception("Invalid user!");
+                        throw new RuntimeException("Invalid user!");
                     }
                     $result = $system->db->fetch($result);
                     $user_id = $result['user_id'];
@@ -81,25 +81,25 @@ function report() {
                     $content = $content_data['message'];
                     break;
                 default:
-                    throw new Exception("Invalid report type!");
+                    throw new RuntimeException("Invalid report type!");
             }
 		
 			if($user_id == $player->user_id && !$player->staff_manager->isModerator()) {
-				throw new Exception("You cannot report yourself!");
+				throw new RuntimeException("You cannot report yourself!");
 			}
 
 			// Check for existing report
 			if($report_type != ReportManager::REPORT_TYPE_PROFILE && $reportManager->checkIfReported($content_id, $report_type)) {
-				throw new Exception("Content already reported!");
+				throw new RuntimeException("Content already reported!");
 			}
 			
 			// Reason
 			if(!isset(ReportManager::$report_reasons[$reason])) {
-				throw new Exception("Invalid reason!");
+				throw new RuntimeException("Invalid reason!");
 			}
 			
 			if(strlen($notes) > ReportManager::MAX_NOTE_SIZE) {
-				throw new Exception("Notes are too long! (" . strlen($notes) . "/" . ReportManager::MAX_NOTE_SIZE . " chars)");
+				throw new RuntimeException("Notes are too long! (" . strlen($notes) . "/" . ReportManager::MAX_NOTE_SIZE . " chars)");
 			}
 
             if($reportManager->submitReport($report_type, $content_id, $content, $user_id, $staff_level, ReportManager::$report_reasons[$reason], $notes)) {
@@ -123,7 +123,7 @@ function report() {
             $report = $reportManager->getReport($report_id);
 
 			if($report['status'] != ReportManager::VERDICT_UNHANDLED && !$player->staff_manager->isHeadModerator()) {
-				throw new Exception("Report has already been handled!");
+				throw new RuntimeException("Report has already been handled!");
 			}
 
             if(isset($_POST['handle_report'])) {
@@ -143,7 +143,7 @@ function report() {
                 }
             }
 			else {
-				throw new Exception("Invalid verdict!");
+				throw new RuntimeException("Invalid verdict!");
 			}
 
             $reportManager->updateReportVerdict($report_id, $verdict);
@@ -170,7 +170,7 @@ function report() {
                         "SELECT `user_name` FrOM `users` WHERE `user_id`='$content_id' LIMIT 1"
                     );
                     if(!$system->db->last_num_rows) {
-                        throw new Exception("Invalid user!");
+                        throw new RuntimeException("Invalid user!");
                     }
 
                     $content_data = $system->db->fetch($user_result);
@@ -181,7 +181,7 @@ function report() {
                 case ReportManager::REPORT_TYPE_PM:
                     $content_data = Inbox::getInfoFromMessageId($system, $content_id);
                     if(!$content_data) {
-                        throw new Exception("Invalid message!");
+                        throw new RuntimeException("Invalid message!");
                     }
 
                     $user_id = $content_data['sender_id'];
@@ -192,7 +192,7 @@ function report() {
                         "SELECT `user_name`, `message` FROM `chat` WHERE `post_id`='$content_id' LIMIT 1"
                     );
                     if($system->db->last_num_rows == 0) {
-                        throw new Exception("Invalid user!");
+                        throw new RuntimeException("Invalid user!");
                     }
 
                     $content_data = $system->db->fetch($result);
@@ -201,14 +201,14 @@ function report() {
                         "SELECT `user_id` FROM `users` WHERE `user_name`='" . $content_data['user_name'] . "' LIMIT 1"
                     );
                     if($system->db->last_num_rows == 0) {
-                        throw new Exception("Invalid user!");
+                        throw new RuntimeException("Invalid user!");
                     }
                     $result = $system->db->fetch($result);
                     $user_id = $result['user_id'];
                     $user_name = $content_data['user_name'];
                     break;
                 default:
-                    throw new Exception("Invalid report type1!");
+                    throw new RuntimeException("Invalid report type1!");
             }
 		
 			// Check for existing report
@@ -217,12 +217,12 @@ function report() {
                     "SELECT `report_id` FROM `reports` WHERE `content_id`='$content_id' AND `report_type`='$report_type'"
                 );
 				if($system->db->last_num_rows > 0) {
-					throw new Exception("This content has already been reported!");
+					throw new RuntimeException("This content has already been reported!");
 				}
 			}
 		
 			if($user_name == $player->user_name && !$player->isModerator()) {
-				throw new Exception("You cannot report yourself!");
+				throw new RuntimeException("You cannot report yourself!");
 			}
 						
 			require 'templates/submit_report.php';
@@ -240,12 +240,12 @@ function report() {
 		try {
 			$report_id = (int)$system->db->clean($_GET['report_id']);
 			if(!$report_id) {
-				throw new Exception("Report ID not given!");
+				throw new RuntimeException("Report ID not given!");
 			}
 
             $report = $reportManager->getReport($report_id);
 			if(!$report) {
-                throw new Exception("Report not found!");
+                throw new RuntimeException("Report not found!");
             }
 
             // Fetch usernames

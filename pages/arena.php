@@ -65,7 +65,7 @@ function arena(): bool {
                     arena();
                     $player->log(User::LOG_ARENA, "Opponent {$ai->id} ({$ai->getName()})");
                     return true;
-                } catch(Exception $e) {
+                } catch(RuntimeException $e) {
                     $system->message("Invalid opponent!");
                     $system->printMessage();
                 }
@@ -117,7 +117,7 @@ function arenaFight(): bool {
             echo "<table class='table'><tr><th>Battle Results</th></tr>
             <tr><td style='text-align: center;'>" . $battle_result . "</td></tr></table>";
         }
-    } catch(Exception $e) {
+    } catch(RuntimeException $e) {
         $system->message($e->getMessage());
         $system->printMessage();
         return false;
@@ -141,7 +141,7 @@ function arenaFightAPI(System $system, User $player): BattlePageAPIResponse {
         if($battle->isComplete()) {
             $response->battle_result = processArenaBattleEnd($battle, $player);
         }
-    } catch(Exception $e) {
+    } catch(RuntimeException $e) {
         $response->errors[] = $e->getMessage();
     }
 

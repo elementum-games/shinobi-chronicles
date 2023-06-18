@@ -10,7 +10,7 @@ $system = new System();
 
 try {
     $player = Auth::getUserFromSession($system);
-} catch(Exception $e) {
+} catch(RuntimeException $e) {
     API::exitWithException($e, $system);
 }
 # End standard auth

@@ -115,19 +115,6 @@ class BattleManager {
             $this->opponent_side = Battle::TEAM2;
         }
 
-        // 1: Player A lock A
-        // 2: Player B lock B
-        // 3: Player A lock B
-        // 4: Player B lock A
-
-        if($this->player->user_id == 1) {
-            error_log("SLEEPING");
-            sleep(5);
-        }
-        else {
-            // sleep(2);
-        }
-
         $this->battle->loadFighters();
 
         if($this->player_side == Battle::TEAM1) {
@@ -200,7 +187,7 @@ class BattleManager {
                         $max_health = $this->player->max_health * (Battle::MAX_PRE_FIGHT_HEAL_PERCENT / 100);
 
                         if ($this->player->health >= $max_health) {
-                            throw new Exception("You can't heal any further!");
+                            throw new RuntimeException("You can't heal any further!");
                         }
                         if ($item->effect === 'heal') {
                             if (--$this->player->items[$item_id]->quantity === 0) {
@@ -220,7 +207,7 @@ class BattleManager {
                     }
                 }
             }
-            catch(Exception $e) {
+            catch(RuntimeException $e) {
                 $this->system->message($e->getMessage());
             }
             return false;
@@ -235,7 +222,7 @@ class BattleManager {
                     // Check for handseals if ninjutsu/genjutsu
                     if($jutsu_type == Jutsu::TYPE_NINJUTSU or $jutsu_type == Jutsu::TYPE_GENJUTSU) {
                         if(!$_POST['hand_seals']) {
-                            throw new Exception("Please enter hand seals!");
+                            throw new RuntimeException("Please enter hand seals!");
                         }
 
                         $player_jutsu = $this->getJutsuFromHandSeals($this->player, $_POST['hand_seals']);
@@ -263,19 +250,19 @@ class BattleManager {
                         }
                     }
                     else {
-                        throw new Exception("Invalid jutsu selection!");
+                        throw new RuntimeException("Invalid jutsu selection!");
                     }
 
                     // Check jutsu cooldown
                     if(!$player_jutsu) {
-                        throw new Exception("Invalid jutsu!");
+                        throw new RuntimeException("Invalid jutsu!");
                     }
                     if(isset($this->battle->jutsu_cooldowns[$player_jutsu->combat_id])) {
-                        throw new Exception("Cannot use that jutsu, it is on cooldown for " . $this->battle->jutsu_cooldowns[$player_jutsu->combat_id] . " more turns!");
+                        throw new RuntimeException("Cannot use that jutsu, it is on cooldown for " . $this->battle->jutsu_cooldowns[$player_jutsu->combat_id] . " more turns!");
                     }
 
                     if(!$this->player->useJutsu($player_jutsu)) {
-                        throw new Exception($this->system->message);
+                        throw new RuntimeException($this->system->message);
                     }
 
                     // Check for weapon if non-BL taijutsu
@@ -388,7 +375,7 @@ class BattleManager {
      */
     public function isPlayerWinner(): bool {
         if(!$this->isComplete()) {
-            throw new Exception("Cannot call isPlayerWinner() check before battle is complete!");
+            throw new RuntimeException("Cannot call isPlayerWinner() check before battle is complete!");
         }
 
         return $this->battle->winner === $this->player_side;
@@ -399,7 +386,7 @@ class BattleManager {
      */
     public function isOpponentWinner(): bool {
         if(!$this->isComplete()) {
-            throw new Exception("Cannot call isPlayerWinner() check before battle is complete!");
+            throw new RuntimeException("Cannot call isPlayerWinner() check before battle is complete!");
         }
 
         return $this->battle->winner === $this->opponent_side;
@@ -411,7 +398,7 @@ class BattleManager {
      */
     public function isDraw(): bool {
         if(!$this->isComplete()) {
-            throw new Exception("Cannot call isDraw() check before battle is complete!");
+            throw new RuntimeException("Cannot call isDraw() check before battle is complete!");
         }
 
         return $this->battle->winner === Battle::DRAW;
@@ -647,7 +634,7 @@ class BattleManager {
             $attack->jutsu = $fighter->bloodline->jutsu[$action->jutsu_id];
         }
         else {
-            throw new Exception("Invalid jutsu purchase type {$action->jutsu_purchase_type} for fighter {$fighter->combat_id}");
+            throw new RuntimeException("Invalid jutsu purchase type {$action->jutsu_purchase_type} for fighter {$fighter->combat_id}");
         }
 
         $attack->jutsu->setCombatId($fighter->combat_id);
@@ -1016,7 +1003,7 @@ class BattleManager {
                 }
                 break;
             default:
-                throw new Exception("Invalid jutsu type!");
+                throw new RuntimeException("Invalid jutsu type!");
         }
 
         return $evasion_stat_amount;
@@ -1108,7 +1095,7 @@ class BattleManager {
      */
     protected function chooseAndSetAIAction(Fighter $ai) {
         if(!($ai instanceof NPC)) {
-            throw new Exception("Calling chooseAndSetAIAction on non-AI!");
+            throw new RuntimeException("Calling chooseAndSetAIAction on non-AI!");
         }
 
         $jutsu = $ai->chooseAttack();

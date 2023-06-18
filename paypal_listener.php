@@ -76,27 +76,27 @@ else {
 			try {
 				// check the payment_status is Completed
 				if($payment_status != "Completed") {
-					throw new Exception("Payment is not complete.");
+					throw new RuntimeException("Payment is not complete.");
 				}
 				// check that txn_id has not been previously processed
 				$result = $system->db->query("SELECT `id` FROM `Payments` WHERE `txn_id`='$txn_id' LIMIT 1");
 				if($system->db->last_num_rows > 0 ) {
-					throw new Exception("Payment has already been processed!");
+					throw new RuntimeException("Payment has already been processed!");
 				}
 				
 				// check that receiver_email is your Primary PayPal email
 				if($receiver_email != "lsmjudoka05@yahoo.com" && $receiver_email != "Lsm_1276033742_biz@gmail.com") {
-					throw new Exception("Invalid recipient!");
+					throw new RuntimeException("Invalid recipient!");
 				}
 				// check that payment_amount/payment_currency are correct
 				if($payment_currency != "USD") {
 					$system->log("ipn_listener", "error", "Invalid currency -- #$txn_id");
-					throw new Exception("Invalid currency!");
+					throw new RuntimeException("Invalid currency!");
 				}
 				// Check payment amount
 				$payment_amount = floor($payment_amount);
 				if($payment_amount < 1) {
-					throw new Exception("Invalid payment, < $1!");
+					throw new RuntimeException("Invalid payment, < $1!");
 				}
 
 				$kunai_amount = $payment_amount * System::KUNAI_PER_DOLLAR;
@@ -151,7 +151,7 @@ else {
 				" has been processed and credited to your account. Thank you!");*/
 				
 				// process payment
-			} catch(Exception $e) {
+			} catch(RuntimeException $e) {
 				$system->log("ipn_listener",  "ipn_error", $e->getMessage() . "\r\nID: $txn_id");
 			}
 		}

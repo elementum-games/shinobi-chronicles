@@ -627,11 +627,11 @@ SET `status`=2, `end_time`={$timestamp} WHERE `mission_id`={$mission_id}");
     public static function startMission($system, $player, $difficulty): SpecialMission {
 
         if ($player->special_mission != 0) {
-            throw new Exception('You cannot start multiple missions!');
+            throw new RuntimeException('You cannot start multiple missions!');
         }
 
         if (!array_key_exists($difficulty, self::$difficulties)) {
-            throw new Exception('Error setting difficulty!');
+            throw new RuntimeException('Error setting difficulty!');
         }
 
         $timestamp = time();

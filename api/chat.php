@@ -49,7 +49,7 @@ try {
                 system: $system,
             );
     }
-} catch(Exception $e) {
+} catch(RuntimeException $e) {
     API::exitWithException($e, system: $system);
 }
 # End standard auth

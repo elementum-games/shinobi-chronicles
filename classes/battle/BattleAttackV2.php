@@ -58,7 +58,7 @@ class BattleAttackV2 {
             return $this->target->isDirectionRight();
         }
 
-        throw new Exception("Unsupported target type for direction check!");
+        throw new RuntimeException("Unsupported target type for direction check!");
     }
 
     /**
@@ -70,7 +70,7 @@ class BattleAttackV2 {
             return $this->target->isDirectionLeft();
         }
 
-        throw new Exception("Unsupported target type for direction check!");
+        throw new RuntimeException("Unsupported target type for direction check!");
     }
 }
 

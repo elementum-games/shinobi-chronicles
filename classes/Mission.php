@@ -294,13 +294,13 @@ class Mission {
      */
     public static function start($player, $mission_id): Mission {
         if($player->mission_id) {
-            throw new Exception("You are already on a mission!");
+            throw new RuntimeException("You are already on a mission!");
         }
 
         $fight_timer = System::ARENA_COOLDOWN;
         $max_last_ai_ms = System::currentTimeMs() - $fight_timer;
         if($player->last_ai_ms > $max_last_ai_ms) {
-            throw new Exception("Please wait " . ceil(($player->last_ai_ms - $max_last_ai_ms) / 1000) . " more seconds!");
+            throw new RuntimeException("Please wait " . ceil(($player->last_ai_ms - $max_last_ai_ms) / 1000) . " more seconds!");
         }
 
         $mission = new Mission($mission_id, $player);

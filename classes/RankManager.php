@@ -134,14 +134,14 @@ class RankManager {
     public function increasePlayerRank(User $player) {
         $new_rank = $player->rank_num + 1;
         if($new_rank > System::SC_MAX_RANK) {
-            throw new Exception("Invalid max rank!");
+            throw new RuntimeException("Invalid max rank!");
         }
         if(!$this->ranks_loaded) {
             $this->loadRanks();
         }
 
         if(!isset($this->ranks[$new_rank])) {
-            throw new Exception("Error loading new rank!");
+            throw new RuntimeException("Error loading new rank!");
         }
 
         $player->rank_num++;

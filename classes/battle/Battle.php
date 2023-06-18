@@ -86,7 +86,7 @@ class Battle {
             case self::TYPE_AI_RANKUP:
                 break;
             default:
-                throw new Exception("Invalid battle type!");
+                throw new RuntimeException("Invalid battle type!");
         }
 
         $player1->combat_id = Battle::combatId(Battle::TEAM1, $player1);
@@ -175,7 +175,7 @@ class Battle {
             if($player->battle_id = $battle_id) {
                 $player->battle_id = 0;
             }
-            throw new Exception("Invalid battle!");
+            throw new RuntimeException("Invalid battle!");
         }
 
         $battle = $this->system->db->fetch($result);
@@ -264,7 +264,7 @@ class Battle {
             case NPC::ID_PREFIX:
                 return NPC::fromEntityId($this->system, $entity_id);
             default:
-                throw new Exception("Invalid entity type! " . Battle::getFighterEntityType($entity_id));
+                throw new RuntimeException("Invalid entity type! " . Battle::getFighterEntityType($entity_id));
         }
     }
 
