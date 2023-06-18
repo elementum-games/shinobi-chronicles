@@ -45,12 +45,12 @@ class Mission {
     public function __construct($mission_id, User $player, ?Team $team = null) {
         global $system;
         $this->system = $system;
-        $result = $this->system->query("SELECT * FROM `missions` WHERE `mission_id`='$mission_id' LIMIT 1");
-        if($this->system->db_last_num_rows == 0) {
+        $result = $this->system->db->query("SELECT * FROM `missions` WHERE `mission_id`='$mission_id' LIMIT 1");
+        if($this->system->db->last_num_rows == 0) {
             return false;
         }
 
-        $mission_data = $this->system->db_fetch($result);
+        $mission_data = $this->system->db->fetch($result);
 
         $this->player = $player;
         $this->team = $team;
@@ -185,7 +185,9 @@ class Mission {
                 $stage_id--;
                 $new_stage = false;
                 $mission_stage = json_encode($this->team->mission_stage);
-                $this->system->query("UPDATE `teams` SET `mission_stage`='$mission_stage' WHERE `team_id`={$this->team->id} LIMIT 1");
+                $this->system->db->query(
+                    "UPDATE `teams` SET `mission_stage`='$mission_stage' WHERE `team_id`={$this->team->id} LIMIT 1"
+                );
             }
         }
         else {
@@ -228,7 +230,9 @@ class Mission {
 
             $mission_stage = json_encode($this->team->mission_stage);
 
-            $this->system->query("UPDATE `teams` SET `mission_stage`='$mission_stage' WHERE `team_id`='{$this->team->id}' LIMIT 1");
+            $this->system->db->query(
+                "UPDATE `teams` SET `mission_stage`='$mission_stage' WHERE `team_id`='{$this->team->id}' LIMIT 1"
+            );
         }
 
         if($this->current_stage['action_type'] == 'travel' || $this->current_stage['action_type'] == 'search') {

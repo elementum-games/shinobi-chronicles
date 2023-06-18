@@ -208,12 +208,12 @@ $clan_positions = array(
 
                     <!--// Last chat post-->
                     <?php
-                    $result = $system->query(
-                    "SELECT `time` FROM `chat` WHERE `user_name`='{$viewUser->user_name}' ORDER BY `post_id` DESC LIMIT 1"
+                    $result = $system->db->query(
+                        "SELECT `time` FROM `chat` WHERE `user_name`='{$viewUser->user_name}' ORDER BY `post_id` DESC LIMIT 1"
                     );
                     ?>
-                    <?php if($system->db_last_num_rows > 0): ?>
-                        <?php $last_post = $system->db_fetch($result)['time']; ?>
+                    <?php if($system->db->last_num_rows > 0): ?>
+                        <?php $last_post = $system->db->fetch($result)['time']; ?>
                         Last chat post: <?= System::timeRemaining(time() - $last_post, 'long') ?> ago<br />
                     <?php endif; ?>
 

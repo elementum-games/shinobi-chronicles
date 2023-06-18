@@ -40,7 +40,7 @@ function healingShop() {
 
 	if(isset($_GET['heal'])) {
 		try {
-			$heal = $system->clean($_GET['heal']);
+			$heal = $system->db->clean($_GET['heal']);
 			if(!isset($ramen_choices[$heal])) {
 				throw new Exception("Invalid choice!");
 			}

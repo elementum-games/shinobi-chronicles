@@ -1,5 +1,7 @@
 <?php
 
+require_once __DIR__ . '/classes/Database.php';
+require_once __DIR__ . '/classes/DatabaseDeadlockException.php';
 require_once __DIR__ . "/classes/EntityId.php";
 require_once __DIR__ . "/classes/System.php";
 require_once __DIR__ . "/classes/Router.php";

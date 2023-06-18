@@ -4,7 +4,7 @@ session_start();
 require_once("classes/_autoload.php");
 
 $system = new System();
-$system->startTransaction();
+$system->db->startTransaction();
 $guest_support = true;
 $self_link = $system->router->base_url . 'support.php';
 $staff_level = 0;
@@ -37,10 +37,10 @@ if($player != null) {
     if(isset($_POST['add_support']) || isset($_POST['add_support_prem']) || isset($_POST['confirm_prem_support'])) {
         try {
             $addSupport = true;
-            $request_type = $system->clean($_POST['support_type']);
-            $subject = $system->clean($_POST['subject']);
+            $request_type = $system->db->clean($_POST['support_type']);
+            $subject = $system->db->clean($_POST['subject']);
             $subjectLength = strlen($subject);
-            $message = $system->clean($_POST['message']);
+            $message = $system->db->clean($_POST['message']);
             $messageLength = strlen($message);
             $cost = ($supportSystem->requestPremiumCosts[$request_type] ?? 0);
             $premium = ($cost > 0 && isset($_POST['confirm_prem_support'])) ? 1 : 0;
@@ -91,14 +91,14 @@ if($player != null) {
                 }
             }
         }catch (Exception $e) {
-            $system->rollbackTransaction();
+            $system->db->rollbackTransaction();
             error_log($e->getMessage());
             $system->message($e->getMessage());
         }
     }
     if(isset($_POST['add_guest_support'])){
         try {
-            $support_key = $system->clean($_POST['support_key']);
+            $support_key = $system->db->clean($_POST['support_key']);
 
             $support_id = $supportSystem->getSupportIdByKey($support_key);
 
@@ -140,7 +140,7 @@ if($player != null) {
         } else {
             if(isset($_POST['add_response'])) {
                 try {
-                    $message = $system->clean($_POST['message']);
+                    $message = $system->db->clean($_POST['message']);
                     $messageLength = strlen($message);
 
                     // Validate
@@ -160,14 +160,14 @@ if($player != null) {
                         throw new Exception("Error adding response!");
                     }
                 } catch (Exception $e) {
-                    $system->rollbackTransaction();
+                    $system->db->rollbackTransaction();
                     error_log($e->getMessage());
                     $system->message($e->getMessage());
                 }
             }
             if(isset($_POST['close_ticket'])) {
                 try {
-                    $message = $system->clean($_POST['message']);
+                    $message = $system->db->clean($_POST['message']);
                     $messageLength = strlen($message);
 
                     // Validate user owns support
@@ -188,7 +188,7 @@ if($player != null) {
                         }
 
                         $supportSystem->addSupportResponse($support_id, $player->user_name, $message);
-                        if(!$system->db_last_insert_id) {
+                        if(!$system->db->last_insert_id) {
                             throw new Exception("Error adding response.");
                         }
                     }
@@ -198,7 +198,7 @@ if($player != null) {
                         $system->message("Support closed.");
                     }
                 }catch (Exception $e) {
-                    $system->rollbackTransaction();
+                    $system->db->rollbackTransaction();
                     error_log($e->getMessage());
                     $system->message($e->getMessage());
                 }
@@ -221,8 +221,8 @@ if($player != null) {
 else {
     // Get support data
     if(isset($_GET['support_key'])) {
-        $support_key = $system->clean($_GET['support_key']);
-        $email = $system->clean($_GET['email']);
+        $support_key = $system->db->clean($_GET['support_key']);
+        $email = $system->db->clean($_GET['email']);
         $supportData = $supportSystem->fetchSupportByKey($support_key, $email);
 
         if(!$supportData) {
@@ -235,12 +235,12 @@ else {
     // Add guest support
     if(isset($_POST['add_support'])) {
         try {
-            $subject = $system->clean($_POST['subject']);
+            $subject = $system->db->clean($_POST['subject']);
             $subjectLength = strlen($subject);
-            $email = $system->clean($_POST['email']);
-            $support_type = $system->clean($_POST['support_type']);
-            $name = $system->clean($_POST['name']);
-            $message = $system->clean($_POST['message']);
+            $email = $system->db->clean($_POST['email']);
+            $support_type = $system->db->clean($_POST['support_type']);
+            $name = $system->db->clean($_POST['name']);
+            $message = $system->db->clean($_POST['message']);
             $messageLength = strlen($message);
             $support_key = sha1(mt_rand(0, 255384));
 
@@ -298,7 +298,7 @@ else {
                 $system->message("Error creating support.");
             }
         }catch(Exception $e) {
-            $system->rollbackTransaction();
+            $system->db->rollbackTransaction();
             error_log($e->getMessage());
             $system->message($e->getMessage());
         }
@@ -306,7 +306,7 @@ else {
     // Add guest response
     if(isset($_POST['add_response'])) {
         try {
-            $message = $system->clean($_POST['message']);
+            $message = $system->db->clean($_POST['message']);
 
             // Message validation
             if(strlen($message) < SupportManager::$validationConstraints['message']['min']) {
@@ -327,7 +327,7 @@ else {
                 throw new Exception("Error adding response!");
             }
         }catch (Exception $e) {
-            $system->rollbackTransaction();
+            $system->db->rollbackTransaction();
             $system->message($e->getMessage());
         }
     }
@@ -343,4 +343,4 @@ else {
 
 $layout->renderAfterContentHTML($system, $player);
 
-$system->commitTransaction();
+$system->db->commitTransaction();

@@ -99,7 +99,7 @@ function clan() {
 			}
 		}
 		else if(!empty($_POST['motto'])) {
-			$motto = $system->clean($_POST['motto']);
+			$motto = $system->db->clean($_POST['motto']);
 			try {
 				$player->clan->setMotto($motto);
 			} catch (Exception $e) {
@@ -107,7 +107,7 @@ function clan() {
 			}
 		}
 		else if(!empty($_POST['logo'])) {
-			$logo_url = $system->clean($_POST['logo']);
+			$logo_url = $system->db->clean($_POST['logo']);
 			try {
                 $player->clan->setLogoUrl($logo_url);
 			} catch (Exception $e) {
@@ -115,7 +115,7 @@ function clan() {
 			}
 		}
 		else if(!empty($_POST['boost'])) {
-			$new_boost = $system->clean($_POST['boost']);
+			$new_boost = $system->db->clean($_POST['boost']);
 			try {
                 $player->clan->setBoost($new_boost);
 			} catch (Exception $e) {
@@ -123,7 +123,7 @@ function clan() {
 			}
 		}
 		else if(!empty($_POST['info'])) {
-			$info = $system->clean($_POST['info']);
+			$info = $system->db->clean($_POST['info']);
 			try {
                 $player->clan->setInfo($info);
 			} catch (Exception $e) {
@@ -153,19 +153,21 @@ function clan() {
                 $prev = 0;
             }
         }
-        $result = $system->query("SELECT COUNT(`user_id`) as `count` FROM `users` WHERE `clan_id`='{$player->clan->id}'");
-        $total_members = $system->db_fetch($result)['count'];
+        $result = $system->db->query(
+            "SELECT COUNT(`user_id`) as `count` FROM `users` WHERE `clan_id`='{$player->clan->id}'"
+        );
+        $total_members = $system->db->fetch($result)['count'];
 
         if($min + $users_per_page < $total_members) {
             $next = $min + $users_per_page;
         }
 
-        $result = $system->query(
+        $result = $system->db->query(
             "SELECT `user_id`, `user_name`, `rank`, `level`, `exp`, `last_active` FROM `users` WHERE `clan_id`='{$player->clan->id}'
                     ORDER BY `rank` DESC, `exp` DESC LIMIT $min, $users_per_page"
         );
 
-        while($row = $system->db_fetch($result)) {
+        while($row = $system->db->fetch($result)) {
             $members[$row['user_id']] = new ClanMemberDto(
                 id: $row['user_id'],
                 name: $row['user_name'],

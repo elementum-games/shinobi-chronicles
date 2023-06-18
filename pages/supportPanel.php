@@ -28,7 +28,7 @@ function supportPanel() {
     }
     $category = 'awaiting_admin';
     if (isset($_GET['category'])) {
-        $category = $system->clean($_GET['category']);
+        $category = $system->db->clean($_GET['category']);
         $self_link .= "&category={$category}";
     }
 
@@ -38,19 +38,19 @@ function supportPanel() {
 
         if(isset($_GET['user_name'])) {
             $self_link .= "&user_name=" . $_GET['user_name'];
-            $searchData['user_name'] = $system->clean($_GET['user_name']);
+            $searchData['user_name'] = $system->db->clean($_GET['user_name']);
         }
         if(isset($_GET['support_type'])) {
             $self_link .= "&support_type=" . $_GET['support_type'];
-            $searchData['support_type'] = $system->clean($_GET['support_type']);
+            $searchData['support_type'] = $system->db->clean($_GET['support_type']);
         }
         if(isset($_GET['support_key'])) {
             $self_link .= "&support_key=" . $_GET['support_key'];
-            $searchData['support_key'] = $system->clean($_GET['support_key']);
+            $searchData['support_key'] = $system->db->clean($_GET['support_key']);
         }
         if(isset($_GET['ip_address'])) {
             $self_link .= "&ip_address=" . $_GET['ip_address'];
-            $searchData['ip_address'] = $system->clean($_GET['ip_address']);
+            $searchData['ip_address'] = $system->db->clean($_GET['ip_address']);
         }
 
         $supports = $supportManager->supportSearch($searchData, false, ['updated' => 'DESC', 'open'=>'DESC', 'premium'=>'DESC']);
@@ -79,7 +79,7 @@ function supportPanel() {
         try {
             if (isset($_POST['add_response'])) {
                 $supportData = $supportManager->fetchSupportByID($support_id);
-                $message = $system->clean($_POST['message']);
+                $message = $system->db->clean($_POST['message']);
 
                 // Support not found
                 if (!$supportData) {
@@ -115,7 +115,7 @@ function supportPanel() {
                 $supportData = $supportManager->fetchSupportByID($support_id);
                 $message = '';
                 if (isset($_POST['message'])) {
-                    $message = $system->clean($_POST['message']);
+                    $message = $system->db->clean($_POST['message']);
                 }
 
                 // Not found
@@ -142,7 +142,7 @@ function supportPanel() {
                 $supportData = $supportManager->fetchSupportByID($support_id);
                 $message = '';
                 if (isset($_POST['message'])) {
-                    $message = $system->clean($_POST['message']);
+                    $message = $system->db->clean($_POST['message']);
                 }
 
                 // Not found

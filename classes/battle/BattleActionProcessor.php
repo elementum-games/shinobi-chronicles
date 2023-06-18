@@ -132,7 +132,7 @@ class BattleActionProcessor {
 
         /*if($collision_text) {
             $collision_text = $this->parseCombatText($collision_text, $this->battle->player1, $this->battle->player2);
-            $this->battle->battle_text .= '[hr]' . $this->system->clean($collision_text);
+            $this->battle->battle_text .= '[hr]' . $this->system->db->clean($collision_text);
         }*/
 
         // Apply damage/effects and set display

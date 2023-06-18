@@ -18,7 +18,7 @@ class Auth {
         }
 
         $system = new System();
-        $system->dbConnect();
+        $system->db->connect();
 
         return User::loadFromId($system, $_SESSION['user_id']);
     }

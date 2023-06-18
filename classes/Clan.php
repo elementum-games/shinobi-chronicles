@@ -91,12 +91,12 @@ class Clan {
      * @throws Exception
      */
     public static function loadFromId(System $system, int $id): ?Clan {
-        $result = $system->query("SELECT * FROM `clans` WHERE `clan_id`=$id LIMIT 1");
+        $result = $system->db->query("SELECT * FROM `clans` WHERE `clan_id`=$id LIMIT 1");
         if(!$result) {
             return null;
         }
         
-        $clan_data = $system->db_fetch($result);
+        $clan_data = $system->db->fetch($result);
         
         return new Clan(
             system: $system,
@@ -124,12 +124,13 @@ class Clan {
     public function getClanMissions(int $player_rank_num): array {
         $max_mission_rank = Mission::maxMissionRank($player_rank_num);
 
-        $result = $this->system->query(
+        $result = $this->system->db->query(
             "SELECT `mission_id`, `name`, `rank` FROM `missions` 
-                WHERE `mission_type`=" . Mission::TYPE_CLAN . " AND `rank` <= $max_mission_rank");
+                WHERE `mission_type`=" . Mission::TYPE_CLAN . " AND `rank` <= $max_mission_rank"
+        );
         $missions = array();
 
-        while($row = $this->system->db_fetch($result)) {
+        while($row = $this->system->db->fetch($result)) {
             $missions[$row['mission_id']] = $row;
         }
 
@@ -176,10 +177,10 @@ class Clan {
             $query = "SELECT `user_id`, `user_name`, `rank`, `level`, `exp`, `avatar_link`, `clan_office`, `last_active` 
                 FROM `users`
                 WHERE `user_id` IN (" . implode(',', $officer_ids) . ")";
-            $result = $this->system->query($query);
+            $result = $this->system->db->query($query);
 
-            if($this->system->db_last_num_rows > 0) {
-                while($row = $this->system->db_fetch($result)) {
+            if($this->system->db->last_num_rows > 0) {
+                while($row = $this->system->db->fetch($result)) {
                     $officers[$row['clan_office']] = new ClanMemberDto(
                         id: $row['user_id'],
                         name: $row['user_name'],
@@ -217,11 +218,13 @@ class Clan {
 
         $this->points -= $boost_cost;
 
-        $this->system->query("UPDATE `clans` SET 
-            `boost`='$new_boost', 
-            `boost_amount`={$boost_amount}, 
-            `points`=`points` - {$boost_cost}
-        WHERE `clan_id`='{$this->id}' LIMIT 1");
+        $this->system->db->query(
+            "UPDATE `clans` SET 
+                `boost`='$new_boost', 
+                `boost_amount`={$boost_amount}, 
+                `points`=`points` - {$boost_cost}
+            WHERE `clan_id`='{$this->id}' LIMIT 1"
+        );
 
         $this->boost = $new_boost;
         $this->boost_type = explode(':', $new_boost)[0];
@@ -282,15 +285,21 @@ class Clan {
         /** @noinspection SqlResolve */
         switch($office) {
             case Clan::OFFICE_LEADER:
-                $this->system->query("UPDATE `clans` SET `leader`='$player->user_id' WHERE `clan_id`='{$this->id}' LIMIT 1");
+                $this->system->db->query(
+                    "UPDATE `clans` SET `leader`='$player->user_id' WHERE `clan_id`='{$this->id}' LIMIT 1"
+                );
                 $this->leader_id = $player->user_id;
                 break;
             case Clan::OFFICE_ELDER_1:
-                $this->system->query("UPDATE `clans` SET `elder_1`='$player->user_id' WHERE `clan_id`='{$this->id}' LIMIT 1");
+                $this->system->db->query(
+                    "UPDATE `clans` SET `elder_1`='$player->user_id' WHERE `clan_id`='{$this->id}' LIMIT 1"
+                );
                 $this->elder_1_id = $player->user_id;
                 break;
             case Clan::OFFICE_ELDER_2:
-                $this->system->query("UPDATE `clans` SET `elder_2`='$player->user_id' WHERE `clan_id`='{$this->id}' LIMIT 1");
+                $this->system->db->query(
+                    "UPDATE `clans` SET `elder_2`='$player->user_id' WHERE `clan_id`='{$this->id}' LIMIT 1"
+                );
                 $this->elder_2_id = $player->user_id;
                 break;
             default:
@@ -315,7 +324,7 @@ class Clan {
             throw new Exception("Clan info is too long!");
         }
 
-        $this->system->query("UPDATE `clans` SET `info`='$info' WHERE `clan_id`='{$this->id}' LIMIT 1");
+        $this->system->db->query("UPDATE `clans` SET `info`='$info' WHERE `clan_id`='{$this->id}' LIMIT 1");
         $this->info = $info;
 
         $this->system->message("Clan info updated!");
@@ -331,7 +340,7 @@ class Clan {
             throw new Exception("Link is too long!");
         }
 
-        $this->system->query("UPDATE `clans` SET `logo`='$logo_url' WHERE `clan_id`='{$this->id}' LIMIT 1");
+        $this->system->db->query("UPDATE `clans` SET `logo`='$logo_url' WHERE `clan_id`='{$this->id}' LIMIT 1");
         $this->logo_url = $logo_url;
         $this->system->message("Logo updated!");
     }
@@ -344,7 +353,7 @@ class Clan {
             throw new Exception("Motto is too long!");
         }
 
-        $this->system->query("UPDATE `clans` SET `motto`='$motto' WHERE `clan_id`='{$this->id}' LIMIT 1");
+        $this->system->db->query("UPDATE `clans` SET `motto`='$motto' WHERE `clan_id`='{$this->id}' LIMIT 1");
         $this->motto = $motto;
 
         $this->system->message("Motto updated!");
@@ -359,15 +368,15 @@ class Clan {
 
         switch($player->clan_office) {
             case Clan::OFFICE_LEADER:
-                $this->system->query("UPDATE `clans` SET `leader`=0 WHERE `clan_id`='{$this->id}' LIMIT 1");
+                $this->system->db->query("UPDATE `clans` SET `leader`=0 WHERE `clan_id`='{$this->id}' LIMIT 1");
                 $this->leader_id = 0;
                 break;
             case Clan::OFFICE_ELDER_1:
-                $this->system->query("UPDATE `clans` SET `elder_1`=0 WHERE `clan_id`='{$this->id}' LIMIT 1");
+                $this->system->db->query("UPDATE `clans` SET `elder_1`=0 WHERE `clan_id`='{$this->id}' LIMIT 1");
                 $this->elder_1_id = 0;
                 break;
             case Clan::OFFICE_ELDER_2:
-                $this->system->query("UPDATE `clans` SET `elder_2`=0 WHERE `clan_id`='{$this->id}' LIMIT 1");
+                $this->system->db->query("UPDATE `clans` SET `elder_2`=0 WHERE `clan_id`='{$this->id}' LIMIT 1");
                 $this->elder_2_id = 0;
                 break;
         }

@@ -57,7 +57,7 @@ function gear(): void {
         }
     }
     else if(isset($_GET['use_item'])) {
-        $item_id = (int)$system->clean($_GET['use_item']);
+        $item_id = (int)$system->db->clean($_GET['use_item']);
         try {
             if(!$player->hasItem($item_id) or $player->items[$item_id]->use_type != 3) {
                 throw new Exception("Invalid item!");

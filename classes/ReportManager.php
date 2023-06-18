@@ -54,12 +54,12 @@ class ReportManager {
             echo "Staff connections...<br />";
         }
 
-        $result = $this->system->query("SELECT * FROM `reports` WHERE `report_id`='{$report_id}' LIMIT 1", $debug);
-        if($this->system->db_last_num_rows) {
+        $result = $this->system->db->query("SELECT * FROM `reports` WHERE `report_id`='{$report_id}' LIMIT 1");
+        if($this->system->db->last_num_rows) {
             if($debug) {
                 echo "Report is found...";
             }
-            $report = $this->system->db_fetch($result);
+            $report = $this->system->db->fetch($result);
 
             //Staff perm check
             if($report['staff_level'] > User::STAFF_NONE) {
@@ -112,8 +112,10 @@ class ReportManager {
         if($report_type == self::REPORT_TYPE_PROFILE) {
             return false;
         }
-        $this->system->query("SELECT `report_id` FROM `reports` WHERE `content_id`='$content_id' AND `report_type`='$report_type'");
-        if($this->system->db_last_num_rows) {
+        $this->system->db->query(
+            "SELECT `report_id` FROM `reports` WHERE `content_id`='$content_id' AND `report_type`='$report_type'"
+        );
+        if($this->system->db->last_num_rows) {
             return true;
         }
         return false;
@@ -131,15 +133,17 @@ class ReportManager {
      * @return bool
      */
     public function submitReport($report_type, $content_id, $content, $reported_user_id, $staff_level, $reason, $notes) {
-        $this->system->query("INSERT INTO `reports`
-            (`report_type`, `content_id`, `content`, `user_id`, `reporter_id`, `staff_level`, 
-                `reason`, `notes`, `status`, `time`)
-            VALUES
-            ('$report_type', '$content_id', '$content', '$reported_user_id', '{$this->player->user_id}', '$staff_level', 
-                '$reason', '$notes', '" . self::VERDICT_UNHANDLED . "', '" . time() . "')
-        ");
+        $this->system->db->query(
+            "INSERT INTO `reports`
+                (`report_type`, `content_id`, `content`, `user_id`, `reporter_id`, `staff_level`, 
+                    `reason`, `notes`, `status`, `time`)
+                VALUES
+                ('$report_type', '$content_id', '$content', '$reported_user_id', '{$this->player->user_id}', '$staff_level', 
+                    '$reason', '$notes', '" . self::VERDICT_UNHANDLED . "', '" . time() . "')
+            "
+        );
 
-        if($this->system->db_last_insert_id) {
+        if($this->system->db->last_insert_id) {
             return true;
         }
         return false;
@@ -177,15 +181,15 @@ class ReportManager {
         $query .= "`status`=" . self::VERDICT_UNHANDLED;
 
         //Query reports
-        $result = $this->system->query($query);
-        if($this->system->db_last_num_rows) {
+        $result = $this->system->db->query($query);
+        if($this->system->db->last_num_rows) {
             if($notification) {
                 return true;
             }
 
             //Pull active reports from DB and add to array, tracking user_ids
             $user_ids = [];
-            while($report = $this->system->db_fetch($result)) {
+            while($report = $this->system->db->fetch($result)) {
                 if(!in_array($report['user_id'], $user_ids)) {
                     $user_ids[] = $report['user_id'];
                 }
@@ -198,9 +202,11 @@ class ReportManager {
             //Fetch usernames from db
             $user_names = [];
             $query_ids = implode(',', $user_ids);
-            $result = $this->system->query("SELECT `user_name`,`user_id` FROM `users` WHERE `user_id` IN ($query_ids)");
-            if($this->system->db_last_num_rows) {
-                while($user = $this->system->db_fetch($result)) {
+            $result = $this->system->db->query(
+                "SELECT `user_name`,`user_id` FROM `users` WHERE `user_id` IN ($query_ids)"
+            );
+            if($this->system->db->last_num_rows) {
+                while($user = $this->system->db->fetch($result)) {
                     if(!isset($user_names[$user['user_id']])) {
                         $user_names[$user['user_id']] = $user['user_name'];
                     }
@@ -227,8 +233,8 @@ class ReportManager {
             if(!$report) {
                 return false;
             }
-            $this->system->query("UPDATE `reports` SET `status`={$verdict} WHERE `report_id`={$report_id} LIMIT 1");
-            if($this->system->db_last_affected_rows) {
+            $this->system->db->query("UPDATE `reports` SET `status`={$verdict} WHERE `report_id`={$report_id} LIMIT 1");
+            if($this->system->db->last_affected_rows) {
                 $log_type = ($report['status'] == self::VERDICT_UNHANDLED) ? StaffManager::STAFF_LOG_MOD : StaffManager::STAFF_LOG_HEAD_MOD;
                 $log_data = "{$this->player->user_name}({$this->player->user_id}) has ";
                 if($log_type == StaffManager::STAFF_LOG_MOD) {

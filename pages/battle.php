@@ -41,16 +41,16 @@ function battle(): bool {
 	}
 	else if(isset($_GET['attack'])) {
 		try {
-			$attack_id = $system->clean($_GET['attack']);
+			$attack_id = $system->db->clean($_GET['attack']);
 
 			try {
                 // get user id off the attack link
-                $result = $system->query("SELECT `user_id` FROM `users` WHERE `attack_id`='{$attack_id}' LIMIT 1");
-                if ($system->db_last_num_rows == 0) {
+                $result = $system->db->query("SELECT `user_id` FROM `users` WHERE `attack_id`='{$attack_id}' LIMIT 1");
+                if ($system->db->last_num_rows == 0) {
                     throw new Exception("Invalid user!");
                 }
 
-                $attack_link = $system->db_fetch($result);
+                $attack_link = $system->db->fetch($result);
                 $attack_id = $attack_link['user_id'];
 
 			    $user = User::loadFromId($system, $attack_id);
@@ -140,7 +140,9 @@ function processBattleFightEnd(BattleManager $battle, User $player): string {
         $player->addMoney($pvp_yen, "PVP win");
         $result .= "You win the fight and earn ¥$pvp_yen![br]";
 
-        $player->system->query("UPDATE `villages` SET `points`=`points`+'$village_point_gain' WHERE `name`='{$player->village->name}' LIMIT 1");
+        $player->system->db->query(
+            "UPDATE `villages` SET `points`=`points`+'$village_point_gain' WHERE `name`='{$player->village->name}' LIMIT 1"
+        );
         $result .= "You have earned $village_point_gain point for your village.[br]";
 
         //TODO: Add a feature that will make alt killing / targeting same user not worth while (diminish gains (negative for excessive chain kills?))
@@ -248,11 +250,11 @@ function check_survival_missions(Int $mission_id): void
     global $system;
     global $player;
 
-    $result = $system->query("SELECT `mission_type` FROM `missions` WHERE `mission_id`='$mission_id' LIMIT 1");
-    if ($system->db_last_num_rows == 0) {
+    $result = $system->db->query("SELECT `mission_type` FROM `missions` WHERE `mission_id`='$mission_id' LIMIT 1");
+    if ($system->db->last_num_rows == 0) {
         return;
     }
-    $mission_data = $system->db_fetch($result);
+    $mission_data = $system->db->fetch($result);
 
     if ($mission_data['mission_type'] == "5") {
         $mission = new Mission($player->mission_id, $player);

@@ -173,42 +173,44 @@ class SupportManager {
 
     public function createSupport($user_name, $support_type, $subject, $message, $premium = false, $email = '', $support_key = '') {
 
-        $this->system->query("INSERT INTO `support_request`
-            (
-                `time`, 
-              `updated`, 
-              `user_id`, 
-              `ip_address`, 
-              `email`, 
-              `support_type`, 
-              `subject`,
-              `message`,
-              `open`, 
-              `admin_response`,
-              `user_name`,
-              `support_key`,
-              `premium`
-            )
-        VALUES
-            (
-                '" . time() . "',
-                '" . time() . "',
-                '{$this->user_id}',
-                '{$this->ip_address}',
-                '{$email}',
-                '{$support_type}',
-                '{$subject}',
-                '{$message}',
-                '1',
-                '0',
-                '{$user_name}',
-                '{$support_key}',
-                '{$premium}'
-            )
-        ");
+        $this->system->db->query(
+            "INSERT INTO `support_request`
+                (
+                    `time`, 
+                  `updated`, 
+                  `user_id`, 
+                  `ip_address`, 
+                  `email`, 
+                  `support_type`, 
+                  `subject`,
+                  `message`,
+                  `open`, 
+                  `admin_response`,
+                  `user_name`,
+                  `support_key`,
+                  `premium`
+                )
+            VALUES
+                (
+                    '" . time() . "',
+                    '" . time() . "',
+                    '{$this->user_id}',
+                    '{$this->ip_address}',
+                    '{$email}',
+                    '{$support_type}',
+                    '{$subject}',
+                    '{$message}',
+                    '1',
+                    '0',
+                    '{$user_name}',
+                    '{$support_key}',
+                    '{$premium}'
+                )
+            "
+        );
 
-        if($this->system->db_last_insert_id) {
-            return $this->system->db_last_insert_id;
+        if($this->system->db->last_insert_id) {
+            return $this->system->db->last_insert_id;
         }
         return false;
     }
@@ -252,8 +254,8 @@ class SupportManager {
                 $definedVals = ['<', '>', '='];
                 if(in_array(substr($val, 0, 1), $definedVals)) {
                     $keys = explode('_', $val);
-                    $comparison = $this->system->clean($keys[0]);
-                    $value = $this->system->clean($keys[1]);
+                    $comparison = $this->system->db->clean($keys[0]);
+                    $value = $this->system->db->clean($keys[1]);
                     $query .= "`$col` {$comparison} '{$value}' AND ";
                 }
                 elseif(substr($val, 0, 2) == 'IN') {
@@ -287,15 +289,15 @@ class SupportManager {
             echo $query;
         }
 
-        $result = $this->system->query($query);
-        if($this->system->db_last_num_rows) {
+        $result = $this->system->db->query($query);
+        if($this->system->db->last_num_rows) {
             if($count) {
-                return $this->system->db_fetch($result)["COUNT(*)"];
+                return $this->system->db->fetch($result)["COUNT(*)"];
             }
 
             if(!$this->staff) {
                 $supports = [];
-                while($row = $this->system->db_fetch($result)) {
+                while($row = $this->system->db->fetch($result)) {
                     $supports[] = $row;
                 }
                 return $supports;
@@ -310,7 +312,7 @@ class SupportManager {
                 ];
 
                 // Prioritize supports
-                while($row = $this->system->db_fetch($result)) {
+                while($row = $this->system->db->fetch($result)) {
                     $supports[$this->getTypePriority($row['support_type'], $row['premium'])][] = $row;
                 }
 
@@ -383,11 +385,13 @@ class SupportManager {
     }
 
     public function fetchSupportResponses($support_id) {
-        $result = $this->system->query("SELECT * FROM `support_request_responses` 
-            WHERE `support_id`='{$support_id}' ORDER BY `time` DESC, `response_id` DESC");
-        if($this->system->db_last_num_rows) {
+        $result = $this->system->db->query(
+            "SELECT * FROM `support_request_responses` 
+                WHERE `support_id`='{$support_id}' ORDER BY `time` DESC, `response_id` DESC"
+        );
+        if($this->system->db->last_num_rows) {
             $responses = [];
-            while($row = $this->system->db_fetch($result)) {
+            while($row = $this->system->db->fetch($result)) {
                 $responses[] = $row;
             }
             return $responses;
@@ -428,34 +432,36 @@ class SupportManager {
         $query = "UPDATE `support_request` SET `updated`='" . time() . "',
             `admin_response`='{$this->staff}' WHERE `support_id`='{$support_id}' LIMIT 1";
 
-        if($this->system->query($query)) {
+        if($this->system->db->query($query)) {
             return true;
         }
         return false;
     }
 
     public function addSupportResponse($support_id, $user_name, $response, $update = true) {
-        $this->system->query("INSERT INTO `support_request_responses`
-            (
-                `support_id`,
-                `time`,
-                `user_id`,
-                `user_name`,
-                `message`,
-                `ip_address`
-            )
-        VALUES
-            (
-                '{$support_id}',
-                '" . time() . "',
-                '{$this->user_id}',
-                '{$user_name}',
-                '{$response}',
-                '{$this->ip_address}'
-            )
-        ");
+        $this->system->db->query(
+            "INSERT INTO `support_request_responses`
+                (
+                    `support_id`,
+                    `time`,
+                    `user_id`,
+                    `user_name`,
+                    `message`,
+                    `ip_address`
+                )
+            VALUES
+                (
+                    '{$support_id}',
+                    '" . time() . "',
+                    '{$this->user_id}',
+                    '{$user_name}',
+                    '{$response}',
+                    '{$this->ip_address}'
+                )
+            "
+        );
 
-        if($this->system->db_last_insert_id) {
+        if($this->system->db->last_insert_id) {
             if($this->staff && $update) {
                 $this->updateSupport($support_id);
             }
@@ -482,8 +488,8 @@ class SupportManager {
             throw new Exception("Support already closed!");
         }
 
-        $this->system->query("UPDATE `support_request` SET `open`=0 WHERE `support_id`={$support_id} LIMIT 1");
-        if($this->system->db_last_affected_rows) {
+        $this->system->db->query("UPDATE `support_request` SET `open`=0 WHERE `support_id`={$support_id} LIMIT 1");
+        if($this->system->db->last_affected_rows) {
             if($inactive) {
                 $this->addSupportResponse($support_id, 'System', '[Closed fo inactivity]', false);
             }
@@ -507,8 +513,8 @@ class SupportManager {
             throw new Exception("Not authorized to view this support!");
         }
 
-        $this->system->query("UPDATE `support_request` SET `open`=1 WHERE `support_id`={$support_id} LIMIT 1");
-        if($this->system->db_last_affected_rows) {
+        $this->system->db->query("UPDATE `support_request` SET `open`=1 WHERE `support_id`={$support_id} LIMIT 1");
+        if($this->system->db->last_affected_rows) {
                 $this->addSupportResponse($support_id, $this->user->user_name, '[Request Re-opened]');
             return true;
         }
@@ -516,20 +522,24 @@ class SupportManager {
     }
 
     public function getSupportIdByKey($support_key) {
-        $result = $this->system->query("SELECT `support_id` FROM `support_request` WHERE `support_key`='{$support_key}' ORDER BY `time` DESC LIMIT 1");
-        if($this->system->db_last_num_rows) {
-            return ($this->system->db_fetch($result)['support_id']);
+        $result = $this->system->db->query(
+            "SELECT `support_id` FROM `support_request` WHERE `support_key`='{$support_key}' ORDER BY `time` DESC LIMIT 1"
+        );
+        if($this->system->db->last_num_rows) {
+            return ($this->system->db->fetch($result)['support_id']);
         }
         return false;
     }
 
     public function autocloseSupports() {
         $timeRequired = time() - (self::$autoClose);
-        $result = $this->system->query("SELECT * FROM `support_request` 
-            WHERE `admin_response`='1' AND `open`='1' AND `updated`<'{$timeRequired}'");
+        $result = $this->system->db->query(
+            "SELECT * FROM `support_request` 
+                WHERE `admin_response`='1' AND `open`='1' AND `updated`<'{$timeRequired}'"
+        );
         $toClose = [];
-        if($this->system->db_last_num_rows) {
-            while($row = $this->system->db_fetch($result)) {
+        if($this->system->db->last_num_rows) {
+            while($row = $this->system->db->fetch($result)) {
                 $toClose[] = $row['support_id'];
             }
         }
@@ -559,9 +569,11 @@ class SupportManager {
             throw new Exception("User already assigned!");
         }
 
-        $this->system->query("UPDATE `support_request` SET `user_id`='{$this->user_id}', `user_name`='{$this->user->user_name}' WHERE `support_id`='{$support_id}' LIMIT 1");
+        $this->system->db->query(
+            "UPDATE `support_request` SET `user_id`='{$this->user_id}', `user_name`='{$this->user->user_name}' WHERE `support_id`='{$support_id}' LIMIT 1"
+        );
 
-        if($this->system->db_last_affected_rows) {
+        if($this->system->db->last_affected_rows) {
             $this->addSupportResponse($support_id, $this->user->user_name, "I have added this guest support to my Account.");
             return true;
         }

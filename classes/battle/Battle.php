@@ -97,7 +97,7 @@ class Battle {
             $player2->combat_id => $player2->health
         ];
 
-        $system->query(
+        $system->db->query(
             "INSERT INTO `battles` SET
                 `battle_type` = '" . $battle_type . "',
                 `start_time` = '" . time() . "',
@@ -115,7 +115,7 @@ class Battle {
                 `fighter_jutsu_used` = '" . $json_empty_array . "'
                 "
         );
-        $battle_id = $system->db_last_insert_id;
+        $battle_id = $system->db->last_insert_id;
 
         if($player1 instanceof User) {
             $player1->battle_id = $battle_id;
@@ -168,17 +168,17 @@ class Battle {
         $this->battle_id = $battle_id;
         $this->player = $player;
 
-        $result = $this->system->query(
+        $result = $this->system->db->query(
             "SELECT * FROM `battles` WHERE `battle_id`='{$battle_id}' LIMIT 1"
         );
-        if($this->system->db_last_num_rows == 0) {
+        if($this->system->db->last_num_rows == 0) {
             if($player->battle_id = $battle_id) {
                 $player->battle_id = 0;
             }
             throw new Exception("Invalid battle!");
         }
 
-        $battle = $this->system->db_fetch($result);
+        $battle = $this->system->db->fetch($result);
 
         $this->raw_active_effects = $battle['active_effects'];
         $this->raw_active_genjutsu = $battle['active_genjutsu'];
@@ -299,28 +299,30 @@ class Battle {
     }
 
     public function updateData() {
-        $this->system->query("START TRANSACTION;");
+        $this->system->db->query("START TRANSACTION;");
 
-        $this->system->query("UPDATE `battles` SET
-            `turn_time` = {$this->turn_time},
-            `turn_count` = {$this->turn_count},
-            `winner` = '{$this->winner}',
-
-            `fighter_health` = '" . json_encode($this->fighter_health) . "',
-            `fighter_actions` = '" . json_encode($this->fighter_actions) . "',
-
-            `field` = '" . $this->raw_field . "',
-
-            `active_effects` = '" . $this->raw_active_effects . "',
-            `active_genjutsu` = '" . $this->raw_active_genjutsu . "',
-
-            `jutsu_cooldowns` = '" . json_encode($this->jutsu_cooldowns) . "',
-            `fighter_jutsu_used` = '" . json_encode($this->fighter_jutsu_used) . "'
-        WHERE `battle_id` = '{$this->battle_id}' LIMIT 1");
+        $this->system->db->query(
+            "UPDATE `battles` SET
+                `turn_time` = {$this->turn_time},
+                `turn_count` = {$this->turn_count},
+                `winner` = '{$this->winner}',
+    
+                `fighter_health` = '" . json_encode($this->fighter_health) . "',
+                `fighter_actions` = '" . json_encode($this->fighter_actions) . "',
+    
+                `field` = '" . $this->raw_field . "',
+    
+                `active_effects` = '" . $this->raw_active_effects . "',
+                `active_genjutsu` = '" . $this->raw_active_genjutsu . "',
+    
+                `jutsu_cooldowns` = '" . json_encode($this->jutsu_cooldowns) . "',
+                `fighter_jutsu_used` = '" . json_encode($this->fighter_jutsu_used) . "'
+            WHERE `battle_id` = '{$this->battle_id}' LIMIT 1"
+        );
 
         BattleLog::addOrUpdateTurnLog($this->system, $this->battle_id, $this->turn_count, $this->battle_text);
 
-        $this->system->query("COMMIT;");
+        $this->system->db->query("COMMIT;");
     }
 
     public static function combatId(string $team, Fighter $fighter): string {

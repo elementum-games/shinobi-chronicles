@@ -10,7 +10,7 @@ function specialMissions() {
     // Start new Special Mission
     if (isset($_GET['start']) && !$player->special_mission) {
         try {
-            $difficulty = $system->clean($_GET['start']);
+            $difficulty = $system->db->clean($_GET['start']);
             $special_mission = SpecialMission::startMission($system, $player, $difficulty);
             $player->special_mission = $special_mission->mission_id;
 

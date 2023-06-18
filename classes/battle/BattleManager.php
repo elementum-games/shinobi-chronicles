@@ -115,6 +115,19 @@ class BattleManager {
             $this->opponent_side = Battle::TEAM2;
         }
 
+        // 1: Player A lock A
+        // 2: Player B lock B
+        // 3: Player A lock B
+        // 4: Player B lock A
+
+        if($this->player->user_id == 1) {
+            error_log("SLEEPING");
+            sleep(5);
+        }
+        else {
+            // sleep(2);
+        }
+
         $this->battle->loadFighters();
 
         if($this->player_side == Battle::TEAM1) {
@@ -154,8 +167,8 @@ class BattleManager {
         $default_attacks = [];
 
         $query = "SELECT * FROM `jutsu` WHERE `purchase_type`='1'";
-        $result = $this->system->query($query);
-        while($row = $this->system->db_fetch($result)) {
+        $result = $this->system->db->query($query);
+        while($row = $this->system->db->fetch($result)) {
             $default_attacks[$row['jutsu_id']] = Jutsu::fromArray($row['jutsu_id'], $row);
         }
         return $default_attacks;
@@ -269,7 +282,7 @@ class BattleManager {
                     $weapon_id = 0;
                     $weapon_element = Jutsu::ELEMENT_NONE;
                     if($jutsu_type == Jutsu::TYPE_TAIJUTSU && !empty($_POST['weapon_id'])) {
-                        $weapon_id = (int)$this->system->clean($_POST['weapon_id']);
+                        $weapon_id = (int)$this->system->db->clean($_POST['weapon_id']);
                         if($weapon_id && $this->player->hasItem($weapon_id)) {
                             if(!in_array($weapon_id, $this->player->equipped_weapon_ids)) {
                                 $weapon_id = 0;
@@ -279,7 +292,7 @@ class BattleManager {
                             $weapon_id = 0;
                         }
 
-                        $weapon_element = $this->system->clean($_POST['weapon_element'] ?? "None");
+                        $weapon_element = $this->system->db->clean($_POST['weapon_element'] ?? "None");
                         if(!in_array($weapon_element, $this->player->elements)) {
                             $weapon_element = Jutsu::ELEMENT_NONE;
                         }
@@ -517,7 +530,7 @@ class BattleManager {
 
         if($collision_text) {
             $collision_text = $this->parseCombatText($collision_text, $this->battle->player1, $this->battle->player2);
-            $this->battle->battle_text .= '[br][hr]' . $this->system->clean($collision_text);
+            $this->battle->battle_text .= '[br][hr]' . $this->system->db->clean($collision_text);
         }
         $this->battle->battle_text .= '[br][hr]';
 
@@ -761,14 +774,14 @@ class BattleManager {
 
         if($attack->jutsu->hasEffect()){
             $text .= "<p style=\"font-style:italic;margin-top:3px;\">" .
-                $this->system->clean($this->effects->getAnnouncementText($attack->jutsu->effect)) .
+                $this->system->db->clean($this->effects->getAnnouncementText($attack->jutsu->effect)) .
                 "</p>";
         }
 
 
         if($attack->jutsu->weapon_id) {
             $text .= "<p style=\"font-style:italic;margin-top:3px;\">" .
-                $this->system->clean($this->effects->getAnnouncementText($attack->jutsu->weapon_effect->effect)) .
+                $this->system->db->clean($this->effects->getAnnouncementText($attack->jutsu->weapon_effect->effect)) .
                 "</p>";
         }
 

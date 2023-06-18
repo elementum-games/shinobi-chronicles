@@ -47,9 +47,9 @@ function chatLog() {
 
     $limit = 10;
     $max_chat_id = 0;
-    $max_result = $system->query("SELECT `post_id` FROM `chat` ORDER BY `post_id` DESC LIMIT 1");
-    if($system->db_last_num_rows) {
-        $max_chat_id = $system->db_fetch($max_result)['post_id'];
+    $max_result = $system->db->query("SELECT `post_id` FROM `chat` ORDER BY `post_id` DESC LIMIT 1");
+    if($system->db->last_num_rows) {
+        $max_chat_id = $system->db->fetch($max_result)['post_id'];
     }
 
     $min_diff = 0;
@@ -69,13 +69,15 @@ function chatLog() {
 
     $posts = [];
     if($report || $post_id) {
-        $result = $system->query("SELECT * FROM `chat` WHERE `post_id` BETWEEN '$min_id' AND '$max_id' ORDER BY `post_id` DESC");
-        if (!$system->db_last_num_rows) {
+        $result = $system->db->query(
+            "SELECT * FROM `chat` WHERE `post_id` BETWEEN '$min_id' AND '$max_id' ORDER BY `post_id` DESC"
+        );
+        if (!$system->db->last_num_rows) {
             $system->message("Posts not found!");
             $system->printMessage();
             return false;
         }
-        $posts = $system->db_fetch_all($result);
+        $posts = $system->db->fetch_all($result);
     }
 
     include 'templates/staff/mod/chat_log.php';

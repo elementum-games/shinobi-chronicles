@@ -79,7 +79,7 @@ function userProfile() {
     $student_message_max_length = 500;
     $recruitment_message_max_length = 100;
     if(!empty($_POST['update_student_recruitment'])) {
-        $recruitment_message = $system->clean($_POST['recruitment_message']);
+        $recruitment_message = $system->db->clean($_POST['recruitment_message']);
         try {
             isset($_POST['accept_students']) ? $player->accept_students = true : $player->accept_students = false;
             // Update recruitment settings
@@ -96,8 +96,8 @@ function userProfile() {
         $player->updateData();
     }
     if(!empty($_POST['update_student_settings'])) {
-        $student_message = $system->clean($_POST['student_message']);
-        $specialization = $system->clean($_POST['specialization']);
+        $student_message = $system->db->clean($_POST['student_message']);
+        $specialization = $system->db->clean($_POST['specialization']);
         try {
             // Update student settings
             $success = SenseiManager::updateStudentSettings($player->user_id, $student_message, $specialization, $system);
@@ -147,7 +147,7 @@ function sendMoney(System $system, User $player, string $currency_type): void {
     }
 
     if(isset($_POST['send_currency'])) {
-        $recipient = $system->clean($_POST['recipient']);
+        $recipient = $system->db->clean($_POST['recipient']);
         $amount = (int)$_POST['amount'];
 
         try {
@@ -158,15 +158,15 @@ function sendMoney(System $system, User $player, string $currency_type): void {
                 throw new Exception("Invalid amount!");
             }
 
-            $result = $system->query(
+            $result = $system->db->query(
                 "SELECT `user_id`, `user_name`, `money`, `premium_credits`
                         FROM `users`
                         WHERE `user_name`='$recipient' LIMIT 1"
             );
-            if(!$system->db_last_num_rows) {
+            if(!$system->db->last_num_rows) {
                 throw new Exception("Invalid user!");
             }
-            $recipient = $system->db_fetch($result);
+            $recipient = $system->db->fetch($result);
 
             if($currency_type == System::CURRENCY_TYPE_MONEY) {
                 if($amount > $player->getMoney()) {
@@ -174,7 +174,9 @@ function sendMoney(System $system, User $player, string $currency_type): void {
                 }
                 $player->subtractMoney($amount, "Sent money to {$recipient['user_name']} (#{$recipient['user_id']})");
 
-                $system->query("UPDATE `users` SET `money`=`money` + $amount WHERE `user_id`='{$recipient['user_id']}' LIMIT 1");
+                $system->db->query(
+                    "UPDATE `users` SET `money`=`money` + $amount WHERE `user_id`='{$recipient['user_id']}' LIMIT 1"
+                );
                 $system->currencyLog(
                     $recipient['user_id'],
                     $currency_type,
@@ -202,7 +204,9 @@ function sendMoney(System $system, User $player, string $currency_type): void {
                 }
                 $player->subtractPremiumCredits($amount, "Sent AK to {$recipient['user_name']} (#{$recipient['user_id']})");
 
-                $system->query("UPDATE `users` SET `premium_credits`=`premium_credits` + $amount WHERE `user_id`='{$recipient['user_id']}' LIMIT 1");
+                $system->db->query(
+                    "UPDATE `users` SET `premium_credits`=`premium_credits` + $amount WHERE `user_id`='{$recipient['user_id']}' LIMIT 1"
+                );
                 $system->currencyLog(
                     $recipient['user_id'],
                     $currency_type,

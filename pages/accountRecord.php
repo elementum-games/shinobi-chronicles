@@ -8,10 +8,12 @@ function accountRecord() {
     $warnings = $player->getOfficialWarnings();
 
     $bans = [];
-    $ban_result = $system->query("SELECT * FROM `user_record` WHERE `user_id`='{$player->user_id}' AND `record_type` IN ('"
-        . StaffManager::RECORD_BAN_ISSUED . "', '" . StaffManager::RECORD_BAN_REMOVED . "') ORDER BY `time` DESC");
-    if($system->db_last_num_rows) {
-        while($ban = $system->db_fetch($ban_result)) {
+    $ban_result = $system->db->query(
+        "SELECT * FROM `user_record` WHERE `user_id`='{$player->user_id}' AND `record_type` IN ('"
+            . StaffManager::RECORD_BAN_ISSUED . "', '" . StaffManager::RECORD_BAN_REMOVED . "') ORDER BY `time` DESC"
+    );
+    if($system->db->last_num_rows) {
+        while($ban = $system->db->fetch($ban_result)) {
             $bans[] = $ban;
         }
     }

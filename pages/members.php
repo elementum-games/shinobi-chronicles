@@ -36,19 +36,23 @@ function members() {
 
 	// Display Team profile
 	if (isset($_GET['view_team'])) {
-		$team_id = $system->clean($_GET['view_team']);
+		$team_id = $system->db->clean($_GET['view_team']);
 		try {
-			$result = $system->query("SELECT `name`, `type`, `points`, `monthly_points`, `village`, `members`, `logo`, `leader` FROM `teams` WHERE `team_id`='{$team_id}'");
+			$result = $system->db->query(
+                "SELECT `name`, `type`, `points`, `monthly_points`, `village`, `members`, `logo`, `leader` FROM `teams` WHERE `team_id`='{$team_id}'"
+            );
 
-			if ($system->db_last_num_rows == 0) {
+			if ($system->db->last_num_rows == 0) {
 				throw new Exception ('Team does not exist');
 			}
 
-			$team_info = $system->db_fetch($result);
+			$team_info = $system->db->fetch($result);
 			$team_member_ids = json_decode($team_info['members'], true);
 
-			$result = $system->query("SELECT `user_name`, `avatar_link`, `forbidden_seal` FROM `users` WHERE `user_id`='{$team_info['leader']}'");
-			$leader_info = $system->db_fetch($result);
+			$result = $system->db->query(
+                "SELECT `user_name`, `avatar_link`, `forbidden_seal` FROM `users` WHERE `user_id`='{$team_info['leader']}'"
+            );
+			$leader_info = $system->db->fetch($result);
 			$forbidden_seal = ($leader_info['forbidden_seal'] != '' ? '175px' : '125px');
 
 			echo "
@@ -109,9 +113,11 @@ function members() {
 				</tr>";
 
 			$user_ids = implode(',', $team_member_ids);
-			$result = $system->query("SELECT `user_name`, `rank`, `level` FROM `users` WHERE `user_id` IN ($user_ids) ORDER BY `rank` DESC, `level` DESC");
+			$result = $system->db->query(
+                "SELECT `user_name`, `rank`, `level` FROM `users` WHERE `user_id` IN ($user_ids) ORDER BY `rank` DESC, `level` DESC"
+            );
 
-			while ($team_member = $system->db_fetch($result)) {
+			while ($team_member = $system->db->fetch($result)) {
 				echo "
 				<tr class='table_multicolumns'>
 					<td>
@@ -135,24 +141,26 @@ function members() {
 	}
     // Display user's profile
     else if(isset($_GET['user'])) {
-		$user_name = $system->clean($_GET['user']);
-		$result = $system->query("SELECT `user_id` FROM `users` WHERE `user_name`='{$user_name}' LIMIT 1");
+		$user_name = $system->db->clean($_GET['user']);
+		$result = $system->db->query("SELECT `user_id` FROM `users` WHERE `user_name`='{$user_name}' LIMIT 1");
 
 		try {
-			if($system->db_last_num_rows == 0) {
+			if($system->db->last_num_rows == 0) {
 				throw new Exception("User does not exist!");
 			}
 
-			$result = $system->db_fetch($result);
+			$result = $system->db->fetch($result);
 			$viewUser = User::loadFromId($system, $result['user_id'], true);
 			$viewUser->loadData(User::UPDATE_NOTHING, true);
 
-			$journal_result = $system->query("SELECT `journal` FROM `journals` WHERE `user_id`='{$viewUser->user_id}'");
-			if($system->db_last_num_rows == 0) {
+			$journal_result = $system->db->query(
+                "SELECT `journal` FROM `journals` WHERE `user_id`='{$viewUser->user_id}'"
+            );
+			if($system->db->last_num_rows == 0) {
 				$journal = '';
 			}
 			else {
-				$journal_result = $system->db_fetch($journal_result);
+				$journal_result = $system->db->fetch($journal_result);
 				$journal = $journal_result['journal'];
 			}
 
@@ -235,11 +243,13 @@ function members() {
 		// Pagination
 		$min = 0;
 		if(isset($_GET['min']) && $view == 'online_users') {
-			$min = (int)$system->clean($_GET['min']);
+			$min = (int)$system->db->clean($_GET['min']);
 		}
 
-        $result = $system->query("SELECT `user_name`, `rank`, `village`, `village_rep`, `exp`, `level` , `pvp_wins` FROM `users`
-			$query_custom LIMIT $min, $results_per_page");
+        $result = $system->db->query(
+            "SELECT `user_name`, `rank`, `village`, `village_rep`, `exp`, `level` , `pvp_wins` FROM `users`
+                $query_custom LIMIT $min, $results_per_page"
+        );
 
 		$table_header = 'Level';
 		switch($view) {
@@ -250,10 +260,10 @@ function members() {
 			case "online_users":
 				$table_header = 'Level';
 
-				$online_users_result = $system->query(
-				    "SELECT COUNT(`user_id`) as `online_users` FROM `users` WHERE `last_active` > UNIX_TIMESTAMP() - $online_seconds"
+				$online_users_result = $system->db->query(
+                    "SELECT COUNT(`user_id`) as `online_users` FROM `users` WHERE `last_active` > UNIX_TIMESTAMP() - $online_seconds"
                 );
-                $online_users = $system->db_fetch($online_users_result)['online_users'];
+                $online_users = $system->db->fetch($online_users_result)['online_users'];
                 $list_name = 'Online Users (' . $online_users . ' currently online)';
 				break;
             case "highest_pvp":
@@ -275,9 +285,11 @@ function members() {
 		if($view == 'highest_teams') {
 			// Teams
 				$user_id_array = array();
-				$result = $system->query("SELECT * FROM `teams` ORDER BY `monthly_points` DESC LIMIT $results_per_page");
+				$result = $system->db->query(
+                    "SELECT * FROM `teams` ORDER BY `monthly_points` DESC LIMIT $results_per_page"
+                );
 				$teams = array();
-				while($row = $system->db_fetch($result)) {
+				while($row = $system->db->fetch($result)) {
 					$teams[] = $row;
 					if(array_search($row['leader'], $user_id_array) === false) {
 							$user_id_array[] = $row['leader'];
@@ -287,10 +299,12 @@ function members() {
 				// Fetch leader names
 				if(!empty($user_id_array)) {
 				$user_id_string = implode(',', $user_id_array);
-				$result = $system->query("SELECT `user_id`, `user_name`, `village` FROM `users` WHERE `user_id` IN ($user_id_string)");
+				$result = $system->db->query(
+                    "SELECT `user_id`, `user_name`, `village` FROM `users` WHERE `user_id` IN ($user_id_string)"
+                );
 				$user_names = array();
 				$village = array();
-				while($row = $system->db_fetch($result)) {
+				while($row = $system->db->fetch($result)) {
 						$user_names[$row['user_id']] = $row['user_name'];
 						$village[$row['village']] = $row['village'];
 					}
@@ -323,18 +337,18 @@ function members() {
 				</tr>";
 	}
 
-	 if($view == 'highest_teams' && $system->db_last_num_rows == 0) {
+	 if($view == 'highest_teams' && $system->db->last_num_rows == 0) {
 			echo "<tr><td colspan='4'>No teams found!</td></tr>
 		</table>";
 		}
-		else if($system->db_last_num_rows == 0) {
+		else if($system->db->last_num_rows == 0) {
 
 				echo "<tr><td colspan='4'>No users found!</td></tr>
 			</table>";
 		}
 
 		else {
-			while($row = $system->db_fetch($result)) {
+			while($row = $system->db->fetch($result)) {
 				$class = '';
 				if(is_int($count++ / 2)) {
 					$class = 'row1';
@@ -377,8 +391,8 @@ function members() {
 				}
 				echo "<a href='$self_link&view=$view&min=$prev'>Previous</a>";
 			}
-			$result = $system->query("SELECT COUNT(`user_id`) as `count` FROM `users` $query_custom");
-			$result = $system->db_fetch($result);
+			$result = $system->db->query("SELECT COUNT(`user_id`) as `count` FROM `users` $query_custom");
+			$result = $system->db->fetch($result);
 			if($min + $results_per_page < $result['count'] && $view == 'online_users') {
 				if($min > 0) {
 					echo "&nbsp;&nbsp;|&nbsp;&nbsp;";
@@ -391,18 +405,20 @@ function members() {
 
 	}
 	else if($display_list == 'staff') {
-		$result = $system->query("SELECT `user_name`, `rank`, `staff_level`, `village` FROM `users` WHERE `staff_level` > 0
-			ORDER BY `staff_level` DESC");
+		$result = $system->db->query(
+            "SELECT `user_name`, `rank`, `staff_level`, `village` FROM `users` WHERE `staff_level` > 0
+                ORDER BY `staff_level` DESC"
+        );
 
 		echo "<table class='table'><tr><th colspan='3'>Administrators</th></tr>";
 
-		if($system->db_last_num_rows == 0) {
+		if($system->db->last_num_rows == 0) {
 			echo "<tr><td colspan='3'>No users found!</td></tr>
 			</table>";
 		}
 		else {
 			$last_staff_level = User::STAFF_ADMINISTRATOR;
-			while($row = $system->db_fetch($result)) {
+			while($row = $system->db->fetch($result)) {
 				$class = '';
 				if(is_int($count++ / 2)) {
 					$class = 'row1';

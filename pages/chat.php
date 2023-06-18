@@ -8,7 +8,7 @@ function chat(): void {
     global $player;
     $chatManager = new ChatManager($system, $player);
     if (isset($_GET['post_id'])) {
-        $initialChatPostId = (int) $system->clean($_GET['post_id']);
+        $initialChatPostId = (int) $system->db->clean($_GET['post_id']);
         $initialChatPostsResponse = $chatManager->loadPosts($initialChatPostId);
     } else {
         $initialChatPostsResponse = $chatManager->loadPosts();

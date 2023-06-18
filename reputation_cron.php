@@ -18,9 +18,9 @@ require_once __DIR__ . './classes/Mission.php';
 require_once __DIR__ . './classes/travel/TravelManager.php';
 
 $system = new System();
-$system->dbConnect();
+$system->db->connect();
 
-if(!$system->con) {
+if(!$system->db->con) {
     throw new Exception("Error connecting to DB!");
 }
 
@@ -42,5 +42,5 @@ if($_SESSION['user_id']) {
 
 function weeklyCron($system) {
     $decay = Village::DECAY;
-    $system->query("UPDATE `users` SET `weekly_rep` = 0, `village_rep`=ceil(`village_rep`*{$decay})");
+    $system->db->query("UPDATE `users` SET `weekly_rep` = 0, `village_rep`=ceil(`village_rep`*{$decay})");
 }

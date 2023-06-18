@@ -12,7 +12,7 @@ try {
     $player->loadData();
 } catch(Exception $e) {
     echo json_encode(['logout' => true]);
-    $system->rollbackTransaction();
+    $system->db->rollbackTransaction();
     error_log($e->getMessage());
     exit;
     // API::exitWithError($e->getMessage());
@@ -25,7 +25,7 @@ $status = true;
 // Check if the user is in battle
 if ($player->battle_id) {
     echo json_encode(['inBattle' => true]);
-    $system->commitTransaction();
+    $system->db->commitTransaction();
     exit;
 }
 
@@ -45,7 +45,7 @@ if (floor(microtime(true) * 1000) >= $target_update) {
     $special_mission->nextEvent();
 }
 
-$system->commitTransaction();
+$system->db->commitTransaction();
 echo json_encode([
     'mission' => $special_mission,
     'systemMessage' => $system->message,

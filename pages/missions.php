@@ -26,15 +26,17 @@ function missions(): bool {
 
 	$max_mission_rank = Mission::maxMissionRank($player->rank_num);
 
-	$result = $system->query("SELECT `mission_id`, `name`, `rank` FROM `missions` WHERE `mission_type`=1 OR `mission_type`=5 AND `rank` <= $max_mission_rank");
-	if($system->db_last_num_rows == 0) {
+	$result = $system->db->query(
+        "SELECT `mission_id`, `name`, `rank` FROM `missions` WHERE `mission_type`=1 OR `mission_type`=5 AND `rank` <= $max_mission_rank"
+    );
+	if($system->db->last_num_rows == 0) {
 		$system->message("No missions available!");
 		$system->printMessage();
 		return false;
 	}
 
 	$missions = array();
-	while($row = $system->db_fetch($result)) {
+	while($row = $system->db->fetch($result)) {
 		$missions[$row['mission_id']] = $row;
 	}
 
@@ -278,7 +280,7 @@ function runActiveMission(): bool {
                 $team_points = 2;
                 // Process team rewards if this is the first completing player, then unset the mission ID
                 if($player->team->mission_id) {
-                    $system->query(
+                    $system->db->query(
                         "UPDATE `teams` SET
 						`points`=`points` + $team_points, `monthly_points`=`monthly_points` + $team_points,`mission_id`=0
 						WHERE `team_id`={$player->team->id}"
@@ -300,7 +302,7 @@ function runActiveMission(): bool {
                 $player->last_ai_ms = System::currentTimeMs();
 
                 $point_gain = 1;
-                $system->query(
+                $system->db->query(
                     "UPDATE `clans` SET `points`=`points`+$point_gain WHERE `clan_id`={$player->clan->id} LIMIT 1"
                 );
 

@@ -8,7 +8,7 @@ if(isset($_SESSION['user_id'])) {
     exit;
 }
 
-$system->dbConnect();
+$system->db->connect();
 
 // Start display
 require("layout/" . System::DEFAULT_LAYOUT . ".php");
@@ -19,25 +19,25 @@ echo str_replace("[HEADER_TITLE]", "Reset your password", $body_start);
 
 // If user confirms password reset, check input and reset
 if($_POST) {
-	$con = $system->dbConnect();
+	$con = $system->db->connect();
 	
-	$user_name = $system->clean($_POST['username']);
-	$email = $system->clean($_POST['email']);
+	$user_name = $system->db->clean($_POST['username']);
+	$email = $system->db->clean($_POST['email']);
 	$query = "SELECT `user_id` FROM users WHERE user_name='$user_name' AND email='$email' LIMIT 1";
-	$result = $system->query($query);
-	if($system->db_last_num_rows == 0) {
+	$result = $system->db->query($query);
+	if($system->db->last_num_rows == 0) {
 		$system->message("Invalid username or email address! Please submit a 
 		    <a href='{$system->router->base_url}support.php'>support request</a>");
 		$system->printMessage();
 	}
 	else {
-		$result = $system->db_fetch($result);
+		$result = $system->db->fetch($result);
 		$userid = $result['user_id'];
 		
 		$hash = sha1(mt_rand(1, 1000000));
 		$new_password = substr($hash, 0, 16);
 		$hashed_password = $system->hash_password($new_password);
-		$system->query("UPDATE users SET password='{$hashed_password}' WHERE user_id=$userid");
+		$system->db->query("UPDATE users SET password='{$hashed_password}' WHERE user_id=$userid");
 		
 		$subject = "Shinobi Chronicles - Password Reset";
 		$headers = "From: Shinobi Chronicles<" . System::SC_ADMIN_EMAIL . ">" . "\r\n";

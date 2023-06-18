@@ -556,7 +556,7 @@ class BattleEffectsManager {
     }
 
     public function getDisplayText(Fighter $fighter): string {
-        return $this->system->clean(
+        return $this->system->db->clean(
             implode(
                 '[br]',
                 array_map(function($text) {

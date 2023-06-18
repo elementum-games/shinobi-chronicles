@@ -28,8 +28,10 @@ class NotificationAPIManager {
         // Return array
         $notifications = [];
         $notification_ids_to_delete = [];
-        $notification_table_result = $this->system->query("SELECT * FROM `notifications` WHERE `user_id` = {$this->player->user_id}");
-        while ($row = $this->system->db_fetch($notification_table_result)) {
+        $notification_table_result = $this->system->db->query(
+            "SELECT * FROM `notifications` WHERE `user_id` = {$this->player->user_id}"
+        );
+        while ($row = $this->system->db->fetch($notification_table_result)) {
             // If notification not valid mark for deletion and go to next loop, otherwise add to list
             switch ($row['type']) {
                 case "training":
@@ -195,7 +197,9 @@ class NotificationAPIManager {
             }
         }
         if (count($notification_ids_to_delete) > 0) {
-            $this->system->query("DELETE FROM `notifications` WHERE `notification_id` IN (" . implode(",", $notification_ids_to_delete) . ")");
+            $this->system->db->query(
+                "DELETE FROM `notifications` WHERE `notification_id` IN (" . implode(",", $notification_ids_to_delete) . ")"
+            );
         }
 
         /* Check for general notifications */
@@ -203,13 +207,13 @@ class NotificationAPIManager {
 
         //Battle
         if ($this->player->battle_id > 0) {
-            $result = $this->system->query(
+            $result = $this->system->db->query(
                 "SELECT `battle_type` FROM `battles` WHERE `battle_id`='{$this->player->battle_id}' LIMIT 1"
             );
-            if ($this->system->db_last_num_rows == 0) {
+            if ($this->system->db->last_num_rows == 0) {
                 $this->player->battle_id = 0;
             } else {
-                $result = $this->system->db_fetch($result);
+                $result = $this->system->db->fetch($result);
                 $link = null;
                 switch ($result['battle_type']) {
                     case Battle::TYPE_AI_ARENA:
@@ -324,12 +328,12 @@ class NotificationAPIManager {
     }
 
     public function closeNotification(int $notification_id): bool {
-        $this->system->query("DELETE FROM `notifications` WHERE `notification_id` = {$notification_id}");
-        return $this->system->db_last_affected_rows > 0 ? true : false;
+        $this->system->db->query("DELETE FROM `notifications` WHERE `notification_id` = {$notification_id}");
+        return $this->system->db->last_affected_rows > 0 ? true : false;
     }
 
     public function clearNotificationAlert(int $notification_id): bool {
-        $this->system->query("UPDATE `notifications` set `alert` = 0 WHERE `notification_id` = {$notification_id}");
-        return $this->system->db_last_affected_rows > 0 ? true : false;
+        $this->system->db->query("UPDATE `notifications` set `alert` = 0 WHERE `notification_id` = {$notification_id}");
+        return $this->system->db->last_affected_rows > 0 ? true : false;
     }
 }

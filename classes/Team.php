@@ -118,15 +118,17 @@ class Team {
 				 0, 0, 
 				 '{$founder_id}', '[{$founder_id},0,0,0]', 
 				 0, './images/default_avatar.png')";
-        $system->query($query);
+        $system->db->query($query);
 
-        return $system->db_last_affected_rows == 1;
+        return $system->db->last_affected_rows == 1;
     }
 
     public function getDefenseBoost(User $player): float {
-        $result = $this->system->query("SELECT COUNT(`user_id`) as `count` FROM `users`
-                    WHERE `team_id`='{$this->id}' AND `location`='".$player->location->fetchString()."' AND `last_active` > UNIX_TIMESTAMP() - 120");
-        $location_count = $this->system->db_fetch($result)['count'];
+        $result = $this->system->db->query(
+            "SELECT COUNT(`user_id`) as `count` FROM `users`
+                        WHERE `team_id`='{$this->id}' AND `location`='".$player->location->fetchString()."' AND `last_active` > UNIX_TIMESTAMP() - 120"
+        );
+        $location_count = $this->system->db->fetch($result)['count'];
         
         return (($location_count - 1) * 0.05);
     }
@@ -161,8 +163,10 @@ class Team {
         $this->points += $point_gain;
         $this->monthly_points += $point_gain;
 
-        $this->system->query("UPDATE `teams` SET `points`=`points`+'$point_gain', `monthly_points`=`monthly_points`+'$point_gain'  
-        WHERE `team_id`={$this->id} LIMIT 1");
+        $this->system->db->query(
+            "UPDATE `teams` SET `points`=`points`+'$point_gain', `monthly_points`=`monthly_points`+'$point_gain'  
+            WHERE `team_id`={$this->id} LIMIT 1"
+        );
     }
 
     /**
@@ -180,11 +184,13 @@ class Team {
 
         $this->members[$first_open_slot] = $player->user_id;
 
-        $this->system->query("UPDATE `teams` 
-            SET `members`='" . json_encode($this->members) . "'
-            WHERE `team_id`='{$this->id}'");
+        $this->system->db->query(
+            "UPDATE `teams` 
+                SET `members`='" . json_encode($this->members) . "'
+                WHERE `team_id`='{$this->id}'"
+        );
 
-        if($this->system->db_last_affected_rows === 1) {
+        if($this->system->db->last_affected_rows === 1) {
             $player->team = $this;
             $player->team_invite = 0;
         }
@@ -214,12 +220,14 @@ class Team {
         $this->boost_amount = $boost['amount'];
         $this->boost_time = time();
 
-        $this->system->query("UPDATE `teams` SET 
-                    `boost`='{$boost_type}', 
-                    `boost_amount`='{$boost['amount']}', 
-                    `points`='{$this->points}', 
-                    `boost_time`='" . time() . "' 
-                    WHERE `team_id`='{$this->id}'");
+        $this->system->db->query(
+            "UPDATE `teams` SET 
+                        `boost`='{$boost_type}', 
+                        `boost_amount`='{$boost['amount']}', 
+                        `points`='{$this->points}', 
+                        `boost_time`='" . time() . "' 
+                        WHERE `team_id`='{$this->id}'"
+        );
     }
 
     /**** STATIC UTILS ****/
@@ -230,12 +238,12 @@ class Team {
      * @return array|null
      */
     protected static function findDataById(System $system, int $team_id): ?array {
-        $result = $system->query("SELECT * FROM `teams` WHERE `team_id`='{$team_id}' LIMIT 1");
-        if($system->db_last_num_rows == 0) {
+        $result = $system->db->query("SELECT * FROM `teams` WHERE `team_id`='{$team_id}' LIMIT 1");
+        if($system->db->last_num_rows == 0) {
             return null;
         }
 
-        return $system->db_fetch($result);
+        return $system->db->fetch($result);
     }
 
     /**

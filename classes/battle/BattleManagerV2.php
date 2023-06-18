@@ -984,8 +984,8 @@ class BattleManagerV2 {
         $default_attacks = [];
 
         $query = "SELECT * FROM `jutsu` WHERE `purchase_type`='1'";
-        $result = $system->query($query);
-        while($row = $system->db_fetch($result)) {
+        $result = $system->db->query($query);
+        while($row = $system->db->fetch($result)) {
             $default_attacks[$row['jutsu_id']] = Jutsu::fromArray($row['jutsu_id'], $row);
         }
         return $default_attacks;

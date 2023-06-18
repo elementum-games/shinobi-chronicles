@@ -128,7 +128,7 @@ function validateField($var_name, $input, $FORM_DATA, $field_constraints, &$all_
         return true;
     }
 
-    $data[$var_name] = $system->clean($input);
+    $data[$var_name] = $system->db->clean($input);
 
     // Check for entry
     if(strlen($data[$var_name]) < 1) {
@@ -188,8 +188,8 @@ function validateField($var_name, $input, $FORM_DATA, $field_constraints, &$all_
             $query = "SELECT `{$field_constraints['unique_column']}` FROM `{$field_constraints['unique_table']}` 
 				WHERE `{$field_constraints['unique_column']}` = '" . $data[$var_name] . "' LIMIT 1";
         }
-        $result = $system->query($query);
-        if($system->db_last_num_rows > 0) {
+        $result = $system->db->query($query);
+        if($system->db->last_num_rows > 0) {
             throw new Exception("'" . System::unSlug($var_name) . "' needs to be unique, the value '" . $data[$var_name] . "' is already taken!");
         }
     }

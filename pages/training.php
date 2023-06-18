@@ -103,7 +103,7 @@ function training() {
 					throw new Exception("You cannot train this jutsu any further!");
 				}
 				$train_type = 'jutsu:' . System::slug($player->jutsu[$jutsu_id]->name);
-				$train_type = $system->clean($train_type);
+				$train_type = $system->db->clean($train_type);
 				$train_gain = $jutsu_id;
 				$train_length = 600 + (60 * round(pow($player->jutsu[$jutsu_id]->level, 1.1)));
 

@@ -16,9 +16,11 @@ class ChatManager {
      * @throws Exception
      */
     public function loadPosts(?int $current_page_post_id = null): array {
-        $result = $this->system->query("SELECT MAX(`post_id`) as `latest_post_id`, MIN(`post_id`) as `first_post_id` FROM `chat`");
-        if($this->system->db_last_num_rows) {
-            $bookend_posts = $this->system->db_fetch($result);
+        $result = $this->system->db->query(
+            "SELECT MAX(`post_id`) as `latest_post_id`, MIN(`post_id`) as `first_post_id` FROM `chat`"
+        );
+        if($this->system->db->last_num_rows) {
+            $bookend_posts = $this->system->db->fetch($result);
             $latest_post_id = $bookend_posts['latest_post_id'];
             $first_post_id = $bookend_posts['first_post_id'];
         }
@@ -66,10 +68,10 @@ class ChatManager {
         else {
             $query = "SELECT * FROM `chat` ORDER BY `post_id` DESC LIMIT $max_posts";
         }
-        $result = $this->system->query($query);
+        $result = $this->system->db->query($query);
 
         $posts = [];
-        while($row = $this->system->db_fetch($result)) {
+        while($row = $this->system->db->fetch($result)) {
             $post = ChatPostDto::fromDb($row);
 
             //Skip post if user blacklisted
@@ -86,13 +88,17 @@ class ChatManager {
 
             //Fetch user data
             $user_data = false;
-            $user_result = $this->system->query("SELECT `user_id`, `staff_level`, `premium_credits_purchased`, `chat_effect`, `avatar_link` FROM `users`
-            WHERE `user_name` = '{$this->system->clean($post->user_name)}'");
-            if($this->system->db_last_num_rows) {
-                $user_data = $this->system->db_fetch($user_result);
-                $settings_result = $this->system->query("SELECT `avatar_style` from `user_settings` where `user_id` = '{$user_data['user_id']}'");
-                if ($this->system->db_last_num_rows) {
-                    $user_data['avatar_style'] = $this->system->db_fetch($settings_result)['avatar_style'];
+            $user_result = $this->system->db->query(
+                "SELECT `user_id`, `staff_level`, `premium_credits_purchased`, `chat_effect`, `avatar_link` FROM `users`
+                WHERE `user_name` = '{$this->system->db->clean($post->user_name)}'"
+            );
+            if($this->system->db->last_num_rows) {
+                $user_data = $this->system->db->fetch($user_result);
+                $settings_result = $this->system->db->query(
+                    "SELECT `avatar_style` from `user_settings` where `user_id` = '{$user_data['user_id']}'"
+                );
+                if ($this->system->db->last_num_rows) {
+                    $user_data['avatar_style'] = $this->system->db->fetch($settings_result)['avatar_style'];
                 } else {
                     $user_data['avatar_style'] = "round";
                 }
@@ -219,10 +225,12 @@ class ChatManager {
         $message_length = strlen(preg_replace('/[\\n\\r]+/', '', trim($message)));
 
         try {
-            $result = $this->system->query("SELECT `message` FROM `chat`
-                 WHERE `user_name` = '{$this->player->user_name}' ORDER BY  `post_id` DESC LIMIT 1");
-            if($this->system->db_last_num_rows) {
-                $post = $this->system->db_fetch($result);
+            $result = $this->system->db->query(
+                "SELECT `message` FROM `chat`
+                     WHERE `user_name` = '{$this->player->user_name}' ORDER BY  `post_id` DESC LIMIT 1"
+            );
+            if($this->system->db->last_num_rows) {
+                $post = $this->system->db->fetch($result);
                 if($post['message'] == $message) {
                     throw new Exception("You cannot post the same message twice in a row!");
                 }
@@ -252,11 +260,13 @@ class ChatManager {
             $sql = "INSERT INTO `chat`
                     (`user_name`, `message`, `title`, `village`, `staff_level`, `user_color`, `time`, `edited`) VALUES
                            ('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s')";
-            $this->system->query(sprintf(
-                $sql, $this->player->user_name, $message, $title, $this->player->village->name, $staff_level, $user_color, time(), 0
-            ));
-            $new_post_id = $this->system->db_last_insert_id;
-            if($this->system->db_last_affected_rows) {
+            $this->system->db->query(
+                sprintf(
+                    $sql, $this->player->user_name, $message, $title, $this->player->village->name, $staff_level, $user_color, time(), 0
+                )
+            );
+            $new_post_id = $this->system->db->last_insert_id;
+            if($this->system->db->last_affected_rows) {
                 $this->system->message("Message posted!");
             }
 
@@ -277,11 +287,13 @@ class ChatManager {
                         if ($this->player->user_name == $quote[0]->user_name) {
                             continue;
                         }
-                        $result = $this->system->query("SELECT `user_id` FROM `users` WHERE `user_name`='{$quote[0]->user_name}' LIMIT 1");
-			            if($this->system->db_last_num_rows == 0) {
+                        $result = $this->system->db->query(
+                            "SELECT `user_id` FROM `users` WHERE `user_name`='{$quote[0]->user_name}' LIMIT 1"
+                        );
+			            if($this->system->db->last_num_rows == 0) {
 				            throw new Exception("User does not exist!");
 			            }
-			            $result = $this->system->db_fetch($result);
+			            $result = $this->system->db->fetch($result);
                         require_once __DIR__ . '/../notification/NotificationManager.php';
                         $new_notification = new ChatNotificationDto(
                             type: "chat",
@@ -314,15 +326,17 @@ class ChatManager {
                         break;
                     }
 
-                    $mentioned_users[] = $this->system->clean(strtolower($match));
+                    $mentioned_users[] = $this->system->db->clean(strtolower($match));
                 }
 
                 foreach($mentioned_users as $mentioned_user) {
-                    $result = $this->system->query("SELECT `user_id` FROM `users` WHERE `user_name`='{$mentioned_user}' LIMIT 1");
-                    if ($this->system->db_last_num_rows == 0) {
+                    $result = $this->system->db->query(
+                        "SELECT `user_id` FROM `users` WHERE `user_name`='{$mentioned_user}' LIMIT 1"
+                    );
+                    if ($this->system->db->last_num_rows == 0) {
                         throw new Exception("User does not exist!");
                     }
-                    $result = $this->system->db_fetch($result);
+                    $result = $this->system->db->fetch($result);
                     require_once __DIR__ . '/../notification/NotificationManager.php';
                     $new_notification = new ChatNotificationDto(
                         type: "chat",
@@ -350,9 +364,9 @@ class ChatManager {
      * @throws Exception
      */
     public function deletePost(int $post_id): array {
-        $this->system->query("DELETE FROM `chat` WHERE `post_id` = $post_id LIMIT 1");
+        $this->system->db->query("DELETE FROM `chat` WHERE `post_id` = $post_id LIMIT 1");
 
-        if($this->system->db_last_affected_rows == 0) {
+        if($this->system->db->last_affected_rows == 0) {
             throw new Exception("Error deleting post!");
         }
 

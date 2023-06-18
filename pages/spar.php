@@ -45,13 +45,15 @@ function spar() {
 	}
 	else if(isset($_GET['challenge'])) {
 		try {
-			$challenge = (int)$system->clean($_GET['challenge']);
-			$result = $system->query("SELECT `user_id`, `user_name`, `village`, `location`, `challenge`, `battle_id`, `last_active`
-				FROM `users` WHERE `user_id`='$challenge' LIMIT 1");
-			if($system->db_last_num_rows == 0) {
+			$challenge = (int)$system->db->clean($_GET['challenge']);
+			$result = $system->db->query(
+                "SELECT `user_id`, `user_name`, `village`, `location`, `challenge`, `battle_id`, `last_active`
+                    FROM `users` WHERE `user_id`='$challenge' LIMIT 1"
+            );
+			if($system->db->last_num_rows == 0) {
 				throw new Exception("Invalid user!");
 			}
-			$user = $system->db_fetch($result);
+			$user = $system->db->fetch($result);
 			
 			/*
 			if($user['village'] != $player->village->name) {
@@ -75,7 +77,7 @@ function spar() {
 				throw new Exception("Target is inactive/offline!");
 			}
 			
-			$system->query("UPDATE `users` SET `challenge`='$player->user_id' WHERE `user_id`='$challenge' LIMIT 1");
+			$system->db->query("UPDATE `users` SET `challenge`='$player->user_id' WHERE `user_id`='$challenge' LIMIT 1");
 			$system->message("Challenge sent!");
 			$system->printMessage();
 		} catch (Exception $e) {
@@ -87,7 +89,7 @@ function spar() {
 	}
 	else if(isset($_GET['accept_challenge'])) {
 		try {
-			$challenge = (int)$system->clean($_GET['accept_challenge']);
+			$challenge = (int)$system->db->clean($_GET['accept_challenge']);
 			
 			if($challenge != $player->challenge) {
 				throw new Exception("Invalid challenge!");
@@ -140,9 +142,11 @@ function spar() {
         NearbyPlayers::renderScoutAreaList($system, $player, $self_link);
 	}
 	else if(isset($_GET['cancel_challenge'])) {
-		$challenge = $system->clean($_GET['cancel_challenge']);
+		$challenge = $system->db->clean($_GET['cancel_challenge']);
 		// Load user challenges sent
-		$result = $system->query("UPDATE `users` SET `challenge`=0 WHERE `user_id`='$challenge' AND `challenge`='$player->user_id' LIMIT 1");
+		$result = $system->db->query(
+            "UPDATE `users` SET `challenge`=0 WHERE `user_id`='$challenge' AND `challenge`='$player->user_id' LIMIT 1"
+        );
 		$system->message("Challenge cancelled!");
 		$system->printMessage();
 
@@ -152,9 +156,9 @@ function spar() {
         $user_challenges = [];
 
 		// Load user challenges sent
-		$result = $system->query("SELECT `user_id`, `user_name` FROM `users` WHERE `challenge`='$player->user_id'");
-		if($system->db_last_num_rows > 0) {
-			while($row = $system->db_fetch($result)) {
+		$result = $system->db->query("SELECT `user_id`, `user_name` FROM `users` WHERE `challenge`='$player->user_id'");
+		if($system->db->last_num_rows > 0) {
+			while($row = $system->db->fetch($result)) {
 				$user_challenges[$row['user_id']] = $row['user_name'];
 			}
 		}
@@ -164,12 +168,14 @@ function spar() {
 				
 			// Challenge received
 			if($player->challenge) {
-				$result = $system->query("SELECT `user_name` FROM `users` WHERE `user_id`='$player->challenge' LIMIT 1");
-				if($system->db_last_num_rows == 0) {
+				$result = $system->db->query(
+                    "SELECT `user_name` FROM `users` WHERE `user_id`='$player->challenge' LIMIT 1"
+                );
+				if($system->db->last_num_rows == 0) {
 					$player->challenge = 0;
 				}
 				else {
-					$challenger_data = $system->db_fetch($result);
+					$challenger_data = $system->db->fetch($result);
 					
 					echo "<tr><td>
 					<p style='display:inline-block;margin:0px;margin-left:20px;'>

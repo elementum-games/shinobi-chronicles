@@ -58,15 +58,15 @@ class NPC extends Fighter {
         if(!$ai_id) {
             throw new Exception("Invalid NPC opponent!");
         }
-        $this->ai_id = $system->clean($ai_id);
+        $this->ai_id = $system->db->clean($ai_id);
         $this->id = self::ID_PREFIX . ':' . $this->ai_id;
 
-        $result = $system->query("SELECT `ai_id`, `name` FROM `ai_opponents` WHERE `ai_id`='$this->ai_id' LIMIT 1");
-        if($system->db_last_num_rows == 0) {
+        $result = $system->db->query("SELECT `ai_id`, `name` FROM `ai_opponents` WHERE `ai_id`='$this->ai_id' LIMIT 1");
+        if($system->db->last_num_rows == 0) {
             throw new Exception("NPC does not exist!");
         }
 
-        $result = $this->system->db_fetch($result);
+        $result = $this->system->db->fetch($result);
 
         $this->name = $result['name'];
 
@@ -83,8 +83,8 @@ class NPC extends Fighter {
      * @throws Exception
      */
     public function loadData() {
-        $result = $this->system->query("SELECT * FROM `ai_opponents` WHERE `ai_id`='$this->ai_id' LIMIT 1");
-        $ai_data = $this->system->db_fetch($result);
+        $result = $this->system->db->query("SELECT * FROM `ai_opponents` WHERE `ai_id`='$this->ai_id' LIMIT 1");
+        $ai_data = $this->system->db->fetch($result);
 
         $this->rankManager = new RankManager($this->system);
         $this->rankManager->loadRanks();
@@ -151,12 +151,13 @@ class NPC extends Fighter {
     }
 
     private function loadDefaultJutsu() {
-        $result = $this->system->query(
+        $result = $this->system->db->query(
             "SELECT `battle_text`, `power`, `jutsu_type` FROM `jutsu` 
                     WHERE `rank` <= '{$this->rank}'
                     AND `purchase_type`='" . Jutsu::PURCHASE_TYPE_DEFAULT . "'
-                    ORDER BY `rank` DESC LIMIT 1");
-        while ($row = $this->system->db_fetch($result)) {
+                    ORDER BY `rank` DESC LIMIT 1"
+        );
+        while ($row = $this->system->db->fetch($result)) {
             $moveArr = [];
             foreach($row as $type => $data) {
                 if($type == 'battle_text') {
@@ -179,11 +180,12 @@ class NPC extends Fighter {
     private function loadRandomShopJutsu() {
         $jutsuTypes = ['ninjutsu', 'taijutsu'];
         $aiType = rand(0, 1);
-        $result = $this->system->query(
+        $result = $this->system->db->query(
             "SELECT `battle_text`, `power`, `jutsu_type` FROM `jutsu` 
                     WHERE `rank` = '{$this->rank}' AND `jutsu_type` = '{$jutsuTypes[$aiType]}' 
-                    AND `purchase_type` != '1' AND `purchase_type` != '3' LIMIT 1");
-        while ($row = $this->system->db_fetch($result)) {
+                    AND `purchase_type` != '1' AND `purchase_type` != '3' LIMIT 1"
+        );
+        while ($row = $this->system->db->fetch($result)) {
             $moveArr = [];
             foreach($row as $type => $data) {
                 if($type == 'battle_text') {

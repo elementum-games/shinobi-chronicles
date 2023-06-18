@@ -6,15 +6,15 @@ if(!isset($_SESSION['user_id']) or $_SESSION['user_id'] != 1) {
 
 require("classes/_autoload.php");
 $system = new System();
-$system->dbConnect();
+$system->db->connect();
 $village = 'Leaf';
 if($_POST['message']) {
-	$user_name = $system->clean($_POST['user_name']);
-	$message = $system->clean($_POST['message']);
-	$title = $system->clean($_POST['title']);
+	$user_name = $system->db->clean($_POST['user_name']);
+	$message = $system->db->clean($_POST['message']);
+	$title = $system->db->clean($_POST['title']);
 	$query = "INSERT INTO `chat` (`user_name`, `message`, `title`, `village`, `time`, `staff_level`) 
 		VALUES ('$user_name', '$message', '$title', '$village', UNIX_TIMESTAMP(), '3');";
-	$system->query($query);
+	$system->db->query($query);
 }
 
 echo "<div style='text-align:center;'>

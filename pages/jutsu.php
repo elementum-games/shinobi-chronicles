@@ -52,8 +52,8 @@ function jutsu(): void {
                     throw new Exception("Invalid jutsu type!");
                 }
                 if($player->hasJutsu($jutsu_array[1])) {
-                    $equipped_jutsu[$count]['id'] = $system->clean($jutsu_array[1]);
-                    $equipped_jutsu[$count]['type'] = $system->clean($jutsu_array[0]);
+                    $equipped_jutsu[$count]['id'] = $system->db->clean($jutsu_array[1]);
+                    $equipped_jutsu[$count]['type'] = $system->db->clean($jutsu_array[0]);
                     $count++;
                 }
             }
@@ -170,8 +170,8 @@ function jutsu(): void {
     }
 
     $child_jutsu = [];
-    $child_jutsu_result = $system->query("SELECT `name`, `parent_jutsu` FROM `jutsu` WHERE `parent_jutsu` != '0'");
-    while($row = $system->db_fetch($child_jutsu_result)) {
+    $child_jutsu_result = $system->db->query("SELECT `name`, `parent_jutsu` FROM `jutsu` WHERE `parent_jutsu` != '0'");
+    while($row = $system->db->fetch($child_jutsu_result)) {
         if (array_key_exists($row['parent_jutsu'], $child_jutsu)) {
             array_push($child_jutsu[$row['parent_jutsu']], $row['name']);
         }

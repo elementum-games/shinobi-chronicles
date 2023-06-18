@@ -271,10 +271,10 @@ class Jutsu {
      * @return Jutsu[]
      */
     public static function fetchAll(System $system): array {
-        $result = $system->query("SELECT * FROM `jutsu` ORDER BY `rank` ASC, `purchase_cost` ASC");
+        $result = $system->db->query("SELECT * FROM `jutsu` ORDER BY `rank` ASC, `purchase_cost` ASC");
 
         $jutsu = [];
-        while($jutsu_db = $system->db_fetch($result)) {
+        while($jutsu_db = $system->db->fetch($result)) {
             $jutsu[$jutsu_db['jutsu_id']] = Jutsu::fromArray($jutsu_db['jutsu_id'], $jutsu_db);
         }
 

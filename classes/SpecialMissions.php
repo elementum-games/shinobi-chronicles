@@ -193,13 +193,13 @@ class SpecialMission {
 
         // GET MISSION DATA
         $sql = "SELECT * FROM `special_missions` WHERE `mission_id`={$this->mission_id}";
-        $result = $this->system->query($sql);
+        $result = $this->system->db->query($sql);
         // Return if the mission doesn't exist
-        if ($this->system->db_last_num_rows == 0) {
+        if ($this->system->db->last_num_rows == 0) {
             return false;
         }
 
-        $mission_data = $this->system->db_fetch($result);
+        $mission_data = $this->system->db->fetch($result);
 
         $this->status = $mission_data['status'];
         $this->difficulty = $mission_data['difficulty'];
@@ -240,9 +240,9 @@ class SpecialMission {
                 `log`='{$log}',
                 `reward`={$this->reward}
                 WHERE `mission_id`={$this->mission_id}";
-        $result = $this->system->query($sql);
+        $result = $this->system->db->query($sql);
 
-        if ($this->system->db_last_affected_rows) {
+        if ($this->system->db->last_affected_rows) {
             $this->player->updateData();
         }
     }
@@ -617,7 +617,7 @@ class SpecialMission {
     // Cancel the mission
     public static function cancelMission($system, $player, $mission_id) {
         $timestamp = time();
-        $result = $system->query("UPDATE `special_missions`
+        $result = $system->db->query("UPDATE `special_missions`
 SET `status`=2, `end_time`={$timestamp} WHERE `mission_id`={$mission_id}");
         $player->special_mission = 0;
         $player->updateData();
@@ -647,9 +647,9 @@ SET `status`=2, `end_time`={$timestamp} WHERE `mission_id`={$mission_id}");
 
         $sql = "INSERT INTO `special_missions` (`user_id`, `start_time`, `log`, `difficulty`)
                 VALUES ('{$player->user_id}', '{$timestamp}', '$log_encode', '{$difficulty}')";
-        $result = $system->query($sql);
+        $result = $system->db->query($sql);
 
-        $mission_id = $system->db_last_insert_id;
+        $mission_id = $system->db->last_insert_id;
         $player->special_mission = $mission_id;
 
         return (new SpecialMission($system, $player, $mission_id));

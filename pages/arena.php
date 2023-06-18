@@ -22,16 +22,18 @@ function arena(): bool {
 	}
 	else {
         $ai_rank = min($player->rank_num, System::SC_MAX_RANK);
-        $result = $system->query("SELECT `ai_id`, `name`, `level` FROM `ai_opponents`
-			WHERE `rank` = {$ai_rank} ORDER BY `level` ASC");
-		if($system->db_last_num_rows == 0) {
+        $result = $system->db->query(
+            "SELECT `ai_id`, `name`, `level` FROM `ai_opponents`
+                WHERE `rank` = {$ai_rank} ORDER BY `level` ASC"
+        );
+		if($system->db->last_num_rows == 0) {
 			$system->message("No NPC opponents found!");
 			$system->printMessage();
 			return false;
 		}
 
 		$ai_opponents = array();
-		while($row = $system->db_fetch($result)) {
+		while($row = $system->db->fetch($result)) {
 			$ai_opponents[$row['ai_id']] = $row;
 		}
 

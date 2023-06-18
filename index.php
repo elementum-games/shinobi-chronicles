@@ -20,7 +20,6 @@ $PAGE_LOAD_START = microtime(true);
 
 require_once("classes/_autoload.php");
 $system = new System();
-$system->startTransaction();
 
 if($system->environment == System::ENVIRONMENT_DEV) {
     ini_set('display_errors', 'On');
@@ -56,22 +55,24 @@ if(!isset($_SESSION['user_id'])) {
 			}*/
 
 			// Basic input check - user_name/password
-			$user_name = $system->clean($_POST['user_name']);
+			$user_name = $system->db->clean($_POST['user_name']);
 			if(empty($user_name)) {
 				throw new Exception("Please enter username!");
 			}
-			$password = $system->clean($_POST['password']);
+			$password = $system->db->clean($_POST['password']);
 			if(empty($password)) {
 				throw new Exception("Please enter password!");
 			}
 
 			// Get result
-			$result = $system->query("SELECT `user_id`, `user_name`, `password`, `failed_logins`, `current_ip`, `last_ip`, `user_verified`
-				FROM `users` WHERE `user_name`='$user_name' LIMIT 1");
-			if($system->db_last_num_rows == 0) {
+			$result = $system->db->query(
+                "SELECT `user_id`, `user_name`, `password`, `failed_logins`, `current_ip`, `last_ip`, `user_verified`
+                    FROM `users` WHERE `user_name`='$user_name' LIMIT 1"
+            );
+			if($system->db->last_num_rows == 0) {
 				throw new Exception("User does not exist!");
 			}
-			$result = $system->db_fetch($result);
+			$result = $system->db->fetch($result);
 			if(!$result['user_verified']) {
 				throw new Exception("Your account has not been verified. Please check your email for the activation code.
 				<a class='link' href='{$system->router->base_url}register.php?act=resend_verification&username=$user_name'>Resend Verification</a>");
@@ -96,7 +97,9 @@ if(!isset($_SESSION['user_id'])) {
 				$_SESSION['user_id'] = $result['user_id'];
 				$LOGGED_IN = true;
 				if($result['failed_logins'] > 0) {
-					$system->query("UPDATE `users` SET `failed_logins`= 0 WHERE `user_id`='{$result['user_id']}' LIMIT 1");
+					$system->db->query(
+                        "UPDATE `users` SET `failed_logins`= 0 WHERE `user_id`='{$result['user_id']}' LIMIT 1"
+                    );
 				}
 
 				$player = User::loadFromId($system, $_SESSION['user_id']);
@@ -107,11 +110,13 @@ if(!isset($_SESSION['user_id'])) {
 			}
 			// If wrong, increment failed logins
 			else {
-				$system->query("UPDATE `users` SET `failed_logins` = `failed_logins` + 1 WHERE `user_id`='{$result['user_id']}' LIMIT 1");
+				$system->db->query(
+                    "UPDATE `users` SET `failed_logins` = `failed_logins` + 1 WHERE `user_id`='{$result['user_id']}' LIMIT 1"
+                );
 				throw new Exception("Invalid password! <a href='./password_reset.php'>Forgot password?</a>");
 			}
 		} catch (Exception $e) {
-            $system->rollbackTransaction();
+            $system->db->rollbackTransaction();
 			$system->message($e->getMessage());
 			error_log($e->getMessage());
 		}
@@ -119,6 +124,8 @@ if(!isset($_SESSION['user_id'])) {
 }
 else {
 	$LOGGED_IN = true;
+
+    $system->db->startTransaction();
 	$player = User::loadFromId($system, $_SESSION['user_id']);
 
     // Check logout timer
@@ -139,16 +146,10 @@ else {
 	$player->loadData();
 }
 
-// Start display
-if(!$LOGGED_IN) {
-	$layout = $system->fetchLayoutByName(System::DEFAULT_LAYOUT);
-}
-else {
-	$layout = $system->fetchLayoutByName($player->layout);
-}
-
 // Load page or news
 if($LOGGED_IN) {
+    $layout = $system->fetchLayoutByName($player->layout);
+
     // Master close
     if(!$system->SC_OPEN && !$player->isUserAdmin()) {
         $layout->renderBeforeContentHTML($system, $player, "Profile");
@@ -179,8 +180,10 @@ if($LOGGED_IN) {
         exit;
     }
 
-    $result = $system->query("SELECT `id` FROM `banned_ips` WHERE `ip_address`='" . $system->clean($_SERVER['REMOTE_ADDR']) . "' LIMIT 1");
-    if($system->db_last_num_rows > 0) {
+    $result = $system->db->query(
+        "SELECT `id` FROM `banned_ips` WHERE `ip_address`='" . $system->db->clean($_SERVER['REMOTE_ADDR']) . "' LIMIT 1"
+    );
+    if($system->db->last_num_rows > 0) {
         $ban_type = StaffManager::BAN_TYPE_IP;
         $expire_int = -1;
         $ban_expire = ($expire_int == StaffManager::PERM_BAN_VALUE ? $expire_int : $system->time_remaining($player->ban_data[StaffManager::BAN_TYPE_GAME] - time()));
@@ -243,15 +246,24 @@ if($LOGGED_IN) {
         $route = Router::$routes[$id] ?? null;
 
         try {
+            $location_name = $player->current_location->location_id
+                ? ' ' . ' <div id="contentHeaderLocation">' . $player->current_location->name . '</div>'
+                : null;
+            $layout->renderBeforeContentHTML(
+                system: $system,
+                player: $player,
+                page_title: $route->title . $location_name
+            );
+
             $system->router->assertRouteIsValid($route, $player);
 
             // Force view battle page if waiting too long
             if($player->battle_id && empty($route->battle_type)) {
-                $battle_result = $system->query(
+                $battle_result = $system->db->query(
                     "SELECT winner, turn_time, battle_type FROM battles WHERE `battle_id`='{$player->battle_id}' LIMIT 1"
                 );
-                if($system->db_last_num_rows) {
-                    $battle_data = $system->db_fetch($battle_result);
+                if($system->db->last_num_rows) {
+                    $battle_data = $system->db->fetch($battle_result);
                     $time_since_turn = time() - $battle_data['turn_time'];
 
                     if($battle_data['winner'] && $time_since_turn >= 60) {
@@ -265,20 +277,9 @@ if($LOGGED_IN) {
                 }
             }
 
-            $location_name = $player->current_location->location_id
-                ? ' ' . ' <div id="contentHeaderLocation">' . $player->current_location->name . '</div>'
-                : null;
-
-            $layout->renderBeforeContentHTML(
-                system: $system,
-                player: $player,
-                page_title: $route->title . $location_name
-            );
-
             $self_link = $system->router->base_url . '?id=' . $id;
 
             $system->printMessage();
-
 
             // EVENT
             if($system::$SC_EVENT_ACTIVE) {
@@ -291,24 +292,16 @@ if($LOGGED_IN) {
 
             $page_loaded = true;
         } catch (Exception $e) {
+            error_log(get_class($e));
+
             if(strlen($e->getMessage()) > 1) {
-                // Display page title if page is set
-                if($routes[$id] != null) {
-                    $layout->renderBeforeContentHTML(
-                        system: $system,
-                        player: $player,
-                        page_title: $route->title
-                    );
-                    $page_loaded = true;
-                }
-                $system->rollbackTransaction();
+                $system->db->rollbackTransaction();
                 $system->message($e->getMessage());
                 $system->printMessage();
             }
         }
     }
-
-    if(!$page_loaded) {
+    else {
         $layout->renderBeforeContentHTML(
             system: $system,
             player: $player,
@@ -325,15 +318,17 @@ if($LOGGED_IN) {
             require("pages/profile.php");
             userProfile();
         } catch(Exception $e) {
-            $system->rollbackTransaction();
+            $system->db->rollbackTransaction();
             $system->message($e->getMessage());
             $system->printMessage(true);
         }
     }
+
     $player->updateData();
 }
 // Login
 else {
+    $layout = $system->fetchLayoutByName(System::DEFAULT_LAYOUT);
     $layout->renderBeforeContentHTML($system, null, "News");
 
     // Display error messages
@@ -355,4 +350,4 @@ else {
 $page_load_time = round(microtime(true) - $PAGE_LOAD_START, 3);
 $layout->renderAfterContentHTML($system, $player ?? null, $page_load_time);
 
-$system->commitTransaction();
+$system->db->commitTransaction();

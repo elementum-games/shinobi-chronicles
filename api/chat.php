@@ -31,7 +31,7 @@ try {
             API::exitWithData($chatManager->loadPosts($starting_post_id), [], [], system: $system);
 
         case 'submit_post':
-            $message = $system->clean($_POST['message']);
+            $message = $system->db->clean($_POST['message']);
 
             API::exitWithData(
                 data: $chatManager->submitPost($message),

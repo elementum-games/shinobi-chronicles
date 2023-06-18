@@ -27,13 +27,15 @@ class TravelManager {
         $this->system = $system;
         $this->user = $user;
 
-        $result = $this->system->query("SELECT * FROM `maps` WHERE `map_id`={$this->user->location->map_id}");
-        $this->map_data = $this->system->db_fetch($result);
+        $result = $this->system->db->query("SELECT * FROM `maps` WHERE `map_id`={$this->user->location->map_id}");
+        $this->map_data = $this->system->db->fetch($result);
     }
 
     public static function locationIsInVillage(System $system, TravelCoords $location): bool {
-        $result = $system->query("SELECT COUNT(*) as `count` FROM `villages` WHERE `location`='{$location->fetchString()}' LIMIT 1");
-        $count = (int)$system->db_fetch($result)['count'];
+        $result = $system->db->query(
+            "SELECT COUNT(*) as `count` FROM `villages` WHERE `location`='{$location->fetchString()}' LIMIT 1"
+        );
+        $count = (int)$system->db->fetch($result)['count'];
 
         return $count >= 1;
     }
@@ -201,8 +203,8 @@ class TravelManager {
                 ON `users`.`rank`=`ranks`.`rank_id`
                 WHERE `users`.`last_active` > UNIX_TIMESTAMP() - 120
                 ORDER BY `users`.`exp` DESC, `users`.`user_name` DESC";
-        $result = $this->system->query($sql);
-        $users = $this->system->db_fetch_all($result);
+        $result = $this->system->db->query($sql);
+        $users = $this->system->db->fetch_all($result);
         $return_arr = [];
         foreach ($users as $user) {
             // check if the user is nearby (including stealth
@@ -299,14 +301,16 @@ class TravelManager {
      * @return MapLocation[]
      */
     public function fetchCurrentMapLocations(): array {
-        $result = $this->system->query("
-            SELECT *
-            FROM `maps_locations`
-            WHERE `map_id`={$this->user->location->map_id}
-        ");
+        $result = $this->system->db->query(
+            "
+                SELECT *
+                FROM `maps_locations`
+                WHERE `map_id`={$this->user->location->map_id}
+            "
+        );
 
         $locations = [];
-        foreach ($this->system->db_fetch_all($result) as $loc) {
+        foreach ($this->system->db->fetch_all($result) as $loc) {
             $locations[] = new MapLocation($loc);
         }
 
@@ -314,10 +318,10 @@ class TravelManager {
         $objectives = [];
         if ($this->user->mission_id > 0) {
             if ($this->user->mission_stage['action_type'] == 'travel') {
-                $mission_result = $this->system->query("SELECT `name` FROM `missions` WHERE `mission_id` = '{$this->user->mission_id}' LIMIT 1");
+                $mission_result = $this->system->db->query("SELECT `name` FROM `missions` WHERE `mission_id` = '{$this->user->mission_id}' LIMIT 1");
                 $mission_location = TravelCoords::fromDbString($this->user->mission_stage['action_data']);
                 $objectives[] = new MapObjectiveLocation(
-                    name: $this->system->db_fetch($mission_result)['name'],
+                    name: $this->system->db->fetch($mission_result)['name'],
                     map_id: $mission_location->map_id,
                     x: $mission_location->x,
                     y: $mission_location->y,
@@ -366,17 +370,19 @@ class TravelManager {
     public function fetchCurrentLocationPortal(): ?array {
         $portal_data = null;
 
-        $result = $this->system->query("
-            SELECT *
-            FROM `maps_portals`
-            WHERE `entrance_x`={$this->user->location->x}
-              AND `entrance_y`={$this->user->location->y}
-              AND `from_id`={$this->user->location->map_id}
-              AND `active`=1
-              ");
+        $result = $this->system->db->query(
+            "
+                SELECT *
+                FROM `maps_portals`
+                WHERE `entrance_x`={$this->user->location->x}
+                  AND `entrance_y`={$this->user->location->y}
+                  AND `from_id`={$this->user->location->map_id}
+                  AND `active`=1
+                  "
+        );
 
-        if ($this->system->db_last_num_rows) {
-            $portal_data = $this->system->db_fetch($result);
+        if ($this->system->db->last_num_rows) {
+            $portal_data = $this->system->db->fetch($result);
         }
 
         return $portal_data;
@@ -388,8 +394,8 @@ class TravelManager {
     public static function fetchVillageLocationsByCoordsStr(System $system): array {
         $village_locations = [];
 
-        $result = $system->query("SELECT `name`, `location` FROM `villages`");
-        while($row = $system->db_fetch($result)) {
+        $result = $system->db->query("SELECT `name`, `location` FROM `villages`");
+        while($row = $system->db->fetch($result)) {
             $village_locations[$row['location']] = $row['name'];
         }
 

@@ -7,14 +7,14 @@ require __DIR__ . '/APIResponse.php';
 class API {
     public static function init(): System {
         $system = new System();
-        $system->startTransaction();
+        $system->db->startTransaction();
         $system->is_api_request = true;
         return $system;
     }
 
     #[NoReturn]
     public static function exitWithError(string $message, System $system, array $debug_messages = []): void {
-        $system->rollbackTransaction();
+        $system->db->rollbackTransaction();
         error_log($message);
         echo json_encode([
             'errors' => $message,
@@ -29,7 +29,7 @@ class API {
             $exception instanceof LoggedOutException
             || $exception instanceof InvalidMovementException
         ) {
-            $system->rollbackTransaction();
+            $system->db->rollbackTransaction();
             echo json_encode([
                 'errors' => $exception->getMessage(),
                 'debug' => $debug_messages
@@ -46,7 +46,7 @@ class API {
 
     #[NoReturn]
     public static function exitWithData(array $data, array $errors, array $debug_messages, System $system): void {
-        $system->commitTransaction();
+        $system->db->commitTransaction();
         echo json_encode([
             'data' => $data,
             'debug' => $debug_messages,

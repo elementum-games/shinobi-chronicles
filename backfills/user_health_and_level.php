@@ -13,23 +13,25 @@ $system->log('backfill', 'user_health_and_level', "ran by {$user->user_name} ({$
 $rankManager = new RankManager($system);
 $rankManager->loadRanks();
 
-$users_result = $system->query("SELECT `user_id`, `user_name`, 
-       `rank`, `level`, `exp`,
-       `max_health`,
-       `max_chakra`,
-       `max_stamina`,
-       `ninjutsu_skill`,
-       `genjutsu_skill`, 
-       `taijutsu_skill`,
-       `bloodline_skill`, 
-       `cast_speed`, 
-       `speed`, 
-       `intelligence`, 
-       `willpower`
-       FROM users");
+$users_result = $system->db->query(
+    "SELECT `user_id`, `user_name`, 
+           `rank`, `level`, `exp`,
+           `max_health`,
+           `max_chakra`,
+           `max_stamina`,
+           `ninjutsu_skill`,
+           `genjutsu_skill`, 
+           `taijutsu_skill`,
+           `bloodline_skill`, 
+           `cast_speed`, 
+           `speed`, 
+           `intelligence`, 
+           `willpower`
+           FROM users"
+);
 
 $count = 0;
-while($user_row = $system->db_fetch($users_result)) {
+while($user_row = $system->db->fetch($users_result)) {
     $rank = $rankManager->ranks[$user_row['rank']];
 
     $total_stats = $user_row['ninjutsu_skill'] +
@@ -91,12 +93,14 @@ while($user_row = $system->db_fetch($users_result)) {
         }
     echo "<br /><br />";
 
-    $system->query("UPDATE `users` SET 
-        `exp`='{$to_update['exp']}',
-        `level`='{$to_update['level']}',
-        `health`='{$to_update['health']}',
-        `max_health`='{$to_update['max_health']}',
-        `max_chakra`='{$to_update['max_chakra']}',
-        `max_stamina`='{$to_update['max_stamina']}'
-        WHERE `user_id`={$user_row['user_id']} LIMIT 1");
+    $system->db->query(
+        "UPDATE `users` SET 
+            `exp`='{$to_update['exp']}',
+            `level`='{$to_update['level']}',
+            `health`='{$to_update['health']}',
+            `max_health`='{$to_update['max_health']}',
+            `max_chakra`='{$to_update['max_chakra']}',
+            `max_stamina`='{$to_update['max_stamina']}'
+            WHERE `user_id`={$user_row['user_id']} LIMIT 1"
+    );
 }

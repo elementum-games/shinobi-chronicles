@@ -52,9 +52,9 @@ function createJutsuPage(System $system, array $RANK_NAMES) {
             }
 
             $query = "INSERT INTO `jutsu` ($column_names) VALUES ($column_data)";
-            $system->query($query);
+            $system->db->query($query);
 
-            if($system->db_last_affected_rows == 1) {
+            if($system->db->last_affected_rows == 1) {
                 $system->message("Jutsu created!");
             }
             else {
@@ -101,13 +101,13 @@ function editJutsuPage(System $system, array $RANK_NAMES) {
     if(!empty($_GET['jutsu_id'])) {
         $jutsu_id = (int)$_GET['jutsu_id'];
 
-        $result = $system->query("SELECT * FROM `jutsu` WHERE `jutsu_id`='$jutsu_id'");
-        if($system->db_last_num_rows == 0) {
+        $result = $system->db->query("SELECT * FROM `jutsu` WHERE `jutsu_id`='$jutsu_id'");
+        if($system->db->last_num_rows == 0) {
             $system->message("Invalid Jutsu!");
             $system->printMessage();
         }
         else {
-            $jutsu_data = $system->db_fetch($result);
+            $jutsu_data = $system->db->fetch($result);
             $jutsu = Jutsu::fromArray($jutsu_data['jutsu_id'], $jutsu_data);
             $select_jutsu = false;
         }
@@ -152,9 +152,9 @@ function editJutsuPage(System $system, array $RANK_NAMES) {
             $query .= "WHERE `jutsu_id`='{$jutsu->id}'";
 
             //echo $query;
-            $system->query($query);
+            $system->db->query($query);
 
-            if($system->db_last_affected_rows == 1) {
+            if($system->db->last_affected_rows == 1) {
                 $system->message("Jutsu edited!");
                 $select_jutsu = true;
             }

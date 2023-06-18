@@ -125,9 +125,9 @@ class StaffManager {
         $return = [];
         $query = "SELECT `user_name`, `user_id`, `failed_logins` FROM `users` WHERE `failed_logins` >= " . User::PARTIAL_LOCK
             . " ORDER BY `failed_logins` DESC";
-        $result = $this->system->query($query);
-        if($this->system->db_last_num_rows) {
-            while($user = $this->system->db_fetch($result)) {
+        $result = $this->system->db->query($query);
+        if($this->system->db->last_num_rows) {
+            while($user = $this->system->db->fetch($result)) {
                 $return[] = $user;
             }
         }
@@ -140,9 +140,11 @@ class StaffManager {
      */
     public function getBannedUsers():array {
         $return = [];
-        $result = $this->system->query("SELECT `user_id`, `user_name`, `ban_data` FROM `users` WHERE `ban_data` != null OR `ban_data` != ''");
-        if($this->system->db_last_num_rows) {
-            while($user = $this->system->db_fetch($result)) {
+        $result = $this->system->db->query(
+            "SELECT `user_id`, `user_name`, `ban_data` FROM `users` WHERE `ban_data` != null OR `ban_data` != ''"
+        );
+        if($this->system->db->last_num_rows) {
+            while($user = $this->system->db->fetch($result)) {
                 $ban_string = '';
                 $ban_data = json_decode($user['ban_data'], true);
                 $count = 0;
@@ -179,9 +181,9 @@ class StaffManager {
      * @return array|string|null
      */
     public function checkMultiStatus($user_id) {
-        $result = $this->system->query("SELECT * FROM `multi_accounts` WHERE `user_id`='$user_id' LIMIT 1");
-        if($this->system->db_last_num_rows) {
-            return $this->system->db_fetch($result)['status'];
+        $result = $this->system->db->query("SELECT * FROM `multi_accounts` WHERE `user_id`='$user_id' LIMIT 1");
+        if($this->system->db->last_num_rows) {
+            return $this->system->db->fetch($result)['status'];
         }
         return false;
     }
@@ -224,13 +226,15 @@ class StaffManager {
      */
     public function addRecord($user_id, $user_name, $record_type, $content, $logStaffAction = true):bool {
         //staff id, staff_name, user_id, record_type, time, data
-        $this->system->query("INSERT INTO `user_record`
-            (`staff_id`, `staff_name`, `user_id`, `record_type`, `time`, `data`)
-            VALUES
-            ('{$this->user_id}', '{$this->user_name}', '{$user_id}', '{$record_type}', '" . time() . "', '{$content}')
-        ");
+        $this->system->db->query(
+            "INSERT INTO `user_record`
+                (`staff_id`, `staff_name`, `user_id`, `record_type`, `time`, `data`)
+                VALUES
+                ('{$this->user_id}', '{$this->user_name}', '{$user_id}', '{$record_type}', '" . time() . "', '{$content}')
+            "
+        );
 
-        if($this->system->db_last_insert_id) {
+        if($this->system->db->last_insert_id) {
             if($logStaffAction) {
                 $this->staffLog(self::STAFF_LOG_MOD, "{$this->user_name} ({$this->user_id}) added a note to " .
                     "{$user_name}\'s ({$user_id}) record.");
@@ -246,11 +250,13 @@ class StaffManager {
      * @param $content
      */
     public function staffLog($type, $content) {
-        $this->system->query("INSERT INTO `staff_logs` 
-            (`time`, `type`, `content`) 
-            VALUES 
-            ('" . time() . "', '{$type}', '{$content}')
-        ");
+        $this->system->db->query(
+            "INSERT INTO `staff_logs` 
+                (`time`, `type`, `content`) 
+                VALUES 
+                ('" . time() . "', '{$type}', '{$content}')
+            "
+        );
     }
 
     public function getStaffLogs($table, $log_type = 'all', $offset = 0, $limit = 100, $maxCount = false) {
@@ -270,12 +276,12 @@ class StaffManager {
 
         $query .= " ORDER BY `" . $id_name . "` DESC LIMIT $limit OFFSET $offset";
 
-        $result = $this->system->query($query);
-        if($this->system->db_last_num_rows) {
+        $result = $this->system->db->query($query);
+        if($this->system->db->last_num_rows) {
             if($maxCount) {
-                return (int) $this->system->db_fetch($result)['COUNT(*)'];
+                return (int) $this->system->db->fetch($result)['COUNT(*)'];
             }
-            return $this->system->db_fetch_all($result);
+            return $this->system->db->fetch_all($result);
         }
         return false;
     }
@@ -288,8 +294,10 @@ class StaffManager {
      * @return bool
      */
     public function manageRecord($record_id, $user_id, $user_name, $delete = true):bool {
-        $this->system->query("UPDATE `user_record` SET `deleted`='{$delete}' WHERE `record_id`='{$record_id}' AND `user_id`='{$user_id}' LIMIT 1");
-        if($this->system->db_last_affected_rows) {
+        $this->system->db->query(
+            "UPDATE `user_record` SET `deleted`='{$delete}' WHERE `record_id`='{$record_id}' AND `user_id`='{$user_id}' LIMIT 1"
+        );
+        if($this->system->db->last_affected_rows) {
             $action_type = ($delete) ? self::STAFF_LOG_HEAD_MOD : self::STAFF_LOG_ADMIN;
             $log_data = "{$this->user_name} ({$this->user_id}) " . ($delete ? 'removed' : 'recovered') . " record note ID $record_id "
             . "on {$user_name}\'s ({$user_id}) record.";
@@ -302,8 +310,10 @@ class StaffManager {
     public function manageMulti($user_id, $status):bool {
         $update = $this->checkMultiStatus($user_id);
         if($update != false) {
-            $this->system->query("UPDATE `multi_accounts` SET `status`='$status' WHERE `user_id`='$user_id' LIMIT 1");
-            if($this->system->db_last_affected_rows) {
+            $this->system->db->query(
+                "UPDATE `multi_accounts` SET `status`='$status' WHERE `user_id`='$user_id' LIMIT 1"
+            );
+            if($this->system->db->last_affected_rows) {
                 $this->staffLog(self::STAFF_LOG_HEAD_MOD, "{$this->user_name}({$this->user_id}) updated "
                     . "multi-account status to $status for user# $user_id.");
                 return true;
@@ -311,13 +321,15 @@ class StaffManager {
             return false;
         }
         else {
-            $this->system->query("INSERT INTO `multi_accounts`
-                (`user_id`, `status`)
-                VALUES
-                ('$user_id', '$status')
-            ");
+            $this->system->db->query(
+                "INSERT INTO `multi_accounts`
+                    (`user_id`, `status`)
+                    VALUES
+                    ('$user_id', '$status')
+                "
+            );
 
-            if($this->system->db_last_insert_id) {
+            if($this->system->db->last_insert_id) {
                 $this->staffLog(self::STAFF_LOG_HEAD_MOD, "{$this->user_name}({$this->user_id}) began "
                     . "multi-account process for user# $user_id with a status of $status.");
                 return true;
@@ -328,26 +340,26 @@ class StaffManager {
 
     public function getUserByName($user_name, $full_load = false) {
         $query = "SELECT " . ($full_load ? "*" : "`user_id`, `user_name`, `staff_level`, `ban_data`, `ban_type`, `ban_expire`");
-        $result = $this->system->query($query . " FROM `users` WHERE `user_name`='{$user_name}' LIMIT 1");
-        if(!$this->system->db_last_num_rows) {
+        $result = $this->system->db->query($query . " FROM `users` WHERE `user_name`='{$user_name}' LIMIT 1");
+        if(!$this->system->db->last_num_rows) {
             return false;
         }
-        return $this->system->db_fetch($result);
+        return $this->system->db->fetch($result);
     }
 
     public function getUserByID($user_id, $full_load = false) {
         $query = "SELECT " . ($full_load ? "*" : "`user_id`, `user_name`, `staff_level`, `ban_data`, `ban_type`, `ban_expire`");
-        $result = $this->system->query($query . " FROM `users` WHERE `user_id`='{$user_id}' LIMIT 1");
-        if(!$this->system->db_last_num_rows) {
+        $result = $this->system->db->query($query . " FROM `users` WHERE `user_id`='{$user_id}' LIMIT 1");
+        if(!$this->system->db->last_num_rows) {
             return false;
         }
-        return $this->system->db_fetch($result);
+        return $this->system->db->fetch($result);
     }
 
     public function getBannedIP($ip_address) {
-        $result = $this->system->query("SELECT * FROM `banned_ips` WHERE `ip_address`='{$ip_address}' LIMIT 1");
-        if($this->system->db_last_num_rows) {
-            return $this->system->db_fetch($result);
+        $result = $this->system->db->query("SELECT * FROM `banned_ips` WHERE `ip_address`='{$ip_address}' LIMIT 1");
+        if($this->system->db->last_num_rows) {
+            return $this->system->db->fetch($result);
         }
         return false;
     }
@@ -474,8 +486,10 @@ class StaffManager {
                 $ban_data = json_encode($ban_data);
             }
 
-            $this->system->query("UPDATE `users` SET `ban_data`='{$ban_data}' WHERE `user_id`='{$user_data['user_id']}' LIMIT 1");
-            if($this->system->db_last_affected_rows) {
+            $this->system->db->query(
+                "UPDATE `users` SET `ban_data`='{$ban_data}' WHERE `user_id`='{$user_data['user_id']}' LIMIT 1"
+            );
+            if($this->system->db->last_affected_rows) {
                 //Log action into staff logs
                 $staff_log = "{$this->user_name}({$this->user_id}) $ban_type ban to " .
                 "{$user_data['user_name']}({$user_data['user_id']})";
@@ -537,8 +551,10 @@ class StaffManager {
 
         $ban_data = empty($ban_data) ? '' : json_encode($ban_data);
 
-        $this->system->query("UPDATE `users` SET `ban_data`='{$ban_data}' WHERE `user_id`='{$user_data['user_id']}' LIMIT 1");
-        if($this->system->db_last_affected_rows) {
+        $this->system->db->query(
+            "UPDATE `users` SET `ban_data`='{$ban_data}' WHERE `user_id`='{$user_data['user_id']}' LIMIT 1"
+        );
+        if($this->system->db->last_affected_rows) {
             $this->addRecord($user_data['user_id'], $user_data['user_name'], self::RECORD_BAN_REMOVED,
                 "Removed $unban_string.", false);
             $this->staffLog(StaffManager::STAFF_LOG_HEAD_MOD,
@@ -550,12 +566,14 @@ class StaffManager {
     }
 
     public function sendOW($content, $user_data) {
-        $this->system->query("INSERT INTO `official_warnings` 
-            (`staff_id`, `staff_name`, `user_id`, `time`, `data`, `viewed`)
-            VALUES 
-            ('{$this->user_id}', '{$this->user_name}', '{$user_data['user_id']}', '" . time() . "', '{$content}', 0)
-        ");
-        if($this->system->db_last_insert_id) {
+        $this->system->db->query(
+            "INSERT INTO `official_warnings` 
+                (`staff_id`, `staff_name`, `user_id`, `time`, `data`, `viewed`)
+                VALUES 
+                ('{$this->user_id}', '{$this->user_name}', '{$user_data['user_id']}', '" . time() . "', '{$content}', 0)
+            "
+        );
+        if($this->system->db->last_insert_id) {
             $this->addRecord($user_data['user_id'], $user_data['user_name'], self::RECORD_OFFICIAL_WARNING, $content, false);
             $this->staffLog(self::STAFF_LOG_MOD, "{$this->user_name}($this->user_id) sent {$user_data['user_name']}({$user_data['user_id']}) an Official Warning.");
             return true;
@@ -575,8 +593,8 @@ class StaffManager {
             default:
                 return false;
         }
-        $this->system->query($query);
-        if($this->system->db_last_affected_rows) {
+        $this->system->db->query($query);
+        if($this->system->db->last_affected_rows) {
             $this->staffLog(self::STAFF_LOG_MOD, "Removed {$user_data['user_name']}({$user_data['user_id']})\'s "
             . ucwords($type) . ".");
             return true;

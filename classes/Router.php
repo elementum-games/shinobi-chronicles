@@ -121,9 +121,11 @@ class Router {
 
         // Check for spar/fight PvP type, stop page if trying to load spar/battle while in NPC battle
         if(isset($route->battle_type)) {
-            $result = $system->query("SELECT `battle_type` FROM `battles` WHERE `battle_id`='$player->battle_id' LIMIT 1");
-            if($system->db_last_num_rows > 0) {
-                $battle_type = $system->db_fetch($result)['battle_type'];
+            $result = $system->db->query(
+                "SELECT `battle_type` FROM `battles` WHERE `battle_id`='$player->battle_id' LIMIT 1"
+            );
+            if($system->db->last_num_rows > 0) {
+                $battle_type = $system->db->fetch($result)['battle_type'];
                 if($battle_type != $route->battle_type) {
                     throw new Exception("You cannot visit this page while in combat!");
                 }

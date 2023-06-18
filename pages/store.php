@@ -34,16 +34,20 @@ function store() {
 	// Load jutsu/items
 	if($view == 'jutsu') {
 		$shop_jutsu = array();
-		$result = $system->query("SELECT * FROM `jutsu` WHERE `purchase_type` = '2' AND `rank` <= '$player->rank_num' ORDER BY `rank` ASC, `purchase_cost` ASC");
-		while($row = $system->db_fetch($result)) {
+		$result = $system->db->query(
+            "SELECT * FROM `jutsu` WHERE `purchase_type` = '2' AND `rank` <= '$player->rank_num' ORDER BY `rank` ASC, `purchase_cost` ASC"
+        );
+		while($row = $system->db->fetch($result)) {
 			$shop_jutsu[$row['jutsu_id']] = $row;
 		}
 	}
 	else {
         /** @var Item[] $shop_items */
 		$shop_items = array();
-		$result = $system->query("SELECT * FROM `items` WHERE `purchase_type` = '1' AND `rank` <= '$player->rank_num' ORDER BY `rank` ASC, `purchase_cost` ASC");
-		while($row = $system->db_fetch($result)) {
+		$result = $system->db->query(
+            "SELECT * FROM `items` WHERE `purchase_type` = '1' AND `rank` <= '$player->rank_num' ORDER BY `rank` ASC, `purchase_cost` ASC"
+        );
+		while($row = $system->db->fetch($result)) {
 			$shop_items[$row['item_id']] = Item::fromDb($row);
 		}
 	}
@@ -51,7 +55,7 @@ function store() {
 	if(isset($_GET['purchase_item'])) {
 		// Use type of 3, okay to purchase more, increment quantity
 		// Use type of 1-2, only okay to purchase one
-		$item_id = $system->clean($_GET['purchase_item']);
+		$item_id = $system->db->clean($_GET['purchase_item']);
 		try {
 			// Check if item exists
 			if(!isset($shop_items[$item_id])) {
@@ -116,7 +120,7 @@ function store() {
 		}
 	}
 	else if(isset($_GET['purchase_jutsu'])) {
-		$jutsu_id = $system->clean($_GET['purchase_jutsu']);
+		$jutsu_id = $system->db->clean($_GET['purchase_jutsu']);
 		try {
 			// Check if jutsu exists
 			if(!isset($shop_jutsu[$jutsu_id])) {
@@ -181,7 +185,7 @@ function store() {
 	// View single jutsu
 	if(!empty($_GET['view_jutsu'])) {
 		$jutsu_list = false;
-		$jutsu_id = (int)$system->clean($_GET['view_jutsu']);
+		$jutsu_id = (int)$system->db->clean($_GET['view_jutsu']);
 		if(!isset($shop_jutsu[$jutsu_id])) {
 			$system->message("Invalid jutsu!");
 			$system->printMessage();
@@ -218,12 +222,12 @@ function store() {
 					<p style='display:inline-block;margin:0px;width:37.1em;'>" . $jutsu['description'] . "</p>
 				<br style='clear:both;' />
 				<label style='width:6.5em;'>Jutsu type:</label>" . ucwords($jutsu['jutsu_type']);
-				$result = $system->query("SELECT `name` FROM `jutsu` WHERE `parent_jutsu`='$jutsu_id'");
-				if($system->db_last_num_rows > 0) {
+				$result = $system->db->query("SELECT `name` FROM `jutsu` WHERE `parent_jutsu`='$jutsu_id'");
+				if($system->db->last_num_rows > 0) {
 					echo "<br />
 					<br /><label>Learn <b>" . $jutsu['name'] . "</b> to level 50 to unlock:</label>
 						<p style='margin-left:10px;margin-top:5px;'>";
-					while($row = $system->db_fetch($result)) {
+					while($row = $system->db->fetch($result)) {
 						echo $row['name'] . "<br />";
 					}
 					echo "</p>";

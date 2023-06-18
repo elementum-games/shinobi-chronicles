@@ -39,9 +39,9 @@ function modPanel() {
 			if(!isset($_POST['ban_length'])) {
 				throw new Exception("Invalid ban length!");
 			}
-			$user_name = $system->clean($_POST['user_name']);
-			$ban_type = $system->clean($_POST['ban_type']);
-			$ban_length = $system->clean($_POST['ban_length']);
+			$user_name = $system->db->clean($_POST['user_name']);
+			$ban_type = $system->db->clean($_POST['ban_type']);
+			$ban_length = $system->db->clean($_POST['ban_length']);
 
             //Check ban type
 			if(array_search($ban_type, StaffManager::$ban_menu_items) === false) {
@@ -78,7 +78,7 @@ function modPanel() {
 	// Journal/avatar/profile song ban + remove [panel upgrade done - Hitori]
 	else if(!empty($_POST['profile_ban'])) {
 		try {
-            $user_name = $system->clean($_POST['user_name']);
+            $user_name = $system->db->clean($_POST['user_name']);
             $avatar_ban = false;
             $avatar_remove = false;
             $journal_ban = false;
@@ -153,8 +153,8 @@ function modPanel() {
             //Believe it is a latency issue where the second update is processed while the first one is still
             //processing and results in it being ultimately dropped. - Hitori
             if($message_string != '') {
-                $system->query($userQuery);
-                if($system->db_last_affected_rows) {
+                $system->db->query($userQuery);
+                if($system->db->last_affected_rows) {
                     $staffLog = "{$player->user_name}({$player->user_id}) ";
                     if($avatar_remove) {
                         $staffLog .= "removed avatar, ";
@@ -171,7 +171,9 @@ function modPanel() {
                     $player->staff_manager->staffLog(StaffManager::STAFF_LOG_MOD, substr($staffLog, 0, strlen($staffLog)-2).".");
                 }
                 if($journal_remove) {
-                    $system->query("UPDATE `journals` SET `journal`='' WHERE `user_id`='{$user_data['user_id']}' LIMIT 1");
+                    $system->db->query(
+                        "UPDATE `journals` SET `journal`='' WHERE `user_id`='{$user_data['user_id']}' LIMIT 1"
+                    );
                     $player->staff_manager->addRecord($user_data['user_id'], $user_data['user_name'], StaffManager::RECORD_NOTE, "Journal Removed");
                 }
                 $system->message(substr($message_string, 0, strlen($message_string) - 2) . ".");
@@ -184,14 +186,16 @@ function modPanel() {
 	else if(!empty($_GET['view_record'])) {
 		try {
             //Query for user
-			$user_name = $system->clean($_GET['view_record']);
-			$result = $system->query("SELECT `user_id`, `user_name`, `staff_level` FROM `users` WHERE `user_name`='$user_name' LIMIT 1");
-			if($system->db_last_num_rows == 0) {
+			$user_name = $system->db->clean($_GET['view_record']);
+			$result = $system->db->query(
+                "SELECT `user_id`, `user_name`, `staff_level` FROM `users` WHERE `user_name`='$user_name' LIMIT 1"
+            );
+			if($system->db->last_num_rows == 0) {
 				throw new Exception("Invalid user!");
 			}
 
             //Fetch user data
-			$result = $system->db_fetch($result);
+			$result = $system->db->fetch($result);
 			$user_id = $result['user_id'];
 			$user_name = $result['user_name'];
 			$staff_level = $result['staff_level'];
@@ -208,7 +212,7 @@ function modPanel() {
             //Add record note
             if(!empty($_POST['add_note'])) {
                 try {
-                    $data = trim($system->clean($_POST['content']));
+                    $data = trim($system->db->clean($_POST['content']));
                     $record_type = StaffManager::RECORD_NOTE;
 
                     if (strlen($data) < StaffManager::RECORD_NOT_MIN_SIZE) {
@@ -216,7 +220,7 @@ function modPanel() {
                     }
 
                     $player->staff_manager->addRecord($user_id, $user_name, $record_type, $data);
-                    if($system->db_last_insert_id) {
+                    if($system->db->last_insert_id) {
                         $system->message("Note added.");
                     }
                 }catch (Exception $e) {
@@ -262,11 +266,11 @@ function modPanel() {
 
             //Fetch record details
             //Reports
-			$result = $system->query("SELECT * FROM `reports` WHERE `user_id`='$user_id'");
+			$result = $system->db->query("SELECT * FROM `reports` WHERE `user_id`='$user_id'");
 			$reports = array();
 			$user_ids = array();
 			$users = [];
-			while($row = $system->db_fetch($result)) {
+			while($row = $system->db->fetch($result)) {
 				$reports[$row['report_id']] = $row;
 				if($row['moderator_id']) {
 					$users[$row['moderator_id']] = $row['moderator_id'];
@@ -275,17 +279,21 @@ function modPanel() {
             // Fetch user names of moderators
             if(count($users) > 0) {
                 $user_ids_string = implode(',', $users);
-                $result = $system->query("SELECT `user_id`, `user_name` FROM `users` WHERE `user_id` IN($user_ids_string)");
-                while($row = $system->db_fetch($result)) {
+                $result = $system->db->query(
+                    "SELECT `user_id`, `user_name` FROM `users` WHERE `user_id` IN($user_ids_string)"
+                );
+                while($row = $system->db->fetch($result)) {
                     $users[$row['user_id']] = $row['user_name'];
                 }
             }
 
             //Record data
             $record = [];
-            $record_result = $system->query("SELECT * FROM `user_record` WHERE `user_id`='$user_id' ORDER BY TIME DESC");
-            if($system->db_last_num_rows) {
-                while($data = $system->db_fetch($record_result)) {
+            $record_result = $system->db->query(
+                "SELECT * FROM `user_record` WHERE `user_id`='$user_id' ORDER BY TIME DESC"
+            );
+            if($system->db->last_num_rows) {
+                while($data = $system->db->fetch($record_result)) {
                     $record[] = $data;
                 }
             }
@@ -304,7 +312,7 @@ function modPanel() {
         try {
             $display_menu = false;
             $content = '';
-            $user_name = $system->clean($_GET['official_warning']);
+            $user_name = $system->db->clean($_GET['official_warning']);
             $user_data = $player->staff_manager->getUserByName($user_name);
 
             if(!$user_data) {
@@ -312,7 +320,7 @@ function modPanel() {
             }
 
             if(isset($_POST['send_official_warning'])) {
-                $content = $system->clean(trim($_POST['content']));
+                $content = $system->db->clean(trim($_POST['content']));
                 //Official warnings follow same rules as banning
                 if(!$player->staff_manager->canIssueOW($user_data['staff_level'])) {
                     throw new Exception("You do not have permission to send warnings to this user!");
@@ -344,9 +352,9 @@ function modPanel() {
     }
 	// Locked out users [panel upgrade done -Hitori]
 	if(!empty($_GET['unlock_account']) && $player->staff_manager->isHeadModerator()) {
-		$user_id = (int)$system->clean($_GET['unlock_account']);
-		$result = $system->query("UPDATE `users` SET `failed_logins`=0 WHERE `user_id`='$user_id' LIMIT 1");
-		if($system->db_last_affected_rows > 0) {
+		$user_id = (int)$system->db->clean($_GET['unlock_account']);
+		$result = $system->db->query("UPDATE `users` SET `failed_logins`=0 WHERE `user_id`='$user_id' LIMIT 1");
+		if($system->db->last_affected_rows > 0) {
             $player->staff_manager->staffLog(StaffManager::STAFF_LOG_HEAD_MOD, "{$player->user_name} ({$player->user_id}) unlocked account ID {$user_id}.");
 			$system->message("Account unlocked!");
 		}
@@ -360,12 +368,12 @@ function modPanel() {
 		// Ban IP [mod panel upgrade done -Hitori]
 		if(!empty($_POST['ban_ip'])) {
 			try {
-				$ip_address = $system->clean($_POST['ip_address']);
+				$ip_address = $system->db->clean($_POST['ip_address']);
 				if($player->staff_manager->getBannedIP($ip_address)) {
 					throw new Exception("IP address has already been banned!");
 				}
-				$system->query("INSERT INTO `banned_ips` (`ip_address`, `ban_level`) VALUES ('$ip_address', 2)");
-				if($system->db_last_affected_rows == 1) {
+				$system->db->query("INSERT INTO `banned_ips` (`ip_address`, `ban_level`) VALUES ('$ip_address', 2)");
+				if($system->db->last_affected_rows == 1) {
                     $player->staff_manager->staffLog(StaffManager::STAFF_LOG_HEAD_MOD,
                         "{$player->user_name}({$player->user_id}) banned IP Address: $ip_address.");
 					$system->message("IP address '$ip_address' banned!");
@@ -380,8 +388,8 @@ function modPanel() {
 		// Social/game/pm unban [mod panel upgrade done -Hitori]
 		if(!empty($_POST['unban'])) {
 			try {
-				$user_name = $system->clean($_POST['user_name']);
-                $unban_type = $system->clean($_POST['ban_type']);
+				$user_name = $system->db->clean($_POST['user_name']);
+                $unban_type = $system->db->clean($_POST['ban_type']);
                 $user_data = $player->staff_manager->getUserByName($user_name);
 
                 //Check if user exists
@@ -422,12 +430,12 @@ function modPanel() {
 		// Unban IP [mod penal upgrade complete -Hitori]
 		if(!empty($_POST['unban_ip'])) {
 			try {
-				$ip_address = $system->clean($_POST['ip_address']);
+				$ip_address = $system->db->clean($_POST['ip_address']);
 				if(!$player->staff_manager->getBannedIP($ip_address)) {
 					throw new Exception("IP address is not banned!");
 				}
-				$system->query("DELETE FROM `banned_ips` WHERE `ip_address`='$ip_address' LIMIT 1");
-				if($system->db_last_affected_rows == 1) {
+				$system->db->query("DELETE FROM `banned_ips` WHERE `ip_address`='$ip_address' LIMIT 1");
+				if($system->db->last_affected_rows == 1) {
                     $player->staff_manager->staffLog(StaffManager::STAFF_LOG_HEAD_MOD,
                         "{$player->user_name}({$player->user_id}) unbanned IP: $ip_address.");
 					$system->message("IP address '$ip_address' unbanned!");
@@ -458,7 +466,7 @@ function modPanel() {
                     throw new Exception("Select an option to unban!");
                 }
                 // Check username
-				$user_name = $system->clean($_POST['user_name']);
+				$user_name = $system->db->clean($_POST['user_name']);
                 $user_data = $player->staff_manager->getUserByName($user_name);
 				if(!$user_data) {
 					throw new Exception("Invalid username!");
@@ -497,7 +505,7 @@ function modPanel() {
 		}
 		// Global message [mod panel upgrade complete -Hitori]
 		else if(!empty($_POST['global_message'])) {
-			$message = $system->clean($_POST['global_message']);
+			$message = $system->db->clean($_POST['global_message']);
 			try {
 				if(strlen($message) < 5) {
 					throw new Exception("Please enter a message!");
@@ -505,8 +513,8 @@ function modPanel() {
 				if(strlen($message) > 1000) {
 					throw new Exception("Message is too long! (" . strlen($message) . "/1000 chars)");
 				}
-				$system->query("UPDATE `system_storage` SET `global_message`='$message', `time`='".time()."'");
-				$system->query("UPDATE `users` SET `global_message_viewed`=0");
+				$system->db->query("UPDATE `system_storage` SET `global_message`='$message', `time`='".time()."'");
+				$system->db->query("UPDATE `users` SET `global_message_viewed`=0");
 				$player->global_message_viewed = 0;
                 $player->staff_manager->staffLog(StaffManager::STAFF_LOG_HEAD_MOD, "$player->user_name($player->user_id) posted global: <br />"
                 . $message);
@@ -538,9 +546,9 @@ function modPanel() {
     //New with mod panel upgrade -Hitori
     else if($view == 'banned_ips' && $player->staff_manager->isHeadModerator()) {
         $banned_ips = [];
-        $result = $system->query("SELECT * FROM `banned_ips`");
-        if($system->db_last_num_rows) {
-            while($ip = $system->db_fetch($result)) {
+        $result = $system->db->query("SELECT * FROM `banned_ips`");
+        if($system->db->last_num_rows) {
+            while($ip = $system->db->fetch($result)) {
                 $banned_ips[] = $ip;
             }
         }
@@ -579,23 +587,25 @@ function modPanel() {
 
         //Multi type
         if(isset($_GET['type'])) {
-            $query_type = $system->clean($_GET['type']);
+            $query_type = $system->db->clean($_GET['type']);
         }
         //Only allow specified multi checks
         if(!in_array($query_type, $query_types)) {
             $query_type = 'current_ip';
         }
 
-        $result = $system->query("SELECT 
-            `$query_type`, COUNT(`$query_type`)
-        FROM 
-             `users` 
-        GROUP BY 
-             `$query_type`
-        HAVING 
-            COUNT(`$query_type`) > 2");
-        if($system->db_last_num_rows) {
-            $to_check = $system->db_fetch_all($result);
+        $result = $system->db->query(
+            "SELECT 
+                `$query_type`, COUNT(`$query_type`)
+            FROM 
+                 `users` 
+            GROUP BY 
+                 `$query_type`
+            HAVING 
+                COUNT(`$query_type`) > 2"
+        );
+        if($system->db->last_num_rows) {
+            $to_check = $system->db->fetch_all($result);
         }
 
         if(!empty($to_check)) {
@@ -604,9 +614,9 @@ function modPanel() {
                 $query .= "'" . $val[$query_type] . "', ";
             }
             $query = substr($query, 0, strlen($query) - 2) . ") ORDER BY `$query_type` DESC";
-            $result2 = $system->query($query);
-            if ($system->db_last_num_rows) {
-                while($account = $system->db_fetch($result2)) {
+            $result2 = $system->db->query($query);
+            if ($system->db->last_num_rows) {
+                while($account = $system->db->fetch($result2)) {
                     $account['multi_status'] = $player->staff_manager->checkMultiStatus($account['user_id']);
                     $accounts[] = $account;
                 }

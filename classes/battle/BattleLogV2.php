@@ -45,7 +45,7 @@ class BattleLogV2 {
 
     public function addFighterActionDescription(Fighter $fighter, string $action_description): void {
         $fighter_action_log = $this->getFighterActionLog($fighter->combat_id);
-        $fighter_action_log->action_description .= $this->system->clean($action_description);
+        $fighter_action_log->action_description .= $this->system->db->clean($action_description);
     }
 
     /**
@@ -81,7 +81,7 @@ class BattleLogV2 {
     public function addFighterEffectHit(
         Fighter $target, EffectHitLog $effect_hit
     ): void {
-        $effect_hit->description = $this->system->clean($effect_hit->description);
+        $effect_hit->description = $this->system->db->clean($effect_hit->description);
 
         $fighter_action_log = $this->getFighterActionLog($target->combat_id);
         $fighter_action_log->effect_hits[] = $effect_hit;
@@ -89,7 +89,7 @@ class BattleLogV2 {
 
     public function addFighterEffectAnnouncement(Fighter $caster, Fighter $target, string $announcement_text): void {
         $fighter_action_log = $this->getFighterActionLog($caster->combat_id);
-        $fighter_action_log->new_effect_announcements[] = $this->system->clean(
+        $fighter_action_log->new_effect_announcements[] = $this->system->db->clean(
             BattleLogV2::parseCombatText(text: $announcement_text, attacker: $caster, target: $target)
         );
     }
@@ -125,10 +125,12 @@ class BattleLogV2 {
      * @throws Exception
      */
     public static function getTurn(System $system, int $battle_id, int $turn_count): ?BattleLogV2 {
-        $result = $system->query("SELECT * FROM `battle_logs` 
-            WHERE `battle_id`='{$battle_id}' AND `turn_number`='{$turn_count}' LIMIT 1");
-        if($system->db_last_num_rows > 0) {
-            return BattleLogV2::fromDbArray($system, $system->db_fetch($result));
+        $result = $system->db->query(
+            "SELECT * FROM `battle_logs` 
+                WHERE `battle_id`='{$battle_id}' AND `turn_number`='{$turn_count}' LIMIT 1"
+        );
+        if($system->db->last_num_rows > 0) {
+            return BattleLogV2::fromDbArray($system, $system->db->fetch($result));
         }
         else {
             return null;
@@ -173,20 +175,22 @@ class BattleLogV2 {
     public static function addOrUpdateTurnLog(
         System $system, BattleLogV2 $log
     ): void {
-        $clean_content = $system->clean($log->content);
+        $clean_content = $system->db->clean($log->content);
 
         $fighter_action_logs_json = json_encode($log->fighter_action_logs);
 
-        $system->query("INSERT INTO `battle_logs` 
-            SET `battle_id`='{$log->battle_id}',
-                `turn_number`='{$log->turn_number}',
-                `turn_phase`='{$log->turn_phase}',
-                `content`='{$clean_content}',
-                `fighter_action_logs`='{$fighter_action_logs_json}'
-            ON DUPLICATE KEY UPDATE
-                `content`='{$clean_content}',
-                `fighter_action_logs`='{$fighter_action_logs_json}'
-        ");
+        $system->db->query(
+            "INSERT INTO `battle_logs` 
+                SET `battle_id`='{$log->battle_id}',
+                    `turn_number`='{$log->turn_number}',
+                    `turn_phase`='{$log->turn_phase}',
+                    `content`='{$clean_content}',
+                    `fighter_action_logs`='{$fighter_action_logs_json}'
+                ON DUPLICATE KEY UPDATE
+                    `content`='{$clean_content}',
+                    `fighter_action_logs`='{$fighter_action_logs_json}'
+            "
+        );
     }
 
     public static function parseCombatText(string $text, Fighter $attacker, Fighter $target): string {

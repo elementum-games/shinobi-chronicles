@@ -18,8 +18,8 @@ function news() {
 	$page = isset($_GET['page']) ? $_GET['page'] : false;
 
 	if(!empty($_POST['create_post']) && $player->hasAdminPanel()) {
-		$post = $system->clean($_POST['news_post']);
-		$title = $system->clean($_POST['title']);
+		$post = $system->db->clean($_POST['news_post']);
+		$title = $system->db->clean($_POST['title']);
 
 		try {
 			if(strlen($post) < 5) {
@@ -38,9 +38,9 @@ function news() {
 
 			$query = "INSERT INTO `news_posts` (`sender`, `title`, `message`, `time`)
 				VALUES ('{$player->user_name}', '{$title}', '{$post}', '" . time() . "')";
-			$system->query($query);
+			$system->db->query($query);
 
-			if($system->db_last_affected_rows == 1) {
+			if($system->db->last_affected_rows == 1) {
 				$system->message("News posted!");
 				$page = false;
 			}
@@ -55,13 +55,13 @@ function news() {
 		$system->printMessage();
 	}
 	else if(!empty($_POST['edit_post']) && $player->isUserAdmin()) {
-		$post_id = (int)$system->clean($_POST['post_id']);
-		$message = $system->clean($_POST['news_post']);
-		$title = $system->clean($_POST['title']);
+		$post_id = (int)$system->db->clean($_POST['post_id']);
+		$message = $system->db->clean($_POST['news_post']);
+		$title = $system->db->clean($_POST['title']);
 
 		try {
-			$result = $system->query("SELECT `post_id` FROM `news_posts` WHERE `post_id`='$post_id'");
-			if($system->db_last_num_rows == 0) {
+			$result = $system->db->query("SELECT `post_id` FROM `news_posts` WHERE `post_id`='$post_id'");
+			if($system->db->last_num_rows == 0) {
 				throw new Exception("Invalid post!");
 			}
 
@@ -83,9 +83,9 @@ function news() {
 				`title` = '{$title}',
 				`message` = '{$message}'
 				WHERE `post_id`='{$post_id}' LIMIT 1";
-			$system->query($query);
+			$system->db->query($query);
 
-			if($system->db_last_affected_rows == 1) {
+			if($system->db->last_affected_rows == 1) {
 				$system->message("News edited!");
 				$page = false;
 			}
@@ -116,15 +116,15 @@ function news() {
 		</td></tr></table>";
 	}
 	else if($page == "edit_post" && $player->isUserAdmin()) {
-		$post_id = (int)$system->clean($_GET['post']);
-		$result = $system->query("SELECT * FROM `news_posts` WHERE `post_id`='$post_id'");
-		if($system->db_last_num_rows == 0) {
+		$post_id = (int)$system->db->clean($_GET['post']);
+		$result = $system->db->query("SELECT * FROM `news_posts` WHERE `post_id`='$post_id'");
+		if($system->db->last_num_rows == 0) {
 			$system->message("Invalid post!");
 			$system->printMessage();
 			$page = false;
 		}
 		else {
-			$post = $system->db_fetch($result);
+			$post = $system->db->fetch($result);
 			echo "<table class='table'><tr><th>New Post</th></tr>
 			<tr><td style='text-align:center;'>
 				<form action='$self_link' method='post'>
@@ -155,14 +155,14 @@ function newsPosts($ADMIN = false, $max_posts = 8) {
 	global $system;
 	$self_link = $system->router->links['news'];
 
-	$result = $system->query("SELECT * FROM `news_posts` ORDER BY `post_id` DESC LIMIT $max_posts");
+	$result = $system->db->query("SELECT * FROM `news_posts` ORDER BY `post_id` DESC LIMIT $max_posts");
 
-	if($system->db_last_num_rows == 0) {
+	if($system->db->last_num_rows == 0) {
 		$system->message("No news posts!");
 		$system->printMessage();
 	}
 
-	while($post = $system->db_fetch($result)) {
+	while($post = $system->db->fetch($result)) {
 		echo "<table id='newstable' class='table'><tr><th>" . $post['title'];
 		if($ADMIN) {
 			echo " ( <a style='color:inherit;' href='{$self_link}&page=edit_post&post={$post['post_id']}'>Edit</a> )";

@@ -1,7 +1,6 @@
 <?php
 
-use JetBrains\PhpStorm\Pure;
-
+require_once __DIR__ . '/Database.php';
 require_once __DIR__ . '/EntityId.php';
 require_once __DIR__ . '/User.php';
 require_once __DIR__ . '/MarkdownParser.php';
@@ -32,8 +31,6 @@ class System {
     const SC_NO_REPLY_EMAIL = "no-reply@shinobichronicles.com";
     const UNSERVICEABLE_EMAIL_DOMAINS = ['hotmail.com', 'live.com', 'msn.com', 'outlook.com'];
 
-    public bool $ENABLE_ROW_LOCKING = true;
-    public bool $in_db_transaction = false;
 
     // TODO: Remove! This is a temporary way to do events
     const SC_EVENT_START = 0;
@@ -51,11 +48,7 @@ class System {
     public array $debug_messages = [];
 
     // Variable for DB connection resource
-    private string $host;
-    private string $username;
-    private string $password;
-    private string $database;
-    public $con;
+    public Database $db;
 
     public $environment;
 
@@ -74,13 +67,6 @@ class System {
     // Training boost switches
     public int $TRAIN_BOOST = 0; // Extra points per training, 0 for none
     public int $LONG_TRAIN_BOOST = 0; // Extra points per long training, 0 for none
-
-    // Variables for query() function to track things
-    public $db_result;
-    public string $db_query_type;
-    public int $db_last_num_rows = 0;
-    public int $db_last_affected_rows;
-    public $db_last_insert_id;
 
     public array $SC_STAFF_COLORS = array(
         User::STAFF_MODERATOR => array(
@@ -195,10 +181,7 @@ class System {
         /** @var $username */
         /** @var $password */
         /** @var $database */
-        $this->host = $host;
-        $this->username = $username;
-        $this->password = $password;
-        $this->database = $database;
+        $this->db = new Database($host, $username, $password, $database);
 
         $this->environment = $ENVIRONMENT ?? self::ENVIRONMENT_DEV;
         $this->register_open = $register_open ?? false;
@@ -215,174 +198,18 @@ class System {
         }
     }
 
-    /* function dbConnect()
-        Connects to a MySQL database and selects a DB. Stores connection resource in $con and returns.
-        -Parameters-
-        None; Uses @host, @user_name, @password, @database from /secure/vars.php for DB credentials.
-    */
-    public function dbConnect(): mysqli {
-        if($this->con) {
-            return $this->con;
-        }
-
-        $con = new mysqli($this->host, $this->username, $this->password) or $this->error(mysqli_error($this->con));
-        mysqli_select_db($con, $this->database) or $this->error(mysqli_error($this->con));
-
-        $this->con = $con;
-        return $con;
-    }
-
-    /* function clean(raw_input)
-        Cleans raw input to be safe for use in queries. Requires $this->con to have a connection for using mysqli_real_escape_string
-        -Parameters-
-        @raw_input: Input to be sanitized
-    */
-    public function clean($raw_input): string {
-        if(!$this->con) {
-            $this->dbConnect();
-        }
-
-        $input = trim($raw_input);
-        $search_terms = array('&yen;');
-        $replace_terms = array('[yen]');
-        $input = str_replace($search_terms, $replace_terms, $input);
-        $input = htmlspecialchars(
-            string: $input,
-            flags: ENT_QUOTES,
-            double_encode: false
-        );
-
-        $input = str_replace($replace_terms, $search_terms, $input);
-        $input = mysqli_real_escape_string($this->con, $input);
-        return $input;
-    }
-
-    /* function query(query) */
-    public function query($query, $debug = false): mysqli_result|bool {
-        $query = trim($query);
-
-        //Debugging
-        if($debug) {
-            $this->debugMessage($query);
-            return false;
-        }
-
-        $expected_query_types = [
-            'select',
-            'insert',
-            'update',
-            'delete'
-        ];
-        $normalized_query = trim(strtolower($query));
-
-        // default to first word
-        $this->db_query_type = explode(' ', $normalized_query)[0];
-
-        // double check for expected types in case of weird whitespace
-        foreach($expected_query_types as $query_type) {
-            if(str_starts_with($normalized_query, $query_type)) {
-                $this->db_query_type = $query_type;
-            }
-        }
-
-        if(!$this->con) {
-            $this->dbConnect();
-        }
-
-        $result = mysqli_query($this->con, $query) or $this->error(mysqli_error($this->con));
-
-        if($this->db_query_type == 'select') {
-            $this->db_last_num_rows = mysqli_num_rows($result);
-            $this->db_result = $result;
-        }
-        else {
-            $this->db_last_affected_rows = mysqli_affected_rows($this->con);
-        }
-
-        if($this->db_query_type == 'insert') {
-            $this->db_last_insert_id = mysqli_insert_id($this->con);
-        }
-        return $result;
-    }
-
-    /* function db_fetch(result set, return_type)
-
-    */
-    public function db_fetch($result = false, $return_type = 'assoc'): ?array {
-        if(!$result) {
-            $result = $this->db_result;
-        }
-
-        if($return_type == 'assoc') {
-            return mysqli_fetch_assoc($result);
-        }
-        else {
-            return mysqli_fetch_array($result);
-        }
-    }
-
     /**
-     * @param false  $result
-     * @param string $return_type
-     * @return array|null
+     * @param $message
+     * @param bool $force_message
+     * @return void
      */
-    public function db_fetch_all($result = false, ?string $id_column = null): array {
-        if(!$result) {
-            $result = $this->db_result;
-        }
-
-        $entities = [];
-        while($row = $this->db_fetch($result)) {
-            if($id_column) {
-                $entities[$row[$id_column]] = $row;
-            }
-            else {
-                $entities[] = $row;
-            }
-        }
-        return $entities;
-    }
-
-    public function startTransaction() {
-        if ($this->ENABLE_ROW_LOCKING) {
-            $this->query("START TRANSACTION;");
-            $this->in_db_transaction = true;
-        }
-    }
-
-    public function commitTransaction() {
-        if ($this->ENABLE_ROW_LOCKING && $this->in_db_transaction) {
-            $this->query("COMMIT;");
-            $this->in_db_transaction = false;
-        }
-    }
-    public function rollbackTransaction()
-    {
-        if ($this->ENABLE_ROW_LOCKING && $this->in_db_transaction) {
-            $this->query("ROLLBACK;");
-            $this->in_db_transaction = false;
-         }
-    }
-
-
-    /* function message(message, force_message)
-
-        Stores a message for display later.
-
-        -Parameters-
-
-        @message: 		Message to be stored for display
-
-        @force_message: Whether or not to overwrite a pre-stored message that has not been displayed. Defaults to false.
-
-    */
-    public function message($message, $force_message = false): void {
+    public function message($message, bool $force_message = false): void {
         if(strlen($this->message) == 0 || $force_message) {
             $this->message = $message;
         }
     }
 
-    public function debugMessage($message) {
+    public function debugMessage($message): void {
         $this->debug_messages[] = $message;
     }
 
@@ -401,86 +228,8 @@ class System {
         return true;
     }
 
-
-    /**
-     * Sends PM to specified recipient
-     * * OLD PRIVATE MESSAGES
-     * @param $sender
-     * @param $recipient
-     * @param $subject
-     * @param $message
-     * @param int $staff_level
-     * @return bool
-     */
-    public function send_pm($sender, $recipient, $subject, $message, $staff_level = 0): bool {
-        if(!$this->con) {
-            $this->dbConnect();
-        }
-
-        $time = time();
-        $type = 0;
-        $userlevel = 1;
-        $sender = $this->clean($sender);
-        $subject = $this->clean($subject);
-        $recipient = $this->clean($recipient);
-        $message = $this->clean(trim($message));
-
-        $query = "INSERT INTO `private_messages` (`sender`, `recipient`, `subject`, `message`, `time`, `message_read`, `staff_level`)
-				VALUES ('$sender', '$recipient', '$subject', '$message', " . time() . ", 0, '$staff_level')";
-        $this->query($query);
-        if($this->db_last_affected_rows) {
-            return true;
-        }
-        else {
-            return false;
-        }
-    }
-
     public static function currentTimeMs(): int {
         return floor(microtime(true) * 1000);
-    }
-
-    /**
-     * Logs an error message(usually from DB), displays a generic error message to user, displays page end, then exits script.
-     *
-     * @param $error_message
-     */
-     public function error($error_message): void {
-        error_log($error_message . ' in ' . System::simpleStackTrace());
-        // DEBUG MODE
-        //echo $error_message;
-
-        $admins = array(1, 190, 193);
-
-        if($this->environment == 'dev' || in_array($_SESSION['user_id'] ?? null, $admins)) {
-            $message = $error_message;
-        }
-        else {
-            $message = "An error has occurred. Please make a report to the administrators if the problem persists.";
-        }
-
-        $this->message($message);
-        if($this->is_api_request) {
-            API::exitWithError(message: $message, system: $this);
-        }
-        $this->printMessage(true);
-
-        global $side_menu_start;
-        global $side_menu_end;
-        global $footer;
-
-        $pages = Router::$routes;
-
-        echo $side_menu_start;
-        foreach($pages as $id => $page) {
-            if(!isset($page->menu) || $page->menu != Route::MENU_USER) {
-                continue;
-            }
-
-            echo "<li><a href='{$this->router->base_url}?id=$id'>" . $page->title . "</a></li>";
-        }
-        echo $side_menu_end . $footer;
-        exit;
     }
 
     /* function explicitLanguageCheck(word)
@@ -575,10 +324,10 @@ class System {
         $search_array = [];
         $replace_array = [];
 
-        $reg_exUrl = '/((?:http|https)\:\/\/(?:[a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,5})(?:\/[^\:\s\\\\]*)?)/i';
+        $reg_exUrl = '/((?:http|https):\/\/(?:[a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,5})(?:\/[^\:\s\\\\]*)?)/i';
         if(self::LOCAL_HOST) {
             //Allow regex to work with local links if system is set to local host
-            $reg_exUrl = '/((?:http|https)\:\/\/(?:[a-zA-Z0-9\-\.]+[a-zA-Z]{2,5})(?:\/[^\:\s\\\\]*)?)/i';
+            $reg_exUrl = '/((?:http|https):\/\/(?:[a-zA-Z0-9\-\.]+[a-zA-Z]{2,5})(?:\/[^\:\s\\\\]*)?)/i';
         }
         $text = preg_replace_callback(
             $reg_exUrl,
@@ -592,23 +341,21 @@ class System {
             $text
         );
 
-        array_push($search_array, '[image_prefix]');
-        array_push($replace_array, 'https://');
+        $search_array[] = '[image_prefix]';
+        $replace_array[] = 'https://';
 
-        array_push($search_array, '\r\n');
-        array_push($replace_array, '<br />');
+        $search_array[] = '\r\n';
+        $replace_array[] = '<br />';
 
-        array_push($search_array, '&amp;#039;');
-        array_push($replace_array, "&#039;");
+        $search_array[] = '&amp;#039;';
+        $replace_array[] = "&#039;";
 
-        array_push($search_array, '&amp;lt;');
-        array_push($replace_array, "&lt;");
-        array_push($search_array, '&amp;gt;');
-        array_push($replace_array, "&gt;");
+        $search_array[] = '&amp;lt;';
+        $replace_array[] = "&lt;";
+        $search_array[] = '&amp;gt;';
+        $replace_array[] = "&gt;";
 
-        $text = str_ireplace($search_array,$replace_array,$text);
-
-        return $text;
+        return str_ireplace($search_array, $replace_array, $text);
 
     }
 
@@ -698,18 +445,20 @@ class System {
     }
 
     public function log($type, $title, $contents): void {
-        $type = $this->clean($type);
-        $title = $this->clean($title);
+        $type = $this->db->clean($type);
+        $title = $this->db->clean($title);
 
         if (is_array($contents))
         {
             $contents = json_encode($contents);
         }
 
-        $contents = $this->clean($contents);
+        $contents = $this->db->clean($contents);
 
-        $this->query("INSERT INTO `logs` (`log_type`, `log_title`, `log_time`, `log_contents`)
-			VALUES ('$type', '$title', " . time() . ", '$contents')");
+        $this->db->query(
+            "INSERT INTO `logs` (`log_type`, `log_title`, `log_time`, `log_contents`)
+                VALUES ('$type', '$title', " . time() . ", '$contents')"
+        );
     }
 
     /**
@@ -731,7 +480,7 @@ class System {
                throw new Exception("Invalid currency type!");
        }
 
-        $this->query(
+        $this->db->query(
             "INSERT INTO `currency_logs` (
                 `character_id`,
                 `currency_type`,
@@ -746,9 +495,10 @@ class System {
                 '{$previous_balance}',
                 '{$new_balance}',
                 '{$transaction_amount}',
-                '{$this->clean($transaction_description)}',
+                '{$this->db->clean($transaction_description)}',
                 " . time() . "
-            )");
+            )"
+        );
     }
 
     public function hash_password($password): string {
@@ -782,13 +532,16 @@ class System {
         }
     }
 
+    /**
+     * @throws Exception
+     */
     public function fetchGlobalMessage(): ?array {
-        $result = $this->query("SELECT `global_message`, `time` FROM `system_storage` LIMIT 1");
+        $result = $this->db->query("SELECT `global_message`, `time` FROM `system_storage` LIMIT 1");
         if($result->num_rows < 1) {
             return null;
         }
 
-        $results = $this->db_fetch($result);
+        $results = $this->db->fetch($result);
 
         return [
             'message' => str_replace("\r\n", "<br />", $results['global_message']),
@@ -796,7 +549,6 @@ class System {
         ];
     }
 
-    #[Pure]
     public function getReactFile(string $component_name): string {
         $filename = "ui_components/build/{$component_name}.js";
         return $this->router->base_url . $filename . "?v=" .  filemtime($filename);

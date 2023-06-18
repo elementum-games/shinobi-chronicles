@@ -29,22 +29,26 @@ $min_password_length = User::MIN_PASSWORD_LENGTH;
 
 if(isset($_GET['act'])) {
     if($_GET['act'] == 'verify') {
-        $key = $system->clean($_GET['verify_key']);
-        $user_name = $system->clean($_GET['username']);
+        $key = $system->db->clean($_GET['verify_key']);
+        $user_name = $system->db->clean($_GET['username']);
 
-        $result = $system->query("UPDATE `users` SET `user_verified`=1 WHERE `user_name`='$user_name' AND `verify_key`='$key' LIMIT 1");
-        if($system->db_last_affected_rows > 0) {
+        $result = $system->db->query(
+            "UPDATE `users` SET `user_verified`=1 WHERE `user_name`='$user_name' AND `verify_key`='$key' LIMIT 1"
+        );
+        if($system->db->last_affected_rows > 0) {
             $system->message("Account activated! You may log in and start playing. <a href='{$system->router->base_url}'>Continue</a>");
             $system->printMessage();
         }
         else {
-            $accountData = $system->query("SELECT `user_verified` FROM `users` WHERE `user_name`='$user_name' AND `verify_key`='$key' LIMIT 1");
-            if(!$system->db_last_num_rows) {
+            $accountData = $system->db->query(
+                "SELECT `user_verified` FROM `users` WHERE `user_name`='$user_name' AND `verify_key`='$key' LIMIT 1"
+            );
+            if(!$system->db->last_num_rows) {
                 $system->message("User not found!. Please contact an administrator. Staff can be found on
                         <a href='{$system->router->links['discord']}' target='_blank'>Discord.</a>");
             }
             else {
-                $accountData = $system->db_fetch($accountData);
+                $accountData = $system->db->fetch($accountData);
                 if($accountData['user_verified']) {
                     $system->message("Your account is already activated and you may login!");
                 }
@@ -57,14 +61,16 @@ if(isset($_GET['act'])) {
         }
     }
     else if($_GET['act'] == 'resend_verification') {
-        $user_name = $system->clean($_GET['username']);
-        $result = $system->query("SELECT `email`, `verify_key`, `user_verified` FROM `users` WHERE `user_name`='$user_name' LIMIT 1");
-        if($system->db_last_num_rows == 0) {
+        $user_name = $system->db->clean($_GET['username']);
+        $result = $system->db->query(
+            "SELECT `email`, `verify_key`, `user_verified` FROM `users` WHERE `user_name`='$user_name' LIMIT 1"
+        );
+        if($system->db->last_num_rows == 0) {
             $system->message("Invalid user!");
             $system->printMessage();
         }
         else {
-            $result = $system->db_fetch($result);
+            $result = $system->db->fetch($result);
 
             $subject = "Shinobi-Chronicles account verification";
             $message = "Welcome to Shinobi-Chronicles RPG. Please visit the link below to verify your account: \r\n" .
@@ -88,7 +94,7 @@ if(isset($_GET['act'])) {
 $alpha_code = 'keepoutNub';
 
 // Load villages
-$result = $system->query("SELECT `name`, `location` FROM `villages`");
+$result = $system->db->query("SELECT `name`, `location` FROM `villages`");
 $villages = [];
 while($row = mysqli_fetch_array($result)) {
     $villages[$row['name']] = $row;
@@ -98,7 +104,7 @@ $register_ok = false;
 if(isset($_POST['register'])) {
     try {
         if(isset($_POST['user_name'])) {
-            $user_name = $system->clean(trim($_POST['user_name']));
+            $user_name = $system->db->clean(trim($_POST['user_name']));
         }
         if(isset($_POST['password'])) {
             $password = trim($_POST['password']);
@@ -107,7 +113,7 @@ if(isset($_POST['register'])) {
             $confirm_password = trim($_POST['confirm_password']);
         }
         if(isset($_POST['email'])) {
-            $email = $system->clean(trim($_POST['email']));
+            $email = $system->db->clean(trim($_POST['email']));
         }
         if(isset($_POST['gender'])) {
             $gender = trim($_POST['gender']);
@@ -180,8 +186,9 @@ if(isset($_POST['register'])) {
         }
 
         // Check for username/email existing
-        $result = $system->query("SELECT `user_id`, `user_name`, `email` FROM `users`
-			WHERE `email`='$email' OR `user_name`='$user_name' LIMIT 1"
+        $result = $system->db->query(
+            "SELECT `user_id`, `user_name`, `email` FROM `users`
+                WHERE `email`='$email' OR `user_name`='$user_name' LIMIT 1"
         );
         if(mysqli_num_rows($result) > 0) {
             $result = mysqli_fetch_assoc($result);

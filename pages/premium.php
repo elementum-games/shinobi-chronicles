@@ -84,17 +84,21 @@ function premium() {
 
 	if($player->clan) {
 
-		$system->query("SELECT `clan_id`, `name` FROM `clans` WHERE `village` = '{$player->village->name}' AND `clan_id` != '{$player->clan->id}' AND `bloodline_only` = '0'");
+		$system->db->query(
+            "SELECT `clan_id`, `name` FROM `clans` WHERE `village` = '{$player->village->name}' AND `clan_id` != '{$player->clan->id}' AND `bloodline_only` = '0'"
+        );
 
-		while($village_clans = $system->db_fetch()) {
+		while($village_clans = $system->db->fetch()) {
 			$available_clans[$village_clans['clan_id']] = stripslashes($village_clans['name']);
 		}
 
 	}
 
 	if($player->bloodline_id && $player->clan->id != $player->bloodline->clan_id) {
-		$system->query(sprintf("SELECT `clan_id`, `name` FROM `clans` WHERE `clan_id` = '%d'", $player->bloodline->clan_id));
-		$result = $system->db_fetch();
+		$system->db->query(
+            sprintf("SELECT `clan_id`, `name` FROM `clans` WHERE `clan_id` = '%d'", $player->bloodline->clan_id)
+        );
+		$result = $system->db->fetch();
 		$available_clans[$result['clan_id']] = stripslashes($result['name']);
 	}
 
@@ -160,14 +164,16 @@ function premium() {
 
                 $player->updateData();
 
-                $system->query("DELETE FROM `user_bloodlines` WHERE `user_id`='$player->user_id'");
-                $system->query("UPDATE `user_inventory` SET
-				`jutsu` = '',
-				`items` = '',
-				`bloodline_jutsu` = '',
-				`equipped_jutsu` = '',
-				`equipped_items` = ''
-				WHERE `user_id`='$player->user_id'");
+                $system->db->query("DELETE FROM `user_bloodlines` WHERE `user_id`='$player->user_id'");
+                $system->db->query(
+                    "UPDATE `user_inventory` SET
+                    `jutsu` = '',
+                    `items` = '',
+                    `bloodline_jutsu` = '',
+                    `equipped_jutsu` = '',
+                    `equipped_items` = ''
+                    WHERE `user_id`='$player->user_id'"
+                );
 
 
                 require 'templates/premium/character_reset_complete.php';
@@ -178,7 +184,7 @@ function premium() {
 		}
 	}
 	else if(isset($_POST['name_change'])) {
-		$new_name = $system->clean($_POST['new_name']);
+		$new_name = $system->db->clean($_POST['new_name']);
 		$akCost = $costs['name_change'];
         $deductNameChanges = 1;
 		try {
@@ -212,9 +218,9 @@ function premium() {
                 $deductNameChanges = 0;
             }
 
-			$result = $system->query("SELECT `user_name` FROM `users` WHERE `user_name`='$new_name' LIMIT 1");
-			if($system->db_last_num_rows) {
-				$result = $system->db_fetch();
+			$result = $system->db->query("SELECT `user_name` FROM `users` WHERE `user_name`='$new_name' LIMIT 1");
+			if($system->db->last_num_rows) {
+				$result = $system->db->fetch();
                 if(strtolower($result['user_name']) == strtolower($new_name) && $result['user_name'] != $player->user_name) {
                     throw new Exception("Username already in use!");
                 }
@@ -233,7 +239,7 @@ function premium() {
 			}
             else {
                 $sql = "UPDATE `users` SET `user_name` = '%s', `username_changes` = `username_changes` - %d WHERE `user_id` = %d LIMIT 1;";
-                $system->query(sprintf($sql, $new_name, $deductNameChanges, $player->user_id));
+                $system->db->query(sprintf($sql, $new_name, $deductNameChanges, $player->user_id));
                 $player->subtractPremiumCredits($akCost, "Username change");
 
                 $system->message("You have changed your name to $new_name.");
@@ -244,7 +250,7 @@ function premium() {
 	}
 	else if(isset($_POST['change_gender'])) {
         try {
-            $new_gender = $system->clean($_POST['new_gender']);
+            $new_gender = $system->db->clean($_POST['new_gender']);
             $akCost = $costs['gender_change'];
             if($player->getPremiumCredits() < $akCost) {
             throw new Exception("You do not have enough Ancient Kunai!");
@@ -279,7 +285,7 @@ function premium() {
     }
 	else if(isset($_POST['stat_reset'])) {
 		try {
-			$stat = $system->clean($_POST['stat']);
+			$stat = $system->db->clean($_POST['stat']);
 			if(array_search($stat, $player->stats) === false) {
 				throw new Exception("Invalid stat!");
 			}
@@ -313,8 +319,8 @@ function premium() {
 	}
 	else if(isset($_POST['stat_allocate'])) {
 		try {
-			$original_stat = $system->clean($_POST['original_stat']);
-			$target_stat = $system->clean($_POST['target_stat']);
+			$original_stat = $system->db->clean($_POST['original_stat']);
+			$target_stat = $system->db->clean($_POST['target_stat']);
 			if(array_search($original_stat, $player->stats) === false) {
 				throw new Exception("Invalid original stat!");
 			}
@@ -334,7 +340,7 @@ function premium() {
             }
 
 			// Transfer amount
-			$transfer_amount = (int)$system->clean($_POST['transfer_amount']);
+			$transfer_amount = (int)$system->db->clean($_POST['transfer_amount']);
 
 			if($transfer_amount < 1) {
 				throw new Exception("Invalid transfer amount!");
@@ -479,15 +485,17 @@ function premium() {
 		try {
             $self_link .= '&view=bloodlines';
             $bloodline_id = (int) $_POST['bloodline_id'];
-			$result = $system->query("SELECT `bloodline_id`, `name`, `clan_id`, `rank` FROM `bloodlines`
-				WHERE `bloodline_id`='$bloodline_id' AND `rank` < 5 ORDER BY `rank` ASC");
+			$result = $system->db->query(
+                "SELECT `bloodline_id`, `name`, `clan_id`, `rank` FROM `bloodlines`
+                    WHERE `bloodline_id`='$bloodline_id' AND `rank` < 5 ORDER BY `rank` ASC"
+            );
 
             //BL not found
-			if($system->db_last_num_rows == 0) {
+			if($system->db->last_num_rows == 0) {
 				throw new Exception("Invalid bloodline!");
 			}
             //Load BL data
-            $result = $system->db_fetch($result);
+            $result = $system->db->fetch($result);
             $akCost = $costs['bloodline'][$result['rank']];
             $bloodline_name = $result['name'];
 
@@ -520,11 +528,11 @@ function premium() {
                 }
                 //Check clan office detail & remove player from clan data if present
                 if ($player->clan && $player->clan->leader_id == $player->user_id) {
-                    $system->query("UPDATE `clans` SET `leader` = '0' WHERE `clan_id` = '{$player->clan->id}'");
+                    $system->db->query("UPDATE `clans` SET `leader` = '0' WHERE `clan_id` = '{$player->clan->id}'");
                 } else if ($player->clan && $player->clan->elder_1_id == $player->user_id) {
-                    $system->query("UPDATE `clans` SET `elder_1` = '0' WHERE `clan_id` = '{$player->clan->id}'");
+                    $system->db->query("UPDATE `clans` SET `elder_1` = '0' WHERE `clan_id` = '{$player->clan->id}'");
                 } else if ($player->clan && $player->clan->elder_2_id == $player->user_id) {
-                    $system->query("UPDATE `clans` SET `elder_2` = '0' WHERE `clan_id` = '{$player->clan->id}'");
+                    $system->db->query("UPDATE `clans` SET `elder_2` = '0' WHERE `clan_id` = '{$player->clan->id}'");
                 }
                 //Remove office from player data if present
                 if ($player->clan_office) {
@@ -546,9 +554,9 @@ function premium() {
 
                 // Set clan
                 $clan_id = $result['clan_id'];
-                $result = $system->query("SELECT `name` FROM `clans` WHERE `clan_id` = '$clan_id' LIMIT 1");
-                if ($system->db_last_num_rows > 0) {
-                    $clan_result = $system->db_fetch($result);
+                $result = $system->db->query("SELECT `name` FROM `clans` WHERE `clan_id` = '$clan_id' LIMIT 1");
+                if ($system->db->last_num_rows > 0) {
+                    $clan_result = $system->db->fetch($result);
 
 
                     $player->clan = Clan::loadFromId($system, $clan_id);
@@ -651,10 +659,10 @@ function premium() {
         }
 	}
 	else if(isset($_POST['change_color']) && $player->canChangeChatColor()) {
-		$color = $system->clean($_POST['name_color']);
+		$color = $system->db->clean($_POST['name_color']);
 
         // Premium effect
-        $chat_effect = (isset($_POST['chat_effect']) ? $system->clean($_POST['chat_effect']) : "");
+        $chat_effect = (isset($_POST['chat_effect']) ? $system->db->clean($_POST['chat_effect']) : "");
 
         if($player->premium_credits_purchased && in_array($chat_effect, ["", "sparkles"])) {
             $player->chat_effect = $chat_effect;
@@ -673,8 +681,8 @@ function premium() {
 	else if(isset($_POST['change_element']) && $player->rank_num >= 3) {
         try {
             $akCost = $costs['element_change'];
-			$current_element = $system->clean($_POST['current_element']);
-			$new_element = $system->clean($_POST['new_element']);
+			$current_element = $system->db->clean($_POST['current_element']);
+			$new_element = $system->db->clean($_POST['new_element']);
             //Player already has new element
             if(in_array($new_element, $player->elements)) {
                 throw new Exception("You already attuned to the $new_element element!");
@@ -870,13 +878,13 @@ function premium() {
             else {
                 //Update clan data if player holds a seat
                 if ($player->clan->leader_id == $player->user_id) {
-                    $system->query("UPDATE `clans` SET `leader` = '0' WHERE `clan_id` = '{$player->clan->id}'");
+                    $system->db->query("UPDATE `clans` SET `leader` = '0' WHERE `clan_id` = '{$player->clan->id}'");
                 }
                 else if ($player->clan->elder_1_id == $player->user_id) {
-                    $system->query("UPDATE `clans` SET `elder_1` = '0' WHERE `clan_id` = '{$player->clan->id}'");
+                    $system->db->query("UPDATE `clans` SET `elder_1` = '0' WHERE `clan_id` = '{$player->clan->id}'");
                 }
                 else if ($player->clan->elder_2_id == $player->user_id) {
-                    $system->query("UPDATE `clans` SET `elder_2` = '0' WHERE `clan_id` = '{$player->clan->id}'");
+                    $system->db->query("UPDATE `clans` SET `elder_2` = '0' WHERE `clan_id` = '{$player->clan->id}'");
                 }
                 //Remove clan seat from player if they hold seat
                 if ($player->clan_office) {
@@ -899,19 +907,21 @@ function premium() {
                 $player->village = new Village($system, $village);
 
                 // Clan
-                $result = $system->query("SELECT `clan_id`, `name` FROM `clans`
-                    WHERE `village`='{$player->village->name}' AND `bloodline_only`='0'");
-                if ($system->db_last_num_rows == 0) {
-                    $result = $system->query("SELECT `clan_id`, `name` FROM `clans` WHERE `bloodline_only`='0'");
+                $result = $system->db->query(
+                    "SELECT `clan_id`, `name` FROM `clans`
+                        WHERE `village`='{$player->village->name}' AND `bloodline_only`='0'"
+                );
+                if ($system->db->last_num_rows == 0) {
+                    $result = $system->db->query("SELECT `clan_id`, `name` FROM `clans` WHERE `bloodline_only`='0'");
                 }
 
-                if (!$system->db_last_num_rows) {
+                if (!$system->db->last_num_rows) {
                     throw new Exception("No clans available!");
                 }
 
                 $clans = array();
                 $count = 0;
-                while ($row = $system->db_fetch($result)) {
+                while ($row = $system->db->fetch($result)) {
                     $clans[$row['clan_id']] = $row;
                     $count++;
                 }
@@ -928,8 +938,8 @@ function premium() {
                 $query .= " FROM `users`";
 
                 $clan_counts = array();
-                $result = $system->query($query);
-                $row = $system->db_fetch($result);
+                $result = $system->db->query($query);
+                $row = $system->db->fetch($result);
                 $total_users = 0;
                 foreach ($row as $id => $user_count) {
                     $clan_counts[$id] = $user_count;
@@ -1007,13 +1017,13 @@ function premium() {
 
                 // Remove player from clan data, if seat held
                 if ($player->clan->leader_id == $player->user_id) {
-                    $system->query("UPDATE `clans` SET `leader` = '0' WHERE `clan_id` = '{$player->clan->id}'");
+                    $system->db->query("UPDATE `clans` SET `leader` = '0' WHERE `clan_id` = '{$player->clan->id}'");
                 }
                 else if ($player->clan->elder_1_id == $player->user_id) {
-                    $system->query("UPDATE `clans` SET `elder_1` = '0' WHERE `clan_id` = '{$player->clan->id}'");
+                    $system->db->query("UPDATE `clans` SET `elder_1` = '0' WHERE `clan_id` = '{$player->clan->id}'");
                 }
                 else if ($player->clan->elder_2_id == $player->user_id) {
-                    $system->query("UPDATE `clans` SET `elder_2` = '0' WHERE `clan_id` = '{$player->clan->id}'");
+                    $system->db->query("UPDATE `clans` SET `elder_2` = '0' WHERE `clan_id` = '{$player->clan->id}'");
                 }
                 //Remove seat from player if held
                 if($player->clan_office) {
@@ -1041,9 +1051,9 @@ function premium() {
 
     // Select all for bloodline list
     $bloodlines = array();
-    $result = $system->query("SELECT * FROM `bloodlines` WHERE `rank` < 5 ORDER BY `rank` ASC");
-    if($system->db_last_num_rows > 0) {
-        while($row = $system->db_fetch($result)) {
+    $result = $system->db->query("SELECT * FROM `bloodlines` WHERE `rank` < 5 ORDER BY `rank` ASC");
+    if($system->db->last_num_rows > 0) {
+        while($row = $system->db->fetch($result)) {
             // Prep json encoded members for use in BL list
             $row['passive_boosts'] = json_decode($row['passive_boosts']);
             $row['combat_boosts'] = json_decode($row['combat_boosts']);
@@ -1117,9 +1127,11 @@ function premiumCreditExchange() {
             $player->updateData();
 
             //Add offer to market
-            $system->query("INSERT INTO `premium_credit_exchange` (`seller`, `premium_credits`, `money`)
-			VALUES ('$player->user_id', '$premium_credits', '$money')");
-            if ($system->db_last_affected_rows > 0) {
+            $system->db->query(
+                "INSERT INTO `premium_credit_exchange` (`seller`, `premium_credits`, `money`)
+                VALUES ('$player->user_id', '$premium_credits', '$money')"
+            );
+            if ($system->db->last_affected_rows > 0) {
                 $system->message("Offer placed!");
             }
             else {
@@ -1136,14 +1148,14 @@ function premiumCreditExchange() {
 	else if(isset($_GET['purchase'])) {
 		try {
 			// Validate input for offer id
-			$id = (int)$system->clean($_GET['purchase']);
-			$result = $system->query("SELECT * FROM `premium_credit_exchange` WHERE `id`='$id' LIMIT 1");
-			if($system->db_last_num_rows == 0) {
+			$id = (int)$system->db->clean($_GET['purchase']);
+			$result = $system->db->query("SELECT * FROM `premium_credit_exchange` WHERE `id`='$id' LIMIT 1");
+			if($system->db->last_num_rows == 0) {
 				 throw new Exception("Invalid offer!");
 			}
 
             //Load offer
-			$offer = $system->db_fetch($result);
+			$offer = $system->db->fetch($result);
 
             //Check if offer is completed
             if($offer['completed'] == 1) {
@@ -1160,12 +1172,14 @@ function premiumCreditExchange() {
             $player->updateData();
 
 			// Run purchase and log [NOTE: Updating first is to avoid as much server lag and possibility for glitching]
-			$system->query("UPDATE `premium_credit_exchange` SET `completed`='1' WHERE `id`='$id' LIMIT 1");
+			$system->db->query("UPDATE `premium_credit_exchange` SET `completed`='1' WHERE `id`='$id' LIMIT 1");
 
-            $result = $system->query("SELECT `money` FROM `users` WHERE `user_id`='{$offer['seller']}' LIMIT 1");
-            $current_balance = $system->db_fetch($result)['money'] ?? null;
+            $result = $system->db->query("SELECT `money` FROM `users` WHERE `user_id`='{$offer['seller']}' LIMIT 1");
+            $current_balance = $system->db->fetch($result)['money'] ?? null;
 
-			$system->query("UPDATE `users` SET `money`=`money` + {$offer['money']} WHERE `user_id`='{$offer['seller']}'");
+			$system->db->query(
+                "UPDATE `users` SET `money`=`money` + {$offer['money']} WHERE `user_id`='{$offer['seller']}'"
+            );
 
             $system->currencyLog(
                 character_id: $offer['seller'],
@@ -1197,13 +1211,13 @@ function premiumCreditExchange() {
 	else if(isset($_GET['cancel'])) {
 		try {
 			// Validate input for offer id
-			$id = (int)$system->clean($_GET['cancel']);
-			$result = $system->query("SELECT * FROM `premium_credit_exchange` WHERE `id`='$id' LIMIT 1");
-			if($system->db_last_num_rows == 0) {
+			$id = (int)$system->db->clean($_GET['cancel']);
+			$result = $system->db->query("SELECT * FROM `premium_credit_exchange` WHERE `id`='$id' LIMIT 1");
+			if($system->db->last_num_rows == 0) {
 				 throw new Exception("Invalid offer!");
 			}
 
-			$offer = $system->db_fetch($result);
+			$offer = $system->db->fetch($result);
 
             // Offer complete
             if($offer['completed']) {
@@ -1216,7 +1230,7 @@ function premiumCreditExchange() {
 			}
 
 			// Cancel log [NOTE: Updating first is to avoid as much server lag and possibility for glitching]
-			$system->query("UPDATE `premium_credit_exchange` SET `completed`='1' WHERE `id`='$id' LIMIT 1");
+			$system->db->query("UPDATE `premium_credit_exchange` SET `completed`='1' WHERE `id`='$id' LIMIT 1");
 
             $player->addPremiumCredits($offer['premium_credits'], "Cancelled AK offer on exchange");
             $player->updateData();
@@ -1234,19 +1248,19 @@ function premiumCreditExchange() {
 	}
 
     $query = "SELECT * FROM `premium_credit_exchange` WHERE `completed`='0' ORDER BY `id` DESC";
-	$result = $system->query($query);
+	$result = $system->db->query($query);
 
 	$credit_users = array();
     $offers = array();
 
 	//If there are offers in the database
-	if($system->db_last_num_rows) {
-		while($row = $system->db_fetch($result)) {
+	if($system->db->last_num_rows) {
+		while($row = $system->db->fetch($result)) {
             //Fetch seller information if not already done
 			if(!in_array($row['seller'], $credit_users))
 			{
-				$user_result = $system->query("SELECT `user_name` FROM `users` WHERE `user_id`='{$row['seller']}'");
-				$user_info = $system->db_fetch($user_result);
+				$user_result = $system->db->query("SELECT `user_name` FROM `users` WHERE `user_id`='{$row['seller']}'");
+				$user_info = $system->db->fetch($user_result);
 				$credit_users[$row['seller']] = $user_info['user_name'];
 			}
             $row['seller_name'] = $credit_users[$row['seller']];

@@ -10,6 +10,7 @@ type Props = {|
     +initialPosts: $ReadOnlyArray < ChatPostType >,
     +initialPostId: ?number,
     +initialNextPagePostId: ?number,
+    +initialPreviousPagePostId: ?number,
     +initialLatestPostId: number,
     +maxPostLength: number,
     +isModerator: boolean,

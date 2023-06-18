@@ -38,7 +38,7 @@ function userSettings() {
 			if(strlen($avatar_link) < 5) {
 				throw new Exception("Please enter an avatar link!");
 			}
-			$avatar_link = $system->clean($avatar_link);
+			$avatar_link = $system->db->clean($avatar_link);
 
 			if(!getimagesize($avatar_link)) {
 				throw new Exception("Image does not exist!");
@@ -63,8 +63,8 @@ function userSettings() {
 		$new_password = trim($_POST['new_password']);
 		$confirm_password = trim($_POST['confirm_new_password']);
 
-		$result = $system->query("SELECT `password` FROM `users` WHERE `user_id`='{$player->user_id}' LIMIT 1");
-		$result = $system->db_fetch($result);
+		$result = $system->db->query("SELECT `password` FROM `users` WHERE `user_id`='{$player->user_id}' LIMIT 1");
+		$result = $system->db->fetch($result);
 
 		try {
 			if(!$system->verify_password($password, $result['password'])) {
@@ -100,8 +100,8 @@ function userSettings() {
 			}
 
 			$password = $system->hash_password($password);
-			$system->query("UPDATE `users` SET `password`='$password' WHERE `user_id`='{$player->user_id}' LIMIT 1");
-			if($system->db_last_affected_rows >= 1) {
+			$system->db->query("UPDATE `users` SET `password`='$password' WHERE `user_id`='{$player->user_id}' LIMIT 1");
+			if($system->db->last_affected_rows >= 1) {
 				$system->message("Password updated!");
 			}
 		} catch (Exception $e) {
@@ -116,14 +116,16 @@ function userSettings() {
                 throw new Exception("Journal is too long! " . $journal_length . "/{$max_journal_length} characters");
             }
 
-            $journal = $system->clean($_POST['journal']);
+            $journal = $system->db->clean($_POST['journal']);
 
 			if($player->checkBan(StaffManager::BAN_TYPE_JOURNAL)) {
 				throw new Exception("You are currently banned from changing your journal.");
 			}
 
-			$system->query("UPDATE `journals` SET `journal`='$journal' WHERE `user_id`='{$player->user_id}' LIMIT 1");
-			if($system->db_last_affected_rows == 1) {
+			$system->db->query(
+                "UPDATE `journals` SET `journal`='$journal' WHERE `user_id`='{$player->user_id}' LIMIT 1"
+            );
+			if($system->db->last_affected_rows == 1) {
 				$system->message("Journal updated!");
 			}
 		} catch (Exception $e) {
@@ -132,14 +134,16 @@ function userSettings() {
 		$system->printMessage();
 	}
 	else if(!empty($_POST['blacklist_add']) or !empty($_POST['blacklist_remove'])) {
-		$blacklist_username = $system->clean(trim($_POST['blacklist_name']));
-		$result = $system->query("SELECT `user_id`, `user_name`, `staff_level` FROM `users` WHERE `user_name`='{$blacklist_username}'");
+		$blacklist_username = $system->db->clean(trim($_POST['blacklist_name']));
+		$result = $system->db->query(
+            "SELECT `user_id`, `user_name`, `staff_level` FROM `users` WHERE `user_name`='{$blacklist_username}'"
+        );
 		try {
-			if($system->db_last_num_rows == 0) {
+			if($system->db->last_num_rows == 0) {
 				throw new Exception("User doesn't exist or check your spelling!");
 			}
 			else {
-				$blacklist_user = $system->db_fetch($result);
+				$blacklist_user = $system->db->fetch($result);
 			}
 			if($blacklist_user['staff_level'] >= User::STAFF_MODERATOR) {
 				throw new Exception("You are unable to blacklist staff members!");
@@ -190,7 +194,7 @@ function userSettings() {
 		$system->printMessage();
 	}
 	else if(!empty($_POST['change_layout'])) {
-		$layout = $system->clean($_POST['layout']);
+		$layout = $system->db->clean($_POST['layout']);
 		if(array_search($layout, $layouts) === false) {
 			$layout = null;
 		}
@@ -201,14 +205,14 @@ function userSettings() {
 		}
 		else {
 			$query = "UPDATE `users` SET `layout`='$layout' WHERE `user_id`='$player->user_id' LIMIT 1";
-			$system->query($query);
+			$system->db->query($query);
 			$system->message("Layout updated!
                 <script type='text/javascript'>setTimeout('window.location.assign(window.location.href)', 2000);</script>");
 			$system->printMessage();
 		}
 	}
 	else if (!empty($_POST['change_avatar_style'])) {
-        $style = $system->clean($_POST['avatar_style']);
+        $style = $system->db->clean($_POST['avatar_style']);
         if ($player->setAvatarStyle($style)) {
             $system->message("Avatar style updated!");
         } else {
@@ -218,7 +222,7 @@ function userSettings() {
         $system->printMessage();
     }
     else if (!empty($_POST['change_sidebar_position'])) {
-        $position = $system->clean($_POST['sidebar_position']);
+        $position = $system->db->clean($_POST['sidebar_position']);
         if ($player->setSidebarPosition($position)) {
             $system->message("Sidebar position updated!");
         } else {
@@ -227,7 +231,7 @@ function userSettings() {
 
         $system->printMessage();
     } else if (!empty($_POST['change_enable_alerts'])) {
-        $enable = $system->clean($_POST['enable_alerts']);
+        $enable = $system->db->clean($_POST['enable_alerts']);
         if ($player->setEnableAlerts((bool)$enable)) {
             $system->message("Alert settings updated!");
         } else {
@@ -270,13 +274,13 @@ function userSettings() {
     }
 
     // Fetch journal info
-	$result = $system->query("SELECT `journal` FROM `journals` WHERE `user_id` = '{$player->user_id}' LIMIT 1");
-	if($system->db_last_num_rows == 0) {
+	$result = $system->db->query("SELECT `journal` FROM `journals` WHERE `user_id` = '{$player->user_id}' LIMIT 1");
+	if($system->db->last_num_rows == 0) {
 		$journal = '';
-		$system->query("INSERT INTO `journals` (`user_id`, `journal`) VALUES('{$player->user_id}', '')");
+		$system->db->query("INSERT INTO `journals` (`user_id`, `journal`) VALUES('{$player->user_id}', '')");
 	}
 	else {
-		$result = $system->db_fetch($result);
+		$result = $system->db->fetch($result);
 		$journal = $result['journal'];
 	}
 

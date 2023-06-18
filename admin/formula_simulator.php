@@ -138,7 +138,7 @@ function calcDamage(Fighter $player1, Fighter $player2, Jutsu $player1_jutsu, Ju
         player2_jutsu: $player2_jutsu
     );
 
-    $system->query("DELETE FROM battles WHERE `battle_id`={$battle_id}");
+    $system->db->query("DELETE FROM battles WHERE `battle_id`={$battle_id}");
 
     $player1_collision_damage = $player1_raw_damage;
     $player2_collision_damage = $player2_raw_damage;
