@@ -28,8 +28,8 @@ function Header({
       month: 'short',
       day: 'numeric'
     };
-    const formattedDate = currentDate.toLocaleDateString(undefined, options);
-    const formattedTime = currentDate.toLocaleTimeString({
+    const formattedDate = currentDate.toLocaleDateString('en-US', options);
+    const formattedTime = currentDate.toLocaleTimeString('en-US', {
       hour12: true
     });
     setServerTime(formattedDate + ' - ' + formattedTime);
