@@ -221,7 +221,7 @@ abstract class Fighter {
      * @param Jutsu  $attack      Copy of the attack data.
      * @param bool   $disable_randomness
      * @return float|int
-     * @throws Exception
+     * @throws RuntimeException
      */
     public function calcDamage(Jutsu $attack, bool $disable_randomness = false): float|int {
         if($this->system->debug['damage'])  {

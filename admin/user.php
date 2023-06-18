@@ -1,7 +1,7 @@
 <?php /** @noinspection SqlWithoutWhere */
 
 /**
- * @throws Exception
+ * @throws RuntimeException
  */
 function activateUserPage(System $system, User $player): void {
     if($_POST['activate']) {
@@ -26,7 +26,7 @@ function activateUserPage(System $system, User $player): void {
 }
 
 /**
- * @throws Exception
+ * @throws RuntimeException
  */
 function editUserPage(System $system, User $player): void {
     $select_user = true;
@@ -193,7 +193,7 @@ function editUserPage(System $system, User $player): void {
 }
 
 /**
- * @throws Exception
+ * @throws RuntimeException
  */
 function statCutPage(System $system, User $player): void {
     $self_link = $system->router->getUrl('admin', ['page' => 'stat_cut']);
@@ -348,7 +348,7 @@ function statCutPage(System $system, User $player): void {
 }
 
 /**
- * @throws Exception
+ * @throws RuntimeException
  */
 function deleteUserPage(System $system, User $player): void {
     $select_user = true;
@@ -519,7 +519,7 @@ function devToolsPage(System $system, User $player): void {
 }
 
 /**
- * @throws Exception
+ * @throws RuntimeException
  */
 function giveBloodlinePage(System $system): void {
     // Fetch BL list

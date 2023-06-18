@@ -188,7 +188,7 @@ function editJutsuPage(System $system, array $RANK_NAMES) {
  * @param int|null   $jutsu_id
  * @param array      $ALL_JUTSU
  * @return string
- * @throws Exception
+ * @throws RuntimeException
  */
 function validateHandSeals(System $system, ?array $raw_hand_seals, ?int $jutsu_id, array $ALL_JUTSU) {
     if($raw_hand_seals == null) {

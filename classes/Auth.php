@@ -8,7 +8,7 @@ class Auth {
     /**
      * @param System $system
      * @return User
-     * @throws Exception
+     * @throws RuntimeException
      */
     public static function getUserFromSession(System $system): User {
         session_start();

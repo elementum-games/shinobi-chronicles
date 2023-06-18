@@ -117,7 +117,7 @@ function fighterFromData(array $fighter_data, string $name): TestFighter {
  * @param Jutsu   $player1_jutsu
  * @param Jutsu   $player2_jutsu
  * @return array
- * @throws Exception
+ * @throws RuntimeException
  */
 function calcDamage(Fighter $player1, Fighter $player2, Jutsu $player1_jutsu, Jutsu $player2_jutsu): array {
     global $system;

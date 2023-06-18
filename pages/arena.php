@@ -94,7 +94,7 @@ function arena(): bool {
 }
 
 /**
- * @throws Exception
+ * @throws RuntimeException
  */
 function arenaFight(): bool {
     global $system;
@@ -149,7 +149,7 @@ function arenaFightAPI(System $system, User $player): BattlePageAPIResponse {
 }
 
 /**
- * @throws Exception
+ * @throws RuntimeException
  */
 function processArenaBattleEnd(BattleManager|BattleManagerV2 $battle, User $player): string {
     // Base chance at 100, goes down if fight is too short/lower level AI

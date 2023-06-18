@@ -17,7 +17,7 @@ abstract class FighterAction {
     /**
      * @param array $action_data
      * @return FighterAttackAction|FighterMovementAction
-     * @throws Exception
+     * @throws RuntimeException
      */
     public static function fromDb(array $action_data): FighterAttackAction|FighterMovementAction {
         if($action_data['type'] === self::TYPE_ATTACK) {

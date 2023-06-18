@@ -33,7 +33,7 @@ function formPreloadData($variables, &$data, $post = true, $post_array = false) 
  * @param      $data
  * @param null $content_id
  * @param null $FORM_DATA
- * @throws Exception if any validation error
+ * @throws RuntimeException if any validation error
  */
 function validateFormData($entity_constraints, &$data, $content_id = null, $FORM_DATA = null): void {
     if($FORM_DATA == null) {
@@ -104,7 +104,7 @@ function validateFormData($entity_constraints, &$data, $content_id = null, $FORM
 }
 
 /**
- * @throws Exception
+ * @throws RuntimeException
  */
 function validateField($var_name, $input, $FORM_DATA, $field_constraints, &$all_constraints, &$data, $content_id = null): bool {
     global $system;

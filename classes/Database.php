@@ -30,7 +30,7 @@ class Database {
     None; Uses @host, @user_name, @password, @database from /secure/vars.php for DB credentials.
 */
     /**
-     * @throws Exception
+     * @throws RuntimeException
      */
     public function connect(): mysqli {
         if($this->con) {
@@ -70,7 +70,7 @@ class Database {
     }
 
     /**
-     * @throws Exception
+     * @throws RuntimeException
      */
     public function query($query): mysqli_result|bool {
         $query = trim($query);

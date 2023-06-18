@@ -202,7 +202,7 @@ class Team {
     /**
      * @param string $boost_type
      * @param string $boost_size
-     * @throws Exception
+     * @throws RuntimeException
      */
     public function setBoost(string $boost_type, string $boost_size) {
         $boost = self::$allowed_boosts[$boost_type][$boost_size] ?? null;
@@ -265,7 +265,7 @@ class Team {
 
     /**
      * @return User
-     * @throws Exception
+     * @throws RuntimeException
      */
     public function fetchLeader(): User {
         $leader = User::loadFromId($this->system, $this->leader, true);

@@ -122,7 +122,7 @@ class BattleLogV2 {
      * @param int    $battle_id
      * @param int    $turn_count
      * @return BattleLogV2|null
-     * @throws Exception
+     * @throws RuntimeException
      */
     public static function getTurn(System $system, int $battle_id, int $turn_count): ?BattleLogV2 {
         $result = $system->db->query(
@@ -138,7 +138,7 @@ class BattleLogV2 {
     }
 
     /**
-     * @throws Exception
+     * @throws RuntimeException
      */
     public static function fromDbArray(System $system, array $raw_data): BattleLogV2 {
         $fighter_action_logs = json_decode($raw_data['fighter_action_logs'], true);
@@ -273,7 +273,7 @@ class EffectHitLog {
     const TYPE_GENJUTSU_DAMAGE = 'genjutsu_damage';
 
     /**
-     * @throws Exception
+     * @throws RuntimeException
      */
     public function __construct(
         public string $caster_id,
@@ -293,7 +293,7 @@ class EffectHitLog {
     }
 
     /**
-     * @throws Exception
+     * @throws RuntimeException
      */
     public static function fromArray($array): EffectHitLog {
         return new EffectHitLog(
@@ -305,7 +305,7 @@ class EffectHitLog {
     }
 
     /**
-     * @throws Exception
+     * @throws RuntimeException
      */
     public static function getTypeFromDamageType(string $damage_type): string {
         switch($damage_type) {

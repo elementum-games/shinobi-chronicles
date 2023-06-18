@@ -6,7 +6,7 @@ use SC\TestUtils\CollisionScenario;
 
 class BattleActionProcessorCollisionTest extends BattleTestCase {
     /**
-     * @throws Exception
+     * @throws RuntimeException
      */
     public function testFindNextTileCollisionPointWorksWithEvenCollision() {
         $fighterA = $this->createStub(Fighter::class);
@@ -82,7 +82,7 @@ class BattleActionProcessorCollisionTest extends BattleTestCase {
     }
 
     /**
-     * @throws Exception
+     * @throws RuntimeException
      */
     public function testFindNextTileCollisionPointWorksWithOddCollision() {
         $fighterA = $this->createStub(Fighter::class);
@@ -156,7 +156,7 @@ class BattleActionProcessorCollisionTest extends BattleTestCase {
 
     /**
      *
-     * @throws Exception
+     * @throws RuntimeException
      * @noinspection PhpUnitMisorderedAssertEqualsArgumentsInspection
      */
     public function testFindCollisions() {
@@ -220,7 +220,7 @@ class BattleActionProcessorCollisionTest extends BattleTestCase {
     }
 
     /**
-     * @throws Exception
+     * @throws RuntimeException
      */
     public function testProcessCollisionsWeakensCollidingAttack() {
         /*
@@ -299,7 +299,6 @@ class BattleActionProcessorCollisionTest extends BattleTestCase {
 
     /**
      * @return void
-     * @throws \Exception
      */
     public function testCollisionIdIsDeterministic(): void {
         $attack1 = new BattleAttackV2(

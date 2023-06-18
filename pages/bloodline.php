@@ -4,7 +4,7 @@
 	Created:	04/10/2014
 */
 /**
- * @throws Exception
+ * @throws RuntimeException
  */
 function bloodline() {
 	global $system;

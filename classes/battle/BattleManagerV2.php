@@ -149,7 +149,7 @@ class BattleManagerV2 {
      * The database calls necessary for spinning up a working instance of BattleManagerV2 are captured in this method,
      * so that for testing we can inject mocks.
      *
-     * @throws Exception
+     * @throws RuntimeException
      */
     public static function init(
         System $system,
@@ -178,7 +178,7 @@ class BattleManagerV2 {
     }
 
     /**
-     * @throws Exception
+     * @throws RuntimeException
      */
     protected function loadFighters(): void {
         if($this->player->id == $this->battle->player1_id) {
@@ -253,7 +253,7 @@ class BattleManagerV2 {
      * required inputs have been gathered.
      *
      * @return string|null
-     * @throws Exception
+     * @throws RuntimeException
      */
     public function checkInputAndRunTurn(): ?string {
         // If someone is not in battle, this will be set
@@ -318,7 +318,7 @@ class BattleManagerV2 {
     // PUBLIC VIEW API
 
     /**
-     * @throws Exception
+     * @throws RuntimeException
      */
     public function renderBattle(): void {
         global $self_link;
@@ -382,7 +382,7 @@ class BattleManagerV2 {
     }
 
     /**
-     * @throws Exception
+     * @throws RuntimeException
      */
     public function isPlayerWinner(): bool {
         if(!$this->isComplete()) {
@@ -393,7 +393,7 @@ class BattleManagerV2 {
     }
 
     /**
-     * @throws Exception
+     * @throws RuntimeException
      */
     public function isOpponentWinner(): bool {
         if(!$this->isComplete()) {
@@ -405,7 +405,7 @@ class BattleManagerV2 {
 
     /**
      * @return bool
-     * @throws Exception
+     * @throws RuntimeException
      */
     public function isDraw(): bool {
         if(!$this->isComplete()) {
@@ -435,7 +435,7 @@ class BattleManagerV2 {
     // PRIVATE API - TURN LIFECYCLE
 
     /**
-     * @throws Exception
+     * @throws RuntimeException
      */
     protected function runActions(): void {
         $this->processTurnEffects();
@@ -503,7 +503,7 @@ class BattleManagerV2 {
     }
 
     /**
-     * @throws Exception
+     * @throws RuntimeException
      */
     private function processTurnEffects(): void {
         // Run turn effects
@@ -571,7 +571,7 @@ class BattleManagerV2 {
     /**
      * @param Fighter       $player
      * @param FighterAction $action
-     * @throws Exception
+     * @throws RuntimeException
      */
     protected function setPlayerAction(Fighter $player, FighterAction $action) {
         if($this->battle->isAttackPhase() && $action instanceof FighterAttackAction) {
@@ -640,7 +640,7 @@ class BattleManagerV2 {
 
     /**
      * @param Fighter $npc
-     * @throws Exception
+     * @throws RuntimeException
      */
     protected function chooseAndSetNPCAction(Fighter $npc): void {
         if(!($npc instanceof NPC)) {
@@ -736,7 +736,7 @@ class BattleManagerV2 {
     }
 
     /**
-     * @throws Exception
+     * @throws RuntimeException
      */
     protected function chooseNPCAttackAction(NPC $npc, Fighter $target): FighterAttackAction {
         $jutsu = $npc->chooseAttack();
@@ -758,7 +758,7 @@ class BattleManagerV2 {
     // PRIVATE UTILS - PLAYER ACTIONS (public only for unit testing)
 
     /**
-     * @throws Exception
+     * @throws RuntimeException
      */
     public function collectPlayerAction(array $FORM_DATA): ?FighterAction {
         if($this->battle->isAttackPhase() && !empty($FORM_DATA['submit_attack'])) {
@@ -876,7 +876,7 @@ class BattleManagerV2 {
      * @param Jutsu    $jutsu
      * @param int|null $target_tile
      * @return AttackTarget
-     * @throws Exception
+     * @throws RuntimeException
      */
     private function getTarget(Fighter $fighter, Jutsu $jutsu, ?int $target_tile): AttackTarget {
         if($target_tile !== null) {

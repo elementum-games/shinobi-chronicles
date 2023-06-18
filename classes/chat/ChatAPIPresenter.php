@@ -2,7 +2,7 @@
 
 class ChatAPIPresenter {
     /**
-     * @throws Exception
+     * @throws RuntimeException
      */
     public static function chatPostResponse(System $system, ChatPostDto $chatPost) {
         return [
@@ -60,7 +60,7 @@ class ChatAPIPresenter {
      * @param int|null      $next_page_post_id
      * @param int           $latest_post_id
      * @return array
-     * @throws Exception
+     * @throws RuntimeException
      */
     public static function loadPostsResponse(
         System $system,
@@ -80,7 +80,7 @@ class ChatAPIPresenter {
     }
 
     /**
-     * @throws Exception
+     * @throws RuntimeException
      */
     public static function submitPostResponse(System $system, array $posts) {
         return [
@@ -93,7 +93,7 @@ class ChatAPIPresenter {
     }
 
     /**
-     * @throws Exception
+     * @throws RuntimeException
      */
     public static function deletePostResponse(System $system, array $posts) {
         return [

@@ -1,7 +1,7 @@
 <?php
 
 /**
- * @throws Exception
+ * @throws RuntimeException
  */
 function chat(): void {
     global $system;

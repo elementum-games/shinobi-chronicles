@@ -60,7 +60,7 @@ class TravelManager {
     }
 
     /**
-     * @throws Exception
+     * @throws RuntimeException
      */
     public function checkRestrictions(): bool {
         $ignore_travel_restrictions = $this->user->isHeadAdmin();
@@ -113,7 +113,7 @@ class TravelManager {
     }
 
     /**
-     * @throws Exception
+     * @throws RuntimeException
      */
     public function movePlayer($direction): bool {
         $new_coords = Travel::getNewMovementValues($direction, $this->user->location);
@@ -157,7 +157,7 @@ class TravelManager {
     }
 
     /**
-     * @throws Exception
+     * @throws RuntimeException
      */
     public function enterPortal($portal_id): bool {
         $ignore_travel_restrictions = $this->user->isHeadAdmin();

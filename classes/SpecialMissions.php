@@ -381,7 +381,7 @@ class SpecialMission {
     // Complete the mission
 
     /**
-     * @throws Exception
+     * @throws RuntimeException
      */
     public function completeMission(): string {
         // Yen gain for completing the mission
@@ -410,7 +410,7 @@ class SpecialMission {
     // Simulates a battle with an ai
 
     /**
-     * @throws Exception
+     * @throws RuntimeException
      */
     public function simulateBattle(): array {
 

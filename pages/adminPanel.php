@@ -14,7 +14,7 @@ require_once 'admin/formTools.php';
 /**
  * @noinspection SqlResolve
  * @noinspection SqlInsertValues
- * @throws Exception
+ * @throws RuntimeException
  */
 function adminPanel() {
     global $system;

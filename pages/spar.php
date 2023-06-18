@@ -43,7 +43,7 @@ function spar() {
             $system->printMessage();
             return false;
         }
-	}
+    }
 	else if(isset($_GET['challenge'])) {
 		try {
 			$challenge = (int)$system->db->clean($_GET['challenge']);
@@ -179,9 +179,9 @@ function spar() {
 					$challenger_data = $system->db->fetch($result);
 					
 					echo "<tr><td>
-					<p style='display:inline-block;margin:0px;margin-left:20px;'>
+					<p style='display:inline-block;margin:0;margin-left:20px;'>
 						Challenged by <span style='font-weight:bold;'>" . $challenger_data['user_name'] . "</span></p>
-					<p style='display:inline-block;margin:0px;margin-right:40px;float:right;'>
+					<p style='display:inline-block;margin:0;margin-right:40px;float:right;'>
 						<a href='$self_link&accept_challenge=$player->challenge'>Accept</a> | 
 						<a href='$self_link&decline_challenge=$player->challenge'>Decline</a>
 					</p></td></tr>";
@@ -191,9 +191,9 @@ function spar() {
 			if(count($user_challenges) > 0) {
 				foreach($user_challenges as $id=>$name) {
 					echo "<tr><td>
-					<p style='display:inline-block;margin:0px;margin-left:20px;'>
+					<p style='display:inline-block;margin:0;margin-left:20px;'>
 						Challenge sent to <span style='font-weight:bold;'>" . $name . "</span></p>
-					<p style='display:inline-block;margin:0px;margin-right:40px;float:right;'>
+					<p style='display:inline-block;margin:0;margin-right:40px;float:right;'>
 						<a href='$self_link&cancel_challenge=$id'>Cancel</a></p>
 					</td></tr>";
 				}
@@ -209,7 +209,7 @@ function spar() {
 }
 
 /**
- * @throws Exception
+ * @throws RuntimeException
  */
 function processSparFightEnd(BattleManager $battle, User $player): string {
     $player->battle_id = 0;

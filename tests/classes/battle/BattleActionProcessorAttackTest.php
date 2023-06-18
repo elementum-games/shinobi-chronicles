@@ -4,7 +4,7 @@ use SC\TestUtils\BattleTestCase;
 
 class BattleActionProcessorAttackTest extends BattleTestCase {
     /**
-     * @throws Exception
+     * @throws RuntimeException
      */
     public function testDirectionAttackPathMatchesRange() {
         $battle = $this->initBattle();
@@ -35,7 +35,7 @@ class BattleActionProcessorAttackTest extends BattleTestCase {
 
     /**
      * @return void
-     * @throws Exception
+     * @throws RuntimeException
      */
     public function testDirectionAttackPathEndsAtEdge(): void {
         $battle = $this->initBattle();
@@ -67,7 +67,7 @@ class BattleActionProcessorAttackTest extends BattleTestCase {
     }
 
     /**
-     * @throws Exception
+     * @throws RuntimeException
      */
     public function testDirectionAttackPathSegmentsHaveCorrectTime() {
         $battle = $this->initBattle();
@@ -97,7 +97,7 @@ class BattleActionProcessorAttackTest extends BattleTestCase {
     }
 
     /**
-     * @throws Exception
+     * @throws RuntimeException
      */
     public function testAttackHitsOpponent() {
         $battle = $this->initBattle(

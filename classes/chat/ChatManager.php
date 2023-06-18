@@ -13,7 +13,7 @@ class ChatManager {
     ) {}
 
     /**
-     * @throws Exception
+     * @throws RuntimeException
      */
     public function loadPosts(?int $current_page_post_id = null): array {
         $result = $this->system->db->query(
@@ -361,7 +361,7 @@ class ChatManager {
     }
 
     /**
-     * @throws Exception
+     * @throws RuntimeException
      */
     public function deletePost(int $post_id): array {
         $this->system->db->query("DELETE FROM `chat` WHERE `post_id` = $post_id LIMIT 1");

@@ -10,7 +10,7 @@ Algorithm:	See master_plan.html
 
 /**
  * @return bool
- * @throws Exception
+ * @throws RuntimeException
  */
 function battle(): bool {
 	global $system;
@@ -123,7 +123,7 @@ function battle(): bool {
 }
 
 /**
- * @throws Exception
+ * @throws RuntimeException
  */
 function processBattleFightEnd(BattleManager $battle, User $player): string {
     $pvp_yen = $player->rank_num * 50;

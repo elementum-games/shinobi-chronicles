@@ -21,7 +21,7 @@ function levelUp() {
 
 /**
  * @return bool
- * @throws Exception
+ * @throws RuntimeException
  */
 function rankUp(): bool {
 	global $system;
@@ -405,7 +405,7 @@ function geninExam(System $system, User $player, RankManager $rankManager) {
 }
 
 /**
- * @throws Exception
+ * @throws RuntimeException
  */
 function chuuninExam(System $system, User $player, RankManager $rankManager): bool {
     global $self_link;
@@ -706,7 +706,7 @@ function chuuninExam(System $system, User $player, RankManager $rankManager): bo
 }
 
 /**
- * @throws Exception
+ * @throws RuntimeException
  */
 function processChuuninExamFightEnd(
     System $system,
@@ -775,7 +775,7 @@ function processChuuninExamFightEnd(
 }
 
 /**
- * @throws Exception
+ * @throws RuntimeException
  */
 function joninExam(System $system, User $player, RankManager $rankManager): bool {
     global $self_link;

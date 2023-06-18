@@ -51,7 +51,7 @@ class BattleAttackV2 {
 
     /**
      * @return bool
-     * @throws Exception
+     * @throws RuntimeException
      */
     public function isFacingRight(): bool {
         if($this->target instanceof AttackDirectionTarget) {
@@ -63,7 +63,7 @@ class BattleAttackV2 {
 
     /**
      * @return bool
-     * @throws Exception
+     * @throws RuntimeException
      */
     public function isFacingLeft(): bool {
         if($this->target instanceof AttackDirectionTarget) {

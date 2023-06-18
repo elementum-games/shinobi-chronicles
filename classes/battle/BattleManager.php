@@ -43,7 +43,7 @@ class BattleManager {
      * @param int    $battle_id
      * @param bool   $spectate
      * @param bool   $load_fighters
-     * @throws Exception
+     * @throws RuntimeException
      */
     public function __construct(System $system, User $player, int $battle_id, bool $spectate = false, bool $load_fighters = true) {
         $this->system = $system;
@@ -76,14 +76,14 @@ class BattleManager {
      * @param bool   $spectate
      * @param bool   $load_fighters
      * @return BattleManager
-     * @throws Exception
+     * @throws RuntimeException
      */
     public static function init(System $system, User $player, int $battle_id, bool $spectate = false, bool $load_fighters = true): BattleManager {
         return new BattleManager($system, $player, $battle_id, $spectate, $load_fighters);
     }
 
     /**
-     * @throws Exception
+     * @throws RuntimeException
      */
     protected function loadFighters() {
         if($this->player->id == $this->battle->player1_id) {
@@ -166,7 +166,7 @@ class BattleManager {
 
     /**
      * @return string|null
-     * @throws Exception
+     * @throws RuntimeException
      */
     public function checkInputAndRunTurn(): ?string {
         // If someone is not in battle, this will be set
@@ -321,7 +321,7 @@ class BattleManager {
     // PUBLIC VIEW API
 
     /**
-     * @throws Exception
+     * @throws RuntimeException
      */
     public function renderBattle(): void {
         global $self_link;
@@ -371,7 +371,7 @@ class BattleManager {
     }
 
     /**
-     * @throws Exception
+     * @throws RuntimeException
      */
     public function isPlayerWinner(): bool {
         if(!$this->isComplete()) {
@@ -382,7 +382,7 @@ class BattleManager {
     }
 
     /**
-     * @throws Exception
+     * @throws RuntimeException
      */
     public function isOpponentWinner(): bool {
         if(!$this->isComplete()) {
@@ -394,7 +394,7 @@ class BattleManager {
 
     /**
      * @return bool
-     * @throws Exception
+     * @throws RuntimeException
      */
     public function isDraw(): bool {
         if(!$this->isComplete()) {
@@ -451,7 +451,7 @@ class BattleManager {
     // PRIVATE API - TURN LIFECYCLE
 
     /**
-     * @throws Exception
+     * @throws RuntimeException
      */
     protected function runActions(): void {
         $this->processTurnEffects();
@@ -579,7 +579,7 @@ class BattleManager {
     }
 
     /**
-     * @throws Exception
+     * @throws RuntimeException
      */
     private function processTurnEffects() {
         // Run turn effects
@@ -620,7 +620,7 @@ class BattleManager {
      * @param Fighter       $fighter
      * @param LegacyFighterAction $action
      * @return BattleAttack
-     * @throws Exception
+     * @throws RuntimeException
      */
     protected function setupFighterAttack(Fighter $fighter, LegacyFighterAction $action): BattleAttack {
         $attack = new BattleAttack();
@@ -778,7 +778,7 @@ class BattleManager {
     }
 
     /**
-     * @throws Exception
+     * @throws RuntimeException
      */
     public function jutsuCollision(
         Fighter $player1, Fighter $player2, &$player1_damage, &$player2_damage, Jutsu $player1_jutsu, Jutsu $player2_jutsu
@@ -983,7 +983,7 @@ class BattleManager {
     }
 
     /**
-     * @throws Exception
+     * @throws RuntimeException
      */
     private function getEvasionStatAmount(Fighter $fighter, Jutsu $fighter_jutsu): float|int {
         switch($fighter_jutsu->jutsu_type) {
@@ -1091,7 +1091,7 @@ class BattleManager {
 
     /**
      * @param Fighter $ai
-     * @throws Exception
+     * @throws RuntimeException
      */
     protected function chooseAndSetAIAction(Fighter $ai) {
         if(!($ai instanceof NPC)) {

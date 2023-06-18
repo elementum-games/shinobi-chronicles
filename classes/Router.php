@@ -70,7 +70,7 @@ class Router {
     /**
      * @param string $page_name
      * @return string
-     * @throws Exception
+     * @throws RuntimeException
      */
     public function getUrl(string $page_name, array $url_params = []): string {
         $id = self::PAGE_IDS[$page_name] ?? null;
@@ -90,7 +90,7 @@ class Router {
      * @param Route $route
      * @param User  $player
      * @return void
-     * @throws Exception
+     * @throws RuntimeException
      */
     public function assertRouteIsValid(Route $route, User $player): void {
         $system = $player->system;

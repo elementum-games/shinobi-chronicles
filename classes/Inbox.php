@@ -43,7 +43,7 @@ class Inbox {
      * @param System $system
      * @param int    $message_id
      * @return array fetch
-     * @throws Exception
+     * @throws RuntimeException
      */
     public static function getInfoFromMessageId(System $system, int $message_id): array {
         $convo_result = $system->db->query(

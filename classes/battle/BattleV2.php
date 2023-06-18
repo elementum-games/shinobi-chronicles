@@ -78,7 +78,7 @@ class BattleV2 {
      * @param Fighter $player2
      * @param int     $battle_type
      * @return int
-     * @throws Exception
+     * @throws RuntimeException
      */
     public static function start(
         System $system, Fighter $player1, Fighter $player2, int $battle_type
@@ -141,7 +141,7 @@ class BattleV2 {
     }
 
     /**
-     * @throws Exception
+     * @throws RuntimeException
      */
     public static function loadFromId(System $system, User $player, int $battle_id): BattleV2 {
         $battle = new BattleV2($system, $player, $battle_id);
@@ -212,7 +212,7 @@ class BattleV2 {
      * @param System $system
      * @param User   $player
      * @param int    $battle_id
-     * @throws Exception
+     * @throws RuntimeException
      */
     public function __construct(
         System $system, User $player, int $battle_id
@@ -224,7 +224,7 @@ class BattleV2 {
     }
 
     /**
-     * @throws Exception
+     * @throws RuntimeException
      */
     public function loadFighters(): void {
         if($this->player1_id != $this->player->id) {
@@ -263,7 +263,7 @@ class BattleV2 {
     /**
      * @param string $entity_id
      * @return Fighter
-     * @throws Exception
+     * @throws RuntimeException
      */
     protected function loadFighterFromEntityId(string $entity_id): Fighter {
     switch(BattleV2::getFighterEntityType($entity_id)) {
@@ -292,7 +292,7 @@ class BattleV2 {
     /**
      * @param string $entity_id
      * @return string
-     * @throws Exception
+     * @throws RuntimeException
      */
     protected static function getFighterEntityType(string $entity_id): string {
         $entity_id = System::parseEntityId($entity_id);
@@ -355,7 +355,7 @@ class BattleV2 {
     /**
      * @param Fighter $fighter
      * @return string
-     * @throws Exception
+     * @throws RuntimeException
      */
     public static function fighterTeam(Fighter $fighter): string {
         $combat_id_parts = explode(':', $fighter->combat_id);

@@ -16,7 +16,7 @@ class Coords {
     /**
      * @param string $coords_str
      * @return Coords
-     * @throws Exception
+     * @throws RuntimeException
      */
     public static function fromString(string $coords_str): Coords {
         $coords_arr = explode(':', $coords_str);

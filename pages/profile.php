@@ -9,7 +9,7 @@ Algorithm:	See master_plan.html
 */
 
 /**
- * @throws Exception
+ * @throws RuntimeException
  */
 function userProfile() {
     global $system;
@@ -139,7 +139,7 @@ function userProfile() {
 }
 
 /**
- * @throws Exception
+ * @throws RuntimeException
  */
 function sendMoney(System $system, User $player, string $currency_type): void {
     if ($currency_type != System::CURRENCY_TYPE_MONEY && $currency_type != System::CURRENCY_TYPE_PREMIUM_CREDITS) {
@@ -264,7 +264,7 @@ function sendMoney(System $system, User $player, string $currency_type): void {
 }
 
 /**
- * @throws Exception
+ * @throws RuntimeException
  */
 function renderProfileSubmenu(): void {
     global $system;

@@ -462,7 +462,7 @@ class System {
     }
 
     /**
-     * @throws Exception
+     * @throws RuntimeException
      */
     public function currencyLog(
         int $character_id,
@@ -533,7 +533,7 @@ class System {
     }
 
     /**
-     * @throws Exception
+     * @throws RuntimeException
      */
     public function fetchGlobalMessage(): ?array {
         $result = $this->db->query("SELECT `global_message`, `time` FROM `system_storage` LIMIT 1");
@@ -557,7 +557,7 @@ class System {
     /**
      * @param string $entity_id
      * @return EntityId
-     * @throws Exception
+     * @throws RuntimeException
      */
     public static function parseEntityId(string $entity_id): EntityId {
         $arr = explode(':', $entity_id);

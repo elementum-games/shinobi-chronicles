@@ -129,7 +129,7 @@ class RankManager {
     /**
      * @param User $player
      * @return void
-     * @throws Exception
+     * @throws RuntimeException
      */
     public function increasePlayerRank(User $player) {
         $new_rank = $player->rank_num + 1;

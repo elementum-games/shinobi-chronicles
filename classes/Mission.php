@@ -290,7 +290,7 @@ class Mission {
      * @param $player
      * @param $mission_id
      * @return Mission
-     * @throws Exception
+     * @throws RuntimeException
      */
     public static function start($player, $mission_id): Mission {
         if($player->mission_id) {

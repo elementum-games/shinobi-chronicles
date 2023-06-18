@@ -70,7 +70,7 @@ class Battle {
      * @param Fighter $player2
      * @param int     $battle_type
      * @return mixed
-     * @throws Exception
+     * @throws RuntimeException
      */
     public static function start(
         System $system, Fighter $player1, Fighter $player2, int $battle_type
@@ -158,7 +158,7 @@ class Battle {
      * @param System $system
      * @param User   $player
      * @param int    $battle_id
-     * @throws Exception
+     * @throws RuntimeException
      */
     public function __construct(
         System $system, User $player, int $battle_id
@@ -216,7 +216,7 @@ class Battle {
     }
 
     /**
-     * @throws Exception
+     * @throws RuntimeException
      */
     public function loadFighters() {
         if($this->player1_id != $this->player->id) {
@@ -255,7 +255,7 @@ class Battle {
     /**
      * @param string $entity_id
      * @return Fighter
-     * @throws Exception
+     * @throws RuntimeException
      */
     protected function loadFighterFromEntityId(string $entity_id): Fighter {
         switch(Battle::getFighterEntityType($entity_id)) {
@@ -271,7 +271,7 @@ class Battle {
     /**
      * @param string $entity_id
      * @return string
-     * @throws Exception
+     * @throws RuntimeException
      */
     protected static function getFighterEntityType(string $entity_id): string {
         $entity_id = System::parseEntityId($entity_id);
@@ -287,7 +287,7 @@ class Battle {
     }
 
     /**
-     * @throws Exception
+     * @throws RuntimeException
      */
 
     public function timeRemaining(): int {

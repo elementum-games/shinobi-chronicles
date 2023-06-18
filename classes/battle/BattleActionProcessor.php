@@ -30,7 +30,7 @@ class BattleActionProcessor {
     }
 
     /**
-     * @throws Exception
+     * @throws RuntimeException
      */
     public function runMovementPhaseActions(): void {
         $player1_action = $this->battle->fighter_actions[$this->battle->player1->combat_id] ?? null;
@@ -62,7 +62,7 @@ class BattleActionProcessor {
     }
 
     /**
-     * @throws Exception
+     * @throws RuntimeException
      */
     public function runAttackPhaseActions(): void {
         $player1_attack = $this->getFighterAttackFromActions($this->battle->player1->combat_id);
@@ -170,7 +170,7 @@ class BattleActionProcessor {
      * @param Fighter             $fighter
      * @param FighterAttackAction $action
      * @return Jutsu
-     * @throws Exception
+     * @throws RuntimeException
      */
     public function getJutsuFromAttackAction(Fighter $fighter, FighterAttackAction $action): Jutsu {
         $jutsu = null;
@@ -210,7 +210,7 @@ class BattleActionProcessor {
     /**
      * @param string $combat_id
      * @return BattleAttackV2|null
-     * @throws Exception
+     * @throws RuntimeException
      */
     protected function getFighterAttackFromActions(string $combat_id): ?BattleAttackV2 {
         $fighter = $this->battle->getFighter($combat_id);
@@ -233,7 +233,7 @@ class BattleActionProcessor {
      * @param Fighter             $fighter
      * @param FighterAttackAction $action
      * @return BattleAttackV2
-     * @throws Exception
+     * @throws RuntimeException
      */
     protected function setupFighterAttack(Fighter $fighter, FighterAttackAction $action): BattleAttackV2 {
         $jutsu = $this->getJutsuFromAttackAction($fighter, $action);
@@ -279,7 +279,7 @@ class BattleActionProcessor {
     }
 
     /**
-     * @throws Exception
+     * @throws RuntimeException
      */
     public function setAttackPath(Fighter $attacker, BattleAttackV2 $attack): void {
         switch($attack->jutsu->use_type) {
@@ -313,7 +313,7 @@ class BattleActionProcessor {
      * @param BattleAttackV2        $attack
      * @param AttackDirectionTarget $target
      * @return BattleAttackV2
-     * @throws Exception
+     * @throws RuntimeException
      */
     public function setupDirectionAttack(
         Fighter $attacker, BattleAttackV2 $attack, AttackDirectionTarget $target
@@ -382,7 +382,7 @@ class BattleActionProcessor {
      * @param BattleAttackV2   $attack
      * @param AttackTileTarget $target
      * @return BattleAttackV2
-     * @throws Exception
+     * @throws RuntimeException
      */
     public function setupTileAttack(
         Fighter $attacker, BattleAttackV2 $attack, AttackTileTarget $target
@@ -418,7 +418,7 @@ class BattleActionProcessor {
     }
 
     /**
-     * @throws Exception
+     * @throws RuntimeException
      */
     public function findAttackHits(Fighter $attacker, BattleAttackV2 $attack): BattleAttackV2 {
         if(!$attack->is_path_setup) {
@@ -456,7 +456,7 @@ class BattleActionProcessor {
     /**
      * @param AttackCollision[] $collisions
      * @return void
-     * @throws Exception
+     * @throws RuntimeException
      */
     public function processCollisions(array $collisions): void {
         /*
@@ -897,7 +897,7 @@ class BattleActionProcessor {
      * @param BattleAttackV2 $attack1
      * @param BattleAttackV2 $attack2
      * @return string
-     * @throws Exception
+     * @throws RuntimeException
      */
     public static function collisionId(BattleAttackV2 $attack1, BattleAttackV2 $attack2): string {
         if($attack1->id == $attack2->id) {
@@ -924,7 +924,7 @@ class BattleActionProcessor {
      * @param BattleAttackV2 $fighter2Attack
      * @param Closure|null   $debug_closure
      * @return AttackCollision[]
-     * @throws Exception
+     * @throws RuntimeException
      */
     public static function findCollisions(BattleAttackV2 $fighter1Attack, BattleAttackV2 $fighter2Attack, ?Closure $debug_closure): array {
         $debug = function(string $category, string $label, string $content) use($debug_closure) {
@@ -1160,7 +1160,7 @@ class BattleActionProcessor {
      * @param BattleAttackV2        $other_attack
      * @param TileAttackSegment[][] $segments_by_tile_and_attack
      * @return ?int
-     * @throws Exception
+     * @throws RuntimeException
      */
     public static function findNextTileCollisionPoint(BattleAttackV2 $attack, BattleAttackV2 $other_attack, array $segments_by_tile_and_attack): ?int {
         // Tile attacks do not have a next target
@@ -1196,7 +1196,7 @@ class BattleActionProcessor {
      * @param BattleAttackV2        $other_attack
      * @param TileAttackSegment[][] $segments_by_tile_and_attack
      * @return ?int
-     * @throws Exception
+     * @throws RuntimeException
      */
     public static function findSameTileCollisionPoint(BattleAttackV2 $attack, BattleAttackV2 $other_attack, array $segments_by_tile_and_attack): ?int {
         foreach($attack->path_segments as $segment) {

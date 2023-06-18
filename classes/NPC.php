@@ -51,7 +51,7 @@ class NPC extends Fighter {
      * NPC constructor.
      * @param System $system
      * @param int    $ai_id Id of the NPC, used to select and update data from database
-     * @throws Exception
+     * @throws RuntimeException
      */
     public function __construct(System $system, int $ai_id) {
         $this->system =& $system;
@@ -80,7 +80,7 @@ class NPC extends Fighter {
 
     /**
      * Loads NPC data from the database into class members
-     * @throws Exception
+     * @throws RuntimeException
      */
     public function loadData() {
         $result = $this->system->db->query("SELECT * FROM `ai_opponents` WHERE `ai_id`='$this->ai_id' LIMIT 1");
@@ -302,7 +302,7 @@ class NPC extends Fighter {
      * @param System $system
      * @param string $entity_id_str
      * @return NPC
-     * @throws Exception
+     * @throws RuntimeException
      */
     public static function fromEntityId(System $system, string $entity_id_str): NPC {
         $entityId = System::parseEntityId($entity_id_str);

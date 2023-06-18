@@ -8,7 +8,7 @@ abstract class AttackTarget {
     /**
      * @param array $target_data
      * @return AttackFighterIdTarget|AttackDirectionTarget|AttackTileTarget
-     * @throws Exception
+     * @throws RuntimeException
      */
     public static function fromDb(array $target_data): AttackFighterIdTarget|AttackDirectionTarget|AttackTileTarget {
         if($target_data['type'] === Jutsu::TARGET_TYPE_FIGHTER_ID) {
@@ -67,7 +67,7 @@ class AttackDirectionTarget extends AttackTarget {
     /**
      * AttackDirectionTarget constructor.
      * @param string $direction
-     * @throws Exception
+     * @throws RuntimeException
      */
     public function __construct(string $direction) {
         // for db export

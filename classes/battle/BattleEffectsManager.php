@@ -260,7 +260,7 @@ class BattleEffectsManager {
     /**
      * @param Fighter $player1
      * @param Fighter $player2
-     * @throws Exception
+     * @throws RuntimeException
      */
     public function applyActiveEffects(Fighter $player1, Fighter $player2) {
         if(!empty($this->active_effects)) {
@@ -534,7 +534,7 @@ class BattleEffectsManager {
     /**
      * @param       $fighter
      * @param Jutsu $fighter_jutsu
-     * @throws Exception
+     * @throws RuntimeException
      */
     public function assertParentGenjutsuActive($fighter, Jutsu $fighter_jutsu) {
         if($fighter_jutsu->jutsu_type != Jutsu::TYPE_GENJUTSU) {

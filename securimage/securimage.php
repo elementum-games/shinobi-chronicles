@@ -2197,7 +2197,7 @@ class Securimage
      * Get the PDO DSN string for connecting to the database
      *
      * @see Securimage::$database_driver Database driver
-     * @throws Exception  If database specific options are not configured
+     * @throws RuntimeException  If database specific options are not configured
      * @return string     The DSN for connecting to the database
      */
     protected function getDsn()
@@ -2230,7 +2230,7 @@ class Securimage
     /**
      * Checks if the necessary database tables for storing captcha codes exist
      *
-     * @throws Exception If the table check failed for some reason
+     * @throws RuntimeException If the table check failed for some reason
      * @return boolean true if the database do exist, false if not
      */
     protected function checkTablesExist()
@@ -2890,7 +2890,7 @@ class Securimage_Color
      *     $color = new Securimage_Color(0, 128, 255);
      *
      * @param string $color  The html color code to use
-     * @throws Exception  If any color value is not valid
+     * @throws RuntimeException  If any color value is not valid
      */
     public function __construct($color = '#ffffff')
     {

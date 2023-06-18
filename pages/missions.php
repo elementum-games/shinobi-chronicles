@@ -9,7 +9,7 @@ Algorithm:	See master_plan.html
 */
 
 /**
- * @throws Exception
+ * @throws RuntimeException
  */
 function missions(): bool {
 	global $system;
@@ -132,7 +132,7 @@ function missions(): bool {
 }
 
 /**
- * @throws Exception
+ * @throws RuntimeException
  */
 function runActiveMission(): bool {
     global $system;
@@ -409,7 +409,7 @@ function runActiveMission(): bool {
  * @param Mission       $mission
  * @param User          $player
  * @return bool|void
- * @throws Exception
+ * @throws RuntimeException
  */
 function processMissionBattleEnd(BattleManager|BattleManagerV2 $battle, Mission $mission, User $player): string {
     if(!$battle->isComplete()) {

@@ -271,7 +271,7 @@ class User extends Fighter {
      * User constructor.
      * @param System $system
      * @param int    $user_id
-     * @throws Exception
+     * @throws RuntimeException
      */
     public function __construct(System $system, int $user_id) {
         $this->system =& $system;
@@ -288,7 +288,7 @@ class User extends Fighter {
      * @param int    $user_id
      * @param bool   $remote_view
      * @return User
-     * @throws Exception
+     * @throws RuntimeException
      */
     public static function loadFromId(System $system, int $user_id, bool $remote_view = false): User {
         $user = new User($system, $user_id);
@@ -383,7 +383,7 @@ class User extends Fighter {
      * @param string $name
      * @param bool   $remote_view
      * @return User|null
-     * @throws Exception
+     * @throws RuntimeException
      */
     public static function findByName(System $system, string $name, bool $remote_view = true): ?User {
         $result = $system->db->query(
@@ -406,7 +406,7 @@ class User extends Fighter {
     */
 
     /**
-     * @throws Exception
+     * @throws RuntimeException
      */
     public function loadData($UPDATE = User::UPDATE_FULL, $remote_view = false): void {
         $result = $this->system->db->query("SELECT * FROM `users` WHERE `user_id`='$this->user_id' LIMIT 1 FOR UPDATE");
@@ -1138,7 +1138,7 @@ class User extends Fighter {
 
     /**
      * @return void
-     * @throws Exception
+     * @throws RuntimeException
      */
     public function checkTraining(): void {
         // Used for sidemenu display
@@ -1250,7 +1250,7 @@ class User extends Fighter {
      * @param string $stat
      * @param int    $stat_gain
      * @return string
-     * @throws Exception
+     * @throws RuntimeException
      */
     public function addStatGain(string $stat, int $stat_gain): string {
         if(!in_array($stat, $this->stats)) {
@@ -1398,7 +1398,7 @@ class User extends Fighter {
     }
 
     /**
-     * @throws Exception
+     * @throws RuntimeException
      */
     private function setMoney(int $new_amount, string $description) {
         $this->system->currencyLog(
@@ -1413,14 +1413,14 @@ class User extends Fighter {
     }
 
     /**
-     * @throws Exception
+     * @throws RuntimeException
      */
     public function addMoney(int $amount, string $description) {
         $this->setMoney($this->money + $amount, $description);
     }
 
     /**
-     * @throws Exception
+     * @throws RuntimeException
      */
     public function subtractMoney(int $amount, string $description) {
         if($this->money < $amount) {
@@ -1434,7 +1434,7 @@ class User extends Fighter {
     }
 
     /**
-     * @throws Exception
+     * @throws RuntimeException
      */
     private function setPremiumCredits(int $new_amount, string $description) {
         $this->system->currencyLog(
@@ -1449,7 +1449,7 @@ class User extends Fighter {
     }
 
     /**
-     * @throws Exception
+     * @throws RuntimeException
      */
     public function addPremiumCredits(int $amount, string $description) {
         $this->setPremiumCredits($this->premium_credits + $amount, $description);
@@ -1457,7 +1457,7 @@ class User extends Fighter {
 
 
     /**
-     * @throws Exception
+     * @throws RuntimeException
      */
     public function subtractPremiumCredits(int $amount, string $description) {
         if($this->getPremiumCredits() < $amount) {
@@ -1639,7 +1639,7 @@ class User extends Fighter {
     }
 
     /**
-     * @throws Exception
+     * @throws RuntimeException
      */
     public function updateInventory(): bool {
         if(!$this->inventory_loaded) {
@@ -1981,7 +1981,7 @@ class User extends Fighter {
     /**
      * @param string $entity_id
      * @return User
-     * @throws Exception
+     * @throws RuntimeException
      */
     public static function fromEntityId(System $system, string $entity_id): User {
         $entity_id = System::parseEntityId($entity_id);

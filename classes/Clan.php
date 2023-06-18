@@ -88,7 +88,7 @@ class Clan {
     }
 
     /**
-     * @throws Exception
+     * @throws RuntimeException
      */
     public static function loadFromId(System $system, int $id): ?Clan {
         $result = $system->db->query("SELECT * FROM `clans` WHERE `clan_id`=$id LIMIT 1");
@@ -199,7 +199,7 @@ class Clan {
     }
 
     /**
-     * @throws Exception
+     * @throws RuntimeException
      */
     public function setBoost(string $new_boost): void {
         $boost_cost = self::$BOOST_COST;
@@ -235,7 +235,7 @@ class Clan {
     }
 
     /**
-     * @throws Exception
+     * @throws RuntimeException
      */
     public function startMission(User $player, int $mission_id): bool {
         $missions = $this->getClanMissions($player->rank_num);
@@ -253,7 +253,7 @@ class Clan {
      * @param User $player
      * @param int  $office
      * @return void
-     * @throws Exception
+     * @throws RuntimeException
      */
     public function challengeForOffice(User $player, int $office): bool {
         if($player->rank_num < 4 && $office == Clan::OFFICE_LEADER) {
@@ -317,7 +317,7 @@ class Clan {
     /**
      * @param string $info
      * @return void
-     * @throws Exception
+     * @throws RuntimeException
      */
     public function setInfo(string $info): void {
         if(strlen($info) > 700) {
@@ -333,7 +333,7 @@ class Clan {
     /**
      * @param string $logo_url
      * @return void
-     * @throws Exception
+     * @throws RuntimeException
      */
     public function setLogoUrl(string $logo_url) {
         if(strlen($logo_url) > 150) {
@@ -346,7 +346,7 @@ class Clan {
     }
 
     /**
-     * @throws Exception
+     * @throws RuntimeException
      */
     public function setMotto(string $motto): void {
         if(strlen($motto) > 180) {

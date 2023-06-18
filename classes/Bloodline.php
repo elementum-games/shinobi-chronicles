@@ -94,7 +94,7 @@ class Bloodline {
     }
 
     /**
-     * @throws Exception
+     * @throws RuntimeException
      */
     public static function loadFromId(System $system, int $bloodline_id, ?int $user_id = null): Bloodline {
         if(!$bloodline_id) {
@@ -289,7 +289,7 @@ class Bloodline {
      * @param int    $user_id
      * @param bool   $display
      * @return bool
-     * @throws Exception
+     * @throws RuntimeException
      */
     public static function giveBloodline(System $system, int $bloodline_id, int $user_id, bool $display = true): bool {
         $result = $system->db->query("SELECT * FROM `bloodlines` WHERE `bloodline_id` = '$bloodline_id' LIMIT 1");

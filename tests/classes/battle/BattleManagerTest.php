@@ -5,7 +5,7 @@ use SC\TestUtils\BattleTestCase;
 
 class BattleManagerTest extends BattleTestCase {
     /**
-     * @throws Exception
+     * @throws RuntimeException
      */
     public function testCollectPlayerAction_Attack() {
         // SETUP

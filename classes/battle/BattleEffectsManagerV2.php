@@ -265,7 +265,7 @@ class BattleEffectsManagerV2 {
     /**
      * @param Fighter $player1
      * @param Fighter $player2
-     * @throws Exception
+     * @throws RuntimeException
      */
     public function applyActiveEffects(Fighter $player1, Fighter $player2) {
         if(!empty($this->active_effects)) {
@@ -353,7 +353,7 @@ class BattleEffectsManagerV2 {
     }
 
     /**
-     * @throws Exception
+     * @throws RuntimeException
      */
     public function applyActiveEffect(Fighter $target, Fighter $attacker, BattleEffect $effect): bool {
         if($target->health <= 0) {
@@ -535,7 +535,7 @@ class BattleEffectsManagerV2 {
     }
 
     /**
-     * @throws Exception
+     * @throws RuntimeException
      */
     public function releaseGenjutsu(Fighter $fighter, Jutsu $fighter_jutsu): void {
         $intelligence = ($fighter->intelligence + $fighter->intelligence_boost - $fighter->intelligence_nerf);
@@ -567,7 +567,7 @@ class BattleEffectsManagerV2 {
     /**
      * @param       $fighter
      * @param Jutsu $fighter_jutsu
-     * @throws Exception
+     * @throws RuntimeException
      */
     public function assertParentGenjutsuActive($fighter, Jutsu $fighter_jutsu) {
         if($fighter_jutsu->jutsu_type != Jutsu::TYPE_GENJUTSU) {
