@@ -17,6 +17,7 @@
             React.createElement(Header, {
                 links: {
                     navigation_api: "<?= $system->router->api_links['navigation'] ?>",
+                    logout_link: "<?= $system->router->base_url . "?logout=1" ?>",
                 },
                 navigationAPIData: {
                     headerMenu: <?= json_encode(

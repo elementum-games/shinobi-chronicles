@@ -15,6 +15,7 @@
 
 .header_bar {
     width: var(--content-width);
+    margin-left: var(--content-sidebar-gap);
 }
 
 .header_bar_inner {
@@ -23,10 +24,8 @@
 .header_link_container {
     height: 100%;
     width: var(--content-width);
-    margin-left: var(--content-sidebar-gap);
     align-items: center;
-    justify-content: center;
-    gap: 40px;
+    gap: 30px;
 }
 
 .header_label {
@@ -49,6 +48,26 @@
 }
 
 .header_time_label {
-    margin-left: 20px;
+    margin-left: auto;
     text-transform: uppercase;
+}
+
+.header_logout_wrapper {
+    margin-left: auto;
+}
+.header_logout_label {
+    color: var(--header-logout-color);
+    text-decoration: none;
+}
+.header_logout_label:hover {
+    color: var(--font-color-1) !important;
+    text-decoration: underline;
+}
+.header_logout_label:active {
+    color: var(--font-color-1);
+    text-decoration: underline;
+}
+.header_logout_label:visited {
+    color: var(--header-logout-color);
+    text-decoration: none;
 }
