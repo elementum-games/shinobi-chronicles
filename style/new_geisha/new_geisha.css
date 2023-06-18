@@ -14,7 +14,6 @@
     --footer-background-color: #0E0D0E;
     --footer-font-color: #423f39;
     --regentimer-color: #7C88C3;
-
     /* Structure */
     --header-height: 35px;
     --content-width: 930px;
@@ -23,7 +22,6 @@
     --topbar-height: 60px;
     --hotbar-height: 85px;
     --footer-height: 30px;
-
     /* Font Config */
     --font-primary: "Trebuchet MS";
     --font-primary-variant: small-caps;
@@ -44,7 +42,6 @@
     --font-xlarge: 18px;
     --font-max: 21px;
     --text-hover: white;
-
     /* Resource Config */
     --resource-bar-width: 300px;
     --resource-bar-height: 21px;
@@ -58,25 +55,22 @@
     --stamina-fill: linear-gradient(to right, #2e362c, #2a5e3c 15%);
     --stamina-preview: #2e362c;
     --stamina-highlight: #7f9d89;
-
     /* Hotbar Config */
     --hotbar-background-color: #100f11;
     --hotbar-border-color: #0c0c0e;
     --hotbar-keybind-modal-width: 700px;
     --hotbar-keybind-modal-height: 400px;
-
     /* Sidebar Config */
     --sidebar-header-background-color: #8c7b58;
     --sidebar-header-height: 23px;
     --sidebar-button-background-color: #1a191d;
     --sidebar-button-background-hover: linear-gradient(to bottom, #262631 50%, #22222a 50%);
     --sidebar-button-border-color: #20222b;
-
     /* Header Config */
     --header-background-color: #151417;
     --header-border-color: #0c0d0e;
     --header-border-height: 3px;
-
+    --header-logout-color: #e6a0a0;
     /* Chat Config */
     --chat-secondary-background-color: #1a1921;
 }
@@ -355,10 +349,8 @@ body {
 /* Content styles */
 .name.black {
     color: #000;
-
     --shadow-color: rgba(100,100,100,1);
     --shadow-size: 1px;
-
     text-shadow:
         /* top row */
         -1px -1px var(--shadow-size) var(--shadow-color),

@@ -76,7 +76,10 @@ function Header({ links, navigationAPIData }: Props) {
                                 )
                             })
                         }
-                        <div className="header_time_label ft-default ft-s ft-c5">{serverTime}</div>
+                    <div className="header_time_label ft-default ft-s ft-c5">{serverTime}</div>
+                    <div className={"header_logout_wrapper t-center"}>
+                        <a href={links.logout_link} className={"header_logout_label ft-default ft-s"}>LOGOUT</a>
+                    </div>
                     </div>
                 </div>
             }

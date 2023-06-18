@@ -403,7 +403,7 @@
 }
 
 .quote_container {
-    display: inline-flex;
+    display: flex;
     gap: 10px;
     font-style: italic;
     font-size: var(--font-min);
