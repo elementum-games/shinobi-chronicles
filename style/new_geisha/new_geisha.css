@@ -352,10 +352,15 @@ body {
     --shadow-color: rgba(100,100,100,1);
     --shadow-size: 1px;
     text-shadow:
-    /* top row */
-    -1px -1px var(--shadow-size) var(--shadow-color), 0 -1px var(--shadow-size) var(--shadow-color), 1px -1px var(--shadow-size) var(--shadow-color),
-    /* left and right */
-    -1px 0 var(--shadow-size) var(--shadow-color), 1px 0 var(--shadow-size) var(--shadow-color),
-    /* bottom row */
-    -1px 1px var(--shadow-size) var(--shadow-color), 0 1px var(--shadow-size) var(--shadow-color), 1px 1px var(--shadow-size) var(--shadow-color);
+        /* top row */
+        -1px -1px var(--shadow-size) var(--shadow-color),
+        0 -1px var(--shadow-size) var(--shadow-color),
+        1px -1px var(--shadow-size) var(--shadow-color),
+        /* left and right */
+        -1px 0 var(--shadow-size) var(--shadow-color),
+        1px 0 var(--shadow-size) var(--shadow-color),
+        /* bottom row */
+        -1px 1px var(--shadow-size) var(--shadow-color),
+        0 1px var(--shadow-size) var(--shadow-color),
+        1px 1px var(--shadow-size) var(--shadow-color);
 }
