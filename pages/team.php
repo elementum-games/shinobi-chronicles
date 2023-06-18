@@ -176,13 +176,17 @@ function team() {
     }
     else {
         if(isset($_GET['join_mission']) && $player->team->mission_id) {
-            $mission_id = $player->team->mission_id;
-            $mission = new Mission($mission_id, $player, $player->team);
+            if ($player->mission_id) {
+                $system->message("You are already on a mission!");
+            } else {
+                $mission_id = $player->team->mission_id;
+                $mission = new Mission($mission_id, $player, $player->team);
 
-            $player->mission_id = $mission_id;
-            $player->log(User::LOG_MISSION, "Team Mission ID #{$mission_id}");
+                $player->mission_id = $mission_id;
+                $player->log(User::LOG_MISSION, "Team Mission ID #{$mission_id}");
 
-            $system->message("Mission joined!");
+                $system->message("Mission joined!");
+            }
         }
 
         //Leader controls
