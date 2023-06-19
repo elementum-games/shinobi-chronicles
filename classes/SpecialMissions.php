@@ -431,6 +431,8 @@ class SpecialMission {
         $equipped_jutsu_chance = 100 - self::BLOODLINE_JUTSU_CHANCE;
         $extra_health_lost = 0; // if you can't use any jutsu, consumes double the HP cost
 
+        $failed_jutsu_extra_health_lost = ($health_lost / self::JUTSU_USES_PER_FIGHT) / 2;
+
         for($i = 0; $i < self::JUTSU_USES_PER_FIGHT; $i++) {
             if($has_equipped_jutsu && (
                 mt_rand(1, 100) < $equipped_jutsu_chance || !$has_bloodline_jutsu
@@ -448,7 +450,7 @@ class SpecialMission {
             }
 
             if($jutsu == null) {
-                $extra_health_lost += $health_lost / self::JUTSU_USES_PER_FIGHT;
+                $extra_health_lost += $failed_jutsu_extra_health_lost;
                 continue;
             }
 
@@ -456,7 +458,7 @@ class SpecialMission {
 
             $result = $this->player->useJutsu($jutsu);
             if($result->failed) {
-                $extra_health_lost += $health_lost / self::JUTSU_USES_PER_FIGHT;
+                $extra_health_lost += $failed_jutsu_extra_health_lost;
             }
 
             /** @noinspection PhpConditionAlreadyCheckedInspection - player->useJutsu can increase the level */
@@ -503,6 +505,7 @@ class SpecialMission {
             // Damage HP
             $this->player->health -= $health_lost;
             $this->player_health -= $health_lost;
+            $battle_text .= "[br]You lost {$health_lost} health";
 
             // Yen Gain
             $this->player->addMoney($yen_gain, "Special mission encounter");
