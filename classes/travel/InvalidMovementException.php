@@ -1,3 +1,3 @@
 <?php
 
-class InvalidMovementException extends Exception {}
+class InvalidMovementException extends RuntimeException {}

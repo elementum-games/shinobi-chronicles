@@ -16,12 +16,12 @@ class Coords {
     /**
      * @param string $coords_str
      * @return Coords
-     * @throws Exception
+     * @throws RuntimeException
      */
     public static function fromString(string $coords_str): Coords {
         $coords_arr = explode(':', $coords_str);
         if(count($coords_arr) != 2) {
-            throw new Exception("Invalid coords str: {$coords_str}!");
+            throw new RuntimeException("Invalid coords str: {$coords_str}!");
         }
 
         return new Coords(x: $coords_arr[0], y: $coords_arr[1]);

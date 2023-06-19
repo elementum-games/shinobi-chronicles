@@ -31,7 +31,7 @@ Contains the objects responsible for handling user data as well as system utilit
 
 class SystemFunctions
 
-dbConnect()
+connect()
 -Establishes a database connection. Called automatically by any class methods that need db connection
 
 clean($raw_input)

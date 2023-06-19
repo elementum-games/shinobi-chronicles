@@ -7,3 +7,8 @@
 #footer {
     flex-direction: row-reverse;
 }
+.header_bar {
+    width: var(--content-width);
+    margin-left: 0 !important;
+    margin-right: var(--content-sidebar-gap);
+}

@@ -21,7 +21,7 @@ function levelUp() {
 
 /**
  * @return bool
- * @throws Exception
+ * @throws RuntimeException
  */
 function rankUp(): bool {
 	global $system;
@@ -107,10 +107,12 @@ function geninExam(System $system, User $player, RankManager $rankManager) {
     $transform_jutsu_id = 12;
     $jutsu_ids = implode(",", [$replacement_jutsu_id, $clone_jutsu_id, $transform_jutsu_id]);
 
-    $result = $system->query("SELECT `jutsu_id`, `name`, `hand_seals` FROM `jutsu` WHERE `jutsu_id` IN({$jutsu_ids})");
+    $result = $system->db->query(
+        "SELECT `jutsu_id`, `name`, `hand_seals` FROM `jutsu` WHERE `jutsu_id` IN({$jutsu_ids})"
+    );
     $jutsu_data = array();
     $count = 1;
-    while($row = $system->db_fetch($result)) {
+    while($row = $system->db->fetch($result)) {
         $jutsu_data[$count++] = $row;
     }
 
@@ -220,18 +222,22 @@ function geninExam(System $system, User $player, RankManager $rankManager) {
                 }
 
                 // Delete current BL
-                $system->query("DELETE FROM `user_bloodlines` WHERE `user_id`='$player->user_id'");
-                $system->query("UPDATE `users` SET `bloodline_id`='0' WHERE `user_id`='$player->user_id'");
+                $system->db->query("DELETE FROM `user_bloodlines` WHERE `user_id`='$player->user_id'");
+                $system->db->query("UPDATE `users` SET `bloodline_id`='0' WHERE `user_id`='$player->user_id'");
 
                 // Pull bloodlines
-                $result = $system->query("SELECT `bloodline_id`, `clan_id`, `name` FROM `bloodlines`
-						WHERE `village`='{$player->village->name}' AND `rank`='$bloodline_rank'");
-                if($system->db_last_num_rows == 0) {
-                    $result = $system->query("SELECT `bloodline_id`, `clan_id`, `name` FROM `bloodlines`
-						WHERE `village`='{$player->village->name}' AND `rank` < 5");
+                $result = $system->db->query(
+                    "SELECT `bloodline_id`, `clan_id`, `name` FROM `bloodlines`
+                            WHERE `village`='{$player->village->name}' AND `rank`='$bloodline_rank'"
+                );
+                if($system->db->last_num_rows == 0) {
+                    $result = $system->db->query(
+                        "SELECT `bloodline_id`, `clan_id`, `name` FROM `bloodlines`
+                            WHERE `village`='{$player->village->name}' AND `rank` < 5"
+                    );
                 }
 
-                if($system->db_last_num_rows == 0) {
+                if($system->db->last_num_rows == 0) {
                     $bloodline_rolled = false;
                 }
 
@@ -239,7 +245,7 @@ function geninExam(System $system, User $player, RankManager $rankManager) {
                 if($bloodline_rolled) {
                     $bloodlines = array();
                     $count = 0;
-                    while($row = $system->db_fetch($result)) {
+                    while($row = $system->db->fetch($result)) {
                         $bloodlines[$row['bloodline_id']] = $row;
                         $count++;
                     }
@@ -256,8 +262,8 @@ function geninExam(System $system, User $player, RankManager $rankManager) {
                     $query .= " FROM `users`";
 
                     $bloodline_counts = array();
-                    $result = $system->query($query);
-                    $row = $system->db_fetch($result);
+                    $result = $system->db->query($query);
+                    $row = $system->db->fetch($result);
                     $total_users = 0;
                     foreach($row as $id => $user_count) {
                         $bloodline_counts[$id] = $user_count;
@@ -285,9 +291,11 @@ function geninExam(System $system, User $player, RankManager $rankManager) {
                     $bloodline_id = $bloodline_rolls[mt_rand(0, count($bloodline_rolls) - 1)];
                     $bloodline_name = $bloodlines[$bloodline_id]['name'];
 
-                    $result = $system->query("SELECT `name` FROM `clans` WHERE `clan_id`='" . $bloodlines[$bloodline_id]['clan_id'] . "'");
-                    if($system->db_last_num_rows > 0) {
-                        $result = $system->db_fetch($result);
+                    $result = $system->db->query(
+                        "SELECT `name` FROM `clans` WHERE `clan_id`='" . $bloodlines[$bloodline_id]['clan_id'] . "'"
+                    );
+                    if($system->db->last_num_rows > 0) {
+                        $result = $system->db->fetch($result);
                         $clan_name = $result['name'];
                         $player->clan = Clan::loadFromId($system, $bloodlines[$bloodline_id]['clan_id']);
                         $player->clan_id = $player->clan->id;
@@ -305,20 +313,24 @@ function geninExam(System $system, User $player, RankManager $rankManager) {
 
             // Clan roll(failsafe if no bloodlines were found on bl roll)
             if(!$bloodline_rolled) {
-                $result = $system->query("SELECT `clan_id`, `name` FROM `clans`
-						WHERE `village`='{$player->village->name}' AND `bloodline_only`='0'");
-                if($system->db_last_num_rows == 0) {
-                    $result = $system->query("SELECT `clan_id`, `name` FROM `clans`
-						WHERE `bloodline_only`='0'");
+                $result = $system->db->query(
+                    "SELECT `clan_id`, `name` FROM `clans`
+                            WHERE `village`='{$player->village->name}' AND `bloodline_only`='0'"
+                );
+                if($system->db->last_num_rows == 0) {
+                    $result = $system->db->query(
+                        "SELECT `clan_id`, `name` FROM `clans`
+                            WHERE `bloodline_only`='0'"
+                    );
                 }
 
-                if($system->db_last_num_rows == 0) {
-                    throw new Exception("No clans available!");
+                if($system->db->last_num_rows == 0) {
+                    throw new RuntimeException("No clans available!");
                 }
 
                 $clans = array();
                 $count = 0;
-                while($row = $system->db_fetch($result)) {
+                while($row = $system->db->fetch($result)) {
                     $clans[$row['clan_id']] = $row;
                     $count++;
                 }
@@ -335,8 +347,8 @@ function geninExam(System $system, User $player, RankManager $rankManager) {
                 $query .= " FROM `users`";
 
                 $clan_counts = array();
-                $result = $system->query($query);
-                $row = $system->db_fetch($result);
+                $result = $system->db->query($query);
+                $row = $system->db->fetch($result);
                 $total_users = 0;
                 foreach($row as $id => $user_count) {
                     $clan_counts[$id] = $user_count;
@@ -384,7 +396,7 @@ function geninExam(System $system, User $player, RankManager $rankManager) {
 					hard with them and become a strong ninja for your clan and village.'<br />
 					<p style='text-align:center;'><a href='{$system->router->links['profile']}'>Continue</a></p>";
             }
-        } catch(Exception $e) {
+        } catch(RuntimeException $e) {
             $system->message($e->getMessage());
         }
         $system->printMessage();
@@ -393,7 +405,7 @@ function geninExam(System $system, User $player, RankManager $rankManager) {
 }
 
 /**
- * @throws Exception
+ * @throws RuntimeException
  */
 function chuuninExam(System $system, User $player, RankManager $rankManager): bool {
     global $self_link;
@@ -418,18 +430,18 @@ function chuuninExam(System $system, User $player, RankManager $rankManager): bo
         try {
             // Question 1 - Illusion jutsu is what type
             if($answer1 != 'genjutsu') {
-                throw new Exception('');
+                throw new RuntimeException('');
             }
 
             // Question 2 - Armor protects against what
             if($answer2 != 'taijutsu') {
-                throw new Exception('');
+                throw new RuntimeException('');
             }
 
             // Question 3 - Most villagers
-            $result = $system->query("SELECT `name` FROM `villages`");
+            $result = $system->db->query("SELECT `name` FROM `villages`");
             $villages = array();
-            while($row = $system->db_fetch($result)) {
+            while($row = $system->db->fetch($result)) {
                 $villages[] = $row;
             }
 
@@ -441,8 +453,8 @@ function chuuninExam(System $system, User $player, RankManager $rankManager): bo
                 }
             }
             $count_query .= " FROM `users`";
-            $result = $system->query($count_query);
-            $village_counts = $system->db_fetch($result);
+            $result = $system->db->query($count_query);
+            $village_counts = $system->db->fetch($result);
             $highest_village = 'Stone';
             foreach($village_counts as $id => $village) {
                 if($village > $village_counts[$highest_village]) {
@@ -451,7 +463,7 @@ function chuuninExam(System $system, User $player, RankManager $rankManager): bo
             }
 
             if($answer3 != $highest_village) {
-                throw new Exception('');
+                throw new RuntimeException('');
             }
 
             $player->exam_stage = RankManager::CHUUNIN_STAGE_SURVIVAL_START;
@@ -493,7 +505,7 @@ function chuuninExam(System $system, User $player, RankManager $rankManager): bo
                     else {
                         Battle::start($system, $player, $opponent, Battle::TYPE_AI_RANKUP);
                     }
-                } catch(Exception $e) {
+                } catch(RuntimeException $e) {
                     $system->message($e->getMessage());
                     $system->printMessage();
                     return false;
@@ -562,7 +574,7 @@ function chuuninExam(System $system, User $player, RankManager $rankManager): bo
                     else {
                         Battle::start($system, $player, $opponent, Battle::TYPE_AI_RANKUP);
                     }
-                } catch(Exception $e) {
+                } catch(RuntimeException $e) {
                     $system->message($e->getMessage());
                     $system->printMessage();
                     return false;
@@ -669,7 +681,7 @@ function chuuninExam(System $system, User $player, RankManager $rankManager): bo
             }
 
             //Exam complete, element selected
-            $player->elements = array('first' => $element);
+            $player->elements = [$element];
             $player->exam_stage = 0;
             if ($player->sensei_id != 0) {
                 // increase graduated count
@@ -684,7 +696,7 @@ function chuuninExam(System $system, User $player, RankManager $rankManager): bo
             }
             $rankManager->increasePlayerRank($player);
             require 'templates/level_rank_up/chuunin_exam_graduation.php';
-        } catch(Exception $e) {
+        } catch(RuntimeException $e) {
             $system->message($e->getMessage());
             $system->printMessage();
         }
@@ -694,7 +706,7 @@ function chuuninExam(System $system, User $player, RankManager $rankManager): bo
 }
 
 /**
- * @throws Exception
+ * @throws RuntimeException
  */
 function processChuuninExamFightEnd(
     System $system,
@@ -763,7 +775,7 @@ function processChuuninExamFightEnd(
 }
 
 /**
- * @throws Exception
+ * @throws RuntimeException
  */
 function joninExam(System $system, User $player, RankManager $rankManager): bool {
     global $self_link;
@@ -804,16 +816,16 @@ function joninExam(System $system, User $player, RankManager $rankManager): bool
 
     if($player->exam_stage == $STAGE_PASS) {
         try {
-            $elements = array('Fire', 'Wind', 'Lightning', 'Earth', 'Water');
-            unset($elements[array_search($player->elements['first'], $elements)]);
+            $elements = User::$ELEMENTS;
+            unset($elements[array_search($player->elements[0], $elements)]);
 
             $element = $_POST['element'] ?? false;
             if(!in_array($element, $elements)) {
                 $element = false;
             }
 
-            if(isset($_POST['select_chakra']) && $element == false) {
-                if($_POST['element'] == $player->elements['first']) {
+            if(isset($_POST['select_chakra']) && !$element) {
+                if(in_array($_POST['element'], $player->elements)) {
                     $system->message("You already have the " . $_POST['element'] . " chakra nature!");
                 }
                 else {
@@ -883,11 +895,11 @@ function joninExam(System $system, User $player, RankManager $rankManager): bool
                 }
             }
 
-            $player->elements['second'] = $element;
+            $player->elements[1] = $element;
             $player->exam_stage = 0;
             $rankManager->increasePlayerRank($player);
             require 'templates/level_rank_up/jonin_exam_graduation.php';
-        } catch(Exception $e) {
+        } catch(RuntimeException $e) {
             echo "<tr><td style='text-align:center;'>" . $e->getMessage() . "</td></tr>";
         }
 
@@ -922,7 +934,7 @@ function rankupFightAPI(System $system, User $player): BattlePageAPIResponse {
         if($battle->isComplete()) {
             $response->battle_result = processChuuninExamFightEnd($system, $battle, $player);
         }
-    } catch(Exception $e) {
+    } catch(RuntimeException $e) {
         $response->errors[] = $e->getMessage();
     }
 

@@ -52,15 +52,15 @@ function createJutsuPage(System $system, array $RANK_NAMES) {
             }
 
             $query = "INSERT INTO `jutsu` ($column_names) VALUES ($column_data)";
-            $system->query($query);
+            $system->db->query($query);
 
-            if($system->db_last_affected_rows == 1) {
+            if($system->db->last_affected_rows == 1) {
                 $system->message("Jutsu created!");
             }
             else {
-                throw new Exception("Error creating jutsu!");
+                throw new RuntimeException("Error creating jutsu!");
             }
-        } catch(Exception $e) {
+        } catch(RuntimeException $e) {
             $system->message($e->getMessage());
             $error = true;
         }
@@ -101,13 +101,13 @@ function editJutsuPage(System $system, array $RANK_NAMES) {
     if(!empty($_GET['jutsu_id'])) {
         $jutsu_id = (int)$_GET['jutsu_id'];
 
-        $result = $system->query("SELECT * FROM `jutsu` WHERE `jutsu_id`='$jutsu_id'");
-        if($system->db_last_num_rows == 0) {
+        $result = $system->db->query("SELECT * FROM `jutsu` WHERE `jutsu_id`='$jutsu_id'");
+        if($system->db->last_num_rows == 0) {
             $system->message("Invalid Jutsu!");
             $system->printMessage();
         }
         else {
-            $jutsu_data = $system->db_fetch($result);
+            $jutsu_data = $system->db->fetch($result);
             $jutsu = Jutsu::fromArray($jutsu_data['jutsu_id'], $jutsu_data);
             $select_jutsu = false;
         }
@@ -152,16 +152,16 @@ function editJutsuPage(System $system, array $RANK_NAMES) {
             $query .= "WHERE `jutsu_id`='{$jutsu->id}'";
 
             //echo $query;
-            $system->query($query);
+            $system->db->query($query);
 
-            if($system->db_last_affected_rows == 1) {
+            if($system->db->last_affected_rows == 1) {
                 $system->message("Jutsu edited!");
                 $select_jutsu = true;
             }
             else {
-                throw new Exception("Error editing jutsu!");
+                throw new RuntimeException("Error editing jutsu!");
             }
-        } catch(Exception $e) {
+        } catch(RuntimeException $e) {
             $system->message($e->getMessage());
         }
         $system->printMessage();
@@ -188,11 +188,11 @@ function editJutsuPage(System $system, array $RANK_NAMES) {
  * @param int|null   $jutsu_id
  * @param array      $ALL_JUTSU
  * @return string
- * @throws Exception
+ * @throws RuntimeException
  */
 function validateHandSeals(System $system, ?array $raw_hand_seals, ?int $jutsu_id, array $ALL_JUTSU) {
     if($raw_hand_seals == null) {
-        throw new Exception("Hand seals are required!");
+        throw new RuntimeException("Hand seals are required!");
     }
 
     $hand_seals_arr = array_map('intval', $raw_hand_seals);
@@ -207,7 +207,7 @@ function validateHandSeals(System $system, ?array $raw_hand_seals, ?int $jutsu_i
     );
 
     if(count($hand_seals_arr) < 1) {
-        throw new Exception("Hand seals are required for ninjutsu and genjutsu!");
+        throw new RuntimeException("Hand seals are required for ninjutsu and genjutsu!");
     }
 
 
@@ -217,7 +217,7 @@ function validateHandSeals(System $system, ?array $raw_hand_seals, ?int $jutsu_i
             continue;
         }
         if($jutsu->hand_seals === $hand_seals_str) {
-            throw new Exception("Hand seals must be unique! ({$jutsu->name} has hand seals {$hand_seals_str})");
+            throw new RuntimeException("Hand seals must be unique! ({$jutsu->name} has hand seals {$hand_seals_str})");
         }
     }
 

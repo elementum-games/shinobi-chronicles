@@ -30,7 +30,7 @@ class BattleActionProcessor {
     }
 
     /**
-     * @throws Exception
+     * @throws RuntimeException
      */
     public function runMovementPhaseActions(): void {
         $player1_action = $this->battle->fighter_actions[$this->battle->player1->combat_id] ?? null;
@@ -62,7 +62,7 @@ class BattleActionProcessor {
     }
 
     /**
-     * @throws Exception
+     * @throws RuntimeException
      */
     public function runAttackPhaseActions(): void {
         $player1_attack = $this->getFighterAttackFromActions($this->battle->player1->combat_id);
@@ -132,7 +132,7 @@ class BattleActionProcessor {
 
         /*if($collision_text) {
             $collision_text = $this->parseCombatText($collision_text, $this->battle->player1, $this->battle->player2);
-            $this->battle->battle_text .= '[hr]' . $this->system->clean($collision_text);
+            $this->battle->battle_text .= '[hr]' . $this->system->db->clean($collision_text);
         }*/
 
         // Apply damage/effects and set display
@@ -170,7 +170,7 @@ class BattleActionProcessor {
      * @param Fighter             $fighter
      * @param FighterAttackAction $action
      * @return Jutsu
-     * @throws Exception
+     * @throws RuntimeException
      */
     public function getJutsuFromAttackAction(Fighter $fighter, FighterAttackAction $action): Jutsu {
         $jutsu = null;
@@ -185,14 +185,14 @@ class BattleActionProcessor {
             $jutsu = $fighter->bloodline->jutsu[$action->jutsu_id] ?? null;
         }
         else {
-            throw new Exception(
+            throw new RuntimeException(
                 "Invalid jutsu purchase type {$action->jutsu_purchase_type} for fighter {$fighter->combat_id}"
             );
         }
 
         if($jutsu == null) {
             $this->debug(BattleManagerV2::DEBUG_PLAYER_ACTION, "getJutsuFromAttackAction", print_r($action, true));
-            throw new Exception(
+            throw new RuntimeException(
                 "Invalid type {$action->jutsu_purchase_type} jutsu {$action->jutsu_id} for fighter {$fighter->getName()}"
             );
         }
@@ -210,7 +210,7 @@ class BattleActionProcessor {
     /**
      * @param string $combat_id
      * @return BattleAttackV2|null
-     * @throws Exception
+     * @throws RuntimeException
      */
     protected function getFighterAttackFromActions(string $combat_id): ?BattleAttackV2 {
         $fighter = $this->battle->getFighter($combat_id);
@@ -233,7 +233,7 @@ class BattleActionProcessor {
      * @param Fighter             $fighter
      * @param FighterAttackAction $action
      * @return BattleAttackV2
-     * @throws Exception
+     * @throws RuntimeException
      */
     protected function setupFighterAttack(Fighter $fighter, FighterAttackAction $action): BattleAttackV2 {
         $jutsu = $this->getJutsuFromAttackAction($fighter, $action);
@@ -251,7 +251,7 @@ class BattleActionProcessor {
         if($attack->jutsu->jutsu_type == Jutsu::TYPE_TAIJUTSU && $action->weapon_id) {
             // Apply element to jutsu
             if($fighter->items[$action->weapon_id]->effect == 'element') {
-                $attack->jutsu->element = $fighter->elements['first'];
+                $attack->jutsu->element = $fighter->elements[0];
                 $attack->starting_raw_damage *= 1 + ($fighter->items[$action->weapon_id]->effect_amount / 100);
             }
             // Set effect in jutsu
@@ -279,7 +279,7 @@ class BattleActionProcessor {
     }
 
     /**
-     * @throws Exception
+     * @throws RuntimeException
      */
     public function setAttackPath(Fighter $attacker, BattleAttackV2 $attack): void {
         switch($attack->jutsu->use_type) {
@@ -292,10 +292,10 @@ class BattleActionProcessor {
                     $this->setupDirectionAttack($attacker, $attack, $attack->target);
                 }
                 else if($attack->target instanceof AttackFighterIdTarget) {
-                    throw new Exception("setAttackPath: Unsupported target type!");
+                    throw new RuntimeException("setAttackPath: Unsupported target type!");
                 }
                 else {
-                    throw new Exception("setAttackPath: Invalid target type!");
+                    throw new RuntimeException("setAttackPath: Invalid target type!");
                 }
                 // TODO
                 break;
@@ -304,7 +304,7 @@ class BattleActionProcessor {
             case Jutsu::USE_TYPE_BUFF:
             case Jutsu::USE_TYPE_BARRIER:
             default:
-                throw new Exception("setAttackPath: Invalid jutsu use type!");
+                throw new RuntimeException("setAttackPath: Invalid jutsu use type!");
         }
     }
 
@@ -313,13 +313,13 @@ class BattleActionProcessor {
      * @param BattleAttackV2        $attack
      * @param AttackDirectionTarget $target
      * @return BattleAttackV2
-     * @throws Exception
+     * @throws RuntimeException
      */
     public function setupDirectionAttack(
         Fighter $attacker, BattleAttackV2 $attack, AttackDirectionTarget $target
     ): BattleAttackV2 {
         if(!isset($this->field->fighter_locations[$attacker->combat_id])) {
-            throw new Exception("Invalid attacker location!");
+            throw new RuntimeException("Invalid attacker location!");
         }
 
         $tiles = $this->field->getTiles();
@@ -328,7 +328,7 @@ class BattleActionProcessor {
             ($target->isDirectionLeft() ? -1 : 1);
         $starting_tile = $tiles[$starting_tile_index] ?? null;
         if(!$this->field->tileIsInBounds($starting_tile_index) || $tiles[$starting_tile_index] == null) {
-            throw new Exception("Invalid starting tile! {$starting_tile_index}");
+            throw new RuntimeException("Invalid starting tile! {$starting_tile_index}");
         }
 
         $attack->first_tile = $starting_tile;
@@ -382,18 +382,18 @@ class BattleActionProcessor {
      * @param BattleAttackV2   $attack
      * @param AttackTileTarget $target
      * @return BattleAttackV2
-     * @throws Exception
+     * @throws RuntimeException
      */
     public function setupTileAttack(
         Fighter $attacker, BattleAttackV2 $attack, AttackTileTarget $target
     ): BattleAttackV2 {
         if(!isset($this->field->fighter_locations[$attacker->combat_id])) {
-            throw new Exception("Invalid attacker location!");
+            throw new RuntimeException("Invalid attacker location!");
         }
 
         $tile = $this->field->getTiles()[$target->tile_index] ?? null;
         if($tile == null) {
-            throw new Exception("setupTileAttack: Invalid tile!");
+            throw new RuntimeException("setupTileAttack: Invalid tile!");
         }
 
         $attack->first_tile = $tile;
@@ -418,11 +418,11 @@ class BattleActionProcessor {
     }
 
     /**
-     * @throws Exception
+     * @throws RuntimeException
      */
     public function findAttackHits(Fighter $attacker, BattleAttackV2 $attack): BattleAttackV2 {
         if(!$attack->is_path_setup) {
-            throw new Exception("Attack path not setup!");
+            throw new RuntimeException("Attack path not setup!");
         }
 
         $attacker_team = BattleV2::fighterTeam($attacker);
@@ -456,7 +456,7 @@ class BattleActionProcessor {
     /**
      * @param AttackCollision[] $collisions
      * @return void
-     * @throws Exception
+     * @throws RuntimeException
      */
     public function processCollisions(array $collisions): void {
         /*
@@ -499,7 +499,7 @@ class BattleActionProcessor {
             $attack1_user = $this->battle->getFighter($attack1->attacker_id);
             $attack2_user = $this->battle->getFighter($attack2->attacker_id);
             if($attack1_user == null || $attack2_user == null) {
-                throw new Exception("Attack had invalid user!");
+                throw new RuntimeException("Attack had invalid user!");
             }
 
             $attack1_damage = $attack1_segment->raw_damage;
@@ -897,11 +897,11 @@ class BattleActionProcessor {
      * @param BattleAttackV2 $attack1
      * @param BattleAttackV2 $attack2
      * @return string
-     * @throws Exception
+     * @throws RuntimeException
      */
     public static function collisionId(BattleAttackV2 $attack1, BattleAttackV2 $attack2): string {
         if($attack1->id == $attack2->id) {
-            throw new Exception("Can't collide the same attack!");
+            throw new RuntimeException("Can't collide the same attack!");
         }
 
         if(strcmp($attack1->id, $attack2->id) < 0) {
@@ -924,7 +924,7 @@ class BattleActionProcessor {
      * @param BattleAttackV2 $fighter2Attack
      * @param Closure|null   $debug_closure
      * @return AttackCollision[]
-     * @throws Exception
+     * @throws RuntimeException
      */
     public static function findCollisions(BattleAttackV2 $fighter1Attack, BattleAttackV2 $fighter2Attack, ?Closure $debug_closure): array {
         $debug = function(string $category, string $label, string $content) use($debug_closure) {
@@ -936,10 +936,10 @@ class BattleActionProcessor {
         };
 
         if(!$fighter1Attack->is_path_setup) {
-            throw new Exception("Attack $fighter1Attack->id path not setup!");
+            throw new RuntimeException("Attack $fighter1Attack->id path not setup!");
         }
         if(!$fighter2Attack->is_path_setup) {
-            throw new Exception("Attack $fighter2Attack->id path not setup!");
+            throw new RuntimeException("Attack $fighter2Attack->id path not setup!");
         }
 
         if(count($fighter1Attack->path_segments) < 1) {
@@ -989,7 +989,7 @@ class BattleActionProcessor {
                 continue;
             }
             if(count($segments_by_attack) > 2) {
-                throw new Exception("3-way collisions are currently not supported!");
+                throw new RuntimeException("3-way collisions are currently not supported!");
             }
 
             $colliding_attack_pairs[] = array_values(
@@ -1063,7 +1063,7 @@ class BattleActionProcessor {
                  < 7 6 5 4 3 2 1
              */
             if($attack1_collision_point === null && $attack2_collision_point === null) {
-                throw new Exception("No collision points found!");
+                throw new RuntimeException("No collision points found!");
             }
 
             if($attack1_collision_point === null && $attack2_collision_point !== null) {
@@ -1123,7 +1123,7 @@ class BattleActionProcessor {
                     $attack2_collision_point += $distance_to_adjust;
                 }
                 else {
-                    throw new Exception("unexpected: No distance between collision points!");
+                    throw new RuntimeException("unexpected: No distance between collision points!");
                 }
             }
 
@@ -1160,7 +1160,7 @@ class BattleActionProcessor {
      * @param BattleAttackV2        $other_attack
      * @param TileAttackSegment[][] $segments_by_tile_and_attack
      * @return ?int
-     * @throws Exception
+     * @throws RuntimeException
      */
     public static function findNextTileCollisionPoint(BattleAttackV2 $attack, BattleAttackV2 $other_attack, array $segments_by_tile_and_attack): ?int {
         // Tile attacks do not have a next target
@@ -1196,7 +1196,7 @@ class BattleActionProcessor {
      * @param BattleAttackV2        $other_attack
      * @param TileAttackSegment[][] $segments_by_tile_and_attack
      * @return ?int
-     * @throws Exception
+     * @throws RuntimeException
      */
     public static function findSameTileCollisionPoint(BattleAttackV2 $attack, BattleAttackV2 $other_attack, array $segments_by_tile_and_attack): ?int {
         foreach($attack->path_segments as $segment) {

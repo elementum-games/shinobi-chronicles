@@ -43,7 +43,7 @@ class BattleManager {
      * @param int    $battle_id
      * @param bool   $spectate
      * @param bool   $load_fighters
-     * @throws Exception
+     * @throws RuntimeException
      */
     public function __construct(System $system, User $player, int $battle_id, bool $spectate = false, bool $load_fighters = true) {
         $this->system = $system;
@@ -76,14 +76,14 @@ class BattleManager {
      * @param bool   $spectate
      * @param bool   $load_fighters
      * @return BattleManager
-     * @throws Exception
+     * @throws RuntimeException
      */
     public static function init(System $system, User $player, int $battle_id, bool $spectate = false, bool $load_fighters = true): BattleManager {
         return new BattleManager($system, $player, $battle_id, $spectate, $load_fighters);
     }
 
     /**
-     * @throws Exception
+     * @throws RuntimeException
      */
     protected function loadFighters() {
         if($this->player->id == $this->battle->player1_id) {
@@ -154,8 +154,8 @@ class BattleManager {
         $default_attacks = [];
 
         $query = "SELECT * FROM `jutsu` WHERE `purchase_type`='1'";
-        $result = $this->system->query($query);
-        while($row = $this->system->db_fetch($result)) {
+        $result = $this->system->db->query($query);
+        while($row = $this->system->db->fetch($result)) {
             $default_attacks[$row['jutsu_id']] = Jutsu::fromArray($row['jutsu_id'], $row);
         }
         return $default_attacks;
@@ -166,7 +166,7 @@ class BattleManager {
 
     /**
      * @return string|null
-     * @throws Exception
+     * @throws RuntimeException
      */
     public function checkInputAndRunTurn(): ?string {
         // If someone is not in battle, this will be set
@@ -187,7 +187,7 @@ class BattleManager {
                         $max_health = $this->player->max_health * (Battle::MAX_PRE_FIGHT_HEAL_PERCENT / 100);
 
                         if ($this->player->health >= $max_health) {
-                            throw new Exception("You can't heal any further!");
+                            throw new RuntimeException("You can't heal any further!");
                         }
                         if ($item->effect === 'heal') {
                             if (--$this->player->items[$item_id]->quantity === 0) {
@@ -207,7 +207,7 @@ class BattleManager {
                     }
                 }
             }
-            catch(Exception $e) {
+            catch(RuntimeException $e) {
                 $this->system->message($e->getMessage());
             }
             return false;
@@ -222,7 +222,7 @@ class BattleManager {
                     // Check for handseals if ninjutsu/genjutsu
                     if($jutsu_type == Jutsu::TYPE_NINJUTSU or $jutsu_type == Jutsu::TYPE_GENJUTSU) {
                         if(!$_POST['hand_seals']) {
-                            throw new Exception("Please enter hand seals!");
+                            throw new RuntimeException("Please enter hand seals!");
                         }
 
                         $player_jutsu = $this->getJutsuFromHandSeals($this->player, $_POST['hand_seals']);
@@ -250,26 +250,26 @@ class BattleManager {
                         }
                     }
                     else {
-                        throw new Exception("Invalid jutsu selection!");
+                        throw new RuntimeException("Invalid jutsu selection!");
                     }
 
                     // Check jutsu cooldown
                     if(!$player_jutsu) {
-                        throw new Exception("Invalid jutsu!");
+                        throw new RuntimeException("Invalid jutsu!");
                     }
                     if(isset($this->battle->jutsu_cooldowns[$player_jutsu->combat_id])) {
-                        throw new Exception("Cannot use that jutsu, it is on cooldown for " . $this->battle->jutsu_cooldowns[$player_jutsu->combat_id] . " more turns!");
+                        throw new RuntimeException("Cannot use that jutsu, it is on cooldown for " . $this->battle->jutsu_cooldowns[$player_jutsu->combat_id] . " more turns!");
                     }
 
                     if(!$this->player->useJutsu($player_jutsu)) {
-                        throw new Exception($this->system->message);
+                        throw new RuntimeException($this->system->message);
                     }
 
                     // Check for weapon if non-BL taijutsu
                     $weapon_id = 0;
                     $weapon_element = Jutsu::ELEMENT_NONE;
                     if($jutsu_type == Jutsu::TYPE_TAIJUTSU && !empty($_POST['weapon_id'])) {
-                        $weapon_id = (int)$this->system->clean($_POST['weapon_id']);
+                        $weapon_id = (int)$this->system->db->clean($_POST['weapon_id']);
                         if($weapon_id && $this->player->hasItem($weapon_id)) {
                             if(!in_array($weapon_id, $this->player->equipped_weapon_ids)) {
                                 $weapon_id = 0;
@@ -279,7 +279,7 @@ class BattleManager {
                             $weapon_id = 0;
                         }
 
-                        $weapon_element = $this->system->clean($_POST['weapon_element'] ?? "None");
+                        $weapon_element = $this->system->db->clean($_POST['weapon_element'] ?? "None");
                         if(!in_array($weapon_element, $this->player->elements)) {
                             $weapon_element = Jutsu::ELEMENT_NONE;
                         }
@@ -321,7 +321,7 @@ class BattleManager {
     // PUBLIC VIEW API
 
     /**
-     * @throws Exception
+     * @throws RuntimeException
      */
     public function renderBattle(): void {
         global $self_link;
@@ -371,22 +371,22 @@ class BattleManager {
     }
 
     /**
-     * @throws Exception
+     * @throws RuntimeException
      */
     public function isPlayerWinner(): bool {
         if(!$this->isComplete()) {
-            throw new Exception("Cannot call isPlayerWinner() check before battle is complete!");
+            throw new RuntimeException("Cannot call isPlayerWinner() check before battle is complete!");
         }
 
         return $this->battle->winner === $this->player_side;
     }
 
     /**
-     * @throws Exception
+     * @throws RuntimeException
      */
     public function isOpponentWinner(): bool {
         if(!$this->isComplete()) {
-            throw new Exception("Cannot call isPlayerWinner() check before battle is complete!");
+            throw new RuntimeException("Cannot call isPlayerWinner() check before battle is complete!");
         }
 
         return $this->battle->winner === $this->opponent_side;
@@ -394,11 +394,11 @@ class BattleManager {
 
     /**
      * @return bool
-     * @throws Exception
+     * @throws RuntimeException
      */
     public function isDraw(): bool {
         if(!$this->isComplete()) {
-            throw new Exception("Cannot call isDraw() check before battle is complete!");
+            throw new RuntimeException("Cannot call isDraw() check before battle is complete!");
         }
 
         return $this->battle->winner === Battle::DRAW;
@@ -451,7 +451,7 @@ class BattleManager {
     // PRIVATE API - TURN LIFECYCLE
 
     /**
-     * @throws Exception
+     * @throws RuntimeException
      */
     protected function runActions(): void {
         $this->processTurnEffects();
@@ -517,7 +517,7 @@ class BattleManager {
 
         if($collision_text) {
             $collision_text = $this->parseCombatText($collision_text, $this->battle->player1, $this->battle->player2);
-            $this->battle->battle_text .= '[br][hr]' . $this->system->clean($collision_text);
+            $this->battle->battle_text .= '[br][hr]' . $this->system->db->clean($collision_text);
         }
         $this->battle->battle_text .= '[br][hr]';
 
@@ -579,7 +579,7 @@ class BattleManager {
     }
 
     /**
-     * @throws Exception
+     * @throws RuntimeException
      */
     private function processTurnEffects() {
         // Run turn effects
@@ -620,7 +620,7 @@ class BattleManager {
      * @param Fighter       $fighter
      * @param LegacyFighterAction $action
      * @return BattleAttack
-     * @throws Exception
+     * @throws RuntimeException
      */
     protected function setupFighterAttack(Fighter $fighter, LegacyFighterAction $action): BattleAttack {
         $attack = new BattleAttack();
@@ -634,7 +634,7 @@ class BattleManager {
             $attack->jutsu = $fighter->bloodline->jutsu[$action->jutsu_id];
         }
         else {
-            throw new Exception("Invalid jutsu purchase type {$action->jutsu_purchase_type} for fighter {$fighter->combat_id}");
+            throw new RuntimeException("Invalid jutsu purchase type {$action->jutsu_purchase_type} for fighter {$fighter->combat_id}");
         }
 
         $attack->jutsu->setCombatId($fighter->combat_id);
@@ -761,14 +761,14 @@ class BattleManager {
 
         if($attack->jutsu->hasEffect()){
             $text .= "<p style=\"font-style:italic;margin-top:3px;\">" .
-                $this->system->clean($this->effects->getAnnouncementText($attack->jutsu->effect)) .
+                $this->system->db->clean($this->effects->getAnnouncementText($attack->jutsu->effect)) .
                 "</p>";
         }
 
 
         if($attack->jutsu->weapon_id) {
             $text .= "<p style=\"font-style:italic;margin-top:3px;\">" .
-                $this->system->clean($this->effects->getAnnouncementText($attack->jutsu->weapon_effect->effect)) .
+                $this->system->db->clean($this->effects->getAnnouncementText($attack->jutsu->weapon_effect->effect)) .
                 "</p>";
         }
 
@@ -778,7 +778,7 @@ class BattleManager {
     }
 
     /**
-     * @throws Exception
+     * @throws RuntimeException
      */
     public function jutsuCollision(
         Fighter $player1, Fighter $player2, &$player1_damage, &$player2_damage, Jutsu $player1_jutsu, Jutsu $player2_jutsu
@@ -983,7 +983,7 @@ class BattleManager {
     }
 
     /**
-     * @throws Exception
+     * @throws RuntimeException
      */
     private function getEvasionStatAmount(Fighter $fighter, Jutsu $fighter_jutsu): float|int {
         switch($fighter_jutsu->jutsu_type) {
@@ -1003,7 +1003,7 @@ class BattleManager {
                 }
                 break;
             default:
-                throw new Exception("Invalid jutsu type!");
+                throw new RuntimeException("Invalid jutsu type!");
         }
 
         return $evasion_stat_amount;
@@ -1091,11 +1091,11 @@ class BattleManager {
 
     /**
      * @param Fighter $ai
-     * @throws Exception
+     * @throws RuntimeException
      */
     protected function chooseAndSetAIAction(Fighter $ai) {
         if(!($ai instanceof NPC)) {
-            throw new Exception("Calling chooseAndSetAIAction on non-AI!");
+            throw new RuntimeException("Calling chooseAndSetAIAction on non-AI!");
         }
 
         $jutsu = $ai->chooseAttack();

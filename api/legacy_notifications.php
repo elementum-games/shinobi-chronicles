@@ -7,12 +7,12 @@ $system = API::init();
 
 try {
     $player = Auth::getUserFromSession($system);
-} catch(Exception $e) {
+} catch(RuntimeException $e) {
     API::exitWithException($e, $system);
 }
 # End standard auth
 
 $player->loadData(User::UPDATE_NOTHING);
-$system->commitTransaction();
+$system->db->commitTransaction();
 
 Notifications::displayNotifications($system, $player, true);

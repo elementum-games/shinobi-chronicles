@@ -21,7 +21,6 @@ $NavigationAPIManager = new NavigationAPIManager($system, $player);
                 links: {
                     navigation_api: "<?= $system->router->api_links['navigation'] ?>",
                     user_api: "<?= $system->router->api_links['user'] ?>",
-                    logout_link: "<?= $system->router->base_url . "?logout=1" ?>",
                 },
                 navigationAPIData: {
                     userMenu: <?= json_encode(NavigationAPIPresenter::menuLinksResponse($NavigationAPIManager->getUserMenu())) ?>,
@@ -34,7 +33,6 @@ $NavigationAPIManager = new NavigationAPIManager($system, $player);
                     playerResources: <?= json_encode(UserAPIPresenter::playerResourcesResponse(player: $player)) ?>,
                     playerSettings: <?= json_encode(UserAPIPresenter::playerSettingsResponse(player: $player)) ?>
                 },
-                logoutTimer: "<?= (System::LOGOUT_LIMIT * 60) - (time() - $player->last_login) ?>",
             }),
             sidebarContainer
         );

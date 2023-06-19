@@ -1,3 +1,3 @@
 <?php
 
-class LoggedOutException extends Exception {}
+class LoggedOutException extends RuntimeException {}

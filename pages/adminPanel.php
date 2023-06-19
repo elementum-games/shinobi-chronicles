@@ -14,7 +14,7 @@ require_once 'admin/formTools.php';
 /**
  * @noinspection SqlResolve
  * @noinspection SqlInsertValues
- * @throws Exception
+ * @throws RuntimeException
  */
 function adminPanel() {
     global $system;
@@ -148,14 +148,14 @@ function adminPanel() {
                     $count++;
                 }
                 $query = "INSERT INTO `ai_opponents` ($column_names) VALUES ($column_data)";
-                $system->query($query);
-                if($system->db_last_affected_rows == 1) {
+                $system->db->query($query);
+                if($system->db->last_affected_rows == 1) {
                     $system->message("NPC created!");
                 }
                 else {
-                    throw new Exception("Error creating NPC!");
+                    throw new RuntimeException("Error creating NPC!");
                 }
-            } catch(Exception $e) {
+            } catch(RuntimeException $e) {
                 $system->message($e->getMessage());
                 $error = true;
             }
@@ -222,14 +222,14 @@ function adminPanel() {
                     $count++;
                 }
                 $query = "INSERT INTO `$table_name` ($column_names) VALUES ($column_data)";
-                $system->query($query);
-                if($system->db_last_affected_rows == 1) {
+                $system->db->query($query);
+                if($system->db->last_affected_rows == 1) {
                     $system->message("Item created!");
                 }
                 else {
-                    throw new Exception("Error creating item!");
+                    throw new RuntimeException("Error creating item!");
                 }
-            } catch(Exception $e) {
+            } catch(RuntimeException $e) {
                 $system->message($e->getMessage());
                 $error = true;
             }
@@ -285,14 +285,14 @@ function adminPanel() {
                     $count++;
                 }
                 $query = "INSERT INTO `$table_name` ($column_names) VALUES ($column_data)";
-                $system->query($query);
-                if($system->db_last_affected_rows == 1) {
+                $system->db->query($query);
+                if($system->db->last_affected_rows == 1) {
                     $system->message(ucwords($content_name) . " created!");
                 }
                 else {
-                    throw new Exception("Error creating " . $content_name . "!");
+                    throw new RuntimeException("Error creating " . $content_name . "!");
                 }
-            } catch(Exception $e) {
+            } catch(RuntimeException $e) {
                 $system->message($e->getMessage());
                 $error = true;
             }
@@ -339,14 +339,14 @@ function adminPanel() {
                     $count++;
                 }
                 $query = "INSERT INTO `$table_name` ($column_names) VALUES ($column_data)";
-                $system->query($query);
-                if($system->db_last_affected_rows == 1) {
+                $system->db->query($query);
+                if($system->db->last_affected_rows == 1) {
                     $system->message(ucwords($content_name) . " created!");
                 }
                 else {
-                    throw new Exception("Error creating " . $content_name . "!");
+                    throw new RuntimeException("Error creating " . $content_name . "!");
                 }
-            } catch(Exception $e) {
+            } catch(RuntimeException $e) {
                 $system->message($e->getMessage());
                 $error = true;
             }
@@ -393,14 +393,14 @@ function adminPanel() {
                     $count++;
                 }
                 $query = "INSERT INTO `$table_name` ($column_names) VALUES ($column_data)";
-                $system->query($query);
-                if($system->db_last_affected_rows == 1) {
+                $system->db->query($query);
+                if($system->db->last_affected_rows == 1) {
                     $system->message(ucwords($content_name) . " created!");
                 }
                 else {
-                    throw new Exception("Error creating " . $content_name . "!");
+                    throw new RuntimeException("Error creating " . $content_name . "!");
                 }
-            } catch(Exception $e) {
+            } catch(RuntimeException $e) {
                 $system->message($e->getMessage());
                 $error = true;
             }
@@ -447,14 +447,14 @@ function adminPanel() {
                     $count++;
                 }
                 $query = "INSERT INTO `$table_name` ($column_names) VALUES ($column_data)";
-                $system->query($query);
-                if($system->db_last_affected_rows == 1) {
+                $system->db->query($query);
+                if($system->db->last_affected_rows == 1) {
                     $system->message(ucwords($content_name) . " created!");
                 }
                 else {
-                    throw new Exception("Error creating " . $content_name . "!");
+                    throw new RuntimeException("Error creating " . $content_name . "!");
                 }
-            } catch(Exception $e) {
+            } catch(RuntimeException $e) {
                 $system->message($e->getMessage());
                 $error = true;
             }
@@ -484,14 +484,14 @@ function adminPanel() {
 
         // Validate NPC id
         if(!empty($_GET['npc_id'])) {
-            $npc_id = (int)$system->clean($_GET['npc_id']);
-            $result = $system->query("SELECT * FROM `ai_opponents` WHERE `ai_id`='$npc_id'");
-            if($system->db_last_num_rows == 0) {
+            $npc_id = (int)$system->db->clean($_GET['npc_id']);
+            $result = $system->db->query("SELECT * FROM `ai_opponents` WHERE `ai_id`='$npc_id'");
+            if($system->db->last_num_rows == 0) {
                 $system->message("Invalid NPC!");
                 $system->printMessage();
             }
             else {
-                $ai_data = $system->db_fetch($result);
+                $ai_data = $system->db->fetch($result);
                 $select_ai = false;
             }
         }
@@ -515,15 +515,15 @@ function adminPanel() {
                     $count++;
                 }
                 $query .= "WHERE `ai_id`='$npc_id'";
-                $system->query($query);
-                if($system->db_last_affected_rows == 1) {
+                $system->db->query($query);
+                if($system->db->last_affected_rows == 1) {
                     $system->message("NPC " . $data['name'] . " has been edited!");
                     $select_ai = true;
                 }
                 else {
-                    throw new Exception("Error editing " . $data['name'] . "! (Or data is the same)");
+                    throw new RuntimeException("Error editing " . $data['name'] . "! (Or data is the same)");
                 }
-            } catch(Exception $e) {
+            } catch(RuntimeException $e) {
                 $system->message($e->getMessage());
                 $select_ai = false;
             }
@@ -544,8 +544,8 @@ function adminPanel() {
         // Show form for selecting ID
         if($select_ai) {
             $all_npcs = [];
-            $result = $system->query("SELECT * FROM `ai_opponents` ORDER BY `level` ASC");
-            while($row = $system->db_fetch($result)) {
+            $result = $system->db->query("SELECT * FROM `ai_opponents` ORDER BY `level` ASC");
+            while($row = $system->db->fetch($result)) {
                 $all_npcs[$row['ai_id']] = $row;
             }
 
@@ -565,13 +565,13 @@ function adminPanel() {
         if(!empty($_GET['item_id'])) {
             $item_id = (int)$_GET['item_id'];
 
-            $result = $system->query("SELECT * FROM `$table_name` WHERE `item_id`='$item_id'");
-            if($system->db_last_num_rows == 0) {
+            $result = $system->db->query("SELECT * FROM `$table_name` WHERE `item_id`='$item_id'");
+            if($system->db->last_num_rows == 0) {
                 $system->message("Invalid item!");
                 $system->printMessage();
             }
             else {
-                $item_being_edited = $system->db_fetch($result);
+                $item_being_edited = $system->db->fetch($result);
             }
         }
 
@@ -597,16 +597,16 @@ function adminPanel() {
                 $query .= "WHERE `item_id`='{$item_being_edited['item_id']}'";
 
                 //echo $query;
-                $system->query($query);
+                $system->db->query($query);
 
-                if($system->db_last_affected_rows == 1) {
+                if($system->db->last_affected_rows == 1) {
                     $system->message("Item edited!");
                     $select_item = true;
                 }
                 else {
-                    throw new Exception("Error editing item!");
+                    throw new RuntimeException("Error editing item!");
                 }
-            } catch(Exception $e) {
+            } catch(RuntimeException $e) {
                 $system->message($e->getMessage());
             }
             $system->printMessage();
@@ -634,9 +634,9 @@ function adminPanel() {
 
         // Show form for selecting ID
         if(!$item_being_edited) {
-            $result = $system->query("SELECT * FROM `items`");
+            $result = $system->db->query("SELECT * FROM `items`");
             $all_items = [];
-            while($row = $system->db_fetch($result)) {
+            while($row = $system->db->fetch($result)) {
                 $all_items[$row['item_id']] = Item::fromDb($row);
             }
 
@@ -652,15 +652,15 @@ function adminPanel() {
         $editing_bloodline_id = null;
         $bloodline_data = null;
         if(!empty($_GET['bloodline_id'])) {
-            $editing_bloodline_id = (int)$system->clean($_GET['bloodline_id']);
-            $result = $system->query("SELECT * FROM `bloodlines` WHERE `bloodline_id`='$editing_bloodline_id'");
-            if($system->db_last_num_rows == 0) {
+            $editing_bloodline_id = (int)$system->db->clean($_GET['bloodline_id']);
+            $result = $system->db->query("SELECT * FROM `bloodlines` WHERE `bloodline_id`='$editing_bloodline_id'");
+            if($system->db->last_num_rows == 0) {
                 $system->message("Invalid bloodline!");
                 $system->printMessage();
                 $editing_bloodline_id = null;
             }
             else {
-                $bloodline_data = $system->db_fetch($result);
+                $bloodline_data = $system->db->fetch($result);
                 $select_content = false;
             }
         }
@@ -677,18 +677,20 @@ function adminPanel() {
                     $update_set_clauses[] = "`$name` = '$var'";
                 }
 
-                $system->query("UPDATE `bloodlines` SET "
-                    . implode(', ', $update_set_clauses)
-                    . " WHERE `bloodline_id`='$editing_bloodline_id'");
+                $system->db->query(
+                    "UPDATE `bloodlines` SET "
+                        . implode(', ', $update_set_clauses)
+                        . " WHERE `bloodline_id`='$editing_bloodline_id'"
+                );
 
-                if($system->db_last_affected_rows == 1) {
+                if($system->db->last_affected_rows == 1) {
                     $system->message('Bloodline ' . $data['name'] . " has been edited!");
                     $select_content = true;
                 }
                 else {
-                    throw new Exception("Error editing " . $data['name'] . "! (Or data is the same)");
+                    throw new RuntimeException("Error editing " . $data['name'] . "! (Or data is the same)");
                 }
-            } catch(Exception $e) {
+            } catch(RuntimeException $e) {
                 $system->message($e->getMessage());
                 $editing_bloodline_id = null;
             }
@@ -702,9 +704,9 @@ function adminPanel() {
 
         // Show form for selecting ID
         if($editing_bloodline_id == null) {
-            $result = $system->query("SELECT * FROM `bloodlines` ORDER BY `rank` ASC");
+            $result = $system->db->query("SELECT * FROM `bloodlines` ORDER BY `rank` ASC");
             $all_bloodlines = [];
-            while($row = $system->db_fetch($result)) {
+            while($row = $system->db->fetch($result)) {
                 $all_bloodlines[$row['bloodline_id']] = new Bloodline($row);
             }
 
@@ -720,14 +722,16 @@ function adminPanel() {
         $select_content = true;
         // Validate content id
         if($_POST[$content_name . '_id']) {
-            $editing_bloodline_id = (int)$system->clean($_POST[$content_name . '_id']);
-            $result = $system->query("SELECT * FROM `{$table_name}` WHERE `{$content_name}_id`='$editing_bloodline_id'");
-            if($system->db_last_num_rows == 0) {
+            $editing_bloodline_id = (int)$system->db->clean($_POST[$content_name . '_id']);
+            $result = $system->db->query(
+                "SELECT * FROM `{$table_name}` WHERE `{$content_name}_id`='$editing_bloodline_id'"
+            );
+            if($system->db->last_num_rows == 0) {
                 $system->message("Invalid $content_name!");
                 $system->printMessage();
             }
             else {
-                $content_data = $system->db_fetch($result);
+                $content_data = $system->db->fetch($result);
                 $select_content = false;
             }
         }
@@ -750,15 +754,15 @@ function adminPanel() {
                     $count++;
                 }
                 $query .= "WHERE `{$content_name}_id`='$editing_bloodline_id'";
-                $system->query($query);
-                if($system->db_last_affected_rows == 1) {
+                $system->db->query($query);
+                if($system->db->last_affected_rows == 1) {
                     $system->message(ucwords($content_name) . ' ' . $data['name'] . " has been edited!");
                     $select_content = true;
                 }
                 else {
-                    throw new Exception("Error editing " . $data['name'] . "! (Or data is the same)");
+                    throw new RuntimeException("Error editing " . $data['name'] . "! (Or data is the same)");
                 }
-            } catch(Exception $e) {
+            } catch(RuntimeException $e) {
                 $system->message($e->getMessage());
                 $select_content = false;
             }
@@ -778,12 +782,12 @@ function adminPanel() {
         }
         // Show form for selecting ID
         if($select_content) {
-            $result = $system->query("SELECT `{$content_name}_id`, `name` FROM `$table_name`");
+            $result = $system->db->query("SELECT `{$content_name}_id`, `name` FROM `$table_name`");
             echo "<table class='table'><tr><th>Select $content_name</th></tr>
 			<tr><td>
 			<form action='{$system->router->getUrl('admin', ['page' => 'edit_' . $content_name])}' method='post'>
 			<select name='{$content_name}_id'>";
-            while($row = $system->db_fetch($result)) {
+            while($row = $system->db->fetch($result)) {
                 echo "<option value='" . $row[$content_name . '_id'] . "'>" . stripslashes($row['name']) . "</option>";
             }
             echo "</select>
@@ -802,14 +806,16 @@ function adminPanel() {
         $select_content = true;
         // Validate NPC id
         if($_POST[$content_name . '_id']) {
-            $editing_bloodline_id = (int)$system->clean($_POST[$content_name . '_id']);
-            $result = $system->query("SELECT * FROM `{$table_name}` WHERE `{$content_name}_id`='$editing_bloodline_id'");
-            if($system->db_last_num_rows == 0) {
+            $editing_bloodline_id = (int)$system->db->clean($_POST[$content_name . '_id']);
+            $result = $system->db->query(
+                "SELECT * FROM `{$table_name}` WHERE `{$content_name}_id`='$editing_bloodline_id'"
+            );
+            if($system->db->last_num_rows == 0) {
                 $system->message("Invalid $content_name!");
                 $system->printMessage();
             }
             else {
-                $content_data = $system->db_fetch($result);
+                $content_data = $system->db->fetch($result);
                 $select_content = false;
             }
         }
@@ -832,15 +838,15 @@ function adminPanel() {
                     $count++;
                 }
                 $query .= "WHERE `{$content_name}_id`='$editing_bloodline_id'";
-                $system->query($query);
-                if($system->db_last_affected_rows == 1) {
+                $system->db->query($query);
+                if($system->db->last_affected_rows == 1) {
                     $system->message(ucwords($content_name) . ' ' . $data['name'] . " has been edited!");
                     $select_content = true;
                 }
                 else {
-                    throw new Exception("Error editing " . $data['name'] . "! (Or data is the same)");
+                    throw new RuntimeException("Error editing " . $data['name'] . "! (Or data is the same)");
                 }
-            } catch(Exception $e) {
+            } catch(RuntimeException $e) {
                 $system->message($e->getMessage());
                 $select_content = false;
             }
@@ -861,12 +867,12 @@ function adminPanel() {
         }
         // Show form for selecting ID
         if($select_content) {
-            $result = $system->query("SELECT `{$content_name}_id`, `name` FROM `$table_name`");
+            $result = $system->db->query("SELECT `{$content_name}_id`, `name` FROM `$table_name`");
             echo "<table class='table'><tr><th>Select $content_name</th></tr>
 			<tr><td>
 			<form action='{$system->router->getUrl('admin', ['page' => 'edit_' . $content_name])}' method='post'>
 			<select name='{$content_name}_id'>";
-            while($row = $system->db_fetch($result)) {
+            while($row = $system->db->fetch($result)) {
                 echo "<option value='" . $row[$content_name . '_id'] . "'>" . stripslashes($row['name']) . "</option>";
             }
             echo "</select>
@@ -885,14 +891,16 @@ function adminPanel() {
         $select_content = true;
         // Validate NPC id
         if($_POST[$content_name . '_id']) {
-            $editing_bloodline_id = (int)$system->clean($_POST[$content_name . '_id']);
-            $result = $system->query("SELECT * FROM `{$table_name}` WHERE `{$content_name}_id`='$editing_bloodline_id'");
-            if($system->db_last_num_rows == 0) {
+            $editing_bloodline_id = (int)$system->db->clean($_POST[$content_name . '_id']);
+            $result = $system->db->query(
+                "SELECT * FROM `{$table_name}` WHERE `{$content_name}_id`='$editing_bloodline_id'"
+            );
+            if($system->db->last_num_rows == 0) {
                 $system->message("Invalid $content_name!");
                 $system->printMessage();
             }
             else {
-                $content_data = $system->db_fetch($result);
+                $content_data = $system->db->fetch($result);
                 $select_content = false;
             }
         }
@@ -915,15 +923,15 @@ function adminPanel() {
                     $count++;
                 }
                 $query .= "WHERE `{$content_name}_id`='$editing_bloodline_id'";
-                $system->query($query);
-                if($system->db_last_affected_rows == 1) {
+                $system->db->query($query);
+                if($system->db->last_affected_rows == 1) {
                     $system->message(ucwords($content_name) . ' ' . $data['name'] . " has been edited!");
                     $select_content = true;
                 }
                 else {
-                    throw new Exception("Error editing " . $data['name'] . "! (Or data is the same)");
+                    throw new RuntimeException("Error editing " . $data['name'] . "! (Or data is the same)");
                 }
-            } catch(Exception $e) {
+            } catch(RuntimeException $e) {
                 $system->message($e->getMessage());
                 $select_content = false;
             }
@@ -944,12 +952,12 @@ function adminPanel() {
         }
         // Show form for selecting ID
         if($select_content) {
-            $result = $system->query("SELECT `{$content_name}_id`, `name` FROM `$table_name`");
+            $result = $system->db->query("SELECT `{$content_name}_id`, `name` FROM `$table_name`");
             echo "<table class='table'><tr><th>Select $content_name</th></tr>
 			<tr><td>
 			<form action='{$system->router->getUrl('admin', ['page' => 'edit_' . $content_name])}' method='post'>
 			<select name='{$content_name}_id'>";
-            while($row = $system->db_fetch($result)) {
+            while($row = $system->db->fetch($result)) {
                 echo "<option value='" . $row[$content_name . '_id'] . "'>" . stripslashes($row['name']) . "</option>";
             }
             echo "</select>
@@ -968,14 +976,16 @@ function adminPanel() {
         $select_content = true;
         // Validate content id
         if($_POST[$content_name . '_id']) {
-            $editing_bloodline_id = (int)$system->clean($_POST[$content_name . '_id']);
-            $result = $system->query("SELECT * FROM `{$table_name}` WHERE `{$content_name}_id`='$editing_bloodline_id'");
-            if($system->db_last_num_rows == 0) {
+            $editing_bloodline_id = (int)$system->db->clean($_POST[$content_name . '_id']);
+            $result = $system->db->query(
+                "SELECT * FROM `{$table_name}` WHERE `{$content_name}_id`='$editing_bloodline_id'"
+            );
+            if($system->db->last_num_rows == 0) {
                 $system->message("Invalid $content_name!");
                 $system->printMessage();
             }
             else {
-                $content_data = $system->db_fetch($result);
+                $content_data = $system->db->fetch($result);
                 $select_content = false;
             }
         }
@@ -998,15 +1008,15 @@ function adminPanel() {
                     $count++;
                 }
                 $query .= "WHERE `{$content_name}_id`='$editing_bloodline_id'";
-                $system->query($query);
-                if($system->db_last_affected_rows == 1) {
+                $system->db->query($query);
+                if($system->db->last_affected_rows == 1) {
                     $system->message(ucwords($content_name) . ' ' . $data['name'] . " has been edited!");
                     $select_content = true;
                 }
                 else {
-                    throw new Exception("Error editing " . $data['name'] . "! (Or data is the same)");
+                    throw new RuntimeException("Error editing " . $data['name'] . "! (Or data is the same)");
                 }
-            } catch(Exception $e) {
+            } catch(RuntimeException $e) {
                 $system->message($e->getMessage());
                 $select_content = false;
             }
@@ -1027,12 +1037,12 @@ function adminPanel() {
         }
         // Show form for selecting ID
         if($select_content) {
-            $result = $system->query("SELECT `{$content_name}_id`, `name` FROM `$table_name`");
+            $result = $system->db->query("SELECT `{$content_name}_id`, `name` FROM `$table_name`");
             echo "<table class='table'><tr><th>Select $content_name</th></tr>
 			<tr><td>
 			<form action='{$system->router->getUrl('admin', ['page' => 'edit_' . $content_name])}' method='post'>
 			<select name='{$content_name}_id'>";
-            while($row = $system->db_fetch($result)) {
+            while($row = $system->db->fetch($result)) {
                 echo "<option value='" . $row[$content_name . '_id'] . "'>" . stripslashes($row['name']) . "</option>";
             }
             echo "</select>
@@ -1051,7 +1061,7 @@ function adminPanel() {
 
         //Pagination - log types
         if(isset($_GET['view'])) {
-            $view = $system->clean($_GET['view']);
+            $view = $system->db->clean($_GET['view']);
             if(!in_array($view, ['staff_logs', 'currency_logs'])) {
                 $view = $default_view;
             }

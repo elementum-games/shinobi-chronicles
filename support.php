@@ -4,7 +4,7 @@ session_start();
 require_once("classes/_autoload.php");
 
 $system = new System();
-$system->startTransaction();
+$system->db->startTransaction();
 $guest_support = true;
 $self_link = $system->router->base_url . 'support.php';
 $staff_level = 0;
@@ -37,39 +37,39 @@ if($player != null) {
     if(isset($_POST['add_support']) || isset($_POST['add_support_prem']) || isset($_POST['confirm_prem_support'])) {
         try {
             $addSupport = true;
-            $request_type = $system->clean($_POST['support_type']);
-            $subject = $system->clean($_POST['subject']);
+            $request_type = $system->db->clean($_POST['support_type']);
+            $subject = $system->db->clean($_POST['subject']);
             $subjectLength = strlen($subject);
-            $message = $system->clean($_POST['message']);
+            $message = $system->db->clean($_POST['message']);
             $messageLength = strlen($message);
             $cost = ($supportSystem->requestPremiumCosts[$request_type] ?? 0);
             $premium = ($cost > 0 && isset($_POST['confirm_prem_support'])) ? 1 : 0;
 
             // Validate support
             if (!in_array($request_type, $request_types)) {
-                throw new Exception("Invalid support type!");
+                throw new RuntimeException("Invalid support type!");
             }
             if ($subjectLength < SupportManager::$validationConstraints['subject']['min']) {
-                throw new Exception("Subject must be at least " .
+                throw new RuntimeException("Subject must be at least " .
                     SupportManager::$validationConstraints['subject']['min'] . " characters!");
             }
             if ($subjectLength > SupportManager::$validationConstraints['subject']['max']) {
-                throw new Exception("Subject must not exceed " .
+                throw new RuntimeException("Subject must not exceed " .
                     SupportManager::$validationConstraints['subject']['max'] . " characters!");
             }
             if ($messageLength < SupportManager::$validationConstraints['message']['min']) {
-                throw new Exception("Content must be at least " .
+                throw new RuntimeException("Content must be at least " .
                     SupportManager::$validationConstraints['message']['min'] . " characters!");
             }
             if ($messageLength > SupportManager::$validationConstraints['message']['max']) {
-                throw new Exception("Content must not exceed " .
+                throw new RuntimeException("Content must not exceed " .
                     SupportManager::$validationConstraints['message']['max'] . " characters!");
             }
 
             // Premium cost
             if (isset($_POST['confirm_prem_support'])) {
                 if($player->getPremiumCredits() < $cost) {
-                    throw new Exception("You need {$cost}AK for this request.");
+                    throw new RuntimeException("You need {$cost}AK for this request.");
                 }
 
                 $player->subtractPremiumCredits($cost, "Submitted premium {$request_type} support");
@@ -91,19 +91,19 @@ if($player != null) {
                 }
             }
         }catch (Exception $e) {
-            $system->rollbackTransaction();
+            $system->db->rollbackTransaction();
             error_log($e->getMessage());
             $system->message($e->getMessage());
         }
     }
     if(isset($_POST['add_guest_support'])){
         try {
-            $support_key = $system->clean($_POST['support_key']);
+            $support_key = $system->db->clean($_POST['support_key']);
 
             $support_id = $supportSystem->getSupportIdByKey($support_key);
 
             if(!$support_id) {
-                throw new Exception("Support not found!");
+                throw new RuntimeException("Support not found!");
             }
 
             if($supportSystem->assignGuestSupportToUser($support_id)) {
@@ -140,16 +140,16 @@ if($player != null) {
         } else {
             if(isset($_POST['add_response'])) {
                 try {
-                    $message = $system->clean($_POST['message']);
+                    $message = $system->db->clean($_POST['message']);
                     $messageLength = strlen($message);
 
                     // Validate
                     if ($messageLength < SupportManager::$validationConstraints['message']['min']) {
-                        throw new Exception("Content must be at least " .
+                        throw new RuntimeException("Content must be at least " .
                             SupportManager::$validationConstraints['message']['min'] . " characters!");
                     }
                     if ($messageLength > SupportManager::$validationConstraints['message']['max']) {
-                        throw new Exception("Content must not exceed " .
+                        throw new RuntimeException("Content must not exceed " .
                             SupportManager::$validationConstraints['message']['max'] . " characters!");
                     }
 
@@ -157,39 +157,39 @@ if($player != null) {
                             $system->message("Response added!");
                     }
                     else {
-                        throw new Exception("Error adding response!");
+                        throw new RuntimeException("Error adding response!");
                     }
                 } catch (Exception $e) {
-                    $system->rollbackTransaction();
+                    $system->db->rollbackTransaction();
                     error_log($e->getMessage());
                     $system->message($e->getMessage());
                 }
             }
             if(isset($_POST['close_ticket'])) {
                 try {
-                    $message = $system->clean($_POST['message']);
+                    $message = $system->db->clean($_POST['message']);
                     $messageLength = strlen($message);
 
                     // Validate user owns support
                     if($support['user_id'] != $player->user_id) {
-                        throw new Exception("You can only close your supports!");
+                        throw new RuntimeException("You can only close your supports!");
                     }
 
                     // Add resopnse
                     if($message != '') {
                         // Validate
                         if ($messageLength < SupportManager::$validationConstraints['message']['min']) {
-                            throw new Exception("Content must be at least " .
+                            throw new RuntimeException("Content must be at least " .
                                 SupportManager::$validationConstraints['message']['min'] . " characters!");
                         }
                         if ($messageLength > SupportManager::$validationConstraints['message']['max']) {
-                            throw new Exception("Content must not exceed " .
+                            throw new RuntimeException("Content must not exceed " .
                                 SupportManager::$validationConstraints['message']['max'] . " characters!");
                         }
 
                         $supportSystem->addSupportResponse($support_id, $player->user_name, $message);
-                        if(!$system->db_last_insert_id) {
-                            throw new Exception("Error adding response.");
+                        if(!$system->db->last_insert_id) {
+                            throw new RuntimeException("Error adding response.");
                         }
                     }
 
@@ -198,7 +198,7 @@ if($player != null) {
                         $system->message("Support closed.");
                     }
                 }catch (Exception $e) {
-                    $system->rollbackTransaction();
+                    $system->db->rollbackTransaction();
                     error_log($e->getMessage());
                     $system->message($e->getMessage());
                 }
@@ -221,8 +221,8 @@ if($player != null) {
 else {
     // Get support data
     if(isset($_GET['support_key'])) {
-        $support_key = $system->clean($_GET['support_key']);
-        $email = $system->clean($_GET['email']);
+        $support_key = $system->db->clean($_GET['support_key']);
+        $email = $system->db->clean($_GET['email']);
         $supportData = $supportSystem->fetchSupportByKey($support_key, $email);
 
         if(!$supportData) {
@@ -235,49 +235,49 @@ else {
     // Add guest support
     if(isset($_POST['add_support'])) {
         try {
-            $subject = $system->clean($_POST['subject']);
+            $subject = $system->db->clean($_POST['subject']);
             $subjectLength = strlen($subject);
-            $email = $system->clean($_POST['email']);
-            $support_type = $system->clean($_POST['support_type']);
-            $name = $system->clean($_POST['name']);
-            $message = $system->clean($_POST['message']);
+            $email = $system->db->clean($_POST['email']);
+            $support_type = $system->db->clean($_POST['support_type']);
+            $name = $system->db->clean($_POST['name']);
+            $message = $system->db->clean($_POST['message']);
             $messageLength = strlen($message);
             $support_key = sha1(mt_rand(0, 255384));
 
             // Name validation
             if($name == '') {
-                throw new Exception("You must enter your name or display name.");
+                throw new RuntimeException("You must enter your name or display name.");
             }
             if(strlen($name) < 3) {
-                throw new Exception("Your name must be at least 3 characters long.");
+                throw new RuntimeException("Your name must be at least 3 characters long.");
             }
             if(strlen($name) > 75) {
-                throw new Exception("Your name may not exceed 75 characters. Please shorten or use a nick name.");
+                throw new RuntimeException("Your name may not exceed 75 characters. Please shorten or use a nick name.");
             }
             // Email validation
             if(!filter_var($_POST['email'], FILTER_VALIDATE_EMAIL)) {
-                throw new Exception("You must provide a valid email!");
+                throw new RuntimeException("You must provide a valid email!");
             }
             if(in_array(strtolower(explode('@', $email)[1]), System::UNSERVICEABLE_EMAIL_DOMAINS)) {
-                throw new Exception("We are currently unable to support " .
+                throw new RuntimeException("We are currently unable to support " .
                     implode(' / ', System::UNSERVICEABLE_EMAIL_DOMAINS) . " email types.");
             }
             // Subject validation
             if($subjectLength < SupportManager::$validationConstraints['subject']['min']) {
-                throw new Exception("Subject must be at least " . SupportManager::$validationConstraints['subject']['min']
+                throw new RuntimeException("Subject must be at least " . SupportManager::$validationConstraints['subject']['min']
                  . " characters long.");
             }
             if($subjectLength > SupportManager::$validationConstraints['subject']['max']) {
-                throw new Exception("Subject may not exceed " . SupportManager::$validationConstraints['subject']['max']
+                throw new RuntimeException("Subject may not exceed " . SupportManager::$validationConstraints['subject']['max']
                 . " characters.");
             }
             // Message validation
             if($messageLength < SupportManager::$validationConstraints['message']['min']) {
-                throw new Exception("Details must be at least " . SupportManager::$validationConstraints['message']['min']
+                throw new RuntimeException("Details must be at least " . SupportManager::$validationConstraints['message']['min']
                     . " characters long.");
             }
             if($messageLength > SupportManager::$validationConstraints['message']['max']) {
-                throw new Exception("Details may not exceed " . SupportManager::$validationConstraints['message']['max']
+                throw new RuntimeException("Details may not exceed " . SupportManager::$validationConstraints['message']['max']
                     . " characters.");
             }
 
@@ -297,8 +297,8 @@ else {
             } else {
                 $system->message("Error creating support.");
             }
-        }catch(Exception $e) {
-            $system->rollbackTransaction();
+        }catch(RuntimeException $e) {
+            $system->db->rollbackTransaction();
             error_log($e->getMessage());
             $system->message($e->getMessage());
         }
@@ -306,28 +306,28 @@ else {
     // Add guest response
     if(isset($_POST['add_response'])) {
         try {
-            $message = $system->clean($_POST['message']);
+            $message = $system->db->clean($_POST['message']);
 
             // Message validation
             if(strlen($message) < SupportManager::$validationConstraints['message']['min']) {
-                throw new Exception("Response must be at least " . SupportManager::$validationConstraints['message']['min'] . " characters.");
+                throw new RuntimeException("Response must be at least " . SupportManager::$validationConstraints['message']['min'] . " characters.");
             }
             if(strlen($message) > SupportManager::$validationConstraints['message']['max']) {
-                throw new Exception("Response may not exceed " . SupportManager::$validationConstraints['message']['max'] . " characters.");
+                throw new RuntimeException("Response may not exceed " . SupportManager::$validationConstraints['message']['max'] . " characters.");
             }
 
             if(!isset($supportData) || !$supportData) {
-                throw new Exception("Support not found!");
+                throw new RuntimeException("Support not found!");
             }
 
             if($supportSystem->addSupportResponse($supportData['support_id'], $supportData['user_name'], $message)) {
                 $system->message("Response added!");
                 $responses = $supportSystem->fetchSupportResponses($supportData['support_id']);
             } else {
-                throw new Exception("Error adding response!");
+                throw new RuntimeException("Error adding response!");
             }
         }catch (Exception $e) {
-            $system->rollbackTransaction();
+            $system->db->rollbackTransaction();
             $system->message($e->getMessage());
         }
     }
@@ -343,4 +343,4 @@ else {
 
 $layout->renderAfterContentHTML($system, $player);
 
-$system->commitTransaction();
+$system->db->commitTransaction();

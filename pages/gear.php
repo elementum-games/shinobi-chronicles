@@ -57,18 +57,18 @@ function gear(): void {
         }
     }
     else if(isset($_GET['use_item'])) {
-        $item_id = (int)$system->clean($_GET['use_item']);
+        $item_id = (int)$system->db->clean($_GET['use_item']);
         try {
             if(!$player->hasItem($item_id) or $player->items[$item_id]->use_type != 3) {
-                throw new Exception("Invalid item!");
+                throw new RuntimeException("Invalid item!");
             }
 
             if($player->health >= $player->max_health) {
-                throw new Exception("Your health is already maxed out!");
+                throw new RuntimeException("Your health is already maxed out!");
             }
 
             if($player->items[$item_id]->quantity <= 0) {
-                throw new Exception("You do not have any more of this item!");
+                throw new RuntimeException("You do not have any more of this item!");
             }
 
             $player->items[$item_id]->quantity--;
@@ -86,7 +86,7 @@ function gear(): void {
             }
 
             $player->updateInventory();
-        } catch(Exception $e) {
+        } catch(RuntimeException $e) {
             $system->message($e->getMessage());
         }
     }

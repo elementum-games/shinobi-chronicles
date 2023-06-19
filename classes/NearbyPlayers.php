@@ -13,22 +13,22 @@ class NearbyPlayers {
         $users_per_page = 30;
         $min = 0;
         if(!empty($_GET['min'])) {
-            $min = (int)$system->clean($_GET['min']);
+            $min = (int)$system->db->clean($_GET['min']);
         }
 
         // Load rank data
         $ranks = [];
-        $result = $system->query("SELECT `rank_id`, `name` FROM `ranks`");
-        while($rank = $system->db_fetch($result)) {
+        $result = $system->db->query("SELECT `rank_id`, `name` FROM `ranks`");
+        while($rank = $system->db->fetch($result)) {
             $ranks[$rank['rank_id']]['name'] = $rank['name'];
         }
 
-        $result = $system->query(
+        $result = $system->db->query(
             "SELECT `user_id`, `user_name`, `rank`, `village`, `exp`, `location`, `battle_id`, `stealth` FROM `users` 
 		WHERE `last_active` > UNIX_TIMESTAMP() - 120 ORDER BY `exp` DESC LIMIT $min, $users_per_page"
         );
         $users = [];
-        while($row = $system->db_fetch($result)) {
+        while($row = $system->db->fetch($result)) {
             $location = TravelCoords::fromDbString($row['location']);
             $row['location_string'] = $row['location'];
             $row['location'] = $location;

@@ -149,7 +149,7 @@ class BattleManagerV2 {
      * The database calls necessary for spinning up a working instance of BattleManagerV2 are captured in this method,
      * so that for testing we can inject mocks.
      *
-     * @throws Exception
+     * @throws RuntimeException
      */
     public static function init(
         System $system,
@@ -178,7 +178,7 @@ class BattleManagerV2 {
     }
 
     /**
-     * @throws Exception
+     * @throws RuntimeException
      */
     protected function loadFighters(): void {
         if($this->player->id == $this->battle->player1_id) {
@@ -253,7 +253,7 @@ class BattleManagerV2 {
      * required inputs have been gathered.
      *
      * @return string|null
-     * @throws Exception
+     * @throws RuntimeException
      */
     public function checkInputAndRunTurn(): ?string {
         // If someone is not in battle, this will be set
@@ -318,7 +318,7 @@ class BattleManagerV2 {
     // PUBLIC VIEW API
 
     /**
-     * @throws Exception
+     * @throws RuntimeException
      */
     public function renderBattle(): void {
         global $self_link;
@@ -382,22 +382,22 @@ class BattleManagerV2 {
     }
 
     /**
-     * @throws Exception
+     * @throws RuntimeException
      */
     public function isPlayerWinner(): bool {
         if(!$this->isComplete()) {
-            throw new Exception("Cannot call isPlayerWinner() check before battle is complete!");
+            throw new RuntimeException("Cannot call isPlayerWinner() check before battle is complete!");
         }
 
         return $this->battle->winner === $this->player_side;
     }
 
     /**
-     * @throws Exception
+     * @throws RuntimeException
      */
     public function isOpponentWinner(): bool {
         if(!$this->isComplete()) {
-            throw new Exception("Cannot call isPlayerWinner() check before battle is complete!");
+            throw new RuntimeException("Cannot call isPlayerWinner() check before battle is complete!");
         }
 
         return $this->battle->winner === $this->opponent_side;
@@ -405,11 +405,11 @@ class BattleManagerV2 {
 
     /**
      * @return bool
-     * @throws Exception
+     * @throws RuntimeException
      */
     public function isDraw(): bool {
         if(!$this->isComplete()) {
-            throw new Exception("Cannot call isDraw() check before battle is complete!");
+            throw new RuntimeException("Cannot call isDraw() check before battle is complete!");
         }
 
         return $this->battle->winner === BattleV2::DRAW;
@@ -435,7 +435,7 @@ class BattleManagerV2 {
     // PRIVATE API - TURN LIFECYCLE
 
     /**
-     * @throws Exception
+     * @throws RuntimeException
      */
     protected function runActions(): void {
         $this->processTurnEffects();
@@ -503,7 +503,7 @@ class BattleManagerV2 {
     }
 
     /**
-     * @throws Exception
+     * @throws RuntimeException
      */
     private function processTurnEffects(): void {
         // Run turn effects
@@ -571,7 +571,7 @@ class BattleManagerV2 {
     /**
      * @param Fighter       $player
      * @param FighterAction $action
-     * @throws Exception
+     * @throws RuntimeException
      */
     protected function setPlayerAction(Fighter $player, FighterAction $action) {
         if($this->battle->isAttackPhase() && $action instanceof FighterAttackAction) {
@@ -591,7 +591,7 @@ class BattleManagerV2 {
             $this->battle->fighter_actions[$player->combat_id] = $action;
         }
         else {
-            throw new Exception(
+            throw new RuntimeException(
                 "Invalid attack type for current turn phase! " .
                 "{$this->battle->turn_type} / {$action->type}"
             );
@@ -608,7 +608,7 @@ class BattleManagerV2 {
                     $max_health = $this->player->max_health * (BattleV2::MAX_PRE_FIGHT_HEAL_PERCENT / 100);
 
                     if($this->player->health >= $max_health) {
-                        throw new Exception("You can't heal any further!");
+                        throw new RuntimeException("You can't heal any further!");
                     }
                     if($item->effect === 'heal') {
                         if(--$this->player->items[$item_id]->quantity === 0) {
@@ -633,18 +633,18 @@ class BattleManagerV2 {
                     }
                 }
             }
-        } catch(Exception $e) {
+        } catch(RuntimeException $e) {
             $this->system->message($e->getMessage());
         }
     }
 
     /**
      * @param Fighter $npc
-     * @throws Exception
+     * @throws RuntimeException
      */
     protected function chooseAndSetNPCAction(Fighter $npc): void {
         if(!($npc instanceof NPC)) {
-            throw new Exception("Calling chooseAndSetNPCAction on non-NPC!");
+            throw new RuntimeException("Calling chooseAndSetNPCAction on non-NPC!");
         }
 
         $target_fighter_location = $this->field->getFighterLocation($this->player->combat_id);
@@ -736,7 +736,7 @@ class BattleManagerV2 {
     }
 
     /**
-     * @throws Exception
+     * @throws RuntimeException
      */
     protected function chooseNPCAttackAction(NPC $npc, Fighter $target): FighterAttackAction {
         $jutsu = $npc->chooseAttack();
@@ -758,7 +758,7 @@ class BattleManagerV2 {
     // PRIVATE UTILS - PLAYER ACTIONS (public only for unit testing)
 
     /**
-     * @throws Exception
+     * @throws RuntimeException
      */
     public function collectPlayerAction(array $FORM_DATA): ?FighterAction {
         if($this->battle->isAttackPhase() && !empty($FORM_DATA['submit_attack'])) {
@@ -783,7 +783,7 @@ class BattleManagerV2 {
             // Check for handseals if ninjutsu/genjutsu
             if($jutsu_category == Jutsu::TYPE_NINJUTSU or $jutsu_category == Jutsu::TYPE_GENJUTSU) {
                 if(!$hand_seals) {
-                    throw new Exception("Please enter hand seals!");
+                    throw new RuntimeException("Please enter hand seals!");
                 }
 
                 $player_jutsu = $this->getJutsuFromHandSeals($this->player, $hand_seals);
@@ -807,22 +807,22 @@ class BattleManagerV2 {
                 }
             }
             else {
-                throw new Exception("Invalid jutsu selection!");
+                throw new RuntimeException("Invalid jutsu selection!");
             }
 
             // Check jutsu cooldown
             if(!$player_jutsu) {
-                throw new Exception("Invalid jutsu!");
+                throw new RuntimeException("Invalid jutsu!");
             }
             if(isset($this->battle->jutsu_cooldowns[$player_jutsu->combat_id])) {
-                throw new Exception(
+                throw new RuntimeException(
                     "Cannot use that jutsu, it is on cooldown for " . $this->battle->jutsu_cooldowns[$player_jutsu->combat_id] . " more turns!"
                 );
             }
 
             $result = $this->player->useJutsu($player_jutsu);
             if($result->failed) {
-                throw new Exception($result->error_message);
+                throw new RuntimeException($result->error_message);
             }
 
             // Check for weapon if non-BL taijutsu
@@ -856,10 +856,10 @@ class BattleManagerV2 {
 
             // Run player attack
             if($target_tile === null) {
-                throw new Exception("Invalid tile!");
+                throw new RuntimeException("Invalid tile!");
             }
             if(!$this->field->tileIsInBounds($target_tile)) {
-                throw new Exception("Invalid tile - out of bounds!");
+                throw new RuntimeException("Invalid tile - out of bounds!");
             }
 
             return new FighterMovementAction(
@@ -876,13 +876,13 @@ class BattleManagerV2 {
      * @param Jutsu    $jutsu
      * @param int|null $target_tile
      * @return AttackTarget
-     * @throws Exception
+     * @throws RuntimeException
      */
     private function getTarget(Fighter $fighter, Jutsu $jutsu, ?int $target_tile): AttackTarget {
         if($target_tile !== null) {
             $distance_to_target = $this->field->distanceFromFighter($fighter->combat_id, $target_tile);
             if($distance_to_target > $jutsu->range) {
-                throw new Exception("getTarget: Target is not in range!");
+                throw new RuntimeException("getTarget: Target is not in range!");
             }
 
             if($jutsu->target_type === Jutsu::TARGET_TYPE_DIRECTION) {
@@ -895,12 +895,12 @@ class BattleManagerV2 {
                 return new AttackTileTarget($target_tile);
             }
             else {
-                throw new Exception("getTarget: Unsupported target type!");
+                throw new RuntimeException("getTarget: Unsupported target type!");
             }
         }
         else {
             // TODO: Attack a fighter directly
-            throw new Exception("getTarget: Invalid target type!");
+            throw new RuntimeException("getTarget: Invalid target type!");
         }
     }
 
@@ -984,8 +984,8 @@ class BattleManagerV2 {
         $default_attacks = [];
 
         $query = "SELECT * FROM `jutsu` WHERE `purchase_type`='1'";
-        $result = $system->query($query);
-        while($row = $system->db_fetch($result)) {
+        $result = $system->db->query($query);
+        while($row = $system->db->fetch($result)) {
             $default_attacks[$row['jutsu_id']] = Jutsu::fromArray($row['jutsu_id'], $row);
         }
         return $default_attacks;

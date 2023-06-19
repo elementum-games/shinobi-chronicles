@@ -3,9 +3,9 @@
 /** @var System $system */
 require __DIR__ . "/../admin/_authenticate_admin.php";
 
-$result = $system->query("SELECT `bloodline_id`, `jutsu` FROM `bloodlines`");
+$result = $system->db->query("SELECT `bloodline_id`, `jutsu` FROM `bloodlines`");
 $bloodlines = array();
-while($row = $system->db_fetch($result)) {
+while($row = $system->db->fetch($result)) {
 	$bloodlines[$row['bloodline_id']] = json_decode($row['jutsu'], true);
 }
 
@@ -19,6 +19,6 @@ foreach($bloodlines as $bloodline_id => $bloodline_jutsu) {
 	}
 	$jutsu_string = json_encode($bloodlines[$bloodline_id]);
 	$query = "UPDATE `bloodlines` SET `jutsu`='$jutsu_string' WHERE `bloodline_id`='$bloodline_id' LIMIT 1";
-	$system->query($query);
+	$system->db->query($query);
 }
 

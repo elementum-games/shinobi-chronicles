@@ -25,12 +25,14 @@
     left: -16px;
     position: relative;
     display: flex;
+    user-select: none;
 }
 
 .sb_header_text_wrapper {
     left: -10px;
     position: relative;
     text-shadow: 1.5px 1.5px 1px #564d3e;
+    user-select: none;
 }
 
 .sb_header_line {
@@ -85,6 +87,7 @@
     position: relative;
     top: 15%;
     cursor: pointer;
+    user-select: none;
 }
 
 .sb_avatar_container {
@@ -112,13 +115,6 @@
     font-family: var(--font-primary);
     font-variant: var(--font-primary-variant);
     font-size: 12px;
-}
-
-#sb_logout_button {
-    top: 20px;
-    position: relative;
-    left: 50%;
-    transform: translateX(-50%);
 }
 
 .sb_name_container {
@@ -275,34 +271,8 @@
     stroke: var(--stamina-highlight);
 }
 
-.sb_logout_container {
-    height: 50px;
-    width: 98%;
-    text-align: center;
-    background-color: var(--sidebar-button-background-color);
-}
-
-.sb_logout_timer_wrapper {
-    color: var(--font-color-3);
-    font-family: var(--font-secondary);
-    font-variant: var(--font-secondary-variant);
-    font-size: 13px;
-}
-
-.sb_logout_button_wrapper {
-    margin-top: 5px;
-}
-
 .sidebar_secorner {
     position: absolute;
     bottom: 0;
     right: 2%;
-}
-
-.sb_logout_button {
-    text-align: center;
-    color: var(--font-color-1);
-    font-family: var(--font-primary);
-    font-variant: var(--font-primary-variant);
-    font-size: 12px;
 }

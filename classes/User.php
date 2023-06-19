@@ -271,12 +271,12 @@ class User extends Fighter {
      * User constructor.
      * @param System $system
      * @param int    $user_id
-     * @throws Exception
+     * @throws RuntimeException
      */
     public function __construct(System $system, int $user_id) {
         $this->system =& $system;
         if(!$user_id) {
-            throw new Exception("Invalid user id!");
+            throw new RuntimeException("Invalid user id!");
         }
 
         $this->user_id = $user_id;
@@ -288,40 +288,41 @@ class User extends Fighter {
      * @param int    $user_id
      * @param bool   $remote_view
      * @return User
-     * @throws Exception
+     * @throws RuntimeException
      */
     public static function loadFromId(System $system, int $user_id, bool $remote_view = false): User {
         $user = new User($system, $user_id);
 
-        $result = $system->query("SELECT
-            `user_id`,
-            `user_name`,
-            `ban_data`,
-            `ban_type`,
-            `ban_expire`,
-            `journal_ban`,
-            `avatar_ban`,
-            `song_ban`,
-            `last_login`,
-            `regen_rate`,
-			`forbidden_seal`,
-			`chat_color`,
-			`chat_effect`,
-			`staff_level`,
-			`username_changes`,
-			`support_level`,
-			`special_mission`,
-            `rank`,
-            `sensei_id`,
-            `accept_students`,
-            `village`
-			FROM `users` WHERE `user_id`='$user_id' LIMIT 1 FOR UPDATE"
+        $result = $system->db->query(
+            "SELECT
+                `user_id`,
+                `user_name`,
+                `ban_data`,
+                `ban_type`,
+                `ban_expire`,
+                `journal_ban`,
+                `avatar_ban`,
+                `song_ban`,
+                `last_login`,
+                `regen_rate`,
+                `forbidden_seal`,
+                `chat_color`,
+                `chat_effect`,
+                `staff_level`,
+                `username_changes`,
+                `support_level`,
+                `special_mission`,
+                `rank`,
+                `sensei_id`,
+                `accept_students`,
+                `village`
+                FROM `users` WHERE `user_id`='$user_id' LIMIT 1 FOR UPDATE"
         );
-        if($system->db_last_num_rows == 0) {
-            throw new Exception("User does not exist!");
+        if($system->db->last_num_rows == 0) {
+            throw new RuntimeException("User does not exist!");
         }
 
-        $user_data = $system->db_fetch($result);
+        $user_data = $system->db->fetch($result);
 
         $user->user_name = $user_data['user_name'];
         $user->username_changes = $user_data['username_changes'];
@@ -358,11 +359,13 @@ class User extends Fighter {
             if($user->ban_expire > time()) {
                 $user->ban_data[$user->ban_type] = $user->ban_expire;
                 $ban_data = json_encode($user->ban_data);
-                $user->system->query("UPDATE `users` SET
-                    `ban_data` = '{$ban_data}',
-                   `ban_type` = '',
-                   `ban_expire` = NULL
-                WHERE `user_id`='{$user->user_id}' LIMIT 1");
+                $user->system->db->query(
+                    "UPDATE `users` SET
+                        `ban_data` = '{$ban_data}',
+                       `ban_type` = '',
+                       `ban_expire` = NULL
+                    WHERE `user_id`='{$user->user_id}' LIMIT 1"
+                );
             }
         }
 
@@ -380,12 +383,14 @@ class User extends Fighter {
      * @param string $name
      * @param bool   $remote_view
      * @return User|null
-     * @throws Exception
+     * @throws RuntimeException
      */
     public static function findByName(System $system, string $name, bool $remote_view = true): ?User {
-        $result = $system->query("SELECT
-               `user_id` FROM `users` WHERE `user_name`='{$name}'");
-        $user_id = $system->db_fetch($result)['user_id'] ?? null;
+        $result = $system->db->query(
+            "SELECT
+                   `user_id` FROM `users` WHERE `user_name`='{$name}'"
+        );
+        $user_id = $system->db->fetch($result)['user_id'] ?? null;
 
         if($user_id) {
             return User::loadFromId(system: $system, user_id: $user_id, remote_view: $remote_view);
@@ -401,11 +406,11 @@ class User extends Fighter {
     */
 
     /**
-     * @throws Exception
+     * @throws RuntimeException
      */
     public function loadData($UPDATE = User::UPDATE_FULL, $remote_view = false): void {
-        $result = $this->system->query("SELECT * FROM `users` WHERE `user_id`='$this->user_id' LIMIT 1 FOR UPDATE");
-        $user_data = $this->system->db_fetch($result);
+        $result = $this->system->db->query("SELECT * FROM `users` WHERE `user_id`='$this->user_id' LIMIT 1 FOR UPDATE");
+        $user_data = $this->system->db->fetch($result);
 
         $this->current_ip = $user_data['current_ip'];
         $this->last_ip = $user_data['last_ip'];
@@ -430,28 +435,32 @@ class User extends Fighter {
 
         // Message blacklist
         $this->blacklist = [];
-        $result = $this->system->query("SELECT `blocked_ids` FROM `blacklist` WHERE `user_id`='$this->user_id' LIMIT 1");
+        $result = $this->system->db->query(
+            "SELECT `blocked_ids` FROM `blacklist` WHERE `user_id`='$this->user_id' LIMIT 1"
+        );
         if($result->num_rows != 0) {
-            $blacklist = $this->system->db_fetch($result);
+            $blacklist = $this->system->db->fetch($result);
             $this->blacklist = json_decode($blacklist['blocked_ids'], true);
             $this->original_blacklist = $this->blacklist;
         }
         else {
             $blacklist_json = json_encode($this->blacklist);
-            $this->system->query("INSERT INTO `blacklist` (`user_id`, `blocked_ids`) VALUES ('{$this->user_id}', '{$blacklist_json}')");
+            $this->system->db->query(
+                "INSERT INTO `blacklist` (`user_id`, `blocked_ids`) VALUES ('{$this->user_id}', '{$blacklist_json}')"
+            );
             $this->original_blacklist = []; // Default an empty array, user did not have an original.
         }
 
         // Rank stuff
         $this->rank_num = $user_data['rank'];
         $this->rank_up = $user_data['rank_up'];
-        $rank_data = $this->system->query("SELECT * FROM `ranks` WHERE `rank_id`='$this->rank_num'");
-        if($this->system->db_last_num_rows == 0) {
+        $rank_data = $this->system->db->query("SELECT * FROM `ranks` WHERE `rank_id`='$this->rank_num'");
+        if($this->system->db->last_num_rows == 0) {
             $this->system->message("Invalid rank!");
             $this->system->printMessage("Invalid rank!");
         }
         else {
-            $rank_data = $this->system->db_fetch($rank_data);
+            $rank_data = $this->system->db->fetch($rank_data);
             $this->rank = Rank::fromDb($rank_data);
         }
 
@@ -615,9 +624,11 @@ class User extends Fighter {
         // Daily Tasks
         $this->daily_tasks = [];
         $this->daily_tasks_reset = 0;
-        $result = $this->system->query("SELECT `tasks`, `last_reset` FROM `daily_tasks` WHERE `user_id`='$this->user_id' LIMIT 1");
-        if($this->system->db_last_num_rows !== 0) {
-            $dt = $this->system->db_fetch($result);
+        $result = $this->system->db->query(
+            "SELECT `tasks`, `last_reset` FROM `daily_tasks` WHERE `user_id`='$this->user_id' LIMIT 1"
+        );
+        if($this->system->db->last_num_rows !== 0) {
+            $dt = $this->system->db->fetch($result);
 
             $dt_arr = json_decode($dt['tasks'], true);
             $this->daily_tasks = array_map(function($dt_data) {
@@ -627,18 +638,21 @@ class User extends Fighter {
             $this->daily_tasks_reset = $dt['last_reset'];
         }
         else {
-            $this->system->query("INSERT INTO `daily_tasks` (`user_id`, `tasks`, `last_reset`)
-			    VALUES ('{$this->user_id}', '" . json_encode([]) . "', '" . time() . "')"
+            $this->system->db->query(
+                "INSERT INTO `daily_tasks` (`user_id`, `tasks`, `last_reset`)
+                    VALUES ('{$this->user_id}', '" . json_encode([]) . "', '" . time() . "')"
             );
         }
 
         if(empty($this->daily_tasks) || (time() - $this->daily_tasks_reset) > (60 * 60 * 24)) {
             $this->daily_tasks = DailyTask::generateNewTasks($this);
 
-            $this->system->query("UPDATE `daily_tasks` SET
-                `tasks`='" . json_encode($this->daily_tasks) . "',
-                `last_reset`='" . time() . "'
-                WHERE `user_id`='{$this->user_id}'");
+            $this->system->db->query(
+                "UPDATE `daily_tasks` SET
+                    `tasks`='" . json_encode($this->daily_tasks) . "',
+                    `last_reset`='" . time() . "'
+                    WHERE `user_id`='{$this->user_id}'"
+            );
         }
         else if($UPDATE == User::UPDATE_FULL && !$remote_view) {
             // check if the user has completed stuff and reward them if so
@@ -696,9 +710,9 @@ class User extends Fighter {
         // Spouse
         $this->spouse = $user_data['spouse'];
         $this->marriage_time = $user_data['marriage_time'];
-        $result = $this->system->query("SELECT `user_name` FROM `users` WHERE `user_id`='$this->spouse' LIMIT 1");
-        if($this->system->db_last_num_rows) {
-            $this->spouse_name = $this->system->db_fetch($result)['user_name'];
+        $result = $this->system->db->query("SELECT `user_name` FROM `users` WHERE `user_id`='$this->spouse' LIMIT 1");
+        if($this->system->db->last_num_rows) {
+            $this->spouse_name = $this->system->db->fetch($result)['user_name'];
         }
         else {
             //TODO: Make a log if this becomes an issue
@@ -787,9 +801,12 @@ class User extends Fighter {
         // Elements
         $elements = $user_data['elements'];
         if($elements) {
-            $this->elements = json_decode(
-                $user_data['elements'] ?? "[]",
-                true
+            // Array values to undo the "first" "second" etc keys
+            $this->elements = array_values(
+                json_decode(
+                    $user_data['elements'] ?? "[]",
+                    true
+                )
             );
         }
         else {
@@ -875,9 +892,11 @@ class User extends Fighter {
                 //Format data if no bans are presnet
                 $ban_data = (!empty($this->ban_data)) ? json_encode($this->ban_data) : null;
                 //Update user table to remove ban(s)
-                $this->system->query("UPDATE `users` SET `ban_data`='{$ban_data}' WHERE `user_id`='{$this->user_id}' LIMIT 1");
+                $this->system->db->query(
+                    "UPDATE `users` SET `ban_data`='{$ban_data}' WHERE `user_id`='{$this->user_id}' LIMIT 1"
+                );
                 //Return ban message expiry message for display
-                if ($this->system->db_last_affected_rows) {
+                if ($this->system->db->last_affected_rows) {
                     return substr($ban_expire_return_string, 0, strlen($ban_expire_return_string) - 2)
                         . " has expired.";
                 }
@@ -923,11 +942,13 @@ class User extends Fighter {
      * @return null|array
      */
     public function getOfficialWarning($id): ?array {
-        $result = $this->system->query("SELECT * FROM `official_warnings` WHERE `user_id`='{$this->user_id}' AND `warning_id`='{$id}' LIMIT 1");
-        $warning = $this->system->db_fetch($result);
+        $result = $this->system->db->query(
+            "SELECT * FROM `official_warnings` WHERE `user_id`='{$this->user_id}' AND `warning_id`='{$id}' LIMIT 1"
+        );
+        $warning = $this->system->db->fetch($result);
 
         if($warning != null) {
-            $this->system->query("UPDATE `official_warnings` SET `viewed`=1 WHERE `warning_id`='{$id}' LIMIT 1");
+            $this->system->db->query("UPDATE `official_warnings` SET `viewed`=1 WHERE `warning_id`='{$id}' LIMIT 1");
             return $warning;
         }
         else {
@@ -942,14 +963,14 @@ class User extends Fighter {
         }
         $query .= " ORDER BY `time` DESC";
 
-        $result = $this->system->query($query);
-        if($this->system->db_last_num_rows) {
+        $result = $this->system->db->query($query);
+        if($this->system->db->last_num_rows) {
             if($for_notification) {
                 return true;
             }
             else {
                 $warnings = [];
-                while($warning = $this->system->db_fetch($result)) {
+                while($warning = $this->system->db->fetch($result)) {
                     $warnings[] = $warning;
                 }
                 return $warnings;
@@ -974,7 +995,7 @@ class User extends Fighter {
 
     public function getInventory() {
         // Query user owned inventory
-        $result = $this->system->query("SELECT * FROM `user_inventory` WHERE `user_id` = '{$this->user_id}'");
+        $result = $this->system->db->query("SELECT * FROM `user_inventory` WHERE `user_id` = '{$this->user_id}'");
 
         $player_jutsu = [];
         $player_item_inventory = [];
@@ -983,16 +1004,17 @@ class User extends Fighter {
         $this->special_items = [];
 
         // Decode JSON of inventory into variables
-        if($this->system->db_last_num_rows > 0) {
-            $user_inventory = $this->system->db_fetch($result);
+        if($this->system->db->last_num_rows > 0) {
+            $user_inventory = $this->system->db->fetch($result);
             $player_jutsu = json_decode($user_inventory['jutsu'], true);
             $player_item_inventory = json_decode($user_inventory['items'], true);
             $equipped_jutsu = json_decode($user_inventory['equipped_jutsu']);
             $equipped_items = json_decode($user_inventory['equipped_items']);
         }
         else {
-            $this->system->query("INSERT INTO `user_inventory` (`user_id`, `items`, `bloodline_jutsu`, `jutsu`)
-                VALUES ('{$this->user_id}', '', '', '')"
+            $this->system->db->query(
+                "INSERT INTO `user_inventory` (`user_id`, `items`, `bloodline_jutsu`, `jutsu`)
+                    VALUES ('{$this->user_id}', '', '', '')"
             );
         }
 
@@ -1013,12 +1035,12 @@ class User extends Fighter {
 
             $this->jutsu = [];
 
-            $result = $this->system->query(
+            $result = $this->system->db->query(
                 "SELECT * FROM `jutsu` WHERE `jutsu_id` IN ({$player_jutsu_string})
 				AND `purchase_type` != '1' AND `rank` <= '{$this->rank_num}'"
             );
-            if($this->system->db_last_num_rows > 0) {
-                while($jutsu_data = $this->system->db_fetch($result)) {
+            if($this->system->db->last_num_rows > 0) {
+                while($jutsu_data = $this->system->db->fetch($result)) {
                     $jutsu_id = $jutsu_data['jutsu_id'];
                     $jutsu = Jutsu::fromArray($jutsu_id, $jutsu_data);
 
@@ -1079,9 +1101,9 @@ class User extends Fighter {
 
             $this->items = [];
 
-            $result = $this->system->query("SELECT * FROM `items` WHERE `item_id` IN ({$player_items_string})");
-            if($this->system->db_last_num_rows > 0) {
-                while($item_data = $this->system->db_fetch($result)) {
+            $result = $this->system->db->query("SELECT * FROM `items` WHERE `item_id` IN ({$player_items_string})");
+            if($this->system->db->last_num_rows > 0) {
+                while($item_data = $this->system->db->fetch($result)) {
                     $item_id = $item_data['item_id'];
                     $this->items[$item_id] = Item::fromDb($item_data, $player_item_inventory[$item_id]['quantity']);
                     if($this->items[$item_id]->use_type == Item::USE_TYPE_SPECIAL) {
@@ -1119,7 +1141,7 @@ class User extends Fighter {
 
     /**
      * @return void
-     * @throws Exception
+     * @throws RuntimeException
      */
     public function checkTraining(): void {
         // Used for sidemenu display
@@ -1231,11 +1253,11 @@ class User extends Fighter {
      * @param string $stat
      * @param int    $stat_gain
      * @return string
-     * @throws Exception
+     * @throws RuntimeException
      */
     public function addStatGain(string $stat, int $stat_gain): string {
         if(!in_array($stat, $this->stats)) {
-            throw new Exception("Invalid stat!");
+            throw new RuntimeException("Invalid stat!");
         }
 
         $new_total_stats = $this->total_stats + $stat_gain;
@@ -1379,7 +1401,7 @@ class User extends Fighter {
     }
 
     /**
-     * @throws Exception
+     * @throws RuntimeException
      */
     private function setMoney(int $new_amount, string $description) {
         $this->system->currencyLog(
@@ -1394,18 +1416,18 @@ class User extends Fighter {
     }
 
     /**
-     * @throws Exception
+     * @throws RuntimeException
      */
     public function addMoney(int $amount, string $description) {
         $this->setMoney($this->money + $amount, $description);
     }
 
     /**
-     * @throws Exception
+     * @throws RuntimeException
      */
     public function subtractMoney(int $amount, string $description) {
         if($this->money < $amount) {
-            throw new Exception("Not enough money!");
+            throw new RuntimeException("Not enough money!");
         }
         $this->setMoney($this->money - $amount, $description);
     }
@@ -1415,7 +1437,7 @@ class User extends Fighter {
     }
 
     /**
-     * @throws Exception
+     * @throws RuntimeException
      */
     private function setPremiumCredits(int $new_amount, string $description) {
         $this->system->currencyLog(
@@ -1430,7 +1452,7 @@ class User extends Fighter {
     }
 
     /**
-     * @throws Exception
+     * @throws RuntimeException
      */
     public function addPremiumCredits(int $amount, string $description) {
         $this->setPremiumCredits($this->premium_credits + $amount, $description);
@@ -1438,11 +1460,11 @@ class User extends Fighter {
 
 
     /**
-     * @throws Exception
+     * @throws RuntimeException
      */
     public function subtractPremiumCredits(int $amount, string $description) {
         if($this->getPremiumCredits() < $amount) {
-            throw new Exception("Not enough Ancient Kunai!");
+            throw new RuntimeException("Not enough Ancient Kunai!");
         }
         $this->setPremiumCredits($this->premium_credits - $amount, $description);
     }
@@ -1602,29 +1624,29 @@ class User extends Fighter {
 		`clan_changes` = '$this->clan_changes',
 		`censor_explicit_language` = " . (int)$this->censor_explicit_language . "
 		WHERE `user_id` = '{$this->user_id}' LIMIT 1";
-        $this->system->query($query);
+        $this->system->db->query($query);
 
         // Update Blacklist
         if(count($this->blacklist) != count($this->original_blacklist)) {
             $blacklist_json = json_encode($this->blacklist);
-            $this->system->query("UPDATE `blacklist` SET `blocked_ids`='{$blacklist_json}' WHERE `user_id`='{$this->user_id}' LIMIT 1");
+            $this->system->db->query(
+                "UPDATE `blacklist` SET `blocked_ids`='{$blacklist_json}' WHERE `user_id`='{$this->user_id}' LIMIT 1"
+            );
         }
 
         //Update Daily Tasks
         if($this->daily_tasks) {
             $dt = json_encode($this->daily_tasks);
-            $this->system->query("UPDATE `daily_tasks` SET `tasks`='{$dt}' WHERE `user_id`='{$this->user_id}'");
+            $this->system->db->query("UPDATE `daily_tasks` SET `tasks`='{$dt}' WHERE `user_id`='{$this->user_id}'");
         }
     }
 
-    /* function updateInventory()
-        Updates user inventory from class members into database
-        -Parameters-
-    */
+    /**
+     * @throws RuntimeException
+     */
     public function updateInventory(): bool {
         if(!$this->inventory_loaded) {
-            $this->system->error("Called update without fetching inventory!");
-            return false;
+            throw new RuntimeException("Called update without fetching inventory!");
         }
 
         $player_jutsu = [];
@@ -1670,12 +1692,13 @@ class User extends Fighter {
         $player_equipped_jutsu_json = json_encode($this->equipped_jutsu);
         $player_equipped_items_json = json_encode($this->equipped_items);
 
-        $this->system->query("UPDATE `user_inventory` SET
-			`jutsu` = '{$player_jutsu_json}',
-			`items` = '{$player_items_json}',
-			`equipped_jutsu` = '{$player_equipped_jutsu_json}',
-			`equipped_items` = '{$player_equipped_items_json}'
-			WHERE `user_id` = '{$this->user_id}' LIMIT 1"
+        $this->system->db->query(
+            "UPDATE `user_inventory` SET
+                `jutsu` = '{$player_jutsu_json}',
+                `items` = '{$player_items_json}',
+                `equipped_jutsu` = '{$player_equipped_jutsu_json}',
+                `equipped_items` = '{$player_equipped_items_json}'
+                WHERE `user_id` = '{$this->user_id}' LIMIT 1"
         );
 
         $bloodline_jutsu = [];
@@ -1693,8 +1716,9 @@ class User extends Fighter {
 
             $bloodline_jutsu_json = json_encode($bloodline_jutsu);
 
-            $this->system->query("UPDATE `user_bloodlines` SET `jutsu` = '{$bloodline_jutsu_json}'
-				WHERE `user_id` = '{$this->user_id}' LIMIT 1"
+            $this->system->db->query(
+                "UPDATE `user_bloodlines` SET `jutsu` = '{$bloodline_jutsu_json}'
+                    WHERE `user_id` = '{$this->user_id}' LIMIT 1"
             );
         }
 
@@ -1943,14 +1967,15 @@ class User extends Fighter {
         $dateTime = System::dateTimeFromMicrotime(microtime(true));
 
         $dateTimeFormat = System::DB_DATETIME_MS_FORMAT;
-        $this->system->query("INSERT INTO `player_logs`
-            (`user_id`, `user_name`, `log_type`, `log_time`,
-             `log_contents`)
-            VALUES
-            ({$this->user_id}, '{$this->user_name}', '{$log_type}', '{$dateTime->format($dateTimeFormat)}',
-             '{$this->system->clean($log_contents)}'
-            )
-        "
+        $this->system->db->query(
+            "INSERT INTO `player_logs`
+                (`user_id`, `user_name`, `log_type`, `log_time`,
+                 `log_contents`)
+                VALUES
+                ({$this->user_id}, '{$this->user_name}', '{$log_type}', '{$dateTime->format($dateTimeFormat)}',
+                 '{$this->system->db->clean($log_contents)}'
+                )
+            "
         );
 
         return true;
@@ -1959,13 +1984,13 @@ class User extends Fighter {
     /**
      * @param string $entity_id
      * @return User
-     * @throws Exception
+     * @throws RuntimeException
      */
     public static function fromEntityId(System $system, string $entity_id): User {
         $entity_id = System::parseEntityId($entity_id);
 
         if($entity_id->entity_type != self::ENTITY_TYPE) {
-            throw new Exception("Entity ID is not a User!");
+            throw new RuntimeException("Entity ID is not a User!");
         }
 
         return User::loadFromId($system, $entity_id->id);
@@ -2058,41 +2083,49 @@ class User extends Fighter {
         /** @noinspection SqlInsertValues */
         $query = "INSERT INTO `users` (" . implode(',', $columns) . ")
 		    VALUES(" . implode(',', $values) . ")";
-        $system->query($query);
+        $system->db->query($query);
 
-        return $system->db_last_insert_id;
+        return $system->db->last_insert_id;
     }
 
     /* User Settings */
 
     // TO-DO: Full user settings GET, assign to user class variables
     public function setAvatarStyle(string $style): bool {
-        $this->system->query("INSERT INTO `user_settings` (`user_id`, `avatar_style`)
-            VALUES ({$this->user_id}, '{$style}')
-            ON DUPLICATE KEY UPDATE `avatar_style`='{$style}';");
+        $this->system->db->query(
+            "INSERT INTO `user_settings` (`user_id`, `avatar_style`)
+                VALUES ({$this->user_id}, '{$style}')
+                ON DUPLICATE KEY UPDATE `avatar_style`='{$style}';"
+        );
 
-        return ($this->system->db_last_affected_rows > 0);
+        return ($this->system->db->last_affected_rows > 0);
     }
     public function setSidebarPosition(string $position): bool {
-        $this->system->query("INSERT INTO `user_settings` (`user_id`, `sidebar_position`)
-            VALUES ({$this->user_id}, '{$position}')
-            ON DUPLICATE KEY UPDATE `sidebar_position`='{$position}';");
+        $this->system->db->query(
+            "INSERT INTO `user_settings` (`user_id`, `sidebar_position`)
+                VALUES ({$this->user_id}, '{$position}')
+                ON DUPLICATE KEY UPDATE `sidebar_position`='{$position}';"
+        );
 
-        return ($this->system->db_last_affected_rows > 0);
+        return ($this->system->db->last_affected_rows > 0);
     }
     public function setEnableAlerts(bool $enable): bool {
-        $this->system->query("INSERT INTO `user_settings` (`user_id`, `enable_alerts`)
-            VALUES ({$this->user_id}, '{$enable}')
-            ON DUPLICATE KEY UPDATE `enable_alerts`='{$enable}';");
+        $this->system->db->query(
+            "INSERT INTO `user_settings` (`user_id`, `enable_alerts`)
+                VALUES ({$this->user_id}, '{$enable}')
+                ON DUPLICATE KEY UPDATE `enable_alerts`='{$enable}';"
+        );
 
-        return ($this->system->db_last_affected_rows > 0);
+        return ($this->system->db->last_affected_rows > 0);
     }
 
     // TO-DO: Replace with user class variables
     public function getAvatarStyle(): string
     {
-        $avatar_result = $this->system->query("SELECT `avatar_style` FROM `user_settings` WHERE `user_id` = {$this->user_id}");
-        $result = $this->system->db_fetch($avatar_result);
+        $avatar_result = $this->system->db->query(
+            "SELECT `avatar_style` FROM `user_settings` WHERE `user_id` = {$this->user_id}"
+        );
+        $result = $this->system->db->fetch($avatar_result);
         if ($result) {
             if (!array_key_exists($result['avatar_style'], $this->forbidden_seal->avatar_styles)) {
                 return "round";
@@ -2103,8 +2136,10 @@ class User extends Fighter {
     }
     public function getSidebarPosition(): string
     {
-        $avatar_result = $this->system->query("SELECT `sidebar_position` FROM `user_settings` WHERE `user_id` = {$this->user_id}");
-        $result = $this->system->db_fetch($avatar_result);
+        $avatar_result = $this->system->db->query(
+            "SELECT `sidebar_position` FROM `user_settings` WHERE `user_id` = {$this->user_id}"
+        );
+        $result = $this->system->db->fetch($avatar_result);
         if ($result) {
             return $result['sidebar_position'];
         }
@@ -2112,8 +2147,10 @@ class User extends Fighter {
     }
     public function getEnableAlerts(): bool
     {
-        $alerts_result = $this->system->query("SELECT `enable_alerts` FROM `user_settings` WHERE `user_id` = {$this->user_id}");
-        $result = $this->system->db_fetch($alerts_result);
+        $alerts_result = $this->system->db->query(
+            "SELECT `enable_alerts` FROM `user_settings` WHERE `user_id` = {$this->user_id}"
+        );
+        $result = $this->system->db->fetch($alerts_result);
         if ($result) {
             return $result['enable_alerts'];
         }

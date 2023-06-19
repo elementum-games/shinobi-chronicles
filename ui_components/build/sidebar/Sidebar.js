@@ -3,7 +3,6 @@ import { apiFetch } from "../utils/network.js";
 // Initialize
 function Sidebar({
   links,
-  logoutTimer,
   navigationAPIData,
   userAPIData
 }) {
@@ -17,9 +16,7 @@ function Sidebar({
   const [playerSettings, setPlayerSettings] = React.useState(userAPIData.playerSettings);
   const [regenTime, setRegenTime] = React.useState(userAPIData.playerResources.regen_time);
   const [regenOffset, setRegenOffset] = React.useState(calculateRegenOffset(userAPIData.playerResources.regen_time));
-  const [logoutTime, setLogoutTime] = React.useState(null);
   const regenTimeVar = React.useRef(userAPIData.playerResources.regen_time);
-  const logoutTimeVar = React.useRef(logoutTimer);
   const queryParameters = new URLSearchParams(window.location.search);
   const pageID = React.useRef(queryParameters.get("id"));
 
@@ -69,22 +66,6 @@ function Sidebar({
     var offset = 126 - 126 * percent / 100;
     return offset;
   }
-  function handleLogout() {
-    logoutTimeVar.current--;
-    setLogoutTime(logoutTimeVar.current);
-  }
-  function formatLogoutTimer(ticks) {
-    var hours = Math.floor(ticks / 3600);
-    var minutes = Math.floor(ticks % 3600 / 60);
-    var seconds = ticks % 60;
-    var formattedHours = hours.toString().padStart(2, '0');
-    var formattedMinutes = minutes.toString().padStart(2, '0');
-    var formattedSeconds = seconds.toString().padStart(2, '0');
-    return formattedHours + ':' + formattedMinutes + ':' + formattedSeconds;
-  }
-  function logoutOnClick(event) {
-    window.location.href = event.currentTarget.getAttribute("href");
-  }
 
   // Content
   function displaySection(section_data, title) {
@@ -117,7 +98,8 @@ function Sidebar({
       return /*#__PURE__*/React.createElement("a", {
         key: i,
         href: link.url,
-        className: pageID.current == link.id ? "sb_link_wrapper selected t-center ft-small ft-s ft-c3" : "sb_link_wrapper t-center ft-small ft-s ft-c3"
+        className: pageID.current == link.id ? "sb_link_wrapper selected t-center ft-small ft-s ft-c3" : "sb_link_wrapper t-center ft-small ft-s ft-c3",
+        draggable: "false"
       }, /*#__PURE__*/React.createElement("label", {
         className: "sb_label"
       }, link.title));
@@ -283,27 +265,6 @@ function Sidebar({
       src: "images/v2/decorations/barrightcorner.png"
     })))));
   }
-  function displayLogout(logout_link, logoutTime) {
-    return /*#__PURE__*/React.createElement("div", {
-      className: "sb_logout_container"
-    }, /*#__PURE__*/React.createElement("div", {
-      className: "sb_logout_timer_wrapper"
-    }, formatLogoutTimer(logoutTime)), /*#__PURE__*/React.createElement("div", {
-      className: "sb_logout_button_wrapper"
-    }, /*#__PURE__*/React.createElement("input", {
-      className: "sb_logout_button button-bar_large t-hover",
-      href: logout_link,
-      onClick: logoutOnClick,
-      type: "button",
-      value: "LOGOUT"
-    })), /*#__PURE__*/React.createElement("img", {
-      className: "swcorner",
-      src: "images/v2/decorations/swcorner.png"
-    }), /*#__PURE__*/React.createElement("img", {
-      className: "sidebar_secorner",
-      src: "images/v2/decorations/secorner.png"
-    }));
-  }
 
   // Misc
   function handleErrors(errors) {
@@ -313,9 +274,7 @@ function Sidebar({
 
   // Initialize
   React.useEffect(() => {
-    setLogoutTime(logoutTimeVar.current);
     const regenInterval = setInterval(() => {
-      handleLogout();
       handleRegen();
     }, 1000);
     return () => clearInterval(regenInterval);
@@ -324,6 +283,6 @@ function Sidebar({
   // Display
   return /*#__PURE__*/React.createElement("div", {
     id: "sidebar"
-  }, displayCharacterSection(playerData, playerResources, playerSettings, regenTime, regenOffset), displaySection(userMenu, "Player Menu"), displaySection(activityMenu, "Action Menu"), displaySection(villageMenu, "Village Menu"), staffMenu.length ? displaySection(staffMenu, "Staff Menu") : null, displayLogout(links.logout_link, logoutTime));
+  }, displayCharacterSection(playerData, playerResources, playerSettings, regenTime, regenOffset), displaySection(userMenu, "Player Menu"), displaySection(activityMenu, "Action Menu"), displaySection(villageMenu, "Village Menu"), staffMenu.length ? displaySection(staffMenu, "Staff Menu") : null);
 }
 window.Sidebar = Sidebar;

@@ -104,11 +104,11 @@ class BattleField {
     /**
      * @param string $fighter_id
      * @param int    $target_tile
-     * @throws Exception
+     * @throws RuntimeException
      */
     public function moveFighterTo(string $fighter_id, int $target_tile): void {
         if(!$this->tileIsInBounds($target_tile)) {
-            throw new Exception("Cannot move to target tile - Out of bounds!");
+            throw new RuntimeException("Cannot move to target tile - Out of bounds!");
         }
 
         $this->fighter_locations[$fighter_id] = $target_tile;
@@ -169,11 +169,11 @@ class BattleField {
      * @param string $fighter_id
      * @param int    $target_tile
      * @return float|int
-     * @throws Exception
+     * @throws RuntimeException
      */
     public function distanceFromFighter(string $fighter_id, int $target_tile): float|int {
         if(!isset($this->fighter_locations[$fighter_id])) {
-            throw new Exception("Invalid fighter location!");
+            throw new RuntimeException("Invalid fighter location!");
         }
 
         return abs($this->fighter_locations[$fighter_id] - $target_tile);

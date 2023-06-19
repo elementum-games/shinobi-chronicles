@@ -19,7 +19,7 @@ try {
     if (isset($_POST['request'])) {
         $request = filter_input(INPUT_POST, 'request', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
     } else {
-        throw new Exception('No request was made!');
+        throw new RuntimeException('No request was made!');
     }
 
     $NotificationResponse = new NotificationAPIResponse();
@@ -33,12 +33,12 @@ try {
             break;
         case "closeNotification":
             $NotificationResponse->response_data = [
-                'success' => $NotificationManager->closeNotification($system->clean($_POST['notification_id'])),
+                'success' => $NotificationManager->closeNotification($system->db->clean($_POST['notification_id'])),
             ];
             break;
         case "clearNotificationAlert":
             $NotificationResponse->response_data = [
-                'success' => $NotificationManager->clearNotificationAlert($system->clean($_POST['notification_id'])),
+                'success' => $NotificationManager->clearNotificationAlert($system->db->clean($_POST['notification_id'])),
             ];
             break;
         default:

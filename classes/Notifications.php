@@ -80,14 +80,14 @@ class Notifications {
 
         //Battle
         if($player->battle_id > 0) {
-            $result = $system->query(
+            $result = $system->db->query(
                 "SELECT `battle_type` FROM `battles` WHERE `battle_id`='$player->battle_id' LIMIT 1"
             );
-            if($system->db_last_num_rows == 0) {
+            if($system->db->last_num_rows == 0) {
                 $player->battle_id = 0;
             }
             else {
-                $result = $system->db_fetch($result);
+                $result = $system->db->fetch($result);
                 $link = null;
                 switch($result['battle_type']) {
                     case Battle::TYPE_AI_ARENA:

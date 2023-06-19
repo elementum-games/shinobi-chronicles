@@ -2,6 +2,7 @@
 
 require_once __DIR__ . '/types/MissionNotificationDto.php';
 require_once __DIR__ . '/types/BattleNotificationDto.php';
+require_once __DIR__ . '/types/ChatNotificationDto.php';
 
 class NotificationDto {
     public function __construct(

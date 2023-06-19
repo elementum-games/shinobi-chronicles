@@ -8,7 +8,7 @@ function team() {
 
     //Process these requests prior to display to avoid having to reload page
     if(isset($_POST['create_team'])) {
-        $name = $system->clean($_POST['name']);
+        $name = $system->db->clean($_POST['name']);
         $name_len = strlen($name);
         $min_name_len = Team::MIN_NAME_LENGTH;
         $max_name_len = Team::MAX_NAME_LENGTH;
@@ -16,13 +16,13 @@ function team() {
         try {
             // Name validation
             if($name_len < $min_name_len) {
-                throw new Exception("Please enter a name longer than " . ($min_name_len - 1) . " characters!");
+                throw new RuntimeException("Please enter a name longer than " . ($min_name_len - 1) . " characters!");
             }
             if($name_len > $max_name_len) {
-                throw new Exception("Please enter a name shorter than " . ($max_name_len + 1) . " characters!");
+                throw new RuntimeException("Please enter a name shorter than " . ($max_name_len + 1) . " characters!");
             }
             if(!preg_match('/^[a-zA-Z0-9 _-]+$/', $name)) {
-                throw new Exception("Only alphanumeric characters, dashes, space, and underscores are allowed in names!");
+                throw new RuntimeException("Only alphanumeric characters, dashes, space, and underscores are allowed in names!");
             }
 
             //Check for at least 3 letters
@@ -37,18 +37,18 @@ function team() {
                 }
             }
             if($symbol_count >= $letter_count) {
-                throw new Exception("Name must be more than half letters!");
+                throw new RuntimeException("Name must be more than half letters!");
             }
 
             //Explicit language
             if($system->explicitLanguageCheck($name)) {
-                throw new Exception("Inappropriate language is not allowed in team names!");
+                throw new RuntimeException("Inappropriate language is not allowed in team names!");
             }
 
             //Check if team exists
-            $system->query("SELECT `team_id` FROM `teams` WHERE `name`='$name' LIMIT 1");
-            if($system->db_last_num_rows > 0) {
-                throw new Exception("Team name already in use!");
+            $system->db->query("SELECT `team_id` FROM `teams` WHERE `name`='$name' LIMIT 1");
+            if($system->db->last_num_rows > 0) {
+                throw new RuntimeException("Team name already in use!");
             }
 
             //Create team
@@ -61,7 +61,7 @@ function team() {
 
             if($created) {
                 $system->message("Team created!");
-                $team_id = $system->db_last_insert_id;
+                $team_id = $system->db->last_insert_id;
                 $player->team = Team::findById($system, $team_id);
 
             }
@@ -77,7 +77,7 @@ function team() {
             $team_id = $player->team_invite;
             $team = Team::findById($system, $team_id);
             if($team == null) {
-                throw new Exception("Invalid team!");
+                throw new RuntimeException("Invalid team!");
             }
 
             $team->addMember($player);
@@ -89,7 +89,7 @@ function team() {
     }
     else if(isset($_GET['decline_invite'])) {
         $player->team_invite = 0;
-        $system->query("UPDATE `users` SET `team_id`=0 WHERE `user_id`='{$player->user_id}' LIMIT 1");
+        $system->db->query("UPDATE `users` SET `team_id`=0 WHERE `user_id`='{$player->user_id}' LIMIT 1");
         $system->message("Invite declined!");
     }
     else if(isset($_GET['leave_team']) && $player->team) {
@@ -111,7 +111,7 @@ function team() {
 
             //Leader must transfer leadership before leaving
             if($player->user_id == $player->team->leader && $count > 1) {
-                throw new Exception("You must first transfer leadership!");
+                throw new RuntimeException("You must first transfer leadership!");
             }
 
             if(!isset($_GET['leave_confirm'])) {
@@ -120,8 +120,8 @@ function team() {
             else {
                 //Delete team if leader only
                 if($count == 1) {
-                    $system->query("DELETE FROM `teams` WHERE `team_id`='{$player->team->id}' LIMIT 1");
-                    if($system->db_last_affected_rows > 0) {
+                    $system->db->query("DELETE FROM `teams` WHERE `team_id`='{$player->team->id}' LIMIT 1");
+                    if($system->db->last_affected_rows > 0) {
                         $system->message("You have left your team.");
                         $player->team = null;
                     }
@@ -138,8 +138,10 @@ function team() {
                     $members = json_encode($members);
 
                     // Update team
-                    $system->query("UPDATE `teams` SET `members`='$members' WHERE `team_id`='{$player->team->id}' LIMIT 1");
-                    if($system->db_last_affected_rows > 0) {
+                    $system->db->query(
+                        "UPDATE `teams` SET `members`='$members' WHERE `team_id`='{$player->team->id}' LIMIT 1"
+                    );
+                    if($system->db->last_affected_rows > 0) {
                         $system->message("You have left your team.");
                         $player->team = null;
                     }
@@ -176,13 +178,47 @@ function team() {
     }
     else {
         if(isset($_GET['join_mission']) && $player->team->mission_id) {
-            $mission_id = $player->team->mission_id;
-            $mission = new Mission($mission_id, $player, $player->team);
+            if ($player->mission_id) {
+                $system->message("You are already on a mission!");
+            }
+            else {
+                $mission_id = $player->team->mission_id;
+                $mission = new Mission($mission_id, $player, $player->team);
 
-            $player->mission_id = $mission_id;
-            $player->log(User::LOG_MISSION, "Team Mission ID #{$mission_id}");
+                $player->mission_id = $mission_id;
+                $player->log(User::LOG_MISSION, "Team Mission ID #{$mission_id}");
 
-            $system->message("Mission joined!");
+                $system->message("Mission joined!");
+
+                // Create notification
+                $result = $system->db->query("SELECT `name` FROM `missions` WHERE `mission_id` = {$mission_id}");
+                $mission_name = $system->db->fetch($result)['name'];
+                require_once __DIR__ . '/../classes/notification/NotificationManager.php';
+                if ($player->mission_stage['action_type'] == 'travel') {
+                    $mission_location = TravelCoords::fromDbString($player->mission_stage['action_data']);
+                    $new_notification = new MissionNotificationDto(
+                        type: "mission_team",
+                        message: $mission_name . ": Travel to " . $mission_location->x . ":" . $mission_location->y,
+                        user_id: $player->user_id,
+                        created: time(),
+                        mission_rank: "Team",
+                        alert: false,
+                    );
+                    NotificationManager::createNotification($new_notification, $system, NotificationManager::UPDATE_REPLACE);
+                }
+                else {
+                    require_once __DIR__ . '/../classes/notification/NotificationManager.php';
+                    $new_notification = new MissionNotificationDto(
+                        type: "mission_team",
+                        message: $mission_name . " in progress",
+                        user_id: $player->user_id,
+                        created: time(),
+                        mission_rank: "Team",
+                        alert: false,
+                    );
+                    NotificationManager::createNotification($new_notification, $system, NotificationManager::UPDATE_REPLACE);
+                }
+            }
         }
 
         //Leader controls
@@ -193,24 +229,28 @@ function team() {
                     $team = $player->team;
 
                     if($new_leader == $team->leader || $new_leader == 0) {
-                        throw new Exception("You must select a new leader!");
+                        throw new RuntimeException("You must select a new leader!");
                     }
                     if(!in_array($new_leader, $team->members)) {
-                        throw new Exception("Invalid replacement!");
+                        throw new RuntimeException("Invalid replacement!");
                     }
 
-                    $result = $system->query("SELECT `user_name` FROM `users` WHERE `user_id`='{$new_leader}' LIMIT 1");
-                    if(!$system->db_last_num_rows) {
-                        throw new Exception("Invalid leader!");
+                    $result = $system->db->query(
+                        "SELECT `user_name` FROM `users` WHERE `user_id`='{$new_leader}' LIMIT 1"
+                    );
+                    if(!$system->db->last_num_rows) {
+                        throw new RuntimeException("Invalid leader!");
                     }
-                    $new_leader_name = $system->db_fetch($result)['user_name'];
+                    $new_leader_name = $system->db->fetch($result)['user_name'];
 
                     if(!isset($_POST['confirm'])) {
                         require "templates/team/transfer_confirm.php";
                     }
                     else {
-                        $system->query("UPDATE `teams` SET `leader`='{$new_leader}' WHERE `team_id`='{$player->team->id}' LIMIT 1");
-                        if($system->db_last_affected_rows) {
+                        $system->db->query(
+                            "UPDATE `teams` SET `leader`='{$new_leader}' WHERE `team_id`='{$player->team->id}' LIMIT 1"
+                        );
+                        if($system->db->last_affected_rows) {
                             $player->team->leader = $new_leader;
                             $system->message("Leadership transferred!");
                         }
@@ -224,16 +264,16 @@ function team() {
             }
             else if(isset($_POST['set_boost'])) {
                 try {
-                    $boost_type = $system->clean($_POST['boost_type']);
-                    $boost_size = $system->clean($_POST['boost_size']);
+                    $boost_type = $system->db->clean($_POST['boost_type']);
+                    $boost_size = $system->db->clean($_POST['boost_size']);
 
                     $allowed_boosts = Team::$allowed_boosts;
 
                     if(!isset($allowed_boosts[$boost_type])) {
-                        throw new Exception("Invalid boost!");
+                        throw new RuntimeException("Invalid boost!");
                     }
                     if(!isset($allowed_boosts[$boost_type][$boost_size])) {
-                        throw new Exception("Invalid boost length!");
+                        throw new RuntimeException("Invalid boost length!");
                     }
 
                     $player->team->setBoost($boost_type, $boost_size);
@@ -244,27 +284,31 @@ function team() {
             }
             else if(isset($_GET['invite'])) {
                 try {
-                    $username = $system->clean($_GET['user_name']);
-                    $result = $system->query("SELECT `user_id`, `rank`, `team_id`, `village` FROM `users` WHERE `user_name`='{$username}' LIMIT 1");
+                    $username = $system->db->clean($_GET['user_name']);
+                    $result = $system->db->query(
+                        "SELECT `user_id`, `rank`, `team_id`, `village` FROM `users` WHERE `user_name`='{$username}' LIMIT 1"
+                    );
 
-                    if($system->db_last_num_rows == 0) {
-                        throw new Exception("Invalid user!");
+                    if($system->db->last_num_rows == 0) {
+                        throw new RuntimeException("Invalid user!");
                     }
 
-                    $user_data = $system->db_fetch($result);
+                    $user_data = $system->db->fetch($result);
 
                     if($user_data['rank'] < Team::MIN_RANK) {
-                        throw new Exception("Team members must be a " . $RANK_NAMES[Team::MIN_RANK] . " or higher!");
+                        throw new RuntimeException("Team members must be a " . $RANK_NAMES[Team::MIN_RANK] . " or higher!");
                     }
                     if($user_data['village'] != $player->village->name) {
-                        throw new Exception("You can only invite members from your village! ");
+                        throw new RuntimeException("You can only invite members from your village! ");
                     }
                     if(!empty($user_data['team_id'])) {
-                        throw new Exception("Player is already in a team or is invited to one!");
+                        throw new RuntimeException("Player is already in a team or is invited to one!");
                     }
 
-                    $system->query("UPDATE `users` SET `team_id`='invite:{$player->team->id}' WHERE `user_id`='{$user_data['user_id']}' LIMIT 1");
-                    if($system->db_last_affected_rows) {
+                    $system->db->query(
+                        "UPDATE `users` SET `team_id`='invite:{$player->team->id}' WHERE `user_id`='{$user_data['user_id']}' LIMIT 1"
+                    );
+                    if($system->db->last_affected_rows) {
                         $system->message("Player invited!");
                     }
                     else {
@@ -293,14 +337,16 @@ function team() {
                     }
 
                     if($kick_key === false) {
-                        throw new Exception("Invalid user key!");
+                        throw new RuntimeException("Invalid user key!");
                     }
 
-                    $result = $system->query("SELECT `user_id`, `user_name` FROM `users` WHERE `user_id`='{$user_to_kick}' LIMIT 1");
-                    if($system->db_last_num_rows == 0) {
-                        throw new Exception("Invalid user!");
+                    $result = $system->db->query(
+                        "SELECT `user_id`, `user_name` FROM `users` WHERE `user_id`='{$user_to_kick}' LIMIT 1"
+                    );
+                    if($system->db->last_num_rows == 0) {
+                        throw new RuntimeException("Invalid user!");
                     }
-                    $user_name = $system->db_fetch($result)['user_name'];
+                    $user_name = $system->db->fetch($result)['user_name'];
 
                     if(!isset($_POST['kick_confirm'])) {
                         require "templates/team/kick_confirm.php";
@@ -312,10 +358,12 @@ function team() {
                         $player->team->members = $members;
                         $members = json_encode($members);
 
-                        $system->query("UPDATE `teams` SET `members`='{$members}' WHERE `team_id`='{$player->team->id}' LIMIT 1");
-                        $system->query("UPDATE `users` SET `team_id`='0' WHERE `user_id`='{$user_to_kick}' LIMIT 1");
+                        $system->db->query(
+                            "UPDATE `teams` SET `members`='{$members}' WHERE `team_id`='{$player->team->id}' LIMIT 1"
+                        );
+                        $system->db->query("UPDATE `users` SET `team_id`='0' WHERE `user_id`='{$user_to_kick}' LIMIT 1");
 
-                        if($system->db_last_affected_rows > 0) {
+                        if($system->db->last_affected_rows > 0) {
                             $system->message("You have kicked <b>$user_name</b>!");
                         }
                         else {
@@ -328,10 +376,12 @@ function team() {
             }
             else if(isset($_POST['logo_link'])) {
                 try {
-                    $logo_link = $system->clean($_POST['logo_link']);
-                    $system->query("UPDATE `teams` SET `logo`='{$logo_link}' WHERE `team_id`='{$player->team->id}' LIMIT 1");
+                    $logo_link = $system->db->clean($_POST['logo_link']);
+                    $system->db->query(
+                        "UPDATE `teams` SET `logo`='{$logo_link}' WHERE `team_id`='{$player->team->id}' LIMIT 1"
+                    );
 
-                    if($system->db_last_affected_rows) {
+                    if($system->db->last_affected_rows) {
                         $system->message("Logo updated!");
                     }
                     else {
@@ -344,25 +394,56 @@ function team() {
             else if(isset($_POST['start_mission'])) {
                 try {
                     $mission_id = (int) $_POST['mission_id'];
-                    $result = $system->query("SELECT `mission_id` FROM `missions` WHERE `mission_id`='{$mission_id}' AND `mission_type`=3 LIMIT 1");
+                    $result = $system->db->query(
+                        "SELECT `mission_id` FROM `missions` WHERE `mission_id`='{$mission_id}' AND `mission_type`=3 LIMIT 1"
+                    );
 
-                    if($system->db_last_num_rows == 0) {
-                        throw new Exception("Invalid mission!");
+                    if($system->db->last_num_rows == 0) {
+                        throw new RuntimeException("Invalid mission!");
                     }
                     if($player->team->mission_id) {
-                        throw new Exception("Team is already on a mission!");
+                        throw new RuntimeException("Team is already on a mission!");
                     }
                     if($player->mission_id) {
-                        throw new Exception("You are already on a mission!");
+                        throw new RuntimeException("You are already on a mission!");
                     }
 
                     $player->team->mission_id = $mission_id;
                     $mission = new Mission($mission_id, $player, $player->team);
 
                     $player->mission_id = $mission_id;
-                    $system->query("UPDATE `teams` SET `mission_id`='{$mission_id}' WHERE `team_id`='{$player->team->id}' LIMIT 1");
-                    if($system->db_last_affected_rows) {
+                    $system->db->query(
+                        "UPDATE `teams` SET `mission_id`='{$mission_id}' WHERE `team_id`='{$player->team->id}' LIMIT 1"
+                    );
+                    if($system->db->last_affected_rows) {
                         $system->message("Mission started!");
+                        // Create notification
+                        $result = $system->db->query("SELECT `name` FROM `missions` WHERE `mission_id` = {$mission_id}");
+                        $mission_name = $system->db->fetch($result)['name'];
+                        require_once __DIR__ . '/../classes/notification/NotificationManager.php';
+                        if ($player->mission_stage['action_type'] == 'travel') {
+                            $mission_location = TravelCoords::fromDbString($player->mission_stage['action_data']);
+                            $new_notification = new MissionNotificationDto(
+                                type: "mission_team",
+                                message: $mission_name . ": Travel to " . $mission_location->x . ":" . $mission_location->y,
+                                user_id: $player->user_id,
+                                created: time(),
+                                mission_rank: "Team",
+                                alert: false,
+                            );
+                            NotificationManager::createNotification($new_notification, $system, NotificationManager::UPDATE_REPLACE);
+                        } else {
+                            require_once __DIR__ . '/../classes/notification/NotificationManager.php';
+                            $new_notification = new MissionNotificationDto(
+                                type: "mission_team",
+                                message: $mission_name . " in progress",
+                                user_id: $player->user_id,
+                                created: time(),
+                                mission_rank: "Team",
+                                alert: false,
+                            );
+                            NotificationManager::createNotification($new_notification, $system, NotificationManager::UPDATE_REPLACE);
+                        }
                     }
                     else {
                         $system->message("Error starting mission!");
@@ -376,7 +457,7 @@ function team() {
                     $mission_id = $player->team->mission_id;
 
                     if($mission_id == 0) {
-                        throw new Exception("Your team is not performing a mission!");
+                        throw new RuntimeException("Your team is not performing a mission!");
                     }
 
                     if(!isset($_GET['confirm'])) {
@@ -384,8 +465,12 @@ function team() {
                     }
                     else {
 
-                        $system->query("UPDATE `teams` SET `mission_id`='0', `mission_stage`='' WHERE `team_id`='{$player->team->id}' LIMIT 1");
-                        $system->query("UPDATE `users` SET `mission_id`='0' WHERE `team_id`='{$player->team->id}' AND `mission_id`='{$mission_id}'");
+                        $system->db->query(
+                            "UPDATE `teams` SET `mission_id`='0', `mission_stage`='' WHERE `team_id`='{$player->team->id}' LIMIT 1"
+                        );
+                        $system->db->query(
+                            "UPDATE `users` SET `mission_id`='0' WHERE `team_id`='{$player->team->id}' AND `mission_id`='{$mission_id}'"
+                        );
 
                         $player->team->mission_id = 0;
 
@@ -402,9 +487,11 @@ function team() {
         }
 
         //Fetch team data
-        $result = $system->query("SELECT `user_name`, `avatar_link`, `forbidden_seal` FROM `users` WHERE `user_id`='{$player->team->leader}' LIMIT 1");
-        if($system->db_last_num_rows) {
-            $result = $system->db_fetch($result);
+        $result = $system->db->query(
+            "SELECT `user_name`, `avatar_link`, `forbidden_seal` FROM `users` WHERE `user_id`='{$player->team->leader}' LIMIT 1"
+        );
+        if($system->db->last_num_rows) {
+            $result = $system->db->fetch($result);
             $leader_name = $result['user_name'];
             $leader_avatar = $result['avatar_link'];
             $leader_avatar_size = User::AVATAR_MAX_SIZE;
@@ -420,24 +507,28 @@ function team() {
             $leader_avatar = './images/default_avatar.png';
         }
 
-        $result = $system->query("SELECT `mission_id`, `name`, `rank` FROM `missions` WHERE `mission_type`=3");
+        $result = $system->db->query("SELECT `mission_id`, `name`, `rank` FROM `missions` WHERE `mission_type`=3");
         $available_missions = [];
-        while($row = $system->db_fetch($result)) {
+        while($row = $system->db->fetch($result)) {
             $available_missions[] = $row;
         }
 
         // Current mission display
         $team_mission_name = null;
         if($player->team->mission_id) {
-            $result = $system->query("SELECT `name` FROM `missions` WHERE `mission_id`={$player->team->mission_id} LIMIT 1");
-            $team_mission_name = $system->db_fetch($result)['name'];
+            $result = $system->db->query(
+                "SELECT `name` FROM `missions` WHERE `mission_id`={$player->team->mission_id} LIMIT 1"
+            );
+            $team_mission_name = $system->db->fetch($result)['name'];
         }
 
         // Members
         $user_ids = implode(',', $player->team->members);
-        $result = $system->query("SELECT `user_id`, `user_name`, `rank`, `level`, `monthly_pvp` FROM `users`
-        WHERE `user_id` IN ($user_ids) ORDER BY `rank` DESC, `level` DESC");
-        $team_members = $system->db_fetch_all($result);
+        $result = $system->db->query(
+            "SELECT `user_id`, `user_name`, `rank`, `level`, `monthly_pvp` FROM `users`
+            WHERE `user_id` IN ($user_ids) ORDER BY `rank` DESC, `level` DESC"
+        );
+        $team_members = $system->db->fetch_all($result);
 
         // Leader tools
         if($player->user_id == $player->team->leader) {

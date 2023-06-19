@@ -1,7 +1,7 @@
 import { apiFetch } from "../utils/network.js";
 
 // Initialize
-function Sidebar({ links, logoutTimer, navigationAPIData, userAPIData }) {
+function Sidebar({ links, navigationAPIData, userAPIData }) {
     // Hooks
     const [userMenu, setUserMenu] = React.useState(navigationAPIData.userMenu);
     const [activityMenu, setActivityMenu] = React.useState(navigationAPIData.activityMenu);
@@ -12,9 +12,7 @@ function Sidebar({ links, logoutTimer, navigationAPIData, userAPIData }) {
     const [playerSettings, setPlayerSettings] = React.useState(userAPIData.playerSettings);
     const [regenTime, setRegenTime] = React.useState(userAPIData.playerResources.regen_time);
     const [regenOffset, setRegenOffset] = React.useState(calculateRegenOffset(userAPIData.playerResources.regen_time));
-    const [logoutTime, setLogoutTime] = React.useState(null);
     const regenTimeVar = React.useRef(userAPIData.playerResources.regen_time);
-    const logoutTimeVar = React.useRef(logoutTimer);
     const queryParameters = new URLSearchParams(window.location.search);
     const pageID = React.useRef(queryParameters.get("id"));
 
@@ -69,27 +67,6 @@ function Sidebar({ links, logoutTimer, navigationAPIData, userAPIData }) {
         return offset;
     }
 
-    function handleLogout() {
-        logoutTimeVar.current--;
-        setLogoutTime(logoutTimeVar.current);
-    }
-
-    function formatLogoutTimer(ticks) {
-        var hours = Math.floor(ticks / 3600);
-        var minutes = Math.floor((ticks % 3600) / 60);
-        var seconds = ticks % 60;
-
-        var formattedHours = hours.toString().padStart(2, '0');
-        var formattedMinutes = minutes.toString().padStart(2, '0');
-        var formattedSeconds = seconds.toString().padStart(2, '0');
-
-        return formattedHours + ':' + formattedMinutes + ':' + formattedSeconds;
-    }
-
-    function logoutOnClick(event) {
-        window.location.href = event.currentTarget.getAttribute("href");
-    }
-
     // Content
     function displaySection(section_data, title) {
         return (
@@ -111,7 +88,7 @@ function Sidebar({ links, logoutTimer, navigationAPIData, userAPIData }) {
                     {(section_data) &&
                         section_data.map(function (link, i) {
                             return (
-                                <a key={i} href={link.url} className={pageID.current == link.id ? "sb_link_wrapper selected t-center ft-small ft-s ft-c3" : "sb_link_wrapper t-center ft-small ft-s ft-c3"}>
+                                <a key={i} href={link.url} className={pageID.current == link.id ? "sb_link_wrapper selected t-center ft-small ft-s ft-c3" : "sb_link_wrapper t-center ft-small ft-s ft-c3"} draggable="false">
                                         <label className={"sb_label"}>{link.title}</label>
                                 </a>
                             )
@@ -215,21 +192,6 @@ function Sidebar({ links, logoutTimer, navigationAPIData, userAPIData }) {
         )
     }
 
-    function displayLogout(logout_link, logoutTime) {
-        return (
-            <div className="sb_logout_container">
-                <div className="sb_logout_timer_wrapper">
-                    {formatLogoutTimer(logoutTime)}
-                </div>
-                <div className="sb_logout_button_wrapper">
-                    <input className={"sb_logout_button button-bar_large t-hover"} href={logout_link} onClick={logoutOnClick} type="button" value="LOGOUT" />
-                </div>
-                <img className="swcorner" src="images/v2/decorations/swcorner.png" />
-                <img className="sidebar_secorner" src="images/v2/decorations/secorner.png" />
-            </div>
-        )
-    }
-
     // Misc
     function handleErrors(errors) {
         console.warn(errors);
@@ -238,10 +200,8 @@ function Sidebar({ links, logoutTimer, navigationAPIData, userAPIData }) {
 
     // Initialize
     React.useEffect(() => {
-        setLogoutTime(logoutTimeVar.current);
 
         const regenInterval = setInterval(() => {
-            handleLogout();
             handleRegen();
         }, 1000);
 
@@ -256,7 +216,6 @@ function Sidebar({ links, logoutTimer, navigationAPIData, userAPIData }) {
             {displaySection(activityMenu, "Action Menu")}
             {displaySection(villageMenu, "Village Menu")}
             {staffMenu.length ? displaySection(staffMenu, "Staff Menu") : null}
-            {displayLogout(links.logout_link, logoutTime)}
         </div>
     )
 }

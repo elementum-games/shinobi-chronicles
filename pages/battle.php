@@ -10,7 +10,7 @@ Algorithm:	See master_plan.html
 
 /**
  * @return bool
- * @throws Exception
+ * @throws RuntimeException
  */
 function battle(): bool {
 	global $system;
@@ -41,59 +41,59 @@ function battle(): bool {
 	}
 	else if(isset($_GET['attack'])) {
 		try {
-			$attack_id = $system->clean($_GET['attack']);
+			$attack_id = $system->db->clean($_GET['attack']);
 
 			try {
                 // get user id off the attack link
-                $result = $system->query("SELECT `user_id` FROM `users` WHERE `attack_id`='{$attack_id}' LIMIT 1");
-                if ($system->db_last_num_rows == 0) {
-                    throw new Exception("Invalid user!");
+                $result = $system->db->query("SELECT `user_id` FROM `users` WHERE `attack_id`='{$attack_id}' LIMIT 1");
+                if ($system->db->last_num_rows == 0) {
+                    throw new RuntimeException("Invalid user!");
                 }
 
-                $attack_link = $system->db_fetch($result);
+                $attack_link = $system->db->fetch($result);
                 $attack_id = $attack_link['user_id'];
 
 			    $user = User::loadFromId($system, $attack_id);
 			    $user->loadData(User::UPDATE_NOTHING, true);
-            } catch(Exception $e) {
-                throw new Exception("Invalid user! " . $e->getMessage());
+            } catch(RuntimeException $e) {
+                throw new RuntimeException("Invalid user! " . $e->getMessage());
             }
 
             // check if the location forbids pvp
             if ($player->current_location->location_id && $player->current_location->pvp_allowed == 0) {
-                throw new Exception("You cannot fight at this location!");
+                throw new RuntimeException("You cannot fight at this location!");
             }
 
 			if($user->village->name == $player->village->name) {
-				throw new Exception("You cannot attack people from your own village!");
+				throw new RuntimeException("You cannot attack people from your own village!");
 			}
 
             if($user->rank_num < 3) {
-				throw new Exception("You cannot attack people below Chuunin rank!");
+				throw new RuntimeException("You cannot attack people below Chuunin rank!");
 			}
 			if($player->rank_num < 3) {
-				throw new Exception("You cannot attack people Chuunin rank and higher!");
+				throw new RuntimeException("You cannot attack people Chuunin rank and higher!");
 			}
 
             if($user->rank_num !== $player->rank_num) {
-                throw new Exception("You can only attack people of the same rank!");
+                throw new RuntimeException("You can only attack people of the same rank!");
             }
 
 			if(!$user->location->equals($player->location)) {
-				throw new Exception("Target is not at your location!");
+				throw new RuntimeException("Target is not at your location!");
 			}
 			if($user->battle_id) {
-				throw new Exception("Target is in battle!");
+				throw new RuntimeException("Target is in battle!");
 			}
 			if($user->last_active < time() - 120) {
-				throw new Exception("Target is inactive/offline!");
+				throw new RuntimeException("Target is inactive/offline!");
 			}
 			if($player->last_death_ms > System::currentTimeMs() - (60 * 1000)) {
-				throw new Exception("You died within the last minute, please wait " .
+				throw new RuntimeException("You died within the last minute, please wait " .
 					ceil((($player->last_death_ms + (60 * 1000)) - System::currentTimeMs()) / 1000) . " more seconds.");
 			}
 			if($user->last_death_ms > System::currentTimeMs() - (60 * 1000)) {
-				throw new Exception("Target has died within the last minute, please wait " .
+				throw new RuntimeException("Target has died within the last minute, please wait " .
 					ceil((($user->last_death_ms + (60 * 1000)) - System::currentTimeMs()) / 1000) . " more seconds.");
 			}
 
@@ -123,7 +123,7 @@ function battle(): bool {
 }
 
 /**
- * @throws Exception
+ * @throws RuntimeException
  */
 function processBattleFightEnd(BattleManager $battle, User $player): string {
     $pvp_yen = $player->rank_num * 50;
@@ -140,7 +140,9 @@ function processBattleFightEnd(BattleManager $battle, User $player): string {
         $player->addMoney($pvp_yen, "PVP win");
         $result .= "You win the fight and earn ¥$pvp_yen![br]";
 
-        $player->system->query("UPDATE `villages` SET `points`=`points`+'$village_point_gain' WHERE `name`='{$player->village->name}' LIMIT 1");
+        $player->system->db->query(
+            "UPDATE `villages` SET `points`=`points`+'$village_point_gain' WHERE `name`='{$player->village->name}' LIMIT 1"
+        );
         $result .= "You have earned $village_point_gain point for your village.[br]";
 
         //TODO: Add a feature that will make alt killing / targeting same user not worth while (diminish gains (negative for excessive chain kills?))
@@ -248,11 +250,11 @@ function check_survival_missions(Int $mission_id): void
     global $system;
     global $player;
 
-    $result = $system->query("SELECT `mission_type` FROM `missions` WHERE `mission_id`='$mission_id' LIMIT 1");
-    if ($system->db_last_num_rows == 0) {
+    $result = $system->db->query("SELECT `mission_type` FROM `missions` WHERE `mission_id`='$mission_id' LIMIT 1");
+    if ($system->db->last_num_rows == 0) {
         return;
     }
-    $mission_data = $system->db_fetch($result);
+    $mission_data = $system->db->fetch($result);
 
     if ($mission_data['mission_type'] == "5") {
         $mission = new Mission($player->mission_id, $player);

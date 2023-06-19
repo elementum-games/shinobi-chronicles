@@ -3,7 +3,9 @@ const chatRefreshInterval = 5000;
 function Chat({
   chatApiLink,
   initialPosts,
+  initialPostId,
   initialNextPagePostId,
+  initialPreviousPagePostId,
   initialLatestPostId,
   maxPostLength,
   isModerator,
@@ -15,8 +17,9 @@ function Chat({
   const [nextPagePostId, setNextPagePostId] = React.useState(initialNextPagePostId);
   const [latestPostId, setLatestPostId] = React.useState(initialLatestPostId);
   // Only set if we're paginating
-  const [previousPagePostId, setPreviousPagePostId] = React.useState(null);
-  const currentPagePostIdRef = React.useRef(null);
+  const [previousPagePostId, setPreviousPagePostId] = React.useState(initialPreviousPagePostId);
+  const [highlightPostId, setHighlightPostId] = React.useState(initialPostId);
+  const currentPagePostIdRef = React.useRef(initialPostId);
   const [error, setError] = React.useState(null);
   const [message, setMessage] = React.useState("");
   if (banInfo.isBanned) {
@@ -28,7 +31,10 @@ function Chat({
   }
   const refreshChat = function () {
     if (currentPagePostIdRef.current != null) {
-      return;
+      // always refresh when initialized to latest
+      if (currentPagePostIdRef.current != latestPostId) {
+        return;
+      }
     }
     apiFetch(chatApiLink, {
       request: 'load_posts'
@@ -112,7 +118,9 @@ function Chat({
     deletePost: deletePost,
     quotePost: quotePost,
     goToNextPage: () => changePage(nextPagePostId),
-    goToPreviousPage: () => changePage(previousPagePostId)
+    goToPreviousPage: () => changePage(previousPagePostId),
+    goToLatestPage: () => changePage(latestPostId),
+    postsBehind: currentPagePostIdRef.current != null ? latestPostId - currentPagePostIdRef.current : 0
   }));
 }
 function ChatBanInfo({
@@ -236,10 +244,17 @@ function ChatPosts({
   deletePost,
   quotePost,
   goToPreviousPage,
-  goToNextPage
+  goToNextPage,
+  goToLatestPage,
+  postsBehind
 }) {
-  return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
-    id: "chat_navigation"
+  return /*#__PURE__*/React.createElement(React.Fragment, null, "  ", postsBehind > 200 && /*#__PURE__*/React.createElement("div", {
+    id: "chat_navigation_latest"
+  }, /*#__PURE__*/React.createElement("a", {
+    className: "chat_pagination",
+    onClick: goToLatestPage
+  }, "<< Jump To Latest >>")), /*#__PURE__*/React.createElement("div", {
+    id: "chat_navigation_top"
   }, /*#__PURE__*/React.createElement("div", {
     className: "chat_navigation_divider_left"
   }, /*#__PURE__*/React.createElement("svg", {
@@ -360,6 +375,54 @@ function ChatPosts({
     style: {
       marginBottom: "2px"
     }
-  }, post.timeString)))))));
+  }, post.timeString)))))), /*#__PURE__*/React.createElement("div", {
+    id: "chat_navigation_bottom"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "chat_navigation_divider_left"
+  }, /*#__PURE__*/React.createElement("svg", {
+    width: "100%",
+    height: "2"
+  }, /*#__PURE__*/React.createElement("line", {
+    x1: "0%",
+    y1: "1",
+    x2: "100%",
+    y2: "1",
+    stroke: "#4e4535",
+    strokeWidth: "1"
+  }))), /*#__PURE__*/React.createElement("div", {
+    className: "chat_pagination_wrapper"
+  }, previousPagePostId != null && /*#__PURE__*/React.createElement("a", {
+    className: "chat_pagination",
+    onClick: goToPreviousPage
+  }, "<< Newer")), /*#__PURE__*/React.createElement("div", {
+    className: "chat_navigation_divider_middle"
+  }, /*#__PURE__*/React.createElement("svg", {
+    width: "100%",
+    height: "2"
+  }, /*#__PURE__*/React.createElement("line", {
+    x1: "0%",
+    y1: "1",
+    x2: "100%",
+    y2: "1",
+    stroke: "#4e4535",
+    strokeWidth: "1"
+  }))), /*#__PURE__*/React.createElement("div", {
+    className: "chat_pagination_wrapper"
+  }, nextPagePostId != null && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("a", {
+    className: "chat_pagination",
+    onClick: goToNextPage
+  }, "Older >>"))), /*#__PURE__*/React.createElement("div", {
+    className: "chat_navigation_divider_right"
+  }, /*#__PURE__*/React.createElement("svg", {
+    width: "100%",
+    height: "2"
+  }, /*#__PURE__*/React.createElement("line", {
+    x1: "0%",
+    y1: "1",
+    x2: "100%",
+    y2: "1",
+    stroke: "#4e4535",
+    strokeWidth: "1"
+  })))));
 }
 window.Chat = Chat;

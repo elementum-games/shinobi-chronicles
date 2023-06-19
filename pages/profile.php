@@ -9,7 +9,7 @@ Algorithm:	See master_plan.html
 */
 
 /**
- * @throws Exception
+ * @throws RuntimeException
  */
 function userProfile() {
     global $system;
@@ -79,34 +79,34 @@ function userProfile() {
     $student_message_max_length = 500;
     $recruitment_message_max_length = 100;
     if(!empty($_POST['update_student_recruitment'])) {
-        $recruitment_message = $system->clean($_POST['recruitment_message']);
+        $recruitment_message = $system->db->clean($_POST['recruitment_message']);
         try {
             isset($_POST['accept_students']) ? $player->accept_students = true : $player->accept_students = false;
             // Update recruitment settings
             $success = SenseiManager::updateStudentRecruitment($player->user_id, $recruitment_message, $system);
             if (!$success) {
-                throw new Exception('Something went wrong!');
+                throw new RuntimeException('Something went wrong!');
             }
             $system->message("Recruitment settings updated!");
         }
-        catch(Exception $e) {
+        catch(RuntimeException $e) {
             $system->message($e->getMessage());
         }
         $system->printMessage();
         $player->updateData();
     }
     if(!empty($_POST['update_student_settings'])) {
-        $student_message = $system->clean($_POST['student_message']);
-        $specialization = $system->clean($_POST['specialization']);
+        $student_message = $system->db->clean($_POST['student_message']);
+        $specialization = $system->db->clean($_POST['specialization']);
         try {
             // Update student settings
             $success = SenseiManager::updateStudentSettings($player->user_id, $student_message, $specialization, $system);
             if (!$success) {
-                throw new Exception('Something went wrong!');
+                throw new RuntimeException('Something went wrong!');
             }
             $system->message("Student settings updated!");
         }
-        catch(Exception $e) {
+        catch(RuntimeException $e) {
             $system->message($e->getMessage());
         }
         $system->printMessage();
@@ -139,42 +139,44 @@ function userProfile() {
 }
 
 /**
- * @throws Exception
+ * @throws RuntimeException
  */
 function sendMoney(System $system, User $player, string $currency_type): void {
     if ($currency_type != System::CURRENCY_TYPE_MONEY && $currency_type != System::CURRENCY_TYPE_PREMIUM_CREDITS) {
-        throw new Exception("Invalid currency type!");
+        throw new RuntimeException("Invalid currency type!");
     }
 
     if(isset($_POST['send_currency'])) {
-        $recipient = $system->clean($_POST['recipient']);
+        $recipient = $system->db->clean($_POST['recipient']);
         $amount = (int)$_POST['amount'];
 
         try {
             if(strtolower($recipient) == strtolower($player->user_name)) {
-                throw new Exception("You cannot send money/AK to yourself!");
+                throw new RuntimeException("You cannot send money/AK to yourself!");
             }
             if($amount <= 0 && !$player->isHeadAdmin()) {
-                throw new Exception("Invalid amount!");
+                throw new RuntimeException("Invalid amount!");
             }
 
-            $result = $system->query(
+            $result = $system->db->query(
                 "SELECT `user_id`, `user_name`, `money`, `premium_credits`
                         FROM `users`
                         WHERE `user_name`='$recipient' LIMIT 1"
             );
-            if(!$system->db_last_num_rows) {
-                throw new Exception("Invalid user!");
+            if(!$system->db->last_num_rows) {
+                throw new RuntimeException("Invalid user!");
             }
-            $recipient = $system->db_fetch($result);
+            $recipient = $system->db->fetch($result);
 
             if($currency_type == System::CURRENCY_TYPE_MONEY) {
                 if($amount > $player->getMoney()) {
-                    throw new Exception("You do not have that much money/AK!");
+                    throw new RuntimeException("You do not have that much money/AK!");
                 }
                 $player->subtractMoney($amount, "Sent money to {$recipient['user_name']} (#{$recipient['user_id']})");
 
-                $system->query("UPDATE `users` SET `money`=`money` + $amount WHERE `user_id`='{$recipient['user_id']}' LIMIT 1");
+                $system->db->query(
+                    "UPDATE `users` SET `money`=`money` + $amount WHERE `user_id`='{$recipient['user_id']}' LIMIT 1"
+                );
                 $system->currencyLog(
                     $recipient['user_id'],
                     $currency_type,
@@ -198,11 +200,13 @@ function sendMoney(System $system, User $player, string $currency_type): void {
             }
             else if($currency_type == System::CURRENCY_TYPE_PREMIUM_CREDITS) {
                 if($amount > $player->getPremiumCredits()) {
-                    throw new Exception("You do not have that much AK!");
+                    throw new RuntimeException("You do not have that much AK!");
                 }
                 $player->subtractPremiumCredits($amount, "Sent AK to {$recipient['user_name']} (#{$recipient['user_id']})");
 
-                $system->query("UPDATE `users` SET `premium_credits`=`premium_credits` + $amount WHERE `user_id`='{$recipient['user_id']}' LIMIT 1");
+                $system->db->query(
+                    "UPDATE `users` SET `premium_credits`=`premium_credits` + $amount WHERE `user_id`='{$recipient['user_id']}' LIMIT 1"
+                );
                 $system->currencyLog(
                     $recipient['user_id'],
                     $currency_type,
@@ -224,7 +228,7 @@ function sendMoney(System $system, User $player, string $currency_type): void {
                 $system->message("{$amount} AK sent to {$recipient['user_name']}!");
             }
 
-        } catch(Exception $e) {
+        } catch(RuntimeException $e) {
             $system->message($e->getMessage());
         }
         $system->printMessage();
@@ -260,7 +264,7 @@ function sendMoney(System $system, User $player, string $currency_type): void {
 }
 
 /**
- * @throws Exception
+ * @throws RuntimeException
  */
 function renderProfileSubmenu(): void {
     global $system;

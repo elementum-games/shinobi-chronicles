@@ -24,26 +24,27 @@ function viewBattles() {
             }
 
             if(!in_array($battleManager->getBattleType(), $battle_types)) {
-                throw new Exception("Invalid battle type!");
+                throw new RuntimeException("Invalid battle type!");
             }
 
             $battleManager->renderBattle();
 
             return true;
-        } catch(Exception $e) {
+        } catch(RuntimeException $e) {
             $system->message($e->getMessage());
             $system->printMessage();
         }
     }
 
-    $battles_result = $system->query(
+    $battles_result = $system->db->query(
         "SELECT `battle_id`, `player1`, `player2`, `winner` FROM `battles`
             WHERE `battle_type` IN (" . implode(",", $battle_types) . ")
-            ORDER BY `battle_id` DESC LIMIT {$limit}");
+            ORDER BY `battle_id` DESC LIMIT {$limit}"
+    );
 
     $user_ids = [];
     $raw_battles = [];
-    while($row = $system->db_fetch($battles_result)) {
+    while($row = $system->db->fetch($battles_result)) {
         $p1 = EntityId::fromString($row['player1']);
         $p2 = EntityId::fromString($row['player2']);
         if($p1->entity_type == User::ENTITY_TYPE) {
@@ -63,10 +64,12 @@ function viewBattles() {
 
     $user_names = [];
     if(count($user_ids) > 0) {
-        $user_names_result = $system->query("SELECT `user_id`, `user_name` FROM `users`
-            WHERE `user_id` IN(" .  implode(',', $user_ids). ")");
+        $user_names_result = $system->db->query(
+            "SELECT `user_id`, `user_name` FROM `users`
+                WHERE `user_id` IN(" .  implode(',', $user_ids). ")"
+        );
 
-        while($row = $system->db_fetch($user_names_result)) {
+        while($row = $system->db->fetch($user_names_result)) {
             $user_names[$row['user_id']] = $row['user_name'];
         }
     }

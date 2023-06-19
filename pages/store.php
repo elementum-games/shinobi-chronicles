@@ -34,16 +34,20 @@ function store() {
 	// Load jutsu/items
 	if($view == 'jutsu') {
 		$shop_jutsu = array();
-		$result = $system->query("SELECT * FROM `jutsu` WHERE `purchase_type` = '2' AND `rank` <= '$player->rank_num' ORDER BY `rank` ASC, `purchase_cost` ASC");
-		while($row = $system->db_fetch($result)) {
+		$result = $system->db->query(
+            "SELECT * FROM `jutsu` WHERE `purchase_type` = '2' AND `rank` <= '$player->rank_num' ORDER BY `rank` ASC, `purchase_cost` ASC"
+        );
+		while($row = $system->db->fetch($result)) {
 			$shop_jutsu[$row['jutsu_id']] = $row;
 		}
 	}
 	else {
         /** @var Item[] $shop_items */
 		$shop_items = array();
-		$result = $system->query("SELECT * FROM `items` WHERE `purchase_type` = '1' AND `rank` <= '$player->rank_num' ORDER BY `rank` ASC, `purchase_cost` ASC");
-		while($row = $system->db_fetch($result)) {
+		$result = $system->db->query(
+            "SELECT * FROM `items` WHERE `purchase_type` = '1' AND `rank` <= '$player->rank_num' ORDER BY `rank` ASC, `purchase_cost` ASC"
+        );
+		while($row = $system->db->fetch($result)) {
 			$shop_items[$row['item_id']] = Item::fromDb($row);
 		}
 	}
@@ -51,16 +55,16 @@ function store() {
 	if(isset($_GET['purchase_item'])) {
 		// Use type of 3, okay to purchase more, increment quantity
 		// Use type of 1-2, only okay to purchase one
-		$item_id = $system->clean($_GET['purchase_item']);
+		$item_id = $system->db->clean($_GET['purchase_item']);
 		try {
 			// Check if item exists
 			if(!isset($shop_items[$item_id])) {
-				throw new Exception("Invalid item!");
+				throw new RuntimeException("Invalid item!");
 			}
 			
 			// check if already owned
 			if($player->hasItem($item_id) && $shop_items[$item_id]->use_type != 3) {
-				throw new Exception("You already own this item!");
+				throw new RuntimeException("You already own this item!");
 			}
 			
 			if (isset($_GET['max'])) { // Code for handling buying bulk
@@ -72,11 +76,11 @@ function store() {
 				}
 
 				if($player->items[$item_id]->quantity >= $max_consumables) {
-					throw new Exception("Your supply of this item is already full!");
+					throw new RuntimeException("Your supply of this item is already full!");
 				}
 
 				if ($player->getMoney() < $shop_items[$item_id]->purchase_cost * $max_missing) {
-					throw new Exception("You do not have enough money to buy the max amount!");
+					throw new RuntimeException("You do not have enough money to buy the max amount!");
 
 				}
 				$player->subtractMoney(
@@ -89,13 +93,13 @@ function store() {
 			} else { //code for handling single purchases
                 // Check for money requirement
                 if($player->getMoney() < $shop_items[$item_id]->purchase_cost) {
-                    throw new Exception("You do not have enough money!");
+                    throw new RuntimeException("You do not have enough money!");
                 }
 
                 // Check for max consumables
                 if($player->hasItem($item_id) && $shop_items[$item_id]->use_type == 3) {
                     if($player->items[$item_id]->quantity >= $max_consumables) {
-                        throw new Exception("Your supply of this item is already full!");
+                        throw new RuntimeException("Your supply of this item is already full!");
                     }
                 }
 
@@ -116,39 +120,39 @@ function store() {
 		}
 	}
 	else if(isset($_GET['purchase_jutsu'])) {
-		$jutsu_id = $system->clean($_GET['purchase_jutsu']);
+		$jutsu_id = $system->db->clean($_GET['purchase_jutsu']);
 		try {
 			// Check if jutsu exists
 			if(!isset($shop_jutsu[$jutsu_id])) {
-				throw new Exception("Invalid jutsu!");
+				throw new RuntimeException("Invalid jutsu!");
 			}
 
 			// check if already owned
 			if(isset($player->jutsu_scrolls[$jutsu_id])) {
-				throw new Exception("You already purchased this scroll!");
+				throw new RuntimeException("You already purchased this scroll!");
 			}
 			// check if already learned
 			if($player->hasJutsu($jutsu_id)) {
-				throw new Exception("You have already learned this jutsu!");
+				throw new RuntimeException("You have already learned this jutsu!");
 			}
 			
 			// Check for money requirement
 			if($player->getMoney() < $shop_jutsu[$jutsu_id]['purchase_cost']) {
-				throw new Exception("You do not have enough money!");
+				throw new RuntimeException("You do not have enough money!");
 			}
 			
 			// Parent jutsu check
 			if($shop_jutsu[$jutsu_id]['parent_jutsu']) {
 				$id = $shop_jutsu[$jutsu_id]['parent_jutsu'];
 				if(!isset($player->jutsu[$id])) {
-					throw new Exception("You need to learn " . $shop_jutsu[$id]['name'] . " first!");
+					throw new RuntimeException("You need to learn " . $shop_jutsu[$id]['name'] . " first!");
 				}
 			}	
 			
 			// Element check
 			if($shop_jutsu[$jutsu_id]['element'] != 'None') {
 				if(!$player->elements or !in_array($shop_jutsu[$jutsu_id]['element'], $player->elements)) {
-					throw new Exception("You do not have the elemental chakra for this jutsu!");
+					throw new RuntimeException("You do not have the elemental chakra for this jutsu!");
 				}
 			}
 			
@@ -181,7 +185,7 @@ function store() {
 	// View single jutsu
 	if(!empty($_GET['view_jutsu'])) {
 		$jutsu_list = false;
-		$jutsu_id = (int)$system->clean($_GET['view_jutsu']);
+		$jutsu_id = (int)$system->db->clean($_GET['view_jutsu']);
 		if(!isset($shop_jutsu[$jutsu_id])) {
 			$system->message("Invalid jutsu!");
 			$system->printMessage();
@@ -218,12 +222,12 @@ function store() {
 					<p style='display:inline-block;margin:0px;width:37.1em;'>" . $jutsu['description'] . "</p>
 				<br style='clear:both;' />
 				<label style='width:6.5em;'>Jutsu type:</label>" . ucwords($jutsu['jutsu_type']);
-				$result = $system->query("SELECT `name` FROM `jutsu` WHERE `parent_jutsu`='$jutsu_id'");
-				if($system->db_last_num_rows > 0) {
+				$result = $system->db->query("SELECT `name` FROM `jutsu` WHERE `parent_jutsu`='$jutsu_id'");
+				if($system->db->last_num_rows > 0) {
 					echo "<br />
 					<br /><label>Learn <b>" . $jutsu['name'] . "</b> to level 50 to unlock:</label>
 						<p style='margin-left:10px;margin-top:5px;'>";
-					while($row = $system->db_fetch($result)) {
+					while($row = $system->db->fetch($result)) {
 						echo $row['name'] . "<br />";
 					}
 					echo "</p>";

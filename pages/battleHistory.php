@@ -16,15 +16,16 @@ function battleHistory() {
     $battle_types = [Battle::TYPE_SPAR, Battle::TYPE_FIGHT, Battle::TYPE_CHALLENGE];
     $limit = $player->forbidden_seal->max_battle_history_view;
 
-    $battles_result = $system->query(
+    $battles_result = $system->db->query(
         "SELECT `battle_id`, `player1`, `player2`, `winner` FROM `battles`
             WHERE `battle_type` IN (" . implode(",", $battle_types) . ")
             AND (player1 = '{$player->id}' OR player2 = '{$player->id}')
-            ORDER BY `battle_id` DESC LIMIT {$limit}");
+            ORDER BY `battle_id` DESC LIMIT {$limit}"
+    );
 
     $user_ids = [];
     $raw_battles = [];
-    while($row = $system->db_fetch($battles_result)) {
+    while($row = $system->db->fetch($battles_result)) {
         $p1 = EntityId::fromString($row['player1']);
         $p2 = EntityId::fromString($row['player2']);
         if($p1->entity_type == User::ENTITY_TYPE) {
@@ -44,10 +45,12 @@ function battleHistory() {
 
     $user_names = [];
     if(count($user_ids) > 0) {
-        $user_names_result = $system->query("SELECT `user_id`, `user_name` FROM `users`
-            WHERE `user_id` IN(" .  implode(',', $user_ids). ")");
+        $user_names_result = $system->db->query(
+            "SELECT `user_id`, `user_name` FROM `users`
+                WHERE `user_id` IN(" .  implode(',', $user_ids). ")"
+        );
 
-        while($row = $system->db_fetch($user_names_result)) {
+        while($row = $system->db->fetch($user_names_result)) {
             $user_names[$row['user_id']] = $row['user_name'];
         }
     }
@@ -91,13 +94,14 @@ function battleHistory() {
         try {
             $battle_id = (int)$_GET['view_log'];
             if (in_array($battle_id, $battleIds)) {
-                $logs_result = $system->query(
-                "SELECT `turn_number`, `content` FROM `battle_logs`
-                WHERE `battle_id` = '{$battle_id}'
-                AND `turn_number` != '0'
-                ORDER BY `turn_number` ASC");
+                $logs_result = $system->db->query(
+                    "SELECT `turn_number`, `content` FROM `battle_logs`
+                    WHERE `battle_id` = '{$battle_id}'
+                    AND `turn_number` != '0'
+                    ORDER BY `turn_number` ASC"
+                );
 
-                while($row = $system->db_fetch($logs_result)) {
+                while($row = $system->db->fetch($logs_result)) {
                     $battle_text = $system->html_parse(stripslashes($row['content']));
                     $battle_text = str_replace(array('[br]', '[hr]'), array('', '<hr />'), $battle_text);
                     $battle_logs[] = [
@@ -107,7 +111,7 @@ function battleHistory() {
                 }
             }
             else {
-                throw new Exception("Invalid battle!");
+                throw new RuntimeException("Invalid battle!");
             }
         }
         catch (Exception $e) {

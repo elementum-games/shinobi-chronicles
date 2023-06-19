@@ -3,7 +3,7 @@ session_start();
 
 require "classes/System.php";
 $system = new System();
-$system->startTransaction();
+$system->db->startTransaction();
 $layout = $system->fetchLayoutByName(System::DEFAULT_LAYOUT);
 
 if(isset($_SESSION['user_id'])) {
@@ -352,4 +352,4 @@ $layout->renderBeforeContentHTML($system, $player ?? null, 'Manual');
 <?php
 $layout->renderAfterContentHTML($system, $player ?? null);
 
-$system->commitTransaction();
+$system->db->commitTransaction();

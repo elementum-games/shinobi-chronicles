@@ -9,7 +9,7 @@ function travel(): void {
         try {
             $travelManager = new TravelManager($system, $player);
 
-            $direction = $system->clean($_GET['travel']);
+            $direction = $system->db->clean($_GET['travel']);
             $travel_ok = $travelManager->movePlayer($direction);
 
             if($travel_ok) {

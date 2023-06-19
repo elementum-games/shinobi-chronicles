@@ -70,6 +70,7 @@
     --header-background-color: #151417;
     --header-border-color: #0c0d0e;
     --header-border-height: 3px;
+    --header-logout-color: #e6a0a0;
     /* Chat Config */
     --chat-secondary-background-color: #1a1921;
 }
@@ -302,12 +303,17 @@ body {
 }
 .avy_borderless {
     padding: 0 !important;
+    clip-path: none;
+    background: none;
 }
 .avy_round {
     clip-path: circle(50% at 50% 50%);
 }
 .avy_three-point {
     clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+}
+.avy_three-point-inverted {
+    clip-path: polygon(50% 100%, 0 0, 100% 0);
 }
 .avy_four-point {
     clip-path: none;
@@ -318,8 +324,14 @@ body {
 .avy_four-point-oblique {
     clip-path: polygon(20% 0%, 80% 0%, 100% 100%, 0% 100%);
 }
+.avy_five-point {
+    clip-path: polygon(50% 0%, 100% 38%, 82% 100%, 18% 100%, 0% 38%);
+}
 .avy_six-point {
     clip-path: polygon(21% 0, 79% 0, 100% 50%, 79% 100%, 21% 100%, 0% 50%);
+}
+.avy_six-point-long {
+    clip-path: polygon(40% 0, 100% 0, 100% 60%, 60% 100%, 0 100%, 0 40%);
 }
 .avy_eight-point {
     clip-path: polygon(30% 0%, 70% 0%, 100% 30%, 100% 70%, 70% 100%, 30% 100%, 0% 70%, 0% 30%);
@@ -330,6 +342,25 @@ body {
 .avy_nine-point {
     clip-path: polygon(50% 0%, 83% 12%, 100% 43%, 94% 78%, 68% 100%, 32% 100%, 6% 78%, 0% 43%, 17% 12%);
 }
-.avy-twelve-point {
+.avy_twelve-point {
     clip-path: polygon(0% 15%, 15% 15%, 15% 0%, 85% 0%, 85% 15%, 100% 15%, 100% 85%, 85% 85%, 85% 100%, 15% 100%, 15% 85%, 0% 85%);
+}
+
+/* Content styles */
+.name.black {
+    color: #000;
+    --shadow-color: rgba(100,100,100,1);
+    --shadow-size: 1px;
+    text-shadow:
+        /* top row */
+        -1px -1px var(--shadow-size) var(--shadow-color),
+        0 -1px var(--shadow-size) var(--shadow-color),
+        1px -1px var(--shadow-size) var(--shadow-color),
+        /* left and right */
+        -1px 0 var(--shadow-size) var(--shadow-color),
+        1px 0 var(--shadow-size) var(--shadow-color),
+        /* bottom row */
+        -1px 1px var(--shadow-size) var(--shadow-color),
+        0 1px var(--shadow-size) var(--shadow-color),
+        1px 1px var(--shadow-size) var(--shadow-color);
 }

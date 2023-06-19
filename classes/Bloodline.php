@@ -94,26 +94,26 @@ class Bloodline {
     }
 
     /**
-     * @throws Exception
+     * @throws RuntimeException
      */
     public static function loadFromId(System $system, int $bloodline_id, ?int $user_id = null): Bloodline {
         if(!$bloodline_id) {
-            throw new Exception("Invalid bloodline id!");
+            throw new RuntimeException("Invalid bloodline id!");
         }
 
-        $result = $system->query("SELECT * FROM `bloodlines` WHERE `bloodline_id`='$bloodline_id' LIMIT 1");
-        if($system->db_last_num_rows == 0) {
-            throw new Exception("Bloodline does not exist!");
+        $result = $system->db->query("SELECT * FROM `bloodlines` WHERE `bloodline_id`='$bloodline_id' LIMIT 1");
+        if($system->db->last_num_rows == 0) {
+            throw new RuntimeException("Bloodline does not exist!");
         }
-        $bloodline_data = $system->db_fetch($result);
+        $bloodline_data = $system->db->fetch($result);
 
         $bloodline = new Bloodline($bloodline_data);
 
         // Load user-related BL data if relevant
         if($user_id) {
-            $result = $system->query("SELECT * FROM `user_bloodlines` WHERE `user_id`=$user_id LIMIT 1");
+            $result = $system->db->query("SELECT * FROM `user_bloodlines` WHERE `user_id`=$user_id LIMIT 1");
             if(mysqli_num_rows($result) == 0) {
-                throw new Exception("Invalid user bloodline data!");
+                throw new RuntimeException("Invalid user bloodline data!");
             }
 
             $user_bloodline = mysqli_fetch_assoc($result);
@@ -289,14 +289,14 @@ class Bloodline {
      * @param int    $user_id
      * @param bool   $display
      * @return bool
-     * @throws Exception
+     * @throws RuntimeException
      */
     public static function giveBloodline(System $system, int $bloodline_id, int $user_id, bool $display = true): bool {
-        $result = $system->query("SELECT * FROM `bloodlines` WHERE `bloodline_id` = '$bloodline_id' LIMIT 1");
-        if($system->db_last_num_rows == 0) {
-            throw new Exception("Invalid bloodline!");
+        $result = $system->db->query("SELECT * FROM `bloodlines` WHERE `bloodline_id` = '$bloodline_id' LIMIT 1");
+        if($system->db->last_num_rows == 0) {
+            throw new RuntimeException("Invalid bloodline!");
         }
-        $bloodline = $system->db_fetch($result);
+        $bloodline = $system->db->fetch($result);
 
         $user_bloodline['bloodline_id'] = $bloodline['bloodline_id'];
         $user_bloodline['name'] = $bloodline['name'];
@@ -377,10 +377,10 @@ class Bloodline {
 
         // move ids (level & exp -> 0)
         $user_bloodline['jutsu'] = false;
-        $result = $system->query("SELECT `bloodline_id` FROM `user_bloodlines` WHERE `user_id`='$user_id' LIMIT 1");
+        $result = $system->db->query("SELECT `bloodline_id` FROM `user_bloodlines` WHERE `user_id`='$user_id' LIMIT 1");
 
         // Insert new row
-        if($system->db_last_num_rows == 0) {
+        if($system->db->last_num_rows == 0) {
             $query = "INSERT INTO `user_bloodlines` (`user_id`, `bloodline_id`, `name`, `passive_boosts`, `combat_boosts`, `jutsu`)
 			VALUES ('$user_id', '$bloodline_id', '{$user_bloodline['name']}', '{$user_bloodline['passive_boosts']}',
 			'{$user_bloodline['combat_boosts']}', '{$user_bloodline['jutsu']}')";
@@ -396,14 +396,16 @@ class Bloodline {
 			`jutsu` = '{$user_bloodline['jutsu']}'
 			WHERE `user_id`='$user_id' LIMIT 1";
         }
-        $system->query($query);
+        $system->db->query($query);
 
-        if($system->db_last_affected_rows == 1) {
+        if($system->db->last_affected_rows == 1) {
             if($display) {
                 $system->message("Bloodline given!");
             }
-            $result = $system->query("SELECT `exp`, `bloodline_skill` FROM `users` WHERE `user_id`='$user_id' LIMIT 1");
-            $result = $system->db_fetch($result);
+            $result = $system->db->query(
+                "SELECT `exp`, `bloodline_skill` FROM `users` WHERE `user_id`='$user_id' LIMIT 1"
+            );
+            $result = $system->db->fetch($result);
             $new_exp = $result['exp'];
             $new_bloodline_skill = $result['bloodline_skill'];
             if($result['bloodline_skill'] > 10) {
@@ -419,7 +421,7 @@ class Bloodline {
             `exp`='{$new_exp}'
 			WHERE `user_id`='$user_id' LIMIT 1";
 
-            $system->query($query);
+            $system->db->query($query);
             if($user_id == $_SESSION['user_id']) {
                 global $player;
                 $player->bloodline_id = $bloodline_id;
@@ -429,7 +431,7 @@ class Bloodline {
             }
         }
         else {
-            throw new Exception("Error giving bloodline! (Or user already has this BL)");
+            throw new RuntimeException("Error giving bloodline! (Or user already has this BL)");
         }
 
         if($display) {

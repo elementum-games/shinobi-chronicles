@@ -23,10 +23,12 @@ class BattleLog {
      * @return BattleLog|null
      */
     public static function getLastTurn(System $system, int $battle_id): ?BattleLog {
-        $result = $system->query("SELECT * FROM `battle_logs` 
-            WHERE `battle_id`='{$battle_id}' ORDER BY `turn_number` DESC LIMIT 1");
-        if($system->db_last_num_rows > 0) {
-            $raw_battle_log = $system->db_fetch($result);
+        $result = $system->db->query(
+            "SELECT * FROM `battle_logs` 
+                WHERE `battle_id`='{$battle_id}' ORDER BY `turn_number` DESC LIMIT 1"
+        );
+        if($system->db->last_num_rows > 0) {
+            $raw_battle_log = $system->db->fetch($result);
             return new BattleLog(
                 $raw_battle_log['battle_id'],
                 $raw_battle_log['turn_number'],
@@ -45,12 +47,14 @@ class BattleLog {
      * @param string $content
      */
     public static function addOrUpdateTurnLog(System $system, int $battle_id, int $turn_number, string $content) {
-        $system->query("INSERT INTO `battle_logs` 
-            SET `battle_id`='{$battle_id}',
-                `turn_number`='{$turn_number}',
-                `content`='{$content}'
-            ON DUPLICATE KEY UPDATE
-                `content`='{$content}'
-        ");
+        $system->db->query(
+            "INSERT INTO `battle_logs` 
+                SET `battle_id`='{$battle_id}',
+                    `turn_number`='{$turn_number}',
+                    `content`='{$content}'
+                ON DUPLICATE KEY UPDATE
+                    `content`='{$content}'
+            "
+        );
     }
 }

@@ -8,7 +8,7 @@ class Auth {
     /**
      * @param System $system
      * @return User
-     * @throws Exception
+     * @throws RuntimeException
      */
     public static function getUserFromSession(System $system): User {
         session_start();
@@ -18,7 +18,7 @@ class Auth {
         }
 
         $system = new System();
-        $system->dbConnect();
+        $system->db->connect();
 
         return User::loadFromId($system, $_SESSION['user_id']);
     }

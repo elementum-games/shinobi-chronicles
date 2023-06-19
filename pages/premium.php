@@ -7,7 +7,7 @@ Revised:	04/30/2014 by Levi Meahan
 Purpose:	Function for premium credit shop. Resets, name changes, bloodline re-rolls, etc
 */
 
-function premium() {
+function premium(): bool {
 	global $system;
 
 	global $player;
@@ -84,17 +84,21 @@ function premium() {
 
 	if($player->clan) {
 
-		$system->query("SELECT `clan_id`, `name` FROM `clans` WHERE `village` = '{$player->village->name}' AND `clan_id` != '{$player->clan->id}' AND `bloodline_only` = '0'");
+		$system->db->query(
+            "SELECT `clan_id`, `name` FROM `clans` WHERE `village` = '{$player->village->name}' AND `clan_id` != '{$player->clan->id}' AND `bloodline_only` = '0'"
+        );
 
-		while($village_clans = $system->db_fetch()) {
+		while($village_clans = $system->db->fetch()) {
 			$available_clans[$village_clans['clan_id']] = stripslashes($village_clans['name']);
 		}
 
 	}
 
 	if($player->bloodline_id && $player->clan->id != $player->bloodline->clan_id) {
-		$system->query(sprintf("SELECT `clan_id`, `name` FROM `clans` WHERE `clan_id` = '%d'", $player->bloodline->clan_id));
-		$result = $system->db_fetch();
+		$system->db->query(
+            sprintf("SELECT `clan_id`, `name` FROM `clans` WHERE `clan_id` = '%d'", $player->bloodline->clan_id)
+        );
+		$result = $system->db->fetch();
 		$available_clans[$result['clan_id']] = stripslashes($result['name']);
 	}
 
@@ -104,13 +108,13 @@ function premium() {
 	if(isset($_POST['user_reset'])) {
 		try {
             if($player->team) {
-                throw new Exception("You must leave your team before resetting!");
+                throw new RuntimeException("You must leave your team before resetting!");
             }
             if($player->clan_office) {
-                throw new Exception("You must resign from your clan office first!");
+                throw new RuntimeException("You must resign from your clan office first!");
             }
             if (SenseiManager::isSensei($player->user_id, $system)) {
-                throw new Exception("You must resign from being a sensei first!");
+                throw new RuntimeException("You must resign from being a sensei first!");
             }
 			if(!isset($_POST['confirm_reset'])) {
                 $confirmation_type = "confirm_reset";
@@ -160,14 +164,16 @@ function premium() {
 
                 $player->updateData();
 
-                $system->query("DELETE FROM `user_bloodlines` WHERE `user_id`='$player->user_id'");
-                $system->query("UPDATE `user_inventory` SET
-				`jutsu` = '',
-				`items` = '',
-				`bloodline_jutsu` = '',
-				`equipped_jutsu` = '',
-				`equipped_items` = ''
-				WHERE `user_id`='$player->user_id'");
+                $system->db->query("DELETE FROM `user_bloodlines` WHERE `user_id`='$player->user_id'");
+                $system->db->query(
+                    "UPDATE `user_inventory` SET
+                    `jutsu` = '',
+                    `items` = '',
+                    `bloodline_jutsu` = '',
+                    `equipped_jutsu` = '',
+                    `equipped_items` = ''
+                    WHERE `user_id`='$player->user_id'"
+                );
 
 
                 require 'templates/premium/character_reset_complete.php';
@@ -178,26 +184,26 @@ function premium() {
 		}
 	}
 	else if(isset($_POST['name_change'])) {
-		$new_name = $system->clean($_POST['new_name']);
+		$new_name = $system->db->clean($_POST['new_name']);
 		$akCost = $costs['name_change'];
         $deductNameChanges = 1;
 		try {
 			if(!$player->username_changes and $player->getPremiumCredits() < $akCost) {
-				throw new Exception("You do not have enough Ancient Kunai!");
+				throw new RuntimeException("You do not have enough Ancient Kunai!");
 			}
 			if(strlen($new_name) < User::MIN_NAME_LENGTH || strlen($new_name) > User::MAX_NAME_LENGTH) {
-				throw new Exception("New user name is to short/long! Please enter a name between "
+				throw new RuntimeException("New user name is to short/long! Please enter a name between "
                     . User::MIN_NAME_LENGTH . " and " . User::MAX_NAME_LENGTH . " characters long.");
 			}
 			if($player->user_name == $new_name) {
-				throw new Exception("Please select a different name than your current one.");
+				throw new RuntimeException("Please select a different name than your current one.");
 			}
 			if(!preg_match('/^[a-zA-Z0-9_-]+$/', $new_name)) {
-				throw new Exception("Only alphanumeric characters, dashes, and underscores are allowed in usernames!");
+				throw new RuntimeException("Only alphanumeric characters, dashes, and underscores are allowed in usernames!");
 			}
 
 			if($system->explicitLanguageCheck($new_name)) {
-				throw new Exception("Inappropriate language is not allowed in usernames!");
+				throw new RuntimeException("Inappropriate language is not allowed in usernames!");
 			}
 
 			if($player->username_changes > 0){
@@ -212,11 +218,11 @@ function premium() {
                 $deductNameChanges = 0;
             }
 
-			$result = $system->query("SELECT `user_name` FROM `users` WHERE `user_name`='$new_name' LIMIT 1");
-			if($system->db_last_num_rows) {
-				$result = $system->db_fetch();
+			$result = $system->db->query("SELECT `user_name` FROM `users` WHERE `user_name`='$new_name' LIMIT 1");
+			if($system->db->last_num_rows) {
+				$result = $system->db->fetch();
                 if(strtolower($result['user_name']) == strtolower($new_name) && $result['user_name'] != $player->user_name) {
-                    throw new Exception("Username already in use!");
+                    throw new RuntimeException("Username already in use!");
                 }
 			}
 
@@ -233,7 +239,7 @@ function premium() {
 			}
             else {
                 $sql = "UPDATE `users` SET `user_name` = '%s', `username_changes` = `username_changes` - %d WHERE `user_id` = %d LIMIT 1;";
-                $system->query(sprintf($sql, $new_name, $deductNameChanges, $player->user_id));
+                $system->db->query(sprintf($sql, $new_name, $deductNameChanges, $player->user_id));
                 $player->subtractPremiumCredits($akCost, "Username change");
 
                 $system->message("You have changed your name to $new_name.");
@@ -244,16 +250,16 @@ function premium() {
 	}
 	else if(isset($_POST['change_gender'])) {
         try {
-            $new_gender = $system->clean($_POST['new_gender']);
+            $new_gender = $system->db->clean($_POST['new_gender']);
             $akCost = $costs['gender_change'];
             if($player->getPremiumCredits() < $akCost) {
-            throw new Exception("You do not have enough Ancient Kunai!");
+            throw new RuntimeException("You do not have enough Ancient Kunai!");
             }
             if($player->gender == $new_gender) {
-            throw new Exception("You are already a {$new_gender}!");
+            throw new RuntimeException("You are already a {$new_gender}!");
             }
             if(!in_array($new_gender, User::$genders, true)) {
-            throw new Exception("Invalid gender!");
+            throw new RuntimeException("Invalid gender!");
             }
 
             //Confirm purchase
@@ -279,9 +285,9 @@ function premium() {
     }
 	else if(isset($_POST['stat_reset'])) {
 		try {
-			$stat = $system->clean($_POST['stat']);
+			$stat = $system->db->clean($_POST['stat']);
 			if(array_search($stat, $player->stats) === false) {
-				throw new Exception("Invalid stat!");
+				throw new RuntimeException("Invalid stat!");
 			}
 
 			// Amount to reset to
@@ -313,18 +319,18 @@ function premium() {
 	}
 	else if(isset($_POST['stat_allocate'])) {
 		try {
-			$original_stat = $system->clean($_POST['original_stat']);
-			$target_stat = $system->clean($_POST['target_stat']);
+			$original_stat = $system->db->clean($_POST['original_stat']);
+			$target_stat = $system->db->clean($_POST['target_stat']);
 			if(array_search($original_stat, $player->stats) === false) {
-				throw new Exception("Invalid original stat!");
+				throw new RuntimeException("Invalid original stat!");
 			}
 			if(array_search($target_stat, $player->stats) === false) {
-				throw new Exception("Invalid target stat!");
+				throw new RuntimeException("Invalid target stat!");
 			}
 
             // Check for same stat
             if($original_stat == $target_stat) {
-                throw new Exception("You cannot transfer points to the same stat!");
+                throw new RuntimeException("You cannot transfer points to the same stat!");
             }
 
             // Amount to reset to
@@ -334,13 +340,13 @@ function premium() {
             }
 
 			// Transfer amount
-			$transfer_amount = (int)$system->clean($_POST['transfer_amount']);
+			$transfer_amount = (int)$system->db->clean($_POST['transfer_amount']);
 
 			if($transfer_amount < 1) {
-				throw new Exception("Invalid transfer amount!");
+				throw new RuntimeException("Invalid transfer amount!");
 			}
 			if($transfer_amount > $player->{$original_stat} - $reset_amount) {
-				throw new Exception("Invalid transfer amount!");
+				throw new RuntimeException("Invalid transfer amount!");
 			}
 
             $is_free_stat_change = $transfer_amount <= $max_free_stat_change_amount && $free_stat_change_cooldown_left <= 0;
@@ -357,19 +363,19 @@ function premium() {
             }
 
 			if($player->getPremiumCredits() < $akCost) {
-				throw new Exception("You do not have enough Ancient Kunai!");
+				throw new RuntimeException("You do not have enough Ancient Kunai!");
 			}
 
 			$time = $transfer_amount / $stat_transfer_points_per_min;
 
 			// Check for minimum stat amount
 			if($player->{$original_stat} <= $reset_amount) {
-				throw new Exception("Stat is already at the minimum!");
+				throw new RuntimeException("Stat is already at the minimum!");
 			}
 
 			// Check for player training
 			if($player->train_time) {
-				throw new Exception("Please finish or cancel your training!");
+				throw new RuntimeException("Please finish or cancel your training!");
 			}
 
 			 if(!isset($_POST['confirm_stat_reset'])) {
@@ -404,6 +410,18 @@ function premium() {
                  }
 
                  $player->updateData();
+
+                require_once __DIR__ . '/../classes/notification/NotificationManager.php';
+                $new_notification = new NotificationDto(
+                    type: "training",
+                    message: "Retraining " . System::unSlug($target_stat),
+                    user_id: $player->user_id,
+                    created: time(),
+                    duration: $time * 60,
+                    alert: false,
+                );
+                NotificationManager::createNotification($new_notification, $system, NotificationManager::UPDATE_REPLACE);
+
                  require 'templates/premium/stat_transfer_confirmation.php';
              }
 		} catch (Exception $e) {
@@ -415,7 +433,7 @@ function premium() {
         try {
             $cost = $costs['reset_ai_battles'];
             if($player->getPremiumCredits() < $cost) {
-                throw new Exception("You do not have enough Ancient Kunai!");
+                throw new RuntimeException("You do not have enough Ancient Kunai!");
             }
 
             if(!isset($_POST['confirm_ai_battle_reset'])) {
@@ -441,7 +459,7 @@ function premium() {
         try {
             $cost = $costs['reset_pvp_battles'];
             if($player->getPremiumCredits() < $cost) {
-                throw new Exception("You do not have enough Ancient Kunai!");
+                throw new RuntimeException("You do not have enough Ancient Kunai!");
             }
 
             if(!isset($_POST['confirm_pvp_battle_reset'])) {
@@ -467,15 +485,17 @@ function premium() {
 		try {
             $self_link .= '&view=bloodlines';
             $bloodline_id = (int) $_POST['bloodline_id'];
-			$result = $system->query("SELECT `bloodline_id`, `name`, `clan_id`, `rank` FROM `bloodlines`
-				WHERE `bloodline_id`='$bloodline_id' AND `rank` < 5 ORDER BY `rank` ASC");
+			$result = $system->db->query(
+                "SELECT `bloodline_id`, `name`, `clan_id`, `rank` FROM `bloodlines`
+                    WHERE `bloodline_id`='$bloodline_id' AND `rank` < 5 ORDER BY `rank` ASC"
+            );
 
             //BL not found
-			if($system->db_last_num_rows == 0) {
-				throw new Exception("Invalid bloodline!");
+			if($system->db->last_num_rows == 0) {
+				throw new RuntimeException("Invalid bloodline!");
 			}
             //Load BL data
-            $result = $system->db_fetch($result);
+            $result = $system->db->fetch($result);
             $akCost = $costs['bloodline'][$result['rank']];
             $bloodline_name = $result['name'];
 
@@ -501,18 +521,18 @@ function premium() {
             }
             else {
                 if ($player->bloodline_id == $bloodline_id) {
-                    throw new Exception("You already have this bloodline!");
+                    throw new RuntimeException("You already have this bloodline!");
                 }
                 if ($player->getPremiumCredits() < $akCost) {
-                    throw new Exception("You do not have enough Ancient Kunai!");
+                    throw new RuntimeException("You do not have enough Ancient Kunai!");
                 }
                 //Check clan office detail & remove player from clan data if present
                 if ($player->clan && $player->clan->leader_id == $player->user_id) {
-                    $system->query("UPDATE `clans` SET `leader` = '0' WHERE `clan_id` = '{$player->clan->id}'");
+                    $system->db->query("UPDATE `clans` SET `leader` = '0' WHERE `clan_id` = '{$player->clan->id}'");
                 } else if ($player->clan && $player->clan->elder_1_id == $player->user_id) {
-                    $system->query("UPDATE `clans` SET `elder_1` = '0' WHERE `clan_id` = '{$player->clan->id}'");
+                    $system->db->query("UPDATE `clans` SET `elder_1` = '0' WHERE `clan_id` = '{$player->clan->id}'");
                 } else if ($player->clan && $player->clan->elder_2_id == $player->user_id) {
-                    $system->query("UPDATE `clans` SET `elder_2` = '0' WHERE `clan_id` = '{$player->clan->id}'");
+                    $system->db->query("UPDATE `clans` SET `elder_2` = '0' WHERE `clan_id` = '{$player->clan->id}'");
                 }
                 //Remove office from player data if present
                 if ($player->clan_office) {
@@ -534,9 +554,9 @@ function premium() {
 
                 // Set clan
                 $clan_id = $result['clan_id'];
-                $result = $system->query("SELECT `name` FROM `clans` WHERE `clan_id` = '$clan_id' LIMIT 1");
-                if ($system->db_last_num_rows > 0) {
-                    $clan_result = $system->db_fetch($result);
+                $result = $system->db->query("SELECT `name` FROM `clans` WHERE `clan_id` = '$clan_id' LIMIT 1");
+                if ($system->db->last_num_rows > 0) {
+                    $clan_result = $system->db->fetch($result);
 
 
                     $player->clan = Clan::loadFromId($system, $clan_id);
@@ -558,16 +578,16 @@ function premium() {
 
             //Check for valid seal level
             if(!isset(ForbiddenSeal::$forbidden_seals[$seal_level]) || $seal_level === 0) {
-                throw new Exception("Invalid forbidden seal!");
+                throw new RuntimeException("Invalid forbidden seal!");
             }
             //Check seal lengths
             if(!isset($costs['forbidden_seal'][$seal_level][$seal_length])) {
-                throw new Exception("Invalid seal length!");
+                throw new RuntimeException("Invalid seal length!");
             }
             $akCost = $costs['forbidden_seal'][$seal_level][$seal_length];
             //Check cost
             if($player->getPremiumCredits() < $akCost) {
-                throw new Exception("You do not have enough Ancient Kunai!");
+                throw new RuntimeException("You do not have enough Ancient Kunai!");
             }
 
             //Extend seal
@@ -639,10 +659,10 @@ function premium() {
         }
 	}
 	else if(isset($_POST['change_color']) && $player->canChangeChatColor()) {
-		$color = $system->clean($_POST['name_color']);
+		$color = $system->db->clean($_POST['name_color']);
 
         // Premium effect
-        $chat_effect = (isset($_POST['chat_effect']) ? $system->clean($_POST['chat_effect']) : "");
+        $chat_effect = (isset($_POST['chat_effect']) ? $system->db->clean($_POST['chat_effect']) : "");
 
         if($player->premium_credits_purchased && in_array($chat_effect, ["", "sparkles"])) {
             $player->chat_effect = $chat_effect;
@@ -661,14 +681,14 @@ function premium() {
 	else if(isset($_POST['change_element']) && $player->rank_num >= 3) {
         try {
             $akCost = $costs['element_change'];
-			$current_element = $system->clean($_POST['current_element']);
-			$new_element = $system->clean($_POST['new_element']);
+			$editing_element_index = (int)$_POST['editing_element_index'];
+			$new_element = $system->db->clean($_POST['new_element']);
             //Player already has new element
             if(in_array($new_element, $player->elements)) {
-                throw new Exception("You already attuned to the $new_element element!");
+                throw new RuntimeException("You already attuned to the $new_element element!");
             }
             //Check player's current element is valid
-            switch($player->elements[$current_element]) {
+            switch($player->elements[$editing_element_index]) {
                 case Jutsu::ELEMENT_FIRE:
                 case Jutsu::ELEMENT_WIND:
                 case Jutsu::ELEMENT_LIGHTNING:
@@ -676,7 +696,7 @@ function premium() {
                 case Jutsu::ELEMENT_WATER:
                     break;
                 default:
-                    throw new Exception("The $current_element element ({$player->elements[$current_element]}) is invalid!");
+                    throw new RuntimeException("The $editing_element_index element ({$player->elements[$editing_element_index]}) is invalid!");
             }
             //Check that new element is valid
             switch($new_element) {
@@ -687,22 +707,28 @@ function premium() {
                 case Jutsu::ELEMENT_WATER:
                     break;
                 default:
-                    throw new Exception("New element $new_element is invalid!");
+                    throw new RuntimeException("New element $new_element is invalid!");
             }
+
+            if($editing_element_index > $player->rank_num - 2) {
+                throw new RuntimeException("Invalid element slot!");
+            }
+
             //Check cost
             if($player->getPremiumCredits() < $akCost) {
-                throw new Exception("You do not have enough Ancient Kunai!");
+                throw new RuntimeException("You do not have enough Ancient Kunai!");
             }
+
             //Confirm purchase
             if(!isset($_POST['confirm_chakra_element_change'])) {
                 $confirmation_type = 'confirm_chakra_element_change';
-                $confirmation_string = "Are you sure you want to <b>forget the {$player->elements[$current_element]} nature</b>
+                $confirmation_string = "Are you sure you want to <b>forget the {$player->elements[$editing_element_index]} nature</b>
                 and any jutsus you have to <b>attune to the $new_element nature</b>?<br />
                 <br />
                 <b>(IMPORTANT: This is non-reversable once completed! If you want to return to your original element you
                 will have to pay another fee. You will forget any elemental jutsu you currently have of this nature.)</b>";
                 $additional_form_data = [
-                    'current_element' => ['input_type' => 'hidden', 'value' => $current_element],
+                    'current_element' => ['input_type' => 'hidden', 'value' => $editing_element_index],
                     'new_element' => ['input_type' => 'hidden', 'value' => $new_element],
                 ];
                 $submit_value = 'change_element';
@@ -770,28 +796,20 @@ function premium() {
                 // Process purchase
                 $player->subtractPremiumCredits(
                     $akCost,
-                    "Changed {$current_element} element from {$player->elements[$current_element]} to $new_element"
+                    "Changed element #{$editing_element_index} from {$player->elements[$editing_element_index]} to $new_element"
                 );
 
                 $player->getInventory();
 
-                // Chuunin element change
-                if ($player->rank_num >= 3 && $current_element === 'first') {
+                // rank check
+
+                if(isset($player->elements[$editing_element_index])) {
                     foreach ($player->jutsu as $jutsu) {
-                        if ($jutsu->element == $player->elements[$current_element]) {
+                        if ($jutsu->element == $player->elements[0]) {
                             $player->removeJutsu($jutsu->id);
                         }
                     }
-                    $player->elements['first'] = $new_element;
-                }
-                // Jonin+ element change
-                else if ($player->rank_num >= 4 && $current_element === 'second') {
-                    foreach ($player->jutsu as $jutsu) {
-                        if ($jutsu->element == $player->elements[$current_element]) {
-                            $player->removeJutsu($jutsu->id);
-                        }
-                    }
-                    $player->elements['second'] = $new_element;
+                    $player->elements[$editing_element_index] = $new_element;
                 }
 
                 $player->updateData();
@@ -807,7 +825,7 @@ function premium() {
         $akCost = $costs['village_change'];
 		try {
 			if($village == $player->village->name) {
-				throw new Exception("Invalid village!");
+				throw new RuntimeException("Invalid village!");
 			}
 
 			switch($village) {
@@ -818,27 +836,27 @@ function premium() {
 				case 'Mist':
 					break;
 				default:
-					throw new Exception("Invalid village!");
+					throw new RuntimeException("Invalid village!");
 					break;
 			}
 
 			if($player->team) {
 				$debug = ($player->layout == 'classic_blue') ? "<br /><br />" : "";
-				throw new Exception($debug . "You must leave your team first!");
+				throw new RuntimeException($debug . "You must leave your team first!");
 			}
 
 			if($player->getPremiumCredits() < $akCost) {
-				throw new Exception("You do not have enough Ancient Kunai!");
+				throw new RuntimeException("You do not have enough Ancient Kunai!");
 			}
 
             if ($player->sensei_id) {
                 if ($player->rank_num < 3) {
-                    throw new Exception("You must leave your sensei first!");
+                    throw new RuntimeException("You must leave your sensei first!");
                 }
             }
             if (SenseiManager::isSensei($player->user_id, $system)) {
                 if (SenseiManager::hasStudents($player->user_id, $system)) {
-                    throw new Exception("You must leave your students first!");
+                    throw new RuntimeException("You must leave your students first!");
                 }
             }
 
@@ -858,13 +876,13 @@ function premium() {
             else {
                 //Update clan data if player holds a seat
                 if ($player->clan->leader_id == $player->user_id) {
-                    $system->query("UPDATE `clans` SET `leader` = '0' WHERE `clan_id` = '{$player->clan->id}'");
+                    $system->db->query("UPDATE `clans` SET `leader` = '0' WHERE `clan_id` = '{$player->clan->id}'");
                 }
                 else if ($player->clan->elder_1_id == $player->user_id) {
-                    $system->query("UPDATE `clans` SET `elder_1` = '0' WHERE `clan_id` = '{$player->clan->id}'");
+                    $system->db->query("UPDATE `clans` SET `elder_1` = '0' WHERE `clan_id` = '{$player->clan->id}'");
                 }
                 else if ($player->clan->elder_2_id == $player->user_id) {
-                    $system->query("UPDATE `clans` SET `elder_2` = '0' WHERE `clan_id` = '{$player->clan->id}'");
+                    $system->db->query("UPDATE `clans` SET `elder_2` = '0' WHERE `clan_id` = '{$player->clan->id}'");
                 }
                 //Remove clan seat from player if they hold seat
                 if ($player->clan_office) {
@@ -887,19 +905,21 @@ function premium() {
                 $player->village = new Village($system, $village);
 
                 // Clan
-                $result = $system->query("SELECT `clan_id`, `name` FROM `clans`
-                    WHERE `village`='{$player->village->name}' AND `bloodline_only`='0'");
-                if ($system->db_last_num_rows == 0) {
-                    $result = $system->query("SELECT `clan_id`, `name` FROM `clans` WHERE `bloodline_only`='0'");
+                $result = $system->db->query(
+                    "SELECT `clan_id`, `name` FROM `clans`
+                        WHERE `village`='{$player->village->name}' AND `bloodline_only`='0'"
+                );
+                if ($system->db->last_num_rows == 0) {
+                    $result = $system->db->query("SELECT `clan_id`, `name` FROM `clans` WHERE `bloodline_only`='0'");
                 }
 
-                if (!$system->db_last_num_rows) {
-                    throw new Exception("No clans available!");
+                if (!$system->db->last_num_rows) {
+                    throw new RuntimeException("No clans available!");
                 }
 
                 $clans = array();
                 $count = 0;
-                while ($row = $system->db_fetch($result)) {
+                while ($row = $system->db->fetch($result)) {
                     $clans[$row['clan_id']] = $row;
                     $count++;
                 }
@@ -916,8 +936,8 @@ function premium() {
                 $query .= " FROM `users`";
 
                 $clan_counts = array();
-                $result = $system->query($query);
-                $row = $system->db_fetch($result);
+                $result = $system->db->query($query);
+                $row = $system->db->fetch($result);
                 $total_users = 0;
                 foreach ($row as $id => $user_count) {
                     $clan_counts[$id] = $user_count;
@@ -965,11 +985,11 @@ function premium() {
             //Check if clan exists and playe not in clan
 			$clan_exists = in_array($new_clan_id, array_keys($available_clans));
 			if( ($new_clan_id == $player->clan->id) || !$clan_exists) {
-				throw new Exception("Invalid clan!");
+				throw new RuntimeException("Invalid clan!");
 			}
 
 			if($player->getPremiumCredits() < $akCost) {
-				throw new Exception("You do not have enough Ancient Kunai!");
+				throw new RuntimeException("You do not have enough Ancient Kunai!");
 			}
 
 			$clan_name = $available_clans[$new_clan_id];
@@ -995,13 +1015,13 @@ function premium() {
 
                 // Remove player from clan data, if seat held
                 if ($player->clan->leader_id == $player->user_id) {
-                    $system->query("UPDATE `clans` SET `leader` = '0' WHERE `clan_id` = '{$player->clan->id}'");
+                    $system->db->query("UPDATE `clans` SET `leader` = '0' WHERE `clan_id` = '{$player->clan->id}'");
                 }
                 else if ($player->clan->elder_1_id == $player->user_id) {
-                    $system->query("UPDATE `clans` SET `elder_1` = '0' WHERE `clan_id` = '{$player->clan->id}'");
+                    $system->db->query("UPDATE `clans` SET `elder_1` = '0' WHERE `clan_id` = '{$player->clan->id}'");
                 }
                 else if ($player->clan->elder_2_id == $player->user_id) {
-                    $system->query("UPDATE `clans` SET `elder_2` = '0' WHERE `clan_id` = '{$player->clan->id}'");
+                    $system->db->query("UPDATE `clans` SET `elder_2` = '0' WHERE `clan_id` = '{$player->clan->id}'");
                 }
                 //Remove seat from player if held
                 if($player->clan_office) {
@@ -1029,9 +1049,9 @@ function premium() {
 
     // Select all for bloodline list
     $bloodlines = array();
-    $result = $system->query("SELECT * FROM `bloodlines` WHERE `rank` < 5 ORDER BY `rank` ASC");
-    if($system->db_last_num_rows > 0) {
-        while($row = $system->db_fetch($result)) {
+    $result = $system->db->query("SELECT * FROM `bloodlines` WHERE `rank` < 5 ORDER BY `rank` ASC");
+    if($system->db->last_num_rows > 0) {
+        while($row = $system->db->fetch($result)) {
             // Prep json encoded members for use in BL list
             $row['passive_boosts'] = json_decode($row['passive_boosts']);
             $row['combat_boosts'] = json_decode($row['combat_boosts']);
@@ -1081,16 +1101,16 @@ function premiumCreditExchange() {
             $money = round($_POST['money'], 1);
 
             if(!is_numeric($premium_credits)) {
-                throw new Exception("Invalid Ancient Kunai amount!");
+                throw new RuntimeException("Invalid Ancient Kunai amount!");
             }
             if($premium_credits < 1) {
-                throw new Exception("Offer must contain at least one (1) Ancient Kunai!");
+                throw new RuntimeException("Offer must contain at least one (1) Ancient Kunai!");
             }
             if(!is_numeric($money)) {
-                throw new Exception("Invalid yen amount!");
+                throw new RuntimeException("Invalid yen amount!");
             }
             if($money < $price_min || $money > $price_max) {
-                throw new Exception("Offer must be between &yen;" . $price_min * 1000 . " & &yen;" . $price_max * 1000 . " each!");
+                throw new RuntimeException("Offer must be between &yen;" . $price_min * 1000 . " & &yen;" . $price_max * 1000 . " each!");
             }
 
             // Adjust money value for processing and insertion into market
@@ -1098,16 +1118,18 @@ function premiumCreditExchange() {
 
             // Check financing
             if ($player->getPremiumCredits() < $premium_credits) {
-                throw new Exception("You do not have enough Ancient Kunai!");
+                throw new RuntimeException("You do not have enough Ancient Kunai!");
             }
             // Subtract premium_credits from user
             $player->subtractPremiumCredits($premium_credits, "Placed AK for sale on exchange");
             $player->updateData();
 
             //Add offer to market
-            $system->query("INSERT INTO `premium_credit_exchange` (`seller`, `premium_credits`, `money`)
-			VALUES ('$player->user_id', '$premium_credits', '$money')");
-            if ($system->db_last_affected_rows > 0) {
+            $system->db->query(
+                "INSERT INTO `premium_credit_exchange` (`seller`, `premium_credits`, `money`)
+                VALUES ('$player->user_id', '$premium_credits', '$money')"
+            );
+            if ($system->db->last_affected_rows > 0) {
                 $system->message("Offer placed!");
             }
             else {
@@ -1124,23 +1146,23 @@ function premiumCreditExchange() {
 	else if(isset($_GET['purchase'])) {
 		try {
 			// Validate input for offer id
-			$id = (int)$system->clean($_GET['purchase']);
-			$result = $system->query("SELECT * FROM `premium_credit_exchange` WHERE `id`='$id' LIMIT 1");
-			if($system->db_last_num_rows == 0) {
-				 throw new Exception("Invalid offer!");
+			$id = (int)$system->db->clean($_GET['purchase']);
+			$result = $system->db->query("SELECT * FROM `premium_credit_exchange` WHERE `id`='$id' LIMIT 1");
+			if($system->db->last_num_rows == 0) {
+				 throw new RuntimeException("Invalid offer!");
 			}
 
             //Load offer
-			$offer = $system->db_fetch($result);
+			$offer = $system->db->fetch($result);
 
             //Check if offer is completed
             if($offer['completed'] == 1) {
-                throw new Exception("This offer has already been processed!");
+                throw new RuntimeException("This offer has already been processed!");
             }
 
             // Check user has enough money
             if($player->getMoney() < $offer['money']) {
-                throw new Exception("You do not have enough money!");
+                throw new RuntimeException("You do not have enough money!");
             }
             // Process payment
             $player->subtractMoney($offer['money'], "Purchased AK from exchange.");
@@ -1148,12 +1170,14 @@ function premiumCreditExchange() {
             $player->updateData();
 
 			// Run purchase and log [NOTE: Updating first is to avoid as much server lag and possibility for glitching]
-			$system->query("UPDATE `premium_credit_exchange` SET `completed`='1' WHERE `id`='$id' LIMIT 1");
+			$system->db->query("UPDATE `premium_credit_exchange` SET `completed`='1' WHERE `id`='$id' LIMIT 1");
 
-            $result = $system->query("SELECT `money` FROM `users` WHERE `user_id`='{$offer['seller']}' LIMIT 1");
-            $current_balance = $system->db_fetch($result)['money'] ?? null;
+            $result = $system->db->query("SELECT `money` FROM `users` WHERE `user_id`='{$offer['seller']}' LIMIT 1");
+            $current_balance = $system->db->fetch($result)['money'] ?? null;
 
-			$system->query("UPDATE `users` SET `money`=`money` + {$offer['money']} WHERE `user_id`='{$offer['seller']}'");
+			$system->db->query(
+                "UPDATE `users` SET `money`=`money` + {$offer['money']} WHERE `user_id`='{$offer['seller']}'"
+            );
 
             $system->currencyLog(
                 character_id: $offer['seller'],
@@ -1175,7 +1199,7 @@ function premiumCreditExchange() {
 
 			$system->message("Ancient Kunai purchased!");
 			$system->printMessage();
-		} catch(Exception $e) {
+		} catch(RuntimeException $e) {
 			$system->message($e->getMessage());
 			$system->printMessage();
 		}
@@ -1185,26 +1209,26 @@ function premiumCreditExchange() {
 	else if(isset($_GET['cancel'])) {
 		try {
 			// Validate input for offer id
-			$id = (int)$system->clean($_GET['cancel']);
-			$result = $system->query("SELECT * FROM `premium_credit_exchange` WHERE `id`='$id' LIMIT 1");
-			if($system->db_last_num_rows == 0) {
-				 throw new Exception("Invalid offer!");
+			$id = (int)$system->db->clean($_GET['cancel']);
+			$result = $system->db->query("SELECT * FROM `premium_credit_exchange` WHERE `id`='$id' LIMIT 1");
+			if($system->db->last_num_rows == 0) {
+				 throw new RuntimeException("Invalid offer!");
 			}
 
-			$offer = $system->db_fetch($result);
+			$offer = $system->db->fetch($result);
 
             // Offer complete
             if($offer['completed']) {
-                throw new Exception("This offer has already been processed!");
+                throw new RuntimeException("This offer has already been processed!");
             }
 
 			// Check offer belongs to user
 			if($player->user_id != $offer['seller']) {
-				throw new Exception("This is not your offer!");
+				throw new RuntimeException("This is not your offer!");
 			}
 
 			// Cancel log [NOTE: Updating first is to avoid as much server lag and possibility for glitching]
-			$system->query("UPDATE `premium_credit_exchange` SET `completed`='1' WHERE `id`='$id' LIMIT 1");
+			$system->db->query("UPDATE `premium_credit_exchange` SET `completed`='1' WHERE `id`='$id' LIMIT 1");
 
             $player->addPremiumCredits($offer['premium_credits'], "Cancelled AK offer on exchange");
             $player->updateData();
@@ -1215,26 +1239,26 @@ function premiumCreditExchange() {
 
 			$system->message("Offer cancelled!");
 			$system->printMessage();
-		} catch(Exception $e) {
+		} catch(RuntimeException $e) {
 			$system->message($e->getMessage());
 			$system->printMessage();
 		}
 	}
 
     $query = "SELECT * FROM `premium_credit_exchange` WHERE `completed`='0' ORDER BY `id` DESC";
-	$result = $system->query($query);
+	$result = $system->db->query($query);
 
 	$credit_users = array();
     $offers = array();
 
 	//If there are offers in the database
-	if($system->db_last_num_rows) {
-		while($row = $system->db_fetch($result)) {
+	if($system->db->last_num_rows) {
+		while($row = $system->db->fetch($result)) {
             //Fetch seller information if not already done
 			if(!in_array($row['seller'], $credit_users))
 			{
-				$user_result = $system->query("SELECT `user_name` FROM `users` WHERE `user_id`='{$row['seller']}'");
-				$user_info = $system->db_fetch($user_result);
+				$user_result = $system->db->query("SELECT `user_name` FROM `users` WHERE `user_id`='{$row['seller']}'");
+				$user_info = $system->db->fetch($user_result);
 				$credit_users[$row['seller']] = $user_info['user_name'];
 			}
             $row['seller_name'] = $credit_users[$row['seller']];

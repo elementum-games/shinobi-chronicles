@@ -36,22 +36,21 @@ class Inbox {
         4 => 'support_system'
     ];
 
-    /**
-     * @param System $system
-     * @param User $user
-     */
     public function __construct() {
     }
 
     /**
      * @param System $system
      * @param int    $message_id
-     * @return array db_fetch
+     * @return array fetch
+     * @throws RuntimeException
      */
     public static function getInfoFromMessageId(System $system, int $message_id): array {
-        $convo_result = $system->query("SELECT `convo_id`, `time` FROM `convos_messages` WHERE `message_id`='{$message_id}' LIMIT 1");
-        if($system->db_last_num_rows) {
-            $convo_data = $system->db_fetch($convo_result);
+        $convo_result = $system->db->query(
+            "SELECT `convo_id`, `time` FROM `convos_messages` WHERE `message_id`='{$message_id}' LIMIT 1"
+        );
+        if($system->db->last_num_rows) {
+            $convo_data = $system->db->fetch($convo_result);
             $timeMax = $convo_data['time'] + 43200;
             $timeMin = $convo_data['time'] - 43200;
 
@@ -62,15 +61,15 @@ class Inbox {
                 WHERE `convo_id`='{$convo_data['convo_id']}' AND `time` BETWEEN {$timeMin} AND {$timeMax}
                 ORDER BY `time` DESC";
 
-            $result = $system->query($sql);
+            $result = $system->db->query($sql);
             $sender_id = null;
             $user_name = null;
             $staff_level = null;
             $time = null;
 
-            if($system->db_last_num_rows) {
+            if($system->db->last_num_rows) {
                 $returnString = '';
-                while($post = $system->db_fetch($result)) {
+                while($post = $system->db->fetch($result)) {
                     if($post['message_id'] == $message_id) {
                         $sender_id = $post['sender_id'];
                         $user_name = $post['user_name'];
@@ -108,7 +107,7 @@ class Inbox {
      */
     public static function checkConvo($system, int|string $convo_id): int {
         $sql = "SELECT COUNT(`convo_id`) FROM `convos` WHERE `convo_id`='{$convo_id}' AND `active`=1";
-        $result = $system->query($sql);
+        $result = $system->db->query($sql);
         $count = $result->fetch_row();
         return $count[0];
     }
@@ -129,12 +128,12 @@ class Inbox {
                 INNER JOIN `blacklist`
                 ON `users`.`user_id`=`blacklist`.`user_id`
                 WHERE `users`.`user_name`='{$user_name}'";
-        $result = $system->query($sql);
-        if (!$system->db_last_num_rows) {
+        $result = $system->db->query($sql);
+        if (!$system->db->last_num_rows) {
             return null;
         }
 
-        $data = $system->db_fetch($result);
+        $data = $system->db->fetch($result);
 
         return new InboxUser(
             user_id: $data['user_id'],
@@ -174,8 +173,8 @@ class Inbox {
      * @return int
      */
     public static function createConversation(System $system, int $owner_id, ?string $title): int {
-        $system->query("INSERT INTO `convos` (`owner_id`, `title`) VALUES ('{$owner_id}', '{$title}')");
-        return $system->db_last_insert_id;
+        $system->db->query("INSERT INTO `convos` (`owner_id`, `title`) VALUES ('{$owner_id}', '{$title}')");
+        return $system->db->last_insert_id;
     }
 
     /**
@@ -188,8 +187,8 @@ class Inbox {
         $timestamp = time();
         $sql = "INSERT INTO `convos_messages` (`convo_id`, `sender_id`, `message`, `time`)
                 VALUES ('{$convo_id}', '{$sender_id}', '{$message}', '{$timestamp}')";
-        $system->query($sql);
-        return $system->db_last_insert_id;
+        $system->db->query($sql);
+        return $system->db->last_insert_id;
     }
 
     /**
@@ -204,8 +203,8 @@ class Inbox {
         $time = time();
         $sql = "INSERT INTO `convos_alerts` (`system_id`, `sender_id`, `target_id`, `message`, `time`)
                 VALUES ('{$type}', '{$sender_id}', '{$target_id}', '{$message}', '{$time}')";
-        $result = $system->query($sql);
-        return $system->db_last_insert_id;
+        $result = $system->db->query($sql);
+        return $system->db->last_insert_id;
     }
 
     /**
@@ -215,8 +214,8 @@ class Inbox {
      */
     public static function updateTitle($system, $convo_id, $title): int {
         $sql = "UPDATE `convos` SET `title`='{$title}' WHERE `convo_id`='{$convo_id}'";
-        $result = $system->query($sql);
-        return $system->db_last_affected_rows;
+        $result = $system->db->query($sql);
+        return $system->db->last_affected_rows;
     }
 
     /**
@@ -227,8 +226,8 @@ class Inbox {
     public static function addUserToConvo($system, $convo_id, $user_id): int {
         $sql = "INSERT INTO `convos_users` (`convo_id`, `user_id`)
                 VALUES ('{$convo_id}', '{$user_id}')";
-        $result = $system->query($sql);
-        return $system->db_last_insert_id;
+        $result = $system->db->query($sql);
+        return $system->db->last_insert_id;
     }
 
     /**
@@ -237,8 +236,8 @@ class Inbox {
      * @return int last_affected_rows
      */
     public static function removePlayerFromConvo($system, $convo_id, $user_id): bool {
-        $system->query("DELETE FROM `convos_users` WHERE `convo_id`='{$convo_id}' AND `user_id`='{$user_id}'");
-        return $system->db_last_affected_rows > 0;
+        $system->db->query("DELETE FROM `convos_users` WHERE `convo_id`='{$convo_id}' AND `user_id`='{$user_id}'");
+        return $system->db->last_affected_rows > 0;
     }
 
     /**
@@ -248,8 +247,10 @@ class Inbox {
      * @return boolean
      */
     public static function toggleMute(System $system, int $convo_id, int $user_id): bool {
-        $system->query("UPDATE `convos_users` SET `muted`=(`muted` ^ 1) WHERE `convo_id`='{$convo_id}' AND `user_id`={$user_id}");
-        return $system->db_last_affected_rows > 0;
+        $system->db->query(
+            "UPDATE `convos_users` SET `muted`=(`muted` ^ 1) WHERE `convo_id`='{$convo_id}' AND `user_id`={$user_id}"
+        );
+        return $system->db->last_affected_rows > 0;
     }
 
     /**
@@ -258,8 +259,8 @@ class Inbox {
      * @return bool whether delete succeeded or not
      */
     public static function deleteConvo(System $system, int|string $convo_id): bool {
-        $system->query("UPDATE `convos` SET `active`=0 WHERE `convo_id`='{$convo_id}'");
-        return $system->db_last_affected_rows > 0;
+        $system->db->query("UPDATE `convos` SET `active`=0 WHERE `convo_id`='{$convo_id}'");
+        return $system->db->last_affected_rows > 0;
     }
 
     /**
@@ -268,7 +269,7 @@ class Inbox {
      */
     public static function conversationCountForUser($system, $user_id): int {
         $sql = "SELECT COUNT(`entry_id`) FROM `convos_users` WHERE `user_id`='{$user_id}'";
-        $result = $system->query($sql);
+        $result = $system->db->query($sql);
         $count = $result->fetch_row();
         return $count[0];
     }
@@ -348,8 +349,8 @@ class Inbox {
     public static function updateLastViewedForUser($system, $convo_id, $user_id): bool {
         $timestamp = time();
         $sql = "UPDATE `convos_users` SET `last_read`={$timestamp} WHERE `convo_id`='{$convo_id}' AND `user_id`={$user_id}";
-        $result = $system->query($sql);
-        return $system->db_last_affected_rows;
+        $result = $system->db->query($sql);
+        return $system->db->last_affected_rows;
     }
 
     /**
@@ -360,7 +361,7 @@ class Inbox {
      */
     public static function verifyAccessToConvo($system, $convo_id, $user_id): int {
         $sql = "SELECT COUNT(`entry_id`) FROM `convos_users` WHERE `convo_id`='{$convo_id}' AND `user_id`='{$user_id}'";
-        $result = $system->query($sql);
+        $result = $system->db->query($sql);
         $count = $result->fetch_row();
         return $count[0];
     }
@@ -378,12 +379,12 @@ class Inbox {
                 INNER JOIN `blacklist`
                 ON `blacklist`.`user_id`=`users`.`user_id`
                 WHERE `convos_users`.`convo_id`='{$convo_id}'";
-        $result = $system->query($sql);
-        if (!$system->db_last_num_rows) {
+        $result = $system->db->query($sql);
+        if (!$system->db->last_num_rows) {
             return null;
         }
 
-        $users_data = $system->db_fetch_all($result);
+        $users_data = $system->db->fetch_all($result);
 
         return array_map(function ($user_data) {
             return new InboxUser(
@@ -407,11 +408,11 @@ class Inbox {
                 AND `target_id`={$user_id}
                 AND `alert_deleted`=0
                 ORDER BY `alert_id` DESC";
-        $result = $system->query($sql);
-        if (!$system->db_last_num_rows) {
+        $result = $system->db->query($sql);
+        if (!$system->db->last_num_rows) {
             return [];
         }
-        $convo_data = $system->db_fetch_all($result);
+        $convo_data = $system->db->fetch_all($result);
         $all_messages = [];
         foreach($convo_data as $message_data) {
             $message = [];
@@ -459,11 +460,11 @@ class Inbox {
                 AND `convos_messages`.`message_id`<{$message_id}
                 ORDER BY `convos_messages`.`time` DESC
                 LIMIT {$limit}";
-        $result = $system->query($sql);
-        if (!$system->db_last_num_rows) {
+        $result = $system->db->query($sql);
+        if (!$system->db->last_num_rows) {
             return false;
         }
-        $all_message_data = $system->db_fetch_all($result);
+        $all_message_data = $system->db->fetch_all($result);
         foreach($all_message_data as $message_data) {
             $message_data['message'] = $system->html_parse(stripslashes($message_data['message']), false, true);
             $message_data['self_message'] = $message_data['sender_id'] == $user->user_id ? true : false;
@@ -479,8 +480,8 @@ class Inbox {
      */
     public static function getConvoOwner($system, $convo_id): int {
         $sql = "SELECT `owner_id` FROM `convos` WHERE `convo_id`='{$convo_id}'";
-        $result = $system->query($sql);
-        $owner_id = $system->db_fetch();
+        $result = $system->db->query($sql);
+        $owner_id = $system->db->fetch();
         return $owner_id['owner_id'];
     }
 
@@ -496,8 +497,8 @@ class Inbox {
                 WHERE `unread`=1
                 AND `system_id`='{$system_id}'
                 AND `target_id`='{$user_id}'";
-        $result = $system->query($sql);
-        return $system->db_last_affected_rows;
+        $result = $system->db->query($sql);
+        return $system->db->last_affected_rows;
     }
 
     /**
@@ -518,11 +519,11 @@ class Inbox {
                 ) t2
                 ON t1.`alert_id` = t2.`alert_id`
                 WHERE t1.`target_id`={$user_id}";
-        $result = $system->query($sql);
-        if (!$system->db_last_num_rows) {
+        $result = $system->db->query($sql);
+        if (!$system->db->last_num_rows) {
             return [];
         }
-        $all_alerts = $system->db_fetch_all($result);
+        $all_alerts = $system->db->fetch_all($result);
         foreach($all_alerts as $alert) {
             // build a fake conversation to display
             $tmp_array = [];
@@ -561,8 +562,8 @@ class Inbox {
                 WHERE `convos_users`.`user_id`='{$user_id}'
                 AND `convos`.`active`=1
                 ORDER BY `convos_users`.`last_read` DESC";
-        $result = $system->query($sql);
-        $convos_data = $system->db_fetch_all($result);
+        $result = $system->db->query($sql);
+        $convos_data = $system->db->fetch_all($result);
 
         foreach($convos_data as $convo) {
             $convo['title'] = htmlspecialchars_decode($convo['title'], ENT_QUOTES);
@@ -575,8 +576,8 @@ class Inbox {
                     ON `convos_users`.`user_id` = `users`.`user_id`
                     WHERE `convos_users`.`convo_id`='{$convo['convo_id']}'
                     AND `convos_users`.`user_id`<>'{$user_id}'";
-            $result = $system->query($sql);
-            $user_data = $system->db_fetch_all($result);
+            $result = $system->db->query($sql);
+            $user_data = $system->db->fetch_all($result);
             $convo['members'] = $user_data;
 
             // get last message data from each convo
@@ -586,8 +587,8 @@ class Inbox {
                     AND `deleted`=0
                     ORDER by `time` DESC
                     LIMIT 1";
-            $result = $system->query($sql);
-            $message_data = $system->db_fetch($result);
+            $result = $system->db->query($sql);
+            $message_data = $system->db->fetch($result);
 
             // unread messages
             if (!empty($message_data)) {

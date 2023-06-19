@@ -22,16 +22,18 @@ function arena(): bool {
 	}
 	else {
         $ai_rank = min($player->rank_num, System::SC_MAX_RANK);
-        $result = $system->query("SELECT `ai_id`, `name`, `level` FROM `ai_opponents`
-			WHERE `rank` = {$ai_rank} ORDER BY `level` ASC");
-		if($system->db_last_num_rows == 0) {
+        $result = $system->db->query(
+            "SELECT `ai_id`, `name`, `level` FROM `ai_opponents`
+                WHERE `rank` = {$ai_rank} ORDER BY `level` ASC"
+        );
+		if($system->db->last_num_rows == 0) {
 			$system->message("No NPC opponents found!");
 			$system->printMessage();
 			return false;
 		}
 
 		$ai_opponents = array();
-		while($row = $system->db_fetch($result)) {
+		while($row = $system->db->fetch($result)) {
 			$ai_opponents[$row['ai_id']] = $row;
 		}
 
@@ -63,7 +65,7 @@ function arena(): bool {
                     arena();
                     $player->log(User::LOG_ARENA, "Opponent {$ai->id} ({$ai->getName()})");
                     return true;
-                } catch(Exception $e) {
+                } catch(RuntimeException $e) {
                     $system->message("Invalid opponent!");
                     $system->printMessage();
                 }
@@ -92,7 +94,7 @@ function arena(): bool {
 }
 
 /**
- * @throws Exception
+ * @throws RuntimeException
  */
 function arenaFight(): bool {
     global $system;
@@ -115,7 +117,7 @@ function arenaFight(): bool {
             echo "<table class='table'><tr><th>Battle Results</th></tr>
             <tr><td style='text-align: center;'>" . $battle_result . "</td></tr></table>";
         }
-    } catch(Exception $e) {
+    } catch(RuntimeException $e) {
         $system->message($e->getMessage());
         $system->printMessage();
         return false;
@@ -139,7 +141,7 @@ function arenaFightAPI(System $system, User $player): BattlePageAPIResponse {
         if($battle->isComplete()) {
             $response->battle_result = processArenaBattleEnd($battle, $player);
         }
-    } catch(Exception $e) {
+    } catch(RuntimeException $e) {
         $response->errors[] = $e->getMessage();
     }
 
@@ -147,7 +149,7 @@ function arenaFightAPI(System $system, User $player): BattlePageAPIResponse {
 }
 
 /**
- * @throws Exception
+ * @throws RuntimeException
  */
 function processArenaBattleEnd(BattleManager|BattleManagerV2 $battle, User $player): string {
     // Base chance at 100, goes down if fight is too short/lower level AI

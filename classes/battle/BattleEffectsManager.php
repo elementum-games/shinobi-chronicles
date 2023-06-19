@@ -260,7 +260,7 @@ class BattleEffectsManager {
     /**
      * @param Fighter $player1
      * @param Fighter $player2
-     * @throws Exception
+     * @throws RuntimeException
      */
     public function applyActiveEffects(Fighter $player1, Fighter $player2) {
         if(!empty($this->active_effects)) {
@@ -272,7 +272,7 @@ class BattleEffectsManager {
                     $effect_target =& $player2;
                 }
                 else {
-                    throw new Exception("Invalid effect target {$effect->target}");
+                    throw new RuntimeException("Invalid effect target {$effect->target}");
                 }
 
                 if($effect->user == $player1->combat_id) {
@@ -282,7 +282,7 @@ class BattleEffectsManager {
                     $effect_user =& $player2;
                 }
                 else {
-                    throw new Exception("Invalid effect user {$effect->user}");
+                    throw new RuntimeException("Invalid effect user {$effect->user}");
                 }
 
                 $this->applyActiveEffect(
@@ -534,7 +534,7 @@ class BattleEffectsManager {
     /**
      * @param       $fighter
      * @param Jutsu $fighter_jutsu
-     * @throws Exception
+     * @throws RuntimeException
      */
     public function assertParentGenjutsuActive($fighter, Jutsu $fighter_jutsu) {
         if($fighter_jutsu->jutsu_type != Jutsu::TYPE_GENJUTSU) {
@@ -545,7 +545,7 @@ class BattleEffectsManager {
         $parent_jutsu = $fighter->jutsu[$fighter_jutsu->parent_jutsu];
         if(!isset($this->active_genjutsu[$parent_genjutsu_id]) or
             $this->active_genjutsu[$parent_genjutsu_id]['turns'] == $parent_jutsu->effect_length) {
-            throw new Exception($parent_jutsu->name .
+            throw new RuntimeException($parent_jutsu->name .
                 ' must be active for 1 turn before using this jutsu!'
             );
         }
@@ -556,7 +556,7 @@ class BattleEffectsManager {
     }
 
     public function getDisplayText(Fighter $fighter): string {
-        return $this->system->clean(
+        return $this->system->db->clean(
             implode(
                 '[br]',
                 array_map(function($text) {

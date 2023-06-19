@@ -44,7 +44,7 @@ abstract class Fighter {
     public float $willpower;
 
     public array $elements = [
-        'first' => Jutsu::ELEMENT_NONE
+        Jutsu::ELEMENT_NONE
     ];
 
     // Inventory
@@ -221,7 +221,7 @@ abstract class Fighter {
      * @param Jutsu  $attack      Copy of the attack data.
      * @param bool   $disable_randomness
      * @return float|int
-     * @throws Exception
+     * @throws RuntimeException
      */
     public function calcDamage(Jutsu $attack, bool $disable_randomness = false): float|int {
         if($this->system->debug['damage'])  {
@@ -248,7 +248,7 @@ abstract class Fighter {
                 $off_nerf = $this->ninjutsu_nerf;
                 break;
             default:
-                throw new Exception("Invalid jutsu type!");
+                throw new RuntimeException("Invalid jutsu type!");
         }
 
         switch($attack->purchase_type) {
@@ -261,7 +261,7 @@ abstract class Fighter {
                     ($off_skill * self::BLOODLINE_OFFENSE_RATIO) + ($this->bloodline_skill * self::BLOODLINE_OFFENSE_RATIO);
                 break;
             default:
-                throw new Exception("Invalid jutsu type!");
+                throw new RuntimeException("Invalid jutsu type!");
         }
         $offense_boost = 0;
 

@@ -51,26 +51,26 @@ class BattleAttackV2 {
 
     /**
      * @return bool
-     * @throws Exception
+     * @throws RuntimeException
      */
     public function isFacingRight(): bool {
         if($this->target instanceof AttackDirectionTarget) {
             return $this->target->isDirectionRight();
         }
 
-        throw new Exception("Unsupported target type for direction check!");
+        throw new RuntimeException("Unsupported target type for direction check!");
     }
 
     /**
      * @return bool
-     * @throws Exception
+     * @throws RuntimeException
      */
     public function isFacingLeft(): bool {
         if($this->target instanceof AttackDirectionTarget) {
             return $this->target->isDirectionLeft();
         }
 
-        throw new Exception("Unsupported target type for direction check!");
+        throw new RuntimeException("Unsupported target type for direction check!");
     }
 }
 

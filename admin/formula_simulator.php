@@ -117,7 +117,7 @@ function fighterFromData(array $fighter_data, string $name): TestFighter {
  * @param Jutsu   $player1_jutsu
  * @param Jutsu   $player2_jutsu
  * @return array
- * @throws Exception
+ * @throws RuntimeException
  */
 function calcDamage(Fighter $player1, Fighter $player2, Jutsu $player1_jutsu, Jutsu $player2_jutsu): array {
     global $system;
@@ -138,7 +138,7 @@ function calcDamage(Fighter $player1, Fighter $player2, Jutsu $player1_jutsu, Ju
         player2_jutsu: $player2_jutsu
     );
 
-    $system->query("DELETE FROM battles WHERE `battle_id`={$battle_id}");
+    $system->db->query("DELETE FROM battles WHERE `battle_id`={$battle_id}");
 
     $player1_collision_damage = $player1_raw_damage;
     $player2_collision_damage = $player2_raw_damage;
@@ -206,10 +206,10 @@ if(isset($_POST['run_simulation']) && $mode == 'vs') {
     ];
     try {
         if(!in_array($player1_data['jutsu_type'], $valid_jutsu_types)) {
-            throw new Exception("Invalid jutsu type for player 1!");
+            throw new RuntimeException("Invalid jutsu type for player 1!");
         }
         if(!in_array($player2_data['jutsu_type'], $valid_jutsu_types)) {
-            throw new Exception("Invalid jutsu type for player 2!");
+            throw new RuntimeException("Invalid jutsu type for player 2!");
         }
 
         $player1 = fighterFromData($player1_data, "Player 1");

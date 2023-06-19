@@ -88,15 +88,15 @@ class Clan {
     }
 
     /**
-     * @throws Exception
+     * @throws RuntimeException
      */
     public static function loadFromId(System $system, int $id): ?Clan {
-        $result = $system->query("SELECT * FROM `clans` WHERE `clan_id`=$id LIMIT 1");
+        $result = $system->db->query("SELECT * FROM `clans` WHERE `clan_id`=$id LIMIT 1");
         if(!$result) {
             return null;
         }
         
-        $clan_data = $system->db_fetch($result);
+        $clan_data = $system->db->fetch($result);
         
         return new Clan(
             system: $system,
@@ -124,12 +124,13 @@ class Clan {
     public function getClanMissions(int $player_rank_num): array {
         $max_mission_rank = Mission::maxMissionRank($player_rank_num);
 
-        $result = $this->system->query(
+        $result = $this->system->db->query(
             "SELECT `mission_id`, `name`, `rank` FROM `missions` 
-                WHERE `mission_type`=" . Mission::TYPE_CLAN . " AND `rank` <= $max_mission_rank");
+                WHERE `mission_type`=" . Mission::TYPE_CLAN . " AND `rank` <= $max_mission_rank"
+        );
         $missions = array();
 
-        while($row = $this->system->db_fetch($result)) {
+        while($row = $this->system->db->fetch($result)) {
             $missions[$row['mission_id']] = $row;
         }
 
@@ -176,10 +177,10 @@ class Clan {
             $query = "SELECT `user_id`, `user_name`, `rank`, `level`, `exp`, `avatar_link`, `clan_office`, `last_active` 
                 FROM `users`
                 WHERE `user_id` IN (" . implode(',', $officer_ids) . ")";
-            $result = $this->system->query($query);
+            $result = $this->system->db->query($query);
 
-            if($this->system->db_last_num_rows > 0) {
-                while($row = $this->system->db_fetch($result)) {
+            if($this->system->db->last_num_rows > 0) {
+                while($row = $this->system->db->fetch($result)) {
                     $officers[$row['clan_office']] = new ClanMemberDto(
                         id: $row['user_id'],
                         name: $row['user_name'],
@@ -198,7 +199,7 @@ class Clan {
     }
 
     /**
-     * @throws Exception
+     * @throws RuntimeException
      */
     public function setBoost(string $new_boost): void {
         $boost_cost = self::$BOOST_COST;
@@ -207,21 +208,23 @@ class Clan {
         $training_boosts = $this->getTrainingBoostOptions();
 
         if(!in_array($new_boost, $training_boosts)) {
-            throw new Exception("Invalid boost!");
+            throw new RuntimeException("Invalid boost!");
         }
         if($this->points < $boost_cost) {
-            throw new Exception("Not enough points!");
+            throw new RuntimeException("Not enough points!");
         }
 
         $new_boost = 'training:' . $new_boost;
 
         $this->points -= $boost_cost;
 
-        $this->system->query("UPDATE `clans` SET 
-            `boost`='$new_boost', 
-            `boost_amount`={$boost_amount}, 
-            `points`=`points` - {$boost_cost}
-        WHERE `clan_id`='{$this->id}' LIMIT 1");
+        $this->system->db->query(
+            "UPDATE `clans` SET 
+                `boost`='$new_boost', 
+                `boost_amount`={$boost_amount}, 
+                `points`=`points` - {$boost_cost}
+            WHERE `clan_id`='{$this->id}' LIMIT 1"
+        );
 
         $this->boost = $new_boost;
         $this->boost_type = explode(':', $new_boost)[0];
@@ -232,13 +235,13 @@ class Clan {
     }
 
     /**
-     * @throws Exception
+     * @throws RuntimeException
      */
     public function startMission(User $player, int $mission_id): bool {
         $missions = $this->getClanMissions($player->rank_num);
 
         if(!isset($missions[$mission_id])) {
-            throw new Exception("Invalid mission!");
+            throw new RuntimeException("Invalid mission!");
         }
         Mission::start($player, $mission_id);
         $player->log(User::LOG_MISSION, "Clan Mission ID #{$mission_id}");
@@ -250,17 +253,17 @@ class Clan {
      * @param User $player
      * @param int  $office
      * @return void
-     * @throws Exception
+     * @throws RuntimeException
      */
     public function challengeForOffice(User $player, int $office): bool {
         if($player->rank_num < 4 && $office == Clan::OFFICE_LEADER) {
-            throw new Exception("Unable to claim leader position at this rank.");
+            throw new RuntimeException("Unable to claim leader position at this rank.");
         }
         if($player->clan_office == $office) {
-            throw new Exception("You cannot challenge yourself!");
+            throw new RuntimeException("You cannot challenge yourself!");
         }
         if($player->clan_office) {
-            throw new Exception("Please resign from your current position before taking a new one!");
+            throw new RuntimeException("Please resign from your current position before taking a new one!");
         }
 
         // Check cooldown
@@ -272,7 +275,7 @@ class Clan {
             : time() - Clan::ELDER_MAX_INACTIVITY;
 
         if($current_officer != null && $current_officer->last_active > $min_officer_last_active) {
-            throw new Exception("Position already taken!");
+            throw new RuntimeException("Position already taken!");
         }
 
         // Claim empty seat
@@ -282,19 +285,25 @@ class Clan {
         /** @noinspection SqlResolve */
         switch($office) {
             case Clan::OFFICE_LEADER:
-                $this->system->query("UPDATE `clans` SET `leader`='$player->user_id' WHERE `clan_id`='{$this->id}' LIMIT 1");
+                $this->system->db->query(
+                    "UPDATE `clans` SET `leader`='$player->user_id' WHERE `clan_id`='{$this->id}' LIMIT 1"
+                );
                 $this->leader_id = $player->user_id;
                 break;
             case Clan::OFFICE_ELDER_1:
-                $this->system->query("UPDATE `clans` SET `elder_1`='$player->user_id' WHERE `clan_id`='{$this->id}' LIMIT 1");
+                $this->system->db->query(
+                    "UPDATE `clans` SET `elder_1`='$player->user_id' WHERE `clan_id`='{$this->id}' LIMIT 1"
+                );
                 $this->elder_1_id = $player->user_id;
                 break;
             case Clan::OFFICE_ELDER_2:
-                $this->system->query("UPDATE `clans` SET `elder_2`='$player->user_id' WHERE `clan_id`='{$this->id}' LIMIT 1");
+                $this->system->db->query(
+                    "UPDATE `clans` SET `elder_2`='$player->user_id' WHERE `clan_id`='{$this->id}' LIMIT 1"
+                );
                 $this->elder_2_id = $player->user_id;
                 break;
             default:
-                throw new Exception("Invalid office!");
+                throw new RuntimeException("Invalid office!");
         }
 
         $player->clan_office = $office;
@@ -308,14 +317,14 @@ class Clan {
     /**
      * @param string $info
      * @return void
-     * @throws Exception
+     * @throws RuntimeException
      */
     public function setInfo(string $info): void {
         if(strlen($info) > 700) {
-            throw new Exception("Clan info is too long!");
+            throw new RuntimeException("Clan info is too long!");
         }
 
-        $this->system->query("UPDATE `clans` SET `info`='$info' WHERE `clan_id`='{$this->id}' LIMIT 1");
+        $this->system->db->query("UPDATE `clans` SET `info`='$info' WHERE `clan_id`='{$this->id}' LIMIT 1");
         $this->info = $info;
 
         $this->system->message("Clan info updated!");
@@ -324,27 +333,27 @@ class Clan {
     /**
      * @param string $logo_url
      * @return void
-     * @throws Exception
+     * @throws RuntimeException
      */
     public function setLogoUrl(string $logo_url) {
         if(strlen($logo_url) > 150) {
-            throw new Exception("Link is too long!");
+            throw new RuntimeException("Link is too long!");
         }
 
-        $this->system->query("UPDATE `clans` SET `logo`='$logo_url' WHERE `clan_id`='{$this->id}' LIMIT 1");
+        $this->system->db->query("UPDATE `clans` SET `logo`='$logo_url' WHERE `clan_id`='{$this->id}' LIMIT 1");
         $this->logo_url = $logo_url;
         $this->system->message("Logo updated!");
     }
 
     /**
-     * @throws Exception
+     * @throws RuntimeException
      */
     public function setMotto(string $motto): void {
         if(strlen($motto) > 180) {
-            throw new Exception("Motto is too long!");
+            throw new RuntimeException("Motto is too long!");
         }
 
-        $this->system->query("UPDATE `clans` SET `motto`='$motto' WHERE `clan_id`='{$this->id}' LIMIT 1");
+        $this->system->db->query("UPDATE `clans` SET `motto`='$motto' WHERE `clan_id`='{$this->id}' LIMIT 1");
         $this->motto = $motto;
 
         $this->system->message("Motto updated!");
@@ -359,15 +368,15 @@ class Clan {
 
         switch($player->clan_office) {
             case Clan::OFFICE_LEADER:
-                $this->system->query("UPDATE `clans` SET `leader`=0 WHERE `clan_id`='{$this->id}' LIMIT 1");
+                $this->system->db->query("UPDATE `clans` SET `leader`=0 WHERE `clan_id`='{$this->id}' LIMIT 1");
                 $this->leader_id = 0;
                 break;
             case Clan::OFFICE_ELDER_1:
-                $this->system->query("UPDATE `clans` SET `elder_1`=0 WHERE `clan_id`='{$this->id}' LIMIT 1");
+                $this->system->db->query("UPDATE `clans` SET `elder_1`=0 WHERE `clan_id`='{$this->id}' LIMIT 1");
                 $this->elder_1_id = 0;
                 break;
             case Clan::OFFICE_ELDER_2:
-                $this->system->query("UPDATE `clans` SET `elder_2`=0 WHERE `clan_id`='{$this->id}' LIMIT 1");
+                $this->system->db->query("UPDATE `clans` SET `elder_2`=0 WHERE `clan_id`='{$this->id}' LIMIT 1");
                 $this->elder_2_id = 0;
                 break;
         }

@@ -5,7 +5,7 @@ if(!$_POST) {
 
 require("classes/_autoload.php");
 $system = new System();
-$system->dbConnect();
+$system->db->connect();
 
 
 // Read the notification from PayPal and create the acknowledgement response
@@ -35,28 +35,28 @@ $header .= "Content-Length: " . strlen($req) . "\r\n\r\n";
 $fp = fsockopen ('ssl://www.paypal.com', 443, $errno, $errstr, 30);
 
 // assign posted variables to local variables
-$txn_id =	 		$system->clean($_POST['txn_id']);
-$payment_date = 	$system->clean($_POST['payment_date']);
+$txn_id =	 		$system->db->clean($_POST['txn_id']);
+$payment_date = 	$system->db->clean($_POST['payment_date']);
 $time = 			time();
-$user_id =			$system->clean($_POST['custom']);
-$buyer_name = 		$system->clean($_POST['first_name'] . ' ' . $_POST['last_name']);
-$buyer_email = 		$system->clean($_POST['payer_email']);
-$payment_amount = 	$system->clean($_POST['mc_gross']);
-$quantity = 		$system->clean($_POST['quantity']);
-$payment_currency = $system->clean($_POST['mc_currency']);
-$address_city =		$system->clean($_POST['address_city']);
-$address_country =	$system->clean($_POST['address_country']);
-$address_state =	$system->clean($_POST['address_state']);
-$address_street =	$system->clean($_POST['address_street']);
-$address_zip =		$system->clean($_POST['address_zip']);
-$address_status =	$system->clean($_POST['address_status']);
+$user_id =			$system->db->clean($_POST['custom']);
+$buyer_name = 		$system->db->clean($_POST['first_name'] . ' ' . $_POST['last_name']);
+$buyer_email = 		$system->db->clean($_POST['payer_email']);
+$payment_amount = 	$system->db->clean($_POST['mc_gross']);
+$quantity = 		$system->db->clean($_POST['quantity']);
+$payment_currency = $system->db->clean($_POST['mc_currency']);
+$address_city =		$system->db->clean($_POST['address_city']);
+$address_country =	$system->db->clean($_POST['address_country']);
+$address_state =	$system->db->clean($_POST['address_state']);
+$address_street =	$system->db->clean($_POST['address_street']);
+$address_zip =		$system->db->clean($_POST['address_zip']);
+$address_status =	$system->db->clean($_POST['address_status']);
 
 $receiver_email = 	$_POST['receiver_email'];
 $payment_status = 	$_POST['payment_status'];
 
 if (!$fp) {
 	// HTTP ERROR
-	$system->send_pm("IPN Listener", "Lsmjudoka", "IPN Received", "HTTP Error");
+	$system->log("IPN Listener","IPN Received", "HTTP Error");
 } 
 else {
 	fputs ($fp, $header . $req);
@@ -72,31 +72,31 @@ else {
 			Id: $txn_id
 			Recipient email: $receiver_email
 			Sender email: $buyer_email";
-			$system->send_pm("IPN Listener", "Lsmjudoka", "Payment", $message);
+
 			try {
 				// check the payment_status is Completed
 				if($payment_status != "Completed") {
-					throw new Exception("Payment is not complete.");
+					throw new RuntimeException("Payment is not complete.");
 				}
 				// check that txn_id has not been previously processed
-				$result = $system->query("SELECT `id` FROM `Payments` WHERE `txn_id`='$txn_id' LIMIT 1");
-				if($system->db_last_num_rows > 0 ) {
-					throw new Exception("Payment has already been processed!");
+				$result = $system->db->query("SELECT `id` FROM `Payments` WHERE `txn_id`='$txn_id' LIMIT 1");
+				if($system->db->last_num_rows > 0 ) {
+					throw new RuntimeException("Payment has already been processed!");
 				}
 				
 				// check that receiver_email is your Primary PayPal email
 				if($receiver_email != "lsmjudoka05@yahoo.com" && $receiver_email != "Lsm_1276033742_biz@gmail.com") {
-					throw new Exception("Invalid recipient!");
+					throw new RuntimeException("Invalid recipient!");
 				}
 				// check that payment_amount/payment_currency are correct
 				if($payment_currency != "USD") {
-					$system->send_pm("IPN Listener", "Lsmjudoka", "IPN Error", "Invalid currency -- #$txn_id");
-					throw new Exception("Invalid currency!");
+					$system->log("ipn_listener", "error", "Invalid currency -- #$txn_id");
+					throw new RuntimeException("Invalid currency!");
 				}
 				// Check payment amount
 				$payment_amount = floor($payment_amount);
 				if($payment_amount < 1) {
-					throw new Exception("Invalid payment, < $1!");
+					throw new RuntimeException("Invalid payment, < $1!");
 				}
 
 				$kunai_amount = $payment_amount * System::KUNAI_PER_DOLLAR;
@@ -105,7 +105,7 @@ else {
 				`payment_currency`, `address_city`, `address_country`, `address_state`, `address_street`, `address_zip`, `address_status`) VALUES
 				('$txn_id', '$payment_date', '$time', 'user:$user_id', '$buyer_name', '$buyer_email', '$payment_amount', '$quantity', 
 				'$payment_currency', '$address_city', '$address_country', '$address_state', '$address_street', '$address_zip', '$address_status')";
-				$system->query($query);
+				$system->db->query($query);
 				
 				// Check shard amount
 				$bonus = 0;
@@ -127,10 +127,10 @@ else {
 				`premium_credits` = `premium_credits` + '" . ($total_amount) . "', 
 				`premium_credits_purchased` = `premium_credits_purchased` + '" . ($total_amount) . "'
 				WHERE `user_id`='$user_id' LIMIT 1";
-				$system->query($query);
+				$system->db->query($query);
 
-                $result = $system->query("SELECT `premium_credits` FROM `users` WHERE `user_id`='{$user_id}'");
-                $user = $system->db_fetch($result);
+                $result = $system->db->query("SELECT `premium_credits` FROM `users` WHERE `user_id`='{$user_id}'");
+                $user = $system->db->fetch($result);
 
                 if($user == null) {
                     $system->log('shard_purchase', 'invalid_user',"Transaction $txn_id for user #{$user_id}");
@@ -146,22 +146,19 @@ else {
                     );
                 }
 
-				$system->send_pm("Lsmjudoka", "$user_id", "Shard purchase",
+				/*$system->send_pm("Lsmjudoka", "$user_id", "Shard purchase",
 				"Your purchase of " . ($kunai_amount + $bonus) . " Ancient Kunai" . ($bonus > 0 ? " ($kunai_amount + $bonus bonus)" : "") .
-				" has been processed and credited to your account. Thank you!");
+				" has been processed and credited to your account. Thank you!");*/
 				
 				// process payment
-			} catch(Exception $e) {
-				$system->send_pm("IPN Listener", "Lsmjudoka", "IPN error", $e->getMessage() . "\r\nID: $txn_id");
+			} catch(RuntimeException $e) {
+				$system->log("ipn_listener",  "ipn_error", $e->getMessage() . "\r\nID: $txn_id");
 			}
 		}
 		else if (strcmp ($res, "INVALID") == 0) {
 			// log for manual investigation
-			$system->send_pm("IPN Listener", "Lsmjudoka", "IPN Received", "Invalid!" .
+			$system->log("ipn_listener",  "invalid_ipn_received", "Invalid!" .
 			$_SERVER['REMOTE_ADDR'] . "<br />" . json_encode($_POST));
-		}
-		else {
-			// $system->send_pm("IPN Listener", "Lsmjudoka", "IPN Received", "Invalid! '$res'<br />" . json_encode($_POST));	
 		}
 	}
 	fclose ($fp);

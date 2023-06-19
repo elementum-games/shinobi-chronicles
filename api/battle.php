@@ -8,15 +8,15 @@ $system = API::init();
 try {
     $player = Auth::getUserFromSession($system);
     $player->loadData(User::UPDATE_NOTHING);
-} catch(Exception $e) {
+} catch(RuntimeException $e) {
     API::exitWithException($e, system: $system);
 }
 # End standard auth
 
 
-$battle_result = $system->query("SELECT battle_type FROM battles WHERE `battle_id`='{$player->battle_id}' LIMIT 1");
-if($system->db_last_num_rows) {
-    $battle_data = $system->db_fetch($battle_result);
+$battle_result = $system->db->query("SELECT battle_type FROM battles WHERE `battle_id`='{$player->battle_id}' LIMIT 1");
+if($system->db->last_num_rows) {
+    $battle_data = $system->db->fetch($battle_result);
 
     $battle_route = null;
     foreach(Router::$routes as $page_id => $page) {
@@ -56,7 +56,7 @@ if($system->db_last_num_rows) {
                 $response = rankupFightAPI($system, $player);
                 break;
             default:
-                throw new Exception("Invalid battle route!");
+                throw new RuntimeException("Invalid battle route!");
         }
 
         if(!($response instanceof BattlePageAPIResponse)) {

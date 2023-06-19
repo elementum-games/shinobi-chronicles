@@ -1895,7 +1895,7 @@ class Securimage
         if (empty($code)) {
             $error = 'Failed to get audible code (are database settings correct?).  Check the error log for details';
             trigger_error($error, E_USER_WARNING);
-            throw new Exception($error);
+            throw new RuntimeException($error);
         }
 
         if (preg_match('/(\d+) (\+|-|x) (\d+)/i', $code['display'], $eq)) {
@@ -1919,7 +1919,7 @@ class Securimage
 
         try {
             return $this->generateWAV($letters);
-        } catch(Exception $ex) {
+        } catch(RuntimeException $ex) {
             throw $ex;
         }
     }
@@ -2197,7 +2197,7 @@ class Securimage
      * Get the PDO DSN string for connecting to the database
      *
      * @see Securimage::$database_driver Database driver
-     * @throws Exception  If database specific options are not configured
+     * @throws RuntimeException  If database specific options are not configured
      * @return string     The DSN for connecting to the database
      */
     protected function getDsn()
@@ -2212,9 +2212,9 @@ class Securimage
             case self::SI_DRIVER_MYSQL:
             case self::SI_DRIVER_PGSQL:
                 if (empty($this->database_host)) {
-                    throw new Exception('Securimage::database_host is not set');
+                    throw new RuntimeException('Securimage::database_host is not set');
                 } else if (empty($this->database_name)) {
-                    throw new Exception('Securimage::database_name is not set');
+                    throw new RuntimeException('Securimage::database_name is not set');
                 }
 
                 $dsn .= sprintf('host=%s;dbname=%s',
@@ -2230,7 +2230,7 @@ class Securimage
     /**
      * Checks if the necessary database tables for storing captcha codes exist
      *
-     * @throws Exception If the table check failed for some reason
+     * @throws RuntimeException If the table check failed for some reason
      * @return boolean true if the database do exist, false if not
      */
     protected function checkTablesExist()
@@ -2264,7 +2264,7 @@ class Securimage
                 return false;
             }
 
-            throw new Exception("Failed to check tables: {$err[0]} - {$err[1]}: {$err[2]}");
+            throw new RuntimeException("Failed to check tables: {$err[0]} - {$err[1]}: {$err[2]}");
         } else if ($this->database_driver == self::SI_DRIVER_SQLITE3) {
             // successful here regardless of row count for sqlite
             return true;
@@ -2467,7 +2467,7 @@ class Securimage
         $first      = true;     // reading first wav file
 
         if ($this->audio_use_sox && !is_executable($this->sox_binary_path)) {
-            throw new Exception("Path to SoX binary is incorrect or not executable");
+            throw new RuntimeException("Path to SoX binary is incorrect or not executable");
         }
 
         foreach ($letters as $letter) {
@@ -2509,7 +2509,7 @@ class Securimage
             } catch (Exception $ex) {
                 // failed to open file, or the wav file is broken or not supported
                 // 2 wav files were not compatible, different # channels, bits/sample, or sample rate
-                throw new Exception("Error generating audio captcha on letter '$letter': " . $ex->getMessage());
+                throw new RuntimeException("Error generating audio captcha on letter '$letter': " . $ex->getMessage());
             }
         }
 
@@ -2541,7 +2541,7 @@ class Securimage
             if ( ($noiseFile = $this->getRandomNoiseFile()) !== false) {
                 try {
                     $wavNoise = new WavFile($noiseFile, false);
-                } catch(Exception $ex) {
+                } catch(RuntimeException $ex) {
                     throw $ex;
                 }
 
@@ -2803,7 +2803,7 @@ class Securimage
         } else if (is_string($color)) {
             try {
                 return new Securimage_Color($color);
-            } catch(Exception $e) {
+            } catch(RuntimeException $e) {
                 return new Securimage_Color($default);
             }
         } else if (is_array($color) && sizeof($color) == 3) {
@@ -2890,7 +2890,7 @@ class Securimage_Color
      *     $color = new Securimage_Color(0, 128, 255);
      *
      * @param string $color  The html color code to use
-     * @throws Exception  If any color value is not valid
+     * @throws RuntimeException  If any color value is not valid
      */
     public function __construct($color = '#ffffff')
     {

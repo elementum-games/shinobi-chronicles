@@ -70,7 +70,7 @@ class Battle {
      * @param Fighter $player2
      * @param int     $battle_type
      * @return mixed
-     * @throws Exception
+     * @throws RuntimeException
      */
     public static function start(
         System $system, Fighter $player1, Fighter $player2, int $battle_type
@@ -86,7 +86,7 @@ class Battle {
             case self::TYPE_AI_RANKUP:
                 break;
             default:
-                throw new Exception("Invalid battle type!");
+                throw new RuntimeException("Invalid battle type!");
         }
 
         $player1->combat_id = Battle::combatId(Battle::TEAM1, $player1);
@@ -97,7 +97,7 @@ class Battle {
             $player2->combat_id => $player2->health
         ];
 
-        $system->query(
+        $system->db->query(
             "INSERT INTO `battles` SET
                 `battle_type` = '" . $battle_type . "',
                 `start_time` = '" . time() . "',
@@ -115,7 +115,7 @@ class Battle {
                 `fighter_jutsu_used` = '" . $json_empty_array . "'
                 "
         );
-        $battle_id = $system->db_last_insert_id;
+        $battle_id = $system->db->last_insert_id;
 
         if($player1 instanceof User) {
             $player1->battle_id = $battle_id;
@@ -158,7 +158,7 @@ class Battle {
      * @param System $system
      * @param User   $player
      * @param int    $battle_id
-     * @throws Exception
+     * @throws RuntimeException
      */
     public function __construct(
         System $system, User $player, int $battle_id
@@ -168,17 +168,17 @@ class Battle {
         $this->battle_id = $battle_id;
         $this->player = $player;
 
-        $result = $this->system->query(
+        $result = $this->system->db->query(
             "SELECT * FROM `battles` WHERE `battle_id`='{$battle_id}' LIMIT 1"
         );
-        if($this->system->db_last_num_rows == 0) {
+        if($this->system->db->last_num_rows == 0) {
             if($player->battle_id = $battle_id) {
                 $player->battle_id = 0;
             }
-            throw new Exception("Invalid battle!");
+            throw new RuntimeException("Invalid battle!");
         }
 
-        $battle = $this->system->db_fetch($result);
+        $battle = $this->system->db->fetch($result);
 
         $this->raw_active_effects = $battle['active_effects'];
         $this->raw_active_genjutsu = $battle['active_genjutsu'];
@@ -216,7 +216,7 @@ class Battle {
     }
 
     /**
-     * @throws Exception
+     * @throws RuntimeException
      */
     public function loadFighters() {
         if($this->player1_id != $this->player->id) {
@@ -255,7 +255,7 @@ class Battle {
     /**
      * @param string $entity_id
      * @return Fighter
-     * @throws Exception
+     * @throws RuntimeException
      */
     protected function loadFighterFromEntityId(string $entity_id): Fighter {
         switch(Battle::getFighterEntityType($entity_id)) {
@@ -264,14 +264,14 @@ class Battle {
             case NPC::ID_PREFIX:
                 return NPC::fromEntityId($this->system, $entity_id);
             default:
-                throw new Exception("Invalid entity type! " . Battle::getFighterEntityType($entity_id));
+                throw new RuntimeException("Invalid entity type! " . Battle::getFighterEntityType($entity_id));
         }
     }
 
     /**
      * @param string $entity_id
      * @return string
-     * @throws Exception
+     * @throws RuntimeException
      */
     protected static function getFighterEntityType(string $entity_id): string {
         $entity_id = System::parseEntityId($entity_id);
@@ -287,7 +287,7 @@ class Battle {
     }
 
     /**
-     * @throws Exception
+     * @throws RuntimeException
      */
 
     public function timeRemaining(): int {
@@ -299,28 +299,30 @@ class Battle {
     }
 
     public function updateData() {
-        $this->system->query("START TRANSACTION;");
+        $this->system->db->query("START TRANSACTION;");
 
-        $this->system->query("UPDATE `battles` SET
-            `turn_time` = {$this->turn_time},
-            `turn_count` = {$this->turn_count},
-            `winner` = '{$this->winner}',
-
-            `fighter_health` = '" . json_encode($this->fighter_health) . "',
-            `fighter_actions` = '" . json_encode($this->fighter_actions) . "',
-
-            `field` = '" . $this->raw_field . "',
-
-            `active_effects` = '" . $this->raw_active_effects . "',
-            `active_genjutsu` = '" . $this->raw_active_genjutsu . "',
-
-            `jutsu_cooldowns` = '" . json_encode($this->jutsu_cooldowns) . "',
-            `fighter_jutsu_used` = '" . json_encode($this->fighter_jutsu_used) . "'
-        WHERE `battle_id` = '{$this->battle_id}' LIMIT 1");
+        $this->system->db->query(
+            "UPDATE `battles` SET
+                `turn_time` = {$this->turn_time},
+                `turn_count` = {$this->turn_count},
+                `winner` = '{$this->winner}',
+    
+                `fighter_health` = '" . json_encode($this->fighter_health) . "',
+                `fighter_actions` = '" . json_encode($this->fighter_actions) . "',
+    
+                `field` = '" . $this->raw_field . "',
+    
+                `active_effects` = '" . $this->raw_active_effects . "',
+                `active_genjutsu` = '" . $this->raw_active_genjutsu . "',
+    
+                `jutsu_cooldowns` = '" . json_encode($this->jutsu_cooldowns) . "',
+                `fighter_jutsu_used` = '" . json_encode($this->fighter_jutsu_used) . "'
+            WHERE `battle_id` = '{$this->battle_id}' LIMIT 1"
+        );
 
         BattleLog::addOrUpdateTurnLog($this->system, $this->battle_id, $this->turn_count, $this->battle_text);
 
-        $this->system->query("COMMIT;");
+        $this->system->db->query("COMMIT;");
     }
 
     public static function combatId(string $team, Fighter $fighter): string {

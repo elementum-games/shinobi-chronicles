@@ -37,45 +37,48 @@ function spar() {
                 </table>";
             }
         }
-        catch (Exception $e) {
-            $system->printMessage($e->getMessage());
-            $player->battle_id = 0;
+        catch (RuntimeException $e) {
+            error_log($e->getMessage());
+            $system->message($e->getMessage());
+            $system->printMessage();
             return false;
         }
-	}
+    }
 	else if(isset($_GET['challenge'])) {
 		try {
-			$challenge = (int)$system->clean($_GET['challenge']);
-			$result = $system->query("SELECT `user_id`, `user_name`, `village`, `location`, `challenge`, `battle_id`, `last_active`
-				FROM `users` WHERE `user_id`='$challenge' LIMIT 1");
-			if($system->db_last_num_rows == 0) {
-				throw new Exception("Invalid user!");
+			$challenge = (int)$system->db->clean($_GET['challenge']);
+			$result = $system->db->query(
+                "SELECT `user_id`, `user_name`, `village`, `location`, `challenge`, `battle_id`, `last_active`
+                    FROM `users` WHERE `user_id`='$challenge' LIMIT 1"
+            );
+			if($system->db->last_num_rows == 0) {
+				throw new RuntimeException("Invalid user!");
 			}
-			$user = $system->db_fetch($result);
+			$user = $system->db->fetch($result);
 			
 			/*
 			if($user['village'] != $player->village->name) {
-				throw new Exception("You cannot spar ninja from enemy villages!");
+				throw new RuntimeException("You cannot spar ninja from enemy villages!");
 			}
 			*/
 			
 			if(!$player->location->equals(TravelCoords::fromDbString($user['location']))) {
-				throw new Exception("Target is not at your location!");
+				throw new RuntimeException("Target is not at your location!");
 			}
 			
 			if($user['challenge']) {
-				throw new Exception("Target has already been challenged!");
+				throw new RuntimeException("Target has already been challenged!");
 			}
 				
 			if($user['battle_id']) {
-				throw new Exception("Target is in battle!");
+				throw new RuntimeException("Target is in battle!");
 			}
 			
 			if($user['last_active'] < time() - 120) {
-				throw new Exception("Target is inactive/offline!");
+				throw new RuntimeException("Target is inactive/offline!");
 			}
 			
-			$system->query("UPDATE `users` SET `challenge`='$player->user_id' WHERE `user_id`='$challenge' LIMIT 1");
+			$system->db->query("UPDATE `users` SET `challenge`='$player->user_id' WHERE `user_id`='$challenge' LIMIT 1");
 			$system->message("Challenge sent!");
 			$system->printMessage();
 		} catch (Exception $e) {
@@ -87,29 +90,29 @@ function spar() {
 	}
 	else if(isset($_GET['accept_challenge'])) {
 		try {
-			$challenge = (int)$system->clean($_GET['accept_challenge']);
+			$challenge = (int)$system->db->clean($_GET['accept_challenge']);
 			
 			if($challenge != $player->challenge) {
-				throw new Exception("Invalid challenge!");
+				throw new RuntimeException("Invalid challenge!");
 			}
 
             try {
                 $user = User::loadFromId($system, $challenge, true);
                 $user->loadData(User::UPDATE_NOTHING, true);
-            } catch(Exception $e) {
-                throw new Exception("Invalid user! " . $e->getMessage());
+            } catch(RuntimeException $e) {
+                throw new RuntimeException("Invalid user! " . $e->getMessage());
             }
 			
 			if(!$user->location->equals($player->location)) {
-				throw new Exception("Target is not at your location!");
+				throw new RuntimeException("Target is not at your location!");
 			}
 			
 			if($user->battle_id) {
-				throw new Exception("User is in battle!");
+				throw new RuntimeException("User is in battle!");
 			}
 			
 			if($user->last_active < time() - 120) {
-				throw new Exception("Target is inactive/offline!");
+				throw new RuntimeException("Target is inactive/offline!");
 			}
 
             $player->challenge = 0;
@@ -140,9 +143,11 @@ function spar() {
         NearbyPlayers::renderScoutAreaList($system, $player, $self_link);
 	}
 	else if(isset($_GET['cancel_challenge'])) {
-		$challenge = $system->clean($_GET['cancel_challenge']);
+		$challenge = $system->db->clean($_GET['cancel_challenge']);
 		// Load user challenges sent
-		$result = $system->query("UPDATE `users` SET `challenge`=0 WHERE `user_id`='$challenge' AND `challenge`='$player->user_id' LIMIT 1");
+		$result = $system->db->query(
+            "UPDATE `users` SET `challenge`=0 WHERE `user_id`='$challenge' AND `challenge`='$player->user_id' LIMIT 1"
+        );
 		$system->message("Challenge cancelled!");
 		$system->printMessage();
 
@@ -152,9 +157,9 @@ function spar() {
         $user_challenges = [];
 
 		// Load user challenges sent
-		$result = $system->query("SELECT `user_id`, `user_name` FROM `users` WHERE `challenge`='$player->user_id'");
-		if($system->db_last_num_rows > 0) {
-			while($row = $system->db_fetch($result)) {
+		$result = $system->db->query("SELECT `user_id`, `user_name` FROM `users` WHERE `challenge`='$player->user_id'");
+		if($system->db->last_num_rows > 0) {
+			while($row = $system->db->fetch($result)) {
 				$user_challenges[$row['user_id']] = $row['user_name'];
 			}
 		}
@@ -164,17 +169,19 @@ function spar() {
 				
 			// Challenge received
 			if($player->challenge) {
-				$result = $system->query("SELECT `user_name` FROM `users` WHERE `user_id`='$player->challenge' LIMIT 1");
-				if($system->db_last_num_rows == 0) {
+				$result = $system->db->query(
+                    "SELECT `user_name` FROM `users` WHERE `user_id`='$player->challenge' LIMIT 1"
+                );
+				if($system->db->last_num_rows == 0) {
 					$player->challenge = 0;
 				}
 				else {
-					$challenger_data = $system->db_fetch($result);
+					$challenger_data = $system->db->fetch($result);
 					
 					echo "<tr><td>
-					<p style='display:inline-block;margin:0px;margin-left:20px;'>
+					<p style='display:inline-block;margin:0;margin-left:20px;'>
 						Challenged by <span style='font-weight:bold;'>" . $challenger_data['user_name'] . "</span></p>
-					<p style='display:inline-block;margin:0px;margin-right:40px;float:right;'>
+					<p style='display:inline-block;margin:0;margin-right:40px;float:right;'>
 						<a href='$self_link&accept_challenge=$player->challenge'>Accept</a> | 
 						<a href='$self_link&decline_challenge=$player->challenge'>Decline</a>
 					</p></td></tr>";
@@ -184,9 +191,9 @@ function spar() {
 			if(count($user_challenges) > 0) {
 				foreach($user_challenges as $id=>$name) {
 					echo "<tr><td>
-					<p style='display:inline-block;margin:0px;margin-left:20px;'>
+					<p style='display:inline-block;margin:0;margin-left:20px;'>
 						Challenge sent to <span style='font-weight:bold;'>" . $name . "</span></p>
-					<p style='display:inline-block;margin:0px;margin-right:40px;float:right;'>
+					<p style='display:inline-block;margin:0;margin-right:40px;float:right;'>
 						<a href='$self_link&cancel_challenge=$id'>Cancel</a></p>
 					</td></tr>";
 				}
@@ -202,7 +209,7 @@ function spar() {
 }
 
 /**
- * @throws Exception
+ * @throws RuntimeException
  */
 function processSparFightEnd(BattleManager $battle, User $player): string {
     $player->battle_id = 0;
@@ -219,7 +226,7 @@ function processSparFightEnd(BattleManager $battle, User $player): string {
         return "You both knocked each other out.";
     }
     else {
-        throw new Exception("Invalid battle completion!");
+        throw new RuntimeException("Invalid battle completion!");
     }
 }
 

@@ -72,27 +72,29 @@ class Travel {
     }
 
     public static function getLocation(System $system, string $x, string $y, string $z): MapLocation {
-        $result = $system->query("SELECT * FROM `maps_locations` WHERE `x`='{$x}' AND `y`='{$y} 'AND `map_id`='{$z}' LIMIT 1");
-        if ($system->db_last_num_rows) {
-            return new MapLocation($system->db_fetch($result));
+        $result = $system->db->query(
+            "SELECT * FROM `maps_locations` WHERE `x`='{$x}' AND `y`='{$y} 'AND `map_id`='{$z}' LIMIT 1"
+        );
+        if ($system->db->last_num_rows) {
+            return new MapLocation($system->db->fetch($result));
         } else {
             return new MapLocation([]);
         }
     }
 
     public static function getPortalData(System $system, int $portal_id): array {
-        $result = $system->query("SELECT * FROM `maps_portals` WHERE `portal_id`={$portal_id} AND `active`=1");
-        if ($system->db_last_num_rows < 1) {
+        $result = $system->db->query("SELECT * FROM `maps_portals` WHERE `portal_id`={$portal_id} AND `active`=1");
+        if ($system->db->last_num_rows < 1) {
             return [];
         }
-        return $system->db_fetch($result);
+        return $system->db->fetch($result);
     }
 
     public static function getMapData(System $system, $map_id): array {
-        $result = $system->query("SELECT * FROM `maps` WHERE `map_id`={$map_id}");
-        if (!$system->db_last_num_rows) {
+        $result = $system->db->query("SELECT * FROM `maps` WHERE `map_id`={$map_id}");
+        if (!$system->db->last_num_rows) {
             return [];
         }
-        return $system->db_fetch($result);
+        return $system->db->fetch($result);
     }
 }

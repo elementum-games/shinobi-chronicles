@@ -28,7 +28,7 @@ class InboxManager {
                 AND `convos_users`.`user_id`='{$this->user->user_id}'
                 AND `convos_users`.`muted`=0
                 ORDER BY `convos_messages`.`time` DESC";
-        $result = $this->system->query($sql);
+        $result = $this->system->db->query($sql);
         $count = $result->fetch_row();
         return $count[0];
     }
@@ -38,7 +38,7 @@ class InboxManager {
      */
     public function checkIfUnreadAlerts(): int {
         $sql = "SELECT COUNT(`alert_id`) FROM `convos_alerts` WHERE `target_id`='{$this->user->user_id}' AND `unread`=1 AND `alert_deleted`=0";
-        $result = $this->system->query($sql);
+        $result = $this->system->db->query($sql);
         $count = $result->fetch_row();
         return $count[0];
     }
@@ -47,7 +47,7 @@ class InboxManager {
      * @param int $convo_id
      * @param int $owner_id
      * @param InboxUser[] $convo_members
-     * @return bool|int db_last_affected_rows
+     * @return bool|int db->last_affected_rows
      */
     public function leaveConversation(int $convo_id, int $owner_id, $convo_members): bool|int {
         // if the convo is just the player and 1 user
@@ -96,8 +96,8 @@ class InboxManager {
                 WHERE `convos`.`convo_id`='{$convo_id}' 
                 AND `convos_users`.`user_id`={$this->user->user_id}
                 AND `convos`.`active`=1";
-        $result = $this->system->query($sql);
-        $convo_data = $this->system->db_fetch($result);
+        $result = $this->system->db->query($sql);
+        $convo_data = $this->system->db->fetch($result);
 
         // get all members
         $convo_data['convo_members'] = $this->getConvoMembers($convo_id);

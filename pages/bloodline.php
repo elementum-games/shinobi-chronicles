@@ -4,7 +4,7 @@
 	Created:	04/10/2014
 */
 /**
- * @throws Exception
+ * @throws RuntimeException
  */
 function bloodline() {
 	global $system;
@@ -28,22 +28,22 @@ function bloodline() {
 		$jutsu_id = (int)$_GET['learn_jutsu'];
 		try {
 			if(!isset($base_bloodline->jutsu[$jutsu_id])) {
-				throw new Exception("Invalid jutsu!");
+				throw new RuntimeException("Invalid jutsu!");
 			}
 			if(isset($player->bloodline->jutsu[$jutsu_id])) {
-				throw new Exception("You already know this jutsu!");
+				throw new RuntimeException("You already know this jutsu!");
 			}
 			if($base_bloodline->jutsu[$jutsu_id]->rank > $player->rank_num) {
-				throw new Exception("You are not high enough rank to learn this jutsu!");
+				throw new RuntimeException("You are not high enough rank to learn this jutsu!");
 			}
 			// Parent jutsu check
 			if($base_bloodline->jutsu[$jutsu_id]->parent_jutsu) {
 				$id = $base_bloodline->jutsu[$jutsu_id]->parent_jutsu - 1;
 				if(!isset($player->bloodline->jutsu[$id])) {
-					throw new Exception("You need to learn " . $base_bloodline->jutsu[$id]->name . " first!");
+					throw new RuntimeException("You need to learn " . $base_bloodline->jutsu[$id]->name . " first!");
 				}
 				if($player->bloodline->jutsu[$id]->level < 50) {
-					throw new Exception("You are not skilled enough with " . $player->bloodline->jutsu[$id]->name .
+					throw new RuntimeException("You are not skilled enough with " . $player->bloodline->jutsu[$id]->name .
 						"! (Level " . $player->bloodline->jutsu[$id]->level . "/50)");
 				}
 			}

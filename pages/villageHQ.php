@@ -35,24 +35,28 @@ function villageHQ() {
 	}
 
 	if($view == 'village_info') {
-		$result = $system->query("SELECT * FROM `villages` WHERE `name`='{$player->village->name}'");
-		$village_data = $system->db_fetch($result);
+		$result = $system->db->query("SELECT * FROM `villages` WHERE `name`='{$player->village->name}'");
+		$village_data = $system->db->fetch($result);
 
-		$result = $system->query("SELECT
-			COUNT(IF(`rank`=1,1,NULL)) as `count_1`,
-			COUNT(IF(`rank`=2,1,NULL)) as `count_2`,
-			COUNT(IF(`rank`=3,1,NULL)) as `count_3`,
-			COUNT(IF(`rank`=4,1,NULL)) as `count_4`
-			FROM `users` WHERE `village`='{$player->village->name}'");
-		$villager_counts = $system->db_fetch($result);
+		$result = $system->db->query(
+            "SELECT
+                COUNT(IF(`rank`=1,1,NULL)) as `count_1`,
+                COUNT(IF(`rank`=2,1,NULL)) as `count_2`,
+                COUNT(IF(`rank`=3,1,NULL)) as `count_3`,
+                COUNT(IF(`rank`=4,1,NULL)) as `count_4`
+                FROM `users` WHERE `village`='{$player->village->name}'"
+        );
+		$villager_counts = $system->db->fetch($result);
 
 
 		$leader_name = 'None';
 		$leader_avatar = './images/default_avatar.png';
 		if($village_data['leader']) {
-			$result = $system->query("SELECT `user_name`, `avatar_link` FROM `users` WHERE `user_id`={$village_data['leader']} LIMIT 1");
-			if($system->db_last_num_rows > 0) {
-				$result = $system->db_fetch($result);
+			$result = $system->db->query(
+                "SELECT `user_name`, `avatar_link` FROM `users` WHERE `user_id`={$village_data['leader']} LIMIT 1"
+            );
+			if($system->db->last_num_rows > 0) {
+				$result = $system->db->fetch($result);
 				$leader_name = $result['user_name'];
 				$leader_avatar = $result['avatar_link'];
 			}
@@ -95,8 +99,8 @@ function villageHQ() {
 	else if($view == 'members') {
 		// Load rank data
 		$ranks = array();
-		$result = $system->query("SELECT `rank_id`, `name` FROM `ranks`");
-		while($rank = $system->db_fetch($result)) {
+		$result = $system->db->query("SELECT `rank_id`, `name` FROM `ranks`");
+		while($rank = $system->db->fetch($result)) {
 			$ranks[$rank['rank_id']]['name'] = $rank['name'];
 		}
 
@@ -104,11 +108,13 @@ function villageHQ() {
 		$users_per_page = 10;
 		$min = 0;
 		if(isset($_GET['min'])) {
-			$min = (int)$system->clean($_GET['min']);
+			$min = (int)$system->db->clean($_GET['min']);
 		}
 
-		$result = $system->query("SELECT `user_name`, `rank`, `level`, `exp` FROM `users`
-			WHERE `village`='{$player->village->name}' ORDER BY `rank` DESC, `exp` DESC LIMIT $min, $users_per_page");
+		$result = $system->db->query(
+            "SELECT `user_name`, `rank`, `level`, `exp` FROM `users`
+                WHERE `village`='{$player->village->name}' ORDER BY `rank` DESC, `exp` DESC LIMIT $min, $users_per_page"
+        );
 
 		echo "<table class='table'><tr><th colspan='4'>Village Members</th></tr>
 		<tr>
@@ -119,7 +125,7 @@ function villageHQ() {
 		</tr>";
 
 		$count = 0;
-		while($row = $system->db_fetch($result)) {
+		while($row = $system->db->fetch($result)) {
 			$class = '';
 			if(is_int($count++ / 2)) {
 				$class = 'row1';
@@ -146,8 +152,10 @@ function villageHQ() {
 			}
 			echo "<a href='$self_link&view=members&min=$prev'>Previous</a>";
 		}
-		$result = $system->query("SELECT COUNT(`user_id`) as `count` FROM `users` WHERE `village`='{$player->village->name}'");
-		$result = $system->db_fetch($result);
+		$result = $system->db->query(
+            "SELECT COUNT(`user_id`) as `count` FROM `users` WHERE `village`='{$player->village->name}'"
+        );
+		$result = $system->db->fetch($result);
 		if($min + $users_per_page < $result['count']) {
 			if($min > 0) {
 				echo "&nbsp;&nbsp;|&nbsp;&nbsp;";
@@ -161,9 +169,11 @@ function villageHQ() {
 		$user_id_array = array();
 
 		// Clans
-		$result = $system->query("SELECT * FROM `clans` WHERE `village`='{$player->village->name}' ORDER BY `points` DESC LIMIT 5");
+		$result = $system->db->query(
+            "SELECT * FROM `clans` WHERE `village`='{$player->village->name}' ORDER BY `points` DESC LIMIT 5"
+        );
 		$clans = array();
-		while($row = $system->db_fetch($result)) {
+		while($row = $system->db->fetch($result)) {
 			$clans[] = $row;
 			if(array_search($row['leader'], $user_id_array) === false) {
 				$user_id_array[] = $row['leader'];
@@ -171,9 +181,11 @@ function villageHQ() {
 		}
 
 		// Teams
-		$result = $system->query("SELECT * FROM `teams` WHERE `village`='{$player->village->name}' ORDER BY `points` DESC LIMIT 5");
+		$result = $system->db->query(
+            "SELECT * FROM `teams` WHERE `village`='{$player->village->name}' ORDER BY `points` DESC LIMIT 5"
+        );
 		$teams = array();
-		while($row = $system->db_fetch($result)) {
+		while($row = $system->db->fetch($result)) {
 			$teams[] = $row;
 			if(array_search($row['leader'], $user_id_array) === false) {
 				$user_id_array[] = $row['leader'];
@@ -182,9 +194,9 @@ function villageHQ() {
 
 		// Fetch leader names
 		$user_id_string = implode(',', $user_id_array);
-		$result = $system->query("SELECT `user_id`, `user_name` FROM `users` WHERE `user_id` IN ($user_id_string)");
+		$result = $system->db->query("SELECT `user_id`, `user_name` FROM `users` WHERE `user_id` IN ($user_id_string)");
 		$user_names = array();
-		while($row = $system->db_fetch($result)) {
+		while($row = $system->db->fetch($result)) {
 			$user_names[$row['user_id']] = $row['user_name'];
 		}
 
@@ -221,9 +233,9 @@ function villageHQ() {
 	}
 	else if($view == 'world_info') {
 		// World info
-		$result = $system->query("SELECT * FROM `villages`");
+		$result = $system->db->query("SELECT * FROM `villages`");
 		$villages = array();
-		while($row = $system->db_fetch($result)) {
+		while($row = $system->db->fetch($result)) {
 			$villages[] = $row;
 		}
 
@@ -235,8 +247,8 @@ function villageHQ() {
 			}
 		}
 		$count_query .= " FROM `users`";
-		$result = $system->query($count_query);
-		$village_counts = $system->db_fetch($result);
+		$result = $system->db->query($count_query);
+		$village_counts = $system->db->fetch($result);
 
 		echo "<table class='table'><tr><th colspan='4'>Villages</th></tr>
 		<tr>
@@ -264,15 +276,15 @@ function villageHQ() {
 			try {
 				// check if already sensei
 				if (SenseiManager::isSensei($player->sensei_id, $system)) {
-                    throw new Exception('You do not meet the requirements!');
+                    throw new RuntimeException('You do not meet the requirements!');
                 }
 				// check rank
                 if ($player->rank_num < 4) {
-                    throw new Exception('You do not meet the requirements!');
+                    throw new RuntimeException('You do not meet the requirements!');
                 }
 				// check level
                 if ($player->level < 75) {
-                    throw new Exception('You do not meet the requirements!');
+                    throw new RuntimeException('You do not meet the requirements!');
                 }
 				// check justu mastered
                 $mastered_count = 0;
@@ -283,18 +295,18 @@ function villageHQ() {
                     }
                 }
                 if ($mastered_count < 5) {
-                    throw new Exception('You do not meet the requirements!');
+                    throw new RuntimeException('You do not meet the requirements!');
                 }
 				$answers = [$_POST['question1'], $_POST['question2'], $_POST['question3'], $_POST['question4'], $_POST['question5'], $_POST['question6']];
 				if (SenseiManager::scoreExam($answers, $system)) {
 					$success = SenseiManager::addSensei($player->user_id, $_POST['specialization'], $system);
 					if (!$success) {
-                        throw new Exception('Something went wrong!');
+                        throw new RuntimeException('Something went wrong!');
                     }
 					$system->message("You passed!");
 				}
 				else {
-                    throw new Exception('Check your answers and try again!');
+                    throw new RuntimeException('Check your answers and try again!');
                 }
             }
 			catch (Exception $e) {
@@ -306,11 +318,11 @@ function villageHQ() {
 			try {
 				// check if sensei
 				if (!SenseiManager::isSensei($player->user_id, $system)) {
-                    throw new Exception('You are not a sensei!');
+                    throw new RuntimeException('You are not a sensei!');
                 }
                 $success = SenseiManager::removeSensei($player->user_id, $system);
 				if (!$success) {
-                    throw new Exception('Something went wrong!');
+                    throw new RuntimeException('Something went wrong!');
                 }
 				$system->message("You have resigned as Sensei!");
             }
@@ -330,7 +342,7 @@ function villageHQ() {
 			try {
 				$success = SenseiManager::removeStudent($player->user_id, (int)$_GET['kick'], $system);
 				if (!$success) {
-                    throw new Exception('Something went wrong!');
+                    throw new RuntimeException('Something went wrong!');
                 }
 				$system->message("You have kicked your student!");
             }
@@ -343,7 +355,7 @@ function villageHQ() {
 			try {
 				$success = SenseiManager::removeStudent($player->sensei_id, $player->user_id, $system);
 				if (!$success) {
-                    throw new Exception('Something went wrong!');
+                    throw new RuntimeException('Something went wrong!');
                 }
 				$player->sensei_id = 0;
 				$system->message("You have left your Sensei!");
@@ -358,28 +370,28 @@ function villageHQ() {
 				$sensei = User::loadFromId($system, (int)$_GET['apply'], true);
 				// check if already student
 				if ($player->sensei_id != 0) {
-                    throw new Exception('You already have a sensei!');
+                    throw new RuntimeException('You already have a sensei!');
                 }
 				// check eligibility
 				if ($player->rank_num > 2)
                 {
-                    throw new Exception('You are not eligible to become a student!');
+                    throw new RuntimeException('You are not eligible to become a student!');
                 }
 				// check is sensei
 				if (!SenseiManager::isSensei($sensei->user_id, $system)) {
-                    throw new Exception('Player is not a valid sensei!');
+                    throw new RuntimeException('Player is not a valid sensei!');
                 }
 				// check village
 				if ($sensei->village->name != $player->village->name) {
-                    throw new Exception('Player is not a valid sensei!');
+                    throw new RuntimeException('Player is not a valid sensei!');
                 }
 				// check if accepting students
 				if (!$sensei->accept_students) {
-                    throw new Exception('Player is not accepting students!');
+                    throw new RuntimeException('Player is not accepting students!');
                 }
 				$success = SenseiManager::createApplication((int)$_GET['apply'], $player->user_id, $system);
 				if (!$success) {
-                    throw new Exception('Something went wrong!');
+                    throw new RuntimeException('Something went wrong!');
                 }
 				$system->message("You have submitted an application!");
             }
@@ -392,7 +404,7 @@ function villageHQ() {
             try {
 				$success = SenseiManager::closeApplication((int)$_GET['close'], $player->user_id, $system);
 				if (!$success) {
-                    throw new Exception('Something went wrong!');
+                    throw new RuntimeException('Something went wrong!');
                 }
 				$system->message("You have closed an application!");
             }
@@ -405,7 +417,7 @@ function villageHQ() {
             try {
 				$success = SenseiManager::acceptApplication($player->user_id, (int)$_GET['accept'], $system);
 				if (!$success) {
-                    throw new Exception('Something went wrong!');
+                    throw new RuntimeException('Something went wrong!');
                 }
 				$system->message("You have accepted an application!");
             }
@@ -418,7 +430,7 @@ function villageHQ() {
             try {
 				$success = SenseiManager::closeApplication($player->user_id, (int)$_GET['deny'], $system);
 				if (!$success) {
-                    throw new Exception('Something went wrong!');
+                    throw new RuntimeException('Something went wrong!');
                 }
 				$system->message("You have denied an application!");
             }
@@ -430,11 +442,11 @@ function villageHQ() {
 		if (isset($_GET['clear'])) {
             try {
 				if (!$player->staff_manager->isModerator()) {
-                    throw new Exception('Not a moderator!');
+                    throw new RuntimeException('Not a moderator!');
                 }
 				$success = SenseiManager::updateStudentRecruitment((int)$_GET['clear'], '', $system);
 				if (!$success) {
-                    throw new Exception('Something went wrong!');
+                    throw new RuntimeException('Something went wrong!');
                 }
 				$system->message("You have removed a recruitment message!");
             }
@@ -447,15 +459,15 @@ function villageHQ() {
 			try {
 				// check if already sensei
                 if (SenseiManager::isSensei($player->user_id, $system)) {
-                    throw new Exception('You do not meet the requirements!');
+                    throw new RuntimeException('You do not meet the requirements!');
                 }
                 // check rank
                 if ($player->rank_num < 4) {
-                    throw new Exception('You do not meet the requirements!');
+                    throw new RuntimeException('You do not meet the requirements!');
                 }
                 // check level
                 if ($player->level < 75) {
-                    throw new Exception('You do not meet the requirements!');
+                    throw new RuntimeException('You do not meet the requirements!');
                 }
                 // check justu mastered
                 $mastered_count = 0;
@@ -466,7 +478,7 @@ function villageHQ() {
                     }
                 }
                 if ($mastered_count < 5) {
-                    throw new Exception('You do not meet the requirements!');
+                    throw new RuntimeException('You do not meet the requirements!');
                 }
             }
 			catch (Exception $e) {
@@ -488,7 +500,7 @@ function villageHQ() {
 			// If staff
 			if (isset($_GET['village'])) {
                 if ($player->staff_manager->isModerator()) {
-					$sensei_list = SenseiManager::getSenseiByVillage($system->clean($_GET['village']), $system);
+					$sensei_list = SenseiManager::getSenseiByVillage($system->db->clean($_GET['village']), $system);
 				}
 				else {
 					$sensei_list = SenseiManager::getSenseiByVillage($player->village->name, $system);

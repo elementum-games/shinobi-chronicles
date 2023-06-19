@@ -10,9 +10,9 @@ $system = API::init();
 try {
     $player = Auth::getUserFromSession($system);
     $player->loadData();
-} catch(Exception $e) {
+} catch(RuntimeException $e) {
     echo json_encode(['logout' => true]);
-    $system->rollbackTransaction();
+    $system->db->rollbackTransaction();
     error_log($e->getMessage());
     exit;
     // API::exitWithError($e->getMessage());
@@ -25,16 +25,16 @@ $status = true;
 // Check if the user is in battle
 if ($player->battle_id) {
     echo json_encode(['inBattle' => true]);
-    $system->commitTransaction();
+    $system->db->commitTransaction();
     exit;
 }
 
 // check if the mission exists
 if (!$player->special_mission) {
-    API::exitWithError(
-        message: "Not on a special mission!",
-        system: $system
-    );
+    echo json_encode([
+        'mission' => null,
+        'systemMessage' => "Not on a special mission!"
+    ]);
 }
 
 $special_mission = new SpecialMission($system, $player, $player->special_mission);
@@ -45,7 +45,7 @@ if (floor(microtime(true) * 1000) >= $target_update) {
     $special_mission->nextEvent();
 }
 
-$system->commitTransaction();
+$system->db->commitTransaction();
 echo json_encode([
     'mission' => $special_mission,
     'systemMessage' => $system->message,

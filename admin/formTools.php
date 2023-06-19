@@ -14,8 +14,6 @@ function formPreloadData($variables, &$data, $post = true, $post_array = false) 
                 }
                 $data[$var_name] = json_encode($data_array);
             }
-            else {
-            }
         }
         else {
             if(isset($post_array[$var_name]) && $post) {
@@ -33,7 +31,7 @@ function formPreloadData($variables, &$data, $post = true, $post_array = false) 
  * @param      $data
  * @param null $content_id
  * @param null $FORM_DATA
- * @throws Exception if any validation error
+ * @throws RuntimeException if any validation error
  */
 function validateFormData($entity_constraints, &$data, $content_id = null, $FORM_DATA = null): void {
     if($FORM_DATA == null) {
@@ -80,7 +78,7 @@ function validateFormData($entity_constraints, &$data, $content_id = null, $FORM
                         $variable['num_required'] = $variable['count'];
                     }
                     if($count < $variable['num_required']) {
-                        throw new Exception("Invalid $var_name! (needs at least " . $variable['num_required'] . ")");
+                        throw new RuntimeException("Invalid $var_name! (needs at least " . $variable['num_required'] . ")");
                     }
                     $data[$var_name] = json_encode($data_array);
                 }
@@ -98,13 +96,13 @@ function validateFormData($entity_constraints, &$data, $content_id = null, $FORM
             }
         }
         else {
-            throw new Exception("Invalid " . System::unSlug($var_name) . "!");
+            throw new RuntimeException("Invalid " . System::unSlug($var_name) . "!");
         }
     }
 }
 
 /**
- * @throws Exception
+ * @throws RuntimeException
  */
 function validateField($var_name, $input, $FORM_DATA, $field_constraints, &$all_constraints, &$data, $content_id = null): bool {
     global $system;
@@ -128,45 +126,45 @@ function validateField($var_name, $input, $FORM_DATA, $field_constraints, &$all_
         return true;
     }
 
-    $data[$var_name] = $system->clean($input);
+    $data[$var_name] = $system->db->clean($input);
 
     // Check for entry
     if(strlen($data[$var_name]) < 1) {
-        throw new Exception("Please enter " . System::unSlug($var_name) . "!");
+        throw new RuntimeException("Please enter " . System::unSlug($var_name) . "!");
     }
     // Check numeric variables
     if($field_constraints['data_type'] != 'string') {
         if(!is_numeric($data[$var_name])) {
-            throw new Exception("Invalid " . System::unSlug($var_name) . "!");
+            throw new RuntimeException("Invalid " . System::unSlug($var_name) . "!");
         }
     }
     // Check variable matches restricted possibles list, if any
     if(!empty($field_constraints['options'])) {
         if($field_constraints['data_type'] == 'string') {
-            if(array_search($data[$var_name], $field_constraints['options']) === false && $var_name != 'elements') {
-                throw new Exception("Invalid " . System::unSlug($var_name) . "!");
+            if(!in_array($data[$var_name], $field_constraints['options']) && $var_name != 'elements') {
+                throw new RuntimeException("Invalid " . System::unSlug($var_name) . "!");
             }
         }
         else {
             if(!isset($field_constraints['options'][$data[$var_name]])) {
-                throw new Exception("Invalid " . System::unSlug($var_name) . "!");
+                throw new RuntimeException("Invalid " . System::unSlug($var_name) . "!");
             }
         }
     }
     // Check number min/max
     if(in_array($field_constraints['data_type'], ['int', 'float'])) {
         if(isset($field_constraints['min']) && $data[$var_name] < $field_constraints['min']) {
-            throw new Exception(System::unSlug($var_name) . " cannot be lower than {$field_constraints['min']}!");
+            throw new RuntimeException(System::unSlug($var_name) . " cannot be lower than {$field_constraints['min']}!");
         }
         if(isset($field_constraints['max']) && $data[$var_name] > $field_constraints['max']) {
-            throw new Exception(System::unSlug($var_name) . " cannot be higher than {$field_constraints['max']}!");
+            throw new RuntimeException(System::unSlug($var_name) . " cannot be higher than {$field_constraints['max']}!");
         }
     }
 
     // Check max length
     if(isset($field_constraints['max_length'])) {
         if(strlen($data[$var_name]) > $field_constraints['max_length']) {
-            throw new Exception(System::unSlug($var_name) .
+            throw new RuntimeException(System::unSlug($var_name) .
                 " is too long! (" . strlen($data[$var_name]) . "/" . $field_constraints['max_length'] . " chars)"
             );
         }
@@ -174,7 +172,7 @@ function validateField($var_name, $input, $FORM_DATA, $field_constraints, &$all_
     // Check pattern
     if(isset($field_constraints['pattern'])) {
         if(!preg_match($field_constraints['pattern'], $data[$var_name])) {
-            throw new Exception("Invalid " . System::unSlug($var_name) . " ({$data[$var_name]})!");
+            throw new RuntimeException("Invalid " . System::unSlug($var_name) . " ({$data[$var_name]})!");
         }
     }
 
@@ -188,9 +186,9 @@ function validateField($var_name, $input, $FORM_DATA, $field_constraints, &$all_
             $query = "SELECT `{$field_constraints['unique_column']}` FROM `{$field_constraints['unique_table']}` 
 				WHERE `{$field_constraints['unique_column']}` = '" . $data[$var_name] . "' LIMIT 1";
         }
-        $result = $system->query($query);
-        if($system->db_last_num_rows > 0) {
-            throw new Exception("'" . System::unSlug($var_name) . "' needs to be unique, the value '" . $data[$var_name] . "' is already taken!");
+        $result = $system->db->query($query);
+        if($system->db->last_num_rows > 0) {
+            throw new RuntimeException("'" . System::unSlug($var_name) . "' needs to be unique, the value '" . $data[$var_name] . "' is already taken!");
         }
     }
 
@@ -339,15 +337,7 @@ function displayVariable($var_name, $variable, $current_value, $input_name_prefi
         foreach($variable['options'] as $value) {
             echo "<input style='margin-left:15px;' type='checkbox' name='{$name}[]' value='$value'";
                 if(is_array($current_value)) {
-                    if($name == 'elements') {
-                        if(isset($current_value['first']) && $current_value['first'] == $value) {
-                            echo "checked='checked' ";
-                        }
-                        if(isset($current_value['second']) && $current_value['second'] == $value) {
-                            echo "checked='checked' ";
-                        }
-                    }
-                    else if(in_array($value, $current_value)) {
+                    if(in_array($value, $current_value)) {
                         echo "checked='checked' ";
                     }
                 }
@@ -357,10 +347,6 @@ function displayVariable($var_name, $variable, $current_value, $input_name_prefi
                     }
                 }
             echo "/>$value<br />";
-        }
-        if($name == 'elements') {
-            echo "<b>Important:</b> Changing only a single element will retain the first/second nature selections.<br />
-            Changing both will result in the 'first' element being whichever appears first on this list.<br />";
         }
     }
     else if(!empty($variable['special']) && $variable['special'] == 'remove') {

@@ -13,6 +13,8 @@ class SpecialMission {
 
     // Number of jutsu to use per fight, picked at random from equipped and bloodline jutsu
     const JUTSU_USES_PER_FIGHT = 4;
+    // % chance to use a bloodline jutsu instead of an equipped jutsu
+    const BLOODLINE_JUTSU_CHANCE = 25;
 
     /*
      * DIFFICULTY
@@ -65,7 +67,7 @@ class SpecialMission {
 
     Nightmare (14% intel gain, ~7 encounters): 1:27 -> 2:47
     */
-    const EVENT_DURATION_MS = 800;
+    const EVENT_DURATION_MS = 750;
 
     const EVENT_START = 'start';
     const EVENT_MOVE_X = 'move_x';
@@ -193,13 +195,13 @@ class SpecialMission {
 
         // GET MISSION DATA
         $sql = "SELECT * FROM `special_missions` WHERE `mission_id`={$this->mission_id}";
-        $result = $this->system->query($sql);
+        $result = $this->system->db->query($sql);
         // Return if the mission doesn't exist
-        if ($this->system->db_last_num_rows == 0) {
+        if ($this->system->db->last_num_rows == 0) {
             return false;
         }
 
-        $mission_data = $this->system->db_fetch($result);
+        $mission_data = $this->system->db->fetch($result);
 
         $this->status = $mission_data['status'];
         $this->difficulty = $mission_data['difficulty'];
@@ -240,9 +242,9 @@ class SpecialMission {
                 `log`='{$log}',
                 `reward`={$this->reward}
                 WHERE `mission_id`={$this->mission_id}";
-        $result = $this->system->query($sql);
+        $result = $this->system->db->query($sql);
 
-        if ($this->system->db_last_affected_rows) {
+        if ($this->system->db->last_affected_rows) {
             $this->player->updateData();
         }
     }
@@ -381,7 +383,7 @@ class SpecialMission {
     // Complete the mission
 
     /**
-     * @throws Exception
+     * @throws RuntimeException
      */
     public function completeMission(): string {
         // Yen gain for completing the mission
@@ -410,14 +412,72 @@ class SpecialMission {
     // Simulates a battle with an ai
 
     /**
-     * @throws Exception
+     * @throws RuntimeException
      */
     public function simulateBattle(): array {
-
         $battle_result = self::EVENT_BATTLE_WIN; // Winning by default, suffering from success
         $battle_text = self::$event_names[self::EVENT_BATTLE_WIN]['text'];
 
-       // Gains for mission progress, basic stuff at the moment.
+        // Percentage to decrease the HP loss, based on stat cap
+        $health_lost = $this->calcHealthLost(
+            self::$difficulties[$this->difficulty]['hp_lost_percent']
+        );
+
+        // Use Jutsu
+        $this->player->getInventory();
+
+        $has_equipped_jutsu = count($this->player->equipped_jutsu) > 0;
+        $has_bloodline_jutsu = $this->player->bloodline && count($this->player->bloodline->jutsu) > 0;
+        $equipped_jutsu_chance = 100 - self::BLOODLINE_JUTSU_CHANCE;
+        $extra_health_lost = 0; // if you can't use any jutsu, consumes double the HP cost
+
+        $failed_jutsu_extra_health_lost = ($health_lost / self::JUTSU_USES_PER_FIGHT) / 2;
+
+        for($i = 0; $i < self::JUTSU_USES_PER_FIGHT; $i++) {
+            if($has_equipped_jutsu && (
+                mt_rand(1, 100) < $equipped_jutsu_chance || !$has_bloodline_jutsu
+            )) {
+                $jutsu_key = array_rand($this->player->equipped_jutsu);
+                $jutsu_id = $this->player->equipped_jutsu[$jutsu_key]['id'];
+                $jutsu = $this->player->jutsu[$jutsu_id] ?? null;
+            }
+            else if($has_bloodline_jutsu) {
+                $jutsu_key = array_rand($this->player->bloodline->jutsu);
+                $jutsu = $this->player->bloodline->jutsu[$jutsu_key];
+            }
+            else {
+                $jutsu = null;
+            }
+
+            if($jutsu == null) {
+                $extra_health_lost += $failed_jutsu_extra_health_lost;
+                continue;
+            }
+
+            $original_level = $jutsu->level;
+
+            $result = $this->player->useJutsu($jutsu);
+            if($result->failed) {
+                $extra_health_lost += $failed_jutsu_extra_health_lost;
+            }
+
+            /** @noinspection PhpConditionAlreadyCheckedInspection - player->useJutsu can increase the level */
+            if($jutsu->level > $original_level) {
+                $battle_text .= "[br]" . stripslashes($jutsu->name) . " has increased to level {$jutsu->level}! ";
+            }
+        }
+
+        $health_lost += $extra_health_lost;
+        if($extra_health_lost > 0 && ($has_equipped_jutsu || $has_bloodline_jutsu)) {
+            $battle_text .= "[br]You ran out of chakra/stamina mid fight, and were wounded as you fought with only basic taijutsu.";
+        }
+        else if($extra_health_lost > 0) {
+            $battle_text .= "[br]You did not have any jutsu prepared, and were wounded as you fought with only basic taijutsu.";
+        }
+
+        $this->player->updateInventory();
+
+        // Gains for mission progress, basic stuff at the moment.
         // 20% variance up/down from base on intel gains. Averages to 105% base
 
         $intel_gained = self::$difficulties[$this->difficulty]['intel_gain'];
@@ -427,11 +487,6 @@ class SpecialMission {
         $yen_gain = self::$difficulties[$this->difficulty]['yen_per_battle'] * $this->player->rank_num;
         $yen_gain *= 0.8 + (mt_rand(1, 4) / 10);
         $yen_gain = floor($yen_gain);
-
-        // Percentage to decrease the HP loss, based on stat cap
-        $health_lost = $this->calcHealthLost(
-            self::$difficulties[$this->difficulty]['hp_lost_percent']
-        );
 
         // ***********************************************************************************************
 
@@ -444,52 +499,19 @@ class SpecialMission {
 
         // REWARD for winning
         if ($battle_result == self::EVENT_BATTLE_WIN) {
-             // intel gain
+            // intel gain
             $this->progress += $intel_gained;
 
             // Damage HP
             $this->player->health -= $health_lost;
             $this->player_health -= $health_lost;
+            if($this->system->environment == System::ENVIRONMENT_DEV) {
+                $battle_text .= "[br]You lost {$health_lost} health";
+            }
 
             // Yen Gain
             $this->player->addMoney($yen_gain, "Special mission encounter");
             $this->reward += $yen_gain;
-
-            $this->player->getInventory();
-
-            // Jutsu exp
-            for($i = 0; $i < self::JUTSU_USES_PER_FIGHT; $i++) {
-                // 33% chance of using bloodline jutsu, if there are any
-                if($this->player->bloodline
-                    && count($this->player->bloodline->jutsu) > 0
-                    && mt_rand(1, 100) < 25
-                ) {
-                    $jutsu_key = array_rand($this->player->bloodline->jutsu);
-                    $jutsu = $this->player->bloodline->jutsu[$jutsu_key];
-                }
-                else if(count($this->player->equipped_jutsu) > 0) {
-                    $jutsu_key = array_rand($this->player->equipped_jutsu);
-                    $jutsu_id = $this->player->equipped_jutsu[$jutsu_key]['id'];
-                    $jutsu = $this->player->jutsu[$jutsu_id] ?? null;
-                }
-                else {
-                    $jutsu = null;
-                }
-
-                if($jutsu == null) {
-                    continue;
-                }
-
-                $original_level = $jutsu->level;
-
-                $this->player->useJutsu($jutsu);
-
-                if($jutsu->level > $original_level) {
-                    $battle_text .= "[br]" . stripslashes($jutsu->name) . " has increased to level {$jutsu->level}! ";
-                }
-            }
-
-            $this->player->updateInventory();
 
             // generate a new target
             $this->generateTarget();
@@ -499,7 +521,6 @@ class SpecialMission {
         }
 
         return ([$battle_result, $battle_text]);
-
     }
 
     // Fails the mission
@@ -617,7 +638,7 @@ class SpecialMission {
     // Cancel the mission
     public static function cancelMission($system, $player, $mission_id) {
         $timestamp = time();
-        $result = $system->query("UPDATE `special_missions`
+        $result = $system->db->query("UPDATE `special_missions`
 SET `status`=2, `end_time`={$timestamp} WHERE `mission_id`={$mission_id}");
         $player->special_mission = 0;
         $player->updateData();
@@ -627,11 +648,11 @@ SET `status`=2, `end_time`={$timestamp} WHERE `mission_id`={$mission_id}");
     public static function startMission($system, $player, $difficulty): SpecialMission {
 
         if ($player->special_mission != 0) {
-            throw new Exception('You cannot start multiple missions!');
+            throw new RuntimeException('You cannot start multiple missions!');
         }
 
         if (!array_key_exists($difficulty, self::$difficulties)) {
-            throw new Exception('Error setting difficulty!');
+            throw new RuntimeException('Error setting difficulty!');
         }
 
         $timestamp = time();
@@ -647,9 +668,9 @@ SET `status`=2, `end_time`={$timestamp} WHERE `mission_id`={$mission_id}");
 
         $sql = "INSERT INTO `special_missions` (`user_id`, `start_time`, `log`, `difficulty`)
                 VALUES ('{$player->user_id}', '{$timestamp}', '$log_encode', '{$difficulty}')";
-        $result = $system->query($sql);
+        $result = $system->db->query($sql);
 
-        $mission_id = $system->db_last_insert_id;
+        $mission_id = $system->db->last_insert_id;
         $player->special_mission = $mission_id;
 
         return (new SpecialMission($system, $player, $mission_id));

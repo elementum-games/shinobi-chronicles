@@ -8,7 +8,7 @@ $system = API::init();
 try {
     $player = Auth::getUserFromSession($system);
     $player->loadData(User::UPDATE_NOTHING);
-} catch(Exception $e) {
+} catch(RuntimeException $e) {
     API::exitWithException($e, system: $system);
 }
 # End standard auth
@@ -18,7 +18,7 @@ try {
     if (isset($_POST['request'])) {
         $request = filter_input(INPUT_POST, 'request', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
     } else {
-        throw new Exception('No request was made!');
+        throw new RuntimeException('No request was made!');
     }
 
     $TravelAPIResponse = new TravelAPIResponse();
@@ -33,22 +33,22 @@ try {
             break;
 
         case 'MovePlayer':
-            $direction = $system->clean($_POST['direction']);
+            $direction = $system->db->clean($_POST['direction']);
 
             $success = $TravelManager->movePlayer($direction);
             $TravelAPIResponse->response = TravelApiPresenter::travelActionResponse($success, $player, $TravelManager);
             break;
 
         case 'EnterPortal':
-            $portal_id = $system->clean($_POST['portal_id']);
+            $portal_id = $system->db->clean($_POST['portal_id']);
 
             $success = $TravelManager->enterPortal($portal_id);
             $TravelAPIResponse->response = TravelApiPresenter::travelActionResponse($success, $player, $TravelManager);
             break;
 
         case 'UpdateFilter':
-            $filter = $system->clean($_POST['filter']);
-            $filter_value = $system->clean($_POST['filter_value']);
+            $filter = $system->db->clean($_POST['filter']);
+            $filter_value = $system->db->clean($_POST['filter_value']);
 
             $success = $TravelManager->updateFilter($filter, $filter_value);
             $TravelAPIResponse->response = TravelApiPresenter::travelActionResponse($success, $player, $TravelManager);
