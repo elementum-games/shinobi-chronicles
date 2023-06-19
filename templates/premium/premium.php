@@ -255,7 +255,7 @@
                     <br/>Choose your element to reattune:
                     <br/>
                     <form action='<?= $self_link ?>' method='post'>
-                        <select name='current_element'>
+                        <select name='editing_element_index'>
                             <?php foreach($player->elements as $slot => $element): ?>
                                 <option value='<?= $slot ?>'><?= $element ?></option>
                             <?php endforeach; ?>
@@ -265,10 +265,7 @@
                         <select name='new_element'>
                             <?php foreach(Jutsu::$elements as $new_element): ?>
                                 <?php
-                                if($player->elements['first'] == $new_element) {
-                                    continue;
-                                }
-                                else if($player->elements['second'] == $new_element) {
+                                if(in_array($new_element, $player->elements)) {
                                     continue;
                                 }
                                 ?>

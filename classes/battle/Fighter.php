@@ -44,7 +44,7 @@ abstract class Fighter {
     public float $willpower;
 
     public array $elements = [
-        'first' => Jutsu::ELEMENT_NONE
+        Jutsu::ELEMENT_NONE
     ];
 
     // Inventory

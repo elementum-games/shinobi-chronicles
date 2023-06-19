@@ -801,9 +801,12 @@ class User extends Fighter {
         // Elements
         $elements = $user_data['elements'];
         if($elements) {
-            $this->elements = json_decode(
-                $user_data['elements'] ?? "[]",
-                true
+            // Array values to undo the "first" "second" etc keys
+            $this->elements = array_values(
+                json_decode(
+                    $user_data['elements'] ?? "[]",
+                    true
+                )
             );
         }
         else {

@@ -14,8 +14,6 @@ function formPreloadData($variables, &$data, $post = true, $post_array = false) 
                 }
                 $data[$var_name] = json_encode($data_array);
             }
-            else {
-            }
         }
         else {
             if(isset($post_array[$var_name]) && $post) {
@@ -143,7 +141,7 @@ function validateField($var_name, $input, $FORM_DATA, $field_constraints, &$all_
     // Check variable matches restricted possibles list, if any
     if(!empty($field_constraints['options'])) {
         if($field_constraints['data_type'] == 'string') {
-            if(array_search($data[$var_name], $field_constraints['options']) === false && $var_name != 'elements') {
+            if(!in_array($data[$var_name], $field_constraints['options']) && $var_name != 'elements') {
                 throw new RuntimeException("Invalid " . System::unSlug($var_name) . "!");
             }
         }
@@ -339,15 +337,7 @@ function displayVariable($var_name, $variable, $current_value, $input_name_prefi
         foreach($variable['options'] as $value) {
             echo "<input style='margin-left:15px;' type='checkbox' name='{$name}[]' value='$value'";
                 if(is_array($current_value)) {
-                    if($name == 'elements') {
-                        if(isset($current_value['first']) && $current_value['first'] == $value) {
-                            echo "checked='checked' ";
-                        }
-                        if(isset($current_value['second']) && $current_value['second'] == $value) {
-                            echo "checked='checked' ";
-                        }
-                    }
-                    else if(in_array($value, $current_value)) {
+                    if(in_array($value, $current_value)) {
                         echo "checked='checked' ";
                     }
                 }
@@ -357,10 +347,6 @@ function displayVariable($var_name, $variable, $current_value, $input_name_prefi
                     }
                 }
             echo "/>$value<br />";
-        }
-        if($name == 'elements') {
-            echo "<b>Important:</b> Changing only a single element will retain the first/second nature selections.<br />
-            Changing both will result in the 'first' element being whichever appears first on this list.<br />";
         }
     }
     else if(!empty($variable['special']) && $variable['special'] == 'remove') {

@@ -35,7 +35,7 @@ function editUserPage(System $system, User $player): void {
     $variables =& $constraints['edit_user'];
 
     if($player->isHeadAdmin()) {
-        $variables ['elements'] = [
+        $variables['elements'] = [
             'data_type' => 'string',
             'input_type' => 'checkbox',
             'options' => User::$ELEMENTS,
@@ -82,41 +82,38 @@ function editUserPage(System $system, User $player): void {
             $select_user = false;
         }
     }
+
     // POST submit edited data
     if(isset($_POST['user_data']) && !$select_user) {
         try {
+            $FORM_DATA = $_POST;
+
             // Additional data checking for Elements
-            $new_elements = array();
-            $current_elements = json_decode($user_data['elements'], true);
-            if($user_data['rank'] >= 3 && $user_data['staff_level'] != StaffManager::STAFF_HEAD_ADMINISTRATOR) {
-                $required_elements = ($_POST['rank'] == 4) ? 2 : 1;
-                if(count($_POST['elements']) > $required_elements) {
-                    throw new RuntimeException("Only $required_elements element(s) allowed!");
+            if($user_data['rank'] >= 3) {
+                $new_elements = array();
+
+                if($user_data['staff_level'] != StaffManager::STAFF_HEAD_ADMINISTRATOR) {
+                    $required_elements = (int)$_POST['rank'] - 2;
+                    if(count($_POST['elements']) > $required_elements) {
+                        throw new RuntimeException("Only $required_elements element(s) allowed!");
+                    }
+                    if(count($_POST['elements']) < $required_elements) {
+                        throw new RuntimeException("There must be at least $required_elements element(s)!");
+                    }
                 }
-                if(count($_POST['elements']) < $required_elements) {
-                    throw new RuntimeException("There must be at least $required_elements element(s)!");
-                }
+
                 if(!is_array($_POST['elements'])) {
                     throw new RuntimeException("Elements form data must be of type array!");
                 }
-                foreach($_POST['elements'] as $num => $element) {
-                    $key = ($num == 0) ? 'first' : 'second';
+                foreach($_POST['elements'] as $element) {
                     if(!in_array($element, User::$ELEMENTS)) {
                         throw new RuntimeException("Invalid element ($element).");
                     }
-                    $new_elements[$key] = $element;
-                }
-
-                // Prevent overwriting primary element based on admin panel structure
-                if($new_elements['second'] == $current_elements['first'] || $new_elements['first'] == $current_elements['second']) {
-                    $new_elements = [
-                        'first' => $new_elements['second'],
-                        'second' => $new_elements['first']
-                    ];
+                    $new_elements[] = $element;
                 }
 
                 //Assign new data as json string
-                $_POST['elements'] = json_encode($new_elements);
+                $FORM_DATA['elements'] = json_encode($new_elements);
             }
             else {
                 //Remove elements in case rank has been reduced
@@ -127,7 +124,7 @@ function editUserPage(System $system, User $player): void {
             }
             // Load form data
             $data = [];
-            validateFormData($variables, $data);
+            validateFormData(entity_constraints: $variables, data: $data, FORM_DATA: $FORM_DATA);
 
             // Insert into database
             $column_names = '';
@@ -146,7 +143,7 @@ function editUserPage(System $system, User $player): void {
                 $count++;
             }
             $query .= "WHERE `user_id`='{$user_data['user_id']}'";
-            //echo $query;
+            // echo $query;
             $system->db->query($query);
 
             if($system->db->last_affected_rows == 1) {
@@ -285,7 +282,7 @@ function statCutPage(System $system, User $player): void {
                     $new_data['elements'] = json_encode(array());
                 }
                 elseif($max_elements == 1) {
-                    $new_data['elements'] = json_encode(['first' => $user['elements']['first']]);
+                    $new_data['elements'] = json_encode(array_slice($user['elements'], 0, 1));
                 }
             }
             $user['elements'] = json_encode($user['elements']); // Set back to string for debugging display

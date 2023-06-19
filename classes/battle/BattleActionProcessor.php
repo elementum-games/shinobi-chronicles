@@ -251,7 +251,7 @@ class BattleActionProcessor {
         if($attack->jutsu->jutsu_type == Jutsu::TYPE_TAIJUTSU && $action->weapon_id) {
             // Apply element to jutsu
             if($fighter->items[$action->weapon_id]->effect == 'element') {
-                $attack->jutsu->element = $fighter->elements['first'];
+                $attack->jutsu->element = $fighter->elements[0];
                 $attack->starting_raw_damage *= 1 + ($fighter->items[$action->weapon_id]->effect_amount / 100);
             }
             // Set effect in jutsu

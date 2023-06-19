@@ -681,7 +681,7 @@ function chuuninExam(System $system, User $player, RankManager $rankManager): bo
             }
 
             //Exam complete, element selected
-            $player->elements = array('first' => $element);
+            $player->elements = [$element];
             $player->exam_stage = 0;
             if ($player->sensei_id != 0) {
                 // increase graduated count
@@ -816,16 +816,16 @@ function joninExam(System $system, User $player, RankManager $rankManager): bool
 
     if($player->exam_stage == $STAGE_PASS) {
         try {
-            $elements = array('Fire', 'Wind', 'Lightning', 'Earth', 'Water');
-            unset($elements[array_search($player->elements['first'], $elements)]);
+            $elements = User::$ELEMENTS;
+            unset($elements[array_search($player->elements[0], $elements)]);
 
             $element = $_POST['element'] ?? false;
             if(!in_array($element, $elements)) {
                 $element = false;
             }
 
-            if(isset($_POST['select_chakra']) && $element == false) {
-                if($_POST['element'] == $player->elements['first']) {
+            if(isset($_POST['select_chakra']) && !$element) {
+                if(in_array($_POST['element'], $player->elements)) {
                     $system->message("You already have the " . $_POST['element'] . " chakra nature!");
                 }
                 else {
@@ -895,7 +895,7 @@ function joninExam(System $system, User $player, RankManager $rankManager): bool
                 }
             }
 
-            $player->elements['second'] = $element;
+            $player->elements[1] = $element;
             $player->exam_stage = 0;
             $rankManager->increasePlayerRank($player);
             require 'templates/level_rank_up/jonin_exam_graduation.php';

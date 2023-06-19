@@ -7,7 +7,7 @@ Revised:	04/30/2014 by Levi Meahan
 Purpose:	Function for premium credit shop. Resets, name changes, bloodline re-rolls, etc
 */
 
-function premium() {
+function premium(): bool {
 	global $system;
 
 	global $player;
@@ -681,14 +681,14 @@ function premium() {
 	else if(isset($_POST['change_element']) && $player->rank_num >= 3) {
         try {
             $akCost = $costs['element_change'];
-			$current_element = $system->db->clean($_POST['current_element']);
+			$editing_element_index = (int)$_POST['editing_element_index'];
 			$new_element = $system->db->clean($_POST['new_element']);
             //Player already has new element
             if(in_array($new_element, $player->elements)) {
                 throw new RuntimeException("You already attuned to the $new_element element!");
             }
             //Check player's current element is valid
-            switch($player->elements[$current_element]) {
+            switch($player->elements[$editing_element_index]) {
                 case Jutsu::ELEMENT_FIRE:
                 case Jutsu::ELEMENT_WIND:
                 case Jutsu::ELEMENT_LIGHTNING:
@@ -696,7 +696,7 @@ function premium() {
                 case Jutsu::ELEMENT_WATER:
                     break;
                 default:
-                    throw new RuntimeException("The $current_element element ({$player->elements[$current_element]}) is invalid!");
+                    throw new RuntimeException("The $editing_element_index element ({$player->elements[$editing_element_index]}) is invalid!");
             }
             //Check that new element is valid
             switch($new_element) {
@@ -709,20 +709,26 @@ function premium() {
                 default:
                     throw new RuntimeException("New element $new_element is invalid!");
             }
+
+            if($editing_element_index > $player->rank_num - 2) {
+                throw new RuntimeException("Invalid element slot!");
+            }
+
             //Check cost
             if($player->getPremiumCredits() < $akCost) {
                 throw new RuntimeException("You do not have enough Ancient Kunai!");
             }
+
             //Confirm purchase
             if(!isset($_POST['confirm_chakra_element_change'])) {
                 $confirmation_type = 'confirm_chakra_element_change';
-                $confirmation_string = "Are you sure you want to <b>forget the {$player->elements[$current_element]} nature</b>
+                $confirmation_string = "Are you sure you want to <b>forget the {$player->elements[$editing_element_index]} nature</b>
                 and any jutsus you have to <b>attune to the $new_element nature</b>?<br />
                 <br />
                 <b>(IMPORTANT: This is non-reversable once completed! If you want to return to your original element you
                 will have to pay another fee. You will forget any elemental jutsu you currently have of this nature.)</b>";
                 $additional_form_data = [
-                    'current_element' => ['input_type' => 'hidden', 'value' => $current_element],
+                    'current_element' => ['input_type' => 'hidden', 'value' => $editing_element_index],
                     'new_element' => ['input_type' => 'hidden', 'value' => $new_element],
                 ];
                 $submit_value = 'change_element';
@@ -790,28 +796,20 @@ function premium() {
                 // Process purchase
                 $player->subtractPremiumCredits(
                     $akCost,
-                    "Changed {$current_element} element from {$player->elements[$current_element]} to $new_element"
+                    "Changed element #{$editing_element_index} from {$player->elements[$editing_element_index]} to $new_element"
                 );
 
                 $player->getInventory();
 
-                // Chuunin element change
-                if ($player->rank_num >= 3 && $current_element === 'first') {
+                // rank check
+
+                if(isset($player->elements[$editing_element_index])) {
                     foreach ($player->jutsu as $jutsu) {
-                        if ($jutsu->element == $player->elements[$current_element]) {
+                        if ($jutsu->element == $player->elements[0]) {
                             $player->removeJutsu($jutsu->id);
                         }
                     }
-                    $player->elements['first'] = $new_element;
-                }
-                // Jonin+ element change
-                else if ($player->rank_num >= 4 && $current_element === 'second') {
-                    foreach ($player->jutsu as $jutsu) {
-                        if ($jutsu->element == $player->elements[$current_element]) {
-                            $player->removeJutsu($jutsu->id);
-                        }
-                    }
-                    $player->elements['second'] = $new_element;
+                    $player->elements[$editing_element_index] = $new_element;
                 }
 
                 $player->updateData();
