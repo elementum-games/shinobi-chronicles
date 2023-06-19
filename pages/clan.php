@@ -24,8 +24,8 @@ function clan() {
                 require("missions.php");
                 runActiveMission();
                 // Create notification
-                $result = $system->query("SELECT `name` FROM `missions` WHERE `mission_id` = {$mission_id}");
-                $mission_name = $system->db_fetch($result)['name'];
+                $result = $system->db->query("SELECT `name` FROM `missions` WHERE `mission_id` = {$mission_id}");
+                $mission_name = $system->db->fetch($result)['name'];
                 require_once __DIR__ . '/../classes/notification/NotificationManager.php';
                 if ($player->mission_stage['action_type'] == 'travel') {
                     $mission_location = TravelCoords::fromDbString($player->mission_stage['action_data']);

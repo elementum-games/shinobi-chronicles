@@ -65,6 +65,11 @@ function getMissionData() {
             if(data.systemMessage != null) {
                 console.log(data.systemMessage);
             }
+            if(data.mission == null) {
+                console.log("Not on a special mission!");
+                stopRefresh();
+                return true;
+            }
 
             // check the mission status
             missionStatus(data.mission);

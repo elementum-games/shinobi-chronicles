@@ -31,10 +31,10 @@ if ($player->battle_id) {
 
 // check if the mission exists
 if (!$player->special_mission) {
-    API::exitWithError(
-        message: "Not on a special mission!",
-        system: $system
-    );
+    echo json_encode([
+        'mission' => null,
+        'systemMessage' => "Not on a special mission!"
+    ]);
 }
 
 $special_mission = new SpecialMission($system, $player, $player->special_mission);
