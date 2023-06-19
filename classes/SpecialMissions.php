@@ -505,7 +505,9 @@ class SpecialMission {
             // Damage HP
             $this->player->health -= $health_lost;
             $this->player_health -= $health_lost;
-            $battle_text .= "[br]You lost {$health_lost} health";
+            if($this->system->environment == System::ENVIRONMENT_DEV) {
+                $battle_text .= "[br]You lost {$health_lost} health";
+            }
 
             // Yen Gain
             $this->player->addMoney($yen_gain, "Special mission encounter");
