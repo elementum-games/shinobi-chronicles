@@ -118,23 +118,20 @@ function userProfile() {
         // get sensei table data
         $sensei = SenseiManager::getSenseiByID($player->sensei_id, $system);
         // get student boost
-        $sensei += SenseiManager::getStudentBoost($sensei['graduated']);
+        $sensei += SenseiManager::getStudentBoostBySensei($player->sensei_id, $system);
         // get sensei user data
-        if (!SenseiManager::isSensei($player->user_id, $system)) {
-            $sensei += SenseiManager::getSenseiUserData($player->sensei_id, $system);
-        }
+        $sensei += SenseiManager::getSenseiUserData($player->sensei_id, $system);
     }
-    else if (SenseiManager::isSensei($player->user_id, $system)) {
+    else if (SenseiManager::isActiveSensei($player->user_id, $system)) {
         // get sensei table data
         $sensei = SenseiManager::getSenseiByID($player->user_id, $system);
         // get student boost
-        $sensei += SenseiManager::getStudentBoost($sensei['graduated']);
+        $sensei += SenseiManager::getStudentBoostBySensei($player->user_id, $system);
         // if sensei has students, get student data
         if (count($sensei['students']) > 0) {
             $students = SenseiManager::getStudentData($sensei['students'], $system);
         }
     }
-
     require 'templates/profile.php';
 }
 

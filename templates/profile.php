@@ -544,9 +544,16 @@ $clan_positions = [
                             </div>
                             <div>
                                 <b>
-                                    <?= ucwords($sensei['specialization'])?> (+<?= $sensei['boost_primary'] ?>%) | Other (+<?= $sensei['boost_secondary'] ?>%)
+                                    <?= System::unSlug($sensei['specialization'])?> (+<?= $sensei['boost_primary'] ?>%) | Other (+<?= $sensei['boost_secondary'] ?>%)
                                 </b>
                             </div>
+                            <?php if(isset($sensei['bloodline_name'])): ?>
+                            <div>
+                                <b>
+                                    <?= ucwords($sensei['bloodline_name'])?> (+<?= $sensei['boost_primary'] ?>%)
+                                </b>
+                            </div>
+                            <?php endif; ?>
                             <?php foreach ($students as $student): ?>
                             <div class="student_container">
                                 <span>Student</span>
@@ -615,14 +622,16 @@ $clan_positions = [
                         </div>
                         <div>
                             <b>
-                                Specialization: <?= ucwords($sensei['specialization'])?>
+                                <?= System::unSlug($sensei['specialization'])?> (+<?= $sensei['boost_primary'] ?>%) | Other (+<?= $sensei['boost_secondary'] ?>%)
                             </b>
                         </div>
+                        <?php if(isset($sensei['bloodline_name'])): ?>
                         <div>
                             <b>
-                                <?= ucwords($sensei['specialization'])?> (+<?= $sensei['boost_primary'] ?>%) | Other (+<?= $sensei['boost_secondary'] ?>%)
+                                <?= ucwords($sensei['bloodline_name'])?> (+<?= $sensei['boost_primary'] ?>%)
                             </b>
                         </div>
+                        <?php endif; ?>
                         <div class="sensei_container">
                             <div>
                                 <p class="label_italics">

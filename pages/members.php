@@ -171,10 +171,10 @@ function members() {
                 // get sensei table data
                 $sensei = SenseiManager::getSenseiByID($viewUser->sensei_id, $system);
                 // get sensei user data
-                if (!SenseiManager::isSensei($viewUser->user_id, $system)) {
+                if (!SenseiManager::isActiveSensei($viewUser->user_id, $system)) {
                     $sensei += SenseiManager::getSenseiUserData($viewUser->sensei_id, $system);
                 }
-            } else if (SenseiManager::isSensei($viewUser->user_id, $system)) {
+            } else if (SenseiManager::isActiveSensei($viewUser->user_id, $system)) {
                 // get sensei table data
                 $sensei = SenseiManager::getSenseiByID($viewUser->user_id, $system);
                 // if sensei has students, get student data

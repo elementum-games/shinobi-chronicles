@@ -92,7 +92,7 @@
         <tr>
             <td>
                 <div>
-                    <p>Resigning as sensei will remove all of your students and record of your accomplishments as Sensei.</p>
+                    <p>Records of your accomplishments as sensei will be preserved.</p>
                     <form action="<?= $system->router->links['villageHQ']?>&view=sensei" method="post">
                         <span>
                             <input type="submit" name="confirm_resignation" value="Confirm Resignation"/>
@@ -104,7 +104,7 @@
     </table>
 <?php endif; ?>
 
-<?php if (!SenseiManager::isSensei($player->user_id, $system) && $player->rank_num > 3): ?>
+<?php if (!SenseiManager::isActiveSensei($player->user_id, $system) && $player->rank_num > 3): ?>
     <table class="table">
         <tr>
             <th>
@@ -132,14 +132,14 @@
                             <td>Tier 1</td>
                             <td>Default</td>
                             <td colspan="2">
-                                <div>3% faster training in specialization</div>
+                                <div>3% faster training in specialization and bloodline</div>
                             </td>
                         </tr>
                         <tr>
                             <td>Tier 2</td>
                             <td>Graduate 3 Students</td>
                             <td colspan="2">
-                                <div>6% faster training in specialization</div>
+                                <div>6% faster training in specialization and bloodline</div>
                                 <div>3% faster in all other types</div>
                             </td>
                         </tr>
@@ -147,7 +147,7 @@
                             <td>Tier 3</td>
                             <td>Graduate 8 Students</td>
                             <td colspan="2">
-                                <div>9% faster training in specialization</div>
+                                <div>9% faster training in specialization and bloodline</div>
                                 <div>4.5% faster in all other types</div>
                             </td>
                         </tr>
@@ -155,7 +155,7 @@
                             <td>Tier 4</td>
                             <td>Graduate 15 Students</td>
                             <td colspan="2">
-                                <div>12% faster training in specialization</div>
+                                <div>12% faster training in specialization and bloodline</div>
                                 <div>6% faster in all other types</div>
                             </td>
                         </tr>
@@ -169,7 +169,7 @@
     </table>
 <?php endif; ?>
 
-<?php if (SenseiManager::isSensei($player->user_id, $system)): ?>
+<?php if (SenseiManager::isActiveSensei($player->user_id, $system)): ?>
     <table class="table">
         <tr>
             <th>
@@ -292,14 +292,16 @@
     <?php foreach ($sensei_list as $sensei): ?>
     <tr>
         <td>
+            <?php if(isset($sensei['bloodline_name'])): ?>
             <div>
                 <p class="label_italics">
                     <?= $sensei['bloodline_name'] ?>
                 </p>
             </div>
+            <?php endif; ?>
             <div>
                 <p class="label_bold">
-                    Specialization: <?= ucwords($sensei['specialization']) ?>
+                    Specialization: <?= System::unSlug($sensei['specialization']) ?>
                 </p>
             </div>
             <div class="sensei_container">
@@ -317,9 +319,16 @@
             </div>
             <div>
                 <p class="label_bold">
-                    <?= ucwords($sensei['specialization'])?> (+<?= $sensei['boost_primary'] ?>%) | Other (+<?= $sensei['boost_secondary'] ?>%)
+                    <?= System::unSlug($sensei['specialization'])?> (+<?= $sensei['boost_primary'] ?>%) | Other (+<?= $sensei['boost_secondary'] ?>%)
                 </p>
             </div>
+            <?php if(isset($sensei['bloodline_name'])): ?>
+            <div>
+                <p class="label_bold">
+                    <?= ucwords($sensei['bloodline_name'])?> (+<?= $sensei['boost_primary'] ?>%)
+                </p>
+            </div>
+            <?php endif; ?>
             <?php foreach ($sensei['students'] as $student): ?>
             <div class="student_container">
                 <span>Student</span>

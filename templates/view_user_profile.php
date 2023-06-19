@@ -62,7 +62,7 @@ $clan_positions = array(
             (<?=$viewUser->village_rep?>)<br />
 			<label style='width:6.5em;'>Bloodline:</label> <?= ($viewUser->bloodline_id ? $viewUser->bloodline_name : "None") ?>
             <br />
-            <?php if (SenseiManager::isSensei($viewUser->user_id, $system)): ?>
+            <?php if (SenseiManager::isActiveSensei($viewUser->user_id, $system)): ?>
                 <label style='width:6.5em;'>Students:</label>
                 <?php foreach ($students as $student): ?>
                     <a href='<?= $system->router->getUrl('members', ['user' => $student->user_name])?>'>
@@ -122,13 +122,13 @@ $clan_positions = array(
                                 <a href='<?= $system->router->base_url ?>?id=24&invite=1&user_name=<?= $viewUser->user_name ?>'>Invite to Team</a>
                 <?php endif; ?>
             <?php endif; ?>
-            <?php if($player->rank_num < 3 && $player->sensei_id == 0 && $player->village->name == $viewUser->village->name && SenseiManager::isSensei($viewUser->user_id, $system) && $viewUser->accept_students): ?>
+            <?php if($player->rank_num < 3 && $player->sensei_id == 0 && $player->village->name == $viewUser->village->name && SenseiManager::isActiveSensei($viewUser->user_id, $system) && $viewUser->accept_students): ?>
                 &nbsp;&nbsp;|&nbsp;&nbsp;<a href='<?= $system->router->links['villageHQ'] ?>&view=sensei&apply=<?= $viewUser->user_id ?>'>Send Application</a>
             <?php endif; ?>
             <?php if($player->rank_num < 3 && $player->sensei_id == $viewUser->user_id): ?>
             &nbsp;&nbsp;|&nbsp;&nbsp;<a href='<?= $system->router->links['villageHQ'] ?>&view=sensei&leave=true'>Leave Sensei</a>
             <?php endif; ?>
-            <?php if(SenseiManager::isSensei($player->user_id, $system) && $viewUser->sensei_id == $player->user_id && $viewUser->user_id != $player->user_id): ?>
+            <?php if(SenseiManager::isActiveSensei($player->user_id, $system) && $viewUser->sensei_id == $player->user_id && $viewUser->user_id != $player->user_id): ?>
             &nbsp;&nbsp;|&nbsp;&nbsp;<a href='<?= $system->router->links['villageHQ'] ?>&view=sensei&kick=<?= $viewUser->user_id ?>'>Kick Student</a>
             <?php endif; ?>
         </td></tr>

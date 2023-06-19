@@ -142,9 +142,13 @@ function training() {
 			// Check for sensei training boost
 			if($player->sensei_id != 0) {
 				$sensei_boost = SenseiManager::getStudentBoostBySensei($player->sensei_id, $system);
-				if ($train_type == $sensei_boost['specialization'] . "_skill" || $train_type == $sensei_boost['specialization']) {
+                if ($train_type == $sensei_boost['specialization'] . "_skill" || $train_type == $sensei_boost['specialization']) {
                     $system->message("Your training was reduced by " . ($train_length * ($sensei_boost['boost_primary'] / 100)) . " seconds due to your student boost.");
-					$train_length *= 1 - ($sensei_boost['boost_primary'] / 100);
+                    $train_length *= 1 - ($sensei_boost['boost_primary'] / 100);
+                }
+				else if ($player->bloodline_id == $sensei_boost['bloodline_id']) {
+                    $system->message("Your training was reduced by " . ($train_length * ($sensei_boost['boost_primary'] / 100)) . " seconds due to your student boost.");
+                    $train_length *= 1 - ($sensei_boost['boost_primary'] / 100);
                 }
 				else if ($sensei_boost['boost_secondary'] > 0) {
 					$system->message("Your training was reduced by " . ($train_length * ($sensei_boost['boost_secondary'] / 100)) . " seconds due to your student boost.");

@@ -32,20 +32,25 @@ class SenseiManager {
 
     public static function getStudentBoostBySensei(int $sensei_id, System $system): array {
         $sensei_result = $system->db->query(
-            "SELECT `graduated_count`, `specialization` FROM `sensei` where `sensei_id` = '{$sensei_id}'"
+            "SELECT `graduated_count`, `specialization`, `bloodline_id`, `name` FROM `sensei`
+                LEFT JOIN `user_bloodlines` on `sensei`.`sensei_id` = `user_bloodlines`.`user_id`
+                WHERE `sensei_id` = '{$sensei_id}'"
         );
         $result = $system->db->fetch($sensei_result);
         $boost = SenseiManager::getStudentBoost((int)$result['graduated_count']);
         $boost['specialization'] = $result['specialization'];
+        $boost['bloodline_id'] = $result['bloodline_id'];
+        $boost['bloodline_name'] = $result['name'];
         return $boost;
     }
 
     public static function getSenseiByVillage(string $village_name, System $system): array {
         $sensei_list = [];
         $sensei_table_result = $system->db->query(
-            "SELECT `sensei`.`sensei_id`, `students`, `recruitment_message`, `graduated_count`, `specialization`, `avatar_link`, `user_name`, `bloodline_name` FROM `sensei`
+            "SELECT `sensei`.`sensei_id`, `students`, `recruitment_message`, `graduated_count`, `specialization`, `avatar_link`, `user_name`, `user_bloodlines`.`name` FROM `sensei`
             INNER JOIN `users` ON `sensei`.`sensei_id` = `users`.`user_id`
-            WHERE `village` = '{$village_name}' AND `accept_students` = '1' ORDER BY `graduated_count` DESC"
+            LEFT JOIN `user_bloodlines` ON `sensei`.`sensei_id` = `user_bloodlines`.`user_id`
+            WHERE `village` = '{$village_name}' AND `accept_students` = '1' AND `is_active` = 1 ORDER BY `graduated_count` DESC"
         );
         while ($result = $system->db->fetch($sensei_table_result)) {
             $sensei_list[] = [
@@ -56,7 +61,7 @@ class SenseiManager {
                 'specialization' => $result['specialization'],
 			    'avatar_link' => $result['avatar_link'],
 			    'user_name' => $result['user_name'],
-			    'bloodline_name' => $result['bloodline_name']
+			    'bloodline_name' => $result['name']
             ];
         }
 		foreach ($sensei_list as &$sensei) {
@@ -188,7 +193,9 @@ class SenseiManager {
     public static function addSensei(int $sensei_id, $specialization, System $system): bool {
         $db_modified = false;
         $system->db->query(
-            "INSERT INTO `sensei` (`sensei_id`, `specialization`) VALUES ('{$sensei_id}', '{$specialization}')"
+            "INSERT INTO `sensei` (`sensei_id`, `specialization`)
+                VALUES ('{$sensei_id}', '{$specialization}')
+                ON DUPLICATE KEY UPDATE `is_active` = 1;"
         );
         if ($system->db->last_affected_rows > 0) {
             $db_modified = true;
@@ -199,11 +206,11 @@ class SenseiManager {
     public static function removeSensei(int $sensei_id, System $system): bool {
         $db_modified = false;
         $system->db->query("UPDATE `users` SET `sensei_id` = '0' WHERE `sensei_id` = {$sensei_id}");
-        $system->db->query("DELETE FROM `sensei` WHERE `sensei_id` = {$sensei_id}");
-        $system->db->query("DELETE FROM `student_applications` WHERE `sensei_id` = {$sensei_id}");
+        $system->db->query("UPDATE `sensei` SET `is_active` = '0', `students` = '[]', `temp_students` = '[]' WHERE `sensei_id` = {$sensei_id}");
         if ($system->db->last_affected_rows > 0) {
             $db_modified = true;
         }
+        $system->db->query("DELETE FROM `student_applications` WHERE `sensei_id` = {$sensei_id}");
         return $db_modified;
     }
 
@@ -333,4 +340,17 @@ class SenseiManager {
         }
         return $isSensei;
     }
+    public static function isActiveSensei(int $user_id, System $system): bool
+    {
+        $isSensei = false;
+        $sensei_result = $system->db->query("SELECT 1 FROM `sensei` WHERE `sensei_id` = '{$user_id}' AND `is_active` = 1");
+        $result = $system->db->fetch($sensei_result);
+        if ($system->db->last_num_rows > 0) {
+            $isSensei = true;
+        }
+        return $isSensei;
+    }
+
+    /* Lesson Functionality */
+
 }
