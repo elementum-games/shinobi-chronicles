@@ -88,7 +88,7 @@ function editUserPage(System $system, User $player): void {
             // Additional data checking for Elements
             $new_elements = array();
             $current_elements = json_decode($user_data['elements'], true);
-            if($user_data['rank'] >= 3) {
+            if($user_data['rank'] >= 3 && $user_data['staff_level'] != StaffManager::STAFF_HEAD_ADMINISTRATOR) {
                 $required_elements = ($_POST['rank'] == 4) ? 2 : 1;
                 if(count($_POST['elements']) > $required_elements) {
                     throw new RuntimeException("Only $required_elements element(s) allowed!");
