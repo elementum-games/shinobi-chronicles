@@ -46,6 +46,20 @@ class SenseiManager {
         return $boost;
     }
 
+    public static function getTrainingBoostForTrainType(int $sensei_id, string $train_type, int $bloodline_id = 0, System $system) {
+        $sensei_boost = SenseiManager::getStudentBoostBySensei($sensei_id, $system);
+        if ($train_type == "bloodline" || $train_type == "bloodline_skill") {
+            if ($bloodline_id == $sensei_boost['bloodline_id']) {
+                return $sensei_boost['boost_primary'];
+            }
+            return $sensei_boost['boost_secondary'];
+        }
+        if ($train_type == $sensei_boost['specialization'] || $train_type == $sensei_boost['specialization'] . "_skill") {
+            return $sensei_boost['boost_primary'];
+        }
+        return $sensei_boost['boost_secondary'];
+    }
+
     public static function getSenseiByVillage(string $village_name, System $system): array {
         $sensei_list = [];
         $sensei_table_result = $system->db->query(
@@ -197,7 +211,7 @@ class SenseiManager {
         $system->db->query(
             "UPDATE `sensei` SET `enable_lessons` = '{$enable_lessons}' WHERE `sensei_id` = '{$sensei_id}'"
         );
-        
+
         return $system->db->last_affected_rows > 0;
     }
 
