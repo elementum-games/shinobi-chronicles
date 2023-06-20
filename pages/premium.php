@@ -110,7 +110,7 @@ function premium() {
 	if(isset($_POST['user_reset'])) {
 		try {
             if($player->team) {
-                throw new Exception("You must leave your team before resetting!");
+                throw new RuntimeException("You must leave your team before resetting!");
             }
             if($player->clan_office) {
                 throw new Exception("You must resign from your clan office first!");
