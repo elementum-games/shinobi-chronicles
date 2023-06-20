@@ -1,5 +1,7 @@
 <?php
 
+require_once __DIR__ . '/../classes/notification/NotificationManager.php';
+
 function specialMissions() {
     global $system;
     global $player;
@@ -17,7 +19,6 @@ function specialMissions() {
             $player->log(User::LOG_SPECIAL_MISSION, "{$difficulty} $difficulty");
 
             // Create notification
-            require_once __DIR__ . '/../classes/notification/NotificationManager.php';
             $new_notification = new NotificationDto(
                 type: "specialmission",
                 message: "Special Mission in progress",

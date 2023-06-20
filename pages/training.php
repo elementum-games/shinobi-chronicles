@@ -7,6 +7,9 @@ Revised:	03/06/2014 by Levi Meahan
 Purpose:	Function for allowing user to train their stats and jutsu
 Algorithm:	See master_plan.html
 */
+
+require_once __DIR__ . '/../classes/notification/NotificationManager.php';
+
 function training() {
 	global $system;
 	global $player;
@@ -109,7 +112,6 @@ function training() {
 
                 // Create notification
                 if (!$notification_created) {
-                    require_once __DIR__ . '/../classes/notification/NotificationManager.php';
                     $new_notification = new NotificationDto(
                         type: "training",
                         message: "Training " . System::unSlug($player->jutsu[$jutsu_id]->name),
@@ -164,7 +166,6 @@ function training() {
 
 			// Create notification
             if (!$notification_created) {
-                require_once __DIR__ . '/../classes/notification/NotificationManager.php';
                 $new_notification = new NotificationDto(
                     type: "training",
                     message: "Training " . System::unSlug($train_type),

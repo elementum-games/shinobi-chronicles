@@ -7,6 +7,8 @@ Revised:	04/30/2014 by Levi Meahan
 Purpose:	Function for premium credit shop. Resets, name changes, bloodline re-rolls, etc
 */
 
+require_once __DIR__ . '/../classes/notification/NotificationManager.php';
+
 function premium() {
 	global $system;
 
@@ -411,7 +413,6 @@ function premium() {
 
                  $player->updateData();
 
-                require_once __DIR__ . '/../classes/notification/NotificationManager.php';
                 $new_notification = new NotificationDto(
                     type: "training",
                     message: "Retraining " . System::unSlug($target_stat),

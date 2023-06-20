@@ -8,6 +8,8 @@ Purpose:	Functions for displaying user profile
 Algorithm:	See master_plan.html
 */
 
+require_once __DIR__ . '/../classes/notification/NotificationManager.php';
+
 /**
  * @throws RuntimeException
  */
@@ -38,7 +40,6 @@ function userProfile() {
     // Rank up
     else if($player->level >= $player->rank->max_level && $player->exp >= $exp_needed && $player->rank_num < System::SC_MAX_RANK && $player->rank_up) {
         // Create notification
-        require_once __DIR__ . '/../classes/notification/NotificationManager.php';
         $new_notification = new NotificationDto(
             type: "rank",
             message: "Rank up available",

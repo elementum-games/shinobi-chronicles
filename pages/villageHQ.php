@@ -8,6 +8,8 @@ Purpose:	Functions for village HQ
 Algorithm:	See master_plan.html
 */
 
+require_once __DIR__ . '/../classes/notification/NotificationManager.php';
+
 function villageHQ() {
 	global $system;
 
@@ -607,7 +609,6 @@ function villageHQ() {
                 $player->train_time = time() + $lesson_duration;
 
 				// Create notification for player
-                require_once __DIR__ . '/../classes/notification/NotificationManager.php';
                 $new_notification = new NotificationDto(
                     type: "training",
                     message: "Training " . System::unSlug($lesson_data['lesson_stat']),
