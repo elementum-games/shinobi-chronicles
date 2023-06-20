@@ -148,8 +148,8 @@
                         <div><span>5 Jutsu Mastered</span></div>
                         <div><span>Pass Aptitude Exam</span></div>
                     </div>
-                    <p>As a Sensei you can have up to three students at a time.</p>
-                    <p>Your students receive training bonuses based on your specialization and experience as a Sensei.</p>
+                    <p>As a sensei you can have up to three students at a time.</p>
+                    <p>Your students receive training bonuses based on your specialization and experience.</p>
                     <table class="table">
                         <tr>
                             <th>Tier</th>
@@ -207,8 +207,8 @@
         <tr>
             <td>
                 <div>
-                    <p>As a Sensei you can have up to three students at a time.</p>
-                    <p>Your students receive training bonuses based on your specialization and experience as a Sensei.</p>
+                    <p>As a sensei you can have up to three students at a time.</p>
+                    <p>Your students receive training bonuses based on your specialization and experience.</p>
                     <table class="table">
                         <tr>
                             <th>Tier</th>
@@ -272,11 +272,29 @@
                     </table>
                     <?php endif; ?>
                 </div>
+                <p>kjhdskjfds</p>
                 <div class="resign_container">
                     <a href="<?= $system->router->links['villageHQ']?>&view=sensei&resign=true">Resign</a>
                 </div>
             </td>
         </tr>
+    </table>
+<?php endif; ?>
+
+<?php if ($player->rank_num > 2): ?>
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>Specialist Training (name?)</th>
+            </tr>
+            <tr>
+                <td>
+                    <p>Some text about how players can reserve special training grounds in the village to take lessons with sensei.</p>
+                    <p>Sensei receive part of the payment, the rest goes to the village as a fee and to maintain the training grounds.</p>
+                    <p>Flavor text about how the grounds are constantly damaged by intensity of the training, ties into why you can't train in village normally.</p>
+                </td>
+            </tr>
+        </tbody>
     </table>
 <?php endif; ?>
 
@@ -290,8 +308,8 @@
         <tr>
             <td>
                 <div>
-                    <p>Sensei are experienced players who provide training bonuses and teach you the ways of the Shinobi.</p>
-                    <p>Apply to any number of Sensei by clicking an available student slot in the listing below.</p>
+                    <p>Sensei are experienced players who provide training bonuses and teach you the ways of the shinobi.</p>
+                    <p>Apply to any number of sensei by clicking an available student slot in the listing below.</p>
                     <p>You can change Sensei at any time by visiting their profile and selecting the "Leave Sensei" option.</p>
                     <?php if (count($applications) > 0): ?>
                         <table class="table application_table">
