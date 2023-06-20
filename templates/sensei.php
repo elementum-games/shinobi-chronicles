@@ -19,11 +19,8 @@
         font-weight: bold;
     }
     .student_container {
-        display:inline-block;
-        height:120px;
-        width:120px;
-        margin: 10px 15px 20px 15px;
         font-weight: bold;
+        flex-basis: 25%;
     }
     .sensei_avatar {
         max-width:120px;max-height:120px;
@@ -56,6 +53,13 @@
     .small_image {
         max-width:20px;
         max-height:20px;
+    }
+    .students_container {
+        display: flex;
+        align-items: baseline;
+        justify-content: center;
+        margin-bottom: 15px;
+        margin-top: 15px;
     }
 </style>
 
@@ -96,6 +100,30 @@
                     <form action="<?= $system->router->links['villageHQ']?>&view=sensei" method="post">
                         <span>
                             <input type="submit" name="confirm_resignation" value="Confirm Resignation"/>
+                        </span>
+                    </form>
+                </div>
+            </td>
+        </tr>
+    </table>
+<?php endif; ?>
+
+<?php if ($lesson): ?>
+    <table class="table">
+        <tr>
+            <th>Confirm Lesson</th>
+        </tr>
+        <tr>
+            <td>
+                <div>
+                    <span>Training with <?= $lesson_data['sensei_name'] ?> will cost <?= $lesson_data['cost'] ?>&yen; and last <?= $lesson_data['duration'] ?> minutes.</span>
+                    <p>Cancelling this training session will not refund the original cost.</p>
+                    <form action="<?= $system->router->getUrl('villageHQ', ['view' => 'sensei'])?>" method="post">
+                        <input type="hidden" name="lesson_stat" value="<?= $lesson_data['stat'] ?>">
+                        <input type="hidden" name="train_type" value="<?= $lesson_data['train_type'] ?>">
+                        <input type="hidden" name="sensei_id" value="<?= $lesson_data['sensei_id'] ?>">
+                        <span>
+                            <input type="submit" name="confirm_lesson" value="Start Lesson"/>
                         </span>
                     </form>
                 </div>
@@ -329,6 +357,7 @@
                 </p>
             </div>
             <?php endif; ?>
+            <div class="students_container">
             <?php foreach ($sensei['students'] as $student): ?>
             <div class="student_container">
                 <span>Student</span>
@@ -340,23 +369,69 @@
                 </span>
             </div>
             <?php endforeach; ?>
-            <?php if (count($sensei['students']) < 3): ?>
-            <?php for ($i = 0; $i < (3 - count($sensei['students'])); $i++): ?>
+            <?php foreach ($sensei['temp_students'] as $student): ?>
             <div class="student_container">
-                <span>Student</span>
-                <div><img src='../images/default_avatar.png' class="student_avatar" /></div>
+                <span>Training</span>
+                <div><img src='<?= $student->avatar_link ?>' class="student_avatar" /></div>
                 <span>
+                    <a href='<?= $system->router->links['members'] ?>&user=<?= $student->user_name ?>'>
+                        <?= $student->user_name ?>
+                    </a>
+                </span>
+            </div>
+            <?php endforeach; ?>
+            <?php if (count($sensei['students']) + count($sensei['temp_students']) < 3): ?>
+            <?php for ($i = 0; $i < (3 - count($sensei['students']) - count($sensei['temp_students'])); $i++): ?>
+            <div class="student_container">
+                <span>Empty</span>
+                <div><img src='../images/default_avatar.png' class="student_avatar" /></div>
                     <?php if ($player->sensei_id == 0 && $player->rank_num < 3): ?>
+                    <span>
                     <a href='<?= $system->router->links['villageHQ'] ?>&view=sensei&apply=<?= $sensei['sensei_id'] ?>'>
                         (Available)
                     </a>
+                    </span>
+                    <?php elseif ((bool)$sensei['enable_lessons'] && $player->train_time == 0 && $player->user_id != $sensei['sensei_id'] && $player->exp < $sensei['exp'] && $player->rank_num > 2): ?>
+                    <label>Lessons</label>
+                    <form action="<?= $system->router->getUrl('villageHQ', ['view' => 'sensei']) ?>" method="post">
+						<select name="lesson">
+                            <?php if ($sensei['ninjutsu_modifier'] > 0): ?>
+							    <option value="ninjutsu_skill" <?= $sensei['specialization'] == "ninjutsu" ? 'selected="selected"' : ""?>>Ninjutsu (+<?= $sensei['ninjutsu_modifier'] ?>%)</option>
+                            <?php endif; ?>
+                            <?php if ($sensei['taijutsu_modifier'] > 0): ?>
+							    <option value="taijutsu_skill" <?= $sensei['specialization'] == "taijutsu" ? 'selected="selected"' : "" ?>>Taijutsu (+<?= $sensei['taijutsu_modifier'] ?>%)</option>
+                            <?php endif; ?>
+                            <?php if ($sensei['genjutsu_modifier'] > 0): ?>
+							    <option value="genjutsu_skill" <?= $sensei['specialization'] == "genjutsu" ? 'selected="selected"' : "" ?>>Genjutsu (+<?= $sensei['genjutsu_modifier'] ?>%)</option>
+                            <?php endif; ?>
+                            <?php if ($player->bloodline_id == $sensei['bloodline_id'] && $sensei['bloodline_modifier'] > 0): ?>
+                                <option value="bloodline_skill">Bloodline (+<?= $sensei['bloodline_modifier'] ?>%)</option>
+                            <?php endif; ?>
+                            <?php if ($sensei['speed_modifier'] > 0): ?>
+                                <option value="speed" <?= $sensei['specialization'] == "speed" ? 'selected="selected"' : "" ?>>Speed (+<?= $sensei['speed_modifier'] ?>%)</option>
+                            <?php endif; ?>
+                            <?php if ($sensei['cast_speed_modifier'] > 0): ?>
+                                <option value="cast_speed" <?= $sensei['specialization'] == "cast_speed" ? 'selected="selected"' : "" ?>>Cast Speed (+<?= $sensei['cast_speed_modifier'] ?>%)</option>
+                            <?php endif; ?>
+                        </select><br>
+                        <select name="train_type">
+							<option value="short" selected="selected">Short (<?= $lesson_cost['short'] ?>&yen;)</option>
+							<option value="long">Long (<?= $lesson_cost['long'] ?>&yen;)</option>
+							<option value="extended">Extended (<?= $lesson_cost['extended'] ?>&yen;)</option>
+                        </select>
+                        <input type="hidden" name="sensei_id" value="<?= $sensei['sensei_id'] ?>" />
+                        <input type="hidden" name="sensei_name" value="<?= $sensei['user_name'] ?>" />
+						<input type="submit" name="lesson_submit" value="Start">
+                    </form>
                     <?php else: ?>
+                    <span>
                     (Available)
+                    </span>
                     <?php endif; ?>
-                </span>
             </div>
             <?php endfor; ?>
             <?php endif; ?>
+            </div>
             <div>
                 <?= $system->html_parse($sensei['recruitment_message']) ?>
             </div>

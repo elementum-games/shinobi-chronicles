@@ -81,9 +81,12 @@ function userProfile() {
     if(!empty($_POST['update_student_recruitment'])) {
         $recruitment_message = $system->db->clean($_POST['recruitment_message']);
         try {
+            $enable_lessons;
             isset($_POST['accept_students']) ? $player->accept_students = true : $player->accept_students = false;
+            isset($_POST['enable_lessons']) ? $enable_lessons = true : $enable_lessons = false;
             // Update recruitment settings
-            $success = SenseiManager::updateStudentRecruitment($player->user_id, $recruitment_message, $system);
+            SenseiManager::updateStudentRecruitment($player->user_id, $recruitment_message, $system);
+            $success = SenseiManager::updateStudentLessons($player->user_id, (bool)$enable_lessons, $system);
             if (!$success) {
                 throw new RuntimeException('Something went wrong!');
             }
@@ -130,6 +133,9 @@ function userProfile() {
         // if sensei has students, get student data
         if (count($sensei['students']) > 0) {
             $students = SenseiManager::getStudentData($sensei['students'], $system);
+        }
+        if (count($sensei['temp_students']) > 0) {
+            $temp_students = SenseiManager::getTempStudentData($sensei['temp_students'], $system);
         }
     }
     require 'templates/profile.php';
