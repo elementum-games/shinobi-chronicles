@@ -118,6 +118,7 @@ function userProfile() {
 
     $sensei;
     $students = [];
+    $temp_students = [];
     if ($player->sensei_id != 0) {
         // get sensei table data
         $sensei = SenseiManager::getSenseiByID($player->sensei_id, $system);
