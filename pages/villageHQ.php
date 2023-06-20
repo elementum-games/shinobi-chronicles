@@ -278,7 +278,7 @@ function villageHQ() {
 			try {
 				// check if already sensei
 				if (SenseiManager::isActiveSensei($player->sensei_id, $system)) {
-                    throw new Exception('You do not meet the requirements!');
+                    throw new RuntimeException('You do not meet the requirements!');
                 }
 				// check rank
                 if ($player->rank_num < 4) {

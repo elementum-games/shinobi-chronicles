@@ -194,14 +194,11 @@ class SenseiManager {
     }
     public static function updateStudentLessons(int $sensei_id, bool $enable_lessons, System $system): bool
     {
-        $db_modified = false;
         $system->db->query(
             "UPDATE `sensei` SET `enable_lessons` = '{$enable_lessons}' WHERE `sensei_id` = '{$sensei_id}'"
         );
-        if ($system->db->last_affected_rows > 0) {
-            $db_modified = true;
-        }
-        return $db_modified;
+        
+        return $system->db->last_affected_rows > 0;
     }
 
     public static function updateStudentSettings(int $sensei_id, $student_message, $specialization, System $system): bool {
@@ -459,10 +456,7 @@ class SenseiManager {
         $temp_students[$temp_student_id] = time() + $lesson_duration;
         $temp_students = json_encode($temp_students, JSON_FORCE_OBJECT);
         $system->db->query("UPDATE `sensei` SET `temp_students` = '{$temp_students}', `yen_gained` = {$yen_gained}, `time_trained` = {$time_trained} WHERE `sensei_id` = '{$sensei_id}'");
-        if ($system->db->last_affected_rows > 0) {
-            $db_modified = true;
-        }
-        return $db_modified;
+        return $system->db->last_affected_rows > 0;
     }
 
     public static function checkTempStudents(int $sensei_id, System $system): array {
