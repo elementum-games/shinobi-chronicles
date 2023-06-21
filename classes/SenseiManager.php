@@ -1,5 +1,7 @@
 <?php
 
+require_once __DIR__ . '/training/TrainingManager.php';
+
 class SenseiManager {
     public static array $boost_tiers = [
         0 => ['boost_primary' => 3, 'boost_secondary' => 0],
@@ -421,18 +423,10 @@ class SenseiManager {
 
     public static function getLessonCostForPlayer(User $player, System $system): array {
         $cost = [];
-        $stat_train_length = 600;
-	    // 56.25% of standard
-	    $stat_long_train_length = $stat_train_length * 4;
-        // 30x length (5 hrs), 12x gains: 40% of standard
-        $stat_extended_train_length = $stat_train_length * 30;
-	    // Forbidden seal trainings boost
-        $stat_long_train_length *= $player->forbidden_seal->long_training_time;
-        $stat_extended_train_length = round($stat_extended_train_length * $player->forbidden_seal->extended_training_time);
-        // Minutes * cost/min * rank
-        $standard_lesson_cost = ($stat_train_length / 60) * SenseiManager::LESSON_COST_PER_MINUTE * $player->rank_num;
-        $long_lesson_cost = ($stat_long_train_length / 60) * SenseiManager::LESSON_COST_PER_MINUTE * $player->rank_num;
-        $extended_lesson_cost = ($stat_extended_train_length / 60) * SenseiManager::LESSON_COST_PER_MINUTE * $player->rank_num;
+        $trainingManager = new TrainingManager($system, $player);
+        $standard_lesson_cost = ($trainingManager->stat_train_length / 60) * SenseiManager::LESSON_COST_PER_MINUTE * $player->rank_num;
+        $long_lesson_cost = ($trainingManager->stat_long_train_length / 60) * SenseiManager::LESSON_COST_PER_MINUTE * $player->rank_num;
+        $extended_lesson_cost = ($trainingManager->stat_extended_train_length / 60) * SenseiManager::LESSON_COST_PER_MINUTE * $player->rank_num;
         $cost['short'] = $standard_lesson_cost;
         $cost['long'] = $long_lesson_cost;
         $cost['extended'] = $extended_lesson_cost;
@@ -441,17 +435,10 @@ class SenseiManager {
 
     public static function getLessonDurationForPlayer(User $player, System $system): array {
         $duration = [];
-        $stat_train_length = 600;
-        // 56.25% of standard
-        $stat_long_train_length = $stat_train_length * 4;
-        // 30x length (5 hrs), 12x gains: 40% of standard
-        $stat_extended_train_length = $stat_train_length * 30;
-        // Forbidden seal trainings boost
-        $stat_long_train_length *= $player->forbidden_seal->long_training_time;
-        $stat_extended_train_length = round($stat_extended_train_length * $player->forbidden_seal->extended_training_time);
-        $duration['short'] = $stat_train_length;
-        $duration['long'] = $stat_long_train_length;
-        $duration['extended'] = $stat_extended_train_length;
+        $trainingManager = new TrainingManager($system, $player);
+        $duration['short'] = $trainingManager->stat_train_length;
+        $duration['long'] = $trainingManager->stat_long_train_length;
+        $duration['extended'] = $trainingManager->stat_extended_train_length;
         return $duration;
     }
 

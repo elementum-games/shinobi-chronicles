@@ -9,6 +9,7 @@ Algorithm:	See master_plan.html
 */
 
 require_once __DIR__ . '/../classes/notification/NotificationManager.php';
+require_once __DIR__ . '/../classes/training/TrainingManager.php';
 
 function villageHQ() {
 	global $system;
@@ -579,23 +580,16 @@ function villageHQ() {
                 $sensei_player->updateData();
 
 				// Set training for player
-				$stat_train_gain = 4 + ($player->rank_num * 4);
-				$stat_long_train_gain = $stat_train_gain * 2.25;
-                $stat_extended_train_gain = $stat_train_gain * 12;
-				$stat_long_train_gain *= $player->forbidden_seal->long_training_gains;
-                $stat_extended_train_gain = round($stat_extended_train_gain * $player->forbidden_seal->extended_training_gains);
-                $stat_train_gain += $system->TRAIN_BOOST;
-                $stat_long_train_gain += $system->LONG_TRAIN_BOOST;
-                $stat_extended_train_gain += ($system->LONG_TRAIN_BOOST * 5);
+                $trainingManager = new TrainingManager($system, $player);
                 switch ($lesson_data['train_type']) {
                     case 'short':
-                        $lesson_gain = $stat_train_gain * $lesson_modifier;
+                        $lesson_gain = $trainingManager->stat_train_gain * $lesson_modifier;
                         break;
                     case 'long':
-                        $lesson_gain = $stat_long_train_gain * $lesson_modifier;
+                        $lesson_gain = $trainingManager->stat_long_train_gain * $lesson_modifier;
                         break;
                     case 'extended':
-                        $lesson_gain = $stat_extended_train_gain * $lesson_modifier;
+                        $lesson_gain = $trainingManager->stat_extended_train_gain * $lesson_modifier;
                         break;
                     default:
                         throw new RuntimeException('Invalid duration!');
