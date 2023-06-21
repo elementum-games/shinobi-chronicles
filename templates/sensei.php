@@ -290,8 +290,8 @@
             <tr>
                 <td>
                     <p>Discover the ancient training grounds of your village where shinobi can participate in specialized training sessions with sensei.</p>
-                    <p>Gain access to the training grounds by making a generous donation to the village.</br>
-                    Your contribution supports the upkeep of the grounds and compensates sensei for their services</p>
+                    <p>Gain access to the training grounds by making a generous donation to the village.<br />
+                    Your contribution supports the upkeep of the grounds and compensates sensei for their services.</p>
                     <p>As the intense battles waged on these grounds take their toll, they require constant maintenance to preserve their sacred aura rendering them unavailable for regular training.</p>
                 </td>
             </tr>
