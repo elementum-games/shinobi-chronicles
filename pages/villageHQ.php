@@ -282,11 +282,11 @@ function villageHQ() {
                 }
 				// check rank
                 if ($player->rank_num < 4) {
-                    throw new Exception('You do not meet the requirements!');
+                    throw new RuntimeException('You do not meet the requirements!');
                 }
 				// check level
                 if ($player->level < 75) {
-                    throw new Exception('You do not meet the requirements!');
+                    throw new RuntimeException('You do not meet the requirements!');
                 }
 				// check justu mastered
                 $mastered_count = 0;
@@ -297,21 +297,21 @@ function villageHQ() {
                     }
                 }
                 if ($mastered_count < 5) {
-                    throw new Exception('You do not meet the requirements!');
+                    throw new RuntimeException('You do not meet the requirements!');
                 }
 				$answers = [$_POST['question1'], $_POST['question2'], $_POST['question3'], $_POST['question4'], $_POST['question5'], $_POST['question6']];
 				if (SenseiManager::scoreExam($answers, $system)) {
 					$success = SenseiManager::addSensei($player->user_id, $_POST['specialization'], $system);
 					if (!$success) {
-                        throw new Exception('Something went wrong!');
+                        throw new RuntimeException('Something went wrong!');
                     }
 					$system->message("You passed!");
 				}
 				else {
-                    throw new Exception('Check your answers and try again!');
+                    throw new RuntimeException('Check your answers and try again!');
                 }
             }
-			catch (Exception $e) {
+			catch (RuntimeException $e) {
 				$system->message($e->getMessage());
             }
         }
@@ -320,15 +320,15 @@ function villageHQ() {
 			try {
 				// check if sensei
 				if (!SenseiManager::isActiveSensei($player->user_id, $system)) {
-                    throw new Exception('You are not a sensei!');
+                    throw new RuntimeException('You are not a sensei!');
                 }
                 $success = SenseiManager::removeSensei($player->user_id, $system);
 				if (!$success) {
-                    throw new Exception('Something went wrong!');
+                    throw new RuntimeException('Something went wrong!');
                 }
 				$system->message("You have resigned as Sensei!");
             }
-			catch (Exception $e) {
+			catch (RuntimeException $e) {
                 $system->message($e->getMessage());
             }
         }
@@ -344,11 +344,11 @@ function villageHQ() {
 			try {
 				$success = SenseiManager::removeStudent($player->user_id, (int)$_GET['kick'], $system);
 				if (!$success) {
-                    throw new Exception('Something went wrong!');
+                    throw new RuntimeException('Something went wrong!');
                 }
 				$system->message("You have kicked your student!");
             }
-			catch (Exception $e) {
+			catch (RuntimeException $e) {
                 $system->message($e->getMessage());
             }
         }
@@ -357,12 +357,12 @@ function villageHQ() {
 			try {
 				$success = SenseiManager::removeStudent($player->sensei_id, $player->user_id, $system);
 				if (!$success) {
-                    throw new Exception('Something went wrong!');
+                    throw new RuntimeException('Something went wrong!');
                 }
 				$player->sensei_id = 0;
 				$system->message("You have left your Sensei!");
             }
-			catch (Exception $e) {
+			catch (RuntimeException $e) {
                 $system->message($e->getMessage());
             }
         }
@@ -372,36 +372,36 @@ function villageHQ() {
 				$sensei = User::loadFromId($system, (int)$_GET['apply'], true);
 				// check if already student
 				if ($player->sensei_id != 0) {
-                    throw new Exception('You already have a sensei!');
+                    throw new RuntimeException('You already have a sensei!');
                 }
 				// check eligibility
 				if ($player->rank_num > 2)
                 {
-                    throw new Exception('You are not eligible to become a student!');
+                    throw new RuntimeException('You are not eligible to become a student!');
                 }
 				// check is sensei
 				if (!SenseiManager::isActiveSensei($sensei->user_id, $system)) {
-                    throw new Exception('Player is not a valid sensei!');
+                    throw new RuntimeException('Player is not a valid sensei!');
                 }
 				// check village
 				if ($sensei->village->name != $player->village->name) {
-                    throw new Exception('Player is not a valid sensei!');
+                    throw new RuntimeException('Player is not a valid sensei!');
                 }
 				// check if accepting students
 				if (!$sensei->accept_students) {
-                    throw new Exception('Player is not accepting students!');
+                    throw new RuntimeException('Player is not accepting students!');
                 }
 				// check if slot available
 				if (!SenseiManager::hasSlot($sensei->user_id, $system)) {
-					throw new Exception('No student slots available!');
+					throw new RuntimeException('No student slots available!');
 				}
 				$success = SenseiManager::createApplication((int)$_GET['apply'], $player->user_id, $system);
 				if (!$success) {
-                    throw new Exception('Something went wrong!');
+                    throw new RuntimeException('Something went wrong!');
                 }
 				$system->message("You have submitted an application!");
             }
-			catch (Exception $e) {
+			catch (RuntimeException $e) {
                 $system->message($e->getMessage());
             }
         }
@@ -410,11 +410,11 @@ function villageHQ() {
             try {
 				$success = SenseiManager::closeApplication((int)$_GET['close'], $player->user_id, $system);
 				if (!$success) {
-                    throw new Exception('Something went wrong!');
+                    throw new RuntimeException('Something went wrong!');
                 }
 				$system->message("You have closed an application!");
             }
-			catch (Exception $e) {
+			catch (RuntimeException $e) {
                 $system->message($e->getMessage());
             }
         }
@@ -423,11 +423,11 @@ function villageHQ() {
             try {
 				$success = SenseiManager::acceptApplication($player->user_id, (int)$_GET['accept'], $system);
 				if (!$success) {
-                    throw new Exception('Something went wrong!');
+                    throw new RuntimeException('Something went wrong!');
                 }
 				$system->message("You have accepted an application!");
             }
-			catch (Exception $e) {
+			catch (RuntimeException $e) {
                 $system->message($e->getMessage());
             }
         }
@@ -436,11 +436,11 @@ function villageHQ() {
             try {
 				$success = SenseiManager::closeApplication($player->user_id, (int)$_GET['deny'], $system);
 				if (!$success) {
-                    throw new Exception('Something went wrong!');
+                    throw new RuntimeException('Something went wrong!');
                 }
 				$system->message("You have denied an application!");
             }
-			catch (Exception $e) {
+			catch (RuntimeException $e) {
                 $system->message($e->getMessage());
             }
         }
@@ -448,15 +448,15 @@ function villageHQ() {
 		if (isset($_GET['clear'])) {
             try {
 				if (!$player->staff_manager->isModerator()) {
-                    throw new Exception('Not a moderator!');
+                    throw new RuntimeException('Not a moderator!');
                 }
 				$success = SenseiManager::updateStudentRecruitment((int)$_GET['clear'], '', $system);
 				if (!$success) {
-                    throw new Exception('Something went wrong!');
+                    throw new RuntimeException('Something went wrong!');
                 }
 				$system->message("You have removed a recruitment message!");
             }
-			catch (Exception $e) {
+			catch (RuntimeException $e) {
                 $system->message($e->getMessage());
             }
         }
@@ -484,11 +484,11 @@ function villageHQ() {
                         $lesson_data['cost'] = $lesson_cost['extended'];
                         break;
                     default:
-                        throw new Exception('Invalid train duration!');
+                        throw new RuntimeException('Invalid train duration!');
                 }
                 $lesson = true;
             }
-			catch (Exception $e) {
+			catch (RuntimeException $e) {
                 $system->message($e->getMessage());
             }
         }
@@ -502,38 +502,38 @@ function villageHQ() {
 
 				// If minimum rank
                 if ($player->rank_num < 3) {
-                    throw new Exception('Insufficient rank!');
+                    throw new RuntimeException('Insufficient rank!');
                 }
 
 				// If not training
                 if ($player->train_time > 0) {
-                    throw new Exception('Training already in progress!');
+                    throw new RuntimeException('Training already in progress!');
                 }
 
 				// If sensei
                 if (!isset($lesson_sensei)) {
-                    throw new Exception('Target player is not a valid sensei!');
+                    throw new RuntimeException('Target player is not a valid sensei!');
                 }
 
 				// If active
 				if (!SenseiManager::isActiveSensei($lesson_data['sensei_id'], $system)) {
-					throw new Exception('Target player is not a valid sensei!');
+					throw new RuntimeException('Target player is not a valid sensei!');
                 }
                 $lesson_sensei += SenseiManager::getSenseiUserData($lesson_data['sensei_id'], $system);
 
 				// If in village
 				if ($player->village->name != $lesson_sensei['village']) {
-					throw new Exception('Target player is not a valid sensei!');
+					throw new RuntimeException('Target player is not a valid sensei!');
                 }
 
 				// If accepting lessons
                 if (!((bool) $lesson_sensei['enable_lessons'] && (bool) $lesson_sensei['accept_students'])) {
-                    throw new Exception('Target player is not a valid sensei!');
+                    throw new RuntimeException('Target player is not a valid sensei!');
                 }
 
 				// If has slot available
                 if (!SenseiManager::hasSlot($lesson_data['sensei_id'], $system)) {
-                    throw new Exception('Target player is not a valid sensei!');
+                    throw new RuntimeException('Target player is not a valid sensei!');
                 }
 				$lesson_cost = SenseiManager::getLessonCostForPlayer($player, $system)[$lesson_data['train_type']];
 				$lesson_duration = SenseiManager::getLessonDurationForPlayer($player, $system)[$lesson_data['train_type']];
@@ -551,7 +551,7 @@ function villageHQ() {
 						if ($player->bloodline_id == $lesson_sensei['bloodline_id']) {
 							$lesson_modifier = round(SenseiManager::getLessonModifier($player->bloodline_skill, $player->exp, $lesson_sensei['bloodline_skill'], $lesson_sensei['exp'], true) * 100 - 100, 2);
 						} else {
-							throw new Exception('Invalid stat!');
+							throw new RuntimeException('Invalid stat!');
                         }
                         break;
                     case 'speed':
@@ -561,12 +561,12 @@ function villageHQ() {
                         $lesson_modifier = SenseiManager::getLessonModifier($player->cast_speed, $player->exp, $lesson_sensei['cast_speed'], $lesson_sensei['exp'], $lesson_sensei['specialization'] == 'cast_speed' ? true : false);
                         break;
                     default:
-                        throw new Exception('Invalid stat!');
+                        throw new RuntimeException('Invalid stat!');
                 }
 
 				// Verify training has minimum increase
 				if ($lesson_modifier <= 1) {
-					throw new Exception('Invalid stat!');
+					throw new RuntimeException('Invalid stat!');
                 }
 
 				// Verify player can afford training
@@ -598,10 +598,10 @@ function villageHQ() {
                         $lesson_gain = $stat_extended_train_gain * $lesson_modifier;
                         break;
                     default:
-                        throw new Exception('Invalid duration!');
+                        throw new RuntimeException('Invalid duration!');
                 }
                 if ($player->total_stats >= $player->rank->stat_cap) {
-                    throw new Exception("You cannot train any more at this rank!");
+                    throw new RuntimeException("You cannot train any more at this rank!");
                 }
                 $player->log(User::LOG_TRAINING, "Type: {$lesson_data['lesson_stat']} / Length: {$lesson_duration}");
                 $player->train_type = $lesson_data['lesson_stat'];
@@ -621,14 +621,14 @@ function villageHQ() {
 
 				// Log lesson
                 if (!SenseiManager::logLesson($lesson_sensei['sensei_id'], $player->user_id, $lesson_duration, $lesson_sensei['temp_students'], (int)$lesson_sensei['yen_gained'] + ((int)$lesson_cost / 5), (int)$lesson_sensei['time_trained'] + (int)$lesson_duration, $system)) {
-                    throw new Exception('Something went wrong!');
+                    throw new RuntimeException('Something went wrong!');
                 }
 
 				// Update
 				$player->updateData();
                 $system->message("Lesson started for " . $lesson_cost . "&yen;.");
             }
-			catch (Exception $e) {
+			catch (RuntimeException $e) {
                 $system->message($e->getMessage());
             }
         }
@@ -637,15 +637,15 @@ function villageHQ() {
 			try {
 				// check if already sensei
                 if (SenseiManager::isActiveSensei($player->user_id, $system)) {
-                    throw new Exception('You do not meet the requirements!');
+                    throw new RuntimeException('You do not meet the requirements!');
                 }
                 // check rank
                 if ($player->rank_num < 4) {
-                    throw new Exception('You do not meet the requirements!');
+                    throw new RuntimeException('You do not meet the requirements!');
                 }
                 // check level
                 if ($player->level < 75) {
-                    throw new Exception('You do not meet the requirements!');
+                    throw new RuntimeException('You do not meet the requirements!');
                 }
                 // check justu mastered
                 $mastered_count = 0;
@@ -656,10 +656,10 @@ function villageHQ() {
                     }
                 }
                 if ($mastered_count < 5) {
-                    throw new Exception('You do not meet the requirements!');
+                    throw new RuntimeException('You do not meet the requirements!');
                 }
             }
-			catch (Exception $e) {
+			catch (RuntimeException $e) {
                 $system->message($e->getMessage());
             }
 			require 'templates/sensei_exam.php';
