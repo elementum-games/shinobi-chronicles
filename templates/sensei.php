@@ -272,7 +272,6 @@
                     </table>
                     <?php endif; ?>
                 </div>
-                <p>kjhdskjfds</p>
                 <div class="resign_container">
                     <a href="<?= $system->router->links['villageHQ']?>&view=sensei&resign=true">Resign</a>
                 </div>
