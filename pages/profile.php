@@ -83,7 +83,7 @@ function userProfile() {
         $recruitment_message = $system->db->clean($_POST['recruitment_message']);
         try {
             $enable_lessons;
-            isset($_POST['accept_students']) ? $player->accept_students = true : $player->accept_students = false;
+           $player->accept_students = isset($_POST['accept_students']);
             $enable_lessons = isset($_POST['enable_lessons']);
             // Update recruitment settings
             SenseiManager::updateStudentRecruitment($player->user_id, $recruitment_message, $system);
