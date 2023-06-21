@@ -285,13 +285,14 @@
     <table class="table">
         <tbody>
             <tr>
-                <th>Specialist Training (name?)</th>
+                <th>Specialist Training</th>
             </tr>
             <tr>
                 <td>
-                    <p>Some text about how players can reserve special training grounds in the village to take lessons with sensei.</p>
-                    <p>Sensei receive part of the payment, the rest goes to the village as a fee and to maintain the training grounds.</p>
-                    <p>Flavor text about how the grounds are constantly damaged by intensity of the training, ties into why you can't train in village normally.</p>
+                    <p>Discover the ancient training grounds of your village where shinobi can participate in specialized training sessions with sensei.</p>
+                    <p>Gain access to the training grounds by making a generous donation to the village.</br>
+                    Your contribution supports the upkeep of the grounds and compensates sensei for their services</p>
+                    <p>As the intense battles waged on these grounds take their toll, they require constant maintenance to preserve their sacred aura rendering them unavailable for regular training.</p>
                 </td>
             </tr>
         </tbody>
