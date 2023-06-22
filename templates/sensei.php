@@ -280,7 +280,7 @@
     </table>
 <?php endif; ?>
 
-<?php if ($player->rank_num > 2): ?>
+<?php if ($player->rank_num > 2 && $system->environment == System::ENVIRONMENT_DEV): ?>
     <table class="table">
         <tbody>
             <tr>
@@ -409,7 +409,7 @@
                         (Available)
                     </a>
                     </span>
-                    <?php elseif ((bool)$sensei['enable_lessons'] && $player->train_time == 0 && $player->user_id != $sensei['sensei_id'] && $player->exp < $sensei['exp'] && $player->rank_num > 2): ?>
+                    <?php elseif ((bool)$sensei['enable_lessons'] && $player->train_time == 0 && $player->user_id != $sensei['sensei_id'] && $player->exp < $sensei['exp'] && $player->rank_num > 2 && $system->environment == System::ENVIRONMENT_DEV): ?>
                     <label>Lessons</label>
                     <form action="<?= $system->router->getUrl('villageHQ', ['view' => 'sensei']) ?>" method="post">
 						<select name="lesson">
