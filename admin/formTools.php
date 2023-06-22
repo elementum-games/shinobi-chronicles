@@ -48,7 +48,7 @@ function validateFormData($entity_constraints, &$data, $content_id = null, $FORM
                     for($i = 0; $i < $variable['count']; $i++) {
                         $data_array[$count] = [];
                         foreach($variable['variables'] as $name => $var) {
-                            if(empty($FORM_DATA[$var_name][$i][$name])) {
+                            if(!isset($FORM_DATA[$var_name][$i][$name])) {
                                 continue;
                             }
                             else {

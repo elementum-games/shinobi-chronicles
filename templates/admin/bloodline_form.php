@@ -1,10 +1,14 @@
 <?php
 /**
- * @var System    $system
- * @var Bloodline $bloodline
- * @var array     $bloodline_constraints the allowed constraints for bloodline fields
- * @var int       $editing_bloodline_id
+ * @var System      $system
+ * @var ?Bloodline  $existing_bloodline
+ * @var array       $bloodline_constraints the allowed constraints for bloodline fields
+ * @var string      $form_action_url
  */
+
+ if(!isset($existing_bloodline)) {
+     $existing_bloodline = null;
+ }
 ?>
 <style>
     .bloodline-form label {
@@ -43,14 +47,18 @@
     }
 </style>
 <table class='table bloodline-form'>
-    <tr><th>Edit Bloodline (<?= stripslashes($bloodline->name) ?>)</th></tr>
+    <?php if($existing_bloodline != null): ?>
+        <tr><th>Edit Bloodline (<?= stripslashes($existing_bloodline->name) ?>)</th></tr>
+    <?php else: ?>
+        <tr><th>Create Bloodline</th></tr>
+    <?php endif; ?>
     <tr><td>
-        <form action='<?= $system->router->links['admin'] ?>&page=edit_bloodline&bloodline_id=<?= $editing_bloodline_id ?>' method='post'>
+        <form action='<?= $form_action_url ?>' method='post'>
             <label for="name">Name:</label>
-            <input type="text" name="name" value="<?= $bloodline->name ?>"><br>
+            <input type="text" name="name" value="<?= $existing_bloodline?->name ?? "" ?>"><br>
 
             <label for="clan_id">Clan Id:</label>
-            <input type="text" name="clan_id" value="<?= $bloodline->clan_id ?>"><br>
+            <input type="text" name="clan_id" value="<?= $existing_bloodline?->clan_id ?? 0 ?>"><br>
 
             <label for="rank" style="margin-top:5px;">Rank:</label>
             <select name="rank">
@@ -58,7 +66,7 @@
                     <option
                         name="rank"
                         value="<?= $value ?>"
-                        <?= $bloodline->rank == $value ? "selected='selected'" : "" ?>
+                        <?= $existing_bloodline?->rank == $value ? "selected='selected'" : "" ?>
                     ><?= $label ?></option>
                 <?php endforeach; ?>
             </select><br />
@@ -69,7 +77,7 @@
                     <option
                         name="village"
                         value="<?= $value ?>"
-                        <?= $bloodline->village == $value ? "selected='selected'" : "" ?>
+                        <?= $existing_bloodline?->village == $value ? "selected='selected'" : "" ?>
                     ><?= $value ?></option>
                 <?php endforeach; ?>
             </select><br />
@@ -82,7 +90,7 @@
                         <input
                             type="number"
                             name="passive_boosts[<?= $i ?>][power]"
-                            value="<?= $bloodline->passive_boosts[$i]['power'] ?? 0 ?>"
+                            value="<?= $existing_bloodline?->passive_boosts[$i]['power'] ?? 0 ?>"
                         >
                         <br />
 
@@ -92,7 +100,7 @@
                             <?php foreach($bloodline_constraints['passive_boosts']['variables']['effect']['options'] as $value): ?>
                                 <option
                                     value="<?= $value ?>"
-                                    <?= ($bloodline->passive_boosts[$i]['effect'] ?? "") == $value ? "selected='selected'" : "" ?>
+                                    <?= ($existing_bloodline?->passive_boosts[$i]['effect'] ?? "") == $value ? "selected='selected'" : "" ?>
                                 ><?= System::unSlug($value) ?></option>
                             <?php endforeach; ?>
                         </select>
@@ -106,9 +114,9 @@
                     <div id="combat_boosts_<?= $i ?>" class='boost-input'>
                         <label for="combat_boosts[<?= $i ?>][power]">Power:</label>
                         <input
-                                type="number"
-                                name="combat_boosts[<?= $i ?>][power]"
-                                value="<?= $bloodline->combat_boosts[$i]['power'] ?? 0 ?>"
+                            type="number"
+                            name="combat_boosts[<?= $i ?>][power]"
+                            value="<?= $existing_bloodline?->combat_boosts[$i]['power'] ?? 0 ?>"
                         >
                         <br />
 
@@ -116,10 +124,10 @@
                         <select name="combat_boosts[<?= $i ?>][effect]">
                             <option value="none">None</option>
                             <?php foreach($bloodline_constraints['combat_boosts']['variables']['effect']['options'] as $value): ?>
-                            <option
+                                <option
                                     value="<?= $value ?>"
-                                <?= ($bloodline->combat_boosts[$i]['effect'] ?? "") == $value ? "selected='selected'" : "" ?>
-                            ><?= System::unSlug($value) ?></option>
+                                    <?= ($existing_bloodline?->combat_boosts[$i]['effect'] ?? "") == $value ? "selected='selected'" : "" ?>
+                                ><?= System::unSlug($value) ?></option>
                             <?php endforeach; ?>
                         </select>
                     </div>
@@ -134,15 +142,15 @@
 
                     <div id="jutsu_<?= $i ?>" class='jutsu-container' style="margin-left: 5px;">
                         <?php
-                            $parent_field_name = "jutsu[{$i}]";
-                            $existing_jutsu = $bloodline->jutsu[$i] ?? null;
-                            $disable_hand_seals = true;
-                            require 'templates/admin/jutsu_form.php';
+                        $parent_field_name = "jutsu[{$i}]";
+                        $existing_jutsu = $existing_bloodline?->jutsu[$i] ?? null;
+                        $disable_hand_seals = true;
+                        require 'templates/admin/jutsu_form.php';
                         ?>
                     </div>
                 <?php endfor; ?>
             </div>
-            <input type="submit" name="bloodline_data" value="Edit">
+            <input type="submit" name="bloodline_data" value="<?= $existing_bloodline != null ? "Edit" : "Create" ?>">
         </form>
     </td></tr>
 </table>

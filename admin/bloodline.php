@@ -5,16 +5,28 @@ require_once 'admin/formTools.php';
 function createBloodlinePage($system, $RANK_NAMES) {
     /* Variables */
     $bloodline_constraints = require 'admin/constraints/bloodline.php';
-
-    $table_name = 'bloodlines';
-    $content_name = 'bloodline';
-
     $error = false;
     $data = [];
-    if($_POST[$content_name . '_data']) {
+
+    if(isset($_POST['bloodline_data'])) {
         try {
             $data = [];
-            validateFormData($bloodline_constraints, $data);
+
+            $FORM_DATA = $_POST;
+
+            $FORM_DATA['passive_boosts'] = array_filter($FORM_DATA['passive_boosts'], function ($boost) {
+                return $boost['effect'] !== 'none';
+            });
+            $FORM_DATA['combat_boosts'] = array_filter($FORM_DATA['combat_boosts'], function ($boost) {
+                return $boost['effect'] !== 'none';
+            });
+
+            validateFormData(
+                entity_constraints: $bloodline_constraints,
+                data: $data,
+                FORM_DATA: $FORM_DATA
+            );
+
             // Insert into database
             $column_names = '';
             $column_data = '';
@@ -28,13 +40,15 @@ function createBloodlinePage($system, $RANK_NAMES) {
                 }
                 $count++;
             }
-            $query = "INSERT INTO `$table_name` ($column_names) VALUES ($column_data)";
+
+            $query = "INSERT INTO `bloodlines` ($column_names) VALUES ($column_data)";
             $system->db->query($query);
+
             if($system->db->last_affected_rows == 1) {
-                $system->message(ucwords($content_name) . " created!");
+                $system->message("Bloodline created!");
             }
             else {
-                throw new RuntimeException("Error creating " . $content_name . "!");
+                throw new RuntimeException("Error creating bloodline!");
             }
         } catch(RuntimeException $e) {
             $system->message($e->getMessage());
@@ -42,20 +56,25 @@ function createBloodlinePage($system, $RANK_NAMES) {
         }
         $system->printMessage();
     }
+
     if($error) {
-        formPreloadData($bloodline_constraints, $data);
+        foreach($bloodline_constraints as $var_name => $variable) {
+            if(isset($_POST[$var_name])) {
+                $data[$var_name] = htmlspecialchars($_POST[$var_name], ENT_QUOTES);
+            }
+            else {
+                $data[$var_name] = '';
+            }
+        }
     }
     else {
-        formPreloadData($bloodline_constraints, $data, false);
+        foreach($bloodline_constraints as $var_name => $variable) {
+            $data[$var_name] = '';
+        }
     }
-    echo "<table class='table'><tr><th>Create " . ucwords(str_replace('_', ' ', $content_name)) . "</th></tr>
-		<tr><td>
-		<form action='" . $system->router->getUrl('admin', ['page' => "create_{$content_name}"]) . "' method='post'>";
-        displayFormFields($bloodline_constraints, $data);
-        echo "<br />
-		<input type='submit' name='" . $content_name . "_data' value='Create' />
-		</form>
-		</td></tr></table>";
+
+    $form_action_url = $system->router->getUrl('admin', ['page' => 'create_bloodline']);
+    require 'templates/admin/bloodline_form.php';
 }
 
 function editBloodlinePage($system, $RANK_NAMES) {
@@ -66,12 +85,12 @@ function editBloodlinePage($system, $RANK_NAMES) {
 
     // Validate NPC id
     $editing_bloodline_id = null;
-    $bloodline = null;
+    $existing_bloodline = null;
     if(!empty($_GET['bloodline_id'])) {
         $editing_bloodline_id = (int)$system->db->clean($_GET['bloodline_id']);
 
         try {
-            $bloodline = Bloodline::loadFromId($system, $editing_bloodline_id);
+            $existing_bloodline = Bloodline::loadFromId($system, $editing_bloodline_id);
         } catch(RuntimeException $e) {
             $system->message("Invalid bloodline!");
             $system->printMessage();
@@ -80,7 +99,7 @@ function editBloodlinePage($system, $RANK_NAMES) {
     }
 
     // POST submit edited data
-    if(isset($_POST['bloodline_data']) && $editing_bloodline_id != null && $bloodline != null) {
+    if(isset($_POST['bloodline_data']) && $editing_bloodline_id != null && $existing_bloodline != null) {
         try {
             $data = [];
 
@@ -121,8 +140,11 @@ function editBloodlinePage($system, $RANK_NAMES) {
     }
 
     // Form for editing data
-    if($bloodline != null && $editing_bloodline_id != null) {
-        require 'templates/admin/edit_bloodline.php';
+    if($existing_bloodline != null && $editing_bloodline_id != null) {
+        $form_action_url = $system->router->getUrl('admin', [
+            'page' => 'edit_bloodline', 'bloodline_id'=> $existing_bloodline->bloodline_id
+        ]);
+        require 'templates/admin/bloodline_form.php';
     }
 
     // Show form for selecting ID
