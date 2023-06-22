@@ -2,7 +2,7 @@
 
 require_once 'admin/formTools.php';
 
-function createBloodlinePage($system, $RANK_NAMES) {
+function createBloodlinePage($system) {
     /* Variables */
     $bloodline_constraints = require 'admin/constraints/bloodline.php';
     $error = false;
@@ -77,7 +77,7 @@ function createBloodlinePage($system, $RANK_NAMES) {
     require 'templates/admin/bloodline_form.php';
 }
 
-function editBloodlinePage($system, $RANK_NAMES) {
+function editBloodlinePage($system) {
     /* Variables */
     $bloodline_constraints = require 'admin/constraints/bloodline.php';
 

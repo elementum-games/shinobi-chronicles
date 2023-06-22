@@ -428,11 +428,11 @@ function adminPanel() {
     // Bloodline
     else if($page == 'create_bloodline') {
         require 'admin/bloodline.php';
-        createBloodlinePage($system, $RANK_NAMES);
+        createBloodlinePage($system);
     }
     else if($page == 'edit_bloodline') {
         require 'admin/bloodline.php';
-        editBloodlinePage($system, $RANK_NAMES);
+        editBloodlinePage($system);
     }
 
     // Create rank
