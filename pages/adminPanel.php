@@ -176,306 +176,6 @@ function adminPanel() {
 		</form>
 		</td></tr></table>";
     }
-
-    // Create jutsu
-    else if($page == 'create_jutsu') {
-        require 'admin/jutsu.php';
-        createJutsuPage($system, $RANK_NAMES);
-    }
-    // Edit jutsu
-    else if($page == 'edit_jutsu') {
-        require 'admin/jutsu.php';
-        editJutsuPage($system, $RANK_NAMES);
-    }
-
-    // Create item
-    else if($page == 'create_item') {
-        /* Variables
-            -item_id
-            -name
-            -rank
-            -purchase_type(1 = purchasable, 2 = event)
-            -purchase_cost
-            -use_type (1 = weapon, 2 = armor, 3 = consumable)
-            -effect
-            -effect_amount */
-        $table_name = 'items';
-        /* Variables */
-        $variables =& $constraints['item'];
-        $error = false;
-        $data = [];
-        if($_POST['item_data']) {
-            try {
-                $data = [];
-                validateFormData($variables, $data);
-                // Insert into database
-                $column_names = '';
-                $column_data = '';
-                $count = 1;
-                foreach($data as $name => $var) {
-                    $column_names .= "`$name`";
-                    $column_data .= "'$var'";
-                    if($count < count($data)) {
-                        $column_names .= ', ';
-                        $column_data .= ', ';
-                    }
-                    $count++;
-                }
-                $query = "INSERT INTO `$table_name` ($column_names) VALUES ($column_data)";
-                $system->db->query($query);
-                if($system->db->last_affected_rows == 1) {
-                    $system->message("Item created!");
-                }
-                else {
-                    throw new RuntimeException("Error creating item!");
-                }
-            } catch(RuntimeException $e) {
-                $system->message($e->getMessage());
-                $error = true;
-            }
-            $system->printMessage();
-        }
-        if($error) {
-            foreach($variables as $var_name => $variable) {
-                if(isset($_POST[$var_name])) {
-                    $data[$var_name] = htmlspecialchars($_POST[$var_name], ENT_QUOTES);
-                }
-                else {
-                    $data[$var_name] = '';
-                }
-            }
-        }
-        else {
-            foreach($variables as $var_name => $variable) {
-                $data[$var_name] = '';
-            }
-        }
-        echo "<table class='table'><tr><th>Create Item</th></tr>
-		<tr><td>
-		<form action='$system->router->getUrl('admin', ['page' => 'create_item'])' method='post'>";
-        displayFormFields($variables, $data);
-        echo "<br />
-		<input type='submit' name='item_data' value='Create' />
-		</form>
-		</td></tr></table>";
-    }
-    // Create Bloodline
-    else if($page == 'create_bloodline') {
-        $table_name = 'bloodlines';
-        $content_name = 'bloodline';
-        /* Variables */
-        $variables =& $constraints['bloodline'];
-        $error = false;
-        $data = [];
-        if($_POST[$content_name . '_data']) {
-            try {
-                $data = [];
-                validateFormData($variables, $data);
-                // Insert into database
-                $column_names = '';
-                $column_data = '';
-                $count = 1;
-                foreach($data as $name => $var) {
-                    $column_names .= "`$name`";
-                    $column_data .= "'$var'";
-                    if($count < count($data)) {
-                        $column_names .= ', ';
-                        $column_data .= ', ';
-                    }
-                    $count++;
-                }
-                $query = "INSERT INTO `$table_name` ($column_names) VALUES ($column_data)";
-                $system->db->query($query);
-                if($system->db->last_affected_rows == 1) {
-                    $system->message(ucwords($content_name) . " created!");
-                }
-                else {
-                    throw new RuntimeException("Error creating " . $content_name . "!");
-                }
-            } catch(RuntimeException $e) {
-                $system->message($e->getMessage());
-                $error = true;
-            }
-            $system->printMessage();
-        }
-        if($error) {
-            formPreloadData($variables, $data);
-        }
-        else {
-            formPreloadData($variables, $data, false);
-        }
-        echo "<table class='table'><tr><th>Create " . ucwords(str_replace('_', ' ', $content_name)) . "</th></tr>
-		<tr><td>
-		<form action='" . $system->router->getUrl('admin', ['page' => "create_{$content_name}"]) . "' method='post'>";
-        displayFormFields($variables, $data);
-        echo "<br />
-		<input type='submit' name='" . $content_name . "_data' value='Create' />
-		</form>
-		</td></tr></table>";
-    }
-    // Create rank
-    else if($page == 'create_rank') {
-        $table_name = 'ranks';
-        $content_name = 'rank';
-        /* Variables */
-        $variables =& $constraints['rank'];
-        $error = false;
-        $data = [];
-        if($_POST[$content_name . '_data']) {
-            try {
-                $data = [];
-                validateFormData($variables, $data);
-                // Insert into database
-                $column_names = '';
-                $column_data = '';
-                $count = 1;
-                foreach($data as $name => $var) {
-                    $column_names .= "`$name`";
-                    $column_data .= "'$var'";
-                    if($count < count($data)) {
-                        $column_names .= ', ';
-                        $column_data .= ', ';
-                    }
-                    $count++;
-                }
-                $query = "INSERT INTO `$table_name` ($column_names) VALUES ($column_data)";
-                $system->db->query($query);
-                if($system->db->last_affected_rows == 1) {
-                    $system->message(ucwords($content_name) . " created!");
-                }
-                else {
-                    throw new RuntimeException("Error creating " . $content_name . "!");
-                }
-            } catch(RuntimeException $e) {
-                $system->message($e->getMessage());
-                $error = true;
-            }
-            $system->printMessage();
-        }
-        if($error) {
-            formPreloadData($variables, $data);
-        }
-        else {
-            formPreloadData($variables, $data, false);
-        }
-        echo "<table class='table'><tr><th>Create " . ucwords(str_replace('_', ' ', $content_name)) . "</th></tr>
-		<tr><td>
-		<form action='$system->router->getUrl('admin', ['page' => 'create_' . $content_name])' method='post'>";
-        displayFormFields($variables, $data);
-        echo "<br />
-		<input type='submit' name='" . $content_name . "_data' value='Create' />
-		</form>
-		</td></tr></table>";
-    }
-    // Create Clan
-    else if($page == 'create_clan') {
-        $table_name = 'clans';
-        $content_name = 'clan';
-        /* Variables */
-        $variables =& $constraints['create_clan'];
-        $error = false;
-        $data = [];
-        if($_POST[$content_name . '_data']) {
-            try {
-                $data = [];
-                validateFormData($variables, $data);
-                // Insert into database
-                $column_names = '';
-                $column_data = '';
-                $count = 1;
-                foreach($data as $name => $var) {
-                    $column_names .= "`$name`";
-                    $column_data .= "'$var'";
-                    if($count < count($data)) {
-                        $column_names .= ', ';
-                        $column_data .= ', ';
-                    }
-                    $count++;
-                }
-                $query = "INSERT INTO `$table_name` ($column_names) VALUES ($column_data)";
-                $system->db->query($query);
-                if($system->db->last_affected_rows == 1) {
-                    $system->message(ucwords($content_name) . " created!");
-                }
-                else {
-                    throw new RuntimeException("Error creating " . $content_name . "!");
-                }
-            } catch(RuntimeException $e) {
-                $system->message($e->getMessage());
-                $error = true;
-            }
-            $system->printMessage();
-        }
-        if($error) {
-            formPreloadData($variables, $data);
-        }
-        else {
-            formPreloadData($variables, $data, false);
-        }
-        echo "<table class='table'><tr><th>Create " . ucwords(str_replace('_', ' ', $content_name)) . "</th></tr>
-		<tr><td>
-		<form action='" . $system->router->getUrl('admin', ['page' => "create_{$content_name}"]) . "' method='post'>";
-        displayFormFields($variables, $data);
-        echo "<br />
-		<input type='submit' name='" . $content_name . "_data' value='Create' />
-		</form>
-		</td></tr></table>";
-    }
-    // Create Clan
-    else if($page == 'create_mission') {
-        $table_name = 'missions';
-        $content_name = 'mission';
-        /* Variables */
-        $variables =& $constraints['mission'];
-        $error = false;
-        $data = [];
-        if($_POST[$content_name . '_data']) {
-            try {
-                $data = [];
-                validateFormData($variables, $data);
-                // Insert into database
-                $column_names = '';
-                $column_data = '';
-                $count = 1;
-                foreach($data as $name => $var) {
-                    $column_names .= "`$name`";
-                    $column_data .= "'$var'";
-                    if($count < count($data)) {
-                        $column_names .= ', ';
-                        $column_data .= ', ';
-                    }
-                    $count++;
-                }
-                $query = "INSERT INTO `$table_name` ($column_names) VALUES ($column_data)";
-                $system->db->query($query);
-                if($system->db->last_affected_rows == 1) {
-                    $system->message(ucwords($content_name) . " created!");
-                }
-                else {
-                    throw new RuntimeException("Error creating " . $content_name . "!");
-                }
-            } catch(RuntimeException $e) {
-                $system->message($e->getMessage());
-                $error = true;
-            }
-            $system->printMessage();
-        }
-        if($error) {
-            formPreloadData($variables, $data);
-        }
-        else {
-            formPreloadData($variables, $data, false);
-        }
-        echo "<table class='table'><tr><th>Create " . ucwords(str_replace('_', ' ', $content_name)) . "</th></tr>
-		<tr><td>
-		<form action='{$system->router->getUrl('admin', ['page' => 'create_' . $content_name])}' method='post'>";
-        displayFormFields($variables, $data);
-        echo "<br />
-		<input type='submit' name='" . $content_name . "_data' value='Create' />
-		</form>
-		</td></tr></table>";
-    }
-    // Edit NPC
     else if($page == 'edit_ai') {
         /* Variables */
         $variables =& $constraints['ai'];
@@ -552,7 +252,88 @@ function adminPanel() {
             require 'templates/admin/edit_npc_select.php';
         }
     }
-    // Edit item
+
+    // jutsu
+    else if($page == 'create_jutsu') {
+        require 'admin/jutsu.php';
+        createJutsuPage($system, $RANK_NAMES);
+    }
+    else if($page == 'edit_jutsu') {
+        require 'admin/jutsu.php';
+        editJutsuPage($system, $RANK_NAMES);
+    }
+
+    // Item
+    else if($page == 'create_item') {
+        /* Variables
+            -item_id
+            -name
+            -rank
+            -purchase_type(1 = purchasable, 2 = event)
+            -purchase_cost
+            -use_type (1 = weapon, 2 = armor, 3 = consumable)
+            -effect
+            -effect_amount */
+        $table_name = 'items';
+        /* Variables */
+        $variables =& $constraints['item'];
+        $error = false;
+        $data = [];
+        if($_POST['item_data']) {
+            try {
+                $data = [];
+                validateFormData($variables, $data);
+                // Insert into database
+                $column_names = '';
+                $column_data = '';
+                $count = 1;
+                foreach($data as $name => $var) {
+                    $column_names .= "`$name`";
+                    $column_data .= "'$var'";
+                    if($count < count($data)) {
+                        $column_names .= ', ';
+                        $column_data .= ', ';
+                    }
+                    $count++;
+                }
+                $query = "INSERT INTO `$table_name` ($column_names) VALUES ($column_data)";
+                $system->db->query($query);
+                if($system->db->last_affected_rows == 1) {
+                    $system->message("Item created!");
+                }
+                else {
+                    throw new RuntimeException("Error creating item!");
+                }
+            } catch(RuntimeException $e) {
+                $system->message($e->getMessage());
+                $error = true;
+            }
+            $system->printMessage();
+        }
+        if($error) {
+            foreach($variables as $var_name => $variable) {
+                if(isset($_POST[$var_name])) {
+                    $data[$var_name] = htmlspecialchars($_POST[$var_name], ENT_QUOTES);
+                }
+                else {
+                    $data[$var_name] = '';
+                }
+            }
+        }
+        else {
+            foreach($variables as $var_name => $variable) {
+                $data[$var_name] = '';
+            }
+        }
+        echo "<table class='table'><tr><th>Create Item</th></tr>
+		<tr><td>
+		<form action='{$system->router->getUrl('admin', ['page' => 'create_item'])}' method='post'>";
+        displayFormFields($variables, $data);
+        echo "<br />
+		<input type='submit' name='item_data' value='Create' />
+		</form>
+		</td></tr></table>";
+    }
     else if($page == 'edit_item') {
         $item_being_edited = null;
         $table_name = 'items';
@@ -643,77 +424,71 @@ function adminPanel() {
             require 'templates/admin/edit_item_select.php';
         }
     }
-    // Edit Bloodline
+
+    // Bloodline
+    else if($page == 'create_bloodline') {
+        require 'admin/bloodline.php';
+        createBloodlinePage($system, $RANK_NAMES);
+    }
     else if($page == 'edit_bloodline') {
-        $variables =& $constraints['bloodline'];
-        $self_link = $system->router->getUrl('admin', ['page' => "edit_bloodline"]);
+        require 'admin/bloodline.php';
+        editBloodlinePage($system, $RANK_NAMES);
+    }
 
-        // Validate NPC id
-        $editing_bloodline_id = null;
-        $bloodline_data = null;
-        if(!empty($_GET['bloodline_id'])) {
-            $editing_bloodline_id = (int)$system->db->clean($_GET['bloodline_id']);
-            $result = $system->db->query("SELECT * FROM `bloodlines` WHERE `bloodline_id`='$editing_bloodline_id'");
-            if($system->db->last_num_rows == 0) {
-                $system->message("Invalid bloodline!");
-                $system->printMessage();
-                $editing_bloodline_id = null;
-            }
-            else {
-                $bloodline_data = $system->db->fetch($result);
-                $select_content = false;
-            }
-        }
-
-        // POST submit edited data
-        if(isset($_POST['bloodline_data']) && $editing_bloodline_id != null) {
+    // Create rank
+    else if($page == 'create_rank') {
+        $table_name = 'ranks';
+        $content_name = 'rank';
+        /* Variables */
+        $variables =& $constraints['rank'];
+        $error = false;
+        $data = [];
+        if($_POST[$content_name . '_data']) {
             try {
                 $data = [];
-
                 validateFormData($variables, $data);
-
-                $update_set_clauses = [];
+                // Insert into database
+                $column_names = '';
+                $column_data = '';
+                $count = 1;
                 foreach($data as $name => $var) {
-                    $update_set_clauses[] = "`$name` = '$var'";
+                    $column_names .= "`$name`";
+                    $column_data .= "'$var'";
+                    if($count < count($data)) {
+                        $column_names .= ', ';
+                        $column_data .= ', ';
+                    }
+                    $count++;
                 }
-
-                $system->db->query(
-                    "UPDATE `bloodlines` SET "
-                        . implode(', ', $update_set_clauses)
-                        . " WHERE `bloodline_id`='$editing_bloodline_id'"
-                );
-
+                $query = "INSERT INTO `$table_name` ($column_names) VALUES ($column_data)";
+                $system->db->query($query);
                 if($system->db->last_affected_rows == 1) {
-                    $system->message('Bloodline ' . $data['name'] . " has been edited!");
-                    $select_content = true;
+                    $system->message(ucwords($content_name) . " created!");
                 }
                 else {
-                    throw new RuntimeException("Error editing " . $data['name'] . "! (Or data is the same)");
+                    throw new RuntimeException("Error creating " . $content_name . "!");
                 }
             } catch(RuntimeException $e) {
                 $system->message($e->getMessage());
-                $editing_bloodline_id = null;
+                $error = true;
             }
             $system->printMessage();
         }
-
-        // Form for editing data
-        if($bloodline_data && $editing_bloodline_id) {
-            require 'templates/admin/edit_bloodline.php';
+        if($error) {
+            formPreloadData($variables, $data);
         }
-
-        // Show form for selecting ID
-        if($editing_bloodline_id == null) {
-            $result = $system->db->query("SELECT * FROM `bloodlines` ORDER BY `rank` ASC");
-            $all_bloodlines = [];
-            while($row = $system->db->fetch($result)) {
-                $all_bloodlines[$row['bloodline_id']] = new Bloodline($row);
-            }
-
-            require 'templates/admin/edit_bloodline_select.php';
+        else {
+            formPreloadData($variables, $data, false);
         }
+        echo "<table class='table'><tr><th>Create " . ucwords(str_replace('_', ' ', $content_name)) . "</th></tr>
+		<tr><td>
+		<form action='{$system->router->getUrl('admin', ['page' => 'create_' . $content_name])}' method='post'>";
+        displayFormFields($variables, $data);
+        echo "<br />
+		<input type='submit' name='" . $content_name . "_data' value='Create' />
+		</form>
+		</td></tr></table>";
     }
-    // Edit NPC
     else if($page == 'edit_rank') {
         $table_name = 'ranks';
         $content_name = 'rank';
@@ -796,7 +571,61 @@ function adminPanel() {
 			</td></tr></table>";
         }
     }
-    // Edit Clan
+
+    // Create Clan
+    else if($page == 'create_clan') {
+        $table_name = 'clans';
+        $content_name = 'clan';
+        /* Variables */
+        $variables =& $constraints['create_clan'];
+        $error = false;
+        $data = [];
+        if($_POST[$content_name . '_data']) {
+            try {
+                $data = [];
+                validateFormData($variables, $data);
+                // Insert into database
+                $column_names = '';
+                $column_data = '';
+                $count = 1;
+                foreach($data as $name => $var) {
+                    $column_names .= "`$name`";
+                    $column_data .= "'$var'";
+                    if($count < count($data)) {
+                        $column_names .= ', ';
+                        $column_data .= ', ';
+                    }
+                    $count++;
+                }
+                $query = "INSERT INTO `$table_name` ($column_names) VALUES ($column_data)";
+                $system->db->query($query);
+                if($system->db->last_affected_rows == 1) {
+                    $system->message(ucwords($content_name) . " created!");
+                }
+                else {
+                    throw new RuntimeException("Error creating " . $content_name . "!");
+                }
+            } catch(RuntimeException $e) {
+                $system->message($e->getMessage());
+                $error = true;
+            }
+            $system->printMessage();
+        }
+        if($error) {
+            formPreloadData($variables, $data);
+        }
+        else {
+            formPreloadData($variables, $data, false);
+        }
+        echo "<table class='table'><tr><th>Create " . ucwords(str_replace('_', ' ', $content_name)) . "</th></tr>
+		<tr><td>
+		<form action='" . $system->router->getUrl('admin', ['page' => "create_{$content_name}"]) . "' method='post'>";
+        displayFormFields($variables, $data);
+        echo "<br />
+		<input type='submit' name='" . $content_name . "_data' value='Create' />
+		</form>
+		</td></tr></table>";
+    }
     else if($page == 'edit_clan') {
         $table_name = 'clans';
         $content_name = 'clan';
@@ -881,92 +710,61 @@ function adminPanel() {
 			</td></tr></table>";
         }
     }
-    // Edit Team
-    else if($page == 'edit_team') {
-        $table_name = 'teams';
-        $content_name = 'team';
-        /* Variables */
-        $variables =& $constraints['team'];
 
-        $select_content = true;
-        // Validate NPC id
-        if($_POST[$content_name . '_id']) {
-            $editing_bloodline_id = (int)$system->db->clean($_POST[$content_name . '_id']);
-            $result = $system->db->query(
-                "SELECT * FROM `{$table_name}` WHERE `{$content_name}_id`='$editing_bloodline_id'"
-            );
-            if($system->db->last_num_rows == 0) {
-                $system->message("Invalid $content_name!");
-                $system->printMessage();
-            }
-            else {
-                $content_data = $system->db->fetch($result);
-                $select_content = false;
-            }
-        }
-        // POST submit edited data
-        if($_POST[$content_name . '_data'] && !$select_content) {
+    // Mission
+    else if($page == 'create_mission') {
+        $table_name = 'missions';
+        $content_name = 'mission';
+        /* Variables */
+        $variables =& $constraints['mission'];
+        $error = false;
+        $data = [];
+        if($_POST[$content_name . '_data']) {
             try {
                 $data = [];
                 validateFormData($variables, $data);
                 // Insert into database
-                // Insert into database
                 $column_names = '';
                 $column_data = '';
                 $count = 1;
-                $query = "UPDATE `$table_name` SET ";
                 foreach($data as $name => $var) {
-                    $query .= "`$name` = '$var'";
+                    $column_names .= "`$name`";
+                    $column_data .= "'$var'";
                     if($count < count($data)) {
-                        $query .= ', ';
+                        $column_names .= ', ';
+                        $column_data .= ', ';
                     }
                     $count++;
                 }
-                $query .= "WHERE `{$content_name}_id`='$editing_bloodline_id'";
+                $query = "INSERT INTO `$table_name` ($column_names) VALUES ($column_data)";
                 $system->db->query($query);
                 if($system->db->last_affected_rows == 1) {
-                    $system->message(ucwords($content_name) . ' ' . $data['name'] . " has been edited!");
-                    $select_content = true;
+                    $system->message(ucwords($content_name) . " created!");
                 }
                 else {
-                    throw new RuntimeException("Error editing " . $data['name'] . "! (Or data is the same)");
+                    throw new RuntimeException("Error creating " . $content_name . "!");
                 }
             } catch(RuntimeException $e) {
                 $system->message($e->getMessage());
-                $select_content = false;
+                $error = true;
             }
             $system->printMessage();
         }
-        // Form for editing data
-        if($content_data && !$select_content) {
-            echo "<table class='table'><tr><th>Edit " . $content_name . " (" . stripslashes($content_data['name']) . ")</th></tr>
-			<tr><td>
-			<form action='{$system->router->getUrl('admin', ['page' => 'edit_' . $content_name])}' method='post'>
-			<label>Team ID:</label> " . $content_data['team_id'] . "<br />";
-            displayFormFields($variables, $content_data);
-            echo "<br />
-			<input type='hidden' name='{$content_name}_id' value='" . $content_data[$content_name . '_id'] . "' />
-			<input type='submit' name='{$content_name}_data' value='Edit' />
-			</form>
-			</td></tr></table>";
+        if($error) {
+            formPreloadData($variables, $data);
         }
-        // Show form for selecting ID
-        if($select_content) {
-            $result = $system->db->query("SELECT `{$content_name}_id`, `name` FROM `$table_name`");
-            echo "<table class='table'><tr><th>Select $content_name</th></tr>
-			<tr><td>
-			<form action='{$system->router->getUrl('admin', ['page' => 'edit_' . $content_name])}' method='post'>
-			<select name='{$content_name}_id'>";
-            while($row = $system->db->fetch($result)) {
-                echo "<option value='" . $row[$content_name . '_id'] . "'>" . stripslashes($row['name']) . "</option>";
-            }
-            echo "</select>
-			<input type='submit' value='Select' />
-			</form>
-			</td></tr></table>";
+        else {
+            formPreloadData($variables, $data, false);
         }
+        echo "<table class='table'><tr><th>Create " . ucwords(str_replace('_', ' ', $content_name)) . "</th></tr>
+		<tr><td>
+		<form action='{$system->router->getUrl('admin', ['page' => 'create_' . $content_name])}' method='post'>";
+        displayFormFields($variables, $data);
+        echo "<br />
+		<input type='submit' name='" . $content_name . "_data' value='Create' />
+		</form>
+		</td></tr></table>";
     }
-    // Edit Mission
     else if($page == 'edit_mission') {
         $table_name = 'missions';
         $content_name = 'mission';
@@ -1052,6 +850,91 @@ function adminPanel() {
         }
     }
 
+    // Edit Team
+    else if($page == 'edit_team') {
+        $table_name = 'teams';
+        $content_name = 'team';
+        /* Variables */
+        $variables =& $constraints['team'];
+
+        $select_content = true;
+        // Validate NPC id
+        if($_POST[$content_name . '_id']) {
+            $editing_bloodline_id = (int)$system->db->clean($_POST[$content_name . '_id']);
+            $result = $system->db->query(
+                "SELECT * FROM `{$table_name}` WHERE `{$content_name}_id`='$editing_bloodline_id'"
+            );
+            if($system->db->last_num_rows == 0) {
+                $system->message("Invalid $content_name!");
+                $system->printMessage();
+            }
+            else {
+                $content_data = $system->db->fetch($result);
+                $select_content = false;
+            }
+        }
+        // POST submit edited data
+        if($_POST[$content_name . '_data'] && !$select_content) {
+            try {
+                $data = [];
+                validateFormData($variables, $data);
+                // Insert into database
+                // Insert into database
+                $column_names = '';
+                $column_data = '';
+                $count = 1;
+                $query = "UPDATE `$table_name` SET ";
+                foreach($data as $name => $var) {
+                    $query .= "`$name` = '$var'";
+                    if($count < count($data)) {
+                        $query .= ', ';
+                    }
+                    $count++;
+                }
+                $query .= "WHERE `{$content_name}_id`='$editing_bloodline_id'";
+                $system->db->query($query);
+                if($system->db->last_affected_rows == 1) {
+                    $system->message(ucwords($content_name) . ' ' . $data['name'] . " has been edited!");
+                    $select_content = true;
+                }
+                else {
+                    throw new RuntimeException("Error editing " . $data['name'] . "! (Or data is the same)");
+                }
+            } catch(RuntimeException $e) {
+                $system->message($e->getMessage());
+                $select_content = false;
+            }
+            $system->printMessage();
+        }
+        // Form for editing data
+        if($content_data && !$select_content) {
+            echo "<table class='table'><tr><th>Edit " . $content_name . " (" . stripslashes($content_data['name']) . ")</th></tr>
+			<tr><td>
+			<form action='{$system->router->getUrl('admin', ['page' => 'edit_' . $content_name])}' method='post'>
+			<label>Team ID:</label> " . $content_data['team_id'] . "<br />";
+            displayFormFields($variables, $content_data);
+            echo "<br />
+			<input type='hidden' name='{$content_name}_id' value='" . $content_data[$content_name . '_id'] . "' />
+			<input type='submit' name='{$content_name}_data' value='Edit' />
+			</form>
+			</td></tr></table>";
+        }
+        // Show form for selecting ID
+        if($select_content) {
+            $result = $system->db->query("SELECT `{$content_name}_id`, `name` FROM `$table_name`");
+            echo "<table class='table'><tr><th>Select $content_name</th></tr>
+			<tr><td>
+			<form action='{$system->router->getUrl('admin', ['page' => 'edit_' . $content_name])}' method='post'>
+			<select name='{$content_name}_id'>";
+            while($row = $system->db->fetch($result)) {
+                echo "<option value='" . $row[$content_name . '_id'] . "'>" . stripslashes($row['name']) . "</option>";
+            }
+            echo "</select>
+			<input type='submit' value='Select' />
+			</form>
+			</td></tr></table>";
+        }
+    }
 
     // Logs
     else if($page == 'logs') {

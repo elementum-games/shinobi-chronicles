@@ -34,6 +34,9 @@ class Jutsu {
     const BL_POWER_PER_LEVEL_PERCENT = 0.5;
     const EFFECT_PER_LEVEL_PERCENT = 0.2;
 
+    // Genjutsu gets declared with full power and effect instead of a tradeoff between them, we balance in code
+    const GENJUTSU_ATTACK_POWER_MODIFIER = 0.55;
+
     public static array $elements = [    
         self::ELEMENT_FIRE,
         self::ELEMENT_EARTH,
@@ -113,6 +116,7 @@ class Jutsu {
      * @param int         $rank
      * @param string      $jutsu_type
      * @param float       $base_power
+     * @param int         $range
      * @param string|null $effect
      * @param float|null  $base_effect_amount
      * @param int|null    $effect_length
@@ -146,8 +150,7 @@ class Jutsu {
             $this->range = 1;
         }
         if($this->jutsu_type == Jutsu::TYPE_GENJUTSU && in_array($use_type, self::$attacking_use_types)) {
-            $this->base_power = $this->base_power * 0.55;
-            $this->power = round($this->base_power, 2);
+            $this->power = round($this->base_power * self::GENJUTSU_ATTACK_POWER_MODIFIER, 2);
             // $this->effect_only = true; // toggle this if you turn the power back to 1
         }
 
@@ -204,18 +207,25 @@ class Jutsu {
         $this->level = $level;
         $this->exp = $exp;
 
-        $level_power_multiplier = $this->is_bloodline ?
-            self::BL_POWER_PER_LEVEL_PERCENT / 100 : self::POWER_PER_LEVEL_PERCENT / 100;
+        $this->recalculatePower();
+
         $level_effect_multiplier = self::EFFECT_PER_LEVEL_PERCENT / 100;
-
-
-        $this->power = $this->base_power * (1 + ($this->level * $level_power_multiplier));
-        $this->power = round($this->power, 2);
-
         if($this->effect && $this->effect != 'none') {
             $this->effect_amount = $this->base_effect_amount *
                 (1 + round($this->level * $level_effect_multiplier, 3));
         }
+    }
+
+    public function recalculatePower() {
+        $level_power_multiplier = $this->is_bloodline ?
+            self::BL_POWER_PER_LEVEL_PERCENT / 100 : self::POWER_PER_LEVEL_PERCENT / 100;
+
+        $is_genjutsu_attack = $this->jutsu_type == Jutsu::TYPE_GENJUTSU && in_array($this->use_type, self::$attacking_use_types);
+
+        $this->power = $this->base_power
+            * ($is_genjutsu_attack ? self::GENJUTSU_ATTACK_POWER_MODIFIER : 1)
+            * (1 + ($this->level * $level_power_multiplier));
+        $this->power = round($this->power, 2);
     }
 
     public function setWeapon(int $weapon_id, $effect, $effect_amount): Jutsu {
