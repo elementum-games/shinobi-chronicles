@@ -401,8 +401,8 @@ function LoginSection({
     className: "home_diamond_up",
     x: "4",
     y: "4",
-    width: "45px",
-    height: "45px"
+    width: "45",
+    height: "45"
   }), /*#__PURE__*/React.createElement("rect", {
     className: "home_diamond_right",
     x: "51",
@@ -446,20 +446,130 @@ function LoginSection({
     textAnchor: "middle",
     dominantBaseline: "middle"
   }, "updates")))), /*#__PURE__*/React.createElement("div", {
-    className: "login_features_button"
+    className: "login_rules_button"
   }, /*#__PURE__*/React.createElement("div", {
     className: "home_diamond_container"
   }, /*#__PURE__*/React.createElement("svg", {
+    className: "home_diamond_svg",
     width: "100",
-    height: "100"
-  }))), /*#__PURE__*/React.createElement("div", {
-    className: "login_world_button"
+    height: "100",
+    style: {
+      transform: "scale(0.85)"
+    }
+  }, /*#__PURE__*/React.createElement("g", {
+    className: "home_diamond_rotategroup diamond_blue",
+    transform: "rotate(45 50 50)"
+  }, /*#__PURE__*/React.createElement("rect", {
+    className: "home_diamond_rear",
+    x: "29",
+    y: "29",
+    width: "78",
+    height: "78"
+  }), /*#__PURE__*/React.createElement("rect", {
+    className: "home_diamond_up",
+    x: "4",
+    y: "4",
+    width: "45",
+    height: "45"
+  }), /*#__PURE__*/React.createElement("rect", {
+    className: "home_diamond_right",
+    x: "51",
+    y: "4",
+    width: "45",
+    height: "45"
+  }), /*#__PURE__*/React.createElement("rect", {
+    className: "home_diamond_left",
+    x: "4",
+    y: "51",
+    width: "45",
+    height: "45"
+  }), /*#__PURE__*/React.createElement("rect", {
+    className: "home_diamond_down",
+    x: "51",
+    y: "51",
+    width: "45",
+    height: "45"
+  })), /*#__PURE__*/React.createElement("text", {
+    className: "home_diamond_shadow_text",
+    x: "50",
+    y: "52",
+    textAnchor: "middle",
+    dominantBaseline: "middle"
+  }, "rules"), /*#__PURE__*/React.createElement("text", {
+    className: "home_diamond_blue_text",
+    x: "50",
+    y: "50",
+    textAnchor: "middle",
+    dominantBaseline: "middle"
+  }, "rules")))), /*#__PURE__*/React.createElement("div", {
+    className: "login_tos_button"
   }, /*#__PURE__*/React.createElement("div", {
     className: "home_diamond_container"
   }, /*#__PURE__*/React.createElement("svg", {
+    className: "home_diamond_svg",
     width: "100",
-    height: "100"
-  }))), /*#__PURE__*/React.createElement("div", {
+    height: "100",
+    style: {
+      transform: "scale(0.85)"
+    }
+  }, /*#__PURE__*/React.createElement("g", {
+    className: "home_diamond_rotategroup diamond_red",
+    transform: "rotate(45 50 50)"
+  }, /*#__PURE__*/React.createElement("rect", {
+    className: "home_diamond_rear",
+    x: "29",
+    y: "29",
+    width: "78",
+    height: "78"
+  }), /*#__PURE__*/React.createElement("rect", {
+    className: "home_diamond_up",
+    x: "4",
+    y: "4",
+    width: "45",
+    height: "45"
+  }), /*#__PURE__*/React.createElement("rect", {
+    className: "home_diamond_right",
+    x: "51",
+    y: "4",
+    width: "45",
+    height: "45"
+  }), /*#__PURE__*/React.createElement("rect", {
+    className: "home_diamond_left",
+    x: "4",
+    y: "51",
+    width: "45",
+    height: "45"
+  }), /*#__PURE__*/React.createElement("rect", {
+    className: "home_diamond_down",
+    x: "51",
+    y: "51",
+    width: "45",
+    height: "45"
+  })), /*#__PURE__*/React.createElement("text", {
+    className: "home_diamond_shadow_text",
+    x: "50",
+    y: "40",
+    textAnchor: "middle",
+    dominantBaseline: "middle"
+  }, "terms of"), /*#__PURE__*/React.createElement("text", {
+    className: "home_diamond_red_text",
+    x: "50",
+    y: "38",
+    textAnchor: "middle",
+    dominantBaseline: "middle"
+  }, "terms of"), /*#__PURE__*/React.createElement("text", {
+    className: "home_diamond_shadow_text",
+    x: "50",
+    y: "64",
+    textAnchor: "middle",
+    dominantBaseline: "middle"
+  }, "service"), /*#__PURE__*/React.createElement("text", {
+    className: "home_diamond_red_text",
+    x: "50",
+    y: "62",
+    textAnchor: "middle",
+    dominantBaseline: "middle"
+  }, "service")))), /*#__PURE__*/React.createElement("div", {
     className: "login_contact_button"
   }, /*#__PURE__*/React.createElement("div", {
     className: "home_diamond_container"

@@ -144,6 +144,16 @@
     left: -350px;
     bottom: -85px;
 }
+.login_rules_button {
+    position: relative;
+    left: -325px;
+    bottom: -225px;
+}
+.login_tos_button {
+    position: relative;
+    left: 325px;
+    bottom: -225px;
+}
 .login_features_button {
     position: relative;
     left: -325px;

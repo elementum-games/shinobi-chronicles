@@ -239,7 +239,7 @@ function LoginSection({ displayLogin, setDisplayLogin, displayRegister, setDispl
                     <svg className="home_diamond_svg" width="100" height="100">
                         <g className={"home_diamond_rotategroup diamond_red"} transform="rotate(45 50 50)">
                             <rect className="home_diamond_rear" x="29" y="29" width="78" height="78" />
-                            <rect className="home_diamond_up" x="4" y="4" width="45px" height="45px" />
+                            <rect className="home_diamond_up" x="4" y="4" width="45" height="45" />
                             <rect className="home_diamond_right" x="51" y="4" width="45" height="45" />
                             <rect className="home_diamond_left" x="4" y="51" width="45" height="45" />
                             <rect className="home_diamond_down" x="51" y="51" width="45" height="45" />
@@ -251,10 +251,42 @@ function LoginSection({ displayLogin, setDisplayLogin, displayRegister, setDispl
                     </svg>
                 </div>
             </div>
-            <div className="login_features_button">
+            <div className="login_rules_button">
+                <div className="home_diamond_container">
+                    <svg className="home_diamond_svg" width="100" height="100" style={{ transform: "scale(0.85)"}}>
+                        <g className={"home_diamond_rotategroup diamond_blue"} transform="rotate(45 50 50)">
+                            <rect className="home_diamond_rear" x="29" y="29" width="78" height="78" />
+                            <rect className="home_diamond_up" x="4" y="4" width="45" height="45" />
+                            <rect className="home_diamond_right" x="51" y="4" width="45" height="45" />
+                            <rect className="home_diamond_left" x="4" y="51" width="45" height="45" />
+                            <rect className="home_diamond_down" x="51" y="51" width="45" height="45" />
+                        </g>
+                        <text className="home_diamond_shadow_text" x="50" y="52" textAnchor="middle" dominantBaseline="middle">rules</text>
+                        <text className="home_diamond_blue_text" x="50" y="50" textAnchor="middle" dominantBaseline="middle">rules</text>
+                    </svg>
+                </div>
+            </div>
+            <div className="login_tos_button">
+                <div className="home_diamond_container">
+                    <svg className="home_diamond_svg" width="100" height="100" style={{ transform: "scale(0.85)"}}>
+                        <g className={"home_diamond_rotategroup diamond_red"} transform="rotate(45 50 50)">
+                            <rect className="home_diamond_rear" x="29" y="29" width="78" height="78" />
+                            <rect className="home_diamond_up" x="4" y="4" width="45" height="45" />
+                            <rect className="home_diamond_right" x="51" y="4" width="45" height="45" />
+                            <rect className="home_diamond_left" x="4" y="51" width="45" height="45" />
+                            <rect className="home_diamond_down" x="51" y="51" width="45" height="45" />
+                        </g>
+                        <text className="home_diamond_shadow_text" x="50" y="40" textAnchor="middle" dominantBaseline="middle">terms of</text>
+                        <text className="home_diamond_red_text" x="50" y="38" textAnchor="middle" dominantBaseline="middle">terms of</text>
+                        <text className="home_diamond_shadow_text" x="50" y="64" textAnchor="middle" dominantBaseline="middle">service</text>
+                        <text className="home_diamond_red_text" x="50" y="62" textAnchor="middle" dominantBaseline="middle">service</text>
+                    </svg>
+                </div>
+            </div>
+            {/*<div className="login_features_button">
                 <div className="home_diamond_container">
                     <svg width="100" height="100">
-                        {/*<g className={"home_diamond_rotategroup diamond_blue"} transform="rotate(45 50 50)">
+                        <g className={"home_diamond_rotategroup diamond_blue"} transform="rotate(45 50 50)">
                             <rect className="home_diamond_rear" x="29" y="29" width="78" height="78" />
                             <rect className="home_diamond_up" x="4" y="4" width="45px" height="45px" />
                             <rect className="home_diamond_right" x="51" y="4" width="45" height="45" />
@@ -264,14 +296,14 @@ function LoginSection({ displayLogin, setDisplayLogin, displayRegister, setDispl
                         <text className="home_diamond_shadow_text" x="50" y="40" textAnchor="middle" dominantBaseline="middle">game</text>
                         <text className="home_diamond_blue_text" x="50" y="38" textAnchor="middle" dominantBaseline="middle">game</text>
                         <text className="home_diamond_shadow_text" x="50" y="64" textAnchor="middle" dominantBaseline="middle">features</text>
-                        <text className="home_diamond_blue_text" x="50" y="62" textAnchor="middle" dominantBaseline="middle">features</text>*/}
+                        <text className="home_diamond_blue_text" x="50" y="62" textAnchor="middle" dominantBaseline="middle">features</text>
                     </svg>
                 </div>
             </div>
             <div className="login_world_button">
                 <div className="home_diamond_container">
                     <svg width="100" height="100">
-                        {/*<g className={"home_diamond_rotategroup diamond_red"} transform="rotate(45 50 50)">
+                        <g className={"home_diamond_rotategroup diamond_red"} transform="rotate(45 50 50)">
                             <rect className="home_diamond_rear" x="29" y="29" width="78" height="78" />
                             <rect className="home_diamond_up" x="4" y="4" width="45px" height="45px" />
                             <rect className="home_diamond_right" x="51" y="4" width="45" height="45" />
@@ -279,11 +311,11 @@ function LoginSection({ displayLogin, setDisplayLogin, displayRegister, setDispl
                             <rect className="home_diamond_down" x="51" y="51" width="45" height="45" />
                         </g>
                         <text className="home_diamond_shadow_text" x="50" y="52" textAnchor="middle" dominantBaseline="middle">world info</text>
-                        <text className="home_diamond_red_text" x="50" y="50" textAnchor="middle" dominantBaseline="middle">world info</text>*/}
+                        <text className="home_diamond_red_text" x="50" y="50" textAnchor="middle" dominantBaseline="middle">world info</text>
                         
                     </svg>
                 </div>
-            </div>
+            </div>*/}
             <div className="login_contact_button">
                 <div className="home_diamond_container">
                     <svg className="home_diamond_svg" width="100" height="100">
