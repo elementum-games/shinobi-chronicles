@@ -286,7 +286,8 @@ function LoginSection({
   }, /*#__PURE__*/React.createElement("div", {
     className: "login_error_label",
     style: {
-      marginBottom: "10px"
+      marginBottom: "30px",
+      marginLeft: "30px"
     }
   }, registerErrorText))), displayReset && /*#__PURE__*/React.createElement("form", {
     id: "reset_form",

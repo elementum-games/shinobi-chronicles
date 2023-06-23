@@ -280,8 +280,9 @@
 }
 .login_error_label {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    font-size: 14px;
-    color: white;
+    font-size: 13px;
+    color: #de7788;
+    font-weight: 600;
     user-select: none;
     margin-left: 15px;
 }
@@ -327,7 +328,7 @@
     position: absolute;
     transform: translateY(-50px);
     width: 500px;
-    background: rgba(20, 20, 28, 0.75);
+    background: rgba(20, 20, 28, 0.90);
 }
 .register_field_label {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -340,14 +341,14 @@
     color: #d1c5ad;
     font-size: 14px;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    margin-left: 12px;
+    margin-left: 30px;
 }
 .register_terms_notice {
     color: #d1c5ad;
     font-size: 14px;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    margin-left: 12px;
-    margin-right: 12px;
+    margin-left: 30px;
+    margin-right: 30px;
     margin-bottom: 15px;
 }
 .register_username_input {
@@ -371,7 +372,7 @@
     margin-bottom: 10px;
 }
 .register_username_wrapper {
-    margin-left: 12px;
+    margin-left: 30px;
     display: flex;
     flex-direction: column;
 }
@@ -379,7 +380,7 @@
 }
 .register_password_wrapper {
     flex-basis: 35%;
-    margin-left: 12px;
+    margin-left: 30px;
     display: flex;
     flex-direction: column;
 }
@@ -388,14 +389,14 @@
     flex-direction: column;
 }
 .register_email_wrapper {
-    margin-left: 12px;
+    margin-left: 30px;
     display: flex;
     flex-direction: column;
 }
 .register_gender_wrapper {
     flex-basis: 35%;
     margin-top: 10px;
-    margin-left: 12px;
+    margin-left: 30px;
     display: flex;
     flex-direction: column;
 }
@@ -412,7 +413,7 @@
     margin-bottom: 10px;
 }
 .register_username_container {
-    margin-top: 5px;
+    margin-top: 20px;
     display: flex;
 }
 .register_option {
@@ -429,10 +430,10 @@
     font-size: 15px;
     font-variant: small-caps;
     user-select: none;
-    color: #fef2da;
+    color: #bfb7e0;
     cursor: pointer;
     margin-left: auto;
-    margin-right: 12px;
+    margin-right: 30px;
 }
     .register_close:hover {
         color: white;
@@ -450,7 +451,7 @@
     font-size: 15px;
     font-variant: small-caps;
     user-select: none;
-    color: #fef2da;
+    color: #bfb7e0;
     cursor: pointer;
     margin-left: auto;
     margin-right: 15px;
@@ -478,17 +479,8 @@
     flex-basis: 40%;
 }
 .reset_email_input {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     width: 165px;
-    background: #0d0e10;
-    outline: none;
-    border-color: #1e1d25;
-    color: #d1c5ad;
     height: 25px;
-    margin-bottom: 10px;
-    padding: 0;
-    border-width: 1px;
-    font-size: 15px;
 }
 .reset_email_label {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;

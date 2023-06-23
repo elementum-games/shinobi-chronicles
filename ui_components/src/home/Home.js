@@ -20,7 +20,7 @@ function Home({
     registerPreFill,
     initialNewsPosts,
 }: Props) {
-    const [displayLogin, setDisplayLogin] = React.useState(loginErrorText == "" ? false : true);
+    const [displayLogin, setDisplayLogin] = React.useState((loginErrorText != "" || loginMessageText != "") ? true : false);
     const [displayRegister, setDisplayRegister] = React.useState(registerErrorText == "" ? false : true);
     const [displayReset, setDisplayReset] = React.useState(resetErrorText == "" ? false : true);
     const [newsPosts, setNewsPosts] = React.useState(initialNewsPosts);
@@ -194,7 +194,7 @@ function LoginSection({ displayLogin, setDisplayLogin, displayRegister, setDispl
                             </div>
                             {registerErrorText != "" &&
                                 <div className="register_input_bottom">
-                                <div className="login_error_label" style={{ marginBottom: "10px" }}>{registerErrorText}</div>
+                                <div className="login_error_label" style={{ marginBottom: "30px", marginLeft: "30px" }}>{registerErrorText}</div>
                                 </div>
                             }
                             </form>
