@@ -8,6 +8,8 @@ Purpose:	Functions for displaying user profile
 Algorithm:	See master_plan.html
 */
 
+require_once __DIR__ . '/../classes/notification/NotificationManager.php';
+
 /**
  * @throws RuntimeException
  */
@@ -38,7 +40,6 @@ function userProfile() {
     // Rank up
     else if($player->level >= $player->rank->max_level && $player->exp >= $exp_needed && $player->rank_num < System::SC_MAX_RANK && $player->rank_up) {
         // Create notification
-        require_once __DIR__ . '/../classes/notification/NotificationManager.php';
         $new_notification = new NotificationDto(
             type: "rank",
             message: "Rank up available",
@@ -81,9 +82,12 @@ function userProfile() {
     if(!empty($_POST['update_student_recruitment'])) {
         $recruitment_message = $system->db->clean($_POST['recruitment_message']);
         try {
-            isset($_POST['accept_students']) ? $player->accept_students = true : $player->accept_students = false;
+            $enable_lessons;
+           $player->accept_students = isset($_POST['accept_students']);
+            $enable_lessons = isset($_POST['enable_lessons']);
             // Update recruitment settings
-            $success = SenseiManager::updateStudentRecruitment($player->user_id, $recruitment_message, $system);
+            SenseiManager::updateStudentRecruitment($player->user_id, $recruitment_message, $system);
+            $success = SenseiManager::updateStudentLessons($player->user_id, (bool)$enable_lessons, $system);
             if (!$success) {
                 throw new RuntimeException('Something went wrong!');
             }
@@ -114,27 +118,28 @@ function userProfile() {
 
     $sensei;
     $students = [];
+    $temp_students = [];
     if ($player->sensei_id != 0) {
         // get sensei table data
         $sensei = SenseiManager::getSenseiByID($player->sensei_id, $system);
         // get student boost
-        $sensei += SenseiManager::getStudentBoost($sensei['graduated']);
+        $sensei += SenseiManager::getStudentBoostBySensei($player->sensei_id, $system);
         // get sensei user data
-        if (!SenseiManager::isSensei($player->user_id, $system)) {
-            $sensei += SenseiManager::getSenseiUserData($player->sensei_id, $system);
-        }
+        $sensei += SenseiManager::getSenseiUserData($player->sensei_id, $system);
     }
-    else if (SenseiManager::isSensei($player->user_id, $system)) {
+    else if (SenseiManager::isActiveSensei($player->user_id, $system)) {
         // get sensei table data
         $sensei = SenseiManager::getSenseiByID($player->user_id, $system);
         // get student boost
-        $sensei += SenseiManager::getStudentBoost($sensei['graduated']);
+        $sensei += SenseiManager::getStudentBoostBySensei($player->user_id, $system);
         // if sensei has students, get student data
         if (count($sensei['students']) > 0) {
             $students = SenseiManager::getStudentData($sensei['students'], $system);
         }
+        if (count($sensei['temp_students']) > 0) {
+            $temp_students = SenseiManager::getTempStudentData($sensei['temp_students'], $system);
+        }
     }
-
     require 'templates/profile.php';
 }
 

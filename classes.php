@@ -66,3 +66,5 @@ require_once __DIR__ . "/classes/notification/NotificationAPIResponse.php";
 require_once __DIR__ . "/classes/notification/NotificationAPIPresenter.php";
 require_once __DIR__ . "/classes/notification/NotificationAPIManager.php";
 require_once __DIR__ . "/classes/notification/NotificationManager.php";
+
+require_once __DIR__ . "/classes/training/TrainingManager.php";

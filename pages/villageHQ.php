@@ -8,6 +8,9 @@ Purpose:	Functions for village HQ
 Algorithm:	See master_plan.html
 */
 
+require_once __DIR__ . '/../classes/notification/NotificationManager.php';
+require_once __DIR__ . '/../classes/training/TrainingManager.php';
+
 function villageHQ() {
 	global $system;
 
@@ -275,7 +278,7 @@ function villageHQ() {
 		if (isset($_POST['submit_exam'])) {
 			try {
 				// check if already sensei
-				if (SenseiManager::isSensei($player->sensei_id, $system)) {
+				if (SenseiManager::isActiveSensei($player->sensei_id, $system)) {
                     throw new RuntimeException('You do not meet the requirements!');
                 }
 				// check rank
@@ -309,7 +312,7 @@ function villageHQ() {
                     throw new RuntimeException('Check your answers and try again!');
                 }
             }
-			catch (Exception $e) {
+			catch (RuntimeException $e) {
 				$system->message($e->getMessage());
             }
         }
@@ -317,7 +320,7 @@ function villageHQ() {
 		if (isset($_POST['confirm_resignation'])) {
 			try {
 				// check if sensei
-				if (!SenseiManager::isSensei($player->user_id, $system)) {
+				if (!SenseiManager::isActiveSensei($player->user_id, $system)) {
                     throw new RuntimeException('You are not a sensei!');
                 }
                 $success = SenseiManager::removeSensei($player->user_id, $system);
@@ -326,14 +329,14 @@ function villageHQ() {
                 }
 				$system->message("You have resigned as Sensei!");
             }
-			catch (Exception $e) {
+			catch (RuntimeException $e) {
                 $system->message($e->getMessage());
             }
         }
 		// If resign clicked, set flag
 		$resign = false;
 		if (isset($_GET['resign'])) {
-            if (SenseiManager::isSensei($player->user_id, $system)) {
+            if (SenseiManager::isActiveSensei($player->user_id, $system)) {
                 $resign = true;
             }
         }
@@ -346,7 +349,7 @@ function villageHQ() {
                 }
 				$system->message("You have kicked your student!");
             }
-			catch (Exception $e) {
+			catch (RuntimeException $e) {
                 $system->message($e->getMessage());
             }
         }
@@ -360,7 +363,7 @@ function villageHQ() {
 				$player->sensei_id = 0;
 				$system->message("You have left your Sensei!");
             }
-			catch (Exception $e) {
+			catch (RuntimeException $e) {
                 $system->message($e->getMessage());
             }
         }
@@ -378,7 +381,7 @@ function villageHQ() {
                     throw new RuntimeException('You are not eligible to become a student!');
                 }
 				// check is sensei
-				if (!SenseiManager::isSensei($sensei->user_id, $system)) {
+				if (!SenseiManager::isActiveSensei($sensei->user_id, $system)) {
                     throw new RuntimeException('Player is not a valid sensei!');
                 }
 				// check village
@@ -389,13 +392,17 @@ function villageHQ() {
 				if (!$sensei->accept_students) {
                     throw new RuntimeException('Player is not accepting students!');
                 }
+				// check if slot available
+				if (!SenseiManager::hasSlot($sensei->user_id, $system)) {
+					throw new RuntimeException('No student slots available!');
+				}
 				$success = SenseiManager::createApplication((int)$_GET['apply'], $player->user_id, $system);
 				if (!$success) {
                     throw new RuntimeException('Something went wrong!');
                 }
 				$system->message("You have submitted an application!");
             }
-			catch (Exception $e) {
+			catch (RuntimeException $e) {
                 $system->message($e->getMessage());
             }
         }
@@ -408,7 +415,7 @@ function villageHQ() {
                 }
 				$system->message("You have closed an application!");
             }
-			catch (Exception $e) {
+			catch (RuntimeException $e) {
                 $system->message($e->getMessage());
             }
         }
@@ -421,7 +428,7 @@ function villageHQ() {
                 }
 				$system->message("You have accepted an application!");
             }
-			catch (Exception $e) {
+			catch (RuntimeException $e) {
                 $system->message($e->getMessage());
             }
         }
@@ -434,7 +441,7 @@ function villageHQ() {
                 }
 				$system->message("You have denied an application!");
             }
-			catch (Exception $e) {
+			catch (RuntimeException $e) {
                 $system->message($e->getMessage());
             }
         }
@@ -450,7 +457,172 @@ function villageHQ() {
                 }
 				$system->message("You have removed a recruitment message!");
             }
-			catch (Exception $e) {
+			catch (RuntimeException $e) {
+                $system->message($e->getMessage());
+            }
+        }
+        $lesson = false;
+        if (isset($_POST['lesson'])) {
+            try {
+                $lesson_data = [];
+                $lesson_data['sensei_name'] = $system->db->clean($_POST['sensei_name']);
+                $lesson_data['stat'] = $system->db->clean($_POST['lesson']);
+                $lesson_data['train_type'] = $system->db->clean($_POST['train_type']);
+                $lesson_data['sensei_id'] = $system->db->clean($_POST['sensei_id']);
+                $lesson_duration = SenseiManager::getLessonDurationForPlayer($player, $system);
+                $lesson_cost = SenseiManager::getLessonCostForPlayer($player, $system);
+                switch ($_POST['train_type']) {
+                    case 'short':
+                        $lesson_data['duration'] = $lesson_duration['short'] / 60;
+                        $lesson_data['cost'] = $lesson_cost['short'];
+                        break;
+                    case 'long':
+                        $lesson_data['duration'] = $lesson_duration['long'] / 60;
+                        $lesson_data['cost'] = $lesson_cost['long'];
+                        break;
+                    case 'extended':
+                        $lesson_data['duration'] = $lesson_duration['extended'] / 60;
+                        $lesson_data['cost'] = $lesson_cost['extended'];
+                        break;
+                    default:
+                        throw new RuntimeException('Invalid train duration!');
+                }
+                $lesson = true;
+            }
+			catch (RuntimeException $e) {
+                $system->message($e->getMessage());
+            }
+        }
+        if (isset($_POST['confirm_lesson'])) {
+            try {
+                $lesson_data = [];
+                $lesson_data['sensei_id'] = $system->db->clean($_POST['sensei_id']);
+                $lesson_data['lesson_stat'] = $system->db->clean($_POST['lesson_stat']);
+                $lesson_data['train_type'] = $system->db->clean($_POST['train_type']);
+                $lesson_sensei = SenseiManager::getSenseiByID($lesson_data['sensei_id'], $system);
+
+				// If minimum rank
+                if ($player->rank_num < 3) {
+                    throw new RuntimeException('Insufficient rank!');
+                }
+
+				// If not training
+                if ($player->train_time > 0) {
+                    throw new RuntimeException('Training already in progress!');
+                }
+
+				// If sensei
+                if (!isset($lesson_sensei)) {
+                    throw new RuntimeException('Target player is not a valid sensei!');
+                }
+
+				// If active
+				if (!SenseiManager::isActiveSensei($lesson_data['sensei_id'], $system)) {
+					throw new RuntimeException('Target player is not a valid sensei!');
+                }
+                $lesson_sensei += SenseiManager::getSenseiUserData($lesson_data['sensei_id'], $system);
+
+				// If in village
+				if ($player->village->name != $lesson_sensei['village']) {
+					throw new RuntimeException('Target player is not a valid sensei!');
+                }
+
+				// If accepting lessons
+                if (!((bool) $lesson_sensei['enable_lessons'] && (bool) $lesson_sensei['accept_students'])) {
+                    throw new RuntimeException('Target player is not a valid sensei!');
+                }
+
+				// If has slot available
+                if (!SenseiManager::hasSlot($lesson_data['sensei_id'], $system)) {
+                    throw new RuntimeException('Target player is not a valid sensei!');
+                }
+				$lesson_cost = SenseiManager::getLessonCostForPlayer($player, $system)[$lesson_data['train_type']];
+				$lesson_duration = SenseiManager::getLessonDurationForPlayer($player, $system)[$lesson_data['train_type']];
+                switch ($_POST['lesson_stat']) {
+                    case 'ninjutsu_skill':
+                        $lesson_modifier = SenseiManager::getLessonModifier($player->ninjutsu_skill, $player->exp, $lesson_sensei['ninjutsu_skill'], $lesson_sensei['exp'], $lesson_sensei['specialization'] == 'ninjutsu_skill' ? true : false);
+                        break;
+                    case 'taijutsu_skill':
+                        $lesson_modifier = SenseiManager::getLessonModifier($player->taijutsu_skill, $player->exp, $lesson_sensei['taijutsu_skill'], $lesson_sensei['exp'], $lesson_sensei['specialization'] == 'taijutsu_skill' ? true : false);
+                        break;
+                    case 'genjutsu_skill':
+                        $lesson_modifier = SenseiManager::getLessonModifier($player->genjutsu_skill, $player->exp, $lesson_sensei['genjutsu_skill'], $lesson_sensei['exp'], $lesson_sensei['specialization'] == 'genjutsu_skill' ? true : false);
+                        break;
+                    case 'bloodline_skill':
+						if ($player->bloodline_id == $lesson_sensei['bloodline_id']) {
+							$lesson_modifier = round(SenseiManager::getLessonModifier($player->bloodline_skill, $player->exp, $lesson_sensei['bloodline_skill'], $lesson_sensei['exp'], true) * 100 - 100, 2);
+						} else {
+							throw new RuntimeException('Invalid stat!');
+                        }
+                        break;
+                    case 'speed':
+                        $lesson_modifier = SenseiManager::getLessonModifier($player->speed, $player->exp, $lesson_sensei['speed'], $lesson_sensei['exp'], $lesson_sensei['specialization'] == 'speed' ? true : false);
+                        break;
+                    case 'cast_speed':
+                        $lesson_modifier = SenseiManager::getLessonModifier($player->cast_speed, $player->exp, $lesson_sensei['cast_speed'], $lesson_sensei['exp'], $lesson_sensei['specialization'] == 'cast_speed' ? true : false);
+                        break;
+                    default:
+                        throw new RuntimeException('Invalid stat!');
+                }
+
+				// Verify training has minimum increase
+				if ($lesson_modifier <= 1) {
+					throw new RuntimeException('Invalid stat!');
+                }
+
+				// Verify player can afford training
+				$player->subtractMoney($lesson_cost, "Paid " . $lesson_cost . "&yen; for lessons.");
+
+                // Add yen to sensei
+                $sensei_player = User::loadFromId($system, $lesson_sensei['sensei_id']);
+                $sensei_player->loadData(User::UPDATE_NOTHING);
+                $sensei_player->addMoney($lesson_cost / 5, "Earned " . $lesson_cost / 5 . "&yen; for lessons.");
+                $sensei_player->updateData();
+
+				// Set training for player
+                $trainingManager = new TrainingManager($system, $player);
+                switch ($lesson_data['train_type']) {
+                    case 'short':
+                        $lesson_gain = $trainingManager->stat_train_gain * $lesson_modifier;
+                        break;
+                    case 'long':
+                        $lesson_gain = $trainingManager->stat_long_train_gain * $lesson_modifier;
+                        break;
+                    case 'extended':
+                        $lesson_gain = $trainingManager->stat_extended_train_gain * $lesson_modifier;
+                        break;
+                    default:
+                        throw new RuntimeException('Invalid duration!');
+                }
+                if ($player->total_stats >= $player->rank->stat_cap) {
+                    throw new RuntimeException("You cannot train any more at this rank!");
+                }
+                $player->log(User::LOG_TRAINING, "Type: {$lesson_data['lesson_stat']} / Length: {$lesson_duration}");
+                $player->train_type = $lesson_data['lesson_stat'];
+                $player->train_gain = $lesson_gain;
+                $player->train_time = time() + $lesson_duration;
+
+				// Create notification for player
+                $new_notification = new NotificationDto(
+                    type: "training",
+                    message: "Training " . System::unSlug($lesson_data['lesson_stat']),
+                    user_id: $player->user_id,
+                    created: time(),
+                    duration: $lesson_duration,
+                    alert: false,
+                );
+                NotificationManager::createNotification($new_notification, $system, NotificationManager::UPDATE_REPLACE);
+
+				// Log lesson
+                if (!SenseiManager::logLesson($lesson_sensei['sensei_id'], $player->user_id, $lesson_duration, $lesson_sensei['temp_students'], (int)$lesson_sensei['yen_gained'] + ((int)$lesson_cost / 5), (int)$lesson_sensei['time_trained'] + (int)$lesson_duration, $system)) {
+                    throw new RuntimeException('Something went wrong!');
+                }
+
+				// Update
+				$player->updateData();
+                $system->message("Lesson started for " . $lesson_cost . "&yen;.");
+            }
+			catch (RuntimeException $e) {
                 $system->message($e->getMessage());
             }
         }
@@ -458,7 +630,7 @@ function villageHQ() {
 		if (isset($_GET['sensei_exam'])) {
 			try {
 				// check if already sensei
-                if (SenseiManager::isSensei($player->user_id, $system)) {
+                if (SenseiManager::isActiveSensei($player->user_id, $system)) {
                     throw new RuntimeException('You do not meet the requirements!');
                 }
                 // check rank
@@ -481,7 +653,7 @@ function villageHQ() {
                     throw new RuntimeException('You do not meet the requirements!');
                 }
             }
-			catch (Exception $e) {
+			catch (RuntimeException $e) {
                 $system->message($e->getMessage());
             }
 			require 'templates/sensei_exam.php';
@@ -490,7 +662,7 @@ function villageHQ() {
 		else {
 			$applications = [];
 			// If Sensei
-			if (SenseiManager::isSensei($player->user_id, $system)) {
+			if (SenseiManager::isActiveSensei($player->user_id, $system)) {
                 $applications = SenseiManager::getApplicationsBySensei($player->user_id, $system);
             }
 			// If eligible Student
@@ -510,8 +682,22 @@ function villageHQ() {
 			else {
 				$sensei_list = SenseiManager::getSenseiByVillage($player->village->name, $system);
             }
+			// Calculate lesson modifiers
+            foreach ($sensei_list as &$sensei) {
+                $sensei['ninjutsu_modifier'] = round(SenseiManager::getLessonModifier($player->ninjutsu_skill, $player->exp, $sensei['ninjutsu_skill'], $sensei['exp'], $sensei['specialization'] == 'ninjutsu_skill' ? true : false) * 100 - 100, 2);
+                $sensei['taijutsu_modifier'] = round(SenseiManager::getLessonModifier($player->taijutsu_skill, $player->exp, $sensei['taijutsu_skill'], $sensei['exp'], $sensei['specialization'] == 'taijutsu_skill' ? true : false) * 100 - 100, 2);
+                $sensei['genjutsu_modifier'] = round(SenseiManager::getLessonModifier($player->genjutsu_skill, $player->exp, $sensei['genjutsu_skill'], $sensei['exp'], $sensei['specialization'] == 'genjutsu_skill' ? true : false) * 100 - 100, 2);
+                if ($player->bloodline_id == $sensei['bloodline_id']) {
+                    $sensei['bloodline_modifier'] = round(SenseiManager::getLessonModifier($player->bloodline_skill, $player->exp, $sensei['bloodline_skill'], $sensei['exp'], true) * 100 - 100, 2);
+                }
+                $sensei['speed_modifier'] = round(SenseiManager::getLessonModifier($player->speed, $player->exp, $sensei['speed'], $sensei['exp'], $sensei['specialization'] == 'speed' ? true : false) * 100 - 100, 2);
+                $sensei['cast_speed_modifier'] = round(SenseiManager::getLessonModifier($player->cast_speed, $player->exp, $sensei['cast_speed'], $sensei['exp'], $sensei['specialization'] == 'cast_speed' ? true : false) * 100 - 100, 2);
+                unset($sensei);
+            }
+            $lesson_cost = SenseiManager::getLessonCostForPlayer($player, $system);
 			require 'templates/sensei.php';
         }
+
 		$system->printMessage();
     }
 }

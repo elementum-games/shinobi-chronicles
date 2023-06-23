@@ -311,7 +311,7 @@ class NotificationAPIManager {
             );
         }
         //Student Applications
-        if (SenseiManager::isSensei($this->player->user_id, $this->system)) {
+        if (SenseiManager::isActiveSensei($this->player->user_id, $this->system)) {
             if (SenseiManager::hasApplications($this->player->user_id, $this->system)) {
                 $notifications[] = new NotificationDto(
                 action_url: $this->system->router->getUrl('villageHQ', ['view' => 'sensei']),

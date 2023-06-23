@@ -77,6 +77,8 @@
                         <option value="taijutsu">Taijutsu</option>
                         <option value="ninjutsu">Ninjutsu</option>
                         <option value="genjutsu">Genjutsu</option>
+                        <option value="speed">Speed</option>
+                        <option value="cast_speed">Cast Speed</option>
                     </select>
                     <p class="submit_wrapper">
                         <input type="submit" name="submit_exam" value="Submit Answers" />

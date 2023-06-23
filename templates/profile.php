@@ -544,9 +544,16 @@ $clan_positions = [
                             </div>
                             <div>
                                 <b>
-                                    <?= ucwords($sensei['specialization'])?> (+<?= $sensei['boost_primary'] ?>%) | Other (+<?= $sensei['boost_secondary'] ?>%)
+                                    <?= System::unSlug($sensei['specialization'])?> (+<?= $sensei['boost_primary'] ?>%) | Other (+<?= $sensei['boost_secondary'] ?>%)
                                 </b>
                             </div>
+                            <?php if(isset($sensei['bloodline_name'])): ?>
+                            <div>
+                                <b>
+                                    <?= ucwords($sensei['bloodline_name'])?> (+<?= $sensei['boost_primary'] ?>%)
+                                </b>
+                            </div>
+                            <?php endif; ?>
                             <?php foreach ($students as $student): ?>
                             <div class="student_container">
                                 <span>Student</span>
@@ -558,8 +565,19 @@ $clan_positions = [
                                 </span><br />
                             </div>
                             <?php endforeach; ?>
-                            <?php if (count($students) < 3): ?>
-                            <?php for ($i = 0; $i < (3 - count($students)); $i++): ?>
+                            <?php foreach ($temp_students as $student): ?>
+                            <div class="student_container">
+                                <span>Training</span>
+                                <div><img src='<?= $student->avatar_link ?>' class="student_avatar" /></div>
+                                <span>
+                                    <a href='<?= $system->router->links['members'] ?>&user=<?= $student->user_name ?>'>
+                                        <?= $student->user_name ?>
+                                    </a>
+                                </span>
+                            </div>
+                            <?php endforeach; ?>
+                            <?php if (count($students) + count($temp_students) < 3): ?>
+                            <?php for ($i = 0; $i < (3 - count($students) - count($temp_students)); $i++): ?>
                             <div class="student_container">
                                 <span>Student</span>
                                 <img class="student_avatar" src='../images/default_avatar.png'/><br />
@@ -589,6 +607,10 @@ $clan_positions = [
                         <form action="<?= $system->router->links['profile'] ?>" method="post">
                             <input type="checkbox" value="1" name="accept_students" <?php if ($player->accept_students) : echo "checked"; endif; ?> />
                             <label for="accept_students">Accept Students</label>
+                            <?php if ($system->environment == System::ENVIRONMENT_DEV): ?>
+                            <input type="checkbox" value="1" name="enable_lessons" <?php if ($sensei['enable_lessons']) : echo "checked"; endif; ?> />
+                            <label for="enable_lessons">Enable Lessons</label>
+                            <?php endif; ?>
                             <div><p class="recruitment_message_wrapper">Recruitment Message</p></div>
                             <div class="message_wrapper"><?= $system->html_parse($sensei['recruitment_message']) ?></div>
                             <textarea id="recruitment_message" name="recruitment_message" class="message_input"><?= $sensei['recruitment_message'] ?></textarea>
@@ -615,14 +637,16 @@ $clan_positions = [
                         </div>
                         <div>
                             <b>
-                                Specialization: <?= ucwords($sensei['specialization'])?>
+                                <?= System::unSlug($sensei['specialization'])?> (+<?= $sensei['boost_primary'] ?>%) | Other (+<?= $sensei['boost_secondary'] ?>%)
                             </b>
                         </div>
+                        <?php if(isset($sensei['bloodline_name'])): ?>
                         <div>
                             <b>
-                                <?= ucwords($sensei['specialization'])?> (+<?= $sensei['boost_primary'] ?>%) | Other (+<?= $sensei['boost_secondary'] ?>%)
+                                <?= ucwords($sensei['bloodline_name'])?> (+<?= $sensei['boost_primary'] ?>%)
                             </b>
                         </div>
+                        <?php endif; ?>
                         <div class="sensei_container">
                             <div>
                                 <p class="label_italics">
