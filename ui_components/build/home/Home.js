@@ -8,7 +8,7 @@ function Home({
   registerPreFill,
   initialNewsPosts
 }) {
-  const [displayLogin, setDisplayLogin] = React.useState(loginErrorText == "" ? false : true);
+  const [displayLogin, setDisplayLogin] = React.useState(loginErrorText != "" || loginMessageText != "" ? true : false);
   const [displayRegister, setDisplayRegister] = React.useState(registerErrorText == "" ? false : true);
   const [displayReset, setDisplayReset] = React.useState(resetErrorText == "" ? false : true);
   const [newsPosts, setNewsPosts] = React.useState(initialNewsPosts);
@@ -287,7 +287,8 @@ function LoginSection({
     className: "login_error_label",
     style: {
       marginBottom: "30px",
-      marginLeft: "30px"
+      marginLeft: "30px",
+      marginTop: "-15px"
     }
   }, registerErrorText))), displayReset && /*#__PURE__*/React.createElement("form", {
     id: "reset_form",

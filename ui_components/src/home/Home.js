@@ -194,7 +194,7 @@ function LoginSection({ displayLogin, setDisplayLogin, displayRegister, setDispl
                             </div>
                             {registerErrorText != "" &&
                                 <div className="register_input_bottom">
-                                <div className="login_error_label" style={{ marginBottom: "30px", marginLeft: "30px" }}>{registerErrorText}</div>
+                                <div className="login_error_label" style={{ marginBottom: "30px", marginLeft: "30px", marginTop: "-15px" }}>{registerErrorText}</div>
                                 </div>
                             }
                             </form>
