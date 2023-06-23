@@ -445,7 +445,9 @@ function LoginSection({
   }, /*#__PURE__*/React.createElement("svg", {
     className: "home_diamond_svg",
     width: "100",
-    height: "100"
+    height: "100",
+    role: "button",
+    tabIndex: "0"
   }, /*#__PURE__*/React.createElement("g", {
     className: "home_diamond_rotategroup diamond_red",
     transform: "rotate(45 50 50)"
@@ -511,6 +513,8 @@ function LoginSection({
     className: "home_diamond_svg",
     width: "100",
     height: "100",
+    role: "button",
+    tabIndex: "0",
     style: {
       transform: "scale(0.85)"
     },
@@ -568,6 +572,8 @@ function LoginSection({
     className: "home_diamond_svg",
     width: "100",
     height: "100",
+    role: "button",
+    tabIndex: "0",
     style: {
       transform: "scale(0.85)"
     },
@@ -636,7 +642,9 @@ function LoginSection({
   }, /*#__PURE__*/React.createElement("svg", {
     className: "home_diamond_svg",
     width: "100",
-    height: "100"
+    height: "100",
+    role: "button",
+    tabIndex: "0"
   }, /*#__PURE__*/React.createElement("g", {
     className: "home_diamond_rotategroup diamond_blue",
     transform: "rotate(45 50 50)"
@@ -685,7 +693,9 @@ function LoginSection({
   }, "contact us")))));
 }
 function NewsSection({}) {
-  return /*#__PURE__*/React.createElement(React.Fragment, null);
+  return /*#__PURE__*/React.createElement("div", {
+    className: "news_container"
+  });
 }
 function FeatureSection({}) {
   return /*#__PURE__*/React.createElement(React.Fragment, null);

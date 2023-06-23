@@ -414,7 +414,7 @@ function LoginSection({
             </div>
             <div className="login_news_button">
                 <div className="home_diamond_container">
-                    <svg className="home_diamond_svg" width="100" height="100">
+                    <svg className="home_diamond_svg" width="100" height="100" role="button" tabIndex="0">
                         <g className={"home_diamond_rotategroup diamond_red"} transform="rotate(45 50 50)">
                             <rect className="home_diamond_rear" x="29" y="29" width="78" height="78" />
                             <rect className="home_diamond_up" x="4" y="4" width="45" height="45" />
@@ -431,7 +431,7 @@ function LoginSection({
             </div>
             <div className="login_rules_button">
                 <div className="home_diamond_container">
-                    <svg className="home_diamond_svg" width="100" height="100" style={{ transform: "scale(0.85)" }} onClick={() => handleRules()}>
+                    <svg className="home_diamond_svg" width="100" height="100" role="button" tabIndex="0" style={{ transform: "scale(0.85)" }} onClick={() => handleRules()}>
                         <g className={"home_diamond_rotategroup diamond_blue"} transform="rotate(45 50 50)">
                             <rect className="home_diamond_rear" x="29" y="29" width="78" height="78" />
                             <rect className="home_diamond_up" x="4" y="4" width="45" height="45" />
@@ -446,7 +446,7 @@ function LoginSection({
             </div>
             <div className="login_terms_button">
                 <div className="home_diamond_container">
-                    <svg className="home_diamond_svg" width="100" height="100" style={{ transform: "scale(0.85)" }} onClick={() => handleTerms()}>
+                    <svg className="home_diamond_svg" width="100" height="100" role="button" tabIndex="0" style={{ transform: "scale(0.85)" }} onClick={() => handleTerms()}>
                         <g className={"home_diamond_rotategroup diamond_red"} transform="rotate(45 50 50)">
                             <rect className="home_diamond_rear" x="29" y="29" width="78" height="78" />
                             <rect className="home_diamond_up" x="4" y="4" width="45" height="45" />
@@ -496,7 +496,7 @@ function LoginSection({
             </div>*/}
             <div className="login_contact_button">
                 <div className="home_diamond_container">
-                    <svg className="home_diamond_svg" width="100" height="100">
+                    <svg className="home_diamond_svg" width="100" height="100" role="button" tabIndex="0">
                         <g className={"home_diamond_rotategroup diamond_blue"} transform="rotate(45 50 50)">
                             <rect className="home_diamond_rear" x="29" y="29" width="78" height="78" />
                             <rect className="home_diamond_up" x="4" y="4" width="45px" height="45px" />
@@ -515,7 +515,8 @@ function LoginSection({
 
 function NewsSection({ }) {
     return (
-        <></>
+        <div className="news_container">
+        </div>
     );
 }
 

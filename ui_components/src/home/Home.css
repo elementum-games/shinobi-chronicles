@@ -192,6 +192,9 @@
 .home_diamond_svg:active rect {
     transition: transform 0s;
 }
+.home_diamond_svg:focus rect {
+    transition: transform 0.3s;
+}
 .home_diamond_svg text {
     transition: text-shadow 0.3s;
 }
@@ -218,17 +221,26 @@
 .home_diamond_svg:active rect.home_diamond_up {
     transform: translate(4px, 4px);
 }
-
 .home_diamond_svg:active rect.home_diamond_left {
     transform: translate(4px, -4px);
 }
-
 .home_diamond_svg:active rect.home_diamond_right {
     transform: translate(-4px, 4px);
 }
-
 .home_diamond_svg:active rect.home_diamond_down {
     transform: translate(-4px, -4px);
+}
+.home_diamond_svg:focus rect.home_diamond_up {
+    transform: translate(4px, 4px) !important;
+}
+.home_diamond_svg:focus rect.home_diamond_left {
+    transform: translate(4px, -4px) !important;
+}
+.home_diamond_svg:focus rect.home_diamond_right {
+    transform: translate(-4px, 4px) !important;
+}
+.home_diamond_svg:focus rect.home_diamond_down {
+    transform: translate(-4px, -4px) !important;
 }
 .home_diamond_red_text {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
