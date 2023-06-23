@@ -390,10 +390,10 @@ address and requested a password reset. If this is not your account, please disr
             error_log($e->getMessage());
             $register_error_text = $e->getMessage();
 
-            $register_pre_fill['user_name'] = $_POST['user_name'];
-            $register_pre_fill['email'] = $_POST['email'];
-            $register_pre_fill['gender'] = $_POST['gender'];
-            $register_pre_fill['village'] = $_POST['village'];
+            $register_pre_fill['user_name'] = isset($_POST['user_name']) ? $_POST['user_name'] : "";
+            $register_pre_fill['email'] = isset($_POST['email']) ? $_POST['email'] : "";
+            $register_pre_fill['gender'] = isset($_POST['gender']) ? $_POST['gender'] : "";
+            $register_pre_fill['village'] = isset($_POST['village']) ? $_POST['village'] : "";
         }
     }
 }

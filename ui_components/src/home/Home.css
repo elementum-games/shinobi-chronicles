@@ -149,7 +149,7 @@
     left: -325px;
     bottom: -225px;
 }
-.login_tos_button {
+.login_terms_button {
     position: relative;
     left: 325px;
     bottom: -225px;
@@ -386,8 +386,6 @@
     display: flex;
     flex-direction: column;
 }
-.register_close {
-}
 .register_password_wrapper {
     flex-basis: 35%;
     margin-left: 30px;
@@ -500,3 +498,90 @@
     color: #ceb581;
     user-select: none;
 }
+
+/* Rules and Terms */
+.rules_modal {
+    position: absolute;
+    width: 500px;
+    height: 558px;
+    background: rgba(20, 20, 28, 0.90);
+}
+.rules_content {
+    max-height: 480px;
+    overflow: auto;
+    margin-left: 30px;
+    padding-right: 15px;
+    color: #d1c5ad;
+    font-size: 14px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+.rules_header {
+    margin-top: 15px;
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+.rules_title {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 15px;
+    font-variant: small-caps;
+    color: #ceb581;
+    user-select: none;
+    margin-left: auto;
+    margin-right: -65px;
+}
+.rules_close {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 15px;
+    font-variant: small-caps;
+    user-select: none;
+    color: #bfb7e0;
+    cursor: pointer;
+    margin-left: auto;
+    margin-right: 30px;
+}
+    .rules_close:hover {
+        color: white;
+    }
+.terms_modal {
+    position: absolute;
+    width: 500px;
+    height: 558px;
+    background: rgba(20, 20, 28, 0.90);
+}
+.terms_content {
+    max-height: 480px;
+    overflow: auto;
+    margin-left: 30px;
+    padding-right: 15px;
+    color: #d1c5ad;
+    font-size: 14px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+.terms_header {
+    display: flex;
+    margin-top: 15px;
+    margin-bottom: 10px;
+}
+.terms_title {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 15px;
+    font-variant: small-caps;
+    color: #ceb581;
+    user-select: none;
+    margin-left: auto;
+    margin-right: -65px;
+}
+.terms_close {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 15px;
+    font-variant: small-caps;
+    user-select: none;
+    color: #bfb7e0;
+    cursor: pointer;
+    margin-left: auto;
+    margin-right: 30px;
+}
+    .terms_close:hover {
+        color: white;
+    }
