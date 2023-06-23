@@ -481,6 +481,7 @@
 .reset_email_input {
     width: 165px;
     height: 25px;
+    margin-bottom: 10px;
 }
 .reset_email_label {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
