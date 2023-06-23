@@ -615,7 +615,11 @@ if($LOGGED_IN) {
 }
 // Login
 else {
-    $layout = $system->fetchLayoutByName(System::DEFAULT_LAYOUT);
+    if ($system->environment == System::ENVIRONMENT_DEV) {
+        $layout = $system->fetchLayoutByName("new_geisha");
+    } else {
+        $layout = $system->fetchLayoutByName(System::DEFAULT_LAYOUT);
+    }
     $layout->renderBeforeContentHTML($system, $player ?? null, "Home", custom_page: true);
 
     // Display error messages
@@ -627,13 +631,21 @@ else {
         </td></tr></table>";
     }
 
-    require './templates/home.php';
-    $layout->renderAfterContentHTML($system, $player ?? null, custom_page: true);
-
     $captcha = '';
-    $page_load_time = round(microtime(true) - $PAGE_LOAD_START, 3);
-    $system->db->commitTransaction();
-    exit;
+
+    if ($system->environment == System::ENVIRONMENT_DEV) {
+        require('./templates/home.php');
+        $layout->renderAfterContentHTML($system, $player ?? null, custom_page: true);
+
+        $page_load_time = round(microtime(true) - $PAGE_LOAD_START, 3);
+        $system->db->commitTransaction();
+        exit;
+    }
+    else {
+        require("pages/news.php");
+        newsPosts();
+    }
+
 }
 
 // Render footer
