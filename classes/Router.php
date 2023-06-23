@@ -65,6 +65,7 @@ class Router {
         $this->api_links['navigation'] = $this->base_url . 'api/navigation.php';
         $this->api_links['user'] = $this->base_url . 'api/user.php';
         $this->api_links['chat'] = $this->base_url . 'api/chat.php';
+        $this->api_links['news'] = $this->base_url . 'api/news.php';
     }
 
     /**
