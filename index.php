@@ -68,11 +68,11 @@ if(!isset($_SESSION['user_id'])) {
             // Basic input check - user_name/password
             $user_name = $system->db->clean($_POST['user_name']);
             if (empty($user_name)) {
-                throw new RuntimeException("Please enter username!");
+                throw new RuntimeException("Please enter a username!");
             }
             $password = $system->db->clean($_POST['password']);
             if (empty($password)) {
-                throw new RuntimeException("Please enter password!");
+                throw new RuntimeException("Please enter a password!");
             }
 
             // Get result
