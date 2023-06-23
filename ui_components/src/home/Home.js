@@ -26,6 +26,8 @@ function Home({
     const [displayRules, setDisplayRules] = React.useState(false);
     const [displayTerms, setDisplayTerms] = React.useState(false);
     const [newsPosts, setNewsPosts] = React.useState(initialNewsPosts);
+    const newsRef = React.useRef(null);
+    const contactRef = React.useRef(null);
 
     return (
         <>
@@ -45,13 +47,19 @@ function Home({
                 resetErrorText={resetErrorText}
                 loginMessageText={loginMessageText}
                 registerPreFill={registerPreFill}
+                newsRef={newsRef}
+                contactRef={contactRef}
             />
             <NewsSection
+                newsRef={newsRef}
                 newsPosts={newsPosts}
             />
             <FeatureSection />
             <WorldSection />
-            <ContactSection />
+            <ContactSection
+                contactRef={contactRef}
+            />
+            <FooterSection />
         </>
     );
 }
@@ -71,7 +79,9 @@ function LoginSection({
     registerErrorText,
     resetErrorText,
     loginMessageText,
-    registerPreFill
+    registerPreFill,
+    newsRef,
+    contactRef,
 }) {
     function handleLogin() {
         setDisplayRegister(false);
@@ -112,16 +122,18 @@ function LoginSection({
         setDisplayRegister(false);
         setDisplayReset(false);
         setDisplayTerms(false);
-        setDisplayRules(!displayRules);
+        setDisplayRules(true);
     }
     function handleTerms() {
         setDisplayLogin(false);
         setDisplayRegister(false);
         setDisplayReset(false);
         setDisplayRules(false);
-        setDisplayTerms(!displayTerms);
+        setDisplayTerms(true);
     }
-
+    function scrollTo(element) {
+        element.scrollIntoView({ behavior: 'smooth' });
+    } 
     return (
         <div className={"home_section login_section"}>
             <div className="login_center_wrapper">
@@ -414,7 +426,7 @@ function LoginSection({
             </div>
             <div className="login_news_button">
                 <div className="home_diamond_container">
-                    <svg className="home_diamond_svg" width="100" height="100" role="button" tabIndex="0">
+                    <svg className="home_diamond_svg" width="100" height="100" role="button" tabIndex="0" onClick={() => scrollTo(newsRef.current)}>
                         <g className={"home_diamond_rotategroup diamond_red"} transform="rotate(45 50 50)">
                             <rect className="home_diamond_rear" x="29" y="29" width="78" height="78" />
                             <rect className="home_diamond_up" x="4" y="4" width="45" height="45" />
@@ -496,7 +508,7 @@ function LoginSection({
             </div>*/}
             <div className="login_contact_button">
                 <div className="home_diamond_container">
-                    <svg className="home_diamond_svg" width="100" height="100" role="button" tabIndex="0">
+                    <svg className="home_diamond_svg" width="100" height="100" role="button" tabIndex="0" onClick={() => scrollTo(contactRef.current)}>
                         <g className={"home_diamond_rotategroup diamond_blue"} transform="rotate(45 50 50)">
                             <rect className="home_diamond_rear" x="29" y="29" width="78" height="78" />
                             <rect className="home_diamond_up" x="4" y="4" width="45px" height="45px" />
@@ -513,9 +525,10 @@ function LoginSection({
     );
 }
 
-function NewsSection({ }) {
+function NewsSection({ newsRef, newsPosts }) {
     return (
-        <div className="news_container">
+        <div ref={newsRef} id="news_container" className={"home_section news_section"}>
+            <div className="home_header"><label className="home_header_label">NEWS & UPDATES</label></div>
         </div>
     );
 }
@@ -532,10 +545,20 @@ function WorldSection({ }) {
     );
 }
 
-function ContactSection({ }) {
+function ContactSection({ contactRef }) {
     return (
-        <></>
+        <div ref={contactRef} id="contact_container" className={"home_section contact_section"}>
+            <div className="home_header"><label className="home_header_label">CONTACT US</label></div>
+        </div>
     );
 }
+function FooterSection({ }) {
+    return (
+        <div className={"home_section footer_section"}>
+            <div className="footer_text">SHINOBI CHRONICLES V0.9.0 COPYRIGHT &copy; LM VISIONS</div>
+        </div>
+    );
+}
+
 
 window.Home = Home;

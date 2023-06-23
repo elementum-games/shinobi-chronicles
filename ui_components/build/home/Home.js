@@ -14,6 +14,8 @@ function Home({
   const [displayRules, setDisplayRules] = React.useState(false);
   const [displayTerms, setDisplayTerms] = React.useState(false);
   const [newsPosts, setNewsPosts] = React.useState(initialNewsPosts);
+  const newsRef = React.useRef(null);
+  const contactRef = React.useRef(null);
   return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement(LoginSection, {
     displayLogin: displayLogin,
     setDisplayLogin: setDisplayLogin,
@@ -29,10 +31,15 @@ function Home({
     registerErrorText: registerErrorText,
     resetErrorText: resetErrorText,
     loginMessageText: loginMessageText,
-    registerPreFill: registerPreFill
+    registerPreFill: registerPreFill,
+    newsRef: newsRef,
+    contactRef: contactRef
   }), /*#__PURE__*/React.createElement(NewsSection, {
+    newsRef: newsRef,
     newsPosts: newsPosts
-  }), /*#__PURE__*/React.createElement(FeatureSection, null), /*#__PURE__*/React.createElement(WorldSection, null), /*#__PURE__*/React.createElement(ContactSection, null));
+  }), /*#__PURE__*/React.createElement(FeatureSection, null), /*#__PURE__*/React.createElement(WorldSection, null), /*#__PURE__*/React.createElement(ContactSection, {
+    contactRef: contactRef
+  }), /*#__PURE__*/React.createElement(FooterSection, null));
 }
 function LoginSection({
   displayLogin,
@@ -49,7 +56,9 @@ function LoginSection({
   registerErrorText,
   resetErrorText,
   loginMessageText,
-  registerPreFill
+  registerPreFill,
+  newsRef,
+  contactRef
 }) {
   function handleLogin() {
     setDisplayRegister(false);
@@ -88,14 +97,19 @@ function LoginSection({
     setDisplayRegister(false);
     setDisplayReset(false);
     setDisplayTerms(false);
-    setDisplayRules(!displayRules);
+    setDisplayRules(true);
   }
   function handleTerms() {
     setDisplayLogin(false);
     setDisplayRegister(false);
     setDisplayReset(false);
     setDisplayRules(false);
-    setDisplayTerms(!displayTerms);
+    setDisplayTerms(true);
+  }
+  function scrollTo(element) {
+    element.scrollIntoView({
+      behavior: 'smooth'
+    });
   }
   return /*#__PURE__*/React.createElement("div", {
     className: "home_section login_section"
@@ -447,7 +461,8 @@ function LoginSection({
     width: "100",
     height: "100",
     role: "button",
-    tabIndex: "0"
+    tabIndex: "0",
+    onClick: () => scrollTo(newsRef.current)
   }, /*#__PURE__*/React.createElement("g", {
     className: "home_diamond_rotategroup diamond_red",
     transform: "rotate(45 50 50)"
@@ -644,7 +659,8 @@ function LoginSection({
     width: "100",
     height: "100",
     role: "button",
-    tabIndex: "0"
+    tabIndex: "0",
+    onClick: () => scrollTo(contactRef.current)
   }, /*#__PURE__*/React.createElement("g", {
     className: "home_diamond_rotategroup diamond_blue",
     transform: "rotate(45 50 50)"
@@ -692,10 +708,19 @@ function LoginSection({
     dominantBaseline: "middle"
   }, "contact us")))));
 }
-function NewsSection({}) {
+function NewsSection({
+  newsRef,
+  newsPosts
+}) {
   return /*#__PURE__*/React.createElement("div", {
-    className: "news_container"
-  });
+    ref: newsRef,
+    id: "news_container",
+    className: "home_section news_section"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "home_header"
+  }, /*#__PURE__*/React.createElement("label", {
+    className: "home_header_label"
+  }, "NEWS & UPDATES")));
 }
 function FeatureSection({}) {
   return /*#__PURE__*/React.createElement(React.Fragment, null);
@@ -703,7 +728,24 @@ function FeatureSection({}) {
 function WorldSection({}) {
   return /*#__PURE__*/React.createElement(React.Fragment, null);
 }
-function ContactSection({}) {
-  return /*#__PURE__*/React.createElement(React.Fragment, null);
+function ContactSection({
+  contactRef
+}) {
+  return /*#__PURE__*/React.createElement("div", {
+    ref: contactRef,
+    id: "contact_container",
+    className: "home_section contact_section"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "home_header"
+  }, /*#__PURE__*/React.createElement("label", {
+    className: "home_header_label"
+  }, "CONTACT US")));
+}
+function FooterSection({}) {
+  return /*#__PURE__*/React.createElement("div", {
+    className: "home_section footer_section"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "footer_text"
+  }, "SHINOBI CHRONICLES V0.9.0 COPYRIGHT \xA9 LM VISIONS"));
 }
 window.Home = Home;
