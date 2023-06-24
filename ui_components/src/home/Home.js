@@ -526,10 +526,53 @@ function LoginSection({
     );
 }
 
-function NewsSection({ newsRef, newsPosts }) {
+function NewsSection({ newsRef, newsPosts, githubURL, discordURL }) {
+    function formatNewsDate(ticks) {
+        var date = new Date(ticks * 1000);
+        var formattedDate = date.toLocaleDateString('en-US', {
+            month: '2-digit',
+            day: '2-digit',
+            year: '2-digit'
+        });
+        return formattedDate;
+    }
+
+    function NewsItem({ newsItem }) {
+        return (
+            <div className="news_item">
+                <div className="news_item_header">
+                    <div className="news_item_title">{newsItem.title.toUpperCase()}</div>
+                    <div className="news_item_version"></div>
+                    {/* array map tags */}
+                    <div className="news_item_details">POSTED {formatNewsDate(newsItem.time)} BY {newsItem.sender.toUpperCase()}</div>
+                </div>
+                <div className="news_item_banner">
+
+                </div>
+                <div className="news_item_content" dangerouslySetInnerHTML={{ __html: newsItem.message }}>
+                </div>
+            </div>
+        );
+    }
+
     return (
         <div ref={newsRef} id="news_container" className={"home_section news_section"}>
-            <div className="home_header"><label className="home_header_label">NEWS & UPDATES</label></div>
+            <div className="home_header">
+                <label className="home_header_label">NEWS & UPDATES</label>
+                <div className="home_external_links">
+                    <a href={githubURL} className="home_github_wrapper">
+                        <img className="home_github" src="../../../images/v2/icons/githubhover.png"/>
+                    </a>
+                    <a href={discordURL} className="home_discord_wrapper">
+                        <img className="home_discord" src="../../../images/v2/icons/discordhover.png"/>
+                    </a>
+                </div>
+            </div>
+            <div className="news_item_container">
+                {newsPosts.map((newsItem, index) => (
+                    <NewsItem key={index} newsItem={newsItem} />
+                ))}
+            </div>
         </div>
     );
 }

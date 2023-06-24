@@ -710,8 +710,41 @@ function LoginSection({
 }
 function NewsSection({
   newsRef,
-  newsPosts
+  newsPosts,
+  githubURL,
+  discordURL
 }) {
+  function formatNewsDate(ticks) {
+    var date = new Date(ticks * 1000);
+    var formattedDate = date.toLocaleDateString('en-US', {
+      month: '2-digit',
+      day: '2-digit',
+      year: '2-digit'
+    });
+    return formattedDate;
+  }
+  function NewsItem({
+    newsItem
+  }) {
+    return /*#__PURE__*/React.createElement("div", {
+      className: "news_item"
+    }, /*#__PURE__*/React.createElement("div", {
+      className: "news_item_header"
+    }, /*#__PURE__*/React.createElement("div", {
+      className: "news_item_title"
+    }, newsItem.title.toUpperCase()), /*#__PURE__*/React.createElement("div", {
+      className: "news_item_version"
+    }), /*#__PURE__*/React.createElement("div", {
+      className: "news_item_details"
+    }, "POSTED ", formatNewsDate(newsItem.time), " BY ", newsItem.sender.toUpperCase())), /*#__PURE__*/React.createElement("div", {
+      className: "news_item_banner"
+    }), /*#__PURE__*/React.createElement("div", {
+      className: "news_item_content",
+      dangerouslySetInnerHTML: {
+        __html: newsItem.message
+      }
+    }));
+  }
   return /*#__PURE__*/React.createElement("div", {
     ref: newsRef,
     id: "news_container",
@@ -720,7 +753,26 @@ function NewsSection({
     className: "home_header"
   }, /*#__PURE__*/React.createElement("label", {
     className: "home_header_label"
-  }, "NEWS & UPDATES")));
+  }, "NEWS & UPDATES"), /*#__PURE__*/React.createElement("div", {
+    className: "home_external_links"
+  }, /*#__PURE__*/React.createElement("a", {
+    href: githubURL,
+    className: "home_github_wrapper"
+  }, /*#__PURE__*/React.createElement("img", {
+    className: "home_github",
+    src: "../../../images/v2/icons/githubhover.png"
+  })), /*#__PURE__*/React.createElement("a", {
+    href: discordURL,
+    className: "home_discord_wrapper"
+  }, /*#__PURE__*/React.createElement("img", {
+    className: "home_discord",
+    src: "../../../images/v2/icons/discordhover.png"
+  })))), /*#__PURE__*/React.createElement("div", {
+    className: "news_item_container"
+  }, newsPosts.map((newsItem, index) => /*#__PURE__*/React.createElement(NewsItem, {
+    key: index,
+    newsItem: newsItem
+  }))));
 }
 function FeatureSection({}) {
   return /*#__PURE__*/React.createElement(React.Fragment, null);
