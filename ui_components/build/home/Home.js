@@ -1,6 +1,8 @@
 import { apiFetch } from "../utils/network.js";
 function Home({
   newsApiLink,
+  githubLink,
+  discordLink,
   loginErrorText,
   registerErrorText,
   resetErrorText,
@@ -36,7 +38,9 @@ function Home({
     contactRef: contactRef
   }), /*#__PURE__*/React.createElement(NewsSection, {
     newsRef: newsRef,
-    newsPosts: newsPosts
+    newsPosts: newsPosts,
+    githubLink: githubLink,
+    discordLink: discordLink
   }), /*#__PURE__*/React.createElement(FeatureSection, null), /*#__PURE__*/React.createElement(WorldSection, null), /*#__PURE__*/React.createElement(ContactSection, {
     contactRef: contactRef
   }), /*#__PURE__*/React.createElement(FooterSection, null));
@@ -711,9 +715,10 @@ function LoginSection({
 function NewsSection({
   newsRef,
   newsPosts,
-  githubURL,
-  discordURL
+  githubLink,
+  discordLink
 }) {
+  const [activePostId, setActivePostId] = React.useState(newsPosts[0] != "undefined" ? newsPosts[0].post_id : null);
   function formatNewsDate(ticks) {
     var date = new Date(ticks * 1000);
     var formattedDate = date.toLocaleDateString('en-US', {
@@ -729,21 +734,22 @@ function NewsSection({
     return /*#__PURE__*/React.createElement("div", {
       className: "news_item"
     }, /*#__PURE__*/React.createElement("div", {
-      className: "news_item_header"
+      className: activePostId == newsItem.post_id ? "news_item_header" : "news_item_header news_item_header_minimized",
+      onClick: () => setActivePostId(newsItem.post_id)
     }, /*#__PURE__*/React.createElement("div", {
       className: "news_item_title"
     }, newsItem.title.toUpperCase()), /*#__PURE__*/React.createElement("div", {
       className: "news_item_version"
     }), /*#__PURE__*/React.createElement("div", {
       className: "news_item_details"
-    }, "POSTED ", formatNewsDate(newsItem.time), " BY ", newsItem.sender.toUpperCase())), /*#__PURE__*/React.createElement("div", {
+    }, "POSTED ", formatNewsDate(newsItem.time), " BY ", newsItem.sender.toUpperCase())), activePostId == newsItem.post_id && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
       className: "news_item_banner"
     }), /*#__PURE__*/React.createElement("div", {
       className: "news_item_content",
       dangerouslySetInnerHTML: {
         __html: newsItem.message
       }
-    }));
+    })));
   }
   return /*#__PURE__*/React.createElement("div", {
     ref: newsRef,
@@ -756,13 +762,13 @@ function NewsSection({
   }, "NEWS & UPDATES"), /*#__PURE__*/React.createElement("div", {
     className: "home_external_links"
   }, /*#__PURE__*/React.createElement("a", {
-    href: githubURL,
+    href: githubLink,
     className: "home_github_wrapper"
   }, /*#__PURE__*/React.createElement("img", {
     className: "home_github",
     src: "../../../images/v2/icons/githubhover.png"
   })), /*#__PURE__*/React.createElement("a", {
-    href: discordURL,
+    href: discordLink,
     className: "home_discord_wrapper"
   }, /*#__PURE__*/React.createElement("img", {
     className: "home_discord",

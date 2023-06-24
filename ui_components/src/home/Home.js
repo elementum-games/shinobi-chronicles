@@ -5,6 +5,8 @@ import type { NewsPostType } from "./newsSchema.js";
 
 type Props = {|
     +newsApiLink: string,
+    +githubLink: string,
+    +discordLink: string,
     +loginErrorText: string,
     +registerErrorText: string,
     +resetErrorText: string,
@@ -14,6 +16,8 @@ type Props = {|
 |};
 function Home({
     newsApiLink,
+    githubLink,
+    discordLink,
     loginErrorText,
     registerErrorText,
     resetErrorText,
@@ -54,6 +58,8 @@ function Home({
             <NewsSection
                 newsRef={newsRef}
                 newsPosts={newsPosts}
+                githubLink={githubLink}
+                discordLink={discordLink}
             />
             <FeatureSection />
             <WorldSection />
@@ -526,7 +532,8 @@ function LoginSection({
     );
 }
 
-function NewsSection({ newsRef, newsPosts, githubURL, discordURL }) {
+function NewsSection({ newsRef, newsPosts, githubLink, discordLink }) {
+    const [activePostId, setActivePostId] = React.useState(newsPosts[0] != "undefined" ? newsPosts[0].post_id : null);
     function formatNewsDate(ticks) {
         var date = new Date(ticks * 1000);
         var formattedDate = date.toLocaleDateString('en-US', {
@@ -540,17 +547,18 @@ function NewsSection({ newsRef, newsPosts, githubURL, discordURL }) {
     function NewsItem({ newsItem }) {
         return (
             <div className="news_item">
-                <div className="news_item_header">
+                <div className={activePostId == newsItem.post_id ? "news_item_header" : "news_item_header news_item_header_minimized"} onClick={() => setActivePostId(newsItem.post_id)}>
                     <div className="news_item_title">{newsItem.title.toUpperCase()}</div>
                     <div className="news_item_version"></div>
                     {/* array map tags */}
                     <div className="news_item_details">POSTED {formatNewsDate(newsItem.time)} BY {newsItem.sender.toUpperCase()}</div>
                 </div>
-                <div className="news_item_banner">
-
-                </div>
-                <div className="news_item_content" dangerouslySetInnerHTML={{ __html: newsItem.message }}>
-                </div>
+                {activePostId == newsItem.post_id &&
+                    <>
+                    <div className="news_item_banner"></div>
+                    <div className="news_item_content" dangerouslySetInnerHTML={{ __html: newsItem.message }}></div>
+                    </>
+                }
             </div>
         );
     }
@@ -560,10 +568,10 @@ function NewsSection({ newsRef, newsPosts, githubURL, discordURL }) {
             <div className="home_header">
                 <label className="home_header_label">NEWS & UPDATES</label>
                 <div className="home_external_links">
-                    <a href={githubURL} className="home_github_wrapper">
+                    <a href={githubLink} className="home_github_wrapper">
                         <img className="home_github" src="../../../images/v2/icons/githubhover.png"/>
                     </a>
-                    <a href={discordURL} className="home_discord_wrapper">
+                    <a href={discordLink} className="home_discord_wrapper">
                         <img className="home_discord" src="../../../images/v2/icons/discordhover.png"/>
                     </a>
                 </div>

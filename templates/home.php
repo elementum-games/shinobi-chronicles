@@ -26,6 +26,8 @@ else $NewsManager = new NewsManager($system);
         ReactDOM.render(
             React.createElement(Home, {
                 newsApiLink: "<?= $system->router->api_links['news'] ?>",
+                githubLink: "<?= $system->router->links['github'] ?>",
+                discordLink: "<?= $system->router->links['discord'] ?>",
                 loginURL: "<?= $system->router->base_url ?>",
                 registerURL: "<?= $system->router->base_url ?>",
                 loginErrorText: "<?= $login_error_text ?>",
