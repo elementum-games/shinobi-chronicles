@@ -97,7 +97,7 @@ class System {
     );
 
     // Default layout
-    const DEFAULT_LAYOUT = 'new_geisha';
+    const DEFAULT_LAYOUT = 'shadow_ribbon';
     const VERSION_NUMBER = '0.8.0';
 
     // Misc stuff
