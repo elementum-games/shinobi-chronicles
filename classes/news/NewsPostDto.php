@@ -18,7 +18,7 @@ class NewsPostDto {
         $post->title = $row['title'];
         $post->message = $row['message'];
         $post->time = $row['time'];
-        $post->tags = json_decode($row['tags'], true);
+        // $post->tags = json_decode($row['tags'], true);
 
         return $post;
     }
