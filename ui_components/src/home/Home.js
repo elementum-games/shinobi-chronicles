@@ -1,3 +1,4 @@
+// @flow
 import { apiFetch } from "../utils/network.js";
 import type { NewsPostType } from "./newsSchema.js";
 
