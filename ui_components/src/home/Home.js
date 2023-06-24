@@ -534,6 +534,7 @@ function LoginSection({
 
 function NewsSection({ newsRef, newsPosts, githubLink, discordLink }) {
     const [activePostId, setActivePostId] = React.useState(newsPosts[0] != "undefined" ? newsPosts[0].post_id : null);
+
     function formatNewsDate(ticks) {
         var date = new Date(ticks * 1000);
         var formattedDate = date.toLocaleDateString('en-US', {
@@ -549,8 +550,13 @@ function NewsSection({ newsRef, newsPosts, githubLink, discordLink }) {
             <div className="news_item">
                 <div className={activePostId == newsItem.post_id ? "news_item_header" : "news_item_header news_item_header_minimized"} onClick={() => setActivePostId(newsItem.post_id)}>
                     <div className="news_item_title">{newsItem.title.toUpperCase()}</div>
-                    <div className="news_item_version"></div>
-                    {/* array map tags */}
+                    <div className="news_item_version">{newsItem.version && newsItem.version.toUpperCase()}</div>
+                        {newsItem.tags.map((tag, index) => (
+                            <>
+                                <div className="news_item_tag_divider">/</div>
+                                <div className="news_item_tag">{tag.toUpperCase()}</div>
+                            </>
+                        ))}
                     <div className="news_item_details">POSTED {formatNewsDate(newsItem.time)} BY {newsItem.sender.toUpperCase()}</div>
                 </div>
                 {activePostId == newsItem.post_id &&
@@ -601,6 +607,9 @@ function ContactSection({ contactRef }) {
     return (
         <div ref={contactRef} id="contact_container" className={"home_section contact_section"}>
             <div className="home_header"><label className="home_header_label">CONTACT US</label></div>
+            <div className="home_form_container">
+
+            </div>
         </div>
     );
 }

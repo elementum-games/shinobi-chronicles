@@ -740,7 +740,11 @@ function NewsSection({
       className: "news_item_title"
     }, newsItem.title.toUpperCase()), /*#__PURE__*/React.createElement("div", {
       className: "news_item_version"
-    }), /*#__PURE__*/React.createElement("div", {
+    }, newsItem.version && newsItem.version.toUpperCase()), newsItem.tags.map((tag, index) => /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
+      className: "news_item_tag_divider"
+    }, "/"), /*#__PURE__*/React.createElement("div", {
+      className: "news_item_tag"
+    }, tag.toUpperCase()))), /*#__PURE__*/React.createElement("div", {
       className: "news_item_details"
     }, "POSTED ", formatNewsDate(newsItem.time), " BY ", newsItem.sender.toUpperCase())), activePostId == newsItem.post_id && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
       className: "news_item_banner"
@@ -797,7 +801,9 @@ function ContactSection({
     className: "home_header"
   }, /*#__PURE__*/React.createElement("label", {
     className: "home_header_label"
-  }, "CONTACT US")));
+  }, "CONTACT US")), /*#__PURE__*/React.createElement("div", {
+    className: "home_form_container"
+  }));
 }
 function FooterSection({}) {
   return /*#__PURE__*/React.createElement("div", {

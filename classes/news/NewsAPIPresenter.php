@@ -19,6 +19,7 @@ class NewsApiPresenter {
                     'message' => $message,
                     'time' => $post->time,
                     'tags' => $post->tags,
+                    'version' => $post->version,
                 ];
             },
             $newsManager->getLatestPosts()
