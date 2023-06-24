@@ -272,6 +272,7 @@
     transform: translate(60px, -10px);
     display: flex;
     gap: 15px;
+    align-items: center;
 }
 .post_village_title {
     white-space: nowrap;

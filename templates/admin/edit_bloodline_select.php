@@ -3,10 +3,10 @@
 /**
  * @var Bloodline[] $all_bloodlines
  * @var string $self_link
- * @var array $variables
+ * @var array $bloodline_constraints
  */
 
-$bloodline_ranks = $variables['rank']['options'];
+$bloodline_ranks = $bloodline_constraints['rank']['options'];
 
 $selected_link_style = "text-decoration:none;";
 
@@ -85,7 +85,7 @@ $current_rank = 1;
                                 <i>(<?= ucwords($jutsu->element) ?>)</i>
                             <?php endif; ?>
                         </p>
-                        <p>Power: <?= $jutsu->power ?></p>
+                        <p>Power: <?= $jutsu->base_power ?></p>
                         <p>
                             <?php if($jutsu->effect !== 'none'): ?>
                                 <?= System::unSlug($jutsu->effect) ?>

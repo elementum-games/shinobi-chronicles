@@ -20,8 +20,12 @@ class Layout {
         public string $footer,
     ) {}
 
-    public function renderBeforeContentHTML(System $system, ?User $player, string $page_title): void {
+    public function renderBeforeContentHTML(System $system, ?User $player, string $page_title, bool $custom_page = false): void {
         if($this->key == 'new_geisha') {
+            if ($custom_page) {
+                echo $this->heading;
+                return;
+            }
             echo $this->heading;
             if ($player->getSidebarPosition() == 'right') {
                 echo "<link rel='stylesheet' type='text/css' href='style/sidebar_right.css' />";
@@ -67,8 +71,12 @@ class Layout {
         }
     }
 
-    public function renderAfterContentHTML(System $system, ?User $player, ?float $page_load_time = null): void {
+    public function renderAfterContentHTML(System $system, ?User $player, ?float $page_load_time = null, bool $custom_page = false): void {
         if($this->key == 'new_geisha') {
+            if ($custom_page) {
+                echo "</body></html>";
+                return;
+            }
             echo "</div>";
             echo "</div>";
 

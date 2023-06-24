@@ -30,7 +30,7 @@ $jutsu_effects = [
 
 $ranks = [];
 for($x = 1; $x <= System::SC_MAX_RANK; $x++) {
-    $ranks[] = $x;
+    $ranks[$x] = $x;
 }
 
 return [
@@ -129,16 +129,13 @@ return [
         'data_type' => 'string',
         'input_type' => 'select',
         'options' => $jutsu_effects,
-        'not_required_value' => 'none',
     ],
     'effect_amount' => [
         'data_type' => 'float',
         'input_type' => 'text',
-        'required_if' => 'effect',
     ],
     'effect_length' => [
         'data_type' => 'int',
         'input_type' => 'text',
-        'required_if' => 'effect',
     ],
 ];

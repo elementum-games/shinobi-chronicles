@@ -48,11 +48,7 @@ function validateFormData($entity_constraints, &$data, $content_id = null, $FORM
                     for($i = 0; $i < $variable['count']; $i++) {
                         $data_array[$count] = [];
                         foreach($variable['variables'] as $name => $var) {
-                            if(isset($var['special']) && $var['special'] == 'remove' and !empty($FORM_DATA[$var_name][$i][$name])) {
-                                $data_array[$count] = [];
-                                break;
-                            }
-                            if(empty($FORM_DATA[$var_name][$i][$name])) {
+                            if(!isset($FORM_DATA[$var_name][$i][$name])) {
                                 continue;
                             }
                             else {
@@ -104,27 +100,10 @@ function validateFormData($entity_constraints, &$data, $content_id = null, $FORM
 /**
  * @throws RuntimeException
  */
-function validateField($var_name, $input, $FORM_DATA, $field_constraints, &$all_constraints, &$data, $content_id = null): bool {
+function validateField(
+    $var_name, $input, $FORM_DATA, $field_constraints, &$all_constraints, &$data, $content_id = null
+): bool {
     global $system;
-    // Skip variable if it is not required
-    if(isset($field_constraints['required_if'])) {
-        $req_var = $field_constraints['required_if'];
-        // If variable false/not set, continue
-        if(empty($data[$req_var]) && empty($FORM_DATA[$req_var])) {
-            return true;
-        }
-        // If variable is set and value matches not required key
-        if(!empty($data[$req_var]) && $data[$req_var] == $all_constraints[$req_var]['not_required_value']) {
-            return true;
-        }
-        if(!empty($FORM_DATA[$req_var]) && $FORM_DATA[$req_var] == $all_constraints[$req_var]['not_required_value']) {
-            return true;
-        }
-    }
-    // Check for special remove variable
-    if(($field_constraints['special'] ?? '') == 'remove') {
-        return true;
-    }
 
     $data[$var_name] = $system->db->clean($input);
 
@@ -141,7 +120,7 @@ function validateField($var_name, $input, $FORM_DATA, $field_constraints, &$all_
     // Check variable matches restricted possibles list, if any
     if(!empty($field_constraints['options'])) {
         if($field_constraints['data_type'] == 'string') {
-            if(!in_array($data[$var_name], $field_constraints['options']) && $var_name != 'elements') {
+            if(!in_array($data[$var_name], $field_constraints['options'])) {
                 throw new RuntimeException("Invalid " . System::unSlug($var_name) . "!");
             }
         }
@@ -212,6 +191,7 @@ function displayFormFields($variables, $data, $input_name_prefix = ''): bool {
                     (isset($variable['num_required']) ? "<i>(" . $variable['num_required'] . " required)</i>" : "") .
                     "<div style='margin-left:20px;margin-top:0;'>";
                 $data_vars = json_decode($data[$var_name], true);
+
                 for($i = 0; $i < $variable['count']; $i++) {
                     $name = $var_name . '[' . $i . ']';
                     echo "<span style='display:block;margin-top:10px;font-weight:bold;'>#" . ($i + 1) .
@@ -224,6 +204,7 @@ function displayFormFields($variables, $data, $input_name_prefix = ''): bool {
                     displayFormFields($variable['variables'], $data_vars[$i], $name);
                     echo "</div>";
                 }
+
                 if(!empty($variable['deselect'])) {
                     $name = $var_name;
                     if($input_name_prefix) {
@@ -232,6 +213,7 @@ function displayFormFields($variables, $data, $input_name_prefix = ''): bool {
                     echo "<br />
 					<input type='radio' name='name' value='none' />None<br />";
                 }
+
                 echo "</div>";
             }
             // Display unique data structure based on array key names
@@ -284,8 +266,8 @@ function displayVariable($var_name, $variable, $current_value, $input_name_prefi
         }
     }
     else if($variable['input_type'] == 'text_area') {
-        echo "<label for='$var_name'>" . System::unSlug($var_name) . ":</label><br />
-            <textarea name='$var_name' rows='3' style='width:60%;max-width:400px;'>"
+        echo "<label for='$name'>" . System::unSlug($var_name) . ":</label><br />
+            <textarea name='$name' rows='3' style='width:60%;max-width:400px;'>"
             . stripslashes($current_value)
             . "</textarea><br />";
     }
@@ -348,11 +330,6 @@ function displayVariable($var_name, $variable, $current_value, $input_name_prefi
                 }
             echo "/>$value<br />";
         }
-    }
-    else if(!empty($variable['special']) && $variable['special'] == 'remove') {
-        echo "<label for='$name' style='margin-top:5px;'>Remove:</label>
-		<p style='padding-left:10px;margin-top:5px;'>
-			<input type='checkbox' name='$name' value='1' />";
     }
     else {
         echo "Coming soon!<br />";

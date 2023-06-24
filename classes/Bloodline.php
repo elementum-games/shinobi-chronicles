@@ -25,8 +25,11 @@ class Bloodline {
     public int $bloodline_id;
     public int $id;
     public string $name;
-    public int $clan_id;
     public int $rank;
+
+    public int $clan_id;
+    public string $village;
+
     public string $description;
 
     protected ?string $raw_passive_boosts;
@@ -45,8 +48,10 @@ class Bloodline {
         // $this->id = 'BL' . $this->user_id;
 
         $this->name = $bloodline_data['name'];
-        $this->clan_id = $bloodline_data['clan_id'];
         $this->rank = $bloodline_data['rank'];
+
+        $this->clan_id = $bloodline_data['clan_id'];
+        $this->village = $bloodline_data['village'];
 
         $this->raw_passive_boosts = $bloodline_data['passive_boosts'];
         $this->raw_combat_boosts = $bloodline_data['combat_boosts'];
@@ -77,7 +82,7 @@ class Bloodline {
                     purchase_type: Jutsu::PURCHASE_TYPE_BLOODLINE,
                     parent_jutsu: $j['parent_jutsu'] ?? 0,
                     element: $j['element'],
-                    hand_seals: $j['hand_seals']
+                    hand_seals: $j['hand_seals'] ?? ""
                 );
                 $this->base_jutsu[$id]->is_bloodline = true;
             }

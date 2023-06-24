@@ -7,35 +7,16 @@ Revised:	03/06/2014 by Levi Meahan
 Purpose:	Function for allowing user to train their stats and jutsu
 Algorithm:	See master_plan.html
 */
+
+require_once __DIR__ . '/../classes/notification/NotificationManager.php';
+require_once __DIR__ . '/../classes/training/TrainingManager.php';
+
 function training() {
 	global $system;
 	global $player;
 	global $self_link;
 
-	$stat_train_length = 600;
-	$stat_train_gain = 4 + ($player->rank_num * 4);
-
-	$jutsu_train_gain = User::$jutsu_train_gain;
-
-	// 56.25% of standard
-	$stat_long_train_length = $stat_train_length * 4;
-	$stat_long_train_gain = $stat_train_gain * 2.25;
-
-    // 30x length (5 hrs), 12x gains: 40% of standard
-    $stat_extended_train_length = $stat_train_length * 30;
-	$stat_extended_train_gain = $stat_train_gain * 12;
-
-	// Forbidden seal trainings boost
-    $stat_long_train_length *= $player->forbidden_seal->long_training_time;
-    $stat_long_train_gain *= $player->forbidden_seal->long_training_gains;
-
-    $stat_extended_train_length = round($stat_extended_train_length * $player->forbidden_seal->extended_training_time);
-    $stat_extended_train_gain = round($stat_extended_train_gain * $player->forbidden_seal->extended_training_gains);
-
-
-	$stat_train_gain += $system->TRAIN_BOOST;
-	$stat_long_train_gain += $system->LONG_TRAIN_BOOST;
-	$stat_extended_train_gain += ($system->LONG_TRAIN_BOOST * 5);
+    $trainingManager = new TrainingManager($system, $player);
 
 	$player->getInventory();
 	if(!empty($_POST['train_type']) && !$player->train_time) {
@@ -49,15 +30,15 @@ function training() {
 			// track if notification already created
             $notification_created = false;
 
-			$train_length = $stat_train_length;
-			$train_gain = $stat_train_gain;
+			$train_length = $trainingManager->stat_train_length;
+			$train_gain = $trainingManager->stat_train_gain;
 			if($_POST['train_type'] == 'Long') {
-				$train_length = $stat_long_train_length;
-				$train_gain = $stat_long_train_gain;
+				$train_length = $trainingManager->stat_long_train_length;
+				$train_gain = $trainingManager->stat_long_train_gain;
 			}
 			else if($_POST['train_type'] == 'Extended') {
-				$train_length = $stat_extended_train_length;
-				$train_gain = $stat_extended_train_gain;
+				$train_length = $trainingManager->stat_extended_train_length;
+				$train_gain = $trainingManager->stat_extended_train_gain;
 			}
 
 			if(!empty($_POST['skill'])) {
@@ -109,7 +90,6 @@ function training() {
 
                 // Create notification
                 if (!$notification_created) {
-                    require_once __DIR__ . '/../classes/notification/NotificationManager.php';
                     $new_notification = new NotificationDto(
                         type: "training",
                         message: "Training " . System::unSlug($player->jutsu[$jutsu_id]->name),
@@ -141,15 +121,9 @@ function training() {
 
 			// Check for sensei training boost
 			if($player->sensei_id != 0) {
-				$sensei_boost = SenseiManager::getStudentBoostBySensei($player->sensei_id, $system);
-				if ($train_type == $sensei_boost['specialization'] . "_skill" || $train_type == $sensei_boost['specialization']) {
-                    $system->message("Your training was reduced by " . ($train_length * ($sensei_boost['boost_primary'] / 100)) . " seconds due to your student boost.");
-					$train_length *= 1 - ($sensei_boost['boost_primary'] / 100);
-                }
-				else if ($sensei_boost['boost_secondary'] > 0) {
-					$system->message("Your training was reduced by " . ($train_length * ($sensei_boost['boost_secondary'] / 100)) . " seconds due to your student boost.");
-					$train_length *= 1 - ($sensei_boost['boost_secondary'] / 100);
-                }
+				$sensei_boost = SenseiManager::getTrainingBoostForTrainType($player->sensei_id, $train_type, $player->bloodline_id, $system);
+                $system->message("Your training was reduced by " . ($train_length * ($sensei_boost / 100)) . " seconds due to your student boost.");
+                $train_length *= 1 - ($sensei_boost / 100);
 			}
 
 			$player->log(User::LOG_TRAINING, "Type: {$train_type} / Length: {$train_length}");
@@ -160,7 +134,6 @@ function training() {
 
 			// Create notification
             if (!$notification_created) {
-                require_once __DIR__ . '/../classes/notification/NotificationManager.php';
                 $new_notification = new NotificationDto(
                     type: "training",
                     message: "Training " . System::unSlug($train_type),
@@ -192,15 +165,15 @@ function training() {
 		<span style='font-weight:bold;'>Skill/Attribute training:</span><br />
 			<p style='margin-left:20px;margin-top:5px;margin-bottom:8px;'>
 			<label style='font-weight:bold;width:70px;'>Short:</label>
-				Takes " . ($stat_train_length / 60) . " minutes, gives $stat_train_gain point" . ($stat_train_gain > 1 ? 's' : '') . "<br />
+				Takes " . ($trainingManager->stat_train_length / 60) . " minutes, gives $trainingManager->stat_train_gain point" . ($trainingManager->stat_train_gain > 1 ? 's' : '') . "<br />
 			<label style='font-weight:bold;width:70px;'>Long:</label>
-				Takes " . ($stat_long_train_length / 60) . " minutes, gives $stat_long_train_gain point" . ($stat_long_train_gain > 1 ? 's' : '') . "<br />
+				Takes " . ($trainingManager->stat_long_train_length / 60) . " minutes, gives $trainingManager->stat_long_train_gain point" . ($trainingManager->stat_long_train_gain > 1 ? 's' : '') . "<br />
             <label style='font-weight:bold;width:70px;'>Extended:</label>
-				Takes " . ($stat_extended_train_length / 60) . " minutes, gives $stat_extended_train_gain point" . ($stat_extended_train_gain > 1 ? 's' : '') . "<br />
+				Takes " . ($trainingManager->stat_extended_train_length / 60) . " minutes, gives $trainingManager->stat_extended_train_gain point" . ($trainingManager->stat_extended_train_gain > 1 ? 's' : '') . "<br />
 			</p>
 		<span style='font-weight:bold;'>Jutsu training:</span><br />
 			<p style='margin-left:20px;margin-top:5px;margin-bottom:8px;'>
-			Takes 10 minutes or more depending on the jutsu level, gives {$jutsu_train_gain} level" . ($jutsu_train_gain > 1 ? 's' : '') . ".</p>
+			Takes 10 minutes or more depending on the jutsu level, gives {$trainingManager->jutsu_train_gain} level" . ($trainingManager->jutsu_train_gain > 1 ? 's' : '') . ".</p>
 		</td></tr>";
 	if($player->train_time) {
 		echo "<tr><th colspan='3'>Currently Training</th></tr>
