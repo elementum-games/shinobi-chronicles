@@ -1,0 +1,639 @@
+/* Page */
+#homeReactContainer {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+}
+.home_section {
+    width: 100%;
+}
+.home_header {
+    width: 1200px;
+    height: 70px;
+    background: #1a1821;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 30pt;
+    color: #ceb581;
+    font-weight: bold;
+    display: flex;
+    justify-content: start;
+    align-items: center;
+    position: relative;
+    left: 50%;
+    transform: translate(-50%, -42px);
+}
+.home_header_label {
+    padding-left: 32px;
+}
+
+/* Login */
+.login_section {
+    background: url(../../../images/v2/decorations/latticeleft.png), 
+        url(../../../images/v2/decorations/latticeright.png), 
+        repeating-linear-gradient(45deg, rgba(14, 15, 17, 0.125) 0, rgba(14, 15, 17, 0.125) 10%, transparent 0, transparent 50%), 
+        repeating-linear-gradient(135deg, rgba(14, 15, 17, 0.125) 0, rgba(14, 15, 17, 0.125) 10%, transparent 0, transparent 50%), 
+        radial-gradient(circle at center bottom, #24151d, #151822 70%);
+    background-size: 32%, 32%, 5em 5em, 5em 5em, 100%;
+    background-color: #101113;
+    background-position: 0% 100%, 100% 100%, center, center, bottom;
+    background-repeat: no-repeat, no-repeat, repeat, repeat, no-repeat;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    overflow: auto;
+    height: 850px;
+    border-bottom: solid 13px #6a5e46;
+}
+.login_center_wrapper {
+    position: absolute;
+    padding: 7px;
+    clip-path: circle(50% at 50% 50%);
+    background: linear-gradient(0deg, #6a5e45 0%, #97845e 50%, #ceb581 100%);
+    width: 1200px;
+    height: 1200px;
+    display: flex;
+    bottom: 60px;
+}
+.login_center_inner {
+    background: url(../../../images/v2/decorations/Banner1.jpg);
+    background-position: -35px 151px;
+    background-size: 105%;
+    clip-path: circle(50% at 50% 50%);
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+.login_inner_title {
+    margin-top: 530px;
+    user-select: none;
+}
+.login_inner_version {
+    background-color: rgba(33, 36, 58, 0.9);
+    height: 37px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 18px;
+    font-weight: 300;
+    color: #fffcf5;
+    letter-spacing: 3px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    clip-path: polygon(20px 0px, calc(100% - 20px) 0px, 100% 50%, calc(100% - 20px) 100%, 20px 100%, 0px 50%);
+    padding-left: 30px;
+    padding-right: 30px;
+    margin-top: 9px;
+    user-select: none;
+}
+.login_inner_input_container {
+    height: 280px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+}
+
+/* Login Button */
+.login_button {
+    cursor: pointer;
+    margin-bottom: 25px;
+    margin-top: -8px;
+}
+    .login_button:hover text.login_button_text {
+        fill: #ffffff;
+        text-shadow: 2px 2px 5px rgba(87, 154, 255, 1), -2px -2px 5px rgba(87, 154, 255, 1);
+    }
+.login_button_background {
+    clip-path: polygon(20px 0px, calc(100% - 20px) 0px, 100% 50%, calc(100% - 20px) 100%, 20px 100%, 0px 50%);
+    fill: #5964a6;
+}
+.login_button_text {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 18px;
+    font-variant: small-caps;
+    fill: #fef2da;
+    user-select: none;
+}
+.login_button_shadow_text {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 18px;
+    font-variant: small-caps;
+    fill: #1e1d25;
+    user-select: none;
+}
+
+/* Register Button */
+.register_button {
+    cursor: pointer;
+    margin-bottom: 25px;
+    margin-top: -8px;
+}
+    .register_button:hover text.register_button_text {
+        fill: #ffffff;
+        text-shadow: 2px 2px 5px rgba(212, 113, 148, 1), -2px -2px 5px rgba(206, 110, 144, 1);
+    }
+.register_button_background {
+    clip-path: polygon(20px 0px, calc(100% - 20px) 0px, 100% 50%, calc(100% - 20px) 100%, 20px 100%, 0px 50%);
+    fill: #7b324c;
+}
+.register_button_text {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 16px;
+    font-variant: small-caps;
+    fill: #fef2da;
+    user-select: none;
+}
+.register_button_shadow_text {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 16px;
+    font-variant: small-caps;
+    fill: #1e1d25;
+    user-select: none;
+}
+
+/* Diamond Positions */
+.login_news_button {
+    position: relative;
+    left: -350px;
+    bottom: -85px;
+}
+.login_rules_button {
+    position: relative;
+    left: -325px;
+    bottom: -225px;
+}
+.login_terms_button {
+    position: relative;
+    left: 325px;
+    bottom: -225px;
+}
+.login_features_button {
+    position: relative;
+    left: -325px;
+    bottom: -225px;
+}
+.login_world_button {
+    position: relative;
+    left: 325px;
+    bottom: -225px;
+}
+.login_contact_button {
+    position: relative;
+    left: 350px;
+    bottom: -85px;
+}
+
+/* Diamond Styles */
+.home_diamond_container {
+}
+.home_diamond_svg {
+    overflow: visible;
+    cursor: pointer;
+}
+.diamond_red rect {
+    fill: #68293f;
+}
+.diamond_blue rect {
+    fill: #343d77;
+}
+.home_diamond_rear {
+    fill: #987e50 !important;
+}
+.home_diamond_svg rect {
+    transition: transform 0.3s;
+}
+.home_diamond_svg:active rect {
+    transition: transform 0s;
+}
+.home_diamond_svg:focus rect {
+    transition: transform 0.3s;
+}
+.home_diamond_svg text {
+    transition: text-shadow 0.3s;
+}
+.home_diamond_svg:hover rect.home_diamond_up {
+    transform: translate(-4px, -4px);
+}
+.home_diamond_svg:hover rect.home_diamond_left {
+    transform: translate(-4px, 4px);
+}
+.home_diamond_svg:hover rect.home_diamond_right {
+    transform: translate(4px, -4px);
+}
+.home_diamond_svg:hover rect.home_diamond_down {
+    transform: translate(4px, 4px);
+}
+.home_diamond_svg:hover text.home_diamond_blue_text {
+    fill: #ffffff;
+    text-shadow: 2px 2px 5px rgba(87, 154, 255, 1), -2px -2px 5px rgba(87, 154, 255, 1);
+}
+.home_diamond_svg:hover text.home_diamond_red_text {
+    fill: #ffffff;
+    text-shadow: 2px 2px 5px rgba(212, 113, 148, 1), -2px -2px 5px rgba(206, 110, 144, 1);
+}
+.home_diamond_svg:active rect.home_diamond_up {
+    transform: translate(4px, 4px);
+}
+.home_diamond_svg:active rect.home_diamond_left {
+    transform: translate(4px, -4px);
+}
+.home_diamond_svg:active rect.home_diamond_right {
+    transform: translate(-4px, 4px);
+}
+.home_diamond_svg:active rect.home_diamond_down {
+    transform: translate(-4px, -4px);
+}
+.home_diamond_svg:focus rect.home_diamond_up {
+    transform: translate(4px, 4px) !important;
+}
+.home_diamond_svg:focus rect.home_diamond_left {
+    transform: translate(4px, -4px) !important;
+}
+.home_diamond_svg:focus rect.home_diamond_right {
+    transform: translate(-4px, 4px) !important;
+}
+.home_diamond_svg:focus rect.home_diamond_down {
+    transform: translate(-4px, -4px) !important;
+}
+.home_diamond_red_text {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 19px;
+    font-weight: 300;
+    font-variant: small-caps;
+    fill: #fef2da;
+    user-select: none;
+}
+.home_diamond_blue_text {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 19px;
+    font-weight: 300;
+    font-variant: small-caps;
+    fill: #fef2da;
+    user-select: none;
+}
+.home_diamond_shadow_text {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 19px;
+    font-weight: 300;
+    font-variant: small-caps;
+    fill: #262e41;
+    user-select: none;
+}
+
+/* Input */
+.login_text_input {
+    background: #0d0e10;
+    outline: none;
+    border-color: #1e1d25;
+    color: #d1c5ad;
+    padding: 0;
+    border-width: 1px;
+    font-size: 14px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Login Form */
+#login_form {
+    position: absolute;
+    transform: translateY(-100px);
+    width: 400px;
+    background: rgba(20, 20, 28, 0.75);
+}
+.login_input_top {
+    height: 75px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 40px;
+}
+.login_input_bottom {
+    display: flex;
+    justify-content: center;
+    flex-direction: row;
+    margin-bottom: 15px;
+    margin-top: -10px;
+}
+.login_error_label {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 13px;
+    color: #de7788;
+    font-weight: 600;
+    user-select: none;
+    margin-left: 15px;
+}
+.login_message_label {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 14px;
+    color: white;
+    user-select: none;
+}
+.login_username_wrapper {
+    flex-basis: 40%;
+}
+.login_username_input {
+    width: 165px;
+    height: 25px;
+    margin-bottom: 10px;
+}
+.login_username_label {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 15px;
+    font-variant: small-caps;
+    color: #ceb581;
+    user-select: none;
+}
+.login_password_wrapper {
+    flex-basis: 40%;
+}
+.login_password_input {
+    width: 165px;
+    height: 25px;
+    margin-bottom: 10px;
+}
+.login_password_label {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 15px;
+    font-variant: small-caps;
+    color: #ceb581;
+    user-select: none;
+}
+
+/* Register Form */
+#register_form {
+    position: absolute;
+    transform: translateY(-50px);
+    width: 500px;
+    background: rgba(20, 20, 28, 0.90);
+}
+.register_field_label {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 15px;
+    font-variant: small-caps;
+    color: #ceb581;
+    user-select: none;
+}
+.register_email_notice {
+    color: #d1c5ad;
+    font-size: 14px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin-left: 30px;
+}
+.register_terms_notice {
+    color: #d1c5ad;
+    font-size: 14px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin-left: 30px;
+    margin-right: 30px;
+    margin-bottom: 30px;
+}
+.register_username_input {
+    width: 165px;
+    height: 25px;
+    margin-bottom: 10px;
+}
+.register_password_input {
+    width: 165px;
+    height: 25px;
+    margin-bottom: 10px;
+}
+.register_password_confirm {
+    width: 165px;
+    height: 25px;
+    margin-bottom: 10px;
+}
+.register_email_input {
+    width: 165px;
+    height: 25px;
+    margin-bottom: 10px;
+}
+.register_username_wrapper {
+    margin-left: 30px;
+    display: flex;
+    flex-direction: column;
+}
+.register_password_wrapper {
+    flex-basis: 35%;
+    margin-left: 30px;
+    display: flex;
+    flex-direction: column;
+}
+.register_confirm_wrapper {
+    display: flex;
+    flex-direction: column;
+}
+.register_email_wrapper {
+    margin-left: 30px;
+    display: flex;
+    flex-direction: column;
+}
+.register_gender_wrapper {
+    flex-basis: 35%;
+    margin-top: 10px;
+    margin-left: 30px;
+    display: flex;
+    flex-direction: column;
+}
+.register_village_wrapper {
+    margin-top: 10px;
+    display: flex;
+    flex-direction: column;
+}
+.register_password_container {
+    display: flex;
+}
+.register_character_container {
+    display: flex;
+    margin-bottom: 10px;
+}
+.register_username_container {
+    margin-top: 20px;
+    display: flex;
+}
+.register_option {
+    accent-color: #d1c5ad;
+}
+.register_option_label {
+    color: #d1c5ad;
+    font-size: 14px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin-left: 5px;
+}
+.register_close {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 15px;
+    font-variant: small-caps;
+    user-select: none;
+    color: #bfb7e0;
+    cursor: pointer;
+    margin-left: auto;
+    margin-right: 30px;
+}
+    .register_close:hover {
+        color: white;
+    }
+
+/* Reset Form */
+#reset_form {
+    position: absolute;
+    transform: translateY(-100px);
+    width: 400px;
+    background: rgba(20, 20, 28, 0.75);
+}
+.reset_link {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 15px;
+    font-variant: small-caps;
+    user-select: none;
+    color: #bfb7e0;
+    cursor: pointer;
+    margin-left: auto;
+    margin-right: 15px;
+    flex-shrink: 0;
+    padding-left: 10px;
+}
+    .reset_link:hover {
+        color: white;
+    }
+.reset_input_top {
+    height: 75px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 40px;
+}
+.reset_input_bottom {
+    display: flex;
+    justify-content: center;
+    flex-direction: row;
+    margin-bottom: 15px;
+    margin-top: -10px;
+}
+.reset_email_wrapper {
+    flex-basis: 40%;
+}
+.reset_email_input {
+    width: 165px;
+    height: 25px;
+    margin-bottom: 10px;
+}
+.reset_email_label {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 15px;
+    font-variant: small-caps;
+    color: #ceb581;
+    user-select: none;
+}
+
+/* Rules and Terms */
+.rules_modal {
+    position: absolute;
+    width: 500px;
+    height: 558px;
+    background: rgba(20, 20, 28, 0.90);
+}
+.rules_content {
+    max-height: 480px;
+    overflow: auto;
+    margin-left: 30px;
+    padding-right: 15px;
+    color: #d1c5ad;
+    font-size: 14px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+.rules_header {
+    margin-top: 15px;
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+.rules_title {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 15px;
+    font-variant: small-caps;
+    color: #ceb581;
+    user-select: none;
+    margin-left: auto;
+    margin-right: -65px;
+}
+.rules_close {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 15px;
+    font-variant: small-caps;
+    user-select: none;
+    color: #bfb7e0;
+    cursor: pointer;
+    margin-left: auto;
+    margin-right: 30px;
+}
+    .rules_close:hover {
+        color: white;
+    }
+.terms_modal {
+    position: absolute;
+    width: 500px;
+    height: 558px;
+    background: rgba(20, 20, 28, 0.90);
+}
+.terms_content {
+    max-height: 480px;
+    overflow: auto;
+    margin-left: 30px;
+    padding-right: 15px;
+    color: #d1c5ad;
+    font-size: 14px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+.terms_header {
+    display: flex;
+    margin-top: 15px;
+    margin-bottom: 10px;
+}
+.terms_title {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 15px;
+    font-variant: small-caps;
+    color: #ceb581;
+    user-select: none;
+    margin-left: auto;
+    margin-right: -65px;
+}
+.terms_close {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 15px;
+    font-variant: small-caps;
+    user-select: none;
+    color: #bfb7e0;
+    cursor: pointer;
+    margin-left: auto;
+    margin-right: 30px;
+}
+    .terms_close:hover {
+        color: white;
+    }
+
+/* News */
+.news_section {
+    background: #131017;
+    border-bottom: solid 13px #6a5e46;
+}
+
+/* Contact */
+.contact_section {
+    background: #18181f; 
+    border-bottom: solid 13px #6a5e46;
+}
+
+/* Footer */
+.footer_section {
+    height: 160px;
+    background: #121114;
+}
+.footer_text {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 15px;
+    color: #838385;
+    margin-top: 30px;
+}
