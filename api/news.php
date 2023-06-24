@@ -22,12 +22,12 @@ try {
     }
 
     $NewsAPIResponse = new NewsAPIResponse();
-    $NewsAPIManager = new NewsAPIManager($system, $player);
+    $NewsManager = new NewsManager($system, $player);
 
     switch ($request) {
         case "getLatestPosts":
             $NewsAPIResponse->response_data = [
-                'postData' => NewsAPIPresenter::newsPostResponse($NewsAPIManager),
+                'postData' => NewsAPIPresenter::newsPostResponse($NewsManager, $system),
             ];
             break;
         default:

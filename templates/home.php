@@ -9,9 +9,9 @@
  */
 
 if (isset($player)) {
-    $NewsAPIManager = new NewsAPIManager($system, $player);
+    $NewsManager = new NewsManager($system, $player);
 }
-else $NewsAPIManager = new NewsAPIManager($system);
+else $NewsManager = new NewsManager($system);
 
 
 ?>
@@ -33,7 +33,7 @@ else $NewsAPIManager = new NewsAPIManager($system);
                 resetErrorText: "<?= $reset_error_text ?>",
                 loginMessageText: "<?= $login_message_text ?>",
                 registerPreFill: <?= json_encode($register_pre_fill) ?>,
-                initialNewsPosts: <?= json_encode(NewsAPIPresenter::newsPostResponse($NewsAPIManager)) ?>,
+                initialNewsPosts: <?= json_encode(NewsAPIPresenter::newsPostResponse($NewsManager, $system)) ?>,
             }),
             homeContainer
         );

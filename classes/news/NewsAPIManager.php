@@ -2,7 +2,7 @@
 
 require __DIR__ . '/NewsPostDto.php';
 
-class NewsAPIManager {
+class NewsManager {
     private System $system;
     private ?User $player;
 
