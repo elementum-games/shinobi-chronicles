@@ -595,7 +595,7 @@ if($LOGGED_IN) {
             }
         }
     }
-    else if ($_GET['home_view']) {
+    else if (isset($_GET['home_view'])) {
         if ($system->environment == System::ENVIRONMENT_DEV) {
             $home_view = "default";
             switch ($_GET['home_view']) {
