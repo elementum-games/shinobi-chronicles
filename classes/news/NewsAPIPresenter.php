@@ -31,7 +31,6 @@ class NewsApiPresenter {
      * @return array
      */
     public static function savePostResponse(NewsManager $newsManager, System $system, NewsPostDto $newsPost, int $num_posts = 8): array {
-            $newsManager->saveNewsPost($newsPost);
             return array_map(
                 function (NewsPostDto $post) use ($system) {
                     $message = $post->message;

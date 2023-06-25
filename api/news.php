@@ -55,6 +55,7 @@ try {
                 tags: $tags,
             );
             $num_posts = $system->db->clean($_POST['num_posts']);
+            $NewsManager->saveNewsPost($newsPost);
             $NewsAPIResponse->response_data = [
                 'postData' => NewsAPIPresenter::savePostResponse($NewsManager, $system, $newsPost, $num_posts),
             ];
