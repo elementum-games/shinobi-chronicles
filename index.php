@@ -596,47 +596,26 @@ if($LOGGED_IN) {
         }
     }
     else {
-        if ($system->environment == System::ENVIRONMENT_DEV) {
-            $layout = $system->fetchLayoutByName("new_geisha");
-            $layout->renderBeforeContentHTML($system, $player ?? null, "Home", custom_page: true);
-            if (!$player->global_message_viewed) {
-                $global_message = $system->fetchGlobalMessage();
-                $layout->renderGlobalMessage($system, $global_message);
-            }
-            try {
-                require('./templates/home.php');
-                $page_load_time = round(microtime(true) - $PAGE_LOAD_START, 3);
-                $layout->renderAfterContentHTML($system, $player ?? null, $page_load_time);
-                $system->db->commitTransaction();
-                exit;
-            } catch (RuntimeException $e) {
-                $system->db->rollbackTransaction();
-                $system->message($e->getMessage());
-                $system->printMessage(true);
-            }
-        } else {
-            $layout->renderBeforeContentHTML(
-                system: $system,
-                player: $player,
-                page_title: "Profile"
-            );
+        $layout->renderBeforeContentHTML(
+            system: $system,
+            player: $player,
+            page_title: "Profile"
+        );
 
-            $system->printMessage();
-            if (!$player->global_message_viewed) {
-                $global_message = $system->fetchGlobalMessage();
-                $layout->renderGlobalMessage($system, $global_message);
-            }
-
-            try {
-                require("pages/profile.php");
-                userProfile();
-            } catch (RuntimeException $e) {
-                $system->db->rollbackTransaction();
-                $system->message($e->getMessage());
-                $system->printMessage(true);
-            }
+        $system->printMessage();
+        if (!$player->global_message_viewed) {
+            $global_message = $system->fetchGlobalMessage();
+            $layout->renderGlobalMessage($system, $global_message);
         }
 
+        try {
+            require("pages/profile.php");
+            userProfile();
+        } catch (RuntimeException $e) {
+            $system->db->rollbackTransaction();
+            $system->message($e->getMessage());
+            $system->printMessage(true);
+        }
     }
 
     $player->updateData();
