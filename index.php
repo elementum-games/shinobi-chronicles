@@ -33,7 +33,7 @@ $reset_error_text = "";
 $initial_login_display = "none";
 $register_pre_fill = [];
 $home_links = [];
-$home_links['newsAPI'] = $system->router->api_links['news'];
+$home_links['news_api'] = $system->router->api_links['news'];
 $home_links['logout'] = $system->router->base_url . "?logout=1";
 $home_links['profile'] = $system->router->getUrl('profile');
 $home_links['github'] = $system->router->links['github'];

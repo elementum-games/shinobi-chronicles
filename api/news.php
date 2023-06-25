@@ -30,6 +30,25 @@ try {
                 'postData' => NewsAPIPresenter::newsPostResponse($NewsManager, $system),
             ];
             break;
+        case "getNewsPosts":
+            $num_posts = $system->db->clean($_POST['num_posts']);
+            $NewsAPIResponse->response_data = [
+                'postData' => NewsAPIPresenter::newsPostResponse($NewsManager, $system, $num_posts),
+            ];
+            break;
+        case "saveNewsPost":
+            $post_id = $system->db->clean($_POST['post_id']);
+            $title = $system->db->clean($_POST['title']);
+            $version = $system->db->clean($_POST['version']);
+            $content = $system->db->clean($_POST['content']);
+            $update = $system->db->clean($_POST['update']) === "true";
+            $bugfix = $system->db->clean($_POST['bugfix']) === "true";
+            $event = $system->db->clean($_POST['event']) === "true";
+            $num_posts = $system->db->clean($_POST['num_posts']);
+            $NewsAPIResponse->response_data = [
+                'postData' => NewsAPIPresenter::savePostResponse($NewsManager, $system, $post_id, $title, $version, $content, $update, $bugfix, $event, $num_posts),
+            ];
+            break;
         default:
             API::exitWithError(message: "Invalid request!", system: $system);
     }
