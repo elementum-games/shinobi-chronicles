@@ -17,6 +17,8 @@ function Home({
   const newsRef = React.useRef(null);
   const contactRef = React.useRef(null);
   return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement(LoginSection, {
+    homeLinks: homeLinks,
+    isLoggedIn: isLoggedIn,
     version: version,
     loginDisplay: loginDisplay,
     setLoginDisplay: setLoginDisplay,
@@ -30,13 +32,14 @@ function Home({
   }), /*#__PURE__*/React.createElement(NewsSection, {
     newsRef: newsRef,
     newsPosts: newsPosts,
-    githubLink: homeLinks['github'],
-    discordLink: homeLinks['discord']
+    homeLinks: homeLinks
   }), /*#__PURE__*/React.createElement(FeatureSection, null), /*#__PURE__*/React.createElement(WorldSection, null), /*#__PURE__*/React.createElement(ContactSection, {
     contactRef: contactRef
   }), /*#__PURE__*/React.createElement(FooterSection, null));
 }
 function LoginSection({
+  homeLinks,
+  isLoggedIn,
   version,
   loginDisplay,
   setLoginDisplay,
@@ -357,7 +360,7 @@ function LoginSection({
     onClick: () => setLoginDisplay("none")
   }, "close")), /*#__PURE__*/React.createElement("div", {
     className: "terms_content"
-  }, "Shinobi-chronicles.com is a fan site: We did not create Naruto nor any of the characters and content in Naruto. While inspired by Naruto, the content of this site is fan-made and not meant to infringe upon any copyrights, it is simply here to further the continuing popularity of Japanese animation. In no event will shinobi-chronicles.com, its host, and any other companies and/or sites linked to shinobi-chronicles.com be liable to any party for any direct, indirect, special or other consequential damages for any use of this website, or on any other hyperlinked website, including, without limitation, any lost profits, loss of programs or other data on your information handling system or otherwise, even if we are expressly advised of the possibility of such damages.", /*#__PURE__*/React.createElement("br", null), /*#__PURE__*/React.createElement("p", null, "Shinobi-chronicles.com accepts no responsibility for the actions of its members i.e. Self harm, vandalism, suicide, homicide, genocide, drug abuse, changes in sexual orientation, or bestiality. Shinobi-chronicles.com will not be held responsible and does not encourage any of the above actions or any other form of anti social behaviour. The staff of shinobi-chronicles.com reserve the right to issue bans and/or account deletion for rule infractions. Rule infractions will be determined at the discretion of the moderating staff."), /*#__PURE__*/React.createElement("p", null, "Loans or transactions of real or in-game currency are between players. Staff take no responsibility for the completion of them. If a player loans real or in-game currency to another player, staff will not be responsible for ensuring the currency is returned."), /*#__PURE__*/React.createElement("p", null, "Ancient Kunai(Premium credits) that have already been spent on in-game purchases of any kind or traded to another player cannot be refunded. Staff are not responsible for lost shards or time on Forbidden Seals lost due to user bans."), /*#__PURE__*/React.createElement("br", null), "The Naruto series is created by and copyright Masashi Kishimoto and TV Tokyo, all rights reserved.")), /*#__PURE__*/React.createElement("svg", {
+  }, "Shinobi-chronicles.com is a fan site: We did not create Naruto nor any of the characters and content in Naruto. While inspired by Naruto, the content of this site is fan-made and not meant to infringe upon any copyrights, it is simply here to further the continuing popularity of Japanese animation. In no event will shinobi-chronicles.com, its host, and any other companies and/or sites linked to shinobi-chronicles.com be liable to any party for any direct, indirect, special or other consequential damages for any use of this website, or on any other hyperlinked website, including, without limitation, any lost profits, loss of programs or other data on your information handling system or otherwise, even if we are expressly advised of the possibility of such damages.", /*#__PURE__*/React.createElement("br", null), /*#__PURE__*/React.createElement("p", null, "Shinobi-chronicles.com accepts no responsibility for the actions of its members i.e. Self harm, vandalism, suicide, homicide, genocide, drug abuse, changes in sexual orientation, or bestiality. Shinobi-chronicles.com will not be held responsible and does not encourage any of the above actions or any other form of anti social behaviour. The staff of shinobi-chronicles.com reserve the right to issue bans and/or account deletion for rule infractions. Rule infractions will be determined at the discretion of the moderating staff."), /*#__PURE__*/React.createElement("p", null, "Loans or transactions of real or in-game currency are between players. Staff take no responsibility for the completion of them. If a player loans real or in-game currency to another player, staff will not be responsible for ensuring the currency is returned."), /*#__PURE__*/React.createElement("p", null, "Ancient Kunai(Premium credits) that have already been spent on in-game purchases of any kind or traded to another player cannot be refunded. Staff are not responsible for lost shards or time on Forbidden Seals lost due to user bans."), /*#__PURE__*/React.createElement("br", null), "The Naruto series is created by and copyright Masashi Kishimoto and TV Tokyo, all rights reserved.")), !isLoggedIn && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("svg", {
     role: "button",
     tabIndex: "0",
     name: "login",
@@ -488,7 +491,131 @@ function LoginSection({
     y: "16",
     textAnchor: "middle",
     dominantBaseline: "middle"
-  }, "create a character"))))), /*#__PURE__*/React.createElement("div", {
+  }, "create a character"))), isLoggedIn && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("a", {
+    href: homeLinks['profile']
+  }, /*#__PURE__*/React.createElement("svg", {
+    role: "button",
+    tabIndex: "0",
+    className: "profile_button",
+    width: "162",
+    height: "32"
+  }, /*#__PURE__*/React.createElement("radialGradient", {
+    id: "profile_fill_default",
+    cx: "50%",
+    cy: "50%",
+    r: "50%",
+    fx: "50%",
+    fy: "50%"
+  }, /*#__PURE__*/React.createElement("stop", {
+    offset: "0%",
+    style: {
+      stopColor: '#464f87',
+      stopOpacity: 1
+    }
+  }), /*#__PURE__*/React.createElement("stop", {
+    offset: "100%",
+    style: {
+      stopColor: '#343d77',
+      stopOpacity: 1
+    }
+  })), /*#__PURE__*/React.createElement("radialGradient", {
+    id: "profile_fill_click",
+    cx: "50%",
+    cy: "50%",
+    r: "50%",
+    fx: "50%",
+    fy: "50%"
+  }, /*#__PURE__*/React.createElement("stop", {
+    offset: "0%",
+    style: {
+      stopColor: '#343d77',
+      stopOpacity: 1
+    }
+  }), /*#__PURE__*/React.createElement("stop", {
+    offset: "100%",
+    style: {
+      stopColor: '#464f87',
+      stopOpacity: 1
+    }
+  })), /*#__PURE__*/React.createElement("rect", {
+    className: "profile_button_background",
+    width: "100%",
+    height: "100%"
+  }), /*#__PURE__*/React.createElement("text", {
+    className: "profile_button_shadow_text",
+    x: "81",
+    y: "18",
+    textAnchor: "middle",
+    dominantBaseline: "middle"
+  }, "profile"), /*#__PURE__*/React.createElement("text", {
+    className: "profile_button_text",
+    x: "81",
+    y: "16",
+    textAnchor: "middle",
+    dominantBaseline: "middle"
+  }, "profile"))), /*#__PURE__*/React.createElement("a", {
+    href: homeLinks['logout']
+  }, /*#__PURE__*/React.createElement("svg", {
+    role: "button",
+    tabIndex: "0",
+    className: "logout_button",
+    width: "162",
+    height: "32"
+  }, /*#__PURE__*/React.createElement("radialGradient", {
+    id: "logout_fill_default",
+    cx: "50%",
+    cy: "50%",
+    r: "50%",
+    fx: "50%",
+    fy: "50%"
+  }, /*#__PURE__*/React.createElement("stop", {
+    offset: "0%",
+    style: {
+      stopColor: '#84314e',
+      stopOpacity: 1
+    }
+  }), /*#__PURE__*/React.createElement("stop", {
+    offset: "100%",
+    style: {
+      stopColor: '#68293f',
+      stopOpacity: 1
+    }
+  })), /*#__PURE__*/React.createElement("radialGradient", {
+    id: "logout_fill_click",
+    cx: "50%",
+    cy: "50%",
+    r: "50%",
+    fx: "50%",
+    fy: "50%"
+  }, /*#__PURE__*/React.createElement("stop", {
+    offset: "0%",
+    style: {
+      stopColor: '#68293f',
+      stopOpacity: 1
+    }
+  }), /*#__PURE__*/React.createElement("stop", {
+    offset: "100%",
+    style: {
+      stopColor: '#84314e',
+      stopOpacity: 1
+    }
+  })), /*#__PURE__*/React.createElement("rect", {
+    className: "logout_button_background",
+    width: "100%",
+    height: "100%"
+  }), /*#__PURE__*/React.createElement("text", {
+    className: "logout_button_shadow_text",
+    x: "81",
+    y: "18",
+    textAnchor: "middle",
+    dominantBaseline: "middle"
+  }, "logout"), /*#__PURE__*/React.createElement("text", {
+    className: "logout_button_text",
+    x: "81",
+    y: "16",
+    textAnchor: "middle",
+    dominantBaseline: "middle"
+  }, "logout"))))))), /*#__PURE__*/React.createElement("div", {
     className: "login_news_button"
   }, /*#__PURE__*/React.createElement("div", {
     className: "home_diamond_container"
@@ -747,8 +874,7 @@ function LoginSection({
 function NewsSection({
   newsRef,
   newsPosts,
-  githubLink,
-  discordLink
+  homeLinks
 }) {
   const [activePostId, setActivePostId] = React.useState(newsPosts[0] != "undefined" ? newsPosts[0].post_id : null);
   function formatNewsDate(ticks) {
@@ -801,13 +927,13 @@ function NewsSection({
   }, "NEWS & UPDATES"), /*#__PURE__*/React.createElement("div", {
     className: "home_external_links"
   }, /*#__PURE__*/React.createElement("a", {
-    href: githubLink,
+    href: homeLinks['github'],
     className: "home_github_wrapper"
   }, /*#__PURE__*/React.createElement("img", {
     className: "home_github",
     src: "../../../images/v2/icons/githubhover.png"
   })), /*#__PURE__*/React.createElement("a", {
-    href: discordLink,
+    href: homeLinks['discord'],
     className: "home_discord_wrapper"
   }, /*#__PURE__*/React.createElement("img", {
     className: "home_discord",

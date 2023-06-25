@@ -37,6 +37,8 @@ function Home({
     return (
         <>
             <LoginSection
+                homeLinks={homeLinks}
+                isLoggedIn={isLoggedIn}
                 version={version}
                 loginDisplay={loginDisplay}
                 setLoginDisplay={setLoginDisplay}
@@ -51,8 +53,7 @@ function Home({
             <NewsSection
                 newsRef={newsRef}
                 newsPosts={newsPosts}
-                githubLink={homeLinks['github']}
-                discordLink={homeLinks['discord']}
+                homeLinks={homeLinks}
             />
             <FeatureSection />
             <WorldSection />
@@ -65,6 +66,8 @@ function Home({
 }
 
 function LoginSection({
+    homeLinks,
+    isLoggedIn,
     version,
     loginDisplay,
     setLoginDisplay,
@@ -97,7 +100,7 @@ function LoginSection({
     }
     function scrollTo(element) {
         element.scrollIntoView({ behavior: 'smooth' });
-    } 
+    }
     return (
         <div className={"home_section login_section"}>
             <div className="login_center_wrapper">
@@ -375,32 +378,70 @@ function LoginSection({
                                 </div>
                             </div>
                         }
-                        <svg role="button" tabIndex="0" name="login" className="login_button" width="162" height="32" onClick={() => handleLogin()} style={{ zIndex: 2 }}>
-                            <radialGradient id="login_fill_default" cx="50%" cy="50%" r="50%" fx="50%" fy="50%">
-                                <stop offset="0%" style={{ stopColor: '#464f87', stopOpacity: 1 }} />
-                                <stop offset="100%" style={{ stopColor: '#343d77', stopOpacity: 1 }} />
-                            </radialGradient>
-                            <radialGradient id="login_fill_click" cx="50%" cy="50%" r="50%" fx="50%" fy="50%">
-                                <stop offset="0%" style={{ stopColor: '#343d77', stopOpacity: 1 }} />
-                                <stop offset="100%" style={{ stopColor: '#464f87', stopOpacity: 1 }} />
-                            </radialGradient>
-                            <rect className="login_button_background" width="100%" height="100%" fill="url(#login_fill_default)"/>
-                            <text className="login_button_shadow_text" x="81" y="18" textAnchor="middle" dominantBaseline="middle">login</text>
-                            <text className="login_button_text" x="81" y="16" textAnchor="middle" dominantBaseline="middle">login</text>
-                        </svg>
-                        <svg role="button" tabIndex="0" name="register" className="register_button" width="162" height="32" onClick={() => handleRegister()} style={{ zIndex: 4 }}>
-                            <radialGradient id="register_fill_default" cx="50%" cy="50%" r="50%" fx="50%" fy="50%">
-                                <stop offset="0%" style={{ stopColor: '#84314e', stopOpacity: 1 }} />
-                                <stop offset="100%" style={{ stopColor: '#68293f', stopOpacity: 1 }} />
-                            </radialGradient>
-                            <radialGradient id="register_fill_click" cx="50%" cy="50%" r="50%" fx="50%" fy="50%">
-                                <stop offset="0%" style={{ stopColor: '#68293f', stopOpacity: 1 }} />
-                                <stop offset="100%" style={{ stopColor: '#84314e', stopOpacity: 1 }} />
-                            </radialGradient>
-                            <rect className="register_button_background" width="100%" height="100%" />
-                            <text className="register_button_shadow_text" x="81" y="18" textAnchor="middle" dominantBaseline="middle">create a character</text>
-                            <text className="register_button_text" x="81" y="16" textAnchor="middle" dominantBaseline="middle">create a character</text>
-                        </svg>
+                        {!isLoggedIn &&
+                            <>
+                                <svg role="button" tabIndex="0" name="login" className="login_button" width="162" height="32" onClick={() => handleLogin()} style={{ zIndex: 2 }}>
+                                    <radialGradient id="login_fill_default" cx="50%" cy="50%" r="50%" fx="50%" fy="50%">
+                                        <stop offset="0%" style={{ stopColor: '#464f87', stopOpacity: 1 }} />
+                                        <stop offset="100%" style={{ stopColor: '#343d77', stopOpacity: 1 }} />
+                                    </radialGradient>
+                                    <radialGradient id="login_fill_click" cx="50%" cy="50%" r="50%" fx="50%" fy="50%">
+                                        <stop offset="0%" style={{ stopColor: '#343d77', stopOpacity: 1 }} />
+                                        <stop offset="100%" style={{ stopColor: '#464f87', stopOpacity: 1 }} />
+                                    </radialGradient>
+                                    <rect className="login_button_background" width="100%" height="100%" fill="url(#login_fill_default)"/>
+                                    <text className="login_button_shadow_text" x="81" y="18" textAnchor="middle" dominantBaseline="middle">login</text>
+                                    <text className="login_button_text" x="81" y="16" textAnchor="middle" dominantBaseline="middle">login</text>
+                                </svg>
+                                <svg role="button" tabIndex="0" name="register" className="register_button" width="162" height="32" onClick={() => handleRegister()} style={{ zIndex: 4 }}>
+                                    <radialGradient id="register_fill_default" cx="50%" cy="50%" r="50%" fx="50%" fy="50%">
+                                        <stop offset="0%" style={{ stopColor: '#84314e', stopOpacity: 1 }} />
+                                        <stop offset="100%" style={{ stopColor: '#68293f', stopOpacity: 1 }} />
+                                    </radialGradient>
+                                    <radialGradient id="register_fill_click" cx="50%" cy="50%" r="50%" fx="50%" fy="50%">
+                                        <stop offset="0%" style={{ stopColor: '#68293f', stopOpacity: 1 }} />
+                                        <stop offset="100%" style={{ stopColor: '#84314e', stopOpacity: 1 }} />
+                                    </radialGradient>
+                                    <rect className="register_button_background" width="100%" height="100%" />
+                                    <text className="register_button_shadow_text" x="81" y="18" textAnchor="middle" dominantBaseline="middle">create a character</text>
+                                    <text className="register_button_text" x="81" y="16" textAnchor="middle" dominantBaseline="middle">create a character</text>
+                                </svg>
+                            </>
+                        }
+                        {isLoggedIn &&
+                            <>
+                            <a href={homeLinks['profile']}>
+                                <svg role="button" tabIndex="0" className="profile_button" width="162" height="32">
+                                    <radialGradient id="profile_fill_default" cx="50%" cy="50%" r="50%" fx="50%" fy="50%">
+                                        <stop offset="0%" style={{ stopColor: '#464f87', stopOpacity: 1 }} />
+                                        <stop offset="100%" style={{ stopColor: '#343d77', stopOpacity: 1 }} />
+                                    </radialGradient>
+                                    <radialGradient id="profile_fill_click" cx="50%" cy="50%" r="50%" fx="50%" fy="50%">
+                                        <stop offset="0%" style={{ stopColor: '#343d77', stopOpacity: 1 }} />
+                                        <stop offset="100%" style={{ stopColor: '#464f87', stopOpacity: 1 }} />
+                                    </radialGradient>
+                                    <rect className="profile_button_background" width="100%" height="100%" />
+                                    <text className="profile_button_shadow_text" x="81" y="18" textAnchor="middle" dominantBaseline="middle">profile</text>
+                                    <text className="profile_button_text" x="81" y="16" textAnchor="middle" dominantBaseline="middle">profile</text>
+                                </svg>
+                            </a>
+                            <a href={homeLinks['logout']}>
+                                <svg role="button" tabIndex="0" className="logout_button" width="162" height="32">
+                                    <radialGradient id="logout_fill_default" cx="50%" cy="50%" r="50%" fx="50%" fy="50%">
+                                        <stop offset="0%" style={{ stopColor: '#84314e', stopOpacity: 1 }} />
+                                        <stop offset="100%" style={{ stopColor: '#68293f', stopOpacity: 1 }} />
+                                    </radialGradient>
+                                    <radialGradient id="logout_fill_click" cx="50%" cy="50%" r="50%" fx="50%" fy="50%">
+                                        <stop offset="0%" style={{ stopColor: '#68293f', stopOpacity: 1 }} />
+                                        <stop offset="100%" style={{ stopColor: '#84314e', stopOpacity: 1 }} />
+                                    </radialGradient>
+                                    <rect className="logout_button_background" width="100%" height="100%" />
+                                    <text className="logout_button_shadow_text" x="81" y="18" textAnchor="middle" dominantBaseline="middle">logout</text>
+                                    <text className="logout_button_text" x="81" y="16" textAnchor="middle" dominantBaseline="middle">logout</text>
+                                </svg>
+                            </a>
+                            </>
+                        }
                     </div>
                 </div>
             </div>
@@ -505,7 +546,7 @@ function LoginSection({
     );
 }
 
-function NewsSection({ newsRef, newsPosts, githubLink, discordLink }) {
+function NewsSection({ newsRef, newsPosts, homeLinks }) {
     const [activePostId, setActivePostId] = React.useState(newsPosts[0] != "undefined" ? newsPosts[0].post_id : null);
 
     function formatNewsDate(ticks) {
@@ -547,10 +588,10 @@ function NewsSection({ newsRef, newsPosts, githubLink, discordLink }) {
             <div className="home_header">
                 <label className="home_header_label">NEWS & UPDATES</label>
                 <div className="home_external_links">
-                    <a href={githubLink} className="home_github_wrapper">
+                    <a href={homeLinks['github']} className="home_github_wrapper">
                         <img className="home_github" src="../../../images/v2/icons/githubhover.png"/>
                     </a>
-                    <a href={discordLink} className="home_discord_wrapper">
+                    <a href={homeLinks['discord']} className="home_discord_wrapper">
                         <img className="home_discord" src="../../../images/v2/icons/discordhover.png"/>
                     </a>
                 </div>

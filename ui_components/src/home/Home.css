@@ -203,6 +203,72 @@ body {
     user-select: none;
 }
 
+/* Profile Button */
+.profile_button {
+    cursor: pointer;
+    margin-bottom: 25px;
+    margin-top: -8px;
+}
+    .profile_button:hover text.profile_button_text {
+        fill: #ffffff;
+        text-shadow: 2px 2px 5px rgba(87, 154, 255, 1), -2px -2px 5px rgba(87, 154, 255, 1);
+        transition: text-shadow 0.1s;
+    }
+    .profile_button:active .profile_button_background {
+        fill: url(#profile_fill_click);
+    }
+.profile_button_background {
+    clip-path: polygon(20px 0px, calc(100% - 20px) 0px, 100% 50%, calc(100% - 20px) 100%, 20px 100%, 0px 50%);
+    fill: url(#profile_fill_default);
+}
+.profile_button_text {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 18px;
+    font-variant: small-caps;
+    fill: #fef2da;
+    user-select: none;
+}
+.profile_button_shadow_text {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 18px;
+    font-variant: small-caps;
+    fill: #1e1d25;
+    user-select: none;
+}
+
+/* Logout Button */
+.logout_button {
+    cursor: pointer;
+    margin-bottom: 25px;
+    margin-top: -8px;
+}
+    .logout_button:hover text.logout_button_text {
+        fill: #ffffff;
+        text-shadow: 2px 2px 5px rgba(212, 113, 148, 1), -2px -2px 5px rgba(206, 110, 144, 1);
+        transition: text-shadow 0.1s;
+    }
+    .logout_button:active .logout_button_background {
+        fill: url(#logout_fill_click);
+    }
+.logout_button_background {
+    clip-path: polygon(20px 0px, calc(100% - 20px) 0px, 100% 50%, calc(100% - 20px) 100%, 20px 100%, 0px 50%);
+    fill: url(#logout_fill_default);
+}
+.logout_button_text {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 18px;
+    font-variant: small-caps;
+    fill: #fef2da;
+    user-select: none;
+}
+.logout_button_shadow_text {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 18px;
+    font-variant: small-caps;
+    fill: #1e1d25;
+    user-select: none;
+}
+
 /* Diamond Positions */
 .login_news_button {
     position: relative;
