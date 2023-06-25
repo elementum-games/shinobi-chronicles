@@ -30,7 +30,14 @@ $login_error_text = "";
 $login_message_text = "";
 $register_error_text = "";
 $reset_error_text = "";
+$initial_login_display = "none";
 $register_pre_fill = [];
+$home_links = [];
+$home_links['newsAPI'] = $system->router->api_links['news'];
+$home_links['logout'] = $system->router->base_url . "?logout=1";
+$home_links['profile'] = $system->router->getUrl('profile');
+$home_links['github'] = $system->router->links['github'];
+$home_links['discord'] = $system->router->links['discord'];
 
 $min_user_name_length = User::MIN_NAME_LENGTH;
 $max_user_name_length = 18;
@@ -589,26 +596,47 @@ if($LOGGED_IN) {
         }
     }
     else {
-        $layout->renderBeforeContentHTML(
-            system: $system,
-            player: $player,
-            page_title: "Profile"
-        );
+        if ($system->environment == System::ENVIRONMENT_DEV) {
+            $layout = $system->fetchLayoutByName("new_geisha");
+            $layout->renderBeforeContentHTML($system, $player ?? null, "Home", custom_page: true);
+            if (!$player->global_message_viewed) {
+                $global_message = $system->fetchGlobalMessage();
+                $layout->renderGlobalMessage($system, $global_message);
+            }
+            try {
+                require('./templates/home.php');
+                $page_load_time = round(microtime(true) - $PAGE_LOAD_START, 3);
+                $layout->renderAfterContentHTML($system, $player ?? null, $page_load_time);
+                $system->db->commitTransaction();
+                exit;
+            } catch (RuntimeException $e) {
+                $system->db->rollbackTransaction();
+                $system->message($e->getMessage());
+                $system->printMessage(true);
+            }
+        } else {
+            $layout->renderBeforeContentHTML(
+                system: $system,
+                player: $player,
+                page_title: "Profile"
+            );
 
-        $system->printMessage();
-        if(!$player->global_message_viewed) {
-            $global_message = $system->fetchGlobalMessage();
-            $layout->renderGlobalMessage($system, $global_message);
+            $system->printMessage();
+            if (!$player->global_message_viewed) {
+                $global_message = $system->fetchGlobalMessage();
+                $layout->renderGlobalMessage($system, $global_message);
+            }
+
+            try {
+                require("pages/profile.php");
+                userProfile();
+            } catch (RuntimeException $e) {
+                $system->db->rollbackTransaction();
+                $system->message($e->getMessage());
+                $system->printMessage(true);
+            }
         }
 
-        try {
-            require("pages/profile.php");
-            userProfile();
-        } catch(RuntimeException $e) {
-            $system->db->rollbackTransaction();
-            $system->message($e->getMessage());
-            $system->printMessage(true);
-        }
     }
 
     $player->updateData();
@@ -634,6 +662,15 @@ else {
     $captcha = '';
 
     if ($system->environment == System::ENVIRONMENT_DEV) {
+        if ($login_error_text != "" || $login_message_text != "") {
+            $initial_login_display = "login";
+        }
+        if ($reset_error_text != "") {
+            $initial_login_display = "reset";
+        }
+        if ($register_error_text != "") {
+            $initial_login_display = "register";
+        }
         require('./templates/home.php');
         $layout->renderAfterContentHTML($system, $player ?? null, custom_page: true);
 

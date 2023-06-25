@@ -99,6 +99,7 @@ class System {
     // Default layout
     const DEFAULT_LAYOUT = 'shadow_ribbon';
     const VERSION_NUMBER = '0.8.0';
+    const VERSION_NAME = '0.8';
 
     // Misc stuff
     const SC_MAX_RANK = 4;
