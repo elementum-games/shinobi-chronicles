@@ -595,6 +595,36 @@ if($LOGGED_IN) {
             }
         }
     }
+    else if ($_GET['home_view']) {
+        if ($system->environment == System::ENVIRONMENT_DEV) {
+            $home_view = "default";
+            switch ($_GET['home_view']) {
+                case "news":
+                    $home_view = "news";
+                    break;
+                case "contact":
+                    $home_view = "contact";
+                    break;
+                case "rules":
+                    $home_view = "rules";
+                    break;
+                case "terms":
+                    $home_view = "terms";
+                    break;
+            }
+            $layout->renderBeforeContentHTML($system, $player ?? null, "Home", custom_page: true);
+            try {
+                require('./templates/home.php');
+            } catch (RuntimeException $e) {
+                $system->db->rollbackTransaction();
+                $system->message($e->getMessage());
+                $system->printMessage(true);
+            }
+            $layout->renderAfterContentHTML($system, $player ?? null, custom_page: true);
+            $page_load_time = round(microtime(true) - $PAGE_LOAD_START, 3);
+            $system->db->commitTransaction();
+        }
+    }
     else {
         $layout->renderBeforeContentHTML(
             system: $system,
