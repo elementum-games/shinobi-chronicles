@@ -30,7 +30,14 @@ $login_error_text = "";
 $login_message_text = "";
 $register_error_text = "";
 $reset_error_text = "";
+$initial_login_display = "none";
 $register_pre_fill = [];
+$home_links = [];
+$home_links['newsAPI'] = $system->router->api_links['news'];
+$home_links['logout'] = $system->router->base_url . "?logout=1";
+$home_links['profile'] = $system->router->getUrl('profile');
+$home_links['github'] = $system->router->links['github'];
+$home_links['discord'] = $system->router->links['discord'];
 
 $min_user_name_length = User::MIN_NAME_LENGTH;
 $max_user_name_length = 18;
@@ -634,6 +641,15 @@ else {
     $captcha = '';
 
     if ($system->environment == System::ENVIRONMENT_DEV) {
+        if ($login_error_text != "" || $login_message_text != "") {
+            $initial_login_display = "login";
+        }
+        if ($reset_error_text != "") {
+            $initial_login_display = "reset";
+        }
+        if ($register_error_text != "") {
+            $initial_login_display = "register";
+        }
         require('./templates/home.php');
         $layout->renderAfterContentHTML($system, $player ?? null, custom_page: true);
 

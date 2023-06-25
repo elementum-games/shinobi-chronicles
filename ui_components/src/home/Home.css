@@ -146,10 +146,14 @@ body {
     .login_button:hover text.login_button_text {
         fill: #ffffff;
         text-shadow: 2px 2px 5px rgba(87, 154, 255, 1), -2px -2px 5px rgba(87, 154, 255, 1);
+        transition: text-shadow 0.1s;
+    }
+    .login_button:active .login_button_background {
+        fill: url(#login_fill_click);
     }
 .login_button_background {
     clip-path: polygon(20px 0px, calc(100% - 20px) 0px, 100% 50%, calc(100% - 20px) 100%, 20px 100%, 0px 50%);
-    fill: #5964a6;
+    fill: url(#login_fill_default);
 }
 .login_button_text {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -175,10 +179,14 @@ body {
     .register_button:hover text.register_button_text {
         fill: #ffffff;
         text-shadow: 2px 2px 5px rgba(212, 113, 148, 1), -2px -2px 5px rgba(206, 110, 144, 1);
+        transition: text-shadow 0.1s;
+    }
+    .register_button:active .register_button_background {
+        fill: url(#register_fill_click);
     }
 .register_button_background {
     clip-path: polygon(20px 0px, calc(100% - 20px) 0px, 100% 50%, calc(100% - 20px) 100%, 20px 100%, 0px 50%);
-    fill: #7b324c;
+    fill: url(#register_fill_default);
 }
 .register_button_text {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -707,6 +715,11 @@ body {
     font-size: 14px;
     color: #ceb581;
     font-weight: 300;
+}
+.news_item_tag_container {
+    display: flex;
+    align-items: flex-end;
+    padding-bottom: 2px;
 }
 .news_item_tag {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;

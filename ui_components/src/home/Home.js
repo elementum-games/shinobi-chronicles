@@ -4,9 +4,11 @@ import type { NewsPostType } from "./newsSchema.js";
 
 
 type Props = {|
-    +newsApiLink: string,
-    +githubLink: string,
-    +discordLink: string,
+    +homeLinks: $ReadOnlyArray,
+    +isLoggedIn: bool,
+    +isAdmin: bool,
+    +version: string,
+    +initialLoginDisplay: string,
     +loginErrorText: string,
     +registerErrorText: string,
     +resetErrorText: string,
@@ -15,9 +17,11 @@ type Props = {|
     +initialNewsPosts: $ReadOnlyArray < NewsPostType >,
 |};
 function Home({
-    newsApiLink,
-    githubLink,
-    discordLink,
+    homeLinks,
+    isLoggedIn,
+    isAdmin,
+    version,
+    initialLoginDisplay,
     loginErrorText,
     registerErrorText,
     resetErrorText,
@@ -25,11 +29,7 @@ function Home({
     registerPreFill,
     initialNewsPosts,
 }: Props) {
-    const [displayLogin, setDisplayLogin] = React.useState((loginErrorText != "" || loginMessageText != "") ? true : false);
-    const [displayRegister, setDisplayRegister] = React.useState(registerErrorText == "" ? false : true);
-    const [displayReset, setDisplayReset] = React.useState(resetErrorText == "" ? false : true);
-    const [displayRules, setDisplayRules] = React.useState(false);
-    const [displayTerms, setDisplayTerms] = React.useState(false);
+    const [loginDisplay, setLoginDisplay] = React.useState(initialLoginDisplay);
     const [newsPosts, setNewsPosts] = React.useState(initialNewsPosts);
     const newsRef = React.useRef(null);
     const contactRef = React.useRef(null);
@@ -37,16 +37,9 @@ function Home({
     return (
         <>
             <LoginSection
-                displayLogin={displayLogin}
-                setDisplayLogin={setDisplayLogin}
-                displayRegister={displayRegister}
-                setDisplayRegister={setDisplayRegister}
-                displayReset={displayReset}
-                setDisplayReset={setDisplayReset}
-                displayRules={displayRules}
-                setDisplayRules={setDisplayRules}
-                displayTerms={displayTerms}
-                setDisplayTerms={setDisplayTerms}
+                version={version}
+                loginDisplay={loginDisplay}
+                setLoginDisplay={setLoginDisplay}
                 loginErrorText={loginErrorText}
                 registerErrorText={registerErrorText}
                 resetErrorText={resetErrorText}
@@ -58,8 +51,8 @@ function Home({
             <NewsSection
                 newsRef={newsRef}
                 newsPosts={newsPosts}
-                githubLink={githubLink}
-                discordLink={discordLink}
+                githubLink={homeLinks['github']}
+                discordLink={homeLinks['discord']}
             />
             <FeatureSection />
             <WorldSection />
@@ -72,16 +65,9 @@ function Home({
 }
 
 function LoginSection({
-    displayLogin,
-    setDisplayLogin,
-    displayRegister,
-    setDisplayRegister,
-    displayReset,
-    setDisplayReset,
-    displayRules,
-    setDisplayRules,
-    displayTerms,
-    setDisplayTerms,
+    version,
+    loginDisplay,
+    setLoginDisplay,
     loginErrorText,
     registerErrorText,
     resetErrorText,
@@ -91,52 +77,23 @@ function LoginSection({
     contactRef,
 }) {
     function handleLogin() {
-        setDisplayRegister(false);
-        setDisplayReset(false);
-        setDisplayRules(false);
-        setDisplayTerms(false);
-        if (!displayLogin) {
-            setDisplayLogin(true);
+        if (loginDisplay != "login") {
+            setLoginDisplay("login");
         }
         else {
             document.getElementById('login_form').submit();
         }
     }
     function handleRegister() {
-        setDisplayReset(false);
-        setDisplayLogin(false);
-        setDisplayRules(false);
-        setDisplayTerms(false);
-        if (!displayRegister) {
-            setDisplayRegister(true);
+        if (loginDisplay != "register") {
+            setLoginDisplay("register");
         }
         else {
             document.getElementById('register_form').submit();
         }
     }
-    function handleDisplayReset() {
-        setDisplayLogin(false);
-        setDisplayRegister(false);
-        setDisplayRules(false);
-        setDisplayTerms(false);
-        setDisplayReset(true);
-    }
     function handleReset() {
         document.getElementById('reset_form').submit();
-    }
-    function handleRules() {
-        setDisplayLogin(false);
-        setDisplayRegister(false);
-        setDisplayReset(false);
-        setDisplayTerms(false);
-        setDisplayRules(true);
-    }
-    function handleTerms() {
-        setDisplayLogin(false);
-        setDisplayRegister(false);
-        setDisplayReset(false);
-        setDisplayRules(false);
-        setDisplayTerms(true);
     }
     function scrollTo(element) {
         element.scrollIntoView({ behavior: 'smooth' });
@@ -146,9 +103,9 @@ function LoginSection({
             <div className="login_center_wrapper">
                 <div className="login_center_inner">
                     <div className="login_inner_title"><img src="/images/v2/decorations/homepagelogo.png" /></div>
-                    <div className="login_inner_version">0.9 MAKE THINGS LOOK GOOD</div>
+                    <div className="login_inner_version">{version}</div>
                     <div className="login_inner_input_container">
-                        {displayLogin &&
+                        {loginDisplay == "login" &&
                             <form id="login_form" action="" method="post" style={{ zIndex: 1 }}>
                             <div className="login_input_top">
                                 <div className="login_username_wrapper">
@@ -168,13 +125,13 @@ function LoginSection({
                             }
                             {loginErrorText != "" &&
                                 <div className="login_input_bottom">
-                                    <div className="login_error_label">{loginErrorText}</div>
-                                    <div className="reset_link" onClick={() => handleDisplayReset()}>reset password</div>
+                                <div className="login_error_label">{loginErrorText}</div>
+                                <div className="reset_link" onClick={() => setLoginDisplay("reset")}>reset password</div>
                                 </div>
                             }
                             </form>
                         }
-                        {displayRegister &&
+                        {loginDisplay == "register" &&
                             <form id="register_form" action="" method="post" style={{ zIndex: 3 }}>
                             <div className="register_input_top">
                                 <input type="hidden" name="register" value="register" />
@@ -183,7 +140,7 @@ function LoginSection({
                                         <label className="register_field_label">username</label>
                                         <input type="text" name="user_name" className="register_username_input login_text_input" defaultValue={registerPreFill.user_name}/>
                                     </div>
-                                    <div className="register_close" onClick={() => setDisplayRegister(false)}>close</div>
+                                    <div className="register_close" onClick={() => setLoginDisplay("none")}>close</div>
                                 </div>
                                 <div className="register_password_container">
                                     <div className="register_password_wrapper">
@@ -260,7 +217,7 @@ function LoginSection({
                             }
                             </form>
                         }
-                        {displayReset &&
+                        {loginDisplay == "reset" &&
                             <form id="reset_form" action="" method="post" style={{ zIndex: 1 }}>
                             <div className="reset_input_top">
                                 <input type="hidden" name="reset" value="reset" />
@@ -282,11 +239,11 @@ function LoginSection({
                             </div>
                             </form>
                         }
-                        {displayRules &&
+                        {loginDisplay == "rules" &&
                             <div className="rules_modal" style={{ zIndex: 5 }}>
                                 <div className="rules_header">
-                                    <div className="rules_title">rules</div>
-                                <div className="rules_close" onClick={() => setDisplayRules(false)}>close</div>
+                                <div className="rules_title">rules</div>
+                                <div className="rules_close" onClick={() => setLoginDisplay("none")}>close</div>
                                 </div>
                                 <div className="rules_content">
                                     These rules are meant to serve as a guideline for on-site behavior. Case-by-case interpretation and enforcement is at the
@@ -385,11 +342,11 @@ function LoginSection({
                                 </div>
                             </div>
                         }
-                        {displayTerms &&
+                        {loginDisplay == "terms" &&
                             <div className="terms_modal" style={{ zIndex: 5 }}>
                                 <div className="terms_header">
                                 <div className="terms_title">terms of service</div>
-                                <div className="terms_close" onClick={() => setDisplayTerms(false)}>close</div>
+                                <div className="terms_close" onClick={() => setLoginDisplay("none")}>close</div>
                                 </div>
                                 <div className="terms_content">
                                     Shinobi-chronicles.com is a fan site: We did not create Naruto nor any of the characters and content in Naruto. While inspired by
@@ -419,11 +376,27 @@ function LoginSection({
                             </div>
                         }
                         <svg role="button" tabIndex="0" name="login" className="login_button" width="162" height="32" onClick={() => handleLogin()} style={{ zIndex: 2 }}>
-                            <rect className="login_button_background" width="100%" height="100%" />
+                            <radialGradient id="login_fill_default" cx="50%" cy="50%" r="50%" fx="50%" fy="50%">
+                                <stop offset="0%" style={{ stopColor: '#464f87', stopOpacity: 1 }} />
+                                <stop offset="100%" style={{ stopColor: '#343d77', stopOpacity: 1 }} />
+                            </radialGradient>
+                            <radialGradient id="login_fill_click" cx="50%" cy="50%" r="50%" fx="50%" fy="50%">
+                                <stop offset="0%" style={{ stopColor: '#343d77', stopOpacity: 1 }} />
+                                <stop offset="100%" style={{ stopColor: '#464f87', stopOpacity: 1 }} />
+                            </radialGradient>
+                            <rect className="login_button_background" width="100%" height="100%" fill="url(#login_fill_default)"/>
                             <text className="login_button_shadow_text" x="81" y="18" textAnchor="middle" dominantBaseline="middle">login</text>
                             <text className="login_button_text" x="81" y="16" textAnchor="middle" dominantBaseline="middle">login</text>
                         </svg>
-                        <svg role="button" tabIndex="0" name="register" className="register_button" width="162" height="32" onClick={() => handleRegister()} style={{zIndex:4}}>
+                        <svg role="button" tabIndex="0" name="register" className="register_button" width="162" height="32" onClick={() => handleRegister()} style={{ zIndex: 4 }}>
+                            <radialGradient id="register_fill_default" cx="50%" cy="50%" r="50%" fx="50%" fy="50%">
+                                <stop offset="0%" style={{ stopColor: '#84314e', stopOpacity: 1 }} />
+                                <stop offset="100%" style={{ stopColor: '#68293f', stopOpacity: 1 }} />
+                            </radialGradient>
+                            <radialGradient id="register_fill_click" cx="50%" cy="50%" r="50%" fx="50%" fy="50%">
+                                <stop offset="0%" style={{ stopColor: '#68293f', stopOpacity: 1 }} />
+                                <stop offset="100%" style={{ stopColor: '#84314e', stopOpacity: 1 }} />
+                            </radialGradient>
                             <rect className="register_button_background" width="100%" height="100%" />
                             <text className="register_button_shadow_text" x="81" y="18" textAnchor="middle" dominantBaseline="middle">create a character</text>
                             <text className="register_button_text" x="81" y="16" textAnchor="middle" dominantBaseline="middle">create a character</text>
@@ -450,7 +423,7 @@ function LoginSection({
             </div>
             <div className="login_rules_button">
                 <div className="home_diamond_container">
-                    <svg className="home_diamond_svg" width="100" height="100" role="button" tabIndex="0" style={{ transform: "scale(0.85)" }} onClick={() => handleRules()}>
+                    <svg className="home_diamond_svg" width="100" height="100" role="button" tabIndex="0" style={{ transform: "scale(0.85)" }} onClick={() => setLoginDisplay("rules")}>
                         <g className={"home_diamond_rotategroup diamond_blue"} transform="rotate(45 50 50)">
                             <rect className="home_diamond_rear" x="29" y="29" width="78" height="78" />
                             <rect className="home_diamond_up" x="4" y="4" width="45" height="45" />
@@ -465,7 +438,7 @@ function LoginSection({
             </div>
             <div className="login_terms_button">
                 <div className="home_diamond_container">
-                    <svg className="home_diamond_svg" width="100" height="100" role="button" tabIndex="0" style={{ transform: "scale(0.85)" }} onClick={() => handleTerms()}>
+                    <svg className="home_diamond_svg" width="100" height="100" role="button" tabIndex="0" style={{ transform: "scale(0.85)" }} onClick={() => setLoginDisplay("terms")}>
                         <g className={"home_diamond_rotategroup diamond_red"} transform="rotate(45 50 50)">
                             <rect className="home_diamond_rear" x="29" y="29" width="78" height="78" />
                             <rect className="home_diamond_up" x="4" y="4" width="45" height="45" />
@@ -551,12 +524,12 @@ function NewsSection({ newsRef, newsPosts, githubLink, discordLink }) {
                 <div className={activePostId == newsItem.post_id ? "news_item_header" : "news_item_header news_item_header_minimized"} onClick={() => setActivePostId(newsItem.post_id)}>
                     <div className="news_item_title">{newsItem.title.toUpperCase()}</div>
                     <div className="news_item_version">{newsItem.version && newsItem.version.toUpperCase()}</div>
-                        {newsItem.tags.map((tag, index) => (
-                            <>
-                                <div className="news_item_tag_divider">/</div>
-                                <div className="news_item_tag">{tag.toUpperCase()}</div>
-                            </>
-                        ))}
+                    {newsItem.tags.map((tag, index) => (
+                        <div key={index} className="news_item_tag_container">
+                            <div className="news_item_tag_divider">/</div>
+                            <div className="news_item_tag">{tag.toUpperCase()}</div>
+                        </div>
+                    ))}
                     <div className="news_item_details">POSTED {formatNewsDate(newsItem.time)} BY {newsItem.sender.toUpperCase()}</div>
                 </div>
                 {activePostId == newsItem.post_id &&
@@ -583,8 +556,8 @@ function NewsSection({ newsRef, newsPosts, githubLink, discordLink }) {
                 </div>
             </div>
             <div className="news_item_container">
-                {newsPosts.map((newsItem, index) => (
-                    <NewsItem key={index} newsItem={newsItem} />
+                {newsPosts.map((newsItem) => (
+                    <NewsItem key={newsItem.post_id} newsItem={newsItem} />
                 ))}
             </div>
         </div>
