@@ -30,8 +30,8 @@ class NewsApiPresenter {
      * @param NewsPostDto[] $newsPosts
      * @return array
      */
-    public static function savePostResponse(NewsManager $newsManager, System $system, int $post_id, string $title, string $version, string $content, bool $update, bool $bugfix, bool $event, int $num_posts = 8): array {
-            $newsManager->saveNewsPost($post_id, $title, $version, $content, $update, $bugfix, $event);
+    public static function savePostResponse(NewsManager $newsManager, System $system, NewsPostDto $newsPost, int $num_posts = 8): array {
+            $newsManager->saveNewsPost($newsPost);
             return array_map(
                 function (NewsPostDto $post) use ($system) {
                     $message = $post->message;

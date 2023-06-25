@@ -37,16 +37,26 @@ try {
             ];
             break;
         case "saveNewsPost":
-            $post_id = $system->db->clean($_POST['post_id']);
-            $title = $system->db->clean($_POST['title']);
-            $version = $system->db->clean($_POST['version']);
-            $content = $system->db->clean($_POST['content']);
-            $update = $system->db->clean($_POST['update']) === "true";
-            $bugfix = $system->db->clean($_POST['bugfix']) === "true";
-            $event = $system->db->clean($_POST['event']) === "true";
+            $tags = [];
+            if ($system->db->clean($_POST['update']) === "true") {
+                array_push($tags, "update");
+            }
+            if ($system->db->clean($_POST['bugfix']) === "true") {
+                array_push($tags, "bugfix");
+            }
+            if ($system->db->clean($_POST['event']) === "true") {
+                array_push($tags, "event");
+            }
+            $newsPost = new NewsPostDto(
+                post_id: $system->db->clean($_POST['post_id']),
+                title: $system->db->clean($_POST['title']),
+                version: $system->db->clean($_POST['version']),
+                message: $system->db->clean($_POST['content']),
+                tags: $tags,
+            );
             $num_posts = $system->db->clean($_POST['num_posts']);
             $NewsAPIResponse->response_data = [
-                'postData' => NewsAPIPresenter::savePostResponse($NewsManager, $system, $post_id, $title, $version, $content, $update, $bugfix, $event, $num_posts),
+                'postData' => NewsAPIPresenter::savePostResponse($NewsManager, $system, $newsPost, $num_posts),
             ];
             break;
         default:
