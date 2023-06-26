@@ -33,10 +33,10 @@ class NewsManager {
     {
         if ($this->player->isHeadAdmin()) {
             $tags = json_encode($newsPost->tags);
-            $time = microtime();
+            $time = time();
             if ($newsPost->post_id == 0) {
                 $this->system->db->query("INSERT INTO `news_posts` (`sender`, `title`, `message`, `time`, `tags`, `version`)
-                    VALUES ('{$this->player->user_name}', '{$newsPost->title}', '{$newsPost->message}', '{$time}', {$tags}, '{$newsPost->version}')");
+                    VALUES ('{$this->player->user_name}', '{$newsPost->title}', '{$newsPost->message}', '{$time}', '{$tags}', '{$newsPost->version}')");
             } else {
                 $this->system->db->query("UPDATE `news_posts` SET `title` = '{$newsPost->title}', `message` = '{$newsPost->message}', `tags` = '{$tags}', `version` = '{$newsPost->version}' WHERE `post_id` = '{$newsPost->post_id}'");
             }

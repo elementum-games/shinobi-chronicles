@@ -55,7 +55,8 @@ function Home({
     src: "../../../images/v2/icons/discordhover.png"
   })))), /*#__PURE__*/React.createElement(News, {
     initialNewsPosts: initialNewsPosts,
-    isAdmin: isAdmin
+    isAdmin: isAdmin,
+    version: version
   })), /*#__PURE__*/React.createElement(FeatureSection, null), /*#__PURE__*/React.createElement(WorldSection, null), /*#__PURE__*/React.createElement(ContactSection, {
     contactRef: contactRef
   }), /*#__PURE__*/React.createElement(FooterSection, null));
@@ -187,10 +188,10 @@ function MainBannerSection({
   }, resetErrorText), /*#__PURE__*/React.createElement("div", {
     className: "reset_link",
     onClick: () => handleReset()
-  }, "send email"))), !isLoggedIn && /*#__PURE__*/React.createElement(LoginButtons, {
+  }, "send email"))), !isLoggedIn && /*#__PURE__*/React.createElement(LoggedInButtons, {
     handleLogin: handleLogin,
     handleRegister: handleRegister
-  }), isLoggedIn && /*#__PURE__*/React.createElement(LogoutButtons, {
+  }), isLoggedIn && /*#__PURE__*/React.createElement(LoggedOutButtons, {
     homeLinks: homeLinks
   })), /*#__PURE__*/React.createElement("div", {
     className: "banner_button news"
@@ -421,7 +422,7 @@ function FooterSection({}) {
   }, "SHINOBI CHRONICLES V0.9.0 COPYRIGHT \xA9 LM VISIONS"));
 }
 
-function LoginButtons({
+function LoggedInButtons({
   handleLogin,
   handleRegister
 }) {
@@ -559,7 +560,7 @@ function LoginButtons({
   }, "create a character")));
 }
 
-function LogoutButtons({
+function LoggedOutButtons({
   homeLinks
 }) {
   return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("a", {

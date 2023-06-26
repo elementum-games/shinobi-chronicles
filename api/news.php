@@ -2,12 +2,14 @@
 
 # Begin standard auth
 require_once __DIR__ . "/../classes.php";
+require_once __DIR__ . "/../classes/LoggedOutException.php";
 
 $system = API::init();
 
 try {
     $player = Auth::getUserFromSession($system);
-    $player->loadData(User::UPDATE_REGEN);
+    $player->loadData(User::UPDATE_NOTHING);
+} catch (LoggedOutException $e) {
 } catch (Exception $e) {
     API::exitWithException($e, system: $system);
 }
@@ -22,7 +24,7 @@ try {
     }
 
     $NewsAPIResponse = new NewsAPIResponse();
-    $NewsManager = new NewsManager($system, $player);
+    $NewsManager = new NewsManager($system, $player ?? null);
 
     switch ($request) {
         case "getLatestPosts":
@@ -57,7 +59,7 @@ try {
             $num_posts = $system->db->clean($_POST['num_posts']);
             $NewsManager->saveNewsPost($newsPost);
             $NewsAPIResponse->response_data = [
-                'postData' => NewsAPIPresenter::savePostResponse($NewsManager, $system, $newsPost, $num_posts),
+                'postData' => NewsAPIPresenter::newsPostResponse($NewsManager, $system, $num_posts),
             ];
             break;
         default:

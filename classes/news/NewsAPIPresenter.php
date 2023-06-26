@@ -2,11 +2,12 @@
 
 class NewsApiPresenter {
     /**
-     * @param NewsPostDto[] $newsPosts
+     * @param NewsManager $newsManager
+     * @param System      $system
+     * @param int         $num_posts
      * @return array
      */
-    public static function newsPostResponse(NewsManager $newsManager, System $system, int $num_posts = 8): array
-    {
+    public static function newsPostResponse(NewsManager $newsManager, System $system, int $num_posts = 8): array {
         return array_map(
             function (NewsPostDto $post) use ($system) {
                 $message = $post->message;
@@ -23,30 +24,6 @@ class NewsApiPresenter {
                 ];
             },
             $newsManager->getNewsPosts($num_posts)
-        );
-    }
-
-    /**
-     * @param NewsPostDto[] $newsPosts
-     * @return array
-     */
-    public static function savePostResponse(NewsManager $newsManager, System $system, NewsPostDto $newsPost, int $num_posts = 8): array {
-            return array_map(
-                function (NewsPostDto $post) use ($system) {
-                    $message = $post->message;
-                    $message = str_replace("\n", "<br />", $message);
-                    $message = wordwrap($system->html_parse(stripslashes($message), true), 90, "\n", true);
-                    return [
-                        'post_id' => $post->post_id,
-                        'sender' => $post->sender,
-                        'title' => $post->title,
-                        'message' => $message,
-                        'time' => $post->time,
-                        'tags' => $post->tags,
-                        'version' => $post->version,
-                    ];
-                },
-                $newsManager->getNewsPosts($num_posts)
         );
     }
 }
