@@ -33,7 +33,7 @@ $reset_error_text = "";
 $initial_login_display = "none";
 $register_pre_fill = [];
 $home_links = [];
-$home_links['newsAPI'] = $system->router->api_links['news'];
+$home_links['news_api'] = $system->router->api_links['news'];
 $home_links['logout'] = $system->router->base_url . "?logout=1";
 $home_links['profile'] = $system->router->getUrl('profile');
 $home_links['github'] = $system->router->links['github'];
@@ -595,48 +595,57 @@ if($LOGGED_IN) {
             }
         }
     }
-    else {
+    else if (isset($_GET['home_view'])) {
         if ($system->environment == System::ENVIRONMENT_DEV) {
-            $layout = $system->fetchLayoutByName("new_geisha");
-            $layout->renderBeforeContentHTML($system, $player ?? null, "Home", custom_page: true);
-            if (!$player->global_message_viewed) {
-                $global_message = $system->fetchGlobalMessage();
-                $layout->renderGlobalMessage($system, $global_message);
+            $home_view = "default";
+            switch ($_GET['home_view']) {
+                case "news":
+                    $home_view = "news";
+                    break;
+                case "contact":
+                    $home_view = "contact";
+                    break;
+                case "rules":
+                    $home_view = "rules";
+                    break;
+                case "terms":
+                    $home_view = "terms";
+                    break;
             }
+            $layout->renderBeforeContentHTML($system, $player ?? null, "Home", custom_page: true);
             try {
                 require('./templates/home.php');
-                $page_load_time = round(microtime(true) - $PAGE_LOAD_START, 3);
-                $layout->renderAfterContentHTML($system, $player ?? null, $page_load_time);
-                $system->db->commitTransaction();
-                exit;
             } catch (RuntimeException $e) {
                 $system->db->rollbackTransaction();
                 $system->message($e->getMessage());
                 $system->printMessage(true);
             }
-        } else {
-            $layout->renderBeforeContentHTML(
-                system: $system,
-                player: $player,
-                page_title: "Profile"
-            );
+            $layout->renderAfterContentHTML($system, $player ?? null, custom_page: true);
+            $page_load_time = round(microtime(true) - $PAGE_LOAD_START, 3);
+            $system->db->commitTransaction();
+        }
+    }
+    else {
+        $layout->renderBeforeContentHTML(
+            system: $system,
+            player: $player,
+            page_title: "Profile"
+        );
 
-            $system->printMessage();
-            if (!$player->global_message_viewed) {
-                $global_message = $system->fetchGlobalMessage();
-                $layout->renderGlobalMessage($system, $global_message);
-            }
-
-            try {
-                require("pages/profile.php");
-                userProfile();
-            } catch (RuntimeException $e) {
-                $system->db->rollbackTransaction();
-                $system->message($e->getMessage());
-                $system->printMessage(true);
-            }
+        $system->printMessage();
+        if (!$player->global_message_viewed) {
+            $global_message = $system->fetchGlobalMessage();
+            $layout->renderGlobalMessage($system, $global_message);
         }
 
+        try {
+            require("pages/profile.php");
+            userProfile();
+        } catch (RuntimeException $e) {
+            $system->db->rollbackTransaction();
+            $system->message($e->getMessage());
+            $system->printMessage(true);
+        }
     }
 
     $player->updateData();

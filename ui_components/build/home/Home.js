@@ -31,8 +31,9 @@ function Home({
     contactRef: contactRef
   }), /*#__PURE__*/React.createElement(NewsSection, {
     newsRef: newsRef,
-    newsPosts: newsPosts,
-    homeLinks: homeLinks
+    initialNewsPosts: initialNewsPosts,
+    homeLinks: homeLinks,
+    isAdmin: isAdmin
   }), /*#__PURE__*/React.createElement(FeatureSection, null), /*#__PURE__*/React.createElement(WorldSection, null), /*#__PURE__*/React.createElement(ContactSection, {
     contactRef: contactRef
   }), /*#__PURE__*/React.createElement(FooterSection, null));
@@ -360,262 +361,12 @@ function LoginSection({
     onClick: () => setLoginDisplay("none")
   }, "close")), /*#__PURE__*/React.createElement("div", {
     className: "terms_content"
-  }, "Shinobi-chronicles.com is a fan site: We did not create Naruto nor any of the characters and content in Naruto. While inspired by Naruto, the content of this site is fan-made and not meant to infringe upon any copyrights, it is simply here to further the continuing popularity of Japanese animation. In no event will shinobi-chronicles.com, its host, and any other companies and/or sites linked to shinobi-chronicles.com be liable to any party for any direct, indirect, special or other consequential damages for any use of this website, or on any other hyperlinked website, including, without limitation, any lost profits, loss of programs or other data on your information handling system or otherwise, even if we are expressly advised of the possibility of such damages.", /*#__PURE__*/React.createElement("br", null), /*#__PURE__*/React.createElement("p", null, "Shinobi-chronicles.com accepts no responsibility for the actions of its members i.e. Self harm, vandalism, suicide, homicide, genocide, drug abuse, changes in sexual orientation, or bestiality. Shinobi-chronicles.com will not be held responsible and does not encourage any of the above actions or any other form of anti social behaviour. The staff of shinobi-chronicles.com reserve the right to issue bans and/or account deletion for rule infractions. Rule infractions will be determined at the discretion of the moderating staff."), /*#__PURE__*/React.createElement("p", null, "Loans or transactions of real or in-game currency are between players. Staff take no responsibility for the completion of them. If a player loans real or in-game currency to another player, staff will not be responsible for ensuring the currency is returned."), /*#__PURE__*/React.createElement("p", null, "Ancient Kunai(Premium credits) that have already been spent on in-game purchases of any kind or traded to another player cannot be refunded. Staff are not responsible for lost shards or time on Forbidden Seals lost due to user bans."), /*#__PURE__*/React.createElement("br", null), "The Naruto series is created by and copyright Masashi Kishimoto and TV Tokyo, all rights reserved.")), !isLoggedIn && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("svg", {
-    role: "button",
-    tabIndex: "0",
-    name: "login",
-    className: "login_button",
-    width: "162",
-    height: "32",
-    onClick: () => handleLogin(),
-    style: {
-      zIndex: 2
-    }
-  }, /*#__PURE__*/React.createElement("radialGradient", {
-    id: "login_fill_default",
-    cx: "50%",
-    cy: "50%",
-    r: "50%",
-    fx: "50%",
-    fy: "50%"
-  }, /*#__PURE__*/React.createElement("stop", {
-    offset: "0%",
-    style: {
-      stopColor: '#464f87',
-      stopOpacity: 1
-    }
-  }), /*#__PURE__*/React.createElement("stop", {
-    offset: "100%",
-    style: {
-      stopColor: '#343d77',
-      stopOpacity: 1
-    }
-  })), /*#__PURE__*/React.createElement("radialGradient", {
-    id: "login_fill_click",
-    cx: "50%",
-    cy: "50%",
-    r: "50%",
-    fx: "50%",
-    fy: "50%"
-  }, /*#__PURE__*/React.createElement("stop", {
-    offset: "0%",
-    style: {
-      stopColor: '#343d77',
-      stopOpacity: 1
-    }
-  }), /*#__PURE__*/React.createElement("stop", {
-    offset: "100%",
-    style: {
-      stopColor: '#464f87',
-      stopOpacity: 1
-    }
-  })), /*#__PURE__*/React.createElement("rect", {
-    className: "login_button_background",
-    width: "100%",
-    height: "100%",
-    fill: "url(#login_fill_default)"
-  }), /*#__PURE__*/React.createElement("text", {
-    className: "login_button_shadow_text",
-    x: "81",
-    y: "18",
-    textAnchor: "middle",
-    dominantBaseline: "middle"
-  }, "login"), /*#__PURE__*/React.createElement("text", {
-    className: "login_button_text",
-    x: "81",
-    y: "16",
-    textAnchor: "middle",
-    dominantBaseline: "middle"
-  }, "login")), /*#__PURE__*/React.createElement("svg", {
-    role: "button",
-    tabIndex: "0",
-    name: "register",
-    className: "register_button",
-    width: "162",
-    height: "32",
-    onClick: () => handleRegister(),
-    style: {
-      zIndex: 4
-    }
-  }, /*#__PURE__*/React.createElement("radialGradient", {
-    id: "register_fill_default",
-    cx: "50%",
-    cy: "50%",
-    r: "50%",
-    fx: "50%",
-    fy: "50%"
-  }, /*#__PURE__*/React.createElement("stop", {
-    offset: "0%",
-    style: {
-      stopColor: '#84314e',
-      stopOpacity: 1
-    }
-  }), /*#__PURE__*/React.createElement("stop", {
-    offset: "100%",
-    style: {
-      stopColor: '#68293f',
-      stopOpacity: 1
-    }
-  })), /*#__PURE__*/React.createElement("radialGradient", {
-    id: "register_fill_click",
-    cx: "50%",
-    cy: "50%",
-    r: "50%",
-    fx: "50%",
-    fy: "50%"
-  }, /*#__PURE__*/React.createElement("stop", {
-    offset: "0%",
-    style: {
-      stopColor: '#68293f',
-      stopOpacity: 1
-    }
-  }), /*#__PURE__*/React.createElement("stop", {
-    offset: "100%",
-    style: {
-      stopColor: '#84314e',
-      stopOpacity: 1
-    }
-  })), /*#__PURE__*/React.createElement("rect", {
-    className: "register_button_background",
-    width: "100%",
-    height: "100%"
-  }), /*#__PURE__*/React.createElement("text", {
-    className: "register_button_shadow_text",
-    x: "81",
-    y: "18",
-    textAnchor: "middle",
-    dominantBaseline: "middle"
-  }, "create a character"), /*#__PURE__*/React.createElement("text", {
-    className: "register_button_text",
-    x: "81",
-    y: "16",
-    textAnchor: "middle",
-    dominantBaseline: "middle"
-  }, "create a character"))), isLoggedIn && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("a", {
-    href: homeLinks['profile']
-  }, /*#__PURE__*/React.createElement("svg", {
-    role: "button",
-    tabIndex: "0",
-    className: "profile_button",
-    width: "162",
-    height: "32"
-  }, /*#__PURE__*/React.createElement("radialGradient", {
-    id: "profile_fill_default",
-    cx: "50%",
-    cy: "50%",
-    r: "50%",
-    fx: "50%",
-    fy: "50%"
-  }, /*#__PURE__*/React.createElement("stop", {
-    offset: "0%",
-    style: {
-      stopColor: '#464f87',
-      stopOpacity: 1
-    }
-  }), /*#__PURE__*/React.createElement("stop", {
-    offset: "100%",
-    style: {
-      stopColor: '#343d77',
-      stopOpacity: 1
-    }
-  })), /*#__PURE__*/React.createElement("radialGradient", {
-    id: "profile_fill_click",
-    cx: "50%",
-    cy: "50%",
-    r: "50%",
-    fx: "50%",
-    fy: "50%"
-  }, /*#__PURE__*/React.createElement("stop", {
-    offset: "0%",
-    style: {
-      stopColor: '#343d77',
-      stopOpacity: 1
-    }
-  }), /*#__PURE__*/React.createElement("stop", {
-    offset: "100%",
-    style: {
-      stopColor: '#464f87',
-      stopOpacity: 1
-    }
-  })), /*#__PURE__*/React.createElement("rect", {
-    className: "profile_button_background",
-    width: "100%",
-    height: "100%"
-  }), /*#__PURE__*/React.createElement("text", {
-    className: "profile_button_shadow_text",
-    x: "81",
-    y: "18",
-    textAnchor: "middle",
-    dominantBaseline: "middle"
-  }, "profile"), /*#__PURE__*/React.createElement("text", {
-    className: "profile_button_text",
-    x: "81",
-    y: "16",
-    textAnchor: "middle",
-    dominantBaseline: "middle"
-  }, "profile"))), /*#__PURE__*/React.createElement("a", {
-    href: homeLinks['logout']
-  }, /*#__PURE__*/React.createElement("svg", {
-    role: "button",
-    tabIndex: "0",
-    className: "logout_button",
-    width: "162",
-    height: "32"
-  }, /*#__PURE__*/React.createElement("radialGradient", {
-    id: "logout_fill_default",
-    cx: "50%",
-    cy: "50%",
-    r: "50%",
-    fx: "50%",
-    fy: "50%"
-  }, /*#__PURE__*/React.createElement("stop", {
-    offset: "0%",
-    style: {
-      stopColor: '#84314e',
-      stopOpacity: 1
-    }
-  }), /*#__PURE__*/React.createElement("stop", {
-    offset: "100%",
-    style: {
-      stopColor: '#68293f',
-      stopOpacity: 1
-    }
-  })), /*#__PURE__*/React.createElement("radialGradient", {
-    id: "logout_fill_click",
-    cx: "50%",
-    cy: "50%",
-    r: "50%",
-    fx: "50%",
-    fy: "50%"
-  }, /*#__PURE__*/React.createElement("stop", {
-    offset: "0%",
-    style: {
-      stopColor: '#68293f',
-      stopOpacity: 1
-    }
-  }), /*#__PURE__*/React.createElement("stop", {
-    offset: "100%",
-    style: {
-      stopColor: '#84314e',
-      stopOpacity: 1
-    }
-  })), /*#__PURE__*/React.createElement("rect", {
-    className: "logout_button_background",
-    width: "100%",
-    height: "100%"
-  }), /*#__PURE__*/React.createElement("text", {
-    className: "logout_button_shadow_text",
-    x: "81",
-    y: "18",
-    textAnchor: "middle",
-    dominantBaseline: "middle"
-  }, "logout"), /*#__PURE__*/React.createElement("text", {
-    className: "logout_button_text",
-    x: "81",
-    y: "16",
-    textAnchor: "middle",
-    dominantBaseline: "middle"
-  }, "logout"))))))), /*#__PURE__*/React.createElement("div", {
+  }, "Shinobi-chronicles.com is a fan site: We did not create Naruto nor any of the characters and content in Naruto. While inspired by Naruto, the content of this site is fan-made and not meant to infringe upon any copyrights, it is simply here to further the continuing popularity of Japanese animation. In no event will shinobi-chronicles.com, its host, and any other companies and/or sites linked to shinobi-chronicles.com be liable to any party for any direct, indirect, special or other consequential damages for any use of this website, or on any other hyperlinked website, including, without limitation, any lost profits, loss of programs or other data on your information handling system or otherwise, even if we are expressly advised of the possibility of such damages.", /*#__PURE__*/React.createElement("br", null), /*#__PURE__*/React.createElement("p", null, "Shinobi-chronicles.com accepts no responsibility for the actions of its members i.e. Self harm, vandalism, suicide, homicide, genocide, drug abuse, changes in sexual orientation, or bestiality. Shinobi-chronicles.com will not be held responsible and does not encourage any of the above actions or any other form of anti social behaviour. The staff of shinobi-chronicles.com reserve the right to issue bans and/or account deletion for rule infractions. Rule infractions will be determined at the discretion of the moderating staff."), /*#__PURE__*/React.createElement("p", null, "Loans or transactions of real or in-game currency are between players. Staff take no responsibility for the completion of them. If a player loans real or in-game currency to another player, staff will not be responsible for ensuring the currency is returned."), /*#__PURE__*/React.createElement("p", null, "Ancient Kunai(Premium credits) that have already been spent on in-game purchases of any kind or traded to another player cannot be refunded. Staff are not responsible for lost shards or time on Forbidden Seals lost due to user bans."), /*#__PURE__*/React.createElement("br", null), "The Naruto series is created by and copyright Masashi Kishimoto and TV Tokyo, all rights reserved.")), !isLoggedIn && /*#__PURE__*/React.createElement(LoginButtons, {
+    handleLogin: handleLogin,
+    handleRegister: handleRegister
+  }), isLoggedIn && /*#__PURE__*/React.createElement(LogoutButtons, {
+    homeLinks: homeLinks
+  })))), /*#__PURE__*/React.createElement("div", {
     className: "login_news_button"
   }, /*#__PURE__*/React.createElement("div", {
     className: "home_diamond_container"
@@ -873,10 +624,20 @@ function LoginSection({
 }
 function NewsSection({
   newsRef,
-  newsPosts,
-  homeLinks
+  initialNewsPosts,
+  homeLinks,
+  isAdmin
 }) {
-  const [activePostId, setActivePostId] = React.useState(newsPosts[0] != "undefined" ? newsPosts[0].post_id : null);
+  const [activePostId, setActivePostId] = React.useState(initialNewsPosts[0] != "undefined" ? initialNewsPosts[0].post_id : null);
+  const [editPostId, setEditPostId] = React.useState(null);
+  const [numPosts, setNumPosts] = React.useState(initialNewsPosts.length);
+  const [newsPosts, setNewsPosts] = React.useState(initialNewsPosts);
+  const titleRef = React.useRef(null);
+  const versionRef = React.useRef(null);
+  const contentRef = React.useRef(null);
+  const updateTagRef = React.useRef(null);
+  const bugfixTagRef = React.useRef(null);
+  const eventTagRef = React.useRef(null);
   function formatNewsDate(ticks) {
     var date = new Date(ticks * 1000);
     var formattedDate = date.toLocaleDateString('en-US', {
@@ -885,6 +646,33 @@ function NewsSection({
       year: '2-digit'
     });
     return formattedDate;
+  }
+  function cleanNewsContents(contents) {
+    console.log(contents);
+    const parser = new DOMParser();
+    const decodedString = parser.parseFromString(contents.replace(/[\r\n]+/g, " ").replace(/<br\s*\/?>/g, '\n'), 'text/html').body.textContent;
+    return decodedString;
+  }
+  function saveNewsItem(postId) {
+    console.log(contentRef.current.value);
+    apiFetch(homeLinks.news_api, {
+      request: 'saveNewsPost',
+      post_id: postId,
+      title: titleRef.current.textContent,
+      version: versionRef.current.textContent,
+      content: contentRef.current.value,
+      update: updateTagRef.current.checked,
+      bugfix: bugfixTagRef.current.checked,
+      event: eventTagRef.current.checked,
+      num_posts: numPosts
+    }).then(response => {
+      if (response.errors.length) {
+        console.warn(response.errors);
+      } else {
+        setNewsPosts(response.data.postData);
+      }
+    });
+    setEditPostId(null);
   }
   function NewsItem({
     newsItem
@@ -906,14 +694,88 @@ function NewsSection({
     }, "/"), /*#__PURE__*/React.createElement("div", {
       className: "news_item_tag"
     }, tag.toUpperCase()))), /*#__PURE__*/React.createElement("div", {
+      className: "news_item_details_container"
+    }, isAdmin && /*#__PURE__*/React.createElement("div", {
+      className: "news_item_edit",
+      onClick: () => setEditPostId(newsItem.post_id)
+    }, "EDIT"), /*#__PURE__*/React.createElement("div", {
       className: "news_item_details"
-    }, "POSTED ", formatNewsDate(newsItem.time), " BY ", newsItem.sender.toUpperCase())), activePostId == newsItem.post_id && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
+    }, "POSTED ", formatNewsDate(newsItem.time), " BY ", newsItem.sender.toUpperCase()))), activePostId == newsItem.post_id && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
       className: "news_item_banner"
     }), /*#__PURE__*/React.createElement("div", {
       className: "news_item_content",
       dangerouslySetInnerHTML: {
         __html: newsItem.message
       }
+    })));
+  }
+  function NewsItemEdit({
+    newsItem
+  }) {
+    return /*#__PURE__*/React.createElement("div", {
+      className: "news_item_editor"
+    }, /*#__PURE__*/React.createElement("div", {
+      className: activePostId == newsItem.post_id ? "news_item_header" : "news_item_header news_item_header_minimized",
+      onClick: () => setActivePostId(newsItem.post_id)
+    }, /*#__PURE__*/React.createElement("div", {
+      className: "news_item_title",
+      ref: titleRef,
+      contentEditable: "true",
+      suppressContentEditableWarning: true
+    }, newsItem.title.toUpperCase()), /*#__PURE__*/React.createElement("div", {
+      className: "news_item_version",
+      ref: versionRef,
+      contentEditable: "true",
+      suppressContentEditableWarning: true
+    }, newsItem.version && newsItem.version.toUpperCase()), /*#__PURE__*/React.createElement("div", {
+      className: "news_item_tag_container"
+    }, /*#__PURE__*/React.createElement("div", {
+      className: "news_item_tag_divider"
+    }, "/"), /*#__PURE__*/React.createElement("div", {
+      className: "news_item_tag"
+    }, "UPDATE"), /*#__PURE__*/React.createElement("input", {
+      id: "news_tag_update",
+      type: "checkbox",
+      ref: updateTagRef,
+      defaultChecked: newsItem.tags.includes("update")
+    })), /*#__PURE__*/React.createElement("div", {
+      className: "news_item_tag_container"
+    }, /*#__PURE__*/React.createElement("div", {
+      className: "news_item_tag_divider"
+    }, "/"), /*#__PURE__*/React.createElement("div", {
+      className: "news_item_tag"
+    }, "BUG FIXES"), /*#__PURE__*/React.createElement("input", {
+      id: "news_tag_bugfixes",
+      type: "checkbox",
+      ref: bugfixTagRef,
+      defaultChecked: newsItem.tags.includes("bugfix")
+    })), /*#__PURE__*/React.createElement("div", {
+      className: "news_item_tag_container"
+    }, /*#__PURE__*/React.createElement("div", {
+      className: "news_item_tag_divider"
+    }, "/"), /*#__PURE__*/React.createElement("div", {
+      className: "news_item_tag"
+    }, "EVENT"), /*#__PURE__*/React.createElement("input", {
+      id: "news_tag_event",
+      type: "checkbox",
+      ref: eventTagRef,
+      defaultChecked: newsItem.tags.includes("event")
+    })), /*#__PURE__*/React.createElement("div", {
+      className: "news_item_details_container"
+    }, isAdmin && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
+      className: "news_item_edit",
+      onClick: () => setEditPostId(null)
+    }, "CANCEL"), /*#__PURE__*/React.createElement("div", {
+      className: "news_item_edit",
+      onClick: () => saveNewsItem(newsItem.post_id)
+    }, "SAVE")), /*#__PURE__*/React.createElement("div", {
+      className: "news_item_details"
+    }, "POSTED ", formatNewsDate(newsItem.time), " BY ", newsItem.sender.toUpperCase()))), activePostId == newsItem.post_id && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
+      className: "news_item_banner"
+    }), /*#__PURE__*/React.createElement("textarea", {
+      className: "news_item_content_editor",
+      ref: contentRef,
+      defaultValue: cleanNewsContents(newsItem.message)
     })));
   }
   return /*#__PURE__*/React.createElement("div", {
@@ -940,7 +802,10 @@ function NewsSection({
     src: "../../../images/v2/icons/discordhover.png"
   })))), /*#__PURE__*/React.createElement("div", {
     className: "news_item_container"
-  }, newsPosts.map(newsItem => /*#__PURE__*/React.createElement(NewsItem, {
+  }, newsPosts && newsPosts.map(newsItem => newsItem.post_id == editPostId ? /*#__PURE__*/React.createElement(NewsItemEdit, {
+    key: newsItem.post_id,
+    newsItem: newsItem
+  }) : /*#__PURE__*/React.createElement(NewsItem, {
     key: newsItem.post_id,
     newsItem: newsItem
   }))));
@@ -972,5 +837,277 @@ function FooterSection({}) {
   }, /*#__PURE__*/React.createElement("div", {
     className: "footer_text"
   }, "SHINOBI CHRONICLES V0.9.0 COPYRIGHT \xA9 LM VISIONS"));
+}
+function LoginButtons({
+  handleLogin,
+  handleRegister
+}) {
+  return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("svg", {
+    role: "button",
+    tabIndex: "0",
+    name: "login",
+    className: "login_button",
+    width: "162",
+    height: "32",
+    onClick: () => handleLogin(),
+    style: {
+      zIndex: 2
+    }
+  }, /*#__PURE__*/React.createElement("radialGradient", {
+    id: "login_fill_default",
+    cx: "50%",
+    cy: "50%",
+    r: "50%",
+    fx: "50%",
+    fy: "50%"
+  }, /*#__PURE__*/React.createElement("stop", {
+    offset: "0%",
+    style: {
+      stopColor: '#464f87',
+      stopOpacity: 1
+    }
+  }), /*#__PURE__*/React.createElement("stop", {
+    offset: "100%",
+    style: {
+      stopColor: '#343d77',
+      stopOpacity: 1
+    }
+  })), /*#__PURE__*/React.createElement("radialGradient", {
+    id: "login_fill_click",
+    cx: "50%",
+    cy: "50%",
+    r: "50%",
+    fx: "50%",
+    fy: "50%"
+  }, /*#__PURE__*/React.createElement("stop", {
+    offset: "0%",
+    style: {
+      stopColor: '#343d77',
+      stopOpacity: 1
+    }
+  }), /*#__PURE__*/React.createElement("stop", {
+    offset: "100%",
+    style: {
+      stopColor: '#464f87',
+      stopOpacity: 1
+    }
+  })), /*#__PURE__*/React.createElement("rect", {
+    className: "login_button_background",
+    width: "100%",
+    height: "100%",
+    fill: "url(#login_fill_default)"
+  }), /*#__PURE__*/React.createElement("text", {
+    className: "login_button_shadow_text",
+    x: "81",
+    y: "18",
+    textAnchor: "middle",
+    dominantBaseline: "middle"
+  }, "login"), /*#__PURE__*/React.createElement("text", {
+    className: "login_button_text",
+    x: "81",
+    y: "16",
+    textAnchor: "middle",
+    dominantBaseline: "middle"
+  }, "login")), /*#__PURE__*/React.createElement("svg", {
+    role: "button",
+    tabIndex: "0",
+    name: "register",
+    className: "register_button",
+    width: "162",
+    height: "32",
+    onClick: () => handleRegister(),
+    style: {
+      zIndex: 4
+    }
+  }, /*#__PURE__*/React.createElement("radialGradient", {
+    id: "register_fill_default",
+    cx: "50%",
+    cy: "50%",
+    r: "50%",
+    fx: "50%",
+    fy: "50%"
+  }, /*#__PURE__*/React.createElement("stop", {
+    offset: "0%",
+    style: {
+      stopColor: '#84314e',
+      stopOpacity: 1
+    }
+  }), /*#__PURE__*/React.createElement("stop", {
+    offset: "100%",
+    style: {
+      stopColor: '#68293f',
+      stopOpacity: 1
+    }
+  })), /*#__PURE__*/React.createElement("radialGradient", {
+    id: "register_fill_click",
+    cx: "50%",
+    cy: "50%",
+    r: "50%",
+    fx: "50%",
+    fy: "50%"
+  }, /*#__PURE__*/React.createElement("stop", {
+    offset: "0%",
+    style: {
+      stopColor: '#68293f',
+      stopOpacity: 1
+    }
+  }), /*#__PURE__*/React.createElement("stop", {
+    offset: "100%",
+    style: {
+      stopColor: '#84314e',
+      stopOpacity: 1
+    }
+  })), /*#__PURE__*/React.createElement("rect", {
+    className: "register_button_background",
+    width: "100%",
+    height: "100%"
+  }), /*#__PURE__*/React.createElement("text", {
+    className: "register_button_shadow_text",
+    x: "81",
+    y: "18",
+    textAnchor: "middle",
+    dominantBaseline: "middle"
+  }, "create a character"), /*#__PURE__*/React.createElement("text", {
+    className: "register_button_text",
+    x: "81",
+    y: "16",
+    textAnchor: "middle",
+    dominantBaseline: "middle"
+  }, "create a character")));
+}
+function LogoutButtons({
+  homeLinks
+}) {
+  return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("a", {
+    href: homeLinks['profile'],
+    style: {
+      display: "flex"
+    }
+  }, /*#__PURE__*/React.createElement("svg", {
+    role: "button",
+    tabIndex: "0",
+    className: "profile_button",
+    width: "162",
+    height: "32"
+  }, /*#__PURE__*/React.createElement("radialGradient", {
+    id: "profile_fill_default",
+    cx: "50%",
+    cy: "50%",
+    r: "50%",
+    fx: "50%",
+    fy: "50%"
+  }, /*#__PURE__*/React.createElement("stop", {
+    offset: "0%",
+    style: {
+      stopColor: '#464f87',
+      stopOpacity: 1
+    }
+  }), /*#__PURE__*/React.createElement("stop", {
+    offset: "100%",
+    style: {
+      stopColor: '#343d77',
+      stopOpacity: 1
+    }
+  })), /*#__PURE__*/React.createElement("radialGradient", {
+    id: "profile_fill_click",
+    cx: "50%",
+    cy: "50%",
+    r: "50%",
+    fx: "50%",
+    fy: "50%"
+  }, /*#__PURE__*/React.createElement("stop", {
+    offset: "0%",
+    style: {
+      stopColor: '#343d77',
+      stopOpacity: 1
+    }
+  }), /*#__PURE__*/React.createElement("stop", {
+    offset: "100%",
+    style: {
+      stopColor: '#464f87',
+      stopOpacity: 1
+    }
+  })), /*#__PURE__*/React.createElement("rect", {
+    className: "profile_button_background",
+    width: "100%",
+    height: "100%"
+  }), /*#__PURE__*/React.createElement("text", {
+    className: "profile_button_shadow_text",
+    x: "81",
+    y: "18",
+    textAnchor: "middle",
+    dominantBaseline: "middle"
+  }, "profile"), /*#__PURE__*/React.createElement("text", {
+    className: "profile_button_text",
+    x: "81",
+    y: "16",
+    textAnchor: "middle",
+    dominantBaseline: "middle"
+  }, "profile"))), /*#__PURE__*/React.createElement("a", {
+    href: homeLinks['logout'],
+    style: {
+      display: "flex"
+    }
+  }, /*#__PURE__*/React.createElement("svg", {
+    role: "button",
+    tabIndex: "0",
+    className: "logout_button",
+    width: "162",
+    height: "32"
+  }, /*#__PURE__*/React.createElement("radialGradient", {
+    id: "logout_fill_default",
+    cx: "50%",
+    cy: "50%",
+    r: "50%",
+    fx: "50%",
+    fy: "50%"
+  }, /*#__PURE__*/React.createElement("stop", {
+    offset: "0%",
+    style: {
+      stopColor: '#84314e',
+      stopOpacity: 1
+    }
+  }), /*#__PURE__*/React.createElement("stop", {
+    offset: "100%",
+    style: {
+      stopColor: '#68293f',
+      stopOpacity: 1
+    }
+  })), /*#__PURE__*/React.createElement("radialGradient", {
+    id: "logout_fill_click",
+    cx: "50%",
+    cy: "50%",
+    r: "50%",
+    fx: "50%",
+    fy: "50%"
+  }, /*#__PURE__*/React.createElement("stop", {
+    offset: "0%",
+    style: {
+      stopColor: '#68293f',
+      stopOpacity: 1
+    }
+  }), /*#__PURE__*/React.createElement("stop", {
+    offset: "100%",
+    style: {
+      stopColor: '#84314e',
+      stopOpacity: 1
+    }
+  })), /*#__PURE__*/React.createElement("rect", {
+    className: "logout_button_background",
+    width: "100%",
+    height: "100%"
+  }), /*#__PURE__*/React.createElement("text", {
+    className: "logout_button_shadow_text",
+    x: "81",
+    y: "18",
+    textAnchor: "middle",
+    dominantBaseline: "middle"
+  }, "logout"), /*#__PURE__*/React.createElement("text", {
+    className: "logout_button_text",
+    x: "81",
+    y: "16",
+    textAnchor: "middle",
+    dominantBaseline: "middle"
+  }, "logout"))));
 }
 window.Home = Home;
