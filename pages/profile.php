@@ -287,12 +287,6 @@ function renderProfileSubmenu(): void {
             'link' => $system->router->getUrl('profile', ['page' => 'send_money']),
             'title' => 'Send Money/AK',
         ];
-        if($player->forbidden_seal->max_battle_history_view > 0) {
-            $submenu_links[] = [
-                'link' => $system->router->links['battle_history'],
-                'title' => 'Battle History',
-            ];
-        }
     }
     if($player->bloodline_id) {
         $submenu_links[] = [
