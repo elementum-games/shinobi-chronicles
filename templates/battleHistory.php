@@ -1,12 +1,12 @@
 <?php
-/** @var array $battles */
+/** @var array $user_battles */
 /** @var array $battle_logs */
 /** @var System $system */
 
 ?>
 <table class='table' style="text-align:center;">
     <tr>
-        <th colspan='4'>View Battles</th>
+        <th colspan='4'>Battle History</th>
     </tr>
     <tr>
         <th>Player 1</th>
@@ -14,7 +14,7 @@
         <th>Winner</th>
         <th>Log</th>
     </tr>
-    <?php foreach($battles as $battle): ?>
+    <?php foreach($user_battles as $battle): ?>
     <tr>
         <td>
             <a href="<?= $system->router->links['members']?>&user=<?= $battle['player1'] ?>" style='text-decoration:none'>
@@ -30,7 +30,7 @@
             <?= $battle['winner'] ?>
         </td>
         <td style="text-align:center">
-            <a href="<?= $system->router->links['battle_history'] ?>&view_log=<?= $battle['id'] ?>">View</a>
+            <a href="<?= $system->router->links['view_battles'] ?>&view_log=<?= $battle['id'] ?>">View</a>
         </td>
     </tr>
     <?php endforeach; ?>

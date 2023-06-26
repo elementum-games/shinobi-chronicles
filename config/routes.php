@@ -241,12 +241,6 @@ return $routes = [
         function_name: 'news',
         menu: Route::MENU_NONE,
     ),
-    33 => new Route(
-        file_name: 'battleHistory.php',
-        title: 'Battle History',
-        function_name: 'battleHistory',
-        menu: Route::MENU_NONE
-    ),
     34 => new Route(
         file_name: 'accountRecord.php',
         title: 'Account Record',

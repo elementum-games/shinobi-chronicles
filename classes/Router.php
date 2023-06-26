@@ -29,12 +29,12 @@ class Router {
         'healingShop' => 23,
         'team' => 24,
         'rankup' => 25,
+        'view_battles' => 26,
         'event' => 27,
         'marriage' => 29,
         'support' => 30,
         'chat_log' => 31,
         'news' => 32,
-        'battle_history' => 33,
         'account_record' => 34,
     ];
 
