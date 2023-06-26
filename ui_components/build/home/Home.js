@@ -33,7 +33,8 @@ function Home({
     newsRef: newsRef,
     initialNewsPosts: initialNewsPosts,
     homeLinks: homeLinks,
-    isAdmin: isAdmin
+    isAdmin: isAdmin,
+    version: version
   }), /*#__PURE__*/React.createElement(FeatureSection, null), /*#__PURE__*/React.createElement(WorldSection, null), /*#__PURE__*/React.createElement(ContactSection, {
     contactRef: contactRef
   }), /*#__PURE__*/React.createElement(FooterSection, null));
@@ -361,10 +362,10 @@ function LoginSection({
     onClick: () => setLoginDisplay("none")
   }, "close")), /*#__PURE__*/React.createElement("div", {
     className: "terms_content"
-  }, "Shinobi-chronicles.com is a fan site: We did not create Naruto nor any of the characters and content in Naruto. While inspired by Naruto, the content of this site is fan-made and not meant to infringe upon any copyrights, it is simply here to further the continuing popularity of Japanese animation. In no event will shinobi-chronicles.com, its host, and any other companies and/or sites linked to shinobi-chronicles.com be liable to any party for any direct, indirect, special or other consequential damages for any use of this website, or on any other hyperlinked website, including, without limitation, any lost profits, loss of programs or other data on your information handling system or otherwise, even if we are expressly advised of the possibility of such damages.", /*#__PURE__*/React.createElement("br", null), /*#__PURE__*/React.createElement("p", null, "Shinobi-chronicles.com accepts no responsibility for the actions of its members i.e. Self harm, vandalism, suicide, homicide, genocide, drug abuse, changes in sexual orientation, or bestiality. Shinobi-chronicles.com will not be held responsible and does not encourage any of the above actions or any other form of anti social behaviour. The staff of shinobi-chronicles.com reserve the right to issue bans and/or account deletion for rule infractions. Rule infractions will be determined at the discretion of the moderating staff."), /*#__PURE__*/React.createElement("p", null, "Loans or transactions of real or in-game currency are between players. Staff take no responsibility for the completion of them. If a player loans real or in-game currency to another player, staff will not be responsible for ensuring the currency is returned."), /*#__PURE__*/React.createElement("p", null, "Ancient Kunai(Premium credits) that have already been spent on in-game purchases of any kind or traded to another player cannot be refunded. Staff are not responsible for lost shards or time on Forbidden Seals lost due to user bans."), /*#__PURE__*/React.createElement("br", null), "The Naruto series is created by and copyright Masashi Kishimoto and TV Tokyo, all rights reserved.")), !isLoggedIn && /*#__PURE__*/React.createElement(LoginButtons, {
+  }, "Shinobi-chronicles.com is a fan site: We did not create Naruto nor any of the characters and content in Naruto. While inspired by Naruto, the content of this site is fan-made and not meant to infringe upon any copyrights, it is simply here to further the continuing popularity of Japanese animation. In no event will shinobi-chronicles.com, its host, and any other companies and/or sites linked to shinobi-chronicles.com be liable to any party for any direct, indirect, special or other consequential damages for any use of this website, or on any other hyperlinked website, including, without limitation, any lost profits, loss of programs or other data on your information handling system or otherwise, even if we are expressly advised of the possibility of such damages.", /*#__PURE__*/React.createElement("br", null), /*#__PURE__*/React.createElement("p", null, "Shinobi-chronicles.com accepts no responsibility for the actions of its members i.e. Self harm, vandalism, suicide, homicide, genocide, drug abuse, changes in sexual orientation, or bestiality. Shinobi-chronicles.com will not be held responsible and does not encourage any of the above actions or any other form of anti social behaviour. The staff of shinobi-chronicles.com reserve the right to issue bans and/or account deletion for rule infractions. Rule infractions will be determined at the discretion of the moderating staff."), /*#__PURE__*/React.createElement("p", null, "Loans or transactions of real or in-game currency are between players. Staff take no responsibility for the completion of them. If a player loans real or in-game currency to another player, staff will not be responsible for ensuring the currency is returned."), /*#__PURE__*/React.createElement("p", null, "Ancient Kunai(Premium credits) that have already been spent on in-game purchases of any kind or traded to another player cannot be refunded. Staff are not responsible for lost shards or time on Forbidden Seals lost due to user bans."), /*#__PURE__*/React.createElement("br", null), "The Naruto series is created by and copyright Masashi Kishimoto and TV Tokyo, all rights reserved.")), !isLoggedIn && /*#__PURE__*/React.createElement(LoggedOutButtons, {
     handleLogin: handleLogin,
     handleRegister: handleRegister
-  }), isLoggedIn && /*#__PURE__*/React.createElement(LogoutButtons, {
+  }), isLoggedIn && /*#__PURE__*/React.createElement(LoggedInButtons, {
     homeLinks: homeLinks
   })))), /*#__PURE__*/React.createElement("div", {
     className: "login_news_button"
@@ -626,11 +627,12 @@ function NewsSection({
   newsRef,
   initialNewsPosts,
   homeLinks,
-  isAdmin
+  isAdmin,
+  version
 }) {
   const [activePostId, setActivePostId] = React.useState(initialNewsPosts[0] != "undefined" ? initialNewsPosts[0].post_id : null);
   const [editPostId, setEditPostId] = React.useState(null);
-  const [numPosts, setNumPosts] = React.useState(initialNewsPosts.length);
+  const numPosts = React.useRef(initialNewsPosts.length);
   const [newsPosts, setNewsPosts] = React.useState(initialNewsPosts);
   const titleRef = React.useRef(null);
   const versionRef = React.useRef(null);
@@ -648,13 +650,12 @@ function NewsSection({
     return formattedDate;
   }
   function cleanNewsContents(contents) {
-    console.log(contents);
     const parser = new DOMParser();
     const decodedString = parser.parseFromString(contents.replace(/[\r\n]+/g, " ").replace(/<br\s*\/?>/g, '\n'), 'text/html').body.textContent;
     return decodedString;
   }
   function saveNewsItem(postId) {
-    console.log(contentRef.current.value);
+    numPosts.current = numPosts.current + 1;
     apiFetch(homeLinks.news_api, {
       request: 'saveNewsPost',
       post_id: postId,
@@ -664,7 +665,7 @@ function NewsSection({
       update: updateTagRef.current.checked,
       bugfix: bugfixTagRef.current.checked,
       event: eventTagRef.current.checked,
-      num_posts: numPosts
+      num_posts: numPosts.current
     }).then(response => {
       if (response.errors.length) {
         console.warn(response.errors);
@@ -673,6 +674,33 @@ function NewsSection({
       }
     });
     setEditPostId(null);
+  }
+  function loadNews() {
+    numPosts.current = numPosts.current + 2;
+    apiFetch(homeLinks.news_api, {
+      request: 'getNewsPosts',
+      num_posts: numPosts.current
+    }).then(response => {
+      if (response.errors.length) {
+        console.warn(response.errors);
+      } else {
+        setNewsPosts(response.data.postData);
+      }
+    });
+  }
+  function createPost() {
+    const newPost = {
+      post_id: 0,
+      title: "New Post",
+      sender: "YOU",
+      time: Math.floor(new Date().getTime() / 1000),
+      version: version,
+      message: "Edit Content",
+      tags: []
+    };
+    const updatedPosts = [...newsPosts];
+    updatedPosts.push(newPost);
+    setNewsPosts(updatedPosts);
   }
   function NewsItem({
     newsItem
@@ -726,7 +754,10 @@ function NewsSection({
       className: "news_item_version",
       ref: versionRef,
       contentEditable: "true",
-      suppressContentEditableWarning: true
+      suppressContentEditableWarning: true,
+      style: {
+        minWidth: "25px"
+      }
     }, newsItem.version && newsItem.version.toUpperCase()), /*#__PURE__*/React.createElement("div", {
       className: "news_item_tag_container"
     }, /*#__PURE__*/React.createElement("div", {
@@ -808,7 +839,11 @@ function NewsSection({
   }) : /*#__PURE__*/React.createElement(NewsItem, {
     key: newsItem.post_id,
     newsItem: newsItem
-  }))));
+  }))), /*#__PURE__*/React.createElement(NewsButtons, {
+    loadNews: loadNews,
+    createPost: createPost,
+    isAdmin: isAdmin
+  }));
 }
 function FeatureSection({}) {
   return /*#__PURE__*/React.createElement(React.Fragment, null);
@@ -838,7 +873,7 @@ function FooterSection({}) {
     className: "footer_text"
   }, "SHINOBI CHRONICLES V0.9.0 COPYRIGHT \xA9 LM VISIONS"));
 }
-function LoginButtons({
+function LoggedOutButtons({
   handleLogin,
   handleRegister
 }) {
@@ -975,7 +1010,7 @@ function LoginButtons({
     dominantBaseline: "middle"
   }, "create a character")));
 }
-function LogoutButtons({
+function LoggedInButtons({
   homeLinks
 }) {
   return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("a", {
@@ -1109,5 +1144,145 @@ function LogoutButtons({
     textAnchor: "middle",
     dominantBaseline: "middle"
   }, "logout"))));
+}
+function NewsButtons({
+  loadNews,
+  createPost,
+  isAdmin
+}) {
+  return /*#__PURE__*/React.createElement("div", {
+    className: "news_button_container"
+  }, /*#__PURE__*/React.createElement("svg", {
+    role: "button",
+    tabIndex: "0",
+    name: "morenews",
+    className: "morenews_button",
+    width: "162",
+    height: "32",
+    onClick: () => loadNews(),
+    style: {
+      zIndex: 2
+    }
+  }, /*#__PURE__*/React.createElement("radialGradient", {
+    id: "morenews_fill_default",
+    cx: "50%",
+    cy: "50%",
+    r: "50%",
+    fx: "50%",
+    fy: "50%"
+  }, /*#__PURE__*/React.createElement("stop", {
+    offset: "0%",
+    style: {
+      stopColor: '#84314e',
+      stopOpacity: 1
+    }
+  }), /*#__PURE__*/React.createElement("stop", {
+    offset: "100%",
+    style: {
+      stopColor: '#68293f',
+      stopOpacity: 1
+    }
+  })), /*#__PURE__*/React.createElement("radialGradient", {
+    id: "morenews_fill_click",
+    cx: "50%",
+    cy: "50%",
+    r: "50%",
+    fx: "50%",
+    fy: "50%"
+  }, /*#__PURE__*/React.createElement("stop", {
+    offset: "0%",
+    style: {
+      stopColor: '#68293f',
+      stopOpacity: 1
+    }
+  }), /*#__PURE__*/React.createElement("stop", {
+    offset: "100%",
+    style: {
+      stopColor: '#84314e',
+      stopOpacity: 1
+    }
+  })), /*#__PURE__*/React.createElement("rect", {
+    className: "morenews_button_background",
+    width: "100%",
+    height: "100%",
+    fill: "url(#morenews_fill_default)"
+  }), /*#__PURE__*/React.createElement("text", {
+    className: "morenews_button_shadow_text",
+    x: "81",
+    y: "18",
+    textAnchor: "middle",
+    dominantBaseline: "middle"
+  }, "more news"), /*#__PURE__*/React.createElement("text", {
+    className: "morenews_button_text",
+    x: "81",
+    y: "16",
+    textAnchor: "middle",
+    dominantBaseline: "middle"
+  }, "more news")), isAdmin && /*#__PURE__*/React.createElement("svg", {
+    role: "button",
+    tabIndex: "0",
+    name: "createpost",
+    className: "createpost_button",
+    width: "162",
+    height: "32",
+    onClick: () => createPost(),
+    style: {
+      zIndex: 4
+    }
+  }, /*#__PURE__*/React.createElement("radialGradient", {
+    id: "createpost_fill_default",
+    cx: "50%",
+    cy: "50%",
+    r: "50%",
+    fx: "50%",
+    fy: "50%"
+  }, /*#__PURE__*/React.createElement("stop", {
+    offset: "0%",
+    style: {
+      stopColor: '#464f87',
+      stopOpacity: 1
+    }
+  }), /*#__PURE__*/React.createElement("stop", {
+    offset: "100%",
+    style: {
+      stopColor: '#343d77',
+      stopOpacity: 1
+    }
+  })), /*#__PURE__*/React.createElement("radialGradient", {
+    id: "createpost_fill_click",
+    cx: "50%",
+    cy: "50%",
+    r: "50%",
+    fx: "50%",
+    fy: "50%"
+  }, /*#__PURE__*/React.createElement("stop", {
+    offset: "0%",
+    style: {
+      stopColor: '#343d77',
+      stopOpacity: 1
+    }
+  }), /*#__PURE__*/React.createElement("stop", {
+    offset: "100%",
+    style: {
+      stopColor: '#464f87',
+      stopOpacity: 1
+    }
+  })), /*#__PURE__*/React.createElement("rect", {
+    className: "createpost_button_background",
+    width: "100%",
+    height: "100%"
+  }), /*#__PURE__*/React.createElement("text", {
+    className: "createpost_button_shadow_text",
+    x: "81",
+    y: "18",
+    textAnchor: "middle",
+    dominantBaseline: "middle"
+  }, "create post"), /*#__PURE__*/React.createElement("text", {
+    className: "createpost_button_text",
+    x: "81",
+    y: "16",
+    textAnchor: "middle",
+    dominantBaseline: "middle"
+  }, "create post")));
 }
 window.Home = Home;
