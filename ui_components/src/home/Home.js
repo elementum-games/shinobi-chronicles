@@ -68,6 +68,7 @@ function Home({
                     initialNewsPosts={initialNewsPosts}
                     isAdmin={isAdmin}
                     version={version}
+                    homeLinks={homeLinks}
                 />
             </div>
             <FeatureSection />
@@ -197,10 +198,10 @@ function MainBannerSection({
 
 
                     {!isLoggedIn &&
-                        <LoggedInButtons handleLogin={handleLogin} handleRegister={handleRegister} />
+                        <LoggedOutButtons handleLogin={handleLogin} handleRegister={handleRegister} />
                     }
                     {isLoggedIn &&
-                        <LoggedOutButtons homeLinks={homeLinks} />
+                        <LoggedInButtons homeLinks={homeLinks} />
                     }
                 </div>
 
@@ -401,7 +402,7 @@ function FooterSection({ }) {
     );
 }
 
-function LoggedInButtons({ handleLogin, handleRegister }) {
+function LoggedOutButtons({ handleLogin, handleRegister }) {
     return (
         <>
             <svg role="button" tabIndex="0" name="login" className="login_button" width="162" height="32" onClick={() => handleLogin()} style={{ zIndex: 2 }}>
@@ -434,10 +435,10 @@ function LoggedInButtons({ handleLogin, handleRegister }) {
     );
 }
 
-function LoggedOutButtons({ homeLinks }) {
+function LoggedInButtons({ homeLinks }) {
     return (
         <>
-            <a href={homeLinks['profile']} style={{ display: "flex" }}>
+            <a href={homeLinks['profile']} style={{ display: "flex", zIndex: 2 }}>
                 <svg role="button" tabIndex="0" className="profile_button" width="162" height="32">
                     <radialGradient id="profile_fill_default" cx="50%" cy="50%" r="50%" fx="50%" fy="50%">
                         <stop offset="0%" style={{ stopColor: '#464f87', stopOpacity: 1 }} />
@@ -452,7 +453,7 @@ function LoggedOutButtons({ homeLinks }) {
                     <text className="profile_button_text" x="81" y="16" textAnchor="middle" dominantBaseline="middle">profile</text>
                 </svg>
             </a>
-            <a href={homeLinks['logout']} style={{ display: "flex" }}>
+            <a href={homeLinks['logout']} style={{ display: "flex", zIndex: 2 }}>
                 <svg role="button" tabIndex="0" className="logout_button" width="162" height="32">
                     <radialGradient id="logout_fill_default" cx="50%" cy="50%" r="50%" fx="50%" fy="50%">
                         <stop offset="0%" style={{ stopColor: '#84314e', stopOpacity: 1 }} />
