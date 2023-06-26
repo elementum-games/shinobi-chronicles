@@ -950,3 +950,16 @@ body {
     color: #838385;
     margin-top: 30px;
 }
+
+/* Mobile Overrides */
+@media (max-width: 1200px) {
+    .login_contact_button {
+        left: 50px;
+        bottom: -300px;
+    }
+
+    .login_news_button {
+        left: -50px;
+        bottom: -300px;
+    }
+}
