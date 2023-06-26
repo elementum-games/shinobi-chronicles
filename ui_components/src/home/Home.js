@@ -67,6 +67,7 @@ function Home({
                 <News
                     initialNewsPosts={initialNewsPosts}
                     isAdmin={isAdmin}
+                    version={version}
                 />
             </div>
             <FeatureSection />
@@ -196,10 +197,10 @@ function MainBannerSection({
 
 
                     {!isLoggedIn &&
-                        <LoginButtons handleLogin={handleLogin} handleRegister={handleRegister} />
+                        <LoggedInButtons handleLogin={handleLogin} handleRegister={handleRegister} />
                     }
                     {isLoggedIn &&
-                        <LogoutButtons homeLinks={homeLinks} />
+                        <LoggedOutButtons homeLinks={homeLinks} />
                     }
                 </div>
 
@@ -400,7 +401,7 @@ function FooterSection({ }) {
     );
 }
 
-function LoginButtons({ handleLogin, handleRegister }) {
+function LoggedInButtons({ handleLogin, handleRegister }) {
     return (
         <>
             <svg role="button" tabIndex="0" name="login" className="login_button" width="162" height="32" onClick={() => handleLogin()} style={{ zIndex: 2 }}>
@@ -433,7 +434,7 @@ function LoginButtons({ handleLogin, handleRegister }) {
     );
 }
 
-function LogoutButtons({ homeLinks }) {
+function LoggedOutButtons({ homeLinks }) {
     return (
         <>
             <a href={homeLinks['profile']} style={{ display: "flex" }}>
