@@ -68,51 +68,80 @@ body {
 }
 
 /* Login */
-.login_section {
-    background: url(../../../images/v2/decorations/latticeleft.png), 
-        url(../../../images/v2/decorations/latticeright.png), 
-        repeating-linear-gradient(45deg, rgba(14, 15, 17, 0.125) 0, rgba(14, 15, 17, 0.125) 10%, transparent 0, transparent 50%), 
-        repeating-linear-gradient(135deg, rgba(14, 15, 17, 0.125) 0, rgba(14, 15, 17, 0.125) 10%, transparent 0, transparent 50%), 
-        radial-gradient(circle at center bottom, #24151d, #151822 70%);
-    background-size: 32%, 32%, 5em 5em, 5em 5em, 100%;
-    background-color: #101113;
-    background-position: 0% 100%, 100% 100%, center, center, bottom;
-    background-repeat: no-repeat, no-repeat, repeat, repeat, no-repeat;
+.main_banner_section {
     display: flex;
     justify-content: center;
     align-items: center;
     position: relative;
     overflow: auto;
-    height: 850px;
+
+    background: url(../../../images/v2/decorations/latticeleft.png),
+        url(../../../images/v2/decorations/latticeright.png),
+        repeating-linear-gradient(45deg, rgba(14, 15, 17, 0.125) 0, rgba(14, 15, 17, 0.125) 10%, transparent 0, transparent 50%),
+        repeating-linear-gradient(135deg, rgba(14, 15, 17, 0.125) 0, rgba(14, 15, 17, 0.125) 10%, transparent 0, transparent 50%),
+        radial-gradient(circle at center bottom, #24151d, #151822 70%);
+    background-size: 32%, 32%, 5em 5em, 5em 5em, 100%;
+    background-color: #101113;
+    background-position: 0% 100%, 100% 100%, center, center, bottom;
+    background-repeat: no-repeat, no-repeat, repeat, repeat, no-repeat;
+
     border-bottom: solid 13px #6a5e46;
 }
-.login_center_wrapper {
-    position: absolute;
+
+:root {
+    --banner-hidden-portion: 360px;
+}
+.main_banner_container {
+    position: relative;
+
+    width: 1200px;
+    height: calc(1200px - var(--banner-hidden-portion));
+    bottom: 60px;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
     padding: 7px;
-    clip-path: circle(50% at 50% 50%);
-    background: linear-gradient(0deg, #6a5e45 0%, #97845e 50%, #ceb581 100%);
+}
+
+.main_banner_image {
     width: 1200px;
     height: 1200px;
-    display: flex;
-    bottom: 60px;
+    top: calc(0px - var(--banner-hidden-portion));
+
+    position: absolute;
+
+    border-radius: 50%;
+    background: linear-gradient(0deg, #6a5e45 0%, #97845e 50%, #ceb581 100%);
+    overflow: hidden;
 }
-.login_center_inner {
+.main_banner_image::before {
+    content: '';
+
+    position: absolute;
+    top: 7px;
+    left: 7px;
+    bottom: 7px;
+    right: 7px;
+
+    border-radius: 50%;
     background: url(../../../images/v2/decorations/Banner1.jpg);
     background-position: -35px 151px;
     background-size: 105%;
-    clip-path: circle(50% at 50% 50%);
-    width: 100%;
-    height: 100%;
+}
+
+.main_banner_title {
+    margin-top: 155px;
+    user-select: none;
+    z-index: 2;
+
     display: flex;
     flex-direction: column;
-    justify-content: center;
     align-items: center;
 }
-.login_inner_title {
-    margin-top: 530px;
-    user-select: none;
-}
-.login_inner_version {
+.title_version {
     background-color: rgba(33, 36, 58, 0.9);
     height: 37px;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -120,16 +149,17 @@ body {
     font-weight: 300;
     color: #fffcf5;
     letter-spacing: 3px;
-    display: flex;
+    display: inline-flex;
     justify-content: center;
     align-items: center;
     clip-path: polygon(20px 0px, calc(100% - 20px) 0px, 100% 50%, calc(100% - 20px) 100%, 20px 100%, 0px 50%);
     padding-left: 30px;
     padding-right: 30px;
-    margin-top: 9px;
+    margin-top: 10px;
     user-select: none;
 }
-.login_inner_input_container {
+
+.login_container {
     height: 280px;
     display: flex;
     flex-direction: column;
@@ -270,36 +300,33 @@ body {
 }
 
 /* Diamond Positions */
-.login_news_button {
-    position: relative;
-    left: -350px;
-    bottom: -85px;
+.banner_button {
+    position: absolute;
 }
-.login_rules_button {
-    position: relative;
+.banner_button.news {
+    left: 30px;
+    bottom: 285px;
+}
+.banner_button.rules {
+    left: 150px;
+    bottom: 135px;
+}
+.banner_button.terms {
+    right: 150px;
+    bottom: 135px;
+}
+.banner_button.contact {
+    right: 30px;
+    bottom: 285px;
+}
+/*.banner_button.feature {
     left: -325px;
     bottom: -225px;
 }
-.login_terms_button {
-    position: relative;
+.banner_button.world {
     left: 325px;
     bottom: -225px;
-}
-.login_features_button {
-    position: relative;
-    left: -325px;
-    bottom: -225px;
-}
-.login_world_button {
-    position: relative;
-    left: 325px;
-    bottom: -225px;
-}
-.login_contact_button {
-    position: relative;
-    left: 350px;
-    bottom: -85px;
-}
+}*/
 
 /* Diamond Styles */
 .home_diamond_container {
@@ -476,13 +503,76 @@ body {
     user-select: none;
 }
 
-/* Register Form */
-#register_form {
+/* Modals  */
+.main_banner_modal {
+    width: 625px;
+
     position: absolute;
-    transform: translateY(-50px);
-    width: 500px;
     background: rgba(20, 20, 28, 0.90);
+    z-index: 10;
 }
+.modal_header {
+    margin-top: 15px;
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+.modal_title {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 15px;
+    font-variant: small-caps;
+    color: #ceb581;
+    user-select: none;
+    margin-left: auto;
+    margin-right: -65px;
+}
+
+.modal_close {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 15px;
+    font-variant: small-caps;
+    user-select: none;
+    color: #bfb7e0;
+    cursor: pointer;
+    margin-left: auto;
+    margin-right: 30px;
+}
+.modal_close.standalone {
+    position: absolute;
+    top: 20px;
+    right: 30px;
+    margin-right: 0;
+}
+.modal_close:hover {
+    color: white;
+}
+.modal_content {
+    overflow: auto;
+    padding: 0 30px 30px;
+
+    color: #d1c5ad;
+    font-size: 14px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.main_banner_modal.rules {
+    top: 100px;
+}
+.rules .modal_content {
+    max-height: 660px;
+}
+
+.main_banner_modal.register {
+    width: 500px;
+    top: 138px;
+}
+
+.main_banner_modal.terms {
+    width: 550px;
+}
+
+
+/* Register Form */
 .register_field_label {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     font-size: 15px;
@@ -494,15 +584,11 @@ body {
     color: #d1c5ad;
     font-size: 14px;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    margin-left: 30px;
 }
 .register_terms_notice {
     color: #d1c5ad;
     font-size: 14px;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    margin-left: 30px;
-    margin-right: 30px;
-    margin-bottom: 30px;
 }
 .register_username_input {
     width: 165px;
@@ -525,13 +611,11 @@ body {
     margin-bottom: 10px;
 }
 .register_username_wrapper {
-    margin-left: 30px;
     display: flex;
     flex-direction: column;
 }
 .register_password_wrapper {
     flex-basis: 35%;
-    margin-left: 30px;
     display: flex;
     flex-direction: column;
 }
@@ -540,14 +624,12 @@ body {
     flex-direction: column;
 }
 .register_email_wrapper {
-    margin-left: 30px;
     display: flex;
     flex-direction: column;
 }
 .register_gender_wrapper {
     flex-basis: 35%;
     margin-top: 10px;
-    margin-left: 30px;
     display: flex;
     flex-direction: column;
 }
@@ -576,19 +658,7 @@ body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     margin-left: 5px;
 }
-.register_close {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    font-size: 15px;
-    font-variant: small-caps;
-    user-select: none;
-    color: #bfb7e0;
-    cursor: pointer;
-    margin-left: auto;
-    margin-right: 30px;
-}
-    .register_close:hover {
-        color: white;
-    }
+
 
 /* Reset Form */
 #reset_form {
@@ -642,101 +712,12 @@ body {
     user-select: none;
 }
 
-/* Rules and Terms */
-.rules_modal {
-    position: absolute;
-    width: 575px;
-    height: 650px;
-    background: rgba(20, 20, 28, 0.90);
-    transform: translateY(40px);
-}
-.rules_content {
-    max-height: 590px;
-    overflow: auto;
-    margin-left: 30px;
-    padding-right: 15px;
-    color: #d1c5ad;
-    font-size: 14px;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-}
-.rules_header {
-    margin-top: 15px;
-    display: flex;
-    align-items: center;
-    margin-bottom: 10px;
-}
-.rules_title {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    font-size: 15px;
-    font-variant: small-caps;
-    color: #ceb581;
-    user-select: none;
-    margin-left: auto;
-    margin-right: -65px;
-}
-.rules_close {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    font-size: 15px;
-    font-variant: small-caps;
-    user-select: none;
-    color: #bfb7e0;
-    cursor: pointer;
-    margin-left: auto;
-    margin-right: 30px;
-}
-    .rules_close:hover {
-        color: white;
-    }
-.terms_modal {
-    position: absolute;
-    width: 575px;
-    height: 610px;
-    background: rgba(20, 20, 28, 0.90);
-    transform: translateY(0px);
-}
-.terms_content {
-    max-height: 550px;
-    overflow: auto;
-    margin-left: 30px;
-    padding-right: 23px;
-    color: #d1c5ad;
-    font-size: 14px;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-}
-.terms_header {
-    display: flex;
-    margin-top: 15px;
-    margin-bottom: 10px;
-}
-.terms_title {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    font-size: 15px;
-    font-variant: small-caps;
-    color: #ceb581;
-    user-select: none;
-    margin-left: auto;
-    margin-right: -65px;
-}
-.terms_close {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    font-size: 15px;
-    font-variant: small-caps;
-    user-select: none;
-    color: #bfb7e0;
-    cursor: pointer;
-    margin-left: auto;
-    margin-right: 30px;
-}
-    .terms_close:hover {
-        color: white;
-    }
-
 /* News */
 .news_section {
     background: #131017;
     border-bottom: solid 13px #6a5e46;
 }
-.news_item_container {
+.news_posts_container {
     display: flex;
     justify-content: center;
     align-items: center;
