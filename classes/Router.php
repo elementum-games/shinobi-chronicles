@@ -35,6 +35,7 @@ class Router {
         'support' => 30,
         'chat_log' => 31,
         'news' => 32,
+        'academy' => 33,
         'account_record' => 34,
     ];
 

@@ -582,7 +582,7 @@ $clan_positions = [
                                 <span>Student</span>
                                 <img class="student_avatar" src='../images/default_avatar.png'/><br />
                                 <span>
-                                    <a href='<?= $system->router->links['villageHQ'] ?>&view=sensei'>
+                                    <a href='<?= $system->router->links['academy'] ?>'>
                                         (Available)
                                     </a>
                                 </span><br />
@@ -677,7 +677,7 @@ $clan_positions = [
         <tr>
             <td>
                 <div>
-                    <p><b><a href="<?= $system->router->links["villageHQ"] ?>&view=sensei">Click here</a> to view the list of available Sensei!</b></p>
+                    <p><b><a href="<?= $system->router->links["academy"] ?>">Click here</a> to view the list of available Sensei!</b></p>
                 </div>
             </td>
         </tr>

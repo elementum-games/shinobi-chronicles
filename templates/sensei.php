@@ -61,32 +61,64 @@
         margin-bottom: 15px;
         margin-top: 15px;
     }
-</style>
 
-<?php if ($player->staff_manager->isModerator()): ?>
-    <table class="table">
-        <tr>
-            <th colspan="5">Mod View</th>
-        </tr>
-        <tr>
-            <td>
-                <a href="<?= $system->router->links['villageHQ'] ?>&view=sensei&village=Stone">Stone</a>
-            </td>
-            <td>
-                <a href="<?= $system->router->links['villageHQ'] ?>&view=sensei&village=Cloud">Cloud</a>
-            </td>
-            <td>
-                <a href="<?= $system->router->links['villageHQ'] ?>&view=sensei&village=Leaf">Leaf</a>
-            </td>
-            <td>
-                <a href="<?= $system->router->links['villageHQ'] ?>&view=sensei&village=Sand">Sand</a>
-            </td>
-            <td>
-                <a href="<?= $system->router->links['villageHQ'] ?>&view=sensei&village=Mist">Mist</a>
-            </td>
-        </tr>
-    </table>
-<?php endif; ?>
+    /* Old Profile */
+    .table_center {
+        text-align: center;
+    }
+    .graduated_wrapper {
+        margin-top: 20px;
+        margin-bottom: 0px;
+        font-weight: bold;
+    }
+    .sensei_container {
+        display:inline-block;
+        height:120px;
+        width:140px;
+        margin: 10px 15px 20px 15px;
+        font-weight: bold;
+    }
+    .student_container_top {
+        display:inline-block;
+        height:120px;
+        width:120px;
+        margin: 10px 15px 20px 15px;
+        font-weight: bold;
+    }
+    .sensei_avatar {
+        max-width:120px;max-height:120px;
+    }
+    .student_avatar {
+        max-width:100px;max-height:100px;
+    }
+    .student_message_label {
+        font-weight: bold;
+        margin-bottom: 0px;
+    }
+    .recruitment_message_wrapper {
+        font-weight: bold;
+        margin-bottom: 0px;
+    }
+    .message_input {
+        width: 500px;
+        height: 100px;
+    }
+    .message_wrapper {
+        margin: 0px 0px 5px 0px;
+    }
+    .update_container {
+        margin-top: 10px;
+        margin-bottom: 10px;
+    }
+    .student_message_wrapper {
+        margin-top: 10px;
+    }
+    .label_italics {
+        font-weight: normal;
+        font-style: italic;
+        margin: 0px;
+    }
+</style>
 
 <?php if ($resign): ?>
     <table class="table">
@@ -97,7 +129,7 @@
             <td>
                 <div>
                     <p>Records of your accomplishments as sensei will be preserved.</p>
-                    <form action="<?= $system->router->links['villageHQ']?>&view=sensei" method="post">
+                    <form action="<?= $system->router->links['academy']?>" method="post">
                         <span>
                             <input type="submit" name="confirm_resignation" value="Confirm Resignation"/>
                         </span>
@@ -118,7 +150,7 @@
                 <div>
                     <span>Training with <?= $lesson_data['sensei_name'] ?> will cost <?= $lesson_data['cost'] ?>&yen; and last <?= $lesson_data['duration'] ?> minutes.</span>
                     <p>Cancelling this training session will not refund the original cost.</p>
-                    <form action="<?= $system->router->getUrl('villageHQ', ['view' => 'sensei'])?>" method="post">
+                    <form action="<?= $system->router->getUrl('academy')?>" method="post">
                         <input type="hidden" name="lesson_stat" value="<?= $lesson_data['stat'] ?>">
                         <input type="hidden" name="train_type" value="<?= $lesson_data['train_type'] ?>">
                         <input type="hidden" name="sensei_id" value="<?= $lesson_data['sensei_id'] ?>">
@@ -130,6 +162,158 @@
             </td>
         </tr>
     </table>
+<?php endif; ?>
+
+<?php if (isset($sensei['sensei_id'])): ?>
+    <!--if player is sensei-->
+    <?php if ($player->user_id == $sensei['sensei_id']): ?>
+        <table class='table table_center'>
+            <tr>
+                <th>Students</th>
+            </tr>
+            <tr>
+                <td>
+                    <div>
+                        <form action="<?= $system->router->links['academy'] ?>" method="post">
+                            <div>
+                                <p class="graduated_wrapper">
+                                    Graduated: <?= $sensei['graduated'] ?>
+                                </p>
+                            </div>
+                            <div>
+                                <b>
+                                    Specialization: 
+                                </b>
+                                <select style="width:100px" class="jutsu_select" name='specialization'>
+                                    <option value="taijutsu" <?= ($sensei['specialization'] == 'taijutsu' ? "selected='selected'" : "") ?>>Taijutsu</option>
+                                    <option value="ninjutsu" <?= ($sensei['specialization'] == 'ninjutsu' ? "selected='selected'" : "") ?>>Ninjutsu</option>
+                                    <option value="genjutsu" <?= ($sensei['specialization'] == 'genjutsu' ? "selected='selected'" : "") ?>>Genjutsu</option>
+                                    <option value="speed" <?= ($sensei['specialization'] == 'speed' ? "selected='selected'" : "") ?>>Speed</option>
+                                    <option value="cast_speed" <?= ($sensei['specialization'] == 'cast_speed' ? "selected='selected'" : "") ?>>Cast Speed</option>
+                                </select>
+                            </div>
+                            <div>
+                                <b>
+                                    <?= System::unSlug($sensei['specialization'])?> (+<?= $sensei['boost_primary'] ?>%) | Other (+<?= $sensei['boost_secondary'] ?>%)
+                                </b>
+                            </div>
+                            <?php if(isset($sensei['bloodline_name'])): ?>
+                            <div>
+                                <b>
+                                    <?= ucwords($sensei['bloodline_name'])?> (+<?= $sensei['boost_primary'] ?>%)
+                                </b>
+                            </div>
+                            <?php endif; ?>
+                            <?php foreach ($students as $student): ?>
+                            <div class="student_container_top">
+                                <span>Student</span>
+                                <img class="student_avatar" src='<?= $student->avatar_link ?>'/><br />
+                                <span>
+                                    <a href='<?= $system->router->links['members'] ?>&user=<?= $student->user_name ?>'>
+                                        <?= $student->user_name ?>
+                                    </a>
+                                </span><br />
+                            </div>
+                            <?php endforeach; ?>
+                            <?php foreach ($temp_students as $student): ?>
+                            <div class="student_container_top">
+                                <span>Training</span>
+                                <div><img src='<?= $student->avatar_link ?>' class="student_avatar" /></div>
+                                <span>
+                                    <a href='<?= $system->router->links['members'] ?>&user=<?= $student->user_name ?>'>
+                                        <?= $student->user_name ?>
+                                    </a>
+                                </span>
+                            </div>
+                            <?php endforeach; ?>
+                            <?php if (count($students) + count($temp_students) < 3): ?>
+                            <?php for ($i = 0; $i < (3 - count($students) - count($temp_students)); $i++): ?>
+                            <div class="student_container_top">
+                                <span>Student</span>
+                                <img class="student_avatar" src='../images/default_avatar.png'/><br />
+                                <span>
+                                    (Available)
+                                </span><br />
+                            </div>
+                            <?php endfor; ?>
+                            <?php endif; ?>
+                            <div><p class="student_message_label">Student Message</p></div>
+                            <div class="message_wrapper"><?= $system->html_parse($sensei['student_message']) ?></div>
+                            <div><textarea id="student_message" name="student_message" class="message_input"><?= $sensei['student_message'] ?></textarea></div>
+                            <div><span id="studentRemainingCharacters" class="red"></span></div>
+                            <div class="update_container"><input name="update_student_settings" type="submit" value="Update" /></div>
+                        </form>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <th>Recruitment</th>
+            </tr>
+            <tr>
+                <td>
+                    <div>
+                        <form action="<?= $system->router->links['academy'] ?>" method="post">
+                            <input type="checkbox" value="1" name="accept_students" <?php if ($player->accept_students) : echo "checked"; endif; ?> />
+                            <label for="accept_students">Accept Students</label>
+                            <?php if ($system->environment == System::ENVIRONMENT_DEV): ?>
+                            <input type="checkbox" value="1" name="enable_lessons" <?php if ($sensei['enable_lessons']) : echo "checked"; endif; ?> />
+                            <label for="enable_lessons">Enable Lessons</label>
+                            <?php endif; ?>
+                            <div><p class="recruitment_message_wrapper">Recruitment Message</p></div>
+                            <div class="message_wrapper"><?= $system->html_parse($sensei['recruitment_message']) ?></div>
+                            <textarea id="recruitment_message" name="recruitment_message" class="message_input"><?= $sensei['recruitment_message'] ?></textarea>
+                            <div><span id="recruitmentRemainingCharacters" class="red"></span></div>
+                            <div class="update_container"><input name="update_student_recruitment" type="submit" value="Update" /></div>
+                        </form>
+                     </div>
+                </td>
+            </tr>
+        </table>
+    <!--if player is student-->
+    <?php else: ?>
+        <table class='table table_center'>
+            <tr>
+                <th>Sensei</th>
+            </tr>
+            <tr>
+                <td>
+                    <div>
+                        <div>
+                            <p class="graduated_wrapper">
+                                Graduated: <?= $sensei['graduated'] ?>
+                            </p>
+                        </div>
+                        <div>
+                            <b>
+                                <?= System::unSlug($sensei['specialization'])?> (+<?= $sensei['boost_primary'] ?>%) | Other (+<?= $sensei['boost_secondary'] ?>%)
+                            </b>
+                        </div>
+                        <?php if(isset($sensei['bloodline_name'])): ?>
+                        <div>
+                            <b>
+                                <?= ucwords($sensei['bloodline_name'])?> (+<?= $sensei['boost_primary'] ?>%)
+                            </b>
+                        </div>
+                        <?php endif; ?>
+                        <div class="sensei_container">
+                            <div>
+                                <p class="label_italics">
+                                    <?= $sensei['bloodline_name'] ?>
+                                </p>
+                            </div>
+                            <img class="sensei_avatar" src='<?= $sensei['avatar_link'] ?>'/><br />
+                            <span>
+                                <a href='<?= $system->router->links['members'] ?>&user=<?= $sensei['user_name'] ?>'>
+                                    <?= $sensei['user_name'] ?>
+                                </a>
+                            </span>
+                        </div>
+                        <div class="message_wrapper student_message_wrapper"><?= $system->html_parse($sensei['student_message']) ?></div>
+                    </div>
+                </td>
+            </tr> 
+        </table>
+    <?php endif; ?>
 <?php endif; ?>
 
 <?php if (!SenseiManager::isActiveSensei($player->user_id, $system) && $player->rank_num > 3): ?>
@@ -190,7 +374,7 @@
                     </table>
                 </div>
                 <div class="take_exam_container">
-                    <a href="<?= $system->router->links['villageHQ']?>&view=sensei&sensei_exam=true">Take Exam</a>
+                    <a href="<?= $system->router->links['academy']?>&sensei_exam=true">Take Exam</a>
                 </div>
             </td>
         </tr>
@@ -262,10 +446,10 @@
                                 </a>
                             </td>
                             <td>
-                                <a href="<?= $system->router->links['villageHQ'] ?>&view=sensei&accept=<?= $application->student_id ?>">Accept</a>
+                                <a href="<?= $system->router->links['academy'] ?>&accept=<?= $application->student_id ?>">Accept</a>
                             </td>
                             <td>
-                                <a href="<?= $system->router->links['villageHQ'] ?>&view=sensei&deny=<?= $application->student_id ?>">Deny</a>
+                                <a href="<?= $system->router->links['academy'] ?>&deny=<?= $application->student_id ?>">Deny</a>
                             </td>
                         </tr>
                         <?php endforeach; ?>
@@ -273,7 +457,7 @@
                     <?php endif; ?>
                 </div>
                 <div class="resign_container">
-                    <a href="<?= $system->router->links['villageHQ']?>&view=sensei&resign=true">Resign</a>
+                    <a href="<?= $system->router->links['academy']?>&resign=true">Resign</a>
                 </div>
             </td>
         </tr>
@@ -319,12 +503,37 @@
                             <?php foreach ($applications as $application): ?>
                             <tr>
                                 <td><a href="<?= $system->router->links['members'] ?>&user=<?= $application->sensei_name ?>"><?= $application->sensei_name ?></a></td>
-                                <td><a href="<?= $system->router->links['villageHQ'] ?>&view=sensei&close=<?= $application->sensei_id ?>">Close Application</a></td>
+                                <td><a href="<?= $system->router->links['academy'] ?>&close=<?= $application->sensei_id ?>">Close Application</a></td>
                             </tr>
                             <?php endforeach; ?>
                         </table>
                     <?php endif; ?>
                 </div>
+            </td>
+        </tr>
+    </table>
+<?php endif; ?>
+
+<?php if ($player->staff_manager->isModerator()): ?>
+    <table class="table">
+        <tr>
+            <th colspan="5">Mod View</th>
+        </tr>
+        <tr>
+            <td>
+                <a href="<?= $system->router->links['academy'] ?>&village=Stone">Stone</a>
+            </td>
+            <td>
+                <a href="<?= $system->router->links['academy'] ?>&village=Cloud">Cloud</a>
+            </td>
+            <td>
+                <a href="<?= $system->router->links['academy'] ?>&village=Leaf">Leaf</a>
+            </td>
+            <td>
+                <a href="<?= $system->router->links['academy'] ?>&village=Sand">Sand</a>
+            </td>
+            <td>
+                <a href="<?= $system->router->links['academy'] ?>&village=Mist">Mist</a>
             </td>
         </tr>
     </table>
@@ -405,13 +614,13 @@
                 <div><img src='../images/default_avatar.png' class="student_avatar" /></div>
                     <?php if ($player->sensei_id == 0 && $player->rank_num < 3): ?>
                     <span>
-                    <a href='<?= $system->router->links['villageHQ'] ?>&view=sensei&apply=<?= $sensei['sensei_id'] ?>'>
+                    <a href='<?= $system->router->links['academy'] ?>&apply=<?= $sensei['sensei_id'] ?>'>
                         (Available)
                     </a>
                     </span>
                     <?php elseif ((bool)$sensei['enable_lessons'] && $player->train_time == 0 && $player->user_id != $sensei['sensei_id'] && $player->exp < $sensei['exp'] && $player->rank_num > 2 && $system->environment == System::ENVIRONMENT_DEV): ?>
                     <label>Lessons</label>
-                    <form action="<?= $system->router->getUrl('villageHQ', ['view' => 'sensei']) ?>" method="post">
+                    <form action="<?= $system->router->getUrl('academy') ?>" method="post">
 						<select name="lesson">
                             <?php if ($sensei['ninjutsu_modifier'] > 0): ?>
 							    <option value="ninjutsu_skill" <?= $sensei['specialization'] == "ninjutsu" ? 'selected="selected"' : ""?>>Ninjutsu (+<?= $sensei['ninjutsu_modifier'] ?>%)</option>
@@ -455,7 +664,7 @@
             </div>
             <?php if($player->staff_manager->isModerator()): ?>
             <div>
-                <a class='imageLink' href='<?= $system->router->links['villageHQ'] ?>&view=sensei&clear=<?= $sensei['sensei_id'] ?>'>
+                <a class='imageLink' href='<?= $system->router->links['academy'] ?>&clear=<?= $sensei['sensei_id'] ?>'>
                     <img class='small_image' src='../images/delete_icon.png' />
                 </a>
             </div>

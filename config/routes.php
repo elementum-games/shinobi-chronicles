@@ -241,6 +241,12 @@ return $routes = [
         function_name: 'news',
         menu: Route::MENU_NONE,
     ),
+    33 => new Route(
+        file_name: 'academy.php',
+        title: 'Academy',
+        function_name: 'academy',
+        menu: Route::MENU_VILLAGE,
+    ),
     34 => new Route(
         file_name: 'accountRecord.php',
         title: 'Account Record',
