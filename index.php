@@ -606,22 +606,24 @@ if($LOGGED_IN) {
             }
         }
     }
-    else if (isset($_GET['home_view'])) {
+    else if (isset($_GET['home'])) {
         if ($system->environment == System::ENVIRONMENT_DEV) {
             $home_view = "default";
-            switch ($_GET['home_view']) {
-                case "news":
-                    $home_view = "news";
-                    break;
-                case "contact":
-                    $home_view = "contact";
-                    break;
-                case "rules":
-                    $home_view = "rules";
-                    break;
-                case "terms":
-                    $home_view = "terms";
-                    break;
+            if (isset($_GET['view'])) {
+                switch ($_GET['view']) {
+                    case "news":
+                        $home_view = "news";
+                        break;
+                    case "contact":
+                        $home_view = "contact";
+                        break;
+                    case "rules":
+                        $home_view = "rules";
+                        break;
+                    case "terms":
+                        $home_view = "terms";
+                        break;
+                }
             }
             $layout->renderBeforeContentHTML($system, $player ?? null, "Home", render_content: false, render_header: true, render_sidebar: false, render_topbar: false);
             try {
