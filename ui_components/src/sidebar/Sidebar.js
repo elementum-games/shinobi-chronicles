@@ -139,10 +139,8 @@ function Sidebar({ links, navigationAPIData, userAPIData }) {
                                 {playerResources.health} / {playerResources.max_health}
                             </label>
                             <div className={"sb_health sb_fill"} style={{ width: health_width + "%" }}>
-                                <svg className="sb_resource_highlight_container">
-                                    <svg className="sb_resource_highlight_wrapper" viewBox="0 0 50 50">
-                                        <polygon x="50" points="20,25 0,0 5,0 25,25 5,50 0,50" id="sb_health_highlight" className="sb_resource_highlight" />
-                                    </svg>
+                                <svg className="sb_resource_highlight_wrapper" viewBox="0 0 50 50">
+                                    <polygon x="50" points="20,25 0,0 5,0 25,25 5,50 0,50" id="sb_health_highlight" className="sb_resource_highlight" />
                                 </svg>
                             </div>
                             <div className={"sb_health sb_preview"}></div>
@@ -158,10 +156,8 @@ function Sidebar({ links, navigationAPIData, userAPIData }) {
                                 {playerResources.chakra} / {playerResources.max_chakra}
                             </label>
                             <div className={"sb_chakra sb_fill"} style={{ width: chakra_width + "%" }}>
-                                <svg className="sb_resource_highlight_container">
-                                    <svg className="sb_resource_highlight_wrapper" viewBox="0 0 50 50">
-                                        <polygon x="50" points="20,25 0,0 5,0 25,25 5,50 0,50" id="sb_chakra_highlight" className="sb_resource_highlight" />
-                                    </svg>
+                                <svg className="sb_resource_highlight_wrapper" viewBox="0 0 50 50" x="100">
+                                    <polygon x="50" points="20,25 0,0 5,0 25,25 5,50 0,50" id="sb_chakra_highlight" className="sb_resource_highlight" />
                                 </svg>
                             </div>
                             <div className={"sb_chakra sb_preview"}></div>
@@ -177,10 +173,8 @@ function Sidebar({ links, navigationAPIData, userAPIData }) {
                                 {playerResources.stamina} / {playerResources.max_stamina}
                             </label>
                             <div className={"sb_stamina sb_fill"} style={{ width: stamina_width + "%" }}>
-                                <svg className="sb_resource_highlight_container">
-                                    <svg className="sb_resource_highlight_wrapper" viewBox="0 0 50 50">
-                                        <polygon x="50" points="20,25 0,0 5,0 25,25 5,50 0,50" id="sb_stamina_highlight" className="sb_resource_highlight" />
-                                    </svg>
+                                <svg className="sb_resource_highlight_wrapper" viewBox="0 0 50 50">
+                                    <polygon x="50" points="20,25 0,0 5,0 25,25 5,50 0,50" id="sb_stamina_highlight" className="sb_resource_highlight" />
                                 </svg>
                             </div>
                             <div className={"sb_stamina sb_preview"}></div>

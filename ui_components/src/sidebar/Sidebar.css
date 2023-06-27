@@ -222,18 +222,11 @@
     fill: var(--font-color-3);
 }
 
-.sb_resource_highlight_container {
-    z-index: 11;
-    height: var(--resource-bar-inner-height);
-    width: 100%;
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-}
-
 .sb_resource_highlight_wrapper {
     right: 0%;
     transform: translate(50%,0px);
+    position: absolute;
+    height: var(--resource-bar-inner-height);
 }
 
 .sb_health {

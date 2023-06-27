@@ -189,8 +189,6 @@ function Sidebar({
         width: health_width + "%"
       }
     }, /*#__PURE__*/React.createElement("svg", {
-      className: "sb_resource_highlight_container"
-    }, /*#__PURE__*/React.createElement("svg", {
       className: "sb_resource_highlight_wrapper",
       viewBox: "0 0 50 50"
     }, /*#__PURE__*/React.createElement("polygon", {
@@ -198,7 +196,7 @@ function Sidebar({
       points: "20,25 0,0 5,0 25,25 5,50 0,50",
       id: "sb_health_highlight",
       className: "sb_resource_highlight"
-    })))), /*#__PURE__*/React.createElement("div", {
+    }))), /*#__PURE__*/React.createElement("div", {
       className: "sb_health sb_preview"
     }), /*#__PURE__*/React.createElement("img", {
       className: "sb_resource_corner_right",
@@ -219,16 +217,15 @@ function Sidebar({
         width: chakra_width + "%"
       }
     }, /*#__PURE__*/React.createElement("svg", {
-      className: "sb_resource_highlight_container"
-    }, /*#__PURE__*/React.createElement("svg", {
       className: "sb_resource_highlight_wrapper",
-      viewBox: "0 0 50 50"
+      viewBox: "0 0 50 50",
+      x: "100"
     }, /*#__PURE__*/React.createElement("polygon", {
       x: "50",
       points: "20,25 0,0 5,0 25,25 5,50 0,50",
       id: "sb_chakra_highlight",
       className: "sb_resource_highlight"
-    })))), /*#__PURE__*/React.createElement("div", {
+    }))), /*#__PURE__*/React.createElement("div", {
       className: "sb_chakra sb_preview"
     }), /*#__PURE__*/React.createElement("img", {
       className: "sb_resource_corner_right",
@@ -249,8 +246,6 @@ function Sidebar({
         width: stamina_width + "%"
       }
     }, /*#__PURE__*/React.createElement("svg", {
-      className: "sb_resource_highlight_container"
-    }, /*#__PURE__*/React.createElement("svg", {
       className: "sb_resource_highlight_wrapper",
       viewBox: "0 0 50 50"
     }, /*#__PURE__*/React.createElement("polygon", {
@@ -258,7 +253,7 @@ function Sidebar({
       points: "20,25 0,0 5,0 25,25 5,50 0,50",
       id: "sb_stamina_highlight",
       className: "sb_resource_highlight"
-    })))), /*#__PURE__*/React.createElement("div", {
+    }))), /*#__PURE__*/React.createElement("div", {
       className: "sb_stamina sb_preview"
     }), /*#__PURE__*/React.createElement("img", {
       className: "sb_resource_corner_right",
