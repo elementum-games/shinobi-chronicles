@@ -38,6 +38,7 @@ $home_links['logout'] = $system->router->base_url . "?logout=1";
 $home_links['profile'] = $system->router->getUrl('profile');
 $home_links['github'] = $system->router->links['github'];
 $home_links['discord'] = $system->router->links['discord'];
+$home_links['support'] = $system->router->base_url . "support.php";
 
 $min_user_name_length = User::MIN_NAME_LENGTH;
 $max_user_name_length = 18;

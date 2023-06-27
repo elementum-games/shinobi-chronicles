@@ -23,7 +23,7 @@ if(isset($_SESSION['user_id'])) {
     $supportSystem = new SupportManager($system, $player);
 }
 else {
-    $layout = $system->fetchLayoutByName(System::DEFAULT_LAYOUT);
+    $layout = $system->fetchLayoutByName("shadow_ribbon");
     $supportSystem = new SupportManager($system);
 }
 
@@ -337,8 +337,6 @@ else {
         $system->printMessage();
     }
     require('templates/guestSupport.php');
-
-    echo $layout->login_menu;
 }
 
 $layout->renderAfterContentHTML($system, $player);

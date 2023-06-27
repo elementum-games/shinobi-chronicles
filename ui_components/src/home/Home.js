@@ -73,9 +73,9 @@ function Home({
             </div>
             <FeatureSection />
             <WorldSection />
-            <ContactSection
+            {/*<ContactSection
                 contactRef={contactRef}
-            />
+            />*/}
             <FooterSection />
         </>
     );
@@ -114,10 +114,13 @@ function MainBannerSection({
     function handleReset() {
         document.getElementById('reset_form').submit();
     }
-
     function scrollTo(element) {
         element.scrollIntoView({ behavior: 'smooth' });
     }
+    function toSupport() {
+        window.location = homeLinks['support'];
+    }
+
 
     let activeModal = null;
     switch(loginDisplay) {
@@ -162,6 +165,16 @@ function MainBannerSection({
                     <img src="/images/v2/decorations/homepagelogo.png" />
                     <div className="title_version">{version}</div>
                 </div>
+
+                {/* Lanterns WIP
+                <div className="home_lantern_1" style={{ zIndex: 1 }}><img src="/images/v2/decorations/lanternbig.png" /></div>
+                <div className="home_lantern_2" style={{ zIndex: 0 }}><img src="/images/v2/decorations/lanternbig2.png" /></div>
+                <div className="home_lantern_3" style={{ zIndex: 1 }}><img src="/images/v2/decorations/lanternsmall.png" /></div>
+                <div className="home_lantern_4" style={{ zIndex: 1 }}><img src="/images/v2/decorations/lanternbig.png" /></div>
+                <div className="home_lantern_5" style={{ zIndex: 1 }}><img src="/images/v2/decorations/lanternsmall.png" /></div>
+                <div className="home_lantern_6" style={{ zIndex: 1 }}><img src="/images/v2/decorations/lanternbig.png" /></div>
+                <div className="home_lantern_7" style={{ zIndex: 1 }}><img src="/images/v2/decorations/lanternsmall.png" /></div>
+                <div className="home_lantern_8" style={{ zIndex: 1 }}><img src="/images/v2/decorations/lanternbig2.png" /></div>*/}
 
                 {activeModal}
 
@@ -254,7 +267,7 @@ function MainBannerSection({
                 </div>*/}
                 <div className="banner_button contact">
                     <BannerDiamondButton
-                        handleClick={() => scrollTo(contactRef.current)}
+                        handleClick={() => toSupport()}
                         firstLineText="contact us"
                         color="blue"
                         largeSize={true}

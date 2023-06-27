@@ -11,7 +11,7 @@ if(isset($_SESSION['user_id'])) {
 $system->db->connect();
 
 // Start display
-require("layout/" . System::DEFAULT_LAYOUT . ".php");
+require("layout/" . "shadow_ribbon" . ".php");
 echo $heading;
 echo $top_menu;
 echo $header;
