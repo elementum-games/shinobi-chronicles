@@ -35,7 +35,7 @@
     <tr>
         <td>
             <p class="exam_header">Answer the following questions correctly to proceed:</p>
-            <form action="<?= $system->router->links['villageHQ'] ?>&view=sensei" method="post">
+            <form action="<?= $system->router->links['academy'] ?>" method="post">
                 <p class="question_label">Which of the following helps with completing Special Missions?</p>
                 <div><input type="radio" name="question1" value="1a" checked/> <label>Stat Total</label></div>
                 <div><input type="radio" name="question1" value="1b" /> <label>Max Health</label></div>

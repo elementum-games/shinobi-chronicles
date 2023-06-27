@@ -170,7 +170,7 @@ class NotificationAPIManager {
                         $notification_ids_to_delete[] = $row['notification_id'];
                         continue 2;
                     } else {
-                        $notifications[] = NotificationDto::fromDb($row, $this->system->router->getUrl('villageHQ', ['view' => 'sensei']));
+                        $notifications[] = NotificationDto::fromDb($row, $this->system->router->getUrl('academy'));
                     }
                     break;
                 case "inbox":
@@ -314,7 +314,7 @@ class NotificationAPIManager {
         if (SenseiManager::isActiveSensei($this->player->user_id, $this->system)) {
             if (SenseiManager::hasApplications($this->player->user_id, $this->system)) {
                 $notifications[] = new NotificationDto(
-                action_url: $this->system->router->getUrl('villageHQ', ['view' => 'sensei']),
+                action_url: $this->system->router->getUrl('academy'),
                 type: "student",
                 message: "Application received!",
                 user_id: $this->player->user_id,

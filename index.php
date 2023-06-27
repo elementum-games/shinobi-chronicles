@@ -612,7 +612,7 @@ if($LOGGED_IN) {
                     $home_view = "terms";
                     break;
             }
-            $layout->renderBeforeContentHTML($system, $player ?? null, "Home", custom_page: true);
+            $layout->renderBeforeContentHTML($system, $player ?? null, "Home", render_content: false, render_header: true, render_sidebar: false, render_topbar: false);
             try {
                 require('./templates/home.php');
             } catch (RuntimeException $e) {
@@ -620,7 +620,7 @@ if($LOGGED_IN) {
                 $system->message($e->getMessage());
                 $system->printMessage(true);
             }
-            $layout->renderAfterContentHTML($system, $player ?? null, custom_page: true);
+            $layout->renderAfterContentHTML($system, $player ?? null, render_content: false, render_footer: false, render_hotbar: false);
             $page_load_time = round(microtime(true) - $PAGE_LOAD_START, 3);
             $system->db->commitTransaction();
         }
@@ -657,7 +657,7 @@ else {
     } else {
         $layout = $system->fetchLayoutByName(System::DEFAULT_LAYOUT);
     }
-    $layout->renderBeforeContentHTML($system, $player ?? null, "Home", custom_page: true);
+    $layout->renderBeforeContentHTML($system, $player ?? null, "Home", render_content: false, render_header: false, render_sidebar: false, render_topbar: false);
 
     // Display error messages
     $system->printMessage();
@@ -681,7 +681,7 @@ else {
             $initial_login_display = "register";
         }
         require('./templates/home.php');
-        $layout->renderAfterContentHTML($system, $player ?? null, custom_page: true);
+        $layout->renderAfterContentHTML($system, $player ?? null, render_content: false, render_footer: false, render_hotbar: false);
 
         $page_load_time = round(microtime(true) - $PAGE_LOAD_START, 3);
         $system->db->commitTransaction();

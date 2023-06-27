@@ -242,10 +242,10 @@ return $routes = [
         menu: Route::MENU_NONE,
     ),
     33 => new Route(
-        file_name: 'battleHistory.php',
-        title: 'Battle History',
-        function_name: 'battleHistory',
-        menu: Route::MENU_NONE
+        file_name: 'academy.php',
+        title: 'Academy',
+        function_name: 'academy',
+        menu: Route::MENU_VILLAGE,
     ),
     34 => new Route(
         file_name: 'accountRecord.php',
