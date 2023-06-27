@@ -303,15 +303,15 @@ function BannerDiamondButton({
                 {secondLineText == null &&
                     <>
                         <text className="home_diamond_shadow_text" x="50" y="52" textAnchor="middle" dominantBaseline="middle">{firstLineText}</text>
-                        <text className="home_diamond_blue_text" x="50" y="50" textAnchor="middle" dominantBaseline="middle">{firstLineText}</text>
+                        <text className={`home_diamond_${color}_text`} x="50" y="50" textAnchor="middle" dominantBaseline="middle">{firstLineText}</text>
                     </>
                 }
                 {secondLineText != null &&
                     <>
                         <text className="home_diamond_shadow_text" x="50" y="40" textAnchor="middle" dominantBaseline="middle">{firstLineText}</text>
-                        <text className="home_diamond_blue_text" x="50" y="38" textAnchor="middle" dominantBaseline="middle">{firstLineText}</text>
+                        <text className={`home_diamond_${color}_text`} x="50" y="38" textAnchor="middle" dominantBaseline="middle">{firstLineText}</text>
                         <text className="home_diamond_shadow_text" x="50" y="64" textAnchor="middle" dominantBaseline="middle">{secondLineText}</text>
-                        <text className="home_diamond_blue_text" x="50" y="62" textAnchor="middle" dominantBaseline="middle">{secondLineText}</text>
+                        <text className={`home_diamond_${color}_text`} x="50" y="62" textAnchor="middle" dominantBaseline="middle">{secondLineText}</text>
                     </>
                 }
             </svg>

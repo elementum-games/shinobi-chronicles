@@ -277,7 +277,7 @@ function BannerDiamondButton({
     textAnchor: "middle",
     dominantBaseline: "middle"
   }, firstLineText), /*#__PURE__*/React.createElement("text", {
-    className: "home_diamond_blue_text",
+    className: `home_diamond_${color}_text`,
     x: "50",
     y: "50",
     textAnchor: "middle",
@@ -289,7 +289,7 @@ function BannerDiamondButton({
     textAnchor: "middle",
     dominantBaseline: "middle"
   }, firstLineText), /*#__PURE__*/React.createElement("text", {
-    className: "home_diamond_blue_text",
+    className: `home_diamond_${color}_text`,
     x: "50",
     y: "38",
     textAnchor: "middle",
@@ -301,7 +301,7 @@ function BannerDiamondButton({
     textAnchor: "middle",
     dominantBaseline: "middle"
   }, secondLineText), /*#__PURE__*/React.createElement("text", {
-    className: "home_diamond_blue_text",
+    className: `home_diamond_${color}_text`,
     x: "50",
     y: "62",
     textAnchor: "middle",
