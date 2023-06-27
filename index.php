@@ -528,13 +528,24 @@ if($LOGGED_IN) {
         $route = Router::$routes[$id] ?? null;
 
         try {
-            $location_name = $player->current_location->location_id
-                ? ' ' . ' <div id="contentHeaderLocation">' . $player->current_location->name . '</div>'
-                : null;
+            if ($layout->key == "new_geisha") {
+                $location_name = $player->current_location->location_id
+                    ? ' ' . ' <div id="contentHeaderLocation">' . " | " . $player->current_location->name . '</div>'
+                    : null;
+                $location_coords = "<div id='contentHeaderCoords'>" . " (" . $player->location->x . "." . $player->location->y . ")" . '</div>';
+                $content_header_divider = '<div class="contentHeaderDivider"><svg width="100%" height="2"><line x1="0%" y1="1" x2="100%" y2="1" stroke="#77694e" stroke-width="1"></line></svg></div>';
+            } else {
+                $location_name = $player->current_location->location_id
+                    ? ' ' . ' <div id="contentHeaderLocation">' . $player->current_location->name . '</div>'
+                    : null;
+                $location_coords = null;
+                $content_header_divider = null;
+            }
+
             $layout->renderBeforeContentHTML(
                 system: $system,
                 player: $player,
-                page_title: $route->title . $location_name
+                page_title: $route->title . $location_name . $location_coords . $content_header_divider,
             );
 
             $system->router->assertRouteIsValid($route, $player);

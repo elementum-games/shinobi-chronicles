@@ -102,6 +102,7 @@
 
 #chatReactContainer {
     font-size: var(--font-default);
+    margin-top: 25px;
 }
 
 #chat_input_box {
