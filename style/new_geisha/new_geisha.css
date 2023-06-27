@@ -397,3 +397,9 @@ body {
         0 1px var(--shadow-size) var(--shadow-color),
         1px 1px var(--shadow-size) var(--shadow-color);
 }
+
+/* Compatibility */
+.systemMessage {
+    width: 100%;
+    top: 5px;
+}
