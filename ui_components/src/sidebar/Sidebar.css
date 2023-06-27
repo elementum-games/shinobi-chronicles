@@ -59,6 +59,10 @@
     border-color: var(--sidebar-button-border-color);
     border-width: 1px;
     font-weight: 400;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none !important;
 }
 
 .sb_link_filler {
@@ -85,9 +89,9 @@
 
 .sb_label {
     position: relative;
-    top: 15%;
     cursor: pointer;
     user-select: none;
+    padding-bottom: 2px;
 }
 
 .sb_avatar_container {
