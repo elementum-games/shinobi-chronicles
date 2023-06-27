@@ -20,7 +20,15 @@ class Layout {
         public string $footer,
     ) {}
 
-    public function renderBeforeContentHTML(System $system, ?User $player, string $page_title, bool $render_header = true, bool $render_sidebar = true, bool $render_topbar = true, bool $render_content = true): void {
+    public function renderBeforeContentHTML(
+      System $system, 
+      ?User $player, 
+      string $page_title, 
+      bool $render_header = true, 
+      bool $render_sidebar = true, 
+      bool $render_topbar = true, 
+      bool $render_content = true
+    ): void {
         if($this->key == 'new_geisha') {
             echo $this->heading;
             if (isset($player)) {
