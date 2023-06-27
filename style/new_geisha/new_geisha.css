@@ -182,6 +182,7 @@ body {
     font-size: var(--font-large) !important;
     display: flex !important;
     flex-direction: row !important;
+    white-space: nowrap;
 }
 
 #contentHeaderLocation {
