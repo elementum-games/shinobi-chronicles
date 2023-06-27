@@ -190,9 +190,6 @@ function academy() {
                 throw new RuntimeException('Not a moderator!');
             }
 			$success = SenseiManager::updateStudentRecruitment((int)$_GET['clear'], '', $system);
-			if (!$success) {
-                throw new RuntimeException('Something went wrong!');
-            }
 			$system->message("You have removed a recruitment message!");
         }
 		catch (RuntimeException $e) {
@@ -420,9 +417,6 @@ function academy() {
                 // Update recruitment settings
                 SenseiManager::updateStudentRecruitment($player->user_id, $recruitment_message, $system);
                 $success = SenseiManager::updateStudentLessons($player->user_id, (bool) $enable_lessons, $system);
-                if (!$success) {
-                    throw new RuntimeException('Something went wrong!');
-                }
                 $system->message("Recruitment settings updated!");
             } catch (RuntimeException $e) {
                 $system->message($e->getMessage());
