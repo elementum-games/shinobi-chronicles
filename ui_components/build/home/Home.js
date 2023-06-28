@@ -141,7 +141,35 @@ function MainBannerSection({
     src: "/images/v2/decorations/homepagelogo.png"
   }), /*#__PURE__*/React.createElement("div", {
     className: "title_version"
-  }, version)), activeModal, /*#__PURE__*/React.createElement("div", {
+  }, version)), /*#__PURE__*/React.createElement("div", {
+    className: "home_lantern_2",
+    style: {
+      zIndex: 0
+    }
+  }, /*#__PURE__*/React.createElement("img", {
+    src: "/images/v2/decorations/lanternbig.png"
+  })), /*#__PURE__*/React.createElement("div", {
+    className: "home_lantern_4",
+    style: {
+      zIndex: 1
+    }
+  }, /*#__PURE__*/React.createElement("img", {
+    src: "/images/v2/decorations/lanternbig.png"
+  })), /*#__PURE__*/React.createElement("div", {
+    className: "home_lantern_5",
+    style: {
+      zIndex: 1
+    }
+  }, /*#__PURE__*/React.createElement("img", {
+    src: "/images/v2/decorations/lanternsmall.png"
+  })), /*#__PURE__*/React.createElement("div", {
+    className: "home_lantern_7",
+    style: {
+      zIndex: 1
+    }
+  }, /*#__PURE__*/React.createElement("img", {
+    src: "/images/v2/decorations/lanternsmall.png"
+  })), activeModal, /*#__PURE__*/React.createElement("div", {
     className: "login_container"
   }, loginDisplay === "login" && /*#__PURE__*/React.createElement(LoginForm, {
     loginMessageText: loginMessageText,
