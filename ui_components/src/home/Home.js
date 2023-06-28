@@ -2,6 +2,7 @@
 
 import { RegisterForm } from "./RegisterForm.js";
 import { Rules, Terms } from "./staticPageContents.js";
+import { clickOnEnter } from "../utils/uiHelpers.js"
 
 import type { NewsPostType } from "./newsSchema.js";
 import { News } from "./News.js";
@@ -35,6 +36,7 @@ function Home({
     const [loginDisplay, setLoginDisplay] = React.useState(initialLoginDisplay);
     const newsRef = React.useRef(null);
     const contactRef = React.useRef(null);
+    const activeElement = React.useRef(null);
 
     return (
         <>
@@ -95,6 +97,7 @@ function MainBannerSection({
     newsRef,
     contactRef,
 }) {
+    const activeElement = React.useRef(null);
     function handleLogin() {
         if (loginDisplay !== "login") {
             setLoginDisplay("login");
@@ -120,7 +123,6 @@ function MainBannerSection({
     function toSupport() {
         window.location = homeLinks['support'];
     }
-
 
     let activeModal = null;
     switch(loginDisplay) {
@@ -305,6 +307,7 @@ function BannerDiamondButton({
                     : {}
                 }
                 onClick={handleClick}
+                onKeyPress={clickOnEnter}
             >
                 <g className={`home_diamond_rotategroup diamond_${color}`} transform="rotate(45 50 50)">
                     <rect className="home_diamond_rear" x="29" y="29" width="78" height="78" />
@@ -372,10 +375,10 @@ function MainBannerModal({ title, className, children, handleCloseClick}) {
             {title
                 ? <div className="modal_header">
                     <div className="modal_title">{title}</div>
-                    <div className="modal_close" onClick={handleCloseClick}>close</div>
+                    <div role="button" tabIndex="0" className="modal_close" onKeyPress={clickOnEnter} onClick={handleCloseClick}>close</div>
                 </div>
                 :
-                <div className="modal_close standalone" onClick={handleCloseClick}>close</div>
+                <div className="modal_close standalone" role="button" tabIndex="0" onKeyPress={clickOnEnter} onClick={handleCloseClick}>close</div>
             }
             <div className="modal_content">
                 {children}
@@ -418,7 +421,7 @@ function FooterSection({ }) {
 function LoggedOutButtons({ handleLogin, handleRegister }) {
     return (
         <>
-            <svg role="button" tabIndex="0" name="login" className="login_button" width="162" height="32" onClick={() => handleLogin()} style={{ zIndex: 2 }}>
+            <svg role="button" tabIndex="0" name="login" className="login_button" width="162" height="32" onClick={() => handleLogin()} onKeyPress={clickOnEnter} style={{ zIndex: 2 }}>
                 <radialGradient id="login_fill_default" cx="50%" cy="50%" r="50%" fx="50%" fy="50%">
                     <stop offset="0%" style={{ stopColor: '#464f87', stopOpacity: 1 }} />
                     <stop offset="100%" style={{ stopColor: '#343d77', stopOpacity: 1 }} />
@@ -431,7 +434,7 @@ function LoggedOutButtons({ handleLogin, handleRegister }) {
                 <text className="login_button_shadow_text" x="81" y="18" textAnchor="middle" dominantBaseline="middle">login</text>
                 <text className="login_button_text" x="81" y="16" textAnchor="middle" dominantBaseline="middle">login</text>
             </svg>
-            <svg role="button" tabIndex="0" name="register" className="register_button" width="162" height="32" onClick={() => handleRegister()} style={{ zIndex: 4 }}>
+            <svg role="button" tabIndex="0" name="register" className="register_button" width="162" height="32" onClick={() => handleRegister()} onKeyPress={clickOnEnter} style={{ zIndex: 4 }}>
                 <radialGradient id="register_fill_default" cx="50%" cy="50%" r="50%" fx="50%" fy="50%">
                     <stop offset="0%" style={{ stopColor: '#84314e', stopOpacity: 1 }} />
                     <stop offset="100%" style={{ stopColor: '#68293f', stopOpacity: 1 }} />
@@ -451,8 +454,8 @@ function LoggedOutButtons({ handleLogin, handleRegister }) {
 function LoggedInButtons({ homeLinks }) {
     return (
         <>
-            <a href={homeLinks['profile']} style={{ display: "flex", zIndex: 2 }}>
-                <svg role="button" tabIndex="0" className="profile_button" width="162" height="32">
+            <a role="button" href={homeLinks['profile']} style={{ display: "flex", zIndex: 2 }}>
+                <svg className="profile_button" width="162" height="32">
                     <radialGradient id="profile_fill_default" cx="50%" cy="50%" r="50%" fx="50%" fy="50%">
                         <stop offset="0%" style={{ stopColor: '#464f87', stopOpacity: 1 }} />
                         <stop offset="100%" style={{ stopColor: '#343d77', stopOpacity: 1 }} />
@@ -466,8 +469,8 @@ function LoggedInButtons({ homeLinks }) {
                     <text className="profile_button_text" x="81" y="16" textAnchor="middle" dominantBaseline="middle">profile</text>
                 </svg>
             </a>
-            <a href={homeLinks['logout']} style={{ display: "flex", zIndex: 2 }}>
-                <svg role="button" tabIndex="0" className="logout_button" width="162" height="32">
+            <a role="button" href={homeLinks['logout']} style={{ display: "flex", zIndex: 2 }}>
+                <svg className="logout_button" width="162" height="32">
                     <radialGradient id="logout_fill_default" cx="50%" cy="50%" r="50%" fx="50%" fy="50%">
                         <stop offset="0%" style={{ stopColor: '#84314e', stopOpacity: 1 }} />
                         <stop offset="100%" style={{ stopColor: '#68293f', stopOpacity: 1 }} />
@@ -484,6 +487,5 @@ function LoggedInButtons({ homeLinks }) {
         </>
     );
 }
-
 
 window.Home = Home;

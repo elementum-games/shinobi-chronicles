@@ -463,14 +463,12 @@ body {
     font-size: 13px;
     color: #de7788;
     font-weight: 600;
-    user-select: none;
     margin-left: 15px;
 }
 .login_message_label {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     font-size: 14px;
     color: white;
-    user-select: none;
 }
 .login_username_wrapper {
     flex-basis: 40%;

@@ -83,7 +83,10 @@ export function News({
       className: "news_item"
     }, /*#__PURE__*/React.createElement("div", {
       className: activePostId === newsItem.post_id ? "news_item_header" : "news_item_header news_item_header_minimized",
-      onClick: () => setActivePostId(newsItem.post_id)
+      onClick: () => setActivePostId(newsItem.post_id),
+      role: "button",
+      tabIndex: "0",
+      onKeyPress: clickOnEnter
     }, /*#__PURE__*/React.createElement("div", {
       className: "news_item_title"
     }, newsItem.title.toUpperCase()), /*#__PURE__*/React.createElement("div", {
@@ -212,6 +215,7 @@ function NewsButtons({
     width: "162",
     height: "32",
     onClick: () => loadNews(),
+    onKeyPress: clickOnEnter,
     style: {
       zIndex: 2
     }
@@ -278,6 +282,7 @@ function NewsButtons({
     width: "162",
     height: "32",
     onClick: () => createPost(),
+    onKeyPress: clickOnEnter,
     style: {
       zIndex: 4
     }
@@ -336,4 +341,13 @@ function NewsButtons({
     textAnchor: "middle",
     dominantBaseline: "middle"
   }, "create post")));
+}
+
+// Should probably be a global helper
+function clickOnEnter(event) {
+  if (event.key === "Enter") {
+    event.target.dispatchEvent(new MouseEvent('click', {
+      bubbles: true
+    }));
+  }
 }
