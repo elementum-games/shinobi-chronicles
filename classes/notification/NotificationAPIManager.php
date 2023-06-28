@@ -192,6 +192,13 @@ class NotificationAPIManager {
                         }
                         $notifications[] = $chat_notification;
                     }
+                case "event":
+                    if (false) {
+                        $notification_ids_to_delete[] = $row['notification_id'];
+                        continue 2;
+                    } else {
+                        $notifications[] = NotificationDto::fromDb($row, $this->system->router->getUrl("event"));
+                    }
                 default:
                     break;
             }
@@ -322,6 +329,17 @@ class NotificationAPIManager {
                 alert: false,
             );
             }
+        }
+        //Event
+        if (System::$SC_EVENT_ACTIVE) {
+            $notifications[] = new NotificationDto(
+                action_url: $this->system->router->getUrl('event'),
+                type: "event",
+                message: System::SC_EVENT_NAME . " is active! " . $this->system->time_remaining(System::SC_EVENT_END - time()),
+                user_id: $this->player->user_id,
+                created: time(),
+                alert: false,
+            );
         }
 
         return $notifications;

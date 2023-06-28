@@ -24,7 +24,8 @@ export type NotificationType = {|
         | "marriage"
         | "student"
         | "inbox"
-        | "chat",
+        | "chat"
+        | "event",
     +message: string,
     +notification_id: number,
     +user_id: number,

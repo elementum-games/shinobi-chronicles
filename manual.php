@@ -4,7 +4,7 @@ session_start();
 require "classes/System.php";
 $system = new System();
 $system->db->startTransaction();
-$layout = $system->fetchLayoutByName(System::DEFAULT_LAYOUT);
+$layout = $system->fetchLayoutByName("shadow_ribbon");
 
 if(isset($_SESSION['user_id'])) {
     require_once 'classes.php';

@@ -57,9 +57,7 @@ function Home({
     isAdmin: isAdmin,
     version: version,
     homeLinks: homeLinks
-  })), /*#__PURE__*/React.createElement(FeatureSection, null), /*#__PURE__*/React.createElement(WorldSection, null), /*#__PURE__*/React.createElement(ContactSection, {
-    contactRef: contactRef
-  }), /*#__PURE__*/React.createElement(FooterSection, null));
+  })), /*#__PURE__*/React.createElement(FeatureSection, null), /*#__PURE__*/React.createElement(WorldSection, null), /*#__PURE__*/React.createElement(FooterSection, null));
 }
 function MainBannerSection({
   homeLinks,
@@ -96,6 +94,9 @@ function MainBannerSection({
     element.scrollIntoView({
       behavior: 'smooth'
     });
+  }
+  function toSupport() {
+    window.location = homeLinks['support'];
   }
   let activeModal = null;
   switch (loginDisplay) {
@@ -212,7 +213,7 @@ function MainBannerSection({
   })), /*#__PURE__*/React.createElement("div", {
     className: "banner_button contact"
   }, /*#__PURE__*/React.createElement(BannerDiamondButton, {
-    handleClick: () => scrollTo(contactRef.current),
+    handleClick: () => toSupport(),
     firstLineText: "contact us",
     color: "blue",
     largeSize: true
@@ -277,7 +278,7 @@ function BannerDiamondButton({
     textAnchor: "middle",
     dominantBaseline: "middle"
   }, firstLineText), /*#__PURE__*/React.createElement("text", {
-    className: "home_diamond_blue_text",
+    className: `home_diamond_${color}_text`,
     x: "50",
     y: "50",
     textAnchor: "middle",
@@ -289,7 +290,7 @@ function BannerDiamondButton({
     textAnchor: "middle",
     dominantBaseline: "middle"
   }, firstLineText), /*#__PURE__*/React.createElement("text", {
-    className: "home_diamond_blue_text",
+    className: `home_diamond_${color}_text`,
     x: "50",
     y: "38",
     textAnchor: "middle",
@@ -301,7 +302,7 @@ function BannerDiamondButton({
     textAnchor: "middle",
     dominantBaseline: "middle"
   }, secondLineText), /*#__PURE__*/React.createElement("text", {
-    className: "home_diamond_blue_text",
+    className: `home_diamond_${color}_text`,
     x: "50",
     y: "62",
     textAnchor: "middle",

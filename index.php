@@ -38,6 +38,7 @@ $home_links['logout'] = $system->router->base_url . "?logout=1";
 $home_links['profile'] = $system->router->getUrl('profile');
 $home_links['github'] = $system->router->links['github'];
 $home_links['discord'] = $system->router->links['discord'];
+$home_links['support'] = $system->router->base_url . "support.php";
 
 $min_user_name_length = User::MIN_NAME_LENGTH;
 $max_user_name_length = 18;
@@ -528,13 +529,24 @@ if($LOGGED_IN) {
         $route = Router::$routes[$id] ?? null;
 
         try {
-            $location_name = $player->current_location->location_id
-                ? ' ' . ' <div id="contentHeaderLocation">' . $player->current_location->name . '</div>'
-                : null;
+            if ($layout->key == "new_geisha") {
+                $location_name = $player->current_location->location_id
+                    ? ' ' . ' <div id="contentHeaderLocation">' . " | " . $player->current_location->name . '</div>'
+                    : null;
+                $location_coords = "<div id='contentHeaderCoords'>" . " (" . $player->location->x . "." . $player->location->y . ")" . '</div>';
+                $content_header_divider = '<div class="contentHeaderDivider"><svg width="100%" height="2"><line x1="0%" y1="1" x2="100%" y2="1" stroke="#77694e" stroke-width="1"></line></svg></div>';
+            } else {
+                $location_name = $player->current_location->location_id
+                    ? ' ' . ' <div id="contentHeaderLocation">' . $player->current_location->name . '</div>'
+                    : null;
+                $location_coords = null;
+                $content_header_divider = null;
+            }
+
             $layout->renderBeforeContentHTML(
                 system: $system,
                 player: $player,
-                page_title: $route->title . $location_name
+                page_title: $route->title . $location_name . $location_coords . $content_header_divider,
             );
 
             $system->router->assertRouteIsValid($route, $player);
@@ -595,22 +607,24 @@ if($LOGGED_IN) {
             }
         }
     }
-    else if (isset($_GET['home_view'])) {
+    else if (isset($_GET['home'])) {
         if ($system->environment == System::ENVIRONMENT_DEV) {
             $home_view = "default";
-            switch ($_GET['home_view']) {
-                case "news":
-                    $home_view = "news";
-                    break;
-                case "contact":
-                    $home_view = "contact";
-                    break;
-                case "rules":
-                    $home_view = "rules";
-                    break;
-                case "terms":
-                    $home_view = "terms";
-                    break;
+            if (isset($_GET['view'])) {
+                switch ($_GET['view']) {
+                    case "news":
+                        $home_view = "news";
+                        break;
+                    case "contact":
+                        $home_view = "contact";
+                        break;
+                    case "rules":
+                        $home_view = "rules";
+                        break;
+                    case "terms":
+                        $home_view = "terms";
+                        break;
+                }
             }
             $layout->renderBeforeContentHTML($system, $player ?? null, "Home", render_content: false, render_header: true, render_sidebar: false, render_topbar: false);
             try {
