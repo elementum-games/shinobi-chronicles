@@ -165,6 +165,47 @@ function event() {
         }
     }
 
+    if (isset($_GET['exchange'])) {
+        try {
+            // Change the item ID values based on dev/prod
+            // These are placeholder exchange options
+            switch ($_GET['exchange']) {
+                case "red_yen":
+                    $player->getInventory();
+                    if (!$player->hasItem("19")) {
+                        throw new RuntimeException("You do not have this item!");
+                    }
+                    if ($player->items["19"]->quantity < 3) {
+                        throw new RuntimeException("You do not have enough of this item!");
+                    }
+                    $player->items["19"]->quantity -= 3;
+                    $player->addMoney("1000", "Event");
+                    $system->message("You have traded 3 Red Lanterns for 1000 yen!");
+                    $player->updateInventory();
+                    $player->updateData();
+                    break;
+                case "red_rep":
+                    $player->getInventory();
+                    if (!$player->hasItem("19")) {
+                        throw new RuntimeException("You do not have this item!");
+                    }
+                    if ($player->items["19"]->quantity < 3) {
+                        throw new RuntimeException("You do not have enough of this item!");
+                    }
+                    $player->items["19"]->quantity -= 3;
+                    $player->addRep("1");
+                    $system->message("You have traded 3 Red Lanterns for 1 rep!");
+                    $player->updateInventory();
+                    $player->updateData();
+                    break;
+                default:
+                    break;
+            }
+        } catch (RuntimeException $e) {
+            $system->message($e->getMessage());
+        }
+
+    }
 
     if($system->message && !$system->message_displayed) {
         $system->printMessage();

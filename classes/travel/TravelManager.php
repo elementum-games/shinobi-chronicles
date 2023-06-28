@@ -2,6 +2,7 @@
 
 require __DIR__ . '/NearbyPlayerDto.php';
 require __DIR__ . '/MapObjectiveLocation.php';
+require __DIR__ . '/MapLocationAction.php';
 require __DIR__ . '/InvalidMovementException.php';
 
 class TravelManager {
@@ -314,7 +315,7 @@ class TravelManager {
             $locations[] = new MapLocation($loc);
         }
 
-        // Get objectives
+        // Get mission objectives
         $objectives = [];
         if ($this->user->mission_id > 0) {
             if ($this->user->mission_stage['action_type'] == 'travel') {
@@ -330,8 +331,47 @@ class TravelManager {
             }
         }
 
+        // TEMP Add Events - We have to hard code the mission IDs is System for now
+        if (System::$SC_EVENT_ACTIVE) {
+            foreach ($this->system->event_data['easy'] as $event_mission) {
+                $objectives[] = new MapObjectiveLocation(
+                    name: "Easy",
+                    map_id: 1,
+                    x: $event_mission['x'],
+                    y: $event_mission['y'],
+                    image: "/images/events/lanternred.png",
+                    action_url: $this->system->router->getUrl("mission", ['start_mission' => '12', 'mission_type' => 'event']),
+                    action_message: "Start Easy Lantern Event",
+                );
+            }
+            foreach ($this->system->event_data['medium'] as $event_mission) {
+                $objectives[] = new MapObjectiveLocation(
+                    name: "Medium",
+                    map_id: 1,
+                    x: $event_mission['x'],
+                    y: $event_mission['y'],
+                    image: "/images/events/lanternblue.png",
+                    action_url: $this->system->router->getUrl("mission", ['start_mission' => '13', 'mission_type' => 'event']),
+                    action_message: "Start Medium Lantern Event",
+                );
+            }
+            foreach ($this->system->event_data['hard'] as $event_mission) {
+                $objectives[] = new MapObjectiveLocation(
+                    name: "Hard",
+                    map_id: 1,
+                    x: $event_mission['x'],
+                    y: $event_mission['y'],
+                    image: "/images/events/lanternviolet.png",
+                    action_url: $this->system->router->getUrl("mission", ['start_mission' => '11', 'mission_type' => 'event']),
+                    action_message: "Start Hard Lantern Event",
+                );
+            }
+        }
+
         // Check if objectives match existing locations
         $new_locations = [];
+        // Use this to assign unique ID for react key
+        $new_location_count = 1000;
         foreach ($objectives as $obj) {
             $match = false;
             foreach ($locations as $loc) {
@@ -339,12 +379,15 @@ class TravelManager {
                 if ($obj->x == $loc->x && $obj->y == $loc->y && $obj->map_id == $loc->map_id) {
                     $loc->objective_image = $obj->image;
                     $loc->name = $loc->name . "\n " . $obj->name;
+                    $loc->action_url = $obj->action_url;
+                    $loc->action_message = $obj->action_message;
                     $match = true;
                 }
             }
             // If no, create location
             if (!$match) {
                 $location_data = array(
+                        "location_id" => $new_location_count,
                         "name" => $obj->name,
                         "map_id" => $obj->map_id,
                         "x" => $obj->x,
@@ -355,8 +398,11 @@ class TravelManager {
                         "pvp_allowed" => 1,
                         "ai_allowed" => 1,
                         "regen" => 50,
+                        "action_url" => $obj->action_url,
+                        "action_message" => $obj->action_message,
                     );
                 $new_locations[] = new MapLocation($location_data);
+                $new_location_count++;
             }
         }
 
@@ -400,6 +446,19 @@ class TravelManager {
         }
 
         return $village_locations;
+    }
+
+    /**
+     * @return MapLocationAction
+     */
+    public static function getMapLocationAction(array $locations = [], User $player): MapLocationAction
+    {
+        foreach ($locations as $location) {
+            if ($location->x == $player->location->x && $location->y == $player->location->y) {
+                return new MapLocationAction($location->action_url, $location->action_message);
+            }
+        }
+        return new MapLocationAction();
     }
 
 }

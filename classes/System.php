@@ -35,7 +35,10 @@ class System {
     // TODO: Remove! This is a temporary way to do events
     const SC_EVENT_START = 0;
     const SC_EVENT_END = 1641769200;
-    const SC_EVENT_NAME = 'Holiday 2021';
+    const SC_EVENT_NAME = 'Lantern Placeholder';
+
+    // Temporary event data storage
+    public array $event_data = [];
 
     public static bool $SC_EVENT_ACTIVE = true;
 
@@ -197,6 +200,25 @@ class System {
         if(time() > self::SC_EVENT_END) {
             self::$SC_EVENT_ACTIVE = false;
         }
+        // Manually set event locations, pulled from TravelManager and Missions to identify event missions
+        $event_missions_easy[] = ['x' => 5, 'y' => 4];
+        $event_missions_easy[] = ['x' => 2, 'y' => 11];
+        $event_missions_easy[] = ['x' => 17, 'y' => 10];
+        $event_missions_easy[] = ['x' => 23, 'y' => 2];
+        $event_missions_easy[] = ['x' => 22, 'y' => 16];
+        $event_missions_easy[] = ['x' => 26, 'y' => 14];
+        $event_missions_easy[] = ['x' => 27, 'y' => 4];
+        $event_missions_easy[] = ['x' => 13, 'y' => 8];
+        $event_missions_easy[] = ['x' => 6, 'y' => 7];
+        $event_missions_easy[] = ['x' => 5, 'y' => 14];
+        $event_missions_medium[] = ['x' => 15, 'y' => 3];
+        $event_missions_medium[] = ['x' => 24, 'y' => 9];
+        $event_missions_medium[] = ['x' => 16, 'y' => 15];
+        $event_missions_medium[] = ['x' => 8, 'y' => 10];
+        $event_missions_hard[] = ['x' => 10, 'y' => 1];
+        $this->event_data['easy'] = $event_missions_easy;
+        $this->event_data['medium'] = $event_missions_medium;
+        $this->event_data['hard'] = $event_missions_hard;
     }
 
     /**
