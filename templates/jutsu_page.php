@@ -21,6 +21,9 @@
     .jutsu_list_table tr {
         text-align: center;
     }
+    .jutsu_list_table {
+        position: relative;
+    }
 
     .jutsu_slots_container {
         display: flex;
@@ -114,13 +117,16 @@
 
     .jutsu_details_table {
         border-radius: 10px;
-        position:fixed;
+        position: absolute;
         z-index: 10;
-	    top: 35%;
-        left: 43.75%;
+	    top: 150px;
+        left: 50%;
         width: 580px !important;
-        transform: translate(-50%, -50%);
+        transform: translate(-50%, 0%);
     }
+        .jutsu_details_table tr {
+            text-align: left;
+        }
     .jutsu_details_label_column {
         vertical-align: top;
         display: inline-block;
@@ -356,75 +362,7 @@
     <?php endif; ?>
 </table>
 
-<!--Jutsu Details Modal-->
-<table class="table jutsu_details_table">
-    <tr>
-        <th id="jutsu_name" colspan="2"></th>
-    </tr>
-    <tr>
-        <td>
-            <div class="jutsu_details_label_column">
-                <p>Rank:</p>
-                <p>Type:</p>
-                <p>Element:</p>
-                <p>Use cost:</p>
-                <p>Level:</p>
-            </div>
-            <div class="jutsu_details_info_column">
-                <p id="jutsu_rank"></p>
-                <p id="jutsu_type"></p>
-                <p id="jutsu_element"></p>
-                <p id="jutsu_cost"></p>
-                <p id="jutsu_level"></p>
-            </div>
-        </td>
-        <td style="vertical-align: top;">
-            <div class="jutsu_details_label_column">
-                <p>Hand seals:</p>
-                <p>Power:</p>
-                <p>Cooldown:</p>
-                <p>Effect:</p>
-                <p>Duration:</p>
-            </div>
-            <div class="jutsu_details_info_column">
-                <p id="jutsu_seals"></p>
-                <p id="jutsu_power"></p>
-                <p id="jutsu_cooldown"></p>
-                <p id="jutsu_effect"></p>
-                <p id="jutsu_duration"></p>
-            </div>
-        </td>
-    </tr>
-    <tr id="jutsu_details_child_row">
-        <td colspan="2">
-            <div class="jutsu_details_label">
-                <p>Child Jutsu:</p>
-            </div>
-            <div class="jutsu_details_child">
-                <p id="jutsu_child"></p>
-                
-            </div>
-        </td>
-    </tr>
-    <tr>
-        <td colspan="2">
-            <div class="jutsu_details_label">
-                <p>Description:</p>
-            </div>
-            <div class="jutsu_details_description">
-                <p id="jutsu_description"></p>
-                <p style='text-align:center'>
-                    <a id="forget_jutsu" href='<?= $self_link ?>&forget_jutsu='>Forget Jutsu!</a>
-                </p>
-            </div>
-        </td>
-    </tr>
-    <tr style="text-align:center">
-        <th colspan="2" class="jutsu_details_close">
-            <div>Close</div>
-        </th>
-    </tr>
-</table>
+
 
 <!--Jutsu List-->
 <table class="table jutsu_list_table">
@@ -452,6 +390,75 @@
     </tr>
     <tr>
         <td>
+            <!--Jutsu Details Modal-->
+            <table class="table jutsu_details_table">
+                <tr>
+                    <th id="jutsu_name" colspan="2"></th>
+                </tr>
+                <tr>
+                    <td>
+                        <div class="jutsu_details_label_column">
+                            <p>Rank:</p>
+                            <p>Type:</p>
+                            <p>Element:</p>
+                            <p>Use cost:</p>
+                            <p>Level:</p>
+                        </div>
+                        <div class="jutsu_details_info_column">
+                            <p id="jutsu_rank"></p>
+                            <p id="jutsu_type"></p>
+                            <p id="jutsu_element"></p>
+                            <p id="jutsu_cost"></p>
+                            <p id="jutsu_level"></p>
+                        </div>
+                    </td>
+                    <td style="vertical-align: top;">
+                        <div class="jutsu_details_label_column">
+                            <p>Hand seals:</p>
+                            <p>Power:</p>
+                            <p>Cooldown:</p>
+                            <p>Effect:</p>
+                            <p>Duration:</p>
+                        </div>
+                        <div class="jutsu_details_info_column">
+                            <p id="jutsu_seals"></p>
+                            <p id="jutsu_power"></p>
+                            <p id="jutsu_cooldown"></p>
+                            <p id="jutsu_effect"></p>
+                            <p id="jutsu_duration"></p>
+                        </div>
+                    </td>
+                </tr>
+                <tr id="jutsu_details_child_row">
+                    <td colspan="2">
+                        <div class="jutsu_details_label">
+                            <p>Child Jutsu:</p>
+                        </div>
+                        <div class="jutsu_details_child">
+                            <p id="jutsu_child"></p>
+                
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        <div class="jutsu_details_label">
+                            <p>Description:</p>
+                        </div>
+                        <div class="jutsu_details_description">
+                            <p id="jutsu_description"></p>
+                            <p style='text-align:center'>
+                                <a id="forget_jutsu" href='<?= $self_link ?>&forget_jutsu='>Forget Jutsu!</a>
+                            </p>
+                        </div>
+                    </td>
+                </tr>
+                <tr style="text-align:center">
+                    <th colspan="2" class="jutsu_details_close">
+                        <div>Close</div>
+                    </th>
+                </tr>
+            </table>
             <div class="jutsu_list">
                 <?php foreach ($jutsu_list as $jutsu): ?>
                     <!--data attributes used for filter logic-->

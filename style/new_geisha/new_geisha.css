@@ -175,6 +175,40 @@ body {
     margin-bottom: var(--hotbar-height);
 }
 
+.contentHeader {
+    font-family: var(--font-primary) !important;
+    font-variant: var(--font-primary-variant);
+    color: var(--font-color-1) !important;
+    font-size: var(--font-large) !important;
+    display: flex !important;
+    flex-direction: row !important;
+    white-space: nowrap;
+}
+
+#contentHeaderLocation {
+    font-family: var(--font-primary) !important;
+    font-variant: var(--font-primary-variant);
+    color: var(--font-color-1) !important;
+    font-size: var(--font-large) !important;
+    white-space: pre;
+}
+
+.contentHeaderDivider {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    margin-left: 15px;
+    margin-right: 25px;
+}
+
+#contentHeaderCoords {
+    font-family: var(--font-primary) !important;
+    font-variant: var(--font-primary-variant);
+    color: var(--font-color-1) !important;
+    font-size: var(--font-large) !important;
+    white-space: pre;
+}
+
 #content {
     width: 100%;
     background-image: var(--content-background-gradient);
@@ -363,4 +397,10 @@ body {
         -1px 1px var(--shadow-size) var(--shadow-color),
         0 1px var(--shadow-size) var(--shadow-color),
         1px 1px var(--shadow-size) var(--shadow-color);
+}
+
+/* Compatibility */
+.systemMessage {
+    width: 100%;
+    top: 5px;
 }

@@ -6,5 +6,6 @@ export type NewsPostType = {|
     +title: string,
     +message: string,
     +time: number,
-    +tags: $ReadOnlyArray<string>,
+    +tags: $ReadOnlyArray < string >,
+    +version: string,
 |};

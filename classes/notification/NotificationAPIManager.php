@@ -170,7 +170,7 @@ class NotificationAPIManager {
                         $notification_ids_to_delete[] = $row['notification_id'];
                         continue 2;
                     } else {
-                        $notifications[] = NotificationDto::fromDb($row, $this->system->router->getUrl('villageHQ', ['view' => 'sensei']));
+                        $notifications[] = NotificationDto::fromDb($row, $this->system->router->getUrl('academy'));
                     }
                     break;
                 case "inbox":
@@ -191,6 +191,13 @@ class NotificationAPIManager {
                             $chat_notification->action_url = $this->system->router->getUrl("chat", ['post_id' => $chat_notification->post_id]);
                         }
                         $notifications[] = $chat_notification;
+                    }
+                case "event":
+                    if (false) {
+                        $notification_ids_to_delete[] = $row['notification_id'];
+                        continue 2;
+                    } else {
+                        $notifications[] = NotificationDto::fromDb($row, $this->system->router->getUrl("event"));
                     }
                 default:
                     break;
@@ -314,7 +321,7 @@ class NotificationAPIManager {
         if (SenseiManager::isActiveSensei($this->player->user_id, $this->system)) {
             if (SenseiManager::hasApplications($this->player->user_id, $this->system)) {
                 $notifications[] = new NotificationDto(
-                action_url: $this->system->router->getUrl('villageHQ', ['view' => 'sensei']),
+                action_url: $this->system->router->getUrl('academy'),
                 type: "student",
                 message: "Application received!",
                 user_id: $this->player->user_id,
@@ -322,6 +329,17 @@ class NotificationAPIManager {
                 alert: false,
             );
             }
+        }
+        //Event
+        if (System::$SC_EVENT_ACTIVE) {
+            $notifications[] = new NotificationDto(
+                action_url: $this->system->router->getUrl('event'),
+                type: "event",
+                message: System::SC_EVENT_NAME . " is active! " . $this->system->time_remaining(System::SC_EVENT_END - time()),
+                user_id: $this->player->user_id,
+                created: time(),
+                alert: false,
+            );
         }
 
         return $notifications;

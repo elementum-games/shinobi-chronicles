@@ -20,32 +20,53 @@ class Layout {
         public string $footer,
     ) {}
 
-    public function renderBeforeContentHTML(System $system, ?User $player, string $page_title, bool $custom_page = false): void {
+    public function renderBeforeContentHTML(
+      System $system, 
+      ?User $player, 
+      string $page_title, 
+      bool $render_header = true, 
+      bool $render_sidebar = true, 
+      bool $render_topbar = true, 
+      bool $render_content = true
+    ): void {
         if($this->key == 'new_geisha') {
-            if ($custom_page) {
-                echo $this->heading;
-                return;
-            }
             echo $this->heading;
-            if ($player->getSidebarPosition() == 'right') {
-                echo "<link rel='stylesheet' type='text/css' href='style/sidebar_right.css' />";
-            }
-            require 'templates/header.php';
-
-            echo "<div id='container'>";
-
-            if($player != null) {
-                require 'templates/sidebar.php';
-                echo '<div id="content_wrapper">';
-                require 'templates/topbar.php';
+            if (isset($player)) {
+                if ($player->getSidebarPosition() == 'right') {
+                    echo "<link rel='stylesheet' type='text/css' href='style/sidebar_right.css' />";
+                }
             }
 
-            echo str_replace("[HEADER_TITLE]", $page_title, $this->body_start);
-
-            if($player != null && !$player->global_message_viewed) {
-                $global_message = $system->fetchGlobalMessage();
-                $this->renderGlobalMessage($system, $global_message);
+            if ($render_header) {
+                require 'templates/header.php';
             }
+            if ($render_content) {
+                echo "<div id='container'>";
+            }
+
+            if(isset($player)) {
+                if ($render_sidebar) {
+                    require 'templates/sidebar.php';
+                } else {
+                    echo "<link rel='stylesheet' type='text/css' href='style/sidebar_none.css' />";
+                }
+                if ($render_content) {
+                    echo '<div id="content_wrapper">';
+                }
+                if ($render_topbar) {
+                    require 'templates/topbar.php';
+                }
+            }
+
+            if ($render_content) {
+                echo str_replace("[HEADER_TITLE]", $page_title, $this->body_start);
+
+                if ($player != null && !$player->global_message_viewed) {
+                    $global_message = $system->fetchGlobalMessage();
+                    $this->renderGlobalMessage($system, $global_message);
+                }
+            }
+
         }
         else {
             echo $this->heading;
@@ -71,9 +92,9 @@ class Layout {
         }
     }
 
-    public function renderAfterContentHTML(System $system, ?User $player, ?float $page_load_time = null, bool $custom_page = false): void {
+    public function renderAfterContentHTML(System $system, ?User $player, ?float $page_load_time = null, bool $render_content = true, bool $render_footer = true, bool $render_hotbar = true): void {
         if($this->key == 'new_geisha') {
-            if ($custom_page) {
+            if (!$render_content) {
                 echo "</body></html>";
                 return;
             }
@@ -83,11 +104,15 @@ class Layout {
             if($player != null) {
                 echo "</div>";
                 if ($system->environment == System::ENVIRONMENT_DEV) {
-                    require 'templates/hotbar.php';
+                    if ($render_hotbar) {
+                        require 'templates/hotbar.php';
+                    }
                 }
             }
 
-            $this->renderFooter($page_load_time);
+            if ($render_footer) {
+                $this->renderFooter($page_load_time);
+            }
         }
         else {
             // Display side menu and footer

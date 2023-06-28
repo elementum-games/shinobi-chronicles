@@ -10,7 +10,7 @@ if(isset($_SESSION['user_id'])) {
 }
 
 // Start display
-$layout = $system->fetchLayoutByName(System::DEFAULT_LAYOUT);
+$layout = $system->fetchLayoutByName("shadow_ribbon");
 
 $layout->renderStaticPageHeader("Create Account");
 

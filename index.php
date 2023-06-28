@@ -30,7 +30,15 @@ $login_error_text = "";
 $login_message_text = "";
 $register_error_text = "";
 $reset_error_text = "";
+$initial_login_display = "none";
 $register_pre_fill = [];
+$home_links = [];
+$home_links['news_api'] = $system->router->api_links['news'];
+$home_links['logout'] = $system->router->base_url . "?logout=1";
+$home_links['profile'] = $system->router->getUrl('profile');
+$home_links['github'] = $system->router->links['github'];
+$home_links['discord'] = $system->router->links['discord'];
+$home_links['support'] = $system->router->base_url . "support.php";
 
 $min_user_name_length = User::MIN_NAME_LENGTH;
 $max_user_name_length = 18;
@@ -521,13 +529,24 @@ if($LOGGED_IN) {
         $route = Router::$routes[$id] ?? null;
 
         try {
-            $location_name = $player->current_location->location_id
-                ? ' ' . ' <div id="contentHeaderLocation">' . $player->current_location->name . '</div>'
-                : null;
+            if ($layout->key == "new_geisha") {
+                $location_name = $player->current_location->location_id
+                    ? ' ' . ' <div id="contentHeaderLocation">' . " | " . $player->current_location->name . '</div>'
+                    : null;
+                $location_coords = "<div id='contentHeaderCoords'>" . " (" . $player->location->x . "." . $player->location->y . ")" . '</div>';
+                $content_header_divider = '<div class="contentHeaderDivider"><svg width="100%" height="2"><line x1="0%" y1="1" x2="100%" y2="1" stroke="#77694e" stroke-width="1"></line></svg></div>';
+            } else {
+                $location_name = $player->current_location->location_id
+                    ? ' ' . ' <div id="contentHeaderLocation">' . $player->current_location->name . '</div>'
+                    : null;
+                $location_coords = null;
+                $content_header_divider = null;
+            }
+
             $layout->renderBeforeContentHTML(
                 system: $system,
                 player: $player,
-                page_title: $route->title . $location_name
+                page_title: $route->title . $location_name . $location_coords . $content_header_divider,
             );
 
             $system->router->assertRouteIsValid($route, $player);
@@ -588,6 +607,38 @@ if($LOGGED_IN) {
             }
         }
     }
+    else if (isset($_GET['home'])) {
+        if ($system->environment == System::ENVIRONMENT_DEV) {
+            $home_view = "default";
+            if (isset($_GET['view'])) {
+                switch ($_GET['view']) {
+                    case "news":
+                        $home_view = "news";
+                        break;
+                    case "contact":
+                        $home_view = "contact";
+                        break;
+                    case "rules":
+                        $home_view = "rules";
+                        break;
+                    case "terms":
+                        $home_view = "terms";
+                        break;
+                }
+            }
+            $layout->renderBeforeContentHTML($system, $player ?? null, "Home", render_content: false, render_header: true, render_sidebar: false, render_topbar: false);
+            try {
+                require('./templates/home.php');
+            } catch (RuntimeException $e) {
+                $system->db->rollbackTransaction();
+                $system->message($e->getMessage());
+                $system->printMessage(true);
+            }
+            $layout->renderAfterContentHTML($system, $player ?? null, render_content: false, render_footer: false, render_hotbar: false);
+            $page_load_time = round(microtime(true) - $PAGE_LOAD_START, 3);
+            $system->db->commitTransaction();
+        }
+    }
     else {
         $layout->renderBeforeContentHTML(
             system: $system,
@@ -596,7 +647,7 @@ if($LOGGED_IN) {
         );
 
         $system->printMessage();
-        if(!$player->global_message_viewed) {
+        if (!$player->global_message_viewed) {
             $global_message = $system->fetchGlobalMessage();
             $layout->renderGlobalMessage($system, $global_message);
         }
@@ -604,7 +655,7 @@ if($LOGGED_IN) {
         try {
             require("pages/profile.php");
             userProfile();
-        } catch(RuntimeException $e) {
+        } catch (RuntimeException $e) {
             $system->db->rollbackTransaction();
             $system->message($e->getMessage());
             $system->printMessage(true);
@@ -620,7 +671,7 @@ else {
     } else {
         $layout = $system->fetchLayoutByName(System::DEFAULT_LAYOUT);
     }
-    $layout->renderBeforeContentHTML($system, $player ?? null, "Home", custom_page: true);
+    $layout->renderBeforeContentHTML($system, $player ?? null, "Home", render_content: false, render_header: false, render_sidebar: false, render_topbar: false);
 
     // Display error messages
     $system->printMessage();
@@ -634,8 +685,17 @@ else {
     $captcha = '';
 
     if ($system->environment == System::ENVIRONMENT_DEV) {
+        if ($login_error_text != "" || $login_message_text != "") {
+            $initial_login_display = "login";
+        }
+        if ($reset_error_text != "") {
+            $initial_login_display = "reset";
+        }
+        if ($register_error_text != "") {
+            $initial_login_display = "register";
+        }
         require('./templates/home.php');
-        $layout->renderAfterContentHTML($system, $player ?? null, custom_page: true);
+        $layout->renderAfterContentHTML($system, $player ?? null, render_content: false, render_footer: false, render_hotbar: false);
 
         $page_load_time = round(microtime(true) - $PAGE_LOAD_START, 3);
         $system->db->commitTransaction();

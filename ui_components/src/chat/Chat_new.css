@@ -51,9 +51,10 @@
     flex-direction: column;
     text-align: center;
     justify-content: center;
-    width: var(--content-width);
+    max-width: var(--content-width);
     border-color: var(--box-color-default);
     border-style: solid;
+    width: 100%;
 }
 .meme_close {
     padding-bottom: 25px;
@@ -102,6 +103,7 @@
 
 #chatReactContainer {
     font-size: var(--font-default);
+    margin-top: 25px;
 }
 
 #chat_input_box {

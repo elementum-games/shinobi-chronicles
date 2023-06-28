@@ -2,12 +2,14 @@
 
 # Begin standard auth
 require_once __DIR__ . "/../classes.php";
+require_once __DIR__ . "/../classes/LoggedOutException.php";
 
 $system = API::init();
 
 try {
     $player = Auth::getUserFromSession($system);
-    $player->loadData(User::UPDATE_REGEN);
+    $player->loadData(User::UPDATE_NOTHING);
+} catch (LoggedOutException $e) {
 } catch (Exception $e) {
     API::exitWithException($e, system: $system);
 }
@@ -22,12 +24,42 @@ try {
     }
 
     $NewsAPIResponse = new NewsAPIResponse();
-    $NewsManager = new NewsManager($system, $player);
+    $NewsManager = new NewsManager($system, $player ?? null);
 
     switch ($request) {
         case "getLatestPosts":
             $NewsAPIResponse->response_data = [
                 'postData' => NewsAPIPresenter::newsPostResponse($NewsManager, $system),
+            ];
+            break;
+        case "getNewsPosts":
+            $num_posts = $system->db->clean($_POST['num_posts']);
+            $NewsAPIResponse->response_data = [
+                'postData' => NewsAPIPresenter::newsPostResponse($NewsManager, $system, $num_posts),
+            ];
+            break;
+        case "saveNewsPost":
+            $tags = [];
+            if ($system->db->clean($_POST['update']) === "true") {
+                array_push($tags, "update");
+            }
+            if ($system->db->clean($_POST['bugfix']) === "true") {
+                array_push($tags, "bugfix");
+            }
+            if ($system->db->clean($_POST['event']) === "true") {
+                array_push($tags, "event");
+            }
+            $newsPost = new NewsPostDto(
+                post_id: $system->db->clean($_POST['post_id']),
+                title: $system->db->clean($_POST['title']),
+                version: $system->db->clean($_POST['version']),
+                message: $system->db->clean($_POST['content']),
+                tags: $tags,
+            );
+            $num_posts = $system->db->clean($_POST['num_posts']);
+            $NewsManager->saveNewsPost($newsPost);
+            $NewsAPIResponse->response_data = [
+                'postData' => NewsAPIPresenter::newsPostResponse($NewsManager, $system, $num_posts),
             ];
             break;
         default:

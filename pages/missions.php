@@ -226,9 +226,9 @@ function runActiveMission(): bool {
                     $result = processMissionBattleEnd($battle, $mission, $player);
                     if(strlen($result) > 0) {
                         echo "<table class='table'>
-                        <tr><th>Battle Results</th></tr>
-                        <tr><td>{$result}</td></tr>
-                    </table>";
+                            <tr><th>Battle Results</th></tr>
+                            <tr><td>{$result}</td></tr>
+                        </table>";
                     }
                 }
                 else {

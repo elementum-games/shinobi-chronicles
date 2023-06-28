@@ -8,6 +8,7 @@ class NewsPostDto {
         public string $message = "",
         public int $time = 0,
         public array $tags = [],
+        public ?string $version = "",
     ) {}
 
     public static function fromDb($row): NewsPostDto
@@ -18,8 +19,8 @@ class NewsPostDto {
         $post->title = $row['title'];
         $post->message = $row['message'];
         $post->time = $row['time'];
-        // $post->tags = json_decode($row['tags'], true);
-
+        $post->tags = json_decode($row['tags']);
+        $post->version = $row['version'];
         return $post;
     }
 }

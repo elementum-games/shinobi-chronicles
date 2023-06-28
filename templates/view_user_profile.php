@@ -123,13 +123,13 @@ $clan_positions = array(
                 <?php endif; ?>
             <?php endif; ?>
             <?php if($player->rank_num < 3 && $player->sensei_id == 0 && $player->village->name == $viewUser->village->name && SenseiManager::isActiveSensei($viewUser->user_id, $system) && $viewUser->accept_students && SenseiManager::hasSlot($viewUser->user_id, $system)): ?>
-                &nbsp;&nbsp;|&nbsp;&nbsp;<a href='<?= $system->router->links['villageHQ'] ?>&view=sensei&apply=<?= $viewUser->user_id ?>'>Send Application</a>
+                &nbsp;&nbsp;|&nbsp;&nbsp;<a href='<?= $system->router->links['academy'] ?>&apply=<?= $viewUser->user_id ?>'>Send Application</a>
             <?php endif; ?>
             <?php if($player->rank_num < 3 && $player->sensei_id == $viewUser->user_id): ?>
-            &nbsp;&nbsp;|&nbsp;&nbsp;<a href='<?= $system->router->links['villageHQ'] ?>&view=sensei&leave=true'>Leave Sensei</a>
+            &nbsp;&nbsp;|&nbsp;&nbsp;<a href='<?= $system->router->links['academy'] ?>&leave=true'>Leave Sensei</a>
             <?php endif; ?>
             <?php if(SenseiManager::isActiveSensei($player->user_id, $system) && $viewUser->sensei_id == $player->user_id && $viewUser->user_id != $player->user_id): ?>
-            &nbsp;&nbsp;|&nbsp;&nbsp;<a href='<?= $system->router->links['villageHQ'] ?>&view=sensei&kick=<?= $viewUser->user_id ?>'>Kick Student</a>
+            &nbsp;&nbsp;|&nbsp;&nbsp;<a href='<?= $system->router->links['academy'] ?>&kick=<?= $viewUser->user_id ?>'>Kick Student</a>
             <?php endif; ?>
         </td></tr>
 

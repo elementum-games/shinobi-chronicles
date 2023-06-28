@@ -5,6 +5,8 @@
  * @var string $login_error_text
  * @var string $register_error_text
  * @var string $reset_error_text
+ * @var string $initial_login_display
+ * @var array $home_links
  * @var array $register_pre_fill
  */
 
@@ -25,7 +27,11 @@ else $NewsManager = new NewsManager($system);
     window.addEventListener('load', () => {
         ReactDOM.render(
             React.createElement(Home, {
-                newsApiLink: "<?= $system->router->api_links['news'] ?>",
+                homeLinks: <?= json_encode($home_links) ?>,
+                isLoggedIn: "<?= isset($player) ?>",
+                isAdmin: "<?= isset($player) ? $player->isHeadAdmin() : false ?>",
+                version: "<?= System::VERSION_NAME ?>",
+                initialLoginDisplay: "<?= $initial_login_display ?>",
                 loginURL: "<?= $system->router->base_url ?>",
                 registerURL: "<?= $system->router->base_url ?>",
                 loginErrorText: "<?= $login_error_text ?>",
