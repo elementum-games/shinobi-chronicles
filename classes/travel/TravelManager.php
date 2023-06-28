@@ -258,7 +258,7 @@ class TravelManager {
         }
 
         // Add more users for display
-        if ($this->system->environment == System::ENVIRONMENT_DEV) {
+        if ($this->system->isDevEnvironment()) {
             $placeholder_coords = new TravelCoords(15, 15, 1);
 
             for ($i = 0; $i < 7; $i++) {

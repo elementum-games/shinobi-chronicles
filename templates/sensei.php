@@ -255,7 +255,7 @@
                         <form action="<?= $system->router->links['academy'] ?>" method="post">
                             <input type="checkbox" value="1" name="accept_students" <?php if ($player->accept_students) : echo "checked"; endif; ?> />
                             <label for="accept_students">Accept Students</label>
-                            <?php if ($system->environment == System::ENVIRONMENT_DEV): ?>
+                            <?php if ($system->isDevEnvironment()): ?>
                             <input type="checkbox" value="1" name="enable_lessons" <?php if ($sensei['enable_lessons']) : echo "checked"; endif; ?> />
                             <label for="enable_lessons">Enable Lessons</label>
                             <?php endif; ?>
@@ -464,7 +464,7 @@
     </table>
 <?php endif; ?>
 
-<?php if ($player->rank_num > 2 && $system->environment == System::ENVIRONMENT_DEV): ?>
+<?php if ($player->rank_num > 2 && $system->isDevEnvironment()): ?>
     <table class="table">
         <tbody>
             <tr>
@@ -618,7 +618,7 @@
                         (Available)
                     </a>
                     </span>
-                    <?php elseif ((bool)$sensei['enable_lessons'] && $player->train_time == 0 && $player->user_id != $sensei['sensei_id'] && $player->exp < $sensei['exp'] && $player->rank_num > 2 && $system->environment == System::ENVIRONMENT_DEV): ?>
+                    <?php elseif ((bool)$sensei['enable_lessons'] && $player->train_time == 0 && $player->user_id != $sensei['sensei_id'] && $player->exp < $sensei['exp'] && $player->rank_num > 2 && $system->isDevEnvironment()): ?>
                     <label>Lessons</label>
                     <form action="<?= $system->router->getUrl('academy') ?>" method="post">
 						<select name="lesson">

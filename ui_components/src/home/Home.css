@@ -95,6 +95,8 @@ body {
     position: relative;
 
     width: 1200px;
+    max-width: 100%;
+    overflow: hidden;
     height: calc(1200px - var(--banner-hidden-portion));
     bottom: 60px;
 
@@ -327,6 +329,38 @@ body {
     left: 325px;
     bottom: -225px;
 }*/
+
+/* Mobile Overrides */
+@media (max-width: 1200px) {
+    .main_banner_section {
+        background:
+        repeating-linear-gradient(45deg, rgba(14, 15, 17, 0.125) 0, rgba(14, 15, 17, 0.125) 10%, transparent 0, transparent 50%),
+        repeating-linear-gradient(135deg, rgba(14, 15, 17, 0.125) 0, rgba(14, 15, 17, 0.125) 10%, transparent 0, transparent 50%),
+        radial-gradient(circle at center bottom, #24151d, #151822 70%);
+        background-color: #101113;
+
+        border-bottom: solid 13px #6a5e46;
+    }
+
+    .banner_button.contact {
+        right: 20px;
+        bottom: 210px;
+    }
+    .banner_button.terms {
+        right: 20px;
+        bottom: 50px;
+    }
+
+
+    .banner_button.news {
+        left: 20px;
+        bottom: 210px;
+    }
+    .banner_button.rules {
+        left: 20px;
+        bottom: 50px;
+    }
+}
 
 /* Diamond Styles */
 .home_diamond_container {

@@ -529,7 +529,7 @@ class System {
             case 'new_geisha':
                 return require  "layout/new_geisha.php";
             default:
-                return require  "layout/" . self::DEFAULT_LAYOUT . ".php";
+                return require "layout/" . self::DEFAULT_LAYOUT . ".php";
         }
     }
 
@@ -728,5 +728,9 @@ class System {
         }
 
         return $display;
+    }
+
+    public function isDevEnvironment(): bool {
+        return $this->environment == System::ENVIRONMENT_DEV;
     }
 }

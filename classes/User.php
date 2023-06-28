@@ -2154,6 +2154,6 @@ class User extends Fighter {
         if ($result) {
             return $result['enable_alerts'];
         }
-        return "left";
+        return false;
     }
 }
