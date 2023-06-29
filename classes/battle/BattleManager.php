@@ -729,7 +729,7 @@ class BattleManager {
 
         $text = $attack->jutsu->battle_text;
         $attack_jutsu_color = BattleManager::getJutsuTextColor($attack->jutsu->jutsu_type);
-        $has_element = ($attack->jutsu->element != "none");
+        $has_element = ($attack->jutsu->element != Jutsu::ELEMENT_NONE);
         $element_text = ' with ' . $attack->jutsu->element;
 
         if(empty($attack->jutsu->effect_only)) {
