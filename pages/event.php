@@ -172,13 +172,13 @@ function event() {
             switch ($_GET['exchange']) {
                 case "red_yen":
                     $player->getInventory();
-                    if (!$player->hasItem("19")) {
+                    if (!$player->hasItem($system->event_data['red_lantern_id'])) {
                         throw new RuntimeException("You do not have this item!");
                     }
-                    if ($player->items["19"]->quantity < 3) {
+                    if ($player->items[$system->event_data['red_lantern_id']]->quantity < 3) {
                         throw new RuntimeException("You do not have enough of this item!");
                     }
-                    $player->items["19"]->quantity -= 3;
+                    $player->items[$system->event_data['red_lantern_id']]->quantity -= 3;
                     $player->addMoney("1000", "Event");
                     $system->message("You have traded 3 Red Lanterns for 1000 yen!");
                     $player->updateInventory();
@@ -186,13 +186,13 @@ function event() {
                     break;
                 case "red_rep":
                     $player->getInventory();
-                    if (!$player->hasItem("19")) {
+                    if (!$player->hasItem($system->event_data['red_lantern_id'])) {
                         throw new RuntimeException("You do not have this item!");
                     }
-                    if ($player->items["19"]->quantity < 3) {
+                    if ($player->items[$system->event_data['red_lantern_id']]->quantity < 3) {
                         throw new RuntimeException("You do not have enough of this item!");
                     }
-                    $player->items["19"]->quantity -= 3;
+                    $player->items[$system->event_data['red_lantern_id']]->quantity -= 3;
                     $player->addRep("1");
                     $system->message("You have traded 3 Red Lanterns for 1 rep!");
                     $player->updateInventory();

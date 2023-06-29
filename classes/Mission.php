@@ -312,11 +312,9 @@ class Mission {
         global $system;
         if ($mission->mission_type == Mission::TYPE_EVENT) {
             if ($mission->rank == 2) {
-                echo "here";
                 $valid = false;
                 foreach ($system->event_data['easy'] as $location) {
                     if ($player->location->x == $location['x'] && $player->location->y == $location['y']) {
-                        echo $player->location->x;
                         $valid = true;
                     }
                 }
@@ -372,14 +370,14 @@ class Mission {
                 $player->getInventory();
 
                 // get items from DB
-                $reward_keys = [];
+                $reward_item_ids = [];
                 foreach ($mission->rewards as $item) {
-                    $reward_keys[] = $item['item_id'];
+                    $reward_item_ids[] = $item['item_id'];
                 }
-                $reward_key_string = '(' . implode(',', $reward_keys) . ')';
+                $reward_ids_string = '(' . implode(',', $reward_item_ids) . ')';
                 /** @var Item[] $reward_items */
                 $reward_items = array();
-                $result = $system->db->query("SELECT * FROM `items` where `item_id` IN {$reward_key_string}");
+                $result = $system->db->query("SELECT * FROM `items` where `item_id` IN {$reward_ids_string}");
                 while ($row = $system->db->fetch($result)) {
                     $reward_items[$row['item_id']] = Item::fromDb($row);
                 }

@@ -977,18 +977,6 @@ body {
         animation-delay: -2.5s !important;
         animation-timing-function: ease-in-out;
     }
-    .home_lantern_1::after {
-        content: '';
-        box-shadow: 0 0 45px 3px #f9f8dd, 0 0 20px 2px #c78b7b;
-        position: absolute;
-        width: 10px;
-        height: 40px;
-        left: 5px;
-        top: 5px;
-        animation-delay: -2.5s !important;
-        animation: floatUpDown 5s infinite, Glow 4s infinite;
-        animation-timing-function: ease-in-out;
-    }
 .home_lantern_2 {
     position: absolute;
     transform: translate(-530px, -100px);
@@ -998,18 +986,6 @@ body {
         position: absolute;
         animation: floatUpDown 5s infinite;
         animation-delay: -2.5s !important;
-        animation-timing-function: ease-in-out;
-    }
-    .home_lantern_2::after {
-        content: '';
-        box-shadow: 0 0 45px 3px #f9f8dd, 0 0 20px 2px #c78b7b;
-        position: absolute;
-        width: 10px;
-        height: 40px;
-        left: 5px;
-        top: 5px;
-        animation-delay: -2.5s !important;
-        animation: floatUpDown 5s infinite, Glow 4s infinite;
         animation-timing-function: ease-in-out;
     }
 .home_lantern_3 {
@@ -1022,50 +998,16 @@ body {
         animation-delay: -1.5s !important;
         animation-timing-function: ease-in-out;
     }
-    .home_lantern_3::after {
-        content: '';
-        box-shadow: 0 0 45px 3px #f9f8dd, 0 0 20px 2px #c78b7b;
-        position: absolute;
-        width: 10px;
-        height: 40px;
-        left: 5px;
-        top: 5px;
-        animation-delay: -1.5s !important;
-        animation: floatUpDown 5s infinite, Glow 4s infinite;
-        animation-timing-function: ease-in-out;
-    }
 .home_lantern_4 {
     position: absolute;
     transform: translate(-225px, -263px) scaleX(-1);
 }
-    .home_lantern_4::before {
-        position: absolute;
-        top: calc(50% - 20px);
-        left: calc(50% - 20px);
-        width: 40px;
-        height: 40px;
-        border-radius: 50%;
-        background-color: #fff;
-        box-shadow: 0 0 60px 30px #fff, 0 0 100px 60px #f0f, 0 0 140px 90px #0ff;
-    }
     .home_lantern_4 img {
         position: absolute;
         animation: floatUpDown 5s infinite;
         animation-delay: -3s !important;
         animation-timing-function: ease-in-out;
         max-height: 60px;
-    }
-    .home_lantern_4::after {
-        content: '';
-        box-shadow: 0 0 45px 3px #f9f8dd, 0 0 20px 2px #c78b7b;
-        position: absolute;
-        width: 10px;
-        height: 40px;
-        left: 5px;
-        top: 5px;
-        animation-delay: -3s !important;
-        animation: floatUpDown 5s infinite, Glow 4s infinite;
-        animation-timing-function: ease-in-out;
     }
 .home_lantern_5 {
     position: absolute;
@@ -1078,18 +1020,6 @@ body {
         animation-timing-function: ease-in-out;
         max-height: 55px;
     }
-    .home_lantern_5::after {
-        content: '';
-        box-shadow: 0 0 45px 3px #f9f8dd, 0 0 20px 2px #c78b7b;
-        position: absolute;
-        width: 10px;
-        height: 40px;
-        left: 5px;
-        top: 5px;
-        animation-delay: -1s !important;
-        animation: floatUpDown 5s infinite, Glow 4s infinite;
-        animation-timing-function: ease-in-out;
-    }
 .home_lantern_6 {
     position: absolute;
     transform: translate(550px, -200px);
@@ -1097,18 +1027,6 @@ body {
     .home_lantern_6 img {
         position: absolute;
         animation-delay: -3.5s !important;
-        animation-timing-function: ease-in-out;
-    }
-    .home_lantern_6::after {
-        content: '';
-        box-shadow: 0 0 45px 3px #f9f8dd, 0 0 20px 2px #c78b7b;
-        position: absolute;
-        width: 10px;
-        height: 40px;
-        left: 5px;
-        top: 5px;
-        animation-delay: -3.5s !important;
-        animation: floatUpDown 5s infinite, Glow 4s infinite;
         animation-timing-function: ease-in-out;
     }
 .home_lantern_7 {
@@ -1125,18 +1043,6 @@ body {
         animation-timing-function: ease-in-out;
         
     }
-    .home_lantern_7::after {
-        content: '';
-        box-shadow: 0 0 45px 3px #f9f8dd, 0 0 20px 2px #c78b7b;
-        position: absolute;
-        width: 10px;
-        height: 40px;
-        left: 5px;
-        top: 5px;
-        animation-delay: -0.5s !important;
-        animation: floatUpDown 5s infinite, Glow 4s infinite;
-        animation-timing-function: ease-in-out;
-    }
 .home_lantern_8 {
     position: absolute;
     transform: translate(675px, 200px);
@@ -1147,17 +1053,17 @@ body {
         animation: floatUpDown 4.5s infinite;
         animation-timing-function: ease-in-out;
     }
-    .home_lantern_8::after {
-        content: '';
-        box-shadow: 0 0 45px 3px #f9f8dd, 0 0 20px 2px #c78b7b;
-        position: absolute;
-        width: 10px;
-        height: 40px;
-        left: 5px;
-        top: 5px;
-        animation: floatUpDown 5s infinite, Glow 4s infinite;
-        animation-timing-function: ease-in-out;
-    }
+.home_lantern::after {
+    content: '';
+    box-shadow: 0 0 45px 3px #f9f8dd, 0 0 20px 2px #c78b7b;
+    position: absolute;
+    width: 10px;
+    height: 40px;
+    left: 5px;
+    top: 5px;
+    animation: floatUpDown 5s infinite, Glow 4s infinite;
+    animation-timing-function: ease-in-out;
+}
 
 @keyframes floatUpDown {
     0% {

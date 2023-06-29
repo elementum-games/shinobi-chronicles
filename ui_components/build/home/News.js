@@ -1,4 +1,5 @@
 import { apiFetch } from "../utils/network.js";
+import { clickOnEnter } from "../utils/uiHelpers.js";
 export function News({
   initialNewsPosts,
   isAdmin,
@@ -341,13 +342,4 @@ function NewsButtons({
     textAnchor: "middle",
     dominantBaseline: "middle"
   }, "create post")));
-}
-
-// Should probably be a global helper
-function clickOnEnter(event) {
-  if (event.key === "Enter") {
-    event.target.dispatchEvent(new MouseEvent('click', {
-      bubbles: true
-    }));
-  }
 }

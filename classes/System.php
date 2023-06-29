@@ -219,6 +219,9 @@ class System {
         $this->event_data['easy'] = $event_missions_easy;
         $this->event_data['medium'] = $event_missions_medium;
         $this->event_data['hard'] = $event_missions_hard;
+        $this->event_data['red_lantern_id'] = 19;
+        $this->event_data['blue_lantern_id'] = 20;
+        $this->event_data['violet_lantern_id'] = 21;
     }
 
     /**

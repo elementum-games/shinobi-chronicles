@@ -235,10 +235,3 @@ function NewsButtons({ loadNews, createPost, isAdmin }) {
         </div>
     );
 }
-
-// Should probably be a global helper
-function clickOnEnter(event) {
-    if (event.key === "Enter") {
-        event.target.dispatchEvent(new MouseEvent('click', { bubbles: true }));
-    }
-}
