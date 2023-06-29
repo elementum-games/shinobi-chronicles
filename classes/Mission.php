@@ -385,7 +385,7 @@ class Mission {
                 }
                 // roll RNG, add to inventory
                 foreach ($mission->rewards as $item) {
-                    if (rand(0, 100) <= $item['chance']) {
+                    if (mt_rand(0, 100) <= $item['chance']) {
                         if ($player->hasItem($item['item_id'])) {
                             $player->items[$item['item_id']]->quantity += $item['quantity'];
                         } else {
