@@ -19,7 +19,8 @@
                 playerData: <?= json_encode(
                     UserAPIPresenter::playerDataResponse(player: $player, rank_names: RankManager::fetchNames($system))
                 ) ?>,
-                playerSettings: <?= json_encode(UserAPIPresenter::playerSettingsResponse(player: $player)) ?>
+                playerStats: <?= json_encode(UserApiPresenter::playerStatsResponse($player)) ?>,
+                playerSettings: <?= json_encode(UserAPIPresenter::playerSettingsResponse($player)) ?>
             }),
             profileContainer
         );

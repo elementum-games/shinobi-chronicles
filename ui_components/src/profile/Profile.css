@@ -11,9 +11,9 @@
 }
 
 .profile_avatar_container {
-    width: 230px;
+    width: 220px; /* 230px */
     height: 250px;
-    margin-right: 20px;
+    margin-right: 15px; /* 20px */
 
     display: flex;
     align-items: center;
@@ -24,7 +24,67 @@
     min-width: 600px;
     flex-grow: 1;
     min-height: 210px;
+
+    padding: 10px 15px;
 }
+.name_row {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+.player_name {
+    font-size: 20px;
+    margin-bottom: 4px;
+}
+.player_title {
+    font-size: var(--font-medium);
+}
+.player_badges {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 6px;
+}
+
+.exp_section {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-between;
+
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+.exp_bar_container {
+    width: 100%;
+    height: 5px;
+
+    display: flex;
+    position: relative;
+    margin-bottom: 4px;
+
+    background-color: #292e4c;
+}
+.exp_bar_fill {
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+
+    background-color: #5964a6;
+}
+
+.status_info_sections {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+.status_info_section {
+    display: flex;
+    flex-direction: column;
+}
+
+
 
 /* Stats */
 .stats_container {
@@ -39,6 +99,27 @@
     width: 100%;
     box-sizing: border-box;
     padding: 5px 10px;
+    margin-bottom: 10px;
+}
+
+.total_stats_bar_container {
+    width: 100%;
+    height: 5px;
+
+    display: flex;
+    position: relative;
+    margin-top: 3px;
+    margin-bottom: 5px;
+
+    background-color: #433c32;
+}
+.total_stats_bar_fill {
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+
+    background-color: #bca471;
 }
 
 .stat_list {
