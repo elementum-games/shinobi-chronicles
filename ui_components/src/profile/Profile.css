@@ -57,7 +57,7 @@
     height: 84px;
     position: relative;
 
-    font-size: 12px;
+    font-size: var(--font-min);
 
     display: inline-flex;
     flex-direction: column;
