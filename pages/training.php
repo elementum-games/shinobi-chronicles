@@ -101,7 +101,39 @@ function training() {
                     NotificationManager::createNotification($new_notification, $system, NotificationManager::UPDATE_REPLACE);
                     $notification_created = true;
                 }
-			}
+			} else if (isset($_POST['bloodline_jutsu'])) {
+                $jutsu_id = (int) $_POST['bloodline_jutsu'];
+                if (!isset($player->bloodline)) {
+                    throw new RuntimeException("No Bloodline!");
+                }
+				if (!isset($player->bloodline->jutsu[$_POST['bloodline_jutsu']])) {
+                    throw new RuntimeException("Invalid jutsu!");
+                }
+				if ($player->rank_num < $player->bloodline->jutsu[$_POST['bloodline_jutsu']]->rank) {
+                    throw new RuntimeException("Invalid jutsu!");
+                }
+                if ($player->bloodline->jutsu[$jutsu_id]->level >= 100) {
+                    throw new RuntimeException("You cannot train this jutsu any further!");
+                }
+                $train_type = 'bloodline_jutsu:' . System::slug($player->bloodline->jutsu[$jutsu_id]->name);
+                $train_type = $system->db->clean($train_type);
+                $train_gain = $jutsu_id;
+                $train_length = 600 + (60 * round(pow($player->bloodline->jutsu[$jutsu_id]->level, 1.1)));
+
+                // Create notification
+                if (!$notification_created) {
+                    $new_notification = new NotificationDto(
+                        type: "training",
+                        message: "Training " . System::unSlug($player->bloodline->jutsu[$jutsu_id]->name),
+                        user_id: $player->user_id,
+                        created: time(),
+                        duration: $train_length,
+                        alert: false,
+                    );
+                    NotificationManager::createNotification($new_notification, $system, NotificationManager::UPDATE_REPLACE);
+                    $notification_created = true;
+                }
+            }
 			else {
 				throw new RuntimeException("Invalid training type!");
 			}
@@ -157,8 +189,8 @@ function training() {
 	}
 
 	// Add rank stuff
-	echo "<table class='table'><tr><th colspan='3'>Academy</th></tr>
-		<tr><td colspan='3'>
+	echo "<table class='table'><tr><th colspan='4'>Academy</th></tr>
+		<tr><td colspan='4'>
 		<p style='text-align:center;'>Here at the academy, you can take classes to improve your skills, attributes, or skill with a
 		jutsu.</p>
 		<br />
@@ -176,8 +208,8 @@ function training() {
 			Takes 10 minutes or more depending on the jutsu level, gives {$trainingManager->jutsu_train_gain} level" . ($trainingManager->jutsu_train_gain > 1 ? 's' : '') . ".</p>
 		</td></tr>";
 	if($player->train_time) {
-		echo "<tr><th colspan='3'>Currently Training</th></tr>
-		<tr><td colspan='3' style='text-align:center'>";
+		echo "<tr><th colspan='4'>Currently Training</th></tr>
+		<tr><td colspan='4' style='text-align:center'>";
 		if(str_contains($player->train_type, 'jutsu:')) {
 			$train_type = str_replace('jutsu:', '', $player->train_type);
 			echo "Currently training: " . ucwords(str_replace('_', ' ', $train_type)) . "<br />" .
@@ -194,9 +226,10 @@ function training() {
 	else {
 		echo "
 			<tr>
-				<th style='width:33%;'>Skills</th>
-				<th style='width:32%;'>Attributes</th>
-				<th style='width:33%;'>Jutsu</th>
+				<th style='width:25%;'>Skills</th>
+				<th style='width:25%;'>Attributes</th>
+				<th style='width:25%;'>Jutsu</th>
+				<th style='width:25%;'>Bloodline Jutsu</th>
 			</tr>
 			<tr>
 				<td style='text-align:center;'>
@@ -235,6 +268,19 @@ function training() {
 					<form action='$self_link' method='post'>
 						<select name='jutsu'>";
 						foreach($player->jutsu as $id => $jutsu) {
+							if($jutsu->level >= 100) {
+								continue;
+							}
+							echo "<option value='$id' title='{$jutsu->jutsu_type}'>" . $jutsu->name . "</option>";
+						}
+						echo "</select><br />
+						<input type='submit' name='train_type' value='Train' />
+					</form>
+				</td>
+				<td style='text-align:center;'>
+					<form action='$self_link' method='post'>
+						<select name='bloodline_jutsu'>";
+						foreach($player->bloodline->jutsu as $id => $jutsu) {
 							if($jutsu->level >= 100) {
 								continue;
 							}
