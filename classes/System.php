@@ -84,7 +84,7 @@ class System {
         ),
         User::STAFF_CONTENT_ADMIN => array(
             'staffBanner' => "content admin",
-            'staffColor' => "#A000B0",
+            'staffColor' => "#6400AF",
             'pm_class' => 'contentAdmin'
         ),
         User::STAFF_ADMINISTRATOR => array(
