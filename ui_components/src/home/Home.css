@@ -95,6 +95,8 @@ body {
     position: relative;
 
     width: 1200px;
+    max-width: 100%;
+    overflow: hidden;
     height: calc(1200px - var(--banner-hidden-portion));
     bottom: 60px;
 
@@ -328,6 +330,38 @@ body {
     bottom: -225px;
 }*/
 
+/* Mobile Overrides */
+@media (max-width: 1200px) {
+    .main_banner_section {
+        background:
+        repeating-linear-gradient(45deg, rgba(14, 15, 17, 0.125) 0, rgba(14, 15, 17, 0.125) 10%, transparent 0, transparent 50%),
+        repeating-linear-gradient(135deg, rgba(14, 15, 17, 0.125) 0, rgba(14, 15, 17, 0.125) 10%, transparent 0, transparent 50%),
+        radial-gradient(circle at center bottom, #24151d, #151822 70%);
+        background-color: #101113;
+
+        border-bottom: solid 13px #6a5e46;
+    }
+
+    .banner_button.contact {
+        right: 20px;
+        bottom: 210px;
+    }
+    .banner_button.terms {
+        right: 20px;
+        bottom: 50px;
+    }
+
+
+    .banner_button.news {
+        left: 20px;
+        bottom: 210px;
+    }
+    .banner_button.rules {
+        left: 20px;
+        bottom: 50px;
+    }
+}
+
 /* Diamond Styles */
 .home_diamond_container {
 }
@@ -463,14 +497,12 @@ body {
     font-size: 13px;
     color: #de7788;
     font-weight: 600;
-    user-select: none;
     margin-left: 15px;
 }
 .login_message_label {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     font-size: 14px;
     color: white;
-    user-select: none;
 }
 .login_username_wrapper {
     flex-basis: 40%;
@@ -640,6 +672,7 @@ body {
 }
 .register_password_container {
     display: flex;
+    gap: 20px;
 }
 .register_character_container {
     display: flex;
@@ -935,18 +968,21 @@ body {
 /* Lanterns WIP */}
 .home_lantern_1 {
     position: absolute;
-    transform: translate(-750px, 200px);
+    transform: translate(-288px, -310px);
 }
     .home_lantern_1 img {
+        max-height: 30px;
         position: absolute;
-        animation: floatUpDown 4.5s infinite;
+        animation: floatUpDownTiny 5s infinite;
+        animation-delay: -2.5s !important;
         animation-timing-function: ease-in-out;
     }
 .home_lantern_2 {
     position: absolute;
-    transform: translate(-550px, -75px);
+    transform: translate(-530px, -100px);
 }
     .home_lantern_2 img {
+        max-height: 65px;
         position: absolute;
         animation: floatUpDown 5s infinite;
         animation-delay: -2.5s !important;
@@ -964,25 +1000,25 @@ body {
     }
 .home_lantern_4 {
     position: absolute;
-    transform: translate(-225px, -250px) scaleX(-1);
+    transform: translate(-225px, -263px) scaleX(-1);
 }
     .home_lantern_4 img {
         position: absolute;
         animation: floatUpDown 5s infinite;
         animation-delay: -3s !important;
         animation-timing-function: ease-in-out;
-        max-height: 90px;
+        max-height: 60px;
     }
 .home_lantern_5 {
     position: absolute;
-    transform: translate(225px, -250px);
+    transform: translate(205px, -255px);
 }
     .home_lantern_5 img {
         position: absolute;
         animation: floatUpDown 5s infinite;
         animation-delay: -1s !important;
         animation-timing-function: ease-in-out;
-        max-height: 60px;
+        max-height: 55px;
     }
 .home_lantern_6 {
     position: absolute;
@@ -995,13 +1031,17 @@ body {
     }
 .home_lantern_7 {
     position: absolute;
-    transform: translate(750px, -200px);
+    transform: translate(450px, -100px) scaleX(-1);
+    background-color: #fff;
+    
 }
     .home_lantern_7 img {
         position: absolute;
+        max-height: 55px;
         animation-delay: -0.5s !important;
         animation: floatUpDown 5s infinite;
         animation-timing-function: ease-in-out;
+        
     }
 .home_lantern_8 {
     position: absolute;
@@ -1013,6 +1053,17 @@ body {
         animation: floatUpDown 4.5s infinite;
         animation-timing-function: ease-in-out;
     }
+.home_lantern::after {
+    content: '';
+    box-shadow: 0 0 45px 3px #f9f8dd, 0 0 20px 2px #c78b7b;
+    position: absolute;
+    width: 10px;
+    height: 40px;
+    left: 5px;
+    top: 5px;
+    animation: floatUpDown 5s infinite, Glow 4s infinite;
+    animation-timing-function: ease-in-out;
+}
 
 @keyframes floatUpDown {
     0% {
@@ -1020,10 +1071,21 @@ body {
     }
 
     50% {
-        transform: translateY(-20px);
+        transform: translateY(-10px);
     }
 
     100% {
         transform: translateY(0);
+    }
+}
+@keyframes Glow {
+    0% {
+        box-shadow: 0 0 45px 3px #f9f8dd, 0 0 20px 2px #c78b7b;
+    }
+    50% {
+        box-shadow: 0 0 50px 3px #f9f8dd, 0 0 22px 2px #c78b7b;
+    }
+    100% {
+        box-shadow: 0 0 45px 3px #f9f8dd, 0 0 20px 2px #c78b7b;
     }
 }

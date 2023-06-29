@@ -1,4 +1,5 @@
 import { apiFetch } from "../utils/network.js";
+import { clickOnEnter } from "../utils/uiHelpers.js";
 export function News({
   initialNewsPosts,
   isAdmin,
@@ -83,7 +84,10 @@ export function News({
       className: "news_item"
     }, /*#__PURE__*/React.createElement("div", {
       className: activePostId === newsItem.post_id ? "news_item_header" : "news_item_header news_item_header_minimized",
-      onClick: () => setActivePostId(newsItem.post_id)
+      onClick: () => setActivePostId(newsItem.post_id),
+      role: "button",
+      tabIndex: "0",
+      onKeyPress: clickOnEnter
     }, /*#__PURE__*/React.createElement("div", {
       className: "news_item_title"
     }, newsItem.title.toUpperCase()), /*#__PURE__*/React.createElement("div", {
@@ -212,6 +216,7 @@ function NewsButtons({
     width: "162",
     height: "32",
     onClick: () => loadNews(),
+    onKeyPress: clickOnEnter,
     style: {
       zIndex: 2
     }
@@ -278,6 +283,7 @@ function NewsButtons({
     width: "162",
     height: "32",
     onClick: () => createPost(),
+    onKeyPress: clickOnEnter,
     style: {
       zIndex: 4
     }

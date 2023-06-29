@@ -102,90 +102,6 @@ function Sidebar({ links, navigationAPIData, userAPIData }) {
         )
     }
 
-    function displayCharacterSection(playerData, playerResources, playerSettings, regenTime, regenOffset) {
-        const health_width = Math.max(Math.round((playerResources.health / playerResources.max_health) * 100), 6);
-        const chakra_width = Math.max(Math.round((playerResources.chakra / playerResources.max_chakra) * 100), 6);
-        const stamina_width = Math.max(Math.round((playerResources.stamina / playerResources.max_stamina) * 100), 6);
-
-        return (
-            <>
-                <div className="sb_avatar_container">
-                    <div className={"sb_avatar_wrapper " + playerSettings.avatar_style} style={{ maxWidth: playerData.avatar_size, maxHeight: playerData.avatar_size }}>
-                        <img className={"sb_avatar_img circle " + playerSettings.avatar_style} style={{ maxWidth: playerData.avatar_size, maxHeight: playerData.avatar_size }} src={playerData.avatar_link} />
-                    </div>
-                </div>
-                <div className={"sb_resources d-in_block"}>
-                    <div className={"sb_name_container t-left d-flex"}>
-                        <div className="sb_name_wrapper">
-                            <div className={"ft-p ft-c1 ft-xlarge ft-b"}>{playerData.user_name}</div>
-                            <div className={"ft-s ft-c1 ft-default"}>{playerData.rank_name} lvl {playerData.level}</div>
-                        </div>
-                        <div className="sb_regentimer_container">
-                            <div id="sb_regentimer">
-                                <svg height="30" width="30" viewBox="0 0 50 50">
-                                    <circle id="sb_regentimer_circle_rear" stroke="#181b2c" cx="24.5" cy="24" r="20" strokeWidth="4" stroke-mitterlimit="0" fill="none" strokeDasharray="126"></circle>
-                                    <circle id="sb_regentimer_circle" stroke="#7C88C3" cx="24.5" cy="24" r="20" strokeWidth="4" stroke-mitterlimit="0" fill="none" strokeDasharray="126" strokeDashoffset={regenOffset} transform="rotate(-90, 24.5, 24)"></circle>
-                                    <text id="sb_regentimer_text" className={"ft-s ft-b ft-large"} x="48.75%" y="50.5%" textAnchor="middle" dominantBaseline="middle">{regenTime}</text>
-                                </svg>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Health Bar */}
-                    <div className="sb_resourceContainer">
-                        <div id="sb_health" className="sb_resourceBarOuter">
-                            <img className="sb_resource_corner_left" src="images/v2/decorations/barrightcorner.png" />
-                            <label className="sb_innerResourceBarLabel">
-                                {playerResources.health} / {playerResources.max_health}
-                            </label>
-                            <div className={"sb_health sb_fill"} style={{ width: health_width + "%" }}>
-                                <svg className="sb_resource_highlight_wrapper" viewBox="0 0 50 50">
-                                    <polygon x="50" points="20,25 0,0 5,0 25,25 5,50 0,50" id="sb_health_highlight" className="sb_resource_highlight" />
-                                </svg>
-                            </div>
-                            <div className={"sb_health sb_preview"}></div>
-                            <img className={"sb_resource_corner_right"} src="images/v2/decorations/barrightcorner.png" />
-                        </div>
-                    </div>
-
-                    {/* Chakra Bar */}
-                    <div className="sb_resourceContainer">
-                        <div id="sb_chakra" className="sb_resourceBarOuter">
-                            <img className="sb_resource_corner_left" src="images/v2/decorations/barrightcorner.png" />
-                            <label className="sb_innerResourceBarLabel">
-                                {playerResources.chakra} / {playerResources.max_chakra}
-                            </label>
-                            <div className={"sb_chakra sb_fill"} style={{ width: chakra_width + "%" }}>
-                                <svg className="sb_resource_highlight_wrapper" viewBox="0 0 50 50" x="100">
-                                    <polygon x="50" points="20,25 0,0 5,0 25,25 5,50 0,50" id="sb_chakra_highlight" className="sb_resource_highlight" />
-                                </svg>
-                            </div>
-                            <div className={"sb_chakra sb_preview"}></div>
-                            <img className="sb_resource_corner_right" src="images/v2/decorations/barrightcorner.png" />
-                        </div>
-                    </div>
-
-                    {/* Stamina Bar */}
-                    <div className="sb_resourceContainer">
-                        <div id="sb_stamina" className="sb_resourceBarOuter">
-                            <img className="sb_resource_corner_left" src="images/v2/decorations/barrightcorner.png" />
-                            <label className="sb_innerResourceBarLabel">
-                                {playerResources.stamina} / {playerResources.max_stamina}
-                            </label>
-                            <div className={"sb_stamina sb_fill"} style={{ width: stamina_width + "%" }}>
-                                <svg className="sb_resource_highlight_wrapper" viewBox="0 0 50 50">
-                                    <polygon x="50" points="20,25 0,0 5,0 25,25 5,50 0,50" id="sb_stamina_highlight" className="sb_resource_highlight" />
-                                </svg>
-                            </div>
-                            <div className={"sb_stamina sb_preview"}></div>
-                            <img className="sb_resource_corner_right" src="images/v2/decorations/barrightcorner.png" />
-                        </div>
-                    </div>
-                </div>
-            </>
-        )
-    }
-
     // Misc
     function handleErrors(errors) {
         console.warn(errors);
@@ -205,13 +121,126 @@ function Sidebar({ links, navigationAPIData, userAPIData }) {
     // Display
     return (
         <div id="sidebar">
-            {displayCharacterSection(playerData, playerResources, playerSettings, regenTime, regenOffset)}
+            <SBCharacterProfile
+                playerData={playerData}
+                playerResources={playerResources}
+                playerSettings={playerSettings}
+                regenTime={regenTime}
+                regenOffset={regenOffset}
+            />
             {displaySection(userMenu, "Player Menu")}
             {displaySection(activityMenu, "Action Menu")}
             {displaySection(villageMenu, "Village Menu")}
             {staffMenu.length ? displaySection(staffMenu, "Staff Menu") : null}
         </div>
     )
+}
+
+function SBCharacterProfile({playerData, playerResources, playerSettings, regenTime, regenOffset}) {
+    const avatarStyles = { maxWidth: playerData.avatar_size, maxHeight: playerData.avatar_size };
+
+    return (
+        <>
+            <div className="sb_avatar_container">
+                <div className={"sb_avatar_wrapper " + playerSettings.avatar_style} style={avatarStyles}>
+                    <img className={"sb_avatar_img " + playerSettings.avatar_style} style={avatarStyles} src={playerData.avatar_link} />
+                </div>
+            </div>
+            <div className={"sb_resources d-in_block"}>
+                <div className={"sb_name_container t-left d-flex"}>
+                    <div className="sb_name_wrapper">
+                        <div className={"ft-p ft-c1 ft-xlarge ft-b"}>{playerData.user_name}</div>
+                        <div className={"ft-s ft-c1 ft-default"}>{playerData.rank_name} lvl {playerData.level}</div>
+                    </div>
+                    <div className="sb_regentimer_container">
+                        <div id="sb_regentimer">
+                            <svg height="30" width="30" viewBox="0 0 50 50">
+                                <circle
+                                    id="sb_regentimer_circle_rear"
+                                    stroke="#181b2c"
+                                    cx="24.5"
+                                    cy="24"
+                                    r="20"
+                                    strokeWidth="4"
+                                    strokeMiterlimit="0"
+                                    fill="none"
+                                    strokeDasharray="126"
+                                />
+                                <circle
+                                    id="sb_regentimer_circle"
+                                    stroke="#7C88C3"
+                                    cx="24.5"
+                                    cy="24"
+                                    r="20"
+                                    strokeWidth="4"
+                                    strokeMiterlimit="0"
+                                    fill="none"
+                                    strokeDasharray="126"
+                                    strokeDashoffset={regenOffset}
+                                    transform="rotate(-90, 24.5, 24)"
+                                />
+                                <text
+                                    id="sb_regentimer_text"
+                                    className={"ft-s ft-b ft-large"}
+                                    x="48.75%"
+                                    y="50.5%"
+                                    textAnchor="middle"
+                                    dominantBaseline="middle"
+                                >{regenTime}</text>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+
+                <SBResourceBar
+                    resourceType="health"
+                    resourceAmount={playerResources.health}
+                    resourceMaxAmount={playerResources.max_health}
+                />
+                <SBResourceBar
+                    resourceType="chakra"
+                    resourceAmount={playerResources.chakra}
+                    resourceMaxAmount={playerResources.max_chakra}
+                />
+                <SBResourceBar
+                    resourceType="stamina"
+                    resourceAmount={playerResources.stamina}
+                    resourceMaxAmount={playerResources.max_stamina}
+                />
+            </div>
+        </>
+    )
+}
+
+type SBResourceBarProps = {|
+    +resourceType: "health",
+    +resourceAmount: number,
+    +resourceMaxAmount: number,
+|};
+function SBResourceBar({
+    resourceType,
+    resourceAmount,
+    resourceMaxAmount,
+}: SBResourceBarProps) {
+    const fillPercent = Math.max(Math.round((resourceAmount / resourceMaxAmount) * 100), 6);
+
+    return (
+        <div className="sb_resourceContainer">
+            <div id={`sb_${resourceType}`} className="sb_resourceBarOuter">
+                <img className="sb_resource_corner_left" src="/images/v2/decorations/barrightcorner.png" />
+                <label className="sb_innerResourceBarLabel">
+                    {resourceAmount} / {resourceMaxAmount}
+                </label>
+                <div className={`sb_${resourceType} sb_fill`} style={{ width: fillPercent + "%" }}>
+                    <svg className="sb_resource_highlight_wrapper" viewBox="0 0 50 50">
+                        <polygon x="50" points="20,25 0,0 5,0 25,25 5,50 0,50" id={`sb_${resourceType}_highlight`} className="sb_resource_highlight" />
+                    </svg>
+                </div>
+                <div className={`sb_${resourceType} sb_preview`}></div>
+                <img className={"sb_resource_corner_right"} src="/images/v2/decorations/barrightcorner.png" />
+            </div>
+        </div>
+    );
 }
 
 window.Sidebar = Sidebar;

@@ -13,7 +13,7 @@ HTML;
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/17.0.2/umd/react-dom.production.min.js" crossorigin></script>
 HTML;
 
-    if($system->environment == System::ENVIRONMENT_DEV) {
+    if($system->isDevEnvironment()) {
         $extra_meta_tags = '<meta name="robots" content="noindex" />';
         $react_tags = $react_dev_tags;
     }

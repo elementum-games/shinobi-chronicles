@@ -729,6 +729,8 @@ class BattleManager {
 
         $text = $attack->jutsu->battle_text;
         $attack_jutsu_color = BattleManager::getJutsuTextColor($attack->jutsu->jutsu_type);
+        $has_element = ($attack->jutsu->element != Jutsu::ELEMENT_NONE);
+        $element_text = ' with ' . $attack->jutsu->element;
 
         if(empty($attack->jutsu->effect_only)) {
               if($damage_resisted > 0 ) {
@@ -737,7 +739,7 @@ class BattleManager {
                                 <span style=\"color:{$attack_jutsu_color}\">
                                     " . sprintf('%.2f', $attack_damage) . " damage
                                 </span>
-                                    to {$target->getName()}. 
+                                    to {$target->getName()}" . ($has_element ? $element_text : "") . ".
                                 <span style=\"font-weight:bold;\">
                                     (resists
                                  <span style=\"color:{$attack_jutsu_color}\">
@@ -745,13 +747,13 @@ class BattleManager {
                                 </span>
                                  damage)
                             </p>"; }
-                else { 
+                else {
                         $text .= "<p style=\"font-weight:bold;\">
                             {$user->getName()} deals
                                 <span style=\"color:{$attack_jutsu_color}\">
                                     " . sprintf('%.2f', $attack_damage) . " damage
                                 </span>
-                                    to {$target->getName()}.
+                                    to {$target->getName()}" . ($has_element ? $element_text : "") . ".
                                 </p>"; }
                     }
 
@@ -773,8 +775,8 @@ class BattleManager {
         }
 
         $this->battle->battle_text .= $this->parseCombatText($text, $user, $target);
-        
-        
+
+
     }
 
     /**

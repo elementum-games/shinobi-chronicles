@@ -12,6 +12,7 @@ class TravelApiPresenter {
     public static function mapDataResponse(User $player, TravelManager $travelManager): array {
         $locations = $travelManager->fetchCurrentMapLocations();
         $current_location_portal = $travelManager->fetchCurrentLocationPortal();
+        $location_action = $travelManager->getMapLocationAction($locations, $player);
 
         return [
             'player_x'          => $player->location->x,
@@ -31,7 +32,9 @@ class TravelApiPresenter {
             'current_mission'   => $travelManager->shouldShowMissionLocationPrompt(),
             'all_locations'     => $locations,
             'tile_width'        => $travelManager->map_data['tile_width'],
-            'tile_height'       => $travelManager->map_data['tile_height']
+            'tile_height'       => $travelManager->map_data['tile_height'],
+            'action_url'        => $location_action->action_url,
+            'action_message'    => $location_action->action_message,
         ];
     }
 

@@ -7,5 +7,7 @@ class MapObjectiveLocation {
         public int $x,
         public int $y,
         public string $image,
+        public string $action_url = "",
+        public string $action_message = "",
     ) {}
 }

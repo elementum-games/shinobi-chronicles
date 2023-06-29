@@ -59,6 +59,7 @@ export type BattleFieldTileType = {|
 |};
 
 export type JutsuCategory = 'ninjutsu' | 'genjutsu' | 'taijutsu' | "bloodline";
+export type JutsuElement = 'None' | 'Fire' | 'Earth' | 'Wind' | 'Water' | 'Lightning';
 
 // BattleApiPresenter::jutsuResponse
 export type JutsuType = {|
@@ -71,7 +72,7 @@ export type JutsuType = {|
     +targetType: 'fighter_id' | 'tile' | 'direction',
     +handSeals: $ReadOnlyArray<string>,
     +range: number,
-    +element: 'None' | 'Fire' | 'Earth' | 'Wind' | 'Water' | 'Lightning';
+    +element: JutsuElement;
 |};
 
 // BattleApiPresenter::weaponResponse

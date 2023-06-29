@@ -13,6 +13,7 @@ class Mission {
     const TYPE_TEAM = 3;
     const TYPE_SPECIAL = 4;
     const TYPE_SURVIVAL = 5;
+    const TYPE_EVENT = 6;
 
     const STATUS_IN_PROGRESS = 1;
     const STATUS_COMPLETE = 2;
@@ -31,6 +32,7 @@ class Mission {
     public $mission_type;
     public $stages;
     public $money;
+    public $rewards = [];
 
     public User $player;
     public ?Team $team;
@@ -60,6 +62,7 @@ class Mission {
         $this->rank = $mission_data['rank'];
         $this->mission_type = $mission_data['mission_type'];
         $this->money = $mission_data['money'];
+        $this->rewards = json_decode($mission_data['rewards'], true);
 
         // Unset team if normal mission
         if($this->mission_type != Mission::TYPE_TEAM) {
@@ -305,6 +308,44 @@ class Mission {
 
         $mission = new Mission($mission_id, $player);
 
+        // TEMP Event Logic
+        global $system;
+        if ($mission->mission_type == Mission::TYPE_EVENT) {
+            if ($mission->rank == 2) {
+                $valid = false;
+                foreach ($system->event_data['easy'] as $location) {
+                    if ($player->location->x == $location['x'] && $player->location->y == $location['y']) {
+                        $valid = true;
+                    }
+                }
+                if ($valid == false) {
+                    throw new RuntimeException("Invalid event location!");
+                }
+            }
+            if ($mission->rank == 3) {
+                $valid = false;
+                foreach ($system->event_data['medium'] as $location) {
+                    if ($player->location->x == $location['x'] && $player->location->y == $location['y']) {
+                        $valid = true;
+                    }
+                }
+                if ($valid == false) {
+                    throw new RuntimeException("Invalid event location!");
+                }
+            }
+            if ($mission->rank == 4) {
+                $valid = false;
+                foreach ($system->event_data['hard'] as $location) {
+                    if ($player->location->x == $location['x'] && $player->location->y == $location['y']) {
+                        $valid = true;
+                    }
+                }
+                if ($valid == false) {
+                    throw new RuntimeException("Invalid event location!");
+                }
+            }
+        }
+
         $player->mission_id = $mission_id;
 
         return $mission;
@@ -320,4 +361,47 @@ class Mission {
         }
         return $max_mission_rank;
     }
+
+    public static function processRewards(Mission $mission, User $player, System $system): string {
+        if (count($mission->rewards) > 0) {
+            try {
+                $reward_text = "";
+                // load player inventory
+                $player->getInventory();
+
+                // get items from DB
+                $reward_item_ids = [];
+                foreach ($mission->rewards as $item) {
+                    $reward_item_ids[] = $item['item_id'];
+                }
+                $reward_ids_string = '(' . implode(',', $reward_item_ids) . ')';
+                /** @var Item[] $reward_items */
+                $reward_items = array();
+                $result = $system->db->query("SELECT * FROM `items` where `item_id` IN {$reward_ids_string}");
+                while ($row = $system->db->fetch($result)) {
+                    $reward_items[$row['item_id']] = Item::fromDb($row);
+                }
+                // roll RNG, add to inventory
+                foreach ($mission->rewards as $item) {
+                    if (mt_rand(0, 100) <= $item['chance']) {
+                        if ($player->hasItem($item['item_id'])) {
+                            $player->items[$item['item_id']]->quantity += $item['quantity'];
+                        } else {
+                            $player->items[$item['item_id']] = $reward_items[$item['item_id']];
+                            $player->items[$item['item_id']]->quantity = $item['quantity'];
+                        }
+                        $reward_text .= "Gained " . $reward_items[$item['item_id']]->name . " x" . $item['quantity'] . " " . $item['chance'] . "%<br>";
+                    }
+                }
+                // save inventory
+                $player->updateInventory();
+                // add message
+                return $reward_text;
+            } catch (RuntimeException $e) {
+                return $e->getMessage();
+            }
+        }
+        return "";
+    }
 }
+

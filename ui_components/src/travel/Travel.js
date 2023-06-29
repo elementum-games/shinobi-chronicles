@@ -12,7 +12,6 @@ import { ScoutArea} from "./ScoutArea.js";
     player_filters:      object,
     map_name:            string,
     background_image:    string,
-    objective_image:     string,
     start_x:             int,
     end_x:               int,
     start_y:             int,
@@ -23,6 +22,8 @@ import { ScoutArea} from "./ScoutArea.js";
     all_locations:       object,
     tile_width:          int,
     tile_height:         int,
+    action_url:          string,
+    action_message:      string,
  * }} mapData
  *
  * @param {{
@@ -331,6 +332,11 @@ function Travel({
                          <a href={missionLink}>
                              <button className='button'>Go to Mission Location</button>
                          </a>
+                        )}
+                        {(mapData && mapData.action_url) && (
+                            <a href={mapData.action_url}>
+                                <button className='button'>{mapData.action_message}</button>
+                            </a>
                         )}
                     </div>
                     {(feedback) && (

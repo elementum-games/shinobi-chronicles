@@ -2154,6 +2154,25 @@ class User extends Fighter {
         if ($result) {
             return $result['enable_alerts'];
         }
-        return "left";
+        return false;
+    }
+
+    public function nextLevelProgressPercent(): int {
+        $exp_needed = $this->expForNextLevel();
+
+        $incremental_exp_needed = $exp_needed - $this->exp;
+
+        $progress_percent =
+            (($this->rank->exp_per_level - $incremental_exp_needed)
+            / $this->rank->exp_per_level)
+            * 100;
+        if($progress_percent < 0) {
+            $progress_percent = 0;
+        }
+        else if($progress_percent > 100) {
+            $progress_percent = 100;
+        }
+
+        return $progress_percent;
     }
 }
