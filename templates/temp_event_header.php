@@ -12,7 +12,7 @@
     <tr><th><?=System::SC_EVENT_NAME?></th></tr>
     <tr>
         <td style="text-align: center;">
-            Placeholder event is active! <a href="<?=$system->router->getUrl('event')?>">Event Detail</a>
+            <?= System::SC_EVENT_NAME ?> is active! <a href="<?=$system->router->getUrl('event')?>">Event Detail</a>
             <div id="eventEnd">
                 <?= $system->time_remaining(System::SC_EVENT_END - time()) ?>
             </div>

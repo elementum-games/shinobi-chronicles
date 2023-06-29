@@ -39,21 +39,21 @@
                 </tr>
                 <tr>
                     <td>1x Red Lantern</td>
-                    <td>200 Yen</td>
+                    <td>25 Yen</td>
                     <td>
                         <a href="<?=$system->router->getUrl("event", ["exchange" => "red_yen_small"])?>">Claim</a>
                     </td>
                 </tr>
                 <tr>
-                    <td>5x Red Lantern</td>
-                    <td>1000 Yen</td>
+                    <td>10x Red Lantern</td>
+                    <td>250 Yen</td>
                     <td>
                         <a href="<?=$system->router->getUrl("event", ["exchange" => "red_yen_medium"])?>">Claim</a>
                     </td>
                 </tr>
                 <tr>
-                    <td>50x Red Lantern</td>
-                    <td>10000 Yen</td>
+                    <td>100x Red Lantern</td>
+                    <td>2500 Yen</td>
                     <td>
                         <a href="<?=$system->router->getUrl("event", ["exchange" => "red_yen_large"])?>">Claim</a>
                     </td>
@@ -94,10 +94,47 @@
                     </td>
                 </tr>
                 <tr>
-                    <td><?php echo $player->hasItem($system->event_data['shadow_essence_id']) ? "1x Shadow Essence" : "???" ?></td>
-                    <td><?php echo $player->hasItem($system->event_data['shadow_essence_id']) ? "50 Reputation" : "???" ?></td>
                     <td>
-                        <a href="<?=$system->router->getUrl("event", ["exchange" => "shadow_rep"])?>">Claim</a>
+                        <?php echo $player->hasItem($system->event_data['shadow_essence_id']) ? "1x Shadow Essence" : "???" ?>
+                    </td>
+                    <td>
+                        <?php echo $player->hasItem($system->event_data['shadow_essence_id']) ? "Sacred Yellow Lantern" : "???" ?>
+                    </td>
+                    <td>
+                        <a href="<?=$system->router->getUrl("event", ["exchange" => "shadow_sacred_yellow"])?>">Claim</a>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <?php echo $player->hasItem($system->event_data['shadow_essence_id']) ? "1x Shadow Essence" : "???" ?>
+                    </td>
+                    <td>
+                        <?php echo $player->hasItem($system->event_data['shadow_essence_id']) ? "Sacred Red Lantern" : "???" ?>
+                    </td>
+                    <td>
+                        <a href="<?=$system->router->getUrl("event", ["exchange" => "shadow_sacred_red"])?>">Claim</a>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <?php echo $player->hasItem($system->event_data['shadow_essence_id']) ? "1x Shadow Essence" : "???" ?>
+                    </td>
+                    <td>
+                        <?php echo $player->hasItem($system->event_data['shadow_essence_id']) ? "Sacred Blue Lantern" : "???" ?>
+                    </td>
+                    <td>
+                        <a href="<?=$system->router->getUrl("event", ["exchange" => "shadow_sacred_blue"])?>">Claim</a>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <?php echo $player->hasItem($system->event_data['shadow_essence_id']) ? "1x Shadow Essence" : "???" ?>
+                    </td>
+                    <td>
+                        <?php echo $player->hasItem($system->event_data['shadow_essence_id']) ? "Sacred Violet Lantern" : "???" ?>
+                    </td>
+                    <td>
+                        <a href="<?=$system->router->getUrl("event", ["exchange" => "shadow_sacred_violet"])?>">Claim</a>
                     </td>
                 </tr>
                 <tr>
@@ -105,7 +142,7 @@
                         <?php echo $player->hasItem($system->event_data['shadow_essence_id']) ? "5x Shadow Essence" : "???" ?>
                     </td>
                     <td>
-                        <?php echo $player->hasItem($system->event_data['shadow_essence_id']) ? "Shadow Clone Jutsu" : "???" ?>
+                        <?php echo $player->hasItem($system->event_data['shadow_essence_id']) ? "Forbidden Jutsu Scroll" : "???" ?>
                     </td>
                     <td>
                         <a href="<?=$system->router->getUrl("event", ["exchange" => "shadow_jutsu"])?>">Claim</a>

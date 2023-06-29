@@ -225,7 +225,6 @@ class System {
                 $event_missions_easy[] = ['x' => 13, 'y' => 8];
                 $event_missions_easy[] = ['x' => 6, 'y' => 7];
                 $event_missions_easy[] = ['x' => 5, 'y' => 14];
-                $event_missions_easy[] = ['x' => 15, 'y' => 3];
                 $event_missions_hard[] = ['x' => 15, 'y' => 3];
                 $event_missions_hard[] = ['x' => 24, 'y' => 9];
                 $event_missions_hard[] = ['x' => 14, 'y' => 14];
@@ -270,6 +269,11 @@ class System {
         $this->event_data['blue_lantern_id'] = 20;
         $this->event_data['violet_lantern_id'] = 21;
         $this->event_data['shadow_essence_id'] = 22;
+        $this->event_data['sacred_lantern_yellow_id'] = 23;
+        $this->event_data['sacred_lantern_red_id'] = 24;
+        $this->event_data['sacred_lantern_blue_id'] = 25;
+        $this->event_data['sacred_lantern_purple_id'] = 26;
+        $this->event_data['forbidden_jutsu_scroll'] = 27;
         $this->event_data['easy_mission_id'] = 12;
         $this->event_data['medium_mission_id'] = 13;
         $this->event_data['hard_mission_id'] = 11;
