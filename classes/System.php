@@ -222,6 +222,9 @@ class System {
         $this->event_data['red_lantern_id'] = 19;
         $this->event_data['blue_lantern_id'] = 20;
         $this->event_data['violet_lantern_id'] = 21;
+        $this->event_data['easy_mission_id'] = 12;
+        $this->event_data['medium_mission_id'] = 13;
+        $this->event_data['hard_mission_id'] = 14;
     }
 
     /**
