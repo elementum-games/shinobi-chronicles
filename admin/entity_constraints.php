@@ -480,7 +480,7 @@ $constraints['mission'] = [
     'mission_type' => [
         'data_type' => 'int',
         'input_type' => 'radio',
-        'options' => [1 => 'Village', 2 => 'Clan', 3 => 'Team', 4 => 'Special', 5 => 'Survival'],
+        'options' => [1 => 'Village', 2 => 'Clan', 3 => 'Team', 4 => 'Special', 5 => 'Survival', 6 => 'Event'],
     ],
     'money' => [
         'data_type' => 'int',
@@ -490,6 +490,11 @@ $constraints['mission'] = [
         'count' => 4,
         'num_required' => 1,
         'variables' => $mission_stage_constraints,
+    ],
+    'rewards' => [
+        'data_type' => 'string',
+        'input_type' => 'text',
+        'max_length' => 2000,
     ],
 ];
 
