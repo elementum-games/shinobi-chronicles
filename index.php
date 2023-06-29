@@ -21,7 +21,7 @@ $PAGE_LOAD_START = microtime(true);
 require_once("classes/_autoload.php");
 $system = new System();
 
-if($system->environment == System::ENVIRONMENT_DEV) {
+if($system->isDevEnvironment()) {
     ini_set('display_errors', 'On');
 }
 
@@ -608,7 +608,7 @@ if($LOGGED_IN) {
         }
     }
     else if (isset($_GET['home'])) {
-        if ($system->environment == System::ENVIRONMENT_DEV) {
+        if ($system->isDevEnvironment()) {
             $home_view = "default";
             if (isset($_GET['view'])) {
                 switch ($_GET['view']) {
@@ -666,7 +666,7 @@ if($LOGGED_IN) {
 }
 // Login
 else {
-    if ($system->environment == System::ENVIRONMENT_DEV) {
+    if ($system->isDevEnvironment()) {
         $layout = $system->fetchLayoutByName("new_geisha");
     } else {
         $layout = $system->fetchLayoutByName(System::DEFAULT_LAYOUT);
@@ -684,7 +684,7 @@ else {
 
     $captcha = '';
 
-    if ($system->environment == System::ENVIRONMENT_DEV) {
+    if ($system->isDevEnvironment()) {
         if ($login_error_text != "" || $login_message_text != "") {
             $initial_login_display = "login";
         }

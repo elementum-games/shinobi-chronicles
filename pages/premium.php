@@ -1032,7 +1032,7 @@ function premium(): bool
     }
 
     // Buying shards
-    if ($system->environment == System::ENVIRONMENT_DEV) {
+    if ($system->isDevEnvironment()) {
         $paypal_url = "https://www.sandbox.paypal.com/cgi-bin/webscr";
         $paypal_business_id = 'lsmjudoka@lmvisions.com';
     } else {

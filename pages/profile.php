@@ -17,8 +17,12 @@ function userProfile() {
     global $system;
     global $player;
 
+    $use_new_layout = $system->isDevEnvironment() && $player->layout == 'new_geisha';
+
     // Submenu
-    renderProfileSubmenu();
+    if(!$use_new_layout) {
+        renderProfileSubmenu();
+    }
 
     // Level up/rank up checks
     $exp_needed = $player->expForNextLevel();
@@ -76,7 +80,12 @@ function userProfile() {
         return;
     }
 
-    require 'templates/profile.php';
+    if($use_new_layout) {
+        require 'templates/profile_v2.php';
+    }
+    else {
+        require 'templates/profile.php';
+    }
 }
 
 /**
