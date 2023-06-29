@@ -13,7 +13,7 @@ final class MissionRewardMigration extends AbstractMigration
         // Modify missions table
         $this->execute("
             ALTER TABLE `missions` 
-                ADD `rewards` VARCHAR(500) NOT NULL DEFAULT '[]';
+                ADD `rewards` VARCHAR(2000) NOT NULL DEFAULT '[]';
         ");
     }
 
