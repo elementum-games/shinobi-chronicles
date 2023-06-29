@@ -35,7 +35,7 @@ class System {
     // TODO: Remove! This is a temporary way to do events
     const SC_EVENT_START = 0;
     const SC_EVENT_END = 1641769200;
-    const SC_EVENT_NAME = 'Lantern Placeholder';
+    const SC_EVENT_NAME = 'Festival of Shadows';
 
     // Temporary event data storage
     public array $event_data = [];
@@ -201,30 +201,79 @@ class System {
             self::$SC_EVENT_ACTIVE = false;
         }
         // Manually set event locations, pulled from TravelManager and Missions to identify event missions
-        $event_missions_easy[] = ['x' => 5, 'y' => 4];
-        $event_missions_easy[] = ['x' => 2, 'y' => 11];
-        $event_missions_easy[] = ['x' => 17, 'y' => 10];
-        $event_missions_easy[] = ['x' => 23, 'y' => 2];
-        $event_missions_easy[] = ['x' => 22, 'y' => 16];
-        $event_missions_easy[] = ['x' => 26, 'y' => 14];
-        $event_missions_easy[] = ['x' => 27, 'y' => 4];
-        $event_missions_easy[] = ['x' => 13, 'y' => 8];
-        $event_missions_easy[] = ['x' => 6, 'y' => 7];
-        $event_missions_easy[] = ['x' => 5, 'y' => 14];
-        $event_missions_medium[] = ['x' => 15, 'y' => 3];
-        $event_missions_medium[] = ['x' => 24, 'y' => 9];
-        $event_missions_medium[] = ['x' => 16, 'y' => 15];
-        $event_missions_medium[] = ['x' => 8, 'y' => 10];
-        $event_missions_hard[] = ['x' => 10, 'y' => 1];
+        $currentMinutes = intval(date('i'));
+        $event_missions_easy = [];
+        $event_missions_medium = [];
+        $event_missions_hard = [];
+        $event_missions_nightmare = [];
+        switch (true) {
+            case ($currentMinutes < 3): // 3 minutes per hour
+                $event_missions_nightmare[] = ['x' => 10, 'y' => 1];
+                $event_missions_hard[] = ['x' => 13, 'y' => 1];
+                $event_missions_hard[] = ['x' => 12, 'y' => 3];
+                $event_missions_hard[] = ['x' => 8, 'y' => 3];
+                $event_missions_hard[] = ['x' => 7, 'y' => 1];
+                break;
+            case ($currentMinutes % 3 == 0):
+                $event_missions_easy[] = ['x' => 5, 'y' => 4];
+                $event_missions_easy[] = ['x' => 2, 'y' => 11];
+                $event_missions_easy[] = ['x' => 17, 'y' => 10];
+                $event_missions_easy[] = ['x' => 23, 'y' => 2];
+                $event_missions_easy[] = ['x' => 22, 'y' => 16];
+                $event_missions_easy[] = ['x' => 26, 'y' => 14];
+                $event_missions_easy[] = ['x' => 27, 'y' => 4];
+                $event_missions_easy[] = ['x' => 13, 'y' => 8];
+                $event_missions_easy[] = ['x' => 6, 'y' => 7];
+                $event_missions_easy[] = ['x' => 5, 'y' => 14];
+                $event_missions_easy[] = ['x' => 15, 'y' => 3];
+                $event_missions_hard[] = ['x' => 15, 'y' => 3];
+                $event_missions_hard[] = ['x' => 24, 'y' => 9];
+                $event_missions_hard[] = ['x' => 14, 'y' => 14];
+                $event_missions_hard[] = ['x' => 8, 'y' => 10];
+                break;
+            case ($currentMinutes % 3 == 1):
+                $event_missions_easy[] = ['x' => 5, 'y' => 4];
+                $event_missions_easy[] = ['x' => 2, 'y' => 11];
+                $event_missions_easy[] = ['x' => 17, 'y' => 10];
+                $event_missions_easy[] = ['x' => 23, 'y' => 2];
+                $event_missions_easy[] = ['x' => 22, 'y' => 16];
+                $event_missions_easy[] = ['x' => 26, 'y' => 14];
+                $event_missions_easy[] = ['x' => 27, 'y' => 4];
+                $event_missions_easy[] = ['x' => 13, 'y' => 8];
+                $event_missions_easy[] = ['x' => 6, 'y' => 7];
+                $event_missions_easy[] = ['x' => 5, 'y' => 14];
+                $event_missions_medium[] = ['x' => 9, 'y' => 5];
+                $event_missions_medium[] = ['x' => 3, 'y' => 14];
+                $event_missions_medium[] = ['x' => 15, 'y' => 11];
+                $event_missions_medium[] = ['x' => 24, 'y' => 5];
+                $event_missions_medium[] = ['x' => 24, 'y' => 17];
+                break;
+            default:
+                $event_missions_easy[] = ['x' => 7, 'y' => 3];
+                $event_missions_easy[] = ['x' => 5, 'y' => 7];
+                $event_missions_easy[] = ['x' => 2, 'y' => 13];
+                $event_missions_easy[] = ['x' => 4, 'y' => 14];
+                $event_missions_easy[] = ['x' => 13, 'y' => 10];
+                $event_missions_easy[] = ['x' => 17, 'y' => 7];
+                $event_missions_easy[] = ['x' => 25, 'y' => 1];
+                $event_missions_easy[] = ['x' => 26, 'y' => 5];
+                $event_missions_easy[] = ['x' => 26, 'y' => 16];
+                $event_missions_easy[] = ['x' => 22, 'y' => 14];
+                break;
+        }
+
         $this->event_data['easy'] = $event_missions_easy;
         $this->event_data['medium'] = $event_missions_medium;
         $this->event_data['hard'] = $event_missions_hard;
+        $this->event_data['nightmare'] = $event_missions_nightmare;
         $this->event_data['red_lantern_id'] = 19;
         $this->event_data['blue_lantern_id'] = 20;
         $this->event_data['violet_lantern_id'] = 21;
+        $this->event_data['shadow_essence_id'] = 22;
         $this->event_data['easy_mission_id'] = 12;
         $this->event_data['medium_mission_id'] = 13;
-        $this->event_data['hard_mission_id'] = 14;
+        $this->event_data['hard_mission_id'] = 11;
+        $this->event_data['nightmare_mission_id'] = 15;
     }
 
     /**

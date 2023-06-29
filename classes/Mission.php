@@ -344,6 +344,17 @@ class Mission {
                     throw new RuntimeException("Invalid event location!");
                 }
             }
+            if ($mission->mission_id == $system->event_data['nightmare_mission_id']) {
+                $valid = false;
+                foreach ($system->event_data['nightmare'] as $location) {
+                    if ($player->location->x == $location['x'] && $player->location->y == $location['y']) {
+                        $valid = true;
+                    }
+                }
+                if ($valid == false) {
+                    throw new RuntimeException("Invalid event location!");
+                }
+            }
         }
 
         $player->mission_id = $mission_id;
