@@ -1,6 +1,7 @@
 // @flow
 
 import { apiFetch } from "../utils/network.js";
+import { clickOnEnter } from "../utils/uiHelpers.js"
 import type { NewsPostType } from "./newsSchema.js";
 
 type Props = {|
@@ -101,6 +102,9 @@ export function News({ initialNewsPosts, isAdmin, version, homeLinks }: Props) {
                         : "news_item_header news_item_header_minimized"
                     }
                     onClick={() => setActivePostId(newsItem.post_id)}
+                    role="button"
+                    tabIndex="0"
+                    onKeyPress={clickOnEnter}
                 >
                     <div className="news_item_title">{newsItem.title.toUpperCase()}</div>
                     <div className="news_item_version">{newsItem.version && newsItem.version.toUpperCase()}</div>
@@ -200,7 +204,7 @@ export function News({ initialNewsPosts, isAdmin, version, homeLinks }: Props) {
 function NewsButtons({ loadNews, createPost, isAdmin }) {
     return (
         <div className="news_button_container">
-            <svg role="button" tabIndex="0" name="morenews" className="morenews_button" width="162" height="32" onClick={() => loadNews()} style={{ zIndex: 2 }}>
+            <svg role="button" tabIndex="0" name="morenews" className="morenews_button" width="162" height="32" onClick={() => loadNews()} onKeyPress={clickOnEnter} style={{ zIndex: 2 }}>
                 <radialGradient id="morenews_fill_default" cx="50%" cy="50%" r="50%" fx="50%" fy="50%">
                     <stop offset="0%" style={{ stopColor: '#84314e', stopOpacity: 1 }} />
                     <stop offset="100%" style={{ stopColor: '#68293f', stopOpacity: 1 }} />
@@ -214,7 +218,7 @@ function NewsButtons({ loadNews, createPost, isAdmin }) {
                 <text className="morenews_button_text" x="81" y="16" textAnchor="middle" dominantBaseline="middle">more news</text>
             </svg>
             {isAdmin &&
-                <svg role="button" tabIndex="0" name="createpost" className="createpost_button" width="162" height="32" onClick={() => createPost()} style={{ zIndex: 4 }}>
+                <svg role="button" tabIndex="0" name="createpost" className="createpost_button" width="162" height="32" onClick={() => createPost()} onKeyPress={clickOnEnter}           style={{ zIndex: 4 }}>
                     <radialGradient id="createpost_fill_default" cx="50%" cy="50%" r="50%" fx="50%" fy="50%">
                         <stop offset="0%" style={{ stopColor: '#464f87', stopOpacity: 1 }} />
                         <stop offset="100%" style={{ stopColor: '#343d77', stopOpacity: 1 }} />

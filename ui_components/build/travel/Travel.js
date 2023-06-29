@@ -12,7 +12,6 @@ import { ScoutArea } from "./ScoutArea.js";
     player_filters:      object,
     map_name:            string,
     background_image:    string,
-    objective_image:     string,
     start_x:             int,
     end_x:               int,
     start_y:             int,
@@ -23,6 +22,8 @@ import { ScoutArea } from "./ScoutArea.js";
     all_locations:       object,
     tile_width:          int,
     tile_height:         int,
+    action_url:          string,
+    action_message:      string,
  * }} mapData
  *
  * @param {{
@@ -267,7 +268,11 @@ function Travel({
     href: missionLink
   }, /*#__PURE__*/React.createElement("button", {
     className: "button"
-  }, "Go to Mission Location"))), feedback && /*#__PURE__*/React.createElement("div", {
+  }, "Go to Mission Location")), mapData && mapData.action_url && /*#__PURE__*/React.createElement("a", {
+    href: mapData.action_url
+  }, /*#__PURE__*/React.createElement("button", {
+    className: "button"
+  }, mapData.action_message))), feedback && /*#__PURE__*/React.createElement("div", {
     className: "travel-messages"
   }, /*#__PURE__*/React.createElement(Message, {
     message: feedback[0],

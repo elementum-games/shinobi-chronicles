@@ -158,10 +158,17 @@ function gear(): void {
                     echo "<td colspan='3'>";
                     $header_displayed = true;
                 }
-                echo sprintf(
-                    "%s <sup style='font-size:9px;'>(%s %s)</sup> <br />", $item->name, $item->effect_amount,
-                    System::unSlug($item->effect)
-                );
+                if ($item->quantity > 1) {
+                    echo sprintf(
+                        "%s <sup style='font-size:9px;'>(%s %s x%s)</sup> <br />", $item->name, $item->effect_amount,
+                        System::unSlug($item->effect), $item->quantity
+                    );
+                } else {
+                    echo sprintf(
+                        "%s <sup style='font-size:9px;'>(%s %s)</sup> <br />", $item->name, $item->effect_amount,
+                        System::unSlug($item->effect)
+                    );
+                }
             }
         }
         if($header_displayed) {

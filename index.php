@@ -575,7 +575,9 @@ if($LOGGED_IN) {
 
             // EVENT
             if($system::$SC_EVENT_ACTIVE) {
-                require 'templates/temp_event_header.php';
+                if ($layout->key != "new_geisha") {
+                    require 'templates/temp_event_header.php';
+                }
             }
 
             require('pages/' . $route->file_name);

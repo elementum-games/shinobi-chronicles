@@ -57,6 +57,58 @@ function missions(): bool {
 	if(!empty($_GET['start_mission'])) {
 		$mission_id = $_GET['start_mission'];
 		try {
+            // TEMP Event Missions
+            if (isset($_GET['mission_type'])) {
+                if ($_GET['mission_type'] == "event") {
+                    if (!System::$SC_EVENT_ACTIVE) {
+                        throw new RuntimeException("Event not active!");
+                    }
+                    $result = $system->db->query(
+                        "SELECT `mission_id`, `name` FROM `missions` WHERE `mission_type`=6"
+                    );
+                    if ($system->db->last_num_rows == 0) {
+                        $system->message("No missions available!");
+                        $system->printMessage();
+                        return false;
+                    }
+                    $event_missions = array();
+                    while ($row = $system->db->fetch($result)) {
+                        $event_missions[$row['mission_id']] = $row;
+                    }
+                    Mission::start($player, $mission_id);
+                    $player->log(User::LOG_MISSION, "Mission ID #{$mission_id}");
+
+                    // Create notification
+                    require_once __DIR__ . '/../classes/notification/NotificationManager.php';
+                    if ($player->mission_stage['action_type'] == 'travel') {
+                        $mission_location = TravelCoords::fromDbString($player->mission_stage['action_data']);
+                        $new_notification = new MissionNotificationDto(
+                            type: "mission",
+                            message: $event_missions[$mission_id]['name'] . ": Travel to " . $mission_location->x . ":" . $mission_location->y,
+                            user_id: $player->user_id,
+                            created: time(),
+                            mission_rank: "E",
+                            alert: false,
+                        );
+                        NotificationManager::createNotification($new_notification, $system, NotificationManager::UPDATE_REPLACE);
+                    } else {
+                        require_once __DIR__ . '/../classes/notification/NotificationManager.php';
+                        $new_notification = new MissionNotificationDto(
+                            type: "mission",
+                            message: $event_missions[$mission_id]['name'] . " in progress",
+                            user_id: $player->user_id,
+                            created: time(),
+                            mission_rank: "E",
+                            alert: false,
+                        );
+                        NotificationManager::createNotification($new_notification, $system, NotificationManager::UPDATE_REPLACE);
+                    }
+
+                    missions();
+                    return true;
+                }
+            }
+
             if(!isset($missions[$mission_id])) {
                 throw new RuntimeException("Invalid mission!");
             }
@@ -97,7 +149,6 @@ function missions(): bool {
 		}
 
 	}
-
 
 	// Display missions
 	$system->printMessage();
@@ -274,6 +325,8 @@ function runActiveMission(): bool {
             }
             // Team mission
             else if($mission->mission_type == Mission::TYPE_TEAM) {
+                // Rewards
+                echo Mission::processRewards($mission, $player, $system);
                 $player->addMoney($mission->money, "Team mission");
                 $player->clearMission();
 
@@ -297,6 +350,8 @@ function runActiveMission(): bool {
             }
             // Clan mission
             else if($mission->mission_type == Mission::TYPE_CLAN) {
+                // Rewards
+                echo Mission::processRewards($mission, $player, $system);
                 $player->addMoney($mission->money, "Clan mission");
                 $player->clearMission();
                 $player->last_ai_ms = System::currentTimeMs();
@@ -357,6 +412,8 @@ function runActiveMission(): bool {
                     $player->missions_completed[$mission->rank] = 1;
                 }
 
+                // Rewards
+                echo Mission::processRewards($mission, $player, $system);
                 $player->addMoney($mission->money, "Village mission complete");
                 $player->clearMission();
                 $player->last_ai_ms = System::currentTimeMs();

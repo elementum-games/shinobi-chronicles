@@ -1,5 +1,6 @@
 import { RegisterForm } from "./RegisterForm.js";
 import { Rules, Terms } from "./staticPageContents.js";
+import { clickOnEnter } from "../utils/uiHelpers.js";
 import { News } from "./News.js";
 function Home({
   homeLinks,
@@ -17,6 +18,7 @@ function Home({
   const [loginDisplay, setLoginDisplay] = React.useState(initialLoginDisplay);
   const newsRef = React.useRef(null);
   const contactRef = React.useRef(null);
+  const activeElement = React.useRef(null);
   return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement(MainBannerSection, {
     homeLinks: homeLinks,
     isLoggedIn: isLoggedIn,
@@ -73,6 +75,7 @@ function MainBannerSection({
   newsRef,
   contactRef
 }) {
+  const activeElement = React.useRef(null);
   function handleLogin() {
     if (loginDisplay !== "login") {
       setLoginDisplay("login");
@@ -138,7 +141,35 @@ function MainBannerSection({
     src: "/images/v2/decorations/homepagelogo.png"
   }), /*#__PURE__*/React.createElement("div", {
     className: "title_version"
-  }, version)), activeModal, /*#__PURE__*/React.createElement("div", {
+  }, version)), /*#__PURE__*/React.createElement("div", {
+    className: "home_lantern home_lantern_2",
+    style: {
+      zIndex: 0
+    }
+  }, /*#__PURE__*/React.createElement("img", {
+    src: "/images/v2/decorations/lanternbig.png"
+  })), /*#__PURE__*/React.createElement("div", {
+    className: "home_lantern home_lantern_4",
+    style: {
+      zIndex: 1
+    }
+  }, /*#__PURE__*/React.createElement("img", {
+    src: "/images/v2/decorations/lanternbig.png"
+  })), /*#__PURE__*/React.createElement("div", {
+    className: "home_lantern home_lantern_5",
+    style: {
+      zIndex: 1
+    }
+  }, /*#__PURE__*/React.createElement("img", {
+    src: "/images/v2/decorations/lanternsmall.png"
+  })), /*#__PURE__*/React.createElement("div", {
+    className: "home_lantern home_lantern_7",
+    style: {
+      zIndex: 1
+    }
+  }, /*#__PURE__*/React.createElement("img", {
+    src: "/images/v2/decorations/lanternsmall.png"
+  })), activeModal, /*#__PURE__*/React.createElement("div", {
     className: "login_container"
   }, loginDisplay === "login" && /*#__PURE__*/React.createElement(LoginForm, {
     loginMessageText: loginMessageText,
@@ -237,7 +268,8 @@ function BannerDiamondButton({
     style: !largeSize ? {
       transform: "scale(0.85)"
     } : {},
-    onClick: handleClick
+    onClick: handleClick,
+    onKeyPress: clickOnEnter
   }, /*#__PURE__*/React.createElement("g", {
     className: `home_diamond_rotategroup diamond_${color}`,
     transform: "rotate(45 50 50)"
@@ -369,10 +401,16 @@ function MainBannerModal({
   }, /*#__PURE__*/React.createElement("div", {
     className: "modal_title"
   }, title), /*#__PURE__*/React.createElement("div", {
+    role: "button",
+    tabIndex: "0",
     className: "modal_close",
+    onKeyPress: clickOnEnter,
     onClick: handleCloseClick
   }, "close")) : /*#__PURE__*/React.createElement("div", {
     className: "modal_close standalone",
+    role: "button",
+    tabIndex: "0",
+    onKeyPress: clickOnEnter,
     onClick: handleCloseClick
   }, "close"), /*#__PURE__*/React.createElement("div", {
     className: "modal_content"
@@ -418,6 +456,7 @@ function LoggedOutButtons({
     width: "162",
     height: "32",
     onClick: () => handleLogin(),
+    onKeyPress: clickOnEnter,
     style: {
       zIndex: 2
     }
@@ -484,6 +523,7 @@ function LoggedOutButtons({
     width: "162",
     height: "32",
     onClick: () => handleRegister(),
+    onKeyPress: clickOnEnter,
     style: {
       zIndex: 4
     }
@@ -547,14 +587,13 @@ function LoggedInButtons({
   homeLinks
 }) {
   return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("a", {
+    role: "button",
     href: homeLinks['profile'],
     style: {
       display: "flex",
       zIndex: 2
     }
   }, /*#__PURE__*/React.createElement("svg", {
-    role: "button",
-    tabIndex: "0",
     className: "profile_button",
     width: "162",
     height: "32"
@@ -613,14 +652,13 @@ function LoggedInButtons({
     textAnchor: "middle",
     dominantBaseline: "middle"
   }, "profile"))), /*#__PURE__*/React.createElement("a", {
+    role: "button",
     href: homeLinks['logout'],
     style: {
       display: "flex",
       zIndex: 2
     }
   }, /*#__PURE__*/React.createElement("svg", {
-    role: "button",
-    tabIndex: "0",
     className: "logout_button",
     width: "162",
     height: "32"
