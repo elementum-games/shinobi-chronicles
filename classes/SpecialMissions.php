@@ -505,7 +505,7 @@ class SpecialMission {
             // Damage HP
             $this->player->health -= $health_lost;
             $this->player_health -= $health_lost;
-            if($this->system->environment == System::ENVIRONMENT_DEV) {
+            if($this->system->isDevEnvironment()) {
                 $battle_text .= "[br]You lost {$health_lost} health";
             }
 

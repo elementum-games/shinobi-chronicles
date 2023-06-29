@@ -103,7 +103,7 @@ class Layout {
 
             if($player != null) {
                 echo "</div>";
-                if ($system->environment == System::ENVIRONMENT_DEV) {
+                if ($system->isDevEnvironment()) {
                     if ($render_hotbar) {
                         require 'templates/hotbar.php';
                     }

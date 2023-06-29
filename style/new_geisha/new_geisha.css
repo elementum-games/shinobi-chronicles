@@ -3,6 +3,7 @@
     --avatar-frame-border_gradient: linear-gradient(0deg, rgba(140,123,88,1) 0%, rgba(181,156,106,1) 50%, rgba(225,207,159,1) 100%);
     --avatar-frame-border-width-large: 7px;
     --avatar-frame-border-width-small: 2px;
+
     /* General Config */
     --border-color-default: #464234;
     --box-color-default: #141317;
@@ -14,6 +15,7 @@
     --footer-background-color: #0E0D0E;
     --footer-font-color: #423f39;
     --regentimer-color: #7C88C3;
+
     /* Structure */
     --header-height: 35px;
     --content-width: 930px;
@@ -22,6 +24,7 @@
     --topbar-height: 60px;
     --hotbar-height: 85px;
     --footer-height: 30px;
+
     /* Font Config */
     --font-primary: "Trebuchet MS";
     --font-primary-variant: small-caps;
@@ -42,6 +45,7 @@
     --font-xlarge: 18px;
     --font-max: 21px;
     --text-hover: white;
+
     /* Resource Config */
     --resource-bar-width: 300px;
     --resource-bar-height: 21px;
@@ -55,22 +59,26 @@
     --stamina-fill: linear-gradient(to right, #2e362c, #2a5e3c 15%);
     --stamina-preview: #2e362c;
     --stamina-highlight: #7f9d89;
+
     /* Hotbar Config */
     --hotbar-background-color: #100f11;
     --hotbar-border-color: #0c0c0e;
     --hotbar-keybind-modal-width: 700px;
     --hotbar-keybind-modal-height: 400px;
+
     /* Sidebar Config */
     --sidebar-header-background-color: #8c7b58;
     --sidebar-header-height: 23px;
     --sidebar-button-background-color: #1a191d;
     --sidebar-button-background-hover: linear-gradient(to bottom, #262631 50%, #22222a 50%);
     --sidebar-button-border-color: #20222b;
+
     /* Header Config */
     --header-background-color: #151417;
     --header-border-color: #0c0d0e;
     --header-border-height: 3px;
     --header-logout-color: #e6a0a0;
+
     /* Chat Config */
     --chat-secondary-background-color: #1a1921;
 }
@@ -90,6 +98,7 @@
     font-family: var(--font-secondary);
     font-variant: var(--font-secondary-variant);
 }
+
 .ft-c1 {
     color: var(--font-color-1);
 }
@@ -105,6 +114,7 @@
 .ft-c5 {
     color: var(--font-color-5);
 }
+
 .ft-min {
     font-size: 12px;
 }
@@ -126,6 +136,7 @@
 .ft-max {
     font-size: 21px;
 }
+
 .t-center {
     text-align: center;
 }
@@ -198,7 +209,7 @@ body {
     display: flex;
     align-items: center;
     margin-left: 15px;
-    margin-right: 25px;
+    margin-right: 20px;
 }
 
 #contentHeaderCoords {
@@ -331,7 +342,7 @@ body {
     left: 0;
 }
 
-/* Configuration Classes */
+/* Avatar styles */
 .avy_none {
     display: none !important;
 }
@@ -380,6 +391,21 @@ body {
     clip-path: polygon(0% 15%, 15% 15%, 15% 0%, 85% 0%, 85% 15%, 100% 15%, 100% 85%, 85% 85%, 85% 100%, 15% 100%, 15% 85%, 0% 85%);
 }
 
+.avatar_frame {
+    max-width: 100%;
+    max-height: 100%;
+
+    position: relative;
+    display: flex;
+
+    background: var(--avatar-frame-border_gradient);
+    padding: var(--avatar-frame-border-width-large);
+}
+.avatar_img {
+    max-width: 100%;
+    max-height: 100%;
+}
+
 /* Content styles */
 .name.black {
     color: #000;
@@ -397,6 +423,51 @@ body {
         -1px 1px var(--shadow-size) var(--shadow-color),
         0 1px var(--shadow-size) var(--shadow-color),
         1px 1px var(--shadow-size) var(--shadow-color);
+}
+
+.box-primary {
+    box-sizing: border-box;
+
+    background-color: var(--box-color-default);
+
+    /* Corners in clockwise direction */
+    background-image:
+            url(/images/v2/decorations/necorner.png),
+            url(/images/v2/decorations/secorner.png),
+            url(/images/v2/decorations/swcorner.png),
+            url(/images/v2/decorations/nwcorner.png);
+    background-repeat:
+            no-repeat,
+            no-repeat,
+            no-repeat,
+            no-repeat;
+    background-position: top right, bottom right, bottom left, top left;
+
+}
+.box-secondary {
+    box-sizing: border-box;
+
+    background-color: var(--box-color-default);
+    border: 1px solid var(--border-color-default);
+}
+
+h2 {
+    font-size: 16px;
+    margin: 4px 0;
+
+    font-family: var(--font-primary) !important;
+    font-variant: var(--font-primary-variant);
+
+    color: var(--font-color-1);
+}
+h3 {
+    font-size: 14px;
+    margin: 4px 0;
+
+    font-family: var(--font-primary) !important;
+    font-variant: var(--font-primary-variant);
+
+    color: var(--font-color-1);
 }
 
 /* Compatibility */
