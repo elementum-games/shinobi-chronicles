@@ -1,5 +1,4 @@
 import { CharacterAvatar } from "../CharacterAvatar.js";
-
 function Profile({
   playerData,
   playerStats,
@@ -7,6 +6,8 @@ function Profile({
 }) {
   return /*#__PURE__*/React.createElement("div", {
     className: "profile_container"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "profile_row_first"
   }, /*#__PURE__*/React.createElement("div", {
     className: "profile_avatar_container"
   }, /*#__PURE__*/React.createElement(CharacterAvatar, {
@@ -16,16 +17,19 @@ function Profile({
     avatarStyle: playerSettings.avatar_style
   })), /*#__PURE__*/React.createElement(StatusAttributes, {
     playerData: playerData
-  }), /*#__PURE__*/React.createElement(PlayerStats, {
+  })), /*#__PURE__*/React.createElement("div", {
+    className: "profile_row_second"
+  }, /*#__PURE__*/React.createElement(PlayerStats, {
     playerData: playerData,
     playerStats: playerStats
-  }));
+  })));
 }
-
 function StatusAttributes({
   playerData
 }) {
   return /*#__PURE__*/React.createElement("div", {
+    className: "status_attributes_wrapper"
+  }, /*#__PURE__*/React.createElement("div", {
     className: "status_attributes box-primary"
   }, /*#__PURE__*/React.createElement("div", {
     className: "name_row ft-c1"
@@ -57,21 +61,20 @@ function StatusAttributes({
   }, /*#__PURE__*/React.createElement("div", {
     className: "status_info_section",
     style: {
-      width: 220
+      flexBasis: "36%"
     }
   }, /*#__PURE__*/React.createElement("span", null, "Gender: ", playerData.gender), /*#__PURE__*/React.createElement("span", null, "Element: ", playerData.elements.join(", ")), /*#__PURE__*/React.createElement("span", null, "Money: ", playerData.money, " yen")), /*#__PURE__*/React.createElement("div", {
     className: "status_info_section",
     style: {
-      width: 170
+      flexBasis: "28%"
     }
   }, /*#__PURE__*/React.createElement("span", null, "Village: ", playerData.villageName), playerData.clanId != null && /*#__PURE__*/React.createElement("span", null, "Clan: ", playerData.clanName), /*#__PURE__*/React.createElement("span", null, "Ancient Kunai: ", playerData.premiumCredits)), /*#__PURE__*/React.createElement("div", {
     className: "status_info_section",
     style: {
-      width: 230
+      flexBasis: "36%"
     }
-  }, /*#__PURE__*/React.createElement("span", null, "Team: ", playerData.teamId == null ? "None" : playerData.teamName), /*#__PURE__*/React.createElement("span", null, "Forbidden Seal: ", playerData.forbiddenSealName))));
+  }, /*#__PURE__*/React.createElement("span", null, "Team: ", playerData.teamId == null ? "None" : playerData.teamName), /*#__PURE__*/React.createElement("span", null, "Forbidden Seal: ", playerData.forbiddenSealName)))));
 }
-
 function PlayerStats({
   playerData,
   playerStats
@@ -144,5 +147,4 @@ function PlayerStats({
     className: "ft-c3"
   }, "nope"))));
 }
-
 window.Profile = Profile;

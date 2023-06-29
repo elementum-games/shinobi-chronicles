@@ -16,68 +16,75 @@ function Profile({
     return (
         <div className="profile_container">
             {/* First row */}
-            <div className="profile_avatar_container">
-                <CharacterAvatar
-                    imageSrc={playerData.avatar_link}
-                    maxWidth={playerData.avatar_size}
-                    maxHeight={playerData.avatar_size}
-                    avatarStyle={playerSettings.avatar_style}
+            <div className="profile_row_first">
+                <div className="profile_avatar_container">
+                    <CharacterAvatar
+                        imageSrc={playerData.avatar_link}
+                        maxWidth={playerData.avatar_size}
+                        maxHeight={playerData.avatar_size}
+                        avatarStyle={playerSettings.avatar_style}
+                    />
+                </div>
+                <StatusAttributes
+                    playerData={playerData}
                 />
             </div>
-            <StatusAttributes
-                playerData={playerData}
-            />
+            
             {/* Second row */}
-            <PlayerStats
-                playerData={playerData}
-                playerStats={playerStats}
-            />
+            <div className="profile_row_second">
+                <PlayerStats
+                    playerData={playerData}
+                    playerStats={playerStats}
+                />
+            </div>
         </div>
     );
 }
 
 function StatusAttributes({ playerData }) {
     return (
-        <div className="status_attributes box-primary">
-            <div className="name_row ft-c1">
-                <div>
-                    <h2 className="player_name">{playerData.user_name}</h2>
-                    <span className="player_title ft-p">{playerData.rank_name} lvl {playerData.level}</span>
+        <div className="status_attributes_wrapper">
+            <div className="status_attributes box-primary">
+                <div className="name_row ft-c1">
+                    <div>
+                        <h2 className="player_name">{playerData.user_name}</h2>
+                        <span className="player_title ft-p">{playerData.rank_name} lvl {playerData.level}</span>
+                    </div>
+                    <div className="player_badges">
+                        <img src="/images/v2/decorations/red_diamond.png" />
+                        <img src="/images/v2/decorations/red_diamond.png" />
+                        <img src="/images/v2/decorations/red_diamond.png" />
+                        <img src="/images/v2/decorations/red_diamond.png" />
+                    </div>
                 </div>
-                <div className="player_badges">
-                    <img src="/images/v2/decorations/red_diamond.png" />
-                    <img src="/images/v2/decorations/red_diamond.png" />
-                    <img src="/images/v2/decorations/red_diamond.png" />
-                    <img src="/images/v2/decorations/red_diamond.png" />
+                <div className="exp_section ft-c3 ft-p ft-small">
+                    <div className="exp_bar_container">
+                        <div className="exp_bar_fill" style={{width: `${playerData.nextLevelProgressPercent}%`}}></div>
+                    </div>
+                    <span>TOTAL EXP: {playerData.exp}</span>
+                    <span>NEXT LEVEL IN {Math.max(playerData.expForNextLevel - playerData.exp, 0)} EXP</span>
                 </div>
-            </div>
-            <div className="exp_section ft-c3 ft-p ft-small">
-                <div className="exp_bar_container">
-                    <div className="exp_bar_fill" style={{width: `${playerData.nextLevelProgressPercent}%`}}></div>
-                </div>
-                <span>TOTAL EXP: {playerData.exp}</span>
-                <span>NEXT LEVEL IN {Math.max(playerData.expForNextLevel - playerData.exp, 0)} EXP</span>
-            </div>
-            <div className="status_info_sections ft-c3">
-                <div className="status_info_section" style={{width: 220}}>
-                    <span>Gender: {playerData.gender}</span>
-                    <span>Element: {playerData.elements.join(", ")}</span>
-                    <span>Money: {playerData.money} yen</span>
-                </div>
-                <div className="status_info_section" style={{width: 170}}>
-                    <span>Village: {playerData.villageName}</span>
-                    {playerData.clanId != null &&
-                        <span>Clan: {playerData.clanName}</span>
-                    }
-                    <span>Ancient Kunai: {playerData.premiumCredits}</span>
-                </div>
-                <div className="status_info_section" style={{width: 230}}>
-                    <span>Team: {playerData.teamId == null
-                        ? "None"
-                        : playerData.teamName}
-                    </span>
-                    {/*<span>Branch Family</span>*/}
-                    <span>Forbidden Seal: {playerData.forbiddenSealName}</span>
+                <div className="status_info_sections ft-c3">
+                    <div className="status_info_section" style={{ flexBasis: "36%" }}>
+                        <span>Gender: {playerData.gender}</span>
+                        <span>Element: {playerData.elements.join(", ")}</span>
+                        <span>Money: {playerData.money} yen</span>
+                    </div>
+                    <div className="status_info_section" style={{ flexBasis: "28%" }}>
+                        <span>Village: {playerData.villageName}</span>
+                        {playerData.clanId != null &&
+                            <span>Clan: {playerData.clanName}</span>
+                        }
+                        <span>Ancient Kunai: {playerData.premiumCredits}</span>
+                    </div>
+                    <div className="status_info_section" style={{ flexBasis: "36%" }}>
+                        <span>Team: {playerData.teamId == null
+                            ? "None"
+                            : playerData.teamName}
+                        </span>
+                        {/*<span>Branch Family</span>*/}
+                        <span>Forbidden Seal: {playerData.forbiddenSealName}</span>
+                    </div>
                 </div>
             </div>
         </div>
