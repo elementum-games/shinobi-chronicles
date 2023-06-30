@@ -311,7 +311,7 @@ class Mission {
         // TEMP Event Logic
         global $system;
         if ($mission->mission_type == Mission::TYPE_EVENT) {
-            if ($mission->rank == 2) {
+            if ($mission->mission_id == $system->event_data['easy_mission_id']) {
                 $valid = false;
                 foreach ($system->event_data['easy'] as $location) {
                     if ($player->location->x == $location['x'] && $player->location->y == $location['y']) {
@@ -322,7 +322,7 @@ class Mission {
                     throw new RuntimeException("Invalid event location!");
                 }
             }
-            if ($mission->rank == 3) {
+            if ($mission->mission_id == $system->event_data['medium_mission_id']) {
                 $valid = false;
                 foreach ($system->event_data['medium'] as $location) {
                     if ($player->location->x == $location['x'] && $player->location->y == $location['y']) {
@@ -333,9 +333,20 @@ class Mission {
                     throw new RuntimeException("Invalid event location!");
                 }
             }
-            if ($mission->rank == 4) {
+            if ($mission->mission_id == $system->event_data['hard_mission_id']) {
                 $valid = false;
                 foreach ($system->event_data['hard'] as $location) {
+                    if ($player->location->x == $location['x'] && $player->location->y == $location['y']) {
+                        $valid = true;
+                    }
+                }
+                if ($valid == false) {
+                    throw new RuntimeException("Invalid event location!");
+                }
+            }
+            if ($mission->mission_id == $system->event_data['nightmare_mission_id']) {
+                $valid = false;
+                foreach ($system->event_data['nightmare'] as $location) {
                     if ($player->location->x == $location['x'] && $player->location->y == $location['y']) {
                         $valid = true;
                     }

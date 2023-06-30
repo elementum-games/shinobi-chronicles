@@ -1148,8 +1148,60 @@ class User extends Fighter {
         if($this->train_time < time()) {
             $team_boost_description = "";
 
+            // Bloodline Jutsu training
             // Jutsu training
-            if(str_contains($this->train_type, 'jutsu:')) {
+            if (str_contains($this->train_type, 'bloodline_jutsu:')) {
+                $jutsu_id = $this->train_gain;
+                $this->getInventory();
+
+                $gain = User::$jutsu_train_gain;
+                if ($this->system->TRAIN_BOOST) {
+                    $gain += $this->system->TRAIN_BOOST;
+                }
+                if ($this->bloodline->jutsu[$jutsu_id]->level + $gain > 100) {
+                    $gain = 100 - $this->bloodline->jutsu[$jutsu_id]->level;
+                }
+
+                    if ($this->bloodline->jutsu[$jutsu_id]->level < 100) {
+                        $new_level = $this->bloodline->jutsu[$jutsu_id]->level + $gain;
+
+                        if ($new_level > 100) {
+                            $this->bloodline->jutsu[$jutsu_id]->level = 100;
+                        } else {
+                            $this->bloodline->jutsu[$jutsu_id]->level += $gain;
+                        }
+                        $message = $this->bloodline->jutsu[$jutsu_id]->name . " has increased to level " .
+                            $this->bloodline->jutsu[$jutsu_id]->level . '.';
+
+                        $jutsu_skill_type = $this->bloodline->jutsu[$jutsu_id]->jutsu_type . '_skill';
+                        if ($this->total_stats < $this->rank->stat_cap) {
+                            $this->{$jutsu_skill_type}++;
+                            $this->exp += 10;
+                            $message .= ' You have gained 1 ' . ucwords(str_replace('_', ' ', $jutsu_skill_type)) .
+                                ' and 10 experience.';
+                        }
+
+                        // Create notification
+                        $new_notification = new NotificationDto(
+                            type: "training_complete",
+                            message: "Training " . $this->bloodline->jutsu[$jutsu_id]->name . " Complete",
+                            user_id: $this->user_id,
+                            created: time(),
+                            alert: true,
+                        );
+                        NotificationManager::createNotification($new_notification, $this->system, NotificationManager::UPDATE_UNIQUE);
+
+                        $this->system->message($message);
+                        $this->system->printMessage();
+
+                        if (!$this->ban_type) {
+                            $this->updateInventory();
+                        }
+                    }
+
+                $this->train_time = 0;
+            }
+            else if(str_contains($this->train_type, 'jutsu:')) {
                 $jutsu_id = $this->train_gain;
                 $this->getInventory();
 

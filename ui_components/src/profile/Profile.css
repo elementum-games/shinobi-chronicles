@@ -8,25 +8,38 @@
 
     padding: 20px;
     box-sizing: border-box;
+
+    font-size: var(--font-default); /* Override Geisha.css default */
+    font-family: var(--font-secondary); /* Override Geisha.css default */
+    
+}
+
+.profile_row_first { /* Organize into rows so we can synchronize flex items */
+    display: flex;
+    align-items: flex-end;
+    gap: 30px;
+    margin-bottom: 5px;
+    height: 220px;
+    width: 100%;
 }
 
 .profile_avatar_container {
     width: 220px; /* 230px */
-    height: 250px;
-    margin-right: 15px; /* 20px */
-
     display: flex;
     align-items: center;
     justify-content: center;
+    height: 100%;
 }
 
+.status_attributes_wrapper { /* Wrap status attributes so we can control scale and position while maintaining background/border size */
+    flex-grow: 1;
+}
 .status_attributes {
     min-width: 600px;
-    flex-grow: 1;
     min-height: 210px;
-
     padding: 10px 15px;
 }
+
 .name_row {
     display: flex;
     flex-direction: row;
@@ -118,6 +131,7 @@
     top: 0;
     left: 0;
     bottom: 0;
+    max-width: 100%;
 
     background-color: #bca471;
 }

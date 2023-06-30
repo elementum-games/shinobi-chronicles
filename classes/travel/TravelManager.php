@@ -340,8 +340,8 @@ class TravelManager {
                     x: $event_mission['x'],
                     y: $event_mission['y'],
                     image: "/images/events/lanternred.png",
-                    action_url: $this->system->router->getUrl("mission", ['start_mission' => '12', 'mission_type' => 'event']),
-                    action_message: "Start Easy Lantern Event",
+                    action_url: $this->system->router->getUrl("mission", ['start_mission' => $this->system->event_data['easy_mission_id'], 'mission_type' => 'event']),
+                    action_message: "Begin Search",
                 );
             }
             foreach ($this->system->event_data['medium'] as $event_mission) {
@@ -351,8 +351,8 @@ class TravelManager {
                     x: $event_mission['x'],
                     y: $event_mission['y'],
                     image: "/images/events/lanternblue.png",
-                    action_url: $this->system->router->getUrl("mission", ['start_mission' => '13', 'mission_type' => 'event']),
-                    action_message: "Start Medium Lantern Event",
+                    action_url: $this->system->router->getUrl("mission", ['start_mission' => $this->system->event_data['medium_mission_id'], 'mission_type' => 'event']),
+                    action_message: "Follow Signs of battle",
                 );
             }
             foreach ($this->system->event_data['hard'] as $event_mission) {
@@ -362,8 +362,19 @@ class TravelManager {
                     x: $event_mission['x'],
                     y: $event_mission['y'],
                     image: "/images/events/lanternviolet.png",
-                    action_url: $this->system->router->getUrl("mission", ['start_mission' => '11', 'mission_type' => 'event']),
-                    action_message: "Start Hard Lantern Event",
+                    action_url: $this->system->router->getUrl("mission", ['start_mission' => $this->system->event_data['hard_mission_id'], 'mission_type' => 'event']),
+                    action_message: "Investigate Suspicious Markings",
+                );
+            }
+            foreach ($this->system->event_data['nightmare'] as $event_mission) {
+                $objectives[] = new MapObjectiveLocation(
+                    name: "Nightmare",
+                    map_id: 1,
+                    x: $event_mission['x'],
+                    y: $event_mission['y'],
+                    image: "/images/events/yokai_cropped.png",
+                    action_url: $this->system->router->getUrl("mission", ['start_mission' => $this->system->event_data['nightmare_mission_id'], 'mission_type' => 'event']),
+                    action_message: "Stop the Ritual",
                 );
             }
         }

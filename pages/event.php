@@ -9,6 +9,8 @@ function event() {
     global $player;
     global $self_link;
 
+    $player->getInventory();
+
     $gifts = [
         1227 => '_yen_ Yen!',
         1228 => '_days_ days of _seal_!',
@@ -170,17 +172,54 @@ function event() {
             // Change the item ID values based on dev/prod
             // These are placeholder exchange options
             switch ($_GET['exchange']) {
-                case "red_yen":
+                case "red_yen_small":
                     $player->getInventory();
                     if (!$player->hasItem($system->event_data['red_lantern_id'])) {
                         throw new RuntimeException("You do not have this item!");
                     }
-                    if ($player->items[$system->event_data['red_lantern_id']]->quantity < 3) {
+                    if ($player->items[$system->event_data['red_lantern_id']]->quantity < 1) {
                         throw new RuntimeException("You do not have enough of this item!");
                     }
-                    $player->items[$system->event_data['red_lantern_id']]->quantity -= 3;
-                    $player->addMoney("1000", "Event");
-                    $system->message("You have traded 3 Red Lanterns for 1000 yen!");
+                    $player->items[$system->event_data['red_lantern_id']]->quantity -= 1;
+                    if ($player->items[$system->event_data['red_lantern_id']]->quantity < 1) {
+                        unset($player->items[$system->event_data['red_lantern_id']]);
+                    }
+                    $player->addMoney("25", "Event");
+                    $system->message("You have traded 1 Red Lantern for 25 yen!");
+                    $player->updateInventory();
+                    $player->updateData();
+                    break;
+                case "red_yen_medium":
+                    $player->getInventory();
+                    if (!$player->hasItem($system->event_data['red_lantern_id'])) {
+                        throw new RuntimeException("You do not have this item!");
+                    }
+                    if ($player->items[$system->event_data['red_lantern_id']]->quantity < 10) {
+                        throw new RuntimeException("You do not have enough of this item!");
+                    }
+                    $player->items[$system->event_data['red_lantern_id']]->quantity -= 10;
+                    if ($player->items[$system->event_data['red_lantern_id']]->quantity < 1) {
+                        unset($player->items[$system->event_data['red_lantern_id']]);
+                    }
+                    $player->addMoney("250", "Event");
+                    $system->message("You have traded 10 Red Lanterns for 250 yen!");
+                    $player->updateInventory();
+                    $player->updateData();
+                    break;
+                case "red_yen_large":
+                    $player->getInventory();
+                    if (!$player->hasItem($system->event_data['red_lantern_id'])) {
+                        throw new RuntimeException("You do not have this item!");
+                    }
+                    if ($player->items[$system->event_data['red_lantern_id']]->quantity < 100) {
+                        throw new RuntimeException("You do not have enough of this item!");
+                    }
+                    $player->items[$system->event_data['red_lantern_id']]->quantity -= 100;
+                    if ($player->items[$system->event_data['red_lantern_id']]->quantity < 1) {
+                        unset($player->items[$system->event_data['red_lantern_id']]);
+                    }
+                    $player->addMoney("2500", "Event");
+                    $system->message("You have traded 100 Red Lanterns for 2500 yen!");
                     $player->updateInventory();
                     $player->updateData();
                     break;
@@ -189,16 +228,228 @@ function event() {
                     if (!$player->hasItem($system->event_data['red_lantern_id'])) {
                         throw new RuntimeException("You do not have this item!");
                     }
-                    if ($player->items[$system->event_data['red_lantern_id']]->quantity < 3) {
+                    if ($player->items[$system->event_data['red_lantern_id']]->quantity < 50) {
                         throw new RuntimeException("You do not have enough of this item!");
                     }
-                    $player->items[$system->event_data['red_lantern_id']]->quantity -= 3;
+                    $player->items[$system->event_data['red_lantern_id']]->quantity -= 50;
+                    if ($player->items[$system->event_data['red_lantern_id']]->quantity < 1) {
+                        unset($player->items[$system->event_data['red_lantern_id']]);
+                    }
                     $player->addRep("1");
-                    $system->message("You have traded 3 Red Lanterns for 1 rep!");
+                    $system->message("You have traded 50 Red Lanterns for 1 Reputation!");
                     $player->updateInventory();
                     $player->updateData();
                     break;
-                default:
+                case "blue_red":
+                    $player->getInventory();
+                    if (!$player->hasItem($system->event_data['blue_lantern_id'])) {
+                        throw new RuntimeException("You do not have this item!");
+                    }
+                    if ($player->items[$system->event_data['blue_lantern_id']]->quantity < 1) {
+                        throw new RuntimeException("You do not have enough of this item!");
+                    }
+                    $player->items[$system->event_data['blue_lantern_id']]->quantity -= 1;
+                    if ($player->items[$system->event_data['blue_lantern_id']]->quantity < 1) {
+                        unset($player->items[$system->event_data['blue_lantern_id']]);
+                    }
+
+                    if ($player->hasItem($system->event_data['red_lantern_id'])) {
+                        $player->items[$system->event_data['red_lantern_id']]->quantity += 5;
+                    } else {
+                        $result = $system->db->query("SELECT * FROM `items` WHERE `item_id` = {$system->event_data['red_lantern_id']}");
+                        $player->items[$system->event_data['red_lantern_id']] = Item::fromDb($system->db->fetch($result), 5);
+                    }
+                    $system->message("You have traded 1 Blue Lantern for 5 Red Lantern!");
+                    $player->updateInventory();
+                    $player->updateData();
+                    break;
+                case "violet_red":
+                    $player->getInventory();
+                    if (!$player->hasItem($system->event_data['violet_lantern_id'])) {
+                        throw new RuntimeException("You do not have this item!");
+                    }
+                    if ($player->items[$system->event_data['violet_lantern_id']]->quantity < 1) {
+                        throw new RuntimeException("You do not have enough of this item!");
+                    }
+                    $player->items[$system->event_data['violet_lantern_id']]->quantity -= 1;
+                    if ($player->items[$system->event_data['violet_lantern_id']]->quantity < 1) {
+                        unset($player->items[$system->event_data['violet_lantern_id']]);
+                    }
+
+                    if ($player->hasItem($system->event_data['red_lantern_id'])) {
+                        $player->items[$system->event_data['red_lantern_id']]->quantity += 20;
+                    } else {
+                        $result = $system->db->query("SELECT * FROM `items` WHERE `item_id` = {$system->event_data['red_lantern_id']}");
+                        $player->items[$system->event_data['red_lantern_id']] = Item::fromDb($system->db->fetch($result), 20);
+                    }
+                    $system->message("You have traded 1 Violet Lantern for 20 Red Lanterns!");
+                    $player->updateInventory();
+                    $player->updateData();
+                    break;
+                case "red_shadow":
+                    $player->getInventory();
+                    if (!$player->hasItem($system->event_data['red_lantern_id'])) {
+                        throw new RuntimeException("You do not have this item!");
+                    }
+                    if ($player->items[$system->event_data['red_lantern_id']]->quantity < 500) {
+                        throw new RuntimeException("You do not have enough of this item!");
+                    }
+                    $player->items[$system->event_data['red_lantern_id']]->quantity -= 500;
+                    if ($player->items[$system->event_data['red_lantern_id']]->quantity < 500) {
+                        unset($player->items[$system->event_data['red_lantern_id']]);
+                    }
+
+                    if ($player->hasItem($system->event_data['shadow_essence_id'])) {
+                        $player->items[$system->event_data['shadow_essence_id']]->quantity += 500;
+                    } else {
+                        $result = $system->db->query("SELECT * FROM `items` WHERE `item_id` = {$system->event_data['shadow_essence_id']}");
+                        $player->items[$system->event_data['shadow_essence_id']] = Item::fromDb($system->db->fetch($result), 1);
+                    }
+                    $system->message("You have traded 500 Red Lanterns for 1 Shadow Essence!");
+                    $player->updateInventory();
+                    $player->updateData();
+                    break;
+                case "shadow_red":
+                    $player->getInventory();
+                    if (!$player->hasItem($system->event_data['shadow_essence_id'])) {
+                        throw new RuntimeException("You do not have this item!");
+                    }
+                    if ($player->items[$system->event_data['shadow_essence_id']]->quantity < 1) {
+                        throw new RuntimeException("You do not have enough of this item!");
+                    }
+                    $player->items[$system->event_data['shadow_essence_id']]->quantity -= 1;
+                    if ($player->items[$system->event_data['shadow_essence_id']]->quantity < 1) {
+                        unset($player->items[$system->event_data['shadow_essence_id']]);
+                    }
+
+                    if ($player->hasItem($system->event_data['red_lantern_id'])) {
+                        $player->items[$system->event_data['red_lantern_id']]->quantity += 500;
+                    } else {
+                        $result = $system->db->query("SELECT * FROM `items` WHERE `item_id` = {$system->event_data['red_lantern_id']}");
+                        $player->items[$system->event_data['red_lantern_id']] = Item::fromDb($system->db->fetch($result), 500);
+                    }
+                    $system->message("You have traded 1 Shadow Essence for 500 Red Lanterns!");
+                    $player->updateInventory();
+                    $player->updateData();
+                    break;
+                case "shadow_sacred_yellow":
+                    $player->getInventory();
+                    if (!$player->hasItem($system->event_data['shadow_essence_id'])) {
+                        throw new RuntimeException("You do not have this item!");
+                    }
+                    if ($player->items[$system->event_data['shadow_essence_id']]->quantity < 1) {
+                        throw new RuntimeException("You do not have enough of this item!");
+                    }
+                    if ($player->hasItem($system->event_data['sacred_lantern_yellow'])) {
+                        throw new RuntimeException("You already have this item!");
+                    }
+                    $player->items[$system->event_data['shadow_essence_id']]->quantity -= 1;
+                    if ($player->items[$system->event_data['shadow_essence_id']]->quantity < 1) {
+                        unset($player->items[$system->event_data['shadow_essence_id']]);
+                    }
+
+
+                    $result = $system->db->query("SELECT * FROM `items` WHERE `item_id` = {$system->event_data['sacred_lantern_yellow']}");
+                    $player->items[$system->event_data['sacred_lantern_yellow']] = Item::fromDb($system->db->fetch($result), 1);
+
+                    $system->message("You have traded 1 Shadow Essence for a Sacred Yellow Lantern!");
+                    $player->updateInventory();
+                    $player->updateData();
+                    break;
+                case "shadow_sacred_red":
+                    $player->getInventory();
+                    if (!$player->hasItem($system->event_data['shadow_essence_id'])) {
+                        throw new RuntimeException("You do not have this item!");
+                    }
+                    if ($player->items[$system->event_data['shadow_essence_id']]->quantity < 1) {
+                        throw new RuntimeException("You do not have enough of this item!");
+                    }
+                    if ($player->hasItem($system->event_data['sacred_lantern_red'])) {
+                        throw new RuntimeException("You already have this item!");
+                    }
+                    $player->items[$system->event_data['shadow_essence_id']]->quantity -= 1;
+                    if ($player->items[$system->event_data['shadow_essence_id']]->quantity < 1) {
+                        unset($player->items[$system->event_data['shadow_essence_id']]);
+                    }
+
+
+                    $result = $system->db->query("SELECT * FROM `items` WHERE `item_id` = {$system->event_data['sacred_lantern_red']}");
+                    $player->items[$system->event_data['sacred_lantern_red']] = Item::fromDb($system->db->fetch($result), 1);
+
+                    $system->message("You have traded 1 Shadow Essence for a Sacred Red Lantern!");
+                    $player->updateInventory();
+                    $player->updateData();
+                    break;
+                case "shadow_sacred_blue":
+                    $player->getInventory();
+                    if (!$player->hasItem($system->event_data['shadow_essence_id'])) {
+                        throw new RuntimeException("You do not have this item!");
+                    }
+                    if ($player->items[$system->event_data['shadow_essence_id']]->quantity < 1) {
+                        throw new RuntimeException("You do not have enough of this item!");
+                    }
+                    if ($player->hasItem($system->event_data['sacred_lantern_blue'])) {
+                        throw new RuntimeException("You already have this item!");
+                    }
+                    $player->items[$system->event_data['shadow_essence_id']]->quantity -= 1;
+                    if ($player->items[$system->event_data['shadow_essence_id']]->quantity < 1) {
+                        unset($player->items[$system->event_data['shadow_essence_id']]);
+                    }
+
+
+                    $result = $system->db->query("SELECT * FROM `items` WHERE `item_id` = {$system->event_data['sacred_lantern_blue']}");
+                    $player->items[$system->event_data['sacred_lantern_blue']] = Item::fromDb($system->db->fetch($result), 1);
+
+                    $system->message("You have traded 1 Shadow Essence for a Sacred Blue Lantern!");
+                    $player->updateInventory();
+                    $player->updateData();
+                    break;
+                case "shadow_sacred_violet":
+                    $player->getInventory();
+                    if (!$player->hasItem($system->event_data['shadow_essence_id'])) {
+                        throw new RuntimeException("You do not have this item!");
+                    }
+                    if ($player->items[$system->event_data['shadow_essence_id']]->quantity < 1) {
+                        throw new RuntimeException("You do not have enough of this item!");
+                    }
+                    if ($player->hasItem($system->event_data['sacred_lantern_violet'])) {
+                        throw new RuntimeException("You already have this item!");
+                    }
+                    $player->items[$system->event_data['shadow_essence_id']]->quantity -= 1;
+                    if ($player->items[$system->event_data['shadow_essence_id']]->quantity < 1) {
+                        unset($player->items[$system->event_data['shadow_essence_id']]);
+                    }
+
+
+                    $result = $system->db->query("SELECT * FROM `items` WHERE `item_id` = {$system->event_data['sacred_lantern_violet']}");
+                    $player->items[$system->event_data['sacred_lantern_violet']] = Item::fromDb($system->db->fetch($result), 1);
+
+                    $system->message("You have traded 1 Shadow Essence for a Sacred Violet Lantern!");
+                    $player->updateInventory();
+                    $player->updateData();
+                    break;
+                case "shadow_jutsu":
+                    $player->getInventory();
+                    if (!$player->hasItem($system->event_data['shadow_essence_id'])) {
+                        throw new RuntimeException("You do not have this item!");
+                    }
+                    if ($player->items[$system->event_data['shadow_essence_id']]->quantity < 1) {
+                        throw new RuntimeException("You do not have enough of this item!");
+                    }
+                    if ($player->hasItem($system->event_data['forbidden_jutsu_scroll'])) {
+                        throw new RuntimeException("You already have this item!");
+                    }
+                    $player->items[$system->event_data['shadow_essence_id']]->quantity -= 1;
+                    if ($player->items[$system->event_data['shadow_essence_id']]->quantity < 1) {
+                        unset($player->items[$system->event_data['shadow_essence_id']]);
+                    }
+
+                    $result = $system->db->query("SELECT * FROM `items` WHERE `item_id` = {$system->event_data['forbidden_jutsu_scroll']}");
+                    $player->items[$system->event_data['forbidden_jutsu_scroll']] = Item::fromDb($system->db->fetch($result), 1);
+
+                    $system->message("You have traded 1 Shadow Essence for a Forbidden Jutsu Scroll!");
+                    $player->updateInventory();
+                    $player->updateData();
                     break;
             }
         } catch (RuntimeException $e) {
