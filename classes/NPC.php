@@ -149,8 +149,8 @@ class NPC extends Fighter {
                 case Jutsu::TYPE_GENJUTSU:
                     $jutsu->use_type = $jutsu->use_type != Jutsu::USE_TYPE_MELEE ? $jutsu->use_type : Jutsu::USE_TYPE_PROJECTILE;
                     $jutsu->effect = $jutsu->effect != "none" ? $jutsu->effect : 'residual_damage';
-                    $jutsu->effect_amount = $jutsu->effect != 0 ? $jutsu->effect : 30;
-                    $jutsu->effect_length = $jutsu->effect != 0 ? $jutsu->effect : 3;
+                    $jutsu->effect_amount = $jutsu->effect_amount != 0 ? $jutsu->effect_amount : 30;
+                    $jutsu->effect_length = $jutsu->effect_length != 0 ? $jutsu->effect_length : 3;
                     break;
                 default:
                     throw new RuntimeException("Invalid jutsu type!");
