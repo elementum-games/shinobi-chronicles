@@ -202,6 +202,7 @@ class System {
         }
         // Manually set event locations, pulled from TravelManager and Missions to identify event missions
         $currentMinutes = intval(date('i'));
+        $event_missions_special = [];
         $event_missions_easy = [];
         $event_missions_medium = [];
         $event_missions_hard = [];
@@ -209,10 +210,10 @@ class System {
         switch (true) {
             case ($currentMinutes < 3): // 3 minutes per hour
                 $event_missions_nightmare[] = ['x' => 10, 'y' => 1];
-                $event_missions_hard[] = ['x' => 13, 'y' => 1];
-                $event_missions_hard[] = ['x' => 12, 'y' => 3];
-                $event_missions_hard[] = ['x' => 8, 'y' => 3];
-                $event_missions_hard[] = ['x' => 7, 'y' => 1];
+                $event_missions_special[] = ['x' => 13, 'y' => 1];
+                $event_missions_special[] = ['x' => 12, 'y' => 3];
+                $event_missions_special[] = ['x' => 8, 'y' => 3];
+                $event_missions_special[] = ['x' => 7, 'y' => 1];
                 break;
             case ($currentMinutes % 3 == 0):
                 $event_missions_easy[] = ['x' => 5, 'y' => 4];
@@ -261,6 +262,7 @@ class System {
                 break;
         }
 
+        $this->event_data['special'] = $event_missions_special;
         $this->event_data['easy'] = $event_missions_easy;
         $this->event_data['medium'] = $event_missions_medium;
         $this->event_data['hard'] = $event_missions_hard;
@@ -273,6 +275,7 @@ class System {
         $this->event_data['sacred_lantern_blue_id'] = 25;
         $this->event_data['sacred_lantern_purple_id'] = 26;
         $this->event_data['forbidden_jutsu_scroll'] = 27;
+        $this->event_data['special_mission_id'] = 19;
         $this->event_data['easy_mission_id'] = 12;
         $this->event_data['medium_mission_id'] = 13;
         $this->event_data['hard_mission_id'] = 11;
