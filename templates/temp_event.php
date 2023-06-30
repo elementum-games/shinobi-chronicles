@@ -80,7 +80,7 @@
                     </td>
                 </tr>
                 <tr>
-                    <td>500x Red Lantern</td>
+                    <td>100x Red Lantern</td>
                     <td><?php echo $player->hasItem($system->event_data['shadow_essence_id']) ? "1x Shadow Essence" : "???" ?></td>
                     <td>
                         <a href="<?=$system->router->getUrl("event", ["exchange" => "red_shadow"])?>">Claim</a>
@@ -88,14 +88,14 @@
                 </tr>
                 <tr>
                     <td><?php echo $player->hasItem($system->event_data['shadow_essence_id']) ? "1x Shadow Essence" : "???" ?></td>
-                    <td><?php echo $player->hasItem($system->event_data['shadow_essence_id']) ? "500x Red Lantern" : "???" ?></td>
+                    <td><?php echo $player->hasItem($system->event_data['shadow_essence_id']) ? "100x Red Lantern" : "???" ?></td>
                     <td>
                         <a href="<?=$system->router->getUrl("event", ["exchange" => "shadow_red"])?>">Claim</a>
                     </td>
                 </tr>
                 <tr>
                     <td>
-                        <?php echo $player->hasItem($system->event_data['shadow_essence_id']) ? "1x Shadow Essence" : "???" ?>
+                        <?php echo $player->hasItem($system->event_data['shadow_essence_id']) ? "5x Shadow Essence" : "???" ?>
                     </td>
                     <td>
                         <?php echo $player->hasItem($system->event_data['shadow_essence_id']) ? "Sacred Red Lantern" : "???" ?>
@@ -106,7 +106,7 @@
                 </tr>
                 <tr>
                     <td>
-                        <?php echo $player->hasItem($system->event_data['shadow_essence_id']) ? "1x Shadow Essence" : "???" ?>
+                        <?php echo $player->hasItem($system->event_data['shadow_essence_id']) ? "5x Shadow Essence" : "???" ?>
                     </td>
                     <td>
                         <?php echo $player->hasItem($system->event_data['shadow_essence_id']) ? "Sacred Blue Lantern" : "???" ?>
@@ -117,7 +117,7 @@
                 </tr>
                 <tr>
                     <td>
-                        <?php echo $player->hasItem($system->event_data['shadow_essence_id']) ? "1x Shadow Essence" : "???" ?>
+                        <?php echo $player->hasItem($system->event_data['shadow_essence_id']) ? "5x Shadow Essence" : "???" ?>
                     </td>
                     <td>
                         <?php echo $player->hasItem($system->event_data['shadow_essence_id']) ? "Sacred Violet Lantern" : "???" ?>
@@ -128,7 +128,7 @@
                 </tr>
                 <tr>
                     <td>
-                        <?php echo $player->hasItem($system->event_data['shadow_essence_id']) ? "5x Shadow Essence" : "???" ?>
+                        <?php echo $player->hasItem($system->event_data['shadow_essence_id']) ? "25x Shadow Essence" : "???" ?>
                     </td>
                     <td>
                         <?php echo $player->hasItem($system->event_data['shadow_essence_id']) ? "Forbidden Jutsu Scroll" : "???" ?>
