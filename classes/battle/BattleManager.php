@@ -350,7 +350,12 @@ class BattleManager {
     }
 
     public function isComplete(): bool {
-        return $this->battle->isComplete();
+        $complete = $this->battle->isComplete();
+        // TEMP FIX
+        if ($complete) {
+            $_SESSION['ai_logic']['special_move_used'] = false;
+        }
+        return $complete;
     }
 
     public function playerActionSubmitted(): bool {
@@ -729,7 +734,7 @@ class BattleManager {
 
         $text = $attack->jutsu->battle_text;
         $attack_jutsu_color = BattleManager::getJutsuTextColor($attack->jutsu->jutsu_type);
-        $has_element = ($attack->jutsu->element != Jutsu::ELEMENT_NONE);
+        $has_element = ($attack->jutsu->element != Jutsu::ELEMENT_NONE && $attack->jutsu->element != "none");
         $element_text = ' with ' . $attack->jutsu->element;
 
         if(empty($attack->jutsu->effect_only)) {

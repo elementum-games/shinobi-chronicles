@@ -210,9 +210,14 @@ $constraints['ai'] = [
         'input_type' => 'text',
     ],
     'moves' => [
-        'count' => 2,
+        'count' => 4,
         'num_required' => 1,
         'variables' => [
+            'disabled' => [
+                'data_type' => 'string',
+                'input_type' => 'radio',
+                'options' => ['disabled'],
+            ],
             'battle_text' => [
                 'data_type' => 'string',
                 'input_type' => 'text',
@@ -226,6 +231,24 @@ $constraints['ai'] = [
                 'data_type' => 'string',
                 'input_type' => 'text',
                 'options' => ['ninjutsu', 'taijutsu', 'genjutsu'],
+            ],
+            'use_type' => [
+                'data_type' => 'string',
+                'input_type' => 'text',
+                'options' => [Jutsu::USE_TYPE_MELEE, Jutsu::USE_TYPE_PROJECTILE, Jutsu::USE_TYPE_BUFF, Jutsu::USE_TYPE_BARRIER],
+            ],
+            'effect' => [
+                'data_type' => 'string',
+                'input_type' => 'text',
+                'options' => ['none', 'taijutsu_boost', 'ninjutsu_boost', 'genjutsu_boost', 'speed_boost', 'cast_speed_boost', 'speed_nerf'],
+            ],
+            'effect_amount' => [
+                'data_type' => 'string',
+                'input_type' => 'text',
+            ],
+            'effect_length' => [
+                'data_type' => 'string',
+                'input_type' => 'text',
             ],
         ],
     ],
