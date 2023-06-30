@@ -210,9 +210,14 @@ $constraints['ai'] = [
         'input_type' => 'text',
     ],
     'moves' => [
-        'count' => 2,
+        'count' => 4,
         'num_required' => 1,
         'variables' => [
+            'disabled' => [
+                'data_type' => 'string',
+                'input_type' => 'radio',
+                'options' => ['disabled'],
+            ],
             'battle_text' => [
                 'data_type' => 'string',
                 'input_type' => 'text',
@@ -226,6 +231,24 @@ $constraints['ai'] = [
                 'data_type' => 'string',
                 'input_type' => 'text',
                 'options' => ['ninjutsu', 'taijutsu', 'genjutsu'],
+            ],
+            'use_type' => [
+                'data_type' => 'string',
+                'input_type' => 'text',
+                'options' => [Jutsu::USE_TYPE_MELEE, Jutsu::USE_TYPE_PROJECTILE, Jutsu::USE_TYPE_BUFF, Jutsu::USE_TYPE_BARRIER],
+            ],
+            'effect' => [
+                'data_type' => 'string',
+                'input_type' => 'text',
+                'options' => ['none', 'residual_damage', 'taijutsu_boost', 'ninjutsu_boost', 'genjutsu_boost', 'speed_boost', 'cast_speed_boost', 'speed_nerf'],
+            ],
+            'effect_amount' => [
+                'data_type' => 'string',
+                'input_type' => 'text',
+            ],
+            'effect_length' => [
+                'data_type' => 'string',
+                'input_type' => 'text',
             ],
         ],
     ],
@@ -443,6 +466,11 @@ $constraints['team'] = [
 
 /* Mission */
 $mission_stage_constraints = [
+    'disabled' => [
+        'data_type' => 'string',
+        'input_type' => 'radio',
+        'options' => ['disabled'],
+    ],
     'action_type' => [
         'data_type' => 'string',
         'input_type' => 'radio',
@@ -464,6 +492,25 @@ $mission_stage_constraints = [
         'data_type' => 'string',
         'input_type' => 'text',
         'max_length' => 300,
+    ],
+];
+$mission_reward_constraints = [
+    'disabled' => [
+        'data_type' => 'string',
+        'input_type' => 'radio',
+        'options' => ['disabled'],
+    ],
+    'item_id' => [
+        'data_type' => 'int',
+        'input_type' => 'text',
+    ],
+    'chance' => [
+        'data_type' => 'int',
+        'input_type' => 'text',
+    ],
+    'quantity' => [
+        'data_type' => 'int',
+        'input_type' => 'text',
     ],
 ];
 $constraints['mission'] = [
@@ -492,9 +539,9 @@ $constraints['mission'] = [
         'variables' => $mission_stage_constraints,
     ],
     'rewards' => [
-        'data_type' => 'string',
-        'input_type' => 'text',
-        'max_length' => 2000,
+        'count' => 4,
+        'num_required' => 0,
+        'variables' => $mission_reward_constraints,
     ],
 ];
 

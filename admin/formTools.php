@@ -48,6 +48,12 @@ function validateFormData($entity_constraints, &$data, $content_id = null, $FORM
                     for($i = 0; $i < $variable['count']; $i++) {
                         $data_array[$count] = [];
                         foreach($variable['variables'] as $name => $var) {
+                            if(isset($FORM_DATA[$var_name][$i]["disabled"])) {
+                                if ($FORM_DATA[$var_name][$i]["disabled"] == "disabled") {
+                                    unset($FORM_DATA[$var_name][$i]);
+                                    continue;
+                                }
+                            }
                             if(!isset($FORM_DATA[$var_name][$i][$name])) {
                                 continue;
                             }
@@ -158,11 +164,11 @@ function validateField(
     // Check for uniqueness
     if(isset($field_constraints['unique_required']) && $field_constraints['unique_required'] == true) {
         if($content_id) {
-            $query = "SELECT `{$field_constraints['unique_column']}` FROM `{$field_constraints['unique_table']}` 
+            $query = "SELECT `{$field_constraints['unique_column']}` FROM `{$field_constraints['unique_table']}`
 				WHERE `{$field_constraints['unique_column']}` = '" . $data[$var_name] . "' and `{$field_constraints['id_column']}` != '$content_id' LIMIT 1";
         }
         else {
-            $query = "SELECT `{$field_constraints['unique_column']}` FROM `{$field_constraints['unique_table']}` 
+            $query = "SELECT `{$field_constraints['unique_column']}` FROM `{$field_constraints['unique_table']}`
 				WHERE `{$field_constraints['unique_column']}` = '" . $data[$var_name] . "' LIMIT 1";
         }
         $result = $system->db->query($query);

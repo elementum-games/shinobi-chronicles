@@ -98,17 +98,6 @@
                         <?php echo $player->hasItem($system->event_data['shadow_essence_id']) ? "1x Shadow Essence" : "???" ?>
                     </td>
                     <td>
-                        <?php echo $player->hasItem($system->event_data['shadow_essence_id']) ? "Sacred Yellow Lantern" : "???" ?>
-                    </td>
-                    <td>
-                        <a href="<?=$system->router->getUrl("event", ["exchange" => "shadow_sacred_yellow"])?>">Claim</a>
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <?php echo $player->hasItem($system->event_data['shadow_essence_id']) ? "1x Shadow Essence" : "???" ?>
-                    </td>
-                    <td>
                         <?php echo $player->hasItem($system->event_data['shadow_essence_id']) ? "Sacred Red Lantern" : "???" ?>
                     </td>
                     <td>

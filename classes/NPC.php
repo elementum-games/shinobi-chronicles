@@ -125,19 +125,32 @@ class NPC extends Fighter {
         $moves = json_decode($ai_data['moves'], true);
 
         foreach($moves as $move) {
-            $jutsu = $this->initJutsu(count($this->jutsu), $move['jutsu_type'], $move['power'], $move['battle_text']);
+            if (!isset ($move['use_type'])) {
+                $move['use_type'] = Jutsu::USE_TYPE_MELEE;
+            }
+            if (!isset($move['effect'])) {
+                $move['effect'] = "none";
+            }
+            if (!isset($move['effect_amount'])) {
+                $move['effect_amount'] = 0;
+            }
+            if (!isset($move['effect_length'])) {
+                $move['effect_length'] = 0;
+            }
+            $jutsu = $this->initJutsu(count($this->jutsu), $move['jutsu_type'], $move['power'], $move['battle_text'], $move['use_type'], $move['effect'], $move['effect_amount'], $move['effect_length']);
 
             switch($jutsu->jutsu_type) {
                 case Jutsu::TYPE_NINJUTSU:
-                    $jutsu->use_type = Jutsu::USE_TYPE_PROJECTILE;
+                    $jutsu->use_type = $jutsu->use_type != Jutsu::USE_TYPE_MELEE ? $jutsu->use_type : Jutsu::USE_TYPE_PROJECTILE;
                     break;
                 case Jutsu::TYPE_TAIJUTSU:
-                    $jutsu->use_type = Jutsu::USE_TYPE_MELEE;
+                    $jutsu->use_type = $jutsu->use_type != Jutsu::USE_TYPE_MELEE ? $jutsu->use_type : Jutsu::USE_TYPE_MELEE;
                     break;
                 case Jutsu::TYPE_GENJUTSU:
-                    $jutsu->effect = 'residual_damage';
-                    $jutsu->effect_amount = 30;
-                    $jutsu->effect_length = 3;
+                    $jutsu->use_type = $jutsu->use_type != Jutsu::USE_TYPE_MELEE ? $jutsu->use_type : Jutsu::USE_TYPE_PROJECTILE;
+                    $jutsu->effect = $jutsu->effect != "none" ? $jutsu->effect : 'residual_damage';
+                    $jutsu->effect_amount = $jutsu->effect_amount != 0 ? $jutsu->effect_amount : 30;
+                    $jutsu->effect_length = $jutsu->effect_length != 0 ? $jutsu->effect_length : 3;
                     break;
                 default:
                     throw new RuntimeException("Invalid jutsu type!");
@@ -152,7 +165,7 @@ class NPC extends Fighter {
 
     private function loadDefaultJutsu() {
         $result = $this->system->db->query(
-            "SELECT `battle_text`, `power`, `jutsu_type` FROM `jutsu` 
+            "SELECT `battle_text`, `power`, `jutsu_type` FROM `jutsu`
                     WHERE `rank` <= '{$this->rank}'
                     AND `purchase_type`='" . Jutsu::PURCHASE_TYPE_DEFAULT . "'
                     ORDER BY `rank` DESC LIMIT 1"
@@ -181,8 +194,8 @@ class NPC extends Fighter {
         $jutsuTypes = ['ninjutsu', 'taijutsu'];
         $aiType = rand(0, 1);
         $result = $this->system->db->query(
-            "SELECT `battle_text`, `power`, `jutsu_type` FROM `jutsu` 
-                    WHERE `rank` = '{$this->rank}' AND `jutsu_type` = '{$jutsuTypes[$aiType]}' 
+            "SELECT `battle_text`, `power`, `jutsu_type` FROM `jutsu`
+                    WHERE `rank` = '{$this->rank}' AND `jutsu_type` = '{$jutsuTypes[$aiType]}'
                     AND `purchase_type` != '1' AND `purchase_type` != '3' LIMIT 1"
         );
         while ($row = $this->system->db->fetch($result)) {
@@ -207,7 +220,7 @@ class NPC extends Fighter {
 
     public function chooseAttack(): Jutsu {
         if(!$_SESSION['ai_logic']['special_move_used'] && $this->jutsu[1]) {
-            $this->current_move =& $this->jutsu[1];
+            $this->current_move =& $this->jutsu[0];
             $_SESSION['ai_logic']['special_move_used'] = true;
         }
         else {
@@ -218,7 +231,7 @@ class NPC extends Fighter {
         return $this->current_move;
     }
 
-    public function initJutsu(int $id, $jutsu_type, float $power, string $battle_text): Jutsu {
+    public function initJutsu(int $id, $jutsu_type, float $power, string $battle_text, string $use_type = Jutsu::USE_TYPE_MELEE, string $effect = "none", int $effect_amount = 0, int $effect_length = 0): Jutsu {
         $battle_text_alt = str_replace(
             ['[player]', '[opponent]'],
             ['[playerX]', '[opponentX]'],
@@ -238,13 +251,13 @@ class NPC extends Fighter {
             jutsu_type: $jutsu_type,
             base_power: $power,
             range: 2,
-            effect: 'none',
-            base_effect_amount: 0,
-            effect_length: 0,
+            effect: $effect,
+            base_effect_amount: $effect_amount,
+            effect_length: $effect_length,
             description: "N/A",
             battle_text: $battle_text_swapped,
             cooldown: 0,
-            use_type: Jutsu::USE_TYPE_MELEE,
+            use_type: $use_type,
             target_type: Jutsu::TARGET_TYPE_FIGHTER_ID,
             use_cost: $this->rank * 5,
             purchase_cost: $this->rank * 1000,

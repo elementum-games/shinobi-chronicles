@@ -117,13 +117,13 @@ export function TopbarNotification({
             }
             {notification.type === "report" &&
                 <a href={notification.action_url}
-                   className={(notification.duration > 0) ? "topbar_notification_wrapper has_duration" : "topbar_notification_wrapper"}
+                   className={(notification.duration > 0) ? "topbar_notification_wrapper_report has_duration" : "topbar_notification_wrapper_report"}
                    data-content={notification.message}
                    data-time={timeRemainingDisplay}
                 >
                     <svg className="topbar_notification_svg" width="40" height="40" viewBox="0 0 100 100">
-                        <polygon points="6,50 50,94 94,50 50,6" strokeWidth="8px" stroke="#5d5c4b" fill="#B09A65" />
-                        <polygon points="6,50 50,94 94,50 50,6" strokeWidth="2px" stroke="#000000" fill="#B09A65" />
+                        <polygon points="6,50 50,94 94,50 50,6" strokeWidth="8px" stroke="#5d5c4b" fill="#ae5576" />
+                        <polygon points="6,50 50,94 94,50 50,6" strokeWidth="2px" stroke="#000000" fill="#ae5576" />
                         <text x="40%" y="70%" className="topbar_notification_important">!</text>
                     </svg>
                 </a>

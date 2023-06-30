@@ -138,3 +138,28 @@
 .topbar_close_notification:hover {
     color: var(--text-hover);
 }
+
+.topbar_notification_wrapper_report {
+    cursor: pointer;
+    position: relative;
+}
+
+.topbar_notification_wrapper_report::after {
+    content: attr(data-content);
+    position: absolute;
+    z-index: 1000;
+    transform: translate(-17px, -10px);
+    background-color: #141317;
+    border-color: #575749;
+    color: var(--font-color-6);
+    font-family: var(--font-secondary);
+    font-size: 12px;
+    font-style: italic;
+    border-width: 1.75px;
+    border-style: solid;
+    padding: 5px;
+    white-space: nowrap;
+    font-weight: bold;
+    top: 100%;
+    transform: translate(calc(-100% - 20px), 0%);
+}
