@@ -268,8 +268,7 @@ class System {
         $this->event_data['red_lantern_id'] = 19;
         $this->event_data['blue_lantern_id'] = 20;
         $this->event_data['violet_lantern_id'] = 21;
-        $this->event_data['shadow_essence_id'] = 22;
-        $this->event_data['sacred_lantern_yellow_id'] = 23;
+        $this->event_data['shadow_essence_id'] = 23;
         $this->event_data['sacred_lantern_red_id'] = 24;
         $this->event_data['sacred_lantern_blue_id'] = 25;
         $this->event_data['sacred_lantern_purple_id'] = 26;
@@ -277,7 +276,7 @@ class System {
         $this->event_data['easy_mission_id'] = 12;
         $this->event_data['medium_mission_id'] = 13;
         $this->event_data['hard_mission_id'] = 11;
-        $this->event_data['nightmare_mission_id'] = 15;
+        $this->event_data['nightmare_mission_id'] = 14;
     }
 
     /**
