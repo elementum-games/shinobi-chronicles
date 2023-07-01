@@ -37,6 +37,7 @@ class Router {
         'news' => 32,
         'academy' => 33,
         'account_record' => 34,
+        'send_money' => 35,
     ];
 
     /** @var Route[] $routes */
