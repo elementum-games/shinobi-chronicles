@@ -274,7 +274,7 @@ class System {
         $this->event_data['sacred_lantern_red_id'] = 24;
         $this->event_data['sacred_lantern_blue_id'] = 25;
         $this->event_data['sacred_lantern_purple_id'] = 26;
-        $this->event_data['forbidden_jutsu_scroll'] = 27;
+        $this->event_data['forbidden_jutsu_scroll_id'] = 27;
         $this->event_data['special_mission_id'] = 19;
         $this->event_data['easy_mission_id'] = 12;
         $this->event_data['medium_mission_id'] = 13;
