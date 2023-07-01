@@ -295,6 +295,7 @@ class System {
         $this->event_data['medium_mission_id'] = 13;
         $this->event_data['hard_mission_id'] = 11;
         $this->event_data['nightmare_mission_id'] = 14;
+        $this->event_data['yen_per_lantern'] = 25;
     }
 
     /**

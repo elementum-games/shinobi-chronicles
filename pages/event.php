@@ -173,6 +173,7 @@ function event() {
             // These are placeholder exchange options
             switch ($_GET['exchange']) {
                 case "red_yen_small":
+                    $yen_gain = $system->event_data['yen_per_lantern'];
                     $player->getInventory();
                     if (!$player->hasItem($system->event_data['red_lantern_id'])) {
                         throw new RuntimeException("You do not have this item!");
@@ -185,11 +186,12 @@ function event() {
                         unset($player->items[$system->event_data['red_lantern_id']]);
                     }
                     $player->addMoney("25", "Event");
-                    $system->message("You have traded 1 Red Lantern for 25 yen!");
+                    $system->message("You exchanged 1 Red Lantern for " . $yen_gain . "&#165;!");
                     $player->updateInventory();
                     $player->updateData();
                     break;
                 case "red_yen_medium":
+                    $yen_gain = $system->event_data['yen_per_lantern'] * 10;
                     $player->getInventory();
                     if (!$player->hasItem($system->event_data['red_lantern_id'])) {
                         throw new RuntimeException("You do not have this item!");
@@ -202,11 +204,12 @@ function event() {
                         unset($player->items[$system->event_data['red_lantern_id']]);
                     }
                     $player->addMoney("250", "Event");
-                    $system->message("You have traded 10 Red Lanterns for 250 yen!");
+                    $system->message("You exchanged 10 Red Lanterns for " . $yen_gain . "&#165;!");
                     $player->updateInventory();
                     $player->updateData();
                     break;
                 case "red_yen_large":
+                    $yen_gain = $system->event_data['yen_per_lantern'] * 100;
                     $player->getInventory();
                     if (!$player->hasItem($system->event_data['red_lantern_id'])) {
                         throw new RuntimeException("You do not have this item!");
@@ -219,7 +222,7 @@ function event() {
                         unset($player->items[$system->event_data['red_lantern_id']]);
                     }
                     $player->addMoney("2500", "Event");
-                    $system->message("You have traded 100 Red Lanterns for 2500 yen!");
+                    $system->message("You exchanged 100 Red Lanterns for " . $yen_gain . "&#165;!");
                     $player->updateInventory();
                     $player->updateData();
                     break;
@@ -236,7 +239,7 @@ function event() {
                         unset($player->items[$system->event_data['red_lantern_id']]);
                     }
                     $player->addRep("1");
-                    $system->message("You have traded 50 Red Lanterns for 1 Reputation!");
+                    $system->message("You exchanged 50 Red Lanterns for 1 Reputation!");
                     $player->updateInventory();
                     $player->updateData();
                     break;
@@ -259,7 +262,7 @@ function event() {
                         $result = $system->db->query("SELECT * FROM `items` WHERE `item_id` = {$system->event_data['red_lantern_id']}");
                         $player->items[$system->event_data['red_lantern_id']] = Item::fromDb($system->db->fetch($result), 5);
                     }
-                    $system->message("You have traded 1 Blue Lantern for 5 Red Lantern!");
+                    $system->message("You exchanged 1 Blue Lantern for 5 Red Lanterns!");
                     $player->updateInventory();
                     $player->updateData();
                     break;
@@ -282,7 +285,7 @@ function event() {
                         $result = $system->db->query("SELECT * FROM `items` WHERE `item_id` = {$system->event_data['red_lantern_id']}");
                         $player->items[$system->event_data['red_lantern_id']] = Item::fromDb($system->db->fetch($result), 20);
                     }
-                    $system->message("You have traded 1 Violet Lantern for 20 Red Lanterns!");
+                    $system->message("You exchanged 1 Violet Lantern for 20 Red Lanterns!");
                     $player->updateInventory();
                     $player->updateData();
                     break;
@@ -305,7 +308,7 @@ function event() {
                         $result = $system->db->query("SELECT * FROM `items` WHERE `item_id` = {$system->event_data['red_lantern_id']}");
                         $player->items[$system->event_data['red_lantern_id']] = Item::fromDb($system->db->fetch($result), 20);
                     }
-                    $system->message("You have traded 1 Gold Lantern for 50 Red Lanterns!");
+                    $system->message("You exchanged 1 Gold Lantern for 50 Red Lanterns!");
                     $player->updateInventory();
                     $player->updateData();
                     break;
@@ -327,7 +330,7 @@ function event() {
                         $result = $system->db->query("SELECT * FROM `items` WHERE `item_id` = {$system->event_data['shadow_essence_id']}");
                         $player->items[$system->event_data['shadow_essence_id']] = Item::fromDb($system->db->fetch($result), 1);
                     }
-                    $system->message("You have traded 100 Red Lanterns for 1 Shadow Essence!");
+                    $system->message("You exchanged 100 Red Lanterns for 1 Shadow Essence!");
                     $player->updateInventory();
                     $player->updateData();
                     break;
@@ -349,7 +352,7 @@ function event() {
                         $result = $system->db->query("SELECT * FROM `items` WHERE `item_id` = {$system->event_data['red_lantern_id']}");
                         $player->items[$system->event_data['red_lantern_id']] = Item::fromDb($system->db->fetch($result), 100);
                     }
-                    $system->message("You have traded 1 Shadow Essence for 100 Red Lanterns!");
+                    $system->message("You exchanged 1 Shadow Essence for 100 Red Lanterns!");
                     $player->updateInventory();
                     $player->updateData();
                     break;
@@ -371,7 +374,7 @@ function event() {
                     $result = $system->db->query("SELECT * FROM `items` WHERE `item_id` = {$system->event_data['sacred_lantern_red_id']}");
                     $player->items[$system->event_data['sacred_lantern_red_id']] = Item::fromDb($system->db->fetch($result), 1);
 
-                    $system->message("You have traded 5 Shadow Essence for a Sacred Red Lantern!");
+                    $system->message("You exchanged 5 Shadow Essence for a Sacred Red Lantern!");
                     $player->updateInventory();
                     $player->updateData();
                     break;
@@ -393,7 +396,7 @@ function event() {
                     $result = $system->db->query("SELECT * FROM `items` WHERE `item_id` = {$system->event_data['sacred_lantern_blue_id']}");
                     $player->items[$system->event_data['sacred_lantern_blue_id']] = Item::fromDb($system->db->fetch($result), 1);
 
-                    $system->message("You have traded 5 Shadow Essence for a Sacred Blue Lantern!");
+                    $system->message("You exchanged 5 Shadow Essence for a Sacred Blue Lantern!");
                     $player->updateInventory();
                     $player->updateData();
                     break;
@@ -415,7 +418,7 @@ function event() {
                     $result = $system->db->query("SELECT * FROM `items` WHERE `item_id` = {$system->event_data['sacred_lantern_violet_id']}");
                     $player->items[$system->event_data['sacred_lantern_violet_id']] = Item::fromDb($system->db->fetch($result), 1);
 
-                    $system->message("You have traded 5 Shadow Essence for a Sacred Violet Lantern!");
+                    $system->message("You exchanged 5 Shadow Essence for a Sacred Violet Lantern!");
                     $player->updateInventory();
                     $player->updateData();
                     break;
@@ -437,7 +440,7 @@ function event() {
                     $result = $system->db->query("SELECT * FROM `items` WHERE `item_id` = {$system->event_data['sacred_lantern_gold_id']}");
                     $player->items[$system->event_data['sacred_lantern_gold_id']] = Item::fromDb($system->db->fetch($result), 1);
 
-                    $system->message("You have traded 5 Shadow Essence for a Sacred Gold Lantern!");
+                    $system->message("You exchanged 5 Shadow Essence for a Sacred Gold Lantern!");
                     $player->updateInventory();
                     $player->updateData();
                     break;
@@ -459,7 +462,7 @@ function event() {
                     $result = $system->db->query("SELECT * FROM `items` WHERE `item_id` = {$system->event_data['forbidden_jutsu_scroll_id']}");
                     $player->items[$system->event_data['forbidden_jutsu_scroll_id']] = Item::fromDb($system->db->fetch($result), 1);
 
-                    $system->message("You have traded 25 Shadow Essence for a Forbidden Jutsu Scroll!");
+                    $system->message("You exchanged 25 Shadow Essence for a Forbidden Jutsu Scroll!");
                     $player->updateInventory();
                     $player->updateData();
                     break;
