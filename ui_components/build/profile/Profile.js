@@ -206,7 +206,7 @@ function DailyTasks({
   }, /*#__PURE__*/React.createElement("div", {
     className: "progress_bar_fill",
     style: {
-      width: `${dailyTask.progressPercent + 10}%`
+      width: `${dailyTask.progressPercent}%`
     }
   })), /*#__PURE__*/React.createElement("span", {
     style: {

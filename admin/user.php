@@ -35,11 +35,6 @@ function editUserPage(System $system, User $player): void {
     $variables =& $constraints['edit_user'];
 
     if($player->isHeadAdmin()) {
-        $variables['elements'] = [
-            'data_type' => 'string',
-            'input_type' => 'checkbox',
-            'options' => User::$ELEMENTS,
-        ];
         $variables['staff_level'] = [
             'data_type' => 'int',
             'input_type' => 'radio',
@@ -122,9 +117,14 @@ function editUserPage(System $system, User $player): void {
                     unset($variables['elements']);
                 }
             }
+
             // Load form data
             $data = [];
             validateFormData(entity_constraints: $variables, data: $data, FORM_DATA: $FORM_DATA);
+
+            if($player->isHeadAdmin()) {
+                $data['elements'] = $FORM_DATA['elements'];
+            }
 
             // Insert into database
             $column_names = '';
@@ -161,9 +161,19 @@ function editUserPage(System $system, User $player): void {
         }
         $system->printMessage();
     }
+
     // Form for editing data
     if(!empty($user_data) && !$select_user) {
         $data =& $user_data;
+
+        if($player->isHeadAdmin()) {
+            $variables['elements'] = [
+                'data_type' => 'string',
+                'input_type' => 'checkbox',
+                'options' => User::$ELEMENTS,
+            ];
+        }
+
         echo "<table class='table'><tr><th>Edit User (" . stripslashes($data['user_name']) . ")</th></tr>
 			<tr><td>
 			<form action='{$system->router->getUrl('admin', ['page' => 'edit_user', 'user_name' => $data['user_name']])}' method='post'>";
