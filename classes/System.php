@@ -101,8 +101,8 @@ class System {
 
     // Default layout
     const DEFAULT_LAYOUT = 'shadow_ribbon';
-    const VERSION_NUMBER = '0.8.0';
-    const VERSION_NAME = '0.8';
+    const VERSION_NUMBER = '0.9.0';
+    const VERSION_NAME = '0.9 Flickering Ambitions';
 
     // Misc stuff
     const SC_MAX_RANK = 4;
