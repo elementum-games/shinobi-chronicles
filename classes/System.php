@@ -267,10 +267,12 @@ class System {
         $hour = $currentDate[1];
         $minute = $currentDate[2];
         $seed = $day + $hour + $minute;
-        srand($seed);
-        if (rand(0, 9) == 0) {
-            $event_missions_gold[] = ['x' => rand(1, 28), 'y' => rand(1, 18)];
+        mt_srand($seed);
+        if (mt_rand(0, 9) == 0) {
+            $event_missions_gold[] = ['x' => mt_rand(1, 28), 'y' => mt_rand(1, 18)];
         }
+        // clear seed
+        mt_rand();
         $this->event_data['gold'] = $event_missions_gold;
         $this->event_data['special'] = $event_missions_special;
         $this->event_data['easy'] = $event_missions_easy;
