@@ -2106,7 +2106,7 @@ class User extends Fighter {
 
             'register_date' => time(),
             'verify_key' => $verification_code,
-            'layout' => 'shadow_ribbon',
+            'layout' => System::DEFAULT_LAYOUT,
             'avatar_link' => './images/default_avatar.png',
 
             // '', '', '', 0, 0, 0, 0,
