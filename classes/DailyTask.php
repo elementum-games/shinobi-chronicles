@@ -75,6 +75,15 @@ class DailyTask {
         return $prompt;
     }
 
+    public function getProgressPercent(): float {
+        $dt_progress = 0;
+        if($this->progress != 0) {
+            $dt_progress = $this->progress / $this->amount * 100;
+        }
+
+        return $dt_progress;
+    }
+
     public static function chooseTaskName(array $used_task_name_keys = []): string {
         $possible_task_names = DailyTask::$possible_task_names;
         foreach($used_task_name_keys as $utnk) {

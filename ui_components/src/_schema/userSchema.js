@@ -21,6 +21,7 @@ export type PlayerDataType = {|
     +avatar_size: number,
     +money: number,
     +premiumCredits: number,
+    +premiumCreditsPurchased: number,
     +villageName: string,
     +clanId: ?number,
     +clanName: ?string,
@@ -35,6 +36,7 @@ export type PlayerStatsType = {|
     +ninjutsuSkill: number,
     +taijutsuSkill: number,
     +genjutsuSkill: number,
+    +bloodlineSkill: number,
     +castSpeed: number,
     +speed: number,
     +intelligence: number,
@@ -64,4 +66,15 @@ export type PlayerSettingsType = {|
     +avatar_style: AvatarStyles,
     +sidebar_position: "left" | "right",
     +enable_alerts: boolean,
+|};
+
+export type DailyTaskType = {|
+    +name: string,
+    +prompt: string,
+    +difficulty: string,
+    +rewardYen: number,
+    +rewardRep: number,
+    +progressPercent: string,
+    +progressCaption: string,
+    +complete: boolean,
 |};

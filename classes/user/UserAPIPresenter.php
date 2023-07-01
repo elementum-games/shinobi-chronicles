@@ -2,6 +2,24 @@
 
 class UserApiPresenter {
     public static function playerDataResponse(User $player, array $rank_names): array {
+        $forbidden_seal_time_left = null;
+        if($player->forbidden_seal->level > 0) {
+            $seconds_left = $player->forbidden_seal->seal_end_time - time();
+            $days = floor($seconds_left / 86400);
+            $hours = floor($seconds_left / 3600);
+            $minutes = ceil($seconds_left / 60);
+
+            if($days > 0) {
+                $forbidden_seal_time_left = "$days day" . ($days > 1 ? "s" : "");
+            }
+            else if($hours > 0) {
+                $forbidden_seal_time_left = "$hours hour" . ($hours > 1 ? "s" : "");
+            }
+            else {
+                $forbidden_seal_time_left = "$minutes hour" . ($minutes > 1 ? "s" : "");
+            }
+        }
+
         return [
             'avatar_link' => $player->avatar_link,
             'user_name' => $player->user_name,
@@ -18,15 +36,14 @@ class UserApiPresenter {
             'avatar_size' => $player->getAvatarSize(),
             'money' => $player->getMoney(),
             'premiumCredits' => $player->getPremiumCredits(),
+            'premiumCreditsPurchased' => $player->premium_credits_purchased,
             'villageName' => $player->village->name,
             'clanId' => $player->clan?->id,
             'clanName' => $player->clan?->name,
             'teamId' => $player->team?->id,
             'teamName' => $player->team?->name,
             'forbiddenSealName' => $player->forbidden_seal->name,
-            'forbiddenSealTimeLeft' => $player->forbidden_seal->level > 0
-                ? $player->system->time_remaining($player->forbidden_seal->seal_end_time - time())
-                : null,
+            'forbiddenSealTimeLeft' => $forbidden_seal_time_left,
         ];
     }
 
@@ -85,5 +102,24 @@ class UserApiPresenter {
             },
             $userManager->getAI()
         );
+    }
+
+    /**
+     * @param DailyTask[] $dailyTasks
+     * @return array[]
+     */
+    public static function dailyTasksResponse(array $dailyTasks): array {
+        return array_map(function(DailyTask $daily_task) {
+            return [
+                'name' => $daily_task->name,
+                'prompt' => $daily_task->getPrompt(),
+                'difficulty' => $daily_task->difficulty,
+                'rewardYen' => $daily_task->reward,
+                'rewardRep' => Village::DAILY_TASK[$daily_task->difficulty],
+                'progressPercent' => $daily_task->getProgressPercent(),
+                'progressCaption' => $daily_task->progress . "/" . $daily_task->amount,
+                'complete' => $daily_task->complete,
+            ];
+        }, $dailyTasks);
     }
 }
