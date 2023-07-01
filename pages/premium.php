@@ -561,7 +561,7 @@ function premium(): bool
             $seal_length = (int) $_POST['seal_length'];
 
             //Check for valid seal level
-            if (!isset(ForbiddenSeal::$forbidden_seals[$seal_level]) || $seal_level === 0) {
+            if (!isset(ForbiddenSeal::$forbidden_seal_names[$seal_level]) || $seal_level === 0) {
                 throw new RuntimeException("Invalid forbidden seal!");
             }
             //Check seal lengths
@@ -605,7 +605,7 @@ function premium(): bool
                     $button_value = 'Confirm Seal Change';
                     require 'templates/premium/purchase_confirmation.php';
                 } else {
-                    $message = "Purchased " . ForbiddenSeal::$forbidden_seals[$seal_level] . " seal for {$seal_length} days.";
+                    $message = "Purchased " . ForbiddenSeal::$forbidden_seal_names[$seal_level] . " seal for {$seal_length} days.";
                     if ($overwrite) {
                         $message .= " This purchase removed {$system->time_remaining($player->forbidden_seal->seal_time_remaining)}" .
                             " of their {$player->forbidden_seal->name}.";
@@ -625,7 +625,7 @@ function premium(): bool
             }
             //New seal
             else {
-                $player->subtractPremiumCredits($akCost, "Purchased " . ForbiddenSeal::$forbidden_seals[$seal_level]
+                $player->subtractPremiumCredits($akCost, "Purchased " . ForbiddenSeal::$forbidden_seal_names[$seal_level]
                     . " for {$seal_length} days.");
                 //Load blank seal
                 $player->forbidden_seal = new ForbiddenSeal($system, 0, 0);

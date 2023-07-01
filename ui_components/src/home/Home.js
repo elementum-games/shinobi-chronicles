@@ -8,7 +8,9 @@ import type { NewsPostType } from "./newsSchema.js";
 import { News } from "./News.js";
 
 type Props = {|
-    +homeLinks: $ReadOnlyArray,
+    +homeLinks: {
+        +[key: string]: string,
+    },
     +isLoggedIn: bool,
     +isAdmin: bool,
     +version: string,
@@ -17,7 +19,12 @@ type Props = {|
     +registerErrorText: string,
     +resetErrorText: string,
     +loginMessageText: string,
-    +registerPreFill: $ReadOnlyArray,
+    +registerPreFill: {
+        +user_name: string,
+        +village: "Stone" | "Cloud" | "Mist" | "Sand" | "Leaf",
+        +email: string,
+        +gender: "Male" | "Female" | "Non-binary" | "None",
+    },
     +initialNewsPosts: $ReadOnlyArray<NewsPostType>,
 |};
 function Home({
@@ -99,12 +106,7 @@ function MainBannerSection({
 }) {
     const activeElement = React.useRef(null);
     function handleLogin() {
-        if (loginDisplay !== "login") {
-            setLoginDisplay("login");
-        }
-        else {
-            document.getElementById('login_form').submit();
-        }
+        document.getElementById('login_form').submit();
     }
     function handleRegister() {
         if (loginDisplay !== "register") {
@@ -176,13 +178,11 @@ function MainBannerSection({
                 {activeModal}
 
                 <div className="login_container">
-                    {loginDisplay === "login" &&
-                        <LoginForm
-                            loginMessageText={loginMessageText}
-                            loginErrorText={loginErrorText}
-                            setLoginDisplay={setLoginDisplay}
-                        />
-                    }
+                    <LoginForm
+                        loginMessageText={loginMessageText}
+                        loginErrorText={loginErrorText}
+                        setLoginDisplay={setLoginDisplay}
+                    />
                     {loginDisplay === "reset" &&
                         <form id="reset_form" action="" method="post" style={{ zIndex: 1 }}>
                             <div className="reset_input_top">

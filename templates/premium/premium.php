@@ -429,8 +429,8 @@
             </td>
         </tr>
         <tr>
-            <th id='premium_twinSparrowSeal_header'><?=ForbiddenSeal::$forbidden_seals[1]?></th>
-            <th id='premium_fourDragonSeal_header'><?=ForbiddenSeal::$forbidden_seals[2]?></th>
+            <th id='premium_twinSparrowSeal_header'><?=ForbiddenSeal::$forbidden_seal_names[1]?></th>
+            <th id='premium_fourDragonSeal_header'><?=ForbiddenSeal::$forbidden_seal_names[2]?></th>
         </tr>
         <tr>
             <td id='premium_twinSparrowSeal_data' style='width:50%;vertical-align:top;'>

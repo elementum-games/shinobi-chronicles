@@ -474,7 +474,7 @@ body {
 /* Login Form */
 #login_form {
     position: absolute;
-    transform: translateY(-100px);
+    transform: translateY(-110px);
     width: 400px;
     background: rgba(20, 20, 28, 0.75);
 }

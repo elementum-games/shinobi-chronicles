@@ -42,7 +42,7 @@ class ForbiddenSeal {
     /** Static Members **/
     public static int $STAFF_SEAL_LEVEL = 2; //Defines default benefits for staff members (Note: Not all benefits are provided)
     public static int $SECONDS_IN_DAY = 86400;
-    public static array $forbidden_seals = array(
+    public static array $forbidden_seal_names = array(
         0 => '',
         1 => 'Twin Sparrow Seal',
         2 => 'Four Dragon Seal'
@@ -175,12 +175,12 @@ class ForbiddenSeal {
     );
 
     public function __construct(System $system, int $seal_level, int $seal_end_time = 0) {
-        if(!isset(self::$forbidden_seals[$seal_level])) {
+        if(!isset(self::$forbidden_seal_names[$seal_level])) {
             $seal_level = 0;
         }
         $this->system = $system;
         $this->level = $seal_level;
-        $this->name = self::$forbidden_seals[$this->level];
+        $this->name = self::$forbidden_seal_names[$this->level];
         $this->seal_end_time = $seal_end_time;
         $this->seal_time_remaining = $this->seal_end_time - time();
     }
@@ -188,7 +188,7 @@ class ForbiddenSeal {
     public function checkExpiration() {
         // Seal expired, remove the seal
         if($this->level > 0 && time() > $this->seal_end_time) {
-            $this->system->message("Your " . self::$forbidden_seals[$this->level] . " has expired!");
+            $this->system->message("Your " . self::$forbidden_seal_names[$this->level] . " has expired!");
             $this->level = 0;
             $this->setBenefits();
         }
@@ -203,7 +203,7 @@ class ForbiddenSeal {
         //Overwrite seal
         else {
             $this->level = $seal_level;
-            $this->name = self::$forbidden_seals[$this->level];
+            $this->name = self::$forbidden_seal_names[$this->level];
             $this->seal_end_time = time() + ($days_to_add * self::$SECONDS_IN_DAY);
             $this->seal_time_remaining = $this->seal_end_time - time();
         }

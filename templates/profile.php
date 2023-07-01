@@ -492,10 +492,6 @@ $clan_positions = [
     <div id='dailyTaskWrapper'>
         <?php foreach($player->daily_tasks as $daily_task): ?>
             <?php
-                $dt_progress = 0;
-                if($daily_task->progress != 0) {
-                    $dt_progress = $daily_task->progress / $daily_task->amount * 100;
-                }
                 $dt_status_class_name = ($daily_task->complete ? 'Complete' : 'NotComplete');
             ?>
 
@@ -517,7 +513,7 @@ $clan_positions = [
                 </div>
                 <div class='dailyTaskProgress'>
                     <div class='dailyTaskProgressBar dailyTask<?= $dt_status_class_name ?>'>
-                        <div style='width: <?= $dt_progress ?>%;'></div>
+                        <div style='width: <?= $daily_task->getProgressPercent() ?>%;'></div>
                     </div>
                 </div>
                 <div class='dailyTaskProgressCaption'>

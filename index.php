@@ -693,9 +693,7 @@ else {
     $captcha = '';
 
     if ($system->isDevEnvironment()) {
-        if ($login_error_text != "" || $login_message_text != "") {
-            $initial_login_display = "login";
-        }
+        $initial_login_display = "login";
         if ($reset_error_text != "") {
             $initial_login_display = "reset";
         }

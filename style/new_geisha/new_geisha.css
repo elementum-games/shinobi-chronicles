@@ -16,6 +16,17 @@
     --footer-font-color: #423f39;
     --regentimer-color: #7C88C3;
 
+    /* Content colors */
+    --daily-task-active-bg-color: #1f161c;
+    --daily-task-complete-bg-color: #1e222c;
+
+    --exp-bar-bg-color: #292e4c;
+    --exp-bar-fill-color: #5964a6;
+
+    --progress-bar-bg-color: #433c32;
+    --progress-bar-dark-bg-color: rgba(0,0,0,0.2);
+    --progress-bar-fill-color: #bca471;
+
     /* Structure */
     --header-height: 35px;
     --content-width: 930px;
@@ -81,6 +92,10 @@
 
     /* Chat Config */
     --chat-secondary-background-color: #1a1921;
+
+    /* Style helpers */
+    --clip-tall-hexagon: polygon(50% 0%,95% 20%,95% 80%,50% 100%,5% 80%,5% 20%);
+
 }
 
 /* Helper Classes - TO-DO: remove helpers, organize module CSS classes */

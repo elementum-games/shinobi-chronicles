@@ -16,11 +16,18 @@
     window.addEventListener('load', () => {
         ReactDOM.render(
             React.createElement(Profile, {
+                links: {
+                    clan: "<?= $system->router->getUrl('clan') ?>",
+                    team: "<?= $system->router->getUrl('team') ?>",
+                    buyForbiddenSeal: "<?= $system->router->getUrl('premium', ['view' => 'forbidden_seal']) ?>",
+                    bloodlinePage: "<?= $system->router->getUrl('bloodline') ?>",
+                },
                 playerData: <?= json_encode(
                     UserAPIPresenter::playerDataResponse(player: $player, rank_names: RankManager::fetchNames($system))
                 ) ?>,
                 playerStats: <?= json_encode(UserApiPresenter::playerStatsResponse($player)) ?>,
-                playerSettings: <?= json_encode(UserAPIPresenter::playerSettingsResponse($player)) ?>
+                playerSettings: <?= json_encode(UserAPIPresenter::playerSettingsResponse($player)) ?>,
+                playerDailyTasks: <?= json_encode(UserApiPresenter::dailyTasksResponse($player->daily_tasks)) ?>,
             }),
             profileContainer
         );
