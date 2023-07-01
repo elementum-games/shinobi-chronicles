@@ -41,21 +41,21 @@
                 </tr>
                 <tr>
                     <td>1x Red Lantern</td>
-                    <td>25 Yen</td>
+                    <td>25&#165;</td>
                     <td>
                         <a href="<?=$system->router->getUrl("event", ["exchange" => "red_yen_small"])?>">Claim</a>
                     </td>
                 </tr>
                 <tr>
                     <td>10x Red Lantern</td>
-                    <td>250 Yen</td>
+                    <td>250&#165;</td>
                     <td>
                         <a href="<?=$system->router->getUrl("event", ["exchange" => "red_yen_medium"])?>">Claim</a>
                     </td>
                 </tr>
                 <tr>
                     <td>100x Red Lantern</td>
-                    <td>2500 Yen</td>
+                    <td>2500&#165;</td>
                     <td>
                         <a href="<?=$system->router->getUrl("event", ["exchange" => "red_yen_large"])?>">Claim</a>
                     </td>
