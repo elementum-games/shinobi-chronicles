@@ -13,8 +13,8 @@
             <p><b><?= System::SC_EVENT_NAME ?> is now active!</b></p>
             <div>
                 <p>Welcome to the annual Festival of Shadows<br />
-                A solemn tradition where lanterns are set adrift to guide departed spirits to the afterlife.</p>
-                <p>As realms of the living and supernatural converge, mischievous yokai grow active to feed on souls of the dead and living alike. Chakra-infused lanterns are relied upon to ward off the shadows, but an unprecedented surge in yokai attacks endangers the villages.</p>
+                A solemn tradition where lanterns are set adrift to guide spirits to the afterlife.</p>
+                <p>As realms of the living and supernatural converge, mischievous yokai grow active to feed on souls of the dead and living alike.<br /> Chakra-infused lanterns are used to ward off the shadows, but an unprecedented surge in yokai attacks endangers the villages.</p>
                 <p>As shinobi it falls on you to recover lanterns, defend your fellow villagers, and uncover the source of the encroaching darkness.</p>
             </div>
             <table class="table" style="width: 85%">
