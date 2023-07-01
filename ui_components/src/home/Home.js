@@ -178,11 +178,13 @@ function MainBannerSection({
                 {activeModal}
 
                 <div className="login_container">
-                    <LoginForm
-                        loginMessageText={loginMessageText}
-                        loginErrorText={loginErrorText}
-                        setLoginDisplay={setLoginDisplay}
-                    />
+                    {!isLoggedIn &&
+                        <LoginForm
+                            loginMessageText={loginMessageText}
+                            loginErrorText={loginErrorText}
+                            setLoginDisplay={setLoginDisplay}
+                        />
+                    }
                     {loginDisplay === "reset" &&
                         <form id="reset_form" action="" method="post" style={{ zIndex: 1 }}>
                             <div className="reset_input_top">

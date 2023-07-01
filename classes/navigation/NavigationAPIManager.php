@@ -163,6 +163,12 @@ class NavigationAPIManager {
         $routes = Router::$routes;
         $return_arr = [];
         $return_arr[] = new NavigationLinkDto(
+            title: "HOME",
+            url: $system->router->base_url . "?home",
+            active: true,
+            id: 0,
+        );
+        $return_arr[] = new NavigationLinkDto(
             title: "NEWS",
             url: $system->router->links['news'],
             active: true,

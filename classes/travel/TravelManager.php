@@ -333,6 +333,28 @@ class TravelManager {
 
         // TEMP Add Events - We have to hard code the mission IDs is System for now
         if (System::$SC_EVENT_ACTIVE) {
+            foreach ($this->system->event_data['gold'] as $event_mission) {
+                $objectives[] = new MapObjectiveLocation(
+                    name: "Treasure",
+                    map_id: 1,
+                    x: $event_mission['x'],
+                    y: $event_mission['y'],
+                    image: "/images/events/lanternyellow.png",
+                    action_url: $this->system->router->getUrl("mission", ['start_mission' => $this->system->event_data['gold_mission_id'], 'mission_type' => 'event']),
+                    action_message: "Chase the Kotengu",
+                );
+            }
+            foreach ($this->system->event_data['special'] as $event_mission) {
+                $objectives[] = new MapObjectiveLocation(
+                    name: "Special",
+                    map_id: 1,
+                    x: $event_mission['x'],
+                    y: $event_mission['y'],
+                    image: "/images/events/cultsign.png",
+                    action_url: $this->system->router->getUrl("mission", ['start_mission' => $this->system->event_data['special_mission_id'], 'mission_type' => 'event']),
+                    action_message: "Enter the Fray",
+                );
+            }
             foreach ($this->system->event_data['easy'] as $event_mission) {
                 $objectives[] = new MapObjectiveLocation(
                     name: "Easy",

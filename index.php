@@ -358,6 +358,12 @@ address and requested a password reset. If this is not your account, please disr
             }
 
             // Village
+            // Load villages
+            $result = $system->db->query("SELECT `name`, `location` FROM `villages`");
+            $villages = [];
+            while ($row = mysqli_fetch_array($result)) {
+                $villages[$row['name']] = $row;
+            }
             if(!isset($villages[$village])) {
                 throw new RuntimeException("Invalid village!");
             }
