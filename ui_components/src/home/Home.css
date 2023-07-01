@@ -501,8 +501,10 @@ body {
 }
 .login_message_label {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    font-size: 14px;
     color: white;
+    font-size: 13px;
+    font-weight: 600;
+    margin-left: 15px;
 }
 .login_username_wrapper {
     flex-basis: 40%;
