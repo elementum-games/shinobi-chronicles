@@ -67,6 +67,9 @@ abstract class Fighter {
     public float $bloodline_speed_boost = 0;
 
     public string $gender;
+    public int $rep_rank;
+
+    public string $current_ip;
 
     public int $max_movement_distance = 2; // not in use yet
 
