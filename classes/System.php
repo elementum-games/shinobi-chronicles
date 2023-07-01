@@ -268,7 +268,7 @@ class System {
         $minute = $currentDate[2];
         $seed = $day + $hour + $minute;
         srand($seed);
-        if (rand(0, 14) == 0) {
+        if (rand(0, 9) == 0) {
             $event_missions_gold[] = ['x' => rand(1, 28), 'y' => rand(1, 18)];
         }
         $this->event_data['gold'] = $event_missions_gold;
