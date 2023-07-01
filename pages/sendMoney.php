@@ -116,7 +116,7 @@ function sendMoney() {
     $recipient = $_GET['recipient'] ?? '';
     
     if (isset($_GET['recipient'])) {
-        echo "<table class='table' style='width: 75px''><tr><td style='text-align: center'><a style='tab-index: 0' href='" . $system->router->getUrl("members",["user" => $recipient]) . "'>Return</a></td></tr></table>";
+        echo "<table class='table' style='width: 125px''><tr><td style='text-align: center'><a style='tab-index: 0' href='" . $system->router->getUrl("members",["user" => $recipient]) . "'>Back to Profile</a></td></tr></table>";
     }
 
     echo "<table class='table'><tr><th>Send Money</th><th>Send AK</th></tr>
