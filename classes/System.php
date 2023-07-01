@@ -272,7 +272,7 @@ class System {
             $event_missions_gold[] = ['x' => mt_rand(1, 28), 'y' => mt_rand(1, 18)];
         }
         // clear seed
-        mt_rand();
+        mt_srand();
         $this->event_data['gold'] = $event_missions_gold;
         $this->event_data['special'] = $event_missions_special;
         $this->event_data['easy'] = $event_missions_easy;
