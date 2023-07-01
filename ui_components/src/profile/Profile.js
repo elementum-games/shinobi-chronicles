@@ -235,7 +235,7 @@ function DailyTasks({ dailyTasks }: DailyTasksProps) {
                     </section>
                     <section className="ft-small ft-c1">
                         <div className="progress_bar_container dark">
-                            <div className="progress_bar_fill" style={{width: `${dailyTask.progressPercent + 10}%`}}></div>
+                            <div className="progress_bar_fill" style={{width: `${dailyTask.progressPercent}%`}}></div>
                         </div>
                         <span style={{marginLeft: "6px"}}>{dailyTask.progressCaption}</span>
                     </section>
