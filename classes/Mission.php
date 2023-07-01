@@ -311,6 +311,17 @@ class Mission {
         // TEMP Event Logic
         global $system;
         if ($mission->mission_type == Mission::TYPE_EVENT) {
+            if ($mission->mission_id == $system->event_data['gold_mission_id']) {
+                $valid = false;
+                foreach ($system->event_data['gold'] as $location) {
+                    if ($player->location->x == $location['x'] && $player->location->y == $location['y']) {
+                        $valid = true;
+                    }
+                }
+                if ($valid == false) {
+                    throw new RuntimeException("Invalid event location!");
+                }
+            }
             if ($mission->mission_id == $system->event_data['special_mission_id']) {
                 $valid = false;
                 foreach ($system->event_data['special'] as $location) {

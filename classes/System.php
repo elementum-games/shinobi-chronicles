@@ -202,6 +202,7 @@ class System {
         }
         // Manually set event locations, pulled from TravelManager and Missions to identify event missions
         $currentMinutes = intval(date('i'));
+        $event_missions_gold = [];
         $event_missions_special = [];
         $event_missions_easy = [];
         $event_missions_medium = [];
@@ -261,7 +262,16 @@ class System {
                 $event_missions_easy[] = ['x' => 22, 'y' => 14];
                 break;
         }
-
+        $currentDate = explode('-', date('d-H-i-s'));
+        $day = $currentDate[0];
+        $hour = $currentDate[1];
+        $minute = $currentDate[2];
+        $seed = $day + $hour + $minute;
+        srand($seed);
+        if (rand(0, 14) == 0) {
+            $event_missions_gold[] = ['x' => rand(1, 28), 'y' => rand(1, 18)];
+        }
+        $this->event_data['gold'] = $event_missions_gold;
         $this->event_data['special'] = $event_missions_special;
         $this->event_data['easy'] = $event_missions_easy;
         $this->event_data['medium'] = $event_missions_medium;
@@ -270,11 +280,14 @@ class System {
         $this->event_data['red_lantern_id'] = 19;
         $this->event_data['blue_lantern_id'] = 20;
         $this->event_data['violet_lantern_id'] = 21;
+        $this->event_data['gold_lantern_id'] = 29;
         $this->event_data['shadow_essence_id'] = 23;
         $this->event_data['sacred_lantern_red_id'] = 24;
         $this->event_data['sacred_lantern_blue_id'] = 25;
         $this->event_data['sacred_lantern_violet_id'] = 26;
+        $this->event_data['sacred_lantern_gold_id'] = 30;
         $this->event_data['forbidden_jutsu_scroll_id'] = 27;
+        $this->event_data['gold_mission_id'] = 20;
         $this->event_data['special_mission_id'] = 19;
         $this->event_data['easy_mission_id'] = 12;
         $this->event_data['medium_mission_id'] = 13;

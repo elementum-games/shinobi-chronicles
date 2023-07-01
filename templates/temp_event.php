@@ -17,17 +17,19 @@
                 <p>As realms of the living and supernatural converge, mischievous yokai grow active to feed on souls of the dead and living alike. Chakra-infused lanterns are relied upon to ward off the shadows, but an unprecedented surge in yokai attacks endangers the villages.</p>
                 <p>As shinobi it falls on you to recover lanterns, defend your fellow villagers, and uncover the source of the encroaching darkness.</p>
             </div>
-            <table class="table" style="width: 65%">
+            <table class="table" style="width: 85%">
                 <tr>
                     <th>Red Lantern</th>
                     <th>Blue Lantern</th>
                     <th>Violet Lantern</th>
+                    <th>Gold Lantern</th>
                     <th><?php echo $player->hasItem($system->event_data['shadow_essence_id']) ? "Shadow Essence" : "???" ?></th>
                 </tr>
                 <tr>
                     <td><?php echo $player->hasItem($system->event_data['red_lantern_id']) ? $player->items[$system->event_data['red_lantern_id']]->quantity : "0" ?>x</td>
                     <td><?php echo $player->hasItem($system->event_data['blue_lantern_id']) ? $player->items[$system->event_data['blue_lantern_id']]->quantity : "0" ?>x</td>
                     <td><?php echo $player->hasItem($system->event_data['violet_lantern_id']) ? $player->items[$system->event_data['violet_lantern_id']]->quantity : "0" ?>x</td>
+                    <td><?php echo $player->hasItem($system->event_data['gold_lantern_id']) ? $player->items[$system->event_data['gold_lantern_id']]->quantity : "0" ?>x</td>
                     <td><?php echo $player->hasItem($system->event_data['shadow_essence_id']) ? $player->items[$system->event_data['shadow_essence_id']]->quantity : "0" ?>x</td>
                 </tr>
             </table>
@@ -77,6 +79,13 @@
                     <td>20x Red Lantern</td>
                     <td>
                         <a href="<?=$system->router->getUrl("event", ["exchange" => "violet_red"])?>">Claim</a>
+                    </td>
+                </tr>
+                <tr>
+                    <td>1x Gold Lantern</td>
+                    <td>50x Red Lantern</td>
+                    <td>
+                        <a href="<?=$system->router->getUrl("event", ["exchange" => "gold_red"])?>">Claim</a>
                     </td>
                 </tr>
                 <tr>

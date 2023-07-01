@@ -286,6 +286,29 @@ function event() {
                     $player->updateInventory();
                     $player->updateData();
                     break;
+                case "gold_red":
+                    $player->getInventory();
+                    if (!$player->hasItem($system->event_data['gold_lantern_id'])) {
+                        throw new RuntimeException("You do not have this item!");
+                    }
+                    if ($player->items[$system->event_data['gold_lantern_id']]->quantity < 1) {
+                        throw new RuntimeException("You do not have enough of this item!");
+                    }
+                    $player->items[$system->event_data['gold_lantern_id']]->quantity -= 1;
+                    if ($player->items[$system->event_data['gold_lantern_id']]->quantity < 1) {
+                        unset($player->items[$system->event_data['gold_lantern_id']]);
+                    }
+
+                    if ($player->hasItem($system->event_data['red_lantern_id'])) {
+                        $player->items[$system->event_data['red_lantern_id']]->quantity += 50;
+                    } else {
+                        $result = $system->db->query("SELECT * FROM `items` WHERE `item_id` = {$system->event_data['red_lantern_id']}");
+                        $player->items[$system->event_data['red_lantern_id']] = Item::fromDb($system->db->fetch($result), 20);
+                    }
+                    $system->message("You have traded 1 Gold Lantern for 50 Red Lanterns!");
+                    $player->updateInventory();
+                    $player->updateData();
+                    break;
                 case "red_shadow":
                     $player->getInventory();
                     if (!$player->hasItem($system->event_data['red_lantern_id'])) {
@@ -393,6 +416,28 @@ function event() {
                     $player->items[$system->event_data['sacred_lantern_violet_id']] = Item::fromDb($system->db->fetch($result), 1);
 
                     $system->message("You have traded 5 Shadow Essence for a Sacred Violet Lantern!");
+                    $player->updateInventory();
+                    $player->updateData();
+                    break;
+                case "shadow_sacred_gold":
+                    $player->getInventory();
+                    if (!$player->hasItem($system->event_data['shadow_essence_id'])) {
+                        throw new RuntimeException("You do not have this item!");
+                    }
+                    if ($player->items[$system->event_data['shadow_essence_id']]->quantity < 5) {
+                        throw new RuntimeException("You do not have enough of this item!");
+                    }
+                    if ($player->hasItem($system->event_data['sacred_lantern_gold_id'])) {
+                        throw new RuntimeException("You already have this item!");
+                    }
+                    $player->items[$system->event_data['shadow_essence_id']]->quantity -= 5;
+                    if ($player->items[$system->event_data['shadow_essence_id']]->quantity < 5) {
+                        unset($player->items[$system->event_data['shadow_essence_id']]);
+                    }
+                    $result = $system->db->query("SELECT * FROM `items` WHERE `item_id` = {$system->event_data['sacred_lantern_gold_id']}");
+                    $player->items[$system->event_data['sacred_lantern_gold_id']] = Item::fromDb($system->db->fetch($result), 1);
+
+                    $system->message("You have traded 5 Shadow Essence for a Sacred Gold Lantern!");
                     $player->updateInventory();
                     $player->updateData();
                     break;
