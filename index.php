@@ -616,38 +616,46 @@ if($LOGGED_IN) {
         }
     }
     else if (isset($_GET['home'])) {
-        if ($system->isDevEnvironment()) {
-            $home_view = "default";
-            if (isset($_GET['view'])) {
-                switch ($_GET['view']) {
-                    case "news":
-                        $home_view = "news";
-                        break;
-                    case "contact":
-                        $home_view = "contact";
-                        break;
-                    case "rules":
-                        $home_view = "rules";
-                        break;
-                    case "terms":
-                        $home_view = "terms";
-                        break;
-                }
+        $home_view = "default";
+        if (isset($_GET['view'])) {
+            switch ($_GET['view']) {
+                case "news":
+                    $home_view = "news";
+                    break;
+                case "contact":
+                    $home_view = "contact";
+                    break;
+                case "rules":
+                    $home_view = "rules";
+                    break;
+                case "terms":
+                    $home_view = "terms";
+                    break;
             }
-            $layout->renderBeforeContentHTML($system, $player ?? null, "Home", render_content: false, render_header: true, render_sidebar: false, render_topbar: false);
-            try {
-                require('./templates/home.php');
-            } catch (RuntimeException $e) {
-                $system->db->rollbackTransaction();
-                $system->message($e->getMessage());
-                if ($system->isDevEnvironment()) {
-                    $system->printMessage(true);
-                }
-            }
-            $layout->renderAfterContentHTML($system, $player ?? null, render_content: false, render_footer: false, render_hotbar: false);
-            $page_load_time = round(microtime(true) - $PAGE_LOAD_START, 3);
-            $system->db->commitTransaction();
         }
+        $layout->renderBeforeContentHTML(
+            $system,
+            $player ?? null,
+            "Home",
+            render_content: false,
+            render_header: true,
+            render_sidebar: false,
+            render_topbar: false
+        );
+
+        try {
+            require('./templates/home.php');
+        } catch (RuntimeException $e) {
+            $system->db->rollbackTransaction();
+            $system->message($e->getMessage());
+            if ($system->isDevEnvironment()) {
+                $system->printMessage(true);
+            }
+        }
+
+        $layout->renderAfterContentHTML($system, $player ?? null, render_content: false, render_footer: false, render_hotbar: false);
+        $page_load_time = round(microtime(true) - $PAGE_LOAD_START, 3);
+        $system->db->commitTransaction();
     }
     else {
         $layout->renderBeforeContentHTML(
