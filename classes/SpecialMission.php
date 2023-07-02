@@ -190,9 +190,7 @@ class SpecialMission {
     public int $player_health;
     public int $player_max_health;
     public int $reward;
-    public int $rep_reward;
 
-    //
     public function __construct(System $system, User $player, $mission_id) {
         $this->system = $system;
         $this->player = $player;
@@ -217,7 +215,6 @@ class SpecialMission {
         $this->target = json_decode($mission_data['target'], true);
         $this->log = json_decode($mission_data['log'], true);
         $this->reward = $mission_data['reward'];
-        $this->rep_reward = $mission_data['rep_gain'];
 
         $this->player_health = $this->player->health;
         $this->player_max_health = $this->player->max_health;
@@ -407,11 +404,12 @@ class SpecialMission {
         $reward_text = self::$event_names[self::EVENT_COMPLETE_REWARD]['text'] . $yen_gain . '!';
 
         //Reputation Reward
-        if($player->mission_rep_cd - time() <= 0) {
-            $rep_gain = $player->calMaxRepGain($this->rep_reward);
+        $rep_gain = self::$difficulties[$this->difficulty]['rep_gain'];
+        if($this->player->mission_rep_cd - time() <= 0) {
+            $rep_gain = $this->player->calMaxRepGain($rep_gain);
             if($rep_gain > 0) {
                 $this->player->addRep($rep_gain);
-                $player->mission_rep_cd = time() + Village::ARENA_MISSION_CD;
+                $this->player->mission_rep_cd = time() + Village::ARENA_MISSION_CD;
                 $reward_text .= ' You have gained ' . $rep_gain . " village reputation!";
             }
         }
