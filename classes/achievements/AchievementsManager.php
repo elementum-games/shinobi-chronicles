@@ -68,6 +68,9 @@ class AchievementsManager {
             if(isset($player->achievements[$achievement->id])) {
                 continue;
             }
+            if($achievement->is_world_first && $player->staff_level > User::STAFF_HEAD_MODERATOR) {
+                continue;
+            }
 
             if($achievement->isCriteriaAchieved($system, $player)) {
                 $player->achievements[$achievement->id] = new PlayerAchievement($achievement, time());
