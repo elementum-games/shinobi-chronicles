@@ -1,5 +1,7 @@
 <?php
 
+require_once __DIR__ . '/SpecialMission.php';
+
 class Village {
     public System $system;
     public TravelCoords $coords;
@@ -78,7 +80,7 @@ class Village {
         Mission::RANK_A => 3,
         Mission::RANK_S => 4
     ];
-    const SPECIAL_MISSION_GAINS = [
+    const SPECIAL_MISSION_REP_GAINS = [
         SpecialMission::DIFFICULTY_EASY => 0,
         SpecialMission::DIFFICULTY_NORMAL => 1,
         SpecialMission::DIFFICULTY_HARD => 2,
