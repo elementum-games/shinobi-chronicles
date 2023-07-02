@@ -165,11 +165,11 @@ class AchievementsManager {
                         if(!in_array(
                             $item->id,
                             $player
-                                ->achievements_in_progress[LANTERN_EVENT_COMPLETE_ALL_MISSIONS]
+                                ->achievements_in_progress[$achievement->id]
                                 ->progress_data['item_ids']
                         )) {
                             $player
-                                ->achievements_in_progress[LANTERN_EVENT_COMPLETE_ALL_MISSIONS]
+                                ->achievements_in_progress[$achievement->id]
                                 ->progress_data['item_ids'][] = $item->id;
                         }
                     }

@@ -1394,11 +1394,11 @@ class User extends Fighter {
     }
 
     public function giveItem(Item $item, int $quantity = 1): void {
-        if ($this->hasItem($item['item_id'])) {
-            $this->items[$item['item_id']]->quantity += $quantity;
+        if ($this->hasItem($item->id)) {
+            $this->items[$item->id]->quantity += $quantity;
         } else {
-            $this->items[$item['item_id']] = $item;
-            $this->items[$item['item_id']]->quantity = $quantity;
+            $this->items[$item->id] = $item;
+            $this->items[$item->id]->quantity = $quantity;
         }
 
         if($item->use_type == Item::USE_TYPE_WEAPON || $item->use_type == Item::USE_TYPE_ARMOR) {
