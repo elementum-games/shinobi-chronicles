@@ -68,7 +68,7 @@ class AchievementsManager {
             if(isset($player->achievements[$achievement->id])) {
                 continue;
             }
-            if($achievement->is_world_first && $player->staff_level > User::STAFF_HEAD_MODERATOR) {
+            if(!$system->isDevEnvironment() && $achievement->is_world_first && $player->staff_level > User::STAFF_HEAD_MODERATOR) {
                 continue;
             }
 
