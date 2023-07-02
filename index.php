@@ -391,8 +391,8 @@ address and requested a password reset. If this is not your account, please disr
             $headers .= "Reply-To: " . System::SC_NO_REPLY_EMAIL . "\r\n";
             if(mail($email, $subject, $message, $headers)) {
                 ;
-                $system->message("Account created!<br />Please check the email that you registered with for the verification  link (Be sure to check your spam folder as well)!");
-                $login_message_text = "Account created!<br />Please check the email that you registered with for the verification  link (Be sure to check your spam folder as well)!";
+                $system->message("Account created! Please check the email that you registered with for the verification  link (Be sure to check your spam folder as well)!");
+                $login_message_text = "Account created! Please check the email that you registered with for the verification  link (Be sure to check your spam folder as well)!";
             }
             else {
                 $system->message("There was a problem sending the email to the address provided: $email Please contact a staff member on the forums for manual activation.");
@@ -640,7 +640,9 @@ if($LOGGED_IN) {
             } catch (RuntimeException $e) {
                 $system->db->rollbackTransaction();
                 $system->message($e->getMessage());
-                $system->printMessage(true);
+                if ($system->isDevEnvironment()) {
+                    $system->printMessage(true);
+                }
             }
             $layout->renderAfterContentHTML($system, $player ?? null, render_content: false, render_footer: false, render_hotbar: false);
             $page_load_time = round(microtime(true) - $PAGE_LOAD_START, 3);
@@ -674,15 +676,14 @@ if($LOGGED_IN) {
 }
 // Login
 else {
-    if ($system->isDevEnvironment()) {
-        $layout = $system->fetchLayoutByName("new_geisha");
-    } else {
-        $layout = $system->fetchLayoutByName(System::DEFAULT_LAYOUT);
-    }
+
+    $layout = $system->fetchLayoutByName(System::DEFAULT_LAYOUT);
     $layout->renderBeforeContentHTML($system, $player ?? null, "Home", render_content: false, render_header: false, render_sidebar: false, render_topbar: false);
 
     // Display error messages
-    $system->printMessage();
+    if ($system->isDevEnvironment()) {
+        $system->printMessage(true);
+    }
     if(!$system->SC_OPEN) {
         echo "<table class='table'><tr><th>Game Maintenance</th></tr>
         <tr><td style='text-align:center;'>
@@ -692,7 +693,6 @@ else {
 
     $captcha = '';
 
-    if ($system->isDevEnvironment()) {
         $initial_login_display = "login";
         if ($reset_error_text != "") {
             $initial_login_display = "reset";
@@ -706,11 +706,7 @@ else {
         $page_load_time = round(microtime(true) - $PAGE_LOAD_START, 3);
         $system->db->commitTransaction();
         exit;
-    }
-    else {
-        require("pages/news.php");
-        newsPosts();
-    }
+
 
 }
 

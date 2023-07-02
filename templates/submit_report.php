@@ -12,14 +12,14 @@
 ?>
 
 <style type='text/css'>
-    label {
+    #report_table label {
         display:inline-block;
         width:110px;
         font-weight:bold;
     }
 </style>
 
-<table class="table">
+<table id="report_table" class="table">
     <tr><th>Submit Report</th></tr>
     <tr>
         <td>

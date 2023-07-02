@@ -136,7 +136,7 @@ class UserApiPresenter {
                 'prompt' => $daily_task->getPrompt(),
                 'difficulty' => $daily_task->difficulty,
                 'rewardYen' => $daily_task->reward,
-                'rewardRep' => Village::DAILY_TASK[$daily_task->difficulty],
+                'rewardRep' => $daily_task->rep_reward,
                 'progressPercent' => $daily_task->getProgressPercent(),
                 'progressCaption' => $daily_task->progress . "/" . $daily_task->amount,
                 'complete' => $daily_task->complete,

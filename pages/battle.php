@@ -145,14 +145,11 @@ function processBattleFightEnd(BattleManager $battle, User $player): string {
         );
         $result .= "You have earned $village_point_gain point for your village.[br]";
 
-        //TODO: Add a feature that will make alt killing / targeting same user not worth while (diminish gains (negative for excessive chain kills?))
-        //TODO: Scale reputation gains based on opponents reputation
-        if($player->weekly_rep < Village::WEEKLY_REP_CAP) {
-            $rep_gain = $player->calMaxRepGain(Village::PVP_REP);
-            if($rep_gain > 0) {
-                $result .= "You have earned $rep_gain village reputation.[br]";
-                $player->addRep($rep_gain);
-            }
+        // Calculate rep gains
+        $rep_gain = $player->village->calcPvpRep($player->level, $player->rep_rank, $battle->opponent->level, $battle->opponent->rep_rank);
+        if($rep_gain > 0) {
+            $result .= "You have earned $rep_gain village reputation.[br]";
+            $player->addRep($rep_gain);
         }
 
         // Team points
@@ -175,6 +172,15 @@ function processBattleFightEnd(BattleManager $battle, User $player): string {
         $player->last_pvp_ms = System::currentTimeMs();
         $player->last_death_ms = System::currentTimeMs();
         $player->moveToVillage();
+
+        // Calc rep loss (if any)
+        // Calculate rep gains
+        $rep_loss = $player->village->calcPvpRep($player->level, $player->rep_rank, $battle->opponent->level,
+            $battle->opponent->rep_rank, false);
+        if($rep_loss < 0) {
+            $result .= "You have lost " . abs($rep_loss) . " village reputation.[br]";
+            $player->subtractRep(abs($rep_loss));
+        }
 
         // If player is killed during a survival mission as a result of PVP, clear the survival mission
         if($player->mission_id != null) {

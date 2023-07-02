@@ -20,9 +20,6 @@ function bloodline() {
 	$base_bloodline = Bloodline::loadFromId($system, $player->bloodline_id);
 	$player->getInventory();
 
-    require_once "profile.php";
-    renderProfileSubmenu();
-
 	// Learn jutsu
 	if(isset($_GET['learn_jutsu'])) {
 		$jutsu_id = (int)$_GET['learn_jutsu'];
@@ -63,6 +60,9 @@ function bloodline() {
 		display: inline-block;
 	}
 	</style>";
+
+    echo "<table class='table' style='width: 125px''><tr><td style='text-align: center'><a style='tab-index: 0' href='" . $system->router->getUrl("profile") . "'>Back to Profile</a></td></tr></table>";
+
 	echo "<table class='table'><tr><th>Your Bloodline</th></tr>
 		<tr><td>";
 	$bloodline_ranks = array(4 => 'Lesser', 3 => 'Common', 2 => 'Elite', 1 => 'Legendary', 5 => 'Admin');
@@ -105,13 +105,13 @@ function bloodline() {
 		),
 		'ninjutsu_resist' => array(
 			'text' => "[BL_SKILL] * [RATIO] -> [random/defense] -> <span class='amount'>[AMOUNT] less ninjutsu damage taken</span>"
-		),			
+		),
 		'genjutsu_resist' => array(
 			'text' => "[BL_SKILL] * [RATIO] -> [random/defense] -> <span class='amount'>[AMOUNT] less genjutsu damage taken</span>"
 		),
 		'taijutsu_resist' => array(
 			'text' => "[BL_SKILL] * [RATIO] -> [random/defense] -> <span class='amount'>[AMOUNT] less taijutsu damage taken</span>"
-		),			
+		),
 		'speed_boost' => array(
 			'text' => "[BL_SKILL] * [RATIO] -> <span class='amount'> [AMOUNT] extra speed</span>"
 		),
@@ -134,7 +134,7 @@ function bloodline() {
 	<style>
 	span.amount {
 		color:#00C000;
-	}	
+	}
 	</style>";
 	$search_array = array('[BL_SKILL]', '[RATIO]', '[AMOUNT]', '[PERCENTAGE]');
 	if($player->bloodline->passive_boosts) {
@@ -225,7 +225,7 @@ function bloodline() {
 				echo "<label style='width:6.5em;'>Cooldown:</label>" . $jutsu->cooldown . " turn(s)<br />";
 			}
 			if($jutsu->effect) {
-				echo "<label style='width:6.5em;'>Effect:</label>" . 
+				echo "<label style='width:6.5em;'>Effect:</label>" .
 					ucwords(str_replace('_', ' ', $jutsu->effect)) . ' - ' . $jutsu->effect_length . " turns<br />";
 			}
 			echo "<label style='width:6.5em;'>Jutsu type:</label>" . ucwords($jutsu->jutsu_type) . "<br />
@@ -237,7 +237,7 @@ function bloodline() {
 			echo "<label style='width:6.5em;float:left;'>Description:</label>
 			<p style='display:inline-block;width:37.1em;margin:0;'>" . $jutsu->description . "</p>
 			<br style='margin:0;clear:both;' />";
-			
+
 		}
 		echo "</div>";
 	}
@@ -254,14 +254,14 @@ function bloodline() {
 				<div style='margin-left:2em;'>
 					<label style='width:6.5em;'>Rank:</label>" . $RANK_NAMES[$jutsu->rank] . "<br />";
 					if($jutsu->parent_jutsu) {
-						echo "<label style='width:6.5em;'>Parent Jutsu:</label>" . 
+						echo "<label style='width:6.5em;'>Parent Jutsu:</label>" .
 							$base_bloodline->jutsu[($jutsu->parent_jutsu - 1)]->name . "<br />";
 					}
 					if($jutsu->element != 'none') {
 						echo "<label style='width:6.5em;'>Element:</label>" . $jutsu->element . "<br />";
 					}
 					echo "<label style='width:6.5em;'>Use cost:</label>" . $jutsu->use_cost . "<br />
-					<label style='width:6.5em;float:left;'>Description:</label> 
+					<label style='width:6.5em;float:left;'>Description:</label>
 						<p style='display:inline-block;margin:0;width:37.1em;'>" . $jutsu->description . "</p>
 					<br style='clear:both;' />
 				<label style='width:6.5em;'>Jutsu type:</label>" . ucwords($jutsu->jutsu_type) . "<br />
