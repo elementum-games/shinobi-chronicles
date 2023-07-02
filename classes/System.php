@@ -100,9 +100,9 @@ class System {
     );
 
     // Default layout
-    const DEFAULT_LAYOUT = 'shadow_ribbon';
-    const VERSION_NUMBER = '0.8.0';
-    const VERSION_NAME = '0.8';
+    const DEFAULT_LAYOUT = 'new_geisha';
+    const VERSION_NUMBER = '0.9.0';
+    const VERSION_NAME = '0.9 Flickering Ambitions';
 
     // Misc stuff
     const SC_MAX_RANK = 4;
@@ -202,6 +202,8 @@ class System {
         }
         // Manually set event locations, pulled from TravelManager and Missions to identify event missions
         $currentMinutes = intval(date('i'));
+        $event_missions_gold = [];
+        $event_missions_special = [];
         $event_missions_easy = [];
         $event_missions_medium = [];
         $event_missions_hard = [];
@@ -209,10 +211,10 @@ class System {
         switch (true) {
             case ($currentMinutes < 3): // 3 minutes per hour
                 $event_missions_nightmare[] = ['x' => 10, 'y' => 1];
-                $event_missions_hard[] = ['x' => 13, 'y' => 1];
-                $event_missions_hard[] = ['x' => 12, 'y' => 3];
-                $event_missions_hard[] = ['x' => 8, 'y' => 3];
-                $event_missions_hard[] = ['x' => 7, 'y' => 1];
+                $event_missions_special[] = ['x' => 13, 'y' => 1];
+                $event_missions_special[] = ['x' => 12, 'y' => 3];
+                $event_missions_special[] = ['x' => 8, 'y' => 3];
+                $event_missions_special[] = ['x' => 7, 'y' => 1];
                 break;
             case ($currentMinutes % 3 == 0):
                 $event_missions_easy[] = ['x' => 5, 'y' => 4];
@@ -260,7 +262,19 @@ class System {
                 $event_missions_easy[] = ['x' => 22, 'y' => 14];
                 break;
         }
-
+        $currentDate = explode('-', date('d-H-i-s'));
+        $day = $currentDate[0];
+        $hour = $currentDate[1];
+        $minute = $currentDate[2];
+        $seed = $day + $hour + $minute;
+        mt_srand($seed);
+        if (mt_rand(0, 9) == 0) {
+            $event_missions_gold[] = ['x' => mt_rand(1, 28), 'y' => mt_rand(1, 18)];
+        }
+        // clear seed
+        mt_srand();
+        $this->event_data['gold'] = $event_missions_gold;
+        $this->event_data['special'] = $event_missions_special;
         $this->event_data['easy'] = $event_missions_easy;
         $this->event_data['medium'] = $event_missions_medium;
         $this->event_data['hard'] = $event_missions_hard;
@@ -268,15 +282,20 @@ class System {
         $this->event_data['red_lantern_id'] = 19;
         $this->event_data['blue_lantern_id'] = 20;
         $this->event_data['violet_lantern_id'] = 21;
+        $this->event_data['gold_lantern_id'] = 29;
         $this->event_data['shadow_essence_id'] = 23;
         $this->event_data['sacred_lantern_red_id'] = 24;
         $this->event_data['sacred_lantern_blue_id'] = 25;
-        $this->event_data['sacred_lantern_purple_id'] = 26;
-        $this->event_data['forbidden_jutsu_scroll'] = 27;
+        $this->event_data['sacred_lantern_violet_id'] = 26;
+        $this->event_data['sacred_lantern_gold_id'] = 30;
+        $this->event_data['forbidden_jutsu_scroll_id'] = 27;
+        $this->event_data['gold_mission_id'] = 20;
+        $this->event_data['special_mission_id'] = 19;
         $this->event_data['easy_mission_id'] = 12;
         $this->event_data['medium_mission_id'] = 13;
         $this->event_data['hard_mission_id'] = 11;
         $this->event_data['nightmare_mission_id'] = 14;
+        $this->event_data['yen_per_lantern'] = 25;
     }
 
     /**

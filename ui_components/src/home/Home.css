@@ -596,7 +596,8 @@ body {
 
 .main_banner_modal.register {
     width: 500px;
-    top: 138px;
+    top: 130px;
+    z-index: 3;
 }
 
 .main_banner_modal.terms {
@@ -691,7 +692,10 @@ body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     margin-left: 5px;
 }
-
+.register_input_bottom .login_error_label {
+    margin: 0 !important;
+    padding-top: 10px;
+}
 
 /* Reset Form */
 #reset_form {

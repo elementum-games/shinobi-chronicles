@@ -157,7 +157,7 @@ class ChatManager {
             $post->message = nl2br($this->system->html_parse($post->message, false, true));
 
             // Handle Mention
-            $pattern = "/@([^ \n\s!?.<>:@\[\]]+)(?=[^A-Za-z0-9_]|$)/";
+            $pattern = "/@([^ \n\s!?.<>:@\[\]()]+)(?=[^A-Za-z0-9_]|$)/";
             $has_mention = preg_match_all($pattern, $post->message, $matches);
             $mention_count = 0;
             if ($has_mention) {
@@ -171,6 +171,7 @@ class ChatManager {
                         // format each mention
                         $formatted_mention = "<div class='mention_container'><a class='chat_user_name userLink' href='" . $this->system->router->getURL("members", ["user" => $match]) . "'>@" . $match . "</a></div>";
                         // replace first
+                        echo $match;
                         $post->message = preg_replace('/@('.$match.')(?![a-zA-Z0-9-_])/', $formatted_mention, $post->message, 1);
                     }
                 }
@@ -309,7 +310,7 @@ class ChatManager {
             }
 
             // Handle Mention
-            $pattern = "/@([^ \n\s!?.<>:@\[\]]+)(?=[^A-Za-z0-9_]|$)/";
+            $pattern = "/@([^ \n\s!?.<>:@\[\]()]+)(?=[^A-Za-z0-9_]|$)/";
             $has_mention = preg_match_all($pattern, $message, $matches);
 
             $mentioned_users = [];

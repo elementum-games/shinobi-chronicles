@@ -18,12 +18,6 @@ return $routes = [
         function_name: 'inbox',
         menu: Route::MENU_USER,
     ),
-    7 => new Route(
-        file_name: 'chat.php',
-        title: 'Chat',
-        function_name: 'chat',
-        menu: Route::MENU_ACTIVITY,
-    ),
     4 => new Route(
         file_name: 'jutsu.php',
         title: 'Jutsu',
@@ -52,6 +46,12 @@ return $routes = [
         function_name: 'members',
         menu: Route::MENU_USER,
     ),
+    35 => new Route(
+        file_name: 'sendMoney.php',
+        title: 'Send Money',
+        function_name: 'sendMoney',
+        menu: Route::MENU_NONE,
+    ),
     24 => new Route(
         file_name: 'team.php',
         title: 'Team',
@@ -67,6 +67,12 @@ return $routes = [
     ),
 
     // Activity Menu
+    7 => new Route(
+        file_name: 'chat.php',
+        title: 'Chat',
+        function_name: 'chat',
+        menu: Route::MENU_ACTIVITY,
+    ),
     11 => new Route(
         file_name: 'travel.php',
         title: 'Travel',
@@ -163,6 +169,12 @@ return $routes = [
         function_name: 'premium',
         menu: Route::MENU_VILLAGE,
     ),
+    33 => new Route(
+        file_name: 'academy.php',
+        title: 'Academy',
+        function_name: 'academy',
+        menu: Route::MENU_VILLAGE,
+    ),
 
     // Staff menu
     30 => new Route(
@@ -240,12 +252,6 @@ return $routes = [
         title: 'News',
         function_name: 'news',
         menu: Route::MENU_NONE,
-    ),
-    33 => new Route(
-        file_name: 'academy.php',
-        title: 'Academy',
-        function_name: 'academy',
-        menu: Route::MENU_VILLAGE,
     ),
     34 => new Route(
         file_name: 'accountRecord.php',

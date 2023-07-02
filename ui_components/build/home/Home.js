@@ -2,7 +2,6 @@ import { RegisterForm } from "./RegisterForm.js";
 import { Rules, Terms } from "./staticPageContents.js";
 import { clickOnEnter } from "../utils/uiHelpers.js";
 import { News } from "./News.js";
-
 function Home({
   homeLinks,
   isLoggedIn,
@@ -62,7 +61,6 @@ function Home({
     homeLinks: homeLinks
   })), /*#__PURE__*/React.createElement(FeatureSection, null), /*#__PURE__*/React.createElement(WorldSection, null), /*#__PURE__*/React.createElement(FooterSection, null));
 }
-
 function MainBannerSection({
   homeLinks,
   isLoggedIn,
@@ -78,11 +76,9 @@ function MainBannerSection({
   contactRef
 }) {
   const activeElement = React.useRef(null);
-
   function handleLogin() {
     document.getElementById('login_form').submit();
   }
-
   function handleRegister() {
     if (loginDisplay !== "register") {
       setLoginDisplay("register");
@@ -90,23 +86,18 @@ function MainBannerSection({
       document.getElementById('register_form').submit();
     }
   }
-
   function handleReset() {
     document.getElementById('reset_form').submit();
   }
-
   function scrollTo(element) {
     element.scrollIntoView({
       behavior: 'smooth'
     });
   }
-
   function toSupport() {
     window.location = homeLinks['support'];
   }
-
   let activeModal = null;
-
   switch (loginDisplay) {
     case "register":
       activeModal = /*#__PURE__*/React.createElement(MainBannerModal, {
@@ -119,7 +110,6 @@ function MainBannerSection({
         setLoginDisplay: setLoginDisplay
       }));
       break;
-
     case "rules":
       activeModal = /*#__PURE__*/React.createElement(MainBannerModal, {
         title: "rules",
@@ -127,7 +117,6 @@ function MainBannerSection({
         handleCloseClick: () => setLoginDisplay("none")
       }, /*#__PURE__*/React.createElement(Rules, null));
       break;
-
     case "terms":
       activeModal = /*#__PURE__*/React.createElement(MainBannerModal, {
         title: "terms",
@@ -136,7 +125,6 @@ function MainBannerSection({
       }, /*#__PURE__*/React.createElement(Terms, null));
       break;
   }
-
   return /*#__PURE__*/React.createElement("div", {
     className: "home_section main_banner_section"
   }, /*#__PURE__*/React.createElement("div", {
@@ -179,7 +167,7 @@ function MainBannerSection({
     src: "/images/v2/decorations/lanternsmall.png"
   })), activeModal, /*#__PURE__*/React.createElement("div", {
     className: "login_container"
-  }, /*#__PURE__*/React.createElement(LoginForm, {
+  }, !isLoggedIn && /*#__PURE__*/React.createElement(LoginForm, {
     loginMessageText: loginMessageText,
     loginErrorText: loginErrorText,
     setLoginDisplay: setLoginDisplay
@@ -258,7 +246,6 @@ function MainBannerSection({
     largeSize: true
   }))));
 }
-
 function BannerDiamondButton({
   color,
   firstLineText,
@@ -350,7 +337,6 @@ function BannerDiamondButton({
     dominantBaseline: "middle"
   }, secondLineText))));
 }
-
 function LoginForm({
   loginMessageText,
   loginErrorText,
@@ -398,7 +384,6 @@ function LoginForm({
     onClick: () => setLoginDisplay("reset")
   }, "reset password")));
 }
-
 function MainBannerModal({
   title,
   className,
@@ -427,15 +412,12 @@ function MainBannerModal({
     className: "modal_content"
   }, children));
 }
-
 function FeatureSection({}) {
   return /*#__PURE__*/React.createElement(React.Fragment, null);
 }
-
 function WorldSection({}) {
   return /*#__PURE__*/React.createElement(React.Fragment, null);
 }
-
 function ContactSection({
   contactRef
 }) {
@@ -451,7 +433,6 @@ function ContactSection({
     className: "home_form_container"
   }));
 }
-
 function FooterSection({}) {
   return /*#__PURE__*/React.createElement("div", {
     className: "home_section footer_section"
@@ -459,7 +440,6 @@ function FooterSection({}) {
     className: "footer_text"
   }, "SHINOBI CHRONICLES V0.9.0 COPYRIGHT \xA9 LM VISIONS"));
 }
-
 function LoggedOutButtons({
   handleLogin,
   handleRegister
@@ -599,7 +579,6 @@ function LoggedOutButtons({
     dominantBaseline: "middle"
   }, "create a character")));
 }
-
 function LoggedInButtons({
   homeLinks
 }) {
@@ -735,5 +714,4 @@ function LoggedInButtons({
     dominantBaseline: "middle"
   }, "logout"))));
 }
-
 window.Home = Home;

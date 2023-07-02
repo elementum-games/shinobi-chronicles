@@ -276,7 +276,7 @@ function runActiveMission(): bool {
                 if($battle->isComplete()) {
                     $result = processMissionBattleEnd($battle, $mission, $player);
                     if(strlen($result) > 0) {
-                        echo "<table class='table'>
+                        echo "<table class='table' style='text-align:center'>
                             <tr><th>Battle Results</th></tr>
                             <tr><td>{$result}</td></tr>
                         </table>";
@@ -531,7 +531,7 @@ function processMissionBattleEnd(BattleManager|BattleManagerV2 $battle, Mission 
     else if($battle->isPlayerWinner()) {
         $player->mission_stage['stage_id'] += 1;
         $mission->nextStage($player->mission_stage['stage_id']);
-        $result_text .= "You have defeated your opponent! " . $player->mission_stage['description'];
+        $result_text .= "You have defeated your opponent! " . "<br>" . $player->mission_stage['description'];
     }
     else if($battle->isOpponentWinner()) {
         $result_text .= "You have been defeated. You have failed your mission.";
