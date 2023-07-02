@@ -237,7 +237,7 @@ function event() {
                     if ($player->items[$system->event->item_ids['red_lantern_id']]->quantity < 1) {
                         unset($player->items[$system->event->item_ids['red_lantern_id']]);
                     }
-                    $player->addRep("1");
+                    $player->addRep($player->calMaxRepGain(1));
                     $system->message("You exchanged 50 Red Lanterns for 1 Reputation!");
                     $player->updateInventory();
                     $player->updateData();
