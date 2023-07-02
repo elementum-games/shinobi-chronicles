@@ -171,7 +171,6 @@ class ChatManager {
                         // format each mention
                         $formatted_mention = "<div class='mention_container'><a class='chat_user_name userLink' href='" . $this->system->router->getURL("members", ["user" => $match]) . "'>@" . $match . "</a></div>";
                         // replace first
-                        echo $match;
                         $post->message = preg_replace('/@('.$match.')(?![a-zA-Z0-9-_])/', $formatted_mention, $post->message, 1);
                     }
                 }
