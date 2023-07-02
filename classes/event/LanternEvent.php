@@ -82,7 +82,7 @@ class LanternEvent extends Event {
         mt_srand($minute_seed);
         
         if (mt_rand(0, 9) == 0) {
-            $mission_coords_gold[] = ['x' => mt_rand(1, 28), 'y' => mt_rand(1, 18)];
+            $mission_coords_gold[] = ['x' => mt_rand(1, 27), 'y' => mt_rand(1, 18)];
         }
         // clear seed
         mt_srand();

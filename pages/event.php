@@ -227,6 +227,9 @@ function event() {
                     break;
                 case "red_rep":
                     $player->getInventory();
+                    if($player->calMaxRepGain(1) == 0) {
+                      throw new RuntimeException("You've already received your weekly reputation limit!");
+                    }
                     if (!$player->hasItem($system->event->item_ids['red_lantern_id'])) {
                         throw new RuntimeException("You do not have this item!");
                     }

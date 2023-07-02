@@ -192,6 +192,7 @@ class NotificationAPIManager {
                         }
                         $notifications[] = $chat_notification;
                     }
+                    break;
                 case "event":
                     if (false) {
                         $notification_ids_to_delete[] = $row['notification_id'];
@@ -199,6 +200,7 @@ class NotificationAPIManager {
                     } else {
                         $notifications[] = NotificationDto::fromDb($row, $this->system->router->getUrl("event"));
                     }
+                    break;
                 default:
                     break;
             }
