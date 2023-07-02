@@ -9,68 +9,68 @@ class Village {
             'title' => 'New Villager',
             'outlaw_title' => 'Vagabond',
             'min_rep' => 0,
-            'weekly_cap' => 75,
+            'weekly_cap' => 500,
             'base_pvp_rep_reward' => 1,
         ],
         2 => [
             'title' => 'Villager',
             'outlaw_title' => 'Thief',
-            'min_rep' => 100,
-            'weekly_cap' => 100,
+            'min_rep' => 500,
+            'weekly_cap' => 500,
             'base_pvp_rep_reward' => 1,
         ],
         3 => [
             'title' => 'Well-Known Villager',
             'outlaw_title' => 'Infamous',
-            'min_rep' => 150,
-            'weekly_cap' => 250,
+            'min_rep' => 1000,
+            'weekly_cap' => 500,
             'base_pvp_rep_reward' => 1,
         ],
         4 => [
             'title' => 'Respected Villager',
             'outlaw_title' => 'Outlaw',
-            'min_rep' => 300,
-            'weekly_cap' => 350,
+            'min_rep' => 2000,
+            'weekly_cap' => 600,
             'base_pvp_rep_reward' => 2,
         ],
         5 => [
             'title' => 'Shinobi',
             'outlaw_title' => 'Rogue',
-            'min_rep' => 500,
-            'weekly_cap' => 350,
+            'min_rep' => 3500,
+            'weekly_cap' => 600,
             'base_pvp_rep_reward' => 2,
         ],
         6 => [
             'title' => 'Respected Shinobi',
             'outlaw_title' => 'Infamous Rogue',
-            'min_rep' => 700,
-            'weekly_cap' => 400,
+            'min_rep' => 5000,
+            'weekly_cap' => 600,
             'base_pvp_rep_reward' => 2,
         ],
         7 => [
             'title' => 'Elite Shinobi',
             'outlaw_title' => 'Master Rogue',
-            'min_rep' => 1000,
-            'weekly_cap' => 450,
+            'min_rep' => 6000,
+            'weekly_cap' => 700,
             'base_pvp_rep_reward' => 3,
         ],
         8 => [
             'title' => 'Legendary Shinobi',
             'outlaw_title' => 'Assassin',
-            'min_rep' => 1500,
-            'weekly_cap' => 500,
+            'min_rep' => 8000,
+            'weekly_cap' => 800,
             'base_pvp_rep_reward' => 3,
         ],
         9 => [
             'title' => 'Master Shinobi',
             'outlaw_title' => 'Master Assassin',
-            'min_rep' => 3000,
-            'weekly_cap' => 500,
+            'min_rep' => 10000,
+            'weekly_cap' => 900,
             'base_pvp_rep_reward' => 3,
         ]
     ];
 
-    const ARENA_MISSION_CD = 300;
+    const ARENA_MISSION_CD = 60;
     const MISSION_GAINS = [
         Mission::RANK_D => 1,
         Mission::RANK_C => 1,
@@ -137,8 +137,11 @@ class Village {
         $level_difference = $player_level - $opponent_level;
         $rep_rank_difference = $player_rep_rank - $opponent_rep_rank;
         $rep_gain = 0;
+
+        return 0;
+        /*
         if($winner == true) {
-        // Level based rewards
+            // Level based rewards
             // Opponent is no more than 3 to 5 levels below player
             if($level_difference >= -5 && $level_difference <= -3) {
                 $rep_gain++;
@@ -156,7 +159,7 @@ class Village {
                 $rep_gain++;
             }
 
-        // Reputation difference rewards
+            // Reputation difference rewards
             // Player is two tiers above opponent
             if($rep_rank_difference == 2) {
                 $rep_gain++;
@@ -201,6 +204,7 @@ class Village {
         }
 
         return $rep_gain;
+        */
     }
 
     public function getKageName() {
