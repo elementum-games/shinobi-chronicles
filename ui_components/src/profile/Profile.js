@@ -35,18 +35,10 @@ function Profile({
         <div className="profile_container">
             {/* First row */}
             <div className="profile_row_first">
-                <div className="profile_avatar_container">
-                    <CharacterAvatar
-                        imageSrc={playerData.avatar_link}
-                        maxWidth={playerData.avatar_size * 0.5}
-                        maxHeight={playerData.avatar_size * 0.5}
-                        avatarStyle={playerSettings.avatar_style}
-                        frameClassNames={["profile_avatar_frame"]}
-                    />
-                </div>
                 <StatusAttributes
                     playerData={playerData}
                     links={links}
+                    playerSettings={playerSettings}
                 />
             </div>
             
@@ -77,14 +69,25 @@ function Profile({
     );
 }
 
-function StatusAttributes({ playerData, links }) {
+function StatusAttributes({ playerData, playerSettings, links }) {
     return (
         <div className="status_attributes_wrapper">
             <div className="status_attributes box-primary">
                 <div className="name_row ft-c1">
-                    <div>
-                        <h2 className="player_name">{playerData.user_name}</h2>
-                        <span className="player_title ft-p">{playerData.rank_name} lvl {playerData.level}</span>
+                    <div className="player_avatar_name_container">
+                        <div className="profile_avatar_container">
+                            <CharacterAvatar
+                                imageSrc={playerData.avatar_link}
+                                maxWidth={playerData.avatar_size * 0.5}
+                                maxHeight={playerData.avatar_size * 0.5}
+                                avatarStyle={playerSettings.avatar_style}
+                                frameClassNames={["profile_avatar_frame"]}
+                            />
+                        </div>
+                        <div>
+                            <h2 className="player_name">{playerData.user_name}</h2>
+                            <span className="player_title ft-p">{playerData.rank_name} lvl {playerData.level}</span>
+                        </div>
                     </div>
                     <div className="player_badges">
                         <img src="/images/v2/decorations/red_diamond.png" />
