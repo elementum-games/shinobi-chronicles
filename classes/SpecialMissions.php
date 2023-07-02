@@ -407,10 +407,13 @@ class SpecialMission {
         $reward_text = self::$event_names[self::EVENT_COMPLETE_REWARD]['text'] . $yen_gain . '!';
 
         //Reputation Reward
-        $rep_gain = $player->calMaxRepGain($this->rep_reward);
-        if($rep_gain > 0) {
-            $this->player->addRep($rep_gain);
-            $reward_text .= ' You have gained ' . $rep_gain . " village reputation!";
+        if($player->mission_rep_cd - time() <= 0) {
+            $rep_gain = $player->calMaxRepGain($this->rep_reward);
+            if($rep_gain > 0) {
+                $this->player->addRep($rep_gain);
+                $player->mission_rep_cd = time() + Village::ARENA_MISSION_CD;
+                $reward_text .= ' You have gained ' . $rep_gain . " village reputation!";
+            }
         }
 
         $stat_to_gain = $this->player->getTrainingStatForArena();
