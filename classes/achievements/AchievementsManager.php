@@ -110,26 +110,37 @@ class AchievementsManager {
                     // Progress achievement
                     if(in_array($mission->mission_id, $system->event->mission_ids)) {
                         if(!isset($player->achievements_in_progress[LANTERN_EVENT_COMPLETE_ALL_MISSIONS])) {
-                            $player->achievements_in_progress[LANTERN_EVENT_COMPLETE_ALL_MISSIONS] = new AchievementProgress(
+                            $progress = new AchievementProgress(
                                 id: null,
-                                achievement_id: LANTERN_EVENT_COMPLETE_ALL_MISSIONS,
+                                achievement_id: $achievement->id,
                                 user_id: $player->user_id,
                                 progress_data: [
                                     'mission_ids' => []
                                 ]
                             );
+                            $progress->id = AchievementsManager::createAchievementProgress(
+                                $system,
+                                $progress
+                            );
+
+                            $player->achievements_in_progress[$achievement->id] = $progress;
                         }
 
 
                         if(!in_array(
                             $mission->mission_id,
                             $player
-                                ->achievements_in_progress[LANTERN_EVENT_COMPLETE_ALL_MISSIONS]
+                                ->achievements_in_progress[$achievement->id]
                                 ->progress_data['mission_ids']
                         )) {
                             $player
-                                ->achievements_in_progress[LANTERN_EVENT_COMPLETE_ALL_MISSIONS]
+                                ->achievements_in_progress[$achievement->id]
                                 ->progress_data['mission_ids'][] = $mission->mission_id;
+
+                            AchievementsManager::updateAchievementProgress(
+                                $system,
+                                $player->achievements_in_progress[$achievement->id]
+                            );
                         }
                     }
                     break;
@@ -152,7 +163,7 @@ class AchievementsManager {
                     // Progress achievement
                     if(in_array($item->id, $system->event->item_ids)) {
                         if(!isset($player->achievements_in_progress[$achievement->id])) {
-                            $player->achievements_in_progress[$achievement->id] = new AchievementProgress(
+                            $progress = new AchievementProgress(
                                 id: null,
                                 achievement_id: $achievement->id,
                                 user_id: $player->user_id,
@@ -160,6 +171,12 @@ class AchievementsManager {
                                     'item_ids' => []
                                 ]
                             );
+                            $progress->id = AchievementsManager::createAchievementProgress(
+                                $system,
+                                $progress
+                            );
+
+                            $player->achievements_in_progress[$achievement->id] = $progress;
                         }
 
                         if(!in_array(
@@ -171,11 +188,35 @@ class AchievementsManager {
                             $player
                                 ->achievements_in_progress[$achievement->id]
                                 ->progress_data['item_ids'][] = $item->id;
+                            AchievementsManager::updateAchievementProgress(
+                                $system,
+                                $player->achievements_in_progress[$achievement->id]
+                            );
                         }
                     }
                     break;
             }
         }
+    }
+
+    private static function createAchievementProgress(System $system, AchievementProgress $achievementProgress): int {
+        $system->db->query("INSERT INTO `user_achievements_progress` SET
+            `achievement_id`='{$achievementProgress->achievement_id}',
+            `user_id`={$achievementProgress->user_id},
+            `progress_data`='" . json_encode($achievementProgress->progress_data) . "'
+        ");
+
+        return $system->db->last_insert_id;
+    }
+
+    private static function updateAchievementProgress(System $system, AchievementProgress $achievementProgress): void {
+        if($achievementProgress->id == null) {
+            throw new RuntimeException("Must have id to update achievement progress!");
+        }
+        $system->db->query("UPDATE `user_achievements_progress` SET
+            `progress_data`='" . json_encode($achievementProgress->progress_data) . "'
+            WHERE `id`={$achievementProgress->id}
+        ");
     }
 }
 

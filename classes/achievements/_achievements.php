@@ -246,7 +246,7 @@ $LANTERN_EVENT_ACHIEVEMENTS = [
             $progress = AchievementsManager::fetchPlayerProgress(
                 system: $system,
                 player: $player,
-                achievement_id: LANTERN_EVENT_COMPLETE_ALL_MISSIONS
+                achievement_id: LANTERN_EVENT_OBTAIN_ALL_ITEMS
             );
 
             if($progress == null) {
@@ -257,7 +257,7 @@ $LANTERN_EVENT_ACHIEVEMENTS = [
             }
 
             $lantern_event = new LanternEvent(new DateTimeImmutable());
-            foreach($lantern_event['item_ids'] as $item_id) {
+            foreach($lantern_event->item_ids as $item_id) {
                 if(!in_array($item_id, $progress->progress_data['item_ids'])) {
                     return false;
                 }
