@@ -79,8 +79,14 @@ function arena(): bool {
         $system->printMessage();
         echo "<table class='table'><tr><th>Choose Opponent</th></tr>
         <tr><td style='text-align: center;'>
-        Welcome to the Arena. Here you can fight against various opponents for cash prizes. Please select your opponent below:
-        </td></tr>
+        Welcome to the Arena. Here you can fight against various opponents for cash prizes. Please select your opponent below:";
+	if($player->mission_rep_cd - time() > 0) {
+	$remaining = $player->mission_rep_cd - time();
+	echo "<br /><br />You can gain village reputation in: <div id='rep_cd' style='display: inline-block'>"
+	    . System::timeRemaining($remaining) . "</div>
+		<script type='text/javascript'>countdownTimer($remaining, 'rep_cd', false);</script>";
+    	}
+        echo "</td></tr>
         <tr><td style='text-align: center;'>";
         foreach($ai_opponents as $ai) {
             echo "<a href='$self_link&fight={$ai['ai_id']}'>
