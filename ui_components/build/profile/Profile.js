@@ -88,18 +88,16 @@ function StatusAttributes({
   }, "None")))), /*#__PURE__*/React.createElement("div", {
     className: "status_info_section section2",
     style: {
-      flexBasis: "32%"
+      flexBasis: "28%"
     }
   }, /*#__PURE__*/React.createElement("p", null, /*#__PURE__*/React.createElement("label", null, "Money:"), /*#__PURE__*/React.createElement("span", null, "\xA5", playerData.money.toLocaleString())), /*#__PURE__*/React.createElement("p", null, /*#__PURE__*/React.createElement("label", null, "Ancient Kunai:"), /*#__PURE__*/React.createElement("span", null, playerData.premiumCredits.toLocaleString())), /*#__PURE__*/React.createElement("p", null, /*#__PURE__*/React.createElement("label", null, "AK Purchased:"), /*#__PURE__*/React.createElement("span", null, playerData.premiumCreditsPurchased.toLocaleString()))), /*#__PURE__*/React.createElement("div", {
     className: "status_info_section section3",
     style: {
-      flexBasis: "30%"
+      flexBasis: "34%"
     }
-  }, /*#__PURE__*/React.createElement("p", null, /*#__PURE__*/React.createElement("label", null, "Village:"), /*#__PURE__*/React.createElement("span", null, playerData.villageName)), playerData.clanId != null && /*#__PURE__*/React.createElement("p", null, /*#__PURE__*/React.createElement("label", null, "Clan:"), /*#__PURE__*/React.createElement("span", null, /*#__PURE__*/React.createElement("a", {
+  }, /*#__PURE__*/React.createElement("p", null, /*#__PURE__*/React.createElement("label", null, "Village:"), /*#__PURE__*/React.createElement("span", null, playerData.villageName)), /*#__PURE__*/React.createElement("p", null, /*#__PURE__*/React.createElement("label", null, "Village Rep:"), /*#__PURE__*/React.createElement("span", null, playerData.villageRepTier, " (", playerData.villageRep, " rep)")), playerData.clanId != null && /*#__PURE__*/React.createElement("p", null, /*#__PURE__*/React.createElement("label", null, "Clan:"), /*#__PURE__*/React.createElement("span", null, /*#__PURE__*/React.createElement("a", {
     href: links.clan
-  }, playerData.clanName))), /*#__PURE__*/React.createElement("p", null, /*#__PURE__*/React.createElement("label", null, "Team:"), /*#__PURE__*/React.createElement("span", null, playerData.teamId == null ? "None" : /*#__PURE__*/React.createElement("a", {
-    href: links.team
-  }, playerData.teamName)))))));
+  }, playerData.clanName)))))));
 }
 
 function PlayerStats({

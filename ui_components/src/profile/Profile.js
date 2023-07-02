@@ -119,7 +119,7 @@ function StatusAttributes({ playerData, links }) {
 
                         </p>
                     </div>
-                    <div className="status_info_section section2" style={{ flexBasis: "32%" }}>
+                    <div className="status_info_section section2" style={{ flexBasis: "28%" }}>
                         <p>
                             <label>Money:</label>
                             <span>&yen;{playerData.money.toLocaleString()}</span>
@@ -133,11 +133,19 @@ function StatusAttributes({ playerData, links }) {
                             <span>{playerData.premiumCreditsPurchased.toLocaleString()}</span>
                         </p>
                     </div>
-                    <div className="status_info_section section3" style={{ flexBasis: "30%" }}>
+                    <div className="status_info_section section3" style={{ flexBasis: "34%" }}>
                         <p>
                             <label>Village:</label>
                             <span>{playerData.villageName}</span>
                         </p>
+                        <p>
+                            <label>Village Rep:</label>
+                            <span>{playerData.villageRepTier} ({playerData.villageRep} rep)</span>
+                        </p>
+                        {/*<p>
+                            <label>Weekly Rep Gained:</label>
+                            <span>{playerData.weeklyRep} / {playerData.maxWeeklyRep}</span>
+                        </p>*/}
                         {playerData.clanId != null &&
                             <p>
                                 <label>Clan:</label>
@@ -145,13 +153,13 @@ function StatusAttributes({ playerData, links }) {
                             </p>
                         }
                         {/*<span>Branch Family</span>*/}
-                        <p>
+                        {/*<p>
                             <label>Team:</label>
                             <span>{playerData.teamId == null
                                 ? "None"
                                 : <a href={links.team}>{playerData.teamName}</a>}
                             </span>
-                        </p>
+                        </p>*/}
 
                     </div>
                 </div>

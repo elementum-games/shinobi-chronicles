@@ -15,7 +15,6 @@
 }
 
 .profile_row_first { /* Organize into rows so we can synchronize flex items */
-    height: 220px;
     width: 100%;
 
     display: flex;
