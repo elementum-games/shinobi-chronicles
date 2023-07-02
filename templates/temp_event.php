@@ -144,7 +144,7 @@
                             <?php echo $player->hasItem($system->event->item_ids['shadow_essence_id']) ? "Sacred Gold Lantern" : "???" ?>
                         </td>
                         <td>
-                            <a href="<?=$system->router->getUrl("event", ["exchange" => "shadow_gold_violet"])?>">Claim</a>
+                            <a href="<?=$system->router->getUrl("event", ["exchange" => "shadow_sacred_gold"])?>">Claim</a>
                         </td>
                     </tr>
                     <tr>
