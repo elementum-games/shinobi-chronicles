@@ -79,10 +79,10 @@ class Village {
         Mission::RANK_S => 4
     ];
     const SPECIAL_MISSION_GAINS = [
-        SpecialMission::DIFFICULTY_EASY => 1,
-        SpecialMission::DIFFICULTY_NORMAL => 3,
-        SpecialMission::DIFFICULTY_HARD => 5,
-        SpecialMission::DIFFICULTY_NIGHTMARE => 10,
+        SpecialMission::DIFFICULTY_EASY => 0,
+        SpecialMission::DIFFICULTY_NORMAL => 1,
+        SpecialMission::DIFFICULTY_HARD => 2,
+        SpecialMission::DIFFICULTY_NIGHTMARE => 3,
     ];
     const DAILY_TASK_GAINS = [
         DailyTask::DIFFICULTY_EASY . '_' . DailyTask::ACTIVITY_ARENA => 1,
