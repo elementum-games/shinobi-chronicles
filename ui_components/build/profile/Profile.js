@@ -5,7 +5,8 @@ function Profile({
   playerData,
   playerStats,
   playerSettings,
-  playerDailyTasks
+  playerDailyTasks,
+  playerAchievements
 }) {
   return /*#__PURE__*/React.createElement("div", {
     className: "profile_container"
@@ -33,7 +34,11 @@ function Profile({
     bloodlinePageUrl: links.bloodlinePage
   }), /*#__PURE__*/React.createElement(DailyTasks, {
     dailyTasks: playerDailyTasks
-  }))));
+  }))), /*#__PURE__*/React.createElement("div", {
+    className: "profile_row_third"
+  }, /*#__PURE__*/React.createElement("h3", null, "Achievements"), /*#__PURE__*/React.createElement(PlayerAchievements, {
+    playerAchievements: playerAchievements
+  })));
 }
 
 function StatusAttributes({
@@ -213,6 +218,17 @@ function DailyTasks({
       marginLeft: "6px"
     }
   }, dailyTask.progressCaption)))));
+}
+
+function PlayerAchievements({
+  playerAchievements
+}) {
+  return /*#__PURE__*/React.createElement("div", {
+    className: "achievements_container"
+  }, playerAchievements.completedAchievements.map(achievement => /*#__PURE__*/React.createElement("div", {
+    key: `achievement:${achievement.id}`,
+    className: "achievement"
+  }, "Name: ", achievement.name, /*#__PURE__*/React.createElement("br", null), "Prompt: ", achievement.prompt)));
 }
 
 window.Profile = Profile;
