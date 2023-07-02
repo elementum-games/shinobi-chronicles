@@ -28,6 +28,13 @@
 
             Special missions reward money and jutsu exp/levels at random for your equipped and Bloodline jutsu.
         </p>
+        <?php if($player->mission_rep_cd - time() > 0): ?>
+            <?php $remaining = $player->mission_rep_cd - time(); ?>
+            <p>
+                You can gain village reputation in: <div id='rep_cd' style='display: inline-block'><?=System::timeRemaining($remaining)?></div>
+                <script type='text/javascript'>countdownTimer(<?=$remaining?>, 'rep_cd', false);</script>";
+            </p>
+        <?php endif ?>
         <a href="<?= $self_link ?>&start=easy">
             <button>Start Easy Mission!</button>
         </a>
