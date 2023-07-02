@@ -13,8 +13,9 @@ type Props = {|
     +links: {|
         +clan: string,
         +team: string,
-        +buyForbiddenSeal: string,
         +bloodlinePage: string,
+        +buyBloodline: string,
+        +buyForbiddenSeal: string,
     |},
     +playerData: PlayerDataType,
     +playerStats: PlayerStatsType,
@@ -58,6 +59,8 @@ function Profile({
                 <div className="profile_row_second_col2">
                     <PlayerBloodline
                         bloodlinePageUrl={links.bloodlinePage}
+                        buyBloodlineUrl={links.buyBloodline}
+                        playerData={playerData}
                     />
                     <DailyTasks
                         dailyTasks={playerDailyTasks}
@@ -217,14 +220,24 @@ function PlayerStats({ playerData, playerStats }) {
     );
 }
 
-function PlayerBloodline({ bloodlinePageUrl }) {
+type PlayerBloodlineProps = {|
+    +playerData: PlayerDataType,
+    +bloodlinePageUrl: string,
+    +buyBloodlineUrl: string,
+|};
+function PlayerBloodline({ playerData, bloodlinePageUrl, buyBloodlineUrl }) {
     return (
         <div className="bloodline_display">
             <div className="bloodline_mastery_indicator">
-                <img src="/images/v2/bloodline/level3.png" />
+                {playerData.has_bloodline
+                    ? <img src="/images/v2/bloodline/level3.png" />
+                    : <img src="/images/v2/bloodline/inactive.png" />
+                }
             </div>
             <div className="bloodline_name ft-c3">
-                Bloodline:&nbsp;<a href={bloodlinePageUrl}>Ancient's Deception</a>
+                Bloodline:&nbsp;{playerData.bloodlineName != null
+                    ? <a href={bloodlinePageUrl}>{playerData.bloodlineName.replace(/&#039;/g, "'")}</a>
+                    : <a href={buyBloodlineUrl}>None</a>}
             </div>
         </div>
     );
