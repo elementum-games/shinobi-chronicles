@@ -73,8 +73,8 @@ function news() {
 				throw new RuntimeException("Please enter a title!");
 			}
 
-			if(strlen($message) > 2000) {
-				throw new RuntimeException("Post is too long! (" . strlen($message) . "/2000 chars)");
+			if(strlen($message) > $max_length) {
+				throw new RuntimeException("Post is too long! (" . strlen($message) . "/{$max_length}} chars)");
 			}
 			if(strlen($title) > 50) {
 				throw new RuntimeException("Title is too long! (" . strlen($title) . "/50 chars)");
