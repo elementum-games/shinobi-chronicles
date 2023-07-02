@@ -29,7 +29,7 @@ else $NewsManager = new NewsManager($system);
             React.createElement(Home, {
                 homeLinks: <?= json_encode($home_links) ?>,
                 isLoggedIn: "<?= isset($player) ?>",
-                isAdmin: "<?= isset($player) ? $player->isHeadAdmin() : false ?>",
+                isAdmin: "<?= isset($player) ? $player->hasAdminPanel() : false ?>",
                 version: "<?= System::VERSION_NAME ?>",
                 initialLoginDisplay: "<?= $initial_login_display ?>",
                 loginURL: "<?= $system->router->base_url ?>",
