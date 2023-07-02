@@ -8,7 +8,7 @@ class Database {
 
     public ?mysqli $con = null;
 
-    public bool $ENABLE_ROW_LOCKING = true;
+    public bool $ENABLE_ROW_LOCKING = false;
     public bool $in_db_transaction = false;
 
     // Variables for query() function to track things
