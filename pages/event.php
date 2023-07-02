@@ -312,7 +312,7 @@ function event() {
                         throw new RuntimeException("You do not have enough of this item!");
                     }
                     $player->items[$system->event->item_ids['red_lantern_id']]->quantity -= 100;
-                    if ($player->items[$system->event->item_ids['red_lantern_id']]->quantity < 100) {
+                    if ($player->items[$system->event->item_ids['red_lantern_id']]->quantity < 1) {
                         unset($player->items[$system->event->item_ids['red_lantern_id']]);
                     }
 
@@ -355,7 +355,7 @@ function event() {
                         throw new RuntimeException("You already have this item!");
                     }
                     $player->items[$system->event->item_ids['shadow_essence_id']]->quantity -= 5;
-                    if ($player->items[$system->event->item_ids['shadow_essence_id']]->quantity < 5) {
+                    if ($player->items[$system->event->item_ids['shadow_essence_id']]->quantity < 1) {
                         unset($player->items[$system->event->item_ids['shadow_essence_id']]);
                     }
 
@@ -377,7 +377,7 @@ function event() {
                         throw new RuntimeException("You already have this item!");
                     }
                     $player->items[$system->event->item_ids['shadow_essence_id']]->quantity -= 5;
-                    if ($player->items[$system->event->item_ids['shadow_essence_id']]->quantity < 5) {
+                    if ($player->items[$system->event->item_ids['shadow_essence_id']]->quantity < 1) {
                         unset($player->items[$system->event->item_ids['shadow_essence_id']]);
                     }
 
@@ -399,7 +399,7 @@ function event() {
                         throw new RuntimeException("You already have this item!");
                     }
                     $player->items[$system->event->item_ids['shadow_essence_id']]->quantity -= 5;
-                    if ($player->items[$system->event->item_ids['shadow_essence_id']]->quantity < 5) {
+                    if ($player->items[$system->event->item_ids['shadow_essence_id']]->quantity < 1) {
                         unset($player->items[$system->event->item_ids['shadow_essence_id']]);
                     }
                     $result = $system->db->query("SELECT * FROM `items` WHERE `item_id` = {$system->event->item_ids['sacred_lantern_violet_id']}");
@@ -421,7 +421,7 @@ function event() {
                         throw new RuntimeException("You already have this item!");
                     }
                     $player->items[$system->event->item_ids['shadow_essence_id']]->quantity -= 5;
-                    if ($player->items[$system->event->item_ids['shadow_essence_id']]->quantity < 5) {
+                    if ($player->items[$system->event->item_ids['shadow_essence_id']]->quantity < 1) {
                         unset($player->items[$system->event->item_ids['shadow_essence_id']]);
                     }
 
@@ -443,7 +443,7 @@ function event() {
                         throw new RuntimeException("You already have this item!");
                     }
                     $player->items[$system->event->item_ids['shadow_essence_id']]->quantity -= 25;
-                    if ($player->items[$system->event->item_ids['shadow_essence_id']]->quantity < 25) {
+                    if ($player->items[$system->event->item_ids['shadow_essence_id']]->quantity < 1) {
                         unset($player->items[$system->event->item_ids['shadow_essence_id']]);
                     }
                     $result = $system->db->query("SELECT * FROM `items` WHERE `item_id` = {$system->event->item_ids['forbidden_jutsu_scroll_id']}");
