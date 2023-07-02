@@ -138,6 +138,17 @@
                     </tr>
                     <tr>
                         <td>
+                            <?php echo $player->hasItem($system->event->item_ids['shadow_essence_id']) ? "5x Shadow Essence" : "???" ?>
+                        </td>
+                        <td>
+                            <?php echo $player->hasItem($system->event->item_ids['shadow_essence_id']) ? "Sacred Gold Lantern" : "???" ?>
+                        </td>
+                        <td>
+                            <a href="<?=$system->router->getUrl("event", ["exchange" => "shadow_gold_violet"])?>">Claim</a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
                             <?php echo $player->hasItem($system->event->item_ids['shadow_essence_id']) ? "25x Shadow Essence" : "???" ?>
                         </td>
                         <td>
