@@ -24,7 +24,7 @@ class LanternEvent extends Event {
         $mission_coords_nightmare = [];
         
         switch (true) {
-            case ($currentMinutes < 300): // 3 minutes per hour
+            case ($currentMinutes < 3): // 3 minutes per hour
                 $mission_coords_nightmare[] = ['x' => 10, 'y' => 1];
                 $mission_coords_special[] = ['x' => 13, 'y' => 1];
                 $mission_coords_special[] = ['x' => 12, 'y' => 3];
