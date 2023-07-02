@@ -21,6 +21,7 @@
     align-items: flex-end;
     gap: 30px;
     margin-bottom: 5px;
+    margin-top: 5px;
 
     position: relative;
 }
@@ -29,15 +30,12 @@
     width: 80px;
     height: 80px;
 
-    top: -5px;
-    left: calc(50% - 40px);
-
-    position: absolute;
-    z-index: 1;
-
     display: flex;
     align-items: center;
     justify-content: center;
+
+    position: relative;
+    top: 10px;
 }
 .profile_avatar_frame {
     padding: var(--avatar-frame-border-width-small);
@@ -56,6 +54,12 @@
     display: flex;
     flex-direction: row;
     justify-content: space-between;
+    max-height: 50px;
+}
+.player_avatar_name_container {
+    display: flex;
+    align-items: flex-end;
+    gap: 12px;
 }
 .player_name {
     font-size: 20px;
@@ -154,7 +158,8 @@
 
 /* Stats */
 .stats_container {
-    width: 580px;
+    flex-basis: 65%;
+    flex-shrink: 1;
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;

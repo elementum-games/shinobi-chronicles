@@ -1,5 +1,4 @@
 import { CharacterAvatar } from "../CharacterAvatar.js";
-
 function Profile({
   links,
   playerData,
@@ -12,17 +11,10 @@ function Profile({
     className: "profile_container"
   }, /*#__PURE__*/React.createElement("div", {
     className: "profile_row_first"
-  }, /*#__PURE__*/React.createElement("div", {
-    className: "profile_avatar_container"
-  }, /*#__PURE__*/React.createElement(CharacterAvatar, {
-    imageSrc: playerData.avatar_link,
-    maxWidth: playerData.avatar_size * 0.5,
-    maxHeight: playerData.avatar_size * 0.5,
-    avatarStyle: playerSettings.avatar_style,
-    frameClassNames: ["profile_avatar_frame"]
-  })), /*#__PURE__*/React.createElement(StatusAttributes, {
+  }, /*#__PURE__*/React.createElement(StatusAttributes, {
     playerData: playerData,
-    links: links
+    links: links,
+    playerSettings: playerSettings
   })), /*#__PURE__*/React.createElement("div", {
     className: "profile_row_second"
   }, /*#__PURE__*/React.createElement(PlayerStats, {
@@ -42,9 +34,9 @@ function Profile({
     playerAchievements: playerAchievements
   })));
 }
-
 function StatusAttributes({
   playerData,
+  playerSettings,
   links
 }) {
   return /*#__PURE__*/React.createElement("div", {
@@ -53,11 +45,21 @@ function StatusAttributes({
     className: "status_attributes box-primary"
   }, /*#__PURE__*/React.createElement("div", {
     className: "name_row ft-c1"
-  }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("h2", {
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "player_avatar_name_container"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "profile_avatar_container"
+  }, /*#__PURE__*/React.createElement(CharacterAvatar, {
+    imageSrc: playerData.avatar_link,
+    maxWidth: playerData.avatar_size * 0.5,
+    maxHeight: playerData.avatar_size * 0.5,
+    avatarStyle: playerSettings.avatar_style,
+    frameClassNames: ["profile_avatar_frame"]
+  })), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("h2", {
     className: "player_name"
   }, playerData.user_name), /*#__PURE__*/React.createElement("span", {
     className: "player_title ft-p"
-  }, playerData.rank_name, " lvl ", playerData.level)), /*#__PURE__*/React.createElement("div", {
+  }, playerData.rank_name, " lvl ", playerData.level))), /*#__PURE__*/React.createElement("div", {
     className: "player_badges"
   }, /*#__PURE__*/React.createElement("img", {
     src: "/images/v2/decorations/red_diamond.png"
@@ -99,7 +101,6 @@ function StatusAttributes({
     href: links.clan
   }, playerData.clanName)))))));
 }
-
 function PlayerStats({
   playerData,
   playerStats
@@ -172,7 +173,6 @@ function PlayerStats({
     className: "ft-c3"
   }, "nope"))));
 }
-
 function PlayerBloodline({
   playerData,
   bloodlinePageUrl,
@@ -194,7 +194,6 @@ function PlayerBloodline({
     href: buyBloodlineUrl
   }, "None")));
 }
-
 function DailyTasks({
   dailyTasks
 }) {
@@ -225,7 +224,6 @@ function DailyTasks({
     }
   }, dailyTask.progressCaption)))));
 }
-
 function PlayerAchievements({
   playerAchievements
 }) {
@@ -251,5 +249,4 @@ function PlayerAchievements({
     className: "progress_label"
   }, achievement.progressLabel)))));
 }
-
 window.Profile = Profile;
