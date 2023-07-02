@@ -233,7 +233,8 @@ class ReportManager {
             if(!$report) {
                 return false;
             }
-            $this->system->db->query("UPDATE `reports` SET `status`={$verdict} WHERE `report_id`={$report_id} LIMIT 1");
+            $this->system->db->query("UPDATE `reports` SET `status`={$verdict}, 
+                     `moderator_id`={$this->player->user_id} WHERE `report_id`={$report_id} LIMIT 1");
             if($this->system->db->last_affected_rows) {
                 $log_type = ($report['status'] == self::VERDICT_UNHANDLED) ? StaffManager::STAFF_LOG_MOD : StaffManager::STAFF_LOG_HEAD_MOD;
                 $log_data = "{$this->player->user_name}({$this->player->user_id}) has ";

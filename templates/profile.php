@@ -416,9 +416,8 @@ $clan_positions = [
     <?php endif; ?>
     <br />
     <label style='width:<?= $label_width ?>;'>Village:</label> <?= $player->village->name ?><br />
-    <!--<label style='width:<?/*= $label_width */?>;'>Reputation:</label> <?/*= $player->village->getRepName($player->village_rep) */?> <em>(<?/*= $player->village_rep*/?>)</em><br />
-    <label style='width:<?/*= $label_width */?>;'>Weekly Cap:</label> <?/*= $player->weekly_rep */?> / <?/*= Village::WEEKLY_REP_CAP */?><br />
-    -->
+    <label style='width:<?= $label_width ?>;'>Reputation:</label> <?= $player->village->getRepName($player->village_rep) ?> <em>(<?= $player->village_rep ?>)</em><br />
+    <label style='width:<?= $label_width ?>;'>Weekly Cap:</label> <?= $player->weekly_rep ?> / <?= $player->weekly_rep_cap ?><br />
     <br />
     <label style='width:<?= $label_width ?>;'>Money:</label> &yen;<?= $player->getMoney() ?><br />
     <label style='width:<?= $label_width ?>;'>Ancient Kunai:</label> <?= $player->getPremiumCredits() ?><br />
@@ -509,7 +508,7 @@ $clan_positions = [
                 </div>
                 <div class='dailyTaskReward'>
                     <span>Reward:</span>
-                    <span>¥<?= $daily_task->reward ?> & <?= Village::DAILY_TASK[$daily_task->difficulty] ?> Rep</span>
+                    <span>¥<?= $daily_task->reward ?> & <?= $daily_task->rep_reward ?> Rep</span>
                 </div>
                 <div class='dailyTaskProgress'>
                     <div class='dailyTaskProgressBar dailyTask<?= $dt_status_class_name ?>'>
