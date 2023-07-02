@@ -11,7 +11,7 @@ class LanternEvent extends Event {
     public array $config = [];
 
     public function __construct(DateTimeImmutable $end_time) {
-        $this->name = "Lantern";
+        $this->name = "Festival of Shadows";
         $this->end_time = $end_time;
 
         // Manually set event locations, pulled from TravelManager and Missions to identify event missions
