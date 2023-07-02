@@ -36,7 +36,7 @@ function Profile({
     dailyTasks: playerDailyTasks
   }))), /*#__PURE__*/React.createElement("div", {
     className: "profile_row_third"
-  }, /*#__PURE__*/React.createElement("h3", null, "Achievements"), /*#__PURE__*/React.createElement(PlayerAchievements, {
+  }, /*#__PURE__*/React.createElement("h2", null, "Achievements"), /*#__PURE__*/React.createElement(PlayerAchievements, {
     playerAchievements: playerAchievements
   })));
 }
@@ -227,8 +227,23 @@ function PlayerAchievements({
     className: "achievements_container"
   }, playerAchievements.completedAchievements.map(achievement => /*#__PURE__*/React.createElement("div", {
     key: `achievement:${achievement.id}`,
-    className: "achievement"
-  }, "Name: ", achievement.name, /*#__PURE__*/React.createElement("br", null), "Prompt: ", achievement.prompt)));
+    className: "achievement completed box-secondary"
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "achievement_name"
+  }, achievement.name), /*#__PURE__*/React.createElement("span", {
+    className: "achievement_prompt"
+  }, achievement.prompt), /*#__PURE__*/React.createElement("div", {
+    className: "achievement_progress"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "progress_bar_container"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "progress_bar_fill",
+    style: {
+      width: `${achievement.progressPercent}%`
+    }
+  })), /*#__PURE__*/React.createElement("span", {
+    className: "progress_label"
+  }, achievement.progressLabel)))));
 }
 
 window.Profile = Profile;

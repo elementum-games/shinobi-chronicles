@@ -65,7 +65,7 @@ function Profile({
                 </div>
             </div>
             <div className="profile_row_third">
-                <h3>Achievements</h3>
+                <h2>Achievements</h2>
                 <PlayerAchievements
                     playerAchievements={playerAchievements}
                 />
@@ -266,9 +266,15 @@ function PlayerAchievements({ playerAchievements }: PlayerAchievementsProps) {
     return (
         <div className="achievements_container">
             {playerAchievements.completedAchievements.map(achievement => (
-                <div key={`achievement:${achievement.id}`} className="achievement">
-                    Name: {achievement.name}<br />
-                    Prompt: {achievement.prompt}
+                <div key={`achievement:${achievement.id}`} className="achievement completed box-secondary">
+                    <span className="achievement_name">{achievement.name}</span>
+                    <span className="achievement_prompt">{achievement.prompt}</span>
+                    <div className="achievement_progress">
+                        <div className="progress_bar_container">
+                            <div className="progress_bar_fill" style={{width: `${achievement.progressPercent}%`}}></div>
+                        </div>
+                        <span className="progress_label">{achievement.progressLabel}</span>
+                    </div>
                 </div>
             ))}
         </div>

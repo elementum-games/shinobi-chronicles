@@ -90,5 +90,7 @@ export type PlayerAchievementsType = {|
             +type: "MONEY" | "FREEMIUM_CREDITS" | "VILLAGE_REP",
             +amount: number,
         |}>,
+        +progressLabel: string,
+        +progressPercent: number,
     |};
 |};

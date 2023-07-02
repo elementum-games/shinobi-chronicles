@@ -96,6 +96,8 @@ class UserApiPresenter {
                             'amount' => $reward->amount,
                         ];
                     }, $playerAchievement->achievement->rewards),
+                    'progressLabel' => '1/1',
+                    'progressPercent' => 100,
                 ];
             }, array_values($player->achievements)),
         ];
