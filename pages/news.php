@@ -16,6 +16,7 @@ function news() {
 	$self_link = $system->router->links['news'];
 
 	$page = isset($_GET['page']) ? $_GET['page'] : false;
+    $max_length = 3500;
 
 	if(!empty($_POST['create_post']) && $player->hasAdminPanel()) {
 		$post = $system->db->clean($_POST['news_post']);
@@ -29,8 +30,8 @@ function news() {
 				throw new RuntimeException("Please enter a title!");
 			}
 
-			if(strlen($post) > 2000) {
-				throw new RuntimeException("Post is too long! (" . strlen($post) . "/2000 chars)");
+			if(strlen($post) > $max_length) {
+				throw new RuntimeException("Post is too long! (" . strlen($post) . "/{$max_length} chars)");
 			}
 			if(strlen($title) > 50) {
 				throw new RuntimeException("Title is too long! (" . strlen($title) . "/50 chars)");
