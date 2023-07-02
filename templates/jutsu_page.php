@@ -119,7 +119,7 @@
         border-radius: 10px;
         position: absolute;
         z-index: 10;
-	    top: 150px;
+	    top: 44px;
         left: 50%;
         width: 580px !important;
         transform: translate(-50%, 0%);
@@ -166,6 +166,7 @@
         margin: 5px 0px;
     }
     #jutsu_name {
+        text-align: center;
         margin: 5px 0px 5px 0px;
     }
     .hidden {
