@@ -405,8 +405,8 @@ function event() {
                     if ($player->items[$system->event->item_ids['shadow_essence_id']]->quantity < 1) {
                         unset($player->items[$system->event->item_ids['shadow_essence_id']]);
                     }
-                    $result = $system->db->query("SELECT * FROM `items` WHERE `item_id` = {$system->event->item_ids['sacred_lantern_violet_id']}");
-                    $player->items[$system->event->item_ids['sacred_lantern_violet_id']] = Item::fromDb($system->db->fetch($result), 1);
+
+                    $player->giveItemById($system->event->item_ids['sacred_lantern_violet_id'], 1);
 
                     $system->message("You exchanged 5 Shadow Essence for a Sacred Violet Lantern!");
                     $player->updateInventory();
@@ -449,8 +449,8 @@ function event() {
                     if ($player->items[$system->event->item_ids['shadow_essence_id']]->quantity < 1) {
                         unset($player->items[$system->event->item_ids['shadow_essence_id']]);
                     }
-                    $result = $system->db->query("SELECT * FROM `items` WHERE `item_id` = {$system->event->item_ids['forbidden_jutsu_scroll_id']}");
-                    $player->items[$system->event->item_ids['forbidden_jutsu_scroll_id']] = Item::fromDb($system->db->fetch($result), 1);
+
+                    $player->giveItemById($system->event->item_ids['forbidden_jutsu_scroll_id'], 1);
 
                     $system->message("You exchanged 25 Shadow Essence for a Forbidden Jutsu Scroll!");
                     $player->updateInventory();

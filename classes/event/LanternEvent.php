@@ -94,7 +94,6 @@ class LanternEvent extends Event {
         $this->mission_coords['hard'] = $mission_coords_hard;
         $this->mission_coords['nightmare'] = $mission_coords_nightmare;
 
-
         $this->item_ids['red_lantern_id'] = 119;
         $this->item_ids['blue_lantern_id'] = 120;
         $this->item_ids['violet_lantern_id'] = 121;
