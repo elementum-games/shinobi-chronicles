@@ -18,6 +18,7 @@ export type PlayerDataType = {|
     +gender: PlayerGenderOptions,
     +elements: $ReadOnlyArray<JutsuElement>,
     +has_bloodline: boolean,
+    +bloodlineName: ?string,
     +avatar_size: number,
     +money: number,
     +premiumCredits: number,

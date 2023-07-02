@@ -31,7 +31,9 @@ function Profile({
   }), /*#__PURE__*/React.createElement("div", {
     className: "profile_row_second_col2"
   }, /*#__PURE__*/React.createElement(PlayerBloodline, {
-    bloodlinePageUrl: links.bloodlinePage
+    bloodlinePageUrl: links.bloodlinePage,
+    buyBloodlineUrl: links.buyBloodline,
+    playerData: playerData
   }), /*#__PURE__*/React.createElement(DailyTasks, {
     dailyTasks: playerDailyTasks
   }))), /*#__PURE__*/React.createElement("div", {
@@ -174,19 +176,25 @@ function PlayerStats({
 }
 
 function PlayerBloodline({
-  bloodlinePageUrl
+  playerData,
+  bloodlinePageUrl,
+  buyBloodlineUrl
 }) {
   return /*#__PURE__*/React.createElement("div", {
     className: "bloodline_display"
   }, /*#__PURE__*/React.createElement("div", {
     className: "bloodline_mastery_indicator"
-  }, /*#__PURE__*/React.createElement("img", {
+  }, playerData.has_bloodline ? /*#__PURE__*/React.createElement("img", {
     src: "/images/v2/bloodline/level3.png"
+  }) : /*#__PURE__*/React.createElement("img", {
+    src: "/images/v2/bloodline/inactive.png"
   })), /*#__PURE__*/React.createElement("div", {
     className: "bloodline_name ft-c3"
-  }, "Bloodline:\xA0", /*#__PURE__*/React.createElement("a", {
+  }, "Bloodline:\xA0", playerData.bloodlineName != null ? /*#__PURE__*/React.createElement("a", {
     href: bloodlinePageUrl
-  }, "Ancient's Deception")));
+  }, playerData.bloodlineName.replace(/&#039;/g, "'")) : /*#__PURE__*/React.createElement("a", {
+    href: buyBloodlineUrl
+  }, "None")));
 }
 
 function DailyTasks({

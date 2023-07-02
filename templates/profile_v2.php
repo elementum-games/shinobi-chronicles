@@ -19,8 +19,9 @@
                 links: {
                     clan: "<?= $system->router->getUrl('clan') ?>",
                     team: "<?= $system->router->getUrl('team') ?>",
-                    buyForbiddenSeal: "<?= $system->router->getUrl('premium', ['view' => 'forbidden_seal']) ?>",
                     bloodlinePage: "<?= $system->router->getUrl('bloodline') ?>",
+                    buyBloodline: "<?= $system->router->getUrl('premium', ['view' => 'bloodlines']) ?>",
+                    buyForbiddenSeal: "<?= $system->router->getUrl('premium', ['view' => 'forbidden_seal']) ?>",
                 },
                 playerData: <?= json_encode(
                     UserAPIPresenter::playerDataResponse(player: $player, rank_names: RankManager::fetchNames($system))
