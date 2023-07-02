@@ -2,7 +2,7 @@
 
 # Begin standard auth
 require_once __DIR__ . "/../classes.php";
-require_once __DIR__ . "/../classes/LoggedOutException.php";
+require_once __DIR__ . "/../classes/exception/LoggedOutException.php";
 
 $system = API::init();
 

@@ -11,6 +11,7 @@ require_once __DIR__ . "/StaffManager.php";
 require_once __DIR__ . "/Rank.php";
 require_once __DIR__ . "/Village.php";
 require_once __DIR__ . "/Clan.php";
+require_once __DIR__ . "/achievements/AchievementsManager.php";
 
 /*	Class:		User
 	Purpose:	Fetch user data and load into class variables.
@@ -162,6 +163,7 @@ class User extends Fighter {
     public $equipped_items;
     public array $special_items;
 
+    // Use giveItem() to give an item, don't add it directly to array yourself
     /** @var Item[] */
     public array $items;
     public array $equipped_weapon_ids;
@@ -256,6 +258,12 @@ class User extends Fighter {
 
     public ?int $sensei_id = null;
     public bool $accept_students;
+
+    /** @var PlayerAchievement[]  */
+    public array $achievements = [];
+
+    /** @var AchievementProgress[]  */
+    public array $achievements_in_progress = [];
 
     public array $stats = [
         'ninjutsu_skill',
@@ -464,7 +472,6 @@ class User extends Fighter {
             $this->rank = Rank::fromDb($rank_data);
         }
 
-        $this->gender = $user_data['gender'];
         $this->village = new Village($this->system, $user_data['village']);
         $this->village_rep = $user_data['village_rep'];
         $this->weekly_rep = $user_data['weekly_rep'];
@@ -863,6 +870,9 @@ class User extends Fighter {
         // Sensei
         $this->sensei_id = $user_data['sensei_id'];
         $this->accept_students = $user_data['accept_students'];
+
+        $this->achievements = AchievementsManager::fetchPlayerAchievements($this->system, $this->user_id);
+        $this->achievements_in_progress = AchievementsManager::fetchPlayerAchievementsInProgress($this->system, $this->user_id);
 
         return;
     }
@@ -1379,6 +1389,35 @@ class User extends Fighter {
         return isset($this->items[$item_id]);
     }
 
+    public function giveItem(Item $item, int $quantity = 1): void {
+        if ($this->hasItem($item['item_id'])) {
+            $this->items[$item['item_id']]->quantity += $quantity;
+        } else {
+            $this->items[$item['item_id']] = $item;
+            $this->items[$item['item_id']]->quantity = $quantity;
+        }
+
+        if($item->use_type == Item::USE_TYPE_WEAPON || $item->use_type == Item::USE_TYPE_ARMOR) {
+            $item->quantity = 1;
+        }
+
+        AchievementsManager::handleItemAcquired($this->system, $this, $item);
+    }
+
+    public function giveItemById(int $item_id, int $quantity = 1): void {
+        if ($this->hasItem($item_id)) {
+            $this->giveItem($this->items[$item_id], $quantity);
+        }
+        else {
+            $result = $this->system->db->query(
+                "SELECT * FROM `items` WHERE `item_id` = {$item_id}"
+            );
+            $item = Item::fromDb($this->system->db->fetch($result));
+
+            $this->giveItem($item, $quantity);
+        }
+    }
+
     /* function useJutsu
         pool check, calc exp, etc */
     public function useJutsu(Jutsu $jutsu): ActionResult {
@@ -1542,11 +1581,17 @@ class User extends Fighter {
         $this->weekly_rep += $amount;
     }
 
+    public function checkAchievementCompletion() {
+        AchievementsManager::checkForCompletedAchievements($this->system, $this);
+    }
+
     /* function updateData()
         Updates user data from class members into database
         -Parameters-
     */
     public function updateData() {
+        // Check achievements
+        $this->checkAchievementCompletion();
 
         /** @noinspection SqlWithoutWhere */
         $query = "UPDATE `users` SET
@@ -1729,7 +1774,7 @@ class User extends Fighter {
             }
         }
 
-        if($this->items && !empty($this->items)) {
+        if(!empty($this->items)) {
             foreach($this->items as $item) {
                 $player_items[$item_count] = [
                     'item_id' => $item->id,
@@ -2016,15 +2061,13 @@ class User extends Fighter {
             return false;
         }
 
-        $dateTime = System::dateTimeFromMicrotime(microtime(true));
-
-        $dateTimeFormat = System::DB_DATETIME_MS_FORMAT;
+        $dbDateTime = Database::currentDatetimeForDb();
         $this->system->db->query(
             "INSERT INTO `player_logs`
                 (`user_id`, `user_name`, `log_type`, `log_time`,
                  `log_contents`)
                 VALUES
-                ({$this->user_id}, '{$this->user_name}', '{$log_type}', '{$dateTime->format($dateTimeFormat)}',
+                ({$this->user_id}, '{$this->user_name}', '{$log_type}', '{$dbDateTime}',
                  '{$this->system->db->clean($log_contents)}'
                 )
             "

@@ -78,3 +78,17 @@ export type DailyTaskType = {|
     +progressCaption: string,
     +complete: boolean,
 |};
+
+export type PlayerAchievementsType = {|
+    +completedAchievements: {|
+        +id: string,
+        +achievedAt: number,
+        +rank: "Legendary" | "Elite" | "Greater" | "Common",
+        +name: string,
+        +prompt: string,
+        +rewards: $ReadOnlyArray<{|
+            +type: "MONEY" | "FREEMIUM_CREDITS" | "VILLAGE_REP",
+            +amount: number,
+        |}>,
+    |};
+|};

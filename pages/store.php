@@ -87,8 +87,7 @@ function store() {
                     $shop_items[$item_id]->purchase_cost * $max_missing,
                     "Purchased {$max_missing} of item #{$item_id}"
                 );
-                $player->items[$item_id] = $shop_items[$item_id];
-				$player->items[$item_id]->quantity = $max_consumables;
+                $player->giveItem(item: $shop_items[$item_id], quantity: $max_consumables);
 
 			} else { //code for handling single purchases
                 // Check for money requirement
@@ -106,13 +105,7 @@ function store() {
                 // Add to inventory or increment quantity
                 $player->subtractMoney($shop_items[$item_id]->purchase_cost, "Purchased item #{$item_id}");
 
-                if(($shop_items[$item_id]->use_type == 1 || $shop_items[$item_id]->use_type == 2) || !$player->hasItem($item_id)) {
-                    $player->items[$item_id] = $shop_items[$item_id];
-                    $player->items[$item_id]->quantity = 1;
-                }
-                else if($shop_items[$item_id]->use_type == 3) {
-                    $player->items[$item_id]->quantity++;
-                }
+                $player->giveItem($shop_items[$item_id], 1);
 			}
 			$system->message("Item purchased!");
 		} catch (Exception $e) {

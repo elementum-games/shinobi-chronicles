@@ -1,12 +1,7 @@
 <?php
-/*
-File: 		missions.php
-Coder:		Levi Meahan
-Created:	05/04/2014
-Revised:	05/04/2014 by Levi Meahan
-Purpose:	Functions for missions
-Algorithm:	See master_plan.html
-*/
+
+require_once __DIR__ . "/../classes/achievements/AchievementsManager.php";
+require_once __DIR__ . '/../classes/notification/NotificationManager.php';
 
 /**
  * @throws RuntimeException
@@ -60,11 +55,12 @@ function missions(): bool {
             // TEMP Event Missions
             if (isset($_GET['mission_type'])) {
                 if ($_GET['mission_type'] == "event") {
-                    if (!System::$SC_EVENT_ACTIVE) {
+                    if($system->event == null) {
                         throw new RuntimeException("Event not active!");
                     }
+
                     $result = $system->db->query(
-                        "SELECT `mission_id`, `name` FROM `missions` WHERE `mission_type`=6"
+                        "SELECT `mission_id`, `name` FROM `missions` WHERE `mission_type` = " . Mission::TYPE_EVENT
                     );
                     if ($system->db->last_num_rows == 0) {
                         $system->message("No missions available!");
@@ -79,7 +75,6 @@ function missions(): bool {
                     $player->log(User::LOG_MISSION, "Mission ID #{$mission_id}");
 
                     // Create notification
-                    require_once __DIR__ . '/../classes/notification/NotificationManager.php';
                     if ($player->mission_stage['action_type'] == 'travel') {
                         $mission_location = TravelCoords::fromDbString($player->mission_stage['action_data']);
                         $new_notification = new MissionNotificationDto(
@@ -92,7 +87,6 @@ function missions(): bool {
                         );
                         NotificationManager::createNotification($new_notification, $system, NotificationManager::UPDATE_REPLACE);
                     } else {
-                        require_once __DIR__ . '/../classes/notification/NotificationManager.php';
                         $new_notification = new MissionNotificationDto(
                             type: "mission",
                             message: $event_missions[$mission_id]['name'] . " in progress",
@@ -421,6 +415,8 @@ function runActiveMission(): bool {
                 echo "<a href='$self_link'>Continue</a>
 					</td></tr></table>";
             }
+
+            AchievementsManager::handleMissionCompleted($system, $player, $mission);
             $player->updateData();
         }
         // Display mission details

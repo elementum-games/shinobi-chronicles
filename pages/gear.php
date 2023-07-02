@@ -71,9 +71,9 @@ function gear(): void {
                 throw new RuntimeException("You do not have any more of this item!");
             }
 
-            $player->items[$item_id]->quantity--;
             switch($player->items[$item_id]->effect) {
                 case 'heal':
+                    $player->items[$item_id]->quantity--;
                     $player->health += $player->items[$item_id]->effect_amount;
                     if($player->health > $player->max_health) {
                         $player->health = $player->max_health;
@@ -81,7 +81,6 @@ function gear(): void {
                     $system->message("Restored " . $player->items[$item_id]->effect_amount . " HP.");
                     break;
                 default:
-                    $player->items[$item_id]->quantity++;
                     break;
             }
 

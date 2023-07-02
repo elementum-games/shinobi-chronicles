@@ -6,15 +6,15 @@
  */
 ?>
 
-<script type='text/javascript'>countdownTimer(<?= System::SC_EVENT_END - time() ?>, 'eventEnd');</script>
+<script type='text/javascript'>countdownTimer(<?= $system->event->end_time->getTimestamp() - time() ?>, 'eventEnd');</script>
 
 <table class="table">
-    <tr><th><?=System::SC_EVENT_NAME?></th></tr>
+    <tr><th><?= $system->event->name ?></th></tr>
     <tr>
         <td style="text-align: center;">
-            <?= System::SC_EVENT_NAME ?> is active! <a href="<?=$system->router->getUrl('event')?>">Event Detail</a>
+            <?= $system->event->name ?> is active! <a href="<?=$system->router->getUrl('event')?>">Event Detail</a>
             <div id="eventEnd">
-                <?= $system->time_remaining(System::SC_EVENT_END - time()) ?>
+                <?= $system->time_remaining($system->event->end_time->getTimestamp() - time()) ?>
             </div>
         </td>
     </tr>

@@ -80,6 +80,27 @@ class UserApiPresenter {
         ];
     }
 
+    public static function playerAchievementsResponse(User $player): array {
+
+        return [
+            'completedAchievements' => array_map(function(PlayerAchievement $playerAchievement) {
+                return [
+                    'id' => $playerAchievement->achievement->id,
+                    'achievedAt' => $playerAchievement->achieved_at,
+                    'rank' => $playerAchievement->achievement->getRankLabel(),
+                    'name' => $playerAchievement->achievement->name,
+                    'prompt' => $playerAchievement->achievement->prompt,
+                    'rewards' => array_map(function(AchievementReward $reward) {
+                        return [
+                            'type' => $reward->type,
+                            'amount' => $reward->amount,
+                        ];
+                    }, $playerAchievement->achievement->rewards),
+                ];
+            }, array_values($player->achievements)),
+        ];
+    }
+
     public static function missionDataResponse(UserAPIManager $userManager): array {
         return array_map(
             function(QuickActionMissionDto $mission) {

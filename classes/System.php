@@ -25,22 +25,13 @@ class System {
     const CURRENCY_TYPE_MONEY = 'money';
     const CURRENCY_TYPE_PREMIUM_CREDITS = 'premium_credits';
 
-    const DB_DATETIME_MS_FORMAT = 'Y-m-d H:i:s.u';
 
     const SC_ADMIN_EMAIL = "admin@shinobichronicles.com";
     const SC_NO_REPLY_EMAIL = "no-reply@shinobichronicles.com";
     const UNSERVICEABLE_EMAIL_DOMAINS = ['hotmail.com', 'live.com', 'msn.com', 'outlook.com'];
 
-
-    // TODO: Remove! This is a temporary way to do events
-    const SC_EVENT_START = 0;
-    const SC_EVENT_END = 1641769200;
-    const SC_EVENT_NAME = 'Festival of Shadows';
-
     // Temporary event data storage
-    public array $event_data = [];
-
-    public static bool $SC_EVENT_ACTIVE = true;
+    public ?Event $event;
 
     public static array $villages = ['Stone', 'Cloud', 'Leaf', 'Sand', 'Mist'];
 
@@ -50,10 +41,11 @@ class System {
 
     public array $debug_messages = [];
 
-    // Variable for DB connection resource
+    // Sub-components
     public Database $db;
+    public Router $router;
 
-    public $environment;
+    public string $environment;
 
     public bool $SC_OPEN;
     public bool $register_open;
@@ -177,8 +169,6 @@ class System {
         'stat_cut' => false,
     ];
 
-    public Router $router;
-
     public function __construct() {
         require __DIR__ . "/../secure/vars.php";
         /** @var $host */
@@ -196,106 +186,7 @@ class System {
 
         $this->timezoneOffset = date('Z');
 
-        // TODO: REMOVE TEMPORARY EVENT STUFF
-        if(time() > self::SC_EVENT_END) {
-            self::$SC_EVENT_ACTIVE = false;
-        }
-        // Manually set event locations, pulled from TravelManager and Missions to identify event missions
-        $currentMinutes = intval(date('i'));
-        $event_missions_gold = [];
-        $event_missions_special = [];
-        $event_missions_easy = [];
-        $event_missions_medium = [];
-        $event_missions_hard = [];
-        $event_missions_nightmare = [];
-        switch (true) {
-            case ($currentMinutes < 3): // 3 minutes per hour
-                $event_missions_nightmare[] = ['x' => 10, 'y' => 1];
-                $event_missions_special[] = ['x' => 13, 'y' => 1];
-                $event_missions_special[] = ['x' => 12, 'y' => 3];
-                $event_missions_special[] = ['x' => 8, 'y' => 3];
-                $event_missions_special[] = ['x' => 7, 'y' => 1];
-                break;
-            case ($currentMinutes % 3 == 0):
-                $event_missions_easy[] = ['x' => 5, 'y' => 4];
-                $event_missions_easy[] = ['x' => 2, 'y' => 11];
-                $event_missions_easy[] = ['x' => 17, 'y' => 10];
-                $event_missions_easy[] = ['x' => 23, 'y' => 2];
-                $event_missions_easy[] = ['x' => 22, 'y' => 16];
-                $event_missions_easy[] = ['x' => 26, 'y' => 14];
-                $event_missions_easy[] = ['x' => 27, 'y' => 4];
-                $event_missions_easy[] = ['x' => 13, 'y' => 8];
-                $event_missions_easy[] = ['x' => 6, 'y' => 7];
-                $event_missions_easy[] = ['x' => 5, 'y' => 14];
-                $event_missions_hard[] = ['x' => 15, 'y' => 3];
-                $event_missions_hard[] = ['x' => 24, 'y' => 9];
-                $event_missions_hard[] = ['x' => 14, 'y' => 14];
-                $event_missions_hard[] = ['x' => 8, 'y' => 10];
-                break;
-            case ($currentMinutes % 3 == 1):
-                $event_missions_easy[] = ['x' => 5, 'y' => 4];
-                $event_missions_easy[] = ['x' => 2, 'y' => 11];
-                $event_missions_easy[] = ['x' => 17, 'y' => 10];
-                $event_missions_easy[] = ['x' => 23, 'y' => 2];
-                $event_missions_easy[] = ['x' => 22, 'y' => 16];
-                $event_missions_easy[] = ['x' => 26, 'y' => 14];
-                $event_missions_easy[] = ['x' => 27, 'y' => 4];
-                $event_missions_easy[] = ['x' => 13, 'y' => 8];
-                $event_missions_easy[] = ['x' => 6, 'y' => 7];
-                $event_missions_easy[] = ['x' => 5, 'y' => 14];
-                $event_missions_medium[] = ['x' => 9, 'y' => 5];
-                $event_missions_medium[] = ['x' => 3, 'y' => 14];
-                $event_missions_medium[] = ['x' => 15, 'y' => 11];
-                $event_missions_medium[] = ['x' => 24, 'y' => 5];
-                $event_missions_medium[] = ['x' => 24, 'y' => 17];
-                break;
-            default:
-                $event_missions_easy[] = ['x' => 7, 'y' => 3];
-                $event_missions_easy[] = ['x' => 5, 'y' => 7];
-                $event_missions_easy[] = ['x' => 2, 'y' => 13];
-                $event_missions_easy[] = ['x' => 4, 'y' => 14];
-                $event_missions_easy[] = ['x' => 13, 'y' => 10];
-                $event_missions_easy[] = ['x' => 17, 'y' => 7];
-                $event_missions_easy[] = ['x' => 25, 'y' => 1];
-                $event_missions_easy[] = ['x' => 26, 'y' => 5];
-                $event_missions_easy[] = ['x' => 26, 'y' => 16];
-                $event_missions_easy[] = ['x' => 22, 'y' => 14];
-                break;
-        }
-        $currentDate = explode('-', date('d-H-i-s'));
-        $day = $currentDate[0];
-        $hour = $currentDate[1];
-        $minute = $currentDate[2];
-        $seed = $day + $hour + $minute;
-        mt_srand($seed);
-        if (mt_rand(0, 9) == 0) {
-            $event_missions_gold[] = ['x' => mt_rand(1, 28), 'y' => mt_rand(1, 18)];
-        }
-        // clear seed
-        mt_srand();
-        $this->event_data['gold'] = $event_missions_gold;
-        $this->event_data['special'] = $event_missions_special;
-        $this->event_data['easy'] = $event_missions_easy;
-        $this->event_data['medium'] = $event_missions_medium;
-        $this->event_data['hard'] = $event_missions_hard;
-        $this->event_data['nightmare'] = $event_missions_nightmare;
-        $this->event_data['red_lantern_id'] = 19;
-        $this->event_data['blue_lantern_id'] = 20;
-        $this->event_data['violet_lantern_id'] = 21;
-        $this->event_data['gold_lantern_id'] = 29;
-        $this->event_data['shadow_essence_id'] = 23;
-        $this->event_data['sacred_lantern_red_id'] = 24;
-        $this->event_data['sacred_lantern_blue_id'] = 25;
-        $this->event_data['sacred_lantern_violet_id'] = 26;
-        $this->event_data['sacred_lantern_gold_id'] = 30;
-        $this->event_data['forbidden_jutsu_scroll_id'] = 27;
-        $this->event_data['gold_mission_id'] = 20;
-        $this->event_data['special_mission_id'] = 19;
-        $this->event_data['easy_mission_id'] = 12;
-        $this->event_data['medium_mission_id'] = 13;
-        $this->event_data['hard_mission_id'] = 11;
-        $this->event_data['nightmare_mission_id'] = 14;
-        $this->event_data['yen_per_lantern'] = 25;
+        $this->checkForActiveEvent();
     }
 
     /**
@@ -785,6 +676,13 @@ class System {
         return (int) date('G', time());
     }
 
+    /**
+     * @return int minute of the hour, 0-59
+     */
+    public static function currentMinute(): int {
+        return (int)date('i');
+    }
+
     public static function getKunaiPacks(): array {
         $kunai_packs = [
             [
@@ -831,5 +729,16 @@ class System {
 
     public function isDevEnvironment(): bool {
         return $this->environment == System::ENVIRONMENT_DEV;
+    }
+
+    public function checkForActiveEvent(): void {
+        $current_datetime = new DateTimeImmutable();
+
+        // July 2023 Lantern Event
+        $july_2023_lantern_event_start_time = new DateTimeImmutable('2023-07-01');
+        $july_2023_lantern_event_end_time = new DateTimeImmutable('2023-07-16');
+        if($current_datetime > $july_2023_lantern_event_start_time && $current_datetime < $july_2023_lantern_event_end_time) {
+            $this->event = new LanternEvent($july_2023_lantern_event_end_time);
+        }
     }
 }

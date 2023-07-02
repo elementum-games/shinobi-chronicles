@@ -1,6 +1,6 @@
 <?php
 
-require_once __DIR__ . '/APIResponse.php';
+require_once __DIR__ . '/../APIResponse.php';
 
 class InboxAPIResponse extends APIResponse {
     public array $response_data;

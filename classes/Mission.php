@@ -311,71 +311,76 @@ class Mission {
         // TEMP Event Logic
         global $system;
         if ($mission->mission_type == Mission::TYPE_EVENT) {
-            if ($mission->mission_id == $system->event_data['gold_mission_id']) {
-                $valid = false;
-                foreach ($system->event_data['gold'] as $location) {
-                    if ($player->location->x == $location['x'] && $player->location->y == $location['y']) {
-                        $valid = true;
+            if($system->event instanceof LanternEvent) {
+                if ($mission->mission_id == $system->event->mission_ids['gold_mission_id']) {
+                    $valid = false;
+                    foreach ($system->event->mission_coords['gold'] as $location) {
+                        if ($player->location->x == $location['x'] && $player->location->y == $location['y']) {
+                            $valid = true;
+                        }
+                    }
+                    if ($valid == false) {
+                        throw new RuntimeException("Invalid event location!");
                     }
                 }
-                if ($valid == false) {
-                    throw new RuntimeException("Invalid event location!");
+                if ($mission->mission_id == $system->event->mission_ids['special_mission_id']) {
+                    $valid = false;
+                    foreach ($system->event->mission_coords['special'] as $location) {
+                        if ($player->location->x == $location['x'] && $player->location->y == $location['y']) {
+                            $valid = true;
+                        }
+                    }
+                    if ($valid == false) {
+                        throw new RuntimeException("Invalid event location!");
+                    }
+                }
+                if ($mission->mission_id == $system->event->mission_ids['easy_mission_id']) {
+                    $valid = false;
+                    foreach ($system->event->mission_coords['easy'] as $location) {
+                        if ($player->location->x == $location['x'] && $player->location->y == $location['y']) {
+                            $valid = true;
+                        }
+                    }
+                    if ($valid == false) {
+                        throw new RuntimeException("Invalid event location!");
+                    }
+                }
+                if ($mission->mission_id == $system->event->mission_ids['medium_mission_id']) {
+                    $valid = false;
+                    foreach ($system->event->mission_coords['medium'] as $location) {
+                        if ($player->location->x == $location['x'] && $player->location->y == $location['y']) {
+                            $valid = true;
+                        }
+                    }
+                    if ($valid == false) {
+                        throw new RuntimeException("Invalid event location!");
+                    }
+                }
+                if ($mission->mission_id == $system->event->mission_ids['hard_mission_id']) {
+                    $valid = false;
+                    foreach ($system->event->mission_coords['hard'] as $location) {
+                        if ($player->location->x == $location['x'] && $player->location->y == $location['y']) {
+                            $valid = true;
+                        }
+                    }
+                    if ($valid == false) {
+                        throw new RuntimeException("Invalid event location!");
+                    }
+                }
+                if ($mission->mission_id == $system->event->mission_ids['nightmare_mission_id']) {
+                    $valid = false;
+                    foreach ($system->event->mission_coords['nightmare'] as $location) {
+                        if ($player->location->x == $location['x'] && $player->location->y == $location['y']) {
+                            $valid = true;
+                        }
+                    }
+                    if ($valid == false) {
+                        throw new RuntimeException("Invalid event location!");
+                    }
                 }
             }
-            if ($mission->mission_id == $system->event_data['special_mission_id']) {
-                $valid = false;
-                foreach ($system->event_data['special'] as $location) {
-                    if ($player->location->x == $location['x'] && $player->location->y == $location['y']) {
-                        $valid = true;
-                    }
-                }
-                if ($valid == false) {
-                    throw new RuntimeException("Invalid event location!");
-                }
-            }
-            if ($mission->mission_id == $system->event_data['easy_mission_id']) {
-                $valid = false;
-                foreach ($system->event_data['easy'] as $location) {
-                    if ($player->location->x == $location['x'] && $player->location->y == $location['y']) {
-                        $valid = true;
-                    }
-                }
-                if ($valid == false) {
-                    throw new RuntimeException("Invalid event location!");
-                }
-            }
-            if ($mission->mission_id == $system->event_data['medium_mission_id']) {
-                $valid = false;
-                foreach ($system->event_data['medium'] as $location) {
-                    if ($player->location->x == $location['x'] && $player->location->y == $location['y']) {
-                        $valid = true;
-                    }
-                }
-                if ($valid == false) {
-                    throw new RuntimeException("Invalid event location!");
-                }
-            }
-            if ($mission->mission_id == $system->event_data['hard_mission_id']) {
-                $valid = false;
-                foreach ($system->event_data['hard'] as $location) {
-                    if ($player->location->x == $location['x'] && $player->location->y == $location['y']) {
-                        $valid = true;
-                    }
-                }
-                if ($valid == false) {
-                    throw new RuntimeException("Invalid event location!");
-                }
-            }
-            if ($mission->mission_id == $system->event_data['nightmare_mission_id']) {
-                $valid = false;
-                foreach ($system->event_data['nightmare'] as $location) {
-                    if ($player->location->x == $location['x'] && $player->location->y == $location['y']) {
-                        $valid = true;
-                    }
-                }
-                if ($valid == false) {
-                    throw new RuntimeException("Invalid event location!");
-                }
+            else {
+                throw new RuntimeException("Invalid event type!");
             }
         }
 
@@ -414,20 +419,21 @@ class Mission {
                 while ($row = $system->db->fetch($result)) {
                     $reward_items[$row['item_id']] = Item::fromDb($row);
                 }
+
                 // roll RNG, add to inventory
                 foreach ($mission->rewards as $item) {
                     if (mt_rand(0, 100) <= $item['chance']) {
-                        if ($player->hasItem($item['item_id'])) {
-                            $player->items[$item['item_id']]->quantity += $item['quantity'];
-                        } else {
-                            $player->items[$item['item_id']] = $reward_items[$item['item_id']];
-                            $player->items[$item['item_id']]->quantity = $item['quantity'];
-                        }
+                        $player->giveItem(
+                            $reward_items[$item['item_id']],
+                            $item['quantity']
+                        );
                         $reward_text .= "Gained " . $reward_items[$item['item_id']]->name . " x" . $item['quantity'] . " " . $item['chance'] . "%<br>";
                     }
                 }
+
                 // save inventory
                 $player->updateInventory();
+
                 // add message
                 return $reward_text;
             } catch (RuntimeException $e) {

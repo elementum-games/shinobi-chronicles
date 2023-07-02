@@ -1,7 +1,13 @@
 // @flow
 
 import { CharacterAvatar } from "../CharacterAvatar.js";
-import type { DailyTaskType, PlayerDataType, PlayerSettingsType, PlayerStatsType } from "../_schema/userSchema.js";
+import type {
+    DailyTaskType,
+    PlayerDataType,
+    PlayerSettingsType,
+    PlayerStatsType,
+    PlayerAchievementsType
+} from "../_schema/userSchema.js";
 
 type Props = {|
     +links: {|
@@ -14,6 +20,7 @@ type Props = {|
     +playerStats: PlayerStatsType,
     +playerSettings: PlayerSettingsType,
     +playerDailyTasks: $ReadOnlyArray<DailyTaskType>,
+    +playerAchievements: PlayerAchievementsType,
 |};
 function Profile({
     links,
@@ -21,6 +28,7 @@ function Profile({
     playerStats,
     playerSettings,
     playerDailyTasks,
+    playerAchievements,
 }: Props) {
     return (
         <div className="profile_container">
@@ -55,6 +63,12 @@ function Profile({
                         dailyTasks={playerDailyTasks}
                     />
                 </div>
+            </div>
+            <div className="profile_row_third">
+                <h3>Achievements</h3>
+                <PlayerAchievements
+                    playerAchievements={playerAchievements}
+                />
             </div>
         </div>
     );
@@ -243,6 +257,22 @@ function DailyTasks({ dailyTasks }: DailyTasksProps) {
             )))}
         </div>
     )
+}
+
+type PlayerAchievementsProps = {|
+    +playerAchievements: PlayerAchievementsType,
+|};
+function PlayerAchievements({ playerAchievements }: PlayerAchievementsProps) {
+    return (
+        <div className="achievements_container">
+            {playerAchievements.completedAchievements.map(achievement => (
+                <div key={`achievement:${achievement.id}`} className="achievement">
+                    Name: {achievement.name}<br />
+                    Prompt: {achievement.prompt}
+                </div>
+            ))}
+        </div>
+    );
 }
 
 window.Profile = Profile;

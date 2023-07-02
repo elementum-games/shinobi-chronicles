@@ -1,6 +1,6 @@
 <?php
 
-require_once __DIR__ . '/Inbox.php';
+require_once __DIR__ . '/inbox/Inbox.php';
 
 class SupportManager {
     public int $user_id;

@@ -331,11 +331,12 @@ class NotificationAPIManager {
             }
         }
         //Event
-        if (System::$SC_EVENT_ACTIVE) {
+        if ($this->system->event != null) {
             $notifications[] = new NotificationDto(
                 action_url: $this->system->router->getUrl('event'),
                 type: "event",
-                message: System::SC_EVENT_NAME . " is active! " . $this->system->time_remaining(System::SC_EVENT_END - time()),
+                message: $this->system->event->name . " is active! " .
+                    $this->system->time_remaining($this->system->event->end_time->getTimestamp() - time()),
                 user_id: $this->player->user_id,
                 created: time(),
                 alert: false,
