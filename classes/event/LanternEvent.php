@@ -24,7 +24,7 @@ class LanternEvent extends Event {
         $mission_coords_nightmare = [];
         
         switch (true) {
-            case ($currentMinutes < 3): // 3 minutes per hour
+            case ($currentMinutes < 300): // 3 minutes per hour
                 $mission_coords_nightmare[] = ['x' => 10, 'y' => 1];
                 $mission_coords_special[] = ['x' => 13, 'y' => 1];
                 $mission_coords_special[] = ['x' => 12, 'y' => 3];
@@ -94,23 +94,23 @@ class LanternEvent extends Event {
         $this->mission_coords['hard'] = $mission_coords_hard;
         $this->mission_coords['nightmare'] = $mission_coords_nightmare;
 
-        $this->item_ids['red_lantern_id'] = 19;
-        $this->item_ids['blue_lantern_id'] = 20;
-        $this->item_ids['violet_lantern_id'] = 21;
-        $this->item_ids['gold_lantern_id'] = 29;
-        $this->item_ids['shadow_essence_id'] = 23;
-        $this->item_ids['sacred_lantern_red_id'] = 24;
-        $this->item_ids['sacred_lantern_blue_id'] = 25;
-        $this->item_ids['sacred_lantern_violet_id'] = 26;
-        $this->item_ids['sacred_lantern_gold_id'] = 30;
-        $this->item_ids['forbidden_jutsu_scroll_id'] = 27;
+        $this->item_ids['red_lantern_id'] = 119;
+        $this->item_ids['blue_lantern_id'] = 120;
+        $this->item_ids['violet_lantern_id'] = 121;
+        $this->item_ids['gold_lantern_id'] = 129;
+        $this->item_ids['shadow_essence_id'] = 123;
+        $this->item_ids['sacred_lantern_red_id'] = 124;
+        $this->item_ids['sacred_lantern_blue_id'] = 125;
+        $this->item_ids['sacred_lantern_violet_id'] = 126;
+        $this->item_ids['sacred_lantern_gold_id'] = 130;
+        $this->item_ids['forbidden_jutsu_scroll_id'] = 127;
 
-        $this->mission_ids['gold_mission_id'] = 20;
-        $this->mission_ids['special_mission_id'] = 19;
-        $this->mission_ids['easy_mission_id'] = 12;
-        $this->mission_ids['medium_mission_id'] = 13;
-        $this->mission_ids['hard_mission_id'] = 11;
-        $this->mission_ids['nightmare_mission_id'] = 14;
+        $this->mission_ids['gold_mission_id'] = 120;
+        $this->mission_ids['special_mission_id'] = 119;
+        $this->mission_ids['easy_mission_id'] = 112;
+        $this->mission_ids['medium_mission_id'] = 113;
+        $this->mission_ids['hard_mission_id'] = 111;
+        $this->mission_ids['nightmare_mission_id'] = 114;
 
         $this->config['yen_per_lantern'] = 25;
     }
