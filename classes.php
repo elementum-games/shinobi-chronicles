@@ -14,7 +14,7 @@ require_once __DIR__ . "/classes/RankManager.php";
 require_once __DIR__ . "/classes/ReportManager.php";
 require_once __DIR__ . "/classes/Router.php";
 require_once __DIR__ . "/classes/SenseiManager.php";
-require_once __DIR__ . "/classes/SpecialMissions.php";
+require_once __DIR__ . "/classes/SpecialMission.php";
 require_once __DIR__ . "/classes/SupportManager.php";
 require_once __DIR__ . "/classes/System.php";
 require_once __DIR__ . "/classes/User.php";

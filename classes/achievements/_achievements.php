@@ -206,7 +206,7 @@ $LANTERN_EVENT_ACHIEVEMENTS = [
         id: LANTERN_EVENT_COMPLETE_ALL_MISSIONS,
         rank: Achievement::RANK_GREATER,
         name: 'Way of the Lantern',
-        prompt: 'Complete all the lantern event missions',
+        prompt: 'Complete all the Festival of Shadows missions',
         rewards: [
             new AchievementReward(AchievementReward::TYPE_MONEY, 10_000)
         ],
@@ -238,7 +238,7 @@ $LANTERN_EVENT_ACHIEVEMENTS = [
         id: LANTERN_EVENT_OBTAIN_ALL_ITEMS,
         rank: Achievement::RANK_GREATER,
         name: 'Lantern Collector',
-        prompt: 'Collect all items from the lantern event',
+        prompt: 'Collect all items from the Festival of Shadows event.',
         rewards: [
             new AchievementReward(AchievementReward::TYPE_MONEY, 10_000)
         ],
