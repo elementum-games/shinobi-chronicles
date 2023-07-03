@@ -2,6 +2,24 @@
 
 class UserApiPresenter {
     public static function playerDataResponse(User $player, array $rank_names): array {
+        $forbidden_seal_time_left = null;
+        if($player->forbidden_seal->level > 0) {
+            $seconds_left = $player->forbidden_seal->seal_end_time - time();
+            $days = floor($seconds_left / 86400);
+            $hours = floor($seconds_left / 3600);
+            $minutes = ceil($seconds_left / 60);
+
+            if($days > 0) {
+                $forbidden_seal_time_left = "$days day" . ($days > 1 ? "s" : "");
+            }
+            else if($hours > 0) {
+                $forbidden_seal_time_left = "$hours hour" . ($hours > 1 ? "s" : "");
+            }
+            else {
+                $forbidden_seal_time_left = "$minutes hour" . ($minutes > 1 ? "s" : "");
+            }
+        }
+
         return [
             'avatar_link' => $player->avatar_link,
             'user_name' => $player->user_name,
@@ -15,18 +33,22 @@ class UserApiPresenter {
             'gender' => $player->gender,
             'elements' => $player->elements,
             'has_bloodline' => isset($player->bloodline),
+            'bloodlineName' => $player->bloodline?->name,
             'avatar_size' => $player->getAvatarSize(),
             'money' => $player->getMoney(),
             'premiumCredits' => $player->getPremiumCredits(),
+            'premiumCreditsPurchased' => $player->premium_credits_purchased,
             'villageName' => $player->village->name,
+            'villageRepTier' => $player->village->getRepName($player->village_rep),
+            'villageRep' => $player->village_rep,
+            'weeklyRep' => $player->weekly_rep,
+            'maxWeeklyRep' => $player->weekly_rep_cap,
             'clanId' => $player->clan?->id,
             'clanName' => $player->clan?->name,
             'teamId' => $player->team?->id,
             'teamName' => $player->team?->name,
             'forbiddenSealName' => $player->forbidden_seal->name,
-            'forbiddenSealTimeLeft' => $player->forbidden_seal->level > 0
-                ? $player->system->time_remaining($player->forbidden_seal->seal_end_time - time())
-                : null,
+            'forbiddenSealTimeLeft' => $forbidden_seal_time_left,
         ];
     }
 
@@ -63,6 +85,29 @@ class UserApiPresenter {
         ];
     }
 
+    public static function playerAchievementsResponse(User $player): array {
+
+        return [
+            'completedAchievements' => array_map(function(PlayerAchievement $playerAchievement) {
+                return [
+                    'id' => $playerAchievement->achievement->id,
+                    'achievedAt' => $playerAchievement->achieved_at,
+                    'rank' => $playerAchievement->achievement->getRankLabel(),
+                    'name' => $playerAchievement->achievement->name,
+                    'prompt' => $playerAchievement->achievement->prompt,
+                    'rewards' => array_map(function(AchievementReward $reward) {
+                        return [
+                            'type' => $reward->type,
+                            'amount' => $reward->amount,
+                        ];
+                    }, $playerAchievement->achievement->rewards),
+                    'progressLabel' => '1/1',
+                    'progressPercent' => 100,
+                ];
+            }, array_values($player->achievements)),
+        ];
+    }
+
     public static function missionDataResponse(UserAPIManager $userManager): array {
         return array_map(
             function(QuickActionMissionDto $mission) {
@@ -85,5 +130,24 @@ class UserApiPresenter {
             },
             $userManager->getAI()
         );
+    }
+
+    /**
+     * @param DailyTask[] $dailyTasks
+     * @return array[]
+     */
+    public static function dailyTasksResponse(array $dailyTasks): array {
+        return array_map(function(DailyTask $daily_task) {
+            return [
+                'name' => $daily_task->name,
+                'prompt' => $daily_task->getPrompt(),
+                'difficulty' => $daily_task->difficulty,
+                'rewardYen' => $daily_task->reward,
+                'rewardRep' => $daily_task->rep_reward,
+                'progressPercent' => $daily_task->getProgressPercent(),
+                'progressCaption' => $daily_task->progress . "/" . $daily_task->amount,
+                'complete' => $daily_task->complete,
+            ];
+        }, $dailyTasks);
     }
 }

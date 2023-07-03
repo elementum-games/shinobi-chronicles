@@ -26,7 +26,7 @@ class SpecialMission {
      *  - healing shop cost is rank * 5 / rank * 20 / rank * 40
      *  - arena battles are approximately rank * 20-45 / 25-60 / 50-80 / 60-80
      *  - arena battles takes ~20 seconds
-     *  - each fight in a mission takes ~25 seconds
+     *  - each fight in a mission takes ~13 seconds
     */
     public static array $difficulties = [
         SpecialMission::DIFFICULTY_EASY => [
@@ -34,28 +34,33 @@ class SpecialMission {
             'yen_per_mission' => 70,
             'stats_per_mission' => 2,
             'hp_lost_percent' => 2, // 20% => 60% lost
-            'intel_gain' => 10, // est. 10 fights (rank * 150 yen)
+            'intel_gain' => 10, // est. 10 fights (rank * 150 yen) [130 seconds]
+            'rep_gain' => Village::SPECIAL_MISSION_REP_GAINS[SpecialMission::DIFFICULTY_EASY],
         ],
+        // Measured average 144 seconds (11.3 fights)
         SpecialMission::DIFFICULTY_NORMAL => [
             'yen_per_battle' => 10, // 10 * 11 = 110
             'yen_per_mission' => 110,
             'stats_per_mission' => 4,
             'hp_lost_percent' => 2.5, // 27.5% => 82.5% lost
-            'intel_gain' => 9 // 11 fights (rank * 210 yen) (old: 63)
+            'intel_gain' => 9, // 11.1 fights (rank * 210 yen) (old: 63) [144 seconds]
+            'rep_gain' => Village::SPECIAL_MISSION_REP_GAINS[SpecialMission::DIFFICULTY_NORMAL],
         ],
         SpecialMission::DIFFICULTY_HARD => [
             'yen_per_battle' => 12, // 12 * 12.5 = 150
             'yen_per_mission' => 150,
             'stats_per_mission' => 6,
             'hp_lost_percent' => 3.5, // 44% => 132% lost
-            'intel_gain' => 8 // 12.5 fights (rank * 270 yen)
+            'intel_gain' => 8, // 12.5 fights (rank * 270 yen) [162 seconds]
+            'rep_gain' => Village::SPECIAL_MISSION_REP_GAINS[SpecialMission::DIFFICULTY_HARD],
         ],
         SpecialMission::DIFFICULTY_NIGHTMARE => [
             'yen_per_battle' => 14, // 20 * 14.28 = 285
             'yen_per_mission' => 200,
             'stats_per_mission' => 8,
             'hp_lost_percent' => 4.5, // 71.4% => 214.2% lost
-            'intel_gain' => 7 // 14.28 fights (rank * 340 yen)
+            'intel_gain' => 7, // 14.28 fights (rank * 340 yen) [185 seconds]
+            'rep_gain' => Village::SPECIAL_MISSION_REP_GAINS[SpecialMission::DIFFICULTY_NIGHTMARE],
         ]
     ];
 
@@ -186,7 +191,6 @@ class SpecialMission {
     public int $player_max_health;
     public int $reward;
 
-    //
     public function __construct(System $system, User $player, $mission_id) {
         $this->system = $system;
         $this->player = $player;
@@ -398,6 +402,17 @@ class SpecialMission {
         $this->player->special_mission = 0;
 
         $reward_text = self::$event_names[self::EVENT_COMPLETE_REWARD]['text'] . $yen_gain . '!';
+
+        //Reputation Reward
+        $rep_gain = self::$difficulties[$this->difficulty]['rep_gain'];
+        if($this->player->mission_rep_cd - time() <= 0) {
+            $rep_gain = $this->player->calMaxRepGain($rep_gain);
+            if($rep_gain > 0) {
+                $this->player->addRep($rep_gain);
+                $this->player->mission_rep_cd = time() + Village::ARENA_MISSION_CD;
+                $reward_text .= ' You have gained ' . $rep_gain . " village reputation!";
+            }
+        }
 
         $stat_to_gain = $this->player->getTrainingStatForArena();
         $stat_gain = self::$difficulties[$this->difficulty]['stats_per_mission']

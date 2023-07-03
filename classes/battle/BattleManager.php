@@ -350,7 +350,12 @@ class BattleManager {
     }
 
     public function isComplete(): bool {
-        return $this->battle->isComplete();
+        $complete = $this->battle->isComplete();
+        // TEMP FIX
+        if ($complete) {
+            $_SESSION['ai_logic']['special_move_used'] = false;
+        }
+        return $complete;
     }
 
     public function playerActionSubmitted(): bool {
@@ -685,7 +690,7 @@ class BattleManager {
         if(empty($attack->jutsu->effect_only)) {
             $attack_damage = $target->calcDamageTaken($attack->raw_damage, $attack->jutsu->jutsu_type);
             $attack_damage_raw = $target->calcDamageTaken($attack->raw_damage, $attack->jutsu->jutsu_type, apply_resists : false);
-            $damage_resisted = $attack_damage_raw - $attack_damage;
+            $damage_resisted = round($attack_damage_raw - $attack_damage, 2);
 
             $target->health -= $attack_damage;
             if($target->health < 0) {
@@ -729,7 +734,7 @@ class BattleManager {
 
         $text = $attack->jutsu->battle_text;
         $attack_jutsu_color = BattleManager::getJutsuTextColor($attack->jutsu->jutsu_type);
-        $has_element = ($attack->jutsu->element != Jutsu::ELEMENT_NONE);
+        $has_element = ($attack->jutsu->element != Jutsu::ELEMENT_NONE && $attack->jutsu->element != "none");
         $element_text = ' with ' . $attack->jutsu->element;
 
         if(empty($attack->jutsu->effect_only)) {

@@ -24,7 +24,7 @@ function arena(): bool {
         $ai_rank = min($player->rank_num, System::SC_MAX_RANK);
         $result = $system->db->query(
             "SELECT `ai_id`, `name`, `level` FROM `ai_opponents`
-                WHERE `rank` = {$ai_rank} ORDER BY `level` ASC"
+                WHERE `rank` = {$ai_rank} AND `money` > 0 ORDER BY `level` ASC"
         );
 		if($system->db->last_num_rows == 0) {
 			$system->message("No NPC opponents found!");
@@ -79,8 +79,14 @@ function arena(): bool {
         $system->printMessage();
         echo "<table class='table'><tr><th>Choose Opponent</th></tr>
         <tr><td style='text-align: center;'>
-        Welcome to the Arena. Here you can fight against various opponents for cash prizes. Please select your opponent below:
-        </td></tr>
+        Welcome to the Arena. Here you can fight against various opponents for cash prizes. Please select your opponent below:";
+	if($player->mission_rep_cd - time() > 0) {
+	$remaining = $player->mission_rep_cd - time();
+	echo "<br /><br />You can gain village reputation in: <div id='rep_cd' style='display: inline-block'>"
+	    . System::timeRemaining($remaining) . "</div>
+		<script type='text/javascript'>countdownTimer($remaining, 'rep_cd', false);</script>";
+    	}
+        echo "</td></tr>
         <tr><td style='text-align: center;'>";
         foreach($ai_opponents as $ai) {
             echo "<a href='$self_link&fight={$ai['ai_id']}'>
@@ -196,7 +202,7 @@ function processArenaBattleEnd(BattleManager|BattleManagerV2 $battle, User $play
         // Village Rep Gains
         $rep_gain = 0;
         if($player->mission_rep_cd - time() <= 0) {
-            $rep_gain = $player->calMaxRepGain($player->village->awardArenaReputation($player->level, $opponent->level));
+            $rep_gain = $player->calMaxRepGain($player->village->calcArenaReputation($player->level, $opponent->level));
         }
         $rep_gain_string = ($rep_gain > 0)
             ? "Fellow " . $player->village->name . " Shinobi learned from your battle, earning you $rep_gain Reputation.<br />"

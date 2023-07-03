@@ -177,7 +177,7 @@ export function TopbarNotification({
     className: "topbar_notification_important"
   }, "!"))), notification.type === "report" && /*#__PURE__*/React.createElement("a", {
     href: notification.action_url,
-    className: notification.duration > 0 ? "topbar_notification_wrapper has_duration" : "topbar_notification_wrapper",
+    className: notification.duration > 0 ? "topbar_notification_wrapper_report has_duration" : "topbar_notification_wrapper_report",
     "data-content": notification.message,
     "data-time": timeRemainingDisplay
   }, /*#__PURE__*/React.createElement("svg", {
@@ -189,12 +189,12 @@ export function TopbarNotification({
     points: "6,50 50,94 94,50 50,6",
     strokeWidth: "8px",
     stroke: "#5d5c4b",
-    fill: "#B09A65"
+    fill: "#ae5576"
   }), /*#__PURE__*/React.createElement("polygon", {
     points: "6,50 50,94 94,50 50,6",
     strokeWidth: "2px",
     stroke: "#000000",
-    fill: "#B09A65"
+    fill: "#ae5576"
   }), /*#__PURE__*/React.createElement("text", {
     x: "40%",
     y: "70%",

@@ -11,6 +11,7 @@ require_once __DIR__ . "/StaffManager.php";
 require_once __DIR__ . "/Rank.php";
 require_once __DIR__ . "/Village.php";
 require_once __DIR__ . "/Clan.php";
+require_once __DIR__ . "/achievements/AchievementsManager.php";
 
 /*	Class:		User
 	Purpose:	Fetch user data and load into class variables.
@@ -109,7 +110,9 @@ class User extends Fighter {
 
     public Village $village;
     public int $village_rep;
+    public int $rep_rank;
     public int $weekly_rep;
+    public int $weekly_rep_cap;
     public int $mission_rep_cd;
 
     public int $rank_num;
@@ -162,6 +165,7 @@ class User extends Fighter {
     public $equipped_items;
     public array $special_items;
 
+    // Use giveItem() to give an item, don't add it directly to array yourself
     /** @var Item[] */
     public array $items;
     public array $equipped_weapon_ids;
@@ -256,6 +260,12 @@ class User extends Fighter {
 
     public ?int $sensei_id = null;
     public bool $accept_students;
+
+    /** @var PlayerAchievement[]  */
+    public array $achievements = [];
+
+    /** @var AchievementProgress[]  */
+    public array $achievements_in_progress = [];
 
     public array $stats = [
         'ninjutsu_skill',
@@ -464,10 +474,11 @@ class User extends Fighter {
             $this->rank = Rank::fromDb($rank_data);
         }
 
-        $this->gender = $user_data['gender'];
         $this->village = new Village($this->system, $user_data['village']);
         $this->village_rep = $user_data['village_rep'];
+        $this->rep_rank = $this->village->getRepRank($this->village_rep);
         $this->weekly_rep = $user_data['weekly_rep'];
+        $this->weekly_rep_cap = Village::$VillageRep[$this->rep_rank]['weekly_cap'];
         $this->mission_rep_cd = $user_data['mission_rep_cd'];
 
         $this->gender = $user_data['gender'];
@@ -663,7 +674,7 @@ class User extends Fighter {
                     $this->addMoney($task->reward, "Completed daily task");
                     $task_message = "You have completed {$task->name} and earned &yen;{$task->reward}";
 
-                    $rep_gain = $this->calMaxRepGain(Village::DAILY_TASK[$task->difficulty]);
+                    $rep_gain = $this->calMaxRepGain($task->rep_reward, true);
                     if($rep_gain > 0) {
                         $this->addRep($rep_gain);
                         $task_message .= " and $rep_gain Reputation";
@@ -863,6 +874,9 @@ class User extends Fighter {
         // Sensei
         $this->sensei_id = $user_data['sensei_id'];
         $this->accept_students = $user_data['accept_students'];
+
+        $this->achievements = AchievementsManager::fetchPlayerAchievements($this->system, $this->user_id);
+        $this->achievements_in_progress = AchievementsManager::fetchPlayerAchievementsInProgress($this->system, $this->user_id);
 
         return;
     }
@@ -1148,8 +1162,60 @@ class User extends Fighter {
         if($this->train_time < time()) {
             $team_boost_description = "";
 
+            // Bloodline Jutsu training
             // Jutsu training
-            if(str_contains($this->train_type, 'jutsu:')) {
+            if (str_contains($this->train_type, 'bloodline_jutsu:')) {
+                $jutsu_id = $this->train_gain;
+                $this->getInventory();
+
+                $gain = User::$jutsu_train_gain;
+                if ($this->system->TRAIN_BOOST) {
+                    $gain += $this->system->TRAIN_BOOST;
+                }
+                if ($this->bloodline->jutsu[$jutsu_id]->level + $gain > 100) {
+                    $gain = 100 - $this->bloodline->jutsu[$jutsu_id]->level;
+                }
+
+                    if ($this->bloodline->jutsu[$jutsu_id]->level < 100) {
+                        $new_level = $this->bloodline->jutsu[$jutsu_id]->level + $gain;
+
+                        if ($new_level > 100) {
+                            $this->bloodline->jutsu[$jutsu_id]->level = 100;
+                        } else {
+                            $this->bloodline->jutsu[$jutsu_id]->level += $gain;
+                        }
+                        $message = $this->bloodline->jutsu[$jutsu_id]->name . " has increased to level " .
+                            $this->bloodline->jutsu[$jutsu_id]->level . '.';
+
+                        $jutsu_skill_type = $this->bloodline->jutsu[$jutsu_id]->jutsu_type . '_skill';
+                        if ($this->total_stats < $this->rank->stat_cap) {
+                            $this->{$jutsu_skill_type}++;
+                            $this->exp += 10;
+                            $message .= ' You have gained 1 ' . ucwords(str_replace('_', ' ', $jutsu_skill_type)) .
+                                ' and 10 experience.';
+                        }
+
+                        // Create notification
+                        $new_notification = new NotificationDto(
+                            type: "training_complete",
+                            message: "Training " . $this->bloodline->jutsu[$jutsu_id]->name . " Complete",
+                            user_id: $this->user_id,
+                            created: time(),
+                            alert: true,
+                        );
+                        NotificationManager::createNotification($new_notification, $this->system, NotificationManager::UPDATE_UNIQUE);
+
+                        $this->system->message($message);
+                        $this->system->printMessage();
+
+                        if (!$this->ban_type) {
+                            $this->updateInventory();
+                        }
+                    }
+
+                $this->train_time = 0;
+            }
+            else if(str_contains($this->train_type, 'jutsu:')) {
                 $jutsu_id = $this->train_gain;
                 $this->getInventory();
 
@@ -1327,6 +1393,35 @@ class User extends Fighter {
         return isset($this->items[$item_id]);
     }
 
+    public function giveItem(Item $item, int $quantity = 1): void {
+        if ($this->hasItem($item->id)) {
+            $this->items[$item->id]->quantity += $quantity;
+        } else {
+            $this->items[$item->id] = $item;
+            $this->items[$item->id]->quantity = $quantity;
+        }
+
+        if($item->use_type == Item::USE_TYPE_WEAPON || $item->use_type == Item::USE_TYPE_ARMOR) {
+            $item->quantity = 1;
+        }
+
+        AchievementsManager::handleItemAcquired($this->system, $this, $item);
+    }
+
+    public function giveItemById(int $item_id, int $quantity = 1): void {
+        if ($this->hasItem($item_id)) {
+            $this->giveItem($this->items[$item_id], $quantity);
+        }
+        else {
+            $result = $this->system->db->query(
+                "SELECT * FROM `items` WHERE `item_id` = {$item_id}"
+            );
+            $item = Item::fromDb($this->system->db->fetch($result));
+
+            $this->giveItem($item, $quantity);
+        }
+    }
+
     /* function useJutsu
         pool check, calc exp, etc */
     public function useJutsu(Jutsu $jutsu): ActionResult {
@@ -1476,18 +1571,40 @@ class User extends Fighter {
         $this->location = $this->village_location;
     }
 
-    public function calMaxRepGain($repGain) {
-        // Temp disable
-        return 0;
-
-       /* if($repGain + $this->weekly_rep > Village::WEEKLY_REP_CAP) {
-            $repGain = Village::WEEKLY_REP_CAP - $this->weekly_rep;
+    public function calMaxRepGain($repGain, $bypass_cap = false) {
+       if($repGain + $this->weekly_rep > $this->weekly_rep_cap && !$bypass_cap) {
+            $repGain = $this->weekly_rep_cap - $this->weekly_rep;
         }
-        return $repGain;*/
+        return $repGain;
     }
-    public function addRep($amount) {
+    public function addRep(int $amount, $incrementWeekly = true) {
         $this->village_rep += $amount;
-        $this->weekly_rep += $amount;
+
+        //Weekly rep
+        if($this->weekly_rep < $this->weekly_rep_cap && $incrementWeekly) {
+            $new_weekly = $this->weekly_rep += $amount;
+            if($new_weekly > $this->weekly_rep_cap) {
+                $new_weekly = $this->weekly_rep_cap;
+            }
+            $this->weekly_rep = $new_weekly;
+        }
+    }
+    public function subtractRep(int $amount) {
+        //Redundancy to ensure subtraction
+        if($amount < 0) {
+            $amount = abs($amount);
+        }
+
+        $this->village_rep -= $amount;
+
+        //Temp disable outlaw reputation
+        if($this->village_rep < 0) {
+            $this->village_rep = 0;
+        }
+    }
+
+    public function checkAchievementCompletion() {
+        AchievementsManager::checkForCompletedAchievements($this->system, $this);
     }
 
     /* function updateData()
@@ -1495,6 +1612,8 @@ class User extends Fighter {
         -Parameters-
     */
     public function updateData() {
+        // Check achievements
+        $this->checkAchievementCompletion();
 
         /** @noinspection SqlWithoutWhere */
         $query = "UPDATE `users` SET
@@ -1677,7 +1796,7 @@ class User extends Fighter {
             }
         }
 
-        if($this->items && !empty($this->items)) {
+        if(!empty($this->items)) {
             foreach($this->items as $item) {
                 $player_items[$item_count] = [
                     'item_id' => $item->id,
@@ -1964,15 +2083,13 @@ class User extends Fighter {
             return false;
         }
 
-        $dateTime = System::dateTimeFromMicrotime(microtime(true));
-
-        $dateTimeFormat = System::DB_DATETIME_MS_FORMAT;
+        $dbDateTime = Database::currentDatetimeForDb();
         $this->system->db->query(
             "INSERT INTO `player_logs`
                 (`user_id`, `user_name`, `log_type`, `log_time`,
                  `log_contents`)
                 VALUES
-                ({$this->user_id}, '{$this->user_name}', '{$log_type}', '{$dateTime->format($dateTimeFormat)}',
+                ({$this->user_id}, '{$this->user_name}', '{$log_type}', '{$dbDateTime}',
                  '{$this->system->db->clean($log_contents)}'
                 )
             "
@@ -2054,7 +2171,7 @@ class User extends Fighter {
 
             'register_date' => time(),
             'verify_key' => $verification_code,
-            'layout' => 'shadow_ribbon',
+            'layout' => System::DEFAULT_LAYOUT,
             'avatar_link' => './images/default_avatar.png',
 
             // '', '', '', 0, 0, 0, 0,

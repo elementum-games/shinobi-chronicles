@@ -358,6 +358,12 @@ address and requested a password reset. If this is not your account, please disr
             }
 
             // Village
+            // Load villages
+            $result = $system->db->query("SELECT `name`, `location` FROM `villages`");
+            $villages = [];
+            while ($row = mysqli_fetch_array($result)) {
+                $villages[$row['name']] = $row;
+            }
             if(!isset($villages[$village])) {
                 throw new RuntimeException("Invalid village!");
             }
@@ -385,8 +391,8 @@ address and requested a password reset. If this is not your account, please disr
             $headers .= "Reply-To: " . System::SC_NO_REPLY_EMAIL . "\r\n";
             if(mail($email, $subject, $message, $headers)) {
                 ;
-                $system->message("Account created!<br />Please check the email that you registered with for the verification  link (Be sure to check your spam folder as well)!");
-                $login_message_text = "Account created!<br />Please check the email that you registered with for the verification  link (Be sure to check your spam folder as well)!";
+                $system->message("Account created! Please check the email that you registered with for the verification  link (Be sure to check your spam folder as well)!");
+                $login_message_text = "Account created! Please check the email that you registered with for the verification  link (Be sure to check your spam folder as well)!";
             }
             else {
                 $system->message("There was a problem sending the email to the address provided: $email Please contact a staff member on the forums for manual activation.");
@@ -574,7 +580,7 @@ if($LOGGED_IN) {
             $self_link = $system->router->base_url . '?id=' . $id;
 
             // EVENT
-            if($system::$SC_EVENT_ACTIVE) {
+            if($system->event != null) {
                 if ($layout->key != "new_geisha") {
                     require 'templates/temp_event_header.php';
                 }
@@ -610,36 +616,46 @@ if($LOGGED_IN) {
         }
     }
     else if (isset($_GET['home'])) {
-        if ($system->isDevEnvironment()) {
-            $home_view = "default";
-            if (isset($_GET['view'])) {
-                switch ($_GET['view']) {
-                    case "news":
-                        $home_view = "news";
-                        break;
-                    case "contact":
-                        $home_view = "contact";
-                        break;
-                    case "rules":
-                        $home_view = "rules";
-                        break;
-                    case "terms":
-                        $home_view = "terms";
-                        break;
-                }
+        $home_view = "default";
+        if (isset($_GET['view'])) {
+            switch ($_GET['view']) {
+                case "news":
+                    $home_view = "news";
+                    break;
+                case "contact":
+                    $home_view = "contact";
+                    break;
+                case "rules":
+                    $home_view = "rules";
+                    break;
+                case "terms":
+                    $home_view = "terms";
+                    break;
             }
-            $layout->renderBeforeContentHTML($system, $player ?? null, "Home", render_content: false, render_header: true, render_sidebar: false, render_topbar: false);
-            try {
-                require('./templates/home.php');
-            } catch (RuntimeException $e) {
-                $system->db->rollbackTransaction();
-                $system->message($e->getMessage());
+        }
+        $layout->renderBeforeContentHTML(
+            $system,
+            $player ?? null,
+            "Home",
+            render_content: false,
+            render_header: true,
+            render_sidebar: false,
+            render_topbar: false
+        );
+
+        try {
+            require('./templates/home.php');
+        } catch (RuntimeException $e) {
+            $system->db->rollbackTransaction();
+            $system->message($e->getMessage());
+            if ($system->isDevEnvironment()) {
                 $system->printMessage(true);
             }
-            $layout->renderAfterContentHTML($system, $player ?? null, render_content: false, render_footer: false, render_hotbar: false);
-            $page_load_time = round(microtime(true) - $PAGE_LOAD_START, 3);
-            $system->db->commitTransaction();
         }
+
+        $layout->renderAfterContentHTML($system, $player ?? null, render_content: false, render_footer: false, render_hotbar: false);
+        $page_load_time = round(microtime(true) - $PAGE_LOAD_START, 3);
+        $system->db->commitTransaction();
     }
     else {
         $layout->renderBeforeContentHTML(
@@ -668,15 +684,14 @@ if($LOGGED_IN) {
 }
 // Login
 else {
-    if ($system->isDevEnvironment()) {
-        $layout = $system->fetchLayoutByName("new_geisha");
-    } else {
-        $layout = $system->fetchLayoutByName(System::DEFAULT_LAYOUT);
-    }
+
+    $layout = $system->fetchLayoutByName(System::DEFAULT_LAYOUT);
     $layout->renderBeforeContentHTML($system, $player ?? null, "Home", render_content: false, render_header: false, render_sidebar: false, render_topbar: false);
 
     // Display error messages
-    $system->printMessage();
+    if ($system->isDevEnvironment()) {
+        $system->printMessage(true);
+    }
     if(!$system->SC_OPEN) {
         echo "<table class='table'><tr><th>Game Maintenance</th></tr>
         <tr><td style='text-align:center;'>
@@ -686,10 +701,7 @@ else {
 
     $captcha = '';
 
-    if ($system->isDevEnvironment()) {
-        if ($login_error_text != "" || $login_message_text != "") {
-            $initial_login_display = "login";
-        }
+        $initial_login_display = "login";
         if ($reset_error_text != "") {
             $initial_login_display = "reset";
         }
@@ -702,11 +714,7 @@ else {
         $page_load_time = round(microtime(true) - $PAGE_LOAD_START, 3);
         $system->db->commitTransaction();
         exit;
-    }
-    else {
-        require("pages/news.php");
-        newsPosts();
-    }
+
 
 }
 

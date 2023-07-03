@@ -18,10 +18,16 @@ export type PlayerDataType = {|
     +gender: PlayerGenderOptions,
     +elements: $ReadOnlyArray<JutsuElement>,
     +has_bloodline: boolean,
+    +bloodlineName: ?string,
     +avatar_size: number,
     +money: number,
     +premiumCredits: number,
+    +premiumCreditsPurchased: number,
     +villageName: string,
+    +villageRepTier: string,
+    +villageRep: number,
+    +weeklyRep: number,
+    +maxWeeklyRep: number,
     +clanId: ?number,
     +clanName: ?string,
     +teamId: ?number,
@@ -35,6 +41,7 @@ export type PlayerStatsType = {|
     +ninjutsuSkill: number,
     +taijutsuSkill: number,
     +genjutsuSkill: number,
+    +bloodlineSkill: number,
     +castSpeed: number,
     +speed: number,
     +intelligence: number,
@@ -64,4 +71,31 @@ export type PlayerSettingsType = {|
     +avatar_style: AvatarStyles,
     +sidebar_position: "left" | "right",
     +enable_alerts: boolean,
+|};
+
+export type DailyTaskType = {|
+    +name: string,
+    +prompt: string,
+    +difficulty: string,
+    +rewardYen: number,
+    +rewardRep: number,
+    +progressPercent: string,
+    +progressCaption: string,
+    +complete: boolean,
+|};
+
+export type PlayerAchievementsType = {|
+    +completedAchievements: {|
+        +id: string,
+        +achievedAt: number,
+        +rank: "Legendary" | "Elite" | "Greater" | "Common",
+        +name: string,
+        +prompt: string,
+        +rewards: $ReadOnlyArray<{|
+            +type: "MONEY" | "FREEMIUM_CREDITS" | "VILLAGE_REP",
+            +amount: number,
+        |}>,
+        +progressLabel: string,
+        +progressPercent: number,
+    |};
 |};

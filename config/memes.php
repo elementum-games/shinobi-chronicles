@@ -669,5 +669,11 @@ return [
             'text' => ':patoderp:',
             'public' => true,
     ],
+    [
+            'code' => ':banhammer:',
+            'image' => "<img src='./images/memes/Banhammer.png' />",
+            'text' => ':banhammer:',
+            'public' => true,
+    ],    
 ];
 

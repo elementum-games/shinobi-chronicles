@@ -474,7 +474,7 @@ body {
 /* Login Form */
 #login_form {
     position: absolute;
-    transform: translateY(-100px);
+    transform: translateY(-110px);
     width: 400px;
     background: rgba(20, 20, 28, 0.75);
 }
@@ -501,8 +501,10 @@ body {
 }
 .login_message_label {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    font-size: 14px;
     color: white;
+    font-size: 13px;
+    font-weight: 600;
+    margin-left: 15px;
 }
 .login_username_wrapper {
     flex-basis: 40%;
@@ -596,7 +598,8 @@ body {
 
 .main_banner_modal.register {
     width: 500px;
-    top: 138px;
+    top: 130px;
+    z-index: 3;
 }
 
 .main_banner_modal.terms {
@@ -691,7 +694,10 @@ body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     margin-left: 5px;
 }
-
+.register_input_bottom .login_error_label {
+    margin: 0 !important;
+    padding-top: 10px;
+}
 
 /* Reset Form */
 #reset_form {
@@ -968,90 +974,62 @@ body {
 /* Lanterns WIP */}
 .home_lantern_1 {
     position: absolute;
-    transform: translate(-288px, -310px);
-}
-    .home_lantern_1 img {
-        max-height: 30px;
-        position: absolute;
-        animation: floatUpDownTiny 5s infinite;
-        animation-delay: -2.5s !important;
-        animation-timing-function: ease-in-out;
-    }
-.home_lantern_2 {
-    position: absolute;
     transform: translate(-530px, -100px);
 }
-    .home_lantern_2 img {
+    .home_lantern_1::after {
+        animation-delay: -2.5s !important;
+    }
+    .home_lantern_1 img {
         max-height: 65px;
         position: absolute;
         animation: floatUpDown 5s infinite;
         animation-delay: -2.5s !important;
         animation-timing-function: ease-in-out;
     }
-.home_lantern_3 {
-    position: absolute;
-    transform: translate(-750px, -250px);
-}
-    .home_lantern_3 img {
-        position: absolute;
-        animation: floatUpDown 5s infinite;
-        animation-delay: -1.5s !important;
-        animation-timing-function: ease-in-out;
-    }
-.home_lantern_4 {
+.home_lantern_2 {
     position: absolute;
     transform: translate(-225px, -263px) scaleX(-1);
 }
-    .home_lantern_4 img {
+    .home_lantern_2::after {
+        animation-delay: -3s !important;
+    }
+    .home_lantern_2 img {
         position: absolute;
         animation: floatUpDown 5s infinite;
         animation-delay: -3s !important;
         animation-timing-function: ease-in-out;
         max-height: 60px;
     }
-.home_lantern_5 {
+.home_lantern_3 {
     position: absolute;
     transform: translate(205px, -255px);
 }
-    .home_lantern_5 img {
+    .home_lantern_3::after {
+        animation-delay: -1s !important;
+    }
+    .home_lantern_3 img {
         position: absolute;
         animation: floatUpDown 5s infinite;
         animation-delay: -1s !important;
         animation-timing-function: ease-in-out;
         max-height: 55px;
     }
-.home_lantern_6 {
-    position: absolute;
-    transform: translate(550px, -200px);
-}
-    .home_lantern_6 img {
-        position: absolute;
-        animation-delay: -3.5s !important;
-        animation-timing-function: ease-in-out;
-    }
-.home_lantern_7 {
+.home_lantern_4 {
     position: absolute;
     transform: translate(450px, -100px) scaleX(-1);
     background-color: #fff;
     
 }
-    .home_lantern_7 img {
+    .home_lantern_4::after {
+        animation-delay: -0.5s !important;
+    }
+    .home_lantern_4 img {
         position: absolute;
         max-height: 55px;
         animation-delay: -0.5s !important;
         animation: floatUpDown 5s infinite;
         animation-timing-function: ease-in-out;
         
-    }
-.home_lantern_8 {
-    position: absolute;
-    transform: translate(675px, 200px);
-}
-    .home_lantern_8 img {
-        position: absolute;
-        max-height: 105px;
-        animation: floatUpDown 4.5s infinite;
-        animation-timing-function: ease-in-out;
     }
 .home_lantern::after {
     content: '';

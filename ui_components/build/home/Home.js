@@ -77,11 +77,7 @@ function MainBannerSection({
 }) {
   const activeElement = React.useRef(null);
   function handleLogin() {
-    if (loginDisplay !== "login") {
-      setLoginDisplay("login");
-    } else {
-      document.getElementById('login_form').submit();
-    }
+    document.getElementById('login_form').submit();
   }
   function handleRegister() {
     if (loginDisplay !== "register") {
@@ -142,28 +138,28 @@ function MainBannerSection({
   }), /*#__PURE__*/React.createElement("div", {
     className: "title_version"
   }, version)), /*#__PURE__*/React.createElement("div", {
-    className: "home_lantern home_lantern_2",
-    style: {
-      zIndex: 0
-    }
-  }, /*#__PURE__*/React.createElement("img", {
-    src: "/images/v2/decorations/lanternbig.png"
-  })), /*#__PURE__*/React.createElement("div", {
-    className: "home_lantern home_lantern_4",
+    className: "home_lantern home_lantern_1",
     style: {
       zIndex: 1
     }
   }, /*#__PURE__*/React.createElement("img", {
     src: "/images/v2/decorations/lanternbig.png"
   })), /*#__PURE__*/React.createElement("div", {
-    className: "home_lantern home_lantern_5",
+    className: "home_lantern home_lantern_2",
+    style: {
+      zIndex: 1
+    }
+  }, /*#__PURE__*/React.createElement("img", {
+    src: "/images/v2/decorations/lanternbig.png"
+  })), /*#__PURE__*/React.createElement("div", {
+    className: "home_lantern home_lantern_3",
     style: {
       zIndex: 1
     }
   }, /*#__PURE__*/React.createElement("img", {
     src: "/images/v2/decorations/lanternsmall.png"
   })), /*#__PURE__*/React.createElement("div", {
-    className: "home_lantern home_lantern_7",
+    className: "home_lantern home_lantern_4",
     style: {
       zIndex: 1
     }
@@ -171,7 +167,7 @@ function MainBannerSection({
     src: "/images/v2/decorations/lanternsmall.png"
   })), activeModal, /*#__PURE__*/React.createElement("div", {
     className: "login_container"
-  }, loginDisplay === "login" && /*#__PURE__*/React.createElement(LoginForm, {
+  }, !isLoggedIn && /*#__PURE__*/React.createElement(LoginForm, {
     loginMessageText: loginMessageText,
     loginErrorText: loginErrorText,
     setLoginDisplay: setLoginDisplay

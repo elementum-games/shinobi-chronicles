@@ -15,7 +15,7 @@ export function CharacterAvatar({
     maxHeight,
     avatarStyle,
     frameClassNames = []
-}: CharacterAvatarProps) {
+}: CharacterAvatarProps): React$Node {
     return (
         <div style={{ maxWidth, maxHeight }} className={`avatar_frame ${avatarStyle} ${frameClassNames.join(' ')}`}>
             <img className={`avatar_img ${avatarStyle}`} src={imageSrc} />

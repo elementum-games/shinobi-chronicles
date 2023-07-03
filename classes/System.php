@@ -25,22 +25,13 @@ class System {
     const CURRENCY_TYPE_MONEY = 'money';
     const CURRENCY_TYPE_PREMIUM_CREDITS = 'premium_credits';
 
-    const DB_DATETIME_MS_FORMAT = 'Y-m-d H:i:s.u';
 
     const SC_ADMIN_EMAIL = "admin@shinobichronicles.com";
     const SC_NO_REPLY_EMAIL = "no-reply@shinobichronicles.com";
     const UNSERVICEABLE_EMAIL_DOMAINS = ['hotmail.com', 'live.com', 'msn.com', 'outlook.com'];
 
-
-    // TODO: Remove! This is a temporary way to do events
-    const SC_EVENT_START = 0;
-    const SC_EVENT_END = 1641769200;
-    const SC_EVENT_NAME = 'Lantern Placeholder';
-
     // Temporary event data storage
-    public array $event_data = [];
-
-    public static bool $SC_EVENT_ACTIVE = true;
+    public ?Event $event;
 
     public static array $villages = ['Stone', 'Cloud', 'Leaf', 'Sand', 'Mist'];
 
@@ -50,10 +41,11 @@ class System {
 
     public array $debug_messages = [];
 
-    // Variable for DB connection resource
+    // Sub-components
     public Database $db;
+    public Router $router;
 
-    public $environment;
+    public string $environment;
 
     public bool $SC_OPEN;
     public bool $register_open;
@@ -84,7 +76,7 @@ class System {
         ),
         User::STAFF_CONTENT_ADMIN => array(
             'staffBanner' => "content admin",
-            'staffColor' => "#A000B0",
+            'staffColor' => "#6400AF",
             'pm_class' => 'contentAdmin'
         ),
         User::STAFF_ADMINISTRATOR => array(
@@ -100,9 +92,9 @@ class System {
     );
 
     // Default layout
-    const DEFAULT_LAYOUT = 'shadow_ribbon';
-    const VERSION_NUMBER = '0.8.0';
-    const VERSION_NAME = '0.8';
+    const DEFAULT_LAYOUT = 'new_geisha';
+    const VERSION_NUMBER = '0.9.0';
+    const VERSION_NAME = '0.9 Flickering Ambitions';
 
     // Misc stuff
     const SC_MAX_RANK = 4;
@@ -177,8 +169,6 @@ class System {
         'stat_cut' => false,
     ];
 
-    public Router $router;
-
     public function __construct() {
         require __DIR__ . "/../secure/vars.php";
         /** @var $host */
@@ -196,32 +186,7 @@ class System {
 
         $this->timezoneOffset = date('Z');
 
-        // TODO: REMOVE TEMPORARY EVENT STUFF
-        if(time() > self::SC_EVENT_END) {
-            self::$SC_EVENT_ACTIVE = false;
-        }
-        // Manually set event locations, pulled from TravelManager and Missions to identify event missions
-        $event_missions_easy[] = ['x' => 5, 'y' => 4];
-        $event_missions_easy[] = ['x' => 2, 'y' => 11];
-        $event_missions_easy[] = ['x' => 17, 'y' => 10];
-        $event_missions_easy[] = ['x' => 23, 'y' => 2];
-        $event_missions_easy[] = ['x' => 22, 'y' => 16];
-        $event_missions_easy[] = ['x' => 26, 'y' => 14];
-        $event_missions_easy[] = ['x' => 27, 'y' => 4];
-        $event_missions_easy[] = ['x' => 13, 'y' => 8];
-        $event_missions_easy[] = ['x' => 6, 'y' => 7];
-        $event_missions_easy[] = ['x' => 5, 'y' => 14];
-        $event_missions_medium[] = ['x' => 15, 'y' => 3];
-        $event_missions_medium[] = ['x' => 24, 'y' => 9];
-        $event_missions_medium[] = ['x' => 16, 'y' => 15];
-        $event_missions_medium[] = ['x' => 8, 'y' => 10];
-        $event_missions_hard[] = ['x' => 10, 'y' => 1];
-        $this->event_data['easy'] = $event_missions_easy;
-        $this->event_data['medium'] = $event_missions_medium;
-        $this->event_data['hard'] = $event_missions_hard;
-        $this->event_data['red_lantern_id'] = 19;
-        $this->event_data['blue_lantern_id'] = 20;
-        $this->event_data['violet_lantern_id'] = 21;
+        $this->checkForActiveEvent();
     }
 
     /**
@@ -711,6 +676,13 @@ class System {
         return (int) date('G', time());
     }
 
+    /**
+     * @return int minute of the hour, 0-59
+     */
+    public static function currentMinute(): int {
+        return (int)date('i');
+    }
+
     public static function getKunaiPacks(): array {
         $kunai_packs = [
             [
@@ -757,5 +729,16 @@ class System {
 
     public function isDevEnvironment(): bool {
         return $this->environment == System::ENVIRONMENT_DEV;
+    }
+
+    public function checkForActiveEvent(): void {
+        $current_datetime = new DateTimeImmutable();
+
+        // July 2023 Lantern Event
+        $july_2023_lantern_event_start_time = new DateTimeImmutable('2023-07-01');
+        $july_2023_lantern_event_end_time = new DateTimeImmutable('2023-07-16');
+        if($current_datetime > $july_2023_lantern_event_start_time && $current_datetime < $july_2023_lantern_event_end_time) {
+            $this->event = new LanternEvent($july_2023_lantern_event_end_time);
+        }
     }
 }

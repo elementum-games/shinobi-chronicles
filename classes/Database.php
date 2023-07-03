@@ -1,9 +1,10 @@
 <?php
 
-require_once __DIR__ . '/DatabaseDeadlockException.php';
+require_once __DIR__ . '/exception/DatabaseDeadlockException.php';
 
 class Database {
     const MYSQL_DEADLOCK_ERROR_CODE = 1213;
+    const DATETIME_UPSERT_MS_FORMAT = 'Y-m-d H:i:s.u';
 
     public ?mysqli $con = null;
 
@@ -99,7 +100,7 @@ class Database {
 
         $result = mysqli_query($this->con, $query);
         if(!$result) {
-            $this->handleQueryError();
+            $this->handleQueryError($query);
         }
 
         if($this->last_query_type == 'select') {
@@ -119,14 +120,14 @@ class Database {
     /**
      * @throws DatabaseDeadlockException|Exception
      */
-    protected function handleQueryError() {
+    protected function handleQueryError(string $query) {
         $error_code = mysqli_errno($this->con);
         if($error_code == self::MYSQL_DEADLOCK_ERROR_CODE) {
             throw new DatabaseDeadlockException();
         }
 
         $error_message = mysqli_error($this->con);
-        error_log($error_message . ' in ' . System::simpleStackTrace());
+        error_log($error_message . ' in query ' . $query . ' at ' . System::simpleStackTrace());
 
         throw new RuntimeException($error_message);
     }
@@ -187,5 +188,12 @@ class Database {
             $this->query("ROLLBACK;");
             $this->in_db_transaction = false;
         }
+    }
+
+    public static function currentDatetimeForDb(): string {
+        $dateTime = System::dateTimeFromMicrotime(microtime(true));
+        $dateTimeFormat = self::DATETIME_UPSERT_MS_FORMAT;
+
+        return $dateTime->format($dateTimeFormat);
     }
 }

@@ -112,8 +112,8 @@ $clan_positions = array(
 			<a href='<?= $system->router->base_url ?>?id=2&page=new_message&sender=<?= $viewUser->user_name ?>'>Send Message</a>
 
             <?php if($player->rank_num > 1): ?>
-                &nbsp;&nbsp;|&nbsp;&nbsp;<a href='<?= $system->router->links['profile'] ?>&page=send_money&recipient=<?= $viewUser->user_name ?>'>Send Money</a>
-                &nbsp;&nbsp;|&nbsp;&nbsp;<a href='<?= $system->router->links['profile'] ?>&page=send_ak&recipient=<?= $viewUser->user_name ?>'>Send AK</a>
+                &nbsp;&nbsp;|&nbsp;&nbsp;<a href='<?= $system->router->links['send_money'] ?>&recipient=<?= $viewUser->user_name ?>'>Send Money</a>
+                &nbsp;&nbsp;|&nbsp;&nbsp;<a href='<?= $system->router->links['send_money'] ?>&recipient=<?= $viewUser->user_name ?>'>Send AK</a>
             <?php endif; ?>
             <?php if($viewUser->rank_num >= 3 && $player->team): ?>
                 <?php if($player->user_id == $player->team->leader && !$viewUser->team && !$viewUser->team_invite &&

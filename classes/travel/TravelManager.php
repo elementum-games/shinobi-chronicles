@@ -332,38 +332,83 @@ class TravelManager {
         }
 
         // TEMP Add Events - We have to hard code the mission IDs is System for now
-        if (System::$SC_EVENT_ACTIVE) {
-            foreach ($this->system->event_data['easy'] as $event_mission) {
+        if ($this->system->event instanceof LanternEvent) {
+            foreach ($this->system->event->mission_coords['gold'] as $event_mission) {
+                $objectives[] = new MapObjectiveLocation(
+                    name: "Treasure",
+                    map_id: 1,
+                    x: $event_mission['x'],
+                    y: $event_mission['y'],
+                    image: "/images/events/lanternyellow.png",
+                    action_url: $this->system->router->getUrl("mission", [
+                        'start_mission' => $this->system->event->mission_ids['gold_mission_id'], 'mission_type' => 'event'
+                    ]),
+                    action_message: "Chase the Kotengu",
+                );
+            }
+            foreach ($this->system->event->mission_coords['special'] as $event_mission) {
+                $objectives[] = new MapObjectiveLocation(
+                    name: "Special",
+                    map_id: 1,
+                    x: $event_mission['x'],
+                    y: $event_mission['y'],
+                    image: "/images/events/cultsign.png",
+                    action_url: $this->system->router->getUrl("mission", [
+                        'start_mission' => $this->system->event->mission_ids['special_mission_id'], 'mission_type' => 'event'
+                    ]),
+                    action_message: "Enter the Fray",
+                );
+            }
+            foreach ($this->system->event->mission_coords['easy'] as $event_mission) {
                 $objectives[] = new MapObjectiveLocation(
                     name: "Easy",
                     map_id: 1,
                     x: $event_mission['x'],
                     y: $event_mission['y'],
                     image: "/images/events/lanternred.png",
-                    action_url: $this->system->router->getUrl("mission", ['start_mission' => '12', 'mission_type' => 'event']),
-                    action_message: "Start Easy Lantern Event",
+                    action_url: $this->system->router->getUrl("mission", [
+                        'start_mission' => $this->system->event->mission_ids['easy_mission_id'], 'mission_type' => 'event'
+                    ]),
+                    action_message: "Begin Search",
                 );
             }
-            foreach ($this->system->event_data['medium'] as $event_mission) {
+            foreach ($this->system->event->mission_coords['medium'] as $event_mission) {
                 $objectives[] = new MapObjectiveLocation(
                     name: "Medium",
                     map_id: 1,
                     x: $event_mission['x'],
                     y: $event_mission['y'],
                     image: "/images/events/lanternblue.png",
-                    action_url: $this->system->router->getUrl("mission", ['start_mission' => '13', 'mission_type' => 'event']),
-                    action_message: "Start Medium Lantern Event",
+                    action_url: $this->system->router->getUrl("mission", [
+                        'start_mission' => $this->system->event->mission_ids['medium_mission_id'], 'mission_type' => 'event'
+                    ]),
+                    action_message: "Follow Signs of battle",
                 );
             }
-            foreach ($this->system->event_data['hard'] as $event_mission) {
+            foreach ($this->system->event->mission_coords['hard'] as $event_mission) {
                 $objectives[] = new MapObjectiveLocation(
                     name: "Hard",
                     map_id: 1,
                     x: $event_mission['x'],
                     y: $event_mission['y'],
                     image: "/images/events/lanternviolet.png",
-                    action_url: $this->system->router->getUrl("mission", ['start_mission' => '11', 'mission_type' => 'event']),
-                    action_message: "Start Hard Lantern Event",
+                    action_url: $this->system->router->getUrl("mission", [
+                        'start_mission' => $this->system->event->mission_ids['hard_mission_id'], 'mission_type' => 'event'
+                    ]),
+                    action_message: "Investigate Suspicious Markings",
+                );
+            }
+            foreach ($this->system->event->mission_coords['nightmare'] as $event_mission) {
+                $objectives[] = new MapObjectiveLocation(
+                    name: "Nightmare",
+                    map_id: 1,
+                    x: $event_mission['x'],
+                    y: $event_mission['y'],
+                    image: "/images/events/yokai_cropped.png",
+                    action_url: $this->system->router->getUrl("mission", [
+                        'start_mission' => $this->system->event->mission_ids['nightmare_mission_id'], 'mission_type' => 'event'
+                    ]),
+                    action_message: "Stop the Ritual",
                 );
             }
         }

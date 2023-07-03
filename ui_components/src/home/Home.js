@@ -8,7 +8,9 @@ import type { NewsPostType } from "./newsSchema.js";
 import { News } from "./News.js";
 
 type Props = {|
-    +homeLinks: $ReadOnlyArray,
+    +homeLinks: {
+        +[key: string]: string,
+    },
     +isLoggedIn: bool,
     +isAdmin: bool,
     +version: string,
@@ -17,7 +19,12 @@ type Props = {|
     +registerErrorText: string,
     +resetErrorText: string,
     +loginMessageText: string,
-    +registerPreFill: $ReadOnlyArray,
+    +registerPreFill: {
+        +user_name: string,
+        +village: "Stone" | "Cloud" | "Mist" | "Sand" | "Leaf",
+        +email: string,
+        +gender: "Male" | "Female" | "Non-binary" | "None",
+    },
     +initialNewsPosts: $ReadOnlyArray<NewsPostType>,
 |};
 function Home({
@@ -99,12 +106,7 @@ function MainBannerSection({
 }) {
     const activeElement = React.useRef(null);
     function handleLogin() {
-        if (loginDisplay !== "login") {
-            setLoginDisplay("login");
-        }
-        else {
-            document.getElementById('login_form').submit();
-        }
+        document.getElementById('login_form').submit();
     }
     function handleRegister() {
         if (loginDisplay !== "register") {
@@ -168,15 +170,15 @@ function MainBannerSection({
                     <div className="title_version">{version}</div>
                 </div>
 
-                <div className={"home_lantern home_lantern_2"} style={{ zIndex: 0 }}><img src="/images/v2/decorations/lanternbig.png" /></div>
-                <div className={"home_lantern home_lantern_4"} style={{ zIndex: 1 }}><img src="/images/v2/decorations/lanternbig.png" /></div>
-                <div className={"home_lantern home_lantern_5"} style={{ zIndex: 1 }}><img src="/images/v2/decorations/lanternsmall.png" /></div>
-                <div className={"home_lantern home_lantern_7"} style={{ zIndex: 1 }}><img src="/images/v2/decorations/lanternsmall.png" /></div>
+                <div className={"home_lantern home_lantern_1"} style={{ zIndex: 1 }}><img src="/images/v2/decorations/lanternbig.png" /></div>
+                <div className={"home_lantern home_lantern_2"} style={{ zIndex: 1 }}><img src="/images/v2/decorations/lanternbig.png" /></div>
+                <div className={"home_lantern home_lantern_3"} style={{ zIndex: 1 }}><img src="/images/v2/decorations/lanternsmall.png" /></div>
+                <div className={"home_lantern home_lantern_4"} style={{ zIndex: 1 }}><img src="/images/v2/decorations/lanternsmall.png" /></div>
 
                 {activeModal}
 
                 <div className="login_container">
-                    {loginDisplay === "login" &&
+                    {!isLoggedIn &&
                         <LoginForm
                             loginMessageText={loginMessageText}
                             loginErrorText={loginErrorText}
