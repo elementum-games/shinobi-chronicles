@@ -1,20 +1,57 @@
 <?php
 
-require_once 'layout/_common.php';
+function getNewGeishaLayout(System $system): Layout {
+    $react_dev_tags = <<<HTML
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/17.0.2/umd/react.development.js" crossorigin></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/17.0.2/umd/react-dom.development.js" crossorigin></script>
+HTML;
 
-$heading = coreHeading('style/geisha/geisha.css') .
-<<<HTML
-<body>
+    $react_prod_tags = <<<HTML
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/17.0.2/umd/react.production.min.js" crossorigin></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/17.0.2/umd/react-dom.production.min.js" crossorigin></script>
+HTML;
+
+    if($system->isDevEnvironment()) {
+        $extra_meta_tags = '<meta name="robots" content="noindex" />';
+        $react_tags = $react_dev_tags;
+
+        if($system->enable_mobile_layout) {
+            $extra_meta_tags .= '<meta name="viewport" content="width=device-width, initial-scale=1" />';
+        }
+    }
+    else {
+        $extra_meta_tags = '';
+        $react_tags = $react_prod_tags;
+    }
+
+    $heading = <<<HTML
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<title>Shinobi Chronicles RPG</title>
+	<link rel='stylesheet' type='text/css' href='style/geisha/geisha.css' />
 	<link rel='stylesheet' type='text/css' href='style/new_geisha/new_geisha.css' />
+	<link rel="icon" href="images/icons/favicon.ico" type="image/x-icon" />
+	<script type='text/javascript' src='./scripts/jquery-2.1.0.min.js'></script>
+	<script type='text/javascript' src="./scripts/jquery-ui.js"></script>
+	{$react_tags}
+	<script type='text/javascript' src="./scripts/functions.js"></script>
+	<script type='text/javascript' src="./scripts/timer.js"></script>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta name="keywords" content="naruto, rpg, online, game, anime, manga, mmorpg" />
+	<meta name="description" content="Shinobi Chronicles: An online browser-based RPG inspired by the anime/manga Naruto." />
+	{$extra_meta_tags}
+</head>
+<body>
 HTML;
 
 
-$header = <<<HTML
+    $header = <<<HTML
 		</div>
 	</div>
 HTML;
 
-$body_start = <<<HTML
+    $body_start = <<<HTML
 <div id='content'>
 		<div class='contentHeader'>
 		[HEADER_TITLE]
@@ -22,7 +59,7 @@ $body_start = <<<HTML
 HTML;
 
 
-$top_menu = <<<HTML
+    $top_menu = <<<HTML
 <ul>
 	<li><a href='{$system->router->links['news']}'>News</a></li>
 	<li><a href='{$system->router->links['discord']}' target='_blank'>Discord</a></li>
@@ -33,7 +70,7 @@ $top_menu = <<<HTML
 </ul>
 HTML;
 
-$side_menu_start = <<<HTML
+    $side_menu_start = <<<HTML
 	</div>
 	<div id='sideMenu' class='sm-tmp-class [side-menu-location-status-class]'>
 
@@ -41,19 +78,19 @@ $side_menu_start = <<<HTML
 	<h2><p>User Menu</p></h2>
 HTML;
 
-$village_menu_start = <<<HTML
+    $village_menu_start = <<<HTML
 	<h2><p>Village Menu</p></h2>
 HTML;
 
-$action_menu_header = <<<HTML
+    $action_menu_header = <<<HTML
 	<h2><p>Activity Menu</p></h2>
 HTML;
 
-$staff_menu_header = <<<HTML
+    $staff_menu_header = <<<HTML
 <h2><p>Staff Menu</p></h2>
 HTML;
 
-$side_menu_end = <<<HTML
+    $side_menu_end = <<<HTML
 		</ul>
 		<div id='logout'>
 			<a href='./?logout=1'>Logout</a>
@@ -63,10 +100,10 @@ $side_menu_end = <<<HTML
 
 		<div id='sideMenuBg'></div>
 
-		<br style='clear:both;margin:0px;padding:0px;' />
+		<br style='clear:both;margin:0;padding:0;' />
 HTML;
 
-$login_menu = <<<HTML
+    $login_menu = <<<HTML
 		</div>
 	<div id='sideMenu'>
 		<div id='notifications'><!--[NOTIFICATIONS]--></div>
@@ -90,10 +127,10 @@ $login_menu = <<<HTML
 	</div>
 	<div id='sideMenuBg'></div>
 
-		<br style='clear:both;margin:0px;padding:0px;' />
+		<br style='clear:both;margin:0;padding:0;' />
 HTML;
 
-$footer = <<<HTML
+    $footer = <<<HTML
 	<div id="footer">
 		<div class="footer-left"></div>
 		<div class="footer-right">
@@ -108,17 +145,19 @@ $footer = <<<HTML
 </html>
 HTML;
 
-return new Layout(
-    key: 'new_geisha',
-    heading: $heading,
-    header: $header,
-    body_start: $body_start,
-    top_menu: $top_menu,
-    side_menu_start: $side_menu_start,
-    village_menu_start: $village_menu_start,
-    action_menu_header: $action_menu_header,
-    staff_menu_header: $staff_menu_header,
-    side_menu_end: $side_menu_end,
-    login_menu: $login_menu,
-    footer: $footer,
-);
+    return new Layout(
+        key: 'new_geisha',
+        heading: $heading,
+        header: $header,
+        body_start: $body_start,
+        top_menu: $top_menu,
+        side_menu_start: $side_menu_start,
+        village_menu_start: $village_menu_start,
+        action_menu_header: $action_menu_header,
+        staff_menu_header: $staff_menu_header,
+        side_menu_end: $side_menu_end,
+        login_menu: $login_menu,
+        footer: $footer,
+    );
+
+}

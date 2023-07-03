@@ -17,7 +17,7 @@ function userProfile() {
     global $system;
     global $player;
 
-    $use_new_layout = $player->layout == 'new_geisha';
+    $use_new_layout = $system->layout->usesV2Interface();
 
     // Submenu
     if(!$use_new_layout) {

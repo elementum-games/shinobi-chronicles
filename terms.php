@@ -4,13 +4,13 @@ session_start();
 require "classes/System.php";
 $system = new System();
 $system->db->startTransaction();
-$layout = $system->fetchLayoutByName("shadow_ribbon");
+$layout = $system->setLayoutByName("shadow_ribbon");
 
 if(isset($_SESSION['user_id'])) {
     require_once 'classes.php';
     $player = User::loadFromId($system, $_SESSION['user_id']);
     $player->loadData();
-    $layout = $system->fetchLayoutByName($player->layout);
+    $layout = $system->setLayoutByName($player->layout);
 }
 
 $layout->renderBeforeContentHTML($system, $player ?? null, 'Terms');

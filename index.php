@@ -236,7 +236,7 @@ address and requested a password reset. If this is not your account, please disr
                         $system->message("Email sent! Please check your email (including spam folder)");
                     } else {
                         $system->message(
-                            "There was a problem sending the email to the address provided: $email
+                            "There was a problem sending the email to the address provided: {$result['verify_key']}
 				Please contact a staff member on the forums for manual activation."
                         );
                     }
@@ -323,6 +323,7 @@ address and requested a password reset. If this is not your account, please disr
                 throw new RuntimeException("Please enter a valid email address!");
             }
 
+            /** @noinspection RegExpRedundantEscape */
             $email_pattern = '/^[\w\-\.\+]+@[\w\-\.]+\.[a-zA-Z]{2,4}$/';
             if(!preg_match($email_pattern, $email)) {
                 throw new RuntimeException("Please enter a valid email address!");
@@ -437,7 +438,7 @@ else {
 
 // Load page or news
 if($LOGGED_IN) {
-    $layout = $system->fetchLayoutByName($player->layout);
+    $layout = $system->setLayoutByName($player->layout);
 
     // Master close
     if(!$system->SC_OPEN && !$player->isUserAdmin()) {
@@ -685,7 +686,7 @@ if($LOGGED_IN) {
 // Login
 else {
 
-    $layout = $system->fetchLayoutByName(System::DEFAULT_LAYOUT);
+    $layout = $system->setLayoutByName(System::DEFAULT_LAYOUT);
     $layout->renderBeforeContentHTML($system, $player ?? null, "Home", render_content: false, render_header: false, render_sidebar: false, render_topbar: false);
 
     // Display error messages

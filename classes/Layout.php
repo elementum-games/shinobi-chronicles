@@ -3,6 +3,7 @@
 require_once __DIR__ . '/Route.php';
 require_once __DIR__ . "/navigation/NavigationAPIPresenter.php";
 require_once __DIR__ . '/navigation/NavigationAPIManager.php';
+require_once __DIR__ . '/notification/Notifications.php';
 
 class Layout {
     public function __construct(
@@ -29,7 +30,7 @@ class Layout {
       bool $render_topbar = true, 
       bool $render_content = true
     ): void {
-        if($this->key == 'new_geisha') {
+        if($this->usesV2Interface()) {
             echo $this->heading;
             if (isset($player)) {
                 if ($player->getSidebarPosition() == 'right') {
@@ -74,7 +75,11 @@ class Layout {
             echo $this->header;
 
             if($player != null) {
-                Notifications::displayNotifications($system, $player);
+                $notifications = Notifications::getNotifications($system, $player);
+
+                echo "<div id='notifications'>";
+                $this->renderLegacyNotifications($notifications);
+                echo "</div>";
 
                 if($player->train_time) {
                     $this->renderTrainingDisplay($player);
@@ -93,7 +98,7 @@ class Layout {
     }
 
     public function renderAfterContentHTML(System $system, ?User $player, ?float $page_load_time = null, bool $render_content = true, bool $render_footer = true, bool $render_hotbar = true): void {
-        if($this->key == 'new_geisha') {
+        if($this->usesV2Interface()) {
             if (!$render_content) {
                 echo "</body></html>";
                 return;
@@ -300,5 +305,62 @@ class Layout {
             </script>";
 
         echo $display;
+    }
+
+    /**
+     * @param Notification[] $notifications
+     * @return void
+     */
+    public function renderLegacyNotifications(array $notifications): void {
+        if($this->usesV2Interface()) {
+            return;
+        }
+
+        if($this->key == 'shadow_ribbon' || $this->key === 'blue_scroll') {
+            if(count($notifications) > 1) {
+                echo "<img class='slideButtonLeft' onclick='slideNotificationLeft()' src='./images/left_arrow.png' />";
+            }
+
+            echo "<div id='notificationSlider'>";
+
+            foreach($notifications as $id => $notification) {
+                $extra_class_names = $notification->critical ? 'red' : '';
+                echo "<p class='notification' data-notification-id='$id'>
+                        <a class='link {$extra_class_names}' href='{$notification->action_url}'>{$notification->title}</a>
+                    </p>";
+            }
+
+            echo "</div>";
+            if(count($notifications) > 1) {
+                echo "<img class='slideButtonRight' onclick='slideNotificationRight()' src='./images/right_arrow.png' />";
+            }
+
+        }
+        else if($this->key == 'geisha') {
+            foreach($notifications as $id => $notification) {
+                $extra_class_names = $notification->critical ? 'red' : '';
+                echo "<p class='notification' style='margin-top:5px;margin-bottom:10px;'>
+                        <a class='link {$extra_class_names}' href='{$notification->action_url}'>{$notification->title}</a>
+                    </p>";
+            }
+        }
+        else {
+            echo "<div style='margin:0;border:1px solid #AAAAAA;border-radius:inherit;'>
+                    <div class='header'>
+                    Notifications
+                    </div>";
+
+            foreach($notifications as $id => $notification) {
+                $extra_class_names = $notification->critical ? 'red' : '';
+                echo "<p class='notification'>
+                        <a class='link {$extra_class_names}' href='{$notification->action_url}'>{$notification->title}</a>
+                    </p>";
+            }
+            echo "</div>";
+        }
+    }
+
+    public function usesV2Interface(): bool {
+        return $this->key == 'new_geisha';
     }
 }

@@ -5,55 +5,14 @@ require_once __DIR__ . '/Notification.php';
 class Notifications {
     // TODO: Refactor into a separate function that returns JSON for notifications and drop the $ajax parameter
     public static function displayNotifications(System $system, User $player, bool $ajax = false) {
-        $notifications = Notifications::getNotifications($system, $player);
+
 
         if(!$ajax) {
             echo "<div id='notifications'>";
         }
 
         if(!empty($notifications)) {
-            if($player->layout == 'shadow_ribbon' || $player->layout === 'blue_scroll') {
-                if(count($notifications) > 1) {
-                    echo "<img class='slideButtonLeft' onclick='slideNotificationLeft()' src='./images/left_arrow.png' />";
-                }
-
-                echo "<div id='notificationSlider'>";
-
-                foreach($notifications as $id => $notification) {
-                    $extra_class_names = $notification->critical ? 'red' : '';
-                    echo "<p class='notification' data-notification-id='$id'>
-                        <a class='link {$extra_class_names}' href='{$notification->action_url}'>{$notification->title}</a>
-                    </p>";
-                }
-
-                echo "</div>";
-                if(count($notifications) > 1) {
-                    echo "<img class='slideButtonRight' onclick='slideNotificationRight()' src='./images/right_arrow.png' />";
-                }
-
-            }
-            else if($player->layout == 'geisha') {
-                foreach($notifications as $id => $notification) {
-                    $extra_class_names = $notification->critical ? 'red' : '';
-                    echo "<p class='notification' style='margin-top:5px;margin-bottom:10px;'>
-                        <a class='link {$extra_class_names}' href='{$notification->action_url}'>{$notification->title}</a>
-                    </p>";
-                }
-            }
-            else {
-                echo "<div style='margin:0;border:1px solid #AAAAAA;border-radius:inherit;'>
-                    <div class='header'>
-                    Notifications
-                    </div>";
-
-                foreach($notifications as $id => $notification) {
-                    $extra_class_names = $notification->critical ? 'red' : '';
-                    echo "<p class='notification'>
-                        <a class='link {$extra_class_names}' href='{$notification->action_url}'>{$notification->title}</a>
-                    </p>";
-                }
-                echo "</div>";
-            }
+            $system->layout->renderLegacyNotifications($notifications);
         }
 
         if(!$ajax) {

@@ -11,7 +11,7 @@ if(isset($_SESSION['user_id'])) {
 $system->db->connect();
 
 // Start display
-$layout = $system->fetchLayoutByName("shadow_ribbon");
+$layout = $system->setLayoutByName("shadow_ribbon");
 $layout->renderBeforeContentHTML($system, null, 'Rules');
 
 // If user confirms password reset, check input and reset
@@ -56,23 +56,24 @@ address and requested a password reset. If this is not your account, please disr
 }
 
 // Print form for password reset
-echo "<table class='table' cellspacing='0' width='95%'>";
-echo "<tr><th>Password Reset</th></tr>";
-echo "<tr><td style='text-align:center;'>";
-echo "Enter your username and the email address you signed up with to have a new password sent to you.
-NOTE: This will reset your current password.<br />";
-echo "<form action='' method='post'>";
-echo "<div style='float:left;width:140px;text-align:left;'>";
-echo "<div style='margin-top:3px;margin-bottom:3px;'>Username: </div>";
-echo "<div style='margin-top:3px;margin-bottom:3px;'>Email address: </div>";
-echo "</div><div style='text-align:left;margin-left:140px;'>";
-echo "<input type='text' name='username' /><br />";
-echo "<input type='text' name='email' /><br />";
-echo "</div>";
-echo "<input type='submit' value='Reset' />";
-echo "</form>";
-echo "</td></tr></table>";
+echo "<table class='table' style='width: 95%'>
+    <tr><th>Password Reset</th></tr>
+    <tr><td style='text-align:center;'>
+        Enter your username and the email address you signed up with to have a new password sent to you.
+        NOTE: This will reset your current password.<br />
+        <form action='' method='post'>
+            <div style='float:left;width:140px;text-align:left;'>
+                <div style='margin-top:3px;margin-bottom:3px;'>Username: </div>
+                <div style='margin-top:3px;margin-bottom:3px;'>Email address: </div>
+            </div>
+            <div style='text-align:left;margin-left:140px;'>
+                <input type='text' name='username' /><br />
+                <input type='text' name='email' /><br />
+            </div>
+            <input type='submit' value='Reset' />
+        </form>
+    </td></tr>
+</table>";
 
 $layout->renderAfterContentHTML($system, $player ?? null);
 
-?>
