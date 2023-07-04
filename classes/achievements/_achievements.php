@@ -169,8 +169,8 @@ $LANTERN_EVENT_ACHIEVEMENTS = [
     LANTERN_EVENT_OBTAIN_VIOLET_LANTERN => new Achievement(
         id: LANTERN_EVENT_OBTAIN_VIOLET_LANTERN,
         rank: Achievement::RANK_COMMON,
-        name: 'Purple Lantern Holder',
-        prompt: 'Obtain a Purple Lantern',
+        name: 'Violet Lantern Holder',
+        prompt: 'Obtain a Violet Lantern',
         rewards: [
             new AchievementReward(AchievementReward::TYPE_MONEY, 5_000)
         ],
