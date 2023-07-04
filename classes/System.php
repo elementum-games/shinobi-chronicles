@@ -187,7 +187,6 @@ class System {
 
         $this->timezoneOffset = date('Z');
 
-        $this->setLayoutByName(System::DEFAULT_LAYOUT);
         $this->checkForActiveEvent();
     }
 
@@ -554,11 +553,6 @@ class System {
         ];
     }
 
-    public function getReactFile(string $component_name): string {
-        $filename = "ui_components/build/{$component_name}.js";
-        return $this->router->base_url . $filename . "?v=" .  filemtime($filename);
-    }
-
     public function isDevEnvironment(): bool {
         return $this->environment == System::ENVIRONMENT_DEV;
     }
@@ -754,6 +748,11 @@ class System {
         }
 
         return $display;
+    }
+
+    public function getReactFile(string $component_name): string {
+        $filename = "ui_components/build/{$component_name}.js";
+        return $this->router->base_url . $filename . "?v=" .  filemtime($filename);
     }
 
     public function getCssFileLink(string $file_name): string {

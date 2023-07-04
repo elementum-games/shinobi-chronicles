@@ -3,23 +3,6 @@
 require_once __DIR__ . '/Notification.php';
 
 class Notifications {
-    // TODO: Refactor into a separate function that returns JSON for notifications and drop the $ajax parameter
-    public static function displayNotifications(System $system, User $player, bool $ajax = false) {
-
-
-        if(!$ajax) {
-            echo "<div id='notifications'>";
-        }
-
-        if(!empty($notifications)) {
-            $system->layout->renderLegacyNotifications($notifications);
-        }
-
-        if(!$ajax) {
-            echo "</div>";
-        }
-    }
-
     /**
      * @param System $system
      * @param User   $player
