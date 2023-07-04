@@ -31,7 +31,7 @@ class NewsManager {
      */
     public function saveNewsPost(NewsPostDto $newsPost): bool
     {
-        if ($this->player->isHeadAdmin()) {
+        if ($this->player->hasAdminPanel()) {
             $tags = json_encode($newsPost->tags);
             $time = time();
             if ($newsPost->post_id == 0) {

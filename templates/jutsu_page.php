@@ -117,12 +117,7 @@
 
     .jutsu_details_table {
         border-radius: 10px;
-        position: absolute;
-        z-index: 10;
-	    top: 44px;
-        left: 50%;
         width: 580px !important;
-        transform: translate(-50%, 0%);
     }
         .jutsu_details_table tr {
             text-align: left;
@@ -156,8 +151,18 @@
         font-weight: bold;
         margin: 5px 0px;
     }
+    .jutsu_details_description {
+        height: 65px;
+        display: flex;
+        justify-content: center;
+        flex-direction: column;
+    }
     .jutsu_details_description p {
         margin: 5px 0px;
+    }
+    #jutsu_description {
+        height: 40px;
+        flex-shrink: 0;
     }
     .jutsu_details_child {
         display: inline-block;
@@ -363,35 +368,7 @@
     <?php endif; ?>
 </table>
 
-
-
-<!--Jutsu List-->
-<table class="table jutsu_list_table">
-    <tr>
-        <th>Jutsu</th>
-    </tr>
-    <tr>
-        <th>
-            <div class="jutsu_filter">
-                <div class="jutsu_filter_button_container">
-                    <button id="jutsu_filter_taijutsu" class="jutsu_filter_button">Taijutsu</button>
-                    <button id="jutsu_filter_ninjutsu" class="jutsu_filter_button">Ninjutsu</button>
-                    <button id="jutsu_filter_genjutsu" class="jutsu_filter_button">Genjutsu</button>
-                </div>
-                <div class="jutsu_filter_checkbox_container">
-                    <input id="jutsu_filter_damage" class="jutsu_filter_checkbox" type="checkbox" name="damage_toggle" checked/>
-                    <label for="damage_toggle">Damage</label>
-                    <input id="jutsu_filter_buff" class="jutsu_filter_checkbox" type="checkbox" name="buff_toggle" checked/>
-                    <label for="buff_toggle">Buff</label>
-                    <input id="jutsu_filter_debuff" class="jutsu_filter_checkbox" type="checkbox" name="debuff_toggle" checked/>
-                    <label for="debuff_toggle">Debuff</label>
-                </div>
-            </div>
-        </th>
-    </tr>
-    <tr>
-        <td>
-            <!--Jutsu Details Modal-->
+ <!--Jutsu Details Modal-->
             <table class="table jutsu_details_table">
                 <tr>
                     <th id="jutsu_name" colspan="2"></th>
@@ -448,7 +425,7 @@
                         </div>
                         <div class="jutsu_details_description">
                             <p id="jutsu_description"></p>
-                            <p style='text-align:center'>
+                            <p style='text-align:center; margin-top: auto'>
                                 <a id="forget_jutsu" href='<?= $self_link ?>&forget_jutsu='>Forget Jutsu!</a>
                             </p>
                         </div>
@@ -460,6 +437,33 @@
                     </th>
                 </tr>
             </table>
+
+<!--Jutsu List-->
+<table class="table jutsu_list_table">
+    <tr>
+        <th>Jutsu</th>
+    </tr>
+    <tr>
+        <th>
+            <div class="jutsu_filter">
+                <div class="jutsu_filter_button_container">
+                    <button id="jutsu_filter_taijutsu" class="jutsu_filter_button">Taijutsu</button>
+                    <button id="jutsu_filter_ninjutsu" class="jutsu_filter_button">Ninjutsu</button>
+                    <button id="jutsu_filter_genjutsu" class="jutsu_filter_button">Genjutsu</button>
+                </div>
+                <div class="jutsu_filter_checkbox_container">
+                    <input id="jutsu_filter_damage" class="jutsu_filter_checkbox" type="checkbox" name="damage_toggle" checked/>
+                    <label for="damage_toggle">Damage</label>
+                    <input id="jutsu_filter_buff" class="jutsu_filter_checkbox" type="checkbox" name="buff_toggle" checked/>
+                    <label for="buff_toggle">Buff</label>
+                    <input id="jutsu_filter_debuff" class="jutsu_filter_checkbox" type="checkbox" name="debuff_toggle" checked/>
+                    <label for="debuff_toggle">Debuff</label>
+                </div>
+            </div>
+        </th>
+    </tr>
+    <tr>
+        <td>
             <div class="jutsu_list">
                 <?php foreach ($jutsu_list as $jutsu): ?>
                     <!--data attributes used for filter logic-->
