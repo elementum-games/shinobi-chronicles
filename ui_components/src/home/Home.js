@@ -1,6 +1,6 @@
 // @flow
 
-import { RegisterForm } from "./RegisterForm.js";
+import { RegisterForm, CreateCharacterButton } from "./RegisterForm.js";
 import { Rules, Terms } from "./staticPageContents.js";
 import { clickOnEnter } from "../utils/uiHelpers.js"
 
@@ -105,18 +105,9 @@ function MainBannerSection({
     const [activeModalName, setActiveModalName] = React.useState(initialView === "register" ? "register" : "none");
 
     const loginFormRef = React.useRef(null);
-    const registerFormRef = React.useRef(null);
 
     function handleLogin() {
         loginFormRef.current?.submit();
-    }
-    function handleRegister() {
-        if (activeModalName !== "register") {
-            setActiveModalName("register");
-        }
-        else {
-            registerFormRef.current?.submit();
-        }
     }
 
     function scrollTo(element: ?HTMLElement) {
@@ -139,7 +130,6 @@ function MainBannerSection({
                 <RegisterForm
                     registerErrorText={registerErrorText}
                     registerPreFill={registerPreFill}
-                    formRef={registerFormRef}
                 />
             </MainBannerModal>;
             break;
@@ -179,7 +169,7 @@ function MainBannerSection({
 
                 {activeModal}
 
-                <div className="login_container">
+                <div className="login_container" style={activeModal != null ? {visibility: "hidden"} : {}}>
                     {!isLoggedIn && loginDisplay !== "reset" &&
                         <LoginForm
                             loginMessageText={loginMessageText}
@@ -195,9 +185,11 @@ function MainBannerSection({
                         />
                     }
 
-                    {!isLoggedIn &&
-                        <LoggedOutButtons handleLogin={handleLogin} handleRegister={handleRegister} />
+                    {!isLoggedIn && <LoginButton onCLick={handleLogin} />}
+                    {!isLoggedIn && activeModalName !== "register" &&
+                        <CreateCharacterButton onClick={() => setActiveModalName("register")} />
                     }
+
                     {isLoggedIn &&
                         <LoggedInButtons homeLinks={homeLinks} />
                     }
@@ -460,36 +452,30 @@ function FooterSection({ }) {
     );
 }
 
-function LoggedOutButtons({ handleLogin, handleRegister }) {
+function LoginButton({ onCLick }) {
     return (
-        <>
-            <svg role="button" tabIndex="0" name="login" className="login_button" width="162" height="32" onClick={() => handleLogin()} onKeyPress={clickOnEnter} style={{ zIndex: 2 }}>
-                <radialGradient id="login_fill_default" cx="50%" cy="50%" r="50%" fx="50%" fy="50%">
-                    <stop offset="0%" style={{ stopColor: '#464f87', stopOpacity: 1 }} />
-                    <stop offset="100%" style={{ stopColor: '#343d77', stopOpacity: 1 }} />
-                </radialGradient>
-                <radialGradient id="login_fill_click" cx="50%" cy="50%" r="50%" fx="50%" fy="50%">
-                    <stop offset="0%" style={{ stopColor: '#343d77', stopOpacity: 1 }} />
-                    <stop offset="100%" style={{ stopColor: '#464f87', stopOpacity: 1 }} />
-                </radialGradient>
-                <rect className="login_button_background" width="100%" height="100%" fill="url(#login_fill_default)" />
-                <text className="login_button_shadow_text" x="81" y="18" textAnchor="middle" dominantBaseline="middle">login</text>
-                <text className="login_button_text" x="81" y="16" textAnchor="middle" dominantBaseline="middle">login</text>
-            </svg>
-            <svg role="button" tabIndex="0" name="register" className="register_button" width="162" height="32" onClick={() => handleRegister()} onKeyPress={clickOnEnter} style={{ zIndex: 4 }}>
-                <radialGradient id="register_fill_default" cx="50%" cy="50%" r="50%" fx="50%" fy="50%">
-                    <stop offset="0%" style={{ stopColor: '#84314e', stopOpacity: 1 }} />
-                    <stop offset="100%" style={{ stopColor: '#68293f', stopOpacity: 1 }} />
-                </radialGradient>
-                <radialGradient id="register_fill_click" cx="50%" cy="50%" r="50%" fx="50%" fy="50%">
-                    <stop offset="0%" style={{ stopColor: '#68293f', stopOpacity: 1 }} />
-                    <stop offset="100%" style={{ stopColor: '#84314e', stopOpacity: 1 }} />
-                </radialGradient>
-                <rect className="register_button_background" width="100%" height="100%" />
-                <text className="register_button_shadow_text" x="81" y="18" textAnchor="middle" dominantBaseline="middle">create a character</text>
-                <text className="register_button_text" x="81" y="16" textAnchor="middle" dominantBaseline="middle">create a character</text>
-            </svg>
-        </>
+        <svg
+            role="button"
+            tabIndex="0"
+            name="login"
+            className="login_button"
+            width="162"
+            height="32"
+            onClick={() => onCLick()}
+            onKeyPress={clickOnEnter}
+        >
+            <radialGradient id="login_fill_default" cx="50%" cy="50%" r="50%" fx="50%" fy="50%">
+                <stop offset="0%" style={{ stopColor: '#464f87', stopOpacity: 1 }} />
+                <stop offset="100%" style={{ stopColor: '#343d77', stopOpacity: 1 }} />
+            </radialGradient>
+            <radialGradient id="login_fill_click" cx="50%" cy="50%" r="50%" fx="50%" fy="50%">
+                <stop offset="0%" style={{ stopColor: '#343d77', stopOpacity: 1 }} />
+                <stop offset="100%" style={{ stopColor: '#464f87', stopOpacity: 1 }} />
+            </radialGradient>
+            <rect className="login_button_background" width="100%" height="100%" fill="url(#login_fill_default)" />
+            <text className="login_button_shadow_text" x="81" y="18" textAnchor="middle" dominantBaseline="middle">login</text>
+            <text className="login_button_text" x="81" y="16" textAnchor="middle" dominantBaseline="middle">login</text>
+        </svg>
     );
 }
 

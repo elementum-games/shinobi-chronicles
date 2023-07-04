@@ -1,4 +1,4 @@
-import { RegisterForm } from "./RegisterForm.js";
+import { RegisterForm, CreateCharacterButton } from "./RegisterForm.js";
 import { Rules, Terms } from "./staticPageContents.js";
 import { clickOnEnter } from "../utils/uiHelpers.js";
 import { News } from "./News.js";
@@ -77,18 +77,9 @@ function MainBannerSection({
   const [loginDisplay, setLoginDisplay] = React.useState(initialView === "reset" ? "reset" : "login");
   const [activeModalName, setActiveModalName] = React.useState(initialView === "register" ? "register" : "none");
   const loginFormRef = React.useRef(null);
-  const registerFormRef = React.useRef(null);
 
   function handleLogin() {
     loginFormRef.current?.submit();
-  }
-
-  function handleRegister() {
-    if (activeModalName !== "register") {
-      setActiveModalName("register");
-    } else {
-      registerFormRef.current?.submit();
-    }
   }
 
   function scrollTo(element) {
@@ -112,8 +103,7 @@ function MainBannerSection({
         handleCloseClick: () => setActiveModalName("none")
       }, /*#__PURE__*/React.createElement(RegisterForm, {
         registerErrorText: registerErrorText,
-        registerPreFill: registerPreFill,
-        formRef: registerFormRef
+        registerPreFill: registerPreFill
       }));
       break;
 
@@ -163,7 +153,10 @@ function MainBannerSection({
   }, /*#__PURE__*/React.createElement("img", {
     src: "/images/v2/decorations/lanternsmall.png"
   })), activeModal, /*#__PURE__*/React.createElement("div", {
-    className: "login_container"
+    className: "login_container",
+    style: activeModal != null ? {
+      visibility: "hidden"
+    } : {}
   }, !isLoggedIn && loginDisplay !== "reset" && /*#__PURE__*/React.createElement(LoginForm, {
     loginMessageText: loginMessageText,
     loginErrorText: loginErrorText,
@@ -172,9 +165,10 @@ function MainBannerSection({
   }), loginDisplay === "reset" && /*#__PURE__*/React.createElement(ResetPasswordForm, {
     resetErrorText: resetErrorText,
     handleCloseClick: () => setLoginDisplay("login")
-  }), !isLoggedIn && /*#__PURE__*/React.createElement(LoggedOutButtons, {
-    handleLogin: handleLogin,
-    handleRegister: handleRegister
+  }), !isLoggedIn && /*#__PURE__*/React.createElement(LoginButton, {
+    onCLick: handleLogin
+  }), !isLoggedIn && activeModalName !== "register" && /*#__PURE__*/React.createElement(CreateCharacterButton, {
+    onClick: () => setActiveModalName("register")
   }), isLoggedIn && /*#__PURE__*/React.createElement(LoggedInButtons, {
     homeLinks: homeLinks
   })), /*#__PURE__*/React.createElement("div", {
@@ -469,22 +463,18 @@ function FooterSection({}) {
   }, "SHINOBI CHRONICLES V0.9.0 COPYRIGHT \xA9 LM VISIONS"));
 }
 
-function LoggedOutButtons({
-  handleLogin,
-  handleRegister
+function LoginButton({
+  onCLick
 }) {
-  return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("svg", {
+  return /*#__PURE__*/React.createElement("svg", {
     role: "button",
     tabIndex: "0",
     name: "login",
     className: "login_button",
     width: "162",
     height: "32",
-    onClick: () => handleLogin(),
-    onKeyPress: clickOnEnter,
-    style: {
-      zIndex: 2
-    }
+    onClick: () => onCLick(),
+    onKeyPress: clickOnEnter
   }, /*#__PURE__*/React.createElement("radialGradient", {
     id: "login_fill_default",
     cx: "50%",
@@ -540,73 +530,7 @@ function LoggedOutButtons({
     y: "16",
     textAnchor: "middle",
     dominantBaseline: "middle"
-  }, "login")), /*#__PURE__*/React.createElement("svg", {
-    role: "button",
-    tabIndex: "0",
-    name: "register",
-    className: "register_button",
-    width: "162",
-    height: "32",
-    onClick: () => handleRegister(),
-    onKeyPress: clickOnEnter,
-    style: {
-      zIndex: 4
-    }
-  }, /*#__PURE__*/React.createElement("radialGradient", {
-    id: "register_fill_default",
-    cx: "50%",
-    cy: "50%",
-    r: "50%",
-    fx: "50%",
-    fy: "50%"
-  }, /*#__PURE__*/React.createElement("stop", {
-    offset: "0%",
-    style: {
-      stopColor: '#84314e',
-      stopOpacity: 1
-    }
-  }), /*#__PURE__*/React.createElement("stop", {
-    offset: "100%",
-    style: {
-      stopColor: '#68293f',
-      stopOpacity: 1
-    }
-  })), /*#__PURE__*/React.createElement("radialGradient", {
-    id: "register_fill_click",
-    cx: "50%",
-    cy: "50%",
-    r: "50%",
-    fx: "50%",
-    fy: "50%"
-  }, /*#__PURE__*/React.createElement("stop", {
-    offset: "0%",
-    style: {
-      stopColor: '#68293f',
-      stopOpacity: 1
-    }
-  }), /*#__PURE__*/React.createElement("stop", {
-    offset: "100%",
-    style: {
-      stopColor: '#84314e',
-      stopOpacity: 1
-    }
-  })), /*#__PURE__*/React.createElement("rect", {
-    className: "register_button_background",
-    width: "100%",
-    height: "100%"
-  }), /*#__PURE__*/React.createElement("text", {
-    className: "register_button_shadow_text",
-    x: "81",
-    y: "18",
-    textAnchor: "middle",
-    dominantBaseline: "middle"
-  }, "create a character"), /*#__PURE__*/React.createElement("text", {
-    className: "register_button_text",
-    x: "81",
-    y: "16",
-    textAnchor: "middle",
-    dominantBaseline: "middle"
-  }, "create a character")));
+  }, "login"));
 }
 
 function LoggedInButtons({

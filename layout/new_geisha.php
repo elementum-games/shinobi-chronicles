@@ -1,6 +1,6 @@
 <?php
 
-function getNewGeishaLayout(System $system): Layout {
+function getNewGeishaLayout(System $system, bool $enable_mobile_layout): Layout {
     $react_dev_tags = <<<HTML
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react/17.0.2/umd/react.development.js" crossorigin></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/17.0.2/umd/react-dom.development.js" crossorigin></script>
@@ -15,7 +15,7 @@ HTML;
         $extra_meta_tags = '<meta name="robots" content="noindex" />';
         $react_tags = $react_dev_tags;
 
-        if($system->enable_mobile_layout) {
+        if($enable_mobile_layout) {
             $extra_meta_tags .= '<meta name="viewport" content="width=device-width, initial-scale=1" />';
         }
     }

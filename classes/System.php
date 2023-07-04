@@ -525,8 +525,9 @@ class System {
                 break;
             case 'new_geisha':
                 require_once __DIR__ . "/../layout/new_geisha.php";
-                $this->layout = getNewGeishaLayout($this);
+                // This needs to be first so the function can read it
                 $this->enable_mobile_layout = true;
+                $this->layout = getNewGeishaLayout($this, $this->enable_mobile_layout);
                 break;
             default:
                 $this->layout = require "layout/" . self::DEFAULT_LAYOUT . ".php";
