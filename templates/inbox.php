@@ -17,7 +17,7 @@ if($player->checkBan(StaffManager::BAN_TYPE_PM)) {
 }
 ?>
 
-<link rel="stylesheet" type="text/css" href="ui_components/src/inbox/inbox.css" />
+<link rel="stylesheet" type="text/css" href="<?= $system->getCssFileLink("ui_components/src/inbox/inbox.css") ?>" />
 
 <div id="inboxReactContainer"></div>
 

@@ -8,7 +8,7 @@ $NotificationAPIManager = new NotificationAPIManager($system, $player);
 
 ?>
 
-<link rel="stylesheet" type="text/css" href="ui_components/src/topbar/Topbar.css" />
+<link rel="stylesheet" type="text/css" href="<?= $system->getCssFileLink("ui_components/src/topbar/Topbar.css") ?>" />
 
 <div id="topbarContainer"></div>
 <script type="module" src="<?= $system->getReactFile("topbar/Topbar") ?>"></script>

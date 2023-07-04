@@ -4,7 +4,7 @@
 
 require_once 'layout/_common.php';
 
-$heading = coreHeading('./style/shadow_ribbon/layout.css') . <<<HTML
+$heading = coreHeading($system->getCssFileLink('style/shadow_ribbon/layout.css')) . <<<HTML
 <body>
 	<div id='header'>
 		<img id='banner' src='./style/shadow_ribbon/images/new_banner.png' />	

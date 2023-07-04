@@ -5,7 +5,7 @@
 
 ?>
 
-<link rel="stylesheet" type="text/css" href="ui_components/src/header/Header.css" />
+<link rel="stylesheet" type="text/css" href="<?= $system->getCssFileLink("ui_components/src/header/Header.css") ?>" />
 
 <div id="headerContainer"></div>
 <script type="module" src="<?= $system->getReactFile("header/Header") ?>"></script>

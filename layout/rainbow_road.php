@@ -1,8 +1,12 @@
 <?php
 
+/**
+ * @var System $system
+ */
+
 require_once 'layout/_common.php';
 
-$heading = coreHeading('./style/rainbow_road/layout.css') .
+$heading = coreHeading($system->getCssFileLink('style/rainbow_road/layout.css')) .
 <<<HTML
 <body>
 	<div id='header'>

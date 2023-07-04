@@ -5,7 +5,7 @@
  */
 ?>
 
-<link rel="stylesheet" type="text/css" href="ui_components/src/travel/Travel.css" />
+<link rel="stylesheet" type="text/css" href="<?= $system->getCssFileLink("ui_components/src/travel/Travel.css") ?>" />
 <div id="travelContainer"></div>
 <script type="module" src="<?= $system->getReactFile("travel/Travel") ?>"></script>
 <script>

@@ -1,8 +1,12 @@
 <?php
 
+/**
+ * @var System $system
+ */
+
 require_once 'layout/_common.php';
 
-$heading = coreHeading('./style/geisha/geisha.css') .
+$heading = coreHeading($system->getCssFileLink('style/geisha/geisha.css')) .
 <<<HTML
 <body>
 	<div id='container'>

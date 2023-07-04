@@ -559,6 +559,21 @@ class System {
         return $this->router->base_url . $filename . "?v=" .  filemtime($filename);
     }
 
+    public function isDevEnvironment(): bool {
+        return $this->environment == System::ENVIRONMENT_DEV;
+    }
+
+    public function checkForActiveEvent(): void {
+        $current_datetime = new DateTimeImmutable();
+
+        // July 2023 Lantern Event
+        $july_2023_lantern_event_start_time = new DateTimeImmutable('2023-07-01');
+        $july_2023_lantern_event_end_time = new DateTimeImmutable('2023-07-16');
+        if($current_datetime > $july_2023_lantern_event_start_time && $current_datetime < $july_2023_lantern_event_end_time) {
+            $this->event = new LanternEvent($july_2023_lantern_event_end_time);
+        }
+    }
+
     /**
      * @param string $entity_id
      * @return EntityId
@@ -741,18 +756,7 @@ class System {
         return $display;
     }
 
-    public function isDevEnvironment(): bool {
-        return $this->environment == System::ENVIRONMENT_DEV;
-    }
-
-    public function checkForActiveEvent(): void {
-        $current_datetime = new DateTimeImmutable();
-
-        // July 2023 Lantern Event
-        $july_2023_lantern_event_start_time = new DateTimeImmutable('2023-07-01');
-        $july_2023_lantern_event_end_time = new DateTimeImmutable('2023-07-16');
-        if($current_datetime > $july_2023_lantern_event_start_time && $current_datetime < $july_2023_lantern_event_end_time) {
-            $this->event = new LanternEvent($july_2023_lantern_event_end_time);
-        }
+    public function getCssFileLink(string $file_name): string {
+        return $this->router->base_url . $file_name . "?v=" .  filemtime($file_name);
     }
 }

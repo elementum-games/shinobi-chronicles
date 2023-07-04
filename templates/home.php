@@ -5,6 +5,7 @@
  * @var string $login_error_text
  * @var string $register_error_text
  * @var string $reset_error_text
+ * @var string $login_message_text
  * @var string $initial_home_view
  * @var array $home_links
  * @var array $register_pre_fill
@@ -15,11 +16,10 @@ if (isset($player)) {
 }
 else $NewsManager = new NewsManager($system);
 
-
 ?>
 
 <div id="homeReactContainer"></div>
-<link rel="stylesheet" type="text/css" href="ui_components/src/home/Home.css" />
+<link rel="stylesheet" type="text/css" href="<?= $system->getCssFileLink("ui_components/src/home/Home.css") ?>" />
 <script type="module" src="<?= $system->getReactFile("home/Home") ?>"></script>
 <script type="text/javascript">
     const homeContainer = document.querySelector("#homeReactContainer");

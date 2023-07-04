@@ -9,11 +9,11 @@
  */
 ?>
 <?php if ($system->layout->usesV2Interface()): ?>
-    <link rel="stylesheet" type="text/css" href="ui_components/src/chat/Chat_new.css" />
+    <link rel="stylesheet" type="text/css" href="<?= $system->getCssFileLink("ui_components/src/chat/Chat_new.css") ?>" />
     <div id="chatReactContainer"></div>
     <script type="module" src="<?= $system->getReactFile("chat/Chat_new") ?>"></script>
 <?php else: ?>
-    <link rel="stylesheet" type="text/css" href="ui_components/src/chat/Chat.css" />
+    <link rel="stylesheet" type="text/css" href="<?= $system->getCssFileLink("ui_components/src/chat/Chat.css") ?>" />
     <div id="chatReactContainer"></div>
     <script type="module" src="<?= $system->getReactFile("chat/Chat") ?>"></script>
 <?php endif; ?>

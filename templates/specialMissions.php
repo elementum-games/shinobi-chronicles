@@ -5,7 +5,7 @@
  * @var string $self_link
  */
 ?>
-<link rel='stylesheet' type='text/css' href='style/special_missions.css' />
+<link rel='stylesheet' type='text/css' href='<?= $system->getCssFileLink("style/special_missions.css") ?>' />
 <?php if(!$player->special_mission): ?>
     <div class="contentDiv">
         <h2 class="contentDivHeader">

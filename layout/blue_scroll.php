@@ -2,7 +2,7 @@
 /** @var System $system */
 
 require_once 'layout/_common.php';
-$heading = coreHeading('./style/blue_scroll/layout.css') .
+$heading = coreHeading($system->getCssFileLink('style/blue_scroll/layout.css')) .
 <<<HTML
 <body>
 	<div id='header'>
