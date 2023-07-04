@@ -2,7 +2,6 @@
     /**
      * @var System  $system
      * @var array   $jutsu_constraints
-     * @var array   $RANK_NAMES
      * @var Jutsu[] $ALL_JUTSU
      * @var ?Jutsu  $existing_jutsu
      * @var ?string $parent_field_name
@@ -27,7 +26,10 @@
         else {
             return $name;
         }
-    }
+    };
+
+    require_once __DIR__ . '/../../classes/RankManager.php';
+    $RANK_NAMES = RankManager::fetchNames($system);
 ?>
 <style>
     .jutsuForm label {

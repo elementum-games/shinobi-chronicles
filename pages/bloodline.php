@@ -1,8 +1,7 @@
 <?php
-/*	File:		bloodline.php
-	Author:		Levi Meahan
-	Created:	04/10/2014
-*/
+
+require_once __DIR__ . '/../classes/RankManager.php';
+
 /**
  * @throws RuntimeException
  */
@@ -11,7 +10,9 @@ function bloodline() {
 	/** @var User */
 	global $player;
 	global $self_link;
-	global $RANK_NAMES;
+
+	$RANK_NAMES = RankManager::fetchNames($system);
+
 	if(!$player->bloodline_id) {
 		$system->message("You do not have a bloodline!");
 		$system->printMessage();

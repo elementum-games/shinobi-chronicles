@@ -5,7 +5,7 @@
  * @var string $login_error_text
  * @var string $register_error_text
  * @var string $reset_error_text
- * @var string $initial_login_display
+ * @var string $initial_home_view
  * @var array $home_links
  * @var array $register_pre_fill
  */
@@ -31,7 +31,7 @@ else $NewsManager = new NewsManager($system);
                 isLoggedIn: "<?= isset($player) ?>",
                 isAdmin: "<?= isset($player) ? $player->hasAdminPanel() : false ?>",
                 version: "<?= System::VERSION_NAME ?>",
-                initialLoginDisplay: "<?= $initial_login_display ?>",
+                initialView: "<?= $initial_home_view ?>",
                 loginURL: "<?= $system->router->base_url ?>",
                 registerURL: "<?= $system->router->base_url ?>",
                 loginErrorText: "<?= $login_error_text ?>",

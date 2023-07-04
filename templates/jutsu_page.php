@@ -1,12 +1,15 @@
 <?php
 /**
+ * @var System $system
  * @var string $self_link
- * @var array $rank_names
  * @var array $child_jutsu
  * @var User $player
  * @var array $jutsu_list
  * @var int $max_equipped_jutsu
  */
+
+require_once __DIR__ . '/../classes/RankManager.php';
+$rank_names = RankManager::fetchNames($system);
 ?>
 
 <style>

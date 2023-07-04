@@ -1,14 +1,8 @@
 <?php
-/*
-File: 		members.php
-Coder:		Levi Meahan
-Created:	08/24/2013
-Revised:	05/02/2014 by Levi Meahan
-Purpose:	Lists of users as well as view profile of specific users
-Algorithm:	See master_plan.html
-*/
 
-function members() {
+require_once __DIR__ . '/../classes/RankManager.php';
+
+function members(): void {
 	global $system;
 
 	global $player;
@@ -17,10 +11,7 @@ function members() {
 
 	$display_list = 'standard';
 
-	// Load rank data
-	global $RANK_NAMES;
-	$ranks = $RANK_NAMES;
-
+    $ranks = RankManager::fetchNames($system);
 
 	// Sub-menu
 	renderMemberSubmenu();

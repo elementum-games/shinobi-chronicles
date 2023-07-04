@@ -107,8 +107,6 @@ function adminPanel() {
         $page = '';
     }
 
-    $RANK_NAMES = RankManager::fetchNames($system);
-
     // Create NPC
     if($page == 'create_ai') {
         /* Variables
@@ -256,11 +254,11 @@ function adminPanel() {
     // jutsu
     else if($page == 'create_jutsu') {
         require 'admin/jutsu.php';
-        createJutsuPage($system, $RANK_NAMES);
+        createJutsuPage($system);
     }
     else if($page == 'edit_jutsu') {
         require 'admin/jutsu.php';
-        editJutsuPage($system, $RANK_NAMES);
+        editJutsuPage($system);
     }
 
     // Item

@@ -1,10 +1,13 @@
 <?php
 
+require_once __DIR__ . '/../classes/RankManager.php';
+
 function team() {
     global $system;
     global $player;
     global $self_link;
-    global $RANK_NAMES;
+
+    $RANK_NAMES = RankManager::fetchNames($system);
 
     //Process these requests prior to display to avoid having to reload page
     if(isset($_POST['create_team'])) {

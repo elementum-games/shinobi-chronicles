@@ -6,7 +6,6 @@ function specialMissions() {
     global $system;
     global $player;
 	global $self_link;
-	global $RANK_NAMES;
 	$self_id = 15;
 
     // Start new Special Mission

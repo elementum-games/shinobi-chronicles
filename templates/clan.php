@@ -2,7 +2,6 @@
 /**
  * @var string $self_link
  * @var System $system
- * @var array $RANK_NAMES
  *
  * @var User $player
  * @var Clan $clan
@@ -22,6 +21,8 @@
  * @var int $next
  */
 
+ require_once __DIR__ . '/../classes/RankManager.php';
+ $RANK_NAMES = RankManager::fetchNames($system);
 ?>
 <style>
     label {

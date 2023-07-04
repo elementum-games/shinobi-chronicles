@@ -5,12 +5,8 @@ require_once __DIR__ . '/../classes/training/TrainingManager.php';
 
 function academy() {
 	global $system;
-
 	global $player;
-
 	global $self_link;
-
-	global $RANK_NAMES;
 
 	// If exam submitted
 	if (isset($_POST['submit_exam'])) {

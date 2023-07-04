@@ -12,12 +12,8 @@ require_once __DIR__ . '/../classes/notification/NotificationManager.php';
 function premium(): bool
 {
     global $system;
-
     global $player;
-
     global $self_link;
-
-    global $RANK_NAMES;
 
     $costs['name_change'] = 15;
     $costs['gender_change'] = 10;

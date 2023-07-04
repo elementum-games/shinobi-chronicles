@@ -2,9 +2,11 @@
 /**
  * @var System $system
  * @var array $jutsu_constraints
- * @var array $RANK_NAMES
  * @var Jutsu[] $ALL_JUTSU
  */
+
+ require_once __DIR__ . '/../../classes/RankManager.php';
+ $RANK_NAMES = RankManager::fetchNames($system);
 ?>
 
 <table class='table'>
