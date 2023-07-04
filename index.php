@@ -493,9 +493,6 @@ if($LOGGED_IN) {
         $player->global_message_viewed = 1;
     }
 
-    // Load rank data// Rank names
-    $RANK_NAMES = RankManager::fetchNames($system);
-
     // Route list
     $routes = Router::$routes;
 
@@ -649,7 +646,7 @@ if($LOGGED_IN) {
         } catch (RuntimeException $e) {
             $system->db->rollbackTransaction();
             $system->message($e->getMessage());
-            if ($system->isDevEnvironment()) {
+            if (!$system->layout->usesV2Interface()) {
                 $system->printMessage(true);
             }
         }
@@ -690,7 +687,7 @@ else {
     $layout->renderBeforeContentHTML($system, $player ?? null, "Home", render_content: false, render_header: false, render_sidebar: false, render_topbar: false);
 
     // Display error messages
-    if ($system->isDevEnvironment()) {
+    if (!$system->layout->usesV2Interface()) {
         $system->printMessage(true);
     }
     if(!$system->SC_OPEN) {
@@ -702,19 +699,19 @@ else {
 
     $captcha = '';
 
-        $initial_login_display = "login";
-        if ($reset_error_text != "") {
-            $initial_login_display = "reset";
-        }
-        if ($register_error_text != "") {
-            $initial_login_display = "register";
-        }
-        require('./templates/home.php');
-        $layout->renderAfterContentHTML($system, $player ?? null, render_content: false, render_footer: false, render_hotbar: false);
+    $initial_home_view = "login";
+    if ($reset_error_text != "") {
+        $initial_home_view = "reset";
+    }
+    if ($register_error_text != "") {
+        $initial_home_view = "register";
+    }
+    require('./templates/home.php');
+    $layout->renderAfterContentHTML($system, $player ?? null, render_content: false, render_footer: false, render_hotbar: false);
 
-        $page_load_time = round(microtime(true) - $PAGE_LOAD_START, 3);
-        $system->db->commitTransaction();
-        exit;
+    $page_load_time = round(microtime(true) - $PAGE_LOAD_START, 3);
+    $system->db->commitTransaction();
+    exit;
 
 
 }

@@ -143,6 +143,9 @@ body {
     flex-direction: column;
     align-items: center;
 }
+.main_banner_title img {
+    max-width: 95%;
+}
 .title_version {
     background-color: rgba(33, 36, 58, 0.9);
     height: 37px;
@@ -162,7 +165,10 @@ body {
 }
 
 .login_container {
+    width: 400px;
     height: 280px;
+    position: relative;
+
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -474,8 +480,8 @@ body {
 /* Login Form */
 #login_form {
     position: absolute;
-    transform: translateY(-110px);
-    width: 400px;
+    transform: translateY(-115px);
+    width: 100%;
     background: rgba(20, 20, 28, 0.75);
 }
 .login_input_top {
@@ -536,6 +542,79 @@ body {
     color: #ceb581;
     user-select: none;
 }
+
+/* Reset Form */
+#reset_form {
+    position: absolute;
+    z-index: 1;
+
+    transform: translateY(-115px);
+    width: 100%;
+    background: rgba(20, 20, 28, 0.75);
+}
+#reset_form h3 {
+    margin: 15px 15px 0;
+
+    font-size: var(--font-large);
+    font-variant: all-small-caps;
+    font-weight: normal;
+}
+#reset_form .modal_close {
+    position: absolute;
+    top: 12px;
+    right: 15px;
+
+    margin: 0;
+
+    background: none;
+    border: none;
+}
+
+.reset_link {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 15px;
+    font-variant: small-caps;
+    user-select: none;
+    color: #bfb7e0;
+    cursor: pointer;
+    margin-left: auto;
+    margin-right: 15px;
+    flex-shrink: 0;
+    padding-left: 10px;
+}
+.reset_link:hover {
+    color: white;
+}
+.reset_input_top {
+    height: 75px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 15px;
+}
+.reset_input_bottom {
+    display: flex;
+    justify-content: center;
+    flex-direction: row;
+    margin-bottom: 15px;
+    margin-top: -10px;
+}
+.reset_email_wrapper {
+    flex-basis: 40%;
+}
+.reset_email_input {
+    width: 165px;
+    height: 25px;
+    margin-bottom: 10px;
+}
+.reset_email_label {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 15px;
+    font-variant: small-caps;
+    color: #ceb581;
+    user-select: none;
+}
+
 
 /* Modals  */
 .main_banner_modal {
@@ -601,11 +680,9 @@ body {
     top: 130px;
     z-index: 3;
 }
-
 .main_banner_modal.terms {
     width: 550px;
 }
-
 
 /* Register Form */
 .register_field_label {
@@ -697,58 +774,6 @@ body {
 .register_input_bottom .login_error_label {
     margin: 0 !important;
     padding-top: 10px;
-}
-
-/* Reset Form */
-#reset_form {
-    position: absolute;
-    transform: translateY(-100px);
-    width: 400px;
-    background: rgba(20, 20, 28, 0.75);
-}
-.reset_link {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    font-size: 15px;
-    font-variant: small-caps;
-    user-select: none;
-    color: #bfb7e0;
-    cursor: pointer;
-    margin-left: auto;
-    margin-right: 15px;
-    flex-shrink: 0;
-    padding-left: 10px;
-}
-    .reset_link:hover {
-        color: white;
-    }
-.reset_input_top {
-    height: 75px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 40px;
-}
-.reset_input_bottom {
-    display: flex;
-    justify-content: center;
-    flex-direction: row;
-    margin-bottom: 15px;
-    margin-top: -10px;
-}
-.reset_email_wrapper {
-    flex-basis: 40%;
-}
-.reset_email_input {
-    width: 165px;
-    height: 25px;
-    margin-bottom: 10px;
-}
-.reset_email_label {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    font-size: 15px;
-    font-variant: small-caps;
-    color: #ceb581;
-    user-select: none;
 }
 
 /* News */
@@ -969,68 +994,13 @@ body {
     font-size: 15px;
     color: #838385;
     margin-top: 30px;
+}
 
-
-/* Lanterns WIP */}
-.home_lantern_1 {
+/* Lanterns WIP */
+.home_lantern {
     position: absolute;
-    transform: translate(-530px, -100px);
+    z-index: 1;
 }
-    .home_lantern_1::after {
-        animation-delay: -2.5s !important;
-    }
-    .home_lantern_1 img {
-        max-height: 65px;
-        position: absolute;
-        animation: floatUpDown 5s infinite;
-        animation-delay: -2.5s !important;
-        animation-timing-function: ease-in-out;
-    }
-.home_lantern_2 {
-    position: absolute;
-    transform: translate(-225px, -263px) scaleX(-1);
-}
-    .home_lantern_2::after {
-        animation-delay: -3s !important;
-    }
-    .home_lantern_2 img {
-        position: absolute;
-        animation: floatUpDown 5s infinite;
-        animation-delay: -3s !important;
-        animation-timing-function: ease-in-out;
-        max-height: 60px;
-    }
-.home_lantern_3 {
-    position: absolute;
-    transform: translate(205px, -255px);
-}
-    .home_lantern_3::after {
-        animation-delay: -1s !important;
-    }
-    .home_lantern_3 img {
-        position: absolute;
-        animation: floatUpDown 5s infinite;
-        animation-delay: -1s !important;
-        animation-timing-function: ease-in-out;
-        max-height: 55px;
-    }
-.home_lantern_4 {
-    position: absolute;
-    transform: translate(450px, -100px) scaleX(-1);
-    background-color: #fff;
-    
-}
-    .home_lantern_4::after {
-        animation-delay: -0.5s !important;
-    }
-    .home_lantern_4 img {
-        position: absolute;
-        max-height: 55px;
-        animation-delay: -0.5s !important;
-        animation: floatUpDown 5s infinite;
-        animation-timing-function: ease-in-out;
-        
-    }
 .home_lantern::after {
     content: '';
     box-shadow: 0 0 45px 3px #f9f8dd, 0 0 20px 2px #c78b7b;
@@ -1040,6 +1010,62 @@ body {
     left: 5px;
     top: 5px;
     animation: floatUpDown 5s infinite, Glow 4s infinite;
+    animation-timing-function: ease-in-out;
+}
+.home_lantern img {
+    position: absolute;
+}
+
+.lantern_1 {
+    transform: translate(-530px, -100px);
+}
+.lantern_1::after {
+    animation-delay: -2.5s !important;
+}
+.lantern_1 img {
+    max-height: 65px;
+    animation: floatUpDown 5s infinite;
+    animation-delay: -2.5s !important;
+    animation-timing-function: ease-in-out;
+}
+
+.lantern_2 {
+    transform: translate(-225px, -263px) scaleX(-1);
+}
+.lantern_2::after {
+    animation-delay: -3s !important;
+}
+.lantern_2 img {
+    max-height: 60px;
+    animation: floatUpDown 5s infinite;
+    animation-delay: -3s !important;
+    animation-timing-function: ease-in-out;
+}
+
+.lantern_3 {
+    transform: translate(205px, -255px);
+}
+.lantern_3::after {
+    animation-delay: -1s !important;
+}
+.lantern_3 img {
+    max-height: 55px;
+    animation: floatUpDown 5s infinite;
+    animation-delay: -1s !important;
+    animation-timing-function: ease-in-out;
+}
+
+.lantern_4 {
+    transform: translate(450px, -100px) scaleX(-1);
+    background-color: #fff;
+}
+.lantern_4::after {
+    animation-delay: -0.5s !important;
+}
+.lantern_4 img {
+    max-height: 55px;
+    animation-delay: -0.5s !important;
+    animation: floatUpDown 5s infinite;
     animation-timing-function: ease-in-out;
 }
 

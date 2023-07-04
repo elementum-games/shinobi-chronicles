@@ -7,10 +7,12 @@ import type { NewsPostType } from "./newsSchema.js";
 type Props = {|
     +initialNewsPosts: $ReadOnlyArray<NewsPostType>,
     +isAdmin: boolean,
-    +verision: string,
-    +homeLinks: $ReadOnlyArray<string>,
+    +version: string,
+    +homeLinks: {
+        +[key: string]: string,
+    },
 |};
-export function News({ initialNewsPosts, isAdmin, version, homeLinks }: Props) {
+export function News({ initialNewsPosts, isAdmin, version, homeLinks }: Props): React$Node {
     const [activePostId, setActivePostId] = React.useState(initialNewsPosts[0] !== "undefined" ? initialNewsPosts[0].post_id : null);
     const [editPostId, setEditPostId] = React.useState(null);
     const numPosts = React.useRef(initialNewsPosts.length);

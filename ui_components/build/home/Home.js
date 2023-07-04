@@ -2,12 +2,13 @@ import { RegisterForm } from "./RegisterForm.js";
 import { Rules, Terms } from "./staticPageContents.js";
 import { clickOnEnter } from "../utils/uiHelpers.js";
 import { News } from "./News.js";
+
 function Home({
   homeLinks,
   isLoggedIn,
   isAdmin,
   version,
-  initialLoginDisplay,
+  initialView,
   loginErrorText,
   registerErrorText,
   resetErrorText,
@@ -15,7 +16,6 @@ function Home({
   registerPreFill,
   initialNewsPosts
 }) {
-  const [loginDisplay, setLoginDisplay] = React.useState(initialLoginDisplay);
   const newsRef = React.useRef(null);
   const contactRef = React.useRef(null);
   const activeElement = React.useRef(null);
@@ -23,8 +23,7 @@ function Home({
     homeLinks: homeLinks,
     isLoggedIn: isLoggedIn,
     version: version,
-    loginDisplay: loginDisplay,
-    setLoginDisplay: setLoginDisplay,
+    initialView: initialView,
     loginErrorText: loginErrorText,
     registerErrorText: registerErrorText,
     resetErrorText: resetErrorText,
@@ -61,12 +60,12 @@ function Home({
     homeLinks: homeLinks
   })), /*#__PURE__*/React.createElement(FeatureSection, null), /*#__PURE__*/React.createElement(WorldSection, null), /*#__PURE__*/React.createElement(FooterSection, null));
 }
+
 function MainBannerSection({
   homeLinks,
   isLoggedIn,
   version,
-  loginDisplay,
-  setLoginDisplay,
+  initialView,
   loginErrorText,
   registerErrorText,
   resetErrorText,
@@ -75,56 +74,66 @@ function MainBannerSection({
   newsRef,
   contactRef
 }) {
-  const activeElement = React.useRef(null);
+  const [loginDisplay, setLoginDisplay] = React.useState(initialView === "reset" ? "reset" : "login");
+  const [activeModalName, setActiveModalName] = React.useState(initialView === "register" ? "register" : "none");
+  const loginFormRef = React.useRef(null);
+  const registerFormRef = React.useRef(null);
+
   function handleLogin() {
-    document.getElementById('login_form').submit();
+    loginFormRef.current?.submit();
   }
+
   function handleRegister() {
-    if (loginDisplay !== "register") {
-      setLoginDisplay("register");
+    if (activeModalName !== "register") {
+      setActiveModalName("register");
     } else {
-      document.getElementById('register_form').submit();
+      registerFormRef.current?.submit();
     }
   }
-  function handleReset() {
-    document.getElementById('reset_form').submit();
-  }
+
   function scrollTo(element) {
+    if (element == null) return;
     element.scrollIntoView({
       behavior: 'smooth'
     });
   }
+
   function toSupport() {
-    window.location = homeLinks['support'];
+    window.location.href = homeLinks['support'];
   }
+
   let activeModal = null;
-  switch (loginDisplay) {
+
+  switch (activeModalName) {
     case "register":
       activeModal = /*#__PURE__*/React.createElement(MainBannerModal, {
         title: null,
         className: "register",
-        handleCloseClick: () => setLoginDisplay("none")
+        handleCloseClick: () => setActiveModalName("none")
       }, /*#__PURE__*/React.createElement(RegisterForm, {
         registerErrorText: registerErrorText,
         registerPreFill: registerPreFill,
-        setLoginDisplay: setLoginDisplay
+        formRef: registerFormRef
       }));
       break;
+
     case "rules":
       activeModal = /*#__PURE__*/React.createElement(MainBannerModal, {
         title: "rules",
         className: "rules",
-        handleCloseClick: () => setLoginDisplay("none")
+        handleCloseClick: () => setActiveModalName("none")
       }, /*#__PURE__*/React.createElement(Rules, null));
       break;
+
     case "terms":
       activeModal = /*#__PURE__*/React.createElement(MainBannerModal, {
         title: "terms",
         className: "terms",
-        handleCloseClick: () => setLoginDisplay("none")
+        handleCloseClick: () => setActiveModalName("none")
       }, /*#__PURE__*/React.createElement(Terms, null));
       break;
   }
+
   return /*#__PURE__*/React.createElement("div", {
     className: "home_section main_banner_section"
   }, /*#__PURE__*/React.createElement("div", {
@@ -138,76 +147,32 @@ function MainBannerSection({
   }), /*#__PURE__*/React.createElement("div", {
     className: "title_version"
   }, version)), /*#__PURE__*/React.createElement("div", {
-    className: "home_lantern home_lantern_1",
-    style: {
-      zIndex: 1
-    }
+    className: "home_lantern lantern_1"
   }, /*#__PURE__*/React.createElement("img", {
     src: "/images/v2/decorations/lanternbig.png"
   })), /*#__PURE__*/React.createElement("div", {
-    className: "home_lantern home_lantern_2",
-    style: {
-      zIndex: 1
-    }
+    className: "home_lantern lantern_2"
   }, /*#__PURE__*/React.createElement("img", {
     src: "/images/v2/decorations/lanternbig.png"
   })), /*#__PURE__*/React.createElement("div", {
-    className: "home_lantern home_lantern_3",
-    style: {
-      zIndex: 1
-    }
+    className: "home_lantern lantern_3"
   }, /*#__PURE__*/React.createElement("img", {
     src: "/images/v2/decorations/lanternsmall.png"
   })), /*#__PURE__*/React.createElement("div", {
-    className: "home_lantern home_lantern_4",
-    style: {
-      zIndex: 1
-    }
+    className: "home_lantern lantern_4"
   }, /*#__PURE__*/React.createElement("img", {
     src: "/images/v2/decorations/lanternsmall.png"
   })), activeModal, /*#__PURE__*/React.createElement("div", {
     className: "login_container"
-  }, !isLoggedIn && /*#__PURE__*/React.createElement(LoginForm, {
+  }, !isLoggedIn && loginDisplay !== "reset" && /*#__PURE__*/React.createElement(LoginForm, {
     loginMessageText: loginMessageText,
     loginErrorText: loginErrorText,
-    setLoginDisplay: setLoginDisplay
-  }), loginDisplay === "reset" && /*#__PURE__*/React.createElement("form", {
-    id: "reset_form",
-    action: "",
-    method: "post",
-    style: {
-      zIndex: 1
-    }
-  }, /*#__PURE__*/React.createElement("div", {
-    className: "reset_input_top"
-  }, /*#__PURE__*/React.createElement("input", {
-    type: "hidden",
-    name: "reset",
-    value: "reset"
-  }), /*#__PURE__*/React.createElement("div", {
-    className: "login_username_wrapper"
-  }, /*#__PURE__*/React.createElement("label", {
-    className: "login_username_label"
-  }, "username"), /*#__PURE__*/React.createElement("input", {
-    type: "text",
-    name: "username",
-    className: "login_username_input login_text_input"
-  })), /*#__PURE__*/React.createElement("div", {
-    className: "reset_email_wrapper"
-  }, /*#__PURE__*/React.createElement("label", {
-    className: "reset_email_label"
-  }, "email address"), /*#__PURE__*/React.createElement("input", {
-    type: "email",
-    name: "email",
-    className: "reset_email_input login_text_input"
-  }))), /*#__PURE__*/React.createElement("div", {
-    className: "reset_input_bottom"
-  }, resetErrorText !== "" && /*#__PURE__*/React.createElement("div", {
-    className: "login_error_label"
-  }, resetErrorText), /*#__PURE__*/React.createElement("div", {
-    className: "reset_link",
-    onClick: () => handleReset()
-  }, "send email"))), !isLoggedIn && /*#__PURE__*/React.createElement(LoggedOutButtons, {
+    setLoginDisplay: setLoginDisplay,
+    formRef: loginFormRef
+  }), loginDisplay === "reset" && /*#__PURE__*/React.createElement(ResetPasswordForm, {
+    resetErrorText: resetErrorText,
+    handleCloseClick: () => setLoginDisplay("login")
+  }), !isLoggedIn && /*#__PURE__*/React.createElement(LoggedOutButtons, {
     handleLogin: handleLogin,
     handleRegister: handleRegister
   }), isLoggedIn && /*#__PURE__*/React.createElement(LoggedInButtons, {
@@ -224,7 +189,7 @@ function MainBannerSection({
     className: "banner_button rules"
   }, /*#__PURE__*/React.createElement(BannerDiamondButton, {
     handleClick: () => {
-      loginDisplay === "rules" ? setLoginDisplay("none") : setLoginDisplay("rules");
+      activeModalName === "rules" ? setActiveModalName("none") : setActiveModalName("rules");
     },
     firstLineText: "rules",
     color: "blue"
@@ -232,7 +197,7 @@ function MainBannerSection({
     className: "banner_button terms"
   }, /*#__PURE__*/React.createElement(BannerDiamondButton, {
     handleClick: () => {
-      loginDisplay === "terms" ? setLoginDisplay("none") : setLoginDisplay("terms");
+      activeModalName === "terms" ? setActiveModalName("none") : setActiveModalName("terms");
     },
     firstLineText: "terms of",
     secondLineText: "service",
@@ -246,6 +211,7 @@ function MainBannerSection({
     largeSize: true
   }))));
 }
+
 function BannerDiamondButton({
   color,
   firstLineText,
@@ -337,18 +303,27 @@ function BannerDiamondButton({
     dominantBaseline: "middle"
   }, secondLineText))));
 }
+
 function LoginForm({
   loginMessageText,
   loginErrorText,
-  setLoginDisplay
+  setLoginDisplay,
+  formRef
 }) {
+  const handleInputKeyDown = e => {
+    if (e.code !== "Enter") {
+      return;
+    }
+
+    e.preventDefault();
+    formRef.current?.submit();
+  };
+
   return /*#__PURE__*/React.createElement("form", {
     id: "login_form",
     action: "",
     method: "post",
-    style: {
-      zIndex: 1
-    }
+    ref: formRef
   }, /*#__PURE__*/React.createElement("div", {
     className: "login_input_top"
   }, /*#__PURE__*/React.createElement("div", {
@@ -358,7 +333,8 @@ function LoginForm({
   }, "username"), /*#__PURE__*/React.createElement("input", {
     type: "text",
     name: "user_name",
-    className: "login_username_input login_text_input"
+    className: "login_username_input login_text_input",
+    onKeyDown: handleInputKeyDown
   })), /*#__PURE__*/React.createElement("div", {
     className: "login_password_wrapper"
   }, /*#__PURE__*/React.createElement("label", {
@@ -366,7 +342,8 @@ function LoginForm({
   }, "password"), /*#__PURE__*/React.createElement("input", {
     type: "password",
     name: "password",
-    className: "login_password_input login_text_input"
+    className: "login_password_input login_text_input",
+    onKeyDown: handleInputKeyDown
   })), /*#__PURE__*/React.createElement("input", {
     type: "hidden",
     name: "login",
@@ -384,6 +361,53 @@ function LoginForm({
     onClick: () => setLoginDisplay("reset")
   }, "reset password")));
 }
+
+function ResetPasswordForm({
+  resetErrorText,
+  handleCloseClick
+}) {
+  const formRef = React.useRef(null);
+  return /*#__PURE__*/React.createElement("form", {
+    id: "reset_form",
+    action: "",
+    method: "post",
+    ref: formRef
+  }, /*#__PURE__*/React.createElement("h3", null, "Reset Password"), /*#__PURE__*/React.createElement("button", {
+    className: "modal_close",
+    onKeyPress: clickOnEnter,
+    onClick: handleCloseClick
+  }, "X"), /*#__PURE__*/React.createElement("div", {
+    className: "reset_input_top"
+  }, /*#__PURE__*/React.createElement("input", {
+    type: "hidden",
+    name: "reset",
+    value: "reset"
+  }), /*#__PURE__*/React.createElement("div", {
+    className: "login_username_wrapper"
+  }, /*#__PURE__*/React.createElement("label", {
+    className: "login_username_label"
+  }, "username"), /*#__PURE__*/React.createElement("input", {
+    type: "text",
+    name: "username",
+    className: "login_username_input login_text_input"
+  })), /*#__PURE__*/React.createElement("div", {
+    className: "reset_email_wrapper"
+  }, /*#__PURE__*/React.createElement("label", {
+    className: "reset_email_label"
+  }, "email address"), /*#__PURE__*/React.createElement("input", {
+    type: "email",
+    name: "email",
+    className: "reset_email_input login_text_input"
+  }))), /*#__PURE__*/React.createElement("div", {
+    className: "reset_input_bottom"
+  }, resetErrorText !== "" && /*#__PURE__*/React.createElement("div", {
+    className: "login_error_label"
+  }, resetErrorText), /*#__PURE__*/React.createElement("div", {
+    className: "reset_link",
+    onClick: () => formRef.current?.submit()
+  }, "send email")));
+}
+
 function MainBannerModal({
   title,
   className,
@@ -412,12 +436,15 @@ function MainBannerModal({
     className: "modal_content"
   }, children));
 }
+
 function FeatureSection({}) {
   return /*#__PURE__*/React.createElement(React.Fragment, null);
 }
+
 function WorldSection({}) {
   return /*#__PURE__*/React.createElement(React.Fragment, null);
 }
+
 function ContactSection({
   contactRef
 }) {
@@ -433,6 +460,7 @@ function ContactSection({
     className: "home_form_container"
   }));
 }
+
 function FooterSection({}) {
   return /*#__PURE__*/React.createElement("div", {
     className: "home_section footer_section"
@@ -440,6 +468,7 @@ function FooterSection({}) {
     className: "footer_text"
   }, "SHINOBI CHRONICLES V0.9.0 COPYRIGHT \xA9 LM VISIONS"));
 }
+
 function LoggedOutButtons({
   handleLogin,
   handleRegister
@@ -579,6 +608,7 @@ function LoggedOutButtons({
     dominantBaseline: "middle"
   }, "create a character")));
 }
+
 function LoggedInButtons({
   homeLinks
 }) {
@@ -714,4 +744,5 @@ function LoggedInButtons({
     dominantBaseline: "middle"
   }, "logout"))));
 }
+
 window.Home = Home;

@@ -1,11 +1,13 @@
 export function RegisterForm({
   registerErrorText,
-  registerPreFill
+  registerPreFill,
+  formRef
 }) {
   return /*#__PURE__*/React.createElement("form", {
     id: "register_form",
     action: "",
-    method: "post"
+    method: "post",
+    ref: formRef
   }, /*#__PURE__*/React.createElement("div", {
     className: "register_input_top"
   }, /*#__PURE__*/React.createElement("input", {

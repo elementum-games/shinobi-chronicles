@@ -8,10 +8,11 @@ type RegisterFormProps = {|
         +email: string,
         +gender: "Male" | "Female" | "Non-binary" | "None",
     },
+    +formRef: { current: ?HTMLFormElement },
 |};
-export function RegisterForm({ registerErrorText, registerPreFill }: RegisterFormProps) {
+export function RegisterForm({ registerErrorText, registerPreFill, formRef }: RegisterFormProps): React$Node {
     return (
-        <form id="register_form" action="" method="post">
+        <form id="register_form" action="" method="post" ref={formRef}>
             <div className="register_input_top">
                 <input type="hidden" name="register" value="register" />
                 <div className="register_username_container">
