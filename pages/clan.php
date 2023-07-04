@@ -180,7 +180,6 @@ function clan() {
     }
 
     $clan = $player->clan;
-    $RANK_NAMES = RankManager::fetchNames($system);
     $max_mission_rank = Mission::maxMissionRank($player->rank_num);
     $missions = $player->clan->getClanMissions($player->rank_num);
 

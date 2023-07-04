@@ -2,7 +2,7 @@
 
 require_once 'admin/formTools.php';
 
-function createJutsuPage(System $system, array $RANK_NAMES) {
+function createJutsuPage(System $system) {
     /* Variables */
     $jutsu_constraints = require 'admin/constraints/jutsu.php';
     $error = false;
@@ -86,7 +86,7 @@ function createJutsuPage(System $system, array $RANK_NAMES) {
     require 'templates/admin/create_jutsu.php';
 }
 
-function editJutsuPage(System $system, array $RANK_NAMES) {
+function editJutsuPage(System $system) {
     $select_jutsu = true;
     $self_link = $system->router->links['admin'] . '&page=edit_jutsu';
 

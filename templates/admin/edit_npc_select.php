@@ -1,10 +1,13 @@
 <?php
 
 /**
+ * @var System $system;
  * @var array $all_npcs
  * @var string $self_link
- * @var string[] $RANK_NAMES
  */
+
+require_once __DIR__ . '/../classes/RankManager.php';
+$RANK_NAMES = RankManager::fetchNames($system);
 
 ?>
 

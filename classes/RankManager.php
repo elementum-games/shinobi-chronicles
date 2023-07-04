@@ -14,6 +14,8 @@ class RankManager {
 
     const JONIN_MISSION_ID = 10;
 
+    private static array $RANK_NAMES = [];
+
     /** @var Rank[] */
     public array $ranks = [];
     private bool $ranks_loaded = false;
@@ -115,13 +117,19 @@ class RankManager {
         return $level;
     }
 
-    public static function fetchNames(System $system): array {
+    public static function fetchNames(System $system, bool $force_reload = false): array {
+        if(count(self::$RANK_NAMES) > 0 && !$force_reload) {
+            return self::$RANK_NAMES;
+        }
+
         $result = $system->db->query("SELECT `rank_id`, `name` FROM `ranks`");
 
         $rank_names = [];
         while($rank = $system->db->fetch($result)) {
             $rank_names[$rank['rank_id']] = $rank['name'];
         }
+
+        self::$RANK_NAMES = $rank_names;
 
         return $rank_names;
     }

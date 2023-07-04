@@ -8,7 +8,7 @@ $UserAPIManager = new UserAPIManager($system, $player);
 
 ?>
 
-<link rel="stylesheet" type="text/css" href="ui_components/src/hotbar/Hotbar.css" />
+<link rel="stylesheet" type="text/css" href="<?= $system->getCssFileLink("ui_components/src/hotbar/Hotbar.css") ?>" />
 
 <div id="hotbarContainer"></div>
 <script type="module" src="<?= $system->getReactFile("hotbar/Hotbar") ?>"></script>

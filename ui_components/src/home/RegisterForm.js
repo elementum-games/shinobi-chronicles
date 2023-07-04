@@ -1,5 +1,7 @@
 // @flow
 
+import { clickOnEnter } from "../utils/uiHelpers.js";
+
 type RegisterFormProps = {|
     +registerErrorText: string,
     +registerPreFill: {
@@ -9,9 +11,11 @@ type RegisterFormProps = {|
         +gender: "Male" | "Female" | "Non-binary" | "None",
     },
 |};
-export function RegisterForm({ registerErrorText, registerPreFill }: RegisterFormProps) {
+export function RegisterForm({ registerErrorText, registerPreFill }: RegisterFormProps): React$Node {
+    const formRef = React.useRef(null);
+
     return (
-        <form id="register_form" action="" method="post">
+        <form id="register_form" action="" method="post" ref={formRef}>
             <div className="register_input_top">
                 <input type="hidden" name="register" value="register" />
                 <div className="register_username_container">
@@ -45,47 +49,25 @@ export function RegisterForm({ registerErrorText, registerPreFill }: RegisterFor
                 <div className="register_character_container">
                     <div className="register_gender_wrapper">
                         <div className="register_field_label">gender</div>
-                        <div>
-                            <input className="register_option" type="radio" id="register_gender_male" name="gender" value="Male" defaultChecked={registerPreFill.gender === "Male"} />
-                            <label className="register_option_label" htmlFor="register_gender_male">Male</label>
-                        </div>
-                        <div>
-                            <input className="register_option" type="radio" id="register_gender_female" name="gender" value="Female" defaultChecked={registerPreFill.gender === "Female"} />
-                            <label className="register_option_label" htmlFor="register_gender_female">Female</label>
-                        </div>
-                        <div>
-                            <input className="register_option" type="radio" id="register_gender_nonbinary" name="gender" value="Non-binary" defaultChecked={registerPreFill.gender === "Non-binary"} />
-                            <label className="register_option_label" htmlFor="register_gender_nonbinary">Non-binary</label>
-                        </div>
-                        <div>
-                            <input className="register_option" type="radio" id="register_gender_none" name="gender" value="None" defaultChecked={registerPreFill.gender === "None"} />
-                            <label className="register_option_label" htmlFor="register_gender_none">None</label>
-                        </div>
+                        <select name="gender" defaultValue={registerPreFill.gender}>
+                            <option value="Male">Male</option>
+                            <option value="Female">Male</option>
+                            <option value="Non-binary">Non-binary</option>
+                            <option value="None">None</option>
+                        </select>
                     </div>
                     <div className="register_village_wrapper">
                         <div className="register_field_label">village</div>
-                        <div>
-                            <input className="register_option" type="radio" id="register_village_stone" name="village" value="Stone" defaultChecked={registerPreFill.village === "Stone"} />
-                            <label className="register_option_label" htmlFor="register_village_stone">Stone</label>
-                        </div>
-                        <div>
-                            <input className="register_option" type="radio" id="register_village_cloud" name="village" value="Cloud" defaultChecked={registerPreFill.village === "Cloud"} />
-                            <label className="register_option_label" htmlFor="register_village_cloud">Cloud</label>
-                        </div>
-                        <div>
-                            <input className="register_option" type="radio" id="register_village_leaf" name="village" value="Leaf" defaultChecked={registerPreFill.village === "Leaf"} />
-                            <label className="register_option_label" htmlFor="register_village_leaf">Leaf</label>
-                        </div>
-                        <div>
-                            <input className="register_option" type="radio" id="register_village_sand" name="village" value="Sand" defaultChecked={registerPreFill.village === "Sand"} />
-                            <label className="register_option_label" htmlFor="register_village_sand">Sand</label>
-                        </div>
-                        <div>
-                            <input className="register_option" type="radio" id="register_village_mist" name="village" value="Mist" defaultChecked={registerPreFill.village === "Mist"} />
-                            <label className="register_option_label" htmlFor="register_village_mist">Mist</label>
-                        </div>
+                        <select name="village" defaultValue={registerPreFill.village}>
+                            <option value="Stone">Stone</option>
+                            <option value="Cloud">Cloud</option>
+                            <option value="Leaf">Leaf</option>
+                            <option value="Sand">Sand</option>
+                            <option value="Mist">Mist</option>
+                        </select>
                     </div>
                 </div>
+                <CreateCharacterButton onClick={() => formRef.current?.submit()} />
                 <div>
                     <div className="register_terms_notice">
                         By clicking 'Create a Character' I affirm that I have read and agree to abide by the Rules and Terms of Service. I understand that if I fail to abide by the rules as determined by the moderating staff, I may be temporarily or permanently banned and that I will not be compensated for time lost. I also understand that any actions taken by anyone on my account are my responsibility.
@@ -104,5 +86,32 @@ export function RegisterForm({ registerErrorText, registerPreFill }: RegisterFor
                 </div>
             }
         </form>
+    );
+}
+
+export function CreateCharacterButton({ onClick }) {
+    return (
+        <svg
+            role="button"
+            tabIndex="0"
+            name="register"
+            className="register_button"
+            width="162"
+            height="32"
+            onClick={onClick}
+            onKeyPress={clickOnEnter}
+        >
+            <radialGradient id="register_fill_default" cx="50%" cy="50%" r="50%" fx="50%" fy="50%">
+                <stop offset="0%" style={{ stopColor: '#84314e', stopOpacity: 1 }} />
+                <stop offset="100%" style={{ stopColor: '#68293f', stopOpacity: 1 }} />
+            </radialGradient>
+            <radialGradient id="register_fill_click" cx="50%" cy="50%" r="50%" fx="50%" fy="50%">
+                <stop offset="0%" style={{ stopColor: '#68293f', stopOpacity: 1 }} />
+                <stop offset="100%" style={{ stopColor: '#84314e', stopOpacity: 1 }} />
+            </radialGradient>
+            <rect className="register_button_background" width="100%" height="100%" />
+            <text className="register_button_shadow_text" x="81" y="18" textAnchor="middle" dominantBaseline="middle">create a character</text>
+            <text className="register_button_text" x="81" y="16" textAnchor="middle" dominantBaseline="middle">create a character</text>
+        </svg>
     );
 }

@@ -6,7 +6,7 @@
  */
 ?>
 
-<link rel="stylesheet" type="text/css" href="ui_components/src/profile/Profile.css" />
+<link rel="stylesheet" type="text/css" href="<?= $system->getCssFileLink("ui_components/src/profile/Profile.css") ?>" />
 <div id="profileReactContainer"></div>
 <script type="module" src="<?= $system->getReactFile("profile/Profile") ?>"></script>
 <!--suppress JSUnresolvedVariable, JSUnresolvedFunction -->

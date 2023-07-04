@@ -1,6 +1,6 @@
 // @flow
 
-import { RegisterForm } from "./RegisterForm.js";
+import { RegisterForm, CreateCharacterButton } from "./RegisterForm.js";
 import { Rules, Terms } from "./staticPageContents.js";
 import { clickOnEnter } from "../utils/uiHelpers.js"
 
@@ -14,7 +14,7 @@ type Props = {|
     +isLoggedIn: bool,
     +isAdmin: bool,
     +version: string,
-    +initialLoginDisplay: string,
+    +initialView: "login" | "reset" | "register",
     +loginErrorText: string,
     +registerErrorText: string,
     +resetErrorText: string,
@@ -32,7 +32,7 @@ function Home({
     isLoggedIn,
     isAdmin,
     version,
-    initialLoginDisplay,
+    initialView,
     loginErrorText,
     registerErrorText,
     resetErrorText,
@@ -40,7 +40,6 @@ function Home({
     registerPreFill,
     initialNewsPosts,
 }: Props) {
-    const [loginDisplay, setLoginDisplay] = React.useState(initialLoginDisplay);
     const newsRef = React.useRef(null);
     const contactRef = React.useRef(null);
     const activeElement = React.useRef(null);
@@ -51,8 +50,7 @@ function Home({
                 homeLinks={homeLinks}
                 isLoggedIn={isLoggedIn}
                 version={version}
-                loginDisplay={loginDisplay}
-                setLoginDisplay={setLoginDisplay}
+                initialView={initialView}
                 loginErrorText={loginErrorText}
                 registerErrorText={registerErrorText}
                 resetErrorText={resetErrorText}
@@ -94,8 +92,7 @@ function MainBannerSection({
     homeLinks,
     isLoggedIn,
     version,
-    loginDisplay,
-    setLoginDisplay,
+    initialView,
     loginErrorText,
     registerErrorText,
     resetErrorText,
@@ -104,40 +101,35 @@ function MainBannerSection({
     newsRef,
     contactRef,
 }) {
-    const activeElement = React.useRef(null);
+    const [loginDisplay, setLoginDisplay] = React.useState(initialView === "reset" ? "reset" : "login");
+    const [activeModalName, setActiveModalName] = React.useState(initialView === "register" ? "register" : "none");
+
+    const loginFormRef = React.useRef(null);
+
     function handleLogin() {
-        document.getElementById('login_form').submit();
+        loginFormRef.current?.submit();
     }
-    function handleRegister() {
-        if (loginDisplay !== "register") {
-            setLoginDisplay("register");
-        }
-        else {
-            document.getElementById('register_form').submit();
-        }
-    }
-    function handleReset() {
-        document.getElementById('reset_form').submit();
-    }
-    function scrollTo(element) {
+
+    function scrollTo(element: ?HTMLElement) {
+        if(element == null) return;
+
         element.scrollIntoView({ behavior: 'smooth' });
     }
     function toSupport() {
-        window.location = homeLinks['support'];
+        window.location.href = homeLinks['support'];
     }
 
     let activeModal = null;
-    switch(loginDisplay) {
+    switch(activeModalName) {
         case "register":
             activeModal = <MainBannerModal
                 title={null}
                 className="register"
-                handleCloseClick={() => setLoginDisplay("none")}
+                handleCloseClick={() => setActiveModalName("none")}
             >
                 <RegisterForm
                     registerErrorText={registerErrorText}
                     registerPreFill={registerPreFill}
-                    setLoginDisplay={setLoginDisplay}
                 />
             </MainBannerModal>;
             break;
@@ -145,7 +137,7 @@ function MainBannerSection({
             activeModal = <MainBannerModal
                 title="rules"
                 className="rules"
-                handleCloseClick={() => setLoginDisplay("none")}
+                handleCloseClick={() => setActiveModalName("none")}
             >
                 <Rules />
             </MainBannerModal>;
@@ -154,7 +146,7 @@ function MainBannerSection({
             activeModal = <MainBannerModal
                 title="terms"
                 className="terms"
-                handleCloseClick={() => setLoginDisplay("none")}
+                handleCloseClick={() => setActiveModalName("none")}
             >
                 <Terms />
             </MainBannerModal>;
@@ -170,48 +162,34 @@ function MainBannerSection({
                     <div className="title_version">{version}</div>
                 </div>
 
-                <div className={"home_lantern home_lantern_1"} style={{ zIndex: 1 }}><img src="/images/v2/decorations/lanternbig.png" /></div>
-                <div className={"home_lantern home_lantern_2"} style={{ zIndex: 1 }}><img src="/images/v2/decorations/lanternbig.png" /></div>
-                <div className={"home_lantern home_lantern_3"} style={{ zIndex: 1 }}><img src="/images/v2/decorations/lanternsmall.png" /></div>
-                <div className={"home_lantern home_lantern_4"} style={{ zIndex: 1 }}><img src="/images/v2/decorations/lanternsmall.png" /></div>
+                <div className={"home_lantern lantern_1"}><img src="/images/v2/decorations/lanternbig.png" /></div>
+                <div className={"home_lantern lantern_2"}><img src="/images/v2/decorations/lanternbig.png" /></div>
+                <div className={"home_lantern lantern_3"}><img src="/images/v2/decorations/lanternsmall.png" /></div>
+                <div className={"home_lantern lantern_4"}><img src="/images/v2/decorations/lanternsmall.png" /></div>
 
                 {activeModal}
 
-                <div className="login_container">
-                    {!isLoggedIn &&
+                <div className="login_container" style={activeModal != null ? {visibility: "hidden"} : {}}>
+                    {!isLoggedIn && loginDisplay !== "reset" &&
                         <LoginForm
                             loginMessageText={loginMessageText}
                             loginErrorText={loginErrorText}
                             setLoginDisplay={setLoginDisplay}
+                            formRef={loginFormRef}
                         />
                     }
                     {loginDisplay === "reset" &&
-                        <form id="reset_form" action="" method="post" style={{ zIndex: 1 }}>
-                            <div className="reset_input_top">
-                                <input type="hidden" name="reset" value="reset" />
-                                <div className="login_username_wrapper">
-                                    <label className="login_username_label">username</label>
-                                    <input type="text" name="username" className="login_username_input login_text_input" />
-                                </div>
-                                <div className="reset_email_wrapper">
-                                    <label className="reset_email_label">email address</label>
-                                    <input type="email" name="email" className="reset_email_input login_text_input" />
-                                </div>
-                            </div>
-
-                            <div className="reset_input_bottom">
-                                {resetErrorText !== "" &&
-                                    <div className="login_error_label">{resetErrorText}</div>
-                                }
-                                <div className="reset_link" onClick={() => handleReset()}>send email</div>
-                            </div>
-                        </form>
+                        <ResetPasswordForm
+                            resetErrorText={resetErrorText}
+                            handleCloseClick={() => setLoginDisplay("login")}
+                        />
                     }
 
-
-                    {!isLoggedIn &&
-                        <LoggedOutButtons handleLogin={handleLogin} handleRegister={handleRegister} />
+                    {!isLoggedIn && <LoginButton onCLick={handleLogin} />}
+                    {!isLoggedIn && activeModalName !== "register" &&
+                        <CreateCharacterButton onClick={() => setActiveModalName("register")} />
                     }
+
                     {isLoggedIn &&
                         <LoggedInButtons homeLinks={homeLinks} />
                     }
@@ -229,9 +207,9 @@ function MainBannerSection({
                 <div className="banner_button rules">
                     <BannerDiamondButton
                         handleClick={() => {
-                            loginDisplay === "rules"
-                                ? setLoginDisplay("none")
-                                : setLoginDisplay("rules")
+                            activeModalName === "rules"
+                                ? setActiveModalName("none")
+                                : setActiveModalName("rules")
                         }}
                         firstLineText="rules"
                         color="blue"
@@ -240,9 +218,9 @@ function MainBannerSection({
                 <div className="banner_button terms">
                     <BannerDiamondButton
                         handleClick={() => {
-                            loginDisplay === "terms"
-                                ? setLoginDisplay("none")
-                                : setLoginDisplay("terms")
+                            activeModalName === "terms"
+                                ? setActiveModalName("none")
+                                : setActiveModalName("terms")
                         }}
                         firstLineText="terms of"
                         secondLineText="service"
@@ -336,18 +314,43 @@ type LoginFormProps = {|
     +loginMessageText: string,
     +loginErrorText: string,
     +setLoginDisplay: (string) => void,
+    +formRef: { current: ?HTMLFormElement },
 |};
-function LoginForm({ loginMessageText, loginErrorText, setLoginDisplay }: LoginFormProps) {
+function LoginForm({ loginMessageText, loginErrorText, setLoginDisplay, formRef }: LoginFormProps) {
+    const handleInputKeyDown = (e: SyntheticKeyboardEvent) => {
+        if(e.code !== "Enter") {
+            return;
+        }
+
+        e.preventDefault();
+        formRef.current?.submit();
+    };
+
     return (
-        <form id="login_form" action="" method="post" style={{ zIndex: 1 }}>
+        <form
+            id="login_form"
+            action=""
+            method="post"
+            ref={formRef}
+        >
             <div className="login_input_top">
                 <div className="login_username_wrapper">
                     <label className="login_username_label">username</label>
-                    <input type="text" name="user_name" className="login_username_input login_text_input" />
+                    <input
+                        type="text"
+                        name="user_name"
+                        className="login_username_input login_text_input"
+                        onKeyDown={handleInputKeyDown}
+                    />
                 </div>
                 <div className="login_password_wrapper">
                     <label className="login_username_label">password</label>
-                    <input type="password" name="password" className="login_password_input login_text_input" />
+                    <input
+                        type="password"
+                        name="password"
+                        className="login_password_input login_text_input"
+                        onKeyDown={handleInputKeyDown}
+                    />
                 </div>
                 <input type="hidden" name="login" value="login"/>
             </div>
@@ -364,6 +367,40 @@ function LoginForm({ loginMessageText, loginErrorText, setLoginDisplay }: LoginF
             }
         </form>
     )
+}
+
+function ResetPasswordForm({ resetErrorText, handleCloseClick }) {
+    const formRef = React.useRef(null);
+
+    return (
+        <form
+            id="reset_form"
+            action=""
+            method="post"
+            ref={formRef}
+        >
+            <h3>Reset Password</h3>
+            <button className="modal_close" onKeyPress={clickOnEnter} onClick={handleCloseClick}>X</button>
+            <div className="reset_input_top">
+                <input type="hidden" name="reset" value="reset" />
+                <div className="login_username_wrapper">
+                    <label className="login_username_label">username</label>
+                    <input type="text" name="username" className="login_username_input login_text_input" />
+                </div>
+                <div className="reset_email_wrapper">
+                    <label className="reset_email_label">email address</label>
+                    <input type="email" name="email" className="reset_email_input login_text_input" />
+                </div>
+            </div>
+
+            <div className="reset_input_bottom">
+                {resetErrorText !== "" &&
+                    <div className="login_error_label">{resetErrorText}</div>
+                }
+                <div className="reset_link" onClick={() => formRef.current?.submit()}>send email</div>
+            </div>
+        </form>
+    );
 }
 
 function MainBannerModal({ title, className, children, handleCloseClick}) {
@@ -415,36 +452,30 @@ function FooterSection({ }) {
     );
 }
 
-function LoggedOutButtons({ handleLogin, handleRegister }) {
+function LoginButton({ onCLick }) {
     return (
-        <>
-            <svg role="button" tabIndex="0" name="login" className="login_button" width="162" height="32" onClick={() => handleLogin()} onKeyPress={clickOnEnter} style={{ zIndex: 2 }}>
-                <radialGradient id="login_fill_default" cx="50%" cy="50%" r="50%" fx="50%" fy="50%">
-                    <stop offset="0%" style={{ stopColor: '#464f87', stopOpacity: 1 }} />
-                    <stop offset="100%" style={{ stopColor: '#343d77', stopOpacity: 1 }} />
-                </radialGradient>
-                <radialGradient id="login_fill_click" cx="50%" cy="50%" r="50%" fx="50%" fy="50%">
-                    <stop offset="0%" style={{ stopColor: '#343d77', stopOpacity: 1 }} />
-                    <stop offset="100%" style={{ stopColor: '#464f87', stopOpacity: 1 }} />
-                </radialGradient>
-                <rect className="login_button_background" width="100%" height="100%" fill="url(#login_fill_default)" />
-                <text className="login_button_shadow_text" x="81" y="18" textAnchor="middle" dominantBaseline="middle">login</text>
-                <text className="login_button_text" x="81" y="16" textAnchor="middle" dominantBaseline="middle">login</text>
-            </svg>
-            <svg role="button" tabIndex="0" name="register" className="register_button" width="162" height="32" onClick={() => handleRegister()} onKeyPress={clickOnEnter} style={{ zIndex: 4 }}>
-                <radialGradient id="register_fill_default" cx="50%" cy="50%" r="50%" fx="50%" fy="50%">
-                    <stop offset="0%" style={{ stopColor: '#84314e', stopOpacity: 1 }} />
-                    <stop offset="100%" style={{ stopColor: '#68293f', stopOpacity: 1 }} />
-                </radialGradient>
-                <radialGradient id="register_fill_click" cx="50%" cy="50%" r="50%" fx="50%" fy="50%">
-                    <stop offset="0%" style={{ stopColor: '#68293f', stopOpacity: 1 }} />
-                    <stop offset="100%" style={{ stopColor: '#84314e', stopOpacity: 1 }} />
-                </radialGradient>
-                <rect className="register_button_background" width="100%" height="100%" />
-                <text className="register_button_shadow_text" x="81" y="18" textAnchor="middle" dominantBaseline="middle">create a character</text>
-                <text className="register_button_text" x="81" y="16" textAnchor="middle" dominantBaseline="middle">create a character</text>
-            </svg>
-        </>
+        <svg
+            role="button"
+            tabIndex="0"
+            name="login"
+            className="login_button"
+            width="162"
+            height="32"
+            onClick={() => onCLick()}
+            onKeyPress={clickOnEnter}
+        >
+            <radialGradient id="login_fill_default" cx="50%" cy="50%" r="50%" fx="50%" fy="50%">
+                <stop offset="0%" style={{ stopColor: '#464f87', stopOpacity: 1 }} />
+                <stop offset="100%" style={{ stopColor: '#343d77', stopOpacity: 1 }} />
+            </radialGradient>
+            <radialGradient id="login_fill_click" cx="50%" cy="50%" r="50%" fx="50%" fy="50%">
+                <stop offset="0%" style={{ stopColor: '#343d77', stopOpacity: 1 }} />
+                <stop offset="100%" style={{ stopColor: '#464f87', stopOpacity: 1 }} />
+            </radialGradient>
+            <rect className="login_button_background" width="100%" height="100%" fill="url(#login_fill_default)" />
+            <text className="login_button_shadow_text" x="81" y="18" textAnchor="middle" dominantBaseline="middle">login</text>
+            <text className="login_button_text" x="81" y="16" textAnchor="middle" dominantBaseline="middle">login</text>
+        </svg>
     );
 }
 

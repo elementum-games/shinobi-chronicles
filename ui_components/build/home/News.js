@@ -16,6 +16,7 @@ export function News({
   const updateTagRef = React.useRef(null);
   const bugfixTagRef = React.useRef(null);
   const eventTagRef = React.useRef(null);
+
   function formatNewsDate(ticks) {
     const date = new Date(ticks * 1000);
     return date.toLocaleDateString('en-US', {
@@ -24,11 +25,13 @@ export function News({
       year: '2-digit'
     });
   }
+
   function cleanNewsContents(contents) {
     console.log(contents);
     const parser = new DOMParser();
     return parser.parseFromString(contents.replace(/[\r\n]+/g, " ").replace(/<br\s*\/?>/g, '\n'), 'text/html').body.textContent;
   }
+
   function saveNewsItem(postId) {
     numPosts.current = numPosts.current + 1;
     apiFetch(homeLinks.news_api, {
@@ -50,6 +53,7 @@ export function News({
     });
     setEditPostId(null);
   }
+
   function loadNews() {
     numPosts.current = numPosts.current + 2;
     apiFetch(homeLinks.news_api, {
@@ -63,6 +67,7 @@ export function News({
       }
     });
   }
+
   function createPost() {
     const newPost = {
       post_id: 0,
@@ -77,6 +82,7 @@ export function News({
     updatedPosts.push(newPost);
     setNewsPosts(updatedPosts);
   }
+
   function NewsItem({
     newsItem
   }) {
@@ -115,6 +121,7 @@ export function News({
       }
     })));
   }
+
   function NewsItemEdit({
     newsItem
   }) {
@@ -135,7 +142,10 @@ export function News({
       className: "news_item_version",
       ref: versionRef,
       contentEditable: "true",
-      suppressContentEditableWarning: true
+      suppressContentEditableWarning: true,
+      style: {
+        minWidth: "25px"
+      }
     }, newsItem.version && newsItem.version.toUpperCase()), /*#__PURE__*/React.createElement("div", {
       className: "news_item_tag_container"
     }, /*#__PURE__*/React.createElement("div", {
@@ -187,6 +197,7 @@ export function News({
       defaultValue: cleanNewsContents(newsItem.message)
     })));
   }
+
   return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
     className: "news_posts_container"
   }, newsPosts && newsPosts.map(newsItem => newsItem.post_id === editPostId ? /*#__PURE__*/React.createElement(NewsItemEdit, {
@@ -201,6 +212,7 @@ export function News({
     isAdmin: isAdmin
   }));
 }
+
 function NewsButtons({
   loadNews,
   createPost,

@@ -10,12 +10,8 @@ Algorithm:	See master_plan.html
 
 function villageHQ() {
 	global $system;
-
 	global $player;
-
 	global $self_link;
-
-	global $RANK_NAMES;
 
 	// Sub-menu
 	echo "<div class='submenu'>
@@ -60,6 +56,8 @@ function villageHQ() {
 				$leader_avatar = $result['avatar_link'];
 			}
 		}
+
+        $RANK_NAMES = RankManager::fetchNames($system);
 
 		echo "<table class='table'><tr><th>{$player->village->name} Village</th></tr>
 		<tr><td class='villageView'>

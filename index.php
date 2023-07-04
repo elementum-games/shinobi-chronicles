@@ -30,7 +30,7 @@ $login_error_text = "";
 $login_message_text = "";
 $register_error_text = "";
 $reset_error_text = "";
-$initial_login_display = "none";
+$initial_home_view = "none";
 $register_pre_fill = [];
 $home_links = [];
 $home_links['news_api'] = $system->router->api_links['news'];
@@ -236,7 +236,7 @@ address and requested a password reset. If this is not your account, please disr
                         $system->message("Email sent! Please check your email (including spam folder)");
                     } else {
                         $system->message(
-                            "There was a problem sending the email to the address provided: $email
+                            "There was a problem sending the email to the address provided: {$result['verify_key']}
 				Please contact a staff member on the forums for manual activation."
                         );
                     }
@@ -323,6 +323,7 @@ address and requested a password reset. If this is not your account, please disr
                 throw new RuntimeException("Please enter a valid email address!");
             }
 
+            /** @noinspection RegExpRedundantEscape */
             $email_pattern = '/^[\w\-\.\+]+@[\w\-\.]+\.[a-zA-Z]{2,4}$/';
             if(!preg_match($email_pattern, $email)) {
                 throw new RuntimeException("Please enter a valid email address!");
@@ -437,7 +438,7 @@ else {
 
 // Load page or news
 if($LOGGED_IN) {
-    $layout = $system->fetchLayoutByName($player->layout);
+    $layout = $system->setLayoutByName($player->layout);
 
     // Master close
     if(!$system->SC_OPEN && !$player->isUserAdmin()) {
@@ -491,9 +492,6 @@ if($LOGGED_IN) {
     if(!$player->global_message_viewed && isset($_GET['clear_message'])) {
         $player->global_message_viewed = 1;
     }
-
-    // Load rank data// Rank names
-    $RANK_NAMES = RankManager::fetchNames($system);
 
     // Route list
     $routes = Router::$routes;
@@ -648,7 +646,7 @@ if($LOGGED_IN) {
         } catch (RuntimeException $e) {
             $system->db->rollbackTransaction();
             $system->message($e->getMessage());
-            if ($system->isDevEnvironment()) {
+            if (!$system->layout->usesV2Interface()) {
                 $system->printMessage(true);
             }
         }
@@ -685,11 +683,11 @@ if($LOGGED_IN) {
 // Login
 else {
 
-    $layout = $system->fetchLayoutByName(System::DEFAULT_LAYOUT);
+    $layout = $system->setLayoutByName(System::DEFAULT_LAYOUT);
     $layout->renderBeforeContentHTML($system, $player ?? null, "Home", render_content: false, render_header: false, render_sidebar: false, render_topbar: false);
 
     // Display error messages
-    if ($system->isDevEnvironment()) {
+    if (!$system->layout->usesV2Interface()) {
         $system->printMessage(true);
     }
     if(!$system->SC_OPEN) {
@@ -701,19 +699,19 @@ else {
 
     $captcha = '';
 
-        $initial_login_display = "login";
-        if ($reset_error_text != "") {
-            $initial_login_display = "reset";
-        }
-        if ($register_error_text != "") {
-            $initial_login_display = "register";
-        }
-        require('./templates/home.php');
-        $layout->renderAfterContentHTML($system, $player ?? null, render_content: false, render_footer: false, render_hotbar: false);
+    $initial_home_view = "login";
+    if ($reset_error_text != "") {
+        $initial_home_view = "reset";
+    }
+    if ($register_error_text != "") {
+        $initial_home_view = "register";
+    }
+    require('./templates/home.php');
+    $layout->renderAfterContentHTML($system, $player ?? null, render_content: false, render_footer: false, render_hotbar: false);
 
-        $page_load_time = round(microtime(true) - $PAGE_LOAD_START, 3);
-        $system->db->commitTransaction();
-        exit;
+    $page_load_time = round(microtime(true) - $PAGE_LOAD_START, 3);
+    $system->db->commitTransaction();
+    exit;
 
 
 }

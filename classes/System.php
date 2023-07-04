@@ -25,7 +25,6 @@ class System {
     const CURRENCY_TYPE_MONEY = 'money';
     const CURRENCY_TYPE_PREMIUM_CREDITS = 'premium_credits';
 
-
     const SC_ADMIN_EMAIL = "admin@shinobichronicles.com";
     const SC_NO_REPLY_EMAIL = "no-reply@shinobichronicles.com";
     const UNSERVICEABLE_EMAIL_DOMAINS = ['hotmail.com', 'live.com', 'msn.com', 'outlook.com'];
@@ -44,6 +43,8 @@ class System {
     // Sub-components
     public Database $db;
     public Router $router;
+    public ?Layout $layout;
+    public bool $enable_mobile_layout = false;
 
     public string $environment;
 
@@ -500,27 +501,40 @@ class System {
         return password_verify($password, $hash);
     }
 
-    public function fetchLayoutByName($layout): Layout {
+    public function setLayoutByName(string $layout): Layout {
         $system = $this;
 
         switch($layout) {
             case 'cextralite':
-                return require "layout/cextralite.php";
+                $this->layout = require "layout/cextralite.php";
+                break;
             case 'classic_blue':
-                return require  "layout/classic_blue.php";
+                $this->layout = require  "layout/classic_blue.php";
+                break;
             case 'shadow_ribbon':
-                return require  "layout/shadow_ribbon.php";
+                $this->layout = require  "layout/shadow_ribbon.php";
+                break;
             case 'geisha':
-                return require  "layout/geisha.php";
+                $this->layout = require  "layout/geisha.php";
+                break;
             case 'blue_scroll':
-                return require  "layout/blue_scroll.php";
+                $this->layout = require  "layout/blue_scroll.php";
+                break;
             case 'rainbow_road':
-                return require  "layout/rainbow_road.php";
+                $this->layout = require "layout/rainbow_road.php";
+                break;
             case 'new_geisha':
-                return require  "layout/new_geisha.php";
+                require_once __DIR__ . "/../layout/new_geisha.php";
+                // This needs to be first so the function can read it
+                $this->enable_mobile_layout = true;
+                $this->layout = getNewGeishaLayout($this, $this->enable_mobile_layout);
+                break;
             default:
-                return require "layout/" . self::DEFAULT_LAYOUT . ".php";
+                $this->layout = require "layout/" . self::DEFAULT_LAYOUT . ".php";
+                break;
         }
+
+        return $this->layout;
     }
 
     /**
@@ -540,9 +554,19 @@ class System {
         ];
     }
 
-    public function getReactFile(string $component_name): string {
-        $filename = "ui_components/build/{$component_name}.js";
-        return $this->router->base_url . $filename . "?v=" .  filemtime($filename);
+    public function isDevEnvironment(): bool {
+        return $this->environment == System::ENVIRONMENT_DEV;
+    }
+
+    public function checkForActiveEvent(): void {
+        $current_datetime = new DateTimeImmutable();
+
+        // July 2023 Lantern Event
+        $july_2023_lantern_event_start_time = new DateTimeImmutable('2023-07-01');
+        $july_2023_lantern_event_end_time = new DateTimeImmutable('2023-07-16');
+        if($current_datetime > $july_2023_lantern_event_start_time && $current_datetime < $july_2023_lantern_event_end_time) {
+            $this->event = new LanternEvent($july_2023_lantern_event_end_time);
+        }
     }
 
     /**
@@ -727,18 +751,12 @@ class System {
         return $display;
     }
 
-    public function isDevEnvironment(): bool {
-        return $this->environment == System::ENVIRONMENT_DEV;
+    public function getReactFile(string $component_name): string {
+        $filename = "ui_components/build/{$component_name}.js";
+        return $this->router->base_url . $filename . "?v=" .  filemtime($filename);
     }
 
-    public function checkForActiveEvent(): void {
-        $current_datetime = new DateTimeImmutable();
-
-        // July 2023 Lantern Event
-        $july_2023_lantern_event_start_time = new DateTimeImmutable('2023-07-01');
-        $july_2023_lantern_event_end_time = new DateTimeImmutable('2023-07-16');
-        if($current_datetime > $july_2023_lantern_event_start_time && $current_datetime < $july_2023_lantern_event_end_time) {
-            $this->event = new LanternEvent($july_2023_lantern_event_end_time);
-        }
+    public function getCssFileLink(string $file_name): string {
+        return $this->router->base_url . $file_name . "?v=" .  filemtime($file_name);
     }
 }

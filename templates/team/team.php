@@ -16,9 +16,10 @@
  * @var array $available_missions
  * @var array $team_mission_name
  * @var array $team_members
- *
- * @var array $RANK_NAMES
  */
+
+require_once __DIR__ . '/../../classes/RankManager.php';
+$RANK_NAMES = RankManager::fetchNames($system);
 ?>
 
 <table id='team_table' class='table'>

@@ -2,17 +2,17 @@
 
 require_once __DIR__ . "/../classes/achievements/AchievementsManager.php";
 require_once __DIR__ . '/../classes/notification/NotificationManager.php';
+require_once __DIR__ . '/../classes/RankManager.php';
 
 /**
  * @throws RuntimeException
  */
 function missions(): bool {
 	global $system;
-
 	global $player;
-
 	global $self_link;
-	global $RANK_NAMES;
+
+    $RANK_NAMES = RankManager::fetchNames($system);
 
 	if($player->mission_id) {
         runActiveMission();

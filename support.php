@@ -16,14 +16,14 @@ if(isset($_SESSION['user_id'])) {
     $guest_support = false;
     $player = User::loadFromId($system, $_SESSION['user_id']);
     $player->loadData();
-    $layout = $system->fetchLayoutByName($player->layout);
+    $layout = $system->setLayoutByName($player->layout);
     $staff_level = $player->staff_level;
     $user_id = $player->user_id;
 
     $supportSystem = new SupportManager($system, $player);
 }
 else {
-    $layout = $system->fetchLayoutByName("shadow_ribbon");
+    $layout = $system->setLayoutByName("shadow_ribbon");
     $supportSystem = new SupportManager($system);
 }
 

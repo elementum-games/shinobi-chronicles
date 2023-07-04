@@ -6,7 +6,7 @@
    *
  */
 ?>
-<link rel="stylesheet" type="text/css" href="ui_components/src/battle/Battle.css" />
+<link rel="stylesheet" type="text/css" href="<?= $system->getCssFileLink("ui_components/src/battle/Battle.css") ?>" />
 <div id="battleReactContainer"></div>
 <script type="module" src="<?= $system->getReactFile("battle/Battle") ?>"></script>
 <!--suppress JSUnresolvedVariable, JSUnresolvedFunction -->

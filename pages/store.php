@@ -1,19 +1,14 @@
 <?php
-/* 
-File: 		store.php
-Coder:		Levi Meahan
-Created:	08/26/2013
-Revised:	12/03/2013 by Levi Meahan
-Purpose:	Function for store which users can buy jutsu, gear, and consumables in
-Algorithm:	See master_plan.html
-*/
+
+require_once __DIR__ . '/../classes/RankManager.php';
 
 function store() {
 	global $system;
 
 	global $player;
 	global $self_link;
-	global $RANK_NAMES;
+
+    $RANK_NAMES = RankManager::fetchNames($system);
 	
 	$store_name = '';
 	if($player->rank_num == 1) {

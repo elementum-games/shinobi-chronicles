@@ -180,7 +180,7 @@ class User extends Fighter {
     public $avatar_ban;
     public $song_ban;
 
-    public $layout;
+    public string $layout;
 
     // Team
     public ?Team $team = null;

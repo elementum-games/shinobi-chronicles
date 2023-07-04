@@ -10,7 +10,7 @@ if(isset($_SESSION['user_id'])) {
 }
 
 // Start display
-$layout = $system->fetchLayoutByName("shadow_ribbon");
+$layout = $system->setLayoutByName("shadow_ribbon");
 
 $layout->renderStaticPageHeader("Create Account");
 
@@ -82,7 +82,7 @@ if(isset($_GET['act'])) {
                 $system->message("Email sent! Please check your email (including spam folder)");
             }
             else {
-                $system->message("There was a problem sending the email to the address provided: $email
+                $system->message("There was a problem sending the email to the address provided: {$result['email']}
 				Please contact a staff member on the forums for manual activation."
                 );
             }
@@ -171,13 +171,13 @@ if(isset($_POST['register'])) {
             throw new RuntimeException("Please enter a valid email address!");
         }
 
+        /** @noinspection RegExpRedundantEscape */
         $email_pattern = '/^[\w\-\.\+]+@[\w\-\.]+\.[a-zA-Z]{2,4}$/';
         if(!preg_match($email_pattern, $email)) {
             throw new RuntimeException("Please enter a valid email address!");
         }
 
         // Check for hotmail
-
         $email_arr = explode('@', $email);
         $email_arr[1] = strtolower($email_arr[1]);
 

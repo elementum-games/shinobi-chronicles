@@ -3,9 +3,10 @@
  * @var System $system
  * @var array $ranks
  * @var array $bloodlines
- * @var array $RANK_NAMES
  */
 
+ require_once __DIR__ . '/../classes/RankManager.php';
+ $RANK_NAMES = RankManager::fetchNames($system);
 ?>
 <script type="text/javascript">
     function toggleBloodlineDetails(name, byID = false) {

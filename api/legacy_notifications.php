@@ -15,4 +15,7 @@ try {
 $player->loadData(User::UPDATE_NOTHING);
 $system->db->commitTransaction();
 
-Notifications::displayNotifications($system, $player, true);
+$system->setLayoutByName($player->layout);
+
+$notifications = Notifications::getNotifications($system, $player);
+$system->layout->renderLegacyNotifications($notifications);

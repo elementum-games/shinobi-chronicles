@@ -9,7 +9,7 @@ $NavigationAPIManager = new NavigationAPIManager($system, $player);
 
 ?>
 
-<link rel="stylesheet" type="text/css" href="ui_components/src/sidebar/Sidebar.css" />
+<link rel="stylesheet" type="text/css" href="<?= $system->getCssFileLink("ui_components/src/sidebar/Sidebar.css") ?>" />
 <div id="sidebarContainer" class="d-in_block"></div>
 <script type="module" src="<?= $system->getReactFile("sidebar/Sidebar") ?>"></script>
 <script>

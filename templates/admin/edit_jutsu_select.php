@@ -1,9 +1,9 @@
 <?php
 
 /**
+ * @var System $system
  * @var Jutsu[] $all_jutsu
  * @var string $self_link
- * @var string[] $RANK_NAMES
  */
 
 $jutsu_type = 'ninjutsu';
@@ -22,6 +22,9 @@ if(!empty($_GET['jutsu_type'])) {
 }
 
 $selected_link_style = "text-decoration:none;";
+
+require_once __DIR__ . '/../classes/RankManager.php';
+$RANK_NAMES = RankManager::fetchNames($system);
 
 ?>
 

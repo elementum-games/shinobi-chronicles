@@ -18,8 +18,6 @@ function jutsu(): void {
 
     $player->getInventory();
 
-    $rank_names = RankManager::fetchNames($system);
-
     $max_equipped_jutsu = User::BASE_JUTSU_SLOTS;
     if($player->rank_num >= 3) {
         $max_equipped_jutsu++;
