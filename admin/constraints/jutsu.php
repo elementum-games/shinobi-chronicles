@@ -2,7 +2,7 @@
 /* Jutsu */
 $jutsu_effects = [
     'none',
-    /*'release_genjutsu',
+    'release_genjutsu',
     'residual_damage',
     'ninjutsu_boost',
     'taijutsu_boost',
@@ -14,10 +14,6 @@ $jutsu_effects = [
     'cast_speed_boost',
     'intelligence_boost',
     'willpower_boost',
-    'absorb_chakra',
-    'absorb_stamina',
-    'drain_chakra',
-    'drain_stamina',
     'ninjutsu_nerf',
     'taijutsu_nerf',
     'genjutsu_nerf',
@@ -25,7 +21,7 @@ $jutsu_effects = [
     'speed_nerf',
     'endurance_nerf',
     'intelligence_nerf',
-    'willpower_nerf',*/
+    'willpower_nerf',
 ];
 
 $ranks = [];
