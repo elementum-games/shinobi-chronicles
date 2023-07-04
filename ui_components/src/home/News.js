@@ -155,6 +155,7 @@ export function News({ initialNewsPosts, isAdmin, version, homeLinks }: Props): 
                         ref={versionRef}
                         contentEditable="true"
                         suppressContentEditableWarning={true}
+                        style={{ minWidth: "25px" }}
                     >{newsItem.version && newsItem.version.toUpperCase()}</div>
                     <div className="news_item_tag_container">
                         <div className="news_item_tag_divider">/</div>

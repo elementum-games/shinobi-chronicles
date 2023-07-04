@@ -142,7 +142,10 @@ export function News({
       className: "news_item_version",
       ref: versionRef,
       contentEditable: "true",
-      suppressContentEditableWarning: true
+      suppressContentEditableWarning: true,
+      style: {
+        minWidth: "25px"
+      }
     }, newsItem.version && newsItem.version.toUpperCase()), /*#__PURE__*/React.createElement("div", {
       className: "news_item_tag_container"
     }, /*#__PURE__*/React.createElement("div", {
