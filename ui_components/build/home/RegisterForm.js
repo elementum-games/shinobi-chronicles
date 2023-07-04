@@ -1,3 +1,4 @@
+import { clickOnEnter } from "../utils/uiHelpers.js";
 export function RegisterForm({
   registerErrorText,
   registerPreFill,
@@ -60,100 +61,34 @@ export function RegisterForm({
     className: "register_gender_wrapper"
   }, /*#__PURE__*/React.createElement("div", {
     className: "register_field_label"
-  }, "gender"), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("input", {
-    className: "register_option",
-    type: "radio",
-    id: "register_gender_male",
+  }, "gender"), /*#__PURE__*/React.createElement("select", {
     name: "gender",
-    value: "Male",
-    defaultChecked: registerPreFill.gender === "Male"
-  }), /*#__PURE__*/React.createElement("label", {
-    className: "register_option_label",
-    htmlFor: "register_gender_male"
-  }, "Male")), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("input", {
-    className: "register_option",
-    type: "radio",
-    id: "register_gender_female",
-    name: "gender",
-    value: "Female",
-    defaultChecked: registerPreFill.gender === "Female"
-  }), /*#__PURE__*/React.createElement("label", {
-    className: "register_option_label",
-    htmlFor: "register_gender_female"
-  }, "Female")), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("input", {
-    className: "register_option",
-    type: "radio",
-    id: "register_gender_nonbinary",
-    name: "gender",
-    value: "Non-binary",
-    defaultChecked: registerPreFill.gender === "Non-binary"
-  }), /*#__PURE__*/React.createElement("label", {
-    className: "register_option_label",
-    htmlFor: "register_gender_nonbinary"
-  }, "Non-binary")), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("input", {
-    className: "register_option",
-    type: "radio",
-    id: "register_gender_none",
-    name: "gender",
-    value: "None",
-    defaultChecked: registerPreFill.gender === "None"
-  }), /*#__PURE__*/React.createElement("label", {
-    className: "register_option_label",
-    htmlFor: "register_gender_none"
+    defaultValue: registerPreFill.gender
+  }, /*#__PURE__*/React.createElement("option", {
+    value: "Male"
+  }, "Male"), /*#__PURE__*/React.createElement("option", {
+    value: "Female"
+  }, "Male"), /*#__PURE__*/React.createElement("option", {
+    value: "Non-binary"
+  }, "Non-binary"), /*#__PURE__*/React.createElement("option", {
+    value: "None"
   }, "None"))), /*#__PURE__*/React.createElement("div", {
     className: "register_village_wrapper"
   }, /*#__PURE__*/React.createElement("div", {
     className: "register_field_label"
-  }, "village"), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("input", {
-    className: "register_option",
-    type: "radio",
-    id: "register_village_stone",
+  }, "village"), /*#__PURE__*/React.createElement("select", {
     name: "village",
-    value: "Stone",
-    defaultChecked: registerPreFill.village === "Stone"
-  }), /*#__PURE__*/React.createElement("label", {
-    className: "register_option_label",
-    htmlFor: "register_village_stone"
-  }, "Stone")), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("input", {
-    className: "register_option",
-    type: "radio",
-    id: "register_village_cloud",
-    name: "village",
-    value: "Cloud",
-    defaultChecked: registerPreFill.village === "Cloud"
-  }), /*#__PURE__*/React.createElement("label", {
-    className: "register_option_label",
-    htmlFor: "register_village_cloud"
-  }, "Cloud")), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("input", {
-    className: "register_option",
-    type: "radio",
-    id: "register_village_leaf",
-    name: "village",
-    value: "Leaf",
-    defaultChecked: registerPreFill.village === "Leaf"
-  }), /*#__PURE__*/React.createElement("label", {
-    className: "register_option_label",
-    htmlFor: "register_village_leaf"
-  }, "Leaf")), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("input", {
-    className: "register_option",
-    type: "radio",
-    id: "register_village_sand",
-    name: "village",
-    value: "Sand",
-    defaultChecked: registerPreFill.village === "Sand"
-  }), /*#__PURE__*/React.createElement("label", {
-    className: "register_option_label",
-    htmlFor: "register_village_sand"
-  }, "Sand")), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("input", {
-    className: "register_option",
-    type: "radio",
-    id: "register_village_mist",
-    name: "village",
-    value: "Mist",
-    defaultChecked: registerPreFill.village === "Mist"
-  }), /*#__PURE__*/React.createElement("label", {
-    className: "register_option_label",
-    htmlFor: "register_village_mist"
+    defaultValue: registerPreFill.village
+  }, /*#__PURE__*/React.createElement("option", {
+    value: "Stone"
+  }, "Stone"), /*#__PURE__*/React.createElement("option", {
+    value: "Cloud"
+  }, "Cloud"), /*#__PURE__*/React.createElement("option", {
+    value: "Leaf"
+  }, "Leaf"), /*#__PURE__*/React.createElement("option", {
+    value: "Sand"
+  }, "Sand"), /*#__PURE__*/React.createElement("option", {
+    value: "Mist"
   }, "Mist")))), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
     className: "register_terms_notice"
   }, "By clicking 'Create a Character' I affirm that I have read and agree to abide by the Rules and Terms of Service. I understand that if I fail to abide by the rules as determined by the moderating staff, I may be temporarily or permanently banned and that I will not be compensated for time lost. I also understand that any actions taken by anyone on my account are my responsibility."))), registerErrorText !== "" && /*#__PURE__*/React.createElement("div", {
@@ -166,4 +101,72 @@ export function RegisterForm({
       marginTop: "-15px"
     }
   }, registerErrorText)));
+}
+export function CreateCharacterButton({
+  onClick
+}) {
+  return /*#__PURE__*/React.createElement("svg", {
+    role: "button",
+    tabIndex: "0",
+    name: "register",
+    className: "register_button",
+    width: "162",
+    height: "32",
+    onClick: onClick,
+    onKeyPress: clickOnEnter
+  }, /*#__PURE__*/React.createElement("radialGradient", {
+    id: "register_fill_default",
+    cx: "50%",
+    cy: "50%",
+    r: "50%",
+    fx: "50%",
+    fy: "50%"
+  }, /*#__PURE__*/React.createElement("stop", {
+    offset: "0%",
+    style: {
+      stopColor: '#84314e',
+      stopOpacity: 1
+    }
+  }), /*#__PURE__*/React.createElement("stop", {
+    offset: "100%",
+    style: {
+      stopColor: '#68293f',
+      stopOpacity: 1
+    }
+  })), /*#__PURE__*/React.createElement("radialGradient", {
+    id: "register_fill_click",
+    cx: "50%",
+    cy: "50%",
+    r: "50%",
+    fx: "50%",
+    fy: "50%"
+  }, /*#__PURE__*/React.createElement("stop", {
+    offset: "0%",
+    style: {
+      stopColor: '#68293f',
+      stopOpacity: 1
+    }
+  }), /*#__PURE__*/React.createElement("stop", {
+    offset: "100%",
+    style: {
+      stopColor: '#84314e',
+      stopOpacity: 1
+    }
+  })), /*#__PURE__*/React.createElement("rect", {
+    className: "register_button_background",
+    width: "100%",
+    height: "100%"
+  }), /*#__PURE__*/React.createElement("text", {
+    className: "register_button_shadow_text",
+    x: "81",
+    y: "18",
+    textAnchor: "middle",
+    dominantBaseline: "middle"
+  }, "create a character"), /*#__PURE__*/React.createElement("text", {
+    className: "register_button_text",
+    x: "81",
+    y: "16",
+    textAnchor: "middle",
+    dominantBaseline: "middle"
+  }, "create a character"));
 }
