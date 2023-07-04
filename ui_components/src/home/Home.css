@@ -218,18 +218,19 @@ body {
 
 /* Register Button */
 .register_button {
+    display: flex;
     cursor: pointer;
     margin-bottom: 25px;
     margin-top: -8px;
 }
-    .register_button:hover text.register_button_text {
-        fill: #ffffff;
-        text-shadow: 2px 2px 5px rgba(212, 113, 148, 1), -2px -2px 5px rgba(206, 110, 144, 1);
-        transition: text-shadow 0.1s;
-    }
-    .register_button:active .register_button_background {
-        fill: url(#register_fill_click);
-    }
+.register_button:hover text.register_button_text {
+    fill: #ffffff;
+    text-shadow: 2px 2px 5px rgba(212, 113, 148, 1), -2px -2px 5px rgba(206, 110, 144, 1);
+    transition: text-shadow 0.1s;
+}
+.register_button:active .register_button_background {
+    fill: url(#register_fill_click);
+}
 .register_button_background {
     clip-path: polygon(20px 0px, calc(100% - 20px) 0px, 100% 50%, calc(100% - 20px) 100%, 20px 100%, 0px 50%);
     fill: url(#register_fill_default);
@@ -247,6 +248,10 @@ body {
     font-variant: small-caps;
     fill: #1e1d25;
     user-select: none;
+}
+
+#register_form .register_button {
+    margin: 14px auto 12px;
 }
 
 /* Profile Button */
@@ -596,7 +601,7 @@ body {
 .main_banner_modal {
     width: 625px;
     max-width: 95%;
-    max-height: 85vh;
+    max-height: 90vh;
 
     display: flex;
     flex-direction: column;
@@ -1104,8 +1109,9 @@ body {
     }
     .main_banner_modal {
         width: 95%;
+        position: fixed;
 
-        top: 50px;
+        top: 5vh;
         overflow: hidden;
     }
     .main_banner_image {

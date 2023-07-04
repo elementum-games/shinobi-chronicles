@@ -76,22 +76,10 @@ function MainBannerSection({
 }) {
   const [loginDisplay, setLoginDisplay] = React.useState(initialView === "reset" ? "reset" : "login");
   const [activeModalName, setActiveModalName] = React.useState(initialView === "register" ? "register" : "none");
-  console.log('activeModal', activeModalName);
   const loginFormRef = React.useRef(null);
-  const registerFormRef = React.useRef(null);
 
   function handleLogin() {
     loginFormRef.current?.submit();
-  }
-
-  function handleRegister() {
-    console.log('REGISTER CLICKED');
-
-    if (activeModalName !== "register") {
-      setActiveModalName("register");
-    } else {
-      registerFormRef.current?.submit();
-    }
   }
 
   function scrollTo(element) {
@@ -115,8 +103,7 @@ function MainBannerSection({
         handleCloseClick: () => setActiveModalName("none")
       }, /*#__PURE__*/React.createElement(RegisterForm, {
         registerErrorText: registerErrorText,
-        registerPreFill: registerPreFill,
-        formRef: registerFormRef
+        registerPreFill: registerPreFill
       }));
       break;
 
@@ -166,7 +153,10 @@ function MainBannerSection({
   }, /*#__PURE__*/React.createElement("img", {
     src: "/images/v2/decorations/lanternsmall.png"
   })), activeModal, /*#__PURE__*/React.createElement("div", {
-    className: "login_container"
+    className: "login_container",
+    style: activeModal != null ? {
+      visibility: "hidden"
+    } : {}
   }, !isLoggedIn && loginDisplay !== "reset" && /*#__PURE__*/React.createElement(LoginForm, {
     loginMessageText: loginMessageText,
     loginErrorText: loginErrorText,
@@ -178,7 +168,7 @@ function MainBannerSection({
   }), !isLoggedIn && /*#__PURE__*/React.createElement(LoginButton, {
     onCLick: handleLogin
   }), !isLoggedIn && activeModalName !== "register" && /*#__PURE__*/React.createElement(CreateCharacterButton, {
-    onClick: handleRegister
+    onClick: () => setActiveModalName("register")
   }), isLoggedIn && /*#__PURE__*/React.createElement(LoggedInButtons, {
     homeLinks: homeLinks
   })), /*#__PURE__*/React.createElement("div", {

@@ -1,9 +1,9 @@
 import { clickOnEnter } from "../utils/uiHelpers.js";
 export function RegisterForm({
   registerErrorText,
-  registerPreFill,
-  formRef
+  registerPreFill
 }) {
+  const formRef = React.useRef(null);
   return /*#__PURE__*/React.createElement("form", {
     id: "register_form",
     action: "",
@@ -89,7 +89,9 @@ export function RegisterForm({
     value: "Sand"
   }, "Sand"), /*#__PURE__*/React.createElement("option", {
     value: "Mist"
-  }, "Mist")))), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+  }, "Mist")))), /*#__PURE__*/React.createElement(CreateCharacterButton, {
+    onClick: () => formRef.current?.submit()
+  }), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
     className: "register_terms_notice"
   }, "By clicking 'Create a Character' I affirm that I have read and agree to abide by the Rules and Terms of Service. I understand that if I fail to abide by the rules as determined by the moderating staff, I may be temporarily or permanently banned and that I will not be compensated for time lost. I also understand that any actions taken by anyone on my account are my responsibility."))), registerErrorText !== "" && /*#__PURE__*/React.createElement("div", {
     className: "register_input_bottom"

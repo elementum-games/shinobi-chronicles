@@ -10,9 +10,10 @@ type RegisterFormProps = {|
         +email: string,
         +gender: "Male" | "Female" | "Non-binary" | "None",
     },
-    +formRef: { current: ?HTMLFormElement },
 |};
-export function RegisterForm({ registerErrorText, registerPreFill, formRef }: RegisterFormProps): React$Node {
+export function RegisterForm({ registerErrorText, registerPreFill }: RegisterFormProps): React$Node {
+    const formRef = React.useRef(null);
+
     return (
         <form id="register_form" action="" method="post" ref={formRef}>
             <div className="register_input_top">
@@ -66,6 +67,7 @@ export function RegisterForm({ registerErrorText, registerPreFill, formRef }: Re
                         </select>
                     </div>
                 </div>
+                <CreateCharacterButton onClick={() => formRef.current?.submit()} />
                 <div>
                     <div className="register_terms_notice">
                         By clicking 'Create a Character' I affirm that I have read and agree to abide by the Rules and Terms of Service. I understand that if I fail to abide by the rules as determined by the moderating staff, I may be temporarily or permanently banned and that I will not be compensated for time lost. I also understand that any actions taken by anyone on my account are my responsibility.

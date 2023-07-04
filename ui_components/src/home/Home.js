@@ -103,22 +103,11 @@ function MainBannerSection({
 }) {
     const [loginDisplay, setLoginDisplay] = React.useState(initialView === "reset" ? "reset" : "login");
     const [activeModalName, setActiveModalName] = React.useState(initialView === "register" ? "register" : "none");
-    console.log('activeModal', activeModalName);
 
     const loginFormRef = React.useRef(null);
-    const registerFormRef = React.useRef(null);
 
     function handleLogin() {
         loginFormRef.current?.submit();
-    }
-    function handleRegister() {
-        console.log('REGISTER CLICKED');
-        if (activeModalName !== "register") {
-            setActiveModalName("register");
-        }
-        else {
-            registerFormRef.current?.submit();
-        }
     }
 
     function scrollTo(element: ?HTMLElement) {
@@ -141,7 +130,6 @@ function MainBannerSection({
                 <RegisterForm
                     registerErrorText={registerErrorText}
                     registerPreFill={registerPreFill}
-                    formRef={registerFormRef}
                 />
             </MainBannerModal>;
             break;
@@ -181,7 +169,7 @@ function MainBannerSection({
 
                 {activeModal}
 
-                <div className="login_container">
+                <div className="login_container" style={activeModal != null ? {visibility: "hidden"} : {}}>
                     {!isLoggedIn && loginDisplay !== "reset" &&
                         <LoginForm
                             loginMessageText={loginMessageText}
@@ -199,7 +187,7 @@ function MainBannerSection({
 
                     {!isLoggedIn && <LoginButton onCLick={handleLogin} />}
                     {!isLoggedIn && activeModalName !== "register" &&
-                        <CreateCharacterButton onClick={handleRegister} />
+                        <CreateCharacterButton onClick={() => setActiveModalName("register")} />
                     }
 
                     {isLoggedIn &&
