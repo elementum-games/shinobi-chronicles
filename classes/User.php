@@ -2217,6 +2217,16 @@ class User extends Fighter {
 
         return ($this->system->db->last_affected_rows > 0);
     }
+    public function setAvatarFrame(string $frame): bool
+    {
+        $this->system->db->query(
+            "INSERT INTO `user_settings` (`user_id`, `avatar_frame`)
+                VALUES ({$this->user_id}, '{$frame}')
+                ON DUPLICATE KEY UPDATE `avatar_frame`='{$frame}';"
+        );
+
+        return ($this->system->db->last_affected_rows > 0);
+    }
     public function setSidebarPosition(string $position): bool {
         $this->system->db->query(
             "INSERT INTO `user_settings` (`user_id`, `sidebar_position`)
@@ -2250,6 +2260,17 @@ class User extends Fighter {
             return $result['avatar_style'];
         }
         return "round";
+    }
+    public function getAvatarFrame(): string
+    {
+        $avatar_result = $this->system->db->query(
+            "SELECT `avatar_frame` FROM `user_settings` WHERE `user_id` = {$this->user_id}"
+        );
+        $result = $this->system->db->fetch($avatar_result);
+        if ($result) {
+            return $result['avatar_frame'];
+        }
+        return "default";
     }
     public function getSidebarPosition(): string
     {

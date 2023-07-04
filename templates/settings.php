@@ -104,6 +104,18 @@
                     </form>
                 </div>
                 <div>
+                    <label>Avatar Frame</label>
+                    <form action='<?=$system->router->getUrl('settings')?>' method='post'>
+                        <select name='avatar_frame'>";
+                            <?php foreach ($avatar_frames as $frame_key => $frame_value): ?>
+                                <option value='<?= $frame_key ?>' <?= $frame_key == $avatar_frame ? "selected='selected'" : "" ?>><?= ucwords($frame_value) ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                        <br />
+                        <input type='submit' name='change_avatar_frame' value='Change' />
+                    </form>
+                </div>
+                <div>
                     <label>Sidebar Position</label>
                     <form action='<?=$system->router->getUrl('settings')?>' method='post'>
                         <select name='sidebar_position'>";

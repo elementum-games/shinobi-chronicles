@@ -80,6 +80,7 @@ class UserApiPresenter {
     public static function playerSettingsResponse(User $player): array {
         return [
             'avatar_style' => $player->getAvatarStyle(),
+            'avatar_frame' => $player->getAvatarFrame(),
             'sidebar_position' => $player->getSidebarPosition(),
             'enable_alerts' => $player->getEnableAlerts(),
         ];

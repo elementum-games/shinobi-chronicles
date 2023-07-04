@@ -54,7 +54,7 @@ function StatusAttributes({
     maxWidth: playerData.avatar_size * 0.5,
     maxHeight: playerData.avatar_size * 0.5,
     avatarStyle: playerSettings.avatar_style,
-    frameClassNames: ["profile_avatar_frame"]
+    frameClassNames: ["profile_avatar_frame", playerSettings.avatar_frame]
   })), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("h2", {
     className: "player_name"
   }, playerData.user_name), /*#__PURE__*/React.createElement("span", {

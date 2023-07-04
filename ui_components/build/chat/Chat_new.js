@@ -318,9 +318,9 @@ function ChatPosts({
   }, /*#__PURE__*/React.createElement("div", {
     className: "post_user_wrapper"
   }, /*#__PURE__*/React.createElement("div", {
-    className: "post_user_avatar_wrapper " + post.avatarStyle + " " + post.userLinkClassNames.join(' ')
+    className: "post_user_avatar_wrapper " + post.avatarStyle + " " + post.avatarFrame + " " + post.userLinkClassNames.join(' ')
   }, /*#__PURE__*/React.createElement("img", {
-    className: "post_user_avatar_img " + post.avatarStyle,
+    className: "post_user_avatar_img " + post.avatarStyle + " " + post.avatarFrame,
     src: post.avatarLink
   })), /*#__PURE__*/React.createElement("div", {
     className: "post_user_info"

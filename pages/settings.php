@@ -220,6 +220,15 @@ function userSettings() {
         }
 
         $system->printMessage();
+    } else if (!empty($_POST['change_avatar_frame'])) {
+        $style = $system->db->clean($_POST['avatar_frame']);
+        if ($player->setAvatarFrame($style)) {
+            $system->message("Avatar frame updated!");
+        } else {
+            $system->message("No change detected, check your selection and try again.");
+        }
+
+        $system->printMessage();
     }
     else if (!empty($_POST['change_sidebar_position'])) {
         $position = $system->db->clean($_POST['sidebar_position']);
@@ -302,6 +311,8 @@ function userSettings() {
     $sidebar_position = $player->getSidebarPosition();
     $avatar_style = $player->getAvatarStyle();
     $avatar_styles = $player->forbidden_seal->avatar_styles;
+    $avatar_frame = $player->getAvatarFrame();
+    $avatar_frames = ['avy_frame_default' => 'Default', 'avy_frame_none' => 'None'];
     $enable_alerts = $player->getEnableAlerts();
 
     require_once('templates/settings.php');

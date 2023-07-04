@@ -13,6 +13,7 @@ class ChatAPIPresenter {
             'userVillage' => $chatPost->village,
             'avatarLink' => $chatPost->avatar,
             'avatarStyle' => $chatPost->avatar_style,
+            'avatarFrame' => $chatPost->avatar_frame,
             'postTime' => $chatPost->time,
             'timeString' => $chatPost->time_string,
             'userProfileLink' => $system->router->getUrl('members', ['user' => $chatPost->user_name]),
