@@ -332,7 +332,7 @@ class TravelManager {
         }
 
         // TEMP Add Events - We have to hard code the mission IDs is System for now
-        if (isset($system->event)) {
+        if (isset($this->system->event)) {
             if ($this->system->event instanceof LanternEvent) {
                 foreach ($this->system->event->mission_coords['gold'] as $event_mission) {
                     $objectives[] = new MapObjectiveLocation(
