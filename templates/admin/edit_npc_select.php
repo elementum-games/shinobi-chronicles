@@ -6,7 +6,7 @@
  * @var string $self_link
  */
 
-require_once __DIR__ . '/../classes/RankManager.php';
+require_once __DIR__ . '/../../classes/RankManager.php';
 $RANK_NAMES = RankManager::fetchNames($system);
 
 ?>
