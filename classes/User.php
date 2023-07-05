@@ -2217,8 +2217,7 @@ class User extends Fighter {
 
         return ($this->system->db->last_affected_rows > 0);
     }
-    public function setAvatarFrame(string $frame): bool
-    {
+    public function setAvatarFrame(string $frame): bool {
         $this->system->db->query(
             "INSERT INTO `user_settings` (`user_id`, `avatar_frame`)
                 VALUES ({$this->user_id}, '{$frame}')
@@ -2245,6 +2244,45 @@ class User extends Fighter {
 
         return ($this->system->db->last_affected_rows > 0);
     }
+    public function setTravelAnimation(string $travel_animation): bool {
+        $this->system->db->query(
+            "INSERT INTO `user_settings` (`user_id`, `travel_animation`)
+                VALUES ({$this->user_id}, '{$travel_animation}')
+                ON DUPLICATE KEY UPDATE `travel_animation`='{$travel_animation}';"
+        );
+
+        return ($this->system->db->last_affected_rows > 0);
+    }
+    public function setTravelGrid(string $travel_grid): bool {
+        $this->system->db->query(
+            "INSERT INTO `user_settings` (`user_id`, `travel_grid`)
+                VALUES ({$this->user_id}, '{$travel_grid}')
+                ON DUPLICATE KEY UPDATE `travel_grid`='{$travel_grid}';"
+        );
+
+        return ($this->system->db->last_affected_rows > 0);
+    }
+    public function setCardImage(string $image): bool
+    {
+        $this->system->db->query(
+            "INSERT INTO `user_settings` (`user_id`, `card_link`)
+                VALUES ({$this->user_id}, '{$image}')
+                ON DUPLICATE KEY UPDATE `card_image`='{$image}';"
+        );
+
+        return ($this->system->db->last_affected_rows > 0);
+    }
+    public function setBannerImage(string $image): bool
+    {
+        $this->system->db->query(
+            "INSERT INTO `user_settings` (`user_id`, `banner_link`)
+                VALUES ({$this->user_id}, '{$image}')
+                ON DUPLICATE KEY UPDATE `banner_image`='{$image}';"
+        );
+
+        return ($this->system->db->last_affected_rows > 0);
+    }
+
 
     // TO-DO: Replace with user class variables
     public function getAvatarStyle(): string
@@ -2261,8 +2299,7 @@ class User extends Fighter {
         }
         return "round";
     }
-    public function getAvatarFrame(): string
-    {
+    public function getAvatarFrame(): string {
         $avatar_result = $this->system->db->query(
             "SELECT `avatar_frame` FROM `user_settings` WHERE `user_id` = {$this->user_id}"
         );
@@ -2293,6 +2330,46 @@ class User extends Fighter {
             return $result['enable_alerts'];
         }
         return false;
+    }
+    public function getTravelAnimation(): string {
+        $travel_result = $this->system->db->query(
+            "SELECT `travel_animation` FROM `user_settings` WHERE `user_id` = {$this->user_id}"
+        );
+        $result = $this->system->db->fetch($travel_result);
+        if ($result) {
+            return $result['travel_animation'];
+        }
+        return "smooth";
+    }
+    public function getTravelGrid(): string {
+        $travel_result = $this->system->db->query(
+            "SELECT `travel_grid` FROM `user_settings` WHERE `user_id` = {$this->user_id}"
+        );
+        $result = $this->system->db->fetch($travel_result);
+        if ($result) {
+            return $result['travel_grid'];
+        }
+        return "visible";
+    }
+    public function getCardImage(): string {
+        $card_result = $this->system->db->query(
+            "SELECT `card_image` FROM `user_settings` WHERE `user_id` = {$this->user_id}"
+        );
+        $result = $this->system->db->fetch($card_result);
+        if ($result) {
+            return $result['card_image'];
+        }
+        return "./images/default_avatar.png";
+    }
+    public function getBannerImage(): string {
+        $banner_result = $this->system->db->query(
+            "SELECT `banner_image` FROM `user_settings` WHERE `user_id` = {$this->user_id}"
+        );
+        $result = $this->system->db->fetch($banner_result);
+        if ($result) {
+            return $result['banner_image'];
+        }
+        return "./images/default_avatar.png";
     }
 
     public function nextLevelProgressPercent(): int {

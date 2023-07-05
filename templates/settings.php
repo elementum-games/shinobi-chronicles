@@ -47,6 +47,36 @@
             <?php endif ?>
         </td>
     </tr>
+    <?php if ($system->isDevEnvironment()): ?> 
+    <tr><th colspan='2'>Player Card</th></tr>
+    <tr>
+        <td colspan="2">
+            <?php if(!$player->checkBan(StaffManager::BAN_TYPE_AVATAR)):?>
+                <div>
+                    <b>Player Card info:</b><br />
+                    Images must be hosted on another website<br />
+                    Background Limit: 450 x 250 pixels<br />
+                    Banner Limit: 450 x 40 pixels<br />
+                    Images can be larger than the limit, but will be resized<br />
+                    Max filesize: <?=$player->getAvatarFileSizeDisplay()?><br />
+                    <br />
+                    <form action='<?=$self_link?>' method='post'>
+                        <input type='text' name='card_image' value='<?=$card_link?>' style='width:250px;margin-bottom:5px;' />
+                        <input type='submit' name='change_card' value='Change' />
+                    </form>
+                    <br />
+                    <form action='<?=$self_link?>' method='post'>
+                        <input type='text' name='banner_image' value='<?=$banner_link?>' style='width:250px;margin-bottom:5px;' />
+                        <input type='submit' name='change_banner' value='Change' />
+                    </form>
+                </div>
+                <br style='clear:both;' />
+            <?php else: ?>
+                <p style="margin-top:90px;">You are currently banned from changing your avatar.</p>
+            <?php endif ?>
+        </td>
+    </tr>
+    <?php endif; ?>
     <tr><th colspan='2'>Password</th></tr>
     <tr>
         <td colspan='2'>
@@ -90,7 +120,7 @@
                 <input type='submit' name='change_layout' value='Change' />
             </form>
             <?php if($player->layout == "new_geisha"): ?>
-            <div style="display: flex; justify-content: center; gap: 10px; margin-top: 10px;">
+            <div style="display: flex; justify-content: center; gap: 10px; margin-top: 10px; flex-wrap: wrap">
                 <div>
                     <label>Avatar Style</label>
                     <form action='<?=$system->router->getUrl('settings')?>' method='post'>
@@ -135,6 +165,30 @@
                         </select>
                         <br />
                         <input type='submit' name='change_enable_alerts' value='Change' />
+                    </form>
+                </div>
+                <div>
+                    <label>Travel Animation</label>
+                    <form action='<?=$system->router->getUrl('settings')?>' method='post'>
+                        <select name='travel_animation'>";
+                            <option value='smooth' <?=($travel_animation == "smooth" ? "selected='selected'" : "")?>>Smooth</option>
+                            <option value='quick' <?=($travel_animation == "quick" ? "selected='selected'" : "")?>>Quick</option>
+                            <option value='instant' <?=($travel_animation == "instant" ? "selected='selected'" : "")?>>Instant</option>
+                            <option value='continuous' <?=($travel_animation == "ontinuous" ? "selected='selected'" : "")?>>Continuous</option>
+                        </select>
+                        <br />
+                        <input type='submit' name='change_travel_animation' value='Change' />
+                    </form>
+                </div>
+                <div>
+                    <label>Travel Grid</label>
+                    <form action='<?=$system->router->getUrl('settings')?>' method='post'>
+                        <select name='travel_grid'>";
+                            <option value='visible' <?=($travel_grid == "visible" ? "selected='selected'" : "")?>>Visible</option>
+                            <option value='hidden' <?=($travel_grid == "hidden" ? "selected='selected'" : "")?>>Hidden</option>
+                        </select>
+                        <br />
+                        <input type='submit' name='change_travel_grid' value='Change' />
                     </form>
                 </div>
             </div>
