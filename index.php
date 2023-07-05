@@ -578,7 +578,7 @@ if($LOGGED_IN) {
             $self_link = $system->router->base_url . '?id=' . $id;
 
             // EVENT
-            if($system->event != null) {
+            if(isset($system->event)) {
                 if ($layout->key != "new_geisha") {
                     require 'templates/temp_event_header.php';
                 }
