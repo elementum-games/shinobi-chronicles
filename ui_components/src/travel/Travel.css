@@ -644,3 +644,11 @@
     color: var(--theme-text-color-light);
     background-image: none;
 }
+
+/* Smooth */
+#map_background {
+    transition: background-position 0.5s ease-out;
+}
+.map_location {
+    transition: all 0.5s ease-out;
+}
