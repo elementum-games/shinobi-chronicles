@@ -5,9 +5,9 @@ use JetBrains\PhpStorm\NoReturn;
 require __DIR__ . '/APIResponse.php';
 
 class API {
-    public static function init(): System {
+    public static function init($row_lock = true): System {
         $system = new System();
-        $system->db->startTransaction();
+        $system->db->startTransaction($row_lock);
         $system->is_api_request = true;
         return $system;
     }
