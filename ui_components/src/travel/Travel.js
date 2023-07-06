@@ -339,12 +339,12 @@ function Travel({
                             </a>
                         )}
                     </div>
-                    {(feedback) && (
+                    {feedback && (
                         <div className='travel-messages'>
                             <Message message={feedback[0]} messageType={feedback[1]} />
                         </div>
                     )}
-                    {(mapData) && (<Map mapData={mapData} />)}
+                    {mapData && (<Map mapData={mapData} />)}
                 </div>
             </div>
             {(mapData && scoutData) && (

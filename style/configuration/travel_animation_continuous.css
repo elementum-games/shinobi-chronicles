@@ -1,7 +1,0 @@
-#map_background {
-    transition: background-position 0.45s linear;
-}
-
-.map_location {
-    transition: all 0.45s linear;
-}

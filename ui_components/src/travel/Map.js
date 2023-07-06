@@ -57,19 +57,26 @@ export const Map = ({mapData}) => {
     const map_offset_y = stage_offset_y * -1;
 
     // Calculate display values
-
+    const map_width = parseInt(mapData.end_x) - parseInt(mapData.start_x) + 1;
+    const map_height = parseInt(mapData.end_y) - parseInt(mapData.start_y) + 1;
 
     const PlayerStyle = {
         position: "absolute",
         backgroundImage: "url(./" + mapData.player_icon + ")",
-        top: (player_offset_y * tile_height) + "px",
-        left: (player_offset_x * tile_width)  + "px"
+        top: 0,
+        left: 0,
+        transform: `translate3d(
+            ${player_x * tile_width}px,
+            ${player_y * tile_height}px,
+            0
+        )`,
     };
 
     const MapStyle = {
         backgroundImage: "url(./" + mapData.background_image + ")",
         backgroundPositionX: (map_offset_x * tile_width) + "px",
-        backgroundPositionY: (map_offset_y * tile_height) + "px"
+        backgroundPositionY: (map_offset_y * tile_height) + "px",
+
     };
 
     return (
@@ -80,22 +87,34 @@ export const Map = ({mapData}) => {
                 stageOffsetX={stage_offset_x}
                 stageOffsetY={stage_offset_y}
             />
-            <div id='travel-map-container'>
-                <div id='map_background' className='map_background' style={ MapStyle }></div>
-                <MapGridLines
-                    mapWidth={stage_width}
-                    mapHeight={stage_height}
-                    tileWidth={tile_width}
-                    tileHeight={tile_height}
-                />
-                <MapLocations
-                    locations={mapData.all_locations || []}
-                    mapOffsetY={map_offset_y}
-                    mapOffsetX={map_offset_x}
-                    tileWidth={tile_width}
-                    tileHeight={tile_height}
-                />
-                <div id='map_player' style={ PlayerStyle }></div>
+            <div className='travel_map_stage'>
+                <div className='travel_map_content'
+                     style={{
+                        transform: `translate3d(
+                            ${MapStyle.backgroundPositionX},
+                            ${MapStyle.backgroundPositionY},
+                            0
+                        )`,
+                        width: map_width * tile_width,
+                        height: map_height * tile_height,
+                    }}
+                >
+                    <div id='map_background' className='map_background' style={{backgroundImage: MapStyle.backgroundImage}}></div>
+                    <div className='map_grid_lines'>
+                        <MapGridLines
+                            mapWidth={map_width}
+                            mapHeight={map_height}
+                            tileWidth={tile_width}
+                            tileHeight={tile_height}
+                        />
+                    </div>
+                    <MapLocations
+                        locations={mapData.all_locations || []}
+                        tileWidth={tile_width}
+                        tileHeight={tile_height}
+                    />
+                    <div id='map_player' style={ PlayerStyle }></div>
+                </div>
             </div>
         </>
     );
@@ -136,7 +155,7 @@ function MapGridLines({ mapWidth, mapHeight, tileWidth, tileHeight }) {
     const cols = [...Array(mapWidth).keys()];
 
     return (
-        <div className='map_grid_lines'>
+        <>
             {rows.map((row) => (
                 cols.map((col) => (
                     <div key={`${row}:${col}`} style={{
@@ -147,11 +166,11 @@ function MapGridLines({ mapWidth, mapHeight, tileWidth, tileHeight }) {
                     }}></div>
                 ))
             ))}
-        </div>
+        </>
     );
 }
 
-function MapLocations({ locations, mapOffsetX, mapOffsetY, tileWidth, tileHeight }) {
+function MapLocations({ locations, tileWidth, tileHeight }) {
     return (
         <div className='map_locations'>
             {locations.map((location) => (
@@ -161,8 +180,8 @@ function MapLocations({ locations, mapOffsetX, mapOffsetY, tileWidth, tileHeight
                         cursor: "pointer",
                         backgroundColor: "#" + location.background_color,
                         backgroundImage: "url(." + location.background_image + ")",
-                        top: ((mapOffsetY + location.y - 1) * tileHeight) + "px",
-                        left: ((mapOffsetX + location.x - 1) * tileWidth) + "px",
+                        top: ((location.y - 1) * tileHeight) + "px",
+                        left: ((location.x - 1) * tileWidth) + "px",
                     }}>
                     <div className='map_locations_tooltip'>{location.name}</div>
                     {location.objective_image &&

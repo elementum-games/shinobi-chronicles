@@ -36,25 +36,6 @@ class Layout {
                 if ($player->getSidebarPosition() == 'right') {
                     echo "<link rel='stylesheet' type='text/css' href='{$system->getCssFileLink("style/configuration/sidebar_right.css")}' />";
                 }
-                switch ($player->getTravelAnimation()) {
-                    case 'smooth':
-                        echo "<link rel='stylesheet' type='text/css' href='{$system->getCssFileLink("style/configuration/travel_animation_smooth.css")}' />";
-                        break;
-                    case 'continuous':
-                        echo "<link rel='stylesheet' type='text/css' href='{$system->getCssFileLink("style/configuration/travel_animation_continuous.css")}' />";
-                        break;
-                    case 'quick':
-                        echo "<link rel='stylesheet' type='text/css' href='{$system->getCssFileLink("style/configuration/travel_animation_quick.css")}' />";
-                        break;
-                    case 'instant':
-                        break;
-                    case 'default':
-                        echo "<link rel='stylesheet' type='text/css' href='{$system->getCssFileLink("style/configuration/travel_animation_smooth.css")}' />";
-                        break;
-                }
-                if ($player->getTravelGrid() == 'hidden') {
-                    echo "<link rel='stylesheet' type='text/css' href='{$system->getCssFileLink("style/configuration/travel_grid_hidden.css")}' />";
-                }
             }
 
             if ($render_header) {

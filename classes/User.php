@@ -2244,24 +2244,7 @@ class User extends Fighter {
 
         return ($this->system->db->last_affected_rows > 0);
     }
-    public function setTravelAnimation(string $travel_animation): bool {
-        $this->system->db->query(
-            "INSERT INTO `user_settings` (`user_id`, `travel_animation`)
-                VALUES ({$this->user_id}, '{$travel_animation}')
-                ON DUPLICATE KEY UPDATE `travel_animation`='{$travel_animation}';"
-        );
 
-        return ($this->system->db->last_affected_rows > 0);
-    }
-    public function setTravelGrid(string $travel_grid): bool {
-        $this->system->db->query(
-            "INSERT INTO `user_settings` (`user_id`, `travel_grid`)
-                VALUES ({$this->user_id}, '{$travel_grid}')
-                ON DUPLICATE KEY UPDATE `travel_grid`='{$travel_grid}';"
-        );
-
-        return ($this->system->db->last_affected_rows > 0);
-    }
     public function setCardImage(string $image): bool
     {
         $this->system->db->query(
@@ -2331,26 +2314,7 @@ class User extends Fighter {
         }
         return false;
     }
-    public function getTravelAnimation(): string {
-        $travel_result = $this->system->db->query(
-            "SELECT `travel_animation` FROM `user_settings` WHERE `user_id` = {$this->user_id}"
-        );
-        $result = $this->system->db->fetch($travel_result);
-        if ($result) {
-            return $result['travel_animation'];
-        }
-        return "smooth";
-    }
-    public function getTravelGrid(): string {
-        $travel_result = $this->system->db->query(
-            "SELECT `travel_grid` FROM `user_settings` WHERE `user_id` = {$this->user_id}"
-        );
-        $result = $this->system->db->fetch($travel_result);
-        if ($result) {
-            return $result['travel_grid'];
-        }
-        return "visible";
-    }
+
     public function getCardImage(): string {
         $card_result = $this->system->db->query(
             "SELECT `card_image` FROM `user_settings` WHERE `user_id` = {$this->user_id}"

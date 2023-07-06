@@ -1,7 +1,0 @@
-#map_background {
-    transition: background-position 0.25s ease-out;
-}
-
-.map_location {
-    transition: all 0.25s ease-out;
-}

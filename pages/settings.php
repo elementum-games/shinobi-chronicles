@@ -265,24 +265,6 @@ function userSettings() {
         }
 
         $system->printMessage();
-    } else if (!empty($_POST['change_travel_animation'])) {
-        $animation = $system->db->clean($_POST['travel_animation']);
-        if ($player->setTravelAnimation($animation)) {
-            $system->message("Travel settings updated!");
-        } else {
-            $system->message("No change detected, check your selection and try again.");
-        }
-
-        $system->printMessage();
-    } else if (!empty($_POST['change_travel_grid'])) {
-        $grid = $system->db->clean($_POST['travel_grid']);
-        if ($player->setTravelGrid($grid)) {
-            $system->message("Travel settings updated!");
-        } else {
-            $system->message("No change detected, check your selection and try again.");
-        }
-
-        $system->printMessage();
     }
     else if(!empty($_POST['level_rank_up'])) {
         $level_up = isset($_POST['level_up']);
@@ -352,8 +334,6 @@ function userSettings() {
     $enable_alerts = $player->getEnableAlerts();
     $card_link = $player->getCardImage();
     $banner_link = $player->getBannerImage();
-    $travel_animation = $player->getTravelAnimation();
-    $travel_grid = $player->getTravelGrid();
 
     require_once('templates/settings.php');
 }

@@ -167,33 +167,8 @@
                         <input type='submit' name='change_enable_alerts' value='Change' />
                     </form>
                 </div>
-                <div>
-                    <label>Travel Animation</label>
-                    <form action='<?=$system->router->getUrl('settings')?>' method='post'>
-                        <select name='travel_animation'>";
-                            <option value='smooth' <?=($travel_animation == "smooth" ? "selected='selected'" : "")?>>Smooth</option>
-                            <option value='quick' <?=($travel_animation == "quick" ? "selected='selected'" : "")?>>Quick</option>
-                            <option value='instant' <?=($travel_animation == "instant" ? "selected='selected'" : "")?>>Instant</option>
-                            <option value='continuous' <?=($travel_animation == "ontinuous" ? "selected='selected'" : "")?>>Continuous</option>
-                        </select>
-                        <br />
-                        <input type='submit' name='change_travel_animation' value='Change' />
-                    </form>
-                </div>
-                <div>
-                    <label>Travel Grid</label>
-                    <form action='<?=$system->router->getUrl('settings')?>' method='post'>
-                        <select name='travel_grid'>";
-                            <option value='visible' <?=($travel_grid == "visible" ? "selected='selected'" : "")?>>Visible</option>
-                            <option value='hidden' <?=($travel_grid == "hidden" ? "selected='selected'" : "")?>>Hidden</option>
-                        </select>
-                        <br />
-                        <input type='submit' name='change_travel_grid' value='Change' />
-                    </form>
-                </div>
             </div>
             <?php endif; ?>
-            
         </td>
     </tr>
     <tr>

@@ -13,7 +13,6 @@ export const Map = ({
   const stage_height = Math.floor(container_height / tile_height);
   const stage_midpoint_x = Math.floor(stage_width / 2);
   const stage_midpoint_y = Math.floor(stage_height / 2);
-
   /* Stage offset is how offset the first visible tile should be.
      0 offset = tile 1
      +5 offset = tile 6
@@ -32,28 +31,34 @@ export const Map = ({
        How do we calculate the starting coordinate in this example? We need to offset the first visible tile by +2 which
      is equal to player X - stage midpoint X.
    */
+
   const stage_offset_x = player_x - stage_midpoint_x;
   const stage_offset_y = player_y - stage_midpoint_y;
-
   /* Start player at midpoint. Offset is the desired tile number minus 1 so player sits inside the desired tile rather
    than to the right/bottom of it. For example if you want to show the player in visible tile 1, you don't want to
    offset the player at all. */
+
   const player_offset_x = stage_midpoint_x - 1;
   const player_offset_y = stage_midpoint_y - 1;
-
   /* Map is anchored to coordinate 1. If stage is starting with +2 offset (first visible tile is coord 3) then we
   need to shift the whole map 2 tiles to the left to make the first part of it showing the row for coord 3.
    */
+
   const map_offset_x = stage_offset_x * -1;
-  const map_offset_y = stage_offset_y * -1;
+  const map_offset_y = stage_offset_y * -1; // Calculate display values
 
-  // Calculate display values
-
+  const map_width = parseInt(mapData.end_x) - parseInt(mapData.start_x) + 1;
+  const map_height = parseInt(mapData.end_y) - parseInt(mapData.start_y) + 1;
   const PlayerStyle = {
     position: "absolute",
     backgroundImage: "url(./" + mapData.player_icon + ")",
-    top: player_offset_y * tile_height + "px",
-    left: player_offset_x * tile_width + "px"
+    top: 0,
+    left: 0,
+    transform: `translate3d(
+            ${player_x * tile_width}px,
+            ${player_y * tile_height}px,
+            0
+        )`
   };
   const MapStyle = {
     backgroundImage: "url(./" + mapData.background_image + ")",
@@ -66,27 +71,41 @@ export const Map = ({
     stageOffsetX: stage_offset_x,
     stageOffsetY: stage_offset_y
   }), /*#__PURE__*/React.createElement("div", {
-    id: "travel-map-container"
+    className: "travel_map_stage"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "travel_map_content",
+    style: {
+      transform: `translate3d(
+                            ${MapStyle.backgroundPositionX},
+                            ${MapStyle.backgroundPositionY},
+                            0
+                        )`,
+      width: map_width * tile_width,
+      height: map_height * tile_height
+    }
   }, /*#__PURE__*/React.createElement("div", {
     id: "map_background",
     className: "map_background",
-    style: MapStyle
-  }), /*#__PURE__*/React.createElement(MapGridLines, {
-    mapWidth: stage_width,
-    mapHeight: stage_height,
+    style: {
+      backgroundImage: MapStyle.backgroundImage
+    }
+  }), /*#__PURE__*/React.createElement("div", {
+    className: "map_grid_lines"
+  }, /*#__PURE__*/React.createElement(MapGridLines, {
+    mapWidth: map_width,
+    mapHeight: map_height,
     tileWidth: tile_width,
     tileHeight: tile_height
-  }), /*#__PURE__*/React.createElement(MapLocations, {
+  })), /*#__PURE__*/React.createElement(MapLocations, {
     locations: mapData.all_locations || [],
-    mapOffsetY: map_offset_y,
-    mapOffsetX: map_offset_x,
     tileWidth: tile_width,
     tileHeight: tile_height
   }), /*#__PURE__*/React.createElement("div", {
     id: "map_player",
     style: PlayerStyle
-  })));
+  }))));
 };
+
 function MapGutters({
   stageWidth,
   stageHeight,
@@ -110,6 +129,7 @@ function MapGutters({
     className: "travel-gutter-grid travel-gutter-grid-y"
   }, gutter))));
 }
+
 function MapGridLines({
   mapWidth,
   mapHeight,
@@ -118,9 +138,7 @@ function MapGridLines({
 }) {
   const rows = [...Array(mapHeight).keys()];
   const cols = [...Array(mapWidth).keys()];
-  return /*#__PURE__*/React.createElement("div", {
-    className: "map_grid_lines"
-  }, rows.map(row => cols.map(col => /*#__PURE__*/React.createElement("div", {
+  return /*#__PURE__*/React.createElement(React.Fragment, null, rows.map(row => cols.map(col => /*#__PURE__*/React.createElement("div", {
     key: `${row}:${col}`,
     style: {
       width: tileWidth,
@@ -130,10 +148,9 @@ function MapGridLines({
     }
   }))));
 }
+
 function MapLocations({
   locations,
-  mapOffsetX,
-  mapOffsetY,
   tileWidth,
   tileHeight
 }) {
@@ -146,8 +163,8 @@ function MapLocations({
       cursor: "pointer",
       backgroundColor: "#" + location.background_color,
       backgroundImage: "url(." + location.background_image + ")",
-      top: (mapOffsetY + location.y - 1) * tileHeight + "px",
-      left: (mapOffsetX + location.x - 1) * tileWidth + "px"
+      top: (location.y - 1) * tileHeight + "px",
+      left: (location.x - 1) * tileWidth + "px"
     }
   }, /*#__PURE__*/React.createElement("div", {
     className: "map_locations_tooltip"
