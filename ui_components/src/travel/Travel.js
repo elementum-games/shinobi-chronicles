@@ -344,7 +344,10 @@ function Travel({
                             <Message message={feedback[0]} messageType={feedback[1]} />
                         </div>
                     )}
-                    {mapData && (<Map mapData={mapData} />)}
+                    {(mapData && scoutData) &&
+                        (<Map mapData={mapData}
+                            scoutData={scoutData}
+                            playerId={playerId} />)}
                 </div>
             </div>
             {(mapData && scoutData) && (

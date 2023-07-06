@@ -679,3 +679,22 @@
     color: var(--theme-text-color-light);
     background-image: none;
 }
+
+/* Not sure if there's a better way to prevent choppy movement for other players? */
+#scout_locations .map_location {
+    transition: all 0.45s linear;
+}
+
+.map_location.player_ally {
+    background: url(../../../images/ninja_head.png), radial-gradient(circle, green 70%, transparent 75%);
+    background-size: 25px 25px;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+.map_location.player_enemy {
+    background: url(../../../images/ninja_head.png), radial-gradient(circle, red 70%, transparent 75%);
+    background-size: 25px 25px;
+    background-repeat: no-repeat;
+    background-position: center;
+}
