@@ -395,8 +395,14 @@
 }
 
 .travel_map_content, #map_player {
-    /* Somehow sync with movement duration */
+    /* Continuous */
     transition: transform 0.45s linear;
+
+    /* Quick */
+    /* transition: transform 0.25s ease-out; */
+
+    /* Smooth */
+    /* transition: transform 0.4s ease-out; */
 }
 
 
