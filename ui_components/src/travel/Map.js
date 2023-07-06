@@ -66,8 +66,8 @@ export const Map = ({mapData}) => {
         top: 0,
         left: 0,
         transform: `translate3d(
-            ${player_x * tile_width}px,
-            ${player_y * tile_height}px,
+            ${(player_x - 1) * tile_width}px,
+            ${(player_y - 1) * tile_height}px,
             0
         )`,
     };
