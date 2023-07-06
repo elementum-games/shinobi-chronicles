@@ -68,7 +68,7 @@ export function RegisterForm({
     value: "Male"
   }, "Male"), /*#__PURE__*/React.createElement("option", {
     value: "Female"
-  }, "Male"), /*#__PURE__*/React.createElement("option", {
+  }, "Female"), /*#__PURE__*/React.createElement("option", {
     value: "Non-binary"
   }, "Non-binary"), /*#__PURE__*/React.createElement("option", {
     value: "None"

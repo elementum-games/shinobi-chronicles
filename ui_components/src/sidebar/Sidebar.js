@@ -142,8 +142,8 @@ function SBCharacterProfile({playerData, playerResources, playerSettings, regenT
     return (
         <>
             <div className="sb_avatar_container">
-                <div className={"sb_avatar_wrapper " + playerSettings.avatar_style} style={avatarStyles}>
-                    <img className={"sb_avatar_img " + playerSettings.avatar_style} style={avatarStyles} src={playerData.avatar_link} />
+                <div className={"sb_avatar_wrapper " + playerSettings.avatar_style + " " + playerSettings.avatar_frame} style={avatarStyles}>
+                    <img className={"sb_avatar_img " + playerSettings.avatar_style + " " + playerSettings.avatar_frame} style={avatarStyles} src={playerData.avatar_link} />
                 </div>
             </div>
             <div className={"sb_resources d-in_block"}>

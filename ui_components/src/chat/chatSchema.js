@@ -10,6 +10,7 @@ export type ChatPostType = {|
     +userVillage: string,
     +avatarLink: string,
     +avatarStyle: string,
+    +avatarFrame: string,
     +postTime: number,
     +timeString: string,
     +userProfileLink: string,

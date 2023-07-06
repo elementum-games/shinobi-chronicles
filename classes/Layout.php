@@ -22,19 +22,38 @@ class Layout {
     ) {}
 
     public function renderBeforeContentHTML(
-      System $system, 
-      ?User $player, 
-      string $page_title, 
-      bool $render_header = true, 
-      bool $render_sidebar = true, 
-      bool $render_topbar = true, 
+      System $system,
+      ?User $player,
+      string $page_title,
+      bool $render_header = true,
+      bool $render_sidebar = true,
+      bool $render_topbar = true,
       bool $render_content = true
     ): void {
         if($this->usesV2Interface()) {
             echo $this->heading;
             if (isset($player)) {
                 if ($player->getSidebarPosition() == 'right') {
-                    echo "<link rel='stylesheet' type='text/css' href='{$system->getCssFileLink("style/sidebar_right.css")}' />";
+                    echo "<link rel='stylesheet' type='text/css' href='{$system->getCssFileLink("style/configuration/sidebar_right.css")}' />";
+                }
+                switch ($player->getTravelAnimation()) {
+                    case 'smooth':
+                        echo "<link rel='stylesheet' type='text/css' href='{$system->getCssFileLink("style/configuration/travel_animation_smooth.css")}' />";
+                        break;
+                    case 'continuous':
+                        echo "<link rel='stylesheet' type='text/css' href='{$system->getCssFileLink("style/configuration/travel_animation_continuous.css")}' />";
+                        break;
+                    case 'quick':
+                        echo "<link rel='stylesheet' type='text/css' href='{$system->getCssFileLink("style/configuration/travel_animation_quick.css")}' />";
+                        break;
+                    case 'instant':
+                        break;
+                    case 'default':
+                        echo "<link rel='stylesheet' type='text/css' href='{$system->getCssFileLink("style/configuration/travel_animation_smooth.css")}' />";
+                        break;
+                }
+                if ($player->getTravelGrid() == 'hidden') {
+                    echo "<link rel='stylesheet' type='text/css' href='{$system->getCssFileLink("style/configuration/travel_grid_hidden.css")}' />";
                 }
             }
 
@@ -49,7 +68,7 @@ class Layout {
                 if ($render_sidebar) {
                     require 'templates/sidebar.php';
                 } else {
-                    echo "<link rel='stylesheet' type='text/css' href='{$system->getCssFileLink("style/sidebar_none.css")}' />";
+                    echo "<link rel='stylesheet' type='text/css' href='{$system->getCssFileLink("style/configuration/sidebar_none.css")}' />";
                 }
                 if ($render_content) {
                     echo '<div id="content_wrapper">';

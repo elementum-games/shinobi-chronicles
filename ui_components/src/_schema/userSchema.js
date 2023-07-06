@@ -65,10 +65,14 @@ export type AvatarStyles =
     | "avy_eight-point-wide"
     | "avy_nine-point"
     | "avy_twelve-point";
+export type AvatarFrames =
+    | "avy_frame_default"
+    | "avy_frame_none";
 
 // KEEP IN SYNC WITH UserApiPresenter::playerSettingsResponse
 export type PlayerSettingsType = {|
     +avatar_style: AvatarStyles,
+    +avatar_frame: AvatarFrames,
     +sidebar_position: "left" | "right",
     +enable_alerts: boolean,
 |};

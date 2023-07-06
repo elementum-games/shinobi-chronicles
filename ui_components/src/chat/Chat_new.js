@@ -332,8 +332,8 @@ function ChatPosts({
                     <div key={`post:${i}`} className="chat_post" style={{ textAlign: "center" }}>
                         <div className="post_user_container">
                             <div className="post_user_wrapper">
-                                <div className={"post_user_avatar_wrapper " + post.avatarStyle + " " + post.userLinkClassNames.join(' ')}>
-                                    <img className={"post_user_avatar_img " + post.avatarStyle} src={post.avatarLink} />
+                                <div className={"post_user_avatar_wrapper " + post.avatarStyle + " " + post.avatarFrame + " " + post.userLinkClassNames.join(' ')}>
+                                    <img className={"post_user_avatar_img " + post.avatarStyle + " " + post.avatarFrame} src={post.avatarLink} />
                                 </div>
                                 <div className="post_user_info">
                                     <a href={post.userProfileLink} className={"chat_user_name " + post.userLinkClassNames.join(' ')}>

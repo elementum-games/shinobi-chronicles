@@ -4,7 +4,7 @@
 require_once __DIR__ . "/../classes.php";
 require_once __DIR__ . "/../classes/exception/LoggedOutException.php";
 
-$system = API::init();
+$system = API::init(row_lock: false);
 
 try {
     $player = Auth::getUserFromSession($system);

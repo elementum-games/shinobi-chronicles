@@ -170,21 +170,21 @@ class Database {
         return $entities;
     }
 
-    public function startTransaction(): void {
-        if ($this->ENABLE_ROW_LOCKING) {
+    public function startTransaction($row_lock = true): void {
+        if ($this->ENABLE_ROW_LOCKING && $row_lock) {
             $this->query("START TRANSACTION;");
             $this->in_db_transaction = true;
         }
     }
 
     public function commitTransaction(): void {
-        if ($this->ENABLE_ROW_LOCKING && $this->in_db_transaction) {
+        if ($this->in_db_transaction) {
             $this->query("COMMIT;");
             $this->in_db_transaction = false;
         }
     }
     public function rollbackTransaction(): void {
-        if ($this->ENABLE_ROW_LOCKING && $this->in_db_transaction) {
+        if ($this->in_db_transaction) {
             $this->query("ROLLBACK;");
             $this->in_db_transaction = false;
         }

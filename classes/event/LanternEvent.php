@@ -8,6 +8,27 @@ class LanternEvent extends Event {
     public array $item_ids = [];
     public array $mission_ids = [];
 
+    public static $static_item_ids = [
+        'red_lantern_id' => 119,
+        'blue_lantern_id' => 120,
+        'violet_lantern_id' => 121,
+        'gold_lantern_id' => 129,
+        'shadow_essence_id' => 123,
+        'sacred_lantern_red_id' => 124,
+        'sacred_lantern_blue_id' => 125,
+        'sacred_lantern_violet_id' => 126,
+        'sacred_lantern_gold_id' => 130,
+        'forbidden_jutsu_scroll_id' => 127,
+    ];
+    public static $static_mission_ids = [
+        'gold_mission_id' => 120,
+        'special_mission_id' => 119,
+        'easy_mission_id' => 112,
+        'medium_mission_id' => 113,
+        'hard_mission_id' => 111,
+        'nightmare_mission_id' => 114,
+    ];
+
     public array $config = [];
 
     public function __construct(DateTimeImmutable $end_time) {
@@ -22,7 +43,7 @@ class LanternEvent extends Event {
         $mission_coords_medium = [];
         $mission_coords_hard = [];
         $mission_coords_nightmare = [];
-        
+
         switch (true) {
             case ($currentMinutes < 3): // 3 minutes per hour
                 $mission_coords_nightmare[] = ['x' => 10, 'y' => 1];
@@ -80,7 +101,7 @@ class LanternEvent extends Event {
 
         $minute_seed = floor(time() / 60);
         mt_srand($minute_seed);
-        
+
         if (mt_rand(0, 9) == 0) {
             $mission_coords_gold[] = ['x' => mt_rand(1, 27), 'y' => mt_rand(1, 18)];
         }
