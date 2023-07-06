@@ -21,20 +21,20 @@ export const ScoutArea = ({
   scoutData,
   membersLink,
   attackLink,
-  ranksToView
+  ranksToView,
+  playerId
 }) => {
   return /*#__PURE__*/React.createElement("div", {
     className: "travel-scout-container"
   }, /*#__PURE__*/React.createElement("div", {
     className: "travel-scout"
-  }, mapData && scoutData.filter(user => ranksToView[parseInt(user.rank_num)] === true).map(player_data => /*#__PURE__*/React.createElement(Player, {
+  }, mapData && scoutData.filter(user => ranksToView[parseInt(user.rank_num)] === true).map(player_data => player_data.user_id != playerId && /*#__PURE__*/React.createElement(Player, {
     key: player_data.user_id,
     player_data: player_data,
     membersLink: membersLink,
     attackLink: attackLink
   }))));
 };
-
 const Player = ({
   player_data,
   membersLink,
@@ -64,23 +64,18 @@ const Player = ({
     className: `direction ${player_data.direction}`
   })));
 };
-
 const alignmentClass = alignment => {
   let class_name = 'travel-scout-entry travel-scout-';
-
   switch (alignment) {
     case 'Ally':
       class_name += 'ally';
       break;
-
     case 'Enemy':
       class_name += 'enemy';
       break;
-
     case 'Neutral':
       class_name += 'neutral';
       break;
   }
-
   return class_name;
 };

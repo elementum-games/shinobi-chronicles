@@ -22,6 +22,7 @@ export const ScoutArea = ({
     membersLink,
     attackLink,
     ranksToView,
+    playerId,
 }) => {
     return (
         <div className='travel-scout-container'>
@@ -29,6 +30,7 @@ export const ScoutArea = ({
                 {(mapData) && scoutData
                     .filter(user => ranksToView[parseInt(user.rank_num)] === true)
                     .map((player_data) => (
+                        (player_data.user_id != playerId) &&
                         <Player
                             key={player_data.user_id}
                             player_data={player_data}

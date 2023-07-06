@@ -357,6 +357,7 @@ function Travel({
                     membersLink={membersLink}
                     attackLink={attackLink}
                     ranksToView={ranksToView}
+                    playerId={playerId}
                 />
             )}
         </>

@@ -1,5 +1,7 @@
 export const Map = ({
-  mapData
+  mapData,
+  scoutData,
+  playerId
 }) => {
   // Visible field info
   const map_div = document.getElementsByClassName('travel-container')[0];
@@ -13,6 +15,7 @@ export const Map = ({
   const stage_height = Math.floor(container_height / tile_height);
   const stage_midpoint_x = Math.floor(stage_width / 2);
   const stage_midpoint_y = Math.floor(stage_height / 2);
+
   /* Stage offset is how offset the first visible tile should be.
      0 offset = tile 1
      +5 offset = tile 6
@@ -31,22 +34,22 @@ export const Map = ({
        How do we calculate the starting coordinate in this example? We need to offset the first visible tile by +2 which
      is equal to player X - stage midpoint X.
    */
-
   const stage_offset_x = player_x - stage_midpoint_x;
   const stage_offset_y = player_y - stage_midpoint_y;
+
   /* Start player at midpoint. Offset is the desired tile number minus 1 so player sits inside the desired tile rather
    than to the right/bottom of it. For example if you want to show the player in visible tile 1, you don't want to
    offset the player at all. */
-
   const player_offset_x = stage_midpoint_x - 1;
   const player_offset_y = stage_midpoint_y - 1;
+
   /* Map is anchored to coordinate 1. If stage is starting with +2 offset (first visible tile is coord 3) then we
   need to shift the whole map 2 tiles to the left to make the first part of it showing the row for coord 3.
    */
-
   const map_offset_x = stage_offset_x * -1;
-  const map_offset_y = stage_offset_y * -1; // Calculate display values
+  const map_offset_y = stage_offset_y * -1;
 
+  // Calculate display values
   const map_width = parseInt(mapData.end_x) - parseInt(mapData.start_x) + 1;
   const map_height = parseInt(mapData.end_y) - parseInt(mapData.start_y) + 1;
   const PlayerStyle = {
@@ -100,12 +103,16 @@ export const Map = ({
     locations: mapData.all_locations || [],
     tileWidth: tile_width,
     tileHeight: tile_height
+  }), /*#__PURE__*/React.createElement(ScoutLocations, {
+    scoutData: scoutData || [],
+    tileWidth: tile_width,
+    tileHeight: tile_height,
+    playerId: playerId
   }), /*#__PURE__*/React.createElement("div", {
     id: "map_player",
     style: PlayerStyle
   }))));
 };
-
 function MapGutters({
   stageWidth,
   stageHeight,
@@ -129,7 +136,6 @@ function MapGutters({
     className: "travel-gutter-grid travel-gutter-grid-y"
   }, gutter))));
 }
-
 function MapGridLines({
   mapWidth,
   mapHeight,
@@ -148,7 +154,6 @@ function MapGridLines({
     }
   }))));
 }
-
 function MapLocations({
   locations,
   tileWidth,
@@ -171,7 +176,45 @@ function MapLocations({
   }, location.name), location.objective_image && /*#__PURE__*/React.createElement("div", {
     className: "map_location_objective",
     style: {
-      backgroundImage: "url(." + location.objective_image + ")"
+      backgroundImage: "url(." + location.objective_image + ")",
+      zIndex: 5
     }
   }))));
 }
+function ScoutLocations({
+  scoutData,
+  tileWidth,
+  tileHeight,
+  playerId
+}) {
+  console.log(playerId);
+  return /*#__PURE__*/React.createElement("div", {
+    id: "scout_locations",
+    className: "map_locations"
+  }, scoutData.map((player, index) => player.user_id != playerId && /*#__PURE__*/React.createElement("div", {
+    key: player.user_id,
+    className: alignmentClass(player.alignment),
+    style: {
+      cursor: "pointer",
+      top: (player.target_y - 1) * tileHeight + "px",
+      left: (player.target_x - 1) * tileWidth + "px"
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "map_locations_tooltip"
+  }, player.user_name))));
+}
+const alignmentClass = alignment => {
+  let class_name = 'map_location';
+  switch (alignment) {
+    case 'Ally':
+      class_name += ' player_ally';
+      break;
+    case 'Enemy':
+      class_name += ' player_enemy';
+      break;
+    case 'Neutral':
+      class_name += ' player_neutral';
+      break;
+  }
+  return class_name;
+};
