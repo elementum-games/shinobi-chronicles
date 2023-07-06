@@ -545,17 +545,17 @@
     color: var(--theme-text-color-normal);
     font-size: 1em;
     font-family: sans-serif;
-    font-weight: normal;
+    font-weight: 600;
 }
 #content .travel-scout-name a:hover {
     color: var(--theme-text-color-light);
 }
 .travel-scout-name span {
-    width: 50%;
+    width: 65%;
     min-width: 100px;
 
     color: var(--theme-text-color-light);
-    font-size: 0.75em;
+    font-size: 1em;
     font-family: sans-serif;
 
 }
