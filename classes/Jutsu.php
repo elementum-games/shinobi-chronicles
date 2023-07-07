@@ -37,7 +37,7 @@ class Jutsu {
     // Genjutsu gets declared with full power and effect instead of a tradeoff between them, we balance in code
     const GENJUTSU_ATTACK_POWER_MODIFIER = 0.55;
 
-    public static array $elements = [    
+    public static array $elements = [
         self::ELEMENT_FIRE,
         self::ELEMENT_EARTH,
         self::ELEMENT_WIND,
@@ -88,6 +88,8 @@ class Jutsu {
     public int $purchase_type;
 
     public ?int $parent_jutsu;
+
+    public ?int $skin_id = null;
 
     // TODO: Upgrade to enum when PHP 8.1 releases
     public string $element;
@@ -202,7 +204,7 @@ class Jutsu {
             hand_seals: $jutsu_data['hand_seals']
         );
     }
-    
+
     public function setLevel(int $level, int $exp) {
         $this->level = $level;
         $this->exp = $exp;
