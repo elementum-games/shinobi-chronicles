@@ -8,6 +8,7 @@ export type NotificationType = {|
     +action_url: string,
     +type: "training"
         | "training_complete"
+        | "stat_transfer"
         | "specialmission"
         | "specialmission_complete"
         | "specialmission_failed"
@@ -36,9 +37,7 @@ export type NotificationType = {|
 
 export type MissionNotificationType = $ReadOnly<{
     ...NotificationType,
-    +type: "mission",
-    +type: "mission_team",
-    +type: "mission_clan",
+    +type: "mission" | "mission_team" | "mission_clan",
     +mission_rank: string,
 }>;
 

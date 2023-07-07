@@ -421,17 +421,17 @@ class System {
         if($days) {
             $minutes -= $hours * 60;
             $hours -= $days * 24;
-            $message .= $days . ($days > 1 ? " days, " : "day, ") .
-                $hours . ($hours > 1 ? " hours, " : "hour, ") .
-                $minutes . ($minutes > 1 ? " minutes" : "minute");
+            $message .= $days . ($days > 1 ? " days, " : " day, ") .
+                $hours . ($hours > 1 ? " hours, " : " hour, ") .
+                $minutes . ($minutes > 1 ? " minutes" : " minute");
         }
         else if($hours) {
             $minutes -= $hours * 60;
-            $message .= $hours . ($hours > 1 ? " hours, " : "hour, ") .
-                $minutes . ($minutes > 1 ? " minutes" : "minute");
+            $message .= $hours . ($hours > 1 ? " hours, " : " hour, ") .
+                $minutes . ($minutes > 1 ? " minutes" : " minute");
         }
         else {
-            $message .= $minutes . ($minutes > 1 ? " minutes" : "minute");
+            $message .= $minutes . ($minutes > 1 ? " minutes" : " minute");
         }
         return $message;
     }

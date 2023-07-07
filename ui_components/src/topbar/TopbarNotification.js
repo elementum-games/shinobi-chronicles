@@ -14,6 +14,7 @@ export function TopbarNotification({
     switch(notification.type) {
         case "training":
         case "training_complete":
+        case "stat_transfer":
             return <TrainingNotification
                 notification={notification}
                 closeNotification={closeNotification}
@@ -30,7 +31,7 @@ export function TopbarNotification({
     }
 
     const timeRemainingDisplay = formatTimeRemaining(
-            calculateTimeRemaining(notification.created, notification.duration)
+        calculateTimeRemaining(notification.created, notification.duration)
     );
 
     return (
@@ -369,6 +370,18 @@ function TrainingNotification({
                         >X</label>
                     </a>
                 </>
+            }
+            {notification.type === "stat_transfer" &&
+                <a href={notification.action_url}
+                   className="topbar_notification_wrapper stat_transfer"
+                   data-content={`${notification.message}: ${formatTimeRemaining(timeRemaining)} remaining`}
+                >
+                    <svg className="topbar_notification_svg" width="40" height="40" viewBox="0 0 100 100">
+                        <polygon points="6,50 50,94 94,50 50,6" strokeWidth="8px" stroke="#5d5c4b" fill="#52466a" />
+                        <polygon points="6,50 50,94 94,50 50,6" strokeWidth="2px" stroke="#000000" fill="#52466a" />
+                        <image className="topbar_notification_icon" height="50" width="50" x="25.5%" y="27.5%" href="images/v2/icons/timer.png" />
+                    </svg>
+                </a>
             }
         </>
     )

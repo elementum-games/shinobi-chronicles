@@ -79,7 +79,7 @@ class User extends Fighter {
     public string $id;
     public int $user_id;
     public string $user_name;
-    public $username_changes;
+    public int $free_username_changes;
     public $blacklist;
     public $original_blacklist;
 
@@ -141,6 +141,10 @@ class User extends Fighter {
     public $train_type;
     public $train_gain;
     public int $train_time;
+
+    public int $stat_transfer_amount;
+    public int $stat_transfer_completion_time;
+    public string $stat_transfer_target_stat;
 
     private int $money;
 
@@ -335,7 +339,7 @@ class User extends Fighter {
         $user_data = $system->db->fetch($result);
 
         $user->user_name = $user_data['user_name'];
-        $user->username_changes = $user_data['username_changes'];
+        $user->free_username_changes = $user_data['username_changes'];
 
         $user->staff_level = $user_data['staff_level'];
         $user->support_level = $user_data['support_level'];
@@ -588,6 +592,10 @@ class User extends Fighter {
 
         $this->total_stats = $this->ninjutsu_skill + $this->genjutsu_skill + $this->taijutsu_skill + $this->bloodline_skill +
             $this->cast_speed + $this->speed + $this->intelligence + $this->willpower;
+
+        $this->stat_transfer_amount = $user_data['stat_transfer_amount'];
+        $this->stat_transfer_completion_time = $user_data['stat_transfer_completion_time'];
+        $this->stat_transfer_target_stat = $user_data['stat_transfer_target_stat'];
 
         $this->ninjutsu_boost = 0;
         $this->genjutsu_boost = 0;
@@ -861,6 +869,9 @@ class User extends Fighter {
         // Check training
         if($this->train_time && $UPDATE >= User::UPDATE_FULL) {
             $this->checkTraining();
+        }
+        if($this->stat_transfer_completion_time && $UPDATE >= User::UPDATE_FULL) {
+            $this->checkStatTransfer();
         }
 
         // Correction location
@@ -1316,6 +1327,46 @@ class User extends Fighter {
     }
 
     /**
+     * @return void
+     * @throws RuntimeException
+     */
+    public function checkStatTransfer(): void {
+        if($this->stat_transfer_completion_time < time()) {
+            if(!in_array($this->stat_transfer_target_stat, $this->stats)) {
+                $this->system->message("Transferring an invalid stat: {$this->stat_transfer_target_stat}. Transfer cancelled.");
+                $this->system->log(
+                    'invalid_stat_transfer',
+                    $this->user_id,
+                    "Stat: {$this->stat_transfer_target_stat} / Amount: $this->stat_transfer_amount"
+                );
+                $this->stat_transfer_completion_time = 0;
+                return;
+            }
+
+            // Check caps
+            $gain_description = $this->addStatGain($this->stat_transfer_target_stat, $this->stat_transfer_amount);
+
+            $this->stat_transfer_completion_time = 0;
+            if($gain_description) {
+                $this->system->message($gain_description);
+            }
+            else if($this->total_stats >= $this->rank->stat_cap) {
+                $this->system->message("Transfer has finished but you cannot gain any more stats!");
+            }
+
+            // Create notification
+/*            $new_notification = new NotificationDto(
+                type: "training_complete",
+                message: str_replace(["<br />", "<b>", "</b>"], " ", $gain_description . '.' . $team_boost_description),
+                user_id: $this->user_id,
+                created: time(),
+                alert: true,
+            );
+            NotificationManager::createNotification($new_notification, $this->system, NotificationManager::UPDATE_UNIQUE);*/
+        }
+    }
+
+    /**
      * @param string $stat
      * @param int    $stat_gain
      * @return string
@@ -1721,6 +1772,9 @@ class User extends Fighter {
 		`train_type` = '$this->train_type',
 		`train_gain` = '$this->train_gain',
 		`train_time` = '$this->train_time',
+        `stat_transfer_amount` = $this->stat_transfer_amount,
+        `stat_transfer_completion_time` = $this->stat_transfer_completion_time,
+        `stat_transfer_target_stat` = '$this->stat_transfer_target_stat',
 		`money` = '$this->money',
 		`premium_credits` = '$this->premium_credits',
 		`pvp_wins` = '$this->pvp_wins',

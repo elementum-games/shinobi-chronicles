@@ -3,6 +3,7 @@
  * @var System $system
  * @var string $self_link
  * @var string $confirmation_type
+ * @var string $confirmation_string
  * @var string $submit_value
  * @var string $button_value
  * @var int|string $akCost

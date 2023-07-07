@@ -5,10 +5,12 @@ export function TopbarNotification({
   switch (notification.type) {
     case "training":
     case "training_complete":
+    case "stat_transfer":
       return /*#__PURE__*/React.createElement(TrainingNotification, {
         notification: notification,
         closeNotification: closeNotification
       });
+
     case "specialmission":
     case "specialmission_complete":
     case "specialmission_failed":
@@ -16,9 +18,11 @@ export function TopbarNotification({
         notification: notification,
         closeNotification: closeNotification
       });
+
     default:
       break;
   }
+
   const timeRemainingDisplay = formatTimeRemaining(calculateTimeRemaining(notification.created, notification.duration));
   return /*#__PURE__*/React.createElement(React.Fragment, null, notification.type === "mission" && /*#__PURE__*/React.createElement("a", {
     href: notification.action_url,
@@ -405,6 +409,7 @@ export function TopbarNotification({
     className: "topbar_notification_important"
   }, "!"))));
 }
+
 function SpecialMissionNotification({
   notification,
   closeNotification
@@ -506,6 +511,7 @@ function SpecialMissionNotification({
     }
   }, "X"))));
 }
+
 function TrainingNotification({
   notification,
   closeNotification
@@ -582,18 +588,46 @@ function TrainingNotification({
       e.preventDefault();
       closeNotification(notification.notification_id);
     }
-  }, "X"))));
-}
+  }, "X"))), notification.type === "stat_transfer" && /*#__PURE__*/React.createElement("a", {
+    href: notification.action_url,
+    className: "topbar_notification_wrapper stat_transfer",
+    "data-content": `${notification.message}: ${formatTimeRemaining(timeRemaining)} remaining`
+  }, /*#__PURE__*/React.createElement("svg", {
+    className: "topbar_notification_svg",
+    width: "40",
+    height: "40",
+    viewBox: "0 0 100 100"
+  }, /*#__PURE__*/React.createElement("polygon", {
+    points: "6,50 50,94 94,50 50,6",
+    strokeWidth: "8px",
+    stroke: "#5d5c4b",
+    fill: "#52466a"
+  }), /*#__PURE__*/React.createElement("polygon", {
+    points: "6,50 50,94 94,50 50,6",
+    strokeWidth: "2px",
+    stroke: "#000000",
+    fill: "#52466a"
+  }), /*#__PURE__*/React.createElement("image", {
+    className: "topbar_notification_icon",
+    height: "50",
+    width: "50",
+    x: "25.5%",
+    y: "27.5%",
+    href: "images/v2/icons/timer.png"
+  }))));
+} // Utilities
 
-// Utilities
+
 function calculateTimeRemaining(created, duration) {
   const currentTimeTicks = new Date().getTime();
   return created + duration - currentTimeTicks / 1000;
 }
+
 function formatTimeRemaining(seconds) {
   if (seconds <= 0) {
     return "Complete";
   }
+
   const hours = Math.floor(seconds / 3600);
   const minutes = Math.floor(seconds % 3600 / 60);
   seconds = Math.floor(seconds % 60);
