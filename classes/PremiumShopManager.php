@@ -154,7 +154,7 @@ class PremiumShopManager {
 
         $this->player->updateData();
 
-        $this->system->db->query("DELETE FROM `user_bloodlines` WHERE `user_id`='$this->player->user_id'");
+        $this->system->db->query("DELETE FROM `user_bloodlines` WHERE `user_id`='{$this->player->user_id}'");
         $this->system->db->query(
             "UPDATE `user_inventory` SET
                     `jutsu` = '',
@@ -162,7 +162,7 @@ class PremiumShopManager {
                     `bloodline_jutsu` = '',
                     `equipped_jutsu` = '',
                     `equipped_items` = ''
-                    WHERE `user_id`='$this->player->user_id'"
+                    WHERE `user_id`='{$this->player->user_id}'"
         );
 
         return ActionResult::succeeded();
