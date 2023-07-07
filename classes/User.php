@@ -746,6 +746,25 @@ class User extends Fighter {
                 user_id: $this->user_id
             );
 
+            // Scale Jutsu Power
+            foreach ($this->bloodline->jutsu as $jutsu) {
+                $rank_diff = $this->rank_num - $jutsu->rank;
+                switch ($jutsu->rank) {
+                    case 2:
+                        // based on scale 2.5 -> 3.5
+                        $factor = 0.2;
+                        break;
+                    case 3:
+                        // based on scale 3.5 -> 4.4
+                        $factor = 0.1285;
+                        break;
+                    default:
+                        $factor = 0;
+                        break;
+                }
+                $jutsu->power *= 1 + ($rank_diff * $factor);
+            }
+
             // Debug info
             if($this->system->debug['bloodline']) {
                 echo "Debugging {$this->getName()}<br />";
