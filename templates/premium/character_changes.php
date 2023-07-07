@@ -196,6 +196,7 @@
                                 name='transfer_amount'
                                 value='<?= $init_transfer_amount ?>'
                                 onchange='statAllocateCostDisplay()'
+                                onkeyup='statAllocateCostDisplay()'
                             /><br/>
                         </div>
                     </div>
