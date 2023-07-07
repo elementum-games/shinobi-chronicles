@@ -576,7 +576,7 @@ p {
 
 
 /* Colors */
-#content .premiumUser, #content .premiumUser:hover {
+a.premiumUser, a.premiumUser:hover {
     --color-text-shadow: rgba(255, 255, 255, 0.4);
 
     background: transparent url("/images/premium_glow.gif") repeat scroll 0 0;
@@ -586,7 +586,7 @@ p {
             -1px 0 1px var(--color-text-shadow),
             1px 0 1px var(--color-text-shadow);
 }
-#content .staffMember {
+a.staffMember {
 	width: 100%;
 	margin: 1px 0 3px;
 	padding: 0;
@@ -596,13 +596,13 @@ p {
 	text-shadow: 0 -1px 1px;
 }
 
-#content .blue, #content a.blue:hover  {
-	color: #0000C0;
+a.blue, a.blue:hover {
+	color: #0000C0 !important;
 }
-#content .pink, #content a.pink:hover {
-	color: #E030C0;
+a.pink, a.pink:hover {
+	color: #E030C0 !important;
 }
-#content .gold, #content a.gold:hover {
+a.gold, a.gold:hover {
     --color-text-shadow: rgba(0,0,0,0.4);
     text-shadow:
             0 1px 1px var(--color-text-shadow),
@@ -612,27 +612,27 @@ p {
 	color: rgb(255,215,0);
 }
 
-#content .moderator, #content a.moderator:hover {
-	color: #009020;
+a.moderator, a.moderator:hover {
+	color: #009020 !important;
 }
-#content .headModerator, #content a.headModerator:hover {
-	color: #0090A0;
+a.headModerator, a.headModerator:hover {
+	color: #0090A0 !important;
 }
-#content .contentAdmin, #content a.contentAdmin:hover {
-    color: #A000B0;
+a.contentAdmin, a.contentAdmin:hover {
+    color: #A000B0 !important;
 }
-#content .administrator, #content a.administrator:hover {
-	color: #A00000;
-}
-
-#content a.chat.normalUser, #content a.chat.normalUser:hover {
-	color: #000000;
+a.administrator, a.administrator:hover {
+	color: #A00000 !important;
 }
 
-#content a.userLink {
+a.chat.normalUser, .chat.normalUser:hover {
+	color: #000000 !important;
+}
+
+a.userLink {
 	text-decoration: none;
 }
-#content a.userLink:hover {
+a.userLink:hover {
 	text-decoration: underline;
 }
 
