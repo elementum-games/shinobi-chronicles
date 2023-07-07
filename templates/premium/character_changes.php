@@ -262,19 +262,20 @@
         }
 
         if(transferSpeed === 'expedited') {
-            yen_cost = Math.floor(transferAmount / expeditedPointsPerYen);
+            yen_cost = transferAmount / expeditedPointsPerYen;
             time = transferAmount / (pointsPerMin * expeditedSpeedMultiplier);
         }
         else if(transferSpeed === 'super_expedited') {
             ak_cost = 1 + Math.floor(
                 (transferAmount / pointsPerAk) * superExpeditedAkCostMultiplier
             );
-            yen_cost = Math.floor(
-                (transferAmount / expeditedPointsPerYen) * superExpeditedYenCostMultiplier
-            );
+            yen_cost = (transferAmount / expeditedPointsPerYen) * superExpeditedYenCostMultiplier;
             time = transferAmount / (pointsPerMin * superExpeditedSpeedMultiplier);
         }
 
+        if(yen_cost > 0) {
+            yen_cost = Math.round(yen_cost / 100) * 100;
+        }
         time = Math.floor(time);
 
         statCostEl.innerHTML = `${ak_cost} AK / ${yen_cost} yen / ${time} minutes`;
