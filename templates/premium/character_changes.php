@@ -106,6 +106,33 @@
 </table>
 
 <!--// Stat reallocation-->
+<style>
+    .stat_transfer_form {
+        width: 470px;
+        max-width: 75%;
+
+        display: flex;
+        gap: 10px;
+        justify-content: space-evenly;
+
+        margin: 10px auto 5px;
+        padding: 15px 5px;
+
+        background: rgba(255,255,255,0.1);
+        border: 1px solid rgba(0,0,0,0.1);
+        border-radius: 5px;
+    }
+    #transferAmount {
+        width: 100px;
+    }
+    #statAllocateCost {
+        margin-bottom: 12px;
+    }
+    .stat_transfer_form b {
+        display: inline-block;
+        margin-bottom: 2px;
+    }
+</style>
 <table class='table'>
     <tr>
         <th>Stat Transfers</th>
@@ -129,46 +156,62 @@
                 <?php endif; ?>
 
                 <form action='<?= $self_link ?>&view=character_changes' method='post'>
-                    <br/>
-                    Transfer<br/>
-                    <select id='statAllocateSelect' name='original_stat' onchange='statSelectChange();'>
-                        <?php foreach($player->stats as $stat): ?>
-                            <option value='<?= $stat ?>'><?= ucwords(str_replace('_', ' ', $stat)) ?></option>
-                        <?php endforeach; ?>
-                    </select><br/>
-                    to<br/>
-                    <select name='target_stat'>
-                        <?php foreach($player->stats as $stat): ?>
-                            <?php if($stat === 'intelligence' || $stat === 'willpower') continue; ?>
-                            <option value='<?= $stat ?>'><?= ucwords(str_replace('_', ' ', $stat)) ?></option>
-                        <?php endforeach; ?>
-                    </select>
-                    <script type='text/javascript'>
-                        statBeingTransferred = document.getElementById('statAllocateSelect').value;
-                        <?php foreach($player->stats as $stat): ?>
+                    <div class='stat_transfer_form'>
+                        <div>
+                            <b>Transfer Speed</b><br />
+                            <select id='transferSpeed' name='transfer_speed' onchange='statAllocateCostDisplay()'>
+                                <option value='<?= PremiumShopManager::STAT_TRANSFER_STANDARD ?>'>Standard</option>
+                                <option value='<?= PremiumShopManager::STAT_TRANSFER_EXPEDITED ?>'>Expedited</option>
+                                <option value='<?= PremiumShopManager::STAT_TRANSFER_SUPER_EXPEDITED ?>'>Super Expedited</option>
+                            </select>
+                        </div>
+                        <div>
+                            <b>Transfer</b><br/>
+                            <select id='statAllocateSelect' name='original_stat' onchange='statSelectChange();'>
+                                <?php foreach($player->stats as $stat): ?>
+                                    <option value='<?= $stat ?>'><?= System::unSlug($stat) ?></option>
+                                <?php endforeach; ?>
+                            </select><br/>
+                            to<br/>
+                            <select name='target_stat'>
+                                <?php foreach($player->stats as $stat): ?>
+                                    <?php if($stat === 'intelligence' || $stat === 'willpower') continue; ?>
+                                    <option value='<?= $stat ?>'><?= System::unSlug($stat) ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                        <div>
+                            <?php
+                            if($player->bloodline_id) {
+                                $init_transfer_amount = $player->bloodline_skill;
+                            }
+                            else {
+                                $init_transfer_amount = $player->ninjutsu_skill;
+                            }
+                            ?>
+                            <b>Transfer amount:</b><br/>
+                            <input
+                                type='number'
+                                id='transferAmount'
+                                name='transfer_amount'
+                                value='<?= $init_transfer_amount ?>'
+                                onkeyup='statAllocateCostDisplay()'
+                            /><br/>
+                        </div>
+                    </div>
+                    <span id='statAllocateCost'></span><br/>
+                    <input type='submit' name='stat_allocate' value='Transfer Stat Points'/>
+                </form>
+                <script type='text/javascript'>
+                    statBeingTransferred = document.getElementById('statAllocateSelect').value;
+                    <?php foreach($player->stats as $stat): ?>
                         <?php if(str_contains($stat, 'skill')): ?>
                         stats.<?= $stat ?> = <?= ($player->{$stat} - 10) ?>;
                         <?php else: ?>
                         stats.<?= $stat ?> = <?= ($player->{$stat} - 5) ?>;
                         <?php endif; ?>
-                        <?php endforeach; ?>
-                    </script>
-                    <?php
-                    if($player->bloodline_id) {
-                        $init_transfer_amount = $player->bloodline_skill - 10;
-                    }
-                    else {
-                        $init_transfer_amount = $player->ninjutsu_skill - 10;
-                    }
-                    ?>
-                    <br/>
-                    <br/>
-                    Transfer amount:<br/>
-                    <input type='text' id='transferAmount' name='transfer_amount' value='<?= $init_transfer_amount ?>'
-                           onkeyup='statAllocateCostDisplay()'/><br/>
-                    <span id='statAllocateCost'></span><br/>
-                    <input type='submit' name='stat_allocate' value='Transfer Stat Points'/>
-                </form>
+                    <?php endforeach; ?>
+                </script>
             <?php endif; ?>
         </td>
     </tr>
@@ -179,33 +222,61 @@
     let stats = {};
     let pointsPerMin = <?= $premiumShopManager->stat_transfer_points_per_min ?>;
     let pointsPerAk = <?= $premiumShopManager->stat_transfer_points_per_ak ?>;
+    let expeditedPointsPerYen = <?= $premiumShopManager->expedited_stat_transfer_points_per_yen ?>;
+
+    const expeditedSpeedMultiplier = <?= PremiumShopManager::EXPEDITED_STAT_TRANSFER_SPEED_MULTIPLIER ?>;
+    const superExpeditedSpeedMultiplier = <?= PremiumShopManager::SUPER_EXPEDITED_STAT_TRANSFER_SPEED_MULTIPLIER ?>;
+
+    const superExpeditedAkCostMultiplier = <?= PremiumShopManager::SUPER_EXPEDITED_AK_COST_MULTIPLIER ?>;
+    const superExpeditedYenCostMultiplier = <?= PremiumShopManager::SUPER_EXPEDITED_YEN_COST_MULTIPLIER ?>;
+
     let maxFreeStatChangeAmount = <?= $premiumShopManager->max_free_stat_change_amount ?>;
     let freeStatChangeActive = Boolean(<?= ($premiumShopManager->free_stat_change_cooldown_left <= 0) ?>);
     let statBeingTransferred = 'ninjutsu_skill';
 
+    const transferAmountEl = document.getElementById('transferAmount');
+    const transferSpeedEl = document.getElementById('transferSpeed');
+    const statSelectEl = document.getElementById('statAllocateSelect');
+    const statCostEl = document.getElementById('statAllocateCost');
+
     function statSelectChange() {
-        statBeingTransferred = document.getElementById('statAllocateSelect').value;
-        $('#transferAmount').val(stats[statBeingTransferred]);
+        statBeingTransferred = statSelectEl.value;
+        transferAmountEl.value = stats[statBeingTransferred];
         statAllocateCostDisplay();
     }
 
     function statAllocateCostDisplay() {
-        let cost;
-        const transferAmount = parseInt($('#transferAmount').val());
+        let ak_cost = 0, yen_cost = 0;
+
+        const transferAmount = parseInt(transferAmountEl.value);
+        const transferSpeed = transferSpeedEl.value;
+
+        let time = transferAmount / pointsPerMin;
+
         if (transferAmount <= maxFreeStatChangeAmount && freeStatChangeActive) {
-            cost = 0;
+            ak_cost = 0;
         }
         else {
-            cost = 1 + Math.floor(transferAmount / pointsPerAk);
+            ak_cost = 1 + Math.floor(transferAmount / pointsPerAk);
         }
 
-        if(statBeingTransferred === 'intelligence' || statBeingTransferred === 'willpower') {
-            cost = 0;
+        if(transferSpeed === 'expedited') {
+            yen_cost = Math.floor(transferAmount / expeditedPointsPerYen);
+            time = transferAmount / (pointsPerMin * expeditedSpeedMultiplier);
+        }
+        else if(transferSpeed === 'super_expedited') {
+            ak_cost = 1 + Math.floor(
+                (transferAmount / pointsPerAk) * superExpeditedAkCostMultiplier
+            );
+            yen_cost = Math.floor(
+                (transferAmount / expeditedPointsPerYen) * superExpeditedYenCostMultiplier
+            );
+            time = transferAmount / (pointsPerMin * superExpeditedSpeedMultiplier);
         }
 
-        const time = transferAmount / pointsPerMin;
-        const display = cost + ' AK / ' + time + ' minutes';
-        $('#statAllocateCost').html(display);
+        time = Math.floor(time);
+
+        statCostEl.innerHTML = `${ak_cost} AK / ${yen_cost} yen / ${time} minutes`;
     }
 
     statAllocateCostDisplay();

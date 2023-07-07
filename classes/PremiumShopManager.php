@@ -7,11 +7,17 @@ class PremiumShopManager {
     const STAT_TRANSFER_EXPEDITED = 'expedited';
     const STAT_TRANSFER_SUPER_EXPEDITED = 'super_expedited';
 
+    const EXPEDITED_STAT_TRANSFER_SPEED_MULTIPLIER = 1.33;
+    const SUPER_EXPEDITED_STAT_TRANSFER_SPEED_MULTIPLIER = 2.0;
+    const SUPER_EXPEDITED_AK_COST_MULTIPLIER = 1.5;
+    const SUPER_EXPEDITED_YEN_COST_MULTIPLIER = 2;
+
     public System $system;
     public User $player;
 
     public int $stat_transfer_points_per_min;
     public int $stat_transfer_points_per_ak;
+    public float $expedited_stat_transfer_points_per_yen;
 
     public static int $free_stat_change_cooldown = 86400;
     public static int $free_stat_change_cooldown_hours = 24;
@@ -19,7 +25,6 @@ class PremiumShopManager {
     public int $max_free_stat_change_amount = 100;
 
     public int $free_stat_change_cooldown_left;
-    public int $free_stat_change_cooldown_hours_left;
 
     public array $costs;
 
@@ -36,15 +41,19 @@ class PremiumShopManager {
 
         if ($this->player->rank_num >= 3) {
             $this->stat_transfer_points_per_min += 5;
-            $this->stat_transfer_points_per_ak = 450;
+
+            $this->stat_transfer_points_per_ak = 600;
         }
         if ($this->player->rank_num >= 4) {
             $this->stat_transfer_points_per_min += 5;
-            $this->stat_transfer_points_per_ak = 600;
+
+            $this->stat_transfer_points_per_ak = 900;
         }
 
         $this->stat_transfer_points_per_min += $player->forbidden_seal->stat_transfer_boost;
         $this->stat_transfer_points_per_ak += $player->forbidden_seal->extra_stat_transfer_points_per_ak;
+
+        $this->expedited_stat_transfer_points_per_yen = round($this->stat_transfer_points_per_ak / 500, 2);
 
         // Free stat transfers
         self::$free_stat_change_cooldown_hours = self::$free_stat_change_cooldown / 3600;
@@ -222,7 +231,7 @@ class PremiumShopManager {
     }
 
 
-    public function statTransferPremiumCreditCost(int $transfer_amount, string $transfer_type): int {
+    public function statTransferPremiumCreditCost(int $transfer_amount, string $transfer_speed): int {
         $is_free_stat_change =
             $transfer_amount <= $this->max_free_stat_change_amount
             && $this->free_stat_change_cooldown_left <= 0;
@@ -230,16 +239,50 @@ class PremiumShopManager {
         if ($is_free_stat_change) {
             return 0;
         } else {
-            return 1 + floor($transfer_amount / $this->stat_transfer_points_per_ak);
+            switch($transfer_speed) {
+                case self::STAT_TRANSFER_STANDARD:
+                case self::STAT_TRANSFER_EXPEDITED:
+                    return 1 + floor($transfer_amount / $this->stat_transfer_points_per_ak);
+                case self::STAT_TRANSFER_SUPER_EXPEDITED:
+                    return 1 + floor(
+                    ($transfer_amount / $this->stat_transfer_points_per_ak) * self::SUPER_EXPEDITED_AK_COST_MULTIPLIER
+                    );
+                default:
+                    throw new RuntimeException("Invalid transfer type!");
+            }
         }
+    }
+
+    public function statTransferYenCost(int $transfer_amount, string $transfer_speed): int {
+       switch($transfer_speed) {
+           case self::STAT_TRANSFER_STANDARD:
+               return 0;
+           case self::STAT_TRANSFER_EXPEDITED:
+               return floor($transfer_amount / $this->expedited_stat_transfer_points_per_yen);
+           case self::STAT_TRANSFER_SUPER_EXPEDITED:
+               return floor($transfer_amount /
+                   ($this->expedited_stat_transfer_points_per_yen * self::SUPER_EXPEDITED_YEN_COST_MULTIPLIER)
+               );
+           default:
+               throw new RuntimeException("Invalid transfer type!");
+       }
     }
 
     public function assertUserCanTransferStat(
         string $original_stat,
         string $target_stat,
         int $transfer_amount,
-        string $transfer_type
+        string $transfer_speed
     ): void {
+        switch($transfer_speed) {
+            case self::STAT_TRANSFER_STANDARD:
+            case self::STAT_TRANSFER_EXPEDITED:
+            case self::STAT_TRANSFER_SUPER_EXPEDITED:
+                break;
+            default:
+                throw new RuntimeException("Invalid transfer type!");
+        }
+
         if (!in_array($original_stat, $this->player->stats)) {
             throw new RuntimeException("Invalid original stat!");
         }
@@ -260,9 +303,14 @@ class PremiumShopManager {
             throw new RuntimeException("Invalid transfer amount!");
         }
 
-        $cost = $this->statTransferPremiumCreditCost($transfer_amount, $transfer_type);
-        if ($this->player->getPremiumCredits() < $cost) {
+        $ak_cost = $this->statTransferPremiumCreditCost($transfer_amount, $transfer_speed);
+        if ($this->player->getPremiumCredits() < $ak_cost) {
             throw new RuntimeException("You do not have enough Ancient Kunai!");
+        }
+
+        $yen_cost = $this->statTransferYenCost($transfer_amount, $transfer_speed);
+        if ($this->player->getMoney() < $yen_cost) {
+            throw new RuntimeException("You do not have enough yen!");
         }
     }
 
@@ -270,19 +318,21 @@ class PremiumShopManager {
         string $original_stat,
         string $target_stat,
         int $transfer_amount,
-        string $transfer_type
+        string $transfer_speed
     ): ActionResult {
         $this->assertUserCanTransferStat(
             original_stat: $original_stat,
             target_stat: $target_stat,
             transfer_amount: $transfer_amount,
-            transfer_type: $transfer_type
+            transfer_speed: $transfer_speed
         );
 
-        $ak_cost = $this->statTransferPremiumCreditCost($transfer_amount, $transfer_type);
-        $time = $this->statTransferTime($transfer_amount, $transfer_type);
+        $ak_cost = $this->statTransferPremiumCreditCost($transfer_amount, $transfer_speed);
+        $yen_cost = $this->statTransferYenCost($transfer_amount, $transfer_speed);
+        $time = $this->statTransferTime($transfer_amount, $transfer_speed);
 
         $this->player->subtractPremiumCredits($ak_cost, "Transferred {$transfer_amount} {$original_stat} to {$target_stat}");
+        $this->player->subtractMoney($yen_cost, "Transferred {$transfer_amount} {$original_stat} to {$target_stat}");
 
         $exp = $transfer_amount * 10;
         $this->player->exp -= $exp;
@@ -311,7 +361,18 @@ class PremiumShopManager {
         return ActionResult::succeeded();
     }
 
-    public function statTransferTime(int $transfer_amount, string $transfer_type): int {
-        return $transfer_amount / $this->stat_transfer_points_per_min;
+    public function statTransferTime(int $transfer_amount, string $transfer_speed): int {
+        switch($transfer_speed) {
+            case self::STAT_TRANSFER_STANDARD:
+                return $transfer_amount / $this->stat_transfer_points_per_min;
+            case self::STAT_TRANSFER_EXPEDITED:
+                return $transfer_amount /
+                    ($this->stat_transfer_points_per_min * self::EXPEDITED_STAT_TRANSFER_SPEED_MULTIPLIER);
+            case self::STAT_TRANSFER_SUPER_EXPEDITED:
+                return $transfer_amount /
+                    ($this->stat_transfer_points_per_min * self::SUPER_EXPEDITED_STAT_TRANSFER_SPEED_MULTIPLIER);
+            default:
+                throw new RuntimeException("Invalid transfer type!");
+        }
     }
 }
