@@ -35,7 +35,7 @@ class SpecialMission {
             'stats_per_mission' => 2,
             'hp_lost_percent' => 2, // 20% => 60% lost
             'intel_gain' => 10, // est. 10 fights (rank * 150 yen) [130 seconds]
-            'rep_gain' => Village::SPECIAL_MISSION_REP_GAINS[SpecialMission::DIFFICULTY_EASY],
+            'rep_gain' => Reputation::SPECIAL_MISSION_REP_GAINS[SpecialMission::DIFFICULTY_EASY],
         ],
         // Measured average 144 seconds (11.3 fights)
         SpecialMission::DIFFICULTY_NORMAL => [
@@ -44,7 +44,7 @@ class SpecialMission {
             'stats_per_mission' => 4,
             'hp_lost_percent' => 2.5, // 27.5% => 82.5% lost
             'intel_gain' => 9, // 11.1 fights (rank * 210 yen) (old: 63) [144 seconds]
-            'rep_gain' => Village::SPECIAL_MISSION_REP_GAINS[SpecialMission::DIFFICULTY_NORMAL],
+            'rep_gain' => Reputation::SPECIAL_MISSION_REP_GAINS[SpecialMission::DIFFICULTY_NORMAL],
         ],
         SpecialMission::DIFFICULTY_HARD => [
             'yen_per_battle' => 12, // 12 * 12.5 = 150
@@ -52,7 +52,7 @@ class SpecialMission {
             'stats_per_mission' => 6,
             'hp_lost_percent' => 3.5, // 44% => 132% lost
             'intel_gain' => 8, // 12.5 fights (rank * 270 yen) [162 seconds]
-            'rep_gain' => Village::SPECIAL_MISSION_REP_GAINS[SpecialMission::DIFFICULTY_HARD],
+            'rep_gain' => Reputation::SPECIAL_MISSION_REP_GAINS[SpecialMission::DIFFICULTY_HARD],
         ],
         SpecialMission::DIFFICULTY_NIGHTMARE => [
             'yen_per_battle' => 14, // 20 * 14.28 = 285
@@ -60,7 +60,7 @@ class SpecialMission {
             'stats_per_mission' => 8,
             'hp_lost_percent' => 4.5, // 71.4% => 214.2% lost
             'intel_gain' => 7, // 14.28 fights (rank * 340 yen) [185 seconds]
-            'rep_gain' => Village::SPECIAL_MISSION_REP_GAINS[SpecialMission::DIFFICULTY_NIGHTMARE],
+            'rep_gain' => Reputation::SPECIAL_MISSION_REP_GAINS[SpecialMission::DIFFICULTY_NIGHTMARE],
         ]
     ];
 
@@ -404,12 +404,10 @@ class SpecialMission {
         $reward_text = self::$event_names[self::EVENT_COMPLETE_REWARD]['text'] . $yen_gain . '!';
 
         //Reputation Reward
-        $rep_gain = self::$difficulties[$this->difficulty]['rep_gain'];
-        if($this->player->mission_rep_cd - time() <= 0) {
-            $rep_gain = $this->player->calMaxRepGain($rep_gain);
+        if($this->player->reputation->canGain(true)) {
+            $rep_gain = $this->player->reputation->addRep(self::$difficulties[$this->difficulty]['rep_gain']);
             if($rep_gain > 0) {
-                $this->player->addRep($rep_gain);
-                $this->player->mission_rep_cd = time() + Village::ARENA_MISSION_CD;
+                $this->player->mission_rep_cd = time() + Reputation::ARENA_MISSION_CD;
                 $reward_text .= ' You have gained ' . $rep_gain . " village reputation!";
             }
         }

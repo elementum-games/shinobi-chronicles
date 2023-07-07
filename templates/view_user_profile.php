@@ -58,8 +58,8 @@ $clan_positions = array(
             <?php endif; ?>
 
 			<label style='width:6.5em;'>Village:</label> <?= $viewUser->village->name ?><br />
-            <label style='width:6.5em;'>Reputation:</label> <?= $viewUser->village->getRepName($viewUser->village_rep) ?>
-            (<?=$viewUser->village_rep?>)<br />
+            <label style='width:6.5em;'>Reputation:</label> <?= $viewUser->reputation->rank_name ?>
+            (<?=$viewUser->reputation->getRepAmount()?>)<br />
 			<label style='width:6.5em;'>Bloodline:</label> <?= ($viewUser->bloodline_id ? $viewUser->bloodline_name : "None") ?>
             <br />
             <?php if (SenseiManager::isActiveSensei($viewUser->user_id, $system)): ?>

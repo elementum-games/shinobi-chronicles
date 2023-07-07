@@ -41,6 +41,6 @@ if($_SESSION['user_id']) {
 }
 
 function weeklyCron($system) {
-    $decay = Village::DECAY;
+    $decay = Reputation::DECAY;
     $system->db->query("UPDATE `users` SET `weekly_rep` = 0, `village_rep`=ceil(`village_rep`*{$decay})");
 }

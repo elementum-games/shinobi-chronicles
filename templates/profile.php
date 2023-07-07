@@ -416,8 +416,8 @@ $clan_positions = [
     <?php endif; ?>
     <br />
     <label style='width:<?= $label_width ?>;'>Village:</label> <?= $player->village->name ?><br />
-    <label style='width:<?= $label_width ?>;'>Reputation:</label> <?= $player->village->getRepName($player->village_rep) ?> <em>(<?= $player->village_rep ?>)</em><br />
-    <label style='width:<?= $label_width ?>;'>Weekly Cap:</label> <?= $player->weekly_rep ?> / <?= $player->weekly_rep_cap ?><br />
+    <label style='width:<?= $label_width ?>;'>Reputation:</label> <?= $player->reputation->rank_name ?> <em>(<?= $player->reputation->getRepAmount() ?>)</em><br />
+    <label style='width:<?= $label_width ?>;'>Weekly Cap:</label> <?= $player->reputation->getWeeklyRepAmount() ?> / <?= $player->reputation->weekly_cap ?><br />
     <br />
     <label style='width:<?= $label_width ?>;'>Money:</label> &yen;<?= $player->getMoney() ?><br />
     <label style='width:<?= $label_width ?>;'>Ancient Kunai:</label> <?= $player->getPremiumCredits() ?><br />

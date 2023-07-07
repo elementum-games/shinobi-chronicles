@@ -67,6 +67,7 @@ abstract class Fighter {
     public float $bloodline_speed_boost = 0;
 
     public string $gender;
+    public Reputation $reputation;
     public int $rep_rank;
 
     public string $current_ip;

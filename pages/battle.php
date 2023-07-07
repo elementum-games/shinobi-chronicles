@@ -144,10 +144,10 @@ function processBattleFightEnd(BattleManager $battle, User $player): string {
         $result .= "You have earned $village_point_gain point for your village.[br]";
 
         // Calculate rep gains
-        $rep_gain = $player->village->calcPvpRep($player->level, $player->rep_rank, $battle->opponent->level, $battle->opponent->rep_rank);
+        $base_rep = $player->reputation->calcPvpRep($player->level, $player->reputation->rank, $battle->opponent->level, $battle->opponent->reputation->rank);
+        $rep_gain = $player->reputation->addRep($base_rep, true);
         if($rep_gain > 0) {
             $result .= "You have earned $rep_gain village reputation.[br]";
-            $player->addRep($rep_gain);
         }
 
         // Team points
@@ -173,11 +173,11 @@ function processBattleFightEnd(BattleManager $battle, User $player): string {
 
         // Calc rep loss (if any)
         // Calculate rep gains
-        $rep_loss = $player->village->calcPvpRep($player->level, $player->rep_rank, $battle->opponent->level,
-            $battle->opponent->rep_rank, false);
+        $rep_loss = $player->reputation->calcPvpRep($player->level, $player->reputation->rank, $battle->opponent->level,
+            $battle->opponent->reputation->rank, false);
         if($rep_loss < 0) {
             $result .= "You have lost " . abs($rep_loss) . " village reputation.[br]";
-            $player->subtractRep(abs($rep_loss));
+            $player->reputation->subtractRep(abs($rep_loss));
         }
 
         // If player is killed during a survival mission as a result of PVP, clear the survival mission

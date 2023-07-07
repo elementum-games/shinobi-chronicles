@@ -380,12 +380,11 @@ function runActiveMission(): bool {
                 }
 
                 // Village reputation
-                if($player->mission_rep_cd - time() <= 0) {
-                    $rep_gain = $player->calMaxRepGain(Village::MISSION_GAINS[$mission->rank]);
+                if($player->reputation->canGain(true)) {
+                    $rep_gain = $player->reputation->addRep(Reputation::MISSION_GAINS[$mission->rank]);
 
                     if ($rep_gain > 0) {
-                        $player->addRep($rep_gain);
-                        $player->mission_rep_cd = time() + Village::ARENA_MISSION_CD;
+                        $player->mission_rep_cd = time() + Reputation::ARENA_MISSION_CD;
                         echo "You have gained $rep_gain village reputation!<br />";
                     }
                 }
