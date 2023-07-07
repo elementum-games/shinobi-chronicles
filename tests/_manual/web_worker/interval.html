@@ -14,8 +14,12 @@
 </head>
 <body>
     <div class='counts_list'>
-        <div id='main_count'>0</div>
-        <div id='worker_count'>0</div>
+        <div>
+            Main Thread: <span id='main_count'>0</span>
+        </div>
+        <div>
+            Worker Thread: <span id='worker_count'>0</span>
+        </div>
     </div>
     <script>
         const mainCountEl = document.getElementById('main_count');
@@ -23,7 +27,7 @@
 
         // Main
         let mainCount = 0;
-        const mainIntervalId = setInterval(incrementMainCount, 1000);
+        const mainIntervalId = setInterval(incrementMainCount, 800);
         function incrementMainCount() {
             if(mainCount >= 1000) {
                 clearInterval((mainIntervalId));
