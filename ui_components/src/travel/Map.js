@@ -203,7 +203,6 @@ function MapLocations({ locations, tileWidth, tileHeight }) {
 }
 
 function ScoutLocations({ scoutData, tileWidth, tileHeight, playerId }) {
-    console.log(playerId);
     return (
         <div id="scout_locations" className='map_locations'>
             {scoutData.map((player, index) => (

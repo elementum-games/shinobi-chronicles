@@ -187,7 +187,6 @@ function ScoutLocations({
   tileHeight,
   playerId
 }) {
-  console.log(playerId);
   return /*#__PURE__*/React.createElement("div", {
     id: "scout_locations",
     className: "map_locations"
