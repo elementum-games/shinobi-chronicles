@@ -66,7 +66,7 @@ const Player = ({
             </div>
             <div className='travel-scout-attack'>
                 {(player_data.attack === true && parseInt(player_data.battle_id, 10) === 0) && (
-                    <a href={attackLink + '&attack=' + player_data.attack_id}></a>
+                    <a onClick={() => attackLink(player_data.attack_id)}></a>
                 )}
                 {(player_data.attack === true && parseInt(player_data.battle_id, 10) > 0) && (
                     <span className='in-battle'></span>

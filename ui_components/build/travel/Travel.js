@@ -64,9 +64,9 @@ function Travel({
   playerId,
   travelPageLink,
   travelAPILink,
+  battleAPILink,
   missionLink,
   membersLink,
-  attackLink,
   travelCooldownMs
 }) {
   const travelIntervalFrequency = 40;
@@ -172,6 +172,18 @@ function Travel({
     console.warn(errors);
     setFeedback([errors, 'info']);
   }
+  const AttackPlayer = target => {
+    apiFetch(battleAPILink, {
+      request: 'AttackPlayer',
+      target: target
+    }).then(response => {
+      if (response.errors.length) {
+        handleErrors(response.errors);
+        return;
+      }
+      window.location.href = response.data.redirect;
+    });
+  };
 
   // Handle travel
   function changeMovementDirection(newDirection) {
@@ -285,7 +297,7 @@ function Travel({
     mapData: mapData,
     scoutData: scoutData,
     membersLink: membersLink,
-    attackLink: attackLink,
+    attackLink: AttackPlayer,
     ranksToView: ranksToView,
     playerId: playerId
   }));

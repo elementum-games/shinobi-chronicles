@@ -57,7 +57,7 @@ const Player = ({
   })), /*#__PURE__*/React.createElement("div", {
     className: "travel-scout-attack"
   }, player_data.attack === true && parseInt(player_data.battle_id, 10) === 0 && /*#__PURE__*/React.createElement("a", {
-    href: attackLink + '&attack=' + player_data.attack_id
+    onClick: () => attackLink(player_data.attack_id)
   }), player_data.attack === true && parseInt(player_data.battle_id, 10) > 0 && /*#__PURE__*/React.createElement("span", {
     className: "in-battle"
   }), player_data.attack === false && player_data.direction !== 'none' && /*#__PURE__*/React.createElement("span", {
