@@ -260,8 +260,8 @@ class PremiumShopManager {
            case self::STAT_TRANSFER_EXPEDITED:
                return floor($transfer_amount / $this->expedited_stat_transfer_points_per_yen);
            case self::STAT_TRANSFER_SUPER_EXPEDITED:
-               return floor($transfer_amount /
-                   ($this->expedited_stat_transfer_points_per_yen * self::SUPER_EXPEDITED_YEN_COST_MULTIPLIER)
+               return floor(($transfer_amount / $this->expedited_stat_transfer_points_per_yen)
+                   * self::SUPER_EXPEDITED_YEN_COST_MULTIPLIER
                );
            default:
                throw new RuntimeException("Invalid transfer type!");

@@ -195,23 +195,13 @@
                                 id='transferAmount'
                                 name='transfer_amount'
                                 value='<?= $init_transfer_amount ?>'
-                                onkeyup='statAllocateCostDisplay()'
+                                onchange='statAllocateCostDisplay()'
                             /><br/>
                         </div>
                     </div>
                     <span id='statAllocateCost'></span><br/>
                     <input type='submit' name='stat_allocate' value='Transfer Stat Points'/>
                 </form>
-                <script type='text/javascript'>
-                    statBeingTransferred = document.getElementById('statAllocateSelect').value;
-                    <?php foreach($player->stats as $stat): ?>
-                        <?php if(str_contains($stat, 'skill')): ?>
-                        stats.<?= $stat ?> = <?= ($player->{$stat} - 10) ?>;
-                        <?php else: ?>
-                        stats.<?= $stat ?> = <?= ($player->{$stat} - 5) ?>;
-                        <?php endif; ?>
-                    <?php endforeach; ?>
-                </script>
             <?php endif; ?>
         </td>
     </tr>
@@ -220,6 +210,14 @@
 <!--suppress JSUnresolvedFunction -->
 <script type='text/javascript'>
     let stats = {};
+    <?php foreach($player->stats as $stat): ?>
+        <?php if(str_contains($stat, 'skill')): ?>
+            stats.<?= $stat ?> = <?= ($player->{$stat} - 10) ?>;
+        <?php else: ?>
+            stats.<?= $stat ?> = <?= ($player->{$stat} - 5) ?>;
+        <?php endif; ?>
+    <?php endforeach; ?>
+
     let pointsPerMin = <?= $premiumShopManager->stat_transfer_points_per_min ?>;
     let pointsPerAk = <?= $premiumShopManager->stat_transfer_points_per_ak ?>;
     let expeditedPointsPerYen = <?= $premiumShopManager->expedited_stat_transfer_points_per_yen ?>;
@@ -238,6 +236,8 @@
     const transferSpeedEl = document.getElementById('transferSpeed');
     const statSelectEl = document.getElementById('statAllocateSelect');
     const statCostEl = document.getElementById('statAllocateCost');
+
+    statBeingTransferred = document.getElementById('statAllocateSelect').value;
 
     function statSelectChange() {
         statBeingTransferred = statSelectEl.value;
