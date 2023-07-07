@@ -7,9 +7,9 @@ class PremiumShopManager {
     const STAT_TRANSFER_EXPEDITED = 'expedited';
     const STAT_TRANSFER_SUPER_EXPEDITED = 'super_expedited';
 
-    const EXPEDITED_STAT_TRANSFER_SPEED_MULTIPLIER = 1.33;
-    const SUPER_EXPEDITED_STAT_TRANSFER_SPEED_MULTIPLIER = 2.0;
-    const SUPER_EXPEDITED_AK_COST_MULTIPLIER = 1.5;
+    const EXPEDITED_STAT_TRANSFER_SPEED_MULTIPLIER = 2;
+    const SUPER_EXPEDITED_STAT_TRANSFER_SPEED_MULTIPLIER = 10;
+    const SUPER_EXPEDITED_AK_COST_MULTIPLIER = 2;
     const SUPER_EXPEDITED_YEN_COST_MULTIPLIER = 2;
 
     public System $system;
@@ -36,32 +36,10 @@ class PremiumShopManager {
         $this->initCosts();
 
         // Stat transfers
-        $this->stat_transfer_points_per_min = 10;
-        $this->stat_transfer_points_per_ak = 300;
-
-        if ($this->player->rank_num >= 3) {
-            $this->stat_transfer_points_per_min += 5;
-
-            $this->stat_transfer_points_per_ak = 600;
-        }
-        if ($this->player->rank_num >= 4) {
-            $this->stat_transfer_points_per_min += 5;
-
-            $this->stat_transfer_points_per_ak = 900;
-        }
-
-        $this->stat_transfer_points_per_min += $player->forbidden_seal->stat_transfer_boost;
-        $this->stat_transfer_points_per_ak += $player->forbidden_seal->extra_stat_transfer_points_per_ak;
-
-        $this->expedited_stat_transfer_points_per_yen = round($this->stat_transfer_points_per_ak / 500, 2);
-
-        // Free stat transfers
-        self::$free_stat_change_cooldown_hours = self::$free_stat_change_cooldown / 3600;
-
-        $this->free_stat_change_cooldown_left = $player->last_free_stat_change - (time() - self::$free_stat_change_cooldown);
+        $this->initStatTransferVars();
     }
 
-    public function initCosts(): void {
+    private function initCosts(): void {
         $this->costs['name_change'] = 15;
         $this->costs['gender_change'] = 10;
         $this->costs['bloodline'][1] = 80;
@@ -96,6 +74,32 @@ class PremiumShopManager {
 
         $this->costs['reset_ai_battles'] = 10;
         $this->costs['reset_pvp_battles'] = 20;
+    }
+
+    private function initStatTransferVars(): void {
+        $this->stat_transfer_points_per_min = 10;
+        $this->stat_transfer_points_per_ak = 300;
+
+        if ($this->player->rank_num >= 3) {
+            $this->stat_transfer_points_per_min += 5;
+
+            $this->stat_transfer_points_per_ak = 600;
+        }
+        if ($this->player->rank_num >= 4) {
+            $this->stat_transfer_points_per_min += 5;
+
+            $this->stat_transfer_points_per_ak = 1200;
+        }
+
+        $this->stat_transfer_points_per_min += $this->player->forbidden_seal->stat_transfer_boost;
+        $this->stat_transfer_points_per_ak += $this->player->forbidden_seal->extra_stat_transfer_points_per_ak;
+
+        $this->expedited_stat_transfer_points_per_yen = round($this->stat_transfer_points_per_ak / 1000, 5);
+
+        // Free stat transfers
+        self::$free_stat_change_cooldown_hours = self::$free_stat_change_cooldown / 3600;
+
+        $this->free_stat_change_cooldown_left = $this->player->last_free_stat_change - (time() - self::$free_stat_change_cooldown);
     }
 
     public function assertUserCanReset(): void {
