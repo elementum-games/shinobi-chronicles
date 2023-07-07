@@ -70,6 +70,10 @@
     font-weight: bold;
 }
 
+.topbar_notification_wrapper.stat_transfer:hover::after {
+    transform: translateX(-20px) translateY(1px);
+}
+
 .topbar_notification_wrapper:hover::after {
     content: attr(data-content);
     position: absolute;

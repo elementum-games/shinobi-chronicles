@@ -106,7 +106,8 @@ function Topbar({ links, notificationAPIData, userAPIData}) {
     // Display
     const leftNotificationTypes = [
         "training",
-        "training_complete"
+        "training_complete",
+        "stat_transfer"
     ];
 
     const rightNotificationTypes = [

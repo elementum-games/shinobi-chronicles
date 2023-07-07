@@ -52,6 +52,15 @@ class NotificationAPIManager {
                         $notifications[] = NotificationDto::fromDb($row, $this->system->router->getUrl("training"));
                     }
                     break;
+                case "stat_transfer":
+                    if ($this->player->stat_transfer_completion_time <= 0) {
+                        $notification_ids_to_delete[] = $row['notification_id'];
+                        continue 2;
+                    }
+                    else {
+                        $notifications[] = NotificationDto::fromDb($row, $this->system->router->getUrl("profile"));
+                    }
+                    break;
                 case "specialmission":
                     if ($this->player->special_mission == 0) {
                         $notification_ids_to_delete[] = $row['notification_id'];
