@@ -11,11 +11,13 @@ session_start();
  *    will also remove players with insufficient reputation from office.    *
  ****************************************************************************/
 
-require_once __DIR__ . './classes/System.php';
-require_once __DIR__ . './classes/Village.php';
-require_once __DIR__ . './classes/User.php';
-require_once __DIR__ . './classes/Mission.php';
-require_once __DIR__ . './classes/travel/TravelManager.php';
+require_once __DIR__ . '/../classes/System.php';
+require_once __DIR__ . '/../classes/Village.php';
+require_once __DIR__ . '/../classes/User.php';
+require_once __DIR__ . '/../classes/Mission.php';
+require_once __DIR__ . '/../classes/Bloodline.php';
+require_once __DIR__ . '/../classes/Reputation.php';
+require_once __DIR__ . '/../classes/travel/TravelManager.php';
 
 $system = new System();
 $system->db->connect();
