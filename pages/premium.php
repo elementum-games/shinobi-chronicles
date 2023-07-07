@@ -1,88 +1,19 @@
 <?php
-/*
-File: 		premium.php
-Coder:		Levi Meahan
-Created:	04/30/2014
-Revised:	04/30/2014 by Levi Meahan
-Purpose:	Function for premium credit shop. Resets, name changes, bloodline re-rolls, etc
-*/
 
+require_once __DIR__ . '/../classes/PremiumShopManager.php';
 require_once __DIR__ . '/../classes/notification/NotificationManager.php';
 
-function premium(): bool
-{
+function premium(): bool {
     global $system;
     global $player;
     global $self_link;
-
-    $costs['name_change'] = 15;
-    $costs['gender_change'] = 10;
-    $costs['bloodline'][1] = 80;
-    $costs['bloodline'][2] = 60;
-    $costs['bloodline'][3] = 40;
-    $costs['bloodline'][4] = 20;
-    $costs['forbidden_seal_monthly_cost'] = [
-        1 => 5,
-        2 => 15
-    ];
-    $costs['forbidden_seal'] = [
-        1 => [
-            30 => $costs['forbidden_seal_monthly_cost'][1],
-            60 => $costs['forbidden_seal_monthly_cost'][1] * 2,
-            90 => $costs['forbidden_seal_monthly_cost'][1] * 3
-        ],
-        2 => [
-            30 => $costs['forbidden_seal_monthly_cost'][2],
-            60 => $costs['forbidden_seal_monthly_cost'][2] * 2,
-            90 => $costs['forbidden_seal_monthly_cost'][2] * 3
-        ]
-    ];
-    $costs['element_change'] = 10;
-    $costs['village_change'] = 5 * $player->village_changes;
-    $costs['clan_change'] = 5 * $player->clan_changes;
-    if ($costs['village_change'] > 40) {
-        $costs['village_change'] = 40;
-    }
-    if ($costs['clan_change'] > 40) {
-        $costs['clan_change'] = 40;
-    }
-
-    $costs['reset_ai_battles'] = 10;
-    $costs['reset_pvp_battles'] = 20;
-
-    // Stat Transfers
-    $stat_transfer_points_per_min = 10;
-    $stat_transfer_points_per_ak = 300;
-
-    if ($player->rank_num >= 3) {
-        $stat_transfer_points_per_min += 5;
-        $stat_transfer_points_per_ak = 450;
-    }
-    if ($player->rank_num >= 4) {
-        $stat_transfer_points_per_min += 5;
-        $stat_transfer_points_per_ak = 600;
-    }
-
-    $stat_transfer_points_per_min += $player->forbidden_seal->stat_transfer_boost;
-    $stat_transfer_points_per_ak += $player->forbidden_seal->extra_stat_transfer_points_per_ak;
-
-    // Free stat transfers
-    $free_stat_change_timer = 86400;
-    $max_free_stat_change_amount = 100;
-    if (System::currentYear() === 2023 && System::currentMonth() === 3 && System::currentDay() < 19) {
-        $free_stat_change_timer = 4 * 86400;
-        $max_free_stat_change_amount = 40000;
-        $stat_transfer_points_per_min *= 10;
-    }
-
-    $free_stat_change_cooldown_left = $player->last_free_stat_change - (time() - $free_stat_change_timer);
-    $free_stat_change_timer_hours = $free_stat_change_timer / 3600;
+    
+    $premiumShopManager = new PremiumShopManager($system, $player);
 
     // Clans
     $available_clans = array();
 
     if ($player->clan) {
-
         $system->db->query(
             "SELECT `clan_id`, `name` FROM `clans` WHERE `village` = '{$player->village->name}' AND `clan_id` != '{$player->clan->id}' AND `bloodline_only` = '0'"
         );
@@ -90,7 +21,6 @@ function premium(): bool
         while ($village_clans = $system->db->fetch()) {
             $available_clans[$village_clans['clan_id']] = stripslashes($village_clans['name']);
         }
-
     }
 
     if ($player->bloodline_id && $player->clan->id != $player->bloodline->clan_id) {
@@ -106,15 +36,8 @@ function premium(): bool
 
     if (isset($_POST['user_reset'])) {
         try {
-            if ($player->team) {
-                throw new RuntimeException("You must leave your team before resetting!");
-            }
-            if ($player->clan_office) {
-                throw new RuntimeException("You must resign from your clan office first!");
-            }
-            if (SenseiManager::isSensei($player->user_id, $system)) {
-                throw new RuntimeException("You must resign from being a sensei first!");
-            }
+            $premiumShopManager->assertUserCanReset($player);
+
             if (!isset($_POST['confirm_reset'])) {
                 $confirmation_type = "confirm_reset";
                 $confirmation_string = "Are you sure you want to reset your character? You will lose all your stats,
@@ -123,56 +46,10 @@ function premium(): bool
                 $button_value = "Reset my Account";
 
                 require 'templates/premium/purchase_confirmation.php';
-            } else {
-                $player->level = 1;
-                $player->level = 1;
-                $player->rank_num = 1;
-                $player->health = 100;
-                $player->max_health = 100;
-                $player->stamina = 100;
-                $player->max_stamina = 100;
-                $player->chakra = 100;
-                $player->max_chakra = 100;
-                $player->regen_rate = User::BASE_REGEN;
-                $player->exp = User::BASE_EXP;
-                $player->bloodline_id = 0;
-                $player->bloodline_name = '';
-                $player->clan = null;
-                $player->clan_id = 0;
-                $player->location = $player->village_location;
-                $player->pvp_wins = 0;
-                $player->pvp_losses = 0;
-                $player->ai_wins = 0;
-                $player->ai_losses = 0;
-                $player->monthly_pvp = 0;
-                $player->ninjutsu_skill = 10;
-                $player->genjutsu_skill = 10;
-                $player->taijutsu_skill = 10;
-                $player->bloodline_skill = 0;
-                $player->cast_speed = 5;
-                $player->speed = 5;
-                $player->intelligence = 5;
-                $player->willpower = 5;
-
-                //Bug fix: Elements previously was not cleared. -- Shadekun
-                $player->elements = array();
-                $player->missions_completed = array(); //Reset missions complete -- Hitori
-
-                $player->exam_stage = 0;
-
-                $player->updateData();
-
-                $system->db->query("DELETE FROM `user_bloodlines` WHERE `user_id`='$player->user_id'");
-                $system->db->query(
-                    "UPDATE `user_inventory` SET
-                    `jutsu` = '',
-                    `items` = '',
-                    `bloodline_jutsu` = '',
-                    `equipped_jutsu` = '',
-                    `equipped_items` = ''
-                    WHERE `user_id`='$player->user_id'"
-                );
-
+                return true;
+            }
+            else {
+                $premiumShopManager->resetUser($player);
 
                 require 'templates/premium/character_reset_complete.php';
                 return true;
@@ -180,48 +57,14 @@ function premium(): bool
         } catch (Exception $e) {
             $system->message($e->getMessage());
         }
-    } else if (isset($_POST['name_change'])) {
+    }
+    else if (isset($_POST['name_change'])) {
         $new_name = $system->db->clean($_POST['new_name']);
-        $akCost = $costs['name_change'];
-        $deductNameChanges = 1;
+
         try {
-            if (!$player->username_changes and $player->getPremiumCredits() < $akCost) {
-                throw new RuntimeException("You do not have enough Ancient Kunai!");
-            }
-            if (strlen($new_name) < User::MIN_NAME_LENGTH || strlen($new_name) > User::MAX_NAME_LENGTH) {
-                throw new RuntimeException("New user name is to short/long! Please enter a name between "
-                    . User::MIN_NAME_LENGTH . " and " . User::MAX_NAME_LENGTH . " characters long.");
-            }
-            if ($player->user_name == $new_name) {
-                throw new RuntimeException("Please select a different name than your current one.");
-            }
-            if (!preg_match('/^[a-zA-Z0-9_-]+$/', $new_name)) {
-                throw new RuntimeException("Only alphanumeric characters, dashes, and underscores are allowed in usernames!");
-            }
-
-            if ($system->explicitLanguageCheck($new_name)) {
-                throw new RuntimeException("Inappropriate language is not allowed in usernames!");
-            }
-
-            if ($player->username_changes > 0) {
-                $akCost = 0;
-            } elseif (strtolower($player->user_name) == strtolower($new_name)) {
-                $akCost = 0;
-                $deductNameChanges = 0;
-                $_POST['confirm_name_change'] = 1; //Bypass need to confirm
-            } else {
-                $deductNameChanges = 0;
-            }
-
-            $result = $system->db->query("SELECT `user_name` FROM `users` WHERE `user_name`='$new_name' LIMIT 1");
-            if ($system->db->last_num_rows) {
-                $result = $system->db->fetch();
-                if (strtolower($result['user_name']) == strtolower($new_name) && $result['user_name'] != $player->user_name) {
-                    throw new RuntimeException("Username already in use!");
-                }
-            }
-
             if (!isset($_POST['confirm_name_change'])) {
+                $premiumShopManager->assertUserCanChangeName($new_name);
+
                 $confirmation_type = 'confirm_name_change';
                 $confirmation_string = "Are you sure you want to change your username?<br />
                 Doing this will also change your login name to the name you select.<br />
@@ -232,19 +75,16 @@ function premium(): bool
 
                 require 'templates/premium/purchase_confirmation.php';
             } else {
-                $sql = "UPDATE `users` SET `user_name` = '%s', `username_changes` = `username_changes` - %d WHERE `user_id` = %d LIMIT 1;";
-                $system->db->query(sprintf($sql, $new_name, $deductNameChanges, $player->user_id));
-                $player->subtractPremiumCredits($akCost, "Username change");
-
-                $system->message("You have changed your name to $new_name.");
+               $result = $premiumShopManager->changeUserName($new_name);
             }
         } catch (Exception $e) {
             $system->message($e->getMessage());
         }
-    } else if (isset($_POST['change_gender'])) {
+    }
+    else if (isset($_POST['change_gender'])) {
         try {
             $new_gender = $system->db->clean($_POST['new_gender']);
-            $akCost = $costs['gender_change'];
+            $akCost = $premiumShopManager->costs['gender_change'];
             if ($player->getPremiumCredits() < $akCost) {
                 throw new RuntimeException("You do not have enough Ancient Kunai!");
             }
@@ -275,10 +115,11 @@ function premium(): bool
         } catch (Exception $e) {
             $system->message($e->getMessage());
         }
-    } else if (isset($_POST['stat_reset'])) {
+    }
+    else if (isset($_POST['stat_reset'])) {
         try {
             $stat = $system->db->clean($_POST['stat']);
-            if (array_search($stat, $player->stats) === false) {
+            if (!in_array($stat, $player->stats)) {
                 throw new RuntimeException("Invalid stat!");
             }
 
@@ -307,107 +148,54 @@ function premium(): bool
             $system->message($e->getMessage());
         }
         $system->printMessage();
-    } else if (isset($_POST['stat_allocate'])) {
+    }
+    else if (isset($_POST['stat_allocate'])) {
         try {
             $original_stat = $system->db->clean($_POST['original_stat']);
             $target_stat = $system->db->clean($_POST['target_stat']);
-            if (array_search($original_stat, $player->stats) === false) {
-                throw new RuntimeException("Invalid original stat!");
-            }
-            if (array_search($target_stat, $player->stats) === false) {
-                throw new RuntimeException("Invalid target stat!");
-            }
+            $transfer_amount = (int)$_POST['transfer_amount'];
+            $transfer_type = PremiumShopManager::STAT_TRANSFER_STANDARD;
 
-            // Check for same stat
-            if ($original_stat == $target_stat) {
-                throw new RuntimeException("You cannot transfer points to the same stat!");
-            }
-
-            // Amount to reset to
-            $reset_amount = 5;
-            if (str_contains($original_stat, 'skill')) {
-                $reset_amount = 10;
-            }
-
-            // Transfer amount
-            $transfer_amount = (int) $system->db->clean($_POST['transfer_amount']);
-
-            if ($transfer_amount < 1) {
-                throw new RuntimeException("Invalid transfer amount!");
-            }
-            if ($transfer_amount > $player->{$original_stat} - $reset_amount) {
-                throw new RuntimeException("Invalid transfer amount!");
-            }
-
-            $is_free_stat_change = $transfer_amount <= $max_free_stat_change_amount && $free_stat_change_cooldown_left <= 0;
-
-            if ($is_free_stat_change) {
-                $akCost = 0;
-            } else {
-                $akCost = 1 + floor($transfer_amount / $stat_transfer_points_per_ak);
-            }
-            //Int and Willpower are free
-            if ($original_stat == 'intelligence' || $original_stat == 'willpower') {
-                $akCost = 0;
-            }
-
-            if ($player->getPremiumCredits() < $akCost) {
-                throw new RuntimeException("You do not have enough Ancient Kunai!");
-            }
-
-            $time = $transfer_amount / $stat_transfer_points_per_min;
-
-            // Check for minimum stat amount
-            if ($player->{$original_stat} <= $reset_amount) {
-                throw new RuntimeException("Stat is already at the minimum!");
-            }
-
-            // Check for player training
-            if ($player->train_time) {
-                throw new RuntimeException("Please finish or cancel your training!");
-            }
+            $time = $premiumShopManager->statTransferTime(
+                $transfer_amount,
+                $transfer_type
+            );
 
             if (!isset($_POST['confirm_stat_reset'])) {
+                $premiumShopManager->assertUserCanTransferStat(
+                    original_stat: $original_stat,
+                    target_stat: $target_stat,
+                    transfer_amount: $transfer_amount,
+                    transfer_type: $transfer_type
+                );
+
                 $confirmation_type = 'confirm_stat_reset';
                 $confirmation_string = "Are you sure you want to transfer $transfer_amount " . System::unSlug($original_stat) .
-                    " to " . System::unSlug($target_stat) . "?<br />" . System::unSlug($original_stat) . ": {$player->{$original_stat}} -> " .
-                    ($player->{$original_stat} - $transfer_amount) . "<br />" . System::unSlug($target_stat) . ": {$player->{$target_stat}} -> " .
-                    ($player->{$target_stat} + $transfer_amount) . "<br /> This will take " . System::timeRemaining($time * 60, 'long', true, true);
+                    " to " . System::unSlug($target_stat) . "?<br />"
+                        . System::unSlug($original_stat) . ": {$player->{$original_stat}} -> "
+                        . ($player->{$original_stat} - $transfer_amount) . "<br />"
+                        . System::unSlug($target_stat) . ": {$player->{$target_stat}} -> "
+                        . ($player->{$target_stat} + $transfer_amount) . "<br /> This will take "
+                        . System::timeRemaining($time * 60, 'long', true, true);
+
                 $additional_form_data = [
                     'original_stat' => ['input_type' => 'hidden', 'value' => $original_stat],
                     'target_stat' => ['input_type' => 'hidden', 'value' => $target_stat],
                     'transfer_amount' => ['input_type' => 'hidden', 'value' => $transfer_amount],
+                    'transfer_type' => ['input_type' => 'hidden', 'value' => $transfer_type],
                 ];
+
                 $submit_value = 'stat_allocate';
                 $button_value = 'Confirm Transfer';
 
                 require 'templates/premium/purchase_confirmation.php';
             } else {
-                $player->subtractPremiumCredits($akCost, "Transferred {$transfer_amount} {$original_stat} to {$target_stat}");
-
-                $exp = $transfer_amount * 10;
-                $player->exp -= $exp;
-                $player->{$original_stat} -= $transfer_amount;
-
-                $player->train_type = $target_stat;
-                $player->train_gain = $transfer_amount;
-                $player->train_time = time() + ($time * 60);
-
-                if ($is_free_stat_change) {
-                    $player->last_free_stat_change = time();
-                }
-
-                $player->updateData();
-
-                $new_notification = new NotificationDto(
-                    type: "training",
-                    message: "Retraining " . System::unSlug($target_stat),
-                    user_id: $player->user_id,
-                    created: time(),
-                    duration: $time * 60,
-                    alert: false,
+                $premiumShopManager->transferStat(
+                    original_stat: $original_stat,
+                    target_stat: $target_stat,
+                    transfer_amount: $transfer_amount,
+                    transfer_type: $transfer_type
                 );
-                NotificationManager::createNotification($new_notification, $system, NotificationManager::UPDATE_REPLACE);
 
                 require 'templates/premium/stat_transfer_confirmation.php';
             }
@@ -415,9 +203,10 @@ function premium(): bool
             $system->message($e->getMessage());
         }
         $system->printMessage();
-    } else if (isset($_POST['reset_ai_battles'])) {
+    }
+    else if (isset($_POST['reset_ai_battles'])) {
         try {
-            $cost = $costs['reset_ai_battles'];
+            $cost = $premiumShopManager->costs['reset_ai_battles'];
             if ($player->getPremiumCredits() < $cost) {
                 throw new RuntimeException("You do not have enough Ancient Kunai!");
             }
@@ -439,9 +228,10 @@ function premium(): bool
             $system->message($e->getMessage());
         }
         $system->printMessage();
-    } else if (isset($_POST['reset_pvp_battles'])) {
+    }
+    else if (isset($_POST['reset_pvp_battles'])) {
         try {
-            $cost = $costs['reset_pvp_battles'];
+            $cost = $premiumShopManager->costs['reset_pvp_battles'];
             if ($player->getPremiumCredits() < $cost) {
                 throw new RuntimeException("You do not have enough Ancient Kunai!");
             }
@@ -463,7 +253,8 @@ function premium(): bool
             $system->message($e->getMessage());
         }
         $system->printMessage();
-    } else if (isset($_POST['purchase_bloodline'])) {
+    }
+    else if (isset($_POST['purchase_bloodline'])) {
         try {
             $self_link .= '&view=bloodlines';
             $bloodline_id = (int) $_POST['bloodline_id'];
@@ -478,7 +269,7 @@ function premium(): bool
             }
             //Load BL data
             $result = $system->db->fetch($result);
-            $akCost = $costs['bloodline'][$result['rank']];
+            $akCost = $premiumShopManager->costs['bloodline'][$result['rank']];
             $bloodline_name = $result['name'];
 
             //Confirm purchase
@@ -551,7 +342,8 @@ function premium(): bool
         } catch (Exception $e) {
             $system->message($e->getMessage());
         }
-    } else if (isset($_POST['forbidden_seal'])) {
+    }
+    else if (isset($_POST['forbidden_seal'])) {
         try {
             $seal_level = (int) $_POST['seal_level'];
             $seal_length = (int) $_POST['seal_length'];
@@ -561,10 +353,10 @@ function premium(): bool
                 throw new RuntimeException("Invalid forbidden seal!");
             }
             //Check seal lengths
-            if (!isset($costs['forbidden_seal'][$seal_level][$seal_length])) {
+            if (!isset($premiumShopManager->costs['forbidden_seal'][$seal_level][$seal_length])) {
                 throw new RuntimeException("Invalid seal length!");
             }
-            $akCost = $costs['forbidden_seal'][$seal_level][$seal_length];
+            $akCost = $premiumShopManager->costs['forbidden_seal'][$seal_level][$seal_length];
             //Check cost
             if ($player->getPremiumCredits() < $akCost) {
                 throw new RuntimeException("You do not have enough Ancient Kunai!");
@@ -636,7 +428,8 @@ function premium(): bool
             $system->message($e->getMessage());
             $system->printMessage();
         }
-    } else if (isset($_POST['change_color']) && $player->canChangeChatColor()) {
+    }
+    else if (isset($_POST['change_color']) && $player->canChangeChatColor()) {
         $color = $system->db->clean($_POST['name_color']);
 
         // Premium effect
@@ -654,9 +447,10 @@ function premium(): bool
         }
 
         $system->printMessage();
-    } else if (isset($_POST['change_element']) && $player->rank_num >= 3) {
+    }
+    else if (isset($_POST['change_element']) && $player->rank_num >= 3) {
         try {
-            $akCost = $costs['element_change'];
+            $akCost = $premiumShopManager->costs['element_change'];
             $editing_element_index = (int) $_POST['editing_element_index'];
             $new_element = $system->db->clean($_POST['new_element']);
             //Player already has new element
@@ -794,9 +588,10 @@ function premium(): bool
             $system->message($e->getMessage());
         }
         $system->printMessage();
-    } else if (isset($_POST['change_village']) && $player->rank_num >= 2) {
+    }
+    else if (isset($_POST['change_village']) && $player->rank_num >= 2) {
         $village = $_POST['new_village'];
-        $akCost = $costs['village_change'];
+        $akCost = $premiumShopManager->costs['village_change'];
         try {
             if ($village == $player->village->name) {
                 throw new RuntimeException("Invalid village!");
@@ -947,9 +742,10 @@ function premium(): bool
             $system->message($e->getMessage());
         }
         $system->printMessage();
-    } else if (isset($_POST['change_clan']) && $player->rank_num >= 2) {
+    }
+    else if (isset($_POST['change_clan']) && $player->rank_num >= 2) {
         $new_clan_id = abs((int) $_POST['clan_change_id']);
-        $akCost = $costs['clan_change'];
+        $akCost = $premiumShopManager->costs['clan_change'];
         try {
             //Check if clan exists and playe not in clan
             $clan_exists = in_array($new_clan_id, array_keys($available_clans));
