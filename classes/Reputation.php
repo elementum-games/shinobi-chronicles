@@ -7,6 +7,7 @@ class Reputation {
             'outlaw_title' => 'Vagabond',
             'min_rep' => 0,
             'weekly_cap' => 500,
+            'base_decay' => 25,
             'base_pvp_rep_reward' => 1,
         ],
         2 => [
@@ -14,6 +15,7 @@ class Reputation {
             'outlaw_title' => 'Thief',
             'min_rep' => 500,
             'weekly_cap' => 500,
+            'base_decay' => 40,
             'base_pvp_rep_reward' => 1,
         ],
         3 => [
@@ -21,6 +23,7 @@ class Reputation {
             'outlaw_title' => 'Infamous',
             'min_rep' => 1000,
             'weekly_cap' => 500,
+            'base_decay' => 60,
             'base_pvp_rep_reward' => 1,
         ],
         4 => [
@@ -28,6 +31,7 @@ class Reputation {
             'outlaw_title' => 'Outlaw',
             'min_rep' => 1750,
             'weekly_cap' => 600,
+            'base_decay' => 80,
             'base_pvp_rep_reward' => 2,
         ],
         5 => [
@@ -35,6 +39,7 @@ class Reputation {
             'outlaw_title' => 'Rogue',
             'min_rep' => 2500,
             'weekly_cap' => 600,
+            'base_decay' => 100,
             'base_pvp_rep_reward' => 2,
         ],
         6 => [
@@ -42,6 +47,7 @@ class Reputation {
             'outlaw_title' => 'Infamous Rogue',
             'min_rep' => 3500,
             'weekly_cap' => 600,
+            'base_decay' => 130,
             'base_pvp_rep_reward' => 2,
         ],
         7 => [
@@ -49,6 +55,7 @@ class Reputation {
             'outlaw_title' => 'Assassin',
             'min_rep' => 5000,
             'weekly_cap' => 700,
+            'base_decay' => 150,
             'base_pvp_rep_reward' => 3,
         ],
         8 => [
@@ -56,6 +63,7 @@ class Reputation {
             'outlaw_title' => 'Master Assassin',
             'min_rep' => 7500,
             'weekly_cap' => 800,
+            'base_decay' => 200,
             'base_pvp_rep_reward' => 3,
         ],
         9 => [
@@ -63,6 +71,7 @@ class Reputation {
             'outlaw_title' => 'Legendary Assassin',
             'min_rep' => 10000,
             'weekly_cap' => 900,
+            'base_decay' => 300,
             'base_pvp_rep_reward' => 3,
         ]
     ];
@@ -94,7 +103,7 @@ class Reputation {
         DailyTask::DIFFICULTY_MEDIUM . '_' . DailyTask::ACTIVITY_PVP => 10,
         DailyTask::DIFFICULTY_HARD . '_' . DailyTask::ACTIVITY_PVP => 15,
     ];
-    const DECAY = 0.95;
+    const DECAY_MODIFIER = 0.65; // Value to reduce decay by if user caps weekly
 
     protected int $rep;
     protected int $weekly_rep;

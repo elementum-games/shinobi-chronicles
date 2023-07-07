@@ -37,12 +37,17 @@ if($_SESSION['user_id']) {
             echo "Script ran.";
         }
         else {
-            echo "You can run the reputation cron script Adhoc. This is not reversible. <a href='{$system->router->base_url}/reputation_cron.php?run_script=true'>Run</a>.";
+            echo "You can run the reputation cron script Adhoc. This is not reversible. <a href='{$system->router->base_url}/cron_jobs/reputation_cron.php?run_script=true'>Run</a>.";
         }
     }
 }
 
 function weeklyCron($system) {
-    $decay = Reputation::DECAY;
-    $system->db->query("UPDATE `users` SET `weekly_rep` = 0, `village_rep`=ceil(`village_rep`*{$decay})");
+    $REP_RANKS = array_reverse(Reputation::$VillageRep, true);
+    foreach($REP_RANKS as $RANK) {
+        echo $RANK['title'] . "<br />";
+        echo "Base decay: " . $RANK['base_decay'] . "<br />";
+        echo "Capped decay: " . ceil($RANK['base_decay'] * Reputation::DECAY_MODIFIER) . "<br /><br />";
+    }
+    //$system->db->query("UPDATE `users` SET `weekly_rep` = 0, `village_rep`=ceil(`village_rep`*{$decay})");
 }
