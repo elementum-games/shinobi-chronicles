@@ -43,11 +43,31 @@ if($_SESSION['user_id']) {
 }
 
 function weeklyCron($system) {
-    $REP_RANKS = array_reverse(Reputation::$VillageRep, true);
-    foreach($REP_RANKS as $RANK) {
-        echo $RANK['title'] . "<br />";
-        echo "Base decay: " . $RANK['base_decay'] . "<br />";
-        echo "Capped decay: " . ceil($RANK['base_decay'] * Reputation::DECAY_MODIFIER) . "<br /><br />";
+    foreach(Reputation::$VillageRep as $RANK_INT => $RANK) {
+        if($RANK_INT == 1) {
+            $queries[] = "UPDATE `users` SET `weekly_rep`=0, `village_rep`=0 WHERE `village_rep` >= " . $RANK['min_rep']
+                . " AND `village_rep` < " . Reputation::$VillageRep[2]['min_rep'] . " AND `village_rep`<" . $RANK['base_decay'];
+        }
+        $next_rank_where = "";
+        if($RANK_INT < sizeof(Reputation::$VillageRep)) {
+            $RANK2_INT = $RANK_INT+1;
+            $RANK2 = Reputation::$VillageRep[$RANK2_INT];
+            $next_rank_where = " AND `village_rep` < " . $RANK2['min_rep'];
+            if($RANK_INT == 1) {
+                $next_rank_where .= " AND `village_rep` > 0";
+            }
+        }
+        $queries[] = "UPDATE `users` SET `weekly_rep`=0, `village_rep`=`village_rep`- " . $RANK['base_decay'] . " WHERE `village_rep` >= "
+            . $RANK['min_rep'] . $next_rank_where . " AND `weekly_rep` < " . $RANK['weekly_cap'];
+        $queries[] = "UPDATE `users` SET `weekly_rep`=0, `village_rep`=`village_rep`- " . floor($RANK['base_decay'] * Reputation::DECAY_MODIFIER)
+            . " WHERE `village_rep` >= " . $RANK['min_rep'] . $next_rank_where . " AND `weekly_rep` >= " . $RANK['weekly_cap'];
     }
-    //$system->db->query("UPDATE `users` SET `weekly_rep` = 0, `village_rep`=ceil(`village_rep`*{$decay})");
+    foreach($queries as $query) {
+        if(false) {
+            echo $query . "<br />";
+        }
+        else {
+            $system->db->query($query);
+        }
+    }
 }
