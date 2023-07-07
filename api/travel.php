@@ -3,7 +3,7 @@
 # Begin standard auth
 require_once __DIR__ . "/../classes.php";
 
-$system = API::init();
+$system = API::init(row_lock: true);
 
 try {
     $player = Auth::getUserFromSession($system);

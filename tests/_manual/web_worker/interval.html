@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Web Worker Interval Test</title>
+    <style>
+        .counts_list {
+            width: 300px;
+            display: flex;
+            flex-direction: row;
+            justify-content: space-evenly;
+        }
+    </style>
+</head>
+<body>
+    <div class='counts_list'>
+        <div>
+            Main Thread: <span id='main_count'>0</span>
+        </div>
+        <div>
+            Worker Thread: <span id='worker_count'>0</span>
+        </div>
+    </div>
+    <script>
+        const mainCountEl = document.getElementById('main_count');
+        const workerCountEl = document.getElementById('worker_count');
+
+        // Main
+        let mainCount = 0;
+        const mainIntervalId = setInterval(incrementMainCount, 800);
+        function incrementMainCount() {
+            if(mainCount >= 1000) {
+                clearInterval((mainIntervalId));
+                return;
+            }
+
+            mainCount++;
+            mainCountEl.innerText = mainCount;
+        }
+
+
+        // Worker
+        const myWorker = new Worker("worker.js");
+        myWorker.onmessage = function(message) {
+            workerCountEl.innerText = message.data.newCount;
+        };
+        myWorker.postMessage({
+            startCount: true
+        });
+    </script>
+</body>
+</html>

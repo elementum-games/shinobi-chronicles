@@ -47,6 +47,36 @@
             <?php endif ?>
         </td>
     </tr>
+    <?php if ($system->isDevEnvironment()): ?> 
+    <tr><th colspan='2'>Player Card</th></tr>
+    <tr>
+        <td colspan="2">
+            <?php if(!$player->checkBan(StaffManager::BAN_TYPE_AVATAR)):?>
+                <div>
+                    <b>Player Card info:</b><br />
+                    Images must be hosted on another website<br />
+                    Background Limit: 450 x 250 pixels<br />
+                    Banner Limit: 450 x 40 pixels<br />
+                    Images can be larger than the limit, but will be resized<br />
+                    Max filesize: <?=$player->getAvatarFileSizeDisplay()?><br />
+                    <br />
+                    <form action='<?=$self_link?>' method='post'>
+                        <input type='text' name='card_image' value='<?=$card_link?>' style='width:250px;margin-bottom:5px;' />
+                        <input type='submit' name='change_card' value='Change' />
+                    </form>
+                    <br />
+                    <form action='<?=$self_link?>' method='post'>
+                        <input type='text' name='banner_image' value='<?=$banner_link?>' style='width:250px;margin-bottom:5px;' />
+                        <input type='submit' name='change_banner' value='Change' />
+                    </form>
+                </div>
+                <br style='clear:both;' />
+            <?php else: ?>
+                <p style="margin-top:90px;">You are currently banned from changing your avatar.</p>
+            <?php endif ?>
+        </td>
+    </tr>
+    <?php endif; ?>
     <tr><th colspan='2'>Password</th></tr>
     <tr>
         <td colspan='2'>
@@ -90,7 +120,7 @@
                 <input type='submit' name='change_layout' value='Change' />
             </form>
             <?php if($player->layout == "new_geisha"): ?>
-            <div style="display: flex; justify-content: center; gap: 10px; margin-top: 10px;">
+            <div style="display: flex; justify-content: center; gap: 10px; margin-top: 10px; flex-wrap: wrap">
                 <div>
                     <label>Avatar Style</label>
                     <form action='<?=$system->router->getUrl('settings')?>' method='post'>
@@ -101,6 +131,18 @@
                         </select>
                         <br />
                         <input type='submit' name='change_avatar_style' value='Change' />
+                    </form>
+                </div>
+                <div>
+                    <label>Avatar Frame</label>
+                    <form action='<?=$system->router->getUrl('settings')?>' method='post'>
+                        <select name='avatar_frame'>";
+                            <?php foreach ($avatar_frames as $frame_key => $frame_value): ?>
+                                <option value='<?= $frame_key ?>' <?= $frame_key == $avatar_frame ? "selected='selected'" : "" ?>><?= ucwords($frame_value) ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                        <br />
+                        <input type='submit' name='change_avatar_frame' value='Change' />
                     </form>
                 </div>
                 <div>
@@ -127,7 +169,6 @@
                 </div>
             </div>
             <?php endif; ?>
-            
         </td>
     </tr>
     <tr>

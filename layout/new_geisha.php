@@ -15,7 +15,7 @@ HTML;
         $extra_meta_tags = '<meta name="robots" content="noindex" />';
         $react_tags = $react_dev_tags;
 
-        if($enable_mobile_layout) {
+        if($enable_mobile_layout && !isset($_SESSION['user_id'])) {
             $extra_meta_tags .= '<meta name="viewport" content="width=device-width, initial-scale=1" />';
         }
     }

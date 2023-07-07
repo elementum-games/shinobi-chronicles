@@ -57,7 +57,6 @@ class ForbiddenSeal {
             'avatar_filesize' => self::ONE_MEGABYTE,
             'avatar_styles' => [
                 'avy_none' => 'none',
-                'avy_borderless' => 'borderless',
                 'avy_round' => 'circle',
                 'avy_four-point' => 'square',
             ],
@@ -92,7 +91,6 @@ class ForbiddenSeal {
             'avatar_filesize' => self::ONE_MEGABYTE,
             'avatar_styles' => [
                 'avy_none' => 'none',
-                'avy_borderless' => 'borderless',
                 'avy_round' => 'circle',
                 'avy_three-point' => 'triangle',
                 'avy_three-point-inverted' => 'triange inverted',
@@ -138,7 +136,6 @@ class ForbiddenSeal {
             'avatar_filesize' => self::ONE_MEGABYTE * 2,
             'avatar_styles' => [
                 'avy_none' => 'none',
-                'avy_borderless' => 'borderless',
                 'avy_round' => 'circle',
                 'avy_three-point' => 'triangle',
                 'avy_three-point-inverted' => 'triange inverted',

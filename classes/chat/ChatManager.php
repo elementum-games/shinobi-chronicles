@@ -95,12 +95,15 @@ class ChatManager {
             if($this->system->db->last_num_rows) {
                 $user_data = $this->system->db->fetch($user_result);
                 $settings_result = $this->system->db->query(
-                    "SELECT `avatar_style` from `user_settings` where `user_id` = '{$user_data['user_id']}'"
+                    "SELECT `avatar_style`, `avatar_frame` from `user_settings` where `user_id` = '{$user_data['user_id']}'"
                 );
                 if ($this->system->db->last_num_rows) {
-                    $user_data['avatar_style'] = $this->system->db->fetch($settings_result)['avatar_style'];
+                    $settings_data = $this->system->db->fetch($settings_result);
+                    $user_data['avatar_style'] = $settings_data['avatar_style'];
+                    $user_data['avatar_frame'] = $settings_data['avatar_frame'];
                 } else {
-                    $user_data['avatar_style'] = "round";
+                    $user_data['avatar_style'] = "avy_round";
+                    $user_data['avatar_frame'] = "avy_frame_default";
                 }
                 //If blacklisted block content, only if blacklisted user is not currently a staff member
                 if($blacklisted && $user_data['staff_level'] == StaffManager::STAFF_NONE) {
@@ -122,6 +125,7 @@ class ChatManager {
                 $post->user_link_class_names[] =
                 $post->avatar = $user_data['avatar_link'];
                 $post->avatar_style = $user_data['avatar_style'];
+                $post->avatar_frame = $user_data['avatar_frame'];
             }
 
             $post->user_link_class_names[] = "chat";

@@ -366,13 +366,47 @@
     border-bottom: 0;
 }
 
-#travel-map-container {
+.travel_map_stage {
     flex-grow: 2;
     position: relative;
     overflow: hidden;
-
-    background: url("../../../images/map/backgrounds/fogofwar.png");
 }
+
+.travel_map_content {
+    position: absolute;
+    top: 0;
+    left: 0;
+
+
+}
+.travel_map_content::after {
+    content: '';
+    position: absolute;
+
+    --fog-of-war-size: 450px;
+
+    top: calc(0px - var(--fog-of-war-size));
+    left: calc(0px - var(--fog-of-war-size));
+    width: calc(100% + (var(--fog-of-war-size) * 2));
+    height: calc(100% + (var(--fog-of-war-size) * 2));
+
+    background: url("../../../images/map/backgrounds/fogofwar.png") repeat;
+    z-index: -1;
+}
+
+.travel_map_content, #map_player {
+    /* Continuous */
+    transition: transform 0.45s linear;
+
+    /* Quick */
+    /* transition: transform 0.25s ease-out; */
+
+    /* Smooth */
+    /* transition: transform 0.4s ease-out; */
+}
+
+
+
 
 #map_background {
     width: 100%;
@@ -382,6 +416,7 @@
     left: 0;
 
     background-repeat: no-repeat;
+    background-size: 100%;
 }
 
 .map_grid_lines {

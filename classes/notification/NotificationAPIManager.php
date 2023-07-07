@@ -333,7 +333,7 @@ class NotificationAPIManager {
             }
         }
         //Event
-        if ($this->system->event != null) {
+        if (isset($this->system->event)) {
             $notifications[] = new NotificationDto(
                 action_url: $this->system->router->getUrl('event'),
                 type: "event",

@@ -23,7 +23,7 @@ if(!empty($_GET['jutsu_type'])) {
 
 $selected_link_style = "text-decoration:none;";
 
-require_once __DIR__ . '/../classes/RankManager.php';
+require_once __DIR__ . '/../../classes/RankManager.php';
 $RANK_NAMES = RankManager::fetchNames($system);
 
 ?>

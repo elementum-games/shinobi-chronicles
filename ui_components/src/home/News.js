@@ -34,7 +34,6 @@ export function News({ initialNewsPosts, isAdmin, version, homeLinks }: Props): 
     }
 
     function cleanNewsContents(contents) {
-        console.log(contents);
         const parser = new DOMParser();
         return parser.parseFromString(
             contents.replace(/[\r\n]+/g, " ").replace(/<br\s*\/?>/g, '\n'),

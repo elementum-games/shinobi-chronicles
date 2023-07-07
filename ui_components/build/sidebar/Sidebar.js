@@ -1,5 +1,6 @@
-import { apiFetch } from "../utils/network.js"; // Initialize
+import { apiFetch } from "../utils/network.js";
 
+// Initialize
 function Sidebar({
   links,
   navigationAPIData,
@@ -17,8 +18,9 @@ function Sidebar({
   const [regenOffset, setRegenOffset] = React.useState(calculateRegenOffset(userAPIData.playerResources.regen_time));
   const regenTimeVar = React.useRef(userAPIData.playerResources.regen_time);
   const queryParameters = new URLSearchParams(window.location.search);
-  const pageID = React.useRef(queryParameters.get("id")); // API
+  const pageID = React.useRef(queryParameters.get("id"));
 
+  // API
   function getSidebarLinks() {
     apiFetch(links.navigation_api, {
       request: 'getNavigationLinks'
@@ -34,7 +36,6 @@ function Sidebar({
       }
     });
   }
-
   function getPlayerData() {
     apiFetch(links.user_api, {
       request: 'getPlayerResources'
@@ -49,9 +50,8 @@ function Sidebar({
         regenTimeVar.current = response.data.playerResources.regen_time;
       }
     });
-  } // Utility
-
-
+  }
+  // Utility
   function handleRegen() {
     if (regenTimeVar.current % 10 == 0 || regenTimeVar < 0) {
       getPlayerData();
@@ -61,14 +61,13 @@ function Sidebar({
       setRegenOffset(calculateRegenOffset(regenTimeVar.current));
     }
   }
-
   function calculateRegenOffset(time) {
     var percent = (time / 60 * 100).toFixed(0);
     var offset = 126 - 126 * percent / 100;
     return offset;
-  } // Content
+  }
 
-
+  // Content
   function displaySection(section_data, title) {
     return /*#__PURE__*/React.createElement("div", {
       className: "sb_section_container"
@@ -107,21 +106,23 @@ function Sidebar({
     }), section_data.length % 2 != 0 && /*#__PURE__*/React.createElement("div", {
       className: "sb_link_filler"
     })));
-  } // Misc
+  }
 
-
+  // Misc
   function handleErrors(errors) {
-    console.warn(errors); //setFeedback([errors, 'info']);
-  } // Initialize
+    console.warn(errors);
+    //setFeedback([errors, 'info']);
+  }
 
-
+  // Initialize
   React.useEffect(() => {
     const regenInterval = setInterval(() => {
       handleRegen();
     }, 1000);
     return () => clearInterval(regenInterval);
-  }, []); // Display
+  }, []);
 
+  // Display
   return /*#__PURE__*/React.createElement("div", {
     id: "sidebar"
   }, /*#__PURE__*/React.createElement(SBCharacterProfile, {
@@ -132,7 +133,6 @@ function Sidebar({
     regenOffset: regenOffset
   }), displaySection(userMenu, "Player Menu"), displaySection(activityMenu, "Action Menu"), displaySection(villageMenu, "Village Menu"), staffMenu.length ? displaySection(staffMenu, "Staff Menu") : null);
 }
-
 function SBCharacterProfile({
   playerData,
   playerResources,
@@ -147,10 +147,10 @@ function SBCharacterProfile({
   return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
     className: "sb_avatar_container"
   }, /*#__PURE__*/React.createElement("div", {
-    className: "sb_avatar_wrapper " + playerSettings.avatar_style,
+    className: "sb_avatar_wrapper " + playerSettings.avatar_style + " " + playerSettings.avatar_frame,
     style: avatarStyles
   }, /*#__PURE__*/React.createElement("img", {
-    className: "sb_avatar_img " + playerSettings.avatar_style,
+    className: "sb_avatar_img " + playerSettings.avatar_style + " " + playerSettings.avatar_frame,
     style: avatarStyles,
     src: playerData.avatar_link
   }))), /*#__PURE__*/React.createElement("div", {
@@ -214,7 +214,6 @@ function SBCharacterProfile({
     resourceMaxAmount: playerResources.max_stamina
   })));
 }
-
 function SBResourceBar({
   resourceType,
   resourceAmount,
@@ -251,5 +250,4 @@ function SBResourceBar({
     src: "/images/v2/decorations/barrightcorner.png"
   })));
 }
-
 window.Sidebar = Sidebar;

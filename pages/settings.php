@@ -220,6 +220,15 @@ function userSettings() {
         }
 
         $system->printMessage();
+    } else if (!empty($_POST['change_avatar_frame'])) {
+        $style = $system->db->clean($_POST['avatar_frame']);
+        if ($player->setAvatarFrame($style)) {
+            $system->message("Avatar frame updated!");
+        } else {
+            $system->message("No change detected, check your selection and try again.");
+        }
+
+        $system->printMessage();
     }
     else if (!empty($_POST['change_sidebar_position'])) {
         $position = $system->db->clean($_POST['sidebar_position']);
@@ -237,6 +246,24 @@ function userSettings() {
         } else {
             $system->message("No change detected, check your selection and try again.");
         }
+        $system->printMessage();
+    } else if (!empty($_POST['change_card_image'])) {
+        $image = $system->db->clean($_POST['card_image']);
+        if ($player->setCardImage($image)) {
+            $system->message("Card updated!");
+        } else {
+            $system->message("No change detected, check your selection and try again.");
+        }
+
+        $system->printMessage();
+    } else if (!empty($_POST['change_banner_image'])) {
+        $image = $system->db->clean($_POST['banner_image']);
+        if ($player->setBannerImage($image)) {
+            $system->message("Banner updated!");
+        } else {
+            $system->message("No change detected, check your selection and try again.");
+        }
+
         $system->printMessage();
     }
     else if(!empty($_POST['level_rank_up'])) {
@@ -302,7 +329,11 @@ function userSettings() {
     $sidebar_position = $player->getSidebarPosition();
     $avatar_style = $player->getAvatarStyle();
     $avatar_styles = $player->forbidden_seal->avatar_styles;
+    $avatar_frame = $player->getAvatarFrame();
+    $avatar_frames = ['avy_frame_default' => 'Default', 'avy_frame_none' => 'None'];
     $enable_alerts = $player->getEnableAlerts();
+    $card_link = $player->getCardImage();
+    $banner_link = $player->getBannerImage();
 
     require_once('templates/settings.php');
 }

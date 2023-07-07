@@ -51,7 +51,7 @@ export function RegisterForm({ registerErrorText, registerPreFill }: RegisterFor
                         <div className="register_field_label">gender</div>
                         <select name="gender" defaultValue={registerPreFill.gender}>
                             <option value="Male">Male</option>
-                            <option value="Female">Male</option>
+                            <option value="Female">Female</option>
                             <option value="Non-binary">Non-binary</option>
                             <option value="None">None</option>
                         </select>

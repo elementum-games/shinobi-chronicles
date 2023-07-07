@@ -361,11 +361,6 @@ body {
 .avy_none {
     display: none !important;
 }
-.avy_borderless {
-    padding: 0 !important;
-    clip-path: none;
-    background: none;
-}
 .avy_round {
     clip-path: circle(50% at 50% 50%);
 }
@@ -415,6 +410,10 @@ body {
 
     background: var(--avatar-frame-border_gradient);
     padding: var(--avatar-frame-border-width-large);
+}
+.avy_frame_none {
+    padding: 0 !important;
+    background: none;
 }
 .avatar_img {
     max-width: 100%;

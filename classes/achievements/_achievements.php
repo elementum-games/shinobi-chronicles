@@ -157,7 +157,7 @@ $REPUTATION_ACHIEVEMENTS = [
  * LANTERN EVENT ACHIEVEMENTS
  *
  * DO NOT CHANGE THE VALUES OF THESE CONSTANTS. These are used to track which achievements the player has, changing one would
- * potentially allow for receiving the achievement's rewards a secont time.
+ * potentially allow for receiving the achievement's rewards a second time.
  */
 const LANTERN_EVENT_OBTAIN_VIOLET_LANTERN = 'LANTERN_EVENT_OBTAIN_VIOLET_LANTERN';
 const LANTERN_EVENT_OBTAIN_GOLD_LANTERN = 'LANTERN_EVENT_OBTAIN_GOLD_LANTERN';
@@ -169,13 +169,13 @@ $LANTERN_EVENT_ACHIEVEMENTS = [
     LANTERN_EVENT_OBTAIN_VIOLET_LANTERN => new Achievement(
         id: LANTERN_EVENT_OBTAIN_VIOLET_LANTERN,
         rank: Achievement::RANK_COMMON,
-        name: 'Purple Lantern Holder',
-        prompt: 'Obtain a Purple Lantern',
+        name: 'Violet Lantern Holder',
+        prompt: 'Obtain a Violet Lantern',
         rewards: [
             new AchievementReward(AchievementReward::TYPE_MONEY, 5_000)
         ],
         criteria_check_closure: function (System $system, User $player) {
-            return $player->hasItem($system->event->item_ids['violet_lantern_id']);
+            return $player->hasItem(LanternEvent::$static_item_ids['violet_lantern_id']);
         },
     ),
     LANTERN_EVENT_OBTAIN_GOLD_LANTERN => new Achievement(
@@ -187,7 +187,7 @@ $LANTERN_EVENT_ACHIEVEMENTS = [
             new AchievementReward(AchievementReward::TYPE_MONEY, 10_000)
         ],
         criteria_check_closure: function (System $system, User $player) {
-            return $player->hasItem($system->event->item_ids['gold_lantern_id']);
+            return $player->hasItem(LanternEvent::$static_item_ids['gold_lantern_id']);
         },
     ),
     LANTERN_EVENT_OBTAIN_SHADOW_ESSENCE => new Achievement(
@@ -199,7 +199,7 @@ $LANTERN_EVENT_ACHIEVEMENTS = [
             new AchievementReward(AchievementReward::TYPE_MONEY, 10_000)
         ],
         criteria_check_closure: function (System $system, User $player) {
-            return $player->hasItem($system->event->item_ids['shadow_essence_id']);
+            return $player->hasItem(LanternEvent::$static_item_ids['shadow_essence_id']);
         },
     ),
     LANTERN_EVENT_COMPLETE_ALL_MISSIONS => new Achievement(
@@ -224,8 +224,7 @@ $LANTERN_EVENT_ACHIEVEMENTS = [
                 return false;
             }
 
-            $lantern_event = new LanternEvent(new DateTimeImmutable());
-            foreach($lantern_event->mission_ids as $mission_id) {
+            foreach(LanternEvent::$static_mission_ids as $mission_id) {
                 if(!in_array($mission_id, $progress->progress_data['mission_ids'])) {
                     return false;
                 }
@@ -256,8 +255,7 @@ $LANTERN_EVENT_ACHIEVEMENTS = [
                 return false;
             }
 
-            $lantern_event = new LanternEvent(new DateTimeImmutable());
-            foreach($lantern_event->item_ids as $item_id) {
+            foreach(LanternEvent::$static_item_ids as $item_id) {
                 if(!in_array($item_id, $progress->progress_data['item_ids'])) {
                     return false;
                 }

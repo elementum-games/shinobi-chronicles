@@ -81,7 +81,7 @@ function StatusAttributes({ playerData, playerSettings, links }) {
                                 maxWidth={playerData.avatar_size * 0.5}
                                 maxHeight={playerData.avatar_size * 0.5}
                                 avatarStyle={playerSettings.avatar_style}
-                                frameClassNames={["profile_avatar_frame"]}
+                                frameClassNames={["profile_avatar_frame", playerSettings.avatar_frame]}
                             />
                         </div>
                         <div>
