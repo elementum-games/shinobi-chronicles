@@ -227,7 +227,7 @@ class PremiumShopManager {
         $this->system->db->query("UPDATE `users` SET 
             `user_name` = '{$new_name}', 
             `username_changes` = `username_changes` - {$free_name_changes_used}
-           WHERE `user_id` = %d LIMIT 1;");
+           WHERE `user_id` = {$this->player->user_id} LIMIT 1;");
         $this->player->subtractPremiumCredits($cost, "Username change");
 
         $this->system->message("You have changed your name to $new_name.");
