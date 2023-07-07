@@ -30,11 +30,27 @@ $player = false;
 if($_SESSION['user_id']) {
     $player = User::loadFromId($system, $_SESSION['user_id']);
     $player->loadData();
+    $production_key = "RuN ON ProDUCtIon";
 
     if($player->staff_manager->isHeadAdmin()) {
         if(isset($_GET['run_script']) && $_GET['run_script'] == 'true') {
-            weeklyCron($system);
-            echo "Script ran.";
+            if($system->environment === System::ENVIRONMENT_PROD) {
+                if (!isset($_POST['confirm']) || $_POST['confirm'] !== $production_key) {
+                    echo "WARNING PRODUCTION ENVIRONMENT! Confirm you would like to run this adhoc on <b>PRODUCTION ENVIRONMENT</b>!!!<br />
+                To confirm, type the following (case sensitive): $production_key<br />
+                <form action='{$system->router->base_url}/cron_jobs/reputation_cron.php?run_script=true' method='post'>
+                    <input type='text' name='confirm' /><input type='submit' value='Run Script' />
+                </form>";
+                }
+                else {
+                    weeklyCron($system);
+                    echo "Script ran.";
+                }
+            }
+            else {
+                weeklyCron($system);
+                echo "Script ran.";
+            }
         }
         else {
             echo "You can run the reputation cron script Adhoc. This is not reversible. <a href='{$system->router->base_url}/cron_jobs/reputation_cron.php?run_script=true'>Run</a>.";
