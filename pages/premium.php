@@ -154,11 +154,11 @@ function premium(): bool {
             $original_stat = $system->db->clean($_POST['original_stat']);
             $target_stat = $system->db->clean($_POST['target_stat']);
             $transfer_amount = (int)$_POST['transfer_amount'];
-            $transfer_type = PremiumShopManager::STAT_TRANSFER_STANDARD;
+            $transfer_speed = $system->db->clean($_POST['transfer_speed']);
 
             $time = $premiumShopManager->statTransferTime(
                 $transfer_amount,
-                $transfer_type
+                $transfer_speed
             );
 
             if (!isset($_POST['confirm_stat_reset'])) {
@@ -166,23 +166,29 @@ function premium(): bool {
                     original_stat: $original_stat,
                     target_stat: $target_stat,
                     transfer_amount: $transfer_amount,
-                    transfer_type: $transfer_type
+                    transfer_speed: $transfer_speed
                 );
 
                 $confirmation_type = 'confirm_stat_reset';
-                $confirmation_string = "Are you sure you want to transfer $transfer_amount " . System::unSlug($original_stat) .
+                $confirmation_string = "Are you sure you want to do a"
+                    . ($transfer_speed == 'expedited' ? "n " : " ")
+                    . "<b>" . System::unSlug($transfer_speed) . "</b>"
+                    . " transfer of $transfer_amount " . System::unSlug($original_stat) .
                     " to " . System::unSlug($target_stat) . "?<br />"
-                        . System::unSlug($original_stat) . ": {$player->{$original_stat}} -> "
-                        . ($player->{$original_stat} - $transfer_amount) . "<br />"
-                        . System::unSlug($target_stat) . ": {$player->{$target_stat}} -> "
-                        . ($player->{$target_stat} + $transfer_amount) . "<br /> This will take "
-                        . System::timeRemaining($time * 60, 'long', true, true);
+                    . System::unSlug($original_stat) . ": {$player->{$original_stat}} -> "
+                    . ($player->{$original_stat} - $transfer_amount) . "<br />"
+                    . System::unSlug($target_stat) . ": {$player->{$target_stat}} -> "
+                    . ($player->{$target_stat} + $transfer_amount) . "<br />"
+                    . "Cost: {$premiumShopManager->statTransferPremiumCreditCost($transfer_amount,$transfer_speed)} AK / "
+                    . "{$premiumShopManager->statTransferYenCost($transfer_amount, $transfer_speed)} yen<br />"
+                    . " This will take "
+                    . System::timeRemaining($time * 60, 'long', true, true);
 
                 $additional_form_data = [
                     'original_stat' => ['input_type' => 'hidden', 'value' => $original_stat],
                     'target_stat' => ['input_type' => 'hidden', 'value' => $target_stat],
                     'transfer_amount' => ['input_type' => 'hidden', 'value' => $transfer_amount],
-                    'transfer_type' => ['input_type' => 'hidden', 'value' => $transfer_type],
+                    'transfer_speed' => ['input_type' => 'hidden', 'value' => $transfer_speed],
                 ];
 
                 $submit_value = 'stat_allocate';
@@ -194,7 +200,7 @@ function premium(): bool {
                     original_stat: $original_stat,
                     target_stat: $target_stat,
                     transfer_amount: $transfer_amount,
-                    transfer_type: $transfer_type
+                    transfer_speed: $transfer_speed
                 );
 
                 require 'templates/premium/stat_transfer_confirmation.php';
