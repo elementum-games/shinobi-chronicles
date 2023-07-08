@@ -354,6 +354,7 @@ class ChatManager {
                 }
             }
 
+            $this->player->updateLastActive();
         } catch(RuntimeException $e) {
             $this->system->message($e->getMessage());
         }

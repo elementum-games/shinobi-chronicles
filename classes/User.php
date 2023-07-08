@@ -1822,6 +1822,10 @@ class User extends Fighter {
         }
     }
 
+    public function updateLastActive() {
+        $this->system->db->query("UPDATE `users` SET `last_active` = '" . time() . "' WHERE `user_id`={$this->user_id} LIMIT 1");
+    }
+
     /**
      * @throws RuntimeException
      */
