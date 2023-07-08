@@ -12,6 +12,7 @@ require_once __DIR__ . "/Rank.php";
 require_once __DIR__ . "/Village.php";
 require_once __DIR__ . "/Clan.php";
 require_once __DIR__ . "/achievements/AchievementsManager.php";
+require_once __DIR__ . "/event/LanternEvent.php";
 
 /*	Class:		User
 	Purpose:	Fetch user data and load into class variables.
@@ -1443,6 +1444,9 @@ class User extends Fighter {
     public function hasItem(int $item_id): bool {
         return isset($this->items[$item_id]);
     }
+    public function itemQuantity(int $item_id): int {
+        return isset($this->items[$item_id]) ? $this->items[$item_id]->quantity : 0;
+    }
 
     public function giveItem(Item $item, int $quantity = 1): void {
         if ($this->hasItem($item->id)) {
@@ -1450,6 +1454,10 @@ class User extends Fighter {
         } else {
             $this->items[$item->id] = $item;
             $this->items[$item->id]->quantity = $quantity;
+        }
+
+        if(isset(LanternEvent::$max_item_quantities[$item->id])) {
+            $this->items[$item->id]->quantity = min($this->items[$item->id]->quantity, LanternEvent::$max_item_quantities[$item->id]);
         }
 
         if($item->use_type == Item::USE_TYPE_WEAPON || $item->use_type == Item::USE_TYPE_ARMOR) {
