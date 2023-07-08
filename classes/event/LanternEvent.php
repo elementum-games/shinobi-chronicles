@@ -20,6 +20,14 @@ class LanternEvent extends Event {
         'sacred_lantern_gold_id' => 130,
         'forbidden_jutsu_scroll_id' => 127,
     ];
+    public static array $max_item_quantities = [
+        119 => 10000, // 200 rep
+        120 => 50, // 250 red lanterns = 5 rep
+        121 => 50, // 500 red lanterns = 10 rep
+        129 => 20, // 1000 red lanterns = 20 rep
+        123 => 10, // 1000 red lanterns = 20 rep
+    ];
+
     public static $static_mission_ids = [
         'gold_mission_id' => 120,
         'special_mission_id' => 119,
@@ -28,6 +36,7 @@ class LanternEvent extends Event {
         'hard_mission_id' => 111,
         'nightmare_mission_id' => 114,
     ];
+
 
     public array $config = [];
 

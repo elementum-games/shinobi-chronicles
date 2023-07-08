@@ -180,12 +180,15 @@ function event() {
                     if ($player->items[$system->event->item_ids['red_lantern_id']]->quantity < 1) {
                         throw new RuntimeException("You do not have enough of this item!");
                     }
+
                     $player->items[$system->event->item_ids['red_lantern_id']]->quantity -= 1;
                     if ($player->items[$system->event->item_ids['red_lantern_id']]->quantity < 1) {
                         unset($player->items[$system->event->item_ids['red_lantern_id']]);
                     }
+
                     $player->addMoney("25", "Event");
                     $system->message("You exchanged 1 Red Lantern for " . $yen_gain . "&#165;!");
+
                     $player->updateInventory();
                     $player->updateData();
                     break;
@@ -227,7 +230,7 @@ function event() {
                     break;
                 case "red_rep":
                     $player->getInventory();
-                    if(!$player->reputation->canGain()) {
+                    if($player->calMaxRepGain(1) == 0) {
                       throw new RuntimeException("You've already received your weekly reputation limit!");
                     }
                     if (!$player->hasItem($system->event->item_ids['red_lantern_id'])) {
@@ -236,225 +239,158 @@ function event() {
                     if ($player->items[$system->event->item_ids['red_lantern_id']]->quantity < 50) {
                         throw new RuntimeException("You do not have enough of this item!");
                     }
+
                     $player->items[$system->event->item_ids['red_lantern_id']]->quantity -= 50;
                     if ($player->items[$system->event->item_ids['red_lantern_id']]->quantity < 1) {
                         unset($player->items[$system->event->item_ids['red_lantern_id']]);
                     }
-                    $player->reputation->addRep(1);
+                    $player->addRep($player->calMaxRepGain(1));
+
                     $system->message("You exchanged 50 Red Lanterns for 1 Reputation!");
                     $player->updateInventory();
                     $player->updateData();
                     break;
                 case "blue_red":
-                    $player->getInventory();
-                    if (!$player->hasItem($system->event->item_ids['blue_lantern_id'])) {
-                        throw new RuntimeException("You do not have this item!");
-                    }
-                    if ($player->items[$system->event->item_ids['blue_lantern_id']]->quantity < 1) {
-                        throw new RuntimeException("You do not have enough of this item!");
-                    }
-                    $player->items[$system->event->item_ids['blue_lantern_id']]->quantity -= 1;
-                    if ($player->items[$system->event->item_ids['blue_lantern_id']]->quantity < 1) {
-                        unset($player->items[$system->event->item_ids['blue_lantern_id']]);
-                    }
-
-                    if ($player->hasItem($system->event->item_ids['red_lantern_id'])) {
-                        $player->items[$system->event->item_ids['red_lantern_id']]->quantity += 5;
-                    } else {
-                        $result = $system->db->query("SELECT * FROM `items` WHERE `item_id` = {$system->event->item_ids['red_lantern_id']}");
-                        $player->giveItem(Item::fromDb($system->db->fetch($result), 5));
-                    }
-                    $system->message("You exchanged 1 Blue Lantern for 5 Red Lanterns!");
-                    $player->updateInventory();
-                    $player->updateData();
+                    doEventItemExchange(
+                        system: $system,
+                        player: $player,
+                        source_item_id: $system->event->item_ids['blue_lantern_id'],
+                        source_item_name: 'Blue Lantern',
+                        target_item_id: $system->event->item_ids['red_lantern_id'],
+                        target_item_name: 'Red Lantern',
+                        source_quantity_given: 1,
+                        target_quantity_received: 5,
+                    );
                     break;
                 case "violet_red":
-                    $player->getInventory();
-                    if (!$player->hasItem($system->event->item_ids['violet_lantern_id'])) {
-                        throw new RuntimeException("You do not have this item!");
-                    }
-                    if ($player->items[$system->event->item_ids['violet_lantern_id']]->quantity < 1) {
-                        throw new RuntimeException("You do not have enough of this item!");
-                    }
-                    $player->items[$system->event->item_ids['violet_lantern_id']]->quantity -= 1;
-                    if ($player->items[$system->event->item_ids['violet_lantern_id']]->quantity < 1) {
-                        unset($player->items[$system->event->item_ids['violet_lantern_id']]);
-                    }
-
-                    $player->giveItemById($system->event->item_ids['red_lantern_id'], 20);
-
-                    $system->message("You exchanged 1 Violet Lantern for 20 Red Lanterns!");
-                    $player->updateInventory();
-                    $player->updateData();
+                    doEventItemExchange(
+                        system: $system,
+                        player: $player,
+                        source_item_id: $system->event->item_ids['violet_lantern_id'],
+                        source_item_name: 'Violet Lantern',
+                        target_item_id: $system->event->item_ids['red_lantern_id'],
+                        target_item_name: 'Red Lantern',
+                        source_quantity_given: 1,
+                        target_quantity_received: 20,
+                    );
                     break;
                 case "gold_red":
-                    $player->getInventory();
-                    if (!$player->hasItem($system->event->item_ids['gold_lantern_id'])) {
-                        throw new RuntimeException("You do not have this item!");
-                    }
-                    if ($player->items[$system->event->item_ids['gold_lantern_id']]->quantity < 1) {
-                        throw new RuntimeException("You do not have enough of this item!");
-                    }
-                    $player->items[$system->event->item_ids['gold_lantern_id']]->quantity -= 1;
-                    if ($player->items[$system->event->item_ids['gold_lantern_id']]->quantity < 1) {
-                        unset($player->items[$system->event->item_ids['gold_lantern_id']]);
-                    }
-
-                    $player->giveItemById(item_id: $system->event->item_ids['red_lantern_id'], quantity: 50);
-
-                    $system->message("You exchanged 1 Gold Lantern for 50 Red Lanterns!");
-                    $player->updateInventory();
-                    $player->updateData();
+                    doEventItemExchange(
+                        system: $system,
+                        player: $player,
+                        source_item_id: $system->event->item_ids['gold_lantern_id'],
+                        source_item_name: 'Gold Lantern',
+                        target_item_id: $system->event->item_ids['red_lantern_id'],
+                        target_item_name: 'Red Lantern',
+                        source_quantity_given: 1,
+                        target_quantity_received: 50,
+                    );
                     break;
                 case "red_shadow":
-                    $player->getInventory();
-                    if (!$player->hasItem($system->event->item_ids['red_lantern_id'])) {
-                        throw new RuntimeException("You do not have this item!");
-                    }
-                    if ($player->items[$system->event->item_ids['red_lantern_id']]->quantity < 100) {
-                        throw new RuntimeException("You do not have enough of this item!");
-                    }
-                    $player->items[$system->event->item_ids['red_lantern_id']]->quantity -= 100;
-                    if ($player->items[$system->event->item_ids['red_lantern_id']]->quantity < 1) {
-                        unset($player->items[$system->event->item_ids['red_lantern_id']]);
-                    }
-
-                    $result = $system->db->query("SELECT * FROM `items` WHERE `item_id` = {$system->event->item_ids['shadow_essence_id']}");
-                    $item = Item::fromDb($system->db->fetch($result));
-                    $player->giveItem($item, 1);
-
-                    $system->message("You exchanged 100 Red Lanterns for 1 Shadow Essence!");
-                    $player->updateInventory();
-                    $player->updateData();
+                    doEventItemExchange(
+                        system: $system,
+                        player: $player,
+                        source_item_id: $system->event->item_ids['red_lantern_id'],
+                        source_item_name: 'Red Lantern',
+                        target_item_id: $system->event->item_ids['shadow_essence_id'],
+                        target_item_name: 'Shadow Essence',
+                        source_quantity_given: 100,
+                        target_quantity_received: 1,
+                    );
                     break;
                 case "shadow_red":
-                    $player->getInventory();
-                    if (!$player->hasItem($system->event->item_ids['shadow_essence_id'])) {
-                        throw new RuntimeException("You do not have this item!");
-                    }
-                    if ($player->items[$system->event->item_ids['shadow_essence_id']]->quantity < 1) {
-                        throw new RuntimeException("You do not have enough of this item!");
-                    }
-                    $player->items[$system->event->item_ids['shadow_essence_id']]->quantity -= 1;
-                    if ($player->items[$system->event->item_ids['shadow_essence_id']]->quantity < 1) {
-                        unset($player->items[$system->event->item_ids['shadow_essence_id']]);
-                    }
-
-                    $player->giveItemById($system->event->item_ids['red_lantern_id'], 100);
-
-                    $system->message("You exchanged 1 Shadow Essence for 100 Red Lanterns!");
-                    $player->updateInventory();
-                    $player->updateData();
+                    doEventItemExchange(
+                        system: $system,
+                        player: $player,
+                        source_item_id: $system->event->item_ids['shadow_essence_id'],
+                        source_item_name: 'Shadow Essence',
+                        target_item_id: $system->event->item_ids['red_lantern_id'],
+                        target_item_name: 'Gold Lantern',
+                        source_quantity_given: 1,
+                        target_quantity_received: 100,
+                    );
                     break;
                 case "shadow_sacred_red":
-                    $player->getInventory();
-                    if (!$player->hasItem($system->event->item_ids['shadow_essence_id'])) {
-                        throw new RuntimeException("You do not have this item!");
-                    }
-                    if ($player->items[$system->event->item_ids['shadow_essence_id']]->quantity < 5) {
-                        throw new RuntimeException("You do not have enough of this item!");
-                    }
                     if ($player->hasItem($system->event->item_ids['sacred_lantern_red_id'])) {
                         throw new RuntimeException("You already have this item!");
                     }
-                    $player->items[$system->event->item_ids['shadow_essence_id']]->quantity -= 5;
-                    if ($player->items[$system->event->item_ids['shadow_essence_id']]->quantity < 1) {
-                        unset($player->items[$system->event->item_ids['shadow_essence_id']]);
-                    }
 
-                    $player->giveItemById($system->event->item_ids['sacred_lantern_red_id'], 1);
-
-                    $system->message("You exchanged 5 Shadow Essence for a Sacred Red Lantern!");
-                    $player->updateInventory();
-                    $player->updateData();
+                    doEventItemExchange(
+                        system: $system,
+                        player: $player,
+                        source_item_id: $system->event->item_ids['shadow_essence_id'],
+                        source_item_name: 'Shadow Essence',
+                        target_item_id: $system->event->item_ids['sacred_lantern_red_id'],
+                        target_item_name: 'Sacred Red Lantern',
+                        source_quantity_given: 5,
+                        target_quantity_received: 1,
+                    );
                     break;
                 case "shadow_sacred_blue":
-                    $player->getInventory();
-                    if (!$player->hasItem($system->event->item_ids['shadow_essence_id'])) {
-                        throw new RuntimeException("You do not have this item!");
-                    }
-                    if ($player->items[$system->event->item_ids['shadow_essence_id']]->quantity < 5) {
-                        throw new RuntimeException("You do not have enough of this item!");
-                    }
                     if ($player->hasItem($system->event->item_ids['sacred_lantern_blue_id'])) {
                         throw new RuntimeException("You already have this item!");
                     }
-                    $player->items[$system->event->item_ids['shadow_essence_id']]->quantity -= 5;
-                    if ($player->items[$system->event->item_ids['shadow_essence_id']]->quantity < 1) {
-                        unset($player->items[$system->event->item_ids['shadow_essence_id']]);
-                    }
 
-                    $player->giveItemById($system->event->item_ids['sacred_lantern_blue_id'], 1);
-
-                    $system->message("You exchanged 5 Shadow Essence for a Sacred Blue Lantern!");
-                    $player->updateInventory();
-                    $player->updateData();
+                    doEventItemExchange(
+                        system: $system,
+                        player: $player,
+                        source_item_id: $system->event->item_ids['shadow_essence_id'],
+                        source_item_name: 'Shadow Essence',
+                        target_item_id: $system->event->item_ids['sacred_lantern_blue_id'],
+                        target_item_name: 'Sacred Blue Lantern',
+                        source_quantity_given: 5,
+                        target_quantity_received: 1,
+                    );
                     break;
                 case "shadow_sacred_violet":
-                    $player->getInventory();
-                    if (!$player->hasItem($system->event->item_ids['shadow_essence_id'])) {
-                        throw new RuntimeException("You do not have this item!");
-                    }
-                    if ($player->items[$system->event->item_ids['shadow_essence_id']]->quantity < 5) {
-                        throw new RuntimeException("You do not have enough of this item!");
-                    }
                     if ($player->hasItem($system->event->item_ids['sacred_lantern_violet_id'])) {
                         throw new RuntimeException("You already have this item!");
                     }
-                    $player->items[$system->event->item_ids['shadow_essence_id']]->quantity -= 5;
-                    if ($player->items[$system->event->item_ids['shadow_essence_id']]->quantity < 1) {
-                        unset($player->items[$system->event->item_ids['shadow_essence_id']]);
-                    }
 
-                    $player->giveItemById($system->event->item_ids['sacred_lantern_violet_id'], 1);
-
-                    $system->message("You exchanged 5 Shadow Essence for a Sacred Violet Lantern!");
-                    $player->updateInventory();
-                    $player->updateData();
+                    doEventItemExchange(
+                        system: $system,
+                        player: $player,
+                        source_item_id: $system->event->item_ids['shadow_essence_id'],
+                        source_item_name: 'Shadow Essence',
+                        target_item_id: $system->event->item_ids['sacred_lantern_violet_id'],
+                        target_item_name: 'Sacred Violet Lantern',
+                        source_quantity_given: 5,
+                        target_quantity_received: 1,
+                    );
                     break;
                 case "shadow_sacred_gold":
-                    $player->getInventory();
-                    if (!$player->hasItem($system->event->item_ids['shadow_essence_id'])) {
-                        throw new RuntimeException("You do not have this item!");
-                    }
-                    if ($player->items[$system->event->item_ids['shadow_essence_id']]->quantity < 5) {
-                        throw new RuntimeException("You do not have enough of this item!");
-                    }
                     if ($player->hasItem($system->event->item_ids['sacred_lantern_gold_id'])) {
                         throw new RuntimeException("You already have this item!");
                     }
-                    $player->items[$system->event->item_ids['shadow_essence_id']]->quantity -= 5;
-                    if ($player->items[$system->event->item_ids['shadow_essence_id']]->quantity < 1) {
-                        unset($player->items[$system->event->item_ids['shadow_essence_id']]);
-                    }
 
-                    $player->giveItemById(item_id: $system->event->item_ids['sacred_lantern_gold_id'], quantity: 1);
-
-                    $system->message("You exchanged 5 Shadow Essence for a Sacred Gold Lantern!");
-                    $player->updateInventory();
-                    $player->updateData();
+                    doEventItemExchange(
+                        system: $system,
+                        player: $player,
+                        source_item_id: $system->event->item_ids['shadow_essence_id'],
+                        source_item_name: 'Shadow Essence',
+                        target_item_id: $system->event->item_ids['sacred_lantern_gold_id'],
+                        target_item_name: 'Sacred Gold Lantern',
+                        source_quantity_given: 5,
+                        target_quantity_received: 1,
+                    );
                     break;
                 case "shadow_jutsu":
-                    $player->getInventory();
-                    if (!$player->hasItem($system->event->item_ids['shadow_essence_id'])) {
-                        throw new RuntimeException("You do not have this item!");
-                    }
-                    if ($player->items[$system->event->item_ids['shadow_essence_id']]->quantity < 25) {
-                        throw new RuntimeException("You do not have enough of this item!");
-                    }
                     if ($player->hasItem($system->event->item_ids['forbidden_jutsu_scroll_id'])) {
                         throw new RuntimeException("You already have this item!");
                     }
-                    $player->items[$system->event->item_ids['shadow_essence_id']]->quantity -= 25;
-                    if ($player->items[$system->event->item_ids['shadow_essence_id']]->quantity < 1) {
-                        unset($player->items[$system->event->item_ids['shadow_essence_id']]);
-                    }
 
-                    $player->giveItemById($system->event->item_ids['forbidden_jutsu_scroll_id'], 1);
+                    doEventItemExchange(
+                        system: $system,
+                        player: $player,
+                        source_item_id: $system->event->item_ids['shadow_essence_id'],
+                        source_item_name: 'Shadow Essence',
+                        target_item_id: $system->event->item_ids['forbidden_jutsu_scroll_id'],
+                        target_item_name: 'Forbidden Jutsu Scroll',
+                        source_quantity_given: 25,
+                        target_quantity_received: 1,
+                    );
 
-                    $system->message("You exchanged 25 Shadow Essence for a Forbidden Jutsu Scroll!");
-                    $player->updateInventory();
-                    $player->updateData();
+                    $player->getInventory();
                     break;
             }
         } catch (RuntimeException $e) {
@@ -468,3 +404,45 @@ function event() {
     }
     require 'templates/temp_event.php';
 }
+
+function doEventItemExchange(
+    System $system,
+    User $player,
+    int $source_item_id,
+    string $source_item_name,
+    int $target_item_id,
+    string $target_item_name,
+    int $source_quantity_given,
+    int $target_quantity_received
+): void {
+    $player->getInventory();
+
+    if ($player->itemQuantity($source_item_id) < $source_quantity_given) {
+        throw new RuntimeException("You do not have enough {$source_item_name}s!");
+    }
+
+    if(isset(LanternEvent::$max_item_quantities[$target_item_id]) &&
+        $player->itemQuantity($target_item_id) >= LanternEvent::$max_item_quantities[$target_item_id]
+    ) {
+        throw new RuntimeException("You have reached the maximum amount of {$target_item_name}s!");
+    }
+
+    $player->items[$source_item_id]->quantity -= $source_quantity_given;
+    if ($player->items[$source_item_id]->quantity < 1) {
+        unset($player->items[$source_item_id]);
+    }
+
+    $player->giveItemById($target_item_id, $target_quantity_received);
+
+    $system->message(
+    "You exchanged {$source_quantity_given} {$source_item_name}"
+        . ($source_quantity_given > 1 ? "s" : "")
+        . " for {$target_quantity_received} {$target_item_name}"
+        . ($target_quantity_received > 1 ? "s" : "")
+        . "!"
+    );
+
+    $player->updateInventory();
+    $player->updateData();
+}
+
