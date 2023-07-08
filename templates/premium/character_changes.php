@@ -195,6 +195,7 @@
                                 id='transferAmount'
                                 name='transfer_amount'
                                 value='<?= $init_transfer_amount ?>'
+                                max='<?= $init_transfer_amount ?>'
                                 onchange='statAllocateCostDisplay()'
                                 onkeyup='statAllocateCostDisplay()'
                             /><br/>
@@ -213,9 +214,9 @@
     let stats = {};
     <?php foreach($player->stats as $stat): ?>
         <?php if(str_contains($stat, 'skill')): ?>
-            stats.<?= $stat ?> = <?= ($player->{$stat} - 10) ?>;
+            stats.<?= $stat ?> = <?= ($player->{$stat}) ?>;
         <?php else: ?>
-            stats.<?= $stat ?> = <?= ($player->{$stat} - 5) ?>;
+            stats.<?= $stat ?> = <?= ($player->{$stat}) ?>;
         <?php endif; ?>
     <?php endforeach; ?>
 
@@ -243,6 +244,7 @@
     function statSelectChange() {
         statBeingTransferred = statSelectEl.value;
         transferAmountEl.value = stats[statBeingTransferred];
+        transferAmountEl.setAttribute('max', stats[statBeingTransferred]);
         statAllocateCostDisplay();
     }
 
