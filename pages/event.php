@@ -256,9 +256,9 @@ function event() {
                         player: $player,
                         source_item_id: $system->event->item_ids['blue_lantern_id'],
                         source_item_name: 'Blue Lantern',
+                        source_quantity_given: 1,
                         target_item_id: $system->event->item_ids['red_lantern_id'],
                         target_item_name: 'Red Lantern',
-                        source_quantity_given: 1,
                         target_quantity_received: 5,
                     );
                     break;
@@ -268,9 +268,9 @@ function event() {
                         player: $player,
                         source_item_id: $system->event->item_ids['violet_lantern_id'],
                         source_item_name: 'Violet Lantern',
+                        source_quantity_given: 1,
                         target_item_id: $system->event->item_ids['red_lantern_id'],
                         target_item_name: 'Red Lantern',
-                        source_quantity_given: 1,
                         target_quantity_received: 20,
                     );
                     break;
@@ -280,9 +280,9 @@ function event() {
                         player: $player,
                         source_item_id: $system->event->item_ids['gold_lantern_id'],
                         source_item_name: 'Gold Lantern',
+                        source_quantity_given: 1,
                         target_item_id: $system->event->item_ids['red_lantern_id'],
                         target_item_name: 'Red Lantern',
-                        source_quantity_given: 1,
                         target_quantity_received: 50,
                     );
                     break;
@@ -292,9 +292,9 @@ function event() {
                         player: $player,
                         source_item_id: $system->event->item_ids['red_lantern_id'],
                         source_item_name: 'Red Lantern',
+                        source_quantity_given: 100,
                         target_item_id: $system->event->item_ids['shadow_essence_id'],
                         target_item_name: 'Shadow Essence',
-                        source_quantity_given: 100,
                         target_quantity_received: 1,
                     );
                     break;
@@ -304,9 +304,9 @@ function event() {
                         player: $player,
                         source_item_id: $system->event->item_ids['shadow_essence_id'],
                         source_item_name: 'Shadow Essence',
+                        source_quantity_given: 1,
                         target_item_id: $system->event->item_ids['red_lantern_id'],
                         target_item_name: 'Red Lantern',
-                        source_quantity_given: 1,
                         target_quantity_received: 100,
                     );
                     break;
@@ -320,9 +320,9 @@ function event() {
                         player: $player,
                         source_item_id: $system->event->item_ids['shadow_essence_id'],
                         source_item_name: 'Shadow Essence',
+                        source_quantity_given: 5,
                         target_item_id: $system->event->item_ids['sacred_lantern_red_id'],
                         target_item_name: 'Sacred Red Lantern',
-                        source_quantity_given: 5,
                         target_quantity_received: 1,
                     );
                     break;
@@ -336,9 +336,9 @@ function event() {
                         player: $player,
                         source_item_id: $system->event->item_ids['shadow_essence_id'],
                         source_item_name: 'Shadow Essence',
+                        source_quantity_given: 5,
                         target_item_id: $system->event->item_ids['sacred_lantern_blue_id'],
                         target_item_name: 'Sacred Blue Lantern',
-                        source_quantity_given: 5,
                         target_quantity_received: 1,
                     );
                     break;
@@ -352,9 +352,9 @@ function event() {
                         player: $player,
                         source_item_id: $system->event->item_ids['shadow_essence_id'],
                         source_item_name: 'Shadow Essence',
+                        source_quantity_given: 5,
                         target_item_id: $system->event->item_ids['sacred_lantern_violet_id'],
                         target_item_name: 'Sacred Violet Lantern',
-                        source_quantity_given: 5,
                         target_quantity_received: 1,
                     );
                     break;
@@ -368,9 +368,9 @@ function event() {
                         player: $player,
                         source_item_id: $system->event->item_ids['shadow_essence_id'],
                         source_item_name: 'Shadow Essence',
+                        source_quantity_given: 5,
                         target_item_id: $system->event->item_ids['sacred_lantern_gold_id'],
                         target_item_name: 'Sacred Gold Lantern',
-                        source_quantity_given: 5,
                         target_quantity_received: 1,
                     );
                     break;
@@ -384,9 +384,9 @@ function event() {
                         player: $player,
                         source_item_id: $system->event->item_ids['shadow_essence_id'],
                         source_item_name: 'Shadow Essence',
+                        source_quantity_given: 25,
                         target_item_id: $system->event->item_ids['forbidden_jutsu_scroll_id'],
                         target_item_name: 'Forbidden Jutsu Scroll',
-                        source_quantity_given: 25,
                         target_quantity_received: 1,
                     );
 
@@ -410,9 +410,9 @@ function doEventItemExchange(
     User $player,
     int $source_item_id,
     string $source_item_name,
+    int $source_quantity_given,
     int $target_item_id,
     string $target_item_name,
-    int $source_quantity_given,
     int $target_quantity_received
 ): void {
     $player->getInventory();
