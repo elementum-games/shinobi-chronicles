@@ -209,7 +209,7 @@ function runActiveMission(): bool {
     $current_mission_stage_id = $player->mission_stage['stage_id'];
 
     //Survival Mission State Controls
-    if($mission->mission_type === Mission::TYPE_SURVIVAL) {
+    if($mission->mission_type == Mission::TYPE_SURVIVAL) {
         if(!empty($_GET['retreat'])) {
             $player->battle_id = 0;
             $mission->nextStage($player->mission_stage['stage_id'] = 4);
