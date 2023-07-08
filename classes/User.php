@@ -45,7 +45,7 @@ class User extends Fighter {
     const PARTIAL_LOCK = 3;
     const FULL_LOCK = 5;
 
-    const BASE_EXP = 500;
+    const BASE_EXP = 0;
     const BASE_REGEN = 25;
 
     const BASE_JUTSU_SLOTS = 4;
@@ -2179,15 +2179,15 @@ class User extends Fighter {
             'train_time' => 0,
             'train_gain' => 0,
 
-            'ninjutsu_skill' => 10,
-            'genjutsu_skill' => 10,
-            'taijutsu_skill' => 10,
+            'ninjutsu_skill' => 0,
+            'genjutsu_skill' => 0,
+            'taijutsu_skill' => 0,
             'bloodline_skill' => 0,
 
-            'cast_speed' => 5,
-            'speed' => 5,
-            'intelligence' => 5,
-            'willpower' => 5,
+            'cast_speed' => 0,
+            'speed' => 0,
+            'intelligence' => 0,
+            'willpower' => 0,
 
             'register_date' => time(),
             'verify_key' => $verification_code,

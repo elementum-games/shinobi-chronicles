@@ -137,14 +137,14 @@ class PremiumShopManager {
         $this->player->ai_wins = 0;
         $this->player->ai_losses = 0;
         $this->player->monthly_pvp = 0;
-        $this->player->ninjutsu_skill = 10;
-        $this->player->genjutsu_skill = 10;
-        $this->player->taijutsu_skill = 10;
+        $this->player->ninjutsu_skill = 0;
+        $this->player->genjutsu_skill = 0;
+        $this->player->taijutsu_skill = 0;
         $this->player->bloodline_skill = 0;
-        $this->player->cast_speed = 5;
-        $this->player->speed = 5;
-        $this->player->intelligence = 5;
-        $this->player->willpower = 5;
+        $this->player->cast_speed = 0;
+        $this->player->speed = 0;
+        $this->player->intelligence = 0;
+        $this->player->willpower = 0;
 
         //Bug fix: Elements previously was not cleared. -- Shadekun
         $this->player->elements = array();

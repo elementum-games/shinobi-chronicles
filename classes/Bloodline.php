@@ -264,6 +264,7 @@ class Bloodline {
      * @return float
      */
     private function offenseToBloodlineRatio(int $offense_skill, int $bloodline_skill): float {
+
         $ratio_max = 1.0;
         $ratio_min = 0.75;
 

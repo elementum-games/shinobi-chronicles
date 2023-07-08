@@ -404,19 +404,25 @@ class SenseiManager {
         return $isSensei;
     }
 
-    public static function getLessonModifier(int $player_stat, int $player_exp, int $sensei_stat, int $sensei_exp, bool $is_specialization): float
-    {
+    public static function getLessonModifier(int $player_stat, int $player_exp, int $sensei_stat, int $sensei_exp, bool $is_specialization): float {
+        if($player_stat < 1) $player_stat = 1;
+        if($sensei_stat < 1) $sensei_stat = 1;
+
         $lesson_modifier = 2.0;
+
         // First 50% no penalty
         $stat_ratio_penalty = ($player_stat - ($sensei_stat / 2)) / ($sensei_stat / 2);
         $lesson_modifier -= max(0, $stat_ratio_penalty);
+
         // First 50% no penalty
         $exp_ratio_penalty = ($player_exp - ($sensei_exp / 2)) / ($sensei_exp / 2);
         $lesson_modifier -= max(0, $exp_ratio_penalty);
+
         // If no benefit, return minimum
         if ($lesson_modifier <= 1) {
             return 1;
         }
+
         // If specialization, cap at 2x else 1.75x
         return $is_specialization ? min(2.0, $lesson_modifier) : min(1.75, $lesson_modifier);
     }
