@@ -93,8 +93,7 @@ if(!isset($_SESSION['user_id'])) {
             }
             $result = $system->db->fetch($result);
             if (!$result['user_verified']) {
-                throw new RuntimeException("Your account has not been verified. Please check your email for the activation code.
-				<a class='link' href='{$system->router->base_url}register.php?act=resend_verification&username=$user_name'>Resend Verification</a>");
+                throw new RuntimeException("Your account has not been verified. Please check your email for the activation code or use the following link to resend your activation email: {$system->router->base_url}?act=resend_verification&username=$user_name");
             }
 
             // Check failed logins
@@ -182,7 +181,7 @@ address and requested a password reset. If this is not your account, please disr
             $reset_error_text = $e->getMessage();
         }
     }
-    else if (!empty($_POST['act'])) {
+    else if (!empty($_GET['act'])) {
         try {
             if (!$system->register_open) {
                 throw new RuntimeException("Sorry, not currently functional. Check back later.");
@@ -196,7 +195,6 @@ address and requested a password reset. If this is not your account, please disr
                 );
                 if ($system->db->last_affected_rows > 0) {
                     $system->message("Account activated! You may log in and start playing. <a href='{$system->router->base_url}'>Continue</a>");
-                    $system->printMessage();
                 } else {
                     $accountData = $system->db->query(
                         "SELECT `user_verified` FROM `users` WHERE `user_name`='$user_name' AND `verify_key`='$key' LIMIT 1"
@@ -213,7 +211,6 @@ address and requested a password reset. If this is not your account, please disr
                         <a href='{$system->router->links['discord']}' target='_blank'>Discord.</a>");
                         }
                     }
-                    $system->printMessage();
                 }
             } else if ($_GET['act'] == 'resend_verification') {
                 $user_name = $system->db->clean($_GET['username']);
@@ -222,7 +219,6 @@ address and requested a password reset. If this is not your account, please disr
                 );
                 if ($system->db->last_num_rows == 0) {
                     $system->message("Invalid user!");
-                    $system->printMessage();
                 } else {
                     $result = $system->db->fetch($result);
 
@@ -240,9 +236,9 @@ address and requested a password reset. If this is not your account, please disr
 				Please contact a staff member on the forums for manual activation."
                         );
                     }
-                    $system->printMessage();
                 }
             }
+            $login_message_text = $system->message;
         } catch (Exception $e) {
             $system->db->rollbackTransaction();
             $system->message($e->getMessage());
