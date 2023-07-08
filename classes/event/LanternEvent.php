@@ -21,11 +21,16 @@ class LanternEvent extends Event {
         'forbidden_jutsu_scroll_id' => 127,
     ];
     public static array $max_item_quantities = [
-        119 => 10000, // 200 rep
+        // Red Lantern
+        119 => 5000, // 100 rep
+        // Blue Lantern (1:5)
         120 => 50, // 250 red lanterns = 5 rep
+        // Violet Lantern (1:20)
         121 => 50, // 500 red lanterns = 10 rep
-        129 => 20, // 1000 red lanterns = 20 rep
-        123 => 10, // 1000 red lanterns = 20 rep
+        // Gold lantern (1:50)
+        129 => 25, // 1250 red lanterns = 25 rep
+        // Shadow essence (1:100)
+        123 => 25, // 2500 red lanterns = 50 rep
     ];
 
     public static $static_mission_ids = [
