@@ -305,7 +305,7 @@ function event() {
                         source_item_id: $system->event->item_ids['shadow_essence_id'],
                         source_item_name: 'Shadow Essence',
                         target_item_id: $system->event->item_ids['red_lantern_id'],
-                        target_item_name: 'Gold Lantern',
+                        target_item_name: 'Red Lantern',
                         source_quantity_given: 1,
                         target_quantity_received: 100,
                     );
