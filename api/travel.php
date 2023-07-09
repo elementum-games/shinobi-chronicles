@@ -55,9 +55,9 @@ try {
             break;
 
         case 'AttackPlayer':
-            $target_user_id = $system->db->clean($_POST['target']);
+            $target_attack_id = $system->db->clean($_POST['target']);
 
-            $success = $TravelManager->attackPlayer($target_user_id);
+            $success = $TravelManager->attackPlayer($target_attack_id);
             $TravelAPIResponse->response = TravelApiPresenter::attackPlayerResponse($success, $system);
             break;
         default:
