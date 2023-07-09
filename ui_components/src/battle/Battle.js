@@ -237,13 +237,19 @@ function SpectateStatus() {
 }
 
 function BattleResult({description, isBattleComplete}) {
+    const secondUrlParamIndex = window.location.href.indexOf('&');
+
+    // Exclude whatever section is after ?id=XYZ because it might trigger an action.
+    // We can probably remove this after we migrate to POST actions via APIs
+    const continueUrl = window.location.href.substring(0, secondUrlParamIndex);
+
     return <table className='table'>
         <tbody>
             <tr><th>Battle Results</th></tr>
             <tr><td>
                 <div dangerouslySetInnerHTML={{__html: description}}></div>
                 {isBattleComplete &&
-                    <button onClick={() => window.location.assign(window.location.href)}>Continue</button>
+                    <button onClick={() => window.location.assign(continueUrl)}>Continue</button>
                 }
             </td></tr>
         </tbody>
