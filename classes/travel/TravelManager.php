@@ -491,15 +491,15 @@ class TravelManager {
     /**
      * @throws RuntimeException
      */
-    public function attackPlayer($target_user_id): bool {
+    public function attackPlayer(string $target_attack_id): bool {
         // get user id off the attack link
-        $result = $this->system->db->query("SELECT `user_id` FROM `users` WHERE `attack_id`='{$target_user_id}' LIMIT 1");
+        $result = $this->system->db->query("SELECT `user_id` FROM `users` WHERE `attack_id`='{$target_attack_id}' LIMIT 1");
         if ($this->system->db->last_num_rows == 0) {
             throw new RuntimeException("Invalid user!");
         }
 
-        $attack_link = $this->system->db->fetch($result);
-        $target_user_id = $attack_link['user_id'];
+        $target_user= $this->system->db->fetch($result);
+        $target_user_id = $target_user['user_id'];
 
         $user = User::loadFromId($this->system, $target_user_id);
         $user->loadData(User::UPDATE_NOTHING, true);
