@@ -187,6 +187,10 @@ function BattleResult({
   description,
   isBattleComplete
 }) {
+  const secondUrlParamIndex = window.location.href.indexOf('&'); // Exclude whatever section is after ?id=XYZ because it might trigger an action.
+  // We can probably remove this after we migrate to POST actions via APIs
+
+  const continueUrl = window.location.href.substring(0, secondUrlParamIndex);
   return /*#__PURE__*/React.createElement("table", {
     className: "table"
   }, /*#__PURE__*/React.createElement("tbody", null, /*#__PURE__*/React.createElement("tr", null, /*#__PURE__*/React.createElement("th", null, "Battle Results")), /*#__PURE__*/React.createElement("tr", null, /*#__PURE__*/React.createElement("td", null, /*#__PURE__*/React.createElement("div", {
@@ -194,7 +198,7 @@ function BattleResult({
       __html: description
     }
   }), isBattleComplete && /*#__PURE__*/React.createElement("button", {
-    onClick: () => window.location.assign(window.location.href)
+    onClick: () => window.location.assign(continueUrl)
   }, "Continue")))));
 }
 
