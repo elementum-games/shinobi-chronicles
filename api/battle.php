@@ -13,23 +13,22 @@ try {
 }
 # End standard auth
 
-
 $battle_result = $system->db->query("SELECT battle_type FROM battles WHERE `battle_id`='{$player->battle_id}' LIMIT 1");
-if($system->db->last_num_rows) {
+if ($system->db->last_num_rows) {
     $battle_data = $system->db->fetch($battle_result);
 
     $battle_route = null;
-    foreach(Router::$routes as $page_id => $page) {
-        if(empty($page->battle_type)) {
+    foreach (Router::$routes as $page_id => $page) {
+        if (empty($page->battle_type)) {
             continue;
         }
 
-        if($page->battle_type == $battle_data['battle_type']) {
+        if ($page->battle_type == $battle_data['battle_type']) {
             $battle_route = $page;
         }
     }
 
-    if($battle_route == null) {
+    if ($battle_route == null) {
         API::exitWithError(
             message: "No route found for battle type!",
             system: $system
@@ -39,7 +38,7 @@ if($system->db->last_num_rows) {
     require(__DIR__ . '/../pages/' . $battle_route->file_name);
 
     try {
-        switch($battle_route->battle_type) {
+        switch ($battle_route->battle_type) {
             case Battle::TYPE_AI_ARENA:
                 $response = arenaFightAPI($system, $player);
                 break;
@@ -59,7 +58,7 @@ if($system->db->last_num_rows) {
                 throw new RuntimeException("Invalid battle route!");
         }
 
-        if(!($response instanceof BattlePageAPIResponse)) {
+        if (!($response instanceof BattlePageAPIResponse)) {
             API::exitWithError(
                 message: "Invalid battle API response! - Expected BattlePageAPIResponse, got " . get_class($response),
                 system: $system,
@@ -78,16 +77,12 @@ if($system->db->last_num_rows) {
     API::exitWithData(
         data: [
             'battle' => $response->battle_data,
-            'battleResult' =>$response->battle_result,
+            'battleResult' => $response->battle_result,
         ],
         errors: $response->errors,
         debug_messages: $system->debug_messages,
         system: $system,
     );
-}
-else {
+} else {
     API::exitWithError(message: 'Not in battle!', system: $system);
 }
-
-
-

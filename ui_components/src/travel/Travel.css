@@ -545,17 +545,17 @@
     color: var(--theme-text-color-normal);
     font-size: 1em;
     font-family: sans-serif;
-    font-weight: normal;
+    font-weight: 600;
 }
 #content .travel-scout-name a:hover {
     color: var(--theme-text-color-light);
 }
 .travel-scout-name span {
-    width: 50%;
+    width: 65%;
     min-width: 100px;
 
     color: var(--theme-text-color-light);
-    font-size: 0.75em;
+    font-size: 1em;
     font-family: sans-serif;
 
 }
@@ -678,4 +678,23 @@
 #container .sm-tmp-outvillage  .only-allowed-in-village:hover {
     color: var(--theme-text-color-light);
     background-image: none;
+}
+
+/* Not sure if there's a better way to prevent choppy movement for other players? */
+#scout_locations .map_location {
+    transition: all 0.45s linear;
+}
+
+.map_location.player_ally {
+    background: url(../../../images/ninja_head.png), radial-gradient(circle, green 70%, transparent 75%);
+    background-size: 25px 25px;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+.map_location.player_enemy {
+    background: url(../../../images/ninja_head.png), radial-gradient(circle, red 70%, transparent 75%);
+    background-size: 25px 25px;
+    background-repeat: no-repeat;
+    background-position: center;
 }

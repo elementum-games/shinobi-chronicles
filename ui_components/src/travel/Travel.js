@@ -70,7 +70,6 @@ type Props = {|
     +travelAPILink: string,
     +missionLink: string,
     +membersLink: string,
-    +attackLink: string,
     +travelCooldownMs: number,
 |};
 
@@ -80,7 +79,6 @@ function Travel({
     travelAPILink,
     missionLink,
     membersLink,
-    attackLink,
     travelCooldownMs
 }): Props {
     const travelIntervalFrequency = 40;
@@ -222,6 +220,23 @@ function Travel({
         setFeedback([errors, 'info']);
     }
 
+    const AttackPlayer = (target) => {
+        apiFetch(
+            travelAPILink,
+            {
+                request: 'AttackPlayer',
+                target: target
+            }
+        ).then((response) => {
+            if (response.errors.length) {
+                handleErrors(response.errors);
+                return;
+            }
+
+            window.location.href = response.data.redirect;
+        });
+    }
+
     // Handle travel
     function changeMovementDirection(newDirection) {
         if(newDirection === movementDirection.current) {
@@ -344,7 +359,10 @@ function Travel({
                             <Message message={feedback[0]} messageType={feedback[1]} />
                         </div>
                     )}
-                    {mapData && (<Map mapData={mapData} />)}
+                    {(mapData && scoutData) &&
+                        (<Map mapData={mapData}
+                            scoutData={scoutData}
+                            playerId={playerId} />)}
                 </div>
             </div>
             {(mapData && scoutData) && (
@@ -352,8 +370,9 @@ function Travel({
                     mapData={mapData}
                     scoutData={scoutData}
                     membersLink={membersLink}
-                    attackLink={attackLink}
+                    attackPlayer={AttackPlayer}
                     ranksToView={ranksToView}
+                    playerId={playerId}
                 />
             )}
         </>

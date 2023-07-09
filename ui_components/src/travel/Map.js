@@ -1,5 +1,5 @@
 
-export const Map = ({mapData}) => {
+export const Map = ({ mapData, scoutData, playerId }) => {
     // Visible field info
     const map_div = document.getElementsByClassName('travel-container')[0];
 
@@ -113,6 +113,12 @@ export const Map = ({mapData}) => {
                         tileWidth={tile_width}
                         tileHeight={tile_height}
                     />
+                    <MapNearbyPlayers
+                        scoutData={scoutData || []}
+                        tileWidth={tile_width}
+                        tileHeight={tile_height}
+                        playerId={playerId}
+                    />
                     <div id='map_player' style={ PlayerStyle }></div>
                 </div>
             </div>
@@ -186,11 +192,47 @@ function MapLocations({ locations, tileWidth, tileHeight }) {
                     <div className='map_locations_tooltip'>{location.name}</div>
                     {location.objective_image &&
                         <div className='map_location_objective' style={{
-                            backgroundImage: "url(." + location.objective_image + ")",
+                        backgroundImage: "url(." + location.objective_image + ")",
+                        zIndex: 5,
                         }}></div>
                     }
                 </div>
             ))}
         </div>
     );
+}
+
+function MapNearbyPlayers({ scoutData, tileWidth, tileHeight, playerId }) {
+    return (
+        <div id="scout_locations" className='map_locations'>
+            {scoutData.map((player, index) => (
+                (player.user_id != playerId) &&
+                <div key={player.user_id}
+                    className={alignmentClass(player.alignment)}
+                    style={{
+                        cursor: "pointer",
+                        top: ((player.target_y - 1) * tileHeight) + "px",
+                        left: ((player.target_x - 1) * tileWidth) + "px",
+                        }}>
+                    <div className='map_locations_tooltip'>{player.user_name}</div>
+                </div>
+            ))}
+        </div>
+    );
+}
+
+const alignmentClass = (alignment) => {
+    let class_name = 'map_location';
+    switch (alignment) {
+        case 'Ally':
+            class_name += ' player_ally';
+            break;
+        case 'Enemy':
+            class_name += ' player_enemy';
+            break;
+        case 'Neutral':
+            class_name += ' player_neutral';
+            break;
+    }
+    return class_name;
 }

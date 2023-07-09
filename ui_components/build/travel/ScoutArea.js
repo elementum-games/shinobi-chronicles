@@ -20,25 +20,25 @@ export const ScoutArea = ({
   mapData,
   scoutData,
   membersLink,
-  attackLink,
-  ranksToView
+  attackPlayer,
+  ranksToView,
+  playerId
 }) => {
   return /*#__PURE__*/React.createElement("div", {
     className: "travel-scout-container"
   }, /*#__PURE__*/React.createElement("div", {
     className: "travel-scout"
-  }, mapData && scoutData.filter(user => ranksToView[parseInt(user.rank_num)] === true).map(player_data => /*#__PURE__*/React.createElement(Player, {
+  }, mapData && scoutData.filter(user => ranksToView[parseInt(user.rank_num)] === true).map(player_data => player_data.user_id != playerId && /*#__PURE__*/React.createElement(Player, {
     key: player_data.user_id,
     player_data: player_data,
     membersLink: membersLink,
-    attackLink: attackLink
+    attackPlayer: attackPlayer
   }))));
 };
-
 const Player = ({
   player_data,
   membersLink,
-  attackLink
+  attackPlayer
 }) => {
   return /*#__PURE__*/React.createElement("div", {
     key: player_data.user_id,
@@ -57,30 +57,25 @@ const Player = ({
   })), /*#__PURE__*/React.createElement("div", {
     className: "travel-scout-attack"
   }, player_data.attack === true && parseInt(player_data.battle_id, 10) === 0 && /*#__PURE__*/React.createElement("a", {
-    href: attackLink + '&attack=' + player_data.attack_id
+    onClick: () => attackPlayer(player_data.attack_id)
   }), player_data.attack === true && parseInt(player_data.battle_id, 10) > 0 && /*#__PURE__*/React.createElement("span", {
     className: "in-battle"
   }), player_data.attack === false && player_data.direction !== 'none' && /*#__PURE__*/React.createElement("span", {
     className: `direction ${player_data.direction}`
   })));
 };
-
 const alignmentClass = alignment => {
   let class_name = 'travel-scout-entry travel-scout-';
-
   switch (alignment) {
     case 'Ally':
       class_name += 'ally';
       break;
-
     case 'Enemy':
       class_name += 'enemy';
       break;
-
     case 'Neutral':
       class_name += 'neutral';
       break;
   }
-
   return class_name;
 };
