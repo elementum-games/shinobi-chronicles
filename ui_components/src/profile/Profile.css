@@ -11,7 +11,6 @@
 
     font-size: var(--font-default); /* Override Geisha.css default */
     font-family: var(--font-secondary); /* Override Geisha.css default */
-    
 }
 
 .profile_row_first { /* Organize into rows so we can synchronize flex items */

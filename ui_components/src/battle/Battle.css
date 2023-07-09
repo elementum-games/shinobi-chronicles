@@ -2,6 +2,45 @@
     --gold-color: #FDD017;
 }
 
+/* Fighters and Status */
+.fightersRow {
+    display: flex;
+    justify-content: space-between;
+}
+
+.battleStatus {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+}
+.turnTimeLeft {
+    font-size: 28px;
+    font-weight: bold;
+    font-family: var(--font-primary);
+    font-variant: var(--font-primary-variant);
+
+    margin-top: 3px;
+}
+.status {
+    font-size: 24px;
+
+    padding: 5px 15px 2px;
+    background: rgba(0,0,0,0.1);
+    border: 1px solid rgba(255,255,255,0.1);
+
+    --corner-width: 15px;
+    clip-path: polygon(
+            0px 50%,
+            15px 0px,
+            calc(100% - 15px) 0px,
+            100% 50%,
+            calc(100% - 15px) 100%,
+            15px 100%,
+            0px 50%
+    );
+}
+
 /* BATTLE FIELD */
 .battleFieldContainer {
     padding: 10px 0;
