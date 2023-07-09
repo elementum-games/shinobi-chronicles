@@ -105,7 +105,6 @@ function Travel({
   };
   const MovePlayer = direction => {
     resetRefreshInterval();
-    setFeedback(['Moving...', 'info']);
     debug('Moving player...' + direction);
     lastTravelStartTime.current = Date.now();
     const requestStart = Date.now();
