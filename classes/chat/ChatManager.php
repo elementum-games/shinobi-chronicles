@@ -155,9 +155,10 @@ class ChatManager {
 
             $post->time_string = $time_string;
 
-            if($this->player->censor_explicit_language) {
-                $post->message = $this->system->explicitLanguageReplace($post->message);
-            }
+            $post->message = $this->system->explicitLanguageReplace(
+                text: $post->message,
+                allow_non_banned_words: !$this->player->censor_explicit_language
+            );
             $post->message = nl2br($this->system->html_parse($post->message, false, true));
 
             // Handle Mention
