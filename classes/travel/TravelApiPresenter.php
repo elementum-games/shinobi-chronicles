@@ -35,6 +35,7 @@ class TravelApiPresenter {
             'tile_height'       => $travelManager->map_data['tile_height'],
             'action_url'        => $location_action->action_url,
             'action_message'    => $location_action->action_message,
+            'invulnerable'      => ($player->last_death_ms > System::currentTimeMs() - (300 * 1000))
         ];
     }
 
@@ -56,6 +57,7 @@ class TravelApiPresenter {
                     'level'         => $nearbyPlayer->level,
                     'battle_id'     => $nearbyPlayer->battle_id,
                     'direction'     => $nearbyPlayer->direction,
+                    'invulnerable'  => $nearbyPlayer->invulnerable,
                 ];
             },
             $travelManager->fetchNearbyPlayers()

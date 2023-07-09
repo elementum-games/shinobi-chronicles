@@ -1,5 +1,5 @@
 
-export const Map = ({ mapData, scoutData, playerId, ranksToView }) => {
+export const Map = ({ mapData, scoutData, playerId, ranksToView}) => {
     // Visible field info
     const map_div = document.getElementsByClassName('travel-container')[0];
 
@@ -62,7 +62,7 @@ export const Map = ({ mapData, scoutData, playerId, ranksToView }) => {
 
     const PlayerStyle = {
         position: "absolute",
-        backgroundImage: "url(./" + mapData.player_icon + ")",
+        backgroundImage: `url(./${mapData.invulnerable ? 'images/ninja_head_grey.png' : mapData.player_icon})`,
         top: 0,
         left: 0,
         transform: `translate3d(
@@ -210,8 +210,8 @@ function MapNearbyPlayers({ scoutData, tileWidth, tileHeight, playerId, ranksToV
                 .filter(user => ranksToView[parseInt(user.rank_num)] === true)
                 .map((player, index) => (
                 (player.user_id != playerId) &&
-                <div key={player.user_id}
-                    className={alignmentClass(player.alignment)}
+                    <div key={player.user_id}
+                    className={alignmentClass(player.alignment) + " " + visibilityClass(player.invulnerable)}
                     style={{
                         cursor: "pointer",
                         top: ((player.target_y - 1) * tileHeight) + "px",
@@ -222,6 +222,13 @@ function MapNearbyPlayers({ scoutData, tileWidth, tileHeight, playerId, ranksToV
             ))}
         </div>
     );
+}
+
+const visibilityClass = (invulnerable) => {
+    if (invulnerable) {
+        return 'invulnerable';
+    }
+    return ' ';
 }
 
 const alignmentClass = (alignment) => {

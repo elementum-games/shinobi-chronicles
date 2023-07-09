@@ -196,7 +196,7 @@ class TravelManager {
      */
     public function fetchNearbyPlayers(): array {
         $sql = "SELECT `users`.`user_id`, `users`.`user_name`, `users`.`village`, `users`.`rank`, `users`.`stealth`,
-                `users`.`level`, `users`.`attack_id`, `users`.`battle_id`, `ranks`.`name` as `rank_name`, `users`.`location`
+                `users`.`level`, `users`.`attack_id`, `users`.`battle_id`, `ranks`.`name` as `rank_name`, `users`.`location`, `users`.`last_death_ms`
                 FROM `users`
                 INNER JOIN `ranks`
                 ON `users`.`rank`=`ranks`.`rank_id`
@@ -237,6 +237,12 @@ class TravelManager {
                 $user_direction = $this->user->location->directionToTarget($user_location);
             }
 
+            $invulnerable = false;
+            // determine if vulnerable to attack
+            if ($user['last_death_ms'] > System::currentTimeMs() - (300 * 1000)) {
+                $invulnerable = true;
+            }
+
             // add to return
             $return_arr[] = new NearbyPlayerDto(
                 user_id: $user['user_id'],
@@ -253,6 +259,7 @@ class TravelManager {
                 level: $user['level'],
                 battle_id: $user['battle_id'],
                 direction: $user_direction,
+                invulnerable: $invulnerable,
             );
         }
 

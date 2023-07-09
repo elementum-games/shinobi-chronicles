@@ -16,5 +16,6 @@ class NearbyPlayerDto {
         public int $level,
         public int $battle_id,
         public string $direction,
+        public bool $invulnerable = false,
     ) {}
 }

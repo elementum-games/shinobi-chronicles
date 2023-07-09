@@ -55,7 +55,7 @@ export const Map = ({
   const map_height = parseInt(mapData.end_y) - parseInt(mapData.start_y) + 1;
   const PlayerStyle = {
     position: "absolute",
-    backgroundImage: "url(./" + mapData.player_icon + ")",
+    backgroundImage: `url(./${mapData.invulnerable ? 'images/ninja_head_grey.png' : mapData.player_icon})`,
     top: 0,
     left: 0,
     transform: `translate3d(
@@ -195,7 +195,7 @@ function MapNearbyPlayers({
     className: "map_locations"
   }, scoutData.filter(user => ranksToView[parseInt(user.rank_num)] === true).map((player, index) => player.user_id != playerId && /*#__PURE__*/React.createElement("div", {
     key: player.user_id,
-    className: alignmentClass(player.alignment),
+    className: alignmentClass(player.alignment) + " " + visibilityClass(player.invulnerable),
     style: {
       cursor: "pointer",
       top: (player.target_y - 1) * tileHeight + "px",
@@ -205,6 +205,12 @@ function MapNearbyPlayers({
     className: "map_locations_tooltip"
   }, player.user_name))));
 }
+const visibilityClass = invulnerable => {
+  if (invulnerable) {
+    return 'invulnerable';
+  }
+  return ' ';
+};
 const alignmentClass = alignment => {
   let class_name = 'map_location';
   switch (alignment) {

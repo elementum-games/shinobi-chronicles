@@ -547,6 +547,9 @@
     font-family: sans-serif;
     font-weight: 600;
 }
+#content .travel-scout-name.invulnerable a {
+    color: rgba(0, 0, 0, 0.5);
+}
 #content .travel-scout-name a:hover {
     color: var(--theme-text-color-light);
 }
@@ -694,6 +697,20 @@
 
 .map_location.player_enemy {
     background: url(../../../images/ninja_head.png), radial-gradient(circle, red 70%, transparent 75%);
+    background-size: 25px 25px;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+.map_location.player_ally.invulnerable {
+    background: url(../../../images/ninja_head_grey.png);
+    background-size: 25px 25px;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+.map_location.player_enemy.invulnerable {
+    background: url(../../../images/ninja_head_grey.png);
     background-size: 25px 25px;
     background-repeat: no-repeat;
     background-position: center;

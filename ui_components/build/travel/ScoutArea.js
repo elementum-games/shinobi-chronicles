@@ -13,7 +13,8 @@
  * attack_id:       string,
  * level:           int,
  * battle_id:       int,
- * direction:       string
+ * direction:       string,
+ * invulnerable:    boolean,
  * }} player
  */
 export const ScoutArea = ({
@@ -44,7 +45,7 @@ const Player = ({
     key: player_data.user_id,
     className: alignmentClass(player_data.alignment)
   }, /*#__PURE__*/React.createElement("div", {
-    className: "travel-scout-name"
+    className: 'travel-scout-name' + " " + visibilityClass(player_data.invulnerable)
   }, /*#__PURE__*/React.createElement("a", {
     href: membersLink + '&user=' + player_data.user_name
   }, player_data.user_name), /*#__PURE__*/React.createElement("span", null, "Lv.", player_data.level, " - ", player_data.rank_name)), /*#__PURE__*/React.createElement("div", {
@@ -56,13 +57,19 @@ const Player = ({
     alt: "mist"
   })), /*#__PURE__*/React.createElement("div", {
     className: "travel-scout-attack"
-  }, player_data.attack === true && parseInt(player_data.battle_id, 10) === 0 && /*#__PURE__*/React.createElement("a", {
+  }, player_data.attack === true && parseInt(player_data.battle_id, 10) === 0 && !player_data.invulnerable && /*#__PURE__*/React.createElement("a", {
     onClick: () => attackPlayer(player_data.attack_id)
   }), player_data.attack === true && parseInt(player_data.battle_id, 10) > 0 && /*#__PURE__*/React.createElement("span", {
     className: "in-battle"
   }), player_data.attack === false && player_data.direction !== 'none' && /*#__PURE__*/React.createElement("span", {
     className: `direction ${player_data.direction}`
   })));
+};
+const visibilityClass = invulnerable => {
+  if (invulnerable) {
+    return 'invulnerable';
+  }
+  return ' ';
 };
 const alignmentClass = alignment => {
   let class_name = 'travel-scout-entry travel-scout-';
