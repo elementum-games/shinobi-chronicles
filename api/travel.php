@@ -58,7 +58,7 @@ try {
             $target_user_id = $system->db->clean($_POST['target']);
 
             $success = $TravelManager->attackPlayer($target_user_id);
-            $TravelAPIResponse->response = TravelApiPresenter::travelActionResponse($success, $player, $TravelManager);
+            $TravelAPIResponse->response = TravelApiPresenter::attackPlayerResponse($success, $system);
             break;
         default:
             API::exitWithError(message: "Invalid request!", system: $system);
