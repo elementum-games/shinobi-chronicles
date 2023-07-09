@@ -64,7 +64,6 @@ function Travel({
   playerId,
   travelPageLink,
   travelAPILink,
-  battleAPILink,
   missionLink,
   membersLink,
   travelCooldownMs
@@ -173,7 +172,7 @@ function Travel({
     setFeedback([errors, 'info']);
   }
   const AttackPlayer = target => {
-    apiFetch(battleAPILink, {
+    apiFetch(travelAPILink, {
       request: 'AttackPlayer',
       target: target
     }).then(response => {
