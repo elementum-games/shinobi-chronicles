@@ -1,7 +1,8 @@
 export const Map = ({
   mapData,
   scoutData,
-  playerId
+  playerId,
+  ranksToView
 }) => {
   // Visible field info
   const map_div = document.getElementsByClassName('travel-container')[0];
@@ -107,7 +108,8 @@ export const Map = ({
     scoutData: scoutData || [],
     tileWidth: tile_width,
     tileHeight: tile_height,
-    playerId: playerId
+    playerId: playerId,
+    ranksToView: ranksToView
   }), /*#__PURE__*/React.createElement("div", {
     id: "map_player",
     style: PlayerStyle
@@ -185,12 +187,13 @@ function MapNearbyPlayers({
   scoutData,
   tileWidth,
   tileHeight,
-  playerId
+  playerId,
+  ranksToView
 }) {
   return /*#__PURE__*/React.createElement("div", {
     id: "scout_locations",
     className: "map_locations"
-  }, scoutData.map((player, index) => player.user_id != playerId && /*#__PURE__*/React.createElement("div", {
+  }, scoutData.filter(user => ranksToView[parseInt(user.rank_num)] === true).map((player, index) => player.user_id != playerId && /*#__PURE__*/React.createElement("div", {
     key: player.user_id,
     className: alignmentClass(player.alignment),
     style: {

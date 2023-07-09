@@ -1,5 +1,5 @@
 
-export const Map = ({ mapData, scoutData, playerId }) => {
+export const Map = ({ mapData, scoutData, playerId, ranksToView }) => {
     // Visible field info
     const map_div = document.getElementsByClassName('travel-container')[0];
 
@@ -118,6 +118,7 @@ export const Map = ({ mapData, scoutData, playerId }) => {
                         tileWidth={tile_width}
                         tileHeight={tile_height}
                         playerId={playerId}
+                        ranksToView={ranksToView}
                     />
                     <div id='map_player' style={ PlayerStyle }></div>
                 </div>
@@ -202,10 +203,12 @@ function MapLocations({ locations, tileWidth, tileHeight }) {
     );
 }
 
-function MapNearbyPlayers({ scoutData, tileWidth, tileHeight, playerId }) {
+function MapNearbyPlayers({ scoutData, tileWidth, tileHeight, playerId, ranksToView }) {
     return (
         <div id="scout_locations" className='map_locations'>
-            {scoutData.map((player, index) => (
+            {scoutData
+                .filter(user => ranksToView[parseInt(user.rank_num)] === true)
+                .map((player, index) => (
                 (player.user_id != playerId) &&
                 <div key={player.user_id}
                     className={alignmentClass(player.alignment)}

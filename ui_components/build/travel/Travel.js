@@ -291,7 +291,8 @@ function Travel({
   })), mapData && scoutData && /*#__PURE__*/React.createElement(Map, {
     mapData: mapData,
     scoutData: scoutData,
-    playerId: playerId
+    playerId: playerId,
+    ranksToView: ranksToView
   }))), mapData && scoutData && /*#__PURE__*/React.createElement(ScoutArea, {
     mapData: mapData,
     scoutData: scoutData,
