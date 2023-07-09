@@ -20,8 +20,9 @@ export const ScoutArea = ({
     mapData,
     scoutData,
     membersLink,
-    attackLink,
+    attackPlayer,
     ranksToView,
+    playerId,
 }) => {
     return (
         <div className='travel-scout-container'>
@@ -29,11 +30,12 @@ export const ScoutArea = ({
                 {(mapData) && scoutData
                     .filter(user => ranksToView[parseInt(user.rank_num)] === true)
                     .map((player_data) => (
+                        (player_data.user_id != playerId) &&
                         <Player
                             key={player_data.user_id}
                             player_data={player_data}
                             membersLink={membersLink}
-                            attackLink={attackLink}
+                            attackPlayer={attackPlayer}
                         />
                     )
                 )}
@@ -45,7 +47,7 @@ export const ScoutArea = ({
 const Player = ({
     player_data,
     membersLink,
-    attackLink,
+    attackPlayer,
 }) => {
     return (
         <div key={player_data.user_id}
@@ -64,7 +66,7 @@ const Player = ({
             </div>
             <div className='travel-scout-attack'>
                 {(player_data.attack === true && parseInt(player_data.battle_id, 10) === 0) && (
-                    <a href={attackLink + '&attack=' + player_data.attack_id}></a>
+                    <a onClick={() => attackPlayer(player_data.attack_id)}></a>
                 )}
                 {(player_data.attack === true && parseInt(player_data.battle_id, 10) > 0) && (
                     <span className='in-battle'></span>

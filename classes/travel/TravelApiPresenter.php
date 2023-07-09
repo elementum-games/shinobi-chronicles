@@ -61,4 +61,12 @@ class TravelApiPresenter {
             $travelManager->fetchNearbyPlayers()
         );
     }
+
+    public static function attackPlayerResponse(bool $success, System $system): array
+    {
+        return [
+            'success' => $success,
+            'redirect' => $system->router->getUrl('battle'),
+        ];
+    }
 }
