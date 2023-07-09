@@ -19,18 +19,18 @@ if (isset($_POST['request'])) {
         switch ($request) {
             case 'AttackPlayer':
                 // Copy functionality from Battle page; TO-DO: encapsulate common functionality
-                $attack_id = $system->db->clean($_POST['target']);
+                $target_user_id = $system->db->clean($_POST['target']);
 
                 // get user id off the attack link
-                $result = $system->db->query("SELECT `user_id` FROM `users` WHERE `attack_id`='{$attack_id}' LIMIT 1");
+                $result = $system->db->query("SELECT `user_id` FROM `users` WHERE `attack_id`='{$target_user_id}' LIMIT 1");
                 if ($system->db->last_num_rows == 0) {
                     throw new RuntimeException("Invalid user!");
                 }
 
                 $attack_link = $system->db->fetch($result);
-                $attack_id = $attack_link['user_id'];
+                $target_user_id = $attack_link['user_id'];
 
-                $user = User::loadFromId($system, $attack_id);
+                $user = User::loadFromId($system, $target_user_id);
                 $user->loadData(User::UPDATE_NOTHING, true);
 
                 // check if the location forbids pvp
