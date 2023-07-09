@@ -362,7 +362,9 @@ function Travel({
                     {(mapData && scoutData) &&
                         (<Map mapData={mapData}
                             scoutData={scoutData}
-                            playerId={playerId} />)}
+                            playerId={playerId}
+                            ranksToView={ranksToView}
+                        />)}
                 </div>
             </div>
             {(mapData && scoutData) && (
