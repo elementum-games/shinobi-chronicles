@@ -68,7 +68,6 @@ type Props = {|
     +playerId: number,
     +travelPageLink: string,
     +travelAPILink: string,
-    +battleAPILink: string,
     +missionLink: string,
     +membersLink: string,
     +travelCooldownMs: number,
@@ -78,7 +77,6 @@ function Travel({
     playerId,
     travelPageLink,
     travelAPILink,
-    battleAPILink,
     missionLink,
     membersLink,
     travelCooldownMs
@@ -224,7 +222,7 @@ function Travel({
 
     const AttackPlayer = (target) => {
         apiFetch(
-            battleAPILink,
+            travelAPILink,
             {
                 request: 'AttackPlayer',
                 target: target

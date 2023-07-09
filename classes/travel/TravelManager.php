@@ -489,6 +489,68 @@ class TravelManager {
     }
 
     /**
+     * @throws RuntimeException
+     */
+    public function attackPlayer($target_user_id): bool {
+        // get user id off the attack link
+        $result = $this->system->db->query("SELECT `user_id` FROM `users` WHERE `attack_id`='{$target_user_id}' LIMIT 1");
+        if ($this->system->db->last_num_rows == 0) {
+            throw new RuntimeException("Invalid user!");
+        }
+
+        $attack_link = $this->system->db->fetch($result);
+        $target_user_id = $attack_link['user_id'];
+
+        $user = User::loadFromId($this->system, $target_user_id);
+        $user->loadData(User::UPDATE_NOTHING, true);
+
+        // check if the location forbids pvp
+        if ($this->user->current_location->location_id && $this->user->current_location->pvp_allowed == 0) {
+            throw new RuntimeException("You cannot fight at this location!");
+        }
+
+        if ($user->village->name == $this->user->village->name) {
+            throw new RuntimeException("You cannot attack people from your own village!");
+        }
+
+        if ($user->rank_num < 3) {
+            throw new RuntimeException("You cannot attack people below Chuunin rank!");
+        }
+        if ($this->user->rank_num < 3) {
+            throw new RuntimeException("You cannot attack people Chuunin rank and higher!");
+        }
+
+        if ($user->rank_num !== $this->user->rank_num) {
+            throw new RuntimeException("You can only attack people of the same rank!");
+        }
+
+        if (!$user->location->equals($this->user->location)) {
+            throw new RuntimeException("Target is not at your location!");
+        }
+        if ($user->battle_id) {
+            throw new RuntimeException("Target is in battle!");
+        }
+        if ($user->last_active < time() - 120) {
+            throw new RuntimeException("Target is inactive/offline!");
+        }
+        if ($this->user->last_death_ms > System::currentTimeMs() - (60 * 1000)) {
+            throw new RuntimeException("You died within the last minute, please wait " .
+                ceil((($this->user->last_death_ms + (60 * 1000)) - System::currentTimeMs()) / 1000) . " more seconds.");
+        }
+        if ($user->last_death_ms > System::currentTimeMs() - (60 * 1000)) {
+            throw new RuntimeException("Target has died within the last minute, please wait " .
+                ceil((($user->last_death_ms + (60 * 1000)) - System::currentTimeMs()) / 1000) . " more seconds.");
+        }
+
+        if ($this->system->USE_NEW_BATTLES) {
+            BattleV2::start($this->system, $this->user, $user, Battle::TYPE_FIGHT);
+        } else {
+            Battle::start($this->system, $this->user, $user, Battle::TYPE_FIGHT);
+        }
+        return true;
+    }
+
+    /**
      * @return array village names, keyed by travel coords str
      */
     public static function fetchVillageLocationsByCoordsStr(System $system): array {

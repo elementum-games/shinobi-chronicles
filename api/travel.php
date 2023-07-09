@@ -52,9 +52,14 @@ try {
 
             $success = $TravelManager->updateFilter($filter, $filter_value);
             $TravelAPIResponse->response = TravelApiPresenter::travelActionResponse($success, $player, $TravelManager);
-
             break;
 
+        case 'AttackPlayer':
+            $target_user_id = $system->db->clean($_POST['target']);
+
+            $success = $TravelManager->attackPlayer($target_user_id);
+            $TravelAPIResponse->response = TravelApiPresenter::travelActionResponse($success, $player, $TravelManager);
+            break;
         default:
             API::exitWithError(message: "Invalid request!", system: $system);
     }
