@@ -103,7 +103,7 @@ export const Map = ({
     locations: mapData.all_locations || [],
     tileWidth: tile_width,
     tileHeight: tile_height
-  }), /*#__PURE__*/React.createElement(ScoutLocations, {
+  }), /*#__PURE__*/React.createElement(MapNearbyPlayers, {
     scoutData: scoutData || [],
     tileWidth: tile_width,
     tileHeight: tile_height,
@@ -181,7 +181,7 @@ function MapLocations({
     }
   }))));
 }
-function ScoutLocations({
+function MapNearbyPlayers({
   scoutData,
   tileWidth,
   tileHeight,

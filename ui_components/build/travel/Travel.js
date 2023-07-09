@@ -297,7 +297,7 @@ function Travel({
     mapData: mapData,
     scoutData: scoutData,
     membersLink: membersLink,
-    attackLink: AttackPlayer,
+    attackPlayer: AttackPlayer,
     ranksToView: ranksToView,
     playerId: playerId
   }));

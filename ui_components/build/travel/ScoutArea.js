@@ -20,7 +20,7 @@ export const ScoutArea = ({
   mapData,
   scoutData,
   membersLink,
-  attackLink,
+  attackPlayer,
   ranksToView,
   playerId
 }) => {
@@ -32,13 +32,13 @@ export const ScoutArea = ({
     key: player_data.user_id,
     player_data: player_data,
     membersLink: membersLink,
-    attackLink: attackLink
+    attackPlayer: attackPlayer
   }))));
 };
 const Player = ({
   player_data,
   membersLink,
-  attackLink
+  attackPlayer
 }) => {
   return /*#__PURE__*/React.createElement("div", {
     key: player_data.user_id,
@@ -57,7 +57,7 @@ const Player = ({
   })), /*#__PURE__*/React.createElement("div", {
     className: "travel-scout-attack"
   }, player_data.attack === true && parseInt(player_data.battle_id, 10) === 0 && /*#__PURE__*/React.createElement("a", {
-    onClick: () => attackLink(player_data.attack_id)
+    onClick: () => attackPlayer(player_data.attack_id)
   }), player_data.attack === true && parseInt(player_data.battle_id, 10) > 0 && /*#__PURE__*/React.createElement("span", {
     className: "in-battle"
   }), player_data.attack === false && player_data.direction !== 'none' && /*#__PURE__*/React.createElement("span", {

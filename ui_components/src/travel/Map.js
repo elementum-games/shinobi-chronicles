@@ -113,7 +113,7 @@ export const Map = ({ mapData, scoutData, playerId }) => {
                         tileWidth={tile_width}
                         tileHeight={tile_height}
                     />
-                    <ScoutLocations
+                    <MapNearbyPlayers
                         scoutData={scoutData || []}
                         tileWidth={tile_width}
                         tileHeight={tile_height}
@@ -202,7 +202,7 @@ function MapLocations({ locations, tileWidth, tileHeight }) {
     );
 }
 
-function ScoutLocations({ scoutData, tileWidth, tileHeight, playerId }) {
+function MapNearbyPlayers({ scoutData, tileWidth, tileHeight, playerId }) {
     return (
         <div id="scout_locations" className='map_locations'>
             {scoutData.map((player, index) => (
