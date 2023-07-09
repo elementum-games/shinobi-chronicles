@@ -119,6 +119,7 @@ class Battle {
 
         if($player1 instanceof User) {
             $player1->battle_id = $battle_id;
+            $player1->last_death_ms = 0;
             $player1->updateData();
         }
         if($player2 instanceof User) {
