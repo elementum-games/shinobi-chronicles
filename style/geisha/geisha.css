@@ -576,15 +576,10 @@ p {
 
 
 /* Colors */
-a.premiumUser, a.premiumUser:hover {
-    --color-text-shadow: rgba(255, 255, 255, 0.4);
-
-    background: transparent url("/images/premium_glow.gif") repeat scroll 0 0;
-    text-shadow:
-            0 1px 1px var(--color-text-shadow),
-            0 -1px 1px var(--color-text-shadow),
-            -1px 0 1px var(--color-text-shadow),
-            1px 0 1px var(--color-text-shadow);
+#chatReactContainer a.premiumUser, #chatReactContainer a.premiumUser:hover {
+	--color-text-shadow: rgba(255, 255, 255, 0.4);
+	background: transparent url("/images/premium_glow.gif") repeat scroll 0 0;
+	text-shadow: 0 1px 1px var(--color-text-shadow), 0 -1px 1px var(--color-text-shadow), -1px 0 1px var(--color-text-shadow), 1px 0 1px var(--color-text-shadow);
 }
 a.staffMember {
 	width: 100%;
@@ -596,37 +591,33 @@ a.staffMember {
 	text-shadow: 0 -1px 1px;
 }
 
-a.blue, a.blue:hover {
-	color: #0000C0 !important;
+#chatReactContainer a.blue, #chatReactContainer a.blue:hover {
+	color: #0000C0;
 }
-a.pink, a.pink:hover {
-	color: #E030C0 !important;
+#chatReactContainer a.pink, #chatReactContainer a.pink:hover {
+	color: #E030C0;
 }
-a.gold, a.gold:hover {
-    --color-text-shadow: rgba(0,0,0,0.4);
-    text-shadow:
-            0 1px 1px var(--color-text-shadow),
-            0 -1px 1px var(--color-text-shadow),
-            -1px 0 1px var(--color-text-shadow),
-            1px 0 1px var(--color-text-shadow);
+#chatReactContainer a.gold, #chatReactContainer a.gold:hover {
+	--color-text-shadow: rgba(0,0,0,0.4);
+	text-shadow: 0 1px 1px var(--color-text-shadow), 0 -1px 1px var(--color-text-shadow), -1px 0 1px var(--color-text-shadow), 1px 0 1px var(--color-text-shadow);
 	color: rgb(255,215,0);
 }
 
-a.moderator, a.moderator:hover {
-	color: #009020 !important;
+#chatReactContainer a.moderator, #chatReactContainer a.moderator:hover {
+	color: #009020;
 }
-a.headModerator, a.headModerator:hover {
-	color: #0090A0 !important;
+#chatReactContainer a.headModerator, #chatReactContainer a.headModerator:hover {
+	color: #0090A0;
 }
-a.contentAdmin, a.contentAdmin:hover {
-    color: #A000B0 !important;
+#chatReactContainer a.contentAdmin, #chatReactContainer a.contentAdmin:hover {
+	color: #A000B0;
 }
-a.administrator, a.administrator:hover {
-	color: #A00000 !important;
+#chatReactContainer a.administrator, #chatReactContainer a.administrator:hover {
+	color: #A00000;
 }
 
-a.chat.normalUser, .chat.normalUser:hover {
-	color: #000000 !important;
+#chatReactContainer a.chat.normalUser, #chatReactContainer .chat.normalUser:hover {
+	color: #000000;
 }
 
 a.userLink {
