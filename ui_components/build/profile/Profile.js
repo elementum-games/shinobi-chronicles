@@ -165,13 +165,13 @@ function PlayerStats({
     className: "badge"
   }, "\u77E5\u80FD"), /*#__PURE__*/React.createElement("span", {
     className: "ft-c3"
-  }, "lol")), /*#__PURE__*/React.createElement("div", {
+  })), /*#__PURE__*/React.createElement("div", {
     className: "stat box-secondary"
   }, /*#__PURE__*/React.createElement("h3", null, "Willpower: ", playerStats.willpower.toLocaleString()), /*#__PURE__*/React.createElement("div", {
     className: "badge"
   }, "\u6839\u6027"), /*#__PURE__*/React.createElement("span", {
     className: "ft-c3"
-  }, "nope"))));
+  }))));
 }
 function PlayerBloodline({
   playerData,
