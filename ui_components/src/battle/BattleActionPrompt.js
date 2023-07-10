@@ -86,42 +86,9 @@ export default function BattleActionPrompt({
 
         <tr>
             <td style={{ textAlign: "center" }}>
-                <TimeRemaining
-                    turnSecondsRemaining={battle.turnSecondsRemaining}
-                    turnCount={battle.turnCount}
-                />
                 <button onClick={forfeitBattle}>Forfeit</button>
             </td>
         </tr>
         </tbody>
     </table>;
-}
-
-function TimeRemaining({
-    turnSecondsRemaining,
-    turnCount
-}) {
-    const [secondsRemaining, setSecondsRemaining] = React.useState(turnSecondsRemaining);
-
-    React.useEffect(() => {
-        setSecondsRemaining(turnSecondsRemaining);
-    }, [turnCount]);
-
-    React.useEffect(() => {
-        const decrementTimeRemaining = () => {
-            setSecondsRemaining(prevSeconds => (
-                prevSeconds <= 0
-                    ? 0
-                    : prevSeconds - 1
-            ));
-        };
-        const intervalId = setInterval(decrementTimeRemaining, 1000);
-
-        return () => clearInterval(intervalId);
-    }, []);
-
-
-    return <div>
-        <b>{secondsRemaining}</b> seconds remaining
-    </div>;
 }

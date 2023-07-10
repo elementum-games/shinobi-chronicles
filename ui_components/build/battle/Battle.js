@@ -1,9 +1,8 @@
-import FighterDisplay from "./FighterDisplay.js";
-import BattleField from "./BattleField.js";
 import BattleLog from "./BattleLog.js";
 import BattleActionPrompt from "./BattleActionPrompt.js";
 import { apiFetch } from "../utils/network.js";
 import { findPlayerJutsu } from "./playerUtils.js";
+import { FightersAndField } from "./FightersAndField.js";
 
 function Battle({
   battle: initialBattle,
@@ -99,68 +98,6 @@ function Battle({
     description: battleResult,
     isBattleComplete: battle.isComplete
   }));
-} // Fighters and Field
-
-
-function FightersAndField({
-  battle,
-  attackInput,
-  membersLink,
-  isSelectingTile,
-  selectedJutsu,
-  onTileSelect
-}) {
-  const player = battle.fighters[battle.playerId];
-  const opponent = battle.fighters[battle.opponentId];
-  const {
-    fighters,
-    field,
-    isSpectating
-  } = battle;
-
-  const handleTileSelect = tileIndex => {
-    onTileSelect(tileIndex);
-  };
-
-  return /*#__PURE__*/React.createElement("table", {
-    className: "table"
-  }, /*#__PURE__*/React.createElement("tbody", null, /*#__PURE__*/React.createElement("tr", null, /*#__PURE__*/React.createElement("th", {
-    style: {
-      width: "50%"
-    }
-  }, /*#__PURE__*/React.createElement("a", {
-    href: `${membersLink}}&user=${player.name}`,
-    style: {
-      textDecoration: "none"
-    }
-  }, player.name)), /*#__PURE__*/React.createElement("th", {
-    style: {
-      width: "50%"
-    }
-  }, opponent.isNpc ? opponent.name : /*#__PURE__*/React.createElement("a", {
-    href: `${membersLink}}&user=${opponent.name}`,
-    style: {
-      textDecoration: "none"
-    }
-  }, opponent.name))), /*#__PURE__*/React.createElement("tr", null, /*#__PURE__*/React.createElement("td", null, /*#__PURE__*/React.createElement(FighterDisplay, {
-    fighter: player,
-    showChakra: !isSpectating
-  })), /*#__PURE__*/React.createElement("td", null, /*#__PURE__*/React.createElement(FighterDisplay, {
-    fighter: opponent,
-    isOpponent: true,
-    showChakra: !isSpectating
-  }))), /*#__PURE__*/React.createElement("tr", null, /*#__PURE__*/React.createElement("td", {
-    colSpan: "2"
-  }, /*#__PURE__*/React.createElement(BattleField, {
-    player: player,
-    fighters: fighters,
-    tiles: field.tiles,
-    fighterLocations: field.fighterLocations,
-    selectedJutsu: selectedJutsu,
-    isMovementPhase: battle.isMovementPhase,
-    lastTurnLog: battle.lastTurnLog,
-    onTileSelect: handleTileSelect
-  })))));
 }
 
 function SpectateStatus() {
