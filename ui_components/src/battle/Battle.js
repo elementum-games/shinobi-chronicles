@@ -1,14 +1,13 @@
 // @flow strict-local
 
-import FighterDisplay from "./FighterDisplay.js";
-import BattleField from "./BattleField.js";
 import BattleLog from "./BattleLog.js";
 import BattleActionPrompt from "./BattleActionPrompt.js";
 
-import type { BattleType as BattleData, JutsuType } from "./battleSchema.js";
+import type { BattleType as BattleData } from "./battleSchema.js";
 import { apiFetch } from "../utils/network.js";
 import type { AttackInputFields } from "./AttackActionPrompt.js";
 import { findPlayerJutsu } from "./playerUtils.js";
+import { FightersAndField } from "./FightersAndField.js";
 
 type Props = {|
     +battle: BattleData,
@@ -130,86 +129,6 @@ function Battle({
         />
         {battleResult && <BattleResult description={battleResult} isBattleComplete={battle.isComplete} />}
     </div>;
-}
-
-// Fighters and Field
-type FightersAndFieldProps = {|
-    +battle: BattleData,
-    +attackInput: AttackInputFields,
-    +membersLink: string,
-    +isSelectingTile: boolean,
-    +selectedJutsu: ?JutsuType,
-    +onTileSelect: (tileIndex: number) => void,
-|};
-
-function FightersAndField({
-    battle,
-    attackInput,
-    membersLink,
-    isSelectingTile,
-    selectedJutsu,
-    onTileSelect
-}: FightersAndFieldProps) {
-    const player = battle.fighters[ battle.playerId ];
-    const opponent = battle.fighters[ battle.opponentId ];
-
-    const { fighters, field, isSpectating } = battle;
-
-    const handleTileSelect = (tileIndex) => {
-        onTileSelect(tileIndex);
-    };
-
-    return (
-        <table className='table'>
-            <tbody>
-            <tr>
-                <th style={{ width: "50%" }}>
-                    <a href={`${membersLink}}&user=${player.name}`} style={{ textDecoration: "none" }}>
-                        {player.name}
-                    </a>
-                </th>
-                <th style={{ width: "50%" }}>
-                    {opponent.isNpc ?
-                        opponent.name
-                        :
-                        <a href={`${membersLink}}&user=${opponent.name}`} style={{ textDecoration: "none" }}>
-                            {opponent.name}
-                        </a>
-                    }
-                </th>
-            </tr>
-            <tr>
-                <td>
-                    <FighterDisplay
-                        fighter={player}
-                        showChakra={!isSpectating}
-                    />
-                </td>
-                <td>
-                    <FighterDisplay
-                        fighter={opponent}
-                        isOpponent={true}
-                        showChakra={!isSpectating}
-                    />
-                </td>
-            </tr>
-            <tr>
-                <td colSpan='2'>
-                    <BattleField
-                        player={player}
-                        fighters={fighters}
-                        tiles={field.tiles}
-                        fighterLocations={field.fighterLocations}
-                        selectedJutsu={selectedJutsu}
-                        isMovementPhase={battle.isMovementPhase}
-                        lastTurnLog={battle.lastTurnLog}
-                        onTileSelect={handleTileSelect}
-                    />
-                </td>
-            </tr>
-            </tbody>
-        </table>
-    );
 }
 
 function SpectateStatus() {
