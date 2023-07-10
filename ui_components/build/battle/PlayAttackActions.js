@@ -107,7 +107,7 @@ function ProjectileAttack({
     "Water": '/images/battle/wave1.png',
     // https://www.freepik.com/premium-vector/blue-ocean-waves-sea-wave-water-surface-seamless-pattern-cartoon-splash-power-waters-nature-travel-beach-journey-vector-set-design-elements_31593378.htm
     "Lightning": '/images/battle/lightning_hori_wave.gif',
-    "None": '/images/battle/fireball.png'
+    "None": '/images/battle/chakra_ball.gif'
   };
   const attackImage = ninjutsuElementImages[attack.jutsuElement]; // TODO: Taijutsu/Genjutsu
 

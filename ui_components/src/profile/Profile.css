@@ -315,12 +315,12 @@
 
     background-color: var(--box-color-default);
     clip-path: polygon(
-            0 0,
-            calc(100% - 13px) 0px,
-            100% 50%,
-            calc(100% - 13px) 100%,
-            0 100%,
-            0 50%
+        0 0,
+        calc(100% - 13px) 0px,
+        100% 50%,
+        calc(100% - 13px) 100%,
+        0 100%,
+        0 50%
     );
 }
 .bloodline_name::after {
