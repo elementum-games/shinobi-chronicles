@@ -58,6 +58,7 @@ class TravelApiPresenter {
                     'battle_id'     => $nearbyPlayer->battle_id,
                     'direction'     => $nearbyPlayer->direction,
                     'invulnerable'  => $nearbyPlayer->invulnerable,
+                    'distance'      => $nearbyPlayer->distance,
                 ];
             },
             $travelManager->fetchNearbyPlayers()
