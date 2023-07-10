@@ -204,7 +204,7 @@ and run `npm run watch-ui` to automatically compile source files from the `src` 
 #### PhpStorm file watcher setup
 - Program: `$ProjectFileDir$\node_modules\.bin\babel`  
 - Arguments: `$FilePathRelativeToProjectRoot$ --out-dir ui_components/build/$FileDirRelativeToSourcepath$`  
-- Output paths to refresh: `$FileDirRelativeToSourcepath$/ui_components/build/$FileNameWithoutExtension$.js`  
+- Output paths to refresh: `ui_components/build/`  
 - Working Directory: `$ContentRoot$`  
 
 Scope
