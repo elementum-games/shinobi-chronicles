@@ -194,7 +194,6 @@ function MapLocations({ locations, tileWidth, tileHeight }) {
                     {location.objective_image &&
                         <div className='map_location_objective' style={{
                         backgroundImage: "url(." + location.objective_image + ")",
-                        zIndex: 5,
                         }}></div>
                     }
                 </div>
