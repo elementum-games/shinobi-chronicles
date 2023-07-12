@@ -323,7 +323,10 @@ abstract class Fighter {
             echo "Damage/boost/nerf: $damage / {$off_boost} / {$off_nerf}} <br />";
         }
 
-        $damage = round($damage * (1 + $off_boost) - $off_nerf, 2);
+        $damage = round(
+          ($damage * (1 + $off_boost)) - $off_nerf, 
+          2
+        );
         if($damage < 0) {
             $damage = 0;
         }
