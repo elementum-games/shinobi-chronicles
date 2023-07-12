@@ -24,6 +24,7 @@ import { ScoutArea} from "./ScoutArea.js";
     tile_height:         int,
     action_url:          string,
     action_message:      string,
+    invulnerable:        boolean,
  * }} mapData
  *
  * @param {{

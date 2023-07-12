@@ -219,12 +219,12 @@ function PlayerStats({ playerData, playerStats }) {
                 <div className="stat box-secondary">
                     <h3>Intelligence: {playerStats.intelligence.toLocaleString()}</h3>
                     <div className="badge">知能</div>
-                    <span className="ft-c3">lol</span>
+                    <span className="ft-c3"></span>
                 </div>
                 <div className="stat box-secondary">
                     <h3>Willpower: {playerStats.willpower.toLocaleString()}</h3>
                     <div className="badge">根性</div>
-                    <span className="ft-c3">nope</span>
+                    <span className="ft-c3"></span>
                 </div>
             </div>
         </div>

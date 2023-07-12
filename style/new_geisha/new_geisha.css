@@ -491,6 +491,9 @@ h3 {
 }
 
 /* User Colors */
+a.userLink:hover {
+    text-decoration: underline !important;
+}
 /* Blue */
 a.blue, a.blue:hover {
     color: #92c0ff !important;

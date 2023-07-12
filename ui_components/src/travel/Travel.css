@@ -450,6 +450,7 @@
     position: absolute;
     top: 0;
     left: 0;
+    z-index: 3;
 
     background-repeat: no-repeat;
     background-position: center;
@@ -498,6 +499,7 @@
     position: absolute;
     top: 0;
     left: 0;
+    z-index: 4;
 
     background-repeat: no-repeat;
     background-position: center;
@@ -546,6 +548,9 @@
     font-size: 1em;
     font-family: sans-serif;
     font-weight: 600;
+}
+#content .travel-scout-name.invulnerable a {
+    color: rgba(0, 0, 0, 0.5);
 }
 #content .travel-scout-name a:hover {
     color: var(--theme-text-color-light);
@@ -683,6 +688,7 @@
 /* Not sure if there's a better way to prevent choppy movement for other players? */
 #scout_locations .map_location {
     transition: all 0.45s linear;
+    z-index: 4;
 }
 
 .map_location.player_ally {
@@ -697,4 +703,12 @@
     background-size: 25px 25px;
     background-repeat: no-repeat;
     background-position: center;
+}
+
+.map_location.player_ally.invulnerable {
+    opacity: 0.5;
+}
+
+.map_location.player_enemy.invulnerable {
+    opacity: 0.5;
 }
