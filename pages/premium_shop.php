@@ -6,56 +6,40 @@ require_once __DIR__ . '/../classes/notification/NotificationManager.php';
 require_once 'templates/premium/purchase_confirmation.php';
 require_once 'templates/premium/purchase_complete.php';
 
-function premiumShop(): bool {
+function premiumShop(): void {
     global $system;
     global $player;
     global $self_link;
     
     $premiumShopManager = new PremiumShopManager($system, $player);
 
-    // Clans
-    $available_clans = array();
-
-    if ($player->clan) {
-        $system->db->query(
-            "SELECT `clan_id`, `name` FROM `clans` WHERE `village` = '{$player->village->name}' AND `clan_id` != '{$player->clan->id}' AND `bloodline_only` = '0'"
-        );
-
-        while ($village_clans = $system->db->fetch()) {
-            $available_clans[$village_clans['clan_id']] = stripslashes($village_clans['name']);
-        }
-    }
-
-    if ($player->bloodline_id && $player->clan->id != $player->bloodline->clan_id) {
-        $system->db->query(
-            sprintf("SELECT `clan_id`, `name` FROM `clans` WHERE `clan_id` = '%d'", $player->bloodline->clan_id)
-        );
-        $result = $system->db->fetch();
-        $available_clans[$result['clan_id']] = stripslashes($result['name']);
-    }
-
-    // Chat name colors
+    $available_clans = $premiumShopManager->getAvailableClans();
     $available_name_colors = $player->getNameColors();
 
     if (isset($_POST['user_reset'])) {
         try {
-            $premiumShopManager->assertUserCanReset($player);
+            $premiumShopManager->assertUserCanReset();
 
             if (!isset($_POST['confirm_reset'])) {
-                $confirmation_type = "confirm_reset";
-                $confirmation_string = "Are you sure you want to reset your character? You will lose all your stats,
-                bloodline, rank and clan. You will keep your money.";
-                $submit_value = "user_reset";
-                $button_value = "Reset my Account";
-
-                require 'templates/premium/purchase_confirmation.php';
-                return true;
+                renderPurchaseConfirmation(
+                    purchase_type: "user_reset",
+                    confirmation_type: "confirm_reset",
+                    confirmation_string: "Are you sure you want to reset your character? You will lose all your stats,
+                bloodline, rank and clan. You will keep your money.",
+                    form_action_link: $self_link,
+                    form_submit_prompt: "Reset my Account",
+                    additional_form_data: []
+                );
             }
             else {
-                $premiumShopManager->resetUser($player);
+                $result = $premiumShopManager->resetUser();
 
-                require 'templates/premium/character_reset_complete.php';
-                return true;
+                renderPurchaseComplete(
+                    title: 'Character Reset',
+                    message: "You have reset your character.<br />
+                        <a href='{$system->router->getUrl('profile')}'>Continue</a>"
+                );
+                return;
             }
         } catch (Exception $e) {
             $system->message($e->getMessage());
@@ -68,15 +52,20 @@ function premiumShop(): bool {
             if (!isset($_POST['confirm_name_change'])) {
                 $premiumShopManager->assertUserCanChangeName($new_name);
 
-                $confirmation_type = 'confirm_name_change';
-                $confirmation_string = "Are you sure you want to change your username?<br />
-                Doing this will also change your login name to the name you select.<br />
-                Changing your name will make it available for use to anyone!";
-                $additional_form_data = ['new_name' => ['input_type' => 'text', 'value' => $new_name]];
-                $submit_value = "name_change";
-                $button_value = "Confirm Change";
+                $confirmation_string = "Changing your username to: <b>{$new_name}</b>
+                <p style='max-width:500px;margin: 10px auto -15px;'>
+                Doing this will also change your login name to the name you select, and make your old name 
+                available for anyone else to use. Would you like to proceed?
+                </p>";
 
-                require 'templates/premium/purchase_confirmation.php';
+                renderPurchaseConfirmation(
+                    purchase_type: 'name_change',
+                    confirmation_type: 'confirm_name_change',
+                    confirmation_string: $confirmation_string,
+                    form_action_link: $self_link,
+                    form_submit_prompt: "Confirm Change",
+                    additional_form_data: ['new_name' => ['input_type' => 'hidden', 'value' => $new_name]]
+                );
             } else {
                $result = $premiumShopManager->changeUserName($new_name);
             }
@@ -87,33 +76,24 @@ function premiumShop(): bool {
     else if (isset($_POST['change_gender'])) {
         try {
             $new_gender = $system->db->clean($_POST['new_gender']);
-            $ak_cost = $premiumShopManager->costs['gender_change'];
-            if ($player->getPremiumCredits() < $ak_cost) {
-                throw new RuntimeException("You do not have enough Ancient Kunai!");
-            }
-            if ($player->gender == $new_gender) {
-                throw new RuntimeException("You are already a {$new_gender}!");
-            }
-            if (!in_array($new_gender, User::$genders, true)) {
-                throw new RuntimeException("Invalid gender!");
-            }
+
+            $premiumShopManager->assertUserCanChangeGender($new_gender);
 
             //Confirm purchase
             if (!isset($_POST['confirm_gender_change'])) {
-                $confirmation_type = "confirm_gender_change";
-                $confirmation_string = "Are you sure you want to change your gender to $new_gender?";
-                $additional_form_data = ['new_gender' => ['input_type' => 'hidden', 'value' => $new_gender]];
-                $submit_value = 'change_gender';
-                $button_value = 'Change Gender';
-
-                require 'templates/premium/purchase_confirmation.php';
+                renderPurchaseConfirmation(
+                    purchase_type: 'change_gender',
+                    confirmation_type: 'confirm_gender_change',
+                    confirmation_string: "Are you sure you want to change your gender to <b>$new_gender</b>?",
+                    form_action_link: $self_link,
+                    form_submit_prompt: 'Change Gender',
+                    additional_form_data: ['new_gender' => ['input_type' => 'hidden', 'value' => $new_gender]]
+                );
             }
             //Complete purchase
             else {
-                $system->message("You have changed your gender to $new_gender.");
-                $player->subtractPremiumCredits($ak_cost, "Gender change to {$new_gender}");
-                $player->gender = $new_gender;
-                $player->updateData();
+                $result = $premiumShopManager->changeGender($new_gender);
+                $system->message($result->success_message);
             }
         } catch (Exception $e) {
             $system->message($e->getMessage());
@@ -133,13 +113,15 @@ function premiumShop(): bool {
             }
 
             if (!isset($_POST['confirm_stat_reset'])) {
-                $confirmation_type = "confirm_stat_reset";
-                $confirmation_string = "Are you sure you want to reset your " . system::unSlug($stat) .
-                    " from {$player->{$stat}} to $reset_amount?";
-                $additional_form_data = ['stat' => ['input_type' => 'hidden', 'value' => $stat]];
-                $submit_value = 'stat_reset';
-                $button_value = 'Confirm Reset';
-                require 'templates/premium/purchase_confirmation.php';
+                renderPurchaseConfirmation(
+                    purchase_type: "stat_reset",
+                    confirmation_type: "confirm_stat_reset",
+                    confirmation_string: "Are you sure you want to reset your " . system::unSlug($stat) .
+                    " from {$player->{$stat}} to $reset_amount?",
+                    form_action_link: $self_link,
+                    form_submit_prompt: "Confirm Reset",
+                    additional_form_data: ['stat' => ['input_type' => 'hidden', 'value' => $stat]]
+                );
             } else {
                 $exp = ($player->{$stat} - $reset_amount) * 10;
 
@@ -172,7 +154,6 @@ function premiumShop(): bool {
                     transfer_speed: $transfer_speed
                 );
 
-                $confirmation_type = 'confirm_stat_reset';
                 $confirmation_string = "Are you sure you want to do a"
                     . ($transfer_speed == 'expedited' ? "n " : " ")
                     . "<b>" . System::unSlug($transfer_speed) . "</b>"
@@ -187,17 +168,19 @@ function premiumShop(): bool {
                     . " This will take "
                     . System::timeRemaining($time * 60, 'long', true, true);
 
-                $additional_form_data = [
-                    'original_stat' => ['input_type' => 'hidden', 'value' => $original_stat],
-                    'target_stat' => ['input_type' => 'hidden', 'value' => $target_stat],
-                    'transfer_amount' => ['input_type' => 'hidden', 'value' => $transfer_amount],
-                    'transfer_speed' => ['input_type' => 'hidden', 'value' => $transfer_speed],
-                ];
-
-                $submit_value = 'stat_allocate';
-                $button_value = 'Confirm Transfer';
-
-                require 'templates/premium/purchase_confirmation.php';
+                renderPurchaseConfirmation(
+                    purchase_type: "stat_allocate",
+                    confirmation_type: "confirm_stat_reset",
+                    confirmation_string: $confirmation_string,
+                    form_action_link: $self_link,
+                    form_submit_prompt: "Confirm Transfer",
+                    additional_form_data: [
+                        'original_stat' => ['input_type' => 'hidden', 'value' => $original_stat],
+                        'target_stat' => ['input_type' => 'hidden', 'value' => $target_stat],
+                        'transfer_amount' => ['input_type' => 'hidden', 'value' => $transfer_amount],
+                        'transfer_speed' => ['input_type' => 'hidden', 'value' => $transfer_speed],
+                    ]
+                );
             } else {
                 $premiumShopManager->transferStat(
                     original_stat: $original_stat,
@@ -206,7 +189,13 @@ function premiumShop(): bool {
                     transfer_speed: $transfer_speed
                 );
 
-                require 'templates/premium/stat_transfer_confirmation.php';
+                renderPurchaseComplete(
+                    'Stat Transfer Started',
+                    "You have started transferring {$transfer_amount} " . System::unSlug($original_stat)
+                        . " to " . System::unSlug($target_stat) . ". This will take "
+                        . System::timeRemaining($time * 60, 'long', true, true)
+
+                );
             }
         } catch (Exception $e) {
             $system->message($e->getMessage());
@@ -221,11 +210,13 @@ function premiumShop(): bool {
             }
 
             if (!isset($_POST['confirm_ai_battle_reset'])) {
-                $confirmation_type = "confirm_ai_battle_reset";
-                $confirmation_string = "Are you sure you want to reset your AI Battle Win/Losses?";
-                $submit_value = 'reset_ai_battles';
-                $button_value = 'Confirm Reset';
-                require 'templates/premium/purchase_confirmation.php';
+                renderPurchaseConfirmation(
+                    purchase_type: "reset_ai_battles",
+                    confirmation_type: "confirm_ai_battle_reset",
+                    confirmation_string: "Are you sure you want to reset your AI Battle Win/Losses?",
+                    form_action_link: $self_link,
+                    form_submit_prompt: "Confirm Reset",
+                );
             } else {
                 $player->subtractPremiumCredits($cost, 'reset_ai_battles');
                 $player->ai_wins = 0;
@@ -246,11 +237,13 @@ function premiumShop(): bool {
             }
 
             if (!isset($_POST['confirm_pvp_battle_reset'])) {
-                $confirmation_type = "confirm_pvp_battle_reset";
-                $confirmation_string = "Are you sure you want to reset your PvP Battle Win/Losses?";
-                $submit_value = 'reset_pvp_battles';
-                $button_value = 'Confirm Reset';
-                require 'templates/premium/purchase_confirmation.php';
+                renderPurchaseConfirmation(
+                    purchase_type: "reset_pvp_battles",
+                    confirmation_type: "confirm_pvp_battle_reset",
+                    confirmation_string: "Are you sure you want to reset your PvP Battle Win/Losses?",
+                    form_action_link: $self_link,
+                    form_submit_prompt: "Confirm Reset",
+                );
             } else {
                 $player->subtractPremiumCredits($cost, 'reset_pvp_battles');
                 $player->pvp_wins = 0;
@@ -283,14 +276,7 @@ function premiumShop(): bool {
 
             //Confirm purchase
             if (!isset($_POST['confirm_bloodline_purchase'])) {
-                $confirmation_type = 'confirm_bloodline_purchase';
                 $confirmation_string = "Are you sure you want to purchase the Bloodline $bloodline_name?";
-                $additional_form_data = [
-                    'bloodline_id' => ['input_type' => 'hidden', 'value' => $bloodline_id]
-                ];
-                $submit_value = 'purchase_bloodline';
-                $button_value = 'Receive Bloodline';
-                //If player has bloodline, add warning
                 if ($player->bloodline) {
                     $confirmation_string .= "<br /><b>WARNING:</b><br />
                     Purchasing the Bloodline $bloodline_name will result in the loss of your current Bloodline
@@ -299,8 +285,19 @@ function premiumShop(): bool {
                     <b>This process can not be undone!</b><br />
                     If you are part of a clan, you may also be removed from any office and be assigned a new clan.";
                 }
-                require_once 'templates/premium/purchase_confirmation.php';
-            } else {
+
+                renderPurchaseConfirmation(
+                    purchase_type: 'purchase_bloodline',
+                    confirmation_type: 'confirm_bloodline_purchase',
+                    confirmation_string: $confirmation_string,
+                    form_action_link: $self_link,
+                    form_submit_prompt: 'Receive Bloodline',
+                    additional_form_data: [
+                        'bloodline_id' => ['input_type' => 'hidden', 'value' => $bloodline_id]
+                    ]
+                );
+            }
+            else {
                 if ($player->bloodline_id == $bloodline_id) {
                     throw new RuntimeException("You already have this bloodline!");
                 }
@@ -339,14 +336,13 @@ function premiumShop(): bool {
                 if ($system->db->last_num_rows > 0) {
                     $clan_result = $system->db->fetch($result);
 
-
                     $player->clan = Clan::loadFromId($system, $clan_id);
                     $player->clan_id = $clan_id;
                     $message .= "<br />With your new bloodline you have been kicked out of your previous clan, and have been accepted by
 				    the " . $clan_result['name'] . " Clan.";
                 }
 
-                require 'templates/premium/bloodline_purchase_confirmation.php';
+                renderPurchaseComplete('New Bloodline!', $message);
             }
         } catch (Exception $e) {
             $system->message($e->getMessage());
@@ -380,27 +376,35 @@ function premiumShop(): bool {
             //Overwrite seal
             elseif ($player->forbidden_seal->level > 0) {
                 $overwrite = isset($_POST['confirm_seal_overwrite']);
+
                 // Confirm change in seal... time will not be reimbursed
                 if (!isset($_POST['change_forbidden_seal'])) {
-                    $confirmation_type = 'change_forbidden_seal';
                     // Convert remaining premium time to days and calculate AK value
                     $akCredit = $player->forbidden_seal->calcRemainingCredit();
+
                     // Adjust purchase cost with minimum 0
                     $ak_cost -= $akCredit;
                     if ($ak_cost < 0) {
                         $ak_cost = 0;
                     }
+
                     $confirmation_string = "Are you sure you would like to change from your {$player->forbidden_seal->name}?<br />
                     You will lose {$system->time_remaining($player->forbidden_seal->seal_time_remaining)} of premium time.<br />
                     Up to {$akCredit} Ancient Kunai will be credited toward your purchase from existing premium time.<br />
                     <b>This can not be undone!</b>";
-                    $additional_form_data = [
-                        'seal_level' => ['input_type' => 'hidden', 'value' => $seal_level],
-                        'seal_length' => ['input_type' => 'hidden', 'value' => $seal_length],
-                    ];
-                    $submit_value = 'forbidden_seal';
-                    $button_value = 'Confirm Seal Change';
-                    require 'templates/premium/purchase_confirmation.php';
+
+                    renderPurchaseConfirmation(
+                        purchase_type: 'forbidden_seal',
+                        confirmation_type: 'change_forbidden_seal',
+                        confirmation_string: $confirmation_string,
+                        form_action_link: $self_link,
+                        form_submit_prompt: 'Confirm Seal Change',
+                        additional_form_data: [
+                            'seal_level' => ['input_type' => 'hidden', 'value' => $seal_level],
+                            'seal_length' => ['input_type' => 'hidden', 'value' => $seal_length],
+                        ],
+                        ak_cost: $ak_cost
+                    );
                 } else {
                     $message = "Purchased " . ForbiddenSeal::$forbidden_seal_names[$seal_level] . " seal for {$seal_length} days.";
                     if ($overwrite) {
@@ -415,8 +419,10 @@ function premiumShop(): bool {
                             $ak_cost = 0;
                         }
                     }
+
                     $player->subtractPremiumCredits($ak_cost, $message);
                     $player->forbidden_seal->addSeal($seal_level, $seal_length);
+
                     $system->message("You changed your seal!");
                 }
             }
@@ -424,13 +430,16 @@ function premiumShop(): bool {
             else {
                 $player->subtractPremiumCredits($ak_cost, "Purchased " . ForbiddenSeal::$forbidden_seal_names[$seal_level]
                     . " for {$seal_length} days.");
+
                 //Load blank seal
                 $player->forbidden_seal = new ForbiddenSeal($system, 0, 0);
                 //Set new seal
                 $player->forbidden_seal->addSeal($seal_level, $seal_length);
+
                 //Load benefits for displaying market & storing in db
                 $player->forbidden_seal->setBenefits();
                 $player->forbidden_seal_loaded = true;
+
                 $system->message("Seal infused!");
             }
         } catch (Exception $e) {
@@ -536,17 +545,21 @@ function premiumShop(): bool {
             }
 
             if (!isset($_POST['confirm_village_change'])) {
-                $confirmation_type = 'confirm_village_change';
                 $confirmation_string = "Are you sure you want to move from the {$player->village->name} village to the $village
                 village? You will be kicked out of your clan and placed in a random clan in the new village.<br />
                 <b>(IMPORTANT: This is non-reversable once completed, if you want to return to your original village
                 you will have to pay a higher transfer fee)</b>";
-                $additional_form_data = [
-                    'new_village' => ['input_type' => 'hidden', 'value' => $village]
-                ];
-                $submit_value = 'change_village';
-                $button_value = 'Change Village';
-                require 'templates/premium/purchase_confirmation.php';
+
+                renderPurchaseConfirmation(
+                    purchase_type: 'change_village',
+                    confirmation_type: 'confirm_village_change',
+                    confirmation_string: $confirmation_string,
+                    form_action_link: $self_link,
+                    form_submit_prompt: 'Change Village',
+                    additional_form_data: [
+                        'new_village' => ['input_type' => 'hidden', 'value' => $village]
+                    ]
+                );
             } else {
                 //Update clan data if player holds a seat
                 if ($player->clan->leader_id == $player->user_id) {
@@ -666,15 +679,21 @@ function premiumShop(): bool {
             $clan_name = $available_clans[$new_clan_id];
 
             if (!isset($_POST['confirm_clan_change'])) {
-                $confirmation_type = 'confirm_clan_change';
                 $confirmation_string = "Are you sure you want to move from the {$player->clan->name} clan to the
                 $clan_name clan?<br /><br />
                 <b>(IMPORTANT: This is non-reversable once completed, if you want to return to your original clan you
                 will have to pay a higher transfer fee)</b><br />";
-                $additional_form_data = ['clan_change_id' => ['input_type' => 'hidden', 'value' => $new_clan_id]];
-                $submit_value = 'change_clan';
-                $button_value = 'Change Clan';
-                require 'templates/premium/purchase_confirmation.php';
+
+                renderPurchaseConfirmation(
+                    purchase_type: 'change_clan',
+                    confirmation_type: 'confirm_clan_change',
+                    confirmation_string: $confirmation_string,
+                    form_action_link: $self_link,
+                    form_submit_prompt: 'Change Clan',
+                    additional_form_data: [
+                        'clan_change_id' => ['input_type' => 'hidden', 'value' => $new_clan_id]
+                    ]
+                );
             } else {
                 // Cost
                 $player->subtractPremiumCredits(
@@ -713,8 +732,6 @@ function premiumShop(): bool {
         $view = $_GET['view'];
     }
 
-    $kunai_per_dollar = System::KUNAI_PER_DOLLAR;
-
     // Select all for bloodline list
     $bloodlines = array();
     $result = $system->db->query("SELECT * FROM `bloodlines` WHERE `rank` < 5 ORDER BY `rank` ASC");
@@ -729,16 +746,6 @@ function premiumShop(): bool {
         }
     }
 
-    // Buying shards
-    if ($system->isDevEnvironment()) {
-        $paypal_url = "https://www.sandbox.paypal.com/cgi-bin/webscr";
-        $paypal_business_id = 'lsmjudoka@lmvisions.com';
-    } else {
-        $paypal_url = 'https://www.paypal.com/cgi-bin/webscr';
-        $paypal_business_id = 'lsmjudoka05@yahoo.com';
-    }
-    $paypal_listener_url = $system->router->base_url . 'paypal_listener.php';
-
     //Load premium seals
     $baseDisplay = ForbiddenSeal::$benefits[0];
     $twinSeal = new ForbiddenSeal($system, 1);
@@ -747,20 +754,17 @@ function premiumShop(): bool {
     $fourDragonSeal->setBenefits();
 
     require "templates/premium/premium.php";
-    return true;
 }
 
-function premiumCreditExchange()
-{
+function premiumCreditExchange() {
     global $system;
-
     global $player;
-
     global $self_link;
+
     $self_link .= '&view=buy_kunai';
 
-    $price_min = 1.0;
-    $price_max = 20.0;
+    $price_min = PremiumShopManager::EXCHANGE_MIN_YEN_PER_AK;
+    $price_max = PremiumShopManager::EXCHANGE_MAX_YEN_PER_AK;
 
     // Create offer
     if (isset($_POST['new_offer'])) {

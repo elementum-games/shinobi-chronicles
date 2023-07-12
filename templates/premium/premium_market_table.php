@@ -6,21 +6,37 @@
  */
 ?>
 <style>
-    label.currency_label {
+    .premium_credit_exchange label {
         width: 11em;
         display: inline-block;
         font-weight: bold;
+        text-align: left;
+    }
+
+    .currency_amount {
+        display: inline-block;
+        width: 8.5em;
+        text-align: left;
+    }
+
+    .create_offer {
+        margin: 5px auto;
+        text-align: center;
+    }
+    .create_offer input, .create_offer select {
+        width: 9em;
+        box-sizing: border-box;
     }
 </style>
-<table class="table">
+<table class="table premium_credit_exchange">
     <tr><th colspan="4">Ancient Kunai Exchange</th></tr>
     <tr>
         <td colspan="4">
-            <div style="margin-left:15px;">
-                <label class="currency_label">Your money:</label>
-                    &yen;<?=number_format($player->getMoney())?><br />
-                <label class="currency_label">Your Ancient Kunai:</label>
-                    <?=number_format($player->getPremiumCredits())?>
+            <div style="text-align: center;">
+                <label>Your money:</label>
+                <span class='currency_amount'>&yen;<?=number_format($player->getMoney())?></span><br />
+                <label>Your Ancient Kunai:</label>
+                <span class='currency_amount'><?=number_format($player->getPremiumCredits())?></span>
             </div>
         </td>
     </tr>
@@ -55,40 +71,45 @@
                 </td>
             </tr>
         <?php endforeach ?>
-    <?php endif ?>
-</table>
+    <?php endif; ?>
+    <tr><th colspan="4">Create Offer</th></tr>
+    <td colspan="4">
+        <script type='text/javascript'>
+            function calcPreview() {
+                var total_credits = parseInt(<?=$player->getPremiumCredits()?>);
+                var premium_credits = parseInt($('#premium_credits').val());
+                var money = parseFloat($('#money option:selected').val());
+                var total_money = premium_credits * (money * 1000);
 
-<script type='text/javascript'>
-    function calcPreview() {
-        var total_credits = parseInt(<?=$player->getPremiumCredits()?>);
-        var premium_credits = parseInt($('#premium_credits').val());
-        var money = parseFloat($('#money option:selected').val());
-        var total_money = premium_credits * (money * 1000);
-
-        if(isNaN(total_money)) {
-            $('#offerPreview').html("");
-            return false;
-        }
-        else if(total_credits < premium_credits) {
-            $('#offerPreview').html("<b style='color:red;'>You do not have that much Ancient Kunai!</b>");
-        }
-        else {
-            $('#offerPreview').html('You are offering <b>' + premium_credits.toLocaleString('en-US') + '</b> Ancient Kunai for &yen;<b>'
-                + total_money.toLocaleString('en-US') + '</b>.');
-            return true;
-        }
-    }
-</script>
-<table class="table">
-    <tr><th>Create Offer</th></tr>
-    <td>
+                if(isNaN(total_money)) {
+                    $('#offerPreview').html("");
+                    return false;
+                }
+                else if(total_credits < premium_credits) {
+                    $('#offerPreview').html("<b style='color:red;'>You do not have that much Ancient Kunai!</b>");
+                }
+                else {
+                    $('#offerPreview').html('You are offering <b>' + premium_credits.toLocaleString('en-US') + '</b> Ancient Kunai for &yen;<b>'
+                        + total_money.toLocaleString('en-US') + '</b>.');
+                    return true;
+                }
+            }
+        </script>
         <form action="<?=$self_link?>" method="post">
-            <div style="margin-left: 50px;margin-bottom:5px;">
+            <div class="create_offer">
                 <label class="currency_label">Ancient Kunai:</label>
-                <input style="width:115px;" type='text' name='premium_credits' id='premium_credits' style='width:80px;margin-left:2px;' onKeyUp='calcPreview()' /><br />
+                <input
+                    type='number'
+                    name='premium_credits'
+                    id='premium_credits'
+                    min='1'
+                    max='<?= $player->getPremiumCredits() ?>'
+                    onKeyUp='calcPreview()'
+                    onchange='calcPreview()'
+                /><br />
                 <label class="currency_label">Yen Each:</label>
-                <select style="width:115px;" onchange='calcPreview();' name='money' id='money'>
-                    <?php for($i = $price_min; $i <= $price_max; $i += 0.5): ?>
+                <select name='money' id='money' onchange='calcPreview();'>
+                    <?php for($i = PremiumShopManager::EXCHANGE_MIN_YEN_PER_AK; $i <= PremiumShopManager::EXCHANGE_MAX_YEN_PER_AK; $i += 1): ?>
                         <option value='<?=sprintf("%.1f", $i)?>'>&yen;<?=number_format(sprintf("%.0f", $i*1000))?></option>
                     <?php endfor ?>
                 </select>

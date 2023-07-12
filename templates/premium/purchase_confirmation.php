@@ -6,7 +6,7 @@ function renderPurchaseConfirmation(
     string $confirmation_string,
     string $form_action_link,
     string $form_submit_prompt,
-    array $additional_form_data,
+    array $additional_form_data = [],
     int $ak_cost = 0,
 ): void {
 ?>

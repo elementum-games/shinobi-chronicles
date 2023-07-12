@@ -12,6 +12,9 @@ class PremiumShopManager {
     const SUPER_EXPEDITED_AK_COST_MULTIPLIER = 2;
     const SUPER_EXPEDITED_YEN_COST_MULTIPLIER = 2;
 
+    const EXCHANGE_MIN_YEN_PER_AK = 1.0;
+    const EXCHANGE_MAX_YEN_PER_AK = 20.0;
+
     public System $system;
     public User $player;
 
@@ -168,7 +171,7 @@ class PremiumShopManager {
         return ActionResult::succeeded();
     }
     
-    
+    // Name change
     public function userNameChangeCost(string $new_name): int {
         $cost = $this->costs['name_change'];
 
@@ -181,8 +184,7 @@ class PremiumShopManager {
 
         return $cost;
     }
-    
-    
+
     public function assertUserCanChangeName(string $new_name): void {
         $ak_cost = $this->userNameChangeCost($new_name);
         
@@ -234,7 +236,7 @@ class PremiumShopManager {
         return ActionResult::succeeded();
     }
 
-
+    // Stat transfer
     public function statTransferPremiumCreditCost(int $transfer_amount, string $transfer_speed): int {
         $is_free_stat_change =
             $transfer_amount <= $this->max_free_stat_change_amount
@@ -381,6 +383,7 @@ class PremiumShopManager {
         }
     }
 
+    // Element Change
     public function assertUserCanChangeElement(int $editing_element_index, string $new_element): void {
         $ak_cost = $this->costs['element_change'];
 
@@ -504,5 +507,70 @@ class PremiumShopManager {
                 jutsu and are now attuned to the {$new_element} nature.</b>";
 
         return ActionResult::succeeded($message);
-    } 
+    }
+
+    // Gender Change
+    public function assertUserCanChangeGender(string $new_gender): void {
+        if ($this->player->getPremiumCredits() < $this->costs['gender_change']) {
+            throw new RuntimeException("You do not have enough Ancient Kunai!");
+        }
+        if ($this->player->gender == $new_gender) {
+            throw new RuntimeException("Your gender is already {$new_gender}!");
+        }
+        if (!in_array($new_gender, User::$genders, true)) {
+            throw new RuntimeException("Invalid gender!");
+        }
+    }
+
+    public function changeGender(string $new_gender): ActionResult {
+        $this->assertUserCanChangeGender($new_gender);
+
+        $this->player->subtractPremiumCredits($this->costs['gender_change'], "Gender change to {$new_gender}");
+        $this->player->gender = $new_gender;
+        $this->player->updateData();
+
+        return ActionResult::succeeded("You have changed your gender to $new_gender.");
+    }
+
+    // Buying shards
+    public function getPaypalUrl(): string {
+        return $this->system->isDevEnvironment()
+            ? "https://www.sandbox.paypal.com/cgi-bin/webscr"
+            : "https://www.paypal.com/cgi-bin/webscr";
+    }
+
+    public function getPaypalBusinessId(): string {
+        return $this->system->isDevEnvironment()
+            ? 'lsmjudoka@lmvisions.com'
+            : 'lsmjudoka05@yahoo.com';
+    }
+
+    public function getPaypalListenerUrl(): string {
+        return $this->system->router->base_url . 'paypal_listener.php';
+    }
+
+    public function getAvailableClans(): array {
+        $available_clans = [];
+
+        if ($this->player->clan) {
+            $this->system->db->query(
+                "SELECT `clan_id`, `name` FROM `clans` WHERE `village` = '{$this->player->village->name}' AND `clan_id` != '{$this->player->clan->id}' AND `bloodline_only` = '0'"
+            );
+
+            while ($village_clans = $this->system->db->fetch()) {
+                $available_clans[$village_clans['clan_id']] = stripslashes($village_clans['name']);
+            }
+        }
+
+        if ($this->player->bloodline_id && $this->player->clan->id != $this->player->bloodline->clan_id) {
+            $this->system->db->query(
+                sprintf("SELECT `clan_id`, `name` FROM `clans` WHERE `clan_id` = '%d'", $this->player->bloodline->clan_id)
+            );
+            $result = $this->system->db->fetch();
+            $available_clans[$result['clan_id']] = stripslashes($result['name']);
+        }
+
+        return $available_clans;
+    }
+
 }

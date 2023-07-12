@@ -10,7 +10,6 @@
  * @var array  $available_clans
  * @var array $available_name_colors
  * @var array $baseDisplay;
- * @var int $kunai_per_dollar
  *
  * @var string $paypal_url
  * @var string $paypal_business_id
