@@ -228,7 +228,7 @@ $layout->renderBeforeContentHTML($system, $player ?? null, 'Manual');
             <tr>
               <td class="row1" style="text-align: center; padding: 7px 20px">Genin</td>
               <td class="row1" style="text-align: center; padding: 7px 20px">25</td>
-              <td class="row1" style="text-align: center; padding: 7px 20px">7,500</td>
+              <td class="row1" style="text-align: center; padding: 7px 20px">10,000</td>
             </tr>
             <tr>
               <td class="row1" style="text-align: center; padding: 7px 20px">Chunin</td>
