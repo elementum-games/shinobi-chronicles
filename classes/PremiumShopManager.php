@@ -380,4 +380,129 @@ class PremiumShopManager {
                 throw new RuntimeException("Invalid transfer type!");
         }
     }
+
+    public function assertUserCanChangeElement(int $editing_element_index, string $new_element): void {
+        $ak_cost = $this->costs['element_change'];
+
+        //Player already has new element
+        if (in_array($new_element, $this->player->elements)) {
+            throw new RuntimeException("You already attuned to the $new_element element!");
+        }
+        //Check player's current element is valid
+        switch ($this->player->elements[$editing_element_index]) {
+            case Jutsu::ELEMENT_FIRE:
+            case Jutsu::ELEMENT_WIND:
+            case Jutsu::ELEMENT_LIGHTNING:
+            case Jutsu::ELEMENT_EARTH:
+            case Jutsu::ELEMENT_WATER:
+                break;
+            default:
+                throw new RuntimeException("The $editing_element_index element ({$this->player->elements[$editing_element_index]}) is invalid!");
+        }
+        //Check that new element is valid
+        switch ($new_element) {
+            case Jutsu::ELEMENT_FIRE:
+            case Jutsu::ELEMENT_WIND:
+            case Jutsu::ELEMENT_LIGHTNING:
+            case Jutsu::ELEMENT_EARTH:
+            case Jutsu::ELEMENT_WATER:
+                break;
+            default:
+                throw new RuntimeException("New element $new_element is invalid!");
+        }
+
+        if ($editing_element_index > $this->player->rank_num - 2) {
+            throw new RuntimeException("Invalid element slot!");
+        }
+
+        //Check cost
+        if ($this->player->getPremiumCredits() < $ak_cost) {
+            throw new RuntimeException("You do not have enough Ancient Kunai!");
+        }
+    }
+    
+    public function changeElement(int $editing_element_index, string $new_element): ActionResult {
+        $this->assertUserCanChangeElement($editing_element_index, $new_element);
+
+        $ak_cost = $this->costs['element_change'];
+        $previous_element = $this->player->elements[$editing_element_index];
+
+        // Process purchase
+        $this->player->subtractPremiumCredits(
+            $ak_cost,
+            "Changed element #{$editing_element_index} from {$this->player->elements[$editing_element_index]} to $new_element"
+        );
+
+        $this->player->getInventory();
+
+        if (isset($this->player->elements[$editing_element_index])) {
+            foreach ($this->player->jutsu as $jutsu) {
+                if ($jutsu->element == $this->player->elements[0]) {
+                    $this->player->removeJutsu($jutsu->id);
+                }
+            }
+            $this->player->elements[$editing_element_index] = $new_element;
+        }
+
+        $this->player->updateData();
+        $this->player->updateInventory();
+
+        $message = '';
+        switch ($new_element) {
+            case Jutsu::ELEMENT_FIRE:
+                $message = "With the image of blazing fires in your mind, you flow chakra from your stomach,
+                    down through your legs and into the seal on the floor. Suddenly one of the pedestals bursts into
+                    fire, breaking your focus, and the elders smile and say:<br /
+                    <br />\"Congratulations, you now have the Fire element. Fire is the embodiment of
+                    consuming destruction, that devours anything in its path. Your Fire jutsu will be strong against Wind jutsu, as
+                    they will only fan the flames and strengthen your jutsu. However, you must be careful against Water jutsu, as they
+                    can extinguish your fires.\"
+                    <br />";
+                break;
+            case Jutsu::ELEMENT_WIND:
+                $message = "Picturing a tempestuous tornado, you flow chakra from your stomach,
+                    down through your legs and into the seal on the floor. You feel a disturbance in the room and
+                    suddenly realize that a small whirlwind has formed around one of the pedestals, and the elders smile and say:<br /
+                    <br />\"Congratulations, you have the Wind element. Wind is the sharpest out of all chakra natures,
+                    and can slice through anything when used properly. Your Wind chakra will be strong against
+                    Lightning jutsu, as you can cut and dissipate it, but you will be weak against Fire jutsu,
+                    because your wind only serves to fan their flames and make them stronger.\"
+                    <br />";
+                break;
+            case Jutsu::ELEMENT_LIGHTNING:
+                $message = "Imagining the feel of electricity coursing through your veins, you flow chakra from your stomach,
+                    down through your legs and into the seal on the floor. Suddenly you feel a charge in the air and
+                    one of the pedestals begins to spark with crackling electricity, and the elders smile and say:<br />
+                    <br />\"Congratulations, you have the Lightning element. Lightning embodies pure speed, and skilled users of
+                    this element physically augment themselves to swiftly strike through almost anything. Your Lightning
+                    jutsu will be strong against Earth as your speed can slice straight through the slower techniques of Earth,
+                    but you must be careful against Wind jutsu as they will dissipate your Lightning.\"
+                    <br />";
+                break;
+            case Jutsu::ELEMENT_EARTH:
+                $message = "Envisioning stone as hard as the temple you are sitting in, you flow chakra from your stomach,
+                    down through your legs and into the seal on the floor. Suddenly dirt from nowhere begins to fall off one of the
+                    pedestals and the elders smile and say:<br />
+                    <br />\"Congratulations, you have the Earth element. Earth
+                    is the hardiest of elements and can protect you or your teammates from enemy attacks. Your Earth jutsu will be
+                    strong against Water jutsu, as you can turn the water to mud and render it useless, but you will be weak to
+                    Lightning jutsu, as they are one of the few types that can swiftly evade and strike through your techniques.\"
+                    <br />";
+                break;
+            case Jutsu::ELEMENT_WATER:
+                $message = "With thoughts of splashing rivers flowing through your mind, you flow chakra from your stomach,
+                    down through your legs and into the seal on the floor. Suddenly a small geyser erupts from one of
+                    the pedestals, and the elders smile and say:<br />
+                    <br />\"Congratulations, you have the Water element. Water is a versatile element that can control the flow
+                    of the battle, trapping enemies or launching large-scale attacks at them. Your Water jutsu will be strong against
+                    Fire jutsu because you can extinguish them, but Earth jutsu can turn your water into mud and render it useless.\"
+                    <br />";
+                break;
+        }
+
+        $message .=  "<b style='color:green'>You have forgotten the {$previous_element} nature and all its
+                jutsu and are now attuned to the {$new_element} nature.</b>";
+
+        return ActionResult::succeeded($message);
+    } 
 }
