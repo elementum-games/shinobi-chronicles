@@ -706,15 +706,9 @@
 }
 
 .map_location.player_ally.invulnerable {
-    background: url(../../../images/ninja_head_grey.png);
-    background-size: 25px 25px;
-    background-repeat: no-repeat;
-    background-position: center;
+    opacity: 0.5;
 }
 
 .map_location.player_enemy.invulnerable {
-    background: url(../../../images/ninja_head_grey.png);
-    background-size: 25px 25px;
-    background-repeat: no-repeat;
-    background-position: center;
+    opacity: 0.5;
 }
