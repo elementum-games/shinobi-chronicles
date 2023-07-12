@@ -3,7 +3,10 @@
 require_once __DIR__ . '/../classes/PremiumShopManager.php';
 require_once __DIR__ . '/../classes/notification/NotificationManager.php';
 
-function premium(): bool {
+require_once 'templates/premium/purchase_confirmation.php';
+require_once 'templates/premium/purchase_complete.php';
+
+function premiumShop(): bool {
     global $system;
     global $player;
     global $self_link;
@@ -84,8 +87,8 @@ function premium(): bool {
     else if (isset($_POST['change_gender'])) {
         try {
             $new_gender = $system->db->clean($_POST['new_gender']);
-            $akCost = $premiumShopManager->costs['gender_change'];
-            if ($player->getPremiumCredits() < $akCost) {
+            $ak_cost = $premiumShopManager->costs['gender_change'];
+            if ($player->getPremiumCredits() < $ak_cost) {
                 throw new RuntimeException("You do not have enough Ancient Kunai!");
             }
             if ($player->gender == $new_gender) {
@@ -108,7 +111,7 @@ function premium(): bool {
             //Complete purchase
             else {
                 $system->message("You have changed your gender to $new_gender.");
-                $player->subtractPremiumCredits($akCost, "Gender change to {$new_gender}");
+                $player->subtractPremiumCredits($ak_cost, "Gender change to {$new_gender}");
                 $player->gender = $new_gender;
                 $player->updateData();
             }
@@ -275,7 +278,7 @@ function premium(): bool {
             }
             //Load BL data
             $result = $system->db->fetch($result);
-            $akCost = $premiumShopManager->costs['bloodline'][$result['rank']];
+            $ak_cost = $premiumShopManager->costs['bloodline'][$result['rank']];
             $bloodline_name = $result['name'];
 
             //Confirm purchase
@@ -301,7 +304,7 @@ function premium(): bool {
                 if ($player->bloodline_id == $bloodline_id) {
                     throw new RuntimeException("You already have this bloodline!");
                 }
-                if ($player->getPremiumCredits() < $akCost) {
+                if ($player->getPremiumCredits() < $ak_cost) {
                     throw new RuntimeException("You do not have enough Ancient Kunai!");
                 }
                 //Check clan office detail & remove player from clan data if present
@@ -318,7 +321,7 @@ function premium(): bool {
                 }
 
                 //Process purchase
-                $player->subtractPremiumCredits($akCost, "Purchased bloodline {$bloodline_name} (#$bloodline_id)");
+                $player->subtractPremiumCredits($ak_cost, "Purchased bloodline {$bloodline_name} (#$bloodline_id)");
 
                 // Give bloodline
                 $status = Bloodline::giveBloodline(
@@ -362,15 +365,15 @@ function premium(): bool {
             if (!isset($premiumShopManager->costs['forbidden_seal'][$seal_level][$seal_length])) {
                 throw new RuntimeException("Invalid seal length!");
             }
-            $akCost = $premiumShopManager->costs['forbidden_seal'][$seal_level][$seal_length];
+            $ak_cost = $premiumShopManager->costs['forbidden_seal'][$seal_level][$seal_length];
             //Check cost
-            if ($player->getPremiumCredits() < $akCost) {
+            if ($player->getPremiumCredits() < $ak_cost) {
                 throw new RuntimeException("You do not have enough Ancient Kunai!");
             }
 
             //Extend seal
             if ($player->forbidden_seal->level == $seal_level) {
-                $player->subtractPremiumCredits($akCost, "Extended {$player->forbidden_seal->name} by {$seal_length} days.");
+                $player->subtractPremiumCredits($ak_cost, "Extended {$player->forbidden_seal->name} by {$seal_length} days.");
                 $player->forbidden_seal->addSeal($seal_level, $seal_length);
                 $system->message("Seal extended!");
             }
@@ -383,9 +386,9 @@ function premium(): bool {
                     // Convert remaining premium time to days and calculate AK value
                     $akCredit = $player->forbidden_seal->calcRemainingCredit();
                     // Adjust purchase cost with minimum 0
-                    $akCost -= $akCredit;
-                    if ($akCost < 0) {
-                        $akCost = 0;
+                    $ak_cost -= $akCredit;
+                    if ($ak_cost < 0) {
+                        $ak_cost = 0;
                     }
                     $confirmation_string = "Are you sure you would like to change from your {$player->forbidden_seal->name}?<br />
                     You will lose {$system->time_remaining($player->forbidden_seal->seal_time_remaining)} of premium time.<br />
@@ -407,19 +410,19 @@ function premium(): bool {
                     // Recalculate adjusted akCost
                     if ($player->forbidden_seal->level > 0) {
                         $akCredit = $player->forbidden_seal->calcRemainingCredit();
-                        $akCost -= $akCredit;
-                        if ($akCost < 0) {
-                            $akCost = 0;
+                        $ak_cost -= $akCredit;
+                        if ($ak_cost < 0) {
+                            $ak_cost = 0;
                         }
                     }
-                    $player->subtractPremiumCredits($akCost, $message);
+                    $player->subtractPremiumCredits($ak_cost, $message);
                     $player->forbidden_seal->addSeal($seal_level, $seal_length);
                     $system->message("You changed your seal!");
                 }
             }
             //New seal
             else {
-                $player->subtractPremiumCredits($akCost, "Purchased " . ForbiddenSeal::$forbidden_seal_names[$seal_level]
+                $player->subtractPremiumCredits($ak_cost, "Purchased " . ForbiddenSeal::$forbidden_seal_names[$seal_level]
                     . " for {$seal_length} days.");
                 //Load blank seal
                 $player->forbidden_seal = new ForbiddenSeal($system, 0, 0);
@@ -456,139 +459,36 @@ function premium(): bool {
     }
     else if (isset($_POST['change_element']) && $player->rank_num >= 3) {
         try {
-            $akCost = $premiumShopManager->costs['element_change'];
-            $editing_element_index = (int) $_POST['editing_element_index'];
+            $editing_element_index = (int)$_POST['editing_element_index'];
             $new_element = $system->db->clean($_POST['new_element']);
-            //Player already has new element
-            if (in_array($new_element, $player->elements)) {
-                throw new RuntimeException("You already attuned to the $new_element element!");
-            }
-            //Check player's current element is valid
-            switch ($player->elements[$editing_element_index]) {
-                case Jutsu::ELEMENT_FIRE:
-                case Jutsu::ELEMENT_WIND:
-                case Jutsu::ELEMENT_LIGHTNING:
-                case Jutsu::ELEMENT_EARTH:
-                case Jutsu::ELEMENT_WATER:
-                    break;
-                default:
-                    throw new RuntimeException("The $editing_element_index element ({$player->elements[$editing_element_index]}) is invalid!");
-            }
-            //Check that new element is valid
-            switch ($new_element) {
-                case Jutsu::ELEMENT_FIRE:
-                case Jutsu::ELEMENT_WIND:
-                case Jutsu::ELEMENT_LIGHTNING:
-                case Jutsu::ELEMENT_EARTH:
-                case Jutsu::ELEMENT_WATER:
-                    break;
-                default:
-                    throw new RuntimeException("New element $new_element is invalid!");
-            }
 
-            if ($editing_element_index > $player->rank_num - 2) {
-                throw new RuntimeException("Invalid element slot!");
-            }
-
-            //Check cost
-            if ($player->getPremiumCredits() < $akCost) {
-                throw new RuntimeException("You do not have enough Ancient Kunai!");
-            }
+            $premiumShopManager->assertUserCanChangeElement($editing_element_index, $new_element);
 
             //Confirm purchase
             if (!isset($_POST['confirm_chakra_element_change'])) {
-                $confirmation_type = 'confirm_chakra_element_change';
                 $confirmation_string = "Are you sure you want to <b>forget the {$player->elements[$editing_element_index]} nature</b>
                 and any jutsus you have to <b>attune to the $new_element nature</b>?<br />
                 <br />
                 <b>(IMPORTANT: This is non-reversable once completed! If you want to return to your original element you
                 will have to pay another fee. You will forget any elemental jutsu you currently have of this nature.)</b>";
-                $additional_form_data = [
-                    'current_element' => ['input_type' => 'hidden', 'value' => $editing_element_index],
-                    'new_element' => ['input_type' => 'hidden', 'value' => $new_element],
-                ];
-                $submit_value = 'change_element';
-                $button_value = 'Change Element';
 
-                require 'templates/premium/purchase_confirmation.php';
-            } else {
-                //Display purchase information
-                $message = '';
-                switch ($new_element) {
-                    case Jutsu::ELEMENT_FIRE:
-                        $message = "With the image of blazing fires in your mind, you flow chakra from your stomach,
-                    down through your legs and into the seal on the floor. Suddenly one of the pedestals bursts into
-                    fire, breaking your focus, and the elders smile and say:<br /
-                    <br />\"Congratulations, you now have the Fire element. Fire is the embodiment of
-                    consuming destruction, that devours anything in its path. Your Fire jutsu will be strong against Wind jutsu, as
-                    they will only fan the flames and strengthen your jutsu. However, you must be careful against Water jutsu, as they
-                    can extinguish your fires.\"
-                    <br />";
-                        break;
-                    case Jutsu::ELEMENT_WIND:
-                        $message = "Picturing a tempestuous tornado, you flow chakra from your stomach,
-                    down through your legs and into the seal on the floor. You feel a disturbance in the room and
-                    suddenly realize that a small whirlwind has formed around one of the pedestals, and the elders smile and say:<br /
-                    <br />\"Congratulations, you have the Wind element. Wind is the sharpest out of all chakra natures,
-                    and can slice through anything when used properly. Your Wind chakra will be strong against
-                    Lightning jutsu, as you can cut and dissipate it, but you will be weak against Fire jutsu,
-                    because your wind only serves to fan their flames and make them stronger.\"
-                    <br />";
-                        break;
-                    case Jutsu::ELEMENT_LIGHTNING:
-                        $message = "Imagining the feel of electricity coursing through your veins, you flow chakra from your stomach,
-                    down through your legs and into the seal on the floor. Suddenly you feel a charge in the air and
-                    one of the pedestals begins to spark with crackling electricity, and the elders smile and say:<br />
-                    <br />\"Congratulations, you have the Lightning element. Lightning embodies pure speed, and skilled users of
-                    this element physically augment themselves to swiftly strike through almost anything. Your Lightning
-                    jutsu will be strong against Earth as your speed can slice straight through the slower techniques of Earth,
-                    but you must be careful against Wind jutsu as they will dissipate your Lightning.\"
-                    <br />";
-                        break;
-                    case Jutsu::ELEMENT_EARTH:
-                        $message = "Envisioning stone as hard as the temple you are sitting in, you flow chakra from your stomach,
-                    down through your legs and into the seal on the floor. Suddenly dirt from nowhere begins to fall off one of the
-                    pedestals and the elders smile and say:<br />
-                    <br />\"Congratulations, you have the Earth element. Earth
-                    is the hardiest of elements and can protect you or your teammates from enemy attacks. Your Earth jutsu will be
-                    strong against Water jutsu, as you can turn the water to mud and render it useless, but you will be weak to
-                    Lightning jutsu, as they are one of the few types that can swiftly evade and strike through your techniques.\"
-                    <br />";
-                        break;
-                    case Jutsu::ELEMENT_WATER:
-                        $message = "With thoughts of splashing rivers flowing through your mind, you flow chakra from your stomach,
-                    down through your legs and into the seal on the floor. Suddenly a small geyser erupts from one of
-                    the pedestals, and the elders smile and say:<br />
-                    <br />\"Congratulations, you have the Water element. Water is a versatile element that can control the flow
-                    of the battle, trapping enemies or launching large-scale attacks at them. Your Water jutsu will be strong against
-                    Fire jutsu because you can extinguish them, but Earth jutsu can turn your water into mud and render it useless.\"
-                    <br />";
-                        break;
-                }
-
-                require 'templates/premium/chakra_purchase_confirmation.php';
-
-                // Process purchase
-                $player->subtractPremiumCredits(
-                    $akCost,
-                    "Changed element #{$editing_element_index} from {$player->elements[$editing_element_index]} to $new_element"
+                renderPurchaseConfirmation(
+                    purchase_type: 'change_element',
+                    confirmation_type: 'confirm_chakra_element_change',
+                    confirmation_string: $confirmation_string,
+                    form_action_link: $self_link,
+                    form_submit_prompt: 'Change Element',
+                    additional_form_data: [
+                        'editing_element_index' => ['input_type' => 'hidden', 'value' => $editing_element_index],
+                        'new_element' => ['input_type' => 'hidden', 'value' => $new_element],
+                    ],
+                    ak_cost: $premiumShopManager->costs['element_change'],
                 );
+            }
+            else {
+                $result = $premiumShopManager->changeElement($editing_element_index, $new_element);
 
-                $player->getInventory();
-
-                // rank check
-
-                if (isset($player->elements[$editing_element_index])) {
-                    foreach ($player->jutsu as $jutsu) {
-                        if ($jutsu->element == $player->elements[0]) {
-                            $player->removeJutsu($jutsu->id);
-                        }
-                    }
-                    $player->elements[$editing_element_index] = $new_element;
-                }
-
-                $player->updateData();
-                $player->updateInventory();
+                renderPurchaseComplete("Chakra Element Change", $result->success_message);
             }
         } catch (Exception $e) {
             $system->message($e->getMessage());
@@ -597,7 +497,7 @@ function premium(): bool {
     }
     else if (isset($_POST['change_village']) && $player->rank_num >= 2) {
         $village = $_POST['new_village'];
-        $akCost = $premiumShopManager->costs['village_change'];
+        $ak_cost = $premiumShopManager->costs['village_change'];
         try {
             if ($village == $player->village->name) {
                 throw new RuntimeException("Invalid village!");
@@ -620,7 +520,7 @@ function premium(): bool {
                 throw new RuntimeException($debug . "You must leave your team first!");
             }
 
-            if ($player->getPremiumCredits() < $akCost) {
+            if ($player->getPremiumCredits() < $ak_cost) {
                 throw new RuntimeException("You do not have enough Ancient Kunai!");
             }
 
@@ -669,7 +569,7 @@ function premium(): bool {
                 }
 
                 // Cost
-                $player->subtractPremiumCredits($akCost, "Changed villages from {$player->village->name} to $village");
+                $player->subtractPremiumCredits($ak_cost, "Changed villages from {$player->village->name} to $village");
                 $player->village_changes++;
 
                 // Village
@@ -751,7 +651,7 @@ function premium(): bool {
     }
     else if (isset($_POST['change_clan']) && $player->rank_num >= 2) {
         $new_clan_id = abs((int) $_POST['clan_change_id']);
-        $akCost = $premiumShopManager->costs['clan_change'];
+        $ak_cost = $premiumShopManager->costs['clan_change'];
         try {
             //Check if clan exists and playe not in clan
             $clan_exists = in_array($new_clan_id, array_keys($available_clans));
@@ -759,7 +659,7 @@ function premium(): bool {
                 throw new RuntimeException("Invalid clan!");
             }
 
-            if ($player->getPremiumCredits() < $akCost) {
+            if ($player->getPremiumCredits() < $ak_cost) {
                 throw new RuntimeException("You do not have enough Ancient Kunai!");
             }
 
@@ -778,7 +678,7 @@ function premium(): bool {
             } else {
                 // Cost
                 $player->subtractPremiumCredits(
-                    $akCost,
+                    $ak_cost,
                     "Changed clan from {$player->clan->name} ({$player->clan->id}) to $clan_name ({$new_clan_id})"
                 );
                 $player->clan_changes++;

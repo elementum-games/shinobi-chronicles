@@ -3,11 +3,20 @@
 class ActionResult {
     public bool $failed;
 
+    public bool $succeeded;
+    public string $error_message = "";
+    public ?string $success_message = null;
+
     private function __construct(
-        public bool $succeeded,
-        public string $error_message = "",
+        bool $succeeded,
+        string $error_message = "",
+        ?string $success_message = null
     ) {
+        $this->succeeded = $succeeded;
         $this->failed = !$this->succeeded;
+
+        $this->error_message = $error_message;
+        $this->success_message = $success_message;
     }
 
     public static function failed(string $error_message): ActionResult {
@@ -17,7 +26,10 @@ class ActionResult {
         );
     }
 
-    public static function succeeded(): ActionResult {
-        return new ActionResult(succeeded: true);
+    public static function succeeded(?string $success_message = null): ActionResult {
+        return new ActionResult(
+            succeeded: true,
+            success_message: $success_message
+        );
     }
 }

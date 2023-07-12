@@ -163,9 +163,9 @@ return $routes = [
         menu: 'conditional',
     ),
     21 => new Route(
-        file_name: 'premium.php',
+        file_name: 'premium_shop.php',
         title: 'Ancient Market',
-        function_name: 'premium',
+        function_name: 'premiumShop',
         menu: Route::MENU_VILLAGE,
     ),
     33 => new Route(
