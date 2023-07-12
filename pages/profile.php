@@ -98,7 +98,7 @@ function renderProfileSubmenu(): void {
     ];
     if($player->rank_num > 1) {
         $submenu_links[] = [
-            'link' => $system->router->getUrl('profile', ['page' => 'send_money']),
+            'link' => $system->router->links['send_money'],
             'title' => 'Send Money/AK',
         ];
     }

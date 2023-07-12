@@ -1,5 +1,5 @@
 
-export const Map = ({mapData}) => {
+export const Map = ({ mapData, scoutData, playerId, ranksToView}) => {
     // Visible field info
     const map_div = document.getElementsByClassName('travel-container')[0];
 
@@ -62,7 +62,7 @@ export const Map = ({mapData}) => {
 
     const PlayerStyle = {
         position: "absolute",
-        backgroundImage: "url(./" + mapData.player_icon + ")",
+        backgroundImage: `url(./${mapData.invulnerable ? 'images/ninja_head_grey.png' : mapData.player_icon})`,
         top: 0,
         left: 0,
         transform: `translate3d(
@@ -112,6 +112,13 @@ export const Map = ({mapData}) => {
                         locations={mapData.all_locations || []}
                         tileWidth={tile_width}
                         tileHeight={tile_height}
+                    />
+                    <MapNearbyPlayers
+                        scoutData={scoutData || []}
+                        tileWidth={tile_width}
+                        tileHeight={tile_height}
+                        playerId={playerId}
+                        ranksToView={ranksToView}
                     />
                     <div id='map_player' style={ PlayerStyle }></div>
                 </div>
@@ -186,11 +193,55 @@ function MapLocations({ locations, tileWidth, tileHeight }) {
                     <div className='map_locations_tooltip'>{location.name}</div>
                     {location.objective_image &&
                         <div className='map_location_objective' style={{
-                            backgroundImage: "url(." + location.objective_image + ")",
+                        backgroundImage: "url(." + location.objective_image + ")",
                         }}></div>
                     }
                 </div>
             ))}
         </div>
     );
+}
+
+function MapNearbyPlayers({ scoutData, tileWidth, tileHeight, playerId, ranksToView }) {
+    return (
+        <div id="scout_locations" className='map_locations'>
+            {scoutData
+                .filter(user => ranksToView[parseInt(user.rank_num)] === true)
+                .map((player, index) => (
+                (player.user_id != playerId) &&
+                    <div key={player.user_id}
+                    className={alignmentClass(player.alignment) + " " + visibilityClass(player.invulnerable)}
+                    style={{
+                        cursor: "pointer",
+                        top: ((player.target_y - 1) * tileHeight) + "px",
+                        left: ((player.target_x - 1) * tileWidth) + "px",
+                        }}>
+                    <div className='map_locations_tooltip'>{player.user_name}</div>
+                </div>
+            ))}
+        </div>
+    );
+}
+
+const visibilityClass = (invulnerable) => {
+    if (invulnerable) {
+        return 'invulnerable';
+    }
+    return ' ';
+}
+
+const alignmentClass = (alignment) => {
+    let class_name = 'map_location';
+    switch (alignment) {
+        case 'Ally':
+            class_name += ' player_ally';
+            break;
+        case 'Enemy':
+            class_name += ' player_enemy';
+            break;
+        case 'Neutral':
+            class_name += ' player_neutral';
+            break;
+    }
+    return class_name;
 }

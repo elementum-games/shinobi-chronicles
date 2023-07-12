@@ -64,8 +64,6 @@ class TravelManager {
      * @throws RuntimeException
      */
     public function checkRestrictions(): bool {
-        $ignore_travel_restrictions = $this->user->isHeadAdmin();
-
         // check if the user has moved too recently
         $move_time_left = Travel::checkMovementDelay($this->user->last_movement_ms);
         if ($move_time_left > 0) {
@@ -74,29 +72,29 @@ class TravelManager {
 
         // check if the user has exited an AI too recently
         $ai_time_left = Travel::checkAIDelay($this->user->last_ai_ms);
-        if ($ai_time_left > 0 && !$ignore_travel_restrictions) {
+        if ($ai_time_left > 0) {
             throw new InvalidMovementException('You have recently left an AI battle and cannot move for ' . floor($ai_time_left / 1000) . ' seconds!');
         }
 
         // check if the user has exited battle too recently
         $pvp_time_left = Travel::checkPVPDelay($this->user->last_pvp_ms);
-        if ($pvp_time_left > 0 && !$ignore_travel_restrictions) {
+        if ($pvp_time_left > 0) {
             throw new InvalidMovementException('You have recently left a battle and cannot move for ' . floor($pvp_time_left / 1000) . ' seconds!');
         }
 
         // check if the user has died to recently
         $death_time_left = Travel::checkDeathDelay($this->user->last_death_ms);
-        if ($death_time_left > 0 && !$ignore_travel_restrictions) {
+        if ($death_time_left > 0) {
             throw new InvalidMovementException('You are still recovering from a defeat and cannot move for ' . floor($death_time_left / 1000) . ' seconds!');
         }
 
         // check if the user is in battle
-        if ($this->user->battle_id && !$ignore_travel_restrictions) {
+        if ($this->user->battle_id) {
             throw new InvalidMovementException('You are in battle!');
         }
 
         // check if the user is in a special mission
-        if ($this->user->special_mission && !$ignore_travel_restrictions) {
+        if ($this->user->special_mission) {
             throw new InvalidMovementException('You are currently in a Special Mission and cannot travel!');
         }
 
@@ -118,7 +116,7 @@ class TravelManager {
      */
     public function movePlayer($direction): bool {
         $new_coords = Travel::getNewMovementValues($direction, $this->user->location);
-        $ignore_travel_restrictions = $this->user->isHeadAdmin();
+        $ignore_coord_restrictions = $this->user->isHeadAdmin();
 
         if (!$this->checkRestrictions()) {
             throw new InvalidMovementException('Unable to move!');
@@ -129,14 +127,14 @@ class TravelManager {
             || $new_coords->y > $this->map_data['end_y']
             || $new_coords->x < 1
             || $new_coords->y < 1)
-            && !$ignore_travel_restrictions) {
+            && !$ignore_coord_restrictions) {
             throw new InvalidMovementException('You cannot move past this point!');
         }
 
         // check if the user is trying to move to a village that is not theirs
         if (TravelManager::locationIsInVillage($this->system, $new_coords)
             && !$new_coords->equals($this->user->village_location)
-            && !$ignore_travel_restrictions) {
+            && !$ignore_coord_restrictions) {
             throw new InvalidMovementException('You cannot enter another village!');
         }
 
@@ -198,7 +196,7 @@ class TravelManager {
      */
     public function fetchNearbyPlayers(): array {
         $sql = "SELECT `users`.`user_id`, `users`.`user_name`, `users`.`village`, `users`.`rank`, `users`.`stealth`,
-                `users`.`level`, `users`.`attack_id`, `users`.`battle_id`, `ranks`.`name` as `rank_name`, `users`.`location`
+                `users`.`level`, `users`.`attack_id`, `users`.`battle_id`, `ranks`.`name` as `rank_name`, `users`.`location`, `users`.`last_death_ms`
                 FROM `users`
                 INNER JOIN `ranks`
                 ON `users`.`rank`=`ranks`.`rank_id`
@@ -239,6 +237,15 @@ class TravelManager {
                 $user_direction = $this->user->location->directionToTarget($user_location);
             }
 
+            // calculate distance
+            $distance = $this->user->location->distanceDifference($user_location);
+
+            $invulnerable = false;
+            // determine if vulnerable to attack
+            if ($user['last_death_ms'] > System::currentTimeMs() - (300 * 1000)) {
+                $invulnerable = true;
+            }
+
             // add to return
             $return_arr[] = new NearbyPlayerDto(
                 user_id: $user['user_id'],
@@ -255,6 +262,8 @@ class TravelManager {
                 level: $user['level'],
                 battle_id: $user['battle_id'],
                 direction: $user_direction,
+                invulnerable: $invulnerable,
+                distance: $distance,
             );
         }
 
@@ -278,9 +287,34 @@ class TravelManager {
                     level: 30,
                     battle_id: 0,
                     direction: $this->user->location->directionToTarget($placeholder_coords),
+                    distance: $this->user->location->distanceDifference($placeholder_coords),
                 );
             }
         }
+
+        usort($return_arr, function ($a, $b) {
+            if ($a->alignment == 'Enemy' && $b->alignment == 'Ally') {
+                return -1; // $a comes before $b
+            } elseif ($a->alignment == 'Ally' && $b->alignment == 'Enemy') {
+                return 1; // $b comes before $a
+            } else {
+                // Sort by distance first
+                if ($a->distance < $b->distance) {
+                    return -1; // $a comes before $b
+                } elseif ($a->distance > $b->distance) {
+                    return 1; // $b comes before $a
+                } else {
+                    // Sort by level if distances are equal
+                    if ($a->level > $b->level) {
+                        return -1; // $a comes before $b
+                    } elseif ($a->level < $b->level) {
+                        return 1; // $b comes before $a
+                    } else {
+                        return 0; // Objects are equal
+                    }
+                }
+            }
+        });
 
         return $return_arr;
     }
@@ -486,6 +520,68 @@ class TravelManager {
         }
 
         return $portal_data;
+    }
+
+    /**
+     * @throws RuntimeException
+     */
+    public function attackPlayer(string $target_attack_id): bool {
+        // get user id off the attack link
+        $result = $this->system->db->query("SELECT `user_id` FROM `users` WHERE `attack_id`='{$target_attack_id}' LIMIT 1");
+        if ($this->system->db->last_num_rows == 0) {
+            throw new RuntimeException("Invalid user!");
+        }
+
+        $target_user= $this->system->db->fetch($result);
+        $target_user_id = $target_user['user_id'];
+
+        $user = User::loadFromId($this->system, $target_user_id);
+        $user->loadData(User::UPDATE_NOTHING, true);
+
+        // check if the location forbids pvp
+        if ($this->user->current_location->location_id && $this->user->current_location->pvp_allowed == 0) {
+            throw new RuntimeException("You cannot fight at this location!");
+        }
+
+        if ($user->village->name == $this->user->village->name) {
+            throw new RuntimeException("You cannot attack people from your own village!");
+        }
+
+        if ($user->rank_num < 3) {
+            throw new RuntimeException("You cannot attack people below Chuunin rank!");
+        }
+        if ($this->user->rank_num < 3) {
+            throw new RuntimeException("You cannot attack people Chuunin rank and higher!");
+        }
+
+        if ($user->rank_num !== $this->user->rank_num) {
+            throw new RuntimeException("You can only attack people of the same rank!");
+        }
+
+        if (!$user->location->equals($this->user->location)) {
+            throw new RuntimeException("Target is not at your location!");
+        }
+        if ($user->battle_id) {
+            throw new RuntimeException("Target is in battle!");
+        }
+        if ($user->last_active < time() - 120) {
+            throw new RuntimeException("Target is inactive/offline!");
+        }
+        if ($this->user->last_death_ms > System::currentTimeMs() - (60 * 1000)) {
+            throw new RuntimeException("You died within the last minute, please wait " .
+                ceil((($this->user->last_death_ms + (60 * 1000)) - System::currentTimeMs()) / 1000) . " more seconds.");
+        }
+        if ($user->last_death_ms > System::currentTimeMs() - (60 * 1000)) {
+            throw new RuntimeException("Target has died within the last minute, please wait " .
+                ceil((($user->last_death_ms + (60 * 1000)) - System::currentTimeMs()) / 1000) . " more seconds.");
+        }
+
+        if ($this->system->USE_NEW_BATTLES) {
+            BattleV2::start($this->system, $this->user, $user, Battle::TYPE_FIGHT);
+        } else {
+            Battle::start($this->system, $this->user, $user, Battle::TYPE_FIGHT);
+        }
+        return true;
     }
 
     /**

@@ -364,12 +364,12 @@ else if($mode == 'speed_graph') {
 
         foreach($scenarios as $key => &$scenario) {
             $player1 = fighterFromData([
-                'ninjutsu_skill' => 10,
+                'ninjutsu_skill' => 0,
                 'taijutsu_skill' => floor($total_stats * 0.33334),
-                'genjutsu_skill' => 10,
+                'genjutsu_skill' => 0,
                 'bloodline_skill' => floor($total_stats * 0.33334),
                 'speed' => floor($total_stats * 0.33334),
-                'cast_speed' => 10,
+                'cast_speed' => 0,
                 'bloodline_boost_1' => 'taijutsu_boost',
                 'bloodline_boost_1_power' => 30,
                 'bloodline_boost_2' => 'taijutsu_resist',
@@ -405,12 +405,12 @@ else if($mode == 'speed_graph') {
             $scenario['player2_bloodline_skill'] = floor($remaining_stats / 2);
 
             $player2 = fighterFromData([
-                'ninjutsu_skill' => 10,
+                'ninjutsu_skill' => 0,
                 'taijutsu_skill' => $scenario['player2_offense'],
-                'genjutsu_skill' => 10,
+                'genjutsu_skill' => 0,
                 'bloodline_skill' => $scenario['player2_bloodline_skill'],
                 'speed' => ceil($scenario['player2_speed']),
-                'cast_speed' => 10,
+                'cast_speed' => 0,
                 'bloodline_boost_1' => 'taijutsu_boost',
                 'bloodline_boost_1_power' => 30,
                 'bloodline_boost_2' => 'taijutsu_resist',
@@ -544,13 +544,13 @@ else if(isset($_POST['run_simulation']) && $mode == 'scenarios') {
     $player1 = new TestFighter();
     $player1->name = "Player 1";
     $player1->system = $system;
-    $player1->ninjutsu_skill = 10;
-    $player1->taijutsu_skill = 10;
-    $player1->genjutsu_skill = 10;
-    $player1->speed = 10;
-    $player1->cast_speed = 10;
-    $player1->intelligence = 10;
-    $player1->willpower = 10;
+    $player1->ninjutsu_skill = 0;
+    $player1->taijutsu_skill = 0;
+    $player1->genjutsu_skill = 0;
+    $player1->speed = 0;
+    $player1->cast_speed = 0;
+    $player1->intelligence = 0;
+    $player1->willpower = 0;
     $player1_jutsu = new Jutsu(
         id: 1,
         name: 'p1j',
@@ -578,13 +578,13 @@ else if(isset($_POST['run_simulation']) && $mode == 'scenarios') {
     $player2 = new TestFighter();
     $player2->system = $system;
     $player2->name = "Player 2";
-    $player2->ninjutsu_skill = 10;
-    $player2->taijutsu_skill = 10;
-    $player2->genjutsu_skill = 10;
-    $player2->speed = 10;
-    $player2->cast_speed = 10;
-    $player2->intelligence = 10;
-    $player2->willpower = 10;
+    $player2->ninjutsu_skill = 0;
+    $player2->taijutsu_skill = 0;
+    $player2->genjutsu_skill = 0;
+    $player2->speed = 0;
+    $player2->cast_speed = 0;
+    $player2->intelligence = 0;
+    $player2->willpower = 0;
     $player2_jutsu = new Jutsu(
         id: 2,
         name: 'p2j',

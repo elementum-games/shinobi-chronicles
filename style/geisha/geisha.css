@@ -576,17 +576,12 @@ p {
 
 
 /* Colors */
-#content .premiumUser, #content .premiumUser:hover {
-    --color-text-shadow: rgba(255, 255, 255, 0.4);
-
-    background: transparent url("/images/premium_glow.gif") repeat scroll 0 0;
-    text-shadow:
-            0 1px 1px var(--color-text-shadow),
-            0 -1px 1px var(--color-text-shadow),
-            -1px 0 1px var(--color-text-shadow),
-            1px 0 1px var(--color-text-shadow);
+#chatReactContainer a.premiumUser, #chatReactContainer a.premiumUser:hover {
+	--color-text-shadow: rgba(255, 255, 255, 0.4);
+	background: transparent url("/images/premium_glow.gif") repeat scroll 0 0;
+	text-shadow: 0 1px 1px var(--color-text-shadow), 0 -1px 1px var(--color-text-shadow), -1px 0 1px var(--color-text-shadow), 1px 0 1px var(--color-text-shadow);
 }
-#content .staffMember {
+a.staffMember {
 	width: 100%;
 	margin: 1px 0 3px;
 	padding: 0;
@@ -596,43 +591,39 @@ p {
 	text-shadow: 0 -1px 1px;
 }
 
-#content .blue, #content a.blue:hover  {
+#chatReactContainer a.blue, #chatReactContainer a.blue:hover {
 	color: #0000C0;
 }
-#content .pink, #content a.pink:hover {
+#chatReactContainer a.pink, #chatReactContainer a.pink:hover {
 	color: #E030C0;
 }
-#content .gold, #content a.gold:hover {
-    --color-text-shadow: rgba(0,0,0,0.4);
-    text-shadow:
-            0 1px 1px var(--color-text-shadow),
-            0 -1px 1px var(--color-text-shadow),
-            -1px 0 1px var(--color-text-shadow),
-            1px 0 1px var(--color-text-shadow);
+#chatReactContainer a.gold, #chatReactContainer a.gold:hover {
+	--color-text-shadow: rgba(0,0,0,0.4);
+	text-shadow: 0 1px 1px var(--color-text-shadow), 0 -1px 1px var(--color-text-shadow), -1px 0 1px var(--color-text-shadow), 1px 0 1px var(--color-text-shadow);
 	color: rgb(255,215,0);
 }
 
-#content .moderator, #content a.moderator:hover {
+#chatReactContainer a.moderator, #chatReactContainer a.moderator:hover {
 	color: #009020;
 }
-#content .headModerator, #content a.headModerator:hover {
+#chatReactContainer a.headModerator, #chatReactContainer a.headModerator:hover {
 	color: #0090A0;
 }
-#content .contentAdmin, #content a.contentAdmin:hover {
-    color: #A000B0;
+#chatReactContainer a.contentAdmin, #chatReactContainer a.contentAdmin:hover {
+	color: #A000B0;
 }
-#content .administrator, #content a.administrator:hover {
+#chatReactContainer a.administrator, #chatReactContainer a.administrator:hover {
 	color: #A00000;
 }
 
-#content a.chat.normalUser, #content a.chat.normalUser:hover {
+#chatReactContainer a.chat.normalUser, #chatReactContainer .chat.normalUser:hover {
 	color: #000000;
 }
 
-#content a.userLink {
+a.userLink {
 	text-decoration: none;
 }
-#content a.userLink:hover {
+a.userLink:hover {
 	text-decoration: underline;
 }
 

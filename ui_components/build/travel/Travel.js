@@ -23,6 +23,7 @@ import { ScoutArea } from "./ScoutArea.js";
     tile_height:         int,
     action_url:          string,
     action_message:      string,
+    invulnerable:        boolean,
  * }} mapData
  *
  * @param {{
@@ -68,7 +69,6 @@ function Travel({
   travelAPILink,
   missionLink,
   membersLink,
-  attackLink,
   travelCooldownMs
 }) {
   const travelIntervalFrequency = 40;
@@ -110,7 +110,6 @@ function Travel({
 
   const MovePlayer = direction => {
     resetRefreshInterval();
-    setFeedback(['Moving...', 'info']);
     debug('Moving player...' + direction);
     lastTravelStartTime.current = Date.now();
     const requestStart = Date.now();
@@ -182,7 +181,21 @@ function Travel({
   function handleErrors(errors) {
     console.warn(errors);
     setFeedback([errors, 'info']);
-  } // Handle travel
+  }
+
+  const AttackPlayer = target => {
+    apiFetch(travelAPILink, {
+      request: 'AttackPlayer',
+      target: target
+    }).then(response => {
+      if (response.errors.length) {
+        handleErrors(response.errors);
+        return;
+      }
+
+      window.location.href = response.data.redirect;
+    });
+  }; // Handle travel
 
 
   function changeMovementDirection(newDirection) {
@@ -294,14 +307,18 @@ function Travel({
   }, /*#__PURE__*/React.createElement(Message, {
     message: feedback[0],
     messageType: feedback[1]
-  })), mapData && /*#__PURE__*/React.createElement(Map, {
-    mapData: mapData
+  })), mapData && scoutData && /*#__PURE__*/React.createElement(Map, {
+    mapData: mapData,
+    scoutData: scoutData,
+    playerId: playerId,
+    ranksToView: ranksToView
   }))), mapData && scoutData && /*#__PURE__*/React.createElement(ScoutArea, {
     mapData: mapData,
     scoutData: scoutData,
     membersLink: membersLink,
-    attackLink: attackLink,
-    ranksToView: ranksToView
+    attackPlayer: AttackPlayer,
+    ranksToView: ranksToView,
+    playerId: playerId
   }));
 }
 

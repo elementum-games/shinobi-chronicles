@@ -12,6 +12,7 @@ require_once __DIR__ . "/Rank.php";
 require_once __DIR__ . "/Village.php";
 require_once __DIR__ . "/Clan.php";
 require_once __DIR__ . "/achievements/AchievementsManager.php";
+require_once __DIR__ . "/event/LanternEvent.php";
 
 /*	Class:		User
 	Purpose:	Fetch user data and load into class variables.
@@ -44,7 +45,7 @@ class User extends Fighter {
     const PARTIAL_LOCK = 3;
     const FULL_LOCK = 5;
 
-    const BASE_EXP = 500;
+    const BASE_EXP = 0;
     const BASE_REGEN = 25;
 
     const BASE_JUTSU_SLOTS = 4;
@@ -746,6 +747,25 @@ class User extends Fighter {
                 user_id: $this->user_id
             );
 
+            // Scale Jutsu Power
+            foreach ($this->bloodline->jutsu as $jutsu) {
+                $rank_diff = $this->rank_num - $jutsu->rank;
+                switch ($jutsu->rank) {
+                    case 2:
+                        // based on scale 2.5 -> 3.5
+                        $factor = 0.2;
+                        break;
+                    case 3:
+                        // based on scale 3.5 -> 4.4
+                        $factor = 0.1285;
+                        break;
+                    default:
+                        $factor = 0;
+                        break;
+                }
+                $jutsu->power *= 1 + ($rank_diff * $factor);
+            }
+
             // Debug info
             if($this->system->debug['bloodline']) {
                 echo "Debugging {$this->getName()}<br />";
@@ -1443,6 +1463,9 @@ class User extends Fighter {
     public function hasItem(int $item_id): bool {
         return isset($this->items[$item_id]);
     }
+    public function itemQuantity(int $item_id): int {
+        return isset($this->items[$item_id]) ? $this->items[$item_id]->quantity : 0;
+    }
 
     public function giveItem(Item $item, int $quantity = 1): void {
         if ($this->hasItem($item->id)) {
@@ -1450,6 +1473,10 @@ class User extends Fighter {
         } else {
             $this->items[$item->id] = $item;
             $this->items[$item->id]->quantity = $quantity;
+        }
+
+        if(isset(LanternEvent::$max_item_quantities[$item->id])) {
+            $this->items[$item->id]->quantity = min($this->items[$item->id]->quantity, LanternEvent::$max_item_quantities[$item->id]);
         }
 
         if($item->use_type == Item::USE_TYPE_WEAPON || $item->use_type == Item::USE_TYPE_ARMOR) {
@@ -1812,6 +1839,10 @@ class User extends Fighter {
             $dt = json_encode($this->daily_tasks);
             $this->system->db->query("UPDATE `daily_tasks` SET `tasks`='{$dt}' WHERE `user_id`='{$this->user_id}'");
         }
+    }
+
+    public function updateLastActive() {
+        $this->system->db->query("UPDATE `users` SET `last_active` = '" . time() . "' WHERE `user_id`={$this->user_id} LIMIT 1");
     }
 
     /**
@@ -2213,20 +2244,22 @@ class User extends Fighter {
             'train_time' => 0,
             'train_gain' => 0,
 
-            'ninjutsu_skill' => 10,
-            'genjutsu_skill' => 10,
-            'taijutsu_skill' => 10,
+            'ninjutsu_skill' => 0,
+            'genjutsu_skill' => 0,
+            'taijutsu_skill' => 0,
             'bloodline_skill' => 0,
 
-            'cast_speed' => 5,
-            'speed' => 5,
-            'intelligence' => 5,
-            'willpower' => 5,
+            'cast_speed' => 0,
+            'speed' => 0,
+            'intelligence' => 0,
+            'willpower' => 0,
 
             'register_date' => time(),
             'verify_key' => $verification_code,
             'layout' => System::DEFAULT_LAYOUT,
-            'avatar_link' => './images/default_avatar.png',
+            'avatar_link' => mt_rand(1, 100) > 50
+                ? './images/default_avatar_v2_blue.png'
+                : './images/default_avatar_v2_red.png',
 
             // '', '', '', 0, 0, 0, 0,
             'forbidden_seal' => '',

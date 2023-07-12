@@ -78,7 +78,6 @@ return $routes = [
         title: 'Travel',
         function_name: 'travel',
         menu: Route::MENU_ACTIVITY,
-        min_rank: 2,
         battle_ok: false,
         village_ok: Route::IN_VILLAGE_OKAY,
         survival_mission_ok: false
@@ -164,9 +163,9 @@ return $routes = [
         menu: 'conditional',
     ),
     21 => new Route(
-        file_name: 'premium.php',
+        file_name: 'premium_shop.php',
         title: 'Ancient Market',
-        function_name: 'premium',
+        function_name: 'premiumShop',
         menu: Route::MENU_VILLAGE,
     ),
     33 => new Route(

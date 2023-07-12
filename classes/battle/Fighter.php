@@ -319,12 +319,14 @@ abstract class Fighter {
         $damage = $offense * $attack->power * $rand;
 
         // Add non-BL damage boosts
-        $damage_boost = $off_boost - $off_nerf;
         if($this->system->debug['damage']) {
-            echo "Damage/boost/nerf/final boost: $damage / {$off_boost} / {$off_nerf} / {$damage_boost} <br />";
+            echo "Damage/boost/nerf: $damage / {$off_boost} / {$off_nerf}} <br />";
         }
 
-        $damage = round($damage + $damage_boost, 2);
+        $damage = round(
+          ($damage * (1 + $off_boost)) - $off_nerf, 
+          2
+        );
         if($damage < 0) {
             $damage = 0;
         }

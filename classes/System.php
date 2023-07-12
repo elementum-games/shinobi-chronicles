@@ -102,7 +102,7 @@ class System {
 
     const MAX_LINK_DISPLAY_LENGTH = 60;
 
-    public static array $banned_words = [
+    public static array $explicit_words = [
         'fuck',
         'fuk',
         'fck',
@@ -159,6 +159,12 @@ class System {
         ' rape',
 
         'dildo',
+    ];
+    public static array $banned_words = [
+        'fag ',
+        'faggot',
+        'retard',
+        'nigger',
     ];
 
     public array $debug = [
@@ -230,7 +236,7 @@ class System {
         @string
     */
     public function explicitLanguageCheck($string): bool {
-        foreach(self::$banned_words as $word) {
+        foreach(self::$explicit_words as $word) {
             if(str_contains(strtolower($string), $word)) {
                 return true;
             }
@@ -240,9 +246,34 @@ class System {
 
     /**
      * @param      $text
+     * @param bool $allow_non_banned_words
      * @return string
      */
-    public function explicitLanguageReplace($text): string {
+    public function explicitLanguageReplace($text, bool $allow_non_banned_words = false): string {
+        $word_replace = [];
+
+        if(!$allow_non_banned_words) {
+            foreach(self::$explicit_words as $word) {
+                $word_replace[] = str_repeat('*', strlen($word));
+            }
+
+            $text = str_ireplace(self::$explicit_words, $word_replace, $text);
+        }
+
+
+        $word_replace = [];
+        foreach(self::$banned_words as $word) {
+            $word_replace[] = str_repeat('*', strlen($word));
+        }
+
+        return str_ireplace(self::$banned_words, $word_replace, $text);
+    }
+
+    /**
+     * @param      $text
+     * @return string
+     */
+    public function bannedLanguageReplace($text): string {
         //String censorship
         $word_replace = [];
         foreach(self::$banned_words as $key => $word) {

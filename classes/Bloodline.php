@@ -195,7 +195,8 @@ class Bloodline {
                         $this->passive_boosts[$id]['progress'] = round($bloodline_skill / ($base_stats * 0.4), 2) * 100;
                     }
                     else {
-                        $boost_amount = $user_rank - 2;
+                        $boost_amount = 1;
+                        /*$boost_amount = $user_rank - 2;
 
                         $extra_boost = $bloodline_skill / ($stats_max_level * 0.5);
                         if($extra_boost > 0.99) {
@@ -203,7 +204,7 @@ class Bloodline {
                         }
                         else {
                             $this->passive_boosts[$id]['progress'] = round($extra_boost, 2) * 100;
-                        }
+                        }*/
 
                     }
                     $this->passive_boosts[$id]['effect_amount'] = $boost_amount;
@@ -264,6 +265,7 @@ class Bloodline {
      * @return float
      */
     private function offenseToBloodlineRatio(int $offense_skill, int $bloodline_skill): float {
+
         $ratio_max = 1.0;
         $ratio_min = 0.75;
 

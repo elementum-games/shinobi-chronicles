@@ -1,14 +1,13 @@
 // @flow strict-local
 
-import FighterDisplay from "./FighterDisplay.js";
-import BattleField from "./BattleField.js";
 import BattleLog from "./BattleLog.js";
 import BattleActionPrompt from "./BattleActionPrompt.js";
 
-import type { BattleType as BattleData, JutsuType } from "./battleSchema.js";
+import type { BattleType as BattleData } from "./battleSchema.js";
 import { apiFetch } from "../utils/network.js";
 import type { AttackInputFields } from "./AttackActionPrompt.js";
 import { findPlayerJutsu } from "./playerUtils.js";
+import { FightersAndField } from "./FightersAndField.js";
 
 type Props = {|
     +battle: BattleData,
@@ -132,86 +131,6 @@ function Battle({
     </div>;
 }
 
-// Fighters and Field
-type FightersAndFieldProps = {|
-    +battle: BattleData,
-    +attackInput: AttackInputFields,
-    +membersLink: string,
-    +isSelectingTile: boolean,
-    +selectedJutsu: ?JutsuType,
-    +onTileSelect: (tileIndex: number) => void,
-|};
-
-function FightersAndField({
-    battle,
-    attackInput,
-    membersLink,
-    isSelectingTile,
-    selectedJutsu,
-    onTileSelect
-}: FightersAndFieldProps) {
-    const player = battle.fighters[ battle.playerId ];
-    const opponent = battle.fighters[ battle.opponentId ];
-
-    const { fighters, field, isSpectating } = battle;
-
-    const handleTileSelect = (tileIndex) => {
-        onTileSelect(tileIndex);
-    };
-
-    return (
-        <table className='table'>
-            <tbody>
-            <tr>
-                <th style={{ width: "50%" }}>
-                    <a href={`${membersLink}}&user=${player.name}`} style={{ textDecoration: "none" }}>
-                        {player.name}
-                    </a>
-                </th>
-                <th style={{ width: "50%" }}>
-                    {opponent.isNpc ?
-                        opponent.name
-                        :
-                        <a href={`${membersLink}}&user=${opponent.name}`} style={{ textDecoration: "none" }}>
-                            {opponent.name}
-                        </a>
-                    }
-                </th>
-            </tr>
-            <tr>
-                <td>
-                    <FighterDisplay
-                        fighter={player}
-                        showChakra={!isSpectating}
-                    />
-                </td>
-                <td>
-                    <FighterDisplay
-                        fighter={opponent}
-                        isOpponent={true}
-                        showChakra={!isSpectating}
-                    />
-                </td>
-            </tr>
-            <tr>
-                <td colSpan='2'>
-                    <BattleField
-                        player={player}
-                        fighters={fighters}
-                        tiles={field.tiles}
-                        fighterLocations={field.fighterLocations}
-                        selectedJutsu={selectedJutsu}
-                        isMovementPhase={battle.isMovementPhase}
-                        lastTurnLog={battle.lastTurnLog}
-                        onTileSelect={handleTileSelect}
-                    />
-                </td>
-            </tr>
-            </tbody>
-        </table>
-    );
-}
-
 function SpectateStatus() {
     return <div>
         Spectate Status
@@ -237,13 +156,19 @@ function SpectateStatus() {
 }
 
 function BattleResult({description, isBattleComplete}) {
+    const secondUrlParamIndex = window.location.href.indexOf('&');
+
+    // Exclude whatever section is after ?id=XYZ because it might trigger an action.
+    // We can probably remove this after we migrate to POST actions via APIs
+    const continueUrl = window.location.href.substring(0, secondUrlParamIndex);
+
     return <table className='table'>
         <tbody>
             <tr><th>Battle Results</th></tr>
             <tr><td>
                 <div dangerouslySetInnerHTML={{__html: description}}></div>
                 {isBattleComplete &&
-                    <button onClick={() => window.location.assign(window.location.href)}>Continue</button>
+                    <button onClick={() => window.location.assign(continueUrl)}>Continue</button>
                 }
             </td></tr>
         </tbody>

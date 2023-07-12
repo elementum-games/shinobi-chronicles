@@ -133,12 +133,14 @@ $clan_positions = array(
             <?php endif; ?>
         </td></tr>
 
-            <?php if($journal): ?>
+            <?php if(!empty($journal)): ?>
                 <?php
-                    if(!str_contains($journal, "\n")) {
-                        $journal = wordwrap($journal, 100, "\r\n", true);
-                    }
                     $journal = $system->html_parse(stripslashes($journal), true, true);
+                    $journal = $system->explicitLanguageReplace(
+                        text: $journal,
+                        allow_non_banned_words: !$player->censor_explicit_language
+                    );
+
                     $class_name = $player->forbidden_seal->level > 0 ? 'forbidden_seal' : 'normal';
                 ?>
                 <style>
