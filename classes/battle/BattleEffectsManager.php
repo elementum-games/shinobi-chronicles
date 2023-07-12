@@ -52,9 +52,6 @@ class BattleEffectsManager {
 
         switch($jutsu->effect) {
             case 'residual_damage':
-            case 'ninjutsu_boost':
-            case 'taijutsu_boost':
-            case 'genjutsu_boost':
             case 'ninjutsu_nerf':
             case 'taijutsu_nerf':
             case 'genjutsu_nerf':
@@ -72,6 +69,9 @@ class BattleEffectsManager {
             case 'drain_stamina':
                 $jutsu->effect_amount = round($raw_damage * ($jutsu->effect_amount / 300), 2);
                 break;
+            case 'ninjutsu_boost':
+            case 'taijutsu_boost':
+            case 'genjutsu_boost':
             case 'speed_boost':
             case 'cast_speed_boost':
             case 'speed_nerf':
@@ -193,13 +193,13 @@ class BattleEffectsManager {
     public function applyPassiveEffect(Fighter $target, BattleEffect $effect): bool {
         // Buffs
         if($effect->effect == 'ninjutsu_boost') {
-            $target->ninjutsu_boost += $effect->effect_amount;
+            $target->ninjutsu_boost += ($effect->effect_amount / 100);
         }
         else if($effect->effect == 'taijutsu_boost') {
-            $target->taijutsu_boost += $effect->effect_amount;
+            $target->taijutsu_boost += ($effect->effect_amount / 100);
         }
         else if($effect->effect == 'genjutsu_boost') {
-            $target->genjutsu_boost += $effect->effect_amount;
+            $target->genjutsu_boost += ($effect->effect_amount / 100);
         }
         else if($effect->effect == 'cast_speed_boost') {
             $target->cast_speed_boost += $target->getCastSpeed(true) * ($effect->effect_amount / 100);
@@ -356,7 +356,7 @@ class BattleEffectsManager {
             $damage = $target->calcDamageTaken($effect->effect_amount, $effect->damage_type, true);
             $residual_damage_raw = $target->calcDamageTaken($effect->effect_amount, $effect->damage_type, true, apply_resists : false);
             $residual_damage_resisted = $residual_damage_raw - $damage;
-            
+
             if($residual_damage_resisted > 0) {
                 $this->addDisplay($target, $target->getName() . " takes $damage residual damage (resists $residual_damage_resisted residual damage)");
             } else {

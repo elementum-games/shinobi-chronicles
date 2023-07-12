@@ -196,7 +196,7 @@ class TravelManager {
      */
     public function fetchNearbyPlayers(): array {
         $sql = "SELECT `users`.`user_id`, `users`.`user_name`, `users`.`village`, `users`.`rank`, `users`.`stealth`,
-                `users`.`level`, `users`.`attack_id`, `users`.`battle_id`, `ranks`.`name` as `rank_name`, `users`.`location`
+                `users`.`level`, `users`.`attack_id`, `users`.`battle_id`, `ranks`.`name` as `rank_name`, `users`.`location`, `users`.`last_death_ms`
                 FROM `users`
                 INNER JOIN `ranks`
                 ON `users`.`rank`=`ranks`.`rank_id`
@@ -237,6 +237,15 @@ class TravelManager {
                 $user_direction = $this->user->location->directionToTarget($user_location);
             }
 
+            // calculate distance
+            $distance = $this->user->location->distanceDifference($user_location);
+
+            $invulnerable = false;
+            // determine if vulnerable to attack
+            if ($user['last_death_ms'] > System::currentTimeMs() - (300 * 1000)) {
+                $invulnerable = true;
+            }
+
             // add to return
             $return_arr[] = new NearbyPlayerDto(
                 user_id: $user['user_id'],
@@ -253,6 +262,8 @@ class TravelManager {
                 level: $user['level'],
                 battle_id: $user['battle_id'],
                 direction: $user_direction,
+                invulnerable: $invulnerable,
+                distance: $distance,
             );
         }
 
@@ -276,9 +287,34 @@ class TravelManager {
                     level: 30,
                     battle_id: 0,
                     direction: $this->user->location->directionToTarget($placeholder_coords),
+                    distance: $this->user->location->distanceDifference($placeholder_coords),
                 );
             }
         }
+
+        usort($return_arr, function ($a, $b) {
+            if ($a->alignment == 'Enemy' && $b->alignment == 'Ally') {
+                return -1; // $a comes before $b
+            } elseif ($a->alignment == 'Ally' && $b->alignment == 'Enemy') {
+                return 1; // $b comes before $a
+            } else {
+                // Sort by distance first
+                if ($a->distance < $b->distance) {
+                    return -1; // $a comes before $b
+                } elseif ($a->distance > $b->distance) {
+                    return 1; // $b comes before $a
+                } else {
+                    // Sort by level if distances are equal
+                    if ($a->level > $b->level) {
+                        return -1; // $a comes before $b
+                    } elseif ($a->level < $b->level) {
+                        return 1; // $b comes before $a
+                    } else {
+                        return 0; // Objects are equal
+                    }
+                }
+            }
+        });
 
         return $return_arr;
     }
