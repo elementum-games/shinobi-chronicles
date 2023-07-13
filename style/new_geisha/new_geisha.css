@@ -388,6 +388,9 @@ body {
 .avy_six-point-long {
     clip-path: polygon(40% 0, 100% 0, 100% 60%, 60% 100%, 0 100%, 0 40%);
 }
+.avy_six-point-long-reverse {
+    clip-path: polygon(0 0, 60% 0, 100% 40%, 100% 100%, 40% 100%, 0 60%);
+}
 .avy_eight-point {
     clip-path: polygon(30% 0%, 70% 0%, 100% 30%, 100% 70%, 70% 100%, 30% 100%, 0% 70%, 0% 30%);
 }
@@ -414,6 +417,9 @@ body {
 .avy_frame_none {
     padding: 0 !important;
     background: none;
+}
+.avy_frame_shadow {
+    background: radial-gradient(ellipse at center, rgba(0, 0, 0, 0.5) 70%, rgba(0, 0, 0, 0) 95%) !important;
 }
 .avatar_img {
     max-width: 100%;
