@@ -44,11 +44,15 @@ if($_SESSION['user_id']) {
                 }
                 else {
                     weeklyCron($system);
+                    $player->staff_manager->staffLog(StaffManager::STAFF_LOG_ADMIN,
+                        "{$player->user_name}({$player->user_id}) manually ran reputation cron.");
                     echo "Script ran.";
                 }
             }
             else {
                 weeklyCron($system);
+                $player->staff_manager->staffLog(StaffManager::STAFF_LOG_ADMIN,
+                    "{$player->user_name}({$player->user_id}) manually ran reputation cron.");
                 echo "Script ran.";
             }
         }
@@ -57,12 +61,16 @@ if($_SESSION['user_id']) {
         }
     }
 }
+else {
+    weeklyCron($system);
+    $system->log('cron', 'Weekly Reputation', "Weekly reputation decay has been processed.");
+}
 
-function weeklyCron($system) {
+function weeklyCron($system, $debug = false) {
     foreach(Reputation::$VillageRep as $RANK_INT => $RANK) {
         if($RANK_INT == 1) {
-            $queries[] = "UPDATE `users` SET `weekly_rep`=0, `village_rep`=0 WHERE `village_rep` >= " . $RANK['min_rep']
-                . " AND `village_rep` < " . Reputation::$VillageRep[2]['min_rep'] . " AND `village_rep`<" . $RANK['base_decay'];
+            // Disable for rank 1
+            continue;
         }
         $next_rank_where = "";
         if($RANK_INT < sizeof(Reputation::$VillageRep)) {
@@ -79,7 +87,7 @@ function weeklyCron($system) {
             . " WHERE `village_rep` >= " . $RANK['min_rep'] . $next_rank_where . " AND `weekly_rep` >= " . $RANK['weekly_cap'];
     }
     foreach($queries as $query) {
-        if(false) {
+        if($debug) {
             echo $query . "<br />";
         }
         else {
