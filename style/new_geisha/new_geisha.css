@@ -3,11 +3,10 @@
     --avatar-frame-border_gradient: linear-gradient(0deg, rgba(140,123,88,1) 0%, rgba(181,156,106,1) 50%, rgba(225,207,159,1) 100%);
     --avatar-frame-border-width-large: 7px;
     --avatar-frame-border-width-small: 2px;
-
     /* General Config */
     --border-color-default: #464234;
     --box-color-default: #141317;
-    --main-background-color: #101113;
+    --main-background-color: #17161b;
     --content-background-color: #272733;
     --content-background-gradient: linear-gradient(to bottom, #272733, #201f26);
     --content-outline-color: #1f212a;
@@ -15,18 +14,14 @@
     --footer-background-color: #0E0D0E;
     --footer-font-color: #423f39;
     --regentimer-color: #7C88C3;
-
     /* Content colors */
     --daily-task-active-bg-color: #1f161c;
     --daily-task-complete-bg-color: #1e222c;
-
     --exp-bar-bg-color: #292e4c;
     --exp-bar-fill-color: #5964a6;
-
     --progress-bar-bg-color: #433c32;
     --progress-bar-dark-bg-color: rgba(0,0,0,0.2);
     --progress-bar-fill-color: #bca471;
-
     /* Structure */
     --header-height: 35px;
     --content-width: 930px;
@@ -35,7 +30,6 @@
     --topbar-height: 60px;
     --hotbar-height: 85px;
     --footer-height: 30px;
-
     /* Font Config */
     --font-primary: "Trebuchet MS";
     --font-primary-variant: small-caps;
@@ -56,7 +50,6 @@
     --font-xlarge: 18px;
     --font-max: 21px;
     --text-hover: white;
-
     /* Resource Config */
     --resource-bar-width: 300px;
     --resource-bar-height: 21px;
@@ -70,32 +63,26 @@
     --stamina-fill: linear-gradient(to right, #2e362c, #2a5e3c 15%);
     --stamina-preview: #2e362c;
     --stamina-highlight: #7f9d89;
-
     /* Hotbar Config */
     --hotbar-background-color: #100f11;
     --hotbar-border-color: #0c0c0e;
     --hotbar-keybind-modal-width: 700px;
     --hotbar-keybind-modal-height: 400px;
-
     /* Sidebar Config */
     --sidebar-header-background-color: #8c7b58;
     --sidebar-header-height: 23px;
     --sidebar-button-background-color: #1a191d;
     --sidebar-button-background-hover: linear-gradient(to bottom, #262631 50%, #22222a 50%);
     --sidebar-button-border-color: #20222b;
-
     /* Header Config */
     --header-background-color: #151417;
     --header-border-color: #0c0d0e;
     --header-border-height: 3px;
     --header-logout-color: #e6a0a0;
-
     /* Chat Config */
     --chat-secondary-background-color: #1a1921;
-
     /* Style helpers */
     --clip-tall-hexagon: polygon(50% 0%,95% 20%,95% 80%,50% 100%,5% 80%,5% 20%);
-
 }
 
 /* Helper Classes - TO-DO: remove helpers, organize module CSS classes */
@@ -180,10 +167,11 @@
 
 body {
     background-color: var(--main-background-color);
-    background-image: url(../../images/v2/decorations/bigdiamond_opa20.png), url(../../images/v2/decorations/smalldiamond_opa20.png);
-    background-position: 16em 40em, 10em 6em, 88% 40em, 92% 12%;
-    background-repeat: no-repeat, no-repeat;
-    background-attachment: fixed, fixed;
+    background-image: linear-gradient(to right, var(--main-background-color) 0%, transparent 17%, transparent 83%, var(--main-background-color) 100%), url(../../images/v2/decorations/Banner1.jpg);
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-size: cover;
+    background-position: center top;
 }
 
 #container {
@@ -192,6 +180,16 @@ body {
     justify-content: center;
     display: flex;
 }
+    #container::before {
+        content: "";
+        position: fixed;
+        width: calc(var(--sidebar-width) + var(--content-width) + 90px);
+        height: 100%;
+        left: 50%;
+        transform: translate(-50%, calc(-1 * var(--header-height) - var(--header-border-height)));
+        background: linear-gradient(to right, transparent 0%, var(--main-background-color) 1%, var(--main-background-color) 99%, transparent 100%);
+        z-index: -1;
+    }
 
 #content_wrapper {
     width: var(--content-width);
