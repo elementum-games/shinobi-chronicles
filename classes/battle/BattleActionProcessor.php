@@ -180,6 +180,9 @@ class BattleActionProcessor {
         }
         else if($action->jutsu_purchase_type == Jutsu::PURCHASE_TYPE_PURCHASABLE) {
             $jutsu = $fighter->jutsu[$action->jutsu_id] ?? null;
+        } 
+        else if ($action->jutsu_purchase_type == Jutsu::PURCHASE_TYPE_EVENT_SHOP) {
+            $jutsu = $fighter->jutsu[$action->jutsu_id] ?? null;
         }
         else if($action->jutsu_purchase_type == Jutsu::PURCHASE_TYPE_BLOODLINE) {
             $jutsu = $fighter->bloodline->jutsu[$action->jutsu_id] ?? null;
@@ -560,18 +563,18 @@ class BattleActionProcessor {
                  else {
                      $block_amount = $attack1_user->barrier;
                  }
- 
+
                  $block_percent = ($attack2_damage >= 1) ? ($block_amount / $attack2_damage) * 100 : 100;
                  $attack1_user->barrier -= $block_amount;
                  $attack2_damage -= $block_amount;
- 
+
                  if($attack1_user->barrier < 0) {
                      $attack1_user->barrier = 0;
                  }
                  if($attack2_damage < 0) {
                      $attack2_damage = 0;
                  }
- 
+
                  // Set display
                  $block_percent = round($block_percent, 1);
                  $collision_text .= "[player]'s barrier blocked $block_percent% of [opponent]'s damage![br]";
@@ -584,18 +587,18 @@ class BattleActionProcessor {
                  else {
                      $block_amount = $attack2_user->barrier;
                  }
- 
+
                  $block_percent = ($attack1_damage >= 1) ? ($block_amount / $attack1_damage) * 100 : 100;
                  $attack2_user->barrier -= $block_amount;
                  $attack1_damage -= $block_amount;
- 
+
                  if($attack2_user->barrier < 0) {
                      $attack2_user->barrier = 0;
                  }
                  if($attack1_damage < 0) {
                      $attack1_damage = 0;
                  }
- 
+
                  // Set display
                  $block_percent = round($block_percent, 1);
                  $collision_text .= "[opponent]'s barrier blocked $block_percent% of [player]'s damage![br]";

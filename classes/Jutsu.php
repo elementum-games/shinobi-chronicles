@@ -14,6 +14,7 @@ class Jutsu {
     const PURCHASE_TYPE_PURCHASABLE = 2;
     const PURCHASE_TYPE_NON_PURCHASABLE = 3;
     const PURCHASE_TYPE_BLOODLINE = 4;
+    const PURCHASE_TYPE_EVENT_SHOP = 5;
 
     const TYPE_NINJUTSU = 'ninjutsu';
     const TYPE_TAIJUTSU = 'taijutsu';
@@ -34,10 +35,13 @@ class Jutsu {
     const BL_POWER_PER_LEVEL_PERCENT = 0.5;
     const EFFECT_PER_LEVEL_PERCENT = 0.2;
 
+    const CHUUNIN_SCALE_FACTOR = 0.4;
+    const JONIN_SCALE_FACTOR = 0.257;
+
     // Genjutsu gets declared with full power and effect instead of a tradeoff between them, we balance in code
     const GENJUTSU_ATTACK_POWER_MODIFIER = 0.55;
 
-    public static array $elements = [    
+    public static array $elements = [
         self::ELEMENT_FIRE,
         self::ELEMENT_EARTH,
         self::ELEMENT_WIND,
@@ -202,7 +206,7 @@ class Jutsu {
             hand_seals: $jutsu_data['hand_seals']
         );
     }
-    
+
     public function setLevel(int $level, int $exp) {
         $this->level = $level;
         $this->exp = $exp;

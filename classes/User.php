@@ -1087,6 +1087,21 @@ class User extends Fighter {
             if($this->system->db->last_num_rows > 0) {
                 while($jutsu_data = $this->system->db->fetch($result)) {
                     $jutsu_id = $jutsu_data['jutsu_id'];
+
+                    // Scale event jutsu
+                    if ($jutsu_data['purchase_type'] == Jutsu::PURCHASE_TYPE_EVENT_SHOP) {
+                        if ($this->rank_num == 3) {
+                            $jutsu_data['rank'] = 3;
+                            $jutsu_data['use_cost'] *= 2;
+                            $jutsu_data['power'] *= (1 + Jutsu::CHUUNIN_SCALE_FACTOR);
+                        }
+                        else if ($this->rank_num == 4) {
+                            $jutsu_data['rank'] = 4;
+                            $jutsu_data['use_cost'] *= 3;
+                            $jutsu_data['power'] *= ((1 + Jutsu::JONIN_SCALE_FACTOR) * (1 + Jutsu::CHUUNIN_SCALE_FACTOR));
+                        }
+                    }
+
                     $jutsu = Jutsu::fromArray($jutsu_id, $jutsu_data);
 
                     if($player_jutsu[$jutsu_id]['level'] == 0) {
