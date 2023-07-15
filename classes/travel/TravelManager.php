@@ -346,6 +346,10 @@ class TravelManager {
 
         $locations = [];
         foreach ($this->system->db->fetch_all($result) as $loc) {
+            if ($loc['name'] == "Ayakashi's Abyss" && $this->system->event == null) {
+                $loc['action_url'] = $this->system->router->getUrl("forbiddenShop");
+                $loc['action_message'] = "Enter the Abyss";
+            }
             $locations[] = new MapLocation($loc);
         }
 
@@ -366,7 +370,7 @@ class TravelManager {
         }
 
         // TEMP Add Events - We have to hard code the mission IDs is System for now
-        if (isset($this->system->event)) {
+        if ($this->system->event != null) {
             if ($this->system->event instanceof LanternEvent) {
                 foreach ($this->system->event->mission_coords['gold'] as $event_mission) {
                     $objectives[] = new MapObjectiveLocation(

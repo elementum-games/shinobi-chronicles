@@ -591,7 +591,7 @@ class System {
 
     public function checkForActiveEvent(): void {
         $current_datetime = new DateTimeImmutable();
-
+        $this->event = null;
         // July 2023 Lantern Event
         $july_2023_lantern_event_start_time = new DateTimeImmutable('2023-07-01');
         $july_2023_lantern_event_end_time = new DateTimeImmutable('2023-07-16');

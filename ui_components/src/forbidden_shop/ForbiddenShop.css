@@ -1,0 +1,124 @@
+.shop_menu_container {
+    position: relative;
+    margin-top: 30px;
+    margin-bottom: 15px;
+    height: 530px;
+    width: 96%;
+    margin-left: auto;
+    margin-right: auto;
+    background: url(/../images/forbidden_shop/bannerimg.png);
+    background-size: auto;
+    background-repeat: no-repeat;
+}
+.shop_title {
+    position: absolute;
+    left: 40px;
+    top: 50px;
+}
+.shop_owner_container {
+    position: absolute;
+    right: 0px;
+    height: 100%;
+    text-align: right;
+    overflow: hidden;
+}
+.shop_owner_image {
+    margin-top: 30px;
+    height: 90%;
+    width: 90%;
+}
+.shop_frame_nw {
+    position: absolute;
+    left: -15px;
+    top: -15px;
+    width: 95%;
+}
+.shop_frame_ne {
+    position: absolute;
+    right: -15px;
+    top: -15px;
+    width: 95%;
+    transform: scaleX(-1);
+}
+.shop_frame_se {
+    position: absolute;
+    right: -15px;
+    bottom: -15px;
+    width: 95%;
+    transform: rotate(180deg);
+}
+.shop_frame_sw {
+    position: absolute;
+    left: -15px;
+    bottom: -15px;
+    width: 95%;
+    transform: scaleY(-1);
+}
+.shop_owner_dialogue_container {
+
+}
+.shop_menu {
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+    position: absolute;
+    left: 150px;
+    bottom: 120px;
+}
+
+.shop_menu_button {
+    cursor: pointer;
+    width: 250px;
+    height: 32px;
+    overflow: visible;
+}
+    .shop_menu_button .shop_button_center {
+        fill: #68293f;
+    }
+    .shop_menu_button:hover .shop_button_center {
+        fill: #924862;
+    }
+    .shop_menu_button .shop_button_center.active {
+        fill: #5964a6;
+    }
+    .shop_menu_button .shop_button_back {
+        fill: #83455b;
+    }
+    .shop_menu_button:hover .shop_button_back {
+        fill: #a05570;
+        width: 92%;
+        x: 4%;
+    }
+    .shop_menu_button .shop_button_back.active {
+        fill: #bfb7e0;
+    }
+.shop_button_center {
+    clip-path: polygon(20px 0px, calc(100% - 20px) 0px, 100% 50%, calc(100% - 20px) 100%, 20px 100%, 0px 50%);
+}
+.shop_button_back {
+    clip-path: polygon(16px 0px, calc(100% - 16px) 0px, 100% 50%, calc(100% - 16px) 100%, 16px 100%, 0px 50%);
+    transition: all 0.2s;
+}
+.shop_button_center_shadow {
+    clip-path: polygon(20px 0px, calc(100% - 20px) 0px, 100% 50%, calc(100% - 20px) 100%, 20px 100%, 0px 50%);
+}
+.shop_button_back_shadow {
+    clip-path: polygon(16px 0px, calc(100% - 16px) 0px, 100% 50%, calc(100% - 16px) 100%, 16px 100%, 0px 50%);
+}
+.shop_button_text {
+    font-family: Segoe UI;
+    font-size: 12pt;
+    font-style: italic;
+    font-variant: small-caps;
+}
+.shop_button_shadow_text {
+    font-family: Segoe UI;
+    font-size: 12pt;
+    fill: #101113;
+    font-style: italic;
+    font-variant: small-caps;
+}
+.shop_menu_button:hover .shop_button_text {
+    text-decoration: underline;
+    text-underline-offset: 5px;
+}
