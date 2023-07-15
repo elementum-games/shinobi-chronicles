@@ -76,6 +76,7 @@ class User extends Fighter {
     public static int $jutsu_train_gain = 5;
 
     public System $system;
+    private bool $read_only = false;
 
     public string $id;
     public int $user_id;
@@ -305,11 +306,16 @@ class User extends Fighter {
      * @return User
      * @throws RuntimeException
      */
-    public static function loadFromId(System $system, int $user_id, bool $remote_view = false): User {
+    public static function loadFromId(
+        System $system,
+        int $user_id,
+        bool $remote_view = false,
+        bool $read_only = false
+    ): User {
         $user = new User($system, $user_id);
+        $user->read_only = $read_only;
 
-        $result = $system->db->query(
-            "SELECT
+        $query = "SELECT
                 `user_id`,
                 `user_name`,
                 `ban_data`,
@@ -331,8 +337,12 @@ class User extends Fighter {
                 `sensei_id`,
                 `accept_students`,
                 `village`
-                FROM `users` WHERE `user_id`='$user_id' LIMIT 1 FOR UPDATE"
-        );
+                FROM `users` WHERE `user_id`='$user_id' LIMIT 1";
+        if(!$read_only) {
+            $query .= " FOR UPDATE";
+        }
+        $result = $system->db->query($query);
+
         if($system->db->last_num_rows == 0) {
             throw new RuntimeException("User does not exist!");
         }
@@ -1690,6 +1700,10 @@ class User extends Fighter {
         -Parameters-
     */
     public function updateData() {
+        if($this->read_only) {
+            throw new RuntimeException("Cannot update, User is loaded as read-only!");
+        }
+
         // Check achievements
         $this->checkAchievementCompletion();
 

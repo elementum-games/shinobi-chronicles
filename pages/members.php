@@ -141,7 +141,12 @@ function members(): void {
 			}
 
 			$result = $system->db->fetch($result);
-			$viewUser = User::loadFromId($system, $result['user_id'], true);
+			$viewUser = User::loadFromId(
+                system: $system,
+                user_id: $result['user_id'],
+                remote_view: true,
+                read_only: true
+            );
 			$viewUser->loadData(User::UPDATE_NOTHING, true);
 
 			$journal_result = $system->db->query(
@@ -165,7 +170,8 @@ function members(): void {
                 if (!SenseiManager::isActiveSensei($viewUser->user_id, $system)) {
                     $sensei += SenseiManager::getSenseiUserData($viewUser->sensei_id, $system);
                 }
-            } else if (SenseiManager::isActiveSensei($viewUser->user_id, $system)) {
+            }
+            else if (SenseiManager::isActiveSensei($viewUser->user_id, $system)) {
                 // get sensei table data
                 $sensei = SenseiManager::getSenseiByID($viewUser->user_id, $system);
                 // if sensei has students, get student data

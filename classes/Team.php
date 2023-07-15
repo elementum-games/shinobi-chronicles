@@ -268,7 +268,7 @@ class Team {
      * @throws RuntimeException
      */
     public function fetchLeader(): User {
-        $leader = User::loadFromId($this->system, $this->leader, true);
+        $leader = User::loadFromId(system: $this->system, user_id: $this->leader, remote_view: true, read_only: true);
         $leader->loadData(User::UPDATE_NOTHING, true);
         return $leader;
     }

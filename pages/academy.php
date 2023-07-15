@@ -104,7 +104,12 @@ function academy() {
 	// If create application
 	if (isset($_GET['apply'])) {
         try {
-			$sensei = User::loadFromId($system, (int)$_GET['apply'], true);
+			$sensei = User::loadFromId(
+                system: $system,
+                user_id: (int)$_GET['apply'],
+                remote_view: true,
+                read_only: true
+            );
 			// check if already student
 			if ($player->sensei_id != 0) {
                 throw new RuntimeException('You already have a sensei!');
