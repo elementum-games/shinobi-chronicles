@@ -263,7 +263,7 @@ function event() {
                         source_quantity_given: 1,
                         target_item_id: $system->event->item_ids['red_lantern_id'],
                         target_item_name: 'Red Lantern',
-                        target_quantity_received: 5,
+                        target_quantity_received: LanternEvent::$static_config['red_lanterns_per_blue'],
                     );
                     break;
                 case "violet_red":
@@ -275,7 +275,7 @@ function event() {
                         source_quantity_given: 1,
                         target_item_id: $system->event->item_ids['red_lantern_id'],
                         target_item_name: 'Red Lantern',
-                        target_quantity_received: 20,
+                        target_quantity_received: LanternEvent::$static_config['red_lanterns_per_violet'],
                     );
                     break;
                 case "gold_red":
@@ -287,7 +287,7 @@ function event() {
                         source_quantity_given: 1,
                         target_item_id: $system->event->item_ids['red_lantern_id'],
                         target_item_name: 'Red Lantern',
-                        target_quantity_received: 50,
+                        target_quantity_received: LanternEvent::$static_config['red_lanterns_per_gold'],
                     );
                     break;
                 case "red_shadow":
@@ -311,7 +311,7 @@ function event() {
                         source_quantity_given: 1,
                         target_item_id: $system->event->item_ids['red_lantern_id'],
                         target_item_name: 'Red Lantern',
-                        target_quantity_received: 100,
+                        target_quantity_received: LanternEvent::$static_config['red_lanterns_per_shadow'],
                     );
                     break;
                 case "shadow_sacred_red":

@@ -34,6 +34,10 @@ class ForbiddenShopApiPresenter {
                 'gold_lantern_id' => LanternEvent::$static_item_ids['gold_lantern_id'],
                 'shadow_essence_id' => LanternEvent::$static_item_ids['shadow_essence_id'],
                 'yen_per_lantern' => LanternEvent::$static_config['yen_per_lantern'],
+                'red_lanterns_per_blue' => LanternEvent::$static_config['red_lanterns_per_blue'],
+                'red_lanterns_per_violet' => LanternEvent::$static_config['red_lanterns_per_violet'],
+                'red_lanterns_per_gold' => LanternEvent::$static_config['red_lanterns_per_gold'],
+                'red_lanterns_per_shadow' => LanternEvent::$static_config['red_lanterns_per_shadow'],
             ],
         ];
     }

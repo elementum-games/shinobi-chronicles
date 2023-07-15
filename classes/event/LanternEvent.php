@@ -42,10 +42,13 @@ class LanternEvent extends Event {
         'nightmare_mission_id' => 114,
     ];
 
-    public static $static_config = [
+    public static array $static_config = [
         'yen_per_lantern' => 25,
+        'red_lanterns_per_blue' => 5,
+        'red_lanterns_per_violet' => 20,
+        'red_lanterns_per_gold' => 50,
+        'red_lanterns_per_shadow' => 100,
     ];
-
 
     public array $config = [];
 

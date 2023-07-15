@@ -1,9 +1,13 @@
+
+:root {
+    --forbidden-shop-padding: 2%;
+}
 .shop_menu_container {
     position: relative;
     margin-top: 30px;
     margin-bottom: 15px;
     height: 530px;
-    width: 96%;
+    width: calc(100% - (var(--forbidden-shop-padding) * 2));
     margin-left: auto;
     margin-right: auto;
     background: url(/../images/forbidden_shop/bannerimg.png);
@@ -227,4 +231,12 @@
     animation: fadeInFromBlack 2s ease-in-out;
     animation-delay: 4s;
     animation-fill-mode: forwards;
+}
+
+.forbidden_shop_sub_header {
+    margin-left: var(--forbidden-shop-padding);
+    margin-top: 25px;
+}
+.currency_exchange {
+    margin: 10px var(--forbidden-shop-padding);
 }

@@ -46,10 +46,10 @@ function ForbiddenShop({
     forbiddenShopAPI: links.forbiddenShopAPI,
     eventData: eventData,
     userAPI: links.userAPI
-  }), /*#__PURE__*/React.createElement(CurrencyExchange, {
+  }), /*#__PURE__*/React.createElement(LanternEventCurrencyExchange, {
     playerInventory: playerInventory,
     forbiddenShopAPI: links.forbiddenShopAPI,
-    eventData: eventData,
+    eventData: eventData.lanternEvent,
     userAPI: links.userAPI
   }));
 }
@@ -270,13 +270,81 @@ function ShopMenuButton({
   }, buttonText)));
 }
 
-function CurrencyExchange({
+function LanternEventCurrencyExchange({
   playerInventory,
   forbiddenShopAPI,
   eventData,
   userAPI
 }) {
-  return /*#__PURE__*/React.createElement(React.Fragment, null);
+  const [currenciesToExchange, setCurrenciesToExchange] = React.useState({
+    redLantern: 10000,
+    blueLantern: 1000,
+    violetLantern: 500,
+    goldLantern: 50,
+    shadowEssence: 2
+  });
+  return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("h3", {
+    className: "forbidden_shop_sub_header"
+  }, "Event currency exchange"), /*#__PURE__*/React.createElement("div", {
+    className: "currency_exchange box-secondary"
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "event_name"
+  }, "Festival of Lanterns event"), /*#__PURE__*/React.createElement("span", {
+    className: "event_date"
+  }, "July 1 - July 15, 2023"), /*#__PURE__*/React.createElement("div", {
+    className: "currencies_to_exchange"
+  }, /*#__PURE__*/React.createElement(CurrencyExchangeInput, {
+    name: "Red Lantern",
+    quantityToExchange: currenciesToExchange.redLantern,
+    setQuantityToExchange: newVal => setCurrenciesToExchange(prevVal => ({ ...prevVal,
+      redLantern: newVal
+    })),
+    yenForEach: eventData.yen_per_lantern
+  }), /*#__PURE__*/React.createElement(CurrencyExchangeInput, {
+    name: "Blue Lantern",
+    quantityToExchange: currenciesToExchange.blueLantern,
+    setQuantityToExchange: newVal => setCurrenciesToExchange(prevVal => ({ ...prevVal,
+      blueLantern: newVal
+    })),
+    yenForEach: eventData.yen_per_lantern * eventData.red_lanterns_per_blue
+  }), /*#__PURE__*/React.createElement(CurrencyExchangeInput, {
+    name: "Violet Lantern",
+    quantityToExchange: currenciesToExchange.violetLantern,
+    setQuantityToExchange: newVal => setCurrenciesToExchange(prevVal => ({ ...prevVal,
+      violetLantern: newVal
+    })),
+    yenForEach: eventData.yen_per_lantern * eventData.red_lanterns_per_violet
+  }), /*#__PURE__*/React.createElement(CurrencyExchangeInput, {
+    name: "Gold Lantern",
+    quantityToExchange: currenciesToExchange.goldLantern,
+    setQuantityToExchange: newVal => setCurrenciesToExchange(prevVal => ({ ...prevVal,
+      goldLantern: newVal
+    })),
+    yenForEach: eventData.yen_per_lantern * eventData.red_lanterns_per_gold
+  }), /*#__PURE__*/React.createElement(CurrencyExchangeInput, {
+    name: "Shadow Essence",
+    quantityToExchange: currenciesToExchange.shadowEssence,
+    setQuantityToExchange: newVal => setCurrenciesToExchange(prevVal => ({ ...prevVal,
+      shadowEssence: newVal
+    })),
+    yenForEach: eventData.yen_per_lantern * eventData.red_lanterns_per_shadow
+  }))));
+}
+
+function CurrencyExchangeInput({
+  name,
+  quantityToExchange,
+  setQuantityToExchange,
+  yenForEach
+}) {
+  const yenToReceive = quantityToExchange * yenForEach;
+  return /*#__PURE__*/React.createElement("div", {
+    className: "currency_to_exchange"
+  }, /*#__PURE__*/React.createElement("span", null, name), /*#__PURE__*/React.createElement("span", null, "x", quantityToExchange.toLocaleString()), /*#__PURE__*/React.createElement("input", {
+    type: "number",
+    value: quantityToExchange,
+    onChange: e => setQuantityToExchange(e.target.value)
+  }), /*#__PURE__*/React.createElement("span", null, yenToReceive.toLocaleString(), " yen"));
 }
 
 function ScrollExchange({

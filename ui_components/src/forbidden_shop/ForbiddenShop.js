@@ -4,12 +4,27 @@ import type {
     PlayerInventoryType
 } from "../_schema/userSchema.js";
 
+type LanternEventData = {|
+    +red_lantern_id: number,
+    +blue_lantern_id: number,
+    +violet_lantern_id: number,
+    +gold_lantern_id: number,
+    +shadow_essence_id: number,
+    +yen_per_lantern: number,
+    +red_lanterns_per_blue: number,
+    +red_lanterns_per_violet: number,
+    +red_lanterns_per_gold: number,
+    +red_lanterns_per_shadow: number,
+|};
+
 type Props = {|
     +links: {|
         +forbiddenShopAPI: string,
         +userAPI: string,
     |},
-    +eventData: Array,
+    +eventData: {|
+        +lanternEvent: LanternEventData
+    |},
     +playerInventory: PlayerInventoryType,
 |};
 function ForbiddenShop({
@@ -64,10 +79,10 @@ function ForbiddenShop({
                 eventData={eventData}
                 userAPI={links.userAPI}
             />
-            <CurrencyExchange
+            <LanternEventCurrencyExchange
                 playerInventory={playerInventory}
                 forbiddenShopAPI={links.forbiddenShopAPI}
-                eventData={eventData}
+                eventData={eventData.lanternEvent}
                 userAPI={links.userAPI}
             />
         </div>
@@ -197,20 +212,114 @@ function ShopMenuButton({ onCLick, buttonText, buttonName, activeButtonName, but
 type CurrencyExchangeProps = {|
     +playerInventory: PlayerInventoryType,
     +forbiddenShopAPI: string,
-    +eventData: array,
+    +eventData: LanternEventData,
     +userAPI: string,
 |};
-function CurrencyExchange({ playerInventory, forbiddenShopAPI, eventData, userAPI }) {
+function LanternEventCurrencyExchange({
+    playerInventory,
+    forbiddenShopAPI,
+    eventData,
+    userAPI
+}: CurrencyExchangeProps) {
+    const [currenciesToExchange, setCurrenciesToExchange] = React.useState({
+        redLantern: 10000,
+        blueLantern: 1000,
+        violetLantern: 500,
+        goldLantern: 50,
+        shadowEssence: 2
+    });
+
     return (
         <>
+            <h3 className="forbidden_shop_sub_header">Event currency exchange</h3>
+            <div className="currency_exchange box-secondary">
+                <span className="event_name">Festival of Lanterns event</span>
+                <span className="event_date">July 1 - July 15, 2023</span>
+
+                <div className="currencies_to_exchange">
+                    <CurrencyExchangeInput
+                        name="Red Lantern"
+                        quantityToExchange={currenciesToExchange.redLantern}
+                        setQuantityToExchange={(newVal) => setCurrenciesToExchange(prevVal => ({
+                            ...prevVal,
+                            redLantern: newVal
+                        }))}
+                        yenForEach={eventData.yen_per_lantern}
+                    />
+                    <CurrencyExchangeInput
+                        name="Blue Lantern"
+                        quantityToExchange={currenciesToExchange.blueLantern}
+                        setQuantityToExchange={(newVal) => setCurrenciesToExchange(prevVal => ({
+                            ...prevVal,
+                            blueLantern: newVal
+                        }))}
+                        yenForEach={eventData.yen_per_lantern * eventData.red_lanterns_per_blue}
+                    />
+                    <CurrencyExchangeInput
+                        name="Violet Lantern"
+                        quantityToExchange={currenciesToExchange.violetLantern}
+                        setQuantityToExchange={(newVal) => setCurrenciesToExchange(prevVal => ({
+                            ...prevVal,
+                            violetLantern: newVal
+                        }))}
+                        yenForEach={eventData.yen_per_lantern * eventData.red_lanterns_per_violet}
+                    />
+                    <CurrencyExchangeInput
+                        name="Gold Lantern"
+                        quantityToExchange={currenciesToExchange.goldLantern}
+                        setQuantityToExchange={(newVal) => setCurrenciesToExchange(prevVal => ({
+                            ...prevVal,
+                            goldLantern: newVal
+                        }))}
+                        yenForEach={eventData.yen_per_lantern * eventData.red_lanterns_per_gold}
+                    />
+                    <CurrencyExchangeInput
+                        name="Shadow Essence"
+                        quantityToExchange={currenciesToExchange.shadowEssence}
+                        setQuantityToExchange={(newVal) => setCurrenciesToExchange(prevVal => ({
+                            ...prevVal,
+                            shadowEssence: newVal
+                        }))}
+                        yenForEach={eventData.yen_per_lantern * eventData.red_lanterns_per_shadow}
+                    />
+                </div>
+            </div>
         </>
+    );
+}
+
+type CurrencyExchangeInputProps = {|
+    +name: string,
+    +quantityToExchange: number,
+    +yenForEach: number,
+    +setQuantityToExchange: (number) => void,
+|};
+function CurrencyExchangeInput({
+    name,
+    quantityToExchange,
+    setQuantityToExchange,
+    yenForEach
+}) {
+    const yenToReceive = quantityToExchange * yenForEach;
+
+    return (
+        <div className="currency_to_exchange">
+            <span>{name}</span>
+            <span>x{quantityToExchange.toLocaleString()}</span>
+            <input
+                type="number"
+                value={quantityToExchange}
+                onChange={(e) => setQuantityToExchange(e.target.value)}
+            />
+            <span>{yenToReceive.toLocaleString()} yen</span>
+        </div>
     );
 }
 
 type ScrollExchangeProps = {|
     +playerInventory: PlayerInventoryType,
     +forbiddenShopAPI: string,
-    +eventData:array,
+    +eventData: LanternEventData,
     +userAPI: string,
 |};
 function ScrollExchange({ playerInventory, forbiddenShopAPI, eventData, userAPI }) {

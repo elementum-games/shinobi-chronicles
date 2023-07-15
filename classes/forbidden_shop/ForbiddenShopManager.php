@@ -13,9 +13,9 @@ class ForbiddenShopManager {
 
     /**
      * @param string $event_name
-     * @param string $curreny_name
-     * @param int $quantity
-     * @throws RuntimeException
+     * @param        $currency_name
+     * @param int    $quantity
+     * @return string
      */
     public function exchangeEventCurrency($event_name, $currency_name, $quantity): string
     {
