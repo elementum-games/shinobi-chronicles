@@ -83,4 +83,19 @@ class ForbiddenShopManager {
                 throw new RuntimeException("Invalid event");
         }
     }
+
+    /**
+     * @throws RuntimeException
+     */
+    public function getEventJutsu(): array
+    {
+        $event_jutsu = array();
+        $result = $this->system->db->query(
+            "SELECT * FROM `jutsu` WHERE `purchase_type` = '5';"
+        );
+        while ($row = $this->system->db->fetch($result)) {
+            $event_jutsu[$row['jutsu_id']] = Jutsu::fromArray($row['jutsu_id'], $row);
+        }
+        return $event_jutsu;
+    }
 }
