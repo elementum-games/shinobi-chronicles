@@ -1,4 +1,5 @@
 import { CharacterAvatar } from "../CharacterAvatar.js";
+
 function Profile({
   links,
   playerData,
@@ -34,6 +35,7 @@ function Profile({
     playerAchievements: playerAchievements
   })));
 }
+
 function StatusAttributes({
   playerData,
   playerSettings,
@@ -101,6 +103,7 @@ function StatusAttributes({
     href: links.clan
   }, playerData.clanName)))))));
 }
+
 function PlayerStats({
   playerData,
   playerStats
@@ -173,6 +176,7 @@ function PlayerStats({
     className: "ft-c3"
   }))));
 }
+
 function PlayerBloodline({
   playerData,
   bloodlinePageUrl,
@@ -194,6 +198,7 @@ function PlayerBloodline({
     href: buyBloodlineUrl
   }, "None")));
 }
+
 function DailyTasks({
   dailyTasks
 }) {
@@ -224,6 +229,7 @@ function DailyTasks({
     }
   }, dailyTask.progressCaption)))));
 }
+
 function PlayerAchievements({
   playerAchievements
 }) {
@@ -249,4 +255,5 @@ function PlayerAchievements({
     className: "progress_label"
   }, achievement.progressLabel)))));
 }
+
 window.Profile = Profile;

@@ -204,7 +204,8 @@ class User extends Fighter {
     public $chat_effect;
     public $last_login;
 
-    public $jutsu_scrolls;
+    /** @var Jutsu[] */
+    public array $jutsu_scrolls = [];
     public string $avatar_link;
     public $profile_song;
     public $log_actions;

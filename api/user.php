@@ -41,6 +41,11 @@ try {
                 'playerSettings' => UserAPIPresenter::playerSettingsResponse($player),
             ];
             break;
+        case "getPlayerInventory":
+            $UserAPIResponse->response_data = [
+                'playerInventory' => UserAPIPresenter::playerInventoryResponse($player),
+            ];
+            break;
         case "getMissionData":
             $UserAPIResponse->response_data = [
                 'missionData' => UserAPIPresenter::missionDataResponse(userManager: $UserAPIManager),

@@ -1,14 +1,16 @@
 // @flow strict
 
+import type { JutsuType } from "../_schema/jutsu.js";
+
 // Match this type to BattleApiPresenter::buildResponse
 export type BattleType = {|
     +id: number,
     +fighters: { [key: string]: FighterType },
     +playerId: string,
     +opponentId: string,
-    +playerDefaultAttacks: $ReadOnlyArray<JutsuType>,
-    +playerEquippedJutsu: $ReadOnlyArray<JutsuType>,
-    +playerBloodlineJutsu: $ReadOnlyArray<JutsuType>,
+    +playerDefaultAttacks: $ReadOnlyArray<BattleJutsuType>,
+    +playerEquippedJutsu: $ReadOnlyArray<BattleJutsuType>,
+    +playerBloodlineJutsu: $ReadOnlyArray<BattleJutsuType>,
     +playerEquippedWeapons: $ReadOnlyArray<WeaponType>,
     +field: BattleFieldType,
     +isSpectating: boolean,
@@ -59,20 +61,12 @@ export type BattleFieldTileType = {|
 |};
 
 export type JutsuCategory = 'ninjutsu' | 'genjutsu' | 'taijutsu' | "bloodline";
-export type JutsuElement = 'None' | 'Fire' | 'Earth' | 'Wind' | 'Water' | 'Lightning';
 
 // BattleApiPresenter::jutsuResponse
-export type JutsuType = {|
-    +id: number,
+export type BattleJutsuType = {|
+    ...JutsuType,
     +combatId: string,
-    +name: string,
     +activeCooldownTurnsLeft: number,
-    +jutsuType: 'ninjutsu' | 'genjutsu' | 'taijutsu',
-    +useType: 'physical' | 'projectile' | 'projectile_aoe' | 'spawn' | 'barrier',
-    +targetType: 'fighter_id' | 'tile' | 'direction',
-    +handSeals: $ReadOnlyArray<string>,
-    +range: number,
-    +element: JutsuElement;
 |};
 
 // BattleApiPresenter::weaponResponse
@@ -98,10 +92,10 @@ export type FighterActionLogType = {|
     +hits: $ReadOnlyArray<AttackHitLogType>,
     +effectHits: $ReadOnlyArray<EffectHitLogType>,
     +newEffectAnnouncements: $ReadOnlyArray<string>,
-    +jutsuElement: JutsuType["element"],
-    +jutsuType: JutsuType["jutsuType"],
-    +jutsuUseType: JutsuType["useType"],
-    +jutsuTargetType: JutsuType["targetType"],
+    +jutsuElement: BattleJutsuType["element"],
+    +jutsuType: BattleJutsuType["jutsuType"],
+    +jutsuUseType: BattleJutsuType["useType"],
+    +jutsuTargetType: BattleJutsuType["targetType"],
 |};
 
 export type AttackPathSegmentType = {|
@@ -115,7 +109,7 @@ export type AttackHitLogType = {|
     +attackerName: string,
     +targetId: string,
     +targetName: string,
-    +damageType: JutsuType["jutsuType"],
+    +damageType: BattleJutsuType["jutsuType"],
     +damage: number,
 |};
 

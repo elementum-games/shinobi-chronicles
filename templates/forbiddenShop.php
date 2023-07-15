@@ -20,7 +20,7 @@
                     userAPI: "<?= $system->router->api_links['user'] ?>",
                 },
                 eventData: <?= json_encode(ForbiddenShopAPIPresenter::eventDataResponse()) ?>,
-                playerInventory: <?= json_encode(UserAPIPresenter::playerDataResponse(player: $player, rank_names: RankManager::fetchNames($system))) ?>,
+                playerInventory: <?= json_encode(UserAPIPresenter::playerInventoryResponse(player: $player)) ?>,
             }),
             forbiddenShopContainer
         );

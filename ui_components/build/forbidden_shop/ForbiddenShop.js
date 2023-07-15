@@ -1,5 +1,6 @@
 import { apiFetch } from "../utils/network.js";
 import { clickOnEnter } from "../utils/uiHelpers.js";
+
 function ForbiddenShop({
   links,
   eventData,
@@ -18,6 +19,7 @@ function ForbiddenShop({
       } else {}
     });
   }
+
   function exchangeForbiddenJutsuScroll(item_type, item_id) {
     apiFetch(links.forbiddenShopAPI, {
       request: 'exchangeForbiddenJutsuScroll',
@@ -30,9 +32,11 @@ function ForbiddenShop({
       } else {}
     });
   }
+
   function handleErrors(errors) {
     console.warn(errors);
   }
+
   return /*#__PURE__*/React.createElement("div", {
     className: "forbidden_shop_container"
   }, /*#__PURE__*/React.createElement(ShopMenu, {
@@ -49,27 +53,33 @@ function ForbiddenShop({
     userAPI: links.userAPI
   }));
 }
+
 function ShopMenu({
   ShopMenuButton
 }) {
   const [activeButtonName, setActiveButtonName] = React.useState(null);
   const [dialogueText, setDialogueText] = React.useState(null);
+
   function questionOneClick() {
     setDialogueText("...");
     setActiveButtonName("questionOne");
   }
+
   function questionTwoClick() {
     setDialogueText("... <span class='dialogue_highlight'>Akuji</span>. Nevermind the what.\n Now, you have something that\n belongs to me.");
     setActiveButtonName("questionTwo");
   }
+
   function scrollExchangeJump() {
     setDialogueText("...");
     setActiveButtonName("scrollExchange");
   }
+
   function currencyExchangeJump() {
     setDialogueText("...");
     setActiveButtonName("currencyExchange");
   }
+
   return /*#__PURE__*/React.createElement("div", {
     className: "shop_menu_container"
   }, /*#__PURE__*/React.createElement("img", {
@@ -139,6 +149,7 @@ function ShopMenu({
     buttonClass: "button_fourth"
   })));
 }
+
 function ShopMenuButton({
   onCLick,
   buttonText,
@@ -258,6 +269,7 @@ function ShopMenuButton({
     fill: "#f0e2c6"
   }, buttonText)));
 }
+
 function CurrencyExchange({
   playerInventory,
   forbiddenShopAPI,
@@ -266,6 +278,7 @@ function CurrencyExchange({
 }) {
   return /*#__PURE__*/React.createElement(React.Fragment, null);
 }
+
 function ScrollExchange({
   playerInventory,
   forbiddenShopAPI,
@@ -274,4 +287,5 @@ function ScrollExchange({
 }) {
   return /*#__PURE__*/React.createElement(React.Fragment, null);
 }
+
 window.ForbiddenShop = ForbiddenShop;

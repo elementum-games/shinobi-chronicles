@@ -1,8 +1,8 @@
 // @flow
 
-import type { BattleType, JutsuType } from "./battleSchema.js";
+import type { BattleType, BattleJutsuType } from "./battleSchema.js";
 
-export function findPlayerJutsu(battle: BattleType, jutsuId: number, isBloodline: boolean = false): ?JutsuType {
+export function findPlayerJutsu(battle: BattleType, jutsuId: number, isBloodline: boolean = false): ?BattleJutsuType {
     if(isBloodline) {
         return battle.playerBloodlineJutsu.find(jutsu => jutsu.id === jutsuId);
     }
