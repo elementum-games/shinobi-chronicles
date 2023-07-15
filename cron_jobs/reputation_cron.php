@@ -79,7 +79,7 @@ else {
     }
 }
 
-function weeklyCron($system, $debug = true) {
+function weeklyCron($system, $debug = false) {
     foreach(Reputation::$VillageRep as $RANK_INT => $RANK) {
         if($RANK_INT == 1) {
             // Disable for rank 1
