@@ -674,24 +674,35 @@ return [
             'image' => "<img src='./images/memes/Banhammer.png' />",
             'text' => ':banhammer:',
             'public' => true,
-    ],  
+    ],
     [
             'code' => ':200iq:',
             'image' => "<img src='./images/memes/200IQ.png' />",
             'text' => ':200iq:',
             'public' => true,
-    ],  
+    ],
     [
             'code' => ':galaxybrain:',
             'image' => "<img src='./images/memes/GalaxyBrain.png' />",
             'text' => ':galaxybrain:',
             'public' => true,
-    ],  
+    ],
     [
             'code' => ':bigbrainbobby:',
             'image' => "<img src='./images/memes/BigBrainBobby.png' />",
             'text' => ':bigbrainbobby:',
             'public' => true,
-    ],      
+    ],
+    [
+        'code' => ':elmofire:',
+        'image' => "<img src='./images/memes/elmo_fire.png' />",
+        'text' => ':elmofire:',
+        'public' => true,
+    ],
+    [
+        'code' => ':rotenkohead:',
+        'image' => "<img src='./images/memes/rotenko_head.png' />",
+        'text' => ':rotenkohead:',
+        'public' => true,
+    ],
 ];
-
