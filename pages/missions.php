@@ -365,57 +365,70 @@ function runActiveMission(): bool {
             }
             // Village/Survival mission
             else {
-                echo "<table class='table'><tr><th>Current Mission</th></tr>
+                if ($player->mission_stage['ai_defeated'] == 0) {
+                    echo "<table class='table'>
+                        <tr><th>Current Mission</th></tr>
+                        <tr>
+                            <tr><td style='text-align:center;'><span style='font-weight:bold;'>$mission->name Failed</span><br />
+                                You have failed to defeat any enemies.<br />
+                                Once you have recovered, return for another assignment.
+                            </td>
+                        </tr>
+                    </table>";
+                    $player->clearMission();
+                    $player->last_ai_ms = System::currentTimeMs();
+                    $player->updateData();
+                } else {
+                    echo "<table class='table'><tr><th>Current Mission</th></tr>
 				<tr><td style='text-align:center;'><span style='font-weight:bold;'>$mission->name Complete</span><br />
 				You have completed your mission.<br />";
-                if($mission->mission_type == 5) {
-                    $mission->money = $player->mission_stage['mission_money'];
-                    echo sprintf(
-                        "For your effort in defeating %d enemies, you have received &yen;%d.<br />",
-                        $player->mission_stage['ai_defeated'], $mission->money
-                    );
-                }
-                else {
-                    echo "You have been paid &yen;$mission->money.<br />";
-                }
-
-                // Village reputation
-                if($player->reputation->canGain(true)) {
-                    $rep_gain = $player->reputation->addRep(Reputation::MISSION_GAINS[$mission->rank]);
-                    if ($rep_gain > 0) {
-                        $player->mission_rep_cd = time() + Reputation::ARENA_MISSION_CD;
-                        echo "You have gained $rep_gain village reputation!<br />";
+                    if ($mission->mission_type == 5) {
+                        $mission->money = $player->mission_stage['mission_money'];
+                        echo sprintf(
+                            "For your effort in defeating %d enemies, you have received &yen;%d.<br />",
+                            $player->mission_stage['ai_defeated'], $mission->money
+                        );
+                    } else {
+                        echo "You have been paid &yen;$mission->money.<br />";
                     }
-                }
 
-                // check what mission rank for daily Task
-                $all_mission_ranks = [0, 1, 2, 3, 4];
-                $mission_rank = $all_mission_ranks[$mission->rank];
-                foreach($player->daily_tasks as $task) {
-                    if($task->activity == DailyTask::ACTIVITY_MISSIONS && $task->mission_rank == $mission_rank && !$task->complete) {
-                        $task->progress++;
+                    // Village reputation
+                    if ($player->reputation->canGain(true)) {
+                        $rep_gain = $player->reputation->addRep(Reputation::MISSION_GAINS[$mission->rank]);
+                        if ($rep_gain > 0) {
+                            $player->mission_rep_cd = time() + Reputation::ARENA_MISSION_CD;
+                            echo "You have gained $rep_gain village reputation!<br />";
+                        }
                     }
-                }
 
-                if(isset($player->missions_completed[$mission->rank])) {
-                    $player->missions_completed[$mission->rank] += 1;
-                }
-                else {
-                    $player->missions_completed[$mission->rank] = 1;
-                }
+                    // check what mission rank for daily Task
+                    $all_mission_ranks = [0, 1, 2, 3, 4];
+                    $mission_rank = $all_mission_ranks[$mission->rank];
+                    foreach ($player->daily_tasks as $task) {
+                        if ($task->activity == DailyTask::ACTIVITY_MISSIONS && $task->mission_rank == $mission_rank && !$task->complete) {
+                            $task->progress++;
+                        }
+                    }
 
-                // Rewards
-                echo Mission::processRewards($mission, $player, $system);
-                $player->addMoney($mission->money, "Village mission complete");
-                $player->clearMission();
-                $player->last_ai_ms = System::currentTimeMs();
+                    if (isset($player->missions_completed[$mission->rank])) {
+                        $player->missions_completed[$mission->rank] += 1;
+                    } else {
+                        $player->missions_completed[$mission->rank] = 1;
+                    }
 
-                echo "<a href='$self_link'>Continue</a>
+                    // Rewards
+                    echo Mission::processRewards($mission, $player, $system);
+                    $player->addMoney($mission->money, "Village mission complete");
+                    $player->clearMission();
+                    $player->last_ai_ms = System::currentTimeMs();
+
+                    echo "<a href='$self_link'>Continue</a>
 					</td></tr></table>";
-            }
+                }
 
-            AchievementsManager::handleMissionCompleted($system, $player, $mission);
-            $player->updateData();
+                AchievementsManager::handleMissionCompleted($system, $player, $mission);
+                $player->updateData();
+            }
         }
         // Display mission details
         else if($player->mission_id) {
