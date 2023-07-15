@@ -705,4 +705,10 @@ return [
         'text' => ':rotenkohead:',
         'public' => true,
     ],
+    [
+        'code' => ':notabit:',
+        'image' => "<img src='./images/memes/notabit.png' />",
+        'text' => ':notabit:',
+        'public' => true,
+    ],
 ];
