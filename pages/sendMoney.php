@@ -34,74 +34,55 @@ function sendMoney() {
                 throw new RuntimeException("Invalid amount!");
             }
 
-            $result = $system->db->query(
-                "SELECT `user_id`, `user_name`, `money`, `premium_credits`
-                        FROM `users`
-                        WHERE `user_name`='$recipient' LIMIT 1"
-            );
-            if(!$system->db->last_num_rows) {
+            $recipient = User::findByName($system, $recipient);
+            if(!$recipient) {
                 throw new RuntimeException("Invalid user!");
             }
-            $recipient = $system->db->fetch($result);
+
+            $recipient->loadData(User::UPDATE_NOTHING, true);
 
             if($currency_type == System::CURRENCY_TYPE_MONEY) {
                 if($amount > $player->getMoney()) {
                     throw new RuntimeException("You do not have that much money/AK!");
                 }
-                $player->subtractMoney($amount, "Sent money to {$recipient['user_name']} (#{$recipient['user_id']})");
+                $player->subtractMoney($amount, "Sent money to {$recipient->user_name} (#{$recipient->user_id})");
+                $recipient->addMoney($amount, "Received money from $player->user_name (#$player->user_id)");
 
-                $system->db->query(
-                    "UPDATE `users` SET `money`=`money` + $amount WHERE `user_id`='{$recipient['user_id']}' LIMIT 1"
-                );
-                $system->currencyLog(
-                    $recipient['user_id'],
-                    $currency_type,
-                    $recipient['money'],
-                    $recipient['money'] + $amount,
-                    $amount,
-                    "Received money from $player->user_name (#$player->user_id)"
-                );
+                // Player will be auto-updated later
+                $recipient->updateData();
 
                 $system->log(
                     'money_transfer',
                     'Money Sent',
-                    "{$amount} yen - #{$player->user_id} ($player->user_name) to #{$recipient['user_id']}"
+                    "{$amount} yen - #{$player->user_id} ($player->user_name) to #{$recipient->user_id}"
                 );
 
                 $alert_message = $player->user_name . " has sent you &yen;$amount.";
-                Inbox::sendAlert($system, Inbox::ALERT_YEN_RECEIVED, $player->user_id, $recipient['user_id'], $alert_message);
+                Inbox::sendAlert($system, Inbox::ALERT_YEN_RECEIVED, $player->user_id, $recipient->user_id, $alert_message);
 
-                $system->message("&yen;{$amount} sent to {$recipient['user_name']}!");
+                $system->message("&yen;{$amount} sent to {$recipient->user_name}!");
 
             }
             else if($currency_type == System::CURRENCY_TYPE_PREMIUM_CREDITS) {
                 if($amount > $player->getPremiumCredits()) {
                     throw new RuntimeException("You do not have that much AK!");
                 }
-                $player->subtractPremiumCredits($amount, "Sent AK to {$recipient['user_name']} (#{$recipient['user_id']})");
+                $player->subtractPremiumCredits($amount, "Sent AK to {$recipient->user_name} (#{$recipient->user_id})");
+                $recipient->addPremiumCredits($amount, "Received AK from $player->user_name (#$player->user_id)");
 
-                $system->db->query(
-                    "UPDATE `users` SET `premium_credits`=`premium_credits` + $amount WHERE `user_id`='{$recipient['user_id']}' LIMIT 1"
-                );
-                $system->currencyLog(
-                    $recipient['user_id'],
-                    $currency_type,
-                    $recipient['premium_credits'],
-                    $recipient['premium_credits'] + $amount,
-                    $amount,
-                    "Received AK from $player->user_name (#$player->user_id)"
-                );
+                // Player will be auto-updated later
+                $recipient->updateData();
 
                 $system->log(
                     'premium_credit_transfer',
                     'Premium Credits Sent',
-                    "{$amount} AK - #{$player->user_id} ($player->user_name) to #{$recipient['user_id']}"
+                    "{$amount} AK - #{$player->user_id} ($player->user_name) to #{$recipient->user_id}"
                 );
 
                 $alert_message = $player->user_name . " has sent you $amount Ancient Kunai.";
-                Inbox::sendAlert($system, Inbox::ALERT_AK_RECEIVED, $player->user_id, $recipient['user_id'], $alert_message);
+                Inbox::sendAlert($system, Inbox::ALERT_AK_RECEIVED, $player->user_id, $recipient->user_id, $alert_message);
 
-                $system->message("{$amount} AK sent to {$recipient['user_name']}!");
+                $system->message("{$amount} AK sent to {$recipient->user_name}!");
             }
 
         } catch(RuntimeException $e) {
