@@ -40,6 +40,9 @@ class LanternEvent extends Event {
         'medium_mission_id' => 113,
         'hard_mission_id' => 111,
         'nightmare_mission_id' => 114,
+
+    public static $static_config = [
+        'yen_per_lantern' => 25,
     ];
 
 

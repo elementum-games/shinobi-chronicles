@@ -20,6 +20,10 @@ function event() {
         101 => 'Crystal Pendant!',
     ];
 
+    if ($system->event == null) {
+        throw new RuntimeException("No event in progress!");
+    }
+
     if(isset($_GET['claim'])) {
         $claim = (int)$_GET['claim'];
         $month = date('M', time());

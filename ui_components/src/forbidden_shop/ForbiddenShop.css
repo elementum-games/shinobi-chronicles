@@ -1,0 +1,230 @@
+.shop_menu_container {
+    position: relative;
+    margin-top: 30px;
+    margin-bottom: 15px;
+    height: 530px;
+    width: 96%;
+    margin-left: auto;
+    margin-right: auto;
+    background: url(/../images/forbidden_shop/bannerimg.png);
+    background-size: auto;
+    background-repeat: no-repeat;
+}
+.shop_background_light_left {
+    position: absolute;
+    top: -100px;
+    left: -100px;
+    animation: moveLeftRight 8s ease-in-out infinite;
+}
+.shop_background_light_right {
+    position: absolute;
+    top: -100px;
+    right: -100px;
+    animation: moveRightLeft 6s ease-in-out infinite;
+}
+@keyframes moveLeftRight {
+    0%, 100% {
+        left: -100px; /* Start and end position is at the left edge */
+    }
+
+    50% {
+        left: 100px; /* Middle position is at the right edge minus element's width */
+    }
+}
+@keyframes moveRightLeft {
+    0%, 100% {
+        right: -100px; /* Start and end position is at the left edge */
+    }
+
+    50% {
+        right: 100px; /* Middle position is at the right edge minus element's width */
+    }
+}
+.shop_title {
+    position: absolute;
+    left: 40px;
+    top: 50px;
+}
+.shop_owner_container {
+    position: absolute;
+    right: 0px;
+    height: 100%;
+    text-align: right;
+    overflow: hidden;
+}
+.shop_owner_image {
+    margin-top: 30px;
+    height: 90%;
+    width: 90%;
+    opacity: 0;
+    animation: fadeInFromBlack 2s ease-in-out;
+    animation-delay: 0.5s;
+    animation-fill-mode: forwards;
+}
+@keyframes fadeInFromBlack {
+    0% {
+        opacity: 0;
+    }
+
+    100% {
+        opacity: 1;
+    }
+}
+.shop_frame_nw {
+    position: absolute;
+    left: -15px;
+    top: -15px;
+    width: 95%;
+}
+.shop_frame_ne {
+    position: absolute;
+    right: -15px;
+    top: -15px;
+    width: 95%;
+    transform: scaleX(-1);
+}
+.shop_frame_se {
+    position: absolute;
+    right: -15px;
+    bottom: -15px;
+    width: 95%;
+    transform: rotate(180deg);
+}
+.shop_frame_sw {
+    position: absolute;
+    left: -15px;
+    bottom: -15px;
+    width: 95%;
+    transform: scaleY(-1);
+}
+.shop_owner_dialogue_container {
+
+}
+.shop_menu {
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+    position: absolute;
+    left: 150px;
+    bottom: 120px;
+}
+
+.shop_menu_button {
+    cursor: pointer;
+    width: 250px;
+    height: 32px;
+    overflow: visible;
+}
+    .shop_menu_button .shop_button_center {
+        fill: #68293f;
+    }
+    .shop_menu_button:hover .shop_button_center {
+        fill: #924862;
+    }
+    .shop_menu_button .shop_button_center.active {
+        fill: #5964a6;
+    }
+    .shop_menu_button .shop_button_back {
+        fill: #83455b;
+    }
+    .shop_menu_button:hover .shop_button_back {
+        fill: #a05570;
+        width: 92%;
+        x: 4%;
+    }
+    .shop_menu_button .shop_button_back.active {
+        fill: #bfb7e0;
+    }
+.shop_button_center {
+    clip-path: polygon(20px 0px, calc(100% - 20px) 0px, 100% 50%, calc(100% - 20px) 100%, 20px 100%, 0px 50%);
+}
+.shop_button_back {
+    clip-path: polygon(16px 0px, calc(100% - 16px) 0px, 100% 50%, calc(100% - 16px) 100%, 16px 100%, 0px 50%);
+    transition: all 0.2s;
+}
+.shop_button_center_shadow {
+    clip-path: polygon(20px 0px, calc(100% - 20px) 0px, 100% 50%, calc(100% - 20px) 100%, 20px 100%, 0px 50%);
+}
+.shop_button_back_shadow {
+    clip-path: polygon(16px 0px, calc(100% - 16px) 0px, 100% 50%, calc(100% - 16px) 100%, 16px 100%, 0px 50%);
+}
+.shop_button_text {
+    font-family: Segoe UI;
+    font-size: 12pt;
+    font-style: italic;
+    font-variant: small-caps;
+}
+.shop_button_shadow_text {
+    font-family: Segoe UI;
+    font-size: 12pt;
+    fill: #101113;
+    font-style: italic;
+    font-variant: small-caps;
+}
+.shop_menu_button:hover .shop_button_text {
+    text-decoration: underline;
+    text-underline-offset: 5px;
+}
+
+.shop_owner_dialogue_container {
+    position: absolute;
+    top: 400px;
+    right: 90px;
+    width: 330px;
+    text-align: left;
+}
+.shop_owner_dialogue_text {
+    background: rgba(23, 22, 27, 0.8); 
+    text-align: center;
+    margin-bottom: 5px;
+    padding-left: 45px;
+    padding-right: 45px;
+    padding-top: 15px;
+    padding-bottom: 15px;
+    font-family: Segoe UI;
+    font-size: 12pt;
+    color: #d1c5ad;
+    font-style: italic;
+    box-sizing: border-box;
+}
+.shop_owner_nameplate {
+    background: rgba(11, 10, 12, 1);
+    position: absolute;
+    padding-left: 15px;
+    padding-right: 15px;
+    padding-bottom: 5px;
+    left: 10px;
+    top: -15px;
+    font-family: Segoe UI;
+    font-size: 12pt;
+    color: #d8d2f1;
+    font-weight: bold;
+    font-variant: small-caps;
+}
+.dialogue_highlight {
+    color: #bfb7e0;
+}
+.button_first {
+    opacity: 0;
+    animation: fadeInFromBlack 2s ease-in-out;
+    animation-delay: 1s;
+    animation-fill-mode: forwards;
+}
+.button_second {
+    opacity: 0;
+    animation: fadeInFromBlack 2s ease-in-out;
+    animation-delay: 2s;
+    animation-fill-mode: forwards;
+}
+.button_third {
+    opacity: 0;
+    animation: fadeInFromBlack 2s ease-in-out;
+    animation-delay: 3s;
+    animation-fill-mode: forwards;
+}
+.button_fourth {
+    opacity: 0;
+    animation: fadeInFromBlack 2s ease-in-out;
+    animation-delay: 4s;
+    animation-fill-mode: forwards;
+}
