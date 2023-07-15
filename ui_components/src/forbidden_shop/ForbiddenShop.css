@@ -56,8 +56,10 @@
     margin-top: 30px;
     height: 90%;
     width: 90%;
-    opacity: 1;
+    opacity: 0;
     animation: fadeInFromBlack 2s ease-in-out;
+    animation-delay: 0.5s;
+    animation-fill-mode: forwards;
 }
 @keyframes fadeInFromBlack {
     0% {
