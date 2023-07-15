@@ -5,20 +5,6 @@ function ForbiddenShop({
   eventData,
   playerInventory
 }) {
-  /* Hooks
-  const [userMenu, setUserMenu] = React.useState(navigationAPIData.userMenu);
-  const [activityMenu, setActivityMenu] = React.useState(navigationAPIData.activityMenu);
-  const [villageMenu, setVillageMenu] = React.useState(navigationAPIData.villageMenu);
-  const [staffMenu, setStaffMenu] = React.useState(navigationAPIData.staffMenu);
-  const [playerData, setPlayerData] = React.useState(userAPIData.playerData);
-  const [playerResources, setPlayerResources] = React.useState(userAPIData.playerResources);
-  const [playerSettings, setPlayerSettings] = React.useState(userAPIData.playerSettings);
-  const [regenTime, setRegenTime] = React.useState(userAPIData.playerResources.regen_time);
-  const [regenOffset, setRegenOffset] = React.useState(calculateRegenOffset(userAPIData.playerResources.regen_time));
-  const regenTimeVar = React.useRef(userAPIData.playerResources.regen_time);
-  const queryParameters = new URLSearchParams(window.location.search);*/
-  //const pageID = React.useRef(queryParameters.get("id"));*/                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           
-
   function echangeEventCurrency(event_name, currency_name, quantity) {
     apiFetch(links.forbiddenShopAPI, {
       request: 'exchangeEventCurrency',
