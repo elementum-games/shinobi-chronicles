@@ -122,3 +122,42 @@
     text-decoration: underline;
     text-underline-offset: 5px;
 }
+
+.shop_owner_dialogue_container {
+    position: absolute;
+    top: 400px;
+    right: 90px;
+    width: 330px;
+    text-align: left;
+}
+.shop_owner_dialogue_text {
+    background: rgba(23, 22, 27, 0.8); 
+    text-align: center;
+    margin-bottom: 5px;
+    padding-left: 45px;
+    padding-right: 45px;
+    padding-top: 15px;
+    padding-bottom: 15px;
+    font-family: Segoe UI;
+    font-size: 12pt;
+    color: #d1c5ad;
+    font-style: italic;
+    box-sizing: border-box;
+}
+.shop_owner_nameplate {
+    background: rgba(11, 10, 12, 1);
+    position: absolute;
+    padding-left: 15px;
+    padding-right: 15px;
+    padding-bottom: 5px;
+    left: 10px;
+    top: -15px;
+    font-family: Segoe UI;
+    font-size: 12pt;
+    color: #d8d2f1;
+    font-weight: bold;
+    font-variant: small-caps;
+}
+.dialogue_highlight {
+    color: #bfb7e0;
+}

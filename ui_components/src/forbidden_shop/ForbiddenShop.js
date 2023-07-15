@@ -76,21 +76,21 @@ function ForbiddenShop({
 
 function ShopMenu({ ShopMenuButton }) {
     const [activeButtonName, setActiveButtonName] = React.useState(null);
-    const dialogueText = React.useRef("...");
+    const [dialogueText, setDialogueText] = React.useState(null);
     function questionOneClick() {
-        dialogueText.current = "... Akuji. Nevermind the what.\n Now, you have something that\n belongs to me."
+        setDialogueText("...");
         setActiveButtonName("questionOne");
     }
     function questionTwoClick() {
-        dialogueText.current = "...";
+        setDialogueText("... <span class='dialogue_highlight'>Akuji</span>. Nevermind the what.\n Now, you have something that\n belongs to me.");
         setActiveButtonName("questionTwo");
     }
     function scrollExchangeJump() {
-        dialogueText.current = "...";
+        setDialogueText("...");
         setActiveButtonName("scrollExchange");
     }
     function currencyExchangeJump() {
-        dialogueText.current = "...";
+        setDialogueText("...");
         setActiveButtonName("currencyExchange");
     }
 
@@ -107,10 +107,12 @@ function ShopMenu({ ShopMenuButton }) {
                 <div className="shop_owner">
                     <img src="/../images/forbidden_shop/akuji.png" className="shop_owner_image"/>
                 </div>
-                <div className="shop_owner_dialogue_container">
-                    <div className="shop_owner_dialogue_text">
+                {dialogueText != null &&
+                    <div className="shop_owner_dialogue_container">
+                        <div className="shop_owner_nameplate">Akuji</div>
+                        <div className="shop_owner_dialogue_text" dangerouslySetInnerHTML={{ __html: dialogueText }}></div>
                     </div>
-                </div>
+                }
             </div>
             <div className="shop_menu">
                 <ShopMenuButton

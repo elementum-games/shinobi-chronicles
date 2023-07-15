@@ -53,21 +53,21 @@ function ShopMenu({
   ShopMenuButton
 }) {
   const [activeButtonName, setActiveButtonName] = React.useState(null);
-  const dialogueText = React.useRef("...");
+  const [dialogueText, setDialogueText] = React.useState(null);
   function questionOneClick() {
-    dialogueText.current = "... Akuji. Nevermind the what.\n Now, you have something that\n belongs to me.";
+    setDialogueText("...");
     setActiveButtonName("questionOne");
   }
   function questionTwoClick() {
-    dialogueText.current = "...";
+    setDialogueText("... <span class='dialogue_highlight'>Akuji</span>. Nevermind the what.\n Now, you have something that\n belongs to me.");
     setActiveButtonName("questionTwo");
   }
   function scrollExchangeJump() {
-    dialogueText.current = "...";
+    setDialogueText("...");
     setActiveButtonName("scrollExchange");
   }
   function currencyExchangeJump() {
-    dialogueText.current = "...";
+    setDialogueText("...");
     setActiveButtonName("currencyExchange");
   }
   return /*#__PURE__*/React.createElement("div", {
@@ -96,10 +96,15 @@ function ShopMenu({
   }, /*#__PURE__*/React.createElement("img", {
     src: "/../images/forbidden_shop/akuji.png",
     className: "shop_owner_image"
-  })), /*#__PURE__*/React.createElement("div", {
+  })), dialogueText != null && /*#__PURE__*/React.createElement("div", {
     className: "shop_owner_dialogue_container"
   }, /*#__PURE__*/React.createElement("div", {
-    className: "shop_owner_dialogue_text"
+    className: "shop_owner_nameplate"
+  }, "Akuji"), /*#__PURE__*/React.createElement("div", {
+    className: "shop_owner_dialogue_text",
+    dangerouslySetInnerHTML: {
+      __html: dialogueText
+    }
   }))), /*#__PURE__*/React.createElement("div", {
     className: "shop_menu"
   }, /*#__PURE__*/React.createElement(ShopMenuButton, {
