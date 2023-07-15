@@ -3,6 +3,8 @@
  * @var System $system
  * @var User $player
  */
+
+$ForbiddenShopManager = new ForbiddenShopManager($system, $player);
 ?>
 
 <link rel="stylesheet" type="text/css" href="<?= $system->getCssFileLink("ui_components/src/forbidden_shop/ForbiddenShop.css") ?>" />
@@ -20,6 +22,7 @@
                     userAPI: "<?= $system->router->api_links['user'] ?>",
                 },
                 eventData: <?= json_encode(ForbiddenShopAPIPresenter::eventDataResponse()) ?>,
+                eventJutsu: <?= json_encode(ForbiddenShopApiPresenter::eventJutsuResponse($ForbiddenShopManager)) ?>,
                 playerInventory: <?= json_encode(UserAPIPresenter::playerInventoryResponse(player: $player)) ?>,
             }),
             forbiddenShopContainer

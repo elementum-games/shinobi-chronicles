@@ -41,4 +41,25 @@ class ForbiddenShopApiPresenter {
             ],
         ];
     }
+    /**
+     * @throws RuntimeException
+     */
+    public static function eventJutsuResponse(ForbiddenShopManager $forbiddenShopManager)
+    {
+        return array_map(
+            function (Jutsu $jutsu) {
+                return [
+                    'jutsu_id' => $jutsu->id,
+                    'jutsu_type' => $jutsu->jutsu_type,
+                    'description' => $jutsu->description,
+                    'power' => $jutsu->base_power,
+                    'cooldown' => $jutsu->cooldown,
+                    'effect' => $jutsu->effect,
+                    'effect_amount' => $jutsu->effect_amount,
+                    'effect_duration' => $jutsu->effect_length,
+                ];
+            },
+            $forbiddenShopManager->getEventJutsu()
+        );
+    }
 }

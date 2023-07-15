@@ -240,3 +240,45 @@
 .currency_exchange {
     margin: 10px var(--forbidden-shop-padding);
 }
+
+.scroll_exchange_section {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items:center;
+    margin-top: 40px;
+    gap: 12px;
+}
+.scroll_exchange_header {
+    width: 100%;
+    display: flex;
+    align-items: flex-end;
+}
+.scroll_exchange_title {
+    font-family: Segoe UI;
+    font-size: 14pt;
+    color: #c7b070;
+    font-variant: small-caps;
+    font-weight: 400;
+    margin-left: 20px;
+}
+.scroll_count_container {
+    margin-left: auto;
+}
+.scroll_count_label {
+    font-family: Segoe UI;
+    font-size: 10pt;
+    color: #c7b070;
+}
+.scroll_count {
+    font-family: Segoe UI;
+    font-size: 11pt;
+    color: #c7b070;
+}
+.scroll_exchange_container {
+    width: 94%;
+    height: 500px;
+    background: url(/../images/forbidden_shop/scrolltable_opa15.jpg);
+    background-size: cover;
+    background-repeat: no-repeat;
+}
