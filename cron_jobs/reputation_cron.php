@@ -27,7 +27,7 @@ if(!$system->db->con) {
 }
 
 $player = false;
-if($_SESSION['user_id']) {
+if(isset($_SESSION['user_id'])) {
     $player = User::loadFromId($system, $_SESSION['user_id']);
     $player->loadData();
     $production_key = "RuN ON ProDUCtIon";
@@ -62,11 +62,24 @@ if($_SESSION['user_id']) {
     }
 }
 else {
-    weeklyCron($system);
-    $system->log('cron', 'Weekly Reputation', "Weekly reputation decay has been processed.");
+    // Check for verify to run cron
+    $run_ok = false;
+    if(php_sapi_name() == 'cli') {
+        $run_ok = true;
+    }
+    else if($_SERVER['REMOTE_ADDR'] == $_SERVER['SERVER_ADDR']) {
+        $run_ok = true;
+    }
+    if($run_ok) {
+        weeklyCron($system);
+        $system->log('cron', 'Weekly Reputation', "Weekly reputation decay has been processed.");
+    }
+    else {
+        $system->log('cron', 'Invalid access', "Attempted access by " . $_SERVER['REMOTE_ADDR']);
+    }
 }
 
-function weeklyCron($system, $debug = false) {
+function weeklyCron($system, $debug = true) {
     foreach(Reputation::$VillageRep as $RANK_INT => $RANK) {
         if($RANK_INT == 1) {
             // Disable for rank 1

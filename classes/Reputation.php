@@ -8,6 +8,7 @@ class Reputation {
             'min_rep' => 0,
             'weekly_cap' => 500,
             'base_pvp_rep_reward' => 1,
+            'base_decay' => 0,
         ],
         2 => [
             'title' => 'Villager',
@@ -15,6 +16,7 @@ class Reputation {
             'min_rep' => 500,
             'weekly_cap' => 500,
             'base_pvp_rep_reward' => 1,
+            'base_decay' => 300,
         ],
         3 => [
             'title' => 'Well-Known Villager',
@@ -22,6 +24,7 @@ class Reputation {
             'min_rep' => 1000,
             'weekly_cap' => 500,
             'base_pvp_rep_reward' => 1,
+            'base_decay' => 400,
         ],
         4 => [
             'title' => 'Respected Villager',
@@ -29,6 +32,7 @@ class Reputation {
             'min_rep' => 1750,
             'weekly_cap' => 600,
             'base_pvp_rep_reward' => 2,
+            'base_decay' => 450,
         ],
         5 => [
             'title' => 'Shinobi',
@@ -36,6 +40,7 @@ class Reputation {
             'min_rep' => 2500,
             'weekly_cap' => 600,
             'base_pvp_rep_reward' => 2,
+            'base_decay' => 500,
         ],
         6 => [
             'title' => 'Respected Shinobi',
@@ -43,6 +48,7 @@ class Reputation {
             'min_rep' => 3500,
             'weekly_cap' => 600,
             'base_pvp_rep_reward' => 2,
+            'base_decay' => 550,
         ],
         7 => [
             'title' => 'Elite Shinobi',
@@ -50,6 +56,7 @@ class Reputation {
             'min_rep' => 5000,
             'weekly_cap' => 700,
             'base_pvp_rep_reward' => 3,
+            'base_decay' => 600,
         ],
         8 => [
             'title' => 'Master Shinobi',
@@ -57,6 +64,7 @@ class Reputation {
             'min_rep' => 7500,
             'weekly_cap' => 800,
             'base_pvp_rep_reward' => 3,
+            'base_decay' => 650,
         ],
         9 => [
             'title' => 'Legendary Shinobi',
@@ -64,6 +72,7 @@ class Reputation {
             'min_rep' => 10000,
             'weekly_cap' => 900,
             'base_pvp_rep_reward' => 3,
+            'base_decay' => 750,
         ]
     ];
 
@@ -94,7 +103,7 @@ class Reputation {
         DailyTask::DIFFICULTY_MEDIUM . '_' . DailyTask::ACTIVITY_PVP => 10,
         DailyTask::DIFFICULTY_HARD . '_' . DailyTask::ACTIVITY_PVP => 15,
     ];
-    const DECAY = 0.95;
+    const DECAY_MODIFIER = 0.65;
 
     protected int $rep;
     protected int $weekly_rep;
