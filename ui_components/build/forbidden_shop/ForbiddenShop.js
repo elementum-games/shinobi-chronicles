@@ -1,12 +1,11 @@
 import { apiFetch } from "../utils/network.js";
 import { clickOnEnter } from "../utils/uiHelpers.js";
-
 function ForbiddenShop({
   links,
   eventData,
   playerInventory
 }) {
-  function echangeEventCurrency(event_name, currency_name, quantity) {
+  function exchangeEventCurrency(event_name, currency_name, quantity) {
     apiFetch(links.forbiddenShopAPI, {
       request: 'exchangeEventCurrency',
       event_name: event_name,
@@ -19,7 +18,6 @@ function ForbiddenShop({
       } else {}
     });
   }
-
   function exchangeForbiddenJutsuScroll(item_type, item_id) {
     apiFetch(links.forbiddenShopAPI, {
       request: 'exchangeForbiddenJutsuScroll',
@@ -32,11 +30,9 @@ function ForbiddenShop({
       } else {}
     });
   }
-
   function handleErrors(errors) {
     console.warn(errors);
   }
-
   return /*#__PURE__*/React.createElement("div", {
     className: "forbidden_shop_container"
   }, /*#__PURE__*/React.createElement(ShopMenu, {
@@ -53,33 +49,27 @@ function ForbiddenShop({
     userAPI: links.userAPI
   }));
 }
-
 function ShopMenu({
   ShopMenuButton
 }) {
   const [activeButtonName, setActiveButtonName] = React.useState(null);
   const [dialogueText, setDialogueText] = React.useState(null);
-
   function questionOneClick() {
     setDialogueText("...");
     setActiveButtonName("questionOne");
   }
-
   function questionTwoClick() {
     setDialogueText("... <span class='dialogue_highlight'>Akuji</span>. Nevermind the what.\n Now, you have something that\n belongs to me.");
     setActiveButtonName("questionTwo");
   }
-
   function scrollExchangeJump() {
     setDialogueText("...");
     setActiveButtonName("scrollExchange");
   }
-
   function currencyExchangeJump() {
     setDialogueText("...");
     setActiveButtonName("currencyExchange");
   }
-
   return /*#__PURE__*/React.createElement("div", {
     className: "shop_menu_container"
   }, /*#__PURE__*/React.createElement("img", {
@@ -149,7 +139,6 @@ function ShopMenu({
     buttonClass: "button_fourth"
   })));
 }
-
 function ShopMenuButton({
   onCLick,
   buttonText,
@@ -269,7 +258,6 @@ function ShopMenuButton({
     fill: "#f0e2c6"
   }, buttonText)));
 }
-
 function CurrencyExchange({
   playerInventory,
   forbiddenShopAPI,
@@ -278,14 +266,27 @@ function CurrencyExchange({
 }) {
   return /*#__PURE__*/React.createElement(React.Fragment, null);
 }
-
 function ScrollExchange({
   playerInventory,
   forbiddenShopAPI,
   eventData,
+  jutsuData,
   userAPI
 }) {
-  return /*#__PURE__*/React.createElement(React.Fragment, null);
+  return /*#__PURE__*/React.createElement("div", {
+    className: "scroll_exchange_section"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "scroll_exchange_header"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "scroll_exchange_title"
+  }, "Forbidden scroll exchange"), /*#__PURE__*/React.createElement("div", {
+    className: "scroll_count_container"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "scroll_count_label"
+  }, "FORBIDDEN SCROLLS"), /*#__PURE__*/React.createElement("div", {
+    className: "scroll_count"
+  }))), /*#__PURE__*/React.createElement("div", {
+    className: "scroll_exchange_container"
+  }));
 }
-
 window.ForbiddenShop = ForbiddenShop;

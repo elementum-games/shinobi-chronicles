@@ -10,6 +10,7 @@ type Props = {|
         +userAPI: string,
     |},
     +eventData: Array,
+    +jutsuData: Array,
     +playerInventory: PlayerInventoryType,
 |};
 function ForbiddenShop({
@@ -17,7 +18,7 @@ function ForbiddenShop({
     eventData,
     playerInventory,
 }: Props) {                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   
-    function echangeEventCurrency(event_name, currency_name, quantity) {
+    function exchangeEventCurrency(event_name, currency_name, quantity) {
         apiFetch(links.forbiddenShopAPI, {
             request: 'exchangeEventCurrency',
             event_name: event_name,
@@ -210,13 +211,23 @@ function CurrencyExchange({ playerInventory, forbiddenShopAPI, eventData, userAP
 type ScrollExchangeProps = {|
     +playerInventory: PlayerInventoryType,
     +forbiddenShopAPI: string,
-    +eventData:array,
+    +eventData: array,
+    +jutsuData: array,
     +userAPI: string,
 |};
-function ScrollExchange({ playerInventory, forbiddenShopAPI, eventData, userAPI }) {
+function ScrollExchange({ playerInventory, forbiddenShopAPI, eventData, jutsuData, userAPI }) {
     return (
-        <>
-        </>
+        <div className="scroll_exchange_section">
+            <div className="scroll_exchange_header">
+                <div className="scroll_exchange_title">Forbidden scroll exchange</div>
+                <div className="scroll_count_container">
+                    <div className="scroll_count_label">FORBIDDEN SCROLLS</div>
+                    <div className="scroll_count"></div>
+                </div>
+            </div>
+            <div className="scroll_exchange_container">
+            </div>
+        </div>
     );
 }
 
