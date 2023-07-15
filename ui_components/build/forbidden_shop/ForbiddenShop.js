@@ -73,6 +73,12 @@ function ShopMenu({
   return /*#__PURE__*/React.createElement("div", {
     className: "shop_menu_container"
   }, /*#__PURE__*/React.createElement("img", {
+    src: "/../images/forbidden_shop/bluelight.png",
+    className: "shop_background_light_left"
+  }), /*#__PURE__*/React.createElement("img", {
+    src: "/../images/forbidden_shop/bluelight.png",
+    className: "shop_background_light_right"
+  }), /*#__PURE__*/React.createElement("img", {
     src: "/../images/forbidden_shop/frame.png",
     className: "shop_frame_nw"
   }), /*#__PURE__*/React.createElement("img", {
@@ -111,35 +117,40 @@ function ShopMenu({
     onCLick: questionOneClick,
     buttonText: "What is this place?",
     buttonName: "questionOne",
-    activeButtonName: activeButtonName
+    activeButtonName: activeButtonName,
+    buttonClass: "button_first"
   }), /*#__PURE__*/React.createElement(ShopMenuButton, {
     onCLick: questionTwoClick,
     buttonText: "Who- What are you?",
     buttonName: "questionTwo",
-    activeButtonName: activeButtonName
+    activeButtonName: activeButtonName,
+    buttonClass: "button_second"
   }), /*#__PURE__*/React.createElement(ShopMenuButton, {
     onCLick: scrollExchangeJump,
     buttonText: "Scroll exchange",
     buttonName: "scrollExchange",
-    activeButtonName: activeButtonName
+    activeButtonName: activeButtonName,
+    buttonClass: "button_third"
   }), /*#__PURE__*/React.createElement(ShopMenuButton, {
     onCLick: currencyExchangeJump,
     buttonText: "Currency exchange",
     buttonName: "currencyExchange",
-    activeButtonName: activeButtonName
+    activeButtonName: activeButtonName,
+    buttonClass: "button_fourth"
   })));
 }
 function ShopMenuButton({
   onCLick,
   buttonText,
   buttonName,
-  activeButtonName
+  activeButtonName,
+  buttonClass
 }) {
   return /*#__PURE__*/React.createElement("svg", {
     role: "button",
     tabIndex: "0",
     name: buttonName,
-    className: "shop_menu_button",
+    className: "shop_menu_button " + buttonClass,
     width: "162",
     height: "32",
     onClick: () => onCLick(),
