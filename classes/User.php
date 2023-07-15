@@ -12,6 +12,7 @@ require_once __DIR__ . "/Rank.php";
 require_once __DIR__ . "/Village.php";
 require_once __DIR__ . "/Clan.php";
 require_once __DIR__ . "/achievements/AchievementsManager.php";
+require_once __DIR__ . "/Reputation.php";
 require_once __DIR__ . "/event/LanternEvent.php";
 
 /*	Class:		User
@@ -111,10 +112,9 @@ class User extends Fighter {
 
     public Village $village;
     public int $village_rep;
-    public int $rep_rank;
     public int $weekly_rep;
-    public int $weekly_rep_cap;
     public int $mission_rep_cd;
+    public Reputation $reputation;
 
     public int $rank_num;
     public Rank $rank;
@@ -481,10 +481,9 @@ class User extends Fighter {
 
         $this->village = new Village($this->system, $user_data['village']);
         $this->village_rep = $user_data['village_rep'];
-        $this->rep_rank = $this->village->getRepRank($this->village_rep);
         $this->weekly_rep = $user_data['weekly_rep'];
-        $this->weekly_rep_cap = Village::$VillageRep[$this->rep_rank]['weekly_cap'];
         $this->mission_rep_cd = $user_data['mission_rep_cd'];
+        $this->reputation = new Reputation($this->village_rep, $this->weekly_rep, $this->mission_rep_cd);
 
         $this->gender = $user_data['gender'];
         $this->level = $user_data['level'];
@@ -683,9 +682,8 @@ class User extends Fighter {
                     $this->addMoney($task->reward, "Completed daily task");
                     $task_message = "You have completed {$task->name} and earned &yen;{$task->reward}";
 
-                    $rep_gain = $this->calMaxRepGain($task->rep_reward, true);
+                    $rep_gain = $this->reputation->addRep($task->rep_reward, true);
                     if($rep_gain > 0) {
-                        $this->addRep($rep_gain);
                         $task_message .= " and $rep_gain Reputation";
                     }
 
@@ -1647,38 +1645,6 @@ class User extends Fighter {
         moves user to village */
     public function moveToVillage() {
         $this->location = $this->village_location;
-    }
-
-    public function calMaxRepGain($repGain, $bypass_cap = false) {
-       if($repGain + $this->weekly_rep > $this->weekly_rep_cap && !$bypass_cap) {
-            $repGain = $this->weekly_rep_cap - $this->weekly_rep;
-        }
-        return $repGain;
-    }
-    public function addRep(int $amount, $incrementWeekly = true) {
-        $this->village_rep += $amount;
-
-        //Weekly rep
-        if($this->weekly_rep < $this->weekly_rep_cap && $incrementWeekly) {
-            $new_weekly = $this->weekly_rep += $amount;
-            if($new_weekly > $this->weekly_rep_cap) {
-                $new_weekly = $this->weekly_rep_cap;
-            }
-            $this->weekly_rep = $new_weekly;
-        }
-    }
-    public function subtractRep(int $amount) {
-        //Redundancy to ensure subtraction
-        if($amount < 0) {
-            $amount = abs($amount);
-        }
-
-        $this->village_rep -= $amount;
-
-        //Temp disable outlaw reputation
-        if($this->village_rep < 0) {
-            $this->village_rep = 0;
-        }
     }
 
     public function checkAchievementCompletion() {

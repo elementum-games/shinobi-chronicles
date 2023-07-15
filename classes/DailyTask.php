@@ -59,7 +59,7 @@ class DailyTask {
         $this->amount = $db_data['amount'];
         $this->difficulty = $db_data['difficulty'];
         $this->reward = $db_data['reward'];
-        $this->rep_reward = $db_data['rep_reward'] ?? Village::DAILY_TASK_GAINS[$this->difficulty . '_' . $this->activity];
+        $this->rep_reward = $db_data['rep_reward'] ?? Reputation::DAILY_TASK_GAINS[$this->difficulty . '_' . $this->activity];
         $this->progress = $db_data['progress'];
         $this->complete = (bool)$db_data['complete'];
     }
@@ -178,7 +178,7 @@ class DailyTask {
         }
 
         // Reputation reward
-        $rep_reward = Village::DAILY_TASK_GAINS[$task_difficulty . '_' . $task_config['type']];
+        $rep_reward = Reputation::DAILY_TASK_GAINS[$task_difficulty . '_' . $task_config['type']];
 
         // Override harder missions to not give so many
         switch($mission_rank) {

@@ -157,7 +157,7 @@ function missions(): bool {
 	echo "<table class='table'><tr><th>" . Mission::$rank_names[$view] . " Missions</th></tr>
 	<tr><td style='text-align:center;'>You can go on village missions here. As a " . $RANK_NAMES[$player->rank_num] . " you
 	can take on up to " . Mission::$rank_names[$max_mission_rank] . " missions.";
-    if($player->mission_rep_cd - time() > 0) {
+    if(!$player->reputation->canGain(true)) {
         $remaining = $player->mission_rep_cd - time();
         echo "<br /><br />You can gain village reputation in: <div id='rep_cd' style='display: inline-block'>"
             . System::timeRemaining($remaining) . "</div>
@@ -380,12 +380,10 @@ function runActiveMission(): bool {
                 }
 
                 // Village reputation
-                if($player->mission_rep_cd - time() <= 0) {
-                    $rep_gain = $player->calMaxRepGain(Village::MISSION_GAINS[$mission->rank]);
-
+                if($player->reputation->canGain(true)) {
+                    $rep_gain = $player->reputation->addRep(Reputation::MISSION_GAINS[$mission->rank]);
                     if ($rep_gain > 0) {
-                        $player->addRep($rep_gain);
-                        $player->mission_rep_cd = time() + Village::ARENA_MISSION_CD;
+                        $player->mission_rep_cd = time() + Reputation::ARENA_MISSION_CD;
                         echo "You have gained $rep_gain village reputation!<br />";
                     }
                 }
