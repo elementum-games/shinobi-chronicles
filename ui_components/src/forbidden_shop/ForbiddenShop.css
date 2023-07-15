@@ -10,6 +10,36 @@
     background-size: auto;
     background-repeat: no-repeat;
 }
+.shop_background_light_left {
+    position: absolute;
+    top: -100px;
+    left: -100px;
+    animation: moveLeftRight 8s ease-in-out infinite;
+}
+.shop_background_light_right {
+    position: absolute;
+    top: -100px;
+    right: -100px;
+    animation: moveRightLeft 6s ease-in-out infinite;
+}
+@keyframes moveLeftRight {
+    0%, 100% {
+        left: -100px; /* Start and end position is at the left edge */
+    }
+
+    50% {
+        left: 100px; /* Middle position is at the right edge minus element's width */
+    }
+}
+@keyframes moveRightLeft {
+    0%, 100% {
+        right: -100px; /* Start and end position is at the left edge */
+    }
+
+    50% {
+        right: 100px; /* Middle position is at the right edge minus element's width */
+    }
+}
 .shop_title {
     position: absolute;
     left: 40px;
@@ -26,6 +56,17 @@
     margin-top: 30px;
     height: 90%;
     width: 90%;
+    opacity: 1;
+    animation: fadeInFromBlack 2s ease-in-out;
+}
+@keyframes fadeInFromBlack {
+    0% {
+        opacity: 0;
+    }
+
+    100% {
+        opacity: 1;
+    }
 }
 .shop_frame_nw {
     position: absolute;
@@ -160,4 +201,28 @@
 }
 .dialogue_highlight {
     color: #bfb7e0;
+}
+.button_first {
+    opacity: 0;
+    animation: fadeInFromBlack 2s ease-in-out;
+    animation-delay: 1s;
+    animation-fill-mode: forwards;
+}
+.button_second {
+    opacity: 0;
+    animation: fadeInFromBlack 2s ease-in-out;
+    animation-delay: 2s;
+    animation-fill-mode: forwards;
+}
+.button_third {
+    opacity: 0;
+    animation: fadeInFromBlack 2s ease-in-out;
+    animation-delay: 3s;
+    animation-fill-mode: forwards;
+}
+.button_fourth {
+    opacity: 0;
+    animation: fadeInFromBlack 2s ease-in-out;
+    animation-delay: 4s;
+    animation-fill-mode: forwards;
 }

@@ -96,6 +96,8 @@ function ShopMenu({ ShopMenuButton }) {
 
     return (
         <div className="shop_menu_container">
+            <img src="/../images/forbidden_shop/bluelight.png" className="shop_background_light_left" />
+            <img src="/../images/forbidden_shop/bluelight.png" className="shop_background_light_right" />
             <img src="/../images/forbidden_shop/frame.png" className="shop_frame_nw" />
             <img src="/../images/forbidden_shop/frame.png" className="shop_frame_ne" />
             <img src="/../images/forbidden_shop/frame.png" className="shop_frame_se" />
@@ -120,37 +122,41 @@ function ShopMenu({ ShopMenuButton }) {
                     buttonText={"What is this place?"}
                     buttonName={"questionOne"}
                     activeButtonName={activeButtonName}
+                    buttonClass={"button_first"}
                 />
                 <ShopMenuButton
                     onCLick={questionTwoClick}
                     buttonText={"Who- What are you?"}
                     buttonName={"questionTwo"}
                     activeButtonName={activeButtonName}
+                    buttonClass={"button_second"}
                 />
                 <ShopMenuButton
                     onCLick={scrollExchangeJump}
                     buttonText={"Scroll exchange"}
                     buttonName={"scrollExchange"}
                     activeButtonName={activeButtonName}
+                    buttonClass={"button_third"}
                 />
                 <ShopMenuButton
                     onCLick={currencyExchangeJump}
                     buttonText={"Currency exchange"}
                     buttonName={"currencyExchange"}
                     activeButtonName={activeButtonName}
+                    buttonClass={"button_fourth"}
                 />
             </div>
         </div>
     );
 }
 
-function ShopMenuButton({ onCLick, buttonText, buttonName, activeButtonName }) {
+function ShopMenuButton({ onCLick, buttonText, buttonName, activeButtonName, buttonClass }) {
     return (
         <svg
             role="button"
             tabIndex="0"
             name={buttonName}
-            className="shop_menu_button"
+            className={"shop_menu_button " + buttonClass}
             width="162"
             height="32"
             onClick={() => onCLick()}
