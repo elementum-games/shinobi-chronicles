@@ -717,4 +717,22 @@ return [
         'text' => ':praisethesun:',
         'public' => true,
     ],
+    [
+        'code' => ':gahorse:',
+        'image' => "<img src='./images/memes/gahorse.gif' />",
+        'text' => ':gahorse:',
+        'public' => true,
+    ],
+    [
+        'code' => ':smugbaka:',
+        'image' => "<img src='./images/memes/smugbaka.png' />",
+        'text' => ':smugbaka:',
+        'public' => true,
+    ],
+    [
+        'code' => ':cooljojo:',
+        'image' => "<img src='./images/memes/cooljojo.gif' />",
+        'text' => ':cooljojo:',
+        'public' => true,
+    ],
 ];
