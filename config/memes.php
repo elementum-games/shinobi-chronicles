@@ -711,4 +711,10 @@ return [
         'text' => ':notabit:',
         'public' => true,
     ],
+    [
+        'code' => ':praisethesun:',
+        'image' => "<img src='./images/memes/PraiseTheSun.png' />",
+        'text' => ':praisethesun:',
+        'public' => true,
+    ],
 ];
