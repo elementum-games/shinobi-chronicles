@@ -349,8 +349,21 @@ class TravelManager {
             if ($loc['name'] == "Ayakashi's Abyss" && $this->system->event == null) {
                 $loc['action_url'] = $this->system->router->getUrl("forbiddenShop");
                 $loc['action_message'] = "Enter the Abyss";
+
+                $abyss_shop = new MapLocation($loc);
+                $distance = $this->user->location->distanceDifference(new TravelCoords(
+                    x: $abyss_shop->x,
+                    y: $abyss_shop->y,
+                    map_id: $abyss_shop->map_id
+                ));
+
+                if($distance <= 2) {
+                    $locations[] = $abyss_shop;
+                }
             }
-            $locations[] = new MapLocation($loc);
+            else {
+                $locations[] = new MapLocation($loc);
+            }
         }
 
         // Get mission objectives
