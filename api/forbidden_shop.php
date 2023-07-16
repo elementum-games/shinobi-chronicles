@@ -39,11 +39,10 @@ try {
                 'playerInventory' => UserApiPresenter::playerInventoryResponse($player)
             ];
             break;
-        case "exchangeForbiddenJutsuScroll":
-            $item_type = $system->db->clean($_POST['item_type']);
-            $item_id = $system->db->clean($_POST['item_id']);
+        case "buyForbiddenJutsu":
+            $jutsu_id = $system->db->clean($_POST['jutsu_id']);
 
-            $message = $ForbiddenShopManager->exchangeForbiddenJutsuScroll($item_type, $item_id);
+            $message = $ForbiddenShopManager->buyForbiddenJutsu($jutsu_id);
             $player->getInventory();
 
             $response->data = [

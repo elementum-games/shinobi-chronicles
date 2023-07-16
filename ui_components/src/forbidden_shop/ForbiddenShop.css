@@ -1,5 +1,5 @@
 :root {
-    --forbidden-shop-padding: 2%;
+    --forbidden-shop-padding: 3%;
 }
 
 .shop_menu_container {
@@ -239,13 +239,9 @@
     color: #c7b070;
     font-variant: small-caps;
     font-weight: 400;
-    margin-left: 20px;
+    margin-left: var(--forbidden-shop-padding);
 }
 
-.forbidden_shop_sub_header {
-    margin-left: var(--forbidden-shop-padding);
-    margin-top: 25px;
-}
 .currency_exchange_section {
     display: flex;
     flex-direction: column;
@@ -359,16 +355,31 @@
     color: #c7b070;
 }
 .scroll_exchange_container {
-    width: 94%;
+    width: calc(100% - (var(--forbidden-shop-padding) * 2));
     height: 500px;
-    background: url(/../images/forbidden_shop/scrolltable_opa15.jpg);
-    background-size: cover;
-    background-repeat: no-repeat;
+
     display: flex;
     gap: 15px;
     align-items: center;
     justify-content: center;
+
+    position: relative;
+
+    background: url(/../images/forbidden_shop/scrolltable_opa15.jpg);
+    background-size: cover;
+    background-repeat: no-repeat;
 }
+.scroll_exchange_response {
+    position: absolute;
+    bottom: 20px;
+
+    font-size: var(--font-medium);
+    color: var(--font-color-5);
+}
+.scroll_exchange_no_jutsu {
+    color: var(--font-color-7);
+}
+
 .jutsu_scroll {
     height: 400px;
     width: 270px;

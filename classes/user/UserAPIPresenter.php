@@ -160,10 +160,10 @@ class UserApiPresenter {
         return [
             'jutsu' => array_map(function (Jutsu $jutsu) {
                 return self::jutsuResponse($jutsu);
-            }, $player->jutsu),
+            }, array_values($player->jutsu)),
             'jutsuScrolls' => array_map(function (Jutsu $jutsu) {
                 return self::jutsuResponse($jutsu);
-            }, $player->jutsu_scrolls),
+            }, array_values($player->jutsu_scrolls)),
             'equippedJutsuIds' => $player->equipped_jutsu,
             'items' => array_map(function (Item $item){
                 return self::itemResponse($item);

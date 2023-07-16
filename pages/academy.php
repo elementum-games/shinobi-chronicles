@@ -497,4 +497,4 @@ function academy() {
 
 	$system->printMessage();
 }
-?>
+

@@ -17,6 +17,7 @@ class ForbiddenShopApiPresenter {
                 'violet_lantern_id' => LanternEvent::$static_item_ids['violet_lantern_id'],
                 'gold_lantern_id' => LanternEvent::$static_item_ids['gold_lantern_id'],
                 'shadow_essence_id' => LanternEvent::$static_item_ids['shadow_essence_id'],
+                'forbidden_jutsu_scroll_id' => LanternEvent::$static_item_ids['forbidden_jutsu_scroll_id'],
                 'yen_per_lantern' => LanternEvent::$static_config['yen_per_lantern'],
                 'red_lanterns_per_blue' => LanternEvent::$static_config['red_lanterns_per_blue'],
                 'red_lanterns_per_violet' => LanternEvent::$static_config['red_lanterns_per_violet'],
@@ -33,7 +34,7 @@ class ForbiddenShopApiPresenter {
         return array_map(
             function (Jutsu $jutsu) {
                 return [
-                    'jutsu_id' => $jutsu->id,
+                    'id' => $jutsu->id,
                     'name' => $jutsu->name,
                     'jutsu_type' => $jutsu->jutsu_type,
                     'description' => html_entity_decode($jutsu->description, ENT_QUOTES),
@@ -44,7 +45,7 @@ class ForbiddenShopApiPresenter {
                     'effect_duration' => $jutsu->effect_length,
                 ];
             },
-            $forbiddenShopManager->getEventJutsu()
+            array_values($forbiddenShopManager->getEventJutsu()) // strip jutsu ID keys so it's a real array in JS
         );
     }
 }

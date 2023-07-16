@@ -18,7 +18,7 @@ function ForbiddenShop({
   }), /*#__PURE__*/React.createElement(ScrollExchange, {
     initialPlayerInventory: initialPlayerInventory,
     forbiddenShopAPI: links.forbiddenShopAPI,
-    eventData: eventData,
+    eventData: eventData.lanternEvent,
     availableEventJutsu: availableEventJutsu,
     userAPI: links.userAPI,
     scrollExchangeRef: scrollExchangeRef
@@ -175,7 +175,7 @@ function ShopMenuButton({
     style: {
       stopColor: 'rgb(0,0,0,0.0)'
     }
-  }))), activeButtonName == buttonName && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("rect", {
+  }))), activeButtonName === buttonName && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("rect", {
     className: "shop_button_back_shadow",
     width: "88%",
     height: "70%",
@@ -216,7 +216,7 @@ function ShopMenuButton({
     style: {
       textDecoration: "none"
     }
-  }, buttonText)), activeButtonName != buttonName && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("rect", {
+  }, buttonText)), activeButtonName !== buttonName && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("rect", {
     className: "shop_button_back_shadow",
     width: "88%",
     height: "70%",
@@ -273,7 +273,7 @@ function LanternEventCurrencyExchange({
   };
   const [responseMessage, setResponseMessage] = React.useState(null);
   const totalQuantity = Object.values(playerQuantities).reduce((accum, currentValue) => {
-    return accum + currentValue;
+    return accum + parseInt(currentValue);
   }, 0);
 
   function exchangeAllEventCurrency() {
@@ -374,19 +374,26 @@ function ScrollExchange({
   availableEventJutsu,
   scrollExchangeRef
 }) {
-  function exchangeForbiddenJutsuScroll(item_type, item_id) {
+  const [playerInventory, setPlayerInventory] = React.useState(initialPlayerInventory);
+  const [responseMessage, setResponseMessage] = React.useState(null);
+
+  function buyForbiddenJutsu(jutsuId) {
+    setResponseMessage(null);
     apiFetch(forbiddenShopAPI, {
-      request: 'exchangeForbiddenJutsuScroll',
-      item_type: item_type,
-      item_id: item_id
+      request: 'buyForbiddenJutsu',
+      jutsu_id: jutsuId
     }).then(response => {
       if (response.errors.length) {
+        setResponseMessage(response.errors);
         console.error(response.errors);
-      } else {// update remaining # of scrolls for display, get new list of jutsu
+      } else {
+        setResponseMessage(response.data.message);
+        setPlayerInventory(response.data.playerInventory); // update remaining # of scrolls for display, get new list of jutsu
       }
     });
   }
 
+  const jutsuForPurchase = availableEventJutsu.filter(jutsu => !playerInventory.jutsu.some(j => j.id === jutsu.id)).filter(jutsu => !playerInventory.jutsuScrolls.some(j => j.id === jutsu.id));
   return /*#__PURE__*/React.createElement("div", {
     className: "scroll_exchange_section",
     ref: scrollExchangeRef
@@ -400,13 +407,17 @@ function ScrollExchange({
     className: "scroll_count_label"
   }, "FORBIDDEN SCROLLS"), /*#__PURE__*/React.createElement("div", {
     className: "scroll_count"
-  }))), /*#__PURE__*/React.createElement("div", {
+  }, playerInventory.items[eventData.forbidden_jutsu_scroll_id]?.quantity || 0))), /*#__PURE__*/React.createElement("div", {
     className: "scroll_exchange_container"
-  }, availableEventJutsu.map(jutsu_data => /*#__PURE__*/React.createElement(JutsuScroll, {
-    key: jutsu_data.jutsu_id,
-    jutsu_data: jutsu_data,
-    onClick: exchangeForbiddenJutsuScroll
-  }))));
+  }, jutsuForPurchase.map(jutsu => /*#__PURE__*/React.createElement(JutsuScroll, {
+    key: jutsu.id,
+    jutsu_data: jutsu,
+    onClick: () => buyForbiddenJutsu(jutsu.id)
+  })), jutsuForPurchase.length < 1 && /*#__PURE__*/React.createElement("span", {
+    className: "scroll_exchange_no_jutsu"
+  }, "No more forbidden jutsu available!"), /*#__PURE__*/React.createElement("div", {
+    className: "scroll_exchange_response"
+  }, responseMessage)));
 }
 
 function JutsuScroll({

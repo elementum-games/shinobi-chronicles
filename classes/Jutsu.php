@@ -179,6 +179,10 @@ class Jutsu {
         $this->parent_jutsu = $parent_jutsu;
         $this->element = $element;
         $this->hand_seals = $hand_seals;
+
+        if($this->purchase_type == Jutsu::PURCHASE_TYPE_EVENT_SHOP && $this->purchase_cost === 0) {
+            $this->purchase_cost = 1;
+        }
     }
 
     #[Pure]

@@ -8,6 +8,9 @@ import type {
 } from "../_schema/userSchema.js";
 import type { JutsuType } from "../_schema/jutsu.js";
 
+type RefType = {|
+    current: ?HTMLElement
+|};
 type LanternEventData = {|
     +eventKey: string,
     +red_lantern_id: number,
@@ -15,6 +18,7 @@ type LanternEventData = {|
     +violet_lantern_id: number,
     +gold_lantern_id: number,
     +shadow_essence_id: number,
+    +forbidden_jutsu_scroll_id: number,
     +yen_per_lantern: number,
     +red_lanterns_per_blue: number,
     +red_lanterns_per_violet: number,
@@ -51,7 +55,7 @@ function ForbiddenShop({
             <ScrollExchange
                 initialPlayerInventory={initialPlayerInventory}
                 forbiddenShopAPI={links.forbiddenShopAPI}
-                eventData={eventData}
+                eventData={eventData.lanternEvent}
                 availableEventJutsu={availableEventJutsu}
                 userAPI={links.userAPI}
                 scrollExchangeRef={scrollExchangeRef}
@@ -168,7 +172,7 @@ function ShopMenuButton({ onClick, buttonText, buttonName, activeButtonName, but
                     <stop offset="90%" style={{ stopColor: 'rgb(0,0,0,0.0)' }} />
                 </radialGradient>
             </defs>
-            {(activeButtonName == buttonName) &&
+            {(activeButtonName === buttonName) &&
                 <>
                 <rect className="shop_button_back_shadow" width="88%" height="70%" y="30%" x="6%" fill="url(#shop_button_fade)" />
                 <rect className="shop_button_center_shadow" width="80%" height="100%" x="10%" y="25%" fill="url(#shop_button_fade)" />
@@ -178,7 +182,7 @@ function ShopMenuButton({ onClick, buttonText, buttonName, activeButtonName, but
                 <text className="shop_button_text" x="50%" y="16" textAnchor="middle" dominantBaseline="middle" fill="white" style={{textDecoration: "none"}}>{buttonText}</text>
                 </>
             }
-            {(activeButtonName != buttonName) &&
+            {(activeButtonName !== buttonName) &&
                 <>
                 <rect className="shop_button_back_shadow" width="88%" height="70%" y="30%" x="6%" fill="url(#shop_button_fade)" />
                 <rect className="shop_button_center_shadow" width="80%" height="100%" x="10%" y="25%" fill="url(#shop_button_fade)"/>
@@ -197,6 +201,7 @@ type CurrencyExchangeProps = {|
     +initialPlayerInventory: PlayerInventoryType,
     +eventData: LanternEventData,
     +forbiddenShopApiLink: string,
+    +currencyExchangeRef: RefType,
 |};
 function LanternEventCurrencyExchange({
     initialPlayerInventory,
@@ -216,9 +221,11 @@ function LanternEventCurrencyExchange({
 
     const [responseMessage, setResponseMessage] = React.useState(null);
 
-    const totalQuantity = Object.values(playerQuantities).reduce((accum, currentValue) => {
-        return accum + currentValue;
-    }, 0);
+    const totalQuantity = Object.values(playerQuantities)
+        .reduce(
+            (accum, currentValue) => { return accum + parseInt(currentValue) },
+            0
+        );
 
     function exchangeAllEventCurrency() {
         apiFetch(forbiddenShopApiLink, {
@@ -349,41 +356,61 @@ type ScrollExchangeProps = {|
     +forbiddenShopAPI: string,
     +eventData: LanternEventData,
     +availableEventJutsu: $ReadOnlyArray<JutsuType>,
+    +scrollExchangeRef: RefType,
 |};
 function ScrollExchange({ initialPlayerInventory, forbiddenShopAPI, eventData, availableEventJutsu, scrollExchangeRef }: ScrollExchangeProps) {
-    function exchangeForbiddenJutsuScroll(item_type, item_id) {
+    const [playerInventory, setPlayerInventory] = React.useState(initialPlayerInventory);
+    const [responseMessage, setResponseMessage] = React.useState(null);
+
+    function buyForbiddenJutsu(jutsuId) {
+        setResponseMessage(null);
+
         apiFetch(forbiddenShopAPI, {
-            request: 'exchangeForbiddenJutsuScroll',
-            item_type: item_type,
-            item_id: item_id,
+            request: 'buyForbiddenJutsu',
+            jutsu_id: jutsuId,
         }).then(response => {
             if (response.errors.length) {
+                setResponseMessage(response.errors);
                 console.error(response.errors);
             }
             else {
+                setResponseMessage(response.data.message);
+                setPlayerInventory(response.data.playerInventory);
                 // update remaining # of scrolls for display, get new list of jutsu
             }
         })
     }
+
+
+    const jutsuForPurchase = availableEventJutsu
+        .filter(jutsu => !playerInventory.jutsu.some(j => j.id === jutsu.id))
+        .filter(jutsu => !playerInventory.jutsuScrolls.some(j => j.id === jutsu.id));
+
     return (
         <div className="scroll_exchange_section" ref={scrollExchangeRef}>
             <div className="scroll_exchange_header">
                 <div className="section_title">Forbidden scroll exchange</div>
                 <div className="scroll_count_container">
                     <div className="scroll_count_label">FORBIDDEN SCROLLS</div>
-                    <div className="scroll_count"></div>
+                    <div className="scroll_count">
+                        {playerInventory.items[eventData.forbidden_jutsu_scroll_id]?.quantity || 0}
+                    </div>
                 </div>
             </div>
             <div className="scroll_exchange_container">
-                {availableEventJutsu
-                    .map((jutsu_data) => (
-                        <JutsuScroll
-                            key={jutsu_data.jutsu_id}
-                            jutsu_data={jutsu_data}
-                            onClick={exchangeForbiddenJutsuScroll}
-                        />
-                    )
-                )}
+                {jutsuForPurchase.map((jutsu) => (
+                    <JutsuScroll
+                        key={jutsu.id}
+                        jutsu_data={jutsu}
+                        onClick={() => buyForbiddenJutsu(jutsu.id)}
+                    />
+                ))}
+                {jutsuForPurchase.length < 1 &&
+                    <span className="scroll_exchange_no_jutsu">No more forbidden jutsu available!</span>
+                }
+                <div className="scroll_exchange_response">
+                    {responseMessage}
+                </div>
             </div>
         </div>
     );

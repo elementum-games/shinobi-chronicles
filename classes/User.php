@@ -1526,6 +1526,19 @@ class User extends Fighter {
         }
     }
 
+    public function removeItemById(int $item_id, int $quantity = 1): void {
+        if(!$this->hasItem($item_id)) {
+            return;
+        }
+
+        $item = $this->items[$item_id];
+
+        $this->items[$item->id]->quantity -= $quantity;
+        if ($this->items[$item->id]->quantity < 1) {
+            unset($this->items[$item->id]);
+        }
+    }
+
     /* function useJutsu
         pool check, calc exp, etc */
     public function useJutsu(Jutsu $jutsu): ActionResult {

@@ -12,36 +12,58 @@ class ForbiddenShopManager {
     }
 
     /**
-     * @param string $item_type
-     * @param int $item_id
-     * @param int $quantity
-     * @throws RuntimeException
+     * @param $jutsu_id
+     * @return string
      */
-    public function exchangeForbiddenJutsuScroll($item_type, $item_id): string
-    {
+    public function buyForbiddenJutsu($jutsu_id): string {
         $this->player->getInventory();
-        switch ($item_type) {
-            case "jutsu":
-            default:
-                throw new RuntimeException("Invalid event");
+
+        $forbidden_jutsu = $this->getEventJutsu();
+
+        // Check if jutsu exists
+        if(!isset($forbidden_jutsu[$jutsu_id])) {
+            throw new RuntimeException("Invalid jutsu!");
         }
+
+        $jutsu = $forbidden_jutsu[$jutsu_id];
+
+        // check if already owned
+        if(isset($this->player->jutsu_scrolls[$jutsu_id])) {
+            throw new RuntimeException("You already purchased this scroll!");
+        }
+        // check if already learned
+        if($this->player->hasJutsu($jutsu_id)) {
+            throw new RuntimeException("You have already learned this jutsu!");
+        }
+
+        // Check for money requirement
+        if($this->player->itemQuantity(LanternEvent::$static_item_ids['forbidden_jutsu_scroll_id']) < $jutsu->purchase_cost) {
+            throw new RuntimeException("You do not have enough forbidden jutsu scrolls!");
+        }
+
+        // Add to inventory
+        $this->player->removeItemById(LanternEvent::$static_item_ids['forbidden_jutsu_scroll_id'], $jutsu->purchase_cost);
+
+        $this->player->jutsu_scrolls[$jutsu_id] = $jutsu;
+        $this->player->updateInventory();
+
+        return "You have purchased {$jutsu->name}!";
     }
 
     /**
      * @throws RuntimeException
+     * @return Jutsu[]
      */
-    public function getEventJutsu(): array
-    {
-        // need to make this only get jutsu the player doesn't know or have the scroll for
+    public function getEventJutsu(): array {
         $event_jutsu = array();
         $result = $this->system->db->query(
-            "SELECT * FROM `jutsu` WHERE `purchase_type` = '5';"
+            "SELECT * FROM `jutsu` WHERE `purchase_type` = " . Jutsu::PURCHASE_TYPE_EVENT_SHOP . ";"
         );
         while ($row = $this->system->db->fetch($result)) {
             $jutsu = Jutsu::fromArray($row['jutsu_id'], $row);
             $jutsu->effect = System::unSlug($jutsu->effect);
             $jutsu->description = html_entity_decode($jutsu->description);
-            $event_jutsu[] = $jutsu;
+            $event_jutsu[$jutsu->id] = $jutsu;
         }
         return $event_jutsu;
     }
