@@ -281,4 +281,79 @@
     background: url(/../images/forbidden_shop/scrolltable_opa15.jpg);
     background-size: cover;
     background-repeat: no-repeat;
+    display: flex;
+    gap: 15px;
+    align-items: center;
+    justify-content: center;
+}
+.jutsu_scroll {
+    height: 400px;
+    width: 270px;
+    background: url(/../images/forbidden_shop/forbiddenscroll.png);
+    background-size: cover;
+    background-position: center;
+    transition: all 0.4s ease-in-out;
+    cursor: pointer;
+}
+    .jutsu_scroll:hover {
+        transform: translateY(-25px);
+        box-shadow: 0 0 80px 1px #680b0b inset;
+    }
+.jutsu_scroll_inner {
+    width: 200px;
+    height: 400px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+}
+.jutsu_stats_container {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: flex-start;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 15px;
+    font-family: Segoe UI;
+    font-size: 12px;
+    color: #17161b;
+}
+.jutsu_name {
+    margin-top: 45px;
+    font-family: Stickrice;
+    Font-size: 25px;
+    color: #17161b;
+}
+.jutsu_type {
+    margin-top: 5px;
+    margin-bottom: 10px;
+    font-family: Segoe UI;
+    font-size: 15px;
+    color: #342769;
+    font-variant: small-caps;
+    display: flex;
+}
+.jutsu_type_label {
+    margin-top: 3px;
+    flex-basis: 70%;
+}
+.jutsu_scroll_divider {
+    flex-basis: 15%;
+}
+.jutsu_description {
+    font-family: Segoe UI;
+    font-size: 13px;
+    color: #17161b;
+    font-style: italic;
+}
+.jutsu_tags {
+    font-family: Segoe UI;
+    font-size: 14px;
+    color: #342769;
+    font-variant: small-caps;
+}
+.jutsu_tag_scaling {
+    color: #680b0b;
 }

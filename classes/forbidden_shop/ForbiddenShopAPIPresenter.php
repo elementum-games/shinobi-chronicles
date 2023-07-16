@@ -50,6 +50,7 @@ class ForbiddenShopApiPresenter {
             function (Jutsu $jutsu) {
                 return [
                     'jutsu_id' => $jutsu->id,
+                    'name' => $jutsu->name,
                     'jutsu_type' => $jutsu->jutsu_type,
                     'description' => $jutsu->description,
                     'power' => $jutsu->base_power,

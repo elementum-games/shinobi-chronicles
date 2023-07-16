@@ -31,6 +31,7 @@ type Props = {|
 function ForbiddenShop({
     links,
     eventData,
+    jutsuData,
     playerInventory,
 }: Props) {                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   
     function exchangeEventCurrency(event_name, currency_name, quantity) {
@@ -39,21 +40,6 @@ function ForbiddenShop({
             event_name: event_name,
             currency_name: currency_name,
             quantity: quantity,
-        }).then(response => {
-            if (response.errors.length) {
-                handleErrors(response.errors);
-                return;
-            }
-            else {
-
-            }
-        })
-    }
-    function exchangeForbiddenJutsuScroll(item_type, item_id) {
-        apiFetch(links.forbiddenShopAPI, {
-            request: 'exchangeForbiddenJutsuScroll',
-            item_type: item_type,
-            item_id: item_id,
         }).then(response => {
             if (response.errors.length) {
                 handleErrors(response.errors);
@@ -78,6 +64,7 @@ function ForbiddenShop({
                 playerInventory={playerInventory}
                 forbiddenShopAPI={links.forbiddenShopAPI}
                 eventData={eventData}
+                jutsuData={jutsuData}
                 userAPI={links.userAPI}
             />
             <LanternEventCurrencyExchange
@@ -94,7 +81,7 @@ function ShopMenu({ ShopMenuButton }) {
     const [activeButtonName, setActiveButtonName] = React.useState(null);
     const [dialogueText, setDialogueText] = React.useState(null);
     function questionOneClick() {
-        setDialogueText("...");
+        setDialogueText("A remnant from a past forgotten.\nAn abyss between the realms of yours... and <span class='dialogue_highlight'>ours</span>.");
         setActiveButtonName("questionOne");
     }
     function questionTwoClick() {
@@ -134,28 +121,28 @@ function ShopMenu({ ShopMenuButton }) {
             </div>
             <div className="shop_menu">
                 <ShopMenuButton
-                    onCLick={questionOneClick}
+                    onClick={questionOneClick}
                     buttonText={"What is this place?"}
                     buttonName={"questionOne"}
                     activeButtonName={activeButtonName}
                     buttonClass={"button_first"}
                 />
                 <ShopMenuButton
-                    onCLick={questionTwoClick}
+                    onClick={questionTwoClick}
                     buttonText={"Who- What are you?"}
                     buttonName={"questionTwo"}
                     activeButtonName={activeButtonName}
                     buttonClass={"button_second"}
                 />
                 <ShopMenuButton
-                    onCLick={scrollExchangeJump}
+                    onClick={scrollExchangeJump}
                     buttonText={"Scroll exchange"}
                     buttonName={"scrollExchange"}
                     activeButtonName={activeButtonName}
                     buttonClass={"button_third"}
                 />
                 <ShopMenuButton
-                    onCLick={currencyExchangeJump}
+                    onClick={currencyExchangeJump}
                     buttonText={"Currency exchange"}
                     buttonName={"currencyExchange"}
                     activeButtonName={activeButtonName}
@@ -166,7 +153,7 @@ function ShopMenu({ ShopMenuButton }) {
     );
 }
 
-function ShopMenuButton({ onCLick, buttonText, buttonName, activeButtonName, buttonClass }) {
+function ShopMenuButton({ onClick, buttonText, buttonName, activeButtonName, buttonClass }) {
     return (
         <svg
             role="button"
@@ -175,7 +162,7 @@ function ShopMenuButton({ onCLick, buttonText, buttonName, activeButtonName, but
             className={"shop_menu_button " + buttonClass}
             width="162"
             height="32"
-            onClick={() => onCLick()}
+            onClick={() => onClick()}
             onKeyPress={clickOnEnter}
         >
             <defs>
@@ -322,9 +309,23 @@ type ScrollExchangeProps = {|
     +forbiddenShopAPI: string,
     +eventData: LanternEventData,
     +jutsuData: array,
-    +userAPI: string,
 |};
-function ScrollExchange({ playerInventory, forbiddenShopAPI, eventData, jutsuData, userAPI }) {
+function ScrollExchange({ playerInventory, forbiddenShopAPI, eventData, jutsuData }) {
+    function exchangeForbiddenJutsuScroll(item_type, item_id) {
+        apiFetch(forbiddenShopAPI, {
+            request: 'exchangeForbiddenJutsuScroll',
+            item_type: item_type,
+            item_id: item_id,
+        }).then(response => {
+            if (response.errors.length) {
+                handleErrors(response.errors);
+                return;
+            }
+            else {
+                // update remaining # of scrolls for display, get new list of jutsu
+            }
+        })
+    }
     return (
         <div className="scroll_exchange_section">
             <div className="scroll_exchange_header">
@@ -335,9 +336,45 @@ function ScrollExchange({ playerInventory, forbiddenShopAPI, eventData, jutsuDat
                 </div>
             </div>
             <div className="scroll_exchange_container">
+                {jutsuData
+                    .map((jutsu_data) => (
+                        <JutsuScroll
+                            key={jutsu_data.jutsu_id}
+                            jutsu_data={jutsu_data}
+                            onClick={exchangeForbiddenJutsuScroll}
+                        />
+                    )
+                )}
             </div>
         </div>
     );
+}
+
+function JutsuScroll({ jutsu_data, onClick }) {
+    return (
+        <div className="jutsu_scroll" onClick={() => onClick()}>
+            <div className="jutsu_scroll_inner">
+                <div className="jutsu_name">{jutsu_data.name}</div>
+                <div className="jutsu_type">
+                    <div className="jutsu_scroll_divider"><svg width="100%" height="2"><line x1="0%" y1="1" x2="95%" y2="1" stroke="#77694e" strokeWidth="1"></line></svg></div>
+                    <div className="jutsu_type_label">forbidden {jutsu_data.jutsu_type}</div>
+                    <div className="jutsu_scroll_divider"><svg width="100%" height="2"><line x1="0%" y1="1" x2="95%" y2="1" stroke="#77694e" strokeWidth="1"></line></svg></div>
+                </div>
+                <div className="jutsu_description">{jutsu_data.description}</div>
+                <div className="jutsu_stats_container">
+                    <div className="jutsu_power"><span style={{ fontWeight: "700" }}>POWER:</span> {jutsu_data.power}</div>
+                    <div className="jutsu_cooldown"><span style={{ fontWeight: "700" }}>COOLDOWN:</span> {jutsu_data.cooldown} TURNS</div>
+                    <div className="jutsu_effect"><span style={{ fontWeight: "700" }}>EFFECT:</span> {jutsu_data.effect} ({jutsu_data.effect_amount}%)</div>
+                    <div className="jutsu_duration"><span style={{ fontWeight: "700" }}>DURATION:</span> {jutsu_data.effect_duration} TURNS</div>
+                </div>
+                <div className="jutsu_scroll_divider_bottom"><svg width="100%" height="2"><line x1="0%" y1="1" x2="95%" y2="1" stroke="#77694e" strokeWidth="1"></line></svg></div>
+                <div className="jutsu_tags">
+                    <div className="jutsu_tag_forbidden">forbidden technique</div>
+                    <div className="jutsu_tag_scaling">scales with rank</div>
+                </div>
+            </div>
+        </div>
+    )
 }
 
 window.ForbiddenShop = ForbiddenShop;
