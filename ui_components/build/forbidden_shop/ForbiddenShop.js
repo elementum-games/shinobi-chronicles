@@ -17,10 +17,9 @@ function ForbiddenShop({
     currencyExchangeRef: currencyExchangeRef
   }), /*#__PURE__*/React.createElement(ScrollExchange, {
     initialPlayerInventory: initialPlayerInventory,
-    forbiddenShopAPI: links.forbiddenShopAPI,
+    forbiddenShopApiLink: links.forbiddenShopAPI,
     eventData: eventData.lanternEvent,
     availableEventJutsu: availableEventJutsu,
-    userAPI: links.userAPI,
     scrollExchangeRef: scrollExchangeRef
   }), /*#__PURE__*/React.createElement(LanternEventCurrencyExchange, {
     initialPlayerInventory: initialPlayerInventory,
@@ -306,41 +305,26 @@ function LanternEventCurrencyExchange({
     name: "Red Lantern",
     playerQuantity: playerQuantities.redLantern,
     quantityToExchange: playerQuantities.redLantern,
-    setQuantityToExchange: newVal => setCurrenciesToExchange(prevVal => ({ ...prevVal,
-      redLantern: newVal
-    })),
     yenForEach: eventData.yen_per_lantern
   }), /*#__PURE__*/React.createElement(CurrencyExchangeInput, {
     name: "Blue Lantern",
     playerQuantity: playerQuantities.blueLantern,
     quantityToExchange: playerQuantities.blueLantern,
-    setQuantityToExchange: newVal => setCurrenciesToExchange(prevVal => ({ ...prevVal,
-      blueLantern: newVal
-    })),
     yenForEach: eventData.yen_per_lantern * eventData.red_lanterns_per_blue
   }), /*#__PURE__*/React.createElement(CurrencyExchangeInput, {
     name: "Violet Lantern",
     playerQuantity: playerQuantities.violetLantern,
     quantityToExchange: playerQuantities.violetLantern,
-    setQuantityToExchange: newVal => setCurrenciesToExchange(prevVal => ({ ...prevVal,
-      violetLantern: newVal
-    })),
     yenForEach: eventData.yen_per_lantern * eventData.red_lanterns_per_violet
   }), /*#__PURE__*/React.createElement(CurrencyExchangeInput, {
     name: "Gold Lantern",
     playerQuantity: playerQuantities.goldLantern,
     quantityToExchange: playerQuantities.goldLantern,
-    setQuantityToExchange: newVal => setCurrenciesToExchange(prevVal => ({ ...prevVal,
-      goldLantern: newVal
-    })),
     yenForEach: eventData.yen_per_lantern * eventData.red_lanterns_per_gold
   }), /*#__PURE__*/React.createElement(CurrencyExchangeInput, {
     name: "Shadow Essence",
     playerQuantity: playerQuantities.shadowEssence,
     quantityToExchange: playerQuantities.shadowEssence,
-    setQuantityToExchange: newVal => setCurrenciesToExchange(prevVal => ({ ...prevVal,
-      shadowEssence: newVal
-    })),
     yenForEach: eventData.yen_per_lantern * eventData.red_lanterns_per_shadow
   })), /*#__PURE__*/React.createElement("button", {
     className: `currency_exchange_button ${totalQuantity <= 0 ? "disabled" : ""}`,
@@ -358,7 +342,6 @@ function CurrencyExchangeInput({
   name,
   playerQuantity,
   quantityToExchange,
-  setQuantityToExchange,
   yenForEach
 }) {
   const yenToReceive = quantityToExchange * yenForEach;
@@ -369,7 +352,7 @@ function CurrencyExchangeInput({
 
 function ScrollExchange({
   initialPlayerInventory,
-  forbiddenShopAPI,
+  forbiddenShopApiLink,
   eventData,
   availableEventJutsu,
   scrollExchangeRef
@@ -379,7 +362,7 @@ function ScrollExchange({
 
   function buyForbiddenJutsu(jutsuId) {
     setResponseMessage(null);
-    apiFetch(forbiddenShopAPI, {
+    apiFetch(forbiddenShopApiLink, {
       request: 'buyForbiddenJutsu',
       jutsu_id: jutsuId
     }).then(response => {
@@ -447,7 +430,7 @@ function JutsuScroll({
     strokeWidth: "1"
   }))), /*#__PURE__*/React.createElement("div", {
     className: "jutsu_type_label"
-  }, "forbidden ", jutsu_data.jutsu_type), /*#__PURE__*/React.createElement("div", {
+  }, "forbidden ", jutsu_data.jutsuType), /*#__PURE__*/React.createElement("div", {
     className: "jutsu_scroll_divider"
   }, /*#__PURE__*/React.createElement("svg", {
     width: "100%",
@@ -481,13 +464,13 @@ function JutsuScroll({
     style: {
       fontWeight: "700"
     }
-  }, "EFFECT:"), " ", jutsu_data.effect, " (", jutsu_data.effect_amount, "%)"), /*#__PURE__*/React.createElement("div", {
+  }, "EFFECT:"), " ", jutsu_data.effect, " (", jutsu_data.effectAmount, "%)"), /*#__PURE__*/React.createElement("div", {
     className: "jutsu_duration"
   }, /*#__PURE__*/React.createElement("span", {
     style: {
       fontWeight: "700"
     }
-  }, "DURATION:"), " ", jutsu_data.effect_duration, " TURNS")), /*#__PURE__*/React.createElement("div", {
+  }, "DURATION:"), " ", jutsu_data.effectDuration, " TURNS")), /*#__PURE__*/React.createElement("div", {
     className: "jutsu_scroll_divider_bottom"
   }, /*#__PURE__*/React.createElement("svg", {
     width: "100%",

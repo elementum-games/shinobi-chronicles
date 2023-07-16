@@ -34,7 +34,7 @@ type Props = {|
     +eventData: {|
         +lanternEvent: LanternEventData
     |},
-    +availableEventJutsu: Array,
+    +availableEventJutsu: $ReadOnlyArray<JutsuType>,
     +initialPlayerInventory: PlayerInventoryType,
 |};
 function ForbiddenShop({
@@ -54,10 +54,9 @@ function ForbiddenShop({
             />
             <ScrollExchange
                 initialPlayerInventory={initialPlayerInventory}
-                forbiddenShopAPI={links.forbiddenShopAPI}
+                forbiddenShopApiLink={links.forbiddenShopAPI}
                 eventData={eventData.lanternEvent}
                 availableEventJutsu={availableEventJutsu}
-                userAPI={links.userAPI}
                 scrollExchangeRef={scrollExchangeRef}
             />
             <LanternEventCurrencyExchange
@@ -255,50 +254,30 @@ function LanternEventCurrencyExchange({
                         name="Red Lantern"
                         playerQuantity={playerQuantities.redLantern}
                         quantityToExchange={playerQuantities.redLantern}
-                        setQuantityToExchange={(newVal) => setCurrenciesToExchange(prevVal => ({
-                            ...prevVal,
-                            redLantern: newVal
-                        }))}
                         yenForEach={eventData.yen_per_lantern}
                     />
                     <CurrencyExchangeInput
                         name="Blue Lantern"
                         playerQuantity={playerQuantities.blueLantern}
                         quantityToExchange={playerQuantities.blueLantern}
-                        setQuantityToExchange={(newVal) => setCurrenciesToExchange(prevVal => ({
-                            ...prevVal,
-                            blueLantern: newVal
-                        }))}
                         yenForEach={eventData.yen_per_lantern * eventData.red_lanterns_per_blue}
                     />
                     <CurrencyExchangeInput
                         name="Violet Lantern"
                         playerQuantity={playerQuantities.violetLantern}
                         quantityToExchange={playerQuantities.violetLantern}
-                        setQuantityToExchange={(newVal) => setCurrenciesToExchange(prevVal => ({
-                            ...prevVal,
-                            violetLantern: newVal
-                        }))}
                         yenForEach={eventData.yen_per_lantern * eventData.red_lanterns_per_violet}
                     />
                     <CurrencyExchangeInput
                         name="Gold Lantern"
                         playerQuantity={playerQuantities.goldLantern}
                         quantityToExchange={playerQuantities.goldLantern}
-                        setQuantityToExchange={(newVal) => setCurrenciesToExchange(prevVal => ({
-                            ...prevVal,
-                            goldLantern: newVal
-                        }))}
                         yenForEach={eventData.yen_per_lantern * eventData.red_lanterns_per_gold}
                     />
                     <CurrencyExchangeInput
                         name="Shadow Essence"
                         playerQuantity={playerQuantities.shadowEssence}
                         quantityToExchange={playerQuantities.shadowEssence}
-                        setQuantityToExchange={(newVal) => setCurrenciesToExchange(prevVal => ({
-                            ...prevVal,
-                            shadowEssence: newVal
-                        }))}
                         yenForEach={eventData.yen_per_lantern * eventData.red_lanterns_per_shadow}
                     />
                 </div>
@@ -323,13 +302,11 @@ type CurrencyExchangeInputProps = {|
     +playerQuantity: number,
     +quantityToExchange: number,
     +yenForEach: number,
-    +setQuantityToExchange: (number) => void,
 |};
 function CurrencyExchangeInput({
     name,
     playerQuantity,
     quantityToExchange,
-    setQuantityToExchange,
     yenForEach
 }: CurrencyExchangeInputProps) {
     const yenToReceive = quantityToExchange * yenForEach;
@@ -353,19 +330,19 @@ function CurrencyExchangeInput({
 
 type ScrollExchangeProps = {|
     +initialPlayerInventory: PlayerInventoryType,
-    +forbiddenShopAPI: string,
+    +forbiddenShopApiLink: string,
     +eventData: LanternEventData,
     +availableEventJutsu: $ReadOnlyArray<JutsuType>,
     +scrollExchangeRef: RefType,
 |};
-function ScrollExchange({ initialPlayerInventory, forbiddenShopAPI, eventData, availableEventJutsu, scrollExchangeRef }: ScrollExchangeProps) {
+function ScrollExchange({ initialPlayerInventory, forbiddenShopApiLink, eventData, availableEventJutsu, scrollExchangeRef }: ScrollExchangeProps) {
     const [playerInventory, setPlayerInventory] = React.useState(initialPlayerInventory);
     const [responseMessage, setResponseMessage] = React.useState(null);
 
     function buyForbiddenJutsu(jutsuId) {
         setResponseMessage(null);
 
-        apiFetch(forbiddenShopAPI, {
+        apiFetch(forbiddenShopApiLink, {
             request: 'buyForbiddenJutsu',
             jutsu_id: jutsuId,
         }).then(response => {
@@ -416,22 +393,26 @@ function ScrollExchange({ initialPlayerInventory, forbiddenShopAPI, eventData, a
     );
 }
 
-function JutsuScroll({ jutsu_data, onClick }) {
+type JutsuScrollProps = {|
+    +jutsu_data: JutsuType,
+    +onClick: () => void,
+|};
+function JutsuScroll({ jutsu_data, onClick }: JutsuScrollProps) {
     return (
         <div className="jutsu_scroll" onClick={() => onClick()}>
             <div className="jutsu_scroll_inner">
                 <div className="jutsu_name">{jutsu_data.name}</div>
                 <div className="jutsu_type">
                     <div className="jutsu_scroll_divider"><svg width="100%" height="2"><line x1="0%" y1="1" x2="95%" y2="1" stroke="#77694e" strokeWidth="1"></line></svg></div>
-                    <div className="jutsu_type_label">forbidden {jutsu_data.jutsu_type}</div>
+                    <div className="jutsu_type_label">forbidden {jutsu_data.jutsuType}</div>
                     <div className="jutsu_scroll_divider"><svg width="100%" height="2"><line x1="0%" y1="1" x2="95%" y2="1" stroke="#77694e" strokeWidth="1"></line></svg></div>
                 </div>
                 <div className="jutsu_description">{jutsu_data.description}</div>
                 <div className="jutsu_stats_container">
                     <div className="jutsu_power"><span style={{ fontWeight: "700" }}>POWER:</span> {jutsu_data.power}</div>
                     <div className="jutsu_cooldown"><span style={{ fontWeight: "700" }}>COOLDOWN:</span> {jutsu_data.cooldown} TURNS</div>
-                    <div className="jutsu_effect"><span style={{ fontWeight: "700" }}>EFFECT:</span> {jutsu_data.effect} ({jutsu_data.effect_amount}%)</div>
-                    <div className="jutsu_duration"><span style={{ fontWeight: "700" }}>DURATION:</span> {jutsu_data.effect_duration} TURNS</div>
+                    <div className="jutsu_effect"><span style={{ fontWeight: "700" }}>EFFECT:</span> {jutsu_data.effect} ({jutsu_data.effectAmount}%)</div>
+                    <div className="jutsu_duration"><span style={{ fontWeight: "700" }}>DURATION:</span> {jutsu_data.effectDuration} TURNS</div>
                 </div>
                 <div className="jutsu_scroll_divider_bottom"><svg width="100%" height="2"><line x1="0%" y1="1" x2="95%" y2="1" stroke="#77694e" strokeWidth="1"></line></svg></div>
                 <div className="jutsu_tags">

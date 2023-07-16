@@ -36,13 +36,13 @@ class ForbiddenShopApiPresenter {
                 return [
                     'id' => $jutsu->id,
                     'name' => $jutsu->name,
-                    'jutsu_type' => $jutsu->jutsu_type,
+                    'jutsuType' => $jutsu->jutsu_type,
                     'description' => html_entity_decode($jutsu->description, ENT_QUOTES),
                     'power' => $jutsu->base_power,
                     'cooldown' => $jutsu->cooldown,
                     'effect' => $jutsu->effect,
-                    'effect_amount' => $jutsu->effect_amount,
-                    'effect_duration' => $jutsu->effect_length,
+                    'effectAmount' => $jutsu->effect_amount,
+                    'effectDuration' => $jutsu->effect_length,
                 ];
             },
             array_values($forbiddenShopManager->getEventJutsu()) // strip jutsu ID keys so it's a real array in JS
