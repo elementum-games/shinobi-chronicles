@@ -1,3 +1,8 @@
+@font-face {
+    src: url("/style/fonts/STICKRICE-8JEZ.TTF");
+    font-family: stickrice;
+}
+
 :root {
     /* Avatar Config */
     --avatar-frame-border_gradient: linear-gradient(0deg, rgba(140,123,88,1) 0%, rgba(181,156,106,1) 50%, rgba(225,207,159,1) 100%);
