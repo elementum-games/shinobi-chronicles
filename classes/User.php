@@ -1560,6 +1560,7 @@ class User extends Fighter {
 
         switch($jutsu->purchase_type) {
             case Jutsu::PURCHASE_TYPE_PURCHASABLE:
+            case Jutsu::PURCHASE_TYPE_EVENT_SHOP:
                 // Element check
                 if($jutsu->element && $jutsu->element != Jutsu::ELEMENT_NONE) {
                     if($this->elements) {
