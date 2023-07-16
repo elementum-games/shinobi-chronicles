@@ -28,19 +28,27 @@ try {
         case "getEventData":
             $response->data = ForbiddenShopAPIPresenter::eventDataResponse();
             break;
-        case "exchangeEventCurrency":
-            $event_name = $system->db->clean($_POST['event_name']);
-            $currency_name = $system->db->clean($_POST['currency_name']);
-            $quantity = $system->db->clean($_POST['quantity']);
+        case "exchangeAllEventCurrency":
+            $event_key = $system->db->clean($_POST['event_key']);
+
+            $message = $ForbiddenShopManager->exchangeAllEventCurrency($event_key);
+            $player->getInventory();
+
             $response->data = [
-                'message' => ForbiddenShopAPIPresenter::exchangeEventCurrencyResponse($ForbiddenShopManager, $event_name, $currency_name, $quantity),
+                'message' => html_entity_decode($message, ENT_QUOTES),
+                'playerInventory' => UserApiPresenter::playerInventoryResponse($player)
             ];
             break;
         case "exchangeForbiddenJutsuScroll":
             $item_type = $system->db->clean($_POST['item_type']);
             $item_id = $system->db->clean($_POST['item_id']);
+
+            $message = $ForbiddenShopManager->exchangeForbiddenJutsuScroll($item_type, $item_id);
+            $player->getInventory();
+
             $response->data = [
-                'message' => ForbiddenShopAPIPresenter::exchangeForbiddenJutsuScrollResponse($ForbiddenShopManager, $item_type, $item_id),
+                'message' => html_entity_decode($message, ENT_QUOTES),
+                'playerInventory' => UserApiPresenter::playerInventoryResponse($player)
             ];
             break;
         default:

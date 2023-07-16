@@ -22,8 +22,8 @@ $ForbiddenShopManager = new ForbiddenShopManager($system, $player);
                     userAPI: "<?= $system->router->api_links['user'] ?>",
                 },
                 eventData: <?= json_encode(ForbiddenShopAPIPresenter::eventDataResponse()) ?>,
-                jutsuData: <?= json_encode(ForbiddenShopApiPresenter::eventJutsuResponse($ForbiddenShopManager)) ?>,
-                playerInventory: <?= json_encode(UserAPIPresenter::playerInventoryResponse(player: $player)) ?>,
+                availableEventJutsu: <?= json_encode(ForbiddenShopApiPresenter::eventJutsuResponse($ForbiddenShopManager)) ?>,
+                initialPlayerInventory: <?= json_encode(UserAPIPresenter::playerInventoryResponse(player: $player)) ?>,
             }),
             forbiddenShopContainer
         );

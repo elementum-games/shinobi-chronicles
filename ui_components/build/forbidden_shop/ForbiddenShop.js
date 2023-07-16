@@ -1,65 +1,55 @@
 import { apiFetch } from "../utils/network.js";
 import { clickOnEnter } from "../utils/uiHelpers.js";
+
 function ForbiddenShop({
   links,
   eventData,
-  jutsuData,
-  playerInventory
+  availableEventJutsu,
+  initialPlayerInventory
 }) {
-  function exchangeEventCurrency(event_name, currency_name, quantity) {
-    apiFetch(links.forbiddenShopAPI, {
-      request: 'exchangeEventCurrency',
-      event_name: event_name,
-      currency_name: currency_name,
-      quantity: quantity
-    }).then(response => {
-      if (response.errors.length) {
-        handleErrors(response.errors);
-        return;
-      } else {}
-    });
-  }
-  function handleErrors(errors) {
-    console.warn(errors);
-  }
   return /*#__PURE__*/React.createElement("div", {
     className: "forbidden_shop_container"
   }, /*#__PURE__*/React.createElement(ShopMenu, {
     ShopMenuButton: ShopMenuButton
   }), /*#__PURE__*/React.createElement(ScrollExchange, {
-    playerInventory: playerInventory,
+    initialPlayerInventory: initialPlayerInventory,
     forbiddenShopAPI: links.forbiddenShopAPI,
     eventData: eventData,
-    jutsuData: jutsuData,
+    availableEventJutsu: availableEventJutsu,
     userAPI: links.userAPI
   }), /*#__PURE__*/React.createElement(LanternEventCurrencyExchange, {
-    playerInventory: playerInventory,
-    forbiddenShopAPI: links.forbiddenShopAPI,
+    initialPlayerInventory: initialPlayerInventory,
     eventData: eventData.lanternEvent,
-    userAPI: links.userAPI
+    forbiddenShopApiLink: links.forbiddenShopAPI
   }));
 }
+
 function ShopMenu({
   ShopMenuButton
 }) {
   const [activeButtonName, setActiveButtonName] = React.useState(null);
   const [dialogueText, setDialogueText] = React.useState(null);
+
   function questionOneClick() {
     setDialogueText("A remnant from a past forgotten.\nAn abyss between the realms of yours... and <span class='dialogue_highlight'>ours</span>.");
     setActiveButtonName("questionOne");
   }
+
   function questionTwoClick() {
     setDialogueText("... <span class='dialogue_highlight'>Akuji</span>. Nevermind the what.\n Now, you have something that\n belongs to me.");
     setActiveButtonName("questionTwo");
   }
+
   function scrollExchangeJump() {
     setDialogueText("...");
     setActiveButtonName("scrollExchange");
   }
+
   function currencyExchangeJump() {
     setDialogueText("...");
     setActiveButtonName("currencyExchange");
   }
+
   return /*#__PURE__*/React.createElement("div", {
     className: "shop_menu_container"
   }, /*#__PURE__*/React.createElement("img", {
@@ -129,6 +119,7 @@ function ShopMenu({
     buttonClass: "button_fourth"
   })));
 }
+
 function ShopMenuButton({
   onClick,
   buttonText,
@@ -248,23 +239,45 @@ function ShopMenuButton({
     fill: "#f0e2c6"
   }, buttonText)));
 }
+
 function LanternEventCurrencyExchange({
-  playerInventory,
-  forbiddenShopAPI,
+  initialPlayerInventory,
   eventData,
-  userAPI
+  forbiddenShopApiLink
 }) {
-  const [currenciesToExchange, setCurrenciesToExchange] = React.useState({
-    redLantern: 10000,
-    blueLantern: 1000,
-    violetLantern: 500,
-    goldLantern: 50,
-    shadowEssence: 2
-  });
+  const [playerInventory, setPlayerInventory] = React.useState(initialPlayerInventory);
+  const playerQuantities = {
+    redLantern: playerInventory.items[eventData.red_lantern_id]?.quantity || 0,
+    blueLantern: playerInventory.items[eventData.blue_lantern_id]?.quantity || 0,
+    violetLantern: playerInventory.items[eventData.violet_lantern_id]?.quantity || 0,
+    goldLantern: playerInventory.items[eventData.gold_lantern_id]?.quantity || 0,
+    shadowEssence: playerInventory.items[eventData.shadow_essence_id]?.quantity || 0
+  };
+  const [currenciesToExchange, setCurrenciesToExchange] = React.useState(playerQuantities);
+  const [responseMessage, setResponseMessage] = React.useState(null);
+  const totalQuantity = Object.values(playerQuantities).reduce((accum, currentValue) => {
+    return accum + currentValue;
+  }, 0);
+
+  function exchangeAllEventCurrency() {
+    apiFetch(forbiddenShopApiLink, {
+      request: 'exchangeAllEventCurrency',
+      event_key: eventData.eventKey
+    }).then(response => {
+      if (response.errors.length) {
+        console.error(response.errors);
+        setResponseMessage(response.errors.join(' / '));
+      } else {
+        setPlayerInventory(response.data.playerInventory);
+        setResponseMessage(response.data.message);
+      }
+    });
+  }
+
   return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("h3", {
     className: "forbidden_shop_sub_header"
   }, "Event currency exchange"), /*#__PURE__*/React.createElement("div", {
-    className: "currency_exchange box-secondary"
+    className: "currency_exchange_section box-secondary"
   }, /*#__PURE__*/React.createElement("span", {
     className: "event_name"
   }, "Festival of Lanterns event"), /*#__PURE__*/React.createElement("span", {
@@ -273,48 +286,59 @@ function LanternEventCurrencyExchange({
     className: "currencies_to_exchange"
   }, /*#__PURE__*/React.createElement(CurrencyExchangeInput, {
     name: "Red Lantern",
+    playerQuantity: playerQuantities.redLantern,
     quantityToExchange: currenciesToExchange.redLantern,
-    setQuantityToExchange: newVal => setCurrenciesToExchange(prevVal => ({
-      ...prevVal,
+    setQuantityToExchange: newVal => setCurrenciesToExchange(prevVal => ({ ...prevVal,
       redLantern: newVal
     })),
     yenForEach: eventData.yen_per_lantern
   }), /*#__PURE__*/React.createElement(CurrencyExchangeInput, {
     name: "Blue Lantern",
+    playerQuantity: playerQuantities.blueLantern,
     quantityToExchange: currenciesToExchange.blueLantern,
-    setQuantityToExchange: newVal => setCurrenciesToExchange(prevVal => ({
-      ...prevVal,
+    setQuantityToExchange: newVal => setCurrenciesToExchange(prevVal => ({ ...prevVal,
       blueLantern: newVal
     })),
     yenForEach: eventData.yen_per_lantern * eventData.red_lanterns_per_blue
   }), /*#__PURE__*/React.createElement(CurrencyExchangeInput, {
     name: "Violet Lantern",
+    playerQuantity: playerQuantities.violetLantern,
     quantityToExchange: currenciesToExchange.violetLantern,
-    setQuantityToExchange: newVal => setCurrenciesToExchange(prevVal => ({
-      ...prevVal,
+    setQuantityToExchange: newVal => setCurrenciesToExchange(prevVal => ({ ...prevVal,
       violetLantern: newVal
     })),
     yenForEach: eventData.yen_per_lantern * eventData.red_lanterns_per_violet
   }), /*#__PURE__*/React.createElement(CurrencyExchangeInput, {
     name: "Gold Lantern",
+    playerQuantity: playerQuantities.goldLantern,
     quantityToExchange: currenciesToExchange.goldLantern,
-    setQuantityToExchange: newVal => setCurrenciesToExchange(prevVal => ({
-      ...prevVal,
+    setQuantityToExchange: newVal => setCurrenciesToExchange(prevVal => ({ ...prevVal,
       goldLantern: newVal
     })),
     yenForEach: eventData.yen_per_lantern * eventData.red_lanterns_per_gold
   }), /*#__PURE__*/React.createElement(CurrencyExchangeInput, {
     name: "Shadow Essence",
+    playerQuantity: playerQuantities.shadowEssence,
     quantityToExchange: currenciesToExchange.shadowEssence,
-    setQuantityToExchange: newVal => setCurrenciesToExchange(prevVal => ({
-      ...prevVal,
+    setQuantityToExchange: newVal => setCurrenciesToExchange(prevVal => ({ ...prevVal,
       shadowEssence: newVal
     })),
     yenForEach: eventData.yen_per_lantern * eventData.red_lanterns_per_shadow
-  }))));
+  })), /*#__PURE__*/React.createElement("button", {
+    className: `currency_exchange_button ${totalQuantity <= 0 ? "disabled" : ""}`,
+    onClick: () => {
+      if (totalQuantity > 0) {
+        exchangeAllEventCurrency();
+      }
+    }
+  }, "Exchange All Festival Of Lanterns Items"), /*#__PURE__*/React.createElement("p", {
+    className: "response_message"
+  }, responseMessage)));
 }
+
 function CurrencyExchangeInput({
   name,
+  playerQuantity,
   quantityToExchange,
   setQuantityToExchange,
   yenForEach
@@ -322,17 +346,14 @@ function CurrencyExchangeInput({
   const yenToReceive = quantityToExchange * yenForEach;
   return /*#__PURE__*/React.createElement("div", {
     className: "currency_to_exchange"
-  }, /*#__PURE__*/React.createElement("span", null, name), /*#__PURE__*/React.createElement("span", null, "x", quantityToExchange.toLocaleString()), /*#__PURE__*/React.createElement("input", {
-    type: "number",
-    value: quantityToExchange,
-    onChange: e => setQuantityToExchange(e.target.value)
-  }), /*#__PURE__*/React.createElement("span", null, yenToReceive.toLocaleString(), " yen"));
+  }, /*#__PURE__*/React.createElement("span", null, name), /*#__PURE__*/React.createElement("span", null, "x", playerQuantity.toLocaleString()), /*#__PURE__*/React.createElement("span", null, yenToReceive.toLocaleString(), " yen"));
 }
+
 function ScrollExchange({
-  playerInventory,
+  initialPlayerInventory,
   forbiddenShopAPI,
   eventData,
-  jutsuData
+  availableEventJutsu
 }) {
   function exchangeForbiddenJutsuScroll(item_type, item_id) {
     apiFetch(forbiddenShopAPI, {
@@ -341,13 +362,12 @@ function ScrollExchange({
       item_id: item_id
     }).then(response => {
       if (response.errors.length) {
-        handleErrors(response.errors);
-        return;
-      } else {
-        // update remaining # of scrolls for display, get new list of jutsu
+        console.error(response.errors);
+      } else {// update remaining # of scrolls for display, get new list of jutsu
       }
     });
   }
+
   return /*#__PURE__*/React.createElement("div", {
     className: "scroll_exchange_section"
   }, /*#__PURE__*/React.createElement("div", {
@@ -362,12 +382,13 @@ function ScrollExchange({
     className: "scroll_count"
   }))), /*#__PURE__*/React.createElement("div", {
     className: "scroll_exchange_container"
-  }, jutsuData.map(jutsu_data => /*#__PURE__*/React.createElement(JutsuScroll, {
+  }, availableEventJutsu.map(jutsu_data => /*#__PURE__*/React.createElement(JutsuScroll, {
     key: jutsu_data.jutsu_id,
     jutsu_data: jutsu_data,
     onClick: exchangeForbiddenJutsuScroll
   }))));
 }
+
 function JutsuScroll({
   jutsu_data,
   onClick
@@ -455,4 +476,5 @@ function JutsuScroll({
     className: "jutsu_tag_scaling"
   }, "scales with rank"))));
 }
+
 window.ForbiddenShop = ForbiddenShop;

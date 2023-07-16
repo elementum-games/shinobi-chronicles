@@ -1,7 +1,7 @@
-
 :root {
     --forbidden-shop-padding: 2%;
 }
+
 .shop_menu_container {
     position: relative;
     margin-top: 30px;
@@ -62,7 +62,7 @@
     width: 90%;
     opacity: 0;
     animation: fadeInFromBlack 2s ease-in-out;
-    animation-delay: 0.5s;
+    animation-delay: 0.25s;
     animation-fill-mode: forwards;
 }
 @keyframes fadeInFromBlack {
@@ -210,35 +210,121 @@
 }
 .button_first {
     opacity: 0;
-    animation: fadeInFromBlack 2s ease-in-out;
+    animation: fadeInFromBlack 1.5s ease-in-out;
     animation-delay: 1s;
     animation-fill-mode: forwards;
 }
 .button_second {
     opacity: 0;
-    animation: fadeInFromBlack 2s ease-in-out;
-    animation-delay: 2s;
+    animation: fadeInFromBlack 1.5s ease-in-out;
+    animation-delay: 1.5s;
     animation-fill-mode: forwards;
 }
 .button_third {
     opacity: 0;
-    animation: fadeInFromBlack 2s ease-in-out;
-    animation-delay: 3s;
+    animation: fadeInFromBlack 1.5s ease-in-out;
+    animation-delay: 2s;
     animation-fill-mode: forwards;
 }
 .button_fourth {
     opacity: 0;
-    animation: fadeInFromBlack 2s ease-in-out;
-    animation-delay: 4s;
+    animation: fadeInFromBlack 1.5s ease-in-out;
+    animation-delay: 2.5s;
     animation-fill-mode: forwards;
+}
+
+.section_title {
+    font-family: Segoe UI, sans-serif;
+    font-size: 14pt;
+    color: #c7b070;
+    font-variant: small-caps;
+    font-weight: 400;
+    margin-left: 20px;
 }
 
 .forbidden_shop_sub_header {
     margin-left: var(--forbidden-shop-padding);
     margin-top: 25px;
 }
-.currency_exchange {
+.currency_exchange_section {
+    display: flex;
+    flex-direction: column;
+
     margin: 10px var(--forbidden-shop-padding);
+    padding: 10px;
+}
+.event_name {
+    color: var(--font-color-1);
+    font-size: var(--font-medium);
+}
+.event_date {
+    color: var(--font-color-5);
+}
+
+.currencies_to_exchange {
+    display: flex;
+    justify-content: space-evenly;
+
+    margin-top: 5px;
+    padding: 20px 10px;
+}
+.currency_to_exchange {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    color: var(--font-color-3);
+}
+.currency_to_exchange input {
+    width: 5.1em;
+    margin: 6px 0;
+
+    text-align: center;
+}
+.currency_exchange_button {
+    display: flex;
+    align-self: center;
+    margin: 10px auto;
+    position: relative;
+
+    padding: 6px 20px;
+    border: none;
+    background: #692828;
+
+    color: var(--font-color-3);
+    font-family: var(--font-primary);
+    font-variant: all-small-caps;
+    font-size: 14px;
+    line-height: 15px;
+    cursor: pointer;
+
+    clip-path: polygon(20px 0px, calc(100% - 20px) 0px, 100% 50%, calc(100% - 20px) 100%, 20px 100%, 0px 50%);
+}
+.currency_exchange_button::before {
+    content: '';
+    width: calc(100% - 4px);
+    height: calc(100% - 4px);
+
+    position: absolute;
+    top: 2px;
+    left: 2px;
+
+    background: #83324f;
+    z-index: -2;
+    clip-path: polygon(18px 0px, calc(100% - 18px) 0px, 100% 50%, calc(100% - 18px) 100%, 18px 100%, 0px 50%);
+}
+.currency_exchange_button.disabled {
+    cursor: default;
+    opacity: 0.5;
+}
+
+
+.response_message {
+    margin-top: 0;
+    text-align: center;
+
+    font-size: var(--font-medium);
+    color: var(--font-color-5);
 }
 
 .scroll_exchange_section {
@@ -253,14 +339,6 @@
     width: 100%;
     display: flex;
     align-items: flex-end;
-}
-.scroll_exchange_title {
-    font-family: Segoe UI;
-    font-size: 14pt;
-    color: #c7b070;
-    font-variant: small-caps;
-    font-weight: 400;
-    margin-left: 20px;
 }
 .scroll_count_container {
     margin-left: auto;

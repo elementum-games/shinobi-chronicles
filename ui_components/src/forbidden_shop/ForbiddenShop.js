@@ -1,10 +1,15 @@
+// @flow
+
 import { apiFetch } from "../utils/network.js";
 import { clickOnEnter } from "../utils/uiHelpers.js"
+
 import type {
     PlayerInventoryType
 } from "../_schema/userSchema.js";
+import type { JutsuType } from "../_schema/jutsu.js";
 
 type LanternEventData = {|
+    +eventKey: string,
     +red_lantern_id: number,
     +blue_lantern_id: number,
     +violet_lantern_id: number,
@@ -25,53 +30,31 @@ type Props = {|
     +eventData: {|
         +lanternEvent: LanternEventData
     |},
-    +jutsuData: Array,
-    +playerInventory: PlayerInventoryType,
+    +availableEventJutsu: Array,
+    +initialPlayerInventory: PlayerInventoryType,
 |};
 function ForbiddenShop({
     links,
     eventData,
-    jutsuData,
-    playerInventory,
-}: Props) {                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   
-    function exchangeEventCurrency(event_name, currency_name, quantity) {
-        apiFetch(links.forbiddenShopAPI, {
-            request: 'exchangeEventCurrency',
-            event_name: event_name,
-            currency_name: currency_name,
-            quantity: quantity,
-        }).then(response => {
-            if (response.errors.length) {
-                handleErrors(response.errors);
-                return;
-            }
-            else {
-
-            }
-        })
-    }
-
-    function handleErrors(errors) {
-        console.warn(errors);
-    }
-
+    availableEventJutsu,
+    initialPlayerInventory,
+}: Props) {
     return (
         <div className="forbidden_shop_container">
             <ShopMenu
                 ShopMenuButton={ShopMenuButton}
             />
             <ScrollExchange
-                playerInventory={playerInventory}
+                initialPlayerInventory={initialPlayerInventory}
                 forbiddenShopAPI={links.forbiddenShopAPI}
                 eventData={eventData}
-                jutsuData={jutsuData}
+                availableEventJutsu={availableEventJutsu}
                 userAPI={links.userAPI}
             />
             <LanternEventCurrencyExchange
-                playerInventory={playerInventory}
-                forbiddenShopAPI={links.forbiddenShopAPI}
+                initialPlayerInventory={initialPlayerInventory}
                 eventData={eventData.lanternEvent}
-                userAPI={links.userAPI}
+                forbiddenShopApiLink={links.forbiddenShopAPI}
             />
         </div>
     )
@@ -198,35 +181,59 @@ function ShopMenuButton({ onClick, buttonText, buttonName, activeButtonName, but
 }
 
 type CurrencyExchangeProps = {|
-    +playerInventory: PlayerInventoryType,
-    +forbiddenShopAPI: string,
+    +initialPlayerInventory: PlayerInventoryType,
     +eventData: LanternEventData,
-    +userAPI: string,
+    +forbiddenShopApiLink: string,
 |};
 function LanternEventCurrencyExchange({
-    playerInventory,
-    forbiddenShopAPI,
+    initialPlayerInventory,
     eventData,
-    userAPI
+    forbiddenShopApiLink,
 }: CurrencyExchangeProps) {
-    const [currenciesToExchange, setCurrenciesToExchange] = React.useState({
-        redLantern: 10000,
-        blueLantern: 1000,
-        violetLantern: 500,
-        goldLantern: 50,
-        shadowEssence: 2
-    });
+    const [playerInventory, setPlayerInventory] = React.useState(initialPlayerInventory);
+
+    const playerQuantities = {
+        redLantern: playerInventory.items[eventData.red_lantern_id]?.quantity || 0,
+        blueLantern: playerInventory.items[eventData.blue_lantern_id]?.quantity || 0,
+        violetLantern: playerInventory.items[eventData.violet_lantern_id]?.quantity || 0,
+        goldLantern: playerInventory.items[eventData.gold_lantern_id]?.quantity || 0,
+        shadowEssence: playerInventory.items[eventData.shadow_essence_id]?.quantity || 0,
+    };
+    const [currenciesToExchange, setCurrenciesToExchange] = React.useState(playerQuantities);
+
+    const [responseMessage, setResponseMessage] = React.useState(null);
+
+    const totalQuantity = Object.values(playerQuantities).reduce((accum, currentValue) => {
+        return accum + currentValue;
+    }, 0);
+
+    function exchangeAllEventCurrency() {
+        apiFetch(forbiddenShopApiLink, {
+            request: 'exchangeAllEventCurrency',
+            event_key: eventData.eventKey,
+        }).then(response => {
+            if (response.errors.length) {
+                console.error(response.errors);
+                setResponseMessage(response.errors.join(' / '));
+            }
+            else {
+                setPlayerInventory(response.data.playerInventory);
+                setResponseMessage(response.data.message);
+            }
+        })
+    }
 
     return (
         <>
             <h3 className="forbidden_shop_sub_header">Event currency exchange</h3>
-            <div className="currency_exchange box-secondary">
+            <div className="currency_exchange_section box-secondary">
                 <span className="event_name">Festival of Lanterns event</span>
                 <span className="event_date">July 1 - July 15, 2023</span>
 
                 <div className="currencies_to_exchange">
                     <CurrencyExchangeInput
                         name="Red Lantern"
+                        playerQuantity={playerQuantities.redLantern}
                         quantityToExchange={currenciesToExchange.redLantern}
                         setQuantityToExchange={(newVal) => setCurrenciesToExchange(prevVal => ({
                             ...prevVal,
@@ -236,6 +243,7 @@ function LanternEventCurrencyExchange({
                     />
                     <CurrencyExchangeInput
                         name="Blue Lantern"
+                        playerQuantity={playerQuantities.blueLantern}
                         quantityToExchange={currenciesToExchange.blueLantern}
                         setQuantityToExchange={(newVal) => setCurrenciesToExchange(prevVal => ({
                             ...prevVal,
@@ -245,6 +253,7 @@ function LanternEventCurrencyExchange({
                     />
                     <CurrencyExchangeInput
                         name="Violet Lantern"
+                        playerQuantity={playerQuantities.violetLantern}
                         quantityToExchange={currenciesToExchange.violetLantern}
                         setQuantityToExchange={(newVal) => setCurrenciesToExchange(prevVal => ({
                             ...prevVal,
@@ -254,6 +263,7 @@ function LanternEventCurrencyExchange({
                     />
                     <CurrencyExchangeInput
                         name="Gold Lantern"
+                        playerQuantity={playerQuantities.goldLantern}
                         quantityToExchange={currenciesToExchange.goldLantern}
                         setQuantityToExchange={(newVal) => setCurrenciesToExchange(prevVal => ({
                             ...prevVal,
@@ -263,6 +273,7 @@ function LanternEventCurrencyExchange({
                     />
                     <CurrencyExchangeInput
                         name="Shadow Essence"
+                        playerQuantity={playerQuantities.shadowEssence}
                         quantityToExchange={currenciesToExchange.shadowEssence}
                         setQuantityToExchange={(newVal) => setCurrenciesToExchange(prevVal => ({
                             ...prevVal,
@@ -271,6 +282,17 @@ function LanternEventCurrencyExchange({
                         yenForEach={eventData.yen_per_lantern * eventData.red_lanterns_per_shadow}
                     />
                 </div>
+                <button
+                    className={`currency_exchange_button ${totalQuantity <= 0 ? "disabled" : ""}`}
+                    onClick={() => {
+                        if(totalQuantity > 0) {
+                            exchangeAllEventCurrency();
+                        }
+                    }}
+                >
+                    Exchange All Festival Of Lanterns Items
+                </button>
+                <p className="response_message">{responseMessage}</p>
             </div>
         </>
     );
@@ -278,39 +300,44 @@ function LanternEventCurrencyExchange({
 
 type CurrencyExchangeInputProps = {|
     +name: string,
+    +playerQuantity: number,
     +quantityToExchange: number,
     +yenForEach: number,
     +setQuantityToExchange: (number) => void,
 |};
 function CurrencyExchangeInput({
     name,
+    playerQuantity,
     quantityToExchange,
     setQuantityToExchange,
     yenForEach
-}) {
+}: CurrencyExchangeInputProps) {
     const yenToReceive = quantityToExchange * yenForEach;
 
     return (
         <div className="currency_to_exchange">
             <span>{name}</span>
-            <span>x{quantityToExchange.toLocaleString()}</span>
-            <input
+            <span>x{playerQuantity.toLocaleString()}</span>
+            {/*<input
                 type="number"
                 value={quantityToExchange}
+                min={0}
+                max={playerQuantity}
                 onChange={(e) => setQuantityToExchange(e.target.value)}
-            />
+                disabled={true}
+            />*/}
             <span>{yenToReceive.toLocaleString()} yen</span>
         </div>
     );
 }
 
 type ScrollExchangeProps = {|
-    +playerInventory: PlayerInventoryType,
+    +initialPlayerInventory: PlayerInventoryType,
     +forbiddenShopAPI: string,
     +eventData: LanternEventData,
-    +jutsuData: array,
+    +availableEventJutsu: $ReadOnlyArray<JutsuType>,
 |};
-function ScrollExchange({ playerInventory, forbiddenShopAPI, eventData, jutsuData }) {
+function ScrollExchange({ initialPlayerInventory, forbiddenShopAPI, eventData, availableEventJutsu }: ScrollExchangeProps) {
     function exchangeForbiddenJutsuScroll(item_type, item_id) {
         apiFetch(forbiddenShopAPI, {
             request: 'exchangeForbiddenJutsuScroll',
@@ -318,8 +345,7 @@ function ScrollExchange({ playerInventory, forbiddenShopAPI, eventData, jutsuDat
             item_id: item_id,
         }).then(response => {
             if (response.errors.length) {
-                handleErrors(response.errors);
-                return;
+                console.error(response.errors);
             }
             else {
                 // update remaining # of scrolls for display, get new list of jutsu
@@ -336,7 +362,7 @@ function ScrollExchange({ playerInventory, forbiddenShopAPI, eventData, jutsuDat
                 </div>
             </div>
             <div className="scroll_exchange_container">
-                {jutsuData
+                {availableEventJutsu
                     .map((jutsu_data) => (
                         <JutsuScroll
                             key={jutsu_data.jutsu_id}
