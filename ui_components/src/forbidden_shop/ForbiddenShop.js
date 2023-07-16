@@ -39,10 +39,14 @@ function ForbiddenShop({
     availableEventJutsu,
     initialPlayerInventory,
 }: Props) {
+    const scrollExchangeRef = React.useRef(null);
+    const currencyExchangeRef = React.useRef(null);
     return (
         <div className="forbidden_shop_container">
             <ShopMenu
                 ShopMenuButton={ShopMenuButton}
+                scrollExchangeRef={scrollExchangeRef}
+                currencyExchangeRef={currencyExchangeRef}
             />
             <ScrollExchange
                 initialPlayerInventory={initialPlayerInventory}
@@ -50,19 +54,26 @@ function ForbiddenShop({
                 eventData={eventData}
                 availableEventJutsu={availableEventJutsu}
                 userAPI={links.userAPI}
+                scrollExchangeRef={scrollExchangeRef}
             />
             <LanternEventCurrencyExchange
                 initialPlayerInventory={initialPlayerInventory}
                 eventData={eventData.lanternEvent}
                 forbiddenShopApiLink={links.forbiddenShopAPI}
+                currencyExchangeRef={currencyExchangeRef}
             />
         </div>
     )
 }
 
-function ShopMenu({ ShopMenuButton }) {
+function ShopMenu({ ShopMenuButton, scrollExchangeRef, currencyExchangeRef }) {
     const [activeButtonName, setActiveButtonName] = React.useState(null);
     const [dialogueText, setDialogueText] = React.useState(null);
+    function scrollTo(element: ?HTMLElement) {
+        if (element == null) return;
+
+        element.scrollIntoView({ behavior: 'smooth' });
+    }
     function questionOneClick() {
         setDialogueText("A remnant from a past forgotten.\nAn abyss between the realms of yours... and <span class='dialogue_highlight'>ours</span>.");
         setActiveButtonName("questionOne");
@@ -74,10 +85,12 @@ function ShopMenu({ ShopMenuButton }) {
     function scrollExchangeJump() {
         setDialogueText("...");
         setActiveButtonName("scrollExchange");
+        scrollTo(scrollExchangeRef.current);
     }
     function currencyExchangeJump() {
         setDialogueText("...");
         setActiveButtonName("currencyExchange");
+        scrollTo(currencyExchangeRef.current);
     }
 
     return (
@@ -189,6 +202,7 @@ function LanternEventCurrencyExchange({
     initialPlayerInventory,
     eventData,
     forbiddenShopApiLink,
+    currencyExchangeRef,
 }: CurrencyExchangeProps) {
     const [playerInventory, setPlayerInventory] = React.useState(initialPlayerInventory);
 
@@ -224,7 +238,7 @@ function LanternEventCurrencyExchange({
 
     return (
         <>
-            <div className="currency_exchange_header section_title">Event currency exchange</div>
+            <h3 className="currency_exchange_header section_title" ref={currencyExchangeRef}>Event currency exchange</h3>
             <div className="currency_exchange_section box-secondary">
                 <span className="event_name">Festival of Lanterns event</span>
                 <span className="event_date">July 1 - July 15, 2023</span>
@@ -336,7 +350,7 @@ type ScrollExchangeProps = {|
     +eventData: LanternEventData,
     +availableEventJutsu: $ReadOnlyArray<JutsuType>,
 |};
-function ScrollExchange({ initialPlayerInventory, forbiddenShopAPI, eventData, availableEventJutsu }: ScrollExchangeProps) {
+function ScrollExchange({ initialPlayerInventory, forbiddenShopAPI, eventData, availableEventJutsu, scrollExchangeRef }: ScrollExchangeProps) {
     function exchangeForbiddenJutsuScroll(item_type, item_id) {
         apiFetch(forbiddenShopAPI, {
             request: 'exchangeForbiddenJutsuScroll',
@@ -352,7 +366,7 @@ function ScrollExchange({ initialPlayerInventory, forbiddenShopAPI, eventData, a
         })
     }
     return (
-        <div className="scroll_exchange_section">
+        <div className="scroll_exchange_section" ref={scrollExchangeRef}>
             <div className="scroll_exchange_header">
                 <div className="section_title">Forbidden scroll exchange</div>
                 <div className="scroll_count_container">
