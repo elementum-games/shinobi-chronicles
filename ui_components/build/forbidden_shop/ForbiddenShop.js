@@ -390,7 +390,7 @@ function ScrollExchange({
     className: "scroll_count_label"
   }, "FORBIDDEN SCROLLS"), /*#__PURE__*/React.createElement("div", {
     className: "scroll_count"
-  }, playerInventory.items[eventData.forbidden_jutsu_scroll_id]?.quantity || 0))), /*#__PURE__*/React.createElement("div", {
+  }, "x", playerInventory.items[eventData.forbidden_jutsu_scroll_id]?.quantity || 0))), /*#__PURE__*/React.createElement("div", {
     className: "scroll_exchange_container"
   }, jutsuForPurchase.map(jutsu => /*#__PURE__*/React.createElement(JutsuScroll, {
     key: jutsu.id,

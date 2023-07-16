@@ -343,16 +343,33 @@
 }
 .scroll_count_container {
     margin-left: auto;
+    margin-right: var(--forbidden-shop-padding);
+
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+
+    padding: 10px;
+    padding-left: 20px;
+
+    --corner-size: 15px;
+    clip-path: polygon(
+        0 50%, var(--corner-size) 0, 100% 0,
+        100% 100%, var(--corner-size) 100%, 0 50%
+    );
+
+    background: var(--box-color-default);
+
+    font-family: var(--font-primary);
+    font-size: 9pt;
+    color: var(--font-color-3);
+    font-style: italic;
 }
 .scroll_count_label {
-    font-family: Segoe UI;
-    font-size: 10pt;
-    color: #c7b070;
+
 }
 .scroll_count {
-    font-family: Segoe UI;
-    font-size: 11pt;
-    color: #c7b070;
 }
 .scroll_exchange_container {
     width: calc(100% - (var(--forbidden-shop-padding) * 2));

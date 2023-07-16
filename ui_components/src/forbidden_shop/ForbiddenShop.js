@@ -370,7 +370,7 @@ function ScrollExchange({ initialPlayerInventory, forbiddenShopApiLink, eventDat
                 <div className="scroll_count_container">
                     <div className="scroll_count_label">FORBIDDEN SCROLLS</div>
                     <div className="scroll_count">
-                        {playerInventory.items[eventData.forbidden_jutsu_scroll_id]?.quantity || 0}
+                        x{playerInventory.items[eventData.forbidden_jutsu_scroll_id]?.quantity || 0}
                     </div>
                 </div>
             </div>
