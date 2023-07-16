@@ -273,8 +273,8 @@ function LanternEventCurrencyExchange({
     });
   }
 
-  return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("h3", {
-    className: "forbidden_shop_sub_header"
+  return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
+    className: "currency_exchange_header section_title"
   }, "Event currency exchange"), /*#__PURE__*/React.createElement("div", {
     className: "currency_exchange_section box-secondary"
   }, /*#__PURE__*/React.createElement("span", {
@@ -372,7 +372,7 @@ function ScrollExchange({
   }, /*#__PURE__*/React.createElement("div", {
     className: "scroll_exchange_header"
   }, /*#__PURE__*/React.createElement("div", {
-    className: "scroll_exchange_title"
+    className: "section_title"
   }, "Forbidden scroll exchange"), /*#__PURE__*/React.createElement("div", {
     className: "scroll_count_container"
   }, /*#__PURE__*/React.createElement("div", {

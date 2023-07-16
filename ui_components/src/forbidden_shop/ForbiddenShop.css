@@ -253,6 +253,10 @@
     margin: 10px var(--forbidden-shop-padding);
     padding: 10px;
 }
+.currency_exchange_header {
+    margin-top: 30px;
+}
+
 .event_name {
     color: var(--font-color-1);
     font-size: var(--font-medium);
@@ -281,6 +285,7 @@
 
     text-align: center;
 }
+
 .currency_exchange_button {
     display: flex;
     align-self: center;
