@@ -238,7 +238,7 @@ function LanternEventCurrencyExchange({
 
     return (
         <>
-            <h3 className="forbidden_shop_sub_header" ref={currencyExchangeRef}>Event currency exchange</h3>
+            <h3 className="currency_exchange_header section_title" ref={currencyExchangeRef}>Event currency exchange</h3>
             <div className="currency_exchange_section box-secondary">
                 <span className="event_name">Festival of Lanterns event</span>
                 <span className="event_date">July 1 - July 15, 2023</span>
@@ -368,7 +368,7 @@ function ScrollExchange({ initialPlayerInventory, forbiddenShopAPI, eventData, a
     return (
         <div className="scroll_exchange_section" ref={scrollExchangeRef}>
             <div className="scroll_exchange_header">
-                <div className="scroll_exchange_title">Forbidden scroll exchange</div>
+                <div className="section_title">Forbidden scroll exchange</div>
                 <div className="scroll_count_container">
                     <div className="scroll_count_label">FORBIDDEN SCROLLS</div>
                     <div className="scroll_count"></div>

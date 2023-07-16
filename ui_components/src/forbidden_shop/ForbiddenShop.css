@@ -253,6 +253,10 @@
     margin: 10px var(--forbidden-shop-padding);
     padding: 10px;
 }
+.currency_exchange_header {
+    margin-top: 30px;
+}
+
 .event_name {
     color: var(--font-color-1);
     font-size: var(--font-medium);
@@ -281,6 +285,7 @@
 
     text-align: center;
 }
+
 .currency_exchange_button {
     display: flex;
     align-self: center;
@@ -375,7 +380,7 @@
 }
     .jutsu_scroll:hover {
         transform: translateY(-25px);
-        box-shadow: 0 0 80px 1px #680b0b inset;
+        filter: drop-shadow(0 0 15px #680b0b);
     }
 .jutsu_scroll_inner {
     width: 200px;
