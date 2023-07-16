@@ -380,7 +380,7 @@
 }
     .jutsu_scroll:hover {
         transform: translateY(-25px);
-        box-shadow: 0 0 80px 1px #680b0b inset;
+        filter: drop-shadow(0 0 15px #680b0b);
     }
 .jutsu_scroll_inner {
     width: 200px;
