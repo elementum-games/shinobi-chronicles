@@ -89,12 +89,16 @@ class ForbiddenShopManager {
      */
     public function getEventJutsu(): array
     {
+        // need to make this only get jutsu the player doesn't know or have the scroll for
         $event_jutsu = array();
         $result = $this->system->db->query(
             "SELECT * FROM `jutsu` WHERE `purchase_type` = '5';"
         );
         while ($row = $this->system->db->fetch($result)) {
-            $event_jutsu[$row['jutsu_id']] = Jutsu::fromArray($row['jutsu_id'], $row);
+            $jutsu = Jutsu::fromArray($row['jutsu_id'], $row);
+            $jutsu->effect = System::unSlug($jutsu->effect);
+            $jutsu->description = html_entity_decode($jutsu->description);
+            $event_jutsu[] = $jutsu;
         }
         return $event_jutsu;
     }
