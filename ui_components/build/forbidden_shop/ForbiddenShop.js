@@ -7,28 +7,43 @@ function ForbiddenShop({
   availableEventJutsu,
   initialPlayerInventory
 }) {
+  const scrollExchangeRef = React.useRef(null);
+  const currencyExchangeRef = React.useRef(null);
   return /*#__PURE__*/React.createElement("div", {
     className: "forbidden_shop_container"
   }, /*#__PURE__*/React.createElement(ShopMenu, {
-    ShopMenuButton: ShopMenuButton
+    ShopMenuButton: ShopMenuButton,
+    scrollExchangeRef: scrollExchangeRef,
+    currencyExchangeRef: currencyExchangeRef
   }), /*#__PURE__*/React.createElement(ScrollExchange, {
     initialPlayerInventory: initialPlayerInventory,
     forbiddenShopAPI: links.forbiddenShopAPI,
     eventData: eventData,
     availableEventJutsu: availableEventJutsu,
-    userAPI: links.userAPI
+    userAPI: links.userAPI,
+    scrollExchangeRef: scrollExchangeRef
   }), /*#__PURE__*/React.createElement(LanternEventCurrencyExchange, {
     initialPlayerInventory: initialPlayerInventory,
     eventData: eventData.lanternEvent,
-    forbiddenShopApiLink: links.forbiddenShopAPI
+    forbiddenShopApiLink: links.forbiddenShopAPI,
+    currencyExchangeRef: currencyExchangeRef
   }));
 }
 
 function ShopMenu({
-  ShopMenuButton
+  ShopMenuButton,
+  scrollExchangeRef,
+  currencyExchangeRef
 }) {
   const [activeButtonName, setActiveButtonName] = React.useState(null);
   const [dialogueText, setDialogueText] = React.useState(null);
+
+  function scrollTo(element) {
+    if (element == null) return;
+    element.scrollIntoView({
+      behavior: 'smooth'
+    });
+  }
 
   function questionOneClick() {
     setDialogueText("A remnant from a past forgotten.\nAn abyss between the realms of yours... and <span class='dialogue_highlight'>ours</span>.");
@@ -43,11 +58,13 @@ function ShopMenu({
   function scrollExchangeJump() {
     setDialogueText("...");
     setActiveButtonName("scrollExchange");
+    scrollTo(scrollExchangeRef.current);
   }
 
   function currencyExchangeJump() {
     setDialogueText("...");
     setActiveButtonName("currencyExchange");
+    scrollTo(currencyExchangeRef.current);
   }
 
   return /*#__PURE__*/React.createElement("div", {
@@ -243,7 +260,8 @@ function ShopMenuButton({
 function LanternEventCurrencyExchange({
   initialPlayerInventory,
   eventData,
-  forbiddenShopApiLink
+  forbiddenShopApiLink,
+  currencyExchangeRef
 }) {
   const [playerInventory, setPlayerInventory] = React.useState(initialPlayerInventory);
   const playerQuantities = {
@@ -273,8 +291,9 @@ function LanternEventCurrencyExchange({
     });
   }
 
-  return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
-    className: "currency_exchange_header section_title"
+  return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("h3", {
+    className: "currency_exchange_header section_title",
+    ref: currencyExchangeRef
   }, "Event currency exchange"), /*#__PURE__*/React.createElement("div", {
     className: "currency_exchange_section box-secondary"
   }, /*#__PURE__*/React.createElement("span", {
@@ -352,7 +371,8 @@ function ScrollExchange({
   initialPlayerInventory,
   forbiddenShopAPI,
   eventData,
-  availableEventJutsu
+  availableEventJutsu,
+  scrollExchangeRef
 }) {
   function exchangeForbiddenJutsuScroll(item_type, item_id) {
     apiFetch(forbiddenShopAPI, {
@@ -368,7 +388,8 @@ function ScrollExchange({
   }
 
   return /*#__PURE__*/React.createElement("div", {
-    className: "scroll_exchange_section"
+    className: "scroll_exchange_section",
+    ref: scrollExchangeRef
   }, /*#__PURE__*/React.createElement("div", {
     className: "scroll_exchange_header"
   }, /*#__PURE__*/React.createElement("div", {
