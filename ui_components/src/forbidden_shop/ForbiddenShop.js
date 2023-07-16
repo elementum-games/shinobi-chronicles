@@ -199,7 +199,6 @@ function LanternEventCurrencyExchange({
         goldLantern: playerInventory.items[eventData.gold_lantern_id]?.quantity || 0,
         shadowEssence: playerInventory.items[eventData.shadow_essence_id]?.quantity || 0,
     };
-    const [currenciesToExchange, setCurrenciesToExchange] = React.useState(playerQuantities);
 
     const [responseMessage, setResponseMessage] = React.useState(null);
 
@@ -234,7 +233,7 @@ function LanternEventCurrencyExchange({
                     <CurrencyExchangeInput
                         name="Red Lantern"
                         playerQuantity={playerQuantities.redLantern}
-                        quantityToExchange={currenciesToExchange.redLantern}
+                        quantityToExchange={playerQuantities.redLantern}
                         setQuantityToExchange={(newVal) => setCurrenciesToExchange(prevVal => ({
                             ...prevVal,
                             redLantern: newVal
@@ -244,7 +243,7 @@ function LanternEventCurrencyExchange({
                     <CurrencyExchangeInput
                         name="Blue Lantern"
                         playerQuantity={playerQuantities.blueLantern}
-                        quantityToExchange={currenciesToExchange.blueLantern}
+                        quantityToExchange={playerQuantities.blueLantern}
                         setQuantityToExchange={(newVal) => setCurrenciesToExchange(prevVal => ({
                             ...prevVal,
                             blueLantern: newVal
@@ -254,7 +253,7 @@ function LanternEventCurrencyExchange({
                     <CurrencyExchangeInput
                         name="Violet Lantern"
                         playerQuantity={playerQuantities.violetLantern}
-                        quantityToExchange={currenciesToExchange.violetLantern}
+                        quantityToExchange={playerQuantities.violetLantern}
                         setQuantityToExchange={(newVal) => setCurrenciesToExchange(prevVal => ({
                             ...prevVal,
                             violetLantern: newVal
@@ -264,7 +263,7 @@ function LanternEventCurrencyExchange({
                     <CurrencyExchangeInput
                         name="Gold Lantern"
                         playerQuantity={playerQuantities.goldLantern}
-                        quantityToExchange={currenciesToExchange.goldLantern}
+                        quantityToExchange={playerQuantities.goldLantern}
                         setQuantityToExchange={(newVal) => setCurrenciesToExchange(prevVal => ({
                             ...prevVal,
                             goldLantern: newVal
@@ -274,7 +273,7 @@ function LanternEventCurrencyExchange({
                     <CurrencyExchangeInput
                         name="Shadow Essence"
                         playerQuantity={playerQuantities.shadowEssence}
-                        quantityToExchange={currenciesToExchange.shadowEssence}
+                        quantityToExchange={playerQuantities.shadowEssence}
                         setQuantityToExchange={(newVal) => setCurrenciesToExchange(prevVal => ({
                             ...prevVal,
                             shadowEssence: newVal
