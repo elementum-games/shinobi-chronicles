@@ -1104,12 +1104,12 @@ class User extends Fighter {
                         if ($this->rank_num == 3) {
                             $jutsu_data['rank'] = 3;
                             $jutsu_data['use_cost'] *= 2;
-                            $jutsu_data['power'] *= (1 + Jutsu::CHUUNIN_SCALE_FACTOR);
+                            $jutsu_data['power'] *= Jutsu::CHUUNIN_SCALE_MULTIPLIER;
                         }
                         else if ($this->rank_num == 4) {
                             $jutsu_data['rank'] = 4;
                             $jutsu_data['use_cost'] *= 3;
-                            $jutsu_data['power'] *= ((1 + Jutsu::JONIN_SCALE_FACTOR) * (1 + Jutsu::CHUUNIN_SCALE_FACTOR));
+                            $jutsu_data['power'] *= Jutsu::JONIN_SCALE_MULTIPLIER;
                         }
                     }
 
