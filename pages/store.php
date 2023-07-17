@@ -75,17 +75,12 @@ function store() {
 			}
 			
 			// check if already owned
-			if($player->hasItem($item_id) && $shop_items[$item_id]->use_type != 3) {
+			if($player->hasItem($item_id) && $shop_items[$item_id]->use_type != Item::USE_TYPE_CONSUMABLE) {
 				throw new RuntimeException("You already own this item!");
 			}
 			
 			if (isset($_GET['max'])) { // Code for handling buying bulk
-				$max_missing = 0;
-				if ($player->hasItem($item_id)) {
-					$max_missing = $max_consumables - $player->items[$item_id]->quantity;
-				} else {
-					$max_missing = $max_consumables;
-				}
+				$max_missing = ($player->hasItem($item_id)) ? $max_consumables - $player->items[$item_id]->quantity : $max_consumables;
 
 				if($player->items[$item_id]->quantity >= $max_consumables) {
 					throw new RuntimeException("Your supply of this item is already full!");
@@ -93,13 +88,13 @@ function store() {
 
 				if ($player->getMoney() < $shop_items[$item_id]->purchase_cost * $max_missing) {
 					throw new RuntimeException("You do not have enough money to buy the max amount!");
-
 				}
+
 				$player->subtractMoney(
                     $shop_items[$item_id]->purchase_cost * $max_missing,
                     "Purchased {$max_missing} of item #{$item_id}"
                 );
-                $player->giveItem(item: $shop_items[$item_id], quantity: $max_consumables);
+                $player->giveItem(item: $shop_items[$item_id], quantity: $max_missing);
 
 			} else { //code for handling single purchases
                 // Check for money requirement
