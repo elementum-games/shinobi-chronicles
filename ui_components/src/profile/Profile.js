@@ -54,6 +54,9 @@ function Profile({
                         buyBloodlineUrl={links.buyBloodline}
                         playerData={playerData}
                     />
+                    <PlayerUserRep
+                        playerData={playerData}
+                    />
                     <DailyTasks
                         dailyTasks={playerDailyTasks}
                     />
@@ -142,8 +145,8 @@ function StatusAttributes({ playerData, playerSettings, links }) {
                             <span>{playerData.villageName}</span>
                         </p>
                         <p>
-                            <label>Village Rep:</label>
-                            <span>{playerData.villageRepTier} ({playerData.villageRep} rep)</span>
+                            <label>Reputation Cap:</label>
+                            <span>{playerData.weeklyRep}&nbsp;/&nbsp;{playerData.maxWeeklyRep}</span>
                         </p>
                         {/*<p>
                             <label>Weekly Rep Gained:</label>
@@ -252,6 +255,22 @@ function PlayerBloodline({ playerData, bloodlinePageUrl, buyBloodlineUrl }) {
             </div>
         </div>
     );
+}
+
+type PlayerUserRepProps = {|
+    +playerData: PlayerDataType
+|};
+function PlayerUserRep ({playerData}) {
+    return (
+        <div className="reputation_display">
+            <div className="reputation_name ft-c3">
+                {playerData.villageRepTier}&nbsp;({playerData.villageRep})
+            </div>
+            <div className="reputation_indicator">
+                <img src="/images/v2/bloodline/level3.png" />
+            </div>
+        </div>
+    )
 }
 
 type DailyTasksProps = {|
