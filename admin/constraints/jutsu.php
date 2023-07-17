@@ -119,6 +119,7 @@ return [
             Jutsu::PURCHASE_TYPE_DEFAULT => 'default',
             Jutsu::PURCHASE_TYPE_PURCHASABLE => 'purchasable',
             Jutsu::PURCHASE_TYPE_NON_PURCHASABLE => 'non-purchasable',
+            Jutsu::PURCHASE_TYPE_EVENT_SHOP => 'event',
         ],
     ],
     'effect' => [

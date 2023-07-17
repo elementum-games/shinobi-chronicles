@@ -1,6 +1,6 @@
 // @flow strict-local
 
-import type { BattleType, FighterType, JutsuType } from "./battleSchema.js";
+import type { BattleType, FighterType, BattleJutsuType } from "./battleSchema.js";
 
 import type { JutsuCategory } from "./battleSchema.js";
 
@@ -45,7 +45,7 @@ export function JutsuInput({ battle, player, onChange }: JutsuInputProps): React
         categoryKey: '',
     });
 
-    const handleJutsuSelect = (categoryKey: JutsuCategory, jutsu: JutsuType) => {
+    const handleJutsuSelect = (categoryKey: JutsuCategory, jutsu: BattleJutsuType) => {
         setSelectedJutsu({
             categoryKey: categoryKey,
             id: jutsu.id,
@@ -121,7 +121,7 @@ function Jutsu({
     hotkeyDisplay,
     isBloodline = false
 }: {
-    +jutsu: JutsuType,
+    +jutsu: BattleJutsuType,
     +selected: boolean,
     +onClick: () => void,
     +hotkeyDisplay: string,

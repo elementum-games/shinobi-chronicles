@@ -1,7 +1,7 @@
 // @flow
 
 // Fighters and Field
-import type { BattleType as BattleData, JutsuType } from "./battleSchema.js";
+import type { BattleType as BattleData, BattleJutsuType } from "./battleSchema.js";
 import type { AttackInputFields } from "./AttackActionPrompt.js";
 
 import FighterDisplay from "./FighterDisplay.js";
@@ -12,7 +12,7 @@ type FightersAndFieldProps = {|
     +attackInput: AttackInputFields,
     +membersLink: string,
     +isSelectingTile: boolean,
-    +selectedJutsu: ?JutsuType,
+    +selectedJutsu: ?BattleJutsuType,
     +onTileSelect: (tileIndex: number) => void,
 |};
 

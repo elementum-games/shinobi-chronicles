@@ -3,7 +3,7 @@
 # Begin standard auth
 require_once __DIR__ . "/../classes.php";
 
-$system = API::init(row_lock: false);
+$system = API::init(row_lock: true);
 
 try {
     $player = Auth::getUserFromSession($system);
@@ -39,6 +39,11 @@ try {
         case "getPlayerSettings":
             $UserAPIResponse->response_data = [
                 'playerSettings' => UserAPIPresenter::playerSettingsResponse($player),
+            ];
+            break;
+        case "getPlayerInventory":
+            $UserAPIResponse->response_data = [
+                'playerInventory' => UserAPIPresenter::playerInventoryResponse($player),
             ];
             break;
         case "getMissionData":

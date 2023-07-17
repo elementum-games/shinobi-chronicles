@@ -151,4 +151,56 @@ class UserApiPresenter {
             ];
         }, $dailyTasks);
     }
+
+    public static function playerInventoryResponse(User $player): array {
+        if(!$player->inventory_loaded) {
+            $player->getInventory();
+        }
+
+        return [
+            'jutsu' => array_map(function (Jutsu $jutsu) {
+                return self::jutsuResponse($jutsu);
+            }, array_values($player->jutsu)),
+            'jutsuScrolls' => array_map(function (Jutsu $jutsu) {
+                return self::jutsuResponse($jutsu);
+            }, array_values($player->jutsu_scrolls)),
+            'equippedJutsuIds' => $player->equipped_jutsu,
+            'items' => array_map(function (Item $item){
+                return self::itemResponse($item);
+            }, $player->items),
+            'equippedArmorIds' => $player->equipped_armor,
+            'equippedWeaponIds' => $player->equipped_weapon_ids,
+        ];
+    }
+
+    public static function jutsuResponse(Jutsu $jutsu): array {
+        return [
+            'id' => $jutsu->id,
+            'name' => $jutsu->name,
+            'jutsuType' => $jutsu->jutsu_type,
+            'targetType' => $jutsu->target_type,
+            'handSeals' => explode('-', $jutsu->hand_seals),
+            'range' => $jutsu->range,
+            'element' => $jutsu->element,
+            // todo later
+           /* 'level' => $jutsu->level,
+            'exp' => $jutsu->exp,*/
+        ];
+    }
+    
+    public static function itemResponse(Item $item): array {
+        return [
+            'id' => $item->id,
+            'name' => $item->name,
+            'description' => $item->description,
+            'rank' => $item->rank,
+            'purchase_cost' => $item->purchase_cost,
+            'purchase_type' => Item::$PURCHASE_TYPE_LABELS[$item->purchase_type],
+            'use_type' => Item::$USE_TYPE_LABELS[$item->use_type],
+            'effect' => $item->effect,
+            'effect_amount' => $item->effect_amount,
+            'quantity' => $item->quantity,
+        ];
+    }
 }
+

@@ -11,6 +11,17 @@ class Item {
     const PURCHASE_TYPE_PURCHASABLE = 1;
     const PURCHASE_TYPE_EVENT = 2;
 
+    public static array $USE_TYPE_LABELS = [
+        self::USE_TYPE_WEAPON => 'weapon',
+        self::USE_TYPE_ARMOR => 'armor',
+        self::USE_TYPE_CONSUMABLE => 'consumable',
+        self::USE_TYPE_SPECIAL => 'special',
+    ];
+    public static array $PURCHASE_TYPE_LABELS = [
+        self::PURCHASE_TYPE_PURCHASABLE => 'purchasable',
+        self::PURCHASE_TYPE_EVENT => 'event',
+    ];
+
     public int $id;
     public string $name;
     public string $description;

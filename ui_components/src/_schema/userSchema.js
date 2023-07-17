@@ -1,6 +1,6 @@
 // @flow strict-local
 
-import type { JutsuElement } from "../battle/battleSchema.js";
+import type { JutsuType, JutsuElement } from "./jutsu.js";
 
 export type PlayerGenderOptions = "Male" | "Female" | "Non-binary" | "None";
 
@@ -102,4 +102,29 @@ export type PlayerAchievementsType = {|
         +progressLabel: string,
         +progressPercent: number,
     |};
+|};
+
+// UserApiPresenter::playerInventoryResponse
+export type PlayerInventoryType = {|
+    +jutsu: $ReadOnlyArray<JutsuType>,
+    +jutsuScrolls: $ReadOnlyArray<JutsuType>,
+    +equippedJutsuIds: $ReadOnlyArray<number>,
+    +items: $ReadOnlyArray<ItemType>,
+    +equippedArmorIds: $ReadOnlyArray<number>,
+    +equippedWeaponIds: $ReadOnlyArray<number>,
+|};
+
+export type ItemUseType = "weapon" | "armor" | "consumable" | "special";
+
+export type ItemType = {|
+    id: number,
+    name: string,
+    description: string,
+    rank: number,
+    purchase_cost: number,
+    purchase_type: "purchasable" | "event",
+    use_type: ItemUseType,
+    effect: string,
+    effect_amount: number,
+    quantity: number,
 |};

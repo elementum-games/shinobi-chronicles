@@ -2,14 +2,14 @@
 import { FighterAvatar } from "./FighterAvatar.js";
 import { PlayAttackActions} from "./PlayAttackActions.js";
 
-import type { FighterType, BattleFieldTileType, JutsuType, BattleLogType, BoundingRect } from "./battleSchema.js";
+import type { FighterType, BattleFieldTileType, BattleJutsuType, BattleLogType, BoundingRect } from "./battleSchema.js";
 
 type Props = {|
     +player: FighterType,
     +fighters: { [ key: string ]: FighterType },
     +fighterLocations: { [ key: string ]: number },
     +tiles: $ReadOnlyArray<BattleFieldTileType>,
-    +selectedJutsu: ?JutsuType,
+    +selectedJutsu: ?BattleJutsuType,
     +isMovementPhase: boolean,
     +lastTurnLog: ?BattleLogType,
     +onTileSelect: (tileIndex: number) => void,
@@ -77,7 +77,7 @@ type BattleFieldContentProps = {|
     +fighterLocations: { [ key: string ]: number },
     +isMovementPhase: boolean,
     +lastTurnLog: ?BattleLogType,
-    +selectedJutsu: ?JutsuType,
+    +selectedJutsu: ?BattleJutsuType,
     +onTileSelect: (tileIndex: number) => void,
 |};
 function BattleFieldContent({
@@ -285,7 +285,7 @@ function BattleFieldContent({
 type BattleFieldTilesProps = {|
     +tilesToDisplay: $ReadOnlyArray<BattleFieldTileType>,
     +getBoundingRectForTile: (tileIndex: number) => BoundingRect,
-    +selectedJutsu: ?JutsuType,
+    +selectedJutsu: ?BattleJutsuType,
     +playerLocation: number,
     +isMovementPhase: boolean,
     +disableTransitions: boolean,

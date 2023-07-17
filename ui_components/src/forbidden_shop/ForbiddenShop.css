@@ -1,0 +1,470 @@
+:root {
+    --forbidden-shop-padding: 3%;
+}
+
+.shop_menu_container {
+    position: relative;
+    margin-top: 30px;
+    margin-bottom: 15px;
+    height: 530px;
+    width: calc(100% - (var(--forbidden-shop-padding) * 2));
+    margin-left: auto;
+    margin-right: auto;
+    background: url(/../images/forbidden_shop/bannerimg.png);
+    background-size: auto;
+    background-repeat: no-repeat;
+}
+.shop_background_light_left {
+    position: absolute;
+    top: -100px;
+    left: -100px;
+    animation: moveLeftRight 8s ease-in-out infinite;
+}
+.shop_background_light_right {
+    position: absolute;
+    top: -100px;
+    right: -100px;
+    animation: moveRightLeft 6s ease-in-out infinite;
+}
+@keyframes moveLeftRight {
+    0%, 100% {
+        left: -100px; /* Start and end position is at the left edge */
+    }
+
+    50% {
+        left: 100px; /* Middle position is at the right edge minus element's width */
+    }
+}
+@keyframes moveRightLeft {
+    0%, 100% {
+        right: -100px; /* Start and end position is at the left edge */
+    }
+
+    50% {
+        right: 100px; /* Middle position is at the right edge minus element's width */
+    }
+}
+.shop_title {
+    position: absolute;
+    left: 40px;
+    top: 50px;
+}
+.shop_owner_container {
+    position: absolute;
+    right: 0px;
+    height: 100%;
+    text-align: right;
+    overflow: hidden;
+}
+.shop_owner_image {
+    margin-top: 30px;
+    height: 90%;
+    width: 90%;
+    opacity: 0;
+    animation: fadeInFromBlack 2s ease-in-out;
+    animation-delay: 0.25s;
+    animation-fill-mode: forwards;
+}
+@keyframes fadeInFromBlack {
+    0% {
+        opacity: 0;
+    }
+
+    100% {
+        opacity: 1;
+    }
+}
+.shop_frame_nw {
+    position: absolute;
+    left: -15px;
+    top: -15px;
+    width: 95%;
+}
+.shop_frame_ne {
+    position: absolute;
+    right: -15px;
+    top: -15px;
+    width: 95%;
+    transform: scaleX(-1);
+}
+.shop_frame_se {
+    position: absolute;
+    right: -15px;
+    bottom: -15px;
+    width: 95%;
+    transform: rotate(180deg);
+}
+.shop_frame_sw {
+    position: absolute;
+    left: -15px;
+    bottom: -15px;
+    width: 95%;
+    transform: scaleY(-1);
+}
+.shop_owner_dialogue_container {
+
+}
+.shop_menu {
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+    position: absolute;
+    left: 150px;
+    bottom: 120px;
+}
+
+.shop_menu_button {
+    cursor: pointer;
+    width: 250px;
+    height: 32px;
+    overflow: visible;
+}
+    .shop_menu_button .shop_button_center {
+        fill: #68293f;
+    }
+    .shop_menu_button:hover .shop_button_center {
+        fill: #924862;
+    }
+    .shop_menu_button .shop_button_center.active {
+        fill: #5964a6;
+    }
+    .shop_menu_button .shop_button_back {
+        fill: #83455b;
+    }
+    .shop_menu_button:hover .shop_button_back {
+        fill: #a05570;
+        width: 92%;
+        x: 4%;
+    }
+    .shop_menu_button .shop_button_back.active {
+        fill: #bfb7e0;
+    }
+.shop_button_center {
+    clip-path: polygon(20px 0px, calc(100% - 20px) 0px, 100% 50%, calc(100% - 20px) 100%, 20px 100%, 0px 50%);
+}
+.shop_button_back {
+    clip-path: polygon(16px 0px, calc(100% - 16px) 0px, 100% 50%, calc(100% - 16px) 100%, 16px 100%, 0px 50%);
+    transition: all 0.2s;
+}
+.shop_button_center_shadow {
+    clip-path: polygon(20px 0px, calc(100% - 20px) 0px, 100% 50%, calc(100% - 20px) 100%, 20px 100%, 0px 50%);
+}
+.shop_button_back_shadow {
+    clip-path: polygon(16px 0px, calc(100% - 16px) 0px, 100% 50%, calc(100% - 16px) 100%, 16px 100%, 0px 50%);
+}
+.shop_button_text {
+    font-family: Segoe UI;
+    font-size: 12pt;
+    font-style: italic;
+    font-variant: small-caps;
+}
+.shop_button_shadow_text {
+    font-family: Segoe UI;
+    font-size: 12pt;
+    fill: #101113;
+    font-style: italic;
+    font-variant: small-caps;
+}
+.shop_menu_button:hover .shop_button_text {
+    text-decoration: underline;
+    text-underline-offset: 5px;
+}
+
+.shop_owner_dialogue_container {
+    position: absolute;
+    top: 400px;
+    right: 90px;
+    width: 330px;
+    text-align: left;
+}
+.shop_owner_dialogue_text {
+    background: rgba(23, 22, 27, 0.8); 
+    text-align: center;
+    margin-bottom: 5px;
+    padding-left: 45px;
+    padding-right: 45px;
+    padding-top: 15px;
+    padding-bottom: 15px;
+    font-family: Segoe UI;
+    font-size: 12pt;
+    color: #d1c5ad;
+    font-style: italic;
+    box-sizing: border-box;
+}
+.shop_owner_nameplate {
+    background: rgba(11, 10, 12, 1);
+    position: absolute;
+    padding-left: 15px;
+    padding-right: 15px;
+    padding-bottom: 5px;
+    left: 10px;
+    top: -15px;
+    font-family: Segoe UI;
+    font-size: 12pt;
+    color: #d8d2f1;
+    font-weight: bold;
+    font-variant: small-caps;
+}
+.dialogue_highlight {
+    color: #bfb7e0;
+}
+.button_first {
+    opacity: 0;
+    animation: fadeInFromBlack 1.5s ease-in-out;
+    animation-delay: 1s;
+    animation-fill-mode: forwards;
+}
+.button_second {
+    opacity: 0;
+    animation: fadeInFromBlack 1.5s ease-in-out;
+    animation-delay: 1.5s;
+    animation-fill-mode: forwards;
+}
+.button_third {
+    opacity: 0;
+    animation: fadeInFromBlack 1.5s ease-in-out;
+    animation-delay: 2s;
+    animation-fill-mode: forwards;
+}
+.button_fourth {
+    opacity: 0;
+    animation: fadeInFromBlack 1.5s ease-in-out;
+    animation-delay: 2.5s;
+    animation-fill-mode: forwards;
+}
+
+.section_title {
+    font-family: Segoe UI, sans-serif;
+    font-size: 14pt;
+    color: #c7b070;
+    font-variant: small-caps;
+    font-weight: 400;
+    margin-left: var(--forbidden-shop-padding);
+}
+
+.currency_exchange_section {
+    display: flex;
+    flex-direction: column;
+
+    margin: 10px var(--forbidden-shop-padding);
+    padding: 10px;
+}
+.currency_exchange_header {
+    margin-top: 30px;
+}
+
+.event_name {
+    color: var(--font-color-1);
+    font-size: var(--font-medium);
+}
+.event_date {
+    color: var(--font-color-5);
+}
+
+.currencies_to_exchange {
+    display: flex;
+    justify-content: space-evenly;
+
+    margin-top: 5px;
+    padding: 20px 10px;
+}
+.currency_to_exchange {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    color: var(--font-color-3);
+}
+.currency_to_exchange input {
+    width: 5.1em;
+    margin: 6px 0;
+
+    text-align: center;
+}
+
+.currency_exchange_button {
+    display: flex;
+    align-self: center;
+    margin: 10px auto;
+    position: relative;
+
+    padding: 6px 20px;
+    border: none;
+    background: #692828;
+
+    color: var(--font-color-3);
+    font-family: var(--font-primary);
+    font-variant: all-small-caps;
+    font-size: 14px;
+    line-height: 15px;
+    cursor: pointer;
+
+    clip-path: polygon(20px 0px, calc(100% - 20px) 0px, 100% 50%, calc(100% - 20px) 100%, 20px 100%, 0px 50%);
+}
+.currency_exchange_button::before {
+    content: '';
+    width: calc(100% - 4px);
+    height: calc(100% - 4px);
+
+    position: absolute;
+    top: 2px;
+    left: 2px;
+
+    background: #83324f;
+    z-index: -2;
+    clip-path: polygon(18px 0px, calc(100% - 18px) 0px, 100% 50%, calc(100% - 18px) 100%, 18px 100%, 0px 50%);
+}
+.currency_exchange_button.disabled {
+    cursor: default;
+    opacity: 0.5;
+}
+
+
+.response_message {
+    margin-top: 0;
+    text-align: center;
+
+    font-size: var(--font-medium);
+    color: var(--font-color-5);
+}
+
+.scroll_exchange_section {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items:center;
+    margin-top: 40px;
+    gap: 12px;
+}
+.scroll_exchange_header {
+    width: 100%;
+    display: flex;
+    align-items: flex-end;
+}
+.scroll_count_container {
+    margin-left: auto;
+    margin-right: var(--forbidden-shop-padding);
+
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+
+    padding: 10px;
+    padding-left: 20px;
+
+    --corner-size: 15px;
+    clip-path: polygon(
+        0 50%, var(--corner-size) 0, 100% 0,
+        100% 100%, var(--corner-size) 100%, 0 50%
+    );
+
+    background: var(--box-color-default);
+
+    font-family: var(--font-primary);
+    font-size: 9pt;
+    color: var(--font-color-3);
+    font-style: italic;
+}
+.scroll_count_label {
+
+}
+.scroll_count {
+}
+.scroll_exchange_container {
+    width: calc(100% - (var(--forbidden-shop-padding) * 2));
+    height: 500px;
+
+    display: flex;
+    gap: 15px;
+    align-items: center;
+    justify-content: center;
+
+    position: relative;
+
+    background: url(/../images/forbidden_shop/scrolltable_opa15.jpg);
+    background-size: cover;
+    background-repeat: no-repeat;
+}
+.scroll_exchange_response {
+    position: absolute;
+    bottom: 20px;
+
+    font-size: var(--font-medium);
+    color: var(--font-color-5);
+}
+.scroll_exchange_no_jutsu {
+    color: var(--font-color-7);
+}
+
+.jutsu_scroll {
+    height: 400px;
+    width: 270px;
+    background: url(/../images/forbidden_shop/forbidden_scroll_v2.png);
+    background-size: cover;
+    background-position: center;
+    transition: all 0.4s ease-in-out;
+    cursor: pointer;
+}
+    .jutsu_scroll:hover {
+        transform: translateY(-25px);
+        filter: drop-shadow(0 0 15px #680b0b);
+    }
+.jutsu_scroll_inner {
+    width: 200px;
+    height: 400px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+}
+.jutsu_stats_container {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: flex-start;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 15px;
+    font-family: Segoe UI;
+    font-size: 12px;
+    color: #17161b;
+}
+.jutsu_name {
+    margin-top: 45px;
+    font-family: Stickrice;
+    Font-size: 25px;
+    color: #17161b;
+}
+.jutsu_type {
+    margin-top: 5px;
+    margin-bottom: 10px;
+    font-family: Segoe UI;
+    font-size: 15px;
+    color: #342769;
+    font-variant: small-caps;
+    display: flex;
+}
+.jutsu_type_label {
+    margin-top: 3px;
+    flex-basis: 70%;
+}
+.jutsu_scroll_divider {
+    flex-basis: 15%;
+}
+.jutsu_description {
+    font-family: Segoe UI;
+    font-size: 13px;
+    color: #17161b;
+    font-style: italic;
+}
+.jutsu_tags {
+    font-family: Segoe UI;
+    font-size: 14px;
+    color: #342769;
+    font-variant: small-caps;
+}
+.jutsu_tag_scaling {
+    color: #680b0b;
+}

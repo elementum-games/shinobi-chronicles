@@ -76,6 +76,7 @@ class User extends Fighter {
     public static int $jutsu_train_gain = 5;
 
     public System $system;
+    private bool $read_only = false;
 
     public string $id;
     public int $user_id;
@@ -203,7 +204,8 @@ class User extends Fighter {
     public $chat_effect;
     public $last_login;
 
-    public $jutsu_scrolls;
+    /** @var Jutsu[] */
+    public array $jutsu_scrolls = [];
     public string $avatar_link;
     public $profile_song;
     public $log_actions;
@@ -305,11 +307,16 @@ class User extends Fighter {
      * @return User
      * @throws RuntimeException
      */
-    public static function loadFromId(System $system, int $user_id, bool $remote_view = false): User {
+    public static function loadFromId(
+        System $system,
+        int $user_id,
+        bool $remote_view = false,
+        bool $read_only = false
+    ): User {
         $user = new User($system, $user_id);
+        $user->read_only = $read_only;
 
-        $result = $system->db->query(
-            "SELECT
+        $query = "SELECT
                 `user_id`,
                 `user_name`,
                 `ban_data`,
@@ -331,8 +338,12 @@ class User extends Fighter {
                 `sensei_id`,
                 `accept_students`,
                 `village`
-                FROM `users` WHERE `user_id`='$user_id' LIMIT 1 FOR UPDATE"
-        );
+                FROM `users` WHERE `user_id`='$user_id' LIMIT 1";
+        if(!$read_only) {
+            $query .= " FOR UPDATE";
+        }
+        $result = $system->db->query($query);
+
         if($system->db->last_num_rows == 0) {
             throw new RuntimeException("User does not exist!");
         }
@@ -1087,6 +1098,21 @@ class User extends Fighter {
             if($this->system->db->last_num_rows > 0) {
                 while($jutsu_data = $this->system->db->fetch($result)) {
                     $jutsu_id = $jutsu_data['jutsu_id'];
+
+                    // Scale event jutsu
+                    if ($jutsu_data['purchase_type'] == Jutsu::PURCHASE_TYPE_EVENT_SHOP) {
+                        if ($this->rank_num == 3) {
+                            $jutsu_data['rank'] = 3;
+                            $jutsu_data['use_cost'] *= 2;
+                            $jutsu_data['power'] *= Jutsu::CHUUNIN_SCALE_MULTIPLIER;
+                        }
+                        else if ($this->rank_num == 4) {
+                            $jutsu_data['rank'] = 4;
+                            $jutsu_data['use_cost'] *= 3;
+                            $jutsu_data['power'] *= Jutsu::JONIN_SCALE_MULTIPLIER;
+                        }
+                    }
+
                     $jutsu = Jutsu::fromArray($jutsu_id, $jutsu_data);
 
                     if($player_jutsu[$jutsu_id]['level'] == 0) {
@@ -1500,6 +1526,19 @@ class User extends Fighter {
         }
     }
 
+    public function removeItemById(int $item_id, int $quantity = 1): void {
+        if(!$this->hasItem($item_id)) {
+            return;
+        }
+
+        $item = $this->items[$item_id];
+
+        $this->items[$item->id]->quantity -= $quantity;
+        if ($this->items[$item->id]->quantity < 1) {
+            unset($this->items[$item->id]);
+        }
+    }
+
     /* function useJutsu
         pool check, calc exp, etc */
     public function useJutsu(Jutsu $jutsu): ActionResult {
@@ -1521,6 +1560,7 @@ class User extends Fighter {
 
         switch($jutsu->purchase_type) {
             case Jutsu::PURCHASE_TYPE_PURCHASABLE:
+            case Jutsu::PURCHASE_TYPE_EVENT_SHOP:
                 // Element check
                 if($jutsu->element && $jutsu->element != Jutsu::ELEMENT_NONE) {
                     if($this->elements) {
@@ -1690,6 +1730,10 @@ class User extends Fighter {
         -Parameters-
     */
     public function updateData() {
+        if($this->read_only) {
+            throw new RuntimeException("Cannot update, User is loaded as read-only!");
+        }
+
         // Check achievements
         $this->checkAchievementCompletion();
 
