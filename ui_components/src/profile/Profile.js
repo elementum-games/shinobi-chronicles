@@ -145,7 +145,7 @@ function StatusAttributes({ playerData, playerSettings, links }) {
                             <span>{playerData.villageName}</span>
                         </p>
                         <p>
-                            <label>Reputation Cap:</label>
+                            <label>Weekly Reputation:</label>
                             <span>{playerData.weeklyRep}&nbsp;/&nbsp;{playerData.maxWeeklyRep}</span>
                         </p>
                         {playerData.clanId != null &&

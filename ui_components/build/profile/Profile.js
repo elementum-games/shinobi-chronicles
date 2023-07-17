@@ -99,7 +99,7 @@ function StatusAttributes({
     style: {
       flexBasis: "34%"
     }
-  }, /*#__PURE__*/React.createElement("p", null, /*#__PURE__*/React.createElement("label", null, "Village:"), /*#__PURE__*/React.createElement("span", null, playerData.villageName)), /*#__PURE__*/React.createElement("p", null, /*#__PURE__*/React.createElement("label", null, "Reputation Cap:"), /*#__PURE__*/React.createElement("span", null, playerData.weeklyRep, "\xA0/\xA0", playerData.maxWeeklyRep)), playerData.clanId != null && /*#__PURE__*/React.createElement("p", null, /*#__PURE__*/React.createElement("label", null, "Clan:"), /*#__PURE__*/React.createElement("span", null, /*#__PURE__*/React.createElement("a", {
+  }, /*#__PURE__*/React.createElement("p", null, /*#__PURE__*/React.createElement("label", null, "Village:"), /*#__PURE__*/React.createElement("span", null, playerData.villageName)), /*#__PURE__*/React.createElement("p", null, /*#__PURE__*/React.createElement("label", null, "Weekly Reputation:"), /*#__PURE__*/React.createElement("span", null, playerData.weeklyRep, "\xA0/\xA0", playerData.maxWeeklyRep)), playerData.clanId != null && /*#__PURE__*/React.createElement("p", null, /*#__PURE__*/React.createElement("label", null, "Clan:"), /*#__PURE__*/React.createElement("span", null, /*#__PURE__*/React.createElement("a", {
     href: links.clan
   }, playerData.clanName)))))));
 }
