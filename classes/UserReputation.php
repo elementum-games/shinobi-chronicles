@@ -76,6 +76,26 @@ class UserReputation {
         ]
     ];
 
+    // Shop benefits
+    const ITEM_SHOP_DISCOUNT_RATE = 5;
+    const BENEFIT_CONSUMABLE_DISCOUNT = 'consumable_discount';
+    const BENEFIT_GEAR_DISCOUNT = 'gear_discount';
+    const BENEFIT_JUTSU_SCROLL_DISCOUNT = 'scroll_discount';
+    // Training benefits
+    const EFFICIENT_LONG_INCREASE = 10;
+    const EFFICIENT_EXTENDED_INCREASE = 15;
+    const BENEFIT_EFFICIENT_LONG = 'efficient_long';
+    const BENEFIT_EFFICIENT_EXTENDED = 'efficient_extended';
+    const BENEFIT_PARTIAL_TRAINING_GAINS = 'partial_trains';
+    // Benefits array, add all benefits as inactive and turn them on in loadBenefits() as appropriate
+    public static array $Benefits = [
+        self::BENEFIT_CONSUMABLE_DISCOUNT => false,
+        self::BENEFIT_GEAR_DISCOUNT => false,
+        self::BENEFIT_JUTSU_SCROLL_DISCOUNT => false,
+        self::BENEFIT_EFFICIENT_LONG => false,
+        self::BENEFIT_EFFICIENT_EXTENDED => false,
+        self::BENEFIT_PARTIAL_TRAINING_GAINS => false,
+    ];
     const ARENA_MISSION_CD = 60;
     const MISSION_GAINS = [
         Mission::RANK_D => 1,
@@ -117,7 +137,7 @@ class UserReputation {
     public string $rank_name;
     public int $weekly_cap;
     public int $base_pvp_reward;
-
+    public array $benefits;
     public function __construct(&$player_rep, &$player_weekly_rep, $mission_cd) {
         $this->rep = &$player_rep;
         $this->weekly_rep = &$player_weekly_rep;
@@ -130,6 +150,8 @@ class UserReputation {
         $this->rank_name = self::nameByRepRank($this->rank); // Use method here for future proofing
         $this->weekly_cap = $REP_RANK['weekly_cap'];
         $this->base_pvp_reward = $REP_RANK['base_pvp_rep_reward'];
+
+        $this->benefits = $this->loadBenefits();
     }
 
     /**
@@ -210,6 +232,31 @@ class UserReputation {
             return true;
         }
         return false;
+    }
+    // Load reputation benefits
+    private function loadBenefits() {
+        $benefits = self::$Benefits;
+
+        // Active benefits based on rank
+        switch($this->rank) {
+            case 9:
+            case 8:
+            case 7:
+                $benefits[self::BENEFIT_PARTIAL_TRAINING_GAINS] = true;
+            case 6:
+                $benefits[self::BENEFIT_EFFICIENT_LONG] = true;
+                $benefits[self::BENEFIT_EFFICIENT_EXTENDED] = true;
+            case 5:
+                $benefits[self::BENEFIT_JUTSU_SCROLL_DISCOUNT] = true;
+            case 4:
+                $benefits[self::BENEFIT_GEAR_DISCOUNT] = true;
+            case 3:
+                $benefits[self::BENEFIT_CONSUMABLE_DISCOUNT] = true;
+            case 2:
+            case 1:
+        }
+
+        return $benefits;
     }
 
     // Calculate and return reputation amount gain from arena fights

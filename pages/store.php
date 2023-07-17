@@ -33,6 +33,11 @@ function store() {
             "SELECT * FROM `jutsu` WHERE `purchase_type` = '2' AND `rank` <= '$player->rank_num' ORDER BY `rank` ASC, `purchase_cost` ASC"
         );
 		while($row = $system->db->fetch($result)) {
+			// Reputation jutsu discount benefit
+			if($player->reputation->benefits[UserReputation::BENEFIT_JUTSU_SCROLL_DISCOUNT]) {
+				$row['purchase_cost'] = floor($row['purchase_cost'] * (1-UserReputation::ITEM_SHOP_DISCOUNT_RATE/100));
+			}
+
 			$shop_jutsu[$row['jutsu_id']] = $row;
 		}
 	}
@@ -43,7 +48,19 @@ function store() {
             "SELECT * FROM `items` WHERE `purchase_type` = '1' AND `rank` <= '$player->rank_num' ORDER BY `rank` ASC, `purchase_cost` ASC"
         );
 		while($row = $system->db->fetch($result)) {
-			$shop_items[$row['item_id']] = Item::fromDb($row);
+			$item = Item::fromDb($row);
+
+			// Reputation discount benefit consumables
+			if($item->use_type == Item::USE_TYPE_CONSUMABLE && $player->reputation->benefits[UserReputation::BENEFIT_CONSUMABLE_DISCOUNT]) {
+				$item->purchase_cost = floor($item->purchase_cost * (1-UserReputation::ITEM_SHOP_DISCOUNT_RATE/100));
+			}
+			// Reputation discount benefit gear
+			if(($item->use_type == Item::USE_TYPE_ARMOR || $item->use_type == Item::USE_TYPE_WEAPON) && $player->reputation->benefits[UserReputation::BENEFIT_GEAR_DISCOUNT]) {
+				$item->purchase_cost = floor($item->purchase_cost * (1-UserReputation::ITEM_SHOP_DISCOUNT_RATE/100));
+			}
+
+			// Insert item into shop array
+			$shop_items[$row['item_id']] = $item;
 		}
 	}
 	
