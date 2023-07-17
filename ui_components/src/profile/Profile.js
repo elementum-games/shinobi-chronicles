@@ -148,10 +148,6 @@ function StatusAttributes({ playerData, playerSettings, links }) {
                             <label>Reputation Cap:</label>
                             <span>{playerData.weeklyRep}&nbsp;/&nbsp;{playerData.maxWeeklyRep}</span>
                         </p>
-                        {/*<p>
-                            <label>Weekly Rep Gained:</label>
-                            <span>{playerData.weeklyRep} / {playerData.maxWeeklyRep}</span>
-                        </p>*/}
                         {playerData.clanId != null &&
                             <p>
                                 <label>Clan:</label>
@@ -260,7 +256,7 @@ function PlayerBloodline({ playerData, bloodlinePageUrl, buyBloodlineUrl }) {
 type PlayerUserRepProps = {|
     +playerData: PlayerDataType
 |};
-function PlayerUserRep ({playerData}) {
+function PlayerUserRep ({playerData}: PlayerUserRepProps) {
     return (
         <div className="reputation_display">
             <div className="reputation_name ft-c3">
