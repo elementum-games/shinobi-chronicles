@@ -204,7 +204,7 @@ function processArenaBattleEnd(BattleManager|BattleManagerV2 $battle, User $play
         if($player->reputation->canGain(true)) {
             $rep_gain = $player->reputation->addRep($player->reputation->calcArenaReputation($player->level, $opponent->level));
             if($rep_gain > 0) {
-                $player->mission_rep_cd = time() + Reputation::ARENA_MISSION_CD;
+                $player->mission_rep_cd = time() + UserReputation::ARENA_MISSION_CD;
                 $rep_gain_string = "Fellow " . $player->village->name . " Shinobi learned from your battle, earning you $rep_gain Reputation.<br />";
             }
         }

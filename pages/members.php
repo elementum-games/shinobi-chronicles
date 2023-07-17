@@ -362,7 +362,7 @@ function members(): void {
 						echo $row['pvp_wins'];
 					}
                     else if($view == 'highest_rep') {
-                        echo Reputation::nameByRepRank(Reputation::tierByRepAmount($row['village_rep'])) . " (" . $row['village_rep'] . ")";
+                        echo UserReputation::nameByRepRank(UserReputation::tierByRepAmount($row['village_rep'])) . " (" . $row['village_rep'] . ")";
                     }
 					else {
 						echo $row['level'];

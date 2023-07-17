@@ -68,7 +68,7 @@ abstract class Fighter {
 
     public string $gender;
     public int $rep_rank;
-    public Reputation $reputation;
+    public UserReputation $reputation;
 
     public string $current_ip;
 

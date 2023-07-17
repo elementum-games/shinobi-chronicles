@@ -12,7 +12,7 @@ require_once __DIR__ . "/Rank.php";
 require_once __DIR__ . "/Village.php";
 require_once __DIR__ . "/Clan.php";
 require_once __DIR__ . "/achievements/AchievementsManager.php";
-require_once __DIR__ . "/Reputation.php";
+require_once __DIR__ . "/UserReputation.php";
 require_once __DIR__ . "/event/LanternEvent.php";
 
 /*	Class:		User
@@ -114,7 +114,7 @@ class User extends Fighter {
     public int $village_rep;
     public int $weekly_rep;
     public int $mission_rep_cd;
-    public Reputation $reputation;
+    public UserReputation $reputation;
 
     public int $rank_num;
     public Rank $rank;
@@ -483,7 +483,7 @@ class User extends Fighter {
         $this->village_rep = $user_data['village_rep'];
         $this->weekly_rep = $user_data['weekly_rep'];
         $this->mission_rep_cd = $user_data['mission_rep_cd'];
-        $this->reputation = new Reputation($this->village_rep, $this->weekly_rep, $this->mission_rep_cd);
+        $this->reputation = new UserReputation($this->village_rep, $this->weekly_rep, $this->mission_rep_cd);
 
         $this->gender = $user_data['gender'];
         $this->level = $user_data['level'];

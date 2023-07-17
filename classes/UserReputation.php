@@ -1,6 +1,6 @@
 <?php
 
-class Reputation {
+class UserReputation {
     public static array $VillageRep = [
         1 => [
             'title' => 'New Villager',
@@ -90,18 +90,22 @@ class Reputation {
         SpecialMission::DIFFICULTY_HARD => 2,
         SpecialMission::DIFFICULTY_NIGHTMARE => 3,
     ];
-    const DAILY_TASK_GAINS = [
-        DailyTask::DIFFICULTY_EASY . '_' . DailyTask::ACTIVITY_ARENA => 1,
-        DailyTask::DIFFICULTY_MEDIUM . '_' . DailyTask::ACTIVITY_ARENA => 3,
-        DailyTask::DIFFICULTY_HARD . '_' . DailyTask::ACTIVITY_ARENA => 5,
-
-        DailyTask::DIFFICULTY_EASY . '_' . DailyTask::ACTIVITY_MISSIONS => 2,
-        DailyTask::DIFFICULTY_MEDIUM . '_' . DailyTask::ACTIVITY_MISSIONS => 5,
-        DailyTask::DIFFICULTY_HARD . '_' . DailyTask::ACTIVITY_MISSIONS => 8,
-
-        DailyTask::DIFFICULTY_EASY . '_' . DailyTask::ACTIVITY_PVP => 5,
-        DailyTask::DIFFICULTY_MEDIUM . '_' . DailyTask::ACTIVITY_PVP => 10,
-        DailyTask::DIFFICULTY_HARD . '_' . DailyTask::ACTIVITY_PVP => 15,
+    const DAILY_TASK_REWARDS = [
+        DailyTask::DIFFICULTY_EASY => [
+            DailyTask::ACTIVITY_ARENA => 1,
+            DailyTask::ACTIVITY_MISSIONS => 2,
+            DailyTask::ACTIVITY_PVP => 5,
+        ],
+        DailyTask::DIFFICULTY_MEDIUM => [
+            DailyTask::ACTIVITY_ARENA => 3,
+            DailyTask::ACTIVITY_MISSIONS => 5,
+            DailyTask::ACTIVITY_PVP => 10,
+        ],
+        DailyTask::DIFFICULTY_HARD => [
+            DailyTask::ACTIVITY_ARENA => 5,
+            DailyTask::ACTIVITY_MISSIONS => 10,
+            DailyTask::ACTIVITY_PVP => 15,
+        ],
     ];
     const DECAY_MODIFIER = 0.65;
 

@@ -16,7 +16,7 @@ require_once __DIR__ . '/../classes/Village.php';
 require_once __DIR__ . '/../classes/User.php';
 require_once __DIR__ . '/../classes/Mission.php';
 require_once __DIR__ . '/../classes/Bloodline.php';
-require_once __DIR__ . '/../classes/Reputation.php';
+require_once __DIR__ . '/../classes/UserReputation.php';
 require_once __DIR__ . '/../classes/travel/TravelManager.php';
 
 $system = new System();
@@ -80,15 +80,15 @@ else {
 }
 
 function weeklyCron($system, $debug = false) {
-    foreach(Reputation::$VillageRep as $RANK_INT => $RANK) {
+    foreach(UserReputation::$VillageRep as $RANK_INT => $RANK) {
         if($RANK_INT == 1) {
             // Disable for rank 1
             continue;
         }
         $next_rank_where = "";
-        if($RANK_INT < sizeof(Reputation::$VillageRep)) {
+        if($RANK_INT < sizeof(UserReputation::$VillageRep)) {
             $RANK2_INT = $RANK_INT+1;
-            $RANK2 = Reputation::$VillageRep[$RANK2_INT];
+            $RANK2 = UserReputation::$VillageRep[$RANK2_INT];
             $next_rank_where = " AND `village_rep` < " . $RANK2['min_rep'];
             if($RANK_INT == 1) {
                 $next_rank_where .= " AND `village_rep` > 0";
@@ -96,7 +96,7 @@ function weeklyCron($system, $debug = false) {
         }
         $queries[] = "UPDATE `users` SET `weekly_rep`=0, `village_rep`=`village_rep`- " . $RANK['base_decay'] . " WHERE `village_rep` >= "
             . $RANK['min_rep'] . $next_rank_where . " AND `weekly_rep` < " . $RANK['weekly_cap'];
-        $queries[] = "UPDATE `users` SET `weekly_rep`=0, `village_rep`=`village_rep`- " . floor($RANK['base_decay'] * Reputation::DECAY_MODIFIER)
+        $queries[] = "UPDATE `users` SET `weekly_rep`=0, `village_rep`=`village_rep`- " . floor($RANK['base_decay'] * UserReputation::DECAY_MODIFIER)
             . " WHERE `village_rep` >= " . $RANK['min_rep'] . $next_rank_where . " AND `weekly_rep` >= " . $RANK['weekly_cap'];
     }
     foreach($queries as $query) {
