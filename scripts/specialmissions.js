@@ -62,7 +62,7 @@ function getMissionData() {
                 inBattle();
                 return;
             }
-            if(data.systemMessage != null) {
+            if(data.systemMessage) {
                 console.log(data.systemMessage);
             }
             if(data.mission == null) {
@@ -186,7 +186,6 @@ function inBattle() {
  */
 function updateMissionStatus(missionStatus) {
     if (missionStatus === 'In Progress') {
-        console.log('Mission In Progress');
         return false;
     }
 
