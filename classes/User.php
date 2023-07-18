@@ -142,6 +142,7 @@ class User extends Fighter {
     public $train_type;
     public $train_gain;
     public int $train_time;
+    public TrainingManager $trainingManager;
 
     public int $stat_transfer_amount;
     public int $stat_transfer_completion_time;
@@ -954,6 +955,12 @@ class User extends Fighter {
             }
         }
         return false;
+    }
+
+    public function loadTrainingManager(): void
+    {
+        $this->trainingManager = new TrainingManager($this->system, $this->train_type, $this->train_gain,
+            $this->train_time, $this->rank, $this->forbidden_seal, $this->reputation, $this->team);
     }
 
     public function setForbiddenSealFromDb(string $forbidden_seal_db, bool $remote_view) {

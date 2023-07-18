@@ -9,8 +9,32 @@ class TrainingManager {
      */
 
     public System $system;
+    public int $train_time;
+    public int $train_gain;
+    public string $train_type;
+    public ForbiddenSeal $forbidden_seal;
+    public ?Team $team;
+    public Rank $rank;
+    public UserReputation $reputation;
 
-    public User $player;
+    public int $train_time_remaining;
+
+    const TRAIN_LEN_SHORT = 'short';
+    const TRAIN_LEN_LONG = 'long';
+    const TRAIN_LEN_EXTENDED = 'extended';
+    public static array $valid_train_lengths = [
+        self::TRAIN_LEN_SHORT, self::TRAIN_LEN_LONG, self::TRAIN_LEN_EXTENDED
+    ];
+
+    public static array $skill_types = [
+        'ninjutsu_skill', 'genjutsu_skill', 'taijutsu_skill', 'bloodline_skill'
+    ];
+    public static array $attribute_types = [
+        'speed', 'cast_speed'
+    ];
+    const BASE_TRAIN_TIME = 600;
+    const BASE_STAT_GAIN = 4;
+    const LONG_MODIFIER = 2.15;
 
     public int $stat_train_gain;
     public int $stat_long_train_gain;
@@ -18,34 +42,235 @@ class TrainingManager {
     public int $stat_train_length;
     public int $stat_long_train_length;
     public int $stat_extended_train_length;
+    public int $base_jutsu_train_length;
     public int $jutsu_train_gain;
     
-    public function __construct(System $system, User $player) {
+    public function __construct(System $system, &$type, &$gain, &$time, $rank, $forbidden_seal, $rep, $team) {
         $this->system = $system;
-        $this->player = $player;
 
-        $this->stat_train_length = 600;
-	    $this->stat_train_gain = 4 + ($player->rank_num * 4);
+        $this->rank = $rank;
+        $this->train_type = &$type;
+        $this->train_gain = &$gain;
+        $this->train_time = &$time;
+        $this->forbidden_seal = $forbidden_seal;
+        $this->team = $team;
+        $this->reputation = $rep;
 
+        $this->train_time_remaining = $this->train_time - time();
+
+        $this->stat_train_length = self::BASE_TRAIN_TIME;
+	    $this->stat_train_gain = self::BASE_STAT_GAIN + ($this->rank->id * 4);
+
+        $this->base_jutsu_train_length = self::BASE_TRAIN_TIME;
 	    $this->jutsu_train_gain = User::$jutsu_train_gain;
 
 	    // 56.25% of standard
-	    $this->stat_long_train_length = $this->stat_train_length * 4;
+	    $this->stat_long_train_length = self::BASE_TRAIN_TIME * 4;
 	    $this->stat_long_train_gain = $this->stat_train_gain * 2.25;
 
         // 30x length (5 hrs), 12x gains: 40% of standard
-        $this->stat_extended_train_length = $this->stat_train_length * 30;
+        $this->stat_extended_train_length = self::BASE_TRAIN_TIME * 30;
 	    $this->stat_extended_train_gain = $this->stat_train_gain * 12;
 
 	    // Forbidden seal trainings boost
-        $this->stat_long_train_length *= $this->player->forbidden_seal->long_training_time;
-        $this->stat_long_train_gain *= $this->player->forbidden_seal->long_training_gains;
+        $this->stat_long_train_length *= $this->forbidden_seal->long_training_time;
+        $this->stat_long_train_gain *= $this->forbidden_seal->long_training_gains;
 
-        $this->stat_extended_train_length = round($this->stat_extended_train_length * $this->player->forbidden_seal->extended_training_time);
-        $this->stat_extended_train_gain = round($this->stat_extended_train_gain * $this->player->forbidden_seal->extended_training_gains);
+        $this->stat_extended_train_length = round($this->stat_extended_train_length * $this->forbidden_seal->extended_training_time);
+        $this->stat_extended_train_gain = round($this->stat_extended_train_gain * $this->forbidden_seal->extended_training_gains);
 
 	    $this->stat_train_gain += $this->system->TRAIN_BOOST;
 	    $this->stat_long_train_gain += $this->system->LONG_TRAIN_BOOST;
-	    $this->stat_extended_train_gain += ($this->system->LONG_TRAIN_BOOST * 5);
+	    $this->stat_extended_train_gain += ($this->system->LONG_TRAIN_BOOST * System::EXTENDED_BOOST_MULTIPLIER);
+    }
+
+    public function hasActiveTraining() {
+        return $this->train_time > 0;
+    }
+
+    public function trainType(): string
+    {
+        if($this->train_time) {
+            return ucwords(str_replace(['bloodline_jutsu:', 'jutsu:', '_'], ['', '', ' '], $this->train_type));
+        }
+        return 'None';
+    }
+
+    public function getTrainingAmount($length, $type) {
+        if(str_contains($type, 'jutsu:')) {
+            $gain = User::$jutsu_train_gain;
+            return $gain;
+        }
+        else {
+            $base_gains = $this->stat_train_gain;
+            switch($length) {
+                case self::TRAIN_LEN_SHORT:
+                    $gain = $base_gains;
+                    // System boost
+                    $gain += $this->system->TRAIN_BOOST;
+                    return $gain;
+                case self::TRAIN_LEN_LONG:
+                    $gain = $base_gains * self::LONG_MODIFIER;
+                    // Forbidden seal
+                    $gain *= $this->forbidden_seal->long_training_gains;
+                    // Reputation enhancement
+                    if($this->reputation->benefits[UserReputation::BENEFIT_EFFICIENT_LONG]){
+                        $gain += floor($gain * UserReputation::EFFICIENT_LONG_INCREASE/100);
+                    }
+                    // System boost
+                    $gain += $this->system->LONG_TRAIN_BOOST;
+                    return $gain;
+                case self::TRAIN_LEN_EXTENDED:
+                    $gain = $base_gains * 12;
+                    // Forbidden seal
+                    $gain = round($gain * $this->forbidden_seal->extended_training_gains);
+                    // Reputation enhancement
+                    if($this->reputation->benefits[UserReputation::BENEFIT_EFFICIENT_EXTENDED]) {
+                        $gain += floor($gain * UserReputation::EFFICIENT_EXTENDED_INCREASE/100);
+                    }
+                    // System boost
+                    $gain += ($this->system->LONG_TRAIN_BOOST * System::EXTENDED_BOOST_MULTIPLIER);
+                    return $gain;
+                default:
+                    return $base_gains;
+            }
+        }
+    }
+
+    public function calcPartialGain($for_display = false) {
+        // No partial gains for jutsu
+        if(str_contains($this->train_type, 'jutsu:')) {
+            return ($for_display) ? "You will no gain any jutsu experience!" : 0;
+        }
+        else {
+            $long_training = ($this->train_gain < $this->getTrainingAmount(self::TRAIN_LEN_EXTENDED, $this->train_type));
+            if($long_training) {
+                $train_length = $this->getTrainingLength(self::TRAIN_LEN_LONG);
+                $completion_rate = round(($train_length - $this->train_time_remaining) / $train_length, 2);
+            }
+            else {
+                $train_length = $this->getTrainingLength(self::TRAIN_LEN_EXTENDED);
+                $completion_rate = round(($train_length - $this->train_time_remaining) / $train_length, 2);
+            }
+
+            // Less than 50% completion
+            if($completion_rate < 0.5) {
+                $time_elapsed = $train_length - $this->train_time_remaining;
+
+                // Less than 10 minutes
+                if($time_elapsed < self::BASE_TRAIN_TIME) {
+                    return ($for_display) ? "You will not gain any of your potential {$this->train_gain} " . $this->trainType() . " points."
+                        : 0;
+                }
+                // 10 minutes or more
+                else {
+                    // Check extended training for long training rate
+                    if(!$long_training) {
+                        if($time_elapsed >= $this->getTrainingLength(self::TRAIN_LEN_LONG)) {
+                            return ($for_display) ? "You will gain " . $this->getTrainingAmount(self::TRAIN_LEN_LONG, $this->train_type) .
+                                " " . $this->trainType() . " points." : $this->getTrainingAmount(self::TRAIN_LEN_LONG, $this->train_type);
+                        }
+                    }
+                    // Return short training gain
+                    return ($for_display) ? "You will gain " . $this->getTrainingAmount(self::TRAIN_LEN_SHORT, $this->train_type) .
+                        " " . $this->trainType() . " points." : $this->getTrainingAmount(self::TRAIN_LEN_SHORT, $this->train_type);
+                }
+            }
+            else {
+                // Long trainings base of 40%, extended base of 30%
+                $to_gain = ($long_training) ? 0.4 : 0.3;
+
+                // Calculate additional gains (up to an additional 31%)
+                $to_gain += round(($completion_rate-0.5) / 1.5, 2);
+
+                // Set total amount
+                $to_gain = floor($this->train_gain * $to_gain);
+
+                return ($for_display) ? "You will gain $to_gain " . $this->trainType() . " skill points"
+                    : $to_gain;
+            }
+        }
+    }
+
+    public function getTrainingLength($length, $jutsu = false, $in_mins = false, $debug = false) {
+        if($jutsu != false) {
+            // True time calculation for setting training
+            if($jutsu instanceof Jutsu) {
+                $len = self::BASE_TRAIN_TIME + (60 * round(pow($jutsu->level, 1.1)));
+                return ($in_mins) ? $len/60 : $len;
+            }
+            // Used for basic display in training menu
+            return ($in_mins) ? self::BASE_TRAIN_TIME / 60 : self::BASE_TRAIN_TIME;
+        }
+        else {
+            switch($length) {
+                case self::TRAIN_LEN_SHORT:
+                    if ($debug)
+                    echo "I AM SHORT";
+                    $train_length = self::BASE_TRAIN_TIME;
+                    return ($in_mins) ? $train_length / 60 : $train_length;
+                case self::TRAIN_LEN_LONG:
+                    if($debug)
+                    echo "I AM LONG";
+                    $train_length = self::BASE_TRAIN_TIME * 4;
+                    // Forbidden seal augment
+                    $train_length *= $this->forbidden_seal->long_training_time;
+                    return ($in_mins) ? $train_length / 60 : $train_length;
+                case self::TRAIN_LEN_EXTENDED:
+                    if($debug)
+                    echo "I AM EXTENDED";
+                    $train_length = self::BASE_TRAIN_TIME * 30;
+                    // Forbidden seal augment
+                    $train_length = round($train_length * $this->forbidden_seal->extended_training_time);
+                    return ($in_mins) ? $train_length / 60 : $train_length;
+                default:
+                    if($debug)
+                    echo "I AM DERP";
+                    return ($in_mins) ? self::BASE_TRAIN_TIME / 60 : self::BASE_TRAIN_TIME;
+            }
+        }
+    }
+
+    public function getTrainingInfo($length, $type) {
+        if(str_contains($type, "jutsu:")) {
+            $gain = $this->getTrainingAmount($length, $type);
+
+            return "Takes " . $this->getTrainingLength($length, true, true) . " minutes or more depending on level, "
+                . "gives $gain level" . ($gain > 1 ? 's' : '');
+        }
+        else {
+            switch ($length) {
+                case self::TRAIN_LEN_SHORT:
+                case self::TRAIN_LEN_LONG:
+                case self::TRAIN_LEN_EXTENDED:
+                    $gain = $this->getTrainingAmount($length, $type);
+                    return "Takes " . $this->getTrainingLength($length, false, true) . " minutes, gives "
+                        . $gain . " point" . ($gain > 1 ? 's' : '');
+                default:
+                    return 'Invalid training type!';
+            }
+        }
+    }
+
+    public function trainingDisplay() {
+        if(str_contains($this->train_type, 'jutsu:')) {
+            return "You will gain " . User::$jutsu_train_gain . " jutsu levels once training is complete!";
+        }
+        else {
+            $display = "You will gain {$this->train_gain} {$this->trainType()} skill point";
+            if($this->train_gain > 1) {
+                $display .= "s";
+            }
+            $display .= " once you have completed training.";
+
+            return $display;
+        }
+    }
+
+    public function setTraining($type, $length, $amount) {
+        $this->train_type = $type;
+        $this->train_time = time() + $length;
+        $this->train_time_remaining = $length;
+        $this->train_gain = $amount;
     }
 }

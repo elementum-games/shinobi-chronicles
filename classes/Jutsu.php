@@ -14,6 +14,7 @@ class Jutsu {
     const PURCHASE_TYPE_PURCHASABLE = 2;
     const PURCHASE_TYPE_NON_PURCHASABLE = 3;
     const PURCHASE_TYPE_BLOODLINE = 4;
+    const MAX_LEVEL = 100;
 
     const TYPE_NINJUTSU = 'ninjutsu';
     const TYPE_TAIJUTSU = 'taijutsu';

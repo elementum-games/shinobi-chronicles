@@ -63,6 +63,7 @@ class System {
     // Training boost switches
     public int $TRAIN_BOOST = 0; // Extra points per training, 0 for none
     public int $LONG_TRAIN_BOOST = 0; // Extra points per long training, 0 for none
+    const EXTENDED_BOOST_MULTIPLIER = 5; // Multiples long by this value to calc extended boost
 
     public array $SC_STAFF_COLORS = array(
         User::STAFF_MODERATOR => array(

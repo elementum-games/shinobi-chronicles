@@ -98,6 +98,14 @@ return $routes = [
         battle_ok: false,
         village_ok: Route::NOT_IN_VILLAGE,
     ),
+    1333 => new Route(
+        file_name: 'training_v2.php',
+        title: 'Training V2',
+        function_name: 'training',
+        menu: Route::MENU_ACTIVITY,
+        battle_ok: false,
+        village_ok: Route::NOT_IN_VILLAGE,
+    ),
     14 => new Route(
         file_name: 'missions.php',
         title: 'Missions',

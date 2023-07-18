@@ -82,8 +82,8 @@ class UserReputation {
     const BENEFIT_GEAR_DISCOUNT = 'gear_discount';
     const BENEFIT_JUTSU_SCROLL_DISCOUNT = 'scroll_discount';
     // Training benefits
-    const EFFICIENT_LONG_INCREASE = 10;
-    const EFFICIENT_EXTENDED_INCREASE = 15;
+    const EFFICIENT_LONG_INCREASE = 5;
+    const EFFICIENT_EXTENDED_INCREASE = 6.25;
     const BENEFIT_EFFICIENT_LONG = 'efficient_long';
     const BENEFIT_EFFICIENT_EXTENDED = 'efficient_extended';
     const BENEFIT_PARTIAL_TRAINING_GAINS = 'partial_trains';
