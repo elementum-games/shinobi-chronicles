@@ -42,9 +42,9 @@ class User extends Fighter {
 
     public static array $HEAL_REGEN_MULTIPLIER = [
         1 => 2,
-        2 => 9,
-        3 => 30,
-        4 => 91,
+        2 => 5,
+        3 => 12,
+        4 => 45,
     ];
 
     const MIN_NAME_LENGTH = 2;
