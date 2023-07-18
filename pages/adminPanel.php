@@ -494,11 +494,9 @@ function adminPanel() {
         $variables =& $constraints['rank'];
         $select_content = true;
         // Validate content id
-        if($_POST[$content_name . '_id']) {
-            $editing_bloodline_id = (int)$system->db->clean($_POST[$content_name . '_id']);
-            $result = $system->db->query(
-                "SELECT * FROM `{$table_name}` WHERE `{$content_name}_id`='$editing_bloodline_id'"
-            );
+        if(isset($_GET['rank_id'])) {
+            $rank_id = (int) $_GET['rank_id'];
+            $result = $system->db->query("SELECT * FROM `{$table_name}` WHERE `rank_id` = '{$rank_id}'");
             if($system->db->last_num_rows == 0) {
                 $system->message("Invalid $content_name!");
                 $system->printMessage();
@@ -509,7 +507,7 @@ function adminPanel() {
             }
         }
         // POST submit edited data
-        if($_POST[$content_name . '_data'] && !$select_content) {
+        if(isset($_POST[$content_name . '_data']) && !$select_content) {
             try {
                 $data = [];
                 validateFormData($variables, $data);
@@ -526,7 +524,7 @@ function adminPanel() {
                     }
                     $count++;
                 }
-                $query .= "WHERE `{$content_name}_id`='$editing_bloodline_id'";
+                $query .= "WHERE `{$content_name}_id`='$rank_id'";
                 $system->db->query($query);
                 if($system->db->last_affected_rows == 1) {
                     $system->message(ucwords($content_name) . ' ' . $data['name'] . " has been edited!");
@@ -542,31 +540,17 @@ function adminPanel() {
             $system->printMessage();
         }
         // Form for editing data
-        if($content_data && !$select_content) {
-            echo "<table class='table'><tr><th>Edit " . $content_name . " (" . stripslashes($content_data['name']) . ")</th></tr>
-			<tr><td>
-			<form action='{$system->router->getUrl('admin', ['page' => 'edit_' . $content_name])}' method='post'>";
-            displayFormFields($variables, $content_data);
-            echo "<br />
-			<input type='hidden' name='{$content_name}_id' value='" . $content_data[$content_name . '_id'] . "' />
-			<input type='submit' name='{$content_name}_data' value='Edit' />
-			</form>
-			</td></tr></table>";
+        if(isset($content_data) && !$select_content) {
+            require 'templates/admin/edit_rank.php';
         }
         // Show form for selecting ID
         if($select_content) {
-            $result = $system->db->query("SELECT `{$content_name}_id`, `name` FROM `$table_name`");
-            echo "<table class='table'><tr><th>Select $content_name</th></tr>
-			<tr><td>
-			<form action='{$system->router->getUrl('admin', ['page' => 'edit_' . $content_name])}' method='post'>
-			<select name='{$content_name}_id'>";
+            $result = $system->db->query("SELECT * FROM `$table_name`");
+            $ranks = [];
             while($row = $system->db->fetch($result)) {
-                echo "<option value='" . $row[$content_name . '_id'] . "'>" . stripslashes($row['name']) . "</option>";
+                $ranks[] = $row;
             }
-            echo "</select>
-			<input type='submit' value='Select' />
-			</form>
-			</td></tr></table>";
+            require 'templates/admin/edit_rank_select.php';
         }
     }
 

@@ -21,7 +21,11 @@ if($player->battle_id or isset($_SESSION['ai_id'])) {
     $regen_cut = round(($player->regen_rate + $player->regen_boost) * 0.7, 1);
 }
 
-$healthRegen = ($player->regen_rate + $player->regen_boost - $regen_cut) * 2;
+$health_multiplier = User::$HEAL_REGEN_MULTIPLIER[$player->rank_num];
+if($player->battle_id) {
+    $health_multiplier = 2;
+}
+$healthRegen = ($player->regen_rate + $player->regen_boost - $regen_cut) * $health_multiplier;
 $standardRegen = $player->regen_rate + $player->regen_boost - $regen_cut;
 
 $health_width = round(($player->health / $player->max_health) * 100, 3);
@@ -340,7 +344,7 @@ $clan_positions = [
                     remainingtime = 60;
 
                     //Check each bar to see if regen will exceed max.
-                    let healthRegen = regen * 2;
+                    let healthRegen = regen * <?= ($player->battle_id) ? 2 : User::$HEAL_REGEN_MULTIPLIER[$player->rank_num] ?>;
 
                     statusBars.health.current = Math.min(statusBars.health.current + healthRegen, statusBars.health.max);
                     statusBars.chakra.current = Math.min(statusBars.chakra.current + regen, statusBars.chakra.max);
@@ -360,19 +364,19 @@ $clan_positions = [
                     const staminaRegenWidth = round(staminaRegenAmount / statusBars.stamina.max, 2);
 
                     document.querySelector('#health label').innerText =
-                        statusBars.health.current.toFixed(2) + '/' + statusBars.health.max.toFixed(2);
+                        statusBars.health.current.toFixed(2) + ' / ' + statusBars.health.max.toFixed(2);
                     document.querySelector('#health .fill').style.width = `${healthWidth}%`;
                     document.querySelector('#health .preview').style.left = `${healthWidth}%`;
                     document.querySelector('#health .preview').style.width = `${healthRegenWidth}%`;
 
                     document.querySelector('#chakra label').innerText =
-                        statusBars.chakra.current.toFixed(2) + '/' + statusBars.chakra.max.toFixed(2);
+                        statusBars.chakra.current.toFixed(2) + ' / ' + statusBars.chakra.max.toFixed(2);
                     document.querySelector('#chakra .fill').style.width = `${chakraWidth}%`;
                     document.querySelector('#chakra .preview').style.left = `${chakraWidth}%`;
                     document.querySelector('#chakra .preview').style.width = `${chakraRegenWidth}%`;
 
                     document.querySelector('#stamina label').innerText =
-                        statusBars.stamina.current.toFixed(2) + '/' + statusBars.stamina.max.toFixed(2);
+                        statusBars.stamina.current.toFixed(2) + ' / ' + statusBars.stamina.max.toFixed(2);
                     document.querySelector('#stamina .fill').style.width = `${staminaWidth}%`;
                     document.querySelector('#stamina .preview').style.left = `${staminaWidth}%`;
                     document.querySelector('#stamina .preview').style.width = `${staminaRegenWidth}%`;

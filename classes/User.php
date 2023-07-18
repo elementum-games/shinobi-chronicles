@@ -40,6 +40,13 @@ class User extends Fighter {
         'Fire', 'Wind', 'Lightning', 'Earth', 'Water'
     ];
 
+    public static array $HEAL_REGEN_MULTIPLIER = [
+        1 => 2,
+        2 => 9,
+        3 => 30,
+        4 => 91,
+    ];
+
     const MIN_NAME_LENGTH = 2;
     const MAX_NAME_LENGTH = 18;
     const MIN_PASSWORD_LENGTH = 6;
@@ -862,13 +869,15 @@ class User extends Fighter {
             $minutes = floor($time_difference / 60);
 
             $regen_amount = $minutes * ($this->regen_rate + $this->regen_boost);
+            $health_multiplier = self::$HEAL_REGEN_MULTIPLIER[$this->rank_num];
 
             // In-battle decrease
             if($this->battle_id) {
                 $regen_amount -= round($regen_amount * 0.7, 1);
+                $health_multiplier = 2;
             }
 
-            $this->health += $regen_amount * 2;
+            $this->health += $regen_amount * $health_multiplier;
             $this->chakra += $regen_amount;
             $this->stamina += $regen_amount;
 
