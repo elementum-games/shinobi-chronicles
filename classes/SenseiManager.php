@@ -386,7 +386,7 @@ class SenseiManager {
 
     public static function isSensei(int $user_id, System $system): bool {
         $isSensei = false;
-        $sensei_result = $system->db->query("SELECT 1 FROM `sensei` WHERE `sensei_id` = '{$user_id}'");
+        $sensei_result = $system->db->query("SELECT * FROM `sensei` WHERE `sensei_id` = '{$user_id}' AND `is_active`='1' LIMIT 1");
         $result = $system->db->fetch($sensei_result);
         if ($system->db->last_num_rows > 0) {
             $isSensei = true;
