@@ -429,10 +429,10 @@ class SenseiManager {
 
     public static function getLessonCostForPlayer(User $player, System $system): array {
         $cost = [];
-        $trainingManager = new TrainingManager($system, $player);
-        $standard_lesson_cost = ($trainingManager->stat_train_length / 60) * SenseiManager::LESSON_COST_PER_MINUTE * $player->rank_num;
-        $long_lesson_cost = ($trainingManager->stat_long_train_length / 60) * SenseiManager::LESSON_COST_PER_MINUTE * $player->rank_num;
-        $extended_lesson_cost = ($trainingManager->stat_extended_train_length / 60) * SenseiManager::LESSON_COST_PER_MINUTE * $player->rank_num;
+        $player->loadTrainingManager();
+        $standard_lesson_cost = ($player->trainingManager->stat_train_length / 60) * SenseiManager::LESSON_COST_PER_MINUTE * $player->rank_num;
+        $long_lesson_cost = ($player->trainingManager->stat_long_train_length / 60) * SenseiManager::LESSON_COST_PER_MINUTE * $player->rank_num;
+        $extended_lesson_cost = ($player->trainingManager->stat_extended_train_length / 60) * SenseiManager::LESSON_COST_PER_MINUTE * $player->rank_num;
         $cost['short'] = $standard_lesson_cost;
         $cost['long'] = $long_lesson_cost;
         $cost['extended'] = $extended_lesson_cost;
@@ -441,10 +441,10 @@ class SenseiManager {
 
     public static function getLessonDurationForPlayer(User $player, System $system): array {
         $duration = [];
-        $trainingManager = new TrainingManager($system, $player);
-        $duration['short'] = $trainingManager->stat_train_length;
-        $duration['long'] = $trainingManager->stat_long_train_length;
-        $duration['extended'] = $trainingManager->stat_extended_train_length;
+        $player->loadTrainingManager();
+        $duration['short'] = $player->trainingManager->stat_train_length;
+        $duration['long'] = $player->trainingManager->stat_long_train_length;
+        $duration['extended'] = $player->trainingManager->stat_extended_train_length;
         return $duration;
     }
 
