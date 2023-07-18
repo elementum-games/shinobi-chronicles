@@ -16,6 +16,8 @@ class TrainingManager {
     public ?Team $team;
     public Rank $rank;
     public UserReputation $reputation;
+    public ?int $sensei_id;
+    public ?int $bloodline_id;
 
     public int $train_time_remaining;
 
@@ -45,7 +47,7 @@ class TrainingManager {
     public int $base_jutsu_train_length;
     public int $jutsu_train_gain;
     
-    public function __construct(System $system, &$type, &$gain, &$time, $rank, $forbidden_seal, $rep, $team) {
+    public function __construct(System $system, &$type, &$gain, &$time, $rank, $forbidden_seal, $rep, $team, $sensei, $bloodline_id) {
         $this->system = $system;
 
         $this->rank = $rank;
@@ -55,6 +57,8 @@ class TrainingManager {
         $this->forbidden_seal = $forbidden_seal;
         $this->team = $team;
         $this->reputation = $rep;
+        $this->sensei_id = $sensei;
+        $this->bloodline_id = $bloodline_id;
 
         $this->train_time_remaining = $this->train_time - time();
 
@@ -108,7 +112,7 @@ class TrainingManager {
                     $gain = $base_gains;
                     // System boost
                     $gain += $this->system->TRAIN_BOOST;
-                    return $gain;
+                    return round($gain);
                 case self::TRAIN_LEN_LONG:
                     $gain = $base_gains * self::LONG_MODIFIER;
                     // Forbidden seal
@@ -119,7 +123,7 @@ class TrainingManager {
                     }
                     // System boost
                     $gain += $this->system->LONG_TRAIN_BOOST;
-                    return $gain;
+                    return round($gain);
                 case self::TRAIN_LEN_EXTENDED:
                     $gain = $base_gains * 12;
                     // Forbidden seal
@@ -130,7 +134,7 @@ class TrainingManager {
                     }
                     // System boost
                     $gain += ($this->system->LONG_TRAIN_BOOST * System::EXTENDED_BOOST_MULTIPLIER);
-                    return $gain;
+                    return round($gain);
                 default:
                     return $base_gains;
             }
@@ -192,7 +196,7 @@ class TrainingManager {
         }
     }
 
-    public function getTrainingLength($length, $jutsu = false, $in_mins = false, $debug = false) {
+    public function getTrainingLength($length, $jutsu = false, $in_mins = false) {
         if($jutsu != false) {
             // True time calculation for setting training
             if($jutsu instanceof Jutsu) {
@@ -203,39 +207,58 @@ class TrainingManager {
             return ($in_mins) ? self::BASE_TRAIN_TIME / 60 : self::BASE_TRAIN_TIME;
         }
         else {
+            // Sensei boost info
+            $sensei_boost = false;
+            if($this->sensei_id) {
+                $sensei_boost = SenseiManager::getTrainingBoostForTrainType($this->sensei_id, $this->train_type, $this->bloodline_id, $this->system);
+            }
             switch($length) {
                 case self::TRAIN_LEN_SHORT:
-                    if ($debug)
-                    echo "I AM SHORT";
                     $train_length = self::BASE_TRAIN_TIME;
-                    return ($in_mins) ? $train_length / 60 : $train_length;
+                    // Sensei boost
+                    if($sensei_boost) {
+                        $train_length *= 1 - ($sensei_boost/100);
+                    }
+                    return ($in_mins) ? self::formatSecondsToMinutes($train_length) : $train_length;
                 case self::TRAIN_LEN_LONG:
-                    if($debug)
-                    echo "I AM LONG";
                     $train_length = self::BASE_TRAIN_TIME * 4;
                     // Forbidden seal augment
                     $train_length *= $this->forbidden_seal->long_training_time;
-                    return ($in_mins) ? $train_length / 60 : $train_length;
+                    // Sensei boost
+                    if($sensei_boost) {
+                        $train_length *= 1 - ($sensei_boost/100);
+                    }
+                    return ($in_mins) ? self::formatSecondsToMinutes($train_length) : $train_length;
                 case self::TRAIN_LEN_EXTENDED:
-                    if($debug)
-                    echo "I AM EXTENDED";
                     $train_length = self::BASE_TRAIN_TIME * 30;
                     // Forbidden seal augment
                     $train_length = round($train_length * $this->forbidden_seal->extended_training_time);
-                    return ($in_mins) ? $train_length / 60 : $train_length;
+                    // Sensei boost
+                    if($sensei_boost) {
+                        $train_length *= 1 - ($sensei_boost/100);
+                    }
+                    return ($in_mins) ? self::formatSecondsToMinutes($train_length) : $train_length;
                 default:
-                    if($debug)
-                    echo "I AM DERP";
-                    return ($in_mins) ? self::BASE_TRAIN_TIME / 60 : self::BASE_TRAIN_TIME;
+                    return ($in_mins) ? self::formatSecondsToMinutes(self::BASE_TRAIN_TIME) : self::BASE_TRAIN_TIME;
             }
         }
+    }
+
+    public static function formatSecondsToMinutes($seconds) {
+        $minutes = floor($seconds/60);
+        $seconds %= $minutes * 60;
+        $string = $minutes . ' minute' . (($minutes > 1) ? 's' : '');
+        if($seconds > 0) {
+            $string .= ' ' . $seconds . ' second' . (($seconds > 1) ? 's' : '');
+        }
+        return $string;
     }
 
     public function getTrainingInfo($length, $type) {
         if(str_contains($type, "jutsu:")) {
             $gain = $this->getTrainingAmount($length, $type);
 
-            return "Takes " . $this->getTrainingLength($length, true, true) . " minutes or more depending on level, "
+            return "Takes " . $this->getTrainingLength($length, true, true) . " or more depending on level, "
                 . "gives $gain level" . ($gain > 1 ? 's' : '');
         }
         else {
@@ -244,7 +267,7 @@ class TrainingManager {
                 case self::TRAIN_LEN_LONG:
                 case self::TRAIN_LEN_EXTENDED:
                     $gain = $this->getTrainingAmount($length, $type);
-                    return "Takes " . $this->getTrainingLength($length, false, true) . " minutes, gives "
+                    return "Takes " . $this->getTrainingLength($length, false, true) . ", gives "
                         . $gain . " point" . ($gain > 1 ? 's' : '');
                 default:
                     return 'Invalid training type!';

@@ -134,22 +134,16 @@ function training() {
 
     if($player->trainingManager->hasActiveTraining() && isset($_GET['cancel_training']) && isset($_GET['cancel_confirm'])) {
         $partial_gain = $player->trainingManager->calcPartialGain();
-        if($partial_gain > 0) {
+        if($partial_gain > 0 && $player->reputation->benefits[UserReputation::BENEFIT_PARTIAL_TRAINING_GAINS]) {
             // Redundancy to bypass jutsu
             if(!str_contains($player->trainingManager->train_type, 'jutsu:')) {
                 // Add partial gains
-                $stat = $player->trainingManager->train_type;
-                $formatted_name = $player->trainingManager->trainType();
+                $stat_gain = $player->addStatGain($player->trainingManager->train_type, $partial_gain);
                 $player->train_time = 0;
-                $player->$stat += $partial_gain;
-                $player->updateTotalStats();
-                $player->exp = $player->total_stats * 10;
-                $player->updateData();
                 // Create notification
                 $new_notification = new NotificationDto(
                     type: "training_complete",
-                    message: "You have cancelled your $formatted_name training and gained $partial_gain points and "
-                        . $partial_gain * 10 . " experience",
+                    message: $stat_gain,
                     user_id: $player->user_id,
                     created: time(),
                     alert: true,
@@ -158,6 +152,7 @@ function training() {
             }
         }
         else {
+            $player->train_time = 0;
             $system->message("Training cancelled!");
         }
     }
