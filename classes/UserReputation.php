@@ -292,11 +292,10 @@ class UserReputation {
         $rep_rank_difference = $player_rep_rank - $opponent_rep_rank;
         $rep_gain = 0;
 
+        // Set current kill
+        $this->last_pvp_kills_array[$opponent_user_id][] = time();
         // Get kill count
         $kill_count = isset($this->last_pvp_kills_array[$opponent_user_id]) ? sizeof($this->last_pvp_kills_array[$opponent_user_id]) : 0;
-        // Add kill to array
-        // This must be done AFTER getting kill count to not penalize user for performing the current kill
-        $this->last_pvp_kills_array[$opponent_user_id][] = time();
         // Encode and set last pvp kills
         $this->encodePvpKills();
 
