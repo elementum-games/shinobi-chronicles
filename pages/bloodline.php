@@ -227,7 +227,7 @@ function bloodline() {
 			}
 			if($jutsu->effect) {
 				echo "<label style='width:6.5em;'>Effect:</label>" .
-					ucwords(str_replace('_', ' ', $jutsu->effect)) . ' - ' . $jutsu->effect_length . " turns<br />";
+					ucwords(str_replace('_', ' ', $jutsu->effect)) . ' (' . round($jutsu->effect_amount, 0) . '%) ' . ' - ' . $jutsu->effect_length . " turns<br />";
 			}
 			echo "<label style='width:6.5em;'>Jutsu type:</label>" . ucwords($jutsu->jutsu_type) . "<br />
 			<label style='width:6.5em;'>Power:</label>" . round($jutsu->power, 1) . "<br />
