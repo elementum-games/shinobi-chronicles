@@ -128,6 +128,9 @@ class UserReputation {
         ],
     ];
     const DECAY_MODIFIER = 0.65;
+    const PVP_TRACK_LIMIT = 3600; // Only kills within last hour will mitigate pvp rep gains
+    const PVP_KILL_REDUCTION = 4; // Pvp kills of same player above this amount reward 0 rep
+    const MIN_DIMINISHED_REP = 2; // Minimum rep gain on diminished returns (will remain 0 on mitigated kills)
 
     protected int $rep;
     protected int $weekly_rep;
@@ -136,13 +139,19 @@ class UserReputation {
     public int $rank;
     public string $rank_name;
     public int $weekly_cap;
+    public ?string $last_pvp_kills;
+    public array $last_pvp_kills_array;
     public int $base_pvp_reward;
     public array $benefits;
-    public function __construct(&$player_rep, &$player_weekly_rep, $mission_cd) {
+    public function __construct(&$player_rep, &$player_weekly_rep, &$last_pvp_kills, $mission_cd) {
         $this->rep = &$player_rep;
         $this->weekly_rep = &$player_weekly_rep;
+        $this->last_pvp_kills = &$last_pvp_kills;
         $this->mission_cd = $mission_cd;
         $this->rank = self::tierByRepAmount($this->rep);
+
+        //Last pvp Kills array
+        $this->loadPvpKillsArray();
 
         //Rep rank info
         $REP_RANK = self::$VillageRep[$this->rank];
@@ -278,25 +287,36 @@ class UserReputation {
         }
     }
     // Calculate and return reputation gains/losses from pvp wins/losses
-    public function calcPvpRep($player_level, $player_rep_rank, $opponent_level, $opponent_rep_rank, $winner = true) {
+    public function calcPvpRep($player_level, $player_rep_rank, $opponent_level, $opponent_rep_rank, $opponent_user_id, $winner = true) {
         $level_difference = $player_level - $opponent_level;
         $rep_rank_difference = $player_rep_rank - $opponent_rep_rank;
         $rep_gain = 0;
 
-        return 0;
-        /*
+        // Get kill count
+        $kill_count = isset($this->last_pvp_kills_array[$opponent_user_id]) ? sizeof($this->last_pvp_kills_array[$opponent_user_id]) : 0;
+        // Add kill to array
+        // This must be done AFTER getting kill count to not penalize user for performing the current kill
+        $this->last_pvp_kills_array[$opponent_user_id][] = time();
+        // Encode and set last pvp kills
+        $this->encodePvpKills();
+
         if($winner == true) {
+            // Opponent killed too many times in mitigation frame, no gain
+            if($kill_count > self::PVP_KILL_REDUCTION) {
+                return 0;
+            }
+
             // Level based rewards
-            // Opponent is no more than 3 to 5 levels below player
-            if($level_difference >= -5 && $level_difference <= -3) {
+            // Opponent is no more than 5 levels below player
+            if($level_difference >= -5) {
                 $rep_gain++;
             }
-            // Opponent is within 2 levels of player
-            if($level_difference >= -2 && $level_difference <= 2) {
+            // Opponent is no more than 2 levels below player
+            if($level_difference >= -2) {
                 $rep_gain++;
             }
-            // Opponent is 3 to 5 levels above player
-            if($level_difference >= 3 && $level_difference <= 5) {
+            // Opponent is 3 or more levels above player
+            if($level_difference >= 3) {
                 $rep_gain++;
             }
             // Opponent is 6 or more levels above player
@@ -306,11 +326,11 @@ class UserReputation {
 
             // Reputation difference rewards
             // Player is two tiers above opponent
-            if($rep_rank_difference == 2) {
+            if($rep_rank_difference <= 2) {
                 $rep_gain++;
             }
             //Player is within 1 tier
-            if($rep_rank_difference <= 1 && $player_rep_rank <= -1) {
+            if($rep_rank_difference <= 1) {
                 $rep_gain++;
             }
             //Opponent is 2 or more tiers above player
@@ -318,8 +338,19 @@ class UserReputation {
                 $rep_gain++;
             }
 
-        // Flat opponent rep rank reward
+            // Flat opponent rep rank reward
             $rep_gain += self::$VillageRep[$opponent_rep_rank]['base_pvp_rep_reward'];
+
+            // Diminishing returns
+            if($kill_count > 0) {
+                if($kill_count / self::PVP_KILL_REDUCTION > 0.5) {
+                    $rep_gain = floor($rep_gain * 0.5);
+                }
+                if($kill_count / self::PVP_KILL_REDUCTION >= 0.75) {
+                    $rep_gain = ceil($rep_gain * 0.25);
+                }
+                $rep_gain = ($rep_gain < self::MIN_DIMINISHED_REP) ? self::MIN_DIMINISHED_REP : $rep_gain;
+            }
         }
         if($winner == false) {
             $rep_gain = -2;
@@ -349,7 +380,34 @@ class UserReputation {
         }
 
         return $rep_gain;
-        */
+    }
+    // Encode and set player last pvp kills
+    public function encodePvpKills() {
+        $this->last_pvp_kills = json_encode($this->last_pvp_kills_array);
+    }
+    // Load pvp kills and remove outdated kills to prvent data bloat
+    public function loadPvpKillsArray() {
+        if(is_array(json_decode($this->last_pvp_kills, true))) {
+            $this->last_pvp_kills_array = json_decode($this->last_pvp_kills, true);
+
+            // Remove outdated data to prevent bloat
+            foreach($this->last_pvp_kills_array as $UID => $kills) {
+                // Remove any invalid kill times from arrays
+                foreach($kills as $key => $time) {
+                    if($time + self::PVP_TRACK_LIMIT <= time()) {
+                        unset($this->last_pvp_kills_array[$UID][$key]);
+                    }
+                }
+
+                // Kill array empty, remove id from array
+                if(empty($this->last_pvp_kills_array[$UID])) {
+                    unset($this->last_pvp_kills_array[$UID]);
+                }
+            }
+        }
+        else {
+            $this->last_pvp_kills_array = array();
+        }
     }
 
 

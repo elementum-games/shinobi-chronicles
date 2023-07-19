@@ -144,7 +144,8 @@ function processBattleFightEnd(BattleManager $battle, User $player): string {
         $result .= "You have earned $village_point_gain point for your village.[br]";
 
         // Calculate rep gains
-        $rep_gain = $player->reputation->calcPvpRep($player->level, $player->reputation->rank, $battle->opponent->level, $battle->opponent->reputation->rank);
+        $rep_gain = $player->reputation->calcPvpRep($player->level, $player->reputation->rank, $battle->opponent->level,
+            $battle->opponent->reputation->rank, $battle->opponent->user_id);
         if($rep_gain > 0) {
             $result .= "You have earned $rep_gain village reputation.[br]";
             $player->reputation->addRep($rep_gain, true);
@@ -174,7 +175,7 @@ function processBattleFightEnd(BattleManager $battle, User $player): string {
         // Calc rep loss (if any)
         // Calculate rep gains
         $rep_loss = $player->reputation->calcPvpRep($player->level, $player->reputation->rank, $battle->opponent->level,
-            $battle->opponent->reputation->rank, false);
+            $battle->opponent->reputation->rank,$battle->opponent->user_id, false);
         if($rep_loss < 0) {
             $result .= "You have lost " . abs($rep_loss) . " village reputation.[br]";
             $player->reputation->subtractRep(abs($rep_loss));

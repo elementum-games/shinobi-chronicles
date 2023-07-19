@@ -18,6 +18,7 @@ abstract class Fighter {
     public System $system;
 
     public string $combat_id;
+    public int $user_id;
 
     // Energy
     public float $health = 100;
@@ -67,7 +68,6 @@ abstract class Fighter {
     public float $bloodline_speed_boost = 0;
 
     public string $gender;
-    public int $rep_rank;
     public UserReputation $reputation;
 
     public string $current_ip;
