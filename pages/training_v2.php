@@ -1,7 +1,6 @@
 <?php
 
 require_once __DIR__ . '/../classes/notification/NotificationManager.php';
-require_once __DIR__ . '/../classes/training/TrainingManager.php';
 
 function training() {
     global $system;

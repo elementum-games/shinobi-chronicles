@@ -1,7 +1,5 @@
 <?php
 
-require_once __DIR__ . '/training/TrainingManager.php';
-
 class SenseiManager {
     public static array $boost_tiers = [
         0 => ['boost_primary' => 3, 'boost_secondary' => 0],
