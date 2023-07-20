@@ -13,6 +13,7 @@ require_once __DIR__ . "/Village.php";
 require_once __DIR__ . "/Clan.php";
 require_once __DIR__ . "/achievements/AchievementsManager.php";
 require_once __DIR__ . "/UserReputation.php";
+require_once __DIR__ . "/training/TrainingManager.php";
 require_once __DIR__ . "/event/LanternEvent.php";
 
 /*	Class:		User
