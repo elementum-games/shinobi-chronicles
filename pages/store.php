@@ -115,7 +115,8 @@ function store() {
                 $player->giveItem($shop_items[$item_id], 1);
 			}
 			$system->message("Item purchased!");
-		} catch (Exception $e) {
+		}
+        catch (Exception $e) {
 			$system->message($e->getMessage());
 		}
 	}
@@ -397,4 +398,4 @@ function store() {
 
 }
 
-?>
+

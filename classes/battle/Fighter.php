@@ -258,6 +258,7 @@ abstract class Fighter {
         switch($attack->purchase_type) {
             case Jutsu::PURCHASE_TYPE_DEFAULT:
             case Jutsu::PURCHASE_TYPE_PURCHASABLE:
+            case Jutsu::PURCHASE_TYPE_EVENT_SHOP:
                 $offense = self::BASE_OFFENSE + ($off_skill * self::SKILL_OFFENSE_RATIO);
                 break;
             case Jutsu::PURCHASE_TYPE_BLOODLINE:

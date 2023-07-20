@@ -634,6 +634,9 @@ class BattleManager {
         }
         else if($action->jutsu_purchase_type == Jutsu::PURCHASE_TYPE_PURCHASABLE) {
             $attack->jutsu = $fighter->jutsu[$action->jutsu_id];
+        } 
+        else if ($action->jutsu_purchase_type == Jutsu::PURCHASE_TYPE_EVENT_SHOP) {
+            $attack->jutsu = $fighter->jutsu[$action->jutsu_id];
         }
         else if($action->jutsu_purchase_type == Jutsu::PURCHASE_TYPE_BLOODLINE) {
             $attack->jutsu = $fighter->bloodline->jutsu[$action->jutsu_id];

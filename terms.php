@@ -8,7 +8,7 @@ $layout = $system->setLayoutByName("shadow_ribbon");
 
 if(isset($_SESSION['user_id'])) {
     require_once 'classes.php';
-    $player = User::loadFromId($system, $_SESSION['user_id']);
+    $player = User::loadFromId($system, $_SESSION['user_id'], read_only: true);
     $player->loadData();
     $layout = $system->setLayoutByName($player->layout);
 }

@@ -592,10 +592,14 @@ class System {
 
     public function checkForActiveEvent(): void {
         $current_datetime = new DateTimeImmutable();
-
+        $this->event = null;
         // July 2023 Lantern Event
         $july_2023_lantern_event_start_time = new DateTimeImmutable('2023-07-01');
         $july_2023_lantern_event_end_time = new DateTimeImmutable('2023-07-16');
+        if($this->isDevEnvironment()) {
+            $july_2023_lantern_event_end_time = new DateTimeImmutable('2023-07-15');
+        }
+
         if($current_datetime > $july_2023_lantern_event_start_time && $current_datetime < $july_2023_lantern_event_end_time) {
             $this->event = new LanternEvent($july_2023_lantern_event_end_time);
         }

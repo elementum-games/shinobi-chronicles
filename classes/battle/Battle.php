@@ -119,7 +119,9 @@ class Battle {
 
         if($player1 instanceof User) {
             $player1->battle_id = $battle_id;
-            $player1->last_death_ms = 0;
+            if ($battle_type == self::TYPE_FIGHT) {
+                $player1->last_death_ms = 0;
+            }
             $player1->updateData();
         }
         if($player2 instanceof User) {
@@ -307,15 +309,15 @@ class Battle {
                 `turn_time` = {$this->turn_time},
                 `turn_count` = {$this->turn_count},
                 `winner` = '{$this->winner}',
-    
+
                 `fighter_health` = '" . json_encode($this->fighter_health) . "',
                 `fighter_actions` = '" . json_encode($this->fighter_actions) . "',
-    
+
                 `field` = '" . $this->raw_field . "',
-    
+
                 `active_effects` = '" . $this->raw_active_effects . "',
                 `active_genjutsu` = '" . $this->raw_active_genjutsu . "',
-    
+
                 `jutsu_cooldowns` = '" . json_encode($this->jutsu_cooldowns) . "',
                 `fighter_jutsu_used` = '" . json_encode($this->fighter_jutsu_used) . "'
             WHERE `battle_id` = '{$this->battle_id}' LIMIT 1"

@@ -445,7 +445,7 @@ class PremiumShopManager {
 
         if (isset($this->player->elements[$editing_element_index])) {
             foreach ($this->player->jutsu as $jutsu) {
-                if ($jutsu->element == $this->player->elements[0]) {
+                if ($jutsu->element == $this->player->elements[$editing_element_index]) {
                     $this->player->removeJutsu($jutsu->id);
                 }
             }

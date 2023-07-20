@@ -3,7 +3,7 @@
 require_once __DIR__ . '/../classes/Route.php';
 
 // KEEP IDS IN SYNC WITH Router::PAGE_IDS
-// NEXT ID: 32 (i.e. if you add 28, update this to 29 to help other contributors)
+// NEXT ID: 37 (i.e. if you add 28, update this to 29 to help other contributors)
 return $routes = [
     // User Menu
     1 => new Route(
@@ -256,6 +256,12 @@ return $routes = [
         file_name: 'accountRecord.php',
         title: 'Account Record',
         function_name: 'accountRecord',
+        menu: Route::MENU_NONE,
+    ),
+    36 => new Route(
+        file_name: 'forbiddenShop.php',
+        title: "???",
+        function_name: 'forbiddenShop',
         menu: Route::MENU_NONE,
     ),
 ];

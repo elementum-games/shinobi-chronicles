@@ -121,12 +121,18 @@ class BattleApiPresenter {
             'id' => $jutsu->id,
             'combatId' => $jutsu->combat_id,
             'name' => $jutsu->name,
+            'description' => html_entity_decode($jutsu->description, ENT_QUOTES),
             'activeCooldownTurnsLeft' => $battle->jutsu_cooldowns[$jutsu->combat_id] ?? 0,
             'jutsuType' => $jutsu->jutsu_type,
             'targetType' => $jutsu->target_type,
             'handSeals' => explode('-', $jutsu->hand_seals),
+            'power' => $jutsu->base_power,
             'range' => $jutsu->range,
             'element' => $jutsu->element,
+            'cooldown' => $jutsu->cooldown,
+            'effect' => $jutsu->effect,
+            'effectAmount' => $jutsu->effect_amount,
+            'effectDuration' => $jutsu->effect_length,
         ];
     }
 
