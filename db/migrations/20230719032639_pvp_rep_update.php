@@ -18,11 +18,11 @@ final class PvpRepUpdate extends AbstractMigration
      */
     public function up(): void {
         $this->execute("ALTER TABLE `users` 
-            ADD COLUMN `rep_last_kill_ids` TEXT DEFAULT NULL AFTER `weekly_rep`;");
+            ADD COLUMN `recent_players_killed_ids` TEXT DEFAULT NULL AFTER `mission_rep_cd`;");
     }
 
     public function down(): void {
         $this->execute("ALTER TABLE `users` 
-            DROP COLUMN `rep_last_kill_ids`;");
+            DROP COLUMN `recent_players_killed_ids`;");
     }
 }

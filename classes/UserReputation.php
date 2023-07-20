@@ -139,14 +139,14 @@ class UserReputation {
     public int $rank;
     public string $rank_name;
     public int $weekly_cap;
-    public ?string $last_pvp_kills;
-    public array $last_pvp_kills_array;
+    public ?string $recent_players_killed_ids;
+    public array $recent_players_killed_ids_array;
     public int $base_pvp_reward;
     public array $benefits;
     public function __construct(&$player_rep, &$player_weekly_rep, &$last_pvp_kills, $mission_cd) {
         $this->rep = &$player_rep;
         $this->weekly_rep = &$player_weekly_rep;
-        $this->last_pvp_kills = &$last_pvp_kills;
+        $this->recent_players_killed_ids = &$last_pvp_kills;
         $this->mission_cd = $mission_cd;
         $this->rank = self::tierByRepAmount($this->rep);
 
@@ -293,9 +293,9 @@ class UserReputation {
         $rep_gain = 0;
 
         // Set current kill
-        $this->last_pvp_kills_array[$opponent_user_id][] = time();
+        $this->recent_players_killed_ids_array[$opponent_user_id][] = time();
         // Get kill count
-        $kill_count = isset($this->last_pvp_kills_array[$opponent_user_id]) ? sizeof($this->last_pvp_kills_array[$opponent_user_id]) : 0;
+        $kill_count = isset($this->recent_players_killed_ids_array[$opponent_user_id]) ? sizeof($this->recent_players_killed_ids_array[$opponent_user_id]) : 0;
         // Encode and set last pvp kills
         $this->encodePvpKills();
 
@@ -382,30 +382,30 @@ class UserReputation {
     }
     // Encode and set player last pvp kills
     public function encodePvpKills() {
-        $this->last_pvp_kills = json_encode($this->last_pvp_kills_array);
+        $this->recent_players_killed_ids = json_encode($this->recent_players_killed_ids_array);
     }
     // Load pvp kills and remove outdated kills to prvent data bloat
     public function loadPvpKillsArray() {
-        if(is_array(json_decode($this->last_pvp_kills, true))) {
-            $this->last_pvp_kills_array = json_decode($this->last_pvp_kills, true);
+        if(is_array(json_decode($this->recent_players_killed_ids, true))) {
+            $this->recent_players_killed_ids_array = json_decode($this->recent_players_killed_ids, true);
 
             // Remove outdated data to prevent bloat
-            foreach($this->last_pvp_kills_array as $UID => $kills) {
+            foreach($this->recent_players_killed_ids_array as $UID => $kills) {
                 // Remove any invalid kill times from arrays
                 foreach($kills as $key => $time) {
                     if($time + self::PVP_TRACK_LIMIT <= time()) {
-                        unset($this->last_pvp_kills_array[$UID][$key]);
+                        unset($this->recent_players_killed_ids_array[$UID][$key]);
                     }
                 }
 
                 // Kill array empty, remove id from array
-                if(empty($this->last_pvp_kills_array[$UID])) {
-                    unset($this->last_pvp_kills_array[$UID]);
+                if(empty($this->recent_players_killed_ids_array[$UID])) {
+                    unset($this->recent_players_killed_ids_array[$UID]);
                 }
             }
         }
         else {
-            $this->last_pvp_kills_array = array();
+            $this->recent_players_killed_ids_array = array();
         }
     }
 
