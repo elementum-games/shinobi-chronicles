@@ -176,7 +176,7 @@ function processBattleFightEnd(BattleManager $battle, User $player): string {
         // Calculate rep gains
         $rep_loss = $player->reputation->calcPvpRep($player->level, $player->reputation->rank, $battle->opponent->level,
             $battle->opponent->reputation->rank,$battle->opponent->user_id, false);
-        if($rep_loss < 0) {
+        if($rep_loss > 0) {
             $result .= "You have lost " . abs($rep_loss) . " village reputation.[br]";
             $player->reputation->subtractRep(abs($rep_loss));
         }
