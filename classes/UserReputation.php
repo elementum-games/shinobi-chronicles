@@ -288,7 +288,7 @@ class UserReputation {
     }
     // Calculate and return reputation gains/losses from pvp wins/losses
     public function calcPvpRep($player_level, $player_rep_rank, $opponent_level, $opponent_rep_rank, $opponent_user_id, $winner = true) {
-        $level_difference = $player_level - $opponent_level;
+        $player_levels_above_opponent = $player_level - $opponent_level;
         $rep_rank_difference = $player_rep_rank - $opponent_rep_rank;
         $rep_gain = 0;
 
@@ -307,28 +307,28 @@ class UserReputation {
 
             // Level based rewards
             // Opponent is no more than 5 levels below player
-            if($level_difference >= -5) {
+            if($player_levels_above_opponent <= 5) {
                 $rep_gain++;
             }
             // Opponent is no more than 2 levels below player
-            if($level_difference >= -2) {
+            if($player_levels_above_opponent <= 2) {
                 $rep_gain++;
             }
             // Opponent is 3 or more levels above player
-            if($level_difference >= 3) {
+            if($player_levels_above_opponent <= -3) {
                 $rep_gain++;
             }
             // Opponent is 6 or more levels above player
-            if($level_difference >= 6) {
+            if($player_levels_above_opponent <= -6) {
                 $rep_gain++;
             }
 
             // Reputation difference rewards
-            // Player is two tiers above opponent
+            // Player is no more than two tiers above opponent
             if($rep_rank_difference <= 2) {
                 $rep_gain++;
             }
-            //Player is within 1 tier
+            //Player is no more than 1 tier above opponent
             if($rep_rank_difference <= 1) {
                 $rep_gain++;
             }
@@ -352,33 +352,33 @@ class UserReputation {
             }
         }
         if($winner == false) {
-            $rep_gain = -2;
-        // Opponent is 5 or more levels above player
-            if($level_difference <= -5) {
-                $rep_gain++; // Gain is negative by default, reduce rep loss
+            $rep_loss = 2;
+            // Opponent is 5 or more levels above player
+            if($player_levels_above_opponent <= -5) {
+                $rep_loss--; // Gain is negative by default, reduce rep loss
             }
 
-        //Reputation based
+            //Reputation based
             // Opponent is 2 or more tiers above player
             if($rep_rank_difference <= -2) {
-                $rep_gain++; // Gain is negative by default, reduce rep loss
+                $rep_loss--; // Gain is negative by default, reduce rep loss
             }
             // Opponent is within 1 tier of player
-            if($rep_rank_difference >= -1 && $rep_rank_difference <= 1) {
-                $rep_gain--; // Increase rep loss
+            if($rep_rank_difference >= -1) {
+                $rep_loss++; // Increase rep loss
             }
             // Opponent is 2 or more tiers below player
             if($rep_rank_difference >= 2) {
-                $rep_gain--;
+                $rep_loss += 2;
             }
 
-            // Redundancy to ensure no rep is rewarded
-            if($rep_gain > 0) {
-                $rep_gain = 0;
+            // Redundancy to ensure rep is not removed when it shouldn't be
+            if($rep_gain < 0) {
+                $rep_loss = 0;
             }
         }
 
-        return $rep_gain;
+        return $rep_loss;
     }
     // Encode and set player last pvp kills
     public function encodePvpKills() {
