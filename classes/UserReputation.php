@@ -128,8 +128,8 @@ class UserReputation {
         ],
     ];
     const DECAY_MODIFIER = 0.65;
-    const PVP_TRACK_LIMIT = 3600; // Only kills within last hour will mitigate pvp rep gains
-    const PVP_KILL_REDUCTION = 4; // Pvp kills of same player above this amount reward 0 rep
+    const RECENT_PLAYER_KILL_THRESHOLD = 3600; // Only kills within last hour will mitigate pvp rep gains
+    const PVP_CHAIN_KILL_LIMIT = 4; // Pvp kills of same player above this amount reward 0 rep
     const MIN_DIMINISHED_REP = 2; // Minimum rep gain on diminished returns (will remain 0 on mitigated kills)
 
     protected int $rep;
@@ -301,7 +301,7 @@ class UserReputation {
 
         if($winner == true) {
             // Opponent killed too many times in mitigation frame, no gain
-            if($kill_count > self::PVP_KILL_REDUCTION) {
+            if($kill_count > self::PVP_CHAIN_KILL_LIMIT) {
                 return 0;
             }
 
@@ -342,10 +342,10 @@ class UserReputation {
 
             // Diminishing returns
             if($kill_count > 0) {
-                if($kill_count / self::PVP_KILL_REDUCTION > 0.5) {
+                if($kill_count / self::PVP_CHAIN_KILL_LIMIT > 0.5) {
                     $rep_gain = floor($rep_gain * 0.5);
                 }
-                if($kill_count / self::PVP_KILL_REDUCTION >= 0.75) {
+                if($kill_count / self::PVP_CHAIN_KILL_LIMIT >= 0.75) {
                     $rep_gain = ceil($rep_gain * 0.25);
                 }
                 $rep_gain = ($rep_gain < self::MIN_DIMINISHED_REP) ? self::MIN_DIMINISHED_REP : $rep_gain;
@@ -393,7 +393,7 @@ class UserReputation {
             foreach($this->recent_players_killed_ids_array as $UID => $kills) {
                 // Remove any invalid kill times from arrays
                 foreach($kills as $key => $time) {
-                    if($time + self::PVP_TRACK_LIMIT <= time()) {
+                    if($time + self::RECENT_PLAYER_KILL_THRESHOLD <= time()) {
                         unset($this->recent_players_killed_ids_array[$UID][$key]);
                     }
                 }
