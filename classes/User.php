@@ -930,6 +930,9 @@ class User extends Fighter {
         $this->achievements = AchievementsManager::fetchPlayerAchievements($this->system, $this->user_id);
         $this->achievements_in_progress = AchievementsManager::fetchPlayerAchievementsInProgress($this->system, $this->user_id);
 
+        // Load training manager
+        $this->loadTrainingManager();
+
         return;
     }
 

@@ -16,7 +16,6 @@ function training() {
 	global $player;
 	global $self_link;
 
-    $player->loadTrainingManager();
     $trainingManager = $player->trainingManager;
 
 	$player->getInventory();

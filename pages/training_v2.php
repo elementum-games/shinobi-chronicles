@@ -9,7 +9,6 @@ function training() {
     global $self_link;
 
     // Load player data
-    $player->loadTrainingManager();
     $player->getInventory();
     // Set valid skills
     $valid_skills = TrainingManager::$skill_types;

@@ -316,7 +316,6 @@ function academy() {
             $sensei_player->updateData();
 
 			// Set training for player
-            $player->loadTrainingManager();
             switch ($lesson_data['train_type']) {
                 case 'short':
                     $lesson_gain = $player->trainingManager->stat_train_gain * $lesson_modifier;
