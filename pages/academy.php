@@ -1,7 +1,6 @@
 <?php
 
 require_once __DIR__ . '/../classes/notification/NotificationManager.php';
-require_once __DIR__ . '/../classes/training/TrainingManager.php';
 
 function academy() {
 	global $system;
@@ -316,16 +315,15 @@ function academy() {
             $sensei_player->updateData();
 
 			// Set training for player
-            $trainingManager = new TrainingManager($system, $player);
             switch ($lesson_data['train_type']) {
                 case 'short':
-                    $lesson_gain = $trainingManager->stat_train_gain * $lesson_modifier;
+                    $lesson_gain = $player->trainingManager->stat_train_gain * $lesson_modifier;
                     break;
                 case 'long':
-                    $lesson_gain = $trainingManager->stat_long_train_gain * $lesson_modifier;
+                    $lesson_gain = $player->trainingManager->stat_long_train_gain * $lesson_modifier;
                     break;
                 case 'extended':
-                    $lesson_gain = $trainingManager->stat_extended_train_gain * $lesson_modifier;
+                    $lesson_gain = $player->trainingManager->stat_extended_train_gain * $lesson_modifier;
                     break;
                 default:
                     throw new RuntimeException('Invalid duration!');

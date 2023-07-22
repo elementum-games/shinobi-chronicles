@@ -9,14 +9,13 @@ Algorithm:	See master_plan.html
 */
 
 require_once __DIR__ . '/../classes/notification/NotificationManager.php';
-require_once __DIR__ . '/../classes/training/TrainingManager.php';
 
 function training() {
 	global $system;
 	global $player;
 	global $self_link;
 
-    $trainingManager = new TrainingManager($system, $player);
+    $trainingManager = $player->trainingManager;
 
 	$player->getInventory();
 	if(!empty($_POST['train_type']) && !$player->train_time) {
@@ -101,7 +100,8 @@ function training() {
                     NotificationManager::createNotification($new_notification, $system, NotificationManager::UPDATE_REPLACE);
                     $notification_created = true;
                 }
-			} else if (isset($_POST['bloodline_jutsu'])) {
+			}
+            else if (isset($_POST['bloodline_jutsu'])) {
                 $jutsu_id = (int) $_POST['bloodline_jutsu'];
                 if (!isset($player->bloodline)) {
                     throw new RuntimeException("No Bloodline!");

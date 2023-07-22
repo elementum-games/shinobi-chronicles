@@ -159,7 +159,7 @@ class AchievementsManager {
 
             switch($achievement->id) {
                 case LANTERN_EVENT_OBTAIN_ALL_ITEMS:
-                    if(!($system->event instanceof LanternEvent)) {
+                    if(!isset($system->event) || !($system->event instanceof LanternEvent)) {
                         break;
                     }
 

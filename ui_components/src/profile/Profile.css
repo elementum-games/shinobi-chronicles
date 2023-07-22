@@ -337,6 +337,101 @@
     z-index: 2;
 }
 
+/* User Reputation */
+.reputation_display {
+    position: relative;
+    align-self: stretch;
+
+    margin-top: 25px;
+}
+
+.reputation_indicator {
+    width: 50px;
+    height: 50px;
+
+    position: absolute;
+    top: -12px;
+    right: -3px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 2px;
+
+    z-index: 3;
+    clip-path: var(--clip-tall-hexagon);
+    background: #433b30;
+}
+.reputation_indicator img {
+    max-width: 100%;
+    max-height: 100%;
+
+    position: relative;
+    z-index: 4;
+}
+.reputation_indicator::after {
+    content: '';
+    position: absolute;
+
+    width: 50px;
+    height: 50px;
+
+    top: 2px;
+    right: 2px;
+
+    clip-path: var(--clip-tall-hexagon);
+    background:  var(--box-color-default);
+    z-index: 2;
+}
+
+.reputation_name {
+    height: 30px;
+
+    margin-left: 10px;
+
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    z-index: 1;
+}
+.reputation_name::before {
+    content: '';
+
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+
+    z-index: -1;
+
+    background-color: var(--box-color-default);
+    clip-path: polygon(
+        100% 0,
+        100% 100%,
+        13px 100%,
+        0 50%,
+        13px 0px
+    );
+}
+.reputation_name::after {
+    content: '';
+
+    position: absolute;
+    left: -5px;
+
+    width: 18px;
+    height: 30px;
+
+    background-image: url(/images/v2/decorations/bar_right_corner_30px.png);
+    background-repeat: no-repeat;
+    transform: scaleX(-1);
+    z-index: 2;
+}
+
 /* Daily Tasks */
 .daily_tasks_container {
     align-self: stretch;

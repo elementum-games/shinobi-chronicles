@@ -3,6 +3,7 @@
 require_once __DIR__ . '/AchievementsManager.php';
 require_once __DIR__ . '/AchievementReward.php';
 require_once __DIR__ . '/../event/LanternEvent.php';
+require_once __DIR__ . '/../UserReputation.php';
 
 /*
  * REPUTATION ACHIEVEMENTS
@@ -34,11 +35,11 @@ $REPUTATION_ACHIEVEMENTS = [
     FIRST_TO_REP_TIER_2 => new Achievement(
         id: FIRST_TO_REP_TIER_2,
         rank: Achievement::RANK_ELITE,
-        name: 'First ' . Village::$VillageRep[2]['title'],
-        prompt: "Become the first player to reach the reputation of " . Village::$VillageRep[2]['title'],
+        name: 'First ' . UserReputation::$VillageRep[2]['title'],
+        prompt: "Become the first player to reach the reputation of " . UserReputation::$VillageRep[2]['title'],
         rewards: $reputation_rewards[FIRST_TO_REP_TIER_2],
         criteria_check_closure: function(System $system, User $player) {
-            if($player->village_rep < Village::$VillageRep[2]['min_rep']) {
+            if($player->reputation->rank < 2) {
                 return false;
             }
 
@@ -49,11 +50,11 @@ $REPUTATION_ACHIEVEMENTS = [
     FIRST_TO_REP_TIER_3 => new Achievement(
         id: FIRST_TO_REP_TIER_3,
         rank: Achievement::RANK_ELITE,
-        name: 'First ' . Village::$VillageRep[3]['title'],
-        prompt: "Become the first player to reach the reputation of " . Village::$VillageRep[3]['title'],
+        name: 'First ' . UserReputation::$VillageRep[3]['title'],
+        prompt: "Become the first player to reach the reputation of " . UserReputation::$VillageRep[3]['title'],
         rewards: $reputation_rewards[FIRST_TO_REP_TIER_3],
         criteria_check_closure: function(System $system, User $player) {
-            if($player->village_rep < Village::$VillageRep[3]['min_rep']) {
+            if($player->reputation->rank < 3) {
                 return false;
             }
 
@@ -64,11 +65,11 @@ $REPUTATION_ACHIEVEMENTS = [
     FIRST_TO_REP_TIER_4 => new Achievement(
         id: FIRST_TO_REP_TIER_4,
         rank: Achievement::RANK_ELITE,
-        name: 'First ' . Village::$VillageRep[4]['title'],
-        prompt: "Become the first player to reach the reputation of " . Village::$VillageRep[4]['title'],
+        name: 'First ' . UserReputation::$VillageRep[4]['title'],
+        prompt: "Become the first player to reach the reputation of " . UserReputation::$VillageRep[4]['title'],
         rewards: $reputation_rewards[FIRST_TO_REP_TIER_4],
         criteria_check_closure: function(System $system, User $player) {
-            if($player->village_rep < Village::$VillageRep[4]['min_rep']) {
+            if($player->reputation->rank < 4) {
                 return false;
             }
 
@@ -79,11 +80,11 @@ $REPUTATION_ACHIEVEMENTS = [
     FIRST_TO_REP_TIER_5 => new Achievement(
         id: FIRST_TO_REP_TIER_5,
         rank: Achievement::RANK_ELITE,
-        name: 'First ' . Village::$VillageRep[5]['title'],
-        prompt: "Become the first player to reach the reputation of " . Village::$VillageRep[5]['title'],
+        name: 'First ' . UserReputation::$VillageRep[5]['title'],
+        prompt: "Become the first player to reach the reputation of " . UserReputation::$VillageRep[5]['title'],
         rewards: $reputation_rewards[FIRST_TO_REP_TIER_5],
         criteria_check_closure: function(System $system, User $player) {
-            if($player->village_rep < Village::$VillageRep[5]['min_rep']) {
+            if($player->reputation->rank < 5) {
                 return false;
             }
 
@@ -94,11 +95,11 @@ $REPUTATION_ACHIEVEMENTS = [
     FIRST_TO_REP_TIER_6 => new Achievement(
         id: FIRST_TO_REP_TIER_6,
         rank: Achievement::RANK_ELITE,
-        name: 'First ' . Village::$VillageRep[6]['title'],
-        prompt: "Become the first player to reach the reputation of " . Village::$VillageRep[6]['title'],
+        name: 'First ' . UserReputation::$VillageRep[6]['title'],
+        prompt: "Become the first player to reach the reputation of " . UserReputation::$VillageRep[6]['title'],
         rewards: $reputation_rewards[FIRST_TO_REP_TIER_6],
         criteria_check_closure: function(System $system, User $player) {
-            if($player->village_rep < Village::$VillageRep[6]['min_rep']) {
+            if($player->reputation->rank < 6) {
                 return false;
             }
 
@@ -109,11 +110,11 @@ $REPUTATION_ACHIEVEMENTS = [
     FIRST_TO_REP_TIER_7 => new Achievement(
         id: FIRST_TO_REP_TIER_7,
         rank: Achievement::RANK_ELITE,
-        name: 'First ' . Village::$VillageRep[7]['title'],
-        prompt: "Become the first player to reach the reputation of " . Village::$VillageRep[7]['title'],
+        name: 'First ' . UserReputation::$VillageRep[7]['title'],
+        prompt: "Become the first player to reach the reputation of " . UserReputation::$VillageRep[7]['title'],
         rewards: $reputation_rewards[FIRST_TO_REP_TIER_7],
         criteria_check_closure: function(System $system, User $player) {
-            if($player->village_rep < Village::$VillageRep[7]['min_rep']) {
+            if($player->reputation->rank < 7) {
                 return false;
             }
 
@@ -124,11 +125,11 @@ $REPUTATION_ACHIEVEMENTS = [
     FIRST_TO_REP_TIER_8 => new Achievement(
         id: FIRST_TO_REP_TIER_8,
         rank: Achievement::RANK_ELITE,
-        name: 'First ' . Village::$VillageRep[8]['title'],
-        prompt: "Become the first player to reach the reputation of " . Village::$VillageRep[8]['title'],
+        name: 'First ' . UserReputation::$VillageRep[8]['title'],
+        prompt: "Become the first player to reach the reputation of " . UserReputation::$VillageRep[8]['title'],
         rewards: $reputation_rewards[FIRST_TO_REP_TIER_8],
         criteria_check_closure: function(System $system, User $player) {
-            if($player->village_rep < Village::$VillageRep[8]['min_rep']) {
+            if($player->reputation->rank < 8) {
                 return false;
             }
 
@@ -139,11 +140,11 @@ $REPUTATION_ACHIEVEMENTS = [
     FIRST_TO_REP_TIER_9 => new Achievement(
         id: FIRST_TO_REP_TIER_9,
         rank: Achievement::RANK_ELITE,
-        name: 'First ' . Village::$VillageRep[9]['title'],
-        prompt: "Become the first player to reach the reputation of " . Village::$VillageRep[9]['title'],
+        name: 'First ' . UserReputation::$VillageRep[9]['title'],
+        prompt: "Become the first player to reach the reputation of " . UserReputation::$VillageRep[9]['title'],
         rewards: $reputation_rewards[FIRST_TO_REP_TIER_9],
         criteria_check_closure: function(System $system, User $player) {
-            if($player->village_rep < Village::$VillageRep[9]['min_rep']) {
+            if($player->reputation->rank < 9) {
                 return false;
             }
 

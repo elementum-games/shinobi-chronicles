@@ -1,7 +1,5 @@
 <?php
 
-require_once __DIR__ . '/training/TrainingManager.php';
-
 class SenseiManager {
     public static array $boost_tiers = [
         0 => ['boost_primary' => 3, 'boost_secondary' => 0],
@@ -386,7 +384,7 @@ class SenseiManager {
 
     public static function isSensei(int $user_id, System $system): bool {
         $isSensei = false;
-        $sensei_result = $system->db->query("SELECT 1 FROM `sensei` WHERE `sensei_id` = '{$user_id}'");
+        $sensei_result = $system->db->query("SELECT * FROM `sensei` WHERE `sensei_id` = '{$user_id}' AND `is_active`='1' LIMIT 1");
         $result = $system->db->fetch($sensei_result);
         if ($system->db->last_num_rows > 0) {
             $isSensei = true;
@@ -429,10 +427,10 @@ class SenseiManager {
 
     public static function getLessonCostForPlayer(User $player, System $system): array {
         $cost = [];
-        $trainingManager = new TrainingManager($system, $player);
-        $standard_lesson_cost = ($trainingManager->stat_train_length / 60) * SenseiManager::LESSON_COST_PER_MINUTE * $player->rank_num;
-        $long_lesson_cost = ($trainingManager->stat_long_train_length / 60) * SenseiManager::LESSON_COST_PER_MINUTE * $player->rank_num;
-        $extended_lesson_cost = ($trainingManager->stat_extended_train_length / 60) * SenseiManager::LESSON_COST_PER_MINUTE * $player->rank_num;
+        $player->loadTrainingManager();
+        $standard_lesson_cost = ($player->trainingManager->stat_train_length / 60) * SenseiManager::LESSON_COST_PER_MINUTE * $player->rank_num;
+        $long_lesson_cost = ($player->trainingManager->stat_long_train_length / 60) * SenseiManager::LESSON_COST_PER_MINUTE * $player->rank_num;
+        $extended_lesson_cost = ($player->trainingManager->stat_extended_train_length / 60) * SenseiManager::LESSON_COST_PER_MINUTE * $player->rank_num;
         $cost['short'] = $standard_lesson_cost;
         $cost['long'] = $long_lesson_cost;
         $cost['extended'] = $extended_lesson_cost;
@@ -441,10 +439,10 @@ class SenseiManager {
 
     public static function getLessonDurationForPlayer(User $player, System $system): array {
         $duration = [];
-        $trainingManager = new TrainingManager($system, $player);
-        $duration['short'] = $trainingManager->stat_train_length;
-        $duration['long'] = $trainingManager->stat_long_train_length;
-        $duration['extended'] = $trainingManager->stat_extended_train_length;
+        $player->loadTrainingManager();
+        $duration['short'] = $player->trainingManager->stat_train_length;
+        $duration['long'] = $player->trainingManager->stat_long_train_length;
+        $duration['extended'] = $player->trainingManager->stat_extended_train_length;
         return $duration;
     }
 

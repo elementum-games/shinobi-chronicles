@@ -80,7 +80,7 @@ function arena(): bool {
         echo "<table class='table'><tr><th>Choose Opponent</th></tr>
         <tr><td style='text-align: center;'>
         Welcome to the Arena. Here you can fight against various opponents for cash prizes. Please select your opponent below:";
-	if($player->mission_rep_cd - time() > 0) {
+	if(!$player->reputation->canGain(true)) {
 	$remaining = $player->mission_rep_cd - time();
 	echo "<br /><br />You can gain village reputation in: <div id='rep_cd' style='display: inline-block'>"
 	    . System::timeRemaining($remaining) . "</div>
@@ -200,13 +200,14 @@ function processArenaBattleEnd(BattleManager|BattleManagerV2 $battle, User $play
         }
 
         // Village Rep Gains
-        $rep_gain = 0;
-        if($player->mission_rep_cd - time() <= 0) {
-            $rep_gain = $player->calMaxRepGain($player->village->calcArenaReputation($player->level, $opponent->level));
+        $rep_gain_string = "";
+        if($player->reputation->canGain(true)) {
+            $rep_gain = $player->reputation->addRep($player->reputation->calcArenaReputation($player->level, $opponent->level));
+            if($rep_gain > 0) {
+                $player->mission_rep_cd = time() + UserReputation::ARENA_MISSION_CD;
+                $rep_gain_string = "Fellow " . $player->village->name . " Shinobi learned from your battle, earning you $rep_gain Reputation.<br />";
+            }
         }
-        $rep_gain_string = ($rep_gain > 0)
-            ? "Fellow " . $player->village->name . " Shinobi learned from your battle, earning you $rep_gain Reputation.<br />"
-            : "";
 
         // TEAM BOOST NPC GAINS
         if($player->team != null) {
@@ -242,10 +243,6 @@ function processArenaBattleEnd(BattleManager|BattleManagerV2 $battle, User $play
         }
 
         $player->addMoney(($money_gain + $extra_yen), 'arena');
-        if($rep_gain > 0) {
-            $player->mission_rep_cd = time() + Village::ARENA_MISSION_CD;
-            $player->addRep($rep_gain);
-        }
         $player->ai_wins++;
         $player->battle_id = 0;
         $player->last_pvp_ms = System::currentTimeMs();

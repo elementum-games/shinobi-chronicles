@@ -12,6 +12,8 @@ require_once __DIR__ . "/Rank.php";
 require_once __DIR__ . "/Village.php";
 require_once __DIR__ . "/Clan.php";
 require_once __DIR__ . "/achievements/AchievementsManager.php";
+require_once __DIR__ . "/UserReputation.php";
+require_once __DIR__ . "/training/TrainingManager.php";
 require_once __DIR__ . "/event/LanternEvent.php";
 
 /*	Class:		User
@@ -37,6 +39,13 @@ class User extends Fighter {
 
     public static array $ELEMENTS = [
         'Fire', 'Wind', 'Lightning', 'Earth', 'Water'
+    ];
+
+    public static array $HEAL_REGEN_MULTIPLIER = [
+        1 => 2,
+        2 => 5,
+        3 => 12,
+        4 => 45,
     ];
 
     const MIN_NAME_LENGTH = 2;
@@ -112,10 +121,10 @@ class User extends Fighter {
 
     public Village $village;
     public int $village_rep;
-    public int $rep_rank;
     public int $weekly_rep;
-    public int $weekly_rep_cap;
     public int $mission_rep_cd;
+    public UserReputation $reputation;
+    public ?string $recent_players_killed_ids;
 
     public int $rank_num;
     public Rank $rank;
@@ -143,6 +152,7 @@ class User extends Fighter {
     public $train_type;
     public $train_gain;
     public int $train_time;
+    public TrainingManager $trainingManager;
 
     public int $stat_transfer_amount;
     public int $stat_transfer_completion_time;
@@ -492,10 +502,10 @@ class User extends Fighter {
 
         $this->village = new Village($this->system, $user_data['village']);
         $this->village_rep = $user_data['village_rep'];
-        $this->rep_rank = $this->village->getRepRank($this->village_rep);
         $this->weekly_rep = $user_data['weekly_rep'];
-        $this->weekly_rep_cap = Village::$VillageRep[$this->rep_rank]['weekly_cap'];
         $this->mission_rep_cd = $user_data['mission_rep_cd'];
+        $this->recent_players_killed_ids = $user_data['recent_players_killed_ids'];
+        $this->reputation = new UserReputation($this->village_rep, $this->weekly_rep, $this->recent_players_killed_ids, $this->mission_rep_cd);
 
         $this->gender = $user_data['gender'];
         $this->level = $user_data['level'];
@@ -694,9 +704,8 @@ class User extends Fighter {
                     $this->addMoney($task->reward, "Completed daily task");
                     $task_message = "You have completed {$task->name} and earned &yen;{$task->reward}";
 
-                    $rep_gain = $this->calMaxRepGain($task->rep_reward, true);
+                    $rep_gain = $this->reputation->addRep($task->rep_reward, true);
                     if($rep_gain > 0) {
-                        $this->addRep($rep_gain);
                         $task_message .= " and $rep_gain Reputation";
                     }
 
@@ -874,13 +883,15 @@ class User extends Fighter {
             $minutes = floor($time_difference / 60);
 
             $regen_amount = $minutes * ($this->regen_rate + $this->regen_boost);
+            $health_multiplier = self::$HEAL_REGEN_MULTIPLIER[$this->rank_num];
 
             // In-battle decrease
             if($this->battle_id) {
                 $regen_amount -= round($regen_amount * 0.7, 1);
+                $health_multiplier = 2;
             }
 
-            $this->health += $regen_amount * 2;
+            $this->health += $regen_amount * $health_multiplier;
             $this->chakra += $regen_amount;
             $this->stamina += $regen_amount;
 
@@ -919,6 +930,9 @@ class User extends Fighter {
 
         $this->achievements = AchievementsManager::fetchPlayerAchievements($this->system, $this->user_id);
         $this->achievements_in_progress = AchievementsManager::fetchPlayerAchievementsInProgress($this->system, $this->user_id);
+
+        // Load training manager
+        $this->loadTrainingManager();
 
         return;
     }
@@ -967,6 +981,13 @@ class User extends Fighter {
             }
         }
         return false;
+    }
+
+    public function loadTrainingManager(): void
+    {
+        $this->trainingManager = new TrainingManager($this->system, $this->train_type, $this->train_gain,
+    $this->train_time, $this->rank, $this->forbidden_seal, $this->reputation, $this->team, $this->sensei_id,
+            $this->bloodline_id);
     }
 
     public function setForbiddenSealFromDb(string $forbidden_seal_db, bool $remote_view) {
@@ -1689,38 +1710,6 @@ class User extends Fighter {
         $this->location = $this->village_location;
     }
 
-    public function calMaxRepGain($repGain, $bypass_cap = false) {
-       if($repGain + $this->weekly_rep > $this->weekly_rep_cap && !$bypass_cap) {
-            $repGain = $this->weekly_rep_cap - $this->weekly_rep;
-        }
-        return $repGain;
-    }
-    public function addRep(int $amount, $incrementWeekly = true) {
-        $this->village_rep += $amount;
-
-        //Weekly rep
-        if($this->weekly_rep < $this->weekly_rep_cap && $incrementWeekly) {
-            $new_weekly = $this->weekly_rep += $amount;
-            if($new_weekly > $this->weekly_rep_cap) {
-                $new_weekly = $this->weekly_rep_cap;
-            }
-            $this->weekly_rep = $new_weekly;
-        }
-    }
-    public function subtractRep(int $amount) {
-        //Redundancy to ensure subtraction
-        if($amount < 0) {
-            $amount = abs($amount);
-        }
-
-        $this->village_rep -= $amount;
-
-        //Temp disable outlaw reputation
-        if($this->village_rep < 0) {
-            $this->village_rep = 0;
-        }
-    }
-
     public function checkAchievementCompletion() {
         AchievementsManager::checkForCompletedAchievements($this->system, $this);
     }
@@ -1754,6 +1743,7 @@ class User extends Fighter {
 		`village` = '{$this->village->name}',
 		`village_rep` = '$this->village_rep',
 		`weekly_rep` = '$this->weekly_rep',
+		`recent_players_killed_ids` = '$this->recent_players_killed_ids',
 		`mission_rep_cd` = '$this->mission_rep_cd',
 		`level` = '$this->level',
 		`level_up` = '" . (int)$this->level_up . "',

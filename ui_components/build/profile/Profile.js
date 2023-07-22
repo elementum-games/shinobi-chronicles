@@ -27,6 +27,8 @@ function Profile({
     bloodlinePageUrl: links.bloodlinePage,
     buyBloodlineUrl: links.buyBloodline,
     playerData: playerData
+  }), /*#__PURE__*/React.createElement(PlayerUserRep, {
+    playerData: playerData
   }), /*#__PURE__*/React.createElement(DailyTasks, {
     dailyTasks: playerDailyTasks
   }))), /*#__PURE__*/React.createElement("div", {
@@ -99,7 +101,7 @@ function StatusAttributes({
     style: {
       flexBasis: "34%"
     }
-  }, /*#__PURE__*/React.createElement("p", null, /*#__PURE__*/React.createElement("label", null, "Village:"), /*#__PURE__*/React.createElement("span", null, playerData.villageName)), /*#__PURE__*/React.createElement("p", null, /*#__PURE__*/React.createElement("label", null, "Village Rep:"), /*#__PURE__*/React.createElement("span", null, playerData.villageRepTier, " (", playerData.villageRep, " rep)")), playerData.clanId != null && /*#__PURE__*/React.createElement("p", null, /*#__PURE__*/React.createElement("label", null, "Clan:"), /*#__PURE__*/React.createElement("span", null, /*#__PURE__*/React.createElement("a", {
+  }, /*#__PURE__*/React.createElement("p", null, /*#__PURE__*/React.createElement("label", null, "Village:"), /*#__PURE__*/React.createElement("span", null, playerData.villageName)), /*#__PURE__*/React.createElement("p", null, /*#__PURE__*/React.createElement("label", null, "Weekly Reputation:"), /*#__PURE__*/React.createElement("span", null, playerData.weeklyRep, "\xA0/\xA0", playerData.maxWeeklyRep)), playerData.clanId != null && /*#__PURE__*/React.createElement("p", null, /*#__PURE__*/React.createElement("label", null, "Clan:"), /*#__PURE__*/React.createElement("span", null, /*#__PURE__*/React.createElement("a", {
     href: links.clan
   }, playerData.clanName)))))));
 }
@@ -197,6 +199,20 @@ function PlayerBloodline({
   }, playerData.bloodlineName.replace(/&#039;/g, "'")) : /*#__PURE__*/React.createElement("a", {
     href: buyBloodlineUrl
   }, "None")));
+}
+
+function PlayerUserRep({
+  playerData
+}) {
+  return /*#__PURE__*/React.createElement("div", {
+    className: "reputation_display"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "reputation_name ft-c3"
+  }, playerData.villageRepTier, "\xA0(", playerData.villageRep, ")"), /*#__PURE__*/React.createElement("div", {
+    className: "reputation_indicator"
+  }, /*#__PURE__*/React.createElement("img", {
+    src: "/images/v2/bloodline/level3.png"
+  })));
 }
 
 function DailyTasks({
