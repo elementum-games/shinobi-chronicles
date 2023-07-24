@@ -285,7 +285,7 @@ class UserReputation {
         return $this->weekly_rep;
     }
     // Returns numeric value of weekly pvp reputaiton
-    public function getWeeklyPvpRepAmount():int {
+    public function getPvpRep():int {
         return $this->pvp_rep;
     }
     // Return of user can gain more rep for restricted methods
