@@ -276,7 +276,7 @@ class UserReputation {
             return false;
         }
         // Check weekly cap
-        if($this->weekly_rep > $this->weekly_cap) {
+        if($this->weekly_rep > $this->weekly_cap && !$check_pvp) {
             return false;
         }
         return true;
