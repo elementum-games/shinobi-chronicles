@@ -149,11 +149,14 @@ class PremiumShopManager {
         $this->player->intelligence = 0;
         $this->player->willpower = 0;
 
-        /** Reset Village Reputation Data **/
+        //Reset Village Reputation Data
         $this->player->village_rep = 0;
         $this->player->weekly_rep = 0;
         $this->player->pvp_rep = 0;
         $this->player->mission_rep_cd = 0;
+
+        //Force roll new daily task
+        $this->player->daily_tasks_reset = 0;
 
         //Bug fix: Elements previously was not cleared. -- Shadekun
         $this->player->elements = array();
