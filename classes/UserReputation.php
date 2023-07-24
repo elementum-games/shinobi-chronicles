@@ -137,6 +137,8 @@ class UserReputation {
         ],
     ];
     const DECAY_MODIFIER = 0.65;
+
+    const PVP_REP_ENABLED = true;
     const RECENT_PLAYER_KILL_THRESHOLD = 3600; // Only kills within last hour will mitigate pvp rep gains
     const PVP_CHAIN_KILL_LIMIT = 4; // Pvp kills of same player above this amount reward 0 rep
     const MIN_DIMINISHED_REP = 2; // Minimum rep gain on diminished returns (will remain 0 on mitigated kills)
@@ -328,6 +330,11 @@ class UserReputation {
         $player_levels_above_opponent = $player_level - $opponent_level;
         $rep_rank_difference = $player_rep_rank - $opponent_rep_rank;
         $rep_gain = 0;
+
+        // Pvp reputation disabled
+        if(!self::PVP_REP_ENABLED) {
+            return 0;
+        }
 
         if($winner == true) {
             // Set current kill
