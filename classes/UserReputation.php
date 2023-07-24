@@ -165,7 +165,7 @@ class UserReputation {
     public int $base_pvp_reward;
     public array $benefits;
     
-    public function __construct(&$player_rep, &$player_weekly_rep, &$player_pvp_rep, &$player_last_pvp_rep_reset, &$last_pvp_kills, &$last_killer_ids, $mission_cd) {
+    public function __construct(&$player_rep, &$player_weekly_rep, &$player_pvp_rep, &$player_last_pvp_rep_reset, &$last_pvp_kills, &$last_killer_ids, $mission_cd, $event) {
         //Player data
         $this->rep = &$player_rep;
         $this->weekly_rep = &$player_weekly_rep;
@@ -186,6 +186,11 @@ class UserReputation {
             if(time() - $this->last_pvp_rep_reset >= 86400*7) {
                 $this->resetPvpRep();
             }
+        }
+
+        //Force weekly reputation for events
+        if(!is_null($event)) {
+            self::PVP_REP_RESET_DAILY = false;
         }
 
         //Load pvp kills/killer arrays
