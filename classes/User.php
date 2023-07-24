@@ -122,9 +122,11 @@ class User extends Fighter {
     public Village $village;
     public int $village_rep;
     public int $weekly_rep;
+    public int $weekly_pvp_rep;
     public int $mission_rep_cd;
     public UserReputation $reputation;
     public ?string $recent_players_killed_ids;
+    public ?string $recent_killer_ids;
 
     public int $rank_num;
     public Rank $rank;
@@ -503,9 +505,11 @@ class User extends Fighter {
         $this->village = new Village($this->system, $user_data['village']);
         $this->village_rep = $user_data['village_rep'];
         $this->weekly_rep = $user_data['weekly_rep'];
+	$this->weekly_pvp_rep = $user_data['weekly_pvp_rep'];
         $this->mission_rep_cd = $user_data['mission_rep_cd'];
         $this->recent_players_killed_ids = $user_data['recent_players_killed_ids'];
-        $this->reputation = new UserReputation($this->village_rep, $this->weekly_rep, $this->recent_players_killed_ids, $this->mission_rep_cd);
+	$this->recent_killer_ids = $user_data['recent_killer_ids'];
+        $this->reputation = new UserReputation($this->village_rep, $this->weekly_rep, $this->weekly_pvp, $this->recent_players_killed_ids, $this->recent_killer_ids, $this->mission_rep_cd);
 
         $this->gender = $user_data['gender'];
         $this->level = $user_data['level'];
@@ -1743,7 +1747,9 @@ class User extends Fighter {
 		`village` = '{$this->village->name}',
 		`village_rep` = '$this->village_rep',
 		`weekly_rep` = '$this->weekly_rep',
+  		`weekly_pvp_rep` = '$this->weekly_pvp_rep',
 		`recent_players_killed_ids` = '$this->recent_players_killed_ids',
+		`recent_killer_ids` = '$this->recent_killer_ids',
 		`mission_rep_cd` = '$this->mission_rep_cd',
 		`level` = '$this->level',
 		`level_up` = '" . (int)$this->level_up . "',
