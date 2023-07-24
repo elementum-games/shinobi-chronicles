@@ -259,6 +259,10 @@ class UserReputation {
     public function getWeeklyRepAmount():int {
         return $this->weekly_rep;
     }
+    // Returns numeric value of weekly pvp reputaiton
+    public function getWeeklyPvpRepAmount():int {
+        return $this->weekly_pvp_rep;
+    }
     // Return of user can gain more rep for restricted methods
     public function canGain($check_mission_cd = false, $check_pvp = false):bool {
         // Check mission cd
