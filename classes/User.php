@@ -511,7 +511,7 @@ class User extends Fighter {
         $this->mission_rep_cd = $user_data['mission_rep_cd'];
         $this->recent_players_killed_ids = $user_data['recent_players_killed_ids'];
 	$this->recent_killer_ids = $user_data['recent_killer_ids'];
-        $this->reputation = new UserReputation($this->village_rep, $this->weekly_rep, $this->pvp_rep, $this->last_pvp_rep_reset, $this->recent_players_killed_ids, $this->recent_killer_ids, $this->mission_rep_cd);
+        $this->reputation = new UserReputation($this->village_rep, $this->weekly_rep, $this->pvp_rep, $this->last_pvp_rep_reset, $this->recent_players_killed_ids, $this->recent_killer_ids, $this->mission_rep_cd, $this->system->event);
 
         $this->gender = $user_data['gender'];
         $this->level = $user_data['level'];
