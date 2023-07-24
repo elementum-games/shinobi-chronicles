@@ -13,7 +13,7 @@ class DailyTask {
     const ACTIVITY_PVP = 'PVP';
     const ACTIVITY_ARENA = 'Arena';
     const ACTIVITY_MISSIONS = 'Missions';
-    const ACTIVITY_TRAINING = 'Training';
+    const ACTIVITY_TRAINING = 'Train';
     const ACTIVITY_EARN_MONEY = 'Money';
 
     const DIFFICULTY_EASY = 'Easy';
@@ -44,8 +44,12 @@ class DailyTask {
         DailyTask::ACTIVITY_PVP => 'PvP Battles',
         DailyTask::ACTIVITY_ARENA => 'Arena Battles',
         DailyTask::ACTIVITY_MISSIONS => 'Missions',
-        DailyTask::ACTIVITY_TRAINING => 'Train',
-        DailyTask::ACTIVITY_EARN_MONEY => 'Earn',
+        DailyTask::ACTIVITY_TRAINING => [
+            DailyTask::SUB_TASK_SKILL => 'skill points',
+            DailyTask::SUB_TASK_GEN => 'attribute points',
+            DailyTask::SUB_TASK_JUTSU => 'levels',
+        ],
+        DailyTask::ACTIVITY_EARN_MONEY => 'yen',
     ];
 
     public string $name;
@@ -77,6 +81,10 @@ class DailyTask {
 
         if($this->activity === DailyTask::ACTIVITY_MISSIONS) {
             $prompt .= Mission::$rank_names[$this->mission_rank] . ' ' . self::$activity_labels[DailyTask::ACTIVITY_MISSIONS];
+        }
+        elseif($this->activity === DailyTask::ACTIVITY_TRAINING) {
+            // Completly override labeling, training structure is different
+            $prompt = ucwords($this->activity) . " " . $this->amount . " " . $this->sub_task;
         }
         else {
             $prompt .= self::$activity_labels[$this->activity];
@@ -174,9 +182,21 @@ class DailyTask {
             $mission_rank = $task_config['mission_rank'][$mission_rank_key];
         }
 
-        if($task_config['type'] == DailyTask::ACTIVITY_TRAINING) {
+        // Increase training difficulty for rank 2
+        if($task_config['type'] == DailyTask::ACTIVITY_TRAINING && $user->rank_num > 1) {
             $task_config['min_amount'] *= 1.75;
             $task_config['max_amount'] *= 1.75;
+        }
+        // Override training amounts of jutsu training
+        if($task_config['type'] == DailyTask::ACTIVITY_TRAINING && $sub_task == DailyTask::SUB_TASK_JUTSU) {
+            if($user->rank_num == 1) {
+                $task_config['min_amount'] = 5;
+                $task_config['max_amount'] = 10;
+            }
+            else {
+                $task_config['min_amount'] = 15;
+                $task_config['max_amount'] = 25;
+            }
         }
 
         // Decide the Task difficulty for rewards
