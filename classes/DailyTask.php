@@ -139,8 +139,8 @@ class DailyTask {
             DailyTask::ACTIVITY_EARN_MONEY => [
                 'type' => DailyTask::ACTIVITY_EARN_MONEY,
                 'sub_task' => [self::SUB_TASK_EARN],
-                'min_amount' => 100,
-                'max_amount' => 250,
+                'min_amount' => 1000,
+                'max_amount' => 5000,
             ],
         ];
 
