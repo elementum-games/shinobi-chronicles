@@ -144,16 +144,19 @@ class UserReputation {
     const MIN_DIMINISHED_REP = 2; // Minimum rep gain on diminished returns (will remain 0 on mitigated kills)
     const RECENTLY_KILLED_BY_THRESHOLD = 1800; // Only being killed within last 30 minutes will mitigate pvp rep losses (further chainkill mitigation)
     const PVP_REP_LOSS_LIMIT = 3; // Being killed by the same player above this amount will result in 0 rep loss
+    const PVP_REP_RESET_DAILY = true; // If false, weekly pvp rep cap is used
+    const PVP_WEEKLY_CONVERSION = 0.25; // Allow 25% of weekly reputation cap if daily reset is used
 
     protected int $rep;
     protected int $weekly_rep;
-    protected int $weekly_pvp_rep;
+    protected int $pvp_rep;
+    public int $last_pvp_rep_reset;
     public int $mission_cd;
 
     public int $rank;
     public string $rank_name;
     public int $weekly_cap;
-    public int $weekly_pvp_cap;
+    public int $pvp_cap;
     // TODO: Make recent_killed private
     public ?string $recent_players_killed_ids;
     public array $recent_players_killed_ids_array;
@@ -161,27 +164,42 @@ class UserReputation {
     public array $recent_killer_ids_array;
     public int $base_pvp_reward;
     public array $benefits;
-    public function __construct(&$player_rep, &$player_weekly_rep, &$player_weekly_pvp_rep, &$last_pvp_kills, &$last_killer_ids, $mission_cd) {
+    
+    public function __construct(&$player_rep, &$player_weekly_rep, &$player_pvp_rep, &$player_last_pvp_rep_reset, &$last_pvp_kills, &$last_killer_ids, $mission_cd) {
+        //Player data
         $this->rep = &$player_rep;
         $this->weekly_rep = &$player_weekly_rep;
-        $this->weekly_pvp_rep = &$player_weekly_pvp_rep;
-        $this->recent_players_killed_ids = &$last_pvp_kills;
-        $this->recent_killer_ids = &$last_killer_ids;
         $this->mission_cd = $mission_cd;
         $this->rank = self::tierByRepAmount($this->rep);
 
-        //Last pvp Kills array
+        //PvP data
+        $this->pvp_rep = &$player_pvp_rep;
+        $this->last_pvp_rep_reset = &$player_last_pvp_rep_reset;
+        $this->recent_players_killed_ids = &$last_pvp_kills;
+        $this->recent_killer_ids = &$last_killer_ids;
+
+        //Reset daily/weekly rep
+        if(self::PVP_REP_RESET_DAILY && time() - $this->last_pvp_rep_reset >= 86400) {
+            $this->resetPvpRep();
+        }
+        else {
+            if(time() - $this->last_pvp_rep_reset >= 86400*7) {
+                $this->resetPvpRep();
+            }
+        }
+
+        //Load pvp kills/killer arrays
         $this->loadPvpKillsArray();
+        // Load benefits - this may only be performed after determining reputation rank 
+        $this->benefits = $this->loadBenefits();
 
         //Rep rank info
         $REP_RANK = self::$VillageRep[$this->rank];
 
         $this->rank_name = self::nameByRepRank($this->rank); // Use method here for future proofing
         $this->weekly_cap = $REP_RANK['weekly_cap'];
-        $this->weekly_pvp_cap = $REP_RANK['weekly_pvp_cap'];
+        $this->pvp_cap = (self::PVP_REP_RESET_DAILY) ? floor($REP_RANK['weekly_pvp_cap'] * self::PVP_WEEKLY_CONVERSION) : $REP_RANK['weekly_pvp_cap'];
         $this->base_pvp_reward = $REP_RANK['base_pvp_rep_reward'];
-
-        $this->benefits = $this->loadBenefits();
     }
 
     /**
@@ -220,9 +238,9 @@ class UserReputation {
         }
         //Increment pvp rep amount
         if($increment_pvp) {
-            $this->weekly_pvp_rep += $maount;
-            if($this->weekly_pvp_rep > $this->weekly_pvp_cap) {
-                $this->weekly_pvp_rep = $this->weekly_pvp_cap;
+            $this->pvp_rep += $maount;
+            if($this->pvp_rep > $this->pvp_cap) {
+                $this->pvp_rep = $this->pvp_cap;
             }
         }
         //Increment rep amount
@@ -253,6 +271,11 @@ class UserReputation {
         }
     }
 
+    public function resetPvpRep() {
+        $this->pvp_rep = 0;
+        $this->last_pvp_rep_reset = time();
+    }
+
     // Returns numeric value of reputation
     public function getRepAmount():int {
         return $this->rep;
@@ -263,7 +286,7 @@ class UserReputation {
     }
     // Returns numeric value of weekly pvp reputaiton
     public function getWeeklyPvpRepAmount():int {
-        return $this->weekly_pvp_rep;
+        return $this->pvp_rep;
     }
     // Return of user can gain more rep for restricted methods
     public function canGain($check_mission_cd = false, $check_pvp = false):bool {
@@ -272,7 +295,7 @@ class UserReputation {
             return false;
         }
         // Check pvp cap
-        if($check_pvp && $this->weekly_pvp_rep >= $this->weekly_pvp_cap) {
+        if($check_pvp && $this->pvp_rep >= $this->pvp_cap) {
             return false;
         }
         // Check weekly cap
@@ -350,7 +373,7 @@ class UserReputation {
             }
 
             // Weekly rep limit
-            if($this->weekly_pvp_rep > $this->weekly_pvp_cap) {
+            if($this->pvp_rep > $this->pvp_cap) {
                 return 0;
             }
 
