@@ -85,19 +85,18 @@ class DailyTask {
     }
     
     public function getPrompt(): string {
-        $prompt = ucwords($this->sub_task) . " " . $this->amount . ' ';
-
-        if($this->activity === DailyTask::ACTIVITY_MISSIONS) {
-            $prompt .= Mission::$rank_names[$this->mission_rank] . ' ' . self::$activity_labels[DailyTask::ACTIVITY_MISSIONS];
-        }
-        elseif($this->activity === DailyTask::ACTIVITY_TRAINING) {
-            // Completly override labeling, training structure is different
-            $prompt = ucwords($this->activity) . " " . $this->amount . " " . $this->sub_task;
+        if($this->activity === DailyTask::ACTIVITY_TRAINING) {
+            $prompt = ucwords($this->activity) . " " . $this->amount . " " . self::$activity_labels[$this->activity][$this->sub_task];
         }
         else {
-            $prompt .= self::$activity_labels[$this->activity];
+            $prompt = ucwords($this->sub_task) . " " . $this->amount . ' ';
+            if($this->activity === DailyTask::ACTIVITY_MISSIONS) {
+                $prompt .= Mission::$rank_names[$this->mission_rank] . ' ' . self::$activity_labels[$this->activity];
+            }
+            else {
+                $prompt .= self::$activity_labels[$this->activity];
+            }
         }
-
         return $prompt;
     }
 
