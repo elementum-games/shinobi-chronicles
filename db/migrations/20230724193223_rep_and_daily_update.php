@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 use Phinx\Migration\AbstractMigration;
 
-final class PvpRepUpdate extends AbstractMigration
+final class RepAndDailyUpdate extends AbstractMigration
 {
     /**
      * Change Method.
