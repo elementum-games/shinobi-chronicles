@@ -149,7 +149,7 @@ function processBattleFightEnd(BattleManager $battle, User $player): string {
 		    $battle->opponent->reputation->rank, $battle->opponent->user_id);
 		if($rep_gain > 0) {
 		    $result .= "You have earned $rep_gain village reputation.[br]";
-		    $player->reputation->addRep($rep_gain, true, true, false);
+		    $player->reputation->addRep($rep_gain, true, true);
 		}
     	}
 

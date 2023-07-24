@@ -217,11 +217,10 @@ class UserReputation {
      * Increments user village reputation
      * $bypass_weekly_cap enabled will always reward the full amount of rep and add to weekly amount
      * $increment_pvp enabled will add towards pvp reputation threshold
-     * $increment_weekly disabled will disable weekly reputation incrementing (USE SPARINGLY!)
      *
      * Returns amount of reputation awarded for display/data confirmation purposes
      */
-    public function addRep(int $amount, bool $bypass_weekly_cap = false, bool $increment_pvp = false, bool $increment_weekly = true):int {
+    public function addRep(int $amount, bool $bypass_weekly_cap = false, bool $increment_pvp = false):int {
         //Adjust reputation gain if gain goes above cap
         if(!$bypass_weekly_cap) {
             $new_rep = $this->rep + $amount;
@@ -235,16 +234,13 @@ class UserReputation {
                 $amount = $weekly_cap - $this->weekly_rep;
             }
         }
-        //Increment weekly rep by amount if method requires incrementing
-        if($increment_weekly && $amount > 0 && $this->weekly_rep < $this->weekly_cap) {
-            $this->weekly_rep += $amount;
-        }
         //Increment pvp rep amount
-        if($increment_pvp) {
-            $this->pvp_rep += $maount;
+        if($increment_pvp && $amount > 0) {
+            $this->pvp_rep += $amount;
         }
         //Increment rep amount
         if($amount > 0) {
+            $this->weekly_rep += $amount;
             $this->rep += $amount;
         }
 
@@ -257,17 +253,11 @@ class UserReputation {
      * Decreases user rep by amount provided
      * If $decrement_weekly is enabled, this will also decrease weekly rep allowing for restricted methods to allow gains again
      */
-    public function subtractRep(int $amount, bool $decrement_weekly = false) {
+    public function subtractRep(int $amount) {
         $this->rep -= $amount;
         //TODO: TEMPORARY! Remove with negative reputation (outlaw update)
         if($this->rep < 0) {
             $this->rep = 0;
-        }
-        if($decrement_weekly && $this->weekly_rep > 0) {
-            $this->weekly_rep -= $amount;
-            if($this->weekly_rep < 0) {
-                $this->weekly_rep = 0;
-            }
         }
     }
 
