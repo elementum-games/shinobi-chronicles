@@ -185,18 +185,13 @@ class UserReputation {
         $this->recent_killer_ids = &$last_killer_ids;
 
         //Reset daily/weekly rep
-        if(self::PVP_REP_RESET_DAILY && time() - $this->last_pvp_rep_reset >= 86400) {
+        if(self::PVP_REP_RESET_DAILY && time() - $this->last_pvp_rep_reset >= 86400 && is_null($event)) {
             $this->resetPvpRep();
         }
         else {
             if(time() - $this->last_pvp_rep_reset >= 86400*7) {
                 $this->resetPvpRep();
             }
-        }
-
-        //Force weekly reputation for events
-        if(!is_null($event)) {
-            self::PVP_REP_RESET_DAILY = false;
         }
 
         //Load pvp kills/killer arrays
@@ -209,7 +204,7 @@ class UserReputation {
 
         $this->rank_name = self::nameByRepRank($this->rank); // Use method here for future proofing
         $this->weekly_cap = $REP_RANK['weekly_cap'];
-        $this->pvp_cap = (self::PVP_REP_RESET_DAILY) ? floor($REP_RANK['weekly_pvp_cap'] * self::PVP_WEEKLY_CONVERSION) : $REP_RANK['weekly_pvp_cap'];
+        $this->pvp_cap = (self::PVP_REP_RESET_DAILY && is_null($event)) ? floor($REP_RANK['weekly_pvp_cap'] * self::PVP_WEEKLY_CONVERSION) : $REP_RANK['weekly_pvp_cap'];
         $this->base_pvp_reward = $REP_RANK['base_pvp_rep_reward'];
     }
 
