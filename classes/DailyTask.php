@@ -21,23 +21,31 @@ class DailyTask {
     const DIFFICULTY_HARD = 'Hard';
 
     public static array $possible_task_names = [
-        'Zodiac of Solaris',
-        'Defend the Past',
-        'Call of Grace',
-        'The Shattered Corpse',
-        'Trap the Fury',
-        'The Obsidian Orb',
-        'Zodia Clock',
-        'Rats of the Frontline',
-        'The Grey Quarry',
-        'Something Immortal',
-        'The Beast in the West',
-        'Made for Error',
-        'Spare Parts',
-        'The Fall of the Orb',
-        'Cry of Menace',
-        'Breaking Rites',
-        'Conjured Moon',
+        DailyTask::ACTIVITY_PVP => [
+            'Defend the Past',
+            'The Beast in the West',
+            'Something Immortal',
+        ],
+        DailyTask::ACTIVITY_ARENA => [
+            'Zodiac of Solaris',
+            'The Shattered Corpse',
+            'Rats of the Frontline',
+        ],
+        DailyTask::ACTIVITY_MISSIONS => [
+            'Call of Grace',
+            'Made for Error',
+            'Codename RED',
+        ],
+        DailyTask::ACTIVITY_TRAINING => [
+            'Breaking Rites',
+            'Cry of Menace',
+            'Conjured Moon',
+        ],
+        DailyTask::ACTIVITY_EARN_MONEY => [
+            'The Grey Quarry',
+            'Hand of Midas',
+            'Fill the Coffers',
+        ],
     ];
 
     public static array $activity_labels = [
@@ -102,19 +110,6 @@ class DailyTask {
         return $dt_progress;
     }
 
-    public static function chooseTaskName(array $used_task_name_keys = []): string {
-        $possible_task_names = DailyTask::$possible_task_names;
-        foreach($used_task_name_keys as $utnk) {
-            unset($possible_task_names[$utnk]);
-        }
-        if(count($possible_task_names) < 1) {
-            $possible_task_names = DailyTask::$possible_task_names;
-        }
-
-        $task_name_key = array_rand($possible_task_names, 1);
-        return $possible_task_names[$task_name_key];
-    }
-
     public static function getPossibleTasks(int $user_rank): array {
         $possible_task_types = [
             DailyTask::ACTIVITY_PVP => [
@@ -163,7 +158,7 @@ class DailyTask {
         return $possible_task_types;
     }
 
-    public static function generateTask(User $user, string $task_activity, array $used_task_name_keys = []): DailyTask {
+    public static function generateTask(User $user, string $task_activity): DailyTask {
         // Generate new Daily Tasks if there's never been a new task or if 24hrs have ellapsed since last reset
 
         $possible_tasks = DailyTask::getPossibleTasks($user->rank_num);
@@ -173,8 +168,7 @@ class DailyTask {
         $sub_task_key = array_rand($task_config['sub_task'], 1);
         $sub_task = $task_config['sub_task'][$sub_task_key];
         $task_amount = mt_rand($task_config['min_amount'], $task_config['max_amount']);
-
-        $task_name = DailyTask::chooseTaskName($used_task_name_keys);
+        $task_name = DailyTask::$possible_task_names[$task_activity][array_rand(DailyTask::$possible_task_names[$task_activity], 1)];
 
         $mission_rank = 0;
         if($task_config['type'] == DailyTask::ACTIVITY_MISSIONS) {
