@@ -1260,42 +1260,49 @@ class User extends Fighter {
                     $gain = 100 - $this->bloodline->jutsu[$jutsu_id]->level;
                 }
 
-                    if ($this->bloodline->jutsu[$jutsu_id]->level < 100) {
-                        $new_level = $this->bloodline->jutsu[$jutsu_id]->level + $gain;
+	    	// Daily task
+		foreach ($this->daily_tasks as $task) {
+		    if (!$task->complete && $task->activity == DailyTask::ACTIVITY_TRAINING && $task->sub_task == DailyTask::SUB_TASK_JUTSU) {
+			$task->progress += $gain;
+		    }
+		}
 
-                        if ($new_level > 100) {
-                            $this->bloodline->jutsu[$jutsu_id]->level = 100;
-                        } else {
-                            $this->bloodline->jutsu[$jutsu_id]->level += $gain;
-                        }
-                        $message = $this->bloodline->jutsu[$jutsu_id]->name . " has increased to level " .
-                            $this->bloodline->jutsu[$jutsu_id]->level . '.';
-
-                        $jutsu_skill_type = $this->bloodline->jutsu[$jutsu_id]->jutsu_type . '_skill';
-                        if ($this->total_stats < $this->rank->stat_cap) {
-                            $this->{$jutsu_skill_type}++;
-                            $this->exp += 10;
-                            $message .= ' You have gained 1 ' . ucwords(str_replace('_', ' ', $jutsu_skill_type)) .
-                                ' and 10 experience.';
-                        }
-
-                        // Create notification
-                        $new_notification = new NotificationDto(
-                            type: "training_complete",
-                            message: "Training " . $this->bloodline->jutsu[$jutsu_id]->name . " Complete",
-                            user_id: $this->user_id,
-                            created: time(),
-                            alert: true,
-                        );
-                        NotificationManager::createNotification($new_notification, $this->system, NotificationManager::UPDATE_UNIQUE);
-
-                        $this->system->message($message);
-                        $this->system->printMessage();
-
-                        if (!$this->ban_type) {
-                            $this->updateInventory();
-                        }
-                    }
+	    	if ($this->bloodline->jutsu[$jutsu_id]->level < 100) {
+			$new_level = $this->bloodline->jutsu[$jutsu_id]->level + $gain;
+	
+			if ($new_level > 100) {
+			    $this->bloodline->jutsu[$jutsu_id]->level = 100;
+			} else {
+			    $this->bloodline->jutsu[$jutsu_id]->level += $gain;
+			}
+			$message = $this->bloodline->jutsu[$jutsu_id]->name . " has increased to level " .
+			    $this->bloodline->jutsu[$jutsu_id]->level . '.';
+	
+			$jutsu_skill_type = $this->bloodline->jutsu[$jutsu_id]->jutsu_type . '_skill';
+			if ($this->total_stats < $this->rank->stat_cap) {
+			    $this->{$jutsu_skill_type}++;
+			    $this->exp += 10;
+			    $message .= ' You have gained 1 ' . ucwords(str_replace('_', ' ', $jutsu_skill_type)) .
+				' and 10 experience.';
+			}
+	
+			// Create notification
+			$new_notification = new NotificationDto(
+			    type: "training_complete",
+			    message: "Training " . $this->bloodline->jutsu[$jutsu_id]->name . " Complete",
+			    user_id: $this->user_id,
+			    created: time(),
+			    alert: true,
+			);
+			NotificationManager::createNotification($new_notification, $this->system, NotificationManager::UPDATE_UNIQUE);
+	
+			$this->system->message($message);
+			$this->system->printMessage();
+	
+			if (!$this->ban_type) {
+			    $this->updateInventory();
+			}
+		    }
 
                 $this->train_time = 0;
             }
@@ -1310,6 +1317,13 @@ class User extends Fighter {
                 if($this->jutsu[$jutsu_id]->level + $gain > 100) {
                     $gain = 100 - $this->jutsu[$jutsu_id]->level;
                 }
+
+	    	// Daily task
+		foreach ($this->daily_tasks as $task) {
+		    if (!$task->complete && $task->activity == DailyTask::ACTIVITY_TRAINING && $task->sub_task == DailyTask::SUB_TASK_JUTSU) {
+			$task->progress += $gain;
+		    }
+		}
 
                 if($this->hasJutsu($jutsu_id)) {
                     if($this->jutsu[$jutsu_id]->level < 100) {
@@ -1377,6 +1391,13 @@ class User extends Fighter {
 
                 // Check caps
                 $gain_description = $this->addStatGain($this->train_type, $this->train_gain);
+
+	    	// Daily task
+		foreach ($this->daily_tasks as $task) {
+		    if (!$task->complete && $task->activity == DailyTask::ACTIVITY_TRAINING && $task->sub_task != DailyTask::SUB_TASK_JUTSU) {
+			$task->progress += $this->train_gain;
+		    }
+		}
 
                 $this->train_time = 0;
                 if($gain_description) {
@@ -1659,6 +1680,12 @@ class User extends Fighter {
      * @throws RuntimeException
      */
     public function addMoney(int $amount, string $description) {
+    	// Daily Tasks
+        foreach ($this->daily_tasks as $task) {
+            if (!$task->complete && $task->activity == DailyTask::ACTIVITY_EARN_MONEY && $task->sub_task == DailyTask::SUB_TASK_EARN) {
+                $task->progress += $amount;
+            }
+        }
         $this->setMoney($this->money + $amount, $description);
     }
 
