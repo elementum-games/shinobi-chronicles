@@ -1263,7 +1263,9 @@ class User extends Fighter {
                 // Daily task
                 foreach ($this->daily_tasks as $task) {
                     if (!$task->complete && $task->activity == DailyTask::ACTIVITY_TRAINING && $task->sub_task == DailyTask::SUB_TASK_JUTSU) {
-                        $task->progress += $gain;
+                        if(str_contains($this->train_type, 'jutsu:')) {
+                            $task->progress += $gain;
+                        }
                     }
                 }
 
@@ -1322,7 +1324,9 @@ class User extends Fighter {
                 // Daily task
                 foreach ($this->daily_tasks as $task) {
                     if (!$task->complete && $task->activity == DailyTask::ACTIVITY_TRAINING && $task->sub_task == DailyTask::SUB_TASK_JUTSU) {
-                        $task->progress += $gain;
+                        if(str_contains($this->train_type, 'jutsu:')) {
+                            $task->progress += $gain;
+                        }
                     }
                 }
 
@@ -1395,15 +1399,14 @@ class User extends Fighter {
 
                 // Daily task
                 foreach ($this->daily_tasks as $task) {
-                    if (!$task->complete && !str_contains($this->train_type, 'jutsu:')) {
+                    if (!$task->complete && $task->activity == DailyTask::ACTIVITY_TRAINING && !str_contains($this->train_type, 'jutsu:')) {
                         $progress_task = false;
                         // Skill training task
-                        $skill_task = $task->sub_task === DailyTask::SUB_TASK_SKILL;
-                        if($skill_task && str_contains($this->train_type, 'skill')) {
+                        if($task->sub_task === DailyTask::SUB_TASK_SKILL && str_contains($this->train_type, 'skill')) {
                             $progress_task = true;
                         }
                         // Attribute task
-                        if(!$skill_task && !str_contains($this->train_type, 'skill')) {
+                        if($task->sub_task === DailyTask::SUB_TASK_GEN && !str_contains($this->train_type, 'skill')) {
                             $progress_task = true;
                         }
 
