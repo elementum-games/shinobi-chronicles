@@ -1697,11 +1697,13 @@ class User extends Fighter {
     /**
      * @throws RuntimeException
      */
-    public function addMoney(int $amount, string $description) {
+    public function addMoney(int $amount, string $description, $increment_daily_task = true) {
     	// Daily Tasks
         foreach ($this->daily_tasks as $task) {
             if (!$task->complete && $task->activity == DailyTask::ACTIVITY_EARN_MONEY && $task->sub_task == DailyTask::SUB_TASK_EARN) {
-                $task->progress += $amount;
+                if($increment_daily_task) {
+                    $task->progress += $amount;
+                }
             }
         }
         $this->setMoney($this->money + $amount, $description);
