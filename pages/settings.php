@@ -332,8 +332,8 @@ function userSettings() {
     $avatar_frame = $player->getAvatarFrame();
     $avatar_frames = ['avy_frame_default' => 'Default', 'avy_frame_none' => 'None', 'avy_frame_shadow' => 'Shadow'];
     $enable_alerts = $player->getEnableAlerts();
-    $card_link = $player->getCardImage();
-    $banner_link = $player->getBannerImage();
+    $card_image = $player->getCardImage();
+    $banner_image = $player->getBannerImage();
     $supported_colors = $player->getNameColors();
     $user_color = '';
     if (isset($supported_colors[$player->chat_color])) {
