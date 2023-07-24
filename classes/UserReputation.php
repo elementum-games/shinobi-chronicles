@@ -136,7 +136,7 @@ class UserReputation {
             DailyTask::ACTIVITY_PVP => 15,
         ],
     ];
-    const DECAY_MODIFIER = 0.65;
+    const DECAY_MODIFIER = 0.65; // Reduce reputation decay by 35% if weekly cap is met
 
     const PVP_REP_ENABLED = true;
     const RECENT_PLAYER_KILL_THRESHOLD = 3600; // Only kills within last hour will mitigate pvp rep gains
