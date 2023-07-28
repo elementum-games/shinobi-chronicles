@@ -114,6 +114,7 @@ $sim_data = array(
     'decay_modifier' => UserReputation::DECAY_MODIFIER * 100,
     'pvp_daily_con' => UserReputation::PVP_WEEKLY_CONVERSION * 100,
     'reputation_data' => UserReputation::$VillageRep,
+    'run_player_types' => RepPlayer::$player_types,
 );
 
 function runRepSimulation(&$data, $sim_data, &$debug_data, $weeks = 4) {
@@ -131,7 +132,9 @@ function runRepSimulation(&$data, $sim_data, &$debug_data, $weeks = 4) {
     }
 
     foreach(RepPlayer::$player_types as $type) {
-        $data[] = new RepPlayer($type);
+        if(in_array($type, $sim_data['run_player_types'])) {
+            $data[] = new RepPlayer($type);
+        }
     }
 
     for($i=1;$i<=$weeks;$i++) {
@@ -324,6 +327,22 @@ if(isset($_POST['run_sim'])) {
         $sim_data['reputation_data'][$rank_id]['weekly_cap'] = (int)$_POST[$rank_id.'_weekly_cap'];
         $sim_data['reputation_data'][$rank_id]['weekly_pvp_cap'] = (int)$_POST[$rank_id.'_pvp_cap'];
         $sim_data['reputation_data'][$rank_id]['base_decay'] = (int)$_POST[$rank_id.'_base_decay'];
+    }
+
+    // Player types to run
+    if(empty($_POST['run_player_types'])) {
+        $error = "You must select a player type!";
+    }
+    else {
+        foreach($_POST['run_player_types'] as $type) {
+            if(!in_array($type, RepPlayer::$player_types)) {
+                $error = "Invalid player type $type";
+            }
+        }
+
+        if($error == null) {
+            $sim_data['run_player_types'] = $_POST['run_player_types'];
+        }
     }
 
     if($error == null) {
@@ -548,7 +567,7 @@ if(isset($_POST['run_sim'])) {
                     <label>Weeks:</label><input type="text" name="weeks" value="<?=$sim_data['weeks']?>" /><br />
                     <?php foreach($sim_data['player_types'] as $player_type): ?>
                         <div class="playerData">
-                            <p class="header <?=$player_type?>"><?=System::unSlug($player_type)?> Player</p>
+                            <p class="header <?=$player_type?>"><input type="checkbox" name="run_player_types[]" value="<?=$player_type?>" <?=(in_array($player_type, $sim_data['run_player_types']) ? 'checked' : '')?>/><?=System::unSlug($player_type)?> Player</p>
                             <label class="indent lrg">Weekly Cap Rate:</label><input type="text" name="<?=$player_type?>_weekly_cap_rate"
                                 value="<?=$sim_data['weekly_cap_rates'][$player_type]?>"/><br />
                             <label class="indent lrg">PvP Cap Rate:</label><input type="text" name="<?=$player_type?>_pvp_cap_rate"
