@@ -142,6 +142,7 @@ class UserReputation {
             DailyTask::ACTIVITY_PVP => 15,
         ],
     ];
+    const DAILY_TASK_BYPASS_CAP = true;
     const DECAY_MODIFIER = 0.65; // Reduce reputation decay by 35% if weekly cap is met
 
     const PVP_REP_ENABLED = true;
@@ -234,12 +235,13 @@ class UserReputation {
                 $amount = $weekly_cap - $this->weekly_rep;
             }
         }
-        //Increment pvp rep amount
-        if($increment_pvp && $amount > 0) {
-            $this->pvp_rep += $amount;
-        }
+
         //Increment rep amount
         if($amount > 0) {
+            // Increment pvp
+            if($increment_pvp) {
+                $this->pvp_rep += $amount;
+            }
             $this->weekly_rep += $amount;
             $this->rep += $amount;
         }
@@ -525,6 +527,7 @@ class UserReputation {
                 return $rank;
             }
         }
+        return 1;
     }
 }
 

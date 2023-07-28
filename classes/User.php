@@ -710,7 +710,7 @@ class User extends Fighter {
                     $this->addMoney($task->reward, "Completed daily task");
                     $task_message = "You have completed {$task->name} and earned &yen;{$task->reward}";
 
-                    $rep_gain = $this->reputation->addRep($task->rep_reward, true);
+                    $rep_gain = $this->reputation->addRep($task->rep_reward, UserReputation::DAILY_TASK_BYPASS_CAP);
                     if($rep_gain > 0) {
                         $task_message .= " and $rep_gain Reputation";
                     }
