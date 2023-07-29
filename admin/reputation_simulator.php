@@ -63,6 +63,12 @@ class RepPlayer {
         self::TYPE_ABOVE_AVERAGE => 60,
         self::TYPE_NIGHTMARE => 100,
     ];
+    const PVP_DAYS_IF_NOT_COMPLETED = [
+        self::TYPE_CASUAL => 1.5,
+        self::TYPE_AVERAGE => 2.5,
+        self::TYPE_ABOVE_AVERAGE => 4,
+        self::TYPE_NIGHTMARE => 7,
+    ];
     const DAILY_COMPLETE_RATE = [
         self::TYPE_CASUAL => 30,
         self::TYPE_AVERAGE => 55,
@@ -108,6 +114,7 @@ $sim_data = array(
     'player_types' => RepPlayer::$player_types,
     'weekly_cap_rates' => RepPlayer::WEEKLY_CAP_RATE,
     'weekly_pvp_rates' => RepPlayer::PVP_CAP_RATE,
+    'pvp_days_not_capped' => RepPlayer::PVP_DAYS_IF_NOT_COMPLETED,
     'daily_comp_rate' => RepPlayer::DAILY_COMPLETE_RATE,
     'daily_task_bypass' => UserReputation::DAILY_TASK_BYPASS_CAP,
     'average_weekly_daily' => 140,
@@ -153,7 +160,8 @@ function runRepSimulation(&$data, $sim_data, &$debug_data, $weeks = 4) {
                     $rep_user->reputation->addRep($rep_user->reputation->weekly_cap);
                     $rep_user->total_rep_earned += $rep_user->reputation->weekly_cap;
                     $weekly_rep_amount = $rep_user->reputation->weekly_cap;
-                } else {
+                }
+                else {
                     $weekly_cap = mt_rand(1, $sim_data['weekly_cap_rates'][$rep_user->type]);
                     $weekly_rep_amount = $rep_user->reputation->weekly_cap * ($weekly_cap / 100);
                     if ($sim_data['debug']) {
@@ -175,7 +183,8 @@ function runRepSimulation(&$data, $sim_data, &$debug_data, $weeks = 4) {
                     if ($sim_data['debug']) {
                         $debug_data[$rep_user->type][$i]['daily_tasks'] = "Earned a full amount of reputation from daily tasks ($daily_task_amount).";
                     }
-                } else {
+                }
+                else {
                     //Simulate 7 - 21 daily tasks completed
                     $amount_per_task = $sim_data['average_weekly_daily'] / 21;
                     $tasks_completed = mt_rand(7, 21);
@@ -206,7 +215,8 @@ function runRepSimulation(&$data, $sim_data, &$debug_data, $weeks = 4) {
                     if ($sim_data['debug']) {
                         $debug_data[$rep_user->type][$i]['pvp'] = "Earned a full amount of reputation from pvp ($rep_gain).";
                     }
-                } else {
+                }
+                else {
                     // Calculate pvp weekly cap into 7 days
                     $rep_cap = ceil($rep_user->reputation->pvp_cap / 7);
                     // Daily Rep cap
@@ -214,19 +224,14 @@ function runRepSimulation(&$data, $sim_data, &$debug_data, $weeks = 4) {
                         $rep_cap = ceil($rep_user->reputation->pvp_cap * ($sim_data['pvp_daily_con'] / 100));
                     }
 
-                    // Simulate 1 - 7 days of pvp cap being met
-                    $days_completed = mt_rand(2, 4));
-                    $rep_gain = $rep_cap * $days_completed;
-
-                    //Reduce more for casual players
-                    if($sim_data['weekly_pvp_rates'][$rep_user->type] <= 50) {
-                        $rep_gain = floor($rep_gain * mt_rand(0.65, 0.8));
-                    }
+                    // Calc reputation gained
+                    $days_completed = $sim_data['pvp_days_not_capped'][$rep_user->type];
+                    $rep_gain = ceil($rep_cap * $days_completed);
 
                     $rep_gain = $rep_user->reputation->addRep($rep_gain, true, true);
                     $rep_user->total_rep_earned += $rep_gain;
                     if ($sim_data['debug']) {
-                        $debug_data[$rep_user->type][$i]['pvp'] = "Did not earn a full amount of reputation from pvp ($rep_gain).";
+                        $debug_data[$rep_user->type][$i]['pvp'] = "Did not earn a full amount of reputation from pvp ($rep_gain) over $days_completed days.";
                     }
                 }
 
@@ -308,6 +313,7 @@ if(isset($_POST['run_sim'])) {
     foreach($sim_data['player_types'] as $p_type) {
         $sim_data['weekly_cap_rates'][$p_type] = (int)$_POST[$p_type.'_weekly_cap_rate'];
         $sim_data['weekly_pvp_rates'][$p_type] = (int)$_POST[$p_type.'_pvp_cap_rate'];
+        $sim_data['pvp_days_not_capped'][$p_type] = (float)$_POST[$p_type.'_pvp_days'];
         $sim_data['daily_comp_rate'][$p_type] = (int)$_POST[$p_type.'_daily_comp_rate'];
     }
     // Reputation data
@@ -576,6 +582,8 @@ if(isset($_POST['run_sim'])) {
                                 value="<?=$sim_data['weekly_cap_rates'][$player_type]?>"/><br />
                             <label class="indent lrg">PvP Cap Rate:</label><input type="text" name="<?=$player_type?>_pvp_cap_rate"
                                 value="<?=$sim_data['weekly_pvp_rates'][$player_type]?>"/>
+                            <label class="indent lrg">PvP Days<div class="tool-tip" title="Number of days capped if pvp is comopleted for full week">!</div>:</label><input type="text" name="<?=$player_type?>_pvp_days"
+                                value="<?=$sim_data['pvp_days_not_capped'][$player_type]?>"/>
                             <label class="indent lrg">Daily Comp Rate:</label><input type="text" name="<?=$player_type?>_daily_comp_rate"
                                 value="<?=$sim_data['daily_comp_rate'][$player_type]?>"/>
                         </div>
