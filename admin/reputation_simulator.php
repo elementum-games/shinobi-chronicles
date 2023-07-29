@@ -207,21 +207,20 @@ function runRepSimulation(&$data, $sim_data, &$debug_data, $weeks = 4) {
                         $debug_data[$rep_user->type][$i]['pvp'] = "Earned a full amount of reputation from pvp ($rep_gain).";
                     }
                 } else {
-                    $pvp_cap = mt_rand(1, $sim_data['weekly_pvp_rates'][$rep_user->type]);
                     // Calculate pvp weekly cap into 7 days
-                    $rep_cap = $rep_user->reputation->pvp_cap / 7;
+                    $rep_cap = ceil($rep_user->reputation->pvp_cap / 7);
                     // Daily Rep cap
                     if ($sim_data['daily_pvp_cap']) {
-                        $rep_cap = $rep_user->reputation->pvp_cap * ($sim_data['pvp_daily_con'] / 100);
+                        $rep_cap = ceil($rep_user->reputation->pvp_cap * ($sim_data['pvp_daily_con'] / 100));
                     }
 
                     // Simulate 1 - 7 days of pvp cap being met
-                    $days_completed = mt_rand(1, ceil($pvp_cap / 100 * 7));
+                    $days_completed = mt_rand(2, 4));
                     $rep_gain = $rep_cap * $days_completed;
 
-                    // A bit more randomness for 1 or 2 days
-                    if ($days_completed <= 2) {
-                        $rep_gain += ceil(mt_rand(1, 3) * ($rep_cap * mt_rand(0.45, 0.85)));
+                    //Reduce more for casual players
+                    if($sim_data['weekly_pvp_rates'][$rep_user->type] <= 50) {
+                        $rep_gain = floor($rep_gain * mt_rand(0.65, 0.8));
                     }
 
                     $rep_gain = $rep_user->reputation->addRep($rep_gain, true, true);
@@ -343,6 +342,11 @@ if(isset($_POST['run_sim'])) {
         if($error == null) {
             $sim_data['run_player_types'] = $_POST['run_player_types'];
         }
+    }
+
+    // Disable on production
+    if($system->environment != System::ENVIRONMENT_DEV) {
+        $error = "This script may only be ran on a development/local environment (due to the potential to modify UserReptuation)!";
     }
 
     if($error == null) {
