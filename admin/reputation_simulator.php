@@ -75,6 +75,12 @@ class RepPlayer {
         self::TYPE_ABOVE_AVERAGE => 80,
         self::TYPE_NIGHTMARE => 100,
     ];
+    const DAILY_TASKS_IF_NOT_CAPPED = [
+        self::TYPE_CASUAL => 7,
+        self::TYPE_AVERAGE => 10,
+        self::TYPE_ABOVE_AVERAGE => 14,
+        self::TYPE_NIGHTMARE => 21,
+    ];
 
     public string $type;
     public string $name;
@@ -116,8 +122,11 @@ $sim_data = array(
     'weekly_pvp_rates' => RepPlayer::PVP_CAP_RATE,
     'pvp_days_not_capped' => RepPlayer::PVP_DAYS_IF_NOT_COMPLETED,
     'daily_comp_rate' => RepPlayer::DAILY_COMPLETE_RATE,
+    'daily_tasks_if_not_capped' => RepPlayer::DAILY_TASKS_IF_NOT_CAPPED,
     'daily_task_bypass' => UserReputation::DAILY_TASK_BYPASS_CAP,
-    'average_weekly_daily' => 140,
+    'average_daily_easy' => 2,
+    'average_daily_med' => 5,
+    'average_daily_hard' => 9,
     'decay_modifier' => UserReputation::DECAY_MODIFIER * 100,
     'pvp_daily_con' => UserReputation::PVP_WEEKLY_CONVERSION * 100,
     'reputation_data' => UserReputation::$VillageRep,
@@ -162,8 +171,7 @@ function runRepSimulation(&$data, $sim_data, &$debug_data, $weeks = 4) {
                     $weekly_rep_amount = $rep_user->reputation->weekly_cap;
                 }
                 else {
-                    $weekly_cap = mt_rand(1, $sim_data['weekly_cap_rates'][$rep_user->type]);
-                    $weekly_rep_amount = $rep_user->reputation->weekly_cap * ($weekly_cap / 100);
+                    $weekly_rep_amount = $rep_user->reputation->weekly_cap * ($sim_data['weekly_cap_rates'][$rep_user->type] / 100);
                     if ($sim_data['debug']) {
                         $debug_data[$rep_user->type][$i]['weekly_cap_data'] = "Did not cap weekly through non-daily means ($weekly_rep_amount).";
                     }
@@ -178,22 +186,44 @@ function runRepSimulation(&$data, $sim_data, &$debug_data, $weeks = 4) {
             if($sim_data['daily_comp_rate'][$rep_user->type] > 0) {
                 $daily_cap = mt_rand(1, 100);
                 if ($daily_cap <= $sim_data['daily_comp_rate'][$rep_user->type]) {
-                    $daily_task_amount = $rep_user->reputation->addRep($sim_data['average_weekly_daily'], $sim_data['daily_task_bypass']);
+                    $rep_gain = ($sim_data['average_daily_easy'] + $sim_data['average_daily_med'] + $sim_data['average_daily_hard']) * 7;
+                    $daily_task_amount = $rep_user->reputation->addRep($rep_gain, $sim_data['daily_task_bypass']);
                     $rep_user->total_rep_earned += $daily_task_amount;
                     if ($sim_data['debug']) {
                         $debug_data[$rep_user->type][$i]['daily_tasks'] = "Earned a full amount of reputation from daily tasks ($daily_task_amount).";
                     }
                 }
                 else {
-                    //Simulate 7 - 21 daily tasks completed
-                    $amount_per_task = $sim_data['average_weekly_daily'] / 21;
-                    $tasks_completed = mt_rand(7, 21);
-                    $amount_to_add = $tasks_completed * $amount_per_task;
+                    $tasks_completed = $sim_data['daily_tasks_if_not_capped'][$rep_user->type];
+                    if($tasks_completed == 0) {
+                        $tasks_completed = 1;
+                    }
 
-                    $daily_task_amount = $rep_user->reputation->addRep($amount_to_add, $sim_data['daily_task_bypass']);
+                    $total_completed = 0;
+                    //Hard tasks
+                    $hard_tasks_completed = ($tasks_completed / 4 > 1) ? floor($tasks_completed / 4) : 1;
+                    $total_completed += $hard_tasks_completed;
+
+                    $medium_tasks_completed = (($tasks_completed - $total_completed) / 3 > 1) ? floor($tasks_completed / 3) : 1;
+                    $total_completed += $medium_tasks_completed;
+                    if($total_completed > $tasks_completed) {
+                        $medium_tasks_completed = $total_completed - $hard_tasks_completed;
+                        $total_completed = $tasks_completed;
+                    }
+
+                    $easy_tasks_completed = 0;
+                    if($total_completed < $tasks_completed) {
+                        $easy_tasks_completed = $tasks_completed - $total_completed;
+                    }
+
+                    $rep_gain = ($easy_tasks_completed * $sim_data['average_daily_easy']) +
+                        ($medium_tasks_completed * $sim_data['average_daily_med']) +
+                        ($hard_tasks_completed * $sim_data['average_daily_hard']);
+
+                    $daily_task_amount = $rep_user->reputation->addRep($rep_gain, $sim_data['daily_task_bypass']);
                     $rep_user->total_rep_earned += $daily_task_amount;
                     if ($sim_data['debug']) {
-                        $debug_data[$rep_user->type][$i]['daily_tasks'] = "Did not earn a full amount of reputation from daily tasks ($daily_task_amount).";
+                        $debug_data[$rep_user->type][$i]['daily_tasks'] = "Did not earn a full amount of reputation from daily tasks ($daily_task_amount) in $tasks_completed tasks.";
                     }
                 }
                 // Run rep rank update
@@ -304,7 +334,9 @@ if(isset($_POST['run_sim'])) {
     $sim_data['debug'] = isset($_POST['debug']);
     $sim_data['decay_modifier'] = $decay_mod;
     $sim_data['pvp_daily_con'] = $pvp_con;
-    $sim_data['average_weekly_daily'] = (int)$_POST['average_weekly_daily'];
+    $sim_data['average_daily_easy'] = (float)$_POST['average_daily_easy'];
+    $sim_data['average_daily_med'] = (float)$_POST['average_daily_med'];
+    $sim_data['average_daily_hard'] = (float)$_POST['average_daily_hard'];
     $sim_data['show_weekly_data'] = isset($_POST['show_weekly_data']);
     $sim_data['daily_pvp_cap'] = isset($_POST['daily_pvp_cap']);
     $sim_data['daily_task_bypass'] = isset($_POST['daily_task_bypass']);
@@ -315,6 +347,7 @@ if(isset($_POST['run_sim'])) {
         $sim_data['weekly_pvp_rates'][$p_type] = (int)$_POST[$p_type.'_pvp_cap_rate'];
         $sim_data['pvp_days_not_capped'][$p_type] = (float)$_POST[$p_type.'_pvp_days'];
         $sim_data['daily_comp_rate'][$p_type] = (int)$_POST[$p_type.'_daily_comp_rate'];
+        $sim_data['daily_tasks_if_not_capped'][$p_type] = (int)$_POST[$p_type.'_daily_tasks'];
     }
     // Reputation data
     foreach($sim_data['reputation_data'] as $rank_id => $tier) {
@@ -573,19 +606,23 @@ if(isset($_POST['run_sim'])) {
                     <label>Daily Bypass<div class="tool-tip" title="Daily tasks will bypass weekly caps">!</div>:</label><input type="checkbox" name="daily_task_bypass" <?=($sim_data['daily_task_bypass'] ? 'checked' : '')?> /><br />
                     <label>Decay Mod<div class="tool-tip" title="Rate at which decay is reduced for meeting weekly cap">!</div>:</label><input type="text" name="decay_modifier" value="<?=$sim_data['decay_modifier']?>" /><br />
                     <label>PvP Daily Con<div class="tool-tip" title="Rate at which weekly pvp cap is reduced for daily reset">!</div>:</label><input type="text" name="pvp_daily_con" value="<?=$sim_data['pvp_daily_con']?>" /><br />
-                    <label>Avg Dly Amnt<div class="tool-tip" title="Average amount of daily rep rewarded per week for completing ALL daily tasks EVERY DAY">!</div>:</label><input type="text" name="average_weekly_daily" value="<?=$sim_data['average_weekly_daily']?>" /><br />
+                    <label>Avg Dly Easy<div class="tool-tip" title="Average amount of daily rep rewarded per easy task">!</div>:</label><input type="text" name="average_daily_easy" value="<?=$sim_data['average_daily_easy']?>" /><br />
+                    <label>Avg Dly Med<div class="tool-tip" title="Average amount of daily rep rewarded per medium task">!</div>:</label><input type="text" name="average_daily_med" value="<?=$sim_data['average_daily_med']?>" /><br />
+                    <label>Avg Dly Hard<div class="tool-tip" title="Average amount of daily rep rewarded per hard task">!</div>:</label><input type="text" name="average_daily_hard" value="<?=$sim_data['average_daily_hard']?>" /><br />
                     <label>Weeks:</label><input type="text" name="weeks" value="<?=$sim_data['weeks']?>" /><br />
                     <?php foreach($sim_data['player_types'] as $player_type): ?>
                         <div class="playerData">
                             <p class="header <?=$player_type?>"><input type="checkbox" name="run_player_types[]" value="<?=$player_type?>" <?=(in_array($player_type, $sim_data['run_player_types']) ? 'checked' : '')?>/><?=System::unSlug($player_type)?> Player</p>
-                            <label class="indent lrg">Weekly Cap Rate:</label><input type="text" name="<?=$player_type?>_weekly_cap_rate"
-                                value="<?=$sim_data['weekly_cap_rates'][$player_type]?>"/><br />
-                            <label class="indent lrg">PvP Cap Rate:</label><input type="text" name="<?=$player_type?>_pvp_cap_rate"
-                                value="<?=$sim_data['weekly_pvp_rates'][$player_type]?>"/>
-                            <label class="indent lrg">PvP Days<div class="tool-tip" title="Number of days capped if pvp is comopleted for full week">!</div>:</label><input type="text" name="<?=$player_type?>_pvp_days"
-                                value="<?=$sim_data['pvp_days_not_capped'][$player_type]?>"/>
-                            <label class="indent lrg">Daily Comp Rate:</label><input type="text" name="<?=$player_type?>_daily_comp_rate"
-                                value="<?=$sim_data['daily_comp_rate'][$player_type]?>"/>
+                            <label class="indent lrg">Weekly Rate<div class="tool-tip" title="Percent rate at which weekly rep is capped. Setting this to 0 will disable it">!</div>:</label>
+                                <input type="text" name="<?=$player_type?>_weekly_cap_rate" value="<?=$sim_data['weekly_cap_rates'][$player_type]?>"/><br />
+                            <label class="indent lrg">PvP Rate<div class="tool-tip" title="Percent rate at which pvp rep is capped. Setting this to 0 will disable it">!</div>:</label>
+                                <input type="text" name="<?=$player_type?>_pvp_cap_rate" value="<?=$sim_data['weekly_pvp_rates'][$player_type]?>"/>
+                            <label class="indent lrg">PvP Days<div class="tool-tip" title="Number of days capped if pvp is not completed for full week">!</div>:</label>
+                                <input type="text" name="<?=$player_type?>_pvp_days" value="<?=$sim_data['pvp_days_not_capped'][$player_type]?>"/>
+                            <label class="indent lrg">Daily Rate<div class="tool-tip" title="Percent rate at which daily tasks are completed. Setting this to 0 will disable it">!</div>:</label>
+                                <input type="text" name="<?=$player_type?>_daily_comp_rate" value="<?=$sim_data['daily_comp_rate'][$player_type]?>"/>
+                            <label class="indent lrg">Daily Tasks<div class="tool-tip" title="Number of tasks completed per week if weekly cap is not met">!</div>:</label>
+                                <input type="text" name="<?=$player_type?>_daily_tasks" value="<?=$sim_data['daily_tasks_if_not_capped'][$player_type]?>"/>
                         </div>
                     <?php endforeach ?>
                     <?php foreach($sim_data['reputation_data'] as $rank_id => $reputation_datum): ?>
