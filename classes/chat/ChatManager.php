@@ -162,7 +162,7 @@ class ChatManager {
             $post->message = nl2br($this->system->html_parse($post->message, false, true));
 
             // Handle Mention
-            $pattern = "/@([^ \n\s!?.<>:@\[\]()]+)(?=[^A-Za-z0-9_]|$)/";
+            $pattern = "/@([^ \n\s!?.<>:@*\/\\\\[\]()]+)(?=[^A-Za-z0-9_]|$)/";
             $has_mention = preg_match_all($pattern, $post->message, $matches);
             $mention_count = 0;
             if ($has_mention) {
