@@ -20,6 +20,18 @@ class ForbiddenShopManager {
 
         $forbidden_jutsu = $this->getEventJutsu();
 
+        // Check if player has fobidden jutsu
+        $learned_jutsu = false;
+        $jutsu_scroll = false;
+        foreach($forbidden_jutsu as $fj_id => $fj) {
+            if($this->player->hasJutsu($fj_id)) {
+                $learned_jutsu = $fj;
+            }
+            if(isset($this->player->jutsu_scrolls[$fj_id])) {
+                $jutsu_scroll = $fj;
+            }
+        }
+
         // Check if jutsu exists
         if(!isset($forbidden_jutsu[$jutsu_id])) {
             throw new RuntimeException("Invalid jutsu!");
@@ -36,8 +48,23 @@ class ForbiddenShopManager {
             throw new RuntimeException("You have already learned this jutsu!");
         }
 
-        // Check for money requirement
+        // Check for money requirement or process exchange
         if($this->player->itemQuantity(LanternEvent::$static_item_ids['forbidden_jutsu_scroll_id']) < $jutsu->purchase_cost) {
+            // Has forbidden jutsu or scroll - allow exchange
+            if($learned_jutsu || $jutsu_scroll) {
+                if($learned_jutsu) {
+                    $this->player->removeJutsu($learned_jutsu->id);
+                    $remove_text = "You have forgotten {$learned_jutsu->name} ";
+                }
+                else {
+                    unset($this->player->jutsu_scrolls[$jutsu_scroll->id]);
+                    $remove_text = "You have exchanged {$jutsu_scroll->name} scroll ";
+                }
+                $this->player->jutsu_scrolls[$jutsu_id] = $jutsu;
+                $this->player->updateInventory();
+                return $remove_text . "in exchange for {$jutsu->name}!";
+            }
+            // Does not have scroll or forbidden jutsu/scroll to exchange
             throw new RuntimeException("You do not have enough forbidden jutsu scrolls!");
         }
 
