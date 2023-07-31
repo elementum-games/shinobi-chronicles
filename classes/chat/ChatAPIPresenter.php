@@ -68,7 +68,7 @@ class ChatAPIPresenter {
         array $posts,
         ?int $previous_page_post_id,
         ?int $next_page_post_id,
-        int $latest_post_id
+        ?int $latest_post_id
     ): array {
         return [
             'posts' => array_map(function(ChatPostDto $post) use($system) {
