@@ -227,7 +227,7 @@ class ChatManager {
     public function submitPost(string $message) {
         $chat_max_post_length = $this->maxPostLength();
 
-        $message_length = strlen(preg_replace('/[\\n\\r]+/', '', trim($message)));
+        $message_length = strlen(preg_replace('/(\\\\[rn])+/', '', trim($message)));
 
         try {
             $result = $this->system->db->query(
