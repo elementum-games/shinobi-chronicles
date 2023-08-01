@@ -1560,9 +1560,12 @@ class User extends Fighter {
         }
     }
 
-    /* function useJutsu
-        pool check, calc exp, etc */
-    public function useJutsu(Jutsu $jutsu): ActionResult {
+    /**
+     * @param Jutsu $jutsu
+     * @param float $resource_cost_multiplier
+     * @return ActionResult
+     */
+    public function useJutsu(Jutsu $jutsu, float $resource_cost_multiplier = 1.0): ActionResult {
         switch($jutsu->jutsu_type) {
             case 'ninjutsu':
             case 'genjutsu':
@@ -1575,7 +1578,9 @@ class User extends Fighter {
                 return ActionResult::failed("Invalid energy type!");
         }
 
-        if($this->{$energy_type} < $jutsu->use_cost) {
+        $jutsu_use_cost = ceil($jutsu->use_cost * $resource_cost_multiplier);
+
+        if($this->{$energy_type} < $jutsu_use_cost) {
             return ActionResult::failed("You do not have enough $energy_type!");
         }
 
@@ -1604,7 +1609,7 @@ class User extends Fighter {
                     }
                 }
 
-                $this->{$energy_type} -= $jutsu->use_cost;
+                $this->{$energy_type} -= $jutsu_use_cost;
                 break;
             case Jutsu::PURCHASE_TYPE_BLOODLINE:
                 if($this->bloodline->jutsu[$jutsu->id]->level < 100) {
@@ -1617,10 +1622,10 @@ class User extends Fighter {
                     }
                 }
 
-                $this->{$energy_type} -= $jutsu->use_cost;
+                $this->{$energy_type} -= $jutsu_use_cost;
                 break;
             case Jutsu::PURCHASE_TYPE_DEFAULT:
-                $this->{$energy_type} -= $jutsu->use_cost;
+                $this->{$energy_type} -= $jutsu_use_cost;
                 break;
 
             default:
