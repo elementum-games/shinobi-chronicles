@@ -60,7 +60,7 @@ class Mission {
         $this->mission_id = $mission_data['mission_id'];
         $this->name = $mission_data['name'];
         $this->rank = $mission_data['rank'];
-        $this->mission_type = $mission_data['mission_type'];
+        $this->mission_type = (int) $mission_data['mission_type'];
         $this->money = $mission_data['money'];
         $this->rewards = json_decode($mission_data['rewards'], true);
 
@@ -139,11 +139,13 @@ class Mission {
         if($this->current_stage['action_type'] == 'travel' || $this->current_stage['action_type'] == 'search') {
             for($i = 0; $i < 3; $i++) {
                 // if basic mission and first stage, use village as root
-                if ($stage_id == 0 && $this->mission_type != $this::TYPE_EVENT) {
+                if ($stage_id == 1 && $this->mission_type != $this::TYPE_EVENT) {
                     $location = $this->rollLocation($this->player->village_location);
                 }
                 // otherwise, use player current location
-                $location = $this->rollLocation($this->player->location);
+                else {
+                    $location = $this->rollLocation($this->player->location);
+                }
                 if(!isset($villages[$location->fetchString()]) || $location->equals($this->player->village_location)) {
                     break;
                 }
