@@ -138,7 +138,12 @@ class Mission {
 
         if($this->current_stage['action_type'] == 'travel' || $this->current_stage['action_type'] == 'search') {
             for($i = 0; $i < 3; $i++) {
-                $location = $this->rollLocation($this->player->village_location);
+                // if basic mission and first stage, use village as root
+                if ($stage_id == 0 && $this->mission_type != $this::TYPE_EVENT) {
+                    $location = $this->rollLocation($this->player->village_location);
+                }
+                // otherwise, use player current location
+                $location = $this->rollLocation($this->player->location);
                 if(!isset($villages[$location->fetchString()]) || $location->equals($this->player->village_location)) {
                     break;
                 }
