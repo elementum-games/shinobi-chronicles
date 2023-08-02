@@ -483,7 +483,7 @@ $clan_positions = [
 
 <?php
     $dt_time_remaining = System::timeRemaining(
-        time_remaining: $player->daily_tasks_reset + (60 * 60 * 24) - time(),
+        time_remaining: $player->daily_tasks->last_reset + UserDailyTasks::TASK_RESET - time(),
         format: 'short',
         include_days: false,
         include_seconds: true
@@ -494,7 +494,7 @@ $clan_positions = [
     <h2 class='contentDivHeader'>Daily Tasks</h2>
 
     <div id='dailyTaskWrapper'>
-        <?php foreach($player->daily_tasks as $daily_task): ?>
+        <?php foreach($player->daily_tasks->tasks as $daily_task): ?>
             <?php
                 $dt_status_class_name = ($daily_task->complete ? 'Complete' : 'NotComplete');
             ?>
@@ -534,7 +534,7 @@ $clan_positions = [
     </div>
 
     <script type='text/javascript'>
-        let stringValue = <?= ($player->daily_tasks_reset + (60 * 60 * 24) - time()) ?>;
+        let stringValue = <?= ($player->daily_tasks->last_reset + UserDailyTasks::TASK_RESET - time()) ?>;
         let targetSpan = document.getElementById('dailyTaskTimer');
         setInterval(() => {
             stringValue--;

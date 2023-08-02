@@ -122,26 +122,27 @@ class UserReputation {
     const DAILY_TASK_REWARDS = [
         DailyTask::DIFFICULTY_EASY => [
             DailyTask::ACTIVITY_EARN_MONEY => 1,
-            DailyTask::ACTIVITY_ARENA => 1,
-            DailyTask::ACTIVITY_TRAINING => 2,
-            DailyTask::ACTIVITY_MISSIONS => 2,
-            DailyTask::ACTIVITY_PVP => 5,
+            DailyTask::ACTIVITY_ARENA => 5,
+            DailyTask::ACTIVITY_TRAINING => 10,
+            DailyTask::ACTIVITY_MISSIONS => 12,
+            DailyTask::ACTIVITY_PVP => 15,
         ],
         DailyTask::DIFFICULTY_MEDIUM => [
             DailyTask::ACTIVITY_EARN_MONEY => 2,
-            DailyTask::ACTIVITY_ARENA => 3,
+            DailyTask::ACTIVITY_ARENA => 15,
             DailyTask::ACTIVITY_TRAINING => 4,
-            DailyTask::ACTIVITY_MISSIONS => 5,
-            DailyTask::ACTIVITY_PVP => 10,
+            DailyTask::ACTIVITY_MISSIONS => 15,
+            DailyTask::ACTIVITY_PVP => 20,
         ],
         DailyTask::DIFFICULTY_HARD => [
             DailyTask::ACTIVITY_EARN_MONEY => 3,
-            DailyTask::ACTIVITY_ARENA => 5,
+            DailyTask::ACTIVITY_ARENA => 20,
             DailyTask::ACTIVITY_TRAINING => 8,
-            DailyTask::ACTIVITY_MISSIONS => 10,
-            DailyTask::ACTIVITY_PVP => 15,
+            DailyTask::ACTIVITY_MISSIONS => 20,
+            DailyTask::ACTIVITY_PVP => 25,
         ],
     ];
+    const DAILY_TASK_PVP_WIN_MOD = 5; // Increase rep by this amount for tasks requiring pvp wins (harder than completes)f
     const DAILY_TASK_BYPASS_CAP = true;
     const DECAY_MODIFIER = 0.65; // Reduce reputation decay by 35% if weekly cap is met
 
@@ -221,7 +222,7 @@ class UserReputation {
      *
      * Returns amount of reputation awarded for display/data confirmation purposes
      */
-    public function addRep(int $amount, bool $bypass_weekly_cap = false, bool $increment_pvp = false):int {
+    public function addRep(int $amount, bool $bypass_weekly_cap = false, bool $increment_pvp = false): int {
         //Adjust reputation gain if gain goes above cap
         if(!$bypass_weekly_cap) {
             $new_rep = $this->rep + $amount;
@@ -234,6 +235,7 @@ class UserReputation {
             if($this->weekly_rep + $amount > $weekly_cap) {
                 $amount = $weekly_cap - $this->weekly_rep;
             }
+            $this->weekly_rep += $amount;
         }
 
         //Increment rep amount
@@ -242,7 +244,6 @@ class UserReputation {
             if($increment_pvp) {
                 $this->pvp_rep += $amount;
             }
-            $this->weekly_rep += $amount;
             $this->rep += $amount;
         }
 
@@ -250,12 +251,11 @@ class UserReputation {
     }
     /**
      * @param int $amount
-     * @param bool $decrement_weekly
      *
      * Decreases user rep by amount provided
      * If $decrement_weekly is enabled, this will also decrease weekly rep allowing for restricted methods to allow gains again
      */
-    public function subtractRep(int $amount) {
+    public function subtractRep(int $amount): void {
         $this->rep -= $amount;
         //TODO: TEMPORARY! Remove with negative reputation (outlaw update)
         if($this->rep < 0) {
@@ -263,7 +263,7 @@ class UserReputation {
         }
     }
 
-    public function resetPvpRep() {
+    public function resetPvpRep(): void {
         $this->pvp_rep = 0;
         $this->last_pvp_rep_reset = time();
     }
@@ -297,7 +297,7 @@ class UserReputation {
         return true;
     }
     // Load reputation benefits
-    private function loadBenefits() {
+    private function loadBenefits(): array {
         $benefits = self::$Benefits;
 
         // Active benefits based on rank
@@ -323,7 +323,7 @@ class UserReputation {
     }
 
     // Calculate and return reputation amount gain from arena fights
-    public function calcArenaReputation($player_level, $opponent_level) {
+    public function calcArenaReputation($player_level, $opponent_level): int {
         if($player_level > $opponent_level) {
             if($player_level - $opponent_level >= 2) {
                 return 0;
@@ -341,7 +341,7 @@ class UserReputation {
         }
     }
     // Calculate and return reputation gains/losses from pvp wins/losses
-    public function calcPvpRep($player_level, $player_rep_rank, $opponent_level, $opponent_rep_rank, $opponent_user_id, $winner = true) {
+    public function calcPvpRep($player_level, $player_rep_rank, $opponent_level, $opponent_rep_rank, $opponent_user_id, $winner = true): int {
         $player_levels_above_opponent = $player_level - $opponent_level;
         $rep_rank_difference = $player_rep_rank - $opponent_rep_rank;
         $rep_gain = 0;
@@ -351,7 +351,7 @@ class UserReputation {
             return 0;
         }
 
-        if($winner == true) {
+        if($winner) {
             // Set current kill
             $this->recent_players_killed_ids_array[$opponent_user_id][] = time();
             // Get kill count
@@ -415,7 +415,7 @@ class UserReputation {
                 $rep_gain = ($rep_gain < self::MIN_DIMINISHED_REP) ? self::MIN_DIMINISHED_REP : $rep_gain;
             }
         }
-        if($winner == false) {
+        if(!$winner) {
             // Set current loss
             $this->recent_killer_ids_array[$opponent_user_id][] = time();
             // Get loss count
@@ -457,12 +457,12 @@ class UserReputation {
         return $rep_loss;
     }
     // Encode and set player last pvp kills
-    public function encodePvpKills() {
+    public function encodePvpKills(): void {
         $this->recent_players_killed_ids = json_encode($this->recent_players_killed_ids_array);
         $this->recent_killer_ids = jseon_encode($this->recent_killer_ids_array);
     }
     // Load pvp kills and remove outdated kills to prvent data bloat
-    public function loadPvpKillsArray() {
+    public function loadPvpKillsArray(): void {
         // Recently killed players
         if(is_array(json_decode($this->recent_players_killed_ids, true))) {
             $this->recent_players_killed_ids_array = json_decode($this->recent_players_killed_ids, true);
@@ -514,14 +514,14 @@ class UserReputation {
     /** MISC FUNCTIONS */
 
     // Returns reputation rank name based on reputation tier
-    public static function nameByRepRank($tier, $title_type = 'title') {
+    public static function nameByRepRank($tier, $title_type = 'title'): string {
         if(isset(self::$VillageRep[$tier])) {
             return self::$VillageRep[$tier][$title_type];
         }
         return "Invalid Rank";
     }
     // Returns numeric value of reputation tier based on amount of rep
-    public static function tierByRepAmount($amount) {
+    public static function tierByRepAmount($amount): int|string {
         foreach(array_reverse(self::$VillageRep, true) as $rank => $data) {
             if(abs($amount) >= $data['min_rep']) {
                 return $rank;

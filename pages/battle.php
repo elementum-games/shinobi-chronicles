@@ -160,10 +160,8 @@ function processBattleFightEnd(BattleManager $battle, User $player): string {
             $result .= "You have earned $team_point_gain point for your team.[br]";
         }
         // Daily Tasks
-        foreach ($player->daily_tasks as $task) {
-            if ($task->activity == DailyTask::ACTIVITY_PVP && !$task->complete) {
-                $task->progress++;
-            }
+        if($player->daily_tasks->hasTaskType(DailyTask::ACTIVITY_PVP)) {
+            $player->daily_tasks->progressTask(DailyTask::ACTIVITY_PVP, 1);
         }
     }
     else if($battle->isOpponentWinner()) {
@@ -190,10 +188,8 @@ function processBattleFightEnd(BattleManager $battle, User $player): string {
         }
 
         // Daily Tasks
-        foreach ($player->daily_tasks as $task) {
-            if ($task->activity == DailyTask::ACTIVITY_PVP && $task->sub_task == DailyTask::SUB_TASK_COMPLETE && !$task->complete) {
-                $task->progress++;
-            }
+        if($player->daily_tasks->hasTaskType(DailyTask::ACTIVITY_PVP)) {
+            $player->daily_tasks->progressTask(DailyTask::ACTIVITY_PVP, 1, DailyTask::SUB_TASK_COMPLETE);
         }
     }
     else {
@@ -208,10 +204,8 @@ function processBattleFightEnd(BattleManager $battle, User $player): string {
         }
 
         // Daily Tasks
-        foreach ($player->daily_tasks as $task) {
-            if ($task->activity == DailyTask::ACTIVITY_PVP && $task->sub_task == DailyTask::SUB_TASK_COMPLETE && !$task->complete) {
-                $task->progress++;
-            }
+        if($player->daily_tasks->hasTaskType(DailyTask::ACTIVITY_PVP)) {
+            $player->daily_tasks->progressTask(DailyTask::ACTIVITY_PVP, 1, DailyTask::SUB_TASK_COMPLETE);
         }
     }
 

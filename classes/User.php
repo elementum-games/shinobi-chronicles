@@ -3,6 +3,7 @@
 require_once __DIR__ . "/Jutsu.php";
 require_once __DIR__ . "/Team.php";
 require_once __DIR__ . "/DailyTask.php";
+require_once __DIR__ . "/UserDailyTasks.php";
 require_once __DIR__ . "/ForbiddenSeal.php";
 require_once __DIR__ . "/battle/Fighter.php";
 require_once __DIR__ . "/travel/TravelCoords.php";
@@ -95,7 +96,7 @@ class User extends Fighter {
     public $original_blacklist;
 
     /** @var DailyTask[] */
-    public array $daily_tasks;
+    public ?UserDailyTasks $daily_tasks;
     public int $daily_tasks_reset;
 
     // Loaded in loadData
@@ -668,57 +669,34 @@ class User extends Fighter {
         /** @noinspection PhpConditionAlreadyCheckedInspection */
         $this->in_village = $this->village_location !== null && $this->location->equals($this->village_location);
 
+
         // Daily Tasks
-        $this->daily_tasks = [];
-        $this->daily_tasks_reset = 0;
-        $result = $this->system->db->query(
-            "SELECT `tasks`, `last_reset` FROM `daily_tasks` WHERE `user_id`='$this->user_id' LIMIT 1"
-        );
-        if($this->system->db->last_num_rows !== 0) {
-            $dt = $this->system->db->fetch($result);
-
-            $dt_arr = json_decode($dt['tasks'], true);
-            $this->daily_tasks = array_map(function($dt_data) {
-                return new DailyTask($dt_data);
-            }, $dt_arr);
-
-            $this->daily_tasks_reset = $dt['last_reset'];
-        }
-        else {
-            $this->system->db->query(
-                "INSERT INTO `daily_tasks` (`user_id`, `tasks`, `last_reset`)
-                    VALUES ('{$this->user_id}', '" . json_encode([]) . "', '" . time() . "')"
-            );
-        }
-
-        if(empty($this->daily_tasks) || (time() - $this->daily_tasks_reset) > (60 * 60 * 24)) {
-            $this->daily_tasks = DailyTask::generateNewTasks($this);
-
-            $this->system->db->query(
-                "UPDATE `daily_tasks` SET
-                    `tasks`='" . json_encode($this->daily_tasks) . "',
-                    `last_reset`='" . time() . "'
-                    WHERE `user_id`='{$this->user_id}'"
-            );
-        }
-        else if($UPDATE == User::UPDATE_FULL && !$remote_view) {
-            // check if the user has completed stuff and reward them if so
-            foreach($this->daily_tasks as $task) {
-                if(!$task->complete && $task->progress >= $task->amount) {
-                    $task->progress = $task->amount;
-                    $task->complete = true;
-                    $this->addMoney($task->reward, "Completed daily task");
-                    $task_message = "You have completed {$task->name} and earned &yen;{$task->reward}";
-
-                    $rep_gain = $this->reputation->addRep($task->rep_reward, UserReputation::DAILY_TASK_BYPASS_CAP);
-                    if($rep_gain > 0) {
-                        $task_message .= " and $rep_gain Reputation";
+        $this->daily_tasks = new UserDailyTasks($this->system, $this->user_id, $this->rank_num);
+        $this->daily_tasks_reset = $this->daily_tasks->last_reset;
+        if($UPDATE == User::UPDATE_FULL && !$remote_view) {
+            // Process tasks completion
+            $completion_data = $this->daily_tasks->checkTaskCompletion();
+            if($completion_data != null) {
+                $this->addMoney($completion_data['money_gain'], 'Completed daily task');
+                $rep_gain = $this->reputation->addRep($completion_data['rep_gain'], UserReputation::DAILY_TASK_BYPASS_CAP);
+                $task_display = "You have completed the task" . (sizeof($completion_data['tasks_completed']) > 1 ? "s" : "");
+                foreach ($completion_data['tasks_completed'] as $x => $t_name) {
+                    if ($x > 0) {
+                        if ($x == sizeof($completion_data['tasks_completed']) - 1) {
+                            $task_display .= " and ";
+                        } else {
+                            $task_display .= ", ";
+                        }
                     }
-
-                    $this->system->message($task_message);
+                    $task_display .= "$t_name";
                 }
+                $task_display .= " earning &yen;" . $completion_data['money_gain'] . " and $rep_gain Reputation.";
+
+                $this->system->message($task_display);
             }
         }
+
+
 
         // Clan
         $this->clan_id = (int)$user_data['clan_id'];
@@ -1261,12 +1239,8 @@ class User extends Fighter {
                 }
 
                 // Daily task
-                foreach ($this->daily_tasks as $task) {
-                    if (!$task->complete && $task->activity == DailyTask::ACTIVITY_TRAINING && $task->sub_task == DailyTask::SUB_TASK_JUTSU) {
-                        if(str_contains($this->train_type, 'jutsu:')) {
-                            $task->progress += $gain;
-                        }
-                    }
+                if($this->daily_tasks->hasTaskType(DailyTask::ACTIVITY_TRAINING)) {
+                    $this->daily_tasks->progressTask(DailyTask::ACTIVITY_TRAINING, $gain, DailyTask::SUB_TASK_JUTSU);
                 }
 
 	    	    if ($this->bloodline->jutsu[$jutsu_id]->level < 100) {
@@ -1322,12 +1296,8 @@ class User extends Fighter {
                 }
 
                 // Daily task
-                foreach ($this->daily_tasks as $task) {
-                    if (!$task->complete && $task->activity == DailyTask::ACTIVITY_TRAINING && $task->sub_task == DailyTask::SUB_TASK_JUTSU) {
-                        if(str_contains($this->train_type, 'jutsu:')) {
-                            $task->progress += $gain;
-                        }
-                    }
+                if($this->daily_tasks->hasTaskType(DailyTask::ACTIVITY_TRAINING)) {
+                    $this->daily_tasks->progressTask(DailyTask::ACTIVITY_TRAINING, $gain, DailyTask::SUB_TASK_JUTSU);
                 }
 
                 if($this->hasJutsu($jutsu_id)) {
@@ -1398,23 +1368,9 @@ class User extends Fighter {
                 $gain_description = $this->addStatGain($this->train_type, $this->train_gain);
 
                 // Daily task
-                foreach ($this->daily_tasks as $task) {
-                    if (!$task->complete && $task->activity == DailyTask::ACTIVITY_TRAINING && !str_contains($this->train_type, 'jutsu:')) {
-                        $progress_task = false;
-                        // Skill training task
-                        if($task->sub_task === DailyTask::SUB_TASK_SKILL && str_contains($this->train_type, 'skill')) {
-                            $progress_task = true;
-                        }
-                        // Attribute task
-                        if($task->sub_task === DailyTask::SUB_TASK_GEN && !str_contains($this->train_type, 'skill')) {
-                            $progress_task = true;
-                        }
-
-                        //Progress task
-                        if($progress_task) {
-                            $task->progress += $this->train_gain;
-                        }
-                    }
+                if($this->daily_tasks->hasTaskType(DailyTask::ACTIVITY_TRAINING)) {
+                    $sub_task_type = (str_contains($this->train_type, 'skill')) ? DailyTask::SUB_TASK_SKILL : DailyTask::SUB_TASK_GEN;
+                    $this->daily_tasks->progressTask(DailyTask::ACTIVITY_TRAINING, $this->train_gain, $sub_task_type);
                 }
 
                 $this->train_time = 0;
@@ -1643,8 +1599,12 @@ class User extends Fighter {
                     $this->jutsu[$jutsu->id]->exp += round(1000 / ($this->jutsu[$jutsu->id]->level * 0.9));
 
                     if($this->jutsu[$jutsu->id]->exp >= 1000) {
-                        $this->jutsu[$jutsu->id]->exp = 0;
-                        $this->jutsu[$jutsu->id]->level++;
+                        $levels_gained = floor($this->jutsu[$jutsu->id]->exp / 1000);
+                        $this->jutsu[$jutsu->id]->exp -= $levels_gained * 1000;
+                        $this->jutsu[$jutsu->id]->level += $levels_gained;
+                        if($this->daily_tasks->hasTaskType(DailyTask::ACTIVITY_TRAINING)) {
+                            $this->daily_tasks->progressTask(DailyTask::ACTIVITY_TRAINING, $levels_gained, DailyTask::SUB_TASK_JUTSU);
+                        }
                         $this->system->message($jutsu->name . " has increased to level " . $this->jutsu[$jutsu->id]->level . ".");
                     }
                 }
@@ -1656,8 +1616,12 @@ class User extends Fighter {
                     $this->bloodline->jutsu[$jutsu->id]->exp += round(500 / ($this->bloodline->jutsu[$jutsu->id]->level * 0.9));
 
                     if($this->bloodline->jutsu[$jutsu->id]->exp >= 1000) {
-                        $this->bloodline->jutsu[$jutsu->id]->exp = 0;
-                        $this->bloodline->jutsu[$jutsu->id]->level++;
+                        $levels_gained = floor($this->jutsu[$jutsu->id]->exp / 1000);
+                        $this->jutsu[$jutsu->id]->exp -= $levels_gained * 1000;
+                        $this->jutsu[$jutsu->id]->level += $levels_gained;
+                        if($this->daily_tasks->hasTaskType(DailyTask::ACTIVITY_TRAINING)) {
+                            $this->daily_tasks->progressTask(DailyTask::ACTIVITY_TRAINING, $levels_gained, DailyTask::SUB_TASK_JUTSU);
+                        }
                         $this->system->message($jutsu->name . " has increased to level " . $this->bloodline->jutsu[$jutsu->id]->level . ".");
                     }
                 }
@@ -1699,12 +1663,8 @@ class User extends Fighter {
      */
     public function addMoney(int $amount, string $description, $increment_daily_task = true) {
     	// Daily Tasks
-        foreach ($this->daily_tasks as $task) {
-            if (!$task->complete && $task->activity == DailyTask::ACTIVITY_EARN_MONEY && $task->sub_task == DailyTask::SUB_TASK_EARN) {
-                if($increment_daily_task) {
-                    $task->progress += $amount;
-                }
-            }
+        if($this->daily_tasks->hasTaskType(DailyTask::ACTIVITY_EARN_MONEY) && $increment_daily_task) {
+            $this->daily_tasks->progressTask(DailyTask::ACTIVITY_EARN_MONEY, $amount);
         }
         $this->setMoney($this->money + $amount, $description);
     }
@@ -1925,9 +1885,8 @@ class User extends Fighter {
         }
 
         //Update Daily Tasks
-        if($this->daily_tasks) {
-            $dt = json_encode($this->daily_tasks);
-            $this->system->db->query("UPDATE `daily_tasks` SET `tasks`='{$dt}' WHERE `user_id`='{$this->user_id}'");
+        if($this->daily_tasks->tasks) {
+            $this->daily_tasks->update();
         }
     }
 
