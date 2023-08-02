@@ -353,7 +353,7 @@ class SpecialMission {
                 $result = $this->generateTarget(true);
                 break;
             case self::EVENT_COMPLETE_SUCCESS:
-                $result = $this->completeMission();
+                $result = $this->completeMission($this->progress);
                 $this->logNewEvent(self::EVENT_COMPLETE_REWARD, $result);
                 // Create notification
                 require_once __DIR__ . '/../classes/notification/NotificationManager.php';
@@ -367,6 +367,8 @@ class SpecialMission {
                 NotificationManager::createNotification($new_notification, $this->system, NotificationManager::UPDATE_REPLACE);
                 break;
             case self::EVENT_COMPLETE_FAIL:
+                $result = $this->completeMission($this->progress);
+                $this->logNewEvent(self::EVENT_COMPLETE_FAIL, $result);
                 $result = $this->failMission();
                 // Create notification
                 require_once __DIR__ . '/../classes/notification/NotificationManager.php';
@@ -390,32 +392,41 @@ class SpecialMission {
     /**
      * @throws RuntimeException
      */
-    public function completeMission(): string {
-        // Yen gain for completing the mission
-        $yen_gain = self::$difficulties[$this->difficulty]['yen_per_mission'] * $this->player->rank_num;
-        $yen_gain *= 0.8 + (mt_rand(1, 4) / 10);
-        $yen_gain = floor($yen_gain);
+    public function completeMission($progress): string {
+        if ($progress > 100) {
+            $progress = 100;
+        }
+        $progress_modifier = $progress / 100;
+        $reward_text = '';
+        if ($progress == 100) {
+            // Yen gain for completing the mission
+            $yen_gain = self::$difficulties[$this->difficulty]['yen_per_mission'] * $this->player->rank_num;
+            $yen_gain *= 0.8 + (mt_rand(1, 4) / 10);
+            $yen_gain = floor($yen_gain);
 
-        $this->status = 1;
-        $this->end_time = time();
-        $this->player->addMoney($yen_gain, "Special mission");
-        $this->reward += $yen_gain;
-        $this->player->special_mission = 0;
+            $this->status = 1;
+            $this->end_time = time();
+            $this->player->addMoney($yen_gain, "Special mission");
+            $this->reward += $yen_gain;
+            $this->player->special_mission = 0;
 
-        $reward_text = self::$event_names[self::EVENT_COMPLETE_REWARD]['text'] . $yen_gain . '!';
+            $reward_text = self::$event_names[self::EVENT_COMPLETE_REWARD]['text'] . $yen_gain . '!';
 
-        //Reputation Reward
-        if($this->player->reputation->canGain(true)) {
-            $rep_gain = $this->player->reputation->addRep(self::$difficulties[$this->difficulty]['rep_gain']);
-            if($rep_gain > 0) {
-                $this->player->mission_rep_cd = time() + UserReputation::ARENA_MISSION_CD;
-                $reward_text .= ' You have gained ' . $rep_gain . " village reputation!";
+            //Reputation Reward
+            if ($this->player->reputation->canGain(true)) {
+                $rep_gain = $this->player->reputation->addRep(self::$difficulties[$this->difficulty]['rep_gain']);
+                if ($rep_gain > 0) {
+                    $this->player->mission_rep_cd = time() + UserReputation::ARENA_MISSION_CD;
+                    $reward_text .= ' You have gained ' . $rep_gain . " village reputation!";
+                }
             }
         }
 
         $stat_to_gain = $this->player->getTrainingStatForArena();
-        $stat_gain = self::$difficulties[$this->difficulty]['stats_per_mission']
-            + (max(0, $this->player->rank_num - 2) * 2);
+        $stat_gain = floor(
+           (self::$difficulties[$this->difficulty]['stats_per_mission'] + (max(0, $this->player->rank_num - 2) * 2)
+           * $progress_modifier
+        );
         if($stat_to_gain != null) {
             $reward_text .= ' ' . $this->player->addStatGain($stat_to_gain, $stat_gain) . '!';
         }
@@ -590,7 +601,7 @@ class SpecialMission {
             'y' => $target_y
         ];
 
-        // if the user is going home just override everything lmao #dontlookatthislol
+        // if the user is going home just override everything lmao #dontlookatthislol #arthesialookedatthis
         if ($home) {
             $new_target = [
                 'target' => $this->player->village->name,

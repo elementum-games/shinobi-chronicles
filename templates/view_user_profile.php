@@ -102,9 +102,7 @@ $clan_positions = array(
 
             <br />
 			<label style='width:6.5em;'>PvP wins:</label>	<?= $viewUser->pvp_wins ?><br />
-			<label style='width:6.5em;'>PvP losses:</label>	<?= $viewUser->pvp_losses ?><br />
 			<label style='width:6.5em;'>AI wins:</label> <?= $viewUser->ai_wins ?><br />
-			<label style='width:6.5em;'>AI losses:</label> <?= $viewUser->ai_losses ?><br />
         </td></tr>
 
         <!--//send message/money/ak-->
