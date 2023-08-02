@@ -404,10 +404,8 @@ function runActiveMission(): bool {
                     // check what mission rank for daily Task
                     $all_mission_ranks = [0, 1, 2, 3, 4];
                     $mission_rank = $all_mission_ranks[$mission->rank];
-                    foreach ($player->daily_tasks as $task) {
-                        if ($task->activity == DailyTask::ACTIVITY_MISSIONS && $task->mission_rank == $mission_rank && !$task->complete) {
-                            $task->progress++;
-                        }
+                    if($player->daily_tasks->hasTaskType(DailyTask::ACTIVITY_MISSIONS)) {
+                        $player->daily_tasks->progressTask(DailyTask::ACTIVITY_MISSIONS, 1, $mission_rank);
                     }
 
                     if (isset($player->missions_completed[$mission->rank])) {

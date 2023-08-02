@@ -1,5 +1,4 @@
 import { CharacterAvatar } from "../CharacterAvatar.js";
-
 function Profile({
   links,
   playerData,
@@ -37,7 +36,6 @@ function Profile({
     playerAchievements: playerAchievements
   })));
 }
-
 function StatusAttributes({
   playerData,
   playerSettings,
@@ -105,7 +103,6 @@ function StatusAttributes({
     href: links.clan
   }, playerData.clanName)))))));
 }
-
 function PlayerStats({
   playerData,
   playerStats
@@ -178,7 +175,6 @@ function PlayerStats({
     className: "ft-c3"
   }))));
 }
-
 function PlayerBloodline({
   playerData,
   bloodlinePageUrl,
@@ -200,10 +196,10 @@ function PlayerBloodline({
     href: buyBloodlineUrl
   }, "None")));
 }
-
 function PlayerUserRep({
   playerData
 }) {
+  let img_link = "images/village_icons/" + playerData.villageName.toLowerCase() + ".png";
   return /*#__PURE__*/React.createElement("div", {
     className: "reputation_display"
   }, /*#__PURE__*/React.createElement("div", {
@@ -211,10 +207,9 @@ function PlayerUserRep({
   }, playerData.villageRepTier, "\xA0(", playerData.villageRep, ")"), /*#__PURE__*/React.createElement("div", {
     className: "reputation_indicator"
   }, /*#__PURE__*/React.createElement("img", {
-    src: "/images/v2/bloodline/level3.png"
+    src: img_link
   })));
 }
-
 function DailyTasks({
   dailyTasks
 }) {
@@ -245,7 +240,6 @@ function DailyTasks({
     }
   }, dailyTask.progressCaption)))));
 }
-
 function PlayerAchievements({
   playerAchievements
 }) {
@@ -271,5 +265,4 @@ function PlayerAchievements({
     className: "progress_label"
   }, achievement.progressLabel)))));
 }
-
 window.Profile = Profile;

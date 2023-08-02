@@ -149,9 +149,10 @@ class PremiumShopManager {
         $this->player->intelligence = 0;
         $this->player->willpower = 0;
 
-        /** Reset Village Reputation Data **/
+        //Reset Village Reputation Data
         $this->player->village_rep = 0;
         $this->player->weekly_rep = 0;
+        $this->player->pvp_rep = 0;
         $this->player->mission_rep_cd = 0;
 
         //Bug fix: Elements previously was not cleared. -- Shadekun
@@ -163,6 +164,7 @@ class PremiumShopManager {
         $this->player->updateData();
 
         $this->system->db->query("DELETE FROM `user_bloodlines` WHERE `user_id`='{$this->player->user_id}'");
+        $this->system->db->query("UPDATE `daily_tasks` SET `last_reset`='0' WHERE `user_id`='{$this->player->user_id}'");
         $this->system->db->query(
             "UPDATE `user_inventory` SET
                     `jutsu` = '',

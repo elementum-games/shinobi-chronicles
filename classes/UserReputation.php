@@ -7,6 +7,7 @@ class UserReputation {
             'outlaw_title' => 'Vagabond',
             'min_rep' => 0,
             'weekly_cap' => 500,
+            'weekly_pvp_cap' => 200,
             'base_pvp_rep_reward' => 1,
             'base_decay' => 0,
         ],
@@ -15,64 +16,72 @@ class UserReputation {
             'outlaw_title' => 'Thief',
             'min_rep' => 500,
             'weekly_cap' => 500,
+            'weekly_pvp_cap' => 200,
             'base_pvp_rep_reward' => 1,
-            'base_decay' => 300,
+            'base_decay' => 400,
         ],
         3 => [
             'title' => 'Well-Known Villager',
             'outlaw_title' => 'Infamous',
             'min_rep' => 1000,
             'weekly_cap' => 500,
+            'weekly_pvp_cap' => 200,
             'base_pvp_rep_reward' => 1,
-            'base_decay' => 400,
+            'base_decay' => 450,
         ],
         4 => [
             'title' => 'Respected Villager',
             'outlaw_title' => 'Outlaw',
             'min_rep' => 1750,
             'weekly_cap' => 600,
+            'weekly_pvp_cap' => 250,
             'base_pvp_rep_reward' => 2,
-            'base_decay' => 450,
+            'base_decay' => 500,
         ],
         5 => [
             'title' => 'Shinobi',
             'outlaw_title' => 'Rogue',
             'min_rep' => 2500,
             'weekly_cap' => 600,
+            'weekly_pvp_cap' => 250,
             'base_pvp_rep_reward' => 2,
-            'base_decay' => 500,
+            'base_decay' => 600,
         ],
         6 => [
             'title' => 'Respected Shinobi',
             'outlaw_title' => 'Infamous Rogue',
             'min_rep' => 3500,
             'weekly_cap' => 600,
+            'weekly_pvp_cap' => 250,
             'base_pvp_rep_reward' => 2,
-            'base_decay' => 550,
+            'base_decay' => 650,
         ],
         7 => [
             'title' => 'Elite Shinobi',
             'outlaw_title' => 'Assassin',
             'min_rep' => 5000,
             'weekly_cap' => 700,
+            'weekly_pvp_cap' => 300,
             'base_pvp_rep_reward' => 3,
-            'base_decay' => 600,
+            'base_decay' => 775,
         ],
         8 => [
             'title' => 'Master Shinobi',
             'outlaw_title' => 'Master Assassin',
             'min_rep' => 7500,
             'weekly_cap' => 800,
+            'weekly_pvp_cap' => 400,
             'base_pvp_rep_reward' => 3,
-            'base_decay' => 650,
+            'base_decay' => 850,
         ],
         9 => [
             'title' => 'Legendary Shinobi',
             'outlaw_title' => 'Legendary Assassin',
             'min_rep' => 10000,
             'weekly_cap' => 900,
+            'weekly_pvp_cap' => 500,
             'base_pvp_rep_reward' => 3,
-            'base_decay' => 750,
+            'base_decay' => 975,
         ]
     ];
 
@@ -112,55 +121,93 @@ class UserReputation {
     ];
     const DAILY_TASK_REWARDS = [
         DailyTask::DIFFICULTY_EASY => [
-            DailyTask::ACTIVITY_ARENA => 1,
-            DailyTask::ACTIVITY_MISSIONS => 2,
-            DailyTask::ACTIVITY_PVP => 5,
-        ],
-        DailyTask::DIFFICULTY_MEDIUM => [
-            DailyTask::ACTIVITY_ARENA => 3,
-            DailyTask::ACTIVITY_MISSIONS => 5,
-            DailyTask::ACTIVITY_PVP => 10,
-        ],
-        DailyTask::DIFFICULTY_HARD => [
+            DailyTask::ACTIVITY_EARN_MONEY => 1,
             DailyTask::ACTIVITY_ARENA => 5,
-            DailyTask::ACTIVITY_MISSIONS => 10,
+            DailyTask::ACTIVITY_TRAINING => 10,
+            DailyTask::ACTIVITY_MISSIONS => 12,
             DailyTask::ACTIVITY_PVP => 15,
         ],
+        DailyTask::DIFFICULTY_MEDIUM => [
+            DailyTask::ACTIVITY_EARN_MONEY => 2,
+            DailyTask::ACTIVITY_ARENA => 15,
+            DailyTask::ACTIVITY_TRAINING => 4,
+            DailyTask::ACTIVITY_MISSIONS => 15,
+            DailyTask::ACTIVITY_PVP => 20,
+        ],
+        DailyTask::DIFFICULTY_HARD => [
+            DailyTask::ACTIVITY_EARN_MONEY => 3,
+            DailyTask::ACTIVITY_ARENA => 20,
+            DailyTask::ACTIVITY_TRAINING => 8,
+            DailyTask::ACTIVITY_MISSIONS => 20,
+            DailyTask::ACTIVITY_PVP => 25,
+        ],
     ];
-    const DECAY_MODIFIER = 0.65;
+    const DAILY_TASK_PVP_WIN_MOD = 5; // Increase rep by this amount for tasks requiring pvp wins (harder than completes)f
+    const DAILY_TASK_BYPASS_CAP = true;
+    const DECAY_MODIFIER = 0.65; // Reduce reputation decay by 35% if weekly cap is met
+
+    const PVP_REP_ENABLED = true;
     const RECENT_PLAYER_KILL_THRESHOLD = 3600; // Only kills within last hour will mitigate pvp rep gains
     const PVP_CHAIN_KILL_LIMIT = 4; // Pvp kills of same player above this amount reward 0 rep
     const MIN_DIMINISHED_REP = 2; // Minimum rep gain on diminished returns (will remain 0 on mitigated kills)
+    const RECENTLY_KILLED_BY_THRESHOLD = 1800; // Only being killed within last 30 minutes will mitigate pvp rep losses (further chainkill mitigation)
+    const PVP_REP_LOSS_LIMIT = 3; // Being killed by the same player above this amount will result in 0 rep loss
+    const PVP_REP_RESET_DAILY = true; // If false, weekly pvp rep cap is used
+    const PVP_WEEKLY_CONVERSION = 0.25; // Allow 25% of weekly reputation cap if daily reset is used
 
     protected int $rep;
     protected int $weekly_rep;
+    protected int $pvp_rep;
+    public int $last_pvp_rep_reset;
     public int $mission_cd;
 
     public int $rank;
     public string $rank_name;
     public int $weekly_cap;
+    public int $pvp_cap;
+    // TODO: Make recent_killed private
     public ?string $recent_players_killed_ids;
     public array $recent_players_killed_ids_array;
+    private ?string $recent_killer_ids;
+    public array $recent_killer_ids_array;
     public int $base_pvp_reward;
     public array $benefits;
-    public function __construct(&$player_rep, &$player_weekly_rep, &$last_pvp_kills, $mission_cd) {
+    
+    public function __construct(&$player_rep, &$player_weekly_rep, &$player_pvp_rep, &$player_last_pvp_rep_reset, &$last_pvp_kills, &$last_killer_ids, $mission_cd, $event) {
+        //Player data
         $this->rep = &$player_rep;
         $this->weekly_rep = &$player_weekly_rep;
-        $this->recent_players_killed_ids = &$last_pvp_kills;
         $this->mission_cd = $mission_cd;
         $this->rank = self::tierByRepAmount($this->rep);
 
-        //Last pvp Kills array
+        //PvP data
+        $this->pvp_rep = &$player_pvp_rep;
+        $this->last_pvp_rep_reset = &$player_last_pvp_rep_reset;
+        $this->recent_players_killed_ids = &$last_pvp_kills;
+        $this->recent_killer_ids = &$last_killer_ids;
+
+        //Reset daily/weekly rep
+        if(self::PVP_REP_RESET_DAILY && time() - $this->last_pvp_rep_reset >= 86400 && is_null($event)) {
+            $this->resetPvpRep();
+        }
+        else {
+            if(time() - $this->last_pvp_rep_reset >= 86400*7) {
+                $this->resetPvpRep();
+            }
+        }
+
+        //Load pvp kills/killer arrays
         $this->loadPvpKillsArray();
+        // Load benefits - this may only be performed after determining reputation rank 
+        $this->benefits = $this->loadBenefits();
 
         //Rep rank info
         $REP_RANK = self::$VillageRep[$this->rank];
 
         $this->rank_name = self::nameByRepRank($this->rank); // Use method here for future proofing
         $this->weekly_cap = $REP_RANK['weekly_cap'];
+        $this->pvp_cap = (self::PVP_REP_RESET_DAILY && is_null($event)) ? floor($REP_RANK['weekly_pvp_cap'] * self::PVP_WEEKLY_CONVERSION) : $REP_RANK['weekly_pvp_cap'];
         $this->base_pvp_reward = $REP_RANK['base_pvp_rep_reward'];
-
-        $this->benefits = $this->loadBenefits();
     }
 
     /**
@@ -171,11 +218,11 @@ class UserReputation {
      *
      * Increments user village reputation
      * $bypass_weekly_cap enabled will always reward the full amount of rep and add to weekly amount
-     * $increment_weekly disabled will disable weekly reputation incrementing (USE SPARINGLY!)
+     * $increment_pvp enabled will add towards pvp reputation threshold
      *
      * Returns amount of reputation awarded for display/data confirmation purposes
      */
-    public function addRep(int $amount, bool $bypass_weekly_cap = false, bool $increment_weekly = true):int {
+    public function addRep(int $amount, bool $bypass_weekly_cap = false, bool $increment_pvp = false): int {
         //Adjust reputation gain if gain goes above cap
         if(!$bypass_weekly_cap) {
             $new_rep = $this->rep + $amount;
@@ -188,16 +235,15 @@ class UserReputation {
             if($this->weekly_rep + $amount > $weekly_cap) {
                 $amount = $weekly_cap - $this->weekly_rep;
             }
-        }
-        //Increment weekly rep by amount if method requires incrementing
-        if($increment_weekly && $amount > 0 && $this->weekly_rep < $this->weekly_cap) {
             $this->weekly_rep += $amount;
-            if($this->weekly_rep > $this->weekly_cap) {
-                $this->weekly_rep = $this->weekly_cap;
-            }
         }
+
         //Increment rep amount
         if($amount > 0) {
+            // Increment pvp
+            if($increment_pvp) {
+                $this->pvp_rep += $amount;
+            }
             $this->rep += $amount;
         }
 
@@ -205,23 +251,21 @@ class UserReputation {
     }
     /**
      * @param int $amount
-     * @param bool $decrement_weekly
      *
      * Decreases user rep by amount provided
      * If $decrement_weekly is enabled, this will also decrease weekly rep allowing for restricted methods to allow gains again
      */
-    public function subtractRep(int $amount, bool $decrement_weekly = false) {
+    public function subtractRep(int $amount): void {
         $this->rep -= $amount;
         //TODO: TEMPORARY! Remove with negative reputation (outlaw update)
         if($this->rep < 0) {
             $this->rep = 0;
         }
-        if($decrement_weekly && $this->weekly_rep > 0) {
-            $this->weekly_rep -= $amount;
-            if($this->weekly_rep < 0) {
-                $this->weekly_rep = 0;
-            }
-        }
+    }
+
+    public function resetPvpRep(): void {
+        $this->pvp_rep = 0;
+        $this->last_pvp_rep_reset = time();
     }
 
     // Returns numeric value of reputation
@@ -232,18 +276,28 @@ class UserReputation {
     public function getWeeklyRepAmount():int {
         return $this->weekly_rep;
     }
+    // Returns numeric value of weekly pvp reputaiton
+    public function getPvpRep():int {
+        return $this->pvp_rep;
+    }
     // Return of user can gain more rep for restricted methods
-    public function canGain($check_mission_cd = false):bool {
-        if($this->weekly_rep < $this->weekly_cap) {
-            if($check_mission_cd && $this->mission_cd - time() > 0) {
-                return false;
-            }
-            return true;
+    public function canGain($check_mission_cd = false, $check_pvp = false):bool {
+        // Check mission cd
+        if($check_mission_cd && $this->mission_cd > time()) {
+            return false;
         }
-        return false;
+        // Check pvp cap
+        if($check_pvp && $this->pvp_rep >= $this->pvp_cap) {
+            return false;
+        }
+        // Check weekly cap
+        if($this->weekly_rep > $this->weekly_cap && !$check_pvp) {
+            return false;
+        }
+        return true;
     }
     // Load reputation benefits
-    private function loadBenefits() {
+    private function loadBenefits(): array {
         $benefits = self::$Benefits;
 
         // Active benefits based on rank
@@ -269,7 +323,7 @@ class UserReputation {
     }
 
     // Calculate and return reputation amount gain from arena fights
-    public function calcArenaReputation($player_level, $opponent_level) {
+    public function calcArenaReputation($player_level, $opponent_level): int {
         if($player_level > $opponent_level) {
             if($player_level - $opponent_level >= 2) {
                 return 0;
@@ -287,21 +341,31 @@ class UserReputation {
         }
     }
     // Calculate and return reputation gains/losses from pvp wins/losses
-    public function calcPvpRep($player_level, $player_rep_rank, $opponent_level, $opponent_rep_rank, $opponent_user_id, $winner = true) {
+    public function calcPvpRep($player_level, $player_rep_rank, $opponent_level, $opponent_rep_rank, $opponent_user_id, $winner = true): int {
         $player_levels_above_opponent = $player_level - $opponent_level;
         $rep_rank_difference = $player_rep_rank - $opponent_rep_rank;
         $rep_gain = 0;
 
-        // Set current kill
-        $this->recent_players_killed_ids_array[$opponent_user_id][] = time();
-        // Get kill count
-        $kill_count = isset($this->recent_players_killed_ids_array[$opponent_user_id]) ? sizeof($this->recent_players_killed_ids_array[$opponent_user_id]) : 0;
-        // Encode and set last pvp kills
-        $this->encodePvpKills();
+        // Pvp reputation disabled
+        if(!self::PVP_REP_ENABLED) {
+            return 0;
+        }
 
-        if($winner == true) {
+        if($winner) {
+            // Set current kill
+            $this->recent_players_killed_ids_array[$opponent_user_id][] = time();
+            // Get kill count
+            $kill_count = isset($this->recent_players_killed_ids_array[$opponent_user_id]) ? sizeof($this->recent_players_killed_ids_array[$opponent_user_id]) : 0;
+            // Encode and set last pvp kills
+            $this->encodePvpKills();
+            
             // Opponent killed too many times in mitigation frame, no gain
             if($kill_count > self::PVP_CHAIN_KILL_LIMIT) {
+                return 0;
+            }
+
+            // Weekly rep limit
+            if($this->pvp_rep > $this->pvp_cap) {
                 return 0;
             }
 
@@ -351,7 +415,19 @@ class UserReputation {
                 $rep_gain = ($rep_gain < self::MIN_DIMINISHED_REP) ? self::MIN_DIMINISHED_REP : $rep_gain;
             }
         }
-        if($winner == false) {
+        if(!$winner) {
+            // Set current loss
+            $this->recent_killer_ids_array[$opponent_user_id][] = time();
+            // Get loss count
+            $loss_count = isset($this->recent_killer_ids_array[$opponent_user_id]) ? sizeof($this->recent_killer_ids_array[$opponent_user_id]) : 0;
+            // Encode and set last pvp data
+            $this->encodePvpKills();
+
+            // Rep loss mitigation (chain kills only)
+            if($loss_count >= self::PVP_REP_LOSS_LIMIT) {
+                return 0;
+            }
+            
             $rep_loss = 2;
             // Opponent is 5 or more levels above player
             if($player_levels_above_opponent <= -5) {
@@ -381,11 +457,13 @@ class UserReputation {
         return $rep_loss;
     }
     // Encode and set player last pvp kills
-    public function encodePvpKills() {
+    public function encodePvpKills(): void {
         $this->recent_players_killed_ids = json_encode($this->recent_players_killed_ids_array);
+        $this->recent_killer_ids = jseon_encode($this->recent_killer_ids_array);
     }
     // Load pvp kills and remove outdated kills to prvent data bloat
-    public function loadPvpKillsArray() {
+    public function loadPvpKillsArray(): void {
+        // Recently killed players
         if(is_array(json_decode($this->recent_players_killed_ids, true))) {
             $this->recent_players_killed_ids_array = json_decode($this->recent_players_killed_ids, true);
 
@@ -407,25 +485,49 @@ class UserReputation {
         else {
             $this->recent_players_killed_ids_array = array();
         }
+
+        // Recently kileld by
+        if(is_array(json_decode($this->recent_killer_ids, true))) {
+            $this->recent_killer_ids_array = json_decode($this->recent_killer_ids, true);
+
+            // Remove outdated data to prevent bloat
+            foreach($this->recent_killer_ids_array as $UID => $kills) {
+                // Remove any invalid kill times from arrays
+                foreach($kills as $key => $time) {
+                    if($time + self::RECENTLY_KILLED_BY_THRESHOLD <= time()) {
+                        unset($this->recent_killer_ids_array[$UID][$key]);
+                    }
+                }
+
+                // Kill array empty, remove id from array
+                if(empty($this->recent_killer_ids_array[$UID])) {
+                    unset($this->recent_killer_ids_array[$UID]);
+                }
+            }
+        }
+        else {
+            $this->recent_killer_ids_array = array();
+        }
     }
 
 
     /** MISC FUNCTIONS */
 
     // Returns reputation rank name based on reputation tier
-    public static function nameByRepRank($tier, $title_type = 'title') {
+    public static function nameByRepRank($tier, $title_type = 'title'): string {
         if(isset(self::$VillageRep[$tier])) {
             return self::$VillageRep[$tier][$title_type];
         }
         return "Invalid Rank";
     }
     // Returns numeric value of reputation tier based on amount of rep
-    public static function tierByRepAmount($amount) {
+    public static function tierByRepAmount($amount): int|string {
         foreach(array_reverse(self::$VillageRep, true) as $rank => $data) {
             if(abs($amount) >= $data['min_rep']) {
                 return $rank;
             }
         }
+        return 1;
     }
 }
 
