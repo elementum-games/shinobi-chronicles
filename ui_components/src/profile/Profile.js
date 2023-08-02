@@ -257,13 +257,14 @@ type PlayerUserRepProps = {|
     +playerData: PlayerDataType
 |};
 function PlayerUserRep ({playerData}: PlayerUserRepProps) {
+    let img_link = "images/village_icons/" + playerData.villageName.toLowerCase() + ".png";
     return (
         <div className="reputation_display">
             <div className="reputation_name ft-c3">
                 {playerData.villageRepTier}&nbsp;({playerData.villageRep})
             </div>
             <div className="reputation_indicator">
-                <img src="/images/v2/bloodline/level3.png" />
+                <img src={img_link} />
             </div>
         </div>
     )

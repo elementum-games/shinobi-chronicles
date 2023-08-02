@@ -12,7 +12,8 @@ class SpecialMission {
     const MAX_DAMAGE_MULTIPLIER = 3;
 
     // Number of jutsu to use per fight, picked at random from equipped and bloodline jutsu
-    const JUTSU_USES_PER_FIGHT = 4;
+    const JUTSU_USES_PER_FIGHT = 3;
+    const JUTSU_COST_DISCOUNT_PERCENT = 25;
     // % chance to use a bloodline jutsu instead of an equipped jutsu
     const BLOODLINE_JUTSU_CHANCE = 25;
 
@@ -480,7 +481,9 @@ class SpecialMission {
 
             $original_level = $jutsu->level;
 
-            $result = $this->player->useJutsu($jutsu);
+            $jutsu_cost_multiplier = (100 - self::JUTSU_COST_DISCOUNT_PERCENT) / 100;
+
+            $result = $this->player->useJutsu($jutsu, $jutsu_cost_multiplier);
             if($result->failed) {
                 $extra_health_lost += $failed_jutsu_extra_health_lost;
             }

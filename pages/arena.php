@@ -248,10 +248,8 @@ function processArenaBattleEnd(BattleManager|BattleManagerV2 $battle, User $play
         $player->last_pvp_ms = System::currentTimeMs();
 
         // Daily Tasks
-        foreach ($player->daily_tasks as $task) {
-            if (!$task->complete && $task->activity == DailyTask::ACTIVITY_ARENA && $task->sub_task == DailyTask::SUB_TASK_WIN_FIGHT) {
-                $task->progress++;
-            }
+        if($player->daily_tasks->hasTaskType(DailyTask::ACTIVITY_ARENA)) {
+            $player->daily_tasks->progressTask(DailyTask::ACTIVITY_ARENA, 1);
         }
     }
     else if($battle->isOpponentWinner()) {
@@ -262,13 +260,6 @@ function processArenaBattleEnd(BattleManager|BattleManagerV2 $battle, User $play
         $player->moveToVillage();
         $player->battle_id = 0;
         $player->last_pvp_ms = System::currentTimeMs();
-
-        // Daily Tasks
-        foreach ($player->daily_tasks as &$task) {
-            if (!$task->complete && $task->activity == DailyTask::ACTIVITY_ARENA && $task->sub_task == DailyTask::SUB_TASK_COMPLETE) {
-                $task->progress++;
-            }
-        }
     }
     else if($battle->isDraw()) {
         $battle_result .= "The battle ended in a draw. You receive no reward.";
@@ -277,13 +268,6 @@ function processArenaBattleEnd(BattleManager|BattleManagerV2 $battle, User $play
         $player->moveToVillage();
         $player->battle_id = 0;
         $player->last_pvp_ms = System::currentTimeMs();
-
-        // Daily Tasks
-        foreach ($player->daily_tasks as $task) {
-            if (!$task->complete && $task->activity == DailyTask::ACTIVITY_ARENA && $task->sub_task == DailyTask::SUB_TASK_COMPLETE) {
-                $task->progress++;
-            }
-        }
     }
 
     return $battle_result;

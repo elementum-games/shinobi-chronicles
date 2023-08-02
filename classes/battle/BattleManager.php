@@ -261,8 +261,9 @@ class BattleManager {
                         throw new RuntimeException("Cannot use that jutsu, it is on cooldown for " . $this->battle->jutsu_cooldowns[$player_jutsu->combat_id] . " more turns!");
                     }
 
-                    if(!$this->player->useJutsu($player_jutsu)) {
-                        throw new RuntimeException($this->system->message);
+                    $result = $this->player->useJutsu($player_jutsu);
+                    if($result->failed) {
+                        throw new RuntimeException($result->error_message);
                     }
 
                     // Check for weapon if non-BL taijutsu

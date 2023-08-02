@@ -144,12 +144,14 @@ function processBattleFightEnd(BattleManager $battle, User $player): string {
         $result .= "You have earned $village_point_gain point for your village.[br]";
 
         // Calculate rep gains
-        $rep_gain = $player->reputation->calcPvpRep($player->level, $player->reputation->rank, $battle->opponent->level,
-            $battle->opponent->reputation->rank, $battle->opponent->user_id);
-        if($rep_gain > 0) {
-            $result .= "You have earned $rep_gain village reputation.[br]";
-            $player->reputation->addRep($rep_gain, true);
-        }
+	if($player->reputation->canGain(false, true) && UserReputation::PVP_REP_ENABLED) {
+		$rep_gain = $player->reputation->calcPvpRep($player->level, $player->reputation->rank, $battle->opponent->level,
+		    $battle->opponent->reputation->rank, $battle->opponent->user_id);
+		if($rep_gain > 0) {
+		    $result .= "You have earned $rep_gain village reputation.[br]";
+		    $player->reputation->addRep($rep_gain, true, true);
+		}
+    	}
 
         // Team points
         if($player->team != null) {
@@ -158,10 +160,8 @@ function processBattleFightEnd(BattleManager $battle, User $player): string {
             $result .= "You have earned $team_point_gain point for your team.[br]";
         }
         // Daily Tasks
-        foreach ($player->daily_tasks as $task) {
-            if ($task->activity == DailyTask::ACTIVITY_PVP && !$task->complete) {
-                $task->progress++;
-            }
+        if($player->daily_tasks->hasTaskType(DailyTask::ACTIVITY_PVP)) {
+            $player->daily_tasks->progressTask(DailyTask::ACTIVITY_PVP, 1);
         }
     }
     else if($battle->isOpponentWinner()) {
@@ -173,13 +173,14 @@ function processBattleFightEnd(BattleManager $battle, User $player): string {
         $player->moveToVillage();
 
         // Calc rep loss (if any)
-        // Calculate rep gains
-        $rep_loss = $player->reputation->calcPvpRep($player->level, $player->reputation->rank, $battle->opponent->level,
-            $battle->opponent->reputation->rank,$battle->opponent->user_id, false);
-        if($rep_loss > 0) {
-            $result .= "You have lost " . abs($rep_loss) . " village reputation.[br]";
-            $player->reputation->subtractRep(abs($rep_loss));
-        }
+    	if(UserReputation::PVP_REP_ENABLED) {
+	        $rep_loss = $player->reputation->calcPvpRep($player->level, $player->reputation->rank, $battle->opponent->level,
+	            $battle->opponent->reputation->rank,$battle->opponent->user_id, false);
+	        if($rep_loss > 0) {
+	            $result .= "You have lost $rep_loss village reputation.[br]";
+	            $player->reputation->subtractRep($rep_loss);
+	        }
+	}
 
         // If player is killed during a survival mission as a result of PVP, clear the survival mission
         if($player->mission_id != null) {
@@ -187,10 +188,8 @@ function processBattleFightEnd(BattleManager $battle, User $player): string {
         }
 
         // Daily Tasks
-        foreach ($player->daily_tasks as $task) {
-            if ($task->activity == DailyTask::ACTIVITY_PVP && $task->sub_task == DailyTask::SUB_TASK_COMPLETE && !$task->complete) {
-                $task->progress++;
-            }
+        if($player->daily_tasks->hasTaskType(DailyTask::ACTIVITY_PVP)) {
+            $player->daily_tasks->progressTask(DailyTask::ACTIVITY_PVP, 1, DailyTask::SUB_TASK_COMPLETE);
         }
     }
     else {
@@ -205,10 +204,8 @@ function processBattleFightEnd(BattleManager $battle, User $player): string {
         }
 
         // Daily Tasks
-        foreach ($player->daily_tasks as $task) {
-            if ($task->activity == DailyTask::ACTIVITY_PVP && $task->sub_task == DailyTask::SUB_TASK_COMPLETE && !$task->complete) {
-                $task->progress++;
-            }
+        if($player->daily_tasks->hasTaskType(DailyTask::ACTIVITY_PVP)) {
+            $player->daily_tasks->progressTask(DailyTask::ACTIVITY_PVP, 1, DailyTask::SUB_TASK_COMPLETE);
         }
     }
 

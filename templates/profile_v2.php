@@ -28,7 +28,7 @@
                 ) ?>,
                 playerStats: <?= json_encode(UserApiPresenter::playerStatsResponse($player)) ?>,
                 playerSettings: <?= json_encode(UserAPIPresenter::playerSettingsResponse($player)) ?>,
-                playerDailyTasks: <?= json_encode(UserApiPresenter::dailyTasksResponse($player->daily_tasks)) ?>,
+                playerDailyTasks: <?= json_encode(UserApiPresenter::dailyTasksResponse($player->daily_tasks->tasks)) ?>,
                 playerAchievements: <?= json_encode(UserApiPresenter::playerAchievementsResponse($player)) ?>,
             }),
             profileContainer
