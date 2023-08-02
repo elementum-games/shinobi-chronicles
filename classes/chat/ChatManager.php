@@ -162,7 +162,7 @@ class ChatManager {
             $post->message = nl2br($this->system->html_parse($post->message, false, true));
 
             // Handle Mention
-            $pattern = "/@([^\n\s]+[a-zA-Z0-9_-]|$)/";
+            $pattern = "/@([^\r\n\s@,<>:\[\]()]+[a-zA-Z0-9_-]|$)/";
             $has_mention = preg_match_all($pattern, $post->message, $matches);
             $mention_count = 0;
             if ($has_mention) {
@@ -174,7 +174,7 @@ class ChatManager {
                             break;
                         }
                         // only display formatted mention if user exists
-                        if(!User::findByName($this->system, $match, true)) {
+                        if(!User::findByName($this->system, str_replace("\\", "", $match), true)) {
                             continue;
                         }
                         // format each mention
