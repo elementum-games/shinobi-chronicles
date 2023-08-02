@@ -14,6 +14,40 @@
  */
 ?>
 
+<style>
+    .player_card {
+        height: 220px;
+        width: 435px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+        .player_card .avatar_frame {
+            flex-basis: 50%;
+        }
+    .player_card_background {
+        min-height: 250px;
+        min-width: 450px;
+        opacity: 0.75;
+        position: relative;
+    }
+    .player_card_bg_wrapper {
+        height: 220px;
+        width: 435px;
+        overflow: hidden;
+        position: absolute;
+    }
+    .player_card_details {
+        flex-basis: 50%;
+        display: flex;
+        flex-direction: column;
+        color: var(--font-color-3);
+        font-family: var(--font-secondary);
+        z-index: 1;
+        height:200px;
+    }
+</style>
+
 <div class='submenu'>
     <ul class='submenu'>
         <li style='width:100%;'><a href='<?= $system->router->getUrl('account_record')?>'>Account Record</a></li>
@@ -51,8 +85,26 @@
     <tr><th colspan='2'>Player Card</th></tr>
     <tr>
         <td colspan="2">
+           <div style="display: flex">
             <?php if(!$player->checkBan(StaffManager::BAN_TYPE_AVATAR)):?>
-                <div>
+                <div class="player_card">
+                    <div class="player_card_bg_wrapper">
+                        <img class="player_card_background" src="<?= $card_image ?>" />
+                    </div>
+                    <div style="max-width: 200px; max-height: 200px;" class="avatar_frame <?= $avatar_style ?> <?= $user_color ?> <?= $avatar_frame ?>">
+                        <img class="<?= $avatar_style ?>" src="<?= $player->avatar_link ?>" />
+                    </div>
+                    <div class="player_card_details">
+                        <div class="player_card_name <?= $user_color ?>"> <?= $player->user_name ?></div>
+                        <div class="player_card_title"></div>
+                        <div class="player_card_rank"></div>
+                        <div class="player_card_village"><?= $player->village->name ?></div>
+                        <div class="player_card_clan"><?= $player->clan->name ?></div>
+                        <div class="player_card_team"><?= $player->team->name ?></div>
+                        <div class="player_card_bloodline"><?= $player->bloodline->name ?></div>
+                    </div>
+                </div>
+                <div style="margin-left: 5px">
                     <b>Player Card info:</b><br />
                     Images must be hosted on another website<br />
                     Background Limit: 450 x 250 pixels<br />
@@ -61,19 +113,20 @@
                     Max filesize: <?=$player->getAvatarFileSizeDisplay()?><br />
                     <br />
                     <form action='<?=$self_link?>' method='post'>
-                        <input type='text' name='card_image' value='<?=$card_link?>' style='width:250px;margin-bottom:5px;' />
-                        <input type='submit' name='change_card' value='Change' />
+                        <input type='text' name='card_image' value='<?=$card_image?>' style='width:250px;margin-bottom:5px;' />
+                        <input type='submit' name='change_card_image' value='Change' />
                     </form>
                     <br />
                     <form action='<?=$self_link?>' method='post'>
-                        <input type='text' name='banner_image' value='<?=$banner_link?>' style='width:250px;margin-bottom:5px;' />
-                        <input type='submit' name='change_banner' value='Change' />
+                        <input type='text' name='banner_image' value='<?=$banner_image?>' style='width:250px;margin-bottom:5px;' />
+                        <input type='submit' name='change_banner_image' value='Change' />
                     </form>
                 </div>
                 <br style='clear:both;' />
             <?php else: ?>
                 <p style="margin-top:90px;">You are currently banned from changing your avatar.</p>
             <?php endif ?>
+            </div>
         </td>
     </tr>
     <?php endif; ?>
