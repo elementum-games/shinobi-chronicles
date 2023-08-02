@@ -367,7 +367,7 @@ class SpecialMission {
                 break;
             case self::EVENT_COMPLETE_FAIL:
                 $result = $this->completeMission($this->progress);
-                $this->logNewEvent(self::EVENT_COMPLETE_REWARD, $result);
+                $this->logNewEvent(self::EVENT_COMPLETE_FAIL, $result);
                 $result = $this->failMission();
                 // Create notification
                 require_once __DIR__ . '/../classes/notification/NotificationManager.php';
