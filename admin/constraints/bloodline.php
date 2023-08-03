@@ -63,7 +63,7 @@ $constraints = [
         'num_required' => 0,
         'variables' => [
             'power' => [
-                'data_type' => 'int',
+                'data_type' => 'float',
                 'input_type' => 'text',
             ],
             'effect' => [
