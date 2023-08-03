@@ -423,8 +423,9 @@ class SpecialMission {
         }
 
         $stat_to_gain = $this->player->getTrainingStatForArena();
+        $extra_stats_for_rank = max(0, $this->player->rank_num - 2) * 2;
         $stat_gain = floor(
-           (self::$difficulties[$this->difficulty]['stats_per_mission'] + (max(0, $this->player->rank_num - 2) * 2)
+           (self::$difficulties[$this->difficulty]['stats_per_mission'] + $extra_stats_for_rank)
            * $progress_modifier
         );
         if($stat_to_gain != null) {
