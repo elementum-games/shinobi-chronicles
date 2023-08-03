@@ -17,6 +17,7 @@ class Jutsu {
     const PURCHASE_TYPE_EVENT_SHOP = 5;
   
     const MAX_LEVEL = 100;
+    const REFUND_AMOUNT = 0.1;
 
     const TYPE_NINJUTSU = 'ninjutsu';
     const TYPE_TAIJUTSU = 'taijutsu';

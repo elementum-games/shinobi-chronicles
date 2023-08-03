@@ -128,19 +128,43 @@ function jutsu(): void {
 
             if(!empty($_POST['confirm_forget'])) {
                 //Forgetting jutsu.
-                $jutsu_name = $player->jutsu[$jutsu_id]->name;
+                $jutsu = $player->jutsu[$jutsu_id];
 
                 //refund input verification
-                $refund = ($player->jutsu[$jutsu_id]->purchase_cost * 0.1); //10% Refund
-                $refund = intval(round($refund)); //round and then convert Float=>Int
-                if($refund > 0 && gettype($refund) == "integer"){
-                    $player->addMoney($refund, "Sell jutsu");
+                if($jutsu->purchase_type == Jutsu::PURCHASE_TYPE_PURCHASABLE){
+                    $message = "You have forgotten {$jutsu->name}";
+
+                    $refund = ceil($jutsu->purchase_cost * Jutsu::REFUND_AMOUNT);
+                    if($refund > 0) {
+                        $player->addMoney($refund, "Sell jutsu");
+                        $message .= " and gained &yen;$refund";
+                    }
+                    $message .= "!";
+                    $player->removeJutsu($jutsu_id);
+                }
+                elseif($jutsu->purchase_type == Jutsu::PURCHASE_TYPE_EVENT_SHOP) {
+                    // TODO: Make this more robust for other event purchase types (possibly add "currency" type to jutsu data)
+                    // Forbidden jutsu
+                    require_once 'classes/event/LanternEvent.php';
+                    require_once 'classes/forbidden_shop/ForbiddenShopManager.php';
+                    $forbidden_shop = new ForbiddenShopManager($system, $player);
+                    $forbidden_jutsu = $forbidden_shop->getEventJutsu();
+
+                    if(!isset($forbidden_jutsu[$jutsu_id])) {
+                        throw new RuntimeException("Invalid forbidden jutsu!");
+                    }
+
+                    $player->giveItem(new Item(LanternEvent::$static_item_ids['forbidden_jutsu_scroll_id']), 1);
+                    $player->removeJutsu($jutsu_id);
+
+                    $message = "You have forgotten {$jutsu->name}! The scroll you gave to Akuji has reappeared in your inventory.";
+                }
+                else {
+                    throw new RuntimeException("Unexpected jutsu purchase type. If this persists, notify an admin!");
                 }
 
-                $player->removeJutsu($jutsu_id);
-
                 //css: Overlap caused by css Position property
-                $system->message("You have forgotten $jutsu_name!<br>You were refunded ¥{$refund}");
+                $system->message($message);
                 $system->printMessage();
             }
             else {

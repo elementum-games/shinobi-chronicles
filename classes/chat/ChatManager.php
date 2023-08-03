@@ -162,7 +162,7 @@ class ChatManager {
             $post->message = nl2br($this->system->html_parse($post->message, false, true));
 
             // Handle Mention
-            $pattern = "/@([^ \n\s!?.<>:@\[\]()]+)(?=[^A-Za-z0-9_]|$)/";
+            $pattern = "/@([^\r\n\s@,<>:\[\]()]+[a-zA-Z0-9_-]|$)/";
             $has_mention = preg_match_all($pattern, $post->message, $matches);
             $mention_count = 0;
             if ($has_mention) {
@@ -172,6 +172,10 @@ class ChatManager {
                         // if at limit, stop
                         if ($mention_count > 3) {
                             break;
+                        }
+                        // only display formatted mention if user exists
+                        if(!User::findByName($this->system, str_replace("\\", "", $match), true)) {
+                            continue;
                         }
                         // format each mention
                         $formatted_mention = "<div class='mention_container'><a class='chat_user_name userLink' href='" . $this->system->router->getURL("members", ["user" => $match]) . "'>@" . $match . "</a></div>";
@@ -227,7 +231,7 @@ class ChatManager {
     public function submitPost(string $message) {
         $chat_max_post_length = $this->maxPostLength();
 
-        $message_length = strlen(preg_replace('/[\\n\\r]+/', '', trim($message)));
+        $message_length = strlen(preg_replace('/(\\\\[rn])+/', '', trim($message)));
 
         try {
             $result = $this->system->db->query(
