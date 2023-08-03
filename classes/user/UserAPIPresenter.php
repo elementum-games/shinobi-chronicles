@@ -43,6 +43,8 @@ class UserApiPresenter {
             'villageRep' => $player->reputation->getRepAmount(),
             'weeklyRep' => $player->reputation->getWeeklyRepAmount(),
             'maxWeeklyRep' => $player->reputation->weekly_cap,
+            'weeklyPvpRep' => $player->reputation->getWeeklyPvpRep(),
+            'maxWeeklyPvpRep' => $player->reputation->weekly_pvp_cap,
             'clanId' => $player->clan?->id,
             'clanName' => $player->clan?->name,
             'teamId' => $player->team?->id,

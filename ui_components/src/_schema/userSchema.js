@@ -28,6 +28,8 @@ export type PlayerDataType = {|
     +villageRep: number,
     +weeklyRep: number,
     +maxWeeklyRep: number,
+    +weeklyPvpRep: number,
+    +maxWeeklyPvpRep: number,
     +clanId: ?number,
     +clanName: ?string,
     +teamId: ?number,

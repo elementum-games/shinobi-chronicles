@@ -39,7 +39,7 @@ class RepPlayerReputation extends UserReputation {
         $REP_RANK = self::$VillageRep[$this->rank];
         $this->rank_name = $REP_RANK['title'];
         $this->weekly_cap = $REP_RANK['weekly_cap'];
-        $this->pvp_cap = ($sim_data['daily_pvp_cap']) ? floor($REP_RANK['weekly_pvp_cap'] * ($sim_data['pvp_daily_con']/100)) : $REP_RANK['weekly_pvp_cap'];
+        $this->weekly_pvp_cap = ($sim_data['daily_pvp_cap']) ? floor($REP_RANK['weekly_pvp_cap'] * ($sim_data['pvp_daily_con']/100)) : $REP_RANK['weekly_pvp_cap'];
     }
 }
 class RepPlayer {
@@ -234,7 +234,7 @@ function runRepSimulation(&$data, $sim_data, &$debug_data, $weeks = 4) {
             if($sim_data['weekly_pvp_rates'][$rep_user->type] > 0) {
                 $pvp_cap = mt_rand(1, 100);
                 if ($pvp_cap <= $sim_data['weekly_pvp_rates'][$rep_user->type]) {
-                    $rep_gain = $rep_user->reputation->pvp_cap;
+                    $rep_gain = $rep_user->reputation->weekly_pvp_cap;
                     //Change rep amount to match weekly gains
                     if ($sim_data['daily_pvp_cap']) {
                         $rep_gain = $rep_gain * 7;
@@ -248,10 +248,10 @@ function runRepSimulation(&$data, $sim_data, &$debug_data, $weeks = 4) {
                 }
                 else {
                     // Calculate pvp weekly cap into 7 days
-                    $rep_cap = ceil($rep_user->reputation->pvp_cap / 7);
+                    $rep_cap = ceil($rep_user->reputation->weekly_pvp_cap / 7);
                     // Daily Rep cap
                     if ($sim_data['daily_pvp_cap']) {
-                        $rep_cap = ceil($rep_user->reputation->pvp_cap * ($sim_data['pvp_daily_con'] / 100));
+                        $rep_cap = ceil($rep_user->reputation->weekly_pvp_cap * ($sim_data['pvp_daily_con'] / 100));
                     }
 
                     // Calc reputation gained
@@ -283,8 +283,8 @@ function runRepSimulation(&$data, $sim_data, &$debug_data, $weeks = 4) {
 
                 'structure:2' => '<br /><b>PvP Data</b><br />',
                 'pvp_rep' => $rep_user->pvp_rep,
-                'pvp_cap' => ($sim_data['daily_pvp_cap']) ? $rep_user->reputation->pvp_cap * 7 : $rep_user->reputation->pvp_cap,
-                'pvp_rate' => round($rep_user->pvp_rep / (($sim_data['daily_pvp_cap']) ? $rep_user->reputation->pvp_cap * 7 : $rep_user->reputation->pvp_cap) * 100, 2) . '%',
+                'pvp_cap' => ($sim_data['daily_pvp_cap']) ? $rep_user->reputation->weekly_pvp_cap * 7 : $rep_user->reputation->weekly_pvp_cap,
+                'pvp_rate' => round($rep_user->pvp_rep / (($sim_data['daily_pvp_cap']) ? $rep_user->reputation->weekly_pvp_cap * 7 : $rep_user->reputation->weekly_pvp_cap) * 100, 2) . '%',
             );
 
             // Reset caps and run decay
