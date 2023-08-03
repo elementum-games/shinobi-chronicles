@@ -152,7 +152,7 @@ function news() {
 	}
 }
 
-function newsPosts($ADMIN = false, $max_posts = 8) {
+function newsPosts($ADMIN = false, $max_posts = 8): void {
 	global $system;
 	$self_link = $system->router->links['news'];
 
@@ -169,17 +169,10 @@ function newsPosts($ADMIN = false, $max_posts = 8) {
 			echo " ( <a style='color:inherit;' href='{$self_link}&page=edit_post&post={$post['post_id']}'>Edit</a> )";
 		}
 		echo "</th></tr>
-			<tr><td>";
-		// To be changed: HTML parse
-		$message = $post['message'];
-
-		$message = str_replace("\n", "<br />", $message);
-
-		echo wordwrap($system->html_parse(stripslashes($message), true), 90, "\n", true);
-
-
-		echo "</td></tr><tr id='newsfooter'><td class='newsFooter'>" .
-			$post['sender'] . " - " . strftime("%m/%d/%y", $post['time']) .
+			<tr><td>"
+            . $system->parseMarkdown(text: stripslashes($post['message']), allow_images: true)
+            . "</td></tr><tr id='newsfooter'><td class='newsFooter'>"
+            . $post['sender'] . " - " . strftime("%m/%d/%y", $post['time']) .
 		"</td></tr></table>";
 	}
 }
