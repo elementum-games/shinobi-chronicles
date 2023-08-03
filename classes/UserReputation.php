@@ -340,10 +340,15 @@ class UserReputation {
             }
         }
     }
+
     // Calculate and return reputation gains/losses from pvp wins/losses
-    public function calcPvpRep($player_level, $player_rep_rank, $opponent_level, $opponent_rep_rank, $opponent_user_id, $winner = true): int {
-        $player_levels_above_opponent = $player_level - $opponent_level;
-        $rep_rank_difference = $player_rep_rank - $opponent_rep_rank;
+    public function handlePvPWin(User $player, Fighter $opponent): int {
+        if(!($opponent instanceof User)) {
+            return 0;
+        }
+
+        $player_levels_above_opponent = $player->level - $opponent->level;
+        $rep_rank_difference = $player->reputation->rank - $opponent->reputation->rank;
         $rep_gain = 0;
 
         // Pvp reputation disabled
@@ -351,111 +356,134 @@ class UserReputation {
             return 0;
         }
 
-        if($winner) {
-            // Set current kill
-            $this->recent_players_killed_ids_array[$opponent_user_id][] = time();
-            // Get kill count
-            $kill_count = isset($this->recent_players_killed_ids_array[$opponent_user_id]) ? sizeof($this->recent_players_killed_ids_array[$opponent_user_id]) : 0;
-            // Encode and set last pvp kills
-            $this->encodePvpKills();
-            
-            // Opponent killed too many times in mitigation frame, no gain
-            if($kill_count > self::PVP_CHAIN_KILL_LIMIT) {
-                return 0;
-            }
+        // Set current kill
+        $this->recent_players_killed_ids_array[$opponent->user_id][] = time();
+        // Get kill count
+        $kill_count = isset($this->recent_players_killed_ids_array[$opponent->user_id]) ? sizeof($this->recent_players_killed_ids_array[$opponent->user_id]) : 0;
+        // Encode and set last pvp kills
+        $this->encodePvpKills();
 
-            // Weekly rep limit
-            if($this->pvp_rep > $this->pvp_cap) {
-                return 0;
-            }
-
-            // Level based rewards
-            // Opponent is no more than 5 levels below player
-            if($player_levels_above_opponent <= 5) {
-                $rep_gain++;
-            }
-            // Opponent is no more than 2 levels below player
-            if($player_levels_above_opponent <= 2) {
-                $rep_gain++;
-            }
-            // Opponent is 3 or more levels above player
-            if($player_levels_above_opponent <= -3) {
-                $rep_gain++;
-            }
-            // Opponent is 6 or more levels above player
-            if($player_levels_above_opponent <= -6) {
-                $rep_gain++;
-            }
-
-            // Reputation difference rewards
-            // Player is no more than two tiers above opponent
-            if($rep_rank_difference <= 2) {
-                $rep_gain++;
-            }
-            //Player is no more than 1 tier above opponent
-            if($rep_rank_difference <= 1) {
-                $rep_gain++;
-            }
-            //Opponent is 2 or more tiers above player
-            if($rep_rank_difference <= -2) {
-                $rep_gain++;
-            }
-
-            // Flat opponent rep rank reward
-            $rep_gain += self::$VillageRep[$opponent_rep_rank]['base_pvp_rep_reward'];
-
-            // Diminishing returns
-            if($kill_count > 0) {
-                if($kill_count / self::PVP_CHAIN_KILL_LIMIT > 0.5) {
-                    $rep_gain = floor($rep_gain * 0.5);
-                }
-                if($kill_count / self::PVP_CHAIN_KILL_LIMIT >= 0.75) {
-                    $rep_gain = ceil($rep_gain * 0.25);
-                }
-                $rep_gain = ($rep_gain < self::MIN_DIMINISHED_REP) ? self::MIN_DIMINISHED_REP : $rep_gain;
-            }
-        }
-        if(!$winner) {
-            // Set current loss
-            $this->recent_killer_ids_array[$opponent_user_id][] = time();
-            // Get loss count
-            $loss_count = isset($this->recent_killer_ids_array[$opponent_user_id]) ? sizeof($this->recent_killer_ids_array[$opponent_user_id]) : 0;
-            // Encode and set last pvp data
-            $this->encodePvpKills();
-
-            // Rep loss mitigation (chain kills only)
-            if($loss_count >= self::PVP_REP_LOSS_LIMIT) {
-                return 0;
-            }
-            
-            $rep_loss = 2;
-            // Opponent is 5 or more levels above player
-            if($player_levels_above_opponent <= -5) {
-                $rep_loss--; // Gain is negative by default, reduce rep loss
-            }
-
-            //Reputation based
-            // Opponent is 2 or more tiers above player
-            if($rep_rank_difference <= -2) {
-                $rep_loss--; // Gain is negative by default, reduce rep loss
-            }
-            // Opponent is within 1 tier of player
-            if($rep_rank_difference >= -1) {
-                $rep_loss++; // Increase rep loss
-            }
-            // Opponent is 2 or more tiers below player
-            if($rep_rank_difference >= 2) {
-                $rep_loss += 2;
-            }
-
-            // Redundancy to ensure rep is not removed when it shouldn't be
-            if($rep_gain < 0) {
-                $rep_loss = 0;
-            }
+        // Opponent killed too many times in mitigation frame, no gain
+        if($kill_count > self::PVP_CHAIN_KILL_LIMIT) {
+            return 0;
         }
 
+        // Weekly rep limit
+        if($this->pvp_rep > $this->pvp_cap) {
+            return 0;
+        }
+
+        // Level based rewards
+        // Opponent is no more than 5 levels below player
+        if($player_levels_above_opponent <= 5) {
+            $rep_gain++;
+        }
+        // Opponent is no more than 2 levels below player
+        if($player_levels_above_opponent <= 2) {
+            $rep_gain++;
+        }
+        // Opponent is 3 or more levels above player
+        if($player_levels_above_opponent <= -3) {
+            $rep_gain++;
+        }
+        // Opponent is 6 or more levels above player
+        if($player_levels_above_opponent <= -6) {
+            $rep_gain++;
+        }
+
+        // Reputation difference rewards
+        // Player is no more than two tiers above opponent
+        if($rep_rank_difference <= 2) {
+            $rep_gain++;
+        }
+        //Player is no more than 1 tier above opponent
+        if($rep_rank_difference <= 1) {
+            $rep_gain++;
+        }
+        //Opponent is 2 or more tiers above player
+        if($rep_rank_difference <= -2) {
+            $rep_gain++;
+        }
+
+        // Flat opponent rep rank reward
+        $rep_gain += self::$VillageRep[$opponent->reputation->rank]['base_pvp_rep_reward'];
+
+        // Diminishing returns
+        if($kill_count > 0) {
+            if($kill_count / self::PVP_CHAIN_KILL_LIMIT > 0.5) {
+                $rep_gain = floor($rep_gain * 0.5);
+            }
+            if($kill_count / self::PVP_CHAIN_KILL_LIMIT >= 0.75) {
+                $rep_gain = ceil($rep_gain * 0.25);
+            }
+            $rep_gain = ($rep_gain < self::MIN_DIMINISHED_REP) ? self::MIN_DIMINISHED_REP : $rep_gain;
+        }
+
+        // Redundancy to ensure rep is not lost when it shouldn't be
+        if($rep_gain < 0) {
+            $rep_gain = 0;
+        }
+
+        $player->reputation->addRep($rep_gain, true, true);
+
+        return $rep_gain;
+    }
+
+    public function handlePvPLoss(User $player, Fighter $opponent): int {
+        if(!($opponent instanceof User)) {
+            return 0;
+        }
+
+        $player_levels_above_opponent = $player->level - $opponent->level;
+        $rep_rank_difference = $player->reputation->rank - $opponent->reputation->rank;
+        $rep_gain = 0;
+
+        // Pvp reputation disabled
+        if(!self::PVP_REP_ENABLED) {
+            return 0;
+        }
+
+        // Set current loss
+        $this->recent_killer_ids_array[$opponent->user_id][] = time();
+        // Get loss count
+        $loss_count = isset($this->recent_killer_ids_array[$opponent->user_id]) ? sizeof($this->recent_killer_ids_array[$opponent->user_id]) : 0;
+        // Encode and set last pvp data
+        $this->encodePvpKills();
+
+        // Rep loss mitigation (chain kills only)
+        if($loss_count >= self::PVP_REP_LOSS_LIMIT) {
+            return 0;
+        }
+
+        $rep_loss = 2;
+        // Opponent is 5 or more levels above player
+        if($player_levels_above_opponent <= -5) {
+            $rep_loss--; // Gain is negative by default, reduce rep loss
+        }
+
+        //Reputation based
+        // Opponent is 2 or more tiers above player
+        if($rep_rank_difference <= -2) {
+            $rep_loss--; // Gain is negative by default, reduce rep loss
+        }
+        // Opponent is within 1 tier of player
+        if($rep_rank_difference >= -1) {
+            $rep_loss++; // Increase rep loss
+        }
+        // Opponent is 2 or more tiers below player
+        if($rep_rank_difference >= 2) {
+            $rep_loss += 2;
+        }
+
+        // Redundancy to ensure rep is not gained when it shouldn't be
+        if($rep_loss < 0) {
+            $rep_loss = 0;
+        }
+
+        $player->reputation->subtractRep($rep_loss);
         return $rep_loss;
     }
+
     // Encode and set player last pvp kills
     public function encodePvpKills(): void {
         $this->recent_players_killed_ids = json_encode($this->recent_players_killed_ids_array);

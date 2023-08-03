@@ -123,7 +123,7 @@ function battle(): bool {
 /**
  * @throws RuntimeException
  */
-function processBattleFightEnd(BattleManager $battle, User $player): string {
+function processBattleFightEnd(BattleManager|BattleManagerV2 $battle, User $player): string {
     $pvp_yen = $player->rank_num * 50;
 
     $result = "";
@@ -144,14 +144,12 @@ function processBattleFightEnd(BattleManager $battle, User $player): string {
         $result .= "You have earned $village_point_gain point for your village.[br]";
 
         // Calculate rep gains
-	if($player->reputation->canGain(false, true) && UserReputation::PVP_REP_ENABLED) {
-		$rep_gain = $player->reputation->calcPvpRep($player->level, $player->reputation->rank, $battle->opponent->level,
-		    $battle->opponent->reputation->rank, $battle->opponent->user_id);
-		if($rep_gain > 0) {
-		    $result .= "You have earned $rep_gain village reputation.[br]";
-		    $player->reputation->addRep($rep_gain, true, true);
-		}
-    	}
+        if($player->reputation->canGain(false, true) && UserReputation::PVP_REP_ENABLED) {
+            $rep_gained = $player->reputation->handlePvPWin($player, $battle->opponent);
+            if($rep_gained > 0) {
+                $result .= "You have earned $rep_gained village reputation.[br]";
+            }
+        }
 
         // Team points
         if($player->team != null) {
@@ -174,11 +172,9 @@ function processBattleFightEnd(BattleManager $battle, User $player): string {
 
         // Calc rep loss (if any)
     	if(UserReputation::PVP_REP_ENABLED) {
-	        $rep_loss = $player->reputation->calcPvpRep($player->level, $player->reputation->rank, $battle->opponent->level,
-	            $battle->opponent->reputation->rank,$battle->opponent->user_id, false);
-	        if($rep_loss > 0) {
-	            $result .= "You have lost $rep_loss village reputation.[br]";
-	            $player->reputation->subtractRep($rep_loss);
+	        $rep_lost = $player->reputation->handlePvPLoss($player, $battle->opponent);
+	        if($rep_lost > 0) {
+	            $result .= "You have lost $rep_lost village reputation.[br]";
 	        }
 	}
 
