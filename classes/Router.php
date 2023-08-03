@@ -184,7 +184,7 @@ class Router {
                     }
                     $player->log(User::LOG_NOT_IN_VILLAGE, implode(',', $contents_arr));
 
-                    throw new RuntimeException("You must be in your village to access this page!");
+                    throw new RuntimeException("You must be in your village or Underground Colosseum to access this page!");
                 }
             }
         }
