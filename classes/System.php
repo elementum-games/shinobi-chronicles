@@ -95,7 +95,7 @@ class System {
 
     // Default layout
     const DEFAULT_LAYOUT = 'new_geisha';
-    const VERSION_NUMBER = '0.9.0';
+    const VERSION_NUMBER = '0.9.1';
     const VERSION_NAME = '0.9 Flickering Ambitions';
 
     // Misc stuff
