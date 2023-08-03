@@ -562,7 +562,7 @@ function processMissionBattleEnd(BattleManager|BattleManagerV2 $battle, Mission 
     else if($battle->isPlayerWinner()) {
         $player->mission_stage['stage_id'] += 1;
         $mission->nextStage($player->mission_stage['stage_id']);
-        $result_text .= "You have defeated your opponent! " . "<br>" . $player->mission_stage['description'];
+        $result_text .= "You have defeated your opponent!";
     }
     else if($battle->isOpponentWinner()) {
         $result_text .= "You have been defeated. You have failed your mission.";
