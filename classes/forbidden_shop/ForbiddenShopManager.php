@@ -20,18 +20,6 @@ class ForbiddenShopManager {
 
         $forbidden_jutsu = $this->getEventJutsu();
 
-        // Check if player has fobidden jutsu
-        $learned_jutsu = false;
-        $jutsu_scroll = false;
-        foreach($forbidden_jutsu as $fj_id => $fj) {
-            if($this->player->hasJutsu($fj_id)) {
-                $learned_jutsu = $fj;
-            }
-            if(isset($this->player->jutsu_scrolls[$fj_id])) {
-                $jutsu_scroll = $fj;
-            }
-        }
-
         // Check if jutsu exists
         if(!isset($forbidden_jutsu[$jutsu_id])) {
             throw new RuntimeException("Invalid jutsu!");

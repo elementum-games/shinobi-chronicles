@@ -143,6 +143,7 @@ function jutsu(): void {
                     $player->removeJutsu($jutsu_id);
                 }
                 elseif($jutsu->purchase_type == Jutsu::PURCHASE_TYPE_EVENT_SHOP) {
+                    // TODO: Make this more robust for other event purchase types (possibly add "currency" type to jutsu data)
                     // Forbidden jutsu
                     require_once 'classes/event/LanternEvent.php';
                     require_once 'classes/forbidden_shop/ForbiddenShopManager.php';
