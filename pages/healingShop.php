@@ -1,5 +1,5 @@
 <?php
-/* 
+/*
 File: 		healingShop.php
 Coder:		Levi Meahan
 Created:	10/05/2013
@@ -22,18 +22,20 @@ function healingShop() {
 	$health[4] = $rankManager->healthForRankAndLevel(4, $rankManager->ranks[4]->max_level);
 	// $health[5] = $rankManager->healthForRankAndLevel(5, $rankManager->ranks[5]->max_level);
 
-	$ramen_choices['vegetable'] = [
-        'cost' => $player->rank_num * 5,
+    $arena_coords = new TravelCoords(16, 15, 1);
+
+    $ramen_choices['vegetable'] = [
+        'cost' => $player->location->equals($arena_coords) ? $player->rank_num * 5 * 5 : $player->rank_num * 5,
         'health_amount' => $health[$player->rank_num] * 0.1,
         'label' => 'Vegetable'
     ];
     $ramen_choices['pork'] = [
-        'cost' => $player->rank_num * 25,
+        'cost' => $player->location->equals($arena_coords) ? $player->rank_num * 25 * 5 : $player->rank_num * 25,
         'health_amount' => $health[$player->rank_num] * 0.5,
         'label' => 'Pork'
     ];
     $ramen_choices['deluxe'] = [
-        'cost' => $player->rank_num * 50,
+        'cost' => $player->location->equals($arena_coords) ? $player->rank_num * 50 * 5 : $player->rank_num * 50,
         'health_amount' => $health[$player->rank_num] * 1,
         'label' => 'Deluxe'
     ];
@@ -61,6 +63,6 @@ function healingShop() {
 		}
 	}
 
-    
+
     require 'templates/ramen_shop.php';
 }

@@ -170,6 +170,23 @@ class Router {
 
                 throw new RuntimeException("You must be in your village to access this page!");
             }
+
+            if ($route->village_ok === Route::VILLAGE_OR_ARENA && !$player->location->equals($player->village_location)) {
+                // hardcoding location, #dontlookplz
+                $arena_coords = new TravelCoords(16, 15, 1);
+                if (!$player->location->equals($arena_coords)) {
+                    $contents_arr = [];
+                    foreach($_GET as $key => $val) {
+                        $contents_arr[] = "GET[{$key}]=$val";
+                    }
+                    foreach($_POST as $key => $val) {
+                        $contents_arr[] = "POST[{$key}]=$val";
+                    }
+                    $player->log(User::LOG_NOT_IN_VILLAGE, implode(',', $contents_arr));
+
+                    throw new RuntimeException("You must be in your village to access this page!");
+                }
+            }
         }
         if(isset($route->min_rank)) {
             if($player->rank_num < $route->min_rank) {
