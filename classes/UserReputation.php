@@ -459,7 +459,7 @@ class UserReputation {
     // Encode and set player last pvp kills
     public function encodePvpKills(): void {
         $this->recent_players_killed_ids = json_encode($this->recent_players_killed_ids_array);
-        $this->recent_killer_ids = jseon_encode($this->recent_killer_ids_array);
+        $this->recent_killer_ids = json_encode($this->recent_killer_ids_array);
     }
     // Load pvp kills and remove outdated kills to prvent data bloat
     public function loadPvpKillsArray(): void {
