@@ -22,8 +22,7 @@
 <style>
     .currency_log_filters {
         display:flex;
-        gap:30px;
-        justify-content: flex-start;
+        justify-content: space-evenly;
     }
     .currency_log_filters p {
         margin: 0;
