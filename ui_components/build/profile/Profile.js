@@ -1,4 +1,5 @@
 import { CharacterAvatar } from "../CharacterAvatar.js";
+
 function Profile({
   links,
   playerData,
@@ -22,11 +23,11 @@ function Profile({
     playerStats: playerStats
   }), /*#__PURE__*/React.createElement("div", {
     className: "profile_row_second_col2"
-  }, /*#__PURE__*/React.createElement(PlayerBloodline, {
+  }, /*#__PURE__*/React.createElement(PlayerUserRep, {
+    playerData: playerData
+  }), /*#__PURE__*/React.createElement(PlayerBloodline, {
     bloodlinePageUrl: links.bloodlinePage,
     buyBloodlineUrl: links.buyBloodline,
-    playerData: playerData
-  }), /*#__PURE__*/React.createElement(PlayerUserRep, {
     playerData: playerData
   }), /*#__PURE__*/React.createElement(DailyTasks, {
     dailyTasks: playerDailyTasks
@@ -36,6 +37,7 @@ function Profile({
     playerAchievements: playerAchievements
   })));
 }
+
 function StatusAttributes({
   playerData,
   playerSettings,
@@ -99,10 +101,13 @@ function StatusAttributes({
     style: {
       flexBasis: "34%"
     }
-  }, /*#__PURE__*/React.createElement("p", null, /*#__PURE__*/React.createElement("label", null, "Village:"), /*#__PURE__*/React.createElement("span", null, playerData.villageName)), /*#__PURE__*/React.createElement("p", null, /*#__PURE__*/React.createElement("label", null, "Weekly Reputation:"), /*#__PURE__*/React.createElement("span", null, playerData.weeklyRep, "\xA0/\xA0", playerData.maxWeeklyRep)), playerData.clanId != null && /*#__PURE__*/React.createElement("p", null, /*#__PURE__*/React.createElement("label", null, "Clan:"), /*#__PURE__*/React.createElement("span", null, /*#__PURE__*/React.createElement("a", {
+  }, /*#__PURE__*/React.createElement("p", null, /*#__PURE__*/React.createElement("label", null, "Village:"), playerData.villageName), playerData.clanId != null && /*#__PURE__*/React.createElement("p", null, /*#__PURE__*/React.createElement("label", null, "Clan:"), /*#__PURE__*/React.createElement("span", null, /*#__PURE__*/React.createElement("a", {
     href: links.clan
-  }, playerData.clanName)))))));
+  }, playerData.clanName))), /*#__PURE__*/React.createElement("p", null, /*#__PURE__*/React.createElement("label", null, "Team:"), /*#__PURE__*/React.createElement("span", null, playerData.teamId == null ? "None" : /*#__PURE__*/React.createElement("a", {
+    href: links.team
+  }, playerData.teamName)))))));
 }
+
 function PlayerStats({
   playerData,
   playerStats
@@ -114,7 +119,7 @@ function PlayerStats({
     className: "total_stats box-primary"
   }, /*#__PURE__*/React.createElement("span", {
     className: "ft-c3"
-  }, "Total stats trained: ", playerData.totalStats.toLocaleString(), " / ", playerData.totalStatCap.toLocaleString()), /*#__PURE__*/React.createElement("br", null), /*#__PURE__*/React.createElement("div", {
+  }, "Total stats trained: ", playerData.totalStats.toLocaleString(), " / ", playerData.totalStatCap.toLocaleString()), /*#__PURE__*/React.createElement("div", {
     className: "progress_bar_container total_stats_bar_container"
   }, /*#__PURE__*/React.createElement("div", {
     className: "progress_bar_fill",
@@ -122,6 +127,8 @@ function PlayerStats({
       width: `${totalStatsPercent}%`
     }
   }))), /*#__PURE__*/React.createElement("div", {
+    className: "stat_lists"
+  }, /*#__PURE__*/React.createElement("div", {
     className: "stat_list skills"
   }, /*#__PURE__*/React.createElement("div", {
     className: "stat box-secondary"
@@ -173,8 +180,9 @@ function PlayerStats({
     className: "badge"
   }, "\u6839\u6027"), /*#__PURE__*/React.createElement("span", {
     className: "ft-c3"
-  }))));
+  })))));
 }
+
 function PlayerBloodline({
   playerData,
   bloodlinePageUrl,
@@ -196,6 +204,7 @@ function PlayerBloodline({
     href: buyBloodlineUrl
   }, "None")));
 }
+
 function PlayerUserRep({
   playerData
 }) {
@@ -203,13 +212,20 @@ function PlayerUserRep({
   return /*#__PURE__*/React.createElement("div", {
     className: "reputation_display"
   }, /*#__PURE__*/React.createElement("div", {
-    className: "reputation_name ft-c3"
-  }, playerData.villageRepTier, "\xA0(", playerData.villageRep, ")"), /*#__PURE__*/React.createElement("div", {
     className: "reputation_indicator"
   }, /*#__PURE__*/React.createElement("img", {
     src: img_link
-  })));
+  }), /*#__PURE__*/React.createElement("span", {
+    className: "village_name"
+  }, playerData.villageName)), /*#__PURE__*/React.createElement("div", {
+    className: "reputation_info ft-c3"
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "reputation_name"
+  }, /*#__PURE__*/React.createElement("b", null, playerData.villageRepTier), "\xA0(", playerData.villageRep, " rep)"), /*#__PURE__*/React.createElement("span", {
+    className: "weekly_reputation"
+  }, playerData.weeklyRep, "/", playerData.maxWeeklyRep, " PvE \xA0|\xA0\xA0", playerData.weeklyPvpRep, "/", playerData.maxWeeklyPvpRep, " PvP")));
 }
+
 function DailyTasks({
   dailyTasks
 }) {
@@ -240,6 +256,7 @@ function DailyTasks({
     }
   }, dailyTask.progressCaption)))));
 }
+
 function PlayerAchievements({
   playerAchievements
 }) {
@@ -265,4 +282,5 @@ function PlayerAchievements({
     className: "progress_label"
   }, achievement.progressLabel)))));
 }
+
 window.Profile = Profile;
