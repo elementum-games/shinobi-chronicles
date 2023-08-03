@@ -920,47 +920,8 @@ function adminPanel() {
 
     // Logs
     else if($page == 'logs') {
-        $self_link .= "&page=logs";
-        $default_view = 'staff_logs';
-        $view = $default_view;
-
-        //Pagination - log types
-        if(isset($_GET['view'])) {
-            $view = $system->db->clean($_GET['view']);
-            if(!in_array($view, ['staff_logs', 'currency_logs'])) {
-                $view = $default_view;
-            }
-            $self_link .= "&view=$view";
-        }
-
-        $offset = 0;
-        $limit = 25;
-        $max = $player->staff_manager->getStaffLogs($view, 'all', $offset, $limit, true) - $limit;
-
-        if(isset($_GET['offset'])) {
-            $offset = (int) $_GET['offset'];
-            if($offset < 0) {
-                $offset = 0;
-            }
-            if($offset > $max) {
-                $offset = $max;
-            }
-        }
-        $next = $offset + $limit;
-        $previous = $offset - $limit;
-        if($next > $max) {
-            $next = $max;
-        }
-        if($previous < 0) {
-            $previous = 0;
-        }
-
-        $logs = $player->staff_manager->getStaffLogs($view, 'all', $offset, $limit);
-
-        if($system->message) {
-            $system->printMessage();
-        }
-        require 'templates/admin/logs.php';
+       require 'admin/logs.php';
+       viewLogsPage($system, $player);
     }
 
     /* USER ADMINISTRATION PAGES */

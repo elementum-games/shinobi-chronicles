@@ -259,6 +259,35 @@ class StaffManager {
         );
     }
 
+    public function getCurrencyLogs(int $character_id, $offset = 0, $limit = 100, ?string $currency_type = null): array {
+        $query = "SELECT * FROM `currency_logs` WHERE `character_id`={$character_id}";
+        if($currency_type != null) {
+            $query .= " AND `currency_type`='{$currency_type}'";
+        }
+        $query .= " ORDER BY `id` DESC LIMIT $limit OFFSET $offset";
+
+        $result = $this->system->db->query($query);
+        if($this->system->db->last_num_rows) {
+            return $this->system->db->fetch_all($result);
+        }
+        return [];
+    }
+
+    public function countCurrencyLogs(int $character_id, $offset = 0, $limit = 100, ?string $currency_type = null): int {
+        $query = "SELECT COUNT(*) as `count` FROM `currency_logs` WHERE `character_id`={$character_id}";
+        if($currency_type != null) {
+            $query .= " AND `currency_type`='{$currency_type}'";
+        }
+        $query .= " ORDER BY `id` DESC LIMIT $limit OFFSET $offset";
+
+        $result = $this->system->db->query($query);
+        if($this->system->db->last_num_rows) {
+            return (int) $this->system->db->fetch($result)['count'];
+        }
+
+        return 0;
+    }
+
     public function getStaffLogs($table, $log_type = 'all', $offset = 0, $limit = 100, $maxCount = false) {
         $query = "SELECT " . ($maxCount ? 'COUNT(*)' : '*') . " FROM `" . $table . "` ";
         switch($log_type) {

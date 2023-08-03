@@ -245,6 +245,11 @@ $clan_positions = array(
         <?php endif; ?>
         <?php if($player->isUserAdmin()): ?>
             &nbsp;&nbsp;|&nbsp;&nbsp;<a href='<?= $system->router->links['admin'] ?>&page=edit_user&user_name=<?= $viewUser->user_name ?>'>Edit user</a>
+            &nbsp;&nbsp;|&nbsp;&nbsp;<a href='<?= $system->router->getUrl(
+                    'admin',
+                        ['page' => 'logs', 'log_type' => 'currency_logs', 'character_id' => $viewUser->user_id]
+                    ) ?>'
+                 >View Currency Logs</a>
         <?php endif; ?>
     </td></tr>
 <?php endif; ?>
