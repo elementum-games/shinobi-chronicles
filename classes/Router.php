@@ -170,6 +170,24 @@ class Router {
 
                 throw new RuntimeException("You must be in your village to access this page!");
             }
+
+            if ($route->village_ok === Route::VILLAGE_OR_COLOSSEUM && !$player->location->equals($player->village_location)) {
+                $result = $system->db->query("SELECT * FROM `maps_locations` WHERE `name` = 'Underground Colosseum'");
+                $location_result = $system->db->fetch($result);
+                $arena_coords = new TravelCoords($location_result['x'], $location_result['y'], 1);
+                if (!$player->location->equals($arena_coords)) {
+                    $contents_arr = [];
+                    foreach($_GET as $key => $val) {
+                        $contents_arr[] = "GET[{$key}]=$val";
+                    }
+                    foreach($_POST as $key => $val) {
+                        $contents_arr[] = "POST[{$key}]=$val";
+                    }
+                    $player->log(User::LOG_NOT_IN_VILLAGE, implode(',', $contents_arr));
+
+                    throw new RuntimeException("You must be in your village or Underground Colosseum to access this page!");
+                }
+            }
         }
         if(isset($route->min_rank)) {
             if($player->rank_num < $route->min_rank) {

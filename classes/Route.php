@@ -4,6 +4,7 @@ class Route {
     const NOT_IN_VILLAGE = 0;
     const IN_VILLAGE_OKAY = 1;
     const ONLY_IN_VILLAGE = 2;
+    const VILLAGE_OR_COLOSSEUM = 3;
 
     const MENU_USER = 'user';
     const MENU_ACTIVITY = 'activity';
