@@ -22,7 +22,9 @@ function healingShop() {
 	$health[4] = $rankManager->healthForRankAndLevel(4, $rankManager->ranks[4]->max_level);
 	// $health[5] = $rankManager->healthForRankAndLevel(5, $rankManager->ranks[5]->max_level);
 
-    $arena_coords = new TravelCoords(16, 15, 1);
+    $result = $system->db->query("SELECT * FROM `maps_locations` WHERE `name` = 'Underground Colosseum'");
+    $location_result = $system->db->fetch($result);
+    $arena_coords = new TravelCoords($location_result['x'], $location_result['y'], 1);
 
     $ramen_choices['vegetable'] = [
         'cost' => $player->location->equals($arena_coords) ? $player->rank_num * 5 * 5 : $player->rank_num * 5,

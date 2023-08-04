@@ -130,7 +130,7 @@ return $routes = [
         function_name: 'healingShop',
         menu: Route::MENU_ACTIVITY,
         battle_ok: false,
-        village_ok: Route::VILLAGE_OR_ARENA,
+        village_ok: Route::VILLAGE_OR_COLOSSEUM,
     ),
     26 => new Route(
         file_name: 'viewBattles.php',

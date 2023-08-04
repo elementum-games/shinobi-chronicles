@@ -171,9 +171,10 @@ class Router {
                 throw new RuntimeException("You must be in your village to access this page!");
             }
 
-            if ($route->village_ok === Route::VILLAGE_OR_ARENA && !$player->location->equals($player->village_location)) {
-                // hardcoding location, #dontlookplz
-                $arena_coords = new TravelCoords(16, 15, 1);
+            if ($route->village_ok === Route::VILLAGE_OR_COLOSSEUM && !$player->location->equals($player->village_location)) {
+                $result = $system->db->query("SELECT * FROM `maps_locations` WHERE `name` = 'Underground Colosseum'");
+                $location_result = $system->db->fetch($result);
+                $arena_coords = new TravelCoords($location_result['x'], $location_result['y'], 1);
                 if (!$player->location->equals($arena_coords)) {
                     $contents_arr = [];
                     foreach($_GET as $key => $val) {
