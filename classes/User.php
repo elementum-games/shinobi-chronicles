@@ -62,7 +62,7 @@ class User extends Fighter {
     const BASE_ARMOR_SLOTS = 2;
     const BASE_WEAPON_SLOTS = 1;
 
-    const MAX_CONSUMABLES = 10;
+    const MAX_CONSUMABLES = 15;
 
     const STAFF_NONE = 0;
     const STAFF_MODERATOR = 1;
