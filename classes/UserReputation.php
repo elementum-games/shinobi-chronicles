@@ -400,12 +400,13 @@ class UserReputation {
             - level_based_gain = 5 - 3.75
             - level_based_gain = 1.25
         */
+
         $level_diff_to_gain_divider = self::MAX_PVP_LEVEL_DIFFERENCE / self::PVP_MEDIAN_LEVEL_BASED_GAIN;
         $rep_tier_diff_to_gain_divider = self::MAX_PVP_REP_TIER_DIFFERENCE / self::PVP_MEDIAN_REP_TIER_BASED_GAIN;
 
         // Gain goes from 0-10 based on level diff and 0-14 based on rep tier
-        $level_based_gain = self::PVP_MEDIAN_LEVEL_BASED_GAIN - ($player_levels_above_opponent * $level_diff_to_gain_divider);
-        $tier_based_gain = self::PVP_MEDIAN_REP_TIER_BASED_GAIN - ($player_rep_tiers_above_opponent * $rep_tier_diff_to_gain_divider);
+        $level_based_gain = self::PVP_MEDIAN_LEVEL_BASED_GAIN - ($player_levels_above_opponent / $level_diff_to_gain_divider);
+        $tier_based_gain = self::PVP_MEDIAN_REP_TIER_BASED_GAIN - ($player_rep_tiers_above_opponent / $rep_tier_diff_to_gain_divider);
 
         // Flat opponent rep rank reward
         $rep_gain = round(
@@ -465,8 +466,8 @@ class UserReputation {
         $rep_tier_diff_to_loss_divider = self::MAX_PVP_REP_TIER_DIFFERENCE / 7;
 
         // Loss goes from 0-10 based on level diff and 0-14 based on rep tier
-        $level_based_loss = 5 - ($player_levels_below_opponent * $level_diff_to_loss_divider);
-        $tier_based_loss = 7 - ($player_rep_tiers_below_opponent * $rep_tier_diff_to_loss_divider);
+        $level_based_loss = 5 - ($player_levels_below_opponent / $level_diff_to_loss_divider);
+        $tier_based_loss = 7 - ($player_rep_tiers_below_opponent / $rep_tier_diff_to_loss_divider);
 
         $rep_loss = round($level_based_loss + $tier_based_loss);
 
