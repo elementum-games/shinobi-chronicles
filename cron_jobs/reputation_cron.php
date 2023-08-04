@@ -3,7 +3,7 @@ session_start();
 /****************************************************************************
  *                           Reputation Weekly Cron                         *
  * **************************************************************************
- *   This should be processed weekly on Wednesdays at 00:00 server time.    *
+ *   This should be processed weekly on Fridays at 23:59 server time.    *
  *                                                                          *
  *    The intent of this script is to reset the weekly gained reputation,   *
  *  decay any current reputation (decrease positive/increase negative) reps *
@@ -14,10 +14,7 @@ session_start();
 require_once __DIR__ . '/../classes/System.php';
 require_once __DIR__ . '/../classes/Village.php';
 require_once __DIR__ . '/../classes/User.php';
-require_once __DIR__ . '/../classes/Mission.php';
-require_once __DIR__ . '/../classes/Bloodline.php';
 require_once __DIR__ . '/../classes/UserReputation.php';
-require_once __DIR__ . '/../classes/travel/TravelManager.php';
 
 $system = new System();
 $system->db->connect();
@@ -70,6 +67,7 @@ else {
     else if($_SERVER['REMOTE_ADDR'] == $_SERVER['SERVER_ADDR']) {
         $run_ok = true;
     }
+
     if($run_ok) {
         weeklyCron($system);
         $system->log('cron', 'Weekly Reputation', "Weekly reputation decay has been processed.");
@@ -79,32 +77,44 @@ else {
     }
 }
 
-function weeklyCron($system, $debug = false) {
+function weeklyCron(System $system, $debug = false): void {
+    $queries = [];
+
+    $queries[] = "UPDATE `users` SET `weekly_rep`=0, `pvp_rep`=0 WHERE 1;";
+
     foreach(UserReputation::$VillageRep as $RANK_INT => $RANK) {
         if($RANK_INT == 1) {
             // Disable for rank 1
             continue;
         }
+
         $next_rank_where = "";
         if($RANK_INT < sizeof(UserReputation::$VillageRep)) {
             $RANK2_INT = $RANK_INT+1;
             $RANK2 = UserReputation::$VillageRep[$RANK2_INT];
             $next_rank_where = " AND `village_rep` < " . $RANK2['min_rep'];
-            if($RANK_INT == 1) {
-                $next_rank_where .= " AND `village_rep` > 0";
-            }
         }
-        $queries[] = "UPDATE `users` SET `weekly_rep`=0, `village_rep`=`village_rep`- " . $RANK['base_decay'] . " WHERE `village_rep` >= "
-            . $RANK['min_rep'] . $next_rank_where . " AND `weekly_rep` < " . $RANK['weekly_cap'];
-        $queries[] = "UPDATE `users` SET `weekly_rep`=0, `village_rep`=`village_rep`- " . floor($RANK['base_decay'] * UserReputation::DECAY_MODIFIER)
-            . " WHERE `village_rep` >= " . $RANK['min_rep'] . $next_rank_where . " AND `weekly_rep` >= " . $RANK['weekly_cap'];
+
+        $queries [] = "UPDATE `users` SET 
+            `village_rep`=`village_rep`- " . $RANK['base_decay'] . " 
+            WHERE `village_rep` >= " . $RANK['min_rep'] . $next_rank_where . " 
+            AND `weekly_rep` + `pvp_rep` < " . $RANK['weekly_cap'];
+
+        $queries[] = "UPDATE `users` SET 
+            `village_rep`=`village_rep`- " . floor($RANK['base_decay'] * UserReputation::WEEKLY_CAP_MET_DECAY_MULTIPLIER) . " 
+            WHERE `village_rep` >= " . $RANK['min_rep'] . $next_rank_where . " 
+            AND `weekly_rep` + `pvp_rep` >= " . $RANK['weekly_cap'];
     }
+
     foreach($queries as $query) {
         if($debug) {
             echo $query . "<br />";
         }
         else {
+            $system->db->query("LOCK TABLES `users` WRITE;");
             $system->db->query($query);
+            $system->db->query("UNLOCK TABLES;");
         }
     }
+
 }

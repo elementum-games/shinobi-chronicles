@@ -39,7 +39,7 @@ class RepPlayerReputation extends UserReputation {
         $REP_RANK = self::$VillageRep[$this->rank];
         $this->rank_name = $REP_RANK['title'];
         $this->weekly_cap = $REP_RANK['weekly_cap'];
-        $this->weekly_pvp_cap = ($sim_data['daily_pvp_cap']) ? floor($REP_RANK['weekly_pvp_cap'] * ($sim_data['pvp_daily_con']/100)) : $REP_RANK['weekly_pvp_cap'];
+        $this->weekly_pvp_cap = $REP_RANK['weekly_pvp_cap'];
     }
 }
 class RepPlayer {
@@ -127,8 +127,7 @@ $sim_data = array(
     'average_daily_easy' => 2,
     'average_daily_med' => 5,
     'average_daily_hard' => 9,
-    'decay_modifier' => UserReputation::DECAY_MODIFIER * 100,
-    'pvp_daily_con' => UserReputation::PVP_WEEKLY_CONVERSION * 100,
+    'decay_modifier' => UserReputation::WEEKLY_CAP_MET_DECAY_MULTIPLIER * 100,
     'reputation_data' => UserReputation::$VillageRep,
     'run_player_types' => RepPlayer::$player_types,
 );
@@ -249,10 +248,6 @@ function runRepSimulation(&$data, $sim_data, &$debug_data, $weeks = 4) {
                 else {
                     // Calculate pvp weekly cap into 7 days
                     $rep_cap = ceil($rep_user->reputation->weekly_pvp_cap / 7);
-                    // Daily Rep cap
-                    if ($sim_data['daily_pvp_cap']) {
-                        $rep_cap = ceil($rep_user->reputation->weekly_pvp_cap * ($sim_data['pvp_daily_con'] / 100));
-                    }
 
                     // Calc reputation gained
                     $days_completed = $sim_data['pvp_days_not_capped'][$rep_user->type];
@@ -327,13 +322,11 @@ if(isset($_POST['run_sim'])) {
 
     $weeks = isset($_POST['weeks']) ? (int)$_POST['weeks'] : 4;
     $decay_mod = (int)$_POST['decay_modifier'];
-    $pvp_con = (int)$_POST['pvp_daily_con'];
 
     // Set simulation data for form
     $sim_data['weeks'] = $weeks;
     $sim_data['debug'] = isset($_POST['debug']);
     $sim_data['decay_modifier'] = $decay_mod;
-    $sim_data['pvp_daily_con'] = $pvp_con;
     $sim_data['average_daily_easy'] = (float)$_POST['average_daily_easy'];
     $sim_data['average_daily_med'] = (float)$_POST['average_daily_med'];
     $sim_data['average_daily_hard'] = (float)$_POST['average_daily_hard'];
@@ -605,7 +598,6 @@ if(isset($_POST['run_sim'])) {
                     <label>Daily PvP<div class="tool-tip" title="Disabled will run weekly cap">!</div>:</label><input type="checkbox" name="daily_pvp_cap" <?=($sim_data['daily_pvp_cap'] ? 'checked' : '')?> /><br />
                     <label>Daily Bypass<div class="tool-tip" title="Daily tasks will bypass weekly caps">!</div>:</label><input type="checkbox" name="daily_task_bypass" <?=($sim_data['daily_task_bypass'] ? 'checked' : '')?> /><br />
                     <label>Decay Mod<div class="tool-tip" title="Rate at which decay is reduced for meeting weekly cap">!</div>:</label><input type="text" name="decay_modifier" value="<?=$sim_data['decay_modifier']?>" /><br />
-                    <label>PvP Daily Con<div class="tool-tip" title="Rate at which weekly pvp cap is reduced for daily reset">!</div>:</label><input type="text" name="pvp_daily_con" value="<?=$sim_data['pvp_daily_con']?>" /><br />
                     <label>Avg Dly Easy<div class="tool-tip" title="Average amount of daily rep rewarded per easy task">!</div>:</label><input type="text" name="average_daily_easy" value="<?=$sim_data['average_daily_easy']?>" /><br />
                     <label>Avg Dly Med<div class="tool-tip" title="Average amount of daily rep rewarded per medium task">!</div>:</label><input type="text" name="average_daily_med" value="<?=$sim_data['average_daily_med']?>" /><br />
                     <label>Avg Dly Hard<div class="tool-tip" title="Average amount of daily rep rewarded per hard task">!</div>:</label><input type="text" name="average_daily_hard" value="<?=$sim_data['average_daily_hard']?>" /><br />

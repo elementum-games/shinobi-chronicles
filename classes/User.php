@@ -508,11 +508,10 @@ class User extends Fighter {
         $this->village_rep = $user_data['village_rep'];
         $this->weekly_rep = $user_data['weekly_rep'];
 	$this->pvp_rep = $user_data['pvp_rep'];
-        $this->last_pvp_rep_reset = $user_data['last_pvp_rep_reset'];
         $this->mission_rep_cd = $user_data['mission_rep_cd'];
         $this->recent_players_killed_ids = $user_data['recent_players_killed_ids'];
 	$this->recent_killer_ids = $user_data['recent_killer_ids'];
-        $this->reputation = new UserReputation($this->village_rep, $this->weekly_rep, $this->pvp_rep, $this->last_pvp_rep_reset, $this->recent_players_killed_ids, $this->recent_killer_ids, $this->mission_rep_cd, $this->system->event);
+        $this->reputation = new UserReputation($this->village_rep, $this->weekly_rep, $this->pvp_rep, $this->recent_players_killed_ids, $this->recent_killer_ids, $this->mission_rep_cd, $this->system->event);
 
         $this->gender = $user_data['gender'];
         $this->level = $user_data['level'];
@@ -1762,7 +1761,6 @@ class User extends Fighter {
 		`village_rep` = '$this->village_rep',
 		`weekly_rep` = '$this->weekly_rep',
   		`pvp_rep` = '$this->pvp_rep',
-    		`last_pvp_rep_reset` = '$this->last_pvp_rep_reset',
 		`recent_players_killed_ids` = '$this->recent_players_killed_ids',
 		`recent_killer_ids` = '$this->recent_killer_ids',
 		`mission_rep_cd` = '$this->mission_rep_cd',

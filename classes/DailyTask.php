@@ -114,69 +114,44 @@ class DailyTask {
         $possible_task_types = [
             DailyTask::ACTIVITY_PVP => [
                 'type' => DailyTask::ACTIVITY_PVP,
-                'sub_task' => [DailyTask::SUB_TASK_WIN_FIGHT, DailyTask::SUB_TASK_COMPLETE],
-                'min_amount' => [
-                    DailyTask::DIFFICULTY_EASY => 1,
-                    DailyTask::DIFFICULTY_MEDIUM => 3,
-                    DailyTask::DIFFICULTY_HARD => 7,
-                ],
+                'sub_task' => [/*DailyTask::SUB_TASK_WIN_FIGHT, */DailyTask::SUB_TASK_COMPLETE],
                 'max_amount' => [
-                    DailyTask::DIFFICULTY_EASY => 3,
-                    DailyTask::DIFFICULTY_MEDIUM => 5,
-                    DailyTask::DIFFICULTY_HARD => 10,
+                    DailyTask::DIFFICULTY_EASY => 4,
+                    DailyTask::DIFFICULTY_MEDIUM => 6,
+                    DailyTask::DIFFICULTY_HARD => 8,
                 ],
             ],
             DailyTask::ACTIVITY_ARENA => [
                 'type' => DailyTask::ACTIVITY_ARENA,
                 'sub_task' => [DailyTask::SUB_TASK_WIN_FIGHT],
-                'min_amount' => [
-                    DailyTask::DIFFICULTY_EASY => 5,
-                    DailyTask::DIFFICULTY_MEDIUM => 16,
-                    DailyTask::DIFFICULTY_HARD => 21,
-                ],
                 'max_amount' => [
                     DailyTask::DIFFICULTY_EASY => 15,
-                    DailyTask::DIFFICULTY_MEDIUM => 20,
-                    DailyTask::DIFFICULTY_HARD => 30,
+                    DailyTask::DIFFICULTY_MEDIUM => 25,
+                    DailyTask::DIFFICULTY_HARD => 35,
                 ],
             ],
             DailyTask::ACTIVITY_MISSIONS => [
                 'type' => DailyTask::ACTIVITY_MISSIONS,
                 'sub_task' => [DailyTask::SUB_TASK_COMPLETE],
-                'min_amount' => [
-                    DailyTask::DIFFICULTY_EASY => 5,
-                    DailyTask::DIFFICULTY_MEDIUM => 11,
-                    DailyTask::DIFFICULTY_HARD => 16,
-                ],
                 'max_amount' => [
-                    DailyTask::DIFFICULTY_EASY => 10,
-                    DailyTask::DIFFICULTY_MEDIUM => 15,
-                    DailyTask::DIFFICULTY_HARD => 25,
+                    DailyTask::DIFFICULTY_EASY => 15,
+                    DailyTask::DIFFICULTY_MEDIUM => 25,
+                    DailyTask::DIFFICULTY_HARD => 35,
                 ],
                 'mission_rank' => [],
             ],
             DailyTask::ACTIVITY_TRAINING => [
                 'type' => DailyTask::ACTIVITY_TRAINING,
                 'sub_task' => [self::SUB_TASK_SKILL, self::SUB_TASK_GEN, self::SUB_TASK_JUTSU],
-                'min_amount' => [
-                    DailyTask::DIFFICULTY_EASY => 25,
-                    DailyTask::DIFFICULTY_MEDIUM => 51,
-                    DailyTask::DIFFICULTY_HARD => 61,
-                ],
                 'max_amount' => [
                     DailyTask::DIFFICULTY_EASY => 50,
-                    DailyTask::DIFFICULTY_MEDIUM => 60,
-                    DailyTask::DIFFICULTY_HARD => 75,
+                    DailyTask::DIFFICULTY_MEDIUM => 65,
+                    DailyTask::DIFFICULTY_HARD => 80,
                 ],
             ],
             DailyTask::ACTIVITY_EARN_MONEY => [
                 'type' => DailyTask::ACTIVITY_EARN_MONEY,
                 'sub_task' => [self::SUB_TASK_EARN],
-                'min_amount' => [
-                    DailyTask::DIFFICULTY_EASY => 200,
-                    DailyTask::DIFFICULTY_MEDIUM => 750,
-                    DailyTask::DIFFICULTY_HARD => 1000,
-                ],
                 'max_amount' => [
                     DailyTask::DIFFICULTY_EASY => 500,
                     DailyTask::DIFFICULTY_MEDIUM => 1000,
@@ -198,52 +173,64 @@ class DailyTask {
         return $possible_task_types;
     }
 
-    public static function generateTask(int $user_rank_num, string $task_activity, &$possible_difficulties): DailyTask {
+    public static function generateTask(int $user_rank_num, string $task_activity, string $task_difficulty): DailyTask {
         // Generate new Daily Tasks if there's never been a new task or if 24hrs have ellapsed since last reset
-
         $possible_tasks = DailyTask::getPossibleTasks($user_rank_num);
         $task_config = $possible_tasks[$task_activity];
 
         // Randomly choose a mission type and amount
-        $sub_task_key = array_rand($task_config['sub_task'], 1);
+        $sub_task_key = array_rand($task_config['sub_task']);
         $sub_task = $task_config['sub_task'][$sub_task_key];
-        $task_name = DailyTask::$possible_task_names[$task_activity][array_rand(DailyTask::$possible_task_names[$task_activity], 1)];
-
-        // Configure mission data
-        $mission_rank = 0;
-        if($task_config['type'] == DailyTask::ACTIVITY_MISSIONS) {
-            $mission_rank_key = array_rand($task_config['mission_rank'], 1);
-            $mission_rank = $task_config['mission_rank'][$mission_rank_key];
-        }
-
-        // Determine task difficulty & remove for next tasks
-        $task_difficulty_key = array_rand($possible_difficulties);
-        $task_difficulty = $possible_difficulties[$task_difficulty_key];
-        unset($possible_difficulties[$task_difficulty_key]);
+        $task_name = DailyTask::$possible_task_names[$task_activity][array_rand(DailyTask::$possible_task_names[$task_activity])];
 
         // Configure min/max amounts based on difficulty
-        $task_config['min_amount'] = $task_config['min_amount'][$task_difficulty];
-        $task_config['max_amount'] = $task_config['max_amount'][$task_difficulty];
+        $max_task_amount = $task_config['max_amount'][$task_difficulty];
+        $min_task_amount = floor($task_config['max_amount'][$task_difficulty] * 0.7);
 
         // Increase training difficulty for rank 2 [skills & attributes]
         if($task_config['type'] == DailyTask::ACTIVITY_TRAINING && $user_rank_num > 1) {
-            $task_config['min_amount'] = ceil($task_config['min_amount'] * 1.75);
-            $task_config['max_amount'] = ceil($task_config['max_amount'] * 1.75);
+            $min_task_amount *= $user_rank_num;
+            $max_task_amount *= $user_rank_num;
         }
         // Override training amounts of jutsu training
         if($task_config['type'] == DailyTask::ACTIVITY_TRAINING && $sub_task == DailyTask::SUB_TASK_JUTSU) {
             if($user_rank_num == 1) {
-                $task_config['min_amount'] = 5;
-                $task_config['max_amount'] = 10;
+                $min_task_amount = 5;
+                $max_task_amount = 10;
             }
             else {
-                $task_config['min_amount'] = 10;
-                $task_config['max_amount'] = 15;
+                $min_task_amount = 10;
+                $max_task_amount = 15;
+            }
+        }
+
+        // Configure mission data
+        $mission_rank = 0;
+        if($task_config['type'] == DailyTask::ACTIVITY_MISSIONS) {
+            $mission_rank_key = array_rand($task_config['mission_rank']);
+            $mission_rank = $task_config['mission_rank'][$mission_rank_key];
+
+            switch($mission_rank) {
+                case Mission::RANK_S:
+                    $min_task_amount = ceil($min_task_amount * 0.3);
+                    $max_task_amount = ceil($max_task_amount * 0.3);
+                    break;
+                case Mission::RANK_A:
+                case Mission::RANK_B:
+                    $min_task_amount = ceil($min_task_amount * 0.5);
+                    $max_task_amount = ceil($max_task_amount * 0.5);
+                    break;
+                case Mission::RANK_C:
+                    $min_task_amount = ceil($min_task_amount * 0.75);
+                    $max_task_amount = ceil($max_task_amount * 0.75);
+                    break;
+                case Mission::RANK_D:
+                    break;
             }
         }
 
         // Assign task amount
-        $task_amount = mt_rand($task_config['min_amount'], $task_config['max_amount']);
+        $task_amount = mt_rand($min_task_amount, $max_task_amount);
 
         // Decide the Task difficulty for rewards
         $task_reward = 200 + (pow($user_rank_num, 2) * 150);
@@ -287,26 +274,41 @@ class DailyTask {
      * @return DailyTask[]
      */
     public static function generateNewTasks(int $user_rank_num): array {
-        $possible_difficulties = [self::DIFFICULTY_EASY, self::DIFFICULTY_MEDIUM, self::DIFFICULTY_HARD];
         $daily_tasks = [];
-
-        $daily_tasks[] = DailyTask::generateTask($user_rank_num, DailyTask::ACTIVITY_ARENA, $possible_difficulties);
 
         // Rank 1 only
         if($user_rank_num == 1) {
-            $daily_tasks[] = DailyTask::generateTask($user_rank_num, DailyTask::ACTIVITY_EARN_MONEY, $possible_difficulties);
+            $daily_tasks[] = DailyTask::generateTask(
+                $user_rank_num,
+                DailyTask::ACTIVITY_ARENA,
+                DailyTask::DIFFICULTY_MEDIUM
+            );
+            $daily_tasks[] = DailyTask::generateTask(
+                $user_rank_num,
+                DailyTask::ACTIVITY_EARN_MONEY,
+                DailyTask::DIFFICULTY_MEDIUM
+            );
+            return $daily_tasks;
         }
-        // Rank 1 and 2 only - training tasks
-        if($user_rank_num <= 2) {
-            $daily_tasks[] = DailyTask::generateTask($user_rank_num, DailyTask::ACTIVITY_TRAINING, $possible_difficulties);
-        }
-        // Rank 2+ mission activity
-        if($user_rank_num >= 2) {
-            $daily_tasks[] = DailyTask::generateTask($user_rank_num, DailyTask::ACTIVITY_MISSIONS, $possible_difficulties);
-        }
-        // Rank 3+ pvp
+
+        // Standard
+        $daily_tasks[] = DailyTask::generateTask(
+            $user_rank_num,
+            DailyTask::ACTIVITY_ARENA,
+            DailyTask::DIFFICULTY_MEDIUM
+        );
+        $daily_tasks[] = DailyTask::generateTask(
+            $user_rank_num,
+            DailyTask::ACTIVITY_MISSIONS,
+            DailyTask::DIFFICULTY_MEDIUM
+        );
+
         if($user_rank_num >= 3) {
-            $daily_tasks[] = DailyTask::generateTask($user_rank_num, DailyTask::ACTIVITY_PVP, $possible_difficulties);
+            $daily_tasks[] = DailyTask::generateTask(
+                $user_rank_num,
+                DailyTask::ACTIVITY_PVP,
+                DailyTask::DIFFICULTY_MEDIUM
+            );
         }
 
         return $daily_tasks;
