@@ -653,6 +653,31 @@ class StaffManager {
         return $ban_lengths;
     }
 
+    /** ADMIN PANEL METHODS **/
+    public function getAdminPanelPerms($type): array {
+        switch($type) {
+            // Keep create content and edit content in line with each other
+            case 'create_content':
+                if($this->isContentAdmin()) {
+                    $tools = ['create_ai', 'create_jutsu', 'create_item', 'create_bloodline', 'create_mission', 'create_clan'];
+                }
+                return $tools ?? array();
+            case 'edit_content':
+                if($this->isContentAdmin()) {
+                    $tools = ['edit_ai', 'edit_jutsu', 'edit_item', 'edit_bloodline', 'edit_mission', 'edit_clan'];
+                }
+                return $tools ?? array();
+            case 'misc_tools':
+                if($this->isUserAdmin()) {
+                    $tools = ['create_rank', 'edit_user', 'activate_user', 'stat_cut', 'staff_payments', 'give_bloodline',
+                        'edit_rank', 'edit_team', 'delete_user', 'dev_tools', 'manual_transaction', 'logs'];
+                }
+                return $tools ?? array();
+            default:
+                return array();
+        }
+    }
+
     /**
      * The following returns true/false if a user has a specific set of permissions
      * @return bool
