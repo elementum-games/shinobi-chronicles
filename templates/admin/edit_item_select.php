@@ -15,6 +15,7 @@ if(isset($_GET['item_type'])) {
             break;
         case 'consumable':
             $item_type = Item::USE_TYPE_CONSUMABLE;
+            break;
         case 'special':
             $item_type = Item::USE_TYPE_SPECIAL;
             break;
