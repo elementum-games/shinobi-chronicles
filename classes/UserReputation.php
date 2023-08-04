@@ -26,7 +26,7 @@ class UserReputation {
             'min_rep' => 1000,
             'weekly_cap' => 500,
             'weekly_pvp_cap' => 750,
-            'base_pvp_rep_reward' => 1,
+            'base_pvp_rep_reward' => 0,
             'base_decay' => 250,
         ],
         4 => [
@@ -35,7 +35,7 @@ class UserReputation {
             'min_rep' => 2500,
             'weekly_cap' => 1250,
             'weekly_pvp_cap' => 1500,
-            'base_pvp_rep_reward' => 2,
+            'base_pvp_rep_reward' => 1,
             'base_decay' => 500,
         ],
         5 => [
@@ -44,7 +44,7 @@ class UserReputation {
             'min_rep' => 5000,
             'weekly_cap' => 1250,
             'weekly_pvp_cap' => 1500,
-            'base_pvp_rep_reward' => 2,
+            'base_pvp_rep_reward' => 1,
             'base_decay' => 1000,
         ],
         6 => [
@@ -53,7 +53,7 @@ class UserReputation {
             'min_rep' => 10000,
             'weekly_cap' => 1250,
             'weekly_pvp_cap' => 1500,
-            'base_pvp_rep_reward' => 2,
+            'base_pvp_rep_reward' => 1,
             'base_decay' => 1750,
         ],
         7 => [
@@ -62,7 +62,7 @@ class UserReputation {
             'min_rep' => 20000,
             'weekly_cap' => 1500,
             'weekly_pvp_cap' => 3000,
-            'base_pvp_rep_reward' => 3,
+            'base_pvp_rep_reward' => 2,
             'base_decay' => 3000,
         ],
         8 => [
@@ -71,7 +71,7 @@ class UserReputation {
             'min_rep' => 35000,
             'weekly_cap' => 1500,
             'weekly_pvp_cap' => 3000,
-            'base_pvp_rep_reward' => 3,
+            'base_pvp_rep_reward' => 2,
             'base_decay' => 4000,
         ],
         9 => [
@@ -80,7 +80,7 @@ class UserReputation {
             'min_rep' => 50000,
             'weekly_cap' => 1500,
             'weekly_pvp_cap' => 3000,
-            'base_pvp_rep_reward' => 3,
+            'base_pvp_rep_reward' => 2,
             'base_decay' => 5000,
         ]
     ];
