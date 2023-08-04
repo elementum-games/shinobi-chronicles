@@ -1620,7 +1620,7 @@ class User extends Fighter {
                     $this->bloodline->jutsu[$jutsu->id]->exp += round(500 / ($this->bloodline->jutsu[$jutsu->id]->level * 0.9));
 
                     if($this->bloodline->jutsu[$jutsu->id]->exp >= 1000) {
-                        $levels_gained = floor($this->jutsu[$jutsu->id]->exp / 1000);
+                        $levels_gained = floor($this->bloodline->jutsu[$jutsu->id]->exp / 1000);
                         $this->jutsu[$jutsu->id]->exp -= $levels_gained * 1000;
                         $this->jutsu[$jutsu->id]->level += $levels_gained;
                         if($this->daily_tasks->hasTaskType(DailyTask::ACTIVITY_TRAINING)) {
