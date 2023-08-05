@@ -603,7 +603,7 @@ class BattleManager {
     }
 
     protected function stopBattle() {
-        $this->battle->winner = Battle::DRAW;
+        $this->battle->winner = Battle::STOP;
         $this->updateData();
     }
 

@@ -19,6 +19,7 @@ class Battle {
     const TEAM1 = 'T1';
     const TEAM2 = 'T2';
     const DRAW = 'DRAW';
+    const STOP = 'STOP';
 
     // Minimum % (of itself) a debuff can be reduced to with debuff resist
     const MIN_DEBUFF_RATIO = 0.1;
@@ -172,7 +173,7 @@ class Battle {
         $this->player = $player;
 
         $result = $this->system->db->query(
-            "SELECT * FROM `battles` WHERE `battle_id`='{$battle_id}' LIMIT 1"
+            "SELECT * FROM `battles` WHERE `battle_id`='{$battle_id}' LIMIT 1 FOR UPDATE"
         );
         if($this->system->db->last_num_rows == 0) {
             if($player->battle_id = $battle_id) {
