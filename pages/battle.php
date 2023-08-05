@@ -128,7 +128,7 @@ function processBattleFightEnd(BattleManager|BattleManagerV2 $battle, User $play
 
     $result = "";
 
-    if($battle->isPlayerWinner()) {
+    if ($battle->isPlayerWinner()) {
         $player->pvp_wins++;
         $player->monthly_pvp++;
         $player->last_pvp_ms = System::currentTimeMs();
@@ -144,25 +144,24 @@ function processBattleFightEnd(BattleManager|BattleManagerV2 $battle, User $play
         $result .= "You have earned $village_point_gain point for your village.[br]";
 
         // Calculate rep gains
-        if($player->reputation->canGain(false, true) && UserReputation::PVP_REP_ENABLED) {
+        if ($player->reputation->canGain(false, true) && UserReputation::PVP_REP_ENABLED) {
             $rep_gained = $player->reputation->handlePvPWin($player, $battle->opponent);
-            if($rep_gained > 0) {
+            if ($rep_gained > 0) {
                 $result .= "You have earned $rep_gained village reputation.[br]";
             }
         }
 
         // Team points
-        if($player->team != null) {
+        if ($player->team != null) {
             $player->team->addPoints($team_point_gain);
 
             $result .= "You have earned $team_point_gain point for your team.[br]";
         }
         // Daily Tasks
-        if($player->daily_tasks->hasTaskType(DailyTask::ACTIVITY_PVP)) {
+        if ($player->daily_tasks->hasTaskType(DailyTask::ACTIVITY_PVP)) {
             $player->daily_tasks->progressTask(DailyTask::ACTIVITY_PVP, 1);
         }
-    }
-    else if($battle->isOpponentWinner()) {
+    } else if ($battle->isOpponentWinner()) {
         $result .= "You lose. You were taken back to your village by some allied ninja.[br]";
         $player->health = 5;
         $player->pvp_losses++;
@@ -171,38 +170,40 @@ function processBattleFightEnd(BattleManager|BattleManagerV2 $battle, User $play
         $player->moveToVillage();
 
         // Calc rep loss (if any)
-    	if(UserReputation::PVP_REP_ENABLED) {
-	        $rep_lost = $player->reputation->handlePvPLoss($player, $battle->opponent);
-	        if($rep_lost > 0) {
-	            $result .= "You have lost $rep_lost village reputation.[br]";
-	        }
-	}
+        if (UserReputation::PVP_REP_ENABLED) {
+            $rep_lost = $player->reputation->handlePvPLoss($player, $battle->opponent);
+            if ($rep_lost > 0) {
+                $result .= "You have lost $rep_lost village reputation.[br]";
+            }
+        }
 
         // If player is killed during a survival mission as a result of PVP, clear the survival mission
-        if($player->mission_id != null) {
+        if ($player->mission_id != null) {
             check_survival_missions($player->mission_id);
         }
 
         // Daily Tasks
-        if($player->daily_tasks->hasTaskType(DailyTask::ACTIVITY_PVP)) {
+        if ($player->daily_tasks->hasTaskType(DailyTask::ACTIVITY_PVP)) {
             $player->daily_tasks->progressTask(DailyTask::ACTIVITY_PVP, 1, DailyTask::SUB_TASK_COMPLETE);
         }
-    }
-    else {
+    } else if ($battle->isDraw()) {
         $result .= "You both knocked each other out. You were taken back to your village by some allied ninja.[br]";
         $player->health = 5;
         $player->moveToVillage();
         $player->last_pvp_ms = System::currentTimeMs();
 
         // If player is killed during a survival mission as a result of PVP, clear the survival mission
-        if($player->mission_id != null) {
+        if ($player->mission_id != null) {
             check_survival_missions($player->mission_id);
         }
 
         // Daily Tasks
-        if($player->daily_tasks->hasTaskType(DailyTask::ACTIVITY_PVP)) {
+        if ($player->daily_tasks->hasTaskType(DailyTask::ACTIVITY_PVP)) {
             $player->daily_tasks->progressTask(DailyTask::ACTIVITY_PVP, 1, DailyTask::SUB_TASK_COMPLETE);
         }
+    }
+    else {
+        $result .= "Battle Stopped.[br]";
     }
 
     return $result;
