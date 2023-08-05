@@ -14,6 +14,7 @@ class TrainingManager {
     public string $train_type;
     public ForbiddenSeal $forbidden_seal;
     public ?Team $team;
+    public ?Clan $clan;
     public Rank $rank;
     public UserReputation $reputation;
     public ?int $sensei_id;
@@ -46,8 +47,8 @@ class TrainingManager {
     public int $stat_extended_train_length;
     public int $base_jutsu_train_length;
     public int $jutsu_train_gain;
-    
-    public function __construct(System $system, &$type, &$gain, &$time, $rank, $forbidden_seal, $rep, $team, $sensei, $bloodline_id) {
+
+    public function __construct(System $system, &$type, &$gain, &$time, $rank, $forbidden_seal, $rep, $team, $clan, $sensei, $bloodline_id) {
         $this->system = $system;
 
         $this->rank = $rank;
@@ -56,6 +57,7 @@ class TrainingManager {
         $this->train_time = &$time;
         $this->forbidden_seal = $forbidden_seal;
         $this->team = $team;
+        $this->clan = $clan;
         $this->reputation = $rep;
         $this->sensei_id = $sensei;
         $this->bloodline_id = $bloodline_id;
@@ -198,9 +200,20 @@ class TrainingManager {
 
     public function getTrainingLength($length, $jutsu = false, $in_mins = false) {
         if($jutsu != false) {
+            // Clan boost info
+            $clan_boost = false;
+            if (isset($this->clan)) {
+                if ($this->clan->boost_effect == 'jutsu') {
+                    $clan_boost = $this->clan->boost_amount;
+                }
+            }
             // True time calculation for setting training
             if($jutsu instanceof Jutsu) {
                 $len = self::BASE_TRAIN_TIME + (60 * round(pow($jutsu->level, 1.1)));
+                // Clan boost
+                if ($clan_boost) {
+                    $len *= 1 - ($clan_boost / 100);
+                }
                 return ($in_mins) ? $len/60 : $len;
             }
             // Used for basic display in training menu
@@ -212,12 +225,26 @@ class TrainingManager {
             if($this->sensei_id) {
                 $sensei_boost = SenseiManager::getTrainingBoostForTrainType($this->sensei_id, $this->train_type, $this->bloodline_id, $this->system);
             }
+            // Clan boost info
+            $clan_boost = false;
+            if (isset($this->clan)) {
+                if ($this->clan->boost_type == 'training') {
+                    if ($this->train_type == $this->clan->boost_effect) {
+                        $clan_boost = $this->clan->boost_amount;
+                    }
+                }
+            }
+            // Length logic
             switch($length) {
                 case self::TRAIN_LEN_SHORT:
                     $train_length = self::BASE_TRAIN_TIME;
                     // Sensei boost
                     if($sensei_boost) {
                         $train_length *= 1 - ($sensei_boost/100);
+                    }
+                    // Clan boost
+                    if ($clan_boost) {
+                        $train_length *= 1 - ($clan_boost / 100);
                     }
                     return ($in_mins) ? self::formatSecondsToMinutes($train_length) : $train_length;
                 case self::TRAIN_LEN_LONG:
@@ -228,6 +255,10 @@ class TrainingManager {
                     if($sensei_boost) {
                         $train_length *= 1 - ($sensei_boost/100);
                     }
+                    // Clan boost
+                    if ($clan_boost) {
+                        $train_length *= 1 - ($clan_boost / 100);
+                    }
                     return ($in_mins) ? self::formatSecondsToMinutes($train_length) : $train_length;
                 case self::TRAIN_LEN_EXTENDED:
                     $train_length = self::BASE_TRAIN_TIME * 30;
@@ -236,6 +267,10 @@ class TrainingManager {
                     // Sensei boost
                     if($sensei_boost) {
                         $train_length *= 1 - ($sensei_boost/100);
+                    }
+                    // Clan boost
+                    if ($clan_boost) {
+                        $train_length *= 1 - ($clan_boost / 100);
                     }
                     return ($in_mins) ? self::formatSecondsToMinutes($train_length) : $train_length;
                 default:

@@ -969,7 +969,7 @@ class User extends Fighter {
     public function loadTrainingManager(): void
     {
         $this->trainingManager = new TrainingManager($this->system, $this->train_type, $this->train_gain,
-    $this->train_time, $this->rank, $this->forbidden_seal, $this->reputation, $this->team, $this->sensei_id,
+    $this->train_time, $this->rank, $this->forbidden_seal, $this->reputation, $this->team, $this->clan, $this->sensei_id,
             $this->bloodline_id);
     }
 
