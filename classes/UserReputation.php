@@ -465,12 +465,12 @@ class UserReputation {
         }
 
         // See handlePvPWin for why we have this
-        $level_diff_to_loss_divider = self::MAX_PVP_LEVEL_DIFFERENCE / 5;
-        $rep_tier_diff_to_loss_divider = self::MAX_PVP_REP_TIER_DIFFERENCE / 7;
+        $level_diff_to_loss_divider = self::MAX_PVP_LEVEL_DIFFERENCE / self::PVP_MEDIAN_LEVEL_BASED_GAIN;
+        $rep_tier_diff_to_loss_divider = self::MAX_PVP_REP_TIER_DIFFERENCE / self::PVP_MEDIAN_REP_TIER_BASED_GAIN;
 
         // Loss goes from 0-10 based on level diff and 0-14 based on rep tier
-        $level_based_loss = 5 - ($player_levels_below_opponent / $level_diff_to_loss_divider);
-        $tier_based_loss = 7 - ($player_rep_tiers_below_opponent / $rep_tier_diff_to_loss_divider);
+        $level_based_loss = self::PVP_MEDIAN_LEVEL_BASED_GAIN - ($player_levels_below_opponent / $level_diff_to_loss_divider);
+        $tier_based_loss = self::PVP_MEDIAN_REP_TIER_BASED_GAIN - ($player_rep_tiers_below_opponent / $rep_tier_diff_to_loss_divider);
 
         $level_based_loss = min($level_based_loss, self::PVP_MEDIAN_LEVEL_BASED_GAIN * 2);
         $tier_based_loss = min($tier_based_loss, self::PVP_MEDIAN_REP_TIER_BASED_GAIN * 2);
