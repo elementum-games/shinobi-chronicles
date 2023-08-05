@@ -48,11 +48,9 @@ class BattleLog {
      */
     public static function addOrUpdateTurnLog(System $system, int $battle_id, int $turn_number, string $content) {
         $system->db->query(
-            "INSERT INTO `battle_logs` 
+            "INSERT IGNORE INTO `battle_logs` 
                 SET `battle_id`='{$battle_id}',
                     `turn_number`='{$turn_number}',
-                    `content`='{$content}'
-                ON DUPLICATE KEY UPDATE
                     `content`='{$content}'
             "
         );
