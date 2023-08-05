@@ -17,7 +17,7 @@ class UserReputation {
             'min_rep' => 500,
             'weekly_cap' => 500,
             'weekly_pvp_cap' => 375,
-            'base_pvp_rep_reward' => 1,
+            'base_pvp_rep_reward' => 2,
             'base_decay' => 0,
         ],
         3 => [
@@ -26,7 +26,7 @@ class UserReputation {
             'min_rep' => 1000,
             'weekly_cap' => 500,
             'weekly_pvp_cap' => 375,
-            'base_pvp_rep_reward' => 1,
+            'base_pvp_rep_reward' => 2,
             'base_decay' => 250,
         ],
         4 => [
@@ -35,7 +35,7 @@ class UserReputation {
             'min_rep' => 2500,
             'weekly_cap' => 1250,
             'weekly_pvp_cap' => 750,
-            'base_pvp_rep_reward' => 2,
+            'base_pvp_rep_reward' => 3,
             'base_decay' => 500,
         ],
         5 => [
@@ -44,7 +44,7 @@ class UserReputation {
             'min_rep' => 5000,
             'weekly_cap' => 1250,
             'weekly_pvp_cap' => 750,
-            'base_pvp_rep_reward' => 2,
+            'base_pvp_rep_reward' => 3,
             'base_decay' => 1000,
         ],
         6 => [
@@ -53,7 +53,7 @@ class UserReputation {
             'min_rep' => 10000,
             'weekly_cap' => 1250,
             'weekly_pvp_cap' => 750,
-            'base_pvp_rep_reward' => 2,
+            'base_pvp_rep_reward' => 3,
             'base_decay' => 1750,
         ],
         7 => [
@@ -62,7 +62,7 @@ class UserReputation {
             'min_rep' => 20000,
             'weekly_cap' => 1500,
             'weekly_pvp_cap' => 1500,
-            'base_pvp_rep_reward' => 3,
+            'base_pvp_rep_reward' => 4,
             'base_decay' => 3000,
         ],
         8 => [
@@ -71,7 +71,7 @@ class UserReputation {
             'min_rep' => 35000,
             'weekly_cap' => 1500,
             'weekly_pvp_cap' => 1500,
-            'base_pvp_rep_reward' => 3,
+            'base_pvp_rep_reward' => 4,
             'base_decay' => 4000,
         ],
         9 => [
@@ -80,7 +80,7 @@ class UserReputation {
             'min_rep' => 50000,
             'weekly_cap' => 1500,
             'weekly_pvp_cap' => 1500,
-            'base_pvp_rep_reward' => 3,
+            'base_pvp_rep_reward' => 4,
             'base_decay' => 5000,
         ]
     ];
@@ -153,10 +153,10 @@ class UserReputation {
     const WEEKLY_CAP_MET_DECAY_MULTIPLIER = 0.7; // Reduce reputation decay by 30% if weekly cap is met
 
     const MAX_PVP_LEVEL_DIFFERENCE = 20;
-    const MAX_PVP_REP_TIER_DIFFERENCE = 3;
+    const MAX_PVP_REP_TIER_DIFFERENCE = 4;
 
-    const PVP_MEDIAN_LEVEL_BASED_GAIN = 3; // amount gained when fighting someone of the same level (TODO: 5)
-    const PVP_MEDIAN_REP_TIER_BASED_GAIN = 3; // amount gained when fighting someone of the same rep tier (TODO: 7)
+    const PVP_MEDIAN_LEVEL_BASED_GAIN = 4; // amount gained when fighting someone of the same level (TODO: 5)
+    const PVP_MEDIAN_REP_TIER_BASED_GAIN = 2; // amount gained when fighting someone of the same rep tier (TODO: 7)
 
     const PVP_REP_ENABLED = true;
 
@@ -385,26 +385,25 @@ class UserReputation {
             return 0;
         }
 
-        /* This is so we can adjust from maximum level difference (say, 20 levels) to maximum gain difference (say, +/- 5 rep)
+        /* This is so we can adjust from maximum level difference (say, 20 levels) to maximum gain difference (say, +/- 4 rep)
          Max point difference is 5
-         Assuming max level diff of 20, level_diff_to_gain_divider is 20 / 5 = 4
+         Assuming max level diff of 20, level_diff_to_gain_divider is 20 / 5 = 5
 
          Scenario 1: Beat someone 10 levels higher. Levels above opponent = -10
 
-         - Normalize level diff to gain: -10 / 4 = -2.5
-         - level_based_gain = 5 - (-2.5)
-         - level_based_gain = 7.5
+         - Normalize level diff to gain: -10 / 5 = -2
+         - level_based_gain = 5 - (-2)
+         - level_based_gain = 7
 
          Scenario 2: Beat someone 15 levels lower. Levels above opponent = 10
-            - Normalize level diff to gain: 15 / 4 = 3.75
-            - level_based_gain = 5 - 3.75
-            - level_based_gain = 1.25
+            - Normalize level diff to gain: 15 / 5 = 3
+            - level_based_gain = 5 - 3
+            - level_based_gain = 2
         */
 
         $level_diff_to_gain_divider = self::MAX_PVP_LEVEL_DIFFERENCE / self::PVP_MEDIAN_LEVEL_BASED_GAIN;
         $rep_tier_diff_to_gain_divider = self::MAX_PVP_REP_TIER_DIFFERENCE / self::PVP_MEDIAN_REP_TIER_BASED_GAIN;
 
-        // Gain goes from 0-10 based on level diff and 0-14 based on rep tier
         $level_based_gain = self::PVP_MEDIAN_LEVEL_BASED_GAIN - ($player_levels_above_opponent / $level_diff_to_gain_divider);
         $tier_based_gain = self::PVP_MEDIAN_REP_TIER_BASED_GAIN - ($player_rep_tiers_above_opponent / $rep_tier_diff_to_gain_divider);
 
