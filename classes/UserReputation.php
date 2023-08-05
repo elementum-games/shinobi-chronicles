@@ -153,7 +153,7 @@ class UserReputation {
     const WEEKLY_CAP_MET_DECAY_MULTIPLIER = 0.7; // Reduce reputation decay by 30% if weekly cap is met
 
     const MAX_PVP_LEVEL_DIFFERENCE = 20;
-    const MAX_PVP_REP_TIER_DIFFERENCE= 2;
+    const MAX_PVP_REP_TIER_DIFFERENCE = 3;
 
     const PVP_MEDIAN_LEVEL_BASED_GAIN = 3; // amount gained when fighting someone of the same level (TODO: 5)
     const PVP_MEDIAN_REP_TIER_BASED_GAIN = 3; // amount gained when fighting someone of the same rep tier (TODO: 7)
