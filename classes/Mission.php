@@ -124,6 +124,14 @@ class Mission {
             return Mission::STATUS_IN_PROGRESS;
         }
 
+        // Get last location
+        $last_location = '';
+        if (isset($this->current_stage['action_type'])) {
+            if ($this->current_stage['action_type'] == 'travel' || $this->current_stage['action_type'] == 'search') {
+                $last_location = $this->current_stage['action_data'];
+            }
+        }
+
         // Load new stage data
         if($new_stage) {
             $this->current_stage = $this->stages[$stage_id];
@@ -151,6 +159,7 @@ class Mission {
                 }
             }
 
+            $this->current_stage['last_location'] = $last_location;
             $this->current_stage['action_data'] = $location->fetchString();
         }
 

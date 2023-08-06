@@ -380,6 +380,17 @@ class TravelManager {
                     image: "/images/v2/icons/anbutracking.png",
                 );
             }
+            if ($this->user->mission_stage['action_type'] == 'search') {
+                $mission_result = $this->system->db->query("SELECT `name` FROM `missions` WHERE `mission_id` = '{$this->user->mission_id}' LIMIT 1");
+                $mission_location = TravelCoords::fromDbString($this->user->mission_stage['last_location']);
+                $objectives[] = new MapObjectiveLocation(
+                    name: $this->system->db->fetch($mission_result)['name'],
+                    map_id: $mission_location->map_id,
+                    x: $mission_location->x,
+                    y: $mission_location->y,
+                    image: "/images/v2/icons/magnifying-glass.png",
+                );
+            }
         }
 
         // TEMP Add Events - We have to hard code the mission IDs is System for now
@@ -472,7 +483,7 @@ class TravelManager {
             }
         }
 
-
+        
         // Check if objectives match existing locations
         $new_locations = [];
         // Use this to assign unique ID for react key
