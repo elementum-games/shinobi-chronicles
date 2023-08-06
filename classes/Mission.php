@@ -125,7 +125,7 @@ class Mission {
         }
 
         // Get last location
-        $last_location = '';
+        $last_location = $this->player->village_location->fetchString();
         if (isset($this->current_stage['action_type'])) {
             if ($this->current_stage['action_type'] == 'travel' || $this->current_stage['action_type'] == 'search') {
                 $last_location = $this->current_stage['action_data'];
