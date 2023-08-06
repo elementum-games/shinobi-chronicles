@@ -40,7 +40,6 @@ function viewBattles() {
     $battles_result = $system->db->query(
         "SELECT `battle_id`, `player1`, `player2`, `winner` FROM `battles`
             WHERE `battle_type` IN (" . implode(",", $battle_types) . ")
-            AND `winner` != '{$winner_stop}'
             ORDER BY `battle_id` DESC LIMIT {$limit}"
     );
 
@@ -90,6 +89,9 @@ function viewBattles() {
         switch($battleManager['winner']) {
             case Battle::DRAW:
                 $winner = 'Draw';
+                break;
+            case Battle::STOP:
+                $winner = 'Stopped';
                 break;
             case Battle::TEAM1:
                 $winner = $p1_name;
