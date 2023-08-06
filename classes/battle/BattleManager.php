@@ -1,5 +1,7 @@
 <?php
 
+use DDTrace\Trace;
+
 require_once __DIR__ . '/Battle.php';
 // require_once __DIR__ . '/BattleField.php';
 require_once __DIR__ . '/BattleEffectsManager.php';
@@ -45,6 +47,7 @@ class BattleManager {
      * @param bool   $load_fighters
      * @throws RuntimeException
      */
+    #[Trace]
     public function __construct(System $system, User $player, int $battle_id, bool $spectate = false, bool $load_fighters = true) {
         $this->system = $system;
         $this->battle_id = $battle_id;
@@ -78,6 +81,7 @@ class BattleManager {
      * @return BattleManager
      * @throws RuntimeException
      */
+    #[Trace]
     public static function init(System $system, User $player, int $battle_id, bool $spectate = false, bool $load_fighters = true): BattleManager {
         return new BattleManager($system, $player, $battle_id, $spectate, $load_fighters);
     }
@@ -85,6 +89,7 @@ class BattleManager {
     /**
      * @throws RuntimeException
      */
+    #[Trace]
     protected function loadFighters() {
         if($this->player->id == $this->battle->player1_id) {
             $this->player_side = Battle::TEAM1;
@@ -168,6 +173,7 @@ class BattleManager {
      * @return string|null
      * @throws RuntimeException
      */
+    #[Trace]
     public function checkInputAndRunTurn(): ?string {
         // If someone is not in battle, this will be set
         if($this->battle->winner) {
@@ -459,6 +465,7 @@ class BattleManager {
     /**
      * @throws RuntimeException
      */
+    #[Trace]
     protected function runActions(): void {
         $this->processTurnEffects();
 
@@ -546,6 +553,7 @@ class BattleManager {
         $this->finishTurn();
     }
 
+    #[Trace]
     private function finishTurn() {
         $this->battle->turn_time = time();
         $this->battle->turn_count++;
@@ -562,6 +570,7 @@ class BattleManager {
         $this->battle->player2->updateInventory();
     }
 
+    #[Trace]
     private function checkForWinner(): string {
         if($this->battle->isComplete()) {
             return $this->battle->winner;
@@ -587,6 +596,7 @@ class BattleManager {
     /**
      * @throws RuntimeException
      */
+    #[Trace]
     private function processTurnEffects() {
         // Run turn effects
         $this->effects->applyActiveEffects($this->battle->player1, $this->battle->player2);
@@ -602,11 +612,13 @@ class BattleManager {
         }
     }
 
+    #[Trace]
     protected function stopBattle() {
         $this->battle->winner = Battle::STOP;
         $this->updateData();
     }
 
+    #[Trace]
     public function updateData() {
         if($this->spectate) {
             return;
@@ -619,7 +631,6 @@ class BattleManager {
         $this->battle->updateData();
     }
 
-
     // PRIVATE API - ATTACK PROCESSING
 
     /**
@@ -628,6 +639,7 @@ class BattleManager {
      * @return BattleAttack
      * @throws RuntimeException
      */
+    #[Trace]
     protected function setupFighterAttack(Fighter $fighter, LegacyFighterAction $action): BattleAttack {
         $attack = new BattleAttack();
         if($action->jutsu_purchase_type == Jutsu::PURCHASE_TYPE_DEFAULT) {
@@ -689,6 +701,7 @@ class BattleManager {
         return $attack;
     }
 
+    #[Trace]
     protected function applyAttack(BattleAttack $attack, Fighter $user, Fighter $target) {
         $attack_damage = $attack->raw_damage;
         if(empty($attack->jutsu->effect_only)) {
@@ -791,6 +804,7 @@ class BattleManager {
     /**
      * @throws RuntimeException
      */
+    #[Trace]
     public function jutsuCollision(
         Fighter $player1, Fighter $player2, &$player1_damage, &$player2_damage, Jutsu $player1_jutsu, Jutsu $player2_jutsu
     ) {
@@ -1020,8 +1034,6 @@ class BattleManager {
         return $evasion_stat_amount;
     }
 
-
-
     // PRIVATE API - PLAYER ACTIONS
 
     private function getJutsuFromHandSeals(Fighter $fighter, string $hand_seals): ?Jutsu {
@@ -1082,6 +1094,7 @@ class BattleManager {
         return $fighter_jutsu;
     }
 
+    #[Trace]
     protected function setPlayerAction(Fighter $player, Jutsu $jutsu, int $weapon_id, string $weapon_element) {
         $this->battle->fighter_actions[$player->combat_id] = new LegacyFighterAction(
             $jutsu->id,
@@ -1104,6 +1117,7 @@ class BattleManager {
      * @param Fighter $ai
      * @throws RuntimeException
      */
+    #[Trace]
     protected function chooseAndSetAIAction(Fighter $ai) {
         if(!($ai instanceof NPC)) {
             throw new RuntimeException("Calling chooseAndSetAIAction on non-AI!");
