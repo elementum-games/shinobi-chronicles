@@ -171,6 +171,9 @@ function viewBattles() {
                 case Battle::DRAW:
                     $winner = 'Draw';
                     break;
+                case Battle::STOP:
+                    $winner = 'Stopped';
+                    break;
                 case Battle::TEAM1:
                     $winner = $p1_name;
                     break;
