@@ -14,7 +14,7 @@ class Battle {
     const TURN_LENGTH = 40;
     const PREP_LENGTH = 20;
 
-    const MAX_PRE_FIGHT_HEAL_PERCENT = 95;
+    const MAX_PRE_FIGHT_HEAL_PERCENT = 85;
 
     const TEAM1 = 'T1';
     const TEAM2 = 'T2';

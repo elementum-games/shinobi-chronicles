@@ -36,6 +36,7 @@ function viewBattles() {
         }
     }
 
+    $winner_stop = Battle::STOP;
     $battles_result = $system->db->query(
         "SELECT `battle_id`, `player1`, `player2`, `winner` FROM `battles`
             WHERE `battle_type` IN (" . implode(",", $battle_types) . ")
@@ -88,6 +89,9 @@ function viewBattles() {
         switch($battleManager['winner']) {
             case Battle::DRAW:
                 $winner = 'Draw';
+                break;
+            case Battle::STOP:
+                $winner = 'Stopped';
                 break;
             case Battle::TEAM1:
                 $winner = $p1_name;
@@ -166,6 +170,9 @@ function viewBattles() {
             switch ($battleManager['winner']) {
                 case Battle::DRAW:
                     $winner = 'Draw';
+                    break;
+                case Battle::STOP:
+                    $winner = 'Stopped';
                     break;
                 case Battle::TEAM1:
                     $winner = $p1_name;
