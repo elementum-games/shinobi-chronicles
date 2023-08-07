@@ -93,14 +93,14 @@ if($battle->battle_text) {
         border-radius: 12px;
     }
 
-    #forfeitButton {
+    #forfeitButton, #retreatButton {
         cursor: pointer;
     }
-    #forfeitDialog button {
+    #forfeitDialog button, #retreatDialog button {
         cursor: pointer;
     }
 
-    .forfeitFormButtons {
+    .forfeitFormButtons, .retreatFormButtons {
         display: flex;
         justify-content: space-evenly;
         margin-top: 12px;
@@ -190,7 +190,7 @@ if($battle->battle_text) {
         <tr><td style='text-align:center;' colspan='2'>
                 <p>
                     <?php if ($battle->isPreparationPhase()): ?>
-                        <?php echo "Prep-Time Remaining:" . $battle->prepTimeRemaining() ?>
+                        <?php echo "Prep-Time Remaining: " . $battle->prepTimeRemaining() ?>
                     <?php elseif (!$battleManager->opponent instanceof NPC): ?>
                         <?php echo "Time Remaining<br>"?>
                         <?php if (isset($battle->fighter_actions[$battle->player1->combat_id])): ?>
@@ -206,29 +206,56 @@ if($battle->battle_text) {
                         <?php endif; ?>
                     <?php endif; ?>
                 </p>
-                <a id='forfeitButton'>Forfeit</a>
-                <dialog id="forfeitDialog">
-                    <form method="post">
-                        <p>Are you sure you want to forfeit this battle?</p>
-                        <div class='forfeitFormButtons'>
-                            <button id="cancelBtn" value="cancel">Cancel</button>
-                            <button id="confirmBtn" name="forfeit" value="1">Confirm</button>
-                        </div>
-                    </form>
-                </dialog>
-                <script type='text/javascript'>
-                    const forfeitButton = document.getElementById('forfeitButton');
-                    const forfeitDialog = document.getElementById('forfeitDialog');
-                    const cancelButton = document.getElementById('cancelBtn');
+                <?php if ($battle->isPreparationPhase()): ?>
+                    <a id='retreatButton'>Retreat</a>
+                    <dialog id="retreatDialog">
+                        <form method="post">
+                            <p>Are you sure you want to retreat from this battle? You will suffer half the normal Reputation loss.</p>
+                            <div class='retreatFormButtons'>
+                                <button id="cancelBtn" value="cancel">Cancel</button>
+                                <button id="confirmBtn" name="retreat" value="1">Confirm</button>
+                            </div>
+                        </form>
+                    </dialog>
+                    <script type='text/javascript'>
+                        const retreatButton = document.getElementById('retreatButton');
+                        const retreatDialog = document.getElementById('retreatDialog');
+                        const cancelButton = document.getElementById('cancelBtn');
 
-                    forfeitButton.addEventListener('click', () => {
-                        forfeitDialog.showModal();
-                    });
-                    cancelButton.addEventListener('click', (e) => {
-                        e.preventDefault();
-                        forfeitDialog.close();
-                    });
-                </script>
+                        retreatButton.addEventListener('click', () => {
+                            retreatDialog.showModal();
+                        });
+                        cancelButton.addEventListener('click', (e) => {
+                            e.preventDefault();
+                            retreatDialog.close();
+                        });
+                    </script>
+                <?php else: ?>
+                    <a id='forfeitButton'>Forfeit</a>
+                    <dialog id="forfeitDialog">
+                        <form method="post">
+                            <p>Are you sure you want to forfeit this battle?</p>
+                            <div class='forfeitFormButtons'>
+                                <button id="cancelBtn" value="cancel">Cancel</button>
+                                <button id="confirmBtn" name="forfeit" value="1">Confirm</button>
+                            </div>
+                        </form>
+                    </dialog>
+                    <script type='text/javascript'>
+                        const forfeitButton = document.getElementById('forfeitButton');
+                        const forfeitDialog = document.getElementById('forfeitDialog');
+                        const cancelButton = document.getElementById('cancelBtn');
+
+                        forfeitButton.addEventListener('click', () => {
+                            forfeitDialog.showModal();
+                        });
+                        cancelButton.addEventListener('click', (e) => {
+                            e.preventDefault();
+                            forfeitDialog.close();
+                        });
+                    </script>
+                <?php endif; ?>
+                
             </td></tr>
     <?php endif; ?>
 

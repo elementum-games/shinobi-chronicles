@@ -43,6 +43,7 @@ class Battle {
     public int $player2_time;
 
     public string $winner;
+    public bool $is_retreat = false;
 
     public Fighter $player;
 
@@ -202,6 +203,9 @@ class Battle {
         $this->turn_count = $battle['turn_count'];
 
         $this->winner = $battle['winner'];
+        if (isset($battle['is_retreat'])) {
+            $this->is_retreat = $battle['is_retreat'];
+        }
 
         $this->player1_id = $battle['player1'];
         $this->player2_id = $battle['player2'];
@@ -357,6 +361,7 @@ class Battle {
             `turn_time` = {$this->turn_time},
             `turn_count` = {$this->turn_count},
             `winner` = '{$this->winner}',
+            `is_retreat` = '{$this->is_retreat}',
 
             `player1_time` = {$this->player1_time},
             `player2_time` = {$this->player2_time},
