@@ -219,7 +219,7 @@ class BattleManager {
             return false;
         }
         // If turn is still active and user hasn't submitted their move, check for action
-        if($this->battle->timeRemaining() > 0 && !$this->playerActionSubmitted()) {
+        if($this->battle->timeRemaining($this->player->id) > 0 && !$this->playerActionSubmitted()) {
             if(!empty($_POST['attack'])) {
                 // Run player attack
                 try {
@@ -295,6 +295,9 @@ class BattleManager {
                     // Log jutsu used
                     $this->setPlayerAction($this->player, $player_jutsu, $weapon_id, $weapon_element);
 
+                    //update player turn time
+                    $this->battle->updatePlayerTime($this->player->id);
+
                     if($this->opponent instanceof NPC) {
                         $this->chooseAndSetAIAction($this->opponent);
                     }
@@ -308,13 +311,24 @@ class BattleManager {
         }
 
         // If time is up or both people have submitted moves, RUN TURN
-        if($this->battle->timeRemaining() <= 0 || $this->allActionsSubmitted()) {
+        $player1_submitted = isset($this->battle->fighter_actions[$this->battle->player1->combat_id]);
+        $player2_submitted = isset($this->battle->fighter_actions[$this->battle->player2->combat_id]);
+        if(($this->battle->timeRemaining($this->battle->player1_id) <= 0 || $player1_submitted) && ($this->battle->timeRemaining($this->battle->player2_id) <= 0 || $player2_submitted)) {
             if(!empty($this->battle->fighter_actions)) {
                 $this->runActions();
+                // if a player did not submit action, update timer
+                if (!$player1_submitted) {
+                    $this->battle->updatePlayerTime($this->battle->player1_id, min: true);
+                }
+                if (!$player2_submitted) {
+                    $this->battle->updatePlayerTime($this->battle->player2_id, min: true);
+                }
             }
             // If neither player moved, update turn timer only
             else {
                 $this->battle->turn_time = time();
+                $this->battle->updatePlayerTime($this->battle->player1_id, min: true);
+                $this->battle->updatePlayerTime($this->battle->player2_id, min: true);
             }
         }
 
@@ -647,7 +661,7 @@ class BattleManager {
         }
         else if($action->jutsu_purchase_type == Jutsu::PURCHASE_TYPE_PURCHASABLE) {
             $attack->jutsu = $fighter->jutsu[$action->jutsu_id];
-        } 
+        }
         else if ($action->jutsu_purchase_type == Jutsu::PURCHASE_TYPE_EVENT_SHOP) {
             $attack->jutsu = $fighter->jutsu[$action->jutsu_id];
         }

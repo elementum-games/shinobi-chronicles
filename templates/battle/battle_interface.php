@@ -183,14 +183,28 @@ if($battle->battle_text) {
         <?php if(!$battleManager->playerActionSubmitted()): ?>
             <?php require 'templates/battle/action_prompt.php'; ?>
         <?php elseif(!$battleManager->opponentActionSubmitted()): ?>
-            <tr><td colspan='2'>Please wait for <?= $opponent->getName() ?> to select an action.</td></tr>
+            <tr><td colspan='2' style="text-align: center">Please wait for <?= $opponent->getName() ?> to select an action.</td></tr>
         <?php endif; ?>
 
         <!--// Turn timer-->
         <tr><td style='text-align:center;' colspan='2'>
                 <p>
-                    <?= ($battle->isPreparationPhase() ? "Prep-" : "") ?>Time remaining:
-                    <?= $battle->isPreparationPhase() ? $battle->prepTimeRemaining() : $battle->timeRemaining() ?> seconds
+                    <?php if ($battle->isPreparationPhase()): ?>
+                        <?php echo "Prep-Time Remaining:" . $battle->prepTimeRemaining() ?>
+                    <?php elseif (!$battleManager->opponent instanceof NPC): ?>
+                        <?php echo "Time Remaining<br>"?>
+                        <?php if (isset($battle->fighter_actions[$battle->player1->combat_id])): ?>
+                            <?php echo "<b>" . $battle->player1->user_name . ":</b> ". "waiting" ?>
+                        <?php else: ?>
+                            <?php echo "<b>" . $battle->player1->user_name . ":</b> ". $battle->timeRemaining($battle->player1_id) . " seconds" ?>
+                        <?php endif; ?>
+                        <br />
+                        <?php if (isset($battle->fighter_actions[$battle->player2->combat_id])): ?>
+                            <?php echo "<b>" . $battle->player2->user_name . ":</b> ". "waiting" ?>
+                        <?php else: ?>
+                            <?php echo "<b>" . $battle->player2->user_name . ":</b> " . $battle->timeRemaining($battle->player2_id) . " seconds" ?>
+                        <?php endif; ?>
+                    <?php endif; ?>
                 </p>
                 <a id='forfeitButton'>Forfeit</a>
                 <dialog id="forfeitDialog">
@@ -227,7 +241,18 @@ if($battle->battle_text) {
                 <?php elseif($battle->winner == Battle::DRAW): ?>
                     Fight ended in a draw.
                 <?php else: ?>
-                    Time remaining: <?= $battle->timeRemaining() ?> seconds
+                    <?php echo "Time Remaining<br>"?>
+                        <?php if (isset($battle->fighter_actions[$battle->player1->combat_id])): ?>
+                            <?php echo "<b>" . $battle->player1->user_name . ":</b> ". "waiting" ?>
+                        <?php else: ?>
+                            <?php echo "<b>" . $battle->player1->user_name . ":</b> ". $battle->timeRemaining($battle->player1_id) . " seconds" ?>
+                        <?php endif; ?>
+                        <br />
+                        <?php if (isset($battle->fighter_actions[$battle->player2->combat_id])): ?>
+                            <?php echo "<b>" . $battle->player2->user_name . ":</b> ". "waiting" ?>
+                        <?php else: ?>
+                            <?php echo "<b>" . $battle->player2->user_name . ":</b> " . $battle->timeRemaining($battle->player2_id) . " seconds" ?>
+                        <?php endif; ?>
                 <?php endif; ?>
             </td></tr>
     <?php endif; ?>
