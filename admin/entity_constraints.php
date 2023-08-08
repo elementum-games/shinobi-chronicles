@@ -213,11 +213,6 @@ $constraints['ai'] = [
         'count' => 4,
         'num_required' => 1,
         'variables' => [
-            'disabled' => [
-                'data_type' => 'string',
-                'input_type' => 'radio',
-                'options' => ['disabled'],
-            ],
             'battle_text' => [
                 'data_type' => 'string',
                 'input_type' => 'text',
@@ -466,11 +461,6 @@ $constraints['team'] = [
 
 /* Mission */
 $mission_stage_constraints = [
-    'disabled' => [
-        'data_type' => 'string',
-        'input_type' => 'radio',
-        'options' => ['disabled'],
-    ],
     'action_type' => [
         'data_type' => 'string',
         'input_type' => 'radio',
@@ -495,11 +485,6 @@ $mission_stage_constraints = [
     ],
 ];
 $mission_reward_constraints = [
-    'disabled' => [
-        'data_type' => 'string',
-        'input_type' => 'radio',
-        'options' => ['disabled'],
-    ],
     'item_id' => [
         'data_type' => 'int',
         'input_type' => 'text',
