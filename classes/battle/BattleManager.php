@@ -22,7 +22,7 @@ class BattleManager {
     public User $player;
     public Fighter $opponent;
 
-    public bool $retreat = false;
+    public bool $is_retreat = false;
 
     public string $player_side;
     public string $opponent_side;
@@ -56,7 +56,7 @@ class BattleManager {
         $this->player = $player;
         $this->spectate = $spectate;
         $this->battle = new Battle($system, $player, $battle_id);
-        $this->retreat = $this->battle->is_retreat;
+        $this->is_retreat = $this->battle->is_retreat;
 
         $this->default_attacks = $this->getDefaultAttacks();
 
@@ -217,7 +217,7 @@ class BattleManager {
                 }
                 if (isset($_POST['retreat'])) {
                     $this->battle->is_retreat = true;
-                    $this->retreat = true;
+                    $this->is_retreat = true;
                     if ($this->player->id == $this->battle->player1_id) {
                         $this->battle->winner = Battle::TEAM2;
                     } else if ($this->player->id == $this->battle->player2_id) {
