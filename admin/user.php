@@ -4,7 +4,7 @@
  * @throws RuntimeException
  */
 function activateUserPage(System $system, User $player): void {
-    if($_POST['activate']) {
+    if(isset($_POST['activate'])) {
         $activate = $system->db->clean($_POST['activate']);
         $system->db->query("UPDATE `users` SET `user_verified`='1' WHERE `user_name`='$activate' LIMIT 1");
         if($system->db->last_affected_rows == 1) {
@@ -359,7 +359,7 @@ function statCutPage(System $system, User $player): void {
  */
 function deleteUserPage(System $system, User $player): void {
     $select_user = true;
-    if($_POST['user_name']) {
+    if(isset($_POST['user_name'])) {
         $user_name = $system->db->clean($_POST['user_name']);
         try {
             $result = $system->db->query(
@@ -542,7 +542,7 @@ function giveBloodlinePage(System $system): void {
         $bloodlines[$row['bloodline_id']]['name'] = $row['name'];
     }
 
-    if($_POST['give_bloodline']) {
+    if(isset($_POST['give_bloodline'])) {
         $editing_bloodline_id = (int)$system->db->clean($_POST['bloodline_id']);
         $user_name = $system->db->clean($_POST['user_name']);
         try {
