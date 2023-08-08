@@ -179,6 +179,8 @@ function processBattleFightEnd(BattleManager|BattleManagerV2 $battle, User $play
         $player->last_death_ms = System::currentTimeMs();
 
         if ($battle->is_retreat) {
+            $player->health = 5;
+            $player->moveToVillage();
             // Calc rep loss (if any)
             if (UserReputation::PVP_REP_ENABLED) {
                 $rep_lost = $player->reputation->handlePvPLoss($player, $battle->opponent, true);
