@@ -360,10 +360,12 @@ $constraints['create_clan'] = [
         'data_type' => 'string',
         'input_type' => 'text',
         'max_length' => 40,
+        'field_required' => false,
     ],
     'boost_amount' => [
         'data_type' => 'float',
         'input_type' => 'text',
+        'field_required' => false,
     ],
     'village' => [
         'data_type' => 'string',
@@ -402,11 +404,13 @@ $edit_clan_constraints['motto'] = [
     'data_type' => 'string',
     'input_type' => 'text',
     'max_length' => 175,
+    'field_required' => false,
 ];
 $edit_clan_constraints['info'] = [
     'data_type' => 'string',
     'input_type' => 'text',
     'max_length' => 750,
+    'field_required' => false,
 ];
 
 $constraints['edit_clan'] = $edit_clan_constraints;

@@ -662,21 +662,23 @@ function adminPanel() {
 				
 		    	$FORM_DATA = $_POST;
 		    	$FORM_DATA['stages'] = array_filter($FORM_DATA['stages'], function ($stage) {
-					return isset($stage['action']);
+					return isset($stage['action_type']);
             	});
 				$FORM_DATA['rewards'] = array_filter($FORM_DATA['rewards'], function ($rewards) {
-					return isset($rewards['item_id']);
+					return $rewards['item_id'] !== '';
             	});
+
                 validateFormData(
 	                entity_constraints: $mission_constraints,
 	                data: $data,
 	                FORM_DATA: $FORM_DATA
             	);
+
                 // Insert into database
                 $column_names = '';
                 $column_data = '';
                 $count = 1;
-                foreach($FORM_DATA as $name => $var) {
+                foreach($data as $name => $var) {
                     $column_names .= "`$name`";
                     $column_data .= "'$var'";
                     if($count < count($data)) {
@@ -700,15 +702,15 @@ function adminPanel() {
             $system->printMessage();
         }
         if($error) {
-            formPreloadData($variables, $data);
+            formPreloadData($mission_constraints, $data);
         }
         else {
-            formPreloadData($variables, $data, false);
+            formPreloadData($mission_constraints, $data, false);
         }
         echo "<table class='table'><tr><th>Create " . ucwords(str_replace('_', ' ', $content_name)) . "</th></tr>
 		<tr><td>
 		<form action='{$system->router->getUrl('admin', ['page' => 'create_' . $content_name])}' method='post'>";
-        displayFormFields($variables, $data);
+        displayFormFields($mission_constraints, $data);
         echo "<br />
 		<input type='submit' name='" . $content_name . "_data' value='Create' />
 		</form>
@@ -743,11 +745,12 @@ function adminPanel() {
 				
                 $FORM_DATA = $_POST;
 		    	$FORM_DATA['stages'] = array_filter($FORM_DATA['stages'], function ($stage) {
-					return isset($stage['action']);
+					return isset($stage['action_type']);
             	});
 				$FORM_DATA['rewards'] = array_filter($FORM_DATA['rewards'], function ($rewards) {
-					return isset($rewards['item_id']);
+					return $rewards['item_id'] !== '';
             	});
+
                 validateFormData(
 	                entity_constraints: $mission_constraints,
 	                data: $data,
@@ -787,7 +790,7 @@ function adminPanel() {
 			<tr><td>
 			<form action='{$system->router->getUrl('admin', ['page' => 'edit_' . $content_name])}' method='post'>
 			<label>Mission ID:</label> " . $content_data['mission_id'] . "<br />";
-            displayFormFields($variables, $content_data);
+            displayFormFields($mission_constraints, $content_data);
             echo "<br />
 			<input type='hidden' name='{$content_name}_id' value='" . $content_data[$content_name . '_id'] . "' />
 			<input type='submit' name='{$content_name}_data' value='Edit' />
