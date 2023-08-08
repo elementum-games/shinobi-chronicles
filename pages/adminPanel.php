@@ -23,87 +23,24 @@ function adminPanel() {
     global $self_link;
 
     // Staff level check
-    if(!$player->hasAdminPanel()) {
+    if(!$player->staff_manager->hasAdminPanel()) {
         return false;
     }
 
-    $content_create_pages = [
-        'create_ai',
-        'create_jutsu',
-        'create_item',
-        'create_bloodline',
-        'create_mission',
-        'create_clan',
-    ];
-    $content_edit_pages = [
-        'edit_ai',
-        'edit_jutsu',
-        'edit_item',
-        'edit_bloodline',
-        'edit_mission',
-        'edit_clan',
-    ];
-
-    $user_admin_pages = [
-        'create_rank',
-        'edit_rank',
-        'edit_team',
-        'edit_user',
-        'activate_user',
-        'delete_user',
-        'give_bloodline',
-        'logs',
-        'stat_cut',
-        'dev_tools'
-    ];
-
-    // Menu
-    echo "<table class='table'>
-        <tr><th>Admin Panel Menu</th></tr>";
-    if($player->isContentAdmin()) {
-        echo "<tr><td style='text-align:center'>";
-        echo implode(
-            "&nbsp;&nbsp;|&nbsp;&nbsp;",
-            array_map(function($page_slug) use ($system) {
-                return "<a href='{$system->router->getUrl('admin', ['page' => $page_slug])}'>" . System::unSlug($page_slug) . "</a>";
-            }, $content_create_pages)
-        );
-        echo "</td></tr>";
-    }
-    if($player->isContentAdmin()) {
-        echo "<tr><td style='text-align:center'>";
-        echo implode(
-            "&nbsp;&nbsp;|&nbsp;&nbsp;",
-            array_map(function($page_slug) use ($system) {
-                return "<a href='{$system->router->getUrl('admin', ['page' => $page_slug])}'>" . System::unSlug($page_slug) . "</a>";
-            }, $content_edit_pages)
-        );
-        echo "</td></tr>";
-    }
-    if($player->isUserAdmin()) {
-        echo "<tr><td style='text-align:center'>";
-        echo implode(
-            "&nbsp;&nbsp;|&nbsp;&nbsp;",
-            array_map(function($page_slug) use ($system) {
-                return "<a href='{$system->router->getUrl('admin', ['page' => $page_slug])}'>" . System::unSlug($page_slug) . "</a>";
-            }, $user_admin_pages)
-        );
-        echo "</td></tr>";
-    }
-    echo "</table>";
+    require 'templates/admin/panel_menu.php';
 
     // Variable sets
     $constraints = require 'admin/entity_constraints.php';
 
     $page = $_GET['page'] ?? '';
 
-    if(in_array($page, $user_admin_pages) && !$player->isUserAdmin()) {
+    if(in_array($page, $player->staff_manager->getAdminPanelPerms('misc_tools')) && !$player->isUserAdmin()) {
         $page = '';
     }
-    else if(in_array($page, $content_create_pages) && !$player->isContentAdmin()) {
+    else if(in_array($page, $player->staff_manager->getAdminPanelPerms('create_content')) && !$player->isContentAdmin()) {
         $page = '';
     }
-    else if(in_array($page, $content_edit_pages) && !$player->isContentAdmin()) {
+    else if(in_array($page, $player->staff_manager->getAdminPanelPerms('edit_content')) && !$player->isContentAdmin()) {
         $page = '';
     }
 
@@ -953,6 +890,13 @@ function adminPanel() {
         require 'admin/user.php';
         devToolsPage($system, $player);
     }
-
+    else if($page == 'staff_payments') {
+        require 'admin/user.php';
+        StaffPaymentPage($system, $player);
+    }
+    else if($page == 'manual_transaction') {
+        require 'admin/user.php';
+        ManualCurrency($system, $player);
+    }
 }
 
