@@ -65,7 +65,7 @@ function adminPanel() {
         $variables =& $constraints['ai'];
         $error = false;
         $data = [];
-        if($_POST['ai_data']) {
+        if(isset($_POST['ai_data'])) {
             try {
                 $data = [];
 				
@@ -232,7 +232,7 @@ function adminPanel() {
         $variables =& $constraints['item'];
         $error = false;
         $data = [];
-        if($_POST['item_data']) {
+        if(isset($_POST['item_data'])) {
             try {
                 $data = [];
                 validateFormData($variables, $data);
@@ -396,7 +396,7 @@ function adminPanel() {
         $variables =& $constraints['rank'];
         $error = false;
         $data = [];
-        if($_POST[$content_name . '_data']) {
+        if(isset($_POST[$content_name . '_data'])) {
             try {
                 $data = [];
                 validateFormData($variables, $data);
@@ -517,7 +517,7 @@ function adminPanel() {
         $variables =& $constraints['create_clan'];
         $error = false;
         $data = [];
-        if($_POST[$content_name . '_data']) {
+        if(isset($_POST[$content_name . '_data'])) {
             try {
                 $data = [];
                 validateFormData($variables, $data);
@@ -571,7 +571,7 @@ function adminPanel() {
 
         $select_content = true;
         // Validate NPC id
-        if($_POST[$content_name . '_id']) {
+        if(isset($_POST[$content_name . '_id'])) {
             $editing_bloodline_id = (int)$system->db->clean($_POST[$content_name . '_id']);
             $result = $system->db->query(
                 "SELECT * FROM `{$table_name}` WHERE `{$content_name}_id`='$editing_bloodline_id'"
@@ -586,7 +586,7 @@ function adminPanel() {
             }
         }
         // POST submit edited data
-        if($_POST[$content_name . '_data'] && !$select_content) {
+        if(isset($_POST[$content_name . '_data']) && !$select_content) {
             try {
                 $data = [];
                 validateFormData($variables, $data);
@@ -619,7 +619,7 @@ function adminPanel() {
             $system->printMessage();
         }
         // Form for editing data
-        if($content_data && !$select_content) {
+        if(isset($content_data) && !$select_content) {
             echo "<table class='table'><tr><th>Edit " . $content_name . " (" . stripslashes($content_data['name']) . ")</th></tr>
 			<tr><td>
 			<form action='{$system->router->getUrl('admin', ['page' => 'edit_' . $content_name])}' method='post'>
@@ -656,7 +656,7 @@ function adminPanel() {
         $mission_constraints =& $constraints['mission'];
         $error = false;
         $data = [];
-        if($_POST[$content_name . '_data']) {
+        if(isset($_POST[$content_name . '_data'])) {
             try {
 				$data = [];
 				
@@ -722,7 +722,7 @@ function adminPanel() {
 
         $select_content = true;
         // Validate content id
-        if($_POST[$content_name . '_id']) {
+        if(isset($_POST[$content_name . '_id'])) {
             $editing_bloodline_id = (int)$system->db->clean($_POST[$content_name . '_id']);
             $result = $system->db->query(
                 "SELECT * FROM `{$table_name}` WHERE `{$content_name}_id`='$editing_bloodline_id'"
@@ -737,7 +737,7 @@ function adminPanel() {
             }
         }
         // POST submit edited data
-        if($_POST[$content_name . '_data'] && !$select_content) {
+        if(isset($_POST[$content_name . '_data']) && !$select_content) {
             try {
 				$data = [];
 				
@@ -782,7 +782,7 @@ function adminPanel() {
             $system->printMessage();
         }
         // Form for editing data
-        if($content_data && !$select_content) {
+        if(isset($content_data) && !$select_content) {
             echo "<table class='table'><tr><th>Edit " . $content_name . " (" . stripslashes($content_data['name']) . ")</th></tr>
 			<tr><td>
 			<form action='{$system->router->getUrl('admin', ['page' => 'edit_' . $content_name])}' method='post'>
@@ -820,7 +820,7 @@ function adminPanel() {
 
         $select_content = true;
         // Validate NPC id
-        if($_POST[$content_name . '_id']) {
+        if(isset($_POST[$content_name . '_id'])) {
             $editing_bloodline_id = (int)$system->db->clean($_POST[$content_name . '_id']);
             $result = $system->db->query(
                 "SELECT * FROM `{$table_name}` WHERE `{$content_name}_id`='$editing_bloodline_id'"
@@ -835,7 +835,7 @@ function adminPanel() {
             }
         }
         // POST submit edited data
-        if($_POST[$content_name . '_data'] && !$select_content) {
+        if(isset($_POST[$content_name . '_data']) && !$select_content) {
             try {
                 $data = [];
                 validateFormData($variables, $data);
@@ -868,7 +868,7 @@ function adminPanel() {
             $system->printMessage();
         }
         // Form for editing data
-        if($content_data && !$select_content) {
+        if(isset($content_data) && !$select_content) {
             echo "<table class='table'><tr><th>Edit " . $content_name . " (" . stripslashes($content_data['name']) . ")</th></tr>
 			<tr><td>
 			<form action='{$system->router->getUrl('admin', ['page' => 'edit_' . $content_name])}' method='post'>
