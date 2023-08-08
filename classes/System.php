@@ -795,4 +795,10 @@ class System {
     public function getCssFileLink(string $file_name): string {
         return $this->router->base_url . $file_name . "?v=" .  filemtime($file_name);
     }
+
+    public static function clampNumber($number, $min, $max)
+    {
+        return max(min($number, $max), $min);
+    }
+
 }
