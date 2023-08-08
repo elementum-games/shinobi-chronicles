@@ -10,7 +10,14 @@ function formPreloadData($variables, &$data, $post = true, $post_array = false) 
                 $data_array = [];
                 for($i = 0; $i < $variable['count']; $i++) {
                     $data_array[$i] = [];
-                    formPreloadData($variable['variables'], $data_array[$i], $post, $post_array[$var_name][$i]);
+					if(isset($post_array[$var_name][$i]) && $post) {
+                    	formPreloadData($variable['variables'], $data_array[$i], $post, $post_array[$var_name][$i]);
+					}
+					else {
+						foreach($variable['variables'] as $constraint_var_name => $constraint_variable) {
+							$data_array[$i][$constraint_var_name] = '';
+						}
+					}
                 }
                 $data[$var_name] = json_encode($data_array);
             }
