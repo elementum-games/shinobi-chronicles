@@ -186,7 +186,7 @@ class UserReputation {
     public array $recent_killer_ids_array;
     public int $base_pvp_reward;
     public array $benefits;
-    
+
     public function __construct(&$player_rep, &$player_weekly_rep, &$player_pvp_rep, &$last_pvp_kills, &$last_killer_ids, $mission_cd, $event) {
         //Player data
         $this->rep = &$player_rep;
@@ -201,7 +201,7 @@ class UserReputation {
 
         //Load pvp kills/killer arrays
         $this->loadPvpKillsArray();
-        // Load benefits - this may only be performed after determining reputation rank 
+        // Load benefits - this may only be performed after determining reputation rank
         $this->benefits = $this->loadBenefits();
 
         //Rep rank info
@@ -349,7 +349,7 @@ class UserReputation {
     }
 
     // Calculate and return reputation gains/losses from pvp wins/losses
-    public function handlePvPWin(User $player, Fighter $opponent): int {
+    public function handlePvPWin(User $player, Fighter $opponent, bool $retreat = false): int {
         if(!($opponent instanceof User)) {
             return 0;
         }
@@ -424,12 +424,17 @@ class UserReputation {
             $rep_gain = 0;
         }
 
+        // If retreat, halve gain
+        if ($retreat) {
+            $rep_gain = ceil($rep_gain / 2);
+        }
+
         $player->reputation->addRep($rep_gain, true, true);
 
         return $rep_gain;
     }
 
-    public function handlePvPLoss(User $player, Fighter $opponent): int {
+    public function handlePvPLoss(User $player, Fighter $opponent, bool $retreat = false): int {
         if(!($opponent instanceof User)) {
             return 0;
         }
@@ -481,6 +486,11 @@ class UserReputation {
         // Redundancy to ensure rep is not lost when it shouldn't be
         if($rep_loss < 0) {
             $rep_loss = 0;
+        }
+
+        // If retreat, halve loss
+        if ($retreat) {
+            $rep_loss = ceil($rep_loss / 2);
         }
 
         $player->reputation->subtractRep($rep_loss);
