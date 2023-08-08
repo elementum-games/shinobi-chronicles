@@ -68,7 +68,16 @@ function adminPanel() {
         if($_POST['ai_data']) {
             try {
                 $data = [];
-                validateFormData($variables, $data);
+				
+                $FORM_DATA = $_POST;
+		    	$FORM_DATA['moves'] = array_filter($FORM_DATA['moves'], function ($moves) {
+					return $moves['battle_text'] !== '';
+            	});
+                validateFormData(
+	                entity_constraints: $variables,
+	                data: $data,
+	                FORM_DATA: $FORM_DATA
+            	);
                 // Insert into database
                 $column_names = '';
                 $column_data = '';
@@ -135,7 +144,16 @@ function adminPanel() {
         if(!empty($_POST['ai_data']) && !$select_ai) {
             try {
                 $data = [];
-                validateFormData($variables, $data);
+				
+                $FORM_DATA = $_POST;
+		    	$FORM_DATA['moves'] = array_filter($FORM_DATA['moves'], function ($moves) {
+					return $moves['battle_text'] !== '';
+            	});
+                validateFormData(
+	                entity_constraints: $variables,
+	                data: $data,
+	                FORM_DATA: $FORM_DATA
+            	);
                 // Insert into database
                 // Insert into database
                 $column_names = '';
@@ -635,18 +653,30 @@ function adminPanel() {
         $table_name = 'missions';
         $content_name = 'mission';
         /* Variables */
-        $variables =& $constraints['mission'];
+        $mission_constraints =& $constraints['mission'];
         $error = false;
         $data = [];
         if($_POST[$content_name . '_data']) {
             try {
-                $data = [];
-                validateFormData($variables, $data);
+				$data = [];
+				
+		    	$FORM_DATA = $_POST;
+		    	$FORM_DATA['stages'] = array_filter($FORM_DATA['stages'], function ($stage) {
+					return isset($stage['action']);
+            	});
+				$FORM_DATA['rewards'] = array_filter($FORM_DATA['rewards'], function ($rewards) {
+					return isset($rewards['item_id']);
+            	});
+                validateFormData(
+	                entity_constraints: $mission_constraints,
+	                data: $data,
+	                FORM_DATA: $FORM_DATA
+            	);
                 // Insert into database
                 $column_names = '';
                 $column_data = '';
                 $count = 1;
-                foreach($data as $name => $var) {
+                foreach($FORM_DATA as $name => $var) {
                     $column_names .= "`$name`";
                     $column_data .= "'$var'";
                     if($count < count($data)) {
@@ -688,7 +718,7 @@ function adminPanel() {
         $table_name = 'missions';
         $content_name = 'mission';
         /* Variables */
-        $variables =& $constraints['mission'];
+        $mission_constraints =& $constraints['mission'];
 
         $select_content = true;
         // Validate content id
@@ -709,8 +739,20 @@ function adminPanel() {
         // POST submit edited data
         if($_POST[$content_name . '_data'] && !$select_content) {
             try {
-                $data = [];
-                validateFormData($variables, $data);
+				$data = [];
+				
+                $FORM_DATA = $_POST;
+		    	$FORM_DATA['stages'] = array_filter($FORM_DATA['stages'], function ($stage) {
+					return isset($stage['action']);
+            	});
+				$FORM_DATA['rewards'] = array_filter($FORM_DATA['rewards'], function ($rewards) {
+					return isset($rewards['item_id']);
+            	});
+                validateFormData(
+	                entity_constraints: $mission_constraints,
+	                data: $data,
+	                FORM_DATA: $FORM_DATA
+            	);
                 // Insert into database
                 // Insert into database
                 $column_names = '';
