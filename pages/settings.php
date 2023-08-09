@@ -26,6 +26,7 @@ function userSettings() {
     $layouts = array('shadow_ribbon', 'geisha', 'new_geisha', 'classic_blue', 'blue_scroll', 'rainbow_road');
 	if($system->environment == 'dev') {
 	    $layouts[] = 'cextralite';
+		$layouts[] = 'sumu';
 	}
 
 	if(!empty($_POST['change_avatar'])) {
