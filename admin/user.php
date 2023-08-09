@@ -6,8 +6,7 @@
 function activateUserPage(System $system, User $player): void {
     if(isset($_POST['activate'])) {
         $activate = $system->db->clean($_POST['activate']);
-        $system->db->query("UPDATE `users` SET `user_verified`='1' WHERE `user_name`='$activate' LIMIT 1");
-        if($system->db->last_affected_rows == 1) {
+        if(activateUser($system, $activate)) {
             $system->message("User activated!");
         }
         else {
@@ -23,6 +22,13 @@ function activateUserPage(System $system, User $player): void {
 			<input type='submit' value='Activate' />
 			</form>
 		</td></tr></table>";
+}
+function activateUser(System $system, string $user_name): bool {
+    $system->db->query("UPDATE `users` SET `user_verified`='1' WHERE `user_name`='$user_name' LIMIT 1");
+    if($system->db->last_affected_rows == 1) {
+        return true;
+    }
+    return false;
 }
 
 /**
