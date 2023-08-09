@@ -841,8 +841,8 @@ function adminPanel() {
 
         $select_content = true;
         // Validate NPC id
-        if(isset($_POST[$content_name . '_id'])) {
-            $editing_bloodline_id = (int)$system->db->clean($_POST[$content_name . '_id']);
+        if(isset($_GET[$content_name . '_id'])) {
+            $editing_bloodline_id = (int)$_GET[$content_name . '_id'];
             $result = $system->db->query(
                 "SELECT * FROM `{$table_name}` WHERE `{$content_name}_id`='$editing_bloodline_id'"
             );
@@ -905,14 +905,13 @@ function adminPanel() {
         if($select_content) {
             $result = $system->db->query("SELECT `{$content_name}_id`, `name` FROM `$table_name`");
             echo "<table class='table'><tr><th>Select $content_name</th></tr>
-			<tr><td>
-			<form action='{$system->router->getUrl('admin', ['page' => 'edit_' . $content_name])}' method='post'>
-			<select name='{$content_name}_id'>";
-            while($row = $system->db->fetch($result)) {
-                echo "<option value='" . $row[$content_name . '_id'] . "'>" . stripslashes($row['name']) . "</option>";
-            }
-            echo "</select>
-			<input type='submit' value='Select' />
+			<tr><td style='text-align: center;'>
+			<form action='{$system->router->getUrl('admin')}' method='get'>
+			    <input type='hidden' name='id' value='" . Router::PAGE_IDS['admin'] . "' />
+			    <input type='hidden' name='page' value='edit_{$content_name}' />
+			    Team ID: <input type='text' name='{$content_name}_id' />
+			    <input type='submit' /><br />
+			    <em>Note: Team edit link can be found on user profiles</em>
 			</form>
 			</td></tr></table>";
         }
