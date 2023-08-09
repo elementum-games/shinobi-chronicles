@@ -403,7 +403,7 @@ function runActiveMission(): bool {
                 } else {
                     $player->missions_completed[$mission->rank] = 1;
                 }
-              
+
                 // Rewards
                 echo Mission::processRewards($mission, $player, $system);
                 $player->addMoney($mission->money, "Village mission complete");
@@ -561,7 +561,6 @@ function processMissionBattleEnd(BattleManager|BattleManagerV2 $battle, Mission 
     }
     else if($battle->isPlayerWinner()) {
         $player->mission_stage['stage_id'] += 1;
-        $mission->nextStage($player->mission_stage['stage_id']);
         $result_text .= "You have defeated your opponent!";
     }
     else if($battle->isOpponentWinner()) {
