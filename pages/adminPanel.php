@@ -571,8 +571,8 @@ function adminPanel() {
 
         $select_content = true;
         // Validate NPC id
-        if(isset($_POST[$content_name . '_id'])) {
-            $editing_bloodline_id = (int)$system->db->clean($_POST[$content_name . '_id']);
+        if(isset($_GET[$content_name . '_id'])) {
+            $editing_bloodline_id = (int) $_GET[$content_name . '_id'];
             $result = $system->db->query(
                 "SELECT * FROM `{$table_name}` WHERE `{$content_name}_id`='$editing_bloodline_id'"
             );
@@ -622,7 +622,7 @@ function adminPanel() {
         if(isset($content_data) && !$select_content) {
             echo "<table class='table'><tr><th>Edit " . $content_name . " (" . stripslashes($content_data['name']) . ")</th></tr>
 			<tr><td>
-			<form action='{$system->router->getUrl('admin', ['page' => 'edit_' . $content_name])}' method='post'>
+			<form action='{$system->router->getUrl('admin', ['page' => 'edit_' . $content_name, 'clan_id' => $content_data[$content_name . '_id']])}' method='post'>
 			<label>Clan ID:</label> " . $content_data['clan_id'] . "<br />";
             displayFormFields($variables, $content_data);
             echo "<br />
@@ -633,18 +633,15 @@ function adminPanel() {
         }
         // Show form for selecting ID
         if($select_content) {
-            $result = $system->db->query("SELECT `{$content_name}_id`, `name` FROM `$table_name`");
-            echo "<table class='table'><tr><th>Select $content_name</th></tr>
-			<tr><td>
-			<form action='{$system->router->getUrl('admin', ['page' => 'edit_' . $content_name])}' method='post'>
-			<select name='{$content_name}_id'>";
-            while($row = $system->db->fetch($result)) {
-                echo "<option value='" . $row[$content_name . '_id'] . "'>" . stripslashes($row['name']) . "</option>";
+            $clans = array();
+            $result = $system->db->query("SELECT `{$content_name}_id`, `name`, `village`, `bloodline_only` FROM 
+                `$table_name` ORDER BY `village` ASC, `bloodline_only` ASC");
+            if($system->db->last_num_rows) {
+                while($row = $system->db->fetch($result)) {
+                    $clans[] = $row;
+                }
             }
-            echo "</select>
-			<input type='submit' value='Select' />
-			</form>
-			</td></tr></table>";
+            require 'templates/admin/edit_clan_select.php';
         }
     }
 
@@ -788,7 +785,7 @@ function adminPanel() {
         if(isset($content_data) && !$select_content) {
             echo "<table class='table'><tr><th>Edit " . $content_name . " (" . stripslashes($content_data['name']) . ")</th></tr>
 			<tr><td>
-			<form action='{$system->router->getUrl('admin', ['page' => 'edit_' . $content_name])}' method='post'>
+			<form action='{$system->router->getUrl('admin', ['page' => 'edit_' . $content_name, 'mission_id' => $content_data[$content_name . '_id']])}' method='post'>
 			<label>Mission ID:</label> " . $content_data['mission_id'] . "<br />";
             displayFormFields($mission_constraints, $content_data);
             echo "<br />
