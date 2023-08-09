@@ -309,6 +309,7 @@ $constraints['item'] = [
         'data_type' => 'string',
         'input_type' => 'text_area',
         'max_length' => 300,
+        'field_required' => false, //Todo: make this mandatory in future
     ],
 ];
 

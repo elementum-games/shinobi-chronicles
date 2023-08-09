@@ -289,6 +289,7 @@ function adminPanel() {
     }
     else if($page == 'edit_item') {
         $item_being_edited = null;
+        $select_item = true;
         $table_name = 'items';
         $self_link = $system->router->getUrl('admin', ['page' => "edit_item"]);
 
@@ -305,6 +306,7 @@ function adminPanel() {
                 $system->printMessage();
             }
             else {
+                $select_item = false;
                 $item_being_edited = $system->db->fetch($result);
             }
         }
@@ -347,7 +349,7 @@ function adminPanel() {
         }
 
         // Form for editing data
-        if($item_being_edited) {
+        if($item_being_edited && !$select_item) {
             $data =& $item_being_edited;
             echo "<p style='text-align:center;margin-top:20px;margin-bottom:-5px;'>
                 <a href='$self_link' style='font-size:14px;'>Back to item select</a> 
@@ -367,7 +369,7 @@ function adminPanel() {
         }
 
         // Show form for selecting ID
-        if(!$item_being_edited) {
+        if($select_item) {
             $result = $system->db->query("SELECT * FROM `items`");
             $all_items = [];
             while($row = $system->db->fetch($result)) {
