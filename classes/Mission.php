@@ -9,11 +9,21 @@ class Mission {
     const RANK_A = 4;
     const RANK_S = 5;
 
+    const TYPE_VILLAGE = 1;
     const TYPE_CLAN = 2;
     const TYPE_TEAM = 3;
     const TYPE_SPECIAL = 4;
     const TYPE_SURVIVAL = 5;
     const TYPE_EVENT = 6;
+
+    public static array $type_names = [
+        self::TYPE_VILLAGE => 'Village',
+        self::TYPE_CLAN => 'Clan',
+        self::TYPE_TEAM => 'Team',
+        self::TYPE_SPECIAL => 'Special',
+        self::TYPE_SURVIVAL => 'Survival',
+        self::TYPE_EVENT => 'Event',
+    ];
 
     const STATUS_IN_PROGRESS = 1;
     const STATUS_COMPLETE = 2;

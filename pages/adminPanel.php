@@ -724,8 +724,8 @@ function adminPanel() {
 
         $select_content = true;
         // Validate content id
-        if(isset($_POST[$content_name . '_id'])) {
-            $editing_bloodline_id = (int)$system->db->clean($_POST[$content_name . '_id']);
+        if(isset($_GET[$content_name . '_id'])) {
+            $editing_bloodline_id = (int)$_GET[$content_name . '_id'];
             $result = $system->db->query(
                 "SELECT * FROM `{$table_name}` WHERE `{$content_name}_id`='$editing_bloodline_id'"
             );
@@ -799,18 +799,39 @@ function adminPanel() {
         }
         // Show form for selecting ID
         if($select_content) {
-            $result = $system->db->query("SELECT `{$content_name}_id`, `name` FROM `$table_name`");
-            echo "<table class='table'><tr><th>Select $content_name</th></tr>
-			<tr><td>
-			<form action='{$system->router->getUrl('admin', ['page' => 'edit_' . $content_name])}' method='post'>
-			<select name='{$content_name}_id'>";
-            while($row = $system->db->fetch($result)) {
-                echo "<option value='" . $row[$content_name . '_id'] . "'>" . stripslashes($row['name']) . "</option>";
+            $missions = array();
+            $result = $system->db->query("SELECT * FROM `$table_name` ORDER BY `rank` DESC");
+            if($system->db->last_num_rows) {
+                while($mission = $system->db->fetch($result)) {
+                    // Format stages
+                    $stages = json_decode($mission['stages'], true);
+                    $stage_display = '';
+                    foreach($stages as $stage_id => $stage_data) {
+                        $stage_display .= "<b>Step " . $stage_id+1 . "</b><br />
+                        Action Type: {$stage_data['action_type']}<br />";
+                    }
+                    $mission['stages'] = $stage_display;
+
+                    // Format rewards
+                    $rewards = json_decode($mission['rewards'], true);
+                    $rewards_display = 'None';
+                    if(!empty($rewards)) {
+                        $rewards_display = '';
+                        foreach($rewards as $reward_num => $reward) {
+                            $rewards_display .= "<b>Reward " . $reward_num+1 . "</b><br />";
+                            foreach($reward as $reward_name => $reward_data) {
+                                $rewards_display .= "$reward_name: $reward_data<br />";
+                            }
+                            $rewards_display .= "<br />";
+                        }
+                    }
+                    $mission['rewards'] = $rewards_display;
+
+
+                    $missions[] = $mission;
+                }
             }
-            echo "</select>
-			<input type='submit' value='Select' />
-			</form>
-			</td></tr></table>";
+            require 'templates/admin/edit_mission_select.php';
         }
     }
 
