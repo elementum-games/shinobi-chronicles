@@ -12,7 +12,7 @@ class Mission {
     const TYPE_CLAN = 2;
     const TYPE_TEAM = 3;
     const TYPE_SPECIAL = 4;
-    const TYPE_SURVIVAL = 5;
+    const TYPE_SURVIVAL = 5; // legacy
     const TYPE_EVENT = 6;
 
     const STATUS_IN_PROGRESS = 1;
@@ -115,11 +115,6 @@ class Mission {
                 'action_data' => $this->player->village_location->fetchString(),
                 'description' => 'Report back to the village to complete the mission.'
             );
-            if($this->mission_type == Mission::TYPE_SURVIVAL) {
-                $this->current_stage['ai_defeated'] = $this->player->mission_stage['ai_defeated'] ?? 0;
-                $this->current_stage['mission_money'] = $this->player->mission_stage['mission_money'] ?? 0;
-                $this->current_stage['round_complete'] = $this->player->mission_stage['round_complete'] ?? false;
-            }
             $this->player->mission_stage = $this->current_stage;
             return Mission::STATUS_IN_PROGRESS;
         }
@@ -168,11 +163,6 @@ class Mission {
 
         $this->current_stage['description'] = str_replace($search_array, $replace_array, $this->current_stage['description']);
 
-        if($this->mission_type == Mission::TYPE_SURVIVAL) {
-            $this->current_stage['ai_defeated'] = $this->player->mission_stage['ai_defeated'] ?? 0;
-            $this->current_stage['mission_money'] = $this->player->mission_stage['mission_money'] ?? 0;
-            $this->current_stage['round_complete'] = $this->player->mission_stage['round_complete'] ?? false;
-        }
         $this->player->mission_stage = $this->current_stage;
         return Mission::STATUS_IN_PROGRESS;
     }
