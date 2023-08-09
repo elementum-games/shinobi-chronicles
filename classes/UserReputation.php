@@ -112,16 +112,16 @@ class UserReputation {
     const ARENA_MISSION_CD = 60;
     const MISSION_GAINS = [
         Mission::RANK_D => 1,
-        Mission::RANK_C => 1,
-        Mission::RANK_B => 2,
-        Mission::RANK_A => 3,
-        Mission::RANK_S => 4
+        Mission::RANK_C => 2,
+        Mission::RANK_B => 3,
+        Mission::RANK_A => 4,
+        Mission::RANK_S => 5
     ];
     const SPECIAL_MISSION_REP_GAINS = [
         SpecialMission::DIFFICULTY_EASY => 1,
-        SpecialMission::DIFFICULTY_NORMAL => 1,
-        SpecialMission::DIFFICULTY_HARD => 2,
-        SpecialMission::DIFFICULTY_NIGHTMARE => 3,
+        SpecialMission::DIFFICULTY_NORMAL => 2,
+        SpecialMission::DIFFICULTY_HARD => 3,
+        SpecialMission::DIFFICULTY_NIGHTMARE => 4,
     ];
 
     const DAILY_TASK_REWARDS = [
