@@ -227,10 +227,8 @@ class TrainingManager {
             }
             // Clan boost info
             $clan_boost = false;
-            if (isset($this->clan)) {
-                if (str_contains($this->clan->boost_type, 'training:') && $this->train_type == explode(":", $this->clan->boost_effect)[1]) {
-                	$clan_boost = $this->clan->boost_amount;
-                }
+            if (isset($this->clan) && $this->clan->boost_type == 'training' && $this->clan->boost_effect == $this->train_type) {
+                $clan_boost = $this->clan->boost_amount;
             }
             // Length logic
             switch($length) {
