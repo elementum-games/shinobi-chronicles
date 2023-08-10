@@ -212,24 +212,6 @@ function runActiveMission(): bool {
     $mission_status = Mission::STATUS_IN_PROGRESS;
     $current_mission_stage_id = $player->mission_stage['stage_id'];
 
-    //Survival Mission State Controls
-    if($mission->mission_type == Mission::TYPE_SURVIVAL) {
-        if(!empty($_GET['retreat'])) {
-            $player->battle_id = 0;
-            $mission->nextStage($player->mission_stage['stage_id'] = 4);
-        }
-
-        $continue_mission = false;
-        if(!empty($_GET['continue'])) {
-            $continue_mission = boolval($_GET['continue']);
-        }
-        if($player->mission_stage['round_complete'] && $continue_mission) {
-            $player->mission_stage['round_complete'] = false;
-            $player->battle_id = 0;
-            $mission_status = $mission->nextStage($player->mission_stage['stage_id']);
-        }
-    }
-
     if($mission_status < Mission::STATUS_COMPLETE) {
         if($player->mission_stage['action_type'] == 'travel' or $player->mission_stage['action_type'] == 'search') {
             if($player->location->equals(TravelCoords::fromDbString($player->mission_stage['action_data']))) {
@@ -250,6 +232,12 @@ function runActiveMission(): bool {
                     throw new RuntimeException("Couldn't load opponent for mission!");
                 }
                 $opponent->loadData();
+
+                // display mission details
+                echo "<table class='table'><tr><th>Current Mission</th></tr>
+			    <tr><td style='text-align:center;'><span style='font-weight:bold;'>" .
+                    ($mission->mission_type == 3 ? '[' . $player->team->name . '] ' : '') . "$mission->name</span><br />" .
+                    $player->mission_stage['description'] . "</td></tr></table>";
 
                 // Initialize start of battle stuff
                 if(!$player->battle_id) {
@@ -403,7 +391,7 @@ function runActiveMission(): bool {
                 } else {
                     $player->missions_completed[$mission->rank] = 1;
                 }
-              
+
                 // Rewards
                 echo Mission::processRewards($mission, $player, $system);
                 $player->addMoney($mission->money, "Village mission complete");
@@ -514,54 +502,9 @@ function processMissionBattleEnd(BattleManager|BattleManagerV2 $battle, Mission 
         $continue_mission = boolval($_GET['continue']);
     }
 
-    if($mission->mission_type == Mission::TYPE_SURVIVAL) {
-        if ($player->mission_stage['round_complete'] && !$continue_mission) {
-            echo "<table class='table'>
-                <tr><th>Battle Results</th></tr>
-                <tr><td>You have defeated your enemy. Either turn back now or push on.</td></tr>
-            </table>";
-        }
-        else if($battle->isPlayerWinner() && !$player->mission_stage['round_complete']) {
-            $money_gain = $mission->money;
-            $level_difference = $player->level - $opponent->level;
-            if($level_difference > 9) {
-                $level_difference = 9;
-            }
-            $money_gain = round($money_gain * (1 - $level_difference * 0.05));
-            if($money_gain < 5) {
-                $money_gain = 5;
-            }
 
-            if($player->mission_stage['ai_defeated'] > 1 && $player->mission_stage['ai_defeated'] % 5 == 0){
-                $player->mission_stage['stage_id'] += 1;
-            }
-            else if($player->mission_stage['stage_id'] > 2){
-                $player->mission_stage['stage_id'] -= 1;
-            }
-
-            if ($player->location == $player->village_location) {
-                $player->mission_stage['stage_id'] = 4;
-            }
-
-            $player->mission_stage['ai_defeated']++;
-            $player->mission_stage['mission_money'] += $money_gain;
-            $player->mission_stage['round_complete'] = true;
-        }
-        else if($battle->isOpponentWinner() || $battle->isDraw()) {
-            $player->mission_stage['mission_money'] = round($player->mission_stage['mission_money'] * 0.75);
-            $player->mission_stage['stage_id'] = 4;
-            $player->moveToVillage();
-
-            $result_text .= "You have been defeated.";
-        }
-        else {
-            $player->clearMission();
-            return $result_text;
-        }
-    }
     else if($battle->isPlayerWinner()) {
         $player->mission_stage['stage_id'] += 1;
-        $mission->nextStage($player->mission_stage['stage_id']);
         $result_text .= "You have defeated your opponent!";
     }
     else if($battle->isOpponentWinner()) {

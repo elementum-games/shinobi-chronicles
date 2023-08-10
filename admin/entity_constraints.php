@@ -527,7 +527,7 @@ $constraints['mission'] = [
     'mission_type' => [
         'data_type' => 'int',
         'input_type' => 'radio',
-        'options' => [1 => 'Village', 2 => 'Clan', 3 => 'Team', 4 => 'Special', 5 => 'Survival', 6 => 'Event'],
+        'options' => [1 => 'Village', 2 => 'Clan', 3 => 'Team', 4 => 'Special', 6 => 'Event'],
     ],
     'money' => [
         'data_type' => 'int',
