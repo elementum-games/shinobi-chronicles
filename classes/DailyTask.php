@@ -314,15 +314,6 @@ class DailyTask {
     public static function generateNewTasks(int $user_rank_num, int $total_skill, int $total_attributes, int $pvp_rep): array {
         $daily_tasks = [];
 
-        // Training tasks
-        $training_tasks = [self::SUB_TASK_JUTSU];
-        if($total_skill > 0) {
-            $training_tasks[] = self::SUB_TASK_SKILL;
-        }
-        if($total_attributes > 0) {
-            $training_tasks[] = self::SUB_TASK_ATTRIBUTES;
-        }
-
         // Rank 1 only
         if($user_rank_num == 1) {
             $daily_tasks[] = DailyTask::generateTask(
