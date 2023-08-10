@@ -7,7 +7,7 @@ class DailyTask {
     const SUB_TASK_WIN_FIGHT = 'win';
     const SUB_TASK_COMPLETE = 'complete';
     const SUB_TASK_SKILL = 'skills';
-    const SUB_TASK_GEN = 'attributes';
+    const SUB_TASK_ATTRIBUTES = 'attributes';
     const SUB_TASK_JUTSU = 'jutsu';
 
     const ACTIVITY_PVP = 'PVP';
@@ -54,7 +54,7 @@ class DailyTask {
         DailyTask::ACTIVITY_MISSIONS => 'Missions',
         DailyTask::ACTIVITY_TRAINING => [
             DailyTask::SUB_TASK_SKILL => 'points',
-            DailyTask::SUB_TASK_GEN => 'points',
+            DailyTask::SUB_TASK_ATTRIBUTES => 'points',
             DailyTask::SUB_TASK_JUTSU => 'levels',
         ],
         DailyTask::ACTIVITY_EARN_MONEY => 'yen',
@@ -142,7 +142,7 @@ class DailyTask {
             ],
             DailyTask::ACTIVITY_TRAINING => [
                 'type' => DailyTask::ACTIVITY_TRAINING,
-                'sub_task' => [self::SUB_TASK_SKILL, self::SUB_TASK_GEN, self::SUB_TASK_JUTSU],
+                'sub_task' => [self::SUB_TASK_SKILL, self::SUB_TASK_ATTRIBUTES, self::SUB_TASK_JUTSU],
                 'max_amount' => [
                     DailyTask::DIFFICULTY_EASY => 50,
                     DailyTask::DIFFICULTY_MEDIUM => 65,
@@ -287,7 +287,7 @@ class DailyTask {
             $training_tasks[] = self::SUB_TASK_SKILL;
         }
         if($total_attributes > 0) {
-            $training_tasks[] = self::SUB_TASK_GEN;
+            $training_tasks[] = self::SUB_TASK_ATTRIBUTES;
         }
 
         // Rank 1 only
