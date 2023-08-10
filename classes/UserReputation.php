@@ -319,15 +319,15 @@ class UserReputation {
             case 9:
             case 8:
             case 7:
-                $benefits[self::BENEFIT_PARTIAL_TRAINING_GAINS] = true;
             case 6:
-                $benefits[self::BENEFIT_EFFICIENT_LONG] = true;
-                $benefits[self::BENEFIT_EFFICIENT_EXTENDED] = true;
+                $benefits[self::BENEFIT_PARTIAL_TRAINING_GAINS] = true;
             case 5:
                 $benefits[self::BENEFIT_JUTSU_SCROLL_DISCOUNT] = true;
             case 4:
+                $benefits[self::BENEFIT_EFFICIENT_LONG] = true;
                 $benefits[self::BENEFIT_GEAR_DISCOUNT] = true;
             case 3:
+                $benefits[self::BENEFIT_EFFICIENT_EXTENDED] = true;
                 $benefits[self::BENEFIT_CONSUMABLE_DISCOUNT] = true;
             case 2:
             case 1:
