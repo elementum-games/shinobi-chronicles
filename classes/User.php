@@ -670,7 +670,9 @@ class User extends Fighter {
 
 
         // Daily Tasks
-        $this->daily_tasks = new UserDailyTasks($this->system, $this->user_id, $this->rank_num);
+        $total_skills = $this->ninjutsu_skill + $this->taijutsu_skill + $this->genjutsu_skill + $this->bloodline_skill;
+        $total_attribs = $this->speed + $this->cast_speed;
+        $this->daily_tasks = new UserDailyTasks($this->system, $this->user_id, $this->rank_num, $total_skills, $total_attribs);
         $this->daily_tasks_reset = $this->daily_tasks->last_reset;
         if($UPDATE == User::UPDATE_FULL && !$remote_view) {
             // Process tasks completion
