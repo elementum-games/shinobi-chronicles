@@ -213,11 +213,6 @@ $constraints['ai'] = [
         'count' => 4,
         'num_required' => 1,
         'variables' => [
-            'disabled' => [
-                'data_type' => 'string',
-                'input_type' => 'radio',
-                'options' => ['disabled'],
-            ],
             'battle_text' => [
                 'data_type' => 'string',
                 'input_type' => 'text',
@@ -314,6 +309,7 @@ $constraints['item'] = [
         'data_type' => 'string',
         'input_type' => 'text_area',
         'max_length' => 300,
+        'field_required' => false, //Todo: make this mandatory in future
     ],
 ];
 
@@ -365,10 +361,12 @@ $constraints['create_clan'] = [
         'data_type' => 'string',
         'input_type' => 'text',
         'max_length' => 40,
+        'field_required' => false,
     ],
     'boost_amount' => [
         'data_type' => 'float',
         'input_type' => 'text',
+        'field_required' => false,
     ],
     'village' => [
         'data_type' => 'string',
@@ -407,11 +405,13 @@ $edit_clan_constraints['motto'] = [
     'data_type' => 'string',
     'input_type' => 'text',
     'max_length' => 175,
+    'field_required' => false,
 ];
 $edit_clan_constraints['info'] = [
     'data_type' => 'string',
     'input_type' => 'text',
     'max_length' => 750,
+    'field_required' => false,
 ];
 
 $constraints['edit_clan'] = $edit_clan_constraints;
@@ -466,11 +466,6 @@ $constraints['team'] = [
 
 /* Mission */
 $mission_stage_constraints = [
-    'disabled' => [
-        'data_type' => 'string',
-        'input_type' => 'radio',
-        'options' => ['disabled'],
-    ],
     'action_type' => [
         'data_type' => 'string',
         'input_type' => 'radio',
@@ -495,11 +490,6 @@ $mission_stage_constraints = [
     ],
 ];
 $mission_reward_constraints = [
-    'disabled' => [
-        'data_type' => 'string',
-        'input_type' => 'radio',
-        'options' => ['disabled'],
-    ],
     'item_id' => [
         'data_type' => 'int',
         'input_type' => 'text',
@@ -527,7 +517,7 @@ $constraints['mission'] = [
     'mission_type' => [
         'data_type' => 'int',
         'input_type' => 'radio',
-        'options' => [1 => 'Village', 2 => 'Clan', 3 => 'Team', 4 => 'Special', 5 => 'Survival', 6 => 'Event'],
+        'options' => [1 => 'Village', 2 => 'Clan', 3 => 'Team', 4 => 'Special', 6 => 'Event'],
     ],
     'money' => [
         'data_type' => 'int',

@@ -529,7 +529,7 @@ if($LOGGED_IN) {
         $route = Router::$routes[$id] ?? null;
 
         try {
-            if ($layout->key == "new_geisha") {
+            if ($layout->usesV2Interface()) {
                 $location_name = $player->current_location->location_id
                     ? ' ' . ' <div id="contentHeaderLocation">' . " | " . $player->current_location->name . '</div>'
                     : null;
@@ -575,7 +575,7 @@ if($LOGGED_IN) {
 
             // EVENT
             if($system->event != null) {
-                if ($layout->key != "new_geisha") {
+                if (!$layout->usesV2Interface()) {
                     require 'templates/temp_event_header.php';
                 }
             }

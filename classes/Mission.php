@@ -9,11 +9,21 @@ class Mission {
     const RANK_A = 4;
     const RANK_S = 5;
 
+    const TYPE_VILLAGE = 1;
     const TYPE_CLAN = 2;
     const TYPE_TEAM = 3;
     const TYPE_SPECIAL = 4;
-    const TYPE_SURVIVAL = 5;
+    const TYPE_SURVIVAL = 5; // legacy
     const TYPE_EVENT = 6;
+
+    public static array $type_names = [
+        self::TYPE_VILLAGE => 'Village',
+        self::TYPE_CLAN => 'Clan',
+        self::TYPE_TEAM => 'Team',
+        self::TYPE_SPECIAL => 'Special',
+        self::TYPE_SURVIVAL => 'Survival',
+        self::TYPE_EVENT => 'Event',
+    ];
 
     const STATUS_IN_PROGRESS = 1;
     const STATUS_COMPLETE = 2;
@@ -115,13 +125,16 @@ class Mission {
                 'action_data' => $this->player->village_location->fetchString(),
                 'description' => 'Report back to the village to complete the mission.'
             );
-            if($this->mission_type == Mission::TYPE_SURVIVAL) {
-                $this->current_stage['ai_defeated'] = $this->player->mission_stage['ai_defeated'] ?? 0;
-                $this->current_stage['mission_money'] = $this->player->mission_stage['mission_money'] ?? 0;
-                $this->current_stage['round_complete'] = $this->player->mission_stage['round_complete'] ?? false;
-            }
             $this->player->mission_stage = $this->current_stage;
             return Mission::STATUS_IN_PROGRESS;
+        }
+
+        // Get last location
+        $last_location = $this->player->village_location->fetchString();
+        if (isset($this->current_stage['action_type'])) {
+            if ($this->current_stage['action_type'] == 'travel' || $this->current_stage['action_type'] == 'search') {
+                $last_location = $this->current_stage['action_data'];
+            }
         }
 
         // Load new stage data
@@ -151,6 +164,7 @@ class Mission {
                 }
             }
 
+            $this->current_stage['last_location'] = $last_location;
             $this->current_stage['action_data'] = $location->fetchString();
         }
 
@@ -159,11 +173,6 @@ class Mission {
 
         $this->current_stage['description'] = str_replace($search_array, $replace_array, $this->current_stage['description']);
 
-        if($this->mission_type == Mission::TYPE_SURVIVAL) {
-            $this->current_stage['ai_defeated'] = $this->player->mission_stage['ai_defeated'] ?? 0;
-            $this->current_stage['mission_money'] = $this->player->mission_stage['mission_money'] ?? 0;
-            $this->current_stage['round_complete'] = $this->player->mission_stage['round_complete'] ?? false;
-        }
         $this->player->mission_stage = $this->current_stage;
         return Mission::STATUS_IN_PROGRESS;
     }

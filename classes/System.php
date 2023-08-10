@@ -561,6 +561,12 @@ class System {
                 $this->enable_mobile_layout = true;
                 $this->layout = getNewGeishaLayout($this, $this->enable_mobile_layout);
                 break;
+            case 'sumu':
+                require_once __DIR__ . "/../layout/sumu.php";
+                // This needs to be first so the function can read it
+                $this->enable_mobile_layout = true;
+                $this->layout = getSumuLayout($this, $this->enable_mobile_layout);
+                break;
             default:
                 $this->layout = require "layout/" . self::DEFAULT_LAYOUT . ".php";
                 break;
@@ -795,4 +801,10 @@ class System {
     public function getCssFileLink(string $file_name): string {
         return $this->router->base_url . $file_name . "?v=" .  filemtime($file_name);
     }
+
+    public static function clampNumber($number, $min, $max)
+    {
+        return max(min($number, $max), $min);
+    }
+
 }

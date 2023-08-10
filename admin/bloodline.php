@@ -20,6 +20,9 @@ function createBloodlinePage($system) {
             $FORM_DATA['combat_boosts'] = array_filter($FORM_DATA['combat_boosts'], function ($boost) {
                 return $boost['effect'] !== 'none';
             });
+            $FORM_DATA['jutsu'] = array_filter($FORM_DATA['jutsu'], function ($jutsu) {
+                return $jutsu['name'] !== '';
+            });
 
             validateFormData(
                 entity_constraints: $bloodline_constraints,
@@ -110,6 +113,9 @@ function editBloodlinePage($system) {
             });
             $FORM_DATA['combat_boosts'] = array_filter($FORM_DATA['combat_boosts'], function ($boost) {
                 return $boost['effect'] !== 'none';
+            });
+            $FORM_DATA['jutsu'] = array_filter($FORM_DATA['jutsu'], function ($jutsu) {
+                return $jutsu['name'] !== '';
             });
 
             validateFormData(entity_constraints: $bloodline_constraints, data: $data, FORM_DATA: $FORM_DATA);

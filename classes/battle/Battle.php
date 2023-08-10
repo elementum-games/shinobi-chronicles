@@ -11,7 +11,8 @@ class Battle {
     const TYPE_AI_MISSION = 5;
     const TYPE_AI_RANKUP = 6;
 
-    const TURN_LENGTH = 40;
+    const TURN_LENGTH = 15;
+    const INITIAL_TURN_LENGTH = 40;
     const PREP_LENGTH = 20;
 
     const MAX_PRE_FIGHT_HEAL_PERCENT = 85;
@@ -38,8 +39,11 @@ class Battle {
     public int $start_time;
     public int $turn_time;
     public int $turn_count;
+    public int $player1_time;
+    public int $player2_time;
 
     public string $winner;
+    public bool $is_retreat = false;
 
     public Fighter $player;
 
@@ -103,6 +107,8 @@ class Battle {
                 `battle_type` = '" . $battle_type . "',
                 `start_time` = '" . time() . "',
                 `turn_time` = '" . (time() + self::PREP_LENGTH - 5) . "',
+                `player1_time` = '" . self::INITIAL_TURN_LENGTH . "',
+                `player2_time` = '" . self::INITIAL_TURN_LENGTH . "',
                 `turn_count` = '" . 0 . "',
                 `winner` = '',
                 `player1` = '" . $player1->id . "',
@@ -192,9 +198,14 @@ class Battle {
 
         $this->start_time = $battle['start_time'];
         $this->turn_time = $battle['turn_time'];
+        $this->player1_time = $battle['player1_time'];
+        $this->player2_time = $battle['player2_time'];
         $this->turn_count = $battle['turn_count'];
 
         $this->winner = $battle['winner'];
+        if (isset($battle['is_retreat'])) {
+            $this->is_retreat = $battle['is_retreat'];
+        }
 
         $this->player1_id = $battle['player1'];
         $this->player2_id = $battle['player2'];
@@ -294,12 +305,52 @@ class Battle {
      * @throws RuntimeException
      */
 
-    public function timeRemaining(): int {
-        return Battle::TURN_LENGTH - (time() - $this->turn_time);
+    public function timeRemaining($player_id = 0): int {
+        // If not set, use current player
+        if ($player_id == 0) {
+            $player_id = $this->player->id;
+        }
+        // If action is set, player's turn time is frozen - else modify by time since last turn
+        switch ($player_id) {
+            case $this->player1_id:
+                if (isset($this->fighter_actions[$this->player1->combat_id])) {
+                    return $this->player1_time;
+                }
+                return $this->player1_time - (time() - $this->turn_time);
+            case $this->player2_id:
+                if (isset($this->fighter_actions[$this->player2->combat_id])) {
+                    return $this->player2_time;
+                }
+                return $this->player2_time - (time() - $this->turn_time);
+            default:
+                return 0;
+        }
     }
 
     public function prepTimeRemaining(): int {
         return Battle::PREP_LENGTH - (time() - $this->start_time);
+    }
+
+    public function updatePlayerTime($player_id = 0, $min = false) {
+        // if min, set to 15 seconds - else add 15 seconds and bound to min/max turn time
+        switch ($player_id) {
+            case $this->player1_id:
+                if ($min) {
+                    $this->player1_time = self::TURN_LENGTH;
+                } else {
+                    $this->player1_time = min(max(($this->player1_time - (time() - $this->turn_time)) + self::TURN_LENGTH, self::TURN_LENGTH), self::INITIAL_TURN_LENGTH);
+                }
+                break;
+            case $this->player2_id:
+                if ($min) {
+                    $this->player2_time = self::TURN_LENGTH;
+                } else {
+                    $this->player2_time = min(max(($this->player2_time - (time() - $this->turn_time)) + self::TURN_LENGTH, self::TURN_LENGTH), self::INITIAL_TURN_LENGTH);
+                }
+                break;
+            default:
+                break;
+        }
     }
 
     public function updateData() {
@@ -307,20 +358,24 @@ class Battle {
 
         $this->system->db->query(
             "UPDATE `battles` SET
-                `turn_time` = {$this->turn_time},
-                `turn_count` = {$this->turn_count},
-                `winner` = '{$this->winner}',
+            `turn_time` = {$this->turn_time},
+            `turn_count` = {$this->turn_count},
+            `winner` = '{$this->winner}',
+            `is_retreat` = '{$this->is_retreat}',
 
-                `fighter_health` = '" . json_encode($this->fighter_health) . "',
-                `fighter_actions` = '" . json_encode($this->fighter_actions) . "',
+            `player1_time` = {$this->player1_time},
+            `player2_time` = {$this->player2_time},
 
-                `field` = '" . $this->raw_field . "',
+            `fighter_health` = '" . json_encode($this->fighter_health) . "',
+            `fighter_actions` = '" . json_encode($this->fighter_actions) . "',
 
-                `active_effects` = '" . $this->raw_active_effects . "',
-                `active_genjutsu` = '" . $this->raw_active_genjutsu . "',
+            `field` = '" . $this->raw_field . "',
 
-                `jutsu_cooldowns` = '" . json_encode($this->jutsu_cooldowns) . "',
-                `fighter_jutsu_used` = '" . json_encode($this->fighter_jutsu_used) . "'
+            `active_effects` = '" . $this->raw_active_effects . "',
+            `active_genjutsu` = '" . $this->raw_active_genjutsu . "',
+
+            `jutsu_cooldowns` = '" . json_encode($this->jutsu_cooldowns) . "',
+            `fighter_jutsu_used` = '" . json_encode($this->fighter_jutsu_used) . "'
             WHERE `battle_id` = '{$this->battle_id}' LIMIT 1"
         );
 

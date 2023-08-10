@@ -112,16 +112,16 @@ class UserReputation {
     const ARENA_MISSION_CD = 60;
     const MISSION_GAINS = [
         Mission::RANK_D => 1,
-        Mission::RANK_C => 1,
-        Mission::RANK_B => 2,
-        Mission::RANK_A => 3,
-        Mission::RANK_S => 4
+        Mission::RANK_C => 2,
+        Mission::RANK_B => 3,
+        Mission::RANK_A => 4,
+        Mission::RANK_S => 5
     ];
     const SPECIAL_MISSION_REP_GAINS = [
         SpecialMission::DIFFICULTY_EASY => 1,
-        SpecialMission::DIFFICULTY_NORMAL => 1,
-        SpecialMission::DIFFICULTY_HARD => 2,
-        SpecialMission::DIFFICULTY_NIGHTMARE => 3,
+        SpecialMission::DIFFICULTY_NORMAL => 2,
+        SpecialMission::DIFFICULTY_HARD => 3,
+        SpecialMission::DIFFICULTY_NIGHTMARE => 4,
     ];
 
     const DAILY_TASK_REWARDS = [
@@ -186,7 +186,7 @@ class UserReputation {
     public array $recent_killer_ids_array;
     public int $base_pvp_reward;
     public array $benefits;
-    
+
     public function __construct(&$player_rep, &$player_weekly_rep, &$player_pvp_rep, &$last_pvp_kills, &$last_killer_ids, $mission_cd, $event) {
         //Player data
         $this->rep = &$player_rep;
@@ -201,7 +201,7 @@ class UserReputation {
 
         //Load pvp kills/killer arrays
         $this->loadPvpKillsArray();
-        // Load benefits - this may only be performed after determining reputation rank 
+        // Load benefits - this may only be performed after determining reputation rank
         $this->benefits = $this->loadBenefits();
 
         //Rep rank info
@@ -240,13 +240,15 @@ class UserReputation {
             }
             $this->weekly_rep += $amount;
         }
-
+        // Pvp rep
+        if($increment_pvp) {
+            if($this->weekly_pvp_rep + $amount > $this->weekly_pvp_cap) {
+                $amount = $this->weekly_pvp_cap - $this->weekly_pvp_rep;
+            }
+            $this->weekly_pvp_rep += $amount;
+        }
         //Increment rep amount
         if($amount > 0) {
-            // Increment pvp
-            if($increment_pvp) {
-                $this->weekly_pvp_rep += $amount;
-            }
             $this->rep += $amount;
         }
 
@@ -347,7 +349,7 @@ class UserReputation {
     }
 
     // Calculate and return reputation gains/losses from pvp wins/losses
-    public function handlePvPWin(User $player, Fighter $opponent): int {
+    public function handlePvPWin(User $player, Fighter $opponent, bool $retreat = false): int {
         if(!($opponent instanceof User)) {
             return 0;
         }
@@ -422,12 +424,17 @@ class UserReputation {
             $rep_gain = 0;
         }
 
+        // If retreat, halve gain
+        if ($retreat) {
+            $rep_gain = ceil($rep_gain / 2);
+        }
+
         $player->reputation->addRep($rep_gain, true, true);
 
         return $rep_gain;
     }
 
-    public function handlePvPLoss(User $player, Fighter $opponent): int {
+    public function handlePvPLoss(User $player, Fighter $opponent, bool $retreat = false): int {
         if(!($opponent instanceof User)) {
             return 0;
         }
@@ -479,6 +486,11 @@ class UserReputation {
         // Redundancy to ensure rep is not lost when it shouldn't be
         if($rep_loss < 0) {
             $rep_loss = 0;
+        }
+
+        // If retreat, halve loss
+        if ($retreat) {
+            $rep_loss = ceil($rep_loss / 2);
         }
 
         $player->reputation->subtractRep($rep_loss);

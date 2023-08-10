@@ -243,6 +243,13 @@ $clan_positions = array(
         <?php endif; ?>
         <?php if($player->isUserAdmin()): ?>
             &nbsp;&nbsp;|&nbsp;&nbsp;<a href='<?= $system->router->links['admin'] ?>&page=edit_user&user_name=<?= $viewUser->user_name ?>'>Edit user</a>
+            <?php if($viewUser->team): ?>
+                &nbsp;|&nbsp; <a href='<?= $system->router->getUrl(
+                    page_name: 'admin',
+                    url_params: ['page' => 'edit_team', 'team_id' => $viewUser->team->id]
+                ) ?>'
+                > Edit Team</a>
+            <?php endif ?>
             &nbsp;&nbsp;|&nbsp;&nbsp;<a href='<?= $system->router->getUrl(
                     'admin',
                         ['page' => 'logs', 'log_type' => 'currency_logs', 'character_id' => $viewUser->user_id]

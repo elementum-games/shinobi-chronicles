@@ -4,10 +4,9 @@
  * @throws RuntimeException
  */
 function activateUserPage(System $system, User $player): void {
-    if($_POST['activate']) {
+    if(isset($_POST['activate'])) {
         $activate = $system->db->clean($_POST['activate']);
-        $system->db->query("UPDATE `users` SET `user_verified`='1' WHERE `user_name`='$activate' LIMIT 1");
-        if($system->db->last_affected_rows == 1) {
+        if(activateUser($system, $activate)) {
             $system->message("User activated!");
         }
         else {
@@ -23,6 +22,13 @@ function activateUserPage(System $system, User $player): void {
 			<input type='submit' value='Activate' />
 			</form>
 		</td></tr></table>";
+}
+function activateUser(System $system, string $user_name): bool {
+    $system->db->query("UPDATE `users` SET `user_verified`='1' WHERE `user_name`='$user_name' LIMIT 1");
+    if($system->db->last_affected_rows == 1) {
+        return true;
+    }
+    return false;
 }
 
 /**
@@ -359,7 +365,7 @@ function statCutPage(System $system, User $player): void {
  */
 function deleteUserPage(System $system, User $player): void {
     $select_user = true;
-    if($_POST['user_name']) {
+    if(isset($_POST['user_name'])) {
         $user_name = $system->db->clean($_POST['user_name']);
         try {
             $result = $system->db->query(
@@ -542,7 +548,7 @@ function giveBloodlinePage(System $system): void {
         $bloodlines[$row['bloodline_id']]['name'] = $row['name'];
     }
 
-    if($_POST['give_bloodline']) {
+    if(isset($_POST['give_bloodline'])) {
         $editing_bloodline_id = (int)$system->db->clean($_POST['bloodline_id']);
         $user_name = $system->db->clean($_POST['user_name']);
         try {
@@ -581,4 +587,132 @@ function giveBloodlinePage(System $system): void {
 		</form>
 		</td></tr></table>";
 
+}
+
+function staffPaymentPage(System $system, User $player) {
+    $display_menu = true;
+    $payment_rates = [
+        StaffManager::STAFF_NONE => 0,
+        StaffManager::STAFF_MODERATOR => 40,
+        StaffManager::STAFF_HEAD_MODERATOR => 200,
+        StaffManager::STAFF_CONTENT_ADMIN => 0,
+        StaffManager::STAFF_ADMINISTRATOR => 0,
+        StaffManager::STAFF_HEAD_ADMINISTRATOR => 0,
+    ];
+    $self_link = $system->router->getUrl('admin', ['page' => 'staff_payments']);
+
+    // Fetch staff members
+    $staff_members = [];
+    $result = $system->db->query("SELECT `staff_level`, `user_name`, `user_id` FROM `users` WHERE `staff_level` >= "
+        . StaffManager::STAFF_MODERATOR . " ORDER BY `staff_level` DESC");
+    if($system->db->last_num_rows) {
+        while($member = $system->db->fetch($result)) {
+            $staff_members[] = $member;
+        }
+    }
+
+    // Process payments
+    if(isset($_POST['process_payments'])) {
+        foreach($staff_members as $member) {
+            if(isset($_POST[$member['user_id'].'_payment'])) {
+                $payment = (int) $_POST[$member['user_id'].'_payment'];
+                if($payment > 0) {
+                    if($member['user_id'] == $player->user_id) {
+                        $player->addPremiumCredits($payment, 'Staff payment');
+
+                        // Send Notification
+                        $alert_message = "You have received $payment Ancient Kunai as Staff Compensation.";
+                        Inbox::sendAlert($system, Inbox::ALERT_AK_RECEIVED, $player->user_id, $player->user_id, $alert_message);
+                    }
+                    else {
+                        // Issue payment
+                        $staff_member = User::findByName($system, $member['user_name'], true);
+                        $staff_member->loadData(User::UPDATE_NOTHING);
+                        $staff_member->addPremiumCredits($payment, 'Staff compensation');
+                        $staff_member->updateData();
+
+                        // Send Notification
+                        $alert_message = "You have received $payment Ancient Kunai as Staff Compensation.";
+                        Inbox::sendAlert($system, Inbox::ALERT_AK_RECEIVED, $player->user_id, $staff_member->user_id, $alert_message);
+                    }
+                }
+            }
+        }
+        $system->message("Payments processed.");
+        $system->printMessage();
+        $display_menu = false;
+    }
+
+    if($display_menu) {
+        require 'templates/admin/staff_payment.php';
+    }
+}
+
+function ManualCurrency(System $system, User $player): void {
+    $self_link = $system->router->getUrl('admin', ['page' => 'manual_transaction']);
+    $currency_types = [System::CURRENCY_TYPE_PREMIUM_CREDITS, System::CURRENCY_TYPE_MONEY];
+    $trans_types = ['debit', 'credit'];
+
+    if(isset($_POST['process_transaction'])) {
+        try {
+            $user_name = $system->db->clean($_POST['user_name']);
+            $amount = (int) $_POST['amount'];
+            $currency_type = $system->db->clean($_POST['currency']);
+            $trans_type = $system->db->clean($_POST['trans_type']);
+            $trans_user = User::findByName($system, $user_name, true);
+
+            // Validate user
+            if(!$trans_user) {
+                throw new RuntimeException("Invalid user!");
+            }
+            if($trans_user->user_id == $player->user_id) {
+                throw new RuntimeException("You can not process manual transactions on yourself!");
+            }
+            $trans_user->loadData(User::UPDATE_NOTHING);
+            // Validate currency and trans type
+            if(!in_array($currency_type, $currency_types)) {
+                throw new RuntimeException("Invalid currency type $currency_type!");
+            }
+            if(!in_array($trans_type, $trans_types)) {
+                throw new RuntimeException("Invalid transaction type!");
+            }
+            if($amount <= 0) {
+                throw new RuntimeException("Amount must be greater than 0!");
+            }
+
+            if($currency_type == System::CURRENCY_TYPE_MONEY) {
+                if($trans_type == 'credit') {
+                    $trans_user->addMoney($amount, "Manual transaction by {$player->user_name}({$player->user_id}).", false);
+                }
+                if($trans_type == 'debit') {
+                    if($trans_user->getMoney() < $amount) {
+                        throw new RuntimeException("{$trans_user->user_name} does not have enough money ($amount/{$trans_user->getMoney()})!");
+                    }
+                    $trans_user->subtractMoney($amount, "Manual transaction by {$player->user_name}({$player->user_id})");
+                }
+            }
+            if($currency_type == System::CURRENCY_TYPE_PREMIUM_CREDITS) {
+                if($trans_type == 'credit') {
+                    $trans_user->addPremiumCredits($amount, "Manual transaction by {$player->user_name}({$player->user_id}).", false);
+                }
+                if($trans_type == 'debit') {
+                    if($trans_user->getPremiumCredits() < $amount) {
+                        throw new RuntimeException("{$trans_user->user_name} does not have enough AK ($amount/{$trans_user->getPremiumCredits()})!");
+                    }
+                    $trans_user->subtractPremiumCredits($amount, "Manual transaction by {$player->user_name}({$player->user_id})");
+                }
+            }
+            $trans_user->updateData();
+            $system->message("Transaction processed!");
+        } catch (RuntimeException $e) {
+            $system->message($e->getMessage());
+        }
+    }
+
+
+
+    if($system->message) {
+        $system->printMessage();
+    }
+    require 'templates/admin/manual_transaction.php';
 }
