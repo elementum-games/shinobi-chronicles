@@ -171,6 +171,9 @@ function processBattleFightEnd(BattleManager|BattleManagerV2 $battle, User $play
         if ($player->daily_tasks->hasTaskType(DailyTask::ACTIVITY_PVP)) {
             $player->daily_tasks->progressTask(DailyTask::ACTIVITY_PVP, 1);
         }
+        if($player->daily_tasks->hasTaskType(DailyTask::ACTIVITY_BATTLES)) {
+            $player->daily_tasks->progressTask(DailyTask::ACTIVITY_BATTLES, 1);
+        }
 
     } else if ($battle->isOpponentWinner()) {
         $result .= "You lose. You were taken back to your village by some allied ninja.[br]";
@@ -209,6 +212,9 @@ function processBattleFightEnd(BattleManager|BattleManagerV2 $battle, User $play
         if ($player->daily_tasks->hasTaskType(DailyTask::ACTIVITY_PVP)) {
             $player->daily_tasks->progressTask(DailyTask::ACTIVITY_PVP, 1, DailyTask::SUB_TASK_COMPLETE);
         }
+        if($player->daily_tasks->hasTaskType(DailyTask::ACTIVITY_BATTLES)) {
+            $player->daily_tasks->progressTask(DailyTask::ACTIVITY_BATTLES, 1);
+        }
     } else if ($battle->isDraw()) {
         $result .= "You both knocked each other out. You were taken back to your village by some allied ninja.[br]";
         $player->health = 5;
@@ -223,6 +229,9 @@ function processBattleFightEnd(BattleManager|BattleManagerV2 $battle, User $play
         // Daily Tasks
         if ($player->daily_tasks->hasTaskType(DailyTask::ACTIVITY_PVP)) {
             $player->daily_tasks->progressTask(DailyTask::ACTIVITY_PVP, 1, DailyTask::SUB_TASK_COMPLETE);
+        }
+        if($player->daily_tasks->hasTaskType(DailyTask::ACTIVITY_BATTLES)) {
+            $player->daily_tasks->progressTask(DailyTask::ACTIVITY_BATTLES, 1);
         }
     }
     else {

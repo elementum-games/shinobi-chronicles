@@ -507,10 +507,10 @@ class User extends Fighter {
         $this->village = new Village($this->system, $user_data['village']);
         $this->village_rep = $user_data['village_rep'];
         $this->weekly_rep = $user_data['weekly_rep'];
-	$this->pvp_rep = $user_data['pvp_rep'];
+	    $this->pvp_rep = $user_data['pvp_rep'];
         $this->mission_rep_cd = $user_data['mission_rep_cd'];
         $this->recent_players_killed_ids = $user_data['recent_players_killed_ids'];
-	$this->recent_killer_ids = $user_data['recent_killer_ids'];
+	    $this->recent_killer_ids = $user_data['recent_killer_ids'];
         $this->reputation = new UserReputation($this->village_rep, $this->weekly_rep, $this->pvp_rep, $this->recent_players_killed_ids, $this->recent_killer_ids, $this->mission_rep_cd, $this->system->event);
 
         $this->gender = $user_data['gender'];
@@ -672,7 +672,7 @@ class User extends Fighter {
         // Daily Tasks
         $total_skills = $this->ninjutsu_skill + $this->taijutsu_skill + $this->genjutsu_skill + $this->bloodline_skill;
         $total_attribs = $this->speed + $this->cast_speed;
-        $this->daily_tasks = new UserDailyTasks($this->system, $this->user_id, $this->rank_num, $total_skills, $total_attribs);
+        $this->daily_tasks = new UserDailyTasks($this->system, $this->user_id, $this->rank_num, $total_skills, $total_attribs, $this->pvp_rep);
         $this->daily_tasks_reset = $this->daily_tasks->last_reset;
         if($UPDATE == User::UPDATE_FULL && !$remote_view) {
             // Process tasks completion

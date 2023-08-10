@@ -131,6 +131,7 @@ class UserReputation {
             DailyTask::ACTIVITY_TRAINING => 4,
             DailyTask::ACTIVITY_MISSIONS => 10,
             DailyTask::ACTIVITY_PVP => 5,
+            DailyTask::ACTIVITY_BATTLES => 10,
         ],
         DailyTask::DIFFICULTY_MEDIUM => [
             DailyTask::ACTIVITY_EARN_MONEY => 2,
@@ -138,6 +139,7 @@ class UserReputation {
             DailyTask::ACTIVITY_TRAINING => 6,
             DailyTask::ACTIVITY_MISSIONS => 15,
             DailyTask::ACTIVITY_PVP => 10,
+            DailyTask::ACTIVITY_BATTLES => 15,
         ],
         DailyTask::DIFFICULTY_HARD => [
             DailyTask::ACTIVITY_EARN_MONEY => 3,
@@ -145,6 +147,7 @@ class UserReputation {
             DailyTask::ACTIVITY_TRAINING => 8,
             DailyTask::ACTIVITY_MISSIONS => 20,
             DailyTask::ACTIVITY_PVP => 15,
+            DailyTask::ACTIVITY_BATTLES => 20,
         ],
     ];
     const DAILY_TASK_PVP_WIN_MOD = 5; // Increase rep by this amount for tasks requiring pvp wins (harder than completes)f

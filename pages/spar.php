@@ -215,13 +215,22 @@ function processSparFightEnd(BattleManager $battle, User $player): string {
     $player->battle_id = 0;
 
     if($battle->isPlayerWinner()) {
+        if($player->daily_tasks->hasTaskType(DailyTask::ACTIVITY_BATTLES)) {
+            $player->daily_tasks->progressTask(DailyTask::ACTIVITY_BATTLES, 1);
+        }
         return "You win!";
     }
     else if($battle->isOpponentWinner()) {
+        if($player->daily_tasks->hasTaskType(DailyTask::ACTIVITY_BATTLES)) {
+            $player->daily_tasks->progressTask(DailyTask::ACTIVITY_BATTLES, 1);
+        }
         $player->health = 5;
         return "You lose.";
     }
     else if($battle->isDraw()) {
+        if($player->daily_tasks->hasTaskType(DailyTask::ACTIVITY_BATTLES)) {
+            $player->daily_tasks->progressTask(DailyTask::ACTIVITY_BATTLES, 1);
+        }
         $player->health = 5;
         return "You both knocked each other out.";
     }
