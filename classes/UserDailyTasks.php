@@ -1,7 +1,6 @@
 <?php
 class UserDailyTasks {
-    //const TASK_RESET = 86400;
-    const TASK_RESET = 10;
+    const TASK_RESET = 86400;
 
     public System $system;
     public int $user_id;
