@@ -1,5 +1,5 @@
 <?php
-/* 
+/*
 File: 		spar.php
 Coder:		Levi Meahan
 Created:	05/02/2014
@@ -29,7 +29,7 @@ function spar() {
             $battle->renderBattle();
 
             if($battle->isComplete()) {
-                $result = processSparFightEnd($battle, $player);
+                $result = processSparFightEnd($battle, $player, $system);
 
                 echo "<table class='table'>
                     <tr><th>Battle complete</th></tr>
@@ -55,29 +55,29 @@ function spar() {
 				throw new RuntimeException("Invalid user!");
 			}
 			$user = $system->db->fetch($result);
-			
+
 			/*
 			if($user['village'] != $player->village->name) {
 				throw new RuntimeException("You cannot spar ninja from enemy villages!");
 			}
 			*/
-			
+
 			if(!$player->location->equals(TravelCoords::fromDbString($user['location']))) {
 				throw new RuntimeException("Target is not at your location!");
 			}
-			
+
 			if($user['challenge']) {
 				throw new RuntimeException("Target has already been challenged!");
 			}
-				
+
 			if($user['battle_id']) {
 				throw new RuntimeException("Target is in battle!");
 			}
-			
+
 			if($user['last_active'] < time() - 120) {
 				throw new RuntimeException("Target is inactive/offline!");
 			}
-			
+
 			$system->db->query("UPDATE `users` SET `challenge`='$player->user_id' WHERE `user_id`='$challenge' LIMIT 1");
 			$system->message("Challenge sent!");
 			$system->printMessage();
@@ -91,7 +91,7 @@ function spar() {
 	else if(isset($_GET['accept_challenge'])) {
 		try {
 			$challenge = (int)$system->db->clean($_GET['accept_challenge']);
-			
+
 			if($challenge != $player->challenge) {
 				throw new RuntimeException("Invalid challenge!");
 			}
@@ -102,15 +102,15 @@ function spar() {
             } catch(RuntimeException $e) {
                 throw new RuntimeException("Invalid user! " . $e->getMessage());
             }
-			
+
 			if(!$user->location->equals($player->location)) {
 				throw new RuntimeException("Target is not at your location!");
 			}
-			
+
 			if($user->battle_id) {
 				throw new RuntimeException("User is in battle!");
 			}
-			
+
 			if($user->last_active < time() - 120) {
 				throw new RuntimeException("Target is inactive/offline!");
 			}
@@ -128,7 +128,7 @@ function spar() {
 			$system->printMessage();
 		} catch (Exception $e) {
 			$player->challenge = 0;
-			
+
 			$system->message($e->getMessage());
 			$system->printMessage();
 
@@ -163,10 +163,10 @@ function spar() {
 				$user_challenges[$row['user_id']] = $row['user_name'];
 			}
 		}
-		
+
 		if($player->challenge or count($user_challenges) > 0) {
 			echo "<table class='table'><tr><th>Challenges</th></tr>";
-				
+
 			// Challenge received
 			if($player->challenge) {
 				$result = $system->db->query(
@@ -177,12 +177,12 @@ function spar() {
 				}
 				else {
 					$challenger_data = $system->db->fetch($result);
-					
+
 					echo "<tr><td>
 					<p style='display:inline-block;margin:0;margin-left:20px;'>
 						Challenged by <span style='font-weight:bold;'>" . $challenger_data['user_name'] . "</span></p>
 					<p style='display:inline-block;margin:0;margin-right:40px;float:right;'>
-						<a href='$self_link&accept_challenge=$player->challenge'>Accept</a> | 
+						<a href='$self_link&accept_challenge=$player->challenge'>Accept</a> |
 						<a href='$self_link&decline_challenge=$player->challenge'>Decline</a>
 					</p></td></tr>";
 
@@ -198,32 +198,53 @@ function spar() {
 					</td></tr>";
 				}
 			}
-			
+
 			echo "</table>";
 		}
 
         NearbyPlayers::renderScoutAreaList($system, $player, $self_link);
 	}
-	
+
 	return true;
 }
 
 /**
  * @throws RuntimeException
  */
-function processSparFightEnd(BattleManager $battle, User $player): string {
+function processSparFightEnd(BattleManager $battle, User $player, System $system): string {
     $player->battle_id = 0;
+	$result = "";
+
+    $reputation_eligible = isReputationEligible($battle, $player, $system);
 
     if($battle->isPlayerWinner()) {
-        return "You win!";
+		$result = "You win!";
+        if ($reputation_eligible) {
+            $rep_gain = $player->reputation->addRep(UserReputation::SPAR_REP_WIN);
+            $player->mission_rep_cd = time() + UserReputation::ARENA_MISSION_CD;
+            $result .= "<br>You have gained $rep_gain village reputation!";
+        }
+        return $result;
     }
     else if($battle->isOpponentWinner()) {
         $player->health = 5;
-        return "You lose.";
+        $result = "You lose.";
+        if ($reputation_eligible) {
+            $rep_gain = $player->reputation->addRep(UserReputation::SPAR_REP_LOSS);
+            $player->mission_rep_cd = time() + UserReputation::ARENA_MISSION_CD;
+            $result .= "<br>You have gained $rep_gain village reputation!";
+        }
+        return $result;
     }
     else if($battle->isDraw()) {
         $player->health = 5;
-        return "You both knocked each other out.";
+        $result = "You both knocked each other out.";
+        if ($reputation_eligible) {
+            $rep_gain = $player->reputation->addRep(UserReputation::SPAR_REP_DRAW);
+            $player->mission_rep_cd = time() + UserReputation::ARENA_MISSION_CD;
+            $result .= "<br>You have gained $rep_gain village reputation!";
+        }
+        return $result;
     }
     else {
         throw new RuntimeException("Invalid battle completion!");
@@ -249,7 +270,7 @@ function sparFightAPI(System $system, User $player): BattlePageAPIResponse {
         $response->battle_data = $battle->getApiResponse();
 
         if($battle->isComplete()) {
-           $response->battle_result = processSparFightEnd($battle, $player);
+           $response->battle_result = processSparFightEnd($battle, $player, $system);
         }
     }
     catch (Exception $e) {
@@ -257,4 +278,31 @@ function sparFightAPI(System $system, User $player): BattlePageAPIResponse {
     }
 
     return $response;
+}
+
+function isReputationEligible(BattleManager $battle, User $player, System $system): bool {
+	// if at Underground Arena
+    $result = $system->db->query("SELECT * FROM `maps_locations` WHERE `name` = 'Underground Colosseum'");
+    $location_result = $system->db->fetch($result);
+    $arena_coords = new TravelCoords($location_result['x'], $location_result['y'], 1);
+    if (!$player->location->equals($arena_coords)) {
+        return false;
+    }
+
+	// if rep timer available
+    if (!$player->reputation->canGain(check_mission_cd: true, check_pvp: false)) {
+        return false;
+    }
+
+	// if players within 5 levels
+    if (abs($player->level - $battle->opponent->level) > 5) {
+        return false;
+    }
+
+	// if battle at least 3 turns long
+    if ($battle->turn_count < 3) {
+        return false;
+    }
+
+    return true;
 }

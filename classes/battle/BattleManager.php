@@ -23,6 +23,7 @@ class BattleManager {
     public Fighter $opponent;
 
     public bool $is_retreat = false;
+    public int $turn_count = 0;
 
     public string $player_side;
     public string $opponent_side;
@@ -57,6 +58,7 @@ class BattleManager {
         $this->spectate = $spectate;
         $this->battle = new Battle($system, $player, $battle_id);
         $this->is_retreat = $this->battle->is_retreat;
+        $this->turn_count = $this->battle->turn_count;
 
         $this->default_attacks = $this->getDefaultAttacks();
 
@@ -584,6 +586,7 @@ class BattleManager {
     private function finishTurn() {
         $this->battle->turn_time = time();
         $this->battle->turn_count++;
+        $this->turn_count = $this->battle->turn_count;
 
         $this->battle->fighter_actions = [];
 
