@@ -218,6 +218,9 @@ function processSparFightEnd(BattleManager $battle, User $player, System $system
     $reputation_eligible = isReputationEligible($battle, $player, $system);
 
     if($battle->isPlayerWinner()) {
+        if($player->daily_tasks->hasTaskType(DailyTask::ACTIVITY_BATTLES)) {
+            $player->daily_tasks->progressTask(DailyTask::ACTIVITY_BATTLES, 1);
+        }
 		$result = "You win!";
         if ($reputation_eligible) {
             $rep_gain = $player->reputation->addRep(UserReputation::SPAR_REP_WIN);
@@ -227,6 +230,9 @@ function processSparFightEnd(BattleManager $battle, User $player, System $system
         return $result;
     }
     else if($battle->isOpponentWinner()) {
+        if($player->daily_tasks->hasTaskType(DailyTask::ACTIVITY_BATTLES)) {
+            $player->daily_tasks->progressTask(DailyTask::ACTIVITY_BATTLES, 1);
+        }
         $player->health = 5;
         $result = "You lose.";
         if ($reputation_eligible) {
@@ -237,6 +243,9 @@ function processSparFightEnd(BattleManager $battle, User $player, System $system
         return $result;
     }
     else if($battle->isDraw()) {
+        if($player->daily_tasks->hasTaskType(DailyTask::ACTIVITY_BATTLES)) {
+            $player->daily_tasks->progressTask(DailyTask::ACTIVITY_BATTLES, 1);
+        }
         $player->health = 5;
         $result = "You both knocked each other out.";
         if ($reputation_eligible) {

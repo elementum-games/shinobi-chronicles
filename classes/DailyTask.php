@@ -15,6 +15,7 @@ class DailyTask {
     const ACTIVITY_MISSIONS = 'Missions';
     const ACTIVITY_TRAINING = 'Train';
     const ACTIVITY_EARN_MONEY = 'Money';
+    const ACTIVITY_BATTLES = 'Battles';
 
     const DIFFICULTY_EASY = 'Easy';
     const DIFFICULTY_MEDIUM = 'Medium';
@@ -46,6 +47,11 @@ class DailyTask {
             'Hand of Midas',
             'Fill the Coffers',
         ],
+        DailyTask::ACTIVITY_BATTLES => [
+            'Fill Thine Goblet',
+            'Battle Master',
+            'Scar Thy Foe',
+        ],
     ];
 
     public static array $activity_labels = [
@@ -58,6 +64,7 @@ class DailyTask {
             DailyTask::SUB_TASK_JUTSU => 'levels',
         ],
         DailyTask::ACTIVITY_EARN_MONEY => 'yen',
+        DailyTask::ACTIVITY_BATTLES => 'PvP Battles or Spars',
     ];
 
     public string $name;
@@ -157,6 +164,15 @@ class DailyTask {
                     DailyTask::DIFFICULTY_MEDIUM => 1000,
                     DailyTask::DIFFICULTY_HARD => 1250,
                 ],
+            ],
+            DailyTask::ACTIVITY_BATTLES => [
+                'type' => DailyTask::ACTIVITY_BATTLES,
+                'sub_task' => [self::SUB_TASK_COMPLETE],
+                'max_amount' => [
+                    DailyTask::DIFFICULTY_EASY => 10,
+                    DailyTask::DIFFICULTY_MEDIUM => 20,
+                    DailyTask::DIFFICULTY_HARD => 30,
+                ]
             ],
         ];
 
@@ -278,7 +294,7 @@ class DailyTask {
      * @param int $user_rank_num
      * @return DailyTask[]
      */
-    public static function generateNewTasks(int $user_rank_num, int $total_skill, int $total_attributes): array {
+    public static function generateNewTasks(int $user_rank_num, int $total_skill, int $total_attributes, int $pvp_rep): array {
         $daily_tasks = [];
 
         // Training tasks
@@ -323,9 +339,13 @@ class DailyTask {
         }
         // Rank 3+
         if($user_rank_num >= 3) {
+            $task = DailyTask::ACTIVITY_BATTLES;
+            if(mt_rand(1, 100) <= $pvp_rep + 20) {
+                $task = DailyTask::ACTIVITY_PVP;
+            }
             $daily_tasks[] = DailyTask::generateTask(
                 $user_rank_num,
-                DailyTask::ACTIVITY_PVP,
+                $task,
                 DailyTask::DIFFICULTY_MEDIUM
             );
         }
