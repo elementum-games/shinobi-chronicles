@@ -1365,7 +1365,7 @@ class User extends Fighter {
 
                 // Daily task
                 if($this->daily_tasks->hasTaskType(DailyTask::ACTIVITY_TRAINING)) {
-                    $sub_task_type = (str_contains($this->train_type, 'skill')) ? DailyTask::SUB_TASK_SKILL : DailyTask::SUB_TASK_GEN;
+                    $sub_task_type = (str_contains($this->train_type, 'skill')) ? DailyTask::SUB_TASK_SKILL : DailyTask::SUB_TASK_ATTRIBUTES;
                     $this->daily_tasks->progressTask(DailyTask::ACTIVITY_TRAINING, $this->train_gain, $sub_task_type);
                 }
 
