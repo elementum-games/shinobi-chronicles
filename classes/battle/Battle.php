@@ -120,7 +120,7 @@ class Battle {
                 `active_genjutsu` = '" . $json_empty_array . "',
                 `jutsu_cooldowns` = '" . $json_empty_array . "',
                 `fighter_jutsu_used` = '" . $json_empty_array . "',
-                `is_retreat` = '" . 0 . "'
+                `is_retreat` = '" . (int)false . "'
                 "
         );
         $battle_id = $system->db->last_insert_id;
