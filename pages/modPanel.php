@@ -365,6 +365,21 @@ function modPanel() {
 	}
 	// HM actions
 	if($player->staff_manager->isHeadModerator()) {
+        // Activate user [Hitori]
+        if(!empty($_POST['activate_user'])) {
+            try {
+                require_once 'admin/user.php';
+                $user_name = $system->db->clean($_POST['user_name']);
+                if(activateUser($system, $user_name)) {
+                    $system->message("$user_name has been activated!");
+                }
+                else {
+                    $system->message("Error activating $user_name (or user is already activated)!");
+                }
+            } catch (RuntimeException $e) {
+                $system->message($e->getMessage());
+            }
+        }
 		// Ban IP [mod panel upgrade done -Hitori]
 		if(!empty($_POST['ban_ip'])) {
 			try {

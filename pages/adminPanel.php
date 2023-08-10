@@ -65,10 +65,19 @@ function adminPanel() {
         $variables =& $constraints['ai'];
         $error = false;
         $data = [];
-        if($_POST['ai_data']) {
+        if(isset($_POST['ai_data'])) {
             try {
                 $data = [];
-                validateFormData($variables, $data);
+				
+                $FORM_DATA = $_POST;
+		    	$FORM_DATA['moves'] = array_filter($FORM_DATA['moves'], function ($moves) {
+					return $moves['battle_text'] !== '';
+            	});
+                validateFormData(
+	                entity_constraints: $variables,
+	                data: $data,
+	                FORM_DATA: $FORM_DATA
+            	);
                 // Insert into database
                 $column_names = '';
                 $column_data = '';
@@ -135,7 +144,16 @@ function adminPanel() {
         if(!empty($_POST['ai_data']) && !$select_ai) {
             try {
                 $data = [];
-                validateFormData($variables, $data);
+				
+                $FORM_DATA = $_POST;
+		    	$FORM_DATA['moves'] = array_filter($FORM_DATA['moves'], function ($moves) {
+					return $moves['battle_text'] !== '';
+            	});
+                validateFormData(
+	                entity_constraints: $variables,
+	                data: $data,
+	                FORM_DATA: $FORM_DATA
+            	);
                 // Insert into database
                 // Insert into database
                 $column_names = '';
@@ -214,7 +232,7 @@ function adminPanel() {
         $variables =& $constraints['item'];
         $error = false;
         $data = [];
-        if($_POST['item_data']) {
+        if(isset($_POST['item_data'])) {
             try {
                 $data = [];
                 validateFormData($variables, $data);
@@ -271,6 +289,7 @@ function adminPanel() {
     }
     else if($page == 'edit_item') {
         $item_being_edited = null;
+        $select_item = true;
         $table_name = 'items';
         $self_link = $system->router->getUrl('admin', ['page' => "edit_item"]);
 
@@ -287,6 +306,7 @@ function adminPanel() {
                 $system->printMessage();
             }
             else {
+                $select_item = false;
                 $item_being_edited = $system->db->fetch($result);
             }
         }
@@ -329,7 +349,7 @@ function adminPanel() {
         }
 
         // Form for editing data
-        if($item_being_edited) {
+        if($item_being_edited && !$select_item) {
             $data =& $item_being_edited;
             echo "<p style='text-align:center;margin-top:20px;margin-bottom:-5px;'>
                 <a href='$self_link' style='font-size:14px;'>Back to item select</a> 
@@ -349,7 +369,7 @@ function adminPanel() {
         }
 
         // Show form for selecting ID
-        if(!$item_being_edited) {
+        if($select_item) {
             $result = $system->db->query("SELECT * FROM `items`");
             $all_items = [];
             while($row = $system->db->fetch($result)) {
@@ -378,7 +398,7 @@ function adminPanel() {
         $variables =& $constraints['rank'];
         $error = false;
         $data = [];
-        if($_POST[$content_name . '_data']) {
+        if(isset($_POST[$content_name . '_data'])) {
             try {
                 $data = [];
                 validateFormData($variables, $data);
@@ -499,7 +519,7 @@ function adminPanel() {
         $variables =& $constraints['create_clan'];
         $error = false;
         $data = [];
-        if($_POST[$content_name . '_data']) {
+        if(isset($_POST[$content_name . '_data'])) {
             try {
                 $data = [];
                 validateFormData($variables, $data);
@@ -553,8 +573,8 @@ function adminPanel() {
 
         $select_content = true;
         // Validate NPC id
-        if($_POST[$content_name . '_id']) {
-            $editing_bloodline_id = (int)$system->db->clean($_POST[$content_name . '_id']);
+        if(isset($_GET[$content_name . '_id'])) {
+            $editing_bloodline_id = (int) $_GET[$content_name . '_id'];
             $result = $system->db->query(
                 "SELECT * FROM `{$table_name}` WHERE `{$content_name}_id`='$editing_bloodline_id'"
             );
@@ -568,7 +588,7 @@ function adminPanel() {
             }
         }
         // POST submit edited data
-        if($_POST[$content_name . '_data'] && !$select_content) {
+        if(isset($_POST[$content_name . '_data']) && !$select_content) {
             try {
                 $data = [];
                 validateFormData($variables, $data);
@@ -601,10 +621,10 @@ function adminPanel() {
             $system->printMessage();
         }
         // Form for editing data
-        if($content_data && !$select_content) {
+        if(isset($content_data) && !$select_content) {
             echo "<table class='table'><tr><th>Edit " . $content_name . " (" . stripslashes($content_data['name']) . ")</th></tr>
 			<tr><td>
-			<form action='{$system->router->getUrl('admin', ['page' => 'edit_' . $content_name])}' method='post'>
+			<form action='{$system->router->getUrl('admin', ['page' => 'edit_' . $content_name, 'clan_id' => $content_data[$content_name . '_id']])}' method='post'>
 			<label>Clan ID:</label> " . $content_data['clan_id'] . "<br />";
             displayFormFields($variables, $content_data);
             echo "<br />
@@ -615,18 +635,15 @@ function adminPanel() {
         }
         // Show form for selecting ID
         if($select_content) {
-            $result = $system->db->query("SELECT `{$content_name}_id`, `name` FROM `$table_name`");
-            echo "<table class='table'><tr><th>Select $content_name</th></tr>
-			<tr><td>
-			<form action='{$system->router->getUrl('admin', ['page' => 'edit_' . $content_name])}' method='post'>
-			<select name='{$content_name}_id'>";
-            while($row = $system->db->fetch($result)) {
-                echo "<option value='" . $row[$content_name . '_id'] . "'>" . stripslashes($row['name']) . "</option>";
+            $clans = array();
+            $result = $system->db->query("SELECT `{$content_name}_id`, `name`, `village`, `bloodline_only` FROM 
+                `$table_name` ORDER BY `village` ASC, `bloodline_only` ASC");
+            if($system->db->last_num_rows) {
+                while($row = $system->db->fetch($result)) {
+                    $clans[] = $row;
+                }
             }
-            echo "</select>
-			<input type='submit' value='Select' />
-			</form>
-			</td></tr></table>";
+            require 'templates/admin/edit_clan_select.php';
         }
     }
 
@@ -635,13 +652,27 @@ function adminPanel() {
         $table_name = 'missions';
         $content_name = 'mission';
         /* Variables */
-        $variables =& $constraints['mission'];
+        $mission_constraints =& $constraints['mission'];
         $error = false;
         $data = [];
-        if($_POST[$content_name . '_data']) {
+        if(isset($_POST[$content_name . '_data'])) {
             try {
-                $data = [];
-                validateFormData($variables, $data);
+				$data = [];
+				
+		    	$FORM_DATA = $_POST;
+		    	$FORM_DATA['stages'] = array_filter($FORM_DATA['stages'], function ($stage) {
+					return isset($stage['action_type']);
+            	});
+				$FORM_DATA['rewards'] = array_filter($FORM_DATA['rewards'], function ($rewards) {
+					return $rewards['item_id'] !== '';
+            	});
+
+                validateFormData(
+	                entity_constraints: $mission_constraints,
+	                data: $data,
+	                FORM_DATA: $FORM_DATA
+            	);
+
                 // Insert into database
                 $column_names = '';
                 $column_data = '';
@@ -670,15 +701,15 @@ function adminPanel() {
             $system->printMessage();
         }
         if($error) {
-            formPreloadData($variables, $data);
+            formPreloadData($mission_constraints, $data);
         }
         else {
-            formPreloadData($variables, $data, false);
+            formPreloadData($mission_constraints, $data, false);
         }
         echo "<table class='table'><tr><th>Create " . ucwords(str_replace('_', ' ', $content_name)) . "</th></tr>
 		<tr><td>
 		<form action='{$system->router->getUrl('admin', ['page' => 'create_' . $content_name])}' method='post'>";
-        displayFormFields($variables, $data);
+        displayFormFields($mission_constraints, $data);
         echo "<br />
 		<input type='submit' name='" . $content_name . "_data' value='Create' />
 		</form>
@@ -688,12 +719,12 @@ function adminPanel() {
         $table_name = 'missions';
         $content_name = 'mission';
         /* Variables */
-        $variables =& $constraints['mission'];
+        $mission_constraints =& $constraints['mission'];
 
         $select_content = true;
         // Validate content id
-        if($_POST[$content_name . '_id']) {
-            $editing_bloodline_id = (int)$system->db->clean($_POST[$content_name . '_id']);
+        if(isset($_GET[$content_name . '_id'])) {
+            $editing_bloodline_id = (int)$_GET[$content_name . '_id'];
             $result = $system->db->query(
                 "SELECT * FROM `{$table_name}` WHERE `{$content_name}_id`='$editing_bloodline_id'"
             );
@@ -707,10 +738,23 @@ function adminPanel() {
             }
         }
         // POST submit edited data
-        if($_POST[$content_name . '_data'] && !$select_content) {
+        if(isset($_POST[$content_name . '_data']) && !$select_content) {
             try {
-                $data = [];
-                validateFormData($variables, $data);
+				$data = [];
+				
+                $FORM_DATA = $_POST;
+		    	$FORM_DATA['stages'] = array_filter($FORM_DATA['stages'], function ($stage) {
+					return isset($stage['action_type']);
+            	});
+				$FORM_DATA['rewards'] = array_filter($FORM_DATA['rewards'], function ($rewards) {
+					return $rewards['item_id'] !== '';
+            	});
+
+                validateFormData(
+	                entity_constraints: $mission_constraints,
+	                data: $data,
+	                FORM_DATA: $FORM_DATA
+            	);
                 // Insert into database
                 // Insert into database
                 $column_names = '';
@@ -740,12 +784,12 @@ function adminPanel() {
             $system->printMessage();
         }
         // Form for editing data
-        if($content_data && !$select_content) {
+        if(isset($content_data) && !$select_content) {
             echo "<table class='table'><tr><th>Edit " . $content_name . " (" . stripslashes($content_data['name']) . ")</th></tr>
 			<tr><td>
-			<form action='{$system->router->getUrl('admin', ['page' => 'edit_' . $content_name])}' method='post'>
+			<form action='{$system->router->getUrl('admin', ['page' => 'edit_' . $content_name, 'mission_id' => $content_data[$content_name . '_id']])}' method='post'>
 			<label>Mission ID:</label> " . $content_data['mission_id'] . "<br />";
-            displayFormFields($variables, $content_data);
+            displayFormFields($mission_constraints, $content_data);
             echo "<br />
 			<input type='hidden' name='{$content_name}_id' value='" . $content_data[$content_name . '_id'] . "' />
 			<input type='submit' name='{$content_name}_data' value='Edit' />
@@ -754,18 +798,39 @@ function adminPanel() {
         }
         // Show form for selecting ID
         if($select_content) {
-            $result = $system->db->query("SELECT `{$content_name}_id`, `name` FROM `$table_name`");
-            echo "<table class='table'><tr><th>Select $content_name</th></tr>
-			<tr><td>
-			<form action='{$system->router->getUrl('admin', ['page' => 'edit_' . $content_name])}' method='post'>
-			<select name='{$content_name}_id'>";
-            while($row = $system->db->fetch($result)) {
-                echo "<option value='" . $row[$content_name . '_id'] . "'>" . stripslashes($row['name']) . "</option>";
+            $missions = array();
+            $result = $system->db->query("SELECT * FROM `$table_name` ORDER BY `rank` DESC");
+            if($system->db->last_num_rows) {
+                while($mission = $system->db->fetch($result)) {
+                    // Format stages
+                    $stages = json_decode($mission['stages'], true);
+                    $stage_display = '';
+                    foreach($stages as $stage_id => $stage_data) {
+                        $stage_display .= "<b>Step " . $stage_id+1 . "</b><br />
+                        Action Type: {$stage_data['action_type']}<br />";
+                    }
+                    $mission['stages'] = $stage_display;
+
+                    // Format rewards
+                    $rewards = json_decode($mission['rewards'], true);
+                    $rewards_display = 'None';
+                    if(!empty($rewards)) {
+                        $rewards_display = '';
+                        foreach($rewards as $reward_num => $reward) {
+                            $rewards_display .= "<b>Reward " . $reward_num+1 . "</b><br />";
+                            foreach($reward as $reward_name => $reward_data) {
+                                $rewards_display .= "$reward_name: $reward_data<br />";
+                            }
+                            $rewards_display .= "<br />";
+                        }
+                    }
+                    $mission['rewards'] = $rewards_display;
+
+
+                    $missions[] = $mission;
+                }
             }
-            echo "</select>
-			<input type='submit' value='Select' />
-			</form>
-			</td></tr></table>";
+            require 'templates/admin/edit_mission_select.php';
         }
     }
 
@@ -778,8 +843,8 @@ function adminPanel() {
 
         $select_content = true;
         // Validate NPC id
-        if($_POST[$content_name . '_id']) {
-            $editing_bloodline_id = (int)$system->db->clean($_POST[$content_name . '_id']);
+        if(isset($_GET[$content_name . '_id'])) {
+            $editing_bloodline_id = (int)$_GET[$content_name . '_id'];
             $result = $system->db->query(
                 "SELECT * FROM `{$table_name}` WHERE `{$content_name}_id`='$editing_bloodline_id'"
             );
@@ -793,7 +858,7 @@ function adminPanel() {
             }
         }
         // POST submit edited data
-        if($_POST[$content_name . '_data'] && !$select_content) {
+        if(isset($_POST[$content_name . '_data']) && !$select_content) {
             try {
                 $data = [];
                 validateFormData($variables, $data);
@@ -826,7 +891,7 @@ function adminPanel() {
             $system->printMessage();
         }
         // Form for editing data
-        if($content_data && !$select_content) {
+        if(isset($content_data) && !$select_content) {
             echo "<table class='table'><tr><th>Edit " . $content_name . " (" . stripslashes($content_data['name']) . ")</th></tr>
 			<tr><td>
 			<form action='{$system->router->getUrl('admin', ['page' => 'edit_' . $content_name])}' method='post'>
@@ -842,14 +907,13 @@ function adminPanel() {
         if($select_content) {
             $result = $system->db->query("SELECT `{$content_name}_id`, `name` FROM `$table_name`");
             echo "<table class='table'><tr><th>Select $content_name</th></tr>
-			<tr><td>
-			<form action='{$system->router->getUrl('admin', ['page' => 'edit_' . $content_name])}' method='post'>
-			<select name='{$content_name}_id'>";
-            while($row = $system->db->fetch($result)) {
-                echo "<option value='" . $row[$content_name . '_id'] . "'>" . stripslashes($row['name']) . "</option>";
-            }
-            echo "</select>
-			<input type='submit' value='Select' />
+			<tr><td style='text-align: center;'>
+			<form action='{$system->router->getUrl('admin')}' method='get'>
+			    <input type='hidden' name='id' value='" . Router::PAGE_IDS['admin'] . "' />
+			    <input type='hidden' name='page' value='edit_{$content_name}' />
+			    Team ID: <input type='text' name='{$content_name}_id' />
+			    <input type='submit' /><br />
+			    <em>Note: Team edit link can be found on user profiles</em>
 			</form>
 			</td></tr></table>";
         }

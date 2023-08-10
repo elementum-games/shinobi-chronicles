@@ -240,13 +240,15 @@ class UserReputation {
             }
             $this->weekly_rep += $amount;
         }
-
+        // Pvp rep
+        if($increment_pvp) {
+            if($this->weekly_pvp_rep + $amount > $this->weekly_pvp_cap) {
+                $amount = $this->weekly_pvp_cap - $this->weekly_pvp_rep;
+            }
+            $this->weekly_pvp_rep += $amount;
+        }
         //Increment rep amount
         if($amount > 0) {
-            // Increment pvp
-            if($increment_pvp) {
-                $this->weekly_pvp_rep += $amount;
-            }
             $this->rep += $amount;
         }
 

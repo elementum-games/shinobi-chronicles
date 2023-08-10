@@ -49,6 +49,7 @@ function training() {
             // Skill & attribute training
             if($train_skill || $train_attrib) {
                 $stat = ($train_skill) ? $system->db->clean($_POST['skill']) : $system->db->clean($_POST['attributes']);
+                $player->trainingManager->train_type = $stat; // Temp override for clan boost calculations
                 //Validate stat
                 if($train_skill && !in_array($stat, $valid_skills)) {
                     throw new RuntimeException("Invalid skill!");

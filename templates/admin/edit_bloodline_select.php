@@ -61,7 +61,8 @@ $current_rank = 1;
         ?>
         <tr style='background:rgba(0,0,0,0.15);'>
             <td>
-                <a href="<?= $self_link ?>&bloodline_id=<?= $bloodline->bloodline_id ?>"><?= $bloodline->name ?></a>
+                <a href="<?= $self_link ?>&bloodline_id=<?= $bloodline->bloodline_id ?>"><?= $bloodline->name ?></a><br />
+                Clan ID: <?= $bloodline->clan_id ?>
             </td>
             <td>
                 <?php foreach($bloodline->passive_boosts as $boost): ?>

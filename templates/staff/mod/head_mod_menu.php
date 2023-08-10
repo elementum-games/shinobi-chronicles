@@ -70,22 +70,26 @@
         </td>
     </tr>
     <tr>
-        <th>Ban IP Address</th>
-        <th>Unban IP Address</th>
+        <th>IP Address Management</th>
+        <th>Activate User</th>
     </tr>
     <tr>
         <td style='text-align:center;'>
-            <form action='<?=$self_link?>' method='post'>
-                <label for='ip_address'>IP address</label><br />
+            <form style='display:inline-block' action='<?=$self_link?>' method='post'>
+                <label for='ip_address'>Ban IP address</label><br />
                 <input type='text' name='ip_address' value='<?=($_GET['ban_ip_address'] ?? "")?>' /><br />
                 <input style='margin-top:5px;' type='submit' name='ban_ip' value='Ban' />
+            </form>
+            <form style='display:inline-block' action='<?=$self_link?>' method='post'>
+                <label for='ip_address'>Unban IP address</label><br />
+                <input type='text' name='ip_address' value='<?=($_GET['unban_ip_address'] ?? "")?>' /><br />
+                <input style='margin-top:5px;' type='submit' name='unban_ip' value='Unban' />
             </form>
         </td>
         <td style='text-align:center;'>
             <form action='<?=$self_link?>' method='post'>
-                <label for='ip_address'>IP address</label><br />
-                <input type='text' name='ip_address' value='<?=($_GET['unban_ip_address'] ?? "")?>' /><br />
-                <input style='margin-top:5px;' type='submit' name='unban_ip' value='Unban' />
+                <input type='text' name='user_name' />
+                <input style='margin-top:5px;' type='submit' name='activate_user' value='Activate' />
             </form>
         </td>
     </tr>
