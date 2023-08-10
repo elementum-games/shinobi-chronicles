@@ -119,7 +119,8 @@ class Battle {
                 `active_effects` = '" . $json_empty_array . "',
                 `active_genjutsu` = '" . $json_empty_array . "',
                 `jutsu_cooldowns` = '" . $json_empty_array . "',
-                `fighter_jutsu_used` = '" . $json_empty_array . "'
+                `fighter_jutsu_used` = '" . $json_empty_array . "',
+                `is_retreat` = '" . 0 . "'
                 "
         );
         $battle_id = $system->db->last_insert_id;
@@ -355,13 +356,13 @@ class Battle {
 
     public function updateData() {
         $this->system->db->query("START TRANSACTION;");
-
+        $is_retreat = (int)$this->is_retreat;
         $this->system->db->query(
             "UPDATE `battles` SET
             `turn_time` = {$this->turn_time},
             `turn_count` = {$this->turn_count},
             `winner` = '{$this->winner}',
-            `is_retreat` = '{$this->is_retreat}',
+            `is_retreat` = {$is_retreat},
 
             `player1_time` = {$this->player1_time},
             `player2_time` = {$this->player2_time},
