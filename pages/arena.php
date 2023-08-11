@@ -170,14 +170,16 @@ function processArenaBattleEnd(BattleManager|BattleManagerV2 $battle, User $play
         $stat_gain_display = false;
         $opponent = $battle->opponent;
 
-        $money_gain = $battle->opponent->getMoney();
+        $multiplier = $battle->opponent->getMoney();
+        $money_gain = $player->calcPlayerMoneyGain($multiplier);
 
+        // Reduce money gains based on level
         if($player->level > $opponent->level) {
             $level_difference = $player->level - $opponent->level;
             if($level_difference > 9) {
                 $level_difference = 9;
             }
-            $money_gain = round($money_gain * (1 - $level_difference * 0.1));
+            $money_gain = round($money_gain * (1-$level_difference*0.1));
             if($money_gain < 5) {
                 $money_gain = 5;
             }

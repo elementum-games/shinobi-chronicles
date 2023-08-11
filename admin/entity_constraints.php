@@ -206,7 +206,7 @@ $constraints['ai'] = [
         'input_type' => 'text',
     ],
     'money' => [
-        'data_type' => 'int',
+        'data_type' => 'float',
         'input_type' => 'text',
     ],
     'moves' => [

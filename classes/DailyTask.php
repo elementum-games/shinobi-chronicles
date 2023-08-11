@@ -264,7 +264,8 @@ class DailyTask {
             $rep_reward_mod += UserReputation::DAILY_TASK_PVP_WIN_MOD;
         }
 
-        $difficulty_multiplier = 1;
+        $base_multiplier = mt_rand($user_rank_num, $user_rank_num + 2);
+        $difficulty_multiplier = 2;
         if($task_difficulty == DailyTask::DIFFICULTY_MEDIUM) {
             $difficulty_multiplier++;
         }
@@ -274,7 +275,7 @@ class DailyTask {
 
         // Reputation & money reward
         $rep_reward = UserReputation::DAILY_TASK_REWARDS[$task_difficulty][$task_config['type']] + $rep_reward_mod;
-        $money_reward = $task_reward * $difficulty_multiplier * $task_win_multiplier;
+        $money_reward = User::calcMoneyGain(rank_num: $user_rank_num, multiplier: floor($base_multiplier * $difficulty_multiplier));
 
         return new DailyTask([
             'name' => $task_name,

@@ -36,7 +36,7 @@ class NPC extends Fighter {
     public float $intelligence;
     public float $willpower;
 
-    public int $money;
+    public float $money;
 
     /** @var Jutsu[] */
     public array $jutsu = [];
@@ -288,7 +288,8 @@ class NPC extends Fighter {
     public function getInventory() {
     }
 
-    public function getMoney(): int {
+    public function getMoney(): float
+    {
         return $this->money;
     }
 
