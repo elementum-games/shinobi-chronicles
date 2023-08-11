@@ -54,6 +54,8 @@ class User extends Fighter {
     const MIN_PASSWORD_LENGTH = 6;
     const PARTIAL_LOCK = 3;
     const FULL_LOCK = 5;
+    const LOCK_OUT_CD = 5 * 60;
+    const MALICIOUS_LOCKOUT_CD = 15 * 60;
 
     const BASE_EXP = 0;
     const BASE_REGEN = 25;
@@ -111,6 +113,7 @@ class User extends Fighter {
     public string $last_ip;
     public string $email;
     public $failed_logins;
+    public $last_malicious_ip;
     public $global_message_viewed;
 
     public string $gender;
@@ -466,6 +469,7 @@ class User extends Fighter {
         $this->last_update = $user_data['last_update'];
         $this->last_active = $user_data['last_active'];
         $this->failed_logins = $user_data['failed_logins'];
+        $this->last_malicious_ip = $user_data['last_malicious_ip'];
         $this->avatar_link = $user_data['avatar_link'];
         $this->profile_song = $user_data['profile_song'];
 
@@ -1765,6 +1769,7 @@ class User extends Fighter {
 		`current_ip` = '$this->current_ip',
 		`last_ip` = '$this->last_ip',
 		`failed_logins` = '$this->failed_logins',
+		`last_malicious_ip` = '$this->last_malicious_ip',
 		`last_login` = '$this->last_login',
 		`last_update` = '$this->last_update',
 		`last_active` = '" . time() . "',
