@@ -85,8 +85,8 @@ if(!isset($_SESSION['user_id'])) {
 
             // Get result
             $result = $system->db->query(
-                "SELECT `user_id`, `user_name`, `password`, `failed_logins`, `current_ip`, `last_ip`, `user_verified`
-                    FROM `users` WHERE `user_name`='$user_name' LIMIT 1"
+                "SELECT `user_id`, `user_name`, `password`, `failed_logins`, `login_attempt_time`, 
+                    `last_malicious_ip`, `current_ip`, `last_ip`, `user_verified` FROM `users` WHERE `user_name`='$user_name' LIMIT 1"
             );
             if ($system->db->last_num_rows == 0) {
                 throw new RuntimeException("User does not exist!");
@@ -96,6 +96,11 @@ if(!isset($_SESSION['user_id'])) {
                 throw new RuntimeException("Your account has not been verified. Please check your email for the activation code or use the following link to resend your activation email: {$system->router->base_url}?act=resend_verification&username=$user_name");
             }
 
+            // Rest account lock based on last attempt
+            $login_cd = ($_SERVER['REMOTE_ADDR'] == $result['last_malicious_ip']) ? User::MALICIOUS_LOCKOUT_CD : User::LOCK_OUT_CD;
+            if($result['failed_logins'] >= User::FULL_LOCK && time() >= $result['login_attempt_time']+$login_cd) {
+                $result['failed_logins'] = 0;
+            }
             // Check failed logins
             if ($result['failed_logins'] >= User::PARTIAL_LOCK && $_SERVER['REMOTE_ADDR'] != $result['current_ip'] && $_SERVER['REMOTE_ADDR'] != $result['last_ip']) {
                 $system->log(
@@ -113,22 +118,27 @@ if(!isset($_SESSION['user_id'])) {
             if ($system->verify_password($password, $result['password'])) {
                 $_SESSION['user_id'] = $result['user_id'];
                 $LOGGED_IN = true;
-                if ($result['failed_logins'] > 0) {
-                    $system->db->query(
-                        "UPDATE `users` SET `failed_logins`= 0 WHERE `user_id`='{$result['user_id']}' LIMIT 1"
-                    );
-                }
 
                 $player = User::loadFromId($system, $_SESSION['user_id']);
                 $player->loadData();
                 $player->last_login = time();
+                $player->failed_logins = 0;
+                $player->last_malicious_ip = null;
                 $player->log(User::LOG_LOGIN, $_SERVER['REMOTE_ADDR']);
                 $player->updateData();
             }
             // If wrong, increment failed logins
             else {
+                $failed_logins = $result['failed_logins']+1;
+                $malicious_ip = null;
+                if($result['failed_logins']+1 >= User::PARTIAL_LOCK) {
+                    if($_SERVER['REMOTE_ADDR'] != $result['last_ip'] && $_SERVER['REMOTE_ADDR'] != $result['current_ip']) {
+                        $malicious_ip = $_SERVER['REMOTE_ADDR'];
+                    }
+                }
                 $system->db->query(
-                    "UPDATE `users` SET `failed_logins` = `failed_logins` + 1 WHERE `user_id`='{$result['user_id']}' LIMIT 1"
+                    "UPDATE `users` SET `failed_logins`='$failed_logins', `login_attempt_time`='" . time() .
+                    "', `last_malicious_ip`='$malicious_ip' WHERE `user_id`='{$result['user_id']}' LIMIT 1"
                 );
                 throw new RuntimeException("Invalid password!");
             }

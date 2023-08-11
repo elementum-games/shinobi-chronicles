@@ -18,6 +18,12 @@ final class YenGainUpdate extends AbstractMigration
      */
     public function up(): void
     {
+        // Locked out accounts
+       $this->execute("ALTER TABLE `users`
+            ADD COLUMN `login_attempt_time` INT NOT NULL DEFAULT 0 AFTER `failed_logins`,
+            ADD COLUMN `last_malicious_ip` TEXT AFTER `login_attempt_time`
+        ");
+        // NPC stuff
         $this->execute("ALTER TABLE `ai_opponents` CHANGE `money` `money_multiplier` SMALLINT(3) NOT NULL;");
         // Rank 1 AI
         $this->execute("UPDATE `ai_opponents` SET `money_multiplier`=1 WHERE `ai_id`=1");
@@ -61,6 +67,12 @@ final class YenGainUpdate extends AbstractMigration
     }
     public function down(): void
     {
+        // Locked out accounts
+        $this->execute("ALTER TABLE `users`
+            DROP COLUMN `login_attempt_time`,
+            DROP COLUMN `last_malicious_ip`
+        ");
+        // NPC stuff
         // Rank 1 AI
         $this->execute("ALTER TABLE `ai_opponents` CHANGE `money_multiplier` `money` INT(11) NOT NULL;");
         $this->execute("UPDATE `ai_opponents` SET `money`=20 WHERE `ai_id`=1");
