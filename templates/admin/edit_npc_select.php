@@ -43,9 +43,7 @@ $RANK_NAMES = RankManager::fetchNames($system);
             <td><?= $npc['taijutsu_skill'] ?></td>
             <td><?= $npc['cast_speed'] ?></td>
             <td><?= $npc['speed'] ?></td>
-            <td>
-                <?=Currency::MONEY_SYMBOL?><?= $npc['money'] ?>
-            </td>
+            <td><?= $npc['money'] ?></td>
         </tr>
     <?php endforeach; ?>
 </table>
