@@ -207,7 +207,7 @@ $constraints['ai'] = [
     ],
     'money_multiplier' => [
         'data_type' => 'int',
-        'input_type' => 'select',
+        'input_type' => 'text',
         'min' => 0,
         'max' => 10,
     ],
