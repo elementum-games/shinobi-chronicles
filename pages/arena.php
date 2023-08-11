@@ -170,8 +170,7 @@ function processArenaBattleEnd(BattleManager|BattleManagerV2 $battle, User $play
         $stat_gain_display = false;
         $opponent = $battle->opponent;
 
-        $multiplier = $battle->opponent->getMoney();
-        $money_gain = $player->calcPlayerMoneyGain($multiplier);
+        $money_gain = $player->calcPlayerMoneyGain(multiplier: $opponent->getMoney(), multiple_of: NPC::MONEY_GAIN_MULTIPLE);
 
         // Reduce money gains based on level
         if($player->level > $opponent->level) {
