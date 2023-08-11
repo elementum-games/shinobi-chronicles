@@ -37,7 +37,7 @@ class NPC extends Fighter {
     public float $intelligence;
     public float $willpower;
 
-    public float $money;
+    public int $money;
 
     /** @var Jutsu[] */
     public array $jutsu = [];

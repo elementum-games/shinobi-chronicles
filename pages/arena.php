@@ -179,8 +179,8 @@ function processArenaBattleEnd(BattleManager|BattleManagerV2 $battle, User $play
                 $level_difference = 9;
             }
             $money_gain = round($money_gain * (1-$level_difference*0.1));
-            if($money_gain < 5) {
-                $money_gain = 5;
+            if($money_gain < $opponent->rank * 5) {
+                $money_gain = $opponent->rank * 5;
             }
         }
 
