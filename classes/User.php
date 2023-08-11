@@ -1674,6 +1674,20 @@ class User extends Fighter {
         }
         $this->setMoney($this->money + $amount, $description);
     }
+    public function calcPlayerMoneyGain(float $multiplier = 1): int {
+        return self::calcMoneyGain($this->rank_num, $multiplier);
+    }
+    public static function calcMoneyGain(int $rank_num, float $multiplier = 1): int {
+        $max_multiplier = $rank_num * 10;
+        if($multiplier <= 0) {
+            $multiplier = 1;
+        }
+        if($multiplier > $max_multiplier) {
+            $multiplier = $max_multiplier;
+        }
+
+        return (100 + (pow($rank_num, 3))) * $multiplier;
+    }
 
     /**
      * @throws RuntimeException
