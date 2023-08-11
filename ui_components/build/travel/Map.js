@@ -96,10 +96,13 @@ export const Map = ({
   }), /*#__PURE__*/React.createElement("div", {
     className: "map_grid_lines"
   }, /*#__PURE__*/React.createElement(MapGridLines, {
-    mapWidth: map_width,
-    mapHeight: map_height,
     tileWidth: tile_width,
-    tileHeight: tile_height
+    tileHeight: tile_height,
+    stageOffsetX: stage_offset_x,
+    stageOffsetY: stage_offset_y,
+    stageWidth: stage_width,
+    stageHeight: stage_height,
+    region_locations: mapData.region_locations
   })), /*#__PURE__*/React.createElement(MapLocations, {
     locations: mapData.all_locations || [],
     tileWidth: tile_width,
@@ -139,13 +142,22 @@ function MapGutters({
   }, gutter))));
 }
 function MapGridLines({
-  mapWidth,
-  mapHeight,
   tileWidth,
-  tileHeight
+  tileHeight,
+  stageOffsetX,
+  stageOffsetY,
+  stageWidth,
+  stageHeight,
+  region_locations
 }) {
-  const rows = [...Array(mapHeight).keys()];
-  const cols = [...Array(mapWidth).keys()];
+  const rows = [];
+  for (let i = stageOffsetY - 1; i < stageOffsetY + stageHeight + 2; i++) {
+    rows.push(i);
+  }
+  const cols = [];
+  for (let j = stageOffsetX - 1; j < stageOffsetX + stageWidth + 2; j++) {
+    cols.push(j);
+  }
   return /*#__PURE__*/React.createElement(React.Fragment, null, rows.map(row => cols.map(col => /*#__PURE__*/React.createElement("div", {
     key: `${row}:${col}`,
     style: {
