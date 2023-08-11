@@ -1674,19 +1674,20 @@ class User extends Fighter {
         }
         $this->setMoney($this->money + $amount, $description);
     }
-    public function calcPlayerMoneyGain(float $multiplier = 1): int {
-        return self::calcMoneyGain($this->rank_num, $multiplier);
+    public function calcPlayerMoneyGain(int $multiplier = 1, $multiple_of = 10): int {
+        return self::calcMoneyGain($this->rank_num, $multiplier, $multiple_of);
     }
-    public static function calcMoneyGain(int $rank_num, float $multiplier = 1): int {
-        $max_multiplier = $rank_num * 10;
-        if($multiplier <= 0) {
+    public static function calcMoneyGain(int $rank_num, int $multiplier = 1, $multiple_of = 10): float {
+        if ($multiplier < 1) {
             $multiplier = 1;
         }
-        if($multiplier > $max_multiplier) {
-            $multiplier = $max_multiplier;
+        if($multiplier > 10) {
+            $multiplier = 10;
         }
+        $gain = ceil(pow($rank_num+2, 3) * $multiplier);
+        $gain = ceil(((30 * $rank_num) + pow($rank_num+1, 2)) * $multiplier);
 
-        return (100 + (pow($rank_num, 3))) * $multiplier;
+        return $gain + ($multiple_of - $gain % $multiple_of);
     }
 
     /**
