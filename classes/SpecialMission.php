@@ -35,7 +35,7 @@ class SpecialMission {
             'yen_per_mission' => 70,
             'stats_per_mission' => 2,
             'hp_lost_percent' => 2, // 20% => 60% lost
-            'intel_gain' => 10, // est. 10 fights (rank * 150 yen) [130 seconds]
+            'intel_gain' => 100, // est. 10 fights (rank * 150 yen) [130 seconds]
             'rep_gain' => UserReputation::SPECIAL_MISSION_REP_GAINS[SpecialMission::DIFFICULTY_EASY],
         ],
         // Measured average 144 seconds (11.3 fights)
@@ -197,6 +197,10 @@ class SpecialMission {
         $this->player = $player;
         $this->team = ($this->player->team ? $this->player->team : null);
         $this->mission_id = $mission_id;
+        // Override if player special mission set
+        if ($this->player->special_mission) {
+            $this->mission_id = $this->player->special_mission;
+        }
 
         // GET MISSION DATA
         $sql = "SELECT * FROM `special_missions` WHERE `mission_id`={$this->mission_id}";
@@ -261,77 +265,86 @@ class SpecialMission {
 
         $new_event = null;
 
-        // Check if the user is in the target square
-        if ($this->target['x'] == $this->player->location->x && $this->target['y'] == $this->player->location->y) {
-            $new_event = self::EVENT_BATTLE;
-            $event_text = self::$event_names[$new_event]['text'];
-        }
-
-        // check if the user lost the battle, fail the mission
-        if ($last_event['event'] == self::EVENT_BATTLE_LOSE) {
+        // Check if the user is in battle
+        if ($this->player->battle_id) {
             $new_event = self::EVENT_COMPLETE_FAIL;
             $event_text = self::$event_names[$new_event]['text'];
         }
 
-        // check if the user has enough progress to complete mission and is back home
-        if ($this->progress >= 100  && $this->player->location->x == self::$target_villages[$this->player->village->name]['x']
-                                    && $this->player->location->y == self::$target_villages[$this->player->village->name]['y']) {
-            $new_event = self::EVENT_COMPLETE_SUCCESS;
-            $event_text = self::$event_names[$new_event]['text'];
+        else {
+            // Check if the user is in the target square
+            if ($this->target['x'] == $this->player->location->x && $this->target['y'] == $this->player->location->y) {
+                $new_event = self::EVENT_BATTLE;
+                $event_text = self::$event_names[$new_event]['text'];
+            }
+
+            // check if the user lost the battle, fail the mission
+            if ($last_event['event'] == self::EVENT_BATTLE_LOSE) {
+                $new_event = self::EVENT_COMPLETE_FAIL;
+                $event_text = self::$event_names[$new_event]['text'];
+            }
+
+            // check if the user has enough progress to complete mission and is back home
+            if (
+                $this->progress >= 100 && $this->player->location->x == self::$target_villages[$this->player->village->name]['x']
+                && $this->player->location->y == self::$target_villages[$this->player->village->name]['y']
+            ) {
+                $new_event = self::EVENT_COMPLETE_SUCCESS;
+                $event_text = self::$event_names[$new_event]['text'];
+            }
+
+            // check what direction the user has to travel
+            $villages = TravelManager::fetchVillageLocationsByCoordsStr($this->system);
+            $move_to_x = $this->player->location->x;
+            $move_to_y = $this->player->location->y;
+            if ($this->player->location->x != $this->target['x']) {
+                if ($this->target['x'] > $this->player->location->x) {
+                    $move_to_x = $this->player->location->x + 1;
+                } else {
+                    $move_to_x = $this->player->location->x - 1;
+                }
+
+                // Go around village not into it
+                $target_location = new TravelCoords($move_to_x, $move_to_y, $this->player->location->map_id);
+                if (isset($villages[$target_location->fetchString()]) && !$this->player->village_location->equals($target_location)) {
+                    if ($this->player->location->y > $this->target['y']) {
+                        $move_to_y--;
+                    } else {
+                        $move_to_y++;
+                    }
+                }
+
+                $new_event = self::EVENT_MOVE_X;
+                $event_text = self::$event_names[$new_event]['text'] . $move_to_x . '.' . $move_to_y;
+
+            } else if ($this->player->location->y != $this->target['y']) {
+                if ($this->target['y'] > $this->player->location->y) {
+                    $move_to_y = $this->player->location->y + 1;
+                } else {
+                    $move_to_y = $this->player->location->y - 1;
+                }
+
+                // Skip past village if trying to move into it
+                $target_location = new TravelCoords($move_to_x, $move_to_y, $this->player->location->map_id);
+                if (isset($villages[$target_location->fetchString()]) && !$this->player->village_location->equals($target_location)) {
+                    if ($this->player->location->x > $this->target['x']) {
+                        $move_to_x--;
+                    } else {
+                        $move_to_x++;
+                    }
+                }
+
+                $new_event = self::EVENT_MOVE_Y;
+                $event_text = self::$event_names[$new_event]['text'] . $move_to_x . '.' . $move_to_y;
+            }
+
+            // check if the mission is complete
+            if ($this->progress >= 100 && $this->target['target'] != $this->player->village->name) {
+                $new_event = self::EVENT_HOME;
+                $event_text = self::$event_names[$new_event]['text'];
+            }
         }
 
-        // check what direction the user has to travel
-        $villages = TravelManager::fetchVillageLocationsByCoordsStr($this->system);
-        $move_to_x = $this->player->location->x;
-        $move_to_y = $this->player->location->y;
-        if ($this->player->location->x != $this->target['x']) {
-            if ($this->target['x'] > $this->player->location->x) {
-                $move_to_x = $this->player->location->x + 1;
-            } else {
-                $move_to_x = $this->player->location->x - 1;
-            }
-
-            // Go around village not into it
-            $target_location = new TravelCoords($move_to_x, $move_to_y, $this->player->location->map_id);
-            if(isset($villages[$target_location->fetchString()]) && !$this->player->village_location->equals($target_location)) {
-                if($this->player->location->y > $this->target['y']) {
-                    $move_to_y--;
-                }
-                else {
-                    $move_to_y++;
-                }
-            }
-
-            $new_event = self::EVENT_MOVE_X;
-            $event_text = self::$event_names[$new_event]['text'] . $move_to_x . '.' . $move_to_y;
-
-        } else if ($this->player->location->y != $this->target['y']) {
-            if ($this->target['y'] > $this->player->location->y) {
-                $move_to_y = $this->player->location->y + 1;
-            } else {
-                $move_to_y = $this->player->location->y - 1;
-            }
-
-            // Skip past village if trying to move into it
-            $target_location = new TravelCoords($move_to_x, $move_to_y, $this->player->location->map_id);
-            if(isset($villages[$target_location->fetchString()]) && !$this->player->village_location->equals($target_location)) {
-                if($this->player->location->x > $this->target['x']) {
-                    $move_to_x--;
-                }
-                else {
-                    $move_to_x++;
-                }
-            }
-
-            $new_event = self::EVENT_MOVE_Y;
-            $event_text = self::$event_names[$new_event]['text'] . $move_to_x . '.' . $move_to_y;
-        }
-
-        // check if the mission is complete
-        if ($this->progress >= 100 && $this->target['target'] != $this->player->village->name) {
-            $new_event = self::EVENT_HOME;
-            $event_text = self::$event_names[$new_event]['text'];
-        }
 
         // Log the event
         $this->logNewEvent($new_event, $event_text);
@@ -368,7 +381,9 @@ class SpecialMission {
                 break;
             case self::EVENT_COMPLETE_FAIL:
                 $result = $this->completeMission($this->progress);
-                $this->logNewEvent(self::EVENT_COMPLETE_FAIL, $result);
+                if (strlen($result) > 0) {
+                    $this->logNewEvent(self::EVENT_COMPLETE_FAIL, $result);
+                }
                 $result = $this->failMission();
                 // Create notification
                 require_once __DIR__ . '/../classes/notification/NotificationManager.php';
@@ -428,7 +443,7 @@ class SpecialMission {
            (self::$difficulties[$this->difficulty]['stats_per_mission'] + $extra_stats_for_rank)
            * $progress_modifier
         );
-        if($stat_to_gain != null) {
+        if($stat_to_gain != null && $stat_gain > 0) {
             $reward_text .= ' ' . $this->player->addStatGain($stat_to_gain, $stat_gain) . '!';
         }
 
@@ -555,8 +570,10 @@ class SpecialMission {
     public function failMission(): bool {
         $this->end_time = time();
         $this->status = 2;
-        $this->player->location->x = self::$target_villages[$this->player->village->name]['x'];
-        $this->player->location->y = self::$target_villages[$this->player->village->name]['y'];
+        if (!$this->player->battle_id) {
+            $this->player->location->x = self::$target_villages[$this->player->village->name]['x'];
+            $this->player->location->y = self::$target_villages[$this->player->village->name]['y'];
+        }
         $this->player->special_mission = 0;
         return true;
     }

@@ -19,29 +19,15 @@ try {
 }
 # End standard auth
 
+$mission_id = $_GET['mission_id'];
 
 $status = true;
 
-// Check if the user is in battle
-if ($player->battle_id) {
-    echo json_encode(['inBattle' => true]);
-    $system->db->commitTransaction();
-    exit;
-}
-
-// check if the mission exists
-if (!$player->special_mission) {
-    echo json_encode([
-        'mission' => null,
-        'systemMessage' => "Not on a special mission!"
-    ]);
-}
-
-$special_mission = new SpecialMission($system, $player, $player->special_mission);
+$special_mission = new SpecialMission($system, $player, $mission_id);
 
 $time_gap_ms = SpecialMission::EVENT_DURATION_MS;
 $target_update = $special_mission->returnLastUpdateMs() + $time_gap_ms;
-if (floor(microtime(true) * 1000) >= $target_update) {
+if (floor(microtime(true) * 1000) >= $target_update && $player->special_mission) {
     $special_mission->nextEvent();
 }
 
