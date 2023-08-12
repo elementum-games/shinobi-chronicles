@@ -1,19 +1,18 @@
 <?php
 
 class TravelApiPresenter {
-    public static function travelActionResponse(bool $success, User $player, TravelManager $travelManager): array {
+    public static function travelActionResponse(bool $success, User $player, TravelManager $travelManager, System $system): array {
         return [
             'success' => $success,
-            'mapData' => TravelApiPresenter::mapDataResponse(player: $player, travelManager: $travelManager),
+            'mapData' => TravelApiPresenter::mapDataResponse(player: $player, travelManager: $travelManager, system: $system),
             'nearbyPlayers' => TravelApiPresenter::nearbyPlayersResponse(travelManager: $travelManager),
         ];
     }
 
-    public static function mapDataResponse(User $player, TravelManager $travelManager): array {
+    public static function mapDataResponse(User $player, TravelManager $travelManager, System $system): array {
         $locations = $travelManager->fetchCurrentMapLocations();
         $current_location_portal = $travelManager->fetchCurrentLocationPortal();
         $location_action = $travelManager->getMapLocationAction($locations, $player);
-
         return [
             'player_x'          => $player->location->x,
             'player_y'          => $player->location->y,
@@ -35,7 +34,9 @@ class TravelApiPresenter {
             'tile_height'       => $travelManager->map_data['tile_height'],
             'action_url'        => $location_action->action_url,
             'action_message'    => $location_action->action_message,
-            'invulnerable'      => ($player->last_death_ms > System::currentTimeMs() - (300 * 1000))
+            'invulnerable'      => ($player->last_death_ms > System::currentTimeMs() - (300 * 1000)),
+            'spar_link'         => $system->router->getUrl('spar'),
+            'colosseum_coords'  => $travelManager->getColosseumCoords(),
         ];
     }
 

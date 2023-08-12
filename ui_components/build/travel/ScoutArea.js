@@ -22,6 +22,7 @@ export const ScoutArea = ({
   scoutData,
   membersLink,
   attackPlayer,
+  sparPlayer,
   ranksToView,
   playerId
 }) => {
@@ -33,13 +34,17 @@ export const ScoutArea = ({
     key: player_data.user_id,
     player_data: player_data,
     membersLink: membersLink,
-    attackPlayer: attackPlayer
+    attackPlayer: attackPlayer,
+    sparPlayer: sparPlayer,
+    colosseumCoords: mapData.colosseum_coords
   }))));
 };
 const Player = ({
   player_data,
   membersLink,
-  attackPlayer
+  attackPlayer,
+  sparPlayer,
+  colosseumCoords
 }) => {
   return /*#__PURE__*/React.createElement("div", {
     key: player_data.user_id,
@@ -57,9 +62,11 @@ const Player = ({
     alt: "mist"
   })), /*#__PURE__*/React.createElement("div", {
     className: "travel-scout-attack"
-  }, player_data.attack === true && parseInt(player_data.battle_id, 10) === 0 && !player_data.invulnerable && /*#__PURE__*/React.createElement("a", {
+  }, player_data.attack === true && parseInt(player_data.battle_id, 10) === 0 && !player_data.invulnerable && (player_data.target_x === colosseumCoords.x && player_data.target_y === colosseumCoords.y ? /*#__PURE__*/React.createElement("a", {
+    onClick: () => sparPlayer(player_data.user_id)
+  }) : /*#__PURE__*/React.createElement("a", {
     onClick: () => attackPlayer(player_data.attack_id)
-  }), player_data.attack === true && parseInt(player_data.battle_id, 10) > 0 && /*#__PURE__*/React.createElement("span", {
+  })), player_data.attack === true && parseInt(player_data.battle_id, 10) > 0 && /*#__PURE__*/React.createElement("span", {
     className: "in-battle"
   }), player_data.attack === false && player_data.direction !== 'none' && /*#__PURE__*/React.createElement("span", {
     className: `direction ${player_data.direction}`
