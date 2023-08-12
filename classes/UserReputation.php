@@ -118,10 +118,10 @@ class UserReputation {
         Mission::RANK_S => 5
     ];
     const SPECIAL_MISSION_REP_GAINS = [
-        SpecialMission::DIFFICULTY_EASY => 1,
-        SpecialMission::DIFFICULTY_NORMAL => 2,
-        SpecialMission::DIFFICULTY_HARD => 3,
-        SpecialMission::DIFFICULTY_NIGHTMARE => 4,
+        SpecialMission::DIFFICULTY_EASY => 2,
+        SpecialMission::DIFFICULTY_NORMAL => 4,
+        SpecialMission::DIFFICULTY_HARD => 6,
+        SpecialMission::DIFFICULTY_NIGHTMARE => 8,
     ];
 
     const DAILY_TASK_REWARDS = [
