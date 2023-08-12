@@ -127,24 +127,24 @@ class UserReputation {
     const DAILY_TASK_REWARDS = [
         DailyTask::DIFFICULTY_EASY => [
             DailyTask::ACTIVITY_EARN_MONEY => 1,
-            DailyTask::ACTIVITY_ARENA => 10,
-            DailyTask::ACTIVITY_TRAINING => 4,
-            DailyTask::ACTIVITY_MISSIONS => 10,
-            DailyTask::ACTIVITY_PVP => 5,
+            DailyTask::ACTIVITY_ARENA => 20,
+            DailyTask::ACTIVITY_TRAINING => 10,
+            DailyTask::ACTIVITY_MISSIONS => 20,
+            DailyTask::ACTIVITY_PVP => 10,
         ],
         DailyTask::DIFFICULTY_MEDIUM => [
             DailyTask::ACTIVITY_EARN_MONEY => 2,
-            DailyTask::ACTIVITY_ARENA => 15,
-            DailyTask::ACTIVITY_TRAINING => 6,
-            DailyTask::ACTIVITY_MISSIONS => 15,
-            DailyTask::ACTIVITY_PVP => 10,
+            DailyTask::ACTIVITY_ARENA => 30,
+            DailyTask::ACTIVITY_TRAINING => 15,
+            DailyTask::ACTIVITY_MISSIONS => 30,
+            DailyTask::ACTIVITY_PVP => 15,
         ],
         DailyTask::DIFFICULTY_HARD => [
             DailyTask::ACTIVITY_EARN_MONEY => 3,
-            DailyTask::ACTIVITY_ARENA => 20,
-            DailyTask::ACTIVITY_TRAINING => 8,
-            DailyTask::ACTIVITY_MISSIONS => 20,
-            DailyTask::ACTIVITY_PVP => 15,
+            DailyTask::ACTIVITY_ARENA => 40,
+            DailyTask::ACTIVITY_TRAINING => 20,
+            DailyTask::ACTIVITY_MISSIONS => 40,
+            DailyTask::ACTIVITY_PVP => 20,
         ],
     ];
     const DAILY_TASK_PVP_WIN_MOD = 5; // Increase rep by this amount for tasks requiring pvp wins (harder than completes)f
