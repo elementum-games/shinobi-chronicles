@@ -115,7 +115,7 @@ class PremiumShopManager {
         $this->free_stat_change_cooldown_left = $this->player->last_free_stat_change - (time() - self::$free_stat_change_cooldown);
     }
 
-    public function handlePremiumPruchase(int $amount, string $description): void {
+    public function handlePremiumPurchase(int $amount, string $description): void {
         $this->player->premium_credits->subtract($amount, $description);
     }
 
@@ -463,7 +463,7 @@ class PremiumShopManager {
         $previous_element = $this->player->elements[$editing_element_index];
 
         // Process purchase
-        $this->handlePremiumPruchase(
+        $this->handlePremiumPurchase(
             $ak_cost,
             "Changed element #{$editing_element_index} from {$this->player->elements[$editing_element_index]} to $new_element"
         );
@@ -557,7 +557,7 @@ class PremiumShopManager {
     public function changeGender(string $new_gender): ActionResult {
         $this->assertUserCanChangeGender($new_gender);
 
-        $this->handlePremiumPruchase($this->costs['gender_change'], "Gender change to {$new_gender}");
+        $this->handlePremiumPurchase($this->costs['gender_change'], "Gender change to {$new_gender}");
         $this->player->gender = $new_gender;
         $this->player->updateData();
 
