@@ -28,7 +28,7 @@
 </style>
 <table class='table'>
     <tr>
-        <th>Buy Ancient Kunai</th>
+        <th>Buy <?=Currency::PREMIUM_NAME?></th>
     </tr>
     <tr>
         <td style='text-align:center;'>
@@ -39,8 +39,8 @@
             <?php foreach(System::getKunaiPacks() as $pack): ?>
                 <div class='kunaiPack'>
                     <b>$<?= $pack['cost'] ?> USD</b><br />
-                    <?= $pack['kunai'] ?> AK + <?= $pack['bonus'] ?> bonus<br />
-                    Total: <?= ($pack['kunai'] + $pack['bonus']) ?> Ancient Kunai<br />
+                    <?= $pack['kunai'] ?> <?=Currency::PREMIUM_SYMBOL?> + <?= $pack['bonus'] ?> bonus<br />
+                    Total: <?= ($pack['kunai'] + $pack['bonus']) ?> <?=Currency::PREMIUM_NAME?><br />
                     <form action='<?= $premiumShopManager->getPaypalUrl() ?>' method='post'>
                         <input type='hidden' name='cmd' value='_xclick' />
                         <input type='hidden' name='business' value='<?= $premiumShopManager->getPaypalBusinessId() ?>' />
@@ -54,13 +54,13 @@
                         <input type='hidden' name='currency_code' value='USD' />
                         <input type='hidden'
                                name='item_name'
-                               value='<?= ($pack['kunai'] + $pack['bonus']) ?> Ancient Kunai - <?= $player->user_name ?>'
+                               value='<?= ($pack['kunai'] + $pack['bonus']) ?> <?=Currency::PREMIUM_NAME?> - <?= $player->user_name ?>'
                         />
                         <input type='hidden' name='custom' value='<?= $player->user_id ?>' />
                         <input type='hidden' name='notify_url' value='<?= $premiumShopManager->getPaypalListenerUrl() ?>' />
                         <input type='image' style='background:none;cursor:pointer;'
                                src='https://www.paypalobjects.com/webstatic/en_US/i/buttons/buy-logo-small.png'
-                               name='submit' alt='Buy Ancient Kunai'>
+                               name='submit' alt='Buy <?=Currency::PREMIUM_NAME?>'>
                         <img src='https://www.paypal.com/en_US/i/scr/pixel.gif' alt=''
                              style='border:0;width:1px;height:1px;position:absolute;' />
                     </form>
