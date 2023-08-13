@@ -54,7 +54,7 @@ function healingShop() {
           	if($player->health >= $player->max_health) {
 				throw new RuntimeException("Your health is already maxed out!");
 			}
-			$player->subtractMoney($ramen_choices[$heal]['cost'], "Purchased {$heal} health");
+			$player->money->subtract($ramen_choices[$heal]['cost'], "Purchased {$heal} health");
 			$player->health += $ramen_choices[$heal]['health_amount'];
 			if($player->health > $player->max_health) {
 				$player->health = $player->max_health;

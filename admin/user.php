@@ -682,13 +682,13 @@ function ManualCurrency(System $system, User $player): void {
 
             if($currency_type == System::CURRENCY_TYPE_MONEY) {
                 if($trans_type == 'credit') {
-                    $trans_user->addMoney($amount, "Manual transaction by {$player->user_name}({$player->user_id}).", false);
+                    $trans_user->money->add($amount, "Manual transaction by {$player->user_name}({$player->user_id}).", false);
                 }
                 if($trans_type == 'debit') {
                     if($trans_user->money->getAmount() < $amount) {
                         throw new RuntimeException("{$trans_user->user_name} does not have enough money ($amount/{$trans_user->money->getAmount()})!");
                     }
-                    $trans_user->subtractMoney($amount, "Manual transaction by {$player->user_name}({$player->user_id})");
+                    $trans_user->money->subtract($amount, "Manual transaction by {$player->user_name}({$player->user_id})");
                 }
             }
             if($currency_type == System::CURRENCY_TYPE_PREMIUM_CREDITS) {

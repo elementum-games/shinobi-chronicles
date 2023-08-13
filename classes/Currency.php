@@ -29,7 +29,7 @@ class Currency {
         }
     }
 
-    public function add(int $amount, string $description, bool $increment_daily_task): void {
+    public function add(int $amount, string $description, bool $increment_daily_task = true): void {
         if($increment_daily_task && $this->type == self::TYPE_MONEY && $this->userDailyTasks instanceof UserDailyTasks) {
             $this->userDailyTasks->progressTask(DailyTask::ACTIVITY_EARN_MONEY, $amount);
         }

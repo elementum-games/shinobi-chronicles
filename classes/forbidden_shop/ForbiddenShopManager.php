@@ -106,7 +106,7 @@ class ForbiddenShopManager {
                     $yen_gain += $num_shadow * $yen_per_lantern * 100;
                     unset($this->player->items[$shadow_essence_id]);
                 }
-                $this->player->addMoney($yen_gain, "Event");
+                $this->player->money->add($yen_gain, "Event");
                 $this->player->updateInventory();
                 $this->player->updateData();
 

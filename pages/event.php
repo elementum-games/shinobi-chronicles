@@ -42,7 +42,7 @@ function event() {
 
                 $amount = $player->rank_num * 1000;
 
-                $player->addMoney($amount, "Christmas event present");
+                $player->money->add($amount, "Christmas event present");
                 $player->presents_claimed[] = 1227;
                 $player->updateData();
 
@@ -119,7 +119,7 @@ function event() {
 
                 $amount = $player->rank_num * 2000;
 
-                $player->addMoney($amount, "Christmas event present");
+                $player->money->add($amount, "Christmas event present");
                 $player->presents_claimed[] = 1230;
                 $player->updateData();
 
@@ -190,7 +190,7 @@ function event() {
                         unset($player->items[$system->event->item_ids['red_lantern_id']]);
                     }
 
-                    $player->addMoney("25", "Event");
+                    $player->money->add("25", "Event");
                     $system->message("You exchanged 1 Red Lantern for " . $yen_gain . "&#165;!");
 
                     $player->updateInventory();
@@ -209,7 +209,7 @@ function event() {
                     if ($player->items[$system->event->item_ids['red_lantern_id']]->quantity < 1) {
                         unset($player->items[$system->event->item_ids['red_lantern_id']]);
                     }
-                    $player->addMoney("250", "Event");
+                    $player->money->add("250", "Event");
                     $system->message("You exchanged 10 Red Lanterns for " . $yen_gain . "&#165;!");
                     $player->updateInventory();
                     $player->updateData();
@@ -227,7 +227,7 @@ function event() {
                     if ($player->items[$system->event->item_ids['red_lantern_id']]->quantity < 1) {
                         unset($player->items[$system->event->item_ids['red_lantern_id']]);
                     }
-                    $player->addMoney("2500", "Event");
+                    $player->money->add("2500", "Event");
                     $system->message("You exchanged 100 Red Lanterns for " . $yen_gain . "&#165;!");
                     $player->updateInventory();
                     $player->updateData();

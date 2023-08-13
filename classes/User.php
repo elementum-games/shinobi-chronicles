@@ -689,7 +689,7 @@ class User extends Fighter {
             // Process tasks completion
             $completion_data = $this->daily_tasks->checkTaskCompletion();
             if($completion_data != null) {
-                $this->addMoney($completion_data['money_gain'], 'Completed daily task');
+                $this->money->add($completion_data['money_gain'], 'Completed daily task');
                 $rep_gain = $this->reputation->addRep($completion_data['rep_gain'], UserReputation::DAILY_TASK_BYPASS_CAP);
                 $task_display = "You have completed the task" . (sizeof($completion_data['tasks_completed']) > 1 ? "s" : "");
                 foreach ($completion_data['tasks_completed'] as $x => $t_name) {
@@ -1654,28 +1654,6 @@ class User extends Fighter {
     /**
      * @throws RuntimeException
      */
-    private function setMoney(int $new_amount, string $description) {
-        /*$this->system->currencyLog(
-            $this->user_id,
-            System::CURRENCY_TYPE_MONEY,
-            $this->money->getAmount(),
-            $new_amount,
-            $new_amount - $this->money->getAmount(),
-            $description
-        );*/
-        $this->money->set($new_amount, $description);
-    }
-
-    /**
-     * @throws RuntimeException
-     */
-    public function addMoney(int $amount, string $description, $increment_daily_task = true) {
-    	// Daily Tasks
-        if($this->daily_tasks->hasTaskType(DailyTask::ACTIVITY_EARN_MONEY) && $increment_daily_task) {
-            $this->daily_tasks->progressTask(DailyTask::ACTIVITY_EARN_MONEY, $amount);
-        }
-        $this->setMoney($this->money->getAmount() + $amount, $description);
-    }
     public function calcPlayerMoneyGain(int $multiplier = 1, $multiple_of = 10): int {
         return self::calcMoneyGain($this->rank_num, $multiplier, $multiple_of);
     }
@@ -1690,16 +1668,6 @@ class User extends Fighter {
         $gain = ceil(((30 * $rank_num) + pow($rank_num+1, 2)) * $multiplier);
 
         return $gain + ($multiple_of - $gain % $multiple_of);
-    }
-
-    /**
-     * @throws RuntimeException
-     */
-    public function subtractMoney(int $amount, string $description) {
-        if($this->money->getAmount() < $amount) {
-            throw new RuntimeException("Not enough money!");
-        }
-        $this->setMoney($this->money->getAmount() - $amount, $description);
     }
 
     public function getPremiumCredits(): int {

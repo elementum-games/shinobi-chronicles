@@ -243,7 +243,7 @@ function processArenaBattleEnd(BattleManager|BattleManagerV2 $battle, User $play
             $battle_result .=  $stat_gain_display;
         }
 
-        $player->addMoney(($money_gain + $extra_yen), 'arena');
+        $player->money->add(($money_gain + $extra_yen), 'arena');
         $player->ai_wins++;
         $player->battle_id = 0;
         $player->last_pvp_ms = System::currentTimeMs();
