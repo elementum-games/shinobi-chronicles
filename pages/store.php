@@ -90,7 +90,7 @@ function store() {
 					throw new RuntimeException("You do not have enough money to buy the max amount!");
 				}
 
-				$player->subtractMoney(
+				$player->money->subtract(
                     $shop_items[$item_id]->purchase_cost * $max_missing,
                     "Purchased {$max_missing} of item #{$item_id}"
                 );
@@ -110,7 +110,7 @@ function store() {
                 }
 
                 // Add to inventory or increment quantity
-                $player->subtractMoney($shop_items[$item_id]->purchase_cost, "Purchased item #{$item_id}");
+                $player->money->subtract($shop_items[$item_id]->purchase_cost, "Purchased item #{$item_id}");
 
                 $player->giveItem($shop_items[$item_id], 1);
 			}
@@ -159,7 +159,7 @@ function store() {
 			
 			
 			// Add to inventory
-			$player->subtractMoney($shop_jutsu[$jutsu_id]['purchase_cost'], "Purchased jutsu #{$jutsu_id}");
+			$player->money->subtract($shop_jutsu[$jutsu_id]['purchase_cost'], "Purchased jutsu #{$jutsu_id}");
 
 			$player->jutsu_scrolls[$jutsu_id] = Jutsu::fromArray($jutsu_id, $shop_jutsu[$jutsu_id]);
 			

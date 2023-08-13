@@ -313,7 +313,7 @@ function runActiveMission(): bool {
             else if($mission->mission_type == Mission::TYPE_TEAM) {
                 // Rewards
                 echo Mission::processRewards($mission, $player, $system);
-                $player->addMoney($mission->money, "Team mission");
+                $player->money->add($mission->money, "Team mission");
                 $player->clearMission();
 
                 $team_points = 2;
@@ -338,7 +338,7 @@ function runActiveMission(): bool {
             else if($mission->mission_type == Mission::TYPE_CLAN) {
                 // Rewards
                 echo Mission::processRewards($mission, $player, $system);
-                $player->addMoney($mission->money, "Clan mission");
+                $player->money->add($mission->money, "Clan mission");
                 $player->clearMission();
                 $player->last_ai_ms = System::currentTimeMs();
 
@@ -394,7 +394,7 @@ function runActiveMission(): bool {
 
                 // Rewards
                 echo Mission::processRewards($mission, $player, $system);
-                $player->addMoney($mission->money, "Village mission complete");
+                $player->money->add($mission->money, "Village mission complete");
                 $player->clearMission();
                 $player->last_ai_ms = System::currentTimeMs();
 

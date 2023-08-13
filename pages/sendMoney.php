@@ -45,8 +45,8 @@ function sendMoney() {
                 if($amount > $player->money->getAmount()) {
                     throw new RuntimeException("You do not have that much money/AK!");
                 }
-                $player->subtractMoney($amount, "Sent money to {$recipient->user_name} (#{$recipient->user_id})");
-                $recipient->addMoney($amount, "Received money from $player->user_name (#$player->user_id)", false);
+                $player->money->subtract($amount, "Sent money to {$recipient->user_name} (#{$recipient->user_id})");
+                $recipient->money->add($amount, "Received money from $player->user_name (#$player->user_id)", false);
 
                 // Player will be auto-updated later
                 $recipient->updateData();

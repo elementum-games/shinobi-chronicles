@@ -346,7 +346,7 @@ class PremiumShopManager {
         $time = $this->statTransferTime($transfer_amount, $transfer_speed);
 
         $this->player->subtractPremiumCredits($ak_cost, "Transferred {$transfer_amount} {$original_stat} to {$target_stat}");
-        $this->player->subtractMoney($yen_cost, "Transferred {$transfer_amount} {$original_stat} to {$target_stat}");
+        $this->player->money->subtract($yen_cost, "Transferred {$transfer_amount} {$original_stat} to {$target_stat}");
 
         $exp = $transfer_amount * 10;
         $this->player->exp -= $exp;

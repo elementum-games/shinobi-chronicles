@@ -306,12 +306,12 @@ function academy() {
             }
 
 			// Verify player can afford training
-			$player->subtractMoney($lesson_cost, "Paid " . $lesson_cost . "&yen; for lessons.");
+			$player->money->subtract($lesson_cost, "Paid " . $lesson_cost . "&yen; for lessons.");
 
             // Add yen to sensei
             $sensei_player = User::loadFromId($system, $lesson_sensei['sensei_id']);
             $sensei_player->loadData(User::UPDATE_NOTHING);
-            $sensei_player->addMoney($lesson_cost / 5, "Earned " . $lesson_cost / 5 . "&yen; for lessons.");
+            $sensei_player->money->add($lesson_cost / 5, "Earned " . $lesson_cost / 5 . "&yen; for lessons.");
             $sensei_player->updateData();
 
 			// Set training for player

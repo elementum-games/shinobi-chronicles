@@ -136,7 +136,7 @@ function jutsu(): void {
 
                     $refund = ceil($jutsu->purchase_cost * Jutsu::REFUND_AMOUNT);
                     if($refund > 0) {
-                        $player->addMoney($refund, "Sell jutsu");
+                        $player->money->add($refund, "Sell jutsu");
                         $message .= " and gained &yen;$refund";
                     }
                     $message .= "!";

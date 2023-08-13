@@ -135,7 +135,7 @@ function processBattleFightEnd(BattleManager|BattleManagerV2 $battle, User $play
         $village_point_gain = 1;
         $team_point_gain = 1;
 
-        $player->addMoney($pvp_yen, "PVP win");
+        $player->money->add($pvp_yen, "PVP win");
         $result .= "You win the fight and earn ¥$pvp_yen![br]";
 
         $player->system->db->query(

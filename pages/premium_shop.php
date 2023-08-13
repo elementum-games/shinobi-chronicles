@@ -836,7 +836,7 @@ function premiumCreditExchange() {
                 throw new RuntimeException("You do not have enough money!");
             }
             // Process payment
-            $player->subtractMoney($offer['money'], "Purchased AK from exchange.");
+            $player->money->subtract($offer['money'], "Purchased AK from exchange.");
             $player->addPremiumCredits($offer['premium_credits'], "Purchased AK from exchange.");
             $player->updateData();
 
