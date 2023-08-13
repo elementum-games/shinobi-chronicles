@@ -211,7 +211,7 @@ class PremiumShopManager {
         $ak_cost = $this->userNameChangeCost($new_name);
         
         if ($this->player->premium_credits->getAmount() < $ak_cost) {
-            throw new RuntimeException("You do not have enough Ancient Kunai!");
+            throw new RuntimeException("You do not have enough <?=Currency::PREMIUM_NAME?>!");
         }
         if (strlen($new_name) < User::MIN_NAME_LENGTH || strlen($new_name) > User::MAX_NAME_LENGTH) {
             throw new RuntimeException("New user name is to short/long! Please enter a name between "
@@ -334,12 +334,12 @@ class PremiumShopManager {
 
         $ak_cost = $this->statTransferPremiumCreditCost($transfer_amount, $transfer_speed);
         if ($this->player->premium_credits->getAmount() < $ak_cost) {
-            throw new RuntimeException("You do not have enough Ancient Kunai!");
+            throw new RuntimeException("You do not have enough <?=Currency::PREMIUM_NAME?>!");
         }
 
         $yen_cost = $this->statTransferYenCost($transfer_amount, $transfer_speed);
         if ($this->player->money->getAmount() < $yen_cost) {
-            throw new RuntimeException("You do not have enough yen!");
+            throw new RuntimeException("You do not have enough <?=Currency::MONEY_NAME?>!");
         }
     }
 
@@ -442,7 +442,7 @@ class PremiumShopManager {
 
         //Check cost
         if ($this->player->premium_credits->getAmount() < $ak_cost) {
-            throw new RuntimeException("You do not have enough Ancient Kunai!");
+            throw new RuntimeException("You do not have enough <?=Currency::PREMIUM_NAME?>!");
         }
     }
     
@@ -534,7 +534,7 @@ class PremiumShopManager {
     // Gender Change
     public function assertUserCanChangeGender(string $new_gender): void {
         if ($this->player->premium_credits->getAmount() < $this->costs['gender_change']) {
-            throw new RuntimeException("You do not have enough Ancient Kunai!");
+            throw new RuntimeException("You do not have enough <?=Currency::PREMIUM_NAME?>!");
         }
         if ($this->player->gender == $new_gender) {
             throw new RuntimeException("Your gender is already {$new_gender}!");
