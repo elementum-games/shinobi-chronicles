@@ -26,20 +26,11 @@ class Currency {
         public ?int $max_amount = null
     ) {
         $this->valid_currency_types = self::getValidCurrencies();
+        // Validate currency type
         if(!in_array($this->type, $this->valid_currency_types)) {
             throw new RunetimeException("Invalid currency type {$this->type}!");
         }
             
-        $this->name = self::getCurrencyName($this->type);
-        $this->symbol = self::getCurrencySymbol($this->type);
-    }
-
-    // Validate currency type and set default members
-    public function setDefaults() {
-        $this->valid_currency_types = self::getCurrencyTypes();
-        if(!in_array($this->type, $this->valid_currency_types)) {
-            throw new RunetimeException("Invalid currency type {$this->type}!");
-        }
         $this->name = self::getCurrencyName($this->type);
         $this->symbol = self::getCurrencySymbol($this->type);
     }
