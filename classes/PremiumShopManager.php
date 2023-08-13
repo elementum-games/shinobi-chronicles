@@ -18,6 +18,11 @@ class PremiumShopManager {
     public System $system;
     public User $player;
 
+    public string $premium_name;
+    public string $premium_symbol;
+    public string $money_name;
+    public string $money_symbol;
+    
     public int $stat_transfer_points_per_min;
     public int $stat_transfer_points_per_ak;
     public float $expedited_stat_transfer_points_per_yen;
@@ -34,6 +39,11 @@ class PremiumShopManager {
     public function __construct(System $system, User $player) {
         $this->system = $system;
         $this->player = $player;
+
+        $this->premium_name = $this->player->premium_currency->getName();
+        $this->premium_symbol = $this->player->premium_currency->getSymbol;
+        $this->money_name = $this->player->money->getName();
+        $this->money_symbol = $this->player->money->getSymbol();
 
         // Costs
         $this->initCosts();
@@ -211,7 +221,7 @@ class PremiumShopManager {
         $ak_cost = $this->userNameChangeCost($new_name);
         
         if ($this->player->premium_credits->getAmount() < $ak_cost) {
-            throw new RuntimeException("You do not have enough <?=Currency::PREMIUM_NAME?>!");
+            throw new RuntimeException("You do not have enough {$this->premium_name}!");
         }
         if (strlen($new_name) < User::MIN_NAME_LENGTH || strlen($new_name) > User::MAX_NAME_LENGTH) {
             throw new RuntimeException("New user name is to short/long! Please enter a name between "
@@ -334,12 +344,12 @@ class PremiumShopManager {
 
         $ak_cost = $this->statTransferPremiumCreditCost($transfer_amount, $transfer_speed);
         if ($this->player->premium_credits->getAmount() < $ak_cost) {
-            throw new RuntimeException("You do not have enough <?=Currency::PREMIUM_NAME?>!");
+            throw new RuntimeException("You do not have enough {$this->premium_name}!");
         }
 
         $yen_cost = $this->statTransferYenCost($transfer_amount, $transfer_speed);
         if ($this->player->money->getAmount() < $yen_cost) {
-            throw new RuntimeException("You do not have enough <?=Currency::MONEY_NAME?>!");
+            throw new RuntimeException("You do not have enough {$this->money_name}!");
         }
     }
 
@@ -442,7 +452,7 @@ class PremiumShopManager {
 
         //Check cost
         if ($this->player->premium_credits->getAmount() < $ak_cost) {
-            throw new RuntimeException("You do not have enough <?=Currency::PREMIUM_NAME?>!");
+            throw new RuntimeException("You do not have enough {$this->premium_name}!");
         }
     }
     
@@ -534,7 +544,7 @@ class PremiumShopManager {
     // Gender Change
     public function assertUserCanChangeGender(string $new_gender): void {
         if ($this->player->premium_credits->getAmount() < $this->costs['gender_change']) {
-            throw new RuntimeException("You do not have enough <?=Currency::PREMIUM_NAME?>!");
+            throw new RuntimeException("You do not have enough {$this->premium_name}!");
         }
         if ($this->player->gender == $new_gender) {
             throw new RuntimeException("Your gender is already {$new_gender}!");
