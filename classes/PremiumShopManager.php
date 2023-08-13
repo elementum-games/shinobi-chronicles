@@ -105,12 +105,19 @@ class PremiumShopManager {
         $this->free_stat_change_cooldown_left = $this->player->last_free_stat_change - (time() - self::$free_stat_change_cooldown);
     }
 
-    public function handlePruchase(int $amount, string $description): void {
+    public function handlePremiumPruchase(int $amount, string $description): void {
         $this->player->premium_credits->subtract($amount, $description);
     }
 
-    public function handleRefund(int $amount, string $description): void {
-        $this->player->premium_credits->add(int $amount, string $description);
+    public function handlePremiumRefund(int $amount, string $description): void {
+        $this->player->premium_credits->add($amount, $description);
+    }
+
+    public function handleMoneyPurchase(int $amount, string $description): void {
+        $this->player->money->subtract($amount, $description);
+    }
+    public function handleMoneyRefund(int $amount, string $description): void {
+        $this->player->money->add($amount, $description);
     }
 
     public function assertUserCanReset(): void {
