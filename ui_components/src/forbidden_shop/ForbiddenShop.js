@@ -244,9 +244,9 @@ function LanternEventCurrencyExchange({
 
     return (
         <>
-            <h3 className="currency_exchange_header section_title" ref={currencyExchangeRef}>Event currency exchange</h3>
+            <div className="currency_exchange_header section_title" ref={currencyExchangeRef}>Event currency exchange</div>
             <div className="currency_exchange_section box-secondary">
-                <span className="event_name">Festival of Lanterns event</span>
+                <span className="event_name">Festival of Shadows Event</span>
                 <span className="event_date">July 1 - July 15, 2023</span>
 
                 <div className="currencies_to_exchange">
@@ -289,7 +289,7 @@ function LanternEventCurrencyExchange({
                         }
                     }}
                 >
-                    Exchange All Festival Of Lanterns Items
+                    Exchange All Festival Of Shadows Items
                 </button>
                 <p className="response_message">{responseMessage}</p>
             </div>
