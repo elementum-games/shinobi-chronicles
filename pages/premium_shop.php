@@ -163,8 +163,8 @@ function premiumShop(): void {
                     . ($player->{$original_stat} - $transfer_amount) . "<br />"
                     . System::unSlug($target_stat) . ": {$player->{$target_stat}} -> "
                     . ($player->{$target_stat} + $transfer_amount) . "<br />"
-                    . "Cost: {$premiumShopManager->statTransferPremiumCreditCost($transfer_amount,$transfer_speed)} <?=Currency::PREMIUM_SYMBOL?> / "
-                    . "{$premiumShopManager->statTransferYenCost($transfer_amount, $transfer_speed)} <?=Currency::MONEY_NAME?><br />"
+                    . "Cost: {$premiumShopManager->statTransferPremiumCreditCost($transfer_amount,$transfer_speed)} {$premiumShopManager->premium_symbol} / "
+                    . "{$premiumShopManager->statTransferYenCost($transfer_amount, $transfer_speed)} {$premiumShopManager->money_name}<br />"
                     . " This will take "
                     . System::timeRemaining($time * 60, 'long', true, true);
 
@@ -206,7 +206,7 @@ function premiumShop(): void {
         try {
             $cost = $premiumShopManager->costs['reset_ai_battles'];
             if ($player->premium_credits->getAmount() < $cost) {
-                throw new RuntimeException("You do not have enough <?=Currency::PREMIUM_NAME?>!");
+                throw new RuntimeException("You do not have enough {$premiumShopManager->premium_name}!");
             }
 
             if (!isset($_POST['confirm_ai_battle_reset'])) {
@@ -233,7 +233,7 @@ function premiumShop(): void {
         try {
             $cost = $premiumShopManager->costs['reset_pvp_battles'];
             if ($player->premium_credits->getAmount() < $cost) {
-                throw new RuntimeException("You do not have enough <?=Currency::PREMIUM_NAME?>!");
+                throw new RuntimeException("You do not have enough {$premiumShopManager->premium_name}!");
             }
 
             if (!isset($_POST['confirm_pvp_battle_reset'])) {
@@ -302,7 +302,7 @@ function premiumShop(): void {
                     throw new RuntimeException("You already have this bloodline!");
                 }
                 if ($player->premium_credits->getAmount() < $ak_cost) {
-                    throw new RuntimeException("You do not have enough <?=Currency::PREMIUM_NAME?>!");
+                    throw new RuntimeException("You do not have enough {$premiumShopManager->premium_name}!");
                 }
                 //Check clan office detail & remove player from clan data if present
                 if ($player->clan && $player->clan->leader_id == $player->user_id) {
@@ -364,7 +364,7 @@ function premiumShop(): void {
             $ak_cost = $premiumShopManager->costs['forbidden_seal'][$seal_level][$seal_length];
             //Check cost
             if ($player->premium_credits->getAmount() < $ak_cost) {
-                throw new RuntimeException("You do not have enough <?=Currency::PREMIUM_NAME?>!");
+                throw new RuntimeException("You do not have enough {$premiumShopManager->premium_name}!");
             }
 
             //Extend seal
@@ -379,7 +379,7 @@ function premiumShop(): void {
 
                 // Confirm change in seal... time will not be reimbursed
                 if (!isset($_POST['change_forbidden_seal'])) {
-                    // Convert remaining premium time to days and calculate <?=Currency::PREMIUM_SYMBOL?> value
+                    // Convert remaining premium time to days and calculate {$premiumShopManager->premium_symbol} value
                     $akCredit = $player->forbidden_seal->calcRemainingCredit();
 
                     // Adjust purchase cost with minimum 0
@@ -390,7 +390,7 @@ function premiumShop(): void {
 
                     $confirmation_string = "Are you sure you would like to change from your {$player->forbidden_seal->name}?<br />
                     You will lose {$system->time_remaining($player->forbidden_seal->seal_time_remaining)} of premium time.<br />
-                    Up to {$akCredit} <?=Currency::PREMIUM_NAME?> will be credited toward your purchase from existing premium time.<br />
+                    Up to {$akCredit} {$premiumShopManager->premium_name} will be credited toward your purchase from existing premium time.<br />
                     <b>This can not be undone!</b>";
 
                     renderPurchaseConfirmation(
@@ -530,7 +530,7 @@ function premiumShop(): void {
             }
 
             if ($player->premium_credits->getAmount() < $ak_cost) {
-                throw new RuntimeException("You do not have enough <?=Currency::PREMIUM_NAME?>!");
+                throw new RuntimeException("You do not have enough {$premiumShopManager->premium_name}!");
             }
 
             if ($player->sensei_id) {
@@ -673,7 +673,7 @@ function premiumShop(): void {
             }
 
             if ($player->premium_credits->getAmount() < $ak_cost) {
-                throw new RuntimeException("You do not have enough <?=Currency::PREMIUM_NAME?>!");
+                throw new RuntimeException("You do not have enough {$premiumShopManager->premium_name}!");
             }
 
             $clan_name = $available_clans[$new_clan_id];
@@ -773,16 +773,16 @@ function premiumCreditExchange() {
             $money = round($_POST['money'], 1);
 
             if (!is_numeric($premium_credits)) {
-                throw new RuntimeException("Invalid <?=Currency::PREMIUM_NAME?> amount!");
+                throw new RuntimeException("Invalid {$premiumShopManager->premium_name} amount!");
             }
             if ($premium_credits < 1) {
-                throw new RuntimeException("Offer must contain at least one (1) <?=Currency::PREMIUM_NAME?>!");
+                throw new RuntimeException("Offer must contain at least one (1) {$premiumShopManager->premium_name}!");
             }
             if (!is_numeric($money)) {
-                throw new RuntimeException("Invalid <?=Currency::MONEY_NAME?> amount!");
+                throw new RuntimeException("Invalid {$premiumShopManager->money_name} amount!");
             }
             if ($money < $price_min || $money > $price_max) {
-                throw new RuntimeException("Offer must be between <?=Currency::MONEY_SYMBOL?>" . $price_min * 1000 . " & <?=Currency::MONEY_SYMBOL?>" . $price_max * 1000 . " each!");
+                throw new RuntimeException("Offer must be between {$premiumShopManager->money_symbol}" . $price_min * 1000 . " & {$premiumShopManager->money_symbol}" . $price_max * 1000 . " each!");
             }
 
             // Adjust money value for processing and insertion into market
@@ -790,10 +790,10 @@ function premiumCreditExchange() {
 
             // Check financing
             if ($player->premium_credits->getAmount() < $premium_credits) {
-                throw new RuntimeException("You do not have enough <?=Currency::PREMIUM_NAME?>!");
+                throw new RuntimeException("You do not have enough {$premiumShopManager->premium_name}!");
             }
             // Subtract premium_credits from user
-			$premiumShopManager->handlePremiumPurchase($premium_credits, "Placed <?=Currency::PREMIUM_SYMBOL?> for sale on exchange");
+			$premiumShopManager->handlePremiumPurchase($premium_credits, "Placed {$premiumShopManager->premium_symbol} for sale on exchange");
             $player->updateData();
 
             //Add offer to market
@@ -836,8 +836,8 @@ function premiumCreditExchange() {
                 throw new RuntimeException("You do not have enough money!");
             }
             // Process payment
-			$premiumShopManager->handleMoneyPurchase($offer['money'], "Purchased <?=Currency::PREMIUM_SYMBOL?> from exchange.");
-			$premiumShopManager->handlePremiumRefund($offer['premium_credits'], "Purchased <?=Currency::PREMIUM_SYMBOL?> from exchange.");
+			$premiumShopManager->handleMoneyPurchase($offer['money'], "Purchased {$premiumShopManager->premium_symbol} from exchange.");
+			$premiumShopManager->handlePremiumRefund($offer['premium_credits'], "Purchased {$premiumShopManager->premium_symbol} from exchange.");
             $player->updateData();
 
             // Run purchase and log [NOTE: Updating first is to avoid as much server lag and possibility for glitching]
@@ -851,12 +851,12 @@ function premiumCreditExchange() {
 			else {
 				$seller->loadData(User::UPDATE_NOTHING);
 				// Note: Can not use premium shop helper function here, would have to make a whole new instance
-				$seller->money->add($offer['money'], "Sold credits on <?=Currency::PREMIUM_SYMBOL?> exchange");
+				$seller->money->add($offer['money'], "Sold credits on {$premiumShopManager->premium_symbol} exchange");
 				$seller->updateData();
 
 				$log_data = "ID# {$offer['id']}; #{$offer['seller']} to #{$player->user_id} ({$player->user_name}) :: "
-                	. "{$offer['premium_credits']} <?=Currency::PREMIUM_SYMBOL?> for <?=Currency::MONEY_SYMBOL?>{$offer['money']}";
-            	$alert_message = "{$player->user_name} has purchased {$offer['premium_credits']} <?=Currency::PREMIUM_SYMBOL?> for <?=Currency::MONEY_SYMBOL?>{$offer['money']}.";
+                	. "{$offer['premium_credits']} {$premiumShopManager->premium_symbol} for {$premiumShopManager->money_symbol}{$offer['money']}";
+            	$alert_message = "{$player->user_name} has purchased {$offer['premium_credits']} {$premiumShopManager->premium_symbol} for {$premiumShopManager->money_symbol}{$offer['money']}.";
 
             	//Add system log
             	$system->log("Kunai Exchange", "Completed Sale", $log_data);
@@ -864,7 +864,7 @@ function premiumCreditExchange() {
             	Inbox::sendAlert($system, Inbox::ALERT_AK_OFFER_COMPLETED, $player->user_id, $offer['seller'], $alert_message);
 			}
 
-            $system->message("<?=Currency::PREMIUM_NAME?> purchased!");
+            $system->message("{$premiumShopManager->premium_name} purchased!");
             $system->printMessage();
         } catch (RuntimeException $e) {
             $system->message($e->getMessage());
@@ -897,11 +897,11 @@ function premiumCreditExchange() {
             // Cancel log [NOTE: Updating first is to avoid as much server lag and possibility for glitching]
             $system->db->query("UPDATE `premium_credit_exchange` SET `completed`='1' WHERE `id`='$id' LIMIT 1");
 
-			$premiumShopManager->handlePremiumRefund($offer['premium_credits'], "Cancelled <?=Currency::PREMIUM_SYMBOL?> offer on exchange");
+			$premiumShopManager->handlePremiumRefund($offer['premium_credits'], "Cancelled {$premiumShopManager->premium_name} offer on exchange");
             $player->updateData();
 
             $log_data = "ID# {$offer['id']}; {$offer['seller']} - Cancelled :: "
-            . "{$offer['premium_credits']} for <?=Currency::MONEY_SYMBOL?>{$offer['money']}";
+            . "{$offer['premium_credits']} for {$premiumShopManager->money_symbol}{$offer['money']}";
 			$system->log("Kunai Exchange", "Cancelled Offer", $log_data);
 
 			$system->message("Offer cancelled!");
