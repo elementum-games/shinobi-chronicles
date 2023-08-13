@@ -2303,6 +2303,7 @@ class User extends Fighter {
 
             'register_date' => time(),
             'verify_key' => $verification_code,
+            'user_verified' => 1, // TEMP FIX
             'layout' => System::DEFAULT_LAYOUT,
             'avatar_link' => mt_rand(1, 100) > 50
                 ? './images/default_avatar_v2_blue.png'
