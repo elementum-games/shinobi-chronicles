@@ -45,7 +45,7 @@
         <div class='playerInfo'>
             <div>
                 <label style='width:9em;font-weight:bold;margin-bottom:1px;'>Your Money</label><br />
-                &yen;<?= number_format(num: $player->getMoney()) ?><br />
+                &yen;<?= number_format(num: $player->money->getAmount()) ?><br />
             </div>
             <div>
                 <label style='width:9em;font-weight:bold;'>Your Health</label>

@@ -323,7 +323,7 @@ class PremiumShopManager {
         }
 
         $yen_cost = $this->statTransferYenCost($transfer_amount, $transfer_speed);
-        if ($this->player->getMoney() < $yen_cost) {
+        if ($this->player->money->getAmount() < $yen_cost) {
             throw new RuntimeException("You do not have enough yen!");
         }
     }

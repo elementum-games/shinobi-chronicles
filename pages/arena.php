@@ -24,7 +24,7 @@ function arena(): bool {
         $ai_rank = min($player->rank_num, System::SC_MAX_RANK);
         $result = $system->db->query(
             "SELECT `ai_id`, `name`, `level` FROM `ai_opponents`
-                WHERE `rank` = {$ai_rank} AND `money` > 0 ORDER BY `level` ASC"
+                WHERE `rank` = {$ai_rank} AND `money_multiplier` > 0 ORDER BY `level` ASC"
         );
 		if($system->db->last_num_rows == 0) {
 			$system->message("No NPC opponents found!");

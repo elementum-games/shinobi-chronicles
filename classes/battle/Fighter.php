@@ -29,7 +29,7 @@ abstract class Fighter {
     public float $max_chakra = 100;
 
     public int $level = 1;
-    private float $money = 0;
+    private int $money = 0;
 
     public string $avatar_link = '';
 
@@ -109,7 +109,7 @@ abstract class Fighter {
 
     abstract public function getInventory();
 
-    public function getMoney(): float|int
+    public function getMoney(): int
     {
         return $this->money;
     }

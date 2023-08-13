@@ -42,7 +42,7 @@ function sendMoney() {
             $recipient->loadData(User::UPDATE_NOTHING, true);
 
             if($currency_type == System::CURRENCY_TYPE_MONEY) {
-                if($amount > $player->getMoney()) {
+                if($amount > $player->money->getAmount()) {
                     throw new RuntimeException("You do not have that much money/AK!");
                 }
                 $player->subtractMoney($amount, "Sent money to {$recipient->user_name} (#{$recipient->user_id})");
@@ -91,7 +91,7 @@ function sendMoney() {
         $system->printMessage();
     }
 
-    $current_amount_money = "&yen;" . $player->getMoney();
+    $current_amount_money = $player->money->getSymbol() . $player->money->getAmount();
     $current_amount_ak = $player->getPremiumCredits();
 
     $recipient = $_GET['recipient'] ?? '';

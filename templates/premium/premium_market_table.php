@@ -34,7 +34,7 @@
         <td colspan="4">
             <div style="text-align: center;">
                 <label>Your money:</label>
-                <span class='currency_amount'>&yen;<?=number_format($player->getMoney())?></span><br />
+                <span class='currency_amount'>&yen;<?=number_format($player->money->getAmount())?></span><br />
                 <label>Your Ancient Kunai:</label>
                 <span class='currency_amount'><?=number_format($player->getPremiumCredits())?></span>
             </div>

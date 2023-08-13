@@ -496,12 +496,8 @@ class System {
         int $transaction_amount,
         string $transaction_description
     ): void {
-       switch($currency_type) {
-           case 'premium_credits':
-           case 'money':
-               break;
-           default:
-               throw new RuntimeException("Invalid currency type!");
+       if(!in_array($currency_type, Currency::getValidCurrencies())) {
+           throw new RuntimeException("Invalid currency type $currency_type!");
        }
 
         $this->db->query(

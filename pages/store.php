@@ -86,7 +86,7 @@ function store() {
 					throw new RuntimeException("Your supply of this item is already full!");
 				}
 
-				if ($player->getMoney() < $shop_items[$item_id]->purchase_cost * $max_missing) {
+				if ($player->money->getAmount() < $shop_items[$item_id]->purchase_cost * $max_missing) {
 					throw new RuntimeException("You do not have enough money to buy the max amount!");
 				}
 
@@ -98,7 +98,7 @@ function store() {
 
 			} else { //code for handling single purchases
                 // Check for money requirement
-                if($player->getMoney() < $shop_items[$item_id]->purchase_cost) {
+                if($player->money->getAmount() < $shop_items[$item_id]->purchase_cost) {
                     throw new RuntimeException("You do not have enough money!");
                 }
 
@@ -138,7 +138,7 @@ function store() {
 			}
 			
 			// Check for money requirement
-			if($player->getMoney() < $shop_jutsu[$jutsu_id]['purchase_cost']) {
+			if($player->money->getAmount() < $shop_jutsu[$jutsu_id]['purchase_cost']) {
 				throw new RuntimeException("You do not have enough money!");
 			}
 			
@@ -272,7 +272,7 @@ function store() {
 		<tr><td style='text-align:center;'>You can buy Jutsu Scrolls in this section for any jutsu of your rank or below.
 		Once you have purchased a scroll, go to the Jutsu page to learn the jutsu.<br />
 		<br />
-		<b>Your money:</b> &yen;{$player->getMoney()}</td></tr></table>
+		<b>Your money:</b> {$player->money->getSymbol()}{$player->money->getAmount()}</td></tr></table>
 
 		<p style='text-align:center;margin-bottom:0;'>
 			<a href='$self_link&view=jutsu&jutsu_type=ninjutsu' " . ($jutsu_type == 'ninjutsu' ? $style : "") . ">Ninjutsu</a> |
@@ -336,7 +336,7 @@ function store() {
 		echo "<table class='table'><tr><th>" . ucwords($category) . "</th></tr>
 		<tr><td style='text-align:center;'>You can buy armor/consumable items in this section for your rank or below.<br />
 		<br />
-		<b>Your money:</b> &yen;{$player->getMoney()}</td></tr></table>
+		<b>Your money:</b> {$player->money->getSymbol()}{$player->money->getAmount()}</td></tr></table>
 		
 		<table class='table'><tr>
 			<th style='width:35%;'>Name</th>

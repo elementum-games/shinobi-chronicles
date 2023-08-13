@@ -832,7 +832,7 @@ function premiumCreditExchange() {
             }
 
             // Check user has enough money
-            if ($player->getMoney() < $offer['money']) {
+            if ($player->money->getAmount() < $offer['money']) {
                 throw new RuntimeException("You do not have enough money!");
             }
             // Process payment
