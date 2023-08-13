@@ -29,7 +29,7 @@ class UserDailyTasks {
                     $progress_task = false;
                 }
                 // Validate mission data
-                if($sub_task !== false && $activity == DailyTask::ACTIVITY_MISSIONS && $task->mission_rank < $sub_task) {
+                if($sub_task !== false && $activity == DailyTask::ACTIVITY_MISSIONS && $task->mission_rank > $sub_task) {
                     $progress_task = false;
                 }
 
