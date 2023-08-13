@@ -16,7 +16,7 @@ function renderPurchaseConfirmation(
             <td>
                 <?=$confirmation_string?><br />
                 <?php if(isset($ak_cost) && $ak_cost > 0): ?>
-                    This will cost <?= $ak_cost ?> Ancient Kunai.
+                    This will cost <?= $ak_cost ?> <?=Currency::PREMIUM_NAME?>.
                 <?php endif ?>
                 <form action="<?= $form_action_link ?>" method="post">
                     <input type="hidden" name="<?= $confirmation_type ?>" value="1" />
