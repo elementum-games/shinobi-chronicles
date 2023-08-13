@@ -29,13 +29,13 @@
     }
 </style>
 <table class="table premium_credit_exchange">
-    <tr><th colspan="4">Ancient Kunai Exchange</th></tr>
+    <tr><th colspan="4"><?=Currency::PREMIUM_NAME?> Exchange</th></tr>
     <tr>
         <td colspan="4">
             <div style="text-align: center;">
                 <label>Your money:</label>
-                <span class='currency_amount'>&yen;<?=number_format($player->money->getAmount())?></span><br />
-                <label>Your Ancient Kunai:</label>
+                <span class='currency_amount'><?=Currency::MONEY_SYMBOL?><?=number_format($player->money->getAmount())?></span><br />
+                <label>Your <?=Currency::PREMIUM_NAME?>:</label>
                 <span class='currency_amount'><?=number_format($player->premium_credits->getAmount())?></span>
             </div>
         </td>
@@ -47,7 +47,7 @@
     <?php else: ?>
         <tr>
             <th>Seller</th>
-            <th>Ancient Kunai</th>
+            <th><?=Currency::PREMIUM_NAME?></th>
             <th>Cost</th>
             <th></th>
         </tr>
@@ -56,11 +56,11 @@
             <tr class="fourColGrid" style="text-align: center;">
                 <td><a href='<?=$system->router->links['members']?>&user=<?=$offer['seller_name']?>'><?=$offer['seller_name']?></a></td>
                 <td>
-                    <?=number_format($offer['premium_credits'])?> Ancient Kunai
+                    <?=number_format($offer['premium_credits'])?> <?=Currency::PREMIUM_NAME?>
                 </td>
                 <td>
-                    &yen;<?=number_format($offer['money'])?><br />
-                    (&yen;<?=number_format($offer['money']/$offer['premium_credits'])?>/AK)
+                    <?=Currency::MONEY_SYMBOL?><?=number_format($offer['money'])?><br />
+                    (<?=Currency::MONEY_SYMBOL?><?=number_format($offer['money']/$offer['premium_credits'])?>/<?=Currency::PREMIUM_SYMBOL?>)
                 </td>
                 <td>
                     <?php if($offer['seller'] == $player->user_id): ?>
@@ -86,10 +86,10 @@
                     return false;
                 }
                 else if(total_credits < premium_credits) {
-                    $('#offerPreview').html("<b style='color:red;'>You do not have that much Ancient Kunai!</b>");
+                    $('#offerPreview').html("<b style='color:red;'>You do not have that much <?=Currency::PREMIUM_NAME?>!</b>");
                 }
                 else {
-                    $('#offerPreview').html('You are offering <b>' + premium_credits.toLocaleString('en-US') + '</b> Ancient Kunai for &yen;<b>'
+                    $('#offerPreview').html('You are offering <b>' + premium_credits.toLocaleString('en-US') + '</b> <?=Currency::PREMIUM_NAME?> for <?=Currency::MONEY_SYMBOL?><b>'
                         + total_money.toLocaleString('en-US') + '</b>.');
                     return true;
                 }
@@ -97,7 +97,7 @@
         </script>
         <form action="<?=$self_link?>" method="post">
             <div class="create_offer">
-                <label class="currency_label">Ancient Kunai:</label>
+                <label class="currency_label"><?=Currency::PREMIUM_NAME?>:</label>
                 <input
                     type='number'
                     name='premium_credits'
@@ -107,10 +107,10 @@
                     onKeyUp='calcPreview()'
                     onchange='calcPreview()'
                 /><br />
-                <label class="currency_label">Yen Each:</label>
+                <label class="currency_label"><?=Currency::MONEY_NAME?> Each:</label>
                 <select name='money' id='money' onchange='calcPreview();'>
                     <?php for($i = PremiumShopManager::EXCHANGE_MIN_YEN_PER_AK; $i <= PremiumShopManager::EXCHANGE_MAX_YEN_PER_AK; $i += 1): ?>
-                        <option value='<?=sprintf("%.1f", $i)?>'>&yen;<?=number_format(sprintf("%.0f", $i*1000))?></option>
+                        <option value='<?=sprintf("%.1f", $i)?>'><?=Currency::MONEY_SYMBOL?><?=number_format(sprintf("%.0f", $i*1000))?></option>
                     <?php endfor ?>
                 </select>
             </div>
