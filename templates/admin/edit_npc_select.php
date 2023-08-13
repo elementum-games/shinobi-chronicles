@@ -46,7 +46,7 @@ $RANK_NAMES = RankManager::fetchNames($system);
             <td>
                 <?= $npc['money_multiplier'] ?>
                 <?php if($npc['money_multiplier'] > 0): ?>
-                    <em>(&yen;<?=User::calcMoneyGain($npc['rank'], $npc['money_multiplier'], NPC::MONEY_GAIN_MULTIPLE)?>)</em>
+                    <em>(<?=Currency::MONEY_SYMBOL?><?=User::calcMoneyGain($npc['rank'], $npc['money_multiplier'], NPC::MONEY_GAIN_MULTIPLE)?>)</em>
                 <?php else: ?>
                     <b>(disabled)</b>
                 <?php endif ?>

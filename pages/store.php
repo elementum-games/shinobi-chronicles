@@ -272,7 +272,7 @@ function store() {
 		<tr><td style='text-align:center;'>You can buy Jutsu Scrolls in this section for any jutsu of your rank or below.
 		Once you have purchased a scroll, go to the Jutsu page to learn the jutsu.<br />
 		<br />
-		<b>Your money:</b> {$player->money->getSymbol()}{$player->money->getAmount()}</td></tr></table>
+		<b>Your money:</b> {$player->money->getFormattedCurrency()}</td></tr></table>
 
 		<p style='text-align:center;margin-bottom:0;'>
 			<a href='$self_link&view=jutsu&jutsu_type=ninjutsu' " . ($jutsu_type == 'ninjutsu' ? $style : "") . ">Ninjutsu</a> |
@@ -314,7 +314,7 @@ function store() {
 					<td style='width:30%;'><a href='$self_link&view=jutsu&view_jutsu=$id'>{$jutsu['name']}</a></td>
 					<td style='width:25%;text-align:center;'>" . ucwords(str_replace('_', ' ', $jutsu['effect'])) . "</td>
 					<td style='width:25%;text-align:center;'>" . ucwords(str_replace('_', ' ', $jutsu['jutsu_type'])) . "</td>
-					<td style='width:26%;text-align:center;'>{$player->money->getSymbol()}{$jutsu['purchase_cost']}</td>
+					<td style='width:26%;text-align:center;'>{$player->money->symbol}{$jutsu['purchase_cost']}</td>
 					<td style='width:28%;text-align:center;'>
 						<a href='$self_link&view=jutsu&purchase_jutsu={$jutsu['jutsu_id']}&jutsu_type={$jutsu['jutsu_type']}'>Purchase</a></td>
 				</tr>";
@@ -336,7 +336,7 @@ function store() {
 		echo "<table class='table'><tr><th>" . ucwords($category) . "</th></tr>
 		<tr><td style='text-align:center;'>You can buy armor/consumable items in this section for your rank or below.<br />
 		<br />
-		<b>Your money:</b> {$player->money->getSymbol()}{$player->money->getAmount()}</td></tr></table>
+		<b>Your money:</b> {$player->money->getFormattedCurrency()}</td></tr></table>
 		
 		<table class='table'><tr>
 			<th style='width:35%;'>Name</th>
@@ -380,7 +380,7 @@ function store() {
 					($owned ? "<br />(Owned: $owned/$max_consumables)" : "") .
 					"</td>
 					<td style='width:25%;'>" . ucwords(str_replace('_', ' ', $item->effect)) . "</td>
-					<td style='width:20%;'>{$player->money->getSymbol()}{$item->purchase_cost}</td>
+					<td style='width:20%;'>{$player->money->symbol}{$item->purchase_cost}</td>
 					<td style='width:20%;'><a href='$self_link&view=$category&purchase_item={$item->id}'>Purchase</a>" .
 					($category == 'consumables' ? "/<br><a href='$self_link&view=$category&purchase_item={$item->id}&max=true'>Purchase Max</a>" : "") .
 					"</td>

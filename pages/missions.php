@@ -329,7 +329,7 @@ function runActiveMission(): bool {
                 echo "<table class='table'><tr><th>Current Mission</th></tr>
 				<tr><td style='text-align:center;'><span style='font-weight:bold;'>$mission->name Complete</span><br />
 				Your team has completed the mission.<br />
-				You have been paid &yen;$mission->money.<br />
+				You have been paid " . Currency::MONEY_SYMBOL . "$mission->money.<br />
 				Your team has received $team_points points.<br />
 				<a href='$self_link'>Continue</a>
 				</td></tr></table>";
@@ -350,7 +350,7 @@ function runActiveMission(): bool {
                 echo "<table class='table'><tr><th>Current Mission</th></tr>
 				<tr><td style='text-align:center;'><span style='font-weight:bold;'>$mission->name Complete</span><br />
 				You have completed your mission for clan {$player->clan->name}.<br />
-				You have been paid &yen;$mission->money.<br />
+				You have been paid " . Currency::MONEY_SYMBOL . "$mission->money.<br />
 				You have earned $point_gain reputation for your clan.<br />
 				<a href='$self_link'>Continue</a>
 				</td></tr></table>";
@@ -363,11 +363,11 @@ function runActiveMission(): bool {
                 if ($mission->mission_type == 5) {
                     $mission->money = $player->mission_stage['mission_money'];
                     echo sprintf(
-                        "For your effort in defeating %d enemies, you have received &yen;%d.<br />",
+                        "For your effort in defeating %d enemies, you have received {$player->money->symbol}%d.<br />",
                         $player->mission_stage['ai_defeated'], $mission->money
                     );
                 } else {
-                    echo "You have been paid &yen;$mission->money.<br />";
+                    echo "You have been paid {$player->money->symbol}$mission->money.<br />";
                 }
 
                 // Village reputation

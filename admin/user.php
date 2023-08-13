@@ -621,7 +621,7 @@ function staffPaymentPage(System $system, User $player) {
                         $player->premium_credits->add($payment, 'Staff payment');
 
                         // Send Notification
-                        $alert_message = "You have received $payment Ancient Kunai as Staff Compensation.";
+                        $alert_message = "You have received $payment " . Currency::PREMIUM_NAME . " as Staff Compensation.";
                         Inbox::sendAlert($system, Inbox::ALERT_AK_RECEIVED, $player->user_id, $player->user_id, $alert_message);
                     }
                     else {
@@ -632,7 +632,7 @@ function staffPaymentPage(System $system, User $player) {
                         $staff_member->updateData();
 
                         // Send Notification
-                        $alert_message = "You have received $payment Ancient Kunai as Staff Compensation.";
+                        $alert_message = "You have received $payment " . Currency::PREMIUM_NAME . " as Staff Compensation.";
                         Inbox::sendAlert($system, Inbox::ALERT_AK_RECEIVED, $player->user_id, $staff_member->user_id, $alert_message);
                     }
                 }
@@ -697,7 +697,8 @@ function ManualCurrency(System $system, User $player): void {
                 }
                 if($trans_type == 'debit') {
                     if($trans_user->premium_credits->getAmount() < $amount) {
-                        throw new RuntimeException("{$trans_user->user_name} does not have enough AK ($amount/{$trans_user->premium_credits->getAmount()})!");
+                        throw new RuntimeException("{$trans_user->user_name} does not have enough {$trans_user->premium_credits->symbol} "
+                         . "($amount/{$trans_user->premium_credits->getAmount()})!");
                     }
                     $trans_user->premium_credits->subtract($amount, "Manual transaction by {$player->user_name}({$player->user_id})");
                 }

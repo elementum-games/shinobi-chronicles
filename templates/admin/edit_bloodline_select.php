@@ -96,7 +96,7 @@ $current_rank = 1;
                             <?php endif; ?>
                         </p>
                         <p>Use Cost: <?= $jutsu->use_cost ?></p>
-                        <p>Purchase Cost: &yen;<?= $jutsu->purchase_cost ?></p>
+                        <p>Purchase Cost: <?=Currency::MONEY_SYMBOL?><?= $jutsu->purchase_cost ?></p>
                     </div>
                 <?php endforeach; ?>
             </td>

@@ -110,7 +110,7 @@ class ForbiddenShopManager {
                 $this->player->updateInventory();
                 $this->player->updateData();
 
-                return "You exchanged all your lanterns and essence, and received &yen;" . $yen_gain . "!";
+                return "You exchanged all your lanterns and essence, and received " . Currency::MONEY_SYMBOL . $yen_gain . "!";
             default:
                 throw new RuntimeException("Invalid event");
         }

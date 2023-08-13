@@ -707,7 +707,7 @@ class User extends Fighter {
                     }
                     $task_display .= "$t_name";
                 }
-                $task_display .= " earning &yen;" . $completion_data['money_gain'] . " and $rep_gain Reputation.";
+                $task_display .= " earning " . Currency::MONEY_SYMBOL . $completion_data['money_gain'] . " and $rep_gain Reputation.";
 
                 $this->system->message($task_display);
             }

@@ -306,12 +306,12 @@ function academy() {
             }
 
 			// Verify player can afford training
-			$player->money->subtract($lesson_cost, "Paid " . $lesson_cost . "&yen; for lessons.");
+			$player->money->subtract($lesson_cost, "Paid " . $lesson_cost . Currency::MONEY_SYMBOL ." for lessons.");
 
             // Add yen to sensei
             $sensei_player = User::loadFromId($system, $lesson_sensei['sensei_id']);
             $sensei_player->loadData(User::UPDATE_NOTHING);
-            $sensei_player->money->add($lesson_cost / 5, "Earned " . $lesson_cost / 5 . "&yen; for lessons.");
+            $sensei_player->money->add($lesson_cost / 5, "Earned " . $lesson_cost / 5 . Currency::MONEY_SYMBOL . " for lessons.");
             $sensei_player->updateData();
 
 			// Set training for player
@@ -354,7 +354,7 @@ function academy() {
 
 			// Update
 			$player->updateData();
-            $system->message("Lesson started for " . $lesson_cost . "&yen;.");
+            $system->message("Lesson started for " . $lesson_cost . Currency::MONEY_SYMBOL . ".");
         }
 		catch (RuntimeException $e) {
             $system->message($e->getMessage());

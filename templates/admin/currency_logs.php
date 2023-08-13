@@ -46,8 +46,8 @@
                     Currency Type:
                     <select name='currency_type'>
                         <option value='all'>All</option>
-                        <option value='premium_credits'>Ancient Kunai</option>
-                        <option value='money'>Yen</option>
+                        <option value='premium_credits'><?= Currency::PREMIUM_NAME?></option>
+                        <option value='money'><?=Currency::MONEY_NAME?></option>
                     </select>
                 </p>
                 <p>

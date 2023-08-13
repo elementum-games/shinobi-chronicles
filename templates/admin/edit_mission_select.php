@@ -38,7 +38,7 @@ $current_rank = '';
                     </a>
                 </td>
                 <td><?=Mission::$type_names[$mission['mission_type']]?></td>
-                <td>&yen;<?=$mission['money']?></td>
+                <td><?=Currency::MONEY_SYMBOL?><?=$mission['money']?></td>
                 <td><?=$mission['stages']?></td>
                 <td><?=$mission['rewards']?></td>
             </tr>

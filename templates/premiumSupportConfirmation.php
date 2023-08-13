@@ -15,7 +15,7 @@
             <input type="hidden" name="support_type" value="<?=$request_type?>" />
             <input type="hidden" name="subject" value="<?=$subject?>" />
             <input type="hidden" name="message" value="<?=$message?>" />
-            Submitting as a premium support will cost <?=$supportSystem->requestPremiumCosts[$request_type]?> AK.<br />
+            Submitting as a premium support will cost <?=$supportSystem->requestPremiumCosts[$request_type]?> <?=Currency::PREMIUM_SYMBOL?>.<br />
             Please confirm how you would like to process this support.<br />
             <input type="submit" name="confirm_prem_support" value="Submit as Premium" />
             <input type="submit" name="add_support" value="Submit as Regular" />
