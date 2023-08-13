@@ -252,7 +252,7 @@ class PremiumShopManager {
             `user_name` = '{$new_name}', 
             `username_changes` = `username_changes` - {$free_name_changes_used}
            WHERE `user_id` = {$this->player->user_id} LIMIT 1;");
-        $this->player->premium_credits->subtract($cost, "Username change");
+        $this->handlePremiumPurchase($cost, "Username change");
 
         $this->system->message("You have changed your name to $new_name.");
         return ActionResult::succeeded();
@@ -360,8 +360,8 @@ class PremiumShopManager {
         $yen_cost = $this->statTransferYenCost($transfer_amount, $transfer_speed);
         $time = $this->statTransferTime($transfer_amount, $transfer_speed);
 
-        $this->player->premium_credits->subtract($ak_cost, "Transferred {$transfer_amount} {$original_stat} to {$target_stat}");
-        $this->player->money->subtract($yen_cost, "Transferred {$transfer_amount} {$original_stat} to {$target_stat}");
+        $this->handlePremiumPurchase($ak_cost, "Transferred {$transfer_amount} {$original_stat} to {$target_stat}");
+        $this->handleMoneyPurchase($yen_cost, "Transferred {$transfer_amount} {$original_stat} to {$target_stat}");
 
         $exp = $transfer_amount * 10;
         $this->player->exp -= $exp;
@@ -453,7 +453,7 @@ class PremiumShopManager {
         $previous_element = $this->player->elements[$editing_element_index];
 
         // Process purchase
-        $this->player->premium_credits->subtract(
+        $this->handlePremiumPruchase(
             $ak_cost,
             "Changed element #{$editing_element_index} from {$this->player->elements[$editing_element_index]} to $new_element"
         );
@@ -547,7 +547,7 @@ class PremiumShopManager {
     public function changeGender(string $new_gender): ActionResult {
         $this->assertUserCanChangeGender($new_gender);
 
-        $this->player->premium_credits->subtract($this->costs['gender_change'], "Gender change to {$new_gender}");
+        $this->handlePremiumPruchase($this->costs['gender_change'], "Gender change to {$new_gender}");
         $this->player->gender = $new_gender;
         $this->player->updateData();
 
