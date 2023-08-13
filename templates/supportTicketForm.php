@@ -13,7 +13,7 @@
         let supportType = $('#support_type').val();
         let costArray = <?= json_encode($supportSystem->requestPremiumCosts) ?>;
 
-        $('#premiumCost').text(costArray[supportType] + ' AK');
+        $('#premiumCost').text(costArray[supportType] + ' <?=Crrency::PREMIUM_SYMBOL?>');
     }
 </script>
 
@@ -36,7 +36,7 @@
             <br />
             *You may submit your support as premium status, giving it higher priority for processing. Note that some support
             types offer free premium service.
-            <b>Current selection: <div id="premiumCost" style="display:inline;"><?=$supportSystem->requestPremiumCosts[$request_types[0]]?> AK</div></b>
+            <b>Current selection: <div id="premiumCost" style="display:inline;"><?=$supportSystem->requestPremiumCosts[$request_types[0]]?> <?=Currency::PREMIUM_SYMBOL?></div></b>
         </form>
     </td></tr>
 </table>
