@@ -483,7 +483,7 @@ class TravelManager {
             }
         }
 
-        
+
         // Check if objectives match existing locations
         $new_locations = [];
         // Use this to assign unique ID for react key
@@ -639,4 +639,12 @@ class TravelManager {
         return new MapLocationAction();
     }
 
+    /**
+     * @return TravelCoords
+     */
+    public function getColosseumCoords(): TravelCoords {
+        $result = $this->system->db->query("SELECT * FROM `maps_locations` WHERE `name` = 'Underground Colosseum'");
+        $location_result = $this->system->db->fetch($result);
+        return new TravelCoords($location_result['x'], $location_result['y'], 1);
+    }
 }

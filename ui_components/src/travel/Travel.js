@@ -25,6 +25,8 @@ import { ScoutArea} from "./ScoutArea.js";
     action_url:          string,
     action_message:      string,
     invulnerable:        boolean,
+    spar_link:           string,
+    colosseum_coords:    object,
  * }} mapData
  *
  * @param {{
@@ -146,7 +148,6 @@ function Travel({
             const requestEnd = Date.now();
             lastTravelEndTime.current = requestEnd;
             lastTravelLatencyMs.current = requestEnd - requestStart;
-
             debug(`MovePlayer Latency: ${lastTravelLatencyMs.current}ms`);
 
             if (response.errors.length > 0) {
@@ -235,6 +236,10 @@ function Travel({
 
             window.location.href = response.data.redirect;
         });
+    }
+
+    const SparPlayer = (target) => {
+        window.location.href = mapData.spar_link + "&challenge=" + target;
     }
 
     // Handle travel
@@ -373,6 +378,7 @@ function Travel({
                     scoutData={scoutData}
                     membersLink={membersLink}
                     attackPlayer={AttackPlayer}
+                    sparPlayer={SparPlayer}
                     ranksToView={ranksToView}
                     playerId={playerId}
                 />

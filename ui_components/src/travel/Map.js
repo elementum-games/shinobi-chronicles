@@ -102,10 +102,13 @@ export const Map = ({ mapData, scoutData, playerId, ranksToView}) => {
                     <div id='map_background' className='map_background' style={{backgroundImage: MapStyle.backgroundImage}}></div>
                     <div className='map_grid_lines'>
                         <MapGridLines
-                            mapWidth={map_width}
-                            mapHeight={map_height}
                             tileWidth={tile_width}
                             tileHeight={tile_height}
+                            stageOffsetX={stage_offset_x}
+                            stageOffsetY={stage_offset_y}
+                            stageWidth={stage_width}
+                            stageHeight={stage_height}
+                            region_locations={mapData.region_locations}
                         />
                     </div>
                     <MapLocations
@@ -157,9 +160,16 @@ function MapGutters({ stageWidth, stageHeight, stageOffsetX, stageOffsetY}) {
     )
 }
 
-function MapGridLines({ mapWidth, mapHeight, tileWidth, tileHeight }) {
-    const rows = [...Array(mapHeight).keys()];
-    const cols = [...Array(mapWidth).keys()];
+function MapGridLines({ tileWidth, tileHeight, stageOffsetX, stageOffsetY, stageWidth, stageHeight, region_locations }) {
+    const rows = [];
+    for (let i = stageOffsetY - 1; i < stageOffsetY + stageHeight + 2; i++) {
+        rows.push(i);
+    }
+
+    const cols = [];
+    for (let j = stageOffsetX - 1; j < stageOffsetX + stageWidth + 2; j++) {
+        cols.push(j);
+    }
 
     return (
         <>

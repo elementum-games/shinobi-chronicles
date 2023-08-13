@@ -1,6 +1,7 @@
 import { apiFetch } from "../utils/network.js";
 import { Map } from "./Map.js";
 import { ScoutArea } from "./ScoutArea.js";
+
 /**
  * @param {{
   player_x:            int,
@@ -24,6 +25,8 @@ import { ScoutArea } from "./ScoutArea.js";
     action_url:          string,
     action_message:      string,
     invulnerable:        boolean,
+    spar_link:           string,
+    colosseum_coords:    object,
  * }} mapData
  *
  * @param {{
@@ -45,24 +48,21 @@ import { ScoutArea } from "./ScoutArea.js";
  **/
 
 let scoutAreaDataInterval = 500; // 500 ms
-// Buffer time, go a little slower than the interval to account for network variance
 
+// Buffer time, go a little slower than the interval to account for network variance
 const travelBufferMs = 25;
 window.travelRefreshActive = true;
 window.travelDebug = false;
 window.travelDebugVerbose = false;
-
 if (window.location.host === 'localhost') {
   window.travelDebug = true;
   scoutAreaDataInterval = 2500;
 }
-
 function debug(...args) {
   if (window.travelDebug) {
     console.log(...args);
   }
 }
-
 function Travel({
   playerId,
   travelPageLink,
@@ -87,13 +87,13 @@ function Travel({
   const lastTravelEndTime = React.useRef(null);
   const lastTravelSuccessTime = React.useRef(null);
   const lastTravelLatencyMs = React.useRef(0);
-  const travelIntervalId = React.useRef(null); // API ACTIONS
+  const travelIntervalId = React.useRef(null);
 
+  // API ACTIONS
   const LoadTravelData = () => {
     if (!window.travelRefreshActive) {
       return;
     }
-
     apiFetch(travelAPILink, {
       request: 'LoadTravelData'
     }).then(response => {
@@ -101,13 +101,11 @@ function Travel({
         handleErrors(response.errors);
         return;
       }
-
       setRanksToView(response.data.mapData.player_filters.travel_ranks_to_view);
       setMapData(response.data.mapData);
       setScoutData(response.data.nearbyPlayers);
     });
   };
-
   const MovePlayer = direction => {
     resetRefreshInterval();
     debug('Moving player...' + direction);
@@ -121,12 +119,10 @@ function Travel({
       lastTravelEndTime.current = requestEnd;
       lastTravelLatencyMs.current = requestEnd - requestStart;
       debug(`MovePlayer Latency: ${lastTravelLatencyMs.current}ms`);
-
       if (response.errors.length > 0) {
         handleErrors(response.errors);
         return;
       }
-
       if (response.data.success) {
         debug(`Move completed ${requestEnd - lastTravelSuccessTime.current} ms after last move`);
         lastTravelSuccessTime.current = requestEnd;
@@ -137,7 +133,6 @@ function Travel({
       }
     });
   };
-
   const EnterPortal = portal_id => {
     debug('Entering Portal...');
     apiFetch(travelAPILink, {
@@ -148,7 +143,6 @@ function Travel({
         handleErrors(response.errors);
         return;
       }
-
       if (response.data.success) {
         setFeedback(null);
         debug('Player moved through portal.');
@@ -159,7 +153,6 @@ function Travel({
       }
     });
   };
-
   const UpdateFilter = (filter, value) => {
     debug('Updating Filter...');
     apiFetch(travelAPILink, {
@@ -171,18 +164,15 @@ function Travel({
         handleErrors(response.errors);
         return;
       }
-
       debug('Filters updated!');
       setMapData(response.data.mapData);
       setScoutData(response.data.nearbyPlayers);
     });
   };
-
   function handleErrors(errors) {
     console.warn(errors);
     setFeedback([errors, 'info']);
   }
-
   const AttackPlayer = target => {
     apiFetch(travelAPILink, {
       request: 'AttackPlayer',
@@ -192,20 +182,20 @@ function Travel({
         handleErrors(response.errors);
         return;
       }
-
       window.location.href = response.data.redirect;
     });
-  }; // Handle travel
+  };
+  const SparPlayer = target => {
+    window.location.href = mapData.spar_link + "&challenge=" + target;
+  };
 
-
+  // Handle travel
   function changeMovementDirection(newDirection) {
     if (newDirection === movementDirection.current) {
       debug('movement direction same, ignoring');
     }
-
     const prevDirection = movementDirection.current;
     movementDirection.current = newDirection;
-
     if (newDirection == null) {
       debug('stop moving');
       clearInterval(travelIntervalId.current);
@@ -215,58 +205,54 @@ function Travel({
       travelIntervalId.current = setInterval(doTravelIfOkay, travelIntervalFrequency);
     }
   }
-
   function doTravelIfOkay() {
     if (movementDirection.current == null) {
       return;
     }
-
     const estimatedNetworkDelay = Math.floor(lastTravelLatencyMs.current * 0.4);
     const timeToWait = travelCooldownMs + travelBufferMs - estimatedNetworkDelay;
     const timeSinceLastTravelStart = Date.now() - lastTravelStartTime.current;
-    const timeSinceLastTravelSuccess = Date.now() - lastTravelSuccessTime.current; // If waiting on a travel request, don't send another one unless it's been more than 200ms
+    const timeSinceLastTravelSuccess = Date.now() - lastTravelSuccessTime.current;
 
+    // If waiting on a travel request, don't send another one unless it's been more than 200ms
     if (lastTravelStartTime.current > lastTravelEndTime.current && timeSinceLastTravelStart < 200) {
       return;
     }
-
     if (timeSinceLastTravelSuccess < timeToWait) {
       return;
     }
-
     debug('base time to wait / network delay', travelCooldownMs + travelBufferMs, estimatedNetworkDelay);
     debug('traveling / +last start / +last success', timeSinceLastTravelStart, timeSinceLastTravelSuccess);
     MovePlayer(movementDirection.current);
-  } // Initial Load, fetch map info from user location
+  }
 
-
+  // Initial Load, fetch map info from user location
   React.useEffect(() => {
-    LoadTravelData(); // scout area loading
+    LoadTravelData();
 
-    refreshIntervalId.current = setInterval(() => LoadTravelData(), scoutAreaDataInterval); // remove the loop when data is displayed. Clear travel interval too if that's set
+    // scout area loading
+    refreshIntervalId.current = setInterval(() => LoadTravelData(), scoutAreaDataInterval);
 
+    // remove the loop when data is displayed. Clear travel interval too if that's set
     return () => {
       clearInterval(refreshIntervalId.current);
       clearInterval(travelIntervalId.current);
     };
   }, []);
-
   function resetRefreshInterval() {
     clearInterval(refreshIntervalId.current);
     refreshIntervalId.current = setInterval(() => LoadTravelData(), scoutAreaDataInterval);
-  } // this is the temporary workaround for the sidemenu reflecting the player's new location
+  }
+
+  // this is the temporary workaround for the sidemenu reflecting the player's new location
   // otherwise people will have to refresh before attempting to train outside of village
-
-
   React.useEffect(() => {
     const menu = document.getElementsByClassName('sm-tmp-class')[0];
-
     if (menu) {
       if (mapData && !mapData.in_village) {
         menu.classList.add('sm-tmp-outvillage');
         menu.classList.remove('sm-tmp-invillage');
       }
-
       if (mapData && mapData.in_village) {
         menu.classList.add('sm-tmp-invillage');
         menu.classList.remove('sm-tmp-outvillage');
@@ -317,21 +303,21 @@ function Travel({
     scoutData: scoutData,
     membersLink: membersLink,
     attackPlayer: AttackPlayer,
+    sparPlayer: SparPlayer,
     ranksToView: ranksToView,
     playerId: playerId
   }));
 }
-
 function TravelFilters({
   ranksToView,
   updateRanksToView
 }) {
   function updateRankVisibility(rank, newValue) {
-    updateRanksToView({ ...ranksToView,
+    updateRanksToView({
+      ...ranksToView,
       [rank]: newValue
     });
   }
-
   return /*#__PURE__*/React.createElement("div", {
     className: "travel-filter"
   }, /*#__PURE__*/React.createElement("div", {
@@ -360,7 +346,6 @@ function TravelFilters({
     onChange: e => updateRankVisibility(1, e.target.checked)
   }), /*#__PURE__*/React.createElement("label", null, "Akademi-sei")));
 }
-
 function TravelActions({
   travelPageLink,
   updateMovementDirection
@@ -375,31 +360,28 @@ function TravelActions({
   });
   const directionButtonClicked = React.useRef(null);
   const [movementDirection, _setMovementDirection] = React.useState(null);
-
   function setMovementDirection(newDirection) {
-    debug('Do direction change', newDirection); // Update internally and externally
-
+    debug('Do direction change', newDirection);
+    // Update internally and externally
     _setMovementDirection(newDirection);
-
     updateMovementDirection(newDirection);
   }
-
   const inputBufferTimeoutId = React.useRef(null);
   React.useEffect(() => {
     return () => {
       clearTimeout(inputBufferTimeoutId.current);
     };
-  }, []); // Actions
+  }, []);
 
+  // Actions
   const changeMovementDirection = React.useCallback(newDirection => {
     debug('Check direction change', newDirection);
-
     if (newDirection === movementDirection) {
       debug('identical direction, quit');
       return;
-    } // If player is first starting to move, wait to see if they press two keys
+    }
 
-
+    // If player is first starting to move, wait to see if they press two keys
     if (movementDirection == null) {
       // Run immediately if there's already a timeout
       if (inputBufferTimeoutId.current != null) {
@@ -415,110 +397,93 @@ function TravelActions({
           inputBufferTimeoutId.current = null;
         }, inputBufferMs);
       }
-    } // Otherwise, all good
+    }
+    // Otherwise, all good
     else {
       setMovementDirection(newDirection);
     }
-  }, [movementDirection]); // Keyboard input
+  }, [movementDirection]);
 
-  const allowed_keys = ['ArrowLeft', 'ArrowUp', 'ArrowRight', 'ArrowDown', 'w', 'a', 's', 'd']; // Top to bottom left to right so the grid stacks right
-
+  // Keyboard input
+  const allowed_keys = ['ArrowLeft', 'ArrowUp', 'ArrowRight', 'ArrowDown', 'w', 'a', 's', 'd'];
+  // Top to bottom left to right so the grid stacks right
   const allowedDirections = ['northwest', 'north', 'northeast', 'west', 'east', 'southwest', 'south', 'southeast'];
-
   const keyDown = e => {
     if (e.repeat) return;
-
     switch (e.key) {
       case 'ArrowLeft':
       case 'a':
         directionKeysPressed.current.left = true;
         break;
-
       case 'ArrowUp':
       case 'w':
         directionKeysPressed.current.up = true;
         break;
-
       case 'ArrowRight':
       case 'd':
         directionKeysPressed.current.right = true;
         break;
-
       case 'ArrowDown':
       case 's':
         directionKeysPressed.current.down = true;
         break;
-
       default:
         return;
     }
-
     e.preventDefault();
-
     if (directionButtonClicked.current != null) {
       return;
     }
-
     changeMovementDirection(directionFromKeysPressed(directionKeysPressed.current));
   };
-
   const keyUp = e => {
     if (!allowed_keys.includes(e.key)) {
       return;
     }
-
     switch (e.key) {
       case 'ArrowLeft':
       case 'a':
         directionKeysPressed.current.left = false;
         break;
-
       case 'ArrowUp':
       case 'w':
         directionKeysPressed.current.up = false;
         break;
-
       case 'ArrowRight':
       case 'd':
         directionKeysPressed.current.right = false;
         break;
-
       case 'ArrowDown':
       case 's':
         directionKeysPressed.current.down = false;
         break;
-
       default:
         return;
     }
-
     e.preventDefault();
-
     if (directionButtonClicked.current != null) {
       return;
     }
-
     changeMovementDirection(directionFromKeysPressed(directionKeysPressed.current));
   };
-
   React.useEffect(() => {
     // shortcut listener
     window.addEventListener('keydown', keyDown);
-    window.addEventListener('keyup', keyUp); // remove the listener
+    window.addEventListener('keyup', keyUp);
 
+    // remove the listener
     return () => {
       window.removeEventListener('keydown', keyDown);
       window.removeEventListener('keyup', keyUp);
     };
   }, [keyDown, keyUp]);
-
   const handlePointerUp = e => {
     // e.preventDefault();
+
     if (directionButtonClicked.current == null) return;
     directionButtonClicked.current = null;
     setMovementDirection(null);
   };
-
   return /*#__PURE__*/React.createElement("div", {
     className: "travel-actions"
   }, allowedDirections.map(direction => /*#__PURE__*/React.createElement("a", {
@@ -527,11 +492,9 @@ function TravelActions({
     className: `${direction} ${direction === movementDirection ? "active" : ""}`,
     onPointerDown: e => {
       e.preventDefault();
-
       if (e.button !== 0) {
         return;
       }
-
       directionButtonClicked.current = direction;
       setMovementDirection(direction);
     },
@@ -547,7 +510,6 @@ function TravelActions({
     }
   })));
 }
-
 const Message = ({
   message,
   messageType
@@ -556,10 +518,8 @@ const Message = ({
     className: `systemMessage-new systemMessage-new-${messageType}`
   }, message);
 };
-
 function directionFromKeysPressed(directionKeysPressed) {
   let direction = null;
-
   if (directionKeysPressed.up && directionKeysPressed.left) {
     direction = 'northwest';
   } else if (directionKeysPressed.up && directionKeysPressed.right) {
@@ -577,8 +537,6 @@ function directionFromKeysPressed(directionKeysPressed) {
   } else if (directionKeysPressed.up) {
     direction = 'north';
   }
-
   return direction;
 }
-
 window.Travel = Travel;

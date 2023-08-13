@@ -22,6 +22,7 @@ export const ScoutArea = ({
     scoutData,
     membersLink,
     attackPlayer,
+    sparPlayer,
     ranksToView,
     playerId,
 }) => {
@@ -37,6 +38,8 @@ export const ScoutArea = ({
                             player_data={player_data}
                             membersLink={membersLink}
                             attackPlayer={attackPlayer}
+                            sparPlayer={sparPlayer}
+                            colosseumCoords={mapData.colosseum_coords}
                         />
                     )
                 )}
@@ -49,6 +52,8 @@ const Player = ({
     player_data,
     membersLink,
     attackPlayer,
+    sparPlayer,
+    colosseumCoords
 }) => {
     return (
         <div key={player_data.user_id}
@@ -67,7 +72,9 @@ const Player = ({
             </div>
             <div className='travel-scout-attack'>
                 {(player_data.attack === true && parseInt(player_data.battle_id, 10) === 0 && !player_data.invulnerable) && (
-                    <a onClick={() => attackPlayer(player_data.attack_id)}></a>
+                    (player_data.target_x === colosseumCoords.x && player_data.target_y === colosseumCoords.y) ?
+                        <a onClick={() => sparPlayer(player_data.user_id)}></a> :
+                        <a onClick={() => attackPlayer(player_data.attack_id)}></a>
                 )}
                 {(player_data.attack === true && parseInt(player_data.battle_id, 10) > 0) && (
                     <span className='in-battle'></span>

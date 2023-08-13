@@ -118,33 +118,33 @@ class UserReputation {
         Mission::RANK_S => 5
     ];
     const SPECIAL_MISSION_REP_GAINS = [
-        SpecialMission::DIFFICULTY_EASY => 1,
-        SpecialMission::DIFFICULTY_NORMAL => 2,
-        SpecialMission::DIFFICULTY_HARD => 3,
-        SpecialMission::DIFFICULTY_NIGHTMARE => 4,
+        SpecialMission::DIFFICULTY_EASY => 2,
+        SpecialMission::DIFFICULTY_NORMAL => 4,
+        SpecialMission::DIFFICULTY_HARD => 6,
+        SpecialMission::DIFFICULTY_NIGHTMARE => 8,
     ];
 
     const DAILY_TASK_REWARDS = [
         DailyTask::DIFFICULTY_EASY => [
-            DailyTask::ACTIVITY_EARN_MONEY => 1,
-            DailyTask::ACTIVITY_ARENA => 10,
-            DailyTask::ACTIVITY_TRAINING => 4,
-            DailyTask::ACTIVITY_MISSIONS => 10,
-            DailyTask::ACTIVITY_PVP => 5,
-        ],
-        DailyTask::DIFFICULTY_MEDIUM => [
-            DailyTask::ACTIVITY_EARN_MONEY => 2,
-            DailyTask::ACTIVITY_ARENA => 15,
-            DailyTask::ACTIVITY_TRAINING => 6,
-            DailyTask::ACTIVITY_MISSIONS => 15,
+            DailyTask::ACTIVITY_EARN_MONEY => 5,
+            DailyTask::ACTIVITY_ARENA => 20,
+            DailyTask::ACTIVITY_TRAINING => 10,
+            DailyTask::ACTIVITY_MISSIONS => 20,
             DailyTask::ACTIVITY_PVP => 10,
         ],
-        DailyTask::DIFFICULTY_HARD => [
-            DailyTask::ACTIVITY_EARN_MONEY => 3,
-            DailyTask::ACTIVITY_ARENA => 20,
-            DailyTask::ACTIVITY_TRAINING => 8,
-            DailyTask::ACTIVITY_MISSIONS => 20,
+        DailyTask::DIFFICULTY_MEDIUM => [
+            DailyTask::ACTIVITY_EARN_MONEY => 10,
+            DailyTask::ACTIVITY_ARENA => 30,
+            DailyTask::ACTIVITY_TRAINING => 15,
+            DailyTask::ACTIVITY_MISSIONS => 30,
             DailyTask::ACTIVITY_PVP => 15,
+        ],
+        DailyTask::DIFFICULTY_HARD => [
+            DailyTask::ACTIVITY_EARN_MONEY => 15,
+            DailyTask::ACTIVITY_ARENA => 40,
+            DailyTask::ACTIVITY_TRAINING => 20,
+            DailyTask::ACTIVITY_MISSIONS => 40,
+            DailyTask::ACTIVITY_PVP => 20,
         ],
     ];
     const DAILY_TASK_PVP_WIN_MOD = 5; // Increase rep by this amount for tasks requiring pvp wins (harder than completes)f
@@ -168,6 +168,10 @@ class UserReputation {
 
     // Only being killed within last 30 minutes will mitigate pvp rep losses (further chainkill mitigation)
     const RECENTLY_KILLED_BY_THRESHOLD = 1800;
+
+    const SPAR_REP_LOSS = 2;
+    const SPAR_REP_DRAW = 3;
+    const SPAR_REP_WIN = 5;
 
     protected int $rep;
     protected int $weekly_rep;
