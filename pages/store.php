@@ -314,7 +314,7 @@ function store() {
 					<td style='width:30%;'><a href='$self_link&view=jutsu&view_jutsu=$id'>{$jutsu['name']}</a></td>
 					<td style='width:25%;text-align:center;'>" . ucwords(str_replace('_', ' ', $jutsu['effect'])) . "</td>
 					<td style='width:25%;text-align:center;'>" . ucwords(str_replace('_', ' ', $jutsu['jutsu_type'])) . "</td>
-					<td style='width:26%;text-align:center;'><?=Currency::MONEY_SYMBOL?>{$jutsu['purchase_cost']}</td>
+					<td style='width:26%;text-align:center;'>{$player->money->getSymbol()}{$jutsu['purchase_cost']}</td>
 					<td style='width:28%;text-align:center;'>
 						<a href='$self_link&view=jutsu&purchase_jutsu={$jutsu['jutsu_id']}&jutsu_type={$jutsu['jutsu_type']}'>Purchase</a></td>
 				</tr>";
@@ -380,7 +380,7 @@ function store() {
 					($owned ? "<br />(Owned: $owned/$max_consumables)" : "") .
 					"</td>
 					<td style='width:25%;'>" . ucwords(str_replace('_', ' ', $item->effect)) . "</td>
-					<td style='width:20%;'><?=Currency::MONEY_SYMBOL?>{$item->purchase_cost}</td>
+					<td style='width:20%;'>{$player->money->getSymbol()}{$item->purchase_cost}</td>
 					<td style='width:20%;'><a href='$self_link&view=$category&purchase_item={$item->id}'>Purchase</a>" .
 					($category == 'consumables' ? "/<br><a href='$self_link&view=$category&purchase_item={$item->id}&max=true'>Purchase Max</a>" : "") .
 					"</td>
