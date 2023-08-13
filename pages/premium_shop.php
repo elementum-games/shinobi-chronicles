@@ -763,6 +763,7 @@ function premiumCreditExchange() {
 
     $self_link .= '&view=buy_kunai';
 
+    $premiumShopManager = new PremiumShopManager($system, $player);
     $price_min = PremiumShopManager::EXCHANGE_MIN_YEN_PER_AK;
     $price_max = PremiumShopManager::EXCHANGE_MAX_YEN_PER_AK;
 
