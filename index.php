@@ -109,9 +109,9 @@ if(!isset($_SESSION['user_id'])) {
                     "IP address {$_SERVER['REMOTE_ADDR']} failed login on account {$result['user_name']} not matching previous IPs {$result['current_ip']} or {$result['last_ip']}."
                 );
 
-                throw new RuntimeException("Account has been locked out1!");
+                throw new RuntimeException("Account has been locked out!");
             } else if ($result['failed_logins'] >= User::FULL_LOCK) {
-                throw new RuntimeException("Account has been locked out2!");
+                throw new RuntimeException("Account has been locked out!");
             }
 
             // Check password (NOTE: Due to importance of login, it is inclusive instead of exclusive (if statement must be true for user to be logged in) )
