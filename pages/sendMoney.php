@@ -57,10 +57,10 @@ function sendMoney() {
                     "{$amount} " . Currency::MONEY_NAME . " - #{$player->user_id} ($player->user_name) to #{$recipient->user_id}"
                 );
 
-                $alert_message = $player->user_name . " has sent you <?=Currency::MONEY_SYMBOL?>$amount.";
+                $alert_message = $player->user_name . " has sent you " . Currency::MONEY_SYMBOL . "$amount.";
                 Inbox::sendAlert($system, Inbox::ALERT_YEN_RECEIVED, $player->user_id, $recipient->user_id, $alert_message);
 
-                $system->message("<?=Currency::MONEY_SYMBOL?>{$amount} sent to {$recipient->user_name}!");
+                $system->message(Currency::MONEY_SYMBOL . "{$amount} sent to {$recipient->user_name}!");
 
             }
             else if($currency_type == System::CURRENCY_TYPE_PREMIUM_CREDITS) {
@@ -79,7 +79,7 @@ function sendMoney() {
                     "{$amount} AK - #{$player->user_id} ($player->user_name) to #{$recipient->user_id}"
                 );
 
-                $alert_message = $player->user_name . " has sent you $amount <?=Currency::PREMIUM_NAME?>.";
+                $alert_message = $player->user_name . " has sent you $amount " . Currency::PREMIUM_NAME . ".";
                 Inbox::sendAlert($system, Inbox::ALERT_AK_RECEIVED, $player->user_id, $recipient->user_id, $alert_message);
 
                 $system->message("{$amount} AK sent to {$recipient->user_name}!");
@@ -91,7 +91,7 @@ function sendMoney() {
         $system->printMessage();
     }
 
-    $current_amount_money = $player->money->getSymbol() . $player->money->getAmount();
+    $current_amount_money = $player->money->getAmount();
     $current_amount_ak = $player->premium_credits->getAmount();
 
     $recipient = $_GET['recipient'] ?? '';
@@ -103,7 +103,7 @@ function sendMoney() {
     echo "<table class='table'><tr><th>Send Money</th><th>Send AK</th></tr>
     <tr><td style='text-align:center;'>
     <form action='{$system->router->links['send_money']}&currency=yen' method='post'>
-    <b>Your Money:</b> {$current_amount_money}<br />
+    <b>Your Money:</b> {$player->money->getSymbol()}{$current_amount_money}<br />
     <br />
     Send Money to:<br />
     <input type='text' name='recipient' value='{$recipient}' /><br />
@@ -113,13 +113,13 @@ function sendMoney() {
     </form></td>
     <td style='text-align:center;'>
     <form action='{$system->router->links['send_money']}&currency=ak' method='post'>
-    <b>Your AK:</b> {$current_amount_ak}<br />
+    <b>Your {$player->premium_credits->getSymbol()}:</b> {$current_amount_ak}<br />
     <br />
-    Send AK to:<br />
+    Send {$player->premium_credits->getSymbol()} to:<br />
     <input type='text' name='recipient' value='{$recipient}' /><br />
     Amount:<br />
     <input type='text' name='amount' /><br />
-    <input type='submit' name='send_currency' value='Send AK' />
+    <input type='submit' name='send_currency' value='Send {$player->premium_credits->getSymbol()}' />
     </form></td>
     </tr></table>";
 }
