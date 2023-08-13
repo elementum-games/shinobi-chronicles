@@ -35,7 +35,7 @@ class SpecialMission {
             'yen_per_mission' => 70,
             'stats_per_mission' => 2,
             'hp_lost_percent' => 2, // 20% => 60% lost
-            'intel_gain' => 100, // est. 10 fights (rank * 150 yen) [130 seconds]
+            'intel_gain' => 10, // est. 10 fights (rank * 150 yen) [130 seconds]
             'rep_gain' => UserReputation::SPECIAL_MISSION_REP_GAINS[SpecialMission::DIFFICULTY_EASY],
         ],
         // Measured average 144 seconds (11.3 fights)
