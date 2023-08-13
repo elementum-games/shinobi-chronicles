@@ -53,7 +53,7 @@
         <td style='text-align:center;'>
             This will reset your AI Wins and AI Losses to 0.<br />
             <br />
-            Cost: <?= $premiumShopManager->costs['reset_ai_battles'] ?> AK
+            Cost: <?= $premiumShopManager->costs['reset_ai_battles'] ?> <?=Currency::PREMIUM_SYMBOL?>
             <form action='<?= $self_link ?>' method='post'>
                 <input type='submit' name='reset_ai_battles' value='Reset AI Battles' style='margin-top:8px;'/>
             </form>
@@ -61,7 +61,7 @@
         <td style='text-align:center;'>
             This will reset your PvP Wins and PvP Losses to 0.<br />
             <br />
-            Cost: <?= $premiumShopManager->costs['reset_pvp_battles'] ?> AK
+            Cost: <?= $premiumShopManager->costs['reset_pvp_battles'] ?> <?=Currency::PREMIUM_SYMBOL?>
             <form action='<?= $self_link ?>' method='post'>
                 <input type='submit' name='reset_pvp_battles' value='Reset PvP Battles' style='margin-top:8px;'/>
             </form>
@@ -73,7 +73,7 @@
     </tr>
     <tr>
         <td colspan='2' style='text-align:center;'>You can change your username free once per account or
-            for <?= $premiumShopManager->costs['name_change'] ?> AK afterward.
+            for <?= $premiumShopManager->costs['name_change'] ?> <?=Currency::PREMIUM_SYMBOL?> afterward.
             Any changes to the case of your name do not cost.<br/>
             <p>Free Changes left: <?= $player->free_username_changes ?></p>
             <form action='<?= $self_link ?>' method='post'>
@@ -87,8 +87,7 @@
         <th colspan='2'>Gender Change</th>
     </tr>
     <tr>
-        <td style='text-align:center;' colspan='2'>You can change your gender for <?= $premiumShopManager->costs['gender_change'] ?> Ancient
-            Kunai.
+        <td style='text-align:center;' colspan='2'>You can change your gender for <?= $premiumShopManager->costs['gender_change'] ?> <?=Currency::PREMIUM_NAME?>.
             <br/>('<?= User::GENDER_NONE ?>' gender will not be displayed on view profile)
             <form action='<?= $self_link ?>' method='post'>
                 <select name='new_gender'>
@@ -138,7 +137,7 @@
     </tr>
     <tr>
         <td style='text-align:center;'>
-            You can transfer points from one stat to another. This costs Ancient Kunai and takes time to complete, both
+            You can transfer points from one stat to another. This costs <?=Currency::PREMIUM_NAME?> and takes time to complete, both
             cost and time increase
             the higher your stat amount is. Stat transfers under <?= $premiumShopManager->max_free_stat_change_amount ?>
             are free but have a <b><?= PremiumShopManager::$free_stat_change_cooldown_hours ?> hour cool down</b>.<br/>
@@ -279,7 +278,7 @@
         }
         time = Math.floor(time);
 
-        statCostEl.innerHTML = `${ak_cost} AK / ${yen_cost} yen / ${time} minutes`;
+        statCostEl.innerHTML = `${ak_cost} <?=Currency::PREMIUM_SYMBOL?> / ${yen_cost} <?=Currency::MONEY_NAME?> / ${time} minutes`;
     }
 
     statAllocateCostDisplay();
@@ -295,7 +294,7 @@
             <td style='text-align:center;'>
                 You can undergo harsh training by the village elders to reattune your chakra nature.
                 <br/>
-                A gift offering of <?= $premiumShopManager->costs['element_change'] ?> Ancient Kunai is required.
+                A gift offering of <?= $premiumShopManager->costs['element_change'] ?> <?=Currency::PREMIUM_NAME?> is required.
                 <br/>
                 <br/>
                 <b>(IMPORTANT: This is non-reversable once completed, if you want to return to your original element you
@@ -339,7 +338,7 @@
             <tr>
                 <td style='text-align:center;'>
                     <p>If you choose to abandon your clan now, you must gain the respect of other leaders in order to be
-                        accepted into their family. A gift offering of <?= $premiumShopManager->costs['clan_change'] ?> Ancient Kunai is
+                        accepted into their family. A gift offering of <?= $premiumShopManager->costs['clan_change'] ?> <?=Currency::PREMIUM_NAME?> is
                         required.
                     </p>
                     <p>
@@ -375,7 +374,7 @@
                 You can betray your own village and go to another village if you no longer wish to be a ninja in your
                 own village.
                 However to get the other village to accept you, you must offer them <?= $premiumShopManager->costs['village_change'] ?>
-                Ancient Kunai.<br/>
+                <?=Currency::PREMIUM_NAME?>.<br/>
                 <br/>
                 <b>(IMPORTANT: This is non-reversable once completed, if you want to return to your original village you
                     will have to pay
