@@ -23,6 +23,8 @@ final class YenGainUpdate extends AbstractMigration
             ADD COLUMN `login_attempt_time` INT NOT NULL DEFAULT 0 AFTER `failed_logins`,
             ADD COLUMN `last_malicious_ip` TEXT AFTER `login_attempt_time`
         ");
+        // Chat deletion
+        $this->execute("ALTER TABLE `chat` ADD COLUMN `deleted` INT(1) NOT NULL DEFAULT 0");
         // NPC stuff
         $this->execute("ALTER TABLE `ai_opponents` CHANGE `money` `money_multiplier` SMALLINT(3) NOT NULL;");
         // Rank 1 AI
@@ -72,6 +74,8 @@ final class YenGainUpdate extends AbstractMigration
             DROP COLUMN `login_attempt_time`,
             DROP COLUMN `last_malicious_ip`
         ");
+        // Chat deletion
+        $this->execute("ALTER TABLE `chat` DROP COLUMN `deleted`");
         // NPC stuff
         // Rank 1 AI
         $this->execute("ALTER TABLE `ai_opponents` CHANGE `money_multiplier` `money` INT(11) NOT NULL;");
