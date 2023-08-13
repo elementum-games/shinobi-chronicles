@@ -23,7 +23,7 @@
         <li style='width:30.5%;'><a href='<?= $self_link ?>&view=character_changes'>Character Changes</a></li>
         <li style='width:23%;'><a href='<?= $self_link ?>&view=bloodlines'>Bloodlines</a></li>
         <li style='width:25.5%;'><a href='<?= $self_link ?>&view=forbidden_seal'>Forbidden Seal</a></li>
-        <li style='width:18.5%;'><a href='<?= $self_link ?>&view=buy_kunai'>Buy AK</a></li>
+        <li style='width:18.5%;'><a href='<?= $self_link ?>&view=buy_kunai'>Buy <?=Currency::PREMIUM_SYMBOL?></a></li>
     </ul>
 </div>
 <div class='submenuMargin'></div>
@@ -37,9 +37,9 @@
     </tr>
     <tr>
         <td style='text-align:center;'>
-            Here you can purchase and spend Ancient Kunai on a variety of boosts and in-game items.<br/>
+            Here you can purchase and spend <?=Currency::PREMIUM_NAME?> on a variety of boosts and in-game items.<br/>
             <br/>
-            <b>Your Ancient Kunai:</b> <?= number_format($player->premium_credits->getAmount()) ?>
+            <b>Your <?=Currency::PREMIUM_NAME?>:</b> <?= number_format($player->premium_credits->getAmount()) ?>
         </td>
     </tr>
 </table>
@@ -54,7 +54,7 @@
             </tr>
             <tr>
                 <td style='text-align:center;'>A researcher from the village will implant another clan's DNA into
-                    you in exchange for Ancient Kunai, allowing you to use a new bloodline
+                    you in exchange for <?=Currency::PREMIUM_NAME?>, allowing you to use a new bloodline
                     <?= ($player->bloodline_id ? ' instead of your own' : '') ?>.<br/><br/>
                     <?php if($player->bloodline_skill > 10): ?>
                     <b>Warning: Your bloodline skill will be reduced by <?= (Bloodline::SKILL_REDUCTION_ON_CHANGE * 100) ?>% as
@@ -65,7 +65,7 @@
 
                     <?php foreach(Bloodline::$public_ranks as $rank_id => $rank): ?>
                         <?php if(empty($bloodlines[$rank_id])) continue; ?>
-                        <?= $rank ?> Bloodlines (<?= $premiumShopManager->costs['bloodline'][$rank_id] ?> Ancient Kunai)<br/>
+                        <?= $rank ?> Bloodlines (<?= $premiumShopManager->costs['bloodline'][$rank_id] ?> <?=Currency::PREMIUM_NAME?>)<br/>
                         <form action='<?= $self_link ?>&view=bloodlines' method='post'>
                             <select name='bloodline_id'>
                                 <?php foreach($bloodlines[$rank_id] as $bloodline_id => $bloodline): ?>
@@ -96,7 +96,7 @@
         <tr>
             <td style='text-align:center;' colspan='2'>
                 Shinobi researchers can imbue you with a forbidden seal, providing you with various benefits, in exchange
-                for Ancient Kunai. The
+                for <?=Currency::PREMIUM_NAME?>. The
                 specific benefits and their strengths depend on which seal the researchers give you. The seals will recede
                 after 30 days
                 naturally, although with extra chakra imbued they can last longer.<br/>
@@ -138,7 +138,7 @@
         <tr>
             <td id='premium_twinSparrowSeal_data' style='width:50%;vertical-align:top;'>
                 <p style='font-weight:bold;text-align:center;'>
-                    <?= $premiumShopManager->costs['forbidden_seal_monthly_cost'][1] ?> Ancient Kunai / 30 days</p>
+                    <?= $premiumShopManager->costs['forbidden_seal_monthly_cost'][1] ?> <?=Currency::PREMIUM_NAME?> / 30 days</p>
                 <br/>
                 +<?=$twinSeal->regen_boost?>% regen rate<br/>
                 <?=$twinSeal->name_color_display?> username color in chat<br/>
@@ -149,14 +149,14 @@
                 Larger journal images (<?=$baseDisplay['journal_image_display']?> -> <?=$twinSeal->journal_image_display?>)<br/>
                 Longer chat posts (<?=$baseDisplay['chat_post_size']?> -> <?=$twinSeal->chat_post_size?> characters)<br/>
                 Longer PMs (<?=$baseDisplay['pm_size']?> -> <?=$twinSeal->pm_size?> characters)<br/>
-                Cheaper stat transfers +<?= $twinSeal->extra_stat_transfer_points_per_ak ?> stat points per AK<br />
+                Cheaper stat transfers +<?= $twinSeal->extra_stat_transfer_points_per_ak ?> stat points per <?=Currency::PREMIUM_SYMBOL?><br />
                 View logs of your last <?= $twinSeal->max_battle_history_view ?> battles
                 <form action='<?= $self_link ?>&view=forbidden_seal' method='post'>
                     <p style='width:100%;text-align:center;margin: 1em 0 0;'>
                         <input type='hidden' name='seal_level' value='1'/>
                         <select name='seal_length'>
                             <?php foreach($premiumShopManager->costs['forbidden_seal'][1] as $pLength => $pCost): ?>
-                                <option value="<?=$pLength?>"><?=$pLength?> days (<?=$pCost?> AK)</option>
+                                <option value="<?=$pLength?>"><?=$pLength?> days (<?=$pCost?> <?=Currency::PREMIUM_SYMBOL?>)</option>
                             <?php endforeach ?>
                         </select><br/>
                         <input type='submit' name='forbidden_seal' value='<?= ($player->forbidden_seal->level == 1 ? 'Extend' : 'Purchase') ?>' />
@@ -165,7 +165,7 @@
             </td>
             <td id='premium_fourDragonSeal_data' style='width:50%;vertical-align:top;'>
                 <p style='font-weight:bold;text-align:center;'>
-                    <?= $premiumShopManager->costs['forbidden_seal_monthly_cost'][2] ?> Ancient Kunai / 30 days</p>
+                    <?= $premiumShopManager->costs['forbidden_seal_monthly_cost'][2] ?> <?=Currency::PREMIUM_NAME?> / 30 days</p>
                 <br/>
                 All benefits of Twin Sparrow Seal<br/>
                 +<?=$fourDragonSeal->regen_boost?>% regen rate<br/>
@@ -177,14 +177,14 @@
                 Enhanced long trainings (<?=$fourDragonSeal->long_training_time?>x length, <?=$fourDragonSeal->long_training_gains?>x gains)<br/>
                 Enhanced extended trainings (<?=$fourDragonSeal->extended_training_time?>x length, <?=$fourDragonSeal->extended_training_gains?>x gains)<br/>
                 Faster stat transfers (+<?=$fourDragonSeal->stat_transfer_boost?>/minute)<br />
-                Cheaper stat transfers +<?= $fourDragonSeal->extra_stat_transfer_points_per_ak ?> stat points per AK<br />
+                Cheaper stat transfers +<?= $fourDragonSeal->extra_stat_transfer_points_per_ak ?> stat points per <?=Currency::PREMIUM_SYMBOL?><br />
                 View logs of your last <?= $fourDragonSeal->max_battle_history_view ?> battles
                 <form action='<?= $self_link ?>&view=forbidden_seal' method='post'>
                     <p style='width:100%;text-align:center;margin: 2.2em 0 0;'>
                         <input type='hidden' name='seal_level' value='2'/>
                         <select name='seal_length'>
                             <?php foreach($premiumShopManager->costs['forbidden_seal'][2] as $pLength => $pCost): ?>
-                                <option value="<?=$pLength?>"><?=$pLength?> days (<?=$pCost?> AK)</option>
+                                <option value="<?=$pLength?>"><?=$pLength?> days (<?=$pCost?> <?=Currency::PREMIUM_SYMBOL?>)</option>
                             <?php endforeach ?>
                         </select><br/>
                         <input type='submit' name='forbidden_seal' value='<?= ($player->forbidden_seal->level == 2 ? 'Extend' : 'Purchase') ?>' />
