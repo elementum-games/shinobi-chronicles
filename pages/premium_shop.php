@@ -218,7 +218,7 @@ function premiumShop(): void {
                     form_submit_prompt: "Confirm Reset",
                 );
             } else {
-                $player->premium_credits->subtract($cost, 'reset_ai_battles');
+				$premiumShopManager->handlePremiumPurchase($cost, 'reset_ai_battles');
                 $player->ai_wins = 0;
                 $player->ai_losses = 0;
 
@@ -245,7 +245,7 @@ function premiumShop(): void {
                     form_submit_prompt: "Confirm Reset",
                 );
             } else {
-                $player->premium_credits->subtract($cost, 'reset_pvp_battles');
+				$premiumShopManager->handlePremiumPurchase($cost, 'reset_pvp_battles');
                 $player->pvp_wins = 0;
                 $player->pvp_losses = 0;
 
@@ -318,7 +318,7 @@ function premiumShop(): void {
                 }
 
                 //Process purchase
-                $player->premium_credits->subtract($ak_cost, "Purchased bloodline {$bloodline_name} (#$bloodline_id)");
+				$premiumShopManager->handlePremiumPurchase($ak_cost, "Purchased bloodline {$bloodline_name} (#$bloodline_id)");
 
                 // Give bloodline
                 $status = Bloodline::giveBloodline(
@@ -369,7 +369,7 @@ function premiumShop(): void {
 
             //Extend seal
             if ($player->forbidden_seal->level == $seal_level) {
-                $player->premium_credits->subtract($ak_cost, "Extended {$player->forbidden_seal->name} by {$seal_length} days.");
+				$premiumShopManager->handlePremiumPurchase($ak_cost, "Extended {$player->forbidden_seal->name} by {$seal_length} days.");
                 $player->forbidden_seal->addSeal($seal_level, $seal_length);
                 $system->message("Seal extended!");
             }
@@ -420,7 +420,7 @@ function premiumShop(): void {
                         }
                     }
 
-                    $player->premium_credits->subtract($ak_cost, $message);
+					$premiumShopManager->handlePremiumPurchase($ak_cost, $message);
                     $player->forbidden_seal->addSeal($seal_level, $seal_length);
 
                     $system->message("You changed your seal!");
@@ -428,7 +428,7 @@ function premiumShop(): void {
             }
             //New seal
             else {
-                $player->premium_credits->subtract($ak_cost, "Purchased " . ForbiddenSeal::$forbidden_seal_names[$seal_level]
+				$premiumShopManager->handlePremiumPurchase($ak_cost, "Purchased " . ForbiddenSeal::$forbidden_seal_names[$seal_level]
                     . " for {$seal_length} days.");
 
                 //Load blank seal
@@ -582,7 +582,7 @@ function premiumShop(): void {
                 }
 
                 // Cost
-                $player->premium_credits->subtract($ak_cost, "Changed villages from {$player->village->name} to $village");
+				$premiumShopManager->handlePremiumPurchase($ak_cost, "Changed villages from {$player->village->name} to $village");
                 $player->village_changes++;
 
                 // Village
@@ -696,7 +696,7 @@ function premiumShop(): void {
                 );
             } else {
                 // Cost
-                $player->premium_credits->subtract(
+				$premiumShopManager->handlePremiumPurchase(
                     $ak_cost,
                     "Changed clan from {$player->clan->name} ({$player->clan->id}) to $clan_name ({$new_clan_id})"
                 );
@@ -793,7 +793,7 @@ function premiumCreditExchange() {
                 throw new RuntimeException("You do not have enough Ancient Kunai!");
             }
             // Subtract premium_credits from user
-            $player->premium_credits->subtract($premium_credits, "Placed AK for sale on exchange");
+			$premiumShopManager->handlePremiumPurchase($premium_credits, "Placed AK for sale on exchange");
             $player->updateData();
 
             //Add offer to market
@@ -836,37 +836,33 @@ function premiumCreditExchange() {
                 throw new RuntimeException("You do not have enough money!");
             }
             // Process payment
-            $player->money->subtract($offer['money'], "Purchased AK from exchange.");
-            $player->premium_credits->add($offer['premium_credits'], "Purchased AK from exchange.");
+			$premiumShopManager->handleMoneyPurchase($offer['money'], "Purchased AK from exchange.");
+			$premiumShopManager->handlePremiumRefund($offer['premium_credits'], "Purchased AK from exchange.");
             $player->updateData();
 
             // Run purchase and log [NOTE: Updating first is to avoid as much server lag and possibility for glitching]
             $system->db->query("UPDATE `premium_credit_exchange` SET `completed`='1' WHERE `id`='$id' LIMIT 1");
 
-            $result = $system->db->query("SELECT `money` FROM `users` WHERE `user_id`='{$offer['seller']}' LIMIT 1");
-            $current_balance = $system->db->fetch($result)['money'] ?? null;
+			$seller_id = (int) $offer['seller'];
+			$seller = User::loadFromId($system, $seller_id, true);
+			if(!$seller) {
+				$system->log("Kunai Exchange", "Failed Sale", "Selelr UID: $seller_id was not found. Money: " . $offer['money']);
+			}
+			else {
+				$seller->loadData(User::UPDATE_NOTHING);
+				// Note: Can not use premium shop helper function here, would have to make a whole new instance
+				$seller->money->add($offer['money'], "Sold credits on AK exchange");
+				$seller->updateData();
 
-            $system->db->query(
-                "UPDATE `users` SET `money`=`money` + {$offer['money']} WHERE `user_id`='{$offer['seller']}'"
-            );
+				$log_data = "ID# {$offer['id']}; #{$offer['seller']} to #{$player->user_id} ({$player->user_name}) :: "
+                	. "{$offer['premium_credits']} AK for &yen;{$offer['money']}";
+            	$alert_message = "{$player->user_name} has purchased {$offer['premium_credits']} AK for &yen;{$offer['money']}.";
 
-            $system->currencyLog(
-                character_id: $offer['seller'],
-                currency_type: System::CURRENCY_TYPE_MONEY,
-                previous_balance: $current_balance,
-                new_balance: $current_balance + $offer['money'],
-                transaction_amount: $offer['money'],
-                transaction_description: "Sold credits on AK exchange"
-            );
-
-            $log_data = "ID# {$offer['id']}; #{$offer['seller']} to #{$player->user_id} ({$player->user_name}) :: "
-                . "{$offer['premium_credits']} AK for &yen;{$offer['money']}";
-            $alert_message = "{$player->user_name} has purchased {$offer['premium_credits']} AK for &yen;{$offer['money']}.";
-
-            //Add system log
-            $system->log("Kunai Exchange", "Completed Sale", $log_data);
-            //Notify seller of purchase
-            Inbox::sendAlert($system, Inbox::ALERT_AK_OFFER_COMPLETED, $player->user_id, $offer['seller'], $alert_message);
+            	//Add system log
+            	$system->log("Kunai Exchange", "Completed Sale", $log_data);
+            	//Notify seller of purchase
+            	Inbox::sendAlert($system, Inbox::ALERT_AK_OFFER_COMPLETED, $player->user_id, $offer['seller'], $alert_message);
+			}
 
             $system->message("Ancient Kunai purchased!");
             $system->printMessage();
@@ -901,7 +897,7 @@ function premiumCreditExchange() {
             // Cancel log [NOTE: Updating first is to avoid as much server lag and possibility for glitching]
             $system->db->query("UPDATE `premium_credit_exchange` SET `completed`='1' WHERE `id`='$id' LIMIT 1");
 
-            $player->premium_credits->add($offer['premium_credits'], "Cancelled AK offer on exchange");
+			$premiumShopManager->handlePremiumRefund($offer['premium_credits'], "Cancelled AK offer on exchange");
             $player->updateData();
 
             $log_data = "ID# {$offer['id']}; {$offer['seller']} - Cancelled :: "
