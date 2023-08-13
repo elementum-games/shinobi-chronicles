@@ -685,8 +685,8 @@ function ManualCurrency(System $system, User $player): void {
                     $trans_user->addMoney($amount, "Manual transaction by {$player->user_name}({$player->user_id}).", false);
                 }
                 if($trans_type == 'debit') {
-                    if($trans_user->getMoney() < $amount) {
-                        throw new RuntimeException("{$trans_user->user_name} does not have enough money ($amount/{$trans_user->getMoney()})!");
+                    if($trans_user->money->getAmount() < $amount) {
+                        throw new RuntimeException("{$trans_user->user_name} does not have enough money ($amount/{$trans_user->money->getAmount()})!");
                     }
                     $trans_user->subtractMoney($amount, "Manual transaction by {$player->user_name}({$player->user_id})");
                 }

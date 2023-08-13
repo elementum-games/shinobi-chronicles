@@ -19,6 +19,7 @@ require_once __DIR__ . "/classes/SupportManager.php";
 require_once __DIR__ . "/classes/System.php";
 require_once __DIR__ . "/classes/User.php";
 require_once __DIR__ . "/classes/Village.php";
+require_once __DIR__ . "/classes/Currency.php";
 
 require_once __DIR__ . "/classes/battle/Battle.php";
 require_once __DIR__ . "/classes/battle/BattleManager.php";

@@ -48,7 +48,7 @@ function healingShop() {
 			if(!isset($ramen_choices[$heal])) {
 				throw new RuntimeException("Invalid choice!");
 			}
-			if($player->getMoney() < $ramen_choices[$heal]['cost']) {
+			if($player->money->getAmount() < $ramen_choices[$heal]['cost']) {
 				throw new RuntimeException("You do not have enough money!");
 			}
           	if($player->health >= $player->max_health) {

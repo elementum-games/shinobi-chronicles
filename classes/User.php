@@ -165,7 +165,7 @@ class User extends Fighter {
     public int $stat_transfer_completion_time;
     public string $stat_transfer_target_stat;
 
-    private int $money;
+    public Currency $money;
 
     public int $pvp_wins;
     public int $pvp_losses;
@@ -591,7 +591,28 @@ class User extends Fighter {
         $this->train_gain = $user_data['train_gain'];
         $this->train_time = $user_data['train_time'];
 
-        $this->money = $user_data['money'];
+        $this->ninjutsu_skill = $user_data['ninjutsu_skill'];
+        $this->genjutsu_skill = $user_data['genjutsu_skill'];
+        $this->taijutsu_skill = $user_data['taijutsu_skill'];
+
+        $this->bloodline_skill = $user_data['bloodline_skill'];
+
+        $this->cast_speed = $user_data['cast_speed'];
+        $this->speed = $user_data['speed'];
+        $this->intelligence = $user_data['intelligence'];
+        $this->willpower = $user_data['willpower'];
+
+        $total_skills = $this->ninjutsu_skill + $this->taijutsu_skill + $this->genjutsu_skill + $this->bloodline_skill;
+        $total_attribs = $this->speed + $this->cast_speed;
+        $this->daily_tasks = new UserDailyTasks($this->system, $this->user_id, $this->rank_num, $total_skills, $total_attribs, $this->pvp_rep);
+
+        $this->money = new Currency(
+            system: $this->system,
+            type: Currency::TYPE_MONEY,
+            user_id: $this->user_id,
+            amount: $user_data['money'],
+            userDailyTasks: $this->daily_tasks
+        );
         $this->premium_credits = $user_data['premium_credits'];
         $this->premium_credits_purchased = $user_data['premium_credits_purchased'];
 
@@ -610,17 +631,6 @@ class User extends Fighter {
         if(!is_array($this->presents_claimed)) {
             $this->presents_claimed = [];
         }
-
-        $this->ninjutsu_skill = $user_data['ninjutsu_skill'];
-        $this->genjutsu_skill = $user_data['genjutsu_skill'];
-        $this->taijutsu_skill = $user_data['taijutsu_skill'];
-
-        $this->bloodline_skill = $user_data['bloodline_skill'];
-
-        $this->cast_speed = $user_data['cast_speed'];
-        $this->speed = $user_data['speed'];
-        $this->intelligence = $user_data['intelligence'];
-        $this->willpower = $user_data['willpower'];
 
         $this->total_stats = $this->ninjutsu_skill + $this->genjutsu_skill + $this->taijutsu_skill + $this->bloodline_skill +
             $this->cast_speed + $this->speed + $this->intelligence + $this->willpower;
@@ -673,10 +683,7 @@ class User extends Fighter {
         $this->in_village = $this->village_location !== null && $this->location->equals($this->village_location);
 
 
-        // Daily Tasks
-        $total_skills = $this->ninjutsu_skill + $this->taijutsu_skill + $this->genjutsu_skill + $this->bloodline_skill;
-        $total_attribs = $this->speed + $this->cast_speed;
-        $this->daily_tasks = new UserDailyTasks($this->system, $this->user_id, $this->rank_num, $total_skills, $total_attribs, $this->pvp_rep);
+        // Check Daily Tasks completion
         $this->daily_tasks_reset = $this->daily_tasks->last_reset;
         if($UPDATE == User::UPDATE_FULL && !$remote_view) {
             // Process tasks completion
@@ -1644,23 +1651,19 @@ class User extends Fighter {
         return ActionResult::succeeded();
     }
 
-    public function getMoney(): int {
-        return $this->money;
-    }
-
     /**
      * @throws RuntimeException
      */
     private function setMoney(int $new_amount, string $description) {
-        $this->system->currencyLog(
+        /*$this->system->currencyLog(
             $this->user_id,
             System::CURRENCY_TYPE_MONEY,
-            $this->money,
+            $this->money->getAmount(),
             $new_amount,
-            $new_amount - $this->money,
+            $new_amount - $this->money->getAmount(),
             $description
-        );
-        $this->money = $new_amount;
+        );*/
+        $this->money->set($new_amount, $description);
     }
 
     /**
@@ -1671,7 +1674,7 @@ class User extends Fighter {
         if($this->daily_tasks->hasTaskType(DailyTask::ACTIVITY_EARN_MONEY) && $increment_daily_task) {
             $this->daily_tasks->progressTask(DailyTask::ACTIVITY_EARN_MONEY, $amount);
         }
-        $this->setMoney($this->money + $amount, $description);
+        $this->setMoney($this->money->getAmount() + $amount, $description);
     }
     public function calcPlayerMoneyGain(int $multiplier = 1, $multiple_of = 10): int {
         return self::calcMoneyGain($this->rank_num, $multiplier, $multiple_of);
@@ -1693,10 +1696,10 @@ class User extends Fighter {
      * @throws RuntimeException
      */
     public function subtractMoney(int $amount, string $description) {
-        if($this->money < $amount) {
+        if($this->money->getAmount() < $amount) {
             throw new RuntimeException("Not enough money!");
         }
-        $this->setMoney($this->money - $amount, $description);
+        $this->setMoney($this->money->getAmount() - $amount, $description);
     }
 
     public function getPremiumCredits(): int {
@@ -1872,7 +1875,7 @@ class User extends Fighter {
         `stat_transfer_amount` = $this->stat_transfer_amount,
         `stat_transfer_completion_time` = $this->stat_transfer_completion_time,
         `stat_transfer_target_stat` = '$this->stat_transfer_target_stat',
-		`money` = '$this->money',
+		`money` = '{$this->money->getAmount()}',
 		`premium_credits` = '$this->premium_credits',
 		`pvp_wins` = '$this->pvp_wins',
 		`pvp_losses` = '$this->pvp_losses',

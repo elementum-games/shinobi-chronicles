@@ -121,7 +121,7 @@ class NPC extends Fighter {
             }
         }
 
-        $this->money = $ai_data['money'];
+        $this->money = $ai_data['money_multiplier'];
 
         $moves = json_decode($ai_data['moves'], true);
 
@@ -289,7 +289,7 @@ class NPC extends Fighter {
     public function getInventory() {
     }
 
-    public function getMoney(): float
+    public function getMoney(): int
     {
         return $this->money;
     }

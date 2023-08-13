@@ -98,7 +98,7 @@ if(!isset($_SESSION['user_id'])) {
 
             // Rest account lock based on last attempt
             $login_cd = ($_SERVER['REMOTE_ADDR'] == $result['last_malicious_ip']) ? User::MALICIOUS_LOCKOUT_CD : User::LOCK_OUT_CD;
-            if($result['failed_logins'] >= User::FULL_LOCK && time() >= $result['login_attempt_time']+$login_cd) {
+            if($result['failed_logins'] >= User::PARTIAL_LOCK && time() >= $result['login_attempt_time']+$login_cd) {
                 $result['failed_logins'] = 0;
             }
             // Check failed logins
@@ -109,9 +109,9 @@ if(!isset($_SESSION['user_id'])) {
                     "IP address {$_SERVER['REMOTE_ADDR']} failed login on account {$result['user_name']} not matching previous IPs {$result['current_ip']} or {$result['last_ip']}."
                 );
 
-                throw new RuntimeException("Account has been locked out!");
+                throw new RuntimeException("Account has been locked out1!");
             } else if ($result['failed_logins'] >= User::FULL_LOCK) {
-                throw new RuntimeException("Account has been locked out!");
+                throw new RuntimeException("Account has been locked out2!");
             }
 
             // Check password (NOTE: Due to importance of login, it is inclusive instead of exclusive (if statement must be true for user to be logged in) )
