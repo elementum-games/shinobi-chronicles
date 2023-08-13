@@ -618,7 +618,7 @@ function staffPaymentPage(System $system, User $player) {
                 $payment = (int) $_POST[$member['user_id'].'_payment'];
                 if($payment > 0) {
                     if($member['user_id'] == $player->user_id) {
-                        $player->addPremiumCredits($payment, 'Staff payment');
+                        $player->premium_credits->add($payment, 'Staff payment');
 
                         // Send Notification
                         $alert_message = "You have received $payment Ancient Kunai as Staff Compensation.";
@@ -628,7 +628,7 @@ function staffPaymentPage(System $system, User $player) {
                         // Issue payment
                         $staff_member = User::findByName($system, $member['user_name'], true);
                         $staff_member->loadData(User::UPDATE_NOTHING);
-                        $staff_member->addPremiumCredits($payment, 'Staff compensation');
+                        $staff_member->premium_credits->add($payment, 'Staff compensation');
                         $staff_member->updateData();
 
                         // Send Notification
@@ -693,13 +693,13 @@ function ManualCurrency(System $system, User $player): void {
             }
             if($currency_type == System::CURRENCY_TYPE_PREMIUM_CREDITS) {
                 if($trans_type == 'credit') {
-                    $trans_user->addPremiumCredits($amount, "Manual transaction by {$player->user_name}({$player->user_id}).", false);
+                    $trans_user->premium_credits->add($amount, "Manual transaction by {$player->user_name}({$player->user_id}).", false);
                 }
                 if($trans_type == 'debit') {
-                    if($trans_user->getPremiumCredits() < $amount) {
-                        throw new RuntimeException("{$trans_user->user_name} does not have enough AK ($amount/{$trans_user->getPremiumCredits()})!");
+                    if($trans_user->premium_credits->getAmount() < $amount) {
+                        throw new RuntimeException("{$trans_user->user_name} does not have enough AK ($amount/{$trans_user->premium_credits->getAmount()})!");
                     }
-                    $trans_user->subtractPremiumCredits($amount, "Manual transaction by {$player->user_name}({$player->user_id})");
+                    $trans_user->premium_credits->subtract($amount, "Manual transaction by {$player->user_name}({$player->user_id})");
                 }
             }
             $trans_user->updateData();

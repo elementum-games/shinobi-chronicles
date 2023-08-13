@@ -36,7 +36,7 @@
                 <label>Your money:</label>
                 <span class='currency_amount'>&yen;<?=number_format($player->money->getAmount())?></span><br />
                 <label>Your Ancient Kunai:</label>
-                <span class='currency_amount'><?=number_format($player->getPremiumCredits())?></span>
+                <span class='currency_amount'><?=number_format($player->premium_credits->getAmount())?></span>
             </div>
         </td>
     </tr>
@@ -76,7 +76,7 @@
     <td colspan="4">
         <script type='text/javascript'>
             function calcPreview() {
-                var total_credits = parseInt(<?=$player->getPremiumCredits()?>);
+                var total_credits = parseInt(<?=$player->premium_credits->getAmount()?>);
                 var premium_credits = parseInt($('#premium_credits').val());
                 var money = parseFloat($('#money option:selected').val());
                 var total_money = premium_credits * (money * 1000);
@@ -103,7 +103,7 @@
                     name='premium_credits'
                     id='premium_credits'
                     min='1'
-                    max='<?= $player->getPremiumCredits() ?>'
+                    max='<?= $player->premium_credits->getAmount() ?>'
                     onKeyUp='calcPreview()'
                     onchange='calcPreview()'
                 /><br />

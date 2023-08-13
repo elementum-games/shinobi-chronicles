@@ -425,7 +425,7 @@ $clan_positions = [
     <label style='width:<?= $label_width ?>;'>PvP Cap:</label> <?= $player->reputation->getWeeklyPvpRep() ?> / <?= $player->reputation->weekly_pvp_cap ?><br />
     <br />
     <label style='width:<?= $label_width ?>;'>Money:</label> <?= $player->money->getSymbol() ?><?= $player->money->getAmount() ?><br />
-    <label style='width:<?= $label_width ?>;'>Ancient Kunai:</label> <?= $player->getPremiumCredits() ?><br />
+    <label style='width:<?= $label_width ?>;'>Ancient Kunai:</label> <?= $player->premium_credits->getAmount() ?><br />
     <label style='width:<?= $label_width ?>;'>Ancient Kunai purchased:</label> <?= $player->premium_credits_purchased ?><br />
 
     <br />

@@ -36,7 +36,7 @@ class UserApiPresenter {
             'bloodlineName' => $player->bloodline?->name,
             'avatar_size' => $player->getAvatarSize(),
             'money' => $player->money->getAmount(),
-            'premiumCredits' => $player->getPremiumCredits(),
+            'premiumCredits' => $player->premium_credits->getAmount(),
             'premiumCreditsPurchased' => $player->premium_credits_purchased,
             'villageName' => $player->village->name,
             'villageRepTier' => $player->reputation->rank_name,

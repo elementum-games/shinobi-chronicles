@@ -195,7 +195,7 @@ class PremiumShopManager {
     public function assertUserCanChangeName(string $new_name): void {
         $ak_cost = $this->userNameChangeCost($new_name);
         
-        if ($this->player->getPremiumCredits() < $ak_cost) {
+        if ($this->player->premium_credits->getAmount() < $ak_cost) {
             throw new RuntimeException("You do not have enough Ancient Kunai!");
         }
         if (strlen($new_name) < User::MIN_NAME_LENGTH || strlen($new_name) > User::MAX_NAME_LENGTH) {
@@ -237,7 +237,7 @@ class PremiumShopManager {
             `user_name` = '{$new_name}', 
             `username_changes` = `username_changes` - {$free_name_changes_used}
            WHERE `user_id` = {$this->player->user_id} LIMIT 1;");
-        $this->player->subtractPremiumCredits($cost, "Username change");
+        $this->player->premium_credits->subtract($cost, "Username change");
 
         $this->system->message("You have changed your name to $new_name.");
         return ActionResult::succeeded();
@@ -318,7 +318,7 @@ class PremiumShopManager {
         }
 
         $ak_cost = $this->statTransferPremiumCreditCost($transfer_amount, $transfer_speed);
-        if ($this->player->getPremiumCredits() < $ak_cost) {
+        if ($this->player->premium_credits->getAmount() < $ak_cost) {
             throw new RuntimeException("You do not have enough Ancient Kunai!");
         }
 
@@ -345,7 +345,7 @@ class PremiumShopManager {
         $yen_cost = $this->statTransferYenCost($transfer_amount, $transfer_speed);
         $time = $this->statTransferTime($transfer_amount, $transfer_speed);
 
-        $this->player->subtractPremiumCredits($ak_cost, "Transferred {$transfer_amount} {$original_stat} to {$target_stat}");
+        $this->player->premium_credits->subtract($ak_cost, "Transferred {$transfer_amount} {$original_stat} to {$target_stat}");
         $this->player->money->subtract($yen_cost, "Transferred {$transfer_amount} {$original_stat} to {$target_stat}");
 
         $exp = $transfer_amount * 10;
@@ -426,7 +426,7 @@ class PremiumShopManager {
         }
 
         //Check cost
-        if ($this->player->getPremiumCredits() < $ak_cost) {
+        if ($this->player->premium_credits->getAmount() < $ak_cost) {
             throw new RuntimeException("You do not have enough Ancient Kunai!");
         }
     }
@@ -438,7 +438,7 @@ class PremiumShopManager {
         $previous_element = $this->player->elements[$editing_element_index];
 
         // Process purchase
-        $this->player->subtractPremiumCredits(
+        $this->player->premium_credits->subtract(
             $ak_cost,
             "Changed element #{$editing_element_index} from {$this->player->elements[$editing_element_index]} to $new_element"
         );
@@ -518,7 +518,7 @@ class PremiumShopManager {
 
     // Gender Change
     public function assertUserCanChangeGender(string $new_gender): void {
-        if ($this->player->getPremiumCredits() < $this->costs['gender_change']) {
+        if ($this->player->premium_credits->getAmount() < $this->costs['gender_change']) {
             throw new RuntimeException("You do not have enough Ancient Kunai!");
         }
         if ($this->player->gender == $new_gender) {
@@ -532,7 +532,7 @@ class PremiumShopManager {
     public function changeGender(string $new_gender): ActionResult {
         $this->assertUserCanChangeGender($new_gender);
 
-        $this->player->subtractPremiumCredits($this->costs['gender_change'], "Gender change to {$new_gender}");
+        $this->player->premium_credits->subtract($this->costs['gender_change'], "Gender change to {$new_gender}");
         $this->player->gender = $new_gender;
         $this->player->updateData();
 
