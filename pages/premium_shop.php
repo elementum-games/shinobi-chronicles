@@ -205,7 +205,7 @@ function premiumShop(): void {
     else if (isset($_POST['reset_ai_battles'])) {
         try {
             $cost = $premiumShopManager->costs['reset_ai_battles'];
-            if ($player->getPremiumCredits() < $cost) {
+            if ($player->premium_credits->getAmount() < $cost) {
                 throw new RuntimeException("You do not have enough Ancient Kunai!");
             }
 
@@ -218,7 +218,7 @@ function premiumShop(): void {
                     form_submit_prompt: "Confirm Reset",
                 );
             } else {
-                $player->subtractPremiumCredits($cost, 'reset_ai_battles');
+                $player->premium_credits->subtract($cost, 'reset_ai_battles');
                 $player->ai_wins = 0;
                 $player->ai_losses = 0;
 
@@ -232,7 +232,7 @@ function premiumShop(): void {
     else if (isset($_POST['reset_pvp_battles'])) {
         try {
             $cost = $premiumShopManager->costs['reset_pvp_battles'];
-            if ($player->getPremiumCredits() < $cost) {
+            if ($player->premium_credits->getAmount() < $cost) {
                 throw new RuntimeException("You do not have enough Ancient Kunai!");
             }
 
@@ -245,7 +245,7 @@ function premiumShop(): void {
                     form_submit_prompt: "Confirm Reset",
                 );
             } else {
-                $player->subtractPremiumCredits($cost, 'reset_pvp_battles');
+                $player->premium_credits->subtract($cost, 'reset_pvp_battles');
                 $player->pvp_wins = 0;
                 $player->pvp_losses = 0;
 
@@ -301,7 +301,7 @@ function premiumShop(): void {
                 if ($player->bloodline_id == $bloodline_id) {
                     throw new RuntimeException("You already have this bloodline!");
                 }
-                if ($player->getPremiumCredits() < $ak_cost) {
+                if ($player->premium_credits->getAmount() < $ak_cost) {
                     throw new RuntimeException("You do not have enough Ancient Kunai!");
                 }
                 //Check clan office detail & remove player from clan data if present
@@ -318,7 +318,7 @@ function premiumShop(): void {
                 }
 
                 //Process purchase
-                $player->subtractPremiumCredits($ak_cost, "Purchased bloodline {$bloodline_name} (#$bloodline_id)");
+                $player->premium_credits->subtract($ak_cost, "Purchased bloodline {$bloodline_name} (#$bloodline_id)");
 
                 // Give bloodline
                 $status = Bloodline::giveBloodline(
@@ -363,13 +363,13 @@ function premiumShop(): void {
             }
             $ak_cost = $premiumShopManager->costs['forbidden_seal'][$seal_level][$seal_length];
             //Check cost
-            if ($player->getPremiumCredits() < $ak_cost) {
+            if ($player->premium_credits->getAmount() < $ak_cost) {
                 throw new RuntimeException("You do not have enough Ancient Kunai!");
             }
 
             //Extend seal
             if ($player->forbidden_seal->level == $seal_level) {
-                $player->subtractPremiumCredits($ak_cost, "Extended {$player->forbidden_seal->name} by {$seal_length} days.");
+                $player->premium_credits->subtract($ak_cost, "Extended {$player->forbidden_seal->name} by {$seal_length} days.");
                 $player->forbidden_seal->addSeal($seal_level, $seal_length);
                 $system->message("Seal extended!");
             }
@@ -420,7 +420,7 @@ function premiumShop(): void {
                         }
                     }
 
-                    $player->subtractPremiumCredits($ak_cost, $message);
+                    $player->premium_credits->subtract($ak_cost, $message);
                     $player->forbidden_seal->addSeal($seal_level, $seal_length);
 
                     $system->message("You changed your seal!");
@@ -428,7 +428,7 @@ function premiumShop(): void {
             }
             //New seal
             else {
-                $player->subtractPremiumCredits($ak_cost, "Purchased " . ForbiddenSeal::$forbidden_seal_names[$seal_level]
+                $player->premium_credits->subtract($ak_cost, "Purchased " . ForbiddenSeal::$forbidden_seal_names[$seal_level]
                     . " for {$seal_length} days.");
 
                 //Load blank seal
@@ -529,7 +529,7 @@ function premiumShop(): void {
                 throw new RuntimeException($debug . "You must leave your team first!");
             }
 
-            if ($player->getPremiumCredits() < $ak_cost) {
+            if ($player->premium_credits->getAmount() < $ak_cost) {
                 throw new RuntimeException("You do not have enough Ancient Kunai!");
             }
 
@@ -582,7 +582,7 @@ function premiumShop(): void {
                 }
 
                 // Cost
-                $player->subtractPremiumCredits($ak_cost, "Changed villages from {$player->village->name} to $village");
+                $player->premium_credits->subtract($ak_cost, "Changed villages from {$player->village->name} to $village");
                 $player->village_changes++;
 
                 // Village
@@ -672,7 +672,7 @@ function premiumShop(): void {
                 throw new RuntimeException("Invalid clan!");
             }
 
-            if ($player->getPremiumCredits() < $ak_cost) {
+            if ($player->premium_credits->getAmount() < $ak_cost) {
                 throw new RuntimeException("You do not have enough Ancient Kunai!");
             }
 
@@ -696,7 +696,7 @@ function premiumShop(): void {
                 );
             } else {
                 // Cost
-                $player->subtractPremiumCredits(
+                $player->premium_credits->subtract(
                     $ak_cost,
                     "Changed clan from {$player->clan->name} ({$player->clan->id}) to $clan_name ({$new_clan_id})"
                 );
@@ -725,7 +725,7 @@ function premiumShop(): void {
     }
 
     $view = 'character_changes';
-    if ($player->getPremiumCredits() == 0) {
+    if ($player->premium_credits->getAmount() == 0) {
         $view = 'buy_kunai';
     }
     if (isset($_GET['view'])) {
@@ -789,11 +789,11 @@ function premiumCreditExchange() {
             $money = $premium_credits * $money * 1000;
 
             // Check financing
-            if ($player->getPremiumCredits() < $premium_credits) {
+            if ($player->premium_credits->getAmount() < $premium_credits) {
                 throw new RuntimeException("You do not have enough Ancient Kunai!");
             }
             // Subtract premium_credits from user
-            $player->subtractPremiumCredits($premium_credits, "Placed AK for sale on exchange");
+            $player->premium_credits->subtract($premium_credits, "Placed AK for sale on exchange");
             $player->updateData();
 
             //Add offer to market
@@ -837,7 +837,7 @@ function premiumCreditExchange() {
             }
             // Process payment
             $player->money->subtract($offer['money'], "Purchased AK from exchange.");
-            $player->addPremiumCredits($offer['premium_credits'], "Purchased AK from exchange.");
+            $player->premium_credits->add($offer['premium_credits'], "Purchased AK from exchange.");
             $player->updateData();
 
             // Run purchase and log [NOTE: Updating first is to avoid as much server lag and possibility for glitching]
@@ -901,7 +901,7 @@ function premiumCreditExchange() {
             // Cancel log [NOTE: Updating first is to avoid as much server lag and possibility for glitching]
             $system->db->query("UPDATE `premium_credit_exchange` SET `completed`='1' WHERE `id`='$id' LIMIT 1");
 
-            $player->addPremiumCredits($offer['premium_credits'], "Cancelled AK offer on exchange");
+            $player->premium_credits->add($offer['premium_credits'], "Cancelled AK offer on exchange");
             $player->updateData();
 
             $log_data = "ID# {$offer['id']}; {$offer['seller']} - Cancelled :: "

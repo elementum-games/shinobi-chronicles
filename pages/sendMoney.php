@@ -64,11 +64,11 @@ function sendMoney() {
 
             }
             else if($currency_type == System::CURRENCY_TYPE_PREMIUM_CREDITS) {
-                if($amount > $player->getPremiumCredits()) {
+                if($amount > $player->premium_credits->getAmount()) {
                     throw new RuntimeException("You do not have that much AK!");
                 }
-                $player->subtractPremiumCredits($amount, "Sent AK to {$recipient->user_name} (#{$recipient->user_id})");
-                $recipient->addPremiumCredits($amount, "Received AK from $player->user_name (#$player->user_id)");
+                $player->premium_credits->subtract($amount, "Sent AK to {$recipient->user_name} (#{$recipient->user_id})");
+                $recipient->premium_credits->subtract($amount, "Received AK from $player->user_name (#$player->user_id)");
 
                 // Player will be auto-updated later
                 $recipient->updateData();
@@ -92,7 +92,7 @@ function sendMoney() {
     }
 
     $current_amount_money = $player->money->getSymbol() . $player->money->getAmount();
-    $current_amount_ak = $player->getPremiumCredits();
+    $current_amount_ak = $player->premium_credits->getAmount();
 
     $recipient = $_GET['recipient'] ?? '';
     

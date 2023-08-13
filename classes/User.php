@@ -263,7 +263,7 @@ class User extends Fighter {
     public int $last_pvp_ms;
     public int $last_death_ms;
 
-    private int $premium_credits;
+    public Currency $premium_credits;
     public int $premium_credits_purchased;
 
     public bool $censor_explicit_language = true;
@@ -613,7 +613,12 @@ class User extends Fighter {
             amount: $user_data['money'],
             userDailyTasks: $this->daily_tasks
         );
-        $this->premium_credits = $user_data['premium_credits'];
+        $this->premium_credits = new Currency(
+            system: $this->system,
+            type: Currency::TYPE_PREMIUM_CREDITS,
+            user_id: $this->user_id,
+            amount: $user_data['premium_credits']
+        );
         $this->premium_credits_purchased = $user_data['premium_credits_purchased'];
 
         $this->pvp_wins = $user_data['pvp_wins'];
@@ -1670,44 +1675,6 @@ class User extends Fighter {
         return $gain + ($multiple_of - $gain % $multiple_of);
     }
 
-    public function getPremiumCredits(): int {
-        return $this->premium_credits;
-    }
-
-    /**
-     * @throws RuntimeException
-     */
-    private function setPremiumCredits(int $new_amount, string $description) {
-        $this->system->currencyLog(
-            $this->user_id,
-            System::CURRENCY_TYPE_PREMIUM_CREDITS,
-            $this->premium_credits,
-            $new_amount,
-            $new_amount - $this->premium_credits,
-            $description
-        );
-        $this->premium_credits = $new_amount;
-    }
-
-    /**
-     * @throws RuntimeException
-     */
-    public function addPremiumCredits(int $amount, string $description) {
-        $this->setPremiumCredits($this->premium_credits + $amount, $description);
-    }
-
-
-    /**
-     * @throws RuntimeException
-     */
-    public function subtractPremiumCredits(int $amount, string $description) {
-        if($this->getPremiumCredits() < $amount) {
-            throw new RuntimeException("Not enough Ancient Kunai!");
-        }
-        $this->setPremiumCredits($this->premium_credits - $amount, $description);
-    }
-
-
     /* function moteToVillage()
         moves user to village */
     public function moveToVillage() {
@@ -1844,7 +1811,7 @@ class User extends Fighter {
         `stat_transfer_completion_time` = $this->stat_transfer_completion_time,
         `stat_transfer_target_stat` = '$this->stat_transfer_target_stat',
 		`money` = '{$this->money->getAmount()}',
-		`premium_credits` = '$this->premium_credits',
+		`premium_credits` = '{$this->premium_credits->getAmount()}',
 		`pvp_wins` = '$this->pvp_wins',
 		`pvp_losses` = '$this->pvp_losses',
 		`ai_wins` = '$this->ai_wins',
