@@ -54,13 +54,13 @@ function sendMoney() {
                 $system->log(
                     'money_transfer',
                     'Money Sent',
-                    "{$amount} yen - #{$player->user_id} ($player->user_name) to #{$recipient->user_id}"
+                    "{$amount} " . Currency::MONEY_NAME . " - #{$player->user_id} ($player->user_name) to #{$recipient->user_id}"
                 );
 
-                $alert_message = $player->user_name . " has sent you &yen;$amount.";
+                $alert_message = $player->user_name . " has sent you <?=Currency::MONEY_SYMBOL?>$amount.";
                 Inbox::sendAlert($system, Inbox::ALERT_YEN_RECEIVED, $player->user_id, $recipient->user_id, $alert_message);
 
-                $system->message("&yen;{$amount} sent to {$recipient->user_name}!");
+                $system->message("<?=Currency::MONEY_SYMBOL?>{$amount} sent to {$recipient->user_name}!");
 
             }
             else if($currency_type == System::CURRENCY_TYPE_PREMIUM_CREDITS) {
@@ -79,7 +79,7 @@ function sendMoney() {
                     "{$amount} AK - #{$player->user_id} ($player->user_name) to #{$recipient->user_id}"
                 );
 
-                $alert_message = $player->user_name . " has sent you $amount Ancient Kunai.";
+                $alert_message = $player->user_name . " has sent you $amount <?=Currency::PREMIUM_NAME?>.";
                 Inbox::sendAlert($system, Inbox::ALERT_AK_RECEIVED, $player->user_id, $recipient->user_id, $alert_message);
 
                 $system->message("{$amount} AK sent to {$recipient->user_name}!");
