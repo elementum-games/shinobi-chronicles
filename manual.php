@@ -203,7 +203,7 @@ $layout->renderBeforeContentHTML($system, $player ?? null, 'Manual');
         </div>
         <p>Note that a portion of stats gained from long and extended trainings are cut</p>
 
-        <p>You can also make use of the Arena to fight AI to gain stat points while earning yen</p>
+        <p>You can also make use of the Arena to fight AI to gain stat points while earning <?=Currency::MONEY_NAME?></p>
         <p><em>The current drop rate of stat points is 100%, Stat dropped is determined by the current stat training ongoin or the last the stat training done.</em></p>
       </div>
 
@@ -250,18 +250,18 @@ $layout->renderBeforeContentHTML($system, $player ?? null, 'Manual');
         <a href="#bloodline-section">
           <h2>Bloodline</h2>
         </a>
-        <div>Bloodlines are items that you receive or buy with <b>Ancient Kunai</b> which has specific boosts/resists and jutsus.</div>
+        <div>Bloodlines are items that you receive or buy with <b><?=Currency::PREMIUM_NAME?></b> which has specific boosts/resists and jutsus.</div>
         <div><b>Legendary</b> - 5% chance</div>
         <div><b>Elite</b> - 10% chance</div>
         <div><b>Common</b> - 15% chance</div>
         <div><b>Lesser</b> - 20% chance</div>
         <div><b>None</b> - 50% chance</div>
 
-        <p>Use <b>Ancient Kunai</b> to purchase or reroll to a new bloodline of your choosing. Note, 10% of bloodline skill will be lost when acquiring a new bloodline.</p>
-        <div><b>Legendary</b> - 80 AK</div>
-        <div><b>Elite</b> - 60 AK</div>
-        <div><b>Common</b> - 40 AK</div>
-        <div><b>Lesser</b> - 20 AK</div>
+        <p>Use <b><?=Currency::PREMIUM_NAME?></b> to purchase or reroll to a new bloodline of your choosing. Note, 10% of bloodline skill will be lost when acquiring a new bloodline.</p>
+        <div><b>Legendary</b> - 80 <?=Currency::PREMIUM_SYMBOL?></div>
+        <div><b>Elite</b> - 60 <?=Currency::PREMIUM_SYMBOL?></div>
+        <div><b>Common</b> - 40 <?=Currency::PREMIUM_SYMBOL?></div>
+        <div><b>Lesser</b> - 20 <?=Currency::PREMIUM_SYMBOL?></div>
 
         <br />
 
@@ -277,12 +277,12 @@ $layout->renderBeforeContentHTML($system, $player ?? null, 'Manual');
         <p>Yen is the primary currency for Shinobi Chronicles, use Yen to purchase the jutsus of your offense type in the shop, gear to help you in battle, and healing items for after combat.</p>
         <p>You can earn Yen by fighting enemies in Arena, completing Missions and Special Missions or ask your friend to transfer you some!</p>
         <br />
-        <h3>Ancient Kunai</h3>
+        <h3><?=Currency::PREMIUM_NAME?></h3>
         <p>It is a premium currency used for various changes toward your character</p>
-        <p>Use <b>Ancient Kunai</b> to reset your character, change your username, transfer skill points into other stats, reset an individual stat, or to change your current clan</p>
+        <p>Use <b><?=Currency::PREMIUM_NAME?></b> to reset your character, change your username, transfer skill points into other stats, reset an individual stat, or to change your current clan</p>
         <br />
         <h3>Auras</h3>
-        <p>With the use of Ancient Kunai, you can imbue your character with a forbidden seal for enhanced benefits toward your character.</p>
+        <p>With the use of <?=Currency::PREMIUM_NAME?>, you can imbue your character with a forbidden seal for enhanced benefits toward your character.</p>
 
       </div>
 
@@ -293,7 +293,7 @@ $layout->renderBeforeContentHTML($system, $player ?? null, 'Manual');
           Twin Sparrow Seal
         </h3>
         <h4>
-          5 Ancient Kunai / 30 days
+          5 <?=Currency::PREMIUM_NAME?> / 30 days
         </h4>
         <div>+10% regen rate</div>
         <div>Blue/Pink username color in chat</div>
@@ -313,7 +313,7 @@ $layout->renderBeforeContentHTML($system, $player ?? null, 'Manual');
         Four Dragon Seal
       </h3>
       <h4>
-        15 Ancient Kunai / 30 days
+        15 <?=Currency::PREMIUM_NAME?> / 30 days
       </h4>
       <ul>
         <li>All benefits of Twin Sparrow Seal</li>
@@ -324,7 +324,7 @@ $layout->renderBeforeContentHTML($system, $player ?? null, 'Manual');
         <li>Enhanced long trainings (1.5x length, 2x gains)</li>
         <li>Enhanced extended trainings (1.5x length, 2.25x gains)</li>
         <li>Faster stat transfers (+5/minute)</li>
-        <li>Cheaper stat transfers +100 stat points per AK</li>
+        <li>Cheaper stat transfers +100 stat points per <?=Currency::PREMIUM_SYMBOL?></li>
       </ul>
 
       <!--GOJO END MANUAL-->

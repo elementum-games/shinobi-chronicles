@@ -28,7 +28,7 @@ function sendMoney() {
 
         try {
             if(strtolower($recipient) == strtolower($player->user_name)) {
-                throw new RuntimeException("You cannot send money/AK to yourself!");
+                throw new RuntimeException("You cannot send currency to yourself!");
             }
             if($amount <= 0 && !$player->isHeadAdmin()) {
                 throw new RuntimeException("Invalid amount!");
@@ -43,7 +43,7 @@ function sendMoney() {
 
             if($currency_type == System::CURRENCY_TYPE_MONEY) {
                 if($amount > $player->money->getAmount()) {
-                    throw new RuntimeException("You do not have that much money/AK!");
+                    throw new RuntimeException("You do not have that much {$player->money->name}!");
                 }
                 $player->money->subtract($amount, "Sent money to {$recipient->user_name} (#{$recipient->user_id})");
                 $recipient->money->add($amount, "Received money from $player->user_name (#$player->user_id)", false);
@@ -63,12 +63,12 @@ function sendMoney() {
                 $system->message(Currency::MONEY_SYMBOL . "{$amount} sent to {$recipient->user_name}!");
 
             }
-            else if($currency_type == System::CURRENCY_TYPE_PREMIUM_CREDITS) {
+            if($currency_type == System::CURRENCY_TYPE_PREMIUM_CREDITS) {
                 if($amount > $player->premium_credits->getAmount()) {
-                    throw new RuntimeException("You do not have that much AK!");
+                    throw new RuntimeException("You do not have that much {$player->premium_credits->name}!");
                 }
-                $player->premium_credits->subtract($amount, "Sent AK to {$recipient->user_name} (#{$recipient->user_id})");
-                $recipient->premium_credits->subtract($amount, "Received AK from $player->user_name (#$player->user_id)");
+                $player->premium_credits->subtract($amount, "Sent {$player->premium_credits->name} to {$recipient->user_name} (#{$recipient->user_id})");
+                $recipient->premium_credits->add($amount, "Received {$player->premium_credits->name} from $player->user_name (#$player->user_id)");
 
                 // Player will be auto-updated later
                 $recipient->updateData();
@@ -76,13 +76,13 @@ function sendMoney() {
                 $system->log(
                     'premium_credit_transfer',
                     'Premium Credits Sent',
-                    "{$amount} AK - #{$player->user_id} ($player->user_name) to #{$recipient->user_id}"
+                    "{$amount} {$player->premium_credits->symbol} - #{$player->user_id} ($player->user_name) to #{$recipient->user_id}"
                 );
 
                 $alert_message = $player->user_name . " has sent you $amount " . Currency::PREMIUM_NAME . ".";
                 Inbox::sendAlert($system, Inbox::ALERT_AK_RECEIVED, $player->user_id, $recipient->user_id, $alert_message);
 
-                $system->message("{$amount} AK sent to {$recipient->user_name}!");
+                $system->message("{$amount} {$player->premium_credits->name} sent to {$recipient->user_name}!");
             }
 
         } catch(RuntimeException $e) {
@@ -100,26 +100,26 @@ function sendMoney() {
         echo "<table class='table' style='width: 125px''><tr><td style='text-align: center'><a style='tab-index: 0' href='" . $system->router->getUrl("members",["user" => $recipient]) . "'>Back to Profile</a></td></tr></table>";
     }
 
-    echo "<table class='table'><tr><th>Send Money</th><th>Send AK</th></tr>
+    echo "<table class='table'><tr><th>Send {$player->money->name}</th><th>Send {$player->premium_credits->name}</th></tr>
     <tr><td style='text-align:center;'>
     <form action='{$system->router->links['send_money']}&currency=yen' method='post'>
-    <b>Your Money:</b> {$player->money->getSymbol()}{$current_amount_money}<br />
+    <b>Your Money:</b> {$player->money->getFormattedCurrency()}<br />
     <br />
-    Send Money to:<br />
+    Send {$player->money->name} to:<br />
     <input type='text' name='recipient' value='{$recipient}' /><br />
     Amount:<br />
     <input type='text' name='amount' /><br />
-    <input type='submit' name='send_currency' value='Send Money' />
+    <input type='submit' name='send_currency' value='Send {$player->money->name}' />
     </form></td>
     <td style='text-align:center;'>
     <form action='{$system->router->links['send_money']}&currency=ak' method='post'>
-    <b>Your {$player->premium_credits->getSymbol()}:</b> {$current_amount_ak}<br />
+    <b>Your {$player->premium_credits->symbol}:</b> {$current_amount_ak}<br />
     <br />
-    Send {$player->premium_credits->getSymbol()} to:<br />
+    Send {$player->premium_credits->symbol} to:<br />
     <input type='text' name='recipient' value='{$recipient}' /><br />
     Amount:<br />
     <input type='text' name='amount' /><br />
-    <input type='submit' name='send_currency' value='Send {$player->premium_credits->getSymbol()}' />
+    <input type='submit' name='send_currency' value='Send {$player->premium_credits->symbol}' />
     </form></td>
     </tr></table>";
 }

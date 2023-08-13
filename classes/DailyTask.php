@@ -63,7 +63,7 @@ class DailyTask {
             DailyTask::SUB_TASK_ATTRIBUTES => 'points',
             DailyTask::SUB_TASK_JUTSU => 'levels',
         ],
-        DailyTask::ACTIVITY_EARN_MONEY => 'yen',
+        DailyTask::ACTIVITY_EARN_MONEY => Currency::MONEY_NAME,
         DailyTask::ACTIVITY_BATTLES => 'PvP Battles or Spars',
     ];
 

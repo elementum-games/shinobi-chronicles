@@ -28,7 +28,7 @@ class Currency {
         $this->valid_currency_types = self::getValidCurrencies();
         // Validate currency type
         if(!in_array($this->type, $this->valid_currency_types)) {
-            throw new RunetimeException("Invalid currency type {$this->type}!");
+            throw new RuntimeException("Invalid currency type {$this->type}!");
         }
             
         $this->name = self::getCurrencyName($this->type);
@@ -72,17 +72,20 @@ class Currency {
         return $this->amount;
     }
 
+    public function getFormattedCurrency(): string {
+        if($this->type == self::TYPE_MONEY) {
+            return $this->symbol . self::formatNumber($this->amount);
+        }
+        return $this->amount . ' ' . self::formatNumber($this->symbol);
+    }
+
     /** Currency Conventions **/
     public static function getValidCurrencies(): array {
         return [self::TYPE_MONEY, self::TYPE_PREMIUM_CREDITS, /*self::TYPE_TOKEN*/];
     }
-    
-    public function getName(): string {
-        return self::getCurrencyName($this->type);
-    }
-    
-    public function getSymbol(): string {
-        return self::getCurrencySymbol($this->type);
+
+    public static function formatNumber(int $num): string {
+        return number_format($num);
     }
     
     public static function getCurrencyName(string $type): string {
@@ -105,11 +108,10 @@ class Currency {
 
     /** Calculate Yen Gains **/
     public static function calcRawYenGain(int $rank_num, int $multiplier): int {
-        $gain = ceil(((30 * $rank_num) + pow($rank_num+1, 2)) * $multiplier);
-        return $gain;
+        return ceil(((30 * $rank_num) + pow($rank_num+1, 2)) * $multiplier);
     }
 
-    public static function roundYen(int $num, int $multiple_of) {
+    public static function roundYen(int $num, int $multiple_of): int {
         $remainder = $num % $multiple_of;
         if($num / $multiple_of >= 0.5) {
             return $num + ($multiple_of - $remainder);
@@ -117,7 +119,7 @@ class Currency {
         return $num - $remainder;
     }
 
-    public static funcion getRoundedYen(int $rank_num, int $multiplier, int $multiple_of) {
+    public static function getRoundedYen(int $rank_num, int $multiplier, int $multiple_of): int {
         return self::roundYen(
             num: self::calcRawYenGain($rank_num, $multiplier),
             multiple_of: $multiple_of

@@ -81,7 +81,7 @@ $RANK_NAMES = RankManager::fetchNames($system);
                 <?php endif; ?>
             </td>
             <td><?= ucwords($jutsu->element) ?></td>
-            <td>&yen;<?= $jutsu->purchase_cost ?></td>
+            <td><?=Currency::MONEY_SYMBOL?><?= $jutsu->purchase_cost ?></td>
             <td><?= $jutsu->cooldown ?></td>
         </tr>
     <?php endforeach; ?>

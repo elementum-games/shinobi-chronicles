@@ -30,7 +30,7 @@
                     <p style='text-align:center;'>
                         <b>Choose an element to focus on</b><br />
                         <i>(Note: Choose carefully, this will determine your primary chakra nature, which cannot be
-                            changed without AK)</i><br />
+                            changed without <?=Currency::PREMIUM_NAME?>)</i><br />
                         <select name='element'>
                             <option value='Fire'>Fire</option>
                             <option value='Wind'>Wind</option>

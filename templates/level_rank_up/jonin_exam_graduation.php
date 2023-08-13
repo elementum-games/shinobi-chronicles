@@ -26,7 +26,7 @@
                     <p style='text-align:center;'>
                         <b>Choose an element to focus on</b><br />
                         <i>(Note: Choose carefully, this will determine your secondary chakra nature, which cannot be
-                            changed without AK)</i><br />
+                            changed without <?=Currency::PREMIUM_NAME?>)</i><br />
                         <select name='element'>
                             <?php foreach($elements as $elem): ?>
                                 <option value="<?=$elem?>"><?=$elem?></option>

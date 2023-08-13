@@ -14,9 +14,9 @@ function event() {
     $gifts = [
         1227 => '_yen_ Yen!',
         1228 => '_days_ days of _seal_!',
-        1229 => '1 Ancient Kunai!',
+        1229 => '1 ' . Currency::PREMIUM_NAME . '!',
         1230 => '_yen_ Yen!',
-        1231 => '_ak_ Ancient Kunai!',
+        1231 => '_ak_ ' . Currency::PREMIUM_NAME . '!',
         101 => 'Crystal Pendant!',
     ];
 

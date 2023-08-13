@@ -40,7 +40,7 @@ moderating staff.</p>
 completion of them. If a player loans real or in-game currency to another player, staff will not be responsible for ensuring the 
 currency is returned.</p>
 
-<p>Ancient Kunai(Premium credits) that have already been spent on in-game purchases of any kind or traded to another player cannot be 
+<p><?=Currency::PREMIUM_NAME?>(Premium credits) that have already been spent on in-game purchases of any kind or traded to another player cannot be
 	refunded. Staff are not responsible for lost shards or time on Forbidden Seals lost due to user bans.</p>
 <br />
 The Naruto series is created by and copyright Masashi Kishimoto and TV Tokyo, all rights reserved.

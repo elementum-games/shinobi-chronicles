@@ -148,7 +148,8 @@
         <tr>
             <td>
                 <div>
-                    <span>Training with <?= $lesson_data['sensei_name'] ?> will cost <?= $lesson_data['cost'] ?>&yen; and last <?= $lesson_data['duration'] ?> minutes.</span>
+                    <span>Training with <?= $lesson_data['sensei_name'] ?> will cost
+                        <?=Currency::MONEY_SYMBOL?><?= $lesson_data['cost'] ?> and last <?= $lesson_data['duration'] ?> minutes.</span>
                     <p>Cancelling this training session will not refund the original cost.</p>
                     <form action="<?= $system->router->getUrl('academy')?>" method="post">
                         <input type="hidden" name="lesson_stat" value="<?= $lesson_data['stat'] ?>">
@@ -642,9 +643,9 @@
                             <?php endif; ?>
                         </select><br>
                         <select name="train_type">
-							<option value="short" selected="selected">Short (<?= $lesson_cost['short'] ?>&yen;)</option>
-							<option value="long">Long (<?= $lesson_cost['long'] ?>&yen;)</option>
-							<option value="extended">Extended (<?= $lesson_cost['extended'] ?>&yen;)</option>
+							<option value="short" selected="selected">Short (<?=Currency::MONEY_SYMBOL?><?= $lesson_cost['short'] ?>)</option>
+							<option value="long">Long (<?=Currency::MONEY_SYMBOL?><?= $lesson_cost['long'] ?>)</option>
+							<option value="extended">Extended (<?=Currency::MONEY_SYMBOL?><?= $lesson_cost['extended'] ?>)</option>
                         </select>
                         <input type="hidden" name="sensei_id" value="<?= $sensei['sensei_id'] ?>" />
                         <input type="hidden" name="sensei_name" value="<?= $sensei['user_name'] ?>" />

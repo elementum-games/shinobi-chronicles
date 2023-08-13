@@ -40,10 +40,10 @@ class PremiumShopManager {
         $this->system = $system;
         $this->player = $player;
 
-        $this->premium_name = $this->player->premium_currency->getName();
-        $this->premium_symbol = $this->player->premium_currency->getSymbol;
-        $this->money_name = $this->player->money->getName();
-        $this->money_symbol = $this->player->money->getSymbol();
+        $this->premium_name = $this->player->premium_credits->name;
+        $this->premium_symbol = $this->player->premium_credits->symbol;
+        $this->money_name = $this->player->money->name;
+        $this->money_symbol = $this->player->money->symbol;
 
         // Costs
         $this->initCosts();

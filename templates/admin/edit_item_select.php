@@ -70,7 +70,7 @@ $selected_link_style = "text-decoration:none;";
                 <?= System::unSlug($item->effect) ?>
                 (<?= $item->effect_amount . $item->effectDisplayUnit() ?>)
             </td>
-            <td>&yen;<?= $item->purchase_cost ?></td>
+            <td><?=Currency::MONEY_SYMBOL?><?= $item->purchase_cost ?></td>
         </tr>
     <?php endforeach; ?>
 </table>

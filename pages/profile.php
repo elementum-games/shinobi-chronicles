@@ -99,7 +99,7 @@ function renderProfileSubmenu(): void {
     if($player->rank_num > 1) {
         $submenu_links[] = [
             'link' => $system->router->links['send_money'],
-            'title' => 'Send Money/AK',
+            'title' => 'Send ' . Currency::MONEY_NAME . '/' . Currency::PREMIUM_SYMBOL,
         ];
     }
     if($player->bloodline_id) {
