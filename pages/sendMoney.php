@@ -92,7 +92,7 @@ function sendMoney() {
     }
 
     $current_amount_money = $player->money->getSymbol() . $player->money->getAmount();
-    $current_amount_ak = $player->getPremiumCredits();
+    $current_amount_ak = $player->premium_credits->getAmount();
 
     $recipient = $_GET['recipient'] ?? '';
     

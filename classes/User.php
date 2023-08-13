@@ -613,7 +613,12 @@ class User extends Fighter {
             amount: $user_data['money'],
             userDailyTasks: $this->daily_tasks
         );
-        $this->premium_credits = $user_data['premium_credits'];
+        $this->premium_credits = new Currency(
+            system: $this->system,
+            type: Currency::TYPE_PREMIUM_CREDITS,
+            user_id: $this->user_id,
+            amount: $user_data['premium_credits']
+        );
         $this->premium_credits_purchased = $user_data['premium_credits_purchased'];
 
         $this->pvp_wins = $user_data['pvp_wins'];
@@ -1677,40 +1682,6 @@ class User extends Fighter {
 
         return $gain + ($multiple_of - $gain % $multiple_of);
     }
-
-    /**
-     * @throws RuntimeException
-     */
-    private function setPremiumCredits(int $new_amount, string $description) {
-        $this->system->currencyLog(
-            $this->user_id,
-            System::CURRENCY_TYPE_PREMIUM_CREDITS,
-            $this->premium_credits,
-            $new_amount,
-            $new_amount - $this->premium_credits,
-            $description
-        );
-        $this->premium_credits = $new_amount;
-    }
-
-    /**
-     * @throws RuntimeException
-     */
-    public function addPremiumCredits(int $amount, string $description) {
-        $this->setPremiumCredits($this->premium_credits + $amount, $description);
-    }
-
-
-    /**
-     * @throws RuntimeException
-     */
-    public function subtractPremiumCredits(int $amount, string $description) {
-        if($this->getPremiumCredits() < $amount) {
-            throw new RuntimeException("Not enough Ancient Kunai!");
-        }
-        $this->setPremiumCredits($this->premium_credits - $amount, $description);
-    }
-
 
     /* function moteToVillage()
         moves user to village */
