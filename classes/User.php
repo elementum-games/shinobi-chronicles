@@ -54,6 +54,8 @@ class User extends Fighter {
     const MIN_PASSWORD_LENGTH = 6;
     const PARTIAL_LOCK = 3;
     const FULL_LOCK = 5;
+    const LOCK_OUT_CD = 5 * 60;
+    const MALICIOUS_LOCKOUT_CD = 15 * 60;
 
     const BASE_EXP = 0;
     const BASE_REGEN = 25;
@@ -111,6 +113,7 @@ class User extends Fighter {
     public string $last_ip;
     public string $email;
     public $failed_logins;
+    public $last_malicious_ip;
     public $global_message_viewed;
 
     public string $gender;
@@ -162,7 +165,7 @@ class User extends Fighter {
     public int $stat_transfer_completion_time;
     public string $stat_transfer_target_stat;
 
-    private int $money;
+    public Currency $money;
 
     public int $pvp_wins;
     public int $pvp_losses;
@@ -260,7 +263,7 @@ class User extends Fighter {
     public int $last_pvp_ms;
     public int $last_death_ms;
 
-    private int $premium_credits;
+    public Currency $premium_credits;
     public int $premium_credits_purchased;
 
     public bool $censor_explicit_language = true;
@@ -466,6 +469,7 @@ class User extends Fighter {
         $this->last_update = $user_data['last_update'];
         $this->last_active = $user_data['last_active'];
         $this->failed_logins = $user_data['failed_logins'];
+        $this->last_malicious_ip = $user_data['last_malicious_ip'];
         $this->avatar_link = $user_data['avatar_link'];
         $this->profile_song = $user_data['profile_song'];
 
@@ -507,10 +511,10 @@ class User extends Fighter {
         $this->village = new Village($this->system, $user_data['village']);
         $this->village_rep = $user_data['village_rep'];
         $this->weekly_rep = $user_data['weekly_rep'];
-	$this->pvp_rep = $user_data['pvp_rep'];
+	    $this->pvp_rep = $user_data['pvp_rep'];
         $this->mission_rep_cd = $user_data['mission_rep_cd'];
         $this->recent_players_killed_ids = $user_data['recent_players_killed_ids'];
-	$this->recent_killer_ids = $user_data['recent_killer_ids'];
+	    $this->recent_killer_ids = $user_data['recent_killer_ids'];
         $this->reputation = new UserReputation($this->village_rep, $this->weekly_rep, $this->pvp_rep, $this->recent_players_killed_ids, $this->recent_killer_ids, $this->mission_rep_cd, $this->system->event);
 
         $this->gender = $user_data['gender'];
@@ -587,8 +591,34 @@ class User extends Fighter {
         $this->train_gain = $user_data['train_gain'];
         $this->train_time = $user_data['train_time'];
 
-        $this->money = $user_data['money'];
-        $this->premium_credits = $user_data['premium_credits'];
+        $this->ninjutsu_skill = $user_data['ninjutsu_skill'];
+        $this->genjutsu_skill = $user_data['genjutsu_skill'];
+        $this->taijutsu_skill = $user_data['taijutsu_skill'];
+
+        $this->bloodline_skill = $user_data['bloodline_skill'];
+
+        $this->cast_speed = $user_data['cast_speed'];
+        $this->speed = $user_data['speed'];
+        $this->intelligence = $user_data['intelligence'];
+        $this->willpower = $user_data['willpower'];
+
+        $total_skills = $this->ninjutsu_skill + $this->taijutsu_skill + $this->genjutsu_skill + $this->bloodline_skill;
+        $total_attribs = $this->speed + $this->cast_speed;
+        $this->daily_tasks = new UserDailyTasks($this->system, $this->user_id, $this->rank_num, $total_skills, $total_attribs, $this->pvp_rep);
+
+        $this->money = new Currency(
+            system: $this->system,
+            type: Currency::TYPE_MONEY,
+            user_id: $this->user_id,
+            amount: $user_data['money'],
+            userDailyTasks: $this->daily_tasks
+        );
+        $this->premium_credits = new Currency(
+            system: $this->system,
+            type: Currency::TYPE_PREMIUM_CREDITS,
+            user_id: $this->user_id,
+            amount: $user_data['premium_credits']
+        );
         $this->premium_credits_purchased = $user_data['premium_credits_purchased'];
 
         $this->pvp_wins = $user_data['pvp_wins'];
@@ -606,17 +636,6 @@ class User extends Fighter {
         if(!is_array($this->presents_claimed)) {
             $this->presents_claimed = [];
         }
-
-        $this->ninjutsu_skill = $user_data['ninjutsu_skill'];
-        $this->genjutsu_skill = $user_data['genjutsu_skill'];
-        $this->taijutsu_skill = $user_data['taijutsu_skill'];
-
-        $this->bloodline_skill = $user_data['bloodline_skill'];
-
-        $this->cast_speed = $user_data['cast_speed'];
-        $this->speed = $user_data['speed'];
-        $this->intelligence = $user_data['intelligence'];
-        $this->willpower = $user_data['willpower'];
 
         $this->total_stats = $this->ninjutsu_skill + $this->genjutsu_skill + $this->taijutsu_skill + $this->bloodline_skill +
             $this->cast_speed + $this->speed + $this->intelligence + $this->willpower;
@@ -669,16 +688,15 @@ class User extends Fighter {
         $this->in_village = $this->village_location !== null && $this->location->equals($this->village_location);
 
 
-        // Daily Tasks
-        $this->daily_tasks = new UserDailyTasks($this->system, $this->user_id, $this->rank_num);
+        // Check Daily Tasks completion
         $this->daily_tasks_reset = $this->daily_tasks->last_reset;
         if($UPDATE == User::UPDATE_FULL && !$remote_view) {
             // Process tasks completion
             $completion_data = $this->daily_tasks->checkTaskCompletion();
             if($completion_data != null) {
-                $this->addMoney($completion_data['money_gain'], 'Completed daily task');
+                $this->money->add($completion_data['money_gain'], 'Completed daily task');
                 $rep_gain = $this->reputation->addRep($completion_data['rep_gain'], UserReputation::DAILY_TASK_BYPASS_CAP);
-                $task_display = "You have completed the task " . (sizeof($completion_data['tasks_completed']) > 1 ? "s" : "");
+                $task_display = "You have completed the task" . (sizeof($completion_data['tasks_completed']) > 1 ? "s" : "");
                 foreach ($completion_data['tasks_completed'] as $x => $t_name) {
                     if ($x > 0) {
                         if ($x == sizeof($completion_data['tasks_completed']) - 1) {
@@ -689,7 +707,7 @@ class User extends Fighter {
                     }
                     $task_display .= "$t_name";
                 }
-                $task_display .= " earning &yen;" . $completion_data['money_gain'] . " and $rep_gain Reputation.";
+                $task_display .= " earning " . Currency::MONEY_SYMBOL . $completion_data['money_gain'] . " and $rep_gain Reputation.";
 
                 $this->system->message($task_display);
             }
@@ -828,6 +846,14 @@ class User extends Fighter {
         // Forbidden seal
         $this->setForbiddenSealFromDb($user_data['forbidden_seal'], $remote_view);
         $this->regen_boost += ceil($this->regen_rate * ($this->forbidden_seal->regen_boost / 100));
+
+    	$this->village_rep = $user_data['village_rep'];
+        $this->weekly_rep = $user_data['weekly_rep'];
+    	$this->pvp_rep = $user_data['pvp_rep'];
+        $this->mission_rep_cd = $user_data['mission_rep_cd'];
+        $this->recent_players_killed_ids = $user_data['recent_players_killed_ids'];
+    	$this->recent_killer_ids = $user_data['recent_killer_ids'];
+        $this->reputation = new UserReputation($this->village_rep, $this->weekly_rep, $this->pvp_rep, $this->recent_players_killed_ids, $this->recent_killer_ids, $this->mission_rep_cd, $this->system->event, $this->forbidden_seal);
 
         //In Village Regen
 //        if($this->in_village) {
@@ -1363,7 +1389,7 @@ class User extends Fighter {
 
                 // Daily task
                 if($this->daily_tasks->hasTaskType(DailyTask::ACTIVITY_TRAINING)) {
-                    $sub_task_type = (str_contains($this->train_type, 'skill')) ? DailyTask::SUB_TASK_SKILL : DailyTask::SUB_TASK_GEN;
+                    $sub_task_type = (str_contains($this->train_type, 'skill')) ? DailyTask::SUB_TASK_SKILL : DailyTask::SUB_TASK_ATTRIBUTES;
                     $this->daily_tasks->progressTask(DailyTask::ACTIVITY_TRAINING, $this->train_gain, $sub_task_type);
                 }
 
@@ -1638,83 +1664,24 @@ class User extends Fighter {
         return ActionResult::succeeded();
     }
 
-    public function getMoney(): int {
-        return $this->money;
-    }
-
     /**
      * @throws RuntimeException
      */
-    private function setMoney(int $new_amount, string $description) {
-        $this->system->currencyLog(
-            $this->user_id,
-            System::CURRENCY_TYPE_MONEY,
-            $this->money,
-            $new_amount,
-            $new_amount - $this->money,
-            $description
-        );
-        $this->money = $new_amount;
+    public function calcPlayerMoneyGain(int $multiplier = 1, $multiple_of = 10): int {
+        return self::calcMoneyGain($this->rank_num, $multiplier, $multiple_of);
     }
-
-    /**
-     * @throws RuntimeException
-     */
-    public function addMoney(int $amount, string $description, $increment_daily_task = true) {
-    	// Daily Tasks
-        if($this->daily_tasks->hasTaskType(DailyTask::ACTIVITY_EARN_MONEY) && $increment_daily_task) {
-            $this->daily_tasks->progressTask(DailyTask::ACTIVITY_EARN_MONEY, $amount);
+    public static function calcMoneyGain(int $rank_num, int $multiplier = 1, $multiple_of = 10): float {
+        if ($multiplier < 1) {
+            $multiplier = 1;
         }
-        $this->setMoney($this->money + $amount, $description);
-    }
-
-    /**
-     * @throws RuntimeException
-     */
-    public function subtractMoney(int $amount, string $description) {
-        if($this->money < $amount) {
-            throw new RuntimeException("Not enough money!");
+        if($multiplier > 10) {
+            $multiplier = 10;
         }
-        $this->setMoney($this->money - $amount, $description);
+        $gain = ceil(pow($rank_num+2, 3) * $multiplier);
+        $gain = ceil(((30 * $rank_num) + pow($rank_num+1, 2)) * $multiplier);
+
+        return $gain + ($multiple_of - $gain % $multiple_of);
     }
-
-    public function getPremiumCredits(): int {
-        return $this->premium_credits;
-    }
-
-    /**
-     * @throws RuntimeException
-     */
-    private function setPremiumCredits(int $new_amount, string $description) {
-        $this->system->currencyLog(
-            $this->user_id,
-            System::CURRENCY_TYPE_PREMIUM_CREDITS,
-            $this->premium_credits,
-            $new_amount,
-            $new_amount - $this->premium_credits,
-            $description
-        );
-        $this->premium_credits = $new_amount;
-    }
-
-    /**
-     * @throws RuntimeException
-     */
-    public function addPremiumCredits(int $amount, string $description) {
-        $this->setPremiumCredits($this->premium_credits + $amount, $description);
-    }
-
-
-    /**
-     * @throws RuntimeException
-     */
-    public function subtractPremiumCredits(int $amount, string $description) {
-        if($this->getPremiumCredits() < $amount) {
-            throw new RuntimeException("Not enough Ancient Kunai!");
-        }
-        $this->setPremiumCredits($this->premium_credits - $amount, $description);
-    }
-
 
     /* function moteToVillage()
         moves user to village */
@@ -1743,6 +1710,7 @@ class User extends Fighter {
 		`current_ip` = '$this->current_ip',
 		`last_ip` = '$this->last_ip',
 		`failed_logins` = '$this->failed_logins',
+		`last_malicious_ip` = '$this->last_malicious_ip',
 		`last_login` = '$this->last_login',
 		`last_update` = '$this->last_update',
 		`last_active` = '" . time() . "',
@@ -1850,8 +1818,8 @@ class User extends Fighter {
         `stat_transfer_amount` = $this->stat_transfer_amount,
         `stat_transfer_completion_time` = $this->stat_transfer_completion_time,
         `stat_transfer_target_stat` = '$this->stat_transfer_target_stat',
-		`money` = '$this->money',
-		`premium_credits` = '$this->premium_credits',
+		`money` = '{$this->money->getAmount()}',
+		`premium_credits` = '{$this->premium_credits->getAmount()}',
 		`pvp_wins` = '$this->pvp_wins',
 		`pvp_losses` = '$this->pvp_losses',
 		`ai_wins` = '$this->ai_wins',
