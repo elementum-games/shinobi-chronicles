@@ -509,13 +509,6 @@ class User extends Fighter {
         }
 
         $this->village = new Village($this->system, $user_data['village']);
-        $this->village_rep = $user_data['village_rep'];
-        $this->weekly_rep = $user_data['weekly_rep'];
-	    $this->pvp_rep = $user_data['pvp_rep'];
-        $this->mission_rep_cd = $user_data['mission_rep_cd'];
-        $this->recent_players_killed_ids = $user_data['recent_players_killed_ids'];
-	    $this->recent_killer_ids = $user_data['recent_killer_ids'];
-        $this->reputation = new UserReputation($this->village_rep, $this->weekly_rep, $this->pvp_rep, $this->recent_players_killed_ids, $this->recent_killer_ids, $this->mission_rep_cd, $this->system->event);
 
         $this->gender = $user_data['gender'];
         $this->level = $user_data['level'];
@@ -846,6 +839,14 @@ class User extends Fighter {
         // Forbidden seal
         $this->setForbiddenSealFromDb($user_data['forbidden_seal'], $remote_view);
         $this->regen_boost += ceil($this->regen_rate * ($this->forbidden_seal->regen_boost / 100));
+
+    	$this->village_rep = $user_data['village_rep'];
+        $this->weekly_rep = $user_data['weekly_rep'];
+    	$this->pvp_rep = $user_data['pvp_rep'];
+        $this->mission_rep_cd = $user_data['mission_rep_cd'];
+        $this->recent_players_killed_ids = $user_data['recent_players_killed_ids'];
+    	$this->recent_killer_ids = $user_data['recent_killer_ids'];
+        $this->reputation = new UserReputation($this->village_rep, $this->weekly_rep, $this->pvp_rep, $this->recent_players_killed_ids, $this->recent_killer_ids, $this->mission_rep_cd, $this->system->event, $this->forbidden_seal);
 
         //In Village Regen
 //        if($this->in_village) {
