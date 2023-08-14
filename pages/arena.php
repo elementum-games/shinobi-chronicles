@@ -170,16 +170,17 @@ function processArenaBattleEnd(BattleManager|BattleManagerV2 $battle, User $play
         $stat_gain_display = false;
         $opponent = $battle->opponent;
 
-        $money_gain = $battle->opponent->getMoney();
+        $money_gain = $player->calcPlayerMoneyGain(multiplier: $opponent->getMoney(), multiple_of: NPC::MONEY_GAIN_MULTIPLE);
 
+        // Reduce money gains based on level
         if($player->level > $opponent->level) {
             $level_difference = $player->level - $opponent->level;
             if($level_difference > 9) {
                 $level_difference = 9;
             }
-            $money_gain = round($money_gain * (1 - $level_difference * 0.1));
-            if($money_gain < 5) {
-                $money_gain = 5;
+            $money_gain = round($money_gain * (1-$level_difference*0.1));
+            if($money_gain < $opponent->rank * 5) {
+                $money_gain = $opponent->rank * 5;
             }
         }
 
@@ -225,7 +226,7 @@ function processArenaBattleEnd(BattleManager|BattleManagerV2 $battle, User $play
                 if($item->effect == 'yen_boost') {
                     $amount = ceil($money_gain * ($item->effect_amount/100));
                     $extra_yen += $amount;
-                    $append_message .= "Your $item->name has provided you with an extra &yen;$amount.<br />";
+                    $append_message .= "Your $item->name has provided you with an extra {$player->money->symbol}$amount.<br />";
                 }
             }
         }
@@ -234,7 +235,7 @@ function processArenaBattleEnd(BattleManager|BattleManagerV2 $battle, User $play
         if($rep_gain_string != "") {
             $battle_result .= $rep_gain_string;
         }
-		$battle_result .= "You have claimed your prize of &yen;$money_gain.<br />";
+		$battle_result .= "You have claimed your prize of {$player->money->symbol}$money_gain.<br />";
         if($append_message != "") {
             $battle_result .= $append_message;
         }
@@ -242,7 +243,7 @@ function processArenaBattleEnd(BattleManager|BattleManagerV2 $battle, User $play
             $battle_result .=  $stat_gain_display;
         }
 
-        $player->addMoney(($money_gain + $extra_yen), 'arena');
+        $player->money->add(($money_gain + $extra_yen), 'arena');
         $player->ai_wins++;
         $player->battle_id = 0;
         $player->last_pvp_ms = System::currentTimeMs();
