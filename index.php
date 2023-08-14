@@ -402,8 +402,8 @@ address and requested a password reset. If this is not your account, please disr
                 $login_message_text = "Account created! Please check the email that you registered with for the verification  link (Be sure to check your spam folder as well)!";
             }
             else {
-                $system->message("There was a problem sending the email to the address provided: $email Please contact a staff member on the forums for manual activation.");
-                $login_message_text = "There was a problem sending the email to the address provided: $email Please contact a staff member on the forums for manual activation.";
+                $system->message("There was a problem sending the email to the address provided: $email. If you are unable to log in please submit a ticket or contact a staff member on discord for manual activation.");
+                $login_message_text = "There was a problem sending the email to the address provided: $email. If you are unable to log in please submit a ticket or contact a staff member on discord for manual activation.";
             }
         } catch (Exception $e) {
             $system->db->rollbackTransaction();

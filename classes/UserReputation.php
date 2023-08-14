@@ -3,85 +3,85 @@
 class UserReputation {
     public static array $VillageRep = [
         1 => [
-            'title' => 'New Villager',
+            'title' => 'Villager',
             'outlaw_title' => 'Vagabond',
             'min_rep' => 0,
-            'weekly_cap' => 500,
-            'weekly_pvp_cap' => 375,
+            'weekly_cap' => 1250,
+            'weekly_pvp_cap' => 1000,
             'base_pvp_rep_reward' => 0,
             'base_decay' => 0,
         ],
         2 => [
-            'title' => 'Villager',
+            'title' => 'Aspiring Shinobi',
             'outlaw_title' => 'Thief',
             'min_rep' => 500,
-            'weekly_cap' => 500,
-            'weekly_pvp_cap' => 375,
+            'weekly_cap' => 1250,
+            'weekly_pvp_cap' => 1000,
             'base_pvp_rep_reward' => 2,
             'base_decay' => 0,
         ],
         3 => [
-            'title' => 'Well-Known Villager',
-            'outlaw_title' => 'Infamous',
-            'min_rep' => 1000,
-            'weekly_cap' => 500,
-            'weekly_pvp_cap' => 375,
-            'base_pvp_rep_reward' => 2,
-            'base_decay' => 250,
-        ],
-        4 => [
-            'title' => 'Respected Villager',
-            'outlaw_title' => 'Outlaw',
+            'title' => 'Shinobi',
+            'outlaw_title' => 'Bandit',
             'min_rep' => 2500,
             'weekly_cap' => 1250,
-            'weekly_pvp_cap' => 750,
+            'weekly_pvp_cap' => 1000,
+            'base_pvp_rep_reward' => 2,
+            'base_decay' => 0,
+        ],
+        4 => [
+            'title' => 'Experienced Shinobi',
+            'outlaw_title' => 'Raider',
+            'min_rep' => 5000,
+            'weekly_cap' => 1250,
+            'weekly_pvp_cap' => 1000,
+            'base_pvp_rep_reward' => 3,
+            'base_decay' => 125,
+        ],
+        5 => [
+            'title' => 'Veteran Shinobi',
+            'outlaw_title' => 'Marauder',
+            'min_rep' => 7500,
+            'weekly_cap' => 1250,
+            'weekly_pvp_cap' => 1000,
+            'base_pvp_rep_reward' => 3,
+            'base_decay' => 250,
+        ],
+        6 => [
+            'title' => 'Expert Shinobi',
+            'outlaw_title' => 'Rogue',
+            'min_rep' => 10000,
+            'weekly_cap' => 1250,
+            'weekly_pvp_cap' => 1000,
             'base_pvp_rep_reward' => 3,
             'base_decay' => 500,
         ],
-        5 => [
-            'title' => 'Shinobi',
-            'outlaw_title' => 'Rogue',
-            'min_rep' => 5000,
-            'weekly_cap' => 1250,
-            'weekly_pvp_cap' => 750,
-            'base_pvp_rep_reward' => 3,
-            'base_decay' => 1000,
-        ],
-        6 => [
-            'title' => 'Respected Shinobi',
-            'outlaw_title' => 'Infamous Rogue',
-            'min_rep' => 10000,
-            'weekly_cap' => 1250,
-            'weekly_pvp_cap' => 750,
-            'base_pvp_rep_reward' => 3,
-            'base_decay' => 1750,
-        ],
         7 => [
             'title' => 'Elite Shinobi',
-            'outlaw_title' => 'Assassin',
-            'min_rep' => 20000,
-            'weekly_cap' => 1500,
-            'weekly_pvp_cap' => 1500,
+            'outlaw_title' => 'Notorious Rogue',
+            'min_rep' => 12500,
+            'weekly_cap' => 1250,
+            'weekly_pvp_cap' => 1000,
             'base_pvp_rep_reward' => 4,
-            'base_decay' => 3000,
+            'base_decay' => 1000,
         ],
         8 => [
             'title' => 'Master Shinobi',
-            'outlaw_title' => 'Master Assassin',
-            'min_rep' => 35000,
-            'weekly_cap' => 1500,
-            'weekly_pvp_cap' => 1500,
+            'outlaw_title' => 'Infamous Rogue',
+            'min_rep' => 25000,
+            'weekly_cap' => 1250,
+            'weekly_pvp_cap' => 1000,
             'base_pvp_rep_reward' => 4,
-            'base_decay' => 4000,
+            'base_decay' => 1250,
         ],
         9 => [
             'title' => 'Legendary Shinobi',
-            'outlaw_title' => 'Legendary Assassin',
+            'outlaw_title' => 'Legendary Rogue',
             'min_rep' => 50000,
-            'weekly_cap' => 1500,
-            'weekly_pvp_cap' => 1500,
+            'weekly_cap' => 1250,
+            'weekly_pvp_cap' => 1000,
             'base_pvp_rep_reward' => 4,
-            'base_decay' => 5000,
+            'base_decay' => 1500,
         ]
     ];
 
@@ -153,7 +153,7 @@ class UserReputation {
     const DAILY_TASK_PVP_WIN_MOD = 5; // Increase rep by this amount for tasks requiring pvp wins (harder than completes)f
     const DAILY_TASK_BYPASS_CAP = false;
 
-    const WEEKLY_CAP_MET_DECAY_MULTIPLIER = 0.7; // Reduce reputation decay by 30% if weekly cap is met
+    const WEEKLY_CAP_MET_DECAY_MULTIPLIER = 1; // Reduce reputation decay by 30% if weekly cap is met
 
     const MAX_PVP_LEVEL_DIFFERENCE = 20;
     const MAX_PVP_REP_TIER_DIFFERENCE = 4;
@@ -270,6 +270,8 @@ class UserReputation {
      */
     public function subtractRep(int $amount): void {
         $this->rep -= $amount;
+        $this->weekly_pvp_rep -= $amount;
+        $this->weekly_pvp_rep = max(0, $this->weekly_pvp_rep);
         //TODO: TEMPORARY! Remove with negative reputation (outlaw update)
         if($this->rep < 0) {
             $this->rep = 0;

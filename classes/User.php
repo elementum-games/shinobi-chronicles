@@ -44,9 +44,9 @@ class User extends Fighter {
 
     public static array $HEAL_REGEN_MULTIPLIER = [
         1 => 2,
-        2 => 5,
-        3 => 12,
-        4 => 45,
+        2 => 4,
+        3 => 10,
+        4 => 30,
     ];
 
     const MIN_NAME_LENGTH = 2;
@@ -2263,6 +2263,7 @@ class User extends Fighter {
 
             'register_date' => time(),
             'verify_key' => $verification_code,
+            'user_verified' => 1, // TEMP FIX
             'layout' => System::DEFAULT_LAYOUT,
             'avatar_link' => mt_rand(1, 100) > 50
                 ? './images/default_avatar_v2_blue.png'
