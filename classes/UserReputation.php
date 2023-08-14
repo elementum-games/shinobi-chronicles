@@ -267,7 +267,8 @@ class UserReputation {
      */
     public function subtractRep(int $amount): void {
         $this->rep -= $amount;
-        $this->weekly_pvp_cap += $amount;
+        $this->weekly_pvp_rep -= $amount;
+        $this->weekly_pvp_rep = max(0, $this->weekly_pvp_rep);
         //TODO: TEMPORARY! Remove with negative reputation (outlaw update)
         if($this->rep < 0) {
             $this->rep = 0;
