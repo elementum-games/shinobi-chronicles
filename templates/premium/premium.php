@@ -169,6 +169,7 @@
                 <br/>
                 All benefits of Twin Sparrow Seal<br/>
                 +<?=$fourDragonSeal->regen_boost?>% regen rate<br/>
+                +<?=$fourDragonSeal->extra_pve_rep?> PVE Reputation<br />
                 +<?=$fourDragonSeal->extra_jutsu_equips?> jutsu equip slots<br/>
                 +<?=$fourDragonSeal->extra_weapon_equips?> weapon equip slots<br/>
                 +<?=$fourDragonSeal->extra_armor_equips?> armor equip slots<br/>
