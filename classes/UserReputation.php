@@ -127,10 +127,10 @@ class UserReputation {
     const DAILY_TASK_REWARDS = [
         DailyTask::DIFFICULTY_EASY => [
             DailyTask::ACTIVITY_EARN_MONEY => 5,
-            DailyTask::ACTIVITY_ARENA => 10,
-            DailyTask::ACTIVITY_TRAINING => 4,
-            DailyTask::ACTIVITY_MISSIONS => 10,
-            DailyTask::ACTIVITY_PVP => 5,
+            DailyTask::ACTIVITY_ARENA => 20,
+            DailyTask::ACTIVITY_TRAINING => 10,
+            DailyTask::ACTIVITY_MISSIONS => 20,
+            DailyTask::ACTIVITY_PVP => 10,
             DailyTask::ACTIVITY_BATTLES => 10,
         ],
         DailyTask::DIFFICULTY_MEDIUM => [
