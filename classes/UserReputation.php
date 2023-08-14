@@ -192,14 +192,20 @@ class UserReputation {
     private ?string $recent_killer_ids;
     public array $recent_killer_ids_array;
     public int $base_pvp_reward;
+    public int $extra_pve_rep;
     public array $benefits;
+    public ForbiddenSeal $forbidden_seal;
 
-    public function __construct(&$player_rep, &$player_weekly_rep, &$player_pvp_rep, &$last_pvp_kills, &$last_killer_ids, $mission_cd, $event) {
+    public function __construct(&$player_rep, &$player_weekly_rep, &$player_pvp_rep, &$last_pvp_kills, &$last_killer_ids, $mission_cd, $event, $forbidden_seal) {
         //Player data
         $this->rep = &$player_rep;
         $this->weekly_rep = &$player_weekly_rep;
         $this->mission_cd = $mission_cd;
         $this->rank = self::tierByRepAmount($this->rep);
+
+        // Pve Rep boost
+        $this->forbidden_seal = $forbidden_seal;
+        $this->extra_pve_rep = $this->forbiddne_seal->extra_pve_rep;
 
         //PvP data
         $this->weekly_pvp_rep = &$player_pvp_rep;
@@ -233,6 +239,10 @@ class UserReputation {
      * Returns amount of reputation awarded for display/data confirmation purposes
      */
     public function addRep(int $amount, bool $bypass_weekly_cap = false, bool $increment_pvp = false): int {
+        // Forbidden seal boost
+        if(!$increment_pvp) {
+            $amount += $this->extra_pve_rep;
+        }
         //Adjust reputation gain if gain goes above cap
         if(!$bypass_weekly_cap) {
             $new_rep = $this->rep + $amount;
