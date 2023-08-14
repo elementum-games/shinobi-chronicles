@@ -63,7 +63,7 @@ class UserReputation {
             'weekly_cap' => 1250,
             'weekly_pvp_cap' => 1000,
             'base_pvp_rep_reward' => 4,
-            'base_decay' => 750,
+            'base_decay' => 1000,
         ],
         8 => [
             'title' => 'Master Shinobi',
