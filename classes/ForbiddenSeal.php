@@ -27,6 +27,7 @@ class ForbiddenSeal {
     public int $extra_weapon_equips;
     public int $stat_transfer_boost;
     public int $extra_stat_transfer_points_per_ak;
+    public int $extra_pve_rep;
     public float $long_training_time;
     public float $long_training_gains;
     public float $extended_training_time;
@@ -78,6 +79,7 @@ class ForbiddenSeal {
             'stat_transfer_boost' => 0,
             'extra_stat_transfer_points_per_ak' => 0,
             'max_battle_history_view' => 0,
+            'extra_pve_rep' => 0,
         ],
         1 => [
             'regen_boost' => 10,
@@ -124,6 +126,7 @@ class ForbiddenSeal {
             'stat_transfer_boost' => 0,
             'extra_stat_transfer_points_per_ak' => 50,
             'max_battle_history_view' => 10,
+            'extra_pve_rep' => 0,
         ],
         2 => [
             'regen_boost' => 20, //Report in whole percentages (20 will be .2 bonus)
@@ -170,6 +173,7 @@ class ForbiddenSeal {
             'stat_transfer_boost' => 5,
             'extra_stat_transfer_points_per_ak' => 100,
             'max_battle_history_view' => 20,
+            'extra_pve_rep' => 1,
         ]
     );
 
@@ -240,6 +244,7 @@ class ForbiddenSeal {
         $this->stat_transfer_boost = self::$benefits[$this->level]['stat_transfer_boost'];
         $this->extra_stat_transfer_points_per_ak = self::$benefits[$this->level]['extra_stat_transfer_points_per_ak'];
         $this->max_battle_history_view = self::$benefits[$this->level]['max_battle_history_view'];
+        $this->extra_pve_rep = self::$benefits[$this->level]['extra_pve_rep'];
 
         // Display variables
         $this->name_color_display = self::$benefits[$this->level]['name_color_display'];
