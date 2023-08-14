@@ -205,11 +205,9 @@ $constraints['ai'] = [
         'data_type' => 'float',
         'input_type' => 'text',
     ],
-    'money_multiplier' => [
+    'money' => [
         'data_type' => 'int',
-        'input_type' => 'text',
-        'min' => 0,
-        'max' => 10,
+        'input_type' => 'text'
     ],
     'moves' => [
         'count' => 4,
