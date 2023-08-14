@@ -27,7 +27,7 @@ try {
     switch($request) {
         case 'LoadTravelData':
             $TravelAPIResponse->response = [
-                'mapData' => TravelApiPresenter::mapDataResponse(player: $player, travelManager: $TravelManager),
+                'mapData' => TravelApiPresenter::mapDataResponse(player: $player, travelManager: $TravelManager, system: $system),
                 'nearbyPlayers' => TravelApiPresenter::nearbyPlayersResponse(travelManager: $TravelManager),
             ];
             break;
@@ -36,14 +36,14 @@ try {
             $direction = $system->db->clean($_POST['direction']);
 
             $success = $TravelManager->movePlayer($direction);
-            $TravelAPIResponse->response = TravelApiPresenter::travelActionResponse($success, $player, $TravelManager);
+            $TravelAPIResponse->response = TravelApiPresenter::travelActionResponse($success, $player, $TravelManager, $system);
             break;
 
         case 'EnterPortal':
             $portal_id = $system->db->clean($_POST['portal_id']);
 
             $success = $TravelManager->enterPortal($portal_id);
-            $TravelAPIResponse->response = TravelApiPresenter::travelActionResponse($success, $player, $TravelManager);
+            $TravelAPIResponse->response = TravelApiPresenter::travelActionResponse($success, $player, $TravelManager, $system);
             break;
 
         case 'UpdateFilter':
@@ -51,7 +51,7 @@ try {
             $filter_value = $system->db->clean($_POST['filter_value']);
 
             $success = $TravelManager->updateFilter($filter, $filter_value);
-            $TravelAPIResponse->response = TravelApiPresenter::travelActionResponse($success, $player, $TravelManager);
+            $TravelAPIResponse->response = TravelApiPresenter::travelActionResponse($success, $player, $TravelManager, $system);
             break;
 
         case 'AttackPlayer':

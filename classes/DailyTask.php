@@ -91,7 +91,7 @@ class DailyTask {
         else {
             $prompt = ucwords($this->sub_task) . " " . $this->amount . ' ';
             if($this->activity === DailyTask::ACTIVITY_MISSIONS) {
-                $prompt .= Mission::$rank_names[$this->mission_rank] . ' ' . self::$activity_labels[$this->activity];
+                $prompt .= Mission::$rank_names[$this->mission_rank] . '+ ' . self::$activity_labels[$this->activity];
             }
             else {
                 $prompt .= self::$activity_labels[$this->activity];

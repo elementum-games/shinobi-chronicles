@@ -134,7 +134,10 @@ class Mission {
         if (isset($this->current_stage['action_type'])) {
             if ($this->current_stage['action_type'] == 'travel' || $this->current_stage['action_type'] == 'search') {
                 $last_location = $this->current_stage['action_data'];
+            } else if ($this->current_stage['action_type'] == 'combat') {
+                $last_location = $this->player->location->fetchString();
             }
+
         }
 
         // Load new stage data

@@ -234,7 +234,7 @@ function runActiveMission(): bool {
                 $opponent->loadData();
 
                 // display mission details
-                echo "<table class='table'><tr><th>Current Mission</th></tr>
+                echo "<table class='table' style='width: 90%'><tr><th>Current Mission</th></tr>
 			    <tr><td style='text-align:center;'><span style='font-weight:bold;'>" .
                     ($mission->mission_type == 3 ? '[' . $player->team->name . '] ' : '') . "$mission->name</span><br />" .
                     $player->mission_stage['description'] . "</td></tr></table>";
