@@ -323,12 +323,12 @@ class DailyTask {
         );
         // Rank 1 & 2
         if($user_rank_num < 3) {
-            $daily_tasks[] = DailyTask::generateTask(
+            /*$daily_tasks[] = DailyTask::generateTask(
                 $user_rank_num,
                 DailyTask::ACTIVITY_TRAINING,
                 DailyTask::DIFFICULTY_MEDIUM,
                 $training_tasks
-            );
+            );*/
         }
         // Standard Rank 2+
         if($user_rank_num > 1) {
