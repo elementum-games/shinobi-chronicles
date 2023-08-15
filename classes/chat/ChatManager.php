@@ -76,7 +76,20 @@ class ChatManager {
 
             //Skip post if user blacklisted
             $blacklisted = false;
-            foreach($this->player->blacklist as $id => $blacklist) {
+            /**
+             * {
+             *      "23":
+             *          {"23":
+             *              {
+             *                  "user_id":"23",
+         *                      "user_name":"Test1",
+             *                  "staff_level":"0"
+             *              }
+         *              },
+         *          "9":{"9":{"user_id":"9","user_name":"Hitori2","staff_level":"0"}}}
+             */
+            if($this->player->blacklist->userBlocked())
+            foreach($this->player->blacklist->blacklist as $id => $blacklist) {
                 if($post->user_name == $blacklist[$id]['user_name']) {
                     $blacklisted = true;
                     break;

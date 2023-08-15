@@ -313,14 +313,14 @@ function userSettings() {
 	}
 
     // Fetch blacklist data
-    if(!empty($player->blacklist)) {
+    if(!empty($player->blacklist->blacklist)) {
         $list = "";
         $i = 0;
-        foreach ($player->blacklist as $id => $name) {
+        foreach ($player->blacklist->blacklist as $id => $name) {
             $i++;
             // var_dump($name);
             $list .= "<a href='{$system->router->links['members']}&user={$name[$id]['user_name']}'>{$name[$id]['user_name']}</a><sup>(<a href='$self_link&blacklist_remove=$id'>x</a>)</sup>";
-            if(count($player->blacklist) > $i) {
+            if(count($player->blacklist->blacklist) > $i) {
                 $list .= ", ";
             }
         }

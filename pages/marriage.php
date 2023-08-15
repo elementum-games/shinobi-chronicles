@@ -65,7 +65,7 @@ function marriage() {
                 }
             }
 
-            if(array_key_exists($user_to_marry['user_id'], $player->blacklist)) {
+            if($player->blacklist->userBlocked($user_to_marry['user_id'])) {
                 throw new RuntimeException("You cannot send proposals to users on your blacklist!");
             }
 

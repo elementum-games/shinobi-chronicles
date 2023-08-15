@@ -2,9 +2,20 @@
 class UserBlacklist {
     public function __construct(
         public string $blacklist_data = '',
-        public array $blacklist = array()
+        public array $blacklist = array(),
+        public bool $update = false
     ) {}
 
+    public function userBlocked(int $target_id) {
+        if(array_key_exists($target_id, $this->blacklist)) {
+            return true;
+        }
+        return false;
+    }
+
+    public function loadList() {
+
+    }
     public function loadBlacklistData(): void {
         $this->blacklist = json_decode($this->blacklist_data, true);
     }
