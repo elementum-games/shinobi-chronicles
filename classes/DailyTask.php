@@ -67,6 +67,34 @@ class DailyTask {
         DailyTask::ACTIVITY_BATTLES => 'PvP Battles or Spars',
     ];
 
+    public static array $task_reward_multipliers = [
+        DailyTask::DIFFICULTY_EASY => [
+            DailyTask::ACTIVITY_PVP => 25,
+            DailyTask::ACTIVITY_ARENA => 40,
+            DailyTask::ACTIVITY_MISSIONS => 30,
+            DailyTask::ACTIVITY_TRAINING => 30,
+            DailyTask::ACTIVITY_EARN_MONEY => 20,
+            DailyTask::ACTIVITY_BATTLES => 25,
+        ],
+        DailyTask::DIFFICULTY_MEDIUM => [
+            DailyTask::ACTIVITY_PVP => 50,
+            DailyTask::ACTIVITY_ARENA => 60,
+            DailyTask::ACTIVITY_MISSIONS => 60,
+            DailyTask::ACTIVITY_TRAINING => 60,
+            DailyTask::ACTIVITY_EARN_MONEY => 40,
+            DailyTask::ACTIVITY_BATTLES => 50,
+        ],
+        DailyTask::DIFFICULTY_HARD => [
+            DailyTask::ACTIVITY_PVP => 75,
+            DailyTask::ACTIVITY_ARENA => 100,
+            DailyTask::ACTIVITY_MISSIONS => 90,
+            DailyTask::ACTIVITY_TRAINING => 90,
+            DailyTask::ACTIVITY_EARN_MONEY => 60,
+            DailyTask::ACTIVITY_BATTLES => 75,
+        ]
+    ];
+    const TASK_REWARD_MULTIPLE_OF = 25;
+
     public string $name;
     public $activity;
     public $mission_rank;
@@ -160,9 +188,9 @@ class DailyTask {
                 'type' => DailyTask::ACTIVITY_EARN_MONEY,
                 'sub_task' => [self::SUB_TASK_EARN],
                 'max_amount' => [
-                    DailyTask::DIFFICULTY_EASY => 500,
-                    DailyTask::DIFFICULTY_MEDIUM => 1000,
-                    DailyTask::DIFFICULTY_HARD => 1250,
+                    DailyTask::DIFFICULTY_EASY => Currency::getRondedYen(rank_num: $user_rank, multiplier: 15, multiple_of: 10),
+                    DailyTask::DIFFICULTY_MEDIUM => Currency::getRondedYen(rank_num: $user_rank, multiplier: 25, multiple_of: 10),
+                    DailyTask::DIFFICULTY_HARD => Currency::getRondedYen(rank_num: $user_rank, multiplier: 40, multiple_of: 10),
                 ],
             ],
             DailyTask::ACTIVITY_BATTLES => [
@@ -252,25 +280,18 @@ class DailyTask {
         $task_reward = 200 + (pow($user_rank_num, 2) * 150);
         $task_reward = round($task_reward * (mt_rand(90, 110) / 100)); // 20% randomness
 
-        $task_win_multiplier = 1;
         $rep_reward_mod = 0;
         if($task_activity == DailyTask::ACTIVITY_PVP && $sub_task == DailyTask::SUB_TASK_WIN_FIGHT) {
-            $task_win_multiplier = 2;
             $rep_reward_mod += UserReputation::DAILY_TASK_PVP_WIN_MOD;
-        }
-
-        $base_multiplier = mt_rand($user_rank_num, $user_rank_num + 2);
-        $difficulty_multiplier = 2;
-        if($task_difficulty == DailyTask::DIFFICULTY_MEDIUM) {
-            $difficulty_multiplier++;
-        }
-        if($task_difficulty == DailyTask::DIFFICULTY_HARD) {
-            $difficulty_multiplier++;
         }
 
         // Reputation & money reward
         $rep_reward = UserReputation::DAILY_TASK_REWARDS[$task_difficulty][$task_config['type']] + $rep_reward_mod;
-        $money_reward = User::calcMoneyGain(rank_num: $user_rank_num, multiplier: floor($base_multiplier * $difficulty_multiplier));
+        $money_reward = Currency::getRoundedYen(
+            rank_num: $user_rank_num,
+            multipler: self::$task_reward_multipliers[$task_difficulty][$tas_config['type']],
+            multiple_of: self::TASK_REWARD_MULTIPLE_OF
+        );
 
         return new DailyTask([
             'name' => $task_name,
