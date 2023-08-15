@@ -202,7 +202,7 @@ class UserReputation {
 
         // Pve Rep boost
         $this->forbidden_seal = $forbidden_seal;
-        $this->extra_pve_rep = $this->forbiddne_seal->extra_pve_rep;
+        $this->extra_pve_rep = $this->forbidden_seal->extra_pve_rep;
 
         //PvP data
         $this->weekly_pvp_rep = &$player_pvp_rep;
