@@ -240,7 +240,7 @@
             </form>
         </td>
         <td style='text-align:center;'>
-            <?php if(!empty($player->blacklist)): ?>
+            <?php if($player->blacklist->hasUsersBlocked): ?>
                 <?=$list?>
             <?php else: ?>
                 <p style="text-align: center;">No blocked users!</p>

@@ -153,15 +153,15 @@ function userSettings() {
 				throw new RuntimeException("You cannot blacklist yourself!");
 			}
 			if(isset($_POST['blacklist_add'])) {
-				if (!empty($player->blacklist) && array_key_exists($blacklist_user['user_id'], $player->blacklist)) {
+				if($player->blacklist->userBlocked($blacklist_user['user_id'])) {
 					throw new RuntimeException("User already in your blacklist!");
 				}
-				$player->blacklist[$blacklist_user['user_id']][$blacklist_user['user_id']] = $blacklist_user;
+				$player->blacklist->addUser(user_id: $blacklist['user_id'], blacklist_user: $blacklist_user);
 				$system->message("{$blacklist_user['user_name']} added to blacklist.");
 			}
 			else {
-				if($player->blacklist[$blacklist_user['user_id']]) {
-					unset($player->blacklist[$blacklist_user['user_id']]);
+				if($player->blacklist->userBlocked($blacklist_user['user_id'])) {
+					$player->blacklist->removeUser($blacklist_user['user_id']);
 					$system->message("{$blacklist_user['user_name']} has been removed from your blacklist.");
 				}
 				else {
@@ -178,16 +178,14 @@ function userSettings() {
 		$user_remove = abs((int) $user_remove);
 
 		try {
-			$user_exists = $player->blacklist[$user_remove];
-
-            $message = ($user_exists) ? "{$player->blacklist[$user_remove][$user_remove]['user_name']} has been removed from your blacklist" : "This user is not on your blacklist.";
-
-			if($user_exists) {
-				unset($player->blacklist[$user_remove]);
+			if($player->blacklist->userBlocked($user_remove)) {
+				$removed_user = $player->blacklist[$user_remove];
+				$player->blacklist->removeUser($user_remove);
+				$system->message("{$removed_user['user_name']} has been removed from your blacklist");
 			}
-
-			$system->message($message);
-
+			else {
+				$system->message("This user is not on your blacklist!");
+			}
 		}
 		catch(RuntimeException $e) {
 			echo $e->getMessage();
@@ -313,14 +311,14 @@ function userSettings() {
 	}
 
     // Fetch blacklist data
-    if(!empty($player->blacklist->blacklist)) {
+    if($player->blacklist->hasUsersBlocked()) {
         $list = "";
         $i = 0;
-        foreach ($player->blacklist->blacklist as $id => $name) {
+		$blacklist_array = $player->blacklist->getBlacklistArray();
+        foreach ($blacklist_array as $id => $blocked_user) {
             $i++;
-            // var_dump($name);
-            $list .= "<a href='{$system->router->links['members']}&user={$name[$id]['user_name']}'>{$name[$id]['user_name']}</a><sup>(<a href='$self_link&blacklist_remove=$id'>x</a>)</sup>";
-            if(count($player->blacklist->blacklist) > $i) {
+            $list .= "<a href='{$system->router->links['members']}&user={$blocked_user['user_name']}'>{$blocked_user['user_name']}</a><sup>(<a href='$self_link&blacklist_remove=$id'>x</a>)</sup>";
+            if(count($blacklist_array) > $i) {
                 $list .= ", ";
             }
         }

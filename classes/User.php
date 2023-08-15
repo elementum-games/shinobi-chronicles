@@ -95,7 +95,6 @@ class User extends Fighter {
     public string $user_name;
     public int $free_username_changes;
     public UserBlacklist $blacklist;
-    public UserBlacklist $original_blacklist;
 
     /** @var DailyTask[] */
     public ?UserDailyTasks $daily_tasks;
@@ -960,17 +959,13 @@ class User extends Fighter {
             query: "SELECT `blocked_ids` FROM `blacklist` WHERE `user_id`='$this->user_id' LIMIT 1"
         );
         if($result->num_rows) {
-            $blacklist = $this->system->db->fetch($result)['blocked_ids'];
+            $this->blacklist = UserBlacklist::fromDb(user_id: $this->user_id, blacklist_data: $this->system->db->fetch($result)['blocked_ids']);
         }
         else {
             $blacklist = json_encode(array());
-            $this->system->db->query(
-                query: "INSERT INTO `blacklist` (`user_id`, `blocked_ids`) VALUES ('{$this->user_id}', '{$blacklist}')"
-            );
+            $this->blacklist = UserBlacklist::fromDb(user_id: $this->user_id, blacklist_data: $blacklist);
+            $this->blacklist->createBlacklist();
         }
-
-        $this->blacklist = UserBlacklist::fromDb($blacklist);
-        $this->original_blacklist = $this->blacklist;
     }
     public function loadDefaultBoostsAndNerfs(): void {
         $this->regen_boost = 0;
@@ -1894,11 +1889,8 @@ class User extends Fighter {
         $this->system->db->query($query);
 
         // Update Blacklist
-        if(count($this->blacklist) != count($this->original_blacklist)) {
-            $blacklist_json = json_encode($this->blacklist);
-            $this->system->db->query(
-                "UPDATE `blacklist` SET `blocked_ids`='{$blacklist_json}' WHERE `user_id`='{$this->user_id}' LIMIT 1"
-            );
+        if($this->blacklist->update) {
+            $this->blacklist->updateData();
         }
 
         //Update Daily Tasks
