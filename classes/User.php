@@ -385,7 +385,6 @@ class User extends Fighter {
         $user->regen_boost = 0;
 
         $user->setForbiddenSealFromDb($user_data['forbidden_seal'], $remote_view);
-        $user->regen_boost += ceil($user->regen_rate * ($user->forbidden_seal->regen_boost / 100));
 
         $user->chat_color = ($user_data['chat_color'] == '') ? 'black' : $user_data['chat_color'];
         $user->chat_effect = $user_data['chat_effect'];
