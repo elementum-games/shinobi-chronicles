@@ -170,18 +170,36 @@ function processArenaBattleEnd(BattleManager|BattleManagerV2 $battle, User $play
         $stat_gain_display = false;
         $opponent = $battle->opponent;
 
-        $money_gain = $player->calcPlayerMoneyGain(multiplier: $opponent->getMoney(), multiple_of: NPC::MONEY_GAIN_MULTIPLE);
-
+        $multiplier = 3;
         // Reduce money gains based on level
         if($player->level > $opponent->level) {
             $level_difference = $player->level - $opponent->level;
+            if($level_difference > 4) {
+                $multiplier--;
+            }
+            if($level_difference > 7) {
+                $multiplier--;
+            }
             if($level_difference > 9) {
-                $level_difference = 9;
+                $multiplier = 0;
             }
-            $money_gain = round($money_gain * (1-$level_difference*0.1));
-            if($money_gain < $opponent->rank * 5) {
-                $money_gain = $opponent->rank * 5;
+        }
+        // Increased gains based on level
+        else {
+            $level_difference = $opponent->level - $player->level;
+            if($level_difference >= 3) {
+                $multiplier++;
             }
+            if($level_difference >= 6) {
+                $multiplier++;
+            }
+        }
+
+        if($multiplier) {
+            $money_gain = Currency::getRoundedYen(rank_num: $player->rank_num, multiplier: $multiplier, multiple_of: NPC::MONEY_GAIN_MULTIPLE);
+        }
+        else {
+            $money_gain = 0;
         }
 
         // 5 levels below = -75% chance
@@ -221,7 +239,7 @@ function processArenaBattleEnd(BattleManager|BattleManagerV2 $battle, User $play
 
         $extra_yen = 0;
         $append_message = "";
-        if($player->special_items) {
+        if($player->special_items && $money_gain) {
             foreach($player->special_items as $item) {
                 if($item->effect == 'yen_boost') {
                     $amount = ceil($money_gain * ($item->effect_amount/100));
@@ -235,15 +253,17 @@ function processArenaBattleEnd(BattleManager|BattleManagerV2 $battle, User $play
         if($rep_gain_string != "") {
             $battle_result .= $rep_gain_string;
         }
-		$battle_result .= "You have claimed your prize of {$player->money->symbol}$money_gain.<br />";
-        if($append_message != "") {
-            $battle_result .= $append_message;
-        }
         if($stat_gain_display) {
             $battle_result .=  $stat_gain_display;
         }
 
-        $player->money->add(($money_gain + $extra_yen), 'arena');
+        if($money_gain) {
+            $battle_result .= "You have claimed your prize of {$player->money->symbol}$money_gain.<br />";
+            if($append_message != "") {
+                $battle_result .= $append_message;
+            }
+            $player->money->add(($money_gain + $extra_yen), 'arena');
+        }
         $player->ai_wins++;
         $player->battle_id = 0;
         $player->last_pvp_ms = System::currentTimeMs();
