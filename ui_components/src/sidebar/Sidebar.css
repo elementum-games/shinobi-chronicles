@@ -297,7 +297,7 @@
 }
 
 /* Mobile Overrides */
-@media screen and (max-width: 999px) {
+@media screen and (max-width: 900px) {
     #sidebar {
         display: flex;
         flex-direction: column;
