@@ -567,3 +567,26 @@ a.normalUser, a.normalUser:hover, a.normalUser:visited {
 .post_user_avatar_wrapper.normalUser, .avatar_frame.normalUser {
     background: var(--avatar-frame-border_gradient) !important;
 }
+
+/* Mobile Overrides */
+@media screen and (max-width: 999px) {
+    #container {
+        flex-direction: column-reverse !important;
+        padding-bottom: 0px;
+    }
+    #footer {
+        display: none;
+    }
+    #hotbar {
+        display: none;
+    }
+    #content_wrapper {
+        margin-left: auto !important;
+        margin-right: auto !important;
+        margin-bottom: 15px;
+        min-height: 80vh;
+    }
+    #container::before {
+        display: none;
+    }
+}
