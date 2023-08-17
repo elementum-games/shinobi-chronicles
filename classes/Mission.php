@@ -47,7 +47,7 @@ class Mission {
     public $stages;
     public $money;
     public $rewards = [];
-    public ?TravelCoords $origin;
+    public ?TravelCoords $custom_start_location;
 
     public User $player;
     public ?Team $team;
@@ -79,8 +79,8 @@ class Mission {
         $this->money = $mission_data['money'];
         $this->rewards = json_decode($mission_data['rewards'], true);
 
-        if (isset($mission_data['origin'])) {
-            $this->origin = TravelCoords::fromDbString($mission_data['origin']);
+        if (isset($mission_data['custom_start_location'])) {
+            $this->custom_start_location = TravelCoords::fromDbString($mission_data['custom_start_location']);
         }
 
         // Unset team if normal mission
@@ -128,13 +128,13 @@ class Mission {
         }
         // Set to completion stage if all stages have been completed
         if ($stage_id > count($this->stages)) {
-            // if origin set
-            if (isset($this->origin)) {
+            // if custom_start_location set
+            if (isset($this->custom_start_location)) {
                 $this->current_stage = array(
                     'stage_id' => $stage_id + 1,
                     'action_type' => 'travel',
-                    'action_data' => $this->origin->fetchString(),
-                    'description' => 'Return to ' . $this->origin->fetchString() . ' to complete the mission.'
+                    'action_data' => $this->custom_start_location->fetchString(),
+                    'description' => 'Return to ' . $this->custom_start_location->fetchString() . ' to complete the mission.'
                 );
             }
             // otherwise use village
@@ -151,9 +151,9 @@ class Mission {
         }
 
         // Get last location
-        if (isset($this->origin)) {
-            // use origin as default
-            $last_location = $this->origin->fetchString();
+        if (isset($this->custom_start_location)) {
+            // use custom_start_location as default
+            $last_location = $this->custom_start_location->fetchString();
         } else {
             // else use village as default
             $last_location = $this->player->village_location->fetchString();
@@ -185,9 +185,9 @@ class Mission {
                 if (isset($this->current_stage['action_data']) && $this->current_stage['action_data'] != '0') {
                     $location = TravelCoords::fromDbString($this->current_stage['action_data']);
                 }
-                // if first stage and origin set, use origin as root
-                else if ($stage_id == 1 && isset($this->origin)) {
-                    $location = $this->rollLocation($this->origin);
+                // if first stage and custom_start_location set, use custom_start_location as root
+                else if ($stage_id == 1 && isset($this->custom_start_location)) {
+                    $location = $this->rollLocation($this->custom_start_location);
                 }
                 // if basic mission and first stage, use village as root
                 else if ($stage_id == 1 && $this->mission_type != $this::TYPE_EVENT) {
@@ -253,13 +253,13 @@ class Mission {
 
         // Set to completion stage if all stages have been completed
         if($stage_id > count($this->stages)) {
-            // if origin set
-            if (isset($this->origin)) {
+            // if custom_start_location set
+            if (isset($this->custom_start_location)) {
                 $this->current_stage = array(
                     'stage_id' => $stage_id + 1,
                     'action_type' => 'travel',
-                    'action_data' => $this->origin->fetchString(),
-                    'description' => 'Return to ' . $this->origin->fetchString() . ' to complete the mission.'
+                    'action_data' => $this->custom_start_location->fetchString(),
+                    'description' => 'Return to ' . $this->custom_start_location->fetchString() . ' to complete the mission.'
                 );
             }
             // otherwise use village
@@ -451,12 +451,12 @@ class Mission {
 
         // Faction Mission Logic
         if ($mission->mission_type == Mission::TYPE_FACTION) {
-            if (isset($mission->origin)) {
-                if ($player->location != $mission->origin) {
+            if (isset($mission->custom_start_location)) {
+                if ($player->location != $mission->custom_start_location) {
                     throw new RuntimeException("Invalid location!");
                 }
             } else {
-                throw new RuntimeException("Invalid origin!");
+                throw new RuntimeException("Invalid custom_start_location!");
             }
         }
 

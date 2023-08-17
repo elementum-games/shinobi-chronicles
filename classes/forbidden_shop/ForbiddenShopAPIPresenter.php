@@ -30,19 +30,6 @@ class ForbiddenShopApiPresenter {
     /**
      * @throws RuntimeException
      */
-    public static function exchangeDataResponse()
-    {
-        return [
-            'exchangeData' => [
-                'ayakashiFavor' => ForbiddenShopManager::AYAKASHI_FAVOR,
-                'favorExchange' => ForbiddenShopManager::FAVOR_EXCHANGE,
-                'factionMissions' => ForbiddenShopManager::FACTION_MISSIONS
-            ],
-        ];
-    }
-    /**
-     * @throws RuntimeException
-     */
     public static function eventJutsuResponse(ForbiddenShopManager $forbiddenShopManager)
     {
         return array_map(

@@ -5,7 +5,9 @@ function ForbiddenShop({
   eventData,
   availableEventJutsu,
   initialPlayerInventory,
-  exchangeData
+  favorExchangeData,
+  factionMissions,
+  ayakashiFavorId
 }) {
   const scrollExchangeRef = React.useRef(null);
   const currencyExchangeRef = React.useRef(null);
@@ -35,7 +37,9 @@ function ForbiddenShop({
     forbiddenShopApiLink: links.forbiddenShopAPI,
     missionLink: links.missionLink,
     eventData: eventData.lanternEvent,
-    exchangeData: exchangeData
+    favorExchangeData: favorExchangeData,
+    factionMissions: factionMissions,
+    ayakashiFavorId: ayakashiFavorId
   }));
 }
 function ShopMenu({
@@ -503,13 +507,15 @@ function FactionSection({
   setPlayerInventory,
   forbiddenShopApiLink,
   missionLink,
-  eventData,
-  exchangeData
+  factionMissions,
+  ayakashiFavorId,
+  favorExchangeData,
+  eventData
 }) {
-  const easyMissionId = React.useRef(exchangeData.exchangeData.factionMissions['easy']);
-  var normalMissionId = React.useRef(exchangeData.exchangeData.factionMissions['normal']);
-  var hardMissionId = React.useRef(exchangeData.exchangeData.factionMissions['hard']);
-  var nightmareMissionId = React.useRef(exchangeData.exchangeData.factionMissions['nightmare']);
+  const easyMissionId = React.useRef(factionMissions['easy']);
+  var normalMissionId = React.useRef(factionMissions['normal']);
+  var hardMissionId = React.useRef(factionMissions['hard']);
+  var nightmareMissionId = React.useRef(factionMissions['nightmare']);
   const [responseMessage, setResponseMessage] = React.useState(null);
   function exchangeFavor(itemId) {
     apiFetch(forbiddenShopApiLink, {
@@ -540,7 +546,7 @@ function FactionSection({
     className: "favor_count_label"
   }, "AYAKASHI'S FAVOR"), /*#__PURE__*/React.createElement("div", {
     className: "favor_count"
-  }, "x", playerInventory.items[exchangeData.exchangeData.ayakashiFavor]?.quantity || 0))), /*#__PURE__*/React.createElement("div", {
+  }, "x", playerInventory.items[ayakashiFavorId]?.quantity || 0))), /*#__PURE__*/React.createElement("div", {
     className: "faction_section_container box-secondary"
   }, /*#__PURE__*/React.createElement("div", {
     className: "favor_exchange_header"
@@ -556,7 +562,7 @@ function FactionSection({
     itemId: eventData.forbidden_jutsu_scroll_id
   }), /*#__PURE__*/React.createElement("div", {
     className: "favor_exchange_label"
-  }, "-", exchangeData.exchangeData.favorExchange[eventData.forbidden_jutsu_scroll_id], " Favor"))), /*#__PURE__*/React.createElement("div", {
+  }, "-", favorExchangeData[eventData.forbidden_jutsu_scroll_id], " Favor"))), /*#__PURE__*/React.createElement("div", {
     className: "faction_mission_header"
   }, "Begin Missions"), /*#__PURE__*/React.createElement("div", {
     className: "faction_mission_container"

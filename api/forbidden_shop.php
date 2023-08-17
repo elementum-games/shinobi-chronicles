@@ -28,9 +28,6 @@ try {
         case "getEventData":
             $response->data = ForbiddenShopAPIPresenter::eventDataResponse();
             break;
-        case "getExchangeData":
-            $response->data = ForbiddenShopAPIPresenter::exchangeDataResponse();
-            break;
         case "exchangeAllEventCurrency":
             $event_key = $system->db->clean($_POST['event_key']);
 
@@ -54,7 +51,7 @@ try {
             ];
             break;
         case "exchangeFavor":
-            $item_id = $system->db->clean($_POST['item_id']);
+            $item_id = $system->db->clean((int)$_POST['item_id']);
 
             $message = $ForbiddenShopManager->exchangeFavor($item_id);
             $player->getInventory();

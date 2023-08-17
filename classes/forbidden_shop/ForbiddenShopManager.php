@@ -11,7 +11,7 @@ class ForbiddenShopManager {
         $this->player = $player;
     }
 
-    const AYAKASHI_FAVOR = 131;
+    const AYAKASHI_FAVOR_ITEM_ID = 131;
 
     const FAVOR_EXCHANGE = [
         127 => 1000, // forbidden scroll
@@ -142,12 +142,12 @@ class ForbiddenShopManager {
         }
 
         // Check for money requirement or process exchange
-        if ($this->player->itemQuantity(self::AYAKASHI_FAVOR) < self::FAVOR_EXCHANGE[$item_id]) {
+        if ($this->player->itemQuantity(self::AYAKASHI_FAVOR_ITEM_ID) < self::FAVOR_EXCHANGE[$item_id]) {
             throw new RuntimeException("You do not have enough favor!");
         }
 
         // Add to inventory
-        $this->player->removeItemById(self::AYAKASHI_FAVOR, self::FAVOR_EXCHANGE[$item_id]);
+        $this->player->removeItemById(self::AYAKASHI_FAVOR_ITEM_ID, self::FAVOR_EXCHANGE[$item_id]);
         $this->player->giveItemById(LanternEvent::$static_item_ids['forbidden_jutsu_scroll_id'], 1);
         $this->player->updateInventory();
 

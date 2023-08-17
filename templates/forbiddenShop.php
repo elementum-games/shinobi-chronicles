@@ -23,9 +23,11 @@ $ForbiddenShopManager = new ForbiddenShopManager($system, $player);
                     missionLink: "<?= $system->router->getUrl('mission') ?>"
                 },
                 eventData: <?= json_encode(ForbiddenShopAPIPresenter::eventDataResponse()) ?>,
+                ayakashiFavorId: <?= ForbiddenShopManager::AYAKASHI_FAVOR_ITEM_ID ?>,
+                favorExchangeData: <?= json_encode(ForbiddenShopManager::FAVOR_EXCHANGE) ?>,
+                factionMissions: <?= json_encode(ForbiddenShopManager::FACTION_MISSIONS) ?>,
                 availableEventJutsu: <?= json_encode(ForbiddenShopApiPresenter::eventJutsuResponse($ForbiddenShopManager)) ?>,
                 initialPlayerInventory: <?= json_encode(UserAPIPresenter::playerInventoryResponse(player: $player)) ?>,
-                exchangeData: <?=  json_encode(ForbiddenShopApiPresenter::exchangeDataResponse())?>,
             }),
             forbiddenShopContainer
         );

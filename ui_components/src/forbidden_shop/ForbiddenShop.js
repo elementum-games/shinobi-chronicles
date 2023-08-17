@@ -46,7 +46,9 @@ function ForbiddenShop({
     eventData,
     availableEventJutsu,
     initialPlayerInventory,
-    exchangeData,
+    favorExchangeData,
+    factionMissions,
+    ayakashiFavorId,
 }: Props) {
     const scrollExchangeRef = React.useRef(null);
     const currencyExchangeRef = React.useRef(null);
@@ -79,7 +81,9 @@ function ForbiddenShop({
                 forbiddenShopApiLink={links.forbiddenShopAPI}
                 missionLink={links.missionLink}
                 eventData={eventData.lanternEvent}
-                exchangeData={exchangeData}
+                favorExchangeData={favorExchangeData}
+                factionMissions={factionMissions}
+                ayakashiFavorId={ayakashiFavorId}
             />
         </div>
     )
@@ -485,13 +489,15 @@ function FactionSection({
     setPlayerInventory,
     forbiddenShopApiLink,
     missionLink,
-    eventData,
-    exchangeData,
+    factionMissions,
+    ayakashiFavorId,
+    favorExchangeData,
+    eventData
 }: factionSectionProps) {
-    const easyMissionId = React.useRef(exchangeData.exchangeData.factionMissions['easy']);
-    var normalMissionId = React.useRef(exchangeData.exchangeData.factionMissions['normal']);
-    var hardMissionId = React.useRef(exchangeData.exchangeData.factionMissions['hard']);
-    var nightmareMissionId = React.useRef(exchangeData.exchangeData.factionMissions['nightmare']);
+    const easyMissionId = React.useRef(factionMissions['easy']);
+    var normalMissionId = React.useRef(factionMissions['normal']);
+    var hardMissionId = React.useRef(factionMissions['hard']);
+    var nightmareMissionId = React.useRef(factionMissions['nightmare']);
     const [responseMessage, setResponseMessage] = React.useState(null);
     
     function exchangeFavor(itemId) {
@@ -520,7 +526,7 @@ function FactionSection({
                 <div className="section_title">Akuji's Lair</div>
                 <div className="favor_count_container">
                     <div className="favor_count_label">AYAKASHI'S FAVOR</div>
-                    <div className="favor_count">x{playerInventory.items[exchangeData.exchangeData.ayakashiFavor]?.quantity || 0}
+                    <div className="favor_count">x{playerInventory.items[ayakashiFavorId]?.quantity || 0}
                     </div>
                 </div>
             </div>
@@ -536,7 +542,7 @@ function FactionSection({
                             onClick={exchangeFavor}
                             itemId={eventData.forbidden_jutsu_scroll_id}
                         />
-                        <div className="favor_exchange_label">-{exchangeData.exchangeData.favorExchange[eventData.forbidden_jutsu_scroll_id]} Favor</div>
+                        <div className="favor_exchange_label">-{favorExchangeData[eventData.forbidden_jutsu_scroll_id]} Favor</div>
                     </div>
                 </div>
                 <div className="faction_mission_header">Begin Missions</div>
