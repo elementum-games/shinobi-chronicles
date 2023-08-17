@@ -44,7 +44,7 @@ function event() {
                         unset($player->items[$system->event->item_ids['red_lantern_id']]);
                     }
 
-                    $player->money->add("25", "Event");
+                    $player->currency->addMoney("25", "Event");
                     $system->message("You exchanged 1 Red Lantern for " . $yen_gain . "&#165;!");
 
                     $player->updateInventory();
@@ -63,7 +63,7 @@ function event() {
                     if ($player->items[$system->event->item_ids['red_lantern_id']]->quantity < 1) {
                         unset($player->items[$system->event->item_ids['red_lantern_id']]);
                     }
-                    $player->money->add("250", "Event");
+                    $player->currency->addMoney("250", "Event");
                     $system->message("You exchanged 10 Red Lanterns for " . $yen_gain . "&#165;!");
                     $player->updateInventory();
                     $player->updateData();
@@ -81,7 +81,7 @@ function event() {
                     if ($player->items[$system->event->item_ids['red_lantern_id']]->quantity < 1) {
                         unset($player->items[$system->event->item_ids['red_lantern_id']]);
                     }
-                    $player->money->add("2500", "Event");
+                    $player->currency->addMoney("2500", "Event");
                     $system->message("You exchanged 100 Red Lanterns for " . $yen_gain . "&#165;!");
                     $player->updateInventory();
                     $player->updateData();

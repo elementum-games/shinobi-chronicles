@@ -262,7 +262,7 @@ class User extends Fighter {
     public int $last_death_ms;
 
     public Currency $premium_credits;
-    public int $premium_credits_purchased;
+    public Currency $premium_credits_purchased;
 
     public bool $censor_explicit_language = true;
 
@@ -596,7 +596,7 @@ class User extends Fighter {
         );
         $this->money = $this->currency->money;
         $this->premium_credits = $this->currency->premium_credits;
-        $this->premium_credits_purchased = $user_data['premium_credits_purchased'];
+        $this->premium_credits_purchased = $this->currency->premium_purchased;
         // Clan
         $this->loadClanData(clan_id: $user_data['clan_id'], clan_office: $user_data['clan_office']);
         // Team
@@ -728,7 +728,7 @@ class User extends Fighter {
             // Process tasks completion
             $completion_data = $this->daily_tasks->checkTaskCompletion();
             if($completion_data != null) {
-                $this->money->add($completion_data['money_gain'], 'Completed daily task');
+                $this->currency->addMoney($completion_data['money_gain'], 'Completed daily task');
                 $rep_gain = $this->reputation->addRep($completion_data['rep_gain'], UserReputation::DAILY_TASK_BYPASS_CAP);
                 $task_display = "You have completed the task" . (sizeof($completion_data['tasks_completed']) > 1 ? "s" : "");
                 foreach ($completion_data['tasks_completed'] as $x => $t_name) {
@@ -1864,8 +1864,9 @@ class User extends Fighter {
         `stat_transfer_amount` = $this->stat_transfer_amount,
         `stat_transfer_completion_time` = $this->stat_transfer_completion_time,
         `stat_transfer_target_stat` = '$this->stat_transfer_target_stat',
-		`money` = '{$this->money->getAmount()}',
-		`premium_credits` = '{$this->premium_credits->getAmount()}',
+		`money` = '{$this->currency->getMoney()}',
+		`premium_credits` = '{$this->currency->getPremiumCredits()}',
+		`premium_credits_purchased` = '{$this->currency->getPremiumPurchased()}',
 		`pvp_wins` = '$this->pvp_wins',
 		`pvp_losses` = '$this->pvp_losses',
 		`ai_wins` = '$this->ai_wins',
@@ -2005,7 +2006,7 @@ class User extends Fighter {
 
     public function canChangeChatColor(): bool {
         // Premium purchased
-        if($this->premium_credits_purchased) {
+        if($this->currency->getPremiumPurchased()) {
             return true;
         }
 
@@ -2040,7 +2041,7 @@ class User extends Fighter {
             }
         }
 
-        if($this->premium_credits_purchased > 0 || $this->isHeadAdmin()) {
+        if($this->currency->getPremiumCredits() > 0 || $this->isHeadAdmin()) {
             $return = array_merge($return, [
                 'gold' => 'gold'
             ]);

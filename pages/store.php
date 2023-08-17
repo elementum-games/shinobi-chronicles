@@ -86,11 +86,11 @@ function store() {
 					throw new RuntimeException("Your supply of this item is already full!");
 				}
 
-				if ($player->getMoney() < $shop_items[$item_id]->purchase_cost * $max_missing) {
+				if ($player->currency->getMoney() < $shop_items[$item_id]->purchase_cost * $max_missing) {
 					throw new RuntimeException("You do not have enough money to buy the max amount!");
 				}
 
-				$player->subtractMoney(
+				$player->currency->subtractMoney(
                     $shop_items[$item_id]->purchase_cost * $max_missing,
                     "Purchased {$max_missing} of item #{$item_id}"
                 );
@@ -98,7 +98,7 @@ function store() {
 
 			} else { //code for handling single purchases
                 // Check for money requirement
-                if($player->getMoney() < $shop_items[$item_id]->purchase_cost) {
+                if($player->currency->getMoney() < $shop_items[$item_id]->purchase_cost) {
                     throw new RuntimeException("You do not have enough money!");
                 }
 
@@ -110,7 +110,7 @@ function store() {
                 }
 
                 // Add to inventory or increment quantity
-                $player->subtractMoney($shop_items[$item_id]->purchase_cost, "Purchased item #{$item_id}");
+                $player->currency->subtractMoney($shop_items[$item_id]->purchase_cost, "Purchased item #{$item_id}");
 
                 $player->giveItem($shop_items[$item_id], 1);
 			}
@@ -138,7 +138,7 @@ function store() {
 			}
 			
 			// Check for money requirement
-			if($player->getMoney() < $shop_jutsu[$jutsu_id]['purchase_cost']) {
+			if($player->currency->getMoney() < $shop_jutsu[$jutsu_id]['purchase_cost']) {
 				throw new RuntimeException("You do not have enough money!");
 			}
 			
@@ -159,7 +159,7 @@ function store() {
 			
 			
 			// Add to inventory
-			$player->subtractMoney($shop_jutsu[$jutsu_id]['purchase_cost'], "Purchased jutsu #{$jutsu_id}");
+			$player->currency->subtractMoney($shop_jutsu[$jutsu_id]['purchase_cost'], "Purchased jutsu #{$jutsu_id}");
 
 			$player->jutsu_scrolls[$jutsu_id] = Jutsu::fromArray($jutsu_id, $shop_jutsu[$jutsu_id]);
 			
@@ -272,7 +272,7 @@ function store() {
 		<tr><td style='text-align:center;'>You can buy Jutsu Scrolls in this section for any jutsu of your rank or below.
 		Once you have purchased a scroll, go to the Jutsu page to learn the jutsu.<br />
 		<br />
-		<b>Your money:</b> &yen;{$player->getMoney()}</td></tr></table>
+		<b>Your money:</b> {$player->currency->getFormattedMoney()}</td></tr></table>
 
 		<p style='text-align:center;margin-bottom:0;'>
 			<a href='$self_link&view=jutsu&jutsu_type=ninjutsu' " . ($jutsu_type == 'ninjutsu' ? $style : "") . ">Ninjutsu</a> |
@@ -314,7 +314,7 @@ function store() {
 					<td style='width:30%;'><a href='$self_link&view=jutsu&view_jutsu=$id'>{$jutsu['name']}</a></td>
 					<td style='width:25%;text-align:center;'>" . ucwords(str_replace('_', ' ', $jutsu['effect'])) . "</td>
 					<td style='width:25%;text-align:center;'>" . ucwords(str_replace('_', ' ', $jutsu['jutsu_type'])) . "</td>
-					<td style='width:26%;text-align:center;'>&yen;{$jutsu['purchase_cost']}</td>
+					<td style='width:26%;text-align:center;'>{$player->currency->money->symbol}{$jutsu['purchase_cost']}</td>
 					<td style='width:28%;text-align:center;'>
 						<a href='$self_link&view=jutsu&purchase_jutsu={$jutsu['jutsu_id']}&jutsu_type={$jutsu['jutsu_type']}'>Purchase</a></td>
 				</tr>";
@@ -336,7 +336,7 @@ function store() {
 		echo "<table class='table'><tr><th>" . ucwords($category) . "</th></tr>
 		<tr><td style='text-align:center;'>You can buy armor/consumable items in this section for your rank or below.<br />
 		<br />
-		<b>Your money:</b> &yen;{$player->getMoney()}</td></tr></table>
+		<b>Your money:</b> {$player->currency->getFormattedMoney()}</td></tr></table>
 		
 		<table class='table'><tr>
 			<th style='width:35%;'>Name</th>
@@ -380,7 +380,7 @@ function store() {
 					($owned ? "<br />(Owned: $owned/$max_consumables)" : "") .
 					"</td>
 					<td style='width:25%;'>" . ucwords(str_replace('_', ' ', $item->effect)) . "</td>
-					<td style='width:20%;'>&yen;{$item->purchase_cost}</td>
+					<td style='width:20%;'>{$player->currency->money->symbol}{$item->purchase_cost}</td>
 					<td style='width:20%;'><a href='$self_link&view=$category&purchase_item={$item->id}'>Purchase</a>" .
 					($category == 'consumables' ? "/<br><a href='$self_link&view=$category&purchase_item={$item->id}&max=true'>Purchase Max</a>" : "") .
 					"</td>

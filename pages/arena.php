@@ -244,7 +244,7 @@ function processArenaBattleEnd(BattleManager|BattleManagerV2 $battle, User $play
                 if($item->effect == 'yen_boost') {
                     $amount = ceil($money_gain * ($item->effect_amount/100));
                     $extra_yen += $amount;
-                    $append_message .= "Your $item->name has provided you with an extra {$player->money->symbol}$amount.<br />";
+                    $append_message .= "Your $item->name has provided you with an extra {$player->currency->money->symbol}$amount.<br />";
                 }
             }
         }
@@ -258,11 +258,11 @@ function processArenaBattleEnd(BattleManager|BattleManagerV2 $battle, User $play
         }
 
         if($money_gain) {
-            $battle_result .= "You have claimed your prize of {$player->money->symbol}$money_gain.<br />";
+            $battle_result .= "You have claimed your prize of {$player->currency->money->symbol}$money_gain.<br />";
             if($append_message != "") {
                 $battle_result .= $append_message;
             }
-            $player->money->add(($money_gain + $extra_yen), 'arena');
+            $player->currency->addMoney(($money_gain + $extra_yen), 'arena');
         }
         $player->ai_wins++;
         $player->battle_id = 0;

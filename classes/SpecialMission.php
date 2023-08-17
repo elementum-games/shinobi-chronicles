@@ -421,7 +421,7 @@ class SpecialMission {
 
             $this->status = 1;
             $this->end_time = time();
-            $this->player->addMoney($yen_gain, "Special mission");
+            $this->player->currency->addMoney($yen_gain, "Special mission");
             $this->reward += $yen_gain;
             $this->player->special_mission = 0;
 
@@ -553,7 +553,7 @@ class SpecialMission {
             }
 
             // Yen Gain
-            $this->player->addMoney($yen_gain, "Special mission encounter");
+            $this->player->currency->addMoney($yen_gain, "Special mission encounter");
             $this->reward += $yen_gain;
 
             // generate a new target

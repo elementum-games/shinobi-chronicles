@@ -45,7 +45,7 @@
         <div class='playerInfo'>
             <div>
                 <label style='width:9em;font-weight:bold;margin-bottom:1px;'>Your Money</label><br />
-                &yen;<?= number_format(num: $player->getMoney()) ?><br />
+                <?=$player->currency->getFormattedMoney()?><br />
             </div>
             <div>
                 <label style='width:9em;font-weight:bold;'>Your Health</label>
@@ -61,7 +61,8 @@
             <div class='choices'>
                 <?php foreach($ramen_choices as $key => $ramen): ?>
                     <a href='<?= $self_link ?>&heal=<?= $key ?>'><span class='button' style='width:10em;'><?= $ramen['label'] ?> ramen</span></a>
-                    <span class='choiceLabel'>&nbsp;&nbsp;&nbsp;(<?= $ramen['health_amount'] ?> health, -&yen;<?= $ramen['cost'] ?>)</span><br />
+                    <span class='choiceLabel'>&nbsp;&nbsp;&nbsp;(<?= $ramen['health_amount'] ?> health,
+                        -<?=$player->currency->money->symbol?><?= $ramen['cost'] ?>)</span><br />
                 <?php endforeach; ?>
             </div>
         </div>
