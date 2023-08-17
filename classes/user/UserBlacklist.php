@@ -1,20 +1,28 @@
 <?php
 class UserBlacklist {
     public function __construct(
+        public System $system,
         public int $user_id,
         public string $blacklist_data = '',
         public array $blacklist = array(),
         public bool $update = false
     ) {}
 
-    public function userBlocked(int $target_id) {
+    public function userBlocked(int $target_id): bool {
         if(array_key_exists($target_id, $this->blacklist)) {
             return true;
         }
         return false;
     }
 
-    public function userBlockedByName(string $target_name) {
+    public function getBlockedUserById(int $id): array|bool {
+        if($this->hasUsersBlocked($id)) {
+            return $this->blacklist[$id];
+        }
+        return false;
+    }
+
+    public function userBlockedByName(string $target_name): bool {
         foreach($this->blacklist as $id => $data) {
             if(strtolower($data['user_name']) == strtolower($target_name)) {
                 return true;
@@ -23,29 +31,30 @@ class UserBlacklist {
         return false;
     }
 
-    public function addUser(int $user_id, array $blacklist_user) {
-        $this->blacklist[$user_id] = $blacklist_data;
+    public function addUser(int $user_id, array $blacklist_user): void {
+        $this->blacklist[$user_id] = $blacklist_user;
         $this->dbEncode();
         $this->update = true;
     }
 
-    public function removeUser(int $user_id) {
+    public function removeUser(int $user_id): void {
         unset($this->blacklist[$user_id]);
+        $this->dbEncode();
         $this->update = true;
     }
 
-    public function hasUsersBlocked() {
+    public function hasUsersBlocked(): bool {
         return !empty($this->blacklist);
     }
 
-    public function getBlacklistArray() {
+    public function getBlacklistArray(): array {
         return $this->blacklist;
     }
     
     public function loadBlacklistData(): void {
         $this->blacklist = json_decode($this->blacklist_data, true);
         // Legacy blacklist support
-        if(!empty($this-blacklist)) {
+        if(!empty($this->blacklist)) {
             $new_blacklist = null;
             foreach($this->blacklist as $id => $user_data) {
                 if(!isset($user_data['user_name'])) {
@@ -76,8 +85,9 @@ class UserBlacklist {
         );
     }
 
-    public static function fromDb(int $user_id, string $blacklist_data): UserBlacklist {
+    public static function fromDb(System $system, int $user_id, string $blacklist_data): UserBlacklist {
         $blacklist = new UserBlacklist(
+            system: $system,
             user_id: $user_id,
             blacklist_data: $blacklist_data
         );

@@ -495,8 +495,6 @@ class User extends Fighter {
         $this->exp = $user_data['exp'];
         $this->loadPools($user_data);
         $this->regen_rate = $user_data['regen_rate'];
-        // Bloodline
-        $this->loadBloodlineData(bloodline_id: $user_data['bloodline_id'], bloodline_name: $user_data['bloodline_name']);
         // Elements, Battle & Mission
         $this->loadElementData(elements: $user_data['elements']);
         $this->battle_id = $user_data['battle_id'];
@@ -544,6 +542,16 @@ class User extends Fighter {
         $this->stat_transfer_amount = $user_data['stat_transfer_amount'];
         $this->stat_transfer_completion_time = $user_data['stat_transfer_completion_time'];
         $this->stat_transfer_target_stat = $user_data['stat_transfer_target_stat'];
+        // Location
+        $this->loadLocationAndTravelData(
+            location: $user_data['location'],
+            attack_id_time_ms: $user_data['attack_id_time_ms'],
+            attack_id: $user_data['attack_id'],
+            last_movement_time: $user_data['last_movement_ms'],
+            user_filters: $user_data['filters']
+        );
+        // Bloodline
+        $this->loadBloodlineData(bloodline_id: $user_data['bloodline_id'], bloodline_name: $user_data['bloodline_name']);
         // Forbidden seal
         $this->setForbiddenSealFromDb($user_data['forbidden_seal'], $remote_view);
         $this->regen_boost += ceil($this->regen_rate * ($this->forbidden_seal->regen_boost / 100));
@@ -589,14 +597,6 @@ class User extends Fighter {
         $this->money = $this->currency->money;
         $this->premium_credits = $this->currency->premium_credits;
         $this->premium_credits_purchased = $user_data['premium_credits_purchased'];
-        // Location
-        $this->loadLocationAndTravelData(
-            location: $user_data['location'],
-            attack_id_time_ms: $user_data['attack_id_time_ms'],
-            attack_id: $user_data['attack_id'],
-            last_movement_time: $user_data['last_movement_ms'],
-            user_filters: $user_data['filters']
-        );
         // Clan
         $this->loadClanData(clan_id: $user_data['clan_id'], clan_office: $user_data['clan_office']);
         // Team
@@ -749,7 +749,7 @@ class User extends Fighter {
     }
     public function loadUserReputation(
         int $village_rep, int $weekly_rep, int $pvp_rep, int $mission_rep_cd,
-        string $recent_players_killed, string $recent_killers
+        ?string $recent_players_killed, ?string $recent_killers
     ): void {
         $this->village_rep = $village_rep;
         $this->weekly_rep = $weekly_rep;
@@ -958,11 +958,11 @@ class User extends Fighter {
             query: "SELECT `blocked_ids` FROM `blacklist` WHERE `user_id`='$this->user_id' LIMIT 1"
         );
         if($result->num_rows) {
-            $this->blacklist = UserBlacklist::fromDb(user_id: $this->user_id, blacklist_data: $this->system->db->fetch($result)['blocked_ids']);
+            $this->blacklist = UserBlacklist::fromDb(system: $this->system, user_id: $this->user_id, blacklist_data: $this->system->db->fetch($result)['blocked_ids']);
         }
         else {
             $blacklist = json_encode(array());
-            $this->blacklist = UserBlacklist::fromDb(user_id: $this->user_id, blacklist_data: $blacklist);
+            $this->blacklist = UserBlacklist::fromDb(system: $this->system, user_id: $this->user_id, blacklist_data: $blacklist);
             $this->blacklist->createBlacklist();
         }
     }

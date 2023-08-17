@@ -156,7 +156,7 @@ function userSettings() {
 				if($player->blacklist->userBlocked($blacklist_user['user_id'])) {
 					throw new RuntimeException("User already in your blacklist!");
 				}
-				$player->blacklist->addUser(user_id: $blacklist['user_id'], blacklist_user: $blacklist_user);
+                $player->blacklist->addUser(user_id: $blacklist_user['user_id'], blacklist_user: $blacklist_user);
 				$system->message("{$blacklist_user['user_name']} added to blacklist.");
 			}
 			else {
@@ -179,7 +179,7 @@ function userSettings() {
 
 		try {
 			if($player->blacklist->userBlocked($user_remove)) {
-				$removed_user = $player->blacklist[$user_remove];
+				$removed_user = $player->blacklist->getBlockedUserById($user_remove);
 				$player->blacklist->removeUser($user_remove);
 				$system->message("{$removed_user['user_name']} has been removed from your blacklist");
 			}

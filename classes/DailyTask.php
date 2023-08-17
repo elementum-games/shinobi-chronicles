@@ -188,9 +188,9 @@ class DailyTask {
                 'type' => DailyTask::ACTIVITY_EARN_MONEY,
                 'sub_task' => [self::SUB_TASK_EARN],
                 'max_amount' => [
-                    DailyTask::DIFFICULTY_EASY => Currency::getRondedYen(rank_num: $user_rank, multiplier: 15, multiple_of: 10),
-                    DailyTask::DIFFICULTY_MEDIUM => Currency::getRondedYen(rank_num: $user_rank, multiplier: 25, multiple_of: 10),
-                    DailyTask::DIFFICULTY_HARD => Currency::getRondedYen(rank_num: $user_rank, multiplier: 40, multiple_of: 10),
+                    DailyTask::DIFFICULTY_EASY => Currency::getRoundedYen(rank_num: $user_rank, multiplier: 15, multiple_of: 10),
+                    DailyTask::DIFFICULTY_MEDIUM => Currency::getRoundedYen(rank_num: $user_rank, multiplier: 25, multiple_of: 10),
+                    DailyTask::DIFFICULTY_HARD => Currency::getRoundedYen(rank_num: $user_rank, multiplier: 40, multiple_of: 10),
                 ],
             ],
             DailyTask::ACTIVITY_BATTLES => [
@@ -289,7 +289,7 @@ class DailyTask {
         $rep_reward = UserReputation::DAILY_TASK_REWARDS[$task_difficulty][$task_config['type']] + $rep_reward_mod;
         $money_reward = Currency::getRoundedYen(
             rank_num: $user_rank_num,
-            multipler: self::$task_reward_multipliers[$task_difficulty][$tas_config['type']],
+            multiplier: self::$task_reward_multipliers[$task_difficulty][$task_config['type']],
             multiple_of: self::TASK_REWARD_MULTIPLE_OF
         );
 
