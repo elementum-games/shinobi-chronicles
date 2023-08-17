@@ -60,7 +60,7 @@ function report() {
                     break;
                 case ReportManager::REPORT_TYPE_CHAT:
                     $result = $system->db->query(
-                        "SELECT `user_name`, `message`, `time` FROM `chat` WHERE `post_id`='$content_id' LIMIT 1"
+                        "SELECT `user_name`, `message`, `time` FROM `chat` WHERE `post_id`='$content_id' && `deleted`=0 LIMIT 1"
                     );
                     if($system->db->last_num_rows == 0) {
                         throw new RuntimeException("Invalid user!");
@@ -189,7 +189,7 @@ function report() {
                     break;
                 case ReportManager::REPORT_TYPE_CHAT:
                     $result = $system->db->query(
-                        "SELECT `user_name`, `message` FROM `chat` WHERE `post_id`='$content_id' LIMIT 1"
+                        "SELECT `user_name`, `message` FROM `chat` WHERE `post_id`='$content_id' AND `deleted`=0 LIMIT 1"
                     );
                     if($system->db->last_num_rows == 0) {
                         throw new RuntimeException("Invalid user!");

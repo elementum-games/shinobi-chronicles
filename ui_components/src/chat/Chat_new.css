@@ -371,6 +371,9 @@
     cursor: pointer;
     background-image: url("/images/v2/icons/delete.png");
 }
+.recover_post_wrapper {
+    cursor: pointer;
+}
 .post_report_wrapper {
     width: 16px;
     height: 16px;

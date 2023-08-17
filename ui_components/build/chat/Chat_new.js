@@ -56,6 +56,12 @@ function Chat({
       post_id: postId
     }).then(handleApiResponse);
   }
+  function recoverPost(postId) {
+    apiFetch(chatApiLink, {
+      request: 'recover_post',
+      post_id: postId
+    }).then(handleApiResponse);
+  }
   function changePage(newStartingPostId) {
     if (newStartingPostId === currentPagePostIdRef.current) {
       return;
@@ -116,6 +122,7 @@ function Chat({
     nextPagePostId: nextPagePostId,
     isModerator: isModerator,
     deletePost: deletePost,
+    recoverPost: recoverPost,
     quotePost: quotePost,
     goToNextPage: () => changePage(nextPagePostId),
     goToPreviousPage: () => changePage(previousPagePostId),
@@ -242,6 +249,7 @@ function ChatPosts({
   nextPagePostId,
   isModerator,
   deletePost,
+  recoverPost,
   quotePost,
   goToPreviousPage,
   goToNextPage,
@@ -355,13 +363,17 @@ function ChatPosts({
     className: "post_quote",
     src: "../images/v2/icons/quote_hover.png",
     onClick: () => quotePost(post.id)
-  })), isModerator && /*#__PURE__*/React.createElement("div", {
+  })), isModerator && !post.deleted && /*#__PURE__*/React.createElement("div", {
     className: "post_delete_wrapper"
   }, /*#__PURE__*/React.createElement("img", {
     className: "post_delete",
     src: "../images/v2/icons/delete_hover.png",
     onClick: () => deletePost(post.id)
-  })), /*#__PURE__*/React.createElement("div", {
+  })), isModerator && post.deleted && /*#__PURE__*/React.createElement("div", {
+    className: "recover_post_wrapper"
+  }, /*#__PURE__*/React.createElement("span", {
+    onClick: () => recoverPost(post.id)
+  }, "Recover")), /*#__PURE__*/React.createElement("div", {
     className: "post_report_wrapper"
   }, /*#__PURE__*/React.createElement("a", {
     className: "imageLink",

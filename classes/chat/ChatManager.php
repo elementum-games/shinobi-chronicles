@@ -63,10 +63,18 @@ class ChatManager {
      */
     private function fetchPosts(?int $starting_post_id = null, int $max_posts = self::MAX_POSTS_PER_PAGE, bool $is_quote = false): array {
         if($starting_post_id != null) {
-            $query = "SELECT * FROM `chat` WHERE `post_id` <= $starting_post_id ORDER BY `post_id` DESC LIMIT $max_posts";
+            $query = "SELECT * FROM `chat` WHERE ";
+            if(!$this->player->staff_manager->isModerator() || !$this->player->staff_manager->isUserAdmin()) {
+                $query .= "`deleted`=0 AND ";
+            }
+            $query .= "`post_id` <= $starting_post_id ORDER BY `post_id` DESC LIMIT $max_posts";
         }
         else {
-            $query = "SELECT * FROM `chat` ORDER BY `post_id` DESC LIMIT $max_posts";
+            $query = "SELECT * FROM `chat` ";
+            if(!$this->player->staff_manager->isModerator() || !$this->player->staff_manager->isUserAdmin()) {
+                $query .= "WHERE`deleted`=0 ";
+            }
+            $query .= "ORDER BY `post_id` DESC LIMIT $max_posts";
         }
         $result = $this->system->db->query($query);
 
@@ -201,14 +209,14 @@ class ChatManager {
                         $quote = $this->fetchPosts($id[1], 1, true);
                         if ($quote) {
                             // if id match
-                            if ($quote[0]->id == $id[1]) {
+                            if (!$quote[0]->deleted) {
                                 // format each entry in $quotes
                                 $formatted_quote = "<div class='quote_container'><a class='chat_user_name " . implode(' ', $quote[0]->user_link_class_names) . "' href='" . $this->system->router->getURL("members", ["user" => $quote[0]->user_name]) . "'>" . $quote[0]->user_name . "</a><div class='quote_message chat_meme_small'>" . $quote[0]->message . "</div></div>";
                                 // replace one instance
                                 $post->message = preg_replace("/" . preg_quote($match, '/') . '/', $formatted_quote, $post->message, 1);
                             }
                             else {
-                                $post->message = str_replace($matches[0], "<i>(removed)</i>", $post->message);
+                                $post->message = str_replace($matches[0], "<div class='quote_container'>Content removed)</div>", $post->message);
                             }
                         }
                     }
@@ -218,7 +226,10 @@ class ChatManager {
                 }
             }
 
-
+            // Deleted post
+            if($post->deleted) {
+                $post->message .= "<br /><b><em>(deleted)</em></b>";
+            }
             $posts[] = $post;
         }
 
@@ -264,11 +275,11 @@ class ChatManager {
             }
 
             $sql = "INSERT INTO `chat`
-                    (`user_name`, `message`, `title`, `village`, `staff_level`, `user_color`, `time`, `edited`) VALUES
-                           ('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s')";
+                    (`user_name`, `message`, `title`, `village`, `staff_level`, `user_color`, `time`, `edited`, `deleted`) VALUES
+                           ('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s')";
             $this->system->db->query(
                 sprintf(
-                    $sql, $this->player->user_name, $message, $title, $this->player->village->name, $staff_level, $user_color, time(), 0
+                    $sql, $this->player->user_name, $message, $title, $this->player->village->name, $staff_level, $user_color, time(), 0, 0
                 )
             );
             $new_post_id = $this->system->db->last_insert_id;
@@ -371,13 +382,32 @@ class ChatManager {
      * @throws RuntimeException
      */
     public function deletePost(int $post_id): array {
-        $this->system->db->query("DELETE FROM `chat` WHERE `post_id` = $post_id LIMIT 1");
+		$this->system->db->query("UPDATE `chat` SET `deleted`=1 WHERE `post_id`=$post_id LIMT 1");
+		$player->staff_manager->staffLog(StaffManager::STAFF_LOG_MOD, "{$player->user_name}({$player->user_id}) deleted chat post #{$post_id}");
 
         if($this->system->db->last_affected_rows == 0) {
             throw new RuntimeException("Error deleting post!");
         }
 
         return ChatAPIPresenter::deletePostResponse(
+            $this->system,
+            $this->fetchPosts(0, is_quote: false)
+
+        );
+    }
+
+    /**
+     * @throws RuntimeException
+     */
+    public function recoverPost(int $post_id): array {
+        $this->system->db->query("UPDATE `chat` SET `deleted`=0 WHERE `post_id`=$post_id LIMIT 1");
+        $this->player->staff_manager->staffLog(StaffManager::STAFF_LOG_MOD, "{$this->player->user_name}({$this->player->user_id}) recovered chat post #{$post_id}");
+
+        if($this->system->db->last_affected_rows == 0) {
+            throw new RuntimeException("Error recover post!");
+        }
+
+        return ChatAPIPresenter::recoverPostResponse(
             $this->system,
             $this->fetchPosts(0, is_quote: false)
 

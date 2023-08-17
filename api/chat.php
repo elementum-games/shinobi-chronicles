@@ -48,6 +48,15 @@ try {
                 debug_messages: [],
                 system: $system,
             );
+        case 'recover_post':
+            $post_id = (int)$_POST['post_id'];
+
+            API::exitWithData(
+                data: $chatManager->recoverPost($post_id),
+                errors: [],
+                debug_messages: [],
+                system: $system,
+            );
     }
 } catch(RuntimeException $e) {
     API::exitWithException($e, system: $system);

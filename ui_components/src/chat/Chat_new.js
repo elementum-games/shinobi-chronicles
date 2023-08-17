@@ -95,6 +95,13 @@ function Chat({
         }).then(handleApiResponse);
     }
 
+    function recoverPost(postId) {
+        apiFetch(chatApiLink, {
+            request: 'recover_post',
+            post_id: postId,
+        }).then(handleApiResponse);
+    }
+
     function changePage(newStartingPostId: ?number) {
         if(newStartingPostId === currentPagePostIdRef.current) {
             return;
@@ -167,6 +174,7 @@ function Chat({
                 nextPagePostId={nextPagePostId}
                 isModerator={isModerator}
                 deletePost={deletePost}
+                recoverPost={recoverPost}
                 quotePost={quotePost}
                 goToNextPage={() => changePage(nextPagePostId)}
                 goToPreviousPage={() => changePage(previousPagePostId)}
@@ -297,6 +305,7 @@ function ChatPosts({
     nextPagePostId,
     isModerator,
     deletePost,
+    recoverPost,
     quotePost,
     goToPreviousPage,
     goToNextPage,
@@ -365,7 +374,7 @@ function ChatPosts({
                                     src='../images/v2/icons/quote_hover.png'
                                     onClick={() => quotePost(post.id)}
                                 /></div>
-                                {isModerator &&
+                                {isModerator && !post.deleted &&
                                     <div className='post_delete_wrapper'>
                                         <img
                                             className='post_delete'
@@ -374,6 +383,11 @@ function ChatPosts({
                                         />
                                     </div>
                                     
+                                }
+                                {isModerator && post.deleted &&
+                                    <div className='recover_post_wrapper'>
+                                        <span onClick={() => recoverPost(post.id)}>Recover</span>
+                                    </div>
                                 }
                                 <div className='post_report_wrapper'>
                                     <a className='imageLink' href={post.reportLink}>

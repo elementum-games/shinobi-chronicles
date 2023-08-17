@@ -17,7 +17,8 @@ class ChatPostDto {
         public array $user_link_class_names = [],
         public string $staff_banner_name = "",
         public string $staff_banner_color = "",
-        public string $time_string = ""
+        public string $time_string = "",
+        public bool $deleted = false,
     ) {}
 
     public static function fromDb(array $post_data): ChatPostDto {
@@ -30,6 +31,7 @@ class ChatPostDto {
             time: $post_data['time'],
             staff_level: $post_data['staff_level'],
             user_color: $post_data['user_color'],
+            deleted: $post_data['deleted'],
         );
     }
 }
