@@ -123,30 +123,34 @@ else {
 
                 $total_amount = $kunai_amount + $bonus;
 
-				$query = "UPDATE `users` SET 
-				`premium_credits` = `premium_credits` + '" . ($total_amount) . "', 
-				`premium_credits_purchased` = `premium_credits_purchased` + '" . ($total_amount) . "'
-				WHERE `user_id`='$user_id' LIMIT 1";
-				$system->db->query($query);
-
-                $result = $system->db->query("SELECT `premium_credits` FROM `users` WHERE `user_id`='{$user_id}'");
-                $user = $system->db->fetch($result);
-
-                if($user == null) {
+                $system->db->query("SELECT `user_id` FROM `users` WHERE `user_id`=$user_id");
+                if(!$system->db->last_num_rows) {
                     $system->log('shard_purchase', 'invalid_user',"Transaction $txn_id for user #{$user_id}");
                 }
                 else {
-                    $system->currencyLog(
-                        $user_id,
-                        System::CURRENCY_TYPE_PREMIUM_CREDITS,
-                        $user['premium_credits'] - $total_amount,
-                        $user['premium_credits'],
-                        $total_amount,
-                        "Purchased AK via Paypal (TXN: $txn_id)"
+                    $currency_user = User::loadFromId(
+                        system: $system,
+                        user_id: $user_id,
+                        remote_view: true
+                    );
+                    $currency_user->loadData(User::UPDATE_NOTHING);
+                    $currency_user->currency->addPremiumCredits(
+                        amount: $total_amount,
+                        description: "Purchased AK via Paypal (TXN: $txn_id)",
+                        increment_purchased: true
+                    );
+                    $currency_user->updateData();
+                    Inbox::sendAlert(
+                        system: $system,
+                        type: Inbox::ALERT_AK_RECEIVED,
+                        sender_id: 1,
+                        target_id: $currency_user->user_id,
+                        message: "Your purchase of $total_amount " . Currency::PREMIUM_NAME .
+                        " has been processed adn credited to your account. Thank you."
                     );
                 }
 
-				/*$system->send_pm("Lsmjudoka", "$user_id", "Shard purchase",
+                /*$system->send_pm("Lsmjudoka", "$user_id", "Shard purchase",
 				"Your purchase of " . ($kunai_amount + $bonus) . " Ancient Kunai" . ($bonus > 0 ? " ($kunai_amount + $bonus bonus)" : "") .
 				" has been processed and credited to your account. Thank you!");*/
 				
