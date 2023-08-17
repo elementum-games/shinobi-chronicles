@@ -730,7 +730,7 @@ class User extends Fighter {
             if($completion_data != null) {
                 $this->currency->addMoney($completion_data['money_gain'], 'Completed daily task');
                 $rep_gain = $this->reputation->addRep($completion_data['rep_gain'], UserReputation::DAILY_TASK_BYPASS_CAP);
-                $task_display = "You have completed the task" . (sizeof($completion_data['tasks_completed']) > 1 ? "s" : "");
+                $task_display = "You have completed the task " . (sizeof($completion_data['tasks_completed']) > 1 ? "s" : "");
                 foreach ($completion_data['tasks_completed'] as $x => $t_name) {
                     if ($x > 0) {
                         if ($x == sizeof($completion_data['tasks_completed']) - 1) {

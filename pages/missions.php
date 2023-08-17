@@ -56,7 +56,7 @@ function missions(): bool {
             // TEMP Event Missions
             if (isset($_GET['mission_type'])) {
                 if ($_GET['mission_type'] == "event") {
-                    if($system->event == null) {
+                    if ($system->event == null) {
                         throw new RuntimeException("Event not active!");
                     }
 
