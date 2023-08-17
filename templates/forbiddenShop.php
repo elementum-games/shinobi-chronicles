@@ -25,6 +25,7 @@ $ForbiddenShopManager = new ForbiddenShopManager($system, $player);
                 eventData: <?= json_encode(ForbiddenShopAPIPresenter::eventDataResponse()) ?>,
                 availableEventJutsu: <?= json_encode(ForbiddenShopApiPresenter::eventJutsuResponse($ForbiddenShopManager)) ?>,
                 initialPlayerInventory: <?= json_encode(UserAPIPresenter::playerInventoryResponse(player: $player)) ?>,
+                exchangeData: <?=  json_encode(ForbiddenShopApiPresenter::exchangeDataResponse())?>,
             }),
             forbiddenShopContainer
         );

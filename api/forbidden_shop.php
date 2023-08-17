@@ -28,6 +28,9 @@ try {
         case "getEventData":
             $response->data = ForbiddenShopAPIPresenter::eventDataResponse();
             break;
+        case "getExchangeData":
+            $response->data = ForbiddenShopAPIPresenter::exchangeDataResponse();
+            break;
         case "exchangeAllEventCurrency":
             $event_key = $system->db->clean($_POST['event_key']);
 

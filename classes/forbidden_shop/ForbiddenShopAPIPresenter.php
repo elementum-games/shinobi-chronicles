@@ -1,6 +1,7 @@
 <?php
 
 require_once __DIR__ . '/../event/LanternEvent.php';
+require_once __DIR__ . '/../forbidden_shop/ForbiddenShopManager.php';
 
 class ForbiddenShopApiPresenter {
 
@@ -23,6 +24,19 @@ class ForbiddenShopApiPresenter {
                 'red_lanterns_per_violet' => LanternEvent::$static_config['red_lanterns_per_violet'],
                 'red_lanterns_per_gold' => LanternEvent::$static_config['red_lanterns_per_gold'],
                 'red_lanterns_per_shadow' => LanternEvent::$static_config['red_lanterns_per_shadow'],
+            ],
+        ];
+    }
+    /**
+     * @throws RuntimeException
+     */
+    public static function exchangeDataResponse()
+    {
+        return [
+            'exchangeData' => [
+                'ayakashiFavor' => ForbiddenShopManager::AYAKASHI_FAVOR,
+                'favorExchange' => ForbiddenShopManager::FAVOR_EXCHANGE,
+                'factionMissions' => ForbiddenShopManager::FACTION_MISSIONS
             ],
         ];
     }

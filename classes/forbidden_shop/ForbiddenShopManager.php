@@ -17,6 +17,13 @@ class ForbiddenShopManager {
         127 => 1000, // forbidden scroll
     ];
 
+    const FACTION_MISSIONS = [
+        'easy' => 151,
+        'normal' => 152,
+        'hard' => 153,
+        'nightmare' => 154,
+    ];
+
     /**
      * @param $jutsu_id
      * @return string

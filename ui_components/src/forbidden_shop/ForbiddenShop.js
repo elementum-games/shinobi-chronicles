@@ -36,12 +36,17 @@ type Props = {|
     |},
     +availableEventJutsu: $ReadOnlyArray<JutsuType>,
     +initialPlayerInventory: PlayerInventoryType,
+    +exchangeData: {|
+        +ayakashiFavor: int,
+        +favorExchange: $ReadOnlyArray<int>,
+    |},
 |};
 function ForbiddenShop({
     links,
     eventData,
     availableEventJutsu,
     initialPlayerInventory,
+    exchangeData,
 }: Props) {
     const scrollExchangeRef = React.useRef(null);
     const currencyExchangeRef = React.useRef(null);
@@ -74,6 +79,7 @@ function ForbiddenShop({
                 forbiddenShopApiLink={links.forbiddenShopAPI}
                 missionLink={links.missionLink}
                 eventData={eventData.lanternEvent}
+                exchangeData={exchangeData}
             />
         </div>
     )
@@ -472,6 +478,7 @@ type factionSectionProps = {|
     +forbiddenShopApiLink: string,
     +missionLink: string,
     +eventData: LanternEventData,
+    +exchangeData: ExchangeData,
 |};
 function FactionSection({
     playerInventory,
@@ -479,11 +486,12 @@ function FactionSection({
     forbiddenShopApiLink,
     missionLink,
     eventData,
+    exchangeData,
 }: factionSectionProps) {
-    var easyMissionId = 151;
-    var normalMissionId = 152;
-    var hardMissionId = 153;
-    var nightmareMissionId = 154;
+    const easyMissionId = React.useRef(exchangeData.exchangeData.factionMissions['easy']);
+    var normalMissionId = React.useRef(exchangeData.exchangeData.factionMissions['normal']);
+    var hardMissionId = React.useRef(exchangeData.exchangeData.factionMissions['hard']);
+    var nightmareMissionId = React.useRef(exchangeData.exchangeData.factionMissions['nightmare']);
     const [responseMessage, setResponseMessage] = React.useState(null);
     
     function exchangeFavor(itemId) {
@@ -512,7 +520,7 @@ function FactionSection({
                 <div className="section_title">Akuji's Lair</div>
                 <div className="favor_count_container">
                     <div className="favor_count_label">AYAKASHI'S FAVOR</div>
-                    <div className="favor_count">x{playerInventory.items[131]?.quantity || 0}
+                    <div className="favor_count">x{playerInventory.items[exchangeData.exchangeData.ayakashiFavor]?.quantity || 0}
                     </div>
                 </div>
             </div>
@@ -528,7 +536,7 @@ function FactionSection({
                             onClick={exchangeFavor}
                             itemId={eventData.forbidden_jutsu_scroll_id}
                         />
-                        <div className="favor_exchange_label">-1000 Favor</div>
+                        <div className="favor_exchange_label">-{exchangeData.exchangeData.favorExchange[eventData.forbidden_jutsu_scroll_id]} Favor</div>
                     </div>
                 </div>
                 <div className="faction_mission_header">Begin Missions</div>
@@ -537,7 +545,7 @@ function FactionSection({
                         <MissionButton
                             buttonText={"Easy"}
                             onClick={beginMission}
-                            missionId={easyMissionId}
+                            missionId={easyMissionId.current}
                         />
                         <div className="favor_exchange_label">+2 Favor</div>
                     </div>
@@ -545,7 +553,7 @@ function FactionSection({
                         <MissionButton
                             buttonText={"Normal"}
                             onClick={beginMission}
-                            missionId={normalMissionId}
+                            missionId={normalMissionId.current}
                         />
                         <div className="favor_exchange_label">+3 Favor</div>
                     </div>
@@ -553,7 +561,7 @@ function FactionSection({
                         <MissionButton
                             buttonText={"Hard"}
                             onClick={beginMission}
-                            missionId={hardMissionId}
+                            missionId={hardMissionId.current}
                         />
                         <div className="favor_exchange_label">+4 Favor</div>
                     </div>
@@ -561,7 +569,7 @@ function FactionSection({
                         <MissionButton
                             buttonText={"Nightmare"}
                             onClick={beginMission}
-                            missionId={nightmareMissionId}
+                            missionId={nightmareMissionId.current}
                         />
                         <div className="favor_exchange_label">+5 Favor</div>
                     </div>
