@@ -68,10 +68,12 @@ class NotificationManager {
                 WHERE `user_id` = {$user_id}
                 AND `type` = '{$type}'
                 AND `notification_id` = (
-                    SELECT MIN(`notification_id`)
-                    FROM `notifications`
-                    WHERE `user_id` = {$user_id}
-                    AND `type` = '{$type}'
+                    SELECT `notification_id` FROM (
+                        SELECT MIN(`notification_id`) AS `notification_id`
+                        FROM `notifications`
+                        WHERE `user_id` = {$user_id}
+                        AND `type` = '{$type}'
+                    ) AS tmp
                 )
             ");
         }
