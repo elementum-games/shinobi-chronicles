@@ -76,6 +76,8 @@ class UserApiPresenter {
             'max_chakra' => $player->max_chakra,
             'stamina' => (int) $player->stamina,
             'max_stamina' => $player->max_stamina,
+            'health_regen' => $player->regen_rate * USER::$HEAL_REGEN_MULTIPLIER[$player->rank_num],
+            'pool_regen' => $player->regen_rate
         ];
     }
 

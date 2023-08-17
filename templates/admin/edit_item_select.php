@@ -19,6 +19,9 @@ if(isset($_GET['item_type'])) {
         case 'special':
             $item_type = Item::USE_TYPE_SPECIAL;
             break;
+        case 'currency':
+            $item_type = Item::USE_TYPE_CURRENCY;
+            break;
     }
 }
 
@@ -48,7 +51,9 @@ $selected_link_style = "text-decoration:none;";
     <a href='<?= $self_link ?>&item_type=consumable' class='<?= ($item_type == Item::USE_TYPE_CONSUMABLE ? 'selected' : "") ?>'>
         Consumables</a> |
     <a href='<?= $self_link ?>&item_type=special' class='<?= ($item_type == Item::USE_TYPE_SPECIAL ? 'selected' : "") ?>'>
-        Special
+        Special</a> | 
+    <a href='<?= $self_link ?>&item_type=currency' class='<?= ($item_type == Item::USE_TYPE_CURRENCY ? 'selected' : "") ?>'>
+        Currency
     </a>
 </p>
 

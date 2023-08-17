@@ -36,15 +36,23 @@ type Props = {|
     |},
     +availableEventJutsu: $ReadOnlyArray<JutsuType>,
     +initialPlayerInventory: PlayerInventoryType,
+    +exchangeData: {|
+        +ayakashiFavor: int,
+        +favorExchange: $ReadOnlyArray<int>,
+    |},
 |};
 function ForbiddenShop({
     links,
     eventData,
     availableEventJutsu,
     initialPlayerInventory,
+    favorExchangeData,
+    factionMissions,
+    ayakashiFavorId,
 }: Props) {
     const scrollExchangeRef = React.useRef(null);
     const currencyExchangeRef = React.useRef(null);
+    const [playerInventory, setPlayerInventory] = React.useState(initialPlayerInventory);
     return (
         <div className="forbidden_shop_container">
             <ShopMenu
@@ -53,17 +61,29 @@ function ForbiddenShop({
                 currencyExchangeRef={currencyExchangeRef}
             />
             <ScrollExchange
-                initialPlayerInventory={initialPlayerInventory}
+                playerInventory={playerInventory}
+                setPlayerInventory={setPlayerInventory}
                 forbiddenShopApiLink={links.forbiddenShopAPI}
                 eventData={eventData.lanternEvent}
                 availableEventJutsu={availableEventJutsu}
                 scrollExchangeRef={scrollExchangeRef}
             />
             <LanternEventCurrencyExchange
-                initialPlayerInventory={initialPlayerInventory}
+                playerInventory={playerInventory}
+                setPlayerInventory={setPlayerInventory}
                 eventData={eventData.lanternEvent}
                 forbiddenShopApiLink={links.forbiddenShopAPI}
                 currencyExchangeRef={currencyExchangeRef}
+            />
+            <FactionSection
+                playerInventory={playerInventory}
+                setPlayerInventory={setPlayerInventory}
+                forbiddenShopApiLink={links.forbiddenShopAPI}
+                missionLink={links.missionLink}
+                eventData={eventData.lanternEvent}
+                favorExchangeData={favorExchangeData}
+                factionMissions={factionMissions}
+                ayakashiFavorId={ayakashiFavorId}
             />
         </div>
     )
@@ -85,6 +105,14 @@ function ShopMenu({ ShopMenuButton, scrollExchangeRef, currencyExchangeRef }) {
         setDialogueText("... <span class='dialogue_highlight'>Akuji</span>. Nevermind the what.\n Now, you have something that\n belongs to me.");
         setActiveButtonName("questionTwo");
     }
+    function questionThreeClick() {
+        setDialogueText("<span class='dialogue_highlight'>Forbidden</span> knowledge is not so easily given... but perhaps to those who prove themselves useful.");
+        setActiveButtonName("questionThree");
+    }
+    function questionFourClick() {
+        setDialogueText("You seek the power of the <span class='dialogue_highlight'>Curse</span>?\n No... you are not yet ready.");
+        setActiveButtonName("questionFour");
+    }
     function scrollExchangeJump() {
         setDialogueText("...");
         setActiveButtonName("scrollExchange");
@@ -94,6 +122,10 @@ function ShopMenu({ ShopMenuButton, scrollExchangeRef, currencyExchangeRef }) {
         setDialogueText("...");
         setActiveButtonName("currencyExchange");
         scrollTo(currencyExchangeRef.current);
+    }
+    function missionsJump() {
+        setDialogueText("...");
+        setActiveButtonName("missions");
     }
 
     return (
@@ -134,19 +166,41 @@ function ShopMenu({ ShopMenuButton, scrollExchangeRef, currencyExchangeRef }) {
                     buttonClass={"button_second"}
                 />
                 <ShopMenuButton
+                    onClick={questionThreeClick}
+                    buttonText={"I seek Knowledge"}
+                    buttonName={"questionThree"}
+                    activeButtonName={activeButtonName}
+                    buttonClass={"button_third"}
+                />
+                <ShopMenuButton
+                    onClick={questionFourClick}
+                    buttonText={"I seek Power"}
+                    buttonName={"questionFour"}
+                    activeButtonName={activeButtonName}
+                    buttonClass={"button_fourth"}
+                />
+                {/*
+                <ShopMenuButton
                     onClick={scrollExchangeJump}
                     buttonText={"Scroll exchange"}
                     buttonName={"scrollExchange"}
                     activeButtonName={activeButtonName}
-                    buttonClass={"button_third"}
+                    buttonClass={"button_fifth"}
                 />
                 <ShopMenuButton
                     onClick={currencyExchangeJump}
                     buttonText={"Currency exchange"}
                     buttonName={"currencyExchange"}
                     activeButtonName={activeButtonName}
-                    buttonClass={"button_fourth"}
+                    buttonClass={"button_sixth"}
                 />
+                <ShopMenuButton
+                    onClick={missionsJump}
+                    buttonText={"Missions"}
+                    buttonName={"missions"}
+                    activeButtonName={activeButtonName}
+                    buttonClass={"button_seventh"}
+                />*/}
             </div>
         </div>
     );
@@ -203,12 +257,12 @@ type CurrencyExchangeProps = {|
     +currencyExchangeRef: RefType,
 |};
 function LanternEventCurrencyExchange({
-    initialPlayerInventory,
+    playerInventory,
+    setPlayerInventory,
     eventData,
     forbiddenShopApiLink,
     currencyExchangeRef,
 }: CurrencyExchangeProps) {
-    const [playerInventory, setPlayerInventory] = React.useState(initialPlayerInventory);
 
     const playerQuantities = {
         redLantern: playerInventory.items[eventData.red_lantern_id]?.quantity || 0,
@@ -335,8 +389,7 @@ type ScrollExchangeProps = {|
     +availableEventJutsu: $ReadOnlyArray<JutsuType>,
     +scrollExchangeRef: RefType,
 |};
-function ScrollExchange({ initialPlayerInventory, forbiddenShopApiLink, eventData, availableEventJutsu, scrollExchangeRef }: ScrollExchangeProps) {
-    const [playerInventory, setPlayerInventory] = React.useState(initialPlayerInventory);
+function ScrollExchange({ playerInventory, setPlayerInventory, forbiddenShopApiLink, eventData, availableEventJutsu, scrollExchangeRef }: ScrollExchangeProps) {
     const [responseMessage, setResponseMessage] = React.useState(null);
 
     function buyForbiddenJutsu(jutsuId) {
@@ -374,7 +427,7 @@ function ScrollExchange({ initialPlayerInventory, forbiddenShopApiLink, eventDat
                     </div>
                 </div>
             </div>
-            <div className="scroll_exchange_container">
+            <div className="scroll_exchange_container box-secondary">
                 {jutsuForPurchase.map((jutsu) => (
                     <JutsuScroll
                         key={jutsu.id}
@@ -421,6 +474,166 @@ function JutsuScroll({ jutsu_data, onClick }: JutsuScrollProps) {
                 </div>
             </div>
         </div>
+    )
+}
+
+type factionSectionProps = {|
+    +initialPlayerInventory: PlayerInventoryType,
+    +forbiddenShopApiLink: string,
+    +missionLink: string,
+    +eventData: LanternEventData,
+    +exchangeData: ExchangeData,
+|};
+function FactionSection({
+    playerInventory,
+    setPlayerInventory,
+    forbiddenShopApiLink,
+    missionLink,
+    factionMissions,
+    ayakashiFavorId,
+    favorExchangeData,
+    eventData
+}: factionSectionProps) {
+    const easyMissionId = React.useRef(factionMissions['easy']);
+    var normalMissionId = React.useRef(factionMissions['normal']);
+    var hardMissionId = React.useRef(factionMissions['hard']);
+    var nightmareMissionId = React.useRef(factionMissions['nightmare']);
+    const [responseMessage, setResponseMessage] = React.useState(null);
+    
+    function exchangeFavor(itemId) {
+
+        apiFetch(forbiddenShopApiLink, {
+            request: 'exchangeFavor',
+            item_id: itemId,
+        }).then(response => {
+            if (response.errors.length) {
+                setResponseMessage(response.errors);
+                console.error(response.errors);
+            }
+            else {
+                setResponseMessage(response.data.message);
+                setPlayerInventory(response.data.playerInventory);
+            }
+        })
+    }
+    function beginMission(missionId) {
+        window.location.href = missionLink + "&mission_type=faction&start_mission=" + missionId;
+    }
+
+    return (
+        <div className="faction_section">
+            <div className="faction_section_header">
+                <div className="section_title">Akuji's Lair</div>
+                <div className="favor_count_container">
+                    <div className="favor_count_label">AYAKASHI'S FAVOR</div>
+                    <div className="favor_count">x{playerInventory.items[ayakashiFavorId]?.quantity || 0}
+                    </div>
+                </div>
+            </div>
+            <div className="faction_section_container box-secondary">
+                <div className="favor_exchange_header">Favor Exchange</div>
+                <div className="favor_exchange_response">
+                    {responseMessage}
+                </div>
+                <div className="favor_exchange_container">
+                    <div className="favor_exchange_item">
+                        <FavorButton
+                            buttonText={"Request Forbidden Scroll"}
+                            onClick={exchangeFavor}
+                            itemId={eventData.forbidden_jutsu_scroll_id}
+                        />
+                        <div className="favor_exchange_label">-{favorExchangeData[eventData.forbidden_jutsu_scroll_id]} Favor</div>
+                    </div>
+                </div>
+                <div className="faction_mission_header">Begin Missions</div>
+                <div className="faction_mission_container">
+                    <div>
+                        <MissionButton
+                            buttonText={"Easy"}
+                            onClick={beginMission}
+                            missionId={easyMissionId.current}
+                        />
+                        <div className="favor_exchange_label">+2 Favor</div>
+                    </div>
+                    <div>
+                        <MissionButton
+                            buttonText={"Normal"}
+                            onClick={beginMission}
+                            missionId={normalMissionId.current}
+                        />
+                        <div className="favor_exchange_label">+3 Favor</div>
+                    </div>
+                    <div>
+                        <MissionButton
+                            buttonText={"Hard"}
+                            onClick={beginMission}
+                            missionId={hardMissionId.current}
+                        />
+                        <div className="favor_exchange_label">+4 Favor</div>
+                    </div>
+                    <div>
+                        <MissionButton
+                            buttonText={"Nightmare"}
+                            onClick={beginMission}
+                            missionId={nightmareMissionId.current}
+                        />
+                        <div className="favor_exchange_label">+5 Favor</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    )
+}
+
+type missionButtonProps = {|
+|};
+function MissionButton({
+    buttonText,
+    onClick,
+    missionId
+}: missionButtonProps) {
+    return (
+        <>
+            <svg role="button" tabIndex="0" name="mission_button" className="mission_button" width="128" height="24" onClick={() => onClick(missionId)} onKeyPress={clickOnEnter} style={{ zIndex: 2 }}>
+                <radialGradient id="mission_fill_default" cx="50%" cy="50%" r="50%" fx="50%" fy="50%">
+                    <stop offset="0%" style={{ stopColor: '#84314e', stopOpacity: 1 }} />
+                    <stop offset="100%" style={{ stopColor: '#68293f', stopOpacity: 1 }} />
+                </radialGradient>
+                <radialGradient id="mission_fill_click" cx="50%" cy="50%" r="50%" fx="50%" fy="50%">
+                    <stop offset="0%" style={{ stopColor: '#68293f', stopOpacity: 1 }} />
+                    <stop offset="100%" style={{ stopColor: '#84314e', stopOpacity: 1 }} />
+                </radialGradient>
+                <rect className="mission_button_background" width="100%" height="100%" fill="url(#mission_fill_default)" />
+                <text className="mission_button_shadow_text" x="64" y="14" textAnchor="middle" dominantBaseline="middle">{buttonText}</text>
+                <text className="mission_button_text" x="64" y="12" textAnchor="middle" dominantBaseline="middle">{buttonText}</text>
+            </svg>
+        </>
+    )
+}
+
+type favorButtonProps = {|
+|};
+function FavorButton({
+    buttonText,
+    onClick,
+    itemId,
+}: favorButtonProps) {
+    return (
+        <>
+            <svg role="button" tabIndex="0" name="favor_button" className="favor_button" width="200" height="24" onClick={() => onClick(itemId)} onKeyPress={clickOnEnter} style={{ zIndex: 2 }}>
+                <radialGradient id="favor_fill_default" cx="50%" cy="50%" r="50%" fx="50%" fy="50%">
+                    <stop offset="0%" style={{ stopColor: '#464f87', stopOpacity: 1 }} />
+                    <stop offset="100%" style={{ stopColor: '#343d77', stopOpacity: 1 }} />
+                </radialGradient>
+                <radialGradient id="favor_fill_click" cx="50%" cy="50%" r="50%" fx="50%" fy="50%">
+                    <stop offset="0%" style={{ stopColor: '#343d77', stopOpacity: 1 }} />
+                    <stop offset="100%" style={{ stopColor: '#464f87', stopOpacity: 1 }} />
+                </radialGradient>
+                <rect className="favor_button_background" width="100%" height="100%" fill="url(#favor_fill_default)" />
+                <text className="favor_button_shadow_text" x="100" y="14" textAnchor="middle" dominantBaseline="middle">{buttonText}</text>
+                <text className="favor_button_text" x="100" y="12" textAnchor="middle" dominantBaseline="middle">{buttonText}</text>
+            </svg>
+        </>
     )
 }
 

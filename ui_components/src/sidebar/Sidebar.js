@@ -196,16 +196,19 @@ function SBCharacterProfile({playerData, playerResources, playerSettings, regenT
                     resourceType="health"
                     resourceAmount={playerResources.health}
                     resourceMaxAmount={playerResources.max_health}
+                    regenRate={playerResources.health_regen}
                 />
                 <SBResourceBar
                     resourceType="chakra"
                     resourceAmount={playerResources.chakra}
                     resourceMaxAmount={playerResources.max_chakra}
+                    regenRate={playerResources.pool_regen}
                 />
                 <SBResourceBar
                     resourceType="stamina"
                     resourceAmount={playerResources.stamina}
                     resourceMaxAmount={playerResources.max_stamina}
+                    regenRate={playerResources.pool_regen}
                 />
             </div>
         </>
@@ -216,11 +219,13 @@ type SBResourceBarProps = {|
     +resourceType: "health",
     +resourceAmount: number,
     +resourceMaxAmount: number,
+    +regenRate: number,
 |};
 function SBResourceBar({
     resourceType,
     resourceAmount,
     resourceMaxAmount,
+    regenRate,
 }: SBResourceBarProps) {
     const fillPercent = Math.max(Math.round((resourceAmount / resourceMaxAmount) * 100), 6);
 
@@ -230,6 +235,9 @@ function SBResourceBar({
                 <img className="sb_resource_corner_left" src="/images/v2/decorations/barrightcorner.png" />
                 <label className="sb_innerResourceBarLabel">
                     {resourceAmount} / {resourceMaxAmount}
+                </label>
+                <label className="sb_innerResourceBarLabel_hover">
+                    {resourceAmount} / {resourceMaxAmount} (+{regenRate})
                 </label>
                 <div className={`sb_${resourceType} sb_fill`} style={{ width: fillPercent + "%" }}>
                     <svg className="sb_resource_highlight_wrapper" viewBox="0 0 50 50">

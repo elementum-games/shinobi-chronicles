@@ -7,19 +7,21 @@ class Item {
     const USE_TYPE_ARMOR = 2;
     const USE_TYPE_CONSUMABLE = 3;
     const USE_TYPE_SPECIAL = 4;
+    const USE_TYPE_CURRENCY = 5;
 
     const PURCHASE_TYPE_PURCHASABLE = 1;
-    const PURCHASE_TYPE_EVENT = 2;
+    const PURCHASE_TYPE_REWARD = 2;
 
     public static array $USE_TYPE_LABELS = [
         self::USE_TYPE_WEAPON => 'weapon',
         self::USE_TYPE_ARMOR => 'armor',
         self::USE_TYPE_CONSUMABLE => 'consumable',
         self::USE_TYPE_SPECIAL => 'special',
+        self::USE_TYPE_CURRENCY => 'currency',
     ];
     public static array $PURCHASE_TYPE_LABELS = [
         self::PURCHASE_TYPE_PURCHASABLE => 'purchasable',
-        self::PURCHASE_TYPE_EVENT => 'event',
+        self::PURCHASE_TYPE_REWARD => 'reward',
     ];
 
     public int $id;
@@ -45,7 +47,7 @@ class Item {
 
         int $purchase_cost = 0,
 
-        int $purchase_type = Item::PURCHASE_TYPE_EVENT,
+        int $purchase_type = Item::PURCHASE_TYPE_REWARD,
         int $use_type = Item::USE_TYPE_SPECIAL,
 
         string $effect = '',

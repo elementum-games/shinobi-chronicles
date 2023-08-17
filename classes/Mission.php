@@ -15,6 +15,9 @@ class Mission {
     const TYPE_SPECIAL = 4;
     const TYPE_SURVIVAL = 5; // legacy
     const TYPE_EVENT = 6;
+    const TYPE_FACTION = 7;
+
+    const FACTION_AYAKASHI = 1; // for future possible use
 
     public static array $type_names = [
         self::TYPE_VILLAGE => 'Village',
@@ -23,6 +26,7 @@ class Mission {
         self::TYPE_SPECIAL => 'Special',
         self::TYPE_SURVIVAL => 'Survival',
         self::TYPE_EVENT => 'Event',
+        self::TYPE_FACTION => 'Faction'
     ];
 
     const STATUS_IN_PROGRESS = 1;
@@ -43,6 +47,7 @@ class Mission {
     public $stages;
     public $money;
     public $rewards = [];
+    public ?TravelCoords $custom_start_location;
 
     public User $player;
     public ?Team $team;
@@ -73,6 +78,10 @@ class Mission {
         $this->mission_type = (int) $mission_data['mission_type'];
         $this->money = $mission_data['money'];
         $this->rewards = json_decode($mission_data['rewards'], true);
+
+        if (isset($mission_data['custom_start_location'])) {
+            $this->custom_start_location = TravelCoords::fromDbString($mission_data['custom_start_location']);
+        }
 
         // Unset team if normal mission
         if($this->mission_type != Mission::TYPE_TEAM) {
@@ -118,19 +127,37 @@ class Mission {
             return Mission::STATUS_COMPLETE;
         }
         // Set to completion stage if all stages have been completed
-        if($stage_id > count($this->stages)) {
-            $this->current_stage = array(
-                'stage_id' => $stage_id + 1,
-                'action_type' => 'travel',
-                'action_data' => $this->player->village_location->fetchString(),
-                'description' => 'Report back to the village to complete the mission.'
-            );
+        if ($stage_id > count($this->stages)) {
+            // if custom_start_location set
+            if (isset($this->custom_start_location)) {
+                $this->current_stage = array(
+                    'stage_id' => $stage_id + 1,
+                    'action_type' => 'travel',
+                    'action_data' => $this->custom_start_location->fetchString(),
+                    'description' => 'Return to ' . $this->custom_start_location->fetchString() . ' to complete the mission.'
+                );
+            }
+            // otherwise use village
+            else {
+                $this->current_stage = array(
+                    'stage_id' => $stage_id + 1,
+                    'action_type' => 'travel',
+                    'action_data' => $this->player->village_location->fetchString(),
+                    'description' => 'Report back to the village to complete the mission.'
+                );
+            }
             $this->player->mission_stage = $this->current_stage;
             return Mission::STATUS_IN_PROGRESS;
         }
 
         // Get last location
-        $last_location = $this->player->village_location->fetchString();
+        if (isset($this->custom_start_location)) {
+            // use custom_start_location as default
+            $last_location = $this->custom_start_location->fetchString();
+        } else {
+            // else use village as default
+            $last_location = $this->player->village_location->fetchString();
+        }
         if (isset($this->current_stage['action_type'])) {
             if ($this->current_stage['action_type'] == 'travel' || $this->current_stage['action_type'] == 'search') {
                 $last_location = $this->current_stage['action_data'];
@@ -154,8 +181,16 @@ class Mission {
 
         if($this->current_stage['action_type'] == 'travel' || $this->current_stage['action_type'] == 'search') {
             for($i = 0; $i < 3; $i++) {
+                // if location is specified
+                if (isset($this->current_stage['action_data']) && $this->current_stage['action_data'] != '0') {
+                    $location = TravelCoords::fromDbString($this->current_stage['action_data']);
+                }
+                // if first stage and custom_start_location set, use custom_start_location as root
+                else if ($stage_id == 1 && isset($this->custom_start_location)) {
+                    $location = $this->rollLocation($this->custom_start_location);
+                }
                 // if basic mission and first stage, use village as root
-                if ($stage_id == 1 && $this->mission_type != $this::TYPE_EVENT) {
+                else if ($stage_id == 1 && $this->mission_type != $this::TYPE_EVENT) {
                     $location = $this->rollLocation($this->player->village_location);
                 }
                 // otherwise, use player current location
@@ -218,12 +253,24 @@ class Mission {
 
         // Set to completion stage if all stages have been completed
         if($stage_id > count($this->stages)) {
-            $this->current_stage = array(
-                'stage_id' => $stage_id + 1,
-                'action_type' => 'travel',
-                'action_data' => $this->player->village_location->fetchString(),
-                'description' => 'Report back to the village to complete the mission.'
-            );
+            // if custom_start_location set
+            if (isset($this->custom_start_location)) {
+                $this->current_stage = array(
+                    'stage_id' => $stage_id + 1,
+                    'action_type' => 'travel',
+                    'action_data' => $this->custom_start_location->fetchString(),
+                    'description' => 'Return to ' . $this->custom_start_location->fetchString() . ' to complete the mission.'
+                );
+            }
+            // otherwise use village
+            else {
+                $this->current_stage = array(
+                    'stage_id' => $stage_id + 1,
+                    'action_type' => 'travel',
+                    'action_data' => $this->player->village_location->fetchString(),
+                    'description' => 'Report back to the village to complete the mission.'
+                );
+            }
             $this->player->mission_stage = $this->current_stage;
             return Mission::STATUS_IN_PROGRESS;
         }
@@ -277,7 +324,6 @@ class Mission {
     }
 
     public function rollLocation(TravelCoords $starting_location): TravelCoords {
-
         $max = $this->current_stage['location_radius'] * 2;
         $x = mt_rand(0, $max) - $this->current_stage['location_radius'];
         $y = mt_rand(0, $max) - $this->current_stage['location_radius'];
@@ -403,6 +449,17 @@ class Mission {
             }
         }
 
+        // Faction Mission Logic
+        if ($mission->mission_type == Mission::TYPE_FACTION) {
+            if (isset($mission->custom_start_location)) {
+                if ($player->location != $mission->custom_start_location) {
+                    throw new RuntimeException("Invalid location!");
+                }
+            } else {
+                throw new RuntimeException("Invalid custom_start_location!");
+            }
+        }
+
         $player->mission_id = $mission_id;
 
         return $mission;
@@ -446,7 +503,12 @@ class Mission {
                             $reward_items[$item['item_id']],
                             $item['quantity']
                         );
-                        $reward_text .= "Gained " . $reward_items[$item['item_id']]->name . " x" . $item['quantity'] . " " . $item['chance'] . "%<br>";
+                        if ($item['chance'] < 100) {
+                            $reward_text .= "Gained " . $reward_items[$item['item_id']]->name . " x" . $item['quantity'] . " " . $item['chance'] . "%<br>";
+                        } else {
+                            $reward_text .= "Gained " . $reward_items[$item['item_id']]->name . " x" . $item['quantity'] . "<br>";
+                        }
+
                     }
                 }
 

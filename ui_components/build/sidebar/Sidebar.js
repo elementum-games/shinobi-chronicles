@@ -203,21 +203,25 @@ function SBCharacterProfile({
   }, regenTime))))), /*#__PURE__*/React.createElement(SBResourceBar, {
     resourceType: "health",
     resourceAmount: playerResources.health,
-    resourceMaxAmount: playerResources.max_health
+    resourceMaxAmount: playerResources.max_health,
+    regenRate: playerResources.health_regen
   }), /*#__PURE__*/React.createElement(SBResourceBar, {
     resourceType: "chakra",
     resourceAmount: playerResources.chakra,
-    resourceMaxAmount: playerResources.max_chakra
+    resourceMaxAmount: playerResources.max_chakra,
+    regenRate: playerResources.pool_regen
   }), /*#__PURE__*/React.createElement(SBResourceBar, {
     resourceType: "stamina",
     resourceAmount: playerResources.stamina,
-    resourceMaxAmount: playerResources.max_stamina
+    resourceMaxAmount: playerResources.max_stamina,
+    regenRate: playerResources.pool_regen
   })));
 }
 function SBResourceBar({
   resourceType,
   resourceAmount,
-  resourceMaxAmount
+  resourceMaxAmount,
+  regenRate
 }) {
   const fillPercent = Math.max(Math.round(resourceAmount / resourceMaxAmount * 100), 6);
   return /*#__PURE__*/React.createElement("div", {
@@ -230,7 +234,9 @@ function SBResourceBar({
     src: "/images/v2/decorations/barrightcorner.png"
   }), /*#__PURE__*/React.createElement("label", {
     className: "sb_innerResourceBarLabel"
-  }, resourceAmount, " / ", resourceMaxAmount), /*#__PURE__*/React.createElement("div", {
+  }, resourceAmount, " / ", resourceMaxAmount), /*#__PURE__*/React.createElement("label", {
+    className: "sb_innerResourceBarLabel_hover"
+  }, resourceAmount, " / ", resourceMaxAmount, " (+", regenRate, ")"), /*#__PURE__*/React.createElement("div", {
     className: `sb_${resourceType} sb_fill`,
     style: {
       width: fillPercent + "%"
