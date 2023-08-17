@@ -10,7 +10,7 @@ abstract class Fighter {
     const BLOODLINE_OFFENSE_RATIO = self::SKILL_OFFENSE_RATIO * 0.8;
     const BLOODLINE_DEFENSE_MULTIPLIER = 35;
 
-    const SPEED_OFFENSE_RATIO = 0.25;
+    const SPEED_OFFENSE_RATIO = 0.35;
 
     const MIN_RAND = 33;
     const MAX_RAND = 36;
