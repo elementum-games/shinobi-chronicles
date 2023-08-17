@@ -17,7 +17,7 @@ class Mission {
     const TYPE_EVENT = 6;
     const TYPE_FACTION = 7;
 
-    const FACTION_AYAKASHI = 1;
+    const FACTION_AYAKASHI = 1; // for future possible use
 
     public static array $type_names = [
         self::TYPE_VILLAGE => 'Village',
@@ -48,7 +48,6 @@ class Mission {
     public $money;
     public $rewards = [];
     public ?TravelCoords $origin;
-    public ?int $faction_id;
 
     public User $player;
     public ?Team $team;
@@ -82,9 +81,6 @@ class Mission {
 
         if (isset($mission_data['origin'])) {
             $this->origin = TravelCoords::fromDbString($mission_data['origin']);
-        }
-        if (isset($mission_data['faction_id'])) {
-            $this->faction_id = $mission_data['faction_id'];
         }
 
         // Unset team if normal mission
