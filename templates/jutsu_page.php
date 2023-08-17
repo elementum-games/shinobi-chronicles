@@ -120,14 +120,14 @@ $rank_names = RankManager::fetchNames($system);
 
     .jutsu_details_table {
         border-radius: 10px;
-        width: 580px !important;
     }
         .jutsu_details_table tr {
-            text-align: left;
+            text-align: center;
         }
     .jutsu_details_label_column {
         vertical-align: top;
         display: inline-block;
+        text-align: left;
     }
     .jutsu_details_label_column p {
         font-weight: bold;
@@ -136,6 +136,7 @@ $rank_names = RankManager::fetchNames($system);
     .jutsu_details_info_column {
         display: inline-block;
         margin-left: 10px;
+        text-align: left;
     }
     .jutsu_details_info_column p {
         margin: 5px 0px;
