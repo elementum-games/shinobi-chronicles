@@ -20,6 +20,7 @@ $ForbiddenShopManager = new ForbiddenShopManager($system, $player);
                 links: {
                     forbiddenShopAPI: "<?= $system->router->api_links['forbidden_shop'] ?>",
                     userAPI: "<?= $system->router->api_links['user'] ?>",
+                    missionLink: "<?= $system->router->getUrl('mission') ?>"
                 },
                 eventData: <?= json_encode(ForbiddenShopAPIPresenter::eventDataResponse()) ?>,
                 availableEventJutsu: <?= json_encode(ForbiddenShopApiPresenter::eventJutsuResponse($ForbiddenShopManager)) ?>,

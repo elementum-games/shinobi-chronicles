@@ -283,7 +283,7 @@ $constraints['item'] = [
         'input_type' => 'radio',
         'options' => [
             Item::PURCHASE_TYPE_PURCHASABLE => 'purchasable',
-            Item::PURCHASE_TYPE_EVENT => 'event'
+            Item::PURCHASE_TYPE_REWARD => 'reward'
         ],
     ],
     'use_type' => [
@@ -293,7 +293,8 @@ $constraints['item'] = [
             Item::USE_TYPE_WEAPON => 'weapon',
             Item::USE_TYPE_ARMOR => 'armor',
             Item::USE_TYPE_CONSUMABLE => 'consumable',
-            Item::USE_TYPE_SPECIAL => 'Special'
+            Item::USE_TYPE_SPECIAL => 'Special',
+            Item::USE_TYPE_CURRENCY => 'Currency'
         ],
     ],
     'effect' => [
@@ -517,11 +518,17 @@ $constraints['mission'] = [
     'mission_type' => [
         'data_type' => 'int',
         'input_type' => 'radio',
-        'options' => [1 => 'Village', 2 => 'Clan', 3 => 'Team', 4 => 'Special', 6 => 'Event'],
+        'options' => [1 => 'Village', 2 => 'Clan', 3 => 'Team', 4 => 'Special', 6 => 'Event', 7 => 'Faction'],
     ],
     'money' => [
         'data_type' => 'int',
         'input_type' => 'text',
+    ],
+    'origin' => [
+        'data_type' => 'string',
+        'input_type' => 'text',
+        'max_length' => 50,
+        'field_required' => false,
     ],
     'stages' => [
         'count' => 4,

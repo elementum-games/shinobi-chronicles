@@ -50,6 +50,17 @@ try {
                 'playerInventory' => UserApiPresenter::playerInventoryResponse($player)
             ];
             break;
+        case "exchangeFavor":
+            $item_id = $system->db->clean($_POST['item_id']);
+
+            $message = $ForbiddenShopManager->exchangeFavor($item_id);
+            $player->getInventory();
+
+            $response->data = [
+                'message' => html_entity_decode($message, ENT_QUOTES),
+                'playerInventory' => UserApiPresenter::playerInventoryResponse($player)
+            ];
+            break;
         default:
             API::exitWithError(message: "Invalid request!", system: $system);
     }

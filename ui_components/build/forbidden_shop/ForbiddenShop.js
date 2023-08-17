@@ -8,6 +8,7 @@ function ForbiddenShop({
 }) {
   const scrollExchangeRef = React.useRef(null);
   const currencyExchangeRef = React.useRef(null);
+  const [playerInventory, setPlayerInventory] = React.useState(initialPlayerInventory);
   return /*#__PURE__*/React.createElement("div", {
     className: "forbidden_shop_container"
   }, /*#__PURE__*/React.createElement(ShopMenu, {
@@ -15,16 +16,24 @@ function ForbiddenShop({
     scrollExchangeRef: scrollExchangeRef,
     currencyExchangeRef: currencyExchangeRef
   }), /*#__PURE__*/React.createElement(ScrollExchange, {
-    initialPlayerInventory: initialPlayerInventory,
+    playerInventory: playerInventory,
+    setPlayerInventory: setPlayerInventory,
     forbiddenShopApiLink: links.forbiddenShopAPI,
     eventData: eventData.lanternEvent,
     availableEventJutsu: availableEventJutsu,
     scrollExchangeRef: scrollExchangeRef
   }), /*#__PURE__*/React.createElement(LanternEventCurrencyExchange, {
-    initialPlayerInventory: initialPlayerInventory,
+    playerInventory: playerInventory,
+    setPlayerInventory: setPlayerInventory,
     eventData: eventData.lanternEvent,
     forbiddenShopApiLink: links.forbiddenShopAPI,
     currencyExchangeRef: currencyExchangeRef
+  }), /*#__PURE__*/React.createElement(FactionSection, {
+    playerInventory: playerInventory,
+    setPlayerInventory: setPlayerInventory,
+    forbiddenShopApiLink: links.forbiddenShopAPI,
+    missionLink: links.missionLink,
+    eventData: eventData.lanternEvent
   }));
 }
 function ShopMenu({
@@ -48,6 +57,14 @@ function ShopMenu({
     setDialogueText("... <span class='dialogue_highlight'>Akuji</span>. Nevermind the what.\n Now, you have something that\n belongs to me.");
     setActiveButtonName("questionTwo");
   }
+  function questionThreeClick() {
+    setDialogueText("<span class='dialogue_highlight'>Forbidden</span> knowledge is not so easily given... but perhaps to those who prove themselves useful.");
+    setActiveButtonName("questionThree");
+  }
+  function questionFourClick() {
+    setDialogueText("You seek the power of the <span class='dialogue_highlight'>Curse</span>?\n No... you are not yet ready.");
+    setActiveButtonName("questionFour");
+  }
   function scrollExchangeJump() {
     setDialogueText("...");
     setActiveButtonName("scrollExchange");
@@ -57,6 +74,10 @@ function ShopMenu({
     setDialogueText("...");
     setActiveButtonName("currencyExchange");
     scrollTo(currencyExchangeRef.current);
+  }
+  function missionsJump() {
+    setDialogueText("...");
+    setActiveButtonName("missions");
   }
   return /*#__PURE__*/React.createElement("div", {
     className: "shop_menu_container"
@@ -114,15 +135,15 @@ function ShopMenu({
     activeButtonName: activeButtonName,
     buttonClass: "button_second"
   }), /*#__PURE__*/React.createElement(ShopMenuButton, {
-    onClick: scrollExchangeJump,
-    buttonText: "Scroll exchange",
-    buttonName: "scrollExchange",
+    onClick: questionThreeClick,
+    buttonText: "I seek Knowledge",
+    buttonName: "questionThree",
     activeButtonName: activeButtonName,
     buttonClass: "button_third"
   }), /*#__PURE__*/React.createElement(ShopMenuButton, {
-    onClick: currencyExchangeJump,
-    buttonText: "Currency exchange",
-    buttonName: "currencyExchange",
+    onClick: questionFourClick,
+    buttonText: "I seek Power",
+    buttonName: "questionFour",
     activeButtonName: activeButtonName,
     buttonClass: "button_fourth"
   })));
@@ -247,12 +268,12 @@ function ShopMenuButton({
   }, buttonText)));
 }
 function LanternEventCurrencyExchange({
-  initialPlayerInventory,
+  playerInventory,
+  setPlayerInventory,
   eventData,
   forbiddenShopApiLink,
   currencyExchangeRef
 }) {
-  const [playerInventory, setPlayerInventory] = React.useState(initialPlayerInventory);
   const playerQuantities = {
     redLantern: playerInventory.items[eventData.red_lantern_id]?.quantity || 0,
     blueLantern: playerInventory.items[eventData.blue_lantern_id]?.quantity || 0,
@@ -337,13 +358,13 @@ function CurrencyExchangeInput({
   }, /*#__PURE__*/React.createElement("span", null, name), /*#__PURE__*/React.createElement("span", null, "x", playerQuantity.toLocaleString()), /*#__PURE__*/React.createElement("span", null, yenToReceive.toLocaleString(), " yen"));
 }
 function ScrollExchange({
-  initialPlayerInventory,
+  playerInventory,
+  setPlayerInventory,
   forbiddenShopApiLink,
   eventData,
   availableEventJutsu,
   scrollExchangeRef
 }) {
-  const [playerInventory, setPlayerInventory] = React.useState(initialPlayerInventory);
   const [responseMessage, setResponseMessage] = React.useState(null);
   function buyForbiddenJutsu(jutsuId) {
     setResponseMessage(null);
@@ -377,7 +398,7 @@ function ScrollExchange({
   }, "FORBIDDEN SCROLLS"), /*#__PURE__*/React.createElement("div", {
     className: "scroll_count"
   }, "x", playerInventory.items[eventData.forbidden_jutsu_scroll_id]?.quantity || 0))), /*#__PURE__*/React.createElement("div", {
-    className: "scroll_exchange_container"
+    className: "scroll_exchange_container box-secondary"
   }, jutsuForPurchase.map(jutsu => /*#__PURE__*/React.createElement(JutsuScroll, {
     key: jutsu.id,
     jutsu_data: jutsu,
@@ -474,5 +495,240 @@ function JutsuScroll({
   }, "forbidden technique"), /*#__PURE__*/React.createElement("div", {
     className: "jutsu_tag_scaling"
   }, "scales with rank"))));
+}
+function FactionSection({
+  playerInventory,
+  setPlayerInventory,
+  forbiddenShopApiLink,
+  missionLink,
+  eventData
+}) {
+  var easyMissionId = 22;
+  var normalMissionId = 23;
+  var hardMissionId = 25;
+  var nightmareMissionId = 24;
+  const [responseMessage, setResponseMessage] = React.useState(null);
+  function exchangeFavor(itemId) {
+    apiFetch(forbiddenShopApiLink, {
+      request: 'exchangeFavor',
+      item_id: itemId
+    }).then(response => {
+      if (response.errors.length) {
+        setResponseMessage(response.errors);
+        console.error(response.errors);
+      } else {
+        setResponseMessage(response.data.message);
+        setPlayerInventory(response.data.playerInventory);
+      }
+    });
+  }
+  function beginMission(missionId) {
+    window.location.href = missionLink + "&mission_type=faction&start_mission=" + missionId;
+  }
+  return /*#__PURE__*/React.createElement("div", {
+    className: "faction_section"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "faction_section_header"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "section_title"
+  }, "Akuji's Lair"), /*#__PURE__*/React.createElement("div", {
+    className: "favor_count_container"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "favor_count_label"
+  }, "AYAKASHI'S FAVOR"), /*#__PURE__*/React.createElement("div", {
+    className: "favor_count"
+  }, "x", playerInventory.items[131]?.quantity || 0))), /*#__PURE__*/React.createElement("div", {
+    className: "faction_section_container box-secondary"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "favor_exchange_header"
+  }, "Favor Exchange"), /*#__PURE__*/React.createElement("div", {
+    className: "favor_exchange_response"
+  }, responseMessage), /*#__PURE__*/React.createElement("div", {
+    className: "favor_exchange_container"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "favor_exchange_item"
+  }, /*#__PURE__*/React.createElement(FavorButton, {
+    buttonText: "Request Forbidden Scroll",
+    onClick: exchangeFavor,
+    itemId: eventData.forbidden_jutsu_scroll_id
+  }), /*#__PURE__*/React.createElement("div", {
+    className: "favor_exchange_label"
+  }, "-500 Favor"))), /*#__PURE__*/React.createElement("div", {
+    className: "faction_mission_header"
+  }, "Begin Missions"), /*#__PURE__*/React.createElement("div", {
+    className: "faction_mission_container"
+  }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement(MissionButton, {
+    buttonText: "Easy",
+    onClick: beginMission,
+    missionId: easyMissionId
+  }), /*#__PURE__*/React.createElement("div", {
+    className: "favor_exchange_label"
+  }, "+4 Favor")), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement(MissionButton, {
+    buttonText: "Normal",
+    onClick: beginMission,
+    missionId: normalMissionId
+  }), /*#__PURE__*/React.createElement("div", {
+    className: "favor_exchange_label"
+  }, "+6 Favor")), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement(MissionButton, {
+    buttonText: "Hard",
+    onClick: beginMission,
+    missionId: hardMissionId
+  }), /*#__PURE__*/React.createElement("div", {
+    className: "favor_exchange_label"
+  }, "+8 Favor")), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement(MissionButton, {
+    buttonText: "Nightmare",
+    onClick: beginMission,
+    missionId: nightmareMissionId
+  }), /*#__PURE__*/React.createElement("div", {
+    className: "favor_exchange_label"
+  }, "+10 Favor")))));
+}
+function MissionButton({
+  buttonText,
+  onClick,
+  missionId
+}) {
+  return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("svg", {
+    role: "button",
+    tabIndex: "0",
+    name: "mission_button",
+    className: "mission_button",
+    width: "128",
+    height: "24",
+    onClick: () => onClick(missionId),
+    onKeyPress: clickOnEnter,
+    style: {
+      zIndex: 2
+    }
+  }, /*#__PURE__*/React.createElement("radialGradient", {
+    id: "mission_fill_default",
+    cx: "50%",
+    cy: "50%",
+    r: "50%",
+    fx: "50%",
+    fy: "50%"
+  }, /*#__PURE__*/React.createElement("stop", {
+    offset: "0%",
+    style: {
+      stopColor: '#84314e',
+      stopOpacity: 1
+    }
+  }), /*#__PURE__*/React.createElement("stop", {
+    offset: "100%",
+    style: {
+      stopColor: '#68293f',
+      stopOpacity: 1
+    }
+  })), /*#__PURE__*/React.createElement("radialGradient", {
+    id: "mission_fill_click",
+    cx: "50%",
+    cy: "50%",
+    r: "50%",
+    fx: "50%",
+    fy: "50%"
+  }, /*#__PURE__*/React.createElement("stop", {
+    offset: "0%",
+    style: {
+      stopColor: '#68293f',
+      stopOpacity: 1
+    }
+  }), /*#__PURE__*/React.createElement("stop", {
+    offset: "100%",
+    style: {
+      stopColor: '#84314e',
+      stopOpacity: 1
+    }
+  })), /*#__PURE__*/React.createElement("rect", {
+    className: "mission_button_background",
+    width: "100%",
+    height: "100%",
+    fill: "url(#mission_fill_default)"
+  }), /*#__PURE__*/React.createElement("text", {
+    className: "mission_button_shadow_text",
+    x: "64",
+    y: "14",
+    textAnchor: "middle",
+    dominantBaseline: "middle"
+  }, buttonText), /*#__PURE__*/React.createElement("text", {
+    className: "mission_button_text",
+    x: "64",
+    y: "12",
+    textAnchor: "middle",
+    dominantBaseline: "middle"
+  }, buttonText)));
+}
+function FavorButton({
+  buttonText,
+  onClick,
+  itemId
+}) {
+  return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("svg", {
+    role: "button",
+    tabIndex: "0",
+    name: "favor_button",
+    className: "favor_button",
+    width: "200",
+    height: "24",
+    onClick: () => onClick(itemId),
+    onKeyPress: clickOnEnter,
+    style: {
+      zIndex: 2
+    }
+  }, /*#__PURE__*/React.createElement("radialGradient", {
+    id: "favor_fill_default",
+    cx: "50%",
+    cy: "50%",
+    r: "50%",
+    fx: "50%",
+    fy: "50%"
+  }, /*#__PURE__*/React.createElement("stop", {
+    offset: "0%",
+    style: {
+      stopColor: '#464f87',
+      stopOpacity: 1
+    }
+  }), /*#__PURE__*/React.createElement("stop", {
+    offset: "100%",
+    style: {
+      stopColor: '#343d77',
+      stopOpacity: 1
+    }
+  })), /*#__PURE__*/React.createElement("radialGradient", {
+    id: "favor_fill_click",
+    cx: "50%",
+    cy: "50%",
+    r: "50%",
+    fx: "50%",
+    fy: "50%"
+  }, /*#__PURE__*/React.createElement("stop", {
+    offset: "0%",
+    style: {
+      stopColor: '#343d77',
+      stopOpacity: 1
+    }
+  }), /*#__PURE__*/React.createElement("stop", {
+    offset: "100%",
+    style: {
+      stopColor: '#464f87',
+      stopOpacity: 1
+    }
+  })), /*#__PURE__*/React.createElement("rect", {
+    className: "favor_button_background",
+    width: "100%",
+    height: "100%",
+    fill: "url(#favor_fill_default)"
+  }), /*#__PURE__*/React.createElement("text", {
+    className: "favor_button_shadow_text",
+    x: "100",
+    y: "14",
+    textAnchor: "middle",
+    dominantBaseline: "middle"
+  }, buttonText), /*#__PURE__*/React.createElement("text", {
+    className: "favor_button_text",
+    x: "100",
+    y: "12",
+    textAnchor: "middle",
+    dominantBaseline: "middle"
+  }, buttonText)));
 }
 window.ForbiddenShop = ForbiddenShop;

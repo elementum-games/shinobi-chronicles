@@ -11,6 +11,12 @@ class ForbiddenShopManager {
         $this->player = $player;
     }
 
+    const AYAKASHI_FAVOR = 131;
+
+    const FAVOR_EXCHANGE = [
+        127 => 500, // forbidden scroll
+    ];
+
     /**
      * @param $jutsu_id
      * @return string
@@ -114,5 +120,30 @@ class ForbiddenShopManager {
             default:
                 throw new RuntimeException("Invalid event");
         }
+    }
+
+    /**
+     * @param $item_id
+     * @return string
+     */
+    public function exchangeFavor($item_id): string
+    {
+        $this->player->getInventory();
+
+        if (!isset(self::FAVOR_EXCHANGE[$item_id])) {
+            throw new RuntimeException("Invalid item!");
+        }
+
+        // Check for money requirement or process exchange
+        if ($this->player->itemQuantity(self::AYAKASHI_FAVOR) < self::FAVOR_EXCHANGE[$item_id]) {
+            throw new RuntimeException("You do not have enough favor!");
+        }
+
+        // Add to inventory
+        $this->player->removeItemById(self::AYAKASHI_FAVOR, self::FAVOR_EXCHANGE[$item_id]);
+        $this->player->giveItemById(LanternEvent::$static_item_ids['forbidden_jutsu_scroll_id'], 1);
+        $this->player->updateInventory();
+
+        return "You have exchanged " . self::FAVOR_EXCHANGE[$item_id] . " favor!";
     }
 }
