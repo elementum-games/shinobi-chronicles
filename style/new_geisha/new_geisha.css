@@ -569,7 +569,7 @@ a.normalUser, a.normalUser:hover, a.normalUser:visited {
 }
 
 /* Mobile Overrides */
-@media screen and (max-width: 900px) {
+@media screen and (max-width: 999px) {
     #container {
         flex-direction: column-reverse !important;
         padding-bottom: 0px;
@@ -586,6 +586,7 @@ a.normalUser, a.normalUser:hover, a.normalUser:visited {
         margin-right: 0;
         margin-bottom: 0;
         width: 100%;
+        min-height: 90vh;
     }
     #container::before {
         display: none;
