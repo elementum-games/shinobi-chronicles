@@ -25,6 +25,8 @@ import { ScoutArea } from "./ScoutArea.js";
     action_url:          string,
     action_message:      string,
     invulnerable:        boolean,
+    regions:             object,
+    region_locations:    object,
     spar_link:           string,
     colosseum_coords:    object,
  * }} mapData
@@ -88,6 +90,7 @@ function Travel({
   const lastTravelSuccessTime = React.useRef(null);
   const lastTravelLatencyMs = React.useRef(0);
   const travelIntervalId = React.useRef(null);
+  const headerCoords = React.useRef(null);
 
   // API ACTIONS
   const LoadTravelData = () => {
@@ -125,6 +128,7 @@ function Travel({
       }
       if (response.data.success) {
         debug(`Move completed ${requestEnd - lastTravelSuccessTime.current} ms after last move`);
+        headerCoords.current.innerHTML = " (" + response.data.mapData.player_x + "." + response.data.mapData.player_y + ")";
         lastTravelSuccessTime.current = requestEnd;
         setMapData(response.data.mapData);
         setScoutData(response.data.nearbyPlayers);
@@ -229,6 +233,7 @@ function Travel({
   // Initial Load, fetch map info from user location
   React.useEffect(() => {
     LoadTravelData();
+    headerCoords.current = document.getElementById('contentHeaderCoords');
 
     // scout area loading
     refreshIntervalId.current = setInterval(() => LoadTravelData(), scoutAreaDataInterval);
