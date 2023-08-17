@@ -167,3 +167,16 @@
     top: 100%;
     transform: translate(calc(-100% - 20px), 0%);
 }
+
+/* Mobile Overrides */
+@media screen and (max-width: 999px) {
+    .header_time_label {
+        display: none;
+    }
+    .header_link_container {
+        justify-content: center;
+    }
+    .header_logout_wrapper {
+        margin: 0;
+    }
+}
