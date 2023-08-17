@@ -14,7 +14,7 @@ class ForbiddenShopManager {
     const AYAKASHI_FAVOR = 131;
 
     const FAVOR_EXCHANGE = [
-        127 => 500, // forbidden scroll
+        127 => 1000, // forbidden scroll
     ];
 
     /**

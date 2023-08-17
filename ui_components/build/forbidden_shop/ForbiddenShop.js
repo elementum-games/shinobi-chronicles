@@ -503,10 +503,10 @@ function FactionSection({
   missionLink,
   eventData
 }) {
-  var easyMissionId = 22;
-  var normalMissionId = 23;
-  var hardMissionId = 25;
-  var nightmareMissionId = 24;
+  var easyMissionId = 151;
+  var normalMissionId = 152;
+  var hardMissionId = 153;
+  var nightmareMissionId = 154;
   const [responseMessage, setResponseMessage] = React.useState(null);
   function exchangeFavor(itemId) {
     apiFetch(forbiddenShopApiLink, {
@@ -553,7 +553,7 @@ function FactionSection({
     itemId: eventData.forbidden_jutsu_scroll_id
   }), /*#__PURE__*/React.createElement("div", {
     className: "favor_exchange_label"
-  }, "-500 Favor"))), /*#__PURE__*/React.createElement("div", {
+  }, "-1000 Favor"))), /*#__PURE__*/React.createElement("div", {
     className: "faction_mission_header"
   }, "Begin Missions"), /*#__PURE__*/React.createElement("div", {
     className: "faction_mission_container"
@@ -563,25 +563,25 @@ function FactionSection({
     missionId: easyMissionId
   }), /*#__PURE__*/React.createElement("div", {
     className: "favor_exchange_label"
-  }, "+4 Favor")), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement(MissionButton, {
+  }, "+2 Favor")), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement(MissionButton, {
     buttonText: "Normal",
     onClick: beginMission,
     missionId: normalMissionId
   }), /*#__PURE__*/React.createElement("div", {
     className: "favor_exchange_label"
-  }, "+6 Favor")), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement(MissionButton, {
+  }, "+3 Favor")), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement(MissionButton, {
     buttonText: "Hard",
     onClick: beginMission,
     missionId: hardMissionId
   }), /*#__PURE__*/React.createElement("div", {
     className: "favor_exchange_label"
-  }, "+8 Favor")), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement(MissionButton, {
+  }, "+4 Favor")), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement(MissionButton, {
     buttonText: "Nightmare",
     onClick: beginMission,
     missionId: nightmareMissionId
   }), /*#__PURE__*/React.createElement("div", {
     className: "favor_exchange_label"
-  }, "+10 Favor")))));
+  }, "+5 Favor")))));
 }
 function MissionButton({
   buttonText,
