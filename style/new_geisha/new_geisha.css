@@ -573,6 +573,7 @@ a.normalUser, a.normalUser:hover, a.normalUser:visited {
     #container {
         flex-direction: column-reverse !important;
         padding-bottom: 0px;
+        width: 100%;
     }
     #footer {
         display: none;
@@ -581,12 +582,15 @@ a.normalUser, a.normalUser:hover, a.normalUser:visited {
         display: none;
     }
     #content_wrapper {
-        margin-left: auto !important;
-        margin-right: auto !important;
-        margin-bottom: 15px;
-        min-height: 80vh;
+        margin-left: 0;
+        margin-right: 0;
+        margin-bottom: 0;
+        width: 100%;
     }
     #container::before {
         display: none;
+    }
+    #content {
+        width: 100%;
     }
 }
