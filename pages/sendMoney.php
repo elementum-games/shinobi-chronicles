@@ -43,7 +43,7 @@ function sendMoney() {
 
             if($currency_type == System::CURRENCY_TYPE_MONEY) {
                 if($amount > $player->currency->getMoney()) {
-                    throw new RuntimeException("You do not have that much {$player->money->name}!");
+                    throw new RuntimeException("You do not have that much {$player->currency->money->name}!");
                 }
                 $player->currency->subtractMoney($amount, "Sent money to {$recipient->user_name} (#{$recipient->user_id})");
                 $recipient->currency->addMoney($amount, "Received money from $player->user_name (#$player->user_id)", false);

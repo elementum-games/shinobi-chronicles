@@ -447,6 +447,8 @@ class User extends Fighter {
 
     /**
      * @throws RuntimeException
+     * NOTE: Changing the order that data is loaded may cause errors!
+     * Any additional changes to data loads should be inserted without altering the data flow top -> bottom
      */
     public function loadData($UPDATE = User::UPDATE_FULL, $remote_view = false): void {
         $result = $this->system->db->query("SELECT * FROM `users` WHERE `user_id`='$this->user_id' LIMIT 1 FOR UPDATE");
@@ -658,7 +660,7 @@ class User extends Fighter {
             // Array values to undo the "first" "second" etc keys
             $this->elements = array_values(
                 json_decode(
-                    $user_data['elements'] ?? "[]",
+                    $elements ?? "[]",
                     true
                 )
             );
