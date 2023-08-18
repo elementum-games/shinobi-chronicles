@@ -31,7 +31,7 @@ final class ForbiddenMissionMigration extends AbstractMigration
         // Insert into items table
         $this->execute("
             INSERT INTO `items` (`item_id`, `name`, `description`, `rank`, `purchase_type`, `purchase_cost`, `use_type`, `effect`, `effect_amount`) VALUES
-                (131, 'Ayakashi&#039;s Favor', 'Faction Currency', 0, 2, 0, 5, 'unknown', 0);
+                (132, 'Ayakashi&#039;s Favor', 'Faction Currency', 0, 2, 0, 5, 'unknown', 0);
         ");
 
         // Commit Transaction
