@@ -330,7 +330,7 @@
         left: auto;
         margin-left: auto;
         margin-right: auto;
-        font-size: 25px;
+        font-size: 20px;
     }
     .sb_resources {
         display: flex;
@@ -356,14 +356,14 @@
         margin-top: 5px;
     }
     .sb_label {
-        font-size: 25px;
+        font-size: 20px;
     }
     .sb_link_wrapper {
-        height: 60px;
+        height: 50px;
         flex-basis: 50%;
     }
     .sb_link_filler {
-        height: 60px;
+        height: 50px;
         flex-basis: 50%;
     }
     .sb_link_container {
