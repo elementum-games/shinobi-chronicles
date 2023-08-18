@@ -11,7 +11,7 @@ class ForbiddenShopManager {
         $this->player = $player;
     }
 
-    const AYAKASHI_FAVOR_ITEM_ID = 131;
+    const AYAKASHI_FAVOR_ITEM_ID = 132;
 
     const FAVOR_EXCHANGE = [
         127 => 1000, // forbidden scroll
