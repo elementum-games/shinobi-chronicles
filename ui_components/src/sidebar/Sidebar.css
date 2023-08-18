@@ -300,7 +300,9 @@
 @media screen and (max-width: 999px) {
     #sidebar {
         display: flex;
+        flex-direction: column;
         width: 100%;
+        max-height: 40vh;
     }
     #sidebarContainer {
         bottom: 0;
@@ -310,6 +312,7 @@
         z-index: 500;
         background-color: var(--box-color-default);
         align-self: flex-end;
+        width: 100%;
     }
     .sb_avatar_container {
         display: none;
@@ -320,10 +323,14 @@
     .sb_header_line {
         display: none;
     }
+    .sb_header_bar {
+        height: 35px;
+    }
     .sb_header_text_wrapper {
         left: auto;
         margin-left: auto;
         margin-right: auto;
+        font-size: 25px;
     }
     .sb_resources {
         display: flex;
@@ -338,12 +345,32 @@
     }
     .sb_section_container {
         flex-basis: 33%;
-        padding-top: 40px;
     }
+        .sb_section_container.Player {
+            padding-top: 40px;
+        }
     .sb_name_wrapper {
         text-align: center;
     }
     .sb_resourceBarOuter {
         margin-top: 5px;
+    }
+    .sb_label {
+        font-size: 25px;
+    }
+    .sb_link_wrapper {
+        height: 60px;
+        flex-basis: 50%;
+    }
+    .sb_link_filler {
+        height: 60px;
+        flex-basis: 50%;
+    }
+    .sb_link_container {
+        width: 100%;
+        gap: 0;
+    }
+    .sb_innerResourceBarLabel {
+        font-size: 20px;
     }
 }

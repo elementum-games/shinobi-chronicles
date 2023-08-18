@@ -70,7 +70,7 @@ function Sidebar({
   // Content
   function displaySection(section_data, title) {
     return /*#__PURE__*/React.createElement("div", {
-      className: "sb_section_container"
+      className: "sb_section_container " + title
     }, /*#__PURE__*/React.createElement("div", {
       className: "sb_header_bar d-flex"
     }, /*#__PURE__*/React.createElement("div", {

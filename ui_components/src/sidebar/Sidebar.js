@@ -70,7 +70,7 @@ function Sidebar({ links, navigationAPIData, userAPIData }) {
     // Content
     function displaySection(section_data, title) {
         return (
-            <div className="sb_section_container">
+            <div className={"sb_section_container " + title}>
                 <div className={"sb_header_bar d-flex"}>
                     <div className={"sb_header_image_wrapper"}>
                         <img src="/images/v2/icons/menudecor.png" className="sb_header_image" />

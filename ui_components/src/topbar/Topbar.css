@@ -179,4 +179,7 @@
     .header_logout_wrapper {
         margin: 0;
     }
+    #topbar {
+        background-color: var(--box-color-default);
+    }
 }
