@@ -67,10 +67,19 @@ function Sidebar({ links, navigationAPIData, userAPIData }) {
         return offset;
     }
 
+    const toggleNav = (e) => {
+        const currentClass = e.target.parentElement.className;
+        if (currentClass.includes('toggle')) {
+            e.target.parentElement.className = currentClass.replace('toggle', '').trim();
+        } else {
+            e.target.parentElement.className += ' toggle';
+        }
+    };
+
     // Content
-    function displaySection(section_data, title) {
+    function displaySection(section_data, title, toggleNav) {
         return (
-            <div className={"sb_section_container " + title}>
+            <div className={"sb_section_container " + title} onClick={toggleNav}>
                 <div className={"sb_header_bar d-flex"}>
                     <div className={"sb_header_image_wrapper"}>
                         <img src="/images/v2/icons/menudecor.png" className="sb_header_image" />
@@ -128,10 +137,10 @@ function Sidebar({ links, navigationAPIData, userAPIData }) {
                 regenTime={regenTime}
                 regenOffset={regenOffset}
             />
-            {displaySection(userMenu, "Player Menu")}
-            {displaySection(activityMenu, "Action Menu")}
-            {displaySection(villageMenu, "Village Menu")}
-            {staffMenu.length ? displaySection(staffMenu, "Staff Menu") : null}
+            {displaySection(userMenu, "Player Menu", toggleNav)}
+            {displaySection(activityMenu, "Action Menu", toggleNav)}
+            {displaySection(villageMenu, "Village Menu", toggleNav)}
+            {staffMenu.length ? displaySection(staffMenu, "Staff Menu", toggleNav) : null}
         </div>
     )
 }
