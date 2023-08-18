@@ -86,6 +86,7 @@ class UserApiPresenter {
             'avatar_style' => $player->getAvatarStyle(),
             'avatar_frame' => $player->getAvatarFrame(),
             'sidebar_position' => $player->getSidebarPosition(),
+            'sidebar_collapse' => $player->getSidebarCollapse(),
             'enable_alerts' => $player->getEnableAlerts(),
         ];
     }
@@ -191,7 +192,7 @@ class UserApiPresenter {
             'exp' => $jutsu->exp,*/
         ];
     }
-    
+
     public static function itemResponse(Item $item): array {
         return [
             'id' => $item->id,

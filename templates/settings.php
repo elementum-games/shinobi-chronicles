@@ -220,6 +220,17 @@
                         <input type='submit' name='change_enable_alerts' value='Change' />
                     </form>
                 </div>
+                <div>
+                    <label>Sidebar Collapsed (Mobile)</label>
+                    <form action='<?=$system->router->getUrl('settings')?>' method='post'>
+                        <select name='sidebar_collapse'>";
+                            <option value='closed' <?=($sidebar_collapse == "closed" ? "selected='selected'" : "")?>>Closed</option>
+                            <option value='open' <?=($sidebar_collapse == "open" ? "selected='selected'" : "")?>>Open</option>
+                        </select>
+                        <br />
+                        <input type='submit' name='change_sidebar_collapse' value='Change' />
+                    </form>
+                </div>
             </div>
             <?php endif; ?>
         </td>
