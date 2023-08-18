@@ -66,11 +66,20 @@ function Sidebar({
     var offset = 126 - 126 * percent / 100;
     return offset;
   }
+  const toggleNav = e => {
+    const currentClass = e.target.parentElement.className;
+    if (currentClass.includes('toggle')) {
+      e.target.parentElement.className = currentClass.replace('toggle', '').trim();
+    } else {
+      e.target.parentElement.className += ' toggle';
+    }
+  };
 
   // Content
-  function displaySection(section_data, title) {
+  function displaySection(section_data, title, toggleNav) {
     return /*#__PURE__*/React.createElement("div", {
-      className: "sb_section_container " + title
+      className: "sb_section_container " + title,
+      onClick: toggleNav
     }, /*#__PURE__*/React.createElement("div", {
       className: "sb_header_bar d-flex"
     }, /*#__PURE__*/React.createElement("div", {
@@ -131,7 +140,7 @@ function Sidebar({
     playerSettings: playerSettings,
     regenTime: regenTime,
     regenOffset: regenOffset
-  }), displaySection(userMenu, "Player Menu"), displaySection(activityMenu, "Action Menu"), displaySection(villageMenu, "Village Menu"), staffMenu.length ? displaySection(staffMenu, "Staff Menu") : null);
+  }), displaySection(userMenu, "Player Menu", toggleNav), displaySection(activityMenu, "Action Menu", toggleNav), displaySection(villageMenu, "Village Menu", toggleNav), staffMenu.length ? displaySection(staffMenu, "Staff Menu", toggleNav) : null);
 }
 function SBCharacterProfile({
   playerData,
