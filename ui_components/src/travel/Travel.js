@@ -161,7 +161,9 @@ function Travel({
 
             if (response.data.success) {
                 debug(`Move completed ${requestEnd - lastTravelSuccessTime.current} ms after last move`);
-                headerCoords.current.innerHTML = " (" + response.data.mapData.player_x + "." + response.data.mapData.player_y + ")";
+                if (headerCoords.current !== null) {
+                    headerCoords.current.innerHTML = " (" + response.data.mapData.player_x + "." + response.data.mapData.player_y + ")";
+                }
                 lastTravelSuccessTime.current = requestEnd;
                 setMapData(response.data.mapData);
                 setScoutData(response.data.nearbyPlayers);
