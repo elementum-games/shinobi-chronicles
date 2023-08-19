@@ -1,5 +1,6 @@
 <?php
 class Currency {
+    // Standard Currecies
     const TYPE_MONEY = 'money';
     const TYPE_PREMIUM_CREDITS = 'premium_credits';
     const TYPE_PREMIUM_CREDITS_PURCHASED = 'premium_credits_purchased';
@@ -20,6 +21,13 @@ class Currency {
     public array $valid_currency_types;
     public string $name;
     public string $symbol;
+
+    // Faction Currencies
+    const TYPE_AYAKASHI_FAVOR = "ayakashi_favor";
+
+    const AYAKASHI_NAME = "Ayakashi's Favor";
+
+    const AYAKASHI_SYMBOL = "AF";
 
     public function __construct(
         // Defined members
@@ -92,7 +100,9 @@ class Currency {
             self::TYPE_MONEY,
             self::TYPE_PREMIUM_CREDITS,
             self::TYPE_PREMIUM_CREDITS_PURCHASED,
-            self::TYPE_TOKEN
+            self::TYPE_TOKEN,
+
+            self::TYPE_AYAKASHI_FAVOR
         ];
     }
 
@@ -106,6 +116,8 @@ class Currency {
             self::TYPE_PREMIUM_CREDITS => self::PREMIUM_NAME,
             self::TYPE_PREMIUM_CREDITS_PURCHASED => self::PREMIUM_PURCHASED_NAME,
             self::TYPE_TOKEN => self::TOKEN_NAME,
+
+            self::TYPE_AYAKASHI_FAVOR => self::AYAKASHI_NAME,
             default => '???',
         };
     }
@@ -116,6 +128,8 @@ class Currency {
             self::TYPE_PREMIUM_CREDITS => self::PREMIUM_SYMBOL,
             self::TYPE_PREMIUM_CREDITS_PURCHASED => self::PREMIUM_PURCHASED_SYMBOL,
             self::TYPE_TOKEN => self::TOKEN_SYMBOL,
+
+            self::TYPE_AYAKASHI_FAVOR => self::AYAKASHI_SYMBOL,
             default => '???',
         };
     }
@@ -150,5 +164,39 @@ class Currency {
             userDailyTasks: $userDailyTasks,
             max_amount: $max_amount
         );
+    }
+
+    public static function fetchUserCurrencies(System $system, int $user_id, array $user_data): array {
+        $result = $system->db->query("SELECT * FROM `user_currency` WHERE `user_id`=$user_id");
+        if(!$system->db->last_num_rows) {
+            $system->db->query("INSERT INTO `user_currency`
+                (
+                    `user_id`,
+                    `" . self::TYPE_MONEY . "`,
+                    `" . self::TYPE_PREMIUM_CREDITS . "`,
+                    `" . self::TYPE_PREMIUM_CREDITS_PURCHASED . "`,
+                    `" . self::TYPE_TOKEN . "`,
+                    `" . self::TYPE_AYAKASHI_FAVOR . "`
+                )
+                VALUES
+                (
+                    $user_id,
+                    '" . $user_data[self::TYPE_MONEY] . "',
+                    '" . $user_data[self::TYPE_PREMIUM_CREDITS] . "',
+                    '" . $user_data[self::TYPE_PREMIUM_CREDITS_PURCHASED] . "',
+                    0,
+                    0
+                )
+            ");
+            return [
+                'user_id' => $this->user_id, 
+                self::TYPE_MONEY => $user_dat[self::TYPE_MONEY], 
+                self::TYPE_PREMIUM_CREDITS => $user_data[self::TYPE_PREMIUM_CREDITS], 
+                self::TYPE_PREMIUM_CREDITS_PURCHASED => $user_data[self::TYPE_PREMIUM_CREDITS_PURCHASED],
+                self::TYPE_TOKEN => 0,
+                self::TYPE_AYAKASHI_FAVOR => 0
+            ];
+        }
+        return $system->db->fetch($result);
     }
 }

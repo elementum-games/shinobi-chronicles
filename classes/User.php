@@ -569,36 +569,7 @@ class User extends Fighter {
         // Daily tasks
         $this->loadDailyTasks($UPDATE, $remote_view);
         // Currency
-        $this->currency = new UserCurrency(
-            money: Currency::loadFromDb(
-                system: $this->system,
-                user_id: $this->user_id,
-                type: Currency::TYPE_MONEY,
-                amount: $user_data['money'],
-                userDailyTasks: $this->daily_tasks
-            ),
-            premium_credits: Currency::loadFromDb(
-                system: $this->system,
-                user_id: $this->user_id,
-                type: Currency::TYPE_PREMIUM_CREDITS,
-                amount: $user_data['premium_credits']
-            ),
-            premium_purchased: Currency::loadFromDb(
-                system: $this->system,
-                user_id: $this->user_id,
-                type: Currency::TYPE_PREMIUM_CREDITS_PURCHASED,
-                amount: $user_data['premium_credits_purchased']
-            ),
-            tokens: Currency::loadFromDb(
-                system: $this->system,
-                user_id: $this->user_id,
-                type: Currency::TYPE_TOKEN,
-                amount: 0
-            ),
-        );
-        $this->money = $this->currency->money;
-        $this->premium_credits = $this->currency->premium_credits;
-        $this->premium_credits_purchased = $this->currency->premium_purchased;
+        $this->loadCurrency(user_data: $user_data);
         // Clan
         $this->loadClanData(clan_id: $user_data['clan_id'], clan_office: $user_data['clan_office']);
         // Team
@@ -653,6 +624,47 @@ class User extends Fighter {
 
             $this->last_update += $minutes * 60;
         }
+    }
+    public function loadCurrency(array $user_data) {
+        $currencies = Currency::fetchUserCurrencies(system: $this->system, user_id: $this->user_id, user_data: $user_data);
+        $this->currency = new UserCurrency(
+            system: $this->system,
+            user_id: $this->user_id,
+            money: Currency::loadFromDb(
+                system: $this->system,
+                user_id: $this->user_id,
+                type: Currency::TYPE_MONEY,
+                amount: $currencies[Currency::TYPE_MONEY],
+                userDailyTasks: $this->daily_tasks
+            ),
+            premium_credits: Currency::loadFromDb(
+                system: $this->system,
+                user_id: $this->user_id,
+                type: Currency::TYPE_PREMIUM_CREDITS,
+                amount: $currencies[Currency::TYPE_PREMIUM_CREDITS]
+            ),
+            premium_purchased: Currency::loadFromDb(
+                system: $this->system,
+                user_id: $this->user_id,
+                type: Currency::TYPE_PREMIUM_CREDITS_PURCHASED,
+                amount: $currencies[Currency::TYPE_PREMIUM_CREDITS_PURCHASED]
+            ),
+            tokens: Currency::loadFromDb(
+                system: $this->system,
+                user_id: $this->user_id,
+                type: Currency::TYPE_TOKEN,
+                amount: $currencies[Currency::TYPE_TOKEN]
+            ),
+            ayakashi_favor: Currency::loadFromDb(
+                system: $this->system,
+                user_id: $this->user_id,
+                type: Currency::TYPE_AYAKASHI_FAVOR,
+                amount: $currencies[Currency::TYPE_AYAKASHI_FAVOR]
+            )
+        );
+        $this->money = $this->currency->money;
+        $this->premium_credits = $this->currency->premium_credits;
+        $this->premium_credits_purchased = $this->currency->premium_purchased;
     }
     public function loadElementData(string $elements): void {
         // Elements
@@ -1866,9 +1878,6 @@ class User extends Fighter {
         `stat_transfer_amount` = $this->stat_transfer_amount,
         `stat_transfer_completion_time` = $this->stat_transfer_completion_time,
         `stat_transfer_target_stat` = '$this->stat_transfer_target_stat',
-		`money` = '{$this->currency->getMoney()}',
-		`premium_credits` = '{$this->currency->getPremiumCredits()}',
-		`premium_credits_purchased` = '{$this->currency->getPremiumPurchased()}',
 		`pvp_wins` = '$this->pvp_wins',
 		`pvp_losses` = '$this->pvp_losses',
 		`ai_wins` = '$this->ai_wins',
@@ -1889,6 +1898,11 @@ class User extends Fighter {
 		`censor_explicit_language` = " . (int)$this->censor_explicit_language . "
 		WHERE `user_id` = '{$this->user_id}' LIMIT 1";
         $this->system->db->query($query);
+
+        // Update Currencies
+        if($this->currency->update_data) {
+            $this->currency->updateCurrencies();
+        }
 
         // Update Blacklist
         if($this->blacklist->update) {
