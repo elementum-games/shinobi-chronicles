@@ -182,4 +182,10 @@
     #topbar {
         background-color: var(--box-color-default);
     }
+    .topbar_notifications_container_right {
+        padding-right: 25px;
+    }
+    .topbar_notifications_container_left {
+        padding-left: 25px;
+    }
 }
