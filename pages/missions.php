@@ -480,12 +480,11 @@ function runActiveMission(): bool {
             }
 
             // Display to battle link
-            if($player->mission_stage['action_type'] == 'combat') {
+            if ($player->mission_stage['action_type'] == 'combat') {
 
-                if($mission->mission_type == 5 && $player->mission_stage['action_type'] == 'combat') {
+                if ($mission->mission_type == 5 && $player->mission_stage['action_type'] == 'combat') {
                     echo "<br /><a href='$self_link&continue=1'>Enter Combat</a> | <a href='$self_link&retreat=1'>Retreat</a>";
-                }
-                else {
+                } else {
                     echo "<br /><a href='$self_link'>Enter Combat</a>";
                     try {
                         // monster id
@@ -521,6 +520,8 @@ function runActiveMission(): bool {
                         return true;
                     }
                 }
+            } else {
+                echo "<br /><a href='" . $system->router->getUrl('travel') . " '>Return to Travel</a>";
             }
 
             echo "<br />
