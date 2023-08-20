@@ -76,7 +76,7 @@
                     <option value="Lightning">Lightning</option>
                     <option value="Water">Water</option>
                     <option value="Earth">Earth</option>
-                    <option value="Wind">Water</option>
+                    <option value="Wind">Wind</option>
                 </select>
             <?php ?>
         </div></td>
