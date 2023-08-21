@@ -29,23 +29,50 @@
         }
     }
 
-    //filter by category
+    //used to keep track of current filters
+    let typeFilter = 'none';
+    let elementFilter = 'none';
+
+    function filterByElement(type){
+        elementFilter = type;
+        applyFilter();
+    }
+
     function filterByType(type){
+        typeFilter = type;
+        applyFilter();
+    }
+
+    function applyFilter(){
         var htmlElementsTypes = document.getElementsByClassName('bloodlineDetails');
        
+        //for elements
         for (var i = 0; i < htmlElementsTypes.length; i ++) {
 
-            //show all
-            if(type == 'none'){
-                htmlElementsTypes[i].style.display = 'block';
-                continue;
+            htmlElementsTypes[i].style.display = "block";  //this is important
+
+            if(elementFilter == 'none'){
+                continue; //skip this html element
             }
 
-            //show [type]
-            if(!htmlElementsTypes[i].classList.contains(type)){
+            //user has picked an element
+            if(!htmlElementsTypes[i].classList.contains(elementFilter))
+            {
                 htmlElementsTypes[i].style.display = 'none';
-            } else {
-                htmlElementsTypes[i].style.display = 'block';
+            }
+        }
+
+        //for elements
+        for (var i = 0; i < htmlElementsTypes.length; i ++) {
+
+            if(typeFilter == 'none'){
+                continue; //skip this html element
+            }
+
+            //user has picked a type
+            if(!htmlElementsTypes[i].classList.contains(typeFilter))
+            {
+                htmlElementsTypes[i].style.display = 'none';
             }
         }
     }
@@ -69,14 +96,24 @@
             <!--Selection Input: Jutsu Type-->
             <?php ?>
             <br>
-                <label for="jutsuTypeFilter">Jutsu Type:</label>
-                <select name="jutsuTypeFilter" onchange="filterByType(this.value)" id="jutsuTypeFilter">
-                    <option value="none">None</option>
+                <label for="jutsuElementFilter">Jutsu Element:</label>
+                <select name="jutsuElementFilter" onchange="filterByElement(this.value)" id="jutsuElementFilter">
+                    <option value="none">Any</option>
                     <option value="Fire">Fire</option>
                     <option value="Lightning">Lightning</option>
                     <option value="Water">Water</option>
                     <option value="Earth">Earth</option>
                     <option value="Wind">Wind</option>
+                </select>
+
+                <br>
+
+                <label for="jutsuTypeFilter">Jutsu Type:</label>
+                <select name="jutsuTypeFilter" onchange="filterByType(this.value)" id="jutsuTypeFilter">
+                    <option value="none">Any</option>
+                    <option value="ninjutsu">Ninjutsu</option>
+                    <option value="genjutsu">Genjutsu</option>
+                    <option value="taijutsu">Taijutsu</option>
                 </select>
             <?php ?>
         </div></td>
@@ -92,13 +129,15 @@
 
                 <!-- Get Jutsu Types -->
                 <?php 
+                $jutsuElement = "";
                 $jutsuType = "";
                 foreach ($bloodline['jutsu'] as $ability){
-                    $jutsuType .=  $ability->element . " ";
+                    $jutsuElement .=  $ability->element . " ";
+                    $jutsuType .=  $ability->jutsu_type . " ";
                 } 
                 ?>
 
-                <td class="<?= $bloodline['village'] ?> bloodlineDetails <?= $jutsuType?>">
+                <td class="<?= $bloodline['village'] ?> bloodlineDetails <?= $jutsuType ?> <?= $jutsuElement ?>">
                     <a onclick="toggleBloodlineDetails('<?=$bloodline_id?>_details')"
                        style="cursor:pointer;"><?=$bloodline['name']?></a><br />
                     <div class="<?=$bloodline_id?>_details" style="display:none; margin-left:1.5em;">
