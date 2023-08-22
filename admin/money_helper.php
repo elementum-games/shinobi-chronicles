@@ -32,9 +32,19 @@ else if(isset($_POST['special_mission'])) {
 		multiplier: Currency::getSpecialMissionMultiplier(difficulty: $difficulty)
 	);
 	
+	$avg_complete = Currency::roundYen(
+		num: $raw_complete,
+		multiple_of: $mission_multiple
+	);
+	
 	$raw_battle = Currency::calcSpecialMissionBattleGain(
 		user_rank: $rank,
 		difficulty: $difficulty
+	);
+	
+	$avg_battle = Currency::roundYen(
+		num: $raw_battle,
+		multiple_of: $battle_multiple
 	);
 
     $DISPLAY_DATA = [
@@ -49,10 +59,7 @@ else if(isset($_POST['special_mission'])) {
 			num: $raw_complete * (SpecialMission::MISSION_COMPLETE_RANDOMNESS + .1),
 			multiple_of: $mission_multiple
 		),
-		'final_complete_average' => Currency::roundYen(
-			num: $raw_complete,
-			multiple_of: $mission_multiple
-		),
+		'final_complete_average' => $avg_complete,
 		'final_highest_rate' => Currency::roundYen(
 			num: $raw_complete * (SpecialMission::MISSION_COMPLETE_RANDOMNESS + .4),
 			multiple_of: $mission_multiple
@@ -64,14 +71,14 @@ else if(isset($_POST['special_mission'])) {
 			num: $raw_battle * (SpecialMission::BATTLE_RANDOMNESS + .1),
 			multiple_of: $battle_multiple
 		),
-		'battle_average_rate' => Currency::roundYen(
-			num: $raw_battle,
-			multiple_of: $battle_multiple
-		),
+		'battle_average_rate' => $avg_battle,
 		'battle_highest_rate' => Currency::roundYen(
 			num: $raw_battle * (SpecialMission::BATTLE_RANDOMNESS + .4),
 			multiple_of: $battle_multiple
 		),
+		
+		'div_3' => "<br />",
+		'Typical Gain:' => ($avg_battle * 9) + $avg_complete
     ];
 }
 ?>
@@ -111,7 +118,7 @@ else if(isset($_POST['special_mission'])) {
         <option value='hard' <?=(isset($DISPLAY_DATA['difficulty']) && $DISPLAY_DATA['difficulty'] == 'hard') ? "selected" : ""?>>Hard</option>
         <option value='nightmare' <?=(isset($DISPLAY_DATA['difficulty']) && $DISPLAY_DATA['difficulty'] == 'nightmare') ? "selected" : ""?>>Nightmare</option>
     </select><br />
-    Battle Multiple: <input type='text' name='battle_multiple' value='<?=($DISPLAY_DATA['battle_multiple'])??5?>' /><br />
-	Complete Multiple: <input type='text' name='mission_multiple' value='<?=($DISPLAY_DATA['mission_multiple'])??25?>' /><br />
+    Battle Multiple: <input type='text' name='battle_multiple' value='<?=($DISPLAY_DATA['battle_multiple'])??SpecialMission::BATTLE_ROUND_MONEY_TO?>' /><br />
+	Complete Multiple: <input type='text' name='mission_multiple' value='<?=($DISPLAY_DATA['mission_multiple'])??SpecialMission::MISSION_COMPLETE_ROUND_MONEY_TO?>' /><br />
     <input type='submit' name='special_mission' value='Run' />
 </form>
