@@ -211,7 +211,7 @@ class Currency {
 
         return self::roundYen(
             num: $base_yen_per_battle,
-            multiple_of: SpecialMission::ROUND_MONEY_TO
+            multiple_of: SpecialMission::BATTLE_ROUND_MONEY_TO
         );
     }
 
