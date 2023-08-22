@@ -3,7 +3,7 @@
  * @var System $system
  * @var User $user
  */
-require_once __DIR__ . "/../Currency.php";
+require_once __DIR__ . "/../classes/Currency.php";
 require_once __DIR__ . "/_authenticate_admin.php";
 $self_link = $system->router->base_url . 'admin/money_helper.php';
 $DISPLAY_DATA = [];
