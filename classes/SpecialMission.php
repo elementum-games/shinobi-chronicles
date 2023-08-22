@@ -443,7 +443,7 @@ class SpecialMission {
 			$this->player->currency->money->manualLog(
 				new_amount: $this->player->money->getAmount(), 
 				old_amount: $this->player->money->getAmount() - $this->reward,
-				description: "Special Mission"
+				description: "Completed " . System::unSlug($this->difficulty) . " Special Mission"
 			);
             $this->player->special_mission = 0;
 
@@ -605,11 +605,11 @@ class SpecialMission {
             $this->player->location->y = self::$target_villages[$this->player->village->name]['y'];
         }
         $this->player->special_mission = 0;
-		$this->player->currency->money->manualLog(
-			new_amount: $this->player->money->getAmount(), 
-            old_amount: $this->player->money->getAmount() - $this->reward,
-            description: "Failed Special Mission"
-		);
+	$this->player->currency->money->manualLog(
+		new_amount: $this->player->money->getAmount(), 
+		old_amount: $this->player->money->getAmount() - $this->reward,
+		description: "Failed " . System::unSlug($this->difficulty) . " Special Mission"
+	);
         return true;
     }
 
@@ -721,6 +721,11 @@ class SpecialMission {
         $result = $system->db->query("UPDATE `special_missions`
 SET `status`=2, `end_time`={$timestamp} WHERE `mission_id`={$mission_id}");
         $player->special_mission = 0;
+	    $this->player->currency->money->manualLog(
+			new_amount: $this->player->money->getAmount(), 
+			old_amount: $this->player->money->getAmount() - $this->reward,
+			description: "Cacnelled " . System::unSlug($this->difficulty) . " Special Mission"
+		);
         $player->updateData();
         return true;
     }
