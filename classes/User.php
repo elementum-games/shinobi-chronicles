@@ -781,7 +781,7 @@ class User extends Fighter {
             forbidden_seal: $this->forbidden_seal
         );
     }
-    public function loadLocationAndTravelData(string $location, int $attack_id_time_ms, string $attack_id,
+    public function loadLocationAndTravelData(string $location, ?int $attack_id_time_ms, string $attack_id,
         int $last_movement_time, string $user_filters
     ): void {
         // Location
