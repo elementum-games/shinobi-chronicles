@@ -209,7 +209,7 @@ class Currency {
             default => floor($base_yen_per_battle * self::SPECIAL_MISSION_EASY_MOD)
         };
 
-        return self::roundedYen(
+        return self::roundYen(
             num: $base_yen_per_battle,
             multiple_of: SpecialMission::ROUND_MONEY_TO
         );

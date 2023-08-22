@@ -428,7 +428,7 @@ class SpecialMission {
                 rank_num: $this->player->rank_num,
                 multiplier: Currency::getSpecialMissionMultiplier(difficulty: $this->difficulty)
             );
-            $yen_gain = Currency::roundedYen(
+            $yen_gain = Currency::roundYen(
                 num: $yen_gain * self::MISSION_COMPLETE_RANDOMNESS + (mt_rand(1, 4) / 10),
                 multiple_of: self::MISSION_COMPLETE_ROUND_MONEY_TO
             );
@@ -553,7 +553,7 @@ class SpecialMission {
             user_rank: $this->player->rank_num, 
             difficulty: $this->difficulty
         );
-        $yen_gain = Currency::roundedYen(
+        $yen_gain = Currency::roundYen(
             num: $yen_gain * self::BATTLE_RANDOMNESS + (mt_rand(1, 3) / 10),
             multiple_of: self::BATTLE_ROUND_MONEY_TO
         );
