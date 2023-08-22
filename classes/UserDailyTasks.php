@@ -41,6 +41,10 @@ class UserDailyTasks {
 
                 if($progress_task) {
                     $task->progress += $amount;
+                    // Prevent going above task amount
+                    if($task->progress > $task->amount) {
+                        $task->progress = $task->amount;
+                    }
                 }
             }
         }
