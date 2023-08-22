@@ -435,7 +435,11 @@ function runActiveMission(): bool {
                 }
 
                 // Calc money
-                $yen_gain = Currency::calcMissionMoneyGain(user_rank: $player->rank_num, mission_rank: $mission_rank, mission_yen_round: Mission::MISSION_GAIN_YEN_ROUND);
+                $yen_gain = Currency::calcMissionMoneyGain(
+                    user_rank: $player->rank_num, 
+                    mission_rank: $mission->rank, 
+                    mission_yen_round: Mission::MISSION_GAIN_YEN_ROUND
+                );
 
                 // check what mission rank for daily Task
                 $all_mission_ranks = [0, 1, 2, 3, 4];
