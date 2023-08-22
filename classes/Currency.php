@@ -89,6 +89,18 @@ class Currency {
         $this->amount = $new_amount;
     }
 
+    // Manual currency log
+    public function manualLog(int $new_amount, int $old_amount, string $description) {
+        $this->system->currencyLog(
+            character_id: $this->user_id,
+            currency_type: $this->type,
+            previous_balance: $old_amount,
+            new_balance: $new_amount,
+            transaction_amount: $new_amount - $old_amount,
+            transaction_description: $description
+        );
+    }
+
     // Return currnt amount of currency
     public function getAmount(): int {
         return $this->amount;
