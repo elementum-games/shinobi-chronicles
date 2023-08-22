@@ -25,7 +25,6 @@ class User extends Fighter {
     const ENTITY_TYPE = 'U';
 
     const AVATAR_MAX_SIZE = 125;
-
     const GENDER_MALE = 'Male';
     const GENDER_FEMALE = 'Female';
     const GENDER_NON_BINARY = 'Non-binary';
@@ -666,7 +665,7 @@ class User extends Fighter {
         $this->premium_credits = $this->currency->premium_credits;
         $this->premium_credits_purchased = $this->currency->premium_purchased;
     }
-    public function loadElementData(string $elements): void {
+    public function loadElementData(?string $elements): void {
         // Elements
         if($elements) {
             // Array values to undo the "first" "second" etc keys
