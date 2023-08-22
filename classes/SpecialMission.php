@@ -723,7 +723,7 @@ SET `status`=2, `end_time`={$timestamp} WHERE `mission_id`={$mission_id}");
         $player->special_mission = 0;
 	    $player->currency->money->manualLog(
 			new_amount: $player->money->getAmount(), 
-			old_amount: $player->money->getAmount() - $this->reward,
+			old_amount: $player->money->getAmount(),
 			description: "Cacnelled Special Mission"
 		);
         $player->updateData();
