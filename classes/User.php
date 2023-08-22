@@ -831,6 +831,7 @@ class User extends Fighter {
                 'travel_ranks_to_view' => array_fill(1, System::SC_MAX_RANK, true)
             ];
             $user_data['filters'] = json_encode($filters);
+            $user_filters = $user_data['filters'];
         }
         $this->filters = json_decode($user_filters, true);
     }
