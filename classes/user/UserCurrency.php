@@ -16,7 +16,7 @@ class UserCurrency {
     public function addMoney(int $amount, string $description = "", bool $increment_daily_task = true, bool $log = true): void {
         $this->money->add(
             amount: $amount, 
-            descripton: $description, 
+            description: $description, 
             increment_daily: $increment_daily_task,
             log: $log
         );
