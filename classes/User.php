@@ -826,7 +826,7 @@ class User extends Fighter {
 
         // Travel data
         $this->last_movement_ms = $last_movement_time;
-        if ($user_filters === null) {
+        if (is_null($user_filters)) {
             $filters = [
                 'travel_ranks_to_view' => array_fill(1, System::SC_MAX_RANK, true)
             ];
