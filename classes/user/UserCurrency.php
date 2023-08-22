@@ -25,7 +25,7 @@ class UserCurrency {
     public function subtractMoney(int $amount, string $description = "", bool $log = true): void {
         $this->money->subtract(
             amount: $amount, 
-            descriptioin: $description,
+            description: $description,
             log: $log
         );
         $this->update_data = true;
