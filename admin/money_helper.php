@@ -6,6 +6,17 @@
 require_once __DIR__ . "/_authenticate_admin.php";
 $self_link = $system->router->base_url . 'admin/money_helper.php';
 $DISPLAY_DATA = [];
+if(isset($_POST['calc_gain'])) {
+    $multiplier = (int) $_POST['multiplier'];
+    $multiple_of = (int) $_POST['multiple_of'];
+    $rank = (int) $_POST['rank'];
+
+    $DISPLAY_DATA = [
+        'rank' => $rank,
+        'multiplier' => $multiplier,
+        'multiple_of' => $multiple_of,
+    ];
+}
 ?>
 
 <?php if(!empty($DISPLAY_DATA)): ?>
