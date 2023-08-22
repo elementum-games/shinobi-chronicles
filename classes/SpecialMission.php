@@ -17,6 +17,15 @@ class SpecialMission {
     // % chance to use a bloodline jutsu instead of an equipped jutsu
     const BLOODLINE_JUTSU_CHANCE = 25;
 
+    // Money gains
+    const MISSION_COMPLETE_BASE_YEN = 25;
+    const MISSION_COMPLETE_RANDOMNESS = 0.8;
+    const MISSION_COMPLETE_ROUND_MONEY_TO = 25;
+
+    const BATTLE_BASE_YEN = 6;
+    const BATTLE_RANDOMNESS = 0.70;
+    const BATTLE_ROUND_MONEY_TO = 5;
+
     /*
      * DIFFICULTY
      * When setting difficulty, consider the max dmg multiplier above as well as that # of fights is
@@ -415,14 +424,27 @@ class SpecialMission {
         $reward_text = '';
         if ($progress == 100) {
             // Yen gain for completing the mission
-            $yen_gain = self::$difficulties[$this->difficulty]['yen_per_mission'] * $this->player->rank_num;
-            $yen_gain *= 0.8 + (mt_rand(1, 4) / 10);
-            $yen_gain = floor($yen_gain);
+            $yen_gain = Currency::calcRawYenGain(
+                rank_num: $this->player->rank_num,
+                multiplier: Currency::getSpecialMissionMultiplier(difficulty: $this->difficulty)
+            );
+            $yen_gain = Currency::roundedYen(
+                num: $yen_gain * self::MISSION_COMPLETE_RANDOMNESS + (mt_rand(1, 4) / 10),
+                multiple_of: self::MISSION_COMPLETE_ROUND_MONEY_TO
+            );
+			$this->reward += $yen_gain;
 
             $this->status = 1;
             $this->end_time = time();
-            $this->player->currency->addMoney($yen_gain, "Special mission");
-            $this->reward += $yen_gain;
+            $this->player->currency->addMoney(
+				amount: $yen_gain, 
+				log: false
+			);
+			$this->player->currency->money->manualLog(
+				new_amount: $this->player->money->getAmount(), 
+				old_amount: $this->player->money->getAmount() - $this->reward,
+				description: "Special Mission"
+			);
             $this->player->special_mission = 0;
 
             $reward_text = self::$event_names[self::EVENT_COMPLETE_REWARD]['text'] . $yen_gain . '!';
@@ -527,9 +549,14 @@ class SpecialMission {
         $intel_gained *= 0.8 + (mt_rand(1, 4) / 10);
         $intel_gained = floor($intel_gained);
 
-        $yen_gain = self::$difficulties[$this->difficulty]['yen_per_battle'] * $this->player->rank_num;
-        $yen_gain *= 0.8 + (mt_rand(1, 4) / 10);
-        $yen_gain = floor($yen_gain);
+        $yen_gain = Currency::calcSpecialMissionBattleGain(
+            user_rank: $this->player->rank_num, 
+            difficulty: $this->difficulty
+        );
+        $yen_gain = Currency::roundedYen(
+            num: $yen_gain * self::BATTLE_RANDOMNESS + (mt_rand(1, 3) / 10),
+            multiple_of: self::BATTLE_ROUND_MONEY_TO
+        );
 
         // ***********************************************************************************************
 
@@ -553,7 +580,10 @@ class SpecialMission {
             }
 
             // Yen Gain
-            $this->player->currency->addMoney($yen_gain, "Special mission encounter");
+            $this->player->currency->addMoney(
+				amount: $yen_gain,
+				log: false
+			);
             $this->reward += $yen_gain;
 
             // generate a new target
@@ -575,6 +605,11 @@ class SpecialMission {
             $this->player->location->y = self::$target_villages[$this->player->village->name]['y'];
         }
         $this->player->special_mission = 0;
+		$this->player->currency->money->manualLog(
+			new_amount: $this->player->money->getAmount(), 
+            old_amount: $this->player->money->getAmount() - $this->reward,
+            description: "Failed Special Mission"
+		);
         return true;
     }
 

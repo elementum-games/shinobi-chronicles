@@ -36,6 +36,17 @@ class Currency {
     const MISSION_RANK_A_MULTIPLIER = 5;
     const MISSION_RANK_S_MULTIPLIER = 6;
 
+    // Special mission battles
+    const SPECIAL_MISSION_EASY_MOD = 1;
+    const SPECIAL_MISSION_NORMAL_MOD = 1.5;
+    const SPECIAL_MISSION_HARD_MOD = 2;
+    const SPECIAL_MISSION_NIGHTMARE_MOD = 3;
+    // Special mission completions
+    const SPECIAL_MISSION_EASY_MULTIPLIER = 1;
+    const SPECIAL_MISSION_NORMAL_MULTIPLIER = 2;
+    const SPECIAL_MISSION_HARD_MULTIPLIER = 3;
+    const SPECIAL_MISSION_NIGHTMARE_MULTIPLIER = 4;
+
     public function __construct(
         // Defined members
         public System $system,
@@ -185,6 +196,33 @@ class Currency {
             multiplier: $multiplier,
             multiple_of: Mission::MISSION_GAIN_YEN_ROUND
         );
+    }
+
+    public static function calcSpecialMissionBattleGain(int $user_rank, string $difficulty) {
+        $base_yen_per_battle = SpecialMission::BATTLE_BASE_YEN * $user_rank;
+        // Difficulty modifier
+        match($difficulty) {
+            SpecialMission::DIFFICULTY_EASY => floor($base_yen_per_battle * self::SPECIAL_MISSION_EASY_MOD),
+            SpecialMission::DIFFICULTY_NORMAL => floor($base_yen_per_battle * self::SPECIAL_MISSION_NORMAL_MOD),
+            SpecialMission::DIFFICULTY_HARD => floor($base_yen_per_battle * self::SPECIAL_MISSION_HARD_MOD),
+            SpecialMission::DIFFICULTY_NIGHTMARE => floor($base_yen_per_battle * self::SPECIAL_MISSION_NIGHTMARE_MOD),
+            default => floor($base_yen_per_battle * self::SPECIAL_MISSION_EASY_MOD)
+        };
+
+        return self::roundedYen(
+            num: $base_yen_per_battle,
+            multiple_of: SpecialMission::ROUND_MONEY_TO
+        );
+    }
+
+    public static function getSpecialMissionMultiplier(string $difficulty) {
+        return match($difficulty) {
+            SpecialMission::DIFFICULTY_EASY => self::SPECIAL_MISSION_EASY_MULTIPLIER,
+            SpecialMission::DIFFICULTY_NORMAL => self::SPECIAL_MISSION_NORMAL_MULTIPLIER,
+            SpecialMission::DIFFICULTY_HARD => self::SPECIAL_MISSION_HARD_MULTIPLIER,
+            SpecialMission::DIFFICULTY_NIGHTMARE => self::SPECIAL_MISSION_NIGHTMARE_MULTIPLIER,
+            default => self::SPECIAL_MISSION_EASY_MULTIPLIER
+        };
     }
 
     /** Load Currency from DB **/
