@@ -31,13 +31,13 @@ if(isset($_POST['calc_gain'])) {
 <?php endif ?>
 <form action="<?=$self_link?>" method="post">
     Rank: <select name="rank">
-        <option value='1'>Akademi-sai</option>
-        <option value='2'>Genin</option>
-        <option value='3'>Chuunin</option>
-        <option value='4'>Jonin</option>
-        <option value='5'>Sennin</option>
+        <option value='1' <?=(isset($DISPLAY_DATA['rank']) && $DISPLAY_DATA['rank'] == 1) ? "selected" : ""?>>Akademi-sai</option>
+        <option value='2' <?=(isset($DISPLAY_DATA['rank']) && $DISPLAY_DATA['rank'] == 2) ? "selected" : ""?>>Genin</option>
+        <option value='3' <?=(isset($DISPLAY_DATA['rank']) && $DISPLAY_DATA['rank'] == 3) ? "selected" : ""?>>Chuunin</option>
+        <option value='4' <?=(isset($DISPLAY_DATA['rank']) && $DISPLAY_DATA['rank'] == 4) ? "selected" : ""?>>Jonin</option>
+        <option value='5' <?=(isset($DISPLAY_DATA['rank']) && $DISPLAY_DATA['rank'] == 5) ? "selected" : ""?>>Sennin</option>
     </select><br />
-    Multiplier: <input type='text' name='multiplier' value='<?=($DISPLAY_DATA['rank'])??1?>' /><br />
+    Multiplier: <input type='text' name='multiplier' value='<?=($DISPLAY_DATA['multiplier'])??1?>' /><br />
     Multiple Of: <input type='text' name='multiple_of' value='<?=($DISPLAY_DATA['multiple_of'])??1?>' /><br />
     <input type='submit' name='calc_gain' value='Run' />
 </form>
