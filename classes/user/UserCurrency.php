@@ -17,7 +17,7 @@ class UserCurrency {
         $this->money->add(
             amount: $amount, 
             description: $description, 
-            increment_daily: $increment_daily_task,
+            increment_daily_task: $increment_daily_task,
             log: $log
         );
         $this->update_data = true;
