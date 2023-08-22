@@ -140,7 +140,7 @@ class Currency {
     }
 
     public static function roundYen(int $num, int $multiple_of): int {
-        return $num * round($num / $multiple_of);
+        return $multiple_of * round($num / $multiple_of);
     }
 
     public static function getRoundedYen(int $rank_num, int $multiplier, int $multiple_of): int {

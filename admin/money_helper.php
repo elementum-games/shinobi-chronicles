@@ -1,4 +1,5 @@
 <?php
+ini_set('display_errors', 'On');
 /**
  * @var System $system
  * @var User $user
@@ -24,8 +25,9 @@ if(isset($_POST['calc_gain'])) {
     Rank: <?=$DISPLAY_DATA['rank']?><br />
     Multiplier: <?=$DISPLAY_DATA['multiplier']?><br />
     Multiple: <?=$DISPLAY_DATA['multiple_of']?><br />
-    Raw: <?=Currency::calcRawYenGain(rank_num: $DISPLAY_DATA['rank_num'], multiplier: $DISPLAY_DATA['multiplier'])?><br />
-    Final Result: <?=Currency::getRoundedYen(rank_num: $DISPLAY_DATA['rank_num'], multiplier: $DISPLAY_DATA['multiplier'], multiple_of: $DISPLAY_DATA['multiple_of'])?>
+    Raw: <?= Currency::calcRawYenGain(rank_num: $DISPLAY_DATA['rank'], multiplier: $DISPLAY_DATA['multiplier']) ?><br />
+    Final Result: <?=Currency::getRoundedYen(rank_num: $DISPLAY_DATA['rank'], multiplier: $DISPLAY_DATA['multiplier'], multiple_of: $DISPLAY_DATA['multiple_of'])?>
+<br /><br />
 <?php endif ?>
 <form action="<?=$self_link?>" method="post">
     Rank: <select name="rank">
@@ -35,7 +37,7 @@ if(isset($_POST['calc_gain'])) {
         <option value='4'>Jonin</option>
         <option value='5'>Sennin</option>
     </select><br />
-    Multiplier: <input type='text' name='multiplier' /><br />
-    Multiple Of: <input type='text' name='multiple_of' /><br />
+    Multiplier: <input type='text' name='multiplier' value='<?=($DISPLAY_DATA['rank'])??1?>' /><br />
+    Multiple Of: <input type='text' name='multiple_of' value='<?=($DISPLAY_DATA['multiple_of'])??1?>' /><br />
     <input type='submit' name='calc_gain' value='Run' />
 </form>
