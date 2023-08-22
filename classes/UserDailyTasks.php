@@ -75,7 +75,12 @@ class UserDailyTasks {
         $this->tasks_string = json_encode($this->tasks);
     }
     public function generateNewTasks($update_db = true): void {
-        $this->tasks = DailyTask::generateNewTasks($this->user_rank_num);
+        $this->tasks = DailyTask::generateNewTasks(
+            user_rank_num: $this->user_rank_num,
+            total_skill: $this->total_skills,
+            total_attributes: $this->total_attributes,
+            pvp_rep: $this->pvp_rep
+        );
         if($update_db) {
             $this->update(true);
         }
