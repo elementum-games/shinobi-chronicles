@@ -443,7 +443,7 @@ class SpecialMission {
 			$this->player->currency->money->manualLog(
 				new_amount: $this->player->money->getAmount(), 
 				old_amount: $this->player->money->getAmount() - $this->reward,
-				description: "Special Mission"
+				description: System::unSlug($this->difficulty) . " Special Mission"
 			);
             $this->player->special_mission = 0;
 
@@ -608,7 +608,7 @@ class SpecialMission {
 		$this->player->currency->money->manualLog(
 			new_amount: $this->player->money->getAmount(), 
             old_amount: $this->player->money->getAmount() - $this->reward,
-            description: "Failed Special Mission"
+            description: "Failed " . System::unSlug($this->difficulty) . " Special Mission"
 		);
         return true;
     }
