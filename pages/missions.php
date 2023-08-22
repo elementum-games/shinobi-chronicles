@@ -434,6 +434,9 @@ function runActiveMission(): bool {
                     }
                 }
 
+                // Calc money
+                $yen_gain = Currency::calcMissionMoneyGain(user_rank: $player->rank_num, mission_rank: $mission_rank, mission_yen_round: Mission::MISSION_GAIN_YEN_ROUND);
+
                 // check what mission rank for daily Task
                 $all_mission_ranks = [0, 1, 2, 3, 4];
                 $mission_rank = $all_mission_ranks[$mission->rank];
@@ -449,7 +452,7 @@ function runActiveMission(): bool {
 
                 // Rewards
                 echo Mission::processRewards($mission, $player, $system);
-                $player->currency->addMoney($mission->money, "Village mission complete");
+                $player->currency->addMoney($yen_gain, "Village mission complete");
                 $player->clearMission();
                 $player->last_ai_ms = System::currentTimeMs();
 

@@ -29,6 +29,13 @@ class Currency {
 
     const AYAKASHI_SYMBOL = "AF";
 
+    // Yen gain controllers
+    const MISSION_RANK_D_MULTIPLIER = 2;
+    const MISSION_RANK_C_MULTIPLIER = 3;
+    const MISSION_RANK_B_MULTIPLIER = 4;
+    const MISSION_RANK_A_MULTIPLIER = 5;
+    const MISSION_RANK_S_MULTIPLIER = 6;
+
     public function __construct(
         // Defined members
         public System $system,
@@ -147,6 +154,24 @@ class Currency {
         return self::roundYen(
             num: self::calcRawYenGain($rank_num, $multiplier),
             multiple_of: $multiple_of
+        );
+    }
+
+    /** Mission Gains **/
+    public static function calcMissionMoneyGain(int $user_rank, int $mission_rank, int $mission_yen_round) {
+        match($mission_rank) {
+            Mission::RANK_D => $multiplier = self::MISSION_RANK_D_MULTIPLIER,
+            Mission::RANK_C => $multiplier = self::MISSION_RANK_C_MULTIPLIER,
+            Mission::RANK_B => $multiplier = self::MISSION_RANK_B_MULTIPLIER,
+            Mission::RANK_A => $multiplier = self::MISSION_RANK_A_MULTIPLIER,
+            Mission::RANK_S => $multiplier = self::MISSION_RANK_S_MULTIPLIER,
+            default => $multiplier = self::MISSION_RANK_D_MULTIPLIER
+        };
+
+        return self::getRoundedYen(
+            rank_num: $user_rank,
+            multiplier: $multiplier,
+            multiple_of: Mission::MISSION_GAIN_YEN_ROUND
         );
     }
 

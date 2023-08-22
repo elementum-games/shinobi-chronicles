@@ -19,6 +19,8 @@ class Mission {
 
     const FACTION_AYAKASHI = 1; // for future possible use
 
+    const MISSION_GAIN_YEN_ROUND = 10;
+
     public static array $type_names = [
         self::TYPE_VILLAGE => 'Village',
         self::TYPE_CLAN => 'Clan',
