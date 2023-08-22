@@ -202,15 +202,15 @@ class Currency {
         $base_yen_per_battle = SpecialMission::BATTLE_BASE_YEN * ($user_rank+1);
         // Difficulty modifier
         match($difficulty) {
-            SpecialMission::DIFFICULTY_EASY => floor($base_yen_per_battle * self::SPECIAL_MISSION_EASY_MOD),
-            SpecialMission::DIFFICULTY_NORMAL => floor($base_yen_per_battle * self::SPECIAL_MISSION_NORMAL_MOD),
-            SpecialMission::DIFFICULTY_HARD => floor($base_yen_per_battle * self::SPECIAL_MISSION_HARD_MOD),
-            SpecialMission::DIFFICULTY_NIGHTMARE => floor($base_yen_per_battle * self::SPECIAL_MISSION_NIGHTMARE_MOD),
-            default => floor($base_yen_per_battle * self::SPECIAL_MISSION_EASY_MOD)
+            SpecialMission::DIFFICULTY_EASY => $yen_gain = floor($base_yen_per_battle * self::SPECIAL_MISSION_EASY_MOD),
+            SpecialMission::DIFFICULTY_NORMAL => $yen_gain = floor($base_yen_per_battle * self::SPECIAL_MISSION_NORMAL_MOD),
+            SpecialMission::DIFFICULTY_HARD => $yen_gain = floor($base_yen_per_battle * self::SPECIAL_MISSION_HARD_MOD),
+            SpecialMission::DIFFICULTY_NIGHTMARE => $yen_gain = floor($base_yen_per_battle * self::SPECIAL_MISSION_NIGHTMARE_MOD),
+            default => $yen_gain = floor($base_yen_per_battle * self::SPECIAL_MISSION_EASY_MOD)
         };
 
         return self::roundYen(
-            num: $base_yen_per_battle,
+            num: $yen_gain,
             multiple_of: SpecialMission::BATTLE_ROUND_MONEY_TO
         );
     }

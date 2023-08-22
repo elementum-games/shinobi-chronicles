@@ -22,9 +22,9 @@ class SpecialMission {
     const MISSION_COMPLETE_RANDOMNESS = 0.8;
     const MISSION_COMPLETE_ROUND_MONEY_TO = 25;
 
-    const BATTLE_BASE_YEN = 6;
-    const BATTLE_RANDOMNESS = 0.70;
-    const BATTLE_ROUND_MONEY_TO = 5;
+    const BATTLE_BASE_YEN = 12;
+    const BATTLE_RANDOMNESS = 0.65;
+    const BATTLE_ROUND_MONEY_TO = 3;
 
     /*
      * DIFFICULTY
@@ -443,7 +443,7 @@ class SpecialMission {
 			$this->player->currency->money->manualLog(
 				new_amount: $this->player->money->getAmount(), 
 				old_amount: $this->player->money->getAmount() - $this->reward,
-				description: System::unSlug($this->difficulty) . " Special Mission"
+				description: "Special Mission"
 			);
             $this->player->special_mission = 0;
 
@@ -554,7 +554,7 @@ class SpecialMission {
             difficulty: $this->difficulty
         );
         $yen_gain = Currency::roundYen(
-            num: $yen_gain * self::BATTLE_RANDOMNESS + (mt_rand(1, 3) / 10),
+            num: $yen_gain * self::BATTLE_RANDOMNESS + (mt_rand(1, 4) / 10),
             multiple_of: self::BATTLE_ROUND_MONEY_TO
         );
 
@@ -608,7 +608,7 @@ class SpecialMission {
 		$this->player->currency->money->manualLog(
 			new_amount: $this->player->money->getAmount(), 
             old_amount: $this->player->money->getAmount() - $this->reward,
-            description: "Failed " . System::unSlug($this->difficulty) . " Special Mission"
+            description: "Failed Special Mission"
 		);
         return true;
     }

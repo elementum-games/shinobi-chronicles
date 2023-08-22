@@ -36,10 +36,6 @@ else if(isset($_POST['special_mission'])) {
 		user_rank: $rank,
 		difficulty: $difficulty
 	);
-	/*$yen_gain = Currency::roundYen(
-		num: $yen_gain * self::BATTLE_RANDOMNESS + (mt_rand(1, 3) / 10),
-		multiple_of: self::BATTLE_ROUND_MONEY_TO
-	);*/
 
     $DISPLAY_DATA = [
         'rank' => $rank,
@@ -51,30 +47,30 @@ else if(isset($_POST['special_mission'])) {
 		'raw_complete' => $raw_complete,
 		'final_lowest_rate' => Currency::roundYen(
 			num: $raw_complete * (SpecialMission::MISSION_COMPLETE_RANDOMNESS + .1),
-			multiple_of: SpecialMission::MISSION_COMPLETE_ROUND_MONEY_TO
+			multiple_of: $mission_multiple
 		),
 		'final_complete_average' => Currency::roundYen(
 			num: $raw_complete,
-			multiple_of: SpecialMission::MISSION_COMPLETE_ROUND_MONEY_TO
+			multiple_of: $mission_multiple
 		),
 		'final_highest_rate' => Currency::roundYen(
 			num: $raw_complete * (SpecialMission::MISSION_COMPLETE_RANDOMNESS + .4),
-			multiple_of: SpecialMission::MISSION_COMPLETE_ROUND_MONEY_TO
+			multiple_of: $mission_multiple
 		),
 		'div_2' => "<br />",
 		
 		'raw_battle' => $raw_battle,
 		'battle_lowest_rate' => Currency::roundYen(
 			num: $raw_battle * (SpecialMission::BATTLE_RANDOMNESS + .1),
-			multiple_of: SpecialMission::BATTLE_ROUND_MONEY_TO
+			multiple_of: $battle_multiple
 		),
 		'battle_average_rate' => Currency::roundYen(
 			num: $raw_battle,
-			multiple_of: SpecialMission::BATTLE_ROUND_MONEY_TO
+			multiple_of: $battle_multiple
 		),
 		'battle_highest_rate' => Currency::roundYen(
-			num: $raw_battle * (SpecialMission::BATTLE_RANDOMNESS + .3),
-			multiple_of: SpecialMission::BATTLE_ROUND_MONEY_TO
+			num: $raw_battle * (SpecialMission::BATTLE_RANDOMNESS + .4),
+			multiple_of: $battle_multiple
 		),
     ];
 }
@@ -115,7 +111,7 @@ else if(isset($_POST['special_mission'])) {
         <option value='hard' <?=(isset($DISPLAY_DATA['difficulty']) && $DISPLAY_DATA['difficulty'] == 'hard') ? "selected" : ""?>>Hard</option>
         <option value='nightmare' <?=(isset($DISPLAY_DATA['difficulty']) && $DISPLAY_DATA['difficulty'] == 'nightmare') ? "selected" : ""?>>Nightmare</option>
     </select><br />
-    Battle Multiple: <input type='text' name='battle_multiple' value='<?=($DISPLAY_DATA['multiple_of'])??5?>' /><br />
-	Complete Multiple: <input type='text' name='mission_multiple' value='<?=($DISPLAY_DATA['multiple_of'])??25?>' /><br />
+    Battle Multiple: <input type='text' name='battle_multiple' value='<?=($DISPLAY_DATA['battle_multiple'])??5?>' /><br />
+	Complete Multiple: <input type='text' name='mission_multiple' value='<?=($DISPLAY_DATA['mission_multiple'])??25?>' /><br />
     <input type='submit' name='special_mission' value='Run' />
 </form>
