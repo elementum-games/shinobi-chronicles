@@ -27,6 +27,9 @@ class UserCurrency {
     public function getFormattedMoney(): string {
         return $this->money->getFormattedCurrency();
     }
+    public function setMoneyDailyTask(UserDailyTasks $daily_tasks): void {
+        $this->money->userDailyTasks = $daily_tasks;
+    }
 
     // Premium functions
     public function addPremiumCredits(int $amount, string $description, bool $increment_purchased = false): void {

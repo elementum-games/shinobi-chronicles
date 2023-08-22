@@ -633,8 +633,7 @@ class User extends Fighter {
                 system: $this->system,
                 user_id: $this->user_id,
                 type: Currency::TYPE_MONEY,
-                amount: $currencies[Currency::TYPE_MONEY],
-                userDailyTasks: $this->daily_tasks
+                amount: $currencies[Currency::TYPE_MONEY]
             ),
             premium_credits: Currency::loadFromDb(
                 system: $this->system,
@@ -735,6 +734,9 @@ class User extends Fighter {
             total_attributes: $total_attribs,
             pvp_rep: $this->pvp_rep
         );
+
+        // Set daily tasks for Money
+        $this->currency->setMoneyDailyTask($this->daily_tasks);
 
         // Check Daily Tasks completion
         if($UPDATE == User::UPDATE_FULL && !$remote_view) {
