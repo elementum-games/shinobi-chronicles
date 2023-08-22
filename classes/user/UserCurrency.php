@@ -13,12 +13,21 @@ class UserCurrency {
     ) {}
 
     // Yen functions
-    public function addMoney(int $amount, string $description, bool $increment_daily_task = true): void {
-        $this->money->add($amount, $description, $increment_daily_task);
+    public function addMoney(int $amount, string $description, bool $increment_daily_task = true, bool $log = true): void {
+        $this->money->add(
+            amount: $amount, 
+            descripton: $description, 
+            increment_daily: $increment_daily_task,
+            log: $log
+        );
         $this->update_data = true;
     }
-    public function subtractMoney(int $amount, string $description): void {
-        $this->money->subtract($amount, $description);
+    public function subtractMoney(int $amount, string $description, bool $log = true): void {
+        $this->money->subtract(
+            amount: $amount, 
+            descriptioin: $description,
+            log: $log
+        );
         $this->update_data = true;
     }
     public function getMoney(): int {
