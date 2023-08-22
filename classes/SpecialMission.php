@@ -721,10 +721,10 @@ class SpecialMission {
         $result = $system->db->query("UPDATE `special_missions`
 SET `status`=2, `end_time`={$timestamp} WHERE `mission_id`={$mission_id}");
         $player->special_mission = 0;
-	    $this->player->currency->money->manualLog(
-			new_amount: $this->player->money->getAmount(), 
-			old_amount: $this->player->money->getAmount() - $this->reward,
-			description: "Cacnelled " . System::unSlug($this->difficulty) . " Special Mission"
+	    $player->currency->money->manualLog(
+			new_amount: $player->money->getAmount(), 
+			old_amount: $player->money->getAmount() - $this->reward,
+			description: "Cacnelled Special Mission"
 		);
         $player->updateData();
         return true;
