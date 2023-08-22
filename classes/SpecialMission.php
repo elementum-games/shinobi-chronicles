@@ -22,7 +22,7 @@ class SpecialMission {
     const MISSION_COMPLETE_RANDOMNESS = 0.8;
     const MISSION_COMPLETE_ROUND_MONEY_TO = 25;
 
-    const BATTLE_BASE_YEN = 12;
+    const BATTLE_BASE_YEN = 8;
     const BATTLE_RANDOMNESS = 0.65;
     const BATTLE_ROUND_MONEY_TO = 3;
 
