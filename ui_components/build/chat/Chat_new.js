@@ -371,9 +371,11 @@ function ChatPosts({
     onClick: () => deletePost(post.id)
   })), isModerator && post.deleted && /*#__PURE__*/React.createElement("div", {
     className: "recover_post_wrapper"
-  }, /*#__PURE__*/React.createElement("span", {
+  }, /*#__PURE__*/React.createElement("img", {
+    className: "post_delete",
+    src: "../images/v2/icons/approve_hover.png",
     onClick: () => recoverPost(post.id)
-  }, "Recover")), /*#__PURE__*/React.createElement("div", {
+  })), /*#__PURE__*/React.createElement("div", {
     className: "post_report_wrapper"
   }, /*#__PURE__*/React.createElement("a", {
     className: "imageLink",

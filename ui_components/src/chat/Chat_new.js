@@ -386,7 +386,11 @@ function ChatPosts({
                                 }
                                 {isModerator && post.deleted &&
                                     <div className='recover_post_wrapper'>
-                                        <span onClick={() => recoverPost(post.id)}>Recover</span>
+                                        <img
+                                            className='post_delete'
+                                            src='../images/v2/icons/approve_hover.png'
+                                            onClick={() => recoverPost(post.id)}
+                                        />
                                     </div>
                                 }
                                 <div className='post_report_wrapper'>
