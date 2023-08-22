@@ -27,11 +27,14 @@ final class YenGainUpdate extends AbstractMigration
         $this->execute("ALTER TABLE `chat` ADD COLUMN `deleted` INT(1) NOT NULL DEFAULT 0");
         // User Currency
         $this->execute("CREATE TABLE `user_currency`
-            `user_id` INT NOT NULL DEFAULT 0 PRIMARY KEY,
-            `money` INT NOT NULL DEFAULT 0,
-            `premium_credits` INT NOT NULL DEFAULT 0,
-            `premium_credits_purchased` INT NOT NULL DEFAULT 0,
-            `ayakashi_favor` INT NOT NULL DEFAULT 0
+            (
+                `user_id` INT NOT NULL DEFAULT 0 PRIMARY KEY,
+                `money` INT NOT NULL DEFAULT 0,
+                `premium_credits` INT NOT NULL DEFAULT 0,
+                `premium_credits_purchased` INT NOT NULL DEFAULT 0,
+                `tokens` INT NOT NULL DEFaULT 0,
+                `ayakashi_favor` INT NOT NULL DEFAULT 0
+            )
         ");
     }
     public function down(): void
@@ -44,6 +47,6 @@ final class YenGainUpdate extends AbstractMigration
         // Chat deletion
         $this->execute("ALTER TABLE `chat` DROP COLUMN `deleted`");
         // User Currency
-        $this->execute("DROP TABLE `user_currency`);
+        $this->execute("DROP TABLE `user_currency`");
     }
 }

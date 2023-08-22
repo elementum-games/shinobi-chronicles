@@ -189,8 +189,8 @@ class Currency {
                 )
             ");
             return [
-                'user_id' => $this->user_id, 
-                self::TYPE_MONEY => $user_dat[self::TYPE_MONEY], 
+                'user_id' => $user_id,
+                self::TYPE_MONEY => $user_data[self::TYPE_MONEY],
                 self::TYPE_PREMIUM_CREDITS => $user_data[self::TYPE_PREMIUM_CREDITS], 
                 self::TYPE_PREMIUM_CREDITS_PURCHASED => $user_data[self::TYPE_PREMIUM_CREDITS_PURCHASED],
                 self::TYPE_TOKEN => 0,
