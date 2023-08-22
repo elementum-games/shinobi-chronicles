@@ -919,7 +919,7 @@ class User extends Fighter {
             }
         }
     }
-    public function loadMissionData(int $mission_id, string $mission_stage, string $missions_completed, int $special_mission): void {
+    public function loadMissionData(int $mission_id, string $mission_stage, ?string $missions_completed, int $special_mission): void {
         // Missions
         $this->mission_id = $mission_id;
         if($this->mission_id) {
