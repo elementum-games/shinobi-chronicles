@@ -444,7 +444,7 @@ function runActiveMission(): bool {
                     mission_rank: $mission->rank, 
                     mission_yen_round: Mission::MISSION_GAIN_YEN_ROUND
                 );
-                echo "You have been paid " . $player->currency->money->symbol . "$yen_gain.";
+                echo "You have been paid " . $player->currency->money->symbol . "$yen_gain.<br />";
 
                 // Village reputation
                 if ($player->reputation->canGain(true)) {
