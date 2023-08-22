@@ -13,7 +13,7 @@ type Props = {|
     },
 |};
 export function News({ initialNewsPosts, isAdmin, version, homeLinks }: Props): React$Node {
-    const [activePostId, setActivePostId] = React.useState(initialNewsPosts[0] !== "undefined" ? initialNewsPosts[0].post_id : null);
+    const [activePostId, setActivePostId] = React.useState(initialNewsPosts[0] !== undefined ? initialNewsPosts[0].post_id : null);
     const [editPostId, setEditPostId] = React.useState(null);
     const numPosts = React.useRef(initialNewsPosts.length);
     const [newsPosts, setNewsPosts] = React.useState(initialNewsPosts);
