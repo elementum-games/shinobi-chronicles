@@ -382,8 +382,8 @@ class ChatManager {
      * @throws RuntimeException
      */
     public function deletePost(int $post_id): array {
-		$this->system->db->query("UPDATE `chat` SET `deleted`=1 WHERE `post_id`=$post_id LIMT 1");
-		$player->staff_manager->staffLog(StaffManager::STAFF_LOG_MOD, "{$player->user_name}({$player->user_id}) deleted chat post #{$post_id}");
+		$this->system->db->query("UPDATE `chat` SET `deleted`=1 WHERE `post_id`=$post_id LIMIT 1");
+		$this->player->staff_manager->staffLog(StaffManager::STAFF_LOG_MOD, "{$this->player->user_name}({$this->player->user_id}) deleted chat post #{$post_id}");
 
         if($this->system->db->last_affected_rows == 0) {
             throw new RuntimeException("Error deleting post!");
