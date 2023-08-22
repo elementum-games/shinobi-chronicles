@@ -565,10 +565,10 @@ class User extends Fighter {
             recent_players_killed: $user_data['recent_players_killed_ids'],
             recent_killers: $user_data['recent_killer_ids']
         );
-        // Daily tasks
-        $this->loadDailyTasks($UPDATE, $remote_view);
         // Currency
         $this->loadCurrency(user_data: $user_data);
+        // Daily tasks
+        $this->loadDailyTasks($UPDATE, $remote_view);
         // Clan
         $this->loadClanData(clan_id: $user_data['clan_id'], clan_office: $user_data['clan_office']);
         // Team
