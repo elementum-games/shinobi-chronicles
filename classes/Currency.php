@@ -199,7 +199,7 @@ class Currency {
     }
 
     public static function calcSpecialMissionBattleGain(int $user_rank, string $difficulty) {
-        $base_yen_per_battle = SpecialMission::BATTLE_BASE_YEN * $user_rank;
+        $base_yen_per_battle = SpecialMission::BATTLE_BASE_YEN * ($user_rank+1);
         // Difficulty modifier
         match($difficulty) {
             SpecialMission::DIFFICULTY_EASY => floor($base_yen_per_battle * self::SPECIAL_MISSION_EASY_MOD),
