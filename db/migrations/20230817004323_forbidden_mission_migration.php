@@ -61,7 +61,7 @@ final class ForbiddenMissionMigration extends AbstractMigration
         // Delete from items table
         $this->execute("
             DELETE FROM `items`
-                WHERE `item_id` = 131;
+                WHERE `item_id` IN (131, 132);
         ");
 
         // Commit Transaction
