@@ -549,12 +549,12 @@ class SpecialMission {
         $intel_gained *= 0.8 + (mt_rand(1, 4) / 10);
         $intel_gained = floor($intel_gained);
 
-        $yen_gain = Currency::calcSpecialMissionBattleGain(
+        $raw_battle_yen = Currency::calcSpecialMissionBattleGain(
             user_rank: $this->player->rank_num, 
             difficulty: $this->difficulty
         );
-        $yen_gain = Currency::roundYen(
-            num: $yen_gain * self::BATTLE_RANDOMNESS + (mt_rand(1, 4) / 10),
+        $battle_yen = Currency::roundYen(
+            num: $raw_battle_yen * (self::BATTLE_RANDOMNESS + (mt_rand(1, 4) / 10)),
             multiple_of: self::BATTLE_ROUND_MONEY_TO
         );
 
@@ -581,16 +581,16 @@ class SpecialMission {
 
             // Yen Gain
             $this->player->currency->addMoney(
-				amount: $yen_gain,
+				amount: $battle_yen,
 				log: false
 			);
-            $this->reward += $yen_gain;
+            $this->reward += $battle_yen;
 
             // generate a new target
             $this->generateTarget();
 
             // Modify the event text
-            $battle_text .= "[br]You collected &#165;{$yen_gain}!";
+            $battle_text .= "[br]You collected &#165;{$battle_yen}!";
         }
 
         return ([$battle_result, $battle_text]);
