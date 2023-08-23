@@ -160,5 +160,5 @@ function training() {
     }
 
     $system->printMessage();
-    require 'templates/training.php';
+    require 'templates/training_v2.php';
 }
