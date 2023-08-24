@@ -1,5 +1,4 @@
 import { CharacterAvatar } from "../CharacterAvatar.js";
-
 function Profile({
   links,
   playerData,
@@ -37,7 +36,6 @@ function Profile({
     playerAchievements: playerAchievements
   })));
 }
-
 function StatusAttributes({
   playerData,
   playerSettings,
@@ -107,7 +105,6 @@ function StatusAttributes({
     href: links.team
   }, playerData.teamName)))))));
 }
-
 function PlayerStats({
   playerData,
   playerStats
@@ -182,7 +179,6 @@ function PlayerStats({
     className: "ft-c3"
   })))));
 }
-
 function PlayerBloodline({
   playerData,
   bloodlinePageUrl,
@@ -204,7 +200,6 @@ function PlayerBloodline({
     href: buyBloodlineUrl
   }, "None")));
 }
-
 function PlayerUserRep({
   playerData
 }) {
@@ -225,7 +220,6 @@ function PlayerUserRep({
     className: "weekly_reputation"
   }, playerData.weeklyRep, "/", playerData.maxWeeklyRep, " PvE \xA0|\xA0\xA0", playerData.weeklyPvpRep, "/", playerData.maxWeeklyPvpRep, " PvP")));
 }
-
 function DailyTasks({
   dailyTasks
 }) {
@@ -256,7 +250,6 @@ function DailyTasks({
     }
   }, dailyTask.progressCaption)))));
 }
-
 function PlayerAchievements({
   playerAchievements
 }) {
@@ -282,5 +275,4 @@ function PlayerAchievements({
     className: "progress_label"
   }, achievement.progressLabel)))));
 }
-
 window.Profile = Profile;

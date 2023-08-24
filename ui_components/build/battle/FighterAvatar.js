@@ -10,7 +10,6 @@ const styles = {
   avatarImage: {
     display: "block",
     margin: "auto",
-
     /* for alt text */
     fontWeight: "bold",
     textTransform: "uppercase",
@@ -28,24 +27,23 @@ export function FighterAvatar({
   const name_letters = name_words.map(word => word.slice(0, 1));
   const name_initials = name_letters.join('');
   let alt = '';
-
   if (name_initials.length > 1) {
     alt = name_initials[0] + name_initials.slice(-1);
   } else {
     alt = name_initials;
   }
+
   /*maxWidth: `${maxAvatarSize}px`,
   maxHeight: `${maxAvatarSize}px`*/
-
 
   const img = /*#__PURE__*/React.createElement("img", {
     src: avatarLink,
     className: "avatarImage",
-    style: { ...styles.avatarImage
+    style: {
+      ...styles.avatarImage
     },
     alt: alt
   });
-
   if (includeContainer) {
     return /*#__PURE__*/React.createElement("div", {
       className: "avatarContainer",

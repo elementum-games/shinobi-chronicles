@@ -9,9 +9,7 @@ export default function BattleActionPrompt({
   if (battle.isComplete) {
     return null;
   }
-
   const opponent = battle.fighters[battle.opponentId];
-
   const renderPhaseComponent = () => {
     if (battle.isPreparationPhase) {
       return null;
@@ -28,9 +26,7 @@ export default function BattleActionPrompt({
       return /*#__PURE__*/React.createElement("tr", null, /*#__PURE__*/React.createElement("td", null, "invalid phase"));
     }
   };
-
   let prompt = '';
-
   if (battle.isPreparationPhase) {
     prompt = "Select pre-fight actions";
   } else if (battle.isMovementPhase) {
@@ -42,7 +38,6 @@ export default function BattleActionPrompt({
       prompt = "Select Jutsu";
     }
   }
-
   return /*#__PURE__*/React.createElement("table", {
     className: "table",
     style: {

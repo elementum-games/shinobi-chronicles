@@ -15,7 +15,8 @@ export default function FighterDisplay({
   showChakra,
   isOpponent
 }) {
-  const containerStyles = { ...styles.fighterDisplay,
+  const containerStyles = {
+    ...styles.fighterDisplay,
     ...(isOpponent && styles.opponent)
   };
   return /*#__PURE__*/React.createElement("div", {

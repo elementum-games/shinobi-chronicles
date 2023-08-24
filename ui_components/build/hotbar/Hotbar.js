@@ -1,5 +1,6 @@
-import { apiFetch } from "../utils/network.js"; // Initialize
+import { apiFetch } from "../utils/network.js";
 
+// Initialize
 function Hotbar({
   links,
   userAPIData
@@ -14,8 +15,9 @@ function Hotbar({
   const trainingFlag = React.useRef(0);
   const specialFlag = React.useRef(0);
   const battleFlag = React.useRef(null);
-  const quickFormRef = React.useRef(null); // API
+  const quickFormRef = React.useRef(null);
 
+  // API
   function getPlayerData() {
     apiFetch(links.user_api, {
       request: 'getPlayerData'
@@ -29,47 +31,35 @@ function Hotbar({
       }
     });
   }
-
   function quickSelectOnChange(event) {
     setQuickType(event.target.selectedOptions[0].getAttribute('data-state'));
   }
-
   function trainingSelectOnChange(event) {
     event.target.setAttribute("name", event.target.selectedOptions[0].getAttribute('data-name'));
   }
-
   function quickSubmitOnClick() {
     quickFormRef.current.submit();
   }
-
   function setKeybindsOnClick() {
     toggleKeybindDisplay(!displayKeybinds);
   }
-
   function hotbarToggle() {
     toggleHotbarDisplay(!displayHotbar);
   }
-
   function checkNotificationFlags(training, special, battle) {
     if (training == '0' && trainingFlag.current != '0') {
       createNotification("Training Complete!");
     }
-
     trainingFlag.current = training;
-
     if (special == '0' && specialFlag.current != '0') {
       createNotification("Special Mission Complete!");
     }
-
     specialFlag.current = special;
-
     if (battle != '0' && battleFlag.current == '0') {
       createNotification("You are in battle!");
     }
-
     battleFlag.current = battle;
   }
-
   function createNotification(message) {
     if (!window.Notification) {
       console.log('Browser does not support notifications.');
@@ -96,9 +86,9 @@ function Hotbar({
         });
       }
     }
-  } // Content
+  }
 
-
+  // Content
   function displayToggle() {
     return /*#__PURE__*/React.createElement("div", {
       id: "hb_toggle",
@@ -106,7 +96,6 @@ function Hotbar({
       className: "t-hover ft-s ft-c1 ft-default"
     }, "Toggle Hotbar");
   }
-
   function displayQuickSection(playerData, missionData, aiData, link_data, quickType) {
     return /*#__PURE__*/React.createElement("div", {
       id: "hb_quick_section",
@@ -287,7 +276,6 @@ function Hotbar({
       value: "deluxe"
     }, "Deluxe"))))));
   }
-
   function displaySettingsSection(playerData) {
     return /*#__PURE__*/React.createElement("div", {
       id: "hb_settings_section",
@@ -326,7 +314,6 @@ function Hotbar({
       className: "ft-s ft-c1 ft-min"
     }, "ENABLE HOTKEYS"))));
   }
-
   function displaySetKeybinds() {
     return /*#__PURE__*/React.createElement("div", {
       id: "hb_keybind_modal",
@@ -346,16 +333,18 @@ function Hotbar({
     }), /*#__PURE__*/React.createElement("div", {
       className: "t-center ft-min ft-s ft-c1 ft-b"
     }, "KEYBINDS"));
-  } // Misc
+  }
 
-
+  // Misc
   function handleErrors(errors) {
-    console.warn(errors); //setFeedback([errors, 'info']);
-  } // Initialize
+    console.warn(errors);
+    //setFeedback([errors, 'info']);
+  }
 
+  // Initialize
+  React.useEffect(() => {}, []);
 
-  React.useEffect(() => {}, []); // Display
-
+  // Display
   return /*#__PURE__*/React.createElement("div", {
     id: "hotbar",
     className: displayHotbar ? "jc-center d-flex" : "jc-center d-flex minimize"
@@ -365,5 +354,4 @@ function Hotbar({
     className: "hb_section_spacer"
   }), displayToggle(), playerData && displayQuickSection(playerData, missionData, aiData, links, quickType), playerData && displaySettingsSection(playerData), displaySetKeybinds()));
 }
-
 window.Hotbar = Hotbar;

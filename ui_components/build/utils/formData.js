@@ -13,21 +13,17 @@ export function buildFormData(data) {
   formData = appendObjProps(formData, data);
   return formData;
 }
-
 function appendObjProps(formData, data, prefix = '') {
   Object.keys(data).forEach(key => {
     let name;
-
     if (prefix) {
       name = prefix + '[' + key + ']';
     } else {
       name = key;
     }
-
     if (data[key] == null) {
       return;
     }
-
     if (typeof data[key] === "object") {
       formData = appendObjProps(formData, data[key], name);
     } else {

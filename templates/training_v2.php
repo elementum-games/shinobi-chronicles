@@ -26,6 +26,75 @@
     }
 </style>
 
+<link rel="stylesheet" type="text/css" href="<?= $system->getCssFileLink("ui_components/src/training/Training.css") ?>" />
+<div id="trainingReactContainer"></div>
+<script type="module" src="<?= $system->getReactFile("training/Training") ?>"></script>
+<script>
+    
+    const trainingContainer = document.querySelector("#trainingReactContainer");
+
+    <?php 
+    //to avoid dni errors
+    if(!isset($partial_gain)){
+        $partial_gain = 0;
+    }        
+    ?>
+
+    /* TODO: Check the Bool T/F cases in all scenarios */
+
+    window.addEventListener('load', () => {
+        ReactDOM.render(
+            React.createElement(Training, {
+                playerData: {
+                    hasPartialGainsBenefits: <?= $player->reputation->benefits[UserReputation::BENEFIT_PARTIAL_TRAINING_GAINS] ?: "false" ?>, /*bool*/
+                    trainGains: <?= $player->trainingManager->train_gain ?>,
+                    partialGain: <?= $partial_gain ?: "false" ?> /*Is this a string or an int?*/,
+                    hasActiveTraining: <?= $player->trainingManager->hasActiveTraining() ?: "false" ?>
+                },
+                trainingData: {
+                    short: "<?= $player->trainingManager->getTrainingInfo(TrainingManager::TRAIN_LEN_SHORT, TrainingManager::$skill_types[0])?>",
+                    long: "<?= $player->trainingManager->getTrainingInfo(TrainingManager::TRAIN_LEN_LONG, TrainingManager::$skill_types[0])?>",
+                    extended: "<?= $player->trainingManager->getTrainingInfo(TrainingManager::TRAIN_LEN_EXTENDED, TrainingManager::$skill_types[0])?>"
+                },
+                headers: {
+                    isSetCancelTraining: <?= isset($_GET['cancel_training']) ?: "false" ?>,
+                    isSetCancelConfirm: <?= isset($_GET['cancel_confirm']) ?: "false" ?>,
+                    selfLink: "<?= $self_link ?>"
+                }
+            }),
+            trainingContainer
+        );
+    })
+</script>
+
+
+<?php
+
+// isset($_GET['cancel_training']
+// isset($_GET['cancel_confirm'])
+
+// $player->reputation->benefits[UserReputation::BENEFIT_PARTIAL_TRAINING_GAINS])
+// $player->trainingManager->hasActiveTraining()
+// $player->trainingManager->train_gain
+// $partial_gain
+
+/** <a href="<?=$self_link?>&cancel_training=1&cancel_confirm=1">Confirm</a>**/
+
+// $player->bloodline_id
+// $trainable_bl_jutsu
+// //$player->trainingManager->hasActiveTraining()
+// $player->trainingManager->trainingDisplay()
+// System::timeRemaining($player->train_time - time(), 'short', false)
+/* /*countdownTimer(<?=$player->trainingManager->train_time_remaining?>, 'train_time_remaining') */
+// $self_link
+// $valid_skills
+// $player->trainingManager->train_type
+// ucwords(str_replace('_', ' ', $skill)
+// $valid_attributes
+// $player->jutsu
+// System::slug($jutsu->name)
+
+?>
 
 <?php if($player->trainingManager->hasActiveTraining() && isset($_GET['cancel_training']) && !isset($_GET['cancel_confirm'])): ?>
         <tr><th>Cancel Training</th></tr>
@@ -129,7 +198,7 @@
                             <?php if($jutsu->level >= Jutsu::MAX_LEVEL): ?>
                                 <?php continue; ?>
                             <?php endif ?>
-                            <option value="<?=$id?>" title="<?=$jutsu->jutsu_type?>" <?=($player->trainingManager->train_type == 'jutsu:'.System::slug($jutsu->name) ? "selected='selected'" : "")?>
+                            <option value="<?=$id?>" title="<?=$jutsu->jutsu_type?>" <?=($player->trainingManager->train_type == 'jutsu:'. System::slug($jutsu->name) ? "selected='selected'" : "")?>
                             ><?=$jutsu->name?></option>
                         <?php endforeach ?>
                     </select><br />
