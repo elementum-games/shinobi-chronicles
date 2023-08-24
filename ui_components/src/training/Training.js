@@ -10,13 +10,14 @@ function CancelTrainingDetails({
     playerData,
     headers
 }){
+
     return (
         <>
-            <p>Cancel Training</p>
+            <h2 className={'themeHeader'} style={{textAlign: 'center'}} >Cancel Training</h2>
             <p>
             Are you certain you wish to cancel your training? You will not gain any of your potential gains.
             </p>
-            <button><a href="<?=$self_link?>&cancel_training=1&cancel_confirm=1">Confirm</a></button>
+            <button><a href={headers.selfLink + '&cancel_training=1&cancel_confirm=1'}>Confirm</a></button>
         </>
     )
 }
@@ -31,15 +32,16 @@ function TrainingDetails({
                 <div>
                     <p>Here at the academy, you can take classes to improve your skills, attributes, or skill with a jutsu.</p>
                     <h3>Skill/Attribute training</h3>
-                    <label>Short: {trainingData.short}</label>
-                    <label>Long: {trainingData.long}</label>
-                    <label>Extended: {trainingData.Extended}</label>
+                    <p>Short: {trainingData.short}</p>
+                    <p>Long: {trainingData.long}</p>
+                    <p>Extended: {trainingData.extended}</p>
                 </div>
             </div>
         </>
     )
 }
 
+//Displays Training Data {Training Details, CancelTrainingDetails}
 function DetailPanel({
     playerData,
     trainingData,
@@ -68,6 +70,59 @@ function DetailPanel({
     )
 }
 
+function Option({
+    title
+}){
+    let styleItem = {
+        flex: '1 1 calc(25% - 20px)', // Distributes space for 4 items, reduces to 33.33% for 3 items
+        backgroundColor: '8B4513',
+        width: '100%',
+        textAlign: 'center'
+    }
+
+    let buttonsArray = []
+
+    return (
+        <div  style={styleItem} id='optionContainer'>
+            <h2>{title}</h2>
+            {buttonsArray.map((item, index) => (
+                <div key={index}>{item}</div>
+            ))}
+        </div>
+    )
+}
+
+//Displays Training Selection Input {TrainingOption}
+function SelectTrainingPanel({
+}){
+
+    let styleContainer = {
+        display: 'flex',
+        flexWrap: 'wrap',
+    }
+
+    return (
+        <div style={styleContainer}>
+            <Option
+            key={0}
+            title="Skills"
+            />
+            <Option
+            key={1} 
+            title="Attributes"
+            />
+            <Option 
+            key={2}
+            title="Jutsu"
+            />
+            <Option 
+            key={3}
+            title="Bloodline Jutsu"
+            />
+        </div>
+    )
+}
+
 function Training({
     playerData,
     trainingData,
@@ -80,6 +135,9 @@ function Training({
             playerData = {playerData}
             trainingData = {trainingData}
             headers = {headers}
+            />
+            <SelectTrainingPanel
+
             />
         </div>
     )

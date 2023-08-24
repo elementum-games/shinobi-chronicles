@@ -40,7 +40,7 @@
     }        
     ?>
 
-    /* TODO: Check the Bool T/F cases in all scenarios */
+    /* TODO: Check the Bool T/F cases in all */
 
     window.addEventListener('load', () => {
         ReactDOM.render(
@@ -59,7 +59,7 @@
                 headers: {
                     isSetCancelTraining: <?= isset($_GET['cancel_training']) ?: "false" ?>,
                     isSetCancelConfirm: <?= isset($_GET['cancel_confirm']) ?: "false" ?>,
-                    selfLink: "<?= $self_link ?>"
+                    selfLink: '<?= $self_link ?>'
                 }
             }),
             trainingContainer
