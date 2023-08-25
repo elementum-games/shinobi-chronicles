@@ -105,7 +105,7 @@ final class MapUpdateMigration extends AbstractMigration
                 (6, 15, 100, 100, 'village', 1, 3, 25, 'Nameless Village', 'wealth'),
                 (7, 1, 100, 100, 'village', 1, 16, 11, 'Nameless Village', 'food'),
                 (8, 1, 100, 100, 'village', 1, 4, 9, 'Nameless Village', 'materials'),
-                (9, 1, 100, 100, 'village', 1, 17, 5, 'Nameless Village', 'wealth'),
+                (9, 1, 100, 100, 'village', 1, 13, 5, 'Nameless Village', 'wealth'),
                 (10, 7, 100, 100, 'castle', 1, 27, 18, 'Nameless Castle', NULL),
                 (11, 7, 100, 100, 'village', 1, 24, 20, 'Nameless Village', 'food'),
                 (12, 4, 100, 100, 'village', 1, 13, 34, 'Nameless Village', 'food'),
@@ -169,7 +169,7 @@ final class MapUpdateMigration extends AbstractMigration
         // Modify map_locations
         $this->execute("UPDATE `maps_locations` SET `x` = 34, `y` = 45 WHERE `name` = 'Underground Colosseum'");
         $this->execute("UPDATE `maps_locations` SET `x` = 32, `y` = 9 WHERE `name` = 'Font of Vitality'");
-        $this->execute("UPDATE `maps_locations` SET `x` = 12, `y` = 8 WHERE `name` = 'Stone'");
+        $this->execute("UPDATE `maps_locations` SET `x` = 9, `y` = 7 WHERE `name` = 'Stone'");
         $this->execute("UPDATE `maps_locations` SET `x` = 71, `y` = 5 WHERE `name` = 'Cloud'");
         $this->execute("UPDATE `maps_locations` SET `x` = 41, `y` = 21 WHERE `name` = 'Leaf'");
         $this->execute("UPDATE `maps_locations` SET `x` = 5, `y` = 35 WHERE `name` = 'Sand'");
