@@ -11,10 +11,10 @@ class Region {
     const VILLAGE_COLORS = [
         0 => "rgba(0, 0, 0, 0)",
         1 => "rgba(139,69,19, 0.4)", // stone
-        2 => "rgba(240, 163, 10, 0.25)", // cloud
-        3 => "rgba(217, 30, 24, 0.25)", // leaf
+        2 => "rgba(253, 240, 0, 0.25)", // cloud
+        3 => "rgba(236, 28, 36, 0.25)", // leaf
         4 => "rgba(249, 105, 14, 0.35)", // sand
-        5 => "rgba(15, 10, 222, 0.25)", // mist
+        5 => "rgba(0, 0, 255, 0.25)", // mist
     ];
 
     public static function fromDb(array $region_data, int $min_x = 0, int $min_y = 0, int $max_x = 84, int $max_y = 48, int $map_id = 1): Region {
