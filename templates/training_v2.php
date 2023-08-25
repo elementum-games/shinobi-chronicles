@@ -38,9 +38,12 @@
     if(!isset($partial_gain)){
         $partial_gain = 0;
     } 
+
     ?>
 
     /* TODO: Check the Bool T/F cases in all */
+    /* TODO: Check if Arrays of valid training Skill/Attribute/Jutsu Types don't trigger errors if json_encode return an empty */
+    /* TODO: Have to test for a few different null cases for example if user doesn't have bloodline then it'll cause a fatal error for new users without bl, etc */
 
     window.addEventListener('load', () => {
         ReactDOM.render(
@@ -53,15 +56,21 @@
                     bloodlineID: <?= $player->bloodline_id ?: "0" ?> ,
                     hasTrainableBLJutsu: <?= $trainable_bl_jutsu ?: "false" ?>,
                     hasTeam: <?= $player->team ?: "false" ?>,
-                    hasTeamBoostTraining: <?= (!is_null($player->team) && $player->team->boost  == Team::BOOST_TRAINING) ? "true" : "false" ?>
+                    hasTeamBoostTraining: <?= (!is_null($player->team) && $player->team->boost  == Team::BOOST_TRAINING) ? "true" : "false" ?>,
+                    validSkillsArray: <?= json_encode($valid_skills) ?>,
+                    validAttributesArray: <?= json_encode($valid_attributes) ?>,
+                    allPlayerBloodlineJutsu: <?= (is_null($player->bloodline)) ? '[]' : json_encode($player->bloodline->jutsu) ?>,
+                    allPlayerJutsu: <?= json_encode($player->jutsu) ?>,
+                    jutsuMaxLevel: "<?= Jutsu::MAX_LEVEL ?>",
                 },
                 trainingData: {
                     short: "<?= $player->trainingManager->getTrainingInfo(TrainingManager::TRAIN_LEN_SHORT, TrainingManager::$skill_types[0])?>",
                     long: "<?= $player->trainingManager->getTrainingInfo(TrainingManager::TRAIN_LEN_LONG, TrainingManager::$skill_types[0])?>",
                     extended: "<?= $player->trainingManager->getTrainingInfo(TrainingManager::TRAIN_LEN_EXTENDED, TrainingManager::$skill_types[0])?>",
+                    jutsuTrainingInfo: "<?= $player->trainingManager->getTrainingInfo(TrainingManager::TRAIN_LEN_SHORT, 'jutsu:clone_combo'); ?>",
                     timeRemaining: "<?= System::timeRemaining($player->train_time - time(), 'short', false) ?>",
                     trainingDisplay: "<?= $player->trainingManager->trainingDisplay() ?>",
-                    trainType: "<?= $player->trainingManager->trainType() ?>"
+                    trainType: "<?= $player->trainingManager->trainType() ?>",
                 },
                 headers: {
                     isSetCancelTraining: <?= isset($_GET['cancel_training']) ?: "false" ?>,

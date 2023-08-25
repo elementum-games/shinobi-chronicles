@@ -12,18 +12,19 @@ function CancelTrainingDetails({
 }){
 
     return (
-        <>
-            <h2 className={'themeHeader'} style={{textAlign: 'center'}} >Cancel Training</h2>
+        <div style={{textAlign: 'center'}}>
+            <h2 className={'themeHeader'}>Cancel Training</h2>
             <p>
                 {/* TODO: I'm not sure how train gains or partial gains works here */}
             Are you certain you wish to cancel your training? You will not gain any of your potential <strong>{playerData.trainGains}</strong> gains.
             </p>
             <button><a href={headers.selfLink + '&cancel_training=1&cancel_confirm=1'}>Confirm</a></button>
-        </>
+        </div>
     )
 }
 
 function TrainingDetails({
+    playerData,
     trainingData
 }){
     return (
@@ -36,6 +37,10 @@ function TrainingDetails({
                     <p>Short: {trainingData.short}</p>
                     <p>Long: {trainingData.long}</p>
                     <p>Extended: {trainingData.extended}</p>
+                    <h3>Jutsu Training:</h3>
+                    <p>{trainingData.jutsuTrainingInfo}</p>
+                    { (playerData.hasTeam && playerData.hasTeamBoostTraining ) ? 
+                    <em>*Note: Your team has a chance at additional stat gains, these are not reflected above.</em> : <></>}
                 </div>
             </div>
         </>
@@ -59,6 +64,7 @@ function DetailPanel({
     } else {
         content = 
         <TrainingDetails
+        playerData = {playerData}
         trainingData = {trainingData}
         />;
     }
@@ -67,9 +73,6 @@ function DetailPanel({
     return (
         <>
         {content}
-        {/* Test this with team */}
-        { (playerData.hasTeam && playerData.hasTeamBoostTraining ) ? 
-        <em>*Note: Your team has a chance at additional stat gains, these are not reflected above.</em> : <></>}
         </>
     )
 }
@@ -97,13 +100,30 @@ function Option({
 
 //Displays Training Selection Input {TrainingOption}
 function SelectTrainingPanel({
-    playerData
+    playerData,
+    headers
 }){
+
+    // TODO: I think this is a heavy calculation for a react component so might need to change this in the future
+    //Only works on words with _ separators 
+    function capitalize(word){
+
+        const arr = word.replace("_", " ").split(" ");
+
+        for (var i = 0; i < arr.length; i++) {
+            arr[i] = arr[i].charAt(0).toUpperCase() + arr[i].slice(1);
+        }
+
+        const result = arr.join(" ");
+        return result;
+    }
 
     let styleContainer = {
         display: 'flex',
         flexWrap: 'wrap',
     }
+    
+    let tempkey = 0; //for child elements
 
     return (
         <div style={styleContainer}>
@@ -111,58 +131,65 @@ function SelectTrainingPanel({
             <Option
             key={0}
             title="Skills">
-                <select>
-                    <option value="grapefruit">Grapefruit</option>
-                    <option value="lime">Lime</option>
-                    <option selected value="coconut">Coconut</option>
-                    <option value="mango">Mango</option>
-                </select>
+                <form action={headers.selfLink} method="post">
+                    <select name="skill">
+                        {playerData.validSkillsArray.map( (skillName) => {
+                            return (<option key={tempkey++} value={skillName}>{capitalize(skillName)}</option>)
+                        })}
+                    </select>   
 
-                <button>
-                    Short
-                </button>
-                <button>
-                    Long
-                </button>
-                <button>
-                    Extended
-                </button>
+                    <br></br>
+
+                    <input type="submit" name="train_type" value="Short" />
+                    <input type="submit" name="train_type" value="Long" />
+                    <input type="submit" name="train_type" value="Extended" />
+                </form>
             </Option>
             
             {/* Attributes Training */}
             <Option
             key={1} 
             title="Attributes">
-                <select>
-                    <option value="grapefruit">Grapefruit</option>
-                    <option value="lime">Lime</option>
-                    <option selected value="coconut">Coconut</option>
-                    <option value="mango">Mango</option>
-                </select>
+                <form action={headers.selfLink} method="post">
+                    <select name="attributes">
+                        {playerData.validAttributesArray.map( (attributeName) => {
+                            return (<option key={tempkey++} value={attributeName}>{capitalize(attributeName)}</option>)
+                        })}
+                    </select>   
 
-                <button>
-                    Short
-                </button>
-                <button>
-                    Long
-                </button>
-                <button>
-                    Extended
-                </button>
+                    <br></br>
+
+                    <input type="submit" name="train_type" value="Short" />
+                    <input type="submit" name="train_type" value="Long" />
+                    <input type="submit" name="train_type" value="Extended" />
+                </form>
             </Option>
 
             {/* Jutsu Training */}
             <Option 
             key={2}
             title="Jutsu">
-                <select>
-                    <option value="grapefruit">Grapefruit</option>
-                    <option value="lime">Lime</option>
-                    <option selected value="coconut">Coconut</option>
-                    <option value="mango">Mango</option>
-                </select>
+                <form action={headers.selfLink} method="post">
+                    <select name="jutsu">
+                        {Object.keys(playerData.allPlayerJutsu).map((key) => {
 
-                <button> Train </button>
+                            const item = playerData.allPlayerJutsu[key].name;
+                            const id = playerData.allPlayerJutsu[key].id;
+                            const level = playerData.allPlayerJutsu[key].level;
+
+                            if(level <= playerData.jutsuMaxLevel){
+                                return <option key={key} value={id}>{item}</option>;
+                            } else {
+                                return null;
+                            }
+
+                        })}
+                    </select>   
+
+                    <br></br>
+
+                    <input type="submit" name="train_type" value="Train" />
+                </form>
             </Option>
             
             {/* Hide if no Bloodline or Trainable Jutsu */}
@@ -171,14 +198,27 @@ function SelectTrainingPanel({
             <Option 
             key={3}
             title="Bloodline Jutsu">
-                <select>
-                    <option value="grapefruit">Grapefruit</option>
-                    <option value="lime">Lime</option>
-                    <option selected value="coconut">Coconut</option>
-                    <option value="mango">Mango</option>
+                <form action={headers.selfLink} method="post">
+                <select name="bloodline_jutsu">
+                    {Object.keys(playerData.allPlayerBloodlineJutsu).map((key) => {
+
+                        const item = playerData.allPlayerBloodlineJutsu[key].name;
+                        const id = playerData.allPlayerBloodlineJutsu[key].id;
+                        const level = playerData.allPlayerBloodlineJutsu[key].level;
+
+                        if(level <= playerData.jutsuMaxLevel){
+                            return <option key={key} value={id}>{item}</option>;
+                        } else {
+                            return null;
+                        }
+
+                    })}
                 </select>
 
-                <button> Train </button>
+                <br></br>
+
+                <input type="submit" name="train_type" value="Train" />
+                </form>
             </Option>
             ) : (<></>)}
         </div>
@@ -204,13 +244,16 @@ function Training({
             {!playerData.hasActiveTraining ? (
                     <SelectTrainingPanel 
                     playerData = {playerData}
+                    headers = {headers}
                     />
                 ) : (
                     <div style={{textAlign: 'center'}}>
                         <h2  className="themeHeader" style={{borderRadius: '0px'}}> {trainingData.trainType} Training</h2>
                         <p>{trainingData.trainingDisplay}</p>
                         <p id="train_time_remaining">{trainingData.timeRemaining} remaining...</p>
-                        <button><a href={headers.selfLink + "&cancel_training=1"}>Cancel Training</a></button>
+                        {
+                            (!headers.isSetCancelTraining) ? <button><a href={headers.selfLink + "&cancel_training=1"}>Cancel Training</a></button> : <></>
+                        }
                     </div>
                 )}
 
