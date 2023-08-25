@@ -171,8 +171,9 @@ function MapGridLines({
     style: {
       width: tileWidth,
       height: tileHeight,
-      top: row * tileHeight,
-      left: col * tileWidth,
+      transform: `translate3d(${col * tileWidth}px, ${row * tileHeight}px, 0)`,
+      backfaceVisibility: "hidden",
+      filter: "blur(0)",
       backgroundColor: strategicView && regionCoords?.[col + 1]?.[row + 1]?.color || '',
       borderTop: strategicView && regionCoords?.[col + 1]?.[row + 1]?.border_top ? 'dashed 3px' : '',
       borderBottom: strategicView && regionCoords?.[col + 1]?.[row + 1]?.border_bottom ? 'dashed 3px' : '',
@@ -250,8 +251,9 @@ function MapNearbyPlayers({
     className: alignmentClass(player.alignment) + " " + visibilityClass(player.invulnerable),
     style: {
       cursor: "pointer",
-      top: (player.target_y - 1) * tileHeight + "px",
-      left: (player.target_x - 1) * tileWidth + "px"
+      transform: `translate3d(${(player.target_x - 1) * tileWidth}px, ${(player.target_y - 1) * tileHeight}px, 0)`,
+      backfaceVisibility: "hidden",
+      filter: "blur(0)"
     }
   }, /*#__PURE__*/React.createElement("div", {
     className: "map_locations_tooltip"
