@@ -16,6 +16,8 @@ class Currency {
     const PREMIUM_PURCHASED_SYMBOL = "AKP";
     const TOKEN_SYMBOL = "AS";
 
+    const BASE_YEN_GAIN = 30;
+    const BASE_YEN_COST = 15;
     const MAX_TOKENS = 0;
 
     public array $valid_currency_types;
@@ -47,6 +49,15 @@ class Currency {
     const SPECIAL_MISSION_HARD_MULTIPLIER = 3;
     const SPECIAL_MISSION_NIGHTMARE_MULTIPLIER = 4;
 
+    // Ramen
+    const RAMEN_VEGETABLE_MULTIPLIER = 1.5;
+    const RAMEN_PORK_MULTIPLIER = 3;
+    const RAMEN_DELUXE_MULTIPLIER = 6;
+    const RAMEN_ARENA_MULTIPLIER = 3;
+
+    // Jutsu
+    const JUTSU_MULTIPLER = 10;
+
     public function __construct(
         // Defined members
         public System $system,
@@ -59,7 +70,7 @@ class Currency {
         $this->valid_currency_types = self::getValidCurrencies();
         // Validate currency type
         if(!in_array($this->type, $this->valid_currency_types)) {
-            throw new RuntimeException("Invalid currency type {$this->type}!");
+            throw new RuntimeException("Invalid currency type $this->type!");
         }
 
         $this->name = self::getCurrencyName($this->type);
@@ -78,7 +89,7 @@ class Currency {
     }
 
     // Process currency reduction, set amount and log transaction
-    public function subtract(int $amount, string $description, bool $log = true) {
+    public function subtract(int $amount, string $description, bool $log = true): void {
         if($this->amount - $amount < 0) {
             throw new RuntimeException("Not enough " . System::unSlug($this->type) . "!");
         }
@@ -101,7 +112,7 @@ class Currency {
     }
 
     // Manual currency log
-    public function manualLog(int $new_amount, int $old_amount, string $description) {
+    public function manualLog(int $new_amount, int $old_amount, string $description): void {
         $this->system->currencyLog(
             character_id: $this->user_id,
             currency_type: $this->type,
@@ -166,7 +177,7 @@ class Currency {
 
     /** Calculate Yen Gains **/
     public static function calcRawYenGain(int $rank_num, int $multiplier): int {
-        return ceil(((30 * $rank_num) + pow($rank_num+1, 2)) * $multiplier);
+        return ceil(((self::BASE_YEN_GAIN * $rank_num) + pow($rank_num+1, 2)) * $multiplier);
     }
 
     public static function roundYen(int $num, int $multiple_of): int {
@@ -181,9 +192,8 @@ class Currency {
     }
 
     /** Mission Gains **/
-    public static function calcMissionMoneyGain(int $user_rank, int $mission_rank, int $mission_yen_round) {
+    public static function calcMissionMoneyGain(int $user_rank, int $mission_rank, int $mission_yen_round): int {
         match($mission_rank) {
-            Mission::RANK_D => $multiplier = self::MISSION_RANK_D_MULTIPLIER,
             Mission::RANK_C => $multiplier = self::MISSION_RANK_C_MULTIPLIER,
             Mission::RANK_B => $multiplier = self::MISSION_RANK_B_MULTIPLIER,
             Mission::RANK_A => $multiplier = self::MISSION_RANK_A_MULTIPLIER,
@@ -194,15 +204,14 @@ class Currency {
         return self::getRoundedYen(
             rank_num: $user_rank,
             multiplier: $multiplier,
-            multiple_of: Mission::MISSION_GAIN_YEN_ROUND
+            multiple_of: $mission_yen_round
         );
     }
 
-    public static function calcSpecialMissionBattleGain(int $user_rank, string $difficulty) {
+    public static function calcSpecialMissionBattleGain(int $user_rank, string $difficulty): int {
         $base_yen_per_battle = SpecialMission::BATTLE_BASE_YEN * ($user_rank+1);
         // Difficulty modifier
         match($difficulty) {
-            SpecialMission::DIFFICULTY_EASY => $yen_gain = floor($base_yen_per_battle * self::SPECIAL_MISSION_EASY_MOD),
             SpecialMission::DIFFICULTY_NORMAL => $yen_gain = floor($base_yen_per_battle * self::SPECIAL_MISSION_NORMAL_MOD),
             SpecialMission::DIFFICULTY_HARD => $yen_gain = floor($base_yen_per_battle * self::SPECIAL_MISSION_HARD_MOD),
             SpecialMission::DIFFICULTY_NIGHTMARE => $yen_gain = floor($base_yen_per_battle * self::SPECIAL_MISSION_NIGHTMARE_MOD),
@@ -215,14 +224,44 @@ class Currency {
         );
     }
 
-    public static function getSpecialMissionMultiplier(string $difficulty) {
+    public static function getSpecialMissionMultiplier(string $difficulty): int {
         return match($difficulty) {
-            SpecialMission::DIFFICULTY_EASY => self::SPECIAL_MISSION_EASY_MULTIPLIER,
             SpecialMission::DIFFICULTY_NORMAL => self::SPECIAL_MISSION_NORMAL_MULTIPLIER,
             SpecialMission::DIFFICULTY_HARD => self::SPECIAL_MISSION_HARD_MULTIPLIER,
             SpecialMission::DIFFICULTY_NIGHTMARE => self::SPECIAL_MISSION_NIGHTMARE_MULTIPLIER,
             default => self::SPECIAL_MISSION_EASY_MULTIPLIER
         };
+    }
+
+    /** Dynamic Costs **/
+    public static function calcRawYenCost(int $rank_num, float $multiplier): int {
+        return floor(((self::BASE_YEN_COST * $rank_num) + pow($rank_num+1, 2)) * $multiplier);
+    }
+    public static function calcRamenCost(int $rank_num, string $ramen_type, bool $arena): int {
+        $round_yen_to = ($arena) ? 50 : 20;
+        $ramen_cost = match($ramen_type) {
+            Item::RAMEN_TYPE_PORK => self::calcRawYenCost(rank_num: $rank_num, multiplier: self::RAMEN_PORK_MULTIPLIER),
+            Item::RAMEN_TYPE_DELUXE => self::calcRawYenCost(rank_num: $rank_num, multiplier: self::RAMEN_DELUXE_MULTIPLIER),
+            default => self::calcRawYenCost(rank_num: $rank_num, multiplier: self::RAMEN_VEGETABLE_MULTIPLIER),
+        };
+        if($arena) {
+            $ramen_cost *= self::RAMEN_ARENA_MULTIPLIER;
+        }
+        return self::roundYen(
+            num: $ramen_cost,
+            multiple_of: $round_yen_to
+        );
+    }
+
+    public static function calcJutsuScrollCost(int $jutsu_rank, float $jutsu_power, float $effect_amount): int {
+        $effect_multiplier = ($effect_amount) ? 1 + round($effect_amount / 5) : 1;
+        return self::roundYen(
+            num: self::calcRawYenCost(
+                rank_num: $jutsu_rank,
+                multiplier: $jutsu_power
+            ) * self::JUTSU_MULTIPLER * $effect_multiplier,
+            multiple_of: 5
+        );
     }
 
     /** Load Currency from DB **/

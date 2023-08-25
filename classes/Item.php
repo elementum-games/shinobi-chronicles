@@ -12,6 +12,10 @@ class Item {
     const PURCHASE_TYPE_PURCHASABLE = 1;
     const PURCHASE_TYPE_REWARD = 2;
 
+    const RAMEN_TYPE_VEGETABLE = 'vegetable';
+    const RAMEN_TYPE_PORK = 'pork';
+    const RAMEN_TYPE_DELUXE = 'deluxe';
+
     public static array $USE_TYPE_LABELS = [
         self::USE_TYPE_WEAPON => 'weapon',
         self::USE_TYPE_ARMOR => 'armor',

@@ -26,20 +26,20 @@ function healingShop() {
     $location_result = $system->db->fetch($result);
     $arena_coords = new TravelCoords($location_result['x'], $location_result['y'], 1);
 
-    $ramen_choices['vegetable'] = [
+    $ramen_choices[Item::RAMEN_TYPE_VEGETABLE] = [
         'cost' => $player->location->equals($arena_coords) ? $player->rank_num * 5 * 5 : $player->rank_num * 5,
         'health_amount' => $health[$player->rank_num] * 0.1,
-        'label' => 'Vegetable'
+        'label' => System::unSlug(Item::RAMEN_TYPE_VEGETABLE)
     ];
-    $ramen_choices['pork'] = [
+    $ramen_choices[Item::RAMEN_TYPE_PORK] = [
         'cost' => $player->location->equals($arena_coords) ? $player->rank_num * 25 * 5 : $player->rank_num * 25,
         'health_amount' => $health[$player->rank_num] * 0.5,
-        'label' => 'Pork'
+        'label' => System::unSlug(Item::RAMEN_TYPE_PORK)
     ];
-    $ramen_choices['deluxe'] = [
+    $ramen_choices[Item::RAMEN_TYPE_DELUXE] = [
         'cost' => $player->location->equals($arena_coords) ? $player->rank_num * 50 * 5 : $player->rank_num * 50,
         'health_amount' => $health[$player->rank_num] * 1,
-        'label' => 'Deluxe'
+        'label' => System::unSlug(Item::RAMEN_TYPE_DELUXE)
     ];
 
 	if(isset($_GET['heal'])) {
