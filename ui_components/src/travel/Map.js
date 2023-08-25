@@ -212,8 +212,10 @@ function MapLocations({ locations, tileWidth, tileHeight }) {
                         cursor: "pointer",
                         backgroundColor: "#" + location.background_color,
                         backgroundImage: "url(." + location.background_image + ")",
-                        top: location.objective_type == 'key_location' ? (((location.y - 1) * tileHeight) - 8) + "px" : ((location.y - 1) * tileHeight) + "px",
-                        left: location.objective_type == 'key_location' ? (((location.x - 1) * tileWidth) - 8) + "px" : ((location.x - 1) * tileWidth) + "px",
+                        transform: location.objective_type == 'key_location' ? `translate3d(${((location.x - 1) * tileWidth) - 8}px, ${((location.y - 1) * tileHeight) - 8}px, 0)`
+                            : `translate3d(${(location.x - 1) * tileWidth}px, ${(location.y - 1) * tileHeight}px, 0)`,
+                        backfaceVisibility: "hidden",
+                        filter: "blur(0)",
                     }}>
                     <div className='map_locations_tooltip'>{location.name}</div>
                     {location.objective_image &&
