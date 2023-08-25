@@ -212,10 +212,10 @@ else if(isset($_POST['calc_arena'])) {
         </td>
         <td style="padding: 10px; max-width:49%;">
             <form action="<?=$self_link?>" method="post">
-                Multiple Of: <input type='text' name='multiple_of' value='<?=($DISPLAY_DATA['multiple_of'])??5?>' /><br />
-                Arena min multiplier: <input type='text' name='arena_min' value='<?=($DISPLAY_DATA['arena_min'])??1?>' /><br />
-                Arena average: <input type='text' name='arena_avg' value='<?=($DISPLAY_DATA['arena_avg'])??3?>' /><br />
-                Arena max: <input type='text' name='arena_max' value='<?=($DISPLAY_DATA['arena_max'])??5?>' /><br />
+                Multiple Of: <input type='text' name='multiple_of' value='<?=($multiple_of)??5?>' /><br />
+                Arena min multiplier: <input type='text' name='arena_min' value='<?=($arena_min)??1?>' /><br />
+                Arena average: <input type='text' name='arena_avg' value='<?=($arena_avg)??3?>' /><br />
+                Arena max: <input type='text' name='arena_max' value='<?=($arena_max)??5?>' /><br />
                 <input type='submit' name='calc_arena' value='Run' />
             </form>
         </td>
