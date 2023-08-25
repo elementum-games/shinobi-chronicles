@@ -49,7 +49,7 @@ final class MapUpdateMigration extends AbstractMigration
         $this->execute("
             INSERT INTO `regions` (`region_id`, `name`, `village`, `vertices`) VALUES
                 (1, 'Stone', 1, '[[0,0],[23,0],[23,9],[21,12],[0,12]]'),
-                (2, 'Cloud', 2, '[[59,0],[84,0],[84,13],[71,13],[59,2]]'),
+                (2, 'Cloud', 2, '[[58,0],[84,0],[84,13],[71,13],[58,1]]'),
                 (3, 'Leaf', 3, '[[47,17],[52,22],[52,23],[49,27],[35,27],[31,23],[31,17]]'),
                 (4, 'Sand', 4, '[[0,27],[21,27],[27,33],[13,48],[0,48]]'),
                 (5, 'Mist', 5, '[[62,48],[62,43],[71,34],[84,34],[84,48]]'),
@@ -57,8 +57,8 @@ final class MapUpdateMigration extends AbstractMigration
                 (7, 'Stone Southeast', 1, '[[21,12],[23,9],[31,14],[31,23],[21,23],[21,12]]'),
                 (8, 'Stone South', 1, '[[0,12],[21,12],[21,23],[16,23],[13,19],[0,18]]'),
                 (9, 'Cloud South', 2, '[[70,12],[84,13],[84,22],[64,22],[65,22],[64,18]]'),
-                (10, 'Cloud Southwest', 2, '[[52,7],[59,2],[69,12],[69,13],[64,19]]'),
-                (11, 'Cloud West', 2, '[[39,0],[59,0],[59,3],[57,3],[56,4],[52,7],[52,6],[39,8]]'),
+                (10, 'Cloud Southwest', 2, '[[52,7],[59,1],[69,12],[69,13],[64,19]]'),
+                (11, 'Cloud West', 2, '[[39,0],[58,0],[58,1],[52,7],[52,6],[39,8]]'),
                 (12, 'Leaf North', 3, '[[39,8],[52,6],[47,12],[47,17],[31,17],[31,14]]'),
                 (13, 'Leaf East', 3, '[[47,12],[52,6],[64,19],[64,22],[62,25],[55,23],[53,23],[47,17]]'),
                 (14, 'Leaf South', 3, '[[38,27],[49,27],[53,22],[61,25],[52,34],[38,34]]'),
@@ -123,7 +123,7 @@ final class MapUpdateMigration extends AbstractMigration
                 (24, 2, 100, 100, 'village', 1, 65, 7, 'Nameless Village', 'materials'),
                 (25, 10, 100, 100, 'castle', 1, 59, 9, 'Nameless Castle', NULL),
                 (26, 10, 100, 100, 'village', 1, 63, 14, 'Nameless Village', 'food'),
-                (27, 10, 100, 100, 'village', 1, 58, 4, 'Nameless Village', 'wealth'),
+                (27, 10, 100, 100, 'village', 1, 58, 3, 'Nameless Village', 'wealth'),
                 (28, 11, 100, 100, 'castle', 1, 48, 3, 'Nameless Castle', NULL),
                 (29, 11, 100, 100, 'village', 1, 48, 7, 'Nameless Village', 'food'),
                 (30, 11, 100, 100, 'village', 1, 42, 4, 'Nameless Village', 'materials'),
