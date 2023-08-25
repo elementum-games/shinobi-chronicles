@@ -2,7 +2,9 @@ export const Map = ({
   mapData,
   scoutData,
   playerId,
-  ranksToView
+  ranksToView,
+  strategicView,
+  displayGrid
 }) => {
   // Visible field info
   const map_div = document.getElementsByClassName('travel-container')[0];
@@ -62,7 +64,9 @@ export const Map = ({
             ${(player_x - 1) * tile_width}px,
             ${(player_y - 1) * tile_height}px,
             0
-        )`
+        )`,
+    backfaceVisibility: "hidden",
+    filter: "blur(0)"
   };
   const MapStyle = {
     backgroundImage: "url(./" + mapData.background_image + ")",
@@ -85,7 +89,9 @@ export const Map = ({
                             0
                         )`,
       width: map_width * tile_width,
-      height: map_height * tile_height
+      height: map_height * tile_height,
+      backfaceVisibility: "hidden",
+      filter: "blur(0)"
     }
   }, /*#__PURE__*/React.createElement("div", {
     id: "map_background",
@@ -93,7 +99,7 @@ export const Map = ({
     style: {
       backgroundImage: MapStyle.backgroundImage
     }
-  }), /*#__PURE__*/React.createElement("div", {
+  }), displayGrid && /*#__PURE__*/React.createElement("div", {
     className: "map_grid_lines"
   }, /*#__PURE__*/React.createElement(MapGridLines, {
     tileWidth: tile_width,
@@ -102,7 +108,8 @@ export const Map = ({
     stageOffsetY: stage_offset_y,
     stageWidth: stage_width,
     stageHeight: stage_height,
-    region_locations: mapData.region_locations
+    regionCoords: mapData.region_coords,
+    strategicView: strategicView
   })), /*#__PURE__*/React.createElement(MapLocations, {
     locations: mapData.all_locations || [],
     tileWidth: tile_width,
@@ -148,7 +155,8 @@ function MapGridLines({
   stageOffsetY,
   stageWidth,
   stageHeight,
-  region_locations
+  regionCoords,
+  strategicView
 }) {
   const rows = [];
   for (let i = stageOffsetY - 1; i < stageOffsetY + stageHeight + 2; i++) {
@@ -164,7 +172,15 @@ function MapGridLines({
       width: tileWidth,
       height: tileHeight,
       top: row * tileHeight,
-      left: col * tileWidth
+      left: col * tileWidth,
+      backgroundColor: strategicView && regionCoords?.[col + 1]?.[row + 1]?.color || '',
+      borderTop: strategicView && regionCoords?.[col + 1]?.[row + 1]?.border_top ? 'dashed 3px' : '',
+      borderBottom: strategicView && regionCoords?.[col + 1]?.[row + 1]?.border_bottom ? 'dashed 3px' : '',
+      borderLeft: strategicView && regionCoords?.[col + 1]?.[row + 1]?.border_left ? 'dashed 3px' : '',
+      borderRight: strategicView && regionCoords?.[col + 1]?.[row + 1]?.border_right ? 'dashed 3px' : '',
+      borderImageSource: strategicView ? 'url(./images/map/border20px.png)' : '',
+      borderImageSlice: strategicView ? 2 : '',
+      borderImageRepeat: strategicView ? 'round' : ''
     }
   }))));
 }
@@ -177,22 +193,46 @@ function MapLocations({
     className: "map_locations"
   }, locations.map(location => /*#__PURE__*/React.createElement("div", {
     key: location.location_id,
-    className: "map_location",
+    className: location.objective_type != undefined ? 'map_location ' + location.objective_type : 'map_location',
     style: {
       cursor: "pointer",
       backgroundColor: "#" + location.background_color,
       backgroundImage: "url(." + location.background_image + ")",
-      top: (location.y - 1) * tileHeight + "px",
-      left: (location.x - 1) * tileWidth + "px"
+      top: location.objective_type == 'key_location' ? (location.y - 1) * tileHeight - 8 + "px" : (location.y - 1) * tileHeight + "px",
+      left: location.objective_type == 'key_location' ? (location.x - 1) * tileWidth - 8 + "px" : (location.x - 1) * tileWidth + "px"
     }
   }, /*#__PURE__*/React.createElement("div", {
     className: "map_locations_tooltip"
   }, location.name), location.objective_image && /*#__PURE__*/React.createElement("div", {
-    className: "map_location_objective",
+    className: location.objective_type != undefined ? 'map_location_objective ' + location.objective_type : 'map_location_objective',
     style: {
       backgroundImage: "url(." + location.objective_image + ")"
     }
-  }))));
+  }), location.objective_health && location.objective_max_health > 0 && (() => {
+    const percentage = location.objective_health / location.objective_max_health * 100;
+    let barColor;
+    if (percentage >= 50) {
+      barColor = 'green';
+    } else if (percentage >= 25) {
+      barColor = 'yellow';
+    } else {
+      barColor = 'red';
+    }
+    return /*#__PURE__*/React.createElement("div", {
+      className: "map_location_objective_health",
+      style: {
+        backgroundColor: barColor,
+        width: `${percentage}%`,
+        height: '6px',
+        position: 'absolute',
+        color: 'white',
+        textAlign: 'center',
+        lineHeight: '8px',
+        fontSize: '8px',
+        top: '3px'
+      }
+    });
+  })())));
 }
 function MapNearbyPlayers({
   scoutData,

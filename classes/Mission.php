@@ -79,7 +79,7 @@ class Mission {
         $this->money = $mission_data['money'];
         $this->rewards = json_decode($mission_data['rewards'], true);
 
-        if (isset($mission_data['custom_start_location'])) {
+        if (isset($mission_data['custom_start_location']) && !empty($mission_data['custom_start_location'])) {
             $this->custom_start_location = TravelCoords::fromDbString($mission_data['custom_start_location']);
         }
 
@@ -129,7 +129,7 @@ class Mission {
         // Set to completion stage if all stages have been completed
         if ($stage_id > count($this->stages)) {
             // if custom_start_location set
-            if (isset($this->custom_start_location)) {
+            if (isset($this->custom_start_location) && !empty($this->custom_start_location)) {
                 $this->current_stage = array(
                     'stage_id' => $stage_id + 1,
                     'action_type' => 'travel',
@@ -151,7 +151,7 @@ class Mission {
         }
 
         // Get last location
-        if (isset($this->custom_start_location)) {
+        if (isset($this->custom_start_location) && !empty($this->custom_start_location)) {
             // use custom_start_location as default
             $last_location = $this->custom_start_location->fetchString();
         } else {
@@ -185,14 +185,48 @@ class Mission {
                 if (isset($this->current_stage['action_data']) && $this->current_stage['action_data'] != '0') {
                     $location = TravelCoords::fromDbString($this->current_stage['action_data']);
                 }
+                // if target type is set
+                else if (isset($this->current_stage['target_type']) && $this->current_stage['target_type'] != "default") {
+                    // get village in home region
+                    if ($this->current_stage['target_type'] == "home_village") {
+                        $village_query = $this->system->db->query("SELECT `x`, `y` FROM `region_locations`
+                            INNER JOIN `regions` ON `regions`.`region_id` = `region_locations`.`region_id`
+                            WHERE `regions`.`region_id` = '{$this->player->village->region_id}' AND `type` = 'village'
+                        ");
+                        $village_result = $this->system->db->fetch_all($village_query);
+                        $random_village = array_rand($village_result);
+                        $location = $this->rollLocation(new TravelCoords($village_result[$random_village]['x'], $village_result[$random_village]['y'], 1));
+                    }
+                    // get any ally village
+                    else if ($this->current_stage['target_type'] == "ally_village") {
+                        $village_query = $this->system->db->query("SELECT `x`, `y` FROM `region_locations`
+                            INNER JOIN `regions` ON `regions`.`region_id` = `region_locations`.`region_id`
+                            WHERE `regions`.`village` = '{$this->player->village->village_id}' AND `type` = 'village'
+                        ");
+                        $village_result = $this->system->db->fetch_all($village_query);
+                        $random_village = array_rand($village_result);
+                        $location = $this->rollLocation(new TravelCoords($village_result[$random_village]['x'], $village_result[$random_village]['y'], 1));
+                    }
+                    // get any enemy village
+                    else if ($this->current_stage['target_type'] == "enemy_village") {
+                        $village_query = $this->system->db->query("SELECT `x`, `y` FROM `region_locations`
+                            INNER JOIN `regions` ON `regions`.`region_id` = `region_locations`.`region_id`
+                            WHERE `regions`.`village` != '{$this->player->village->village_id}' AND `type` = 'village'
+                        ");
+                        $village_result = $this->system->db->fetch_all($village_query);
+                        $random_village = array_rand($village_result);
+                        $location = $this->rollLocation(new TravelCoords($village_result[$random_village]['x'], $village_result[$random_village]['y'], 1));
+                    }
+                }
                 // if first stage and custom_start_location set, use custom_start_location as root
-                else if ($stage_id == 1 && isset($this->custom_start_location)) {
+                else if ($stage_id == 1 && isset($this->custom_start_location) && !empty($this->custom_start_location)) {
                     $location = $this->rollLocation($this->custom_start_location);
                 }
                 // if basic mission and first stage, use village as root
                 else if ($stage_id == 1 && $this->mission_type != $this::TYPE_EVENT) {
                     $location = $this->rollLocation($this->player->village_location);
                 }
+
                 // otherwise, use player current location
                 else {
                     $location = $this->rollLocation($this->player->location);
@@ -254,7 +288,7 @@ class Mission {
         // Set to completion stage if all stages have been completed
         if($stage_id > count($this->stages)) {
             // if custom_start_location set
-            if (isset($this->custom_start_location)) {
+            if (isset($this->custom_start_location) && !empty($this->custom_start_location)) {
                 $this->current_stage = array(
                     'stage_id' => $stage_id + 1,
                     'action_type' => 'travel',
@@ -328,8 +362,12 @@ class Mission {
         $x = mt_rand(0, $max) - $this->current_stage['location_radius'];
         $y = mt_rand(0, $max) - $this->current_stage['location_radius'];
         $map_id = $starting_location->map_id;
-        if($x == 0 && $y == 0) {
-            $x++;
+
+        // minimum 1 tile off target if radius > 0;
+        if ($this->current_stage['location_radius'] > 0) {
+            if ($x == 0 && $y == 0) {
+                $x++;
+            }
         }
 
         $x += $starting_location->x;
@@ -451,7 +489,7 @@ class Mission {
 
         // Faction Mission Logic
         if ($mission->mission_type == Mission::TYPE_FACTION) {
-            if (isset($mission->custom_start_location)) {
+            if (isset($mission->custom_start_location) && !empty($this->custom_start_location)) {
                 if ($player->location != $mission->custom_start_location) {
                     throw new RuntimeException("Invalid location!");
                 }
