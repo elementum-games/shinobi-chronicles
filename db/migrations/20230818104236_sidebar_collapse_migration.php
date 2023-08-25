@@ -16,7 +16,7 @@ final class SidebarCollapseMigration extends AbstractMigration
         // Modify missions table
         $this->execute("
             ALTER TABLE `user_settings`
-                `sidebar_collapse` varchar(50) NOT NULL DEFAULT 'closed';
+                ADD `sidebar_collapse` varchar(50) NOT NULL DEFAULT 'closed';
         ");
 
         // Commit Transaction
