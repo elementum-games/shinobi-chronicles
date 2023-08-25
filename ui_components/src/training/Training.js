@@ -15,7 +15,8 @@ function CancelTrainingDetails({
         <>
             <h2 className={'themeHeader'} style={{textAlign: 'center'}} >Cancel Training</h2>
             <p>
-            Are you certain you wish to cancel your training? You will not gain any of your potential gains.
+                {/* TODO: I'm not sure how train gains or partial gains works here */}
+            Are you certain you wish to cancel your training? You will not gain any of your potential <strong>{playerData.trainGains}</strong> gains.
             </p>
             <button><a href={headers.selfLink + '&cancel_training=1&cancel_confirm=1'}>Confirm</a></button>
         </>
@@ -66,12 +67,16 @@ function DetailPanel({
     return (
         <>
         {content}
+        {/* Test this with team */}
+        { (playerData.hasTeam && playerData.hasTeamBoostTraining ) ? 
+        <em>*Note: Your team has a chance at additional stat gains, these are not reflected above.</em> : <></>}
         </>
     )
 }
 
 function Option({
-    title
+    title,
+    children
 }){
     let styleItem = {
         flex: '1 1 calc(25% - 20px)', // Distributes space for 4 items, reduces to 33.33% for 3 items
@@ -83,17 +88,16 @@ function Option({
     let buttonsArray = []
 
     return (
-        <div  style={styleItem} id='optionContainer'>
-            <h2>{title}</h2>
-            {buttonsArray.map((item, index) => (
-                <div key={index}>{item}</div>
-            ))}
+        <div style={styleItem} id='optionContainer'>
+            <h2 className={"themeHeader"}>{title}</h2>
+            {children}
         </div>
     )
 }
 
 //Displays Training Selection Input {TrainingOption}
 function SelectTrainingPanel({
+    playerData
 }){
 
     let styleContainer = {
@@ -103,22 +107,80 @@ function SelectTrainingPanel({
 
     return (
         <div style={styleContainer}>
+            {/* Skill Training */}
             <Option
             key={0}
-            title="Skills"
-            />
+            title="Skills">
+                <select>
+                    <option value="grapefruit">Grapefruit</option>
+                    <option value="lime">Lime</option>
+                    <option selected value="coconut">Coconut</option>
+                    <option value="mango">Mango</option>
+                </select>
+
+                <button>
+                    Short
+                </button>
+                <button>
+                    Long
+                </button>
+                <button>
+                    Extended
+                </button>
+            </Option>
+            
+            {/* Attributes Training */}
             <Option
             key={1} 
-            title="Attributes"
-            />
+            title="Attributes">
+                <select>
+                    <option value="grapefruit">Grapefruit</option>
+                    <option value="lime">Lime</option>
+                    <option selected value="coconut">Coconut</option>
+                    <option value="mango">Mango</option>
+                </select>
+
+                <button>
+                    Short
+                </button>
+                <button>
+                    Long
+                </button>
+                <button>
+                    Extended
+                </button>
+            </Option>
+
+            {/* Jutsu Training */}
             <Option 
             key={2}
-            title="Jutsu"
-            />
+            title="Jutsu">
+                <select>
+                    <option value="grapefruit">Grapefruit</option>
+                    <option value="lime">Lime</option>
+                    <option selected value="coconut">Coconut</option>
+                    <option value="mango">Mango</option>
+                </select>
+
+                <button> Train </button>
+            </Option>
+            
+            {/* Hide if no Bloodline or Trainable Jutsu */}
+            {/* Bloodline Jutsu Training */}
+            {playerData.bloodlineID != 0 && playerData.hasTrainableBLJutsu ? (
             <Option 
             key={3}
-            title="Bloodline Jutsu"
-            />
+            title="Bloodline Jutsu">
+                <select>
+                    <option value="grapefruit">Grapefruit</option>
+                    <option value="lime">Lime</option>
+                    <option selected value="coconut">Coconut</option>
+                    <option value="mango">Mango</option>
+                </select>
+
+                <button> Train </button>
+            </Option>
+            ) : (<></>)}
         </div>
     )
 }
@@ -131,14 +193,27 @@ function Training({
 ){
     return (
         <div id='TrainingContainer'>
+            
             <DetailPanel 
             playerData = {playerData}
             trainingData = {trainingData}
             headers = {headers}
             />
-            <SelectTrainingPanel
 
-            />
+            {/* Hide when training */}
+            {!playerData.hasActiveTraining ? (
+                    <SelectTrainingPanel 
+                    playerData = {playerData}
+                    />
+                ) : (
+                    <div style={{textAlign: 'center'}}>
+                        <h2  className="themeHeader" style={{borderRadius: '0px'}}> {trainingData.trainType} Training</h2>
+                        <p>{trainingData.trainingDisplay}</p>
+                        <p id="train_time_remaining">{trainingData.timeRemaining} remaining...</p>
+                        <button><a href={headers.selfLink + "&cancel_training=1"}>Cancel Training</a></button>
+                    </div>
+                )}
+
         </div>
     )
 }

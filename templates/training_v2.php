@@ -34,10 +34,10 @@
     const trainingContainer = document.querySelector("#trainingReactContainer");
 
     <?php 
-    //to avoid dni errors
+    // to avoid dni errors
     if(!isset($partial_gain)){
         $partial_gain = 0;
-    }        
+    } 
     ?>
 
     /* TODO: Check the Bool T/F cases in all */
@@ -49,12 +49,19 @@
                     hasPartialGainsBenefits: <?= $player->reputation->benefits[UserReputation::BENEFIT_PARTIAL_TRAINING_GAINS] ?: "false" ?>, /*bool*/
                     trainGains: <?= $player->trainingManager->train_gain ?>,
                     partialGain: <?= $partial_gain ?: "false" ?> /*Is this a string or an int?*/,
-                    hasActiveTraining: <?= $player->trainingManager->hasActiveTraining() ?: "false" ?>
+                    hasActiveTraining: <?= $player->trainingManager->hasActiveTraining() ?: "false" ?>,
+                    bloodlineID: <?= $player->bloodline_id ?: "0" ?> ,
+                    hasTrainableBLJutsu: <?= $trainable_bl_jutsu ?: "false" ?>,
+                    hasTeam: <?= $player->team ?: "false" ?>,
+                    hasTeamBoostTraining: <?= (!is_null($player->team) && $player->team->boost  == Team::BOOST_TRAINING) ? "true" : "false" ?>
                 },
                 trainingData: {
                     short: "<?= $player->trainingManager->getTrainingInfo(TrainingManager::TRAIN_LEN_SHORT, TrainingManager::$skill_types[0])?>",
                     long: "<?= $player->trainingManager->getTrainingInfo(TrainingManager::TRAIN_LEN_LONG, TrainingManager::$skill_types[0])?>",
-                    extended: "<?= $player->trainingManager->getTrainingInfo(TrainingManager::TRAIN_LEN_EXTENDED, TrainingManager::$skill_types[0])?>"
+                    extended: "<?= $player->trainingManager->getTrainingInfo(TrainingManager::TRAIN_LEN_EXTENDED, TrainingManager::$skill_types[0])?>",
+                    timeRemaining: "<?= System::timeRemaining($player->train_time - time(), 'short', false) ?>",
+                    trainingDisplay: "<?= $player->trainingManager->trainingDisplay() ?>",
+                    trainType: "<?= $player->trainingManager->trainType() ?>"
                 },
                 headers: {
                     isSetCancelTraining: <?= isset($_GET['cancel_training']) ?: "false" ?>,

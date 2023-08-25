@@ -7,7 +7,7 @@ function CancelTrainingDetails({
     style: {
       textAlign: 'center'
     }
-  }, "Cancel Training"), /*#__PURE__*/React.createElement("p", null, "Are you certain you wish to cancel your training? You will not gain any of your potential gains."), /*#__PURE__*/React.createElement("button", null, /*#__PURE__*/React.createElement("a", {
+  }, "Cancel Training"), /*#__PURE__*/React.createElement("p", null, "Are you certain you wish to cancel your training? You will not gain any of your potential ", /*#__PURE__*/React.createElement("strong", null, playerData.trainGains), " gains."), /*#__PURE__*/React.createElement("button", null, /*#__PURE__*/React.createElement("a", {
     href: headers.selfLink + '&cancel_training=1&cancel_confirm=1'
   }, "Confirm")));
 }
@@ -41,10 +41,11 @@ function DetailPanel({
       trainingData: trainingData
     });
   }
-  return /*#__PURE__*/React.createElement(React.Fragment, null, content);
+  return /*#__PURE__*/React.createElement(React.Fragment, null, content, playerData.hasTeam && playerData.hasTeamBoostTraining ? /*#__PURE__*/React.createElement("em", null, "*Note: Your team has a chance at additional stat gains, these are not reflected above.") : /*#__PURE__*/React.createElement(React.Fragment, null));
 }
 function Option({
-  title
+  title,
+  children
 }) {
   let styleItem = {
     flex: '1 1 calc(25% - 20px)',
@@ -57,13 +58,15 @@ function Option({
   return /*#__PURE__*/React.createElement("div", {
     style: styleItem,
     id: "optionContainer"
-  }, /*#__PURE__*/React.createElement("h2", null, title), buttonsArray.map((item, index) => /*#__PURE__*/React.createElement("div", {
-    key: index
-  }, item)));
+  }, /*#__PURE__*/React.createElement("h2", {
+    className: "themeHeader"
+  }, title), children);
 }
 
 //Displays Training Selection Input {TrainingOption}
-function SelectTrainingPanel({}) {
+function SelectTrainingPanel({
+  playerData
+}) {
   let styleContainer = {
     display: 'flex',
     flexWrap: 'wrap'
@@ -73,16 +76,52 @@ function SelectTrainingPanel({}) {
   }, /*#__PURE__*/React.createElement(Option, {
     key: 0,
     title: "Skills"
-  }), /*#__PURE__*/React.createElement(Option, {
+  }, /*#__PURE__*/React.createElement("select", null, /*#__PURE__*/React.createElement("option", {
+    value: "grapefruit"
+  }, "Grapefruit"), /*#__PURE__*/React.createElement("option", {
+    value: "lime"
+  }, "Lime"), /*#__PURE__*/React.createElement("option", {
+    selected: true,
+    value: "coconut"
+  }, "Coconut"), /*#__PURE__*/React.createElement("option", {
+    value: "mango"
+  }, "Mango")), /*#__PURE__*/React.createElement("button", null, "Short"), /*#__PURE__*/React.createElement("button", null, "Long"), /*#__PURE__*/React.createElement("button", null, "Extended")), /*#__PURE__*/React.createElement(Option, {
     key: 1,
     title: "Attributes"
-  }), /*#__PURE__*/React.createElement(Option, {
+  }, /*#__PURE__*/React.createElement("select", null, /*#__PURE__*/React.createElement("option", {
+    value: "grapefruit"
+  }, "Grapefruit"), /*#__PURE__*/React.createElement("option", {
+    value: "lime"
+  }, "Lime"), /*#__PURE__*/React.createElement("option", {
+    selected: true,
+    value: "coconut"
+  }, "Coconut"), /*#__PURE__*/React.createElement("option", {
+    value: "mango"
+  }, "Mango")), /*#__PURE__*/React.createElement("button", null, "Short"), /*#__PURE__*/React.createElement("button", null, "Long"), /*#__PURE__*/React.createElement("button", null, "Extended")), /*#__PURE__*/React.createElement(Option, {
     key: 2,
     title: "Jutsu"
-  }), /*#__PURE__*/React.createElement(Option, {
+  }, /*#__PURE__*/React.createElement("select", null, /*#__PURE__*/React.createElement("option", {
+    value: "grapefruit"
+  }, "Grapefruit"), /*#__PURE__*/React.createElement("option", {
+    value: "lime"
+  }, "Lime"), /*#__PURE__*/React.createElement("option", {
+    selected: true,
+    value: "coconut"
+  }, "Coconut"), /*#__PURE__*/React.createElement("option", {
+    value: "mango"
+  }, "Mango")), /*#__PURE__*/React.createElement("button", null, " Train ")), playerData.bloodlineID != 0 && playerData.hasTrainableBLJutsu ? /*#__PURE__*/React.createElement(Option, {
     key: 3,
     title: "Bloodline Jutsu"
-  }));
+  }, /*#__PURE__*/React.createElement("select", null, /*#__PURE__*/React.createElement("option", {
+    value: "grapefruit"
+  }, "Grapefruit"), /*#__PURE__*/React.createElement("option", {
+    value: "lime"
+  }, "Lime"), /*#__PURE__*/React.createElement("option", {
+    selected: true,
+    value: "coconut"
+  }, "Coconut"), /*#__PURE__*/React.createElement("option", {
+    value: "mango"
+  }, "Mango")), /*#__PURE__*/React.createElement("button", null, " Train ")) : /*#__PURE__*/React.createElement(React.Fragment, null));
 }
 function Training({
   playerData,
@@ -95,6 +134,21 @@ function Training({
     playerData: playerData,
     trainingData: trainingData,
     headers: headers
-  }), /*#__PURE__*/React.createElement(SelectTrainingPanel, null));
+  }), !playerData.hasActiveTraining ? /*#__PURE__*/React.createElement(SelectTrainingPanel, {
+    playerData: playerData
+  }) : /*#__PURE__*/React.createElement("div", {
+    style: {
+      textAlign: 'center'
+    }
+  }, /*#__PURE__*/React.createElement("h2", {
+    className: "themeHeader",
+    style: {
+      borderRadius: '0px'
+    }
+  }, " ", trainingData.trainType, " Training"), /*#__PURE__*/React.createElement("p", null, trainingData.trainingDisplay), /*#__PURE__*/React.createElement("p", {
+    id: "train_time_remaining"
+  }, trainingData.timeRemaining, " remaining..."), /*#__PURE__*/React.createElement("button", null, /*#__PURE__*/React.createElement("a", {
+    href: headers.selfLink + "&cancel_training=1"
+  }, "Cancel Training"))));
 }
 window.Training = Training; //man I don't even know what this does
