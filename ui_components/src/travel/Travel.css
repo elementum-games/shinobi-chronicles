@@ -471,6 +471,7 @@
     background-size: auto 100%;
 }
     .map_location_objective.castle {
+        position: absolute;
         height: 64px;
         width: 64px;
         left: -16px;
