@@ -134,9 +134,9 @@ class DailyTask {
                 'type' => DailyTask::ACTIVITY_MISSIONS,
                 'sub_task' => [DailyTask::SUB_TASK_COMPLETE],
                 'max_amount' => [
-                    DailyTask::DIFFICULTY_EASY => 15,
-                    DailyTask::DIFFICULTY_MEDIUM => 25,
-                    DailyTask::DIFFICULTY_HARD => 35,
+                    DailyTask::DIFFICULTY_EASY => 10,
+                    DailyTask::DIFFICULTY_MEDIUM => 20,
+                    DailyTask::DIFFICULTY_HARD => 30,
                 ],
                 'mission_rank' => [],
             ],
