@@ -185,9 +185,8 @@ function MapGridLines({ tileWidth, tileHeight, stageOffsetX, stageOffsetY, stage
                     <div key={`${row}:${col}`} style={{
                         width: tileWidth,
                         height: tileHeight,
-                        transform: `translate3d(${(col * tileWidth)}px, ${(row * tileHeight)}px, 0)`,
-                        backfaceVisibility: "hidden",
-                        filter: "blur(0)",
+                        top: row * tileHeight,
+                        left: col * tileWidth,
                         backgroundColor: strategicView && regionCoords?.[col + 1]?.[row + 1]?.color || '',
                         borderTop: strategicView && regionCoords?.[col+1]?.[row+1]?.border_top ? 'dashed 3px' : '',
                         borderBottom: strategicView && regionCoords?.[col+1]?.[row+1]?.border_bottom ? 'dashed 3px' : '',
