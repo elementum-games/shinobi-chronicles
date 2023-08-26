@@ -104,7 +104,7 @@ final class MapUpdateMigration extends AbstractMigration
                 (6, 15, 100, 100, 'village', 1, 3, 25, 'Nameless Village', 'wealth'),
                 (7, 1, 100, 100, 'village', 1, 16, 11, 'Nameless Village', 'food'),
                 (8, 1, 100, 100, 'village', 1, 4, 9, 'Nameless Village', 'materials'),
-                (9, 1, 100, 100, 'village', 1, 13, 5, 'Nameless Village', 'wealth'),
+                (9, 1, 100, 100, 'village', 1, 14, 6, 'Nameless Village', 'wealth'),
                 (10, 7, 100, 100, 'castle', 1, 27, 18, 'Nameless Castle', NULL),
                 (11, 7, 100, 100, 'village', 1, 24, 20, 'Nameless Village', 'food'),
                 (12, 4, 100, 100, 'village', 1, 13, 34, 'Nameless Village', 'food'),
