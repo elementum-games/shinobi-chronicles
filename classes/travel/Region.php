@@ -57,6 +57,7 @@ class Region {
         return $new_region;
     }
 
+    // ray-cast algorithm
     public static function coordInRegion(RegionCoords $coord, $polygon) {
         $x = $coord->x;
         $y = $coord->y-1;
