@@ -1,31 +1,11 @@
-span.header {
+h2{
+    padding: 0.1em 0;
+    margin-top: 0;
+    background-color: #332a2e;
+    text-align: center;
     font-weight: bold;
-    margin-left: 10px;
-}
-p.indent {
-    margin-left: 25px;
-    margin-top: 5px;
-    margin-bottom: 8px;
-}
-p.indent label {
-    font-weight: bold;
-    width: 70px;
 }
 
-#TrainingContainer{
-    margin: 2em 1em;
-    border-radius: 1em 1em 0em 0em;
-    overflow: auto;
-    background-color: #ebd4b2;
-}
-
-#DetailPanelContainer{
-    background-color: rgb(251, 238, 218);
-}
-
-.themeHeader{
-    padding: 0.3em 0em;
-    margin-top: 0px;
-    background-color: #332a23;
-    border-radius: 0.5em 0.5em 0em 0em;
+form {
+    padding: 1em 0.2em;
 }

@@ -6,14 +6,55 @@ type Props = {|
     +playerData: PlayerDataType
 |};
 
+const styles = {
+    // general style
+    // 1em = 16px
+    body: {
+        margin: '1em 0.5em',
+        padding: '0em 0em 2em 0em',
+        border: '0em solid #554d35e6',
+        borderRadius: '0.5em'
+    },
+    topHeader: {
+        border: '0em solid',
+        borderRadius: '0.5em 0.5em, 0em, 0em' // Should match parent element
+    },
+    bgColor: {
+        backgroundColor: '#d2c9b3',
+        color: '958556e6',
+    },
+    indent: {
+        margin: '0em 1em'
+    },
+    indentLabel: {
+      fontWeight: 'bold',
+      width: '80%',
+    },
+    roundBorder: {
+        borderRadius: '0.5em 0.5em 0em 0em',
+    },
+    //specific elements
+    option: {
+        padding: '1em, 0em',
+        margin: '0em 0.3em',
+        border: '0.5px solid #958556e6',
+        borderRadius: '0 0 0.5em 0.5em', // Should match parent element
+        flex: '1 1 calc(25% - 20px)', // Distributes space for 4 items, reduces to 33.33% for 3 items
+        minWidth: '200px',
+        backgroundColor: '8B4513',
+        width: '100%',
+        textAlign: 'center'
+    }
+  };
+
 function CancelTrainingDetails({
     playerData,
     headers
 }){
 
     return (
-        <div style={{textAlign: 'center'}}>
-            <h2 className={'themeHeader'}>Cancel Training</h2>
+        <div>
+            <h2>Cancel Training</h2>
             <p>
                 {/* TODO: I'm not sure how train gains or partial gains works here */}
             Are you certain you wish to cancel your training? You will not gain any of your potential <strong>{playerData.trainGains}</strong> gains.
@@ -26,18 +67,19 @@ function CancelTrainingDetails({
 function TrainingDetails({
     playerData,
     trainingData
-}){
+}){ 
+    const combinedHeaderStyles = {...styles.header, ...styles.topHeader}
     return (
         <>
             <div id='DetailPanelContainer'>
-            <h2 className={'themeHeader'} style={{textAlign: 'center'}}>Academy</h2>
-                <div>
+            <h2 style={combinedHeaderStyles}>Academy</h2>
+                <div style={styles.indent}>
                     <p>Here at the academy, you can take classes to improve your skills, attributes, or skill with a jutsu.</p>
-                    <h3>Skill/Attribute training</h3>
+                    <h2>Skill/Attribute training</h2>
                     <p>Short: {trainingData.short}</p>
                     <p>Long: {trainingData.long}</p>
                     <p>Extended: {trainingData.extended}</p>
-                    <h3>Jutsu Training:</h3>
+                    <h2>Jutsu Training</h2>
                     <p>{trainingData.jutsuTrainingInfo}</p>
                     { (playerData.hasTeam && playerData.hasTeamBoostTraining ) ? 
                     <em>*Note: Your team has a chance at additional stat gains, these are not reflected above.</em> : <></>}
@@ -91,7 +133,7 @@ function Option({
     let buttonsArray = []
 
     return (
-        <div style={styleItem} id='optionContainer'>
+        <div style={styles.option}>
             <h2 className={"themeHeader"}>{title}</h2>
             {children}
         </div>
@@ -231,8 +273,9 @@ function Training({
     headers     
 }: props
 ){
+    const combinedStyles = {...styles.bgColor, ...styles.body}
     return (
-        <div id='TrainingContainer'>
+        <div style={combinedStyles} id='TrainingContainer'>
             
             <DetailPanel 
             playerData = {playerData}
@@ -247,8 +290,8 @@ function Training({
                     headers = {headers}
                     />
                 ) : (
-                    <div style={{textAlign: 'center'}}>
-                        <h2  className="themeHeader" style={{borderRadius: '0px'}}> {trainingData.trainType} Training</h2>
+                    <div>
+                        <h2 style={styles.header}> {trainingData.trainType} Training</h2>
                         <p>{trainingData.trainingDisplay}</p>
                         <p id="train_time_remaining">{trainingData.timeRemaining} remaining...</p>
                         {

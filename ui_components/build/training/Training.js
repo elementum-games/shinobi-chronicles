@@ -1,14 +1,51 @@
+const styles = {
+  // general style
+  // 1em = 16px
+  body: {
+    margin: '1em 0.5em',
+    padding: '0em 0em 2em 0em',
+    border: '0em solid #554d35e6',
+    borderRadius: '0.5em'
+  },
+  topHeader: {
+    border: '0em solid',
+    borderRadius: '0.5em 0.5em, 0em, 0em' // Should match parent element
+  },
+
+  bgColor: {
+    backgroundColor: '#d2c9b3',
+    color: '958556e6'
+  },
+  indent: {
+    margin: '0em 1em'
+  },
+  indentLabel: {
+    fontWeight: 'bold',
+    width: '80%'
+  },
+  roundBorder: {
+    borderRadius: '0.5em 0.5em 0em 0em'
+  },
+  //specific elements
+  option: {
+    padding: '1em, 0em',
+    margin: '0em 0.3em',
+    border: '0.5px solid #958556e6',
+    borderRadius: '0 0 0.5em 0.5em',
+    // Should match parent element
+    flex: '1 1 calc(25% - 20px)',
+    // Distributes space for 4 items, reduces to 33.33% for 3 items
+    minWidth: '200px',
+    backgroundColor: '8B4513',
+    width: '100%',
+    textAlign: 'center'
+  }
+};
 function CancelTrainingDetails({
   playerData,
   headers
 }) {
-  return /*#__PURE__*/React.createElement("div", {
-    style: {
-      textAlign: 'center'
-    }
-  }, /*#__PURE__*/React.createElement("h2", {
-    className: 'themeHeader'
-  }, "Cancel Training"), /*#__PURE__*/React.createElement("p", null, "Are you certain you wish to cancel your training? You will not gain any of your potential ", /*#__PURE__*/React.createElement("strong", null, playerData.trainGains), " gains."), /*#__PURE__*/React.createElement("button", null, /*#__PURE__*/React.createElement("a", {
+  return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("h2", null, "Cancel Training"), /*#__PURE__*/React.createElement("p", null, "Are you certain you wish to cancel your training? You will not gain any of your potential ", /*#__PURE__*/React.createElement("strong", null, playerData.trainGains), " gains."), /*#__PURE__*/React.createElement("button", null, /*#__PURE__*/React.createElement("a", {
     href: headers.selfLink + '&cancel_training=1&cancel_confirm=1'
   }, "Confirm")));
 }
@@ -16,14 +53,17 @@ function TrainingDetails({
   playerData,
   trainingData
 }) {
+  const combinedHeaderStyles = {
+    ...styles.header,
+    ...styles.topHeader
+  };
   return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
     id: "DetailPanelContainer"
   }, /*#__PURE__*/React.createElement("h2", {
-    className: 'themeHeader',
-    style: {
-      textAlign: 'center'
-    }
-  }, "Academy"), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("p", null, "Here at the academy, you can take classes to improve your skills, attributes, or skill with a jutsu."), /*#__PURE__*/React.createElement("h3", null, "Skill/Attribute training"), /*#__PURE__*/React.createElement("p", null, "Short: ", trainingData.short), /*#__PURE__*/React.createElement("p", null, "Long: ", trainingData.long), /*#__PURE__*/React.createElement("p", null, "Extended: ", trainingData.extended), /*#__PURE__*/React.createElement("h3", null, "Jutsu Training:"), /*#__PURE__*/React.createElement("p", null, trainingData.jutsuTrainingInfo), playerData.hasTeam && playerData.hasTeamBoostTraining ? /*#__PURE__*/React.createElement("em", null, "*Note: Your team has a chance at additional stat gains, these are not reflected above.") : /*#__PURE__*/React.createElement(React.Fragment, null))));
+    style: combinedHeaderStyles
+  }, "Academy"), /*#__PURE__*/React.createElement("div", {
+    style: styles.indent
+  }, /*#__PURE__*/React.createElement("p", null, "Here at the academy, you can take classes to improve your skills, attributes, or skill with a jutsu."), /*#__PURE__*/React.createElement("h2", null, "Skill/Attribute training"), /*#__PURE__*/React.createElement("p", null, "Short: ", trainingData.short), /*#__PURE__*/React.createElement("p", null, "Long: ", trainingData.long), /*#__PURE__*/React.createElement("p", null, "Extended: ", trainingData.extended), /*#__PURE__*/React.createElement("h2", null, "Jutsu Training"), /*#__PURE__*/React.createElement("p", null, trainingData.jutsuTrainingInfo), playerData.hasTeam && playerData.hasTeamBoostTraining ? /*#__PURE__*/React.createElement("em", null, "*Note: Your team has a chance at additional stat gains, these are not reflected above.") : /*#__PURE__*/React.createElement(React.Fragment, null))));
 }
 
 //Displays Training Data {Training Details, CancelTrainingDetails}
@@ -59,8 +99,7 @@ function Option({
   };
   let buttonsArray = [];
   return /*#__PURE__*/React.createElement("div", {
-    style: styleItem,
-    id: "optionContainer"
+    style: styles.option
   }, /*#__PURE__*/React.createElement("h2", {
     className: "themeHeader"
   }, title), children);
@@ -194,7 +233,12 @@ function Training({
   trainingData,
   headers
 }) {
+  const combinedStyles = {
+    ...styles.bgColor,
+    ...styles.body
+  };
   return /*#__PURE__*/React.createElement("div", {
+    style: combinedStyles,
     id: "TrainingContainer"
   }, /*#__PURE__*/React.createElement(DetailPanel, {
     playerData: playerData,
@@ -203,15 +247,8 @@ function Training({
   }), !playerData.hasActiveTraining ? /*#__PURE__*/React.createElement(SelectTrainingPanel, {
     playerData: playerData,
     headers: headers
-  }) : /*#__PURE__*/React.createElement("div", {
-    style: {
-      textAlign: 'center'
-    }
-  }, /*#__PURE__*/React.createElement("h2", {
-    className: "themeHeader",
-    style: {
-      borderRadius: '0px'
-    }
+  }) : /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("h2", {
+    style: styles.header
   }, " ", trainingData.trainType, " Training"), /*#__PURE__*/React.createElement("p", null, trainingData.trainingDisplay), /*#__PURE__*/React.createElement("p", {
     id: "train_time_remaining"
   }, trainingData.timeRemaining, " remaining..."), !headers.isSetCancelTraining ? /*#__PURE__*/React.createElement("button", null, /*#__PURE__*/React.createElement("a", {
