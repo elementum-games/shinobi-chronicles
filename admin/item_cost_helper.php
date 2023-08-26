@@ -209,9 +209,9 @@ if(isset($_POST['calc_cost'])) {
                 <th>Rank</th>
                 <th>Cost</th>
             </tr>
-            <?php foreach($DISPLAY_DATA as $rank => $cost): ?>
+            <?php foreach($DISPLAY_DATA as $rank_num => $cost): ?>
                 <tr style="text-align:center;">
-                    <td><?=$RANKS[$rank]?></td>
+                    <td><?=$RANKS[$rank_num]?></td>
                     <td><?=$user->currency->money->symbol.$cost?></td>
                 </tr>
             <?php endforeach ?>
