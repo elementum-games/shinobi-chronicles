@@ -12,22 +12,18 @@
             Special Missions
         </h2>
 
-        <p>
-            As nations struggle for control of the world around them, it falls upon ninja to undertake the missions that
-            see these goals realised. Most missions serve as a means to generate income from loyal clients and fund the
-            shinobi way of life. Occasionally, however, a task of such great importance arises to a village that it
-            warrants special designation. These missions challenge even the strongest shinobi, but the potential rewards
-            are endless. Enemies abound, but those dedicated few who take these missions secure valuable information for
-            their village. This information in turn supports the greater war, helping the nation grow stronger than
-            those around it.
+        <p style="width: inherit; text-align: center">
+            As nations vie for power it falls upon shinobi to undertake missions that
+            see these goals realized. Occasionally tasks of great importance warrant special designation. 
+            These missions challenge even the strongest shinobi but come with great rewards. 
         </p>
-        <p>
-            Special missions take about 1-5 minutes to complete. Your character will automatically perform
-            the steps without you having to manually move, scout, etc. You can be attacked by other players while your
-            character is moving around the map.
-
-            Special missions reward money and jutsu exp/levels at random for your equipped and Bloodline jutsu.
-        </p>
+        <ul style="list-style-type: none">
+            <li>Special missions take 2-5 minutes to complete.</li>
+            <li>Your character will automatically scout enemy territory while completing battles.</li>
+            <li>You can be attacked by other players while your character is moving around the map.</li>
+            <li>Special missions reward money, experience and village reputation increasing with mission difficulty.</li>
+            <li>Completing special missions gradually drains chakra or stamina in exchange for jutsu experience.</li>
+        </ul><br />
         <a href="<?= $self_link ?>&start=easy">
             <button>Start Easy Mission!</button>
         </a>
@@ -39,7 +35,7 @@
         </a>
         <a href="<?= $self_link ?>&start=nightmare">
             <button>Start Nightmare Mission!</button>
-        </a>
+        </a><br /><br />
     </div>
 <?php endif; ?>
 

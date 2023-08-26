@@ -2370,6 +2370,16 @@ class User extends Fighter {
 
         return ($this->system->db->last_affected_rows > 0);
     }
+    public function setSidebarCollapse(string $collapse): bool
+    {
+        $this->system->db->query(
+            "INSERT INTO `user_settings` (`user_id`, `sidebar_collapse`)
+                VALUES ({$this->user_id}, '{$collapse}')
+                ON DUPLICATE KEY UPDATE `sidebar_collapse`='{$collapse}';"
+        );
+
+        return ($this->system->db->last_affected_rows > 0);
+    }
     public function setEnableAlerts(bool $enable): bool {
         $this->system->db->query(
             "INSERT INTO `user_settings` (`user_id`, `enable_alerts`)
@@ -2429,14 +2439,25 @@ class User extends Fighter {
     }
     public function getSidebarPosition(): string
     {
-        $avatar_result = $this->system->db->query(
+        $sidebar_result = $this->system->db->query(
             "SELECT `sidebar_position` FROM `user_settings` WHERE `user_id` = {$this->user_id}"
         );
-        $result = $this->system->db->fetch($avatar_result);
+        $result = $this->system->db->fetch($sidebar_result);
         if ($result) {
             return $result['sidebar_position'];
         }
         return "left";
+    }
+    public function getSidebarCollapse(): string
+    {
+        $sidebar_result = $this->system->db->query(
+            "SELECT `sidebar_collapse` FROM `user_settings` WHERE `user_id` = {$this->user_id}"
+        );
+        $result = $this->system->db->fetch($sidebar_result);
+        if ($result) {
+            return $result['sidebar_collapse'];
+        }
+        return "closed";
     }
     public function getEnableAlerts(): bool
     {

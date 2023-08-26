@@ -107,10 +107,7 @@ function premiumShop(): void {
             }
 
             // Amount to reset to
-            $reset_amount = 5;
-            if (strpos($stat, 'skill')) {
-                $reset_amount = 10;
-            }
+            $reset_amount = 0;
 
             if (!isset($_POST['confirm_stat_reset'])) {
                 renderPurchaseConfirmation(

@@ -74,14 +74,18 @@ function Sidebar({
       e.target.parentElement.className += ' toggle';
     }
   };
+  const parentClick = e => {
+    e.target.parentElement.click();
+  };
 
   // Content
-  function displaySection(section_data, title, toggleNav) {
+  function displaySection(section_data, title, toggleNav, sidebarCollapse, parentClick) {
     return /*#__PURE__*/React.createElement("div", {
-      className: "sb_section_container " + title,
+      className: sidebarCollapse == "closed" ? "sb_section_container " + title : "sb_section_container toggle " + title,
       onClick: toggleNav
     }, /*#__PURE__*/React.createElement("div", {
-      className: "sb_header_bar d-flex"
+      className: "sb_header_bar d-flex",
+      onClick: parentClick
     }, /*#__PURE__*/React.createElement("div", {
       className: "sb_header_image_wrapper"
     }, /*#__PURE__*/React.createElement("img", {
@@ -140,7 +144,7 @@ function Sidebar({
     playerSettings: playerSettings,
     regenTime: regenTime,
     regenOffset: regenOffset
-  }), displaySection(userMenu, "Player Menu", toggleNav), displaySection(activityMenu, "Action Menu", toggleNav), displaySection(villageMenu, "Village Menu", toggleNav), staffMenu.length ? displaySection(staffMenu, "Staff Menu", toggleNav) : null);
+  }), displaySection(userMenu, "Player Menu", toggleNav, playerSettings.sidebar_collapse, parentClick), displaySection(activityMenu, "Action Menu", toggleNav, playerSettings.sidebar_collapse, parentClick), displaySection(villageMenu, "Village Menu", toggleNav, playerSettings.sidebar_collapse, parentClick), staffMenu.length ? displaySection(staffMenu, "Staff Menu", toggleNav, playerSettings.sidebar_collapse, parentClick) : null);
 }
 function SBCharacterProfile({
   playerData,

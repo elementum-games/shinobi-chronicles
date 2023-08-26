@@ -68,6 +68,7 @@ class UserApiPresenter {
     }
 
     public static function playerResourcesResponse(User $player): array {
+        $regen_cut = $player->battle_id ? round(($player->regen_rate + $player->regen_boost) * 0.7, 1) : 0;
         return [
             'regen_time' => 60 - (time() - $player->last_update),
             'health' => (int) $player->health,
@@ -76,8 +77,9 @@ class UserApiPresenter {
             'max_chakra' => $player->max_chakra,
             'stamina' => (int) $player->stamina,
             'max_stamina' => $player->max_stamina,
-            'health_regen' => $player->regen_rate * USER::$HEAL_REGEN_MULTIPLIER[$player->rank_num],
-            'pool_regen' => $player->regen_rate
+            'regen_cut' => $regen_cut,
+            'health_regen' => ($player->regen_rate + $player->regen_boost - $regen_cut) * USER::$HEAL_REGEN_MULTIPLIER[$player->rank_num],
+            'pool_regen' => $player->regen_rate + $player->regen_boost - $regen_cut,
         ];
     }
 
@@ -86,6 +88,7 @@ class UserApiPresenter {
             'avatar_style' => $player->getAvatarStyle(),
             'avatar_frame' => $player->getAvatarFrame(),
             'sidebar_position' => $player->getSidebarPosition(),
+            'sidebar_collapse' => $player->getSidebarCollapse(),
             'enable_alerts' => $player->getEnableAlerts(),
         ];
     }
@@ -191,7 +194,7 @@ class UserApiPresenter {
             'exp' => $jutsu->exp,*/
         ];
     }
-    
+
     public static function itemResponse(Item $item): array {
         return [
             'id' => $item->id,

@@ -29,190 +29,179 @@ function userSettings() {
 		$layouts[] = 'sumu';
 	}
 
-	if(!empty($_POST['change_avatar'])) {
-		$avatar_link = trim($_POST['avatar_link']);
-		try {
-			if($player->checkBan(StaffManager::BAN_TYPE_AVATAR)) {
+    if (!empty($_POST['change_avatar'])) {
+        $avatar_link = trim($_POST['avatar_link']);
+        try {
+            if ($player->checkBan(StaffManager::BAN_TYPE_AVATAR)) {
                 throw new RuntimeException("You are currently banned from changing your avatar.");
             }
 
-			if(strlen($avatar_link) < 5) {
-				throw new RuntimeException("Please enter an avatar link!");
-			}
-			$avatar_link = $system->db->clean($avatar_link);
+            if (strlen($avatar_link) < 5) {
+                throw new RuntimeException("Please enter an avatar link!");
+            }
+            $avatar_link = $system->db->clean($avatar_link);
 
-			if(!getimagesize($avatar_link)) {
-				throw new RuntimeException("Image does not exist!");
-			}
+            if (!getimagesize($avatar_link)) {
+                throw new RuntimeException("Image does not exist!");
+            }
 
             $avatar_filesize = getAvatarFileSize($avatar_link);
 
-            if($avatar_filesize > $player->forbidden_seal->avatar_filesize) {
-				$filesize_display = round($avatar_filesize / 1024);
-				throw new RuntimeException("Image is too large! Size {$filesize_display}KB, maximum is " . $player->getAvatarFileSizeDisplay('kb'));
-			}
+            if ($avatar_filesize > $player->forbidden_seal->avatar_filesize) {
+                $filesize_display = round($avatar_filesize / 1024);
+                throw new RuntimeException("Image is too large! Size {$filesize_display}KB, maximum is " . $player->getAvatarFileSizeDisplay('kb'));
+            }
 
-			$player->avatar_link = $avatar_link;
-			$system->message("Avatar updated!");
-		} catch (Exception $e) {
-			$system->message($e->getMessage());
-		}
-		$system->printMessage();
-	}
-	else if(!empty($_POST['change_password'])) {
-		$password = trim($_POST['current_password']);
-		$new_password = trim($_POST['new_password']);
-		$confirm_password = trim($_POST['confirm_new_password']);
+            $player->avatar_link = $avatar_link;
+            $system->message("Avatar updated!");
+        } catch (Exception $e) {
+            $system->message($e->getMessage());
+        }
+        $system->printMessage();
+    } else if (!empty($_POST['change_password'])) {
+        $password = trim($_POST['current_password']);
+        $new_password = trim($_POST['new_password']);
+        $confirm_password = trim($_POST['confirm_new_password']);
 
-		$result = $system->db->query("SELECT `password` FROM `users` WHERE `user_id`='{$player->user_id}' LIMIT 1");
-		$result = $system->db->fetch($result);
+        $result = $system->db->query("SELECT `password` FROM `users` WHERE `user_id`='{$player->user_id}' LIMIT 1");
+        $result = $system->db->fetch($result);
 
-		try {
-			if(!$system->verify_password($password, $result['password'])) {
-				throw new RuntimeException("Current password is incorrect!");
-			}
+        try {
+            if (!$system->verify_password($password, $result['password'])) {
+                throw new RuntimeException("Current password is incorrect!");
+            }
 
-			$password = $new_password;
+            $password = $new_password;
 
-			if(strlen($password) < User::MIN_PASSWORD_LENGTH) {
-				throw new RuntimeException("Please enter a password longer than 3 characters!");
-			}
+            if (strlen($password) < User::MIN_PASSWORD_LENGTH) {
+                throw new RuntimeException("Please enter a password longer than 3 characters!");
+            }
 
-			if(preg_match('/[0-9]/', $password) == false) {
-				throw new RuntimeException("Password must include at least one number!");
-			}
-			if(preg_match('/[A-Z]/', $password) == false) {
-				throw new RuntimeException("Password must include at least one capital letter!");
-			}
-			if(preg_match('/[a-z]/', $password) == false) {
-				throw new RuntimeException("Password must include at least one lowercase letter!");
-			}
-			$common_passwords = array(
-				'Password1'
-			);
-			foreach($common_passwords as $pword) {
-				if($pword == $password) {
-					throw new RuntimeException("This password is too common, please choose a more unique password!");
-				}
-			}
+            if (preg_match('/[0-9]/', $password) == false) {
+                throw new RuntimeException("Password must include at least one number!");
+            }
+            if (preg_match('/[A-Z]/', $password) == false) {
+                throw new RuntimeException("Password must include at least one capital letter!");
+            }
+            if (preg_match('/[a-z]/', $password) == false) {
+                throw new RuntimeException("Password must include at least one lowercase letter!");
+            }
+            $common_passwords = array(
+                'Password1'
+            );
+            foreach ($common_passwords as $pword) {
+                if ($pword == $password) {
+                    throw new RuntimeException("This password is too common, please choose a more unique password!");
+                }
+            }
 
-			if($password != $confirm_password) {
-				throw new RuntimeException("The passwords do not match!");
-			}
+            if ($password != $confirm_password) {
+                throw new RuntimeException("The passwords do not match!");
+            }
 
-			$password = $system->hash_password($password);
-			$system->db->query("UPDATE `users` SET `password`='$password' WHERE `user_id`='{$player->user_id}' LIMIT 1");
-			if($system->db->last_affected_rows >= 1) {
-				$system->message("Password updated!");
-			}
-		} catch (Exception $e) {
-			$system->message($e->getMessage());
-		}
-		$system->printMessage();
-	}
-	else if(!empty($_POST['change_journal'])) {
-		try {
+            $password = $system->hash_password($password);
+            $system->db->query("UPDATE `users` SET `password`='$password' WHERE `user_id`='{$player->user_id}' LIMIT 1");
+            if ($system->db->last_affected_rows >= 1) {
+                $system->message("Password updated!");
+            }
+        } catch (Exception $e) {
+            $system->message($e->getMessage());
+        }
+        $system->printMessage();
+    } else if (!empty($_POST['change_journal'])) {
+        try {
             $journal_length = strlen(preg_replace('/[\\n\\r]+/', '', trim($_POST['journal'])));
-            if($journal_length > $max_journal_length) {
+            if ($journal_length > $max_journal_length) {
                 throw new RuntimeException("Journal is too long! " . $journal_length . "/{$max_journal_length} characters");
             }
 
             $journal = $system->db->clean($_POST['journal']);
 
-			if($player->checkBan(StaffManager::BAN_TYPE_JOURNAL)) {
-				throw new RuntimeException("You are currently banned from changing your journal.");
-			}
+            if ($player->checkBan(StaffManager::BAN_TYPE_JOURNAL)) {
+                throw new RuntimeException("You are currently banned from changing your journal.");
+            }
 
-			$system->db->query(
+            $system->db->query(
                 "UPDATE `journals` SET `journal`='$journal' WHERE `user_id`='{$player->user_id}' LIMIT 1"
             );
-			if($system->db->last_affected_rows == 1) {
-				$system->message("Journal updated!");
-			}
-		} catch (Exception $e) {
-			$system->message($e->getMessage());
-		}
-		$system->printMessage();
-	}
-	else if(!empty($_POST['blacklist_add']) or !empty($_POST['blacklist_remove'])) {
-		$blacklist_username = $system->db->clean(trim($_POST['blacklist_name']));
-		$result = $system->db->query(
+            if ($system->db->last_affected_rows == 1) {
+                $system->message("Journal updated!");
+            }
+        } catch (Exception $e) {
+            $system->message($e->getMessage());
+        }
+        $system->printMessage();
+    } else if (!empty($_POST['blacklist_add']) or !empty($_POST['blacklist_remove'])) {
+        $blacklist_username = $system->db->clean(trim($_POST['blacklist_name']));
+        $result = $system->db->query(
             "SELECT `user_id`, `user_name`, `staff_level` FROM `users` WHERE `user_name`='{$blacklist_username}'"
         );
-		try {
-			if($system->db->last_num_rows == 0) {
-				throw new RuntimeException("User doesn't exist or check your spelling!");
-			}
-			else {
-				$blacklist_user = $system->db->fetch($result);
-			}
-			if($blacklist_user['staff_level'] >= User::STAFF_MODERATOR) {
-				throw new RuntimeException("You are unable to blacklist staff members!");
-			}
-			if($player->user_id == $blacklist_user['user_id']) {
-				throw new RuntimeException("You cannot blacklist yourself!");
-			}
-			if(isset($_POST['blacklist_add'])) {
-				if (!empty($player->blacklist) && array_key_exists($blacklist_user['user_id'], $player->blacklist)) {
-					throw new RuntimeException("User already in your blacklist!");
-				}
-				$player->blacklist[$blacklist_user['user_id']][$blacklist_user['user_id']] = $blacklist_user;
-				$system->message("{$blacklist_user['user_name']} added to blacklist.");
-			}
-			else {
-				if($player->blacklist[$blacklist_user['user_id']]) {
-					unset($player->blacklist[$blacklist_user['user_id']]);
-					$system->message("{$blacklist_user['user_name']} has been removed from your blacklist.");
-				}
-				else {
-					$system->message("{$blacklist_user['user_name']} is not on your blacklist");
-				}
-			}
+        try {
+            if ($system->db->last_num_rows == 0) {
+                throw new RuntimeException("User doesn't exist or check your spelling!");
+            } else {
+                $blacklist_user = $system->db->fetch($result);
+            }
+            if ($blacklist_user['staff_level'] >= User::STAFF_MODERATOR) {
+                throw new RuntimeException("You are unable to blacklist staff members!");
+            }
+            if ($player->user_id == $blacklist_user['user_id']) {
+                throw new RuntimeException("You cannot blacklist yourself!");
+            }
+            if (isset($_POST['blacklist_add'])) {
+                if (!empty($player->blacklist) && array_key_exists($blacklist_user['user_id'], $player->blacklist)) {
+                    throw new RuntimeException("User already in your blacklist!");
+                }
+                $player->blacklist[$blacklist_user['user_id']][$blacklist_user['user_id']] = $blacklist_user;
+                $system->message("{$blacklist_user['user_name']} added to blacklist.");
+            } else {
+                if ($player->blacklist[$blacklist_user['user_id']]) {
+                    unset($player->blacklist[$blacklist_user['user_id']]);
+                    $system->message("{$blacklist_user['user_name']} has been removed from your blacklist.");
+                } else {
+                    $system->message("{$blacklist_user['user_name']} is not on your blacklist");
+                }
+            }
 
-		} catch (Exception $e) {
-			$system->message($e->getMessage());
-		}
-		$system->printMessage();
-	}
-	else if($user_remove = $_GET['blacklist_remove'] ?? null) {
-		$user_remove = abs((int) $user_remove);
+        } catch (Exception $e) {
+            $system->message($e->getMessage());
+        }
+        $system->printMessage();
+    } else if ($user_remove = $_GET['blacklist_remove'] ?? null) {
+        $user_remove = abs((int) $user_remove);
 
-		try {
-			$user_exists = $player->blacklist[$user_remove];
+        try {
+            $user_exists = $player->blacklist[$user_remove];
 
             $message = ($user_exists) ? "{$player->blacklist[$user_remove][$user_remove]['user_name']} has been removed from your blacklist" : "This user is not on your blacklist.";
 
-			if($user_exists) {
-				unset($player->blacklist[$user_remove]);
-			}
+            if ($user_exists) {
+                unset($player->blacklist[$user_remove]);
+            }
 
-			$system->message($message);
+            $system->message($message);
 
-		}
-		catch(RuntimeException $e) {
-			echo $e->getMessage();
-		}
-		$system->printMessage();
-	}
-	else if(!empty($_POST['change_layout'])) {
-		$layout = $system->db->clean($_POST['layout']);
-		if(array_search($layout, $layouts) === false) {
-			$layout = null;
-		}
+        } catch (RuntimeException $e) {
+            echo $e->getMessage();
+        }
+        $system->printMessage();
+    } else if (!empty($_POST['change_layout'])) {
+        $layout = $system->db->clean($_POST['layout']);
+        if (array_search($layout, $layouts) === false) {
+            $layout = null;
+        }
 
-		if(!$layout) {
-			$system->message("Invalid layout choice!");
-			$system->printMessage();
-		}
-		else {
-			$query = "UPDATE `users` SET `layout`='$layout' WHERE `user_id`='$player->user_id' LIMIT 1";
-			$system->db->query($query);
-			$system->message("Layout updated!
+        if (!$layout) {
+            $system->message("Invalid layout choice!");
+            $system->printMessage();
+        } else {
+            $query = "UPDATE `users` SET `layout`='$layout' WHERE `user_id`='$player->user_id' LIMIT 1";
+            $system->db->query($query);
+            $system->message("Layout updated!
                 <script type='text/javascript'>setTimeout('window.location.assign(window.location.href)', 2000);</script>");
-			$system->printMessage();
-		}
-	}
-	else if (!empty($_POST['change_avatar_style'])) {
+            $system->printMessage();
+        }
+    } else if (!empty($_POST['change_avatar_style'])) {
         $style = $system->db->clean($_POST['avatar_style']);
         if ($player->setAvatarStyle($style)) {
             $system->message("Avatar style updated!");
@@ -230,8 +219,7 @@ function userSettings() {
         }
 
         $system->printMessage();
-    }
-    else if (!empty($_POST['change_sidebar_position'])) {
+    } else if (!empty($_POST['change_sidebar_position'])) {
         $position = $system->db->clean($_POST['sidebar_position']);
         if ($player->setSidebarPosition($position)) {
             $system->message("Sidebar position updated!");
@@ -240,6 +228,16 @@ function userSettings() {
         }
 
         $system->printMessage();
+    } else if (!empty($_POST['change_sidebar_collapse'])) {
+        $collapse = $system->db->clean($_POST['sidebar_collapse']);
+        if ($player->setSidebarCollapse($collapse)) {
+            $system->message("Sidebar collapse updated!");
+        } else {
+            $system->message("No change detected, check your selection and try again.");
+        }
+
+        $system->printMessage();
+
     } else if (!empty($_POST['change_enable_alerts'])) {
         $enable = $system->db->clean($_POST['enable_alerts']);
         if ($player->setEnableAlerts((bool)$enable)) {
@@ -328,6 +326,7 @@ function userSettings() {
 
 	// Temp settings
     $sidebar_position = $player->getSidebarPosition();
+    $sidebar_collapse = $player->getSidebarCollapse();
     $avatar_style = $player->getAvatarStyle();
     $avatar_styles = $player->forbidden_seal->avatar_styles;
     $avatar_frame = $player->getAvatarFrame();

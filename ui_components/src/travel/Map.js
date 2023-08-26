@@ -1,5 +1,5 @@
 
-export const Map = ({ mapData, scoutData, playerId, ranksToView}) => {
+export const Map = ({ mapData, scoutData, playerId, ranksToView, strategicView, displayGrid}) => {
     // Visible field info
     const map_div = document.getElementsByClassName('travel-container')[0];
 
@@ -70,6 +70,8 @@ export const Map = ({ mapData, scoutData, playerId, ranksToView}) => {
             ${(player_y - 1) * tile_height}px,
             0
         )`,
+        backfaceVisibility: "hidden",
+        filter: "blur(0)",
     };
 
     const MapStyle = {
@@ -97,20 +99,25 @@ export const Map = ({ mapData, scoutData, playerId, ranksToView}) => {
                         )`,
                         width: map_width * tile_width,
                         height: map_height * tile_height,
+                        backfaceVisibility: "hidden",
+                        filter: "blur(0)",
                     }}
                 >
                     <div id='map_background' className='map_background' style={{backgroundImage: MapStyle.backgroundImage}}></div>
-                    <div className='map_grid_lines'>
-                        <MapGridLines
-                            tileWidth={tile_width}
-                            tileHeight={tile_height}
-                            stageOffsetX={stage_offset_x}
-                            stageOffsetY={stage_offset_y}
-                            stageWidth={stage_width}
-                            stageHeight={stage_height}
-                            region_locations={mapData.region_locations}
-                        />
-                    </div>
+                    {displayGrid &&
+                        <div className='map_grid_lines'>
+                            <MapGridLines
+                                tileWidth={tile_width}
+                                tileHeight={tile_height}
+                                stageOffsetX={stage_offset_x}
+                                stageOffsetY={stage_offset_y}
+                                stageWidth={stage_width}
+                                stageHeight={stage_height}
+                                regionCoords={mapData.region_coords}
+                                strategicView={strategicView}
+                            />
+                        </div>
+                    }
                     <MapLocations
                         locations={mapData.all_locations || []}
                         tileWidth={tile_width}
@@ -160,7 +167,7 @@ function MapGutters({ stageWidth, stageHeight, stageOffsetX, stageOffsetY}) {
     )
 }
 
-function MapGridLines({ tileWidth, tileHeight, stageOffsetX, stageOffsetY, stageWidth, stageHeight, region_locations }) {
+function MapGridLines({ tileWidth, tileHeight, stageOffsetX, stageOffsetY, stageWidth, stageHeight, regionCoords, strategicView }) {
     const rows = [];
     for (let i = stageOffsetY - 1; i < stageOffsetY + stageHeight + 2; i++) {
         rows.push(i);
@@ -179,7 +186,15 @@ function MapGridLines({ tileWidth, tileHeight, stageOffsetX, stageOffsetY, stage
                         width: tileWidth,
                         height: tileHeight,
                         top: row * tileHeight,
-                        left: col * tileWidth
+                        left: col * tileWidth,
+                        backgroundColor: strategicView && regionCoords?.[col + 1]?.[row + 1]?.color || '',
+                        borderTop: strategicView && regionCoords?.[col+1]?.[row+1]?.border_top ? 'dashed 3px' : '',
+                        borderBottom: strategicView && regionCoords?.[col+1]?.[row+1]?.border_bottom ? 'dashed 3px' : '',
+                        borderLeft: strategicView && regionCoords?.[col+1]?.[row+1]?.border_left ? 'dashed 3px' : '',
+                        borderRight: strategicView && regionCoords?.[col + 1]?.[row + 1]?.border_right ? 'dashed 3px' : '',
+                        borderImageSource: strategicView ? 'url(./images/map/border20px.png)' : '',
+                        borderImageSlice: strategicView ? 2 : '',
+                        borderImageRepeat: strategicView ? 'round' : '',
                     }}></div>
                 ))
             ))}
@@ -192,19 +207,53 @@ function MapLocations({ locations, tileWidth, tileHeight }) {
         <div className='map_locations'>
             {locations.map((location) => (
                 <div key={location.location_id}
-                    className='map_location'
+                    className={location.objective_type != undefined ? 'map_location ' + location.objective_type : 'map_location'}
                     style={{
                         cursor: "pointer",
                         backgroundColor: "#" + location.background_color,
                         backgroundImage: "url(." + location.background_image + ")",
-                        top: ((location.y - 1) * tileHeight) + "px",
-                        left: ((location.x - 1) * tileWidth) + "px",
+                        transform: location.objective_type == 'key_location' ? `translate3d(${((location.x - 1) * tileWidth) - 8}px, ${((location.y - 1) * tileHeight) - 8}px, 0)`
+                            : `translate3d(${(location.x - 1) * tileWidth}px, ${(location.y - 1) * tileHeight}px, 0)`,
+                        backfaceVisibility: "hidden",
+                        filter: "blur(0)",
                     }}>
                     <div className='map_locations_tooltip'>{location.name}</div>
                     {location.objective_image &&
-                        <div className='map_location_objective' style={{
+                        <div className={location.objective_type != undefined ? 'map_location_objective ' + location.objective_type : 'map_location_objective'} style={{
                         backgroundImage: "url(." + location.objective_image + ")",
                         }}></div>
+                    }
+                    {location.objective_health && location.objective_max_health > 0 &&
+                        (() => {
+                            const percentage = (location.objective_health / location.objective_max_health) * 100;
+                            let barColor;
+
+                            if (percentage >= 50) {
+                                barColor = 'green';
+                            } else if (percentage >= 25) {
+                                barColor = 'yellow';
+                            } else {
+                                barColor = 'red';
+                            }
+
+                            return (
+                                <div
+                                    className='map_location_objective_health'
+                                    style={{
+                                        backgroundColor: barColor,
+                                        width: `${percentage}%`,
+                                        height: '6px',
+                                        position: 'absolute',
+                                        color: 'white',
+                                        textAlign: 'center',
+                                        lineHeight: '8px',
+                                        fontSize: '8px',
+                                        top: '3px',
+                                    }}
+                                >
+                                </div>
+                            );
+                        })()
                     }
                 </div>
             ))}
@@ -223,8 +272,9 @@ function MapNearbyPlayers({ scoutData, tileWidth, tileHeight, playerId, ranksToV
                     className={alignmentClass(player.alignment) + " " + visibilityClass(player.invulnerable)}
                     style={{
                         cursor: "pointer",
-                        top: ((player.target_y - 1) * tileHeight) + "px",
-                        left: ((player.target_x - 1) * tileWidth) + "px",
+                        transform: `translate3d(${(player.target_x - 1) * tileWidth}px, ${(player.target_y - 1) * tileHeight}px, 0)`,
+                        backfaceVisibility: "hidden",
+                        filter: "blur(0)",
                         }}>
                     <div className='map_locations_tooltip'>{player.user_name}</div>
                 </div>

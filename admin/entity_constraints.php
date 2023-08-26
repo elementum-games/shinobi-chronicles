@@ -489,6 +489,11 @@ $mission_stage_constraints = [
         'input_type' => 'text',
         'max_length' => 300,
     ],
+    'target_type' => [
+        'data_type' => 'string',
+        'input_type' => 'radio',
+        'options' => ['default', 'home_village', 'ally_village', 'enemy_village'],
+    ],
 ];
 $mission_reward_constraints = [
     'item_id' => [
