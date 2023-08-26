@@ -33,6 +33,9 @@ const styles = {
     roundBorder: {
         borderRadius: '0.5em 0.5em 0em 0em',
     },
+    textAlignCenter: {
+        textAlign: 'center'
+    },
     //specific elements
     option: {
         padding: '1em, 0em',
@@ -53,7 +56,7 @@ function CancelTrainingDetails({
 }){
 
     return (
-        <div>
+        <div style={styles.textAlignCenter}>
             <h2>Cancel Training</h2>
             <p>
                 {/* TODO: I'm not sure how train gains or partial gains works here */}
@@ -71,7 +74,7 @@ function TrainingDetails({
     const combinedHeaderStyles = {...styles.header, ...styles.topHeader}
     return (
         <>
-            <div id='DetailPanelContainer'>
+            <div >
             <h2 style={combinedHeaderStyles}>Academy</h2>
                 <div style={styles.indent}>
                     <p>Here at the academy, you can take classes to improve your skills, attributes, or skill with a jutsu.</p>
@@ -285,12 +288,12 @@ function Training({
 
             {/* Hide when training */}
             {!playerData.hasActiveTraining ? (
-                    <SelectTrainingPanel 
+                    <SelectTrainingPanel
                     playerData = {playerData}
                     headers = {headers}
                     />
                 ) : (
-                    <div>
+                    <div style={styles.textAlignCenter} >
                         <h2 style={styles.header}> {trainingData.trainType} Training</h2>
                         <p>{trainingData.trainingDisplay}</p>
                         <p id="train_time_remaining">{trainingData.timeRemaining} remaining...</p>

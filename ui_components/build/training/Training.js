@@ -26,6 +26,9 @@ const styles = {
   roundBorder: {
     borderRadius: '0.5em 0.5em 0em 0em'
   },
+  textAlignCenter: {
+    textAlign: 'center'
+  },
   //specific elements
   option: {
     padding: '1em, 0em',
@@ -45,7 +48,9 @@ function CancelTrainingDetails({
   playerData,
   headers
 }) {
-  return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("h2", null, "Cancel Training"), /*#__PURE__*/React.createElement("p", null, "Are you certain you wish to cancel your training? You will not gain any of your potential ", /*#__PURE__*/React.createElement("strong", null, playerData.trainGains), " gains."), /*#__PURE__*/React.createElement("button", null, /*#__PURE__*/React.createElement("a", {
+  return /*#__PURE__*/React.createElement("div", {
+    style: styles.textAlignCenter
+  }, /*#__PURE__*/React.createElement("h2", null, "Cancel Training"), /*#__PURE__*/React.createElement("p", null, "Are you certain you wish to cancel your training? You will not gain any of your potential ", /*#__PURE__*/React.createElement("strong", null, playerData.trainGains), " gains."), /*#__PURE__*/React.createElement("button", null, /*#__PURE__*/React.createElement("a", {
     href: headers.selfLink + '&cancel_training=1&cancel_confirm=1'
   }, "Confirm")));
 }
@@ -57,9 +62,7 @@ function TrainingDetails({
     ...styles.header,
     ...styles.topHeader
   };
-  return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
-    id: "DetailPanelContainer"
-  }, /*#__PURE__*/React.createElement("h2", {
+  return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("h2", {
     style: combinedHeaderStyles
   }, "Academy"), /*#__PURE__*/React.createElement("div", {
     style: styles.indent
@@ -247,7 +250,9 @@ function Training({
   }), !playerData.hasActiveTraining ? /*#__PURE__*/React.createElement(SelectTrainingPanel, {
     playerData: playerData,
     headers: headers
-  }) : /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("h2", {
+  }) : /*#__PURE__*/React.createElement("div", {
+    style: styles.textAlignCenter
+  }, /*#__PURE__*/React.createElement("h2", {
     style: styles.header
   }, " ", trainingData.trainType, " Training"), /*#__PURE__*/React.createElement("p", null, trainingData.trainingDisplay), /*#__PURE__*/React.createElement("p", {
     id: "train_time_remaining"
