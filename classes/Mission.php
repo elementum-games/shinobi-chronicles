@@ -193,9 +193,6 @@ class Mission {
                             INNER JOIN `regions` ON `regions`.`region_id` = `region_locations`.`region_id`
                             WHERE `regions`.`region_id` = '{$this->player->village->region_id}' AND `type` = 'village'
                         ");
-                        $village_result = $this->system->db->fetch_all($village_query);
-                        $random_village = array_rand($village_result);
-                        $location = $this->rollLocation(new TravelCoords($village_result[$random_village]['x'], $village_result[$random_village]['y'], 1));
                     }
                     // get any ally village
                     else if ($this->current_stage['target_type'] == "ally_village") {
@@ -203,9 +200,6 @@ class Mission {
                             INNER JOIN `regions` ON `regions`.`region_id` = `region_locations`.`region_id`
                             WHERE `regions`.`village` = '{$this->player->village->village_id}' AND `type` = 'village'
                         ");
-                        $village_result = $this->system->db->fetch_all($village_query);
-                        $random_village = array_rand($village_result);
-                        $location = $this->rollLocation(new TravelCoords($village_result[$random_village]['x'], $village_result[$random_village]['y'], 1));
                     }
                     // get any enemy village
                     else if ($this->current_stage['target_type'] == "enemy_village") {
@@ -213,10 +207,10 @@ class Mission {
                             INNER JOIN `regions` ON `regions`.`region_id` = `region_locations`.`region_id`
                             WHERE `regions`.`village` != '{$this->player->village->village_id}' AND `type` = 'village'
                         ");
-                        $village_result = $this->system->db->fetch_all($village_query);
-                        $random_village = array_rand($village_result);
-                        $location = $this->rollLocation(new TravelCoords($village_result[$random_village]['x'], $village_result[$random_village]['y'], 1));
                     }
+                    $village_result = $this->system->db->fetch_all($village_query);
+                    $random_village = array_rand($village_result);
+                    $location = $this->rollLocation(new TravelCoords($village_result[$random_village]['x'], $village_result[$random_village]['y'], 1));
                 }
                 // if first stage and custom_start_location set, use custom_start_location as root
                 else if ($stage_id == 1 && isset($this->custom_start_location) && !empty($this->custom_start_location)) {

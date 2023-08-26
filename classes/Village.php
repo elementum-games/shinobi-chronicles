@@ -19,8 +19,7 @@ class Village {
         $this->name = $village;
         $this->kage_name = $this->getKageName();
         $this->coords = $this->setVillageCoords();
-        $this->region_id = $this->getRegionId($this->system, $this->name);
-        $this->village_id = $this->getVillageId($this->system, $this->name);
+        $this->getVillageData();
     }
 
     public function getKageName() {
@@ -62,22 +61,16 @@ class Village {
         return null;
     }
 
-    public static function getRegionId(System $system, string $village_name): int {
-        $result = $system->db->query(
-            "SELECT `region_id` FROM `villages`
-                WHERE `villages`.`name`='{$village_name}'"
+    private function getVillageData()
+    {
+        $result = $this->system->db->query(
+            "SELECT `village_id`, `region_id` FROM `villages`
+                WHERE `villages`.`name`='{$this->name}'"
         );
-        $result = $system->db->fetch($result);
-        return $result['region_id'];
+        $result = $this->system->db->fetch($result);
+        $this->region_id = $result['region_id'];
+        $this->village_id = $result['village_id'];
     }
 
-    public static function getVillageId(System $system, string $village_name): int
-    {
-        $result = $system->db->query(
-            "SELECT `village_id` FROM `villages`
-                WHERE `villages`.`name`='{$village_name}'"
-        );
-        $result = $system->db->fetch($result);
-        return $result['village_id'];
-    }
+
 }
