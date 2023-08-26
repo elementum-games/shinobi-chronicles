@@ -21,6 +21,15 @@ if(isset($_POST['calc_cost'])) {
     $rank = (int) $_POST['rank'];
     $jutsu_effect_amount = (float) $_POST['jutsu_effect_amount'];
 
+    if($type == 'item') {
+        $ranks = [1, 2, 3, 4, 5];
+        if($rank != 0) {
+            $ranks = [$rank];
+        }
+        foreach($ranks as $rank_num) {
+            $DISPLAY_DATA[$rank_num] = Currency::calcItemCost($rank_num);
+        }
+    }
     if($type == 'ramen') {
         $ranks = [1, 2, 3, 4, 5];
         if($rank != 0) {
@@ -190,6 +199,19 @@ if(isset($_POST['calc_cost'])) {
                 </tr>
             <?php endforeach ?>
             <tr><td colspan="21"><em>*Jutsu cost w/effect</em></td></tr>
+        </table>
+    <?php elseif(isset($type) && $type == 'item'): ?>
+        <table class='table small_width'>
+            <tr>
+                <th>Rank</th>
+                <th>Cost</th>
+            </tr>
+            <?php foreach($DISPLAY_DATA as $rank => $cost): ?>
+                <tr>
+                    <td><?=$RANKS[$rank]?></td>
+                    <td><?=$cost?></td>
+                </tr>
+            <?php endforeach ?>
         </table>
     <?php endif ?>
 <?php endif ?>

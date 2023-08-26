@@ -264,6 +264,16 @@ class Currency {
         );
     }
 
+    public static function calcItemCost(int $item_rank): int {
+        return self::roundYen(
+            num: self::calcRawYenCost(
+                rank_num: $item_rank,
+                multiplier: pow($item_rank + 1, 2)
+            ),
+            multiple_of: 5
+        );
+    }
+
     /** Load Currency from DB **/
     public static function loadFromDb(System $system, int $user_id, string $type, int $amount, ?UserDailyTasks $userDailyTasks = null, ?int $max_amount = null): Currency {
         return new Currency(
