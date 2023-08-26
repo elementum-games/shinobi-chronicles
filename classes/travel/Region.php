@@ -10,7 +10,7 @@ class Region {
 
     const VILLAGE_COLORS = [
         0 => "rgba(0, 0, 0, 0)",
-        1 => "rgba(139,69,19, 0.4)", // stone
+        1 => "rgba(92,75,23, 0.4)", // stone
         2 => "rgba(253, 240, 0, 0.25)", // cloud
         3 => "rgba(236, 28, 36, 0.25)", // leaf
         4 => "rgba(249, 105, 14, 0.35)", // sand
