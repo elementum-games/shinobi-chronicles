@@ -100,18 +100,18 @@ else if(isset($_POST['calc_arena'])) {
         $DISPLAY_DATA[$i] = [
             Currency::getRoundedYen(
                 rank_num: $i,
-                multiplier: 1,
-                multiple_of: NPC::MONEY_GAIN_MULTIPLE
+                multiplier: $arena_min,
+                multiple_of: $multiple_of
             ),
             Currency::getRoundedYen(
                 rank_num: $i,
-                multiplier: 3,
-                multiple_of: NPC::MONEY_GAIN_MULTIPLE
+                multiplier: $arena_avg,
+                multiple_of: $multiple_of
             ),
             Currency::getRoundedYen(
                 rank_num: $i,
-                multiplier: 5,
-                multiple_of: NPC::MONEY_GAIN_MULTIPLE
+                multiplier: $arena_max,
+                multiple_of: $multiple_of
             )
         ];
     }
