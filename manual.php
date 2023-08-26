@@ -64,6 +64,7 @@ $layout->renderBeforeContentHTML($system, $player ?? null, 'Manual');
 
       <div style="padding:7px 10px">
         <h1>Intro to Shinobi Chronicles</h1>
+        <h5>Note: Outdated, new Manual coming soon! - Arthesia 8/25/23</h5>
         <h4>Shinobi Chronicles is a browser based MMORPG inspired by the popular anime/manga series, Naruto. Train your character through the village ranking system, climb to new heights whilst becoming a world renowned Ninja!</h4>
         <h4>Learn various jutsu, unlock your bloodline and partake in combat with warring or neutral villages to earn points and unlock boosts and rewards for your entire village and personal squads.</h4>
         <h4>Work your way up through the ninja ranks and claim the highest possible position, the Kage, or become an elite level ninja, feared across all villages.</h4>
