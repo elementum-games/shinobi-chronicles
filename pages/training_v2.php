@@ -6,6 +6,9 @@ function training() {
     global $system;
     global $player;
     global $self_link;
+    
+    //  Old or New Layout
+	$use_new_layout = $system->layout->usesV2Interface();
 
     // Load player data
     $player->getInventory();
@@ -160,5 +163,10 @@ function training() {
     }
 
     $system->printMessage();
-    require 'templates/training_v2.php';
+
+    if(!$use_new_layout){
+        require 'templates/training.php';
+    } else {
+        require 'templates/training_v2.php';
+    }
 }
