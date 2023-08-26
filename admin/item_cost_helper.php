@@ -129,6 +129,9 @@ if(isset($_POST['calc_cost'])) {
     table.small_width {
         width: 65%;
     }
+    table.super_small_width {
+        width: 25%;
+    }
     table.table th {
         text-align: center;
         text-transform: uppercase;
@@ -201,15 +204,15 @@ if(isset($_POST['calc_cost'])) {
             <tr><td colspan="21"><em>*Jutsu cost w/effect</em></td></tr>
         </table>
     <?php elseif(isset($type) && $type == 'item'): ?>
-        <table class='table small_width'>
+        <table class='table super_small_width'>
             <tr>
                 <th>Rank</th>
                 <th>Cost</th>
             </tr>
             <?php foreach($DISPLAY_DATA as $rank => $cost): ?>
-                <tr>
+                <tr style="text-align:center;">
                     <td><?=$RANKS[$rank]?></td>
-                    <td><?=$cost?></td>
+                    <td><?=$user->currency->money->symbol.$cost?></td>
                 </tr>
             <?php endforeach ?>
         </table>
