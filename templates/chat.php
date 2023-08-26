@@ -34,7 +34,7 @@
                 initialPreviousPagePostId: initialPostsResponse.previousPagePostId,
                 initialLatestPostId: initialPostsResponse.latestPostId,
                 maxPostLength: <?= $chatManager->maxPostLength() ?>,
-                isModerator: Boolean(<?= (int)$player->isModerator() ?>),
+                isModerator: Boolean(<?= (int)$player->staff_manager->isModerator() ?>),
                 initialBanInfo: initialBanInfo,
                 memes: <?= json_encode($system->getMemes()) ?>,
             }),

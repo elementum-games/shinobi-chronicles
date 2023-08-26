@@ -25,7 +25,6 @@ class User extends Fighter {
     const ENTITY_TYPE = 'U';
 
     const AVATAR_MAX_SIZE = 125;
-
     const GENDER_MALE = 'Male';
     const GENDER_FEMALE = 'Female';
     const GENDER_NON_BINARY = 'Non-binary';
@@ -54,6 +53,8 @@ class User extends Fighter {
     const MIN_PASSWORD_LENGTH = 6;
     const PARTIAL_LOCK = 3;
     const FULL_LOCK = 5;
+    const LOCK_OUT_CD = 5 * 60;
+    const MALICIOUS_LOCKOUT_CD = 15 * 60;
 
     const BASE_EXP = 0;
     const BASE_REGEN = 25;
@@ -92,12 +93,10 @@ class User extends Fighter {
     public int $user_id;
     public string $user_name;
     public int $free_username_changes;
-    public $blacklist;
-    public $original_blacklist;
+    public UserBlacklist $blacklist;
 
     /** @var DailyTask[] */
     public ?UserDailyTasks $daily_tasks;
-    public int $daily_tasks_reset;
 
     // Loaded in loadData
     public float $health;
@@ -111,6 +110,7 @@ class User extends Fighter {
     public string $last_ip;
     public string $email;
     public $failed_logins;
+    public $last_malicious_ip;
     public $global_message_viewed;
 
     public string $gender;
@@ -162,7 +162,8 @@ class User extends Fighter {
     public int $stat_transfer_completion_time;
     public string $stat_transfer_target_stat;
 
-    private int $money;
+    public UserCurrency $currency;
+    public Currency $money;
 
     public int $pvp_wins;
     public int $pvp_losses;
@@ -170,7 +171,6 @@ class User extends Fighter {
     public int $ai_losses;
 
     public $missions_completed;
-    public $presents_claimed;
 
     public $monthly_pvp;
 
@@ -260,8 +260,8 @@ class User extends Fighter {
     public int $last_pvp_ms;
     public int $last_death_ms;
 
-    private int $premium_credits;
-    public int $premium_credits_purchased;
+    public Currency $premium_credits;
+    public Currency $premium_credits_purchased;
 
     public bool $censor_explicit_language = true;
 
@@ -384,9 +384,8 @@ class User extends Fighter {
         $user->regen_boost = 0;
 
         $user->setForbiddenSealFromDb($user_data['forbidden_seal'], $remote_view);
-        $user->regen_boost += ceil($user->regen_rate * ($user->forbidden_seal->regen_boost / 100));
 
-        $user->chat_color = $user_data['chat_color'];
+        $user->chat_color = ($user_data['chat_color'] == '') ? 'black' : $user_data['chat_color'];
         $user->chat_effect = $user_data['chat_effect'];
 
         $user->sensei_id = $user_data['sensei_id'];
@@ -447,149 +446,63 @@ class User extends Fighter {
 
     /**
      * @throws RuntimeException
+     * NOTE: Changing the order that data is loaded may cause errors!
+     * Any additional changes to data loads should be inserted without altering the data flow top -> bottom
      */
     public function loadData($UPDATE = User::UPDATE_FULL, $remote_view = false): void {
         $result = $this->system->db->query("SELECT * FROM `users` WHERE `user_id`='$this->user_id' LIMIT 1 FOR UPDATE");
         $user_data = $this->system->db->fetch($result);
 
+        /** Personal Information **/
+        $this->email = $user_data['email'];
         $this->current_ip = $user_data['current_ip'];
         $this->last_ip = $user_data['last_ip'];
-        // IP stuff
         if(!$remote_view && $this->current_ip != $_SERVER['REMOTE_ADDR']) {
             $this->last_ip = $this->current_ip;
             $this->current_ip = $_SERVER['REMOTE_ADDR'];
         }
-        $this->email = $user_data['email'];
 
+        /** Global Information **/
         $this->global_message_viewed = $user_data['global_message_viewed'];
-
         $this->last_update = $user_data['last_update'];
         $this->last_active = $user_data['last_active'];
         $this->failed_logins = $user_data['failed_logins'];
+        $this->last_malicious_ip = $user_data['last_malicious_ip'];
+        $this->log_actions = $user_data['log_actions'];
+        $this->censor_explicit_language = (bool) $user_data['censor_explicit_language'];
+        $this->loadBlacklistData();
+        $this->layout = $user_data['layout'];
+
+        /** Premium Purchase Data **/
+        $this->village_changes = $user_data['village_changes'];
+        $this->clan_changes = $user_data['clan_changes'];
+
+        /** Profile Data **/
         $this->avatar_link = $user_data['avatar_link'];
         $this->profile_song = $user_data['profile_song'];
 
-        $this->log_actions = $user_data['log_actions'];
-
-        $this->censor_explicit_language = (bool)$user_data['censor_explicit_language'];
-
-        // Message blacklist
-        $this->blacklist = [];
-        $result = $this->system->db->query(
-            "SELECT `blocked_ids` FROM `blacklist` WHERE `user_id`='$this->user_id' LIMIT 1"
-        );
-        if($result->num_rows != 0) {
-            $blacklist = $this->system->db->fetch($result);
-            $this->blacklist = json_decode($blacklist['blocked_ids'], true);
-            $this->original_blacklist = $this->blacklist;
-        }
-        else {
-            $blacklist_json = json_encode($this->blacklist);
-            $this->system->db->query(
-                "INSERT INTO `blacklist` (`user_id`, `blocked_ids`) VALUES ('{$this->user_id}', '{$blacklist_json}')"
-            );
-            $this->original_blacklist = []; // Default an empty array, user did not have an original.
-        }
-
-        // Rank stuff
+        /** Character Data **/
+        // Default boosts & nerfs
+        $this->loadDefaultBoostsAndNerfs();
+        $this->village = new Village($this->system, $user_data['village']);
+        $this->village_location = Village::getLocation($this->system, $this->village->name);
+        $this->gender = $user_data['gender'];
+        // Rank/Level/Pools/Regen
         $this->rank_num = $user_data['rank'];
         $this->rank_up = $user_data['rank_up'];
-        $rank_data = $this->system->db->query("SELECT * FROM `ranks` WHERE `rank_id`='$this->rank_num'");
-        if($this->system->db->last_num_rows == 0) {
-            $this->system->message("Invalid rank!");
-            $this->system->printMessage("Invalid rank!");
-        }
-        else {
-            $rank_data = $this->system->db->fetch($rank_data);
-            $this->rank = Rank::fromDb($rank_data);
-        }
-
-        $this->village = new Village($this->system, $user_data['village']);
-        $this->village_rep = $user_data['village_rep'];
-        $this->weekly_rep = $user_data['weekly_rep'];
-	$this->pvp_rep = $user_data['pvp_rep'];
-        $this->mission_rep_cd = $user_data['mission_rep_cd'];
-        $this->recent_players_killed_ids = $user_data['recent_players_killed_ids'];
-	$this->recent_killer_ids = $user_data['recent_killer_ids'];
-        $this->reputation = new UserReputation($this->village_rep, $this->weekly_rep, $this->pvp_rep, $this->recent_players_killed_ids, $this->recent_killer_ids, $this->mission_rep_cd, $this->system->event);
-
-        $this->gender = $user_data['gender'];
+        $this->loadRankData();
         $this->level = $user_data['level'];
         $this->level_up = $user_data['level_up'];
-        $this->health = $user_data['health'];
-        $this->max_health = $user_data['max_health'];
-        $this->stamina = $user_data['stamina'];
-        $this->max_stamina = $user_data['max_stamina'];
-        $this->chakra = $user_data['chakra'];
-        $this->max_chakra = $user_data['max_chakra'];
-
-        if($this->health > $this->max_health) {
-            $this->health = $this->max_health;
-        }
-        if($this->chakra > $this->max_chakra) {
-            $this->chakra = $this->max_chakra;
-        }
-        if($this->stamina > $this->max_stamina) {
-            $this->stamina = $this->max_stamina;
-        }
-
+        $this->exp = $user_data['exp'];
+        $this->loadPools($user_data);
         $this->regen_rate = $user_data['regen_rate'];
-        $this->regen_boost = 0;
-
+        // Elements, Battle & Mission
+        $this->loadElementData(elements: $user_data['elements']);
         $this->battle_id = $user_data['battle_id'];
         $this->challenge = $user_data['challenge'];
-
-        $this->mission_id = $user_data['mission_id'];
-        if($this->mission_id) {
-            $this->mission_stage = json_decode($user_data['mission_stage'], true);
-        }
-
-        $this->special_mission = $user_data['special_mission'];
-
-        $this->exam_stage = $user_data['exam_stage'];
-
         $this->last_ai_ms = $user_data['last_ai_ms'];
-        $this->last_free_stat_change = $user_data['last_free_stat_change'];
         $this->last_pvp_ms = $user_data['last_pvp_ms'];
         $this->last_death_ms = $user_data['last_death_ms'];
-
-        $this->layout = $user_data['layout'];
-
-        $this->exp = $user_data['exp'];
-        $this->bloodline_id = $user_data['bloodline_id'];
-        $this->bloodline_name = $user_data['bloodline_name'];
-
-        if($this->bloodline_id) {
-            array_unshift($this->stats, 'bloodline_skill');
-        }
-
-        $this->location = TravelCoords::fromDbString($user_data['location']);
-        $this->current_location = Travel::getLocation($this->system, $this->location->x, $this->location->y, $this->location->map_id);
-        $this->last_movement_ms = $user_data['last_movement_ms'];
-        // generate a new attack link if it's been 10 minutes
-        if ($user_data['attack_id_time_ms'] <= (System::currentTimeMs() - (60 * User::ATTACK_LINK_DURATION_MIN * 1000))) {
-            $this->attack_id = uniqid($this->id . ':');
-            $this->attack_id_time_ms = System::currentTimeMs();
-        } else {
-            $this->attack_id = $user_data['attack_id'];
-            $this->attack_id_time_ms = $user_data['attack_id_time_ms'];
-        }
-
-        if ($user_data['filters'] === null) {
-            $filters = [
-                'travel_ranks_to_view' => array_fill(1, System::SC_MAX_RANK, true)
-            ];
-            $user_data['filters'] = json_encode($filters);
-        }
-        $this->filters = json_decode($user_data['filters'], true);
-
-        $this->train_type = $user_data['train_type'];
-        $this->train_gain = $user_data['train_gain'];
-        $this->train_time = $user_data['train_time'];
-
-        $this->money = $user_data['money'];
-        $this->premium_credits = $user_data['premium_credits'];
-        $this->premium_credits_purchased = $user_data['premium_credits_purchased'];
 
         $this->pvp_wins = $user_data['pvp_wins'];
         $this->pvp_losses = $user_data['pvp_losses'];
@@ -597,15 +510,20 @@ class User extends Fighter {
         $this->ai_losses = $user_data['ai_losses'];
         $this->monthly_pvp = $user_data['monthly_pvp'];
 
-        $this->missions_completed = json_decode($user_data['missions_completed'], true);
-        if(!is_array($this->missions_completed)) {
-            $this->missions_completed = [];
-        }
+        $this->loadMissionData(
+            mission_id: $user_data['mission_id'],
+            mission_stage: $user_data['mission_stage'],
+            missions_completed: $user_data['missions_completed'],
+            special_mission: $user_data['special_mission']
+        );
+        $this->exam_stage = $user_data['exam_stage'];
+        // Sensei, Stats & Training
+        $this->sensei_id = $user_data['sensei_id'];
+        $this->accept_students = $user_data['accept_students'];
 
-        $this->presents_claimed = json_decode($user_data['presents_claimed'], true);
-        if(!is_array($this->presents_claimed)) {
-            $this->presents_claimed = [];
-        }
+        $this->train_type = $user_data['train_type'];
+        $this->train_gain = $user_data['train_gain'];
+        $this->train_time = $user_data['train_time'];
 
         $this->ninjutsu_skill = $user_data['ninjutsu_skill'];
         $this->genjutsu_skill = $user_data['genjutsu_skill'];
@@ -618,65 +536,214 @@ class User extends Fighter {
         $this->intelligence = $user_data['intelligence'];
         $this->willpower = $user_data['willpower'];
 
-        $this->total_stats = $this->ninjutsu_skill + $this->genjutsu_skill + $this->taijutsu_skill + $this->bloodline_skill +
-            $this->cast_speed + $this->speed + $this->intelligence + $this->willpower;
+        $this->total_stats = $this->ninjutsu_skill + $this->genjutsu_skill + $this->taijutsu_skill
+            + $this->bloodline_skill + $this->cast_speed + $this->speed + $this->intelligence + $this->willpower;
 
+        $this->last_free_stat_change = $user_data['last_free_stat_change'];
         $this->stat_transfer_amount = $user_data['stat_transfer_amount'];
         $this->stat_transfer_completion_time = $user_data['stat_transfer_completion_time'];
         $this->stat_transfer_target_stat = $user_data['stat_transfer_target_stat'];
+        // Location
+        $this->loadLocationAndTravelData(
+            location: $user_data['location'],
+            attack_id_time_ms: $user_data['attack_id_time_ms'],
+            attack_id: $user_data['attack_id'],
+            last_movement_time: $user_data['last_movement_ms'],
+            user_filters: $user_data['filters']
+        );
+        // Bloodline
+        $this->loadBloodlineData(bloodline_id: $user_data['bloodline_id'], bloodline_name: $user_data['bloodline_name']);
+        // Forbidden seal
+        $this->setForbiddenSealFromDb($user_data['forbidden_seal'], $remote_view);
+        $this->regen_boost += ceil($this->regen_rate * ($this->forbidden_seal->regen_boost / 100));
+        // Reputation
+        $this->loadUserReputation(
+            village_rep: $user_data['village_rep'],
+            weekly_rep: $user_data['weekly_rep'],
+            pvp_rep: $user_data['pvp_rep'],
+            mission_rep_cd: $user_data['mission_rep_cd'],
+            recent_players_killed: $user_data['recent_players_killed_ids'],
+            recent_killers: $user_data['recent_killer_ids']
+        );
+        // Currency
+        $this->loadCurrency(user_data: $user_data);
+        // Daily tasks
+        $this->loadDailyTasks($UPDATE, $remote_view);
+        // Clan
+        $this->loadClanData(clan_id: $user_data['clan_id'], clan_office: $user_data['clan_office']);
+        // Team
+        $this->loadTeamData(team_id: $user_data['team_id']);
+        // Spouse
+        $this->loadSpouseData(spouse_id: $user_data['spouse'], marriage_time: $user_data['marriage_time']);
 
-        $this->ninjutsu_boost = 0;
-        $this->genjutsu_boost = 0;
-        $this->taijutsu_boost = 0;
-
-        $this->cast_speed_boost = 0;
-        $this->speed_boost = 0;
-        $this->intelligence_boost = 0;
-        $this->willpower_boost = 0;
-
-        $this->defense_boost = 0;
-
-        $this->ninjutsu_resist = 0;
-        $this->taijutsu_resist = 0;
-        $this->genjutsu_resist = 0;
-
-        // Combat nerfs
-        $this->ninjutsu_nerf = 0;
-        $this->taijutsu_nerf = 0;
-        $this->genjutsu_nerf = 0;
-
-        $this->cast_speed_nerf = 0;
-        $this->speed_nerf = 0;
-        $this->intelligence_nerf = 0;
-        $this->willpower_nerf = 0;
-
-        $this->scout_range = 1;
-        $this->stealth = 0;
-
-        if($this->rank_num > 3) {
-            $this->scout_range++;
+        // Check Regen & Training
+        $this->checkRegen($UPDATE);
+        if($this->train_time && $UPDATE >= User::UPDATE_FULL) {
+            $this->checkTraining();
         }
-        if($this->isHeadAdmin()) {
-            $this->scout_range += 2;
+        if($this->stat_transfer_completion_time && $UPDATE >= User::UPDATE_FULL) {
+            $this->checkStatTransfer();
         }
 
-        $this->village_changes = $user_data['village_changes'];
-        $this->clan_changes = $user_data['clan_changes'];
+        // Achievements
+        $this->achievements = AchievementsManager::fetchPlayerAchievements($this->system, $this->user_id);
+        $this->achievements_in_progress = AchievementsManager::fetchPlayerAchievementsInProgress($this->system, $this->user_id);
 
-        // Village
-        $this->village_location = Village::getLocation($this->system, $this->village->name);
-        /** @noinspection PhpConditionAlreadyCheckedInspection */
-        $this->in_village = $this->village_location !== null && $this->location->equals($this->village_location);
+        // Training Manager
+        $this->loadTrainingManager();
+    }
 
+    public function checkRegen($UPDATE): void {
+        $time_difference = time() - $this->last_update;
+        if($time_difference > 60 && $UPDATE >= User::UPDATE_REGEN) {
+            $minutes = floor($time_difference / 60);
 
-        // Daily Tasks
-        $this->daily_tasks = new UserDailyTasks($this->system, $this->user_id, $this->rank_num);
-        $this->daily_tasks_reset = $this->daily_tasks->last_reset;
+            $regen_amount = $minutes * ($this->regen_rate + $this->regen_boost);
+            $health_multiplier = self::$HEAL_REGEN_MULTIPLIER[$this->rank_num];
+
+            // In-battle decrease
+            if($this->battle_id) {
+                $regen_amount -= round($regen_amount * 0.7, 1);
+                $health_multiplier = 2;
+            }
+
+            $this->health += $regen_amount * $health_multiplier;
+            $this->chakra += $regen_amount;
+            $this->stamina += $regen_amount;
+
+            if($this->health > $this->max_health) {
+                $this->health = $this->max_health;
+            }
+            if($this->chakra > $this->max_chakra) {
+                $this->chakra = $this->max_chakra;
+            }
+            if($this->stamina > $this->max_stamina) {
+                $this->stamina = $this->max_stamina;
+            }
+
+            $this->last_update += $minutes * 60;
+        }
+    }
+    public function loadCurrency(array $user_data) {
+        $currencies = Currency::fetchUserCurrencies(system: $this->system, user_id: $this->user_id, user_data: $user_data);
+        $this->currency = new UserCurrency(
+            system: $this->system,
+            user_id: $this->user_id,
+            money: Currency::loadFromDb(
+                system: $this->system,
+                user_id: $this->user_id,
+                type: Currency::TYPE_MONEY,
+                amount: $currencies[Currency::TYPE_MONEY]
+            ),
+            premium_credits: Currency::loadFromDb(
+                system: $this->system,
+                user_id: $this->user_id,
+                type: Currency::TYPE_PREMIUM_CREDITS,
+                amount: $currencies[Currency::TYPE_PREMIUM_CREDITS]
+            ),
+            premium_purchased: Currency::loadFromDb(
+                system: $this->system,
+                user_id: $this->user_id,
+                type: Currency::TYPE_PREMIUM_CREDITS_PURCHASED,
+                amount: $currencies[Currency::TYPE_PREMIUM_CREDITS_PURCHASED]
+            ),
+            tokens: Currency::loadFromDb(
+                system: $this->system,
+                user_id: $this->user_id,
+                type: Currency::TYPE_TOKEN,
+                amount: $currencies[Currency::TYPE_TOKEN]
+            ),
+            ayakashi_favor: Currency::loadFromDb(
+                system: $this->system,
+                user_id: $this->user_id,
+                type: Currency::TYPE_AYAKASHI_FAVOR,
+                amount: $currencies[Currency::TYPE_AYAKASHI_FAVOR]
+            )
+        );
+        $this->money = $this->currency->money;
+        $this->premium_credits = $this->currency->premium_credits;
+        $this->premium_credits_purchased = $this->currency->premium_purchased;
+    }
+    public function loadElementData(?string $elements): void {
+        // Elements
+        if($elements) {
+            // Array values to undo the "first" "second" etc keys
+            $this->elements = array_values(
+                json_decode(
+                    $elements ?? "[]",
+                    true
+                )
+            );
+        }
+        else {
+            $this->elements = [];
+        }
+    }
+    public function loadSpouseData(int $spouse_id, int $marriage_time): void {
+        $this->spouse = $spouse_id;
+        $this->marriage_time = $marriage_time;
+        $result = $this->system->db->query("SELECT `user_name` FROM `users` WHERE `user_id`='$this->spouse' LIMIT 1");
+        if($this->system->db->last_num_rows) {
+            $this->spouse_name = $this->system->db->fetch($result)['user_name'];
+        }
+        else {
+            //TODO: Make a log if this becomes an issue
+            $this->spouse_name = '???';
+        }
+    }
+    public function loadTeamData(int $team_id): void {
+        $this->team = null;
+        $this->team_invite = null;
+        $this->fake_team = [
+            'name' => 'Something',
+            'avatar' => 'Something Else',
+        ];
+
+        if($team_id) {
+            // Invite stuff
+            if(str_starts_with($team_id, 'invite:')) {
+                $this->team_invite = (int)explode(':', $team_id)[1];
+            }
+            // Player team stuff
+            else {
+                $this->team = Team::findById($this->system, $team_id);
+                if($this->team != null) {
+                    $this->defense_boost += $this->team->getDefenseBoost($this);
+                }
+            }
+        }
+    }
+    public function loadClanData(int $clan_id, int $clan_office): void {
+        $this->clan_id = $clan_id;
+        $this->clan_office = 0;
+        if($this->clan_id) {
+            $this->clan = Clan::loadFromId($this->system, $this->clan_id);
+            if($this->clan) {
+                $this->clan_office = $clan_office;
+            }
+        }
+    }
+    public function loadDailyTasks($UPDATE, $remote_view): void {
+        $total_skills = $this->ninjutsu_skill + $this->taijutsu_skill + $this->genjutsu_skill + $this->bloodline_skill;
+        $total_attribs = $this->speed + $this->cast_speed;
+        $this->daily_tasks = new UserDailyTasks(
+            system: $this->system,
+            user_id: $this->user_id,
+            user_rank_num: $this->rank_num,
+            total_skills: $total_skills,
+            total_attributes: $total_attribs,
+            pvp_rep: $this->pvp_rep
+        );
+
+        // Set daily tasks for Money
+        $this->currency->setMoneyDailyTask($this->daily_tasks);
+
+        // Check Daily Tasks completion
         if($UPDATE == User::UPDATE_FULL && !$remote_view) {
             // Process tasks completion
             $completion_data = $this->daily_tasks->checkTaskCompletion();
             if($completion_data != null) {
-                $this->addMoney($completion_data['money_gain'], 'Completed daily task');
+                $this->currency->addMoney($completion_data['money_gain'], 'Completed daily task');
                 $rep_gain = $this->reputation->addRep($completion_data['rep_gain'], UserReputation::DAILY_TASK_BYPASS_CAP);
                 $task_display = "You have completed the task " . (sizeof($completion_data['tasks_completed']) > 1 ? "s" : "");
                 foreach ($completion_data['tasks_completed'] as $x => $t_name) {
@@ -689,60 +756,95 @@ class User extends Fighter {
                     }
                     $task_display .= "$t_name";
                 }
-                $task_display .= " earning &yen;" . $completion_data['money_gain'] . " and $rep_gain Reputation.";
+                $task_display .= " earning " . Currency::MONEY_SYMBOL . $completion_data['money_gain'] . " and $rep_gain Reputation.";
 
                 $this->system->message($task_display);
             }
         }
+    }
+    public function loadUserReputation(
+        int $village_rep, int $weekly_rep, int $pvp_rep, int $mission_rep_cd,
+        ?string $recent_players_killed, ?string $recent_killers
+    ): void {
+        $this->village_rep = $village_rep;
+        $this->weekly_rep = $weekly_rep;
+        $this->pvp_rep = $pvp_rep;
+        $this->mission_rep_cd = $mission_rep_cd;
+        $this->recent_players_killed_ids = $recent_players_killed;
+        $this->recent_killer_ids = $recent_killers;
+        $this->reputation = new UserReputation(
+            player_rep: $this->village_rep,
+            player_weekly_rep: $this->weekly_rep,
+            player_pvp_rep: $this->pvp_rep,
+            last_pvp_kills: $this->recent_players_killed_ids,
+            last_killer_ids: $this->recent_killer_ids,
+            mission_cd: $this->mission_rep_cd,
+            event: $this->system->event,
+            forbidden_seal: $this->forbidden_seal
+        );
+    }
+    public function loadLocationAndTravelData(string $location, ?int $attack_id_time_ms, ?string $attack_id,
+        ?int $last_movement_time, ?string $user_filters
+    ): void {
+        // Location
+        $this->location = TravelCoords::fromDbString($location);
+        $this->current_location = Travel::getLocation($this->system, $this->location->x, $this->location->y, $this->location->map_id);
+        /** @noinspection PhpConditionAlreadyCheckedInspection */
+        $this->in_village = $this->village_location !== null && $this->location->equals($this->village_location);
 
-
-
-        // Clan
-        $this->clan_id = (int)$user_data['clan_id'];
-        $this->clan_office = 0;
-        if($this->clan_id) {
-            $this->clan = Clan::loadFromId($this->system, $this->clan_id);
-            if($this->clan) {
-                $this->clan_office = $user_data['clan_office'];
-            }
+        // Location correction
+        if(TravelManager::locationIsInVillage($this->system, $this->location) &&
+            !$this->location->equals($this->village_location) &&
+            !$this->isHeadAdmin()
+        ) {
+            $this->location->x--;
         }
 
-        // Team
-        $this->team = null;
-        $this->team_invite = null;
-        $this->fake_team = [
-            'name' => 'Something',
-            'avatar' => 'Something Else',
-        ];
-
-        $team_id = $user_data['team_id'];
-        if($team_id) {
-            // Invite stuff
-            if(substr($team_id, 0, 7) == 'invite:') {
-                $this->team_invite = (int)explode(':', $team_id)[1];
-            }
-            // Player team stuff
-            else {
-                $this->team = Team::findById($this->system, $team_id);
-                if($this->team != null) {
-                    $this->defense_boost += $this->team->getDefenseBoost($this);
-                }
-            }
+        // Location with Regen Boost
+        if ($this->current_location->location_id && $this->current_location->regen) {
+            $this->regen_boost += ($this->current_location->regen / 100) * $this->regen_rate;
         }
 
-        // Spouse
-        $this->spouse = $user_data['spouse'];
-        $this->marriage_time = $user_data['marriage_time'];
-        $result = $this->system->db->query("SELECT `user_name` FROM `users` WHERE `user_id`='$this->spouse' LIMIT 1");
-        if($this->system->db->last_num_rows) {
-            $this->spouse_name = $this->system->db->fetch($result)['user_name'];
+        // Attack links
+        // generate a new attack link if it's been 10 minutes
+        if ($attack_id_time_ms <= (System::currentTimeMs() - (60 * User::ATTACK_LINK_DURATION_MIN * 1000))) {
+            $this->attack_id = uniqid($this->id . ':');
+            $this->attack_id_time_ms = System::currentTimeMs();
         }
         else {
-            //TODO: Make a log if this becomes an issue
-            $this->spouse_name = '???';
+            $this->attack_id = $attack_id;
+            $this->attack_id_time_ms = $attack_id_time_ms;
         }
 
-        // Bloodline
+        // Scout & Stealth
+        $this->scout_range = 1;
+        $this->stealth = 0;
+        if($this->rank_num > 3) {
+            $this->scout_range++;
+        }
+        if($this->isHeadAdmin()) {
+            $this->scout_range += 2;
+        }
+
+        // Travel data
+        $this->last_movement_ms = $last_movement_time;
+        if (is_null($user_filters)) {
+            $filters = [
+                'travel_ranks_to_view' => array_fill(1, System::SC_MAX_RANK, true)
+            ];
+            $user_data['filters'] = json_encode($filters);
+            $user_filters = $user_data['filters'];
+        }
+        $this->filters = json_decode($user_filters, true);
+    }
+    public function loadBloodlineData(int $bloodline_id, string $bloodline_name): void {
+        $this->bloodline_id = $bloodline_id;
+        $this->bloodline_name = $bloodline_name;
+
+        if($this->bloodline_id) {
+            array_unshift($this->stats, 'bloodline_skill');
+        }
+
         if($this->bloodline_id) {
             $this->bloodline = Bloodline::loadFromId(
                 system: $this->system,
@@ -819,102 +921,94 @@ class User extends Fighter {
                 }
             }
         }
-
-        // Chat color
-        if($this->chat_color == '') {
-            $this->chat_color = 'black';
+    }
+    public function loadMissionData(int $mission_id, string $mission_stage, ?string $missions_completed, int $special_mission): void {
+        // Missions
+        $this->mission_id = $mission_id;
+        if($this->mission_id) {
+            $this->mission_stage = json_decode($mission_stage, true);
         }
 
-        // Forbidden seal
-        $this->setForbiddenSealFromDb($user_data['forbidden_seal'], $remote_view);
-        $this->regen_boost += ceil($this->regen_rate * ($this->forbidden_seal->regen_boost / 100));
+        // Special Missions
+        $this->special_mission = $special_mission;
 
-        //In Village Regen
-//        if($this->in_village) {
-//            // regen boost or regen rate?
-//            $this->regen_boost += ($this->regen_rate / 2);
-//        }
-
-        // Location with Regen Boost
-        if ($this->current_location->location_id && $this->current_location->regen) {
-            $this->regen_boost += ($this->current_location->regen / 100) * $this->regen_rate;
+        // Missions completed
+        $this->missions_completed = json_decode($missions_completed, true);
+        if(!is_array($this->missions_completed)) {
+            $this->missions_completed = [];
         }
+    }
+    public function loadPools(array $user_data): void {
+        $this->health = $user_data['health'];
+        $this->max_health = $user_data['max_health'];
+        $this->stamina = $user_data['stamina'];
+        $this->max_stamina = $user_data['max_stamina'];
+        $this->chakra = $user_data['chakra'];
+        $this->max_chakra = $user_data['max_chakra'];
 
-        // Elements
-        $elements = $user_data['elements'];
-        if($elements) {
-            // Array values to undo the "first" "second" etc keys
-            $this->elements = array_values(
-                json_decode(
-                    $user_data['elements'] ?? "[]",
-                    true
-                )
-            );
+        // Keep pools within constraints
+        if($this->health > $this->max_health) {
+            $this->health = $this->max_health;
+        }
+        if($this->chakra > $this->max_chakra) {
+            $this->chakra = $this->max_chakra;
+        }
+        if($this->stamina > $this->max_stamina) {
+            $this->stamina = $this->max_stamina;
+        }
+    }
+    public function loadRankData(): void {
+        $rank_data = $this->system->db->query(
+            query: "SELECT * FROM `ranks` WHERE `rank_id`='$this->rank_num'"
+        );
+        if($this->system->db->last_num_rows == 0) {
+            throw new RuntimeException("Invalid rank!");
         }
         else {
-            $this->elements = [];
+            $rank_data = $this->system->db->fetch($rank_data);
+            $this->rank = Rank::fromDb($rank_data);
         }
-
-        // Regen/time-based events
-        $time_difference = time() - $this->last_update;
-        if($time_difference > 60 && $UPDATE >= User::UPDATE_REGEN) {
-            $minutes = floor($time_difference / 60);
-
-            $regen_amount = $minutes * ($this->regen_rate + $this->regen_boost);
-            $health_multiplier = self::$HEAL_REGEN_MULTIPLIER[$this->rank_num];
-
-            // In-battle decrease
-            if($this->battle_id) {
-                $regen_amount -= round($regen_amount * 0.7, 1);
-                $health_multiplier = 2;
-            }
-
-            $this->health += $regen_amount * $health_multiplier;
-            $this->chakra += $regen_amount;
-            $this->stamina += $regen_amount;
-
-            if($this->health > $this->max_health) {
-                $this->health = $this->max_health;
-            }
-            if($this->chakra > $this->max_chakra) {
-                $this->chakra = $this->max_chakra;
-            }
-            if($this->stamina > $this->max_stamina) {
-                $this->stamina = $this->max_stamina;
-            }
-
-            $this->last_update += $minutes * 60;
-        }
-
-        // Check training
-        if($this->train_time && $UPDATE >= User::UPDATE_FULL) {
-            $this->checkTraining();
-        }
-        if($this->stat_transfer_completion_time && $UPDATE >= User::UPDATE_FULL) {
-            $this->checkStatTransfer();
-        }
-
-        // Correction location
-        if(TravelManager::locationIsInVillage($this->system, $this->location) &&
-            !$this->location->equals($this->village_location) &&
-            !$this->isHeadAdmin()
-        ) {
-            $this->location->x--;
-        }
-
-        // Sensei
-        $this->sensei_id = $user_data['sensei_id'];
-        $this->accept_students = $user_data['accept_students'];
-
-        $this->achievements = AchievementsManager::fetchPlayerAchievements($this->system, $this->user_id);
-        $this->achievements_in_progress = AchievementsManager::fetchPlayerAchievementsInProgress($this->system, $this->user_id);
-
-        // Load training manager
-        $this->loadTrainingManager();
-
-        return;
     }
+    public function loadBlacklistData(): void {
+        $result = $this->system->db->query(
+            query: "SELECT `blocked_ids` FROM `blacklist` WHERE `user_id`='$this->user_id' LIMIT 1"
+        );
+        if($result->num_rows) {
+            $this->blacklist = UserBlacklist::fromDb(system: $this->system, user_id: $this->user_id, blacklist_data: $this->system->db->fetch($result)['blocked_ids']);
+        }
+        else {
+            $blacklist = json_encode(array());
+            $this->blacklist = UserBlacklist::fromDb(system: $this->system, user_id: $this->user_id, blacklist_data: $blacklist);
+            $this->blacklist->createBlacklist();
+        }
+    }
+    public function loadDefaultBoostsAndNerfs(): void {
+        $this->regen_boost = 0;
+        $this->ninjutsu_boost = 0;
+        $this->genjutsu_boost = 0;
+        $this->taijutsu_boost = 0;
 
+        $this->cast_speed_boost = 0;
+        $this->speed_boost = 0;
+        $this->intelligence_boost = 0;
+        $this->willpower_boost = 0;
+
+        $this->defense_boost = 0;
+
+        $this->ninjutsu_resist = 0;
+        $this->taijutsu_resist = 0;
+        $this->genjutsu_resist = 0;
+
+        // Combat nerfs
+        $this->ninjutsu_nerf = 0;
+        $this->taijutsu_nerf = 0;
+        $this->genjutsu_nerf = 0;
+
+        $this->cast_speed_nerf = 0;
+        $this->speed_nerf = 0;
+        $this->intelligence_nerf = 0;
+        $this->willpower_nerf = 0;
+    }
     public function loadBanData($ban_data) {
         if($ban_data === null) {
             return array();
@@ -966,6 +1060,12 @@ class User extends Fighter {
         $this->trainingManager = new TrainingManager($this->system, $this->train_type, $this->train_gain,
     $this->train_time, $this->rank, $this->forbidden_seal, $this->reputation, $this->team, $this->clan, $this->sensei_id,
             $this->bloodline_id);
+    }
+    public function loadStaffManager(): StaffManager {
+        if(isset($this->staff_manager)) {
+            return $this->staff_manager;
+        }
+        return new StaffManager($this->system, $this->user_id, $this->user_name, $this->staff_level, $this->support_level);
     }
 
     public function setForbiddenSealFromDb(string $forbidden_seal_db, bool $remote_view) {
@@ -1039,13 +1139,6 @@ class User extends Fighter {
                 return array();
             }
         }
-    }
-
-    public function loadStaffManager() {
-        if(isset($this->staff_manager) && $this->staff_manager instanceof StaffManager) {
-            return $this->staff_manager;
-        }
-        return new StaffManager($this->system, $this->user_id, $this->user_name, $this->staff_level, $this->support_level);
     }
 
     public function getInventory() {
@@ -1363,7 +1456,7 @@ class User extends Fighter {
 
                 // Daily task
                 if($this->daily_tasks->hasTaskType(DailyTask::ACTIVITY_TRAINING)) {
-                    $sub_task_type = (str_contains($this->train_type, 'skill')) ? DailyTask::SUB_TASK_SKILL : DailyTask::SUB_TASK_GEN;
+                    $sub_task_type = (str_contains($this->train_type, 'skill')) ? DailyTask::SUB_TASK_SKILL : DailyTask::SUB_TASK_ATTRIBUTES;
                     $this->daily_tasks->progressTask(DailyTask::ACTIVITY_TRAINING, $this->train_gain, $sub_task_type);
                 }
 
@@ -1638,83 +1731,24 @@ class User extends Fighter {
         return ActionResult::succeeded();
     }
 
-    public function getMoney(): int {
-        return $this->money;
-    }
-
     /**
      * @throws RuntimeException
      */
-    private function setMoney(int $new_amount, string $description) {
-        $this->system->currencyLog(
-            $this->user_id,
-            System::CURRENCY_TYPE_MONEY,
-            $this->money,
-            $new_amount,
-            $new_amount - $this->money,
-            $description
-        );
-        $this->money = $new_amount;
+    public function calcPlayerMoneyGain(int $multiplier = 1, $multiple_of = 10): int {
+        return self::calcMoneyGain($this->rank_num, $multiplier, $multiple_of);
     }
-
-    /**
-     * @throws RuntimeException
-     */
-    public function addMoney(int $amount, string $description, $increment_daily_task = true) {
-    	// Daily Tasks
-        if($this->daily_tasks->hasTaskType(DailyTask::ACTIVITY_EARN_MONEY) && $increment_daily_task) {
-            $this->daily_tasks->progressTask(DailyTask::ACTIVITY_EARN_MONEY, $amount);
+    public static function calcMoneyGain(int $rank_num, int $multiplier = 1, $multiple_of = 10): float {
+        if ($multiplier < 1) {
+            $multiplier = 1;
         }
-        $this->setMoney($this->money + $amount, $description);
-    }
-
-    /**
-     * @throws RuntimeException
-     */
-    public function subtractMoney(int $amount, string $description) {
-        if($this->money < $amount) {
-            throw new RuntimeException("Not enough money!");
+        if($multiplier > 10) {
+            $multiplier = 10;
         }
-        $this->setMoney($this->money - $amount, $description);
+        $gain = ceil(pow($rank_num+2, 3) * $multiplier);
+        $gain = ceil(((30 * $rank_num) + pow($rank_num+1, 2)) * $multiplier);
+
+        return $gain + ($multiple_of - $gain % $multiple_of);
     }
-
-    public function getPremiumCredits(): int {
-        return $this->premium_credits;
-    }
-
-    /**
-     * @throws RuntimeException
-     */
-    private function setPremiumCredits(int $new_amount, string $description) {
-        $this->system->currencyLog(
-            $this->user_id,
-            System::CURRENCY_TYPE_PREMIUM_CREDITS,
-            $this->premium_credits,
-            $new_amount,
-            $new_amount - $this->premium_credits,
-            $description
-        );
-        $this->premium_credits = $new_amount;
-    }
-
-    /**
-     * @throws RuntimeException
-     */
-    public function addPremiumCredits(int $amount, string $description) {
-        $this->setPremiumCredits($this->premium_credits + $amount, $description);
-    }
-
-
-    /**
-     * @throws RuntimeException
-     */
-    public function subtractPremiumCredits(int $amount, string $description) {
-        if($this->getPremiumCredits() < $amount) {
-            throw new RuntimeException("Not enough Ancient Kunai!");
-        }
-        $this->setPremiumCredits($this->premium_credits - $amount, $description);
-    }
-
 
     /* function moteToVillage()
         moves user to village */
@@ -1743,6 +1777,7 @@ class User extends Fighter {
 		`current_ip` = '$this->current_ip',
 		`last_ip` = '$this->last_ip',
 		`failed_logins` = '$this->failed_logins',
+		`last_malicious_ip` = '$this->last_malicious_ip',
 		`last_login` = '$this->last_login',
 		`last_update` = '$this->last_update',
 		`last_active` = '" . time() . "',
@@ -1836,11 +1871,6 @@ class User extends Fighter {
             $missions_completed = json_encode($missions_completed);
         }
 
-        $presents_claimed = $this->presents_claimed;
-        if(is_array($presents_claimed)) {
-            $presents_claimed = json_encode($this->presents_claimed);
-        }
-
         $query .= "`forbidden_seal`='$forbidden_seal',
         `chat_color` = '$this->chat_color',
         `chat_effect` = '$this->chat_effect',
@@ -1850,14 +1880,11 @@ class User extends Fighter {
         `stat_transfer_amount` = $this->stat_transfer_amount,
         `stat_transfer_completion_time` = $this->stat_transfer_completion_time,
         `stat_transfer_target_stat` = '$this->stat_transfer_target_stat',
-		`money` = '$this->money',
-		`premium_credits` = '$this->premium_credits',
 		`pvp_wins` = '$this->pvp_wins',
 		`pvp_losses` = '$this->pvp_losses',
 		`ai_wins` = '$this->ai_wins',
 		`ai_losses` = '$this->ai_losses',
 		`missions_completed` = '$missions_completed',
-		`presents_claimed` = '$presents_claimed',
 		`monthly_pvp` = '$this->monthly_pvp',
 		`elements` = '$elements',
 		`ninjutsu_skill` = '$this->ninjutsu_skill',
@@ -1874,12 +1901,14 @@ class User extends Fighter {
 		WHERE `user_id` = '{$this->user_id}' LIMIT 1";
         $this->system->db->query($query);
 
+        // Update Currencies
+        if($this->currency->update_data) {
+            $this->currency->updateCurrencies();
+        }
+
         // Update Blacklist
-        if(count($this->blacklist) != count($this->original_blacklist)) {
-            $blacklist_json = json_encode($this->blacklist);
-            $this->system->db->query(
-                "UPDATE `blacklist` SET `blocked_ids`='{$blacklist_json}' WHERE `user_id`='{$this->user_id}' LIMIT 1"
-            );
+        if($this->blacklist->update) {
+            $this->blacklist->updateData();
         }
 
         //Update Daily Tasks
@@ -1995,7 +2024,7 @@ class User extends Fighter {
 
     public function canChangeChatColor(): bool {
         // Premium purchased
-        if($this->premium_credits_purchased) {
+        if($this->currency->getPremiumPurchased()) {
             return true;
         }
 
@@ -2030,7 +2059,7 @@ class User extends Fighter {
             }
         }
 
-        if($this->premium_credits_purchased > 0 || $this->isHeadAdmin()) {
+        if($this->currency->getPremiumCredits() > 0 || $this->isHeadAdmin()) {
             $return = array_merge($return, [
                 'gold' => 'gold'
             ]);

@@ -59,18 +59,6 @@ $constraints['edit_user'] = [
         'data_type' => 'int',
         'input_type' => 'text',
     ],
-    'money' => [
-        'data_type' => 'int',
-        'input_type' => 'text',
-    ],
-    'premium_credits' => [
-        'data_type' => 'int',
-        'input_type' => 'text',
-    ],
-    'premium_credits_purchased' => [
-        'data_type' => 'int',
-        'input_type' => 'text',
-    ],
     'pvp_wins' => [
         'data_type' => 'int',
         'input_type' => 'text',

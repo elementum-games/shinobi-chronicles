@@ -51,6 +51,7 @@ return $routes = [
         title: 'Send Money',
         function_name: 'sendMoney',
         menu: Route::MENU_NONE,
+        min_rank: 2,
     ),
     24 => new Route(
         file_name: 'team.php',

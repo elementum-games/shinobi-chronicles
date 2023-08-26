@@ -26,20 +26,20 @@ function healingShop() {
     $location_result = $system->db->fetch($result);
     $arena_coords = new TravelCoords($location_result['x'], $location_result['y'], 1);
 
-    $ramen_choices['vegetable'] = [
+    $ramen_choices[Item::RAMEN_TYPE_VEGETABLE] = [
         'cost' => $player->location->equals($arena_coords) ? $player->rank_num * 5 * 5 : $player->rank_num * 5,
         'health_amount' => $health[$player->rank_num] * 0.1,
-        'label' => 'Vegetable'
+        'label' => System::unSlug(Item::RAMEN_TYPE_VEGETABLE)
     ];
-    $ramen_choices['pork'] = [
+    $ramen_choices[Item::RAMEN_TYPE_PORK] = [
         'cost' => $player->location->equals($arena_coords) ? $player->rank_num * 25 * 5 : $player->rank_num * 25,
         'health_amount' => $health[$player->rank_num] * 0.5,
-        'label' => 'Pork'
+        'label' => System::unSlug(Item::RAMEN_TYPE_PORK)
     ];
-    $ramen_choices['deluxe'] = [
+    $ramen_choices[Item::RAMEN_TYPE_DELUXE] = [
         'cost' => $player->location->equals($arena_coords) ? $player->rank_num * 50 * 5 : $player->rank_num * 50,
         'health_amount' => $health[$player->rank_num] * 1,
-        'label' => 'Deluxe'
+        'label' => System::unSlug(Item::RAMEN_TYPE_DELUXE)
     ];
 
 	if(isset($_GET['heal'])) {
@@ -48,13 +48,13 @@ function healingShop() {
 			if(!isset($ramen_choices[$heal])) {
 				throw new RuntimeException("Invalid choice!");
 			}
-			if($player->getMoney() < $ramen_choices[$heal]['cost']) {
+			if($player->currency->getMoney() < $ramen_choices[$heal]['cost']) {
 				throw new RuntimeException("You do not have enough money!");
 			}
           	if($player->health >= $player->max_health) {
 				throw new RuntimeException("Your health is already maxed out!");
 			}
-			$player->subtractMoney($ramen_choices[$heal]['cost'], "Purchased {$heal} health");
+			$player->currency->subtractMoney($ramen_choices[$heal]['cost'], "Purchased {$heal} health");
 			$player->health += $ramen_choices[$heal]['health_amount'];
 			if($player->health > $player->max_health) {
 				$player->health = $player->max_health;

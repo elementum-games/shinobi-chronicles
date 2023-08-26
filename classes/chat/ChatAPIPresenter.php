@@ -23,6 +23,7 @@ class ChatAPIPresenter {
             'staffBannerName' => $chatPost->staff_banner_name,
             'staffBannerColor' => $chatPost->staff_banner_color,
             'userLinkClassNames' => $chatPost->user_link_class_names,
+            'deleted' => $chatPost->deleted,
         ];
     }
 
@@ -97,6 +98,17 @@ class ChatAPIPresenter {
      * @throws RuntimeException
      */
     public static function deletePostResponse(System $system, array $posts) {
+        return [
+            'posts' => array_map(function(ChatPostDto $post) use($system) {
+                return self::chatPostResponse($system, $post);
+            }, $posts),
+        ];
+    }
+
+    /**
+     * @throws RuntimeException
+     */
+    public static function recoverPostResponse(System $system, array $posts) {
         return [
             'posts' => array_map(function(ChatPostDto $post) use($system) {
                 return self::chatPostResponse($system, $post);

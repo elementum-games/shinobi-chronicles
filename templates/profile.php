@@ -424,9 +424,9 @@ $clan_positions = [
     <label style='width:<?= $label_width ?>;'>Weekly Cap:</label> <?= $player->reputation->getWeeklyRepAmount() ?> / <?= $player->reputation->weekly_cap ?><br />
     <label style='width:<?= $label_width ?>;'>PvP Cap:</label> <?= $player->reputation->getWeeklyPvpRep() ?> / <?= $player->reputation->weekly_pvp_cap ?><br />
     <br />
-    <label style='width:<?= $label_width ?>;'>Money:</label> &yen;<?= $player->getMoney() ?><br />
-    <label style='width:<?= $label_width ?>;'>Ancient Kunai:</label> <?= $player->getPremiumCredits() ?><br />
-    <label style='width:<?= $label_width ?>;'>Ancient Kunai purchased:</label> <?= $player->premium_credits_purchased ?><br />
+    <label style='width:<?= $label_width ?>;'><?=$player->currency->money->name?>:</label> <?=$player->currency->getFormattedMoney()?><br />
+    <label style='width:<?= $label_width ?>;'><?=$player->currency->premium_credits->name?>:</label> <?= $player->currency->getPremiumCredits() ?><br />
+    <label style='width:<?= $label_width ?>;'><?=$player->currency->premium_credits->name?> purchased:</label> <?= $player->currency->getPremiumPurchased() ?><br />
 
     <br />
     <label style='width:<?= $label_width ?>;'>PvP wins:</label>		<?= $player->pvp_wins ?><br />

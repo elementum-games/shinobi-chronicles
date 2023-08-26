@@ -7,7 +7,7 @@ class DailyTask {
     const SUB_TASK_WIN_FIGHT = 'win';
     const SUB_TASK_COMPLETE = 'complete';
     const SUB_TASK_SKILL = 'skills';
-    const SUB_TASK_GEN = 'attributes';
+    const SUB_TASK_ATTRIBUTES = 'attributes';
     const SUB_TASK_JUTSU = 'jutsu';
 
     const ACTIVITY_PVP = 'PVP';
@@ -15,6 +15,7 @@ class DailyTask {
     const ACTIVITY_MISSIONS = 'Missions';
     const ACTIVITY_TRAINING = 'Train';
     const ACTIVITY_EARN_MONEY = 'Money';
+    const ACTIVITY_BATTLES = 'Battles';
 
     const DIFFICULTY_EASY = 'Easy';
     const DIFFICULTY_MEDIUM = 'Medium';
@@ -46,6 +47,11 @@ class DailyTask {
             'Hand of Midas',
             'Fill the Coffers',
         ],
+        DailyTask::ACTIVITY_BATTLES => [
+            'Fill Thine Goblet',
+            'Battle Master',
+            'Scar Thy Foe',
+        ],
     ];
 
     public static array $activity_labels = [
@@ -54,11 +60,40 @@ class DailyTask {
         DailyTask::ACTIVITY_MISSIONS => 'Missions',
         DailyTask::ACTIVITY_TRAINING => [
             DailyTask::SUB_TASK_SKILL => 'points',
-            DailyTask::SUB_TASK_GEN => 'points',
+            DailyTask::SUB_TASK_ATTRIBUTES => 'points',
             DailyTask::SUB_TASK_JUTSU => 'levels',
         ],
-        DailyTask::ACTIVITY_EARN_MONEY => 'yen',
+        DailyTask::ACTIVITY_EARN_MONEY => Currency::MONEY_NAME,
+        DailyTask::ACTIVITY_BATTLES => 'PvP Battles or Spars',
     ];
+
+    public static array $task_reward_multipliers = [
+        DailyTask::DIFFICULTY_EASY => [
+            DailyTask::ACTIVITY_PVP => 25,
+            DailyTask::ACTIVITY_ARENA => 40,
+            DailyTask::ACTIVITY_MISSIONS => 30,
+            DailyTask::ACTIVITY_TRAINING => 30,
+            DailyTask::ACTIVITY_EARN_MONEY => 20,
+            DailyTask::ACTIVITY_BATTLES => 25,
+        ],
+        DailyTask::DIFFICULTY_MEDIUM => [
+            DailyTask::ACTIVITY_PVP => 50,
+            DailyTask::ACTIVITY_ARENA => 60,
+            DailyTask::ACTIVITY_MISSIONS => 60,
+            DailyTask::ACTIVITY_TRAINING => 60,
+            DailyTask::ACTIVITY_EARN_MONEY => 40,
+            DailyTask::ACTIVITY_BATTLES => 50,
+        ],
+        DailyTask::DIFFICULTY_HARD => [
+            DailyTask::ACTIVITY_PVP => 75,
+            DailyTask::ACTIVITY_ARENA => 100,
+            DailyTask::ACTIVITY_MISSIONS => 90,
+            DailyTask::ACTIVITY_TRAINING => 90,
+            DailyTask::ACTIVITY_EARN_MONEY => 60,
+            DailyTask::ACTIVITY_BATTLES => 75,
+        ]
+    ];
+    const TASK_REWARD_MULTIPLE_OF = 25;
 
     public string $name;
     public $activity;
@@ -142,7 +177,7 @@ class DailyTask {
             ],
             DailyTask::ACTIVITY_TRAINING => [
                 'type' => DailyTask::ACTIVITY_TRAINING,
-                'sub_task' => [self::SUB_TASK_SKILL, self::SUB_TASK_GEN, self::SUB_TASK_JUTSU],
+                'sub_task' => [self::SUB_TASK_SKILL, self::SUB_TASK_ATTRIBUTES, self::SUB_TASK_JUTSU],
                 'max_amount' => [
                     DailyTask::DIFFICULTY_EASY => 50,
                     DailyTask::DIFFICULTY_MEDIUM => 65,
@@ -153,10 +188,19 @@ class DailyTask {
                 'type' => DailyTask::ACTIVITY_EARN_MONEY,
                 'sub_task' => [self::SUB_TASK_EARN],
                 'max_amount' => [
-                    DailyTask::DIFFICULTY_EASY => 500,
-                    DailyTask::DIFFICULTY_MEDIUM => 1000,
-                    DailyTask::DIFFICULTY_HARD => 1250,
+                    DailyTask::DIFFICULTY_EASY => Currency::getRoundedYen(rank_num: $user_rank, multiplier: 15, multiple_of: 10),
+                    DailyTask::DIFFICULTY_MEDIUM => Currency::getRoundedYen(rank_num: $user_rank, multiplier: 25, multiple_of: 10),
+                    DailyTask::DIFFICULTY_HARD => Currency::getRoundedYen(rank_num: $user_rank, multiplier: 40, multiple_of: 10),
                 ],
+            ],
+            DailyTask::ACTIVITY_BATTLES => [
+                'type' => DailyTask::ACTIVITY_BATTLES,
+                'sub_task' => [self::SUB_TASK_COMPLETE],
+                'max_amount' => [
+                    DailyTask::DIFFICULTY_EASY => 10,
+                    DailyTask::DIFFICULTY_MEDIUM => 20,
+                    DailyTask::DIFFICULTY_HARD => 30,
+                ]
             ],
         ];
 
@@ -236,24 +280,18 @@ class DailyTask {
         $task_reward = 200 + (pow($user_rank_num, 2) * 150);
         $task_reward = round($task_reward * (mt_rand(90, 110) / 100)); // 20% randomness
 
-        $task_win_multiplier = 1;
         $rep_reward_mod = 0;
         if($task_activity == DailyTask::ACTIVITY_PVP && $sub_task == DailyTask::SUB_TASK_WIN_FIGHT) {
-            $task_win_multiplier = 2;
             $rep_reward_mod += UserReputation::DAILY_TASK_PVP_WIN_MOD;
-        }
-
-        $difficulty_multiplier = 1;
-        if($task_difficulty == DailyTask::DIFFICULTY_MEDIUM) {
-            $difficulty_multiplier++;
-        }
-        if($task_difficulty == DailyTask::DIFFICULTY_HARD) {
-            $difficulty_multiplier++;
         }
 
         // Reputation & money reward
         $rep_reward = UserReputation::DAILY_TASK_REWARDS[$task_difficulty][$task_config['type']] + $rep_reward_mod;
-        $money_reward = $task_reward * $difficulty_multiplier * $task_win_multiplier;
+        $money_reward = Currency::getRoundedYen(
+            rank_num: $user_rank_num,
+            multiplier: self::$task_reward_multipliers[$task_difficulty][$task_config['type']],
+            multiple_of: self::TASK_REWARD_MULTIPLE_OF
+        );
 
         return new DailyTask([
             'name' => $task_name,
@@ -273,40 +311,58 @@ class DailyTask {
      * @param int $user_rank_num
      * @return DailyTask[]
      */
-    public static function generateNewTasks(int $user_rank_num): array {
+    public static function generateNewTasks(int $user_rank_num, int $total_skill, int $total_attributes, int $pvp_rep): array {
         $daily_tasks = [];
+
+        // Training tasks
+        $training_tasks = [self::SUB_TASK_JUTSU];
+        if($total_skill > 0) {
+            $training_tasks[] = self::SUB_TASK_SKILL;
+        }
+        if($total_attributes > 0) {
+            $training_tasks[] = self::SUB_TASK_ATTRIBUTES;
+        }
 
         // Rank 1 only
         if($user_rank_num == 1) {
             $daily_tasks[] = DailyTask::generateTask(
                 $user_rank_num,
-                DailyTask::ACTIVITY_ARENA,
-                DailyTask::DIFFICULTY_MEDIUM
-            );
-            $daily_tasks[] = DailyTask::generateTask(
-                $user_rank_num,
                 DailyTask::ACTIVITY_EARN_MONEY,
                 DailyTask::DIFFICULTY_MEDIUM
             );
-            return $daily_tasks;
         }
-
-        // Standard
+        // Standard Rank 1+
         $daily_tasks[] = DailyTask::generateTask(
             $user_rank_num,
             DailyTask::ACTIVITY_ARENA,
             DailyTask::DIFFICULTY_MEDIUM
         );
-        $daily_tasks[] = DailyTask::generateTask(
-            $user_rank_num,
-            DailyTask::ACTIVITY_MISSIONS,
-            DailyTask::DIFFICULTY_MEDIUM
-        );
-
-        if($user_rank_num >= 3) {
+        // Rank 1 & 2
+        if($user_rank_num < 3) {
             $daily_tasks[] = DailyTask::generateTask(
                 $user_rank_num,
-                DailyTask::ACTIVITY_PVP,
+                DailyTask::ACTIVITY_TRAINING,
+                DailyTask::DIFFICULTY_MEDIUM,
+                $training_tasks
+            );
+        }
+        // Standard Rank 2+
+        if($user_rank_num > 1) {
+            $daily_tasks[] = DailyTask::generateTask(
+                $user_rank_num,
+                DailyTask::ACTIVITY_MISSIONS,
+                DailyTask::DIFFICULTY_MEDIUM
+            );
+        }
+        // Rank 3+
+        if($user_rank_num >= 3) {
+            $task = DailyTask::ACTIVITY_BATTLES;
+            if(mt_rand(1, 100) <= $pvp_rep + 20) {
+                $task = DailyTask::ACTIVITY_PVP;
+            }
+            $daily_tasks[] = DailyTask::generateTask(
+                $user_rank_num,
+                $task,
                 DailyTask::DIFFICULTY_MEDIUM
             );
         }

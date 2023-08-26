@@ -4,15 +4,21 @@ class UserDailyTasks {
 
     public System $system;
     public int $user_id;
+    public int $total_skills;
+    public int $total_attributes;
+    public int $pvp_rep;
     public int $user_rank_num;
     public int $last_reset;
     public string $tasks_string;
     public array $tasks;
     public ?array $current_task_types;
-    public function __construct($system, $user_id, $user_rank_num) {
+    public function __construct($system, $user_id, $user_rank_num, $total_skills, $total_attributes, $pvp_rep) {
         $this->system = $system;
         $this->user_id = $user_id;
         $this->user_rank_num = $user_rank_num;
+        $this->total_skills = $total_skills;
+        $this->total_attributes = $total_attributes;
+        $this->pvp_rep = $pvp_rep;
         $this->current_task_types = null;
 
         $this->loadTasksFromDb();
@@ -35,6 +41,10 @@ class UserDailyTasks {
 
                 if($progress_task) {
                     $task->progress += $amount;
+                    // Prevent going above task amount
+                    if($task->progress > $task->amount) {
+                        $task->progress = $task->amount;
+                    }
                 }
             }
         }
@@ -69,7 +79,12 @@ class UserDailyTasks {
         $this->tasks_string = json_encode($this->tasks);
     }
     public function generateNewTasks($update_db = true): void {
-        $this->tasks = DailyTask::generateNewTasks($this->user_rank_num);
+        $this->tasks = DailyTask::generateNewTasks(
+            user_rank_num: $this->user_rank_num,
+            total_skill: $this->total_skills,
+            total_attributes: $this->total_attributes,
+            pvp_rep: $this->pvp_rep
+        );
         if($update_db) {
             $this->update(true);
         }

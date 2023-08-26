@@ -18,4 +18,5 @@ export type ChatPostType = {|
     +staffBannerName: string,
     +staffBannerColor: string,
     +userLinkClassNames: $ReadOnlyArray<string>,
+    +deleted: boolean
 |};

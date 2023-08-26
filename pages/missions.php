@@ -354,7 +354,14 @@ function runActiveMission(): bool {
             else if($mission->mission_type == Mission::TYPE_TEAM) {
                 // Rewards
                 echo Mission::processRewards($mission, $player, $system);
-                $player->addMoney($mission->money, "Team mission");
+                // Yen gain
+                $yen_gain = Currency::calcMissionMoneyGain(
+                    user_rank: $player->rank_num, 
+                    mission_rank: $mission->rank, 
+                    mission_yen_round: Mission::MISSION_GAIN_YEN_ROUND
+                );
+
+                $player->currency->addMoney($yen_gain, "Team mission");
                 $player->clearMission();
 
                 $team_points = 2;
@@ -370,7 +377,7 @@ function runActiveMission(): bool {
                 echo "<table class='table'><tr><th>Current Mission</th></tr>
 				<tr><td style='text-align:center;'><span style='font-weight:bold;'>$mission->name Complete</span><br />
 				Your team has completed the mission.<br />
-				You have been paid &yen;$mission->money.<br />
+				You have been paid " . Currency::MONEY_SYMBOL . "$yen_gain.<br />
 				Your team has received $team_points points.<br />
 				<a href='$self_link'>Continue</a>
 				</td></tr></table>";
@@ -379,7 +386,13 @@ function runActiveMission(): bool {
             else if($mission->mission_type == Mission::TYPE_CLAN) {
                 // Rewards
                 echo Mission::processRewards($mission, $player, $system);
-                $player->addMoney($mission->money, "Clan mission");
+                // Yen
+                $yen_gain = Currency::calcMissionMoneyGain(
+                    user_rank: $player->rank_num, 
+                    mission_rank: $mission->rank, 
+                    mission_yen_round: Mission::MISSION_GAIN_YEN_ROUND
+                );
+                $player->currency->addMoney($yen_gain, "Clan mission");
                 $player->clearMission();
                 $player->last_ai_ms = System::currentTimeMs();
 
@@ -391,7 +404,7 @@ function runActiveMission(): bool {
                 echo "<table class='table'><tr><th>Current Mission</th></tr>
 				<tr><td style='text-align:center;'><span style='font-weight:bold;'>$mission->name Complete</span><br />
 				You have completed your mission for clan {$player->clan->name}.<br />
-				You have been paid &yen;$mission->money.<br />
+				You have been paid " . Currency::MONEY_SYMBOL . "$yen_gain.<br />
 				You have earned $point_gain reputation for your clan.<br />
 				<a href='$self_link'>Continue</a>
 				</td></tr></table>";
@@ -415,15 +428,23 @@ function runActiveMission(): bool {
                 echo "<table class='table'><tr><th>Current Mission</th></tr>
 			<tr><td style='text-align:center;'><span style='font-weight:bold;'>$mission->name Complete</span><br />
 			You have completed your mission.<br />";
-                if ($mission->mission_type == 5) {
+            // TODO: Factor out all survival missions
+                /*if ($mission->mission_type == 5) {
                     $mission->money = $player->mission_stage['mission_money'];
                     echo sprintf(
-                        "For your effort in defeating %d enemies, you have received &yen;%d.<br />",
+                        "For your effort in defeating %d enemies, you have received {$player->currency->money->symbol}%d.<br />",
                         $player->mission_stage['ai_defeated'], $mission->money
                     );
                 } else {
-                    echo "You have been paid &yen;$mission->money.<br />";
-                }
+                    echo "You have been paid {$player->currency->money->symbol}$mission->money.<br />";
+                }*/
+                // Calc money
+                $yen_gain = Currency::calcMissionMoneyGain(
+                    user_rank: $player->rank_num, 
+                    mission_rank: $mission->rank, 
+                    mission_yen_round: Mission::MISSION_GAIN_YEN_ROUND
+                );
+                echo "You have been paid " . $player->currency->money->symbol . "$yen_gain.<br />";
 
                 // Village reputation
                 if ($player->reputation->canGain(true)) {
@@ -449,7 +470,7 @@ function runActiveMission(): bool {
 
                 // Rewards
                 echo Mission::processRewards($mission, $player, $system);
-                $player->addMoney($mission->money, "Village mission complete");
+                $player->currency->addMoney($yen_gain, "Village mission complete");
                 $player->clearMission();
                 $player->last_ai_ms = System::currentTimeMs();
 

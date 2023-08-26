@@ -7,6 +7,8 @@
 class NPC extends Fighter {
     const ID_PREFIX = 'NPC';
 
+    const MONEY_GAIN_MULTIPLE = 5;
+
     public System $system;
     public RankManager $rankManager;
 

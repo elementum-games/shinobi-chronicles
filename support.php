@@ -68,11 +68,11 @@ if($player != null) {
 
             // Premium cost
             if (isset($_POST['confirm_prem_support'])) {
-                if($player->getPremiumCredits() < $cost) {
-                    throw new RuntimeException("You need {$cost}AK for this request.");
+                if($player->currency->getPremiumCredits() < $cost) {
+                    throw new RuntimeException("You need {$cost}" . Currency::PREMIUM_SYMBOL . " for this request.");
                 }
 
-                $player->subtractPremiumCredits($cost, "Submitted premium {$request_type} support");
+                $player->currency->subtractPremiumCredits($cost, "Submitted premium {$request_type} support");
                 $player->updateData();
             }
 
