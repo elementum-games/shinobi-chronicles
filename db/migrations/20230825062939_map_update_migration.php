@@ -16,7 +16,6 @@ final class MapUpdateMigration extends AbstractMigration
         // Modify villages table structure
         $this->execute("
             ALTER TABLE `villages`
-                ADD `map_location_id` int(11) DEFAULT NULL,
                 ADD `region_id` int(11) NOT NULL
         ");
 
