@@ -36,7 +36,9 @@ class TravelManager {
 
     public static function locationIsInVillage(System $system, TravelCoords $location): bool {
         $result = $system->db->query(
-            "SELECT COUNT(*) as `count` FROM `villages` WHERE `location`='{$location->fetchString()}' LIMIT 1"
+            "SELECT COUNT(*) as `count` FROM `villages`
+            INNER JOIN `maps_locations` ON `maps_locations`.`location_id` = `villages`.`map_location_id`
+            WHERE `x`='{$location->x}' AND `Y`='{$location->y}' AND `map_id`='{$location->map_id}' LIMIT 1"
         );
         $count = (int)$system->db->fetch($result)['count'];
 
@@ -817,5 +819,138 @@ class TravelManager {
         $result = $this->system->db->query("SELECT * FROM `maps_locations` WHERE `name` = 'Underground Colosseum'");
         $location_result = $this->system->db->fetch($result);
         return new TravelCoords($location_result['x'], $location_result['y'], 1);
+    }
+
+    /**
+     * @return NearbyPlayerDto[]
+     */
+    public function fetchNearbyPatrols(): array
+    {
+        $sql = "SELECT `users`.`user_id`, `users`.`user_name`, `users`.`village`, `users`.`rank`, `users`.`stealth`,
+                `users`.`level`, `users`.`attack_id`, `users`.`battle_id`, `ranks`.`name` as `rank_name`, `users`.`location`, `users`.`last_death_ms`
+                FROM `users`
+                INNER JOIN `ranks`
+                ON `users`.`rank`=`ranks`.`rank_id`
+                WHERE `users`.`last_active` > UNIX_TIMESTAMP() - 120
+                ORDER BY `users`.`exp` DESC, `users`.`user_name` DESC";
+        $result = $this->system->db->query($sql);
+        $users = $this->system->db->fetch_all($result);
+        $return_arr = [];
+        foreach ($users as $user) {
+            // check if the user is nearby (including stealth
+            $scout_range = max(0, $this->user->scout_range - $user['stealth']);
+            $user_location = TravelCoords::fromDbString($user['location']);
+            if (
+                $user_location->map_id !== $this->user->location->map_id ||
+                $user_location->distanceDifference($this->user->location) > $scout_range
+            ) {
+                continue;
+            }
+
+            // if ally or enemy
+            // if there were alliance we can do additional checks here
+            if ($user['village'] === $this->user->village->name) {
+                $user_alignment = 'Ally';
+            } else {
+                $user_alignment = 'Enemy';
+            }
+
+            // only display attack links if the same rank
+            $can_attack = false;
+            if (
+                (int) $user['rank'] === $this->user->rank_num
+                && $this->user->location->equals(TravelCoords::fromDbString($user['location']))
+                && $user['user_id'] != $this->user->user_id
+                && $user['village'] !== $this->user->village->name
+            ) {
+                $can_attack = true;
+            }
+
+            // calculate direction
+            $user_direction = "none";
+            if ($user['user_id'] != $this->user->user_id) {
+                $user_direction = $this->user->location->directionToTarget($user_location);
+            }
+
+            // calculate distance
+            $distance = $this->user->location->distanceDifference($user_location);
+
+            $invulnerable = false;
+            // determine if vulnerable to attack
+            if ($user['last_death_ms'] > System::currentTimeMs() - (300 * 1000)) {
+                $invulnerable = true;
+            }
+
+            // add to return
+            $return_arr[] = new NearbyPlayerDto(
+                user_id: $user['user_id'],
+                user_name: $user['user_name'],
+                target_x: $user_location->x,
+                target_y: $user_location->y,
+                target_map_id: $user_location->map_id,
+                rank_name: $user['rank_name'],
+                rank_num: $user['rank'],
+                village_icon: TravelManager::VILLAGE_ICONS[$user['village']],
+                alignment: $user_alignment,
+                attack: $can_attack,
+                attack_id: $user['attack_id'],
+                level: $user['level'],
+                battle_id: $user['battle_id'],
+                direction: $user_direction,
+                invulnerable: $invulnerable,
+                distance: $distance,
+            );
+        }
+
+        // Add more users for display
+        if ($this->system->isDevEnvironment()) {
+            $placeholder_coords = new TravelCoords(15, 15, 1);
+
+            for ($i = 0; $i < 7; $i++) {
+                $return_arr[] = new NearbyPlayerDto(
+                    user_id: $i . mt_rand(10000, 20000),
+                    user_name: 'Konohamaru',
+                    target_x: $placeholder_coords->x,
+                    target_y: $placeholder_coords->y,
+                    target_map_id: $placeholder_coords->map_id,
+                    rank_name: 'Akademi-sei',
+                    rank_num: 3,
+                    village_icon: TravelManager::VILLAGE_ICONS['Mist'],
+                    alignment: 'Enemy',
+                    attack: $this->user->location->equals($placeholder_coords),
+                    attack_id: 'abc' . $i . mt_rand(10000, 20000),
+                    level: 30,
+                    battle_id: 0,
+                    direction: $this->user->location->directionToTarget($placeholder_coords),
+                    distance: $this->user->location->distanceDifference($placeholder_coords),
+                );
+            }
+        }
+
+        usort($return_arr, function ($a, $b) {
+            if ($a->alignment == 'Enemy' && $b->alignment == 'Ally') {
+                return -1; // $a comes before $b
+            } elseif ($a->alignment == 'Ally' && $b->alignment == 'Enemy') {
+                return 1; // $b comes before $a
+            } else {
+                // Sort by distance first
+                if ($a->distance < $b->distance) {
+                    return -1; // $a comes before $b
+                } elseif ($a->distance > $b->distance) {
+                    return 1; // $b comes before $a
+                } else {
+                    // Sort by level if distances are equal
+                    if ($a->level > $b->level) {
+                        return -1; // $a comes before $b
+                    } elseif ($a->level < $b->level) {
+                        return 1; // $b comes before $a
+                    } else {
+                        return 0; // Objects are equal
+                    }
+                }
+            }
+        });
+
+        return $return_arr;
     }
 }
