@@ -19,7 +19,7 @@ class TravelManager {
 
     public array $map_data;
 
-    const DISPLAY_RADIUS = 15;
+    const DISPLAY_RADIUS = 16;
 
     /**
      * @var TravelCoords[]
