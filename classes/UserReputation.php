@@ -111,11 +111,11 @@ class UserReputation {
     // Limits
     const ARENA_MISSION_CD = 60;
     const MISSION_GAINS = [
-        Mission::RANK_D => 1,
-        Mission::RANK_C => 2,
-        Mission::RANK_B => 3,
-        Mission::RANK_A => 4,
-        Mission::RANK_S => 5
+        Mission::RANK_D => 2,
+        Mission::RANK_C => 4,
+        Mission::RANK_B => 6,
+        Mission::RANK_A => 8,
+        Mission::RANK_S => 10
     ];
     const SPECIAL_MISSION_REP_GAINS = [
         SpecialMission::DIFFICULTY_EASY => 2,
