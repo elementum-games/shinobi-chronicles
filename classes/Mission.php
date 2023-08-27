@@ -483,7 +483,7 @@ class Mission {
 
         // Faction Mission Logic
         if ($mission->mission_type == Mission::TYPE_FACTION) {
-            if (isset($mission->custom_start_location) && !empty($this->custom_start_location)) {
+            if (isset($mission->custom_start_location) && !empty($mission->custom_start_location)) {
                 if ($player->location != $mission->custom_start_location) {
                     throw new RuntimeException("Invalid location!");
                 }
