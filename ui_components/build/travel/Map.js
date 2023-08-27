@@ -159,11 +159,11 @@ function MapGridLines({
   strategicView
 }) {
   const rows = [];
-  for (let i = stageOffsetY - 1; i < stageOffsetY + stageHeight + 2; i++) {
+  for (let i = stageOffsetY - 2; i < stageOffsetY + stageHeight + 2; i++) {
     rows.push(i);
   }
   const cols = [];
-  for (let j = stageOffsetX - 1; j < stageOffsetX + stageWidth + 2; j++) {
+  for (let j = stageOffsetX - 2; j < stageOffsetX + stageWidth + 2; j++) {
     cols.push(j);
   }
   return /*#__PURE__*/React.createElement(React.Fragment, null, rows.map(row => cols.map(col => /*#__PURE__*/React.createElement("div", {
