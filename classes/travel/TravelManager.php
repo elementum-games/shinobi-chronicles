@@ -38,7 +38,7 @@ class TravelManager {
         $result = $system->db->query(
             "SELECT COUNT(*) as `count` FROM `villages`
             INNER JOIN `maps_locations` ON `maps_locations`.`location_id` = `villages`.`map_location_id`
-            WHERE `x`='{$location->x}' AND `Y`='{$location->y}' AND `map_id`='{$location->map_id}' LIMIT 1"
+            WHERE `x`='{$location->x}' AND `y`='{$location->y}' AND `map_id`='{$location->map_id}' LIMIT 1"
         );
         $count = (int)$system->db->fetch($result)['count'];
 
