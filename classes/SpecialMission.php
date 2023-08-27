@@ -653,7 +653,7 @@ class SpecialMission {
             $is_y_negative = (bool) mt_rand(0, 1);
             $max_y = ($is_y_negative ? self::$target_villages[$random_village_key]['negative_y'] : self::$target_villages[$random_village_key]['positive_y']);
             $random_y = mt_rand(1, $max_y);
-            $target_y = ($is_x_negative ? (self::$target_villages[$random_village_key]['y'] - $random_y) : (self::$target_villages[$random_village_key]['y'] + $random_y));
+            $target_y = ($is_y_negative ? (self::$target_villages[$random_village_key]['y'] - $random_y) : (self::$target_villages[$random_village_key]['y'] + $random_y));
 
             $new_target = [
                 'target' => $random_village_key,
@@ -687,7 +687,7 @@ class SpecialMission {
             $is_y_negative = (bool) mt_rand(0, 1);
             $max_y = ($is_y_negative ? self::$target_villages[$random_village_key]['negative_y'] : self::$target_villages[$random_village_key]['positive_y']);
             $random_y = mt_rand(1, $max_y);
-            $target_y = ($is_x_negative ? (self::$target_villages[$random_village_key]['y'] - $random_y) : (self::$target_villages[$random_village_key]['y'] + $random_y));
+            $target_y = ($is_y_negative ? (self::$target_villages[$random_village_key]['y'] - $random_y) : (self::$target_villages[$random_village_key]['y'] + $random_y));
 
             $new_target = [
                 'target' => $random_village_key,
@@ -717,7 +717,7 @@ class SpecialMission {
             $is_y_negative = (bool) mt_rand(0, 1);
             $max_y = ($is_y_negative ? self::$target_villages[$random_village_key]['negative_y'] : self::$target_villages[$random_village_key]['positive_y']);
             $random_y = mt_rand(1, $max_y);
-            $target_y = ($is_x_negative ? (self::$target_villages[$random_village_key]['y'] - $random_y) : (self::$target_villages[$random_village_key]['y'] + $random_y));
+            $target_y = ($is_y_negative ? (self::$target_villages[$random_village_key]['y'] - $random_y) : (self::$target_villages[$random_village_key]['y'] + $random_y));
 
             $new_target = [
                 'target' => $random_village_key,
