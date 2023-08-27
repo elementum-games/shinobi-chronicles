@@ -327,6 +327,15 @@ class SpecialMission {
                     $move_to_x = $this->player->location->x - 1;
                 }
 
+                // Move Diagonal
+                if ($this->player->location->y != $this->target['y']) {
+                    if ($this->target['y'] > $this->player->location->y) {
+                        $move_to_y = $this->player->location->y + 1;
+                    } else {
+                        $move_to_y = $this->player->location->y - 1;
+                    }
+                }
+
                 // Go around village not into it
                 $target_location = new TravelCoords($move_to_x, $move_to_y, $this->player->location->map_id);
                 if (isset($villages[$target_location->fetchString()]) && !$this->player->village_location->equals($target_location)) {
@@ -334,14 +343,6 @@ class SpecialMission {
                         $move_to_y--;
                     } else {
                         $move_to_y++;
-                    }
-                }
-                // Move Diagonal
-                else if ($this->player->location->y != $this->target['y']) {
-                    if ($this->target['y'] > $this->player->location->y) {
-                        $move_to_y = $this->player->location->y + 1;
-                    } else {
-                        $move_to_y = $this->player->location->y - 1;
                     }
                 }
 
@@ -355,6 +356,15 @@ class SpecialMission {
                     $move_to_y = $this->player->location->y - 1;
                 }
 
+                // Move Diagonal
+                if ($this->player->location->x != $this->target['x']) {
+                    if ($this->target['x'] > $this->player->location->x) {
+                        $move_to_x = $this->player->location->x + 1;
+                    } else {
+                        $move_to_x = $this->player->location->x - 1;
+                    }
+                }
+
                 // Skip past village if trying to move into it
                 $target_location = new TravelCoords($move_to_x, $move_to_y, $this->player->location->map_id);
                 if (isset($villages[$target_location->fetchString()]) && !$this->player->village_location->equals($target_location)) {
@@ -362,14 +372,6 @@ class SpecialMission {
                         $move_to_x--;
                     } else {
                         $move_to_x++;
-                    }
-                }
-                // Move Diagonal
-                else if ($this->player->location->x != $this->target['x']) {
-                    if ($this->target['x'] > $this->player->location->x) {
-                        $move_to_x = $this->player->location->x + 1;
-                    } else {
-                        $move_to_x = $this->player->location->x - 1;
                     }
                 }
 
