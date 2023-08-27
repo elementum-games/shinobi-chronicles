@@ -20,6 +20,12 @@ class Auth {
         $system = new System();
         $system->db->connect();
 
-        return User::loadFromId($system, $_SESSION['user_id']);
+        $user = User::loadFromId($system, $_SESSION['user_id']);
+
+        if(!$system->SC_OPEN && !$user->isContentAdmin()) {
+            throw new RuntimeException('Server is temporarily closed!');
+        }
+
+        return $user;
     }
 }
