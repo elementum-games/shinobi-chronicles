@@ -650,14 +650,11 @@ class User extends Fighter {
         $this->intelligence_nerf = 0;
         $this->willpower_nerf = 0;
 
-        $this->scout_range = 1;
+        $this->scout_range = $this->rank_num;
         $this->stealth = 0;
 
-        if($this->rank_num > 3) {
-            $this->scout_range++;
-        }
         if($this->isHeadAdmin()) {
-            $this->scout_range += 2;
+            $this->scout_range += 4;
         }
 
         $this->village_changes = $user_data['village_changes'];
