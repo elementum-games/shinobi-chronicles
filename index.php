@@ -356,7 +356,9 @@ address and requested a password reset. If this is not your account, please disr
 
             // Village
             // Load villages
-            $result = $system->db->query("SELECT `name`, `location` FROM `villages`");
+            $result = $system->db->query("SELECT `villages`.`name`, `x`, `y`, `map_id` FROM `villages`
+                INNER JOIN `maps_locations` on `villages`.`map_location_id` = `maps_locations`.`location_id`
+            ");
             $villages = [];
             while ($row = mysqli_fetch_array($result)) {
                 $villages[$row['name']] = $row;
@@ -370,6 +372,8 @@ address and requested a password reset. If this is not your account, please disr
 
             $verification_code = sha1(mt_rand(1, 1337000));
 
+            $village_coords = new TravelCoords($villages[$village]['x'], $villages[$village]['y'], $villages[$village]['map_id']);
+
             User::create(
                 $system,
                 $user_name,
@@ -377,7 +381,7 @@ address and requested a password reset. If this is not your account, please disr
                 $email,
                 $gender,
                 $village,
-                $villages[$village]['location'],
+                $village_coords->fetchString(),
                 $verification_code
             );
 
