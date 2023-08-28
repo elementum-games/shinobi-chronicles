@@ -36,8 +36,5 @@
     "targets": {
       "esmodules": true
     }
-  },
-  "dependencies": {
-    "chart.js": "^4.4.0"
   }
 }

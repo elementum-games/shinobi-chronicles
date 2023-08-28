@@ -9,6 +9,8 @@ import type {
     PlayerAchievementsType
 } from "../_schema/userSchema.js";
 
+import MyChart from '../charts/Chart.js';
+
 type Props = {|
     +links: {|
         +clan: string,
@@ -31,6 +33,20 @@ function Profile({
     playerDailyTasks,
     playerAchievements,
 }: Props) {
+
+    const chartData = {
+        labels: ['A', 'B', 'C', 'D', 'E'],
+        datasets: [
+          {
+            label: 'My Dataset',
+            data: [10, 20, 30, 25, 15],
+            fill: false,
+            borderColor: 'rgb(75, 192, 192)',
+            tension: 0.1,
+          },
+        ],
+      };
+
     return (
         <div className="profile_container">
             {/* First row */}
@@ -67,6 +83,10 @@ function Profile({
                 <PlayerAchievements
                     playerAchievements={playerAchievements}
                 />
+            </div>
+
+            <div>
+                <MyChart data={chartData} />
             </div>
         </div>
     );

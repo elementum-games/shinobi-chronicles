@@ -26,8 +26,9 @@ export default function ConversationList({
     selectedConvo: selectedConvoData,
     viewConvo: viewConvo
   }))));
-} // CUSTOM COMPONENTS
+}
 
+// CUSTOM COMPONENTS
 const ConvoListCard = ({
   convo,
   selectedConvo,

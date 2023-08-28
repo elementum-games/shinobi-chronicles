@@ -17,23 +17,19 @@ export default function AttackActionPrompt({
   } = selectedAttack;
   const isSelectingHandSeals = ['ninjutsu', 'genjutsu'].includes(jutsuCategory);
   const isSelectingWeapon = jutsuCategory === 'taijutsu';
-
   const handleHandSealsChange = handSeals => {
     updateSelectedAttack({
       handSeals
     });
   };
-
   const handleJutsuChange = (jutsuId, newJutsuCategory) => {
     let newSelectedAttack = {
       jutsuCategory: newJutsuCategory,
       jutsuId
     };
     const jutsu = findPlayerJutsu(battle, jutsuId, newJutsuCategory === 'bloodline');
-
     if (jutsu != null) {
       newSelectedAttack.jutsuType = jutsu.jutsuType;
-
       if (newJutsuCategory === "ninjutsu" || newJutsuCategory === "genjutsu") {
         newSelectedAttack.handSeals = jutsu.handSeals;
       } else {
@@ -42,17 +38,14 @@ export default function AttackActionPrompt({
     } else {
       console.error("Invalid jutsu!");
     }
-
     updateSelectedAttack(newSelectedAttack);
   };
-
   const handleWeaponChange = weaponId => {
     console.log("Weapon selected ", weaponId);
     updateSelectedAttack({
       weaponId
     });
   };
-
   return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("tr", null, /*#__PURE__*/React.createElement("td", null, isSelectingHandSeals && /*#__PURE__*/React.createElement(HandSealsInput, {
     initialHandSeals: handSeals,
     onChange: handleHandSealsChange
@@ -68,7 +61,6 @@ export default function AttackActionPrompt({
     onChange: handleJutsuChange
   }))));
 }
-
 function HandSealsInput({
   initialHandSeals,
   onChange,
@@ -159,7 +151,6 @@ function HandSealsInput({
     id: "handsealOverlay"
   }));
 }
-
 function WeaponInput({
   weapons,
   selectedWeaponId,

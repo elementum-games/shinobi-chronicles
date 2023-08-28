@@ -32,7 +32,6 @@ export function JutsuInput({
     id: 0,
     categoryKey: ''
   });
-
   const handleJutsuSelect = (categoryKey, jutsu) => {
     setSelectedJutsu({
       categoryKey: categoryKey,
@@ -41,7 +40,6 @@ export function JutsuInput({
     });
     onChange(jutsu.id, categoryKey);
   };
-
   const handleKeyDown = event => {
     // $FlowIssue[incompatible-type]: Flow doesn't infer Object.values return type from the argument
     for (const category of Object.values(jutsuCategories)) {
@@ -49,22 +47,19 @@ export function JutsuInput({
         setSelectedCategory(category.key);
         return;
       }
-    } // Check for jutsu select
+    }
 
-
+    // Check for jutsu select
     let numericKey = parseInt(event.key);
-
     if (!isNaN(numericKey) && selectedCategory != null) {
       // Offset to avoid using 0 as a visible number
       numericKey -= 1;
       const category = jutsuCategories[selectedCategory];
-
       if (category.jutsu[numericKey] != null) {
         handleJutsuSelect(selectedCategory, category.jutsu[numericKey]);
       }
     }
   };
-
   React.useEffect(() => {
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
@@ -73,11 +68,9 @@ export function JutsuInput({
     id: "jutsuContainer"
   }, jutsuCategoryKeys.map(categoryKey => {
     const category = jutsuCategories[categoryKey];
-
     if (category.key === 'bloodline' && !player.hasBloodline) {
       return null;
     }
-
     return /*#__PURE__*/React.createElement("div", {
       className: "jutsuCategory",
       key: categoryKey
@@ -93,7 +86,6 @@ export function JutsuInput({
     }));
   }));
 }
-
 function Jutsu({
   jutsu,
   selected,

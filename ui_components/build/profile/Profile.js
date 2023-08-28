@@ -1,5 +1,5 @@
 import { CharacterAvatar } from "../CharacterAvatar.js";
-
+import MyChart from '../charts/Chart.js';
 function Profile({
   links,
   playerData,
@@ -8,6 +8,16 @@ function Profile({
   playerDailyTasks,
   playerAchievements
 }) {
+  const chartData = {
+    labels: ['A', 'B', 'C', 'D', 'E'],
+    datasets: [{
+      label: 'My Dataset',
+      data: [10, 20, 30, 25, 15],
+      fill: false,
+      borderColor: 'rgb(75, 192, 192)',
+      tension: 0.1
+    }]
+  };
   return /*#__PURE__*/React.createElement("div", {
     className: "profile_container"
   }, /*#__PURE__*/React.createElement("div", {
@@ -35,9 +45,10 @@ function Profile({
     className: "profile_row_third"
   }, /*#__PURE__*/React.createElement("h2", null, "Achievements"), /*#__PURE__*/React.createElement(PlayerAchievements, {
     playerAchievements: playerAchievements
+  })), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement(MyChart, {
+    data: chartData
   })));
 }
-
 function StatusAttributes({
   playerData,
   playerSettings,
@@ -107,7 +118,6 @@ function StatusAttributes({
     href: links.team
   }, playerData.teamName)))))));
 }
-
 function PlayerStats({
   playerData,
   playerStats
@@ -182,7 +192,6 @@ function PlayerStats({
     className: "ft-c3"
   })))));
 }
-
 function PlayerBloodline({
   playerData,
   bloodlinePageUrl,
@@ -204,7 +213,6 @@ function PlayerBloodline({
     href: buyBloodlineUrl
   }, "None")));
 }
-
 function PlayerUserRep({
   playerData
 }) {
@@ -225,7 +233,6 @@ function PlayerUserRep({
     className: "weekly_reputation"
   }, playerData.weeklyRep, "/", playerData.maxWeeklyRep, " PvE \xA0|\xA0\xA0", playerData.weeklyPvpRep, "/", playerData.maxWeeklyPvpRep, " PvP")));
 }
-
 function DailyTasks({
   dailyTasks
 }) {
@@ -256,7 +263,6 @@ function DailyTasks({
     }
   }, dailyTask.progressCaption)))));
 }
-
 function PlayerAchievements({
   playerAchievements
 }) {
@@ -282,5 +288,4 @@ function PlayerAchievements({
     className: "progress_label"
   }, achievement.progressLabel)))));
 }
-
 window.Profile = Profile;
