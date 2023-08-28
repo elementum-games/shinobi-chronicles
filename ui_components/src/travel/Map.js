@@ -211,7 +211,7 @@ function MapLocations({ locations, tileWidth, tileHeight }) {
                     style={{
                         cursor: "pointer",
                         backgroundColor: "#" + location.background_color,
-                        backgroundImage: "url(." + location.background_image + ")",
+                        backgroundImage: location.background_image ? `url(${location.background_image})` : null,
                         transform: location.objective_type == 'key_location' ? `translate3d(${((location.x - 1) * tileWidth) - 8}px, ${((location.y - 1) * tileHeight) - 8}px, 0)`
                             : `translate3d(${(location.x - 1) * tileWidth}px, ${(location.y - 1) * tileHeight}px, 0)`,
                         backfaceVisibility: "hidden",
