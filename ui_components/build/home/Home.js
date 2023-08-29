@@ -2,7 +2,6 @@ import { RegisterForm, CreateCharacterButton } from "./RegisterForm.js";
 import { Rules, Terms } from "./staticPageContents.js";
 import { clickOnEnter } from "../utils/uiHelpers.js";
 import { News } from "./News.js";
-
 function Home({
   homeLinks,
   isLoggedIn,
@@ -60,7 +59,6 @@ function Home({
     homeLinks: homeLinks
   })), /*#__PURE__*/React.createElement(FeatureSection, null), /*#__PURE__*/React.createElement(WorldSection, null), /*#__PURE__*/React.createElement(FooterSection, null));
 }
-
 function MainBannerSection({
   homeLinks,
   isLoggedIn,
@@ -77,24 +75,19 @@ function MainBannerSection({
   const [loginDisplay, setLoginDisplay] = React.useState(initialView === "reset" ? "reset" : "login");
   const [activeModalName, setActiveModalName] = React.useState(initialView === "register" ? "register" : "none");
   const loginFormRef = React.useRef(null);
-
   function handleLogin() {
     loginFormRef.current?.submit();
   }
-
   function scrollTo(element) {
     if (element == null) return;
     element.scrollIntoView({
       behavior: 'smooth'
     });
   }
-
   function toSupport() {
     window.location.href = homeLinks['support'];
   }
-
   let activeModal = null;
-
   switch (activeModalName) {
     case "register":
       activeModal = /*#__PURE__*/React.createElement(MainBannerModal, {
@@ -106,7 +99,6 @@ function MainBannerSection({
         registerPreFill: registerPreFill
       }));
       break;
-
     case "rules":
       activeModal = /*#__PURE__*/React.createElement(MainBannerModal, {
         title: "rules",
@@ -114,7 +106,6 @@ function MainBannerSection({
         handleCloseClick: () => setActiveModalName("none")
       }, /*#__PURE__*/React.createElement(Rules, null));
       break;
-
     case "terms":
       activeModal = /*#__PURE__*/React.createElement(MainBannerModal, {
         title: "terms",
@@ -123,7 +114,6 @@ function MainBannerSection({
       }, /*#__PURE__*/React.createElement(Terms, null));
       break;
   }
-
   return /*#__PURE__*/React.createElement("div", {
     className: "home_section main_banner_section"
   }, /*#__PURE__*/React.createElement("div", {
@@ -205,7 +195,6 @@ function MainBannerSection({
     largeSize: true
   }))));
 }
-
 function BannerDiamondButton({
   color,
   firstLineText,
@@ -297,7 +286,6 @@ function BannerDiamondButton({
     dominantBaseline: "middle"
   }, secondLineText))));
 }
-
 function LoginForm({
   loginMessageText,
   loginErrorText,
@@ -308,11 +296,9 @@ function LoginForm({
     if (e.code !== "Enter") {
       return;
     }
-
     e.preventDefault();
     formRef.current?.submit();
   };
-
   return /*#__PURE__*/React.createElement("form", {
     id: "login_form",
     action: "",
@@ -355,7 +341,6 @@ function LoginForm({
     onClick: () => setLoginDisplay("reset")
   }, "reset password")));
 }
-
 function ResetPasswordForm({
   resetErrorText,
   handleCloseClick
@@ -401,7 +386,6 @@ function ResetPasswordForm({
     onClick: () => formRef.current?.submit()
   }, "send email")));
 }
-
 function MainBannerModal({
   title,
   className,
@@ -430,15 +414,12 @@ function MainBannerModal({
     className: "modal_content"
   }, children));
 }
-
 function FeatureSection({}) {
   return /*#__PURE__*/React.createElement(React.Fragment, null);
 }
-
 function WorldSection({}) {
   return /*#__PURE__*/React.createElement(React.Fragment, null);
 }
-
 function ContactSection({
   contactRef
 }) {
@@ -454,7 +435,6 @@ function ContactSection({
     className: "home_form_container"
   }));
 }
-
 function FooterSection({}) {
   return /*#__PURE__*/React.createElement("div", {
     className: "home_section footer_section"
@@ -462,7 +442,6 @@ function FooterSection({}) {
     className: "footer_text"
   }, "SHINOBI CHRONICLES V0.9.0 COPYRIGHT \xA9 LM VISIONS"));
 }
-
 function LoginButton({
   onCLick
 }) {
@@ -532,7 +511,6 @@ function LoginButton({
     dominantBaseline: "middle"
   }, "login"));
 }
-
 function LoggedInButtons({
   homeLinks
 }) {
@@ -668,5 +646,4 @@ function LoggedInButtons({
     dominantBaseline: "middle"
   }, "logout"))));
 }
-
 window.Home = Home;

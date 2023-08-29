@@ -35,12 +35,12 @@ function Profile({
 }: Props) {
 
     //Chart.js variables
-    const [showChart, setShowChart] = React.useState(false);
+    const [showChart, setShowChart] = React.useState(true);
     function handleShowGraph() {
-        console.log("clicked");
         setShowChart(!showChart);
     }
-    let showChartButtonStyle={backgroundColor: 'rgb(20, 19, 23)', color: 'rgb(209, 197, 173)', borderRadius: '12px 12px 0 0', marginTop: '10px'}
+    //marginRight temp fix for wrapping to same row as chart when window width changes
+    let showChartButtonStyle={display:'block', marginRight: '75%', backgroundColor: 'rgb(20, 19, 23)', color: 'rgb(209, 197, 173)', borderRadius: '12px 12px 0 0', marginTop: '10px'}
 
     return (
         <div className="profile_container">

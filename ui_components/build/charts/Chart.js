@@ -12,17 +12,18 @@ const RadarNinjaChart = ({
     const canvasElement = document.getElementById('chart');
     const context = canvasElement.getContext('2d');
     const normalizeValue = (value, minValue, maxValue) => {
-      return (value - minValue) / (maxValue - minValue) * 5;
+      return (value - minValue) / (maxValue - minValue) * 100;
     };
     const bloodline = playerStats.bloodlineSkill;
     const castSpeed = playerStats.castSpeed;
     const genjutsu = playerStats.genjutsuSkill;
-    const intelligence = playerStats.intelligence;
+    // const intelligence = playerStats.intelligence;
     const ninjutsu = playerStats.ninjutsuSkill;
     const speed = playerStats.speed;
     const taijutsu = playerStats.taijutsuSkill;
-    const willpower = playerStats.willpower;
-    const playerData = [genjutsu, willpower, taijutsu, speed, castSpeed, ninjutsu, intelligence];
+    // const willpower = playerStats.willpower;
+
+    const playerData = [genjutsu, taijutsu, speed, bloodline, castSpeed, ninjutsu];
     const skillValues = Object.values(playerData);
     const minValue = Math.min(...skillValues);
     const maxValue = Math.max(...skillValues);
@@ -38,7 +39,7 @@ const RadarNinjaChart = ({
     const myChart = new Chart(context, {
       type: 'radar',
       data: {
-        labels: ['Genjutsu', 'Willpower', 'Taijutsu', 'Speed', 'Cast Speed', 'Ninjutsu', 'Intelligence'],
+        labels: ['Genjutsu', 'Taijutsu', 'Speed', 'Bloodline', 'Cast Speed', 'Ninjutsu'],
         datasets: [{
           data: normalizedStatsArray,
           backgroundColor: 'rgba(180, 200, 230, 0.4)',
@@ -47,6 +48,20 @@ const RadarNinjaChart = ({
         }]
       },
       options: {
+        animations: {
+          tension: {
+            duration: 2100,
+            easing: 'easeOutQuad',
+            from: 0.25,
+            to: 0,
+            loop: false
+          }
+        },
+        elements: {
+          line: {
+            spanGaps: true
+          }
+        },
         plugins: {
           legend: {
             display: false
@@ -58,10 +73,10 @@ const RadarNinjaChart = ({
         scales: {
           r: {
             angleLines: {
-              color: 'rgba(255, 255, 255, 0.2)'
+              color: 'rgba(255, 255, 255, 0.25)'
             },
             grid: {
-              color: 'rgba(255, 255, 255, 0.15)'
+              color: 'rgba(255, 255, 255, 0.03)'
             },
             pointLabels: {
               color: '#c7b070'
@@ -75,7 +90,17 @@ const RadarNinjaChart = ({
     });
   }, []); // Empty dependency array means this effect runs once after initial render
 
-  return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("canvas", {
+  return /*#__PURE__*/React.createElement("div", {
+    style: {
+      alignItems: 'center',
+      maxHeight: '440px',
+      minWidth: '470px',
+      borderRadius: '0 20px 20px 20px',
+      backgroundColor: 'rgba(0,0,0,0.1)',
+      padding: '20px'
+    },
+    className: "stats_container"
+  }, /*#__PURE__*/React.createElement("canvas", {
     id: "chart"
   }));
 };
