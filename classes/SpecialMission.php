@@ -485,7 +485,10 @@ class SpecialMission {
            * $progress_modifier
         );
         if($stat_to_gain != null && $stat_gain > 0) {
-            $reward_text .= ' ' . $this->player->addStatGain($stat_to_gain, $stat_gain) . '!';
+            $stat_gained = $this->player->addStatGain($stat_to_gain, $stat_gain);
+            if (!empty($stat_gained)) {
+                $reward_text .= ' ' . $stat_gained . '!';
+            }
         }
 
         return $reward_text;
