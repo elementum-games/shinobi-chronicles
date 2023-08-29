@@ -1,5 +1,5 @@
 import { CharacterAvatar } from "../CharacterAvatar.js";
-
+import RadarNinjaChart from '../charts/Chart.js';
 function Profile({
   links,
   playerData,
@@ -31,13 +31,14 @@ function Profile({
     playerData: playerData
   }), /*#__PURE__*/React.createElement(DailyTasks, {
     dailyTasks: playerDailyTasks
-  }))), /*#__PURE__*/React.createElement("div", {
+  }))), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement(RadarNinjaChart, {
+    playerStats: playerStats
+  })), /*#__PURE__*/React.createElement("div", {
     className: "profile_row_third"
   }, /*#__PURE__*/React.createElement("h2", null, "Achievements"), /*#__PURE__*/React.createElement(PlayerAchievements, {
     playerAchievements: playerAchievements
   })));
 }
-
 function StatusAttributes({
   playerData,
   playerSettings,
@@ -107,7 +108,6 @@ function StatusAttributes({
     href: links.team
   }, playerData.teamName)))))));
 }
-
 function PlayerStats({
   playerData,
   playerStats
@@ -182,7 +182,6 @@ function PlayerStats({
     className: "ft-c3"
   })))));
 }
-
 function PlayerBloodline({
   playerData,
   bloodlinePageUrl,
@@ -204,7 +203,6 @@ function PlayerBloodline({
     href: buyBloodlineUrl
   }, "None")));
 }
-
 function PlayerUserRep({
   playerData
 }) {
@@ -225,7 +223,6 @@ function PlayerUserRep({
     className: "weekly_reputation"
   }, playerData.weeklyRep, "/", playerData.maxWeeklyRep, " PvE \xA0|\xA0\xA0", playerData.weeklyPvpRep, "/", playerData.maxWeeklyPvpRep, " PvP")));
 }
-
 function DailyTasks({
   dailyTasks
 }) {
@@ -256,7 +253,6 @@ function DailyTasks({
     }
   }, dailyTask.progressCaption)))));
 }
-
 function PlayerAchievements({
   playerAchievements
 }) {
@@ -282,5 +278,4 @@ function PlayerAchievements({
     className: "progress_label"
   }, achievement.progressLabel)))));
 }
-
 window.Profile = Profile;

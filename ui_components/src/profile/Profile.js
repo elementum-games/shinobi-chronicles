@@ -9,6 +9,8 @@ import type {
     PlayerAchievementsType
 } from "../_schema/userSchema.js";
 
+import RadarNinjaChart from '../charts/Chart.js';
+
 type Props = {|
     +links: {|
         +clan: string,
@@ -62,6 +64,13 @@ function Profile({
                     />
                 </div>
             </div>
+            
+            <div>
+                 <RadarNinjaChart 
+                    playerStats={playerStats}
+                 />
+            </div>
+
             <div className="profile_row_third">
                 <h2>Achievements</h2>
                 <PlayerAchievements
