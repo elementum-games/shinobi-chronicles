@@ -9,7 +9,7 @@ function Profile({
   playerAchievements
 }) {
   //Chart.js variables
-  const [showChart, setShowChart] = React.useState(true);
+  const [showChart, setShowChart] = React.useState(false);
   function handleShowGraph() {
     setShowChart(!showChart);
   }

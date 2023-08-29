@@ -35,7 +35,7 @@ function Profile({
 }: Props) {
 
     //Chart.js variables
-    const [showChart, setShowChart] = React.useState(true);
+    const [showChart, setShowChart] = React.useState(false);
     function handleShowGraph() {
         setShowChart(!showChart);
     }
