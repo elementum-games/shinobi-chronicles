@@ -204,7 +204,7 @@ function members(): void {
 		$view = 'highest_exp';
 		if(isset($_GET['view']) && $_GET['view'] == 'highest_exp') {
 			$query_custom = " WHERE `staff_level` <= " . User::STAFF_HEAD_MODERATOR .
-                " ORDER BY `exp` DESC, `pvp_wins` DESC";
+                " ORDER BY `exp` DESC, ABS(`village_rep`) DESC";
 			$view = 'highest_exp';
 		}
 		else if(isset($_GET['view']) && $_GET['view'] == 'highest_pvp') {
