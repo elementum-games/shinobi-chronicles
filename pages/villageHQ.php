@@ -109,8 +109,8 @@ function villageHQ() {
 		}
 
 		$result = $system->db->query(
-            "SELECT `user_name`, `rank`, `level`, `exp` FROM `users`
-                WHERE `village`='{$player->village->name}' ORDER BY `rank` DESC, `exp` DESC LIMIT $min, $users_per_page"
+            "SELECT `user_name`, `rank`, `level`, `exp`, `village_rep` FROM `users`
+                WHERE `village`='{$player->village->name}' ORDER BY `exp` DESC, ABS(`village_rep`) DESC LIMIT $min, $users_per_page"
         );
 
 		echo "<table class='table'><tr><th colspan='4'>Village Members</th></tr>

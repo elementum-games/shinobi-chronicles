@@ -327,6 +327,15 @@ class SpecialMission {
                     $move_to_x = $this->player->location->x - 1;
                 }
 
+                // Move Diagonal
+                if ($this->player->location->y != $this->target['y']) {
+                    if ($this->target['y'] > $this->player->location->y) {
+                        $move_to_y = $this->player->location->y + 1;
+                    } else {
+                        $move_to_y = $this->player->location->y - 1;
+                    }
+                }
+
                 // Go around village not into it
                 $target_location = new TravelCoords($move_to_x, $move_to_y, $this->player->location->map_id);
                 if (isset($villages[$target_location->fetchString()]) && !$this->player->village_location->equals($target_location)) {
@@ -334,14 +343,6 @@ class SpecialMission {
                         $move_to_y--;
                     } else {
                         $move_to_y++;
-                    }
-                }
-                // Move Diagonal
-                else if ($this->player->location->y != $this->target['y']) {
-                    if ($this->target['y'] > $this->player->location->y) {
-                        $move_to_y = $this->player->location->y + 1;
-                    } else {
-                        $move_to_y = $this->player->location->y - 1;
                     }
                 }
 
@@ -355,6 +356,15 @@ class SpecialMission {
                     $move_to_y = $this->player->location->y - 1;
                 }
 
+                // Move Diagonal
+                if ($this->player->location->x != $this->target['x']) {
+                    if ($this->target['x'] > $this->player->location->x) {
+                        $move_to_x = $this->player->location->x + 1;
+                    } else {
+                        $move_to_x = $this->player->location->x - 1;
+                    }
+                }
+
                 // Skip past village if trying to move into it
                 $target_location = new TravelCoords($move_to_x, $move_to_y, $this->player->location->map_id);
                 if (isset($villages[$target_location->fetchString()]) && !$this->player->village_location->equals($target_location)) {
@@ -362,14 +372,6 @@ class SpecialMission {
                         $move_to_x--;
                     } else {
                         $move_to_x++;
-                    }
-                }
-                // Move Diagonal
-                else if ($this->player->location->x != $this->target['x']) {
-                    if ($this->target['x'] > $this->player->location->x) {
-                        $move_to_x = $this->player->location->x + 1;
-                    } else {
-                        $move_to_x = $this->player->location->x - 1;
                     }
                 }
 
@@ -483,7 +485,10 @@ class SpecialMission {
            * $progress_modifier
         );
         if($stat_to_gain != null && $stat_gain > 0) {
-            $reward_text .= ' ' . $this->player->addStatGain($stat_to_gain, $stat_gain) . '!';
+            $stat_gained = $this->player->addStatGain($stat_to_gain, $stat_gain);
+            if (!empty($stat_gained)) {
+                $reward_text .= ' ' . $stat_gained . '!';
+            }
         }
 
         return $reward_text;
@@ -651,7 +656,7 @@ class SpecialMission {
             $is_y_negative = (bool) mt_rand(0, 1);
             $max_y = ($is_y_negative ? self::$target_villages[$random_village_key]['negative_y'] : self::$target_villages[$random_village_key]['positive_y']);
             $random_y = mt_rand(1, $max_y);
-            $target_y = ($is_x_negative ? (self::$target_villages[$random_village_key]['y'] - $random_y) : (self::$target_villages[$random_village_key]['y'] + $random_y));
+            $target_y = ($is_y_negative ? (self::$target_villages[$random_village_key]['y'] - $random_y) : (self::$target_villages[$random_village_key]['y'] + $random_y));
 
             $new_target = [
                 'target' => $random_village_key,
@@ -685,7 +690,7 @@ class SpecialMission {
             $is_y_negative = (bool) mt_rand(0, 1);
             $max_y = ($is_y_negative ? self::$target_villages[$random_village_key]['negative_y'] : self::$target_villages[$random_village_key]['positive_y']);
             $random_y = mt_rand(1, $max_y);
-            $target_y = ($is_x_negative ? (self::$target_villages[$random_village_key]['y'] - $random_y) : (self::$target_villages[$random_village_key]['y'] + $random_y));
+            $target_y = ($is_y_negative ? (self::$target_villages[$random_village_key]['y'] - $random_y) : (self::$target_villages[$random_village_key]['y'] + $random_y));
 
             $new_target = [
                 'target' => $random_village_key,
@@ -715,7 +720,7 @@ class SpecialMission {
             $is_y_negative = (bool) mt_rand(0, 1);
             $max_y = ($is_y_negative ? self::$target_villages[$random_village_key]['negative_y'] : self::$target_villages[$random_village_key]['positive_y']);
             $random_y = mt_rand(1, $max_y);
-            $target_y = ($is_x_negative ? (self::$target_villages[$random_village_key]['y'] - $random_y) : (self::$target_villages[$random_village_key]['y'] + $random_y));
+            $target_y = ($is_y_negative ? (self::$target_villages[$random_village_key]['y'] - $random_y) : (self::$target_villages[$random_village_key]['y'] + $random_y));
 
             $new_target = [
                 'target' => $random_village_key,

@@ -3,12 +3,12 @@
 # Begin standard auth
 require_once __DIR__ . "/../classes.php";
 
-$system = API::init(row_lock: true);
+$system = API::init(row_lock: false);
 
 try {
     $player = Auth::getUserFromSession($system);
-    $player->loadData(User::UPDATE_FULL);
-    $player->updateData();
+    $player->loadData(User::UPDATE_PREVIEW);
+    //$player->updateData();
 } catch (Exception $e) {
     API::exitWithException($e, system: $system);
 }

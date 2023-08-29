@@ -652,9 +652,7 @@ function TravelActions({ travelPageLink, updateMovementDirection }) {
                     onPointerUp={handlePointerUp}
                     onPointerLeave={handlePointerUp}
                     onContextMenu={e => {
-                        if(e.nativeEvent.pointerType === "touch") {
-                            e.preventDefault();
-                        }
+                        e.preventDefault();
                     }}
                     onClick={e => {
                         e.preventDefault();

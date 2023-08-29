@@ -192,7 +192,7 @@ class BattleManager {
             try {
                 if (isset($_POST['attack'])) {
                     $item_id = $_POST['item_id'] ?? null;
-                    if ($item_id && $this->player->hasItem($item_id)) {
+                    if ($item_id && $this->player->itemQuantity($item_id) > 0) {
                         $item = $this->player->items[$item_id];
 
                         $max_health = $this->player->max_health * (Battle::MAX_PRE_FIGHT_HEAL_PERCENT / 100);
