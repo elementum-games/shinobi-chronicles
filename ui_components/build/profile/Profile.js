@@ -1,5 +1,5 @@
 import { CharacterAvatar } from "../CharacterAvatar.js";
-import MyChart from '../charts/Chart.js';
+import RadarNinjaChart from '../charts/Chart.js';
 function Profile({
   links,
   playerData,
@@ -8,16 +8,6 @@ function Profile({
   playerDailyTasks,
   playerAchievements
 }) {
-  const chartData = {
-    labels: ['A', 'B', 'C', 'D', 'E'],
-    datasets: [{
-      label: 'My Dataset',
-      data: [10, 20, 30, 25, 15],
-      fill: false,
-      borderColor: 'rgb(75, 192, 192)',
-      tension: 0.1
-    }]
-  };
   return /*#__PURE__*/React.createElement("div", {
     className: "profile_container"
   }, /*#__PURE__*/React.createElement("div", {
@@ -41,12 +31,12 @@ function Profile({
     playerData: playerData
   }), /*#__PURE__*/React.createElement(DailyTasks, {
     dailyTasks: playerDailyTasks
-  }))), /*#__PURE__*/React.createElement("div", {
+  }))), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement(RadarNinjaChart, {
+    playerStats: playerStats
+  })), /*#__PURE__*/React.createElement("div", {
     className: "profile_row_third"
   }, /*#__PURE__*/React.createElement("h2", null, "Achievements"), /*#__PURE__*/React.createElement(PlayerAchievements, {
     playerAchievements: playerAchievements
-  })), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement(MyChart, {
-    data: chartData
   })));
 }
 function StatusAttributes({
