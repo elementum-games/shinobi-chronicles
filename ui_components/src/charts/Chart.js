@@ -90,9 +90,9 @@ const myChart = new Chart(context, {
 
 
   return (
-  <>
-  <canvas id="chart"></canvas>
-  </>
+  <div style={{alignItems: 'center', minWidth: '558px'}} className="stats_container">
+    <canvas id="chart"></canvas>
+  </div>
   );
 };
 

@@ -33,6 +33,15 @@ function Profile({
     playerDailyTasks,
     playerAchievements,
 }: Props) {
+
+    //Chart.js variables
+    const [showChart, setShowChart] = React.useState(false);
+    function handleShowGraph() {
+        console.log("clicked");
+        setShowChart(!showChart);
+    }
+    let showChartButtonStyle={backgroundColor: 'rgb(20, 19, 23)', color: 'rgb(209, 197, 173)', borderRadius: '12px 12px 0 0', marginTop: '10px'}
+
     return (
         <div className="profile_container">
             {/* First row */}
@@ -43,13 +52,24 @@ function Profile({
                     playerSettings={playerSettings}
                 />
             </div>
+
+            <button style={showChartButtonStyle} onClick={handleShowGraph}>{(!showChart) ? "Show Graph": "Show Stats"}</button>
             
             {/* Second row */}
             <div className="profile_row_second">
-                <PlayerStats
-                    playerData={playerData}
-                    playerStats={playerStats}
-                />
+                {/* Show Chart or Graph */}
+                {
+                    (!showChart) ? 
+                    <PlayerStats
+                        playerData={playerData}
+                        playerStats={playerStats}
+                    />
+                    :
+                    <RadarNinjaChart 
+                        playerStats={playerStats}
+                    />
+                }
+
                 <div className="profile_row_second_col2">
                     <PlayerUserRep
                         playerData={playerData}
@@ -63,12 +83,6 @@ function Profile({
                         dailyTasks={playerDailyTasks}
                     />
                 </div>
-            </div>
-            
-            <div>
-                 <RadarNinjaChart 
-                    playerStats={playerStats}
-                 />
             </div>
 
             <div className="profile_row_third">
