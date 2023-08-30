@@ -735,4 +735,10 @@ return [
         'text' => ':cooljojo:',
         'public' => true,
     ],
+    [
+        'code' => ':oranhead:',
+        'image' => "<img src='./images/memes/oran_head.png' />",
+        'text' => ':oranhead:',
+        'public' => true,
+    ],      
 ];
