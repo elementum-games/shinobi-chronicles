@@ -24,6 +24,9 @@ try {
     $TravelAPIResponse = new TravelAPIResponse();
     $TravelManager = new TravelManager($system, $player);
 
+    // for optimization testing
+    //$start_time = microtime(true) * 1000;
+
     switch($request) {
         case 'LoadTravelData':
             $TravelAPIResponse->response = [
@@ -63,6 +66,9 @@ try {
         default:
             API::exitWithError(message: "Invalid request!", system: $system);
     }
+
+    //$duration = microtime(true) * 1000 - $start_time;
+    //$TravelAPIResponse->response['time'] = $duration;
 
     API::exitWithData(
         data: $TravelAPIResponse->response,

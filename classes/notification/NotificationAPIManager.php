@@ -228,9 +228,7 @@ class NotificationAPIManager {
             $result = $this->system->db->query(
                 "SELECT `battle_type` FROM `battles` WHERE `battle_id`='{$this->player->battle_id}' LIMIT 1"
             );
-            if ($this->system->db->last_num_rows == 0) {
-                $this->player->battle_id = 0;
-            } else {
+            if (!$this->system->db->last_num_rows == 0) {
                 $result = $this->system->db->fetch($result);
                 $link = null;
                 switch ($result['battle_type']) {

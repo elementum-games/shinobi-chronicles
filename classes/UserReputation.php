@@ -113,9 +113,9 @@ class UserReputation {
     const MISSION_GAINS = [
         Mission::RANK_D => 1,
         Mission::RANK_C => 2,
-        Mission::RANK_B => 3,
-        Mission::RANK_A => 4,
-        Mission::RANK_S => 5
+        Mission::RANK_B => 4,
+        Mission::RANK_A => 6,
+        Mission::RANK_S => 8
     ];
     const SPECIAL_MISSION_REP_GAINS = [
         SpecialMission::DIFFICULTY_EASY => 2,

@@ -76,11 +76,15 @@ function Sidebar({ links, navigationAPIData, userAPIData }) {
         }
     };
 
+    const parentClick = (e) => {
+        e.target.parentElement.click();
+    }
+
     // Content
-    function displaySection(section_data, title, toggleNav) {
+    function displaySection(section_data, title, toggleNav, sidebarCollapse, parentClick) {
         return (
-            <div className={"sb_section_container " + title} onClick={toggleNav}>
-                <div className={"sb_header_bar d-flex"}>
+            <div className={sidebarCollapse == "closed" ? "sb_section_container " + title : "sb_section_container toggle " + title} onClick={toggleNav}>
+                <div className={"sb_header_bar d-flex"} onClick={parentClick}>
                     <div className={"sb_header_image_wrapper"}>
                         <img src="/images/v2/icons/menudecor.png" className="sb_header_image" />
                     </div>
@@ -137,10 +141,10 @@ function Sidebar({ links, navigationAPIData, userAPIData }) {
                 regenTime={regenTime}
                 regenOffset={regenOffset}
             />
-            {displaySection(userMenu, "Player Menu", toggleNav)}
-            {displaySection(activityMenu, "Action Menu", toggleNav)}
-            {displaySection(villageMenu, "Village Menu", toggleNav)}
-            {staffMenu.length ? displaySection(staffMenu, "Staff Menu", toggleNav) : null}
+            {displaySection(userMenu, "Player Menu", toggleNav, playerSettings.sidebar_collapse, parentClick)}
+            {displaySection(activityMenu, "Action Menu", toggleNav, playerSettings.sidebar_collapse, parentClick)}
+            {displaySection(villageMenu, "Village Menu", toggleNav, playerSettings.sidebar_collapse, parentClick)}
+            {staffMenu.length ? displaySection(staffMenu, "Staff Menu", toggleNav, playerSettings.sidebar_collapse, parentClick) : null}
         </div>
     )
 }

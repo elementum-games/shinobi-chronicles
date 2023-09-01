@@ -30,49 +30,44 @@ class SpecialMission {
      *  - each fight in a mission takes ~13 seconds
     */
     public static array $difficulties = [
-        SpecialMission::DIFFICULTY_EASY => [
-            'yen_per_battle' => 8, // 8 * 10 = 80
+        SpecialMission::DIFFICULTY_EASY => [ // tested time: 2:45-4:15 minutes
+            'yen_per_battle' => 8,
             'yen_per_mission' => 70,
             'stats_per_mission' => 2,
-            'hp_lost_percent' => 2, // 20% => 60% lost
-            'intel_gain' => 10, // est. 10 fights (rank * 150 yen) [130 seconds]
+            'hp_lost_percent' => 2.5, // 22.5% => 67.5% lost
+            'intel_gain' => 12, // 9 fights
             'rep_gain' => UserReputation::SPECIAL_MISSION_REP_GAINS[SpecialMission::DIFFICULTY_EASY],
+            'battles_per_region' => 3, // 3 regions
         ],
-        // Measured average 144 seconds (11.3 fights)
         SpecialMission::DIFFICULTY_NORMAL => [
             'yen_per_battle' => 10, // 10 * 11 = 110
             'yen_per_mission' => 110,
             'stats_per_mission' => 4,
-            'hp_lost_percent' => 2.5, // 27.5% => 82.5% lost
-            'intel_gain' => 9, // 11.1 fights (rank * 210 yen) (old: 63) [144 seconds]
+            'hp_lost_percent' => 2.5, // 30% => 90% lost
+            'intel_gain' => 9, // 12 fights
             'rep_gain' => UserReputation::SPECIAL_MISSION_REP_GAINS[SpecialMission::DIFFICULTY_NORMAL],
+            'battles_per_region' => 4, // 3 regions
         ],
         SpecialMission::DIFFICULTY_HARD => [
             'yen_per_battle' => 12, // 12 * 12.5 = 150
             'yen_per_mission' => 150,
             'stats_per_mission' => 6,
-            'hp_lost_percent' => 3.5, // 44% => 132% lost
-            'intel_gain' => 8, // 12.5 fights (rank * 270 yen) [162 seconds]
+            'hp_lost_percent' => 3.5, // 52.5% => 157.5% lost
+            'intel_gain' => 7, // 15 fights
             'rep_gain' => UserReputation::SPECIAL_MISSION_REP_GAINS[SpecialMission::DIFFICULTY_HARD],
+            'battles_per_region' => 5, // 3 regions
         ],
-        SpecialMission::DIFFICULTY_NIGHTMARE => [
+        SpecialMission::DIFFICULTY_NIGHTMARE => [ // tested time: 3:00-4:30 minutes
             'yen_per_battle' => 14, // 20 * 14.28 = 285
             'yen_per_mission' => 200,
             'stats_per_mission' => 8,
-            'hp_lost_percent' => 4.5, // 71.4% => 214.2% lost
-            'intel_gain' => 7, // 14.28 fights (rank * 340 yen) [185 seconds]
+            'hp_lost_percent' => 4.5, // 76.5% => 229.5% lost
+            'intel_gain' => 6, // 17 fights
             'rep_gain' => UserReputation::SPECIAL_MISSION_REP_GAINS[SpecialMission::DIFFICULTY_NIGHTMARE],
+            'battles_per_region' => 6, // 3 regions
         ]
     ];
 
-    /* The longer this is set then the easier it is for users to get sniped and the longer the mission
-    takes to complete.
-
-    Baseline testing at 1200ms shows completion ranges of
-    Easy (20% intel gain, ~5 encounters): 1:09 - 2:01
-
-    Nightmare (14% intel gain, ~7 encounters): 1:27 -> 2:47
-    */
     const EVENT_DURATION_MS = 650;
 
     const EVENT_START = 'start';
@@ -135,46 +130,74 @@ class SpecialMission {
     const SPY_TARGET_CLOUD = 'Cloud';
     const SPY_TARGET_MIST = 'Mist';
 
-    public static array $target_villages = [
+    public static array $valid_targets = [
         SpecialMission::SPY_TARGET_LEAF => [
-            'x' => 9,
-            'y' => 6,
-            'negative_x' => 2,
-            'positive_x' => 2,
-            'negative_y' => 2,
-            'positive_y' => 2
+            SpecialMission::SPY_TARGET_LEAF => true,
+            SpecialMission::SPY_TARGET_STONE => true,
+            SpecialMission::SPY_TARGET_SAND => true,
+            SpecialMission::SPY_TARGET_CLOUD => true,
+            SpecialMission::SPY_TARGET_MIST => true,
         ],
         SpecialMission::SPY_TARGET_STONE => [
-            'x' => 5,
-            'y' => 3,
-            'negative_x' => 2,
-            'positive_x' => 2,
-            'negative_y' => 2,
-            'positive_y' => 2
+            SpecialMission::SPY_TARGET_LEAF => true,
+            SpecialMission::SPY_TARGET_STONE => true,
+            SpecialMission::SPY_TARGET_SAND => true,
+            SpecialMission::SPY_TARGET_CLOUD => true,
+            SpecialMission::SPY_TARGET_MIST => false,
         ],
         SpecialMission::SPY_TARGET_SAND => [
-            'x' => 3,
-            'y' => 8,
-            'negative_x' => 2,
-            'positive_x' => 2,
-            'negative_y' => 2,
-            'positive_y' => 2
+            SpecialMission::SPY_TARGET_LEAF => true,
+            SpecialMission::SPY_TARGET_STONE => true,
+            SpecialMission::SPY_TARGET_SAND => true,
+            SpecialMission::SPY_TARGET_CLOUD => false,
+            SpecialMission::SPY_TARGET_MIST => true,
         ],
         SpecialMission::SPY_TARGET_CLOUD => [
-            'x' => 17,
-            'y' => 2,
-            'negative_x' => 2,
-            'positive_x' => 1,
-            'negative_y' => 1,
-            'positive_y' => 2
+            SpecialMission::SPY_TARGET_LEAF => true,
+            SpecialMission::SPY_TARGET_STONE => true,
+            SpecialMission::SPY_TARGET_SAND => false,
+            SpecialMission::SPY_TARGET_CLOUD => true,
+            SpecialMission::SPY_TARGET_MIST => true,
         ],
         SpecialMission::SPY_TARGET_MIST => [
-            'x' => 16,
-            'y' => 10,
-            'negative_x' => 2,
-            'positive_x' => 2,
-            'negative_y' => 2,
-            'positive_y' => 2
+            SpecialMission::SPY_TARGET_LEAF => true,
+            SpecialMission::SPY_TARGET_STONE => false,
+            SpecialMission::SPY_TARGET_SAND => true,
+            SpecialMission::SPY_TARGET_CLOUD => true,
+            SpecialMission::SPY_TARGET_MIST => true,
+        ],
+    ];
+
+    public static array $target_villages = [
+        SpecialMission::SPY_TARGET_LEAF => [
+            'negative_x' => 5,
+            'positive_x' => 5,
+            'negative_y' => 5,
+            'positive_y' => 5
+        ],
+        SpecialMission::SPY_TARGET_STONE => [
+            'negative_x' => 5,
+            'positive_x' => 5,
+            'negative_y' => 4,
+            'positive_y' => 5
+        ],
+        SpecialMission::SPY_TARGET_SAND => [
+            'negative_x' => 4,
+            'positive_x' => 5,
+            'negative_y' => 5,
+            'positive_y' => 5
+        ],
+        SpecialMission::SPY_TARGET_CLOUD => [
+            'negative_x' => 5,
+            'positive_x' => 5,
+            'negative_y' => 4,
+            'positive_y' => 5
+        ],
+        SpecialMission::SPY_TARGET_MIST => [
+            'negative_x' => 5,
+            'positive_x' => 5,
+            'negative_y' => 5,
+            'positive_y' => 4
         ]
     ];
 
@@ -304,6 +327,15 @@ class SpecialMission {
                     $move_to_x = $this->player->location->x - 1;
                 }
 
+                // Move Diagonal
+                if ($this->player->location->y != $this->target['y']) {
+                    if ($this->target['y'] > $this->player->location->y) {
+                        $move_to_y = $this->player->location->y + 1;
+                    } else {
+                        $move_to_y = $this->player->location->y - 1;
+                    }
+                }
+
                 // Go around village not into it
                 $target_location = new TravelCoords($move_to_x, $move_to_y, $this->player->location->map_id);
                 if (isset($villages[$target_location->fetchString()]) && !$this->player->village_location->equals($target_location)) {
@@ -322,6 +354,15 @@ class SpecialMission {
                     $move_to_y = $this->player->location->y + 1;
                 } else {
                     $move_to_y = $this->player->location->y - 1;
+                }
+
+                // Move Diagonal
+                if ($this->player->location->x != $this->target['x']) {
+                    if ($this->target['x'] > $this->player->location->x) {
+                        $move_to_x = $this->player->location->x + 1;
+                    } else {
+                        $move_to_x = $this->player->location->x - 1;
+                    }
                 }
 
                 // Skip past village if trying to move into it
@@ -444,7 +485,10 @@ class SpecialMission {
            * $progress_modifier
         );
         if($stat_to_gain != null && $stat_gain > 0) {
-            $reward_text .= ' ' . $this->player->addStatGain($stat_to_gain, $stat_gain) . '!';
+            $stat_gained = $this->player->addStatGain($stat_to_gain, $stat_gain);
+            if (!empty($stat_gained)) {
+                $reward_text .= ' ' . $stat_gained . '!';
+            }
         }
 
         return $reward_text;
@@ -524,8 +568,8 @@ class SpecialMission {
         // 20% variance up/down from base on intel gains. Averages to 105% base
 
         $intel_gained = self::$difficulties[$this->difficulty]['intel_gain'];
-        $intel_gained *= 0.8 + (mt_rand(1, 4) / 10);
-        $intel_gained = floor($intel_gained);
+        //$intel_gained *= 0.8 + (mt_rand(1, 4) / 10);
+        //$intel_gained = floor($intel_gained);
 
         $yen_gain = self::$difficulties[$this->difficulty]['yen_per_battle'] * $this->player->rank_num;
         $yen_gain *= 0.8 + (mt_rand(1, 4) / 10);
@@ -591,40 +635,98 @@ class SpecialMission {
 
     // Generates a new target location
     public function generateTarget($home = false): int {
-        // Set the Village
-        $random_village_key = false;
-        while($random_village_key == false) {
-            $key = array_rand(self::$target_villages, 1);
-            if ($key != $this->player->village->name) {
-                $random_village_key = $key;
+        if ($this->target == null) {
+            // Set the Village
+            $random_village_key = false;
+            while ($random_village_key == false) {
+                $key = array_rand(self::$target_villages, 1);
+                if ($key != $this->player->village->name && SpecialMission::$valid_targets[$this->player->village->name][$key]) {
+                    $random_village_key = $key;
+                }
+            }
+
+            // Set the coords
+            $is_x_negative = (bool) mt_rand(0, 1);
+            $max_x = ($is_x_negative ? self::$target_villages[$random_village_key]['negative_x'] : self::$target_villages[$random_village_key]['positive_x']);
+            $random_x = mt_rand(1, $max_x);
+            $target_x = ($is_x_negative ?
+                (self::$target_villages[$random_village_key]['x'] - $random_x) :
+                (self::$target_villages[$random_village_key]['x'] + $random_x));
+
+            $is_y_negative = (bool) mt_rand(0, 1);
+            $max_y = ($is_y_negative ? self::$target_villages[$random_village_key]['negative_y'] : self::$target_villages[$random_village_key]['positive_y']);
+            $random_y = mt_rand(1, $max_y);
+            $target_y = ($is_y_negative ? (self::$target_villages[$random_village_key]['y'] - $random_y) : (self::$target_villages[$random_village_key]['y'] + $random_y));
+
+            $new_target = [
+                'target' => $random_village_key,
+                'x' => $target_x,
+                'y' => $target_y,
+                'count' => 1,
+            ];
+        }
+        else if ($home) {
+            if ($home) {
+                $new_target = [
+                    'target' => $this->player->village->name,
+                    'x' => self::$target_villages[$this->player->village->name]['x'],
+                    'y' => self::$target_villages[$this->player->village->name]['y']
+                ];
             }
         }
+        // create a set number of battles per region targeted
+        else if ($this->target['count'] < self::$difficulties[$this->difficulty]['battles_per_region']) {
+            // Set the Village
+            $random_village_key = $this->target['target'];
 
-        // Set the coords
-        $is_x_negative = (bool)mt_rand(0,1);
-        $max_x = ($is_x_negative ? self::$target_villages[$random_village_key]['negative_x'] : self::$target_villages[$random_village_key]['positive_x']);
-        $random_x = mt_rand(1, $max_x);
-        $target_x = ($is_x_negative ?
-            (self::$target_villages[$random_village_key]['x'] - $random_x) :
-            (self::$target_villages[$random_village_key]['x'] + $random_x));
+            // Set the coords
+            $is_x_negative = (bool) mt_rand(0, 1);
+            $max_x = ($is_x_negative ? self::$target_villages[$random_village_key]['negative_x'] : self::$target_villages[$random_village_key]['positive_x']);
+            $random_x = mt_rand(1, $max_x);
+            $target_x = ($is_x_negative ?
+                (self::$target_villages[$random_village_key]['x'] - $random_x) :
+                (self::$target_villages[$random_village_key]['x'] + $random_x));
 
-        $is_y_negative = (bool)mt_rand(0,1);
-        $max_y = ($is_y_negative ? self::$target_villages[$random_village_key]['negative_y'] : self::$target_villages[$random_village_key]['positive_y']);
-        $random_y = mt_rand(1, $max_y);
-        $target_y = ($is_x_negative ? (self::$target_villages[$random_village_key]['y'] - $random_y) : (self::$target_villages[$random_village_key]['y'] + $random_y));
+            $is_y_negative = (bool) mt_rand(0, 1);
+            $max_y = ($is_y_negative ? self::$target_villages[$random_village_key]['negative_y'] : self::$target_villages[$random_village_key]['positive_y']);
+            $random_y = mt_rand(1, $max_y);
+            $target_y = ($is_y_negative ? (self::$target_villages[$random_village_key]['y'] - $random_y) : (self::$target_villages[$random_village_key]['y'] + $random_y));
 
-        $new_target = [
-            'target' => $random_village_key,
-            'x' => $target_x,
-            'y' => $target_y
-        ];
-
-        // if the user is going home just override everything lmao #dontlookatthislol #arthesialookedatthis
-        if ($home) {
             $new_target = [
-                'target' => $this->player->village->name,
-                'x' => self::$target_villages[$this->player->village->name]['x'],
-                'y' => self::$target_villages[$this->player->village->name]['y']
+                'target' => $random_village_key,
+                'x' => $target_x,
+                'y' => $target_y,
+                'count' => $this->target['count'] + 1,
+            ];
+        }
+        else {
+            // Set the Village
+            $random_village_key = false;
+            while ($random_village_key == false) {
+                $key = array_rand(self::$target_villages, 1);
+                if ($key != $this->player->village->name && $key != $this->target['target'] && SpecialMission::$valid_targets[$this->target['target']][$key]) {
+                    $random_village_key = $key;
+                }
+            }
+
+            // Set the coords
+            $is_x_negative = (bool) mt_rand(0, 1);
+            $max_x = ($is_x_negative ? self::$target_villages[$random_village_key]['negative_x'] : self::$target_villages[$random_village_key]['positive_x']);
+            $random_x = mt_rand(1, $max_x);
+            $target_x = ($is_x_negative ?
+                (self::$target_villages[$random_village_key]['x'] - $random_x) :
+                (self::$target_villages[$random_village_key]['x'] + $random_x));
+
+            $is_y_negative = (bool) mt_rand(0, 1);
+            $max_y = ($is_y_negative ? self::$target_villages[$random_village_key]['negative_y'] : self::$target_villages[$random_village_key]['positive_y']);
+            $random_y = mt_rand(1, $max_y);
+            $target_y = ($is_y_negative ? (self::$target_villages[$random_village_key]['y'] - $random_y) : (self::$target_villages[$random_village_key]['y'] + $random_y));
+
+            $new_target = [
+                'target' => $random_village_key,
+                'x' => $target_x,
+                'y' => $target_y,
+                'count' => 1,
             ];
         }
 

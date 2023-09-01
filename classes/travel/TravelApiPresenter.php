@@ -13,6 +13,7 @@ class TravelApiPresenter {
         $locations = $travelManager->fetchCurrentMapLocations();
         $current_location_portal = $travelManager->fetchCurrentLocationPortal();
         $location_action = $travelManager->getMapLocationAction($locations, $player);
+        $regions = $travelManager->getRegions($player);
         return [
             'player_x'          => $player->location->x,
             'player_y'          => $player->location->y,
@@ -35,6 +36,8 @@ class TravelApiPresenter {
             'action_url'        => $location_action->action_url,
             'action_message'    => $location_action->action_message,
             'invulnerable'      => ($player->last_death_ms > System::currentTimeMs() - (300 * 1000)),
+            'regions'           => $regions,
+            'region_coords'     => $travelManager->getCoordsByRegion($regions),
             'spar_link'         => $system->router->getUrl('spar'),
             'colosseum_coords'  => $travelManager->getColosseumCoords(),
         ];

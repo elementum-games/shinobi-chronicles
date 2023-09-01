@@ -81,6 +81,7 @@ class User extends Fighter {
     const UPDATE_NOTHING = 0;
     const UPDATE_REGEN = 1;
     const UPDATE_FULL = 2;
+    const UPDATE_PREVIEW = 3; // used to simulate full update without changing user data
     const ATTACK_LINK_DURATION_MIN = 10;
 
     public static int $jutsu_train_gain = 5;
@@ -650,14 +651,11 @@ class User extends Fighter {
         $this->intelligence_nerf = 0;
         $this->willpower_nerf = 0;
 
-        $this->scout_range = 1;
+        $this->scout_range = $this->rank_num;
         $this->stealth = 0;
 
-        if($this->rank_num > 3) {
-            $this->scout_range++;
-        }
         if($this->isHeadAdmin()) {
-            $this->scout_range += 2;
+            $this->scout_range += 4;
         }
 
         $this->village_changes = $user_data['village_changes'];
@@ -857,7 +855,7 @@ class User extends Fighter {
 
         // Regen/time-based events
         $time_difference = time() - $this->last_update;
-        if($time_difference > 60 && $UPDATE >= User::UPDATE_REGEN) {
+        if($time_difference > 60 && $UPDATE == User::UPDATE_REGEN || $UPDATE == User::UPDATE_FULL) {
             $minutes = floor($time_difference / 60);
 
             $regen_amount = $minutes * ($this->regen_rate + $this->regen_boost);
@@ -887,10 +885,12 @@ class User extends Fighter {
         }
 
         // Check training
-        if($this->train_time && $UPDATE >= User::UPDATE_FULL) {
+        if ($this->train_time && $UPDATE == User::UPDATE_FULL) {
             $this->checkTraining();
+        } else if ($this->train_time && $UPDATE == User::UPDATE_PREVIEW) {
+            $this->checkTraining(is_preview: true);
         }
-        if($this->stat_transfer_completion_time && $UPDATE >= User::UPDATE_FULL) {
+        if($this->stat_transfer_completion_time && $UPDATE == User::UPDATE_FULL) {
             $this->checkStatTransfer();
         }
 
@@ -1213,7 +1213,7 @@ class User extends Fighter {
      * @return void
      * @throws RuntimeException
      */
-    public function checkTraining(): void {
+    public function checkTraining($is_preview = false): void {
         // Used for sidemenu display
         if($this->train_time < time()) {
             $team_boost_description = "";
@@ -1233,7 +1233,7 @@ class User extends Fighter {
                 }
 
                 // Daily task
-                if($this->daily_tasks->hasTaskType(DailyTask::ACTIVITY_TRAINING)) {
+                if($this->daily_tasks->hasTaskType(DailyTask::ACTIVITY_TRAINING) && !$is_preview) {
                     $this->daily_tasks->progressTask(DailyTask::ACTIVITY_TRAINING, $gain, DailyTask::SUB_TASK_JUTSU);
                 }
 
@@ -1268,9 +1268,8 @@ class User extends Fighter {
                     NotificationManager::createNotification($new_notification, $this->system, NotificationManager::UPDATE_UNIQUE);
 
                     $this->system->message($message);
-                    $this->system->printMessage();
 
-                    if (!$this->ban_type) {
+                    if (!$this->ban_type && !$is_preview) {
                         $this->updateInventory();
                     }
 		        }
@@ -1290,7 +1289,7 @@ class User extends Fighter {
                 }
 
                 // Daily task
-                if($this->daily_tasks->hasTaskType(DailyTask::ACTIVITY_TRAINING)) {
+                if($this->daily_tasks->hasTaskType(DailyTask::ACTIVITY_TRAINING) && !$is_preview) {
                     $this->daily_tasks->progressTask(DailyTask::ACTIVITY_TRAINING, $gain, DailyTask::SUB_TASK_JUTSU);
                 }
 
@@ -1326,9 +1325,8 @@ class User extends Fighter {
                         NotificationManager::createNotification($new_notification, $this->system, NotificationManager::UPDATE_UNIQUE);
 
                         $this->system->message($message);
-                        $this->system->printMessage();
 
-                        if(!$this->ban_type) {
+                        if(!$this->ban_type && !$is_preview) {
                             $this->updateInventory();
                         }
                     }
@@ -1362,7 +1360,7 @@ class User extends Fighter {
                 $gain_description = $this->addStatGain($this->train_type, $this->train_gain);
 
                 // Daily task
-                if($this->daily_tasks->hasTaskType(DailyTask::ACTIVITY_TRAINING)) {
+                if($this->daily_tasks->hasTaskType(DailyTask::ACTIVITY_TRAINING) && !$is_preview) {
                     $sub_task_type = (str_contains($this->train_type, 'skill')) ? DailyTask::SUB_TASK_SKILL : DailyTask::SUB_TASK_GEN;
                     $this->daily_tasks->progressTask(DailyTask::ACTIVITY_TRAINING, $this->train_gain, $sub_task_type);
                 }
@@ -2370,6 +2368,16 @@ class User extends Fighter {
 
         return ($this->system->db->last_affected_rows > 0);
     }
+    public function setSidebarCollapse(string $collapse): bool
+    {
+        $this->system->db->query(
+            "INSERT INTO `user_settings` (`user_id`, `sidebar_collapse`)
+                VALUES ({$this->user_id}, '{$collapse}')
+                ON DUPLICATE KEY UPDATE `sidebar_collapse`='{$collapse}';"
+        );
+
+        return ($this->system->db->last_affected_rows > 0);
+    }
     public function setEnableAlerts(bool $enable): bool {
         $this->system->db->query(
             "INSERT INTO `user_settings` (`user_id`, `enable_alerts`)
@@ -2429,14 +2437,25 @@ class User extends Fighter {
     }
     public function getSidebarPosition(): string
     {
-        $avatar_result = $this->system->db->query(
+        $sidebar_result = $this->system->db->query(
             "SELECT `sidebar_position` FROM `user_settings` WHERE `user_id` = {$this->user_id}"
         );
-        $result = $this->system->db->fetch($avatar_result);
+        $result = $this->system->db->fetch($sidebar_result);
         if ($result) {
             return $result['sidebar_position'];
         }
         return "left";
+    }
+    public function getSidebarCollapse(): string
+    {
+        $sidebar_result = $this->system->db->query(
+            "SELECT `sidebar_collapse` FROM `user_settings` WHERE `user_id` = {$this->user_id}"
+        );
+        $result = $this->system->db->fetch($sidebar_result);
+        if ($result) {
+            return $result['sidebar_collapse'];
+        }
+        return "closed";
     }
     public function getEnableAlerts(): bool
     {

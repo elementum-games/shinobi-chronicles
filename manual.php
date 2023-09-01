@@ -64,6 +64,7 @@ $layout->renderBeforeContentHTML($system, $player ?? null, 'Manual');
 
       <div style="padding:7px 10px">
         <h1>Intro to Shinobi Chronicles</h1>
+        <h5>Note: Outdated, new Manual coming soon! - Arthesia 8/25/23</h5>
         <h4>Shinobi Chronicles is a browser based MMORPG inspired by the popular anime/manga series, Naruto. Train your character through the village ranking system, climb to new heights whilst becoming a world renowned Ninja!</h4>
         <h4>Learn various jutsu, unlock your bloodline and partake in combat with warring or neutral villages to earn points and unlock boosts and rewards for your entire village and personal squads.</h4>
         <h4>Work your way up through the ninja ranks and claim the highest possible position, the Kage, or become an elite level ninja, feared across all villages.</h4>
@@ -72,7 +73,7 @@ $layout->renderBeforeContentHTML($system, $player ?? null, 'Manual');
 
       <div class="grid-container" style="border-top: 1px solid #aaa">
         <div class="item-1">
-          <h2>Index</h2>
+          <h2 style="color: black">Index</h2>
           <ol>
             <li><a href="#combat-section">Combat</a></li>
             <li><a href="#training-section">Training</a></li>
@@ -82,7 +83,7 @@ $layout->renderBeforeContentHTML($system, $player ?? null, 'Manual');
           </ol>
         </div>
         <div class="item-1">
-          <h2>Contributions</h2>
+            <h2 style="color: black">Contributions</h2>
 
           To submit changes to this manual (you may need a GitHub account):
           <ol>
@@ -93,7 +94,7 @@ $layout->renderBeforeContentHTML($system, $player ?? null, 'Manual');
             <li>Click "Create Pull Request"</li>
           </ol>
 
-          <h3>Authors</h3>
+            <h3 style="color: black">Authors</h3>
           <ul>
             <li><a href="https://shinobichronicles.com/?id=6&user=Gojo">Gojo</a></li>
             <li><a href="https://shinobichronicles.com/?id=6&user=Stain">Stain</a></li>
@@ -106,7 +107,7 @@ $layout->renderBeforeContentHTML($system, $player ?? null, 'Manual');
       <!--COMBAT SECTION-->
       <div id="combat-section" class="section-container">
         <a href="#combat-section">
-          <h2>Combat</h2>
+            <h2 style="color: black">Combat</h2>
         </a>
         <p>
           Combat works as a turn based battle system, explore different uses of effects such as nerfs, boosts, drains, and many more to ensure and strategize the best possible outcome that may lead to your victory in battle
@@ -188,7 +189,7 @@ $layout->renderBeforeContentHTML($system, $player ?? null, 'Manual');
       <!--TRAINING SECTION-->
       <div id="training-section" class="section-container">
         <a href="#training-section">
-          <h2>Training</h2>
+            <h2 style="color: black">Training</h2>
         </a>
         <p>
           Your main source of gaining stats will be through a timed training system.
@@ -211,7 +212,7 @@ $layout->renderBeforeContentHTML($system, $player ?? null, 'Manual');
       <!--RANKS AND STAT CAPS-->
       <div id="rank-section" class="section-container">
         <a href="#rank-section">
-          <h2>Ranks &amp; Stat caps</h2>
+            <h2 style="color: black">Ranks &amp; Stat caps</h2>
         </a>
         <table class="table">
           <tbody>
@@ -248,9 +249,10 @@ $layout->renderBeforeContentHTML($system, $player ?? null, 'Manual');
       <!--BLOODLINE SECTION-->
       <div id="bloodline-section" class="section-container">
         <a href="#bloodline-section">
-          <h2>Bloodline</h2>
+            <h2 style="color: black">Bloodline</h2>
         </a>
         <div>Bloodlines are items that you receive or buy with <b>Ancient Kunai</b> which has specific boosts/resists and jutsus.</div>
+          <i>Note - a method for earning bloodlines is coming soon! - Arthesia 8/25/2023</i>
         <div><b>Legendary</b> - 5% chance</div>
         <div><b>Elite</b> - 10% chance</div>
         <div><b>Common</b> - 15% chance</div>
@@ -264,24 +266,24 @@ $layout->renderBeforeContentHTML($system, $player ?? null, 'Manual');
         <div><b>Lesser</b> - 20 AK</div>
 
         <br />
-
-        <?php include('templates/bloodlineList.php') ?>
+        <a href="<?=$system->router->getUrl('premium', ['view' => 'bloodlines'])?>">View Bloodlines</a>
+      <!--<?php include('templates/bloodlineList.php') ?>-->
       </div>
 
 
       <!--CURRENCIES-->
       <div id="currency-section" class="section-container">
         <a href="#curreny-section">
-          <h2>Currencies</h2>
+            <h2 style="color: black">Currencies</h2>
         </a>
         <p>Yen is the primary currency for Shinobi Chronicles, use Yen to purchase the jutsus of your offense type in the shop, gear to help you in battle, and healing items for after combat.</p>
         <p>You can earn Yen by fighting enemies in Arena, completing Missions and Special Missions or ask your friend to transfer you some!</p>
         <br />
-        <h3>Ancient Kunai</h3>
+          <h3 style="color: black">Ancient Kunai</h3>
         <p>It is a premium currency used for various changes toward your character</p>
         <p>Use <b>Ancient Kunai</b> to reset your character, change your username, transfer skill points into other stats, reset an individual stat, or to change your current clan</p>
         <br />
-        <h3>Auras</h3>
+          <h3 style="color: black">Auras</h3>
         <p>With the use of Ancient Kunai, you can imbue your character with a forbidden seal for enhanced benefits toward your character.</p>
 
       </div>
@@ -289,43 +291,52 @@ $layout->renderBeforeContentHTML($system, $player ?? null, 'Manual');
 
 
       <div>
-        <h3>
+        <h3 style="color: black">
           Twin Sparrow Seal
         </h3>
         <h4>
           5 Ancient Kunai / 30 days
         </h4>
-        <div>+10% regen rate</div>
-        <div>Blue/Pink username color in chat</div>
-        <div>Larger avatar (125x125 -> 175x175)</div>
-        <div>Longer logout timer (60 -> 90 minutes)</div>
-        <div>Larger inbox (50 -> 75 messages)</div>
-        <div>Longer journal (1000 -> 2000 characters)</div>
-        <div>Larger journal images (300x200 -> 500x500)</div>
-        <div>Longer chat posts (350 -> 450 characters)</div>
-        Longer PMs (1000 -> 1500 characters)rs)
+          <ul>
+              <li>+10% regen rate</li>
+              <li>Blue/Pink username color in chat</li>
+              <li>Additional avatar styles (new layout)</li>
+              <li>Larger avatar (125x125 -> 200x200)</li>
+              <li>Larger inbox (50 -> 75 messages)</li>
+              <li>Longer journal (1000 -> 2000 characters)</li>
+              <li>Larger journal images (300x200 -> 500x500)</li>
+              <li>Longer chat posts (350 -> 450 characters)</li>
+              <li>Longer PMs (1000 -> 1500 characters)</li>
+              <li>Cheaper stat transfers +50 stat points per AK</li>
+              <li>View logs of your last 10 battles</li>
+          </ul>
+
       </div>
 
       <br>
       <!--Unedited-->
 
-      <h3>
-        Four Dragon Seal
-      </h3>
+        <h3 style="color: black">
+            Four Dragon Seal
+        </h3>
       <h4>
         15 Ancient Kunai / 30 days
       </h4>
-      <ul>
-        <li>All benefits of Twin Sparrow Seal</li>
-        <li>+20% regen rate</li>
-        <li>+1 jutsu equip slot</li>
-        <li>+1 weapon equip slot</li>
-        <li>+1 armor equip slot</li>
-        <li>Enhanced long trainings (1.5x length, 2x gains)</li>
-        <li>Enhanced extended trainings (1.5x length, 2.25x gains)</li>
-        <li>Faster stat transfers (+5/minute)</li>
-        <li>Cheaper stat transfers +100 stat points per AK</li>
-      </ul>
+        <ul>
+            <li>All benefits of Twin Sparrow Seal</li>
+            <li>+20% regen rate</li>
+            <li>+1 jutsu equip slots</li>
+            <li>+1 weapon equip slots</li>
+            <li>+1 armor equip slots</li>
+            <li>Larger avatar filesize (2048 KB)</li>
+            <li>Longer journal (1000 -> 2500 characters)</li>
+            <li>Enhanced long trainings (1.5x length, 2x gains)</li>
+            <li>Enhanced extended trainings (1.5x length, 2x gains)</li>
+            <li>Faster stat transfers (+5/minute)</li>
+            <li>Cheaper stat transfers +100 stat points per AK</li>
+            <li>View logs of your last 20 battles</li>
+        </ul>
+
 
       <!--GOJO END MANUAL-->
 

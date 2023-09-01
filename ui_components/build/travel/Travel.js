@@ -26,7 +26,7 @@ import { ScoutArea } from "./ScoutArea.js";
     action_message:      string,
     invulnerable:        boolean,
     regions:             object,
-    region_locations:    object,
+    region_coords:       object,
     spar_link:           string,
     colosseum_coords:    object,
  * }} mapData
@@ -83,6 +83,8 @@ function Travel({
     3: false,
     4: false
   });
+  const [strategicView, setStrategicView] = React.useState(false);
+  const [displayGrid, setDisplayGrid] = React.useState(true);
   const refreshIntervalId = React.useRef(null);
   const movementDirection = React.useRef(null);
   const lastTravelStartTime = React.useRef(null);
@@ -105,6 +107,8 @@ function Travel({
         return;
       }
       setRanksToView(response.data.mapData.player_filters.travel_ranks_to_view);
+      setStrategicView(response.data.mapData.player_filters.strategic_view === "true");
+      setDisplayGrid(response.data.mapData.player_filters.display_grid === "true");
       setMapData(response.data.mapData);
       setScoutData(response.data.nearbyPlayers);
     });
@@ -127,6 +131,7 @@ function Travel({
         return;
       }
       if (response.data.success) {
+        //console.log("Response Time: " + response.data.time);
         debug(`Move completed ${requestEnd - lastTravelSuccessTime.current} ms after last move`);
         if (headerCoords.current !== null) {
           headerCoords.current.innerHTML = " (" + response.data.mapData.player_x + "." + response.data.mapData.player_y + ")";
@@ -231,6 +236,14 @@ function Travel({
     debug('traveling / +last start / +last success', timeSinceLastTravelStart, timeSinceLastTravelSuccess);
     MovePlayer(movementDirection.current);
   }
+  function updateStrategicView(value) {
+    setStrategicView(value);
+    UpdateFilter("strategic_view", value);
+  }
+  function updateDisplayGrid(value) {
+    setDisplayGrid(value);
+    UpdateFilter("display_grid", value);
+  }
 
   // Initial Load, fetch map info from user location
   React.useEffect(() => {
@@ -271,7 +284,11 @@ function Travel({
     updateRanksToView: newRanksToView => {
       let newRanksToViewCsv = Object.keys(newRanksToView).filter(rank => newRanksToView[rank]).join(',');
       UpdateFilter("travel_ranks_to_view", newRanksToViewCsv);
-    }
+    },
+    strategicView: strategicView,
+    updateStrategicView: updateStrategicView,
+    displayGrid: displayGrid,
+    updateDisplayGrid: updateDisplayGrid
   }), /*#__PURE__*/React.createElement("div", {
     className: "travel-wrapper"
   }, /*#__PURE__*/React.createElement(TravelActions, {
@@ -304,7 +321,9 @@ function Travel({
     mapData: mapData,
     scoutData: scoutData,
     playerId: playerId,
-    ranksToView: ranksToView
+    ranksToView: ranksToView,
+    strategicView: strategicView,
+    displayGrid: displayGrid
   }))), mapData && scoutData && /*#__PURE__*/React.createElement(ScoutArea, {
     mapData: mapData,
     scoutData: scoutData,
@@ -317,7 +336,11 @@ function Travel({
 }
 function TravelFilters({
   ranksToView,
-  updateRanksToView
+  updateRanksToView,
+  strategicView,
+  updateStrategicView,
+  displayGrid,
+  updateDisplayGrid
 }) {
   function updateRankVisibility(rank, newValue) {
     updateRanksToView({
@@ -351,7 +374,20 @@ function TravelFilters({
     type: "checkbox",
     checked: ranksToView[1],
     onChange: e => updateRankVisibility(1, e.target.checked)
-  }), /*#__PURE__*/React.createElement("label", null, "Akademi-sei")));
+  }), /*#__PURE__*/React.createElement("label", null, "Akademi-sei"), /*#__PURE__*/React.createElement("input", {
+    id: "travel-filter-as",
+    type: "checkbox",
+    checked: displayGrid,
+    onChange: e => updateDisplayGrid(e.target.checked),
+    style: {
+      marginLeft: "auto"
+    }
+  }), /*#__PURE__*/React.createElement("label", null, "Display Grid"), /*#__PURE__*/React.createElement("input", {
+    id: "travel-filter-as",
+    type: "checkbox",
+    checked: strategicView,
+    onChange: e => updateStrategicView(e.target.checked)
+  }), /*#__PURE__*/React.createElement("label", null, "Strategic View")));
 }
 function TravelActions({
   travelPageLink,
@@ -508,9 +544,7 @@ function TravelActions({
     onPointerUp: handlePointerUp,
     onPointerLeave: handlePointerUp,
     onContextMenu: e => {
-      if (e.nativeEvent.pointerType === "touch") {
-        e.preventDefault();
-      }
+      e.preventDefault();
     },
     onClick: e => {
       e.preventDefault();

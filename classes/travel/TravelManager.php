@@ -19,6 +19,8 @@ class TravelManager {
 
     public array $map_data;
 
+    const DISPLAY_RADIUS = 15;
+
     /**
      * @var TravelCoords[]
      */
@@ -34,7 +36,9 @@ class TravelManager {
 
     public static function locationIsInVillage(System $system, TravelCoords $location): bool {
         $result = $system->db->query(
-            "SELECT COUNT(*) as `count` FROM `villages` WHERE `location`='{$location->fetchString()}' LIMIT 1"
+            "SELECT COUNT(*) as `count` FROM `villages`
+            INNER JOIN `maps_locations` ON `maps_locations`.`location_id` = `villages`.`map_location_id`
+            WHERE `x`='{$location->x}' AND `y`='{$location->y}' AND `map_id`='{$location->map_id}' LIMIT 1"
         );
         $count = (int)$system->db->fetch($result)['count'];
 
@@ -53,6 +57,14 @@ class TravelManager {
                     $this->user->filters['travel_ranks_to_view'][$i] = in_array($i, $filter_value_arr);
                 }
 
+                $this->user->updateData();
+                return true;
+            case 'strategic_view':
+                $this->user->filters['strategic_view'] = $filter_value;
+                $this->user->updateData();
+                return true;
+            case 'display_grid':
+                $this->user->filters['display_grid'] = $filter_value;
                 $this->user->updateData();
                 return true;
             default;
@@ -357,12 +369,37 @@ class TravelManager {
                     map_id: $abyss_shop->map_id
                 ));
 
-                if($distance <= 2) {
+                if($distance <= 3) {
                     $locations[] = $abyss_shop;
                 }
             }
+            else if ($loc['name'] == "Unknown") {
+                $unknown = new MapLocation($loc);
+                $distance = $this->user->location->distanceDifference(
+                    new TravelCoords(
+                        x: $unknown->x,
+                        y: $unknown->y,
+                        map_id: $unknown->map_id
+                    )
+                );
+
+                if ($distance <= 1) {
+                    $locations[] = $unknown;
+                }
+            }
             else {
-                $locations[] = new MapLocation($loc);
+                $new_location = new MapLocation($loc);
+                $new_location->objective_type = "key_location";
+                $distance = $this->user->location->distanceDifference(
+                    new TravelCoords(
+                        x: $new_location->x,
+                        y: $new_location->y,
+                        map_id: $new_location->map_id
+                    )
+                );
+                if ($distance <= self::DISPLAY_RADIUS) {
+                    $locations[] = $new_location;
+                }
             }
         }
 
@@ -483,6 +520,83 @@ class TravelManager {
             }
         }
 
+        // Get Region Objectives
+        $region_result = $this->system->db->query("SELECT `region_locations`.`region_id`, `region_locations`.`name`, `health`, `max_health`, `type`, `x`, `y`, `resource`, `village`, `villages`.`name` as `village_name` FROM `region_locations`
+            INNER JOIN `regions` ON `regions`.`region_id` = `region_locations`.`region_id`
+            INNER JOIN `villages` ON `regions`.`village` = `villages`.`village_id`");
+        $region_objectives = $this->system->db->fetch_all($region_result);
+        foreach($region_objectives as $obj) {
+            $distance = $this->user->location->distanceDifference(
+                new TravelCoords(
+                    x: $obj['x'],
+                    y: $obj['y'],
+                    map_id: 1,
+                )
+            );
+            if ($distance <= self::DISPLAY_RADIUS) {
+                switch ($obj['type']) {
+                    case "castle":
+                        $image = "/images/map/icons/castle.png";
+                        $objectives[] = new MapObjectiveLocation(
+                            name: $obj['name'],
+                            map_id: 1,
+                            x: $obj['x'],
+                            y: $obj['y'],
+                            objective_health: $obj['health'],
+                            objective_max_health: $obj['max_health'],
+                            objective_type: $obj['type'],
+                            image: $image,
+                        );
+                        break;
+                    case "tower":
+                        break;
+                        $image = "/images/map/icons/tower.png";
+                        $objectives[] = new MapObjectiveLocation(
+                            name: $obj['name'],
+                            map_id: 1,
+                            x: $obj['x'],
+                            y: $obj['y'],
+                            objective_health: $obj['health'],
+                            objective_max_health: $obj['max_health'],
+                            objective_type: $obj['type'],
+                            image: $image,
+                        );
+                    case "village":
+                        //if ($distance <= $this->user->scout_range || $obj['village_name'] == $this->user->village->name) {
+                        if (true) {
+                            $image = "/images/map/icons/village.png";
+                            if (isset($this->user->filters['strategic_view']) && $this->user->filters['strategic_view'] == "true" && isset($obj['resource'])) {
+                                switch ($obj['resource']) {
+                                    case null:
+                                        break;
+                                    case "food":
+                                        $image = "/images/map/icons/food.png";
+                                        break;
+                                    case "materials":
+                                        $image = "/images/map/icons/materials.png";
+                                        break;
+                                    case "wealth":
+                                        $image = "/images/map/icons/wealth.png";
+                                        break;
+                                }
+                            }
+                            $obj['health'] = null;
+                            $obj['max_health'] = null;
+                            $objectives[] = new MapObjectiveLocation(
+                                name: $obj['name'],
+                                map_id: 1,
+                                x: $obj['x'],
+                                y: $obj['y'],
+                                objective_health: $obj['health'],
+                                objective_max_health: $obj['max_health'],
+                                objective_type: $obj['type'],
+                                image: $image,
+                            );
+                        }
+                        break;
+                }
+            }
+        }
 
         // Check if objectives match existing locations
         $new_locations = [];
@@ -497,6 +611,8 @@ class TravelManager {
                     $loc->name = $loc->name . "\n " . $obj->name;
                     $loc->action_url = $obj->action_url;
                     $loc->action_message = $obj->action_message;
+                    $loc->objective_health = $obj->objective_health;
+                    $loc->objective_max_health = $obj->objective_max_health;
                     $match = true;
                 }
             }
@@ -516,6 +632,9 @@ class TravelManager {
                         "regen" => 50,
                         "action_url" => $obj->action_url,
                         "action_message" => $obj->action_message,
+                        "objective_health" => $obj->objective_health,
+                        "objective_max_health" => $obj->objective_max_health,
+                        "objective_type" => $obj->objective_type,
                     );
                 $new_locations[] = new MapLocation($location_data);
                 $new_location_count++;
@@ -618,9 +737,12 @@ class TravelManager {
     public static function fetchVillageLocationsByCoordsStr(System $system): array {
         $village_locations = [];
 
-        $result = $system->db->query("SELECT `name`, `location` FROM `villages`");
+        $result = $system->db->query("SELECT `villages`.`name`, `x`, `y`, `map_id` FROM `villages`
+            INNER JOIN `maps_locations` on `villages`.`map_location_id` = `maps_locations`.`location_id`
+        ");
         while($row = $system->db->fetch($result)) {
-            $village_locations[$row['location']] = $row['name'];
+            $village_coords = new TravelCoords($row['x'], $row['y'], $row['map_id']);
+            $village_locations[$village_coords->fetchString()] = $row['name'];
         }
 
         return $village_locations;
@@ -637,6 +759,57 @@ class TravelManager {
             }
         }
         return new MapLocationAction();
+    }
+
+    /**
+     * @return Region[]
+     */
+    public function getRegions(User $player): array {
+        // generate vertices for player view area
+        $player_area = [
+            [$player->location->x - self::DISPLAY_RADIUS, $player->location->y - self::DISPLAY_RADIUS], // top left bound
+            [$player->location->x + self::DISPLAY_RADIUS, $player->location->y - self::DISPLAY_RADIUS], // top right bound
+            [$player->location->x + self::DISPLAY_RADIUS, $player->location->y + self::DISPLAY_RADIUS], // bottom right bound
+            [$player->location->x - self::DISPLAY_RADIUS, $player->location->y + self::DISPLAY_RADIUS], // bottom left bound
+        ];
+
+        $result = $this->system->db->query("SELECT * FROM `regions`");
+
+        $regions = [];
+        foreach ($this->system->db->fetch_all($result) as $region) {
+            $in_view_area = false;
+            $region_vertices = json_decode($region['vertices']);
+            // if a region vertex is in the view area add to list
+            foreach ($region_vertices as $vertex) {
+                $coord = new RegionCoords($vertex[0], $vertex[1], 1);
+                if (Region::coordInRegion($coord, $player_area)) {
+                    $in_view_area = true;
+                }
+            }
+            if ($in_view_area) {
+                $regions[] = Region::fromDb($region, $player->location->x - self::DISPLAY_RADIUS, $player->location->y - self::DISPLAY_RADIUS, $player->location->x + self::DISPLAY_RADIUS, $player->location->y + self::DISPLAY_RADIUS);
+            }
+        }
+
+        return $regions;
+    }
+
+    /**
+     * @return array
+     */
+    public function getCoordsByRegion($regions): array
+    {
+        $locations = [];
+        foreach ($regions as $region) {
+            if (isset($region->coordinates) && is_array($region->coordinates)) {
+                foreach ($region->coordinates as $x => $innerArray) {
+                    foreach ($innerArray as $y => $value) {
+                        $locations[$x][$y] = $value;
+                    }
+                }
+            }
+        }
+        return $locations;
     }
 
     /**

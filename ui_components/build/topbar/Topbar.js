@@ -56,30 +56,18 @@ function Topbar({
     }
   }
   function createNotification(message) {
-    if (!window.Notification) {
-      console.log('Browser does not support notifications.');
+    // Check for Notification API support
+    if ("Notification" in window) {
+      // Request permission if needed, then show notification
+      Notification.requestPermission().then(permission => {
+        if (permission === "granted") {
+          new Notification("Shinobi Chronicles", {
+            body: message
+          });
+        }
+      }).catch(err => console.error(err));
     } else {
-      // check if permission is already granted
-      if (Notification.permission === 'granted') {
-        // show notification here
-        var notify = new Notification('Shinobi Chronicles', {
-          body: message
-        });
-      } else {
-        // request permission from user
-        Notification.requestPermission().then(function (p) {
-          if (p === 'granted') {
-            // show notification here
-            var notify = new Notification('Shinobi Chronicles', {
-              body: message
-            });
-          } else {
-            console.log('User blocked notifications.');
-          }
-        }).catch(function (err) {
-          console.error(err);
-        });
-      }
+      console.log("Browser does not support notifications.");
     }
   }
 
