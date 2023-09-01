@@ -33,9 +33,6 @@
     
     const trainingContainer = document.querySelector("#trainingReactContainer");
 
-    /* TODO: Check the Bool T/F cases in all */
-    /* TODO: Check if Arrays of valid training Skill/Attribute/Jutsu Types don't trigger errors if json_encode return an empty */
-    /* TODO: Have to test for a few different null cases for example if user doesn't have bloodline then it'll cause a fatal error for new users without bl, etc */
 
     window.addEventListener('load', () => {
         ReactDOM.render(
@@ -43,12 +40,12 @@
                 playerData: {
                     hasPartialGainsBenefits: <?= $player->reputation->benefits[UserReputation::BENEFIT_PARTIAL_TRAINING_GAINS] ?: "false" ?>, /*bool*/
                     trainGains: <?= $player->trainingManager->train_gain ?>,
-                    partialGain: <?= (!isset($partial_gain)) ? 0 : $partial_gain ?> /*Is this a string or an int?*/,
+                    partialGain: <?= (!isset($partial_gain)) ? 0 : $partial_gain ?>,
                     hasActiveTraining: <?= $player->trainingManager->hasActiveTraining() ?: "false" ?>,
                     bloodlineID: <?= $player->bloodline_id ?: "0" ?> ,
                     hasTrainableBLJutsu: <?= $trainable_bl_jutsu ?: "false" ?>,
-                    hasTeam: <?= $player->team ?: "false" ?>,
-                    hasTeamBoostTraining: <?= (!is_null($player->team) && $player->team->boost  == Team::BOOST_TRAINING) ? "true" : "false" ?>,
+                    hasTeam: <?= isset($player->team) ?: "false" ?>,
+                    hasTeamBoostTraining: <?= (isset($player->team) && $player->team->boost  == Team::BOOST_TRAINING) ? "true" : "false" ?>,
                     validSkillsArray: <?= json_encode($valid_skills) ?>,
                     validAttributesArray: <?= json_encode($valid_attributes) ?>,
                     allPlayerBloodlineJutsu: <?= (is_null($player->bloodline)) ? '[]' : json_encode($player->bloodline->jutsu) ?>,
