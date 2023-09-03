@@ -16,6 +16,8 @@ require_once __DIR__ . "/achievements/AchievementsManager.php";
 require_once __DIR__ . "/UserReputation.php";
 require_once __DIR__ . "/training/TrainingManager.php";
 require_once __DIR__ . "/event/LanternEvent.php";
+require_once __DIR__ . "/Bloodline.php";
+require_once __DIR__ . "/travel/TravelManager.php";
 
 /*	Class:		User
 	Purpose:	Fetch user data and load into class variables.
@@ -662,7 +664,7 @@ class User extends Fighter {
         $this->clan_changes = $user_data['clan_changes'];
 
         // Village
-        $this->village_location = Village::getLocation($this->system, $this->village->name);
+        $this->village_location = Village::getLocation($this->system, $this->village->village_id);
         /** @noinspection PhpConditionAlreadyCheckedInspection */
         $this->in_village = $this->village_location !== null && $this->location->equals($this->village_location);
 
