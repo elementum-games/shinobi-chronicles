@@ -23,7 +23,12 @@ const RadarNinjaChart = ({
     const taijutsu = playerStats.taijutsuSkill;
     // const willpower = playerStats.willpower;
 
-    const playerData = [genjutsu, taijutsu, speed, bloodline, castSpeed, ninjutsu];
+    let playerData = [genjutsu, taijutsu, speed, bloodline, ninjutsu, castSpeed];
+    let skill_labels = ['Genjutsu', 'Taijutsu', 'Speed', 'Bloodline', 'Ninjutsu', 'Cast Speed'];
+    if (bloodline <= 0) {
+      playerData = [genjutsu, taijutsu, speed, ninjutsu, castSpeed];
+      skill_labels = ['Genjutsu', 'Taijutsu', 'Speed', 'Ninjutsu', 'Cast Speed'];
+    }
     const skillValues = Object.values(playerData);
     const minValue = Math.min(...skillValues);
     const maxValue = Math.max(...skillValues);
@@ -39,7 +44,7 @@ const RadarNinjaChart = ({
     const myChart = new Chart(context, {
       type: 'radar',
       data: {
-        labels: ['Genjutsu', 'Taijutsu', 'Speed', 'Bloodline', 'Cast Speed', 'Ninjutsu'],
+        labels: skill_labels,
         datasets: [{
           data: normalizedStatsArray,
           backgroundColor: 'rgba(180, 200, 230, 0.4)',
