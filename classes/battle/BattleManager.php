@@ -9,8 +9,8 @@ require_once __DIR__ . '/BattleAttack.php';
 require_once __DIR__ . '/LegacyFighterAction.php';
 
 class BattleManager {
-    const SPEED_DAMAGE_REDUCTION_RATIO = 0.4;
-    const CAST_SPEED_DAMAGE_REDUCTION_RATIO = 0.4;
+    const SPEED_DAMAGE_REDUCTION_RATIO = 0.47;
+    const CAST_SPEED_DAMAGE_REDUCTION_RATIO = 0.47;
     const MAX_EVASION_DAMAGE_REDUCTION = 0.35;
 
     private System $system;
