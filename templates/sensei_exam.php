@@ -56,7 +56,7 @@
                 <p class="question_label">How much speed is required to reach maximum evasion (35%)?</p>
                 <div><input type="radio" name="question4" value="4a" checked/> <label>+50%</label></div>
                 <div><input type="radio" name="question4" value="4b" /> <label>+66.6%</label></div>
-                <div><input type="radio" name="question4" value="4c" /> <label>+87.5%</label></div>
+                <div><input type="radio" name="question4" value="4c" /> <label>+75%</label></div>
                 <div><input type="radio" name="question4" value="4d" /> <label>+100%</label></div>
                 <p class="question_label">Which of the following jutsu has the greatest total power?</p>
                 <div><input type="radio" name="question5" value="5a" checked/> <label>3.5 Base Power, lv100 - Shop Jutsu</label></div>
