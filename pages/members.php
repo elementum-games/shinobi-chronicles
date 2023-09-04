@@ -198,6 +198,7 @@ function members(): void {
 
 	if($display_list == 'standard') {
 		$online_seconds = 900; // 15 mins
+        $daily_seconds = 86400;
         $results_per_page = 15;
 
 		$query_custom = '';
@@ -226,7 +227,6 @@ function members(): void {
 		}
 		else if(isset($_GET['view']) && $_GET['view'] == 'online_users') {
 			$query_custom = "WHERE `last_active` > UNIX_TIMESTAMP() - $online_seconds ORDER BY `level` DESC";
-
 			$view = 'online_users';
             $results_per_page = 20;
 		}
@@ -261,7 +261,9 @@ function members(): void {
                     "SELECT COUNT(`user_id`) as `online_users` FROM `users` WHERE `last_active` > UNIX_TIMESTAMP() - $online_seconds"
                 );
                 $online_users = $system->db->fetch($online_users_result)['online_users'];
-                $list_name = 'Online Users (' . $online_users . ' currently online)';
+                $daily_users_result = $system->db->query("SELECT COUNT(`user_id`) as `daily_users` FROM `users` WHERE `last_active` > UNIX_TIMESTAMP() - $daily_seconds");
+                $daily_users = $system->db->fetch($daily_users_result)['daily_users'];
+                $list_name = 'Online Users (' . $online_users . ' online, ' . $daily_users . ' daily)';
 				break;
             case "highest_pvp":
                 $table_header = 'Pvp Kills';
