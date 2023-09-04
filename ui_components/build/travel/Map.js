@@ -1,6 +1,7 @@
 export const Map = ({
   mapData,
   scoutData,
+  patrolData,
   playerId,
   ranksToView,
   strategicView,
@@ -37,8 +38,8 @@ export const Map = ({
        How do we calculate the starting coordinate in this example? We need to offset the first visible tile by +2 which
      is equal to player X - stage midpoint X.
    */
-  const stage_offset_x = player_x - stage_midpoint_x;
-  const stage_offset_y = player_y - stage_midpoint_y;
+  const stage_offset_x = player_x - stage_midpoint_x - 1;
+  const stage_offset_y = player_y - stage_midpoint_y - 1;
 
   /* Start player at midpoint. Offset is the desired tile number minus 1 so player sits inside the desired tile rather
    than to the right/bottom of it. For example if you want to show the player in visible tile 1, you don't want to
@@ -114,8 +115,22 @@ export const Map = ({
     locations: mapData.all_locations || [],
     tileWidth: tile_width,
     tileHeight: tile_height
+  }), /*#__PURE__*/React.createElement(MapObjectives, {
+    objectives: mapData.map_objectives || [],
+    tileWidth: tile_width,
+    tileHeight: tile_height
+  }), /*#__PURE__*/React.createElement(RegionObjectives, {
+    objectives: mapData.region_objectives || [],
+    tileWidth: tile_width,
+    tileHeight: tile_height
   }), /*#__PURE__*/React.createElement(MapNearbyPlayers, {
     scoutData: scoutData || [],
+    tileWidth: tile_width,
+    tileHeight: tile_height,
+    playerId: playerId,
+    ranksToView: ranksToView
+  }), /*#__PURE__*/React.createElement(MapNearbyPatrols, {
+    patrolData: patrolData || [],
     tileWidth: tile_width,
     tileHeight: tile_height,
     playerId: playerId,
@@ -203,7 +218,7 @@ function MapLocations({
       filter: "blur(0)"
     }
   }, /*#__PURE__*/React.createElement("div", {
-    className: "map_locations_tooltip"
+    className: "map_location_tooltip"
   }, location.name), location.objective_image && /*#__PURE__*/React.createElement("div", {
     className: location.objective_type != undefined ? 'map_location_objective ' + location.objective_type : 'map_location_objective',
     style: {
@@ -235,6 +250,78 @@ function MapLocations({
     });
   })())));
 }
+function MapObjectives({
+  objectives,
+  tileWidth,
+  tileHeight
+}) {
+  return /*#__PURE__*/React.createElement("div", {
+    className: "map_objectives"
+  }, objectives.map(objective => /*#__PURE__*/React.createElement("div", {
+    key: objective.id,
+    className: objective.objective_type != undefined ? 'map_objective ' + objective.objective_type : 'map_objective',
+    style: {
+      cursor: "pointer",
+      backgroundColor: "#" + objective.background_color,
+      backgroundImage: objective.image ? `url(${objective.image})` : null,
+      transform: `translate3d(${(objective.x - 1) * tileWidth}px, ${(objective.y - 1) * tileHeight}px, 0)`,
+      backfaceVisibility: "hidden",
+      filter: "blur(0)"
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "map_objective_tooltip"
+  }, objective.name))));
+}
+function RegionObjectives({
+  objectives,
+  tileWidth,
+  tileHeight
+}) {
+  return /*#__PURE__*/React.createElement("div", {
+    className: "region_objectives"
+  }, /*#__PURE__*/React.createElement(ReactTransitionGroup.TransitionGroup, null, objectives.map(objective => /*#__PURE__*/React.createElement(ReactTransitionGroup.CSSTransition, {
+    key: objective.id,
+    timeout: 500 // Set the animation duration in milliseconds
+    ,
+    classNames: "fade"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: objective.objective_type != undefined ? 'region_objective ' + objective.objective_type : 'region_objective',
+    style: {
+      cursor: "pointer",
+      backgroundColor: "#" + objective.background_color,
+      backgroundImage: objective.image ? `url(${objective.image})` : null,
+      transform: `translate3d(${(objective.x - 1) * tileWidth}px, ${(objective.y - 1) * tileHeight}px, 0)`,
+      backfaceVisibility: "hidden",
+      filter: "blur(0)"
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "region_objective_tooltip"
+  }, objective.name), objective.objective_health && objective.objective_max_health > 0 && (() => {
+    const percentage = objective.objective_health / objective.objective_max_health * 100;
+    let barColor;
+    if (percentage >= 50) {
+      barColor = 'green';
+    } else if (percentage >= 25) {
+      barColor = 'yellow';
+    } else {
+      barColor = 'red';
+    }
+    return /*#__PURE__*/React.createElement("div", {
+      className: "region_objective_health",
+      style: {
+        backgroundColor: barColor,
+        width: `${percentage}%`,
+        height: '6px',
+        position: 'absolute',
+        color: 'white',
+        textAlign: 'center',
+        lineHeight: '8px',
+        fontSize: '8px',
+        top: '3px'
+      }
+    });
+  })())))));
+}
 function MapNearbyPlayers({
   scoutData,
   tileWidth,
@@ -247,7 +334,7 @@ function MapNearbyPlayers({
     className: "map_locations"
   }, scoutData.filter(user => ranksToView[parseInt(user.rank_num)] === true).map((player, index) => player.user_id != playerId && /*#__PURE__*/React.createElement("div", {
     key: player.user_id,
-    className: alignmentClass(player.alignment) + " " + visibilityClass(player.invulnerable),
+    className: alignmentClassPlayer(player.alignment, player.village_id) + " " + visibilityClass(player.invulnerable),
     style: {
       cursor: "pointer",
       transform: `translate3d(${(player.target_x - 1) * tileWidth}px, ${(player.target_y - 1) * tileHeight}px, 0)`,
@@ -255,8 +342,31 @@ function MapNearbyPlayers({
       filter: "blur(0)"
     }
   }, /*#__PURE__*/React.createElement("div", {
-    className: "map_locations_tooltip"
+    className: "map_location_tooltip"
   }, player.user_name))));
+}
+function MapNearbyPatrols({
+  patrolData,
+  tileWidth,
+  tileHeight,
+  playerId,
+  ranksToView
+}) {
+  return /*#__PURE__*/React.createElement("div", {
+    id: "patrol_locations",
+    className: "map_locations"
+  }, patrolData.map((patrol, index) => /*#__PURE__*/React.createElement("div", {
+    key: patrol.patrol_id + '_' + patrol.patrol_type,
+    className: alignmentClassPatrol(patrol.alignment, patrol.village_id) + ' ' + patrol.patrol_type,
+    style: {
+      cursor: "pointer",
+      transform: `translate3d(${(patrol.target_x - 1) * tileWidth}px, ${(patrol.target_y - 1) * tileHeight}px, 0)`,
+      backfaceVisibility: "hidden",
+      filter: "blur(0)"
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "map_location_tooltip"
+  }, patrol.patrol_name))));
 }
 const visibilityClass = invulnerable => {
   if (invulnerable) {
@@ -264,7 +374,7 @@ const visibilityClass = invulnerable => {
   }
   return ' ';
 };
-const alignmentClass = alignment => {
+const alignmentClassPlayer = (alignment, village_id) => {
   let class_name = 'map_location';
   switch (alignment) {
     case 'Ally':
@@ -275,6 +385,55 @@ const alignmentClass = alignment => {
       break;
     case 'Neutral':
       class_name += ' player_neutral';
+      break;
+  }
+  switch (village_id) {
+    case 1:
+      class_name += ' player_stone';
+      break;
+    case 2:
+      class_name += ' player_cloud';
+      break;
+    case 3:
+      class_name += ' player_leaf';
+      break;
+    case 4:
+      class_name += ' player_sand';
+      break;
+    case 5:
+      class_name += ' player_mist';
+      break;
+  }
+  return class_name;
+};
+const alignmentClassPatrol = (alignment, village_id) => {
+  let class_name = 'map_location';
+  switch (alignment) {
+    case 'Ally':
+      class_name += ' patrol_ally';
+      break;
+    case 'Enemy':
+      class_name += ' patrol_enemy';
+      break;
+    case 'Neutral':
+      class_name += ' patrol_neutral';
+      break;
+  }
+  switch (village_id) {
+    case 1:
+      class_name += ' patrol_stone';
+      break;
+    case 2:
+      class_name += ' patrol_cloud';
+      break;
+    case 3:
+      class_name += ' patrol_leaf';
+      break;
+    case 4:
+      class_name += ' patrol_sand';
+      break;
+    case 5:
+      class_name += ' patrol_mist';
       break;
   }
   return class_name;

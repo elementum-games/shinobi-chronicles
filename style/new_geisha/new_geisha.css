@@ -48,6 +48,8 @@
     --font-color-5: #a3a3c5;
     --font-color-6: #a59e8d;
     --font-color-7: #948768;
+    --font-link: #9e97ba;
+    --font-link-hover: #bdb3e3;
     --font-min: 12px;
     --font-small: 13px;
     --font-default: 14px;
@@ -75,7 +77,7 @@
     --hotbar-keybind-modal-width: 700px;
     --hotbar-keybind-modal-height: 400px;
     /* Sidebar Config */
-    --sidebar-header-background-color: #8c7b58;
+    --sidebar-header-background: #8c7b58;
     --sidebar-header-height: 23px;
     --sidebar-button-background-color: #1a191d;
     --sidebar-button-background-hover: linear-gradient(to bottom, #262631 50%, #22222a 50%);
@@ -173,7 +175,7 @@
 
 body {
     background-color: var(--main-background-color);
-    background-image: linear-gradient(to right, var(--main-background-color) 0%, transparent 17%, transparent 83%, var(--main-background-color) 100%), url(../../images/v2/decorations/Banner1.jpg);
+    background-image: linear-gradient(to right, var(--main-background-color) 0%, transparent 17%, transparent 83%, var(--main-background-color) 100%), url(../../images/v2/new_geisha/background_ng_1.jpg);
     background-repeat: no-repeat;
     background-attachment: fixed;
     background-size: cover;

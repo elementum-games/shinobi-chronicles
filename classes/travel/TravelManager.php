@@ -1,7 +1,8 @@
 <?php
 
 require __DIR__ . '/NearbyPlayerDto.php';
-require __DIR__ . '/MapObjectiveLocation.php';
+require __DIR__ . '/MapObjective.php';
+require __DIR__ . '/RegionObjective.php';
 require __DIR__ . '/MapLocationAction.php';
 require __DIR__ . '/InvalidMovementException.php';
 
@@ -19,7 +20,7 @@ class TravelManager {
 
     public array $map_data;
 
-    const DISPLAY_RADIUS = 15;
+    const DISPLAY_RADIUS = 12;
 
     /**
      * @var TravelCoords[]
@@ -208,10 +209,12 @@ class TravelManager {
      */
     public function fetchNearbyPlayers(): array {
         $sql = "SELECT `users`.`user_id`, `users`.`user_name`, `users`.`village`, `users`.`rank`, `users`.`stealth`,
-                `users`.`level`, `users`.`attack_id`, `users`.`battle_id`, `ranks`.`name` as `rank_name`, `users`.`location`, `users`.`last_death_ms`
+                `users`.`level`, `users`.`attack_id`, `users`.`battle_id`, `ranks`.`name` as `rank_name`, `users`.`location`, `users`.`last_death_ms`, `villages`.`village_id`
                 FROM `users`
                 INNER JOIN `ranks`
                 ON `users`.`rank`=`ranks`.`rank_id`
+                INNER JOIN `villages`
+                ON `users`.`village` = `villages`.`name`
                 WHERE `users`.`last_active` > UNIX_TIMESTAMP() - 120
                 ORDER BY `users`.`exp` DESC, `users`.`user_name` DESC";
         $result = $this->system->db->query($sql);
@@ -276,6 +279,7 @@ class TravelManager {
                 direction: $user_direction,
                 invulnerable: $invulnerable,
                 distance: $distance,
+                village_id: $user['village_id'],
             );
         }
 
@@ -283,7 +287,7 @@ class TravelManager {
         if ($this->system->isDevEnvironment()) {
             $placeholder_coords = new TravelCoords(15, 15, 1);
 
-            for ($i = 0; $i < 7; $i++) {
+            for ($i = 0; $i < 2; $i++) {
                 $return_arr[] = new NearbyPlayerDto(
                     user_id: $i . mt_rand(10000, 20000),
                     user_name: 'Konohamaru',
@@ -300,6 +304,8 @@ class TravelManager {
                     battle_id: 0,
                     direction: $this->user->location->directionToTarget($placeholder_coords),
                     distance: $this->user->location->distanceDifference($placeholder_coords),
+                    invulnerable: false,
+                    village_id: 3,
                 );
             }
         }
@@ -403,246 +409,7 @@ class TravelManager {
             }
         }
 
-        // Get mission objectives
-        $objectives = [];
-        if ($this->user->mission_id > 0) {
-            if ($this->user->mission_stage['action_type'] == 'travel') {
-                $mission_result = $this->system->db->query("SELECT `name` FROM `missions` WHERE `mission_id` = '{$this->user->mission_id}' LIMIT 1");
-                $mission_location = TravelCoords::fromDbString($this->user->mission_stage['action_data']);
-                $objectives[] = new MapObjectiveLocation(
-                    name: $this->system->db->fetch($mission_result)['name'],
-                    map_id: $mission_location->map_id,
-                    x: $mission_location->x,
-                    y: $mission_location->y,
-                    image: "/images/v2/icons/anbutracking.png",
-                );
-            }
-            if ($this->user->mission_stage['action_type'] == 'search') {
-                $mission_result = $this->system->db->query("SELECT `name` FROM `missions` WHERE `mission_id` = '{$this->user->mission_id}' LIMIT 1");
-                $mission_location = TravelCoords::fromDbString($this->user->mission_stage['last_location']);
-                $objectives[] = new MapObjectiveLocation(
-                    name: $this->system->db->fetch($mission_result)['name'],
-                    map_id: $mission_location->map_id,
-                    x: $mission_location->x,
-                    y: $mission_location->y,
-                    image: "/images/v2/icons/magnifying-glass.png",
-                );
-            }
-        }
-
-        // TEMP Add Events - We have to hard code the mission IDs is System for now
-        if ($this->system->event != null) {
-            if ($this->system->event instanceof LanternEvent) {
-                foreach ($this->system->event->mission_coords['gold'] as $event_mission) {
-                    $objectives[] = new MapObjectiveLocation(
-                        name: "Treasure",
-                        map_id: 1,
-                        x: $event_mission['x'],
-                        y: $event_mission['y'],
-                        image: "/images/events/lanternyellow.png",
-                        action_url: $this->system->router->getUrl("mission", [
-                            'start_mission' => $this->system->event->mission_ids['gold_mission_id'],
-                            'mission_type' => 'event'
-                        ]),
-                        action_message: "Chase the Kotengu",
-                    );
-                }
-                foreach ($this->system->event->mission_coords['special'] as $event_mission) {
-                    $objectives[] = new MapObjectiveLocation(
-                        name: "Special",
-                        map_id: 1,
-                        x: $event_mission['x'],
-                        y: $event_mission['y'],
-                        image: "/images/events/cultsign.png",
-                        action_url: $this->system->router->getUrl("mission", [
-                            'start_mission' => $this->system->event->mission_ids['special_mission_id'],
-                            'mission_type' => 'event'
-                        ]),
-                        action_message: "Enter the Fray",
-                    );
-                }
-                foreach ($this->system->event->mission_coords['easy'] as $event_mission) {
-                    $objectives[] = new MapObjectiveLocation(
-                        name: "Easy",
-                        map_id: 1,
-                        x: $event_mission['x'],
-                        y: $event_mission['y'],
-                        image: "/images/events/lanternred.png",
-                        action_url: $this->system->router->getUrl("mission", [
-                            'start_mission' => $this->system->event->mission_ids['easy_mission_id'],
-                            'mission_type' => 'event'
-                        ]),
-                        action_message: "Begin Search",
-                    );
-                }
-                foreach ($this->system->event->mission_coords['medium'] as $event_mission) {
-                    $objectives[] = new MapObjectiveLocation(
-                        name: "Medium",
-                        map_id: 1,
-                        x: $event_mission['x'],
-                        y: $event_mission['y'],
-                        image: "/images/events/lanternblue.png",
-                        action_url: $this->system->router->getUrl("mission", [
-                            'start_mission' => $this->system->event->mission_ids['medium_mission_id'],
-                            'mission_type' => 'event'
-                        ]),
-                        action_message: "Follow Signs of battle",
-                    );
-                }
-                foreach ($this->system->event->mission_coords['hard'] as $event_mission) {
-                    $objectives[] = new MapObjectiveLocation(
-                        name: "Hard",
-                        map_id: 1,
-                        x: $event_mission['x'],
-                        y: $event_mission['y'],
-                        image: "/images/events/lanternviolet.png",
-                        action_url: $this->system->router->getUrl("mission", [
-                            'start_mission' => $this->system->event->mission_ids['hard_mission_id'],
-                            'mission_type' => 'event'
-                        ]),
-                        action_message: "Investigate Suspicious Markings",
-                    );
-                }
-                foreach ($this->system->event->mission_coords['nightmare'] as $event_mission) {
-                    $objectives[] = new MapObjectiveLocation(
-                        name: "Nightmare",
-                        map_id: 1,
-                        x: $event_mission['x'],
-                        y: $event_mission['y'],
-                        image: "/images/events/yokai_cropped.png",
-                        action_url: $this->system->router->getUrl("mission", [
-                            'start_mission' => $this->system->event->mission_ids['nightmare_mission_id'],
-                            'mission_type' => 'event'
-                        ]),
-                        action_message: "Stop the Ritual",
-                    );
-                }
-            }
-        }
-
-        // Get Region Objectives
-        $region_result = $this->system->db->query("SELECT `region_locations`.`region_id`, `region_locations`.`name`, `health`, `max_health`, `type`, `x`, `y`, `resource`, `village`, `villages`.`name` as `village_name` FROM `region_locations`
-            INNER JOIN `regions` ON `regions`.`region_id` = `region_locations`.`region_id`
-            INNER JOIN `villages` ON `regions`.`village` = `villages`.`village_id`");
-        $region_objectives = $this->system->db->fetch_all($region_result);
-        foreach($region_objectives as $obj) {
-            $distance = $this->user->location->distanceDifference(
-                new TravelCoords(
-                    x: $obj['x'],
-                    y: $obj['y'],
-                    map_id: 1,
-                )
-            );
-            if ($distance <= self::DISPLAY_RADIUS) {
-                switch ($obj['type']) {
-                    case "castle":
-                        $image = "/images/map/icons/castle.png";
-                        $objectives[] = new MapObjectiveLocation(
-                            name: $obj['name'],
-                            map_id: 1,
-                            x: $obj['x'],
-                            y: $obj['y'],
-                            objective_health: $obj['health'],
-                            objective_max_health: $obj['max_health'],
-                            objective_type: $obj['type'],
-                            image: $image,
-                        );
-                        break;
-                    case "tower":
-                        break;
-                        $image = "/images/map/icons/tower.png";
-                        $objectives[] = new MapObjectiveLocation(
-                            name: $obj['name'],
-                            map_id: 1,
-                            x: $obj['x'],
-                            y: $obj['y'],
-                            objective_health: $obj['health'],
-                            objective_max_health: $obj['max_health'],
-                            objective_type: $obj['type'],
-                            image: $image,
-                        );
-                    case "village":
-                        //if ($distance <= $this->user->scout_range || $obj['village_name'] == $this->user->village->name) {
-                        if (true) {
-                            $image = "/images/map/icons/village.png";
-                            if (isset($this->user->filters['strategic_view']) && $this->user->filters['strategic_view'] == "true" && isset($obj['resource'])) {
-                                switch ($obj['resource']) {
-                                    case null:
-                                        break;
-                                    case "food":
-                                        $image = "/images/map/icons/food.png";
-                                        break;
-                                    case "materials":
-                                        $image = "/images/map/icons/materials.png";
-                                        break;
-                                    case "wealth":
-                                        $image = "/images/map/icons/wealth.png";
-                                        break;
-                                }
-                            }
-                            $obj['health'] = null;
-                            $obj['max_health'] = null;
-                            $objectives[] = new MapObjectiveLocation(
-                                name: $obj['name'],
-                                map_id: 1,
-                                x: $obj['x'],
-                                y: $obj['y'],
-                                objective_health: $obj['health'],
-                                objective_max_health: $obj['max_health'],
-                                objective_type: $obj['type'],
-                                image: $image,
-                            );
-                        }
-                        break;
-                }
-            }
-        }
-
-        // Check if objectives match existing locations
-        $new_locations = [];
-        // Use this to assign unique ID for react key
-        $new_location_count = 1000;
-        foreach ($objectives as $obj) {
-            $match = false;
-            foreach ($locations as $loc) {
-                // If yes, pass data
-                if ($obj->x == $loc->x && $obj->y == $loc->y && $obj->map_id == $loc->map_id) {
-                    $loc->objective_image = $obj->image;
-                    $loc->name = $loc->name . "\n " . $obj->name;
-                    $loc->action_url = $obj->action_url;
-                    $loc->action_message = $obj->action_message;
-                    $loc->objective_health = $obj->objective_health;
-                    $loc->objective_max_health = $obj->objective_max_health;
-                    $match = true;
-                }
-            }
-            // If no, create location
-            if (!$match) {
-                $location_data = array(
-                        "location_id" => $new_location_count,
-                        "name" => $obj->name,
-                        "map_id" => $obj->map_id,
-                        "x" => $obj->x,
-                        "y" => $obj->y,
-                        "background_image" => "",
-                        "background_color" => "",
-                        "objective_image" => $obj->image,
-                        "pvp_allowed" => 1,
-                        "ai_allowed" => 1,
-                        "regen" => 50,
-                        "action_url" => $obj->action_url,
-                        "action_message" => $obj->action_message,
-                        "objective_health" => $obj->objective_health,
-                        "objective_max_health" => $obj->objective_max_health,
-                        "objective_type" => $obj->objective_type,
-                    );
-                $new_locations[] = new MapLocation($location_data);
-                $new_location_count++;
-            }
-        }
-
-        // Include new locations in return array
-        return array_merge($locations, $new_locations);
+        return $locations;
     }
 
     /**
@@ -819,5 +586,270 @@ class TravelManager {
         $result = $this->system->db->query("SELECT * FROM `maps_locations` WHERE `name` = 'Underground Colosseum'");
         $location_result = $this->system->db->fetch($result);
         return new TravelCoords($location_result['x'], $location_result['y'], 1);
+    }
+
+    /**
+     * @return NearbyPatrol[]
+     */
+    public function fetchNearbyPatrols(): array {
+        $return_arr = [];
+
+        $result = $this->system->db->query("SELECT * FROM `patrols`");
+        $result = $this->system->db->fetch_all($result);
+        foreach ($result as $row) {
+            $patrol = new NearbyPatrol($row, "patrol");
+            $patrol->setLocation($this->system);
+            if ($this->user->location->distanceDifference(new TravelCoords($patrol->current_x, $patrol->current_y, $patrol->map_id)) <= $this->user->scout_range) {
+                $return_arr[] = $patrol;
+            }
+        }
+        $result = $this->system->db->query("SELECT * FROM `caravans`");
+        $result = $this->system->db->fetch_all($result);
+        foreach ($result as $row) {
+            // if travel time is set then only display if active
+            if (!empty($row['travel_time'])) {
+                if ($row['travel_time'] + ($row['start_time'] * 1000) + NearbyPatrol::DESTINATION_BUFFER_MS > (time() * 1000)) {
+                    $patrol = new NearbyPatrol($row, "caravan");
+                    $patrol->setLocation($this->system);
+                    if ($this->user->location->distanceDifference(new TravelCoords($patrol->current_x, $patrol->current_y, $patrol->map_id)) <= $this->user->scout_range) {
+                        $return_arr[] = $patrol;
+                    }
+                }
+            } else {
+                $patrol = new NearbyPatrol($row, "caravan");
+                $patrol->setLocation($this->system);
+                if ($this->user->location->distanceDifference(new TravelCoords($patrol->current_x, $patrol->current_y, $patrol->map_id)) <= $this->user->scout_range) {
+                    $return_arr[] = $patrol;
+                }
+            }
+        }
+
+        return $return_arr;
+    }
+
+    /**
+     * @return MapObjective[]
+     */
+    public function fetchMapObjectives(): array
+    {
+        $objectives = [];
+
+        // Get mission objectives
+        if ($this->user->mission_id > 0) {
+            if ($this->user->mission_stage['action_type'] == 'travel') {
+                $mission_result = $this->system->db->query("SELECT `name` FROM `missions` WHERE `mission_id` = '{$this->user->mission_id}' LIMIT 1");
+                $mission_location = TravelCoords::fromDbString($this->user->mission_stage['action_data']);
+                $objectives[] = new MapObjective(
+                    id: null,
+                    name: $this->system->db->fetch($mission_result)['name'],
+                    map_id: $mission_location->map_id,
+                    x: $mission_location->x,
+                    y: $mission_location->y,
+                    image: "/images/v2/icons/reticle.png",
+                    objective_type: "target",
+                );
+            }
+            if ($this->user->mission_stage['action_type'] == 'search') {
+                $mission_result = $this->system->db->query("SELECT `name` FROM `missions` WHERE `mission_id` = '{$this->user->mission_id}' LIMIT 1");
+                $mission_location = TravelCoords::fromDbString($this->user->mission_stage['last_location']);
+                $objectives[] = new MapObjective(
+                    id: null,
+                    name: $this->system->db->fetch($mission_result)['name'],
+                    map_id: $mission_location->map_id,
+                    x: $mission_location->x,
+                    y: $mission_location->y,
+                    image: "/images/v2/icons/magnifying-glass.png",
+                );
+            }
+        }
+
+        // TEMP Add Events - We have to hard code the mission IDs is System for now
+        if ($this->system->event != null) {
+            if ($this->system->event instanceof LanternEvent) {
+                foreach ($this->system->event->mission_coords['gold'] as $event_mission) {
+                    $objectives[] = new MapObjective(
+                        id: null,
+                        name: "Treasure",
+                        map_id: 1,
+                        x: $event_mission['x'],
+                        y: $event_mission['y'],
+                        image: "/images/events/lanternyellow.png",
+                        action_url: $this->system->router->getUrl("mission", [
+                            'start_mission' => $this->system->event->mission_ids['gold_mission_id'],
+                            'mission_type' => 'event'
+                        ]),
+                        action_message: "Chase the Kotengu",
+                    );
+                }
+                foreach ($this->system->event->mission_coords['special'] as $event_mission) {
+                    $objectives[] = new MapObjective(
+                        id: null,
+                        name: "Special",
+                        map_id: 1,
+                        x: $event_mission['x'],
+                        y: $event_mission['y'],
+                        image: "/images/events/cultsign.png",
+                        action_url: $this->system->router->getUrl("mission", [
+                            'start_mission' => $this->system->event->mission_ids['special_mission_id'],
+                            'mission_type' => 'event'
+                        ]),
+                        action_message: "Enter the Fray",
+                    );
+                }
+                foreach ($this->system->event->mission_coords['easy'] as $event_mission) {
+                    $objectives[] = new MapObjective(
+                        id: null,
+                        name: "Easy",
+                        map_id: 1,
+                        x: $event_mission['x'],
+                        y: $event_mission['y'],
+                        image: "/images/events/lanternred.png",
+                        action_url: $this->system->router->getUrl("mission", [
+                            'start_mission' => $this->system->event->mission_ids['easy_mission_id'],
+                            'mission_type' => 'event'
+                        ]),
+                        action_message: "Begin Search",
+                    );
+                }
+                foreach ($this->system->event->mission_coords['medium'] as $event_mission) {
+                    $objectives[] = new MapObjective(
+                        id: null,
+                        name: "Medium",
+                        map_id: 1,
+                        x: $event_mission['x'],
+                        y: $event_mission['y'],
+                        image: "/images/events/lanternblue.png",
+                        action_url: $this->system->router->getUrl("mission", [
+                            'start_mission' => $this->system->event->mission_ids['medium_mission_id'],
+                            'mission_type' => 'event'
+                        ]),
+                        action_message: "Follow Signs of battle",
+                    );
+                }
+                foreach ($this->system->event->mission_coords['hard'] as $event_mission) {
+                    $objectives[] = new MapObjective(
+                        id: null,
+                        name: "Hard",
+                        map_id: 1,
+                        x: $event_mission['x'],
+                        y: $event_mission['y'],
+                        image: "/images/events/lanternviolet.png",
+                        action_url: $this->system->router->getUrl("mission", [
+                            'start_mission' => $this->system->event->mission_ids['hard_mission_id'],
+                            'mission_type' => 'event'
+                        ]),
+                        action_message: "Investigate Suspicious Markings",
+                    );
+                }
+                foreach ($this->system->event->mission_coords['nightmare'] as $event_mission) {
+                    $objectives[] = new MapObjective(
+                        id: null,
+                        name: "Nightmare",
+                        map_id: 1,
+                        x: $event_mission['x'],
+                        y: $event_mission['y'],
+                        image: "/images/events/yokai_cropped.png",
+                        action_url: $this->system->router->getUrl("mission", [
+                            'start_mission' => $this->system->event->mission_ids['nightmare_mission_id'],
+                            'mission_type' => 'event'
+                        ]),
+                        action_message: "Stop the Ritual",
+                    );
+                }
+            }
+        }
+
+        return $objectives;
+    }
+
+    /**
+     * @return RegionObjective[]
+     */
+    public function fetchRegionObjectives(): array
+    {
+        $objectives = [];
+
+        // Get Region Objectives
+        $region_result = $this->system->db->query("SELECT `region_locations`.`id` as `region_location_id`, `region_locations`.`region_id`, `region_locations`.`name`, `health`, `max_health`, `type`, `x`, `y`, `resource_name`, `village`, `villages`.`name` as `village_name` FROM `region_locations`
+            INNER JOIN `regions` ON `regions`.`region_id` = `region_locations`.`region_id`
+            INNER JOIN `villages` ON `regions`.`village` = `villages`.`village_id`
+            LEFT JOIN `resources` on `region_locations`.`resource_id` = `resources`.`resource_id`");
+        $region_objectives = $this->system->db->fetch_all($region_result);
+        foreach ($region_objectives as $obj) {
+            $distance = $this->user->location->distanceDifference(
+                new TravelCoords(
+                    x: $obj['x'],
+                    y: $obj['y'],
+                    map_id: 1,
+                )
+            );
+            if ($distance <= self::DISPLAY_RADIUS) {
+                switch ($obj['type']) {
+                    case "castle":
+                        $image = "/images/map/icons/castle.png";
+                        $objectives[] = new RegionObjective(
+                            id: $obj['region_location_id'],
+                            name: $obj['name'],
+                            map_id: 1,
+                            x: $obj['x'],
+                            y: $obj['y'],
+                            objective_health: $obj['health'],
+                            objective_max_health: $obj['max_health'],
+                            objective_type: $obj['type'],
+                            image: $image,
+                        );
+                        break;
+                    case "tower":
+                        break;
+                        $image = "/images/map/icons/tower.png";
+                        $objectives[] = new RegionObjective(
+                            id: $obj['region_location_id'],
+                            name: $obj['name'],
+                            map_id: 1,
+                            x: $obj['x'],
+                            y: $obj['y'],
+                            objective_health: $obj['health'],
+                            objective_max_health: $obj['max_health'],
+                            objective_type: $obj['type'],
+                            image: $image,
+                        );
+                    case "village":
+                        if ($distance <= $this->user->scout_range || $obj['village_name'] == $this->user->village->name) {
+                            $image = "/images/map/icons/village.png";
+                            if (isset($this->user->filters['strategic_view']) && $this->user->filters['strategic_view'] == "true" && isset($obj['resource_name'])) {
+                                switch ($obj['resource_name']) {
+                                    case null:
+                                        break;
+                                    case "food":
+                                        $image = "/images/map/icons/food.png";
+                                        break;
+                                    case "materials":
+                                        $image = "/images/map/icons/materials.png";
+                                        break;
+                                    case "wealth":
+                                        $image = "/images/map/icons/wealth.png";
+                                        break;
+                                }
+                            }
+                            $obj['health'] = null;
+                            $obj['max_health'] = null;
+                            $objectives[] = new RegionObjective(
+                                id: $obj['region_location_id'],
+                                name: $obj['name'],
+                                map_id: 1,
+                                x: $obj['x'],
+                                y: $obj['y'],
+                                objective_health: $obj['health'],
+                                objective_max_health: $obj['max_health'],
+                                objective_type: $obj['type'],
+                                image: $image,
+                            );
+                        }
+                        break;
+                }
+            }
+        }
+
+        return $objectives;
     }
 }

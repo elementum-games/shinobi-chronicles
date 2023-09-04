@@ -10,18 +10,18 @@
     --avatar-frame-border-width-small: 2px;
     /* General Config */
     --border-color-default: #939cb6;
-    --box-color-default: #b2b4b9;
+    --box-color-default: #b9bfcc;
     --main-background-color: #898fa1;
     --content-background-color: #272733;
-    --content-background-gradient: linear-gradient(to bottom, #c6c4c4, #c6c4c4);
-    --content-outline-color: #1f212a;
-    --content-border-color: #14131a;
+    --content-background-gradient: linear-gradient(to bottom, #c3c9d7, #c3c9d7);
+    --content-outline-color: #777f95;
+    --content-border-color: #898fa1;
     --footer-background-color: #0E0D0E;
     --footer-font-color: #423f39;
     --regentimer-color: #7C88C3;
     /* Content colors */
-    --daily-task-active-bg-color: #a4a5ab;
-    --daily-task-complete-bg-color: #1e222c;
+    --daily-task-active-bg-color: #b5bdd4;
+    --daily-task-complete-bg-color: #ae9aa5;
     --exp-bar-bg-color: #383838;
     --exp-bar-fill-color: #6e0e11;
     --progress-bar-bg-color: #383838;
@@ -41,13 +41,15 @@
     --font-primary-variant: small-caps;
     --font-secondary: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     --font-secondary-variant: small-caps;
-    --font-color-1: #232020;
-    --font-color-2: #232020;
-    --font-color-3: #232020;
+    --font-color-1: #383838; /* Bold headers/titles */
+    --font-color-2: #3e424d; /* Inverted headers/titles */
+    --font-color-3: #232020; /* Softer general text */
     --font-color-4: #232020;
-    --font-color-5: #232020;
+    --font-color-5: #b5bdd4; /* Header links */
     --font-color-6: #232020;
     --font-color-7: #232020;
+    --font-link: #0a1460;
+    --font-link-hover: #676d91;
     --font-min: 12px;
     --font-small: 13px;
     --font-default: 14px;
@@ -75,11 +77,11 @@
     --hotbar-keybind-modal-width: 700px;
     --hotbar-keybind-modal-height: 400px;
     /* Sidebar Config */
-    --sidebar-header-background-color: #8c7b58;
+    --sidebar-header-background: #7f869a;
     --sidebar-header-height: 23px;
-    --sidebar-button-background-color: #1a191d;
-    --sidebar-button-background-hover: linear-gradient(to bottom, #262631 50%, #22222a 50%);
-    --sidebar-button-border-color: #20222b;
+    --sidebar-button-background-color: #c3c9d7;
+    --sidebar-button-background-hover: #474b58;
+    --sidebar-button-border-color: #7f869a;
     /* Header Config */
     --header-background-color: #151417;
     --header-border-color: #0c0d0e;
@@ -173,7 +175,7 @@
 
 body {
     background-color: var(--main-background-color);
-    background-image: linear-gradient(to right, var(--main-background-color) 0%, transparent 17%, transparent 83%, var(--main-background-color) 100%), url(../../images/v2/decorations/Banner1.jpg);
+    background-image: url(../../images/v2/sumu/background.jpg);
     background-repeat: no-repeat;
     background-attachment: fixed;
     background-size: cover;
@@ -193,7 +195,7 @@ body {
         height: 100%;
         left: 50%;
         transform: translate(-50%, calc(-1 * var(--header-height) - var(--header-border-height)));
-        background: linear-gradient(to right, transparent 0%, var(--main-background-color) 1%, var(--main-background-color) 99%, transparent 100%);
+
         z-index: -1;
     }
 
@@ -242,17 +244,31 @@ body {
 #content {
     width: 100%;
     background-image: var(--content-background-gradient);
-    border-width: 0px;
+    border-width: 2px;
     border-color: var(--content-border-color);
     border-style: solid;
-    outline: 0px;
+    outline: 5px;
     outline-color: var(--content-outline-color);
-    outline-offset: 0;
+    outline-offset: 0px;
     outline-style: solid;
     min-height: 500px;
     padding-bottom: 5px;
     margin: 0;
+    margin-top: 14px;
 }
+    #content::after {
+        pointer-events: none;
+        content: "";
+        display: block;
+        position: absolute;
+        top: -38px;
+        left: -33px;
+        width: 996px;
+        height: 144px;
+        background: url(../../images/v2/sumu/topframe.png) no-repeat top center;
+        background-size: cover; /* Adjust as needed */
+        z-index: 1; /* Ensure the image is positioned above the #content */
+    }
 
 .main_logo {
     height: 30px;
@@ -506,10 +522,10 @@ a.userLink:hover {
 }
 /* Blue */
 a.blue, a.blue:hover {
-    color: #92c0ff !important;
+    color: #3b5cb6 !important;
 }
 .post_user_avatar_wrapper.blue, .avatar_frame.blue, .avatar_frame.visited {
-    background: linear-gradient(0deg, rgba(87, 130, 188, 1) 0%, rgba(146, 192, 255, 1) 100%);
+    background: linear-gradient(0deg, #3b5cb6 0%, #3b5cb6 100%);
 }
 
 /* Pink */
@@ -522,48 +538,107 @@ a.pink, a.pink:hover {
 
 /* Gold */
 a.chat_user_name.gold, a.gold:hover, a.gold:visited {
-    color: #c6ab5c !important;
+    color: #c7a417 !important;
 }
 .post_user_avatar_wrapper.gold, .avatar_frame.gold {
-    background: linear-gradient(0deg, rgba(126, 103, 50, 1) 0%, rgba(198, 171, 92, 1) 100%);
+    background: linear-gradient(0deg, #c7a417 0%, #c7a417 100%);
 }
 
 /* Moderator */
 a.chat_user_name.moderator, a.moderator:hover, a.moderator:visited {
-    color: #67d18c !important;
+    color: #31a759 !important;
 }
 .post_user_avatar_wrapper.moderator, .avatar_frame.moderator {
-    background: linear-gradient(0deg, rgba(64, 124, 78, 1) 0%, rgba(103, 209, 140, 1) 100%);
+    background: linear-gradient(0deg, #31a759 0%, #31a759 100%);
 }
 
 /* Head Moderator */
 a.headModerator, a.headModerator:hover, a.headModerator:visited {
-    color: #83ddea !important;
+    color: #34a3b3 !important;
 }
 .post_user_avatar_wrapper.headModerator, .avatar_frame.headModerator {
-    background: linear-gradient(0deg, rgba(82, 133, 129, 1) 0%, rgba(131, 221, 234, 1) 100%);
+    background: linear-gradient(0deg, #34a3b3 0%, #34a3b3 100%);
 }
 
 /* Content Admin */
 a.contentAdmin, a.contentAdmin:hover, a.contentAdmin:visited {
-    color: #c3afff !important;
+    color: #6140c1 !important;
 }
 .post_user_avatar_wrapper.contentAdmin, .avatar_frame.contentAdmin {
-    background: linear-gradient(0deg, rgba(103, 89, 176, 1) 0%, rgba(195, 175, 255, 1) 100%);
+    background: linear-gradient(0deg, #6140c1 0%, #6140c1 100%);
 }
 
 /* Administrator */
 a.administrator, a.administrator:hover, a.administrator:visited {
-    color: #f57677 !important;
+    color: #d73839 !important;
 }
 .post_user_avatar_wrapper.administrator, .avatar_frame.administrator {
-    background: linear-gradient(0deg, rgba(177, 69, 66, 1) 0%, rgba(245, 118, 119, 1) 100%);
+    background: linear-gradient(0deg, #d73839 0%, #d73839 100%);
 }
 
 /* Default User */
 a.normalUser, a.normalUser:hover, a.normalUser:visited {
-    color: #c5baa3 !important;
+    color: #383838 !important;
 }
 .post_user_avatar_wrapper.normalUser, .avatar_frame.normalUser {
-    background: var(--avatar-frame-border_gradient) !important;
+    background: #383838 !important;
 }
+
+/* Sumu Sidebar Header Override */
+.sb_header_bar {
+    background: linear-gradient(var(--sidebar-header-background) 0%, var(--sidebar-header-background) 100%) !important;
+    position: relative;
+}
+    .sb_header_bar::after {
+        content: "";
+        display: block;
+        position: absolute;
+        top: -3px;
+        left: -12px;
+        width: 173px;
+        height: 28px;
+        background: url(../../../images/v2/sumu/cloud.png) no-repeat top center;
+        background-size: cover; /* Adjust as needed */
+        z-index: 1; /* Ensure the image is positioned above the #content */
+    }
+.sb_header_line {
+    display: none;
+}
+.sb_header_image_wrapper {
+    display: none !important;
+}
+.sb_header_text_wrapper {
+    padding-top: 4px;
+    z-index: 2;
+    left: 5px !important;
+    text-shadow: none !important;
+    font-family: StickRice;
+    color: #3e424d;
+    font-size: 21px;
+    text-transform: uppercase;
+    font-weight: normal !important;
+}
+
+/* Sumu Profile Override */
+.skills .badge {
+    background-image: url(../../../images/v2/sumu/redplate.png) !important;
+}
+.attributes .badge {
+    background-image: url(../../../images/v2/sumu/blueplate.png) !important;
+}
+
+/* Sumu Travel Override */
+.travel-scout-attack span.direction {
+    background-image: url(../../../images/icons/right_hover.png) !important;
+}
+.quick-scout span.direction {
+    background-image: url(../../../images/icons/right_hover.png) !important;
+}
+
+/* Sumu Topbar Override */
+.main_logo {
+    background: url(../../../images/v2/sumu/sumulogo.png) no-repeat center !important;
+}
+
+/* Sumu Chat Override */
+c5c9d5

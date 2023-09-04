@@ -1,3 +1,4 @@
+import { QuickScout } from "./ScoutArea.js";
 import { apiFetch } from "../utils/network.js";
 import { Map } from "./Map.js";
 import { ScoutArea } from "./ScoutArea.js";
@@ -29,6 +30,8 @@ import { ScoutArea } from "./ScoutArea.js";
     region_coords:       object,
     spar_link:           string,
     colosseum_coords:    object,
+    region_objectives:   object,
+    map_objectives:      object,
  * }} mapData
  *
  * @param {{
@@ -77,6 +80,7 @@ function Travel({
   const [feedback, setFeedback] = React.useState(null);
   const [mapData, setMapData] = React.useState(null);
   const [scoutData, setScoutData] = React.useState(null);
+  const [patrolData, setPatrolData] = React.useState(null);
   const [ranksToView, setRanksToView] = React.useState({
     1: false,
     2: false,
@@ -111,6 +115,7 @@ function Travel({
       setDisplayGrid(response.data.mapData.player_filters.display_grid === "true");
       setMapData(response.data.mapData);
       setScoutData(response.data.nearbyPlayers);
+      setPatrolData(response.data.nearbyPatrols);
     });
   };
   const MovePlayer = direction => {
@@ -139,6 +144,7 @@ function Travel({
         lastTravelSuccessTime.current = requestEnd;
         setMapData(response.data.mapData);
         setScoutData(response.data.nearbyPlayers);
+        setPatrolData(response.data.nearbyPatrols);
       } else {
         debug('Cannot move player.');
       }
@@ -291,12 +297,9 @@ function Travel({
     updateDisplayGrid: updateDisplayGrid
   }), /*#__PURE__*/React.createElement("div", {
     className: "travel-wrapper"
-  }, /*#__PURE__*/React.createElement(TravelActions, {
-    travelPageLink: travelPageLink,
-    travelCooldownMs: travelCooldownMs,
-    updateMovementDirection: changeMovementDirection,
-    movePlayer: MovePlayer
-  }), /*#__PURE__*/React.createElement("div", {
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "travel-panel"
+  }, /*#__PURE__*/React.createElement("div", {
     id: "travel-container",
     className: "travel-container"
   }, /*#__PURE__*/React.createElement("div", {
@@ -320,11 +323,23 @@ function Travel({
   })), mapData && scoutData && /*#__PURE__*/React.createElement(Map, {
     mapData: mapData,
     scoutData: scoutData,
+    patrolData: patrolData,
     playerId: playerId,
     ranksToView: ranksToView,
     strategicView: strategicView,
     displayGrid: displayGrid
-  }))), mapData && scoutData && /*#__PURE__*/React.createElement(ScoutArea, {
+  })), /*#__PURE__*/React.createElement(TravelActions, {
+    travelPageLink: travelPageLink,
+    travelCooldownMs: travelCooldownMs,
+    updateMovementDirection: changeMovementDirection,
+    movePlayer: MovePlayer,
+    mapData: mapData,
+    scoutData: scoutData,
+    attackPlayer: AttackPlayer,
+    sparPlayer: SparPlayer,
+    ranksToView: ranksToView,
+    playerId: playerId
+  })), mapData && scoutData && /*#__PURE__*/React.createElement(ScoutArea, {
     mapData: mapData,
     scoutData: scoutData,
     membersLink: membersLink,
@@ -332,7 +347,7 @@ function Travel({
     sparPlayer: SparPlayer,
     ranksToView: ranksToView,
     playerId: playerId
-  }));
+  })));
 }
 function TravelFilters({
   ranksToView,
@@ -391,7 +406,13 @@ function TravelFilters({
 }
 function TravelActions({
   travelPageLink,
-  updateMovementDirection
+  updateMovementDirection,
+  mapData,
+  scoutData,
+  attackPlayer,
+  sparPlayer,
+  ranksToView,
+  playerId
 }) {
   // If player presses one key, wait a short amount before updating the direction in case they press a second key
   const inputBufferMs = 25;
@@ -527,8 +548,10 @@ function TravelActions({
     directionButtonClicked.current = null;
     setMovementDirection(null);
   };
+  const travelActionRef = React.useRef(null);
   return /*#__PURE__*/React.createElement("div", {
-    className: "travel-actions"
+    className: "travel-actions",
+    ref: travelActionRef
   }, allowedDirections.map(direction => /*#__PURE__*/React.createElement("a", {
     key: `travel:${direction}`,
     href: `${travelPageLink}&travel=${direction}`,
@@ -549,7 +572,15 @@ function TravelActions({
     onClick: e => {
       e.preventDefault();
     }
-  })));
+  })), /*#__PURE__*/React.createElement(QuickScout, {
+    mapData: mapData,
+    scoutData: scoutData,
+    attackPlayer: attackPlayer,
+    sparPlayer: sparPlayer,
+    ranksToView: ranksToView,
+    playerId: playerId,
+    travelActionRef: travelActionRef
+  }));
 }
 const Message = ({
   message,

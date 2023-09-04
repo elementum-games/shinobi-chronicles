@@ -1,6 +1,7 @@
+import { QuickScout } from "./ScoutArea.js";
 import { apiFetch } from "../utils/network.js";
 import { Map } from "./Map.js";
-import { ScoutArea} from "./ScoutArea.js";
+import { ScoutArea } from "./ScoutArea.js";
 
 /**
  * @param {{
@@ -29,6 +30,8 @@ import { ScoutArea} from "./ScoutArea.js";
     region_coords:       object,
     spar_link:           string,
     colosseum_coords:    object,
+    region_objectives:   object,
+    map_objectives:      object,
  * }} mapData
  *
  * @param {{
@@ -92,6 +95,7 @@ function Travel({
 
     const [mapData, setMapData] = React.useState(null);
     const [scoutData, setScoutData] = React.useState(null);
+    const [patrolData, setPatrolData] = React.useState(null);
 
     const [ranksToView, setRanksToView] = React.useState({
         1: false,
@@ -134,6 +138,7 @@ function Travel({
             setDisplayGrid(response.data.mapData.player_filters.display_grid === "true");
             setMapData(response.data.mapData);
             setScoutData(response.data.nearbyPlayers);
+            setPatrolData(response.data.nearbyPatrols);
         });
     }
 
@@ -171,6 +176,7 @@ function Travel({
                 lastTravelSuccessTime.current = requestEnd;
                 setMapData(response.data.mapData);
                 setScoutData(response.data.nearbyPlayers);
+                setPatrolData(response.data.nearbyPatrols);
             }
             else {
                 debug('Cannot move player.');
@@ -359,57 +365,66 @@ function Travel({
                 updateDisplayGrid={updateDisplayGrid}
             />
             <div className='travel-wrapper'>
-                <TravelActions
-                    travelPageLink={travelPageLink}
-                    travelCooldownMs={travelCooldownMs}
-                    updateMovementDirection={changeMovementDirection}
-                    movePlayer={MovePlayer}
-                />
-                <div id='travel-container' className='travel-container'>
-                    <div className='travel-buttons'>
-                        {mapData?.current_portal?.portal_id != null && (
-                            <button className='button'
+                <div className="travel-panel">
+                    <div id='travel-container' className='travel-container'>
+                        <div className='travel-buttons'>
+                            {mapData?.current_portal?.portal_id != null && (
+                                <button className='button'
                                     onClick={() => EnterPortal(mapData.current_portal.portal_id)}>
-                                Go to {mapData.current_portal.entrance_name}
-                            </button>
-                        )}
-                        {(mapData && mapData.current_mission) && (
-                         <a href={missionLink}>
-                             <button className='button'>Go to Mission Location</button>
-                         </a>
-                        )}
-                        {(mapData && mapData.action_url) && (
-                            <a href={mapData.action_url}>
-                                <button className='button'>{mapData.action_message}</button>
-                            </a>
-                        )}
-                    </div>
-                    {feedback && (
-                        <div className='travel-messages'>
-                            <Message message={feedback[0]} messageType={feedback[1]} />
+                                    Go to {mapData.current_portal.entrance_name}
+                                </button>
+                            )}
+                            {(mapData && mapData.current_mission) && (
+                                <a href={missionLink}>
+                                    <button className='button'>Go to Mission Location</button>
+                                </a>
+                            )}
+                            {(mapData && mapData.action_url) && (
+                                <a href={mapData.action_url}>
+                                    <button className='button'>{mapData.action_message}</button>
+                                </a>
+                            )}
                         </div>
-                    )}
-                    {(mapData && scoutData) &&
-                        (<Map mapData={mapData}
-                            scoutData={scoutData}
-                            playerId={playerId}
-                            ranksToView={ranksToView}
-                            strategicView={strategicView}
-                            displayGrid={displayGrid}
-                        />)}
+                        {feedback && (
+                            <div className='travel-messages'>
+                                <Message message={feedback[0]} messageType={feedback[1]} />
+                            </div>
+                        )}
+                        {(mapData && scoutData) &&
+                            (<Map mapData={mapData}
+                                scoutData={scoutData}
+                                patrolData={patrolData}
+                                playerId={playerId}
+                                ranksToView={ranksToView}
+                                strategicView={strategicView}
+                                displayGrid={displayGrid}
+                            />)}
+                    </div>
+                    <TravelActions
+                        travelPageLink={travelPageLink}
+                        travelCooldownMs={travelCooldownMs}
+                        updateMovementDirection={changeMovementDirection}
+                        movePlayer={MovePlayer}
+                        mapData={mapData}
+                        scoutData={scoutData}
+                        attackPlayer={AttackPlayer}
+                        sparPlayer={SparPlayer}
+                        ranksToView={ranksToView}
+                        playerId={playerId}
+                    />
                 </div>
+                {(mapData && scoutData) && (
+                    <ScoutArea
+                        mapData={mapData}
+                        scoutData={scoutData}
+                        membersLink={membersLink}
+                        attackPlayer={AttackPlayer}
+                        sparPlayer={SparPlayer}
+                        ranksToView={ranksToView}
+                        playerId={playerId}
+                    />
+                )}
             </div>
-            {(mapData && scoutData) && (
-                <ScoutArea
-                    mapData={mapData}
-                    scoutData={scoutData}
-                    membersLink={membersLink}
-                    attackPlayer={AttackPlayer}
-                    sparPlayer={SparPlayer}
-                    ranksToView={ranksToView}
-                    playerId={playerId}
-                />
-            )}
         </>
     );
 }
@@ -475,7 +490,16 @@ function TravelFilters({ ranksToView, updateRanksToView, strategicView, updateSt
     );
 }
 
-function TravelActions({ travelPageLink, updateMovementDirection }) {
+function TravelActions({
+    travelPageLink,
+    updateMovementDirection,
+    mapData,
+    scoutData,
+    attackPlayer,
+    sparPlayer,
+    ranksToView,
+    playerId,
+}) {
     // If player presses one key, wait a short amount before updating the direction in case they press a second key
     const inputBufferMs = 25;
 
@@ -633,8 +657,10 @@ function TravelActions({ travelPageLink, updateMovementDirection }) {
         setMovementDirection(null);
     };
 
+    const travelActionRef = React.useRef(null);
+
     return (
-        <div className='travel-actions'>
+        <div className='travel-actions' ref={travelActionRef}>
             {allowedDirections.map((direction) => (
                 <a
                     key={`travel:${direction}`}
@@ -659,6 +685,16 @@ function TravelActions({ travelPageLink, updateMovementDirection }) {
                     }}
                 ></a>
             ))}
+            <QuickScout
+                mapData={mapData}
+                scoutData={scoutData}
+                attackPlayer={attackPlayer}
+                sparPlayer={sparPlayer}
+                ranksToView={ranksToView}
+                playerId={playerId}
+                travelActionRef={travelActionRef}
+            />
+
         </div>
     )
 }

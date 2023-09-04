@@ -25,22 +25,31 @@
     align-items: center;
     justify-content: flex-start;
 
-    background: var(--theme-content-bg-color);
+    background: var(--sidebar-button-background-color);
     border: 1px solid rgba(0, 0, 0, 0.12);
 }
 .travel-wrapper {
     width: 95%;
-
+    display: flex;
+    gap: 5px;
+    flex-direction: row;
     flex-grow: 0;
     position: relative;
-    padding: var(--travel-button-size);
+}
+.travel-panel {
+    width: 100%;
+    display: flex;
+    flex-shrink: 0;
+    flex-direction: column;
+    flex-basis: 65.5%;
 }
 
 #travel-container {
-    height: 600px;
+    height: 450px;
+    width: 100%;
 }
 
-@media (max-height: 1200px) {
+/*@media (max-height: 1200px) {
     #travel-container {
         height: 550px;
     }
@@ -64,32 +73,35 @@
     #travel-container {
         height: 350px;
     }
-}
+}*/
 
 .travel-scout-container {
-    width: 95%;
-
+    width: 100%;
     flex-grow: 0;
     display: flex;
+    border: 1px solid var(--border-color-default);
 }
 .travel-scout {
     width: 100%;
     display: flex;
-    flex-flow: row wrap;
-    justify-content: space-between;
+    flex-direction: column;
     gap: 6px 0;
+    z-index: 10;
+    background-image: url("../../../images/v2/decorations/NinjaScout.png");
+    background-position: bottom;
+    background-repeat: no-repeat;
 }
 .travel-scout-entry {
-    width: 49.5%;
-
+    width: 100%;
+    height: 40px;
     display: flex;
     flex-flow: row wrap;
     align-items: center;
     justify-content: space-between;
     position: relative;
-    padding: 8px 0 8px 8px;
-
-    background: var(--theme-content-bg-color);
+    padding: 4px 0 8px 8px;
+    
+    background: var(--sidebar-button-background-color);
     border: 1px solid rgba(0, 0, 0, 0.12);
 }
 
@@ -119,7 +131,7 @@
     margin: 0 auto;
     padding: 5px 10px;
 
-    color: var(--theme-text-color-normal);
+    color: var(--font-color-1);
     font-family: sans-serif;
     font-weight: bold;
 
@@ -135,7 +147,7 @@
     margin: 0 10px 0 0;
 
     text-indent: 3px;
-    color: var(--theme-text-color-light);
+    color: var(--font-color-1) !important;
     text-transform: uppercase;
     font-size: 0.8em;
     font-family: sans-serif;
@@ -170,17 +182,12 @@
     color: var(--theme-text-color-normal);
 }
 
-
-
-
 .travel-actions {
     width: 100%;
-    height: 100%;
-    position: absolute;
-    top: 0;
-    left: 0;
+    height: 225px;
     display: flex;
     flex-flow: row wrap;
+    position: relative;
 }
 
 .travel-buttons {
@@ -208,14 +215,12 @@
     height: 33.333%;
     z-index: 1;
     position: relative;
-
     cursor: pointer;
     user-select: none;
     touch-action: none;
     -webkit-tap-highlight-color: transparent;
-
-    background: var(--theme-content-darker2-bg-color);
-    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.12) inset;
+    background: var(--sidebar-button-background-color);
+    box-shadow: 0 0 0 1px var(--sidebar-button-border-color) inset;
 }
 
 :root {
@@ -231,7 +236,7 @@
 
     height: var(--travel-arrow-size);
     width: var(--travel-arrow-size);
-    color: var(--theme-text-color-normal);
+    color: var(--font-color-3);
 }
 .travel-actions a.north::before {
     top: var(--travel-arrow-half-size);
@@ -284,11 +289,11 @@
     flex-grow: 2;
 }
 .travel-actions a.active, .travel-actions a.active:hover {
-    background: var(--theme-content-bg-color);
+    background: var(--sidebar-button-background-hover);
 }
 @media(hover: hover) {
     .travel-actions a:hover {
-        background: var(--theme-content-darker-bg-color);
+        background: var(--sidebar-button-background-hover);
         transition: background-color 200ms ease-in-out;
     }
 }
@@ -300,9 +305,8 @@
     justify-content: flex-start;
     position: relative;
     z-index: 10;
-
     background: var(--theme-content-darker-bg-color);
-    border: 1px solid rgba(0, 0, 0, 0.12);
+    border: 1px solid var(--sidebar-button-border-color);
 }
 
 #travel-x-container {
@@ -315,9 +319,8 @@
     justify-content: flex-start;
     align-self: flex-start;
     overflow: hidden;
-
-    background: var(--theme-content-darker2-bg-color);
-    border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+    background: var(--sidebar-button-background-color);
+    border-bottom: 1px solid var(--sidebar-button-border-color);
 }
 
 #travel-y-container {
@@ -329,9 +332,8 @@
     justify-content: flex-start;
     align-items: flex-start;
     overflow: hidden;
-
-    background: var(--theme-content-darker-bg-color);
-    border-right: 1px solid rgba(0, 0, 0, 0.12);
+    background: var(--sidebar-button-background-color);
+    border-right: 1px solid var(--sidebar-button-border-color);
 }
 
 .travel-gutter-grid {
@@ -341,26 +343,24 @@
     flex-flow: column nowrap;
     align-items: center;
     justify-content: center;
-
     font-family: sans-serif;
-    color: var(--theme-text-color-normal);
-
-    background: var(--theme-content-darker-bg-color);
+    color: var(--font-color-3);
+    background: var(--sidebar-button-background-color);
 }
 
 .travel-gutter-grid-x {
-    border-right: 1px solid rgba(0, 0, 0, 0.12);
+    border-right: 1px solid var(--sidebar-button-border-color);
 }
-.travel-gutter-grid-x:first-of-type {
-    border-left: 1px solid rgba(0, 0, 0, 0.12);
-}
+    .travel-gutter-grid-x:first-of-type {
+        border-left: 1px solid var(--sidebar-button-border-color);
+    }
 
 .travel-gutter-grid-x:last-of-type {
     border-right: 0;
 }
 
 .travel-gutter-grid-y {
-    border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+    border-bottom: 1px solid var(--sidebar-button-border-color);
 }
 .travel-gutter-grid-y:last-of-type {
     border-bottom: 0;
@@ -436,25 +436,27 @@
     border-bottom: 1px solid rgba(0, 0, 0, 0.19);
 }
 
+/* Map Locations */
+
 .map_locations {
     width: 100%;
     height: 100%;
     position: absolute;
     top: 0;
     left: 0;
+    pointer-events: none;
 }
-
 .map_location {
     width: 32px;
     height: 32px;
     position: absolute;
     top: 0;
     left: 0;
-    z-index: 3;
-
     background-repeat: no-repeat;
     background-position: center;
     background-size: auto 100%;
+    cursor: pointer;
+    pointer-events: auto;
 }
     .map_location.key_location {
         height: 48px;
@@ -470,18 +472,11 @@
     background-position: center;
     background-size: auto 100%;
 }
-    .map_location_objective.castle {
-        position: absolute;
-        height: 64px;
-        width: 64px;
-        left: -16px;
-        top: -32px;
-    }
+    
 .map_location_objective_health {
     display: none;
 }
-
-.map_locations_tooltip {
+.map_location_tooltip {
     display: none;
     position: absolute;
     bottom: 110%;
@@ -493,20 +488,127 @@
     text-align: center;
     width: fit-content;
     white-space: pre;
-
-    background: var(--theme-content-bg-color);
+    background: #3c2b2bcc;
     border-radius: 4px;
-    box-shadow: 0 0 2px rgba(38, 35, 30, 0.46);
-
+    box-shadow: 0 0 4px rgba(0, 0, 0, 0.46);
     font-family: sans-serif;
-    color: var(--theme-text-color-normal);
-
+    color: #fff6e0;
     z-index: 3;
+    font-weight: bold;
+    font-size: 12px;
+    text-shadow: 1px 0px 2px black;
 }
-
-.map_locations > div:hover .map_locations_tooltip {
+.map_location:hover .map_location_tooltip {
     display: block;
 }
+
+/* Objectives */
+.region_objective.castle {
+    position: absolute;
+    height: 64px;
+    width: 64px;
+    left: -16px;
+    top: -32px;
+}
+.map_objective.target {
+    position: absolute;
+    height: 48px;
+    width: 48px;
+    left: -8px;
+    top: -8px;
+}
+.map_objectives {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+}
+.region_objectives {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+}
+.map_objective {
+    width: 32px;
+    height: 32px;
+    position: absolute;
+    top: 0;
+    left: 0;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: auto 100%;
+    cursor: pointer;
+    pointer-events: auto;
+}
+.region_objective {
+    width: 32px;
+    height: 32px;
+    position: absolute;
+    top: 0;
+    left: 0;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: auto 100%;
+    cursor: pointer;
+    pointer-events: auto;
+}
+.region_objective:hover .region_objective_tooltip {
+    display: block;
+}
+.map_objective:hover .map_objective_tooltip {
+    display: block;
+}
+.region_objective_tooltip {
+    display: none;
+    position: absolute;
+    bottom: 110%;
+    left: 50%;
+    right: 0;
+    transform: translateX(-50%);
+    margin: 0 auto;
+    padding: 5px 10px;
+    text-align: center;
+    width: fit-content;
+    white-space: pre;
+    background: #3c2b2bcc;
+    border-radius: 4px;
+    box-shadow: 0 0 4px rgba(0, 0, 0, 0.46);
+    font-family: sans-serif;
+    color: #fff6e0;
+    z-index: 3;
+    font-weight: bold;
+    font-size: 12px;
+    text-shadow: 1px 0px 2px black;
+}
+.map_objective_tooltip {
+    display: none;
+    position: absolute;
+    bottom: 110%;
+    left: 50%;
+    right: 0;
+    transform: translateX(-50%);
+    margin: 0 auto;
+    padding: 5px 10px;
+    text-align: center;
+    width: fit-content;
+    white-space: pre;
+    background: #3c2b2bcc;
+    border-radius: 4px;
+    box-shadow: 0 0 4px rgba(0, 0, 0, 0.46);
+    font-family: sans-serif;
+    color: #fff6e0;
+    z-index: 3;
+    font-weight: bold;
+    font-size: 12px;
+    text-shadow: 1px 0px 2px black;
+}
+
+/* Player */
 
 #map_player {
     width: 32px;
@@ -520,6 +622,8 @@
     background-position: center;
     background-size: 80% auto;
 }
+
+/* Scout Report */
 
 .travel-scout-entry::before {
     content: '';
@@ -545,7 +649,6 @@
 }
 
 .travel-scout-name {
-    min-width: 190px;
     word-break: break-all;
     display: flex;
     flex-flow: row nowrap;
@@ -559,7 +662,7 @@
 #content .travel-scout-name a {
     width: 100%;
     text-decoration: none;
-    color: var(--theme-text-color-normal);
+    color: var(--font-color-3);
     font-size: 1em;
     font-family: sans-serif;
     font-weight: 600;
@@ -568,16 +671,13 @@
     color: rgba(0, 0, 0, 0.5);
 }
 #content .travel-scout-name a:hover {
-    color: var(--theme-text-color-light);
+    color: var(--font-color-2);
 }
 .travel-scout-name span {
     width: 65%;
-    min-width: 100px;
-
-    color: var(--theme-text-color-light);
+    color: var(--font-color-3) !important;
     font-size: 1em;
     font-family: sans-serif;
-
 }
 
 @media (max-width: 600px) {
@@ -607,7 +707,7 @@
     width: 55px;
     text-align: center;
 
-    color: var(--theme-text-color-light);
+    color: var(--font-color-3);
     font-family: sans-serif;
     font-size: 1em;
 }
@@ -649,7 +749,7 @@
     width: 100%;
     height: 100%;
 
-    background-image: url("../../../images/icons/right.png");
+    background-image: url("../../../images/icons/right_white.png");
     background-size: 50% auto;
     background-repeat: no-repeat;
     background-position: center;
@@ -704,16 +804,24 @@
 #scout_locations .map_location {
     transition: all 0.45s linear;
     z-index: 4;
+    animation: none;
 }
 
-.map_location.player_ally {
+#patrol_locations .map_location {
+    transition: all 2s linear;
+    z-index: 4;
+}
+
+/* Icon Classes */
+
+.map_location.player_stone {
     background: url(../../../images/ninja_head.png), radial-gradient(circle, green 70%, transparent 75%);
     background-size: 25px 25px;
     background-repeat: no-repeat;
     background-position: center;
 }
 
-.map_location.player_enemy {
+.map_location.player_leaf {
     background: url(../../../images/ninja_head.png), radial-gradient(circle, red 70%, transparent 75%);
     background-size: 25px 25px;
     background-repeat: no-repeat;
@@ -726,4 +834,174 @@
 
 .map_location.player_enemy.invulnerable {
     opacity: 0.5;
+}
+
+.map_location.patrol_stone.caravan {
+    background: url(../../../images/map/icons/carriage4.png), radial-gradient(circle, rgba(10, 144, 35, 1) 70%, transparent 75%);
+    background-size: 25px 25px;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+.map_location.patrol_cloud.caravan {
+    background: url(../../../images/map/icons/wheel.png), radial-gradient(circle, rgba(240, 163, 10, 1) 70%, transparent 75%);
+    background-size: 25px 25px;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+.map_location.patrol_leaf.caravan {
+    background: url(../../../images/map/icons/wheel.png), radial-gradient(circle, rgba(255, 0, 0, 1) 70%, transparent 75%);
+    background-size: 25px 25px;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+.map_location.patrol_sand.caravan {
+    background: url(../../../images/map/icons/carriage10.png), radial-gradient(circle, rgba(249, 105, 14, 1) 70%, transparent 75%);
+    background-size: 25px 25px;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+.map_location.patrol_mist.caravan {
+    background: url(../../../images/map/icons/wheel.png), radial-gradient(circle, rgba(61, 84, 255, 1) 70%, transparent 75%);
+    background-size: 25px 25px;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+.map_location.patrol_stone.patrol {
+    background: url(../../../images/map/icons/samurai.png), radial-gradient(circle, rgba(10, 144, 35, 1) 70%, transparent 75%);
+    background-size: 25px 25px;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+.map_location.patrol_cloud.patrol {
+    background: url(../../../images/map/icons/samurai.png), radial-gradient(circle, rgba(240, 163, 10, 1) 70%, transparent 75%);
+    background-size: 25px 25px;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+.map_location.patrol_leaf.patrol {
+    background: url(../../../images/map/icons/samurai.png), radial-gradient(circle, rgba(255, 0, 0, 1) 70%, transparent 75%);
+    background-size: 25px 25px;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+.map_location.patrol_sand.patrol {
+    background: url(../../../images/map/icons/samurai.png), radial-gradient(circle, rgba(249, 105, 14, 1) 70%, transparent 75%);
+    background-size: 25px 25px;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+.map_location.patrol_mist.patrol {
+    background: url(../../../images/map/icons/samurai.png), radial-gradient(circle, rgba(61, 84, 255, 1) 70%, transparent 75%);
+    background-size: 25px 25px;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+/* Transition Animation Logic */
+.fade-enter {
+    opacity: 0;
+}
+
+.fade-enter-active {
+    opacity: 1;
+    transition: opacity 0.5s ease-in; /* Match the timeout value in CSSTransition */
+}
+
+.fade-exit {
+    opacity: 1;
+}
+
+.fade-exit-active {
+    opacity: 0;
+    transition: opacity 0.5s ease-out; /* Match the timeout value in CSSTransition */
+}
+@keyframes fadeIn {
+    0% {
+        opacity: 0;
+    }
+
+    100% {
+        opacity: 1;
+    }
+}
+@keyframes fadeOut {
+    0% {
+        opacity: 1;
+    }
+
+    100% {
+        opacity: 0;
+    }
+}
+
+/* Quick Scout */
+.quick-scout span.direction {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    background-image: url("../../../images/icons/right_white.png");
+    background-size: 50% auto;
+    background-repeat: no-repeat;
+    background-position: center;
+    opacity: 0.5;
+}
+.quick-scout {
+    width: 75px;
+    height: 75px;
+}
+.quick-scout a {
+    display: block;
+    width: 100%;
+    height: 100%;
+    cursor: pointer;
+    background-image: url("../../../images/map/icons/attack-off.png");
+    background-size: 50px auto;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+    .quick-scout a:hover {
+        background-image: url("../../../images/map/icons/attack-on.png");
+        background-size: 50px auto;
+        background-repeat: no-repeat;
+        background-position: center;
+    }
+    .quick-scout a::before {
+        content: none;
+        display: none;
+    }
+    .quick-scout span.in-battle {
+        display: block;
+        width: 100%;
+        height: 100%;
+        background-image: url("../../../images/map/icons/in-battle.png");
+        background-size: 50px auto;
+        background-repeat: no-repeat;
+        background-position: center;
+    }
+    .quick-scout:hover {
+        background: var(--sidebar-button-background-hover);
+    }
+.quick-scout span.north {
+    transform: rotate(-90deg);
+}
+.quick-scout span.northeast {
+    transform: rotate(-45deg) translate(5px, 0px);
+}
+.quick-scout span.east {
+    transform: rotate(0deg);
+}
+.quick-scout span.southeast {
+    transform: rotate(45deg) translate(5px, 0px);
+}
+.quick-scout span.south {
+    transform: rotate(90deg);
+}
+.quick-scout span.southwest {
+    transform: rotate(135deg) translate(5px, 0px);
+}
+.quick-scout span.west {
+    transform: rotate(180deg);
+}
+.quick-scout span.northwest {
+    transform: rotate(-135deg) translate(5px, 0px);
 }

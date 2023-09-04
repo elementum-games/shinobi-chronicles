@@ -6,6 +6,7 @@ class TravelApiPresenter {
             'success' => $success,
             'mapData' => TravelApiPresenter::mapDataResponse(player: $player, travelManager: $travelManager, system: $system),
             'nearbyPlayers' => TravelApiPresenter::nearbyPlayersResponse(travelManager: $travelManager),
+            'nearbyPatrols' => TravelApiPresenter::nearbyPatrolsResponse(travelManager: $travelManager),
         ];
     }
 
@@ -40,6 +41,8 @@ class TravelApiPresenter {
             'region_coords'     => $travelManager->getCoordsByRegion($regions),
             'spar_link'         => $system->router->getUrl('spar'),
             'colosseum_coords'  => $travelManager->getColosseumCoords(),
+            'region_objectives' => $travelManager->fetchRegionObjectives(),
+            'map_objectives'    => $travelManager->fetchMapObjectives(),
         ];
     }
 
@@ -63,9 +66,33 @@ class TravelApiPresenter {
                     'direction'     => $nearbyPlayer->direction,
                     'invulnerable'  => $nearbyPlayer->invulnerable,
                     'distance'      => $nearbyPlayer->distance,
+                    'village_id'    => $nearbyPlayer->village_id,
                 ];
             },
             $travelManager->fetchNearbyPlayers()
+        );
+    }
+
+    public static function nearbyPatrolsResponse(TravelManager $travelManager): array
+    {
+        return array_map(
+            function (NearbyPatrol $nearbyPatrol) {
+                return [
+                    'patrol_id' => $nearbyPatrol->id,
+                    'patrol_name' => $nearbyPatrol->name,
+                    'target_x' => $nearbyPatrol->current_x,
+                    'target_y' => $nearbyPatrol->current_y,
+                    'target_map_id' => $nearbyPatrol->map_id,
+                    'patrol_type' => $nearbyPatrol->patrol_type,
+                    'rank_name' => 'Jonin',
+                    'rank_num' => 4,
+                    'village_icon' => '',
+                    'alignment' => 'Ally',
+                    'level' => 100,
+                    'village_id' => $nearbyPatrol->village_id,
+                ];
+            },
+            $travelManager->fetchNearbyPatrols()
         );
     }
 

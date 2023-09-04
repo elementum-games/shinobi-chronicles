@@ -6,11 +6,13 @@ function coreHeading(string $stylesheet_path): string {
     $react_dev_tags = <<<HTML
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react/17.0.2/umd/react.development.js" crossorigin></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/17.0.2/umd/react-dom.development.js" crossorigin></script>
+<script src="https://unpkg.com/react-transition-group/dist/react-transition-group.js" crossorigin></script>
 HTML;
 
     $react_prod_tags = <<<HTML
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react/17.0.2/umd/react.production.min.js" crossorigin></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/17.0.2/umd/react-dom.production.min.js" crossorigin></script>
+<script src="https://unpkg.com/react-transition-group/dist/react-transition-group.js" crossorigin></script>
 HTML;
 
     if($system->isDevEnvironment()) {

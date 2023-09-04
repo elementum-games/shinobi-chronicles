@@ -16,7 +16,7 @@
 }
 
 .sb_header_bar {
-    background-color: var(--sidebar-header-background-color);
+    background: var(--sidebar-header-background);
     height: var(--sidebar-header-height);
     align-items: center;
 }
