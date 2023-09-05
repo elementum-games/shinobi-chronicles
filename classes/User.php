@@ -2510,4 +2510,24 @@ class User extends Fighter {
 
         return $progress_percent;
     }
+
+    /**
+     * @return bool
+     * checks if PvP battle is complete, used to redirect playuer
+     */
+    public function checkPvPComplete(): bool {
+        $complete = false;
+        if ($this->battle_id > 0) {
+            $result = $this->system->db->query(
+                "SELECT `battle_type`, `winner` FROM `battles` WHERE `battle_id`='{$this->battle_id}' LIMIT 1"
+            );
+            if (!$this->system->db->last_num_rows == 0) {
+                $result = $this->system->db->fetch($result);
+                if ($result['battle_type'] == Battle::TYPE_FIGHT && !empty($result['winner'])) {
+                    $complete = true;
+                }
+            }
+        }
+        return $complete;
+    }
 }

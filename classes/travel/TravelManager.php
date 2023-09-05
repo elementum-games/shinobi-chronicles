@@ -862,7 +862,6 @@ class TravelManager {
             );
             if (!$this->system->db->last_num_rows == 0) {
                 $result = $this->system->db->fetch($result);
-                $link = null;
                 switch ($result['battle_type']) {
                     case Battle::TYPE_AI_ARENA:
                         $link = $this->system->router->getUrl('arena');
