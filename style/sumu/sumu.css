@@ -663,3 +663,62 @@ a.normalUser, a.normalUser:hover, a.normalUser:visited {
     border: 1px solid #abb3c7 !important;
     border-right: none !important;
 }
+.meme_toggle {
+    background: url(../../../images/v2/sumu/memeframe.png) no-repeat center !important;
+    height: 33px !important;
+    padding-bottom: 4px !important;
+}
+    .meme_toggle:hover {
+        background: url(../../../images/v2/sumu/memeframe_hover.png) no-repeat center !important;
+        color: #9a1c1d;
+    }
+.meme_close {
+    background: url(../../../images/v2/sumu/memeframe.png) no-repeat center !important;
+    height: 33px !important;
+    padding-bottom: 4px !important;
+}
+    .meme_close:hover {
+        background: url(../../../images/v2/sumu/memeframe_hover.png) no-repeat center !important;
+        color: #9a1c1d;
+    }
+.chat_submit_button {
+    background: url(../../../images/v2/sumu/sendframe.png) no-repeat center !important;
+    height: 33px !important;
+    padding-bottom: 4px !important;
+}
+    .chat_submit_button:hover {
+        background: url(../../../images/v2/sumu/sendframe_hover.png) no-repeat center !important;
+        color: #9a1c1d;
+    }
+
+/* Mobile Overrides */
+@media screen and (max-width: 999px) {
+    #container {
+        flex-direction: column !important;
+        padding-bottom: 0px;
+        width: 100%;
+    }
+
+    #footer {
+        display: none;
+    }
+
+    #hotbar {
+        display: none;
+    }
+
+    #content_wrapper {
+        margin-left: 0;
+        margin-right: 0;
+        margin-bottom: 0;
+        width: 100%;
+    }
+
+    #container::before {
+        display: none;
+    }
+
+    #content {
+        width: 100%;
+    }
+}
