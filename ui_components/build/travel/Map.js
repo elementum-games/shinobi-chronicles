@@ -228,31 +228,7 @@ function MapLocations({
     style: {
       backgroundImage: "url(." + location.objective_image + ")"
     }
-  }), location.objective_health && location.objective_max_health > 0 && (() => {
-    const percentage = location.objective_health / location.objective_max_health * 100;
-    let barColor;
-    if (percentage >= 50) {
-      barColor = 'green';
-    } else if (percentage >= 25) {
-      barColor = 'yellow';
-    } else {
-      barColor = 'red';
-    }
-    return /*#__PURE__*/React.createElement("div", {
-      className: "map_location_objective_health",
-      style: {
-        backgroundColor: barColor,
-        width: `${percentage}%`,
-        height: '6px',
-        position: 'absolute',
-        color: 'white',
-        textAlign: 'center',
-        lineHeight: '8px',
-        fontSize: '8px',
-        top: '3px'
-      }
-    });
-  })())))));
+  }))))));
 }
 function MapObjectives({
   objectives,
@@ -310,7 +286,7 @@ function RegionObjectives({
     } else {
       barColor = 'red';
     }
-    return /*#__PURE__*/React.createElement("div", {
+    return percentage < 100 ? /*#__PURE__*/React.createElement("div", {
       className: "region_objective_health",
       style: {
         backgroundColor: barColor,
@@ -323,7 +299,7 @@ function RegionObjectives({
         fontSize: '8px',
         top: '3px'
       }
-    });
+    }) : null;
   })())))));
 }
 function MapNearbyPlayers({

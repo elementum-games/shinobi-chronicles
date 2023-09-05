@@ -744,4 +744,8 @@ a.normalUser, a.normalUser:hover, a.normalUser:visited {
     #content {
         width: 100%;
     }
+
+    .sb_header_bar::after {
+        display: none;
+    }
 }

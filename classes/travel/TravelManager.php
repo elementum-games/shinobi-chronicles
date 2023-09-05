@@ -770,7 +770,7 @@ class TravelManager {
         $objectives = [];
 
         // Get Region Objectives
-        $region_result = $this->system->db->query("SELECT `region_locations`.`id` as `region_location_id`, `region_locations`.`region_id`, `region_locations`.`name`, `health`, `max_health`, `type`, `x`, `y`, `resource_name`, `village`, `villages`.`name` as `village_name` FROM `region_locations`
+        $region_result = $this->system->db->query("SELECT `region_locations`.`id` as `region_location_id`, `region_locations`.`region_id`, `region_locations`.`name`, `health`, `max_health`, `type`, `x`, `y`, `resource_name`, `defense`, `village`, `villages`.`name` as `village_name` FROM `region_locations`
             INNER JOIN `regions` ON `regions`.`region_id` = `region_locations`.`region_id`
             INNER JOIN `villages` ON `regions`.`village` = `villages`.`village_id`
             LEFT JOIN `resources` on `region_locations`.`resource_id` = `resources`.`resource_id`");
@@ -795,6 +795,7 @@ class TravelManager {
                             y: $obj['y'],
                             objective_health: $obj['health'],
                             objective_max_health: $obj['max_health'],
+                            defense: $obj['defense'],
                             objective_type: $obj['type'],
                             image: $image,
                         );
@@ -810,6 +811,7 @@ class TravelManager {
                             y: $obj['y'],
                             objective_health: $obj['health'],
                             objective_max_health: $obj['max_health'],
+                            defense: $obj['defense'],
                             objective_type: $obj['type'],
                             image: $image,
                         );
@@ -831,8 +833,6 @@ class TravelManager {
                                         break;
                                 }
                             }
-                            $obj['health'] = null;
-                            $obj['max_health'] = null;
                             $objectives[] = new RegionObjective(
                                 id: $obj['region_location_id'],
                                 name: $obj['name'],
@@ -841,6 +841,7 @@ class TravelManager {
                                 y: $obj['y'],
                                 objective_health: $obj['health'],
                                 objective_max_health: $obj['max_health'],
+                                defense: $obj['defense'],
                                 objective_type: $obj['type'],
                                 image: $image,
                             );

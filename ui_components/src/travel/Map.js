@@ -246,38 +246,6 @@ function MapLocations({ locations, tileWidth, tileHeight }) {
                                         backgroundImage: "url(." + location.objective_image + ")",
                                     }}></div>
                             }
-                            {location.objective_health && location.objective_max_health > 0 &&
-                                (() => {
-                                    const percentage = (location.objective_health / location.objective_max_health) * 100;
-                                    let barColor;
-
-                                    if (percentage >= 50) {
-                                        barColor = 'green';
-                                    } else if (percentage >= 25) {
-                                        barColor = 'yellow';
-                                    } else {
-                                        barColor = 'red';
-                                    }
-
-                                    return (
-                                        <div
-                                            className='map_location_objective_health'
-                                            style={{
-                                                backgroundColor: barColor,
-                                                width: `${percentage}%`,
-                                                height: '6px',
-                                                position: 'absolute',
-                                                color: 'white',
-                                                textAlign: 'center',
-                                                lineHeight: '8px',
-                                                fontSize: '8px',
-                                                top: '3px',
-                                            }}
-                                        >
-                                        </div>
-                                    );
-                                })()
-                            }
                         </div>
                     </ReactTransitionGroup.CSSTransition>
                 ))}
@@ -343,21 +311,21 @@ function RegionObjectives({ objectives, tileWidth, tileHeight }) {
                                         barColor = 'red';
                                     }
 
-                                    return (
-                                        <div
-                                            className='region_objective_health'
-                                            style={{
-                                                backgroundColor: barColor,
-                                                width: `${percentage}%`,
-                                                height: '6px',
-                                                position: 'absolute',
-                                                color: 'white',
-                                                textAlign: 'center',
-                                                lineHeight: '8px',
-                                                fontSize: '8px',
-                                                top: '3px',
-                                            }}
-                                        />
+                                return (percentage < 100 ? (
+                                    <div
+                                        className='region_objective_health'
+                                        style={{
+                                            backgroundColor: barColor,
+                                            width: `${percentage}%`,
+                                            height: '6px',
+                                            position: 'absolute',
+                                            color: 'white',
+                                            textAlign: 'center',
+                                            lineHeight: '8px',
+                                            fontSize: '8px',
+                                            top: '3px',
+                                        }}
+                                    />) : null
                                     );
                                 })()
                             }
