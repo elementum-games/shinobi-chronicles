@@ -10,8 +10,9 @@ class RegionObjective {
         public string $image,
         public string $action_url = "",
         public string $action_message = "",
-        public ?int $objective_health = null,
-        public ?int $objective_max_health = null,
+        public int $objective_health,
+        public int $objective_max_health,
+        public int $defense,
         public ?string $objective_type = null,
     ) {}
 }

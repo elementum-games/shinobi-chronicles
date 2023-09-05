@@ -206,8 +206,12 @@ function MapLocations({
 }) {
   return /*#__PURE__*/React.createElement("div", {
     className: "map_locations"
-  }, locations.map(location => /*#__PURE__*/React.createElement("div", {
+  }, /*#__PURE__*/React.createElement(ReactTransitionGroup.TransitionGroup, null, locations.map(location => /*#__PURE__*/React.createElement(ReactTransitionGroup.CSSTransition, {
     key: location.location_id,
+    timeout: 500 // Set the animation duration in milliseconds
+    ,
+    classNames: "fade"
+  }, /*#__PURE__*/React.createElement("div", {
     className: location.objective_type != undefined ? 'map_location ' + location.objective_type : 'map_location',
     style: {
       cursor: "pointer",
@@ -248,7 +252,7 @@ function MapLocations({
         top: '3px'
       }
     });
-  })())));
+  })())))));
 }
 function MapObjectives({
   objectives,

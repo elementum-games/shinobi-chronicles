@@ -12,7 +12,7 @@
     --border-color-default: #939cb6;
     --box-color-default: #b9bfcc;
     --main-background-color: #898fa1;
-    --content-background-color: #272733;
+    --content-background-color: #b5bdd4;
     --content-background-gradient: linear-gradient(to bottom, #c3c9d7, #c3c9d7);
     --content-outline-color: #777f95;
     --content-border-color: #898fa1;
@@ -88,7 +88,7 @@
     --header-border-height: 3px;
     --header-logout-color: #e6a0a0;
     /* Chat Config */
-    --chat-secondary-background-color: #1a1921;
+    --chat-secondary-background-color: #ae9aa5;
     /* Style helpers */
     --clip-tall-hexagon: polygon(50% 0%,95% 20%,95% 80%,50% 100%,5% 80%,5% 20%);
 }
@@ -641,4 +641,25 @@ a.normalUser, a.normalUser:hover, a.normalUser:visited {
 }
 
 /* Sumu Chat Override */
-c5c9d5
+.post_staff_title {
+    color: white !important;
+}
+.chat_pagination {
+    color: #5c73b3 !important;
+}
+    .chat_pagination:hover {
+        color: #939cb6 !important;
+    }
+.post_controls_container {
+    border: 1px solid #abb3c7 !important;
+    border-left: none !important;
+}
+.post_message_container {
+    border: 1px solid #abb3c7 !important;
+    border-left: none !important;
+    border-right: none !important;
+}
+.post_user_container {
+    border: 1px solid #abb3c7 !important;
+    border-right: none !important;
+}

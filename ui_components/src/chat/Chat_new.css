@@ -79,7 +79,7 @@
     flex-direction: row;
     flex-wrap: wrap;
     justify-content: center;
-    background-color: #272733;
+    background-color: var(--content-background-color);
 }
 .meme_select {
     cursor: pointer;

@@ -222,59 +222,66 @@ function MapGridLines({ tileWidth, tileHeight, stageOffsetX, stageOffsetY, stage
 function MapLocations({ locations, tileWidth, tileHeight }) {
     return (
         <div className='map_locations'>
-            {locations.map((location) => (
-                <div key={location.location_id}
-                    className={location.objective_type != undefined ? 'map_location ' + location.objective_type : 'map_location'}
-                    style={{
-                        cursor: "pointer",
-                        backgroundColor: "#" + location.background_color,
-                        backgroundImage: location.background_image ? `url(${location.background_image})` : null,
-                        transform: location.objective_type == 'key_location' ? `translate3d(${((location.x - 1) * tileWidth) - 8}px, ${((location.y - 1) * tileHeight) - 8}px, 0)`
-                            : `translate3d(${(location.x - 1) * tileWidth}px, ${(location.y - 1) * tileHeight}px, 0)`,
-                        backfaceVisibility: "hidden",
-                        filter: "blur(0)",
-                    }}>
-                    <div className='map_location_tooltip'>{location.name}</div>
-                    {location.objective_image &&
-                        <div className={location.objective_type != undefined ? 'map_location_objective ' + location.objective_type : 'map_location_objective'}
+            <ReactTransitionGroup.TransitionGroup>
+                {locations.map((location) => (
+                    <ReactTransitionGroup.CSSTransition
+                        key={location.location_id}
+                        timeout={500} // Set the animation duration in milliseconds
+                        classNames="fade"
+                    >
+                        <div className={location.objective_type != undefined ? 'map_location ' + location.objective_type : 'map_location'}
                             style={{
-                                backgroundImage: "url(." + location.objective_image + ")",
-                            }}></div>
-                    }
-                    {location.objective_health && location.objective_max_health > 0 &&
-                        (() => {
-                            const percentage = (location.objective_health / location.objective_max_health) * 100;
-                            let barColor;
-
-                            if (percentage >= 50) {
-                                barColor = 'green';
-                            } else if (percentage >= 25) {
-                                barColor = 'yellow';
-                            } else {
-                                barColor = 'red';
-                            }
-
-                            return (
-                                <div
-                                    className='map_location_objective_health'
+                                cursor: "pointer",
+                                backgroundColor: "#" + location.background_color,
+                                backgroundImage: location.background_image ? `url(${location.background_image})` : null,
+                                transform: location.objective_type == 'key_location' ? `translate3d(${((location.x - 1) * tileWidth) - 8}px, ${((location.y - 1) * tileHeight) - 8}px, 0)`
+                                    : `translate3d(${(location.x - 1) * tileWidth}px, ${(location.y - 1) * tileHeight}px, 0)`,
+                                backfaceVisibility: "hidden",
+                                filter: "blur(0)",
+                            }}>
+                            <div className='map_location_tooltip'>{location.name}</div>
+                            {location.objective_image &&
+                                <div className={location.objective_type != undefined ? 'map_location_objective ' + location.objective_type : 'map_location_objective'}
                                     style={{
-                                        backgroundColor: barColor,
-                                        width: `${percentage}%`,
-                                        height: '6px',
-                                        position: 'absolute',
-                                        color: 'white',
-                                        textAlign: 'center',
-                                        lineHeight: '8px',
-                                        fontSize: '8px',
-                                        top: '3px',
-                                    }}
-                                >
-                                </div>
-                            );
-                        })()
-                    }
-                </div>
-            ))}
+                                        backgroundImage: "url(." + location.objective_image + ")",
+                                    }}></div>
+                            }
+                            {location.objective_health && location.objective_max_health > 0 &&
+                                (() => {
+                                    const percentage = (location.objective_health / location.objective_max_health) * 100;
+                                    let barColor;
+
+                                    if (percentage >= 50) {
+                                        barColor = 'green';
+                                    } else if (percentage >= 25) {
+                                        barColor = 'yellow';
+                                    } else {
+                                        barColor = 'red';
+                                    }
+
+                                    return (
+                                        <div
+                                            className='map_location_objective_health'
+                                            style={{
+                                                backgroundColor: barColor,
+                                                width: `${percentage}%`,
+                                                height: '6px',
+                                                position: 'absolute',
+                                                color: 'white',
+                                                textAlign: 'center',
+                                                lineHeight: '8px',
+                                                fontSize: '8px',
+                                                top: '3px',
+                                            }}
+                                        >
+                                        </div>
+                                    );
+                                })()
+                            }
+                        </div>
+                    </ReactTransitionGroup.CSSTransition>
+                ))}
+            </ReactTransitionGroup.TransitionGroup>
         </div>
     );
 }
