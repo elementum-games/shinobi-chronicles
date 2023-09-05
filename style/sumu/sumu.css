@@ -700,7 +700,7 @@ a.normalUser, a.normalUser:hover, a.normalUser:visited {
         color: #9a1c1d;
     }
 #chat_input_box {
-    background-image: url(../../../images/v2/sumu/nwbigcorner.png), url(../../../images/v2/sumu/nebigcorner.png), url(../../../images/v2/sumu/sebigcorner.png), url(../../../images/v2/sumu/nwbigcorner.png) !important;
+    background-image: url(../../../images/v2/sumu/nwbigcorner.png), url(../../../images/v2/sumu/nebigcorner.png), url(../../../images/v2/sumu/sebigcorner.png), url(../../../images/v2/sumu/swbigcorner.png) !important;
     background-position: top 0 left 0, top 0 right 0, bottom 0 right 0, bottom 0 left 0;
     background-repeat: no-repeat, no-repeat, no-repeat, no-repeat;
 }
