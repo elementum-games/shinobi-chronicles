@@ -43,6 +43,7 @@ class TravelApiPresenter {
             'colosseum_coords'  => $travelManager->getColosseumCoords(),
             'region_objectives' => $travelManager->fetchRegionObjectives(),
             'map_objectives'    => $travelManager->fetchMapObjectives(),
+            'battle_url'        => $travelManager->getPlayerBattleUrl(),
         ];
     }
 

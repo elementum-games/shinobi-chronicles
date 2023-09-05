@@ -32,6 +32,7 @@ import { ScoutArea } from "./ScoutArea.js";
     colosseum_coords:    object,
     region_objectives:   object,
     map_objectives:      object,
+    battle_url:          boolean,
  * }} mapData
  *
  * @param {{
@@ -129,6 +130,9 @@ function Travel({
                 request: 'LoadTravelData'
             }
         ).then((response) => {
+            if (response.data.mapData.battle_url) {
+                window.location.href = response.data.mapData.battle_url;
+            }
             if (response.errors.length) {
                 handleErrors(response.errors);
                 return;

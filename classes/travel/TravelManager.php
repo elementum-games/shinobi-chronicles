@@ -853,4 +853,35 @@ class TravelManager {
 
         return $objectives;
     }
+
+    function getPlayerBattleUrl(): ?string {
+        $link = null;
+        if ($this->user->battle_id > 0) {
+            $result = $this->system->db->query(
+                "SELECT `battle_type` FROM `battles` WHERE `battle_id`='{$this->user->battle_id}' LIMIT 1"
+            );
+            if (!$this->system->db->last_num_rows == 0) {
+                $result = $this->system->db->fetch($result);
+                $link = null;
+                switch ($result['battle_type']) {
+                    case Battle::TYPE_AI_ARENA:
+                        $link = $this->system->router->getUrl('arena');
+                        break;
+                    case Battle::TYPE_AI_MISSION:
+                        $link = $this->system->router->getUrl('mission');
+                        break;
+                    case Battle::TYPE_AI_RANKUP:
+                        $link = $this->system->router->getUrl('rankup');
+                        break;
+                    case Battle::TYPE_SPAR:
+                        $link = $this->system->router->getUrl('spar');
+                        break;
+                    case Battle::TYPE_FIGHT:
+                        $link = $this->system->router->getUrl('battle');
+                        break;
+                }
+            }
+        }
+        return $link;
+    }
 }
