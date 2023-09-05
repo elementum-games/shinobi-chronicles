@@ -472,10 +472,10 @@ body {
 
     /* Corners in clockwise direction */
     background-image:
-            url(/images/v2/decorations/necorner.png),
-            url(/images/v2/decorations/secorner.png),
-            url(/images/v2/decorations/swcorner.png),
-            url(/images/v2/decorations/nwcorner.png);
+            url(/images/v2/sumu/necorner.png),
+            url(/images/v2/sumu/secorner.png),
+            url(/images/v2/sumu/swcorner.png),
+            url(/images/v2/sumu/nwcorner.png);
     background-repeat:
             no-repeat,
             no-repeat,
@@ -626,6 +626,15 @@ a.normalUser, a.normalUser:hover, a.normalUser:visited {
 .attributes .badge {
     background-image: url(../../../images/v2/sumu/blueplate.png) !important;
 }
+.profile_row_third {
+    background: url(../../../images/v2/sumu/nwbigcorner.png) no-repeat top left, url(../../../images/v2/sumu/sebigcorner.png) no-repeat bottom right !important;
+}
+.reputation_indicator {
+    background: #8690ac !important;
+}
+.bloodline_mastery_indicator {
+    background: #8690ac !important;
+}
 
 /* Sumu Travel Override */
 .travel-scout-attack span.direction {
@@ -690,6 +699,20 @@ a.normalUser, a.normalUser:hover, a.normalUser:visited {
         background: url(../../../images/v2/sumu/sendframe_hover.png) no-repeat center !important;
         color: #9a1c1d;
     }
+#chat_input_box {
+    background-image: url(../../../images/v2/sumu/nwbigcorner.png), url(../../../images/v2/sumu/nebigcorner.png), url(../../../images/v2/sumu/sebigcorner.png), url(../../../images/v2/sumu/nwbigcorner.png) !important;
+    background-position: top 0 left 0, top 0 right 0, bottom 0 right 0, bottom 0 left 0;
+    background-repeat: no-repeat, no-repeat, no-repeat, no-repeat;
+}
+.quick_reply_box {
+    outline: none !important;
+    accent-color: #9a1c1d !important;
+}
+
+/* Content Header Overrides */
+.contentHeaderDivider > svg > line {
+    display: none;
+}
 
 /* Mobile Overrides */
 @media screen and (max-width: 999px) {
