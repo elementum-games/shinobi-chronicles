@@ -102,12 +102,12 @@
     border: 1px solid rgba(0, 0, 0, 0.12);
 }
 
+/* Slightly bigger buttons for small touchscreens
 @media (max-width: 1200px) {
-    /* Slightly bigger buttons for small touchscreens */
     .travel-wrapper {
         padding: 40px;
     }
-}
+}*/
 @media (max-width: 600px) {
     .travel-wrapper {
         width: calc(95% - 10px - var(--scout-container-side-width));
@@ -650,9 +650,8 @@
     display: flex;
     flex-flow: row nowrap;
     text-indent: 5px;
-
+    white-space: nowrap;
     padding-right: 5px;
-
     flex-grow: 2;
     align-items: center;
 }
