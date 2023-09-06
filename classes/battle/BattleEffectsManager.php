@@ -459,11 +459,11 @@ class BattleEffectsManager {
             case 'ninjutsu_nerf':
                 $announcement_text = "[opponent]'s Ninjutsu offense is being lowered";
                 break;
+            case 'daze':
             case 'genjutsu_nerf':
                 $announcement_text = "[opponent]'s Genjutsu is being lowered";
                 break;
             case 'intelligence_nerf':
-            case 'daze':
                 $announcement_text = "[opponent]'s Intelligence is being lowered";
                 break;
             case 'willpower_nerf':
