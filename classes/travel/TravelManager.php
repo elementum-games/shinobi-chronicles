@@ -1,5 +1,7 @@
 <?php
 
+use DDTrace\Trace;
+
 require __DIR__ . '/NearbyPlayerDto.php';
 require __DIR__ . '/MapObjective.php';
 require __DIR__ . '/RegionObjective.php';
@@ -127,6 +129,7 @@ class TravelManager {
     /**
      * @throws RuntimeException
      */
+    #[Trace]
     public function movePlayer($direction): bool {
         $new_coords = Travel::getNewMovementValues($direction, $this->user->location);
         $ignore_coord_restrictions = $this->user->isHeadAdmin();
@@ -207,6 +210,7 @@ class TravelManager {
     /**
      * @return NearbyPlayerDto[]
      */
+    #[Trace]
     public function fetchNearbyPlayers(): array {
         $sql = "SELECT `users`.`user_id`, `users`.`user_name`, `users`.`village`, `users`.`rank`, `users`.`stealth`,
                 `users`.`level`, `users`.`attack_id`, `users`.`battle_id`, `ranks`.`name` as `rank_name`, `users`.`location`, `users`.`last_death_ms`, `villages`.`village_id`
@@ -353,6 +357,7 @@ class TravelManager {
     /**
      * @return MapLocation[]
      */
+    #[Trace]
     public function fetchCurrentMapLocations(): array {
         $result = $this->system->db->query(
             "
@@ -531,6 +536,7 @@ class TravelManager {
     /**
      * @return Region[]
      */
+    #[Trace]
     public function getRegions(User $player): array {
         // generate vertices for player view area
         $player_area = [
@@ -591,6 +597,7 @@ class TravelManager {
     /**
      * @return NearbyPatrol[]
      */
+    #[Trace]
     public function fetchNearbyPatrols(): array {
         $return_arr = [];
 
@@ -630,6 +637,7 @@ class TravelManager {
     /**
      * @return MapObjective[]
      */
+    #[Trace]
     public function fetchMapObjectives(): array
     {
         $objectives = [];
@@ -765,6 +773,7 @@ class TravelManager {
     /**
      * @return RegionObjective[]
      */
+    #[Trace]
     public function fetchRegionObjectives(): array
     {
         $objectives = [];
