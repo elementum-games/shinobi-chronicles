@@ -552,10 +552,8 @@ function TravelActions({
     directionButtonClicked.current = null;
     setMovementDirection(null);
   };
-  const travelActionRef = React.useRef(null);
   return /*#__PURE__*/React.createElement("div", {
-    className: "travel-actions",
-    ref: travelActionRef
+    className: "travel-actions"
   }, allowedDirections.map(direction => /*#__PURE__*/React.createElement("a", {
     key: `travel:${direction}`,
     href: `${travelPageLink}&travel=${direction}`,
@@ -583,7 +581,7 @@ function TravelActions({
     sparPlayer: sparPlayer,
     ranksToView: ranksToView,
     playerId: playerId,
-    travelActionRef: travelActionRef
+    updateMovementDirection: updateMovementDirection
   }));
 }
 const Message = ({

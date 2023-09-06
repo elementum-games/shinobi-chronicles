@@ -661,10 +661,8 @@ function TravelActions({
         setMovementDirection(null);
     };
 
-    const travelActionRef = React.useRef(null);
-
     return (
-        <div className='travel-actions' ref={travelActionRef}>
+        <div className='travel-actions'>
             {allowedDirections.map((direction) => (
                 <a
                     key={`travel:${direction}`}
@@ -696,7 +694,7 @@ function TravelActions({
                 sparPlayer={sparPlayer}
                 ranksToView={ranksToView}
                 playerId={playerId}
-                travelActionRef={travelActionRef}
+                updateMovementDirection={updateMovementDirection}
             />
 
         </div>

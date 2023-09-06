@@ -932,21 +932,22 @@
 
 /* Quick Scout */
 .quick-scout-contrainer {
-    position: absolute; 
-    height: 75px; 
-    width: 75px; 
-    top: 50%; 
-    left: 50%; 
-    transform: translate(-50%, calc(-50% - 1px)); 
-    cursor: pointer; 
-    z-index: 10; 
-    background: linear-gradient(var(--sidebar-button-background-color) var(--sidebar-button-background-color)); 
-    background-size: cover; 
-    background-repeat: no-repeat; 
-    background-position: center; 
-    box-shadow: 0 0 0 1px var(--sidebar-button-border-color) inset; 
-    user-select: none; 
+    position: absolute;
+    height: 75px;
+    width: 75px;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, calc(-50% - 1px));
+    cursor: pointer;
+    z-index: 10;
+    background: var(--travel-ui-color);
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    box-shadow: 0 0 0 1px var(--sidebar-button-border-color) inset;
+    user-select: none;
     touch-action: none;
+    -webkit-tap-highlight-color: transparent;
 }
 .quick-scout span.direction {
     display: flex;
@@ -962,16 +963,18 @@
     width: 75px;
     height: 75px;
 }
-.quick-scout a {
-    display: block;
-    width: 100%;
-    height: 100%;
-    cursor: pointer;
-    background-image: url("../../../images/map/icons/attack-off.png");
-    background-size: 50px auto;
-    background-repeat: no-repeat;
-    background-position: center;
-}
+    .quick-scout a {
+        display: block;
+        width: 100%;
+        height: 100%;
+        cursor: pointer;
+        background-image: url("../../../images/map/icons/attack-off.png");
+        background-size: 50px auto;
+        background-repeat: no-repeat;
+        background-position: center;
+        user-select: none;
+        touch-action: none;
+    }
     .quick-scout a:hover {
         background-image: url("../../../images/map/icons/attack-on.png");
         background-size: 50px auto;

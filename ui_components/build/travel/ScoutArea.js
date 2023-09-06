@@ -46,7 +46,7 @@ export const QuickScout = ({
   sparPlayer,
   ranksToView,
   playerId,
-  travelActionRef
+  updateMovementDirection
 }) => {
   return /*#__PURE__*/React.createElement("div", {
     className: "quick-scout-contrainer",
@@ -62,7 +62,7 @@ export const QuickScout = ({
     attackPlayer: attackPlayer,
     sparPlayer: sparPlayer,
     colosseumCoords: mapData ? mapData.colosseum_coords : null,
-    travelActionRef: travelActionRef
+    updateMovementDirection: updateMovementDirection
   }));
 };
 const Player = ({
@@ -103,132 +103,19 @@ const QuickScoutInner = ({
   attackPlayer,
   sparPlayer,
   colosseumCoords,
-  travelActionRef
+  updateMovementDirection
 }) => {
-  const quickScoutMouseDown = () => {
-    switch (player_data.direction) {
-      case 'north':
-        event = new KeyboardEvent('keydown', {
-          key: 'w',
-          bubbles: true,
-          cancelable: true
-        });
-        travelActionRef.current.dispatchEvent(event);
-        break;
-      case 'northeast':
-        event = new KeyboardEvent('keydown', {
-          key: 'w',
-          bubbles: true,
-          cancelable: true
-        });
-        travelActionRef.current.dispatchEvent(event);
-        event = new KeyboardEvent('keydown', {
-          key: 'd',
-          bubbles: true,
-          cancelable: true
-        });
-        travelActionRef.current.dispatchEvent(event);
-        break;
-      case 'east':
-        event = new KeyboardEvent('keydown', {
-          key: 'd',
-          bubbles: true,
-          cancelable: true
-        });
-        travelActionRef.current.dispatchEvent(event);
-        break;
-      case 'southeast':
-        event = new KeyboardEvent('keydown', {
-          key: 'd',
-          bubbles: true,
-          cancelable: true
-        });
-        travelActionRef.current.dispatchEvent(event);
-        event = new KeyboardEvent('keydown', {
-          key: 's',
-          bubbles: true,
-          cancelable: true
-        });
-        travelActionRef.current.dispatchEvent(event);
-        break;
-      case 'south':
-        event = new KeyboardEvent('keydown', {
-          key: 's',
-          bubbles: true,
-          cancelable: true
-        });
-        travelActionRef.current.dispatchEvent(event);
-        break;
-      case 'southwest':
-        event = new KeyboardEvent('keydown', {
-          key: 's',
-          bubbles: true,
-          cancelable: true
-        });
-        travelActionRef.current.dispatchEvent(event);
-        event = new KeyboardEvent('keydown', {
-          key: 'a',
-          bubbles: true,
-          cancelable: true
-        });
-        travelActionRef.current.dispatchEvent(event);
-        break;
-      case 'west':
-        event = new KeyboardEvent('keydown', {
-          key: 'a',
-          bubbles: true,
-          cancelable: true
-        });
-        travelActionRef.current.dispatchEvent(event);
-        break;
-      case 'northwest':
-        event = new KeyboardEvent('keydown', {
-          key: 'a',
-          bubbles: true,
-          cancelable: true
-        });
-        travelActionRef.current.dispatchEvent(event);
-        event = new KeyboardEvent('keydown', {
-          key: 'w',
-          bubbles: true,
-          cancelable: true
-        });
-        travelActionRef.current.dispatchEvent(event);
-        break;
-      default:
-        break;
-    }
+  const onKeyDown = e => {
+    e.preventDefault();
+    updateMovementDirection(player_data.direction);
   };
-  const quickScoutMouseUp = () => {
-    event = new KeyboardEvent('keyup', {
-      key: 'w',
-      bubbles: true,
-      cancelable: true
-    });
-    travelActionRef.current.dispatchEvent(event);
-    event = new KeyboardEvent('keyup', {
-      key: 'a',
-      bubbles: true,
-      cancelable: true
-    });
-    travelActionRef.current.dispatchEvent(event);
-    event = new KeyboardEvent('keyup', {
-      key: 's',
-      bubbles: true,
-      cancelable: true
-    });
-    travelActionRef.current.dispatchEvent(event);
-    event = new KeyboardEvent('keyup', {
-      key: 'd',
-      bubbles: true,
-      cancelable: true
-    });
-    travelActionRef.current.dispatchEvent(event);
+  const onKeyUp = e => {
+    e.preventDefault();
+    updateMovementDirection(null);
   };
   return /*#__PURE__*/React.createElement("div", {
     className: "quick-scout",
-    onMouseDown: quickScoutMouseDown,
-    onMouseUp: quickScoutMouseUp
+    onMouseUp: e => onKeyUp(e)
   }, player_data.attack === true && parseInt(player_data.battle_id, 10) === 0 && !player_data.invulnerable && (player_data.target_x === colosseumCoords.x && player_data.target_y === colosseumCoords.y ? /*#__PURE__*/React.createElement("a", {
     onClick: () => sparPlayer(player_data.user_id)
   }) : /*#__PURE__*/React.createElement("a", {
@@ -236,7 +123,8 @@ const QuickScoutInner = ({
   })), player_data.attack === true && parseInt(player_data.battle_id, 10) > 0 && /*#__PURE__*/React.createElement("span", {
     className: "in-battle"
   }), player_data.attack === false && player_data.direction !== 'none' && /*#__PURE__*/React.createElement("span", {
-    className: `direction ${player_data.direction}`
+    className: `direction ${player_data.direction}`,
+    onMouseDown: e => onKeyDown(e)
   }));
 };
 const visibilityClass = invulnerable => {
