@@ -58,23 +58,14 @@ export const QuickScout = ({
     travelActionRef,
 }) => {
     return (
-        <div className='quick-scout-contrainer' style={{
-            position: 'absolute',
-            height: '75px',
-            width: '75px',
-            top: '50%',
-            left: '50%',
-            transform: 'translate(-50%, calc(-50% - 1px))',
-            cursor: 'pointer',
-            zIndex: 10,
-            background: 'linear-gradient(var(--sidebar-button-background-color), var(--sidebar-button-background-color))',
-            backgroundSize: "cover",
-            backgroundRepeat: "no-repeat",
-            backgroundPosition: "center",
-            boxShadow: '0 0 0 1px var(--sidebar-button-border-color) inset',
-            userSelect: 'none',
-            touchAction: 'none',
-            }}>
+        <div className='quick-scout-contrainer'
+            onContextMenu={e => {
+                e.preventDefault();
+            }}
+            onClick={e => {
+                e.preventDefault();
+            }}
+        >
             {scoutData && scoutData.find(user => ranksToView[parseInt(user.rank_num)] === true && user.user_id !== playerId) && (
                 <QuickScoutInner
                     key={scoutData[0].user_id}

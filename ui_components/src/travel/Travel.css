@@ -19,13 +19,11 @@
 .travel-filter {
     width: 95%;
     max-width: calc(1000px);
-
     display: flex;
     flex-flow: row nowrap;
     align-items: center;
     justify-content: flex-start;
-
-    background: var(--sidebar-button-background-color);
+    background: var(--travel-ui-color);
     border: 1px solid rgba(0, 0, 0, 0.12);
 }
 .travel-wrapper {
@@ -100,8 +98,7 @@
     justify-content: space-between;
     position: relative;
     padding: 4px 0 8px 8px;
-    
-    background: var(--sidebar-button-background-color);
+    background: var(--travel-ui-color);
     border: 1px solid rgba(0, 0, 0, 0.12);
 }
 
@@ -219,8 +216,8 @@
     user-select: none;
     touch-action: none;
     -webkit-tap-highlight-color: transparent;
-    background: var(--sidebar-button-background-color);
-    box-shadow: 0 0 0 1px var(--sidebar-button-border-color) inset;
+    background: var(--travel-ui-color);
+    box-shadow: 0 0 0 1px var(--travel-background-color) inset;
 }
 
 :root {
@@ -289,11 +286,11 @@
     flex-grow: 2;
 }
 .travel-actions a.active, .travel-actions a.active:hover {
-    background: var(--sidebar-button-background-hover);
+    background: var(--travel-button-hover);
 }
 @media(hover: hover) {
     .travel-actions a:hover {
-        background: var(--sidebar-button-background-hover);
+        background: var(--travel-button-hover);
         transition: background-color 200ms ease-in-out;
     }
 }
@@ -306,7 +303,7 @@
     position: relative;
     z-index: 10;
     background: var(--theme-content-darker-bg-color);
-    border: 1px solid var(--sidebar-button-border-color);
+    border: 1px solid var(--travel-background-color);
 }
 
 #travel-x-container {
@@ -319,8 +316,8 @@
     justify-content: flex-start;
     align-self: flex-start;
     overflow: hidden;
-    background: var(--sidebar-button-background-color);
-    border-bottom: 1px solid var(--sidebar-button-border-color);
+    background: var(--travel-ui-color);
+    border-bottom: 1px solid var(--travel-background-color);
 }
 
 #travel-y-container {
@@ -332,8 +329,8 @@
     justify-content: flex-start;
     align-items: flex-start;
     overflow: hidden;
-    background: var(--sidebar-button-background-color);
-    border-right: 1px solid var(--sidebar-button-border-color);
+    background: var(--travel-ui-color);
+    border-right: 1px solid var(--travel-background-color);
 }
 
 .travel-gutter-grid {
@@ -345,14 +342,14 @@
     justify-content: center;
     font-family: sans-serif;
     color: var(--font-color-3);
-    background: var(--sidebar-button-background-color);
+    background: var(--travel-ui-color);
 }
 
 .travel-gutter-grid-x {
-    border-right: 1px solid var(--sidebar-button-border-color);
+    border-right: 1px solid var(--travel-background-color);
 }
     .travel-gutter-grid-x:first-of-type {
-        border-left: 1px solid var(--sidebar-button-border-color);
+        border-left: 1px solid var(--travel-background-color);
     }
 
 .travel-gutter-grid-x:last-of-type {
@@ -360,7 +357,7 @@
 }
 
 .travel-gutter-grid-y {
-    border-bottom: 1px solid var(--sidebar-button-border-color);
+    border-bottom: 1px solid var(--travel-background-color);
 }
 .travel-gutter-grid-y:last-of-type {
     border-bottom: 0;
@@ -935,6 +932,23 @@
 }
 
 /* Quick Scout */
+.quick-scout-contrainer {
+    position: absolute; 
+    height: 75px; 
+    width: 75px; 
+    top: 50%; 
+    left: 50%; 
+    transform: translate(-50%, calc(-50% - 1px)); 
+    cursor: pointer; 
+    z-index: 10; 
+    background: linear-gradient(var(--sidebar-button-background-color) var(--sidebar-button-background-color)); 
+    background-size: cover; 
+    background-repeat: no-repeat; 
+    background-position: center; 
+    box-shadow: 0 0 0 1px var(--sidebar-button-border-color) inset; 
+    user-select: none; 
+    touch-action: none;
+}
 .quick-scout span.direction {
     display: flex;
     width: 100%;
@@ -979,7 +993,7 @@
         background-position: center;
     }
     .quick-scout:hover {
-        background: var(--sidebar-button-background-hover);
+        background: var(--travel-button-hover);
     }
 .quick-scout span.north {
     transform: rotate(-90deg);

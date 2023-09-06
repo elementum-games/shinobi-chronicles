@@ -91,6 +91,10 @@
     --chat-secondary-background-color: #ae9aa5;
     /* Style helpers */
     --clip-tall-hexagon: polygon(50% 0%,95% 20%,95% 80%,50% 100%,5% 80%,5% 20%);
+    /* Travel Config */
+    --travel-ui-color: #c3c9d7;
+    --travel-button-hover: #474b58;
+    --travel-background-color: #7f869a;
 }
 
 /* Helper Classes - TO-DO: remove helpers, organize module CSS classes */
@@ -514,6 +518,7 @@ h3 {
 .systemMessage {
     width: 100%;
     top: 5px;
+    color: var(--font-color-1);
 }
 
 /* User Colors */
