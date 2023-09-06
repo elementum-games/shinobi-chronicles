@@ -52,6 +52,8 @@ function Chat({
 
     const [message, setMessage] = React.useState("");
 
+    const chatInputRef = React.useRef(null);
+
     if(banInfo.isBanned) {
         return <ChatBanInfo
             banName={banInfo.name}
@@ -149,6 +151,7 @@ function Chat({
 
     function quotePost(postId) {
         setMessage(prevMessage => `${prevMessage}[quote:${postId}]`);
+        chatInputRef.current.focus();
     }
 
     return (
@@ -160,6 +163,7 @@ function Chat({
                 submitPost={submitPost}
                 message={message}
                 setMessage={setMessage}
+                chatInputRef={chatInputRef}
             />
             <ChatPosts
                 posts={posts}
@@ -197,7 +201,7 @@ function ChatBanInfo({ banName, banDescription, banTimeRemaining }) {
     );
 }
 
-function ChatInput({maxPostLength, memes, submitPost, message, setMessage}) {
+function ChatInput({ maxPostLength, memes, submitPost, message, setMessage, chatInputRef }) {
     const [quickReply, _setQuickReply] = React.useState(
         JSON.parse(localStorage.getItem("quick_reply_on") ?? "true")
     );
@@ -211,6 +215,7 @@ function ChatInput({maxPostLength, memes, submitPost, message, setMessage}) {
     function handleMemeSelect(memeIndex: number) {
         setMessage(prevMessage => `${prevMessage}${memes.codes[memeIndex]}`);
         setShowMemeSelect(false);
+        chatInputRef.current.focus();
     }
 
     const handlePostSubmit = React.useCallback(() => {
@@ -233,7 +238,7 @@ function ChatInput({maxPostLength, memes, submitPost, message, setMessage}) {
 
     const charactersRemaining = maxPostLength - message.length;
     const charactersRemainingDisplay = `Characters remaining ${charactersRemaining}`;
-
+    
     return (
         <div className="chat_input_container">
             {showMemeSelect &&
@@ -255,6 +260,7 @@ function ChatInput({maxPostLength, memes, submitPost, message, setMessage}) {
             <div className="chat_input_center">
                 <textarea
                     id="chat_input_box"
+                    ref={chatInputRef}
                     minLength="3"
                     maxLength={maxPostLength}
                     value={message}
