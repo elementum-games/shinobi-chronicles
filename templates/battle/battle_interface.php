@@ -117,6 +117,7 @@ if($battle->battle_text) {
 
 <?php $system->printMessage(); ?>
 <table class='table'>
+    <tr><th colspan="2">Turn <?= $battle->winner ? $battle->turn_count : $battle->turn_count + 1 ?></th></tr>
     <tr>
         <th id='bi_th_user' style='width:50%;'>
             <a href='<?= $system->router->links['members'] ?>&user=<?= $player->getName() ?>' style='text-decoration:none'><?= $player->getName() ?></a>
