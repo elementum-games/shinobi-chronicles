@@ -14,7 +14,7 @@ class Village {
     public int $region_id;
     public string $kage_name;
     public array $resources = [];
-
+    public array $relations = [];
 
     const KAGE_NAMES = [
         1 => 'Tsuchikage',
@@ -39,6 +39,7 @@ class Village {
             }
             $this->kage_name = self::KAGE_NAMES[$this->village_id];
             $this->coords = self::getLocation($this->system, $this->village_id);
+            $this->relations = self::getRelations($this->system, $this->village_id);
         }
         // updated legacy constructor logic
         else {
@@ -46,6 +47,7 @@ class Village {
             $this->getVillageData();
             $this->kage_name = self::KAGE_NAMES[$this->village_id];
             $this->coords = self::getLocation($this->system, $this->village_id);
+            $this->relations = self::getRelations($this->system, $this->village_id);
         }
     }
 
@@ -101,5 +103,29 @@ class Village {
             return true;
         }
         return false;
+    }
+
+    /**
+     * @return VillageRelation[]
+     */
+    public function getRelations(System $system, string $village_id): array {
+        $relations = [];
+        $relations_result = $system->db->query(
+            "SELECT * FROM `village_relations`
+                WHERE `relation_end` IS NULL
+                AND (`village1_id` = {$village_id} OR `village2_id` = {$village_id});
+            ");
+        $relations_result = $system->db->fetch_all($relations_result);
+        foreach ($relations_result as $relation) {
+            $relation_target = 0;
+            if ($relation['village1_id'] != $village_id) {
+                $relation_target = $relation['village1_id'];
+            }
+            else if ($relation['village2_id'] != $village_id) {
+                $relation_target = $relation['village2_id'];
+            }
+            $relations[$relation_target] = new VillageRelation($relation);
+        }
+        return $relations;
     }
 }
