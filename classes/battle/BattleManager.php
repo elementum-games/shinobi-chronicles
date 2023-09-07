@@ -779,8 +779,12 @@ class BattleManager {
             );
         }
 
-        $text = $attack->jutsu->battle_text;
         $attack_jutsu_color = BattleManager::getJutsuTextColor($attack->jutsu->jutsu_type);
+        if (!$user instanceof NPC) {
+            $text = "<span style=\'color:{$attack_jutsu_color}\'><i>" . System::unSlug($attack->jutsu->name) . '</i></span></br>' . $attack->jutsu->battle_text;
+        } else {
+            $text = $attack->jutsu->battle_text;
+        }
         $has_element = ($attack->jutsu->element != Jutsu::ELEMENT_NONE && $attack->jutsu->element != "none");
         $element_text = ' with ' . $attack->jutsu->element;
 
