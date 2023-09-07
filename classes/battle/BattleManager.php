@@ -744,7 +744,7 @@ class BattleManager {
         }
 
         // Weapon effect for taijutsu (IN PROGRESS)
-        if($attack->jutsu->weapon_id && $user->items[$attack->jutsu->weapon_id]) {
+        if($attack->jutsu->weapon_id && !empty($user->items[$attack->jutsu->weapon_id])) {
             if($user->items[$attack->jutsu->weapon_id]->effect != 'diffuse' && $user->items[$attack->jutsu->weapon_id]->effect != 'element') {
                 $this->effects->setEffect(
                     $user,
@@ -782,9 +782,9 @@ class BattleManager {
         if (!$user instanceof NPC) {
             if ($attack->jutsu->weapon_id) {
                 echo $attack->jutsu->weapon_id;
-                $text .= "<span style=\"color:{$attack_jutsu_color}\"><i>" . System::unSlug($attack->jutsu->name) . " / " . System::unSlug($user->items[$attack->jutsu->weapon_id]->name) . "</br>" . '</i></span>';
+                $text .= "<b><span style=\"color:{$attack_jutsu_color}\"><i>" . System::unSlug($attack->jutsu->name) . " / " . System::unSlug($user->items[$attack->jutsu->weapon_id]->name) . "</br>" . '</i></span></b>';
             } else {
-                $text .= "<span style=\"color:{$attack_jutsu_color}\"><i>" . System::unSlug($attack->jutsu->name) . '</i></span></br>';
+                $text .= "<b><span style=\"color:{$attack_jutsu_color}\"><i>" . System::unSlug($attack->jutsu->name) . '</i></span></b></br>';
             }
         }
         $text .= $attack->jutsu->battle_text;
