@@ -735,4 +735,16 @@ return [
         'text' => ':cooljojo:',
         'public' => true,
     ],
+    [
+        'code' => ':bink:',
+        'image' => "<img src='./images/memes/bink.png' />",
+        'text' => ':bink:',
+        'public' => true,
+    ],
+    [
+        'code' => ':lyin:',
+        'image' => "<img src='./images/memes/lyin.png' />",
+        'text' => ':lyin:',
+        'public' => true,
+    ],
 ];
