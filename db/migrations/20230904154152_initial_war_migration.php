@@ -81,6 +81,27 @@ final class InitialWarMigration extends AbstractMigration
             (8, 'relics')
         ");
 
+        // Create village_relations table
+        $this->execute("CREATE TABLE `village_relations` (
+            `relation_id` INT(11) NOT NULL AUTO_INCREMENT,
+            `village1_id` INT(11) NOT NULL,
+            `village2_id` INT(11) NOT NULL,
+            `relation_type` VARCHAR(50) NOT NULL,
+            `relation_name` VARCHAR(200) NOT NULL,
+            `relation_start` INT(11) NULL DEFAULT NULL,
+            `relation_end` INT(11) NULL DEFAULT NULL,
+            PRIMARY KEY (`relation_id`))");
+        $this->execute("INSERT INTO `shinobi_chronicles`.`village_relations` (`village1_id`, `village2_id`, `relation_type`, `relation_name`, `relation_start`, `relation_end`) VALUES (1, 2, 'Neutral', 'Ancient Calm', NULL, NULL)");
+        $this->execute("INSERT INTO `shinobi_chronicles`.`village_relations` (`village1_id`, `village2_id`, `relation_type`, `relation_name`, `relation_start`, `relation_end`) VALUES (1, 3, 'Neutral', 'Ancient Calm', NULL, NULL)");
+        $this->execute("INSERT INTO `shinobi_chronicles`.`village_relations` (`village1_id`, `village2_id`, `relation_type`, `relation_name`, `relation_start`, `relation_end`) VALUES (1, 4, 'Neutral', 'Ancient Calm', NULL, NULL)");
+        $this->execute("INSERT INTO `shinobi_chronicles`.`village_relations` (`village1_id`, `village2_id`, `relation_type`, `relation_name`, `relation_start`, `relation_end`) VALUES (1, 5, 'Neutral', 'Ancient Calm', NULL, NULL)");
+        $this->execute("INSERT INTO `shinobi_chronicles`.`village_relations` (`village1_id`, `village2_id`, `relation_type`, `relation_name`, `relation_start`, `relation_end`) VALUES (2, 3, 'Neutral', 'Ancient Calm', NULL, NULL)");
+        $this->execute("INSERT INTO `shinobi_chronicles`.`village_relations` (`village1_id`, `village2_id`, `relation_type`, `relation_name`, `relation_start`, `relation_end`) VALUES (2, 4, 'Neutral', 'Ancient Calm', NULL, NULL)");
+        $this->execute("INSERT INTO `shinobi_chronicles`.`village_relations` (`village1_id`, `village2_id`, `relation_type`, `relation_name`, `relation_start`, `relation_end`) VALUES (2, 5, 'Neutral', 'Ancient Calm', NULL, NULL)");
+        $this->execute("INSERT INTO `shinobi_chronicles`.`village_relations` (`village1_id`, `village2_id`, `relation_type`, `relation_name`, `relation_start`, `relation_end`) VALUES (3, 4, 'Neutral', 'Ancient Calm', NULL, NULL)");
+        $this->execute("INSERT INTO `shinobi_chronicles`.`village_relations` (`village1_id`, `village2_id`, `relation_type`, `relation_name`, `relation_start`, `relation_end`) VALUES (3, 5, 'Neutral', 'Ancient Calm', NULL, NULL)");
+        $this->execute("INSERT INTO `shinobi_chronicles`.`village_relations` (`village1_id`, `village2_id`, `relation_type`, `relation_name`, `relation_start`, `relation_end`) VALUES (4, 5, 'Neutral', 'Ancient Calm', NULL, NULL)");
+
         // Commit Transaction
         $this->execute("COMMIT");
     }
@@ -111,6 +132,9 @@ final class InitialWarMigration extends AbstractMigration
 
         // Create resources table
         $this->execute("DROP TABLE `resources`");
+
+        // Create village_relations table
+        $this->execute("DROP TABLE `village_relations`");
 
         // Commit Transaction
         $this->execute("COMMIT");
