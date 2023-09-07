@@ -561,7 +561,7 @@ class BattleManager {
             $collision_text = $this->parseCombatText($collision_text, $this->battle->player1, $this->battle->player2);
             $this->battle->battle_text .= '[br][hr]' . $this->system->db->clean($collision_text);
         }
-        $this->battle->battle_text .= '[br][hr]';
+        $this->battle->battle_text .= '[br][hr][br]';
 
         // Apply damage/effects and set display
         if($player2_attack) {
@@ -708,13 +708,11 @@ class BattleManager {
                 $attack->raw_damage *= 1 + ($fighter->items[$action->weapon_id]->effect_amount / 100);
             }
             // Set effect in jutsu
-            else {
-                $attack->jutsu->setWeapon(
-                    $action->weapon_id,
-                    $fighter->items[$action->weapon_id]->effect,
-                    $fighter->items[$action->weapon_id]->effect_amount,
-                );
-            }
+            $attack->jutsu->setWeapon(
+                $action->weapon_id,
+                $fighter->items[$action->weapon_id]->effect,
+                $fighter->items[$action->weapon_id]->effect_amount,
+            );
         }
 
         if($attack->jutsu->isAllyTargetType()) {
@@ -747,7 +745,7 @@ class BattleManager {
 
         // Weapon effect for taijutsu (IN PROGRESS)
         if($attack->jutsu->weapon_id) {
-            if($user->items[$attack->jutsu->weapon_id]->effect != 'diffuse') {
+            if($user->items[$attack->jutsu->weapon_id]->effect != 'diffuse' && $user->items[$attack->jutsu->weapon_id]->effect != 'element') {
                 $this->effects->setEffect(
                     $user,
                     $target->combat_id,
@@ -779,12 +777,17 @@ class BattleManager {
             );
         }
 
+        $text = '';
         $attack_jutsu_color = BattleManager::getJutsuTextColor($attack->jutsu->jutsu_type);
         if (!$user instanceof NPC) {
-            $text = "<span style=\'color:{$attack_jutsu_color}\'><i>" . System::unSlug($attack->jutsu->name) . '</i></span></br>' . $attack->jutsu->battle_text;
-        } else {
-            $text = $attack->jutsu->battle_text;
+            if ($attack->jutsu->weapon_id) {
+                echo $attack->jutsu->weapon_id;
+                $text .= "<span style=\"color:{$attack_jutsu_color}\"><i>" . System::unSlug($attack->jutsu->name) . " / " . System::unSlug($user->items[$attack->jutsu->weapon_id]->name) . "</br>" . '</i></span>';
+            } else {
+                $text .= "<span style=\"color:{$attack_jutsu_color}\"><i>" . System::unSlug($attack->jutsu->name) . '</i></span></br>';
+            }
         }
+        $text .= $attack->jutsu->battle_text;
         $has_element = ($attack->jutsu->element != Jutsu::ELEMENT_NONE && $attack->jutsu->element != "none");
         $element_text = ' with ' . $attack->jutsu->element;
 
