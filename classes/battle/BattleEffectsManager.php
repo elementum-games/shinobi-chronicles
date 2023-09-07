@@ -356,11 +356,12 @@ class BattleEffectsManager {
             $damage = $target->calcDamageTaken($effect->effect_amount, $effect->damage_type, true);
             $residual_damage_raw = $target->calcDamageTaken($effect->effect_amount, $effect->damage_type, true, apply_resists : false);
             $residual_damage_resisted = $residual_damage_raw - $damage;
+            $attack_jutsu_color = BattleManager::getJutsuTextColor($effect->damage_type);
 
             if($residual_damage_resisted > 0) {
-                $this->addDisplay($target, $target->getName() . " takes $damage residual damage (resists $residual_damage_resisted residual damage)");
+                $this->addDisplay($target, $target->getName() . " takes " . "<span style=\"color:{$attack_jutsu_color}\">" . $damage . "</span>" . " residual damage (resists $residual_damage_resisted residual damage)");
             } else {
-                $this->addDisplay($target, $target->getName() . " takes $damage residual damage");
+                $this->addDisplay($target, $target->getName() . " takes " . "<span style=\"color:{$attack_jutsu_color}\">" . $damage . "</span>" . " residual damage");
             }
 
             $target->health -= $damage;
@@ -370,7 +371,7 @@ class BattleEffectsManager {
         }
         else if($effect->effect == 'heal') {
             $heal = $effect->effect_amount;
-            $this->addDisplay($target, $target->getName() . " heals $heal health");
+            $this->addDisplay($target, $target->getName() . " heals " . "<span style=\"color:green\">" . $heal . "</span>" . " health");
 
             $target->health += $heal;
             if($target->health > $target->max_health) {
@@ -556,14 +557,14 @@ class BattleEffectsManager {
     }
 
     public function getDisplayText(Fighter $fighter): string {
-        return $this->system->db->clean(
+        return htmlspecialchars_decode($this->system->db->clean(
             implode(
                 '[br]',
                 array_map(function($text) {
                     return "-{$text}-";
                 }, $this->displays[$fighter->combat_id])
             )
-        );
+        ));
     }
 
     public function addDisplay(Fighter $fighter, string $display) {

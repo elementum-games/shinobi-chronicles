@@ -474,7 +474,7 @@ class BattleManager {
         );
     }
 
-    private static function getJutsuTextColor($jutsu_type): string {
+    public static function getJutsuTextColor($jutsu_type): string {
         switch ($jutsu_type) {
             case Jutsu::TYPE_NINJUTSU:
                 return "blue";
@@ -744,7 +744,7 @@ class BattleManager {
         }
 
         // Weapon effect for taijutsu (IN PROGRESS)
-        if($attack->jutsu->weapon_id) {
+        if($attack->jutsu->weapon_id && $user->items[$attack->jutsu->weapon_id]) {
             if($user->items[$attack->jutsu->weapon_id]->effect != 'diffuse' && $user->items[$attack->jutsu->weapon_id]->effect != 'element') {
                 $this->effects->setEffect(
                     $user,
