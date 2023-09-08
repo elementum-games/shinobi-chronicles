@@ -125,7 +125,7 @@ $RANK_NAMES = RankManager::fetchNames($system);
 
     <?php foreach($team_members as $row): ?>
         <tr class='table_multicolumns'>
-            <td style='width:29%;'>
+            <td style='width:29%;text-align:center;'>
                 <a href='<?= $system->router->links['members'] ?>&user=<?= $row['user_name'] ?>'><?= $row['user_name'] ?></a>
             </td>
             <td style='width:20%;text-align:center;'><?= $RANK_NAMES[$row['rank']] ?></td>
