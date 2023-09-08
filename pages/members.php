@@ -309,7 +309,7 @@ function members(): void {
 					}
 				}
 					// Team display
-				   echo "<table id='members_team_table' class='table'><tr><th colspan='4'>Top {$results_per_page} Teams - Points This Month</th></tr><tr>
+				   echo "<table id='members_team_table' class='table' style='text-align:center;'><tr><th colspan='4'>Top {$results_per_page} Teams - Points This Month</th></tr><tr>
 						   <th>Name</th>
 						   <th>Leader</th>
 						   <th>Village</th>
@@ -327,7 +327,7 @@ function members(): void {
 
 		// List top 15 users by experience
 		else {
-			echo "<table id='members_table' class='table'><tr><th colspan='4'>$list_name</th></tr>
+			echo "<table id='members_table' class='table' style='text-align:center;'><tr><th colspan='4'>$list_name</th></tr>
 				<tr>
 					<th style='width:30%;'>Username</th>
 					<th style='width:20%;'>Rank</th>
@@ -458,7 +458,7 @@ function members(): void {
 				}
 
 				echo "<tr class='threeColumns' >
-					<td class='$class' style='width:45%;'>
+					<td class='$class' style='width:45%;text-align:center;'>
 						<a class='$link_class userLink' href='$self_link&user={$row['user_name']}'>" . $row['user_name'] . "</a></td>
 					<td class='$class' style='width:20%;text-align:center;'>" . $ranks[$row['rank']] . "</td>
 					<td class='$class' style='width:35%;text-align:center;'>
