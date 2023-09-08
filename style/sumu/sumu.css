@@ -93,7 +93,7 @@
     --clip-tall-hexagon: polygon(50% 0%,95% 20%,95% 80%,50% 100%,5% 80%,5% 20%);
     /* Travel Config */
     --travel-ui-color: #c3c9d7;
-    --travel-button-hover: #474b58;
+    --travel-button-hover: #7f869a;
     --travel-background-color: #7f869a;
     /* Battle Text Config */
     --ninjutsu_text_color: #324EB0;
