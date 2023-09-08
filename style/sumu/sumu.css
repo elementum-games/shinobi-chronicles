@@ -762,7 +762,7 @@ a.normalUser, a.normalUser:hover, a.normalUser:visited {
 
 /* Geisha Overrides */
 .contentDivHeader {
-    color: var(--font-color-2) !important;
+    color: var(--text-hover) !important;
     background: var(--sidebar-header-background);
     border-radius: 0px;
 }
