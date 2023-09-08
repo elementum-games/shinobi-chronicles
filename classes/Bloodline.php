@@ -3,7 +3,7 @@
 /* Class:		Bloodline
 */
 class Bloodline {
-    const SKILL_REDUCTION_ON_CHANGE = 0.1;
+    const SKILL_REDUCTION_ON_CHANGE = 0;
 
     const RANK_ADMIN = 5;
     const RANK_LESSER = 4;

@@ -53,18 +53,16 @@
                 <th>Purchase New Bloodline</th>
             </tr>
             <tr>
-                <td style='text-align:center;'>A researcher from the village will implant another clan's DNA into
-                    you in exchange for Ancient Kunai, allowing you to use a new bloodline
-                    <?= ($player->bloodline_id ? ' instead of your own' : '') ?>.<br/><br/>
-                    <?php if($player->bloodline_skill > 10): ?>
+                <td style='text-align:center;'>Researchers from the village will implant another clan's genetic material into
+                    your body in exchange for Ancient Kunai.
+                    <?= ($player->bloodline_id ? '<br/>This will replace your existing bloodline.' : '') ?><br/><br/>
+                    <?php if($player->bloodline_skill > 10 && Bloodline::SKILL_REDUCTION_ON_CHANGE > 0): ?>
                     <b>Warning: Your bloodline skill will be reduced by <?= (Bloodline::SKILL_REDUCTION_ON_CHANGE * 100) ?>% as
                         you must
                         re-adjust to your new bloodline!</b><br/>
                     <?php endif; ?>
-                    <br/>
-
                     <?php foreach(Bloodline::$public_ranks as $rank_id => $rank): ?>
-                        <?php if(empty($bloodlines[$rank_id])) continue; ?>
+                        <?php if(empty($bloodlines[$rank_id]) || $rank_id > 2) continue; ?>
                         <?= $rank ?> Bloodlines (<?= $premiumShopManager->costs['bloodline'][$rank_id] ?> Ancient Kunai)<br/>
                         <form action='<?= $self_link ?>&view=bloodlines' method='post'>
                             <select name='bloodline_id'>
@@ -79,7 +77,30 @@
                     <?php endforeach; ?>
                 </td>
             </tr>
-
+        </table>
+        <table class='table'>
+            <tr>
+                <th>Awaken Bloodline (Random)</th>
+            </tr>
+            <tr>
+                <td style='text-align:center;'>Researchers from the village will awaken a dormant bloodline within your lineage 
+                    in exchange for Ancient Kunai.
+                    <?= ($player->bloodline_id ? '<br/>This will replace your existing bloodline.' : '') ?><br/><br/>
+                    <?php if($player->bloodline_skill > 10 && Bloodline::SKILL_REDUCTION_ON_CHANGE > 0): ?>
+                    <b>Warning: Your bloodline skill will be reduced by <?= (Bloodline::SKILL_REDUCTION_ON_CHANGE * 100) ?>% as
+                        you must
+                        re-adjust to your new bloodline!</b><br/>
+                    <?php endif; ?>
+                    <?php foreach(Bloodline::$public_ranks as $rank_id => $rank): ?>
+                        <?php if(empty($bloodlines[$rank_id]) || $rank_id > 2) continue; ?>
+                        <?= $rank ?> Bloodline (<?= $premiumShopManager->costs['bloodline_random'][$rank_id] ?> Ancient Kunai)<br/>
+                        <form action='<?= $self_link ?>&view=bloodlines' method='post'>
+                            <input type='submit' name='purchase_bloodline_random' value='Awaken <?= $rank ?> Bloodline'/>
+                            <input type='hidden' name='bloodline_rank' value=<?=$rank_id?>/>
+                        </form>
+                    <?php endforeach; ?>
+                </td>
+            </tr>
         </table>
         <?php include('templates/bloodlineList.php') ?>
     <?php else: ?>

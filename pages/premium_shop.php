@@ -10,7 +10,7 @@ function premiumShop(): void {
     global $system;
     global $player;
     global $self_link;
-    
+
     $premiumShopManager = new PremiumShopManager($system, $player);
 
     $available_clans = $premiumShopManager->getAvailableClans();
@@ -30,8 +30,7 @@ function premiumShop(): void {
                     form_submit_prompt: "Reset my Account",
                     additional_form_data: []
                 );
-            }
-            else {
+            } else {
                 $result = $premiumShopManager->resetUser();
 
                 renderPurchaseComplete(
@@ -44,8 +43,7 @@ function premiumShop(): void {
         } catch (Exception $e) {
             $system->message($e->getMessage());
         }
-    }
-    else if (isset($_POST['name_change'])) {
+    } else if (isset($_POST['name_change'])) {
         $new_name = $system->db->clean($_POST['new_name']);
 
         try {
@@ -54,7 +52,7 @@ function premiumShop(): void {
 
                 $confirmation_string = "Changing your username to: <b>{$new_name}</b>
                 <p style='max-width:500px;margin: 10px auto -15px;'>
-                Doing this will also change your login name to the name you select, and make your old name 
+                Doing this will also change your login name to the name you select, and make your old name
                 available for anyone else to use. Would you like to proceed?
                 </p>";
 
@@ -67,13 +65,12 @@ function premiumShop(): void {
                     additional_form_data: ['new_name' => ['input_type' => 'hidden', 'value' => $new_name]]
                 );
             } else {
-               $result = $premiumShopManager->changeUserName($new_name);
+                $result = $premiumShopManager->changeUserName($new_name);
             }
         } catch (Exception $e) {
             $system->message($e->getMessage());
         }
-    }
-    else if (isset($_POST['change_gender'])) {
+    } else if (isset($_POST['change_gender'])) {
         try {
             $new_gender = $system->db->clean($_POST['new_gender']);
 
@@ -98,8 +95,7 @@ function premiumShop(): void {
         } catch (Exception $e) {
             $system->message($e->getMessage());
         }
-    }
-    else if (isset($_POST['stat_reset'])) {
+    } else if (isset($_POST['stat_reset'])) {
         try {
             $stat = $system->db->clean($_POST['stat']);
             if (!in_array($stat, $player->stats)) {
@@ -130,12 +126,11 @@ function premiumShop(): void {
             $system->message($e->getMessage());
         }
         $system->printMessage();
-    }
-    else if (isset($_POST['stat_allocate'])) {
+    } else if (isset($_POST['stat_allocate'])) {
         try {
             $original_stat = $system->db->clean($_POST['original_stat']);
             $target_stat = $system->db->clean($_POST['target_stat']);
-            $transfer_amount = (int)$_POST['transfer_amount'];
+            $transfer_amount = (int) $_POST['transfer_amount'];
             $transfer_speed = $system->db->clean($_POST['transfer_speed']);
 
             $time = $premiumShopManager->statTransferTime(
@@ -160,7 +155,7 @@ function premiumShop(): void {
                     . ($player->{$original_stat} - $transfer_amount) . "<br />"
                     . System::unSlug($target_stat) . ": {$player->{$target_stat}} -> "
                     . ($player->{$target_stat} + $transfer_amount) . "<br />"
-                    . "Cost: {$premiumShopManager->statTransferPremiumCreditCost($transfer_amount,$transfer_speed)} AK / "
+                    . "Cost: {$premiumShopManager->statTransferPremiumCreditCost($transfer_amount, $transfer_speed)} AK / "
                     . "{$premiumShopManager->statTransferYenCost($transfer_amount, $transfer_speed)} yen<br />"
                     . " This will take "
                     . System::timeRemaining($time * 60, 'long', true, true);
@@ -189,8 +184,8 @@ function premiumShop(): void {
                 renderPurchaseComplete(
                     'Stat Transfer Started',
                     "You have started transferring {$transfer_amount} " . System::unSlug($original_stat)
-                        . " to " . System::unSlug($target_stat) . ". This will take "
-                        . System::timeRemaining($time * 60, 'long', true, true)
+                    . " to " . System::unSlug($target_stat) . ". This will take "
+                    . System::timeRemaining($time * 60, 'long', true, true)
 
                 );
             }
@@ -198,8 +193,7 @@ function premiumShop(): void {
             $system->message($e->getMessage());
         }
         $system->printMessage();
-    }
-    else if (isset($_POST['reset_ai_battles'])) {
+    } else if (isset($_POST['reset_ai_battles'])) {
         try {
             $cost = $premiumShopManager->costs['reset_ai_battles'];
             if ($player->getPremiumCredits() < $cost) {
@@ -225,8 +219,7 @@ function premiumShop(): void {
             $system->message($e->getMessage());
         }
         $system->printMessage();
-    }
-    else if (isset($_POST['reset_pvp_battles'])) {
+    } else if (isset($_POST['reset_pvp_battles'])) {
         try {
             $cost = $premiumShopManager->costs['reset_pvp_battles'];
             if ($player->getPremiumCredits() < $cost) {
@@ -252,8 +245,7 @@ function premiumShop(): void {
             $system->message($e->getMessage());
         }
         $system->printMessage();
-    }
-    else if (isset($_POST['purchase_bloodline'])) {
+    } else if (isset($_POST['purchase_bloodline'])) {
         try {
             $self_link .= '&view=bloodlines';
             $bloodline_id = (int) $_POST['bloodline_id'];
@@ -277,8 +269,7 @@ function premiumShop(): void {
                 if ($player->bloodline) {
                     $confirmation_string .= "<br /><b>WARNING:</b><br />
                     Purchasing the Bloodline $bloodline_name will result in the loss of your current Bloodline
-                    {$player->bloodline_name}. This will result in loss of all Bloodline jutsu level and unlocks and 10%
-                    of your Bloodline skill!<br />
+                    {$player->bloodline_name}. This will result in loss of all Bloodline jutsu levels!<br />
                     <b>This process can not be undone!</b><br />
                     If you are part of a clan, you may also be removed from any office and be assigned a new clan.";
                 }
@@ -293,7 +284,7 @@ function premiumShop(): void {
                         'bloodline_id' => ['input_type' => 'hidden', 'value' => $bloodline_id]
                     ]
                 );
-            }
+            } 
             else {
                 if ($player->bloodline_id == $bloodline_id) {
                     throw new RuntimeException("You already have this bloodline!");
@@ -325,7 +316,7 @@ function premiumShop(): void {
                     display: false
                 );
 
-                $message = "You now have the bloodline <b>$bloodline_name</b>.";
+                $message = "You have gained the bloodline <b>$bloodline_name</b>!";
 
                 // Set clan
                 $clan_id = $result['clan_id'];
@@ -335,7 +326,98 @@ function premiumShop(): void {
 
                     $player->clan = Clan::loadFromId($system, $clan_id);
                     $player->clan_id = $clan_id;
-                    $message .= "<br />With your new bloodline you have been kicked out of your previous clan, and have been accepted by
+                    $message .= "<br />With your new bloodline you have been removed from your previous clan, and have been accepted by
+				    the " . $clan_result['name'] . " Clan.";
+                }
+
+                renderPurchaseComplete('New Bloodline!', $message);
+            }
+        } catch (Exception $e) {
+            $system->message($e->getMessage());
+        }
+    } else if (isset($_POST['purchase_bloodline_random'])) {
+        try {
+            $bloodline_rank = (int) $_POST['bloodline_rank'];
+            $self_link .= '&view=bloodlines';
+            // get list of bloodlines
+            if (!isset($_POST['confirm_bloodline_purchase'])) {
+                $confirmation_string = "Are you sure you want to purchase a random " . Bloodline::$public_ranks[$bloodline_rank] . " Bloodline?";
+                if ($player->bloodline) {
+                    $confirmation_string .= "<br /><b>WARNING:</b><br />
+                    Purchasing a Bloodline will result in the loss of your current Bloodline
+                    {$player->bloodline_name}. This will result in loss of all Bloodline jutsu levels!<br />
+                    <b>This process can not be undone!</b><br />
+                    If you are part of a clan, you may also be removed from any office and be assigned a new clan.";
+                }
+
+                renderPurchaseConfirmation(
+                    purchase_type: 'purchase_bloodline_random',
+                    confirmation_type: 'confirm_bloodline_purchase',
+                    confirmation_string: $confirmation_string,
+                    form_action_link: $self_link,
+                    form_submit_prompt: 'Receive Bloodline',
+                    additional_form_data: [
+                        'bloodline_rank' => ['input_type' => 'hidden', 'value' => $bloodline_rank]
+                    ]
+                );
+            } else {
+                $current_bloodline = $player->bloodline ? $player->bloodline_id : 0;
+                $ak_cost = $premiumShopManager->costs['bloodline_random'][$bloodline_rank];
+                $result = $system->db->query(
+                    "SELECT `bloodline_id`, `name`, `clan_id` FROM `bloodlines`
+                    WHERE `rank` = {$bloodline_rank}
+                    AND `bloodline_id` != {$player->bloodline_id}
+                ");
+                if ($system->db->last_num_rows == 0) {
+                    throw new RuntimeException("Invalid bloodline!");
+                }
+                $bloodlines = $system->db->fetch_all($result);
+                // select random bloodline
+                $new_bloodline = array_rand($bloodlines);
+                $bloodline_name = $bloodlines[$new_bloodline]['name'];
+                $bloodline_id = $bloodlines[$new_bloodline]['bloodline_id'];
+                // give bloodline
+                if ($player->bloodline_id == $bloodline_id) {
+                    throw new RuntimeException("You already have this bloodline!");
+                }
+                if ($player->getPremiumCredits() < $ak_cost) {
+                    throw new RuntimeException("You do not have enough Ancient Kunai!");
+                }
+                //Check clan office detail & remove player from clan data if present
+                if ($player->clan && $player->clan->leader_id == $player->user_id) {
+                    $system->db->query("UPDATE `clans` SET `leader` = '0' WHERE `clan_id` = '{$player->clan->id}'");
+                } else if ($player->clan && $player->clan->elder_1_id == $player->user_id) {
+                    $system->db->query("UPDATE `clans` SET `elder_1` = '0' WHERE `clan_id` = '{$player->clan->id}'");
+                } else if ($player->clan && $player->clan->elder_2_id == $player->user_id) {
+                    $system->db->query("UPDATE `clans` SET `elder_2` = '0' WHERE `clan_id` = '{$player->clan->id}'");
+                }
+                //Remove office from player data if present
+                if ($player->clan_office) {
+                    $player->clan_office = 0;
+                }
+
+                //Process purchase
+                $player->subtractPremiumCredits($ak_cost, "Purchased bloodline {$bloodline_name} (#$bloodline_id)");
+
+                // Give bloodline
+                $status = Bloodline::giveBloodline(
+                    system: $system,
+                    bloodline_id: $bloodline_id,
+                    user_id: $player->user_id,
+                    display: false
+                );
+
+                $message = "You have gained the bloodline <b>$bloodline_name</b>!";
+
+                // Set clan
+                $clan_id = $bloodlines[$new_bloodline]['clan_id'];
+                $result = $system->db->query("SELECT `name` FROM `clans` WHERE `clan_id` = '$clan_id' LIMIT 1");
+                if ($system->db->last_num_rows > 0) {
+                    $clan_result = $system->db->fetch($result);
+
+                    $player->clan = Clan::loadFromId($system, $clan_id);
+                    $player->clan_id = $clan_id;
+                    $message .= "<br />With your new bloodline you have been removed from your previous clan, and have been accepted by
 				    the " . $clan_result['name'] . " Clan.";
                 }
 
