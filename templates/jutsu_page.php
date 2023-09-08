@@ -44,7 +44,6 @@ $rank_names = RankManager::fetchNames($system);
     }
     .jutsu_select_wrapper {
         border-radius: 36px;
-        border-color: var(--theme-content-darker2-bg-color) !important;
         display:inline-block;
         margin: 10px;
         overflow:hidden;

@@ -765,3 +765,6 @@ select {
 #content table.table td.newsFooter {
     background-color: var(--sidebar-header-background);
 }
+.jutsu_select_wrapper {
+    border-color: var(--sidebar-button-border-color) !important;
+}

@@ -96,10 +96,10 @@
     --travel-button-hover: #474b58;
     --travel-background-color: #7f869a;
     /* Battle Text Config */
-    --ninjutsu_text_color: #4C8CFF;
-    --taijutsu_text_color: #FF4C4C;
-    --genjutsu_text_color: #B54CFF;
-    --heal_text_color: #4CFF70;
+    --ninjutsu_text_color: #324EB0;
+    --taijutsu_text_color: #B03232;
+    --genjutsu_text_color: #8032B0;
+    --heal_text_color: #2A8A48;
 }
 
 /* Helper Classes - TO-DO: remove helpers, organize module CSS classes */
@@ -774,7 +774,7 @@ a.normalUser, a.normalUser:hover, a.normalUser:visited {
     background: var(--sidebar-button-background-color);
 }
 #content table.table th {
-    color: var(--font-color-2);
+    color: var(--text-hover);
     background: var(--sidebar-header-background);
     text-shadow: 0 1px 0 #000000;
     font-family: var(--font-primary);
@@ -796,30 +796,30 @@ a.normalUser, a.normalUser:hover, a.normalUser:visited {
     background-color: var(--sidebar-button-background-color);
 }
 #content table.table td.row2 {
-    background: var(--sidebar-button-background-hover);
+    background: var(--content-background-color);
 }
 #content table.table td {
     border: 1px solid var(--sidebar-button-border-color);
 }
 input {
-    background: var(--sidebar-button-background-hover);
+    background: var(--content-background-color);
     color: var(--font-color-3);
-    border-color: var(--font-color-3);
+    border-color: var(--sidebar-button-border-color);
 }
 textarea {
     background: var(--content-background-color);
     color: var(--font-color-3);
-    border-color: var(--font-color-3);
+    border-color: var(--sidebar-button-border-color);
 }
 select {
     background: var(--content-background-color);
     color: var(--font-color-3);
-    border-color: var(--font-color-3);
+    border-color: var(--sidebar-button-border-color);
 }
 #content .button, .contentDiv button {
     background: var(--content-background-color);
     color: var(--font-color-3);
-    border-color: var(--font-color-3);
+    border-color: var(--sidebar-button-border-color);
 }
     #content .button:hover, .contentDiv button:hover {
         background: var(--box-color-default);
@@ -859,7 +859,7 @@ select {
         background: var(--sidebar-header-background);
     }
     #content ul.submenu a {
-        color: var(--font-color-2);
+        color: var(--text-hover);
         text-shadow: 0 1px 0 #000000;
         font-family: var(--font-primary);
         font-variant: var(--font-primary-variant);
@@ -896,7 +896,7 @@ select {
     color: var(--heal_text_color) !important;
 }
 #content table.table th a {
-    color: var(--font-color-2);
+    color: var(--text-hover);
 }
 #content table.table th a:hover {
     color: var(--font-color-4);
@@ -912,9 +912,12 @@ select {
         border-color: var(--sidebar-button-border-color) !important;
     }
 .kunaiPack {
-    background: var(--avatar-frame-border_gradient) !important;
+    background: var(--content-background-color) !important;
     color: black !important;
 }
 #content table.table td.newsFooter {
     background-color: var(--sidebar-header-background);
+}
+.jutsu_select_wrapper {
+    border-color: var(--sidebar-button-border-color) !important;
 }
