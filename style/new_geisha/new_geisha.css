@@ -95,6 +95,11 @@
     --travel-ui-color: #1a191d;
     --travel-button-hover: #262631;
     --travel-background-color: #20222b;
+    /* Battle Text Config */
+    --ninjutsu_text_color: #4C8CFF;
+    --taijutsu_text_color: #FF4C4C;
+    --genjutsu_text_color: #B54CFF;
+    --heal_text_color: #4CFF70;
 }
 
 /* Helper Classes - TO-DO: remove helpers, organize module CSS classes */
@@ -600,4 +605,163 @@ a.normalUser, a.normalUser:hover, a.normalUser:visited {
     #content {
         width: 100%;
     }
+}
+
+/* Geisha Overrides */
+.contentDivHeader {
+    color: var(--font-color-2) !important;
+    background: var(--sidebar-header-background);
+    border-radius: 0px;
+}
+#content {
+    color: var(--font-color-3);
+    font-family: var(--font-secondary);
+}
+.contentDiv, .contentDivMed {
+    background: var(--sidebar-button-background-color);
+}
+#content table.table th {
+    color: var(--font-color-2);
+    background: var(--sidebar-header-background);
+    text-shadow: 0 1px 0 #000000;
+    font-family: var(--font-primary);
+    font-variant: var(--font-primary-variant);
+    font-size: var(--font-medium);
+}
+#content table.table {
+    background-color: var(--sidebar-button-background-color);
+    border-radius: 0px;
+    font-size: var(--font-default);
+}
+#content td a {
+    color: var(--font-link);
+}
+#content a, a:visited {
+    color: var(--font-link);
+}
+#content table.table td.row1 {
+    background-color: var(--sidebar-button-background-color);
+}
+#content table.table td.row2 {
+    background: var(--sidebar-button-background-hover);
+}
+#content table.table td {
+    border: 1px solid var(--sidebar-button-border-color);
+}
+input {
+    background: var(--sidebar-button-background-hover);
+    color: var(--font-color-3);
+    border-color: var(--font-color-3);
+}
+textarea {
+    background: var(--content-background-color);
+    color: var(--font-color-3);
+    border-color: var(--font-color-3);
+}
+select {
+    background: var(--content-background-color);
+    color: var(--font-color-3);
+    border-color: var(--font-color-3);
+}
+#content .button, .contentDiv button {
+    background: var(--content-background-color);
+    color: var(--font-color-3);
+    border-color: var(--font-color-3);
+}
+    #content .button:hover, .contentDiv button:hover {
+        background: var(--box-color-default);
+        color: var(--font-color-2);
+        border-color: var(--font-color-2);
+    }
+#jutsu .jutsuName {
+    background: var(--content-background-color) !important;
+    color: var(--font-color-3);
+    border-color: var(--font-color-3);
+}
+    #jutsu .jutsuName:hover {
+        background: var(--box-color-default) !important;
+    }
+    #jutsu .jutsuName.selected_jutsu {
+        border-color: var(--font-color-2);
+        color: var(--font-color-2);
+        background: var(--box-color-default) !important;
+    }
+.weapon {
+    background: var(--content-background-color) !important;
+    color: var(--font-color-3);
+    border-color: var(--font-color-3);
+}
+    .weapon:hover {
+        background: var(--box-color-default) !important;
+    }
+    .weapon.selected_weapon {
+    border-color: var(--font-color-2);
+    color: var(--font-color-2);
+    background: var(--box-color-default) !important;
+}
+#content ul.submenu {
+    background: var(--sidebar-header-color);
+}
+    #content ul.submenu li {
+        background: var(--sidebar-header-background);
+    }
+    #content ul.submenu a {
+        color: var(--font-color-2);
+        text-shadow: 0 1px 0 #000000;
+        font-family: var(--font-primary);
+        font-variant: var(--font-primary-variant);
+        font-size: var(--font-medium);
+    }
+        #content ul.submenu a:hover {
+            text-shadow: none;
+        }
+#content table.table tr:first-child td:last-child, #content table.table tr:first-child th:last-child {
+    border-top-right-radius: 0px;
+}
+#content table.table tr:first-child td:first-child, #content table.table tr:first-child th:first-child {
+    border-top-left-radius: 0px;
+}
+.healthFill {
+    background: var(--health-fill) !important;
+}
+.staminaFill {
+    background: var(--stamina-fill) !important;
+}
+.chakraFill {
+    background: var(--chakra-fill) !important;
+}
+.battle_text_ninjutsu {
+    color: var(--ninjutsu_text_color) !important;
+}
+.battle_text_taijutsu {
+    color: var(--taijutsu_text_color) !important;
+}
+.battle_text_genjutsu {
+    color: var(--genjutsu_text_color) !important;
+}
+.battle_text_heal {
+    color: var(--heal_text_color) !important;
+}
+#content table.table th a {
+    color: var(--font-color-2);
+}
+#content table.table th a:hover {
+    color: var(--font-color-4);
+}
+.jutsu_filter_button {
+    background-color: var(--sidebar-button-background-color) !important;
+    color: var(--font-color-3) !important;
+    border-color: var(--sidebar-button-border-color) !important;
+}
+    .jutsu_filter_button.active {
+        background-color: var(--sidebar-button-background-hover) !important;
+        color: var(--font-color-2) !important;
+        border-color: var(--sidebar-button-border-color) !important;
+    }
+.kunaiPack {
+    background: var(--avatar-frame-border_gradient) !important;
+    color: black !important;
+}
+#content table.table td.newsFooter {
+    background-color: var(--sidebar-header-background);
 }

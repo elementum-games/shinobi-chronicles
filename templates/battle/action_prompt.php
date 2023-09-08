@@ -229,9 +229,11 @@ $prefill_item_id = $_POST['item_id'] ?? '';
 
             if(currentlySelectedJutsu !== false) {
                 $(currentlySelectedJutsu).css('box-shadow', '0px');
+                $(currentlySelectedJutsu).removeClass('selected_jutsu');
             }
             currentlySelectedJutsu = this;
             $(currentlySelectedJutsu).css('box-shadow', '0px 0px 4px 0px #000000');
+            $(currentlySelectedJutsu).addClass('selected_jutsu');
             $('.handsealTooltip').html('&nbsp;');
             var handseal_string = $(this).attr('data-handseals');
             var handseal_array = handseal_string.split('-');
@@ -247,9 +249,11 @@ $prefill_item_id = $_POST['item_id'] ?? '';
         $('.weapon').click(function(){
             if(currentlySelectedWeapon !== false) {
                 $(currentlySelectedWeapon).css('box-shadow', '0px');
+                $(currentlySelectedWeapon).removeClass('selected_weapon');
             }
             currentlySelectedWeapon = this;
             $(currentlySelectedWeapon).css('box-shadow', '0px 0px 4px 0px #000000');
+            $(currentlySelectedWeapon).addClass('selected_weapon');
             $('#weaponID').val( $(this).attr('data-id') );
             $('#weaponElement').val($(this).attr('data-element') || "None");
         });

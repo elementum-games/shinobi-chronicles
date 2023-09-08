@@ -782,9 +782,9 @@ class BattleManager {
         if (!$user instanceof NPC) {
             if ($attack->jutsu->weapon_id) {
                 echo $attack->jutsu->weapon_id;
-                $text .= "<b><span style=\"color:{$attack_jutsu_color}\"><i>" . System::unSlug($attack->jutsu->name) . " / " . System::unSlug($user->items[$attack->jutsu->weapon_id]->name) . "</br>" . '</i></span></b>';
+                $text .= "<b><span class=\"battle_text_{$attack->jutsu->jutsu_type}\" style=\"color:{$attack_jutsu_color}\"><i>" . System::unSlug($attack->jutsu->name) . " / " . System::unSlug($user->items[$attack->jutsu->weapon_id]->name) . "</br>" . '</i></span></b>';
             } else {
-                $text .= "<b><span style=\"color:{$attack_jutsu_color}\"><i>" . System::unSlug($attack->jutsu->name) . '</i></span></b></br>';
+                $text .= "<b><span class=\"battle_text_{$attack->jutsu->jutsu_type}\" style=\"color:{$attack_jutsu_color}\"><i>" . System::unSlug($attack->jutsu->name) . '</i></span></b></br>';
             }
         }
         $text .= $attack->jutsu->battle_text;
@@ -795,13 +795,13 @@ class BattleManager {
               if($damage_resisted > 0 ) {
                     $text .= "<p style=\"font-weight:bold;\">
                             {$user->getName()} deals
-                                <span style=\"color:{$attack_jutsu_color}\">
+                                <span class=\"battle_text_{$attack->jutsu->jutsu_type}\" style=\"color:{$attack_jutsu_color}\">
                                     " . sprintf('%.2f', $attack_damage) . " damage
                                 </span>
                                     to {$target->getName()}" . ($has_element ? $element_text : "") . ".
                                 <span style=\"font-weight:bold;\">
                                     (resists
-                                 <span style=\"color:{$attack_jutsu_color}\">
+                                 <span class=\"battle_text_{$attack->jutsu->jutsu_type}\" style=\"color:{$attack_jutsu_color}\">
                                     " . sprintf('%.2f', $damage_resisted) . "
                                 </span>
                                  damage)
@@ -809,7 +809,7 @@ class BattleManager {
                 else {
                         $text .= "<p style=\"font-weight:bold;\">
                             {$user->getName()} deals
-                                <span style=\"color:{$attack_jutsu_color}\">
+                                <span class=\"battle_text_{$attack->jutsu->jutsu_type}\" style=\"color:{$attack_jutsu_color}\">
                                     " . sprintf('%.2f', $attack_damage) . " damage
                                 </span>
                                     to {$target->getName()}" . ($has_element ? $element_text : "") . ".

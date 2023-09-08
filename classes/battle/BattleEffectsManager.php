@@ -359,9 +359,9 @@ class BattleEffectsManager {
             $attack_jutsu_color = BattleManager::getJutsuTextColor($effect->damage_type);
 
             if($residual_damage_resisted > 0) {
-                $this->addDisplay($target, $target->getName() . " takes " . "<span style=\"color:{$attack_jutsu_color}\">" . $damage . "</span>" . " residual damage (resists $residual_damage_resisted residual damage)");
+                $this->addDisplay($target, $target->getName() . " takes " . "<span class=\"battle_text_{$effect->damage_type}\" style=\"color:{$attack_jutsu_color}\">" . $damage . "</span>" . " residual damage (resists $residual_damage_resisted residual damage)");
             } else {
-                $this->addDisplay($target, $target->getName() . " takes " . "<span style=\"color:{$attack_jutsu_color}\">" . $damage . "</span>" . " residual damage");
+                $this->addDisplay($target, $target->getName() . " takes " . "<span class=\"battle_text_{$effect->damage_type}\" style=\"color:{$attack_jutsu_color}\">" . $damage . "</span>" . " residual damage");
             }
 
             $target->health -= $damage;
@@ -371,7 +371,7 @@ class BattleEffectsManager {
         }
         else if($effect->effect == 'heal') {
             $heal = $effect->effect_amount;
-            $this->addDisplay($target, $target->getName() . " heals " . "<span style=\"color:green\">" . $heal . "</span>" . " health");
+            $this->addDisplay($target, $target->getName() . " heals " . "<span class=\"battle_text_heal\" style=\"color:green\">" . $heal . "</span>" . " health");
 
             $target->health += $heal;
             if($target->health > $target->max_health) {
