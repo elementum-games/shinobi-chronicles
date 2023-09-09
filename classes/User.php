@@ -253,6 +253,8 @@ class User extends Fighter {
 
     public int $special_mission;
 
+    public int $operation;
+
     public int $exam_stage;
 
     public int $last_ai_ms;
@@ -547,6 +549,7 @@ class User extends Fighter {
         }
 
         $this->special_mission = $user_data['special_mission'];
+        $this->operation = $user_data['operation'];
 
         $this->exam_stage = $user_data['exam_stage'];
 
@@ -1814,6 +1817,12 @@ class User extends Fighter {
             $query .= "`special_mission`='0',";
         }
 
+        if ($this->operation) {
+            $query .= "`operation`='$this->operation',";
+        } else {
+            $query .= "`operation`='0',";
+        }
+
         $query .= "`exam_stage` = '{$this->exam_stage}',
 		`last_ai_ms` = '$this->last_ai_ms',
 		`last_free_stat_change` = '{$this->last_free_stat_change}',
@@ -2201,10 +2210,11 @@ class User extends Fighter {
     const LOG_SPECIAL_MISSION = 'special_mission';
     const LOG_IN_BATTLE = 'in_battle';
     const LOG_NOT_IN_VILLAGE = 'not_in_village';
+    const LOG_OPERATION = 'operation';
 
     public function log(string $log_type, string $log_contents): bool {
         $valid_log_types = [
-            self::LOG_TRAINING, self::LOG_ARENA, self::LOG_LOGIN, self::LOG_MISSION, self::LOG_SPECIAL_MISSION, self::LOG_IN_BATTLE, self::LOG_NOT_IN_VILLAGE
+            self::LOG_TRAINING, self::LOG_ARENA, self::LOG_LOGIN, self::LOG_MISSION, self::LOG_SPECIAL_MISSION, self::LOG_IN_BATTLE, self::LOG_NOT_IN_VILLAGE, self::LOG_OPERATION
         ];
         if(!in_array($log_type, $valid_log_types)) {
             error_log("Invalid player log type {$log_type}");
